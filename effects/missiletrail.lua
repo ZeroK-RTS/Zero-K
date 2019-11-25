@@ -20,7 +20,140 @@
 -- bdtrail
 -- voidtrail
 
-return {
+local cegs = {
+  ["rocket_trail_bar"] = {
+    largeflash = {
+      air                = true,
+      class              = "CBitmapMuzzleFlame",
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = "1 0.3 0.1 0.01 1 0.3 0.1 0.01 0 0 0 0.01",
+        dir                = "dir",
+        frontoffset        = 0,
+        fronttexture       = "muzzlefront",
+        length             = -17,
+        sidetexture        = "muzzleside",
+        size               = -4.5,
+        sizegrowth         = 0.4,
+        ttl                = 2,
+      },
+    },
+    fireglow = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0,
+        colormap           = [[0.11 0.077 0.015 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 90,
+        emitrotspread      = 0,
+        emitvector         = [[dir]],
+        gravity            = [[0.0, 0.0, 0.0]],
+        numparticles       = 1,
+        particlelife       = 2,
+        particlelifespread = 0,
+        particlesize       = 28,
+        particlesizespread = 6,
+        particlespeed      = 0,
+        particlespeedspread = 0,
+        pos                = [[0.0, 90, 0.0]],
+        sizegrowth         = 0,
+        sizemod            = 1,
+        texture            = [[glow2]],
+        useairlos          = true,
+      },
+    },
+    sparks = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.9,
+        colormap           = [[0.9 0.5 0.4 0.01   0.9 0.4 0.1 0.007  0.4 0.15 0.05 0.007   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 180,
+        emitrotspread      = 7,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 2,
+        particlelifespread = 2,
+        particlesize       = 21,
+        particlesizespread = 25,
+        particlespeed      = 2,
+        particlespeedspread = 4,
+        pos                = [[0, 90 ,0]],
+        sizegrowth         = -2.4,
+        sizemod            = 0.8,
+        texture            = [[gunshotglow]],
+        useairlos          = false,
+      },
+    },
+    smoke = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.92,
+        colormap           = [[0.05 0.04 0.033 0.5   0.04 0.038 0.034 0.5   0.04 0.036 0.032 0.42   0.025 0.025 0.025 0.27   0.014 0.014 0.014 0.13    0.006 0.006 0.006 0.05   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = -180,
+        emitrotspread      = 17,
+        emitvector         = [[dir]],
+        gravity            = [[0.0, -0.01, 0.0]],
+        numparticles       = [[3 r4]],
+        particlelife       = 10,
+        particlelifespread = 25,
+        particlesize       = 2.5,
+        particlesizespread = 3.5,
+        particlespeed      = 1.5,
+        particlespeedspread = 2.5,
+        pos                = [[-2 r4, -2 r4, -2 r4]],
+        sizegrowth         = 0.11,
+        sizemod            = 1,
+        texture            = [[smoke]],
+        useairlos          = true,
+      },
+    },
+    smoke2 = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.92,
+        colormap           = [[0.12 0.09 0.08 0.4   0.095 0.085 0.07 0.33   0.08 0.072 0.07 0.24   0.05 0.045 0.04 0.15   0.027 0.027 0.027 0.08    0.012 0.012 0.012 0.04   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = -180,
+        emitrotspread      = 17,
+        emitvector         = [[dir]],
+        gravity            = [[0.0, -0.01, 0.0]],
+        numparticles       = 2,
+        particlelife       = 10,
+        particlelifespread = 15,
+        particlesize       = 2.5,
+        particlesizespread = 3.5,
+        particlespeed      = 1.5,
+        particlespeedspread = 2.5,
+        pos                = [[-2 r4, -2 r4, -2 r4]],
+        sizegrowth         = 0.11,
+        sizemod            = 1,
+        texture            = [[smoke]],
+        useairlos          = true,
+      },
+    },
+  },
   ["missiletrailredsmall"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -1528,4 +1661,51 @@ return {
   },
 }
 
+local variantes = {
+	rocket_trail_bar_flameboosted = {
+		source = "rocket_trail_bar",
+		data = {
+			largeflash = {
+				properties = {
+					length = -18,
+					size = -5,
+					sizegrowth = 0.75,
+					ttl = 3,
+				},
+			},
+			smoke = {
+				properties = {
+					emitrotspread      = 20,
+					particlesizespread = 5,
+				},
+			},
+			smoke2 = {
+				properties = {
+					emitrotspread      = 20,
+					particlesizespread = 5,
+				},
+			},
+			spikes = {
+				air    = true,
+				class  = "explspike",
+				count  = 3,
+				ground = true,
+				water  = true,
+				properties = {
+					alpha      = 1,
+					alphadecay = 0.25,
+					color      = "0.8, 0.1, 0",
+					dir        = "-6 r12,-6 r12,-6 r12",
+					length     = 8,
+					width      = 5,
+				},
+			},
+		},
+	},
+}
 
+local suMergeTable = Spring.Utilities.MergeTable
+for variante, info in pairs(variantes) do
+	cegs[variante] = suMergeTable(info.data, cegs[info.source], true)
+end
+return cegs
