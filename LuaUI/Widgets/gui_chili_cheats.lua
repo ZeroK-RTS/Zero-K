@@ -224,7 +224,7 @@ local function AddGodmodeToggle(parent, offset)
 		checked = Spring.IsGodModeEnabled(),
 		parent = parent,
 		OnChange = {function(self, value)
-			Spring.SendCommands("godmode " .. (value and 1 or 0))
+			Spring.SendCommands("godmode " .. (value and 3 or 0))
 		end},
 	}
 
