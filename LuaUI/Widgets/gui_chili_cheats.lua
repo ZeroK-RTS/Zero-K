@@ -224,6 +224,9 @@ local function AddGodmodeToggle(parent, offset)
 		checked = Spring.IsGodModeEnabled(),
 		parent = parent,
 		OnChange = {function(self, value)
+			-- the param is a bitfield, 1 for allies and 2 for enemies, so
+			-- in theory those could be separate toggles, but I don't think
+			-- anybody minds the wider control
 			Spring.SendCommands("godmode " .. (value and 3 or 0))
 		end},
 	}
