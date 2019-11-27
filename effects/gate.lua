@@ -15,7 +15,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 0 0 0.01  0.3 0.3 0.3 0.3      0 0 0 0.01]],
@@ -38,16 +38,15 @@ return {
       },
     },
   },
-  
 
-["gate_teleport"] = {
+  ["gate_teleport"] = {
     boom = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:PARIS]],
@@ -61,7 +60,7 @@ return {
       count              = 2,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = [[0 i2]],
         explosiongenerator = [[custom:GATE_TELEPORT_GLOW]],
@@ -74,7 +73,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = [[55 i10]], -- [[110 i20]],
         explosiongenerator = [[custom:GATE_TELEPORT_RGROUNDFLASH]],
@@ -87,7 +86,7 @@ return {
       count              = 30,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = [[80r62]],
         explosiongenerator = [[custom:GATE_TELEPORT_SMOKE]],
@@ -100,7 +99,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = [[30 r10]], -- [[60 r20]],
         explosiongenerator = [[custom:GATE_TELEPORT_YGROUNDFLASH]],
@@ -116,7 +115,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:GATE_TELEPORT_CIRCLE_LIGHTNING_SINGLE]],
@@ -129,7 +128,7 @@ return {
       flashalpha         = 0.3,
       flashsize          = 46,
       ttl                = 3,
-	  underwater         = true,
+      underwater         = true,
       color = {
         [1]  = 0.5,
         [2]  = 0.5,
@@ -145,7 +144,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 0 0 0.01   1 1 1 1             0 0 0 0.01]],
@@ -189,7 +188,7 @@ return {
       flashalpha         = 1,
       flashsize          = 150,
       ttl                = 60, --120,
-	  underwater         = true,
+      underwater         = true,
       color = {
         [1]  = 1,
         [2]  = 0.20000000298023,
@@ -205,7 +204,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.5,
         colormap           = [[1 1 1 0.01     1 1 1 0.01]],
@@ -236,7 +235,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:GATE_TELEPORT]],
@@ -252,7 +251,7 @@ return {
       flashalpha         = 1,
       flashsize          = 150,
       ttl                = 75, --150,
-	  underwater         = true,
+      underwater         = true,
       color = {
         [1]  = 1,
         [2]  = 1,
@@ -260,6 +259,5 @@ return {
       },
     },
   },
-
 }
 

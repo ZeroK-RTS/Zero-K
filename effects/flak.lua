@@ -95,7 +95,7 @@ return {
       },
     },
   },
-  
+
   ["flak_trail"] = {
     burst = {
       air                = true,

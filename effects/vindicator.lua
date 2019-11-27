@@ -120,7 +120,7 @@ return {
       },
     },
   },
-  
+
   ["uw_vindiback"] = {
     fire = {
       air                = true,
@@ -157,7 +157,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.6,
         useairlos       = false,
@@ -187,7 +187,7 @@ return {
       count              = 1,
       ground             = true,
       water              = false,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.95,
         colormap           = [[0 0 0 0.001 0.04 0.04 0.04 0.2    0 0 0 0.001]],

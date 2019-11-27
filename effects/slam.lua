@@ -123,7 +123,6 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-
     sheatpillar = {
       class              = [[CExpGenSpawner]],
       count              = 32,
@@ -174,8 +173,6 @@ return {
         --~ pos                = [[0, 0, 0]],
       --~ },
     --~ },
-
-    
   },
 
    ["slam_air_scrap"] = {
@@ -257,8 +254,7 @@ return {
       count              = 24,
       ground             = true,
       water              = true,
-      
-      underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = [[12 i0.083333]],
         dir                = [[dir]],

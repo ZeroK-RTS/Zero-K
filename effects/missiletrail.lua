@@ -259,7 +259,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["missiletrailpurple"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -340,7 +340,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["missiletrailblue"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -1098,7 +1098,7 @@ local cegs = {
     alwaysvisible           = false,
     usedefaultexplosions    = false,
 
-	largeflash = {
+    largeflash = {
       air                   = true,
       class                 = [[CBitmapMuzzleFlame]],
       count                 = 1,
@@ -1117,7 +1117,7 @@ local cegs = {
         ttl                 = 7,
       },
     },
-	
+
     smoke_front = {
       air                   = true,
       class                 = [[CSimpleParticleSystem]],
@@ -1190,7 +1190,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["disarmtrail"] = {
     alwaysvisible           = false,
     usedefaultexplosions    = false,
@@ -1272,7 +1272,7 @@ local cegs = {
     alwaysvisible           = false,
     usedefaultexplosions    = false,
 
-	largeflash = {
+    largeflash = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,
@@ -1307,7 +1307,7 @@ local cegs = {
         width              = 5,
       },
     },
-    
+
     sparks = {
       air                   = true,
       class                 = [[CSimpleParticleSystem]],

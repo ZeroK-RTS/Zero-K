@@ -105,9 +105,7 @@ local cegs = {
       },
     },
   },
-
-  
-["beamlaser_hit_green"] = {
+  ["beamlaser_hit_green"] = {
     usedefaultexplosions = false,
     glow = {
       air                = true,
@@ -192,7 +190,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_hit_yellow_groundflash"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -208,7 +205,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_hit_yellow_small"] = {
      usedefaultexplosions = false,
      flash = {
@@ -241,7 +237,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_hit_yellow_tiny"] = {
     usedefaultexplosions = false,
     pikes = {
@@ -285,7 +280,6 @@ local cegs = {
         texture            = [[plasma]],
       },
     },
-	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 2,
@@ -298,7 +292,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_hit_yellow"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -353,7 +346,6 @@ local cegs = {
         texture            = [[plasma]],
       },
     },
-	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 16,
@@ -421,7 +413,6 @@ local cegs = {
         texture            = [[plasma]],
       },
     },
-	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 16,
@@ -433,10 +424,7 @@ local cegs = {
         pos                = [[0, 0, 0]],
       },
     },
-	
-
   },
-  
   ["beamweapon_hit_yellow_steam"] = {
     steam = {
       class              = [[CSimpleParticleSystem]],
@@ -657,7 +645,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_hit_purple"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -712,7 +699,6 @@ local cegs = {
         texture            = [[plasma]],
       },
     },
-	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 16,
@@ -780,7 +766,6 @@ local cegs = {
         texture            = [[plasma]],
       },
     },
-	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 16,
@@ -793,7 +778,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_muzzle_red"] = {
     usedefaultexplosions = false,
     glow = {
@@ -869,7 +853,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_muzzle_yellow_small"] = {
     usedefaultexplosions = false,
     glow = {
@@ -907,7 +890,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_muzzle_white"] = {
     usedefaultexplosions = false,
     glow = {
@@ -945,7 +927,6 @@ local cegs = {
       },
     },
   },
- 
   ["beamweapon_muzzle_orange"] = {
     usedefaultexplosions = false,
     glow = {
@@ -983,7 +964,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_muzzle_orange_small"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1021,7 +1001,6 @@ local cegs = {
       },
     },
   },
-  
   ["beamweapon_muzzle_blue"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1059,7 +1038,6 @@ local cegs = {
       },
     },
   },
-
   ["beamweapon_muzzle_purple"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1097,7 +1075,6 @@ local cegs = {
       },
     },
   },
- 
   ["beamweapon_muzzle_teal"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1155,7 +1132,6 @@ local colors = {
       },
     },
   },
-  
   beamweapon_muzzle_red_large = {
     source = "beamweapon_muzzle_yellow",
     data = {
@@ -1164,7 +1140,6 @@ local colors = {
       },
     },
   },
-  
   beamweapon_hit_green = {
     source = "beamweapon_hit_yellow",
     data = {
@@ -1189,7 +1164,6 @@ local colors = {
       },
     },
   },
-  
   beamweapon_hit_red_large = {
     source = "beamweapon_hit_yellow",
     data = {

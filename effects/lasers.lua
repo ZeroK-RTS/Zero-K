@@ -251,7 +251,7 @@ return {
         dir                = [[-1 r2,-1 r2,-1 r2]],
         length             = 3,
         width              = 5,
-		lengthGrowth       = 0.1,
+        lengthGrowth       = 0.1,
       },
     },
     sparks = {
@@ -522,7 +522,7 @@ return {
       },
     },
   },
-  
+
   ["flash1bluedark"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -593,7 +593,7 @@ return {
     },
   },
 
-   ["flash1green"] = {
+  ["flash1green"] = {
     usedefaultexplosions = false,
     meltage = {
       air                = true,
@@ -607,7 +607,7 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-	pikes = {
+    pikes = {
       air                = true,
       class              = [[explspike]],
       count              = 5,
@@ -622,7 +622,7 @@ return {
         width              = 10,
       },
     },
-	sparks = {
+    sparks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
@@ -649,9 +649,9 @@ return {
         texture            = [[plasma]],
       },
     },
-   },
-   
-   ["flash2purple"] = {
+  },
+
+  ["flash2purple"] = {
     usedefaultexplosions = false,
     groundflash = {
       circlealpha        = 0,
@@ -1067,7 +1067,7 @@ return {
       },
     },
   },
-  
+
   ["coregreen"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -1192,7 +1192,7 @@ return {
       },
     },
   },
-  
+
   ["flashslow"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -1262,7 +1262,7 @@ return {
       },
     },
   },
-  
+
   ["slow_melt"] = {
     groundflash = {
       circlealpha        = 1,
@@ -1277,7 +1277,7 @@ return {
       },
     },
   },
-  
+
   ["flashslowwithsparks"] = {
     usedefaultexplosions = false,
     groundflash = {

@@ -64,7 +64,6 @@ local cegs = {
       },
     },
     redploom_1 = GetPloomPos([[ 0 r10,  0 r10,  0 r10]]),
-	
     redploom_2 = GetPloomPos([[ 42 r10,  35 r10,  0  r10]]),
     redploom_3 = GetPloomPos([[-42 r10,  35 r10,  0  r10]]),
     redploom_6 = GetPloomPos([[ 0  r10,  35 r10,  42 r10]]),
@@ -184,15 +183,15 @@ local cegs = {
         -- RADIUS y10 = 200 + -1 * rand(200^(1/4))^4
         -- ANGLE  y11 = rand(2 pi) - pi
         -- A = rand(1)
-        
+
         -- theta = ANGLE
         -- phi = 2 * arcsin(sqrt(A))
-        
+
         -- XZMULT = sin(phi) = sin(2 * arcsin(sqrt(A))) = 2*sqrt(1 - A) * sqrt(A)
         -- X = cos(ANGLE) * RADIUS * XZMULT
         -- Y = (1 - 2*A) * RADIUS
         -- Z = sin(ANGLE) * RADIUS * XZMULT
-        
+
         -- Old-not-so-good sphere
         -- [[r6.3496 y10 -1 x10x10x10 y10 256 a10     y10 r6.2831 y11 -3.1415 a11 y11      r1 y12 -0.5 a12 y0 1 x0x0 p0.5 y0 -1 x12 y1 0 a1 a0 y0 -0.5 x0 y0 0.25 a0 p0.5 y0   -1 x12 y1 0.5 a1 y1 1 x1x1 p0.5 y1 0 a12 a1 y1 -0.5 x1 y1 0.75 a1 p0.5 y1 -1 x1 y1 0 a0 a1 y12 2.22144 x12 y12      -0.5x12x12 y0 0.0417x12x12x12x12 y1 -0.00139x12x12x12x12x12x12 y2 0.0000248015x12x12x12x12x12x12x12x12 y3 -0.000000275573x12x12x12x12x12x12x12x12x12x12 y4 0.00000000208768x12x12x12x12x12x12x12x12x12x12x12x12 y5 1 a0 a1 a2 a3 a4 a5 y13         -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,          -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
         -- RADIUS y10 = 256 + -1 * rand(6.3496)^3
@@ -206,7 +205,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["napalm_drp"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -244,7 +243,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["napalm_firewalker"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -282,7 +281,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["napalm_firewalker_small"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -308,7 +307,7 @@ local cegs = {
       },
     },
   },
-  
+
   ["napalm_gunshipbomb"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -384,7 +383,7 @@ local cegs = {
       },
     },
   },
-    
+
   -- Fireball particles of various lifetimes
   ["napalmfireball_200"] = {
     rocks = {

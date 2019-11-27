@@ -125,7 +125,6 @@ return {
       },
     },
   },
-  
   -- muzzle and dust as a single reference
   ["thud_fire_fx"] = {
 	muzzle = {

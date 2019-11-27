@@ -40,7 +40,7 @@ return {
       },
     },
   },
-  
+
   ["gravityless_flamer"] = {
     fire = {
       air                = true,
@@ -71,7 +71,7 @@ return {
       },
     },
   },
-  
+
   ["fire1_burn1_flame1"] = {
     fire = {
       air                = true,

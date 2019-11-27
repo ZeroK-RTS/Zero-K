@@ -5,7 +5,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
       ground             = true,
-	  water				 = true,
+      water              = true,
       properties = {
         airdrag            = 0.7,
         --alwaysvisible      = true,
@@ -26,7 +26,6 @@ return {
         sizemod            = 0.9,
         texture            = [[new_dirta]],
         useairlos          = false,
-		--colorchange			= "stuffs",
       },
     },
   },
@@ -58,10 +57,8 @@ return {
         sizemod            = 0.9,
         texture            = [[new_dirta]],
         useairlos          = false,
-        --colorchange         = "stuffs",
       },
     },
-   
     bubblesuw = {
       air                = false,
       class              = [[CSimpleParticleSystem]],
@@ -89,7 +86,6 @@ return {
         sizemod            = 0.9,
         texture            = [[randdots]],
         useairlos          = false,
-        --colorchange         = "stuffs",
       },
     },
   },

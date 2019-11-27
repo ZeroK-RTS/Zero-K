@@ -98,7 +98,7 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-	electricsyellow = {
+    electricsyellow = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 3,
@@ -457,10 +457,10 @@ return {
       },
     },
   },
-  
+
   -- muzzle and groundflash as a single reference
   ["zeus_fire_fx"] = {
-	muzzle = {
+    muzzle = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -470,10 +470,10 @@ return {
         delay              = 0,
         explosiongenerator = [[custom:zeusmuzzle]],
         pos                = [[0, 0, 0]],
-		dir				   = [[dir]],
+        dir                = [[dir]],
       },
     },
-	dust = {
+    dust = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -483,11 +483,11 @@ return {
         delay              = 0,
         explosiongenerator = [[custom:zeusgroundflash]],
         pos                = [[0, 0, 0]],
-		dir				   = [[dir]],
+        dir                = [[dir]],
       },
     },
   },
-  
+
   ["lightningplosion_smallbolts_purple"] = {
     ["electric thingies2"] = {
       air                = true,
