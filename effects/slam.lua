@@ -1013,7 +1013,11 @@ return {
       properties = {
         alwaysVisible      = true,
         airdrag            = 0.99,
-        colormap           = [[0 0 0 0  1 1 0.8 0.1  0.8 1 1 0.075  0.8 1 1 0.025  0.8 1 1 0]],
+        colormap           = [[0.0 0 0.0 0.000
+                               1.0 1 0.8 0.100
+                               0.8 1 1.0 0.075
+                               0.8 1 1.0 0.025
+                               0.8 1 1.0 0.000]],
         directional        = false,
         emitrot            = 30,
         emitrotspread      = 5,
@@ -1042,7 +1046,11 @@ return {
       properties = {
         alwaysVisible      = true,
         airdrag            = 0.989,
-        colormap           = [[0.25 0.25 0.2 0.01  0.1 0.1 0.1 1  0.1 0.1 0.1 0.9  0.1 0.1 0.1 0.7  0.1 0.1 0.1 0]],
+        colormap           = [[0.25 0.25 0.2 0.01
+                               0.10 0.10 0.1 1.00
+                               0.10 0.10 0.1 0.90
+                               0.10 0.10 0.1 0.70
+                               0.10 0.10 0.1 0.00]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 0,
@@ -1071,7 +1079,11 @@ return {
       properties = {
         alwaysVisible      = true,
         airdrag            = 0.99,
-        colormap           = [[0.25 0.25 0.2 0  0.15 0.15 0.15 1  0.15 0.15 0.15 0.9  0.15 0.15 0.15 0.7  0.15 0.15 0.15 0]],
+        colormap           = [[0.25 0.25 0.20 0.0
+                               0.15 0.15 0.15 1.0
+                               0.15 0.15 0.15 0.9
+                               0.15 0.15 0.15 0.7
+                               0.15 0.15 0.15 0.0]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 0,
@@ -1102,7 +1114,11 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.6,
-        colormap           = [[0.1 0.09 0.075 0.1 1 0.2 0.1 0.1  0.1 0.1 0.08 0.6 0.1 0.1 0.08 0.4 0.0 0.0 0.0 0.01]],
+        colormap           = [[0.1 0.09 0.075 0.10
+                               1.0 0.20 0.100 0.10
+                               0.1 0.10 0.080 0.60
+                               0.1 0.10 0.080 0.40
+                               0.0 0.00 0.000 0.01]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 5,
@@ -1154,7 +1170,10 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.9,
-        colormap           = [[0.12 0.1 0.1 0.8  0.12 0.1 0.1 0.6 0.12 0.1 0.1 0.6  0.0 0.0 0.0 0.01]],
+        colormap           = [[0.12 0.1 0.1 0.80
+                               0.12 0.1 0.1 0.60
+                               0.12 0.1 0.1 0.60
+                               0.00 0.0 0.0 0.01]],
         directional        = false,
         dir                = [[dir]],
         emitrot            = 15,

@@ -15,7 +15,8 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.90,
-        colormap           = [[1 1 0.9 1   0 0 0 0.01]],
+        colormap           = [[1 1 0.9 1.00
+                               0 0 0.0 0.01]],
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 90,
@@ -99,7 +100,9 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.8,
-        colormap           = [[0.1  0.1 0.1 1   0.3  0.3 0.3 1 0 0 0 0.01]],
+        colormap           = [[0.1 0.1 0.1 1.00
+                               0.3 0.3 0.3 1.00
+                               0.0 0.0 0.0 0.01]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 90,
@@ -129,7 +132,9 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.8,
-        colormap           = [[1 1 1 1             1 1 1 1              0 0 0 0.01]],
+        colormap           = [[1 1 1 1.00
+                               1 1 1 1.00
+                               0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 90,
@@ -159,7 +164,9 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.8,
-        colormap           = [[1 1 1 1     1 1 1 1   0 0 0 0.01]],
+        colormap           = [[1 1 1 1.00
+                               1 1 1 1.00
+                               0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 90,
@@ -189,7 +196,13 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.8,
-        colormap           = [[0.1 0.1 0.1 1              0.1 0.1 0.1 1         0.1 0.1 0.1 1      0.1 0.1 0.1 1  0.1 0.1 0.1 1   0 0 0  1        0 0 0 0.01]],
+        colormap           = [[0.1 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.0 0.0 0.0 1.00
+                               0.0 0.0 0.0 0.01]],
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 90,
