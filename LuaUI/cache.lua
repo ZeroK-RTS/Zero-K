@@ -24,6 +24,9 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --	MarkerAddLine(a,b,c,d,e,f,true)
 --end
 
+local spGetProjectileTeamID = Spring.GetProjectileTeamID
+local spGetMyTeamID = Spring.GetMyTeamID
+local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetProjectileDefID = Spring.GetProjectileDefID
 local filteredWeaponDefID = {}
 for wdid, wd in pairs(WeaponDefs) do
@@ -34,14 +37,19 @@ end
 local function FilterOutRestrictedProjectiles(projectiles)
 	local i = 1
 	local n = #projectiles
+	local myTeamID = spGetMyTeamID()
 	while i <= n do
 		local p = projectiles[i]
-		local pID = spGetProjectileDefID(p)
-		if filteredWeaponDefID[pID] then
-			projectiles[i] = projectiles[n]
-			projectiles[n] = nil
-			n = n - 1
-			i = i - 1
+		local ownerTeamID = spGetProjectileTeamID(p)
+		-- If the owner is allied with us, we shouldn't need to filter anything out
+		if not spAreTeamsAllied(ownerTeamID, myTeamID) then
+			local pID = spGetProjectileDefID(p)
+			if filteredWeaponDefID[pID] then
+				projectiles[i] = projectiles[n]
+				projectiles[n] = nil
+				n = n - 1
+				i = i - 1
+			end
 		end
 		i = i + 1
 	end
