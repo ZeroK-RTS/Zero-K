@@ -175,7 +175,7 @@ function script.EndBurst()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 420.5, 25)
 end
 
 function script.Create()

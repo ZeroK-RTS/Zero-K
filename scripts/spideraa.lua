@@ -108,7 +108,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1000
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 220.1, 75 * distMult)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 260.1, 75 * distMult)
 	end
 	return false
 end
