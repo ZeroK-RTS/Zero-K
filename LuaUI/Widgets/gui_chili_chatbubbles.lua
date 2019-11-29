@@ -270,7 +270,7 @@ function widget:AddChatMessage(msg)
 			playerName = msg.playername
 			active = true
 		else
-			playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(playerID)
+			playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, _, customKeys  = Spring.GetPlayerInfo(playerID)
 			teamcolor = {Spring.GetTeamColor(teamID)}
 			if (customKeys ~= nil) and (customKeys.avatar~=nil) then
 				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"

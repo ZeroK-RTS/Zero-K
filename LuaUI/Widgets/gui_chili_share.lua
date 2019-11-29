@@ -499,7 +499,7 @@ end
 
 local function MergeWithClanMembers()
 	local playerID = Spring.GetMyPlayerID()
-	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
+	local customKeys = select(11, Spring.GetPlayerInfo(playerID)) or {}
 	local myclanShort = customKeys.clan     or ""
 	local myclanLong  = customKeys.clanfull or ""
 	if myclanShort ~= "" then
@@ -508,7 +508,7 @@ local function MergeWithClanMembers()
 		for i=1, #teamlist do
 			local players = Spring.GetPlayerList(teamlist[i],true)
 			for j=1, #players do
-				local customKeys = select(10, Spring.GetPlayerInfo(players[j])) or {}
+				local customKeys = select(11, Spring.GetPlayerInfo(players[j])) or {}
 				local clanShort = customKeys.clan     or ""
 				local clanLong  = customKeys.clanfull or ""
 				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j], false)) .. " : " .. clanLong)
@@ -963,7 +963,7 @@ local function InitName(subject, playerPanel)
 	end
 	local country, icon, badges, clan, avatar, faction, admin
 	if (subject.player) then
-		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
+		local pdata = select(11, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player, false))
 		icon = pdata.icon
 		badges = pdata.badges
@@ -1326,8 +1326,8 @@ local function EloComparator(subject1, subject2)
 	if (not subject2.player and not subject1.player) then return subject1.id > subject2.id end
 	if (not subject2.player) then return true end
 	if (not subject1.player) then return false end
-	local elo1 = select(10,Spring.GetPlayerInfo(subject1.player)).elo
-	local elo2 = select(10,Spring.GetPlayerInfo(subject2.player)).elo
+	local elo1 = select(11,Spring.GetPlayerInfo(subject1.player)).elo
+	local elo2 = select(11,Spring.GetPlayerInfo(subject2.player)).elo
 	if (not elo2 and not elo1) then return subject1.id > subject2.id end
 	if (not elo2) then return true end
 	if (not elo1) then return false end

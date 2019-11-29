@@ -89,7 +89,7 @@ local function InitUnsafe()
 	for name, id in pairs(Spring.GetPlayerList()) do	-- pairs(playerIDsByName) do
 		-- copied from PlanetWars
 		local commData, success
-		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local customKeys = select(11, Spring.GetPlayerInfo(id))
 		local commDataRaw = customKeys and customKeys.commanders
 		if not (commDataRaw and type(commDataRaw) == 'string') then
 			if commDataRaw then

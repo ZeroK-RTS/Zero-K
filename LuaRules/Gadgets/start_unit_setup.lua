@@ -568,7 +568,7 @@ function gadget:GameStart()
 			playerlist = workAroundSpecsInTeamZero(playerlist, team)
 			if playerlist then
 				for i = 1, #playerlist do
-					local customKeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
+					local customKeys = select(11, Spring.GetPlayerInfo(playerlist[i]))
 					if customKeys and customKeys.extracomm then
 						for j = 1, tonumber(customKeys.extracomm) do
 							Spring.Echo("Spawing a commander")

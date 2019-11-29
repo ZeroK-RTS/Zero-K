@@ -389,7 +389,7 @@ local function GetAllyTeamLeader(teamList)
 	for i = 1, #teamList do
 		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i], false)
 		if leader and not isAiTeam then
-			local customKeys = select(10, Spring.GetPlayerInfo(leader)) or {}
+			local customKeys = select(11, Spring.GetPlayerInfo(leader)) or {}
 			local rank = customKeys.pwrank
 			if rank then
 				if (not bestRank) or (rank < bestRank) then
@@ -815,7 +815,7 @@ function gadget:Initialize()
 	--local players = Spring.GetPlayerList()
 	--for i=1,#players do
 	--	local player = players[i]
-	--	local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
+	--	local _,_,_,team,_,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
 	--	if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
 	--		canAttackTeams[team] = true
 	--	end

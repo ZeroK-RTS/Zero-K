@@ -145,7 +145,7 @@ local function InitUnsafe()
 	local noUnlocks = true
 	
 	for index, id in pairs(Spring.GetPlayerList())
-		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local customKeys = select(11, Spring.GetPlayerInfo(id))
 		if customKeys and customKeys.unlocks then
 			noUnlocks = false
 			break
@@ -163,7 +163,7 @@ local function InitUnsafe()
 	for index, id in pairs(Spring.GetPlayerList()) do
 		-- copied from PlanetWars
 		local unlockData, success
-		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local customKeys = select(11, Spring.GetPlayerInfo(id))
 		local unlocksRaw = customKeys and customKeys.unlocks
 		if not (unlocksRaw and type(unlocksRaw) == 'string') then
 			if unlocksRaw then

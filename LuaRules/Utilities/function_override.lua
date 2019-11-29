@@ -80,7 +80,7 @@ if Script.IsEngineMinVersion(104, 0, 50) then
 	end
 end
 
-if Script.IsEngineMinVersion(104, 0, 536) then
+if not Script.IsEngineMinVersion(104, 0, 536) then
 	local origGetPlayerInfo = Spring.GetPlayerInfo
 	Spring.GetPlayerInfo = function (playerID)
 		if not playerID then

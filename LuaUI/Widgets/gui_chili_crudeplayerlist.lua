@@ -487,7 +487,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 	local name,active,spectator,pingTime,cpuUsage,country,_, customKeys
 	local playerID = entity.playerID or teams[teamID].leader
 	if playerID then
-		name,active,spectator,_,_,pingTime,cpuUsage,country,_, customKeys = Spring.GetPlayerInfo(playerID)
+		name,active,spectator,_,_,pingTime,cpuUsage,country,_, _, customKeys = Spring.GetPlayerInfo(playerID)
 	end
 	--Spring.Echo("Entity with team ID " .. teamID .. " is " .. (active and '' or "NOT ") .. "active")
 	if not active then deadTeam = true end

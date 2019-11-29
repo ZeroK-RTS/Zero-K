@@ -1164,7 +1164,7 @@ SetupPlayerNames = function()
 	-- also store the data needed later to calculate the team average elo
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,customKeys = Spring.GetPlayerInfo(playerID)
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,_, customKeys = Spring.GetPlayerInfo(playerID)
 		local clan, faction, level, elo, wins, rank
 		if customKeys then
 			clan = customKeys.clan

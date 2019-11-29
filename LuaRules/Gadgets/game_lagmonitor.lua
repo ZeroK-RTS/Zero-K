@@ -137,7 +137,7 @@ local function GetPlayerActivity(playerID, onlyActive)
 	if not playerID then
 		return false
 	end
-	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
+	local name, active, spec, team, allyTeam, ping, _, _, _, _, customKeys = spGetPlayerInfo(playerID)
 	
 	if onlyActive then
 		if (active and ping <= PING_TIMEOUT) then

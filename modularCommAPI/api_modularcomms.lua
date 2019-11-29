@@ -83,7 +83,7 @@ local function LoadCommData()
 	local players = Spring.GetPlayerList()
 	for i = 1, #players do
 		local playerID = players[i]
-		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
+		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, _, customKeys = Spring.GetPlayerInfo(playerID)
 		
 		if (not spectator) then
 			local playerCommProfileIDs	-- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
