@@ -117,7 +117,7 @@ if not Script.IsEngineMinVersion(104, 0, 1143) then
 	end
 end
 
-if Script.IsEngineMinVersion(104, 0, 1166) then
+if not Script.IsEngineMinVersion(104, 0, 1166) then
 	local origGetTeamInfo = Spring.GetTeamInfo
 	Spring.GetTeamInfo = function (p1, p2)
 		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)

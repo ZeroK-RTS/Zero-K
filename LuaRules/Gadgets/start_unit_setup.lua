@@ -202,7 +202,7 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID, true))
+	local teamInfo = teamID and select(8, Spring.GetTeamInfo(teamID, true))
 	if teamInfo and teamInfo.staticcomm then
 		local commanderName = teamInfo.staticcomm
 		local commanderLevel = teamInfo.staticcomm_level or 1
@@ -310,7 +310,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if not teamID then
 		return
 	end
-	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID, true)
+	local _,_,_,_,_,allyTeamID,_,teamInfo = Spring.GetTeamInfo(teamID, true)
 	if teamInfo and teamInfo.nocommander then
 		waitingForComm[teamID] = nil
 		return

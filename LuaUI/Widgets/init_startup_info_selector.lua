@@ -176,7 +176,7 @@ end
 local function GetStartZoomBounds()
 	if fixedStartPos then
 		local teamID = Spring.GetMyTeamID()
-		local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+		local teamInfo = teamID and select(8, Spring.GetTeamInfo(teamID))
 		local x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
 		if not x then
 			x, _, z = Spring.GetTeamStartPosition(teamID)
@@ -428,7 +428,7 @@ function widget:Initialize()
 	-- nothing serious, just annoying
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
-	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	local teamInfo = teamID and select(8, Spring.GetTeamInfo(teamID))
 	if teamInfo and teamInfo.staticcomm then
 		wantClose = true
 		return

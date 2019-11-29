@@ -373,7 +373,7 @@ local function InitializeAiTeamRulesParams()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _, leaderID, _, isAiTeam, _, _, customKeys = spGetTeamInfo(teamID)
+		local _, leaderID, _, isAiTeam, _, _, _, customKeys = spGetTeamInfo(teamID)
 		if isAiTeam then
 			Spring.SetTeamRulesParam(teamList[i], "initialIsAiTeam", 1)
 		end
