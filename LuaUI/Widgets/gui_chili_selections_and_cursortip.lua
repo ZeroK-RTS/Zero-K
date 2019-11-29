@@ -846,25 +846,6 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local UnitDefIDByHumanName_cache = {}
-local function GetUnitDefByHumanName(humanName)
-	local cached_unitDefID = UnitDefIDByHumanName_cache[humanName]
-	if (cached_udef ~= nil) then
-		return cached_udef
-	end
-	
-	for i = 1, #UnitDefs do
-		local ud = UnitDefs[i]
-		if (ud.humanName == humanName) then
-			UnitDefIDByHumanName_cache[humanName] = i
-			return i
-		end
-	end
-	
-	UnitDefIDByHumanName_cache[humanName] = false
-	return false
-end
-
 local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	unitID = unitID or (unitList and unitList[1])
 	
@@ -2188,12 +2169,9 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
-		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
-		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
-		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
-		local unitDefID = GetUnitDefByHumanName(unitHumanName)
+		local unitDefID, morphTime, morphCost = chiliTooltip:match('(%d+) (%d+) (%d+)')
 		if unitDefID and morphTime and morphCost then
-			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, false, morphTime, morphCost)
+			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, tonumber(morphTime), tonumber(morphCost))
 		end
 		return true
 	end

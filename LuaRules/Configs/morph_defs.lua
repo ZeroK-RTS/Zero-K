@@ -223,6 +223,7 @@ local function BuildMorphDef(udSrc, morphData)
 			e = (newData.increment * newData.energy)
 		}
 		newData.facing = morphData.facing
+		newData.tooltip = 'Morph ' .. newData.into .. ' ' .. newData.time .. ' ' .. newData.metal
 
 		MAX_MORPH = MAX_MORPH + 1 -- CMD_MORPH is the "generic" morph command. "Specific" morph command start at CMD_MORPH+1
 		newData.cmd = CMD_MORPH + MAX_MORPH
@@ -238,7 +239,6 @@ local function BuildMorphDef(udSrc, morphData)
 		GG.MorphInfo["MAX_MORPH"] = MAX_MORPH
 
 		newData.texture = morphData.texture
-		newData.text = morphData.text
 		return newData
 	end
 end

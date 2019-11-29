@@ -160,26 +160,12 @@ local stopUpgradeCmdDesc = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
-	local ud = UnitDefs[morphDef.into]
-	local tt = ''
-	if (morphDef.text ~= nil) then
-		tt = tt .. WhiteStr	.. morphDef.text .. '\n'
-	else
-		tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
-	end
-	tt = tt .. GreenStr	.. 'time: '	 .. morphDef.time	 .. '\n'
-	tt = tt .. CyanStr	 .. 'metal: '	.. morphDef.metal	.. '\n'
-	tt = tt .. YellowStr .. 'energy: ' .. morphDef.energy	 .. '\n'
-	return tt
-end
-
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
 	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef.into) then
 		return
 	end
 	
-	morphCmdDesc.tooltip = GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
+	morphCmdDesc.tooltip = morphDef.tooltip
 	
 	GG.AddMiscPriorityUnit(unitID)
 	if morphDef.texture then
