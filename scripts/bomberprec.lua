@@ -319,7 +319,7 @@ function script.BlockShot(num, targetID)
 			-- Remove attack command on blocked target, it's already dead so move on.
 			local cQueue = Spring.GetCommandQueue(unitID, 1)
 			if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {} )
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, 0)
 			end
 			return true
 		end

@@ -355,16 +355,16 @@ local function PickupAndDropFixer()
 			Sleep(1500)
 			local passengerId = getPassengerId()
 			if passengerId and (getCommandId() == 75) and isValidCargo(passengerId) and isNearPickupPoint(passengerId, 120) then
-				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
 			end
 		end
 		
 		if unitLoaded and (getCommandId() == 81) and isNearDropPoint(unitLoaded, 80) then
 			Sleep(1500)
 			if unitLoaded and (getCommandId() == 81) and isNearDropPoint(unitLoaded, 80) then
-				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
 			end
 		end
 		
@@ -493,10 +493,6 @@ function script.QueryWeapon(num)
 	return pieces[weaponPieces[num].index]
 end
 
-
-function script.FireWeapon(num)
-	--Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
-end
 
 function script.Shot(num)
 	local index = weaponPieces[num].index

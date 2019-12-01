@@ -8,7 +8,7 @@ function script.Create()
 	--local x, y, z = Spring.GetUnitPosition(unitID)
 	--Spring.MoveCtrl.SetPosition(x, 1000, z)
 	Spring.SetUnitRadiusAndHeight(unitID, 0, 0)
-	Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {0}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {0}, 0)
 end
 
 function script.HitByWeapon()
