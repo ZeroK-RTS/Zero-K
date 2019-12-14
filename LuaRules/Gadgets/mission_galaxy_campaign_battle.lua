@@ -772,8 +772,8 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 	end
 end
 
-local function AddMidgameUnit(unitData, teamID, gameFrame)
-	local n = unitData.delay
+local function AddMidgameUnit(unitData, teamID, gameFrame, spawnFrameOverride)
+	local n = spawnFrameOverride or unitData.delay
 	if gameFrame > n then
 		return -- Loaded game.
 	end
@@ -1201,10 +1201,13 @@ local function CheckDisableControlAiMessage()
 	disableAiUnitControl = nil
 end
 
-local function PlaceMidgameUnits(unitList)
+local function PlaceMidgameUnits(unitList, gameFrame)
 	for i = 1, #unitList do
 		local data = unitList[i]
 		PlaceUnit(data.unitData, data.teamID, true, true)
+		if data.unitData.repeatDelay then
+			AddMidgameUnit(data.unitData, data.teamID, gameFrame, gameFrame + data.unitData.repeatDelay)
+		end
 	end
 	
 	if commandsToGive then
@@ -1490,7 +1493,7 @@ function gadget:GameFrame(n)
 	end
 	
 	if midgamePlacement[n] then
-		PlaceMidgameUnits(midgamePlacement[n])
+		PlaceMidgameUnits(midgamePlacement[n], n)
 		midgamePlacement[n] = nil
 	end
 	
