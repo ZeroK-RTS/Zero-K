@@ -1,51 +1,17 @@
-local name = "commweapon_rocketlauncher_napalm"
-local weaponDef = {
-	name                    = [[Napalm Rocket Launcher]],
-	areaOfEffect            = 144,
-	cegTag                  = [[rocket_trail_bar_flameboosted]],
-	craterBoost             = 1,
-	craterMult              = 1,
+local _, def = VFS.Include("gamedata/modularcomms/weapons/rocketlauncher.lua")
 
-	customParams            = {
-		is_unit_weapon = 1,
-		slot = [[5]],
-		muzzleEffectFire = [[custom:STORMMUZZLE]],
-		burntime         = 450,
-		burnchance       = 1,
-		setunitsonfire   = [[1]],
+def.name = "Napalm " .. def.name
+def.areaOfEffect = def.areaOfEffect * 1.5 -- other napalms are 1.25 tho?
+for armorType, damage in pairs (def.damage) do
+	def.damage[armorType] = damage * 0.75
+end
+def.craterBoost = 1
+def.craterMult = 1
 
-		light_camera_height = 1600,
-		light_color = [[0.95 0.5 0.25]],
-		light_radius = 350,
-		reaim_time = 1,
-	},
+def.customParams.light_color = "0.95 0.5 0.25"
+def.customParams.light_radius = def.customParams.light_radius * 1.25
+def.customParams.light_camera_height = def.customParams.light_camera_height + 600
+def.explosiongenerator = "custom:napalm_phoenix"
+def.soundHit = "weapon/burn_mixed"
 
-	damage                  = {
-		default = 270,
-		subs    = 18,
-	},
-
-	explosiongenerator      = [[custom:napalm_phoenix]],
-	fireStarter             = 180,
-	flightTime              = 3,
-	impulseBoost            = 0,
-	impulseFactor           = 0.4,
-	interceptedByShieldType = 2,
-	model                   = [[wep_m_hailstorm.s3o]],
-	range                   = 430,
-	reloadtime              = 3,
-	smokeTrail              = false,
-	soundHit                = [[weapon/burn_mixed]],
-	soundHitVolume          = 7,
-	soundStart              = [[weapon/missile/sabot_fire]],
-	soundStartVolume        = 7,
-	startVelocity           = 200,
-	tracks                  = false,
-	trajectoryHeight        = 0.05,
-	turret                  = true,
-	weaponAcceleration      = 100,
-	weaponType              = [[MissileLauncher]],
-	weaponVelocity          = 250,
-}
-
-return name, weaponDef
+return "commweapon_rocketlauncher_improved", def
