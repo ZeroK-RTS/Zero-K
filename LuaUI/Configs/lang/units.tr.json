@@ -767,7 +767,7 @@
     "zenith": {
         "name": "Zirve",
         "description": "Meteor Kontrolcüsü",
-        "helptext": "Zirve göktaşlarını gökten toplar (500'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
+        "helptext": "Zirve göktaşlarını gökten toplar (300'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
     },
     "vehaa": {
         "name": "Çarpıcı",

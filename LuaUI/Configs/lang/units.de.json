@@ -42,7 +42,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",
-		"helptext" : "The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal."
+		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"athena" : {
 		"name" : "Athena",

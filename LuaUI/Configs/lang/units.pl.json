@@ -767,7 +767,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Kontroler meteorytów",
-		"helptext" : "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 500). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
+		"helptext" : "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 300). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
 	},
 	"vehaa" : {
 		"name" : "Crasher",
