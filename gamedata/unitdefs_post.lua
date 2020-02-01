@@ -354,19 +354,21 @@ end
 -- Maneuverability multipliers, useful for testing.
 -- TODO: migrate the x3 and x5 ones to defs, leave at x1 for easy testing
 
-local TURNRATE_MULT = 1
+local TURNRATE_MULT = 1.2
+local TURNRATE_MULT_HIGH = 1.6
 local ACCEL_MULT = 3
-local ACCEL_MULT_HIGH = 5
+local ACCEL_MULT_HIGH = 6
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 
-		ud.turnrate = ud.turnrate * TURNRATE_MULT
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
+		ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
 			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
 		else
+			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
 			ud.brakerate = ud.brakerate * ACCEL_MULT*2
 		end
@@ -729,6 +731,8 @@ end
 --------------------------------------------------------------------------------
 -- Altered unit health mod option
 --
+
+modOptions.hpmult = 2 -- TEST CHANGE
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
