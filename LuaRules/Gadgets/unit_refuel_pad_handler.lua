@@ -214,7 +214,7 @@ local function SitOnPad(unitID)
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost
 				if updateCost > 0 then
-					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, true, miscPriorityKey)
+					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, not GG.REPAIR_COSTS_METAL, miscPriorityKey)
 				else
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 				end
@@ -223,6 +223,9 @@ local function SitOnPad(unitID)
 			if (updateCost > 0) then
 				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID)
 				resTable.e = updateCost*updateRate
+				if GG.REPAIR_COSTS_METAL then
+					resTable.m = resTable.e
+				end
 			else
 				updateRate = 1
 			end
