@@ -732,7 +732,7 @@ end
 -- Altered unit health mod option
 --
 
-modOptions.hpmult = 2 -- TEST CHANGE
+modOptions.hpmult = 1.5 -- TEST CHANGE
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
