@@ -312,6 +312,8 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	buildSpeedMod[builderID] = GG.unitRepairRate[unitID]
 	
 	if GG.REPAIR_COSTS_METAL then
+		scale = TeamScale[teamID]
+	else
 		if GG.unitRepairRate[unitID] then
 			UnitOnlyEnergy[builderID] = true
 			scale = TeamScaleEnergy[teamID]
@@ -319,8 +321,6 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 			UnitOnlyEnergy[builderID] = false
 			scale = TeamScale[teamID]
 		end
-	else
-		scale = TeamScale[teamID]
 	end
 
 	local priorityLevel
@@ -393,24 +393,24 @@ function gadget:GameFrame(n)
 				if unitDefID ~= nil then
 					if UnitOnlyEnergy[unitID] then
 						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
-						energySpending[pri] = energySpending[pri] + buildSpeed*buildSpeedMod[unitID]
+						energySpending[pri] = energySpending[pri] + buildSpeed*(buildSpeedMod[unitID] or 1)
 						if scaleEnergy and scaleEnergy[pri] then
-							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*buildSpeedMod[unitID]*scaleEnergy[pri]
+							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
 							
 							if debugMode and debugOnUnits then
 								GG.UnitEcho(unitID, "Energy Priority: " ..  pri ..
 									", BP: " .. buildSpeed ..
-									", Pull: " .. buildSpeed*buildSpeedMod[unitID]*scaleEnergy[pri]
+									", Pull: " .. buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
 								)
 							end
 						end
 					else
 						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
-						spending[pri] = spending[pri] + buildSpeed*(buildSpeedMod[unitID] or 0)
+						spending[pri] = spending[pri] + buildSpeed*(buildSpeedMod[unitID] or 1)
 						
 						if debugMode and debugOnUnits then
 							GG.UnitEcho(unitID, "Priority: " .. pri ..
-								", BP: " .. buildSpeed
+								", BP: " ..  buildSpeed*(buildSpeedMod[unitID] or 1)
 							)
 						end
 					end
