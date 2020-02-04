@@ -123,6 +123,7 @@ return { jumpraid = {
       impulseFactor           = 0,
       intensity               = 0.3,
       interceptedByShieldType = 1,
+      leadLimit               = 10,
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 260,

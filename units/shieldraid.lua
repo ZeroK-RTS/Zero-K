@@ -91,6 +91,7 @@ return { shieldraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       noSelfDamage            = true,
       range                   = 245,
       reloadtime              = 0.1,

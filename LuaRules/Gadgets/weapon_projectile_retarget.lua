@@ -25,9 +25,25 @@ local UNIT = 117
 local projectiles = {}
 local thereAreProjectiles = false
 
+local spGetProjectileTarget   = Spring.GetProjectileTarget
+local spGetUnitVelocity       = Spring.GetUnitVelocity
+local spGetProjectilePosition = Spring.GetProjectilePosition
+local spGetProjectileTeamID   = Spring.GetProjectileTeamID
+local spValidUnitID           = Spring.ValidUnitID
+local spSetProjectileVelocity = Spring.SetProjectileVelocity
+
+local dist3D = Spring.Utilities.Vector.Dist3D
+
 -- In elmos/frame
 local projectileSpeed = {
 	[WeaponDefNames["bomberheavy_arm_pidr"].id] = 19, -- empirical
+}
+local projectileLead = {
+	[WeaponDefNames["cloakraid_emg"].id] = WeaponDefNames["cloakraid_emg"].projectilespeed,
+	[WeaponDefNames["vehraid_heatray"].id] = WeaponDefNames["vehraid_heatray"].projectilespeed,
+	[WeaponDefNames["hoverraid_gauss"].id] = WeaponDefNames["hoverraid_gauss"].projectilespeed,
+	[WeaponDefNames["shieldraid_laser"].id] = WeaponDefNames["shieldraid_laser"].projectilespeed,
+	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].projectilespeed,
 }
 
 -- Recluse projectile speed at different distances formula is a result of the least squares linear fit
@@ -37,6 +53,9 @@ local projectileSpeed = {
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileSpeed) do
+		Script.SetWatchProjectile(id, true)
+	end
+	for id, _ in pairs(projectileLead) do
 		Script.SetWatchProjectile(id, true)
 	end
 end
@@ -147,9 +166,38 @@ local function AddProjectile(proID, speed, alwaysBurnblow, trackTarget)
 	end
 end
 
+local function GetTargetPosition(targetID)
+	local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(targetID, true, true)
+	return tx, ty, tz
+end
+
+local function ApplyProjectileLead(proID, speed)
+	local targetType, targetID = spGetProjectileTarget(proID)
+	if not (targetType == UNIT and spValidUnitID(targetID)) then
+		return
+	end
+	
+	local tx, ty, tz = CallAsTeam(spGetProjectileTeamID(proID), GetTargetPosition, targetID)
+	local vx, vy, vz = spGetUnitVelocity(targetID)
+	local px, py, pz = spGetProjectilePosition(proID)
+
+	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
+	
+	local lx, ly, lz = (tx - px) + vx*flyTime, (ty - py) + vy*flyTime, (tz - pz) + vz*flyTime
+	local leadSpeed = dist3D(lx, ly, lz, 0, 0, 0)
+	local normFactor = speed/leadSpeed
+	
+	--Spring.Utilities.UnitEcho(targetID, dist3D(ax*normFactor, ay*normFactor, az*normFactor, 0, 0, 0))
+	
+	spSetProjectileVelocity(proID, lx*normFactor, ly*normFactor, lz*normFactor)
+end
+
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if projectileSpeed[weaponID] then
 		AddProjectile(proID, projectileSpeed[weaponID], false)
+	end
+	if projectileLead[weaponID] then
+		ApplyProjectileLead(proID, projectileLead[weaponID])
 	end
 end
 

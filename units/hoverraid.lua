@@ -97,6 +97,7 @@ return { hoverraid = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,

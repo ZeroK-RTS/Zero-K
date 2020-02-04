@@ -107,6 +107,7 @@ return { vehraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 10,
       lodDistance             = 10000,
       noSelfDamage            = true,
       proximityPriority       = 10,
