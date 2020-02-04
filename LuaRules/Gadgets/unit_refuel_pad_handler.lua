@@ -63,6 +63,7 @@ local mobilePadDefs = {
 
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
+local REPAIR_RESOURCE_MULT = 0.5
 
 local turnRadius = {}
 local reammoFrames = {}
@@ -209,7 +210,7 @@ local function SitOnPad(unitID)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
-			updateCost = (reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain
+			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)*REPAIR_RESOURCE_MULT
 			if updateCost ~= oldUpdateCost or oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost

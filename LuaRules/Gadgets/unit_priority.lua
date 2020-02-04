@@ -105,7 +105,7 @@ local debugTeam = false
 local debugOnUnits = false
 local debugBuildUnit
 
-local REPAIR_METAL_COST_FACTOR = 0.5 -- Must match energyCostFactor in modrules.
+local REPAIR_METAL_COST_FACTOR = 0.25 -- Must match energyCostFactor in modrules.
 GG.REPAIR_COSTS_METAL = true -- Configurable
 
 --------------------------------------------------------------------------------
