@@ -178,8 +178,15 @@ local function ApplyProjectileLead(proID, speed)
 	end
 	
 	local tx, ty, tz = CallAsTeam(spGetProjectileTeamID(proID), GetTargetPosition, targetID)
+	if not tx then
+		return
+	end
+
 	local vx, vy, vz = spGetUnitVelocity(targetID)
 	local px, py, pz = spGetProjectilePosition(proID)
+	if not (vx  and px) then
+		return
+	end
 
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
 	
