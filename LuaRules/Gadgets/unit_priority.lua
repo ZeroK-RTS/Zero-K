@@ -105,8 +105,9 @@ local debugTeam = false
 local debugOnUnits = false
 local debugBuildUnit
 
-local REPAIR_METAL_COST_FACTOR = 0.25 -- Must match energyCostFactor in modrules.
 GG.REPAIR_COSTS_METAL = true -- Configurable
+GG.REPAIR_RESOURCE_MULT = 0.5
+local REPAIR_METAL_COST_FACTOR = 0.5*GG.REPAIR_RESOURCE_MULT -- Must match energyCostFactor in modrules.
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -310,6 +311,9 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	
 	local scale
 	buildSpeedMod[builderID] = GG.unitRepairRate[unitID]
+	if GG.unitRepairRate[unitID] then
+		buildSpeedMod[builderID] = buildSpeedMod[builderID]*GG.REPAIR_RESOURCE_MULT
+	end
 	
 	if GG.REPAIR_COSTS_METAL then
 		scale = TeamScale[teamID]
