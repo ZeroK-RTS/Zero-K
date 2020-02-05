@@ -28,8 +28,8 @@ for i = 1, #ploppables do
 end
 
 -- starting resources
-START_METAL   = 250
-START_ENERGY  = 250
+START_METAL   = 300
+START_ENERGY  = 300
 
 INNATE_INC_METAL   = 2
 INNATE_INC_ENERGY  = 2
