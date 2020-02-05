@@ -89,7 +89,7 @@ return { cloakassault = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 240,
+        default        = 230,
       },
 
       duration                = 10,

@@ -4,7 +4,7 @@ return { jumpcon = {
   description         = [[Jumpjet Constructor, Builds at 4 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.78,
-  buildCostMetal      = 120,
+  buildCostMetal      = 140,
   buildDistance       = 128,
   builder             = true,
 

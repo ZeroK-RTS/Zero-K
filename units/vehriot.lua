@@ -89,8 +89,8 @@ return { vehriot = {
       },
       
       damage                  = {
-        default = 220.2,
-        planes  = 220.2,
+        default = 250.2,
+        planes  = 250.2,
         subs    = 11,
       },
 
@@ -100,8 +100,8 @@ return { vehriot = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 1.6 + 1/30,
+      range                   = 320,
+      reloadtime              = 1.6,
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
       soundStartVolume        = 3,
