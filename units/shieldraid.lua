@@ -26,7 +26,7 @@ return { shieldraid = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 265,
+  maxDamage              = 320,
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
@@ -79,8 +79,8 @@ return { shieldraid = {
       },
       
       damage                  = {
-        default = 9.53,
-        subs    = 0.61,
+        default = 7.95,
+        subs    = 0.4,
       },
 
       duration                = 0.02,

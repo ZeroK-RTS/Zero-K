@@ -30,7 +30,7 @@ return { vehraid = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 420,
+  maxDamage              = 480,
   maxSlope               = 18,
   maxVelocity            = 3.7,
   maxWaterDepth          = 22,
@@ -91,9 +91,9 @@ return { vehraid = {
       },
 
       damage                  = {
-        default = 31.4,
-        planes  = 31.4,
-        subs    = 1.5,
+        default = 25.2,
+        planes  = 25.2,
+        subs    = 1.25,
       },
 
       duration                = 0.3,

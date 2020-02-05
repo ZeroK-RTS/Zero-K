@@ -27,7 +27,7 @@ return { cloakraid = {
   idleAutoHeal           = 20,
   idleTime               = 150,
   leaveTracks            = true,
-  maxDamage              = 200,
+  maxDamage              = 240,
   maxSlope               = 36,
   maxVelocity            = 3.85,
   maxWaterDepth          = 22,
@@ -86,7 +86,7 @@ return { cloakraid = {
       },
 
       damage                  = {
-        default = 12,
+        default = 10,
         subs    = 0.567,
       },
 
