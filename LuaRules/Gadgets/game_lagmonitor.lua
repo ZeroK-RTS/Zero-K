@@ -30,23 +30,24 @@ local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
 
-local spAddTeamResource   = Spring.AddTeamResource
-local spEcho              = Spring.Echo
-local spGetGameSeconds    = Spring.GetGameSeconds
-local spGetPlayerInfo     = Spring.GetPlayerInfo
-local spGetTeamInfo       = Spring.GetTeamInfo
-local spGetTeamList       = Spring.GetTeamList
-local spGetTeamResources  = Spring.GetTeamResources
-local spGetTeamUnits      = Spring.GetTeamUnits
-local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
-local spGetUnitDefID      = Spring.GetUnitDefID
-local spGetUnitTeam       = Spring.GetUnitTeam
-local spGetPlayerList     = Spring.GetPlayerList
-local spTransferUnit      = Spring.TransferUnit
-local spUseTeamResource   = Spring.UseTeamResource
-local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
-local spGetUnitHealth     = Spring.GetUnitHealth
-local spSetUnitHealth     = Spring.SetUnitHealth
+local spAddTeamResource     = Spring.AddTeamResource
+local spEcho                = Spring.Echo
+local spGetGameSeconds      = Spring.GetGameSeconds
+local spGetPlayerInfo       = Spring.GetPlayerInfo
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetTeamList         = Spring.GetTeamList
+local spGetTeamResources    = Spring.GetTeamResources
+local spGetTeamUnits        = Spring.GetTeamUnits
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetPlayerList       = Spring.GetPlayerList
+local spTransferUnit        = Spring.TransferUnit
+local spUseTeamResource     = Spring.UseTeamResource
+local spGetUnitIsBuilding   = Spring.GetUnitIsBuilding
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spSetUnitHealth       = Spring.SetUnitHealth
+local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
 
 local useAfkDetection = (Spring.GetModOptions().enablelagmonitor ~= "0")
 
@@ -154,10 +155,15 @@ local function GetPlayerActivity(playerID, onlyActive)
 	
 	if useAfkDetection and (lastActionTime >= TO_AFK_THRESHOLD or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID]) then
 		playerIsAfk[playerID] = true
+		spSetPlayerRulesParam(playerID, "lagmonitor_lagging", 1)
 		return false
 	end
-
+	
+	if playerIsAfk[playerID] then
+		spSetPlayerRulesParam(playerID, "lagmonitor_lagging", nil)
+	end
 	playerIsAfk[playerID] = false
+	
 	return customKeys.elo and tonumber(customKeys.elo) or 0
 end
 
