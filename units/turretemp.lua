@@ -45,7 +45,7 @@ return { turretemp = {
 
   },
 
-  sightDistance                 = 506,
+  sightDistance                 = 554, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardMap                       = [[oo oo]],
 

@@ -55,7 +55,7 @@ return { turretheavy = {
     },
 
   },
-  sightDistance                 = 780,
+  sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

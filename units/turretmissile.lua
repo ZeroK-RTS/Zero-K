@@ -48,7 +48,7 @@ return { turretmissile = {
     },
 
   },
-  sightDistance                 = 660,
+  sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

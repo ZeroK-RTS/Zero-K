@@ -44,7 +44,7 @@ return { turretriot = {
 
   },
 
-  sightDistance                 = 451,
+  sightDistance                 = 499, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 

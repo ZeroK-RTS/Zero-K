@@ -50,7 +50,7 @@ return { turretgauss = {
     },
   },
 
-  sightDistance                 = 660,
+  sightDistance                 = 664, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardmap                       = [[ooooooooo]],
 

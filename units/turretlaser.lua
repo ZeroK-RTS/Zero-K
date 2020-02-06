@@ -47,7 +47,7 @@ return { turretlaser = {
     },
 
   },
-  sightDistance                 = 520,
+  sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline                     = 5,

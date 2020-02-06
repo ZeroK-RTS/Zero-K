@@ -37,8 +37,8 @@ return { turrettorp = {
   script            = [[turrettorp.lua]],
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
 
-  sightDistance     = 610,
-  sonarDistance     = 610,
+  sightDistance     = 653, -- Range*1.1 + 48 for radar overshoot
+  sonarDistance     = 653,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
