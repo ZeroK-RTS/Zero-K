@@ -53,7 +53,7 @@ return { spiderscout = {
 
   },
 
-  sightDistance       = 560,
+  sightDistance       = 620,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

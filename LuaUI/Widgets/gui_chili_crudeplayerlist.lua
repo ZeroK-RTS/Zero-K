@@ -606,14 +606,6 @@ local function InitializePlayerlist()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = false,
-		
-		--OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
-		--	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		--	if not meta then return false end
-		--	WG.crude.OpenPath(options_path)
-		--	WG.crude.ShowMenu()
-		--	return true
-		--end },
 	}
 	
 	local gaiaTeamID = Spring.GetGaiaTeamID

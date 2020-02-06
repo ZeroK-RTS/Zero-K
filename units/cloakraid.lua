@@ -48,7 +48,7 @@ return { cloakraid = {
 
   },
 
-  sightDistance          = 500,
+  sightDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.9,

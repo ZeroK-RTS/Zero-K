@@ -46,7 +46,7 @@ return { tankheavyraid = {
     },
 
   },
-  sightDistance          = 450,
+  sightDistance          = 560,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,

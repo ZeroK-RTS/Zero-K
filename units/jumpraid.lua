@@ -57,7 +57,7 @@ return { jumpraid = {
 
   },
 
-  sightDistance         = 420,
+  sightDistance         = 560,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,

@@ -43,8 +43,8 @@ return { amphraid = {
     },
   },
 
-  sightDistance          = 500,
-  sonarDistance          = 500,
+  sightDistance          = 560,
+  sonarDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

@@ -49,7 +49,7 @@ return { vehraid = {
     },
 
   },
-  sightDistance          = 400,
+  sightDistance          = 560,
   trackOffset            = 5,
   trackStrength          = 5,
   trackStretch           = 1,

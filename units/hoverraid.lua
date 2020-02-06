@@ -47,8 +47,8 @@ return { hoverraid = {
 
   },
 
-  sightDistance       = 560,
-  sonarDistance       = 560,
+  sightDistance       = 640,
+  sonarDistance       = 640,
   turninplace         = 0,
   turnRate            = 673,
   workerTime          = 0,

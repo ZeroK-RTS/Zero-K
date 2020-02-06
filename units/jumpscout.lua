@@ -59,7 +59,7 @@ return { jumpscout = {
     },
 
   },
-  sightDistance          = 560,
+  sightDistance          = 640,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,
