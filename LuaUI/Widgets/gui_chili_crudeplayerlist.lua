@@ -273,7 +273,7 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	}
 	
 	if playerID then
-		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
+		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, _, customKeys = Spring.GetPlayerInfo(playerID, true)
 		customKeys = customKeys or {}
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)
@@ -560,20 +560,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function PrintTeamData(teamID)
-	local _, leaderID, isDead, isAiTeam, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
-	if leaderID < 0 then
-		leaderID = Spring.GetTeamRulesParam(teamID, "initLeaderID")
-	end
-	
-	if leaderID and leaderID >= 0 then
-		local playerName, active, spectator, _, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(leaderID, true)
-		Spring.Echo("teamID", teamID, "leaderID", leaderID, "playerName", playerName, "spectator", spectator)
-	else
-		Spring.Echo("No leaderID", teamID, "isAI", isAiTeam, "leaderID", leaderID)
-	end
-end
-
 local function InitializePlayerlist()
 	if playerlistWindow then
 		playerlistWindow:Dispose()
@@ -625,7 +611,6 @@ local function InitializePlayerlist()
 		local teamID = teamList[i]
 		if teamID ~= gaiaTeamID then
 			local _, leaderID, isDead, isAiTeam, _, allyTeamID = Spring.GetTeamInfo(teamID, false)
-			--PrintTeamData(teamID)
 			if leaderID < 0 then
 				leaderID = Spring.GetTeamRulesParam(teamID, "initLeaderID") or leaderID
 			end
