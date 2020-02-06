@@ -14,4 +14,4 @@ def.customParams.light_camera_height = def.customParams.light_camera_height + 60
 def.explosiongenerator = "custom:napalm_phoenix"
 def.soundHit = "weapon/burn_mixed"
 
-return "commweapon_rocketlauncher_improved", def
+return "commweapon_rocketlauncher_napalm", def
