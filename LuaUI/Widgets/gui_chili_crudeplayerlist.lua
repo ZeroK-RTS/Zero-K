@@ -130,12 +130,15 @@ local function ToGrey(v)
 	return 0.6 + 0.1*(v - 0.6)
 end
 
-local function GetName(name, font, isDead, isLagging)
-	if isDead then
+local function GetName(name, font, state)
+	if state.isDead then
 		name = "<Dead> " .. name
-	elseif isLagging then
-		name = "<Lag> " .. name
+	elseif state.isLagging then
+		name = "<Lagging> " .. name
+	elseif state.isAfk then
+		name = "<AFK> " .. name
 	end
+	
 	if not font then
 		return name
 	end
@@ -199,11 +202,19 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			end
 		end
 		
-		newIsLagging = (((not active) or (pingTime > PING_TIMEOUT) or spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging")) and true) or false
+		newIsLagging = (((not active) or (pingTime > PING_TIMEOUT)) and true) or false
 		if forceUpdateControls or newIsLagging ~= entryData.isLagging then
 			entryData.isLagging = newIsLagging
 			if controls and not entryData.isDead then
-				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData.isDead, entryData.isLagging))
+				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
+			end
+		end
+		
+		newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
+		if forceUpdateControls or newIsAfk ~= entryData.isAfk then
+			entryData.isAfk = newIsAfk
+			if controls and not (entryData.isDead or entryData.isLagging) then
+				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
 			end
 		end
 		
@@ -252,7 +263,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 	if forceUpdateControls or newIsDead ~= entryData.isDead then
 		entryData.isDead = newIsDead
 		if controls then
-			controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData.isDead, entryData.isLagging))
+			controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
 			controls.textName.font.color = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
 			controls.textName:Invalidate()
 		end
@@ -393,13 +404,13 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		bottom = 3,
 		align = "left",
 		parent = userControls.mainControl,
-		caption = GetName(userControls.entryData.name, nil, userControls.entryData.isDead, userControls.entryData.isLagging),
+		caption = GetName(userControls.entryData.name, nil, userControls.entryData),
 		textColor = GetPlayerTeamColor(userControls.entryData.teamID, userControls.entryData.isDead),
 		fontsize = options.text_height.value,
 		fontShadow = true,
 		autosize = false,
 	}
-	userControls.textName:SetCaption(GetName(userControls.entryData.name, userControls.textName.font, userControls.entryData.isDead, userControls.entryData.isLagging))
+	userControls.textName:SetCaption(GetName(userControls.entryData.name, userControls.textName.font, userControls.entryData))
 	offset = offset + MAX_NAME_LENGTH
 
 	offset = offset + 1
