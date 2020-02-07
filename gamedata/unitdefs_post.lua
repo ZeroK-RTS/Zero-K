@@ -352,25 +352,24 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Maneuverability multipliers, useful for testing.
--- TODO: migrate the x3 and x5 ones to defs, leave at x1 for easy testing
 
 local TURNRATE_MULT = 1.2
 local TURNRATE_MULT_HIGH = 1.6
-local ACCEL_MULT = 3
-local ACCEL_MULT_HIGH = 6
+local ACCEL_MULT = 1
+local ACCEL_MULT_HIGH = 1.2
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
-		ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
-			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
+			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
 		else
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
-			ud.brakerate = ud.brakerate * ACCEL_MULT*2
+			ud.brakerate = ud.brakerate * ACCEL_MULT
 		end
 	end
 end
