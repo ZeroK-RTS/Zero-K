@@ -748,9 +748,8 @@ function gadget:DrawWorld()
 	if drawAnything then
 		glPushAttrib(GL.LINE_BITS)
 		glLineWidth(3)
-		gl.DepthTest(true)
-		glCallList(drawList)
 		gl.DepthTest(false)
+		glCallList(drawList)
 		glColor(1,1,1,1)
 		glPopAttrib()
 	end
