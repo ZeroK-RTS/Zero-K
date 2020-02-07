@@ -119,8 +119,8 @@ local function PingTimeOut(pingTime)
 	return "Ping " .. ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
 end
 
-local function CpuTimeOut(cpuTime)
-	return "CPU usage " .. math.ceil(cpuTime*100) .. "%"
+local function CpuUsageOut(cpuUsage)
+	return "CPU usage " .. math.ceil(cpuUsage*100) .. "%"
 end
 
 local function ToGrey(v)
@@ -186,7 +186,6 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 		if forceUpdateControls or pingBucket ~= entryData.pingBucket then
 			entryData.pingBucket = pingBucket
 			if controls then
-				controls.imPing.tooltip = PingTimeOut(pingTime)
 				controls.imPing.color = pingCpuColors[entryData.pingBucket]
 				controls.imPing:Invalidate()
 			end
@@ -196,10 +195,14 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 		if forceUpdateControls or cpuBucket ~= entryData.cpuBucket then
 			entryData.cpuBucket = cpuBucket
 			if controls then
-				controls.imCpu.tooltip = CpuTimeOut(cpuUsage)
 				controls.imCpu.color = pingCpuColors[entryData.cpuBucket]
 				controls.imCpu:Invalidate()
 			end
+		end
+		
+		if controls then
+			controls.imCpu.tooltip = CpuUsageOut(cpuUsage)
+			controls.imPing.tooltip = PingTimeOut(pingTime)
 		end
 		
 		newIsLagging = (((not active) or (pingTime > PING_TIMEOUT)) and true) or false
