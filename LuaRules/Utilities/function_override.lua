@@ -80,6 +80,19 @@ if Script.IsEngineMinVersion(104, 0, 50) then
 	end
 end
 
+if not Script.IsEngineMinVersion(104, 0, 503) then
+	local origGiveOrderToUnit = Spring.GiveOrderToUnit
+	local paramTable = {0}
+	Spring.GiveOrderToUnit = function (unitID, cmdID, params, opts)
+		if type(params) == "table" then
+			return origGiveOrderToUnit(unitID, cmdID, params, opts)
+		else
+			paramTable[1] = params
+			return origGiveOrderToUnit(unitID, cmdID, paramTable, opts)
+		end
+	end
+end
+
 if not Script.IsEngineMinVersion(104, 0, 536) then
 	local origGetPlayerInfo = Spring.GetPlayerInfo
 	Spring.GetPlayerInfo = function (playerID)
