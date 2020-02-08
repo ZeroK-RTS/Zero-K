@@ -21,6 +21,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
+local spGiveOrderToUnit   = Spring.GiveOrderToUnit
 
 local mapSizeX = Game.mapSizeX
 local mapSizeZ = Game.mapSizeZ
@@ -31,6 +32,9 @@ local CMD_REMOVE  = CMD.REMOVE
 local CMD_REPAIR  = CMD.REPAIR
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_MOVE    = CMD.MOVE
+local CMD_INSERT  = CMD.INSERT
+
+local CMD_OPT_ALT = CMD.OPT_ALT
 
 local MAX_UNITS = Game.maxUnits
 
@@ -574,7 +578,7 @@ local function CheckConstructorBuild(unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
 		if (not cx) or math.abs(cx - cp_1) > 3 or math.abs(cz - cp_3) > 3 then
-			Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+			spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
 			StopRawMoveUnit(unitID, true)
 		end
 		return
@@ -585,7 +589,7 @@ local function CheckConstructorBuild(unitID)
 		local buildDistSq = (buildDist + 30)^2
 		local distSq = (cx - x)^2 + (cz - z)^2
 		if distSq > buildDistSq then
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist, CONSTRUCTOR_TIMEOUT_RATE}, CMD.OPT_ALT)
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist, CONSTRUCTOR_TIMEOUT_RATE}, CMD_OPT_ALT)
 		end
 	end
 end
@@ -685,9 +689,9 @@ local function ReplaceMoveCommand(unitID)
 		if fromFactory[unitID] then
 			fromFactory[unitID] = nil
 		else
-			Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD.OPT_ALT)
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD_OPT_ALT)
 		end
-		Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
 	end
 end
 

@@ -929,7 +929,7 @@ local function ProcessUnitCommand(unitID, command)
 		if command.pos then
 			command.pos[1], command.pos[2] = SanitizeBuildPositon(command.pos[1], command.pos[2], ud, command.facing or 0)
 		else -- Must be a factory production command
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or 0)
+			Spring.GiveOrderToUnit(unitID, command.cmdID, 0, command.options or 0)
 			return
 		end
 	end
@@ -952,7 +952,7 @@ local function ProcessUnitCommand(unitID, command)
 		local p = command.atPosition
 		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
 		if units and units[1] then
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or 0)
+			Spring.GiveOrderToUnit(unitID, command.cmdID, units[1], command.options or 0)
 		end
 		return
 	end

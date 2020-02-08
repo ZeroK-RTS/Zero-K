@@ -1153,7 +1153,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		if value == -1 then
 			local priority = Spring.GetUnitRulesParam(factID,"buildpriority")
 			if priority then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, CMD.OPT_SHIFT)
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, priority, CMD.OPT_SHIFT)
 			end
 		end
 	end

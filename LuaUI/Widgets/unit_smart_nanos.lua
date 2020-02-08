@@ -71,8 +71,6 @@ local orderQueue = {}
 
 local myTeamID
 
-local EMPTY_TABLE = {}
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -161,9 +159,9 @@ function widget:CommandNotify(id, params, options)
       local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
         if (cmdID == CMD.REPAIR) and (cmdParam == targetUnit) then
           if options.shift then
-            GiveOrderToUnit(unitID,CMD.STOP, EMPTY_TABLE, 0)
+            GiveOrderToUnit(unitID,CMD.STOP, 0, 0)
           else
-            GiveOrderToUnit(unitID,CMD.RECLAIM,{targetUnit}, 0)
+            GiveOrderToUnit(unitID,CMD.RECLAIM,targetUnit, 0)
           end
         end
     end
