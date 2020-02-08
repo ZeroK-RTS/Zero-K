@@ -69,8 +69,6 @@ local nanoTurrets = {}
 local allyUnits = {}
 local orderQueue = {}
 
-if (Game.modShortName == "BA") then local BA = true end
-
 local myTeamID
 
 local EMPTY_TABLE = {}
@@ -147,19 +145,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:CommandNotify(id, params, options)
---[[
-  local CMD_UPGRADEMEX = math.huge
-  
-  if BA and (id == 31244) then
-    if (#params == 1) then
-      local unitDefID = GetUnitDefID(params[1])
-      if (unitDefID ~= nil) and (UnitDefs[unitDefID].customParams.ismex) then
-        CMD_UPGRADEMEX = 31244
-      end
-    end
-  end
-]]--
-  
   local selUnits = GetSelectedUnits()
     
   for _,unitID in ipairs(selUnits) do
@@ -169,7 +154,6 @@ function widget:CommandNotify(id, params, options)
     end
   end
     
-  --if (id == CMD.RECLAIM) or (id == CMD_UPGRADEMEX) then
   if (id == CMD.RECLAIM) then
     targetUnit = params[1]
     teamUnits[targetUnit] = nil
