@@ -51,13 +51,6 @@ local UPDATE = 0.5     -- Response time for commands
 local NANO_GROUPS = 8  -- Groups to split nanoturrets into
 local UPDATE_TICK = 2.5  -- Seconds to check if last order is still the best
 
-local noReclaimList = {}
-noReclaimList["Dragon's Teeth"] = 0
-noReclaimList["Shark's Teeth"] = 0
-noReclaimList["Fortification Wall"] = 0
-noReclaimList["Spike"] = 0
-noReclaimList["Commander Wreckage"] = 25
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -438,7 +431,7 @@ function widget:Update(deltaTime)
                 local fd = GetFeatureDefID(featureID)
                 local radiusSqr = (FeatureDefs[fd].radius * FeatureDefs[fd].radius)
                 if (getDistance(unitDefs.posX, unitDefs.posZ, fX, fZ) < (unitDefs.buildDistanceSqr + radiusSqr)) then
-                  if (FeatureDefs[fd].reclaimable) and (not noReclaimList[FeatureDefs[fd].tooltip]) then
+                  if FeatureDefs[fd].reclaimable then
                     local fm,_,fe  = GetFeatureResources(featureID)
                     if (fm > 0) and (fe > 0) then
                       bestFeature = featureID
