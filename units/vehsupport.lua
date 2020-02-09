@@ -21,6 +21,7 @@ return { vehsupport = {
 
   customParams           = {
     modelradius    = [[13]],
+    aimposoffset   = [[0 10 0]],
     chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
   },
 
