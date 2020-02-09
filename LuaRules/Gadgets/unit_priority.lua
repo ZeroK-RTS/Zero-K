@@ -105,9 +105,9 @@ local debugTeam = false
 local debugOnUnits = false
 local debugBuildUnit
 
-GG.REPAIR_COSTS_METAL = true -- Configurable
-GG.REPAIR_RESOURCE_MULT = 0.5
-local REPAIR_METAL_COST_FACTOR = 0.5*GG.REPAIR_RESOURCE_MULT -- Must match energyCostFactor in modrules.
+GG.REPAIR_COSTS_METAL = false -- Configurable
+GG.REPAIR_RESOURCE_MULT = 1
+local REPAIR_METAL_COST_FACTOR = Game.repairEnergyCostFactor
 
 --------------------------------------------------------------------------------
 --  COMMON

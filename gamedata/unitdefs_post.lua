@@ -464,11 +464,13 @@ end
 -- 2x repair speed than BP
 --
 
+local REPAIR_ENERGY_COST_FACTOR = 0.75 -- Game.repairEnergyCostFactor
+
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then
-		unitDef.repairspeed = unitDef.repairspeed * 2
+		unitDef.repairspeed = unitDef.repairspeed / REPAIR_ENERGY_COST_FACTOR
 	elseif (unitDef.workertime) then
-		unitDef.repairspeed = unitDef.workertime * 2
+		unitDef.repairspeed = unitDef.workertime / REPAIR_ENERGY_COST_FACTOR
     end
 end
 
