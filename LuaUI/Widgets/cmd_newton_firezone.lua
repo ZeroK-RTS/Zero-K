@@ -42,6 +42,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
 --local ech = Spring.Echo
 
 local floor = math.floor
@@ -74,12 +75,19 @@ local cmdStopFirezone = {
 local bombUnitDefIDs = {
 	[UnitDefNames["jumpscout"].id] = true,
 }
+local jumpUnitDefIDs = {}
+
 for udid = 1, #UnitDefs do
 	local ud = UnitDefs[udid]
+	local cp = ud.customParams
 	if ud.canKamikaze then
 		bombUnitDefIDs[udid] = true
 	end
+	if cp.canjump == "1" and cp.jump_from_midair ~= "0" then
+		jumpUnitDefIDs[udid] = true
+	end
 end
+
 
 --------------
 ---OPTIONS----
@@ -91,7 +99,7 @@ local transportPredictLevel = 1
 local transportPredictionSpeedSq = 5^2
 
 options_path = 'Settings/Interface/Falling Units'--/Formations'
-options_order = { 'lbl_newton', 'predictNewton', 'alwaysDrawZones', 'lbl_transports', 'predictDrop', 'transportSpeed'}
+options_order = { 'lbl_newton', 'predictNewton', 'alwaysDrawZones', 'jumpOnPrediction', 'lbl_transports', 'predictDrop', 'transportSpeed'}
 options = {
 	lbl_newton = { name = 'Newton Launchers', type = 'label'},
 	predictNewton = {
@@ -125,6 +133,12 @@ options = {
 		OnChange = function(self)
 			alwaysDrawFireZones = self.value
 		end,
+	},
+	jumpOnPrediction = {
+		name = "Jump on prediction",
+		desc = "Enable to have jumpjet units jump to the predicted land location.",
+		type = 'bool',
+		value = true,
 	},
 	lbl_transports = { name = 'Transports', type = 'label'},
 	predictDrop = {
@@ -181,13 +195,19 @@ local groupTarget = {}
 local victimStillBeingAttacked = {}
 local victimLandingLocation = {}
 
-local queueTrajectoryEstimate = {targetFrame=-1,unitList={}} --for use in scheduling the time to calculate unit trajectory
+local queueTrajectoryEstimate = {} --for use in scheduling the time to calculate unit trajectory
 local transportedUnits = {}
 
 --local cmdRate = 0
 --local cmdRateS = 0
 local softEnabled = false	--if zero newtons has orders, uses less
 local currentFrame = Spring.GetGameFrame()
+
+local GetBoundedLineIntersection = Spring.Utilities.Vector.GetBoundedLineIntersection
+local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
+local EDGE_GAP = 16
+local prevJump = {}
+local prevMove = {}
 
 local EMPTY_TABLE = {}
 
@@ -428,6 +448,73 @@ function widget:CommandsChanged()
 		customCommands[#customCommands+1] = cmdStopFirezone
 	end
 end
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-- Jump command handling
+
+local function BoundToMap(unitX, unitY, unitZ, landX, landY, landZ)
+	if landX > EDGE_GAP and landX < mapWidth - EDGE_GAP and landZ > EDGE_GAP and landZ < mapHeight - EDGE_GAP then
+		return landX, landY, landZ
+	end
+	
+	local edges = {}
+	if landX < 0 then
+		edges[#edges + 1] = {{EDGE_GAP, 0}, {EDGE_GAP, mapHeight}}
+	elseif landX >= mapWidth then
+		edges[#edges + 1] = {{mapWidth - EDGE_GAP, 0}, {mapWidth - EDGE_GAP, mapHeight}}
+	end
+	if landZ < 0 then
+		edges[#edges + 1] = {{0, EDGE_GAP}, {mapWidth, EDGE_GAP}}
+	elseif landZ >= mapHeight then
+		edges[#edges + 1] = {{0, mapHeight - EDGE_GAP}, {mapWidth, mapHeight - EDGE_GAP}}
+	end
+	
+	local flyLine = {{unitX, unitZ}, {landX, landZ}}
+	
+	for i = 1, #edges do
+		local line = edges[i]
+		local newPoint = GetBoundedLineIntersection(flyLine, line)
+		if newPoint then
+			flyLine[2][1] = newPoint[1]
+			flyLine[2][2] = newPoint[2]
+		end
+	end
+	
+	return flyLine[2][1], spGetGroundHeight(flyLine[2][1], flyLine[2][2]), flyLine[2][2]
+end
+
+local function IssueJumpCommand(unitID, unitX, unitY, unitZ, landX, landY, landZ)
+	local removeTag = false
+	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD_JUMP then
+		if prevJump[unitID] and math.abs(prevJump[unitID][1] - cp_1) < 0.01 and math.abs(prevJump[unitID][2] - cp_2) < 0.01 and math.abs(prevJump[unitID][3] - cp_3) < 0.01 then
+			removeTag = cmdTag
+		else
+			-- Do not add jump command if the player has manually issued one.
+			return
+		end
+	end
+	
+	if prevMove[unitID] and (cmdID == CMD_RAW_MOVE or cmdID == CMD_MOVE) then
+		if math.abs(prevMove[unitID][1] - cp_1) < 0.01 and math.abs(prevMove[unitID][2] - cp_2) < 0.01 and math.abs(prevMove[unitID][3] - cp_3) < 0.01 then
+			prevMove[unitID] = nil
+			removeTag = cmdTag
+		end
+	end
+	
+	local cx,cy,cz = BoundToMap(unitX, unitY, unitZ, landX, landY, landZ)
+	
+	if removeTag then
+		spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+		spGiveOrderToUnit(unitID, CMD.REMOVE, {removeTag}, 0 )
+	else
+		spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+	end
+	
+	prevJump[unitID] = {cx, cy, cz}
+end
+
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 --- SPECTATOR CHECK
@@ -471,11 +558,20 @@ function widget:UnitDestroyed(unitID)
 	end
 end
 
-local function AddTrajectoryEstimate(unitID)
-	if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
-		queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
+local function AddTrajectoryEstimate(unitID, unitDefID, offset)
+	local frame = (currentFrame - (currentFrame % 15)) + offset
+	queueTrajectoryEstimate[frame] = queueTrajectoryEstimate[frame] or {}
+	queueTrajectoryEstimate[frame][unitID] = true
+	
+	if options.jumpOnPrediction.value and jumpUnitDefIDs[unitDefID] then
+		local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+		if cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE then
+			prevMove[unitID] = prevMove[unitID] or {}
+			prevMove[unitID][1] = cp_1
+			prevMove[unitID][2] = cp_2
+			prevMove[unitID][3] = cp_3
+		end
 	end
-	queueTrajectoryEstimate["unitList"][unitID] = true
 end
 
 local function UpdateTransportedUnits()
@@ -514,7 +610,9 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	
 	if ((launchPredictLevel == 2) and damage == 0) or (launchPredictLevel == 3) or ((launchPredictLevel == 1) and victim[unitID]) then
 		--estimate trajectory of any unit hit by weapon
-		AddTrajectoryEstimate(unitID)
+		AddTrajectoryEstimate(unitID, unitDefID, 15)
+		AddTrajectoryEstimate(unitID, unitDefID, 60)
+		AddTrajectoryEstimate(unitID, unitDefID, 150)
 	end
 end
 
@@ -531,11 +629,11 @@ function widget:GameFrame(n)
 	end
 	
 	-- estimate for recently launched units
-	if queueTrajectoryEstimate["targetFrame"] == n then
-		for unitID,_ in pairs(queueTrajectoryEstimate["unitList"]) do
+	if queueTrajectoryEstimate[n] then
+		for unitID,_ in pairs(queueTrajectoryEstimate[n]) do
 			EstimateCrashLocation(unitID)
-			queueTrajectoryEstimate["unitList"][unitID]=nil
 		end
+		queueTrajectoryEstimate[n] = nil
 	end
 	
 	--empty whitelist to widget:UnitDamaged() monitoring
@@ -729,7 +827,14 @@ function EstimateCrashLocation(victimID, transportID)
 	local airDensity = 1.2/4 --see Spring/rts/Map/Mapinfo.cpp
 	local future_locationX, future_height,future_locationZ = SimulateWithDrag(xVel,yVel,zVel, x,y,z, gravity ,mass,radius, airDensity)
 	if future_locationX then
-		victimLandingLocation[victimID]={future_locationX,future_height, future_locationZ}
+		victimLandingLocation[victimID] = {future_locationX, future_height, future_locationZ}
+	end
+	
+	if options.jumpOnPrediction.value and jumpUnitDefIDs[defID] then
+		local groundHeight = spGetGroundHeight( x, z)
+		if y - groundHeight > 50 then
+			IssueJumpCommand(victimID, x,y,z, future_locationX, future_height, future_locationZ)
+		end
 	end
 end
 

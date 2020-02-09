@@ -35,6 +35,7 @@ VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 VFS.Include("LuaRules/Utilities/unitStates.lua")
 VFS.Include("LuaRules/Utilities/teamFunctions.lua")
+VFS.Include("LuaRules/Utilities/vector.lua")
 
 VFS.Include("LuaRules/Utilities/function_override.lua")
 
