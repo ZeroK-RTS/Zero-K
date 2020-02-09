@@ -60,6 +60,8 @@ if not USE_OLD_CHILI then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+Spring.Echo("Not USE_OLD_CHILI")
+
 local Chili
 local screen0
 local th
@@ -233,6 +235,8 @@ widget.TweakMouseWheel   = widget.MouseWheel
 else -- Old Chili
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+Spring.Echo("USE_OLD_CHILI")
 
 local Chili
 local screen0
