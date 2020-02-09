@@ -89,9 +89,9 @@ return { vehriot = {
       },
       
       damage                  = {
-        default = 250.2,
-        planes  = 250.2,
-        subs    = 11,
+        default = 280.2,
+        planes  = 280.2,
+        subs    = 14,
       },
 
       edgeEffectiveness       = 0.75,
