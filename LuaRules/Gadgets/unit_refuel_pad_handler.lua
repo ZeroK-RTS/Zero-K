@@ -61,6 +61,10 @@ local mobilePadDefs = {
 	[UnitDefNames["shipcarrier"].id] = true,
 }
 
+local DEFAULT_REAMMO_TIME = 5
+local DEFAULT_REAMMO_DRAIN = 10
+local DEFAULT_REPAIR_BP = 2.5
+
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
 
@@ -85,12 +89,12 @@ for i = 1, #UnitDefs do
 		rotateUnit[i] = false
 	end
 	if ud.customParams.requireammo then
-		reammoFrames[i] = (tonumber(ud.customParams.reammoseconds) or 5)*30
-		reammoDrain[i] = (tonumber(ud.customParams.reammodrain) or 0)/30
+		reammoFrames[i] = (tonumber(ud.customParams.reammoseconds) or DEFAULT_REAMMO_TIME)*30
+		reammoDrain[i] = (tonumber(ud.customParams.reammodrain) or DEFAULT_REAMMO_DRAIN)/30
 	end
 	
 	if ud.customParams.ispad then
-		padRepairBp[i] = tonumber(ud.customParams.pad_bp) or 2.5
+		padRepairBp[i] = tonumber(ud.customParams.pad_bp) or DEFAULT_REPAIR_BP
 	end
 end
 
