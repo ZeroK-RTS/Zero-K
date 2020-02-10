@@ -28,6 +28,7 @@ local windDefs = {
 	[ UnitDefNames['energywind'].id ] = true,
 }
 
+local WIND_HEALTH = UnitDefNames['energywind'].health
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local windmills = IterableMap.New()
@@ -173,7 +174,7 @@ local function SetupUnit(unitID)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
 		local health = Spring.GetUnitHealth(unitID)
-		if health == 130 then
+		if health == WIND_HEALTH then
 			Spring.SetUnitHealth(unitID, 400)
 		end
 		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
