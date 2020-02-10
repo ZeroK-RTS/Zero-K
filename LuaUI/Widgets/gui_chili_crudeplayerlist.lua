@@ -11,6 +11,10 @@ function widget:GetInfo()
 	}
 end
 
+if Spring.GetModOptions().singleplayercampaignbattleid then
+	return
+end
+
 -- A test game: http://zero-k.info/Battles/Detail/797379
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
