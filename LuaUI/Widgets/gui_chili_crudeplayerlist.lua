@@ -139,6 +139,8 @@ local function GetName(name, font, state)
 		name = "<Dead> " .. name
 	elseif state.isLagging then
 		name = "<Lagging> " .. name
+	elseif state.isWaiting then
+		name = "<Waiting> " .. name
 	elseif state.isAfk then
 		name = "<AFK> " .. name
 	end
@@ -157,11 +159,15 @@ local function GetPlayerTeamColor(teamID, isDead)
 	return {r, g, b, a}
 end
 
-local function ShareUnits(playername, team)
+local function ShareUnits(playername, teamID)
+	if not teamID then
+		Spring.Echo('Player List: Invalid team to share.')
+		return
+	end
 	local selcnt = Spring.GetSelectedUnitsCount()
 	if selcnt > 0 then
 		Spring.SendCommands("say a: I gave "..selcnt.." units to "..playername..".")
-		Spring.ShareResources(team, "units")
+		Spring.ShareResources(teamID, "units")
 	else
 		Spring.Echo('Player List: No units selected to share.')
 	end
@@ -173,6 +179,7 @@ end
 local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateControls)
 	local newTeamID, newAllyTeamID = entryData.teamID, entryData.allyTeamID
 	local newIsLagging = entryData.isLagging
+	local newIsWaiting = entryData.isWaiting
 	local isSpectator = false
 	
 	if entryData.playerID then
@@ -209,7 +216,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			controls.imPing.tooltip = PingTimeOut(pingTime)
 		end
 		
-		newIsLagging = (((not active) or (pingTime > PING_TIMEOUT)) and true) or false
+		newIsLagging = ((pingTime > PING_TIMEOUT) and true) or false
 		if forceUpdateControls or newIsLagging ~= entryData.isLagging then
 			entryData.isLagging = newIsLagging
 			if controls and not entryData.isDead then
@@ -217,10 +224,18 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			end
 		end
 		
+		newIsWaiting = (not active)
+		if forceUpdateControls or newIsWaiting ~= entryData.isWaiting then
+			entryData.isWaiting = newIsWaiting
+			if controls and not (entryData.isDead or entryData.isLagging) then
+				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
+			end
+		end
+		
 		newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
 		if forceUpdateControls or newIsAfk ~= entryData.isAfk then
 			entryData.isAfk = newIsAfk
-			if controls and not (entryData.isDead or entryData.isLagging) then
+			if controls and not (entryData.isDead or entryData.isLagging or entryData.isWaiting) then
 				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
 			end
 		end
@@ -262,7 +277,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			controls.textAllyTeam.font.color = entryData.allyTeamColor
 			controls.textAllyTeam:Invalidate()
 			
-			controls.btnShare:SetVisibility((myAllyTeamID and entryData.isMyAlly and (entryData.teamID ~= myTeamID) and true) or false)
+			controls.btnShare:SetVisibility((myAllyTeamID and entryData.isMyAlly and not entryData.isDead and (entryData.teamID ~= myTeamID) and true) or false)
 		end
 	end
 	
@@ -431,7 +446,9 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		caption = "",
 		tooltip = "Double click to share the units you have selected to this player.",
 		padding ={0,0,0,0},
-		OnDblClick = { function(self) ShareUnits(userControls.entryData.name, playerID) end, },
+		OnDblClick = {function(self)
+			ShareUnits(userControls.entryData.name, userControls.entryData.teamID)
+		end, },
 	}
 	Chili.Image:New {
 		name = "imShare",
