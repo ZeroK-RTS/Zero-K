@@ -1481,9 +1481,8 @@ function gadget:GameFrame(n)
 				end
 				
 				local metalIncome = odShare + baseShare + miscShare
-				if mCurr + metalIncome < mStor then
+				if share > 0 and mCurr + metalIncome < mStor then
 					freeSpace[i] = mStor - (mCurr + metalIncome)
-					totalFreeSpace = totalFreeSpace + freeSpace[i]
 				end
 				
 				totalMetalIncome[i] = metalIncome
@@ -1509,6 +1508,14 @@ function gadget:GameFrame(n)
 					te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 					te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
 				)
+			end
+			
+			for i = 1, allyTeamData.teams do
+				local share = (splitByShare and teamResourceShare[teamID]) or 1
+				if share > 0 and freeSpace[i] then
+					freeSpace[i] = math.min(freeSpace[i], totalToShare * share)
+					totalFreeSpace = totalFreeSpace + freeSpace[i]
+				end
 			end
 			
 			if totalToShare ~= 0 then
