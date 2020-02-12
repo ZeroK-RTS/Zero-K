@@ -58,6 +58,8 @@ local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 local PING_TIMEOUT = 2000 -- ms
 
+local debugAllyTeam
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utilities
@@ -312,10 +314,18 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	local recieveAiTeamID = false
 	local backupAiTeam = false
 	
+	if debugAllyTeam and debugAllyTeam[allyTeamID] then
+		Spring.Echo(" ======= Lagmonitor Debug " .. allyTeamID .. " ======= ")
+	end
+	
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local resourceShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
+		if debugAllyTeam and debugAllyTeam[allyTeamID] then
+			Spring.Echo("teamID", teamID, "share", resourceShare, "rank", teamRank, "isHostedAi", isHostedAiTeam, "isBackup", isBackupAi)
+		end
+		
 		if not isBackupAi then
 			if resourceShare == 0 then
 				if teamResourceShare[teamID] ~= 0 then
@@ -337,6 +347,10 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		end
 		
 		teamResourceShare[teamID] = resourceShare
+	end
+	
+	if debugAllyTeam and debugAllyTeam[allyTeamID] then
+		Spring.Echo("totalResourceShares", totalResourceShares)
 	end
 	
 	-- The backup AI team should be a LuaAI that exists only to take over from the circuitAIs.
@@ -406,6 +420,32 @@ function gadget:GameOver()
 	gadgetHandler:RemoveGadget() --shutdown after game over, so that at end of a REPLAY Lagmonitor doesn't bounce unit among player
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local function LagmonitorDebugToggle(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local allyTeamID = tonumber(words[1])
+	Spring.Echo("Debug Lagmonitor for allyTeam " .. (allyTeamID or "nil"))
+	if allyTeamID then
+		if not debugAllyTeam then
+			debugAllyTeam = {}
+		end
+		if debugAllyTeam[allyTeamID] then
+			debugAllyTeam[allyTeamID] = nil
+			if #debugAllyTeam == 0 then
+				debugAllyTeam = {}
+			end
+			Spring.Echo("Disabled")
+		else
+			debugAllyTeam[allyTeamID] = true
+			Spring.Echo("Enabled")
+		end
+	end
+end
+
 ----------------------------------------------------------------------------------------
 -- External Functions
 ----------------------------------------------------------------------------------------
@@ -430,4 +470,6 @@ function gadget:Initialize()
 	end
 
 	GG.Lagmonitor = externalFunctions
+	
+	gadgetHandler:AddChatAction("debuglag", LagmonitorDebugToggle, "Toggles Lagmonitor debug.")
 end
