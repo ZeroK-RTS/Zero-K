@@ -181,6 +181,9 @@ local function ApplyProjectileLead(proID, speed)
 	if not tx then
 		return
 	end
+	if ty < 1 then
+		ty = 1
+	end
 
 	local vx, vy, vz = spGetUnitVelocity(targetID)
 	local px, py, pz = spGetProjectilePosition(proID)
@@ -189,11 +192,7 @@ local function ApplyProjectileLead(proID, speed)
 	end
 
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
-	
 	local lx, ly, lz = (tx - px) + vx*flyTime, (ty - py) + vy*flyTime, (tz - pz) + vz*flyTime
-	if ly < 2 then
-		ly = 2
-	end
 	local leadSpeed = dist3D(lx, ly, lz, 0, 0, 0)
 	local normFactor = speed/leadSpeed
 	
