@@ -191,6 +191,9 @@ local function ApplyProjectileLead(proID, speed)
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
 	
 	local lx, ly, lz = (tx - px) + vx*flyTime, (ty - py) + vy*flyTime, (tz - pz) + vz*flyTime
+	if ly < 2 then
+		ly = 2
+	end
 	local leadSpeed = dist3D(lx, ly, lz, 0, 0, 0)
 	local normFactor = speed/leadSpeed
 	
