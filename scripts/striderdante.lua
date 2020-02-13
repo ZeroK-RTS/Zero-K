@@ -64,8 +64,6 @@ local SIG_IDLE = 64
 local RELOADTIME = wd and WeaponDefs[wd].reload*30 or 20*30
 local SALVO_TIME = 1000
 
-local unitScale = 1
-
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
 
@@ -242,7 +240,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)/unitScale
+		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
@@ -275,29 +273,6 @@ local function Walk()
 	end
 end
 
-local function ScaleFunc(mag, period, t)
-	return 1.2^(math.sin(t/period)*mag)
-end
-
-local function SizeControl()
-	local p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16 = Spring.GetUnitPieceMatrix(unitID, base)
-	local pieceTable = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16}
-	
-	local mag = math.random()*3 + 1
-	local period = math.random()*30 + 10
-	local t = math.random()*100
-	
-	while true do
-		unitScale = ScaleFunc(mag, period, t)
-		pieceTable[1] = unitScale
-		pieceTable[6] = unitScale
-		pieceTable[11] = unitScale
-		Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
-		t = t + 1
-		Sleep(33)
-	end
-end
-
 function script.Create()
 	Hide(flame1)
 	Hide(flame2)
@@ -310,7 +285,6 @@ function script.Create()
 	Hide(jet1)
 	Hide(jet2)
 	
-	StartThread(SizeControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
