@@ -39,7 +39,7 @@ return { bomberriot = {
   maxDamage           = 720,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
-  maxRudder           = 0.008,
+  maxRudder           = 0.009,
   maxFuel             = 1000000,
   maxVelocity         = 8,
   minCloakDistance    = 75,
@@ -58,8 +58,8 @@ return { bomberriot = {
     },
 
   },
-  sightDistance       = 660,
-  turnRadius          = 200,
+  sightDistance       = 780,
+  turnRadius          = 160,
   workerTime          = 0,
 
   weapons             = {

@@ -205,8 +205,10 @@ end
 	timeout -- percieved projectile travel time from unitID to targetID in frames
 	fastMult -- Multiplier to timeout if the target is fast
 	radarMult -- Multiplier to timeout if the taget is a radar dot
+	staticOnly -- Only against static targets
+	noFire -- The unit is just testing whether it would be blocked. It is not neccessarily creating a projectile frrom this test.
 ]]--
-local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly, noFire)
 
 	-- Modify timeout based on unit speed and fastMult
 	local unitDefID = Spring.GetUnitDefID(targetID)
@@ -225,9 +227,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	-- When true, the projectile damage will be added to the damage to be taken by the unit.
 	-- When false, it will only check whether the shot should be blocked.
-	local addToIncomingDamage = true
+	local addToIncomingDamage = not noFire
 
-	if staticOnly then
+	if staticOnly and not noFire then
 		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
 	end
 
@@ -353,6 +355,19 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 	end
 end
 
+function GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
+	if not (unitID and targetID and units[unitID]) then
+		return false
+	end
+
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		local gameFrame = spGetGameFrame()
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult, staticOnly, true)
+	end
+	return false
+end
+
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
 	if not (unitID and targetID and units[unitID]) then
 		return false
@@ -433,7 +448,8 @@ end
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_PREVENT_OVERKILL)
-
+	GG.IsUnitIdentifiedStructure = IsUnitIdentifiedStructure
+	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

@@ -41,7 +41,7 @@ return { bomberprec = {
   maxBank             = 0.6,
   maxDamage           = 1000,
   maxElevator         = 0.02,
-  maxRudder           = 0.009,
+  maxRudder           = 0.013,
   maxFuel             = 1000000,
   maxPitch            = 0.4,
   maxVelocity         = 7.8,
@@ -60,7 +60,7 @@ return { bomberprec = {
     },
 
   },
-  sightDistance       = 660,
+  sightDistance       = 780,
   turnRadius          = 300,
   workerTime          = 0,
 
@@ -75,7 +75,7 @@ return { bomberprec = {
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 150,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
     
@@ -153,7 +153,7 @@ return { bomberprec = {
       leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
       leadLimit               = 20,
-      range                   = 150,
+      range                   = 180,
       reloadtime              = 5,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],

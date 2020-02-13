@@ -36,14 +36,15 @@ return { bomberdisarm = {
   maxAcc              = 0.5,
   maxDamage           = 1000,
   maxFuel             = 1000000,
+  maxRudder           = 0.0052,
   maxVelocity         = 9,
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName          = [[stiletto.s3o]],
   script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
-  sightDistance       = 660,
-  turnRadius          = 400,
+  sightDistance       = 780,
+  turnRadius          = 320,
 
   weapons             = {
 
