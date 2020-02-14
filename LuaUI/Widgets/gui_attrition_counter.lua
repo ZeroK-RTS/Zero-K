@@ -304,7 +304,7 @@ function widget:Initialize()
 			if(isAI) then
 				elo = 1000;
 			else
-				local keys = select(11,GetPlayerInfo(leader));
+				local keys = select(10,GetPlayerInfo(leader));
 				elo = (keys and keys.elo) or 1000;
 			end
 			

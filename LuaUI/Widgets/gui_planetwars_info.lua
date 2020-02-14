@@ -447,7 +447,7 @@ end
 
 local function GetInstructions()
 	local modOpts = Spring.GetModOptions()
-	local customKeys = select(11, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
 
 	local myRole = "defender"
 	if Spring.GetSpectatingState() or not customKeys then

@@ -80,20 +80,7 @@ if Script.IsEngineMinVersion(104, 0, 50) then
 	end
 end
 
-if not Script.IsEngineMinVersion(104, 0, 503) then
-	local origGiveOrderToUnit = Spring.GiveOrderToUnit
-	local paramTable = {0}
-	Spring.GiveOrderToUnit = function (unitID, cmdID, params, opts)
-		if type(params) == "table" then
-			return origGiveOrderToUnit(unitID, cmdID, params, opts)
-		else
-			paramTable[1] = params
-			return origGiveOrderToUnit(unitID, cmdID, paramTable, opts)
-		end
-	end
-end
-
-if not Script.IsEngineMinVersion(104, 0, 536) then
+if Script.IsEngineMinVersion(104, 0, 536) then
 	local origGetPlayerInfo = Spring.GetPlayerInfo
 	Spring.GetPlayerInfo = function (playerID)
 		if not playerID then
@@ -130,7 +117,7 @@ if not Script.IsEngineMinVersion(104, 0, 1143) then
 	end
 end
 
-if not Script.IsEngineMinVersion(104, 0, 1166) then
+if Script.IsEngineMinVersion(104, 0, 1166) then
 	local origGetTeamInfo = Spring.GetTeamInfo
 	Spring.GetTeamInfo = function (p1, p2)
 		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)

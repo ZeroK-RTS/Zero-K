@@ -449,7 +449,7 @@ function widgetHandler:Initialize()
   end
 
   -- Add ignorelist --
-  local customkeys = select(11, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
   if customkeys["ignored"] then
     if string.find(customkeys["ignored"],",") then
       local newignorelist = string.gsub(customkeys["ignored"],","," ")
@@ -1456,7 +1456,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			newMsg.msgtype = 'spec_to_specs'
 		end
 		local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
-		local customkeys = select(11, Spring.GetPlayerInfo(playerID_msg))
+		local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))
 		if customkeys and (customkeys.muted or (newMsg.msgtype == 'spec_to_everyone' and ((customkeys.can_spec_chat or '1') == '0'))) then
 			local myPlayerID = Spring.GetLocalPlayerID()
 			if myPlayerID == playerID_msg then --if I am the muted, then:
@@ -2095,7 +2095,7 @@ end
 
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
-  local playerName, _, _, _, _, _, _, _, _, _, customkeys = Spring.GetPlayerInfo(playerID)
+  local playerName, _, _, _, _, _, _, _, _, customkeys = Spring.GetPlayerInfo(playerID)
   if ignorelist.ignorees[playerName] or (customkeys and customkeys.muted) then
     return true
   end

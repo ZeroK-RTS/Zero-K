@@ -306,7 +306,7 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	}
 	
 	if playerID then
-		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, _, customKeys = Spring.GetPlayerInfo(playerID, true)
+		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
 		customKeys = customKeys or {}
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)

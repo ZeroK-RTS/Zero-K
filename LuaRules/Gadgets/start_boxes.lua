@@ -190,7 +190,7 @@ local function GetPlayerInfo (teamID)
 	end
 
 	local name = Spring.GetPlayerInfo(playerID, false) or "?"
-	local customKeys = select(11, Spring.GetPlayerInfo(playerID)) or {}
+	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
 	local clanShort = customKeys.clan     or ""
 	local clanLong  = customKeys.clanfull or ""
 	local elo       = customKeys.elo      or "0"

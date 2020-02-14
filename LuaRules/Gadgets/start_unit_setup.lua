@@ -202,7 +202,7 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-	local teamInfo = teamID and select(8, Spring.GetTeamInfo(teamID, true))
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID, true))
 	if teamInfo and teamInfo.staticcomm then
 		local commanderName = teamInfo.staticcomm
 		local commanderLevel = teamInfo.staticcomm_level or 1
@@ -310,7 +310,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if not teamID then
 		return
 	end
-	local _,_,_,_,_,allyTeamID,_,teamInfo = Spring.GetTeamInfo(teamID, true)
+	local _,_,_,_,_,allyTeamID,teamInfo = Spring.GetTeamInfo(teamID, true)
 	if teamInfo and teamInfo.nocommander then
 		waitingForComm[teamID] = nil
 		return
@@ -568,7 +568,7 @@ function gadget:GameStart()
 			playerlist = workAroundSpecsInTeamZero(playerlist, team)
 			if playerlist then
 				for i = 1, #playerlist do
-					local customKeys = select(11, Spring.GetPlayerInfo(playerlist[i]))
+					local customKeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
 					if customKeys and customKeys.extracomm then
 						for j = 1, tonumber(customKeys.extracomm) do
 							Spring.Echo("Spawing a commander")

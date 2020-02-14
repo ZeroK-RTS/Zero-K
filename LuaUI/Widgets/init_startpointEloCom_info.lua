@@ -56,7 +56,7 @@ function widget:Initialize()
 		local playerList = Spring.GetPlayerList(teamID)--get player(s) in a team
 		for j=1, #playerList do
 			local playerID = playerList[j]
-			local _,_,spec,_,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey -- oh really? no fucking shit sherlock
+			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey -- oh really? no fucking shit sherlock
 			local icon = 'LuaUI/Images/LobbyRanks/' .. (customKey and customKey.icon or "0_0") .. '.png'
 			local validEntry = not (x==y and x==z) and (not spec)
 			playerInfo[#playerInfo +1] = {icon=icon, xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry,

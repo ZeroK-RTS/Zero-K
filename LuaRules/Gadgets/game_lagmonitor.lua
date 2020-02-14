@@ -140,7 +140,7 @@ local function GetPlayerActivity(playerID, onlyActive)
 	if not playerID then
 		return false
 	end
-	local name, active, spec, team, allyTeam, ping, _, _, _, _, customKeys = spGetPlayerInfo(playerID)
+	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
 	
 	if onlyActive then
 		if (active and ping <= PING_TIMEOUT) then
@@ -393,7 +393,7 @@ local function InitializeAiTeamRulesParams()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		local _, leaderID, _, isAiTeam, _, _, _, customKeys = spGetTeamInfo(teamID)
+		local _, leaderID, _, isAiTeam, _, _, customKeys = spGetTeamInfo(teamID)
 		if isAiTeam then
 			Spring.SetTeamRulesParam(teamList[i], "initialIsAiTeam", 1)
 		end

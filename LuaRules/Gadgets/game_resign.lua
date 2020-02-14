@@ -57,7 +57,7 @@ function gadget:GotChatMsg (msg, senderID)
 		if (senderID == 255) then -- Springie
 			allowed = true
 		else
-			local playerkeys = select (11, spGetPlayerInfo(senderID))
+			local playerkeys = select (10, spGetPlayerInfo(senderID))
 			if (playerkeys and playerkeys.admin and (playerkeys.admin == "1")) then
 				allowed = true
 			end
