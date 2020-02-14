@@ -102,7 +102,6 @@ local ENEMY_COLOR = {1, 0, 0, 1}
 local PING_TIMEOUT = 2000 -- ms
 
 local MAX_NAME_LENGTH = 150
-local WINDOW_WIDTH = MAX_NAME_LENGTH + 130
 
 local UPDATE_PERIOD = 1
 
@@ -603,12 +602,16 @@ local function InitializePlayerlist()
 	
 	if listControls then
 		for i = 1, #listControls do
-			listControls[i]:Dispose()
+			if listControls[i].mainControl then
+				listControls[i].mainControl:Dispose()
+			end
 		end
 		listControls = {}
 		playersByPlayerID = {}
 		teamByTeamID = {}
 	end
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local windowWidth = MAX_NAME_LENGTH + 10*(options.text_height.value or 13)
 
 	--// WINDOW
 	playerlistWindow = Chili.Window:New{
@@ -618,12 +621,11 @@ local function InitializePlayerlist()
 		dockable = true,
 		name = "Player List",
 		padding = {0, 0, 0, 0},
-		-- right = "50%",
-		x = 200,
-		y = 200,
-		width = WINDOW_WIDTH,
-		minWidth = WINDOW_WIDTH,
-		clientHeight = 600,
+		x = screenWidth - windowWidth,
+		y = math.floor(screenHeight/10),
+		width = windowWidth,
+		minWidth = windowWidth,
+		clientHeight = math.floor(screenHeight/2),
 		minHeight = 100,
 		draggable = false,
 		resizable = false,
