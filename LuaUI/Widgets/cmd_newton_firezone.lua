@@ -496,7 +496,7 @@ local function IssueJumpCommand(unitID, unitX, unitY, unitZ, landX, landY, landZ
 		end
 	end
 	
-	if prevMove[unitID] and (cmdID == CMD_RAW_MOVE or cmdID == CMD_MOVE) then
+	if prevMove[unitID] and (cmdID == CMD_RAW_MOVE or cmdID == CMD_MOVE) and prevMove[unitID][1] and prevMove[unitID][2] and prevMove[unitID][3] and cp_1 and cp_2 and cp_3 then
 		if math.abs(prevMove[unitID][1] - cp_1) < 0.01 and math.abs(prevMove[unitID][2] - cp_2) < 0.01 and math.abs(prevMove[unitID][3] - cp_3) < 0.01 then
 			prevMove[unitID] = nil
 			removeTag = cmdTag
@@ -565,7 +565,7 @@ local function AddTrajectoryEstimate(unitID, unitDefID, offset)
 	
 	if options.jumpOnPrediction.value and jumpUnitDefIDs[unitDefID] then
 		local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-		if cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE then
+		if (cmdID == CMD_RAW_MOVE or cmdID == CMD.MOVE) and cp_3 then
 			prevMove[unitID] = prevMove[unitID] or {}
 			prevMove[unitID][1] = cp_1
 			prevMove[unitID][2] = cp_2
