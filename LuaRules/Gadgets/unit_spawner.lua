@@ -984,7 +984,7 @@ local function MorphQueen()
 	
 	-- perform switcheroo
 	data.queenID = nil
-	Spring.DestroyUnit(tempID, false, true, nil, true)
+	Spring.DestroyUnit(tempID, false, true, tempID, true)
 	if data.morphed == true then
 		data.queenID = spCreateUnit(queenName, x, y, z, "n", queenOwner)
 	else
