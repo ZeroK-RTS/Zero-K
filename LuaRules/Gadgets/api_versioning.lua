@@ -9,8 +9,8 @@ function gadget:GetInfo()
 end
 
 function gadget:Initialize()
-	Spring.SetGameRulesParam("GetTeamInfoCustomKeysIndex", 8)
-	Spring.SetGameRulesParam("GetPlayerInfoCustomKeysIndex", 11)
+	Spring.SetGameRulesParam("GetTeamInfoCustomKeysIndex", 7)
+	Spring.SetGameRulesParam("GetPlayerInfoCustomKeysIndex", 10)
 
 	Spring.SetGameRulesParam("GetGroundInfoNameIndex", 1)
 	Spring.SetGameRulesParam("GetTerrainTypeDataNameIndex", 1)
