@@ -189,7 +189,7 @@ local function SitOnPad(unitID)
 	
 	local function SitLoop()
 		-- read unitrulesparam for save/load handling
-		local reammoProgress = GG.RequireRefuel(unitID) and (Spring.GetUnitRulesParam(unitID, "reammoProgress") or 0) * reammoMaxTime
+		local reammoProgress = GG.RequireRefuel(unitID) and reammoMaxTime and (Spring.GetUnitRulesParam(unitID, "reammoProgress") or 0) * reammoMaxTime
 		local landDuration = 0
 		local oldBuildRate = 0
 		local oldUpdateCost = 0

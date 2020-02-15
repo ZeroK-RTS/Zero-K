@@ -22,7 +22,8 @@ return { bomberassault = {
   cruiseAlt           = 250,
 
   customParams        = {
-    modelradius    = [[10]],
+    requireammo      = [[1]],
+    modelradius      = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],

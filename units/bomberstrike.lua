@@ -20,6 +20,7 @@ return { bomberstrike = {
   cruiseAlt           = 160,
 
   customParams        = {
+    requireammo      = [[1]],
     --modelradius    = [[10]],
   },
 
