@@ -225,7 +225,7 @@ local function SitOnPad(unitID)
 			end
 			
 			if (updateCost > 0) then
-				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID)
+				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, not GG.REPAIR_COSTS_METAL)
 				resTable.e = updateCost*updateRate
 				if GG.REPAIR_COSTS_METAL then
 					resTable.m = resTable.e
