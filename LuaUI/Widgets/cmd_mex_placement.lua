@@ -886,7 +886,7 @@ function widget:DrawWorld()
 
 	mexSpotToDraw = false
 
-	if WG.metalSpots and pos and (pregame or WG.selectionEntirelyCons) and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
+	if WG.metalSpots and pos and (-mexDefID == cmdID or ((pregame or WG.selectionEntirelyCons) and (peruse or CMD_AREA_MEX == cmdID))) then
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
