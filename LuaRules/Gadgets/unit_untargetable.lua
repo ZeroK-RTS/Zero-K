@@ -20,7 +20,7 @@ end
 local CMD_INSERT = CMD.INSERT
 local spValidUnitID = Spring.ValidUnitID
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
 
 	local numParams = #cmdParams
 	if cmdID == CMD_INSERT then

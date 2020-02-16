@@ -62,7 +62,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return onlyCountList
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if not needsCheck then
 		needsCheck = true
 		ghUpdateCallIn(gh, 'GameFrame')

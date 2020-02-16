@@ -86,7 +86,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag, synced)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag)
 	if (cmdID == CMD_DECREASE_SIZE or cmdID == CMD_INCREASE_SIZE) then
 		if (not unitData[unitID]) then
 			unitData[unitID] = { scale = 1.0 }

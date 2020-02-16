@@ -2154,6 +2154,7 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParam
 	
 	if not Script.IsEngineMinVersion(104, 0, 1431) then
 		fromSynced = playerID
+		playerID = nil
 	end
 
 	for _,g in r_ipairs(self.AllowCommandList) do
@@ -2168,7 +2169,7 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParam
 
 		if ((wantedCommand == true) or wantedCommand[cmdID]) and
 			((wantedUnitDefID == true) or wantedUnitDefID[unitDefID]) and
-			(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, fromSynced)) then
+			(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, playerID, fromSynced, fromLua)) then
 			return false
 		end
 	end
