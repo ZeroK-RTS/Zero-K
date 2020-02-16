@@ -24,6 +24,7 @@ end
 --[[ The checks in this file don't apply to map-defined units,
      only ZK-side, so can afford to be brutal (crash on failure).
      This ensures that mistakes and cargo cults don't go unnoticed. ]]
+Game = Game or { gameSpeed = 30 } -- compat for 287, would ideally be in defs.lua but 287 has some VFS fuckup which disallows that
 VFS_Include('gamedata/unitdefs_checks.lua', nil, VFS_GAME)
 
 lowerkeys = lowerKeys -- legacy mapside defs might want it
