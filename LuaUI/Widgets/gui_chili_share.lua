@@ -374,10 +374,12 @@ local function UpdatePlayer(subject)
 	--Spring.Echo("allyteam: " .. allyteamID)
 	--Spring.Echo("myallyteam: " .. myallyteamID)
 	if subject.player and subject.player == myPlayerID then
-		if (teamLeader or sharemode == false or mySpec) then
-			givemebuttons[subject.id]["leave"]:SetVisibility(false)
-		elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-			givemebuttons[subject.id]["leave"]:SetVisibility(true)
+		if givemebuttons[subject.id]["leave"] then
+			if (teamLeader or sharemode == false or mySpec) then
+				givemebuttons[subject.id]["leave"]:SetVisibility(false)
+			elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+				givemebuttons[subject.id]["leave"]:SetVisibility(true)
+			end
 		end
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 	elseif subject.ai then
