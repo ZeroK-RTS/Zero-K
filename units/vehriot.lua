@@ -35,6 +35,7 @@ return { vehriot = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[corleveler_512.s3o]],
+  script              = [[vehriot.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -79,7 +80,6 @@ return { vehriot = {
       craterMult              = 0.5,
 
       customParams            = {
-        reaim_time = 8, -- COB
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],
