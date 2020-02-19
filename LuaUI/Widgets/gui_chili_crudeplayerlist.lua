@@ -12,6 +12,10 @@ function widget:GetInfo()
 end
 
 if Spring.GetModOptions().singleplayercampaignbattleid then
+	function widget:Initialize()
+		Spring.SendCommands("info 0")
+	end
+
 	return
 end
 
@@ -769,4 +773,9 @@ function widget:Initialize()
 		return
 	end
 	InitializePlayerlist()
+	Spring.SendCommands("info 0")
 end
+
+--function widget:Shutdown()
+--	Spring.SendCommands("info 1")
+--end
