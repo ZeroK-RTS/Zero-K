@@ -90,7 +90,6 @@ local function GetColorChar(colorTable)
 	return string.char(col[4],col[1],col[2],col[3])
 end
 
-local pingMult = 2/3 -- lower = higher ping needed to be red
 local pingCpuColors = {
 	{0, 1, 0, 1},
 	{0.7, 1, 0, 1},
