@@ -515,15 +515,15 @@ local teamByTeamID = {}
 local function Compare(ac, bc)
 	local a, b = ac.entryData, bc.entryData
 	
-	if a.isMe ~= b.isMe then
+	if not a.isMe ~= not b.isMe then
 		return b.isMe
 	end
 	
-	if a.isMyTeam ~= b.isMyTeam then
+	if not a.isMyTeam ~= not b.isMyTeam then
 		return b.isMyTeam
 	end
 	
-	if a.isMyAlly ~= b.isMyAlly then
+	if not a.isMyAlly ~= not b.isMyAlly then
 		return b.isMyAlly
 	end
 	
@@ -531,7 +531,7 @@ local function Compare(ac, bc)
 		return a.allyTeamID > b.allyTeamID 
 	end
 	
-	if a.isAiTeam ~= b.isAiTeam then
+	if not a.isAiTeam ~= not b.isAiTeam then
 		return a.isAiTeam
 	end
 	
@@ -539,9 +539,10 @@ local function Compare(ac, bc)
 		return a.teamID > b.teamID
 	end
 	
-	if a.playerID and b.playerID and a.playerID ~= b.playerID then
-		return a.playerID > b.playerID
+	if a.playerID then
+		return (not b.playerID) or a.playerID > b.playerID
 	end
+	return (not b.playerID)
 end
 
 local function SortEntries()
@@ -554,6 +555,7 @@ local function SortEntries()
 	local toTop = options.alignToTop.value
 	local offset = 0
 	for i = 1, #listControls do
+		Spring.Echo("listControls[i]", i, listControls[i].entryData.name)
 		if toTop then
 			listControls[i].mainControl._relativeBounds.top = offset
 			listControls[i].mainControl._relativeBounds.bottom = nil
