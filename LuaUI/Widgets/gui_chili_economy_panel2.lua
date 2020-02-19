@@ -100,6 +100,7 @@ local blinkM_status = false
 local blinkE_status = false
 local excessE = false
 local flashModeEnabled = true
+local externalForceHide = false
 
 local strings = {
 	local_metal_economy = "",
@@ -185,6 +186,10 @@ local function option_recreateWindow()
 		if spectating then
 			return false
 		end
+	end
+	
+	if externalForceHide then
+		return false
 	end
 	
 	CreateWindow(x,y,w,h)
@@ -1026,6 +1031,7 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
+	externalForceHide = not newVisibility
 	if dispose then
 		local x,y,w,h = DestroyWindow()
 		if newVisibility then
