@@ -6,6 +6,9 @@ local lwheel1, lwheel2, lwheel3 = piece('lwheel1', 'lwheel2', 'lwheel3')
 local gs1r, gs2r, gs3r = piece('gs1r', 'gs2r', 'gs3r')
 local gs1l, gs2l, gs3l = piece('gs1l', 'gs2l', 'gs3l')
 
+local TURRET_TURN_SPEED  = math.rad(220)
+local TURRET_PITCH_SPEED = math.rad(60)
+
 local SUSPENSION_BOUND = 3
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
@@ -104,8 +107,8 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(1)
 	SetSignalMask(1)
 
-	Turn(turret, y_axis, heading, math.rad(220))
-	Turn(sleeve, x_axis, -pitch, math.rad(60))
+	Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+	Turn(sleeve, x_axis, -pitch, TURRET_PITCH_SPEED)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
 
