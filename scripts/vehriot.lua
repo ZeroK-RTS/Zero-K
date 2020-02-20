@@ -6,8 +6,8 @@ local lwheel1, lwheel2, lwheel3 = piece('lwheel1', 'lwheel2', 'lwheel3')
 local gs1r, gs2r, gs3r = piece('gs1r', 'gs2r', 'gs3r')
 local gs1l, gs2l, gs3l = piece('gs1l', 'gs2l', 'gs3l')
 
-local TURRET_TURN_SPEED  = math.rad(220)
-local TURRET_PITCH_SPEED = math.rad(60)
+local TURRET_TURN_SPEED  = math.rad(160)
+local TURRET_PITCH_SPEED = math.rad(50)
 
 local SUSPENSION_BOUND = 3
 local spGetGroundHeight = Spring.GetGroundHeight
