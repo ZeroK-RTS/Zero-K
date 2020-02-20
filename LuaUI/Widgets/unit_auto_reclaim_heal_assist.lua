@@ -6,7 +6,7 @@ function widget:GetInfo()
       date         = "2020",
       license      = "PD", -- should be compatible with Spring
       layer        = 11,
-      enabled      = true
+      enabled      = false
    }
 end
 
