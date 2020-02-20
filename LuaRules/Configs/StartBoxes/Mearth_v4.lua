@@ -8,7 +8,7 @@ local starting_triples = {
 	{9471, 11572, "Mordor", "Mordor"},
 	{4380, 11300, "Gondor", "Gondor"},
 	{5371,  9235, "Rohan", "Rohan"},
-	{5810,  5333, "Moria", "Moria"},
+	{5810,  5333, "Khazad-dûm", "Moria"},
 	{9323,   963, "Withered Heath", "WHeath"},
 	{3853,  2024, "Evendim Hills", "EHills"},
 	{9543, 14740, "Khand", "Khand"},
