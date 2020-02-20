@@ -338,7 +338,6 @@ function script.BlockShot(num, targetID)
 	Move(drop, z_axis, dz)
 	Move(drop, y_axis, dy)
 	local distance = math.max((Spring.GetUnitSeparation(unitID, targetID) or 1) - 25, 1)
-	Spring.Echo("distance", distance)
 	local unitHeight = (GG.GetUnitHeight and GG.GetUnitHeight(targetID)) or 0
 	distance = math.max(0, distance - unitHeight/2)
 	local projectileTime = 35*math.min(1, distance/340)
