@@ -181,7 +181,29 @@ local collectionFunctionCount = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function initBloomTextures()
+	local width, height = vsx/2, vsy/2
+
+	brightTexture1 = glCreateTexture(width, height, {
+		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+	})
+	brightTexture2 = glCreateTexture(width, height, {
+		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+		format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+	})
+
+	if not brightTexture1 or not brightTexture2 then
+		Spring.Echo('Deferred Rendering: Failed to create bloom buffers!')
+		options.enableBloom.value = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:ViewResize()
+
 	vsx, vsy = gl.GetViewSizes()
 	ivsx = 1.0 / vsx --we can do /n here!
 	ivsy = 1.0 / vsy
@@ -205,21 +227,7 @@ function widget:ViewResize()
 		})
 
 		if options.enableBloom.value then
-			local width, height = vsx/2, vsy/2
-
-			brightTexture1 = glCreateTexture(width, height, {
-				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
-			})
-			brightTexture2 = glCreateTexture(width, height, {
-				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
-			})
-
-			if not brightTexture1 or not brightTexture2 then
-				Spring.Echo('Deferred Rendering: Failed to create bloom buffers!')
-				options.enableBloom.value = false
-			end
+			initBloomTextures()
 		end
 
 		if not screenHDR then
@@ -550,6 +558,13 @@ local function Bloom()
 	gl.Color(1, 1, 1, 1)
 
 	if options.enableHDR.value and options.enableBloom.value then
+		if not brightTexture1 or not brightTexture2 then
+			Spring.Echo("Bloom textures (HDR) did not initialize on resize. Trying again.")
+			initBloomTextures()
+			if not options.enableBloom.value then
+				return
+			end
+		end
 		glUseShader(brightShader)
 			glUniformInt(brightShaderText0Loc, 0)
 			glUniform(   brightShaderInvRXLoc, ivsx)
