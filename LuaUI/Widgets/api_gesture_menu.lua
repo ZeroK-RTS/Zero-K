@@ -51,7 +51,7 @@ options = {
 	mouseMoveThreshold = {
 		name = "Mouse move threshold (10-2000)",
 		type = 'number',
-		value = 900,
+		value = 1000,
 		min=10,max=2000,step=1,
 		desc = "When you hold right button, you must move this distance(squared) to show menu",
 		OnChange = OptionsChanged,
@@ -133,10 +133,12 @@ instance_options = {
 		OnChange = InstanceOptionsChanged,
 	},
 
+	-- TODO: This should ideally be a radio menu with a list of gesture menu instances on the top level menu
+	-- (opening multiple at once with right click drag is probably not sane)
 	onlyOpenWithKeyboard = {
 		name = 'Only open with keyboard',
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Disables right click drag to open',
 		OnChange = InstanceOptionsChanged,
 	},

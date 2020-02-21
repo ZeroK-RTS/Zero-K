@@ -86,6 +86,9 @@ for i = 1,#local_options_order do
 	options_order[#options_order] = local_options_order[i]
 end
 
+-- Set some saner defaults
+options.iconDistance.value = 120
+
 function widget:Initialize()
 	-- FIXME: Do this more nicely
 	options.iconDistance.OnChange()

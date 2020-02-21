@@ -208,6 +208,9 @@ for i = 1,#local_options_order do
 	options_order[#options_order] = local_options_order[i]
 end
 
+-- Set some saner defaults
+options.onlyOpenWithKeyboard.value = false
+
 function widget:Initialize()
 	OptionsChanged()
 	-- FIXME: Do this more nicely
