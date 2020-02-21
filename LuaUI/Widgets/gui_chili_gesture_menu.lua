@@ -93,10 +93,10 @@ options = {
 	},
 	
 	iconDistance = {
-		name = "Icon distance (20-150)",
+		name = "Icon distance (20-360)",
 		type = 'number',
 		value = 50,
-		min=20,max=150,step=1,
+		min=20,max=360,step=10,
 		OnChange = OptionsChanged,
 	},
 	
