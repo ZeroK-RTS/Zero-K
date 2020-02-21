@@ -315,8 +315,12 @@ local function EndMenu(ok)
 				level = level + 1  -- save level
 				levels[level] = {menu_selected, menu_selected.angle+180}
 			end
-			if osclock() - menu_start > level * 0.25 then	-- if speed was slower than 250ms per level, flash the gesture
-				menu_flash = {origin[1], origin[2], osclock()}
+			if osclock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
+				local fx,fy = origin[1], origin[2]
+				if menu ~= menu_selected then
+					fx,fy = GetPos(fx, fy, menu_selected.angle, MINDIST)
+				end
+				menu_flash = {fx, fy, osclock()}
 			end
 		end
 	end
