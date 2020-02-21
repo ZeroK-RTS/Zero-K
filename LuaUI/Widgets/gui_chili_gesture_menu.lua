@@ -180,7 +180,6 @@ local average_difference = 0 -- average movement speed/difference
 local ignored_angle = nil -- angle to currently ignore in menu
 
 local origin = nil
-local selected_item = nil
 
 local menu = nil -- nil indicates no menu is visible atm
 local menu_selected = nil -- currently selected item - used in last level menus where you can select without changing origin
@@ -197,8 +196,6 @@ local level = 0
 local levels = {}
 
 local move_digested = nil -- was move command digested (hold right click detection)
-
-local customKeyBind = false
 
 local menu_use = include("Configs/marking_menu_menus.lua", nil, VFS.RAW_FIRST)
 
@@ -374,7 +371,6 @@ function EndMenu(ok)
   if (not ok) then
 		menu_selected = nil
    end
-  local initialQueue = CanInitialQueue()
 
   if menu_selected~=nil and menu_selected.unit ~= nil then
     local cmdid = menu_selected.cmd
