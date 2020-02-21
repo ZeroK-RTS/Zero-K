@@ -188,6 +188,8 @@ local menu_invisible = false  -- indicates if menu should be active but invisibl
 local menu_start = 0 -- time when the menu was started
 
 local menu_keymode = false -- was menu opened using keyboard
+local menu_flash
+local hold_pos
 
 
 -- remember the walk through the menu, to be able to go back
@@ -246,7 +248,7 @@ function ProcessMove(x,y)
   if (menu == nil or KEYBOARD_ONLY or mouselessOpen) then return end
   local dx = x - lx
   local dy = y - ly
-  diff =  math.sqrt(dx*dx + dy*dy)
+  local diff = math.sqrt(dx*dx + dy*dy)
   lx = x
   ly = y
 
@@ -686,7 +688,7 @@ function widget:DrawScreen()
   if (menu == nil or menu_invisible) then return end  -- get out if menu not visible
 
 
-  cmdDesc = Spring.GetActiveCmdDescs()
+  local cmdDesc = Spring.GetActiveCmdDescs()
 
   -- render back path
   glTexture(false)
