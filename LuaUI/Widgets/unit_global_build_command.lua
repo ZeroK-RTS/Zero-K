@@ -91,7 +91,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Declarations ----------------------------------------------------------------
-include("keysym.h.lua")
+include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 options_path = 'Settings/Unit Behaviour/Worker AI'

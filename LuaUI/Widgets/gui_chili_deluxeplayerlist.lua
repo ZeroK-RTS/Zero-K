@@ -384,7 +384,7 @@ local timer = 0
 local lastSizeX
 local lastSizeY
 local lastChosenSizeX = 0
-include("keysym.h.lua")
+include("keysym.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

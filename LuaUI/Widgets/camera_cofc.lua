@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
@@ -2665,7 +2665,7 @@ local spGetUnitGroup = Spring.GetUnitGroup
 local spGetGroupList  = Spring.GetGroupList
 
 
---include("keysym.h.lua")
+--include("keysym.lua")
 local previousGroup =99
 local currentIteration = 1
 local currentIterations = {}

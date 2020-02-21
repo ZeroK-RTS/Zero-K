@@ -46,6 +46,10 @@ local projectileLead = {
 	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].projectilespeed,
 }
 
+local waterWeapon = {
+	[WeaponDefNames["hoverraid_gauss"].id] = true,
+}
+
 -- Recluse projectile speed at different distances formula is a result of the least squares linear fit
 -- of the following data set of {distance, averageSpeed} data.
 -- {{290.8, 7.458}, {125.0, 6.252}, {451.9,8.369}, {31.436, 5.238}, {207.89, 6.929}, {371.8, 7.911}, {474.12, 8.466}}
@@ -171,7 +175,7 @@ local function GetTargetPosition(targetID)
 	return tx, ty, tz
 end
 
-local function ApplyProjectileLead(proID, speed)
+local function ApplyProjectileLead(proID, speed, weaponID)
 	local targetType, targetID = spGetProjectileTarget(proID)
 	if not (targetType == UNIT and spValidUnitID(targetID)) then
 		return
@@ -181,10 +185,10 @@ local function ApplyProjectileLead(proID, speed)
 	if not tx then
 		return
 	end
-	if ty < 1 then
-		ty = 1
+	if ty < 4 and not waterWeapon[weaponID] then
+		ty = 4
 	end
-
+	
 	local vx, vy, vz = spGetUnitVelocity(targetID)
 	local px, py, pz = spGetProjectilePosition(proID)
 	if not (vx  and px) then
@@ -206,7 +210,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 		AddProjectile(proID, projectileSpeed[weaponID], false)
 	end
 	if projectileLead[weaponID] then
-		ApplyProjectileLead(proID, projectileLead[weaponID])
+		ApplyProjectileLead(proID, projectileLead[weaponID], weaponID)
 	end
 end
 

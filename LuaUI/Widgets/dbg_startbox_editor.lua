@@ -70,7 +70,7 @@ function widget:MouseMove(mx, my)
 	return true
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 function widget:KeyPress(key)
 	if (key == KEYSYMS.S) then

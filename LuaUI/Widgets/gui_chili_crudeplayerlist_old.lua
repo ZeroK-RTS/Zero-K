@@ -116,7 +116,7 @@ local pingPic		  = ":n:"..LUAUI_DIRNAME.."Images/playerlist/ping.png"
 local localTeam = 0
 local localAlliance = 0
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 
 

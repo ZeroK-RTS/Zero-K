@@ -21,7 +21,7 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("keysym.h.lua")
+include("keysym.lua")
 local keysyms = {}
 for k,v in pairs(KEYSYMS) do
 	keysyms[v] = k

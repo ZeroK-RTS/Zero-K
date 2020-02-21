@@ -1,5 +1,5 @@
 -- $Id$
-include("keysym.h.lua")
+include("keysym.lua")
 local versionNumber = "1.1"
 
 function widget:GetInfo()

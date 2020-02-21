@@ -12,7 +12,7 @@ function widget:GetInfo()
 	}
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 ---- CHANGELOG -----

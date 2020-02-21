@@ -22,7 +22,7 @@ local echo				= Spring.Echo
 ------------------------------------------------
 
 -- config
-include("keysym.h.lua")
+include("keysym.lua")
 local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua")
 	
 local build_menu_use = include("Configs/marking_menu_menus.lua")

@@ -165,7 +165,7 @@ local languages, flagByLang, langByFlag = VFS.Include("LuaUI/Headers/languages.l
 --    If so, it uses that command.
 -- Lastly, it checks uikeys.txt (read-only).
 
-include("keysym.h.lua")
+include("keysym.lua")
 local keysyms = {}
 for k, v in pairs(KEYSYMS) do
 	keysyms['' .. v] = k

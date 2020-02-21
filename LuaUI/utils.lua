@@ -109,7 +109,7 @@ function include(filename, envTable, VFSMODE)
 	end
 	if filename:find(".h.", 1, true) then
 		--// give error on old LuaUI syntax (<=0.82)
-		error("Headers files aren't supported anymore use \"require\" instead!", 2)
+		--error("Headers files aren't supported anymore use \"require\" instead!", 2)
 	end
 
 	if (not filename:find("/", 1, true))or(not VFS.FileExists(filename, VFSMODE or VFS.DEF_MODE)) then

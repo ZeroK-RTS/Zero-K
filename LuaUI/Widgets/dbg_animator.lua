@@ -30,7 +30,7 @@ local screen0
 
 local scrH, scrW 		= 0,0
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 local PI = 3.14
 local B_HEIGHT = 20

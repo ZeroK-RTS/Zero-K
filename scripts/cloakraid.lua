@@ -206,7 +206,7 @@ function script.QueryWeapon(num)
 end
 
 function script.AimFromWeapon(num)
-	return chest
+	return head
 end
 
 function script.AimWeapon(num, heading, pitch)

@@ -108,7 +108,8 @@ function gadget:GameFrame(n)
 			local x,y,z = spGetUnitPosition(unitID)
 			local h = data.h
 
-			if y > h and y <= 0 and select(4, spGetUnitVelocity(unitID)) > 0 and not spGetUnitIsCloaked(unitID) then
+			local _, _, _, speed = spGetUnitVelocity(unitID)
+			if speed and y > h and y <= 0 and speed > 0 and not spGetUnitIsCloaked(unitID) then
 				-- 1 is the pieceID, most likely it's usually the base piece
 				-- but even if it isn't, it doesn't really matter
 				spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)

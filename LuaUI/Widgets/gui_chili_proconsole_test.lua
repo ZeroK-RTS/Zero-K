@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
 local missionMode = Spring.GetModOptions().singleplayercampaignbattleid

@@ -36,7 +36,7 @@ stats_hide_projectile_speed
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("keysym.h.lua")
+include("keysym.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 

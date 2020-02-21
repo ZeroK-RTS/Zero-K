@@ -104,6 +104,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	Move(flare1, z_axis, 7)
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
 end
