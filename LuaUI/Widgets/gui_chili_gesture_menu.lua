@@ -24,20 +24,17 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local osclock	= os.clock
 
 local GL_LINE_STRIP		= GL.LINE_STRIP
-local glVertex			= gl.Vertex
-local glLineStipple 	= gl.LineStipple
+local glGetTextWidth  = gl.GetTextWidth
+local glTexture       = gl.Texture
+local glTexRect       = gl.TexRect
+local glText          = gl.Text
+local glVertex			  = gl.Vertex
 local glLineWidth   	= gl.LineWidth
 local glColor       	= gl.Color
 local glBeginEnd    	= gl.BeginEnd
-local glPushMatrix		= gl.PushMatrix
-local glPopMatrix		= gl.PopMatrix
-local glScale			= gl.Scale
-local glTranslate		= gl.Translate
-local glRect = gl.Rect
-local glLoadIdentity	= gl.LoadIdentity
-local tinsert = table.insert
+local glRect          = gl.Rect
 
-local spEcho				= Spring.Echo
+local spEcho          = Spring.Echo
 
 ------------------------------------------------
 -- constst
@@ -70,7 +67,7 @@ local function OptionsChanged()
 	KEYBOARD_ONLY = options.keyboardOnly.value
 	KEYBOARD_OPEN_ONLY = options.onlyOpenWithKeyboard.value
 	ALLOW_MULTIPLE = options.allowMultiple.value
-	
+
 	if options.alternateconfig.value then
 		keys = keyconfig.qwerty_d.keys
 		keys_display = keyconfig.qwerty_d.keys_display
@@ -91,7 +88,7 @@ options = {
 		type = 'button',
 		--OnChange defined later
 	},
-	
+
 	iconDistance = {
 		name = "Icon distance (20-360)",
 		type = 'number',
@@ -99,7 +96,7 @@ options = {
 		min=20,max=360,step=10,
 		OnChange = OptionsChanged,
 	},
-	
+
 	iconSize = {
 		name = "Icon size (10-100)",
 		type = 'number',
@@ -107,7 +104,7 @@ options = {
 		min=10,max=100,step=1,
 		OnChange = OptionsChanged,
 	},
-	
+
 	selectedIconSize = {
 		name = "Selected icon size (10-100)",
 		type = 'number',
@@ -115,7 +112,7 @@ options = {
 		min=10,max=100,step=1,
 		OnChange = OptionsChanged,
 	},
-	
+
 	mouseMoveThreshold = {
 		name = "Mouse move threshold (10-2000)",
 		type = 'number',
@@ -124,7 +121,7 @@ options = {
 		desc = "When you hold right button, you must move this distance(squared) to show menu",
 		OnChange = OptionsChanged,
 	},
-	
+
 	mouseIdleThreshold = {
 		name = "Mouse idle threshold (0.1-3s)",
 		type = 'number',
@@ -133,7 +130,7 @@ options = {
 		desc = "When you hold right button still, menu appears after this time(s)",
 		OnChange = OptionsChanged,
 	},
-	
+
 	keyboardOnly = {
 		name = 'Keyboard only',
 		type = 'bool',
@@ -141,7 +138,7 @@ options = {
 		desc = 'Disables gesture recognition',
 		OnChange = OptionsChanged,
 	},
-	
+
 	onlyOpenWithKeyboard = {
 		name = 'Only open with keyboard',
 		type = 'bool',
@@ -157,7 +154,7 @@ options = {
 		desc = "keys for qwertz keyboard",
 		OnChange = OptionsChanged,
 	},
-	
+
 	alternateconfig = {
 		name = "Alternate Keyboard Layout",
 		type = "bool",
@@ -165,7 +162,7 @@ options = {
 		desc = "Centre hotkeys around D instead of S.",
 		OnChange = OptionsChanged,
 	},
-	
+
 	allowMultiple = {
 		name = "Allow for multiple selected units",
 		type = "bool",
@@ -173,7 +170,7 @@ options = {
 		desc = "Allows gestures even for multiple units selected",
 		OnChange = OptionsChanged,
 	},
-	
+
 }
 
 local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
@@ -234,7 +231,7 @@ function widget:Update(t)
   if hold_pos then
     local dx = mx - hold_pos[1]
     local dy = my - hold_pos[2]
-    if dx*dx + dy*dy > MOVE_THRESHOLD_SQUARED  or os.clock() - menu_start > IDLE_THRESHOLD then
+    if dx*dx + dy*dy > MOVE_THRESHOLD_SQUARED  or osclock() - menu_start > IDLE_THRESHOLD then
       menu_invisible = false
       hold_pos = nil
     end
@@ -253,9 +250,9 @@ function ProcessMove(x,y)
   lx = x
   ly = y
 
-  
+
   if diff < average_difference * 0.5 then  -- we are slowed down, this is a spot where we check stuff in detail
-    
+
     local angle = GetAngle(x,y, origin[1],origin[2])
     local dist = GetDist(x,y,origin[1],origin[2])
     if (ignored_angle == nil or AngleDifference(angle,ignored_angle) > ANGLE_TOLERANCE) and  dist > MINDIST then
@@ -276,7 +273,7 @@ function ProcessMove(x,y)
             level = level - 1
             menu = l_menu
             menu_selected = menu
-            
+
             if level > 0 then  --  incorrect angle is angle of previous level (to which we are going). If there is none we are in initial state and all angles are valid
               ignored_angle = levels[level][2]  + 180
             else
@@ -287,19 +284,19 @@ function ProcessMove(x,y)
         end
       end
       if (item ~= nil) then
-        
+
         if (item.items ~= nil)  then -- item has subitems
-          
+
           level = level + 1  -- save level
           levels[level] = {menu, item.angle+180}
 
           ignored_angle = item.angle
           menu = item
           menu_selected = item
-        
+
           origin = {x,y}
         else
-          
+
           if (dist > MINDIST + 2*BIG_ICON_SIZE) then
             local nx,ny = GetPos(x,y, item.angle - 180, MINDIST)
             origin  = {nx,ny}
@@ -307,7 +304,7 @@ function ProcessMove(x,y)
           menu_selected = item
         end
       else
-        -- spEcho("no item"..angle) FIXME?
+        -- spEcho("no item"..angle) -- FIXME?
       end
     else
       if (dist < MINDIST) then
@@ -334,7 +331,7 @@ function SetupMenu(keyboard, mouseless)
   -- only show menu if a unit is selected
   if allow then
     origin = {Spring.GetMouseState()} -- origin might by set by mouse hold detection so we only set it if unset
-    
+
     local found = false
     for _, unitID in ipairs(units) do
       local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
@@ -358,7 +355,7 @@ function SetupMenu(keyboard, mouseless)
       menu_flash = nil -- erase previous flashing
       menu = found and menu_use[found.name] or menu_use["armcom1"]
       menu_selected = menu
-      menu_start = os.clock()
+      menu_start = osclock()
     else
       menu = nil
       menu_selected=  nil
@@ -376,7 +373,7 @@ function EndMenu(ok)
 		menu_selected = nil
    end
   local initialQueue = CanInitialQueue()
- 
+
   if menu_selected~=nil and menu_selected.unit ~= nil then
     local cmdid = menu_selected.cmd
     if (cmdid == nil) then
@@ -388,13 +385,13 @@ function EndMenu(ok)
     if (cmdid) then
       local alt, ctrl, meta, shift = Spring.GetModKeyState()
       local _, _, left, _, right = Spring.GetMouseState()
-        
+
       if (menu ~= menu_selected) then -- store last item and level to render its back path
         level = level + 1  -- save level
         levels[level] = {menu_selected, menu_selected.angle+180}
       end
-      if os.clock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
-        menu_flash = {origin[1], origin[2], os.clock()}
+      if osclock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
+        menu_flash = {origin[1], origin[2], osclock()}
       end
       Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
     end
@@ -436,14 +433,14 @@ function widget:KeyPress(k)
 		menu_invisible = false -- if menu was activated with mouse but isnt visible yet,show it now
 		if (menu.items) then
 			local item = nil
-		
+
 			for _,i in ipairs(menu.items) do
 				if (AngleDifference(i.angle,angle) < ANGLE_TOLERANCE) then
 					item = i
 					break
 				end
 			end
-			
+
 			if item ~= nil then
 				if (item.items ~= nil)  then -- item has subitems
 					level = level + 1  -- save level
@@ -467,7 +464,7 @@ function widget:KeyPress(k)
 						level = level - 1
 						menu = l_menu
 						menu_selected = menu
-            
+
 						if level > 0 then  --  incorrect angle is angle of previous level (to which we are going). If there is none we are in initial state and all angles are valid
 							ignored_angle = levels[level][2]  + 180
 						else
@@ -512,21 +509,21 @@ end
 
 
 local function MinimapMouseToWorld(mx, my)
-	
+
 	local _, posy, sizex, sizey = Spring.GetMiniMapGeometry()
 	local rx, ry
-	
+
 	if dualMinimapOnLeft then
 		rx, ry = (mx + sizex) / sizex, (my - posy) / sizey
 	else
 		rx, ry = mx / sizex, (my - posy) / sizey
 	end
-	
+
 	if (rx >= 0) and (rx <= 1) and
 	   (ry >= 0) and (ry <= 1) then
-		
+
 		local mapx, mapz = mapWidth * rx, mapHeight * (1 - ry)
-		
+
 		return {mapx, Spring.GetGroundHeight(mapx, mapz), mapz}
 	else
 		return nil
@@ -553,14 +550,14 @@ end
 function widget:MouseRelease(x,y,button)
 	if button ~= 3 then return end
 	if move_digested and (menu_invisible) then  -- we digested command, but menu not displayed, issue standard move command
-	
+
 		local activeCmdIndex, activeid = Spring.GetActiveCommand()
 		if (activeid ~= nil and activeid < 0) then  -- we already had unit selected and menu wasnt visible - cancel previous unit selection
 			Spring.SetActiveCommand(0)
 		else
 			local inMinimap = Spring.IsAboveMiniMap(x, y)
 			local pos
-	
+
 			if inMinimap then
 				pos = MinimapMouseToWorld(x, y)
 			else
@@ -576,7 +573,7 @@ function widget:MouseRelease(x,y,button)
 			if ctrl  then keyState.ctrl  = true; keyState.coded = keyState.coded + CMD.OPT_CTRL  end
 			if meta  then keyState.meta  = true; keyState.coded = keyState.coded + CMD.OPT_META  end
 			if shift then keyState.shift = true; keyState.coded = keyState.coded + CMD.OPT_SHIFT end
-    
+
 			if meta and WG.CommandInsert then
 				GiveNotifyingInsertOrder(CMD_RAW_MOVE, {pos[1], pos[2], pos[3]},keyState)
 			else
@@ -624,8 +621,8 @@ local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, cmdDesc
 	if (ud)  then
       if (displayLabel and item.label) then
         glColor(1,1,1,alpha)
-        local wid = gl.GetTextWidth(item.label)*12
-        gl.Text(item.label,x-wid*0.5, y+size,12,"")
+        local wid = glGetTextWidth(item.label)*12
+        glText(item.label,x-wid*0.5, y+size,12,"")
       end
 
 	  local isEnabled = CanInitialQueue()
@@ -637,30 +634,30 @@ local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, cmdDesc
 			end
 		  end
 	  end
-	  
+
 	  if isEnabled then
 		glColor(1*alpha,1*alpha,1,alpha)
 	  else glColor(0.3,0.3,0.3,alpha) end
-      gl.Texture(WG.GetBuildIconFrame(ud))
-      gl.TexRect(x-size, y-size, x+size, y+size)
-      gl.Texture("#"..ud.id)
-      gl.TexRect(x-size, y-size, x+size, y+size)
-      gl.Texture(false)
+      glTexture(WG.GetBuildIconFrame(ud))
+      glTexRect(x-size, y-size, x+size, y+size)
+      glTexture("#"..ud.id)
+      glTexRect(x-size, y-size, x+size, y+size)
+      glTexture(false)
 
 	  if (ud.metalCost) then
-		--gl.Color(1,1,1,alpha)
-		gl.Text(ud.metalCost .. " m",x-size+4,y-size + 4,10,"")
+		--glColor(1,1,1,alpha)
+		glText(ud.metalCost .. " m",x-size+4,y-size + 4,10,"")
 	  end
 
 	  if angle then
 		if angle < 0 then angle = angle + 360 end
 		local idx = angle / 45
-		gl.Color(0,1,0,1)
-		gl.Text(keys_display[1 + idx%8],x-size+4,y+size-10,10,"")
+		glColor(0,1,0,1)
+		glText(keys_display[1 + idx%8],x-size+4,y+size-10,10,"")
 	  end
     end
   end
-  
+
 end
 
 
@@ -669,41 +666,41 @@ function widget:DrawScreen()
 
   if menu_flash then
     -- render back path
-    gl.Texture(false)
-    glColor(1,1,1,0.5 + 0.5 * math.sin(os.clock()*30))
-    gl.LineWidth(2)
-    gl.BeginEnd(GL_LINE_STRIP, BackPathFunc, menu_flash, MINDIST*3)
-    
+    glTexture(false)
+    glColor(1,1,1,0.5 + 0.5 * math.sin(osclock()*30))
+    glLineWidth(2)
+    glBeginEnd(GL_LINE_STRIP, BackPathFunc, menu_flash, MINDIST*3)
+
     local sx,sy = unpack(menu_flash)
     for i=level,1,-1 do
       local menu,angle = unpack(levels[i])
       sx,sy= GetPos(sx,sy, angle, MINDIST*3)
     end
-    gl.Rect(sx-5,sy-5,sx+5,sy+5)
+    glRect(sx-5,sy-5,sx+5,sy+5)
 
-    if (os.clock() - menu_flash[3]>1) then  -- only flash for 3 seconds
+    if (osclock() - menu_flash[3]>1) then  -- only flash for 3 seconds
       menu_flash = nil
     end
   end
 
   if (menu == nil or menu_invisible) then return end  -- get out if menu not visible
 
-  
+
   cmdDesc = Spring.GetActiveCmdDescs()
-  
+
   -- render back path
-  gl.Texture(false)
+  glTexture(false)
   glColor(0,0,0,1)
   local sx,sy = unpack(origin)
-  gl.BeginEnd(GL_LINE_STRIP, BackPathFunc, origin, MINDIST+SMALL_ICON_SIZE)
+  glBeginEnd(GL_LINE_STRIP, BackPathFunc, origin, MINDIST+SMALL_ICON_SIZE)
   for i=level,1,-1 do
     local menu,angle = unpack(levels[i])
     sx,sy= GetPos(sx,sy, angle, MINDIST+SMALL_ICON_SIZE)
     DrawMenuItem(menu, sx,sy, SMALL_ICON_SIZE, 0.5, true, angle, cmdDesc)
     glColor(0,0,0,1)
-    gl.Rect(sx-4,sy-4,sx+4,sy+4)
+    glRect(sx-4,sy-4,sx+4,sy+4)
     glColor(1,1,1,1)
-    gl.Rect(sx-3,sy-3,sx+3,sy+3)
+    glRect(sx-3,sy-3,sx+3,sy+3)
   end
 
   glColor(0,0,0,1)
@@ -717,12 +714,12 @@ function widget:DrawScreen()
   else
     DrawMenuItem(menu, origin[1], origin[2], SMALL_ICON_SIZE, 0.8, true, menu.angle, cmdDesc)
   end
-  
+
 
   if (menu.items) then
     for _,i in ipairs(menu.items) do
       local x,y = GetPos(origin[1], origin[2], i.angle, MINDIST + SMALL_ICON_SIZE)
-      
+
       if (i == menu_selected) then
         DrawMenuItem(i, x,y, BIG_ICON_SIZE, 1, true, i.angle, cmdDesc)
       else
@@ -780,10 +777,10 @@ function widget:CommandsChanged()
 	local selectedUnits = Spring.GetSelectedUnits()
 	local customCommands = widgetHandler.customCommands
 	local foundBuilder = false
-    
+
   for _, unitID in ipairs(selectedUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
-			
+
     if UnitDefs[unitDefID].isBuilder then
       foundBuilder = true
       break
