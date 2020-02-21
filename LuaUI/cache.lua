@@ -17,6 +17,8 @@ local GetTeamColor = Spring.GetTeamColor
 local SetTeamColor = Spring.SetTeamColor
 local GetVisibleUnits = Spring.GetVisibleUnits
 local MarkerAddPoint = Spring.MarkerAddPoint
+-- Please only use responsibly
+Spring.RealMarkerAddPoint = MarkerAddPoint
 
 -- Block line drawing widgets
 --local MarkerAddLine = Spring.MarkerAddLine
