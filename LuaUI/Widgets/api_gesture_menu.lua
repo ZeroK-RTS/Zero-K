@@ -11,6 +11,42 @@ function widget:GetInfo()
 	}
 end
 
+--[===[
+This creates gesture menus, with the exact behaviour of each defined by per-widget callbacks.
+
+The core of this widget is WG.CreateGestureMenu(GetMenuDefinition, PreDrawMenuItems, DrawMenuItem, KeyToAngle, PerformAction):
+
+@param GetMenuDefinition(keyboard, mouse_pos, world_pos)
+	Callback that determines what the menu layout is.
+  Invoked each time the menu is opened.
+	Provided with whether the menu was opened from a keyboard shortcut, the mouse position, and the world position.
+	May return nil, in which case the menu is not opened.
+@param DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, userdata)
+	Callback invoked during DrawWorld, which should draw a single item.
+	Provided woth the item data, the x and y screen coordinates, the relative size of the item (hovered items are expected to be larger), the level of transparency, the label to display, and the angle this item was reached from.
+	If PreDrawMenuItems was provided, the result is passed in as userdata. Otherwise userdata is nil.
+@param PerformAction(item, worldOrigin)
+	Callback invoked when an item in the menu has been selected.
+	The selected item, and the original world position of the mouse when the menu was opened, are provided.
+@param PreDrawMenuItems()
+	Optional callback, may be nil.
+	If provided, invoked once per DrawWorld cycle, and the return value is passed to each invocation of DrawMenuItem.
+@param KeyToAngle(key)
+	Optional callback, may be nil.
+	If the menu should be navigable by a keyboard, this should provide a mapping from keys to the next angle.
+
+@returns options       Global options table to be exposed by the widget, with common options. You can modify this table, but it must be the same table - a reference is preserved for reading instance options.
+@returns options_order Global options_order table to be exposed by the widget, with common options. You can modify this table.
+@returns Update        widget.Update
+@returns DrawScreen    widget.DrawScreen
+@returns KeyPress      widget.KeyPress
+@returns MousePress    widget.MousePress
+@returns MouseRelease  widget.MouseRelease
+@returns IsAbove       widget.IsAbove
+
+The returned functions should either be directly assigned to their role, or called from within a function performing that role, with similar arguments.
+--]===]
+
 include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
