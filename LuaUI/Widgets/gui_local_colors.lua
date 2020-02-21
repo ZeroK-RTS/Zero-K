@@ -19,9 +19,9 @@ local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 --------------------------------------------------------------------------------
 
 local function GetColorConfig()
-	if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then -- user override
+	if VFS.FileExists("LuaUI/Configs/LocalColors.lua", VFS.RAW_FIRST) then -- user override
 		Spring.Echo("Loaded local team color config.")
-		return VFS.Include("LuaUI/Configs/LocalColors.lua")
+		return VFS.Include("LuaUI/Configs/LocalColors.lua", nil, VFS.RAW_FIRST)
 	elseif VFS.FileExists("LuaUI/Configs/ZKTeamColors.lua") then
 		return VFS.Include("LuaUI/Configs/ZKTeamColors.lua")
 	else

@@ -57,7 +57,7 @@ local ALLOW_MULTIPLE
 
 local mouselessOpen = false
 
-local keyconfig = include("Configs/marking_menu_keys.lua")
+local keyconfig = include("Configs/marking_menu_keys.lua", nil, VFS.RAW_FIRST)
 local keys = keyconfig.qwerty.keys
 local keys_display = keyconfig.qwerty.keys_display
 
@@ -201,7 +201,7 @@ local move_digested = nil -- was move command digested (hold right click detecti
 
 local customKeyBind = false
 
-local menu_use = include("Configs/marking_menu_menus.lua")
+local menu_use = include("Configs/marking_menu_menus.lua", nil, VFS.RAW_FIRST)
 
 local function GetAngle(x1,y1,x2,y2)
   return 180 * math.atan2(x1-x2,y1-y2) / math.pi
