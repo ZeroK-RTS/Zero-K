@@ -91,9 +91,10 @@ end
 -- read local widgets config
 local localWidgetsFirst = false
 local localWidgets = false
+local disableLocalWidgets = (Spring.GetModOptions().disable_local_widgets and Spring.GetModOptions().disable_local_widgets ~= "0" and Spring.GetModOptions().disable_local_widgets ~= 0)
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
-  if Spring.GetModOptions().disable_local_widgets ~= 1 then
+  if not disableLocalWidgets then
     local cadata = VFS.Include(CONFIG_FILENAME)
     if cadata and cadata["Local Widgets Config"] then
       localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
@@ -102,7 +103,7 @@ if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to
   end
 end
 
-Spring.Echo("localWidgets", Spring.GetModOptions().disable_local_widgets ~= 1, localWidgets, localWidgetsFirst)
+Spring.Echo("localWidgets", disableLocalWidgets, localWidgets, localWidgetsFirst)
 local VFSMODE
 VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
