@@ -37,7 +37,9 @@ VFS.Include("LuaRules/Utilities/unitStates.lua")
 VFS.Include("LuaRules/Utilities/teamFunctions.lua")
 VFS.Include("LuaRules/Utilities/vector.lua")
 
+Spring.Echo("function_override include")
 VFS.Include("LuaRules/Utilities/function_override.lua")
+Spring.Echo("function_override DONE")
 
 include("keysym.h.lua")
 include("utils.lua")
@@ -91,13 +93,16 @@ local localWidgetsFirst = false
 local localWidgets = false
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
-  local cadata = VFS.Include(CONFIG_FILENAME)
-  if cadata and cadata["Local Widgets Config"] then
-    localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
-    localWidgets = cadata["Local Widgets Config"].localWidgets
+  if Spring.GetModOptions().disable_local_widgets ~= 1 then
+    local cadata = VFS.Include(CONFIG_FILENAME)
+    if cadata and cadata["Local Widgets Config"] then
+      localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
+      localWidgets = cadata["Local Widgets Config"].localWidgets
+    end
   end
 end
 
+Spring.Echo("localWidgets", Spring.GetModOptions().disable_local_widgets ~= 1, localWidgets, localWidgetsFirst)
 local VFSMODE
 VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
@@ -449,7 +454,9 @@ function widgetHandler:Initialize()
   end
 
   -- Add ignorelist --
-  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+  Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
+  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
+  Spring.Echo("Spring.GetMyPlayerID() done", customkeys)
   if customkeys["ignored"] then
     if string.find(customkeys["ignored"],",") then
       local newignorelist = string.gsub(customkeys["ignored"],","," ")

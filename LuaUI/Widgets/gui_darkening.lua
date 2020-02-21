@@ -75,8 +75,8 @@ function fileexists( file )
 end
 
 function widget:Initialize()
-  if fileexists(LUA_BRIGHT_MAP_FILE) then
-    darkeningMap = include("Config/darkeningMap.lua");
+  if VFS.FileExists(LUA_BRIGHT_MAP_FILE, VFS.MAP) then
+    darkeningMap = include(LUA_BRIGHT_MAP_FILE, nil, VFS.MAP)
   end
   if (brightnessMap) then
     darkening = darkeningMap[Game.mapName];

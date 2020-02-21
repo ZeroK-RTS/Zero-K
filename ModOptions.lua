@@ -278,6 +278,14 @@ local options = {
     def=false,
   },
   {
+    key='disable_local_widgets',
+    name='Disable Local Widgets',
+    desc='Disable loading of local widget.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
     key='campaign_chassis',
     name='Allow campaign commander chassis',
     desc='Allows you to choose the campaign commander chassis.',

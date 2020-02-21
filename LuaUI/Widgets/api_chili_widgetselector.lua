@@ -42,14 +42,11 @@ options =
 local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
-
 -- Config file data
-local VFSMODE      = VFS.RAW_FIRST
-
 --------------------------------------------------------------------------------
 
 local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
-local confdata = VFS.Include(file, nil, VFSMODE)
+local confdata = VFS.Include(file, nil, VFS.ZIP)
 local color = confdata.color
 
 

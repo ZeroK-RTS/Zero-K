@@ -19,7 +19,7 @@ LUAUI_VERSION = "LuaUI v0.3"
 
 LUAUI_DIRNAME = 'LuaUI/'
 
-VFS.DEF_MODE = VFS.RAW_FIRST
+VFS.DEF_MODE = VFS.ZIP
 
 local STARTUP_FILENAME = LUAUI_DIRNAME .. 'camain.lua'
 
@@ -30,7 +30,7 @@ local STARTUP_FILENAME = LUAUI_DIRNAME .. 'camain.lua'
 --
 
 do
-  text = VFS.LoadFile(STARTUP_FILENAME, VFS.RAW_FIRST)
+  text = VFS.LoadFile(STARTUP_FILENAME, VFS.ZIP)
   if (text == nil) then
     Script.Kill('Failed to load ' .. STARTUP_FILENAME)
   end

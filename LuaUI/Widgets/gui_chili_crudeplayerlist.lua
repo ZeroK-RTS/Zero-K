@@ -555,7 +555,6 @@ local function SortEntries()
 	local toTop = options.alignToTop.value
 	local offset = 0
 	for i = 1, #listControls do
-		Spring.Echo("listControls[i]", i, listControls[i].entryData.name)
 		if toTop then
 			listControls[i].mainControl._relativeBounds.top = offset
 			listControls[i].mainControl._relativeBounds.bottom = nil

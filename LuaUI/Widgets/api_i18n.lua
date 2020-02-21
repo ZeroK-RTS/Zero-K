@@ -118,7 +118,7 @@ end
 
 local function initializeTranslation(database)
 	local trans = {
-		i18n = VFS.Include("LuaUI/i18nlib/i18n/init.lua", nil, VFS.DEF_MODE),
+		i18n = VFS.Include("LuaUI/i18nlib/i18n/init.lua", nil),
 		locales = {en = true},
 	}
 	loadLocale(trans.i18n,database,"en")

@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Crude Player List",
+    name      = "Chili Crude Player List Old",
     desc      = "v1.327 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",

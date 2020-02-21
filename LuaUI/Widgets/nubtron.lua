@@ -129,7 +129,7 @@ local lang = 'en'
 --------------------------------------------------------------------------------
 
 local classesByUnit = {}
-local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
+local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.ZIP)
 local unitClasses = nubtronData.unitClasses
 local unitClassNames = nubtronData.unitClassNames
 local mClasses = nubtronData.mClasses
@@ -406,7 +406,7 @@ local function addTabText(unitDefID)
 end
 
 local function SetupText(lang)
-	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.RAW_FIRST)
+	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.ZIP)
 	local texts_lang = texts[lang]
 	
 	if not texts_lang then
