@@ -7,6 +7,7 @@ function widget:GetInfo()
 		license   = "GNU GPL, v2 or later",
 		layer     = 100000,
 		enabled   = false,
+		api       = true
 	}
 end
 
