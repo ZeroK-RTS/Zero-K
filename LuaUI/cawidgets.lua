@@ -676,7 +676,7 @@ function widgetHandler:NewWidget()
   widget.widgetHandler = {}
   local wh = widget.widgetHandler
   local self = self
-  widget.include  = function (f) return include(f, widget) end
+  widget.include  = function (f,_,MODE) return include(f, widget, MODE) end
   wh.ForceLayout  = function (_) self:ForceLayout() end
   wh.RaiseWidget  = function (_) self:RaiseWidget(widget) end
   wh.LowerWidget  = function (_) self:LowerWidget(widget) end
