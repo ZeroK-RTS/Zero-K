@@ -1573,6 +1573,7 @@ local function AddMex(unitID, teamID, metalMake)
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 
 		if teamID and enableMexPayback then
+			-- share goes down to 0 linearly, so halved to average it over refund duration
 			local refundTime = MEX_REFUND_VALUE / ((MEX_REFUND_SHARE / 2) * metalMake)
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
