@@ -160,9 +160,17 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local costMult = 1
+local blockSeismic = true
 local modOptions = Spring.GetModOptions()
+
 if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
+end
+
+if modOptions.noseismicblock then
+	blockSeismic = false
+else
+	blockSeismic = true
 end
 
 volumeCost = volumeCost * costMult * inbuiltCostMult
@@ -3148,20 +3156,22 @@ function gadget:GameFrame(n)
 	end
 	
 	--check structures for terrain deformation
-	local struc = structureCheckFrame[n % structureCheckLoopFrames]
-	if struc then
-		local i = 1
-		while i <= struc.count do
-			local unit = structure[struc.unit[i]]
-			if unit then
-				local height = spGetGroundHeight(unit.x, unit.z)
-				if height ~= unit.h then
-					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
+	if blockSeismic then
+		local struc = structureCheckFrame[n % structureCheckLoopFrames]
+		if struc then
+			local i = 1
+			while i <= struc.count do
+				local unit = structure[struc.unit[i]]
+				if unit then
+					local height = spGetGroundHeight(unit.x, unit.z)
+					if height ~= unit.h then
+						spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
+					end
+				else
+
 				end
-			else
-				
+				i = i + 1
 			end
-			i = i + 1
 		end
 	end
 end
@@ -3289,7 +3299,7 @@ end
 local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
-			if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+			if not blockSeismic or not (structureAreaMap[i] and structureAreaMap[i][j]) then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
 					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
@@ -3365,7 +3375,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				
 				for i = sx - smoothradius, sx + smoothradius,8 do
 					for j = sz - smoothradius, sz + smoothradius,8 do
-						if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+						if not blockSeismic or not (structureAreaMap[i] and structureAreaMap[i][j]) then
 							local disSQ = (i - x)^2 + (j - z)^2
 							if disSQ <= smoothradiusSQ then
 								if not origHeight[i] then
