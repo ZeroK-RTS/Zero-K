@@ -18,7 +18,6 @@ local SIG_Activate = 2
 local SIG_Defensive = 4
 local unitDefID = Spring.GetUnitDefID(unitID)
 
--- don't ask daddy difficult questions like "Why does it armor at the START of the animation?"
 local function Open()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
@@ -37,7 +36,6 @@ local function Open()
 	
 	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	--SetUnitValue(COB.ARMORED,1)
 end
 
 local function Close()
@@ -58,7 +56,6 @@ local function Close()
 	WaitForTurn(dish4, z_axis)
 	
 	Spring.SetUnitArmored(unitID, true)
-	SetUnitValue(COB.ARMORED, 1)
 end
 
 function script.Activate()
