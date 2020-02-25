@@ -111,6 +111,7 @@ end
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
+local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
 
 local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["energywind"].id] = {cost = UnitDefNames["energywind"].metalCost*PAYBACK_FACTOR},
@@ -1572,11 +1573,12 @@ local function AddMex(unitID, teamID, metalMake)
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 
 		if teamID and enableMexPayback then
-			local refundTime = 400/metalMake
+			-- share goes down to 0 linearly, so halved to average it over refund duration
+			local refundTime = MEX_REFUND_VALUE / ((MEX_REFUND_SHARE / 2) * metalMake)
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
 			mexByID[unitID].refundTimeTotal = refundTime
-			mexByID[unitID].refundTotal = metalMake*refundTime*MEX_REFUND_SHARE*0.5
+			mexByID[unitID].refundTotal = MEX_REFUND_VALUE
 			mexByID[unitID].refundSoFar = 0
 			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal
 		end
