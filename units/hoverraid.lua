@@ -5,7 +5,7 @@ return { hoverraid = {
   acceleration        = 0.33,
   activateWhenBuilt   = true,
   brakeRate           = 0.835,
-  buildCostMetal      = 80,
+  buildCostMetal      = 75,
   builder             = false,
   buildPic            = [[hoverraid.png]],
   canGuard            = true,
@@ -24,7 +24,7 @@ return { hoverraid = {
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
-  iconType            = [[hoverraider]],
+  iconType            = [[hoverscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxDamage           = 300,
@@ -88,7 +88,7 @@ return { hoverraid = {
       },
       
       damage                  = {
-        default = 95.01,
+        default = 100.01,
       },
       
       explosionGenerator      = [[custom:gauss_hit_l]],
@@ -101,8 +101,8 @@ return { hoverraid = {
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,
-      range                   = 210,
-      reloadtime              = 3,
+      range                   = 220,
+      reloadtime              = 2.8,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
       size                    = 0.8,

@@ -58,6 +58,7 @@ local units = {
 	factoryhover = {
 		hovercon = CONSTRUCTOR,
 		hoverraid = RAIDER,
+		hoverheavyraid = WEIRD_RAIDER,
 		hoverdepthcharge = SPECIAL,
 		hoverriot = RIOT,
 		hoverskirm = SKIRMISHER,

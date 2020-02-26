@@ -151,6 +151,9 @@ unitConfigs = {
   [UnitDefNames.hoverraid.id] = {
     clamp = 0,
   },
+  [UnitDefNames.hoverheavyraid.id] = {
+    clamp = 0,
+  },
   [UnitDefNames.turretmissile.id] = {
     clamp = 2,
   },

@@ -14,6 +14,7 @@ return { factoryhover = {
   buildoptions     = {
     [[hovercon]],
     [[hoverraid]],
+    [[hoverheavyraid]],
     [[hoverskirm]],
     [[hoverassault]],
     [[hoverdepthcharge]],

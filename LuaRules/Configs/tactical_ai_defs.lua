@@ -127,12 +127,15 @@ local shortRangeSkirmieeArray = NameToDefID({
 	"shieldraid",
 })
 
-local riotRangeSkirmieeArray = NameToDefID({
-	"tankheavyraid",
-	"cloakriot",
+local shortToRiotRangeSkirmieeArray = NameToDefID({
 	"hoverraid",
-	"hoverscout",
 	"amphriot",
+})
+
+local riotRangeSkirmieeArray = NameToDefID({
+	"cloakriot",
+	"tankheavyraid",
+	"hoverheavyraid",
 	"striderantiheavy",
 	"striderdante",
 	
@@ -252,12 +255,13 @@ local slasherSkirmieeArray = NameToDefID({
 })
 
 -- Nested union so long ranged things also skirm the things skirmed by short ranged things
-shortRangeSkirmieeArray  = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
-riotRangeSkirmieeArray   = Union(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
-lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
-medRangeSkirmieeArray    = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
-longRangeSkirmieeArray   = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
-artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
+shortRangeSkirmieeArray       = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
+shortToRiotRangeSkirmieeArray = Union(shortToRiotRangeSkirmieeArray,shortRangeSkirmieeArray)
+riotRangeSkirmieeArray        = Union(riotRangeSkirmieeArray,shortToRiotRangeSkirmieeArray)
+lowMedRangeSkirmieeArray      = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
+medRangeSkirmieeArray         = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
+longRangeSkirmieeArray        = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
+artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
 
 ---------------------------------------------------------------------------
 -- Explosion avoidance
@@ -643,9 +647,21 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
 	},
-  
+	["hoverheavyraid"] = {
+		skirms = shortToRiotRangeSkirmieeArray,
+		swarms = lowRangeSwarmieeArray,
+		flees = {},
+		fightOnlyUnits = shortRangeExplodables,
+		circleStrafe = ENABLE_OLD_JINK_STRAFE,
+		strafeOrderLength = 180,
+		maxSwarmLeeway = 40,
+		swarmLeeway = 50,
+		stoppingDistance = 15,
+		skirmOrderDis = 150,
+	},
+
 	["jumpraid"] = {
-		skirms = shortRangeSkirmieeArray,
+		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,
@@ -672,7 +688,7 @@ local behaviourConfig = {
 	},
   
 	["tankheavyraid"] = {
-		skirms = shortRangeSkirmieeArray,
+		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		fightOnlyUnits = shortRangeExplodables,

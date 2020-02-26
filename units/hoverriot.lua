@@ -49,7 +49,7 @@ return { hoverriot = {
   sightDistance       = 407,
   sonarDistance       = 407,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 400,
   workerTime          = 0,
 
   weapons             = {
