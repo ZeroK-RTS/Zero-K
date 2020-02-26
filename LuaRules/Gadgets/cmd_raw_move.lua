@@ -306,10 +306,12 @@ end
 
 local function HandleRawMove(unitID, unitDefID, cmdParams)
 	if spMoveCtrlGetTag(unitID) then
+		--Spring.Echo("ret 10")
 		return true, false
 	end
 
 	if #cmdParams < 3 then
+		--Spring.Echo("ret 9")
 		return true, true
 	end
 
@@ -333,6 +335,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		if unitData.handlingWaitTime <= 0 then
 			unitData.handlingWaitTime = nil
 		end
+		--Spring.Echo("ret 8")
 		return true, false
 	end
 
@@ -366,16 +369,19 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			end
 		end
 		StopRawMoveUnit(unitID, true)
+		--Spring.Echo("ret 7")
 		return true, true
 	end
 
 	if canFlyDefs[unitDefID] then
 		if unitData.commandHandled then
+			--Spring.Echo("ret 6")
 			return true, false
 		end
 		unitData.switchedFromRaw = true
 		unitData.commandHandled = true
 		Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDistOverride or goalDist[unitDefID] or 16, nil, false)
+		--Spring.Echo("ret 5")
 		return true, false
 	end
 
@@ -394,19 +400,23 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*6) + 5
-			if distSq < GIVE_UP_STUCK_DIST_SQ then
-				StopRawMoveUnit(unitID, true)
-				return true, true
-			else
-				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
-				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
-				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, 16, nil, false)
-				unitData.commandHandled = nil
-				unitData.switchedFromRaw = nil
-				unitData.nextTestTime = nil
-				unitData.doingRawMove = nil
-				unitData.handlingWaitTime = math.floor(math.random()*4) + 2
-				return true, false
+			if not GG.floatUnit[unitID] then
+				if distSq < GIVE_UP_STUCK_DIST_SQ then
+					StopRawMoveUnit(unitID, true)
+					--Spring.Echo("ret 4")
+					return true, true
+				else
+					local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
+					local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
+					Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, 16, nil, false)
+					unitData.commandHandled = nil
+					unitData.switchedFromRaw = nil
+					unitData.nextTestTime = nil
+					unitData.doingRawMove = nil
+					unitData.handlingWaitTime = math.floor(math.random()*4) + 2
+					--Spring.Echo("ret 4")
+					return true, false
+				end
 			end
 		else
 			unitData.stuckCheckTimer = 4 + math.min(6, math.floor(distSq/500))
@@ -421,6 +431,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			unitData.switchedFromRaw = nil
 			unitData.nextTestTime = nil
 		else
+			--Spring.Echo("ret 2")
 			return true, false
 		end
 	end
@@ -461,6 +472,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	if not unitData.commandHandled then
 		unitData.commandHandled = true
 	end
+	--Spring.Echo("ret 1")
 	return true, false
 end
 

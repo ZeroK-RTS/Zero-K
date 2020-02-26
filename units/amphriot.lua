@@ -17,8 +17,10 @@ return { amphriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 10,
+    amph_regen = 20,
     amph_submerged_at = 40,
+    sink_on_emp    = 1,
+    floattoggle    = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -75,7 +77,7 @@ return { amphriot = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 100,
+      areaOfEffect            = 128,
       burst                   = 2,
       burstRate               = 0.2,
       avoidFriendly           = false,
@@ -102,7 +104,7 @@ return { amphriot = {
       myGravity               = 2,
       model                   = [[diskball.s3o]],
       numBounce               = 1,
-      range                   = 230,
+      range                   = 300,
       reloadtime              = 1.4,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,

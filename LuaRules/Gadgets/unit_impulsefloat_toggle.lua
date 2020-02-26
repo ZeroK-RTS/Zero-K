@@ -72,6 +72,10 @@ local aimWeapon = {}
 local GRAVITY = Game.gravity/30/30
 local RAD_PER_ROT = (math.pi/(2^15))
 local buildTestUnitDefID = UnitDefNames["turretriot"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
+
+-- Communicate to other gadgets
+GG.floatUnit = {}
+
 --------------------------------------------------------------------------------
 -- Communication to script
 
@@ -92,6 +96,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 			local place, feature = Spring.TestBuildOrder(buildTestUnitDefID, x, y ,z, 1)
 			if place == 2 or place == 1 then
 				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
+				GG.floatUnit[unitID] = true
 				floatByID.count = floatByID.count + 1
 				floatByID.data[floatByID.count] = unitID
 				GG.SetUnitPermanentFallDamageImmunity(unitID, true)
@@ -116,6 +121,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 end
 
 local function removeFloat(unitID)
+	GG.floatUnit[unitID] = false
 	GG.SetUnitPermanentFallDamageImmunity(unitID, false)
 	float[floatByID.data[floatByID.count] ].index = float[unitID].index
 	floatByID.data[float[unitID].index] = floatByID.data[floatByID.count]
@@ -251,7 +257,7 @@ function gadget:GameFrame(f)
 			
 			-- Check if the unit should sink
 			if checkOrder then
-				if data.transportCall>0 then
+				if data.transportCall > 0 then
 					local cmdID = Spring.GetUnitCurrentCommand(unitID)
 					local moving = cmdID and sinkCommand[cmdID]
 					setSurfaceState(unitID, data.unitDefID, not moving)
@@ -283,9 +289,21 @@ function gadget:GameFrame(f)
 			data.x, data.y, data.z = Spring.GetUnitPosition(unitID)
 			
 			-- Increase & decrease floating/sinking speed
-			if data.y <= def.floatPoint then
+			local underwaterEffect = 1
+			if data.y > def.floatPoint then
+				if def.surfaceDampen and data.y - def.floatPoint <= def.surfaceDampen then
+					underwaterEffect = 1 - (data.y - def.floatPoint)/def.surfaceDampen
+				else
+					underwaterEffect = 0
+				end
+			end
+			
+			local submergedSpeed
+			local airSpeed
+			
+			if underwaterEffect ~= 0 then
 				if not data.surfacing then -- sinking
-					data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+					submergedSpeed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
 					data.onSurface = false
 					-- Horizontal jitter if terrain below is invalid
 					if f%30 == 0 then
@@ -297,11 +315,15 @@ function gadget:GameFrame(f)
 						end
 					end
 				else --rising
-					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
+					submergedSpeed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				end
-			else
-				data.speed = (data.speed + def.airAccel)*def.airDrag
 			end
+			
+			if underwaterEffect ~= 1 then
+				airSpeed = (data.speed + def.airAccel)*def.airDrag
+			end
+			
+			data.speed = underwaterEffect*(submergedSpeed or 0) + (1 - underwaterEffect)*(airSpeed or 0)
 			
 			-- Test for special case
 			local height = Spring.GetGroundHeight(data.x, data.z)
@@ -312,13 +334,13 @@ function gadget:GameFrame(f)
 					local waterline = data.y - def.floatPoint
 					-- enter water: do splash
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
-						callScript(unitID, "Float_crossWaterline", {data.speed})
+						callScript(unitID, "Float_crossWaterline", data.speed)
 						data.speed = data.speed*def.waterHitDrag
 					end
 					
 					--leave water: do splash
 					if data.speed > 0 and waterline < 0 and -waterline < data.speed then
-						callScript(unitID, "Float_crossWaterline", {data.speed})
+						callScript(unitID, "Float_crossWaterline", data.speed)
 					end
 				end
 				
@@ -404,6 +426,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if floatDefs[unitDefID] then
 		floatState[unitID] = DEFAULT_FLOAT
 		Spring.InsertUnitCmdDesc(unitID, unitFloatIdleBehaviour)
+	end
+	
+	if GG.floatUnit[unitID] then
+		GG.floatUnit[unitID] = nil
 	end
 end
 

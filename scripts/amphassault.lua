@@ -98,13 +98,13 @@ end
 
 local function dustBottom()
 	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID,rffoot)
-	Spring.SpawnCEG("uw_vindiback", x1, y1+5, z1, 0, 0, 0, 0)
+	Spring.SpawnCEG("uw_amphlift", x1, y1+5, z1, 0, 0, 0, 0)
 	local x2,y2,z2 = Spring.GetUnitPiecePosDir(unitID,rbfoot)
-	Spring.SpawnCEG("uw_vindiback", x2, y2+5, z2, 0, 0, 0, 0)
+	Spring.SpawnCEG("uw_amphlift", x2, y2+5, z2, 0, 0, 0, 0)
 	local x3,y3,z3 = Spring.GetUnitPiecePosDir(unitID,lffoot)
-	Spring.SpawnCEG("uw_vindiback", x3, y3+5, z3, 0, 0, 0, 0)
+	Spring.SpawnCEG("uw_amphlift", x3, y3+5, z3, 0, 0, 0, 0)
 	local x4,y4,z4 = Spring.GetUnitPiecePosDir(unitID,lbfoot)
-	Spring.SpawnCEG("uw_vindiback", x4, y4+5, z4, 0, 0, 0, 0)
+	Spring.SpawnCEG("uw_amphlift", x4, y4+5, z4, 0, 0, 0, 0)
 end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------

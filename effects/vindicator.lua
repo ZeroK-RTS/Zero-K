@@ -1,6 +1,7 @@
 -- vindimuzzle
 -- vindiback
 -- uw_vindiback
+-- uw_amphlift
 
 return {
   ["vindimuzzle"] = {
@@ -210,5 +211,35 @@ return {
     },
   },
 
+  ["uw_amphlift"] = {
+    takeoff1 = {
+      air                = false,
+      useairlos       = false,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = false,
+      underwater         = true,
+      properties = {
+        airdrag            = 0.95,
+        colormap           = [[0 0 0 0.001 0.04 0.04 0.04 0.2    0 0 0 0.001]],
+        emitrot            = 90,
+        emitrotspread      = 0,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0.005, 0]],
+        numparticles       = 15,
+        particlelife       = 80,
+        particlelifespread = 0,
+        particlesize       = 4,
+        particlesizespread = 1,
+        particlespeed      = 2.5,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0.3,
+        sizemod            = 1.0,
+        texture            = [[kfoam]],
+      },
+    },
+  },
 }
 

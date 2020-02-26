@@ -845,7 +845,7 @@ local behaviourConfig = {
 		},
 		sea = {
 			weaponNum = 2,
-			skirms = riotRangeSkirmieeArray,
+			skirms = {},
 			swarms = {},
 			flees = {},
 			fightOnlyUnits = shortRangeExplodables,
