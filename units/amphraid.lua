@@ -50,7 +50,7 @@ return { amphraid = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1000,
+  turnRate               = 1750,
   upright                = true,
 
   weapons                = {
@@ -83,7 +83,7 @@ return { amphraid = {
       },
 
       damage                  = {
-        default = 115,
+        default = 130.01,
         subs    = 10,
       },
 
@@ -124,7 +124,7 @@ return { amphraid = {
       craterMult              = 2,
 
       damage                  = {
-        default = 115,
+        default = 130.01,
       },
 
       edgeEffectiveness       = 0.99,

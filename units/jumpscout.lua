@@ -39,7 +39,7 @@ return { jumpscout = {
   leaveTracks            = true,
   maxDamage              = 80,
   maxSlope               = 36,
-  maxVelocity            = 3.5,
+  maxVelocity            = 3.4,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[SKBOT2]],
@@ -93,8 +93,8 @@ return { jumpscout = {
             },
 
       damage                  = {
-        default = 410.1,
-        planes  = 410.1,
+        default = 720.1,
+        planes  = 720.1,
         subs    = 20.5,
       },
 
@@ -105,7 +105,7 @@ return { jumpscout = {
       interceptedByShieldType = 2,
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
-      range                   = 170,
+      range                   = 150,
       reloadtime              = 1,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_med5]],

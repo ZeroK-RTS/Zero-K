@@ -163,9 +163,9 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM[num])
 	SetSignalMask(SIG_AIM[num])
-	Turn(head, y_axis, heading, math.rad(240))
-	Turn(lturret, x_axis, -pitch, math.rad(120))
-	Turn(rturret, x_axis, -pitch, math.rad(120))
+	Turn(head, y_axis, heading, math.rad(380))
+	Turn(lturret, x_axis, -pitch, math.rad(160))
+	Turn(rturret, x_axis, -pitch, math.rad(160))
 	WaitForTurn(head, y_axis)
 	WaitForTurn(lturret, x_axis)
 	WaitForTurn(rturret, x_axis)
@@ -198,9 +198,9 @@ end
 
 function script.BlockShot(num, targetID)
 	if num == 1 then -- surface missiles
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40, 0.25)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 130, 40, 0.25)
 	elseif num == 2 then -- torpedoes
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 130, 40)
 	end
 	return false
 end

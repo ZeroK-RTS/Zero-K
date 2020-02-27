@@ -30,7 +30,7 @@ return { spideremp = {
   leaveTracks            = true,
   maxDamage              = 750,
   maxSlope               = 72,
-  maxVelocity            = 2.7,
+  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
@@ -69,24 +69,24 @@ return { spideremp = {
 
     spider = {
       name                    = [[Electro-Stunner]],
-      areaOfEffect            = 160,
+      areaOfEffect            = 128,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 600,
+        extra_damage = 450,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
       },
 
       damage                  = {
-        default        = 18,
+        default        = 40,
       },
 
       duration                = 8,
-      explosionGenerator      = [[custom:LIGHTNINGPLOSION160AoE]],
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION128AoE]],
       fireStarter             = 0,
       heightMod               = 1,
       impulseBoost            = 0,
@@ -96,7 +96,7 @@ return { spideremp = {
       noSelfDamage            = true,
       paralyzeTime            = 3,
       range                   = 240,
-      reloadtime              = 1.733,
+      reloadtime              = 1.5,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
