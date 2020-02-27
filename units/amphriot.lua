@@ -17,7 +17,7 @@ return { amphriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 20,
+    amph_regen = 10,
     amph_submerged_at = 40,
     sink_on_emp    = 1,
     floattoggle    = [[1]],
@@ -32,7 +32,7 @@ return { amphriot = {
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
-  maxVelocity            = 1.5,
+  maxVelocity            = 1.6,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER]],
@@ -93,7 +93,7 @@ return { amphriot = {
         default = 90.1,
       },
 
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
       flightTime              = 1.6,
       groundbounce            = 1,
       impactOnly              = false,
