@@ -35,8 +35,8 @@ local CommandDesc = {
 	type        = CMDTYPE.ICON_MODE,
 	name        = 'Retreat',
 	action      = 'retreat',
-	tooltip 	= Tooltips[DefaultState + 1],
-	params  = { 'Retreat Off', 'Retreat Off', 'Retreat 30%', 'Retreat 65%', 'Retreat 99%' },
+	tooltip     = Tooltips[DefaultState + 1],
+	params      = { 'Retreat Off', 'Retreat Off', 'Retreat 30%', 'Retreat 65%', 'Retreat 99%' },
 }
 local StateCount = #CommandDesc.params-1
 
