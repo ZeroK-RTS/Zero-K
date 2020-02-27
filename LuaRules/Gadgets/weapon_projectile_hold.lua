@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "1 July 2017",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
@@ -25,12 +25,12 @@ local depthcharge = {
 }
 
 local projectileDefs = {
-	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = depthcharge,
+	--[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = depthcharge,
 	[WeaponDefNames["hoverdepthcharge_fake_depthcharge"].id] = depthcharge
 }
 
 local projectileSpeed = {
-	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = 3, -- empirical
+	--[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = 3, -- empirical
 }
 
 local projectileTimes = {}
@@ -90,7 +90,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	
 	projectileMoveCtrl[proID] = true
 	Spring.SetProjectileMoveControl(proID, true)
-	Spring.SetPieceProjectileParams (proID, 1000)
+	Spring.SetPieceProjectileParams(proID, 1000)
 	
 	if not projectileTimes[releaseFrame] then
 		projectileTimes[releaseFrame] = proID

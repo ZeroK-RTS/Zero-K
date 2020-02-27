@@ -318,7 +318,7 @@ function widget:Initialize()
 		for i = 1, #ud.weapons do
 			local WeaponDefID = ud.weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
-			if (WeaponDef.reload>ud.reloadTime) then
+			if (WeaponDef.reload > ud.reloadTime) then
 				ud.reloadTime    = WeaponDef.reload;
 				ud.primaryWeapon = i;
 			end

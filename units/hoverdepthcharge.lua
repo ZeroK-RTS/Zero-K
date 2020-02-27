@@ -4,7 +4,7 @@ return { hoverdepthcharge = {
   description         = [[Anti-Sub Hovercraft]],
   acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 0.43,
+  brakeRate           = 1.3,
   buildCostMetal      = 330,
   builder             = false,
   buildPic            = [[hoverdepthcharge.png]],
@@ -18,7 +18,6 @@ return { hoverdepthcharge = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    turnatfullspeed = [[1]],
     modelradius    = [[25]],
   },
 
@@ -30,7 +29,7 @@ return { hoverdepthcharge = {
   idleTime            = 1800,
   maxDamage           = 1650,
   maxSlope            = 36,
-  maxVelocity         = 3.3,
+  maxVelocity         = 2.5,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
@@ -78,7 +77,7 @@ return { hoverdepthcharge = {
 
     DEPTHCHARGE = {
       name                    = [[Depth Charge]],
-      areaOfEffect            = 290,
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       bounceSlip              = 0.94,
       bounceRebound           = 0.8,
@@ -91,7 +90,7 @@ return { hoverdepthcharge = {
       },
 
       damage                  = {
-        default = 900.5,
+        default = 600.5,
       },
 
       edgeEffectiveness       = 0.4,
@@ -106,28 +105,28 @@ return { hoverdepthcharge = {
       leadLimit               = 0,
       model                   = [[depthcharge_big.s3o]],
       myGravity               = 0.2,
-      noSelfDamage            = false,
+      noSelfDamage            = true,
       numbounce               = 3,
-      range                   = 270,
-      reloadtime              = 8,
+      range                   = 330,
+      reloadtime              = 5,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
-      soundStartVolume        = 8,
+      soundStartVolume        = 5,
       startVelocity           = 5,
       tolerance               = 1000000,
       tracks                  = true,
-      turnRate                = 30000,
+      turnRate                = 50000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 15,
+      weaponAcceleration      = 12,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 280,
     },
     
     FAKE_DEPTHCHARGE = {
-      name                    = [[Fake Depth Charge]],
-      areaOfEffect            = 290,
+      name                    = [[Rolled Charge]],
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       bounceSlip              = 0.4,
       bounceRebound           = 0.4,
@@ -137,7 +136,7 @@ return { hoverdepthcharge = {
       craterMult              = 2,
 
       damage                  = {
-        default = 900.5,
+        default = 600.5,
       },
 
       edgeEffectiveness       = 0.4,
@@ -151,10 +150,10 @@ return { hoverdepthcharge = {
       interceptedByShieldType = 1,
       model                   = [[depthcharge_big.s3o]],
       myGravity               = 0.2,
-      noSelfDamage            = false,
+      noSelfDamage            = true,
       numbounce               = 1,
-      range                   = 270,
-      reloadtime              = 8,
+      range                   = 160,
+      reloadtime              = 5,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -163,9 +162,8 @@ return { hoverdepthcharge = {
       tracks                  = false,
       turnRate                = 0,
       turret                  = true,
-      waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 5,
+      weaponVelocity          = 180,
     },
     
     FAKEGUN = {
@@ -190,8 +188,8 @@ return { hoverdepthcharge = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 75,
-      reloadtime              = 8,
+      range                   = 160,
+      reloadtime              = 5,
       size                    = 1E-06,
       smokeTrail              = false,
       targetborder            = 0.9,

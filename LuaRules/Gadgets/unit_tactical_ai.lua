@@ -359,6 +359,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		predictedDist = 0
 	end
 	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	--Spring.Echo("skirmRange", skirmRange, GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum))
 	local reloadFrames
 	if behaviour.reloadSkirmLeeway then
 		local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
@@ -580,7 +581,10 @@ local function updateUnits(frame, start, increment)
 				local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
 				local behaviour
 				if unitAIBehaviour[data.udID].waterline then
-					local _,by = spGetUnitPosition(unitID, true)
+					local bx,by,bz = spGetUnitPosition(unitID, true)
+					if unitAIBehaviour[data.udID].floatWaterline then
+						by = Spring.GetGroundHeight(bx, bz)
+					end
 					if by < unitAIBehaviour[data.udID].waterline then
 						behaviour = unitAIBehaviour[data.udID].sea
 					else

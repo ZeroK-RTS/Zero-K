@@ -384,6 +384,7 @@ local subfleeables = NameToDefID({
 local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lowRangeSwarmieeArray)
 
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
+-- floatWaterline (defalts to false): Use ground height instead of unit height for waterline check
 -- sea: table of behaviour for sea. Note that these tables are optional.
 -- land: table of behaviour for land
 
@@ -924,13 +925,28 @@ local behaviourConfig = {
 		},
 	},
 	["hoverdepthcharge"] = {
-		skirms = {},
-		swarms = {},
-		flees = {},
-		skirmEverything = true,
-		skirmLeeway = 200,
-		skirmOrderDis = 180,
-		reloadSkirmLeeway = 2,
+		waterline = -5,
+		floatWaterline = true,
+		land = {
+			weaponNum = 1,
+			skirms = {},
+			swarms = {},
+			flees = {},
+			skirmEverything = true,
+			skirmLeeway = 15,
+			stoppingDistance = 8,
+			skirmOrderDis = 150,
+		},
+		sea = {
+			weaponNum = 0,
+			skirms = {},
+			swarms = {},
+			flees = {},
+			skirmEverything = true,
+			skirmLeeway = 15,
+			stoppingDistance = 8,
+			skirmOrderDis = 150,
+		},
 	},
 	
 	--assaults
