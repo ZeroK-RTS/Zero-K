@@ -69,13 +69,13 @@ return { spideremp = {
 
     spider = {
       name                    = [[Electro-Stunner]],
-      areaOfEffect            = 160,
+      areaOfEffect            = 40,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 600,
+        extra_damage = 500,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
@@ -96,7 +96,7 @@ return { spideremp = {
       noSelfDamage            = true,
       paralyzeTime            = 3,
       range                   = 240,
-      reloadtime              = 1.733,
+      reloadtime              = 1.2,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

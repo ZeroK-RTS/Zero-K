@@ -26,7 +26,7 @@ return { shieldraid = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 320,
+  maxDamage              = 340,
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
@@ -79,7 +79,7 @@ return { shieldraid = {
       },
       
       damage                  = {
-        default = 7.95,
+        default = 8.35,
         subs    = 0.4,
       },
 
@@ -93,7 +93,7 @@ return { shieldraid = {
       interceptedByShieldType = 1,
       leadLimit               = 0,
       noSelfDamage            = true,
-      range                   = 245,
+      range                   = 250,
       reloadtime              = 0.1,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
