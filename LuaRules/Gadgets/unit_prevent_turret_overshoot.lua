@@ -153,13 +153,15 @@ function gadget:GameFrame()
 		local proID, rangeSq = projData[1], projData[2]
 		local ux, uy, uz = projData[3], projData[4], projData[5]
 		local tx, ty, tz = spGetProjectilePosition(proID)
-		local dx, dy, dz = ux-tx, uy-ty, uz-tz
-		local distSq = dx*dx + dy*dy + dz*dz
-		if distSq > rangeSq then
-			local prc = projCount
-			spDeleteProjectile(proID)
-			if prc == projCount then gadget:ProjectileDestroyed(proID) end -- ugly workaround because it isnt always called
-			i = i - 1
+		if tx then
+			local dx, dy, dz = ux-tx, uy-ty, uz-tz
+			local distSq = dx*dx + dy*dy + dz*dz
+			if distSq > rangeSq then
+				local prc = projCount
+				spDeleteProjectile(proID)
+				if prc == projCount then gadget:ProjectileDestroyed(proID) end -- ugly workaround because it isnt always called
+				i = i - 1
+			end
 		end
 	end
 end
