@@ -68,10 +68,10 @@ local function WeaponRangeUpdate()
 		local height = Spring.GetGroundHeight(x, z)
 		if height > -5 then
 			Spring.SetUnitMaxRange(unitID, landRange)
-			Spring.SetUnitWeaponState(unitID, 1, {range = landRange})
+			Spring.SetUnitWeaponState(unitID, 1, "range", landRange)
 		else
 			Spring.SetUnitMaxRange(unitID, seaRange)
-			Spring.SetUnitWeaponState(unitID, 1, {range = seaRange})
+			Spring.SetUnitWeaponState(unitID, 1, "range", seaRange)
 		end
 		Sleep(500)
 	end

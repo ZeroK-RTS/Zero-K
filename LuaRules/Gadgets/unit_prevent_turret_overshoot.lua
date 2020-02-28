@@ -89,8 +89,9 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 -------------------------------------------------------------------------------
+-- Unused
 
-local trackedWeaponDefNames = {"turretgauss_gauss"}
+local trackedWeaponDefNames = {} -- {"turretgauss_gauss"}
 local trackedWeaponDefIDs = {}
 for i = 1, #trackedWeaponDefNames do
 	local wd = WeaponDefNames[trackedWeaponDefNames[i]]

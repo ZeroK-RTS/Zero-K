@@ -110,7 +110,7 @@ return { turretgauss = {
       soundStartVolume        = 2.5,
       stages                  = 32,
       turret                  = true,
-      waterweapon              = true,
+      waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1200,
     },
