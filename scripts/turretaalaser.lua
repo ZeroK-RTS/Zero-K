@@ -133,8 +133,11 @@ function script.AimWeapon (num, heading, pitch)
 end
 
 function script.FireWeapon ()
-	gun = not gun
 	EmitSfx (gun and firep1 or firep2, 1024)
+end
+
+function script.EndBurst()
+	gun = not gun
 end
 
 function script.Killed (recentDamage, maxHealth)

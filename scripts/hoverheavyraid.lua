@@ -69,7 +69,7 @@ function script.AimFromWeapon()
 	return turret
 end
 
-function script.Shot(num)
+function script.EndBurst()
 	fireNum = (fireNum%3) + 1
 end
 

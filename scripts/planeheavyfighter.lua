@@ -67,7 +67,7 @@ function script.AimWeapon(num, heading, pitch)
 	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
-function script.Shot(num)
+function script.EndBurst(num)
 	gun = not gun
 end
 

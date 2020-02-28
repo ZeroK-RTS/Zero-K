@@ -11,8 +11,8 @@ return { hoverheavyraid = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 0 2]],
-  collisionVolumeScales  = [[26 26 45]],
+  collisionVolumeOffsets = [[0 -4 0]],
+  collisionVolumeScales  = [[22 22 40]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
