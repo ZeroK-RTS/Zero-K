@@ -110,6 +110,9 @@ for i = 0, 64, 8 do
 	end
 end
 
+local lutGridX = 16 -- largest X footprint is mahlazer at 10
+local lutGridZ = 16 -- largest Z footprint is factoryship at 14
+
 local maxCommandPoints = 2500
 local maxCommandUnits = 1000
 
@@ -160,17 +163,10 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local costMult = 1
-local blockSeismic = true
 local modOptions = Spring.GetModOptions()
 
 if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
-end
-
-if modOptions.noseismicblock then
-	blockSeismic = false
-else
-	blockSeismic = true
 end
 
 volumeCost = volumeCost * costMult * inbuiltCostMult
@@ -190,6 +186,7 @@ local structureTable		= {}
 local structureCount	 	= 0
 
 local structureAreaMap      = {}
+local structureLUT          = {}
 
 local structureCheckFrame	= {}
 local currentCheckFrame 	= 0
@@ -347,6 +344,120 @@ elseif modOptions.terrarestoreonly == "1" then
 			cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
 		end
 	end
+end
+
+--------------------------------------------------------------------------------
+-- Coordinate-to-structure lookup functions
+--------------------------------------------------------------------------------
+
+local function GetLutCellFromCoords(x,z)
+	return floor(x/lutGridX), floor(z/lutGridZ)
+end
+
+local function AddStructureVertexToLUT(unitID,x,z)
+	local gridX, gridZ = GetLutCellFromCoords(structure[unitID].x, structure[unitID].z)
+	if not structureLUT[gridX] then
+		structureLUT[gridX] = {}
+	end
+	if not structureLUT[gridX][gridZ] then
+		structureLUT[gridX][gridZ] = {}
+	end
+	structureLUT[gridX][gridZ][unitID] = true
+end
+
+local function DeleteStructureVertexFromLUT(unitID,x,z)
+	local gridX, gridZ = GetLutCellFromCoords(structure[unitID].x, structure[unitID].z)
+	if not structureLUT[gridX] then
+		structureLUT[gridX] = {}
+	end
+	if not structureLUT[gridX][gridZ] then
+		structureLUT[gridX][gridZ] = {}
+	end
+	structureLUT[gridX][gridZ][unitID] = nil
+end
+
+local function DeleteStructureFromLUT(unitID)
+	DeleteStructureVertexFromLUT(unitID,structure[unitID].x, structure[unitID].z)
+	DeleteStructureVertexFromLUT(unitID,structure[unitID].x, structure[unitID].maxz)
+	DeleteStructureVertexFromLUT(unitID,structure[unitID].maxx, structure[unitID].z)
+	DeleteStructureVertexFromLUT(unitID,structure[unitID].maxxx, structure[unitID].maxz)
+end
+
+local function AddStructureToLUT(unitID)
+	AddStructureVertexToLUT(unitID,structure[unitID].x, structure[unitID].z)
+	AddStructureVertexToLUT(unitID,structure[unitID].x, structure[unitID].maxz)
+	AddStructureVertexToLUT(unitID,structure[unitID].maxx, structure[unitID].z)
+	AddStructureVertexToLUT(unitID,structure[unitID].maxxx, structure[unitID].maxz)
+end
+
+local function GetSingleLutStructByCoords(gridX, gridZ, x, z)
+	if(structureLUT[gridX]) then
+		if(structureLUT[gridX][gridZ]) then
+			-- is pairs that bad if the max number of buildings per cell is fairly small?
+			for structID, truth in pairs(structureLUT[gridX][gridZ]) do
+				if structure[structID].x >= x and
+				   structure[structID].z >= z and
+				   structure[structID].maxx <= x and
+				   structure[structID].maxz <= z 
+				then
+					return structID
+				end
+			end
+		end
+	end
+end
+
+local function GetAllLutStructByCoords(gridX, gridZ, x, z)
+	local found = {};
+	local numFound = 0;
+	if(structureLUT[gridX]) then
+		if(structureLUT[gridX][gridZ]) then
+			-- is pairs that bad if the max number of buildings per cell is fairly small?
+			for structID, truth in pairs(structureLUT[gridX][gridZ]) do
+				if structure[structID].x >= x and
+				   structure[structID].z >= z and
+				   structure[structID].maxx <= x and
+				   structure[structID].maxz <= z 
+				then
+					numFound = numFound+1
+					found[numFound] = structID
+				end
+			end
+		end
+	end
+	return found;
+end
+
+-- this assumes only one structure is allowed to exist at the same point to avoid table creation
+local function GetStructureByCoords(x,z)
+	local gridX, gridZ = GetLutCellFromCoords(x,z)
+	local unitID = 
+		GetSingleLutStructByCoords(gridX, gridZ, x, z) or 
+		GetSingleLutStructByCoords(gridX-1, gridZ, x, z) or
+		GetSingleLutStructByCoords(gridX, gridZ-1, x, z)
+		GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)
+	return unitID
+end
+
+-- probably ready implementations somewhere but cba to search atm, and don't expect multi-return to be useful tbh
+local function TableConcat(t1,t2)
+    for i=1,#t2 do
+        t1[#t1+1] = t2[i]
+    end
+    return t1
+end
+
+-- lots of table creation, only makes sense if for some reason multiple terra-blocking structs are allowed per tile
+local function GetStructuresByCoords(x,z)
+	local gridX, gridZ = GetLutCellFromCoords(x,z)
+	return TableConcat(
+            TableConcat(
+             TableConcat(
+			   GetSingleLutStructsByCoords(gridX, gridZ, x, z), 
+				GetSingleLutStructByCoords(gridX-1, gridZ, x, z)),
+				 GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)),		
+				  GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)
+	)
 end
 
 --------------------------------------------------------------------------------
@@ -3156,22 +3267,21 @@ function gadget:GameFrame(n)
 	end
 	
 	--check structures for terrain deformation
-	if blockSeismic then
-		local struc = structureCheckFrame[n % structureCheckLoopFrames]
-		if struc then
-			local i = 1
-			while i <= struc.count do
-				local unit = structure[struc.unit[i]]
-				if unit then
-					local height = spGetGroundHeight(unit.x, unit.z)
-					if height ~= unit.h then
-						spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
-					end
-				else
-
+	local struc = structureCheckFrame[n % structureCheckLoopFrames]
+	if struc then
+		local i = 1
+		while i <= struc.count do
+			local unit = structure[struc.unit[i]]
+			if unit then
+				local height = spGetGroundHeight(unit.x, unit.z)
+				if height ~= unit.h + unit.dh then
+					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h+unit.dh)
+					unit.dh = 0
 				end
-				i = i + 1
+			else
+
 			end
+			i = i + 1
 		end
 	end
 end
@@ -3299,10 +3409,13 @@ end
 local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
-			if not blockSeismic or not (structureAreaMap[i] and structureAreaMap[i][j]) then
+			local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
+			if (structureAreaMap[i] and structureAreaMap[i][j]) then
+				local struct = GetStructureByCoords(i,j)
+				structure[struct].dh = structure[struct].dh + newHeight/((structure[struct].maxx-structure[struct].x)*(structure[struct].maxz-structure[struct].z)
+			else
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
-					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
 					spAddHeightMap(i, j, newHeight)
 				end
 			end
@@ -3375,7 +3488,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				
 				for i = sx - smoothradius, sx + smoothradius,8 do
 					for j = sz - smoothradius, sz + smoothradius,8 do
-						if not blockSeismic or not (structureAreaMap[i] and structureAreaMap[i][j]) then
+						if not (structureAreaMap[i] and structureAreaMap[i][j]) then
 							local disSQ = (i - x)^2 + (j - z)^2
 							if disSQ <= smoothradiusSQ then
 								if not origHeight[i] then
@@ -3466,6 +3579,8 @@ local function deregisterStructure(unitID)
 			end
 		end
 	end
+
+	DeleteStructureFromLUT(unitID)
 	
 	for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 		if not structureAreaMap[i] then
@@ -3682,10 +3797,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		
 	    if ((face == 0) or(face == 2)) then
 			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-	        minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
+	        minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount, dh = 0}
 	    else
 	        structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-	        minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
+	        minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount, dh = 0}
 	    end
 		
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
@@ -3705,6 +3820,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		end
 		
 		structureTable[structureCount] = unitID
+
+		AddStructureToLUT(unitID)
 		
 		-- slow update for terrain checking
 		if not structureCheckFrame[currentCheckFrame] then

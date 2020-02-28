@@ -400,14 +400,6 @@ local options = {
     def    = false,
   },
   {
-    key='noseismicblock',
-    name='Buildings affected by seismics',
-    desc='Buildings can be moved vertically by seismic effects such as Quake and Ripper explosions',
-    type='bool',
-    section= 'experimental',
-    def=false,
-  },
-  {
     key     = "tweakunits",
     name    = "Tweak Units",
     desc    = "A base64 encoded lua table of unit parameters to change.",
