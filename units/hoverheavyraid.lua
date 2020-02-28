@@ -1,10 +1,10 @@
 return { hoverheavyraid = {
   unitname            = [[hoverheavyraid]],
-  name                = [[Cestus]],
-  description         = [[Heavy Attack Hovercraft]],
+  name                = [[Bolas]],
+  description         = [[Disruptor Hovercraft]],
   acceleration        = 0.15,
   brakeRate           = 0.43,
-  buildCostMetal      = 200,
+  buildCostMetal      = 190,
   builder             = false,
   buildPic            = [[hoverheavyraid.png]],
   canGuard            = true,
@@ -12,7 +12,7 @@ return { hoverheavyraid = {
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 2]],
-  collisionVolumeScales  = [[27 27 45]],
+  collisionVolumeScales  = [[26 26 45]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
@@ -23,12 +23,12 @@ return { hoverheavyraid = {
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
-  iconType            = [[hoverraider]],
+  iconType            = [[hoversupport]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 720,
+  maxDamage           = 760,
   maxSlope            = 36,
-  maxVelocity         = 3.1,
+  maxVelocity         = 2.9,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
@@ -54,7 +54,7 @@ return { hoverheavyraid = {
   weapons             = {
 
     {
-      def                = [[PARTICLEBEAM]],
+      def                = [[DISRUPTOR]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -64,41 +64,54 @@ return { hoverheavyraid = {
 
   weaponDefs          = {
 
-    PARTICLEBEAM = {
-      name                    = [[Auto Particle Beam]],
-      beamDecay               = 0.85,
+    DISRUPTOR      = {
+      name                    = [[Disruptor Pulse Beam]],
+      areaOfEffect            = 24,
+      beamdecay               = 0.9,
       beamTime                = 1/30,
-      beamttl                 = 45,
-      coreThickness           = 0.3,
+      beamttl                 = 50,
+      coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-
+  
       customParams            = {
-        light_color = [[0.9 0.22 0.22]],
-        light_radius = 80,
+        timeslow_damagefactor = 4,
+        
+        light_camera_height = 2000,
+        light_color = [[0.85 0.33 1]],
+        light_radius = 120,
       },
-
+      
       damage                  = {
-        default = 40.01,
-        subs    = 2,
+        default = 35,
       },
-
-      explosionGenerator      = [[custom:flash1red]],
-      fireStarter             = 100,
+  
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
       impactOnly              = true,
-      impulseFactor           = 0,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      laserFlareSize          = 5.5,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4.33,
       minIntensity            = 1,
-      range                   = 240,
-      reloadtime              = 0.2 + 2/30,
-      rgbColor                = [[1 0 0]],
-      soundStart              = [[weapon/laser/mini_laser]],
+      noSelfDamage            = true,
+      range                   = 225,
+      reloadtime              = 0.3 + 2/30,
+      rgbColor                = [[0.3 0 0.4]],
+      soundStart              = [[weapon/laser/heavy_laser5]],
       soundStartVolume        = 3,
-      thickness               = 2.5,
-      tolerance               = 8192,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 8,
+      tolerance               = 18000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
 
   },

@@ -398,6 +398,10 @@ local icontypes = {
     bitmap='icons/hoverraider.dds',
     size=1.8,
   },
+  hoversupport = {
+    bitmap='icons/hoversupport.dds',
+    size=1.8,
+  },
   hoverassault = {
     bitmap='icons/hoverassault.dds',
     size=1.8,
