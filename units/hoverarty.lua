@@ -12,9 +12,9 @@ return { hoverarty = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 -2 0]],
-  collisionVolumeScales  = [[48 58 48]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 -6 0]],
+  collisionVolumeScales  = [[40 56 56]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
