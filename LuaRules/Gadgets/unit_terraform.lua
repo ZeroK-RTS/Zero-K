@@ -2001,7 +2001,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		local constructorCount = cmdParams[9]
 		local volumeSelection = cmdParams[10]
 		
-		if pointCount > maxCommandPoints or constructorCount > maxCommandUnits then
+		if (not pointCount) or (not maxCommandPoints) or (not maxCommandUnits) or (pointCount > maxCommandPoints) or (constructorCount > maxCommandUnits) then
 			return
 		end
 		
