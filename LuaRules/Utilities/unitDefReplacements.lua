@@ -172,7 +172,7 @@ end
 function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if not unitDefID then
-		return 0
+		return false
 	end
 	local ud = UnitDefs[unitDefID]
 	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
