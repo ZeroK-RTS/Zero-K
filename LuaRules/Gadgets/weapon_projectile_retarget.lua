@@ -30,6 +30,7 @@ local spGetUnitVelocity       = Spring.GetUnitVelocity
 local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileTeamID   = Spring.GetProjectileTeamID
 local spValidUnitID           = Spring.ValidUnitID
+local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spSetProjectileVelocity = Spring.SetProjectileVelocity
 
 local dist3D = Spring.Utilities.Vector.Dist3D
@@ -67,6 +68,19 @@ local projectileLead = {
 	[WeaponDefNames["shieldraid_laser"].id] = WeaponDefNames["shieldraid_laser"].projectilespeed,
 	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].projectilespeed,
 }
+
+local projectileLeadLimit = {
+	[WeaponDefNames["cloakraid_emg"].id] = WeaponDefNames["cloakraid_emg"].leadLimit,
+	[WeaponDefNames["vehraid_heatray"].id] = WeaponDefNames["vehraid_heatray"].leadLimit,
+	[WeaponDefNames["hoverraid_gauss"].id] = WeaponDefNames["hoverraid_gauss"].leadLimit,
+	[WeaponDefNames["shieldraid_laser"].id] = WeaponDefNames["shieldraid_laser"].leadLimit,
+	[WeaponDefNames["jumpraid_flamethrower"].id] = WeaponDefNames["jumpraid_flamethrower"].leadLimit,
+}
+for key, value in pairs(projectileLeadLimit) do
+	if value <= 0 then
+		projectileLeadLimit[key] = nil
+	end
+end
 
 local waterWeapon = {
 	[WeaponDefNames["hoverraid_gauss"].id] = true,
@@ -248,7 +262,7 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 	if not (targetType == UNIT and spValidUnitID(targetID)) then
 		return
 	end
-	
+
 	local tx, ty, tz = CallAsTeam(spGetProjectileTeamID(proID), GetTargetPosition, targetID)
 	if not tx then
 		return
@@ -256,20 +270,37 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 	if ty < 4 and not waterWeapon[weaponID] then
 		ty = 4
 	end
-	
-	local vx, vy, vz = spGetUnitVelocity(targetID)
+
+	local vx, vy, vz, uSpeed = spGetUnitVelocity(targetID)
 	local px, py, pz = spGetProjectilePosition(proID)
+	local pvx, pvy, pvz = spGetProjectileVelocity(proID)
 	if not (vx  and px) then
 		return
 	end
 
+	-- Approximate flight time for direct flight
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
-	local lx, ly, lz = (tx - px) + vx*flyTime, (ty - py) + vy*flyTime, (tz - pz) + vz*flyTime
+	
+	-- Reduce additional lead amount by the leadLimit of the weapon
+	if projectileLeadLimit[weaponID] then
+		if flyTime*uSpeed <= projectileLeadLimit[weaponID] then
+			-- already leading
+			return
+		end
+		flyTime = (flyTime*speed - projectileLeadLimit[weaponID])/speed
+	end
+	
+	-- First order approximation of where we're currently going
+	local pdx, pdy, pdz = pvx*flyTime, pvy*flyTime, pvz*flyTime
+	-- First order approximation of where our lead point should be
+	local lx, ly, lz = pdx + vx*flyTime, pdy + vy*flyTime, pdz + vz*flyTime
+
+	-- Normalize it all back down to what the speed should be
 	local leadSpeed = dist3D(lx, ly, lz, 0, 0, 0)
 	local normFactor = speed/leadSpeed
-	
+
 	--Spring.Utilities.UnitEcho(targetID, dist3D(ax*normFactor, ay*normFactor, az*normFactor, 0, 0, 0))
-	
+
 	spSetProjectileVelocity(proID, lx*normFactor, ly*normFactor, lz*normFactor)
 end
 
