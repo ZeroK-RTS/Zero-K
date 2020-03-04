@@ -3100,12 +3100,14 @@ function gadget:GameFrame(n)
 	--	GG.Terraform_RaiseWater(-20)
 	--end
 
-	for k, v in pairs(immediateDisplacements) do
-		ApplyUnitDisplacement(k);
+	if #immediateDisplacements > 0 then
+		for k, v in pairs(immediateDisplacements) do
+			ApplyUnitDisplacement(k);
+		end
+		immediateDisplacements = {}
 	end
 
-	immediateDisplacements = {}
-	
+
 	if n >= nextUpdateCheck then
 		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
 		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
