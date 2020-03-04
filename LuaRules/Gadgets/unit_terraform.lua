@@ -185,7 +185,8 @@ local structure          	= {}
 local structureTable		= {}
 local structureCount	 	= 0
 
-local structureAreaMap      = {}
+local structureAreaMap      = {{}{}{}{}} -- each vertex can be shared by at most 4 structures
+
 local structureLUT          = {}
 
 local structureCheckFrame	= {}
@@ -347,120 +348,6 @@ elseif modOptions.terrarestoreonly == "1" then
 end
 
 --------------------------------------------------------------------------------
--- Coordinate-to-structure lookup functions
---------------------------------------------------------------------------------
-
-local function GetLutCellFromCoords(x,z)
-	return floor(x/lutGridX), floor(z/lutGridZ)
-end
-
-local function AddStructureVertexToLUT(unitID,x,z)
-	local gridX, gridZ = GetLutCellFromCoords(structure[unitID].x, structure[unitID].z)
-	if not structureLUT[gridX] then
-		structureLUT[gridX] = {}
-	end
-	if not structureLUT[gridX][gridZ] then
-		structureLUT[gridX][gridZ] = {}
-	end
-	structureLUT[gridX][gridZ][unitID] = true
-end
-
-local function DeleteStructureVertexFromLUT(unitID,x,z)
-	local gridX, gridZ = GetLutCellFromCoords(structure[unitID].x, structure[unitID].z)
-	if not structureLUT[gridX] then
-		structureLUT[gridX] = {}
-	end
-	if not structureLUT[gridX][gridZ] then
-		structureLUT[gridX][gridZ] = {}
-	end
-	structureLUT[gridX][gridZ][unitID] = nil
-end
-
-local function DeleteStructureFromLUT(unitID)
-	DeleteStructureVertexFromLUT(unitID,structure[unitID].x, structure[unitID].z)
-	DeleteStructureVertexFromLUT(unitID,structure[unitID].x, structure[unitID].maxz)
-	DeleteStructureVertexFromLUT(unitID,structure[unitID].maxx, structure[unitID].z)
-	DeleteStructureVertexFromLUT(unitID,structure[unitID].maxxx, structure[unitID].maxz)
-end
-
-local function AddStructureToLUT(unitID)
-	AddStructureVertexToLUT(unitID,structure[unitID].x, structure[unitID].z)
-	AddStructureVertexToLUT(unitID,structure[unitID].x, structure[unitID].maxz)
-	AddStructureVertexToLUT(unitID,structure[unitID].maxx, structure[unitID].z)
-	AddStructureVertexToLUT(unitID,structure[unitID].maxxx, structure[unitID].maxz)
-end
-
-local function GetSingleLutStructByCoords(gridX, gridZ, x, z)
-	if(structureLUT[gridX]) then
-		if(structureLUT[gridX][gridZ]) then
-			-- is pairs that bad if the max number of buildings per cell is fairly small?
-			for structID, truth in pairs(structureLUT[gridX][gridZ]) do
-				if structure[structID].x >= x and
-				   structure[structID].z >= z and
-				   structure[structID].maxx <= x and
-				   structure[structID].maxz <= z 
-				then
-					return structID
-				end
-			end
-		end
-	end
-end
-
-local function GetAllLutStructByCoords(gridX, gridZ, x, z)
-	local found = {};
-	local numFound = 0;
-	if(structureLUT[gridX]) then
-		if(structureLUT[gridX][gridZ]) then
-			-- is pairs that bad if the max number of buildings per cell is fairly small?
-			for structID, truth in pairs(structureLUT[gridX][gridZ]) do
-				if structure[structID].x >= x and
-				   structure[structID].z >= z and
-				   structure[structID].maxx <= x and
-				   structure[structID].maxz <= z 
-				then
-					numFound = numFound+1
-					found[numFound] = structID
-				end
-			end
-		end
-	end
-	return found;
-end
-
--- this assumes only one structure is allowed to exist at the same point to avoid table creation
-local function GetStructureByCoords(x,z)
-	local gridX, gridZ = GetLutCellFromCoords(x,z)
-	local unitID = 
-		GetSingleLutStructByCoords(gridX, gridZ, x, z) or 
-		GetSingleLutStructByCoords(gridX-1, gridZ, x, z) or
-		GetSingleLutStructByCoords(gridX, gridZ-1, x, z)
-		GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)
-	return unitID
-end
-
--- probably ready implementations somewhere but cba to search atm, and don't expect multi-return to be useful tbh
-local function TableConcat(t1,t2)
-    for i=1,#t2 do
-        t1[#t1+1] = t2[i]
-    end
-    return t1
-end
-
--- lots of table creation, only makes sense if for some reason multiple terra-blocking structs are allowed per tile
-local function GetStructuresByCoords(x,z)
-	local gridX, gridZ = GetLutCellFromCoords(x,z)
-	return TableConcat(
-            TableConcat(
-             TableConcat(
-			   GetSingleLutStructsByCoords(gridX, gridZ, x, z), 
-				GetSingleLutStructByCoords(gridX-1, gridZ, x, z)),
-				 GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)),		
-				  GetSingleLutStructByCoords(gridX-1, gridZ-1, x, z)
-	)
-end
-
---------------------------------------------------------------------------------
 -- New Functions
 --------------------------------------------------------------------------------
 
@@ -496,8 +383,10 @@ local function SetTooltip(unitID, spent, estimatedCost)
 end
 
 local function IsPositionTerraformable(x, z)
-	if structureAreaMap[x] and structureAreaMap[x][z] then
-		return false
+	for k=1,4 do
+		if structureAreaMap[k][x] and structureAreaMap[k][x][z] then
+			return false
+		end
 	end
 	if GG.map_AllowPositionTerraform then
 		return GG.map_AllowPositionTerraform(x, z)
@@ -3372,10 +3261,13 @@ end
 local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 	--local found = {count = 0, data = {}}
 	for i = 1, posCount do
-		if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
-			posY[i] = 0
-			--found.count = found.count + 1
-			--found.data[found.count] = {x = posX[i], z = posZ[i]}
+		for k = 1,4 do
+			if structureAreaMap[k][posX[i]] and structureAreaMap[k][posX[i]][posZ[i]] then
+				posY[i] = 0
+				break;
+				--found.count = found.count + 1
+				--found.data[found.count] = {x = posX[i], z = posZ[i]}
+			end
 		end
 	end
 	
@@ -3410,10 +3302,16 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
 			local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
-			if (structureAreaMap[i] and structureAreaMap[i][j]) then
-				local struct = GetStructureByCoords(i,j)
-				structure[struct].dh = structure[struct].dh + newHeight/((structure[struct].maxx-structure[struct].x)*(structure[struct].maxz-structure[struct].z)
-			else
+			local noStructs = true;
+			for k = 1,4 do
+				if structureAreaMap[k][i][j] then
+					local struct = structureAreaMap[k][i][j]
+					structure[struct].dh = structure[struct].dh + newHeight/((structure[struct].maxx-structure[struct].x)*(structure[struct].maxz-structure[struct].z)
+					noStructs = false
+				end
+			end
+
+			if noStructs then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
 					spAddHeightMap(i, j, newHeight)
@@ -3488,7 +3386,14 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				
 				for i = sx - smoothradius, sx + smoothradius,8 do
 					for j = sz - smoothradius, sz + smoothradius,8 do
-						if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+						local noStruct = true
+						for k = 1,4 do
+							if structureAreaMap[k][i] and structureAreaMap[k][i][j]) then
+								noStruct = false
+								break;
+							end
+						end
+						if noStruct then
 							local disSQ = (i - x)^2 + (j - z)^2
 							if disSQ <= smoothradiusSQ then
 								if not origHeight[i] then
@@ -3580,16 +3485,15 @@ local function deregisterStructure(unitID)
 		end
 	end
 
-	DeleteStructureFromLUT(unitID)
-	
-	for i = structure[unitID].minx, structure[unitID].maxx, 8 do
-		if not structureAreaMap[i] then
-			structureAreaMap[i] = {}
-		end
-		for j = structure[unitID].minz, structure[unitID].maxz, 8 do
-			structureAreaMap[i][j] = structureAreaMap[i][j] - 1
-			if structureAreaMap[i][j] < 1 then
-				structureAreaMap[i][j] = nil
+	for k = 1,4 do
+		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
+			if not structureAreaMap[k][i] then
+				structureAreaMap[k][i] = {}
+			end
+			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
+				if structureAreaMap[k][i][j] == unitID then
+					structureAreaMap[k][i][j] = nil
+				end
 			end
 		end
 	end
@@ -3805,23 +3709,25 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 			structure[unitID].area[i] = {}
-			if not structureAreaMap[i] then
-				structureAreaMap[i] = {}
-			end
 			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
 				structure[unitID].area[i][j] = true
-				if structureAreaMap[i][j] then
-					structureAreaMap[i][j] = structureAreaMap[i][j] + 1
-				else
-					structureAreaMap[i][j] = 1
+				local inserted = false
+				for k = 1,4, do -- stick the structure-vertex in the first vacant slot found
+					if not structureAreaMap[k][i] then
+						structureAreaMap[k][i] = {}
+					end
+					if not structureAreaMap[k][i][j] then
+						structureAreaMap[k][i][j] = unitID
+						break;
+					end
 				end
-				
+				if not inserted then
+					Spring.Echo("unit_terraform: failed to insert structure "..unitID.." into structureAreaMap at vertex ["..i..","..j.."]");
+				end
 			end
 		end
-		
+				
 		structureTable[structureCount] = unitID
-
-		AddStructureToLUT(unitID)
 		
 		-- slow update for terrain checking
 		if not structureCheckFrame[currentCheckFrame] then
