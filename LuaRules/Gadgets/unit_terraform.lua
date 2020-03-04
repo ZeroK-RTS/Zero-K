@@ -163,6 +163,7 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local costMult = 1
+local buildingResistanceModifier = 0.8; -- make a modoption? 0 is fully immune
 local modOptions = Spring.GetModOptions()
 
 if modOptions.terracostmult then
@@ -185,7 +186,8 @@ local structure          	= {}
 local structureTable		= {}
 local structureCount	 	= 0
 
-local structureAreaMap      = {{}{}{}{}} -- each vertex can be shared by at most 4 structures
+local structureAreaMap      = {{}} -- a list of maps, with extra map layers added as necessary
+local numStructureAreaMaps = 1
 
 local structureLUT          = {}
 
@@ -212,6 +214,7 @@ local MAX_UPDATE_PERIOD     = 30
 local updatePeriod          = 15 -- how many frames to update
 local terraformOperations   = 0 -- tracks how many operations. Used to prevent slowdown.
 local nextUpdateCheck       = 0 -- Time at which to check performance
+local immediateDisplacements = {} -- list of units that have been deliberately displaced by terraform
 
 -- Map terraform commands given by teamID and tag.
 local fallbackCommands  = {}
@@ -383,7 +386,7 @@ local function SetTooltip(unitID, spent, estimatedCost)
 end
 
 local function IsPositionTerraformable(x, z)
-	for k=1,4 do
+	for k=1,numStructureAreaMaps do
 		if structureAreaMap[k][x] and structureAreaMap[k][x][z] then
 			return false
 		end
@@ -3000,6 +3003,18 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	return 1
 end
 
+local function ApplyUnitDisplacement(unitID)
+	local unit = structure[unitID]
+	if unit then
+		local height = spGetGroundHeight(unit.x, unit.z)
+		if height ~= unit.h + unit.dh then
+			spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h+unit.dh)
+			unit.h = unit.h + unit.dh
+			unit.dh = 0
+		end
+	end
+end
+
 local function DoTerraformUpdate(n, forceCompletion)
 	local i = 1
 	while i <= terraformUnitCount do
@@ -3084,6 +3099,12 @@ function gadget:GameFrame(n)
 	--if n % 300 == 0 then
 	--	GG.Terraform_RaiseWater(-20)
 	--end
+
+	for k, v in pairs(immediateDisplacements) do
+		ApplyUnitDisplacement(k);
+	end
+
+	immediateDisplacements = {}
 	
 	if n >= nextUpdateCheck then
 		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
@@ -3160,16 +3181,7 @@ function gadget:GameFrame(n)
 	if struc then
 		local i = 1
 		while i <= struc.count do
-			local unit = structure[struc.unit[i]]
-			if unit then
-				local height = spGetGroundHeight(unit.x, unit.z)
-				if height ~= unit.h + unit.dh then
-					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h+unit.dh)
-					unit.dh = 0
-				end
-			else
-
-			end
+			ApplyUnitDisplacement(struc.unit[i]);
 			i = i + 1
 		end
 	end
@@ -3261,7 +3273,7 @@ end
 local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 	--local found = {count = 0, data = {}}
 	for i = 1, posCount do
-		for k = 1,4 do
+		for k = 1,numStructureAreaMaps do
 			if structureAreaMap[k][posX[i]] and structureAreaMap[k][posX[i]][posZ[i]] then
 				posY[i] = 0
 				break;
@@ -3301,21 +3313,30 @@ end
 local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
+			local disSQ = (i - x)^2 + (j - z)^2
 			local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
 			local noStructs = true;
-			for k = 1,4 do
-				if structureAreaMap[k][i][j] then
-					local struct = structureAreaMap[k][i][j]
-					structure[struct].dh = structure[struct].dh + newHeight/((structure[struct].maxx-structure[struct].x)*(structure[struct].maxz-structure[struct].z)
-					noStructs = false
+
+			if newHeight == newHeight then -- guard against NaN
+				for k = 1,numStructureAreaMaps do
+					if structureAreaMap[k] then
+						if structureAreaMap[k][i] then
+							if structureAreaMap[k][i][j] then
+								local struct = structureAreaMap[k][i][j]
+								local area = (structure[struct].maxx-structure[struct].x)*(structure[struct].maxz-structure[struct].z) / 16
+								structure[struct].dh = structure[struct].dh + newHeight/area * buildingResistanceModifier
+								-- remove this if waiting for snap-back is okay
+							    immediateDisplacements[struct] = true
+								-- Spring.Echo("Displacing struct "..struct.."(area: "..area..") by "..newHeight.." total = "..(newHeight/area).." average, accum = "..structure[struct].dh)
+								noStructs = false
+							end
+						end
+					end
 				end
 			end
 
-			if noStructs then
-				local disSQ = (i - x)^2 + (j - z)^2
-				if disSQ <= smoothradiusSQ then
-					spAddHeightMap(i, j, newHeight)
-				end
+			if noStructs and disSQ <= smoothradiusSQ then
+				spAddHeightMap(i, j, newHeight)
 			end
 		end
 	end
@@ -3387,8 +3408,9 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				for i = sx - smoothradius, sx + smoothradius,8 do
 					for j = sz - smoothradius, sz + smoothradius,8 do
 						local noStruct = true
-						for k = 1,4 do
-							if structureAreaMap[k][i] and structureAreaMap[k][i][j]) then
+						for k = 1,numStructureAreaMaps do
+
+							if structureAreaMap[k][i] and structureAreaMap[k][i][j] then
 								noStruct = false
 								break;
 							end
@@ -3485,7 +3507,7 @@ local function deregisterStructure(unitID)
 		end
 	end
 
-	for k = 1,4 do
+	for k = 1,numStructureAreaMaps do
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 			if not structureAreaMap[k][i] then
 				structureAreaMap[k][i] = {}
@@ -3712,17 +3734,22 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
 				structure[unitID].area[i][j] = true
 				local inserted = false
-				for k = 1,4, do -- stick the structure-vertex in the first vacant slot found
+				for k = 1,numStructureAreaMaps do -- stick the structure-vertex in the first vacant slot found
 					if not structureAreaMap[k][i] then
 						structureAreaMap[k][i] = {}
 					end
 					if not structureAreaMap[k][i][j] then
 						structureAreaMap[k][i][j] = unitID
+						inserted = true
 						break;
 					end
 				end
-				if not inserted then
-					Spring.Echo("unit_terraform: failed to insert structure "..unitID.." into structureAreaMap at vertex ["..i..","..j.."]");
+				if not inserted then -- add another map layer and add this struct-vertex to that layer
+					numStructureAreaMaps = numStructureAreaMaps + 1
+					structureAreaMap[numStructureAreaMaps] = {}
+					structureAreaMap[numStructureAreaMaps][i] = {}
+					structureAreaMap[numStructureAreaMaps][i][j] = unitID
+					Spring.Echo("unit_terraform: increased number of structure-area-maps to "..numStructureAreaMaps)
 				end
 			end
 		end
