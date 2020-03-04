@@ -33,6 +33,9 @@ for i = 1, #mapUnits do
 	suCopyTable(lowerKeys(VFS_Include(mapUnits[i], nil, VFS_MAP)), false, unitDefs)
 end
 
+if VFS.FileExists('gamedata/unitdefs_post.lua', VFS_MAP) then
+	VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_MAP)
+end
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
 
 return unitDefs
