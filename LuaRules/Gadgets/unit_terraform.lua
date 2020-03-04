@@ -3100,12 +3100,11 @@ function gadget:GameFrame(n)
 	--	GG.Terraform_RaiseWater(-20)
 	--end
 
-	if #immediateDisplacements > 0 then
-		for k, v in pairs(immediateDisplacements) do
-			ApplyUnitDisplacement(k);
-		end
-		immediateDisplacements = {}
+	for k, v in pairs(immediateDisplacements) do
+		ApplyUnitDisplacement(k);
 	end
+	immediateDisplacements = {}
+
 
 
 	if n >= nextUpdateCheck then
