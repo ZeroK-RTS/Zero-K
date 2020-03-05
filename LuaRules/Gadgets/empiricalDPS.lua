@@ -47,18 +47,18 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
 	attackerUnitDefID = attackerDefID
 	-- delay
 	if last then
-		Spring.Echo("Last: ", frame - last, math.random())
+		--Spring.Echo("Last: ", frame - last, math.random())
 	end
 	last = frame
 	-- dps
 	if start then
-		Spring.Echo(damage/(frame-start)*30)
+		--Spring.Echo(damage/(frame-start)*30)
 		damage = damage + unitDamage
 	else
 		start = frame
 		damage = unitDamage
 	end
-	Spring.Echo("Damage: ", damage, start)
+	--Spring.Echo("Damage: ", damage, start)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
