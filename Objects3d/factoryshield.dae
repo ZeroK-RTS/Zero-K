@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.82.7 commit date:2020-02-12, commit time:16:20, hash:77d23b0bd76f</authoring_tool>
     </contributor>
-    <created>2020-03-06T00:00:11</created>
-    <modified>2020-03-06T00:00:11</modified>
+    <created>2020-03-06T00:12:47</created>
+    <modified>2020-03-06T00:12:47</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -1825,9 +1825,9 @@
               </instance_geometry>
             </node>
           </node>
-          <node id="Portal_001" name="Portal.001" type="NODE">
+          <node id="PortalPiston" name="PortalPiston" type="NODE">
             <matrix sid="transform">1 0 0 -2.03401e-6 0 1 0 -29.71944 0 0 1 -11.19847 0 0 0 1</matrix>
-            <instance_geometry url="#Cube_001-mesh" name="Portal.001">
+            <instance_geometry url="#Cube_001-mesh" name="PortalPiston">
               <bind_material>
                 <technique_common>
                   <instance_material symbol="Starlight_001-material" target="#Starlight_001-material">
