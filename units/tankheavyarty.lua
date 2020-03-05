@@ -89,6 +89,7 @@ return { tankheavyarty = {
         gatherradius     = [[240]],
         smoothradius     = [[120]],
         smoothmult       = [[0.5]],
+        smoothexponent   = [[0.6]],
         quickgather      = [[1]],
         lups_noshockwave = [[1]],
         

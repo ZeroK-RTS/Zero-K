@@ -342,6 +342,50 @@ elseif modOptions.terrarestoreonly == "1" then
 end
 
 --------------------------------------------------------------------------------
+-- Structure Utilities
+--------------------------------------------------------------------------------
+
+local function AddStructure(unitID, i, j)
+	local k = 1
+	while structureAreaMap[k] and structureAreaMap[k][i] and structureAreaMap[k][i][j] do
+		k = k + 1
+	end
+	if not structureAreaMap[k] then
+		structureAreaMap[k] = {}
+	end
+	if not structureAreaMap[k][i] then
+		structureAreaMap[k][i] = {}
+	end
+	structureAreaMap[k][i][j] = unitID
+end
+
+local function RemoveStructure(unitID, i, j)
+	local k = 1
+	local index
+	while structureAreaMap[k] and structureAreaMap[k][i] and structureAreaMap[k][i][j] do
+		if structureAreaMap[k][i][j] == unitID then
+			index = k
+		end
+		k = k + 1
+	end
+	if not index then
+		Spring.Echo("LUA_ERRRUN", "Structure removal failure:", unitID, k, "i, j:", i, j)
+		return
+	end
+	local structCount = k - 1
+	if index == 1 and structCount == 1 then
+		structureAreaMap[structCount][i][j] = nil
+		return
+	end
+	structureAreaMap[index][i][j] = structureAreaMap[structCount][i][j]
+	structureAreaMap[structCount][i][j] = nil
+end
+
+local function HasStructure(i, j)
+	return structureAreaMap[1] and structureAreaMap[1][i] and structureAreaMap[1][i][j]
+end
+
+--------------------------------------------------------------------------------
 -- New Functions
 --------------------------------------------------------------------------------
 
@@ -377,7 +421,7 @@ local function SetTooltip(unitID, spent, estimatedCost)
 end
 
 local function IsPositionTerraformable(x, z)
-	if structureAreaMap[x] and structureAreaMap[x][z] then
+	if HasStructure(x, z) then
 		return false
 	end
 	if GG.map_AllowPositionTerraform then
@@ -3141,8 +3185,6 @@ function gadget:GameFrame(n)
 				if height ~= unit.h then
 					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
 				end
-			else
-				
 			end
 			i = i + 1
 		end
@@ -3228,6 +3270,8 @@ for i=1,#WeaponDefs do
 			quickgather = wd.customParams.quickgather,
 			detachmentradius = wd.customParams.detachmentradius,
 			smoothheightoffset = wd.customParams.smoothheightoffset,
+			movestructures = wd.customParams.movestructures,
+			smoothexponent = (wd.customParams.smoothexponent or 0.8)*0.5,
 		}
 	end
 end
@@ -3235,7 +3279,7 @@ end
 local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 	--local found = {count = 0, data = {}}
 	for i = 1, posCount do
-		if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
+		if HasStructure(posX[i], posZ[i]) then
 			posY[i] = 0
 			--found.count = found.count + 1
 			--found.data[found.count] = {x = posX[i], z = posZ[i]}
@@ -3269,16 +3313,65 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
-local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
+local VALUE = 3
+local NUMERATOR = (2 + math.exp(VALUE) + math.exp(-1*VALUE))/(math.exp(VALUE) - math.exp(-1*VALUE))
+local OFFSET = NUMERATOR/(1 + math.exp(VALUE))
+local function FalloffFunc(disSQ, smoothradiusSQ, smoothExponent)
+	return NUMERATOR/(1 + math.exp(2*VALUE*(disSQ/smoothradiusSQ)^smoothExponent - VALUE)) - OFFSET
+end
+
+local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, smoothExponent, movestructures)
+	local structI = movestructures and {}
+	local structJ = movestructures and {}
+	
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
-			if not (structureAreaMap[i] and structureAreaMap[i][j]) then
+			if not HasStructure(i, j) then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
-					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
+					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent)
 					spAddHeightMap(i, j, newHeight)
 				end
+			elseif structI then
+				structI[#structI + 1] = i
+				structJ[#structJ + 1] = j
 			end
+		end
+	end
+	
+	if not movestructures then
+		return
+	end
+	
+	local structHeight = {}
+	local structTested = {}
+	for s = 1, #structI do
+		local i = structI[s]
+		local j = structJ[s]
+		local height = 0
+		local structCount = 0
+		local k = 1
+		while structureAreaMap[k] and structureAreaMap[k][i] and structureAreaMap[k][i][j] do
+			local unitID = structureAreaMap[k][i][j]
+			if not structTested[unitID] then
+				local structData = structure[unitID]
+				local disSQ = (x - structData.x)^2 + (z - structData.z)^2
+				if disSQ <= smoothradiusSQ then
+					local gh = spGetGroundHeight(i,j)
+					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent) + gh
+					structHeight[unitID] = structData.h
+				end
+				structTested[unitID] = true
+			end
+			if structHeight[unitID] then
+				height = height + structHeight[unitID]
+				structCount = structCount + 1
+			end
+			k = k + 1
+		end
+		if structCount > 0 then
+			height = height/structCount
+			spSetHeightMap(i, j, height)
 		end
 	end
 end
@@ -3289,18 +3382,17 @@ local function SmoothFromList(xt,zt,ht)
 	end
 end
 
-local APPLY_SMALL_CHANGES = true
-
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
 		local height = spGetGroundHeight(x,z)
 		
-		local smoothradius = SeismicWeapon[weaponID].smoothradius
-		local gatherradius = SeismicWeapon[weaponID].gatherradius
-		local detachmentradius = SeismicWeapon[weaponID].detachmentradius
-		local maxSmooth = SeismicWeapon[weaponID].smooth
-		local smoothheightoffset = SeismicWeapon[weaponID].smoothheightoffset
+		local def = SeismicWeapon[weaponID]
+		local smoothradius = def.smoothradius
+		local gatherradius = def.gatherradius
+		local detachmentradius = def.detachmentradius
+		local maxSmooth = def.smooth
+		local smoothheightoffset = def.smoothheightoffset
 		
 		if y > height + HEIGHT_FUDGE_FACTOR then
 			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
@@ -3325,7 +3417,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		local groundPoints = 0
 		local groundHeight = 0
 		
-		local increment = (SeismicWeapon[weaponID].quickgather and 16) or 8
+		local increment = (def.quickgather and 16) or 8
 		for i = sx - gatherradius, sx + gatherradius, increment do
 			for j = sz - gatherradius, sz + gatherradius, increment do
 				local disSQ = (i - x)^2 + (j - z)^2
@@ -3338,49 +3430,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints - (smoothheightoffset or 0)
-			
-			if APPLY_SMALL_CHANGES then
-				spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ)
-			else
-				local posX, posY, posZ = {}, {}, {}
-				local posCount = 0
-				local biggestChange = 0
-				
-				for i = sx - smoothradius, sx + smoothradius,8 do
-					for j = sz - smoothradius, sz + smoothradius,8 do
-						if not (structureAreaMap[i] and structureAreaMap[i][j]) then
-							local disSQ = (i - x)^2 + (j - z)^2
-							if disSQ <= smoothradiusSQ then
-								if not origHeight[i] then
-									origHeight[i] = {}
-								end
-								if not origHeight[i][j] then
-									origHeight[i][j] = spGetGroundHeight(i,j)
-								end
-								local newHeight = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
-								posCount = posCount + 1
-								posX[posCount] = i
-								posY[posCount] = newHeight
-								posZ[posCount] = j
-								local absChange = math.abs(newHeight)
-								if biggestChange and absChange > biggestChange then
-									if absChange > 0.5 then
-										biggestChange = false
-									else
-										biggestChange = absChange
-									end
-								end
-							end
-						end
-					end
-				end
-				
-				--posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-				
-				if (not biggestChange) or (math.random() < biggestChange/2) then
-					spSetHeightMapFunc(SmoothFromList, posX, posZ, posY)
-				end
-			end
+			spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, def.smoothexponent, def.movestructures)
 		end
 		
 		if detachmentradius then
@@ -3392,7 +3442,6 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 			end
 		end
 	end
-
 end
 
 --------------------------------------------------------------------------------
@@ -3441,17 +3490,11 @@ local function deregisterStructure(unitID)
 	end
 	
 	for i = structure[unitID].minx, structure[unitID].maxx, 8 do
-		if not structureAreaMap[i] then
-			structureAreaMap[i] = {}
-		end
 		for j = structure[unitID].minz, structure[unitID].maxz, 8 do
-			structureAreaMap[i][j] = structureAreaMap[i][j] - 1
-			if structureAreaMap[i][j] < 1 then
-				structureAreaMap[i][j] = nil
-			end
+			RemoveStructure(unitID, i, j)
 		end
 	end
-		
+	
 	local f = structureCheckFrame[structure[unitID].frame]
 	if f.count ~= structure[unitID].frameIndex then
 		structureCheckFrame[structure[unitID].frame].unit[structure[unitID].frameIndex] = structureCheckFrame[structure[unitID].frame].unit[f.count]
@@ -3620,7 +3663,6 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-
 	if spGetUnitIsDead(unitID) then
 		return
 	end
@@ -3644,36 +3686,28 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	-- add structure to structure table
 	if ud.isImmobile and not ud.customParams.mobilebuilding then
-	    local ux, uy, uz = spGetUnitPosition(unitID)
+		local ux, uy, uz = spGetUnitPosition(unitID)
 		ux = floor((ux+4)/8)*8
 		uz = floor((uz+4)/8)*8
-	    local face = spGetUnitBuildFacing(unitID)
-	    local xsize = ud.xsize*4
-	    local ysize = (ud.zsize or ud.ysize)*4
+		local face = spGetUnitBuildFacing(unitID)
+		local xsize = ud.xsize*4
+		local ysize = (ud.zsize or ud.ysize)*4
 		
 		structureCount = structureCount + 1
 		
-	    if ((face == 0) or(face == 2)) then
+		if ((face == 0) or(face == 2)) then
 			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-	        minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
-	    else
-	        structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-	        minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
-	    end
+			minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
+		else
+			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
+			minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
+		end
 		
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 			structure[unitID].area[i] = {}
-			if not structureAreaMap[i] then
-				structureAreaMap[i] = {}
-			end
 			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
 				structure[unitID].area[i][j] = true
-				if structureAreaMap[i][j] then
-					structureAreaMap[i][j] = structureAreaMap[i][j] + 1
-				else
-					structureAreaMap[i][j] = 1
-				end
-				
+				AddStructure(unitID, i, j)
 			end
 		end
 		

@@ -225,6 +225,8 @@ return { raveparty = {
         gatherradius = [[384]],
         smoothradius = [[192]],
         smoothmult   = [[0.7]],
+        smoothexponent = [[0.9]],
+        movestructures = [[0.7]],
         restrict_in_widgets = 1,
         script_reload = [[6]],
       },

@@ -283,6 +283,8 @@ return { striderdetriment = {
         gatherradius = [[180]],
         smoothradius = [[120]],
         smoothmult   = [[0.25]],
+        smoothexponent = [[0.9]],
+        movestructures = [[0.7]],
         
         light_color = [[1 1.4 0.35]],
         light_radius = 400,

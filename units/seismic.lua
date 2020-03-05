@@ -57,7 +57,7 @@ return { seismic = {
 
     SEISMIC_WEAPON = {
       name                    = [[Seismic Missile]],
-      areaOfEffect            = 512,
+      areaOfEffect            = 640,
       avoidFriendly           = false,
       cegTag                  = [[seismictrail]],
       collideFriendly         = false,
@@ -66,9 +66,11 @@ return { seismic = {
 
       customParams            = {
         gatherradius = [[416]],
-        smoothradius = [[256]],
-        detachmentradius = [[256]],
+        smoothradius = [[320]],
+        detachmentradius = [[320]],
         smoothmult   = [[1]],
+        smoothexponent = [[0.9]],
+        movestructures = [[0.7]],
 
         restrict_in_widgets = 1,
 
