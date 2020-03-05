@@ -774,6 +774,12 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ''
 		end
 
+		if cp.movestructures then
+			cells[#cells+1] = ' - Smoothes under structures'
+			--cells[#cells+1] = cp.smoothradius .. " radius" -- overlaps
+			cells[#cells+1] = ''
+		end
+
 		local highTraj = wd.highTrajectory
 		if highTraj == 2 then
 			highTraj = ws.highTrajectory

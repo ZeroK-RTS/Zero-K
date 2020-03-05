@@ -5,7 +5,7 @@ return { jumpscout = {
   acceleration           = 0.72,
   activateWhenBuilt      = true,
   brakeRate              = 4.32,
-  buildCostMetal         = 50,
+  buildCostMetal         = 45,
   builder                = false,
   buildPic               = [[jumpscout.png]],
   canGuard               = true,
@@ -25,7 +25,7 @@ return { jumpscout = {
     grey_goo = 1,
     grey_goo_spawn = "jumpscout",
     grey_goo_drain = 5,
-    grey_goo_cost = 50,
+    grey_goo_cost = 45,
     grey_goo_range = 120,
     selection_scale = 1, -- Maybe change later
   },
@@ -39,7 +39,7 @@ return { jumpscout = {
   leaveTracks            = true,
   maxDamage              = 80,
   maxSlope               = 36,
-  maxVelocity            = 3.4,
+  maxVelocity            = 3.5,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[SKBOT2]],
@@ -93,8 +93,8 @@ return { jumpscout = {
             },
 
       damage                  = {
-        default = 720.1,
-        planes  = 720.1,
+        default = 410.1,
+        planes  = 410.1,
         subs    = 20.5,
       },
 
@@ -105,7 +105,7 @@ return { jumpscout = {
       interceptedByShieldType = 2,
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
-      range                   = 160,
+      range                   = 170,
       reloadtime              = 1.5,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_med5]],

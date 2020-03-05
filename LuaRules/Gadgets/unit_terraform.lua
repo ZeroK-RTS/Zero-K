@@ -3365,6 +3365,14 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 					local gh = spGetGroundHeight(i,j)
 					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent) + gh
 					structHeight[unitID] = structData.h
+					-- Causes structures to become non-blocking.
+					--local unitDefID = Spring.GetUnitDefID(unitID)
+					--if unitDefID then
+					--	local mvoeHeight = (UnitDefs[unitDefID].floatOnWater and math.max(structData.h, 0)) or structData.h
+					--	Spring.MoveCtrl.Enable(unitID)
+					--	Spring.MoveCtrl.SetPosition(unitID, structData.x, mvoeHeight, structData.z)
+					--	Spring.MoveCtrl.Disable(unitID)
+					--end
 				end
 				structTested[unitID] = true
 			end

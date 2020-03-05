@@ -918,11 +918,8 @@ local behaviourConfig = {
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
-		skirmLeeway = -30,
-		stoppingDistance = 5,
-		fightOnlyOverride = {
-			skirmLeeway = 10,
-		},
+		skirmLeeway = -5,
+		stoppingDistance = 30,
 	},
 	["hoverdepthcharge"] = {
 		waterline = -5,
