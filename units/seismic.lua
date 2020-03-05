@@ -69,7 +69,7 @@ return { seismic = {
         smoothradius = [[320]],
         detachmentradius = [[320]],
         smoothmult   = [[1]],
-        smoothexponent = [[0.9]],
+        smoothexponent = [[0.45]],
         movestructures = [[0.7]],
 
         restrict_in_widgets = 1,

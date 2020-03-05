@@ -34,7 +34,7 @@ for i = 1, #mapUnits do
 end
 
 if VFS.FileExists('gamedata/unitdefs_post.lua', VFS_MAP) then
-	VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_MAP)
+	--VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_MAP)
 end
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
 

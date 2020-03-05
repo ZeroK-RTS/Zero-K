@@ -3271,7 +3271,7 @@ for i=1,#WeaponDefs do
 			detachmentradius = wd.customParams.detachmentradius,
 			smoothheightoffset = wd.customParams.smoothheightoffset,
 			movestructures = wd.customParams.movestructures,
-			smoothexponent = (wd.customParams.smoothexponent or 0.8)*0.5,
+			smoothexponent = wd.customParams.smoothexponent,
 		}
 	end
 end
@@ -3329,8 +3329,13 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 			if not HasStructure(i, j) then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
-					local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent)
-					spAddHeightMap(i, j, newHeight)
+					if smoothExponent then
+						local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent)
+						spAddHeightMap(i, j, newHeight)
+					else
+						local newHeight = (groundHeight - spGetGroundHeight(i,j)) * maxSmooth * (1 - disSQ/smoothradiusSQ)^1.5
+						spAddHeightMap(i, j, newHeight)
+					end
 				end
 			elseif structI then
 				structI[#structI + 1] = i
