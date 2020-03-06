@@ -498,7 +498,7 @@ local overrides = {
 		stateTooltip = {
 			tooltips.GOO_GATHER:gsub("_STATE_", "Off"),
 			tooltips.GOO_GATHER:gsub("_STATE_", "On except cloaked"),
-			tooltips.GOO_GATHER:gsub("_STATE_", "On")
+			tooltips.GOO_GATHER:gsub("_STATE_", "On always")
 		}
 	},
 	[CMD_DISABLE_ATTACK] = {

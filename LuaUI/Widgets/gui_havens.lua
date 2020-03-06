@@ -38,6 +38,8 @@ options = {
 		name = 'Cancel Retreat',
 		desc = 'Set your selected units to not retreat. It might be useful to assign it a hotkey.',
 		type = 'button',
+		action  = 'cancelretreat',
+		hidden = true,
 		OnChange = function(self)
 			Spring.GiveOrder(CMD_RETREAT, RETREAT_OFF_TABLE, CMD.OPT_RIGHT)
 		end,
