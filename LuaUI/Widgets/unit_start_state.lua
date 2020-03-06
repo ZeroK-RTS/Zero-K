@@ -71,6 +71,11 @@ local tooltips = {
 		[1] = "Float to attack",
 		[2] = "Float to attack or when idle",
 	},
+	goostate = {
+		[0] = "Never gather",
+		[1] = "Gather when not cloaked",
+		[2] = "Always Gather",
+	},
 	selectionrank = {
 		[0] = "0",
 		[1] = "1",
@@ -615,6 +620,21 @@ local function addUnit(defName, path)
 			tooltipFunction = tooltipFunc.floatstate,
 		}
 		options_order[#options_order+1] = defName .. "_floattoggle"
+	end
+
+	if ud.customParams and ud.customParams.grey_goo then
+		options[defName .. "_goostate"] = {
+			name = "  Puppy Goo",
+			desc = "Values: Never gather, Gather when not cloaked, Always Gather",
+			type = 'number',
+			value = (ud.customParams and ud.customParams.grey_goo) or 1,
+			min = 0,
+			max = 2,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.goostate,
+		}
+		options_order[#options_order+1] = defName .. "_goostate"
 	end
 
 	options[defName .. "_buildpriority_0"] = {

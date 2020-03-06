@@ -99,7 +99,8 @@ local custom_cmd_actions = {
 	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
 	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
-	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
+	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Kill", states = {'Off', 'On'}},
+	goostate = {cmdType = 2, name = "Goo State", states = {'Off', 'When uncloaked', 'On'}},
 	disableattack = {cmdType = 2, name = "Allow Attack", states = {'Allowed', 'Blocked'}},
 	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
@@ -186,6 +187,8 @@ local usedActions = {
 	["cancelfirezone"] = true,
 	["selection_rank"] = true,
 	["pushpull"] = true,
+	["unit_kill_subordinates"] = true,
+	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
