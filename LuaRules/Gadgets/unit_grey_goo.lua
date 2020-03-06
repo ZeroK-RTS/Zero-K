@@ -15,7 +15,7 @@ end
 
 --SYNCED
 if (not gadgetHandler:IsSyncedCode()) then
-   return false
+	return false
 end
 
 local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
@@ -52,7 +52,6 @@ local CMD_GUARD      = CMD.GUARD
 local UPDATE_FREQUNECY, gooDefs = include("LuaRules/Configs/grey_goo_defs.lua")
 local CEG_SPAWN = [[dirt2]];
 
-
 local units = {}
 local unitIndex = {count = 0, info = {}}
 
@@ -79,7 +78,6 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function getStealableAlly(x, z, r, unitID, progress, team)
-
 	local nearby = spGetUnitsInCylinder(x, z, r, team)
 
 	for i = 1, #nearby do
@@ -90,7 +88,6 @@ local function getStealableAlly(x, z, r, unitID, progress, team)
 	end
 
 	return false
-	
 end
 
 local function getClosestWreck(x, z, r) -- hopefully to be replaced
@@ -141,16 +138,14 @@ function gadget:GameFrame(f)
 			local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 			-- drain metal while quote not fulfilled
 			while quota > 0 and (not stunned_or_inbuild) and x and z do
-				
 				local feature = getClosestWreck(x, z, unit.defs.range)
 				
 				if feature then
-					
 					spSpawnCEG( CEG_SPAWN,
-					   x,y,z,
-					   0,0,0,
-					   30, 30
-					);
+						x, y, z,
+						0, 0, 0,
+						30, 30
+					)
 					local metal = featureMetal[feature] or spGetFeatureResources(feature)
 					-- The 0.0001 is to safeguard against rounding errors possibly introduced by
 					-- the fact that reclaim has a fractional value.
@@ -171,7 +166,6 @@ function gadget:GameFrame(f)
 							if units[ally].progress >= quota then
 								unit.progress = unit.progress + quota
 								units[ally].progress = units[ally].progress-quota
-								
 							else
 								unit.progress = unit.progress + units[ally].progress
 								units[ally].progress = 0
@@ -181,7 +175,6 @@ function gadget:GameFrame(f)
 					quota = 0
 				end
 			end
-			
 		end
 		
 		-- update feature status
@@ -192,10 +185,10 @@ function gadget:GameFrame(f)
 			fz = fz+math.random(-20,20);
 			
 			spSpawnCEG( CEG_SPAWN,
-			   fx,fy,fz,
-			   0,0,0,
-			   30, 30
-			);
+				fx, fy, fz,
+				0, 0, 0,
+				30, 30
+			)
 
 			-- NB: if somebody finishes the reclaim of a partially goo'd feature
 			-- they will receive the "missing" energy as a chunk (for example if you
@@ -212,10 +205,10 @@ function gadget:GameFrame(f)
 			local fx, fy, fz = Spring.GetFeaturePosition(id);
 			
 			spSpawnCEG( CEG_SPAWN,
-			   fx,fy,fz,
-			   0,0,0,
-			   30, 30
-			);
+				fx, fy, fz,
+				0, 0, 0,
+				30, 30
+			)
 
 			spDestroyFeature(id)
 
@@ -244,10 +237,10 @@ function gadget:GameFrame(f)
 					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
 
 					spSpawnCEG( CEG_SPAWN,
-					   x,y,z,
-					   0,0,0,
-					   30, 30
-					);
+						x, y, z,
+						0, 0, 0,
+						30, 30
+					)
 				end
 			end
 			if unit.oldProgress ~= unit.progress then
@@ -255,12 +248,10 @@ function gadget:GameFrame(f)
 				spSetUnitRulesParam(unitIndex[i],"gooState",unit.progress/unit.defs.cost, LOS_ACCESS)
 			end
 		end
-	
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	
 	if gooDefs[unitDefID] then
 		unitIndex.count = unitIndex.count + 1
 		unitIndex[unitIndex.count] = unitID
@@ -275,7 +266,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-
 	if gooDefs[unitDefID] then
 		unitIndex[units[unitID].index] = unitIndex[unitIndex.count] -- move index from end to index to be deleted
 		units[unitIndex[unitIndex.count]].index = units[unitID].index -- update index of unit at end
@@ -283,7 +273,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		unitIndex.count = unitIndex.count - 1 -- remove index at end too
 		units[unitID] = nil -- remove unit to be deleted
 	end
-
 end
 
 function gadget:Initialize()
@@ -295,5 +284,4 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
-	
 end
