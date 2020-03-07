@@ -5,7 +5,7 @@ function widget:GetInfo() return {
 	date      = "Nov 2014", -- "Feb, 2008"
 	license   = "GNU GPL, v2 or later",
 	layer     = 5,
-	enabled   = true,
+	enabled   = false,
 } end
 
 local min   = math.min
