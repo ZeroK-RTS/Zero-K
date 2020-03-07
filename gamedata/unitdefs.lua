@@ -33,9 +33,13 @@ for i = 1, #mapUnits do
 	suCopyTable(lowerKeys(VFS_Include(mapUnits[i], nil, VFS_MAP)), false, unitDefs)
 end
 
-if VFS.FileExists('gamedata/unitdefs_post.lua', VFS_MAP) then
-	--VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_MAP)
+--[[ VFS.FileExists is broken and claims the file is present in VFS.MAP
+     even if when it actually isn't, so we have to detect errors "manually" ]]
+local ok, err = pcall(VFS_Include, 'gamedata/unitdefs_post.lua', nil, VFS_MAP)
+if not ok and err ~= "Include() file missing 'gamedata/unitdefs_post.lua'\n" then
+	error(err)
 end
+
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
 
 return unitDefs
