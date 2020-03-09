@@ -804,7 +804,6 @@ local behaviourConfig = {
 		fightOnlyOverride = {
 			skirmLeeway = 10,
 			stoppingDistance = 10,
-			stoppingDistance = 10,
 		},
 	},
 	
