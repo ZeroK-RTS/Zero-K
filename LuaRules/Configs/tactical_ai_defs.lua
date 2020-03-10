@@ -77,7 +77,6 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"shieldassault",
 	"spiderassault",
 	"vehassault",
-	"cloakassault",
 	"hoverassault",
 	
 	"tankassault",
