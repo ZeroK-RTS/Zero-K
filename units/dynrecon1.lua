@@ -84,7 +84,7 @@ return { dynrecon1 = {
   trackWidth          = 22,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 8,
   
   featureDefs         = {
 

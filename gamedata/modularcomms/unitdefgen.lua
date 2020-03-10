@@ -149,7 +149,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-commDefs = {}	--holds precedurally generated comm defs
+commDefs = {} --holds precedurally generated comm defs
 
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then

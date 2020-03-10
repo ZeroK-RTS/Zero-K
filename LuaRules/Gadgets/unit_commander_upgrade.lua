@@ -119,9 +119,12 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
+	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
-	if data.speedMult then
-		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
+	if data.speedMod then
+		local speedMult = (data.speedMod + ud.speed)/ud.speed
+		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", speedMult, INLOS)
 	end
 	
 	if data.radarRange then
@@ -153,11 +156,10 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 	end
 	
-	-- All comms have 10 BP in their unitDef (even support)
-	local buildPower = (10 + (data.bonusBuildPower or 0)) * (data.buildPowerMult or 1)
+	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed
 	data.metalIncome = (data.metalIncome or 0)
 	data.energyIncome = (data.energyIncome or 0)
-	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
+	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPowerMult, INLOS)
 	
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)

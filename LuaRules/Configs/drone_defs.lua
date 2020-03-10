@@ -20,7 +20,7 @@ local carrierDefNames = {
 		},
 	},
 	--gunshipkrow = { {drone = UnitDefNames.dronelight.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900, buildTime=3,
-			-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
+	-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
 	nebula = {
 		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{
@@ -91,7 +91,7 @@ local carrierDefNames = {
 local presets = {
 	module_companion_drone = {
 		drone = UnitDefNames.dronelight.id,
-		reloadTime = 15,
+		reloadTime = 12,
 		maxDrones = 2,
 		spawnSize = 1,
 		range = 600,
@@ -101,7 +101,7 @@ local presets = {
 	},
 	module_battle_drone = {
 		drone = UnitDefNames.droneheavyslow.id,
-		reloadTime = 25,
+		reloadTime = 18,
 		maxDrones = 1,
 		spawnSize = 1,
 		range = 600,
@@ -114,7 +114,7 @@ local presets = {
 local unitRulesCarrierDefs = {
 	drone = {
 		drone = UnitDefNames.dronelight.id,
-		reloadTime = 15,
+		reloadTime = 12,
 		maxDrones = 2,
 		spawnSize = 1,
 		range = 450,
@@ -124,7 +124,7 @@ local unitRulesCarrierDefs = {
 	},
 	droneheavyslow = {
 		drone = UnitDefNames.droneheavyslow.id,
-		reloadTime = 25,
+		reloadTime = 18,
 		maxDrones = 1,
 		spawnSize = 1,
 		range = 600,

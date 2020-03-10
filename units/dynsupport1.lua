@@ -47,7 +47,7 @@ return { dynsupport1 = {
   losEmitHeight       = 40,
   maxDamage           = 3800,
   maxSlope            = 36,
-  maxVelocity         = 1.2,
+  maxVelocity         = 1.3,
   maxWaterDepth       = 5000,
   metalStorage        = 500,
   minCloakDistance    = 75,
@@ -80,7 +80,7 @@ return { dynsupport1 = {
   trackWidth          = 22,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 12,
 
   featureDefs         = {
 
