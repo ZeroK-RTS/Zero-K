@@ -89,9 +89,9 @@ return { cloakriot = {
       },
 
       damage                  = {
-        default = 40,
-        planes  = 40,
-        subs    = 2.1,
+        default = 45,
+        planes  = 45,
+        subs    = 2.25,
       },
 
       edgeEffectiveness       = 0.5,
@@ -103,7 +103,7 @@ return { cloakriot = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 270,
-      reloadtime              = 0.4 + 2/30,
+      reloadtime              = 0.5,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],
