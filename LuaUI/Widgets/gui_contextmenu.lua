@@ -1438,7 +1438,22 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
-	
+
+	if isCommander then
+		local batDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow")
+		if batDrones and batDrones > 0 then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Battle Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = batDrones, textColor = color.stats_fg, }
+		end
+		local compDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_drone")
+		if compDrones and compDrones > 0 then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Companion Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = compDrones, textColor = color.stats_fg, }
+		end
+	else
+		-- Do something for Reef and other carriers
+	end
+
 	if ud.customParams.reload_move_penalty then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Reload move mult: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(100*tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
