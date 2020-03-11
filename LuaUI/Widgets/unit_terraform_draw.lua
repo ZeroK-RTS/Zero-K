@@ -27,8 +27,18 @@ local terraIcons = {
 	[5] = pathPrefix.."restore.png",
 	[6] = pathPrefix.."bumpy.png",
 }
+pathPrefix = "LuaUI/Images/commands/blocked/"
+local terraBlockedIcons = {
+	[1] = pathPrefix.."level.png",
+	[2] = pathPrefix.."raise.png",
+	[3] = pathPrefix.."smooth.png",
+	[4] = pathPrefix.."ramp.png",
+	[5] = pathPrefix.."restore.png",
+	[6] = pathPrefix.."bumpy.png",
+}
 
-local gfRemove = -1
+local UPDATE_FREQUENCY = 10
+local forceGameFrame = false
 
 local function UpdateTeamColors()
 	for unitID, info in pairs(terraUnits) do
@@ -63,21 +73,23 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 			b = b,
 			a = a,
 		}
-		gfRemove = Spring.GetGameFrame() + 0
-		widgetHandler:UpdateCallIn("GameFrame")
+		forceGameFrame = true
 	end
 end
 
 function widget:GameFrame(frame)
+	if not (forceGameFrame or frame%UPDATE_FREQUENCY == 0) then
+		return
+	end
+	forceGameFrame = false
+	
 	for unitID, info in pairs(terraUnits) do
 		if info and info.terraformType == 0 then --not yet known terraformType
-			local terraformType=Spring.GetUnitRulesParam(unitID, "terraformType") or 0
+			local terraformType = Spring.GetUnitRulesParam(unitID, "terraformType") or 0
 			terraUnits[unitID].terraformType = terraformType
 		end
-	end
-
-	if frame >= gfRemove then
-		widgetHandler:RemoveCallIn("GameFrame")
+		local blocked = (Spring.GetUnitRulesParam(unitID, "terraform_enemy") or -1) > 0
+		terraUnits[unitID].blocked = blocked
 	end
 end
 
@@ -89,7 +101,11 @@ end
 
 local iconSize = 14
 local function DrawTerraformIcon(unitID, info)
-	gl.Texture(terraIcons[info.terraformType])
+	if info.blocked then
+		gl.Texture(terraBlockedIcons[info.terraformType])
+	else
+		gl.Texture(terraIcons[info.terraformType])
+	end
 
 	local x, y, z = Spring.GetUnitPosition(unitID)
 	local cx, cy, cz = Spring.GetCameraPosition()

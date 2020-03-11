@@ -94,8 +94,7 @@ local checkCoord = {
 }
 
 local invRoot2 = 1/sqrt(2)
-
-local terraUnitHP = 1000000 --hp of terraunit, must be the same as on unitdef
+local ALLIED_TABLE = {allied = true}
 
 --------------------------------------------------------------------------------
 -- Configuration
@@ -159,11 +158,16 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
+local enemyDistConst = 36 -- Constant added to enemy distinct check
+local nearbyEnemyPenalty = 20 -- Cost multiplier for terraform on enemy units
+
 local costMult = 1
 local modOptions = Spring.GetModOptions()
 if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
 end
+
+local ENEMY_BLOCK_TERRA = not (tonumber(modOptions.enemyterra) == 1)
 
 volumeCost = volumeCost * costMult * inbuiltCostMult
 pointExtraPerimeterCost = pointExtraPerimeterCost * costMult * inbuiltCostMult
@@ -211,6 +215,8 @@ local nextUpdateCheck       = 0 -- Time at which to check performance
 local fallbackCommands  = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
+local terraUnitHP = UnitDefs[terraunitDefID].health
+local terraUnitCost = UnitDefs[terraunitDefID].metalCost
 
 local shieldscoutDefID = UnitDefNames["shieldscout"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
@@ -397,12 +403,15 @@ local function EchoUnit(unitID)
 	end
 end
 
+local function IsDebug(unitID)
+	return debugMode and ((not debugModeUnitID) or debugModeUnitID[unitID])
+end
+
 local function EchoDebug(unitID, ...)
-	if debugMode and ((not debugModeUnitID) or debugModeUnitID[unitID]) then
+	if IsDebug(unitID) then
 		Spring.Echo(unitID, ...)
 	end
 end
-
 
 local function IsBadNumber(value, thingToSay)
 	local isBad = (string.find(tostring(value), "n") and true) or false
@@ -413,11 +422,11 @@ local function IsBadNumber(value, thingToSay)
 end
 
 local function SetTooltip(unitID, spent, estimatedCost)
-	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, {allied = true})
+	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, ALLIED_TABLE)
 	if IsBadNumber(estimatedCost, "SetTooltip") then
 		estimatedCost = 100 -- the estimate is for widgets only so better to have wrong data than to crash
 	end
-	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, {allied = true})
+	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, ALLIED_TABLE)
 end
 
 local function IsPositionTerraformable(x, z)
@@ -447,6 +456,38 @@ local function GetGroundOrigHeightOverride(x, z, xOff, zOff)
 		return GG.mapgen_origHeight[x][z]
 	end
 	return spGetGroundOrigHeight(x +  (xOff or 0), z + (zOff or 0))
+end
+
+--------------------------------------------------------------------------------
+-- Enemy Terraform Blocking
+--------------------------------------------------------------------------------
+
+local function CheckNearbyEnemy(unitID)
+	if not ENEMY_BLOCK_TERRA then
+		return
+	end
+	local nearbyEnemyID = Spring.GetUnitNearestEnemy(unitID, terraformUnit[unitID].enemyCheckDist, true)
+	local nearbyEnemy = (nearbyEnemyID and true) or false
+	if IsDebug(unitID) then
+		Spring.Echo("nearbyEnemy", nearbyEnemy, math.random())
+		if nearbyEnemyID then
+			Spring.Utilities.UnitEcho(nearbyEnemyID, "")
+		end
+	end
+	if nearbyEnemy ~= terraformUnit[unitID].nearbyEnemy then
+		spSetUnitRulesParam(unitID, "terraform_enemy", (nearbyEnemy and nearbyEnemyID) or -1, ALLIED_TABLE)
+		terraformUnit[unitID].nearbyEnemy = nearbyEnemy
+		Spring.SetUnitCosts(unitID, {buildTime = terraUnitCost*((nearbyEnemy and nearbyEnemyPenalty) or 1)})
+	end
+end
+
+local function InitialiseNearbyEnemy(unitID)
+	local data = terraformUnit[unitID]
+	local size = math.sqrt((data.border.bottom - data.border.top)^2 + (data.border.right - data.border.left)^2)
+	data.enemyCheckDist = size*0.5 + terraUnitLeash + enemyDistConst
+	EchoDebug(unitID, "enemyCheckDist", data.enemyCheckDist)
+	
+	CheckNearbyEnemy(unitID)
 end
 
 --------------------------------------------------------------------------------
@@ -1013,6 +1054,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
 				}
+				InitialiseNearbyEnemy(id)
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
@@ -1424,6 +1466,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
 				}
+				InitialiseNearbyEnemy(id)
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
@@ -1906,6 +1949,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
 				}
+				InitialiseNearbyEnemy(id)
 
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
@@ -3023,7 +3067,9 @@ local function DoTerraformUpdate(n, forceCompletion)
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
-		EchoDebug(id, "Check", Spring.GetUnitHealth(id))
+		if IsDebug(id) then
+			EchoDebug(id, "Check", Spring.GetUnitHealth(id))
+		end
 		if (spValidUnitID(id)) then
 			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
 			
@@ -3039,6 +3085,10 @@ local function DoTerraformUpdate(n, forceCompletion)
 					spDestroyUnit(id, false, true)
 				else
 					i = i + 1
+					if (n - terraformUnit[id].lastUpdate >= updatePeriod) then
+						CheckNearbyEnemy(id)
+						terraformUnit[id].lastUpdate = n
+					end
 				end
 			else
 				if not terraformUnit[id].fullyInitialised then
@@ -3046,6 +3096,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 				end
 				
 				if force or (n - terraformUnit[id].lastUpdate >= updatePeriod) then
+					CheckNearbyEnemy(id)
 					local costDiff = health - terraformUnit[id].lastHealth
 					if force then
 						costDiff = costDiff + 100000 -- enough?
@@ -3073,9 +3124,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 					end
 					
 					if updateVar == 1 then
-						if n then
-							terraformUnit[id].lastUpdate = n
-						end
+						terraformUnit[id].lastUpdate = n
 						i = i + 1
 					end
 				else

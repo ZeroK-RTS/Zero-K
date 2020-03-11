@@ -400,6 +400,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'enemyterra',
+    name   = 'Allow Terraform Near Enemies',
+    desc   = 'Without this option terraform progress is 20x slower if an enemy unit is visible nearby.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },
+  {
     key     = "tweakunits",
     name    = "Tweak Units",
     desc    = "A base64 encoded lua table of unit parameters to change.",

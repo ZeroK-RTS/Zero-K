@@ -879,6 +879,10 @@ end
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
 
+local function ResetMouse()
+	Spring.WarpMouse(mouseX, mouseY)
+end
+
 local function snapToHeight(heightArray, snapHeight, arrayCount)
 	local smallest = abs(heightArray[1] - snapHeight)
 	local smallestIndex = 1
@@ -1136,7 +1140,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 		
 		local a,c,m,s = spGetModKeyState()
 		if a then
-			Spring.WarpMouse (mouseX,mouseY)
+			ResetMouse()
 			storedHeight = storedHeight + (my-mouseY)*mouseSensitivity
 			local heightArray = {
 				-6,
@@ -1145,7 +1149,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 			point[1].y = heightArray[snapToHeight(heightArray,storedHeight,2)]
 		else
 			if my ~= mouseY then
-				Spring.WarpMouse (mouseX,mouseY)
+				ResetMouse()
 				point[1].y = point[1].y + (my-mouseY)*mouseSensitivity
 				storedHeight = point[1].y
 			end
@@ -1157,7 +1161,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 
 		local a,c,m,s = spGetModKeyState()
 		if a then
-			Spring.WarpMouse (mouseX,mouseY)
+			ResetMouse()
 
 			local dis = sqrt((point[1].x-point[2].x)^2 + (point[1].z-point[2].z)^2)
 			storedHeight = storedHeight + (my-mouseY)/50*dis*mouseSensitivity
@@ -1173,7 +1177,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 			point[2].y = heightArray[snapToHeight(heightArray,storedHeight,7)]
 		else
 			if my ~= mouseY then
-				Spring.WarpMouse (mouseX,mouseY)
+				ResetMouse()
 				point[2].y = point[2].y + (my-mouseY)*mouseSensitivity
 				storedHeight = point[2].y
 			end
@@ -1226,7 +1230,7 @@ function widget:Update(dt)
 					mouseY = my
 				end
 			elseif a then
-				Spring.WarpMouse (mouseX,mouseY)
+				ResetMouse()
 				storedHeight = storedHeight + (my-mouseY)*mouseSensitivity
 				local heightArray = {
 					-2,
@@ -1235,7 +1239,7 @@ function widget:Update(dt)
 				}
 				terraformHeight = heightArray[snapToHeight(heightArray,storedHeight,3)]
 			else
-				Spring.WarpMouse (mouseX,mouseY)
+				ResetMouse()
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
@@ -1246,7 +1250,7 @@ function widget:Update(dt)
 			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 		elseif terraform_type == 2 then
-			Spring.WarpMouse (mouseX,mouseY)
+			ResetMouse()
 			local a,c,m,s = spGetModKeyState()
 			if c then
 				terraformHeight = 0
@@ -1265,7 +1269,7 @@ function widget:Update(dt)
 			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 		elseif terraform_type == 4 then
-			Spring.WarpMouse (mouseX,mouseY)
+			ResetMouse()
 			terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 			if terraformHeight < minRampWidth then
 				terraformHeight = minRampWidth
