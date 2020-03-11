@@ -528,7 +528,7 @@ local function Compare(ac, bc)
 	end
 	
 	if a.allyTeamID ~= b.allyTeamID then
-		return a.allyTeamID > b.allyTeamID 
+		return a.allyTeamID > b.allyTeamID
 	end
 	
 	if not a.isAiTeam ~= not b.isAiTeam then

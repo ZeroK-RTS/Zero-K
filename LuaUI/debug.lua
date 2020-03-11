@@ -252,8 +252,7 @@ end
 
 
 function PrintPlayerInfo(playerID)
-  local name, active, spectator, team, allyteam, ping, cpuUsage = 
-    Spring.GetPlayerInfo(playerID)
+  local name, active, spectator, team, allyteam, ping, cpuUsage = Spring.GetPlayerInfo(playerID)
   print('   name:     '..name)
   print('   id:       '..playerID)
   print('   active:   '..tostring(active))

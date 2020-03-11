@@ -79,15 +79,15 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 end
 
-function widget:UnitDestroyed(unitID) 
+function widget:UnitDestroyed(unitID)
 	if not (ConStack[unitID]==nil) then
 		ConStack[unitID]=ConStack[unitID]:unset();
 	end
 end
 
-function widget:GameFrame(n) 
+function widget:GameFrame(n)
 	if (n%UPDATE_FRAME==0 and n > 30) then
-		for _,Con in pairs(ConStack) do 
+		for _,Con in pairs(ConStack) do
 			Con:handle()
 		end
 	end
