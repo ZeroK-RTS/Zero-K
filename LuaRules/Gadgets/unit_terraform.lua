@@ -159,7 +159,7 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local enemyDistConst = 36 -- Constant added to enemy distinct check
-local nearbyEnemyPenalty = 20 -- Cost multiplier for terraform on enemy units
+local nearbyEnemyPenalty = 50 -- Cost multiplier for terraform on enemy units
 
 local costMult = 1
 local modOptions = Spring.GetModOptions()
