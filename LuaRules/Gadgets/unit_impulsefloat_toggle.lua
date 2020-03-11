@@ -301,9 +301,26 @@ function gadget:GameFrame(f)
 			local submergedSpeed
 			local airSpeed
 			
+			local submergePower = 1
+			if def.surfaceWaitPos then
+				local onSurfaceForWait = (data.y > def.surfaceWaitPos)
+				if onSurfaceForWait and (not data.onSurfaceSince) then
+					data.onSurfaceSince = f
+				elseif (not onSurfaceForWait) and data.onSurfaceSince then
+					data.onSurfaceSince = nil
+				end
+				if data.onSurfaceSince and (f - data.onSurfaceSince) < def.surfaceMaxWait then
+					if (f - data.onSurfaceSince) < def.surfaceMinWait then
+						submergePower = -0.5
+					else
+						submergePower = 1.5*((f - data.onSurfaceSince) - def.surfaceMinWait)/(def.surfaceMaxWait - def.surfaceMinWait) - 0.5
+					end
+				end
+			end
+			
 			if underwaterEffect ~= 0 then
 				if not data.surfacing then -- sinking
-					submergedSpeed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+					submergedSpeed = (data.speed + submergePower*def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
 					data.onSurface = false
 					-- Horizontal jitter if terrain below is invalid
 					if f%30 == 0 then
@@ -327,8 +344,8 @@ function gadget:GameFrame(f)
 			
 			-- Test for special case
 			local height = Spring.GetGroundHeight(data.x, data.z)
+			local removed = false
 			if data.speed ~= 0 or data.y <= height or not data.onSurface then
-				
 				-- Splash animation when enter/exit water
 				if not data.onSurface then
 					local waterline = data.y - def.floatPoint
@@ -355,22 +372,24 @@ function gadget:GameFrame(f)
 					end
 				else --next position is below ground/on the ground?
 					Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+					Spring.SetUnitPosition(unitID, data.x, data.z)
 					GG.WaitWaitMoveUnit(unitID)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
-					
+					removed = true
 					i = i - 1
 				end
 			end
 
 			--Apply desired speed
-			local _,dy = Spring.GetUnitVelocity(unitID)
-			local dyCorrection = data.speed+GRAVITY-dy
-			local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT --get current heading
-			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore
-			Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
-			Spring.AddUnitImpulse(unitID, 0,4+dyCorrection,0)
-			
+			if not removed then
+				local _,dy = Spring.GetUnitVelocity(unitID)
+				local dyCorrection = data.speed+GRAVITY-dy
+				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT --get current heading
+				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore
+				Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
+				Spring.AddUnitImpulse(unitID, 0,4+dyCorrection,0)
+			end
 			i = i + 1
 		else
 			removeFloat(unitID)
