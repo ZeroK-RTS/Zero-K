@@ -16,7 +16,6 @@ return { shiparty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-
     --extradrawrange = 200,
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
