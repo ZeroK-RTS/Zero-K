@@ -129,7 +129,7 @@ local pointExtraAreaCost = 0 -- 0.027
 local pointExtraAreaCostDepth = 6
 local pointExtraPerimeterCost = 0.1
 local pointExtraPerimeterCostDepth = 6
-local baseTerraunitCost = 12
+local baseTerraunitCost = 0
 local inbuiltCostMult = 0.5
 
 local perimeterEdgeCost = {
