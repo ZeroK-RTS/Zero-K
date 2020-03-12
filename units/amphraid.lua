@@ -129,6 +129,7 @@ return { amphraid = {
 
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:TORPEDO_HIT]],
+      flightTime              = 1,
       groundbounce            = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -144,7 +145,7 @@ return { amphraid = {
       --soundStart              = [[weapon/torpedo]],
       soundStartVolume        = 0.7,
       soundHitVolume          = 0.7,
-      startVelocity           = 50,
+      startVelocity           = 120,
       tolerance               = 1000,
       tracks                  = true,
       turnRate                = 25000,
@@ -152,7 +153,7 @@ return { amphraid = {
       waterWeapon             = true,
       weaponAcceleration      = 75,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 240,
     },
   },
 

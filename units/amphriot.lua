@@ -94,7 +94,7 @@ return { amphriot = {
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
-      flightTime              = 1.6,
+      flightTime              = 1.5,
       groundbounce            = 1,
       impactOnly              = false,
       impulseBoost            = 0,
@@ -111,12 +111,12 @@ return { amphriot = {
       --soundStart            = [[weapon/torpedo]],
       startVelocity           = 90,
       tracks                  = true,
-      turnRate                = 30000,
+      turnRate                = 70000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 300,
+      weaponAcceleration      = 700,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 300,
     },
 
     FLECHETTE = {
