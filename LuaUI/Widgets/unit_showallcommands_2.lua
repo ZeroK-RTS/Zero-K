@@ -14,33 +14,36 @@ end
 --July 1 2013 (msafwan add chili radiobutton and new options!)
 --NOTE: this options will behave correctly if "alwaysDrawQueue == 0" in cmdcolors.txt
 
-local spDrawUnitCommands = Spring.DrawUnitCommands
-local spGetAllUnits = Spring.GetAllUnits
-local spIsGUIHidden = Spring.IsGUIHidden
-local spGetModKeyState = Spring.GetModKeyState
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetUnitTeam = Spring.GetUnitTeam
+local spDrawUnitCommands      = Spring.DrawUnitCommands
+local spGetAllUnits           = Spring.GetAllUnits
+local spIsGUIHidden           = Spring.IsGUIHidden
+local spGetModKeyState        = Spring.GetModKeyState
+local spGetUnitAllyTeam       = Spring.GetUnitAllyTeam
+local spGetSelectedUnits      = Spring.GetSelectedUnits
+local spGetUnitPosition       = Spring.GetUnitPosition
+local spGetUnitRulesParam     = Spring.GetUnitRulesParam
+local spGetUnitTeam           = Spring.GetUnitTeam
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
-local glVertex = gl.Vertex
-local glPushAttrib = gl.PushAttrib
+local glVertex      = gl.Vertex
+local glPushAttrib  = gl.PushAttrib
 local glLineStipple = gl.LineStipple
-local glDepthTest = gl.DepthTest
-local glLineWidth = gl.LineWidth
-local glColor = gl.Color
-local glBeginEnd = gl.BeginEnd
-local glPopAttrib = gl.PopAttrib
-local glCreateList = gl.CreateList
-local glCallList = gl.CallList
-local glDeleteList = gl.DeleteList
-local GL_LINES = GL.LINES
+local glDepthTest   = gl.DepthTest
+local glLineWidth   = gl.LineWidth
+local glColor       = gl.Color
+local glBeginEnd    = gl.BeginEnd
+local glPopAttrib   = gl.PopAttrib
+local glCreateList  = gl.CreateList
+local glCallList    = gl.CallList
+local glDeleteList  = gl.DeleteList
+local GL_LINES      = GL.LINES
 
 -- Constans
 local TARGET_NONE = 0
 local TARGET_GROUND = 1
 local TARGET_UNIT= 2
+
+local CMD_ATTACK = CMD.ATTACK
 
 local selectedUnitCount = 0
 local selectedUnits
@@ -211,18 +214,23 @@ local function getTargetPosition(unitID)
 	if not setTargetUnit[unitID] then
 		return nil
 	end
-	local target_type=spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
+	local target_type = spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
 	
 	local tx,ty,tz
 	
 	if target_type == TARGET_GROUND then
-		tx = spGetUnitRulesParam(unitID,"target_x")
-		ty = spGetUnitRulesParam(unitID,"target_y")
-		tz = spGetUnitRulesParam(unitID,"target_z")
+		tx = spGetUnitRulesParam(unitID, "target_x")
+		ty = spGetUnitRulesParam(unitID, "target_y")
+		tz = spGetUnitRulesParam(unitID, "target_z")
 	elseif target_type == TARGET_UNIT then
-		local target = spGetUnitRulesParam(unitID,"target_id")
-		if target and target ~= 0 and Spring.ValidUnitID(target) then
-			_,_,_,tx,ty,tz = spGetUnitPosition(target,true)
+		local targetID = spGetUnitRulesParam(unitID, "target_id")
+		local cmdID, cmdOpts, _, cmdParam1, cmdParam2 = spGetUnitCurrentCommand(unitID)
+		if cmdID == CMD_ATTACK and cmdParam1 == targetID and not cmdParam2 then
+			-- Do not draw set target and attack on the same target.
+			return nil
+		end
+		if targetID and targetID ~= 0 and Spring.ValidUnitID(targetID) then
+			_, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
 		else
 			return nil
 		end

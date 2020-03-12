@@ -61,6 +61,10 @@ local function isValidUnit(unitID)
 	return false
 end
 
+local TargetIssuingCommand = {
+	[CMD.ATTACK] = true,
+}
+
 local TargetKeepingCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
@@ -87,8 +91,8 @@ local TargetCancelingCommand = {
 
 local orderParamTable = {0}
 local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
-function widget:CommandNotify(id, params, cmdOptions)
-	if TargetKeepingCommand[id] and options.keepTarget.value then
+function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	if TargetKeepingCommand[cmdID] and options.keepTarget.value then
 		local units = Spring.GetSelectedUnits()
 		for i = 1, #units do
 			local unitID = units[i]
@@ -100,12 +104,13 @@ function widget:CommandNotify(id, params, cmdOptions)
 				end
 			end
 		end
-	elseif TargetCancelingCommand[id] and options.removeTarget.value then
+	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
 		local units = Spring.GetSelectedUnits()
-		for i = 1, #units do
-			local unitID = units[i]
-			Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,0)
-		end
+		orderParamTable[1] = cmdParams[1]
+		Spring.GiveOrderToUnitArray(units, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
+	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value and not cmdOptions.shift then
+		local units = Spring.GetSelectedUnits()
+		Spring.GiveOrderToUnitArray(units, CMD_UNIT_CANCEL_TARGET, cmdParams, 0)
 	end
 	return false
 end
@@ -119,8 +124,11 @@ function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
 				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 			end
 		end
+	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
+		orderParamTable[1] = cmdParams[1]
+		Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value then
-		Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET,cmdParams, 0)
+		Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET, cmdParams, 0)
 	end
 	return false
 end
