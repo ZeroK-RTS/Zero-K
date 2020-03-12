@@ -52,7 +52,7 @@ local legBackwardAngleMinor = math.rad(10)
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local bCurling = false
+local armored = false
 local nocurl = true
 
 local gun_0 = 0
@@ -104,7 +104,9 @@ local function Walk()
 end
 
 local function Curl()
-	if nocurl then return end
+	if nocurl or armored then
+		return
+	end
 	--Spring.Echo("Initiating curl")
 	
 	Signal(SIG_MOVE)
@@ -117,7 +119,6 @@ local function Curl()
 	end
 	
 	Sleep(100)
-	bCurling = true
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.1)
 	GG.UpdateUnitAttributes(unitID)
@@ -153,8 +154,8 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 	
-	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
+	armored = true
 end
 
 local function ResetLegs()
@@ -183,7 +184,6 @@ end
 
 local function Uncurl()
 	--Spring.Echo("Initiating uncurl", Spring.GetGameFrame())
-	bCurling = true
 	
 	ResetLegs()
 	Move(canon, y_axis, 0, 2.5)
@@ -193,6 +193,7 @@ local function Uncurl()
 	Sleep(400)
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
 	Spring.SetUnitArmored(unitID,false)
+	armored = false
 	
 	WaitForTurn(leg1, x_axis)
 	WaitForTurn(leg2, x_axis)
@@ -202,7 +203,6 @@ local function Uncurl()
 	--Spring.Echo("speeding up", Spring.GetGameFrame())
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	bCurling = false
 end
 
 local function BlinkingLight()
@@ -298,7 +298,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(canon, x_axis)
 		StartThread(RestoreAfterDelay1)
-		return (not bCurling)
+		return true
 	elseif num == 2 then
 		Signal(SIG_AIM2)
 		SetSignalMask(SIG_AIM2)
