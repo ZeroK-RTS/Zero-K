@@ -64,6 +64,7 @@ local floatDefs = include("LuaRules/Configs/float_defs.lua")
 --------------------------------------------------------------------------------
 -- Local Vars
 
+local floatDisableFrame = {} -- For units that are not currently floating
 local float = {}
 local floatByID = {data = {}, count = 0}
 
@@ -94,7 +95,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		if y < def.depthRequirement or isFlying then
 			local place, feature = Spring.TestBuildOrder(buildTestUnitDefID, x, y ,z, 1)
-			if place == 2 or place == 1 then
+			if isFlying or place == 2 or place == 1 then
 				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
 				GG.floatUnit[unitID] = true
 				floatByID.count = floatByID.count + 1
@@ -112,7 +113,9 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 					isFlying = isFlying,
 					paraData = {want = false, para = false},
 					transportCall = transportCall or 0,
+					disableFrame = floatDisableFrame[unitID],
 				}
+				floatDisableFrame[unitID] = nil
 				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT
 				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore
 			end
@@ -175,11 +178,13 @@ GG.Floating_UnitTeleported = GG.Floating_UnitTeleported or function() end
 
 local function checkAlwaysFloat(unitID)
 	if not select(1, Spring.GetUnitIsStunned(unitID)) then
-		local unitDefID = Spring.GetUnitDefID(unitID)
 		local cmdID = Spring.GetUnitCurrentCommand(unitID)
 		local moving = cmdID and sinkCommand[cmdID]
 		if not moving then
-			addFloat(unitID, unitDefID)
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local px,py,pz = Spring.GetUnitPosition(unitID)
+			local isFlying = (py > Spring.GetGroundHeight(px,pz) + 20)
+			addFloat(unitID, unitDefID, isFlying)
 			return true
 		end
 	end
@@ -197,13 +202,14 @@ function gadget:GameFrame(f)
 	while i <= floatByID.count do
 		local unitID = floatByID.data[i]
 		local isValidUnitID = Spring.ValidUnitID(unitID)
-		local isFlying = isValidUnitID and float[unitID]["isFlying"]
-		
 		local data = float[unitID]
-		if isFlying then --check if unit has landed or not
-			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
+		
+		if isValidUnitID and data.disableFrame and (f < data.disableFrame) then
+			i = i + 1
+		elseif isValidUnitID and data.isFlying then --check if unit has landed or not
+			data.x, data.y, data.z = Spring.GetUnitPosition(unitID)
 			local height = Spring.GetGroundHeight(data.x, data.z)
-			if data.y == height then --touch down on ground
+			if data.y == height or not data.surfacing then --touch down on ground
 				removeFloat(unitID)
 				i = i - 1
 			elseif data.y <= 0 then --touch down on water level
@@ -211,18 +217,17 @@ function gadget:GameFrame(f)
 				data.speed = dy --Note: data.speed is designed for speed on y axis
 				data.isFlying = false
 				local cmdID, cmdOpts, cmdTag = Spring.GetUnitCurrentCommand(unitID)
-				if cmdID then
-					if (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) and cmdOpts == CMD.OPT_RIGHT then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
-						Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
-							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
-						})
-					end
+				if cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) and cmdOpts == CMD.OPT_RIGHT then
+					--Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
+					Spring.GiveOrderArrayToUnitArray( {unitID},{
+						{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
+						{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
+					})
 				end
 			end
 			i = i + 1
 			
-		elseif isValidUnitID and not isFlying then --perform float/sink behaviour
+		elseif isValidUnitID and not data.isFlying then --perform float/sink behaviour
 			local def = floatDefs[data.unitDefID]
 			
 			-- This cannot be done when the float is added because that will often be
@@ -452,6 +457,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
 
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	floatDisableFrame[unitID] = nil
+end
+
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_FLOAT_STATE)
@@ -522,9 +531,16 @@ function gadget:Initialize()
 	
 	GG.Floating_InterruptFloat = function(unitID, frames)
 		if float[unitID] then
-			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
-			callScript(unitID, "script.StopMoving")
-			removeFloat(unitID)
+			if frames then
+				float[unitID].disableFrame = Spring.GetGameFrame() + frames
+				float[unitID].isFlying = true
+			else
+				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+				callScript(unitID, "script.StopMoving")
+				removeFloat(unitID)
+			end
+		elseif frames then
+			floatDisableFrame[unitID] = Spring.GetGameFrame() + frames
 		end
 	end
 end

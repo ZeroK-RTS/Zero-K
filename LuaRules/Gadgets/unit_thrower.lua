@@ -191,7 +191,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 					}
 				)
 				SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID), flyTime)
-				GG.Floating_InterruptFloat(nearID)
+				GG.Floating_InterruptFloat(nearID, 60)
 			end
 		end
 	end
