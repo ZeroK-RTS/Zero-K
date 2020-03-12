@@ -1,7 +1,7 @@
 return { amphcon = {
   unitname            = [[amphcon]],
   name                = [[Conch]],
-  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s]],
+  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle]],
   acceleration        = 1.2,
   activateWhenBuilt   = true,
   brakeRate           = 1.5,
@@ -23,6 +23,7 @@ return { amphcon = {
     amph_submerged_at = 40,
   },
 
+  damageModifier      = 0.25,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,

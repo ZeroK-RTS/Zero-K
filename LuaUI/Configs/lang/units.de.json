@@ -831,7 +831,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
+		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
 		"helptext" : "Ein robuster und effizienter Konstruktionsroboter der sowohl im Wasser als auch an Land seine Arbeit verrichtet."
 	},
 	"bomberassault" : {

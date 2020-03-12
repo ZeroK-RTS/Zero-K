@@ -806,7 +806,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
+		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
 	},
 	"spiderriot" : {
