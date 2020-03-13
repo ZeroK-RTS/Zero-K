@@ -71,7 +71,7 @@ return { tankraid = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      accuracy                = 1400,
+      accuracy                = 1300,
       areaOfEffect            = 96,
       avoidFeature            = true,
       avoidFriendly           = true,
@@ -82,13 +82,13 @@ return { tankraid = {
 
       customParams              = {
         setunitsonfire = "1",
-        burnchance     = "0.7",
-        burntime       = 60,
+        burnchance     = "1",
+        burntime       = 30,
 
         area_damage = 1,
         area_damage_radius = 56,
         area_damage_dps = 45,
-        area_damage_duration = 2,
+        area_damage_duration = 1.5,
         
         light_color = [[1.6 0.8 0.32]],
         light_radius = 320,
