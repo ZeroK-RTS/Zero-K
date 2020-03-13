@@ -118,7 +118,7 @@ return { tankraid = {
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 230,
+      weaponVelocity          = 220,
     },
 
   },
