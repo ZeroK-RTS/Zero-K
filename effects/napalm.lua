@@ -543,7 +543,7 @@ local altforms = {
       properties = {
         particlelife = 35, 
         particlelifespread = 12,
-        particlesize       = 45,
+        particlesize       = 40,
         particlesizespread = 16,},
       },
     },
