@@ -50,7 +50,7 @@ return { cloakriot = {
 
   },
 
-  sightDistance          = 345,
+  sightDistance          = 350,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,
@@ -102,7 +102,7 @@ return { cloakriot = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 270,
+      range                   = 275,
       reloadtime              = 0.5,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,

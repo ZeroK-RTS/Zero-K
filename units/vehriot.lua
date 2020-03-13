@@ -26,9 +26,9 @@ return { vehriot = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 1100,
+  maxDamage           = 1020,
   maxSlope            = 18,
-  maxVelocity         = 2.2,
+  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
@@ -47,14 +47,14 @@ return { vehriot = {
     },
 
   },
-  sightDistance       = 347,
+  sightDistance       = 350,
   trackOffset         = 7,
   trackStrength       = 6,
   trackStretch        = 1,
   trackType           = [[StdTank]],
   trackWidth          = 28,
   turninplace         = 0,
-  turnRate            = 442,
+  turnRate            = 390,
   workerTime          = 0,
 
   weapons             = {
@@ -89,8 +89,8 @@ return { vehriot = {
       },
       
       damage                  = {
-        default = 270.2,
-        planes  = 270.2,
+        default = 260.2,
+        planes  = 260.2,
         subs    = 13.5,
       },
 
@@ -100,8 +100,8 @@ return { vehriot = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 285,
-      reloadtime              = 1.7,
+      range                   = 280,
+      reloadtime              = 1.7 + 2/30,
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
       soundStartVolume        = 3,
