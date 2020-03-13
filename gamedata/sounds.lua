@@ -42,6 +42,16 @@ local Sounds = {
 			pitchmod = 0.5,
 			gainmod = 0.2,
 		},
+		FireLaunch = {
+			file = "sounds/weapon/cannon/cannon_fire3.wav",
+			pitchmod = 0.1,
+			gainmod = 0.1,
+		},
+		FireHit = {
+			file = "sounds/explosion/ex_med6.wav",
+			pitchmod = 0.4,
+			gainmod = 0.2,
+		},
 		DefaultsForSounds = { -- this are default settings
 			file = "ThisEntryMustBePresent.wav",
 			gain = 1.0,

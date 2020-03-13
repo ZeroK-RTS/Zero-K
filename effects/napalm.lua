@@ -94,7 +94,7 @@ local cegs = {
       },
     },
   },
-  ["napalm_koda_small"] = {
+  ["napalm_koda_small_long"] = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
@@ -308,6 +308,32 @@ local cegs = {
     },
   },
 
+  ["napalm_koda_small"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 48,
+      ttl                = 60,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i10]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_60]],
+        pos                = [[-10 r20, 25, -10 r20]],
+      },
+    },
+  },
+
   ["napalm_gunshipbomb"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -507,6 +533,14 @@ local altforms = {
     modifications = {
       rocks = {
 	properties = {particlelife = 150, particlelifespread = 300},
+      },
+    },
+  },
+  napalmfireball_60 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 30, particlelifespread = 20},
       },
     },
   },

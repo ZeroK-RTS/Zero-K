@@ -100,6 +100,7 @@ lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
 local veryShortRangeSkirmieeArray = NameToDefID({
 	"shieldscout",
+	"tankraid",
 	"jumpassault",
 	"cloakheavyraid",
 	"cloakbomb",
@@ -118,7 +119,6 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 
 local shortRangeSkirmieeArray = NameToDefID({
 	"jumpraid",
-	"tankraid",
 	"amphraid",
 	"jumpsumo",
 	"amphbomb",
