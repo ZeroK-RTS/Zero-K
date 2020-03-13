@@ -312,7 +312,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 48,
+      flashsize          = 54,
       ttl                = 60,
       color = {
         [1]  = 0.7,
@@ -328,8 +328,8 @@ local cegs = {
       water              = true,
       properties = {
         delay              = [[0 i10]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_60]],
-        pos                = [[-10 r20, 25, -10 r20]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_45]],
+        pos                = [[-10 r10, 25, -10 r10]],
       },
     },
   },
@@ -536,11 +536,15 @@ local altforms = {
       },
     },
   },
-  napalmfireball_60 = {
+  napalmfireball_45 = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {particlelife = 30, particlelifespread = 20},
+      properties = {
+        particlelife = 35, 
+        particlelifespread = 12,
+        particlesize       = 45,
+        particlesizespread = 16,},
       },
     },
   },
