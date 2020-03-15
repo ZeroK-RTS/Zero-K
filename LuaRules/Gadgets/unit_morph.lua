@@ -420,6 +420,10 @@ local function FinishMorph(unitID, morphData)
 	--local lineage = Spring.GetUnitLineage(unitID)
 	--// copy facplop
 	local facplop = Spring.GetUnitRulesParam(unitID, "facplop")
+	-- Remove old facplop due to a bug that allows facplop duplication if done during morph.
+	if facplop and (facplop == 1) then
+		Spring.SetUnitRulesParam(unitID, "facplop", 0, {inlos = true})
+	end
 	--//copy command queue
 	local cmds = Spring.GetCommandQueue(unitID, -1)
 
