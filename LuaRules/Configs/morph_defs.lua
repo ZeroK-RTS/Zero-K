@@ -31,21 +31,38 @@ local baseComMorph = {
 --------------------------------------------------------------------------------
 -- customparams
 --------------------------------------------------------------------------------
-for i=1,#UnitDefs do
+
+for i = 1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local cp = ud.customParams
 	local name = ud.name
-	local morphTo = cp.morphto
-	if morphTo then
+
+	local morphList = (cp.morphto_1 and true) or false
+	local index = 1
+	local append = (morphList and ("_" .. index)) or ""
+
+	while true do
+		local morphTo = cp["morphto" .. append]
+		if not morphTo then
+			break
+		end
+		
 		local targetDef = UnitDefNames[morphTo]
 		morphDefs[name] = morphDefs[name] or {}
 		morphDefs[name][#morphDefs[name] + 1] = {
 			into = morphTo,
-			time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
-			metal = tonumber(cp.morphcost),
-			energy = tonumber(cp.morphcost),
-			combatMorph = cp.combatmorph == "1",
+			time = cp["morphtime" .. append] or (cp["level" .. append] and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp["level" .. append] + 1)))),	-- or 30,
+			metal = tonumber(cp["morphcost" .. append]),
+			energy = tonumber(cp["morphcost" .. append]),
+			combatMorph = (cp["combatmorph" .. append] == "1"),
 		}
+		
+		if morphList then
+			index = index + 1
+			append = ("_" .. index)
+		else
+			break
+		end
 	end
 end
 
