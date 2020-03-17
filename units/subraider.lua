@@ -87,8 +87,8 @@ return { subraider = {
       },
 
       damage                  = {
-        default = 250.1,
-        subs    = 250.1,
+        default = 260.1,
+        subs    = 260.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
