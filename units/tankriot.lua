@@ -92,6 +92,7 @@ return { tankriot = {
       impulseBoost            = 0,
       impulseFactor           = 0.6,
       interceptedByShieldType = 2,
+	  leadlimit               = 0,
       model                   = [[corbanishrk.s3o]],
       noSelfDamage            = true,
       range                   = 320,
