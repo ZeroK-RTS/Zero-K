@@ -4,7 +4,7 @@ return { tankraid = {
   description         = [[Raider Tank]],
   acceleration        = 0.625,
   brakeRate           = 1.375,
-  buildCostMetal      = 160,
+  buildCostMetal      = 170,
   builder             = false,
   buildPic            = [[tankraid.png]],
   canGuard            = true,
@@ -29,7 +29,7 @@ return { tankraid = {
   idleAutoHeal        = 10,
   idleTime            = 300,
   leaveTracks         = true,
-  maxDamage           = 700,
+  maxDamage           = 650,
   maxSlope            = 18,
   maxVelocity         = 3.9,
   maxWaterDepth       = 22,
@@ -95,8 +95,8 @@ return { tankraid = {
       },
       
       damage                  = {
-        default = 52,
-        planes  = 52,
+        default = 51,
+        planes  = 51,
         subs    = 2.6,
       },
 
@@ -111,7 +111,7 @@ return { tankraid = {
       myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 235,
-      reloadtime              = 0.4 + 1/30,
+      reloadtime              = 0.4 + 2/30,
       soundHit                = [[FireHit]],
       soundHitVolume          = 3,
       soundStart              = [[FireLaunch]],
