@@ -93,6 +93,7 @@ return { amphriot = {
         default = 90.1,
       },
 
+      edgeEffectiveness       = 0.6,
       explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
       flightTime              = 1.5,
       groundbounce            = 1,
