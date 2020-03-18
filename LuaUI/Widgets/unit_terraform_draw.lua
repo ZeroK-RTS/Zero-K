@@ -26,6 +26,10 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local terraunitDefID = UnitDefNames["terraunit"].id
 local terraOffset = UnitDefNames["terraunit"].height + 14 --magic number from ETA widget
 
+local FLASH_TIME = 1.4
+
+local flash = 0
+
 local terraUnits = {}
 
 local pathPrefix = "LuaUI/Images/commands/"
@@ -87,9 +91,8 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
 
-local flash = 0
 function widget:Update(dt)
-	flash = (flash + dt)%1
+	flash = (flash + dt)%FLASH_TIME
 end
 
 function widget:GameFrame(frame)
@@ -169,10 +172,10 @@ local function DrawWire(emitUnitID, recUnitID)
 		point[4] = {rX, rY, rZ}
 		gl.PushAttrib(GL.LINE_BITS)
 		gl.DepthTest(true)
-		local intensity = (flash < 0.5 and (flash*2)) or (2 - flash*2)
-		gl.Color (0.6 + 0.35*intensity, 0.6, 0.6, math.random()*0.05 + 0.65)
+		local intensity = ((flash < FLASH_TIME/2 and (flash*2)) or (FLASH_TIME*2 - flash*2))/FLASH_TIME
+		gl.Color (0.7 + 0.3*intensity, 0.3 + 0.1*intensity, 0.3 + 0.1*intensity, math.random()*0.05 + 0.75)
 		gl.LineWidth(3)
-		gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
+		gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 14)
 		gl.DepthTest(false)
 		gl.Color (1,1,1,1)
 		gl.PopAttrib()
