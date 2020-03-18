@@ -270,6 +270,7 @@ for name, wd in pairs (WeaponDefs) do
 		if not cp.area_damage_dps then cp.area_damage_dps = area_damage_defaults.dps end
 		if not cp.area_damage_radius then cp.area_damage_radius = area_damage_defaults.radius end
 		if not cp.area_damage_duration then cp.area_damage_duration = area_damage_defaults.duration end
+		if not cp.area_damage_plateau_radius then cp.area_damage_plateau_radius = area_damage_defaults.plateau_radius end
 
 		if not cp.area_damage_is_impulse then cp.area_damage_is_impulse = area_damage_defaults.is_impulse end
 		if not cp.area_damage_range_falloff then cp.area_damage_range_falloff = area_damage_defaults.range_falloff end
