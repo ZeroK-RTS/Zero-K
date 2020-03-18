@@ -692,7 +692,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				px, py, pz = GetUnitPosition(unitID)
 				
 				local temp = droneList[droneID]
-				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
 				local rx, rz = RandomPointInUnitCircle()
 				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0, false, true)
 				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , CMD.OPT_SHIFT)
