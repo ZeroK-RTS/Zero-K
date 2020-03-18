@@ -16,7 +16,8 @@ return { cloakarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[14]],
+    modelradius       = [[14]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],

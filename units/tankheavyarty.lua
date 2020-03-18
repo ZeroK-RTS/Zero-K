@@ -17,8 +17,9 @@ return { tankheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[17]],
-    cus_noflashlight = 1,
+    modelradius       = [[17]],
+    cus_noflashlight  = 1,
+    selection_scale   = 0.92,
   },
 
   explodeAs              = [[BIG_UNIT]],

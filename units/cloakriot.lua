@@ -19,8 +19,9 @@ return { cloakriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[7]],
-    cus_noflashlight = 1,
+    modelradius       = [[7]],
+    cus_noflashlight  = 1,
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

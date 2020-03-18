@@ -17,7 +17,8 @@ return { hoverheavyraid = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[25]],
+    modelradius       = [[25]],
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],

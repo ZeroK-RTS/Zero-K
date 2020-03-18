@@ -23,6 +23,7 @@ return { jumpskirm = {
 
   customParams        = {
     dontfireatradarcommand = '1',
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -18,6 +18,7 @@ return { hoverriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    selection_scale   = 0.92,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -17,10 +17,11 @@ return { amphfloater = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 60,
+    amph_regen        = 60,
     amph_submerged_at = 30,
-    sink_on_emp    = 0,
-    floattoggle    = [[1]],
+    sink_on_emp       = 0,
+    floattoggle       = [[1]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],

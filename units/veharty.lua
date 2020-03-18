@@ -17,6 +17,7 @@ return { veharty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],
