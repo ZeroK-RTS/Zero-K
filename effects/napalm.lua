@@ -312,7 +312,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 54,
+      flashsize          = 52,
       ttl                = 60,
       color = {
         [1]  = 0.7,
@@ -323,7 +323,7 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 2,
+      count              = 1,
       ground             = true,
       water              = true,
       properties = {
@@ -543,7 +543,7 @@ local altforms = {
       properties = {
         particlelife = 35, 
         particlelifespread = 12,
-        particlesize       = 40,
+        particlesize       = 38,
         particlesizespread = 16,},
       },
     },

@@ -80,6 +80,7 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 		explosionCount = explosionCount + 1
 		explosionList[explosionCount] = {
 			radius = weaponInfo[weaponID].radius,
+			plateauRadius = weaponInfo[weaponID].plateauRadius,
 			damage = weaponDamage,
 			impulse = weaponInfo[weaponID].impulse,
 			expiry = frameNum + weaponInfo[weaponID].duration,
@@ -106,8 +107,9 @@ function gadget:GameFrame(f)
 					local u = ulist[j]
 					local ux, uy, uz = Spring.GetUnitPosition(u)
 					local damage = data.damage
-					if data.rangeFall ~= 0 then
-						damage = damage - damage*data.rangeFall*math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)/data.radius
+					local distance = math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)
+					if data.rangeFall ~= 0 and distance > data.plateauRadius then
+						damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
 					end
 					if data.impulse then
 						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
