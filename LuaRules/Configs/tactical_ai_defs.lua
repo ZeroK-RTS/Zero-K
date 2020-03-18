@@ -1253,6 +1253,7 @@ local behaviourConfig = {
 		velocityPrediction = 0,
 	},
 	["striderbantha"] = {
+		defaultAIState = 0,
 		skirms = allMobileGround,
 		swarms = {},
 		flees = {},
