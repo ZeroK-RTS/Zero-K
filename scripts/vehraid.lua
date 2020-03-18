@@ -161,7 +161,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
 	Turn(sleeve, x_axis, -pitch, math.rad(SLEEVE_TURN_SPEED))
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(sleeve, y_axis)
+	WaitForTurn(sleeve, x_axis)
 	StartThread(RestoreAfterDelay)
 
 	return (true)
