@@ -324,6 +324,10 @@ function gadget:Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+	
+	for w,_ in pairs(HandledWeaponDefIDs) do
+		Script.SetWatchProjectile(w, true)
+	end
 end
 
 -------------------------------------------------------------------------------------
