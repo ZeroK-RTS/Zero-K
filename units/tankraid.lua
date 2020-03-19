@@ -34,7 +34,7 @@ return { tankraid = {
   idleAutoHeal        = 10,
   idleTime            = 300,
   leaveTracks         = true,
-  maxDamage           = 660,
+  maxDamage           = 670,
   maxSlope            = 18,
   maxVelocity         = 3.9,
   maxWaterDepth       = 22,
@@ -52,7 +52,7 @@ return { tankraid = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 880,
+  turnRate            = 800,
   workerTime          = 0,
 
   weapons             = {
