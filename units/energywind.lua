@@ -19,7 +19,7 @@ return { energywind = {
   customParams                  = {
     pylonrange     = 60,
     windgen        = true,
-    modelradius    = [[15]],
+    modelradius    = [[12]],
     removewait     = 1,
     default_spacing = 2,
   },

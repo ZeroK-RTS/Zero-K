@@ -177,9 +177,9 @@ local function SetupUnit(unitID)
 		if health == WIND_HEALTH then
 			Spring.SetUnitHealth(unitID, 400)
 		end
-		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
-		Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
-		Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
+		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
+		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
+		Spring.SetUnitRulesParam(unitID, "midpos_override", 5 - midy)
 		Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
 		return false
 	end
