@@ -61,7 +61,7 @@ return { shiparty = {
       name                    = [[Plasma Cannon]],
       areaOfEffect            = 96,
       avoidFeature            = false,
-      avoidGround             = false,
+      avoidGround             = true,
       craterBoost             = 1,
       craterMult              = 2,
 

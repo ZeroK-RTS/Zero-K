@@ -68,7 +68,7 @@ return { tankarty = {
       accuracy                = 180,
       areaOfEffect            = 84,
       avoidFeature            = false,
-      avoidGround             = false,
+      avoidGround             = true,
       craterBoost             = 1,
       craterMult              = 2,
 
