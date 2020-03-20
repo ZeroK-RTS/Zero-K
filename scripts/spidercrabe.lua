@@ -193,7 +193,6 @@ local function Uncurl()
 	Sleep(400)
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
 	Spring.SetUnitArmored(unitID,false)
-	armored = false
 	
 	WaitForTurn(leg1, x_axis)
 	WaitForTurn(leg2, x_axis)
@@ -226,18 +225,19 @@ end
 local function Motion()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
+	armored = false
 	Sleep(30)
 	Uncurl()
 	Walk()
 end
 
 function script.StartMoving()
-	--Spring.Utilities.UnitEcho(unitID, "A")
+	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
 end
 
 function script.StopMoving()
-	--Spring.Utilities.UnitEcho(unitID, "P")
+	--Spring.Utilities.UnitEcho(unitID, "P " .. ((armored and "T") or "F"))
 	StartThread(Curl)
 end
 
