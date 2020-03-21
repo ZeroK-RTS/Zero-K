@@ -22,6 +22,7 @@ return { subtacmissile = {
     stockpiletime  = [[30]],
     stockpilecost  = [[600]],
     priority_misc  = 1, -- Medium
+    no_auto_keep_target = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

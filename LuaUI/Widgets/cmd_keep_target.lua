@@ -47,7 +47,7 @@ options = {
 local keepTargetDefs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	keepTargetDefs[i] = not (ud.isBomber or ud.isFactory or ud.customParams.reallyabomber)
+	keepTargetDefs[i] = not (ud.isBomber or ud.isFactory or ud.customParams.reallyabomber or ud.customParams.no_auto_keep_target)
 end
 
 --------------------------------------------------------------------------------
@@ -107,7 +107,13 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
 		local units = Spring.GetSelectedUnits()
 		orderParamTable[1] = cmdParams[1]
-		Spring.GiveOrderToUnitArray(units, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
+		for i = 1, #units do
+			local unitID = units[i]
+			if isValidUnit(unitID) then
+				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
+			end
+		end
+		--Spring.GiveOrderToUnitArray(units, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value and not cmdOptions.shift then
 		local units = Spring.GetSelectedUnits()
 		Spring.GiveOrderToUnitArray(units, CMD_UNIT_CANCEL_TARGET, cmdParams, 0)
@@ -125,8 +131,10 @@ function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
 			end
 		end
 	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
-		orderParamTable[1] = cmdParams[1]
-		Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
+		if isValidUnit(unitID) then
+			orderParamTable[1] = cmdParams[1]
+			Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
+		end
 	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value then
 		Spring.GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET, cmdParams, 0)
 	end
