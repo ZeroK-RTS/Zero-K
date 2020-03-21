@@ -114,6 +114,9 @@ return { tankassault = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[50 50 50]],
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[correap_dead.s3o]],
     },
 
