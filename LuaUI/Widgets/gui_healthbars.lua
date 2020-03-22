@@ -839,7 +839,9 @@ do
 		brightClr[1] = color[1]*1.5 brightClr[2] = color[2]*1.5 brightClr[3] = color[3]*1.5 brightClr[4] = color[4]
 		local progress_pos = -barWidth+barWidth*2*percent-1
 		local bar_Height  = barHeight+offsetY
-		if percent < 1 then glBeginEnd(GL_QUADS, DrawGradient, progress_pos, bar_Height, barWidth, offsetY, bkTop, bkBottom) end
+		if percent < 1 then
+			glBeginEnd(GL_QUADS, DrawGradient, progress_pos, bar_Height, barWidth, offsetY, bkTop, bkBottom)
+		end
 		glBeginEnd(GL_QUADS, DrawGradient, -barWidth, bar_Height, progress_pos, offsetY, brightClr, color)
 	end
 
