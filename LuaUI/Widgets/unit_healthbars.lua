@@ -467,7 +467,9 @@ do
 	local fBarHeightL = featureBarHeight + 2
 	local fBarStart   = -(featureBarWidth + 1)
 
-	for i = 1, maxBars do bars[i] = {} end
+	for i = 1, maxBars do
+		bars[i] = {}
+	end
 
 	function AddBar(title, progress, color_index, text, color)
 		barsN = barsN + 1
@@ -666,7 +668,7 @@ do
 
 		morph = UnitMorphs[unitID]
 
-		if (drawUnitsOnFire)and(GetUnitRulesParam(unitID, "on_fire") == 1) then
+		if (drawUnitsOnFire) and (GetUnitRulesParam(unitID, "on_fire") == 1) then
 			onFireUnits[#onFireUnits+1] = unitID
 		end
 
@@ -707,210 +709,210 @@ do
 			AddBar(messages.building, build, "build", (fullText and floor(build*100)..'%') or '')
 		end
 
-		----// MORPHING
-		--if (morph) then
-		--	local build = morph.progress
-		--	AddBar(messages.morph, build, "build", (fullText and floor(build*100)..'%') or '')
+		--// MORPHING
+		if (morph) then
+			local build = morph.progress
+			AddBar(messages.morph, build, "build", (fullText and floor(build*100)..'%') or '')
+		end
+		
+		--// STOCKPILE
+		if (ci.canStockpile) then
+			local stockpileBuild
+			numStockpiled, numStockpileQued, stockpileBuild = GetUnitStockpile(unitID)
+			if ci.gadgetStock then
+				stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
+			end
+			if numStockpiled and stockpileBuild and (numStockpileQued ~= 0) then
+				AddBar(messages.stockpile, stockpileBuild, "stock", (fullText and floor(stockpileBuild*100)..'%') or '')
+			end
+		else
+			numStockpiled = false
+		end
+		
+			--// PARALYZE
+		local paraTime = false
+		local stunned = GetUnitIsStunned(unitID)
+		if (emp > 0) and(emp < 1e8) then
+			local infotext = ""
+			stunned = stunned and paralyzeDamage >= empHP
+			if (stunned) then
+				paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
+				paraUnits[#paraUnits+1] = unitID
+				if (fullText) then
+					infotext = floor(paraTime) .. 's'
+				end
+				emp = 1
+			else
+				if (emp > 1) then
+					emp = 1
+				end
+				if (fullText) then
+					infotext = floor(emp*100)..'%'
+				end
+			end
+			local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
+			AddBar(messages.paralyze, emp, empcolor_index, infotext)
+		end
+		
+		 --// DISARM
+		local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
+		if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
+			local disarmProp = (disarmFrame - gameFrame)/1200
+			if disarmProp < 1 then
+				if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
+					AddBar(messages.disarm, disarmProp, "disarm", (fullText and floor(disarmProp*100)..'%') or '')
+				end
+			else
+				local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
+				if (not paraTime) or disarmTime > paraTime + 0.5 then
+					AddBar(messages.disarm, 1, ((blink and "disarm_b") or "disarm_p") or ("disarm"), floor(disarmTime) .. 's')
+					if not stunned then
+						disarmUnits[#disarmUnits+1] = unitID
+					end
+				end
+			end
+		end
+		
+		--// CAPTURE (set by capture gadget)
+		if ((capture or -1) > 0) then
+			AddBar(messages.capture, capture, "capture", (fullText and floor(capture*100)..'%') or '')
+		end
+		
+		--// CAPTURE RECHARGE
+		if ci.canCapture then
+			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame")
+			if (captureReloadState and captureReloadState > 0) then
+				local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+				AddBar(messages.capture_reload, capture, "reload", (fullText and floor(capture*100)..'%') or '')
+			end
+		end
+		
+		--// WATER TANK
+		if ci.maxWaterTank then
+			local waterTank = GetUnitRulesParam(unitID, "watertank")
+			if waterTank then
+				local prog = waterTank/ci.maxWaterTank
+				if prog < 1 then
+					AddBar(messages.water_tank, prog, "tank", (fullText and floor(prog*100)..'%') or '')
+				end
+			end
+		end
+		
+		--// Teleport progress
+		local TeleportEnd = GetUnitRulesParam(unitID, "teleportend")
+		local TeleportCost = GetUnitRulesParam(unitID, "teleportcost")
+		if TeleportEnd and TeleportCost and TeleportEnd >= 0 then
+			local prog
+			if TeleportEnd > 1 then
+				-- End frame given
+				prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
+			else
+				-- Same parameters used to display a static progress
+				prog = 1 - TeleportEnd
+			end
+			if prog < 1 then
+				AddBar(messages.teleport, prog, "tele", (fullText and floor(prog*100)..'%') or '')
+			end
+		end
+		
+		--// Planetwars teleport progress
+		if ci.isPwStructure then
+			TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
+			if TeleportEnd then
+				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
+				if prog < 1 then
+					AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+				end
+			end
+		end
+		
+		--// SPECIAL WEAPON
+		if ci.specialReload then
+			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
+			if (specialReloadState and specialReloadState > gameFrame) then
+				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
+				AddBar(messages.ability, special, "reload2", (fullText and floor(special*100)..'%') or '')
+			end
+		end
+		
+		--// REAMMO
+		if ci.canReammo then
+			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+			if reammoProgress then
+				AddBar(messages.reammo, reammoProgress, "reammo", (fullText and floor(reammoProgress*100)..'%') or '')
+			end
+		end
+		
+		--// RELOAD
+		if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
+			local primaryWeapon = (ci.dyanmicComm and GetUnitRulesParam(unitID, "primary_weapon_override")) or ci.primaryWeapon
+			_, reloaded, reloadFrame = GetUnitWeaponState(unitID, primaryWeapon)
+			if (reloaded == false) then
+				local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon, 'reloadTime')
+				if (not ci.dyanmicComm) or (reloadTime >= options.minReloadTime.value) then
+					ci.reloadTime = reloadTime
+					-- When weapon is disabled the reload time is constantly set to be almost complete.
+					-- It results in a bunch of units walking around with 99% reload bars.
+					if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
+						reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
+						if (reload >= 0) then
+							AddBar(messages.reload, reload, "reload", (fullText and floor(reload*100)..'%') or '')
+						end
+					end
+				end
+			end
+		end
+		
+		if ci.scriptReload and (ci.scriptReload >= options.minReloadTime.value) then
+			local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame")
+			if reloadFrame and reloadFrame > gameFrame then
+				local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
+				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
+				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
+				if (reload >= 0) then
+					AddBar(messages.reload, reload, "reload", (fullText and barText) or '')
+				end
+			end
+		end
+		
+		--// SHEATH
+		--local sheathState = GetUnitRulesParam(unitID, "sheathState")
+		--if sheathState and (sheathState < 1) then
+		--	AddBar("sheath", sheathState, "sheath", (fullText and floor(sheathState*100)..'%') or '')
 		--end
-		--
-		----// STOCKPILE
-		--if (ci.canStockpile) then
-		--	local stockpileBuild
-		--	numStockpiled, numStockpileQued, stockpileBuild = GetUnitStockpile(unitID)
-		--	if ci.gadgetStock then
-		--		stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
-		--	end
-		--	if numStockpiled and stockpileBuild and (numStockpileQued ~= 0) then
-		--		AddBar(messages.stockpile, stockpileBuild, "stock", (fullText and floor(stockpileBuild*100)..'%') or '')
-		--	end
-		--else
-		--	numStockpiled = false
-		--end
-		--
-		--	--// PARALYZE
-		--local paraTime = false
-		--local stunned = GetUnitIsStunned(unitID)
-		--if (emp > 0) and(emp < 1e8) then
-		--	local infotext = ""
-		--	stunned = stunned and paralyzeDamage >= empHP
-		--	if (stunned) then
-		--		paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
-		--		paraUnits[#paraUnits+1] = unitID
-		--		if (fullText) then
-		--			infotext = floor(paraTime) .. 's'
-		--		end
-		--		emp = 1
-		--	else
-		--		if (emp > 1) then
-		--			emp = 1
-		--		end
-		--		if (fullText) then
-		--			infotext = floor(emp*100)..'%'
-		--		end
-		--	end
-		--	local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
-		--	AddBar(messages.paralyze, emp, empcolor_index, infotext)
-		--end
-		--
-		-- --// DISARM
-		--local disarmFrame = GetUnitRulesParam(unitID, "disarmframe")
-		--if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
-		--	local disarmProp = (disarmFrame - gameFrame)/1200
-		--	if disarmProp < 1 then
-		--		if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-		--			AddBar(messages.disarm, disarmProp, "disarm", (fullText and floor(disarmProp*100)..'%') or '')
-		--		end
-		--	else
-		--		local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
-		--		if (not paraTime) or disarmTime > paraTime + 0.5 then
-		--			AddBar(messages.disarm, 1, ((blink and "disarm_b") or "disarm_p") or ("disarm"), floor(disarmTime) .. 's')
-		--			if not stunned then
-		--				disarmUnits[#disarmUnits+1] = unitID
-		--			end
-		--		end
-		--	end
-		--end
-		--
-		----// CAPTURE (set by capture gadget)
-		--if ((capture or -1) > 0) then
-		--	AddBar(messages.capture, capture, "capture", (fullText and floor(capture*100)..'%') or '')
-		--end
-		--
-		----// CAPTURE RECHARGE
-		--if ci.canCapture then
-		--	local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame")
-		--	if (captureReloadState and captureReloadState > 0) then
-		--		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-		--		AddBar(messages.capture_reload, capture, "reload", (fullText and floor(capture*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// WATER TANK
-		--if ci.maxWaterTank then
-		--	local waterTank = GetUnitRulesParam(unitID, "watertank")
-		--	if waterTank then
-		--		local prog = waterTank/ci.maxWaterTank
-		--		if prog < 1 then
-		--			AddBar(messages.water_tank, prog, "tank", (fullText and floor(prog*100)..'%') or '')
-		--		end
-		--	end
-		--end
-		--
-		----// Teleport progress
-		--local TeleportEnd = GetUnitRulesParam(unitID, "teleportend")
-		--local TeleportCost = GetUnitRulesParam(unitID, "teleportcost")
-		--if TeleportEnd and TeleportCost and TeleportEnd >= 0 then
-		--	local prog
-		--	if TeleportEnd > 1 then
-		--		-- End frame given
-		--		prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
-		--	else
-		--		-- Same parameters used to display a static progress
-		--		prog = 1 - TeleportEnd
-		--	end
-		--	if prog < 1 then
-		--		AddBar(messages.teleport, prog, "tele", (fullText and floor(prog*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// Planetwars teleport progress
-		--if ci.isPwStructure then
-		--	TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
-		--	if TeleportEnd then
-		--		local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
-		--		if prog < 1 then
-		--			AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
-		--		end
-		--	end
-		--end
-		--
-		----// SPECIAL WEAPON
-		--if ci.specialReload then
-		--	local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
-		--	if (specialReloadState and specialReloadState > gameFrame) then
-		--		local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-		--		AddBar(messages.ability, special, "reload2", (fullText and floor(special*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// REAMMO
-		--if ci.canReammo then
-		--	local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
-		--	if reammoProgress then
-		--		AddBar(messages.reammo, reammoProgress, "reammo", (fullText and floor(reammoProgress*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// RELOAD
-		--if (not ci.scriptReload) and (ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value)) then
-		--	local primaryWeapon = (ci.dyanmicComm and GetUnitRulesParam(unitID, "primary_weapon_override")) or ci.primaryWeapon
-		--	_, reloaded, reloadFrame = GetUnitWeaponState(unitID, primaryWeapon)
-		--	if (reloaded == false) then
-		--		local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon, 'reloadTime')
-		--		if (not ci.dyanmicComm) or (reloadTime >= options.minReloadTime.value) then
-		--			ci.reloadTime = reloadTime
-		--			-- When weapon is disabled the reload time is constantly set to be almost complete.
-		--			-- It results in a bunch of units walking around with 99% reload bars.
-		--			if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
-		--				reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
-		--				if (reload >= 0) then
-		--					AddBar(messages.reload, reload, "reload", (fullText and floor(reload*100)..'%') or '')
-		--				end
-		--			end
-		--		end
-		--	end
-		--end
-		--
-		--if ci.scriptReload and (ci.scriptReload >= options.minReloadTime.value) then
-		--	local reloadFrame = GetUnitRulesParam(unitID, "scriptReloadFrame")
-		--	if reloadFrame and reloadFrame > gameFrame then
-		--		local scriptLoaded = GetUnitRulesParam(unitID, "scriptLoaded") or ci.scriptBurst
-		--		local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
-		--		reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
-		--		if (reload >= 0) then
-		--			AddBar(messages.reload, reload, "reload", (fullText and barText) or '')
-		--		end
-		--	end
-		--end
-		--
-		----// SHEATH
-		----local sheathState = GetUnitRulesParam(unitID, "sheathState")
-		----if sheathState and (sheathState < 1) then
-		----	AddBar("sheath", sheathState, "sheath", (fullText and floor(sheathState*100)..'%') or '')
-		----end
-		--
-		----// SLOW
-		--local slowState = GetUnitRulesParam(unitID, "slowState")
-		--if (slowState and (slowState > 0)) then
-		--	if slowState > 0.5 then
-		--		AddBar(messages.slow, 1, "slow", (fullText and floor((slowState - 0.5)*25)..'s') or '')
-		--	else
-		--		AddBar(messages.slow, slowState*2, "slow", (fullText and floor(slowState*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// GOO
-		--if ci.canGoo then
-		--	local gooState = GetUnitRulesParam(unitID, "gooState")
-		--	if (gooState and (gooState > 0)) then
-		--		AddBar(messages.goo, gooState, "goo", (fullText and floor(gooState*100)..'%') or '')
-		--	end
-		--end
-		--
-		----// JUMPJET
-		--if ci.canJump then
-		--	local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
-		--	if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
-		--		AddBar(messages.jump, jumpReload, "jump", (fullText and floor(jumpReload*100)..'%') or '')
-		--	end
-		--end
-		--
-		--if debugMode then
-		--local x, y, z = Spring.GetUnitPosition(unitID)
-		--	Spring.MarkerAddPoint(x, y, z, "N" .. barsN)
-		--end
+		
+		--// SLOW
+		local slowState = GetUnitRulesParam(unitID, "slowState")
+		if (slowState and (slowState > 0)) then
+			if slowState > 0.5 then
+				AddBar(messages.slow, 1, "slow", (fullText and floor((slowState - 0.5)*25)..'s') or '')
+			else
+				AddBar(messages.slow, slowState*2, "slow", (fullText and floor(slowState*100)..'%') or '')
+			end
+		end
+		
+		--// GOO
+		if ci.canGoo then
+			local gooState = GetUnitRulesParam(unitID, "gooState")
+			if (gooState and (gooState > 0)) then
+				AddBar(messages.goo, gooState, "goo", (fullText and floor(gooState*100)..'%') or '')
+			end
+		end
+		
+		--// JUMPJET
+		if ci.canJump then
+			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
+			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
+				AddBar(messages.jump, jumpReload, "jump", (fullText and floor(jumpReload*100)..'%') or '')
+			end
+		end
+		
+		if debugMode then
+		local x, y, z = Spring.GetUnitPosition(unitID)
+			Spring.MarkerAddPoint(x, y, z, "N" .. barsN)
+		end
 
-		if (barsN > 0) or (numStockpiled) then
+		if ((barsN > 0) or (numStockpiled)) then
 			glPushMatrix()
 			glTranslate(ux, uy+ci.height, uz )
 			gl.Scale(barScale, barScale, barScale)
@@ -962,7 +964,7 @@ do
 		ci = customInfo[featureDefID]
 
 		health, maxHealth, resurrect = GetFeatureHealth(featureID)
-		_, _, _, _, reclaimLeft        = GetFeatureResources(featureID) -- NB: the two resources' progresses are actually separate (goo can drain just M while keeping E)
+		_, _, _, _, reclaimLeft      = GetFeatureResources(featureID) -- NB: the two resources' progresses are actually separate (goo can drain just M while keeping E)
 		if (not resurrect) then
 			resurrect = 0
 		end
@@ -1131,7 +1133,7 @@ do
 
 	function widget:DrawWorld()
 		if not Spring.IsGUIHidden() then
-			if (#visibleUnits+#visibleFeatures == 0) then
+			if (#visibleUnits + #visibleFeatures == 0) then
 				return
 			end
 
