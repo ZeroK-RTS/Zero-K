@@ -114,7 +114,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			end
 		end
 		--Spring.GiveOrderToUnitArray(units, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
-	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value and not cmdOptions.shift then
+	elseif TargetCancelingCommand[cmdID] and options.removeTarget.value and not (cmdOptions and cmdOptions.shift) then
 		local units = Spring.GetSelectedUnits()
 		Spring.GiveOrderToUnitArray(units, CMD_UNIT_CANCEL_TARGET, cmdParams, 0)
 	end
@@ -130,7 +130,7 @@ function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
 				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 			end
 		end
-	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not cmdOptions.shift) and cmdParams and #cmdParams == 1 then
+	elseif TargetIssuingCommand[cmdID] and options.keepTarget.value and (not (cmdOptions and cmdOptions.shift)) and cmdParams and #cmdParams == 1 then
 		if isValidUnit(unitID) then
 			orderParamTable[1] = cmdParams[1]
 			Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
