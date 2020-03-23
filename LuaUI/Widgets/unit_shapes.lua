@@ -245,7 +245,7 @@ local function GetVisibleUnits()
 
 		if IsSelectionBoxActive() then --It's not worth rebuilding visible selected lists for selection box, but selection box needs to be updated per-frame
 			local units = spGetVisibleUnits(-1, 30, true)
-			for i=1, #units do
+			for i = 1, #units do
 				local unitID = units[i]
 				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
 					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]

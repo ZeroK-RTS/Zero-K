@@ -24,6 +24,8 @@ local drawAlpha = 0.17
 local disabledColor = { 0.9,0.5,0.3, drawAlpha}
 local cloakedColor = { 0.4, 0.4, 0.9, drawAlpha} -- drawAlpha on purpose!
 
+local decloakDist = {}
+
 options_path = 'Settings/Interface/Defense and Cloak Ranges'
 options_order = {
 	"label",
@@ -65,11 +67,14 @@ local function DrawMergedDecloakRanges(drawActive, drawDisabled)
 	for i = 1, #selUnits do
 		local unitID = selUnits[i]
 		local unitDefID = spGetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
+		if not decloakDist[unitDefID] then
+			local ud = UnitDefs[unitDefID]
+			decloakDist[unitDefID] = ud.decloakDistance
+		end
 		local cloaked = Spring.GetUnitIsCloaked(unitID)
 		local wantCloak = (not cloaked) and ((spGetUnitRulesParam(unitID, "wantcloak") == 1) or (spGetUnitRulesParam(unitID, "areacloaked") == 1))
 		if (cloaked and drawActive) or (wantCloak and drawDisabled) then
-			local radius = ud.decloakDistance
+			local radius = decloakDist[unitDefID]
 			
 			local commCloaked = spGetUnitRulesParam(unitID, "comm_decloak_distance")
 			if commCloaked and (commCloaked > 0) then

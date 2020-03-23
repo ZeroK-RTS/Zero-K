@@ -109,10 +109,23 @@ local function OptionsChanged()
 	drawBarPercentages = options.drawBarPercentages.value
 	barScale = options.barScale.value
 	debugMode = options.debugMode.value
+	
+	healthbarDistSq    = options.unitMaxHeight.value*options.unitMaxHeight.value
+	healthbarPercentSq = options.unitPercentHeight.value*options.unitPercentHeight.value
+	healthbarTitleSq   = options.unitTitleHeight.value*options.unitTitleHeight.value
+	
+	featureDistSq      = options.featureMaxHeight.value*options.featureMaxHeight.value
+	featurePercentSq   = options.featurePercentHeight.value*options.featurePercentHeight.value
+	featureTitleSq     = options.featureTitleHeight.value*options.featureTitleHeight.value
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'barScale', 'debugMode', 'minReloadTime', 'drawMaxHeight', 'simpleHealthPercent'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages',
+	'barScale', 'debugMode', 'minReloadTime',
+	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
+	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
+	'simpleHealthPercent'
+}
 options = {
 	showhealthbars = {
 		name = 'Show Healthbars',
@@ -164,22 +177,56 @@ options = {
 		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
 	},
-	drawMaxHeight = { -- Code for this is all from icon height widget
-		name = 'Health Bar Fade Height',
-		desc = 'If the camera is above this height, health bars will not be drawn. Setting this above 3000 may affect performance.',
+	unitMaxHeight = {
+		name = 'Unit Bar Fade Height',
+		desc = 'If the camera is above this height, health bars will not be drawn.',
 		type = 'number',
-		min = 0, max = 9000, step = 200,
+		min = 0, max = 8000, step = 50,
 		value = 3000,
+		OnChange = OptionsChanged,
 	},
-	simpleHealthPercent = { -- Code for this is all from icon height widget
-		name = 'Simple Health Bar Distance',
-		desc = 'Percentage of Health Bar Fade Height after which simple health bars are shown. Setting this above 50 may affect performance.',
+	unitPercentHeight = {
+		name = 'Unit Bar Percentage Height',
+		desc = 'If the camera is above this height, health bar percentages will not be drawn.',
 		type = 'number',
-		min = 1, max = 100, step = 1,
-		value = 25,
+		min = 0, max = 7000, step = 50,
+		value = 700,
+		OnChange = OptionsChanged,
+	},
+	unitTitleHeight = {
+		name = 'Unit Bar Title Heightt',
+		desc = 'If the camera is above this height, health bar titles will not be drawn.',
+		type = 'number',
+		min = 0, max = 7000, step = 50,
+		value = 500,
+		OnChange = OptionsChanged,
+	},
+	featureMaxHeight = {
+		name = 'Wreckage Bar Fade Height',
+		desc = 'If the camera is above this height, health bars will not be drawn.',
+		type = 'number',
+		min = 0, max = 7000, step = 50,
+		value = 2200,
+		OnChange = OptionsChanged,
+	},
+	featurePercentHeight = {
+		name = 'Wreckage Bar Percentage Height',
+		desc = 'If the camera is above this height, health bar percentages will not be drawn.',
+		type = 'number',
+		min = 0, max = 7000, step = 50,
+		value = 500,
+		OnChange = OptionsChanged,
+	},
+	featureTitleHeight = {
+		name = 'Wreckage Bar Title Heightt',
+		desc = 'If the camera is above this height, health bar titles will not be drawn.',
+		type = 'number',
+		min = 0, max = 7000, step = 50,
+		value = 500,
+		OnChange = OptionsChanged,
 	},
 }
-
+OptionsChanged()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -206,14 +253,13 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local function IsCameraBelowMaxHeight()
 	local cs = Spring.GetCameraState()
 	if cs.name == "ta" then
-		return cs.height < options.drawMaxHeight.value
+		return cs.height < options.unitMaxHeight.value
 	elseif cs.name == "ov" then
 		return false
 	else
-		return (cs.py - spGetGroundHeight(cs.px, cs.pz)) < options.drawMaxHeight.value
+		return (cs.py - spGetGroundHeight(cs.px, cs.pz)) < options.unitMaxHeight.value
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -261,17 +307,17 @@ local barColors = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local blink = false;
-local gameFrame = 0;
+local blink = false
+local gameFrame = 0
 
-local empDecline = 1/40;
+local empDecline = 1/40
 
-local cx, cy, cz = 0, 0, 0;  --// camera pos
+local cx, cy, cz = 0, 0, 0 --// camera pos
 
-local paraUnits   = {};
-local disarmUnits = {};
-local onFireUnits = {};
-local UnitMorphs  = {};
+local paraUnits   = {}
+local disarmUnits = {}
+local onFireUnits = {}
+local UnitMorphs  = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -284,84 +330,17 @@ local floor           = math.floor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-do
-	local deactivated = false
-	function showhealthbars(cmd, line, words)
-		if ((words[1])and(words[1] ~= "0"))or(deactivated) then
-			widgetHandler:UpdateCallIn('DrawWorld')
-			deactivated = false
-		else
-			widgetHandler:RemoveCallIn('DrawWorld')
-			deactivated = true
-		end
-	end
-	options.showhealthbars.OnChange = function(self) showhealthbars(_, _, {self.value and '1' or '0'}) end
-end --//end do
-
-function widget:Initialize()
-
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
-
-	--// catch f9
-	Spring.SendCommands({"showhealthbars 0"})
-	Spring.SendCommands({"showrezbars 0"})
-	widgetHandler:AddAction("showhealthbars", showhealthbars)
-	Spring.SendCommands({"unbind f9 showhealthbars"})
-	Spring.SendCommands({"bind f9 luaui showhealthbars"})
-
-	--// find real primary weapon and its reloadtime
-	for _, ud in pairs(UnitDefs) do
-		ud.reloadTime    = 0;
-		ud.primaryWeapon = 1;
-		ud.shieldPower   = 0;
-
-		for i = 1, #ud.weapons do
-			local WeaponDefID = ud.weapons[i].weaponDef;
-			local WeaponDef   = WeaponDefs[ WeaponDefID ];
-			if (WeaponDef.reload > ud.reloadTime) then
-				ud.reloadTime    = WeaponDef.reload;
-				ud.primaryWeapon = i;
-			end
-		end
-		local shieldDefID = ud.shieldWeaponDef
-		ud.shieldPower = ((shieldDefID)and(WeaponDefs[shieldDefID].shieldPower))or(-1)
-	end
-
-	--// link morph callins
-	widgetHandler:RegisterGlobal('MorphUpdate', MorphUpdate)
-	widgetHandler:RegisterGlobal('MorphFinished', MorphFinished)
-	widgetHandler:RegisterGlobal('MorphStart', MorphStart)
-	widgetHandler:RegisterGlobal('MorphStop', MorphStop)
-
-	--// deactivate cheesy progress text
-	widgetHandler:RegisterGlobal('MorphDrawProgress', function() return true end)
-
-	--// wow, using a buffered list can give 1-2 frames in extreme(!) situations :p
-	for hp = 0, 100 do
-		bfcolormap[hp] = {GetColor(hpcolormap, hp*0.01)}
+local deactivated = false
+local function showhealthbars(cmd, line, words)
+	if ((words[1])and(words[1] ~= "0"))or(deactivated) then
+		widgetHandler:UpdateCallIn('DrawWorld')
+		deactivated = false
+	else
+		widgetHandler:RemoveCallIn('DrawWorld')
+		deactivated = true
 	end
 end
-
-function widget:Shutdown()
-	WG.ShutdownTranslation(GetInfo().name)
-
-	--// catch f9
-	widgetHandler:RemoveAction("showhealthbars", showhealthbars)
-	Spring.SendCommands({"unbind f9 luaui"})
-	Spring.SendCommands({"bind f9 showhealthbars"})
-	Spring.SendCommands({"showhealthbars 1"})
-	Spring.SendCommands({"showrezbars 1"})
-
-	widgetHandler:DeregisterGlobal('MorphUpdate', MorphUpdate)
-	widgetHandler:DeregisterGlobal('MorphFinished', MorphFinished)
-	widgetHandler:DeregisterGlobal('MorphStart', MorphStart)
-	widgetHandler:DeregisterGlobal('MorphStop', MorphStop)
-
-	widgetHandler:DeregisterGlobal('MorphDrawProgress')
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+options.showhealthbars.OnChange = function(self) showhealthbars(_, _, {self.value and '1' or '0'}) end
 
 function GetColor(colormap, slider)
 	local coln = #colormap
@@ -386,11 +365,23 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local DrawUnitBar
-local DrawFeatureBar
-local DrawStockpile
+local function GetBarDrawer()
+	--//speedup
+	local glColor      = gl.Color
+	local glText       = gl.Text
 
-do
+	local barsN = 0
+	local maxBars = 20
+	local bars    = {}
+	local barHeightL = barHeight + 2
+	local barStart   = -(barWidth + 1)
+	local fBarHeightL = featureBarHeight + 2
+	local fBarStart   = -(featureBarWidth + 1)
+
+	for i = 1, maxBars do
+		bars[i] = {}
+	end
+
 	--//speedup
 	local GL_QUADS        = GL.QUADS
 	local glVertex        = gl.Vertex
@@ -411,9 +402,9 @@ do
 	end
 
 	local brightClr = {}
-	function DrawUnitBar(offsetY, percent, color)
+	local function DrawUnitBar(offsetY, percent, color)
 		brightClr[1] = color[1]*1.5; brightClr[2] = color[2]*1.5; brightClr[3] = color[3]*1.5; brightClr[4] = color[4]
-		local progress_pos = -barWidth+barWidth*2*percent-1
+		local progress_pos = -barWidth + barWidth*2*percent
 		local bar_Height  = barHeight+offsetY
 		if percent < 1 then
 			glBeginEnd(GL_QUADS, DrawGradient, progress_pos, bar_Height, barWidth, offsetY, bkTop, bkBottom)
@@ -421,14 +412,16 @@ do
 		glBeginEnd(GL_QUADS, DrawGradient, -barWidth, bar_Height, progress_pos, offsetY, brightClr, color)
 	end
 
-	function DrawFeatureBar(offsetY, percent, color)
+	local function DrawFeatureBar(offsetY, percent, color)
 		brightClr[1] = color[1]*1.5; brightClr[2] = color[2]*1.5; brightClr[3] = color[3]*1.5; brightClr[4] = color[4]
 		local progress_pos = -featureBarWidth+featureBarWidth*2*percent
 		glBeginEnd(GL_QUADS, DrawGradient, progress_pos, featureBarHeight+offsetY, featureBarWidth, offsetY, fbkTop, fbkBottom)
 		glBeginEnd(GL_QUADS, DrawGradient, -featureBarWidth, featureBarHeight+offsetY, progress_pos, offsetY, brightClr, color)
 	end
 
-	function DrawStockpile(numStockpiled, numStockpileQued, freeStockpile)
+	local externalFunc = {}
+
+	function externalFunc.DrawStockpile(numStockpiled, numStockpileQued, freeStockpile)
 		--// DRAW STOCKPILED MISSLES
 		glColor(1, 1, 1, 1)
 		glTexture("LuaUI/Images/nuke.png")
@@ -445,55 +438,33 @@ do
 		end
 	end
 
-end --//end do
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local AddBar
-local DrawBars
-local barsN = 0
-
-do
-	--//speedup
-	local glColor      = gl.Color
-	local glText       = gl.Text
-
-	local maxBars = 20
-	local bars    = {}
-	local barHeightL = barHeight + 2
-	local barStart   = -(barWidth + 1)
-	local fBarHeightL = featureBarHeight + 2
-	local fBarStart   = -(featureBarWidth + 1)
-
-	for i = 1, maxBars do
-		bars[i] = {}
-	end
-
-	function AddBar(title, progress, color_index, text, color)
+	function externalFunc.AddBar(title, progress, color_index, text, color)
 		barsN = barsN + 1
 		local barInfo    = bars[barsN]
-		barInfo.title    = title
-		barInfo.progress = progress
-		barInfo.color    = color or barColors[color_index]
-		barInfo.text     = text
+		if barInfo then
+			barInfo.title    = title
+			barInfo.progress = progress
+			barInfo.color    = color or barColors[color_index]
+			barInfo.text     = text
+		end
 	end
 
-	function DrawBars(fullText)
+	function externalFunc.HasBars()
+		return (barsN ~= 0)
+	end
+
+	function externalFunc.DrawBars()
 		local yoffset = 0
 		for i = 1, barsN do
 			local barInfo = bars[i]
 			DrawUnitBar(yoffset, barInfo.progress, barInfo.color)
-			if (fullText) then
-				if (drawBarPercentages) then
-					glColor(1, 1, 1, barAlpha)
-					glText(barInfo.text, barStart, yoffset, 4, "r")
-				end
-				if (drawBarTitles) then
-					glColor(1, 1, 1, titlesAlpha)
-					glText(barInfo.title, 0, yoffset, 2.5, "cd")
-				end
+			if (drawBarPercentages and barInfo.text) then
+				glColor(1, 1, 1, barAlpha)
+				glText(barInfo.text, barStart, yoffset, 4, "r")
+			end
+			if (drawBarTitles and barInfo.title) then
+				glColor(1, 1, 1, titlesAlpha)
+				glText(barInfo.title, 0, yoffset, 2.5, "cd")
 			end
 			yoffset = yoffset - barHeightL
 		end
@@ -501,29 +472,29 @@ do
 		barsN = 0 --//reset!
 	end
 
-	function DrawBarsFeature(fullText)
+	function externalFunc.DrawBarsFeature()
 		local yoffset = 0
 		for i = 1, barsN do
 			local barInfo = bars[i]
 			DrawFeatureBar(yoffset, barInfo.progress, barInfo.color)
-			if (fullText) then
-				if (drawBarPercentages) then
-					glColor(1, 1, 1, featureBarAlpha)
-					glText(barInfo.text, fBarStart, yoffset, 4, "r")
-				end
-				if (drawBarTitles) then
-					glColor(1, 1, 1, featureTitlesAlpha)
-					glText(barInfo.title, 0, yoffset, 2.5, "cd")
-				end
+			if (drawBarPercentages and barInfo.text) then
+				glColor(1, 1, 1, featureBarAlpha)
+				glText(barInfo.text, fBarStart, yoffset, 4, "r")
+			end
+			if (drawBarTitles and barInfo.title) then
+				glColor(1, 1, 1, featureTitlesAlpha)
+				glText(barInfo.title, 0, yoffset, 2.5, "cd")
 			end
 			yoffset = yoffset - fBarHeightL
 		end
 
 		barsN = 0 --//reset!
 	end
+	
+	return externalFunc
+end --//end GetBarDrawer
 
-end --//end do
-
+local barDrawer = GetBarDrawer()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -545,7 +516,7 @@ do
 	local GetUnitStockpile     = Spring.GetUnitStockpile
 	local GetUnitRulesParam    = Spring.GetUnitRulesParam
 
-	local fullText
+	local addPercent
 	local ux, uy, uz
 	local dx, dy, dz, dist
 	local health, maxHealth, paralyzeDamage, capture, build
@@ -622,26 +593,18 @@ do
 		end
 		ci = customInfo[unitDefID]
 
-		fullText = true
 		local ux, uy, uz = GetUnitViewPosition(unitID)
 		if not ux then
 			return
 		end
 		local dx, dy, dz = ux-cx, uy-cy, uz-cz
 		local dist = dx*dx + dy*dy + dz*dz
-		local maxDist = math.pow(options.drawMaxHeight.value, 2)
-		local simpleDist = maxDist * (options.simpleHealthPercent.value/100)
 
-		if (dist > simpleDist) then
-			if (dist > maxDist) then
-				if debugMode then
-					local x, y, z = Spring.GetUnitPosition(unitID)
-					Spring.MarkerAddPoint(x, y, z, "High Distance")
-				end
-				return
-			end
-			fullText = false
+		if (dist > healthbarDistSq) then
+			return
 		end
+		addPercent = (dist < healthbarPercentSq)
+		addTitle = (dist < healthbarTitleSq)
 
 		--// GET UNIT INFORMATION
 		local health, maxHealth, paralyzeDamage, capture, build = GetUnitHealth(unitID)
@@ -681,38 +644,38 @@ do
 					local shieldOn, shieldPower = GetUnitShieldState(unitID, GetUnitRulesParam(unitID, "comm_shield_num"))
 					if (shieldOn)and(build == 1)and(shieldPower < commShield) then
 						shieldPower = shieldPower / commShield
-						AddBar(messages.shield, shieldPower, "shield", (fullText and floor(shieldPower*100)..'%') or '')
+						barDrawer.AddBar(addTitle and messages.shield, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
 					end
 				end
 			else
 				local shieldOn, shieldPower = GetUnitShieldState(unitID)
 				if (shieldOn)and(build == 1)and(shieldPower < ci.maxShield) then
 					shieldPower = shieldPower / ci.maxShield
-					AddBar(messages.shield, shieldPower, "shield", (fullText and floor(shieldPower*100)..'%') or '')
+					barDrawer.AddBar(addTitle and messages.shield, shieldPower, "shield", (addPercent and floor(shieldPower*100) .. '%'))
 				end
 			end
 		end
 
 		--// HEALTH
-		if (health) and ((drawFullHealthBars)or(hp < 1)) and ((build == 1)or(hp < 0.99 and (build > hp+0.01 or hp > build+0.01))or(drawFullHealthBars)) then
+		if (health) and ((drawFullHealthBars)or(hp < 1)) and ((build == 1)or(hp < 0.99 and (build > hp+0.01 or hp > build+0.01)) or (drawFullHealthBars)) then
 			hp100 = hp*100; hp100 = hp100 - hp100%1; --//same as floor(hp*100), but 10% faster
 			if (hp100 < 0) then hp100 = 0 elseif (hp100 > 100) then
 				hp100 = 100
 			end
 			if (drawFullHealthBars)or(hp100 < 100) then
-				AddBar(messages.health_bar, hp, nil, (fullText and hp100..'%') or '', bfcolormap[hp100])
+				barDrawer.AddBar(addTitle and messages.health_bar, hp, nil, (addPercent and hp100..'%') or '', bfcolormap[hp100])
 			end
 		end
 
 		--// BUILD
 		if (build < 1) then
-			AddBar(messages.building, build, "build", (fullText and floor(build*100)..'%') or '')
+			barDrawer.AddBar(addTitle and messages.building, build, "build", (addPercent and floor(build*100) .. '%'))
 		end
 
 		--// MORPHING
 		if (morph) then
 			local build = morph.progress
-			AddBar(messages.morph, build, "build", (fullText and floor(build*100)..'%') or '')
+			barDrawer.AddBar(addTitle and messages.morph, build, "build", (addPercent and floor(build*100) .. '%'))
 		end
 		
 		--// STOCKPILE
@@ -723,7 +686,7 @@ do
 				stockpileBuild = GetUnitRulesParam(unitID, "gadgetStockpile")
 			end
 			if numStockpiled and stockpileBuild and (numStockpileQued ~= 0) then
-				AddBar(messages.stockpile, stockpileBuild, "stock", (fullText and floor(stockpileBuild*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.stockpile, stockpileBuild, "stock", (addPercent and floor(stockpileBuild*100) .. '%'))
 			end
 		else
 			numStockpiled = false
@@ -738,7 +701,7 @@ do
 			if (stunned) then
 				paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
 				paraUnits[#paraUnits+1] = unitID
-				if (fullText) then
+				if (addPercent) then
 					infotext = floor(paraTime) .. 's'
 				end
 				emp = 1
@@ -746,12 +709,12 @@ do
 				if (emp > 1) then
 					emp = 1
 				end
-				if (fullText) then
+				if (addPercent) then
 					infotext = floor(emp*100)..'%'
 				end
 			end
 			local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
-			AddBar(messages.paralyze, emp, empcolor_index, infotext)
+			barDrawer.AddBar(addTitle and messages.paralyze, emp, empcolor_index, infotext)
 		end
 		
 		 --// DISARM
@@ -760,12 +723,12 @@ do
 			local disarmProp = (disarmFrame - gameFrame)/1200
 			if disarmProp < 1 then
 				if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-					AddBar(messages.disarm, disarmProp, "disarm", (fullText and floor(disarmProp*100)..'%') or '')
+					barDrawer.AddBar(addTitle and messages.disarm, disarmProp, "disarm", (addPercent and floor(disarmProp*100) .. '%'))
 				end
 			else
 				local disarmTime = (disarmFrame - gameFrame - 1200)/gameSpeed
 				if (not paraTime) or disarmTime > paraTime + 0.5 then
-					AddBar(messages.disarm, 1, ((blink and "disarm_b") or "disarm_p") or ("disarm"), floor(disarmTime) .. 's')
+					barDrawer.AddBar(addTitle and messages.disarm, 1, ((blink and "disarm_b") or "disarm_p") or ("disarm"), floor(disarmTime) .. 's')
 					if not stunned then
 						disarmUnits[#disarmUnits+1] = unitID
 					end
@@ -775,7 +738,7 @@ do
 		
 		--// CAPTURE (set by capture gadget)
 		if ((capture or -1) > 0) then
-			AddBar(messages.capture, capture, "capture", (fullText and floor(capture*100)..'%') or '')
+			barDrawer.AddBar(addTitle and messages.capture, capture, "capture", (addPercent and floor(capture*100) .. '%'))
 		end
 		
 		--// CAPTURE RECHARGE
@@ -783,7 +746,7 @@ do
 			local captureReloadState = GetUnitRulesParam(unitID, "captureRechargeFrame")
 			if (captureReloadState and captureReloadState > 0) then
 				local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-				AddBar(messages.capture_reload, capture, "reload", (fullText and floor(capture*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.capture_reload, capture, "reload", (addPercent and floor(capture*100) .. '%'))
 			end
 		end
 		
@@ -793,7 +756,7 @@ do
 			if waterTank then
 				local prog = waterTank/ci.maxWaterTank
 				if prog < 1 then
-					AddBar(messages.water_tank, prog, "tank", (fullText and floor(prog*100)..'%') or '')
+					barDrawer.AddBar(addTitle and messages.water_tank, prog, "tank", (addPercent and floor(prog*100) .. '%'))
 				end
 			end
 		end
@@ -811,7 +774,7 @@ do
 				prog = 1 - TeleportEnd
 			end
 			if prog < 1 then
-				AddBar(messages.teleport, prog, "tele", (fullText and floor(prog*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.teleport, prog, "tele", (addPercent and floor(prog*100) .. '%'))
 			end
 		end
 		
@@ -821,7 +784,7 @@ do
 			if TeleportEnd then
 				local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
 				if prog < 1 then
-					AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
+					barDrawer.AddBar(addTitle and messages.teleport, prog, "tele_pw", (addPercent and floor(prog*100) .. '%'))
 				end
 			end
 		end
@@ -831,7 +794,7 @@ do
 			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
 			if (specialReloadState and specialReloadState > gameFrame) then
 				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-				AddBar(messages.ability, special, "reload2", (fullText and floor(special*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
 			end
 		end
 		
@@ -839,7 +802,7 @@ do
 		if ci.canReammo then
 			local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
 			if reammoProgress then
-				AddBar(messages.reammo, reammoProgress, "reammo", (fullText and floor(reammoProgress*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.reammo, reammoProgress, "reammo", (addPercent and floor(reammoProgress*100) .. '%'))
 			end
 		end
 		
@@ -856,7 +819,7 @@ do
 					if (reloadFrame > gameFrame + 6) or (GetUnitRulesParam(unitID, "reloadPaused") ~= 1) then -- UPDATE_PERIOD in unit_attributes.lua.
 						reload = 1 - ((reloadFrame-gameFrame)/gameSpeed) / ci.reloadTime;
 						if (reload >= 0) then
-							AddBar(messages.reload, reload, "reload", (fullText and floor(reload*100)..'%') or '')
+							barDrawer.AddBar(addTitle and messages.reload, reload, "reload", (addPercent and floor(reload*100) .. '%'))
 						end
 					end
 				end
@@ -870,7 +833,7 @@ do
 				local barText = string.format("%i/%i", scriptLoaded, ci.scriptBurst) -- .. ' | ' .. floor(reload*100) .. '%'
 				reload = Spring.GetUnitRulesParam(unitID, "scriptReloadPercentage") or (1 - ((reloadFrame - gameFrame)/gameSpeed) / ci.scriptReload)
 				if (reload >= 0) then
-					AddBar(messages.reload, reload, "reload", (fullText and barText) or '')
+					barDrawer.AddBar(addTitle and messages.reload, reload, "reload", (addPercent and barText))
 				end
 			end
 		end
@@ -878,16 +841,16 @@ do
 		--// SHEATH
 		--local sheathState = GetUnitRulesParam(unitID, "sheathState")
 		--if sheathState and (sheathState < 1) then
-		--	AddBar("sheath", sheathState, "sheath", (fullText and floor(sheathState*100)..'%') or '')
+		--	barDrawer.AddBar("sheath", sheathState, "sheath", (addPercent and floor(sheathState*100) .. '%'))
 		--end
 		
 		--// SLOW
 		local slowState = GetUnitRulesParam(unitID, "slowState")
 		if (slowState and (slowState > 0)) then
 			if slowState > 0.5 then
-				AddBar(messages.slow, 1, "slow", (fullText and floor((slowState - 0.5)*25)..'s') or '')
+				barDrawer.AddBar(addTitle and messages.slow, 1, "slow", (addPercent and floor((slowState - 0.5)*25) .. 's'))
 			else
-				AddBar(messages.slow, slowState*2, "slow", (fullText and floor(slowState*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.slow, slowState*2, "slow", (addPercent and floor(slowState*100) .. '%'))
 			end
 		end
 		
@@ -895,7 +858,7 @@ do
 		if ci.canGoo then
 			local gooState = GetUnitRulesParam(unitID, "gooState")
 			if (gooState and (gooState > 0)) then
-				AddBar(messages.goo, gooState, "goo", (fullText and floor(gooState*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.goo, gooState, "goo", (addPercent and floor(gooState*100) .. '%'))
 			end
 		end
 		
@@ -903,16 +866,16 @@ do
 		if ci.canJump then
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
-				AddBar(messages.jump, jumpReload, "jump", (fullText and floor(jumpReload*100)..'%') or '')
+				barDrawer.AddBar(addTitle and messages.jump, jumpReload, "jump", (addPercent and floor(jumpReload*100) .. '%'))
 			end
 		end
 		
 		if debugMode then
-		local x, y, z = Spring.GetUnitPosition(unitID)
-			Spring.MarkerAddPoint(x, y, z, "N" .. barsN)
+			local x, y, z = Spring.GetUnitPosition(unitID)
+			--Spring.MarkerAddPoint(x, y, z, "N" .. barsN)
 		end
 
-		if ((barsN > 0) or (numStockpiled)) then
+		if ((barDrawer.HasBars()) or (numStockpiled)) then
 			glPushMatrix()
 			glTranslate(ux, uy+ci.height, uz )
 			gl.Scale(barScale, barScale, barScale)
@@ -920,11 +883,11 @@ do
 
 			--// STOCKPILE ICON
 			if (numStockpiled) then
-				DrawStockpile(numStockpiled, numStockpileQued, ci.freeStockpile)
+				barDrawer.DrawStockpile(numStockpiled, numStockpileQued, ci.freeStockpile)
 			end
 
 			--// DRAW BARS
-			DrawBars(fullText)
+			barDrawer.DrawBars()
 
 			glPopMatrix()
 		end
@@ -953,7 +916,7 @@ do
 	local customInfo = {}
 	local ci
 
-	function DrawFeatureInfos(featureID, featureDefID, fullText, fx, fy, fz)
+	function DrawFeatureInfos(featureID, featureDefID, addPercent, addTitle, fx, fy, fz)
 		if (not customInfo[featureDefID]) then
 			local featureDef = FeatureDefs[featureDefID or -1] or {height = 0, name = ''}
 			customInfo[featureDefID] = {
@@ -985,20 +948,20 @@ do
 		--// HEALTH
 		if (hp < featureHpThreshold)and(drawFeatureHealth) then
 			local hpcolor = {GetColor(fhpcolormap, hp)}
-			AddBar(messages.health_bar, hp, nil, (fullText and floor(hp*100)..'%') or '', hpcolor)
+			barDrawer.AddBar(addTitle and messages.health_bar, hp, nil, (addPercent and floor(hp*100) .. '%'), hpcolor)
 		end
 
 		--// RESURRECT
 		if (resurrect > 0) then
-			AddBar(messages.resurrect, resurrect, "resurrect", (fullText and floor(resurrect*100)..'%') or '')
+			barDrawer.AddBar(addTitle and messages.resurrect, resurrect, "resurrect", (addPercent and floor(resurrect*100) .. '%'))
 		end
 
 		--// RECLAIMING
 		if (reclaimLeft > 0 and reclaimLeft < 1) then
-			AddBar(messages.reclaim, reclaimLeft, "reclaim", (fullText and floor(reclaimLeft*100)..'%') or '')
+			barDrawer.AddBar(addTitle and messages.reclaim, reclaimLeft, "reclaim", (addPercent and floor(reclaimLeft*100) .. '%'))
 		end
 
-		if (barsN > 0) then
+		if barDrawer.HasBars() then
 			glPushMatrix()
 			glTranslate(fx, fy+ci.height, fz)
 			local scale = options.barScale.value or 1
@@ -1006,7 +969,7 @@ do
 			glBillboard()
 
 			--// DRAW BARS
-			DrawBarsFeature(fullText)
+			barDrawer.DrawBarsFeature()
 
 			glPopMatrix()
 		end
@@ -1121,6 +1084,70 @@ end --//end do
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function widget:Initialize()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+
+	--// catch f9
+	Spring.SendCommands({"showhealthbars 0"})
+	Spring.SendCommands({"showrezbars 0"})
+	widgetHandler:AddAction("showhealthbars", showhealthbars)
+	Spring.SendCommands({"unbind f9 showhealthbars"})
+	Spring.SendCommands({"bind f9 luaui showhealthbars"})
+
+	--// find real primary weapon and its reloadtime
+	for _, ud in pairs(UnitDefs) do
+		ud.reloadTime    = 0;
+		ud.primaryWeapon = 1;
+		ud.shieldPower   = 0;
+
+		for i = 1, #ud.weapons do
+			local WeaponDefID = ud.weapons[i].weaponDef;
+			local WeaponDef   = WeaponDefs[ WeaponDefID ];
+			if (WeaponDef.reload > ud.reloadTime) then
+				ud.reloadTime    = WeaponDef.reload;
+				ud.primaryWeapon = i;
+			end
+		end
+		local shieldDefID = ud.shieldWeaponDef
+		ud.shieldPower = ((shieldDefID)and(WeaponDefs[shieldDefID].shieldPower))or(-1)
+	end
+
+	--// link morph callins
+	widgetHandler:RegisterGlobal('MorphUpdate', MorphUpdate)
+	widgetHandler:RegisterGlobal('MorphFinished', MorphFinished)
+	widgetHandler:RegisterGlobal('MorphStart', MorphStart)
+	widgetHandler:RegisterGlobal('MorphStop', MorphStop)
+
+	--// deactivate cheesy progress text
+	widgetHandler:RegisterGlobal('MorphDrawProgress', function() return true end)
+
+	--// wow, using a buffered list can give 1-2 frames in extreme(!) situations :p
+	for hp = 0, 100 do
+		bfcolormap[hp] = {GetColor(hpcolormap, hp*0.01)}
+	end
+end
+
+function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+
+	--// catch f9
+	widgetHandler:RemoveAction("showhealthbars", showhealthbars)
+	Spring.SendCommands({"unbind f9 luaui"})
+	Spring.SendCommands({"bind f9 showhealthbars"})
+	Spring.SendCommands({"showhealthbars 1"})
+	Spring.SendCommands({"showrezbars 1"})
+
+	widgetHandler:DeregisterGlobal('MorphUpdate', MorphUpdate)
+	widgetHandler:DeregisterGlobal('MorphFinished', MorphFinished)
+	widgetHandler:DeregisterGlobal('MorphStart', MorphStart)
+	widgetHandler:DeregisterGlobal('MorphStop', MorphStop)
+
+	widgetHandler:DeregisterGlobal('MorphDrawProgress')
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local visibleFeatures = {}
 local visibleUnits = {}
 
@@ -1179,8 +1206,6 @@ do
 			--// draw bars for features
 			local wx, wy, wz, dx, dy, dz, dist, featureID, valid
 			local featureInfo
-			local maxFeatureDist = math.pow(options.drawMaxHeight.value, 2) * (2/3)
-			local simpleFeatureDist = maxFeatureDist*(options.simpleHealthPercent.value/100)
 			for i = 1, #visibleFeatures do
 				featureInfo = visibleFeatures[i]
 				featureID = featureInfo[4]
@@ -1189,12 +1214,8 @@ do
 					wx, wy, wz = featureInfo[1], featureInfo[2], featureInfo[3]
 					dx, dy, dz = wx-cx, wy-cy, wz-cz
 					dist = dx*dx + dy*dy + dz*dz
-					if (dist < maxFeatureDist) then
-						if (dist < simpleFeatureDist) then
-							DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx, wy, wz)
-						else
-							DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx, wy, wz)
-						end
+					if (dist < featureDistSq) then
+						DrawFeatureInfos(featureInfo[4], featureInfo[5], (dist < featurePercentSq), (dist < featureTitleSq), wx, wy, wz)
 					end
 				end
 			end
@@ -1204,10 +1225,7 @@ do
 				unitID    = visibleUnits[i]
 				unitDefID = GetUnitDefID(unitID)
 				if (unitDefID) then
-					unitDef   = UnitDefs[unitDefID]
-					if (unitDef) then
-						JustGetOverlayInfos(unitID, unitDefID)
-					end
+					JustGetOverlayInfos(unitID, unitDefID)
 				end
 			end
 		end
