@@ -24,7 +24,7 @@ end
 --[[ The checks in this file don't apply to map-defined units,
      only ZK-side, so can afford to be brutal (crash on failure).
      This ensures that mistakes and cargo cults don't go unnoticed. ]]
-Game = Game or { gameSpeed = 30 } -- compat for 287, would ideally be in defs.lua but 287 has some VFS fuckup which disallows that
+Game = Game or { gameSpeed = 30 } -- compat for 287, would ideally be in defs.lua but 287 has some VFS fuckup which disallows that (see below)
 VFS_Include('gamedata/unitdefs_checks.lua', nil, VFS_GAME)
 
 lowerkeys = lowerKeys -- legacy mapside defs might want it
@@ -33,11 +33,24 @@ for i = 1, #mapUnits do
 	suCopyTable(lowerKeys(VFS_Include(mapUnits[i], nil, VFS_MAP)), false, unitDefs)
 end
 
---[[ VFS.FileExists is broken and claims the file is present in VFS.MAP
-     even if when it actually isn't, so we have to detect errors "manually" ]]
-local ok, err = pcall(VFS_Include, 'gamedata/unitdefs_post.lua', nil, VFS_MAP)
-if not ok and err ~= "Include() file missing 'gamedata/unitdefs_post.lua'\n" then
-	error(err)
+--[[ This would ideally be 'gamedata/unitdefs_post.lua' because that is
+     the convention used in the past, back when map files overrode games'
+     by default. Also it would be elegant if mappers could just copy our
+     gameside file and get something working. However, there are issues
+     preventing this from happening:
+
+     1) VFS.FileExists is (as of 104-1435) broken and seems to behave as
+        if the namespace argument was (VFS.BASE .. VFS.GAME .. VFS.MAP)
+	 regardless of what it actually is. This would make us include the
+	 file every time since it's present gameside. It could be worked
+	 around by using pcall and ignoring an inclusion failure, but...
+
+     2) VFS.Include is broken in the same way on old engines (specifically
+        on 104-287 which we want to keep supporting for the time being).
+	 This means that the gameside posts would instead be included twice. ]]
+local MAPSIDE_POSTS_FILEPATH = 'gamedata/unitdefs_map.lua'
+if VFS.FileExists(MAPSIDE_POSTS_FILEPATH, VFS_MAP) then
+	VFS_Include(MAPSIDE_POSTS_FILEPATH, nil, VFS_MAP)
 end
 
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
