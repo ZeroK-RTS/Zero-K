@@ -72,6 +72,7 @@ return { shiptorpraider = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      cegTag                  = [[torpedo_trail]],
 
             customParams = {
                 burst = Shared.BURST_RELIABLE,
@@ -93,7 +94,7 @@ return { shiptorpraider = {
       interceptedByShieldType = 1,
       flightTime              = 0.9,
       leadlimit               = 0,
-      model                   = [[wep_m_ajax.s3o]],
+      model                   = [[wep_t_barracuda.s3o]],
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
