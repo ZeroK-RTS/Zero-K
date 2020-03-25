@@ -19,9 +19,6 @@ return { shipcarrier = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Flugzeugträger (Bomber)]],
-    description_fr = [[Porte-Avion Bombardier]],
-    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
     midposoffset   = [[0 -10 0]],
     modelradius    = [[80]],
     stockpiletime  = [[30]],

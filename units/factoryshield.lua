@@ -32,10 +32,6 @@ return { factoryshield = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Produit des Robots d'Infanterie L. une vitesse de 10 m/s]],
-    description_de = [[Produziert zähe Roboter, Baut mit 10 M/s]],
-    helptext       = [[The Shieldbot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer]],
-    helptext_de    = [[Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Snitch, Dirtbag]],
     sortName       = [[1]],
     midposoffset   = [[0 0 -24]],
     solid_factory  = [[6]],
