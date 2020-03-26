@@ -67,7 +67,7 @@ return { turrettorp = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      cegTag                  = [[torpedo_trail]],
+      cegTag                  = [[torpedo_trail_long]],
 
       damage                  = {
         default = 190,
