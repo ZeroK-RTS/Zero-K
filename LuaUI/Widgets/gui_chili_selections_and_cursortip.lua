@@ -14,6 +14,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
@@ -235,6 +236,8 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
+local ctrlFilterUnits = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Settings
@@ -249,7 +252,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
+	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter', 'uniticon_size', 'manualWeaponReloadBar',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -363,6 +366,13 @@ options = {
 				selectionWindow.SetGroupInfoVisible(self.value)
 			end
 		end,
+	},
+	ctrlFilter = {
+		name = 'Ctrl Selection Filtering',
+		type = 'bool',
+		desc = "Hold Ctrl and click on some units. These units will be selected when Ctrl is released.",
+		value = true,
+		path = selPath,
 	},
 	--unitCommand = {
 	--	name="Show Unit's Command",
@@ -882,15 +892,34 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 		spSelectUnitArray(newSelectedUnits)
 		widget:SelectionChanged(newSelectedUnits)
 	elseif button == 1 then
-		if shift then
-			spSelectUnitArray(unitList) -- select all
+		if ctrl then
+			ctrlFilterUnits = ctrlFilterUnits or {}
+			if shift then
+				for i = 1, #unitList do
+					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
+				end
+			else
+				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
+			end
 		else
-			spSelectUnitArray({unitID})  -- only 1
+			if shift then
+				spSelectUnitArray(unitList) -- select all
+			else
+				spSelectUnitArray({unitID})  -- only 1
+			end
 		end
 	else --button2 (middle)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		SetCameraTarget(x, y, z, 1)
 	end
+end
+
+local function CheckCtrlFilterRelease()
+	if not ctrlFilterUnits then
+		return
+	end
+	spSelectUnitArray(ctrlFilterUnits)
+	ctrlFilterUnits = false
 end
 
 local cacheFeatureTooltip = {}
@@ -2439,6 +2468,12 @@ function widget:Update(dt)
 	if slowUpdate then
 		selectionWindow.UpdateSelectionWindow()
 		updateTimer = 0
+	end
+end
+
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL) then
+		CheckCtrlFilterRelease()
 	end
 end
 
