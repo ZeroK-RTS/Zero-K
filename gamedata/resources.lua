@@ -171,7 +171,8 @@ local resources = {
       whitelightb= "pd/whitelightningball.tga",
 	  whitelightgpl = 'GPL/lightw.png',
 	  sonic_glow = "sonic_glow.png",
-	  sonic_glow2 = "sonic_glow2.png",
+    sonic_glow2 = "sonic_glow2.png",
+    bubble= "other/bubble.tga",
 	  },
 	},
 }
