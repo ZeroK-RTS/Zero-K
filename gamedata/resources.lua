@@ -55,7 +55,8 @@ local resources = {
 
 		projectiletextures = {
       -- MANUAL
-			----------Spring Effects--------
+      ----------Spring Effects--------
+      bubbletexture='randdots.tga',
 			circularthingy='circularthingy.tga',
 			laserend='laserend.tga',
 			laserfalloff='laserfalloff.tga',
