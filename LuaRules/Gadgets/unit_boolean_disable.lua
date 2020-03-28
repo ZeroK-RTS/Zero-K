@@ -29,6 +29,8 @@ local wantedWeaponList = {}
 
 local disarmWeapons = {}
 local paraWeapons = {}
+local overstunDamageMult = {}
+
 for wid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wid]
 	local wcp = wd.customParams or {}
@@ -43,6 +45,9 @@ for wid = 1, #WeaponDefs do
 		local paraTime = wd.paralyzer and wd.damages.paralyzeDamageTime or wd.customParams.extra_paratime
 		paraWeapons[wid] = paraTime * FRAMES_PER_SECOND
 		wantedWeaponList[#wantedWeaponList + 1] = wid
+	end
+	if wd.customParams and wd.customParams.overstun_damage_mult then
+		overstunDamageMult[wid] = tonumber(wd.customParams.overstun_damage_mult)
 	end
 end
 
@@ -121,14 +126,17 @@ local function moveUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 	Spring.SetUnitRulesParam(unitID, "disarmframe", frame + extraParamFrames, LOS_ACCESS)
 end
 
-local function addParalysisDamageToUnit(unitID, damage, pTime)
-	local health,maxHealth,paralyzeDamage = Spring.GetUnitHealth(unitID)
-	local extraTime = math.floor(damage/health*DECAY_FRAMES) -- time that the damage would add
+local function addParalysisDamageToUnit(unitID, damage, pTime, overstunMult)
+	local health, maxHealth, paralyzeDamage = Spring.GetUnitHealth(unitID)
 	if partialUnitID[unitID] then -- if the unit is partially paralysed
+		local extraTime = math.floor(damage/health*DECAY_FRAMES) -- time that the damage would add
 		local newPara = partialUnitID[unitID].frameID+extraTime
 		if newPara - f > DECAY_FRAMES then -- the new para damage exceeds 100%
 			removeUnitID(unitID, partialUnits, partialUnitID) -- remove from partial table
 			newPara = newPara - DECAY_FRAMES -- take away the para used to get 100%
+			if overstunMult then
+				newPara = f + math.ceil((newPara - f) * overstunMult)
+			end
 			if pTime and pTime < newPara - f then -- prevent weapon going over para timer
 				newPara = math.floor(pTime) + f
 			end
@@ -138,21 +146,27 @@ local function addParalysisDamageToUnit(unitID, damage, pTime)
 			moveUnitID(unitID, partialUnits, partialUnitID, newPara, 0)
 		end
 	elseif paraUnitID[unitID] then -- the unit is fully paralysed, just add more damage
+		local extraTime = math.floor((overstunMult or 1)*damage/health*DECAY_FRAMES) -- time that the damage would add
 		local newPara = paraUnitID[unitID].frameID
 		if (not pTime) or pTime > newPara - f then -- if the para time on the unit is less than this weapons para timer
-			newPara = newPara+extraTime
+			newPara = newPara + extraTime
 			if pTime and pTime < newPara - f then -- prevent going over para time
 				newPara = math.floor(pTime) + f
 			end
 			moveUnitID(unitID, paraUnits, paraUnitID, newPara, DECAY_FRAMES)
 		end
 	else -- unit is not paralysed at all
-		if paralyzeDamage > 0 then
-			extraTime = math.floor((damage/health + paralyzeDamage/maxHealth)*DECAY_FRAMES)
-		end
+		local extraTime = math.floor((damage/health + paralyzeDamage/maxHealth)*DECAY_FRAMES)
 		if extraTime > DECAY_FRAMES then -- if the new paralysis puts it over 100%
 			local newPara = extraTime + f
 			newPara = newPara - DECAY_FRAMES
+			if overstunMult then
+				if paralyzeDamage < maxHealth then
+					newPara = f + math.ceil((newPara - f) * overstunMult)
+				else
+					newPara = f + math.floor((overstunMult*damage/health + paralyzeDamage/maxHealth)*DECAY_FRAMES)
+				end
+			end
 			if pTime and pTime < newPara - f then -- prevent going over para time
 				newPara = math.floor(pTime) + f
 			end
@@ -198,12 +212,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	
 	if disarmWeapons[weaponDefID] then
 		local def = disarmWeapons[weaponDefID]
-		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer)
+		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, overstunDamageMult[weaponDefID])
 		return damage*def.normalDamage
 	end
 
 	if paralyzer and (partialUnitID[unitID] or paraUnitID[unitID]) then
-		addParalysisDamageToUnit(unitID, damage, paraWeapons[weaponDefID])
+		addParalysisDamageToUnit(unitID, damage, paraWeapons[weaponDefID], overstunDamageMult[weaponDefID])
 	end
 
 	return damage
