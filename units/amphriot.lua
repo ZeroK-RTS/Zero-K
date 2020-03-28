@@ -88,7 +88,8 @@ return { amphriot = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      
+      cegTag                  = [[torpedo_trail]],
+   
       damage                  = {
         default = 90.1,
       },

@@ -122,6 +122,7 @@ return { amphraid = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      cegTag                  = [[torpedo_trail]],
 
       damage                  = {
         default = 130.01,
