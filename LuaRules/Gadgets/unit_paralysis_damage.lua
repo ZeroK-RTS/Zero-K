@@ -29,6 +29,7 @@ local spAddUnitDamage    = Spring.AddUnitDamage
 local normalDamageMult = {}
 local wantedWeaponList = {}
 local paraTime = {}
+local overstunDamageMult = {}
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
@@ -42,6 +43,9 @@ for wdid = 1, #WeaponDefs do
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
 	end
+	if wd.customParams and wd.customParams.overstun_damage_mult then
+		overstunDamageMult[wdid] = tonumber(wd.customParams.overstun_damage_mult)
+	end
 end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
@@ -53,11 +57,26 @@ function gadget:UnitDamaged_GetWantedWeaponDef()
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
-                            weaponDefID, attackerID, attackerDefID, attackerTeam)
+                               weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
-		local health, maxHealth = spGetUnitHealth(unitID)
+		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
 		if health and maxHealth and health ~= 0 then -- taking no chances.
-			return damage*maxHealth/health
+			if not (weaponDefID and overstunDamageMult[weaponDefID]) then
+				return damage*maxHealth/health
+			end
+			
+			local rawDamage = damage*maxHealth/health
+			if maxHealth <= paralyzeDamage then
+				--Spring.Echo("Above", rawDamage*overstunDamageMult[weaponDefID])
+				return rawDamage*overstunDamageMult[weaponDefID]
+			end
+			local damageGap = (maxHealth - paralyzeDamage)
+			if rawDamage <= damageGap then
+				--Spring.Echo("damageGap", maxHealth, paralyzeDamage, damageGap, rawDamage)
+				return rawDamage
+			end
+			--Spring.Echo("Partial", maxHealth, paralyzeDamage, damageGap, rawDamage, damageGap + (rawDamage - damageGap)*overstunDamageMult[weaponDefID])
+			return damageGap + (rawDamage - damageGap)*overstunDamageMult[weaponDefID]
 		end
 	end
 	
