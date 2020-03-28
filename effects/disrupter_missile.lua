@@ -7,6 +7,8 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = 1,
+      unit               = 1,
       properties = {
         alwaysvisible      = false,
         heat               = [[40]],
@@ -37,6 +39,8 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = 1,
+      unit               = 1,
       properties = {
         alwaysvisible      = false,
         heat               = [[100]],
