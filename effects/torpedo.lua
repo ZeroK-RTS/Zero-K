@@ -635,7 +635,7 @@ return {
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,
       ground             = true,
-      underwater         = false,
+      underwater         = true,
       water              = true,
       properties = {
         colormap           = [[0.6 0.6 0.6 0.01 0.4 0.4 0.4 0.01 0 0 0 0.01]],
