@@ -14,9 +14,9 @@ options_order = {'text_hotkey', 'hotkey_inc', 'hotkey_dec', 'hotkey_facing_inc',
 options_path = 'Hotkeys/Construction'
 options = {
 	text_hotkey = {
-		name = 'Placement Modifiers',
-		type = 'text',
-		value = "Hotkeys for adjusting structure placement.",
+		name = 'Structure Placement Modifiers',
+		type = 'label',
+		--value = "Hotkeys for adjusting structure placement.",
 	},
 	hotkey_inc = {
 		name = 'Increase Build Spacing',

@@ -55,7 +55,7 @@ end
 ---------------------------------
 local hotkeyPath = "Hotkeys/Construction"
 options_path = 'Settings/Interface/Building Placement'
-options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight', 'hotkey_toggle', 'hotkey_raise', 'hotkey_lower'}
+options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight', 'label_structure', 'hotkey_toggle', 'hotkey_raise', 'hotkey_lower'}
 options = {
 	enterSetHeightWithB = {
 		name = "Toggle set height",
@@ -70,6 +70,11 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = "Hold Alt and mouse wheel to set height."
+	},
+	label_structure = {
+		type = 'label',
+		name = 'Terraform Structure Placement',
+		path = hotkeyPath
 	},
 	hotkey_toggle = {
 		name = 'Toggle Structure Terraform',

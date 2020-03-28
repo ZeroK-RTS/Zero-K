@@ -81,8 +81,10 @@ local Grid = 16 -- grid size, do not change without other changes.
 ---------------------------------
 -- Epic Menu
 ---------------------------------
+local HOTKEY_PATH = 'Hotkeys/Construction'
+
 options_path = 'Settings/Interface/Building Placement'
-options_order = {'structure_holdMouse', 'structure_altSelect', 'structure_altmmb', 'staticMouseTime'}
+options_order = {'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
 options = {
 	structure_holdMouse = {
 		name = "Terraform by holding mouse click",
@@ -100,6 +102,23 @@ options = {
 		name = "Structure Terraform Press Time",
 		type = "number",
 		value = 1, min = 0, max = 10, step = 0.05,
+	},
+	label_preset = {
+		type = 'label',
+		name = 'Terraform Preset Hotkeys',
+		path = HOTKEY_PATH
+	},
+	text_hotkey_level = {
+		name = 'Level Presets',
+		type = 'text',
+		value = "These buttons can be bound to issue Level commands without the height selection step. Each preset is associated to a sliderbar which determines the height. The first four defaults (0, -10, -20, -24) block ships, let all units pass, block some units, and block land units.",
+		path = HOTKEY_PATH .. "/Level",
+	},
+	text_hotkey_raise = {
+		name = 'Raise Presets',
+		type = 'text',
+		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (8, -8) and bots (20, -20).",
+		path = HOTKEY_PATH .. "/Raise",
 	},
 }
 
@@ -177,6 +196,7 @@ local commandMap = {
 local volumeSelection = 0
 
 local currentlyActiveCommand = false
+local presetTerraHeight = false
 local mouseBuilding = false
 
 local buildToGive = false
@@ -204,11 +224,67 @@ local mouseX, mouseY
 local mexDefID = UnitDefNames.staticmex.id
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Hotkeys
+
+local levelPresets = {0, -8, -20, -24}
+local raisePresets = {8, -8, 20, -20}
+
+for i = 1, 10 do
+	options["level_value_" .. i] = {
+		name = "Level Value " .. i,
+		type = "number",
+		path = HOTKEY_PATH .. "/Level",
+		value = levelPresets[i] or 0,
+		min = -300, max = 300, step = 2,
+	}
+	options_order[#options_order + 1] = "level_value_" .. i
+	options["level_hotkey_" .. i] = {
+		type = 'button',
+		name = 'Level Hotkey ' .. i,
+		desc = 'Set this hotkey to issue a Level command with the height set below.',
+		path = HOTKEY_PATH .. "/Level",
+		OnChange = function ()
+			local cmdDesc = Spring.GetCmdDescIndex(CMD_LEVEL)
+			if cmdDesc then
+				Spring.SetActiveCommand(cmdDesc)
+				presetTerraHeight = options["level_value_" .. i].value
+			end
+		end,
+	}
+	options_order[#options_order + 1] = "level_hotkey_" .. i
+	
+	options["raise_value_" .. i] = {
+		name = "Raise Value " .. i,
+		type = "number",
+		path = HOTKEY_PATH .. "/Raise",
+		value = raisePresets[i] or 0,
+		min = -300, max = 300, step = 2,
+	}
+	options_order[#options_order + 1] = "raise_value_" .. i
+	options["raise_hotkey_" .. i] = {
+		type = 'button',
+		name = 'Raise Hotkey ' .. i,
+		desc = 'Set this hotkey to issue a Level command with the height set below.',
+		path = HOTKEY_PATH .. "/Raise",
+		OnChange = function ()
+			local cmdDesc = Spring.GetCmdDescIndex(CMD_RAISE)
+			if cmdDesc then
+				Spring.SetActiveCommand(cmdDesc)
+				presetTerraHeight = options["raise_value_" .. i].value
+			end
+		end,
+	}
+	options_order[#options_order + 1] = "raise_hotkey_" .. i
+end
+
+--------------------------------------------------------------------------------
 -- Command handling and issuing.
 --------------------------------------------------------------------------------
 
 local function stopCommand()
 	currentlyActiveCommand = false
+	presetTerraHeight = false
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
@@ -232,6 +308,7 @@ end
 
 local function completelyStopCommand()
 	currentlyActiveCommand = false
+	presetTerraHeight = false
 	spSetActiveCommand(-1)
 	originalCommandGiven = false
 	drawingLasso = false
@@ -1385,7 +1462,7 @@ function widget:MouseRelease(mx, my, button)
 				end
 			end
 			
-			if terraform_type == 1 or terraform_type == 2 then
+			if (not presetTerraHeight) and (terraform_type == 1 or terraform_type == 2) then
 				setHeight = true
 				drawingLasso = false
 				mouseX = mx
@@ -1420,7 +1497,7 @@ function widget:MouseRelease(mx, my, button)
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
-			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
+			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 or (presetTerraHeight and (terraform_type == 1 or terraform_type == 2)) then
 			
 				local disSQ = (point[1].x-point[points].x)^2 + (point[1].z-point[points].z)^2
 			
@@ -1436,6 +1513,9 @@ function widget:MouseRelease(mx, my, button)
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				end
 				if points ~= 0 then
+					if presetTerraHeight then
+						terraformHeight = presetTerraHeight
+					end
 					SendCommand()
 				end
 				stopCommand()
@@ -1452,7 +1532,7 @@ function widget:MouseRelease(mx, my, button)
 		if button == 1 then
 			--spSetActiveCommand(-1)
 			
-			if terraform_type == 1 or terraform_type == 2 then
+			if (not presetTerraHeight) and (terraform_type == 1 or terraform_type == 2) then
 				setHeight = true
 				drawingRectangle = false
 				mouseX = mx
@@ -1575,7 +1655,7 @@ function widget:MouseRelease(mx, my, button)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
 				
-			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
+			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 or (presetTerraHeight and (terraform_type == 1 or terraform_type == 2)) then
 			
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				local x,z
@@ -1652,6 +1732,9 @@ function widget:MouseRelease(mx, my, button)
 				end
 
 				if points ~= 0 then
+					if presetTerraHeight then
+						terraformHeight = presetTerraHeight
+					end
 					SendCommand()
 				end
 				stopCommand()
