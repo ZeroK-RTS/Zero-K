@@ -81,7 +81,8 @@ return {
       ground             = false,
       underwater         = true,
       water              = false,
-      unit               = true,
+      unit               = false,
+      air                = false,
       properties = {
         airdrag            = 0.5,
         alwaysvisible      = false,
