@@ -112,6 +112,18 @@ local Utilities = VFS.Include('gamedata/utilities.lua')
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Make Terraunit not decloak enemies
+--
+
+if Utilities.IsCurrentVersionNewerThan(104, 1400) and not Utilities.IsCurrentVersionNewerThan(104, 1470) then
+	UnitDefs.terraunit.collisionvolumeoffsets = [[0 -550 0]]
+	UnitDefs.terraunit.selectionvolumeoffsets = [[0 550 0]]
+	UnitDefs.terraunit.customparams.midposoffset   = [[0 -550 0]]
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Convert all CustomParams to strings
 --
 
@@ -839,7 +851,6 @@ for name, ud in pairs (UnitDefs) do
 		if not cp.jump_spread_exception then cp.jump_spread_exception = tostring(jump_defaults.spread_exception) end
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

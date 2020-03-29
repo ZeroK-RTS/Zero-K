@@ -9,10 +9,10 @@ return { terraunit = {
   buildPic               = [[levelterra.png]],
   capturable             = false,
   category               = [[TERRAFORM STUPIDTARGET]],
-  collisionVolumeOffsets = [[0 -550 0]],
+  collisionVolumeOffsets = [[0 -3000 0]],
   collisionVolumeScales  = [[32 32 32]],
   collisionVolumeType    = [[box]],
-  selectionVolumeOffsets = [[0 550 0]],
+  selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[32 16 32]],
   selectionVolumeType    = [[box]],
 
@@ -21,8 +21,6 @@ return { terraunit = {
     mobilebuilding = [[1]],
     cannotcloak    = [[1]],
     instantselfd   = [[1]],
-    midposoffset   = [[0 -550 0]],
-    no_grow        = [[1]],
   },
 
   footprintX             = 2,
