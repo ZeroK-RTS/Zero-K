@@ -84,6 +84,7 @@ return { hoverdepthcharge = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      cegTag                  = [[torpedo_trail]],
 
       customParams = {
         burst = Shared.BURST_UNRELIABLE,
