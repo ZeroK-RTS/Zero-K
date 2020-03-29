@@ -135,6 +135,9 @@ local pointExtraPerimeterCostDepth = 10
 local baseTerraunitCost = 6
 local inbuiltCostMult = 0.5
 
+local noBuildBaseCost = 3
+local baseSpendProp = 0.94
+
 local perimeterEdgeCost = {
 	[0] = 0,
 	[1] = 1,
@@ -2571,7 +2574,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	
 	if terra.baseCostSpent then
 		EchoDebug(id, "baseCostSpent", terra.baseCostSpent, terra.baseCost)
-		if costDiff < terra.baseCost - terra.baseCostSpent then
+		if terra.baseCostSpent < noBuildBaseCost then
 			terra.baseCostSpent = terra.baseCostSpent + costDiff
 			
 			local newBuild = terra.baseCostSpent/terra.totalCost
@@ -2583,6 +2586,10 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			terra.lastHealth = newBuild*terraUnitHP
 			terra.lastProgress = newBuild
 			return 1
+		elseif costDiff < terra.baseCost - terra.baseCostSpent then
+			terra.baseCostSpent = terra.baseCostSpent + costDiff*baseSpendProp
+			
+			costDiff = costDiff*(1 - baseSpendProp)
 		else
 			costDiff = costDiff - (terra.baseCost-terra.baseCostSpent)
 			terra.baseCostSpent = false
@@ -2897,7 +2904,10 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			
 			addedCost = addedCost*volumeCost
 			
-			local edgeTerraCost = (costDiff*addedCost/(costDiff+addedCost))
+			-- Spend less on the pyramid when base cost has not been spent (i.e., when terra.baseCostSpent has a value)
+			local edgeSpendFactor = (terra.baseCostSpent and 0.38) or 1
+			
+			local edgeTerraCost = edgeSpendFactor*(costDiff*addedCost/(costDiff+addedCost))
 			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.cost
 			edgeTerraMult = edgeTerraCost/addedCost
 			if extraCost > 0 then
