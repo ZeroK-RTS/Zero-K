@@ -17,14 +17,14 @@ return { staticcon = {
   canPatrol                     = true,
   cantBeTransported             = true,
   category                      = [[FLOAT UNARMED]],
-  collisionVolumeOffsets        = [[0 2 0]],
+  collisionVolumeOffsets        = [[0 4 0]],
   collisionVolumeScales         = [[48 56 48]],
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
 
-    aimposoffset   = [[0 16 0]],
+    aimposoffset   = [[0 18 0]],
     midposoffset   = [[0 -4 0]],
     modelradius    = [[24]],
     default_spacing = 1,

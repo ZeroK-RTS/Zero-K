@@ -111,13 +111,13 @@ options = {
 	text_hotkey_level = {
 		name = 'Level Presets',
 		type = 'text',
-		value = "These buttons can be bound to issue Level commands without the height selection step. Each preset is associated to a sliderbar which determines the height. The first four defaults (0, -10, -20, -24) block ships, let all units pass, block some units, and block land units.",
+		value = "These buttons can be bound to issue Level commands without the height selection step. Each preset is associated to a sliderbar which determines the height. The first four defaults (0, -8, -20, -24) block ships, let all units pass, block some units, and block land units.",
 		path = HOTKEY_PATH .. "/Level",
 	},
 	text_hotkey_raise = {
 		name = 'Raise Presets',
 		type = 'text',
-		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (8, -8) and bots (20, -20).",
+		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (10, -10) and bots (22, -22).",
 		path = HOTKEY_PATH .. "/Raise",
 	},
 }
@@ -228,7 +228,7 @@ local mexDefID = UnitDefNames.staticmex.id
 -- Hotkeys
 
 local levelPresets = {0, -8, -20, -24}
-local raisePresets = {8, -8, 20, -20}
+local raisePresets = {10, -10, 22, -22}
 
 for i = 1, 10 do
 	options["level_value_" .. i] = {
@@ -1223,7 +1223,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 			ResetMouse()
 			storedHeight = storedHeight + (my-mouseY)*mouseSensitivity
 			local heightArray = {
-				-6,
+				-12,
 				orHeight,
 			}
 			point[1].y = heightArray[snapToHeight(heightArray,storedHeight,2)]

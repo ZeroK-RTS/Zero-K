@@ -39,6 +39,7 @@ local sqrt                  = math.sqrt
 local pow                   = math.pow
 local random                = math.random
 local max                   = math.max
+local min                   = math.min
 
 local spAdjustHeightMap     = Spring.AdjustHeightMap
 local spGetGroundHeight     = Spring.GetGroundHeight
@@ -122,15 +123,16 @@ local wallSegmentLength = 14 -- how many points are part of a wall segment (poin
 local maxRampWidth = 200 -- maximun width of ramp segment
 local maxRampLegth = 200 -- maximun length of ramp segment
 
-local maxHeightDifference = 30 -- max difference of height around terraforming, Makes Shraka Pyramids
+local maxHeightDifference = 28 -- max difference of height around terraforming, Makes Shraka Pyramids
 local maxRampGradient = 5
+local maxEdgeHeightDiff = 4 -- max difference of terraform around the edge of the pyramid
 
 local volumeCost = 0.0128
 local pointExtraAreaCost = 0 -- 0.027
-local pointExtraAreaCostDepth = 6
-local pointExtraPerimeterCost = 0.1
-local pointExtraPerimeterCostDepth = 6
-local baseTerraunitCost = 0
+local pointExtraAreaCostDepth = 14
+local pointExtraPerimeterCost = 0.15
+local pointExtraPerimeterCostDepth = 10
+local baseTerraunitCost = 6
 local inbuiltCostMult = 0.5
 
 local perimeterEdgeCost = {
@@ -2205,7 +2207,9 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 	--    terraformUnit[oid].intercepts = terraformUnit[oid].intercepts - 1
 	--    terraformUnit[oid].interceptMap[id] = nil
 	--end
-		
+	
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x, 0, terraformUnit[id].position.z, "Spent: " .. terraformUnit[id].totalSpent)
+	
 	-- remove from order table
 	local to = terraformOrder[terraformUnit[id].order]
 	if terraformUnit[id].orderIndex ~= to.indexes then
@@ -2628,7 +2632,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	for i = 1, terra.points do
 		if terra.point[i].edges then
 			local newHeight = terra.point[i].orHeight+(terra.point[i].aimHeight-terra.point[i].orHeight)*newProgress
-			local makingPyramid = terra.point[i].aimHeight-terra.point[i].orHeight > 0
+			local makingPyramid = terra.point[i].aimHeight - terra.point[i].orHeight > 0
 			for j = 1, terra.point[i].edges do
 				local thisEdge = terra.point[i].edge[j]
 				local x = thisEdge.x
@@ -2692,15 +2696,56 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						extraPointArea[x] = {}
 					end
 					extraPointArea[x][z] = index
+				else
+					-- Check for smooth edge around base of pyramid
+					local parentGoal = terra.point[i].aimHeight
+					local borderHeightDiff = false
+					if makingPyramid then
+						if groundHeight + maxEdgeHeightDiff < parentGoal then
+							borderHeightDiff = min(maxEdgeHeightDiff, parentGoal - groundHeight + maxEdgeHeightDiff)
+						end
+					else
+						if groundHeight - maxEdgeHeightDiff > parentGoal then
+							borderHeightDiff = min(maxEdgeHeightDiff, groundHeight - maxEdgeHeightDiff - parentGoal)
+						end
+					end
+					
+					if borderHeightDiff then
+						local lookAheadHeight = spGetGroundHeight(x + (thisEdge.checkX or 0), z + (thisEdge.checkZ or 0))
+						if (not (extraPointArea[x] and extraPointArea[x][z])) and
+								((makingPyramid and groundHeight < lookAheadHeight + borderHeightDiff) or ((not makingPyramid) and groundHeight > lookAheadHeight - borderHeightDiff)) and
+								IsPositionTerraformable(x, z) then
+						
+							extraPoints = extraPoints + 1
+							extraPoint[extraPoints] = {
+								x = x,
+								z = z,
+								orHeight = groundHeight,
+								heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
+								cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
+								pyramid = makingPyramid, -- pyramid = rising up, not pyramid = ditch
+							}
+							
+							addedCost = addedCost + extraPoint[extraPoints].cost
+							
+							if not extraPointArea[x] then
+								extraPointArea[x] = {}
+							end
+							extraPointArea[x][z] = extraPoints
+						end
+					end
 				end
 			end
 		end
 	end
 	
 	do
-		local i = 1
-		local x, z, checkIndex
-		while i <= extraPoints do
+	
+	local i = 1
+	local x, z, checkIndex
+	local diffX, diffZ
+	while i <= extraPoints do
+		if extraPoint[i].supportID then
 			local newHeight = extraPoint[i].supportH
 			-- diamond pyramids
 			--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
@@ -2710,10 +2755,12 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 				if checkIndex == 0 and extraPoint[i].checkX then
 					x = extraPoint[i].x + extraPoint[i].checkX
 					z = extraPoint[i].z
+					diffX, diffZ = extraPoint[i].checkX, 0
 					checkIndex = 1
 				elseif extraPoint[i].checkZ then
 					x = extraPoint[i].x
 					z = extraPoint[i].z + extraPoint[i].checkZ
+					diffX, diffZ = 0, extraPoint[i].checkZ
 					checkIndex = 2
 				else
 					break
@@ -2721,7 +2768,6 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 				
 				--and not (extraPointArea[x] and extraPointArea[x][z])
 				if not (terra.area[x] and terra.area[x][z]) then
-
 					local groundHeight = spGetGroundHeight(x, z)
 					local edgeHeight = groundHeight
 					local overlap = false
@@ -2779,16 +2825,56 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 							extraPointArea[x] = {}
 						end
 						extraPointArea[x][z] = index
+					else
+						-- Check for smooth edge around base of pyramid
+						local parentGoal = extraPoint[i].orHeight + extraPoint[i].heightDiff
+						local borderHeightDiff = false
+						if extraPoint[i].pyramid then
+							if groundHeight + maxEdgeHeightDiff < parentGoal then
+								borderHeightDiff = min(maxEdgeHeightDiff, parentGoal - groundHeight + maxEdgeHeightDiff)
+							end
+						else
+							if groundHeight - maxEdgeHeightDiff > parentGoal then
+								borderHeightDiff = min(maxEdgeHeightDiff, groundHeight - maxEdgeHeightDiff - parentGoal)
+							end
+						end
+						
+						if borderHeightDiff then
+							local lookAheadHeight = spGetGroundHeight(x + diffX, z + diffZ)
+							if (not (extraPointArea[x] and extraPointArea[x][z])) and
+									((extraPoint[i].pyramid and groundHeight < lookAheadHeight + borderHeightDiff) or ((not extraPoint[i].pyramid) and groundHeight > lookAheadHeight - borderHeightDiff)) and
+									IsPositionTerraformable(x, z) then
+							
+								extraPoints = extraPoints + 1
+								extraPoint[extraPoints] = {
+									x = x,
+									z = z,
+									orHeight = groundHeight,
+									heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
+									cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
+									pyramid = extraPoint[i].pyramid, -- pyramid = rising up, not pyramid = ditch
+								}
+								
+								addedCost = addedCost + extraPoint[extraPoints].cost
+								
+								if not extraPointArea[x] then
+									extraPointArea[x] = {}
+								end
+								extraPointArea[x][z] = extraPoints
+							end
+						end
 					end
 				end
 			end
-			
-			if extraPoints > 9000 then
-				Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
-				break -- safty
-			end
-			i = i + 1
-		end 
+		end
+		
+		if extraPoints > 9000 then
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
+			break -- safty
+		end
+		i = i + 1
+	end
+	
 	end -- End do
 	
 	terraformOperations = terraformOperations + extraPoints
@@ -2813,7 +2899,6 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.cost
 			edgeTerraMult = edgeTerraCost/addedCost
 			if extraCost > 0 then
-				
 				edgeTerraCost = edgeTerraCost + extraCost
 				
 				if edgeTerraCost > addedCost then
@@ -2833,10 +2918,11 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	end
 	
 	local progress = terra.progress
-	if terra.progress > 1 then
+	if terra.progress >= 1 then
 		progress = 1
 		edgeTerraMult = 1
 	end
+	--Spring.Echo("progress", progress, "edgeTerraMult", edgeTerraMult, "addedCost", addedCost)
 
 	local newBuild = terra.progress
 	
@@ -2899,14 +2985,14 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local z = extraPoint[i].z
 			local freeLeft = not (extraPointArea[x-8] and extraPointArea[x-8][z])
 			local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
-			drawingList[#drawingList+1] = {x = x, z = z, tex = 2}
+			drawingList[#drawingList+1] = {x = x, z = z, tex = 2, extraEdge = true}
 			if freeLeft then
-				drawingList[#drawingList+1] = {x = x-8, z = z, tex = 2}
+				drawingList[#drawingList+1] = {x = x-8, z = z, tex = 2, extraEdge = true}
 			end
 			if freeUp then
-				drawingList[#drawingList+1] = {x = x, z = z-8, tex = 2}
+				drawingList[#drawingList+1] = {x = x, z = z-8, tex = 2, extraEdge = true}
 				if freeLeft then
-					drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 2}
+					drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 2, extraEdge = true}
 				end
 			end
 		end
@@ -2915,7 +3001,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local x = drawingList[i].x+4
 			local z = drawingList[i].z+4
 			local edge = drawingList[i].edge
+			local extraEdge = drawingList[i].extraEdge
 			drawingList[i].edge = nil -- don't sent to other gadget to send to unsynced
+			drawingList[i].extraEdge = extraEdge -- don't sent to other gadget to send to unsynced
 			-- edge exists because raised walls have passability at higher normal than uniform ramps
 			local oHeight = GetGroundOrigHeightOverride(drawingList[i].x, drawingList[i].z, 4, 4)
 			local height = spGetGroundHeight(x,z)
@@ -2923,9 +3011,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 				drawingList[i].tex = 0
 			else
 				local normal = select(2,Spring.GetGroundNormal(x,z))
-				if (edge and normal > 0.8) or (not edge and  normal > 0.892) then
+				if (edge and normal > 0.82) or (normal > 0.892) then
 					drawingList[i].tex = 1
-				elseif (edge and normal > 0.41) or (not edge and normal > 0.585) then
+				elseif ((edge or extraEdge) and normal > 0.43) or (normal > 0.585) then
 					drawingList[i].tex = 2
 				else
 					drawingList[i].tex = 3
@@ -2948,7 +3036,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	--end
 	EchoDebug(id, "terra.points", terra.points, "newProgress", newProgress)
 	
-	if terra.progress > 1 then
+	if terra.progress >= 1 then
 		deregisterTerraformUnit(id,arrayIndex,2)
 		spDestroyUnit(id, false, true)
 		return 0
@@ -3048,7 +3136,7 @@ function gadget:GameFrame(n)
 	--end
 	
 	if n >= nextUpdateCheck then
-		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
+		updatePeriod = math.max(MIN_UPDATE_PERIOD, min(MAX_UPDATE_PERIOD, terraformOperations/60))
 		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
 		terraformOperations = 0
 		nextUpdateCheck = n + updatePeriod
