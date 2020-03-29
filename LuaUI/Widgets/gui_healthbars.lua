@@ -1,13 +1,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Health Bars",
+		name      = "Health Bars 2.0 (experimental)",
 		desc      = "Options: /healthbars_style,  /healthbars_percentage",
 		author    = "Floris (original plain bars by jK)",
 		date      = "28 march 2015",
 		license   = "GNU GPL, v2 or later",
 		layer     = -10,
-		enabled   = true
+		enabled   = false
 	}
 end
 
