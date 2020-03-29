@@ -162,7 +162,7 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local enemyDistConst = 36 -- Constant added to enemy distinct check
-local nearbyEnemyPenalty = 50 -- Cost multiplier for terraform on enemy units
+local nearbyEnemyPenalty = 20 -- Cost multiplier for terraform on enemy units
 
 local costMult = 1
 local modOptions = Spring.GetModOptions()
@@ -481,6 +481,7 @@ local function CheckNearbyEnemy(unitID)
 		spSetUnitRulesParam(unitID, "terraform_enemy", (nearbyEnemy and nearbyEnemyID) or -1, ALLIED_TABLE)
 		terraformUnit[unitID].nearbyEnemy = nearbyEnemy
 		Spring.SetUnitCosts(unitID, {buildTime = terraUnitCost*((nearbyEnemy and nearbyEnemyPenalty) or 1)})
+		EchoDebug(unitID, "SetUnitCosts mult", ((nearbyEnemy and nearbyEnemyPenalty) or 1))
 	end
 end
 
@@ -2570,10 +2571,11 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	
 	if terra.baseCostSpent then
 		EchoDebug(id, "baseCostSpent", terra.baseCostSpent, terra.baseCost)
-		if costDiff < terra.baseCost-terra.baseCostSpent then
+		if costDiff < terra.baseCost - terra.baseCostSpent then
 			terra.baseCostSpent = terra.baseCostSpent + costDiff
 			
 			local newBuild = terra.baseCostSpent/terra.totalCost
+			EchoDebug(id, "SetHealth Base", newBuild*terraUnitHP, newBuild)
 			spSetUnitHealth(id, {
 				health = newBuild*terraUnitHP,
 				build  = newBuild
@@ -3057,7 +3059,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 			
 			local health = spGetUnitHealth(id)
 			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
-			EchoDebug(id, "Valid", diffProgress, terraformUnit[id].progress, health)
+			EchoDebug(id, "Valid", diffProgress, terraformUnit[id].progress, health, (n - terraformUnit[id].lastUpdate >= updatePeriod))
 			
 			if diffProgress == 0 then
 				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
@@ -3086,7 +3088,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 					EchoUnit(id)
 					EchoDebug(id, "============== " .. id .. " ==============")
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
-					EchoDebug(id, "Spent", terraformUnit[id].totalSpent, costDiff)
+					EchoDebug(id, "Spent", terraformUnit[id].totalSpent, costDiff, terraformUnit[id].lastHealth)
 					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
 					
 					if GG.Awards and GG.Awards.AddAwardPoints then
