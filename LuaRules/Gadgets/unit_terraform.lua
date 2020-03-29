@@ -94,6 +94,7 @@ local checkCoord = {
 }
 
 local invRoot2 = 1/sqrt(2)
+local SQRT_2 = sqrt(2)
 local ALLIED_TABLE = {allied = true}
 
 --------------------------------------------------------------------------------
@@ -2267,54 +2268,38 @@ local function updateTerraformEdgePoints(id)
 			
 			if spots.left then
 				edges = edges + 1
-				edge[edges] = {x = x-8, z = z, check = {count = 1, pos = {[1] = {x = -8, z = 0}, } } }
+				edge[edges] = {x = x-8, z = z, checkX = -8, checkZ = nil}
 				if spots.top then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = -8}
+					edges = edges + 1
+					edge[edges] = {x = x-8, z = z-8, checkX = -8, checkZ = -8}
 				end
 				if spots.bot then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = 8}
+					edges = edges + 1
+					edge[edges] = {x = x-8, z = z+8, checkX = -8, checkZ = 8}
 				end
 			end
 			
 			if spots.right then
 				edges = edges + 1
-				edge[edges] = {x = x+8, z = z, check = {count = 1, pos = {[1] = {x = 8, z = 0}, } } }
+				edge[edges] = {x = x+8, z = z, checkX = 8, checkZ = nil}
 				if spots.top then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = -8}
+					edges = edges + 1
+					edge[edges] = {x = x+8, z = z-8, checkX = 8, checkZ = -8}
 				end
 				if spots.bot then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = 8}
+					edges = edges + 1
+					edge[edges] = {x = x+8, z = z+8, checkX = 8, checkZ = 8}
 				end
 			end
 			
 			if spots.top then
 				edges = edges + 1
-				edge[edges] = {x = x, z = z-8, check = {count = 1, pos = {[1] = {x = 0, z = -8}, } } }
-				if spots.left then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = -8, z = 0}
-				end
-				if spots.right then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 8, z = 0}
-				end
+				edge[edges] = {x = x, z = z-8, checkX = nil, checkZ = -8}
 			end
 			
 			if spots.bot then
 				edges = edges + 1
-				edge[edges] = {x = x, z = z+8, check = {count = 1, pos = {[1] = {x = 0, z = 8}, } } }
-				if spots.left then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = -8, z = 0}
-				end
-				if spots.right then
-					edge[edges].check.count = edge[edges].check.count + 1
-					edge[edges].check.pos[edge[edges].check.count] = {x = 8, z = 0}
-				end
+				edge[edges] = {x = x, z = z+8, checkX = nil, checkZ = 8}
 			end
 			
 			if edges ~= 0 then
@@ -2674,9 +2659,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local newHeight = terra.point[i].orHeight+(terra.point[i].aimHeight-terra.point[i].orHeight)*newProgress
 			local up = terra.point[i].aimHeight-terra.point[i].orHeight > 0
 			for j = 1, terra.point[i].edges do
-			
-				local x = terra.point[i].edge[j].x
-				local z = terra.point[i].edge[j].z
+				local thisEdge = terra.point[i].edge[j]
+				local x = thisEdge.x
+				local z = thisEdge.z
 			
 				local groundHeight = spGetGroundHeight(x, z)
 				local edgeHeight = groundHeight
@@ -2687,9 +2672,10 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
 					overlapCost = extraPoint[overlap].cost
 				end
+				local maxDiff = (thisEdge.checkX and thisEdge.checkZ and (SQRT_2*maxHeightDifference)) or maxHeightDifference
 
 				local diffHeight = newHeight - edgeHeight
-				if diffHeight > maxHeightDifference and up then
+				if diffHeight > maxDiff and up then
 				
 					local index = extraPoints + 1
 					if overlap then
@@ -2707,13 +2693,14 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					extraPoint[index] = {
 						x = x, z = z,
 						orHeight = groundHeight,
-						heightDiff = newHeight - maxHeightDifference - groundHeight,
-						cost = (newHeight - maxHeightDifference - groundHeight),
+						heightDiff = newHeight - maxDiff - groundHeight,
+						cost = (newHeight - maxDiff - groundHeight),
 						supportX = terra.point[i].x,
 						supportZ = terra.point[i].z,
 						supportH = newHeight,
 						supportID = i,
-						check = terra.point[i].edge[j].check,
+						checkX = thisEdge.checkX,
+						checkZ = thisEdge.checkZ,
 						pyramid = true, -- pyramid = rising up, not pyramid = ditch
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
@@ -2734,7 +2721,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					end
 					extraPointArea[x][z] = index
 
-				elseif diffHeight < -maxHeightDifference and not up then
+				elseif diffHeight < -maxDiff and not up then
 					
 					local index = extraPoints + 1
 					if overlap then
@@ -2753,13 +2740,14 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						x = x,
 						z = z,
 						orHeight = groundHeight,
-						heightDiff = newHeight + maxHeightDifference - groundHeight,
-						cost = -(newHeight + maxHeightDifference - groundHeight),
+						heightDiff = newHeight + maxDiff - groundHeight,
+						cost = -(newHeight + maxDiff - groundHeight),
 						supportX = terra.point[i].x,
 						supportZ = terra.point[i].z,
 						supportH = newHeight,
 						supportID = i,
-						check = terra.point[i].edge[j].check,
+						checkX = thisEdge.checkX,
+						checkZ = thisEdge.checkZ,
 						pyramid = false, -- pyramid = rising up, not pyramid = ditch
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
@@ -2784,128 +2772,144 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	do local i = 1
-	while i <= extraPoints do
-		local newHeight = extraPoint[i].supportH
-		-- diamond pyramids
-		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
-		-- circular pyramids
-		for j = 1, extraPoint[i].check.count do
-			local x = extraPoint[i].check.pos[j].x + extraPoint[i].x
-			local z = extraPoint[i].check.pos[j].z + extraPoint[i].z
-			--and not (extraPointArea[x] and extraPointArea[x][z])
-			if not (terra.area[x] and terra.area[x][z]) then
-
-				local groundHeight = spGetGroundHeight(x, z)
-				local edgeHeight = groundHeight
-				local overlap = false
-				local overlapCost = 0
-				if extraPointArea[x] and extraPointArea[x][z] then
-					overlap = extraPointArea[x][z]
-					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
-					overlapCost = extraPoint[overlap].cost
+	do
+		local i = 1
+		local x, z, checkIndex
+		while i <= extraPoints do
+			local newHeight = extraPoint[i].supportH
+			-- diamond pyramids
+			--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
+			-- circular pyramids
+			checkIndex = 0
+			while checkIndex < 2 do
+				if checkIndex == 0 and extraPoint[i].checkX then
+					x = extraPoint[i].x + extraPoint[i].checkX
+					z = extraPoint[i].z
+					checkIndex = 1
+				elseif extraPoint[i].checkZ then
+					x = extraPoint[i].x
+					z = extraPoint[i].z + extraPoint[i].checkZ
+					checkIndex = 2
+				else
+					break
 				end
-				local maxHeightDifferenceLocal = GetHeightDiffLocal(abs(x - extraPoint[i].supportX), abs(z - extraPoint[i].supportZ))
-
-				local diffHeight = newHeight - edgeHeight
-				if diffHeight > maxHeightDifferenceLocal and extraPoint[i].pyramid then
-					local index = extraPoints + 1
-					if overlap then
-						if not extraPoint[overlap].pyramid then
-							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)
-							spDestroyUnit(id, false, true)
-							return 0
-						end
-						index = overlap
-					else
-						extraPoints = extraPoints + 1
-					end
-					extraPoint[index] = {
-						x = x,
-						z = z,
-						orHeight = groundHeight,
-						heightDiff = newHeight - maxHeightDifferenceLocal - groundHeight,
-						cost = (newHeight - maxHeightDifferenceLocal - groundHeight),
-						supportX = extraPoint[i].supportX,
-						supportZ = extraPoint[i].supportZ,
-						supportH = extraPoint[i].supportH,
-						supportID = extraPoint[i].supportID,
-						check =  extraPoint[i].check,
-						pyramid = true, -- pyramid = rising up, not pyramid = ditch
-					}
-					--updateTerraformBorder(id,x,z) --Removed Intercept Check
-					
-					if not IsPositionTerraformable(x, z) then
-						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
-							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
-						end
-						terra.point[extraPoint[i].supportID].diffHeight = 0.0001
-						terra.point[extraPoint[i].supportID].structure = 1
-						return -1
-					end
-					
-					addedCost = addedCost + extraPoint[index].cost - overlapCost
-					
-					if not extraPointArea[x] then
-						extraPointArea[x] = {}
-					end
-					extraPointArea[x][z] = index
-
-				elseif diffHeight < -maxHeightDifferenceLocal and not extraPoint[i].pyramid then
-					local index = extraPoints + 1
-					if overlap then
-						if extraPoint[overlap].pyramid then
-							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
-							deregisterTerraformUnit(id,arrayIndex,2)
-							spDestroyUnit(id, false, true)
-							return 0
-						end
-						index = overlap
-					else
-						extraPoints = extraPoints + 1
-					end
-					extraPoint[index] = {
-						x = x,
-						z = z,
-						orHeight = groundHeight,
-						heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,
-						cost = -(newHeight + maxHeightDifferenceLocal - groundHeight),
-						supportX = extraPoint[i].supportX,
-						supportZ = extraPoint[i].supportZ,
-						supportH = extraPoint[i].supportH,
-						supportID = extraPoint[i].supportID,
-						check =  extraPoint[i].check,
-						pyramid = false, -- pyramid = rising up, not pyramid = ditch
-					}
-					--updateTerraformBorder(id,x,z) --Removed Intercept Check
-					
-					if not IsPositionTerraformable(x, z) then
-						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
-							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false -- false for edge-derived problems
-						end
-						terra.point[extraPoint[i].supportID].diffHeight = 0.0001
-						terra.point[extraPoint[i].supportID].structure = 1
-						return -1
-					end
-					
-					addedCost = addedCost + extraPoint[index].cost - overlapCost
-					
-					if not extraPointArea[x] then
-						extraPointArea[x] = {}
-					end
-					extraPointArea[x][z] = index
 				
+				--and not (extraPointArea[x] and extraPointArea[x][z])
+				if not (terra.area[x] and terra.area[x][z]) then
+
+					local groundHeight = spGetGroundHeight(x, z)
+					local edgeHeight = groundHeight
+					local overlap = false
+					local overlapCost = 0
+					if extraPointArea[x] and extraPointArea[x][z] then
+						overlap = extraPointArea[x][z]
+						edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
+						overlapCost = extraPoint[overlap].cost
+					end
+					local maxHeightDifferenceLocal = GetHeightDiffLocal(abs(x - extraPoint[i].supportX), abs(z - extraPoint[i].supportZ))
+
+					local diffHeight = newHeight - edgeHeight
+					if diffHeight > maxHeightDifferenceLocal and extraPoint[i].pyramid then
+						local index = extraPoints + 1
+						if overlap then
+							if not extraPoint[overlap].pyramid then
+								addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
+								deregisterTerraformUnit(id,arrayIndex,2)
+								spDestroyUnit(id, false, true)
+								return 0
+							end
+							index = overlap
+						else
+							extraPoints = extraPoints + 1
+						end
+						extraPoint[index] = {
+							x = x,
+							z = z,
+							orHeight = groundHeight,
+							heightDiff = newHeight - maxHeightDifferenceLocal - groundHeight,
+							cost = (newHeight - maxHeightDifferenceLocal - groundHeight),
+							supportX = extraPoint[i].supportX,
+							supportZ = extraPoint[i].supportZ,
+							supportH = extraPoint[i].supportH,
+							supportID = extraPoint[i].supportID,
+							checkX =  extraPoint[i].checkX,
+							checkZ =  extraPoint[i].checkZ,
+							pyramid = true, -- pyramid = rising up, not pyramid = ditch
+						}
+						--updateTerraformBorder(id,x,z) --Removed Intercept Check
+						
+						if not IsPositionTerraformable(x, z) then
+							if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
+								terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
+							end
+							terra.point[extraPoint[i].supportID].diffHeight = 0.0001
+							terra.point[extraPoint[i].supportID].structure = 1
+							return -1
+						end
+						
+						addedCost = addedCost + extraPoint[index].cost - overlapCost
+						
+						if not extraPointArea[x] then
+							extraPointArea[x] = {}
+						end
+						extraPointArea[x][z] = index
+
+					elseif diffHeight < -maxHeightDifferenceLocal and not extraPoint[i].pyramid then
+						local index = extraPoints + 1
+						if overlap then
+							if extraPoint[overlap].pyramid then
+								addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
+								deregisterTerraformUnit(id,arrayIndex,2)
+								spDestroyUnit(id, false, true)
+								return 0
+							end
+							index = overlap
+						else
+							extraPoints = extraPoints + 1
+						end
+						extraPoint[index] = {
+							x = x,
+							z = z,
+							orHeight = groundHeight,
+							heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,
+							cost = -(newHeight + maxHeightDifferenceLocal - groundHeight),
+							supportX = extraPoint[i].supportX,
+							supportZ = extraPoint[i].supportZ,
+							supportH = extraPoint[i].supportH,
+							supportID = extraPoint[i].supportID,
+							checkX =  extraPoint[i].checkX,
+							checkZ =  extraPoint[i].checkZ,
+							pyramid = false, -- pyramid = rising up, not pyramid = ditch
+						}
+						--updateTerraformBorder(id,x,z) --Removed Intercept Check
+						
+						if not IsPositionTerraformable(x, z) then
+							if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
+								terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false -- false for edge-derived problems
+							end
+							terra.point[extraPoint[i].supportID].diffHeight = 0.0001
+							terra.point[extraPoint[i].supportID].structure = 1
+							return -1
+						end
+						
+						addedCost = addedCost + extraPoint[index].cost - overlapCost
+						
+						if not extraPointArea[x] then
+							extraPointArea[x] = {}
+						end
+						extraPointArea[x][z] = index
+					
+					end
 				end
 			end
-		end
-		
-		if extraPoints > 9000 then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
-			break -- safty
-		end
-		i = i + 1
-	end end
+			
+			if extraPoints > 9000 then
+				Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
+				break -- safty
+			end
+			i = i + 1
+		end 
+	end -- End do
 	
 	terraformOperations = terraformOperations + extraPoints
 	
