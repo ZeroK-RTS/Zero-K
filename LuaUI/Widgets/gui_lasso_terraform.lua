@@ -1157,6 +1157,9 @@ function widget:MousePress(mx, my, button)
 end
 
 function widget:MouseMove(mx, my, dx, dy, button)
+	--local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
+	--local normal = select(2, Spring.GetGroundNormal(pos[1], pos[3]))
+	--Spring.Echo("normal", normal)
 
 	if drawingLasso then
 

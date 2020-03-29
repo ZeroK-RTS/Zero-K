@@ -2551,12 +2551,22 @@ end
 
 local function addSteepnessMarker(team, x, z)
 	local n = spGetGameFrame()
-	if steepnessMarkers.inner.frame ~= n then
+	if steepnessMarkervxs.inner.frame ~= n then
 		steepnessMarkers.inner = {count = 0, data = {}, frame = n}
 	end
 	Spring.Echo(steepnessMarkers.inner.frame)
 	steepnessMarkers.inner.count = steepnessMarkers.inner.count+1
 	steepnessMarkers.inner.data[steepnessMarkers.inner.count] = {team = team, x = x, z = z}
+end
+
+local function GetHeightDiffLocal(xDiff, zDiff)
+	if xDiff == 0 then
+		return zDiff*maxHeightDifference/8
+	end
+	if zDiff == 0 then
+		return xDiff*maxHeightDifference/8
+	end
+	return sqrt(xDiff^2 + zDiff^2)*maxHeightDifference/8
 end
 
 local function updateTerraform(health,id,arrayIndex,costDiff)
@@ -2780,7 +2790,6 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		-- diamond pyramids
 		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
 		-- circular pyramids
-		local maxHeightDifferenceLocal = sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference
 		for j = 1, extraPoint[i].check.count do
 			local x = extraPoint[i].check.pos[j].x + extraPoint[i].x
 			local z = extraPoint[i].check.pos[j].z + extraPoint[i].z
@@ -2796,6 +2805,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					edgeHeight = extraPoint[overlap].orHeight + extraPoint[overlap].heightDiff
 					overlapCost = extraPoint[overlap].cost
 				end
+				local maxHeightDifferenceLocal = GetHeightDiffLocal(abs(x - extraPoint[i].supportX), abs(z - extraPoint[i].supportZ))
 
 				local diffHeight = newHeight - edgeHeight
 				if diffHeight > maxHeightDifferenceLocal and extraPoint[i].pyramid then
