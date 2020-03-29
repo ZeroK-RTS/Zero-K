@@ -371,7 +371,7 @@ function widget:CommandNotify(cmdID, params, options)
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
-				local y = Spring.GetGroundHeight(x, z)
+				local y = math.max(0, Spring.GetGroundHeight(x, z))
 
 				-- check if some other widget wants to handle the command before sending it to units.
 				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
@@ -383,7 +383,7 @@ function widget:CommandNotify(cmdID, params, options)
 						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
-						local yy = Spring.GetGroundHeight(xx, zz)
+						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
 						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
 
 						-- check if some other widget wants to handle the command before sending it to units.
