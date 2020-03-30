@@ -243,14 +243,18 @@ end
 
 -- pick a point on map (towards random one of 8 directions) to teleport to
 -- ud is teleportiee's unitdef, tx and tz are Djinn's position
-local function GetTeleTargetPos(ud, tx, tz)
+local function GetTeleTargetPos(ud, unitDefID, tx, tz)
 	local size = ud.xsize
 	local startCheck = math.floor(math.random(8))
 	local direction = (math.random() < 0.5 and -1) or 1
 	for j = 0, 7 do
 		local spot = (j*direction+startCheck)%8
-		local place, feature = Spring.TestBuildOrder(ud.id, tx + offset[spot].x*(size*4+40), 0 ,tz + offset[spot].z*(size*4+40), 1)
-		if (place == 2 and feature == nil) or ud.canFly then
+		if ud.canFly then
+			return spot
+		end
+		local sx, sz = tx + offset[spot].x*(size*4+40), tz + offset[spot].z*(size*4+40)
+		local place, feature = Spring.TestBuildOrder(ud.id, sx, 0 , sz, 1)
+		if (place == 2 and feature == nil) and Spring.TestMoveOrder(unitDefID, sx, 0, sz, 0, 0, 0, true, true, true) then
 			return spot
 		end
 	end
@@ -477,10 +481,10 @@ function gadget:GameFrame(f)
 							if cmdID and cmdID == CMD_WAIT_AT_BEACON and cmdParam_1 == bid then
 								local priority = beaconWaiter[nid].frame
 								if ((not bestPriority) or priority < bestPriority) then
-									local ud = Spring.GetUnitDefID(nid)
-									ud = ud and UnitDefs[ud]
+									local unitDefID = Spring.GetUnitDefID(nid)
+									local ud = unitDefID and UnitDefs[unitDefID]
 									if ud then
-										local spot = GetTeleTargetPos(ud, tx, tz)
+										local spot = GetTeleTargetPos(ud, unitDefID, tx, tz)
 										if spot then
 											teleportiee = nid
 											bestPriority = priority
@@ -658,17 +662,19 @@ function gadget:Load(zip)
 		if teleportieeOld and teleportieeOld > 0 then
 			local teleportiee = GG.SaveLoad.GetNewUnitID(teleportieeOld)
 			if teleportiee and tele[unitID] then
-				local udID = Spring.GetUnitDefID(teleportiee)
-				local ud = UnitDefs[udID]
-				local tx, ty, tz = Spring.GetUnitPosition(unitID)
-				-- pick a new teleport destination
-				local teleTarget = GetTeleTargetPos(ud, tx, tz)
-				if teleTarget then
-					tele[unitID].teleportiee = teleportiee
-					tele[unitID].offsetIndex = teleTarget
-					Spring.SetUnitRulesParam(unitID, "teleportiee", teleportiee)
-				else
-					Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
+				local unitDefID = Spring.GetUnitDefID(teleportiee)
+				local ud = unitDefID and UnitDefs[unitDefID]
+				if ud then
+					local tx, ty, tz = Spring.GetUnitPosition(unitID)
+					-- pick a new teleport destination
+					local teleTarget = GetTeleTargetPos(ud, unitDefID, tx, tz)
+					if teleTarget then
+						tele[unitID].teleportiee = teleportiee
+						tele[unitID].offsetIndex = teleTarget
+						Spring.SetUnitRulesParam(unitID, "teleportiee", teleportiee)
+					else
+						Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
+					end
 				end
 			else
 				Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
