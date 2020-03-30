@@ -13,7 +13,7 @@ end
 
 function Spring.Utilities.GetTeamGroundHeight(teamID, x, z)
 	return CallAsTeam(teamID, spGetGroundHeight, x, z)
-end 
+end
 
 function Spring.Utilities.ClampPosition(x, z)
 	if x and z then

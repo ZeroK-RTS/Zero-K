@@ -103,7 +103,7 @@ end
 function widget:MousePress(mx, my, button)
 	if enabled and (not Spring.IsAboveMiniMap(mx, my)) then
 		local _, pos = Spring.TraceScreenRay(mx, my, true)
-		if legalPos(pos) then	
+		if legalPos(pos) then
 			spots[#spots+1] = {
 				x = pos[1],
 				z = pos[3],
@@ -135,7 +135,7 @@ local function DrawTextWithBackground(text, x, y, size, opt)
 	else
 		glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
 	end
-	glColor(0.75, 0.75, 0.75, 1)	
+	glColor(0.75, 0.75, 0.75, 1)
 	glText(text, x, y, size, opt)
 	
 end
@@ -155,8 +155,8 @@ local function IntegrateMetal(x, z, forceUpdate)
 		newCenterZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
 	
-	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then 
-		return 
+	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then
+		return
 	end
 	
 	centerX = newCenterX

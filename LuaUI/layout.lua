@@ -42,13 +42,6 @@ local FrameTex   = "bitmaps/icons/frame_slate_128x96.png"
 local FrameScale = "&0.1x0.1&"
 local PageNumTex = "bitmaps/circularthingy.tga"
 
-
-if (false) then  --  disable textured buttons?
-  FrameTex   = ""
-  PageNumTex = ""
-end
-
-
 local PageNumCmd = {
   name    = "1",
   texture = PageNumTex,
@@ -77,7 +70,7 @@ local function DefaultHandler(xIcons, yIcons, cmdCount, commands)
   widgetHandler.commands.n = cmdCount
   widgetHandler:CommandsChanged()
 
-  -- FIXME: custom commands  
+  -- FIXME: custom commands
   if (cmdCount <= 0) then
     return "", xIcons, yIcons, {}, {}, {}, {}, {}, {}, {}, {}
   end
