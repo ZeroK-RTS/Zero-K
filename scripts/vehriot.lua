@@ -26,8 +26,8 @@ end
 local xtiltv, ztiltv = 0, 0
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local function Suspension()
-	local xtilt, xtilta = 0, 0, 0
-	local ztilt, ztilta = 0, 0, 0
+	local xtilt, xtilta = 0, 0
+	local ztilt, ztilta = 0, 0
 	local ya, yv, yp = 0, 0, 0
 
 	while true do
