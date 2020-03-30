@@ -15,13 +15,14 @@ local CentreNano 		= piece 'CentreNano'
 local leftClaw 			= piece 'LeftClaw'
 local leftClawBit 		= piece 'LeftClawBit'
 local leftNano 			= piece 'LeftNano'
+local rightNano 			= piece 'RightNano'
 local rightClaw 		= piece 'RightClaw'
 local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
 local engShield2 		= piece 'EngShield2'
 
 local smokePiece = {base, engine1, engine2}
-local nanoPieces = {nano, CentreNano, LeftNano}
+local nanoPieces = {CentreNano, leftNano, rightNano}
 
 local SIG_TILT = 1
 local SIG_LAND = 2
