@@ -254,6 +254,8 @@ local function GetTeleTargetPos(ud, unitDefID, tx, tz)
 		end
 		local sx, sz = tx + offset[spot].x*(size*4+40), tz + offset[spot].z*(size*4+40)
 		local place, feature = Spring.TestBuildOrder(ud.id, sx, 0 , sz, 1)
+
+		-- also test move order to prevent getting stuck on terrains with 0 speed mult
 		if (place == 2 and feature == nil) and Spring.TestMoveOrder(unitDefID, sx, 0, sz, 0, 0, 0, true, true, true) then
 			return spot
 		end
