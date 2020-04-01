@@ -415,7 +415,7 @@ function widget:MousePress(mx, my, button)
 		return true
 	end
 
-	if not buildingPlacementID then
+	if not (buildingPlacementID and pointX and pointZ) then
 		return
 	end
 
