@@ -1,4 +1,4 @@
-function customSmoke(n)
+local function customSmoke(n)
     return {
         dirtg = {
             air                = true,
