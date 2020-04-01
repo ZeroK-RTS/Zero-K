@@ -23,8 +23,8 @@ local engShield2 		= piece 'EngShield2'
 
 local smokePiece = {base, engine1, engine2}
 
--- model-wise this would ideally be {CentreNano, leftNano, rightNano},
--- but 3 beams look too powerful for a low 4 BP constructor
+-- intentionally not {CentreNano, leftNano, rightNano}
+-- 3 beams look too powerful for a low 4 BP constructor
 local nanoPieces = {nano}
 
 local SIG_TILT = 1
