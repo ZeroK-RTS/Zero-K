@@ -124,7 +124,6 @@ options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
-	'simpleHealthPercent'
 }
 options = {
 	showhealthbars = {
