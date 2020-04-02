@@ -81,7 +81,7 @@ local pairs = pairs
 local ipairs = ipairs
 
 do -- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption when OS crash
- 	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
+	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
 	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'} --this is a header text that is appended to start of file
 	for i=1, #fileToCheck do
 		CheckLUAFileAndBackup(fileToCheck[i], extraText[i]) --utility_two.lua
@@ -1478,7 +1478,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		-- IGNORE FEATURE--
 		if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg, false))] then
 			return
-        	end
+		end
 	end
 	
     

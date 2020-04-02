@@ -325,24 +325,24 @@ function widget:Update(deltaTime)
                     commandMe = true
                   end
                 end
-	            end
-	          end
-	          if (cmdID == CMD.REPAIR) then
-	            prevCommand = CMD.REPAIR
-	            prevUnit = cmdParam
+              end
+            end
+            if (cmdID == CMD.REPAIR) then
+              prevCommand = CMD.REPAIR
+              prevUnit = cmdParam
               local targetDefID = GetUnitDefID(prevUnit)
               if (targetDefID ~= nil) and UnitDefs[targetDefID].canMove then
                 local uX, _, uZ = GetUnitPosition(prevUnit)
                 if (getDistance(unitDefs.posX, unitDefs.posZ, uX, uZ) > unitDefs.buildDistanceSqr) then
                   commandMe = true
                 end
-  	          end
-  	        end
-	        
-	          if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
-	            commandMe = true
-	          end
-	        end
+            end
+          end
+          
+            if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
+              commandMe = true
+            end
+          end
         end
                     
         if (commandMe) then

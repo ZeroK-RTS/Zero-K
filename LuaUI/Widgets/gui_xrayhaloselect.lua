@@ -396,7 +396,7 @@ local function DrawWorldFunc()
         else
             visBoxedUnit[nb] = unitID
             nb = nb+1
-    	end
+        end
     end
     nb = nb - 1
     nbc = nbc - 1

@@ -51,7 +51,7 @@ function ComboBox:Select(itemIdx)
 	if (type(itemIdx) == "number") then
 		local item = self.items[itemIdx]
 		if not item then
- 			return
+			return
 		end
 		self.selected = itemIdx
 

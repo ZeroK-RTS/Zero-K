@@ -233,24 +233,24 @@ function widget:Initialize()
 
   WG['bloom'] = {}
   WG['bloom'].getAdvBloom = function()
-  	return drawHighlights
+	return drawHighlights
   end
   WG['bloom'].setAdvBloom = function(value)
-  	drawHighlights = value
+	drawHighlights = value
 	reset()
-  	if initialized == false then
-  		Spring.Echo('Bloom shader doesnt work (enable shaders: \'ForceShaders = 1\' in springsettings.cfg)')
-  	end
+	if initialized == false then
+		Spring.Echo('Bloom shader doesnt work (enable shaders: \'ForceShaders = 1\' in springsettings.cfg)')
+	end
   end
   WG['bloom'].getBrightness = function()
-  	return basicAlpha
+	return basicAlpha
   end
   WG['bloom'].setBrightness = function(value)
 	basicAlpha = value
 	reset()
-  	if initialized == false then
-  		Spring.Echo('Bloom shader doesnt work (enable shaders: \'ForceShaders = 1\' in springsettings.cfg)')
-  	end
+	if initialized == false then
+		Spring.Echo('Bloom shader doesnt work (enable shaders: \'ForceShaders = 1\' in springsettings.cfg)')
+	end
   end
 
   if (gl.CreateShader == nil) then
@@ -570,9 +570,9 @@ function widget:TextCommand(command)
   if (string.find(command, "advbloom") == 1  and  string.len(command) == 8) then
 		WG['bloom'].setAdvBloom(not drawHighlights)
 		if drawHighlights then
-	 		Spring.Echo('Adv bloom enabled')
-	 	else
-	 		Spring.Echo('Adv bloom disabled')
-	 	end
+			Spring.Echo('Adv bloom enabled')
+		else
+			Spring.Echo('Adv bloom disabled')
+		end
 	end
 end

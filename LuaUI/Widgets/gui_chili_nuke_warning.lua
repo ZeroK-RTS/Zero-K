@@ -98,7 +98,7 @@ local function CreateWindow()
 		bottom = 0,
 		caption = WG.Translate ("interface", "nuclear_launch_detected"),
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 32,

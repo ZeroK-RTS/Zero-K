@@ -90,27 +90,27 @@ end
 options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve'}
  
 options = {
-  eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
-  onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
-  enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
-  defaultEnergyReserve = {
-	name = "Initial Energy Reserve",
-	type = "number",
-	value = 0.05, min = 0, max = 1, step = 0.01,
-  },
-  defaultMetalReserve = {
-	name = "Initial Metal Reserve",
-	type = "number",
-	value = 0, min = 0, max = 1, step = 0.01,
-  },
-  workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
-  energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
-  opacity = {
-	name = "Opacity",
-	type = "number",
-	value = 0, min = 0, max = 1, step = 0.01,
-	OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
-  }
+	eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
+	onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
+	enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
+	defaultEnergyReserve = {
+		name = "Initial Energy Reserve",
+		type = "number",
+		value = 0.05, min = 0, max = 1, step = 0.01,
+	},
+	defaultMetalReserve = {
+		name = "Initial Metal Reserve",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+	},
+	workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
+	energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
+	opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
+	}
 }
 
 --------------------------------------------------------------------------------
@@ -225,8 +225,8 @@ local initialReserveSet = false
 function widget:GameFrame(n)
 
 	if (n%TEAM_SLOWUPDATE_RATE ~= 0) or not window then
-        return
-    end
+		return
+	end
 	
 	if n > 5 and not initialReserveSet then
 		updateReserveBars(true, false, options.defaultMetalReserve.value, true)
@@ -348,11 +348,11 @@ function widget:GameFrame(n)
 	end
 
 	bar_energy:SetValue( ePercent )
-    
+
 	if stallingE then
 		bar_energy_reserve_overlay:SetCaption( (RedStr.."%i/%i"):format(eCurr, eStor) )
 	elseif wastingE then
-        bar_energy_reserve_overlay:SetCaption( (GreenStr.."%i/%i"):format(eCurr, eStor) )
+		bar_energy_reserve_overlay:SetCaption( (GreenStr.."%i/%i"):format(eCurr, eStor) )
 	else
 		bar_energy_reserve_overlay:SetCaption( ("%i/%i"):format(eCurr, eStor) )
 	end
@@ -393,8 +393,8 @@ function widget:GameFrame(n)
 	"\n  Cons: " .. metalConstructor ..
 	"\n  Sharing: " .. metalShare ..
 	"\n  Construction: " .. metalConstuction ..
-    "\n  Reserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
-    "\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
+	"\n  Reserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
+	"\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " ..
 	"\nTeam Metal Economy  " ..
 	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
@@ -404,7 +404,7 @@ function widget:GameFrame(n)
 	"\n  Cons: " .. team_metalConstructor ..
 	"\n  Construction: " .. team_metalConstuction ..
 	"\n  Waste: " .. team_metalWaste ..
-    "\n  Stored: " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
+	"\n  Stored: " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\n  Generators: " .. energyGenerators ..
@@ -412,8 +412,8 @@ function widget:GameFrame(n)
 	"\n  Sharing & Overdrive: " .. energyOverdrive ..
 	"\n  Construction: " .. metalConstuction ..
 	"\n  Other: " .. energyOther ..
-    "\n  Reserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
-    "\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n  Reserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
+	"\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\nTeam Energy Economy" ..
 	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
@@ -423,7 +423,7 @@ function widget:GameFrame(n)
 	"\n  Construction: " .. team_metalConstuction ..
 	"\n  Other: " .. team_energyOther ..
 	"\n  Waste: " .. team_energyWaste ..
-    "\n  Stored: " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+	"\n  Stored: " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 
 	local mTotal
 	if options.onlyShowExpense.value then
@@ -525,7 +525,7 @@ function widget:Initialize()
 	end
 
 	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
-    --widgetHandler:RegisterGlobal("ReserveState", ReserveState)
+	--widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
@@ -606,8 +606,8 @@ function CreateWindow()
 		color  = col_metal,
 		height = p(100/bars),
 		right  = 26,
-                x      = 110,
-                y      = p(100/bars),
+		x      = 110,
+		y      = p(100/bars),
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
@@ -622,8 +622,8 @@ function CreateWindow()
 		parent = window,
 		height = p(100/bars),
 		width  = 60,
-                x      = 10,
-                y      = p(100/bars),
+		x      = 10,
+		y      = p(100/bars),
 		valign = "center",
 		align  = "right",
 		caption = "0",
@@ -635,11 +635,11 @@ function CreateWindow()
 		parent = window,
 		height = p(50/bars),
 		width  = 40,
-                x      = 70,
-                y      = p(100/bars),
+		x      = 70,
+		y      = p(100/bars),
 		caption = "10.0",
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {0,1,0,1}},
 		tooltip = "Your metal Income.\nGained primarilly from metal extractors, overdrive and reclaim",
@@ -648,8 +648,8 @@ function CreateWindow()
 		parent = window,
 		height = p(50/bars),
 		width  = 40,
-                x      = 70,
-                y      = p(1.5*100/bars),
+		x      = 70,
+		y      = p(1.5*100/bars),
 		caption = "10.0",
 		valign = "center",
 		align  = "center",
@@ -664,11 +664,11 @@ function CreateWindow()
 		parent = window,
 		height = p(100/bars),
 		width  = 25,
-                right  = 10,
-                y      = 1,
+		right  = 10,
+		y      = 1,
 		file   = 'LuaUI/Images/energy.png',
 	}
-    
+
 	bar_energy_overlay = Chili.Progressbar:New{
 		parent = window,
 		color  = col_energy,
@@ -696,14 +696,14 @@ function CreateWindow()
 		noSkin = true,
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
-    
+
 	bar_energy = Chili.Progressbar:New{
 		parent = window,
 		color  = col_energy,
 		height = p(100/bars),
 		right  = 36,
-                x      = 100,
-                y      = 1,
+		x      = 100,
+		y      = 1,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
@@ -718,8 +718,8 @@ function CreateWindow()
 		parent = window,
 		height = p(100/bars),
 		width  = 60,
-                x      = 0,
-                y      = 1,
+		x      = 0,
+		y      = 1,
 		valign = "center",
 		align  = "right",
 		caption = "0",
@@ -731,8 +731,8 @@ function CreateWindow()
 		parent = window,
 		height = p(50/bars),
 		width  = 40,
-                x      = 60,
-                y      = 1,
+		x      = 60,
+		y      = 1,
 		caption = "10.0",
 		valign  = "center",
 		align   = "center",
@@ -744,8 +744,8 @@ function CreateWindow()
 		parent = window,
 		height = p(50/bars),
 		width  = 40,
-                x      = 60,
-                y      = p(50/bars),
+		x      = 60,
+		y      = p(50/bars),
 		caption = "10.0",
 		valign = "center",
 		align  = "center",

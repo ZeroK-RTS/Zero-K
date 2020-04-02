@@ -482,7 +482,7 @@ function gadget:Load(zip)
     if radius > 0 then
       data.radius = radius
       if (data.draw) then
-    	SendToUnsynced(SYNCSTR, data.id, radius)
+        SendToUnsynced(SYNCSTR, data.id, radius)
       end
       UpdateCloakees(data)
     end

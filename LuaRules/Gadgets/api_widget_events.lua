@@ -42,7 +42,7 @@ function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDe
 		end
 	else
 		if not isAllyUnit and (not (spec and specFullView) and (spGetUnitLosState(unitID, spGetMyAllyTeamID(), true) % 2 == 1)) then
- 			scriptUnitDestroyed (unitID, unitDefID, unitTeam)
- 		end
- 	end
+			scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+		end
+	end
 end

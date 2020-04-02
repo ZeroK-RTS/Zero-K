@@ -204,7 +204,7 @@ end
 
 function Object:Clone()
 	local newinst = {}
- 	-- FIXME
+	-- FIXME
 	return newinst
 end
 

@@ -312,7 +312,7 @@ function comma_value(amount, displayPlusMinus)
 		formatted = amount .. ""
 	end
 
-  	return formatted
+	return formatted
 end
 
 
