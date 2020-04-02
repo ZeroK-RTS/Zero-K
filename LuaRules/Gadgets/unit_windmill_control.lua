@@ -227,9 +227,9 @@ function gadget:Initialize()
 		minWindMult = tonumber(mapInfo.custom.zkminwindmult)
 	end
 	
-	local groundMin, groundMax = Spring.GetGroundExtremes()
+	local nominalGroundMin, nominalGroundMax = Spring.GetGroundExtremes()
 	local waterlevel = Spring.GetGameRulesParam("waterlevel")
-	local groundMin, groundMax = math.max(groundMin - waterlevel,0), math.max(groundMax - waterlevel, 1)
+	local groundMin, groundMax = math.max(nominalGroundMin - waterlevel,0), math.max(nominalGroundMax - waterlevel, 1)
 	local mexHeight = math.max(0, Spring.GetGameRulesParam("mex_min_height") or groundMin)
 
 	GG.WindGroundMin = (groundMin + mexHeight)/2

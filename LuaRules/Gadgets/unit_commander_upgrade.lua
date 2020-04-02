@@ -372,7 +372,6 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedJammingRange = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
-	unitCreatedCarrierDef = nil
 	
 	if not unitID then
 		return false

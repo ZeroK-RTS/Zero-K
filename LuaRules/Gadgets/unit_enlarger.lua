@@ -14,8 +14,8 @@ end
 -- speedups
 --------------------------------------------------------------------------------
 
-CMD_DECREASE_SIZE = 33500
-CMD_INCREASE_SIZE = 33501
+local CMD_DECREASE_SIZE = 33500
+local CMD_INCREASE_SIZE = 33501
 
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------

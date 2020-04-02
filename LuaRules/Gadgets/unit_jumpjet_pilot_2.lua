@@ -31,7 +31,7 @@ local noRecursion = false
 
 gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
 
-function Dist(x,y,z, x2, y2, z2)
+local function Dist(x,y,z, x2, y2, z2)
 	local xd = x2-x
 	local yd = y2-y
 	local zd = z2-z

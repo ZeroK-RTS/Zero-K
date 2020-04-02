@@ -28,11 +28,7 @@ function widget:TextCommand(command)
 	end
 	if string.lower(prcmd[1]) == "ignorelist" then
 		local IgnoreList,count = widgetHandler:GetIgnoreList()
-		if #IgnoreList ~= 1 then
-			ignorestring = "game_message: You are ignoring " .. count .. " users:"
-		else
-			ignorestring = "game_message: You are ignoring " .. count .. " user:"
-		end
+		local ignorestring = "game_message: You are ignoring " .. count .. " user(s):"
 		for ignoree,_ in pairs(IgnoreList) do
 			ignorestring = ignorestring .. "\n- " .. ignoree
 		end

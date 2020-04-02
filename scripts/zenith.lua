@@ -281,8 +281,8 @@ function script.Create()
 		Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 	end
 	Spring.SetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
-	ux,_, uz = Spring.GetUnitPosition(unitID)
-	uy = Spring.GetGroundHeight(ux, uz)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
 	
 	currentlyStunned = IsDisabled()
 	

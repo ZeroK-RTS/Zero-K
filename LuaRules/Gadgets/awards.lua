@@ -358,7 +358,7 @@ local function ProcessAwardData()
 			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			if maxVal > compare then
 				maxVal = floor(maxVal)
-				maxValWrite = comma_value(maxVal)
+				local maxValWrite = comma_value(maxVal)
 
 				if awardType == 'cap' then
 					message = 'Captured value: ' .. maxValWrite

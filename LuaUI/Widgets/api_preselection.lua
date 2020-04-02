@@ -129,10 +129,10 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 			y = math_max(y, posY)
 			y = math_min(y, posY+sizeY)
 			local _, here = SafeTraceScreenRay(x, y, true, thruMinimap)
-			left = math_min(start[1], here[1])
-			bottom = math_min(start[3], here[3])
-			right = math_max(start[1], here[1])
-			top = math_max(start[3], here[3])
+			local left = math_min(start[1], here[1])
+			local bottom = math_min(start[3], here[3])
+			local right = math_max(start[1], here[1])
+			local top = math_max(start[3], here[3])
 			local units = Spring.GetUnitsInRectangle(left, bottom, right, top)
 			if spec and fullselect then
 				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(units)) or units --nil if empty
@@ -212,6 +212,7 @@ function widget:MousePress(x, y, button)
 	screenStartY = y
 	if (button == 1) and Spring.GetActiveCommand() == 0 then
 		thruMinimap = not WG.MinimapDraggingCamera and spIsAboveMiniMap(x, y)
+		local _
 		_, start = SafeTraceScreenRay(x, y, true, thruMinimap)
 		holdingForSelection = true
 	end
