@@ -54,7 +54,7 @@ return { planecon = {
   script              = [[planecon.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
-  sightDistance       = 380,
+  sightDistance       = 375,
   turnRate            = 500,
   workerTime          = 5,
 
