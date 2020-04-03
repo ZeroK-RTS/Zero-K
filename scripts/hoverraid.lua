@@ -58,8 +58,8 @@ end
 local function RestoreAfterDelay()
 	SetSignalMask(SIG_AIM)
 	Sleep(5000)
-	Turn(turret, y_axis, 0, math.rad(20))
-	Turn(gun, x_axis, 0, math.rad(20))
+	Turn(turret, y_axis, 0, math.rad(180))
+	Turn(gun, x_axis, 0, math.rad(180))
 end
 
 function script.AimFromWeapon()
