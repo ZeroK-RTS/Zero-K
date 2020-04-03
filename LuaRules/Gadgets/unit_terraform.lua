@@ -2695,7 +2695,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					maxDiff = (thisEdge.checkX and thisEdge.checkZ and (SQRT_2*maxHeightDiffDownInner)) or maxHeightDiffDownInner
 				end
 
-				local heightSign = (makingPyramid and 1 or -1)vx
+				local heightSign = (makingPyramid and 1 or -1)
 				local diffHeight = newHeight - edgeHeight
 				if (diffHeight > maxDiff and makingPyramid) or (diffHeight < -maxDiff and not makingPyramid) then
 					local index = extraPoints + 1
