@@ -56,10 +56,8 @@ local spTestBuildOrder      = Spring.TestBuildOrder
 local spSetHeightMap        = Spring.SetHeightMap
 local spSetHeightMapFunc    = Spring.SetHeightMapFunc
 local spRevertHeightMap     = Spring.RevertHeightMap
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spGetActiveCommand    = Spring.GetActiveCommand
-local spSpawnCEG            = Spring.SpawnCEG
 local spCreateUnit          = Spring.CreateUnit
 local spDestroyUnit         = Spring.DestroyUnit
 local spGetAllyTeamList     = Spring.GetAllyTeamList
@@ -226,6 +224,7 @@ local fallbackCommands  = {}
 local terraunitDefID = UnitDefNames["terraunit"].id
 local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit having full health to make it always able to be built.
 local terraUnitCost = UnitDefs[terraunitDefID].metalCost
+local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
 local shieldscoutDefID = UnitDefNames["shieldscout"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
@@ -2454,12 +2453,12 @@ local function updateTerraformCost(id)
 	
 	terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
 	terra.lastProgress = terra.progress
-	terra.lastHealth = terra.progress*(terraUnitHP - 1000)
+	terra.lastHealth = terra.progress*terraUnitHP
 	
 	EchoDebug(id, "updateTerraformCost")
 	spSetUnitHealth(id, {
 		health = terra.lastHealth,
-		build  = terra.lastProgress
+		build  = terra.lastProgress*terraBuildMult
 	})
 	
 	EchoDebug(id, "Update Cost", terra.cost, terra.totalCost)
@@ -2607,7 +2606,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 				EchoDebug(id, "SetHealth Base", newBuild*terraUnitHP, newBuild)
 				spSetUnitHealth(id, {
 					health = newBuild*terraUnitHP,
-					build  = newBuild
+					build  = newBuild*terraBuildMult
 				})
 				terra.lastHealth = newBuild*terraUnitHP
 				terra.lastProgress = newBuild
@@ -2924,7 +2923,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 			end
 		end
 		
-		if extraPoints > 9000 then
+		if extraPoints > 7000 then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
 			break -- safty
 		end
@@ -2979,10 +2978,10 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 
 	EchoDebug(id, "SetHealth", terra.progress*terraUnitHP, terra.progress)
 	
-	terra.lastHealth = terra.progress*(terraUnitHP - 1000)
+	terra.lastHealth = terra.progress*terraUnitHP
 	spSetUnitHealth(id, {
 		health = terra.lastHealth,
-		build  = terra.progress
+		build  = terra.progress*terraBuildMult
 	})
 	terra.lastProgress = terra.progress
 
