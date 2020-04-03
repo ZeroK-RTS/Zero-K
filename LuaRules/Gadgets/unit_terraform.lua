@@ -3185,17 +3185,20 @@ local function DoTerraformUpdate(n, forceCompletion)
 						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)
 					end
 					
+					local attempts = 1
 					local updateVar = updateTerraform(health,id,i,costDiff)
 					EchoDebug(id, "updateVar", updateVar)
-					while updateVar == -1 do
+					while updateVar == -1 and attempts < 10 do
 						if updateTerraformCost(id) then
 							updateTerraformEdgePoints(id)
 							updateVar = updateTerraform(health,id,i,costDiff)
+							attempts = attempts + 1
 						else
 							updateVar = 0
 						end
 						EchoDebug(id, "updateVar while", updateVar)
 					end
+					--Spring.Echo("attempts", attempts)
 					
 					if updateVar == 1 then
 						terraformUnit[id].lastUpdate = n
