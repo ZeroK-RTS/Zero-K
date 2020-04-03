@@ -282,9 +282,12 @@ end
 -- Command handling and issuing.
 --------------------------------------------------------------------------------
 
-local function stopCommand()
+local function stopCommand(shiftHeld)
+	if not shiftHeld then
+		presetTerraHeight = false
+	end
+	
 	currentlyActiveCommand = false
-	presetTerraHeight = false
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
@@ -307,8 +310,9 @@ local function stopCommand()
 end
 
 local function completelyStopCommand()
-	currentlyActiveCommand = false
 	presetTerraHeight = false
+	
+	currentlyActiveCommand = false
 	spSetActiveCommand(-1)
 	originalCommandGiven = false
 	drawingLasso = false
@@ -1135,7 +1139,8 @@ function widget:MousePress(mx, my, button)
 	
 	if setHeight and button == 1 then
 		SendCommand()
-		stopCommand()
+		local a,c,m,s = spGetModKeyState()
+		stopCommand(s)
 		return true
 	end
 	
@@ -1521,7 +1526,8 @@ function widget:MouseRelease(mx, my, button)
 					end
 					SendCommand()
 				end
-				stopCommand()
+				local a,c,m,s = spGetModKeyState()
+				stopCommand(s)
 			end
 			
 			return true
@@ -1700,7 +1706,8 @@ function widget:MouseRelease(mx, my, button)
 							
 							
 							SendCommand()
-							stopCommand()
+							local a,c,m,s = spGetModKeyState()
+							stopCommand(s)
 							return true
 						end
 					end
@@ -1740,7 +1747,8 @@ function widget:MouseRelease(mx, my, button)
 					end
 					SendCommand()
 				end
-				stopCommand()
+				local a,c,m,s = spGetModKeyState()
+				stopCommand(s)
 				
 			end
 			

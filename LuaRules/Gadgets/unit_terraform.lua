@@ -2649,7 +2649,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	end
 	--]]
 	
-	Spring.Echo(" === newProgress === ", newProgress)
+	--Spring.Echo(" === newProgress === ", newProgress)
 	
 	for i = 1, terra.points do
 		if terra.point[i].edges then
@@ -2925,9 +2925,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		else
 			local extraCost = 0
 			
-			if terra.progress + costDiff/terra.cost > 1 then
-				extraCost = costDiff - terra.cost*(1 - terra.progress)
-				costDiff = (1 - terra.progress)*terra.cost
+			if newProgress > 0.96 and terra.progress + costDiff/terra.cost > 1 then
+				extraCost = costDiff - terra.totalCost*(1 - terra.progress)
+				costDiff = costDiff - extraCost
 			end
 			
 			addedCost = addedCost*volumeCost
@@ -2936,15 +2936,15 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			local edgeSpendFactor = (terra.baseCostSpent and 0.38) or 1
 			
 			local edgeTerraCost = edgeSpendFactor*(costDiff*addedCost/(costDiff+addedCost))
-			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.cost
+			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.totalCost
 			edgeTerraMult = edgeTerraCost/addedCost
 			
-			Spring.Echo("edgeTerraMult", edgeTerraMult, "edgeSpendFactor", edgeSpendFactor, "costDiff", costDiff, "edgeTerraCost", edgeTerraCost, "totalSpent", terra.totalSpent, "cost", terra.cost)
+			--Spring.Echo("edgeTerraMult", edgeTerraMult, "edgeSpendFactor", edgeSpendFactor, "costDiff", costDiff, "edgeTerraCost", edgeTerraCost, "totalSpent", terra.totalSpent, "cost", terra.totalCost)
 			if extraCost > 0 then
 				edgeTerraCost = edgeTerraCost + extraCost
 				
 				if edgeTerraCost > addedCost then
-					terra.progress = terra.progress + (edgeTerraCost - addedCost)/terra.cost
+					terra.progress = terra.progress + (edgeTerraCost - addedCost)/terra.totalCost
 					edgeTerraMult = 1
 				else
 					edgeTerraMult = edgeTerraCost/addedCost
@@ -2959,7 +2959,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Tell Google Frog")
 	end
 	
-	Spring.Echo("terra.progress", terra.progress)
+	--Spring.Echo("terra.progress", terra.progress)
 	local progress = terra.progress
 	if terra.progress >= 1 then
 		progress = 1
