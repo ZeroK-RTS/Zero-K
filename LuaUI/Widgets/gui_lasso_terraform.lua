@@ -117,10 +117,13 @@ options = {
 	text_hotkey_raise = {
 		name = 'Raise Presets',
 		type = 'text',
-		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (12, -12) and bots (24, -24).",
+		value = "These buttons can be bound to issue Raise commands without the height adjustment step. Each preset is associated to a sliderbar which determines the amount raised or lowered. The first four values block vehicles (12, -12) and bots (24, -30).",
 		path = HOTKEY_PATH .. "/Raise",
 	},
 }
+
+local levelPresets = {0, -8, -20, -24}
+local raisePresets = {12, -12, 24, -30}
 
 ---------------------------------
 -- Config
@@ -226,9 +229,6 @@ local mexDefID = UnitDefNames.staticmex.id
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Hotkeys
-
-local levelPresets = {0, -8, -20, -24}
-local raisePresets = {12, -12, 24, -24}
 
 for i = 1, 10 do
 	options["level_value_" .. i] = {
