@@ -2,7 +2,7 @@ return { hoverskirm = {
   unitname            = [[hoverskirm]],
   name                = [[Scalpel]],
   description         = [[Skirmisher/Anti-Heavy Hovercraft]],
-  acceleration        = 0.2175,
+  acceleration        = 0.2,
   activateWhenBuilt   = true,
   brakeRate           = 2.05,
   buildCostMetal      = 220,
@@ -55,7 +55,7 @@ return { hoverskirm = {
   sightDistance       = 484,
   sonarDistance       = 484,
   turninplace         = 0,
-  turnRate            = 420,
+  turnRate            = 335,,
   workerTime          = 0,
   
   weapons             = {

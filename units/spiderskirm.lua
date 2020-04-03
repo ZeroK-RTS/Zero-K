@@ -25,7 +25,7 @@ return { spiderskirm = {
   leaveTracks            = true,
   maxDamage              = 650,
   maxSlope               = 72,
-  maxVelocity            = 1.6,
+  maxVelocity            = 1.5,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
@@ -39,7 +39,7 @@ return { spiderskirm = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 52,
-  turnRate               = 1600,
+  turnRate               = 1400,
 
   weapons                = {
 

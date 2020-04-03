@@ -2,7 +2,7 @@ return { hoverraid = {
   unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
-  acceleration        = 0.33,
+  acceleration        = 0.32,
   activateWhenBuilt   = true,
   brakeRate           = 0.835,
   buildCostMetal      = 75,
@@ -50,7 +50,7 @@ return { hoverraid = {
   sightDistance       = 640,
   sonarDistance       = 640,
   turninplace         = 0,
-  turnRate            = 673,
+  turnRate            = 540,
   workerTime          = 0,
   
   weapons             = {

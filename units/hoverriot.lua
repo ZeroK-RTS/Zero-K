@@ -2,7 +2,7 @@ return { hoverriot = {
   unitname            = [[hoverriot]],
   name                = [[Mace]],
   description         = [[Riot Hover]],
-  acceleration        = 0.15,
+  acceleration        = 0.14,
   activateWhenBuilt   = true,
   brakeRate           = 0.36,
   buildCostMetal      = 400,
@@ -50,7 +50,7 @@ return { hoverriot = {
   sightDistance       = 407,
   sonarDistance       = 407,
   turninplace         = 0,
-  turnRate            = 400,
+  turnRate            = 375,
   workerTime          = 0,
 
   weapons             = {
