@@ -2454,7 +2454,7 @@ local function updateTerraformCost(id)
 	
 	terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
 	terra.lastProgress = terra.progress
-	terra.lastHealth = terra.progress*terraUnitHP
+	terra.lastHealth = terra.progress*(terraUnitHP - 1000)
 	
 	EchoDebug(id, "updateTerraformCost")
 	spSetUnitHealth(id, {
@@ -2978,11 +2978,12 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	--Spring.Echo("progress", terraformUpdateProgress, "edgeTerraMult", edgeTerraMult, "pyramindCost", pyramindCost)
 
 	EchoDebug(id, "SetHealth", terra.progress*terraUnitHP, terra.progress)
+	
+	terra.lastHealth = terra.progress*(terraUnitHP - 1000)
 	spSetUnitHealth(id, {
-		health = terra.progress*terraUnitHP,
+		health = terra.lastHealth,
 		build  = terra.progress
 	})
-	terra.lastHealth = terra.progress*terraUnitHP
 	terra.lastProgress = terra.progress
 
 	-- Bug Safety
