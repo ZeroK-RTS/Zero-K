@@ -78,6 +78,7 @@ local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 -- Chili control classes
 local Chili
+local Control
 local Button
 local Label
 local Colorbars
@@ -1834,7 +1835,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			local icon = option.icon
 			local numberPanel = Panel:New{
 				width = "100%",
-				height = 42,
+				height = 35,
 				backgroundColor = {0, 0, 0, 0},
 				padding = {0, 0, 0, 0},
 				margin = {0, 0, 0, 0},
@@ -1842,17 +1843,17 @@ MakeSubWindow = function(path, pause, labelScroll)
 				autosize = false,
 			}
 			if icon then
-				numberPanel:AddChild(Image:New{file = icon, width = 16, height = 16, x = 4, y = 7})
-				numberPanel:AddChild(Label:New{caption = option.name, textColor = color.sub_fg, x = 20, y = 7, HitTest = returnSelf})
+				numberPanel:AddChild(Image:New{file = icon, width = 16, height = 16, x = 4, y = 0})
+				numberPanel:AddChild(Label:New{caption = option.name, textColor = color.sub_fg, x = 20, y = 0, HitTest = returnSelf})
 			else
-				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 7, textColor = color.sub_fg, HitTest = returnSelf})
+				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0, textColor = color.sub_fg, HitTest = returnSelf})
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
 			numberPanel:AddChild(
 				Trackbar:New{
-					y = 20,
+					y = 14,
 					width = "100%",
 					caption = option.name,
 					value = option.value,
@@ -1892,7 +1893,8 @@ MakeSubWindow = function(path, pause, labelScroll)
 			}
 			]]--
 		elseif option.type == 'radioButton' then
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}
+			tree_children[#tree_children+1] = Control:New{height = 1, minHeight = 0, padding = {0, 0, 0, 0},}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header,}
 			for i = 1, #option.items do
 				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT
@@ -1909,10 +1911,10 @@ MakeSubWindow = function(path, pause, labelScroll)
 					round = true,
 				}
 				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey, nil, 2)
-					
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey, nil, 1)
+				
 			end
-			tree_children[#tree_children+1] = Label:New{caption = ''}
+			tree_children[#tree_children+1] = Control:New{height = 2, minHeight = 0, padding = {0, 6, 0, 0},}
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_fg}
@@ -2811,6 +2813,7 @@ function widget:Initialize()
 
 	-- setup Chili
 	Chili = WG.Chili
+	Control = Chili.Control
 	Button = Chili.Button
 	Label = Chili.Label
 	Colorbars = Chili.Colorbars

@@ -237,28 +237,28 @@ local mexDefID = UnitDefNames.staticmex.id
 -- Hotkeys
 
 for i = 1, 10 do
+	options["level_type_" .. i]  = {
+		name = 'Level Hotkey ' .. i,
+		type = 'radioButton',
+		path = HOTKEY_PATH .. "/Level",
+		value = levelTypePreset[i] or 0,
+		items = {
+			{key = 0, name = 'Add and Subtract', desc = 'Terraform the entire area to the selected height.'},
+			{key = 1, name = 'Only Add', desc = 'Raise lower parts of the terrain up to the selected height.'},
+			{key = 2, name = 'Only Subtract', desc = 'Lower high parts of the terrain up to the selected height.'},
+		},
+		noHotkey = true,
+	}
+	options_order[#options_order + 1] = "level_type_" .. i
+	
 	options["level_value_" .. i] = {
-		name = "Level Value " .. i,
+		name = "Level height " .. i,
 		type = "number",
 		path = HOTKEY_PATH .. "/Level",
 		value = levelPresets[i] or 0,
 		min = -300, max = 300, step = 2,
 	}
 	options_order[#options_order + 1] = "level_value_" .. i
-	
-	options["level_type_" .. i]  = {
-		name = 'Volume Selection',
-		type = 'radioButton',
-		path = HOTKEY_PATH .. "/Level",
-		value = levelTypePreset[i] or 0,
-		items = {
-			{key = 0, name = 'None', desc = 'Terraform the entire area to the selected height.'},
-			{key = 1, name = 'Only Raise', desc = 'Raise lower parts of the terrain up to the selected height.'},
-			{key = 2, name = 'Only Lower', desc = 'Lower high parts of the terrain up to the selected height.'},
-		},
-		noHotkey = true,
-	}
-	options_order[#options_order + 1] = "level_type_" .. i
 	
 	options["level_hotkey_" .. i] = {
 		type = 'button',
@@ -276,17 +276,8 @@ for i = 1, 10 do
 	}
 	options_order[#options_order + 1] = "level_hotkey_" .. i
 	
-	options["raise_value_" .. i] = {
-		name = "Raise Value " .. i,
-		type = "number",
-		path = HOTKEY_PATH .. "/Raise",
-		value = raisePresets[i] or 0,
-		min = -300, max = 300, step = 2,
-	}
-	options_order[#options_order + 1] = "raise_value_" .. i
-	
 	options["raise_type_" .. i]  = {
-		name = 'Raise Culling',
+		name = 'Level Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Raise",
 		value = raiseTypePreset[i] or 0,
@@ -299,10 +290,19 @@ for i = 1, 10 do
 	}
 	options_order[#options_order + 1] = "raise_type_" .. i
 	
+	options["raise_value_" .. i] = {
+		name = "Raise amount " .. i,
+		type = "number",
+		path = HOTKEY_PATH .. "/Raise",
+		value = raisePresets[i] or 0,
+		min = -300, max = 300, step = 2,
+	}
+	options_order[#options_order + 1] = "raise_value_" .. i
+	
 	options["raise_hotkey_" .. i] = {
 		type = 'button',
 		name = 'Raise Hotkey ' .. i,
-		desc = 'Set this hotkey to issue a Raise command with the above parameters.',
+		desc = 'Set this hotkey to issue a Raise command with these parameters.',
 		path = HOTKEY_PATH .. "/Raise",
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_RAISE)
@@ -2025,10 +2025,8 @@ local function DrawRampMiddleEnd(dis)
 end
 
 local function drawMouseText(y,text)
-
 	local mx,my = spGetMouseState()
-	glText(text, mx+40, my+y, 22,"")
-
+	glText(text, mx+40, my+y, 18,"")
 end
 
 
@@ -2087,21 +2085,20 @@ function widget:DrawWorld()
 end
 
 function widget:DrawScreen()
-
 	if terraform_type == 1 or terraform_type == 2 then
 		if setHeight then
-			drawMouseText(0,floor(terraformHeight))
+			drawMouseText(10,floor(terraformHeight))
 		end
 	elseif terraform_type == 4 then
 		if drawingRamp == 1 then
-			drawMouseText(0,floor(point[1].y))
+			drawMouseText(10,floor(point[1].y))
 		elseif drawingRamp == 3 then
 			if point[2].y == 0 then
-				drawMouseText(0,point[2].y .. " Water Level")
+				drawMouseText(10,point[2].y .. " Water Level")
 			elseif point[2].y == point[1].y then
-				drawMouseText(0,floor(point[2].y) .. " Flat")
+				drawMouseText(10,floor(point[2].y) .. " Flat")
 			else
-				drawMouseText(0,floor(point[2].y))
+				drawMouseText(10,floor(point[2].y))
 			end
 		end
 	end
@@ -2110,22 +2107,22 @@ function widget:DrawScreen()
 		if terraform_type ~= 6 then
 			if volumeSelection == 1 then
 				if terraform_type == 2 then
-					drawMouseText(-30,"Cull Cliffs")
+					drawMouseText(-10,"Cull Cliffs")
 				else
-					drawMouseText(-30,"Only Raise")
+					drawMouseText(-10,"Only Raise")
 				end
 			elseif volumeSelection == 2 then
 				if terraform_type == 2 then
-					drawMouseText(-30,"Cull Ridges")
+					drawMouseText(-10,"Cull Ridges")
 				else
-					drawMouseText(-30,"Only Lower")
+					drawMouseText(-10,"Only Lower")
 				end
 			end
 		else
 			if volumeSelection == 0 then
-				drawMouseText(-30,"Blocks Vehicles")
+				drawMouseText(-10,"Blocks Vehicles")
 			elseif volumeSelection == 1 then
-				drawMouseText(-30,"Blocks Bots")
+				drawMouseText(-10,"Blocks Bots")
 			end
 		end
 	end
