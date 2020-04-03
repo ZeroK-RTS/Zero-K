@@ -122,8 +122,14 @@ options = {
 	},
 }
 
+---------------------------------
+---------------------------------
+-- Terraform hotkey presets
+
 local levelPresets = {0, -8, -20, -24}
+local levelTypePreset = {0, 0, 0, 0}
 local raisePresets = {12, -12, 24, -30}
+local raiseTypePreset = {1, 2, 1, 2}
 
 ---------------------------------
 -- Config
@@ -239,15 +245,31 @@ for i = 1, 10 do
 		min = -300, max = 300, step = 2,
 	}
 	options_order[#options_order + 1] = "level_value_" .. i
+	
+	options["level_type_" .. i]  = {
+		name = 'Volume Selection',
+		type = 'radioButton',
+		path = HOTKEY_PATH .. "/Level",
+		value = levelTypePreset[i] or 0,
+		items = {
+			{key = 0, name = 'None', desc = 'Terraform the entire area to the selected height.'},
+			{key = 1, name = 'Only Raise', desc = 'Raise lower parts of the terrain up to the selected height.'},
+			{key = 2, name = 'Only Lower', desc = 'Lower high parts of the terrain up to the selected height.'},
+		},
+		noHotkey = true,
+	}
+	options_order[#options_order + 1] = "level_type_" .. i
+	
 	options["level_hotkey_" .. i] = {
 		type = 'button',
 		name = 'Level Hotkey ' .. i,
-		desc = 'Set this hotkey to issue a Level command with the height set below.',
+		desc = 'Set this hotkey to issue a Level command with the above parameters.',
 		path = HOTKEY_PATH .. "/Level",
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_LEVEL)
 			if cmdDesc then
 				Spring.SetActiveCommand(cmdDesc)
+				volumeSelection = options["level_type_" .. i].value
 				presetTerraHeight = options["level_value_" .. i].value
 			end
 		end,
@@ -262,15 +284,31 @@ for i = 1, 10 do
 		min = -300, max = 300, step = 2,
 	}
 	options_order[#options_order + 1] = "raise_value_" .. i
+	
+	options["raise_type_" .. i]  = {
+		name = 'Raise Culling',
+		type = 'radioButton',
+		path = HOTKEY_PATH .. "/Raise",
+		value = raiseTypePreset[i] or 0,
+		items = {
+			{key = 0, name = 'None', desc = 'Raise or lower the entire area.'},
+			{key = 1, name = 'Cull Cliffs', desc = 'Avoid raising sections of the terrain over the edge of cliffs.'},
+			{key = 2, name = 'Cull Ridges', desc = 'Avoid lowering sections of the terrain into steep ridges or walls.'},
+		},
+		noHotkey = true,
+	}
+	options_order[#options_order + 1] = "raise_type_" .. i
+	
 	options["raise_hotkey_" .. i] = {
 		type = 'button',
 		name = 'Raise Hotkey ' .. i,
-		desc = 'Set this hotkey to issue a Level command with the height set below.',
+		desc = 'Set this hotkey to issue a Raise command with the above parameters.',
 		path = HOTKEY_PATH .. "/Raise",
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_RAISE)
 			if cmdDesc then
 				Spring.SetActiveCommand(cmdDesc)
+				volumeSelection = options["raise_type_" .. i].value
 				presetTerraHeight = options["raise_value_" .. i].value
 			end
 		end,
@@ -285,6 +323,9 @@ end
 local function stopCommand(shiftHeld)
 	if not shiftHeld then
 		presetTerraHeight = false
+	end
+	if not presetTerraHeight then
+		volumeSelection = 0
 	end
 	
 	currentlyActiveCommand = false
@@ -304,13 +345,13 @@ local function stopCommand(shiftHeld)
 	placingRectangle = false
 	drawingRamp = false
 	simpleDrawingRamp = false
-	volumeSelection = 0
 	points = 0
 	terraform_type = 0
 end
 
 local function completelyStopCommand()
 	presetTerraHeight = false
+	volumeSelection = 0
 	
 	currentlyActiveCommand = false
 	spSetActiveCommand(-1)
@@ -331,7 +372,6 @@ local function completelyStopCommand()
 	placingRectangle = false
 	drawingRamp = false
 	simpleDrawingRamp = false
-	volumeSelection = 0
 	points = 0
 	terraform_type = 0
 end
@@ -471,7 +511,6 @@ local function legalPos(pos)
 end
 
 local function lineVolumeLevel()
-
 	for i = 1, drawPoints do
 		repeat -- emulating continue
 			if (terraformHeight < drawPoint[i].ytl) then
@@ -494,7 +533,6 @@ local function lineVolumeLevel()
 			end
 		until true --do not repeat
 	end
-
 end
 
 local function lineVolumeRaise()
@@ -1841,6 +1879,7 @@ function widget:KeyPress(key)
 	
 	if key == KEYSYMS.SPACE and (
 		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or
+		(terraform_type == 2 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or
 		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or
 		(terraform_type == 4 and (setHeight or drawingRamp or simpleDrawingRamp or drawingRectangle)) or
 		(terraform_type == 5 and (drawingLasso or drawingRectangle))
@@ -2067,20 +2106,29 @@ function widget:DrawScreen()
 		end
 	end
 	
-	if terraform_type == 1 or terraform_type == 3 or terraform_type == 4 or terraform_type == 5 then
-		if volumeSelection == 1 then
-			drawMouseText(-30,"Only raise")
-		elseif volumeSelection == 2 then
-			drawMouseText(-30,"Only lower")
-		end
-	elseif terraform_type == 6 then
-		if volumeSelection == 0 then
-			drawMouseText(-30,"Blocks Vehicles")
-		elseif volumeSelection == 1 then
-			drawMouseText(-30,"Blocks Bots")
+	if (setHeight or drawingLasso or placingRectangle or drawingRectangle or drawingRamp or simpleDrawingRamp) then
+		if terraform_type ~= 6 then
+			if volumeSelection == 1 then
+				if terraform_type == 2 then
+					drawMouseText(-30,"Cull Cliffs")
+				else
+					drawMouseText(-30,"Only Raise")
+				end
+			elseif volumeSelection == 2 then
+				if terraform_type == 2 then
+					drawMouseText(-30,"Cull Ridges")
+				else
+					drawMouseText(-30,"Only Lower")
+				end
+			end
+		else
+			if volumeSelection == 0 then
+				drawMouseText(-30,"Blocks Vehicles")
+			elseif volumeSelection == 1 then
+				drawMouseText(-30,"Blocks Bots")
+			end
 		end
 	end
-
 end
 --------------------------------------------------------------------------------
 -- Drawing

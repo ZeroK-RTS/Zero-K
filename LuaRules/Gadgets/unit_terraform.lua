@@ -168,6 +168,8 @@ local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 local enemyDistConst = 36 -- Constant added to enemy distinct check
 local nearbyEnemyPenalty = 20 -- Cost multiplier for terraform on enemy units
 
+local pyramidLimitExtra = 8 -- Extra limit on pyramid height before terraform is cancelled.
+
 local costMult = 1
 local modOptions = Spring.GetModOptions()
 if modOptions.terracostmult then
@@ -1314,6 +1316,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		local totalCost = 0
 		local areaCost = 0
 		local perimeterCost = 0
+		local absTerraformHeight = abs(terraformHeight)
 		
 		if terraform_type == 1 then
 			for j = 1, segment[i].points do
@@ -1337,7 +1340,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				segment[i].point[j].aimHeight = terraformHeight + segment[i].point[j].orHeight
 				SetupPointStructure(segment[i].point[j], segment[i].structureArea, segment[i].area)
 				
-				totalCost = totalCost + abs(terraformHeight)
+				totalCost = totalCost + absTerraformHeight
 				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
@@ -1456,6 +1459,8 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					baseCost = baseCost,
 					totalCost = totalCost,
 					pyramidCostEstimate = pyramidCostEstimate,
+					pyramidUpLimit = (volumeSelection == 1 and terraform_type == 2 and (absTerraformHeight + pyramidLimitExtra)),
+					pyramidDownLimit = (volumeSelection == 2 and terraform_type == 2 and (absTerraformHeight + pyramidLimitExtra)),
 					point = segment[i].point,
 					points = segment[i].points,
 					area = segment[i].area,
@@ -1799,6 +1804,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		local totalCost = 0
 		local areaCost = 0
 		local perimeterCost = 0
+		local absTerraformHeight = abs(terraformHeight)
 		
 		if terraform_type == 1 then
 			for j = 1, segment[i].points do
@@ -1939,6 +1945,8 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					baseCost = baseCost,
 					totalCost = totalCost,
 					pyramidCostEstimate = pyramidCostEstimate,
+					pyramidUpLimit = (volumeSelection == 1 and terraform_type == 2 and (absTerraformHeight + pyramidLimitExtra)),
+					pyramidDownLimit = (volumeSelection == 2 and terraform_type == 2 and (absTerraformHeight + pyramidLimitExtra)),
 					point = segment[i].point,
 					points = segment[i].points,
 					area = segment[i].area,
@@ -2713,7 +2721,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 					}
 					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
-					if not IsPositionTerraformable(x, z) then
+					if (not IsPositionTerraformable(x, z)) or
+							(makingPyramid and terra.pyramidUpLimit and diffHeight > terra.pyramidUpLimit) or
+							((not makingPyramid) and terra.pyramidDownLimit and diffHeight < -terra.pyramidDownLimit) then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
 							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
@@ -2847,7 +2857,9 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						}
 						--updateTerraformBorder(id,x,z) --Removed Intercept Check
 						
-						if not IsPositionTerraformable(x, z) then
+						if not IsPositionTerraformable(x, z) or
+								(extraPoint[i].pyramid and terra.pyramidUpLimit and diffHeight > terra.pyramidUpLimit) or
+								((not extraPoint[i].pyramid) and terra.pyramidDownLimit and diffHeight < -terra.pyramidDownLimit) then
 							if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
 								terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
 							end
