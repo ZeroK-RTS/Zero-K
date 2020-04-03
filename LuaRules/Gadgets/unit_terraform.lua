@@ -1041,7 +1041,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					progress = 0,
 					lastUpdate = 0,
 					totalSpent = 0,
+					volCostSpent = 0,
 					baseCostSpent = 0,
+					zeroProgressCost = 0,
 					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
@@ -1454,7 +1456,9 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					progress = 0,
 					lastUpdate = 0,
 					totalSpent = 0,
+					volCostSpent = 0,
 					baseCostSpent = 0,
+					zeroProgressCost = 0,
 					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
@@ -1940,7 +1944,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					progress = 0,
 					lastUpdate = 0,
 					totalSpent = 0,
+					volCostSpent = 0,
 					baseCostSpent = 0,
+					zeroProgressCost = 0,
 					cost = totalCost,
 					baseCost = baseCost,
 					totalCost = totalCost,
@@ -2436,23 +2442,25 @@ local function updateTerraformCost(id)
 		volume = volume + abs(point.diffHeight)
 	end
 	
-	EchoDebug(id, "updateTerraformCost")
-	spSetUnitHealth(id, {
-		health = 0,
-		build  = 0
-	})
-	
 	if volume < 0.0001 then
 		-- Destroying the terraform here would enable structure-detecting maphax.
 		volume = 0.0001
 		terra.toRemove = true
 	end
-
-	terra.lastProgress = 0
-	terra.lastHealth = 0
-	terra.progress = 0
-	terra.cost = volume*volumeCost
+	
+	terra.zeroProgressCost = terra.volCostSpent
+	terra.cost = terra.volCostSpent + volume*volumeCost
 	terra.totalCost = terra.cost + terra.baseCost
+	
+	terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
+	terra.lastProgress = terra.progress
+	terra.lastHealth = terra.progress*terraUnitHP
+	
+	EchoDebug(id, "updateTerraformCost")
+	spSetUnitHealth(id, {
+		health = terra.lastHealth,
+		build  = terra.lastProgress
+	})
 	
 	EchoDebug(id, "Update Cost", terra.cost, terra.totalCost)
 	
@@ -2461,7 +2469,6 @@ end
 
 
 local function checkTerraformIntercepts(id)
-
 	for i = 1, terraformOrders do
 		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.top,terraformOrder[i].border.right,0,terraformOrder[i].border.top)
 		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.bottom,terraformOrder[i].border.right,0,terraformOrder[i].border.bottom)
@@ -2580,7 +2587,7 @@ local function GetHeightDiffLocal(xDiff, zDiff, innerEdgeDist)
 	return sqrt(xDiff^2 + zDiff^2)*maxHeightDifference/8
 end
 
-local function updateTerraform(health,id,arrayIndex,costDiff)
+local function updateTerraform(health, id, arrayIndex, costDiff)
 	local terra = terraformUnit[id]
 	
 	if terra.toRemove and terra.totalSpent > 0.1 then
@@ -2610,7 +2617,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 			terra.baseCostSpent = terra.baseCostSpent + costDiff*baseSpendProp
 			costDiff = costDiff*(1 - baseSpendProp)
 		else
-			costDiff = costDiff - (terra.baseCost-terra.baseCostSpent)
+			costDiff = costDiff - (terra.baseCost - terra.baseCostSpent)
 			terra.baseCostSpent = false
 		end
 	end
@@ -2631,12 +2638,12 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	local newProgress = terra.progress + costDiff/terra.totalCost
+	local newProgress = (terra.volCostSpent - terra.zeroProgressCost + costDiff) / (terra.cost - terra.zeroProgressCost)
 	if newProgress> 1 then
 		newProgress = 1
 	end
 	
-	local addedCost = 0
+	local pyramindCost = 0
 	local extraPoint = {}
 	local extraPoints = 0
 	local extraPointArea = {}
@@ -2732,7 +2739,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 						return -1
 					end
 					
-					addedCost = addedCost + extraPoint[index].cost - overlapCost
+					pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
 					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
@@ -2769,7 +2776,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 								pyramid = makingPyramid, -- pyramid = rising up, not pyramid = ditch
 							}
 							
-							addedCost = addedCost + extraPoint[extraPoints].cost
+							pyramindCost = pyramindCost + extraPoint[extraPoints].cost
 							
 							if not extraPointArea[x] then
 								extraPointArea[x] = {}
@@ -2868,7 +2875,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 							return -1
 						end
 						
-						addedCost = addedCost + extraPoint[index].cost - overlapCost
+						pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
 						
 						if not extraPointArea[x] then
 							extraPointArea[x] = {}
@@ -2904,7 +2911,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 									pyramid = extraPoint[i].pyramid, -- pyramid = rising up, not pyramid = ditch
 								}
 								
-								addedCost = addedCost + extraPoint[extraPoints].cost
+								pyramindCost = pyramindCost + extraPoint[extraPoints].cost
 								
 								if not extraPointArea[x] then
 									extraPointArea[x] = {}
@@ -2926,42 +2933,33 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	
 	end -- End do
 	
+	-- Update costs and determine progress.
 	terraformOperations = terraformOperations + extraPoints
-	
-	local oldCostDiff = costDiff
+	pyramindCost = pyramindCost*volumeCost
 	
 	local edgeTerraMult = 1
 	if costDiff ~= 0 then
-		if addedCost == 0 then
-			terra.progress = terra.progress + costDiff/terra.totalCost
+		if pyramindCost == 0 then
+			terra.volCostSpent = terra.volCostSpent + costDiff
+			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent + costDiff) / terra.totalCost
 		else
-			local extraCost = 0
-			
-			if newProgress > 0.96 and terra.progress + costDiff/terra.cost > 1 then
-				extraCost = costDiff - terra.totalCost*(1 - terra.progress)
-				costDiff = costDiff - extraCost
-			end
-			
-			addedCost = addedCost*volumeCost
-			
-			-- Spend less on the pyramid when base cost has not been spent (i.e., when terra.baseCostSpent has a value)
 			local edgeSpendFactor = (terra.baseCostSpent and 0.38) or 1
+			local edgeSpending = costDiff*edgeSpendFactor*(1 - costDiff/(costDiff + pyramindCost))
 			
-			local edgeTerraCost = edgeSpendFactor*(costDiff*addedCost/(costDiff+addedCost))
-			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.totalCost
-			edgeTerraMult = edgeTerraCost/addedCost
-			
-			--Spring.Echo("edgeTerraMult", edgeTerraMult, "edgeSpendFactor", edgeSpendFactor, "costDiff", costDiff, "edgeTerraCost", edgeTerraCost, "totalSpent", terra.totalSpent, "cost", terra.totalCost)
-			if extraCost > 0 then
-				edgeTerraCost = edgeTerraCost + extraCost
-				
-				if edgeTerraCost > addedCost then
-					terra.progress = terra.progress + (edgeTerraCost - addedCost)/terra.totalCost
-					edgeTerraMult = 1
-				else
-					edgeTerraMult = edgeTerraCost/addedCost
-				end
+			if terra.volCostSpent + costDiff > terra.cost then
+				local costRemaining = terra.cost - terra.volCostSpent
+				edgeSpending = costDiff*(1 - costRemaining/(costRemaining + pyramindCost))
 			end
+			if edgeSpending > pyramindCost then
+				edgeSpending = pyramindCost
+			end
+			
+			--Spring.Echo("costDiff", costDiff, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
+			
+			costDiff = costDiff - edgeSpending
+			edgeTerraMult = edgeSpending/pyramindCost
+			terra.volCostSpent = terra.volCostSpent + costDiff
+			terra.progress = ((terra.baseCostSpent or terra.baseCost) + terra.volCostSpent) / terra.totalCost
 		end
 	end
 	
@@ -2972,23 +2970,20 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	end
 	
 	--Spring.Echo("terra.progress", terra.progress)
-	local progress = terra.progress
-	if terra.progress >= 1 then
-		progress = 1
+	local terraformUpdateProgress = (terra.volCostSpent - terra.zeroProgressCost) / (terra.cost - terra.zeroProgressCost)
+	if terraformUpdateProgress > 1 or terra.progress >= 1 then
+		terraformUpdateProgress = 1
 		edgeTerraMult = 1
 	end
-	--Spring.Echo("progress", progress, "edgeTerraMult", edgeTerraMult, "addedCost", addedCost)
+	--Spring.Echo("progress", terraformUpdateProgress, "edgeTerraMult", edgeTerraMult, "pyramindCost", pyramindCost)
 
-	local newBuild = terra.progress
-	
-	EchoDebug(id, "SetHealth", newBuild*terraUnitHP, newBuild)
+	EchoDebug(id, "SetHealth", terra.progress*terraUnitHP, terra.progress)
 	spSetUnitHealth(id, {
-		health = newBuild*terraUnitHP,
-		build  = newBuild
+		health = terra.progress*terraUnitHP,
+		build  = terra.progress
 	})
-	
-	terra.lastHealth = newBuild*terraUnitHP
-	terra.lastProgress = newBuild
+	terra.lastHealth = terra.progress*terraUnitHP
+	terra.lastProgress = terra.progress
 
 	-- Bug Safety
 	for i = 1, extraPoints do
@@ -3004,7 +2999,7 @@ local function updateTerraform(health,id,arrayIndex,costDiff)
 	
 	local func = function()
 		for i = 1, terra.points do
-			local height = terra.point[i].orHeight+terra.point[i].diffHeight*progress
+			local height = terra.point[i].orHeight+terra.point[i].diffHeight*terraformUpdateProgress
 			spSetHeightMap(terra.point[i].x,terra.point[i].z, height)
 			terra.point[i].prevHeight = height
 		end
