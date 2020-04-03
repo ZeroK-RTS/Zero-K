@@ -3011,6 +3011,12 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 
 	-- Draw the changes
 	if USE_TERRAIN_TEXTURE_CHANGE then
+		local drawX = {}
+		local drawZ = {}
+		local drawTex = {}
+		local drawEdge = {}
+		local count = 0
+		
 		local drawingList = {}
 		for i = 1, terra.points do
 			local x = terra.point[i].x
@@ -3019,59 +3025,95 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 			local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
 			local freeRight = not (terra.area[x+8] and terra.area[x+8][z]) and not (extraPointArea[x+8] and extraPointArea[x+8][z])
 			local freeDown = not (terra.area[x] and terra.area[x][z+8]) and not (extraPointArea[x] and extraPointArea[x][z+8])
-			drawingList[#drawingList+1] = {x = x, z = z, tex = 1, edge = freeRight or freeDown}
+			
+			count = count + 1
+			drawX[count] = x
+			drawZ[count] = z
+			drawTex[count] = 1
+			drawEdge[count] = ((freeRight or freeDown) and 1) or 0
+			
 			if freeLeft then
-				drawingList[#drawingList+1] = {x = x-8, z = z, tex = 1, edge = true}
+				count = count + 1
+				drawX[count] = x  - 8
+				drawZ[count] = z
+				drawTex[count] = 1
+				drawEdge[count] = 1
 			end
 			if freeUp then
-				drawingList[#drawingList+1] = {x = x, z = z-8, tex = 1, edge = true}
+				count = count + 1
+				drawX[count] = x
+				drawZ[count] = z - 8
+				drawTex[count] = 1
+				drawEdge[count] = 1
 				if freeLeft then
-					drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 1, edge = true}
+					count = count + 1
+					drawX[count] = x - 8
+					drawZ[count] = z - 8
+					drawTex[count] = 1
+					drawEdge[count] = 1
 				end
 			end
 		end
+		
 		for i = 1, extraPoints do
 			local x = extraPoint[i].x
 			local z = extraPoint[i].z
 			local freeLeft = not (extraPointArea[x-8] and extraPointArea[x-8][z])
 			local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
-			drawingList[#drawingList+1] = {x = x, z = z, tex = 2, extraEdge = true}
+
+			count = count + 1
+			drawX[count] = x
+			drawZ[count] = z
+			drawTex[count] = 2
+			drawEdge[count] = 2
+			
 			if freeLeft then
-				drawingList[#drawingList+1] = {x = x-8, z = z, tex = 2, extraEdge = true}
+				count = count + 1
+				drawX[count] = x - 8
+				drawZ[count] = z
+				drawTex[count] = 2
+				drawEdge[count] = 2
 			end
 			if freeUp then
-				drawingList[#drawingList+1] = {x = x, z = z-8, tex = 2, extraEdge = true}
+				count = count + 1
+				drawX[count] = x
+				drawZ[count] = z - 8
+				drawTex[count] = 2
+				drawEdge[count] = 2
 				if freeLeft then
-					drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 2, extraEdge = true}
+					count = count + 1
+					drawX[count] = x - 8
+					drawZ[count] = z - 8
+					drawTex[count] = 2
+					drawEdge[count] = 2
 				end
 			end
 		end
 		
-		for i = 1, #drawingList do
-			local x = drawingList[i].x+4
-			local z = drawingList[i].z+4
-			local edge = drawingList[i].edge
-			local extraEdge = drawingList[i].extraEdge
-			drawingList[i].edge = nil -- don't sent to other gadget to send to unsynced
-			drawingList[i].extraEdge = extraEdge -- don't sent to other gadget to send to unsynced
+		for i = 1, count do
+			local x = drawX[i]
+			local z = drawZ[i]
+			local edge = (drawEdge[i] == 1)
+			local extraEdge = (drawEdge[i] == 2)
+			
 			-- edge exists because raised walls have passability at higher normal than uniform ramps
-			local oHeight = GetGroundOrigHeightOverride(drawingList[i].x, drawingList[i].z, 4, 4)
-			local height = spGetGroundHeight(x,z)
+			local oHeight = GetGroundOrigHeightOverride(drawX[i], drawZ[i], 4, 4)
+			local height = spGetGroundHeight(x, z)
 			if abs(oHeight-height) < 1 then
-				drawingList[i].tex = 0
+				drawTex[i] = 0
 			else
-				local normal = select(2,Spring.GetGroundNormal(x,z))
+				local normal = select(2, Spring.GetGroundNormal(x,z))
 				if (edge and normal > 0.82) or (normal > 0.892) then
-					drawingList[i].tex = 1
+					drawTex[i] = 1
 				elseif ((edge or extraEdge) and normal > 0.455) or (normal > 0.585) then
-					drawingList[i].tex = 2
+					drawTex[i] = 2
 				else
-					drawingList[i].tex = 3
+					drawTex[i] = 3
 				end
 			end
 		end
 		
-		GG.Terrain_Texture_changeBlockList(drawingList)
+		GG.Terrain_Texture_changeBlockList(drawX, drawZ, drawTex)
 	end
 	
 	--Removed Intercept Check
