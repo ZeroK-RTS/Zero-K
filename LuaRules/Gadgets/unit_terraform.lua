@@ -212,8 +212,8 @@ local currentCon            = 0
 local checkInterval         = 0
 
 -- Performance
-local MIN_UPDATE_PERIOD     = 8
-local MAX_UPDATE_PERIOD     = 30
+local MIN_UPDATE_PERIOD     = 6
+local MAX_UPDATE_PERIOD     = 40
 local updatePeriod          = 20 -- how many frames to update
 local terraformOperations   = 0 -- tracks how many operations. Used to prevent slowdown.
 local nextUpdateCheck       = 0 -- Time at which to check performance
@@ -2695,7 +2695,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					maxDiff = (thisEdge.checkX and thisEdge.checkZ and (SQRT_2*maxHeightDiffDownInner)) or maxHeightDiffDownInner
 				end
 
-				local heightSign = (makingPyramid and 1 or -1)
+				local heightSign = (makingPyramid and 1 or -1)vx
 				local diffHeight = newHeight - edgeHeight
 				if (diffHeight > maxDiff and makingPyramid) or (diffHeight < -maxDiff and not makingPyramid) then
 					local index = extraPoints + 1
