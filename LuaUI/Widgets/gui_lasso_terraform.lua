@@ -277,7 +277,7 @@ for i = 1, 10 do
 	options_order[#options_order + 1] = "level_hotkey_" .. i
 	
 	options["raise_type_" .. i]  = {
-		name = 'Level Hotkey ' .. i,
+		name = 'Raise Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Raise",
 		value = raiseTypePreset[i] or 0,
