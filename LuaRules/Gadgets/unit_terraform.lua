@@ -3091,8 +3091,8 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		end
 		
 		for i = 1, count do
-			local x = drawX[i]
-			local z = drawZ[i]
+			local x = drawX[i] + 4
+			local z = drawZ[i] + 4
 			local edge = (drawEdge[i] == 1)
 			local extraEdge = (drawEdge[i] == 2)
 			
