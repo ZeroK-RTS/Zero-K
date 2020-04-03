@@ -1,7 +1,7 @@
 return { planecon = {
   unitname            = [[planecon]],
   name                = [[Crane]],
-  description         = [[Construction Aircraft, Builds at 4 m/s]],
+  description         = [[Construction Aircraft, Builds at 5 m/s]],
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
@@ -45,7 +45,7 @@ return { planecon = {
   iconType            = [[builderair]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 240,
+  maxDamage           = 260,
   maxVelocity         = 6,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -56,7 +56,7 @@ return { planecon = {
   showNanoSpray       = false,
   sightDistance       = 380,
   turnRate            = 500,
-  workerTime          = 4,
+  workerTime          = 5,
 
   featureDefs         = {
 
