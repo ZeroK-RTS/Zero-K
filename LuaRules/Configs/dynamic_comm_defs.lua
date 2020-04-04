@@ -602,7 +602,7 @@ local moduleDefs = {
 	{
 		name = "module_radarnet",
 		humanName = "Field Radar",
-		description = "Field Radar - Attaches a basic radar system to the Commander.",
+		description = "Field Radar - Attaches a basic radar system.",
 		image = moduleImagePath .. "module_fieldradar.png",
 		limit = 1,
 		cost = 75 * COST_MULT,
@@ -615,7 +615,7 @@ local moduleDefs = {
 	{
 		name = "module_personal_cloak",
 		humanName = "Personal Cloak",
-		description = "Personal Cloak - A personal cloaking device for the Commander. Reduces speed by 8.",
+		description = "Personal Cloak - A personal cloaking device. Reduces speed by 8.",
 		image = moduleImagePath .. "module_personal_cloak.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
