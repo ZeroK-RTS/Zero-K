@@ -282,7 +282,7 @@ for i = 1, 10 do
 		path = HOTKEY_PATH .. "/Raise",
 		value = raiseTypePreset[i] or 0,
 		items = {
-			{key = 0, name = 'None', desc = 'Raise or lower the entire area.'},
+			{key = 0, name = 'Full', desc = 'Raise or lower the entire area.'},
 			{key = 1, name = 'Cull Cliffs', desc = 'Avoid raising sections of the terrain over the edge of cliffs.'},
 			{key = 2, name = 'Cull Ridges', desc = 'Avoid lowering sections of the terrain into steep ridges or walls.'},
 		},
