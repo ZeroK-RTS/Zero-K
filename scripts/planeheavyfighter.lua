@@ -13,7 +13,7 @@ local smokePiece = {base, engineL, engineR}
 --variables
 local gun = false
 
-local RESTORE_DELAY = 250
+local RESTORE_DELAY = 150
 local FIRE_SLOWDOWN = tonumber(UnitDef.customParams.combat_slowdown)
 
 --signals
