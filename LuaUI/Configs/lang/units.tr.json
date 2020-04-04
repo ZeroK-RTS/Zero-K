@@ -516,7 +516,7 @@
     },
     "gunshipbomb": {
         "name": "Blastwing",
-        "description": "Uçan Bomba (Kazar)",
+        "description": "Uçan Bomba Gözcü (Kazar)",
         "helptext": "Blastwing, LLT'ler, rüzgar çiftlikleri ve nanotonları çıkarmak için uygun, ancak daha uygun bir yumruk kütlesi sunmasına rağmen, sadece küçük bir hasar verir. Bombanın yörüngesinde öldükten sonra devam edecek olan yönelimli şarapnel olduğu için, hareket hızına ve yönüne dikkat edin. Bu sayede, Blastwing menzildeyken ölse bile, bir metal parçayla bir düşmanı püskürtebilirsiniz. Zincileme patlama olacağı için çok fazla sıkmayın. İnince görünmez."
     },
     "napalmmissile": {
