@@ -36,8 +36,6 @@ end
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
-local applyBlockingFrame = {}
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Constants
@@ -60,8 +58,6 @@ local RECENT_MAX = -1.45
 local RECENT_INT_WIDTH = 1
 
 local MAX_ALTITUDE_AIM = 400
-
-local NO_BLOCK_TIME = 5
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -132,19 +128,6 @@ local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
 
-
-local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, odz)
-	local _,_,_, _, ny, _ = Spring.GetUnitPosition(unitID, true)
-	local ndy = ty - ny
-	local flyTime = math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
-	
-	local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
-	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-	
-	GG.AddGadgetImpulseRaw(unitID, (px - vx)*launchMult*sideMult, (py - vy)*launchMult*upMult, (pz - vz)*launchMult*sideMult, true, true, nil, nil, true)
-	return flyTime
-end
-
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if not weaponDefID and throwWeaponDef[weaponDefID] then
 		return
@@ -179,13 +162,6 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		odz = odz*maxRange/fireDistance
 	end
 	
-	-- Blocking
-	Spring.SetUnitBlocking(proOwnerID, true, false)
-	local frame = Spring.GetGameFrame() + NO_BLOCK_TIME
-	applyBlockingFrame[frame] = applyBlockingFrame[frame] or {}
-	applyBlockingFrame[frame][proOwnerID] = true
-	
-	-- Apply impulse
 	local nearUnits = Spring.GetUnitsInCylinder(ox, oz, data.def.radius)
 	if nearUnits then
 		for i = 1, #nearUnits do
@@ -193,24 +169,23 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			local physicsData = physicsRestore and physicsRestore.Get(nearID)
 			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
 			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
-				
 				local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
 				local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
 				local launchMult = recentMult*speedMult
 				
-				local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
-				flyTime = flyTime + 15 -- Sideways time.
+				local _,_,_, _, ny, _ = Spring.GetUnitPosition(nearID, true)
+				local ndy = ty - ny
+				local flyTime = math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
 				
+				local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
+				
+				local vx, vy, vz = Spring.GetUnitVelocity(nearID)
+				GG.AddGadgetImpulseRaw(nearID, (px - vx)*launchMult, (py - vy)*launchMult, (pz - vz)*launchMult, true, true, nil, nil, true)
 				SetUnitDrag(nearID, 0)
 				GG.SetCollisionDamageMult(nearID, 0)
 				Spring.SetUnitLeaveTracks(nearID, false)
 				physicsRestore.Add(nearID,
 					{
-						odx = odx,
-						ty = ty,
-						odz = odz,
-						sidewaysCounter = 15,
-						launchMult = launchMult,
 						drag = -1.5,
 						collisionResistence = -5*flyTime/MIN_FLY_TIME,
 					}
@@ -322,18 +297,6 @@ function gadget:Initialize()
 	end
 end
 
-local function UpdateTrajectory(unitID, data)
-	if data.sidewaysCounter then
-		data.sidewaysCounter = data.sidewaysCounter - 1
-		if data.sidewaysCounter < 10 then
-			SendUnitToTarget(unitID, data.launchMult, 0.9*(1 - data.sidewaysCounter/10), 1, data.odx, data.ty, data.odz)
-		end
-		if data.sidewaysCounter <= 0 then
-			data.sidewaysCounter = nil
-		end
-	end
-end
-
 local function ReinstatePhysics(unitID, data)
 	if data.drag then
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
@@ -357,18 +320,8 @@ local function ReinstatePhysics(unitID, data)
 end
 
 function gadget:GameFrame(n)
-	physicsRestore.Apply(UpdateTrajectory)
 	if n%2 == 0 then
 		physicsRestore.Apply(ReinstatePhysics)
-	end
-	
-	if applyBlockingFrame[n] then
-		for unitID, _ in pairs(applyBlockingFrame[n]) do
-			if Spring.ValidUnitID(unitID) then
-				Spring.SetUnitBlocking(unitID, true, true)
-			end
-		end
-		applyBlockingFrame[n] = nil
 	end
 end
 
