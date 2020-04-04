@@ -35,6 +35,7 @@ local gunBelts = {
 }
 
 local gunFlares = {rflare, lflare}
+local ejectors = {rejector, lejector}
 local gun = 1
 local aiming = false
 
@@ -342,7 +343,11 @@ function script.Create()
 	Hide(rejector)
 	Hide(rflare)
 	Hide(lflare)
-	
+
+	-- workaround for ejectors pointing forwards in model
+	Turn(lejector, y_axis, math.rad(90), 100.0)
+	Turn(rejector, y_axis, math.rad(-90), 100.0)
+
 	StartThread(GG.Script.SmokeUnit, unitID, {chest})
 end
 
@@ -368,13 +373,13 @@ function script.FireWeapon(num)
 		reloadSpeedMult = 0.5
 	end
 	EmitSfx(gunFlares[gun], 1024)
-	EmitSfx(rejector, 1025)
+	EmitSfx(ejectors[gun], 1025)
 	Sleep(100/reloadSpeedMult)
 	EmitSfx(gunFlares[gun], 1024)
-	EmitSfx(rejector, 1025)
+	EmitSfx(ejectors[gun], 1025)
 	Sleep(100/reloadSpeedMult)
 	EmitSfx(gunFlares[gun], 1024)
-	EmitSfx(rejector, 1025)
+	EmitSfx(ejectors[gun], 1025)
 	Turn(gunBelts[gun].main, x_axis, math.rad(-2), math.rad(50))
 	Turn(gunBelts[gun].other, x_axis, math.rad(2), math.rad(50))
 	Sleep(100/reloadSpeedMult)
