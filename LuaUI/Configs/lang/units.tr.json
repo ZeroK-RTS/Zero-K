@@ -1076,7 +1076,7 @@
     },
     "planecon": {
         "name": "Vinç",
-        "description": "Mühendis Uçak, 4 m/s de inşa eder",
+        "description": "Mühendis Uçak, 5 m/s de inşa eder",
         "helptext": "Vinç herhangi bir arazide hızla uçuyor, ancak herhangi bir AH için kırılgan. Diğer inşaatçılar ile karşılaştırıldığında nispeten zayıf bir nano güce sahip olmasına rağmen, ulaşılması zor birçok yerde inşa edebilir ve bir hava oyuncuları bölgesini doğrusal olmayan bir şekilde genişletebilir. Hareket kabiliyetinden dolayı, enkazları ve diğer tekrarlayan görevleri geri almak için idealdir."
     },
     "gunshipraid": {

@@ -1071,7 +1071,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Statek powietrzny konstruktor, moc 4 m/s",
+		"description" : "Statek powietrzny konstruktor, moc 5 m/s",
 		"helptext" : "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
 	},
 	"gunshipraid" : {

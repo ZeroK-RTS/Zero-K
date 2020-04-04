@@ -1056,7 +1056,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Konstruktionsflugzeug, Baut mit 4 m/s",
+		"description" : "Konstruktionsflugzeug, Baut mit 5 m/s",
 		"helptext" : "Der Crane bewegt sich flink über das Terrain, ist aber auch anfällig gegenüber AA. Obwohl er ziemlich wenig Baukraft hat, ist er in der Lage auch auf außergewöhnlichen Plätzen zu bauen. Durch seine Mobilität ist er ideal dafür geschaffen, Wracks zu absorbieren und daraus das Metall zu gewinnen."
 	},
 	"turretsunlance" : {
