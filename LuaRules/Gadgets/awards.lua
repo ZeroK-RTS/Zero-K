@@ -539,8 +539,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			end
 		elseif ud.name == "roost" then
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
-		else
-			--
 		end
 	end
 end

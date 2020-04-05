@@ -160,9 +160,7 @@ local function ChangeTextureBlock(x, z, myTex)
 			blockMap[x][z] = nil
 			blockList.data[blockList.count] = nil
 			blockList.count = blockList.count - 1
-		elseif myTex == otherTex then
-			-- There is nothing to do, changes are the same.
-		else
+		elseif myTex ~= otherTex then
 			-- Replace pending change
 			blockList.data[otherIndex].tex = myTex
 		end

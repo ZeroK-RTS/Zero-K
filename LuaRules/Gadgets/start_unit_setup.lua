@@ -438,7 +438,7 @@ local function StartUnitPicked(playerID, name)
 		local frame = Spring.GetGameFrame() + 3
 		if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
 		scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
-	else
+	--else
 		--[[
 		if startPosition[teamID] then
 			local oldCommID = prespawnedCommIDs[teamID]

@@ -101,7 +101,7 @@ local function IsPathTraversable(unitDef, startX, startZ, goalX, goalZ)
                 not canMoveInWater) or (submerged and IsUnitShip(unitDef) and unitDef.moveDef.depth > depth) then
                 --Spring.MarkerAddPoint(x, 0, z, "Slope not traversable")
                 return false
-            else
+            --else
                 --Spring.MarkerAddPoint(x, 0, z, "Slope traversable")
                 --if x >= goalX and z >= goalZ then
                 --Debug("Slope " .. x .. ", " .. z .. " is traversable")
@@ -137,7 +137,7 @@ local function FindAccessibleSpot(diffs, unitDef, startX, startZ)
         if isFree then
             --Debug("Path is free")
             return goalX, goalZ
-        else
+        --else
             --Debug("Path " .. i .. " is unknown or not free")
         end
     end
@@ -285,7 +285,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                     if targetX then
                         spSetUnitPosition(units[i], targetX, targetZ)
                         -- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
-                    else
+                    --else
                         --Debug("Failed to find an accessible spot")
                     end
                 end

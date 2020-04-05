@@ -1656,9 +1656,9 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
 	teamID = teamID or spGetUnitTeam(unitID)
 
-	if generator[allyTeamID][teamID][unitID] then
+	--if generator[allyTeamID][teamID][unitID] then
 		--return
-	end
+	--end
 
 	if unitDefID and generatorDefs[unitDefID] then
 		local defData = generatorDefs[unitDefID]
@@ -1696,9 +1696,9 @@ local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 
 	resourceGenoratingUnit[unitID] = false
 
-	if not generator[allyTeamID][teamID][unitID] then
+	--if not generator[allyTeamID][teamID][unitID] then
 		--return
-	end
+	--end
 
 	local list = generatorList[allyTeamID][teamID]
 	local listID = generator[allyTeamID][teamID][unitID].listID

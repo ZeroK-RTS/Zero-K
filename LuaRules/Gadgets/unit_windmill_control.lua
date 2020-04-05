@@ -86,9 +86,9 @@ end
 -- Debug
 
 local function ToggleWindAnimation(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then
+	--if not Spring.IsCheatingEnabled() then
 		--return
-	end
+	--end
 	GG.Wind_SpinDisabled = not GG.Wind_SpinDisabled
 	
 	if GG.Wind_SpinDisabled then

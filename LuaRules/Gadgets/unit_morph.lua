@@ -397,9 +397,9 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
-	if (extraUnitMorphDefs[unitID] ~= nil) then
+	--if (extraUnitMorphDefs[unitID] ~= nil) then
 	-- nothing here for now
-	end
+	--end
 	
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message

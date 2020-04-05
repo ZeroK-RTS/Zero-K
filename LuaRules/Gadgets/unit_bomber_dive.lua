@@ -135,8 +135,6 @@ local function GetWantedBomberHeight(unitID, bomberID, config, underShield)
 	end
 	
 	local _, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
-	if inbuild then
-	end
 	
 	local speedMult = (inbuild and 0) or (stunned and 0) or (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
 	if (speedMult or 1) ~= 1 then
