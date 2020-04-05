@@ -96,7 +96,7 @@ local myTeamID 			= Spring.GetLocalTeamID()
 local ceasefires 		= (not Spring.FixedAllies())
 local marketandbounty 	= false
 
-local window_unitcontext, window_unitstats
+local window_unitcontext
 local statswindows = {}
 
 local colorCyan = {0.2, 0.7, 1, 1}
@@ -1696,10 +1696,6 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		}
 	}
 
-	if window_unitstats then
-		window_unitstats:Dispose()
-	end
-
 	statswindows[num] = Window:New{
 		x = x,
 		y = y,
@@ -1812,8 +1808,6 @@ local function PriceWindow(unitID, action)
 end
 
 local function MakeUnitContextMenu(unitID,x,y)
-	--hideWindow(window_unitstats)
-					
 	local udid 			= spGetUnitDefID(unitID)
 	local ud 			= UnitDefs[udid]
 	if not ud then return end
@@ -1992,11 +1986,6 @@ function widget:MousePress(x,y,button)
 	--[[
 	if window_unitcontext and window_unitcontext.visible and (not screen0.hoveredControl or not screen0.hoveredControl:IsDescendantOf(window_unitcontext)) then
 		hideWindow(window_unitcontext)
-		return true
-	end
-	
-	if window_unitstats and window_unitstats.visible and (not screen0.hoveredControl or not screen0.hoveredControl:IsDescendantOf(window_unitstats)) then
-		hideWindow(window_unitstats)
 		return true
 	end
 	--]]

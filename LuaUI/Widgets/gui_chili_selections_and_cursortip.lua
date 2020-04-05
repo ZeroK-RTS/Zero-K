@@ -1860,7 +1860,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		local teamID
-		local addedName
 		local ud
 		local metalInfoShown = false
 		local maxHealthShown = false
@@ -1933,9 +1932,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:Invalidate()
 			
 			local unitName = GetHumanName(ud, unitID)
-			if addedName then
-				unitName = unitName .. addedName
-			end
 			unitNameUpdate(true, unitName, GetUnitIcon(unitDefID))
 			
 			if unitID then

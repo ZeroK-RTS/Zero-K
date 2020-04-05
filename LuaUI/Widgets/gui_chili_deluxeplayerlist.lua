@@ -1165,7 +1165,7 @@ SetupPlayerNames = function()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,customKeys = Spring.GetPlayerInfo(playerID)
-		local clan, faction, level, elo, wins, rank
+		local clan, faction, level, elo, rank
 		if customKeys then
 			clan = customKeys.clan
 			faction = customKeys.faction
@@ -1193,7 +1193,6 @@ SetupPlayerNames = function()
 				faction = faction,
 				level = level,
 				elo = elo,
-				wins = wins,
 			}
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
