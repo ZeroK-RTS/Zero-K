@@ -217,10 +217,7 @@ upgrades = {
 							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
 						elseif id == "commweapon_gaussrifle" then
 							v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
-						elseif id == "commweapon_shockrifle" then
-							--v.rgbcolor = [[0.1 0.65 0.9]]
-							--v.explosiongenerator = [[custom:BURNTEAL]]
-						end
+						end -- no visual effect on shock rifle
 						if i == "commweapon_shotgun_green" or i == "commweapon_heavymachinegun_lime" then
 							v.rgbcolor = "0 1 0.7"
 							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_TURQUOISE]]
