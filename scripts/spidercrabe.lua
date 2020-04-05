@@ -27,6 +27,9 @@ local gflash = piece 'gflash'
 
 local smokePiece = {base, turret}
 
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
+local CMD_MOVE = CMD.MOVE
+
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -184,13 +187,18 @@ end
 
 local function Uncurl()
 	--Spring.Echo("Initiating uncurl", Spring.GetGameFrame())
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD_RAW_MOVE or cmdID == CMD_MOVE then
+		Sleep(100)
+	else
+		Sleep(700)
+	end
 	
 	ResetLegs()
 	Move(canon, y_axis, 0, 2.5)
 	Move(base, y_axis, 0, 2.5)
 	Move(base, z_axis, 0, 2.5)
 
-	Sleep(400)
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
 	Spring.SetUnitArmored(unitID,false)
 	
@@ -251,7 +259,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.02)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)

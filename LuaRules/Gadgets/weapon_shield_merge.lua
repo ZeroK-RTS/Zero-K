@@ -45,6 +45,8 @@ for i = 1, #WeaponDefs do
 	defaultShielDamages[i] = WeaponDefs[i].damages[SHIELD_ARMOR]
 end
 
+local beamWeaponDef = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Network management
@@ -297,12 +299,19 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	if proID == -1 then
 		local unitDefID = Spring.GetUnitDefID(beamCarrierID)
 		hackyProID = beamCarrierID + beamEmitter/64
-		-- Beam weapon
-		local ud = beamCarrierID and UnitDefs[unitDefID]
-		if not ud then
+		if not unitDefID then
 			return true
 		end
-		weaponDefID = ud.weapons[beamEmitter].weaponDef
+		-- Beam weapon
+		if not (beamWeaponDef[unitDefID] and beamWeaponDef[unitDefID][beamEmitter]) then
+			local ud = beamCarrierID and UnitDefs[unitDefID]
+			if not ud then
+				return true
+			end
+			beamWeaponDef[unitDefID] = beamWeaponDef[unitDefID] or {}
+			beamWeaponDef[unitDefID][beamEmitter] = ud.weapons[beamEmitter].weaponDef
+		end
+		weaponDefID = beamWeaponDef[unitDefID][beamEmitter]
 	else
 		-- Projectile
 		weaponDefID = Spring.GetProjectileDefID(proID)
