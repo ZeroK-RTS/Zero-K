@@ -2559,7 +2559,7 @@ end
 
 local function addSteepnessMarker(team, x, z)
 	local n = spGetGameFrame()
-	if steepnessMarkervxs.inner.frame ~= n then
+	if steepnessMarkers.inner.frame ~= n then
 		steepnessMarkers.inner = {count = 0, data = {}, frame = n}
 	end
 	Spring.Echo(steepnessMarkers.inner.frame)
