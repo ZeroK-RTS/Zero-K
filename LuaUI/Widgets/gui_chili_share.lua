@@ -1306,7 +1306,7 @@ local function UpdateInviteTable()
 					givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
 					--Spring.Echo("showing")
 			end
-		else
+		-- else
 			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID, false)))
 		end
 	end

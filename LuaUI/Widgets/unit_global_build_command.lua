@@ -1518,9 +1518,7 @@ function FindCheapestJob(unitID)
 		local cmd = tmpJob.id
 		local jx, jy, jz
 		
-		if tmpJob.target and tmpJob.target == unitID then
-		-- ignore self-targetting commands
-		else
+		if not tmpJob.target or tmpJob.target ~= unitID then -- ignore self-targetting commands
 			-- get job position
 			if tmpJob.x then -- for jobs with explicit locations, or for which we've cached locations
 				jx, jy, jz = tmpJob.x, tmpJob.y, tmpJob.z --the location of the current job
@@ -2016,9 +2014,7 @@ function CleanOrders(cmd, isNew)
 
 		local canBuildThisThere,_ = spTestBuildOrder(cmdID,cx,cy,cz,ch) --check if build site is blocked by buildings & terrain
 	
-		if canBuildThisThere == blockageType.free then -- if our job is not obstructed by anything
-		-- do nothing, leave isClear set to true.
-		else -- otherwise if our job is blocked by something
+		if canBuildThisThere ~= blockageType.free then -- if our job is not obstructed by anything, do nothing, leave isClear set to true
 			local r = ( sqrt(xSize^2+zSize^2) /2 )+75 -- convert the rectangular diagonal into a radius, buffer it for increased reliability with small buildings.
 			local blockingUnits = spGetUnitsInCylinder(cx+(xSize/2), cz+(zSize/2), r)
 			for i=1, #blockingUnits do

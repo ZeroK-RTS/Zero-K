@@ -91,8 +91,7 @@ for i = 1, #buildOpts do
 		defense_list[#defense_list + 1] = name
 	elseif special_commands[-UnitDefNames[name].id] then
 		special_list[#special_list + 1] = name
-	else
-		-- fac; has its own category (though things can be in multiple cats if wanted)
+	-- else fac; has its own category (though things can be in multiple cats if wanted)
 	end
 end
 

@@ -360,11 +360,8 @@ function widget:Initialize()
 
   -- check for custom key bind
   local hotkeys = Spring.GetActionHotKeys("radialmenu")
-  if hotkeys == nil then
-  else
-    if #hotkeys > 0 then
-      customKeyBind = true
-    end
+  if hotkeys and #hotkeys > 0 then
+    customKeyBind = true
   end
 
   -- adding functions because of "handler=true"
@@ -382,11 +379,8 @@ function widget:Initialize()
   
   -- check for custom key bind
   local hotkeys = Spring.GetActionHotKeys("buildprev")
-  if hotkeys == nil then
-  else
-    if #hotkeys > 0 then
-      customKeyBind = true
-    end
+  if hotkeys and #hotkeys > 0 then
+    customKeyBind = true
   end
   widgetHandler:AddAction("buildprev", BuildPrev, nil, "t")
   if not customKeyBind then

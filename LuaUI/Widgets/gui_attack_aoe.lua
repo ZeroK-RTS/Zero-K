@@ -776,9 +776,7 @@ function widget:DrawWorld()
 	elseif (weaponType == "orbital") then
 		DrawAoE(tx, ty, tz, info.aoe, info.ee)
 		DrawOrbitalScatter(info.scatter, tx, ty, tz)
-	elseif (weaponType == "dontdraw") then
-		-- don't draw anything foo
-	else
+	elseif (weaponType ~= "dontdraw") then
 		DrawAoE(tx, ty, tz, info.aoe, info.ee)
 	end
 

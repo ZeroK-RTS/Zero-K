@@ -69,8 +69,7 @@ function Spring.IsGUIHidden()
 end
 
 function Spring.GetTeamColor(teamid)
-  if teamColor[teamid] then
-  else
+  if not teamColor[teamid] then
     teamColor[teamid] = { GetTeamColor(teamid) }
   end
   return unpack(teamColor[teamid])

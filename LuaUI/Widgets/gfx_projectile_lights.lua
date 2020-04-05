@@ -452,10 +452,10 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 					local drawParams = GetBeamLights(lightParams, pID, x, y, z)
 					beamLightCount = beamLightCount + 1
 					beamLights[beamLightCount] = drawParams
-					if projectileDrawParams then
+					--if projectileDrawParams then
 						-- Don't add beams (for now?)
 						--projectileDrawParams[#projectileDrawParams + 1] = drawParams
-					end
+					--end
 				else -- point type
 					if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 						local drawParams = GetProjectileLight(lightParams, pID, x, y, z)

@@ -1450,7 +1450,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = 'Companion Drones: ', textColor = color.stats_fg, }
 			statschildren[#statschildren+1] = Label:New{ caption = compDrones, textColor = color.stats_fg, }
 		end
-	else
+	-- else
 		-- Do something for Reef and other carriers
 	end
 

@@ -118,10 +118,10 @@ function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
 		-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
 		-- Spring.Echo("d: {"..dx..", "..dz.."}")
 	end
-	if lockPoint.mode == lockMode.free then
+	-- if lockPoint.mode == lockMode.free then
 		--When someone needs this, this is where to put in the correction mode that works on xyz
 		--should be useful for orbiting/rotating around a point, but not necessary for tiltzoom
-	end
+	-- end
 
 	return dx, nil, dz
 end

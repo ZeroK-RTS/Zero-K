@@ -153,9 +153,9 @@ local function AddAddonAction(addon, cmd, func, data, types, _)
 	assert(_ == nil, "actionHandler:Foobar() is deprecated, use actionHandler.Foobar()!")
 
 	-- make sure that this is a fully initialized addon
-	if (not addon._info) then
+	--if (not addon._info) then
 		--error(LUAUI_DIRNAME .. "error adding action: please use addon:Initialize()")
-	end
+	--end
 
 	-- default to text and keyPress  (not repeat or releases)
 	local text, keyPress, keyRepeat, keyRelease = ParseTypes(types, "tp")
