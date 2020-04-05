@@ -20,9 +20,6 @@ local GAMESPEED = Game.gameSpeed
 local SHIELDARMORID = 4
 local SHIELDARMORIDALT = 0
 
-local proDamDefs = {}
-local beamDamDefs = {}
-
 if gadgetHandler:IsSyncedCode() then
 	local spSetUnitRulesParam = Spring.SetUnitRulesParam
 	local INLOS_ACCESS = {inlos = true}
@@ -33,52 +30,30 @@ if gadgetHandler:IsSyncedCode() then
 	end
 
 	function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
-		
-		local damage = -1
+		local wd = nil
+		local dmgMod = 1
 		if proID and proID ~= -1 then
 			local proDefID = Spring.GetProjectileDefID(proID)
-			if not proDamDefs[proDefID] then
-				wd = WeaponDefs[proDefID]
-				if wd then
-					proDamDefs[proDefID] = wd.damages[SHIELDARMORID]
-					if proDamDefs[proDefID] <= 0.1 then --some stupidity here: llt has 0.0001 dmg in wd.damages[SHIELDARMORID]
-						proDamDefs[proDefID] = wd.damages[SHIELDARMORIDALT]
-					end
-				else
-					proDamDefs[proDefID] = -1
-				end
-			end
-			damage = proDamDefs[proDefID]
-		end
-		
-		if beamEmitterUnitID and beamEmitterWeaponNum then
+			wd = WeaponDefs[proDefID]
+		elseif beamEmitterUnitID then --hitscan weapons
 			local unitDefID = Spring.GetUnitDefID(beamEmitterUnitID)
-			if not (beamDamDefs[unitDefID] and beamDamDefs[unitDefID][beamEmitterWeaponNum]) then
-				beamDamDefs[unitDefID] = beamDamDefs[unitDefID] or {}
-				local weaponDefID = UnitDefs[unitDefID].weapons[beamEmitterWeaponNum].weaponDef
-				wd = WeaponDefs[weaponDefID]
-				if wd then
-					local dmgMod = 1
-					if wd.type ~= "LightningCannon" then
-						dmgMod = 1 / (wd.beamtime * GAMESPEED)
-					end
-					beamDamDefs[unitDefID][beamEmitterWeaponNum] = wd.damages[SHIELDARMORID]
-					if beamDamDefs[unitDefID][beamEmitterWeaponNum] <= 0.1 then --some stupidity here: llt has 0.0001 dmg in wd.damages[SHIELDARMORID]
-						beamDamDefs[unitDefID][beamEmitterWeaponNum] = wd.damages[SHIELDARMORIDALT]
-					end
-				else
-					beamDamDefs[unitDefID][beamEmitterWeaponNum] = -1
-				end
+			local weaponDefID = UnitDefs[unitDefID].weapons[beamEmitterWeaponNum].weaponDef
+			wd = WeaponDefs[weaponDefID]
+			if wd.type ~= "LightningCannon" then
+				dmgMod = 1 / (wd.beamtime * GAMESPEED)
 			end
-			damage = beamDamDefs[unitDefID][beamEmitterWeaponNum]
 		end
 
-		if damage and damage ~= -1 then
+		if wd then
+			local dmg = wd.damages[SHIELDARMORID]
+			if dmg <= 0.1 then --some stupidity here: llt has 0.0001 dmg in wd.damages[SHIELDARMORID]
+				dmg = wd.damages[SHIELDARMORIDALT]
+			end
 			--GG.TableEcho(wd.damages)
 			--Spring.Echo("dmg=", dmg, dmg * dmgMod)
 			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
 			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
-			SendToUnsynced("AddShieldHitDataHandler", gameFrame, shieldCarrierUnitID, damage, dx, dy, dz)
+			SendToUnsynced("AddShieldHitDataHandler", gameFrame, shieldCarrierUnitID, dmg * dmgMod, dx, dy, dz)
 		end
 
 		spSetUnitRulesParam(shieldCarrierUnitID, "shieldHitFrame", gameFrame, INLOS_ACCESS)

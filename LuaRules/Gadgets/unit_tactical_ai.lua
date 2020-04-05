@@ -54,8 +54,6 @@ local ALLY_TABLE = {
 	ally = true,
 }
 
-local AVOID_HEIGHT_DIFF = 25
-
 --------------------------------------------------------------------------------
 -- Globals
 
@@ -327,18 +325,11 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		return behaviour.skirmKeepOrder
 	end
 
-	if enemyUnitDef and behaviour.avoidHeightDiff and behaviour.avoidHeightDiff[enemyUnitDef] then
-		if ey - uy > AVOID_HEIGHT_DIFF or ey - uy < -AVOID_HEIGHT_DIFF then
-			return behaviour.skirmKeepOrder
-		end
-	end
-
 	-- Use aim position as enemy position
 	ey = aimY or ey
 	
 	-- The e vector is relative to unit position
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
-	
 	
 	local predict = 1
 	if enemySpeed < behaviour.mySpeed*0.95 then

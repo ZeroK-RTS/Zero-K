@@ -2,10 +2,10 @@ if GG.SetupAimPosTerraform then
 	return
 end
 
-function GG.SetupAimPosTerraform(unitID, floatOnWater, defaultMid, defaultAim, minAimOffset, maxAimOffset, cliffPeek, searchRange)
+function GG.SetupAimPosTerraform(unitID, unitDefID, defaultMid, defaultAim, minAimOffset, maxAimOffset, cliffPeek, searchRange)
 	local baseX,_,baseZ = Spring.GetUnitPosition(unitID)
 	local baseHeight = Spring.GetGroundHeight(baseX, baseZ)
-	if baseHeight < 0 and floatOnWater then
+	if baseHeight < 0 and UnitDefs[unitDefID].floatOnWater then
 		baseHeight = 0
 	end
 	

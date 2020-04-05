@@ -22,7 +22,6 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 		height = spGetGroundHeight(x,z)
 		if y - height < 1 then
 			speed = select(4, spGetUnitVelocity(unitID))
-			--Spring.Echo("speed", speed, "moving", moving, "Spring.GetUnitTravel", Spring.GetUnitTravel(unitID))
 			if moving then
 				if speed <= thresholdSpeed then
 					moving = false
