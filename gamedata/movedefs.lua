@@ -9,8 +9,8 @@
 --------------------------------------------------------------------------------
 
 local common_depthmodparams = {
-	quadraticCoeff = 0,
-	linearCoeff = 0.07,
+	quadraticCoeff = 0.0027,
+	linearCoeff = 0.02,
 }
 
 local moveDefs = {
