@@ -1272,11 +1272,16 @@ function gadget:GameFrame(n)
 				end
 				energyWasted = 0
 			elseif totalFreeStorage > energyToRefund then
+				energyToRefund = energyToRefund - totalFreeStorageLimited -- Give everyone energy up to the free storage limit.
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
 					if te.energyProducerOrUser then
-						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*te.freeStorage/totalFreeStorage
+						if te.freeStorage > FREE_STORAGE_LIMIT then
+							te.overdriveEnergyNet = te.overdriveEnergyNet + FREE_STORAGE_LIMIT + energyToRefund*(te.freeStorage - FREE_STORAGE_LIMIT)/totalFreeStorage
+						else
+							te.overdriveEnergyNet = te.overdriveEnergyNet + te.freeStorage
+						end
 					end
 				end
 				energyWasted = 0
