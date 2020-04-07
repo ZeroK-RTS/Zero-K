@@ -108,6 +108,7 @@ local function paybackFactorFunction(repayRatio)
 	end
 end
 
+local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
@@ -1225,6 +1226,7 @@ function gadget:GameFrame(n)
 			local overdriveEnergySpending = energyForOverdrive - energyWasted
 			--// Refund excess energy from overdrive and overfull storages.
 			local totalFreeStorage = 0
+			local totalFreeStorageLimited = 0
 			local energyToRefund = energyWasted
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
@@ -1240,6 +1242,7 @@ function gadget:GameFrame(n)
 				if te.freeStorage > 0 then
 					if te.energyProducerOrUser then
 						totalFreeStorage = totalFreeStorage + te.freeStorage
+						totalFreeStorageLimited = totalFreeStorageLimited + min(FREE_STORAGE_LIMIT, te.freeStorage)
 						if debugMode then
 							Spring.Echo(teamID, "Free", te.freeStorage)
 						end
@@ -1259,7 +1262,16 @@ function gadget:GameFrame(n)
 				Spring.Echo("AllyTeam totalFreeStorage", totalFreeStorage, "energyToRefund", energyToRefund)
 			end
 
-			if totalFreeStorage > energyToRefund then
+			if totalFreeStorageLimited > energyToRefund then
+				for i = 1, allyTeamData.teams do
+					local teamID = allyTeamData.team[i]
+					local te = teamEnergy[teamID]
+					if te.energyProducerOrUser then
+						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*min(FREE_STORAGE_LIMIT, te.freeStorage)/totalFreeStorageLimited
+					end
+				end
+				energyWasted = 0
+			elseif totalFreeStorage > energyToRefund then
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
@@ -1514,13 +1526,13 @@ function gadget:GameFrame(n)
 			for i = 1, allyTeamData.teams do
 				local share = (splitByShare and teamResourceShare[teamID]) or 1
 				if share > 0 and freeSpace[i] then
-					freeSpace[i] = math.min(freeSpace[i], totalToShare * share)
+					freeSpace[i] = min(freeSpace[i], totalToShare * share)
 					totalFreeSpace = totalFreeSpace + freeSpace[i]
 				end
 			end
 			
 			if totalToShare ~= 0 then
-				local excessFactor = 1 - math.min(1, totalFreeSpace/totalToShare)
+				local excessFactor = 1 - min(1, totalFreeSpace/totalToShare)
 				local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
 				for i = 1, allyTeamData.teams do
 					if shareToSend[i] then
