@@ -14,8 +14,9 @@
 
 local vfsInclude = VFS.Include
 local vfsGame = VFS.GAME
+local spSendCommands = Spring.SendCommands
 
-Spring.SendCommands({"ctrlpanel " .. LUAUI_DIRNAME .. "ctrlpanel.txt"})
+spSendCommands("ctrlpanel LuaUI/ctrlpanel.txt")
 
 vfsInclude("LuaUI/utils.lua"    , nil, vfsGame)
 vfsInclude("LuaUI/setupdefs.lua", nil, vfsGame)
@@ -41,7 +42,7 @@ do
   if (RestartCount > 0) then
     restartStr = "  (" .. RestartCount .. " Restarts)"
   end
-  Spring.SendCommands({"echo " .. LUAUI_VERSION .. restartStr})
+  spSendCommands("echo " .. LUAUI_VERSION .. restartStr)
 end
 
 
@@ -57,7 +58,7 @@ local gl = Spring.Draw  --  easier to use
 --
 
 function Say(msg)
-  Spring.SendCommands({'say ' .. msg})
+	spSendCommands('say ' .. msg)
 end
 
 
