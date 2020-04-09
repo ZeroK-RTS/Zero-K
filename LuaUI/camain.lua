@@ -12,17 +12,18 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local vfsInclude = VFS.Include
+local vfsGame = VFS.GAME
+
 Spring.SendCommands({"ctrlpanel " .. LUAUI_DIRNAME .. "ctrlpanel.txt"})
 
-VFS.Include(LUAUI_DIRNAME .. 'utils.lua', nil, VFS.ZIP)
-
-include("setupdefs.lua")
-include("savetable.lua")
-
-include("debug.lua")
-include("modfonts.lua")
-include("layout.lua")   -- contains a simple LayoutButtons()
-include("cawidgets.lua")  -- the widget handler
+vfsInclude("LuaUI/utils.lua"    , nil, vfsGame)
+vfsInclude("LuaUI/setupdefs.lua", nil, vfsGame)
+vfsInclude("LuaUI/savetable.lua", nil, vfsGame)
+vfsInclude("LuaUI/debug.lua"    , nil, vfsGame)
+vfsInclude("LuaUI/modfonts.lua" , nil, vfsGame)
+vfsInclude("LuaUI/layout.lua"   , nil, vfsGame)   -- contains a simple LayoutButtons()
+vfsInclude("LuaUI/cawidgets.lua", nil, vfsGame)  -- the widget handler
 
 --------------------------------------------------------------------------------
 --
