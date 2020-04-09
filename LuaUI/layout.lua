@@ -24,7 +24,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 
 local langSuffix = Spring.GetConfigString('Language', 'fr')
 local l10nName = 'L10N/commands_' .. langSuffix .. '.lua'

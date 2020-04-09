@@ -6,7 +6,7 @@ local abs = math.abs
 local FLOW_PER_ARROW = 5
 local MAX_ARROWS = 6
 
-VFS.Include("LuaUI/Headers/colors.h.lua") -- for WhiteStr
+VFS.Include("LuaUI/colors.lua") -- for WhiteStr
 
 local function PrettyFormat(input, positiveColourStr, negativeColourStr)
 	--[[ FIXME: would ideally replace the ones in the respective widgets,

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  file:    colors.h.lua
+--  file:    colors.lua
 --  brief:   color strings (Spring format) and color arrays
 --  author:  Dave Rodgers
 --

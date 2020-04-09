@@ -92,10 +92,6 @@ end
 -- Include
 
 function include(filename, envTable, VFSMODE)
-	if filename == "colors.h.lua" then
-		return require("colors.lua") --// tail call so we don't need to bother with stacklevels
-	end
-
 	if (not filename:find("/", 1, true))or(not VFS.FileExists(filename, VFSMODE or VFS.DEF_MODE)) then
 		if VFS.FileExists(LUAUI_DIRNAME .. filename, VFSMODE or VFS.DEF_MODE) then
 			filename = LUAUI_DIRNAME .. filename
