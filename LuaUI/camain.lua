@@ -26,30 +26,9 @@ vfsInclude("LuaUI/modfonts.lua" , nil, vfsGame)
 vfsInclude("LuaUI/layout.lua"   , nil, vfsGame)   -- contains a simple LayoutButtons()
 vfsInclude("LuaUI/cawidgets.lua", nil, vfsGame)  -- the widget handler
 
---------------------------------------------------------------------------------
---
--- print the header
---
-
-if (RestartCount == nil) then
-  RestartCount = 0
-else
-  RestartCount = RestartCount + 1
-end
-
-do
-  local restartStr = ""
-  if (RestartCount > 0) then
-    restartStr = "  (" .. RestartCount .. " Restarts)"
-  end
-  spSendCommands("echo " .. LUAUI_VERSION .. restartStr)
-end
-
-
---------------------------------------------------------------------------------
+spSendCommands("echo " .. LUAUI_VERSION)
 
 local gl = Spring.Draw  --  easier to use
-
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
