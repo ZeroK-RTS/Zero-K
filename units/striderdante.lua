@@ -209,6 +209,7 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 450,
         reaim_time = 1,
       },
       
@@ -260,6 +261,7 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 450,
         
         light_color = [[0.8 0.4 0.1]],
         light_radius = 320,
