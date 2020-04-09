@@ -41,7 +41,7 @@ Spring.Echo("function_override include")
 VFS.Include("LuaRules/Utilities/function_override.lua")
 Spring.Echo("function_override DONE")
 
-include("keysym.h.lua")
+include("keysym.lua")
 includeZIPFirst("system.lua")
 includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
 include("callins.lua")

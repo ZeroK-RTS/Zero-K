@@ -11,7 +11,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 ------------------------------------------------
 -- Speedups
