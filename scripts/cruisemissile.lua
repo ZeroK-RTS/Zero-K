@@ -9,10 +9,12 @@ local function RemoveMissile()
 	GG.MissileSilo.DestroyMissile(unitID, unitDefID)
 	Spring.SetUnitRulesParam(unitID, "do_not_save", 1)
 	
+	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
 	Spring.SetUnitNoMinimap(unitID, true)
-	Spring.SetUnitHealth(unitID, {paralyze=99999999})
+	Spring.SetUnitHealth(unitID, {paralyze = 99999999, health = maxHealth})
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
