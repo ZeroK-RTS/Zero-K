@@ -14,7 +14,7 @@ local function RemoveMissile()
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
 	Spring.SetUnitNoMinimap(unitID, true)
-	Spring.SetUnitHealth(unitID, {paralyze = 99999999, health = maxHealth})
+	Spring.SetUnitHealth(unitID, {paralyze = 99999999, health = maxHealth}) -- also heal to drop (now off-map) repair orders
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
