@@ -1,6 +1,6 @@
 Spring.Utilities = Spring.Utilities or {}
 if not Spring.Utilities.Base64Decode then
-	VFS.Include("LuaRules/Utilities/base64.lua")
+	VFS.Include("LuaRules/Utilities/base64.lua", nil, VFS.GAME)
 end
 
 -------------------------------------------------------------------------------------
