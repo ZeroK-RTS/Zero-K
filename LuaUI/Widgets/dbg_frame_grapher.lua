@@ -10,7 +10,7 @@ function widget:GetInfo()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spGetTimer = Spring.GetTimer 
+local spGetTimer = Spring.GetTimer
 local spDiffTimers = Spring.DiffTimers
 
 local deltats = {}

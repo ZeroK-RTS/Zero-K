@@ -2896,7 +2896,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						
 						if borderHeightDiff and not (terra.area[x + diffX] and terra.area[x + diffX][z + diffZ]) then
 							local lookAheadHeight = spGetGroundHeight(x + diffX, z + diffZ)
-							if (not (extraPointArea[x] and extraPointArea[x][z])) and 
+							if (not (extraPointArea[x] and extraPointArea[x][z])) and
 									((extraPoint[i].pyramid and groundHeight < lookAheadHeight + borderHeightDiff) or ((not extraPoint[i].pyramid) and groundHeight > lookAheadHeight - borderHeightDiff)) and
 									IsPositionTerraformable(x, z) then
 							

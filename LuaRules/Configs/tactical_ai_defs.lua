@@ -290,7 +290,7 @@ local medRangeExplodables = NameToDefID({
 })
 
 local explodableFull = Union(
-	veryShortRangeExplodables, 
+	veryShortRangeExplodables,
 	Union(shortRangeExplodables,
 	Union(diverExplodables,
 	medRangeExplodables
