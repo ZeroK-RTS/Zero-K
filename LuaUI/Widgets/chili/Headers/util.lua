@@ -499,22 +499,21 @@ function mixColors(c1, c2, a)
 	}
 end
 
-function color2incolor(r, g, b, a)
+function color2incolor(r, g, b)
 	if type(r) == 'table' then
-		r, g, b, a = unpack4(r)
+		r, g, b = unpack4(r)
 	end
 
-	local inColor = '\255\255\255\255'
 	if r then
-		inColor = string.char(255, r*255, g*255, b*255)
+		return string.char(255, r*255, g*255, b*255)
+	else
+		return '\255\255\255\255'
 	end
-	return inColor
 end
 
 function incolor2color(inColor)
-	local a = 255
 	local r, g, b = inColor:sub(2, 4):byte(1, 3)
-	return r/255, g/255, b/255, a/255
+	return r/255, g/255, b/255, 1
 end
 
 --// =============================================================================
