@@ -40,14 +40,18 @@ vfsInclude("LuaUI/system.lua"                        , nil, vfsGame)
 vfsInclude("LuaUI/cache.lua"                         , nil, vfsGame)
 vfsInclude("LuaUI/callins.lua"                       , nil, vfsGame)
 vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
-vfsInclude("LuaUI/utility_two.lua"                   , nil, vfsGame)
 
+local CheckLUAFileAndBackup = vfsInclude("LuaUI/file_backups.lua", nil, vfsGame)
 local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
 local modShortUpper = Game.modShortName:upper()
 local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
 local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
+
+-- make/load backup config in case of corruption
+CheckLUAFileAndBackup(ORDER_FILENAME)
+CheckLUAFileAndBackup(CONFIG_FILENAME)
 
 local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
@@ -73,14 +77,6 @@ local glPopAttrib  = gl.PopAttrib
 local glPushAttrib = gl.PushAttrib
 local pairs = pairs
 local ipairs = ipairs
-
-do -- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption when OS crash
-	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
-	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'} --this is a header text that is appended to start of file
-	for i=1, #fileToCheck do
-		CheckLUAFileAndBackup(fileToCheck[i], extraText[i]) --utility_two.lua
-	end
-end
 
 -- read local widgets config
 local localWidgetsFirst = false

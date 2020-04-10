@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
-include("utility_two.lua") --contain file backup function
+local CheckLUAFileAndBackup = VFS.Include("LuaUI/file_backups.lua", nil, VFS.Game)
 
 --CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
 --1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
@@ -53,7 +53,8 @@ do
 		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
 	end
 	--check for validity, backup or delete
-	CheckLUAFileAndBackup(keybind_dir .. keybind_file, '') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
+	CheckLUAFileAndBackup(keybind_dir .. keybind_file)
+
 	--load default keybinds:
 	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
 	local default_keybind_file = keybind_dir .. confdata.default_source_file
