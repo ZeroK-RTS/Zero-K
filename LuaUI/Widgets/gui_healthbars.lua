@@ -57,8 +57,8 @@ local featureReclaimVisibility  = true      -- draw feature bars for reclaimed f
 
 local minPercentageDistance     = 130000     -- always show health percentage text below this distance
 local infoDistance              = 900000
-local maxFeatureInfoDistance    = 330000    --max squared distance at which text it drawn for features 
-local maxFeatureDistance        = 570000    --max squared distance at which any info is drawn for features 
+local maxFeatureInfoDistance    = 330000    --max squared distance at which text it drawn for features
+local maxFeatureDistance        = 570000    --max squared distance at which any info is drawn for features
 local maxUnitDistance           = 12000000  --max squared distance at which any info is drawn for units  MUST BE LARGER THAN FOR FEATURES!
 
 local minReloadTime             = 4 --// in seconds
@@ -67,7 +67,7 @@ local destructableFeature = {}
 local drawnFeature = {}
 for i = 1, #FeatureDefs do
 	destructableFeature[i] = FeatureDefs[i].destructable
-	drawnFeature[i] = (FeatureDefs[i].drawTypeString == "model") 
+	drawnFeature[i] = (FeatureDefs[i].drawTypeString == "model")
 end
 
 local drawStunnedOverlay = true
@@ -177,7 +177,7 @@ local glMyText        = gl.FogCoord
 local floor           = math.floor
 local sub             = string.sub
 local GetUnitDefID    = Spring.GetUnitDefID
-local glDepthTest     = gl.DepthTest 
+local glDepthTest     = gl.DepthTest
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ function drawBarGl()
 	gl.PushMatrix()
 	gl.Scale(barScale, barScale, barScale)
 	
-	if (OPTIONS[currentOption].choppedCorners) then 
+	if (OPTIONS[currentOption].choppedCorners) then
 		gl.BeginEnd(GL.QUADS, function()
 		
 			
@@ -287,7 +287,7 @@ function drawBarGl()
 					gl.Vertex(barWidth-cs,  barHeight,                 (barWidth*2)-cs*2, 1)
 					gl.Color(bkOutlineTop)
 					gl.Vertex(barWidth-cs,  barHeight+heightAddition,  (barWidth*2)-cs*2, 1)
-					gl.Vertex(-barWidth,    barHeight+heightAddition,  0,                 1)  
+					gl.Vertex(-barWidth,    barHeight+heightAddition,  0,                 1)
 					
 					-- bottom middle piece
 					usedColor = bkOutlineBottom[1]-((bkOutlineBottom[1]-bkOutlineTop[1]) * (heightAddition/(barHeight+heightAddition+heightAddition)))
@@ -425,7 +425,7 @@ function drawFeatureBarGl()
 		heightAddition = outlineSize
 	end
 	
-	if (OPTIONS[currentOption].choppedCorners) then 
+	if (OPTIONS[currentOption].choppedCorners) then
 		gl.BeginEnd(GL.QUADS, function()
 			-- center background piece
 			gl.Color((OPTIONS[currentOption].showOutline and bkOutlineBottom or bkBottom))
@@ -487,7 +487,7 @@ function drawFeatureBarGl()
 					gl.Vertex(barWidth-cs,  barHeight,                 (barWidth*2)-cs*2, 1)
 					gl.Color(bkOutlineTop)
 					gl.Vertex(barWidth-cs,  barHeight+heightAddition,  (barWidth*2)-cs*2, 1)
-					gl.Vertex(-barWidth,    barHeight+heightAddition,  0,                 1)  
+					gl.Vertex(-barWidth,    barHeight+heightAddition,  0,                 1)
 					
 					-- bottom middle piece
 					usedColor = bkOutlineBottom[1]-((bkOutlineBottom[1]-bkOutlineTop[1]) * (heightAddition/(barHeight+heightAddition+heightAddition)))
@@ -918,7 +918,7 @@ do
 
 				gl.PushMatrix()
 					gl.Scale(barScale, barScale, barScale)
-					if (barShader) then 
+					if (barShader) then
 						glMyText(1)
 					end
 					glColor(1, 1, 1, barAlpha)
@@ -1196,7 +1196,7 @@ do
 		ci = customInfo[featureDefID]
 
 		health, maxHealth, resurrect = GetFeatureHealth(featureID)
-		if (health == nil or health < 1) then  return end 
+		if (health == nil or health < 1) then  return end
 		_, _, _, _, reclaimLeft        = GetFeatureResources(featureID)
 		if (not resurrect)   then resurrect = 0 end
 		if (not reclaimLeft) then reclaimLeft = 1 end
@@ -1314,8 +1314,8 @@ local visibleUnits = {}
 
 do
 	local GetCameraPosition    = Spring.GetCameraPosition
-	local GetSmoothMeshHeight  = Spring.GetSmoothMeshHeight 
-	local IsGUIHidden          = Spring.IsGUIHidden 
+	local GetSmoothMeshHeight  = Spring.GetSmoothMeshHeight
+	local IsGUIHidden          = Spring.IsGUIHidden
 	local glDepthMask          = gl.DepthMask
 	local GetFeatureHealth     = Spring.GetFeatureHealth
 	local GetFeatureResources  = Spring.GetFeatureResources
@@ -1337,9 +1337,9 @@ do
 		
 		cx, cy, cz = GetCameraPosition()
 
-		--if the camera is too far up, higher than maxDistance on smoothmesh, dont even call any visibility checks or nothing 
+		--if the camera is too far up, higher than maxDistance on smoothmesh, dont even call any visibility checks or nothing
 		local smoothheight = GetSmoothMeshHeight(cx, cz) --clamps x and z
-		if ((cy-smoothheight)^2 < maxUnitDistance) then 
+		if ((cy-smoothheight)^2 < maxUnitDistance) then
 
 		glDepthTest(true)    -- enabling this will make healthbars opague to other healthbars
 			glDepthMask(true)
@@ -1470,13 +1470,13 @@ function widget:SetConfigData(data)
 end
 
 function widget:TextCommand(command)
-		if (string.find(command, "healthbars_percentage") == 1  and  string.len(command) == 21) then 
+	if (string.find(command, "healthbars_percentage") == 1  and  string.len(command) == 21) then
 		drawBarPercentage =  (drawBarPercentage < 100 and 100 or 0)
 	end
-		if (string.find(command, "healthbars_compercentage") == 1  and  string.len(command) == 24) then 
+	if (string.find(command, "healthbars_compercentage") == 1  and  string.len(command) == 24) then
 		alwaysDrawBarPercentageForComs = not alwaysDrawBarPercentageForComs
 	end
-		if (string.find(command, "healthbars_style") == 1  and  string.len(command) == 16) then 
+	if (string.find(command, "healthbars_style") == 1  and  string.len(command) == 16) then
 		toggleOption()
 	end
 end
