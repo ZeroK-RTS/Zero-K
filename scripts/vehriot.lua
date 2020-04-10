@@ -48,7 +48,13 @@ local function Suspension()
 
 		ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
 		yv = yv*0.99 + ya
+		if yv < -0.1 then
+			yv = -0.1
+		end
 		yp = yp*0.98 + yv
+		if yp < -3 then
+			yp = -3
+		end
 
 		Move(base, y_axis, yp)
 		Turn(base, x_axis, xtilt)
