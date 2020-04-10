@@ -4,10 +4,10 @@ return {
 	tex2 = "strikecom_2.dds",
 	midpos = {0,30,0},
 	radius = 30,
-	height = 100,
+	height = 50,
 	pieces = {
 		Scene = {
-			offset = {0.0, 30.0, 0.0},
+			offset = {0.0, 31.0, 0.0},
 		}
 	}
 }

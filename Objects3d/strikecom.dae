@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.82.7 commit date:2020-03-12, commit time:05:06, hash:375c7dc4caf4</authoring_tool>
     </contributor>
-    <created>2020-04-10T15:41:06</created>
-    <modified>2020-04-10T15:41:06</modified>
+    <created>2020-04-10T17:19:33</created>
+    <modified>2020-04-10T17:19:33</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -839,32 +839,6 @@
       </mesh>
     </geometry>
   </library_geometries>
-  <library_animations>
-    <animation id="action_container-FootLeft" name="FootLeft"/>
-    <animation id="action_container-FootRight" name="FootRight"/>
-    <animation id="action_container-Gun" name="Gun"/>
-    <animation id="action_container-HandRight" name="HandRight"/>
-    <animation id="action_container-Head" name="Head"/>
-    <animation id="action_container-HipLeft" name="HipLeft"/>
-    <animation id="action_container-HipRight" name="HipRight"/>
-    <animation id="action_container-Muzzle" name="Muzzle"/>
-    <animation id="action_container-Nano" name="Nano"/>
-    <animation id="action_container-RightMuzzle" name="RightMuzzle"/>
-    <animation id="action_container-Breast" name="Breast"/>
-    <animation id="action_container-CalfLeft" name="CalfLeft"/>
-    <animation id="action_container-CalfRight" name="CalfRight"/>
-    <animation id="action_container-FingerA" name="FingerA"/>
-    <animation id="action_container-FingerB" name="FingerB"/>
-    <animation id="action_container-FingerC" name="FingerC"/>
-    <animation id="action_container-Stomach" name="Stomach"/>
-    <animation id="action_container-UnderGun" name="UnderGun"/>
-    <animation id="action_container-UnderMuzzle" name="UnderMuzzle"/>
-    <animation id="action_container-AntennaTip" name="AntennaTip"/>
-    <animation id="action_container-ArmLeft" name="ArmLeft"/>
-    <animation id="action_container-ArmRight" name="ArmRight"/>
-    <animation id="action_container-AssLeft" name="AssLeft"/>
-    <animation id="action_container-AssRight" name="AssRight"/>
-  </library_animations>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Root" name="Root" type="NODE">
@@ -981,7 +955,7 @@
                   <node id="Palm" name="Palm" type="NODE">
                     <matrix sid="transform">1 -2.53546e-9 8.56063e-8 0.05753231 -4.36224e-10 1 -1.72533e-15 -0.146876 -1.40902e-7 -5.71836e-16 1 -4.95992 0 0 0 1</matrix>
                     <node id="FingerA" name="FingerA" type="NODE">
-                      <matrix sid="transform">1 4.19912e-9 1.21551e-7 -0.05752945 7.16005e-10 1 2.32831e-9 -1.664587 -3.21444e-8 1.39698e-9 1 -0.5575476 0 0 0 1</matrix>
+                      <matrix sid="transform">-0.5000001 -0.8660254 1.37114e-7 1.511238 0.8660255 -0.5000001 -3.86261e-9 1.052611 3.04246e-8 3.75212e-8 1 -0.5575476 0 0 0 1</matrix>
                       <instance_geometry url="#Cylinder_011-mesh" name="FingerA">
                         <bind_material>
                           <technique_common>
@@ -992,7 +966,7 @@
                         </bind_material>
                       </instance_geometry>
                       <node id="FingerTipA" name="FingerTipA" type="NODE">
-                        <matrix sid="transform">0.9996611 -0.0185373 -0.01827523 0.05029964 0.02603073 0.7153326 0.6982991 0.05658889 1.28226e-4 -0.6985382 0.7155728 -6.534547 0 0 0 1</matrix>
+                        <matrix sid="transform">0.9996612 -0.0185373 -0.01827518 0.05030012 0.02603072 0.7153327 0.6982991 0.05658913 1.28226e-4 -0.6985382 0.7155728 -6.534547 0 0 0 1</matrix>
                       </node>
                     </node>
                     <node id="FingerC" name="FingerC" type="NODE">
@@ -1011,7 +985,7 @@
                       </node>
                     </node>
                     <node id="FingerB" name="FingerB" type="NODE">
-                      <matrix sid="transform">1 4.19912e-9 1.21551e-7 -0.05752945 7.16005e-10 1 2.32831e-9 -1.664587 -3.21444e-8 1.39698e-9 1 -0.5575476 0 0 0 1</matrix>
+                      <matrix sid="transform">-0.5000001 0.8660254 1.34694e-7 -1.626308 -0.8660255 -0.5000001 1.27102e-8 1.052604 3.04246e-8 -3.47272e-8 1 -0.5575475 0 0 0 1</matrix>
                       <instance_geometry url="#Cylinder_016-mesh" name="FingerB">
                         <bind_material>
                           <technique_common>
@@ -1022,7 +996,7 @@
                         </bind_material>
                       </instance_geometry>
                       <node id="FingerTipB" name="FingerTipB" type="NODE">
-                        <matrix sid="transform">0.9996612 -0.01853742 -0.01827524 0.0503006 0.02603078 0.7153327 0.6982992 0.05658865 1.28093e-4 -0.6985384 0.7155726 -6.534547 0 0 0 1</matrix>
+                        <matrix sid="transform">0.9996612 -0.01853748 -0.01827527 0.0503006 0.02603075 0.7153328 0.6982993 0.05658722 1.28093e-4 -0.6985384 0.7155726 -6.534547 0 0 0 1</matrix>
                       </node>
                     </node>
                   </node>
