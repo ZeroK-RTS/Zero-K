@@ -22,32 +22,27 @@ local resetWidgetDetailLevel = false -- has widget detail level changed
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
 local DATA_VERSION = 9 -- change this to reset widget settings
 
-function includeZIPFirst(filename, envTable)
-  if (string.find(filename, '.h.lua', 1, true)) then
-    filename = 'Headers/' .. filename
-  end
-  return VFS.Include(LUAUI_DIRNAME .. filename, envTable, VFS.ZIP_FIRST)
-end
+local vfs = VFS
+local vfsInclude = vfs.Include
+local vfsGame = vfs.GAME
 
 WG = {}
 Spring.Utilities = {}
-VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-VFS.Include("LuaRules/Utilities/versionCompare.lua")
-VFS.Include("LuaRules/Utilities/unitStates.lua")
-VFS.Include("LuaRules/Utilities/teamFunctions.lua")
-VFS.Include("LuaRules/Utilities/vector.lua")
 
-Spring.Echo("function_override include")
-VFS.Include("LuaRules/Utilities/function_override.lua")
-Spring.Echo("function_override DONE")
+vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/teamFunctions.lua"    , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/vector.lua"           , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/function_override.lua", nil, vfsGame)
+vfsInclude("LuaUI/keysym.lua"                        , nil, vfsGame)
+vfsInclude("LuaUI/system.lua"                        , nil, vfsGame)
+vfsInclude("LuaUI/cache.lua"                         , nil, vfsGame)
+vfsInclude("LuaUI/callins.lua"                       , nil, vfsGame)
+vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
+vfsInclude("LuaUI/utility_two.lua"                   , nil, vfsGame)
 
-include("keysym.lua")
-includeZIPFirst("system.lua")
-includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
-include("callins.lua")
-include("savetable.lua")
-include("utility_two.lua") --contain file backup function: CheckLUAFileAndBackup()
-local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = include("chat_preprocess.lua") -- contain stuff that preprocess chat message for Chili Chat widgets
+local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
 local modShortUpper = Game.modShortName:upper()
 local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
