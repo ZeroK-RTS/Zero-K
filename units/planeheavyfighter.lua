@@ -28,7 +28,7 @@ return { planeheavyfighter = {
     modelradius    = [[10]],
     refuelturnradius = [[120]],
 
-    combat_slowdown = 0.5,
+    combat_slowdown = 0.35,
     selection_scale = 1.4,
   },
 
@@ -41,7 +41,7 @@ return { planeheavyfighter = {
   iconType               = [[stealthfighter]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxAcc                 = 0.5,
+  maxAcc                 = 0.55,
   maxDamage              = 1100,
   maxRudder              = 0.006,
   maxVelocity            = 7.6,
