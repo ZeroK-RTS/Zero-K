@@ -143,8 +143,10 @@ for name, wd in pairs(DEFS.weaponDefs) do
 
 		-- weapon type bonuses
 		if weaponNameLower:find("flamethrower") or weaponNameLower:find("flame thrower") then
+			wd.customparams.shield_mult = FLAMER_DAMAGE_MOD
 			wd.damage.shield = wd.damage.shield * FLAMER_DAMAGE_MOD
 		elseif weaponNameLower:find("gauss") then
+			wd.customparams.shield_mult = GAUSS_DAMAGE_MOD
 			wd.damage.shield = wd.damage.shield * GAUSS_DAMAGE_MOD
 		end
 	end

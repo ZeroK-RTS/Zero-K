@@ -569,6 +569,9 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. " x " .. mult
 			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
+		if cp.shield_mult then
+			shield_dam_str = shield_dam_str .. " x " .. math.floor(100*cp.shield_mult) .. '%'
+		end
 		
 		local show_damage = not cp.stats_hide_damage
 		local show_dps = not cp.stats_hide_dps
