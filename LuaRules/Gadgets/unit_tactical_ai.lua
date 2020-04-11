@@ -380,6 +380,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		end
 	end
 	
+	--Spring.Echo("skirmRange", skirmRange, "pred", predictedDist, "frame", Spring.GetGameFrame())
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
 			local enemyRange = (GetEffectiveWeaponRange(enemyUnitDef, dy, behaviour.weaponNum) or 0) + behaviour.skirmOnlyNearEnemyRange
@@ -737,6 +738,7 @@ local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 				unitAIBehaviour[ud.id] = {
 					defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
 					waterline = (behaviourData.waterline or 0),
+					floatWaterline = behaviourData.floatWaterline,
 					land = GetBehaviourTable(behaviourData.land, ud),
 					sea = GetBehaviourTable(behaviourData.sea, ud),
 				}

@@ -106,7 +106,7 @@ return { amphriot = {
       myGravity               = 2,
       model                   = [[diskball.s3o]],
       numBounce               = 4,
-      range                   = 285,
+      range                   = 270,
       reloadtime              = 1.4,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
@@ -137,7 +137,7 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 26,
+        default = 23,
         subs    = 1.6,
       },
 
@@ -149,7 +149,7 @@ return { amphriot = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles             = 3,
-      range                   = 285,
+      range                   = 270,
       reloadtime              = 0.8,
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],

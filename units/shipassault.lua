@@ -31,7 +31,7 @@ return { shipassault = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 3750,
+  maxDamage              = 4000,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -51,8 +51,8 @@ return { shipassault = {
 
   },
 
-  sightDistance          = 430,
-  sonarDistance          = 430,
+  sightDistance          = 440,
+  sonarDistance          = 440,
   turninplace            = 0,
   turnRate               = 320,
   workerTime             = 0,
@@ -110,7 +110,7 @@ return { shipassault = {
         interceptedByShieldType = 1,
         myGravity               = 0.01,
         noSelfDamage            = true,
-        range                   = 355,
+        range                   = 360,
         reloadtime              = 3,
         size                    = 64,
         sizeDecay               = 0.2,
