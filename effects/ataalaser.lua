@@ -1,12 +1,10 @@
 return {
   ["ataalaser"] = {
-		
     groundsmoke = {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
       ground             = 0,
-						unit = 1,
-
+      unit               = 1,
       properties = {
         airdrag            = 0.8,
         colormap           = [[0.2 0 0.25 1  0.4 0 0.7 1   0 0 0 0]],
@@ -28,13 +26,11 @@ return {
         texture            = [[smokesmall]],
       },
     },
-	
-	flash = {
+    flash = {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
       ground             = 1,
-      air = 1,
-
+      air                = 1,
       properties = {
         airdrag            = 0.8,
         colormap           = [[0.25 0.35 1 0.01   0 0 0 0]],
@@ -56,12 +52,11 @@ return {
         texture            = [[flare]],
       },
     },
-	flash2 = {
+    flash2 = {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = 1,
-						air = 1,
-
+      air                = 1,
       properties = {
         airdrag            = 0.8,
         colormap           = [[0.3 0.15 0.9 0.01   0 0 0 0]],
@@ -83,8 +78,7 @@ return {
         texture            = [[flare]],
       },
     },
-	
-	stacheln1 = {
+    stacheln1 = {
       air                = true,
       class              = [[explspike]],
       count              = 8,
@@ -101,8 +95,7 @@ return {
         width              = 20,
       },
     },
-	
-	funken = {
+    funken = {
       class              = [[CSimpleParticleSystem]],
       count              = 5,
       ground             = true,
@@ -128,15 +121,13 @@ return {
         texture            = [[gunshot]],
       },
     },
-
-	yudell = {
+    yudell = {
       air                = false,
       class              = [[CSimpleGroundFlash]],
       count              = 1,
       ground             = true,
       water              = false,
       properties = {
-        
         colormap           = [[0.6 0.25 1 0.2  0.4 0.2 1 0.2    0 0 0 0]],
         size               = 80,
         sizegrowth         = [[-1.25]],
@@ -144,15 +135,13 @@ return {
         ttl                = 60,
       },
     },
-	
-	yudell3 = {
+    yudell3 = {
       air                = false,
       class              = [[CSimpleGroundFlash]],
       count              = 1,
       ground             = true,
       water              = false,
       properties = {
-        
         colormap           = [[1 1 0 0.2  1 .45 0 0.2     0 0 0 0]],
         size               = 20,
         sizegrowth         = [[-1.25]],
@@ -160,7 +149,5 @@ return {
         ttl                = 60,
       },
     },
-				
   },
-
 }

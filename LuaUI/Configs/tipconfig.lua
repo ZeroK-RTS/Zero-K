@@ -54,8 +54,8 @@ raiderDefs = {
 	"tankheavyraid",
 	"tankraid",
 	
-	"armsh",
 	"hoverraid",
+	"hoverheavyraid",
 	
 	"chicken",
 	"chicken_leaper",

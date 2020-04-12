@@ -1,9 +1,9 @@
-unitDef = {
+return { tankcon = {
   unitname               = [[tankcon]],
   name                   = [[Welder]],
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
-  acceleration           = 0.066,
-  brakeRate              = 1.5,
+  acceleration           = 0.33,
+  brakeRate              = 15.0,
   buildCostMetal         = 200,
   buildDistance          = 180,
   builder                = true,
@@ -16,14 +16,14 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[60 60 60]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 6 0]],
+  collisionVolumeScales  = [[34 18 46]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     aimposoffset   = [[0 0 0]],
-    midposoffset   = [[0 -10 0]],
+    midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
     selection_scale = 1.2,
   },
@@ -41,7 +41,7 @@ unitDef = {
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  movementClass          = [[TANK2]],
+  movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -132,6 +132,9 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[welder_dead.s3o]],
+      collisionVolumeOffsets        = [[0 -2 0]],
+      collisionVolumeScales         = [[34 18 46]],
+      collisionVolumeType           = [[box]],
     },
 
     HEAP  = {
@@ -143,6 +146,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankcon = unitDef })
+} }

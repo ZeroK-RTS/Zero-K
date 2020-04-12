@@ -1,41 +1,17 @@
-local name = "commweapon_partillery_napalm"
-local weaponDef = {
-	name                    = [[Light Napalm Artillery]],
-	accuracy                = 350,
-	areaOfEffect            = 128,
+local _, def = VFS.Include("gamedata/modularcomms/weapons/partillery.lua")
 
-	customParams            = {
-		is_unit_weapon = 1,
-		muzzleEffectFire = [[custom:thud_fire_fx]],
-		burnchance = [[1]],
-		setunitsonfire = [[1]],
-		burntime = [[450]],
-	},
+def.name = "Light Napalm Artillery"
+def.areaOfEffect = def.areaOfEffect * 2
+for armorType, damage in pairs (def.damage) do
+	def.damage[armorType] = damage * 0.75
+end
+def.customParams.burntime = 450
+def.customParams.burnchance = 1
+def.customParams.setunitsonfire = 1
+def.fireStarter = 100
 
-	craterBoost             = 0,
-	craterMult              = 0,
+def.explosiongenerator = "custom:napalm_koda"
+def.rgbColor = "1 0.3 0.1"
+def.soundHit = "weapon/burn_mixed"
 
-	damage                  = {
-		default = 240,
-		subs    = 12,
-	},
-
-	edgeEffectiveness       = 0.5,
-	explosionGenerator      = [[custom:napalm_koda]],
-	fireStarter             = 100,
-	impulseBoost            = 0,
-	impulseFactor           = 0.4,
-	interceptedByShieldType = 1,
-	myGravity               = 0.09,
-	noSelfDamage            = true,
-	range                   = 800,
-	reloadtime              = 4,
-	size                    = 4,
-	soundHit                = [[weapon/burn_mixed]],
-	soundStart              = [[weapon/cannon/cannon_fire1]],
-	turret                  = true,
-	weaponType              = [[Cannon]],
-	weaponVelocity          = 300,
-}
-
-return name, weaponDef
+return "commweapon_partillery_napalm", def

@@ -1,4 +1,4 @@
-unitDef = {
+return { pw_generic = {
   unitname                      = [[pw_generic]],
   name                          = [[Generic Neutral Structure]],
   description                   = [[Blank]],
@@ -62,6 +62,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ pw_generic = unitDef })
+} }

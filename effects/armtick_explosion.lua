@@ -142,7 +142,6 @@ return {
         texture            = [[laserend]],
       },
     },
-    
     electricstorm = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -156,6 +155,5 @@ return {
       },
     },
   },
-
 }
 

@@ -84,7 +84,6 @@ return {
         [3]  = 1,
       },
     },
-    
     smoke = {
       air                = true,
       count              = 8,
@@ -119,7 +118,6 @@ return {
         texture            = [[laserend]],
       },
     },
-    
     electricstorm = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -133,6 +131,5 @@ return {
       },
     },
   },
-
 }
 

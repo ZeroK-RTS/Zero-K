@@ -1,9 +1,9 @@
-unitDef = {
+return { vehaa = {
   unitname               = [[vehaa]],
   name                   = [[Crasher]],
   description            = [[Fast Anti-Air Rover]],
-  acceleration           = 0.05952,
-  brakeRate              = 0.14875,
+  acceleration           = 0.298,
+  brakeRate              = 1.488,
   buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[vehaa.png]],
@@ -146,6 +146,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehaa = unitDef })
+} }

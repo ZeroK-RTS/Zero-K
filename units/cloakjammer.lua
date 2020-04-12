@@ -1,10 +1,10 @@
-unitDef = {
+return { cloakjammer = {
   unitname               = [[cloakjammer]],
   name                   = [[Iris]],
   description            = [[Area Cloaker/Jammer Walker]],
-  acceleration           = 0.25,
+  acceleration           = 0.75,
   activateWhenBuilt      = true,
-  brakeRate              = 0.75,
+  brakeRate              = 4.5,
   buildCostMetal         = 600,
   buildPic               = [[cloakjammer.png]],
   canMove                = true,
@@ -71,6 +71,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakjammer = unitDef })
+} }

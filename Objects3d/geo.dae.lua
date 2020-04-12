@@ -1,11 +1,9 @@
-geo = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
-
 			wheel = {
 				offset = {0.00, 0.00, 0.00},
-
 			},
 		},
 	},
@@ -22,5 +20,3 @@ geo = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return geo

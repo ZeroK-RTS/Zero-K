@@ -1,10 +1,10 @@
-unitDef = {
+return { assaultcruiser = {
   unitname               = [[assaultcruiser]],
   name                   = [[Vanquisher]],
   description            = [[Heavy Cruiser (Assault)]],
-  acceleration           = 0.0768,
+  acceleration           = 0.384,
   activateWhenBuilt      = true,
-  brakeRate              = 0.042,
+  brakeRate              = 0.42,
   buildCostMetal         = 1600,
   builder                = false,
   buildPic               = [[assaultcruiser.png]],
@@ -249,6 +249,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ assaultcruiser = unitDef })
+} }

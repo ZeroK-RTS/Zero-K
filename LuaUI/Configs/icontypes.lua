@@ -390,8 +390,16 @@ local icontypes = {
 
 
   --hover
+  hoverscout = {
+    bitmap='icons/hoverscout.png',
+    size=1.8,
+  },
   hoverraider = {
     bitmap='icons/hoverraider.dds',
+    size=1.8,
+  },
+  hoversupport = {
+    bitmap='icons/hoversupport.dds',
     size=1.8,
   },
   hoverassault = {

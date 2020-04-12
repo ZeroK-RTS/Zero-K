@@ -50,7 +50,7 @@ local savedata = {
 local function ReadFile(zip, name, file)
 	name = name or ''
 	if (not file) then return end
-	local dataRaw, dataFunc, data, err
+	local dataRaw, dataFunc, success, data, err
 	
 	zip:open(file)
 	dataRaw = zip:read("*all")

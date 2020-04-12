@@ -1,11 +1,10 @@
-unitDef = {
-
+return { shiptorpraider = {
   unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
   description         = [[Torpedo-Boat (Raider)]],
-  acceleration        = 0.048,
+  acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 0.043,
+  brakeRate           = 0.43,
   buildCostMetal      = 100,
   builder             = false,
   buildPic            = [[shiptorpraider.png]],
@@ -42,8 +41,8 @@ unitDef = {
   objectName          = [[SHIPTORPRAIDER]],
   script              = [[shiptorpraider.lua]],
   selfDestructAs      = [[SMALL_UNITEX]],
-  sightDistance       = 450,
-  sonarDistance       = 450,
+  sightDistance       = 560,
+  sonarDistance       = 560,
   turnRate            = 800,
   waterline           = 0,
   workerTime          = 0,
@@ -73,6 +72,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      cegTag                  = [[torpedo_trail]],
 
             customParams = {
                 burst = Shared.BURST_RELIABLE,
@@ -94,7 +94,7 @@ unitDef = {
       interceptedByShieldType = 1,
       flightTime              = 0.9,
       leadlimit               = 0,
-      model                   = [[wep_m_ajax.s3o]],
+      model                   = [[wep_t_barracuda.s3o]],
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
@@ -105,7 +105,7 @@ unitDef = {
       soundHitVolume          = 2.8,
       soundStart              = [[weapon/torp_land]],
       soundStartVolume        = 4,
-      startVelocity           = 20,
+      startVelocity           = 60,
       tolerance               = 100000,
       tracks                  = true,
       turnRate                = 200000,
@@ -141,7 +141,4 @@ unitDef = {
 
   },
 
-}
-
-
-return lowerkeys({ shiptorpraider = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { shieldraid = {
   unitname               = [[shieldraid]],
   name                   = [[Bandit]],
   description            = [[Medium-Light Raider Bot]],
-  acceleration           = 0.5,
-  brakeRate              = 0.4,
+  acceleration           = 1.5,
+  brakeRate              = 2.4,
   buildCostMetal         = 75,
   buildPic               = [[shieldraid.png]],
   canGuard               = true,
@@ -26,7 +26,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 265,
+  maxDamage              = 330,
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
@@ -45,7 +45,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 500,
+  sightDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -79,8 +79,8 @@ unitDef = {
       },
       
       damage                  = {
-        default = 9.53,
-        subs    = 0.61,
+        default = 8.15,
+        subs    = 0.4,
       },
 
       duration                = 0.02,
@@ -91,6 +91,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 3,
       noSelfDamage            = true,
       range                   = 245,
       reloadtime              = 0.1,
@@ -126,6 +127,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldraid = unitDef })
+} }

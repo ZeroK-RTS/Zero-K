@@ -54,11 +54,6 @@ function addon.DrawLoadScreen()
 	local vsx, vsy = gl.GetViewSizes()
 
 	-- draw progressbar
-	local hbw = 3.5/vsx
-	local vbw = 3.5/vsy
-	local hsw = 0.2
-	local vsw = 0.2
-	
 	gl.PushMatrix()
 	gl.Scale(BAR_SCALING,BAR_SCALING,1)
 	gl.Translate(X_OFFSET,Y_OFFSET,0)

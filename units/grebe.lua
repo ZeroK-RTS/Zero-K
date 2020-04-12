@@ -1,10 +1,10 @@
-unitDef = {
+return { grebe = {
   unitname               = [[grebe]],
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
+  brakeRate              = 2.4,
   buildCostMetal         = 300,
   buildPic               = [[grebe.png]],
   canGuard               = true,
@@ -157,6 +157,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ grebe = unitDef })
+} }

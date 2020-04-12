@@ -1,10 +1,10 @@
-unitDef = {
+return { subscout = {
   unitname              = [[subscout]],
   name                  = [[Lancelet]],
   description           = [[Scout/Suicide Minisub]],
-  acceleration          = 0.032,
+  acceleration          = 0.16,
   activateWhenBuilt     = true,
-  brakeRate             = 0.25,
+  brakeRate             = 2.5,
   buildCostMetal        = 200,
   builder               = false,
   buildPic              = [[subscout.png]],
@@ -38,6 +38,7 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE HOVER]],
   objectName            = [[subscout.s3o]],
+  script                = [[subscout.lua]],
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
   sightDistance         = 550,
@@ -70,6 +71,4 @@ unitDef = {
             },
         },
     },
-}
-
-return lowerkeys({ subscout = unitDef })
+} }

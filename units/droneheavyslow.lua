@@ -1,4 +1,4 @@
-unitDef = {
+return { droneheavyslow = {
   unitname            = [[droneheavyslow]],
   name                = [[Viper]],
   description         = [[Advanced Battle Drone]],
@@ -23,6 +23,8 @@ unitDef = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[gunship]],
+  idleAutoHeal        = 10,
+  idleTime            = 300,
   maxDamage           = 430,
   maxVelocity         = 5,
   minCloakDistance    = 75,
@@ -115,6 +117,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ droneheavyslow = unitDef })
+} }

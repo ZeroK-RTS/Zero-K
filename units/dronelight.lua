@@ -1,4 +1,4 @@
-unitDef = {
+return { dronelight = {
   unitname            = [[dronelight]],
   name                = [[Firefly]],
   description         = [[Attack Drone]],
@@ -23,6 +23,8 @@ unitDef = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[fighter]],
+  idleAutoHeal        = 10,
+  idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 7,
   minCloakDistance    = 75,
@@ -105,6 +107,4 @@ unitDef = {
     },
   },
 
-}
-
-return lowerkeys({ dronelight = unitDef })
+} }

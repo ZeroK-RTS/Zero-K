@@ -1,9 +1,9 @@
-unitDef = {
+return { spideraa = {
   unitname               = [[spideraa]],
   name                   = [[Tarantula]],
   description            = [[Anti-Air Spider]],
-  acceleration           = 0.22,
-  brakeRate              = 0.66,
+  acceleration           = 0.66,
+  brakeRate              = 3.96,
   buildCostMetal         = 380,
   buildPic               = [[spideraa.png]],
   canGuard               = true,
@@ -112,7 +112,7 @@ unitDef = {
       footprintZ       = 3,
       collisionVolumeOffsets = [[0 -5 0]],
       collisionVolumeScales  = [[40 30 40]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[tarantula_dead.s3o]],
     },
 
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spideraa = unitDef })
+} }

@@ -1,10 +1,10 @@
-unitDef = {
+return { shieldcon = {
   unitname            = [[shieldcon]],
   name                = [[Convict]],
   description         = [[Shielded Construction Bot, Builds at 5 m/s]],
-  acceleration        = 0.5,
+  acceleration        = 1.5,
   activateWhenBuilt   = true,
-  brakeRate           = 0.3,
+  brakeRate           = 1.8,
   buildCostMetal      = 120,
   buildDistance       = 128,
   builder             = true,
@@ -32,7 +32,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 650,
+  maxDamage           = 780,
   maxSlope            = 36,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
@@ -108,6 +108,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldcon = unitDef })
+} }

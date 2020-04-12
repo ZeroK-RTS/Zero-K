@@ -15,7 +15,12 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.96,
-        colormap           = [[0 0 0 0.0001   0 0 0 0.0001    0.1 0.1 0.1 0.1    0.1 0.1 0.1 0.2  0.05 0.05 0.05 0.2  0 0 0 0.001]],
+        colormap           = [[0.00 0.00 0.00 0.001
+                               0.00 0.00 0.00 0.001
+                               0.10 0.10 0.10 0.100
+                               0.10 0.10 0.10 0.200
+                               0.05 0.05 0.05 0.200
+                               0.00 0.00 0.00 0.001]],
         directional        = false,
         emitrot            = 80,
         emitrotspread      = 10,
@@ -64,7 +69,10 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.93,
-        colormap           = [[1 1 1 0.25   1 0.8 0.5 0.25   0.08 0.08 0.08 0.3    0 0 0 0.001]],
+        colormap           = [[1.00 1.00 1.00 0.250
+                               1.00 0.80 0.50 0.250
+                               0.08 0.08 0.08 0.300
+                               0.00 0.00 0.00 0.001]],
         directional        = false,
         emitrot            = 52,
         emitrotspread      = 38,
@@ -177,7 +185,8 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.96,
-        colormap           = [[0.05 0.05 0.05 0.2  0 0 0 0.001]],
+        colormap           = [[0.05 0.05 0.05 0.200
+                               0.00 0.00 0.00 0.001]],
         directional        = false,
         emitrot            = 80,
         emitrotspread      = 10,

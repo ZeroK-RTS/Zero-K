@@ -1,10 +1,10 @@
-unitDef = {
+return { hoversonic = {
   unitname            = [[hoversonic]],
   name                = [[Morningstar]],
   description         = [[Antisub Hovercraft]],
-  acceleration        = 0.048,
+  acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 0.043,
+  brakeRate           = 0.43,
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoversonic.png]],
@@ -132,6 +132,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoversonic = unitDef })
+} }

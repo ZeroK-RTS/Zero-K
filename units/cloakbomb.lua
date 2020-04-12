@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakbomb = {
   unitname               = [[cloakbomb]],
   name                   = [[Imp]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
-  acceleration           = 0.25,
-  brakeRate              = 0.6,
+  acceleration           = 0.75,
+  brakeRate              = 3.6,
   buildCostMetal         = 120,
   buildPic               = [[cloakbomb.png]],
   canMove                = true,
@@ -77,33 +77,26 @@ unitDef = {
     },
 
   },
-}
-
---------------------------------------------------------------------------------
-
-local weaponDefs = {
-  cloakbomb_DEATH = {
-    areaOfEffect       = 352,
-    craterBoost        = 0,
-    craterMult         = 0,
-    edgeEffectiveness  = 0.5,
-    explosionGenerator = "custom:cloakbomb_EXPLOSION",
-    explosionSpeed     = 10,
-    impulseBoost       = 0,
-    impulseFactor      = 0,
-    name               = "EMP Explosion",
-    paralyzer          = true,
-    paralyzeTime       = 16,
-    soundHit           = "weapon/more_lightning",
-    damage = {
-      default          = 2500,
+  weaponDefs = {
+    cloakbomb_DEATH = {
+      areaOfEffect       = 352,
+      craterBoost        = 0,
+      craterMult         = 0,
+      edgeEffectiveness  = 0.5,
+      explosionGenerator = "custom:cloakbomb_EXPLOSION",
+      explosionSpeed     = 10,
+      impulseBoost       = 0,
+      impulseFactor      = 0,
+      name               = "EMP Explosion",
+      paralyzer          = true,
+      paralyzeTime       = 16,
+      soundHit           = "weapon/more_lightning",
+      damage = {
+        default          = 2500,
+      },
+      customParams = {
+        burst = Shared.BURST_UNRELIABLE,
+       },
     },
-    customParams = {
-      burst = Shared.BURST_UNRELIABLE,
-    },
-  },
-}
-unitDef.weaponDefs = weaponDefs
-
---------------------------------------------------------------------------------
-return lowerkeys({ cloakbomb = unitDef })
+  }
+} }

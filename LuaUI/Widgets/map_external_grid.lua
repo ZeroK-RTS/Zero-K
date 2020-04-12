@@ -279,8 +279,7 @@ local function TilesVerticesOutside()
 	local TileMaxZ = mapSizeZ/res +1
 	for x=-range,TileMaxX+range,1 do
 		for z=-range,TileMaxZ+range,1 do
-			if (x > 0 and z > 0 and x < TileMaxX and z < TileMaxZ) then
-			else
+			if not (x > 0 and z > 0 and x < TileMaxX and z < TileMaxZ) then
 				glTexCoord(0,0)
 				glVertex(res*(x-1), GetGroundHeight(res*(x-1),res*z), res*z)
 				glTexCoord(0,1)

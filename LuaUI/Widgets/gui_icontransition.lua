@@ -80,10 +80,10 @@ local GL_GREATER = GL.GREATER
 -- Includes and initializations
 --
 
-include("keysym.h.lua")
+include("keysym.lua")
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
-local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.ZIP)
 
 renderAtPos = {
 	[UnitDefNames["staticmex"].id] = true,

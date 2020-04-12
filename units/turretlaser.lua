@@ -1,4 +1,4 @@
-unitDef = {
+return { turretlaser = {
   unitname                      = [[turretlaser]],
   name                          = [[Lotus]],
   description                   = [[Light Laser Tower]],
@@ -47,7 +47,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 520,
+  sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline                     = 5,
@@ -84,8 +84,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 7.15,
-        subs    = 0.5,
+        default = 7.5,
+        subs    = 0.375,
       },
 
       explosionGenerator      = [[custom:FLASH1blue]],
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretlaser = unitDef })
+} }

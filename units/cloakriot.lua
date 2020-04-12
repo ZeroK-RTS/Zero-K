@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakriot = {
   unitname               = [[cloakriot]],
   name                   = [[Reaver]],
   description            = [[Riot Bot]],
-  acceleration           = 0.25,
-  brakeRate              = 0.2,
+  acceleration           = 0.75,
+  brakeRate              = 1.2,
   buildCostMetal         = 220,
   buildPic               = [[cloakriot.png]],
   canGuard               = true,
@@ -19,8 +19,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[7]],
-    cus_noflashlight = 1,
+    modelradius       = [[7]],
+    cus_noflashlight  = 1,
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -50,7 +51,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 345,
+  sightDistance          = 350,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,
@@ -89,9 +90,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 40,
-        planes  = 40,
-        subs    = 2.1,
+        default = 45,
+        planes  = 45,
+        subs    = 2.25,
       },
 
       edgeEffectiveness       = 0.5,
@@ -102,8 +103,8 @@ unitDef = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 270,
-      reloadtime              = 0.4 + 2/30,
+      range                   = 275,
+      reloadtime              = 0.5,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],
@@ -135,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakriot = unitDef })
+} }

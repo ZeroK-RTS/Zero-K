@@ -222,6 +222,9 @@ function script.Shot(num)
 		Move(rmissile, z_axis, -1 )
 		Move(rmissile, z_axis, 0, 500)
 	end
+end
+
+function script.EndBurst()
 	gun = not gun
 end
 

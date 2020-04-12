@@ -118,7 +118,7 @@ local function InitializeControls(aiTeams)
 	}
 	
 	local scrollPanel = Chili.ScrollPanel:New{
-  		x = 8,
+		x = 8,
 		y = 36,
 		bottom = 8,
 		right = 8,

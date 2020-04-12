@@ -1,4 +1,4 @@
-unitDef = {
+return { factoryamph = {
   unitname         = [[factoryamph]],
   name             = [[Amphbot Factory]],
   description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
@@ -91,6 +91,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factoryamph = unitDef })
+} }

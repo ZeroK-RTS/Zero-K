@@ -1,9 +1,9 @@
-unitDef = {
+return { jumpbomb = {
   unitname               = [[jumpbomb]],
   name                   = [[Skuttle]],
   description            = [[Cloaked Jumping Anti-Heavy Bomb]],
-  acceleration           = 0.18,
-  brakeRate              = 0.54,
+  acceleration           = 0.54,
+  brakeRate              = 3.24,
   buildCostMetal         = 550,
   builder                = false,
   buildPic               = [[jumpbomb.png]],
@@ -86,34 +86,27 @@ unitDef = {
     },
 
   },
-}
+  weaponDefs = {
+    jumpbomb_DEATH = {
+      areaOfEffect       = 180,
+      craterBoost        = 4,
+      craterMult         = 5,
+      edgeEffectiveness  = 0.3,
+      explosionGenerator = "custom:NUKE_150",
+      explosionSpeed     = 10000,
+      impulseBoost       = 0,
+      impulseFactor      = 0.1,
+      name               = "Explosion",
+      soundHit           = "explosion/mini_nuke",
 
---------------------------------------------------------------------------------
-
-local weaponDefs = {
-  jumpbomb_DEATH = {
-    areaOfEffect       = 180,
-    craterBoost        = 4,
-    craterMult         = 5,
-    edgeEffectiveness  = 0.3,
-    explosionGenerator = "custom:NUKE_150",
-    explosionSpeed     = 10000,
-    impulseBoost       = 0,
-    impulseFactor      = 0.1,
-    name               = "Explosion",
-    soundHit           = "explosion/mini_nuke",
-    
-    customParams       = {
+      customParams       = {
         burst = Shared.BURST_UNRELIABLE,
 
-      lups_explodelife = 1.5,
+        lups_explodelife = 1.5,
+      },
+      damage = {
+        default          = 8002.4,
+      },
     },
-    damage = {
-      default          = 8002.4,
-    },
-  },
-}
-unitDef.weaponDefs = weaponDefs
-
---------------------------------------------------------------------------------
-return lowerkeys({ jumpbomb = unitDef })
+  }
+} }

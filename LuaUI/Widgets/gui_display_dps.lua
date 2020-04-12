@@ -64,7 +64,6 @@ local unitParalyze = {}
 local unitDamage = {}
 local deadList = {}
 local lastTime = 0
-local paused = false
 local changed = false
 
 --------------------------------------------------------------------------------
@@ -248,7 +247,7 @@ local function DrawWorldFunc()
  
   if (not next(damageTable)) and (not next(deadList)) then return end
     
-  _,_,paused = GetGameSpeed()
+  local _,_,paused = GetGameSpeed()
   
   glDepthMask(true)
   glDepthTest(true)

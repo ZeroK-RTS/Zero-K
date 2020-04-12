@@ -17,7 +17,7 @@ local toClear = {}	-- {[1] = {x = posX, z = posZ, unitID = unitID}}	-- entries c
 local numBuildings = 0
 
 local team = Spring.GetMyTeamID()
-include("keysym.h.lua")
+include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 local CMD_REMOVE = CMD.REMOVE

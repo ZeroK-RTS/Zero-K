@@ -1,10 +1,10 @@
-unitDef = {
+return { jumpskirm = {
   unitname            = [[jumpskirm]],
   name                = [[Moderator]],
   description         = [[Disruptor Skirmisher Walker]],
-  acceleration        = 0.2,
+  acceleration        = 0.6,
   activateWhenBuilt   = true,
-  brakeRate           = 0.6,
+  brakeRate           = 3.6,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[jumpskirm.png]],
@@ -23,6 +23,7 @@ unitDef = {
 
   customParams        = {
     dontfireatradarcommand = '1',
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -237,6 +238,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpskirm = unitDef })
+} }

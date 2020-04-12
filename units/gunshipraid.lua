@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipraid = {
   unitname               = [[gunshipraid]],
   name                   = [[Locust]],
   description            = [[Raider Gunship]],
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipraid = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { spiderscout = {
   unitname            = [[spiderscout]],
   name                = [[Flea]],
   description         = [[Ultralight Scout Spider (Burrows)]],
-  acceleration        = 0.7,
-  brakeRate           = 2.1,
+  acceleration        = 2.1,
+  brakeRate           = 12.6,
   buildCostMetal      = 25,
   buildPic            = [[spiderscout.png]],
   canGuard            = true,
@@ -53,7 +53,7 @@ unitDef = {
 
   },
 
-  sightDistance       = 560,
+  sightDistance       = 620,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderscout = unitDef })
+} }

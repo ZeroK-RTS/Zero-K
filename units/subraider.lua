@@ -1,10 +1,10 @@
-unitDef = {
+return { subraider = {
   unitname               = [[subraider]],
   name                   = [[Seawolf]],
   description            = [[Attack Submarine (Stealth Raider)]],
-  acceleration           = 0.06,
+  acceleration           = 0.3,
   activateWhenBuilt      = true,
-  brakeRate              = 0.2,
+  brakeRate              = 2.0,
   buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[subraider.png]],
@@ -87,8 +87,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 250.1,
-        subs    = 250.1,
+        default = 260.1,
+        subs    = 260.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
@@ -96,8 +96,8 @@ unitDef = {
       flightTime              = 1.2,
       groundbounce            = 1,
       impactOnly              = true,
-      impulseBoost            = 60,
-      impulseFactor           = 0.6,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
       leadlimit               = 0,
       model                   = [[wep_t_longbolt.s3o]],
@@ -185,6 +185,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ subraider = unitDef })
+} }

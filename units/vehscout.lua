@@ -1,9 +1,9 @@
-unitDef = {
+return { vehscout = {
   unitname               = [[vehscout]],
   name                   = [[Dart]],
   description            = [[Disruptor Raider/Scout Rover]],
-  acceleration           = 0.14,
-  brakeRate              = 0.1555,
+  acceleration           = 0.7,
+  brakeRate              = 1.555,
   buildCostMetal         = 40,
   builder                = false,
   buildPic               = [[vehscout.png]],
@@ -42,7 +42,7 @@ unitDef = {
   objectName             = [[vehscout.s3o]],
   script                 = [[vehscout.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
-  sightDistance          = 580,
+  sightDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 1,
   trackStretch           = 0.1,
@@ -137,6 +137,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehscout = unitDef })
+} }

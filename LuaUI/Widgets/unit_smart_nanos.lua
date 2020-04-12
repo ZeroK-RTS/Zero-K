@@ -51,13 +51,6 @@ local UPDATE = 0.5     -- Response time for commands
 local NANO_GROUPS = 8  -- Groups to split nanoturrets into
 local UPDATE_TICK = 2.5  -- Seconds to check if last order is still the best
 
-local noReclaimList = {}
-noReclaimList["Dragon's Teeth"] = 0
-noReclaimList["Shark's Teeth"] = 0
-noReclaimList["Fortification Wall"] = 0
-noReclaimList["Spike"] = 0
-noReclaimList["Commander Wreckage"] = 25
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -76,11 +69,7 @@ local nanoTurrets = {}
 local allyUnits = {}
 local orderQueue = {}
 
-if (Game.modShortName == "BA") then local BA = true end
-
 local myTeamID
-
-local EMPTY_TABLE = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -154,19 +143,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:CommandNotify(id, params, options)
---[[
-  local CMD_UPGRADEMEX = math.huge
-  
-  if BA and (id == 31244) then
-    if (#params == 1) then
-      local unitDefID = GetUnitDefID(params[1])
-      if (unitDefID ~= nil) and (UnitDefs[unitDefID].customParams.ismex) then
-        CMD_UPGRADEMEX = 31244
-      end
-    end
-  end
-]]--
-  
   local selUnits = GetSelectedUnits()
     
   for _,unitID in ipairs(selUnits) do
@@ -176,7 +152,6 @@ function widget:CommandNotify(id, params, options)
     end
   end
     
-  --if (id == CMD.RECLAIM) or (id == CMD_UPGRADEMEX) then
   if (id == CMD.RECLAIM) then
     targetUnit = params[1]
     teamUnits[targetUnit] = nil
@@ -184,9 +159,9 @@ function widget:CommandNotify(id, params, options)
       local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
         if (cmdID == CMD.REPAIR) and (cmdParam == targetUnit) then
           if options.shift then
-            GiveOrderToUnit(unitID,CMD.STOP, EMPTY_TABLE, 0)
+            GiveOrderToUnit(unitID,CMD.STOP, 0, 0)
           else
-            GiveOrderToUnit(unitID,CMD.RECLAIM,{targetUnit}, 0)
+            GiveOrderToUnit(unitID,CMD.RECLAIM,targetUnit, 0)
           end
         end
     end
@@ -350,24 +325,24 @@ function widget:Update(deltaTime)
                     commandMe = true
                   end
                 end
-	            end
-	          end
-	          if (cmdID == CMD.REPAIR) then
-	            prevCommand = CMD.REPAIR
-	            prevUnit = cmdParam
+              end
+            end
+            if (cmdID == CMD.REPAIR) then
+              prevCommand = CMD.REPAIR
+              prevUnit = cmdParam
               local targetDefID = GetUnitDefID(prevUnit)
               if (targetDefID ~= nil) and UnitDefs[targetDefID].canMove then
                 local uX, _, uZ = GetUnitPosition(prevUnit)
                 if (getDistance(unitDefs.posX, unitDefs.posZ, uX, uZ) > unitDefs.buildDistanceSqr) then
                   commandMe = true
                 end
-  	          end
-  	        end
-	        
-	          if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
-	            commandMe = true
-	          end
-	        end
+            end
+          end
+          
+            if ((unitDefs.timeCounter + UPDATE_TICK) < GetGameSeconds()) then
+              commandMe = true
+            end
+          end
         end
                     
         if (commandMe) then
@@ -438,7 +413,7 @@ function widget:Update(deltaTime)
                 local fd = GetFeatureDefID(featureID)
                 local radiusSqr = (FeatureDefs[fd].radius * FeatureDefs[fd].radius)
                 if (getDistance(unitDefs.posX, unitDefs.posZ, fX, fZ) < (unitDefs.buildDistanceSqr + radiusSqr)) then
-                  if (FeatureDefs[fd].reclaimable) and (not noReclaimList[FeatureDefs[fd].tooltip]) then
+                  if FeatureDefs[fd].reclaimable then
                     local fm,_,fe  = GetFeatureResources(featureID)
                     if (fm > 0) and (fe > 0) then
                       bestFeature = featureID

@@ -1,10 +1,10 @@
-unitDef = {
+return { striderfunnelweb = {
   unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
   description            = [[Shield Support Strider]],
-  acceleration           = 0.0552,
+  acceleration           = 0.166,
   activateWhenBuilt      = true,
-  brakeRate              = 0.1375,
+  brakeRate              = 0.825,
   buildCostMetal         = 3000,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
@@ -101,7 +101,7 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 23000,
+      shieldPower             = 19400,
       shieldPowerRegen        = 300,
       shieldPowerRegenEnergy  = 48,
       shieldRadius            = 550,
@@ -134,6 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderfunnelweb = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { vehsupport = {
   unitname               = [[vehsupport]],
   name                   = [[Fencer]],
   description            = [[Deployable Missile Rover (must stop to fire)]],
-  acceleration           = 0.0354,
-  brakeRate              = 0.0358,
+  acceleration           = 0.15,
+  brakeRate              = 0.3,
   buildCostMetal         = 140,
   builder                = false,
   buildPic               = [[vehsupport.png]],
@@ -21,6 +21,7 @@ unitDef = {
 
   customParams           = {
     modelradius    = [[13]],
+    aimposoffset   = [[0 10 0]],
     chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
   },
 
@@ -60,7 +61,7 @@ unitDef = {
   trackType              = [[StdTank]],
   trackWidth             = 34,
   turninplace            = 0,
-  turnRate               = 486,
+  turnRate               = 420,
   workerTime             = 0,
 
   weapons                = {
@@ -101,7 +102,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_frostshard.s3o]],
       range                   = 600,
-      reloadtime              = 0.733,
+      reloadtime              = 0.766,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med17]],
       soundStart              = [[weapon/missile/missile_fire11]],
@@ -138,6 +139,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehsupport = unitDef })
+} }

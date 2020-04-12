@@ -271,8 +271,11 @@ function script.FireWeapon(num)
 		Hide(r_missile)
 		StartThread(RestoreAfterDelayRight)
 	end
-	gun_1 = not gun_1
 	--StartThread(RestoreAfterDelay)
+end
+
+function script.EndBurst(num)
+	gun_1 = not gun_1
 end
 
 function script.BlockShot(num, targetID)

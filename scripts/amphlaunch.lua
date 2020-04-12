@@ -94,11 +94,10 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turretheading, y_axis, heading, 4)
+	Turn(turretheading, y_axis, heading, 12)
 	--Move(turretheading, y_axis, 1.5*math.abs(pitch), 3.5)
 	--Turn(turretpitch, x_axis, -pitch, 1.9)
 	WaitForTurn(turretheading, y_axis)
-	WaitForTurn(turretpitch, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end

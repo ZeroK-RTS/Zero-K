@@ -1,46 +1,18 @@
-local name = "commweapon_riotcannon_napalm"
-local weaponDef = {
-	name                    = [[Napalm Riot Cannon]],
-	areaOfEffect            = 170,
-	avoidFeature            = true,
-	avoidFriendly           = true,
-	burnblow                = true,
-	craterBoost             = 1,
-	craterMult              = 2,
+local _, def = VFS.Include("gamedata/modularcomms/weapons/riotcannon.lua")
 
-	customParams            = {
-		is_unit_weapon = 1,
-		slot = [[5]],
-		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
-		miscEffectFire   = [[custom:RIOT_SHELL_L]],
-		burntime         = 420,
-		burnchance       = 1,
-		setunitsonfire   = [[1]],
+def.name = "Napalm " .. def.name
+def.areaOfEffect = def.areaOfEffect * 1.25
+for armorType, damage in pairs (def.damage) do
+	def.damage[armorType] = damage * 0.75
+end
+def.craterBoost = 1
+def.craterMult = 1
 
-		light_camera_height = 1500,
-	},
+def.customParams.burntime = 420 -- blaze it!
+def.customParams.burnchance = 1
+def.customParams.setunitsonfire = 1
+def.explosiongenerator = "custom:napalm_phoenix"
+def.rgbColor = "1 0.3 0.1"
+def.soundHit = "weapon/burn_mixed"
 
-	damage                  = {
-		default = 165,
-		subs    = 9,
-	},
-
-	edgeEffectiveness       = 0.75,
-	explosionGenerator      = [[custom:napalm_phoenix]],
-	fireStarter             = 150,
-	impulseBoost            = 60,
-	impulseFactor           = 0.5,
-	interceptedByShieldType = 1,
-	noSelfDamage            = true,
-	range                   = 300,
-	reloadtime              = 49/30,
-	rgbcolor                = [[1 0.3 0.1]],
-	soundhit                = [[weapon/burn_mixed]],
-	soundStart              = [[weapon/cannon/outlaw_gun]],
-	soundStartVolume        = 3,
-	turret                  = true,
-	weaponType              = [[Cannon]],
-	weaponVelocity          = 750,
-}
-
-return name, weaponDef
+return "commweapon_riotcannon_napalm", def

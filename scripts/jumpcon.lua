@@ -24,7 +24,7 @@ local SIG_WALK = 1
 local RESTORE_DELAY = 1000
 
 local smokePiece = {torso}
-local nanoPiece = lhand
+local nanoPiece = flare
 
 local usingNano = false
 local usingGun = false

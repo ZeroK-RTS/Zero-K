@@ -1,9 +1,9 @@
-unitDef = {
+return { shieldaa = {
   unitname               = [[shieldaa]],
   name                   = [[Vandal]],
   description            = [[Anti-Air Bot]],
-  acceleration           = 0.45,
-  brakeRate              = 1.35,
+  acceleration           = 1.35,
+  brakeRate              = 8.1,
   buildCostMetal         = 90,
   buildPic               = [[shieldaa.png]],
   canGuard               = true,
@@ -134,6 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldaa = unitDef })
+} }

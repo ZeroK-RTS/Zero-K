@@ -140,7 +140,7 @@ function script.QueryWeapon(num)
 	return guns[gunNum].flare
 end
 
-function gunFire(num)
+local function gunFire(num)
 	Move(guns[num].barrel, z_axis, guns[num].z*1.2, 8*guns[num].zs)
 	Move(guns[num].barrel, y_axis, guns[num].y*1.2, 8*guns[num].ys)
 	WaitForMove(guns[num].barrel, y_axis)

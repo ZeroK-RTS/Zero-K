@@ -13,7 +13,7 @@ local smokePiece = {base, engineL, engineR}
 --variables
 local gun = false
 
-local RESTORE_DELAY = 250
+local RESTORE_DELAY = 150
 local FIRE_SLOWDOWN = tonumber(UnitDef.customParams.combat_slowdown)
 
 --signals
@@ -67,7 +67,7 @@ function script.AimWeapon(num, heading, pitch)
 	return not (GetUnitValue(COB.CRASHING) == 1)
 end
 
-function script.Shot(num)
+function script.EndBurst(num)
 	gun = not gun
 end
 

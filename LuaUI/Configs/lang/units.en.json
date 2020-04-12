@@ -606,7 +606,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Jumpjet Constructor, Builds at 4 m/s",
+		"description" : "Jumpjet Constructor, Builds at 5 m/s",
 		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
 	},
 	"chicken_blimpy" : {
@@ -767,7 +767,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",
-		"helptext" : "The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal."
+		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"vehaa" : {
 		"name" : "Crasher",
@@ -806,7 +806,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
+		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
 	},
 	"spiderriot" : {
@@ -1052,7 +1052,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
-		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance."
+		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance. It can also enable a short-range cloaking field, which unlike the aforementioned abilities costs energy to maintain."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",
@@ -1071,7 +1071,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Construction Aircraft, Builds at 4 m/s",
+		"description" : "Construction Aircraft, Builds at 5 m/s",
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
 	},
 	"gunshipraid" : {

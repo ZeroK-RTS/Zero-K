@@ -70,11 +70,11 @@ function widget:MouseMove(mx, my)
 	return true
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 function widget:KeyPress(key)
 	if (key == KEYSYMS.S) then
-		str = "\n\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
+		local str = "\n\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
 		for j = 1, #final_polygons do
 			str = str .. "\t\t{\n"
 			local polygon = final_polygons[j]

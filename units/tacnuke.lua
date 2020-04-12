@@ -1,4 +1,4 @@
-unitDef = {
+return { tacnuke = {
   unitname                      = [[tacnuke]],
   name                          = [[Eos]],
   description                   = [[Tactical Nuke]],
@@ -108,6 +108,4 @@ unitDef = {
   featureDefs                   = {
   },
 
-}
-
-return lowerkeys({ tacnuke = unitDef })
+} }

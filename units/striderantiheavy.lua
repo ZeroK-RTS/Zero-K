@@ -1,11 +1,11 @@
-unitDef = {
+return { striderantiheavy = {
   unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 2000,
   buildPic               = [[striderantiheavy.png]],
   canGuard               = true,
@@ -132,6 +132,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderantiheavy = unitDef })
+} }

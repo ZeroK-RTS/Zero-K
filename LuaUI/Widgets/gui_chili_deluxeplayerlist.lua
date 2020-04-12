@@ -384,7 +384,7 @@ local timer = 0
 local lastSizeX
 local lastSizeY
 local lastChosenSizeX = 0
-include("keysym.h.lua")
+include("keysym.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -646,7 +646,7 @@ local function MakeSpecTooltip()
 	)
 
 	if list_size <= 2 then
-		windowTooltip = windowTooltip or "PLAYERS"
+		windowTooltip = "PLAYERS"
 		for i=1, #players do
 			windowTooltip = windowTooltip .. "\n\t"..players[i].name.."\t"..players[i].cpuColChar..(players[i].cpuText)..'\008' .. "\t"..players[i].pingColChar..(players[i].pingText).."\008"
 		end
@@ -1165,7 +1165,7 @@ SetupPlayerNames = function()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,customKeys = Spring.GetPlayerInfo(playerID)
-		local clan, faction, level, elo, wins, rank
+		local clan, faction, level, elo, rank
 		if customKeys then
 			clan = customKeys.clan
 			faction = customKeys.faction
@@ -1193,7 +1193,6 @@ SetupPlayerNames = function()
 				faction = faction,
 				level = level,
 				elo = elo,
-				wins = wins,
 			}
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]

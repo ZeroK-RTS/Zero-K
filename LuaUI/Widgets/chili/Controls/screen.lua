@@ -260,8 +260,8 @@ function Screen:MouseUp(x, y, ...)
 		if CompareLinks(hoveredControl, activeControl) then
 			--//FIXME send this to controls too, when they didn't `return self` in MouseDown!
 			if (math.abs(x - self._lastClickedX) < 3) and
- 				(math.abs(y - self._lastClickedY) < 3) and
- 				(Spring.DiffTimers(now, self._lastClicked) < 0.45 ) --FIXME 0.45 : = doubleClick time (use spring config?)
+				(math.abs(y - self._lastClickedY) < 3) and
+				(Spring.DiffTimers(now, self._lastClicked) < 0.45 ) --FIXME 0.45 : = doubleClick time (use spring config?)
 			then
 				obj = activeControl:MouseDblClick(cx, cy, ...)
 			end

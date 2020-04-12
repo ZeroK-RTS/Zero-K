@@ -217,7 +217,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(aagun, x_axis, -pitch, math.rad(240))
 		WaitForTurn(aaturret, y_axis)
 		WaitForTurn(aagun, x_axis)
-	elseif num == 3 then
+	--elseif num == 3 then
 		--Turn(torso, y_axis, heading, math.rad(180))
 		--Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(270))
 		--WaitForTurn(torso, y_axis)

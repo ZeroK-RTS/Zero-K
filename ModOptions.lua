@@ -278,6 +278,14 @@ local options = {
     def=false,
   },
   {
+    key='disable_local_widgets',
+    name='Disable Local Widgets',
+    desc='Disable loading of local widget.',
+    type='bool',
+    section= 'a_important',
+    def=false,
+  },
+  {
     key='campaign_chassis',
     name='Allow campaign commander chassis',
     desc='Allows you to choose the campaign commander chassis.',
@@ -390,6 +398,22 @@ local options = {
     type   = 'bool',
     section= 'experimental',
     def    = false,
+  },
+  {
+    key    = 'enemyterra',
+    name   = 'Allow Terraform Near Enemies',
+    desc   = 'Without this option terraform progress is 20x slower if an enemy unit is visible nearby.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },
+  {
+    key     = "tweakunits",
+    name    = "Tweak Units",
+    desc    = "A base64 encoded lua table of unit parameters to change.",
+    section = 'experimental',
+    type    = "string",
+    def     = "",
   },
 --[[
   {

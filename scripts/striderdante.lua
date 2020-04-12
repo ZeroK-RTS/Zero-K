@@ -74,7 +74,6 @@ local dead = false
 local armsFree = true
 local dgunning = false
 
-local targetHeading = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Arm Animation
@@ -231,7 +230,6 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	local speedMult = 1
 	if armsFree then
 		Turn(torso, y_axis, 0, math.rad(90))
 		Turn(larm, y_axis, 0, math.rad(120))
@@ -360,7 +358,6 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
-		targetHeading = heading + GetUnitValue(COB.HEADING)/32768
 		StartThread(RestoreAfterDelay)
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
@@ -392,8 +389,6 @@ function script.Shot(num)
 		EmitSfx(weapon.query[index], 1024)
 		EmitSfx(missileEmits[side][1], 1025)
 		EmitSfx(missileEmits[side][2], 1025)
-	elseif num == 4 then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 	weapon.index = index + 1
 	if (index + 1) > #weapon.query then

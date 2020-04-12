@@ -4,12 +4,21 @@ include "trackControl.lua"
 include "pieceControl.lua"
 local dynamicRockData
 
+local scriptReload = include("scriptReload.lua")
+
 local base, turret, sleeve = piece ('base', 'turret', 'sleeve')
 
 local missiles = {
 	piece ('dummy1'),
 	piece ('dummy2'),
 }
+
+local isLoaded = {
+	true,
+	true,
+}
+
+local RELOAD_TIME = 2.3 * 30
 
 local SIG_AIM = 1
 local SIG_MOVE = 2
@@ -104,13 +113,13 @@ function UnstunThread()
 	end
 end
 
-function Stunned (stun_type)
+function Stunned(stun_type)
 	-- since only the turret is animated, treat all types the same since they all disable weaponry
 	stuns[stun_type] = true
 	StartThread (StunThread)
 end
 
-function Unstunned (stun_type)
+function Unstunned(stun_type)
 	stuns[stun_type] = false
 	if not stuns[1] and not stuns[2] and not stuns[3] then
 		StartThread (UnstunThread)
@@ -156,12 +165,21 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
+local SleepAndUpdateReload = scriptReload.SleepAndUpdateReload
+
+local function reload(num)
+	scriptReload.GunStartReload(num)
+	isLoaded[num] = false
+	SleepAndUpdateReload(num, RELOAD_TIME)
+	isLoaded[num] = true
+end
+
 local function ReloadThread(missile)
 	Hide (missiles[missile])
-	Move (missiles[missile], z_axis, -3)
-	Sleep (4000)
+	Move (missiles[missile], z_axis, -5)
+	Sleep (1000)
 	Show (missiles[missile])
-	Move (missiles[missile], z_axis, 0.5, 1)
+	Move (missiles[missile], z_axis, 0.8, 5.5)
 end
 
 function script.FireWeapon()
@@ -171,14 +189,23 @@ function script.FireWeapon()
 end
 
 function script.EndBurst()
+	StartThread(reload, currentMissile)
 	currentMissile = 3 - currentMissile
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25)
+	if isLoaded[currentMissile] then
+		if not targetID then
+			return false
+		end
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0) * 0.083
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 240.5, distMult)
+	end
+	return true
 end
 
 function script.Create()
+	scriptReload.SetupScriptReload(2, RELOAD_TIME)
 	dynamicRockData = GG.ScriptRock.InitializeRock(rockData)
 	InitiailizeTrackControl(trackData)
 
@@ -186,8 +213,8 @@ function script.Create()
 		Sleep (250)
 	end
 
-	Move (missiles[1], z_axis, 0.5)
-	Move (missiles[2], z_axis, 0.5)
+	Move(missiles[1], z_axis, 0.8)
+	Move(missiles[2], z_axis, 0.8)
 
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 end

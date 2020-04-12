@@ -1,10 +1,10 @@
-unitDef = {
+return { shipriot = {
   unitname               = [[shipriot]],
   name                   = [[Corsair]],
   description            = [[Corvette (Raider/Riot)]],
-  acceleration           = 0.0417,
+  acceleration           = 0.209,
   activateWhenBuilt      = true,
-  brakeRate              = 0.142,
+  brakeRate              = 1.42,
   buildCostMetal         = 240,
   builder                = false,
   buildPic               = [[shipriot.png]],
@@ -144,6 +144,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipriot = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { chicken_leaper = {
   unitname            = [[chicken_leaper]],
   name                = [[Leaper]],
   description         = [[Hopping Raider]],
-  acceleration        = 0.5,
-  brakeRate           = 0.205,
+  acceleration        = 1.5,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -105,6 +105,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_leaper = unitDef })
+} }

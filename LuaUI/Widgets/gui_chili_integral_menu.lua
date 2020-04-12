@@ -18,7 +18,7 @@ end
 --------------------------------------------------------------------------------
 -- Configuration
 
-include("keysym.h.lua")
+include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 
 -- Chili classes

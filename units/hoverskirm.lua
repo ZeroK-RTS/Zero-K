@@ -1,10 +1,10 @@
-unitDef = {
+return { hoverskirm = {
   unitname            = [[hoverskirm]],
   name                = [[Scalpel]],
   description         = [[Skirmisher/Anti-Heavy Hovercraft]],
-  acceleration        = 0.0435,
+  acceleration        = 0.2,
   activateWhenBuilt   = true,
-  brakeRate           = 0.205,
+  brakeRate           = 2.05,
   buildCostMetal      = 220,
   builder             = false,
   buildPic            = [[hoverskirm.png]],
@@ -55,7 +55,7 @@ unitDef = {
   sightDistance       = 484,
   sonarDistance       = 484,
   turninplace         = 0,
-  turnRate            = 420,
+  turnRate            = 335,
   workerTime          = 0,
   
   weapons             = {
@@ -139,6 +139,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverskirm = unitDef })
+} }

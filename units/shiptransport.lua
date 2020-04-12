@@ -1,10 +1,10 @@
-unitDef = {
+return { shiptransport = {
   unitname            = [[shiptransport]],
   name                = [[Surfboard]],
   description         = [[Transport Platform]],
-  acceleration        = 0.102,
+  acceleration        = 0.51,
   activateWhenBuilt   = true,
-  brakeRate           = 0.115,
+  brakeRate           = 1.15,
   buildCostMetal      = 220,
   builder             = false,
   buildPic            = [[shiptransport.png]],
@@ -64,6 +64,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shiptransport = unitDef })
+} }

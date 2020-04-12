@@ -1,4 +1,4 @@
-unitDef = {
+return { planelightscout = {
   unitname            = [[planelightscout]],
   name                = [[Sparrow]],
   description         = [[Light Scout Plane]],
@@ -67,6 +67,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ planelightscout = unitDef })
+} }

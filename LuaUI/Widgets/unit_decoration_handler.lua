@@ -206,7 +206,7 @@ local function DrawWorldFunc()
 					glTexRect(-attributes.width, -attributes.height, attributes.width, attributes.height)
 					glPopMatrix()
 				end
-			else
+			-- else
 				-- Requires more work
 				--RemoveUnit(unitID, textureName)
 			end

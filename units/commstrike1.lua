@@ -1,10 +1,10 @@
-unitDef = {
+return { commstrike1 = {
   unitname               = [[commstrike1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
@@ -196,6 +196,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ commstrike1 = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { jumpaa = {
   unitname            = [[jumpaa]],
   name                = [[Toad]],
   description         = [[Heavy Anti-Air Jumper]],
-  acceleration        = 0.18,
-  brakeRate           = 0.2,
+  acceleration        = 0.54,
+  brakeRate           = 1.2,
   buildCostMetal      = 500,
   buildPic            = [[jumpaa.png]],
   canMove             = true,
@@ -29,7 +29,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 2000,
+  maxDamage           = 2100,
   maxSlope            = 36,
   maxVelocity         = 2.017,
   maxWaterDepth       = 22,
@@ -40,7 +40,7 @@ unitDef = {
   objectName          = [[hunchback.s3o]],
   script              = [[jumpaa.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
-  sightDistance       = 660,
+  sightDistance       = 900,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -145,7 +145,7 @@ unitDef = {
       laserFlareSize          = 3.25,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 820,
+      range                   = 850,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
@@ -180,6 +180,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpaa = unitDef })
+} }

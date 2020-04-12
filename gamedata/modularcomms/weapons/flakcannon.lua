@@ -18,6 +18,7 @@ local weaponDef = {
 		onlyTargetCategory = [[FIXEDWING GUNSHIP]],
 
 		light_radius = 0,
+		reaim_time = 1,
 	},
 
 	damage                  = {

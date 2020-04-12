@@ -16,7 +16,7 @@ return {
       air                = true,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         alphafalloff       = 2,
         alwaysvisible      = true,
@@ -35,7 +35,7 @@ return {
       ground             = true,
       ttl                = 17,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       color = {
         [1]  = 0,
         [2]  = 0.5,
@@ -48,7 +48,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.8,
         colormap           = [[1.0 1.0 1.0 0.04	0.9 0.5 0.2 0.01	0.8 0.1 0.1 0.01]],

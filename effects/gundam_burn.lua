@@ -8,11 +8,7 @@ return {
       flashalpha         = 1,
       flashsize          = 12,
       ttl                = 8,
-      color = {
-        [1]  = 0.80000001192093,
-        [2]  = 0.10000000149012,
-        [3]  = 0,
-      },
+      color = { 0.8, 0.1, 0 },
     },
     searingflame = {
       air                = true,
@@ -22,7 +18,9 @@ return {
       properties = {
         airdrag            = 0.8,
         alwaysvisible      = true,
-        colormap           = [[0.9 0.5 0.4 0.04	0.9 0.4 0.1 0.01	0.5 0.1 0.1 0.01]],
+        colormap           = [[0.9 0.5 0.4 0.04
+                               0.9 0.4 0.1 0.01
+                               0.5 0.1 0.1 0.01]],
         directional        = true,
         emitrot            = 45,
         emitrotspread      = 32,
@@ -49,7 +47,12 @@ return {
       properties = {
         airdrag            = 0.70,
         alwaysvisible      = true,
-        colormap           = [[0.1 0.1 0.1 0.01    0.5 0.3 0.0 0.05    0.5 0.1 0.1 1.0    0.1 0.1 0.1 1.0    0.5 0.5 0.5 1.0   0 0 0 0.01]],
+        colormap           = [[0.1 0.1 0.1 0.01
+                               0.5 0.3 0.0 0.05
+                               0.5 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.5 0.5 0.5 1.00
+                               0.0 0.0 0.0 0.01]],
         directional        = true,
         emitrot            = 90,
         emitrotspread      = 0,

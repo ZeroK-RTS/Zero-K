@@ -35,8 +35,8 @@ local CommandDesc = {
 	type        = CMDTYPE.ICON_MODE,
 	name        = 'Retreat',
 	action      = 'retreat',
-	tooltip 	= Tooltips[DefaultState + 1],
-	params  = { 'Retreat Off', 'Retreat Off', 'Retreat 30%', 'Retreat 65%', 'Retreat 99%' },
+	tooltip     = Tooltips[DefaultState + 1],
+	params      = { 'Retreat Off', 'Retreat Off', 'Retreat 30%', 'Retreat 65%', 'Retreat 99%' },
 }
 local StateCount = #CommandDesc.params-1
 
@@ -63,6 +63,14 @@ local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam 	= Spring.SetUnitRulesParam
 local spFindUnitCmdDesc 	= Spring.FindUnitCmdDesc
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
+
+local CMD_INSERT = CMD.INSERT
+local CMD_REMOVE = CMD.REMOVE
+local CMD_WAIT   = CMD.WAIT
+
+local CMD_OPT_ALT      = CMD.OPT_ALT
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_OPT_SHIFT    = CMD.OPT_SHIFT
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local getMovetype = Spring.Utilities.getMovetype
@@ -213,7 +221,7 @@ local function StopRetreating(unitID)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if cmd.id == CMD_REARM then
-				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, 0)
+				spGiveOrderToUnit(unitID, CMD_REMOVE, cmd.tag, 0)
 			end
 		end
 	end
@@ -222,9 +230,9 @@ local function StopRetreating(unitID)
 		local first = true
 		for _,cmd in ipairs(cmds) do
 			if cmd.tag == retreaterTagsMove[unitID] or cmd.tag == retreaterTagsWait[unitID] then
-				spGiveOrderToUnit(unitID, CMD.REMOVE, { cmd.tag }, 0)
-			elseif first and cmd.id == CMD.WAIT then
-				spGiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+				spGiveOrderToUnit(unitID, CMD_REMOVE, cmd.tag, 0)
+			elseif first and cmd.id == CMD_WAIT then
+				spGiveOrderToUnit(unitID, CMD_WAIT, 0, 0)
 			end
 			first = false
 		end
@@ -258,7 +266,7 @@ local function GiveRearmOrders(unitID)
 		
 		if unitIsIdle then
 			local ux, uy, uz = spGetUnitPosition(unitID)
-			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD.OPT_SHIFT)
+			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD_OPT_SHIFT)
 		end
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -277,17 +285,11 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	local insertIndex = 0
 	local hy = Spring.GetGroundHeight(hx, hz)
 	
-	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
-	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
+	spGiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_WAIT, CMD_OPT_SHIFT}, CMD_OPT_ALT) --SHIFT W
+	GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_RAW_MOVE, CMD_OPT_INTERNAL, hx, hy, hz}, CMD_OPT_ALT) -- ALT makes the 0 positional
 	
-	local tag1, tag2
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local cmds = Spring.GetCommandQueue(unitID, 2)
-		tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
-	else
-		_, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
-		_, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
-	end
+	local _, _, tag1 = Spring.GetUnitCurrentCommand(unitID)
+	local _, _, tag2 = Spring.GetUnitCurrentCommand(unitID, 2)
 	
 	isRetreating[unitID] = true
 	retreaterTagsMove[unitID] = tag1
@@ -295,7 +297,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	
 	if unitIsIdle then
 		local ux, uy, uz = spGetUnitPosition(unitID)
-		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD.OPT_SHIFT)
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, CMD_OPT_SHIFT)
 	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -315,7 +317,7 @@ local function MaybeLandGunshipAtAirpad(unitID, x, z, r)
 		return
 	end
 
-	spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, padID}, CMD.OPT_ALT)
+	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_REARM, CMD_OPT_SHIFT + CMD_OPT_INTERNAL, padID}, CMD_OPT_ALT)
 	retreaterHasRearm[unitID] = true
 
 	-- there's some room for improvement, for example check if there's a second pad in the zone if the first is dead or slacking

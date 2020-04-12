@@ -1,4 +1,4 @@
-unitDef = {
+return { turretgauss = {
   unitname                      = [[turretgauss]],
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
@@ -50,7 +50,7 @@ unitDef = {
     },
   },
 
-  sightDistance                 = 660,
+  sightDistance                 = 664, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardmap                       = [[ooooooooo]],
 
@@ -110,7 +110,7 @@ unitDef = {
       soundStartVolume        = 2.5,
       stages                  = 32,
       turret                  = true,
-      waterweapon              = true,
+      waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1200,
     },
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretgauss = unitDef })
+} }

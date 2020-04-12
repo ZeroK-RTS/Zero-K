@@ -854,12 +854,12 @@ local function ProcessOptions(materialDef, optName, optValues)
 				--Spring.Echo("optTable[optName]", optTable[optName])
 				handled = true
 			end
-		elseif knownIntOptions[optName] then --integer
-			--TODO
-			--handled = true
-		elseif knownFloatOptions[optName] then --float
-			--TODO
-			--handled = true
+		--[[ TODO
+		elseif knownIntOptions[optName] then
+			handled = true
+		elseif knownFloatOptions[optName] then
+			handled = true
+		]]
 		end
 	end
 

@@ -12,7 +12,7 @@ function widget:GetInfo()
 	}
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 --------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ end
 ---------------------------------
 local hotkeyPath = "Hotkeys/Construction"
 options_path = 'Settings/Interface/Building Placement'
-options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight', 'hotkey_toggle', 'hotkey_raise', 'hotkey_lower'}
+options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight', 'label_structure', 'hotkey_toggle', 'hotkey_raise', 'hotkey_lower'}
 options = {
 	enterSetHeightWithB = {
 		name = "Toggle set height",
@@ -70,6 +70,11 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = "Hold Alt and mouse wheel to set height."
+	},
+	label_structure = {
+		type = 'label',
+		name = 'Terraform Structure Placement',
+		path = hotkeyPath
 	},
 	hotkey_toggle = {
 		name = 'Toggle Structure Terraform',
@@ -121,6 +126,7 @@ local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground heig
 -- colour of lasso during drawing
 local lassoColor = {0.2, 1.0, 0.2, 0.8}
 local edgeColor = {0.2, 1.0, 0.2, 0.4}
+local waterColor = {0.2, 0.0, 1.0, 0.4}
 
 local SQUARE_BUILDABLE = 2 -- magic constant returned by TestBuildOrder
 
@@ -135,6 +141,7 @@ local buildingPlacementHeight = 0
 
 local toggleEnabled = false
 local floating = false
+local drawWater = false
 
 local pointX = 0
 local pointY = 0
@@ -352,6 +359,12 @@ function widget:Update(dt)
 			pointY = height + buildingPlacementHeight
 		end
 		
+		if height > 0 and pointY < 0 then
+			drawWater = true
+		else
+			drawWater = false
+		end
+		
 		for i = -1, 1, 2 do
 			for j = -1, 1, 2 do
 				corner[i][j] = spGetGroundHeight(pointX + sizeX*i, pointZ + sizeZ*j)
@@ -402,7 +415,7 @@ function widget:MousePress(mx, my, button)
 		return true
 	end
 
-	if not buildingPlacementID then
+	if not (buildingPlacementID and pointX and pointZ) then
 		return
 	end
 
@@ -419,12 +432,12 @@ end
 -- Drawing
 --------------------------------------------------------------------------------
 
-local function DrawRectangleLine()
-	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
-	glVertex(pointX + sizeX, pointY, pointZ - sizeZ)
-	glVertex(pointX - sizeX, pointY, pointZ - sizeZ)
-	glVertex(pointX - sizeX, pointY, pointZ + sizeZ)
-	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
+local function DrawRectangleLine(h)
+	glVertex(pointX + sizeX, h, pointZ + sizeZ)
+	glVertex(pointX + sizeX, h, pointZ - sizeZ)
+	glVertex(pointX - sizeX, h, pointZ - sizeZ)
+	glVertex(pointX - sizeX, h, pointZ + sizeZ)
+	glVertex(pointX + sizeX, h, pointZ + sizeZ)
 end
 
 local function DrawRectangleCorners()
@@ -451,12 +464,17 @@ function widget:DrawWorld()
 		--// draw the lines
 		
 		glLineWidth(2.0)
+		if drawWater then
+			glColor(waterColor)
+			glBeginEnd(GL_LINE_STRIP, DrawRectangleLine, 0)
+		end
+		
 		glColor(edgeColor)
 		glBeginEnd(GL_LINES, DrawRectangleCorners)
 		
 		glLineWidth(3.0)
 		glColor(lassoColor)
-		glBeginEnd(GL_LINE_STRIP, DrawRectangleLine)
+		glBeginEnd(GL_LINE_STRIP, DrawRectangleLine, pointY)
 		
 		glColor(1, 1, 1, 1)
 		glLineWidth(1.0)

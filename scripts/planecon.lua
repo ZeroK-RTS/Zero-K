@@ -11,17 +11,21 @@ local nano = piece 'nano'
 --New bits
 local centreClaw 		= piece 'CentreClaw'
 local centreClawBit 	= piece 'CentreClawBit'
-local CentreNano 		= piece 'CentreNano'
+local CentreNano		= piece 'CentreNano'
 local leftClaw 			= piece 'LeftClaw'
 local leftClawBit 		= piece 'LeftClawBit'
 local leftNano 			= piece 'LeftNano'
+local rightNano 		= piece 'RightNano'
 local rightClaw 		= piece 'RightClaw'
 local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
 local engShield2 		= piece 'EngShield2'
 
 local smokePiece = {base, engine1, engine2}
-local nanoPieces = {nano, CentreNano, LeftNano}
+
+-- intentionally not {CentreNano, leftNano, rightNano}
+-- 3 beams look too powerful for a low 4 BP constructor
+local nanoPieces = {nano}
 
 local SIG_TILT = 1
 local SIG_LAND = 2
@@ -133,7 +137,7 @@ function script.StopBuilding()
 end
 
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),CentreNano)
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), nano)
 	return nano
 end
 

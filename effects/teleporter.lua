@@ -9,7 +9,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -31,20 +31,20 @@ return {
         texture            = [[chargeparticles]],
       },
     },
-	burst = {
+    burst = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:teleport_burst]],
         pos                = [[0 0 0]],
       },
     },
-	groundflash = {
+    groundflash = {
       circlealpha        = 0,
       circlegrowth       = 0,
       flashalpha         = 0.5,
@@ -57,14 +57,13 @@ return {
       },
     },
   },
-  
   ["teleport_progress"] = {
     sparks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -87,14 +86,13 @@ return {
       },
     },
   },
-  
   ["teleport_out"] = {
     sparks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -116,12 +114,12 @@ return {
         texture            = [[chargeparticles]],
       },
     },
-	white = {
+    white = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[1 1 1 0.1   0 0 0 0]],
@@ -143,12 +141,12 @@ return {
         texture            = [[burncircle]],
       },
     },
-	teal = {
+    teal = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 1 1 0.1   0 0 0 0]],
@@ -175,7 +173,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 0 0 0   0 0 0 1   0 0 0 0]],
@@ -205,7 +203,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = 0,
         colormap           = [[1 1 0 .1   0 0 0 0]],
@@ -227,7 +225,7 @@ return {
         texture            = [[burncircle]],
       },
     },
-	groundflash = {
+    groundflash = {
       circlealpha        = 0.5,
       circlegrowth       = 10,
       flashalpha         = 1,
@@ -245,7 +243,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         alpha              = 0.3,
         alwaysvisible      = false,
@@ -254,13 +252,13 @@ return {
         ttl                = 20,
       },
     },
-	fade = {
+    fade = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         delay              = 10,
         explosiongenerator = [[custom:teleport_fade]],
@@ -269,7 +267,7 @@ return {
     },
   },
   ["teleport_fade"] = {
-  	groundflash = {
+      groundflash = {
       circlealpha        = 0,
       circlegrowth       = 0,
       flashalpha         = 0.5,

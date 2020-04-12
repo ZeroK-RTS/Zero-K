@@ -1,4 +1,4 @@
-unitDef = {
+return { factoryhover = {
   unitname         = [[factoryhover]],
   name             = [[Hovercraft Platform]],
   description      = [[Produces Hovercraft, Builds at 10 m/s]],
@@ -14,6 +14,7 @@ unitDef = {
   buildoptions     = {
     [[hovercon]],
     [[hoverraid]],
+    [[hoverheavyraid]],
     [[hoverskirm]],
     [[hoverassault]],
     [[hoverdepthcharge]],
@@ -96,6 +97,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factoryhover = unitDef })
+} }

@@ -216,14 +216,14 @@ return {
       },
     },
   },
-  
+
   ["black_hole"] = {
     usedefaultexplosions = false,
     sparks = {
       air                = true,
-	  ground             = true,
+      ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       class              = [[CSimpleParticleSystem]],
       properties = {
         airdrag            = 1,
@@ -252,9 +252,9 @@ return {
     usedefaultexplosions = false,
     sparks = {
       air                = true,
-	  ground             = true,
+      ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       class              = [[CSimpleParticleSystem]],
       properties = {
         airdrag            = 1,
@@ -283,10 +283,10 @@ return {
     usedefaultexplosions = false,
     sparks = {
       air                = true,
-	  ground             = true,
+      ground             = true,
       water              = true,
-	  underwater         = true,
-	  unit               = true,
+      underwater         = true,
+      unit               = true,
       class              = [[CSimpleParticleSystem]],
       properties = {
         airdrag            = 1,
@@ -310,7 +310,7 @@ return {
       },
     },
   },
-  
+
   ["grav_danger_spikes_actual"] = {
     pikes = {
       air                = true,
@@ -401,7 +401,7 @@ return {
   },
 
   ["leveler_clouds_large"] = {
-	dustcloud = {
+    dustcloud = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
@@ -429,7 +429,7 @@ return {
       },
     },
   },
-  
+
   ["grav_blast_effect"] = {
     usedefaultexplosions = false,
     groundflash = {

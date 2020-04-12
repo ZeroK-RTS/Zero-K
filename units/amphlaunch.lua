@@ -1,11 +1,11 @@
-unitDef = {
+return { amphlaunch = {
   unitname               = [[amphlaunch]],
   name                   = [[Lobster]],
   description            = [[Amphibious Launcher Bot]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
-  buildCostMetal         = 320,
+  brakeRate              = 2.4,
+  buildCostMetal         = 230,
   buildPic               = [[amphlaunch.png]],
   canGuard               = true,
   canManualFire          = true,
@@ -174,6 +174,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphlaunch = unitDef })
+} }

@@ -14,6 +14,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+include("keysym.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
@@ -99,8 +100,8 @@ local NO_TOOLTIP = "NONE"
 
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
-local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
-local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.RAW_FIRST)
+local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.ZIP)
+local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
 local terraformGeneralTip =
 	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
@@ -235,6 +236,8 @@ local sameObjectIDTime = 0
 local selectedUnitsList = {}
 local commanderManualFireReload = {}
 
+local ctrlFilterUnits = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Settings
@@ -249,7 +252,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo','uniticon_size', 'manualWeaponReloadBar',
+	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter', 'uniticon_size', 'manualWeaponReloadBar',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -363,6 +366,13 @@ options = {
 				selectionWindow.SetGroupInfoVisible(self.value)
 			end
 		end,
+	},
+	ctrlFilter = {
+		name = 'Ctrl Selection Filtering',
+		type = 'bool',
+		desc = "Hold Ctrl and click on some units. These units will be selected when Ctrl is released.",
+		value = true,
+		path = selPath,
 	},
 	--unitCommand = {
 	--	name="Show Unit's Command",
@@ -846,25 +856,6 @@ local function UpdateMouseCursor(holdingDrawKey)
 	end
 end
 
-local UnitDefIDByHumanName_cache = {}
-local function GetUnitDefByHumanName(humanName)
-	local cached_unitDefID = UnitDefIDByHumanName_cache[humanName]
-	if (cached_udef ~= nil) then
-		return cached_udef
-	end
-	
-	for i = 1, #UnitDefs do
-		local ud = UnitDefs[i]
-		if (ud.humanName == humanName) then
-			UnitDefIDByHumanName_cache[humanName] = i
-			return i
-		end
-	end
-	
-	UnitDefIDByHumanName_cache[humanName] = false
-	return false
-end
-
 local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 	unitID = unitID or (unitList and unitList[1])
 	
@@ -901,15 +892,34 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 		spSelectUnitArray(newSelectedUnits)
 		widget:SelectionChanged(newSelectedUnits)
 	elseif button == 1 then
-		if shift then
-			spSelectUnitArray(unitList) -- select all
+		if ctrl then
+			ctrlFilterUnits = ctrlFilterUnits or {}
+			if shift then
+				for i = 1, #unitList do
+					ctrlFilterUnits[#ctrlFilterUnits + 1] = unitList[i]
+				end
+			else
+				ctrlFilterUnits[#ctrlFilterUnits + 1] = unitID
+			end
 		else
-			spSelectUnitArray({unitID})  -- only 1
+			if shift then
+				spSelectUnitArray(unitList) -- select all
+			else
+				spSelectUnitArray({unitID})  -- only 1
+			end
 		end
 	else --button2 (middle)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		SetCameraTarget(x, y, z, 1)
 	end
+end
+
+local function CheckCtrlFilterRelease()
+	if not ctrlFilterUnits then
+		return
+	end
+	spSelectUnitArray(ctrlFilterUnits)
+	ctrlFilterUnits = false
 end
 
 local cacheFeatureTooltip = {}
@@ -1850,7 +1860,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
 		local teamID
-		local addedName
 		local ud
 		local metalInfoShown = false
 		local maxHealthShown = false
@@ -1923,9 +1932,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:Invalidate()
 			
 			local unitName = GetHumanName(ud, unitID)
-			if addedName then
-				unitName = unitName .. addedName
-			end
 			unitNameUpdate(true, unitName, GetUnitIcon(unitDefID))
 			
 			if unitID then
@@ -2188,12 +2194,9 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
-		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
-		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
-		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
-		local unitDefID = GetUnitDefByHumanName(unitHumanName)
+		local unitDefID, morphTime, morphCost = chiliTooltip:match('(%d+) (%d+) (%d+)')
 		if unitDefID and morphTime and morphCost then
-			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, false, morphTime, morphCost)
+			tooltipWindow.SetUnitishTooltip(nil, tonumber(unitDefID), nil, nil, false, tonumber(morphTime), tonumber(morphCost))
 		end
 		return true
 	end
@@ -2461,6 +2464,12 @@ function widget:Update(dt)
 	if slowUpdate then
 		selectionWindow.UpdateSelectionWindow()
 		updateTimer = 0
+	end
+end
+
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL) then
+		CheckCtrlFilterRelease()
 	end
 end
 

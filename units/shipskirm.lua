@@ -1,10 +1,10 @@
-unitDef = {
+return { shipskirm = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
   description            = [[Rocket Boat (Skirmisher)]],
-  acceleration           = 0.039,
+  acceleration           = 0.195,
   activateWhenBuilt      = true,
-  brakeRate              = 0.115,
+  brakeRate              = 1.15,
   buildCostMetal         = 240,
   builder                = false,
   buildPic               = [[shipskirm.png]],
@@ -75,7 +75,7 @@ unitDef = {
       areaOfEffect            = 75,
       burst                   = 4,
       burstRate               = 0.3,
-      cegTag                  = [[missiletrailred]],
+      cegTag                  = [[rocket_trail_bar_flameboosted]],
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -98,13 +98,12 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 610,
       reloadtime              = 8.0,
-      smokeTrail              = true,
+      smokeTrail              = false,
       soundHit                = [[explosion/ex_med4]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
       startVelocity           = 230,
-      texture2                = [[darksmoketrail]],
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
@@ -139,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipskirm = unitDef })
+} }

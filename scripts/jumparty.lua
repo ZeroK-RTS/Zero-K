@@ -57,9 +57,8 @@ local gun_1 = 0
 local function Walk()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	local pace = WALK_RATE
 	while true do
-		pace = WALK_RATE*(Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+		local pace = WALK_RATE*(Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		
 		Turn(rupleg 	, y_axis, 0, math.rad(pace))
 		Turn(lupleg 	, y_axis, 0, math.rad(pace))

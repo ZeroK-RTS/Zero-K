@@ -1,10 +1,10 @@
-unitDef = {
+return { jumpsumo = {
   unitname            = [[jumpsumo]],
   name                = [[Jugglenaut]],
   description         = [[Heavy Riot Jumper]],
-  acceleration        = 0.1,
+  acceleration        = 0.3,
   activateWhenBuilt   = true,
-  brakeRate           = 0.3,
+  brakeRate           = 1.8,
   buildCostMetal      = 1700,
   builder             = false,
   buildPic            = [[jumpsumo.png]],
@@ -425,6 +425,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpsumo = unitDef })
+} }

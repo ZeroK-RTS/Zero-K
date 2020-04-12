@@ -229,7 +229,7 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID, old
 	end
 	
 	spTransferUnit(unitID, newTeam, false)
-	spGiveOrderToUnit(unitID, CMD_STOP, {}, 0)
+	spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 end
 
 --------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- add stats that the unit requires for this gadget
-	local health, maxHealth = spGetUnitHealth(unitID)
+	local health, maxHealth, _, _, build = spGetUnitHealth(unitID)
 	maxHealth = maxHealth + FIREWALL_HEALTH
 	if not unitDamage[unitID] then
 		damageByID.count = damageByID.count + 1
@@ -310,7 +310,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		-- reload handling
 		if controllers[attackerID].postCaptureReload then
 			local gameFrame = spGetGameFrame()
-			local frame = gameFrame + controllers[attackerID].postCaptureReload
+			local captureReloadMult = (((not build) or build == 1) and 1) or (build*0.5)
+			local frame = gameFrame + math.floor(controllers[attackerID].postCaptureReload*captureReloadMult)
 			spSetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, LOS_ACCESS)
 			spSetUnitRulesParam(attackerID, "captureRechargeFrame", frame, LOS_ACCESS)
 			GG.UpdateUnitAttributes(attackerID, gameFrame)
@@ -321,7 +322,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		-- destroy the unit if the controller is set to destroy units
 		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= (capturedUnits[unitID] or {}).originAllyTeam then
-			spGiveOrderToUnit(unitID, CMD_SELFD, {}, 0)
+			spGiveOrderToUnit(unitID, CMD_SELFD, 0, 0)
 		end
 		return 0
 	end

@@ -1,10 +1,10 @@
-unitDef = {
+return { shipcon = {
   unitname               = [[shipcon]],
   name                   = [[Mariner]],
   description            = [[Construction Ship, Builds at 7.5 m/s]],
-  acceleration           = 0.051375,
+  acceleration           = 0.256,
   activateWhenBuilt      = true,
-  brakeRate              = 0.061,
+  brakeRate              = 0.61,
   buildCostMetal         = 200,
   buildDistance          = 330,
   builder                = true,
@@ -48,8 +48,8 @@ unitDef = {
   script                 = [[shipcon.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
   showNanoSpray          = false,
-  sightDistance          = 325,
-  sonarDistance          = 325,
+  sightDistance          = 375,
+  sonarDistance          = 375,
   turninplace            = 0,
   turnRate               = 508,
   workerTime             = 7.5,
@@ -73,6 +73,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipcon = unitDef })
+} }

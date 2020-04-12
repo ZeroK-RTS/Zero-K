@@ -1,12 +1,12 @@
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.24",
-		desc	= "Press H to bring up the chili share menu.",
-		author	= "Commshare by _Shaman, Playerlist by DeinFreund",
-		date	= "12-3-2016",
-		license	= "Do whatever with it (cuz a license isn't going to stop you ;) )",
-		layer	= 2000,
-		enabled	= true,
+		name    = "Chili Share menu v1.24",
+		desc    = "Press H to bring up the chili share menu.",
+		author  = "Commshare by _Shaman, Playerlist by DeinFreund",
+		date    = "12-3-2016",
+		license = "Do whatever with it (cuz a license isn't going to stop you ;) )",
+		layer   = 2000,
+		enabled = true,
 	}
 end
 
@@ -56,6 +56,27 @@ local defaultamount = 100
 
 local UpdateListFunction
 local wantRebuild = false
+
+local pingCpuColors = {
+	'\255\0\255\0',
+	'\255\178\255\0',
+	'\255\255\255\0',
+	'\255\255\153\0',
+	'\255\255\0\0',
+	'\255\255\255\255',
+}
+
+local function PingTimeOut(pingTime)
+	local pingBucket = math.max(1, math.min(5, math.ceil(math.min(pingTime, 1) * 5))) or 6
+	if pingTime < 1 then
+		return pingCpuColors[pingBucket] .. (math.floor(pingTime*1000) ..'ms')
+	elseif pingTime > 999 then
+		return pingCpuColors[pingBucket] .. ('' .. (math.floor(pingTime*100/60)/100)):sub(1,4) .. 'min'
+	end
+	--return (math.floor(pingTime*100))/100
+	return pingCpuColors[pingBucket] .. ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
+end
+
 
 options_path = 'Settings/HUD Panels/Player List'
 --[[ Change path if necessary. I just dumped it here because it made sense.
@@ -315,24 +336,8 @@ local function RenderName(subject)
 		end
 	end
 	if (subject.player) then
-		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player, false) )
-		
-		local colorPing = '\255\180\180\180'
-		if (ping >= 500) then
-			colorPing = '\255\255\255\0'
-		end
-		if (ping > 1000) then
-			colorPing = '\255\255\0\0'
-		end
-		if (ping < 1000) then
-			ping = round(ping, 0).. "ms"
-		elseif (ping < 60000) then
-			ping = round(ping/1000, 1).. "sec"
-		else
-			ping = round(ping/60000, 1).. "min"
-		end
-			
-		givemebuttons[subject.id]["ping"]:SetText(colorPing .. ping)
+		local pingTime = select(6, Spring.GetPlayerInfo(subject.player, false))
+		givemebuttons[subject.id]["ping"]:SetText(PingTimeOut(pingTime))
 	elseif givemebuttons[subject.id]["ping"] then
 		givemebuttons[subject.id]["ping"]:SetText("\255\180\180\180 n/a")
 	end
@@ -374,10 +379,12 @@ local function UpdatePlayer(subject)
 	--Spring.Echo("allyteam: " .. allyteamID)
 	--Spring.Echo("myallyteam: " .. myallyteamID)
 	if subject.player and subject.player == myPlayerID then
-		if (teamLeader or sharemode == false or mySpec) then
-			givemebuttons[subject.id]["leave"]:SetVisibility(false)
-		elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-			givemebuttons[subject.id]["leave"]:SetVisibility(true)
+		if givemebuttons[subject.id]["leave"] then
+			if (teamLeader or sharemode == false or mySpec) then
+				givemebuttons[subject.id]["leave"]:SetVisibility(false)
+			elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+				givemebuttons[subject.id]["leave"]:SetVisibility(true)
+			end
 		end
 		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 	elseif subject.ai then
@@ -1299,7 +1306,7 @@ local function UpdateInviteTable()
 					givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
 					--Spring.Echo("showing")
 			end
-		else
+		-- else
 			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID, false)))
 		end
 	end

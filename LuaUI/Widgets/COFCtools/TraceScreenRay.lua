@@ -212,14 +212,6 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 	elseif returnRayDistance then
 		rayDist = math.sqrt(outResult.cursorxzDist^2+outResult.ry^2)
 	end
-	--Finish
-	if false then
-		-- Spring.MarkerAddPoint(outResult.gx, outResult.gy, outResult.gz, "here")
-		-- Spring.Echo(planeToHit)
-		-- Spring.Echo(sphereToHit)
-		-- Spring.Echo(math.modf(outResult.gx)..",".. math.modf(outResult.gy)..",".. math.modf(outResult.gz))
-		-- Spring.Echo(math.modf(outResult.rx)..",".. math.modf(outResult.ry)..",".. math.modf(outResult.rz))
-	end
 	return outResult.gx,outResult.gy,outResult.gz,outResult.rx,outResult.ry,outResult.rz,rayDist,cancelCache
 	--Most important credit to!:
 	--0: Google search service

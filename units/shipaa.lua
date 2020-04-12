@@ -1,11 +1,11 @@
-unitDef = {
+return { shipaa = {
   unitname               = [[shipaa]],
 
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
-  acceleration           = 0.0498,
+  acceleration           = 0.249,
   activateWhenBuilt   = true,
-  brakeRate              = 0.0808,
+  brakeRate              = 0.808,
 
   buildCostMetal         = 400,
   builder                = false,
@@ -196,6 +196,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipaa = unitDef })
+} }

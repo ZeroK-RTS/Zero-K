@@ -1,10 +1,10 @@
-unitDef = {
+return { hoverarty = {
   unitname            = [[hoverarty]],
   name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
-  acceleration        = 0.016,
+  acceleration        = 0.08,
   activateWhenBuilt   = true,
-  brakeRate           = 0.148,
+  brakeRate           = 1.48,
   buildCostMetal      = 1000,
   builder             = false,
   buildPic            = [[hoverarty.png]],
@@ -12,9 +12,9 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 -2 0]],
-  collisionVolumeScales  = [[48 58 48]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 -6 0]],
+  collisionVolumeScales  = [[40 56 56]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -33,7 +33,7 @@ unitDef = {
   losEmitHeight       = 40,
   maxDamage           = 1000,
   maxSlope            = 18,
-  maxVelocity         = 2.2,
+  maxVelocity         = 1.85,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
@@ -142,6 +142,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverarty = unitDef })
+} }

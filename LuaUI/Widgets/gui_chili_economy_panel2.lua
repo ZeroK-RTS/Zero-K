@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 local MIN_STORAGE = 0.5
 
@@ -100,6 +100,7 @@ local blinkM_status = false
 local blinkE_status = false
 local excessE = false
 local flashModeEnabled = true
+local externalForceHide = false
 
 local strings = {
 	local_metal_economy = "",
@@ -186,7 +187,11 @@ local function option_recreateWindow()
 			return false
 		end
 	end
-		
+	
+	if externalForceHide then
+		return false
+	end
+	
 	CreateWindow(x,y,w,h)
 	return true
 end
@@ -591,8 +596,8 @@ local initialReserveSet = false
 function widget:GameFrame(n)
 
 	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then
-        return
-    end
+		return
+	end
 	
 	if not window then
 		if not option_recreateWindow() then
@@ -898,7 +903,7 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 		width  = 200,
 		caption = text,
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		parent = holder,
@@ -951,7 +956,7 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 		width  = "90%",
 		caption = strings.resbar_no_storage,
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		parent = holder,
@@ -1026,6 +1031,7 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
+	externalForceHide = not newVisibility
 	if dispose then
 		local x,y,w,h = DestroyWindow()
 		if newVisibility then
@@ -1234,7 +1240,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
@@ -1383,7 +1389,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}

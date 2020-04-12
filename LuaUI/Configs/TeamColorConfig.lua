@@ -11,16 +11,20 @@ local colors = {
 	gaiaColor	= Range({ 200, 200, 200 }),	-- can only be 1 color
 	
 	allyColors = {
-	  Range({ 020, 105, 255 }),
+	  -- the first three ally colours are shades of blue
+	  -- this is so that in a MM game (4v4 or less) you are the only one green
+	  -- this is effectively soft simplecolors without the main disadvantage
+	  Range({ 010, 080, 255 }),
 	  Range({ 010, 250, 250 }),
-	  Range({ 120, 120, 255 }),
+	  Range({ 150, 150, 255 }),
+
 	  Range({ 005, 120, 005 }),
 	  Range({ 120, 175, 050 }),
-	  Range({ 090, 040, 255 }),
 	  Range({ 030, 120, 110 }),
 	  Range({ 130, 255, 210 }),
 	  Range({ 170, 190, 220 }),
 	  Range({ 060, 170, 190 }),
+	  Range({ 090, 040, 255 }), -- decently salient but too purple to be earlier in the list
 	},
 
 	enemyColors = {

@@ -517,9 +517,7 @@ function widget:Update(dt)
 		for i=1,#circles do
 			local circle = circles[i]
 			local age = circle.time / circleTTL
-			if age > 1 then
-				
-			else
+			if age <= 1 then
 				circle.time = circle.time + ringUpdatePeriod
 				circle.radius = circleRadius - (circleRadius - circleRadiusMin) * age
 				local alphaMult = 0.5 - math.abs(0.5 - age)

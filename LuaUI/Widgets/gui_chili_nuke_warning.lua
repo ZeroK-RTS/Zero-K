@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local Chili
@@ -98,7 +98,7 @@ local function CreateWindow()
 		bottom = 0,
 		caption = WG.Translate ("interface", "nuclear_launch_detected"),
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 32,

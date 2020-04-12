@@ -1011,7 +1011,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		if constructionCount == oldConstructionCount and constructionDefID == oldConstructionDefID and buildProgress == oldBuildProgress then
 			return
 		end
-		oldConstructionCount, oldConstructionDefIDoldBuildProgress, oldBuildProgress = constructionCount, constructionDefID, buildProgress
+		oldConstructionCount, oldConstructionDefID, oldBuildProgress = constructionCount, constructionDefID, buildProgress
 		
 		local tooltip = WG.Translate("interface", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[unitDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = constructionCount})
 		if repeatState then

@@ -1,9 +1,9 @@
-unitDef = {
+return { veharty = {
   unitname            = [[veharty]],
   name                = [[Badger]],
   description         = [[Artillery Minelayer Rover]],
-  acceleration        = 0.0282,
-  brakeRate           = 0.08,
+  acceleration        = 0.14,
+  brakeRate           = 0.80,
   buildCostMetal      = 260,
   builder             = false,
   buildPic            = [[veharty.png]],
@@ -17,6 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -30,7 +31,7 @@ unitDef = {
   maneuverleashlength = [[650]],
   maxDamage           = 450,
   maxSlope            = 18,
-  maxVelocity         = 2.5,
+  maxVelocity         = 2.25,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
@@ -102,7 +103,7 @@ unitDef = {
       model                   = [[clawshell.s3o]],
       myGravity               = 0.34,
       noSelfDamage            = true,
-      range                   = 730,
+      range                   = 750,
       reloadtime              = 5.5,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
@@ -135,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ veharty = unitDef })
+} }

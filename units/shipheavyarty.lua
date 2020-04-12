@@ -1,10 +1,10 @@
-unitDef = {
+return { shipheavyarty = {
   unitname               = [[shipheavyarty]],
   name                   = [[Shogun]],
   description            = [[Battleship (Heavy Artillery)]],
-  acceleration           = 0.039,
+  acceleration           = 0.195,
   activateWhenBuilt   = true,
-  brakeRate              = 0.0475,
+  brakeRate              = 0.475,
   buildCostMetal         = 5000,
   builder                = false,
   buildPic               = [[shipheavyarty.png]],
@@ -31,7 +31,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 8000,
-  maxVelocity            = 2.2,
+  maxVelocity            = 1.9,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],
@@ -146,6 +146,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipheavyarty = unitDef })
+} }

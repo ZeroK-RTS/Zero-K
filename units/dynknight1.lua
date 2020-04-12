@@ -1,14 +1,14 @@
 local included = VFS.Include("units/dynstrike1.lua")
 local unitDef = included.dynstrike1
 unitDef.unitname = "dynknight1"
-unitDef.buildpic = [[cremcom.png]]
-unitDef.objectname = [[cremcom.s3o]]
+unitDef.buildPic = [[cremcom.png]]
+unitDef.objectName = [[cremcom.s3o]]
 unitDef.script  = [[dynknight.lua]]
+unitDef.maxVelocity = 1.35
 
-unitDef.customparams.commtype = "6"
-unitDef.customparams.statsname = "dynknight1"
-unitDef.customparams.shield_emit_height = "30"
-
+unitDef.customParams.commtype = "6"
+unitDef.customParams.statsname = "dynknight1"
+unitDef.customParams.shield_emit_height = "30"
 
 unitDef.sfxtypes = {
     explosiongenerators = {
@@ -21,4 +21,4 @@ unitDef.sfxtypes = {
     }
 }
 
-return lowerkeys({ dynknight1 = unitDef })
+return { dynknight1 = unitDef }

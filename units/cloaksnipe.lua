@@ -1,9 +1,9 @@
-unitDef = {
+return { cloaksnipe = {
   unitname               = [[cloaksnipe]],
   name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
-  acceleration           = 0.3,
-  brakeRate              = 0.2,
+  acceleration           = 0.9,
+  brakeRate              = 1.2,
   buildCostMetal         = 750,
   buildPic               = [[cloaksnipe.png]],
   canGuard               = true,
@@ -37,7 +37,7 @@ unitDef = {
   initCloaked            = true,
   maxDamage              = 560,
   maxSlope               = 36,
-  maxVelocity            = 1.45,
+  maxVelocity            = 1.4,
   maxWaterDepth          = 22,
   minCloakDistance       = 155,
   movementClass          = [[KBOT3]],
@@ -136,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloaksnipe = unitDef })
+} }

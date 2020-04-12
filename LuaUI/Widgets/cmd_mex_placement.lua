@@ -371,7 +371,7 @@ function widget:CommandNotify(cmdID, params, options)
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
-				local y = Spring.GetGroundHeight(x, z)
+				local y = math.max(0, Spring.GetGroundHeight(x, z))
 
 				-- check if some other widget wants to handle the command before sending it to units.
 				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
@@ -379,11 +379,11 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i=1, #addons do
+					for i = 1, #addons do
 						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
-						local yy = Spring.GetGroundHeight(xx, zz)
+						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
 						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
 
 						-- check if some other widget wants to handle the command before sending it to units.
@@ -396,7 +396,7 @@ function widget:CommandNotify(cmdID, params, options)
 
 			for i = 1, #commandArrayToIssue do
 				local command = commandArrayToIssue[i]
-				WG.CommandInsert(command[1], command[2], options, i - 1)
+				WG.CommandInsert(command[1], command[2], options, i - 1, true)
 			end
 		end
 
@@ -886,7 +886,7 @@ function widget:DrawWorld()
 
 	mexSpotToDraw = false
 
-	if WG.metalSpots and pos and (pregame or WG.selectionEntirelyCons) and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
+	if WG.metalSpots and pos and (-mexDefID == cmdID or ((pregame or WG.selectionEntirelyCons) and (peruse or CMD_AREA_MEX == cmdID))) then
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])

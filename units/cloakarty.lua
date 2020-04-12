@@ -1,10 +1,10 @@
-unitDef = {
+return { cloakarty = {
   unitname               = [[cloakarty]],
   name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
-  acceleration           = 0.25,
-  brakeRate              = 0.75,
-  buildCostMetal         = 110,
+  acceleration           = 0.75,
+  brakeRate              = 4.5,
+  buildCostMetal         = 100,
   buildPic               = [[cloakarty.png]],
   canGuard               = true,
   canMove                = true,
@@ -16,7 +16,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[14]],
+    modelradius       = [[14]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,7 +29,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 350,
   maxSlope               = 36,
-  maxVelocity            = 1.62,
+  maxVelocity            = 1.6,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
@@ -95,13 +96,13 @@ unitDef = {
       interceptedByShieldType = 1,
       myGravity               = 0.09,
       noSelfDamage            = true,
-      range                   = 840,
+      range                   = 860,
       reloadtime              = 6,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 260,
+      weaponVelocity          = 270,
     },
 
   },
@@ -125,6 +126,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakarty = unitDef })
+} }

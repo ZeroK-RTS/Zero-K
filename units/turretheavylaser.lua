@@ -1,4 +1,4 @@
-unitDef = {
+return { turretheavylaser = {
   unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
@@ -48,7 +48,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 660,
+  sightDistance                 = 730, -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -142,6 +142,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretheavylaser = unitDef })
+} }

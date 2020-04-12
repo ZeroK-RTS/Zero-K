@@ -1,10 +1,10 @@
-unitDef = {
+return { shieldriot = {
   unitname               = [[shieldriot]],
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
-  acceleration           = 0.25,
+  acceleration           = 0.75,
   activateWhenBuilt      = true,
-  brakeRate              = 0.75,
+  brakeRate              = 4.5,
   buildCostMetal         = 250,
   buildPic               = [[shieldriot.png]],
   canGuard               = true,
@@ -90,8 +90,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 30,
-        planes  = 30,
+        default = 25,
+        planes  = 25,
         subs    = 0.1,
       },
 
@@ -215,6 +215,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldriot = unitDef })
+} }

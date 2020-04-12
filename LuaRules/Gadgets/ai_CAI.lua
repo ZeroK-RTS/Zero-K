@@ -977,10 +977,7 @@ local function makeMex(team, unitID)
 	
 	if minMexSpotID ~= 0 then
 		spGiveOrderToUnit(unitID, -buildDefs.mexIds[1].ID, {GG.metalSpots[minMexSpotID].x,0,GG.metalSpots[minMexSpotID].z}, 0)
-	else
-		--Spring.Echo("No free mex spots")
 	end
-
 end
 
 
@@ -1627,14 +1624,6 @@ local function battleGroupHandler(team, frame, slowUpdate)
 	for i = 1, battleGroup.count do
 		
 		local data = battleGroup[i]
-
-		for unitID,_ in pairs(data.unit) do
-			if spValidUnitID(unitID) then
-				if not unitInBattleGroupByID[unitID] then
-					--mapEcho(unitID, "unit not in group")
-				end
-			end
-		end
 
 		local averageX = 0
 		local averageZ = 0
@@ -2303,9 +2292,9 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 		for j = 1, heatArrayHeight do
 			local data = scoutingHeatmap[i][j]
 			if spIsPosInLos(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,allyTeam) then
-				if debugData.drawScoutmap[allyTeam] and not data.scouted then
+				--if debugData.drawScoutmap[allyTeam] and not data.scouted then
 					--Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"now scouted")
-				end
+				--end
 				if removeEmpty then -- called infrequently
 					local units = CallAsTeam(at.aTeamOnThisTeam,
 						function ()
@@ -2348,9 +2337,9 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 						unScoutedPoint[unScoutedPoint.count] = {x = heatmapPosition[i][j].x, y = heatmapPosition[i][j].y, z = heatmapPosition[i][j].z}
 					end
 					data.scouted = false
-					if debugData.drawScoutmap[allyTeam] then
+					--if debugData.drawScoutmap[allyTeam] then
 						--Spring.MarkerErasePosition (heatmapPosition[i][j].x,0,heatmapPosition[i][j].z)
-					end
+					--end
 				end
 				
 			end
@@ -2615,10 +2604,6 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 
 	local ud = UnitDefs[unitDefID]
 
-	if readd then
-		--mapEcho(unitID, "added heatmap")
-	end
-	
 	if readd or (not at.unitInHeatmap[unitID]) then
 		--mapEcho(unitID, "added heatmap")
 		local x, y, z = spGetUnitPosition(unitID)
@@ -2681,8 +2666,6 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence + ud.metalCost
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
-			
 		end
 	end
 	

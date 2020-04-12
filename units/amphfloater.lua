@@ -1,11 +1,11 @@
-unitDef = {
+return { amphfloater = {
   unitname               = [[amphfloater]],
   name                   = [[Buoy]],
   description            = [[Heavy Amphibious Skirmisher Bot]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
-  buildCostMetal         = 300,
+  brakeRate              = 2.4,
+  buildCostMetal         = 280,
   buildPic               = [[amphfloater.png]],
   canGuard               = true,
   canMove                = true,
@@ -17,10 +17,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 60,
+    amph_regen        = 60,
     amph_submerged_at = 30,
-    sink_on_emp    = 0,
-    floattoggle    = [[1]],
+    sink_on_emp       = 0,
+    floattoggle       = [[1]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -32,7 +33,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
-  maxVelocity            = 1.4,
+  maxVelocity            = 1.7,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -173,6 +174,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphfloater = unitDef })
+} }

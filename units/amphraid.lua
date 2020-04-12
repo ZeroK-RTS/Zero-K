@@ -1,10 +1,10 @@
-unitDef = {
+return { amphraid = {
   unitname               = [[amphraid]],
   name                   = [[Duck]],
   description            = [[Amphibious Raider Bot (Anti-Sub)]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 80,
   buildPic               = [[amphraid.png]],
   canGuard               = true,
@@ -30,7 +30,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 340,
   maxSlope               = 36,
-  maxVelocity            = 2.8,
+  maxVelocity            = 3,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -43,14 +43,14 @@ unitDef = {
     },
   },
 
-  sightDistance          = 500,
-  sonarDistance          = 500,
+  sightDistance          = 560,
+  sonarDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1000,
+  turnRate               = 1750,
   upright                = true,
 
   weapons                = {
@@ -83,7 +83,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 115,
+        default = 130.01,
         subs    = 10,
       },
 
@@ -95,9 +95,9 @@ unitDef = {
       leadlimit               = 0,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      projectiles             = 2,
+      projectiles             = 1,
       range                   = 240,
-      reloadtime              = 4,
+      reloadtime              = 2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/missile/missile_fire9]],
@@ -118,17 +118,19 @@ unitDef = {
       areaOfEffect            = 32,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
-      bounceslip              = 0.5,
+      bounceslip              = 0.8,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      cegTag                  = [[torpedo_trail]],
 
       damage                  = {
-        default = 115,
+        default = 130.01,
       },
 
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:TORPEDO_HIT]],
+      flightTime              = 1.3,
       groundbounce            = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -137,14 +139,14 @@ unitDef = {
       model                   = [[wep_m_ajax.s3o]],
       numbounce               = 4,
       noSelfDamage            = true,
-      projectiles             = 2,
-      range                   = 150,
-      reloadtime              = 4,
+      projectiles             = 1,
+      range                   = 210,
+      reloadtime              = 2,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
       soundStartVolume        = 0.7,
       soundHitVolume          = 0.7,
-      startVelocity           = 50,
+      startVelocity           = 140,
       tolerance               = 1000,
       tracks                  = true,
       turnRate                = 25000,
@@ -152,7 +154,7 @@ unitDef = {
       waterWeapon             = true,
       weaponAcceleration      = 75,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 240,
     },
   },
 
@@ -175,6 +177,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphraid = unitDef })
+} }

@@ -1,9 +1,9 @@
-unitDef = {
+return { striderarty = {
   unitname               = [[striderarty]],
   name                   = [[Merlin]],
   description            = [[Heavy Saturation Artillery Strider]],
-  acceleration           = 0.1092,
-  brakeRate              = 0.1942,
+  acceleration           = 0.328,
+  brakeRate              = 1.165,
   buildCostMetal         = 3500,
   builder                = false,
   buildPic               = [[striderarty.png]],
@@ -28,7 +28,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 4000,
   maxSlope               = 36,
-  maxVelocity            = 1.8,
+  maxVelocity            = 1.2,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
@@ -137,6 +137,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderarty = unitDef })
+} }

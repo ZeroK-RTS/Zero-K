@@ -1,11 +1,11 @@
-unitDef = {
+return { chicken_tiamat = {
   unitname            = [[chicken_tiamat]],
   name                = [[Tiamat]],
   description         = [[Heavy Assault/Riot]],
-  acceleration        = 0.36,
+  acceleration        = 1.08,
   activateWhenBuilt   = true,
   autoheal            = 20,
-  brakeRate           = 0.205,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -268,6 +268,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_tiamat = unitDef })
+} }

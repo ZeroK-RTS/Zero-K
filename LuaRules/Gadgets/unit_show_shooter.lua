@@ -32,7 +32,7 @@ local MOBILE_SHOW_TIME = 4.5 -- 2.5 seconds
 local fakeWeapons = {} -- WeaponDefs which are for hax.
 local fakeWeaponByNum = {}
 local immobileUnits = {} -- Units which are static
-local noDecloaUnits = {
+local noDecloakUnits = {
 	[UnitDefNames["cloaksnipe"].id] = true,
 }
 
@@ -79,7 +79,7 @@ local function CheckUnitRevealAllyTeam(unitID, unitDefID, x, z, allyTeamID)
 	
 	-- Don't reveal units which are already in LOS. Waste of time to do so.
 	if aLos and not los then
-		if noDecloaUnits[unitDefID] and Spring.GetUnitIsCloaked(unitID) then
+		if noDecloakUnits[unitDefID] and Spring.GetUnitIsCloaked(unitID) then
 			return
 		end
 		revealedUnits[allyTeamID][unitID] = immobileUnits[unitDefID] and STATIC_SHOW_TIME or MOBILE_SHOW_TIME

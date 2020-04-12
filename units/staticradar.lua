@@ -1,4 +1,4 @@
-unitDef = {
+return { staticradar = {
   unitname                      = [[staticradar]],
   name                          = [[Radar Tower]],
   description                   = [[Early Warning System]],
@@ -165,6 +165,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticradar = unitDef })
+} }

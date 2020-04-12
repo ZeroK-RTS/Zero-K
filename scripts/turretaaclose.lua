@@ -11,6 +11,7 @@ local launcher2 = piece 'launcher2'
 local firepoint1 = piece 'firepoint1'
 local firepoint2 = piece 'firepoint2'
 
+local aiming = false
 local shot = 0
 local gun = {
 	[0] = {firepoint = firepoint1, loaded = true},
@@ -55,7 +56,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	aiming = true
 
-	Turn(turret, y_axis, heading, math.rad(200))
+	Turn(turret, y_axis, heading, math.rad(250))
 	Turn(launcher1, x_axis, -pitch, math.rad(200))
 	Turn(launcher2, x_axis, -pitch, math.rad(200))
 
@@ -110,7 +111,7 @@ end
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
 		local distMult = (Spring.ValidUnitID(targetID) and Spring.GetUnitSeparation(unitID, targetID) or 0)/430
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 25 * distMult)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 500.1, 25 * distMult)
 	end
 	return true
 end

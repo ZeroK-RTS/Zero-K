@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipcon = {
   unitname            = [[gunshipcon]],
   name                = [[Wasp]],
   description         = [[Heavy Construction Aircraft, Builds at 7.5 m/s]],
@@ -56,7 +56,7 @@ unitDef = {
   script              = [[gunshipcon.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
-  sightDistance       = 350,
+  sightDistance       = 375,
   turnRate            = 500,
   workerTime          = 7.5,
 
@@ -69,7 +69,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 0 -20]],
       collisionVolumeScales  = [[90 90 60]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[bumblebee_d.dae]],
     },
 
@@ -83,6 +83,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipcon = unitDef })
+} }

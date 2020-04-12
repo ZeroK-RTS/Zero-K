@@ -1,9 +1,9 @@
-unitDef = {
+return { spideremp = {
   unitname               = [[spideremp]],
   name                   = [[Venom]],
   description            = [[Lightning Riot Spider]],
-  acceleration           = 0.26,
-  brakeRate              = 0.78,
+  acceleration           = 0.78,
+  brakeRate              = 4.68,
   buildCostMetal         = 200,
   buildPic               = [[spideremp.png]],
   canGuard               = true,
@@ -30,7 +30,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 750,
   maxSlope               = 72,
-  maxVelocity            = 2.7,
+  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
@@ -69,24 +69,24 @@ unitDef = {
 
     spider = {
       name                    = [[Electro-Stunner]],
-      areaOfEffect            = 160,
+      areaOfEffect            = 128,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 600,
+        extra_damage = 450,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
       },
 
       damage                  = {
-        default        = 18,
+        default        = 40,
       },
 
       duration                = 8,
-      explosionGenerator      = [[custom:LIGHTNINGPLOSION160AoE]],
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION128AoE]],
       fireStarter             = 0,
       heightMod               = 1,
       impulseBoost            = 0,
@@ -96,7 +96,7 @@ unitDef = {
       noSelfDamage            = true,
       paralyzeTime            = 3,
       range                   = 240,
-      reloadtime              = 1.733,
+      reloadtime              = 1.5,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
@@ -118,7 +118,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[40 30 50]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[venom_wreck.s3o]],
     },
     HEAP  = {
@@ -130,6 +130,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spideremp = unitDef })
+} }

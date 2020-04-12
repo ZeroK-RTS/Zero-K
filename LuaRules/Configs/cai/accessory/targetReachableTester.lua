@@ -14,7 +14,6 @@ function IsTargetReallyReachable(unitID, x,y,z,ux, uy, uz)
 		local result,finCoord = Spring.Utilities.IsTargetReachable(moveID, ux,uy,uz,x,y,z,128)
 		if result == "outofreach" then --if result not reachable (and we'll have the closest coordinate), then:
 			reach = false --target is unreachable
-		else -- Spring.PathRequest() must be non-functional
 		end
 		--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
 	end

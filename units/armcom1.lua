@@ -1,11 +1,11 @@
-unitDef = {
+return { armcom1 = {
   unitname               = [[armcom1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander, Builds at 10 m/s]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
@@ -209,6 +209,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ armcom1 = unitDef })
+} }

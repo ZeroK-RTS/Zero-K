@@ -21,12 +21,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local math_acos				= math.acos
-local math_pi				= math.pi
-local math_cos				= math.cos
-local math_sin				= math.sin
-local math_abs				= math.abs
-local rad_con				= 180 / math_pi
+local math_acos  = math.acos
+local math_pi    = math.pi
+local math_cos   = math.cos
+local math_sin   = math.sin
+local math_abs   = math.abs
+local rad_con    = 180 / math_pi
 
 local GL_KEEP      = 0x1E00
 local GL_REPLACE   = 0x1E01
@@ -39,10 +39,10 @@ local spGetSelectedUnits     = Spring.GetSelectedUnits
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spIsUnitSelected       = Spring.IsUnitSelected
 
-local spGetCameraPosition	 = Spring.GetCameraPosition
-local spGetGameFrame		 = Spring.GetGameFrame
-local spTraceScreenRay		 = Spring.TraceScreenRay
-local spGetMouseState		 = Spring.GetMouseState
+local spGetCameraPosition  = Spring.GetCameraPosition
+local spGetGameFrame       = Spring.GetGameFrame
+local spTraceScreenRay     = Spring.TraceScreenRay
+local spGetMouseState      = Spring.GetMouseState
 
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
@@ -245,7 +245,7 @@ local function GetVisibleUnits()
 
 		if IsSelectionBoxActive() then --It's not worth rebuilding visible selected lists for selection box, but selection box needs to be updated per-frame
 			local units = spGetVisibleUnits(-1, 30, true)
-			for i=1, #units do
+			for i = 1, #units do
 				local unitID = units[i]
 				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
 					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]
@@ -683,7 +683,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	-- gl.StencilMask(0x01)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	for i=1, #unitList do
+	for i = 1, #unitList do
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]

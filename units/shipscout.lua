@@ -1,10 +1,10 @@
-unitDef = {
+return { shipscout = {
   unitname               = [[shipscout]],
   name                   = [[Cutter]],
   description            = [[Picket Ship (Disarming Scout)]],
-  acceleration           = 0.0984,
+  acceleration           = 0.492,
   activateWhenBuilt      = true,
-  brakeRate              = 0.0475,
+  brakeRate              = 0.475,
   buildCostMetal         = 70,
   builder                = false,
   buildPic               = [[shipscout.png]],
@@ -132,6 +132,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipscout = unitDef })
+} }

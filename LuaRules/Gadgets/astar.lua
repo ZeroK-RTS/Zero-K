@@ -38,7 +38,6 @@ end
 local startID = aStar.ToID{1, 1}
 local goalID = aStar.ToID{80, 90}
 local path = aStar.GetPath(startID, goalID)
-]]
 ---------------------------------------------------------------------
 ---------------------------------------------------------------------
 
@@ -49,6 +48,7 @@ local function GetSetCount(set)
   end
   return count
 end
+]]
 
 
 local function ReconstructPath(parents, node)

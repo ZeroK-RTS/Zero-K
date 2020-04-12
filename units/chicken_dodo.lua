@@ -1,10 +1,10 @@
-unitDef = {
+return { chicken_dodo = {
   unitname              = [[chicken_dodo]],
   name                  = [[Dodo]],
   description           = [[Chicken Bomb]],
-  acceleration          = 6,
+  acceleration          = 18,
   activateWhenBuilt     = true,
-  brakeRate             = 0.205,
+  brakeRate             = 1.23,
   buildCostEnergy       = 0,
   buildCostMetal        = 0,
   builder               = false,
@@ -80,6 +80,4 @@ unitDef = {
             },
         },
     },
-}
-
-return lowerkeys({ chicken_dodo = unitDef })
+} }

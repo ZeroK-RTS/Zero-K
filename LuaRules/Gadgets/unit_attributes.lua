@@ -106,6 +106,8 @@ end
 --------------------------------------------------------------------------------
 -- Build Speed Handling
 
+local REPAIR_ENERGY_COST_FACTOR = Game.repairEnergyCostFactor
+
 local origUnitBuildSpeed = {}
 
 local function UpdateBuildSpeed(unitID, ud, speedFactor)
@@ -129,7 +131,7 @@ local function UpdateBuildSpeed(unitID, ud, speedFactor)
 	
     spSetUnitBuildSpeed(unitID,
         state.buildSpeed*speedFactor, -- build
-        2*state.buildSpeed*speedFactor, -- repair
+        state.buildSpeed*speedFactor / REPAIR_ENERGY_COST_FACTOR, -- repair
         state.buildSpeed*speedFactor, -- reclaim
         0.5*state.buildSpeed*speedFactor) -- rezz
     

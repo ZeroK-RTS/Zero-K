@@ -42,7 +42,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",
-		"helptext" : "The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal."
+		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"athena" : {
 		"name" : "Athena",
@@ -252,7 +252,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Getarnter Konstruktionsroboter, Baut mit 5 M/s",
-		"helptext" : "Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können."
+		"helptext" : "Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können. Er ist auch mit einem kleinen Tarnschild ausgestattet, der im Gegensatz zu den vorgenannten Fähigkeiten nutzt Energie."
 	},
 	"gunshipaa" : {
 		"name" : "Trident",
@@ -487,7 +487,7 @@
 	"cloakjammer" : {
 		"name" : "Iris",
 		"description" : "Tarn-/Störsenderroboter",
-		"helptext" : "Der Iris besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
+		"helptext" : "Der Iris besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen."
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
@@ -831,7 +831,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
+		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
 		"helptext" : "Ein robuster und effizienter Konstruktionsroboter der sowohl im Wasser als auch an Land seine Arbeit verrichtet."
 	},
 	"bomberassault" : {
@@ -986,7 +986,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Konstruktionsjumpjet, Baut mit 4 M/s",
+		"description" : "Konstruktionsjumpjet, Baut mit 5 M/s",
 		"helptext" : "Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion."
 	},
 	"jumparty" : {
@@ -1056,7 +1056,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Konstruktionsflugzeug, Baut mit 4 m/s",
+		"description" : "Konstruktionsflugzeug, Baut mit 5 m/s",
 		"helptext" : "Der Crane bewegt sich flink über das Terrain, ist aber auch anfällig gegenüber AA. Obwohl er ziemlich wenig Baukraft hat, ist er in der Lage auch auf außergewöhnlichen Plätzen zu bauen. Durch seine Mobilität ist er ideal dafür geschaffen, Wracks zu absorbieren und daraus das Metall zu gewinnen."
 	},
 	"turretsunlance" : {

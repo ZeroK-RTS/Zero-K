@@ -66,16 +66,7 @@ local function WantAttackGround(unitID)
 		return true
 	end
 	
-	local cmdID, cp_3
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local queue = Spring.GetCommandQueue(unitID, 1)
-		if queue and queue[1] then
-			cmdID, cp_3 = queue[1].id, queue[1].params[3]
-		end
-	else
-		cmdID, _, _, _, _, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-	end
-		
+	local cmdID, _, _, _, _, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 	if not cmdID then
 		return false, true
 	end

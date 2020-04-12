@@ -94,7 +94,7 @@ options = {
 	},
 }
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 local imageDir = 'LuaUI/Images/commands/'
 local fireStateIcons = {

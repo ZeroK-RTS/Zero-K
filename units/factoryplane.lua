@@ -1,4 +1,4 @@
-unitDef = {
+return { factoryplane = {
   unitname                      = [[factoryplane]],
   name                          = [[Airplane Plant]],
   description                   = [[Produces Airplanes, Builds at 10 m/s]],
@@ -40,6 +40,7 @@ unitDef = {
     default_spacing = 8,
     factorytab       = 1,
     shared_energy_gen = 1,
+    ispad         = 1,
   },
 
   energyUse                     = 0,
@@ -87,6 +88,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factoryplane = unitDef })
+} }

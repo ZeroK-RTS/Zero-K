@@ -1,4 +1,4 @@
-unitDef = {
+return { turretriot = {
   unitname                      = [[turretriot]],
   name                          = [[Stardust]],
   description                   = [[Anti-Swarm Turret]],
@@ -44,7 +44,7 @@ unitDef = {
 
   },
 
-  sightDistance                 = 451,
+  sightDistance                 = 499, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretriot = unitDef })
+} }

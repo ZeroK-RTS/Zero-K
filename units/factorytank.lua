@@ -1,4 +1,4 @@
-unitDef = {
+return { factorytank = {
   unitname                      = [[factorytank]],
   name                          = [[Tank Foundry]],
   description                   = [[Produces Heavy Tracked Vehicles, Builds at 10 m/s]],
@@ -96,6 +96,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factorytank = unitDef })
+} }

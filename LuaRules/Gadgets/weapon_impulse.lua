@@ -57,7 +57,7 @@ local CMD_ONOFF = CMD.ONOFF
 local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
 
 local impulseMult = {
-	[0] = 0.02, -- fixedwing
+	[0] = 0.022, -- fixedwing
 	[1] = 0.004, -- gunships
 	[2] = 0.0036, -- other
 }
@@ -410,7 +410,7 @@ local function AddImpulses()
 					spSetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 
 					--if data.allied then
-						if Spring.Utilities.GetUnitFirstCommand(unitID) == CMD_GUARD then
+						if Spring.GetUnitCurrentCommand(unitID) == CMD_GUARD then
 							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
 						end
 

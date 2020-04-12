@@ -20,9 +20,11 @@ if (gadgetHandler:IsSyncedCode()) then
 end
 
 function gadget:Initialize()
-	local name = Game.modName
-	Spring.SetWMIcon("LuaUI/Images/ZK_logo.png")
-	--Spring.SetWMCaption(name .. " (Spring " .. Spring.Utilities.GetEngineVersion() .. ")", name)
+	-- not putting the version allows detection
+	-- by external programs, such as Discord
 	Spring.SetWMCaption("Zero-K", "Zero-K")
+
+	Spring.SetWMIcon("LuaUI/Images/ZK_logo.png")
+
 	gadgetHandler:RemoveGadget()
 end

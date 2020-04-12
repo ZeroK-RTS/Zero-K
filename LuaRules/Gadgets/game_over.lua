@@ -577,7 +577,6 @@ local function ProcessLastAlly()
 								else
 									hasDroppedTeam = true
 								end
-							else
 							end
 						end
 					end

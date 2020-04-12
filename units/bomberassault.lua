@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberassault = {
   unitname            = [[bomberassault]],
   name                = [[Eclipse]],
   description         = [[Assault Bomber (Anti-Static)]],
@@ -22,7 +22,8 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    modelradius    = [[10]],
+    requireammo      = [[1]],
+    modelradius      = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -116,6 +117,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberassault = unitDef })
+} }

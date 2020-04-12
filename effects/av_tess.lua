@@ -165,7 +165,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-      	alwaysvisible      = true,
+        alwaysvisible      = true,
         airdrag            = 1,
         colormap           = [[0 0 0 0.01   1 1 0.8 0.9              0 0 0 0.01]],
         directional        = true,

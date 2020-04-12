@@ -813,7 +813,7 @@ local function CheckBoundings(udid,top,left,bottom,right,scale,border)
       --Spring.Echo(i,UnitDefs[udid].name .. ": offsetting",offX,offY,"",left,bottom,width,height,renderX,renderY,autoConfigs[udid].zoom);
       autoConfigs[udid].offset = {autoConfigs[udid].offset[1] + offX, autoConfigs[udid].offset[2] + offY,0};
       return false, left_,bottom_, width_,height_;
-    else
+    --else
       --// zoom out!
     end;
   end;
@@ -830,7 +830,7 @@ local function CheckBoundings(udid,top,left,bottom,right,scale,border)
       --Spring.Echo(i,UnitDefs[udid].name .. ": Boundings outside of the texture",offX,offY);
       autoConfigs[udid].offset = {autoConfigs[udid].offset[1] + offX, autoConfigs[udid].offset[2] + offY,0};
       return false, left_,bottom_, width_,height_;
-    else
+    --else
       --Spring.Echo(i,UnitDefs[udid].name .. ": Render Context too small (you have to increase renderX&renderY)");
     end;
   end;
@@ -870,10 +870,10 @@ end
       end;
     end;
 
-    if (#jobs == 0) then
+    --if (#jobs == 0) then
       --gadget.DrawGenesis = nil;
       --gadgetHandler:UpdateCallIn("DrawGenesis");
-    end;
+    --end;
   end
 
 

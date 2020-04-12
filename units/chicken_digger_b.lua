@@ -1,10 +1,10 @@
-unitDef = {
+return { chicken_digger_b = {
   unitname            = [[chicken_digger_b]],
   name                = [[Digger (burrowed)]],
   description         = [[Burrowing Scout/Raider]],
-  acceleration        = 0.26,
+  acceleration        = 0.78,
   activateWhenBuilt   = false,
-  brakeRate           = 0.205,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -117,6 +117,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_digger_b = unitDef })
+} }

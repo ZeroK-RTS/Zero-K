@@ -1,17 +1,17 @@
-unitDef = {
+return { staticmex = {
   unitname               = [[staticmex]],
   name                   = [[Metal Extractor]],
   description            = [[Produces Metal]],
   acceleration           = 0,
   activateWhenBuilt      = true,
   brakeRate              = 0,
-  buildCostMetal         = 75,
+  buildCostMetal         = 90,
   builder                = false,
   buildingMask           = 0,
   buildPic               = [[staticmex.png]],
   category               = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[40 40 40]],
+  collisionVolumeOffsets = [[0 4 0]],
+  collisionVolumeScales  = [[40 50 40]],
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -19,7 +19,7 @@ unitDef = {
     occupationStrength = 1,
     pylonrange         = 50,
     ismex              = 1,
-    aimposoffset       = [[0 -4 0]],
+    aimposoffset       = [[0 11 0]],
     midposoffset       = [[0 -10 0]],
     modelradius        = [[15]],
     removewait         = 1,
@@ -35,8 +35,8 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   levelGround            = false,
-  maxDamage              = 400,
-  maxSlope               = 255,
+  maxDamage              = 700,
+  maxSlope               = 28,
   maxVelocity            = 0,
   maxWaterDepth          = 5000,
   minCloakDistance       = 150,
@@ -71,6 +71,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticmex = unitDef })
+} }

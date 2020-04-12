@@ -1,4 +1,4 @@
-pw_wormhole2 = {
+return {
 	--pieces = {
 	--	base = {
 	--		drone = {
@@ -14,5 +14,3 @@ pw_wormhole2 = {
 	tex2 = "pw_wormhole2_2.dds",
 	--numpieces = 1,
 }
-
-return pw_wormhole2

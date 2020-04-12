@@ -160,26 +160,12 @@ local stopUpgradeCmdDesc = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
-	local ud = UnitDefs[morphDef.into]
-	local tt = ''
-	if (morphDef.text ~= nil) then
-		tt = tt .. WhiteStr	.. morphDef.text .. '\n'
-	else
-		tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
-	end
-	tt = tt .. GreenStr	.. 'time: '	 .. morphDef.time	 .. '\n'
-	tt = tt .. CyanStr	 .. 'metal: '	.. morphDef.metal	.. '\n'
-	tt = tt .. YellowStr .. 'energy: ' .. morphDef.energy	 .. '\n'
-	return tt
-end
-
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
 	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef.into) then
 		return
 	end
 	
-	morphCmdDesc.tooltip = GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
+	morphCmdDesc.tooltip = morphDef.tooltip
 	
 	GG.AddMiscPriorityUnit(unitID)
 	if morphDef.texture then
@@ -411,9 +397,9 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
-	if (extraUnitMorphDefs[unitID] ~= nil) then
+	--if (extraUnitMorphDefs[unitID] ~= nil) then
 	-- nothing here for now
-	end
+	--end
 	
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message
@@ -434,6 +420,10 @@ local function FinishMorph(unitID, morphData)
 	--local lineage = Spring.GetUnitLineage(unitID)
 	--// copy facplop
 	local facplop = Spring.GetUnitRulesParam(unitID, "facplop")
+	-- Remove old facplop due to a bug that allows facplop duplication if done during morph.
+	if facplop and (facplop == 1) then
+		Spring.SetUnitRulesParam(unitID, "facplop", 0, {inlos = true})
+	end
 	--//copy command queue
 	local cmds = Spring.GetCommandQueue(unitID, -1)
 

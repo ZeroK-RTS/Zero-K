@@ -1,4 +1,4 @@
-unitDef = {
+return { empmissile = {
   unitname               = [[empmissile]],
   name                   = [[Shockley]],
   description            = [[EMP missile]],
@@ -105,6 +105,4 @@ unitDef = {
   featureDefs            = {
   },
 
-}
-
-return lowerkeys({ empmissile = unitDef })
+} }

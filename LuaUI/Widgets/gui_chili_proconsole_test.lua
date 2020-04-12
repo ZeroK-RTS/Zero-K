@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
 local missionMode = Spring.GetModOptions().singleplayercampaignbattleid
@@ -509,10 +509,16 @@ options = {
 	},
 	--]]
 	defaultAllyChat = {
-		name = "Default ally chat",
+		name = "Default Chat Mode",
+		type = 'radioButton',
 		desc = "Sets default chat mode to allies at game start",
-		type = 'bool',
-		value = true,
+		value = 'auto',
+		items = {
+			{key = 'on',   name = 'Ally/Spectator Chat', desc = "Always start the game with ally chat or spectator chat enabled."},
+			{key = 'auto', name = 'Context Dependant',   desc = "Start the game with ally chat enabled if you have any allies. Always start the game with spectator chat enabled."},
+			{key = 'off',  name = 'All Chat',            desc = "Start the game with ally and spectator chat disabled."},
+		},
+		OnChange = CheckHide,
 		noHotkey = true,
 	},
 	defaultBacklogEnabled = {
@@ -674,14 +680,6 @@ local function SetInputFontSize(size)
 		Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
 		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
 	end
-end
-
-local function HaveAllyOrSpectating()
-	local spectating = Spring.GetSpectatingState()
-	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
-	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	-- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
-	return not (#teams == 1 and (not spectating))
 end
 
 --------------------------------------------------------------------------------
@@ -1304,6 +1302,23 @@ options.toggleBacklog.OnChange = SwapBacklog
 -- callins
 -----------------------------------------------------------------------
 
+local function CheckEnableAllyChat()
+	if options.defaultAllyChat.value == "off" then
+		return false
+	elseif options.defaultAllyChat.value == "on" then
+		return true
+	end
+	if Spring.GetSpectatingState() then
+		return true
+	end
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	if not myAllyTeamID then
+		return true
+	end
+	local myTeamList = Spring.GetTeamList(myAllyTeamID)
+	return (not myTeamList) or (#myTeamList > 1)
+end
+
 local keypadEnterPressed = false
 
 function widget:KeyPress(key, modifier, isRepeat)
@@ -1312,8 +1327,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
 		if firstEnter then
-			if HaveAllyOrSpectating() and (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
+			if (not (modifier.Shift or modifier.Ctrl)) and CheckEnableAllyChat() then
 				Spring.SendCommands("chatally")
+			else
+				Spring.SendCommands("chatall")
 			end
 			firstEnter = false
 		end

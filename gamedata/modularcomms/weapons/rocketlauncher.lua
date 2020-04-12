@@ -2,7 +2,7 @@ local name = "commweapon_rocketlauncher"
 local weaponDef = {
 	name                    = [[Rocket Launcher]],
 	areaOfEffect            = 96,
-	cegTag                  = [[missiletrailred]],
+	cegTag                  = [[rocket_trail_bar_flameboosted]],
 	craterBoost             = 0,
 	craterMult              = 0,
 
@@ -14,6 +14,7 @@ local weaponDef = {
 		light_camera_height = 2200,
 		light_color = [[0.95 0.65 0.30]],
 		light_radius = 280,
+		reaim_time = 1,
 	},
 
 	damage                  = {
@@ -29,13 +30,12 @@ local weaponDef = {
 	model                   = [[wep_m_hailstorm.s3o]],
 	range                   = 430,
 	reloadtime              = 3,
-	smokeTrail              = true,
+	smokeTrail              = false,
 	soundHit                = [[explosion/ex_med4]],
 	soundHitVolume          = 7,
 	soundStart              = [[weapon/missile/sabot_fire]],
 	soundStartVolume        = 7,
 	startVelocity           = 200,
-	texture2                = [[darksmoketrail]],
 	tracks                  = false,
 	trajectoryHeight        = 0.05,
 	turret                  = true,

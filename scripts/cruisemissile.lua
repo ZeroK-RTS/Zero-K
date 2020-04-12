@@ -9,10 +9,12 @@ local function RemoveMissile()
 	GG.MissileSilo.DestroyMissile(unitID, unitDefID)
 	Spring.SetUnitRulesParam(unitID, "do_not_save", 1)
 	
+	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
 	Spring.SetUnitNoMinimap(unitID, true)
-	Spring.SetUnitHealth(unitID, {paralyze=99999999})
+	Spring.SetUnitHealth(unitID, {paralyze = 99999999, health = maxHealth}) -- also heal to drop (now off-map) repair orders
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
@@ -24,7 +26,7 @@ local function RemoveMissile()
 	-- Note that missiles intentionally remove their command 2s after firing
 	-- instead of immediately. This is to give some command feedback (that the
 	-- command actually was placed) and to show allies where the launch occurred.
-	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, 0, 0)
 	
 	Sleep(15000)
 	Spring.DestroyUnit(unitID, false, true)

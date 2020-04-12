@@ -36,8 +36,6 @@ for i=1,#subdirs do
 	    local name = g.ghInfo.name
 	    print(string.format("Loaded gadget:  %-18s  <%s>", name, gf))
 	end
-    else
-    
     end
 end
 

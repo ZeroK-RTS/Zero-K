@@ -173,23 +173,23 @@ function EditBox:_SetSelection(selStart, selStartY, selEnd, selEndY)
 	self.selEnd    = selEnd          or self.selEnd
 	self.selEndY   = selEndY         or self.selEndY
 	if selStart or selStartY then
-        if not self.lines[self.selStartY] then
-            Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selStartY] is nil for self.selStartY: " .. tostring(self.selStartY) .. " and #self.lines: " .. tostring(#self.lines))
-            Spring.Log("chiliui", LOG.ERROR, debug.traceback())
-        else
-    		local logicalLine = self.lines[self.selStartY]
-    		self.selStartPhysical, self.selStartPhysicalY = self:_LineLog2Phys(logicalLine, self.selStart)
-        end
+		if not self.lines[self.selStartY] then
+			Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selStartY] is nil for self.selStartY: " .. tostring(self.selStartY) .. " and #self.lines: " .. tostring(#self.lines))
+			Spring.Log("chiliui", LOG.ERROR, debug.traceback())
+		else
+			local logicalLine = self.lines[self.selStartY]
+			self.selStartPhysical, self.selStartPhysicalY = self:_LineLog2Phys(logicalLine, self.selStart)
+		end
 	end
 
 	if selEnd or selEndY then
-        if not self.lines[self.selEndY] then
-            Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selEndY] is nil for self.selEndY: " .. tostring(self.selEndY) .. " and #self.lines: " .. tostring(#self.lines))
-            Spring.Log("chiliui", LOG.ERROR, debug.traceback())
-        else
-    		local logicalLine = self.lines[self.selEndY]
-    		self.selEndPhysical, self.selEndPhysicalY  = self:_LineLog2Phys(logicalLine, self.selEnd)
-        end
+		if not self.lines[self.selEndY] then
+			Spring.Log("chiliui", LOG.ERROR, "self.lines[self.selEndY] is nil for self.selEndY: " .. tostring(self.selEndY) .. " and #self.lines: " .. tostring(#self.lines))
+			Spring.Log("chiliui", LOG.ERROR, debug.traceback())
+		else
+			local logicalLine = self.lines[self.selEndY]
+			self.selEndPhysical, self.selEndPhysicalY  = self:_LineLog2Phys(logicalLine, self.selEnd)
+		end
 	end
 end
 
@@ -249,58 +249,58 @@ function EditBox:_GeneratePhysicalLines(logicalLineID)
 	-- split the text into physical lines
 	local logLineX = 0
 	for lineIndex, lineText in pairs(explode("\n", wrappedText)) do
-	  local th, td = font:GetTextHeight(lineText)
-	  local _txt = colorPrefix .. lineText
-	  local physicalLine = {
-		  text = _txt,
-		  th   = th,
-		  td   = td,
-		  lh   = fontLineHeight,
-		  tw   = font:GetTextWidth(lineText),
-		  y    = y,
-		  -- link to the logical line ID
-		  lineID = logicalLineID,
-		  colorPrefix = colorPrefix,
-		  logLineX = logLineX,
-		  extraSpace = false,
-	  }
-	  table.insert(self.physicalLines, physicalLine)
-	  logLineX = logLineX + #lineText - 1
-	  -- sometimes font:WrapText (see above) adds a " " at the end of the line, and sometimes it doesn't
-	  -- this handles the situations when it doesn't
-	  if _txt:sub(#_txt - 1, #_txt - 1) ~= " " then
-	  	-- a lack of " " at the end might be caused by two things
-	  	-- 1) the string is continuous and there shouldn't be a " " in the first place
-        -- 2) there are two words and there is a " "
-		if text:sub(logLineX + 1, logLineX + 1) == " " then
-	  		logLineX = logLineX + 1
-	  		physicalLine.extraSpace = true
-	    end
-	  end
-	  y = y + fontLineHeight
-
-	  -- link to the physical line ID
-	  table.insert(line.pls, #self.physicalLines)
-
-	  -- find color for next line
-	  if #colors > 0 then
-		totalLength = totalLength + #_txt
-		local colorIndex = 1
-		while colorIndex <= #colors do
-			if colors[colorIndex] > totalLength then
-				break
+		local th, td = font:GetTextHeight(lineText)
+		local _txt = colorPrefix .. lineText
+		local physicalLine = {
+			text = _txt,
+			th   = th,
+			td   = td,
+			lh   = fontLineHeight,
+			tw   = font:GetTextWidth(lineText),
+			y    = y,
+			-- link to the logical line ID
+			lineID = logicalLineID,
+			colorPrefix = colorPrefix,
+			logLineX = logLineX,
+			extraSpace = false,
+		}
+		table.insert(self.physicalLines, physicalLine)
+		logLineX = logLineX + #lineText - 1
+		-- sometimes font:WrapText (see above) adds a " " at the end of the line, and sometimes it doesn't
+		-- this handles the situations when it doesn't
+		if _txt:sub(#_txt - 1, #_txt - 1) ~= " " then
+			-- a lack of " " at the end might be caused by two things
+			-- 1) the string is continuous and there shouldn't be a " " in the first place
+			-- 2) there are two words and there is a " "
+			if text:sub(logLineX + 1, logLineX + 1) == " " then
+				logLineX = logLineX + 1
+				physicalLine.extraSpace = true
 			end
-			colorIndex = colorIndex + 1
 		end
-		colorIndex = colorIndex - 1
+		y = y + fontLineHeight
 
-		colorPrefix = ""
-		if colors[colorIndex] ~= nil then
-			local cp = colors[colorIndex]
-			colorPrefix = text:sub(cp, cp+3)
+		-- link to the physical line ID
+		table.insert(line.pls, #self.physicalLines)
+
+		-- find color for next line
+		if #colors > 0 then
+			totalLength = totalLength + #_txt
+			local colorIndex = 1
+			while colorIndex <= #colors do
+				if colors[colorIndex] > totalLength then
+					break
+				end
+				colorIndex = colorIndex + 1
+			end
+			colorIndex = colorIndex - 1
+
+			colorPrefix = ""
+			if colors[colorIndex] ~= nil then
+				local cp = colors[colorIndex]
+				colorPrefix = text:sub(cp, cp+3)
+			end
 		end
-	  end
-    end
+	end
 
 	if self.autoHeight then
 		local totalHeight = #self.physicalLines * fontLineHeight

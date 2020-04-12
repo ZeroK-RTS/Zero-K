@@ -1,9 +1,9 @@
-unitDef = {
+return { spideranarchid = {
   unitname               = [[spideranarchid]],
   name                   = [[Anarchid]],
   description            = [[Riot EMP Spider]],
-  acceleration           = 0.26,
-  brakeRate              = 0.78,
+  acceleration           = 0.78,
+  brakeRate              = 4.68,
   buildCostMetal         = 250,
   buildPic               = [[spideremp.png]],
   canGuard               = true,
@@ -127,6 +127,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spideranarchid = unitDef })
+} }

@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberstrike = {
   unitname            = [[bomberstrike]],
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
@@ -20,6 +20,7 @@ unitDef = {
   cruiseAlt           = 160,
 
   customParams        = {
+    requireammo      = [[1]],
     --modelradius    = [[10]],
   },
 
@@ -122,6 +123,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberstrike = unitDef })
+} }

@@ -12,7 +12,7 @@ function widget:GetInfo()
 	}
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 ---- CHANGELOG -----
@@ -335,7 +335,7 @@ end
 function widget:KeyPress(key, modifier, isRepeat)
 	if ( modifier.alt and not modifier.meta ) then
 		local gr = groupNumber[key]
- 		if (key == removeAutogroupKey) then gr = -1 end
+		if (key == removeAutogroupKey) then gr = -1 end
 		if (gr ~= nil) then
 			if (gr == -1) then
 				gr = nil

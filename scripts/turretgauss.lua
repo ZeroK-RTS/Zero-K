@@ -29,6 +29,8 @@ local unpackSpeed = 5;
 local smokePiece = { lidLeft, lidRight, wheel}
 
 --variables
+local weaponRange = WeaponDefNames["turretgauss_gauss"].range
+local rangeChanged = false
 local is_open = false
 local restore_delay = 2000;
 
@@ -124,7 +126,7 @@ local function Close()
 	end
 end
 
-function RestoreAfterDelay()
+local function RestoreAfterDelay()
 	Sleep(restore_delay);
 	
 	repeat
@@ -176,9 +178,28 @@ function script.Create()
 			end
 		end
 	end
-
 end
 
+function script.BlockShot(num, targetID)
+	if targetID then
+		local dist = Spring.GetUnitSeparation(unitID, targetID)
+		if dist then
+			dist = dist + 30
+			if dist > weaponRange then
+				-- noExplode weapons are hardcoded in the engine to expire after they have travelled their range in distance.
+				rangeChanged = true
+				Spring.SetUnitWeaponState(unitID, 1, "range", dist)
+			end
+		end
+	end
+	return false
+end
+
+function script.EndBurst()
+	if rangeChanged then
+		Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange)
+	end
+end
 
 function script.QueryWeapon(n)
 	return muzzleProxy
@@ -195,7 +216,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(belt, z_axis, heading, math.rad(200));
 
 	-- instantly turn the actual sim gun towards target, then wait for the visual pieces to animate
-	Turn(aimProxy, x_axis, -pitch); 
+	Turn(aimProxy, x_axis, -pitch)
 	
 	if (not is_open) then
 		StartThread(Open);

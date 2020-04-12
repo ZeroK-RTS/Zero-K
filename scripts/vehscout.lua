@@ -28,7 +28,7 @@ local SIG_MOVE = 1
 local SIG_AIM = 2
 
 local spGetUnitHeading = Spring.GetUnitHeading
-function Lean()
+local function Lean()
 	SetSignalMask (SIG_MOVE)
 	local lastHeading = spGetUnitHeading (unitID)
 	while true do

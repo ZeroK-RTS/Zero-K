@@ -226,7 +226,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 		retData = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.wantedHeight, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
 	elseif (weaponType == "StarburstLauncher") then
 		if (weaponDef.tracks) then
-			retData = {type = "tracking"}
+			retData = {type = "tracking", range = weaponDef.range}
 		else
 			retData = {type = "cruise", range = weaponDef.range}
 		end
@@ -776,13 +776,11 @@ function widget:DrawWorld()
 	elseif (weaponType == "orbital") then
 		DrawAoE(tx, ty, tz, info.aoe, info.ee)
 		DrawOrbitalScatter(info.scatter, tx, ty, tz)
-	elseif (weaponType == "dontdraw") then
-		-- don't draw anything foo
-	else
+	elseif (weaponType ~= "dontdraw") then
 		DrawAoE(tx, ty, tz, info.aoe, info.ee)
 	end
 
-	if (cmd == CMD_MANUALFIRE) then
+	if (cmd == CMD_MANUALFIRE) and info.range then
 		glColor(1, 0, 0, 0.75)
 		glLineWidth(1)
 		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)

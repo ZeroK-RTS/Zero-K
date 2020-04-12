@@ -1,9 +1,9 @@
-unitDef = {
+return { vehraid = {
   unitname               = [[vehraid]],
   name                   = [[Scorcher]],
   description            = [[Raider Rover]],
-  acceleration           = 0.057,
-  brakeRate              = 0.07,
+  acceleration           = 0.285,
+  brakeRate              = 0.7,
   buildCostMetal         = 130,
   builder                = false,
   buildPic               = [[vehraid.png]],
@@ -30,7 +30,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 420,
+  maxDamage              = 480,
   maxSlope               = 18,
   maxVelocity            = 3.7,
   maxWaterDepth          = 22,
@@ -49,7 +49,7 @@ unitDef = {
     },
 
   },
-  sightDistance          = 400,
+  sightDistance          = 560,
   trackOffset            = 5,
   trackStrength          = 5,
   trackStretch           = 1,
@@ -91,9 +91,9 @@ unitDef = {
       },
 
       damage                  = {
-        default = 31.4,
-        planes  = 31.4,
-        subs    = 1.5,
+        default = 26.5,
+        planes  = 26.5,
+        subs    = 1.25,
       },
 
       duration                = 0.3,
@@ -107,6 +107,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 10,
       lodDistance             = 10000,
       noSelfDamage            = true,
       proximityPriority       = 10,
@@ -144,6 +145,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehraid = unitDef })
+} }

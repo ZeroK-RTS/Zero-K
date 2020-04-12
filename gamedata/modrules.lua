@@ -42,7 +42,7 @@ local modrules  = {
 
 
   repair = {
-    energyCostFactor = 0.5,  -- defaults to 0
+    energyCostFactor = 0.75,  -- defaults to 0
   },
 
 
@@ -64,6 +64,7 @@ local modrules  = {
   sensors = {
     requireSonarUnderWater = true,  -- defaults to true
     alwaysVisibleOverridesCloaked = true, -- default false
+    decloakRequiresLineOfSight = true, -- default false
     
     los = {
 	  -- Don't bother changing these values.

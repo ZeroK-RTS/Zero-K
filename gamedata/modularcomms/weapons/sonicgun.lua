@@ -15,6 +15,7 @@ local weaponDef = {
 		lups_explodespeed = 1,
 		badtargetcategory = [[FIXEDWING]],
 		onlyTargetCategory = [[FIXEDWING LAND SINK SWIM FLOAT SHIP SUB GUNSHIP HOVER]],
+		reaim_time = 1,
 	},
 
 	damage                  = {

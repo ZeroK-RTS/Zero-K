@@ -149,7 +149,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-commDefs = {}	--holds precedurally generated comm defs
+commDefs = {} --holds precedurally generated comm defs
 
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
@@ -360,7 +360,6 @@ for name, data in pairs(commDefs) do
 		local maxRange = 0
 		local weaponRanges = {}
 		local weaponNames = {}
-		local wep1Name
 		-- first check if the comm is actually using the weapon
 		if data.weapons then
 			for index, weaponData in pairs(data.weapons) do

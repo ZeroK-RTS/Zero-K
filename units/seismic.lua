@@ -1,4 +1,4 @@
-unitDef = {
+return { seismic = {
   unitname                      = [[seismic]],
   name                          = [[Quake]],
   description                   = [[Seismic Missile]],
@@ -57,7 +57,7 @@ unitDef = {
 
     SEISMIC_WEAPON = {
       name                    = [[Seismic Missile]],
-      areaOfEffect            = 512,
+      areaOfEffect            = 640,
       avoidFriendly           = false,
       cegTag                  = [[seismictrail]],
       collideFriendly         = false,
@@ -66,9 +66,11 @@ unitDef = {
 
       customParams            = {
         gatherradius = [[416]],
-        smoothradius = [[256]],
-        detachmentradius = [[256]],
+        smoothradius = [[320]],
+        detachmentradius = [[320]],
         smoothmult   = [[1]],
+        smoothexponent = [[0.45]],
+        movestructures = [[1]],
 
         restrict_in_widgets = 1,
 
@@ -110,6 +112,4 @@ unitDef = {
   featureDefs                   = {
   },
 
-}
-
-return lowerkeys({ seismic = unitDef })
+} }

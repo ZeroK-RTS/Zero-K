@@ -88,39 +88,42 @@ local function InterpLockScreenWorldPoints(lockPoint, tweenFact)
 end
 
 function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
-	local dx, dy, dz
-	if lockPoint then
-		-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
-		InterpLockScreenWorldPoints(lockPoint, tweenFact)
-
-		if lockPoint.worldCenter and lockPoint.mode == lockMode.xycenter then --This seems to be necessary to stop jittering with Zoomout from center
-		 	CorrectLockpointCentering(cs, lockPoint)
-		 	lockPoint.world.x = lockPoint.worldCenter.x
-			lockPoint.world.z = lockPoint.worldCenter.z
-		end
-
-		if lockPoint.mode == lockMode.xy or lockPoint.mode == lockMode.xycenter then
-			local dirx, diry, dirz = Spring.GetPixelDir(lockPoint.screen.x, lockPoint.screen.y)
-			local distanceFactor = 0
-			if diry ~= 0 then
-				distanceFactor = (lockPoint.world.y - cs.py) / diry
-			end
-			dirx = dirx * distanceFactor
-			diry = diry * distanceFactor
-			dirz = dirz * distanceFactor
-			local screenTargetInWorld = {x = cs.px + dirx, y = cs.py + diry, z = cs.pz + dirz}
-			-- Spring.Echo("lockPoint.world: {"..lockPoint.world.x..", "..lockPoint.world.z.."}, screenTargetInWorld: {"..screenTargetInWorld.x..", "..screenTargetInWorld.z.."}")
-
-			dx, dz = lockPoint.world.x - screenTargetInWorld.x, lockPoint.world.z - screenTargetInWorld.z
-			-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
-			-- Spring.Echo("d: {"..dx..", "..dz.."}")
-		end
-		if lockPoint.mode == lockMode.free then
-			--When someone needs this, this is where to put in the correction mode that works on xyz
-			--should be useful for orbiting/rotating around a point, but not necessary for tiltzoom
-		end
+	if not lockPoint then
+		return
 	end
-	return dx, dy, dz
+
+	local dx, dz
+	-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
+	InterpLockScreenWorldPoints(lockPoint, tweenFact)
+
+	if lockPoint.worldCenter and lockPoint.mode == lockMode.xycenter then --This seems to be necessary to stop jittering with Zoomout from center
+		CorrectLockpointCentering(cs, lockPoint)
+		lockPoint.world.x = lockPoint.worldCenter.x
+		lockPoint.world.z = lockPoint.worldCenter.z
+	end
+
+	if lockPoint.mode == lockMode.xy or lockPoint.mode == lockMode.xycenter then
+		local dirx, diry, dirz = Spring.GetPixelDir(lockPoint.screen.x, lockPoint.screen.y)
+		local distanceFactor = 0
+		if diry ~= 0 then
+			distanceFactor = (lockPoint.world.y - cs.py) / diry
+		end
+		dirx = dirx * distanceFactor
+		diry = diry * distanceFactor
+		dirz = dirz * distanceFactor
+		local screenTargetInWorld = {x = cs.px + dirx, y = cs.py + diry, z = cs.pz + dirz}
+		-- Spring.Echo("lockPoint.world: {"..lockPoint.world.x..", "..lockPoint.world.z.."}, screenTargetInWorld: {"..screenTargetInWorld.x..", "..screenTargetInWorld.z.."}")
+
+		dx, dz = lockPoint.world.x - screenTargetInWorld.x, lockPoint.world.z - screenTargetInWorld.z
+		-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
+		-- Spring.Echo("d: {"..dx..", "..dz.."}")
+	end
+	-- if lockPoint.mode == lockMode.free then
+		--When someone needs this, this is where to put in the correction mode that works on xyz
+		--should be useful for orbiting/rotating around a point, but not necessary for tiltzoom
+	-- end
+
+	return dx, nil, dz
 end
 
 local function CorrectLockpointCamera(cs, dx, dy, dz)
@@ -137,17 +140,19 @@ local function CorrectLockpointCamera(cs, dx, dy, dz)
 end
 
 local function CorrectToLockpoint(cs, tweenFact)
-	if lockTarget and lockTarget.mode then
-		local dx, dy, dz = GetLockpointCorrectionDelta(cs, lockTarget, tweenFact)
-		CorrectLockpointCamera(cs, dx, dy, dz)
+	if not lockTarget or not lockTarget.mode then
+		return
+	end
 
-		--Theoretically this should handle zoom out to center for fromCursor and fromCenter, but it's
-		--not the most numerically stable, so it's only enabled for fromCursor,
-		--since fromCenter has another possible method that's less bouncy.
-		if lockTarget.worldCenter and lockTarget.mode ~= lockMode.xycenter then
-			dx, dz = CorrectLockpointCentering(cs, lockTarget)
-			CorrectLockpointCamera(cs, dx, dy, dz)
-		end
+	local dx, dy, dz = GetLockpointCorrectionDelta(cs, lockTarget, tweenFact)
+	CorrectLockpointCamera(cs, dx, dy, dz)
+
+	--Theoretically this should handle zoom out to center for fromCursor and fromCenter, but it's
+	--not the most numerically stable, so it's only enabled for fromCursor,
+	--since fromCenter has another possible method that's less bouncy.
+	if lockTarget.worldCenter and lockTarget.mode ~= lockMode.xycenter then
+		dx, dz = CorrectLockpointCentering(cs, lockTarget)
+		CorrectLockpointCamera(cs, dx, dy, dz)
 	end
 end
 

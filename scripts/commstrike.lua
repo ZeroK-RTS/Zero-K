@@ -1,6 +1,7 @@
 include "constants.lua"
 
-dyncomm = include('dynamicCommander.lua')
+local dyncomm = include('dynamicCommander.lua')
+_G.dyncomm = dyncomm
 
 local AntennaTip = piece('AntennaTip')
 local ArmLeft = piece('ArmLeft')
@@ -334,11 +335,9 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	local speedMult = 1
-	
 	while true do
 		walkCycle = 3 - walkCycle
-		speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace())
+		local speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace())
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]

@@ -1,9 +1,9 @@
-unitDef = {
+return { jumparty = {
   unitname               = [[jumparty]],
   name                   = [[Firewalker]],
   description            = [[Saturation Artillery Walker]],
-  acceleration           = 0.12,
-  brakeRate              = 0.24,
+  acceleration           = 0.36,
+  brakeRate              = 1.44,
   buildCostMetal         = 900,
   builder                = false,
   buildPic               = [[jumparty.png]],
@@ -17,6 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    selection_scale   = 0.92,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,7 +29,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
-  maxVelocity            = 1.45,
+  maxVelocity            = 1.4,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
@@ -186,6 +187,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumparty = unitDef })
+} }

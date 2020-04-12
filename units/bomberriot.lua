@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberriot = {
   unitname            = [[bomberriot]],
   name                = [[Phoenix]],
   description         = [[Saturation Napalm Bomber]],
@@ -36,10 +36,10 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 720,
+  maxDamage           = 900,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
-  maxRudder           = 0.008,
+  maxRudder           = 0.009,
   maxFuel             = 1000000,
   maxVelocity         = 8,
   minCloakDistance    = 75,
@@ -58,8 +58,8 @@ unitDef = {
     },
 
   },
-  sightDistance       = 660,
-  turnRadius          = 200,
+  sightDistance       = 780,
+  turnRadius          = 160,
   workerTime          = 0,
 
   weapons             = {
@@ -140,6 +140,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberriot = unitDef })
+} }

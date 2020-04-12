@@ -311,11 +311,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	--Sleep(1000)
 	if num ~= 3 then
 		EmitSfx(gunpoints[num].fire, 1024)
-	else
-		--ClusterBomb()
 	end
 end
 

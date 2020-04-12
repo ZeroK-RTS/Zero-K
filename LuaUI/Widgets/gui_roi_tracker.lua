@@ -121,13 +121,13 @@ function CreateWindow()
 	}
 
 	title_caption = Chili.Label:New {
- 		x = 5,
- 		y = 5,
- 		width = 10,
- 		parent = window,
- 		caption = "Player     Due:  OD       Base     Income:  OD      Base",
- 		fontsize = 13,
- 		textColor = {1,1,1,1},
+		x = 5,
+		y = 5,
+		width = 10,
+		parent = window,
+		caption = "Player     Due:  OD       Base     Income:  OD      Base",
+		fontsize = 13,
+		textColor = {1,1,1,1},
 	}
 	fake_window:AddChild (title_caption)
 

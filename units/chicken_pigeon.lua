@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_pigeon = {
   unitname            = [[chicken_pigeon]],
   name                = [[Pigeon]],
   description         = [[Flying Spore Scout]],
@@ -152,6 +152,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_pigeon = unitDef })
+} }

@@ -1,10 +1,10 @@
-unitDef = {
+return { hovershotgun = {
   unitname            = [[hovershotgun]],
   name                = [[Punisher]],
   description         = [[Shotgun Hover]],
-  acceleration        = 0.048,
+  acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 0.043,
+  brakeRate           = 0.43,
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoversonic.png]],
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hovershotgun = unitDef })
+} }

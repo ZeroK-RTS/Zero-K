@@ -1,9 +1,9 @@
-unitDef = {
+return { jumpraid = {
   unitname              = [[jumpraid]],
   name                  = [[Pyro]],
   description           = [[Raider/Riot Jumper]],
-  acceleration          = 0.4,
-  brakeRate             = 1.2,
+  acceleration          = 1.2,
+  brakeRate             = 7.2,
   buildCostMetal        = 220,
   builder               = false,
   buildPic              = [[jumpraid.png]],
@@ -33,7 +33,7 @@ unitDef = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
-  maxDamage             = 620,
+  maxDamage             = 700,
   maxSlope              = 36,
   maxVelocity           = 3,
   maxWaterDepth         = 22,
@@ -57,7 +57,7 @@ unitDef = {
 
   },
 
-  sightDistance         = 420,
+  sightDistance         = 560,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -110,7 +110,7 @@ unitDef = {
       },
     
       damage                  = {
-        default = 8.5,
+        default = 9.2,
         subs    = 0.01,
       },
 
@@ -123,6 +123,7 @@ unitDef = {
       impulseFactor           = 0,
       intensity               = 0.3,
       interceptedByShieldType = 1,
+      leadLimit               = 10,
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 260,
@@ -187,6 +188,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpraid = unitDef })
+} }

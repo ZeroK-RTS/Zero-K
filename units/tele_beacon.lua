@@ -1,4 +1,4 @@
-unitDef = {
+return { tele_beacon = {
   unitname                      = [[tele_beacon]],
   name                          = [[Lamp]],
   description                   = [[Teleport Bridge Entry Beacon, right click to teleport.]],
@@ -39,6 +39,4 @@ unitDef = {
   featureDefs                   = {
   },
 
-}
-
-return lowerkeys({ tele_beacon = unitDef })
+} }

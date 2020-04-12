@@ -1,10 +1,10 @@
-unitDef = {
+return { subtacmissile = {
   unitname               = [[subtacmissile]],
   name                   = [[Scylla]],
   description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
-  acceleration           = 0.0372,
+  acceleration           = 0.186,
   activateWhenBuilt      = true,
-  brakeRate              = 0.1942,
+  brakeRate              = 1.942,
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[subtacmissile.png]],
@@ -22,6 +22,7 @@ unitDef = {
     stockpiletime  = [[30]],
     stockpilecost  = [[600]],
     priority_misc  = 1, -- Medium
+    no_auto_keep_target = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -169,6 +170,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ subtacmissile = unitDef })
+} }

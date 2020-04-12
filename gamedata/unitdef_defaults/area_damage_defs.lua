@@ -2,6 +2,7 @@ local defaults = {
 	dps = 20,
 	radius = 128,
 	duration = 20,
+	plateau_radius = 0,
 
 	is_impulse = 0,
 	range_falloff = 0.6,

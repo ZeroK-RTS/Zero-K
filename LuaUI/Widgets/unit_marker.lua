@@ -13,8 +13,8 @@ local unitList = {}
 
 local markingActive = false
 
-if VFS.FileExists("LuaUI/Configs/unit_marker_local.lua") then
-	unitList = VFS.Include("LuaUI/Configs/unit_marker_local.lua")
+if VFS.FileExists("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW) then
+	unitList = VFS.Include("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW)
 else
 	unitList = VFS.Include("LuaUI/Configs/unit_marker.lua")
 end

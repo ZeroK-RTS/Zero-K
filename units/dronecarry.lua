@@ -1,4 +1,4 @@
-unitDef = {
+return { dronecarry = {
   unitname            = [[dronecarry]],
   name                = [[Gull]],
   description         = [[Carrier Drone]],
@@ -27,6 +27,8 @@ unitDef = {
   hoverAttack         = true,
   iconType            = [[smallgunship]],
   maneuverleashlength = [[900]],
+  idleAutoHeal        = 10,
+  idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 8.56,
   minCloakDistance    = 75,
@@ -110,6 +112,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dronecarry = unitDef })
+} }

@@ -23,9 +23,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local spGetFactoryCommands = Spring.GetFactoryCommands
+local spGiveOrderToUnit    = Spring.GiveOrderToUnit
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 
-local cmdOpts = CMD.OPT_CTRL
+local CMD_OPT_CTRL = CMD.OPT_CTRL
+local CMD_REMOVE = CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
@@ -66,12 +69,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return
 	end
 
-	local commands = Spring.GetFactoryCommands(unitID, -1)
+	local commands = spGetFactoryCommands(unitID, -1)
 	if not commands then
 		return
 	end
 	for i = 1, #commands do
-		Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {commands[i].tag}, cmdOpts)
+		spGiveOrderToUnit(unitID, CMD_REMOVE, commands[i].tag, CMD_OPT_CTRL)
 	end
 end
 

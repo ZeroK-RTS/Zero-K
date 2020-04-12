@@ -1,10 +1,10 @@
-unitDef = {
+return { spiderantiheavy = {
   unitname              = [[spiderantiheavy]],
   name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
-  acceleration          = 0.3,
+  acceleration          = 0.9,
   activateWhenBuilt     = true,
-  brakeRate             = 0.9,
+  brakeRate             = 5.4,
   buildCostMetal        = 280,
   buildPic              = [[spiderantiheavy.png]],
   canGuard              = true,
@@ -125,6 +125,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderantiheavy = unitDef })
+} }

@@ -114,7 +114,7 @@ local function Close()
 	
 end
 
-function padchange()
+local function padchange()
 	while true do
 	Sleep(1200)
 	Hide(pad1)

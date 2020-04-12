@@ -27,13 +27,24 @@ end
 --------------------------------------------------------------------------------
 -- speedups
 --------------------------------------------------------------------------------
-local spGetUnitTeam		= Spring.GetUnitTeam
-local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
-local spGetUnitDefID	= Spring.GetUnitDefID
-local spGetUnitIsDead	= Spring.GetUnitIsDead
-local spGetUnitRulesParam	= Spring.GetUnitRulesParam
-local spSetUnitRulesParam	= Spring.SetUnitRulesParam
-local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetUnitTeam        = Spring.GetUnitTeam
+local spGetUnitAllyTeam    = Spring.GetUnitAllyTeam
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetUnitIsDead      = Spring.GetUnitIsDead
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spSetUnitRulesParam  = Spring.SetUnitRulesParam
+local spAreTeamsAllied     = Spring.AreTeamsAllied
+
+local CMD_FIGHT  = CMD.FIGHT
+local CMD_INSERT = CMD.INSERT
+local CMD_REMOVE = CMD.REMOVE
+local CMD_STOP   = CMD.STOP
+
+local CMD_FIRE_STATE = CMD.FIRE_STATE
+
+local CMD_OPT_ALT      = CMD.OPT_ALT
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_OPT_SHIFT    = CMD.OPT_SHIFT
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -100,7 +111,7 @@ local spGetCommandQueue = Spring.GetCommandQueue
 local combatCommands = {	-- commands that require ammo to execute
 	[CMD.ATTACK] = true,
 	[CMD.AREA_ATTACK] = true,
-	[CMD.FIGHT] = true,
+	[CMD_FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
 	[CMD.MANUALFIRE] = true,
@@ -109,7 +120,7 @@ local combatCommands = {	-- commands that require ammo to execute
 local defaultCommands = { -- commands that is processed by gadget
 	[CMD.ATTACK] = true,
 	[CMD.AREA_ATTACK] = true,
-	[CMD.FIGHT] = true,
+	[CMD_FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
 	[CMD.MANUALFIRE] = true,
@@ -118,8 +129,8 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
 	[CMD_RAW_BUILD] = true,
-	[CMD.REMOVE] = true,
-	[CMD.INSERT] = true,
+	[CMD_REMOVE] = true,
+	[CMD_INSERT] = true,
 }
 
 --------------------------------------------------------------------------------
@@ -147,12 +158,12 @@ local findPadCMD = {
 
 local emptyTable = {}
 
-local airpadsData = {}	-- stores data
-local airpadsPerAllyteam = {}	-- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
+local airpadsData = {}         -- stores data
+local airpadsPerAllyteam = {}  -- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
 local bomberUnitIDs = {}
-local bomberToPad = {}	-- [bomberID] = detination pad ID
-local bomberLanding = {} -- [bomberID] = true
-local rearmRequest = {} -- [bomberID] = true	(used to avoid recursion in UnitIdle)
+local bomberToPad = {}         -- [bomberID] = detination pad ID
+local bomberLanding = {}       -- [bomberID] = true
+local rearmRequest = {}        -- [bomberID] = true (used to avoid recursion in UnitIdle)
 local rearmRemove = {}
 local cmdIgnoreSelf = false
 -- local totalReservedPad = 0
@@ -174,7 +185,7 @@ function gadget:Initialize()
 end
 
 local function MakeOptsWithShift(opts)
-	return opts.coded + (opts.shift and 0 or CMD.OPT_SHIFT)
+	return opts.coded + (opts.shift and 0 or CMD_OPT_SHIFT)
 end
 
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
@@ -184,10 +195,10 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = spGetCommandQueue(unitID, -1)
 	local firestate = Spring.Utilities.GetUnitFireState(unitID)
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
-	spGiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
+	spGiveOrderToUnit(unitID, CMD_FIRE_STATE, 0, 0)
+	spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 	if queue then
-		local cmdOpt = opts and MakeOptsWithShift(opts) or CMD.OPT_SHIFT
+		local cmdOpt = opts and MakeOptsWithShift(opts) or CMD_OPT_SHIFT
 		local i = 1
 		local toInsert = (index >= 0)
 		local commands = #queue
@@ -209,7 +220,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 			spGiveOrderToUnit(unitID, cmdID, params, cmdOpt)
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
+	spGiveOrderToUnit(unitID, CMD_FIRE_STATE, firestate, 0)
 end
 GG.InsertCommand = InsertCommand
 
@@ -344,7 +355,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
 		local queueLength = spGetCommandQueue(unitID, 0)
 		if queueLength <= 2 and (not Spring.Utilities.GetUnitRepeat(unitID)) then
-			spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, CMD.OPT_ALT)
+			spGiveOrderToUnit(unitID, CMD_REMOVE, CMD_FIGHT, CMD_OPT_ALT)
 		end
 	end
 	
@@ -377,9 +388,9 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		local replaceExistingRearm = (detectedRearm and replaceExisting) --replace existing Rearm (if available)
 		-- InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM commandID. airpadID as its Params[1]
 		if replaceExistingRearm then
-			spGiveOrderToUnit(unitID, CMD.REMOVE, {index}, 0)
+			spGiveOrderToUnit(unitID, CMD_REMOVE, index, 0)
 		end
-		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
+		spGiveOrderToUnit(unitID, CMD_INSERT, {index, CMD_REARM, CMD_OPT_SHIFT + CMD_OPT_INTERNAL, targetPad}, CMD_OPT_ALT) --Internal to avoid repeat
 		cmdIgnoreSelf = false
 		return targetPad, index
 	end
@@ -395,7 +406,7 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 		bomberUnitIDs[unitID] = true
 	end
 	--[[
-	local id = Spring.FindUnitCmdDesc(unitID, CMD.WAIT)
+	local id = Spring.FindUnitCmdDesc(unitID, CMD_WAIT)
 	local desc = Spring.GetUnitCmdDescs(unitID, id, id)
 	for i,v in ipairs(desc) do
 		if type(v) == "table" then
@@ -416,6 +427,8 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 		airpadsData[unitID].emptySpot = {}
 		airpadsPerAllyteam[allyTeam][unitID] = unitDefID
 		spSetUnitRulesParam(unitID,"unreservedPad",airpadsData[unitID].cap) --hint widgets
+		
+		GG.AddMiscPriorityUnit(unitID) -- For refuel pad handler
 	end
 end
 
@@ -533,7 +546,7 @@ function gadget:GameFrame(n)
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
 			local unitDefID = data.unitDefID
-			if (Spring.Utilities.GetUnitFirstCommand(bomberID) == CMD_REARM) and
+			if Spring.GetUnitCurrentCommand(bomberID) == CMD_REARM and
 					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and airDefs[unitDefID] and airDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
@@ -547,7 +560,7 @@ function gadget:GameFrame(n)
 						if Spring.Utilities.GetUnitRepeat(bomberID) then
 							cmdIgnoreSelf = true
 							-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
-							spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, CMD.OPT_ALT) --Internal to avoid repeat
+							spGiveOrderToUnit(bomberID, CMD_INSERT, {-1, CMD_REARM, CMD_OPT_SHIFT + CMD_OPT_INTERNAL, targetPad}, CMD_OPT_ALT) --Internal to avoid repeat
 							cmdIgnoreSelf = false
 						end
 						if GG.SendBomberToPad then
@@ -570,7 +583,7 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+				local cmdID = Spring.GetUnitCurrentCommand(unitID)
 				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand)
 					RequestRearm(unitID, nil, true)
 				end
@@ -592,12 +605,12 @@ function GG.LandComplete(bomberID)
 	local padID = bomberData and bomberData.padID
 
 	CancelAirpadReservation(bomberID) -- cancel reservation and mark bomber as free to fire
-	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
-	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
+	spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
+	spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
 	
 	-- Check queue inheritence
 	local queueLength = spGetCommandQueue(bomberID, 0)
-	local cmdID = Spring.Utilities.GetUnitFirstCommand(bomberID)
+	local cmdID = Spring.GetUnitCurrentCommand(bomberID)
 	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and
 			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
 		local padQueueLength = spGetCommandQueue(padID, 0)
@@ -608,7 +621,7 @@ function GG.LandComplete(bomberID)
 				padQueue[i][2] = padQueue[i].params
 				padQueue[i][3] = padQueue[i].options.coded
 			end
-			spGiveOrderToUnit(bomberID,CMD.STOP, emptyTable, 0)
+			spGiveOrderToUnit(bomberID,CMD_STOP, 0, 0)
 			Spring.GiveOrderArrayToUnitArray({bomberID}, padQueue)
 			return
 		end
@@ -689,7 +702,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			return true
 		end
 	elseif noAmmo == 1 then
-		if combatCommands[cmdID] or cmdID == CMD.STOP then	-- don't fight without ammo, go get ammo first!
+		if combatCommands[cmdID] or cmdID == CMD_STOP then	-- don't fight without ammo, go get ammo first!
 			rearmRequest[unitID] = true
 		end
 	end

@@ -1,4 +1,4 @@
-unitDef = {
+return { dronefighter = {
   unitname               = [[dronefighter]],
   name                   = [[Spicula]],
   description            = [[Fighter Drone]],
@@ -33,8 +33,8 @@ unitDef = {
   footprintZ             = 2,
   frontToSpeed           = 0,
   iconType               = [[fighter]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
+  idleAutoHeal           = 10,
+  idleTime               = 300,
   maneuverleashlength    = [[400]],
   maxAcc                 = 0.7,
   maxDamage              = 360,
@@ -110,6 +110,4 @@ unitDef = {
       weaponType              = [[BeamLaser]],
     },
   },
-}
-
-return lowerkeys({ dronefighter = unitDef })
+} }

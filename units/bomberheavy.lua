@@ -1,4 +1,4 @@
-unitDef = {
+return { bomberheavy = {
   unitname            = [[bomberheavy]],
   name                = [[Likho]],
   description         = [[Singularity Bomber]],
@@ -43,6 +43,7 @@ unitDef = {
   maxAcc              = 0.75,
   maxDamage           = 2360,
   maxFuel             = 1000000,
+  maxRudder           = 0.0045,
   maxVelocity         = 9,
   minCloakDistance    = 75,
   mygravity           = 1,
@@ -52,7 +53,7 @@ unitDef = {
   refuelTime          = 20,
   script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
-  sightDistance       = 660,
+  sightDistance       = 780,
   turnRadius          = 20,
   workerTime          = 0,
 
@@ -139,6 +140,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberheavy = unitDef })
+} }

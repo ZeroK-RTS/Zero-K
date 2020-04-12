@@ -1,10 +1,10 @@
-unitDef = {
+return { shipassault = {
   unitname               = [[shipassault]],
   name                   = [[Siren]],
   description            = [[Destroyer (Riot/Assault)]],
-  acceleration           = 0.0768,
+  acceleration           = 0.384,
   activateWhenBuilt      = true,
-  brakeRate              = 0.042,
+  brakeRate              = 0.5,
   buildCostMetal         = 600,
   builder                = false,
   buildPic               = [[shipassault.png]],
@@ -12,9 +12,9 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 6 5]],
-  collisionVolumeScales  = [[55 55 130]],
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeOffsets = [[0 6 0]],
+  collisionVolumeScales  = [[55 55 110]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
   customParams           = {
@@ -31,7 +31,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 3750,
+  maxDamage              = 4000,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -51,10 +51,10 @@ unitDef = {
 
   },
 
-  sightDistance          = 430,
-  sonarDistance          = 430,
+  sightDistance          = 440,
+  sonarDistance          = 440,
   turninplace            = 0,
-  turnRate               = 360,
+  turnRate               = 320,
   workerTime             = 0,
 
   weapons                = {
@@ -110,7 +110,7 @@ unitDef = {
         interceptedByShieldType = 1,
         myGravity               = 0.01,
         noSelfDamage            = true,
-        range                   = 340,
+        range                   = 360,
         reloadtime              = 3,
         size                    = 64,
         sizeDecay               = 0.2,
@@ -190,6 +190,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipassault = unitDef })
+} }

@@ -98,7 +98,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(wake2, SFX.FALL + SFX.EXPLODE)
 		return 1
 	elseif severity <= .99 then
-		corpsetype = 3
 		Explode(base, SFX.NONE)
 		Explode(turret, SFX.SHATTER)
 		Explode(wake1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)

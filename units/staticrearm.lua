@@ -1,4 +1,4 @@
-unitDef = {
+return { staticrearm = {
   unitname            = [[staticrearm]],
   name                = [[Airpad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
@@ -27,6 +27,7 @@ unitDef = {
     notreallyafactory = 1,
     selection_rank  = [[1]],
     selectionscalemult = 1,
+    ispad         = 1,
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],
@@ -68,6 +69,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticrearm = unitDef })
+} }

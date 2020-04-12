@@ -54,6 +54,8 @@ local ALLY_TABLE = {
 	ally = true,
 }
 
+local AVOID_HEIGHT_DIFF = 25
+
 --------------------------------------------------------------------------------
 -- Globals
 
@@ -92,63 +94,6 @@ local unitAICmdDesc = {
 
 local function distance(x1,y1,x2,y2)
 	return sqrt((x1-x2)^2 + (y1-y2)^2)
-end
-
-local function getUnitOrderState_COMPAT(unitID, data, cQueue, holdPos)
-	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
-	--        Return false means the unit does not want orders from tactical ai.
-	-- ret 2: true if there is a move command at the start of queue which will need removal.
-	-- ret 3: true if the unit is using AI due to a fight or patrol command.
-	-- ret 4: fallback enemy ID. This is set if the unit has a non-manual attack command.
-	--        Use it as a fallback if there is no behaviour against the nearest enemy.
-	-- ret 5, 6, 7: Fight command target
-	
-	if not cQueue or #cQueue == 0 then
-		if (not holdPos) then
-			return -1, false -- could still skirm from static or flee
-		end
-		return false -- no queue and on hold position.
-	end
-	
-	if (#cQueue == 1 and holdPos and cQueue[1].id == CMD_ATTACK and cQueue[1].options.internal) then
-		return false -- set to hold position and is auto-acquiring target
-	end
-	
-	local fightTwo = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
-	if cQueue[1].id == CMD_FIGHT then
-		return -1, false, true, nil, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-	elseif cQueue[1].id == CMD_ATTACK and ((not holdPos) or fightTwo) then -- if I attack
-		local target,check = cQueue[1].params[1],cQueue[1].params[2]
-		if (not check) and spValidUnitID(target) then -- if I target a unit
-			if not (cQueue[1].id == CMD_FIGHT or fightTwo or cQueue[1].options.internal) then -- only skirm single target when given the order manually
-				return target, false
-			else
-				return -1, false, true, target
-			end
-		elseif (cQueue[1].id == CMD_FIGHT) then --  if I target the ground and have fight or patrol command
-			return -1, false, nil, nil, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-		end
-	elseif (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE) and #cQueue > 1 then
-		-- if I am moving
-		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
-		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
-			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
-			if fightTwo or (cQueue[2].id == CMD_ATTACK and ((not holdPos) or fightThree)) then -- if the next command is attack, patrol or fight
-				local target,check = cQueue[2].params[1],cQueue[2].params[2]
-				if not check then -- if I target a unit
-					if not (cQueue[2].id == CMD_FIGHT or fightThree or cQueue[2].options.internal) then -- only skirm single target when given the order manually
-						return target, true, nil, nil, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-					else
-						return -1, true, true, target, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-					end
-				elseif (cQueue[2].id == 16) then -- if I target the ground and have fight or patrol command
-					return -1, true, true, nil, cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]
-				end
-			end
-		end
-	end
-
-	return false
 end
 
 local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
@@ -374,12 +319,18 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	local data = unit[unitID]
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
-	local vx,vy,vz = spGetUnitVelocity(enemy)
+	local vx,vy,vz, enemySpeed = spGetUnitVelocity(enemy)
 	local ex,ey,ez,_,aimY = spGetUnitPosition(enemy, false, true) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 
 	if not (ex and vx) then
 		return behaviour.skirmKeepOrder
+	end
+
+	if enemyUnitDef and behaviour.avoidHeightDiff and behaviour.avoidHeightDiff[enemyUnitDef] then
+		if ey - uy > AVOID_HEIGHT_DIFF or ey - uy < -AVOID_HEIGHT_DIFF then
+			return behaviour.skirmKeepOrder
+		end
 	end
 
 	-- Use aim position as enemy position
@@ -388,8 +339,15 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	-- The e vector is relative to unit position
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
 	
+	
+	local predict = 1
+	if enemySpeed < behaviour.mySpeed*0.95 then
+		predict = 0.8*enemySpeed/behaviour.mySpeed
+	end
+	predict = predict*behaviour.velocityPrediction
+	
 	-- The d vector is also relative to unit position.
-	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	local dx,dy,dz = ex + vx*predict, ey + vy*predict, ez + vz*predict
 	if behaviour.selfVelocityPrediction then
 		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
 		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
@@ -410,6 +368,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		predictedDist = 0
 	end
 	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	--Spring.Echo("skirmRange", skirmRange, GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum))
 	local reloadFrames
 	if behaviour.reloadSkirmLeeway then
 		local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
@@ -421,6 +380,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 		end
 	end
 	
+	--Spring.Echo("skirmRange", skirmRange, "pred", predictedDist, "frame", Spring.GetGameFrame())
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
 			local enemyRange = (GetEffectiveWeaponRange(enemyUnitDef, dy, behaviour.weaponNum) or 0) + behaviour.skirmOnlyNearEnemyRange
@@ -429,17 +389,18 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 			end
 		end
 		
-		if (not doHug) and (not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
+		if (not doHug) and (behaviour.skirmBlockedApproachOnFight or not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
 			if not reloadFrames then
 				local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
 				if reloadState then
 					reloadFrames = reloadState - n
 				end
 			end
+			
 			-- Negative reloadFrames is how many frames the weapon has been loaded for.
 			-- If a unit has not fired then it has been loaded since frame zero.
 			if reloadFrames and (behaviour.skirmBlockedApproachFrames < -reloadFrames) then
-				if behaviour.skirmBlockApproachHeadingBlock and HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
+				if (not behaviour.skirmBlockApproachHeadingBlock) or HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
 					if cmdID and move and not behaviour.skirmKeepOrder then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 					end
@@ -614,34 +575,15 @@ local function updateUnits(frame, start, increment)
 			--Spring.Echo("unit parsed")
 			if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
 				if data.receivedOrder then
-					if Spring.Utilities.COMPAT_GET_ORDER then
-						local cQueue = spGetCommandQueue(unitID,1)
-						if cQueue and cQueue[1] then
-							clearOrder(unitID, data, cQueue[1].id, cQueue[1].tag, cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3])
-						end
-					else
-						cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-						clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-					end
+					local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 				end
 				break
 			end
 			
-			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3
-			local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ
+			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 			local holdPos = (Spring.Utilities.GetUnitMoveState(unitID) == 0)
-			if Spring.Utilities.COMPAT_GET_ORDER then
-				local cQueue = spGetCommandQueue(unitID, 3)
-				if cQueue and cQueue[1] then
-					cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = cQueue[1].id, cQueue[1].options.coded, cQueue[1].tag, cQueue[1].params[1], cQueue[1].params[2], cQueue[1].params[3]
-				end
-				enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState_COMPAT(unitID, data, cQueue, holdPos) -- returns target enemy and movement state
-			else
-				cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-				enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
-				--Spring.Echo("enemy, move, haveFight, autoAttackEnemyID", enemy, move, haveFight, autoAttackEnemyID)
-				--Spring.Echo("fightX, fightY, fightZ", fightX, fightY, fightZ)
-			end
+			local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 			
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
@@ -649,7 +591,10 @@ local function updateUnits(frame, start, increment)
 				local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
 				local behaviour
 				if unitAIBehaviour[data.udID].waterline then
-					local _,by = spGetUnitPosition(unitID, true)
+					local bx,by,bz = spGetUnitPosition(unitID, true)
+					if unitAIBehaviour[data.udID].floatWaterline then
+						by = Spring.GetGroundHeight(bx, bz)
+					end
 					if by < unitAIBehaviour[data.udID].waterline then
 						behaviour = unitAIBehaviour[data.udID].sea
 					else
@@ -770,6 +715,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
 	behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
 	behaviourData.minFleeRange            = behaviourData.minFleeRange - behaviourData.fleeLeeway
+	behaviourData.mySpeed                 = ud.speed/30
 	
 	if behaviourData.fightOnlyOverride then
 		for k, v in pairs(behaviourData) do
@@ -792,6 +738,7 @@ local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 				unitAIBehaviour[ud.id] = {
 					defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
 					waterline = (behaviourData.waterline or 0),
+					floatWaterline = behaviourData.floatWaterline,
 					land = GetBehaviourTable(behaviourData.land, ud),
 					sea = GetBehaviourTable(behaviourData.sea, ud),
 				}

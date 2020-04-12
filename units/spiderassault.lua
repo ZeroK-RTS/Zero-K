@@ -1,9 +1,9 @@
-unitDef = {
+return { spiderassault = {
   unitname               = [[spiderassault]],
   name                   = [[Hermit]],
   description            = [[All Terrain Assault Bot]],
-  acceleration           = 0.18,
-  brakeRate              = 0.22,
+  acceleration           = 0.54,
+  brakeRate              = 1.32,
   buildCostMetal         = 160,
   buildPic               = [[spiderassault.png]],
   canGuard               = true,
@@ -121,6 +121,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderassault = unitDef })
+} }

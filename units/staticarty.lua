@@ -1,4 +1,4 @@
-unitDef = {
+return { staticarty = {
   unitname                      = [[staticarty]],
   name                          = [[Cerberus]],
   description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
@@ -72,7 +72,7 @@ unitDef = {
       name                    = [[Long-Range Plasma Battery]],
       areaOfEffect            = 192,
       avoidFeature            = false,
-      avoidGround             = false,
+      avoidGround             = true,
       burst                   = 3,
       burstRate               = 0.133,
       craterBoost             = 1,
@@ -128,6 +128,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticarty = unitDef })
+} }

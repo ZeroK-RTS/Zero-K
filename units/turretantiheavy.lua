@@ -1,4 +1,4 @@
-unitDef = {
+return { turretantiheavy = {
   unitname                      = [[turretantiheavy]],
   name                          = [[Lucifer]],
   description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretantiheavy = unitDef })
+} }

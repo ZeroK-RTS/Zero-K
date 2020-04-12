@@ -602,7 +602,7 @@ local moduleDefs = {
 	{
 		name = "module_radarnet",
 		humanName = "Field Radar",
-		description = "Field Radar - Attaches a basic radar system to the Commander.",
+		description = "Field Radar - Attaches a basic radar system.",
 		image = moduleImagePath .. "module_fieldradar.png",
 		limit = 1,
 		cost = 75 * COST_MULT,
@@ -615,7 +615,7 @@ local moduleDefs = {
 	{
 		name = "module_personal_cloak",
 		humanName = "Personal Cloak",
-		description = "Personal Cloak - A personal cloaking device for the Commander.",
+		description = "Personal Cloak - A personal cloaking device. Reduces speed by 8.",
 		image = moduleImagePath .. "module_personal_cloak.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
@@ -625,6 +625,7 @@ local moduleDefs = {
 		applicationFunction = function (modules, sharedData)
 			sharedData.decloakDistance = math.max(sharedData.decloakDistance or 0, 150)
 			sharedData.personalCloak = true
+			sharedData.speedMod = (sharedData.speedMod or 0) - 8
 		end
 	},
 	{
@@ -696,7 +697,7 @@ local moduleDefs = {
 		image = moduleImagePath .. "module_battle_drone.png",
 		limit = 8,
 		cost = 500 * COST_MULT,
-		requireChassis = {"support", "knight"},
+		requireChassis = {"assault", "support", "knight"},
 		requireOneOf = {"module_companion_drone"},
 		requireLevel = 3,
 		slotType = "module",
@@ -734,7 +735,7 @@ local moduleDefs = {
 	{
 		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces movement by 10%. " ..
+		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces speed by 3. " ..
 		"Limit: 8, Requires Ablative Armour Plates",
 		image = moduleImagePath .. "module_heavy_armor.png",
 		limit = 8,
@@ -744,13 +745,13 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600*HP_MULT
-			sharedData.speedMult = (sharedData.speedMult or 1) - 0.1
+			sharedData.speedMod = (sharedData.speedMod or 0) - 3
 		end
 	},
 	{
 		name = "module_dmg_booster",
 		humanName = "Damage Booster",
-		description = "Damage Booster - Increases damage by 10% but reduces speed by 2.5%.  Limit: 8",
+		description = "Damage Booster - Increases damage by 10% but reduces speed by 1.  Limit: 8",
 		image = moduleImagePath .. "module_dmg_booster.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
@@ -759,26 +760,26 @@ local moduleDefs = {
 		applicationFunction = function (modules, sharedData)
 			-- Damage boost is applied via clone swapping
 			sharedData.damageMult = (sharedData.damageMult or 1) + 0.1
-			sharedData.speedMult = (sharedData.speedMult or 1) - 0.025
+			sharedData.speedMod = (sharedData.speedMod or 0) - 1
 		end
 	},
 	{
 		name = "module_high_power_servos",
 		humanName = "High Power Servos",
-		description = "High Power Servos - Increases speed by 8%. Limit: 8",
+		description = "High Power Servos - Increases speed by 3. Limit: 8",
 		image = moduleImagePath .. "module_high_power_servos.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.speedMult = (sharedData.speedMult or 1) + 0.08
+			sharedData.speedMod = (sharedData.speedMod or 0) + 3
 		end
 	},
 	{
 		name = "module_adv_targeting",
 		humanName = "Adv. Targeting System",
-		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 2.5%. Limit: 8",
+		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 1. Limit: 8",
 		image = moduleImagePath .. "module_adv_targeting.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
@@ -786,7 +787,7 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.075
-			sharedData.speedMult = (sharedData.speedMult or 1) - 0.025
+			sharedData.speedMod = (sharedData.speedMod or 0) - 1
 		end
 	},
 	{
@@ -799,7 +800,6 @@ local moduleDefs = {
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			-- All comms have 10 BP in their unitDef (even support)
 			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
 		end
 	},
@@ -941,7 +941,7 @@ local chassisDefs = {
 				morphBuildPower = 15,
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12.5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike2_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -961,7 +961,7 @@ local chassisDefs = {
 				morphBuildPower = 20,
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 16
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -985,7 +985,7 @@ local chassisDefs = {
 				morphBuildPower = 25,
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 27.5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 25
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike4_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -1174,7 +1174,6 @@ local chassisDefs = {
 				morphBuildPower = 10,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -1186,7 +1185,6 @@ local chassisDefs = {
 				morphBuildPower = 10,
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1208,7 +1206,6 @@ local chassisDefs = {
 				morphBuildPower = 15,
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1230,7 +1227,6 @@ local chassisDefs = {
 				morphBuildPower = 20,
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1256,8 +1252,7 @@ local chassisDefs = {
 				morphBuildPower = 25,
 				morphBaseCost = morphCosts[4],
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
-					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 8
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 9
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -1282,8 +1277,7 @@ local chassisDefs = {
 				morphBuildPower = 30,
 				morphBaseCost = morphCosts[5],
 				chassisApplicationFunction = function (modules, sharedData)
-					-- All comms have 10 BP in their unitDef (even support)
-					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 10
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 12
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -1319,6 +1313,7 @@ local chassisDefs = {
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault0"].id
@@ -1330,6 +1325,7 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault1_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1350,6 +1346,7 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 2
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault2_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1370,6 +1367,8 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 2
+					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault3_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1394,6 +1393,8 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 3
+					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault4_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1418,6 +1419,8 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.drones = (sharedData.drones or 0) + 3
+					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 2
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault5_" .. GetAssaultCloneModulesString(modulesByDefID)].id

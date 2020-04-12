@@ -71,7 +71,6 @@ else
 
 local Lups
 local LupsAddParticles
-local SYNCED = SYNCED
 
 local projectiles = {}
 

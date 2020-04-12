@@ -131,7 +131,7 @@ function Progressbar:DrawControl()
 		end
 	else
 		if self.reverse then
- 			gl.Rect(0, 0, w, h*percent)
+			gl.Rect(0, 0, w, h*percent)
 		else
 			gl.Rect(0, h*(1-percent), w, h)
 		end

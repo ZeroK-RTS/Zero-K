@@ -1,4 +1,4 @@
-unitDef = {
+return { turretheavy = {
   unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
   description                   = [[Medium Range Defense Fortress - Power by connecting to a 50 energy grid]],
@@ -55,7 +55,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 780,
+  sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -192,6 +192,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretheavy = unitDef })
+} }

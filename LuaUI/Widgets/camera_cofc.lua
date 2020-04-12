@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
@@ -1259,7 +1259,7 @@ end
 local function DriftToCenter(cs, gx, gy, gz, mx, my)
 	if options.drifttocenter.value then
 		mx = mx + (mx - vsx/2)/(vsx/2) * horizAspectCorrectionFactor * centerDriftFactor --Seems to produce the same apparent size on centered object independent of FOV
-	 	my = my + (my - vsy/2)/(vsy/2) * vertAspectCorrectionFactor * centerDriftFactor
+		my = my + (my - vsy/2)/(vsy/2) * vertAspectCorrectionFactor * centerDriftFactor
 		local dirx, diry, dirz = Spring.GetPixelDir(mx, vsy - my)
 		local distanceFactor = 0
 		if diry ~= 0 then
@@ -2665,7 +2665,7 @@ local spGetUnitGroup = Spring.GetUnitGroup
 local spGetGroupList  = Spring.GetGroupList
 
 
---include("keysym.h.lua")
+--include("keysym.lua")
 local previousGroup =99
 local currentIteration = 1
 local currentIterations = {}

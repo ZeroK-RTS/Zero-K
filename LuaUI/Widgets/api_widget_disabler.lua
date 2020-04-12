@@ -25,10 +25,12 @@ local spEcho = Spring.Echo
 -- config --
 local badwidgets = {
 	[1] = "*Mearth Location Tags*1.0", -- Map: Mearth_v4.
+	[2] = "Metalspot Finder (map)", -- oktogon v3
 }
 
 local reason = {
 	[1] = "Causes black ground on some graphics cards, possible copyright issues.",
+	[2] = "breaks everything mex-related",
 }
 
 -- callins --

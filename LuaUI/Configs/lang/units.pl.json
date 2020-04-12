@@ -606,7 +606,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Skoczek konstruktor, moc 4 m/s",
+		"description" : "Skoczek konstruktor, moc 5 m/s",
 		"helptext" : "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
 	},
 	"chicken_blimpy" : {
@@ -767,7 +767,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Kontroler meteorytów",
-		"helptext" : "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 500). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
+		"helptext" : "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 300). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
 	},
 	"vehaa" : {
 		"name" : "Crasher",
@@ -1052,7 +1052,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Niewidzialny bot konstruktor, moc 5 m/s",
-		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem krótkiego zasięgu."
+		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem radaru krótkiego zasięgu. Może też włączyć pole niewidzialności, co jednak w przeciwieństwie do wcześniej wymienionych umiejętności wymaga energii do działania."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",
@@ -1071,7 +1071,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Statek powietrzny konstruktor, moc 4 m/s",
+		"description" : "Statek powietrzny konstruktor, moc 5 m/s",
 		"helptext" : "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
 	},
 	"gunshipraid" : {

@@ -91,9 +91,9 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	end
 	
 	-- upgrade by level -- no longer used
+	--[[
 	local level = (tonumber(unitDef.customparams.level) - 1) or 0
 	local wd = unitDef.weapondefs[weapon]
-	--[[
 	if wd.range then
 		wd.range = wd.range + (wd.customparams.rangeperlevel or 0) * level
 	end
@@ -125,7 +125,7 @@ function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
 	local weapons = unitDef.weapons or {}
 	local weaponDefs = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
- 		if v.def and weaponDefs[v.def] and (weaponDefs[v.def].customparams.idstring == oldWeapon) then
+		if v.def and weaponDefs[v.def] and (weaponDefs[v.def].customparams.idstring == oldWeapon) then
 			--Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
 			ApplyWeapon(unitDef, newWeapon, true, i)
 			break -- one conversion, one weapon changed. Get 2 if you want 2

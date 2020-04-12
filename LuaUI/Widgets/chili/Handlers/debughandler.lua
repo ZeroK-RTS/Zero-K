@@ -149,9 +149,9 @@ function DebugHandler.Stacktrace()
 
 		--// we remove any occurence of the debughandler in the stacktrace (it's useless for debugging)
 		if (info.short_src ~= self_src)
- 			and(info.name ~= "SafeCall")
- 			and(info.name ~= "cdxpcall")
- 			and(info.name ~= "cdCreateList")
+			and(info.name ~= "SafeCall")
+			and(info.name ~= "cdxpcall")
+			and(info.name ~= "cdCreateList")
 		then
 			local curLine = info.currentline
 			if (curLine < 0) then

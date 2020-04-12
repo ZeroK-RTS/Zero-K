@@ -1,11 +1,11 @@
-unitDef = {
+return { chickenlandqueen = {
   unitname               = [[chickenlandqueen]],
   name                   = [[Chicken Queen]],
   description            = [[Clucking Hell!]],
-  acceleration           = 1,
+  acceleration           = 3.0,
   activateWhenBuilt      = true,
   autoHeal               = 0,
-  brakeRate              = 3,
+  brakeRate              = 18.0,
   buildCostEnergy        = 0,
   buildCostMetal         = 0,
   builder                = false,
@@ -413,6 +413,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chickenlandqueen = unitDef })
+} }

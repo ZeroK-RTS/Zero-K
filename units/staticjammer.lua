@@ -1,4 +1,4 @@
-unitDef = {
+return { staticjammer = {
   unitname                      = [[staticjammer]],
   name                          = [[Cornea]],
   description                   = [[Area Cloaker/Jammer]],
@@ -76,6 +76,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticjammer = unitDef })
+} }

@@ -13,6 +13,7 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
+		reaim_time = 1,
 	},
 
 	damage                  = {

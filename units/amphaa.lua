@@ -1,10 +1,10 @@
-unitDef = {
+return { amphaa = {
   unitname               = [[amphaa]],
   name                   = [[Angler]],
   description            = [[Amphibious Anti-Air Bot]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 180,
   buildPic               = [[amphaa.png]],
   canGuard               = true,
@@ -17,10 +17,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 20,
+    amph_regen        = 20,
     amph_submerged_at = 40,
-    sink_on_emp    = 1,
-    floattoggle = [[1]],
+    sink_on_emp       = 1,
+    floattoggle       = [[1]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -140,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphaa = unitDef })
+} }

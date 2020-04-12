@@ -1,6 +1,7 @@
 include "constants.lua"
 
-dyncomm = include('dynamicCommander.lua')
+local dyncomm = include('dynamicCommander.lua')
+_G.dyncomm = dyncomm
 
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
@@ -139,9 +140,6 @@ local walkAngle = {
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	
-	local speedMult = 1
-	local scaleMult = dyncomm.GetScale()
 	
 	while true do
 		walkCycle = 3 - walkCycle

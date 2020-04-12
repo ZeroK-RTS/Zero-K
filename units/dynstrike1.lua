@@ -1,10 +1,10 @@
-unitDef = {
+return { dynstrike1 = {
   unitname               = [[dynstrike1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 1200,
   buildDistance          = 144,
   builder                = true,
@@ -47,7 +47,7 @@ unitDef = {
   losEmitHeight          = 40,
   maxDamage              = 4200,
   maxSlope               = 36,
-  maxVelocity            = 1.35,
+  maxVelocity            = 1.45,
   maxWaterDepth          = 5000,
   metalStorage           = 500,
   minCloakDistance       = 75,
@@ -98,6 +98,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynstrike1 = unitDef })
+} }

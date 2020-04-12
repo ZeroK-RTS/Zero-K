@@ -87,7 +87,7 @@ local custom_cmd_actions = {
 	--states
 --	stealth = {cmdType = 2, name = "stealth"}, --no longer applicable
 	cloak_shield = {cmdType = 2, name = "Area Cloaker", states = {'Off', 'On'}},
-	retreat = {cmdType = 2, name = "Retreat Threshold", states = {'Off', '30%', '65%', '99%'}},
+	retreat = {cmdType = 2, name = "Retreat Threshold", states = {'Off', '30%', '65%', '99%'}, actionOverride = {'cancelretreat'}},
 	['luaui noretreat'] = {cmdType = 2, name = "luaui noretreat"},
 	priority = {cmdType = 2, name = "Construction Priority", states = {'Low', 'Normal', 'High'}},
 	miscpriority = {cmdType = 2, name = "Misc. Priority", states = {'Low', 'Normal', 'High'}},
@@ -99,7 +99,8 @@ local custom_cmd_actions = {
 	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
 	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
-	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", states = {'Off', 'On'}},
+	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Kill", states = {'Off', 'On'}},
+	goostate = {cmdType = 2, name = "Goo State", states = {'Off', 'When uncloaked', 'On'}},
 	disableattack = {cmdType = 2, name = "Allow Attack", states = {'Allowed', 'Blocked'}},
 	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
@@ -186,6 +187,8 @@ local usedActions = {
 	["cancelfirezone"] = true,
 	["selection_rank"] = true,
 	["pushpull"] = true,
+	["unit_kill_subordinates"] = true,
+	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
@@ -205,7 +208,8 @@ local fullCustomCmdActions = {}
 for name, data in pairs(custom_cmd_actions) do
 	if data.states then
 		for i = 1, #data.states do
-			fullCustomCmdActions[name .. " " .. (i-1)] = {
+			local cmdName = (data.actionOverride and data.actionOverride[i]) or (name .. " " .. (i-1))
+			fullCustomCmdActions[cmdName] = {
 				cmdType = data.cmdType,
 				name = data.name .. ": set " .. data.states[i],
 			}

@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local Chili
@@ -859,8 +859,6 @@ local upgradeSignature = {}
 local savedSlotLoadout = {}
 
 function SendUpgradeCommand(newModules)
-	table.sort(upgradeSignature.alreadyOwned)
-
 	-- Find selected eligible units
 	local units = Spring.GetSelectedUnits()
 	local upgradableUnits = {}
@@ -939,6 +937,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 		local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 		alreadyOwned[#alreadyOwned + 1] = module
 	end
+	table.sort(alreadyOwned)
 	
 	-- Record the signature of the morphing unit for later application.
 	upgradeSignature.level = level
@@ -1027,9 +1026,8 @@ function widget:CommandsChanged()
 					local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 					alreadyOwned[#alreadyOwned + 1] = module
 				end
-				
 				table.sort(alreadyOwned)
-				
+
 				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, upgradeSignature.alreadyOwned) then
 					foundMatchingComm = true
 					break

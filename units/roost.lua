@@ -1,4 +1,4 @@
-unitDef = {
+return { roost = {
   unitname          = [[roost]],
   name              = [[Roost]],
   description       = [[Spawns Chicken]],
@@ -28,6 +28,7 @@ unitDef = {
   minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
+  script            = [[roost.lua]],
   selfDestructAs    = [[NOWEAPON]],
 
   sfxtypes          = {
@@ -113,6 +114,4 @@ unitDef = {
   featureDefs       = {
   },
 
-}
-
-return lowerkeys({ roost = unitDef })
+} }

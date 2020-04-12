@@ -13,6 +13,7 @@ local raider = {
 	
 	"armsh",
 	"hoverraid",
+	"hoverheavyraid",
 	
 	"chicken",
 	"chicken_leaper",

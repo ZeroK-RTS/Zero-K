@@ -1,9 +1,9 @@
-unitDef = {
+return { vehcapture = {
   unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
   description         = [[Capture Rover]],
-  acceleration        = 0.0444,
-  brakeRate           = 0.0385,
+  acceleration        = 0.222,
+  brakeRate           = 0.385,
   buildCostMetal      = 420,
   builder             = false,
   buildPic            = [[vehcapture.png]],
@@ -115,6 +115,7 @@ unitDef = {
       thickness               = 4.2,
       tolerance               = 5000,
       turret                  = true,
+      waterweapon             = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
@@ -145,6 +146,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehcapture = unitDef })
+} }

@@ -1,11 +1,11 @@
-unitDef = {
+return { commsupport1 = {
   unitname            = [[commsupport1]],
   name                = [[Support Commander]],
   description         = [[Econ/Support Commander, Builds at 12 m/s]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
-  brakeRate           = 0.45,
+  brakeRate           = 2.7,
   buildCostMetal      = 1200,
   buildDistance       = 250,
   builder             = true,
@@ -206,6 +206,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ commsupport1 = unitDef })
+} }

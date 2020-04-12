@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipemp = {
   unitname            = [[gunshipemp]],
   name                = [[Gnat]],
   description         = [[Anti-Heavy EMP Drone]],
@@ -36,7 +36,7 @@ unitDef = {
   iconType            = [[gunshipscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 420,
+  maxDamage           = 370,
   maxVelocity         = 7.5,
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipemp = unitDef })
+} }

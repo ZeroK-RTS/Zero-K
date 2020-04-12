@@ -137,11 +137,9 @@ function widget:Initialize()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if not enableIdleNanos
-	or unitTeam ~= spGetMyTeamID()
-	or not IsImmobileBuilder(UnitDefs[unitDefID])
-	or spGetGameRulesParam("loadPurge") == 1
-	then
+	if not enableIdleNanos or unitTeam ~= spGetMyTeamID()
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -171,17 +169,37 @@ function widget:UnitGiven(unitID, unitDefID, unitTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
+local idleCheckUnits
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
-	if not enableIdleNanos
-	or stoppedUnit[unitID]
-	or unitTeam ~= spGetMyTeamID()
-	or not IsImmobileBuilder(UnitDefs[unitDefID])
-	or spGetGameRulesParam("loadPurge") == 1
-	then
+	if not enableIdleNanos or stoppedUnit[unitID]
+			or unitTeam ~= spGetMyTeamID()
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
-	SetupUnit(unitID)
+	--[[ A unit can become "idle" in the process of receiving a command. Consider:
+
+	  CommandNotify()
+	    RemoveAllCommands() -- triggers idle here
+	    return false -- not actually idle
+
+	If the command was ordered with SHIFT it would get appended after the patrol. ]]
+
+	idleCheckUnits = idleCheckUnits or {}
+	idleCheckUnits[unitID] = true
+end
+
+function widget:Update(dt)
+	if not idleCheckUnits then
+		return
+	end
+	for unitID, _ in pairs(idleCheckUnits) do
+		if Spring.ValidUnitID(unitID) and Spring.GetCommandQueue(unitID, 0) == 0 then
+			SetupUnit(unitID)
+		end
+	end
+	idleCheckUnits = nil
 end
 
 --------------------------------------------------------------------------------

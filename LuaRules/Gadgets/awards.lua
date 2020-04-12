@@ -358,7 +358,7 @@ local function ProcessAwardData()
 			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			if maxVal > compare then
 				maxVal = floor(maxVal)
-				maxValWrite = comma_value(maxVal)
+				local maxValWrite = comma_value(maxVal)
 
 				if awardType == 'cap' then
 					message = 'Captured value: ' .. maxValWrite
@@ -539,8 +539,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			end
 		elseif ud.name == "roost" then
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
-		else
-			--
 		end
 	end
 end

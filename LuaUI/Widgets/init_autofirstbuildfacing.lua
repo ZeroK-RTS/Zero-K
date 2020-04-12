@@ -30,9 +30,7 @@ local function SetStartPos()
 	if Spring.GetTeamUnitCount(Spring.GetMyTeamID()) and Spring.GetTeamUnitCount(Spring.GetMyTeamID())>0 then
 		x= 0
 		for k,unitID in pairs(Spring.GetTeamUnits(Spring.GetMyTeamID())) do
-			local ux=0
-			local uz=0
-			ux,_,uz=Spring.GetUnitPosition(unitID)
+			local ux, _, uz = Spring.GetUnitPosition(unitID)
 			if ux and uz then
 				x=x+ux
 				z=z+uz

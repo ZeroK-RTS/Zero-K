@@ -5,11 +5,18 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 2,
       ground             = true,
-	  water				 = true,
+      water              = true,
       properties = {
         airdrag            = 0.7,
         --alwaysvisible      = true,
-        colormap           = [[1 0.5 0 1.0	1 0.5 0 1.0		0.9 0.4 0 1.0	0.6 0.2 0 1.0	0.3 0.1 0 1.0	0 0 0 1.0	0 0 0 0.5	0 0 0 0.1]],
+        colormap           = [[1.0 0.5 0 1.0
+                               1.0 0.5 0 1.0
+                               0.9 0.4 0 1.0
+                               0.6 0.2 0 1.0
+                               0.3 0.1 0 1.0
+                               0.0 0.0 0 1.0
+                               0.0 0.0 0 0.5
+                               0.0 0.0 0 0.1]],
         directional        = true,
         emitrot            = 45,
         emitrotspread      = 32,
@@ -26,7 +33,6 @@ return {
         sizemod            = 0.9,
         texture            = [[new_dirta]],
         useairlos          = false,
-		--colorchange			= "stuffs",
       },
     },
   },
@@ -41,7 +47,14 @@ return {
       properties = {
         airdrag            = 0.7,
         --alwaysvisible      = true,
-        colormap           = [[1 0.5 0 1.0  1 0.5 0 1.0     0.9 0.4 0 1.0   0.6 0.2 0 1.0   0.3 0.1 0 1.0   0 0 0 1.0   0 0 0 0.5   0 0 0 0.1]],
+        colormap           = [[1.0 0.5 0 1.0
+                               1.0 0.5 0 1.0
+                               0.9 0.4 0 1.0
+                               0.6 0.2 0 1.0
+                               0.3 0.1 0 1.0
+                               0.0 0.0 0 1.0
+                               0.0 0.0 0 0.5
+                               0.0 0.0 0 0.1]],
         directional        = true,
         emitrot            = 45,
         emitrotspread      = 32,
@@ -58,10 +71,8 @@ return {
         sizemod            = 0.9,
         texture            = [[new_dirta]],
         useairlos          = false,
-        --colorchange         = "stuffs",
       },
     },
-   
     bubblesuw = {
       air                = false,
       class              = [[CSimpleParticleSystem]],
@@ -72,7 +83,9 @@ return {
       properties = {
         airdrag            = 0.7,
         --alwaysvisible      = true,
-        colormap           = [[1 1 1 0.5    0.5 0.5 1 0.8   0 0 0 0.0]],
+        colormap           = [[1.0 1.0 1 0.5
+                               0.5 0.5 1 0.8
+                               0.0 0.0 0 0.0]],
         directional        = true,
         emitrot            = 45,
         emitrotspread      = 32,
@@ -89,7 +102,6 @@ return {
         sizemod            = 0.9,
         texture            = [[randdots]],
         useairlos          = false,
-        --colorchange         = "stuffs",
       },
     },
   },

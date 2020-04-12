@@ -1,9 +1,9 @@
-unitDef = {
+return { tankheavyraid = {
   unitname               = [[tankheavyraid]],
   name                   = [[Blitz]],
   description            = [[Lightning Assault/Raider Tank]],
-  acceleration           = 0.125,
-  brakeRate              = 0.1375,
+  acceleration           = 0.625,
+  brakeRate              = 1.375,
   buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[tankheavyraid.png]],
@@ -18,6 +18,7 @@ unitDef = {
 
   customParams           = {
     modelradius    = [[10]],
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -27,9 +28,9 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1100,
+  maxDamage              = 1250,
   maxSlope               = 18,
-  maxVelocity            = 3.4,
+  maxVelocity            = 3.25,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
@@ -46,7 +47,7 @@ unitDef = {
     },
 
   },
-  sightDistance          = 450,
+  sightDistance          = 560,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,
@@ -99,7 +100,7 @@ unitDef = {
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
       range                   = 245,
-      reloadtime              = 2.6 + 1/30,
+      reloadtime              = 2.6,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
@@ -152,6 +153,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankheavyraid = unitDef })
+} }

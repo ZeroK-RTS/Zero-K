@@ -24,6 +24,9 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --	MarkerAddLine(a,b,c,d,e,f,true)
 --end
 
+local spGetProjectileTeamID = Spring.GetProjectileTeamID
+local spGetMyTeamID = Spring.GetMyTeamID
+local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetProjectileDefID = Spring.GetProjectileDefID
 local filteredWeaponDefID = {}
 for wdid, wd in pairs(WeaponDefs) do
@@ -34,14 +37,19 @@ end
 local function FilterOutRestrictedProjectiles(projectiles)
 	local i = 1
 	local n = #projectiles
+	local myTeamID = spGetMyTeamID()
 	while i <= n do
 		local p = projectiles[i]
-		local pID = spGetProjectileDefID(p)
-		if filteredWeaponDefID[pID] then
-			projectiles[i] = projectiles[n]
-			projectiles[n] = nil
-			n = n - 1
-			i = i - 1
+		local ownerTeamID = spGetProjectileTeamID(p)
+		-- If the owner is allied with us, we shouldn't need to filter anything out
+		if not spAreTeamsAllied(ownerTeamID, myTeamID) then
+			local pID = spGetProjectileDefID(p)
+			if filteredWeaponDefID[pID] then
+				projectiles[i] = projectiles[n]
+				projectiles[n] = nil
+				n = n - 1
+				i = i - 1
+			end
 		end
 		i = i + 1
 	end
@@ -61,8 +69,7 @@ function Spring.IsGUIHidden()
 end
 
 function Spring.GetTeamColor(teamid)
-  if teamColor[teamid] then
-  else
+  if not teamColor[teamid] then
     teamColor[teamid] = { GetTeamColor(teamid) }
   end
   return unpack(teamColor[teamid])
@@ -107,50 +114,18 @@ function Spring.GetVisibleUnits(teamID, radius, Icons)
 	end
 
 	local ret = GetVisibleUnits(teamID, radius, Icons)
-	local rev = {}
-	for i = 1, #ret do
-		rev[ret[i]] = i
-	end
-
 	visible.units = ret
 	visible.frame = currentFrame
 	visible.time = now
-	visible.reverse = rev
 
 	return ret
-end
-
--- returns unitTable = { [unitID] = number indexFromTableReturnedByGetVisibleUnits, ... }
-function Spring.GetVisibleUnitsReverse(teamID, radius, Icons)
-  local index = buildIndex(teamID, radius, Icons)
-  local update = false
-  if visibleUnits[index] then
-    local visible = visibleUnits[index]
-    -- check time
-    local now = Spring.GetTimer()
-    local diff = Spring.DiffTimers(now, visible.time)
-    if diff > 1/25 then
-      visible.time = now
-      update = true
-    else
-      return visible.reverse
-      end
-  else
-    update = true
-  end
-
-  if update then
-    -- update
-    Spring.GetVisibleUnits(teamID, radius, Icons)
-  end
-  return visibleUnits[index].reverse
 end
 
 --Workaround for Spring.SetCameraTarget() not working in Freestyle mode.
 local SetCameraTarget = Spring.SetCameraTarget
 function Spring.SetCameraTarget(x,y,z,transTime)
 	local cs = Spring.GetCameraState()
-	if cs.mode==4 then --if using Freestyle cam, especially when using "camera_cofc.lua"
+	if cs.mode == 4 then --if using Freestyle cam, especially when using "camera_cofc.lua"
 		--"0.46364757418633" is the default pitch given to FreeStyle camera (the angle between Target->Camera->Ground, tested ingame) and is the only pitch that original "Spring.SetCameraTarget()" is based upon.
 		--"cs.py-y" is the camera height.
 		--"math.pi/2 + cs.rx" is the current pitch for Freestyle camera (the angle between Target->Camera->Ground). Freestyle camera can change its pitch by rotating in rx-axis.

@@ -93,7 +93,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, math.rad(360))
+	Turn(turret, y_axis, heading, math.rad(440))
 	Turn(barrel, x_axis, -pitch, math.rad(180))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel, x_axis)

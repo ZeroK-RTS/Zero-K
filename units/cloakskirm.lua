@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakskirm = {
   unitname               = [[cloakskirm]],
   name                   = [[Ronin]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
-  acceleration           = 0.3,
-  brakeRate              = 0.2,
+  acceleration           = 0.9,
+  brakeRate              = 1.2,
   buildCostMetal         = 90,
   buildPic               = [[cloakskirm.png]],
   canGuard               = true,
@@ -73,7 +73,7 @@ unitDef = {
       name                    = [[Rocket]],
       areaOfEffect            = 48,
       burnblow                = true,
-      cegTag                  = [[missiletrailredsmall]],
+      cegTag                  = [[rocket_trail_bar]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -100,13 +100,12 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 455,
       reloadtime              = 3.5,
-      smokeTrail              = true,
+      smokeTrail              = false,
       soundHit                = [[weapon/missile/sabot_hit]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/sabot_fire]],
       soundStartVolume        = 7,
       startVelocity           = 200,
-      texture2                = [[darksmoketrail]],
       tracks                  = false,
       turret                  = true,
       weaponAcceleration      = 200,
@@ -135,6 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakskirm = unitDef })
+} }

@@ -1,4 +1,4 @@
-include("keysym.h.lua")
+include("keysym.lua")
 local versionNumber = "1.22"
 
 function widget:GetInfo()

@@ -103,22 +103,16 @@ local armsFree, shieldOn = true, true
 local restoreHeading = 0
 local gun_num = 0
 
-local flamers = {}
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	elseif weaponDef.type == "StarburstLauncher" then
+	if weaponDef.type == "StarburstLauncher" then
 		starBLaunchers[index] = true
-		--Spring.Echo("sbl found")
 	end
 end
 wepTable = nil
-
---local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -284,9 +278,6 @@ function script.Shot(num)
 		EmitSfx(flareL, 1025)
 	elseif num == 3 then
 		EmitSfx(flareR, 1027)
-	end
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 end
 

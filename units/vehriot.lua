@@ -1,9 +1,9 @@
-unitDef = {
+return { vehriot = {
   unitname            = [[vehriot]],
   name                = [[Ripper]],
   description         = [[Riot Rover]],
-  acceleration        = 0.0318,
-  brakeRate           = 0.124,
+  acceleration        = 0.159,
+  brakeRate           = 1.24,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[vehriot.png]],
@@ -17,6 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    selection_scale   = 0.85,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -26,15 +27,16 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 1100,
+  maxDamage           = 1020,
   maxSlope            = 18,
-  maxVelocity         = 2.2,
+  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[corleveler_512.s3o]],
+  script              = [[vehriot.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -46,14 +48,14 @@ unitDef = {
     },
 
   },
-  sightDistance       = 347,
+  sightDistance       = 350,
   trackOffset         = 7,
   trackStrength       = 6,
   trackStretch        = 1,
   trackType           = [[StdTank]],
   trackWidth          = 28,
   turninplace         = 0,
-  turnRate            = 442,
+  turnRate            = 390,
   workerTime          = 0,
 
   weapons             = {
@@ -79,7 +81,6 @@ unitDef = {
       craterMult              = 0.5,
 
       customParams            = {
-        reaim_time = 8, -- COB
         gatherradius = [[90]],
         smoothradius = [[60]],
         smoothmult   = [[0.08]],
@@ -89,9 +90,9 @@ unitDef = {
       },
       
       damage                  = {
-        default = 220.2,
-        planes  = 220.2,
-        subs    = 11,
+        default = 260.2,
+        planes  = 260.2,
+        subs    = 13.5,
       },
 
       edgeEffectiveness       = 0.75,
@@ -100,8 +101,8 @@ unitDef = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 1.6 + 1/30,
+      range                   = 280,
+      reloadtime              = 1.7 + 2/30,
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
       soundStartVolume        = 3,
@@ -132,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehriot = unitDef })
+} }

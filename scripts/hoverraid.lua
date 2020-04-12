@@ -10,6 +10,9 @@ for i = 1, 8 do
 	wakes[i] = piece('wake0' .. i)
 end
 
+local weaponRange = WeaponDefNames["hoverraid_gauss"].range
+local rangeChanged = false
+
 local function WobbleUnit()
 	local wobble = true
 	while true do
@@ -55,12 +58,33 @@ end
 local function RestoreAfterDelay()
 	SetSignalMask(SIG_AIM)
 	Sleep(5000)
-	Turn(turret, y_axis, 0, math.rad(20))
-	Turn(gun, x_axis, 0, math.rad(20))
+	Turn(turret, y_axis, 0, math.rad(180))
+	Turn(gun, x_axis, 0, math.rad(180))
 end
 
 function script.AimFromWeapon()
 	return turret
+end
+
+function script.BlockShot(num, targetID)
+	if targetID then
+		local dist = Spring.GetUnitSeparation(unitID, targetID)
+		if dist then
+			dist = dist + 30
+			if dist > weaponRange then
+				-- noExplode weapons are hardcoded in the engine to expire after they have travelled their range in distance.
+				rangeChanged = true
+				Spring.SetUnitWeaponState(unitID, 1, "range", dist)
+			end
+		end
+	end
+	return false
+end
+
+function script.EndBurst()
+	if rangeChanged then
+		Spring.SetUnitWeaponState(unitID, 1, "range", weaponRange)
+	end
 end
 
 function script.AimWeapon(num, heading, pitch)

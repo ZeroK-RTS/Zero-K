@@ -1,10 +1,10 @@
-unitDef = {
+return { amphassault = {
   unitname            = [[amphassault]],
   name                = [[Grizzly]],
   description         = [[Heavy Amphibious Assault Walker]],
-  acceleration        = 0.1,
+  acceleration        = 0.3,
   activateWhenBuilt   = true,
-  brakeRate           = 0.3,
+  brakeRate           = 1.8,
   buildCostMetal      = 2000,
   buildPic            = [[amphassault.png]],
   canGuard            = true,
@@ -200,6 +200,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphassault = unitDef })
+} }

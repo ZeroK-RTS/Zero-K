@@ -125,6 +125,10 @@ local unitIsHeavy = {
 	[UnitDefNames["striderdetriment"].id] = true,
 }
 
+local unitPriorityModifier = {
+	[UnitDefNames["gunshipemp"].id] = -0.8,
+}
+
 -- Hardcode weapons that are bad against fast moving stuff.
 -- [weapondefid] = {Threshold for penalty to apply, base penalty, additional penantly per excess velocity}
 local VEL_DEFAULT_BASE = 1
@@ -271,6 +275,7 @@ for uid = 1, #UnitDefs do
 		if priority > 12 then
 			priority = 12 + 0.1*priority
 		end
+		priority = priority + (unitPriorityModifier[uid] or 0)
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = priority + 35
 		elseif unitIsClaw[uid] then

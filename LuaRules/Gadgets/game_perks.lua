@@ -207,9 +207,9 @@ local function InitUnsafe()
 end
 
 function gadget:Initialize()
-	if (GG.Chicken) then
+	--if (GG.Chicken) then
 		--gadgetHandler:RemoveGadget()
-	end
+	--end
 	local teams = Spring.GetTeamList()
 	for _, teamID in ipairs(teams) do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)

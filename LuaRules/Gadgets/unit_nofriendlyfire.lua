@@ -108,11 +108,10 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam, projectileID)
 	if weaponID and noFFWeaponDefs[weaponID] then
-		attackerTeam = attackerTeam or haxProjectiles[projectileID]
-		if not attackerTeam then
-			Spring.Echo(" OUTLAWFHTAGN ") -- some unique string I can search infologs for to track the bug's existence (too trivial for LUA_ERRRUN)
-			attackerTeam = unitTeam
-		end
+		-- note: haxProjectiles may still be nil legitimately. For example you can
+		-- reclaim an Outlaw fast enough for it to be gone before the wave hits,
+		-- or modders can fail to set "needs hax" on their weapons
+		attackerTeam = attackerTeam or haxProjectiles[projectileID] or unitTeam
 		if attackerID ~= unitID and spAreTeamsAllied(unitTeam, attackerTeam) then
 			return 0, 0
 		elseif unitDefID and DefensiveManeuverDefs[unitDefID] then

@@ -1,10 +1,10 @@
-unitDef = {
+return { spidercon = {
   unitname               = [[spidercon]],
   name                   = [[Weaver]],
   description            = [[Construction Spider, Builds at 7.5 m/s]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.6,
+  brakeRate              = 3.6,
   buildCostMetal         = 170,
   buildDistance          = 220,
   builder                = true,
@@ -35,7 +35,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 820,
+  maxDamage              = 980,
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
@@ -47,7 +47,7 @@ unitDef = {
   script                 = [[spidercon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
-  sightDistance          = 380,
+  sightDistance          = 375,
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,
@@ -75,6 +75,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spidercon = unitDef })
+} }

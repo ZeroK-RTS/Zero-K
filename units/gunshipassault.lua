@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipassault = {
   unitname            = [[gunshipassault]],
   name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
@@ -63,7 +63,7 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       burst                   = 8,
-      burstrate               = 0.066,
+      burstrate               = 2/30,
       cegTag                  = [[BANISHERTRAIL]],
       collideFriendly         = false,
       craterBoost             = 0.123,
@@ -135,6 +135,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipassault = unitDef })
+} }

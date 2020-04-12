@@ -940,10 +940,10 @@ end
 -- end
 
 local function CleanUpFBO()
-  if (gl.DeleteFBO) and fbo ~= nil then
-    gl.DeleteFBO(fbo or 0)
-    fbo = nil
-  end
+	if (gl.DeleteFBO) and fbo ~= nil then
+		gl.DeleteFBO(fbo or 0)
+		fbo = nil
+	end
 end
 
 function widget:Initialize()
@@ -963,80 +963,80 @@ function widget:Initialize()
 	MakeMinimapWindow()
 
 	if (gl.CreateFBO) then
-	  fbo = gl.CreateFBO()
+		fbo = gl.CreateFBO()
 
 		fbo.color0 = nil;
 
-	  gl.DeleteTextureFBO(offscreentex or 0)
+		gl.DeleteTextureFBO(offscreentex or 0)
 
 		local vsx,vsy = gl.GetViewSizes()
-	  if vsx > 0 and vsy > 0 then
-		  offscreentex = gl.CreateTexture(vsx,vsy, {
-		    border = false,
-		    min_filter = GL.LINEAR,
-		    mag_filter = GL.LINEAR,
-		    wrap_s = GL.CLAMP,
-		    wrap_t = GL.CLAMP,
-		    fbo = true,
-		  })
+		if vsx > 0 and vsy > 0 then
+			offscreentex = gl.CreateTexture(vsx,vsy, {
+				border = false,
+				min_filter = GL.LINEAR,
+				mag_filter = GL.LINEAR,
+				wrap_s = GL.CLAMP,
+				wrap_t = GL.CLAMP,
+				fbo = true,
+			})
 
-		  fbo.color0 = offscreentex
-		  fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
+			fbo.color0 = offscreentex
+			fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
 		end
 
 		if (gl.CreateShader) then
-		  fadeShader = gl.CreateShader({
-		  	vertex = [[
-		  		varying vec2 texCoord;
+			fadeShader = gl.CreateShader({
+				vertex = [[
+					varying vec2 texCoord;
 
-          void main() {
-            texCoord = gl_Vertex.xy * 0.5 + 0.5;
-            gl_Position = vec4(gl_Vertex.xyz, 1.0);
-          }
-		  	]],
-		    fragment = [[
-		      uniform sampler2D tex0;
-		      uniform float alpha;
-		      uniform vec4 bounds;
-		      uniform vec2 screen;
+					void main() {
+						texCoord = gl_Vertex.xy * 0.5 + 0.5;
+						gl_Position = vec4(gl_Vertex.xyz, 1.0);
+					}
+				]],
+				fragment = [[
+					uniform sampler2D tex0;
+					uniform float alpha;
+					uniform vec4 bounds;
+					uniform vec2 screen;
 
-		      varying vec2 texCoord;
+					varying vec2 texCoord;
 
-		      const float edgeFadePixels = 16.0;
+					const float edgeFadePixels = 16.0;
 
-		      void main(void) {
-		        vec4 color = texture2D(tex0, texCoord.st);
-		       	//float width = bounds.z;
-		       	//float height = bounds.w;
-		        float edgeFadeScaledPixels = edgeFadePixels/1080.0 * screen.y;
-		       	vec2 edgeFadeBase = vec2(edgeFadeScaledPixels / screen.x, edgeFadeScaledPixels / screen.y);
-		       	vec2 edgeFade = vec2((2.0 * bounds.z) / edgeFadeBase.x, (2.0 * bounds.w) / edgeFadeBase.y);
-		       	vec2 edgeAlpha = vec2(clamp(1.0 - abs((texCoord.x - bounds.x)/bounds.z - 0.5) * 2.0, 0.0, 1.0/edgeFade.x) * edgeFade.x,
-		       												clamp(1.0 - abs((texCoord.y - bounds.y)/bounds.w - 0.5) * 2.0, 0.0, 1.0/edgeFade.y) * edgeFade.y);
-		       	float final_alpha = edgeAlpha.x * edgeAlpha.y * alpha;
-		        gl_FragColor = vec4(color.rgb, final_alpha);
-		      }
-		    ]],
-		    uniformInt = {
-		      tex0 = 0,
-		    },
-		    uniform = {
-              alpha = 0,
-              bounds = {0,0,0,0},
-              screen = {0,0},
-		  	},
-		  })
+					void main(void) {
+						vec4 color = texture2D(tex0, texCoord.st);
+						//float width = bounds.z;
+						//float height = bounds.w;
+						float edgeFadeScaledPixels = edgeFadePixels/1080.0 * screen.y;
+						vec2 edgeFadeBase = vec2(edgeFadeScaledPixels / screen.x, edgeFadeScaledPixels / screen.y);
+						vec2 edgeFade = vec2((2.0 * bounds.z) / edgeFadeBase.x, (2.0 * bounds.w) / edgeFadeBase.y);
+						vec2 edgeAlpha = vec2(clamp(1.0 - abs((texCoord.x - bounds.x)/bounds.z - 0.5) * 2.0, 0.0, 1.0/edgeFade.x) * edgeFade.x,
+							clamp(1.0 - abs((texCoord.y - bounds.y)/bounds.w - 0.5) * 2.0, 0.0, 1.0/edgeFade.y) * edgeFade.y);
+						float final_alpha = edgeAlpha.x * edgeAlpha.y * alpha;
+						gl_FragColor = vec4(color.rgb, final_alpha);
+					}
+				]],
+				uniformInt = {
+					tex0 = 0,
+				},
+				uniform = {
+					alpha = 0,
+					bounds = {0,0,0,0},
+					screen = {0,0},
+				},
+			})
 
-		  if (fadeShader == nil) then
-		    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Minimap widget: fade shader error: "..gl.GetShaderLog())
-			  CleanUpFBO()
-		  else
-			  alphaLoc = gl.GetUniformLocation(fadeShader, 'alpha')
+			if (fadeShader == nil) then
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, "Minimap widget: fade shader error: "..gl.GetShaderLog())
+				CleanUpFBO()
+			else
+				alphaLoc = gl.GetUniformLocation(fadeShader, 'alpha')
 				boundsLoc = gl.GetUniformLocation(fadeShader, 'bounds')
 				screenLoc = gl.GetUniformLocation(fadeShader, 'screen')
 		  end
 		else --Shader Generation impossible, clean up FBO
-		  CleanUpFBO()
+			CleanUpFBO()
 		end
 	end
 
@@ -1048,11 +1048,11 @@ function widget:Shutdown()
 	gl.SlaveMiniMap(false)
 	Spring.SendCommands("minimap geo " .. Spring.GetConfigString("MiniMapGeometry"))
 
-  if (gl.DeleteTextureFBO) then
-    gl.DeleteTextureFBO(offscreentex)
-  end
+	if (gl.DeleteTextureFBO) then
+		gl.DeleteTextureFBO(offscreentex)
+	end
 
-  CleanUpFBO()
+	CleanUpFBO()
 
 	--// free the chili window
 	if (window) then
@@ -1065,8 +1065,8 @@ end
 local lx, ly, lw, lh, last_window_x, last_window_y
 
 local function DrawMiniMap()
-  gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
-  glDrawMiniMap()
+	gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
+	glDrawMiniMap()
 end
 
 function widget:DrawScreen()

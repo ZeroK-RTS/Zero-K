@@ -6,7 +6,7 @@ function gadget:GetInfo() return {
 	author   = "Sprung",
 	date     = "2015-05-19",
 	license  = "PD",
-	layer    = -math.huge + 10,
+	layer    = -math.huge, -- in particular, before mex_spot_finder (so mexes can depend on occupied boxes)
 	enabled  = true,
 } end
 

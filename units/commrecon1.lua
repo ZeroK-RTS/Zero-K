@@ -1,11 +1,11 @@
-unitDef = {
+return { commrecon1 = {
   unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander, Builds at 10 m/s]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,
-  brakeRate           = 0.45,
+  brakeRate           = 2.7,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -215,6 +215,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ commrecon1 = unitDef })
+} }
