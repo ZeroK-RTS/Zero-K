@@ -58,12 +58,20 @@ local pylons = {count = 0, data = {}}
 local pylonByID = {}
 
 local pylonDefs = {}
+local isBuilder = {}
+local floatOnWater = {}
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	local range = tonumber(udef.customParams.pylonrange)
 	if (range and range > 0) then
 		pylonDefs[i] = range
+	end
+	if udef.isBuilder then
+		isBuilder[i] = true
+	end
+	if udef.floatOnWater then
+		floatOnWater[i] = true
 	end
 end
 
@@ -253,7 +261,7 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 		for i=1,#selUnits do
 			local unitID = selUnits[i]
 			local unitDefID = spGetUnitDefID(unitID)
-			if UnitDefs[unitDefID].isBuilder then
+			if unitDefID and isBuilder[unitDefID] then
 				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
 				if cmdQueue then
 					for i = 1, #cmdQueue do
@@ -294,11 +302,11 @@ local function HighlightPylons()
 end
 
 local function HighlightPlacement(unitDefID)
-	if not (unitDefID and UnitDefs[unitDefID]) then
+	if not unitDefID then
 		return
 	end
 	local mx, my = spGetMouseState()
-	local _, coords = spTraceScreenRay(mx, my, true, true, false, not UnitDefs[unitDefID].floatOnWater)
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, not floatOnWater[unitDefID])
 	if coords then
 		local radius = pylonDefs[unitDefID]
 		if (radius ~= 0) then
@@ -332,7 +340,7 @@ function widget:DrawWorldPreUnit()
 				for i=1,#selUnits do
 					local unitID = selUnits[i]
 					local unitDefID = spGetUnitDefID(unitID)
-					if UnitDefs[unitDefID].isBuilder then
+					if unitDefID and isBuilder[unitDefID] then
 						commandsCount = Spring.GetCommandQueue(unitID, 0)
 						break
 					end
