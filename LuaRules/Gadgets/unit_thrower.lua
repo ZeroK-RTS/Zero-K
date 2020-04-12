@@ -49,18 +49,18 @@ local FEATURE = 102
 local GROUND = 103
 local UNIT = 117
 
-local MIN_FLY_TIME = 120
-local MAX_FLY_TIME = 150
+local MIN_FLY_TIME = 125
+local MAX_FLY_TIME = 125
 
 local SPEED_MAX = 20 --9
 local SPEED_INT_WIDTH = 3
 -- Dart speed is 5.1.
 -- Normal launch speed is 9.9
 
-local RECENT_MAX = -1.45
+local RECENT_MAX = -1.15 -- Ensure that units that are still being accelerated sideways cannot be rethrown
 local RECENT_INT_WIDTH = 1
 
-local MAX_ALTITUDE_AIM = 400
+local MAX_ALTITUDE_AIM = 120
 
 local NO_BLOCK_TIME = 5
 
@@ -140,7 +140,7 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 		return false
 	end
 	local ndy = ty - ny
-	local flyTime = math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
+	local flyTime = MIN_FLY_TIME -- math.max(MIN_FLY_TIME, math.min(MAX_FLY_TIME, math.sqrt(math.abs(ndy))*10))
 	
 	local px, py, pz = odx/flyTime, flyTime*GRAVITY/2 + ndy/flyTime, odz/flyTime
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
@@ -199,7 +199,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
 			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
 				
-				--local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
+				local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
 				local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
 				local launchMult = speedMult
 				
@@ -343,6 +343,7 @@ local function UpdateTrajectory(unitID, data)
 			end
 		end
 		if data.sidewaysCounter <= 0 then
+			Spring.Echo("drag", data.drag)
 			data.sidewaysCounter = nil
 		end
 	end
