@@ -343,7 +343,6 @@ local function UpdateTrajectory(unitID, data)
 			end
 		end
 		if data.sidewaysCounter <= 0 then
-			Spring.Echo("drag", data.drag)
 			data.sidewaysCounter = nil
 		end
 	end
