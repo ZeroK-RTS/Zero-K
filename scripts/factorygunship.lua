@@ -1,7 +1,6 @@
 include "constants.lua"
 
 local beam1, beam2 = piece ('beam1', 'beam2')
-local door1, door2 = piece ('door1', 'door2')
 local post1, post2 = piece ('post1', 'post2')
 local nano1, nano2 = piece ('nano1', 'nano2')
 local base, pad = piece ('base', 'pad')
@@ -12,14 +11,6 @@ local smokePiece = { base }
 local function Open ()
 	Signal (1)
 	SetSignalMask (1)
-
-	Turn (door1, z_axis, math.rad(-90), math.rad(160))
-	Turn (door2, z_axis, math.rad( 90), math.rad(160))
-	WaitForTurn (door1, z_axis)
-
-	Move (door1, y_axis, -4.5, 7)
-	Move (door2, y_axis, -4.5, 7)
-	WaitForMove (door1, y_axis)
 
 	Move (post1, y_axis, 7, 21)
 	Move (post1, y_axis, 7, 21)
@@ -53,14 +44,6 @@ local function Close()
 	Move (post1, y_axis, 0, 21)
 	Move (post1, y_axis, 0, 21)
 	WaitForMove (post1, y_axis)
-
-	Move (door1, y_axis, 0, 7)
-	Move (door2, y_axis, 0, 7)
-	WaitForMove (door1, y_axis)
-
-	Turn (door1, z_axis, 0, math.rad(160))
-	Turn (door2, z_axis, 0, math.rad(160))
-	-- WaitForTurn (door1, z_axis)
 end
 
 function script.Create()
@@ -89,7 +72,7 @@ function script.QueryBuildInfo ()
 	return pad
 end
 
-local explodables = {nano1, nano2, post1, post2, door1, door2}
+local explodables = {nano1, nano2, post1, post2}
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
