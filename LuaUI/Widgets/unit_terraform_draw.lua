@@ -107,8 +107,10 @@ function widget:GameFrame(frame)
 			terraUnits[unitID].terraformType = terraformType
 		end
 		local blocked = Spring.GetUnitRulesParam(unitID, "terraform_enemy")
-		blocked = (blocked > -1 and blocked) or false
-		terraUnits[unitID].blocked = blocked
+		if blocked then
+			blocked = (blocked > -1 and blocked) or false
+			terraUnits[unitID].blocked = blocked
+		end
 	end
 end
 
