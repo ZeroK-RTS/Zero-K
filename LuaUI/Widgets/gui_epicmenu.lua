@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
-local CheckLUAFileAndBackup = VFS.Include("LuaUI/file_backups.lua", nil, VFS.Game)
+local CheckLUAFileAndBackup = VFS.Include("LuaUI/file_backups.lua", nil, VFS.GAME)
 
 --CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
 --1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
