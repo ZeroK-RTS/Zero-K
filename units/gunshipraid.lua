@@ -33,7 +33,7 @@ return { gunshipraid = {
   iconType               = [[gunshipraider]],
   idleAutoHeal           = 10,
   idleTime               = 150,
-  maxDamage              = 860,
+  maxDamage              = 800,
   maxVelocity            = 6.9,
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
@@ -57,7 +57,7 @@ return { gunshipraid = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 180,
+      maxAngleDif        = 150,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -88,8 +88,8 @@ return { gunshipraid = {
       },
 
       damage                  = {
-        default = 7.8,
-        subs    = 0.39,
+        default = 7.6,
+        subs    = 0.38,
       },
 
       explosionGenerator      = [[custom:flash1red]],
@@ -102,7 +102,7 @@ return { gunshipraid = {
       laserFlareSize          = 2,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 270,
+      range                   = 260,
       reloadtime              = 4/30,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/laser_burn9]],

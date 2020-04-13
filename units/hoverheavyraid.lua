@@ -76,7 +76,7 @@ return { hoverheavyraid = {
       craterMult              = 0,
   
       customParams            = {
-        timeslow_damagefactor = 4,
+        timeslow_damagefactor = 3,
         
         light_camera_height = 2000,
         light_color = [[0.85 0.33 1]],
