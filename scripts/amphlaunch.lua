@@ -117,6 +117,9 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	local height = spGetGroundHeight(x, z)
+	if height < -5 then
+		height = -5
+	end
 	if y - height > 12 then
 		local _, vy = Spring.GetUnitVelocity(unitID)
 		if y - vy*4 - height > 12 then
