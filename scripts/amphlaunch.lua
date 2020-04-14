@@ -22,7 +22,8 @@ local LEG_Z_SPEED = 1100 * 8/PERIOD
 local LEG_RAISE_DISPLACEMENT = 2
 local LEG_Y_SPEED = 1100 * LEG_RAISE_DISPLACEMENT/PERIOD * 2
 
-local unitDefID = Spring.GetUnitDefID(unitID)
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGetUnitPosition = Spring.GetUnitPosition
 
 local smokePiece = {pelvis, turret}
 
@@ -94,10 +95,10 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turretheading, y_axis, heading, 12)
+	Turn(turretheading, y_axis, heading, 24)
 	--Move(turretheading, y_axis, 1.5*math.abs(pitch), 3.5)
 	--Turn(turretpitch, x_axis, -pitch, 1.9)
-	WaitForTurn(turretheading, y_axis)
+	--WaitForTurn(turretheading, y_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
@@ -111,6 +112,17 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
+	local x, y, z = spGetUnitPosition(unitID)
+	if not x then
+		return true
+	end
+	local height = spGetGroundHeight(x, z)
+	if y - height > 12 then
+		local _, vy = Spring.GetUnitVelocity(unitID)
+		if y - vy*4 - height > 12 then
+			return true
+		end
+	end
 	local reloadTime = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")*30 -- Takes slow into account
 	local otherNum = 3 - num
 	local gameFrame = Spring.GetGameFrame()

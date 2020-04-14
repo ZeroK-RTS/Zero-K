@@ -60,7 +60,7 @@ local SPEED_INT_WIDTH = 3
 local RECENT_MAX = -1.15 -- Ensure that units that are still being accelerated sideways cannot be rethrown
 local RECENT_INT_WIDTH = 1
 
-local MAX_ALTITUDE_AIM = 120
+local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
 
