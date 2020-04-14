@@ -99,7 +99,7 @@ local function WriteTable(concatArray, tab, tabName, params)
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
 	local comma = params.raw and "" or ", "
-	local endLine = comma .. "\n"
+	local endLine = params.raw and "\n" or ",\n"
 	local str = ""
 	
 	local function NewLine()
