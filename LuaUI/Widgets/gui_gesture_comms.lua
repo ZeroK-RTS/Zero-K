@@ -26,7 +26,7 @@ options_path = 'Settings/Interface/Gesture Menus/Comms Menu'
 local local_options_order = {}
 local local_options = {}
 
-local menu_use = include("Configs/teamcomms_menu_menus.lua", nil, VFS.RAW_FIRST)
+local menu_use = VFS.Include("LuaUI/Configs/teamcomms_menu_menus.lua", nil, VFS.RAW_FIRST)
 
 local function GetMenuDefinition(keyboard, mouse_pos, world_pos)
 	if world_pos == nil then return nil end
