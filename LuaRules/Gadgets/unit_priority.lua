@@ -213,7 +213,6 @@ end
 -- The external gadget is then trusted to obey the proportion which
 -- they are allocated.
 local function GetMiscPrioritySpendScale(unitID, teamID, onlyEnergy)
-
 	if (teamMiscPriorityUnits[teamID] == nil) then
 		teamMiscPriorityUnits[teamID] = {}
 	end

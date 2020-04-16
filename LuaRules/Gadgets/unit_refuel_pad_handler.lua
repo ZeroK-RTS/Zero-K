@@ -121,22 +121,26 @@ local function GetBuildRate(unitID)
 	return spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1
 end
 
+local function ForceImmediateAbort(unitID, padID, isLanded)
+	if not spGetUnitIsDead(unitID) then
+		spSetUnitLeaveTracks(unitID, true)
+		if isLanded then
+			spSetUnitVelocity(unitID, 0, 0, 0)
+			GG.StopMiscPriorityResourcing(padID, miscPriorityKey)
+			-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
+			Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
+		end
+		mcDisable(unitID)
+		unitMovectrled[unitID] = nil
+		GG.UpdateUnitAttributes(unitID)
+	end
+	landingUnit[unitID] = nil
+	return true
+end
+
 local function AbortCheck(unitID, padID, isLanded)
 	if (not landingUnit[unitID]) or landingUnit[unitID].abort then
-		if not spGetUnitIsDead(unitID) then
-			spSetUnitLeaveTracks(unitID, true)
-			if isLanded then
-				spSetUnitVelocity(unitID, 0, 0, 0)
-				GG.StopMiscPriorityResourcing(padID, miscPriorityKey)
-				-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
-				Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
-			end
-			mcDisable(unitID)
-			unitMovectrled[unitID] = nil
-			GG.UpdateUnitAttributes(unitID)
-		end
-		landingUnit[unitID] = nil
-		return true
+		ForceImmediateAbort(unitID, padID, isLanded)
 	end
 	
 	return false
@@ -201,6 +205,10 @@ local function SitOnPad(unitID)
 				return
 			end
 			padTeamID = Spring.GetUnitTeam(landData.padID)
+			if not padTeamID then
+				ForceImmediateAbort(unitID, landData.padID, true)
+				return
+			end
 			
 			if landData.mobilePad then
 				local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
@@ -516,7 +524,8 @@ local function CircleToLand(unitID, goal)
 			end
 		end
 		
-		if not AbortCheck(unitID) then
+		if (not AbortCheck(unitID)) and landingUnit[unitID] then
+			
 			landingUnit[unitID].landed = true
 			SitOnPad(unitID)
 		end
