@@ -10,7 +10,7 @@ function widget:GetInfo()
     date      = "2020",
     license   = "public",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
