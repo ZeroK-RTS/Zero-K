@@ -473,7 +473,7 @@ end
 local function AimArm(heading, pitch, arm, hand, wait)
 	aiming = true
 	Turn(arm, x_axis, -pitch/2 - 0.7, ARM_SPEED_PITCH)
-	Turn(Stomach, z_axis, heading, TORSO_SPEED_YAW)
+	Turn(Breast, z_axis, heading, TORSO_SPEED_YAW)
 	Turn(hand, x_axis, -pitch/2 - 0.85, ARM_SPEED_PITCH)
 	if wait then
 		WaitForTurn(Stomach, z_axis)
