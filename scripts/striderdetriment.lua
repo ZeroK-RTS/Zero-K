@@ -18,16 +18,18 @@ local rightLeg = { thigh=piece'rupleg', knee=piece'rmidleg', shin=piece'rleg', f
 local smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
-	{larmflare1, larmflare2, larmflare3, rarmflare1, rarmflare2, rarmflare3},
-	{aaflare1, aaflare2},
-	{shoulderflare},
-	{headlaser1, headlaser2, headlaser3}
+	{larmflare1, larmflare2, larmflare3},	
+	{rarmflare1, rarmflare2, rarmflare3},		
+	{shoulderflare},	
+	{lfoot}
 }
-local barrels = {larmbarrel1, larmbarrel2, larmbarrel3, rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {torso, aaturret, shoulderflare, head}
+
+local barrelsL = {larmbarrel1, larmbarrel2, larmbarrel3}
+local barrelsR = {rarmbarrel1, rarmbarrel2, rarmbarrel3}
+local aimpoints = {larm, rarm, shoulderflare, lfoot}
 
 local gunIndex = {1,1,1,1}
-local gunFixEmit = {true, false, false, false}
+local gunFixEmit = {true, true, false, false}
 
 local gunFlareCount = {}
 for i = 1, #gunFlares do
@@ -72,9 +74,37 @@ local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(30) * PACE
 
 local isFiring = false
+local lgunpod_not_aimed = true
+local rgunpod_not_aimed = true
 
 local CHARGE_TIME = 60	-- frames
 local FIRE_TIME = 120
+
+
+
+local sp1 = 1.2
+local sp2 = 1
+local lf_angle = math.rad(25)
+local rf_angle = math.rad(-25)
+local lb_angle = math.rad(-65)
+local rb_angle = math.rad(65)
+
+local p_angle = -.3
+local th_angle = -.3
+local th_speed = 1.1
+local sh_angle = .4
+local sh_speed = 1
+local drop = .8
+
+local dirtfling = 1024
+local muzzle_flash = 1025
+local shells = 1026
+local muzzle_flash_large = 1027
+local muzzle_smoke_large = 1028
+local jetfeet = 1029
+local jetfeet_fire = 1030
+local crater = 4099 --Weapon 4
+
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
@@ -153,19 +183,19 @@ local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	
-	Move(torso, y_axis, 0, 100)
+	Move(torso, y_axis, 0, 1)
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 0, 2)
+		Turn(rightLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
 	end
-	Turn(pelvis, z_axis, 0, 1)
-	Turn(torso, x_axis, 0, 1)
+	Turn(pelvis, z_axis, 0, math.rad(30))
+	Turn(torso, x_axis, 0, math.rad(30))
 	if not(isFiring) then
-		Turn(torso, y_axis, 0, 4)
+		Turn(torso, y_axis, 0, math.rad(30))
 	end
-	Move(pelvis, y_axis, 0, 50)
-	Turn(rarm, x_axis, 0, 1)
-	Turn(larm, x_axis, 0, 1)
+	Move(pelvis, y_axis, 0, 1)
+	Turn(rarm, x_axis, 0, math.rad(30))
+	Turn(larm, x_axis, 0, math.rad(10))
 end
 
 function script.StartMoving()
@@ -176,15 +206,71 @@ function script.StopMoving()
 	StartThread(StopWalk)
 end
 
+-- Jumping
+
+local function BeginJumpThread()
+	Signal(SIG_Walk)	
+	EmitSfx(lfoot, jetfeet)
+	EmitSfx(rfoot, jetfeet)
+	local x,y,z = Spring.GetUnitPosition(unitID, true)	
+	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)	
+end
+
+local function EndJumpThread()
+	EmitSfx(lfoot, crater)	
+	Turn(torso, x_axis, -30, math.rad(500))
+	Turn(larm, x_axis,  math.rad(-60), math.rad(500))
+	Turn(rarm, x_axis,  math.rad(-60), math.rad(500))	
+	WaitForTurn(torso, x_axis)
+	WaitForTurn(larm, x_axis)
+	WaitForTurn(rarm, x_axis)
+	Sleep(200)
+	Turn(torso, x_axis, 0, math.rad(35))
+	Turn(larm, x_axis, 0, math.rad(35))
+	Turn(rarm, x_axis, 0, math.rad(35))
+	WaitForTurn(torso, x_axis)
+	WaitForTurn(larm, x_axis)
+	WaitForTurn(rarm, x_axis)
+end
+
+function preJump(turn,distance)
+	StartThread(StopWalk)	
+end
+
+function beginJump()	
+	StartThread(BeginJumpThread)
+end
+
+function jumping(jumpPercent)
+	if jumpPercent < 30 then
+		GG.PokeDecloakUnit(unitID, 50)
+		EmitSfx(lfoot, jetfeet_fire)
+		EmitSfx(rfoot, jetfeet_fire)				
+	end
+	
+	if jumpPercent > 95 and not landing then
+		landing = true		
+	end
+end
+
+
+function halfJump()
+end
+
+function endJump()
+	landing = false
+	StartThread(EndJumpThread)	
+end
+
 
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
-	Sleep(5000)
+	Sleep(2000)
 	Turn(head, y_axis, 0, 2)
-	Turn(torso, y_axis, 0, 1.5)
-	Turn(larm, x_axis, 0, 2)
-	Turn(rarm, x_axis, 0, 2)
+	Turn(torso, y_axis, 0, math.rad(70))
+	Turn(larm, x_axis, 0, math.rad(30))
+	Turn(rarm, x_axis, 0, math.rad(30))
 	Turn(shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
@@ -200,37 +286,32 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local SIG_AIM = 2^(num+1)
+	
 	isFiring = true
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
 	StartThread(RestoreAfterDelay)
 	
-	if num == 1 then
-		Turn(torso, y_axis, heading, math.rad(180))
-		Turn(larm, x_axis, -pitch, math.rad(120))
-		Turn(rarm, x_axis, -pitch, math.rad(120))
+	if num == 1 then  -- Left gunpod
+		lgunpod_not_aimed = true
+		Turn(torso, y_axis, heading, math.rad(140))
+		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))		
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
-	elseif num == 2 then
-		Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
-		Turn(aagun, x_axis, -pitch, math.rad(240))
-		WaitForTurn(aaturret, y_axis)
-		WaitForTurn(aagun, x_axis)
-	--elseif num == 3 then
-		--Turn(torso, y_axis, heading, math.rad(180))
-		--Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(270))
-		--WaitForTurn(torso, y_axis)
-		--WaitForTurn(shouldercannon, x_axis)
-	elseif num == 4 then
-		Turn(torso, y_axis, heading, math.rad(180))
+		lgunpod_not_aimed = false
+	elseif num == 2 then -- Right gunpod
+		rgunpod_not_aimed = true
+		Turn(torso, y_axis, heading, math.rad(140))		
+		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
+		WaitForTurn(torso, y_axis)
+		WaitForTurn(rarm, x_axis)	
+		rgunpod_not_aimed = false			
+	elseif num == 3 then
+		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
 	end
-	
-	if num ~= 2 then
-		lastTorsoHeading = heading
-	end
-	
+	lastTorsoHeading = heading
 	return true
 end
 
@@ -245,10 +326,22 @@ local function BumpGunNum(num, doSleep)
 end
 
 function script.Shot(num)
-	if num == 1 then
-		Move(barrels[gunIndex[1]], z_axis, -20)
-		Move(barrels[gunIndex[1]], z_axis, 0, 20)
+	-- Plasma Left
+	if num == 1 then		
+		EmitSfx(larmflare3, muzzle_smoke_large2)		
+		Move(barrelsL[gunIndex[1]], z_axis, -40)		
+		EmitSfx(larmflare3, muzzle_flash_large)
+		Move(barrelsL[gunIndex[1]], z_axis, 0, 15)
 	end
+	
+	-- Plasma right
+	if num == 2 then	
+		EmitSfx(rarmflare3, muzzle_smoke_large2)		
+		Move(barrelsR[gunIndex[2]], z_axis, -40)		
+		EmitSfx(rarmflare3, muzzle_flash_large)
+		Move(barrelsR[gunIndex[2]], z_axis, 0, 15)
+	end
+	
 	if gunFixEmit[num] then
 		StartThread(BumpGunNum, num, true)
 	else
@@ -257,20 +350,21 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num ~= 3 then
-		return false
+	if num == 1 and lgunpod_not_aimed then
+		return true
 	end
+	if num == 2 and rgunpod_not_aimed then
+		return true
+	end	
+	
 	if not targetID then
 		return false
 	end
+	
 	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
 		return true
 	end
-	-- Separation check is not required as the physics of the missile seems to result in a
-	-- time to impact of between 140 and 150 frames in almost all cases.
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
-		return true
-	end
+	
 	return false
 end
 
