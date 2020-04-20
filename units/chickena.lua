@@ -70,59 +70,6 @@ return { chickena = {
 
 
   weaponDefs          = {
-
-    AEROSPORES = {
-      name                    = [[Anti-Air Spores]],
-      areaOfEffect            = 24,
-      avoidFriendly           = false,
-      burst                   = 5,
-      burstrate               = 0.133,
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-      
-      customParams            = {
-        light_radius = 0,
-      },
-
-      damage                  = {
-        default = 80,
-        planes  = 80,
-        subs    = 8,
-      },
-
-      dance                   = 60,
-      explosionGenerator      = [[custom:NONE]],
-      fireStarter             = 0,
-      fixedlauncher           = 1,
-      flightTime              = 5,
-      groundbounce            = 1,
-      heightmod               = 0.5,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      metalpershot            = 0,
-      model                   = [[chickeneggblue.s3o]],
-      noSelfDamage            = true,
-      range                   = 600,
-      reloadtime              = 8,
-      smokeTrail              = true,
-      startVelocity           = 100,
-      texture1                = [[]],
-      texture2                = [[sporetrailblue]],
-      tolerance               = 10000,
-      tracks                  = true,
-      turnRate                = 24000,
-      turret                  = true,
-      waterweapon             = true,
-      weaponAcceleration      = 100,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 500,
-      wobble                  = 32000,
-    },
-
-
     WEAPON     = {
       name                    = [[Claws]],
       areaOfEffect            = 8,

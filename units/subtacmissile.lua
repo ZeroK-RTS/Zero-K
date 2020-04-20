@@ -51,59 +51,14 @@ return { subtacmissile = {
   workerTime             = 0,
 
   weapons                = {
-    --{
-    --  def = [[SUB_AMD_ROCKET]],
-    --},
-
     {
       def                = [[TACNUKE]],
       badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
-
   },
 
   weaponDefs             = {
-
-    SUB_AMD_ROCKET = {
-      name                    = [[Anti-Nuke Missile]],
-      areaOfEffect            = 420,
-      collideFriendly         = false,
-      coverage                = 1500,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 1500,
-        subs    = 75,
-      },
-
-      explosionGenerator      = [[custom:ANTINUKE]],
-      fireStarter             = 100,
-      flightTime              = 15,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      interceptor             = 1,
-      model                   = [[antinukemissile.s3o]],
-      noSelfDamage            = true,
-      range                   = 3000,
-      reloadtime              = 12,
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
-      startVelocity           = 400,
-      tolerance               = 4000,
-      tracks                  = true,
-      turnrate                = 65535,
-      waterWeapon             = true,
-      weaponAcceleration      = 400,
-      weaponTimer             = 1,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1300,
-    },
-
-
     TACNUKE        = {
       name                    = [[Tactical Nuke]],
       areaOfEffect            = 256,
