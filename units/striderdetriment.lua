@@ -146,51 +146,7 @@ return { striderdetriment = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
-    },
-	
-	CHAINGUN = {
-      name                    = [[Heavy Chaingun]],
-      accuracy                = 1500,
-      alphaDecay              = 0.7,
-      areaOfEffect            = 120,
-      burnblow                = true,     
-      craterBoost             = 0.8,
-      craterMult              = 2.2,
-
-      customParams        = {
-        light_camera_height = 1600,
-        light_color = [[0.8 0.76 0.38]],
-        light_radius = 450,
-      },
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 2.25,
-      },
-
-      edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:EMG_HIT_HE]],
-      firestarter             = 70,
-	  fireTolerance		      = 8192,	  
-      impulseBoost            = 500,
-      impulseFactor           = 0.4,
-      intensity               = 1.3,
-      interceptedByShieldType = 1,
-      noSelfDamage            = true,
-      range                   = 600,
-      reloadtime              = 0.2,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      soundHit                = [[weapon/cannon/emg_hit]],
-	  soundHitVolume          = 7,
-      soundStart              = [[weapon/sd_emgv7]],
-	  soundStartVolume        = 7,	  
-      stages                  = 10,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
-    },    
+    },	
 	
 	SNITCH_LAUNCHER = {
       name                    = [[Snitch Launcher]],
