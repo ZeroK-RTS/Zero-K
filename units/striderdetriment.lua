@@ -20,7 +20,7 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	canjump            = 1,
+	  canjump            = 1,
     jump_range         = 1500,
     jump_height        = 1000,
     jump_speed         = 12,
@@ -55,12 +55,12 @@ return { striderdetriment = {
   sfxtypes            = {
     explosiongenerators = {
       [[custom:sumosmoke]],
-	  [[custom:WARMUZZLE]],
+	    [[custom:WARMUZZLE]],
       [[custom:emg_shells_l]],
-	  [[custom:extra_large_muzzle_flash_flame]],
-	  [[custom:extra_large_muzzle_flash_smoke]],	  
-	  [[custom:vindiback_large]],
-	  [[custom:rocketboots_muzzle]],
+	    [[custom:extra_large_muzzle_flash_flame]],
+	    [[custom:extra_large_muzzle_flash_smoke]],	  
+	    [[custom:vindiback_large]],
+	    [[custom:rocketboots_muzzle]],
     },
   },
   
@@ -82,7 +82,7 @@ return { striderdetriment = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
     },	
 		
-	{
+	  {
       def                = [[PLASMA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -93,7 +93,7 @@ return { striderdetriment = {
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 	
-	{
+	  {
       def                = [[LANDING]],
       badTargetCategory  = [[]],
       mainDir            = [[1 0 0]],
@@ -109,7 +109,7 @@ return { striderdetriment = {
   
 	PLASMA  = {
       name                    = [[Heavy Plasma Impulse Cannon]],
-	  accuracy                = 2000,
+	    accuracy                = 2000,
       areaOfEffect            = 384,
       avoidFeature            = false,
       burnBlow                = true,	  
@@ -129,10 +129,10 @@ return { striderdetriment = {
 
       edgeEffectiveness       = 0.5,	  
       explosionGenerator      = [[custom:flashbigbuilding]],
-	  explosionSpeed          = 500,	  
+	    explosionSpeed          = 500,	  
       fireStarter             = 99,
       fireTolerance		      = 8192,  
-	  impulseBoost            = 3000,
+	    impulseBoost            = 3000,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
@@ -142,7 +142,7 @@ return { striderdetriment = {
       soundHit                = [[weapon/cannon/cannon_hit4]],
       soundHitVolume          = 15,
       soundStart              = [[weapon/cannon/heavy_cannon2]],
-	  soundStartVolume        = 16,      
+	    soundStartVolume        = 16,      
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
@@ -158,13 +158,11 @@ return { striderdetriment = {
       commandFire             = true, 
       craterBoost             = 2,
       craterMult              = 5,
-      
       customParams            = {
-	    burst = Shared.BURST_RELIABLE,        
-		
+	      burst = Shared.BURST_RELIABLE,
         light_color = [[0.65 0.65 0.18]],
         light_radius = 380,        
-		reaim_time = 8, -- COB
+		    reaim_time = 8, -- COB
       },
 
       damage                  = {
@@ -173,21 +171,21 @@ return { striderdetriment = {
       
       edgeEffectiveness  = 0.4,
       explosionGenerator = "custom:ROACHPLOSION",
-	  explosionSpeed     = 10000,
+	    explosionSpeed     = 10000,
       fireStarter             = 100,    
       highTrajectory		  = 1,
       impulseBoost            = 2,
       impulseFactor           = 2.8,
       interceptedByShieldType = 2,
       model                   = [[logroach.s3o]], 
-	  myGravity               = 0.095,
+	    myGravity               = 0.095,
       noSelfDamage            = true,         
       range                   = 1200,
       reloadtime              = 30,      
       soundHit           	  = "explosion/mini_nuke",
       soundStart              = [[weapon/cannon/pillager_fire]],
       soundStartVolume        = 25,
-	  sprayAngle              = 1000, 
+	    sprayAngle              = 1000, 
       tolerance               = 512,
       turret                  = true,   
       weaponType              = [[Cannon]],
@@ -207,7 +205,7 @@ return { striderdetriment = {
 
       edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:FLASH64]],
-	  explosionSpeed          = 500,
+	    explosionSpeed          = 500,
       impulseBoost            = 6000,
       impulseFactor           = 25,
       interceptedByShieldType = 1,
