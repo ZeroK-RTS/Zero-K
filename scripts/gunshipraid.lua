@@ -63,6 +63,10 @@ function script.FireWeapon(num)
 	Turn (ljet, x_axis, 0, math.rad(70))
 end
 
+function script.BlockShot(num)
+	return GetUnitValue(GG.Script.CRASHING) == 1
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if (severity <= .50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing")) then
