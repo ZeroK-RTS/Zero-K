@@ -633,6 +633,7 @@ local behaviourConfig = {
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
+		velocityPrediction = 20,
 	},
 	
 	["hoverscout"] = {
