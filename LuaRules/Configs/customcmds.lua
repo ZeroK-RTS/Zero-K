@@ -77,6 +77,7 @@ local cmds = {
 	RECALL_DRONES = 35300,
 	TOGGLE_DRONES = 35301,
 	ANTINUKEZONE = 35130, -- ceasefire
+	GOO_GATHER = 35646,
 	UNIT_KILL_SUBORDINATES = 35821, -- unit_capture
 	DISABLE_ATTACK = 35822, -- unit_launcher
 	PUSH_PULL = 35666, -- weapon_impulse
