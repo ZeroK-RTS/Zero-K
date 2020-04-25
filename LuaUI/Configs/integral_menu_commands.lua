@@ -10,6 +10,8 @@ local RIOT            = {order = 4, row = 1, col = 4}
 local ASSAULT         = {order = 5, row = 1, col = 5}
 local ARTILLERY       = {order = 6, row = 1, col = 6}
 
+-- note: row 2 column 1 purposefully skipped, since
+-- that allows giving facs Attack orders via hotkey
 local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
 local ANTI_AIR        = {order = 8, row = 2, col = 3}
 local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
