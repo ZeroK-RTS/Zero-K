@@ -79,6 +79,11 @@
 		"description" : "Fast Attack Hovercraft",
 		"helptext" : "The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets."
 	},
+	"hoverheavyraid" : {
+		"name" : "Bolas",
+		"description" : "Disruptor Hovercraft",
+		"helptext" : "The Bolas is a heavy raider hovercraft armed with a rapid-fire disruptor beam. While its damage output is quite noticeable, it works even better alongside Maces or Scalpels to hit the slowed-down enemies harder."
+	},
 	"chicken_digger" : {
 		"name" : "Digger",
 		"description" : "Burrowing Scout/Raider",
