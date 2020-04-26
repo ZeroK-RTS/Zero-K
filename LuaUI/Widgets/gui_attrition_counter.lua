@@ -488,7 +488,7 @@ function CreateWindow()
 		minHeight = 65,
 		maxHeight = 65,
 		minWidth = 250,
-		draggable = true,
+		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
