@@ -1,7 +1,7 @@
 include "constants.lua"
 include "pieceControl.lua"
 
-local base, base2, sleeve, body, turret, firepoint, wake1, wake2, platform = piece ('base', 'bas2', 'sleeve', 'body', 'turret', 'firepoint', 'wake1', 'wake2', 'platform')
+local hull, torp, turret, sonar, wake1, wake2 = piece ('Hull', 'Torp', 'Turret', 'Sonar', 'Wake1', 'Wake2')
 
 local SIG_Move = 1
 local SIG_Aim = 2
@@ -39,6 +39,14 @@ function script.StartMoving()
 	moving = true
 end
 
+function script.Activate()
+	Spin(sonar, y_axis, math.rad(60))
+end
+
+function script.Deactivate()
+	StopSpin(sonar, y_axis)
+end
+
 local function StunThread ()
 	disarmed = true
 	Signal (SIG_Aim)
@@ -64,7 +72,7 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(GG.Script.SmokeUnit, unitID, {sleeve, turret})
+	StartThread(GG.Script.SmokeUnit, unitID, {hull, sonar, turret})
 end
 
 function script.AimFromWeapon(id)
@@ -72,7 +80,7 @@ function script.AimFromWeapon(id)
 end
 
 function script.QueryWeapon(id)
-	return firepoint
+	return torp
 end
 
 function script.AimWeapon(id, heading, pitch)
@@ -99,7 +107,7 @@ function script.BlockShot(num, targetID)
 	return false
 end
 
-local explodables = {base2, sleeve, turret}
+local explodables = {hull, sonar, turret}
 function script.Killed(severity, health)
 	severity = severity / health
 
