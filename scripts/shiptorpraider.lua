@@ -107,7 +107,7 @@ function script.BlockShot(num, targetID)
 	return false
 end
 
-local explodables = {hull, sonar, turret}
+local explodables = {sonar, turret}
 function script.Killed(severity, health)
 	severity = severity / health
 
@@ -120,7 +120,7 @@ function script.Killed(severity, health)
 	if severity <= 0.5 then
 		return 1
 	else
-		-- no shatter because 3do models are gebork
+		Explode (hull, SFX.SHATTER)
 		return 2
 	end
 end
