@@ -5,5 +5,3 @@ return {
 	tex1 = "Hunter1.dds",
 	tex2 = "Hunter2.dds",
 }
-
-return boat
