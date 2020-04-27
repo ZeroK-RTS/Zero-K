@@ -1,4 +1,4 @@
-boat = {
+return {
 	radius = 50.00,
 	height = 35.00,
 	midpos = {0.00, 0.00, 0.00},
