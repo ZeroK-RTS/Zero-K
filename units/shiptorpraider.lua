@@ -127,7 +127,7 @@ return { shiptorpraider = {
 
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[shiptorpraider_dead.s3o]],
+      object           = [[Hunter_d.dae]],
     },
 
 
