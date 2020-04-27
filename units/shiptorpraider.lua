@@ -38,7 +38,7 @@ return { shiptorpraider = {
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
-  objectName          = [[Hunter.dae]],
+  objectName          = [[shiptorpraider.dae]],
   script              = [[shiptorpraider.lua]],
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 560,
@@ -127,7 +127,7 @@ return { shiptorpraider = {
 
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[Hunter_d.dae]],
+      object           = [[shiptorpraider_dead.dae]],
     },
 
 
