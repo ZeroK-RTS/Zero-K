@@ -79,6 +79,8 @@ end
 backgrounds = {
 --// stuff that needs hardcoding
   {check={name="shipcarrier"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
+  {check={name="shipscout"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
+
 
   
 --[[terraforms
