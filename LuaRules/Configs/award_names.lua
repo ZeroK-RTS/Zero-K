@@ -3,7 +3,6 @@ return {
 	navy    = 'Fleet Admiral',
 	air     = 'Airforce General',
 	nux     = 'Apocalyptic Achievement Award',
-	friend  = 'Friendly Fire Award',
 	shell   = 'Turtle Shell',
 	fire    = 'Master Grill-Chef',
 	emp     = 'EMP Wizard',

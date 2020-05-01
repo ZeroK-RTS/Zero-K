@@ -59,7 +59,6 @@ local veryEasyFactor = 0.3
 local empFactor     = veryEasyFactor*4
 local reclaimFactor = veryEasyFactor*0.2 -- wrecks aren't guaranteed to leave more than 0.2 of value
 
-local minFriendRatio = 0.25
 local minReclaimRatio = 0.15
 
 local awardAbsolutes = {
@@ -325,21 +324,6 @@ local function ProcessAwardData()
 		if awardType == 'vet' then
 			maxVal = expUnitExp
 			winningTeam = expUnitTeam
-		elseif awardType == 'friend' then
-
-			maxVal = 0
-			for team,dmg in pairs(data) do
-
-				--local totalDamage = dmg+damageList[team]
-				local totalDamage = dmg + awardData.pwn[team]
-				local damageRatio = totalDamage>0 and dmg/totalDamage or 0
-
-				if damageRatio > maxVal then
-					winningTeam = team
-					maxVal = damageRatio
-				end
-			end
-
 		else
 			winningTeam, maxVal = getMaxVal(data)
 
@@ -378,8 +362,6 @@ local function ProcessAwardData()
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
 					message = 'Reclaimed value: ' .. maxValWrite
-				elseif awardType == 'friend' then
-					message = 'Damage inflicted on allies: '.. floor(maxVal * 100) ..'%'
 				elseif awardType == 'mex' then
 					message = 'Mexes built: '.. maxVal
 				elseif awardType == 'mexkill' then
@@ -560,11 +542,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local ud = UnitDefs[unitDefID]
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
-	if spAreTeamsAllied(attackerTeam, unitTeam) then
-		if not paralyzer then
-			AddAwardPoints( 'friend', attackerTeam, costdamage )
-		end
-	else
+	if not spAreTeamsAllied(attackerTeam, unitTeam) then
 		if paralyzer then
 			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		else
