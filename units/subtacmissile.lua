@@ -47,7 +47,7 @@ return { subtacmissile = {
   turninplace            = 0,
   turnRate               = 307,
   upright                = true,
-  waterline              = 25,
+  waterline              = 55,
   workerTime             = 0,
 
   weapons                = {
