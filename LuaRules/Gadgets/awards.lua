@@ -487,6 +487,12 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	end
 end
 
+-- wtf, why does each shitty chicken get to have its own award?
+local    chicken_dragonDefID = UnitDefNames.chicken_dragon   .id
+local chickenflyerqueenDefID = UnitDefNames.chickenflyerqueen.id
+local  chickenlandqueenDefID = UnitDefNames.chickenlandqueen .id
+local             roostDefID = UnitDefNames.roost            .id
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	local experience = spGetUnitExperience(unitID)
 	if experience > expUnitExp and (experience*UnitDefs[unitDefID].metalCost > 1000) then
@@ -510,16 +516,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			AddAwardPoints( 'mexkill', killerTeam, 1 )
 		end
 	else
-		local ud = UnitDefs[unitDefID]
-		if (ud.customParams.dynamic_comm and (not spAreTeamsAllied(killerTeam, unitTeam))) then
+		if (comms[unitDefID] and (not spAreTeamsAllied(killerTeam, unitTeam))) then
 			AddAwardPoints( 'head', killerTeam, 1 )
-		elseif ud.name == "chicken_dragon" then
+		elseif unitDefID == chicken_dragonDefID then
 			AddAwardPoints( 'dragon', killerTeam, 1 )
-		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
+		elseif unitDefID == chickenflyerqueenDefID or unitDefID == chickenlandqueenDefID then
 			for killerFrienz, _ in pairs(awardData['heart']) do --give +1000000000 points for all frienz that kill queen and won
 				AddAwardPoints( 'heart', killerFrienz, awardAbsolutes['heart']) --the extra points is for id purpose. Will deduct later
 			end
-		elseif ud.name == "roost" then
+		elseif unitDefID == roostDefID then
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
 		end
 	end
@@ -539,14 +544,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		or (attackerTeam == gaiaTeamID)
 		then return end
 
-	local ud = UnitDefs[unitDefID]
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
 	if not spAreTeamsAllied(attackerTeam, unitTeam) then
 		if paralyzer then
 			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		else
-			if ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
+			if unitDefID == chickenflyerqueenDefID or unitDefID == chickenlandqueenDefID then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
 			local ad = UnitDefs[attackerDefID]
