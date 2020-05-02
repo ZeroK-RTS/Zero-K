@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		author    = "Google Frog",
 		date      = "12 Janurary 2018",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = -1,
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -266,7 +266,13 @@ local function BlockAttackToggle(unitID, cmdParams)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_DISABLE_ATTACK] = true, [CMD_ATTACK] = true, [CMD_INSERT] = true}
+	return {
+		[CMD_DISABLE_ATTACK] = true,
+		[CMD_ATTACK] = true,
+		[CMD_INSERT] = true,
+		[CMD_UNIT_SET_TARGET] = true,
+		[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+	}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -278,7 +284,11 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD_ATTACK) or (cmdID == CMD_INSERT and cmdParams and cmdParams[2] == CMD_ATTACK) then
+	if (cmdID == CMD_INSERT and cmdParams and cmdParams[2]) then
+		cmdID = cmdParams[2]
+	end
+	
+	if (cmdID == CMD_ATTACK) or (cmdID == CMD_UNIT_SET_TARGET) or (cmdID == CMD_UNIT_SET_TARGET_CIRCLE) then
 		local data = throwUnits.Get(unitID)
 		if (data and data.blockAttack) then
 			return false  -- command was used
