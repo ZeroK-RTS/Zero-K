@@ -23,6 +23,7 @@ return { gunshipheavyskirm = {
   customParams        = {
     airstrafecontrol = [[0]],
     modelradius    = [[10]],
+    lookahead = 300,
   },
 
   explodeAs           = [[GUNSHIPEX]],

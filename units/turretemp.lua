@@ -16,9 +16,10 @@ return { turretemp = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-
     aimposoffset   = [[0 10 0]],
     modelradius    = [[16]],
+
+    lookahead    = 300,
   },
 
   damageModifier                = 0.25,

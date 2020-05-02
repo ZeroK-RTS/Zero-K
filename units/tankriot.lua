@@ -19,6 +19,8 @@ return { tankriot = {
   customParams        = {
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
+
+    lookahead         = 300,
   },
 
   explodeAs           = [[BIG_UNITEX]],

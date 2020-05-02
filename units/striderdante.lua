@@ -13,8 +13,9 @@ return { striderdante = {
   canPatrol           = true,
   category            = [[LAND]],
   corpse              = [[DEAD]],
-  
+
   customParams        = {
+    lookahead = 300,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
