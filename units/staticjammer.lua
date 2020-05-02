@@ -29,7 +29,7 @@ return { staticjammer = {
     area_cloak_radius = 550,
     area_cloak_decloak_distance = 75,
 
-    priority_misc = 2, -- High
+    priority_misc  = 1, -- High
     addfight       = 1,
     addpatrol      = 1,
   },

@@ -21,7 +21,7 @@ return { cloakjammer = {
     area_cloak_radius = 440,
     area_cloak_decloak_distance = 75,
     
-    priority_misc = 2, -- High
+    priority_misc = 1, -- High
     cus_noflashlight = 1,
   },
 
