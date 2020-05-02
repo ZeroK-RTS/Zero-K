@@ -128,7 +128,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Prevent Overkill", "Fire at anything"}
+	params 	= {0, "Fire at anything", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
