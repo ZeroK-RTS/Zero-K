@@ -296,13 +296,6 @@ local explodableFull = Union(
 	medRangeExplodables
 )))
 
-for name, data in pairs(UnitDefNames) do -- avoid factory death explosions.
-	if string.match(name, "factory") or string.match(name, "hub") then
-		shortRangeExplodables[data.id] = true
-		medRangeExplodables[data.id] = true
-	end
-end
-
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
