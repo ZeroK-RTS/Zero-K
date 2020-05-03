@@ -16,7 +16,11 @@ function gadget:GetInfo()
     enabled   = true,
   }
 end
-local lookaheadUnitDefs = include("LuaRules/Configs/target_lookahead_defs.lua")
+
+local lookaheadUnitDefs = {}
+for i=1,#UnitDefs do
+	lookaheadUnitDefs[i] = UnitDefs[i].customParams.lookahead
+end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	local lookahead = lookaheadUnitDefs[unitDefID]
