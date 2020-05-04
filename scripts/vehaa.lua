@@ -20,6 +20,9 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
+local MAX_STEER = math.rad(25)
+local STEER_MULT = 3.5
+local STEER_RATE_MAX = math.rad(235)
 local SUSPENSION_BOUND = 7
 local WHEEL_TURN_MULT = 1.2
 local ANIM_PERIOD = 50
@@ -27,7 +30,11 @@ local ANIM_PERIOD = 50
 local smokePiece = {turret, body}
 local moving, wheelTurnSpeed
 
+local lastHeading = 0
 local turnTilt = 0
+local lastSteer = 0
+local steerRate = 0
+local steer = 0
 
 local SETTLE_PERIODS = 15
 local settleTimer = 0
@@ -72,34 +79,35 @@ function StartMoving()
 	Spin(lwheel2, x_axis, wheelTurnSpeed)
 end
 
+local function UpdateAnimControl()
+	local currHeading, diffHeading, turnAngle
 
-local function AnimControl()
-	Signal(SIG_ANIM)
-	SetSignalMask(SIG_ANIM)
-	
-	local lastHeading, currHeading, diffHeading, turnAngle
-	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
-	while true do
-	
-		--pivot
-		currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
-		diffHeading = (currHeading - lastHeading)
-		
-		-- Fix wrap location
-		if diffHeading > math.pi then
-			diffHeading = diffHeading - 2*math.pi
-		end
-		if diffHeading < -math.pi then
-			diffHeading = diffHeading + 2*math.pi
-		end
-		
-		-- Bound maximun pivot
-		turnAngle = diffHeading
-		
-		turnTilt = -turnAngle*0.007
-		lastHeading = currHeading
-		Sleep(ANIM_PERIOD)
+	--pivot
+	currHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
+	diffHeading = (currHeading - lastHeading)
+
+	-- Fix wrap location
+	if diffHeading > math.pi then
+		diffHeading = diffHeading - 2*math.pi
 	end
+	if diffHeading < -math.pi then
+		diffHeading = diffHeading + 2*math.pi
+	end
+
+	steer = STEER_MULT * diffHeading
+	steer = math.min(MAX_STEER, math.max(-MAX_STEER, steer))
+
+	steerRate = STEER_RATE_MAX
+	if math.abs(steer) > math.abs(lastSteer) then
+		steerRate = STEER_RATE_MAX / 2
+	end
+
+	-- Bound maximun pivot
+	turnAngle = diffHeading
+
+	turnTilt = -turnAngle*0.007
+	lastHeading = currHeading
+	lastSteer = steer
 end
 
 function Suspension()
@@ -110,6 +118,7 @@ function Suspension()
 	local ztilt, ztiltv, ztilta = 0, 0, 0
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
+	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
 	
 	while true do
 		speed = select(4,spGetUnitVelocity(unitID))
@@ -130,7 +139,8 @@ function Suspension()
 		elseif settleTimer < SETTLE_PERIODS then
 			settleTimer = settleTimer + 1
 		end
-		
+
+		UpdateAnimControl()
 		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
 			x,y,z = spGetUnitPosition(unitID)
 			height = spGetGroundHeight(x,z)
@@ -152,6 +162,9 @@ function Suspension()
 				ya = (s1r + s2r + s1l + s2l)/1000
 				yv = yv*0.99 + ya
 				yp = yp*0.98 + yv
+
+				Turn(rwheel1, y_axis, steer, steerRate)
+				Turn(lwheel1, y_axis, steer, steerRate)
 
 				Move(rockbase, y_axis, yp, 9000)
 				--Turn(rockbase, x_axis, xtilt, math.rad(9000))
@@ -176,7 +189,6 @@ end
 function script.Create()
 	moving = false
 	StartThread(Suspension)
-	StartThread(AnimControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
