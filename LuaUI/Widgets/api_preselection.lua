@@ -69,8 +69,8 @@ local function SafeTraceScreenRay(x, y, onlyCoords, useMinimap, includeSky, igno
 			camRot = {rx=math_pi/2 - math_acos(cs.dy),ry=ry,rz=0}
 		end
 		local vsx, vsy = Spring.GetViewGeometry()
-		local x, y, z = TraceCursorToGround(vsx, vsy, {x=x, y=y}, cs.fov, camPos, camRot, -4900)
-		pt = {x, y, z}
+		local gx, gy, gz = TraceCursorToGround(vsx, vsy, {x=x, y=y}, cs.fov, camPos, camRot, -4900)
+		pt = {gx, gy, gz}
 		type = "ground"
 	end
 	return type, pt

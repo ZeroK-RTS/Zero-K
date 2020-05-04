@@ -1510,8 +1510,8 @@ local function HasDoubleCommand(unitID, cmdID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local cmdID = Spring.GetUnitCurrentCommand(unitID)
-			return cmdID == CMD.WAIT
+			local currCmdID = Spring.GetUnitCurrentCommand(unitID)
+			return currCmdID == CMD.WAIT
 		end
 	end
 	return false
