@@ -914,11 +914,6 @@
 		"description" : "Anti-Air Frigate",
 		"helptext" : "With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
 	},
-	"shiptransport" : {
-		"name" : "Surfboard",
-		"description" : "Transport Platform",
-		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
-	},
 	"shipheavyarty" : {
 		"name" : "Shogun",
 		"description" : "Battleship (Heavy Artillery)",

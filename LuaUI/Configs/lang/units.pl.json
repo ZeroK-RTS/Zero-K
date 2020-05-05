@@ -909,11 +909,6 @@
 		"description" : "Fregata przeciwlotnicza",
 		"helptext" : "Zapewnia flocie ochronę przed wrogim lotnictwem przy użyciu podwójych działek laserowych."
 	},
-	"shiptransport" : {
-		"name" : "Surfboard",
-		"description" : "Statek transportowy",
-		"helptext" : "Surfboard jest statkiem transportowym; jednostki, które przewozi, mogą strzelać w trakcie przewozu."
-	},
 	"shipheavyarty" : {
 		"name" : "Shogun",
 		"description" : "Ciężki pancernik artyleryjski",

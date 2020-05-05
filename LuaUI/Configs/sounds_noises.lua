@@ -1115,7 +1115,6 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	-- Transport boat doesn't have one by design.
 	
 	-- Economy
 	staticmex = {

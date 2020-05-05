@@ -181,7 +181,6 @@ AddMiscCategory("wacky", {
 	"comm_campaign_isonade",
 	"neebcomm",
 	"rocksink",
-	"shiptransport",
 	"starlight_satellite",
 })
 
