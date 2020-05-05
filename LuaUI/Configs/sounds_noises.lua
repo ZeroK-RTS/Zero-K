@@ -32,14 +32,6 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	cormine1 = {
-		ok = {
-			[1] = "light_bot_move",
-		},
-		select = {
-			[1] = "crawlie_select",
-		},
-	},
 	corcom = {
 		build = "builder_start",
 		ok = {
@@ -534,14 +526,6 @@ local sounds = {
 	},
 	
 	-- Mech
-	armraz = {
-		ok = {
-			[1] = "heavy_bot_move",
-		},
-		select = {
-			[1] = "heavy_bot_move",
-		},
-	},
 	striderdante = {
 		ok = {
 			[1] = "heavy_bot_move",
@@ -698,14 +682,6 @@ local sounds = {
 		},
 	},
 	tankraid = {
-		ok = {
-			[1] = "light_tank_move2",
-		},
-		select = {
-			[1] = "tank_select",
-		},
-	},
-	core_egg_shell  = {
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -1187,11 +1163,6 @@ local sounds = {
 			[1] = "building_select2",
 		},
 	},
-	corestor = {
-		select = {
-			[1] = "fusion_select",
-		},
-	},
 	staticcon = {
 		build = "builder_start",
 		select = {
@@ -1274,18 +1245,6 @@ local sounds = {
 	},
 	
 	-- Intel
-	--[[
-	staticradar = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	staticheavyradar = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	--]]
 	staticsonar = {
 		select = {
 			[1] = "sonar_select",
@@ -1302,11 +1261,6 @@ local sounds = {
 		},
 	},
 	
-	staticshield = {
-		select = {
-			[1] = "shield_select",
-		},
-	},
 	shieldshield = {
 		ok = {
 			[1] = "bot_move",
@@ -1445,14 +1399,6 @@ local sounds = {
 	
 	-- Air Turrets
 	turretmissile = {
-		ok = {
-			[1] = "turret_move",
-		},
-		select = {
-			[1] = "light_turret_select",
-		},
-	},
-	corraz = {
 		ok = {
 			[1] = "turret_move",
 		},
