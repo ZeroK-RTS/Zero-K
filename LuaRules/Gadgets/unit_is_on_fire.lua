@@ -90,6 +90,11 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local fireproof = {}
+for i = 1, #UnitDefs do
+	fireproof[i] = (UnitDefs[i].customParams.fireproof == "1")
+end
+
 local unitsOnFire = {}
 local inWater = {}
 local inGameFrame = false
@@ -129,7 +134,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
-	if UnitDefs[unitDefID].customParams.fireproof == "1" then
+	if fireproof[unitDefID] then
 		return
 	end
 
