@@ -493,6 +493,7 @@ end
 --- Returns:
 --- - hotkeys: Table[state_name, value_text], nil if action cannot be found or action has no states; value_text is
 ---   "(none)" if a hotkey is not set
+--- - n: Integer - number of hotkeys that are set, nil under same conditions as for hotkeys
 local function GetHotkeysForStatesText(action_name)
 	local action = custom_cmd_actions[action_name]
 	if not action then return nil end
@@ -502,18 +503,24 @@ local function GetHotkeysForStatesText(action_name)
 	local n = 0
 	for state_idx = 1, #states do
 		local hotkey = WG.crude.GetHotkey(action_name .. " " .. (state_idx - 1))
-		if not hotkey or hotkey == '' then hotkey = "(none)" end
+		if not hotkey or hotkey == '' then
+			hotkey = "(none)"
+		else
+			n = n + 1
+		end
 		hotkeys[states[state_idx]] = hotkey
-		n = n + 1
 	end
-	return hotkeys
+	return hotkeys, n
 end
 
 local function GetActionHotkey(actionName)
 	return WG.crude.GetHotkey(actionName)
 end
 
+--- Combines the information about the command, its state and hotkeys
 local function GetButtonTooltip(displayConfig, command, state)
+	local SEP = "\n  "
+	
 	local tooltip = displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
 	if not tooltip then
 		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
@@ -523,23 +530,14 @@ local function GetButtonTooltip(displayConfig, command, state)
 	end
 	if command and command.action then
 		local hotkey_for_toggle = GetHotkeyText(command.action)
-		local hotkeys_for_states = GetHotkeysForStatesText(command.action)
-		local sep = "\n  "
-		if hotkeys_for_states then -- long list
-			tooltip = tooltip .. sep .. "Hotkeys:"
-		end
+		local hotkeys_for_states, states_n = GetHotkeysForStatesText(command.action)
 		if hotkey_for_toggle then
-			local prefix, suffix = "", ""
-			if hotkeys_for_states then -- long list
-				prefix = sep .. GetGreenStr("Toggle: ")
-			else -- short form
-				prefix, suffix = " (", ")"
-			end
-			tooltip = tooltip .. prefix .. GetGreenStr(hotkey_for_toggle) .. suffix
+			tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
 		end
-		if hotkeys_for_states then
+		if hotkeys_for_states and states_n > 0 then
+			tooltip = tooltip .. SEP .. "State Hotkeys:"
 			for state_name, hotkey in pairs(hotkeys_for_states) do
-				tooltip = tooltip .. sep .. GetGreenStr(state_name .. ": " .. hotkey)
+				tooltip = tooltip .. SEP .. GetGreenStr(state_name .. ": " .. hotkey)
 			end
 		end
 	end
