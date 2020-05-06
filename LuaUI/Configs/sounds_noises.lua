@@ -2,14 +2,6 @@
 
 local sounds = {
 	-- Misc
-	default = {
-		ok = {
-			[1] = "light_bot_move",
-		},
-		select = {
-			[1] = "light_bot_select",
-		},
-	},
 	staticrearm = {
 		select = {
 			[1] = "building_select1",

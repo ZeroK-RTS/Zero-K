@@ -165,7 +165,7 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 	if unitID then
 		local unitDefID = GetUnitDefID(unitID)
 		local unitName = UnitDefs[unitDefID].name
-		local sounds = soundTable[unitName] or soundTable[default]
+		local sounds = soundTable[unitName]
 		if not isBuild then
 			if (sounds and sounds.ok) then
 				CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, sounds.ok.volume)
@@ -182,7 +182,7 @@ local function PlayResponse(unitID, cmdID, cooldown)
 		return false
 	end
 	local unitName = UnitDefs[unitDefID].name
-	local sounds = soundTable[unitName] or soundTable[default]
+	local sounds = soundTable[unitName]
 	if cmdID and (CMD[cmdID] or widgetCMD[cmdID] or cmdID > 0) then
 		if (sounds and sounds.ok) then
 			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
@@ -217,7 +217,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 	if (unitTeam == myTeamID) and damage > 1 then
 		local unitDefID = GetUnitDefID(unitID)
 		local unitName = UnitDefs[unitDefID].name
-		local sounds = soundTable[unitName] or soundTable[default]
+		local sounds = soundTable[unitName]
 		if sounds and sounds.underattack and sounds.underattack[1] and (sounds.attackonscreen or not spInView(unitID)) then
 			if sounds.attackdelay and WG.ModularCommAPI.IsStarterComm and WG.ModularCommAPI.IsStarterComm(unitID) then
 				local health, maxhealth = spGetUnitHealth(unitID)
