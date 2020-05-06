@@ -81,6 +81,7 @@ local unitIsBomber = {
 	[UnitDefNames["bomberriot"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
 	[UnitDefNames["bomberdisarm"].id] = true,
+	[UnitDefNames["bomberstrike"].id] = true,
 }
 
 -- Hardcode things which do high burst damage with a long cooldown
