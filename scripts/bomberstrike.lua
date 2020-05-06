@@ -1,5 +1,6 @@
 include "constants.lua"
 include "bombers.lua"
+include "fixedwingTakeOff.lua"
 
 local fuselage = piece 'fuselage'
 local wingl = piece 'wingl'
@@ -20,12 +21,18 @@ local bombr = piece 'bombr'
 
 local bFirepoint1 = false
 local bFirepoint2 = false
+
+local SIG_TAKEOFF = 1
+local takeoffHeight = UnitDefNames["bomberstrike"].wantedHeight
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function script.Create()
-	Turn(turret, y_axis, math.pi)
+	SetInitialBomberSettings()
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(GG.Script.SmokeUnit, unitID, {piece 'wingtipl', piece 'wingtipr', head})
+	Turn(turret, y_axis, math.pi)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
 	Hide(turretbase)
@@ -36,14 +43,15 @@ function script.Create()
 	Hide(barrelr)
 end
 
-function script.Activate()
+function script.StartMoving()
 	Move(wingl, x_axis, 0, 7)
 	Move(wingr, x_axis, 0, 7)
 end
 
-function script.Deactivate()
+function script.StopMoving()
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
+	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function RestoreAfterDelay()
@@ -114,6 +122,18 @@ end
 
 function script.AimFromWeapon(num)
 	return bFirepoint2 and flarel or flarer
+end
+
+function script.BlockShot(num, targetID)
+	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, 900, 140, 0.7, false, false) then
+                -- Remove attack command on blocked target, it's already dead so move on.
+                local cQueue = Spring.GetCommandQueue(unitID, 1)
+                if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
+                        Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
+                end
+                return true
+        end
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 900, 140, 0.7, false, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

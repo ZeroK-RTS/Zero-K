@@ -85,6 +85,7 @@ local units = {
 		planecon = CONSTRUCTOR,
 		planefighter = RAIDER,
 		bomberriot = RIOT,
+		bomberstrike = SKIRMISHER,
 		-- No Plane Artillery
 		planeheavyfighter = WEIRD_RAIDER,
 		planescout = UTILITY,
