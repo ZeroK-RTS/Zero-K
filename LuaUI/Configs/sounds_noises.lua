@@ -1502,51 +1502,40 @@ local sounds = {
 	
 }
 
-for udid, ud in pairs(UnitDefs) do
-	if ud.customParams then
-		if ud.customParams.soundok then
-			if sounds[ud.name] then
-				sounds[ud.name].ok = {[1] = ud.customParams.soundok}
-			else
-				sounds[ud.name] = {ok = {[1] = ud.customParams.soundok}}
-			end
-		end
-		if ud.customParams.soundselect then
-			if sounds[ud.name] then
-				sounds[ud.name].select = {[1] = ud.customParams.soundselect}
-			else
-				sounds[ud.name] = {select = {[1] = ud.customParams.soundselect}}
-			end
-		end
-		if ud.customParams.soundbuild then
-			if sounds[ud.name] then
-				sounds[ud.name].build = ud.customParams.soundbuild
-			else
-				sounds[ud.name] = {build = ud.customParams.soundbuild}
-			end
-		end
+local function applyCustomParamSound(soundDef, soundName, customParams)
+	local sound = customParams["sound" .. soundName]
+	if not sound then
+		return soundDef
 	end
+
+	soundDef = soundDef or {}
+	soundDef[soundName] = { sound }
+	return soundDef
 end
 
 local commanderUnderAttack = "alarm"
-
-for udid, ud in pairs(UnitDefs) do
-	if ud.customParams.commtype then
-		if sounds[ud.name] then
-			sounds[ud.name].underattack = {[1] = commanderUnderAttack, volume = 0.8}
-			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end
-			sounds[ud.name].attackonscreen = true
-			sounds[ud.name].volume = 0.6
-		else
-			sounds[ud.name] = {
-				underattack = {[1] = commanderUnderAttack, volume = 0.4},
-				attackDelay = function(hp) return 20*hp+2 end,
-				attackonscreen = true,
-			}
-		end
+local function applyCommanderSound(soundDef, customParams)
+	if not customParams.commtype then
+		return soundDef
 	end
+
+	soundDef = soundDef or {}
+	soundDef.underattack = {[1] = commanderUnderAttack, volume = 0.8}
+	soundDef.attackdelay = function(hp) return 20*hp+2 end
+	soundDef.attackonscreen = true
+	soundDef.volume = 0.6
+	return soundDef
 end
 
+for udid, ud in pairs(UnitDefs) do
+	local soundDef = sounds[ud.name]
+	local cp = ud.customParams
+	soundDef = applyCustomParamSound(soundDef, "ok"    , cp)
+	soundDef = applyCustomParamSound(soundDef, "select", cp)
+	soundDef = applyCustomParamSound(soundDef, "build" , cp)
+	soundDef = applyCommanderSound(soundDef, cp, ud.name)
+	sounds[ud.name] = soundDef
+end
 
 local underAttackSounds = {
 --	[1] = "udamaged_1",
