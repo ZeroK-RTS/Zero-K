@@ -18,8 +18,11 @@ function gadget:GetInfo()
 end
 
 local lookaheadUnitDefs = {}
-for i=1,#UnitDefs do
-	lookaheadUnitDefs[i] = UnitDefs[i].customParams.lookahead
+local weaponCounts = {}
+for i=1, #UnitDefs do
+	local unitDef = UnitDefs[i]
+	lookaheadUnitDefs[i] = unitDef.customParams.lookahead
+	weaponCounts[i] = #unitDef.weapons -- even for non-lookaheads, this keeps the internal representation an array
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
@@ -27,7 +30,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if not lookahead then
 		return
 	end
-	for weaponIdx=1,#UnitDefs[unitDefID].weapons do
-		Spring.SetUnitWeaponState(unitID,weaponIdx,"autoTargetRangeBoost",lookahead)
+	for weaponIdx=1, weaponCounts[unitDefID] do
+		Spring.SetUnitWeaponState(unitID, weaponIdx, "autoTargetRangeBoost", lookahead)
 	end
 end
