@@ -1537,15 +1537,5 @@ for udid, ud in pairs(UnitDefs) do
 	sounds[ud.name] = soundDef
 end
 
-local underAttackSounds = {
---	[1] = "udamaged_1",
-	[1] = "udamaged_2",
-}
-for i,v in pairs(sounds) do
-	if not v.underattack then
-		v.underattack = underAttackSounds[math.random(1,#underAttackSounds)]
-	end
-end
-
 return sounds
 
