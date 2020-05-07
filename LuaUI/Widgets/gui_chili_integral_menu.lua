@@ -18,8 +18,10 @@ end
 --------------------------------------------------------------------------------
 -- Configuration
 
+include("colors.lua")
 include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 -- Chili classes
 local Chili
@@ -478,27 +480,65 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
+--- Returns:
+--- - hotkey: string - nil if hotkey is not set
 local function GetHotkeyText(actionName)
 	local hotkey = WG.crude.GetHotkey(actionName)
 	if hotkey ~= '' then
-		return '\255\0\255\0' .. hotkey
+		return GetGreenStr(hotkey)
 	end
 	return nil
+end
+
+--- Returns:
+--- - hotkeys: Table[state_name, value_text], nil if action cannot be found or action has no states; value_text is
+---   "(none)" if a hotkey is not set
+--- - n: Integer - number of hotkeys that are set, nil under same conditions as for hotkeys
+local function GetHotkeysForStatesText(action_name)
+	local action = custom_cmd_actions[action_name]
+	if not action then return nil end
+	local states = action.states
+	if not states then return nil end
+	local hotkeys = {}
+	local n = 0
+	for state_idx = 1, #states do
+		local hotkey = WG.crude.GetHotkey(action_name .. " " .. (state_idx - 1))
+		if not hotkey or hotkey == '' then
+			hotkey = "(none)"
+		else
+			n = n + 1
+		end
+		hotkeys[states[state_idx]] = hotkey
+	end
+	return hotkeys, n
 end
 
 local function GetActionHotkey(actionName)
 	return WG.crude.GetHotkey(actionName)
 end
 
+--- Combines the information about the command, its state and hotkeys
 local function GetButtonTooltip(displayConfig, command, state)
+	local SEP = "\n  "
+	
 	local tooltip = displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
 	if not tooltip then
 		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
 	end
+	if not tooltip then
+		return nil
+	end
 	if command and command.action then
-		local hotkey = GetHotkeyText(command.action)
-		if tooltip and hotkey then
-			tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
+		local hotkey_for_toggle = GetHotkeyText(command.action)
+		local hotkeys_for_states, states_n = GetHotkeysForStatesText(command.action)
+		if hotkey_for_toggle then
+			tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
+		end
+		if hotkeys_for_states and states_n > 0 then
+			tooltip = tooltip .. SEP .. "State Hotkeys:"
+			for state_name, hotkey in pairs(hotkeys_for_states) do
+				tooltip = tooltip .. SEP .. GetGreenStr(state_name .. ": " .. hotkey)
+			end
 		end
 	end
 	return tooltip
@@ -986,7 +1026,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	
 	local function SetGridKey(key)
 		usingGrid = true
-		hotkeyText = '\255\0\255\0' .. key
+		hotkeyText = GetGreenStr(key)
 		SetText(textConfig.topLeft.name, hotkeyText)
 	end
 	
@@ -1430,7 +1470,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	local hideHotkey = loiterable
 	
 	if hotkey and (not hideHotkey) and (not disabled) then
-		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
+		button:SetCaption(humanName .. " (" .. GetGreenStr(hotkey) .. ")")
 	end
 	
 	local externalFunctionsAndData = {
@@ -1456,7 +1496,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		end
 		
 		if isActive then
-			button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
+			button:SetCaption(humanName .. " (" .. GetGreenStr(hotkey) .. ")")
 		else
 			button:SetCaption(humanName .. " (" .. hotkey .. ")")
 		end
