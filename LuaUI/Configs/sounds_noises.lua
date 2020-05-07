@@ -1527,6 +1527,7 @@ local function applyCommanderSound(soundDef, customParams)
 	return soundDef
 end
 
+local ret = {}
 for udid, ud in pairs(UnitDefs) do
 	local soundDef = sounds[ud.name]
 	local cp = ud.customParams
@@ -1534,8 +1535,7 @@ for udid, ud in pairs(UnitDefs) do
 	soundDef = applyCustomParamSound(soundDef, "select", cp)
 	soundDef = applyCustomParamSound(soundDef, "build" , cp)
 	soundDef = applyCommanderSound(soundDef, cp, ud.name)
-	sounds[ud.name] = soundDef
+	ret[udid] = soundDef
 end
 
-return sounds
-
+return ret
