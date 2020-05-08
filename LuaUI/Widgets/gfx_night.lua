@@ -287,7 +287,7 @@ local function DrawSearchlights()
   if (searchlightVertexCount < 2) then return end
   if (options.bases.value == "none") and (options.beam.value == false) then return end
   
-  local visibleUnits = GetVisibleUnits(-1, 30, false)
+  local visibleUnits = GetVisibleUnits(-1, nil, false)
   local cx, cy, cz = GetCameraPosition()
   local timeFromNoon = math.abs(currDayTime - 0.5)
   

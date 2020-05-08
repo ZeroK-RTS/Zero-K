@@ -335,7 +335,7 @@ if not spIsGUIHidden() then
   glColor(1, 1, 1, alpha)
 
   -- for _,unitID in ipairs(spGetSelectedUnits()) do
-  local units = spGetVisibleUnits(-1, 30, true)
+  local units = spGetVisibleUnits(-1, nil, true)
   for i=1, #units do
     local unitID = units[i]
     if IsUnitInSelectionBox(unitID) or (GetUnitUnderCursor() == unitID and not spIsUnitSelected(unitID)) then

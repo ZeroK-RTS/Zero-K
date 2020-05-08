@@ -172,7 +172,7 @@ local uCycle = 1
 
 
 local function GetVisibleUnits()
-  local units = spGetVisibleUnits(-1, 30, true)
+  local units = spGetVisibleUnits(-1, nil, true)
   --local visibleUnits = {}
   local boxedUnits = GetUnitsInSelectionBox();
 
