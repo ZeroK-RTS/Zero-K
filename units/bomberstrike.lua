@@ -3,7 +3,7 @@ return { bomberstrike = {
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
   brakerate           = 0.4,
-  buildCostMetal      = 600,
+  buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[bomberstrike.png]],
   canFly              = true,
@@ -21,7 +21,7 @@ return { bomberstrike = {
 
   customParams        = {
     reallyabomber    = [[1]],
-    reammoseconds    = [[15]],
+    reammoseconds    = [[5]],
     refuelturnradius = [[90]],
     requireammo      = [[1]],
     modelradius      = [[10]],
@@ -35,7 +35,7 @@ return { bomberstrike = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 900,
+  maxDamage           = 850,
   maxElevator         = 0.02,
   maxRudder           = 0.006,
   maxFuel             = 1000000,
@@ -73,8 +73,8 @@ return { bomberstrike = {
       craterMult              = 2,
 
       damage                  = {
-        default = 540,
-        planes  = 540,
+        default = 330,
+        planes  = 330,
       },
 
       fireStarter             = 70,
