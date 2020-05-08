@@ -106,5 +106,17 @@
 		"few" : "%{count} units in queue",
 		"many" : "%{count} units in queue",
 		"other" : "%{count} units in queue"
+	"defences_range" : "Defense Ranges",
+	"ally_ground_defence_range" : "Show Ally Ground Defence",
+	"ally_air_defence_range" : "Show Ally Air Defence",
+	"ally_nuke_defence_range" : "Show Ally Nuke Defence",
+	"enemy_ground_defence_range" : "Show Enemy Ground Defence",
+	"enemy_air_defence_range" : "Show Enemy Air Defence",
+	"enemy_nuke_defence_range" : "Show Enemy Nuke Defence",
+	"enemy_shields_range" : "Show Enemy Shields",
+	"enemy_radar_range" : "Show Enemy Radar Coverage",
+	"spec_defence_range" : "Show Ground Defence as Spectator",
+	"spec_air_defence_range" : "Show Air Defence as Spectator",
+	"spec_nuke_defence_range" : "Show Nuke Defence as Spectator",
 	}
 }
