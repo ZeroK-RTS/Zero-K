@@ -216,59 +216,59 @@ local function OnOptChange(self)
 end
 
 options = {
-	label = { type = 'label', name = 'Defense Ranges' },
+	label = { type = 'label', name = i18n("defences_range", "interface.en.json") },
 	allyground = {
-		name = 'Show Ally Ground Defence',
+		name = i18n("ally_ground_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = false,
 	},
 	allyair = {
-		name = 'Show Ally Air Defence',
+		name = i18n("ally_air_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = false,
 	},
 	allynuke = {
-		name = 'Show Ally Nuke Defence',
+		name = i18n("ally_nuke_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
 	enemyground = {
-		name = 'Show Enemy Ground Defence',
+		name = i18n("enemy_ground_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
 	enemyair = {
-		name = 'Show Enemy Air Defence',
+		name = i18n("enemy_air_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
 	enemynuke = {
-		name = 'Show Enemy Nuke Defence',
+		name = i18n("enemy_nuke_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
 	enemyshield = {
-		name = 'Show Enemy Shields',
+		name = i18n("enemy_shields", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
 	enemyradar = {
-		name = 'Show Enemy Radar Coverage',
+		name = i18n("enemy_radar_range", "interface.en.json"),
 		type = 'bool',
 		value = false,
 	},
 	specground = {
-		name = 'Show Ground Defence as Spectator',
+		name = i18n("spec_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = false,
 	},
 	specair = {
-		name = 'Show Air Defence as Spectator',
+		name = i18n("spec_air_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = false,
 	},
 	specnuke = {
-		name = 'Show Nuke Defence as Spectator',
+		name = i18n("spec_nuke_defence_range", "interface.en.json"),
 		type = 'bool',
 		value = true,
 	},
