@@ -518,7 +518,7 @@ local function RadarDotCheck(unitID)
 	return true
 end
 
-local function Draw(extension,layer)
+local function Draw(extension,layer,water)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
@@ -563,7 +563,7 @@ local function Draw(extension,layer)
 							--// render effects
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) then
+								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
 									if (fx.piecenum) then
 										--// enter piece space
 										glPushMatrix()
@@ -588,7 +588,7 @@ local function Draw(extension,layer)
 							------------------------------------------------------------------------------------
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) then
+								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
 									glPushMatrix()
 									if fx.projectile and not fx.worldspace then
 										local x,y,z = spGetProjectilePosition(fx.projectile)
@@ -684,7 +684,7 @@ local function DrawParticlesWater()
 	--// Draw() (layers: -50 upto 50)
 	glAlphaTest(GL_GREATER, 0)
 	for i=-50,50 do
-		Draw("",i)
+		Draw("",i,true)
 	end
 	glAlphaTest(false)
 end
@@ -899,7 +899,6 @@ local function GameFrame(_,n)
 	thisGameFrame = n
 	if ((not next(particles)) and (not effectsInDelay[1])) then return end
 
-	UpdateAllyTeamStatus()
 	--// create delayed FXs
 	if (effectsInDelay[1]) then
 		local remaingFXs,cnt={},1
@@ -958,8 +957,9 @@ local function GameFrame(_,n)
 end
 
 local function Update(_,dt)
-	--// update frameoffset
+	--// update frameoffset and self allyteam
 	frameOffset = spGetFrameTimeOffset()
+	UpdateAllyTeamStatus()
 
 	--// Game Frame Update
 	local x = spGetGameFrame()
