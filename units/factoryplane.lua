@@ -18,7 +18,6 @@ return { factoryplane = {
     [[planeheavyfighter]],
     [[bomberprec]],
     [[bomberriot]],
-    [[bomberstrike]],
     [[bomberdisarm]],
     [[bomberheavy]],
     [[planescout]],
