@@ -1655,7 +1655,7 @@ local function SearchElement(termToSearch, path)
 	
 	local roughNumberOfHit = #filtered_pathOptions
 	if roughNumberOfHit == 0 then
-		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.postit}
+		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.postit}
 	elseif  roughNumberOfHit > maximumResult then
 		tree_children[1] = Label:New{caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.postit}
 		tree_children[2] = Label:New{caption = "- please navigate the menu to see all options -",  textColor = color.postit}

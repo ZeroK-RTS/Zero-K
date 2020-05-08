@@ -466,7 +466,6 @@ options = {
 		min = 0,
 		max = 3,
 		step = 1,
-		path = path,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.selectionrank,
 	},

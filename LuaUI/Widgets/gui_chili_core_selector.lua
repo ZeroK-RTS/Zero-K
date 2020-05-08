@@ -350,7 +350,6 @@ options = {
 	},
 	leftsideofscreen = {
 		name = 'Left side of screen',
-		type = 'number',
 		type = 'bool',
 		value = true,
 		hidden = true,
