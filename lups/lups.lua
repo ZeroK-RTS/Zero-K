@@ -261,8 +261,7 @@ end
 --------------------------------------------------------------------------------
 
 --// saves all particles
-particles = {}
-local particles = particles
+local particles = {}
 local particlesCount = 0
 
 local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][fx]
@@ -771,7 +770,7 @@ local function IsUnitFXVisible(fx)
 	end
 	--Spring.Utilities.UnitEcho(unitID, "w")
 	if (unitActive) then
-		if isWidget or fx.alwaysVisible then
+		if (isWidget and not fx.noIconDraw) or fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then
 			return fx:Visible()

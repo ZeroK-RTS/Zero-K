@@ -277,15 +277,15 @@ function NanoLasers:CreateParticle()
 	self.dieGameFrame    = self.firstGameFrame + self.life
 	self._staticTarget   = false
 	self._lastupdate_los = nil
-
+	local GLOBAL = (WG or GG)
 
 	if (self.flare) then
 		--[[if you add those flares, then the laser is slower as the engine, so it needs some tweaking]]--
-		if (self.flare1id and particles[self.flare1id] and particles[self.flare2id]) then
-			local flare1 = particles[self.flare1id]
+		if (self.flare1id and GLOBAL.Lups.GetParticles(self.flare1id) and GLOBAL.Lups.GetParticles(self.flare2id)) then
+			local flare1 = GLOBAL.Lups.GetParticles(self.flare1id)
 			flare1.size  = self.count*0.1
 			flare1:ReInitialize()
-			local flare2 = particles[self.flare2id]
+			local flare2 = GLOBAL.Lups.GetParticles(self.flare2id)
 			flare2.size  = self.count*0.75
 			flare2:ReInitialize()
 			return
