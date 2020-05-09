@@ -261,8 +261,9 @@ end
 --------------------------------------------------------------------------------
 
 --// saves all particles
-local particles = {}
-local particlesCount = 0
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
+local particles = IterableMap.New()
 
 local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][fx]
 local effectsInDelay = {}  --// fxs which use the delay tag, and waiting for their spawn
@@ -332,14 +333,14 @@ function AddParticles(Class,Options   ,__id)
 
 	local newParticles,reusedFxID = particleClass.Create(Options)
 	if (newParticles) then
-		particlesCount = particlesCount + 1
 		if (__id) then
 			newParticles.id = __id
 		else
 			partIDCount = partIDCount+1
 			newParticles.id = partIDCount
 		end
-		particles[ newParticles.id ] = newParticles
+		--particles[ newParticles.id ] = newParticles
+		IterableMap.Add(particles, newParticles.id, newParticles)
 
 		local space = ((not newParticles.worldspace) and newParticles.unit) or (-1)
 		local fxTable = CreateSubTables(RenderSequence,{newParticles.layer,particleClass,space})
@@ -370,29 +371,31 @@ function AddParticlesArray(array)
 	end
 end
 
-function GetParticles(particlesID)
-	return particles[particlesID]
+function GetParticles(particleID)
+	--return particles[particleID]
+	return IterableMap.Get(particles, particleID)
 end
 
-function RemoveParticles(particlesID)
-	local fx = particles[particlesID]
+function RemoveParticles(particleID, skipMapRemoval)
+	local fx = IterableMap.Get(particles, particleID)
 	if (fx) then
 		if (type(fx.fxTable)=="table") then
 			for j,w in pairs(fx.fxTable) do
-				if (w.id==particlesID) then
+				if (w.id==particleID) then
 					pop(fx.fxTable,j)
 				end
 			end
 		end
 		fx:Destroy()
-		particles[particlesID] = nil
-		particlesCount = particlesCount-1;
+		if not skipMapRemoval then
+			IterableMap.Remove(particles, particleID)
+		end
 		return
 	else
 		local status,err = pcall(function()
 --//FIXME
 			for i=1,#effectsInDelay do
-				if (effectsInDelay[i].id==particlesID) then
+				if (effectsInDelay[i].id==particleID) then
 					table.remove(effectsInDelay,i)
 					return
 				end
@@ -411,7 +414,7 @@ function RemoveParticles(particlesID)
 end
 
 function GetStats()
-	local count   = particlesCount
+	local count   = IterableMap.GetIndexMax(particles)
 	local effects = {}
 	local layers  = 0
 
@@ -814,39 +817,30 @@ local function IsWorldFXVisible(fx)
 end
 
 
-local function CreateVisibleFxList()
-	local removeFX = {}
-	local removeCnt = 1
-
-	for _,fx in pairs(particles) do
-		if ((fx.unit or -1) > -1) then
-			fx.visible = IsUnitFXVisible(fx)
-			if (fx.visible) then
-				if (not anyFXVisible) then anyFXVisible = true end
-				if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
-			end
-		elseif ((fx.projectile or -1) > -1) then
-			fx.visible = IsProjectileFXVisible(fx)
-			if (fx.visible) then
+local function CreateVisibleFxList(particleID, fx, index)
+	if ((fx.unit or -1) > -1) then
+		fx.visible = IsUnitFXVisible(fx)
+		if (fx.visible) then
 			if (not anyFXVisible) then anyFXVisible = true end
 			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
-			end
-		else
-			fx.visible = IsWorldFXVisible(fx)
-			if (fx.visible) then
-				if (not anyFXVisible) then anyFXVisible = true end
-				if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
-			elseif (fx.Valid and (not fx:Valid())) then
-				removeFX[removeCnt] = fx.id
-				removeCnt = removeCnt + 1
-			end
+		end
+	elseif ((fx.projectile or -1) > -1) then
+		fx.visible = IsProjectileFXVisible(fx)
+		if (fx.visible) then
+		if (not anyFXVisible) then anyFXVisible = true end
+		if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+		end
+	else
+		fx.visible = IsWorldFXVisible(fx)
+		if (fx.visible) then
+			if (not anyFXVisible) then anyFXVisible = true end
+			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+		elseif (fx.Valid and (not fx:Valid())) then
+			RemoveParticles(particleID, true)
+			return true -- remove
 		end
 	end
-	--Spring.Echo("Lups fx cnt", particles.GetIndexMax())
-
-	for i=1,removeCnt-1 do
-		RemoveParticles(removeFX[i])
-	end
+	return false -- do not remove
 end
 
 --------------------------------------------------------------------------------
@@ -885,20 +879,38 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---// needed to allow to use RemoveParticles in :Update of the particleclasses
-local fxRemoveList = {}
-function BufferRemoveParticles(id)
-	fxRemoveList[#fxRemoveList+1] = id
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local lastGameFrame = 0
+
+local function ParticleGameFrame(particleID, partFx, index, n, framesToUpdate)
+	if (n>=partFx.dieGameFrame) then
+		--// lifetime ended
+		if (partFx.repeatEffect) then
+			if (type(partFx.repeatEffect)=="number") then
+				partFx.repeatEffect = partFx.repeatEffect - 1
+				if (partFx.repeatEffect==1) then partFx.repeatEffect = nil end
+			end
+			if (partFx.ReInitialize) then
+				partFx:ReInitialize()
+			else
+				partFx.dieGameFrame = partFx.dieGameFrame + partFx.life
+			end
+		else
+			RemoveParticles(particleID, true)
+			return true -- Remove particle
+		end
+	else
+		--// update particles
+		if (partFx.Update) then
+			partFx:Update(framesToUpdate)
+		end
+	end
+end
 
 local function GameFrame(_,n)
 	thisGameFrame = n
-	if ((not next(particles)) and (not effectsInDelay[1])) then return end
+	if ((IterableMap.IsEmpty(particles)) and (not effectsInDelay[1])) then
+		return
+	end
 
 	--// create delayed FXs
 	if (effectsInDelay[1]) then
@@ -911,7 +923,7 @@ local function GameFrame(_,n)
 			else
 				AddParticles(fx.class,fx.options, fx.id)
 				if (fx.frame-thisGameFrame>0) then
-					particles[fx.id]:Update(fx.frame-thisGameFrame)
+					IterableMap.Get(particles, fx.id):Update(fx.frame-thisGameFrame)
 				end
 			end
 		end
@@ -923,38 +935,7 @@ local function GameFrame(_,n)
 
 	--// update FXs
 	framesToUpdate = thisGameFrame - lastGameFrame
-	for _,partFx in pairs(particles) do
-		if (n>=partFx.dieGameFrame) then
-			--// lifetime ended
-			if (partFx.repeatEffect) then
-				if (type(partFx.repeatEffect)=="number") then
-					partFx.repeatEffect = partFx.repeatEffect - 1
-					if (partFx.repeatEffect==1) then partFx.repeatEffect = nil end
-				end
-				if (partFx.ReInitialize) then
-					partFx:ReInitialize()
-				else
-					partFx.dieGameFrame = partFx.dieGameFrame + partFx.life
-				end
-			else
-				--// we can't remove items from a table we are iterating atm, so just buffer them and remove them later
-				BufferRemoveParticles(partFx.id)
-			end
-		else
-			--// update particles
-			if (partFx.Update) then
-				partFx:Update(framesToUpdate)
-			end
-		end
-	end
-
-	--// now we can remove particles
-	if (#fxRemoveList>0) then
-		for i=1,#fxRemoveList do
-			RemoveParticles(fxRemoveList[i])
-		end
-		fxRemoveList = {}
-	end
+	IterableMap.Apply(particles, ParticleGameFrame, n, framesToUpdate)
 end
 
 local function Update(_,dt)
@@ -973,7 +954,7 @@ local function Update(_,dt)
 	anyFXVisible = false
 	anyDistortionsVisible = false
 	if (next(particles)) then
-		CreateVisibleFxList()
+		IterableMap.Apply(particles, CreateVisibleFxList)
 	end
 end
 
