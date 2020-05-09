@@ -72,7 +72,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if gunshipDef[unitDefID] then
 		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
-		gunships.Add(unitID,
+		IterableMap.Add(gunships, unitID,
 			{
 				unitDefID = unitDefID,
 				def = gunshipDef[unitDefID],
@@ -85,7 +85,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	gunships.Remove(unitID)
+	IterableMap.Remove(gunships, unitID)
 end
 
 function gadget:Initialize()
@@ -96,7 +96,7 @@ end
 
 function gadget:GameFrame(n)
 	if n%UPDATE_PERIOD == 0 then
-		gunships.Apply(CheckClimb)
+		IterableMap.Apply(gunships, CheckClimb)
 	end
 end
 

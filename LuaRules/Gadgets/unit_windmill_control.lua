@@ -111,7 +111,7 @@ end
 
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		if (not windmills.IsEmpty()) then
+		if (not IterableMap.IsEmpty(windmills)) then
 			if step_count > 0 then
 				strength = strength + strength_step
 				step_count = step_count - 1
@@ -128,7 +128,7 @@ function gadget:GameFrame(n)
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
-			local indexMax, keyByIndex, dataByKey = windmills.GetBarbarianData()
+			local indexMax, keyByIndex, dataByKey = IterableMap.GetBarbarianData(windmills)
 			for i = 1, indexMax do
 				local unitID = keyByIndex[i]
 				local entry = dataByKey[unitID]
@@ -199,7 +199,7 @@ local function SetupUnit(unitID)
 		" (E " .. round(windMin+windRange*windData.myMin,1) .. "-" .. round(windMax,1) .. ")"
 	)
 	
-	windmills.Add(unitID, windData)
+	IterableMap.Add(windmills, unitID, windData)
 	
 	return true, windMin+windRange*windData.myMin, windRange*(1-windData.myMin)
 end
@@ -258,16 +258,16 @@ end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
 	if (windDefs[unitDefID]) then
-		local data = windmills.Get(unitID)
+		local data = IterableMap.Get(windmills, unitID)
 		if data then
 			data.teamID = unitTeam
-			windmills.Set(unitID, data)
+			IterableMap.Set(windmills, unitID, data)
 		end
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (windDefs[unitDefID]) then
-		windmills.Remove(unitID)
+		IterableMap.Remove(windmills, unitID)
 	end
 end

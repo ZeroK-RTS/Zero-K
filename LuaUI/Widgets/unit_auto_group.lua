@@ -277,7 +277,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
 			end
 			--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
 		else
-			screwyWaypointUnits.Add(unitID, {})
+			IterableMap.Add(screwyWaypointUnits, unitID, {})
 		end
 	end
 end
@@ -285,7 +285,7 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
 	createdFrame[unitID] = nil
-	screwyWaypointUnits.Remove(unitID)
+	IterableMap.Remove(screwyWaypointUnits, unitID)
 	--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
 
@@ -308,7 +308,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		if gr ~= nil then
 			SetUnitGroup(unitID, gr)
 		end
-		screwyWaypointUnits.Remove(unitID)
+		IterableMap.Remove(screwyWaypointUnits, unitID)
 	end
 	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
@@ -321,7 +321,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 			SetUnitGroup(unitID, gr)
 			--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
-		screwyWaypointUnits.Remove(unitID)
+		IterableMap.Remove(screwyWaypointUnits, unitID)
 		finiGroup[unitID] = nil
 	end
 end
@@ -475,7 +475,7 @@ end
 
 function widget:GameFrame(n)
 	if n%113 == 7 then
-		screwyWaypointUnits.Apply(UnstickUpdate)
+		IterableMap.Apply(screwyWaypointUnits, UnstickUpdate)
 	end
 end
 

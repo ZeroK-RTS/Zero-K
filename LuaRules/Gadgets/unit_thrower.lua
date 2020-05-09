@@ -154,7 +154,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		return
 	end
 	
-	local data = throwUnits.Get(proOwnerID)
+	local data = IterableMap.Get(throwUnits, proOwnerID)
 	if not data then
 		return
 	end
@@ -195,7 +195,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if nearUnits then
 		for i = 1, #nearUnits do
 			local nearID = nearUnits[i]
-			local physicsData = physicsRestore and physicsRestore.Get(nearID)
+			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
 			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
 			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
 				
@@ -210,7 +210,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 					SetUnitDrag(nearID, 0)
 					GG.SetCollisionDamageMult(nearID, 0)
 					Spring.SetUnitLeaveTracks(nearID, false)
-					physicsRestore.Add(nearID,
+					IterableMap.Add(physicsRestore, nearID,
 						{
 							odx = odx,
 							ty = ty,
@@ -252,7 +252,7 @@ end
 -- Command Handling
 
 local function BlockAttackToggle(unitID, cmdParams)
-	local data = throwUnits.Get(unitID)
+	local data = IterableMap.Get(throwUnits, unitID)
 	if data then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_DISABLE_ATTACK)
@@ -289,7 +289,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if (cmdID == CMD_ATTACK) or (cmdID == CMD_UNIT_SET_TARGET) or (cmdID == CMD_UNIT_SET_TARGET_CIRCLE) then
-		local data = throwUnits.Get(unitID)
+		local data = IterableMap.Get(throwUnits, unitID)
 		if (data and data.blockAttack) then
 			return false  -- command was used
 		end
@@ -309,7 +309,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if throwDefs[unitDefID] then
-		throwUnits.Add(unitID,
+		IterableMap.Add(throwUnits, unitID,
 			{
 				def = throwDefs[unitDefID],
 				unitDefID = unitDefID,
@@ -323,7 +323,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	throwUnits.Remove(unitID)
+	IterableMap.Remove(throwUnits, unitID)
 	if unitIsNotBlocking[unitID] then
 		local frame = unitIsNotBlocking[unitID]
 		applyBlockingFrame[frame] = applyBlockingFrame[frame] or {}
@@ -381,9 +381,9 @@ local function ReinstatePhysics(unitID, data)
 end
 
 function gadget:GameFrame(n)
-	physicsRestore.Apply(UpdateTrajectory)
+	IterableMap.Apply(physicsRestore, UpdateTrajectory)
 	if n%2 == 0 then
-		physicsRestore.Apply(ReinstatePhysics)
+		IterableMap.Apply(physicsRestore, ReinstatePhysics)
 	end
 	
 	if applyBlockingFrame[n] then
@@ -496,7 +496,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	if throwDefs[unitDefID] then
-		throwers.Add(unitID,
+		IterableMap.Add(throwers, unitID,
 			{
 				def = throwDefs[unitDefID],
 			}
@@ -505,14 +505,14 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	throwers.Remove(unitID)
+	IterableMap.Remove(throwers, unitID)
 end
 
 local function DrawWorldFunc()
-	if throwers.GetIndexMax() > 0 then
+	if IterableMap.GetIndexMax(throwers) > 0 then
 		local _, fullview = Spring.GetSpectatingState()
 		alreadyWired = {}
-		throwers.Apply(DrawThrowerWires, fullview, spGetMyAllyTeamID())
+		IterableMap.Apply(throwers, DrawThrowerWires, fullview, spGetMyAllyTeamID())
 	end
 end
 

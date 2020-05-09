@@ -136,7 +136,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	end
 	
 	overlappingAreas = 0
-	projectiles.Apply(SumOverlappingAreas, x, y, z, allyTeamID, shotsRequired)
+	IterableMap.Apply(projectiles, SumOverlappingAreas, x, y, z, allyTeamID, shotsRequired)
 	local block = not overlappingAreas
 	
 	if not block then
@@ -150,7 +150,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 			allyTeamID = allyTeamID,
 		}
 		
-		projectiles.Add(-unitID, data)
+		IterableMap.Add(projectiles, -unitID, data)
 		return false
 	else
 		local queueSize = spGetCommandQueue(unitID, 0)
@@ -178,9 +178,9 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	local targetType, targetData = Spring.GetProjectileTarget(proID)
 	if targetType == UNIT then
 		-- aim position
-		if proOwnerID and projectiles.InMap(-proOwnerID) then
-			data = projectiles.Get(-proOwnerID)
-			projectiles.Remove(-proOwnerID)
+		if proOwnerID and IterableMap.InMap(projectiles, -proOwnerID) then
+			data = IterableMap.Get(projectiles, -proOwnerID)
+			IterableMap.Remove(projectiles, -proOwnerID)
 		else
 			local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetData, true, true)
 			local gameFrame = Spring.GetGameFrame()
@@ -219,18 +219,18 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		data.allyTeamID = allyTeamID
 	end
 	
-	projectiles.Add(proID, data)
+	IterableMap.Add(projectiles, proID, data)
 end
 
 function gadget:ProjectileDestroyed(proID)
-	if not projectiles.InMap(proID) then
+	if not IterableMap.InMap(projectiles, proID) then
 		return
 	end
 	
 	local x, y, z = Spring.GetProjectilePosition(proID)
 	local gameFrame = Spring.GetGameFrame()
 	
-	local data = projectiles.Get(proID)
+	local data = IterableMap.Get(projectiles, proID)
 	data.x = x
 	data.y = y
 	data.z = z
@@ -240,8 +240,8 @@ function gadget:ProjectileDestroyed(proID)
 	data.targetType = nil
 	data.posUpdateFrame = nil
 	
-	projectiles.Add(projectiles.GetUnusedKey(), data)
-	projectiles.Remove(proID)
+	IterableMap.Add(projectiles, IterableMap.GetUnusedKey(projectiles), data)
+	IterableMap.Remove(projectiles, proID)
 end
 
 --local function Echo(key, data, index)
@@ -250,7 +250,7 @@ end
 --
 --function gadget:GameFrame(n)
 --	if n%15 == 0 then
---		projectiles.Apply(Echo)
+--		IterableMap.Apply(projectiles, Echo)
 --	end
 --end
 
