@@ -34,6 +34,12 @@ function IterableMap.New()
 		indexByKey[key] = indexMax
 	end
 	
+	function api.AddSelf(data)
+		key = api.GetUnusedKey()
+		data.index = key
+		api.Add(key, data)
+	end
+	
 	function api.Remove(key)
 		if (not key) or (not indexByKey[key]) then
 			return false
@@ -120,6 +126,19 @@ function IterableMap.New()
 		while i <= indexMax do
 			local key = keyByIndex[i]
 			if funcToApply(key, dataByKey[key], i, ...) then
+				-- Return true to remove element
+				api.Remove(key)
+			else
+				i = i + 1
+			end
+		end
+	end
+	
+	function api.ApplySelf(funcName, ...)
+		local i = 1
+		while i <= indexMax do
+			local key = keyByIndex[i]
+			if dataByKey[key][funcName](...) then
 				-- Return true to remove element
 				api.Remove(key)
 			else
