@@ -25,6 +25,8 @@ local bFirepoint2 = false
 local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberstrike"].wantedHeight
 
+local DAMAGE = 640
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -125,7 +127,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, 660, 140, 0.7, false, false) then
+	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, DAMAGE, 140, 0.7, false, false) then
                 -- Remove attack command on blocked target, it's already dead so move on.
                 local cQueue = Spring.GetCommandQueue(unitID, 1)
                 if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
@@ -133,7 +135,7 @@ function script.BlockShot(num, targetID)
                 end
                 return true
         end
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 660, 140, 0.7, false, false)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, DAMAGE, 140, 0.7, false, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -73,8 +73,8 @@ return { bomberstrike = {
       craterMult              = 2,
 
       damage                  = {
-        default = 330,
-        planes  = 330,
+        default = 320,
+        planes  = 320,
       },
 
       fireStarter             = 70,
