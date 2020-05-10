@@ -8,7 +8,7 @@ local sounds = {
 		},
 	},
 	athena = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -25,7 +25,7 @@ local sounds = {
 		},
 	},
 	corcom = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -34,7 +34,7 @@ local sounds = {
 		},
 	},
 	armcom = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -43,7 +43,7 @@ local sounds = {
 		},
 	},
 	commsupport = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -52,7 +52,7 @@ local sounds = {
 		},
 	},
 	commrecon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -61,7 +61,7 @@ local sounds = {
 		},
 	},
 	striderantiheavy = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -72,7 +72,7 @@ local sounds = {
 	
 	-- Spider
 	spidercon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "spider_move",
 			volume = 0.95,
@@ -159,7 +159,7 @@ local sounds = {
 	
 	-- Shield
 	shieldcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -242,7 +242,7 @@ local sounds = {
 	
 	-- Jumper
 	jumpcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -334,7 +334,7 @@ local sounds = {
 	
 	-- Cloak
 	cloakcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -418,7 +418,7 @@ local sounds = {
 	
 	-- Amphib
 	amphcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "amph_move",
 			volume = 0.8,
@@ -582,7 +582,7 @@ local sounds = {
 	
 	-- Vehicle
 	vehcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -657,7 +657,7 @@ local sounds = {
 	
 	-- Tank
 	tankcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -740,7 +740,7 @@ local sounds = {
 	
 	-- Hovercraft
 	hovercon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -881,7 +881,7 @@ local sounds = {
 	
 	-- Gunship
 	planecon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -890,7 +890,7 @@ local sounds = {
 		},
 	},
 	gunshipcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -987,7 +987,7 @@ local sounds = {
 	
 	-- New Ships
 	shipcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1155,13 +1155,13 @@ local sounds = {
 		},
 	},
 	staticcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "building_select1",
 		},
 	},
     striderhub = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "building_select1",
 		},
@@ -1169,67 +1169,67 @@ local sounds = {
 	
 	-- Factory
 	factorycloak = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryshield = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryjump = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryspider = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryamph = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryveh = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factorytank = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryhover = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryplane = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factorygunship = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryship = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
@@ -1440,7 +1440,7 @@ local sounds = {
 	
 	-- Silo etc
 	staticmissilesilo = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "silo_select",
 		},
