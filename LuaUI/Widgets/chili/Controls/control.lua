@@ -1321,6 +1321,11 @@ function Control:DrawForList()
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then
 		self:InvalidateSelf()
 	end
+	
+	if self.debugPosition then
+		Spring.Echo("DrawForList non-integer position")
+		self:TraceDebug({"name", "x", "y"})
+	end
 
 	if (self._tex_all and not self._inrtt) then
 		if WG.ChiliRedraw then
@@ -1406,6 +1411,11 @@ function Control:Draw()
 		self:InvalidateSelf()
 	end
 
+	if self.debugPosition then
+		Spring.Echo("Draw non-integer position")
+		self:TraceDebug({"name", "x", "y"})
+	end
+	
 	if (self._tex_all) then
 		if WG.ChiliRedraw then
 			WG.ChiliRedraw.AddControl(self, "Draw_tex_all")
