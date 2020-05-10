@@ -188,6 +188,10 @@ function TreeViewNode:Collapse()
 	end
 end
 
+function TreeViewNode:SetHighlight(newHighlight)
+	self.highlight = newHighlight
+end
+
 --// =============================================================================
 
 function TreeViewNode:GetNodeByCaption(caption)
