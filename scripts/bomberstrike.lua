@@ -25,7 +25,7 @@ local bFirepoint2 = false
 local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberstrike"].wantedHeight
 
-local DAMAGE = 640
+local DAMAGE = 540
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -21,8 +21,8 @@ return { bomberstrike = {
 
   customParams        = {
     reallyabomber    = [[1]],
-    reammoseconds    = [[5]],
-    refuelturnradius = [[90]],
+    reammoseconds    = [[8]],
+    refuelturnradius = [[150]],
     requireammo      = [[1]],
     modelradius      = [[10]],
   },
@@ -35,11 +35,12 @@ return { bomberstrike = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 850,
-  maxElevator         = 0.02,
-  maxRudder           = 0.006,
+  maxAileron          = 0.02,
+  maxDamage           = 780,
+  maxElevator         = 0.01,
+  maxRudder           = 0.007,
   maxFuel             = 1000000,
-  maxVelocity         = 7.4,
+  maxVelocity         = 8.4,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -49,7 +50,7 @@ return { bomberstrike = {
 
   sfxtypes            = {},
   sightDistance       = 780,
-  turnRadius          = 120,
+  turnRadius          = 500,
   workerTime          = 0,
 
   weapons             = {
@@ -73,8 +74,8 @@ return { bomberstrike = {
       craterMult              = 2,
 
       damage                  = {
-        default = 320,
-        planes  = 320,
+        default = 270,
+        planes  = 270,
       },
 
       fireStarter             = 70,
@@ -92,17 +93,17 @@ return { bomberstrike = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/rapid_rocket_fire2]],
       soundStartVolume        = 7,
-      startVelocity           = 220,
+      startVelocity           = 260,
       texture2                = [[lightsmoketrail]],
-      tolerance               = 8000,
+      tolerance               = 4000,
       tracks                  = true,
       trajectoryHeight        = 0,
-      turnRate                = 9000,
+      turnRate                = 8000,
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 230,
+      weaponVelocity          = 260,
     },
     
   },
