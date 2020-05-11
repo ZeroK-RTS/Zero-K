@@ -19,20 +19,20 @@
 
 local version = "v1.1"
 function widget:GetInfo()
-  return {
-    name      = "Global Build Command",
-    desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
+	return {
+		name      = "Global Build Command",
+		desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
 "You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
 "Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
 "Configuration is in \nGame->Worker AI",
-    author    = "aeonios",
-    date      = "July 20, 2009, 8 March 2014",
-    license   = "GNU GPL, v2 or later",
-    layer     = 10,
-    handler   = true,
-    enabled   = false  --  loaded by default?
-  }
+		author    = "aeonios",
+		date      = "July 20, 2009, 8 March 2014",
+		license   = "GNU GPL, v2 or later",
+		layer     = 10,
+		handler   = true,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 --  Global Build Command creates and manages a global, persistent build queue for all
@@ -111,12 +111,12 @@ options_order = {
 
 options = {
 	updateRate = {
-    name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
-    type = 'number',
-    min = 1, max = 4, step = 1,
-    value = 1,
+		name = 'Worker Update Rate (higher numbers are faster but more CPU intensive):',
+		type = 'number',
+		min = 1, max = 4, step = 1,
+		value = 1,
 	},
-	
+
 	separateConstructors = {
 		name = 'Separate Constructors',
 		type = 'bool',
@@ -603,7 +603,7 @@ end
 --  Text stuff mostly borrowed from gunblob's Group Label and trepan/JK's BuildETA.
 --  Ghost stuff borrowed from very_bad_soldier's Ghost Radar.
 function widget:DrawWorld()
-    if spIsGUIHidden() then
+	if spIsGUIHidden() then
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
@@ -1204,7 +1204,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				if ( options.shift ) then -- if the command was given with shift
 					return true	-- we return true to take ownership of the command from Spring.
 				else -- for direct orders
-                    if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
+					if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
 						buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
 					end
 					busyUnits[unitID] = hash -- add the worker to our busy list
@@ -1412,75 +1412,81 @@ end
 -- This function finds work for all the workers compiled in our eligible worker list and issues the orders.
 function GiveWorkToUnit(unitID)
 	local myJob = FindCheapestJob(unitID) -- find the cheapest job
-	if myJob and (not busyUnits[unitID] or busyUnits[unitID] ~= hash) then -- if myJob returns a job rather than nil
+	if not myJob then
+		-- Nothing to do, mark us as idle
+		includedBuilders[unitID].cmdtype = commandType.idle
+		return
+	end
+	local hash = BuildHash(myJob)
+	local lastHash = busyUnits[unitID]
+	if lastHash then
+		if (lastHash == hash) then
+			-- We're already on it
+			return
+		end
+		-- if we're reassigning, we need to update the entry stored in the queue
+		buildQueue[lastHash].assignedUnits[unitID] = nil
+	end
 	-- if the unit has already been assigned to the same job, we also prevent order spam
 	-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
-		local hash = BuildHash(myJob)
-		if busyUnits[unitID] then -- if we're reassigning, we need to update the entry stored in the queue
-			key = busyUnits[unitID]
-			buildQueue[key].assignedUnits[unitID] = nil
-		end
-		if myJob.id < 0 then -- for build jobs
-			if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
-			else -- ZK-Specific: for combination raise-and-build jobs
-				local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
-				for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
-					local target = localUnits[i]
-					local udid = spGetUnitDefID(target)
-					local unitDef = UnitDefs[udid]
-					if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
-						spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
-						break
-					end
+	if myJob.id < 0 then -- for build jobs
+		if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
+		else -- ZK-Specific: for combination raise-and-build jobs
+			local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
+			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
+				local target = localUnits[i]
+				local udid = spGetUnitDefID(target)
+				local unitDef = UnitDefs[udid]
+				if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
+					break
 				end
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD.OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
-			end -- end zk-specific guard
-		else -- for repair/reclaim/resurrect
-			if not myJob.target then -- for area commands
-				if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
-					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, 0)
-					if myJob.alt then -- if alt was held, the job should remain 'permanent'
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT + CMD.OPT_SHIFT)
-					else -- for normal area jobs
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_SHIFT) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
-					end
-				elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT)
-				else -- for normal area jobs
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
-				end
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
-			else -- for single-target commands
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
 			end
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD.OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
+		end -- end zk-specific guard
+	else -- for repair/reclaim/resurrect
+		if not myJob.target then -- for area commands
+			if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
+				spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, 0)
+				if myJob.alt then -- if alt was held, the job should remain 'permanent'
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT + CMD.OPT_SHIFT)
+				else -- for normal area jobs
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_SHIFT) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
+				end
+			elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT)
+			else -- for normal area jobs
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
+			end
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
+		else -- for single-target commands
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
 		end
-	elseif not myJob then
-		includedBuilders[unitID].cmdtype = commandType.idle -- otherwise if no valid job is found mark it as idle
 	end
 end
 
 -- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob().
 function FindCheapestJob(unitID)
-    local cachedJob = nil -- the cheapest job that we've seen
-    local cachedCost = 0 -- the cost of the currently cached cheapest job
-    local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
-    
-    -- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
-    -- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
-    -- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
-    if busyUnits[unitID] and CleanOrders(buildQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
+	local cachedJob = nil -- the cheapest job that we've seen
+	local cachedCost = 0 -- the cost of the currently cached cheapest job
+	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
+
+	-- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
+	-- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
+	-- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
+	if busyUnits[unitID] and CleanOrders(buildQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
 		local key = busyUnits[unitID]
 		local jx, jy, jz
 		cachedJob = buildQueue[key]
@@ -1550,20 +1556,20 @@ function FindCheapestJob(unitID)
 			end
 		end
 	end
-    return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
+	return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
 end
-                    
+
 -- This function implements the 'intelligent' cost model for assigning jobs.
 function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local job = buildQueue[hash]
-    local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
-    
-    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
-    
-    -- note we only count workers that are roughly closer/equal distance to the job,
-    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
-    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
-    -- but does not directly determine the behavior.
+	local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
+
+	local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
+
+	-- note we only count workers that are roughly closer/equal distance to the job,
+	-- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+	-- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+	-- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
 		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
@@ -1665,14 +1671,14 @@ end
 -- This function implements the 'flat' cost model for assigning jobs.
 function FlatCost(unitID, hash, ux, uz, jx, jz)
 	local job = buildQueue[hash]
-    local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
-    
-    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
-    
-    -- note we only count workers that are roughly closer/equal distance to the job,
-    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
-    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
-    -- but does not directly determine the behavior.
+	local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
+
+	local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
+
+	-- note we only count workers that are roughly closer/equal distance to the job,
+	-- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+	-- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+	-- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
 		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
@@ -2210,30 +2216,30 @@ function IsTargetReachable(unitID, tx,ty,tz)
 	local ox, oy, oz = spGetUnitPosition(unitID)	-- unit location
 	local unitDefID = spGetUnitDefID(unitID)
 	local buildDist = UnitDefs[unitDefID].buildDistance -- build range
-    local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
-    if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
-	    local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
-	    if path then
-		    local waypoints = path:GetPathWayPoints()
-		    local finalCoord = waypoints[#waypoints]
-		    if finalCoord then -- unknown why sometimes NIL
-			    local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-			    local dist = sqrt(dx*dx + dz*dz)
-			    if dist < buildDist + 40 then -- is within radius?
-				    return true -- within reach
-			    else
-				    return false -- not within reach
-			    end
-            else
-                return true -- if finalCoord is nil for some reason, return true
-		    end
-	    else
-		    return true -- if path is nil for some reason, return true
-		    -- note: it usually returns nil for very short distances, which is why returning true is a much better default here
-	    end
-    else
-	    return true --for air units; always reachable
-    end
+	local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
+	if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
+		local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
+		if path then
+			local waypoints = path:GetPathWayPoints()
+			local finalCoord = waypoints[#waypoints]
+			if finalCoord then -- unknown why sometimes NIL
+				local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+				local dist = sqrt(dx*dx + dz*dz)
+				if dist < buildDist + 40 then -- is within radius?
+					return true -- within reach
+				else
+					return false -- not within reach
+				end
+			else
+				return true -- if finalCoord is nil for some reason, return true
+			end
+		else
+			return true -- if path is nil for some reason, return true
+			-- note: it usually returns nil for very short distances, which is why returning true is a much better default here
+		end
+	else
+		return true --for air units; always reachable
+	end
 end
 
 -- This function caches pathing when a new worker enters the group.
@@ -2364,8 +2370,8 @@ end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
 function Distance(x1,z1,x2,z2)
-  local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
-  return dis
+	local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
+	return dis
 end
 
 -- Produces a normalized direction from two points.
