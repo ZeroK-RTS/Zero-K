@@ -1412,62 +1412,68 @@ end
 -- This function finds work for all the workers compiled in our eligible worker list and issues the orders.
 function GiveWorkToUnit(unitID)
 	local myJob = FindCheapestJob(unitID) -- find the cheapest job
-	if myJob and (not busyUnits[unitID] or busyUnits[unitID] ~= hash) then -- if myJob returns a job rather than nil
+	if not myJob then
+		-- Nothing to do, mark us as idle
+		includedBuilders[unitID].cmdtype = commandType.idle
+		return
+	end
+	local hash = BuildHash(myJob)
+	local lastHash = busyUnits[unitID]
+	if lastHash then
+		if (lastHash == hash) then
+			-- We're already on it
+			return
+		end
+		-- if we're reassigning, we need to update the entry stored in the queue
+		buildQueue[lastHash].assignedUnits[unitID] = nil
+	end
 	-- if the unit has already been assigned to the same job, we also prevent order spam
 	-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
-		local hash = BuildHash(myJob)
-		if busyUnits[unitID] then -- if we're reassigning, we need to update the entry stored in the queue
-			key = busyUnits[unitID]
-			buildQueue[key].assignedUnits[unitID] = nil
-		end
-		if myJob.id < 0 then -- for build jobs
-			if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
-			else -- ZK-Specific: for combination raise-and-build jobs
-				local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
-				for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
-					local target = localUnits[i]
-					local udid = spGetUnitDefID(target)
-					local unitDef = UnitDefs[udid]
-					if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
-						spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
-						break
-					end
+	if myJob.id < 0 then -- for build jobs
+		if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
+		else -- ZK-Specific: for combination raise-and-build jobs
+			local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
+			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
+				local target = localUnits[i]
+				local udid = spGetUnitDefID(target)
+				local unitDef = UnitDefs[udid]
+				if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
+					break
 				end
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD.OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
-			end -- end zk-specific guard
-		else -- for repair/reclaim/resurrect
-			if not myJob.target then -- for area commands
-				if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
-					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, 0)
-					if myJob.alt then -- if alt was held, the job should remain 'permanent'
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT + CMD.OPT_SHIFT)
-					else -- for normal area jobs
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_SHIFT) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
-					end
-				elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT)
-				else -- for normal area jobs
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
-				end
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
-			else -- for single-target commands
-				spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
-				busyUnits[unitID] = hash -- save the command info for bookkeeping
-				includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-				buildQueue[hash].assignedUnits[unitID] = true
 			end
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD.OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
+		end -- end zk-specific guard
+	else -- for repair/reclaim/resurrect
+		if not myJob.target then -- for area commands
+			if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
+				spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {myJob.x, myJob.y, myJob.z}, 0)
+				if myJob.alt then -- if alt was held, the job should remain 'permanent'
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT + CMD.OPT_SHIFT)
+				else -- for normal area jobs
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_SHIFT) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
+				end
+			elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, CMD.OPT_ALT)
+			else -- for normal area jobs
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
+			end
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
+		else -- for single-target commands
+			spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
+			busyUnits[unitID] = hash -- save the command info for bookkeeping
+			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+			buildQueue[hash].assignedUnits[unitID] = true
 		end
-	elseif not myJob then
-		includedBuilders[unitID].cmdtype = commandType.idle -- otherwise if no valid job is found mark it as idle
 	end
 end
 
