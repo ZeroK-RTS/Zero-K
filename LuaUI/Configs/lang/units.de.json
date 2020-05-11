@@ -619,11 +619,6 @@
 		"description" : "Schnelles Flugabwehr Fahrzeug",
 		"helptext" : "Crasher ist eine schnelle Antwort auf Flugzeuge. Er ist also gut genug gegen Hubschrauber."
 	},
-	"shiptransport" : {
-		"name" : "Surfboard",
-		"description" : "Transportboot",
-		"helptext" : "Das Surfboard bietet sich als Wassertransportmittel und als Feuerplattform an, denn alle auf dem Surfboard transportierten Einheiten können weiter feuern."
-	},
 	"shiparty" : {
 		"name" : "Envoy",
 		"description" : "Cruiser (Artillery)",

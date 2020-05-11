@@ -106,7 +106,7 @@ end
 
 local function GetClosestFactory(x, z, unitDefID)
 	local nearID, nearDistSq, nearData
-	for unitID, data in factories.Iterator() do
+	for unitID, data in IterableMap.Iterator(factories) do
 		if data.unitDefID == unitDefID then
 			local dSq = DistSq(x, z, data.x, data.z)
 			if (not nearDistSq) or (dSq < nearDistSq) then
@@ -218,7 +218,7 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)
-	factories.Add(unitID, {
+	IterableMap.Add(factories, unitID, {
 		unitDefID = unitDefID,
 		x = x,
 		y = y,
@@ -230,7 +230,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if not factoryBuildAction[unitDefID] then
 		return
 	end
-	factories.Remove(unitID)
+	IterableMap.Remove(factories, unitID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -242,7 +242,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function widget:Initialize()
-	factories.Clear()
+	IterableMap.Clear(factories)
 	
 	local units = Spring.GetTeamUnits(myTeamID)
 	for i = 1, #units do
@@ -315,7 +315,7 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	end
 	
 	local drawn = false
-	for unitID, data in factories.Iterator() do
+	for unitID, data in IterableMap.Iterator(factories) do
 		if data.unitDefID == currentFactoryDefID then
 			drawn = true
 			local drawDef = GetDrawDef(mx, mz, data)
@@ -348,7 +348,7 @@ function widget:DrawWorld()
 	end
 	
 	local drawn = false
-	for unitID, data in factories.Iterator() do
+	for unitID, data in IterableMap.Iterator(factories) do
 		if data.unitDefID == currentFactoryDefID then
 			drawn = true
 			local drawDef = GetDrawDef(mx, mz, data)

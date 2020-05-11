@@ -914,11 +914,6 @@
         "description": "Kruvazör (Topçu)",
         "helptext": "Bu kruvazör, sabit yer ve kıyı hedeflerini bombalamak için yararlı olan güçlü, uzun menzilli bir top barındırıyor. Uçaklara, denizaltılara ve akıncı gemilerine dikkat edin."
     },
-    "shiptransport": {
-        "name": "Sörfçü",
-        "description": "Taşıyıcı Platform",
-        "helptext": "Sörf tahtası deniz taşımacılığı ve ateş platformu olarak hizmet eder - yani Sörf Tahtası üzerindeki herhangi bir ünite ateşleyebilir."
-    },
     "shipheavyarty": {
         "name": "Pomplalı",
         "description": "Savaşgemisi (Ağır Topçu)",

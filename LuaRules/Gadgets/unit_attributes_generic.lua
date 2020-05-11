@@ -352,7 +352,7 @@ local function UpdateUnitAttributes(unitID, attList)
 	local buildMult = 1
 	local senseMult = 1
 	
-	for _, data in attList.Iterator() do
+	for _, data in IterableMap.Iterator(attList) do
 		moveMult = moveMult*(data.move or 1)
 		turnMult = turnMult*(data.turn or 1)
 		accelMult = accelMult*(data.accel or 1)
@@ -402,7 +402,7 @@ function Attributes.AddEffect(unitID, key, effect)
 	if not attributeUnits[unitID] then
 		attributeUnits[unitID] = IterableMap.New()
 	end
-	local data = attributeUnits[unitID].Get(key) or {}
+	local data = IterableMap.Get(attributeUnits[unitID], key) or {}
 	
 	data.move = effect.move
 	data.turn = effect.turn or effect.move
@@ -412,7 +412,7 @@ function Attributes.AddEffect(unitID, key, effect)
 	data.build = effect.build
 	data.sense = effect.sense
 	
-	attributeUnits[unitID].Add(key, data) -- Overwrites existing key if it exists
+	IterableMap.Add(attributeUnits[unitID], key, data) -- Overwrites existing key if it exists
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
 		Attributes.RemoveUnit(unitID)
 	end
@@ -422,7 +422,7 @@ function Attributes.RemoveEffect(unitID, key)
 	if not attributeUnits[unitID] then
 		return
 	end
-	attributeUnits[unitID].Remove(key)
+	IterableMap.Remove(attributeUnits[unitID], key)
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
 		Attributes.RemoveUnit(unitID)
 	end
