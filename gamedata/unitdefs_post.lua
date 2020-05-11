@@ -185,6 +185,38 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
+local typeNames = {
+	"CONSTRUCTOR",
+	"RAIDER",
+	"SKIRMISHER",
+	"RIOT",
+	"ASSAULT",
+	"ARTILLERY",
+	"WEIRD_RAIDER",
+	"ANTI_AIR",
+	"HEAVY_SOMETHING",
+	"SPECIAL",
+	"UTILITY",
+}
+local typeNamesLower = {}
+for i = 1, #typeNames do
+	typeNamesLower[i] = "pos_" .. typeNames[i]:lower()
+end
+
+-- Set build options from pos_ customparam
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+for name, ud in pairs(UnitDefs) do
+	local cp = ud.customparams
+	for i = 1, #typeNamesLower do
+		local value = cp[typeNamesLower[i]]
+		if value then
+			ud.buildoptions = ud.buildoptions or {}
+			ud.buildoptions[#ud.buildoptions + 1] = value
+		end
+	end
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- 3dbuildrange for all none plane builders
