@@ -204,7 +204,7 @@ for k,v in pairs(local_options) do
 	options[k] = v
 end
 for i = 1,#local_options_order do
-	options_order[#options_order] = local_options_order[i]
+	options_order[#options_order+1] = local_options_order[i]
 end
 
 -- Set some saner defaults
