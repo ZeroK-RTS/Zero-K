@@ -216,59 +216,59 @@ local function OnOptChange(self)
 end
 
 options = {
-	label = { type = 'label', name = i18n("defences_range", "interface.en.json") },
+	label = { type = 'label', name = WG.Translate("interface", "defences_range") },
 	allyground = {
-		name = i18n("ally_ground_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "ally_ground_defence_range"),
 		type = 'bool',
 		value = false,
 	},
 	allyair = {
-		name = i18n("ally_air_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "ally_air_defence_range"),
 		type = 'bool',
 		value = false,
 	},
 	allynuke = {
-		name = i18n("ally_nuke_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "ally_nuke_defence_range"),
 		type = 'bool',
 		value = true,
 	},
 	enemyground = {
-		name = i18n("enemy_ground_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "enemy_ground_defence_range"),
 		type = 'bool',
 		value = true,
 	},
 	enemyair = {
-		name = i18n("enemy_air_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "enemy_air_defence_range"),
 		type = 'bool',
 		value = true,
 	},
 	enemynuke = {
-		name = i18n("enemy_nuke_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "enemy_nuke_defence_range"),
 		type = 'bool',
 		value = true,
 	},
 	enemyshield = {
-		name = i18n("enemy_shields", "interface.en.json"),
+		name = WG.Translate("interface", "enemy_shields"),
 		type = 'bool',
 		value = true,
 	},
 	enemyradar = {
-		name = i18n("enemy_radar_range", "interface.en.json"),
+		name = WG.Translate("interface", "enemy_radar_range"),
 		type = 'bool',
 		value = false,
 	},
 	specground = {
-		name = i18n("spec_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "spec_defence_range"),
 		type = 'bool',
 		value = false,
 	},
 	specair = {
-		name = i18n("spec_air_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "spec_air_defence_range"),
 		type = 'bool',
 		value = false,
 	},
 	specnuke = {
-		name = i18n("spec_nuke_defence_range", "interface.en.json"),
+		name = WG.Translate("interface", "spec_nuke_defence_range"),
 		type = 'bool',
 		value = true,
 	},
