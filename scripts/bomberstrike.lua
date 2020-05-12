@@ -5,6 +5,8 @@ include "fixedwingTakeOff.lua"
 local fuselage = piece 'fuselage'
 local wingl = piece 'wingl'
 local wingr = piece 'wingr'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 local enginel = piece 'enginel'
 local enginer = piece 'enginer'
 local head = piece 'head'
@@ -33,7 +35,7 @@ local DAMAGE = 540
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	StartThread(GG.Script.SmokeUnit, unitID, {piece 'wingtipl', piece 'wingtipr', head})
+	StartThread(GG.Script.SmokeUnit, unitID, {wingtipl, wingtipr, head})
 	Turn(turret, y_axis, math.pi)
 	Move(wingl, x_axis, -5, 7)
 	Move(wingr, x_axis, 5, 7)
