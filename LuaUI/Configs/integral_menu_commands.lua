@@ -102,9 +102,6 @@ local units = {
 		gunshipbomb = unitTypes.RIOT,
 	},
 	factoryplane = {
-		planecon = CONSTRUCTOR,
-		planefighter = RAIDER,
-		bomberriot = RIOT,
 		planecon = unitTypes.CONSTRUCTOR,
 		planefighter = unitTypes.RAIDER,
 		bomberriot = unitTypes.RIOT,
