@@ -112,6 +112,9 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
+	if num == 1 and GG.Thrower and GG.Thrower.BlockAttack(unitID) then
+		return true
+	end
 	local x, y, z = spGetUnitPosition(unitID)
 	if not x then
 		return true

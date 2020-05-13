@@ -331,6 +331,12 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
+local externalFunc = {}
+function externalFunc.BlockAttack(unitID)
+	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
+	return unitData and unitData.blockAttack
+end
+
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_DISABLE_ATTACK)
@@ -342,6 +348,8 @@ function gadget:Initialize()
 	for id, _ in pairs(throwWeaponDef) do
 		Script.SetWatchProjectile(id, true)
 	end
+	
+	GG.Thrower = externalFunc
 end
 
 local function UpdateTrajectory(unitID, data)
