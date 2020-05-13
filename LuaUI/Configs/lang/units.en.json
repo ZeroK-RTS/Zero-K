@@ -391,8 +391,8 @@
 	},
 	"jumpbomb" : {
 		"name" : "Skuttle",
-		"description" : "Cloaked Jumping Anti-Heavy Bomb",
-		"helptext" : "This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it."
+		"description" : "Jumping Anti-Heavy Bomb",
+		"helptext" : "This slow-moving, expensive unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it."
 	},
 	"jumpskirm" : {
 		"name" : "Moderator",
