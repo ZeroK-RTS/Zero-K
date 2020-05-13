@@ -540,10 +540,9 @@ factionBuildConfig = {
 				
 				[4] = { -- bomber
 					importanceMult = 1,
-					count = 3,
-					[1] = {ID = UnitDefNames['bomberprec'].id, chance = 0.3},
-					[2] = {ID = UnitDefNames['bomberriot'].id, chance = 0.5},
-					[3] = {ID = UnitDefNames['bomberstrike'].id, chance = 0.2},
+					count = 2,
+					[1] = {ID = UnitDefNames['bomberprec'].id, chance = 0.4},
+					[2] = {ID = UnitDefNames['bomberriot'].id, chance = 0.6},
 				},
 				
 				[5] = { -- gunship

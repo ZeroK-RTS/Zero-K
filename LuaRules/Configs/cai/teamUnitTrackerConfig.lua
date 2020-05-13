@@ -166,7 +166,6 @@ local air = {
 		"bomberriot",
 		"bomberdisarm",
 		"bomberheavy",
-		"bomberstrike",
 	},
 	
 	gunship = {
