@@ -1127,6 +1127,12 @@ local function printAbilities(ud, unitID)
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
+		cells[#cells+1] = 'Light Speed: '
+		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		if not ud.customParams.islighttransport then
+			cells[#cells+1] = 'Heavy Speed: '
+			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
+		end
 	end
 
 	if ud.customParams.nuke_coverage then

@@ -29,6 +29,7 @@ return { gunshipheavytrans = {
     midposoffset   = [[0 0 0]],
     aimposoffset   = [[0 10 0]],
     modelradius    = [[15]],
+    transport_speed_heavy   = [[0.5]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
