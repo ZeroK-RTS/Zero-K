@@ -105,6 +105,7 @@ local units = {
 		planecon = unitTypes.CONSTRUCTOR,
 		planefighter = unitTypes.RAIDER,
 		bomberriot = unitTypes.RIOT,
+		bomberstrike = unitTypes.SKIRMISHER,
 		-- No Plane Artillery
 		planeheavyfighter = unitTypes.WEIRD_RAIDER,
 		planescout = unitTypes.UTILITY,

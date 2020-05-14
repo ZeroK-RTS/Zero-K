@@ -815,6 +815,10 @@ local icontypes = {
     bitmap='icons/bomberspecial.dds',
     size=2.1,
   },
+  bomberskirm = {
+    bitmap='icons/bomberskirm.dds',
+    size=2.1,
+  },
   bomberraider = {
     bitmap='icons/bomberraider.dds',
     size=2.1,
