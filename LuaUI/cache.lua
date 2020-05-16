@@ -85,6 +85,11 @@ function Spring.SetTeamColor(teamid, r, g, b)
   teamColor[teamid] = { GetTeamColor(teamid) }
 end
 
+local spSetUnitNoSelect = Spring.SetUnitNoSelect
+function Spring.SetUnitNoSelect(unitID, value)
+	return
+end
+
 local function buildIndex(teamID, radius, Icons)
   --local index = tostring(teamID)..":"..tostring(radius)..":"..tostring(Icons)
   local t = {}
