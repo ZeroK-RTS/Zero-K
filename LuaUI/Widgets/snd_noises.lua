@@ -149,40 +149,51 @@ function widget:SelectionChanged(selection, subselection)
 	if (not selection[1]) then
 		return
 	end
+
 	local unitDefID = GetUnitDefID(selection[1])
-	if (unitDefID) then --only make sound when selecting own units
-		local unitName = UnitDefs[unitDefID].name
-		if (unitName and soundTable[unitName]) then
-			local sound = soundTable[unitName].select[1]
-			if (sound) then
-				CoolNoisePlay((sound), options.selectSoundCooldown.value, (soundTable[unitName].select.volume or 1)*options.selectnoisevolume.value)
-			end
-		end
+	if not unitDefID then --only make sound when selecting own units
+		return
 	end
+
+	local sounds = soundTable[unitDefID]
+	if not sounds then
+		return
+	end
+
+	local sound = sounds.select[1]
+	if not sound then
+		return
+	end
+
+	CoolNoisePlay(sound, options.selectSoundCooldown.value, (sounds.select.volume or 1)*options.selectnoisevolume.value)
 end
 
 function WG.sounds_gaveOrderToUnit(unitID, isBuild)
-	if unitID then
-		local unitDefID = GetUnitDefID(unitID)
-		local unitName = UnitDefs[unitDefID].name
-		local sounds = soundTable[unitName] or soundTable[default]
-		if not isBuild then
-			if (sounds and sounds.ok) then
-				CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, sounds.ok.volume)
-			end
-		elseif (sounds and sounds.build) then
-			CoolNoisePlay(sounds.build, options.commandSoundCooldown.value)
+	if not unitID then
+		return
+	end
+
+	local unitDefID = GetUnitDefID(unitID)
+	local sounds = soundTable[unitDefID]
+	if not sounds then
+		return
+	end
+
+	if not isBuild then
+		if sounds.ok then
+			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, sounds.ok.volume)
 		end
+	elseif sounds.build then
+		CoolNoisePlay(sounds.build, options.commandSoundCooldown.value)
 	end
 end
 
 local function PlayResponse(unitID, cmdID, cooldown)
 	local unitDefID = GetUnitDefID(unitID)
-	if not (unitDefID and UnitDefs[unitDefID]) then
+	if not unitDefID then
 		return false
 	end
-	local unitName = UnitDefs[unitDefID].name
-	local sounds = soundTable[unitName] or soundTable[default]
+	local sounds = soundTable[unitDefID]
 	if cmdID and (CMD[cmdID] or widgetCMD[cmdID] or cmdID > 0) then
 		if (sounds and sounds.ok) then
 			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
@@ -214,18 +225,25 @@ function widget:Update()
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-	if (unitTeam == myTeamID) and damage > 1 then
-		local unitDefID = GetUnitDefID(unitID)
-		local unitName = UnitDefs[unitDefID].name
-		local sounds = soundTable[unitName] or soundTable[default]
-		if sounds and sounds.underattack and sounds.underattack[1] and (sounds.attackonscreen or not spInView(unitID)) then
-			if sounds.attackdelay and WG.ModularCommAPI.IsStarterComm and WG.ModularCommAPI.IsStarterComm(unitID) then
-				local health, maxhealth = spGetUnitHealth(unitID)
-				CoolNoisePlay(sounds.underattack[1], sounds.attackdelay(health/maxhealth), (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
-			else
-				CoolNoisePlay(sounds.underattack[1], 40, (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
-			end
-		end
+	if unitTeam ~= myTeamID or damage < 1 then
+		return
+	end
+
+	local unitDefID = GetUnitDefID(unitID)
+	local sounds = soundTable[unitDefID]
+	if not sounds or not sounds.underattack or not sounds.underattack[1] then
+		return
+	end
+
+	if not sounds.attackonscreen and spInView(unitID) then
+		return
+	end
+
+	if sounds.attackdelay and WG.ModularCommAPI.IsStarterComm and WG.ModularCommAPI.IsStarterComm(unitID) then
+		local health, maxhealth = spGetUnitHealth(unitID)
+		CoolNoisePlay(sounds.underattack[1], sounds.attackdelay(health/maxhealth), (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
+	else
+		CoolNoisePlay(sounds.underattack[1], 40, (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
 	end
 end
 
