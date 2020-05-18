@@ -217,7 +217,7 @@ end
 function widget:DrawWorldPreUnit()
 	glDepthTest(true)
 	glPolygonOffset(-10000, -2)  -- draw on top of water/map - sideeffect: will shine through terrain/mountains
-	for _,unitID in ipairs(Spring.GetVisibleUnits()) do
+	for _,unitID in ipairs(Spring.GetVisibleUnits(-1, nil, false)) do
 		local team = spGetUnitTeam(unitID)
 		if (team) then
 			local radius = GetUnitDefRealRadius(spGetUnitDefID(unitID))
