@@ -71,7 +71,6 @@ local spGetUnitRadius        = Spring.GetUnitRadius
 local spGetUnitTeam          = Spring.GetUnitTeam
 local spGetUnitViewPosition  = Spring.GetUnitViewPosition
 local spIsUnitSelected       = Spring.IsUnitSelected
-local spIsUnitVisible        = Spring.IsUnitVisible
 local spSendCommands         = Spring.SendCommands
 
 
