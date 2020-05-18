@@ -321,7 +321,7 @@ local function DrawWorldFunc()
 	
 	-- this is probably faster than spIsUnitInView() for all the units
 	-- but that's probably worth testing to confirm
-	local unitsInView = spGetVisibleUnits()
+	local unitsInView = spGetVisibleUnits(-1, nil, true)
 	local unitIsInView = {}
 	for k, v in pairs(unitsInView) do
 		unitIsInView[v] = true
