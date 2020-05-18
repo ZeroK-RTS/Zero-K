@@ -516,7 +516,7 @@
 	},
 	"gunshipbomb" : {
 		"name" : "Blastwing",
-		"description" : "Latająca bomba zwiadowczy (zakopuje się)",
+		"description" : "Latająca bomba zwiadowcza (zakopuje się)",
 		"helptext" : "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
 	},
 	"napalmmissile" : {
