@@ -41,9 +41,11 @@ return { planeheavyfighter = {
   iconType               = [[stealthfighter]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxAcc                 = 0.55,
+  maxAcc                 = 0.605,
+  maxAileron             = 0.02,
   maxDamage              = 1100,
-  maxRudder              = 0.006,
+  maxElevator            = 0.015,
+  maxRudder              = 0.008,
   maxVelocity            = 7.6,
   minCloakDistance       = 75,
   mygravity              = 1,
@@ -53,7 +55,7 @@ return { planeheavyfighter = {
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
   speedToFront           = 0.5,
-  turnRadius             = 80,
+  turnRadius             = 160,
 
   weapons                = {
 
