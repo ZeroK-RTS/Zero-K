@@ -303,7 +303,7 @@ local function SetTeamColor(teamID)
 end
 
 local function DrawVisibleUnitsAll()
-  local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,true)
+  local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
   for i=1,#visibleUnits do
     local unitID = visibleUnits[i]
     SetTeamColor(GetUnitTeam(unitID))
