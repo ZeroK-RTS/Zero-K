@@ -1,7 +1,7 @@
 return { gunshipbomb = {
   unitname               = [[gunshipbomb]],
   name                   = [[Blastwing]],
-  description            = [[Flying Bomb (Burrows)]],
+  description            = [[Flying Bomb/Scout (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.2,
   buildCostMetal         = 45,
@@ -51,7 +51,7 @@ return { gunshipbomb = {
   script                 = [[gunshipbomb.lua]],
   selfDestructAs         = [[gunshipbomb_EXPLOSION]],
   selfDestructCountdown  = 0,
-  sightDistance          = 450,
+  sightDistance          = 560,
   turnRate               = 1144,
   upright                = false,
   workerTime             = 0,

@@ -521,7 +521,7 @@
 	},
 	"gunshipbomb" : {
 		"name" : "Blastwing",
-		"description" : "Flying Bomb (Burrows)",
+		"description" : "Flying Bomb/Scout (Burrows)",
 		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"napalmmissile" : {

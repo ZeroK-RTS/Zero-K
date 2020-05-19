@@ -1061,7 +1061,7 @@
 	},
 	"gunshipbomb" : {
 		"name" : "Blastwing",
-		"description" : "Fliegende Bombe",
+		"description" : "Fliegende Bombe/Aufklärer",
 		"helptext" : "Der Blastwing macht sehr wenig Schaden, ideal, um etwa Metallextraktoren, Soloranlagen, Leichte Lasertürme, Windanlagen und Nanotürme auszumerzen. Dennoch können gunshipbombs in Massen durchaus ordentlich Schaden anrichten. Beachte die Geschwindigkeit und Richtung, in die die Drohnen fliegen, denn der größte Schaden wird durch das Schrapnell erzielt, das nach dem Tod der Drohne weiter in Flugrichtung fliegen wird. Auf diese Weise kannst du deinen Gegner trotzdem mit Metallsplittern überhäufen, obwohl deine gunshipbombs schon vorher abgeschossen wurden. Vermeide, dass du die gunshipbombs zu nah aneinander stationiert, da sie in einer Kettenreaktion explodieren können. Kann sich zur Mine entwickeln."
 	},
 	"chicken_tiamat" : {
