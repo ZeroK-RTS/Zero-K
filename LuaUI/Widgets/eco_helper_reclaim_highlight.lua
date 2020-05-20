@@ -400,11 +400,6 @@ end
 function widget:Initialize()
 	-- This information is pretty useful as a spectator too
 	-- CheckSpecState(widgetName)
-	local curModID = string.upper(Game.modShortName or "")
-	if ( curModID ~= "ZK" ) then
-		widgetHandler:RemoveWidget()
-		return
-	end
 
 	UpdateTeamAndAllyTeamID()
 
