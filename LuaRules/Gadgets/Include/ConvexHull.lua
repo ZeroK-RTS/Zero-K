@@ -43,7 +43,7 @@ local function JarvisMarch(points, benchmark)
 	-- Process CCW from the left-most point to the start point
 	repeat
 		-- Find the next point q such that (p, i, q) is CCW for all i
-		q = points[p + 1] and p + 1 or 1
+		local q = points[p + 1] and p + 1 or 1
 		for i = 1, numPoints, 1 do
 		  if isCCW(points[p], points[i], points[q]) then q = i end
 		end
@@ -64,7 +64,7 @@ end
 -- https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 -- Direct port from Javascript version
 
-function MonotoneChain(points, benchmark)
+local function MonotoneChain(points, benchmark)
 	benchmark:Enter("MonotoneChain")
 	local numPoints = #points
 	if numPoints < 3 then return end
