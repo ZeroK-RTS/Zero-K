@@ -489,50 +489,49 @@ end
 
 function widget:GameFrame(frame)
 	local frameMod = frame % checkFrequency
-	if frameMod == 0 then
-		benchmark:Enter("GameFrame UpdateFeatures")
-		UpdateFeatures(frame)
-		--Spring.Echo("featuresUpdated", featuresUpdated)
-		if featuresUpdated then
-			ClusterizeFeatures()
-			ClustersToConvexHull()
-			--Spring.Echo("LuaUI memsize before = ", collectgarbage("count"))
-			--collectgarbage("collect")
-			--Spring.Echo("LuaUI memsize after = ", collectgarbage("count"))
-			--benchmark:PrintAllStat()
-		end
-
-		if featuresUpdated or drawFeatureConvexHullSolidList == nil then
-			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
-			--Spring.Echo("featuresUpdated")
-			if drawFeatureConvexHullSolidList then
-				gl.DeleteList(drawFeatureConvexHullSolidList)
-				drawFeatureConvexHullSolidList = nil
-			end
-
-			if drawFeatureConvexHullEdgeList then
-				gl.DeleteList(drawFeatureConvexHullEdgeList)
-				drawFeatureConvexHullEdgeList = nil
-			end
-
-
-			drawFeatureConvexHullSolidList = gl.CreateList(DrawFeatureConvexHullSolid)
-			drawFeatureConvexHullEdgeList = gl.CreateList(DrawFeatureConvexHullEdge)
-			benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
-		end
-
-		if featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
-			benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
-			--Spring.Echo("clusterMetalUpdated")
-			if drawFeatureClusterTextList then
-				gl.DeleteList(drawFeatureClusterTextList)
-				drawFeatureClusterTextList = nil
-			end
-			drawFeatureClusterTextList = gl.CreateList(DrawFeatureClusterText)
-			benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
-		end
-		benchmark:Leave("GameFrame UpdateFeatures")
+	if frameMod ~= 0 then return end
+	benchmark:Enter("GameFrame UpdateFeatures")
+	UpdateFeatures(frame)
+	--Spring.Echo("featuresUpdated", featuresUpdated)
+	if featuresUpdated then
+		ClusterizeFeatures()
+		ClustersToConvexHull()
+		--Spring.Echo("LuaUI memsize before = ", collectgarbage("count"))
+		--collectgarbage("collect")
+		--Spring.Echo("LuaUI memsize after = ", collectgarbage("count"))
+		--benchmark:PrintAllStat()
 	end
+
+	if featuresUpdated or drawFeatureConvexHullSolidList == nil then
+		benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+		--Spring.Echo("featuresUpdated")
+		if drawFeatureConvexHullSolidList then
+			gl.DeleteList(drawFeatureConvexHullSolidList)
+			drawFeatureConvexHullSolidList = nil
+		end
+
+		if drawFeatureConvexHullEdgeList then
+			gl.DeleteList(drawFeatureConvexHullEdgeList)
+			drawFeatureConvexHullEdgeList = nil
+		end
+
+
+		drawFeatureConvexHullSolidList = gl.CreateList(DrawFeatureConvexHullSolid)
+		drawFeatureConvexHullEdgeList = gl.CreateList(DrawFeatureConvexHullEdge)
+		benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+	end
+
+	if featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
+		benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+		--Spring.Echo("clusterMetalUpdated")
+		if drawFeatureClusterTextList then
+			gl.DeleteList(drawFeatureClusterTextList)
+			drawFeatureClusterTextList = nil
+		end
+		drawFeatureClusterTextList = gl.CreateList(DrawFeatureClusterText)
+		benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+	end
+	benchmark:Leave("GameFrame UpdateFeatures")
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
