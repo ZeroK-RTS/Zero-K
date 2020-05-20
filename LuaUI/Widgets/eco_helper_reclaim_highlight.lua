@@ -21,7 +21,7 @@ local fontSizeMax = 250
 
 local textParametersChanged = false
 
-options_path = "Settings/Interface/Reclaim Highlight"
+options_path = "Settings/Interface/Reclaim Field Highlight"
 options_order = { 'flashStrength', 'fontSizeMin', 'fontSizeMax', 'fontScaling' }
 options = {
 	flashStrength = {
