@@ -165,6 +165,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Reclaim Field Highlight']  = imgPath..'epicmenu/reclaimfield.png',
 	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
 	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
