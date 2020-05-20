@@ -13,7 +13,6 @@ Image = Button:Inherit{
 
   flip  = true;
   flip2 = true;
-  firstDraw = true,
 
   keepAspect = true;
 
@@ -69,19 +68,12 @@ function Image:DrawControl()
   else
     if (self.file2) then
       TextureHandler.LoadTexture(0,self.file2,self)
-      if self.firstDraw then
-        gl.TextureInfo(self.file2)
-      end
       gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip2)
     end
     if (self.file) then
       TextureHandler.LoadTexture(0,self.file,self)
-      if self.firstDraw then
-        gl.TextureInfo(self.file)
-      end
       gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip)
     end
-    self.firstDraw = false
   end
   gl.Texture(0,false)
 end
