@@ -14,6 +14,61 @@ function widget:GetInfo()
   }
 end
 
+local flashStrength = 0.5
+local fontScaling = 25 / 40
+local fontSizeMin = 40
+local fontSizeMax = 250
+
+local textParametersChanged = false
+
+options_path = "Settings/Interface/Reclaim Highlight"
+options_order = { 'flashStrength', 'fontSizeMin', 'fontSizeMax', 'fontScaling' }
+options = {
+	flashStrength = {
+		name = "Field flashing strength",
+		type = 'number',
+		OnChange = function()
+			flashStrength = options.flashStrength.value
+		end,
+		value = flashStrength,
+		min=0.0, max=0.5, step=0.05,
+		desc = "How intensely the reclaim fields should pulse over time"
+	},
+	fontSizeMin = {
+		name = "Minimum font size",
+		type = 'number',
+		OnChange = function()
+			fontSizeMin = options.fontSizeMin.value
+			textParametersChanged = true
+		end,
+		value = fontSizeMin,
+		min = 20, max=100, step=10,
+		desc = "The smallest font size to use for the smallest reclaim fields"
+	},
+	fontSizeMax = {
+		name = "Maximum font size",
+		type = 'number',
+		OnChange = function()
+			fontSizeMax = options.fontSizeMax.value
+			textParametersChanged = true
+		end,
+		value = fontSizeMax,
+		min = 20, max=300, step=10,
+		desc = "The largest font size to use for the largest reclaim fields"
+	},
+	fontScaling = {
+		name = "Font scaling factor",
+		type = 'number',
+		OnChange = function()
+			fontScaling = options.fontScaling.value
+			textParametersChanged = true
+		end,
+		value = fontScaling,
+		min = 0.2, max=0.8, step=0.025,
+		desc = "How quickly the font size of the metal value display should grow with the size of the field"
+	}
+}
+
 local glBeginEnd = gl.BeginEnd
 local glBlending = gl.Blending
 local glCallList = gl.CallList
@@ -438,9 +493,6 @@ local function DrawFeatureConvexHullEdge()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 end
 
-local fontSizeMin = 40 --font size for minDim sized convex Hull
-local fontSizeMax = 250
-
 local drawFeatureClusterTextList
 local function DrawFeatureClusterText()
 	for i = 1, #featureConvexHulls do
@@ -451,7 +503,7 @@ local function DrawFeatureClusterText()
 		glTranslate(center.x, center.y, center.z)
 		glRotate(-90, 1, 0, 0)
 
-		local fontSize = 25
+		local fontSize = fontSizeMin * fontScaling
 		local area = featureConvexHulls[i].area
 		fontSize = math.sqrt(area) * fontSize / minDim
 		fontSize = math.max(fontSize, fontSizeMin)
@@ -500,7 +552,7 @@ function widget:Update(dt)
 	end
 
 	local frame=spGetGameFrame()
-	color = 0.5 + 0.5 * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
+	color = 0.5 + flashStrength * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
 	if color < 0 then color = 0 end
 	if color > 1 then color = 1 end
 end
@@ -539,7 +591,7 @@ function widget:GameFrame(frame)
 		benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 	end
 
-	if featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
+	if textParametersChanged or featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
 		benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
 		--spEcho("clusterMetalUpdated")
 		if drawFeatureClusterTextList then
@@ -547,6 +599,7 @@ function widget:GameFrame(frame)
 			drawFeatureClusterTextList = nil
 		end
 		drawFeatureClusterTextList = glCreateList(DrawFeatureClusterText)
+		textParametersChanged = false
 		benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
 	end
 	benchmark:Leave("GameFrame UpdateFeatures")

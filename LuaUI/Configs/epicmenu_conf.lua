@@ -387,6 +387,9 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
+local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
+	ShButton(pathReclaimHighlight, 'Toggle Reclaim Field Highlight', function() spSendCommands{"luaui togglewidget Reclaim Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
+
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
   
