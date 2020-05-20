@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-local flashStrength = 0.5
+local flashStrength = 0.0
 local fontScaling = 25 / 40
 local fontSizeMin = 40
 local fontSizeMax = 250
