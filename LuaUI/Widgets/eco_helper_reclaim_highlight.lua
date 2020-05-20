@@ -14,12 +14,43 @@ function widget:GetInfo()
   }
 end
 
+local glBeginEnd = gl.BeginEnd
+local glBlending = gl.Blending
+local glCallList = gl.CallList
+local glColor = gl.Color
+local glCreateList = gl.CreateList
+local glDeleteList = gl.DeleteList
+local glDepthTest = gl.DepthTest
+local glLineWidth = gl.LineWidth
+local glPolygonMode = gl.PolygonMode
+local glPopMatrix = gl.PopMatrix
+local glPushMatrix = gl.PushMatrix
+local glRotate = gl.Rotate
+local glText = gl.Text
+local glTranslate = gl.Translate
+local glVertex = gl.Vertex
+local spGetAllFeatures = Spring.GetAllFeatures
+local spGetCameraPosition = Spring.GetCameraPosition
+local spGetFeatureHeight = Spring.GetFeatureHeight
+local spGetFeaturePosition = Spring.GetFeaturePosition
+local spGetFeatureResources = Spring.GetFeatureResources
+local spGetFeatureTeam = Spring.GetFeatureTeam
+local spGetGaiaTeamID = Spring.GetGaiaTeamID
+local spGetGameFrame = Spring.GetGameFrame
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
+local spIsGUIHidden = Spring.IsGUIHidden
+local spIsPosInLos = Spring.IsPosInLos
+local spTraceScreenRay = Spring.TraceScreenRay
+local spValidFeatureID = Spring.ValidFeatureID
+
+
 local screenx, screeny
 
-local gaiaTeamId = Spring.GetGaiaTeamID()
+local gaiaTeamId = spGetGaiaTeamID()
 local myAllyTeamID
 local function UpdateTeamAndAllyTeamID()
-	myAllyTeamID = Spring.GetMyAllyTeamID()
+	myAllyTeamID = spGetMyAllyTeamID()
 end
 
 local Benchmark = VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
@@ -77,22 +108,22 @@ local function UpdateFeatures(gf)
 	featuresUpdated = false
 	clusterMetalUpdated = false
 	benchmark:Enter("UpdateFeatures 1loop")
-	for _, fID in ipairs(Spring.GetAllFeatures()) do
-		local metal, _, energy = Spring.GetFeatureResources(fID)
+	for _, fID in ipairs(spGetAllFeatures()) do
+		local metal, _, energy = spGetFeatureResources(fID)
 		metal = metal + energy * E2M
 
 		if (not knownFeatures[fID]) and (metal >= minFeatureMetal) then --first time seen
 			local f = {}
 			f.lastScanned = gf
 
-			local fx, _, fz = Spring.GetFeaturePosition(fID)
-			local fy = Spring.GetGroundHeight(fx, fz)
+			local fx, _, fz = spGetFeaturePosition(fID)
+			local fy = spGetGroundHeight(fx, fz)
 			f.x = fx
 			f.y = fy
 			f.z = fz
 
-			f.isGaia = (Spring.GetFeatureTeam(fID) == gaiaTeamId)
-			f.height = Spring.GetFeatureHeight(fID)
+			f.isGaia = (spGetFeatureTeam(fID) == gaiaTeamId)
+			f.height = spGetFeatureHeight(fID)
 			f.drawAlt = ((fy > 0 and fy) or 0) + f.height + 10
 
 			f.metal = metal
@@ -106,8 +137,8 @@ local function UpdateFeatures(gf)
 		if knownFeatures[fID] and gf - knownFeatures[fID].lastScanned >= scanInterval then
 			knownFeatures[fID].lastScanned = gf
 
-			local fx, _, fz = Spring.GetFeaturePosition(fID)
-			local fy = Spring.GetGroundHeight(fx, fz)
+			local fx, _, fz = spGetFeaturePosition(fID)
+			local fy = spGetGroundHeight(fx, fz)
 
 			if knownFeatures[fID].x ~= fx or knownFeatures[fID].y ~= fy or knownFeatures[fID].z ~= fz then
 				knownFeatures[fID].x = fx
@@ -117,19 +148,19 @@ local function UpdateFeatures(gf)
 				knownFeatures[fID].drawAlt = ((fy > 0 and fy) or 0) + knownFeatures[fID].height + 10
 
 				UpdateFeatureNeighborsMatrix(fID, false, true, false)
-				featuresUpdated = true
+			featuresUpdated = true
 			end
 
 			if knownFeatures[fID].metal ~= metal then
-				--Spring.Echo("knownFeatures[fID].metal ~= metal", metal)
+				--spEcho("knownFeatures[fID].metal ~= metal", metal)
 				if knownFeatures[fID].clID then
-					--Spring.Echo("knownFeatures[fID].clID")
+					--spEcho("knownFeatures[fID].clID")
 					local thisCluster = featureClusters[ knownFeatures[fID].clID ]
 					thisCluster.metal = thisCluster.metal - knownFeatures[fID].metal
 					if metal >= minFeatureMetal then
 						thisCluster.metal = thisCluster.metal + metal
 						knownFeatures[fID].metal = metal
-						--Spring.Echo("clusterMetalUpdated = true", thisCluster.metal)
+						--spEcho("clusterMetalUpdated = true", thisCluster.metal)
 						clusterMetalUpdated = true
 					else
 						UpdateFeatureNeighborsMatrix(fID, false, false, true)
@@ -145,8 +176,8 @@ local function UpdateFeatures(gf)
 	benchmark:Enter("UpdateFeatures 2loop")
 	for fID, fInfo in pairs(knownFeatures) do
 
-		if fInfo.isGaia and Spring.ValidFeatureID(fID) == false then
-			--Spring.Echo("fInfo.isGaia and Spring.ValidFeatureID(fID) == false")
+		if fInfo.isGaia and spValidFeatureID(fID) == false then
+			--spEcho("fInfo.isGaia and spValidFeatureID(fID) == false")
 
 			UpdateFeatureNeighborsMatrix(fID, false, false, true)
 			fInfo = nil
@@ -155,9 +186,9 @@ local function UpdateFeatures(gf)
 		end
 
 		if fInfo and gf - fInfo.lastScanned >= scanForRemovalInterval then --long time unseen features, maybe they were relcaimed or destroyed?
-			local los = Spring.IsPosInLos(fInfo.x, fInfo.y, fInfo.z, myAllyTeamID)
+			local los = spIsPosInLos(fInfo.x, fInfo.y, fInfo.z, myAllyTeamID)
 			if los then --this place has no feature, it's been moved or reclaimed or destroyed
-				--Spring.Echo("this place has no feature, it's been moved or reclaimed or destroyed")
+				--spEcho("this place has no feature, it's been moved or reclaimed or destroyed")
 
 				UpdateFeatureNeighborsMatrix(fID, false, false, true)
 				fInfo = nil
@@ -182,7 +213,7 @@ local function ClusterizeFeatures()
 
 	local unclusteredPoints  = {}
 
-	--Spring.Echo("#knownFeatures", #knownFeatures)
+	--spEcho("#knownFeatures", #knownFeatures)
 
 	for fID, fInfo in pairs(knownFeatures) do
 		pointsTable[#pointsTable + 1] = {
@@ -204,7 +235,7 @@ local function ClusterizeFeatures()
 	featureClusters = opticsObject:Clusterize(minDistance)
 	benchmark:Leave("opticsObject:Clusterize(minDistance)")
 
-	--Spring.Echo("#featureClusters", #featureClusters)
+	--spEcho("#featureClusters", #featureClusters)
 
 
 	for i = 1, #featureClusters do
@@ -261,7 +292,7 @@ local featureConvexHulls = {}
 local function ClustersToConvexHull()
 	benchmark:Enter("ClustersToConvexHull")
 	featureConvexHulls = {}
-	--Spring.Echo("#featureClusters", #featureClusters)
+	--spEcho("#featureClusters", #featureClusters)
 	for fc = 1, #featureClusters do
 		local clusterPoints = {}
 		benchmark:Enter("ClustersToConvexHull 1st Part")
@@ -272,7 +303,7 @@ local function ClustersToConvexHull()
 				y = knownFeatures[fID].drawAlt,
 				z = knownFeatures[fID].z
 			}
-			--Spring.MarkerAddPoint(knownFeatures[fID].x, 0, knownFeatures[fID].z, string.format("%i(%i)", fc, fcm))
+			--spMarkerAddPoint(knownFeatures[fID].x, 0, knownFeatures[fID].z, string.format("%i(%i)", fc, fcm))
 		end
 		benchmark:Leave("ClustersToConvexHull 1st Part")
 
@@ -282,11 +313,11 @@ local function ClustersToConvexHull()
 		benchmark:Enter("ClustersToConvexHull 2nd Part")
 		local convexHull
 		if #clusterPoints >= 3 then
-			--Spring.Echo("#clusterPoints >= 3")
+			--spEcho("#clusterPoints >= 3")
 			--convexHull = ConvexHull.JarvisMarch(clusterPoints, benchmark)
 			convexHull = ConvexHull.MonotoneChain(clusterPoints, benchmark) --twice faster
 		else
-			--Spring.Echo("not #clusterPoints >= 3")
+			--spEcho("not #clusterPoints >= 3")
 			local thisCluster = featureClusters[fc]
 
 			local xmin, xmax, zmin, zmax = thisCluster.xmin, thisCluster.xmax, thisCluster.zmin, thisCluster.zmax
@@ -349,7 +380,7 @@ local function ClustersToConvexHull()
 
 --[[
 		for i = 1, #convexHull do
-			Spring.MarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
+			spMarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
 		end
 ]]--
 		benchmark:Leave("ClustersToConvexHull")
@@ -377,7 +408,7 @@ function widget:Initialize()
 
 	UpdateTeamAndAllyTeamID()
 
-	--local iconDist = Spring.GetConfigInt("UnitIconDist")
+	--local iconDist = spGetConfigInt("UnitIconDist")
 
 	screenx, screeny = widgetHandler:GetViewSizes()
 
@@ -389,35 +420,35 @@ local cameraScale
 
 local drawFeatureConvexHullSolidList
 local function DrawFeatureConvexHullSolid()
-	gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	for i = 1, #featureConvexHulls do
-		gl.PushMatrix()
+		glPushMatrix()
 
-		gl.BeginEnd(GL.TRIANGLE_FAN, function()
+		glBeginEnd(GL.TRIANGLE_FAN, function()
 			for j = 1, #featureConvexHulls[i] do
-				gl.Vertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
+				glVertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
 			end
 		end)
 
-		gl.PopMatrix()
+		glPopMatrix()
 	end
 end
 
 local drawFeatureConvexHullEdgeList
 local function DrawFeatureConvexHullEdge()
-	gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+	glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 	for i = 1, #featureConvexHulls do
-		gl.PushMatrix()
+		glPushMatrix()
 
-		gl.BeginEnd(GL.LINE_LOOP, function()
+		glBeginEnd(GL.LINE_LOOP, function()
 			for j = 1, #featureConvexHulls[i] do
-				gl.Vertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
+				glVertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
 			end
 		end)
 
-		gl.PopMatrix()
+		glPopMatrix()
 	end
-	gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 end
 
 local fontSizeMin = 40 --font size for minDim sized convex Hull
@@ -426,12 +457,12 @@ local fontSizeMax = 250
 local drawFeatureClusterTextList
 local function DrawFeatureClusterText()
 	for i = 1, #featureConvexHulls do
-		gl.PushMatrix()
+		glPushMatrix()
 
 		local center = featureConvexHulls[i].center
 
-		gl.Translate(center.x, center.y, center.z)
-		gl.Rotate(-90, 1, 0, 0)
+		glTranslate(center.x, center.y, center.z)
+		glRotate(-90, 1, 0, 0)
 
 		local fontSize = 25
 		local area = featureConvexHulls[i].area
@@ -441,7 +472,7 @@ local function DrawFeatureClusterText()
 
 
 		local metal = featureClusters[i].metal
-		--Spring.Echo(metal)
+		--spEcho(metal)
 		local metalText
 		if metal < 1000 then
 			metalText = string.format("%.0f", metal) --exact number
@@ -457,12 +488,12 @@ local function DrawFeatureClusterText()
 		local g = x1000 - x100
 		local b = x100
 
-		gl.Color(r, g, b, 1.0)
-		--gl.Rect(-200, -200, 200, 200)
-		gl.Text(metalText, 0, 0, fontSize, "cv")
+		glColor(r, g, b, 1.0)
+		--glRect(-200, -200, 200, 200)
+		glText(metalText, 0, 0, fontSize, "cv")
 
 
-		gl.PopMatrix()
+		glPopMatrix()
 	end
 end
 
@@ -471,9 +502,9 @@ local checkFrequency = 30
 local cumDt = 0
 function widget:Update(dt)
 	cumDt = cumDt + dt
-	local cx, cy, cz = Spring.GetCameraPosition()
+	local cx, cy, cz = spGetCameraPosition()
 
-	local desc, w = Spring.TraceScreenRay(screenx / 2, screeny / 2, true)
+	local desc, w = spTraceScreenRay(screenx / 2, screeny / 2, true)
 	if desc then
 		local cameraDist = math.min( 8000, math.sqrt( (cx-w[1])^2 + (cy-w[2])^2 + (cz-w[3])^2 ) )
 		cameraScale = math.sqrt((cameraDist / 600)) --number is an "optimal" view distance
@@ -481,7 +512,7 @@ function widget:Update(dt)
 		cameraScale = 1.0
 	end
 
-	local frame=Spring.GetGameFrame()
+	local frame=spGetGameFrame()
 	color = 0.5 + 0.5 * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
 	if color < 0 then color = 0 end
 	if color > 1 then color = 1 end
@@ -492,43 +523,43 @@ function widget:GameFrame(frame)
 	if frameMod ~= 0 then return end
 	benchmark:Enter("GameFrame UpdateFeatures")
 	UpdateFeatures(frame)
-	--Spring.Echo("featuresUpdated", featuresUpdated)
+	--spEcho("featuresUpdated", featuresUpdated)
 	if featuresUpdated then
 		ClusterizeFeatures()
 		ClustersToConvexHull()
-		--Spring.Echo("LuaUI memsize before = ", collectgarbage("count"))
+		--spEcho("LuaUI memsize before = ", collectgarbage("count"))
 		--collectgarbage("collect")
-		--Spring.Echo("LuaUI memsize after = ", collectgarbage("count"))
+		--spEcho("LuaUI memsize after = ", collectgarbage("count"))
 		--benchmark:PrintAllStat()
 	end
 
 	if featuresUpdated or drawFeatureConvexHullSolidList == nil then
 		benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
-		--Spring.Echo("featuresUpdated")
+		--spEcho("featuresUpdated")
 		if drawFeatureConvexHullSolidList then
-			gl.DeleteList(drawFeatureConvexHullSolidList)
+			glDeleteList(drawFeatureConvexHullSolidList)
 			drawFeatureConvexHullSolidList = nil
 		end
 
 		if drawFeatureConvexHullEdgeList then
-			gl.DeleteList(drawFeatureConvexHullEdgeList)
+			glDeleteList(drawFeatureConvexHullEdgeList)
 			drawFeatureConvexHullEdgeList = nil
 		end
 
 
-		drawFeatureConvexHullSolidList = gl.CreateList(DrawFeatureConvexHullSolid)
-		drawFeatureConvexHullEdgeList = gl.CreateList(DrawFeatureConvexHullEdge)
+		drawFeatureConvexHullSolidList = glCreateList(DrawFeatureConvexHullSolid)
+		drawFeatureConvexHullEdgeList = glCreateList(DrawFeatureConvexHullEdge)
 		benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 	end
 
 	if featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
 		benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
-		--Spring.Echo("clusterMetalUpdated")
+		--spEcho("clusterMetalUpdated")
 		if drawFeatureClusterTextList then
-			gl.DeleteList(drawFeatureClusterTextList)
+			glDeleteList(drawFeatureClusterTextList)
 			drawFeatureClusterTextList = nil
 		end
-		drawFeatureClusterTextList = gl.CreateList(DrawFeatureClusterText)
+		drawFeatureClusterTextList = glCreateList(DrawFeatureClusterText)
 		benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
 	end
 	benchmark:Leave("GameFrame UpdateFeatures")
@@ -539,44 +570,44 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
-	gl.DepthTest(false)
-	--gl.DepthTest(true)
+	if spIsGUIHidden() then return end
+	glDepthTest(false)
+	--glDepthTest(true)
 
-	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+	glBlending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 	if drawFeatureConvexHullSolidList then
-		gl.Color(ColorMul(color, reclaimColor))
-		gl.CallList(drawFeatureConvexHullSolidList)
+		glColor(ColorMul(color, reclaimColor))
+		glCallList(drawFeatureConvexHullSolidList)
 		--DrawFeatureConvexHullSolid()
 	end
 
 	if drawFeatureConvexHullEdgeList then
-		gl.LineWidth(6.0 / cameraScale)
-		gl.Color(ColorMul(color, reclaimEdgeColor))
-		gl.CallList(drawFeatureConvexHullEdgeList)
+		glLineWidth(6.0 / cameraScale)
+		glColor(ColorMul(color, reclaimEdgeColor))
+		glCallList(drawFeatureConvexHullEdgeList)
 		--DrawFeatureConvexHullEdge()
-		gl.LineWidth(1.0)
+		glLineWidth(1.0)
 	end
 
 
 	if drawFeatureClusterTextList then
-		gl.CallList(drawFeatureClusterTextList)
+		glCallList(drawFeatureClusterTextList)
 		--DrawFeatureClusterText()
 	end
 
-	gl.DepthTest(true)
+	glDepthTest(true)
 
 end
 
 function widget:Shutdown()
 	if drawFeatureConvexHullSolidList then
-		gl.DeleteList(drawFeatureConvexHullSolidList)
+		glDeleteList(drawFeatureConvexHullSolidList)
 	end
 	if drawFeatureConvexHullEdgeList then
-		gl.DeleteList(drawFeatureConvexHullEdgeList)
+		glDeleteList(drawFeatureConvexHullEdgeList)
 	end
 	if drawFeatureClusterTextList then
-		gl.DeleteList(drawFeatureClusterTextList)
+		glDeleteList(drawFeatureClusterTextList)
 	end
 	benchmark:PrintAllStat()
 end
