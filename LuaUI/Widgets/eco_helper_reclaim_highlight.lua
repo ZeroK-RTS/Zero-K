@@ -22,7 +22,7 @@ local function UpdateTeamAndAllyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
 end
 
-local Benchmark = VFS.Include("LuaUI/Widgets/libs/Benchmark.lua")
+local Benchmark = VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
 local benchmark = Benchmark.new()
 
 local scanInterval = 1 * Game.gameSpeed
@@ -172,7 +172,7 @@ local function UpdateFeatures(gf)
 	benchmark:Leave("UpdateFeatures")
 end
 
-local Optics = VFS.Include("LuaUI/Widgets/libs/Optics.lua")
+local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
 
 local function ClusterizeFeatures()
 	benchmark:Enter("ClusterizeFeatures")
@@ -251,7 +251,7 @@ local function ClusterizeFeatures()
 	benchmark:Leave("ClusterizeFeatures")
 end
 
-local ConvexHull = VFS.Include("LuaUI/Widgets/libs/ConvexHull.lua")
+local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
 
 local minDim = 100
 

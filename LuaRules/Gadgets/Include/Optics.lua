@@ -2,7 +2,7 @@
 -- Adapted from:
 -- https://gist.githubusercontent.com/frnsys/6014eed30c69c6722177/raw/ec32813a900348cbb3ab60205921d70c60286ce3/optics.py
 --
-local PQ = VFS.Include("LuaUI/Widgets/libs/PriorityQueue.lua")
+local PQ = VFS.Include("LuaRules/Gadgets/Include/PriorityQueue.lua")
 
 local function DistSq(p1, p2)
 	return (p1.x - p2.x)^2 + (p1.z - p2.z)^2
