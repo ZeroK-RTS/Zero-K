@@ -82,20 +82,22 @@ local function UpdateFeatures(gf)
 		metal = metal + energy * E2M
 
 		if (not knownFeatures[fID]) and (metal >= minFeatureMetal) then --first time seen
-			knownFeatures[fID] = {}
-			knownFeatures[fID].lastScanned = gf
+			local f = {}
+			f.lastScanned = gf
 
 			local fx, _, fz = Spring.GetFeaturePosition(fID)
 			local fy = Spring.GetGroundHeight(fx, fz)
-			knownFeatures[fID].x = fx
-			knownFeatures[fID].y = fy
-			knownFeatures[fID].z = fz
+			f.x = fx
+			f.y = fy
+			f.z = fz
 
-			knownFeatures[fID].isGaia = (Spring.GetFeatureTeam(fID) == gaiaTeamId)
-			knownFeatures[fID].height = Spring.GetFeatureHeight(fID)
-			knownFeatures[fID].drawAlt = ((fy > 0 and fy) or 0) + knownFeatures[fID].height + 10
+			f.isGaia = (Spring.GetFeatureTeam(fID) == gaiaTeamId)
+			f.height = Spring.GetFeatureHeight(fID)
+			f.drawAlt = ((fy > 0 and fy) or 0) + f.height + 10
 
-			knownFeatures[fID].metal = metal
+			f.metal = metal
+
+			knownFeatures[fID] = f
 
 			UpdateFeatureNeighborsMatrix(fID, true, false, false)
 			featuresUpdated = true
