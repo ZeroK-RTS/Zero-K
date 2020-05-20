@@ -413,19 +413,19 @@ end
 local color
 local cameraScale
 
+local function DrawHullVertices(hull)
+	for j = 1, #hull do
+		glVertex(hull[j].x, hull[j].y, hull[j].z)
+	end
+end
+
 local drawFeatureConvexHullSolidList
 local function DrawFeatureConvexHullSolid()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	for i = 1, #featureConvexHulls do
-		glPushMatrix()
 
-		glBeginEnd(GL.TRIANGLE_FAN, function()
-			for j = 1, #featureConvexHulls[i] do
-				glVertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
-			end
-		end)
+		glBeginEnd(GL.TRIANGLE_FAN, DrawHullVertices, featureConvexHulls[i])
 
-		glPopMatrix()
 	end
 end
 
@@ -433,15 +433,7 @@ local drawFeatureConvexHullEdgeList
 local function DrawFeatureConvexHullEdge()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 	for i = 1, #featureConvexHulls do
-		glPushMatrix()
-
-		glBeginEnd(GL.LINE_LOOP, function()
-			for j = 1, #featureConvexHulls[i] do
-				glVertex(featureConvexHulls[i][j].x, featureConvexHulls[i][j].y, featureConvexHulls[i][j].z)
-			end
-		end)
-
-		glPopMatrix()
+		glBeginEnd(GL.LINE_LOOP, DrawHullVertices, featureConvexHulls[i])
 	end
 	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 end
