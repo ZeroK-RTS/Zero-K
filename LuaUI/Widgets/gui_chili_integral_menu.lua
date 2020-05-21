@@ -491,7 +491,8 @@ local function GetHotkeyText(actionName)
 end
 
 --- Returns:
---- - hotkeys: Table[state_name, value_text], nil if action cannot be found or action has no states; value_text is
+--- - states: Table - See customCmdTypes.lua
+--- - hotkeys: Table[state_idx, value_text], nil if action cannot be found or action has no states; value_text is
 ---   "(none)" if a hotkey is not set
 --- - n: Integer - number of hotkeys that are set, nil under same conditions as for hotkeys
 local function GetHotkeysForStatesText(action_name)
@@ -508,9 +509,9 @@ local function GetHotkeysForStatesText(action_name)
 		else
 			n = n + 1
 		end
-		hotkeys[states[state_idx]] = hotkey
+		hotkeys[state_idx] = hotkey
 	end
-	return hotkeys, n
+	return action.states, hotkeys, n
 end
 
 local function GetActionHotkey(actionName)
@@ -528,16 +529,21 @@ local function GetButtonTooltip(displayConfig, command, state)
 	if not tooltip then
 		return nil
 	end
-	if command and command.action then
-		local hotkey_for_toggle = GetHotkeyText(command.action)
-		local hotkeys_for_states, states_n = GetHotkeysForStatesText(command.action)
-		if hotkey_for_toggle then
-			tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
-		end
-		if hotkeys_for_states and states_n > 0 then
-			tooltip = tooltip .. SEP .. "State Hotkeys:"
-			for state_name, hotkey in pairs(hotkeys_for_states) do
-				tooltip = tooltip .. SEP .. GetGreenStr(state_name .. ": " .. hotkey)
+	if command then
+		local action_name = command.action
+		if command.action then
+			local hotkey_for_toggle = GetHotkeyText(action_name)
+			local states, hotkeys_for_states, number_of_set_hotkeys = GetHotkeysForStatesText(action_name)
+			if hotkey_for_toggle then
+				tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
+			end
+			if hotkeys_for_states and number_of_set_hotkeys > 0 then
+				tooltip = tooltip .. SEP .. "State Hotkeys:"
+				for i = 1, #states do
+					local state_name = states[i]
+					local hotkey = hotkeys_for_states[i]
+					tooltip = tooltip .. SEP .. GetGreenStr(state_name .. ": " .. hotkey)
+				end
 			end
 		end
 	end
