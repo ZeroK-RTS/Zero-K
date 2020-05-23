@@ -520,33 +520,40 @@ end
 
 --- Combines the information about the command, its state and hotkeys
 local function GetButtonTooltip(displayConfig, command, state)
-	local SEP = "\n  "
-	
-	local tooltip = displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
-	if not tooltip then
-		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
+	local PARAGRAPH = "\n  "
+
+	local tooltip
+	if displayConfig and state then
+		tooltip = (displayConfig.stateTooltip and displayConfig.stateTooltip[state]) or displayConfig.tooltip
+	elseif command then
+		tooltip = command.tooltip
 	end
 	if not tooltip then
 		return nil
 	end
-	if command then
-		local action_name = command.action
-		if command.action then
-			local hotkey_for_toggle = GetHotkeyText(action_name)
-			local states, hotkeys_for_states, number_of_set_hotkeys = GetHotkeysForStatesText(action_name)
-			if hotkey_for_toggle then
-				tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
-			end
-			if hotkeys_for_states and number_of_set_hotkeys > 0 then
-				tooltip = tooltip .. SEP .. "State Hotkeys:"
-				for i = 1, #states do
-					local state_name = states[i]
-					local hotkey = hotkeys_for_states[i]
-					tooltip = tooltip .. SEP .. GetGreenStr(state_name .. ": " .. hotkey)
-				end
-			end
+
+	local action_name = command.action
+	if not action_name then
+		return nil
+	end
+
+	-- Append Toggle hotkey
+	local hotkey_for_toggle = GetHotkeyText(action_name)
+	if hotkey_for_toggle then
+		tooltip = tooltip .. " (" .. GetGreenStr(hotkey_for_toggle) .. ")"
+	end
+
+	-- Append State hotkeys if any are set
+	local states, hotkeys_for_states, number_of_set_hotkeys = GetHotkeysForStatesText(action_name)
+	if hotkeys_for_states and number_of_set_hotkeys > 0 then
+		tooltip = tooltip .. PARAGRAPH .. "State Hotkeys:"
+		for i = 1, #states do
+			local state_name = states[i]
+			local hotkey = hotkeys_for_states[i]
+			tooltip = tooltip .. PARAGRAPH .. GetGreenStr(state_name .. ": " .. hotkey)
 		end
 	end
+
 	return tooltip
 end
 
