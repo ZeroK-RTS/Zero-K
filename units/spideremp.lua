@@ -19,8 +19,7 @@ return { spideremp = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[19]],
-
-    lookahead    = 300,
+    aim_lookahead  = 100,
   },
 
   explodeAs              = [[BIG_UNITEX]],

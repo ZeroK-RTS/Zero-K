@@ -21,8 +21,10 @@ local lookaheadUnitDefs = {}
 local weaponCounts = {}
 for i=1, #UnitDefs do
 	local unitDef = UnitDefs[i]
-	lookaheadUnitDefs[i] = unitDef.customParams.lookahead
-	weaponCounts[i] = #unitDef.weapons -- even for non-lookaheads, this keeps the internal representation an array
+	if unitDef.customParams.aim_lookahead then
+		lookaheadUnitDefs[i] = tonumber(unitDef.customParams.aim_lookahead)
+		weaponCounts[i] = #unitDef.weapons -- even for non-lookaheads, this keeps the internal representation an array
+	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
@@ -30,7 +32,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if not lookahead then
 		return
 	end
-	for weaponIdx=1, weaponCounts[unitDefID] do
+	for weaponIdx = 1, weaponCounts[unitDefID] do
 		Spring.SetUnitWeaponState(unitID, weaponIdx, "autoTargetRangeBoost", lookahead)
 	end
 end

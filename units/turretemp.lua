@@ -18,8 +18,7 @@ return { turretemp = {
   customParams                  = {
     aimposoffset   = [[0 10 0]],
     modelradius    = [[16]],
-
-    lookahead    = 300,
+    aim_lookahead  = 50,
   },
 
   damageModifier                = 0.25,

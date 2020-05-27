@@ -88,7 +88,7 @@ return { vehcapture = {
       },
 
       damage                  = {
-        default = 11.1,
+        default = 22,
         subs    = 0.5,
       },
 

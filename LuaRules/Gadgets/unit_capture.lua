@@ -20,9 +20,7 @@ local RETAKING_DEGRADE_TIMER = 15
 local GENERAL_DEGRADE_TIMER  = 5
 local DEGRADE_FACTOR         = 0.04
 local CAPTURE_LINGER         = 0.95
-local FIREWALL_HEALTH        = 500
-
-local DAMAGE_MULT = 3 -- n times faster when target is at 0% health
+local FIREWALL_HEALTH        = 1000
 
 local SAVE_FILE = "Gadgets/unit_capture.lua"
 

@@ -18,8 +18,7 @@ return { vehriot = {
 
   customParams        = {
     selection_scale   = 0.85,
-
-    lookahead    = 300,
+    aim_lookahead     = 100,
   },
 
   explodeAs           = [[BIG_UNITEX]],

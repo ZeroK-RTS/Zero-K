@@ -15,7 +15,7 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    lookahead = 300,
+    aim_lookahead = 200,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],

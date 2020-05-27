@@ -22,8 +22,7 @@ return { cloakriot = {
     modelradius       = [[7]],
     cus_noflashlight  = 1,
     selection_scale   = 0.85,
-
-    lookahead = 300,
+    aim_lookahead     = 120,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
