@@ -45,7 +45,7 @@ return { subraider = {
   turninplace            = 0,
   turnRate               = 600,
   upright                = true,
-  waterline              = 20,
+  waterline              = 55,
   workerTime             = 0,
 
   weapons                = {
