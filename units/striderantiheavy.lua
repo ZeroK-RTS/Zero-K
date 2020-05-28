@@ -80,6 +80,7 @@ return { striderantiheavy = {
       areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
+      avoidGround             = false,
       avoidNeutral            = false,
       commandfire             = false,
       craterBoost             = 1,
