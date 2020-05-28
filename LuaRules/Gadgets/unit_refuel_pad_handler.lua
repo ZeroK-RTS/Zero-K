@@ -122,7 +122,7 @@ local function GetBuildRate(unitID)
 end
 
 local function ForceImmediateAbort(unitID, padID, isLanded)
-	if not spGetUnitIsDead(unitID) then
+	if (not spGetUnitIsDead(unitID)) and Spring.ValidUnitID(unitID) then
 		spSetUnitLeaveTracks(unitID, true)
 		if isLanded then
 			spSetUnitVelocity(unitID, 0, 0, 0)
@@ -131,19 +131,19 @@ local function ForceImmediateAbort(unitID, padID, isLanded)
 			Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		end
 		mcDisable(unitID)
-		unitMovectrled[unitID] = nil
 		GG.UpdateUnitAttributes(unitID)
 	end
+	unitMovectrled[unitID] = nil
 	landingUnit[unitID] = nil
 	return true
 end
 
 local function AbortCheck(unitID, padID, isLanded)
 	if (not landingUnit[unitID]) or landingUnit[unitID].abort then
-		ForceImmediateAbort(unitID, padID, isLanded)
+		return ForceImmediateAbort(unitID, padID, isLanded)
 	end
 	
-	return false
+	return spGetUnitIsDead(unitID) or (not Spring.ValidUnitID(unitID))
 end
 
 local function SitOnPad(unitID)
@@ -266,7 +266,7 @@ local function SitOnPad(unitID)
 			landDuration = landDuration + 1
 			-- Check crashing every 10s as safety for a rare bug. Otherwise the pad will be oocupied forever.
 			if landDuration%300 == 0 then
-				if Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing" then
+				if spGetUnitIsDead(unitID) or (not Spring.ValidUnitID(unitID)) or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 					Spring.DestroyUnit(unitID)
 				end
@@ -483,6 +483,10 @@ local function CircleToLand(unitID, goal)
 		while currentDistance + currentSpeed < totalDist do
 			
 			if AbortCheck(unitID) then
+				return
+			end
+			if (Spring.GetUnitRulesParam(unitID, "crashing") == 1) then
+				ForceImmediateAbort(unitID, padID, isLanded)
 				return
 			end
 			
