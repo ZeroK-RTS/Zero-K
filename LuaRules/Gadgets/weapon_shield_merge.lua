@@ -190,9 +190,9 @@ end
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam, false)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam].InMap(unitID) then
+	if allyTeamID and allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
 		local unitData
-		if allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam].InMap(unitID) then
+		if allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
 			unitData = allyTeamShields[oldAllyTeam].Get(unitID)
 			
 			allyTeamShields[oldAllyTeam].Remove(unitID)

@@ -199,6 +199,8 @@ local function SitOnPad(unitID)
 		local oldUpdateCost = 0
 		local updateRate = 1
 		
+		Sleep() -- Avoid recursion in instantly cancelled commands.
+		
 		local health, buildRate, updateCost, drainScale, padTeamID
 		while true do
 			if AbortCheck(unitID, landData.padID, true) then
