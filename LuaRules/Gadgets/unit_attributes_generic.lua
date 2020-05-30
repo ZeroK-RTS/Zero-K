@@ -158,7 +158,7 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, unitDefID, speedFactor, rangeFactor, gameFrame)
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, gameFrame)
 	if not origUnitWeapons[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 	
@@ -209,17 +209,19 @@ local function UpdateWeapons(unitID, unitDefID, speedFactor, rangeFactor, gameFr
 				unitReloadPaused[unitID] = nil
 				spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
 			end
-			local newReload = w.reload/speedFactor
+			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
 			else
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
 			end
 		end
-		Spring.Echo("w.range*rangeFactor", w.range*rangeFactor)
-		spSetUnitWeaponState(unitID, i, "range", w.range*rangeFactor)
-		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", w.range*rangeFactor)
+		local moddedRange = ((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
+		
+		spSetUnitWeaponState(unitID, i, "range", w.range*moddedRange)
+		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", w.range*moddedRange)
 	end
 end
 
@@ -323,7 +325,7 @@ end
 --------------------------------------------------------------------------------
 -- Handle by a different gadget
 
-local function ApplyExternalChanges(unitID, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+local function ApplyExternalChanges(unitID, weaponMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
 	GG.att_genericUsed = true
 
 	GG.att_moveMult[unitID]   = moveMult
@@ -332,6 +334,8 @@ local function ApplyExternalChanges(unitID, moveMult, turnMult, accelMult, reloa
 	GG.att_reloadMult[unitID] = reloadMult
 	GG.att_econMult[unitID]   = econMult
 	GG.att_buildMult[unitID]  = buildMult
+
+	GG.att_weaponMods[unitID] = weaponMods
 
 	GG.UpdateUnitAttributes(unitID)
 end
@@ -380,16 +384,29 @@ local function UpdateUnitAttributes(unitID, attList)
 	local econMult = 1
 	local buildMult = 1
 	local senseMult = 1
+	local weaponSpecificMods = false
 	
 	for _, data in IterableMap.Iterator(attList) do
 		moveMult = moveMult*(data.move or 1)
 		turnMult = turnMult*(data.turn or 1)
 		accelMult = accelMult*(data.accel or 1)
-		reloadMult = reloadMult*(data.reload or 1)
-		rangeMult = rangeMult*(data.range or 1)
 		econMult = econMult*(data.econ or 1)
 		buildMult = buildMult*(data.build or 1)
 		senseMult = senseMult*(data.sense or 1)
+		
+		if data.weaponNum then
+			weaponSpecificMods = weaponSpecificMods or {}
+			weaponSpecificMods[data.weaponNum] = weaponSpecificMods[data.weaponNum] or {
+				reloadMult = 1,
+				rangeMult = 1,
+			}
+			local wepData = weaponSpecificMods[data.weaponNum]
+			wepData.reloadMult = wepData.reloadMult*(data.reload or 1)
+			wepData.rangeMult = wepData.rangeMult*(data.range or 1)
+		else
+			reloadMult = reloadMult*(data.reload or 1)
+			rangeMult = rangeMult*(data.range or 1)
+		end
 	end
 	
 	if DO_CHANGES_EXTERNALLY then
@@ -398,7 +415,7 @@ local function UpdateUnitAttributes(unitID, attList)
 			currentSense[unitID] = senseMult
 		end
 		
-		ApplyExternalChanges(unitID, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+		ApplyExternalChanges(unitID, weaponSpecificMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
 		return
 	end
 	
@@ -410,7 +427,7 @@ local function UpdateUnitAttributes(unitID, attList)
 	end
 	
 	if (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
-		UpdateWeapons(unitID, unitDefID, reloadMult, rangeMult, frame)
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
 	end
@@ -452,6 +469,7 @@ function Attributes.AddEffect(unitID, key, effect)
 	data.econ = effect.econ
 	data.build = effect.build
 	data.sense = effect.sense
+	data.weaponNum = effect.weaponNum
 	
 	IterableMap.Add(attributeUnits[unitID], key, data) -- Overwrites existing key if it exists
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then

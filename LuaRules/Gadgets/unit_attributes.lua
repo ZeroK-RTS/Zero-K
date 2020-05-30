@@ -62,10 +62,28 @@ GG.att_accelMult  = GG.att_accelMult  or {}
 GG.att_reloadMult = GG.att_reloadMult or {}
 GG.att_econMult   = GG.att_econMult   or {}
 GG.att_buildMult  = GG.att_buildMult  or {}
+GG.att_weaponMods = GG.att_weaponMods or {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Sensor Handling
+-- UnitDefs caching
+
+local shieldWeaponDef = {}
+local isFirePlatform = {}
+local buildSpeedDef = {}
+
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.shieldWeaponDef then
+		shieldWeaponDef[i] = true
+	end
+	if ud.isFirePlatform then
+		isFirePlatform[i] = true
+	end
+	if (ud.buildSpeed or 0) ~= 0 then
+		buildSpeedDef[i] = ud.buildSpeed
+	end
+end
 
 local hasSensorOrJamm = {
 	[ UnitDefNames['staticheavyradar'].id ] = true,
@@ -93,6 +111,10 @@ for unitDefID,_ in pairs(hasSensorOrJamm) do
 		jammerUnitDef[unitDefID] = ud.jammerRadius
 	end
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Sensor Handling
+
 
 local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	if radarUnitDef[unitDefID] or radarOverride then
@@ -116,40 +138,28 @@ end
 
 local REPAIR_ENERGY_COST_FACTOR = Game.repairEnergyCostFactor
 
-local origUnitBuildSpeed = {}
 
-local function UpdateBuildSpeed(unitID, ud, speedFactor)
+local function UpdateBuildSpeed(unitID, unitDefID, speedFactor)
+	local buildSpeed = (buildSpeedDef[unitDefID] or 0)
+	if buildSpeed == 0 then
+		return
+	end
 
-    if ud.buildSpeed == 0 then
-        return
-    end
-        
-    local unitDefID = ud.id
+	spSetUnitRulesParam(unitID, "buildSpeed", buildSpeed*speedFactor, INLOS_ACCESS)
 
-    if not origUnitBuildSpeed[unitDefID] then
-    
-        origUnitBuildSpeed[unitDefID] = {
-            buildSpeed = ud.buildSpeed,
-        }
-    end
+	spSetUnitBuildSpeed(unitID,
+		buildSpeed*speedFactor, -- build
+		buildSpeed*speedFactor / REPAIR_ENERGY_COST_FACTOR, -- repair
+		buildSpeed*speedFactor, -- reclaim
+		0.5*buildSpeed*speedFactor) -- rezz
 
-    local state = origUnitBuildSpeed[unitDefID]
-
-	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, INLOS_ACCESS)
-	
-    spSetUnitBuildSpeed(unitID,
-        state.buildSpeed*speedFactor, -- build
-        state.buildSpeed*speedFactor / REPAIR_ENERGY_COST_FACTOR, -- repair
-        state.buildSpeed*speedFactor, -- reclaim
-        0.5*state.buildSpeed*speedFactor) -- rezz
-    
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Economy Handling
 
-local function UpdateEconomy(unitID, ud, factor)
+local function UpdateEconomy(unitID, unitDefID, factor)
 	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
 end
 
@@ -179,11 +189,9 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateReloadSpeed(unitID, ud, speedFactor, gameFrame)
-	local unitDefID = ud.id
-	
+local function UpdateReloadSpeed(unitID, unitDefID, weaponMods, speedFactor, gameFrame)
 	if not origUnitReload[unitDefID] then
-	
+		local ud = UnitDefs[unitDefID]
 		origUnitReload[unitDefID] = {
 			weapon = {},
 			weaponCount = #ud.weapons,
@@ -229,16 +237,16 @@ local function UpdateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 				unitReloadPaused[unitID] = nil
 				spSetUnitRulesParam(unitID, "reloadPaused", 0, INLOS_ACCESS)
 			end
-			local newReload = w.reload/speedFactor
+			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
 			else
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
 			end
 		end
 	end
-	
 end
 
 --------------------------------------------------------------------------------
@@ -247,10 +255,9 @@ end
 
 local origUnitSpeed = {}
 
-local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)
-	local unitDefID = ud.id
+local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	if not origUnitSpeed[unitDefID] then
-	
+		local ud = UnitDefs[unitDefID]
 		local moveData = spGetUnitMoveTypeData(unitID)
     
 		origUnitSpeed[unitDefID] = {
@@ -381,14 +388,12 @@ function UpdateUnitAttributes(unitID, frame)
 		return
 	end
 	
-	local udid = spGetUnitDefID(unitID)
-	if not udid then
+	local unitDefID = spGetUnitDefID(unitID)
+	if not unitDefID then
 		return
 	end
 	
 	frame = frame or spGetGameFrame()
-	
-	local ud = UnitDefs[udid]
 	local changedAtt = false
 	
 	-- Increased reload from CAPTURE --
@@ -419,6 +424,7 @@ function UpdateUnitAttributes(unitID, frame)
 	-- Disable
 	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
 	
+	local weaponMods = false
 	if GG.att_genericUsed and GG.att_moveMult[unitID] then
 		selfMoveSpeedChange = (selfMoveSpeedChange or 1)*GG.att_moveMult[unitID]
 		selfTurnSpeedChange = (selfTurnSpeedChange or 1)*GG.att_turnMult[unitID]/GG.att_moveMult[unitID]
@@ -427,9 +433,11 @@ function UpdateUnitAttributes(unitID, frame)
 		selfReloadSpeedChange = (selfReloadSpeedChange or 1)*GG.att_reloadMult[unitID]
 		selfIncomeChange = (selfIncomeChange or 1)*GG.att_econMult[unitID]
 		buildpowerMult = (buildpowerMult or 1)*GG.att_buildMult[unitID]/GG.att_econMult[unitID]
+		
+		weaponMods = GG.att_weaponMods[unitID]
 	end
 	
-	if fullDisable or selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
+	if weaponMods or fullDisable or selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
 			selfTurnSpeedChange or selfIncomeChange or disarmed or completeDisable or selfMaxAccelerationChange then
 		
 		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
@@ -458,25 +466,25 @@ function UpdateUnitAttributes(unitID, frame)
 		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 		
 		unitSlowed[unitID] = moveMult < 1
-		if reloadMult ~= currentReload[unitID] then
-			UpdateReloadSpeed(unitID, ud, reloadMult, frame)
+		if weaponMods or reloadMult ~= currentReload[unitID] then
+			UpdateReloadSpeed(unitID, unitDefID, weaponMods, reloadMult, frame)
 			currentReload[unitID] = reloadMult
 		end
 		
 		if currentMovement[unitID] ~= moveMult or currentTurn[unitID] ~= turnMult or currentAcc[unitID] ~= maxAccMult then
-			UpdateMovementSpeed(unitID, ud, moveMult, turnMult, maxAccMult*moveMult)
+			UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, maxAccMult*moveMult)
 			currentMovement[unitID] = moveMult
 			currentTurn[unitID] = turnMult
 			currentAcc[unitID] = maxAccMult
 		end
 		
 		if buildMult ~= currentBuildpower[unitID] then
-			UpdateBuildSpeed(unitID, ud, buildMult)
+			UpdateBuildSpeed(unitID, unitDefID, buildMult)
 			currentBuildpower[unitID] = buildMult
 		end
 		
 		if econMult ~= currentEcon[unitID] then
-			UpdateEconomy(unitID, ud, econMult)
+			UpdateEconomy(unitID, unitDefID, econMult)
 			currentEcon[unitID] = econMult
 		end
 		if econMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 or maxAccMult ~= 1 then
@@ -496,7 +504,7 @@ function UpdateUnitAttributes(unitID, frame)
 		setNewState = true
 	end
 	
-	if ud.shieldWeaponDef and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and setNewState then
+	if shieldWeaponDef[unitDefID] and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and setNewState then
 		if abilityDisabled then
 			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
 		else
@@ -511,8 +519,8 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	if setNewState or radarOverride or sonarOverride or jammerOverride or sightOverride then
 		changedAtt = true
-		abilityDisabled = abilityDisabled and not ud.isFirePlatform -- Can't have surfboard losing sensors
-		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
+		abilityDisabled = abilityDisabled and not isFirePlatform[unitDefID] -- Can't have surfboard losing sensors
+		UpdateSensorAndJamm(unitID, unitDefID, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (completeDisable == 1)
