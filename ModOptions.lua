@@ -415,6 +415,14 @@ local options = {
     type    = "string",
     def     = "",
   },
+  {
+    key     = "tweakdefs",
+    name    = "Tweak Defs",
+    desc    = "A base64 encoded snippet of code that modifies game definitions.",
+    section = 'experimental',
+    type    = "string",
+    def     = "",
+  },
 --[[
   {
     key    = 'damagemult',
@@ -735,6 +743,30 @@ local options = {
 	step   = 1,
   },
 }
+
+for i = 1, 9 do
+	options[#options + 1] =  {
+		key     = "tweakunits" .. i,
+		name    = "Tweak Units " .. i,
+		desc    = "A base64 encoded lua table of unit parameters to change.",
+		section = 'experimental',
+		type    = "string",
+		def     = "",
+		noLobby = true,
+	}
+end
+
+for i = 1, 9 do
+	options[#options + 1] =  {
+		key     = "tweakdefs" .. i,
+		name    = "Tweak Defs " .. i,
+		desc    = "A base64 encoded snippet of code that modifies game definitions.",
+		section = 'experimental',
+		type    = "string",
+		def     = "",
+		noLobby = true,
+	}
+end
 
 --// add key-name to the description (so you can easier manage modoptions in springie)
 for i=1,#options do
