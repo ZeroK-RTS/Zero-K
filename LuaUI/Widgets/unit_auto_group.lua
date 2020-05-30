@@ -454,18 +454,22 @@ local function UnstickUpdate(unitID, unitData)
 	if not Spring.ValidUnitID(unitID) then
 		return true
 	end
-	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, cmdOpts, cmdTag = Spring.GetUnitCurrentCommand(unitID)
 	if not cmdID then
 		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		return true
 	end
 	if cmdID == CMD.FIGHT then
+		local queueSize = Spring.GetCommandQueue(unitID, 0)
+		if queueSize and queueSize > 1 then
+			return
+		end
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		if not unitData.x then
 			unitData.x, unitData.y, unitData.z = x, y, z
 			return
 		end
-		if math.abs(x - unitData.x) < 64 and math.abs(z - unitData.z) < 64 then
+		if math.abs(x - unitData.x) < 32 and math.abs(z - unitData.z) < 32 then
 			Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 			return true
 		end
