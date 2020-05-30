@@ -186,43 +186,51 @@ local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFa
 	end
 	
 	local state = origUnitWeapons[unitDefID]
-	Spring.SetUnitMaxRange(unitID, state.maxWeaponRange*rangeFactor)
+	local maxRangeModified = state.maxWeaponRange*rangeFactor
 
 	for i = 1, state.weaponCount do
 		local w = state.weapon[i]
-		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
-		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
-		if speedFactor <= 0 then
-			if not unitReloadPaused[unitID] then
-				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
-				unitReloadPaused[unitID] = unitDefID
-				if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
-				else
-					local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+		
+		if not DO_CHANGES_EXTERNALLY then
+			local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
+			local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
+			if speedFactor <= 0 then
+				if not unitReloadPaused[unitID] then
+					local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+					unitReloadPaused[unitID] = unitDefID
+					if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
+						spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+					else
+						local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+						spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+					end
+					-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 				end
-				-- add UPDATE_PERIOD so that the reload time never advances past what it is now
-			end
-		else
-			if unitReloadPaused[unitID] then
-				unitReloadPaused[unitID] = nil
-				spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
-			end
-			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
-			local newReload = w.reload/moddedSpeed
-			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
 			else
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				if unitReloadPaused[unitID] then
+					unitReloadPaused[unitID] = nil
+					spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
+				end
+				local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+				local newReload = w.reload/moddedSpeed
+				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+				if w.burstRate then
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
+				else
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				end
 			end
 		end
-		local moddedRange = ((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
+		local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
 		
-		spSetUnitWeaponState(unitID, i, "range", w.range*moddedRange)
-		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", w.range*moddedRange)
+		spSetUnitWeaponState(unitID, i, "range", moddedRange)
+		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
+		if maxRangeModified < moddedRange then
+			maxRangeModified = moddedRange
+		end
 	end
+	
+	Spring.SetUnitMaxRange(unitID, maxRangeModified)
 end
 
 --------------------------------------------------------------------------------
@@ -414,6 +422,10 @@ local function UpdateUnitAttributes(unitID, attList)
 			UpdateSensorAndJamm(unitID, unitDefID, senseMult)
 			currentSense[unitID] = senseMult
 		end
+		if weaponSpecificMods or (currentRange[unitID] or 1) ~= rangeMult then
+			UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
+			currentRange[unitID] = rangeMult
+		end
 		
 		ApplyExternalChanges(unitID, weaponSpecificMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
 		return
@@ -426,7 +438,7 @@ local function UpdateUnitAttributes(unitID, attList)
 		currentAccel[unitID] = accelMult
 	end
 	
-	if (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
+	if weaponSpecificMods or (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
 		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
