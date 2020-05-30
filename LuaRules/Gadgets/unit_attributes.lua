@@ -55,6 +55,14 @@ local CMD_WAIT = CMD.WAIT
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
+-- For generic attributes support
+GG.att_moveMult   = GG.att_moveMult   or {}
+GG.att_turnMult   = GG.att_turnMult   or {}
+GG.att_accelMult  = GG.att_accelMult  or {}
+GG.att_reloadMult = GG.att_reloadMult or {}
+GG.att_econMult   = GG.att_econMult   or {}
+GG.att_buildMult  = GG.att_buildMult  or {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
@@ -411,8 +419,18 @@ function UpdateUnitAttributes(unitID, frame)
 	-- Disable
 	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
-			selfTurnSpeedChange or selfIncomeChange or disarmed or completeDisable or selfAccelerationChange then
+	if GG.att_genericUsed and GG.att_moveMult[unitID] then
+		selfMoveSpeedChange = (selfMoveSpeedChange or 1)*GG.att_moveMult[unitID]
+		selfTurnSpeedChange = (selfTurnSpeedChange or 1)*GG.att_turnMult[unitID]/GG.att_moveMult[unitID]
+		selfMaxAccelerationChange = (selfMaxAccelerationChange or 1)*GG.att_accelMult[unitID]
+		
+		selfReloadSpeedChange = (selfReloadSpeedChange or 1)*GG.att_reloadMult[unitID]
+		selfIncomeChange = (selfIncomeChange or 1)*GG.att_econMult[unitID]
+		buildpowerMult = (buildpowerMult or 1)*GG.att_buildMult[unitID]/GG.att_econMult[unitID]
+	end
+	
+	if fullDisable or selfReloadSpeedChange or selfMoveSpeedChange or slowState or zombieSpeedMult or buildpowerMult or
+			selfTurnSpeedChange or selfIncomeChange or disarmed or completeDisable or selfMaxAccelerationChange then
 		
 		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
 		
