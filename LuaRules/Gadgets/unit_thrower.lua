@@ -86,6 +86,9 @@ local function ValidThrowTarget(unitID, targetID, speed)
 	if speed > SPEED_MAX then
 		return false
 	end
+	if Spring.GetUnitTransporter(targetID) then
+		return false
+	end
 	local unitDefID = spGetUnitDefID(targetID)
 	return canBeThrown[unitDefID]
 end
@@ -135,6 +138,9 @@ local UPDATE_PERIOD = 6
 
 
 local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, odz)
+	if Spring.GetUnitTransporter(unitID) then
+		return false
+	end
 	local _,_,_, _, ny, _ = Spring.GetUnitPosition(unitID, true)
 	if not ny then
 		return false
@@ -493,7 +499,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 			for i = 1, #nearUnits do
 				local nearID = nearUnits[i]
 				local _, _, _, speed = Spring.GetUnitVelocity(nearID)
-				if UnitIsActive(nearID) and ValidThrowTarget(unitID, nearID, speed) and not alreadyWired[nearID] then
+				if ValidThrowTarget(unitID, nearID, speed) and not alreadyWired[nearID] then
 					DrawWire(unitID, nearID, spec, myAllyTeam, x, y, z)
 					alreadyWired[nearID] = true
 				end
