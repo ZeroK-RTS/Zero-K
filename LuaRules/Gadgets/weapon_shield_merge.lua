@@ -191,11 +191,12 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam, false)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if allyTeamID and allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
+		
 		local unitData
 		if allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
-			unitData = allyTeamShields[oldAllyTeam].Get(unitID)
+			unitData = IterableMap.Get(allyTeamShields[oldAllyTeam], unitID)
 			
-			allyTeamShields[oldAllyTeam].Remove(unitID)
+			IterableMap.Remove(allyTeamShields[oldAllyTeam], unitID)
 			RemoveUnitFromNeighbors(allyTeamShields[oldAllyTeam], unitID, unitData.neighbors)
 			unitData.neighbors = IterableMap.New()
 			unitData.allyTeamID = allyTeamID
