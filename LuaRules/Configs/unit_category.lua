@@ -37,7 +37,7 @@ local function GetUnitCategory(unitDefID)
 		return "army"
 	end
 	
-	if string.find(name, "turret") or string.find(name, "shield") then
+	if string.find(name, "turret") or (name ~= "factoryshield" and string.find(name, "shield")) then
 		return "def"
 	end
 	
