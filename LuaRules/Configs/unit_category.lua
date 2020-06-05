@@ -28,8 +28,8 @@ local function GetUnitCategory(unitDefID)
 	if cp.level then -- commander
 		return "other"
 	end
-	
-	if cp.ismex or cp.income_energy or (cp.pylonrange and ((tonumber(cp.pylonrange) or 0) > 400)) or ud.energyStorage > 0 then
+
+	if cp.ismex or cp.income_energy or (cp.pylonrange and ((tonumber(cp.pylonrange) or 0) > 400)) or ud.energyStorage > 0 or ud.isBuilder then
 		return "econ"
 	end
 	
