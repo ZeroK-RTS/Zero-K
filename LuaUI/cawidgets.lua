@@ -540,7 +540,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   end
   local chunk, err = loadstring(text, filename)
   if (chunk == nil) then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename, err)
     return nil
   end
   
@@ -548,7 +548,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   setfenv(chunk, widget)
   local success, err = pcall(chunk)
   if (not success) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Echo('Failed to load: ' .. basename, err)
     return nil
   end
   if (err == false) then
