@@ -23,6 +23,7 @@ local weaponDef = {
 	},
 
 	explosionGenerator      = [[custom:DGUNTRACE]],
+	heightMod               = 1,
 	impulseBoost            = 0,
 	impulseFactor           = 0,
 	interceptedByShieldType = 0,
