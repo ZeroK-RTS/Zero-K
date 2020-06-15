@@ -270,7 +270,10 @@ return { raveparty = {
       },
 
       damage                  = {
-        default        = 12003,
+        --[[ huge value to burst Funnelweb shields, since most of DRP's
+             power is in effects normally crappy vs them but we don't want
+             DRP to arbitrarily suck vs Funnel if the other supers don't ]]
+        default        = 30000,
       },
 
       edgeEffectiveness       = 0.75,
