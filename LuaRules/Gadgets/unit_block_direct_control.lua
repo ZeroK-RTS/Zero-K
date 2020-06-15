@@ -6,12 +6,14 @@ function gadget:GetInfo()
 		desc    = "Disables FPS mode.",
 		author  = "GoogleFrog",
 		date    = "5 November 2018",
-		license   = "GNU GPL, v2 or later",
+		license = "GNU GPL, v2 or later",
 		layer   = 0,
 		enabled = true
 	}
 end
 
-function gadget:AllowDirectUnitControl(unitID, unitDefID)
-	return false
+local spIsCheatingEnabled = Spring.IsCheatingEnabled
+
+function gadget:AllowDirectUnitControl()
+	return spIsCheatingEnabled()
 end
