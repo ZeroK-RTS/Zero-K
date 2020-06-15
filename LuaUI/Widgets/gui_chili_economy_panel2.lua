@@ -592,6 +592,9 @@ local function Format(input, override)
 	end
 end
 
+local  metalWarnOpt = options.metalWarning
+local energyWarnOpt = options.energyWarning
+
 local initialReserveSet = false
 function widget:GameFrame(n)
 
@@ -737,8 +740,10 @@ function widget:GameFrame(n)
 	end
 
 	-- Warnings
-	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
-	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or ((not metalWarning) and eStor <= 1 and eInco < mInco)
+	local  metalWarnLevel =  metalWarnOpt.value
+	local energyWarnLevel = energyWarnOpt.value
+	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
 	
