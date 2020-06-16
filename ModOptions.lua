@@ -665,7 +665,8 @@ local options = {
     section= 'chicken',
     def    = 1,
     min    = 0.1,
-    max    = 30,
+    max    = 1000, --[[ keep in mind that this can get further increased by playercount-based mults,
+                        and that at such extreme values float errors appear (uncharted territory) ]]
     step   = 0.05,
   },
   {
