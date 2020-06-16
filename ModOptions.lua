@@ -587,6 +587,7 @@ local options = {
       { key = 'Chicken: Custom', name = "Chicken: Custom", desc = 'Customize your chicken.' },
     },
   },
+--[[ broken, prevent newbie footgun (cf. #3567 gameside ticket)
   {
     key = "playerchickens",
     name = "Players as chickens",
@@ -595,6 +596,7 @@ local options = {
     def = false,
     section = 'chicken',
   },
+]]
   {
     key	= "eggs",
     name = "Chicken Eggs",
