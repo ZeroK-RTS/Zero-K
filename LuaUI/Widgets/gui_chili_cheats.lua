@@ -157,7 +157,6 @@ AddMiscCategory("subunits", {
 	"wolverine_mine",
 })
 AddMiscCategory("campaign", {
-	"ampharty",
 	"bomberassault",
 	"bomberstrike",
 	"dynknight0",
