@@ -365,7 +365,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Remove submarine damage modifier 
+-- Remove submarine damage modifier
 -- TODO: also remove from defs
 
 for _, weaponDef in pairs(WeaponDefs) do
