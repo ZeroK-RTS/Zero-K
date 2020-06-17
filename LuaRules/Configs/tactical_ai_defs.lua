@@ -455,6 +455,7 @@ local behaviourDefaults = {
 local behaviourConfig = {
 	-- swarmers
 	["cloakbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -468,6 +469,7 @@ local behaviourConfig = {
 	},
 	
 	["shieldbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -481,6 +483,7 @@ local behaviourConfig = {
 	},
 	
 	["amphbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
