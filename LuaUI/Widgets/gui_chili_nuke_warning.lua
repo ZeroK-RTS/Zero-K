@@ -75,7 +75,6 @@ local function CreateWindow()
 		parent = screen0,
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
-		dockable = true,
 		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
