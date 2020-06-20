@@ -31,8 +31,6 @@ local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local frame = Spring.GetGameFrame()
-
 local unitFrame = {}
 local frameList = {}
 local gameFrame = Spring.GetGameFrame()
