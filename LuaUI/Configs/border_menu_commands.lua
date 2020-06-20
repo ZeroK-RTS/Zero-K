@@ -303,7 +303,6 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	jump=1,
 	find_pad=1,
 	embark=1,
-	disembark=1,
 	oneclickwep=1,
 	settarget=1,
 	canceltarget=1,

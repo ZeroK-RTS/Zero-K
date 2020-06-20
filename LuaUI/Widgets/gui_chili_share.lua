@@ -639,7 +639,6 @@ local function InitName(subject, playerPanel)
 	
 	givemebuttons[subject.id]["text"] = chili.TextBox:New{
 		parent=playerPanel,
-		height='100%',
 		width=146,
 		height = sizefont+1,
 		fontsize=sizefont + 1,

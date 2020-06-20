@@ -1603,7 +1603,6 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	}
 	
 	local helptext_stack = StackPanel:New{
-		resizeItems = false,
 		orientation = 'vertical',
 		autoArrangeV  = false,
 		autoArrangeH  = false,
