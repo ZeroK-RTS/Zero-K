@@ -108,6 +108,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"shieldbomb",
 	"chicken",
 	"chickena",
+	"chicken_leaper",
 	"chicken_tiamat",
 	"chicken_dragon",
 	"hoverdepthcharge",
