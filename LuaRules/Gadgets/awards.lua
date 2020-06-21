@@ -91,7 +91,7 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
 local awardList = {}
 
-local boats, t3Units, comms = {}, {}, {}
+local boats, comms = {}, {}, {}
 
 local staticO_small = {
 	staticheavyarty = 1,
@@ -436,16 +436,6 @@ function gadget:Initialize()
 		end
 	end
 
-	--[[
-	local t3Facs = {'armshltx', 'corgant', }
-	for _, t3Fac in pairs(t3Facs) do
-		local udT3Fac = UnitDefNames[t3Fac]
-		for _, t3DefID in pairs(udT3Fac.buildOptions) do
-			t3Units[t3DefID] = true
-		end
-	end
-	--]]
-
 	for i=1,#WeaponDefs do
 		local wcp = WeaponDefs[i].customParams or {}
 		if (wcp.setunitsonfire) then
@@ -579,9 +569,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 			elseif boats[attackerDefID] then
 				AddAwardPoints( 'navy', attackerTeam, costdamage )
-
-			elseif t3Units[attackerDefID] then
-				AddAwardPoints( 't3', attackerTeam, costdamage )
 
 			elseif comms[attackerDefID] then
 				AddAwardPoints( 'comm', attackerTeam, costdamage )
