@@ -91,7 +91,7 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
 local awardList = {}
 
-local boats, comms = {}, {}, {}
+local boats, comms = {}, {}
 
 local staticO_small = {
 	staticheavyarty = 1,
