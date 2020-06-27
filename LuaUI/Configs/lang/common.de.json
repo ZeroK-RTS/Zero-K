@@ -4,7 +4,7 @@
 	"geospot" : "Erdwärmeschacht\nHier lässt sich ein geothermisches Kraftwerk platzieren.",
 	"build_eta" : "ETA:",
 	"lvl" : "lvl",
-	"builds_at" : "baut mit",
+	"builds_at" : "%{desc}, baut mit %{bp} m/s",
 	"disabled_no_grid" : "Deaktiviert - kein Netz",
 	"grid" : "Netz",
 	"wind_range" : "Windstärke",

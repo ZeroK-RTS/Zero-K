@@ -4,7 +4,7 @@
 	"geospot" : "地热通风口\n能在这里放个地热发电机吗？",
 	"build_eta" : "预计到达时间",
 	"lvl" : "lvl",
-	"builds_at" : "生成于",
+	"builds_at" : "%{desc}, 建造速度在 %{bp}M/秒",
 	"disabled_no_grid" : "禁用-无网格",
 	"grid" : "网格",
 	"wind_range" : "风向范围",

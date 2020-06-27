@@ -1,7 +1,7 @@
 return { factoryshield = {
   unitname                      = [[factoryshield]],
   name                          = [[Shieldbot Factory]],
-  description                   = [[Produces Tough, Shielded Robots, Builds at 10 m/s]],
+  description                   = [[Produces Tough, Shielded Robots]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,

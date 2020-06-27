@@ -1,7 +1,7 @@
 return { spidercon = {
   unitname               = [[spidercon]],
   name                   = [[Weaver]],
-  description            = [[Construction Spider, Builds at 7.5 m/s]],
+  description            = [[Construction Spider]],
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 3.6,

@@ -1,7 +1,7 @@
 return { factorygunship = {
   unitname                      = [[factorygunship]],
   name                          = [[Gunship Plant]],
-  description                   = [[Produces Gunships, Builds at 10 m/s]],
+  description                   = [[Produces Gunships]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,

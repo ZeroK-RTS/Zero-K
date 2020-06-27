@@ -1,7 +1,7 @@
 return { commsupport1 = {
   unitname            = [[commsupport1]],
   name                = [[Support Commander]],
-  description         = [[Econ/Support Commander, Builds at 12 m/s]],
+  description         = [[Econ/Support Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,

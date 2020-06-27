@@ -1,7 +1,7 @@
 return { cremcom1 = {
   unitname               = [[cremcom1]],
   name                   = [[Commander]],
-  description            = [[Mobile Assault Commander, Builds at 10 m/s]],
+  description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,

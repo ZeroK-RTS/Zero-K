@@ -1,7 +1,7 @@
 return { factoryveh = {
   unitname                      = [[factoryveh]],
   name                          = [[Rover Assembly]],
-  description                   = [[Produces Rovers, Builds at 10 m/s]],
+  description                   = [[Produces Rovers]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,

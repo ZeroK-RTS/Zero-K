@@ -1,7 +1,7 @@
 return { athena = {
   unitname            = [[athena]],
   name                = [[Athena]],
-  description         = [[Airborne SpecOps Engineer, Builds at 15 m/s]],
+  description         = [[Airborne SpecOps Engineer]],
   acceleration        = 0.1,
   airStrafe           = 0,
   autoHeal            = 20,

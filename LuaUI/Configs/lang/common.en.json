@@ -4,7 +4,7 @@
 	"geospot" : "Geothermal vent\nCan place a Geothermal Generator here",
 	"build_eta" : "ETA:",
 	"lvl" : "lvl",
-	"builds_at" : "builds at",
+	"builds_at" : "%{desc}, builds at %{bp} m/s",
 	"disabled_no_grid" : "Disabled - no grid",
 	"grid" : "Grid",
 	"wind_range" : "Wind range",

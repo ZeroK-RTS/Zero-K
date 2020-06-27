@@ -1,7 +1,7 @@
 return { factoryplane = {
   unitname                      = [[factoryplane]],
   name                          = [[Airplane Plant]],
-  description                   = [[Produces Airplanes, Builds at 10 m/s]],
+  description                   = [[Produces Airplanes]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,

@@ -1,7 +1,7 @@
 return { tankcon = {
   unitname               = [[tankcon]],
   name                   = [[Welder]],
-  description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
+  description            = [[Armed Construction Tank]],
   acceleration           = 0.33,
   brakeRate              = 15.0,
   buildCostMetal         = 200,

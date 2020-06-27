@@ -6,7 +6,7 @@
 	},
 	"gunshipcon" : {
 		"name" : "Wasp",
-		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
+		"description" : "Heavy Gunship Constructor",
 		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
 	},
 	"gunshipskirm" : {
@@ -16,7 +16,7 @@
 	},
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
-		"description" : "Produces Cloaked, Mobile Robots, Builds at 10 m/s",
+		"description" : "Produces Cloaked, Mobile Robots",
 		"helptext" : "Emphasizing guile over brute force, the Cloakbot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Ronin, Reaver, Knight, Sling"
 	},
 	"amphlaunch" : {
@@ -31,7 +31,7 @@
 	},
 	"staticmissilesilo" : {
 		"name" : "Missile Silo",
-		"description" : "Produces Tactical Missiles, Builds at 10 m/s",
+		"description" : "Produces Tactical Missiles",
 		"helptext" : "The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes."
 	},
 	"spiderscout" : {
@@ -146,7 +146,7 @@
 	},
 	"factoryveh" : {
 		"name" : "Rover Assembly",
-		"description" : "Produces Light Wheeled Vehicles, Builds at 10 m/s",
+		"description" : "Produces Light Wheeled Vehicles",
 		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Slasher"
 	},
 	"turretgauss" : {
@@ -266,7 +266,7 @@
 	},
 	"shieldcon" : {
 		"name" : "Convict",
-		"description" : "Shielded Construction Bot, Builds at 5 m/s",
+		"description" : "Shielded Construction Bot",
 		"helptext" : "The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots."
 	},
 	"energysingu" : {
@@ -306,7 +306,7 @@
 	},
 	"staticcon" : {
 		"name" : "Caretaker",
-		"description" : "Construction Assistant, Builds at 10 m/s",
+		"description" : "Construction Assistant",
 		"helptext" : "The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however."
 	},
 	"terraunit" : {
@@ -381,7 +381,7 @@
 	},
 	"factoryshield" : {
 		"name" : "Shieldbot Factory",
-		"description" : "Produces Tough Robots, Builds at 10 m/s",
+		"description" : "Produces Tough Robots",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
 	},
 	"chickena" : {
@@ -496,7 +496,7 @@
 	},
 	"spidercon" : {
 		"name" : "Weaver",
-		"description" : "Construction Spider, Builds at 7.5 m/s",
+		"description" : "Construction Spider",
 		"helptext" : "The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar."
 	},
 	"hoverdepthcharge" : {
@@ -516,7 +516,7 @@
 	},
 	"factoryplane" : {
 		"name" : "Airplane Plant",
-		"description" : "Produces Airplanes, Builds at 10 m/s",
+		"description" : "Produces Airplanes",
 		"helptext" : "The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms. The plant also comes bundled with one rearm pad."
 	},
 	"gunshipbomb" : {
@@ -531,12 +531,12 @@
 	},
 	"factoryamph" : {
 		"name" : "Amphbot Factory",
-		"description" : "Produces Amphibious Bots, Builds at 10 m/s",
+		"description" : "Produces Amphibious Bots",
 		"helptext" : "The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged."
 	},
 	"factoryship" : {
 		"name" : "Shipyard",
-		"description" : "Produces Naval Units, Builds at 10 m/s",
+		"description" : "Produces Naval Units",
 		"helptext" : "Shipyard is where both ships and submarines are built. Other waterborne units such as hovercraft and amphibious bots have separate factories."
 	},
 	"vehassault" : {
@@ -561,7 +561,7 @@
 	},
 	"tankcon" : {
 		"name" : "Welder",
-		"description" : "Armed Construction Tank, Builds at 7.5 m/s",
+		"description" : "Armed Construction Tank",
 		"helptext" : "Armed with a small defensive tower, the Welder can defend itself against light enemy attacks."
 	},
 	"shieldarty" : {
@@ -611,7 +611,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Jumpjet Constructor, Builds at 5 m/s",
+		"description" : "Jumpjet Constructor",
 		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
 	},
 	"chicken_blimpy" : {
@@ -626,7 +626,7 @@
 	},
 	"athena" : {
 		"name" : "Athena",
-		"description" : "Airborne SpecOps Engineer, Builds at 15 m/s",
+		"description" : "Airborne SpecOps Engineer",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
 	"staticsonar" : {
@@ -651,7 +651,7 @@
 	},
 	"factoryhover" : {
 		"name" : "Hovercraft Platform",
-		"description" : "Produces Hovercraft, Builds at 10 m/s",
+		"description" : "Produces Hovercraft",
 		"helptext" : "The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Lance"
 	},
 	"gunshipassault" : {
@@ -731,7 +731,7 @@
 	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
-		"description" : "Produces Spiders, Builds at 10 m/s",
+		"description" : "Produces Spiders",
 		"helptext" : "Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crab"
 	},
 	"chicken_dragon" : {
@@ -806,12 +806,12 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Constructs Striders, Builds at 10 m/s",
+		"description" : "Constructs Striders",
 		"helptext" : "The Strider Hub deploys striders, the \"humongous mecha\" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it."
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
+		"description" : "Amphibious Construction Bot, Armored When Idle",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
 	},
 	"spiderriot" : {
@@ -856,7 +856,7 @@
 	},
 	"vehcon" : {
 		"name" : "Mason",
-		"description" : "Construction Rover, Builds at 5 m/s",
+		"description" : "Construction Rover",
 		"helptext" : "Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area."
 	},
 	"amphtele" : {
@@ -866,7 +866,7 @@
 	},
 	"shipcon" : {
 		"name" : "Mariner",
-		"description" : "Construction Ship, Builds at 7.5 m/s",
+		"description" : "Construction Ship",
 		"helptext" : "Although expensive, the Construction Ship boasts extremely high nano power, combined with tough armor and good speed."
 	},
 	"shipscout" : {
@@ -921,7 +921,7 @@
 	},
 	"factorygunship" : {
 		"name" : "Gunship Plant",
-		"description" : "Produces Gunships, Builds at 10 m/s",
+		"description" : "Produces Gunships",
 		"helptext" : "The Gunship Plant is designed for close air support. It includes a selection of transports for hauling land units around, and combat gunships which can perform a variety of offensive or defensive roles."
 	},
 	"turretheavy" : {
@@ -961,7 +961,7 @@
 	},
 	"factorytank" : {
 		"name" : "Tank Foundry",
-		"description" : "Produces Heavy Tracked Vehicles, Builds at 10 m/s",
+		"description" : "Produces Heavy Tracked Vehicles",
 		"helptext" : "The Tank Foundry is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Emissary, Minotaur, Ogre, Cyclops"
 	},
 	"striderbantha" : {
@@ -981,7 +981,7 @@
 	},
 	"factoryjump" : {
 		"name" : "Jumpbot Factory",
-		"description" : "Produces Jumpjet Equipped Robots, Builds at 10 m/s",
+		"description" : "Produces Jumpjet Equipped Robots",
 		"helptext" : "The esoteric Jumpbot Factory offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Jugglenaut"
 	},
 	"jumpsumo" : {
@@ -1001,7 +1001,7 @@
 	},
 	"hovercon" : {
 		"name" : "Quill",
-		"description" : "Construction Hovercraft, Builds at 5 m/s",
+		"description" : "Construction Hovercraft",
 		"helptext" : "The Quill allows smooth expansion across both land and sea."
 	},
 	"jumpaa" : {
@@ -1051,7 +1051,7 @@
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
-		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
+		"description" : "Cloaked Construction Bot",
 		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance. It can also enable a short-range cloaking field, which unlike the aforementioned abilities costs energy to maintain."
 	},
 	"turretsunlance" : {
@@ -1071,7 +1071,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Construction Aircraft, Builds at 5 m/s",
+		"description" : "Construction Aircraft",
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
 	},
 	"gunshipraid" : {

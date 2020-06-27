@@ -1,7 +1,7 @@
 return { hovercon = {
   unitname            = [[hovercon]],
   name                = [[Quill]],
-  description         = [[Construction Hovercraft, Builds at 5 m/s]],
+  description         = [[Construction Hovercraft]],
   acceleration        = 0.33,
   activateWhenBuilt   = true,
   brakeRate           = 15.0,

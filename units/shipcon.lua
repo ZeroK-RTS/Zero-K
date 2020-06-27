@@ -1,7 +1,7 @@
 return { shipcon = {
   unitname               = [[shipcon]],
   name                   = [[Mariner]],
-  description            = [[Construction Ship, Builds at 7.5 m/s]],
+  description            = [[Construction Ship]],
   acceleration           = 0.256,
   activateWhenBuilt      = true,
   brakeRate              = 0.61,
