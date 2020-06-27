@@ -26,6 +26,7 @@ return { shipcarrier = {
     priority_misc = 2, -- High
     extradrawrange = 3000,
     ispad         = 1,
+    pad_count = 2,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],

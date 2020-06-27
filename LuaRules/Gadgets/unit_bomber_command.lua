@@ -396,8 +396,34 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 end
 
+local function GetIdleBombersForTeam(team)
+	local bombers = {}
+	-- bomberToPad contains bombers scheduled for refuel/repair that have not yet landed
+	-- TODO: Only return bombers that cannot land on arrival, e.g. use the reservations
+	-- count on the airpad somehow. Otherwise building multiple airpads in quick succession
+	-- may result in bombers being moved from one available airpad to the new one with no
+	-- actual gain in repair capacity if the newest airpad is built closest to the bombers.
+	for bomberID, _ in pairs(bomberToPad) do
+		local allyteam = spGetUnitAllyTeam(bomberID)
+		if (allyteam == team) then
+			bombers[#bombers+1] = bomberID
+		end
+	end
+	return bombers
+end
+
+function GG.RedirectBombersToAirpad(bombers, airpadUnitID)
+	-- Clear up existing reservations before sending bombers to newly built airpad
+	for i=1, #bombers do
+		CancelAirpadReservation(bombers[i])
+	end
+	Spring.GiveOrderToUnitArray(bombers, CMD_REARM, {airpadUnitID}, 0)
+end
+
+
 GG.RequestRearm = RequestRearm
 GG.FindBestAirpadAt = FindBestAirpadAt
+GG.GetIdleBombersForTeam = GetIdleBombersForTeam
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if airDefs[unitDefID] then
@@ -433,7 +459,7 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 end
 
 -- we don't need the airpad for now, free up a slot
-local function CancelAirpadReservation(unitID)
+function CancelAirpadReservation(unitID)
 	spSetUnitRulesParam(unitID, "airpadReservation",0)
 	if GG.LandAborted then
 		GG.LandAborted(unitID)

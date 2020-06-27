@@ -588,3 +588,45 @@ function gadget:GameFrame(f)
 		UpdatePadLocations()
 	end
 end
+
+-- Search for any idle bombers to rearm at a newly built airpad
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	local unitDef = UnitDefs[unitDefID]
+	local padCount = tonumber(unitDef.customParams.pad_count)
+	if (padCount == nil or padCount == 0) then return end
+
+	local bombersToRearm
+	local idleBombers = GG.GetIdleBombersForTeam(teamID)
+	local idleBombersCount = #idleBombers
+
+	if (idleBombersCount <= padCount) then
+		bombersToRearm = idleBombers
+	else
+		bombersToRearm = GetFirstNearestIdleBombers(unitID, idleBombers, padCount)
+	end
+
+	GG.RedirectBombersToAirpad(bombersToRearm, unitID)
+end
+
+function GetFirstNearestIdleBombers(airpadID, idleBombers, count)
+	local unitIDsByDistance = {}
+	for i = 1, #idleBombers do
+		local bomberID = idleBombers[i]
+		local distance = math.floor(Spring.GetUnitSeparation(airpadID, bomberID))
+		unitIDsByDistance[distance] = bomberID
+	end
+
+	-- Sort by increasing distance to find only the first N bombers nearest the airpad
+	local keys = {}
+	for distance, _ in pairs(unitIDsByDistance) do keys[#keys+1] = distance end
+	table.sort(keys)
+
+	local nearestBombers = {}
+	for i=1, count do
+		local distance = keys[i]
+		local unitID = unitIDsByDistance[distance]
+		nearestBombers[i] = unitID
+	end
+
+	return nearestBombers
+end
