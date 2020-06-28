@@ -556,14 +556,13 @@ end
 
 local function UpdateMorph(unitID, morphData)
 	local transportID = Spring.GetUnitTransporter(unitID)
-	local transportUnitDefID = 0
 	if transportID then
 		if not morphData.combatMorph then
 			StopMorph(unitID, morphUnits[unitID])
 			morphUnits[unitID] = nil
 			return true
 		end
-		transportUnitDefID = Spring.GetUnitDefID(transportID)
+		local transportUnitDefID = Spring.GetUnitDefID(transportID)
 		if not UnitDefs[transportUnitDefID].isFirePlatform then
 			return true
 		end
