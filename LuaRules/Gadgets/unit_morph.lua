@@ -988,7 +988,8 @@ local function SelectSwap(cmd, oldID, newID)
 
 	if (Script.LuaUI('MorphFinished')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil,GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1009,7 +1010,8 @@ end
 local function StartMorph(cmd, unitID, unitDefID, morphID)
 	if (Script.LuaUI('MorphStart')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1030,7 +1032,8 @@ end
 local function StopMorph(cmd, unitID)
 	if (Script.LuaUI('MorphStop')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1077,7 +1080,8 @@ function gadget:Update()
 
 			if useLuaUI then
 				local morphTable = {}
-				local readTeam, spec, specFullView = nil,GetSpectatingState()
+				local readTeam
+				local spec, specFullView = GetSpectatingState()
 				if specFullView then
 					readTeam = Script.ALL_ACCESS_TEAM
 				else
