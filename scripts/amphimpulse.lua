@@ -351,7 +351,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_START_FLOAT)
 	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end

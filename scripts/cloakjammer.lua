@@ -10,7 +10,7 @@ local lfoot = piece 'lfoot'
 local disc = piece 'disc'
 local cloaker = piece 'cloaker'
 
-local SIG_MOVE = 1
+local SIG_Walk = 1
 
 include "constants.lua"
 

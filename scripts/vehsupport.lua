@@ -35,6 +35,7 @@ local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 local SIG_AIM = 1
 local SIG_DEPLOY = 2
 local SIG_RESTORE = 4
+local SIG_ANIM = 8
 
 local SUSPENSION_BOUND = 6
 
