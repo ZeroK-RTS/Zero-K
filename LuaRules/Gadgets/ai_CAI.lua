@@ -1847,8 +1847,6 @@ local function raiderJobHandler(team)
 	local tZ = false
 	local idleCost = 0
 	
-	local averageX = 0
-	local averageZ = 0
 	local averageCount = 0
 	
 	for unitID,data in pairs(raiderByID) do
@@ -1857,16 +1855,11 @@ local function raiderJobHandler(team)
 		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
-			averageX = averageX + x
-			averageZ = averageZ + z
 			averageCount = averageCount + 1
 		end
 	end
 
 	if averageCount > 0 then
-	
-		averageX = averageX/averageCount
-		averageZ = averageZ/averageCount
 		local aX,aZ
 		local idleFactor = idleCost/raider.cost
 	
@@ -2011,8 +2004,6 @@ local function gunshipJobHandler(team)
 	local tZ = false
 	local idleCost = 0
 	
-	local averageX = 0
-	local averageZ = 0
 	local averageCount = 0
 	
 	for unitID,data in pairs(gunshipByID) do
@@ -2021,16 +2012,11 @@ local function gunshipJobHandler(team)
 		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
-			averageX = averageX + x
-			averageZ = averageZ + z
 			averageCount = averageCount + 1
 		end
 	end
 
 	if averageCount > 0 then
-	
-		averageX = averageX/averageCount
-		averageZ = averageZ/averageCount
 		local aX,aZ
 		local idleFactor = idleCost/gunship.cost
 	

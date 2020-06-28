@@ -741,7 +741,6 @@ local function InitializeUnitsToSpawn()
 	local pwDataRaw = modOptions.planetwarsstructures
 	local pwDataFunc, err, success, unitData
 	if not (pwDataRaw and type(pwDataRaw) == 'string') then
-		err = "Planetwars data entry in modoption is empty or in invalid format"
 		return {}, false
 	else
 		pwDataRaw = string.gsub(pwDataRaw, '_', '=')

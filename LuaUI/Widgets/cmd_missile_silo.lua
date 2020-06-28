@@ -18,14 +18,6 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local siloDefID = UnitDefNames.staticmissilesilo.id
-local missileDefIDs = {}
-local missileNames = {"tacnuke", "seismic", "empmissile", "napalmmissile"}
-
-for i=1,#missileNames do
-  if UnitDefNames[missileNames[i]] then
-	missileDefIDs[UnitDefNames[missileNames[i]].id] = true
-  end
-end
 
 local selectMissilesCmdDesc = {
 	id      = CMD_SELECT_MISSILES,
