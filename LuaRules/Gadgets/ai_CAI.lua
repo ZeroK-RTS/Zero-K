@@ -878,8 +878,8 @@ local function makeMiscBuilding(team, unitID, defId, searchRange, maxRange)
 		end
 	end
 
-	x = ux + math.random(-searchRange,searchRange)
-	z = uz + math.random(-searchRange,searchRange)
+	local x = ux + math.random(-searchRange,searchRange)
+	local z = uz + math.random(-searchRange,searchRange)
 	
 	while (spTestBuildOrder(defId, x, 0 ,z, 1) == 0 or not IsTargetReallyReachable(unitID, x, 0 ,z,ux,uy,uz)) or nearFactory(team,x,z,250) or nearMexSpot(x,z,100) do
 		x = ux + math.random(-searchRange,searchRange)
@@ -918,8 +918,8 @@ local function makeRadar(team, unitID, searchRange, minDistance)
 	-- start my on construction
 	local radarDefID = buildDefs.radarIds[1].ID
 
-	x = ux + math.random(-searchRange,searchRange)
-	z = uz + math.random(-searchRange,searchRange)
+	local x = ux + math.random(-searchRange,searchRange)
+	local z = uz + math.random(-searchRange,searchRange)
 	
 	while (spTestBuildOrder(radarDefID, x, 0 ,z, 1) == 0 or not IsTargetReallyReachable(unitID, x, 0 ,z,ux,uy,uz)) or nearFactory(team,x,z,250) or nearMexSpot(x,z,60) do
 		x = ux + math.random(-searchRange,searchRange)
@@ -1033,8 +1033,8 @@ local function makeNano(team,unitID)
 	
 	local searchRange = 0
 	
-	x = data.nanoX + math.random(-searchRange,searchRange)
-	z = data.nanoZ + math.random(-searchRange,searchRange)
+	local x = data.nanoX + math.random(-searchRange,searchRange)
+	local z = data.nanoZ + math.random(-searchRange,searchRange)
 	
 	while (spTestBuildOrder(nanoDefID, x, 0 ,z, 1) == 0 or not IsTargetReallyReachable(unitID, x, 0 ,z,ux,uy,uz)) or disSQ(data.x, data.z, x ,z) > nanoRangeSQ do
 		x = data.nanoX + math.random(-searchRange,searchRange)
@@ -1107,8 +1107,8 @@ local function makeEnergy(team,unitID)
 	local searchRange = 120
 	local minDistance = 100
 	
-	x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
-	z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
+	local x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
+	local z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 	
 	while (spTestBuildOrder(energyDefID, x, 0 ,z, 1) == 0 or not IsTargetReallyReachable(unitID, x, 0 ,z,ux,uy,uz)) or nearFactory(team,x,z,250) or nearMexSpot(x,z,60) or nearEcon(team,x,z, buildDefs.econByDefId[energyDefID].energySpacing) do
 		x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
@@ -1258,8 +1258,8 @@ local function assignFactory(team,unitID,cQueue)
 			
 			local ux,uy,uz = spGetUnitPosition(unitID)
 			local searchRange = 200
-			x = ux + math.random(-searchRange,searchRange)
-			z = uz + math.random(-searchRange,searchRange)
+			local x = ux + math.random(-searchRange,searchRange)
+			local z = uz + math.random(-searchRange,searchRange)
 			while (spTestBuildOrder(buildableFactory[choice].ID, x, 0 ,z, 1) == 0 or not IsTargetReallyReachable(unitID, x, 0 ,z,ux,uy,uz)) or nearMexSpot(x,z,160) or nearEcon(team,x,z,200) or nearMapEdge(x,z,600) or nearFactory(team,x,z,1000) or nearDefence(team,x,z,120) do
 				
 				x = ux + math.random(-searchRange,searchRange)
