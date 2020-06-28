@@ -347,30 +347,6 @@ function widget:Update()
 		end
 	end
 
-	if (Spring.GetGameFrame()<1) then
-		--// send errorlog if me (jK) is in the game
-		local allPlayers = Spring.GetPlayerList()
-		for i = 1, #allPlayers do
-			local playerName = Spring.GetPlayerInfo(allPlayers[i], false)
-			if (playerName == "[LCC]jK" or playerName == "GoogleFrog") then
-				local errorLog = Lups.GetErrorLog(1)
-				if (errorLog~="") then
-					local cmds = {
-						"say ------------------------------------------------------",
-						"say LUPS: jK is here! Sending error log (so he can fix your problems):",
-					}
-					--// the str length is limited with "say ...", so we split it
-					for line in errorLog:gmatch("[^\r\n]+") do
-						cmds[#cmds+1] = "say " .. line
-					end
-					cmds[#cmds+1] = "say ------------------------------------------------------"
-					Spring.SendCommands(cmds)
-				end
-				break
-			end
-		end
-	end
-
 	LupsAddFX = Lups.AddParticles
 
 	widget.UnitFinished   = UnitFinished
