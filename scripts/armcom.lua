@@ -97,7 +97,6 @@ for index, weapon in pairs(wepTable) do
 		starBLaunchers[index] = true
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs

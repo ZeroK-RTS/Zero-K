@@ -92,7 +92,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- Walking

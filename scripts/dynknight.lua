@@ -114,7 +114,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
 
