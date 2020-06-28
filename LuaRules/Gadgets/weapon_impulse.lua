@@ -128,7 +128,7 @@ local function DetatchFromGround(unitID, threshold, height, doImpulse)
 	height = height or 0.1
 	local x,y,z = spGetUnitPosition(unitID)
 	local h = spGetGroundHeight(x,z)
-	--GG.UnitEcho(unitID,h-y)
+	--Spring.Utilities.UnitEcho(unitID,h-y)
 	if h >= y - threshold or y >= h - threshold then
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, doImpulse, 0)
@@ -439,7 +439,7 @@ local function AddImpulses()
 				else
 					spAddUnitImpulse(unitID, data.x, data.y, data.z)
 				end
-				--GG.UnitEcho(unitID,data.y)
+				--Spring.Utilities.UnitEcho(unitID,data.y)
 			end
 		end
 		unitByID = {count = 0, data = {}}
