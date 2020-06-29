@@ -747,23 +747,28 @@ local function HotkeyChangeNotification()
 	local keycode = ToKeysyms(key and key[1])
 	keys[keycode] = 'left'
 	key_code.left = keycode;
-	local key = WG.crude.GetHotkeyRaw("moveright")
-	local keycode = ToKeysyms(key and key[1])
+	
+	key = WG.crude.GetHotkeyRaw("moveright")
+	keycode = ToKeysyms(key and key[1])
 	keys[keycode] = 'right'
 	key_code.right = keycode;
-	local key = WG.crude.GetHotkeyRaw("moveforward")
-	local keycode = ToKeysyms(key and key[1])
+
+	key = WG.crude.GetHotkeyRaw("moveforward")
+	keycode = ToKeysyms(key and key[1])
 	keys[keycode] = 'up'
 	key_code.up = keycode;
-	local key = WG.crude.GetHotkeyRaw("moveback")
-	local keycode = ToKeysyms(key and key[1])
+
+	key = WG.crude.GetHotkeyRaw("moveback")
+	keycode = ToKeysyms(key and key[1])
 	keys[keycode] = 'down'
 	key_code.down = keycode;
-	local key = WG.crude.GetHotkeyRaw("moveup")
-	local keycode = ToKeysyms(key and key[1])
+
+	key = WG.crude.GetHotkeyRaw("moveup")
+	keycode = ToKeysyms(key and key[1])
 	key_code.pageup = keycode;
-	local key = WG.crude.GetHotkeyRaw("movedown")
-	local keycode = ToKeysyms(key and key[1])
+
+	key = WG.crude.GetHotkeyRaw("movedown")
+	keycode = ToKeysyms(key and key[1])
 	key_code.pagedown = keycode;
 end
 
