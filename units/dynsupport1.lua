@@ -1,10 +1,10 @@
-unitDef = {
+return { dynsupport1 = {
   unitname            = [[dynsupport1]],
   name                = [[Engineer Commander]],
   description         = [[Econ/Support Commander]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
-  brakeRate           = 0.45,
+  brakeRate           = 2.7,
   buildCostMetal      = 1200,
   buildDistance       = 232,
   builder             = true,
@@ -47,7 +47,7 @@ unitDef = {
   losEmitHeight       = 40,
   maxDamage           = 3800,
   maxSlope            = 36,
-  maxVelocity         = 1.2,
+  maxVelocity         = 1.3,
   maxWaterDepth       = 5000,
   metalStorage        = 500,
   minCloakDistance    = 75,
@@ -80,7 +80,7 @@ unitDef = {
   trackWidth          = 22,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 12,
 
   featureDefs         = {
 
@@ -101,6 +101,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynsupport1 = unitDef })
+} }

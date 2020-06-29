@@ -93,7 +93,7 @@ local unitSetTargetCmdDesc = {
 	name    = 'Set Target',
 	action  = 'settarget',
 	cursor  = 'SetTarget',
-	tooltip = 'Set Target: Set a priority target that is indepdent of the units command queue.',
+	tooltip = 'Set Target: Set a priority target that is independent of the units command queue.',
 	hidden = true,
 }
 
@@ -103,7 +103,7 @@ local unitSetTargetCircleCmdDesc = {
 	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
 	cursor  = 'SetTarget',
-	tooltip = 'Set Target: Set a priority target that is indepdent of the units command queue.',
+	tooltip = 'Set Target: Set a priority target that is independent of the units command queue.',
 	hidden = false,
 }
 

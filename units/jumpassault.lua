@@ -1,9 +1,9 @@
-unitDef = {
+return { jumpassault = {
   unitname            = [[jumpassault]],
   name                = [[Jack]],
   description         = [[Melee Assault Jumper]],
-  acceleration        = 0.16,
-  brakeRate           = 0.2,
+  acceleration        = 0.48,
+  brakeRate           = 1.2,
   buildCostMetal      = 600,
   builder             = false,
   buildPic            = [[jumpassault.png]],
@@ -138,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpassault = unitDef })
+} }

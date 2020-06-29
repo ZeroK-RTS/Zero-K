@@ -131,7 +131,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return {[leaperDefID] = true}
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
   if noRecursion then
     return true
   end

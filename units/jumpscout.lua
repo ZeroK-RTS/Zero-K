@@ -1,11 +1,11 @@
-unitDef = {
+return { jumpscout = {
   unitname               = [[jumpscout]],
   name                   = [[Puppy]],
   description            = [[Walking Missile]],
-  acceleration           = 0.24,
+  acceleration           = 0.72,
   activateWhenBuilt      = true,
-  brakeRate              = 0.72,
-  buildCostMetal         = 50,
+  brakeRate              = 4.32,
+  buildCostMetal         = 45,
   builder                = false,
   buildPic               = [[jumpscout.png]],
   canGuard               = true,
@@ -25,7 +25,7 @@ unitDef = {
     grey_goo = 1,
     grey_goo_spawn = "jumpscout",
     grey_goo_drain = 5,
-    grey_goo_cost = 50,
+    grey_goo_cost = 45,
     grey_goo_range = 120,
     selection_scale = 1, -- Maybe change later
   },
@@ -59,7 +59,7 @@ unitDef = {
     },
 
   },
-  sightDistance          = 560,
+  sightDistance          = 640,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,
@@ -106,7 +106,7 @@ unitDef = {
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
       range                   = 170,
-      reloadtime              = 1,
+      reloadtime              = 1.5,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_med5]],
       soundHitVolume          = 8,
@@ -142,6 +142,4 @@ unitDef = {
 
   },
   
-}
-
-return lowerkeys({ jumpscout = unitDef })
+} }

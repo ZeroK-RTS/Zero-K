@@ -31,7 +31,6 @@ function JitterParticles2.GetInfo()
 end
 
 JitterParticles2.Default = {
-	emitVector     = {0,1,0},
 	pos            = {0,0,0}, --// start pos
 	partpos        = "0,0,0", --// particle relative start pos (can contain lua code!)
 	layer          = 0,

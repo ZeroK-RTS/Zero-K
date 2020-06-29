@@ -20,7 +20,7 @@ function gadget:Initialize() -- GamePreload causes issues with widgets.
 
 	local preset = Spring.GetModOptions().waterpreset or "manual"
 	if preset == "dry" then
-		local lowest, highest = Spring.GetGroundExtremes ()
+		local lowest = Spring.GetGroundExtremes ()
 		waterlevel = math.min (0, lowest + DRY_WATERLEVEL)
 	elseif preset == "flooded" then
 		local heights = {}

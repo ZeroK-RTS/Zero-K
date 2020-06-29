@@ -112,21 +112,14 @@ local function IsUnitAllied(unitID1,unitID2)
 end
 
 local function IsUnitIdle(unitID)
-	local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
 	local moving = cmdID and sinkCommand[cmdID]
 	return not moving
 end
 
-local function GetCommandLenght(unitID)
-	local cmds
-	local lenght = 0
-	lenght = spGetCommandQueue(unitID,0) or 0
-	return lenght, cmds
-end
-
 -- warning: causes recursion?
-local function ClearUnitCommandQueue(unitID,cmds)
-	cmds = cmds or spGetCommandQueue(unitID, -1)
+local function ClearUnitCommandQueue(unitID)
+	local cmds = spGetCommandQueue(unitID, -1)
 	for i=1,#cmds do
 		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmds[i].tag},0)
 	end
@@ -160,12 +153,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			end
 			local targetDefID = spGetUnitDefID(cmdParams[1])
 			if floatDefs[targetDefID] then --targeted unit could utilize float gadget (unit_impulsefloat.lua)
-				local cmds
-				local index = 0
-				index,cmds = GetCommandLenght(unitID)
+				local index = spGetCommandQueue(unitID, 0)
 				 --LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
 				if not cmdOptions.shift then
-					ClearUnitCommandQueue(unitID,cmds)
+					ClearUnitCommandQueue(unitID)
 					transportPhase[unitID] = nil
 					index = 0
 				end
@@ -187,12 +178,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				haveWater = true
 			end
 			if haveWater then
-				local cmds
-				local index = 0
-				index,cmds = GetCommandLenght(unitID)
+				local index = spGetCommandQueue(unitID, 0)
 				--LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
 				if not cmdOptions.shift then
-					ClearUnitCommandQueue(unitID,cmds)
+					ClearUnitCommandQueue(unitID)
 					transportPhase[unitID] = nil
 					index = 0
 				end
@@ -202,11 +191,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 	end
 	if (cmdID == CMD.UNLOAD_UNITS) then
-		local cmds
-		local index = 0
-		index,cmds = GetCommandLenght(unitID)
+		local index = spGetCommandQueue(unitID, 0)
 		if not cmdOptions.shift then
-			ClearUnitCommandQueue(unitID,cmds)
+			ClearUnitCommandQueue(unitID)
 			transportPhase[unitID] = nil
 			index = 0
 		end
@@ -325,7 +312,7 @@ function gadget:GameFrame(f)
 						haveFloater = true
 					end
 				end
-				local cmdID = Spring.Utilities.GetUnitFirstCommand(transportID)
+				local cmdID = Spring.GetUnitCurrentCommand(transportID)
 				if cmdID then
 					if cmdID == CMD.LOAD_UNITS and haveFloater then
 						i = i + 1 --go to next entry

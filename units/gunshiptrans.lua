@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshiptrans = {
   unitname            = [[gunshiptrans]],
   name                = [[Charon]],
   description         = [[Air Transport]],
@@ -28,6 +28,7 @@ unitDef = {
     airstrafecontrol  = [[1]],
     midposoffset      = [[0 0 0]],
     modelradius       = [[15]],
+    transport_speed_light   = [[0.7]],
     islighttransport  = 1,
   },
 
@@ -40,7 +41,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxDamage           = 300,
-  maxVelocity         = 10.7,
+  maxVelocity         = 11.5,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -84,6 +85,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshiptrans = unitDef })
+} }

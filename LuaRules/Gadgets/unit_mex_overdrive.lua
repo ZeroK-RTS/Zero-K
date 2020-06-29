@@ -108,9 +108,11 @@ local function paybackFactorFunction(repayRatio)
 	end
 end
 
+local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
+local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
 
 local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["energywind"].id] = {cost = UnitDefNames["energywind"].metalCost*PAYBACK_FACTOR},
@@ -1224,6 +1226,7 @@ function gadget:GameFrame(n)
 			local overdriveEnergySpending = energyForOverdrive - energyWasted
 			--// Refund excess energy from overdrive and overfull storages.
 			local totalFreeStorage = 0
+			local totalFreeStorageLimited = 0
 			local energyToRefund = energyWasted
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
@@ -1239,6 +1242,7 @@ function gadget:GameFrame(n)
 				if te.freeStorage > 0 then
 					if te.energyProducerOrUser then
 						totalFreeStorage = totalFreeStorage + te.freeStorage
+						totalFreeStorageLimited = totalFreeStorageLimited + min(FREE_STORAGE_LIMIT, te.freeStorage)
 						if debugMode then
 							Spring.Echo(teamID, "Free", te.freeStorage)
 						end
@@ -1258,12 +1262,27 @@ function gadget:GameFrame(n)
 				Spring.Echo("AllyTeam totalFreeStorage", totalFreeStorage, "energyToRefund", energyToRefund)
 			end
 
-			if totalFreeStorage > energyToRefund then
+			if totalFreeStorageLimited > energyToRefund then
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
 					if te.energyProducerOrUser then
-						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*te.freeStorage/totalFreeStorage
+						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*min(FREE_STORAGE_LIMIT, te.freeStorage)/totalFreeStorageLimited
+					end
+				end
+				energyWasted = 0
+			elseif totalFreeStorage > energyToRefund then
+				energyToRefund = energyToRefund - totalFreeStorageLimited -- Give everyone energy up to the free storage limit.
+				totalFreeStorage = totalFreeStorage - totalFreeStorageLimited
+				for i = 1, allyTeamData.teams do
+					local teamID = allyTeamData.team[i]
+					local te = teamEnergy[teamID]
+					if te.energyProducerOrUser then
+						if te.freeStorage > FREE_STORAGE_LIMIT then
+							te.overdriveEnergyNet = te.overdriveEnergyNet + FREE_STORAGE_LIMIT + energyToRefund*(te.freeStorage - FREE_STORAGE_LIMIT)/totalFreeStorage
+						else
+							te.overdriveEnergyNet = te.overdriveEnergyNet + te.freeStorage
+						end
 					end
 				end
 				energyWasted = 0
@@ -1481,9 +1500,8 @@ function gadget:GameFrame(n)
 				end
 				
 				local metalIncome = odShare + baseShare + miscShare
-				if mCurr + metalIncome < mStor then
+				if share > 0 and mCurr + metalIncome < mStor then
 					freeSpace[i] = mStor - (mCurr + metalIncome)
-					totalFreeSpace = totalFreeSpace + freeSpace[i]
 				end
 				
 				totalMetalIncome[i] = metalIncome
@@ -1511,8 +1529,16 @@ function gadget:GameFrame(n)
 				)
 			end
 			
+			for i = 1, allyTeamData.teams do
+				local share = (splitByShare and teamResourceShare[teamID]) or 1
+				if share > 0 and freeSpace[i] then
+					freeSpace[i] = min(freeSpace[i], totalToShare * share)
+					totalFreeSpace = totalFreeSpace + freeSpace[i]
+				end
+			end
+			
 			if totalToShare ~= 0 then
-				local excessFactor = 1 - math.min(1, totalFreeSpace/totalToShare)
+				local excessFactor = 1 - min(1, totalFreeSpace/totalToShare)
 				local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
 				for i = 1, allyTeamData.teams do
 					if shareToSend[i] then
@@ -1565,11 +1591,12 @@ local function AddMex(unitID, teamID, metalMake)
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 
 		if teamID and enableMexPayback then
-			local refundTime = 400/metalMake
+			-- share goes down to 0 linearly, so halved to average it over refund duration
+			local refundTime = MEX_REFUND_VALUE / ((MEX_REFUND_SHARE / 2) * metalMake)
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
 			mexByID[unitID].refundTimeTotal = refundTime
-			mexByID[unitID].refundTotal = metalMake*refundTime*MEX_REFUND_SHARE*0.5
+			mexByID[unitID].refundTotal = MEX_REFUND_VALUE
 			mexByID[unitID].refundSoFar = 0
 			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal
 		end
@@ -1647,9 +1674,9 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
 	teamID = teamID or spGetUnitTeam(unitID)
 
-	if generator[allyTeamID][teamID][unitID] then
+	--if generator[allyTeamID][teamID][unitID] then
 		--return
-	end
+	--end
 
 	if unitDefID and generatorDefs[unitDefID] then
 		local defData = generatorDefs[unitDefID]
@@ -1687,9 +1714,9 @@ local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 
 	resourceGenoratingUnit[unitID] = false
 
-	if not generator[allyTeamID][teamID][unitID] then
+	--if not generator[allyTeamID][teamID][unitID] then
 		--return
-	end
+	--end
 
 	local list = generatorList[allyTeamID][teamID]
 	local listID = generator[allyTeamID][teamID][unitID].listID

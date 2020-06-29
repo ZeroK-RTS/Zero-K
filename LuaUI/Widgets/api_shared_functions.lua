@@ -99,7 +99,7 @@ local function WriteTable(concatArray, tab, tabName, params)
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
 	local comma = params.raw and "" or ", "
-	local endLine = comma .. "\n"
+	local endLine = params.raw and "\n" or ",\n"
 	local str = ""
 	
 	local function NewLine()
@@ -207,7 +207,7 @@ local function WritePythonOrJSONDict(dict, dictName, params)
 	params.numIndents = params.numIndents or 0
 	local isJSON = params.json
 	local comma = params.raw and "" or ", "
-	local endLine = comma .. "\n"
+	local endLine = params.raw and "\n" or ",\n"
 	local separator = (params.raw and (not isJSON)) and " = " or  " : "
 	local str = ""
 	if (not params.raw) then

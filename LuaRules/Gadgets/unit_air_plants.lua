@@ -70,8 +70,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		plantList[unitID] = {flyState=(AIRPLANT[unitDefID].land and 1) or 0, repairAt=0}
 		Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
 	elseif plantList[builderID] then
-		GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, 0)
-		GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].flyState }, 0)
+		GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, plantList[builderID].repairAt, 0)
+		GiveOrderToUnit(unitID, CMD.IDLEMODE, plantList[builderID].flyState, 0)
 	end
 end
 

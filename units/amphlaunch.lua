@@ -1,11 +1,11 @@
-unitDef = {
+return { amphlaunch = {
   unitname               = [[amphlaunch]],
   name                   = [[Lobster]],
   description            = [[Amphibious Launcher Bot]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
-  buildCostMetal         = 320,
+  brakeRate              = 2.4,
+  buildCostMetal         = 230,
   buildPic               = [[amphlaunch.png]],
   canGuard               = true,
   canManualFire          = true,
@@ -102,7 +102,7 @@ unitDef = {
       myGravity               = 0.05,
       projectiles             = 1,
       range                   = 680,
-      reloadtime              = 8.5,
+      reloadtime              = 9,
       rgbColor                = [[0.05 0.45 0.95]],
       size                    = 0.005,
       soundStart              = [[Launcher]],
@@ -142,7 +142,7 @@ unitDef = {
       myGravity               = 0.05,
       projectiles             = 1,
       range                   = 680,
-      reloadtime              = 8.5,
+      reloadtime              = 10,
       rgbColor                = [[0.05 0.45 0.95]],
       size                    = 0.005,
       soundStart              = [[Launcher]],
@@ -174,6 +174,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphlaunch = unitDef })
+} }

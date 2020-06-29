@@ -22,35 +22,36 @@ local resetWidgetDetailLevel = false -- has widget detail level changed
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
 local DATA_VERSION = 9 -- change this to reset widget settings
 
-function includeZIPFirst(filename, envTable)
-  if (string.find(filename, '.h.lua', 1, true)) then
-    filename = 'Headers/' .. filename
-  end
-  return VFS.Include(LUAUI_DIRNAME .. filename, envTable, VFS.ZIP_FIRST)
-end
+local vfs = VFS
+local vfsInclude = vfs.Include
+local vfsGame = vfs.GAME
 
 WG = {}
 Spring.Utilities = {}
-VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-VFS.Include("LuaRules/Utilities/versionCompare.lua")
-VFS.Include("LuaRules/Utilities/unitStates.lua")
-VFS.Include("LuaRules/Utilities/teamFunctions.lua")
 
-VFS.Include("LuaRules/Utilities/function_override.lua")
+vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/teamFunctions.lua"    , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/vector.lua"           , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/function_override.lua", nil, vfsGame)
+vfsInclude("LuaUI/keysym.lua"                        , nil, vfsGame)
+vfsInclude("LuaUI/system.lua"                        , nil, vfsGame)
+vfsInclude("LuaUI/cache.lua"                         , nil, vfsGame)
+vfsInclude("LuaUI/callins.lua"                       , nil, vfsGame)
+vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
 
-include("keysym.h.lua")
-include("utils.lua")
-includeZIPFirst("system.lua")
-includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
-include("callins.lua")
-include("savetable.lua")
-include("utility_two.lua") --contain file backup function: CheckLUAFileAndBackup()
-local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = include("chat_preprocess.lua") -- contain stuff that preprocess chat message for Chili Chat widgets
+local CheckLUAFileAndBackup = vfsInclude("LuaUI/file_backups.lua", nil, vfsGame)
+local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
 local modShortUpper = Game.modShortName:upper()
 local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
 local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
+
+-- make/load backup config in case of corruption
+CheckLUAFileAndBackup(ORDER_FILENAME)
+CheckLUAFileAndBackup(CONFIG_FILENAME)
 
 local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
@@ -77,26 +78,22 @@ local glPushAttrib = gl.PushAttrib
 local pairs = pairs
 local ipairs = ipairs
 
-do -- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption when OS crash
- 	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
-	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'} --this is a header text that is appended to start of file
-	for i=1, #fileToCheck do
-		CheckLUAFileAndBackup(fileToCheck[i], extraText[i]) --utility_two.lua
-	end
-end
-
 -- read local widgets config
 local localWidgetsFirst = false
 local localWidgets = false
+local disableLocalWidgets = (Spring.GetModOptions().disable_local_widgets and Spring.GetModOptions().disable_local_widgets ~= "0" and Spring.GetModOptions().disable_local_widgets ~= 0)
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
-  local cadata = VFS.Include(CONFIG_FILENAME)
-  if cadata and cadata["Local Widgets Config"] then
-    localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
-    localWidgets = cadata["Local Widgets Config"].localWidgets
+  if not disableLocalWidgets then
+    local cadata = VFS.Include(CONFIG_FILENAME)
+    if cadata and cadata["Local Widgets Config"] then
+      localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
+      localWidgets = cadata["Local Widgets Config"].localWidgets
+    end
   end
 end
 
+Spring.Echo("localWidgets", disableLocalWidgets, localWidgets, localWidgetsFirst)
 local VFSMODE
 VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
@@ -448,7 +445,9 @@ function widgetHandler:Initialize()
   end
 
   -- Add ignorelist --
-  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+  Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
+  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
+  Spring.Echo("Spring.GetMyPlayerID() done", customkeys)
   if customkeys["ignored"] then
     if string.find(customkeys["ignored"],",") then
       local newignorelist = string.gsub(customkeys["ignored"],","," ")
@@ -541,7 +540,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   end
   local chunk, err = loadstring(text, filename)
   if (chunk == nil) then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename, err)
     return nil
   end
   
@@ -549,7 +548,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   setfenv(chunk, widget)
   local success, err = pcall(chunk)
   if (not success) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Echo('Failed to load: ' .. basename, err)
     return nil
   end
   if (err == false) then
@@ -667,7 +666,7 @@ function widgetHandler:NewWidget()
   widget.widgetHandler = {}
   local wh = widget.widgetHandler
   local self = self
-  widget.include  = function (f) return include(f, widget) end
+  widget.include  = function (f,_,MODE) return include(f, widget, MODE) end
   wh.ForceLayout  = function (_) self:ForceLayout() end
   wh.RaiseWidget  = function (_) self:RaiseWidget(widget) end
   wh.LowerWidget  = function (_) self:LowerWidget(widget) end
@@ -1469,7 +1468,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		-- IGNORE FEATURE--
 		if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg, false))] then
 			return
-        	end
+		end
 	end
 	
     

@@ -12,42 +12,23 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-Spring.SendCommands({"ctrlpanel " .. LUAUI_DIRNAME .. "ctrlpanel.txt"})
+local vfsInclude = VFS.Include
+local vfsGame = VFS.GAME
+local spSendCommands = Spring.SendCommands
 
-VFS.Include(LUAUI_DIRNAME .. 'utils.lua', utilFile)
+spSendCommands("ctrlpanel LuaUI/ctrlpanel.txt")
 
-include("setupdefs.lua")
-include("savetable.lua")
+vfsInclude("LuaUI/utils.lua"    , nil, vfsGame)
+vfsInclude("LuaUI/setupdefs.lua", nil, vfsGame)
+vfsInclude("LuaUI/savetable.lua", nil, vfsGame)
+vfsInclude("LuaUI/debug.lua"    , nil, vfsGame)
+vfsInclude("LuaUI/modfonts.lua" , nil, vfsGame)
+vfsInclude("LuaUI/layout.lua"   , nil, vfsGame)   -- contains a simple LayoutButtons()
+vfsInclude("LuaUI/cawidgets.lua", nil, vfsGame)  -- the widget handler
 
-include("debug.lua")
-include("modfonts.lua")
-include("layout.lua")   -- contains a simple LayoutButtons()
-include("cawidgets.lua")  -- the widget handler
-
---------------------------------------------------------------------------------
---
--- print the header
---
-
-if (RestartCount == nil) then
-  RestartCount = 0
-else
-  RestartCount = RestartCount + 1
-end
-
-do
-  local restartStr = ""
-  if (RestartCount > 0) then
-    restartStr = "  (" .. RestartCount .. " Restarts)"
-  end
-  Spring.SendCommands({"echo " .. LUAUI_VERSION .. restartStr})
-end
-
-
---------------------------------------------------------------------------------
+spSendCommands("echo " .. LUAUI_VERSION)
 
 local gl = Spring.Draw  --  easier to use
-
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -56,7 +37,7 @@ local gl = Spring.Draw  --  easier to use
 --
 
 function Say(msg)
-  Spring.SendCommands({'say ' .. msg})
+	spSendCommands('say ' .. msg)
 end
 
 

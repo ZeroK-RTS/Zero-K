@@ -23,15 +23,7 @@ function MoveUnitOutOfFactory(unitID,factDefID)
 	---Order unit to move away from factory's build yard---
 	if (not excludedFactory[factDefID]) then
 
-		local cmdID, cmdTag, cmdParam_1
-		if Spring.Utilities.COMPAT_GET_ORDER then
-			local queue = Spring.GetCommandQueue(unitID, 1)
-			if queue and queue[1] then
-				cmdID, cmdTag, cmdParam_1 = queue[1].id, queue[1].tag, queue[1].params[1]
-			end
-		else
-			cmdID, _, cmdTag, cmdParam_1 = Spring.GetUnitCurrentCommand(unitID)
-		end
+		local cmdID, _, cmdTag, cmdParam_1 = Spring.GetUnitCurrentCommand(unitID)
 
 		if cmdID then
 			if not (cmdID == CMD.MOVE or cmdID == CMD_JUMP) then --no rally behaviour?? (we leave unit with CMD.MOVE alone because we don't want to disturb factory's move command)

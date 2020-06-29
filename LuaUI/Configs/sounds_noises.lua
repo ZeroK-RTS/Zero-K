@@ -2,21 +2,13 @@
 
 local sounds = {
 	-- Misc
-	default = {
-		ok = {
-			[1] = "light_bot_move",
-		},
-		select = {
-			[1] = "light_bot_select",
-		},
-	},
 	staticrearm = {
 		select = {
 			[1] = "building_select1",
 		},
 	},
 	athena = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -32,16 +24,8 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	cormine1 = {
-		ok = {
-			[1] = "light_bot_move",
-		},
-		select = {
-			[1] = "crawlie_select",
-		},
-	},
 	corcom = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -50,7 +34,7 @@ local sounds = {
 		},
 	},
 	armcom = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -59,7 +43,7 @@ local sounds = {
 		},
 	},
 	commsupport = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -68,7 +52,7 @@ local sounds = {
 		},
 	},
 	commrecon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -77,7 +61,7 @@ local sounds = {
 		},
 	},
 	striderantiheavy = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -88,7 +72,7 @@ local sounds = {
 	
 	-- Spider
 	spidercon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "spider_move",
 			volume = 0.95,
@@ -175,7 +159,7 @@ local sounds = {
 	
 	-- Shield
 	shieldcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -258,7 +242,7 @@ local sounds = {
 	
 	-- Jumper
 	jumpcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -350,7 +334,7 @@ local sounds = {
 	
 	-- Cloak
 	cloakcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "bot_move",
 		},
@@ -434,7 +418,7 @@ local sounds = {
 	
 	-- Amphib
 	amphcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "amph_move",
 			volume = 0.8,
@@ -534,14 +518,6 @@ local sounds = {
 	},
 	
 	-- Mech
-	armraz = {
-		ok = {
-			[1] = "heavy_bot_move",
-		},
-		select = {
-			[1] = "heavy_bot_move",
-		},
-	},
 	striderdante = {
 		ok = {
 			[1] = "heavy_bot_move",
@@ -606,7 +582,7 @@ local sounds = {
 	
 	-- Vehicle
 	vehcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "vehicle_move",
 		},
@@ -681,7 +657,7 @@ local sounds = {
 	
 	-- Tank
 	tankcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -698,14 +674,6 @@ local sounds = {
 		},
 	},
 	tankraid = {
-		ok = {
-			[1] = "light_tank_move2",
-		},
-		select = {
-			[1] = "tank_select",
-		},
-	},
-	core_egg_shell  = {
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -772,7 +740,7 @@ local sounds = {
 	
 	-- Hovercraft
 	hovercon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -781,6 +749,14 @@ local sounds = {
 		},
 	},
 	hoverraid = {
+		ok = {
+			[1] = "hovercraft_move",
+		},
+		select = {
+			[1] = "hovercraft_select",
+		},
+	},
+	hoverheavyraid = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -905,7 +881,7 @@ local sounds = {
 	
 	-- Gunship
 	planecon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -914,7 +890,7 @@ local sounds = {
 		},
 	},
 	gunshipcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -1011,7 +987,7 @@ local sounds = {
 	
 	-- New Ships
 	shipcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1131,7 +1107,6 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	-- Transport boat doesn't have one by design.
 	
 	-- Economy
 	staticmex = {
@@ -1179,19 +1154,14 @@ local sounds = {
 			[1] = "building_select2",
 		},
 	},
-	corestor = {
-		select = {
-			[1] = "fusion_select",
-		},
-	},
 	staticcon = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "building_select1",
 		},
 	},
     striderhub = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "building_select1",
 		},
@@ -1199,85 +1169,73 @@ local sounds = {
 	
 	-- Factory
 	factorycloak = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryshield = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryjump = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryspider = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryamph = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryveh = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factorytank = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryhover = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryplane = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factorygunship = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	factoryship = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "factory_select",
 		},
 	},
 	
 	-- Intel
-	--[[
-	staticradar = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	staticheavyradar = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	--]]
 	staticsonar = {
 		select = {
 			[1] = "sonar_select",
@@ -1294,11 +1252,6 @@ local sounds = {
 		},
 	},
 	
-	staticshield = {
-		select = {
-			[1] = "shield_select",
-		},
-	},
 	shieldshield = {
 		ok = {
 			[1] = "bot_move",
@@ -1444,14 +1397,6 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	corraz = {
-		ok = {
-			[1] = "turret_move",
-		},
-		select = {
-			[1] = "light_turret_select",
-		},
-	},
 	turretaaclose = {
 		ok = {
 			[1] = "turret_move",
@@ -1495,7 +1440,7 @@ local sounds = {
 	
 	-- Silo etc
 	staticmissilesilo = {
-		build = "builder_start",
+		build = { "builder_start" },
 		select = {
 			[1] = "silo_select",
 		},
@@ -1557,61 +1502,40 @@ local sounds = {
 	
 }
 
-for udid, ud in pairs(UnitDefs) do
-	if ud.customParams then
-		if ud.customParams.soundok then
-			if sounds[ud.name] then
-				sounds[ud.name].ok = {[1] = ud.customParams.soundok}
-			else
-				sounds[ud.name] = {ok = {[1] = ud.customParams.soundok}}
-			end
-		end
-		if ud.customParams.soundselect then
-			if sounds[ud.name] then
-				sounds[ud.name].select = {[1] = ud.customParams.soundselect}
-			else
-				sounds[ud.name] = {select = {[1] = ud.customParams.soundselect}}
-			end
-		end
-		if ud.customParams.soundbuild then
-			if sounds[ud.name] then
-				sounds[ud.name].build = ud.customParams.soundbuild
-			else
-				sounds[ud.name] = {build = ud.customParams.soundbuild}
-			end
-		end
+local function applyCustomParamSound(soundDef, soundName, customParams)
+	local sound = customParams["sound" .. soundName]
+	if not sound then
+		return soundDef
 	end
+
+	soundDef = soundDef or {}
+	soundDef[soundName] = { sound }
+	return soundDef
 end
 
 local commanderUnderAttack = "alarm"
+local function applyCommanderSound(soundDef, customParams)
+	if not customParams.commtype then
+		return soundDef
+	end
 
+	soundDef = soundDef or {}
+	soundDef.underattack = {[1] = commanderUnderAttack, volume = 0.8}
+	soundDef.attackdelay = function(hp) return 20*hp+2 end
+	soundDef.attackonscreen = true
+	soundDef.volume = 0.6
+	return soundDef
+end
+
+local ret = {}
 for udid, ud in pairs(UnitDefs) do
-	if ud.customParams.commtype then
-		if sounds[ud.name] then
-			sounds[ud.name].underattack = {[1] = commanderUnderAttack, volume = 0.8}
-			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end
-			sounds[ud.name].attackonscreen = true
-			sounds[ud.name].volume = 0.6
-		else
-			sounds[ud.name] = {
-				underattack = {[1] = commanderUnderAttack, volume = 0.4},
-				attackDelay = function(hp) return 20*hp+2 end,
-				attackonscreen = true,
-			}
-		end
-	end
+	local soundDef = sounds[ud.name]
+	local cp = ud.customParams
+	soundDef = applyCustomParamSound(soundDef, "ok"    , cp)
+	soundDef = applyCustomParamSound(soundDef, "select", cp)
+	soundDef = applyCustomParamSound(soundDef, "build" , cp)
+	soundDef = applyCommanderSound(soundDef, cp, ud.name)
+	ret[udid] = soundDef
 end
 
-
-local underAttackSounds = {
---	[1] = "udamaged_1",
-	[1] = "udamaged_2",
-}
-for i,v in pairs(sounds) do
-	if not v.underattack then
-		v.underattack = underAttackSounds[math.random(1,#underAttackSounds)]
-	end
-end
-
-return sounds
-
+return ret

@@ -119,9 +119,12 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, dama
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
+	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
-	if data.speedMult then
-		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
+	if data.speedMod then
+		local speedMult = (data.speedMod + ud.speed)/ud.speed
+		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", speedMult, INLOS)
 	end
 	
 	if data.radarRange then
@@ -153,11 +156,10 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 	end
 	
-	-- All comms have 10 BP in their unitDef (even support)
-	local buildPower = (10 + (data.bonusBuildPower or 0)) * (data.buildPowerMult or 1)
+	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed
 	data.metalIncome = (data.metalIncome or 0)
 	data.energyIncome = (data.energyIncome or 0)
-	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
+	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPowerMult, INLOS)
 	
 	if data.metalIncome and GG.Overdrive then
 		Spring.SetUnitRulesParam(unitID, "comm_income_metal", data.metalIncome, INLOS)
@@ -370,7 +372,6 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedJammingRange = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
-	unitCreatedCarrierDef = nil
 	
 	if not unitID then
 		return false
@@ -436,8 +437,11 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
-	local moduleList = {moduleDefNames.econ}
-	local moduleCost = moduleDefs[moduleDefNames.econ].cost
+	local moduleList = {moduleDefNames.econ, moduleDefNames.module_radarnet}
+	local moduleCost = 0
+	for i = 1, #moduleList do
+		moduleCost = moduleCost + moduleDefs[moduleList[i]].cost
+	end
 	
 	if commProfileInfo.decorations then
 		for i = 1, #commProfileInfo.decorations do

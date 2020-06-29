@@ -1,4 +1,4 @@
-unitDef = {
+return { napalmmissile = {
   unitname                      = [[napalmmissile]],
   name                          = [[Inferno]],
   description                   = [[Napalm Missile]],
@@ -115,6 +115,4 @@ unitDef = {
   featureDefs                   = {
   },
 
-}
-
-return lowerkeys({ napalmmissile = unitDef })
+} }

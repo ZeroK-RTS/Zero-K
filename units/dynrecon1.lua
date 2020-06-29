@@ -1,10 +1,10 @@
-unitDef = {
+return { dynrecon1 = {
   unitname            = [[dynrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
-  brakeRate           = 0.45,
+  brakeRate           = 2.7,
   buildCostMetal      = 1200,
   buildDistance       = 144,
   builder             = true,
@@ -84,7 +84,7 @@ unitDef = {
   trackWidth          = 22,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 8,
   
   featureDefs         = {
 
@@ -106,6 +106,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynrecon1 = unitDef })
+} }

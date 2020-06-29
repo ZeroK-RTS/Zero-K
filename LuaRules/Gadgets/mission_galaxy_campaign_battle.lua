@@ -772,8 +772,8 @@ local function PlaceUnit(unitData, teamID, doLevelGround, findClearPlacement)
 	end
 end
 
-local function AddMidgameUnit(unitData, teamID, gameFrame)
-	local n = unitData.delay
+local function AddMidgameUnit(unitData, teamID, gameFrame, spawnFrameOverride)
+	local n = spawnFrameOverride or unitData.delay
 	if gameFrame > n then
 		return -- Loaded game.
 	end
@@ -929,7 +929,7 @@ local function ProcessUnitCommand(unitID, command)
 		if command.pos then
 			command.pos[1], command.pos[2] = SanitizeBuildPositon(command.pos[1], command.pos[2], ud, command.facing or 0)
 		else -- Must be a factory production command
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {}, command.options or 0)
+			Spring.GiveOrderToUnit(unitID, command.cmdID, 0, command.options or 0)
 			return
 		end
 	end
@@ -952,7 +952,7 @@ local function ProcessUnitCommand(unitID, command)
 		local p = command.atPosition
 		local units = Spring.GetUnitsInRectangle(p[1] - BUILD_RESOLUTION, p[2] - BUILD_RESOLUTION, p[1] + BUILD_RESOLUTION, p[2] + BUILD_RESOLUTION)
 		if units and units[1] then
-			Spring.GiveOrderToUnit(unitID, command.cmdID, {units[1]}, command.options or 0)
+			Spring.GiveOrderToUnit(unitID, command.cmdID, units[1], command.options or 0)
 		end
 		return
 	end
@@ -1201,10 +1201,13 @@ local function CheckDisableControlAiMessage()
 	disableAiUnitControl = nil
 end
 
-local function PlaceMidgameUnits(unitList)
+local function PlaceMidgameUnits(unitList, gameFrame)
 	for i = 1, #unitList do
 		local data = unitList[i]
 		PlaceUnit(data.unitData, data.teamID, true, true)
+		if data.unitData.repeatDelay then
+			AddMidgameUnit(data.unitData, data.teamID, gameFrame, gameFrame + data.unitData.repeatDelay)
+		end
 	end
 	
 	if commandsToGive then
@@ -1490,7 +1493,7 @@ function gadget:GameFrame(n)
 	end
 	
 	if midgamePlacement[n] then
-		PlaceMidgameUnits(midgamePlacement[n])
+		PlaceMidgameUnits(midgamePlacement[n], n)
 		midgamePlacement[n] = nil
 	end
 	

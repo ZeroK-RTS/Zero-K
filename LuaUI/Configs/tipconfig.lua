@@ -54,8 +54,8 @@ raiderDefs = {
 	"tankheavyraid",
 	"tankraid",
 	
-	"armsh",
 	"hoverraid",
+	"hoverheavyraid",
 	
 	"chicken",
 	"chicken_leaper",
@@ -145,6 +145,7 @@ bomberDefs = {
 	"bomberriot",
 	"bomberdisarm",
 	"bomberheavy",
+	"bomberstrike",
 }
 
 conDefs = {

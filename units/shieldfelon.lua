@@ -1,10 +1,10 @@
-unitDef = {
+return { shieldfelon = {
   unitname            = [[shieldfelon]],
   name                = [[Felon]],
   description         = [[Shielded Riot/Skirmisher Bot]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
-  brakeRate           = 0.22,
+  brakeRate           = 1.32,
   buildCostMetal      = 620,
   buildPic            = [[shieldfelon.png]],
   canGuard            = true,
@@ -154,6 +154,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldfelon = unitDef })
+} }

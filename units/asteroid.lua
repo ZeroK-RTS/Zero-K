@@ -1,4 +1,4 @@
-unitDef = {
+return { asteroid = {
   unitname                      = [[asteroid]],
   name                          = [[Asteroid]],
   description                   = [[Space Rock]],
@@ -52,6 +52,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ asteroid = unitDef })
+} }

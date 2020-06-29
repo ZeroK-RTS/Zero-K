@@ -1,9 +1,9 @@
-unitDef = {
+return { spidercrabe = {
   unitname               = [[spidercrabe]],
   name                   = [[Crab]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
-  acceleration           = 0.22,
-  brakeRate              = 0.18,
+  acceleration           = 0.66,
+  brakeRate              = 1.08,
   buildCostMetal         = 1600,
   buildPic               = [[spidercrabe.png]],
   canGuard               = true,
@@ -126,6 +126,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spidercrabe = unitDef })
+} }

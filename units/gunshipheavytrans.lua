@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipheavytrans = {
   unitname               = [[gunshipheavytrans]],
   name                   = [[Hercules]],
   description            = [[Armed Heavy Air Transport]],
@@ -29,6 +29,7 @@ unitDef = {
     midposoffset   = [[0 0 0]],
     aimposoffset   = [[0 10 0]],
     modelradius    = [[15]],
+    transport_speed_heavy   = [[0.5]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -206,6 +207,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipheavytrans = unitDef })
+} }

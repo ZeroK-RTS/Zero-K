@@ -1,3 +1,6 @@
+local Spring = Spring
+local alwaysColor, losColor, radarColor, jamColor, radarColor2 = Spring.GetLosViewColors()
+
 return {
 	definitions = {
 		Spring.GetConfigInt("HighResInfoTexture") and "#define HIGH_QUALITY" or "",
@@ -64,11 +67,11 @@ return {
 		}
 	]],
 	uniformFloat = {
-		alwaysColor = select(1, Spring.GetLosViewColors()),
-		losColor    = select(2, Spring.GetLosViewColors()),
-		radarColor  = select(3, Spring.GetLosViewColors()),
-		jamColor    = select(4, Spring.GetLosViewColors()),
-		radarColor2 = select(5, Spring.GetLosViewColors()),
+		alwaysColor = alwaysColor,
+		losColor    = losColor,
+		radarColor  = radarColor,
+		jamColor    = jamColor,
+		radarColor2 = radarColor2,
 	},
 	uniformInt = {
 		tex0 = 0,

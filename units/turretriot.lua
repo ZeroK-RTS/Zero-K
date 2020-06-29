@@ -1,4 +1,4 @@
-unitDef = {
+return { turretriot = {
   unitname                      = [[turretriot]],
   name                          = [[Stardust]],
   description                   = [[Anti-Swarm Turret]],
@@ -19,6 +19,7 @@ unitDef = {
   customParams                  = {
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
+    aim_lookahead  = 100,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -44,7 +45,7 @@ unitDef = {
 
   },
 
-  sightDistance                 = 451,
+  sightDistance                 = 499, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 
@@ -125,6 +126,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretriot = unitDef })
+} }

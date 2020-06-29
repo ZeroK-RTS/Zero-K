@@ -26,7 +26,7 @@ local function GetLeftRightAllyTeamIDs()
 		comparisonX = Game.mapSizeX / 2
 	else
 		local enemyBoxID = 1 - myBoxID -- FIXME: assumes boxIDs are 0 and 1 and that there are at least 2 boxes
-		comparisonX = Spring.GetGameRulesParam("startpos_x_" .. enemyBoxID .. "_1")
+		comparisonX = Spring.GetGameRulesParam("startpos_x_" .. enemyBoxID .. "_1") or (Game.mapSizeX / 2)
 	end
 
 	if (not myBoxRepresentativeSpotX) or (myBoxRepresentativeSpotX <= comparisonX) then

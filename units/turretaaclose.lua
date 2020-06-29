@@ -1,4 +1,4 @@
-unitDef = {
+return { turretaaclose = {
   unitname                      = [[turretaaclose]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
@@ -41,7 +41,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 550,
+  sightDistance                 = 560,
   useBuildingGroundDecal        = true,
   waterline                     = 10,
   workerTime                    = 0,
@@ -79,8 +79,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 60.1,
-        planes  = 600.1,
+        default = 50.1,
+        planes  = 500.1,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -93,19 +93,19 @@ unitDef = {
       leadLimit               = 0,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 480,
+      range                   = 490,
       reloadtime              = 0.2,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/missile_fire3]],
-      startVelocity           = 600,
+      startVelocity           = 620,
       texture2                = [[AAsmoketrail]],
       tracks                  = true,
-      turnRate                = 110000,
+      turnRate                = 130000,
       turret                  = true,
       weaponAcceleration      = 0,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 600,
+      weaponVelocity          = 620,
     },
 
   },
@@ -131,6 +131,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretaaclose = unitDef })
+} }

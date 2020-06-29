@@ -1,10 +1,10 @@
-unitDef = {
+return { chickenbroodqueen = {
   unitname            = [[chickenbroodqueen]],
   name                = [[Chicken Brood Queen]],
   description         = [[Tends the Nest]],
-  acceleration        = 0.2,
+  acceleration        = 0.6,
   autoHeal            = 10,
-  brakeRate           = 0.205,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   buildDistance       = 240,
@@ -205,6 +205,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chickenbroodqueen = unitDef })
+} }

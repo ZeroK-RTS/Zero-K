@@ -57,6 +57,29 @@ local function MoveScript()
 	end
 end
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+local landRange = WeaponDefNames["hoverdepthcharge_fake_depthcharge"].range
+local seaRange  = WeaponDefNames["hoverdepthcharge_depthcharge"].range
+
+local function WeaponRangeUpdate()
+	while true do
+		local x, _, z = Spring.GetUnitPosition(unitID)
+		local height = Spring.GetGroundHeight(x, z)
+		if height > -5 then
+			Spring.SetUnitMaxRange(unitID, landRange)
+			Spring.SetUnitWeaponState(unitID, 1, "range", landRange)
+		else
+			Spring.SetUnitMaxRange(unitID, seaRange)
+			Spring.SetUnitWeaponState(unitID, 1, "range", seaRange)
+		end
+		Sleep(500)
+	end
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
 function script.Create()
 	Hide(flare1)
 	Hide(flare2)
@@ -90,6 +113,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
+	StartThread(WeaponRangeUpdate)
 end
 
 function script.QueryWeapon(num)
@@ -126,25 +150,24 @@ local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 function ShootDepthcharge()
 	EmitSfx(pads, GG.Script.FIRE_W3)
 	StartThread(ShotThread)
+	Move(gun, y_axis, -2)
+	Move(gun, y_axis, 2, 2)
+
+	GG.PokeDecloakUnit(unitID,100)
 end
 
-local function FakeWeaponShoot()
+local function FakeWeaponShoot(targetID)
 	local reloaded = select(2, spGetUnitWeaponState(unitID,1))
 	if reloaded then
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local h = Spring.GetGroundHeight(x,z)
-		if h > -10 then
+		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 400, 30) then
 			local gameFrame = spGetGameFrame()
 			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame})
 			
-			EmitSfx(pads, GG.Script.FIRE_W3)
-			StartThread(ShotThread)
-			Move(gun, y_axis, -2)
-			Move(gun, y_axis, 2, 2)
-	
-			GG.PokeDecloakUnit(unitID,100)
+			ShootDepthcharge()
 		end
 	end
 end
@@ -153,9 +176,11 @@ function script.BlockShot(num, targetID)
 	if num == 1 then
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600, 60)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 500, 60)
 	end
-	FakeWeaponShoot()
+	if num == 2 then
+		FakeWeaponShoot(targetID)
+	end
 	return true
 end
 

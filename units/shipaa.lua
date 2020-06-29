@@ -1,11 +1,11 @@
-unitDef = {
+return { shipaa = {
   unitname               = [[shipaa]],
 
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
-  acceleration           = 0.0498,
+  acceleration           = 0.249,
   activateWhenBuilt   = true,
-  brakeRate              = 0.0808,
+  brakeRate              = 0.808,
 
   buildCostMetal         = 400,
   builder                = false,
@@ -116,64 +116,6 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 1500,
     },
-
-
-    BOGUS_MISSILE = {
-      name                    = [[Missiles]],
-      areaOfEffect            = 48,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 0,
-      },
-
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      metalpershot            = 0,
-      range                   = 800,
-      reloadtime              = 0.5,
-      startVelocity           = 450,
-      tolerance               = 9000,
-      turnRate                = 33000,
-      turret                  = true,
-      weaponAcceleration      = 101,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 2000,
-    },
-
-
-    FLAK          = {
-      name                    = [[Flak Cannon]],
-      accuracy                = 1000,
-      areaOfEffect            = 64,
-      burnblow                = true,
-      canattackground         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 10,
-        planes  = 100,
-        subs    = 2.5,
-      },
-
-      edgeEffectiveness       = 0.85,
-      explosionGenerator      = [[custom:FLAK_HIT_24]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      noSelfDamage            = true,
-      range                   = 900,
-      reloadtime              = 0.4,
-      soundHit                = [[weapon/flak_hit]],
-      soundStart              = [[weapon/flak_fire]],
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 2000,
-    },
-
   },
 
 
@@ -196,6 +138,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipaa = unitDef })
+} }

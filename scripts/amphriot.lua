@@ -23,7 +23,8 @@ local base_speed = 100
 local SIG_WALK = 1
 local SIG_AIM1 = 2
 local SIG_AIM2 = 4
-local SIG_RESTORE = 8
+local SIG_BOB = 8
+local SIG_FLOAT = 16
 
 local SPEED = 2
 
@@ -126,10 +127,217 @@ local function WeaponRangeUpdate()
 	end
 end
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim functions
+
+local floatState = nil
+-- rising, sinking, static
+
+local function Bob()
+	Signal(SIG_BOB)
+	SetSignalMask(SIG_BOB)
+	while true do
+		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(0,2)), math.rad(math.random()))
+		Sleep(2000)
+		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(-2,0)), math.rad(math.random()))
+		Sleep(2000)
+	end
+end
+
+local function riseFloat_thread()
+	if floatState ~= 0 then
+		floatState = 0
+	else
+		return
+	end
+	Signal(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT)
+
+	Turn(lfleg, x_axis, 0, math.rad(800))
+	Turn(lffoot, x_axis, 0, math.rad(800))
+	Turn(rfleg, x_axis, 0, math.rad(800))
+	Turn(rffoot, x_axis, 0, math.rad(800))
+	
+	Turn(lbleg, x_axis, 0, math.rad(800))
+	Turn(lbfoot, x_axis, 0, math.rad(800))
+	Turn(rbleg, x_axis, 0, math.rad(800))
+	Turn(rbfoot, x_axis, 0, math.rad(800))
+	
+	Sleep(100)
+	
+	Turn(lfleg,x_axis, math.rad(100), math.rad(320))
+	Turn(rfleg,x_axis, math.rad(100), math.rad(320))
+	Turn(lbleg,x_axis, math.rad(-100), math.rad(320))
+	Turn(rbleg,x_axis, math.rad(-100), math.rad(320))
+	
+	Turn(lffoot,x_axis, math.rad(-90), math.rad(300))
+	Turn(rffoot,x_axis, math.rad(-90), math.rad(300))
+	Turn(lbfoot,x_axis, math.rad(90), math.rad(300))
+	Turn(rbfoot,x_axis, math.rad(90), math.rad(300))
+	
+	Sleep(200)
+	
+	while true do
+		Turn(lffoot,x_axis, math.rad(-90+10), math.rad(50))
+		Turn(rffoot,x_axis, math.rad(-90-10), math.rad(50))
+		Turn(lbfoot,x_axis, math.rad(90-10), math.rad(50))
+		Turn(rbfoot,x_axis, math.rad(90+10), math.rad(50))
+	
+		Sleep(300)
+		Turn(lffoot,x_axis, math.rad(-90-10), math.rad(50))
+		Turn(rffoot,x_axis, math.rad(-90+10), math.rad(50))
+		Turn(lbfoot,x_axis, math.rad(90+10), math.rad(50))
+		Turn(rbfoot,x_axis, math.rad(90-10), math.rad(50))
+	
+		Sleep(300)
+	end
+end
+
+local function staticFloat_thread()
+	if floatState ~= 2 then
+		floatState = 2
+	else
+		return
+	end
+	Signal(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT)
+	
+	Turn(lfleg,x_axis, math.rad(55-15), math.rad(60))
+	Turn(rfleg,x_axis, math.rad(55+15), math.rad(60))
+	Turn(lbleg,x_axis, math.rad(-55+15), math.rad(60))
+	Turn(rbleg,x_axis, math.rad(-55-15), math.rad(60))
+	
+	Sleep(400)
+	
+	Turn(lffoot,x_axis, math.rad(-60-20), math.rad(60))
+	Turn(rffoot,x_axis, math.rad(-60+20), math.rad(60))
+	Turn(lbfoot,x_axis, math.rad(60-20), math.rad(60))
+	Turn(rbfoot,x_axis, math.rad(60-20), math.rad(60))
+	
+	while true do
+		Turn(lfleg,x_axis, math.rad(55+15), math.rad(37.5))
+		Turn(rfleg,x_axis, math.rad(55-15), math.rad(37.5))
+		Turn(lbleg,x_axis, math.rad(-55-15), math.rad(37.5))
+		Turn(rbleg,x_axis, math.rad(-55+15), math.rad(37.5))
+	
+		Sleep(400)
+	
+		Turn(lffoot,x_axis, math.rad(-60+20), math.rad(40))
+		Turn(rffoot,x_axis, math.rad(-60-20), math.rad(25))
+		Turn(lbfoot,x_axis, math.rad(60-20), math.rad(40))
+		Turn(rbfoot,x_axis, math.rad(60+20), math.rad(25))
+	
+		Sleep(400)
+	
+		Turn(lfleg,x_axis, math.rad(55-15), math.rad(37.5))
+		Turn(rfleg,x_axis, math.rad(55+15), math.rad(37.5))
+		Turn(lbleg,x_axis, math.rad(-55+15), math.rad(37.5))
+		Turn(rbleg,x_axis, math.rad(-55-15), math.rad(37.5))
+	
+		Sleep(400)
+	
+		Turn(lffoot,x_axis, math.rad(-60-20), math.rad(25))
+		Turn(rffoot,x_axis, math.rad(-60+20), math.rad(40))
+		Turn(lbfoot,x_axis, math.rad(60+20), math.rad(25))
+		Turn(rbfoot,x_axis, math.rad(60-20), math.rad(40))
+	
+		Sleep(400)
+	end
+end
+
+local function sinkFloat_thread()
+	if floatState ~= 1 then
+		floatState = 1
+	else
+		return
+	end
+
+	Signal(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT)
+	Signal(SIG_BOB)
+
+	Turn(lfleg, x_axis, 0, math.rad(80))
+	Turn(lffoot, x_axis, 0, math.rad(80))
+	Turn(rfleg, x_axis, 0, math.rad(80))
+	Turn(rffoot, x_axis, 0, math.rad(80))
+	Turn(lbleg, x_axis, 0, math.rad(80))
+	Turn(lbfoot, x_axis, 0, math.rad(80))
+	Turn(rbleg, x_axis, 0, math.rad(80))
+	Turn(rbfoot, x_axis, 0, math.rad(80))
+	
+	Turn(base, x_axis, 0, math.rad(math.random()))
+	Turn(base, z_axis, 0, math.rad(math.random()))
+	Move(base, y_axis, 0, math.rad(math.random()))
+
+	while true do
+		EmitSfx(lfleg, SFX.BUBBLE)
+		Sleep(66)
+		EmitSfx(rfleg, SFX.BUBBLE)
+		Sleep(66)
+		EmitSfx(lbleg, SFX.BUBBLE)
+		Sleep(66)
+		EmitSfx(rbleg, SFX.BUBBLE)
+		Sleep(66)
+	end
+
+end
+
+local function dustBottom()
+	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID, base)
+	Spring.SpawnCEG("uw_amphlift", x1, y1 + 5, z1, 0, 0, 0, 0)
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim gadget callins
+
+function Float_startFromFloor()
+	dustBottom()
+	Signal(SIG_WALK)
+	StartThread(riseFloat_thread)
+	StartThread(Bob)
+end
+
+function Float_stopOnFloor()
+	dustBottom()
+	Signal(SIG_FLOAT)
+	Signal(SIG_BOB)
+end
+
+function Float_rising()
+	StartThread(riseFloat_thread)
+end
+
+function Float_sinking()
+	StartThread(sinkFloat_thread)
+end
+
+function Float_crossWaterline(speed)
+	if speed > 0 then
+		StartThread(staticFloat_thread)
+	end
+end
+
+function Float_stationaryOnSurface()
+	StartThread(staticFloat_thread)
+end
+
+function unit_teleported(position)
+	return GG.Floating_UnitTeleported(unitID, position)
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
 function script.Create()
 	--StartThread(Walk)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(WeaponRangeUpdate)
+	--StartThread(WeaponRangeUpdate) -- Equal range so not required
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then
 		if not longRange then
@@ -150,6 +358,7 @@ end
 function script.StopMoving()
 	--Spring.Echo("Stopped moving")
 	StartThread(ResetLegs)
+	GG.Floating_StopMoving(unitID)
 end
 
 local function RestoreAfterDelay()
@@ -162,6 +371,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	GG.Floating_AimWeapon(unitID)
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
@@ -222,8 +432,9 @@ end
 
 function script.BlockShot(num, targetID)
 	if num == 2 then -- torpedoes
+		local x,y,z = Spring.GetUnitPosition(unitID)
 		-- Lower than real damage (180) to help against Duck regen case.
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
+		return y < -22 or GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
 	end
 	return false
 end

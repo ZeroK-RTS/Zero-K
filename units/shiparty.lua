@@ -1,10 +1,10 @@
-unitDef = {
+return { shiparty = {
   unitname               = [[shiparty]],
   name                   = [[Envoy]],
   description            = [[Cruiser (Artillery)]],
-  acceleration           = 0.0417,
+  acceleration           = 0.209,
   activateWhenBuilt      = true,
-  brakeRate              = 0.142,
+  brakeRate              = 1.42,
   buildCostMetal         = 850,
   builder                = false,
   buildPic               = [[shiparty.png]],
@@ -16,7 +16,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-
     --extradrawrange = 200,
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
@@ -62,7 +61,7 @@ unitDef = {
       name                    = [[Plasma Cannon]],
       areaOfEffect            = 96,
       avoidFeature            = false,
-      avoidGround             = false,
+      avoidGround             = true,
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -111,6 +110,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shiparty = unitDef })
+} }

@@ -350,7 +350,6 @@ options = {
 	},
 	leftsideofscreen = {
 		name = 'Left side of screen',
-		type = 'number',
 		type = 'bool',
 		value = true,
 		hidden = true,
@@ -1011,7 +1010,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		if constructionCount == oldConstructionCount and constructionDefID == oldConstructionDefID and buildProgress == oldBuildProgress then
 			return
 		end
-		oldConstructionCount, oldConstructionDefIDoldBuildProgress, oldBuildProgress = constructionCount, constructionDefID, buildProgress
+		oldConstructionCount, oldConstructionDefID, oldBuildProgress = constructionCount, constructionDefID, buildProgress
 		
 		local tooltip = WG.Translate("interface", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[unitDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = constructionCount})
 		if repeatState then
@@ -1510,8 +1509,8 @@ local function HasDoubleCommand(unitID, cmdID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local cmdID = Spring.GetUnitCurrentCommand(unitID)
-			return cmdID == CMD.WAIT
+			local currCmdID = Spring.GetUnitCurrentCommand(unitID)
+			return currCmdID == CMD.WAIT
 		end
 	end
 	return false

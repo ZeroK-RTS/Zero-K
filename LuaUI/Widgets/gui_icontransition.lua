@@ -80,10 +80,10 @@ local GL_GREATER = GL.GREATER
 -- Includes and initializations
 --
 
-include("keysym.h.lua")
+include("keysym.lua")
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
-local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.ZIP)
 
 renderAtPos = {
 	[UnitDefNames["staticmex"].id] = true,
@@ -321,7 +321,7 @@ local function DrawWorldFunc()
 	
 	-- this is probably faster than spIsUnitInView() for all the units
 	-- but that's probably worth testing to confirm
-	local unitsInView = spGetVisibleUnits()
+	local unitsInView = spGetVisibleUnits(-1, nil, true)
 	local unitIsInView = {}
 	for k, v in pairs(unitsInView) do
 		unitIsInView[v] = true

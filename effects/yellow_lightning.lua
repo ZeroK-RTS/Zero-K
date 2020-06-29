@@ -135,7 +135,7 @@ return {
       },
     },
   },
-  
+
   ["white_lightning_bomb_bolts"] = {
     bluebolts = {
       air                = true,
@@ -165,7 +165,7 @@ return {
       },
     },
   },
-  
+
   ["yellow_lightning_bomb"] = {
     bluebolts = {
       air                = true,

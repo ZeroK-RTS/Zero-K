@@ -9,6 +9,17 @@
 -- michelle_n
 -- michelle_nw
 
+local michelle_colormap = [[0.0 0.00 0.0 0.01
+                            0.9 0.90 0.0 0.50
+                            0.9 0.90 0.0 0.50
+                            0.8 0.80 0.1 0.50
+                            0.7 0.70 0.2 0.50
+                            0.5 0.35 0.0 0.50
+                            0.5 0.35 0.0 0.50
+                            0.5 0.35 0.0 0.50
+                            0.5 0.35 0.0 0.50
+                            0.0 0.00 0.0 0.01]]
+
 return {
   ["michelle_ne"] = {
     rocks = {
@@ -19,7 +30,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -49,7 +60,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -94,7 +105,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -223,7 +234,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -253,7 +264,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -283,7 +294,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -313,7 +324,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,
@@ -343,7 +354,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   0.9 0.9 0 0.5     0.9 0.9 0 0.5       0.8 0.8 0.1 0.5       0.7 0.7 0.2 0.5      0.5 0.35 0. 0.5   0.5 0.35 0. 0.5   0.5 0.35 0. 0.5    0.5 0.35 0. 0.5   0 0 0 0.01]],
+        colormap           = michelle_colormap,
         directional        = true,
         emitrot            = 0,
         emitrotspread      = 10,

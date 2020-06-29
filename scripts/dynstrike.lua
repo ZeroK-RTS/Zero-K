@@ -28,6 +28,8 @@ local Base = piece('Base')
 local Nano = piece('Nano')
 local UnderGun = piece('UnderGun')
 local UnderMuzzle = piece('UnderMuzzle')
+local RightMuzzle = piece('RightMuzzle')
+
 local Eye = piece('Eye')
 local Shield = piece('Shield')
 local FingerTipA = piece('FingerTipA')
@@ -429,7 +431,7 @@ function script.AimFromWeapon(num)
 		if dyncomm.GetWeapon(num) == 1 then
 			return Palm
 		elseif dyncomm.GetWeapon(num) == 2 then
-			return UnderMuzzle
+			return RightMuzzle
 		end
 	end
 	return Shield
@@ -439,7 +441,7 @@ function script.QueryWeapon(num)
 	if dyncomm.GetWeapon(num) == 1 then
 		return Muzzle
 	elseif dyncomm.GetWeapon(num) == 2 then
-		return UnderMuzzle
+		return RightMuzzle
 	end
 	return Shield
 end
@@ -449,7 +451,7 @@ local function RestoreTorsoAim(sleepTime)
 	SetSignalMask(SIG_RESTORE_TORSO)
 	Sleep(sleepTime or RESTORE_DELAY)
 	if not nanoing then
-		Turn(Stomach, z_axis, 0, TORSO_SPEED_YAW)
+		Turn(Breast, z_axis, 0, TORSO_SPEED_YAW)
 		aiming = false
 	end
 end
@@ -477,10 +479,10 @@ end
 local function AimArm(heading, pitch, arm, hand, wait)
 	aiming = true
 	Turn(arm, x_axis, -pitch/2 - 0.7, ARM_SPEED_PITCH)
-	Turn(Stomach, z_axis, heading, TORSO_SPEED_YAW)
+	Turn(Breast, z_axis, heading, TORSO_SPEED_YAW)
 	Turn(hand, x_axis, -pitch/2 - 0.85, ARM_SPEED_PITCH)
 	if wait then
-		WaitForTurn(Stomach, z_axis)
+		WaitForTurn(Breast, z_axis)
 		WaitForTurn(arm, x_axis)
 	end
 end
@@ -515,7 +517,7 @@ function script.FireWeapon(num)
 	if weaponNum == 1 then
 		dyncomm.EmitWeaponFireSfx(Muzzle, num)
 	elseif weaponNum == 2 then
-		dyncomm.EmitWeaponFireSfx(UnderMuzzle, num)
+		dyncomm.EmitWeaponFireSfx(RightMuzzle, num)
 	end
 end
 
@@ -524,7 +526,7 @@ function script.Shot(num)
 	if weaponNum == 1 then
 		dyncomm.EmitWeaponShotSfx(Muzzle, num)
 	elseif weaponNum == 2 then
-		dyncomm.EmitWeaponShotSfx(UnderMuzzle, num)
+		dyncomm.EmitWeaponShotSfx(RightMuzzle, num)
 	end
 end
 
@@ -593,7 +595,7 @@ function script.Create()
     end
     
     Turn(Muzzle, x_axis, math.rad(180))
-    Turn(UnderMuzzle,x_axis, math.rad(180))
+    Turn(RightMuzzle,x_axis, math.rad(180))
 	
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)

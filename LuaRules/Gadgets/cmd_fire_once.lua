@@ -61,13 +61,13 @@ function gadget:ScriptEndBurst(unitID, unitDefID, weaponNum)
 
 	if Spring.Utilities.GetUnitRepeat(unitID) then
 		spSetUnitTarget(unitID, nil)
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
 		spGiveOrderToUnit(unitID, CMD_ATTACK, {cmdParam1, cmdParam2, cmdParam3}, Spring.Utilities.AndBit(cmdOpt, CMD_OPT_SHIFT))
 	else
 		--[[ Unit keeps shooting otherwise; doesn't seem to affect Set Target negatively though.
 			 Has to be before REMOVE because else if there's 2 commands in a row, the unit already
 			 starts doing the second command by the time the target it set to nil ]]
 		spSetUnitTarget(unitID, nil)
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+		spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
 	end
 end

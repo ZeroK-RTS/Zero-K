@@ -17,12 +17,12 @@ end
 
 -------------------------------------------------
 
-local echo				= Spring.Echo
+local echo = Spring.Echo
 
 ------------------------------------------------
 
 -- config
-include("keysym.h.lua")
+include("keysym.lua")
 local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua")
 	
 local build_menu_use = include("Configs/marking_menu_menus.lua")
@@ -866,8 +866,6 @@ local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, co
 			file = texture;
 			parent = key_buttons[hotkey_key];
 		}
-	else
-		--key_buttons[hotkey_key]:SetCaption( name:gsub(' ', '\n') )
 	end
 	key_buttons[hotkey_key]:SetCaption( name and name:gsub(' ', '\n') or '' )
 	
@@ -1153,11 +1151,9 @@ function widget:Initialize()
 	end
 	
 	widgetHandler:AddAction("buildprev", BuildPrev, nil, "t")
-	if not customKeyBind then
+	--if not customKeyBind then
 		--Spring.SendCommands("bind d buildprev")
-	end
-	
-	
+	--end
 end
 
 function widget:Shutdown()
@@ -1166,9 +1162,9 @@ function widget:Shutdown()
 	end
 	widgetHandler:RemoveAction("radialbuildmenu")
 	
-	if not customKeyBind then
+	--if not customKeyBind then
 		--Spring.SendCommands("unbind d buildprev")
-	end
+	--end
 	widgetHandler:RemoveAction("buildprev")
 	
 end

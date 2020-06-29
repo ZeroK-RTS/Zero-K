@@ -461,7 +461,7 @@ function widget:DrawScreenEffectsAnaglyphNoShader()
 	gl.Blending(false)
 	glColor(1, 1, 1, 1)
 
- 	if (not left) then
+	if (not left) then
 		gl.ColorMask(false,true,true,true)
 		glTexture(righttext)
 		glTexRect(0,vsy,vsx,0)
@@ -507,7 +507,7 @@ end
 
 function widget:Initialize()
 	if (canShader) then
-	  	stereoShader = gl.CreateShader({
+		stereoShader = gl.CreateShader({
 			fragment = [[
 				uniform mat3 colorleft;
 				uniform mat3 colorright;

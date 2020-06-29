@@ -1,9 +1,9 @@
-unitDef = {
+return { striderbantha = {
   unitname               = [[striderbantha]],
   name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
-  acceleration           = 0.1047,
-  brakeRate              = 0.2212,
+  acceleration           = 0.314,
+  brakeRate              = 1.327,
   buildCostMetal         = 10000,
   builder                = false,
   buildPic               = [[striderbantha.png]],
@@ -254,6 +254,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderbantha = unitDef })
+} }

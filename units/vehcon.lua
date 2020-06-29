@@ -1,9 +1,9 @@
-unitDef = {
+return { vehcon = {
   unitname               = [[vehcon]],
   name                   = [[Mason]],
   description            = [[Construction Rover, Builds at 5 m/s]],
-  acceleration           = 0.066,
-  brakeRate              = 1.5,
+  acceleration           = 0.33,
+  brakeRate              = 15.0,
   buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
@@ -35,7 +35,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 900,
+  maxDamage              = 1000,
   maxSlope               = 18,
   maxVelocity            = 2.4,
   maxWaterDepth          = 22,
@@ -47,7 +47,7 @@ unitDef = {
   script                 = [[vehcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
-  sightDistance          = 273,
+  sightDistance          = 300,
   trackOffset            = -3,
   trackStrength          = 6,
   trackStretch           = 1,
@@ -76,6 +76,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehcon = unitDef })
+} }

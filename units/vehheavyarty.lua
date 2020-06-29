@@ -1,9 +1,9 @@
-unitDef = {
+return { vehheavyarty = {
   unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Rover]],
-  acceleration        = 0.042,
-  brakeRate           = 0.08,
+  acceleration        = 0.21,
+  brakeRate           = 0.8,
   buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[vehheavyarty.png]],
@@ -28,7 +28,7 @@ unitDef = {
   leaveTracks         = true,
   maxDamage           = 1100,
   maxSlope            = 18,
-  maxVelocity         = 2.25,
+  maxVelocity         = 2.0,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -134,7 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehheavyarty = unitDef })
-
+} }

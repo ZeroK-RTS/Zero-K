@@ -81,6 +81,7 @@ local unitIsBomber = {
 	[UnitDefNames["bomberriot"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
 	[UnitDefNames["bomberdisarm"].id] = true,
+	[UnitDefNames["bomberstrike"].id] = true,
 }
 
 -- Hardcode things which do high burst damage with a long cooldown
@@ -123,6 +124,10 @@ local unitIsHeavy = {
 	[UnitDefNames["striderarty"].id] = true,
 	[UnitDefNames["striderbantha"].id] = true,
 	[UnitDefNames["striderdetriment"].id] = true,
+}
+
+local unitPriorityModifier = {
+	[UnitDefNames["gunshipemp"].id] = -0.8,
 }
 
 -- Hardcode weapons that are bad against fast moving stuff.
@@ -271,6 +276,7 @@ for uid = 1, #UnitDefs do
 		if priority > 12 then
 			priority = 12 + 0.1*priority
 		end
+		priority = priority + (unitPriorityModifier[uid] or 0)
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = priority + 35
 		elseif unitIsClaw[uid] then

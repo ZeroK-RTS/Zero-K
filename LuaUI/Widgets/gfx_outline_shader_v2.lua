@@ -36,13 +36,12 @@ local USE_MATERIAL_INDICES = true
 -----------------------------------------------------------------
 
 local shadersDir = "LuaUI/Widgets/Shaders/"
-local luaShaderDir = "LuaUI/Widgets/Include/"
 
 -----------------------------------------------------------------
 -- Global Variables
 -----------------------------------------------------------------
 
-local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
+local LuaShader = VFS.Include("LuaRules/Gadgets/Include/LuaShader.lua")
 
 local vsx, vsy, vpx, vpy
 local firstTime

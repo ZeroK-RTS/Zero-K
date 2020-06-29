@@ -1,11 +1,11 @@
-unitDef = {
+return { hoverdepthcharge = {
   unitname            = [[hoverdepthcharge]],
   name                = [[Claymore]],
   description         = [[Anti-Sub Hovercraft]],
-  acceleration        = 0.048,
+  acceleration        = 0.12,
   activateWhenBuilt   = true,
-  brakeRate           = 0.043,
-  buildCostMetal      = 330,
+  brakeRate           = 1.3,
+  buildCostMetal      = 320,
   builder             = false,
   buildPic            = [[hoverdepthcharge.png]],
   canGuard            = true,
@@ -18,7 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    turnatfullspeed = [[1]],
     modelradius    = [[25]],
   },
 
@@ -28,9 +27,9 @@ unitDef = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 1650,
+  maxDamage           = 1260,
   maxSlope            = 36,
-  maxVelocity         = 3.3,
+  maxVelocity         = 2.35,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
@@ -78,56 +77,57 @@ unitDef = {
 
     DEPTHCHARGE = {
       name                    = [[Depth Charge]],
-      areaOfEffect            = 290,
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       bounceSlip              = 0.94,
       bounceRebound           = 0.8,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      cegTag                  = [[torpedo_trail]],
 
       customParams = {
         burst = Shared.BURST_UNRELIABLE,
       },
 
       damage                  = {
-        default = 900.5,
+        default = 620.5,
       },
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flightTime              = 2.1,
+      flightTime              = 2.3,
       groundBounce            = true,
       heightMod               = 0,
-      impulseBoost            = 0.4,
-      impulseFactor           = 1,
+      impulseBoost            = 0.2,
+      impulseFactor           = 0.9,
       interceptedByShieldType = 1,
       leadLimit               = 0,
       model                   = [[depthcharge_big.s3o]],
       myGravity               = 0.2,
-      noSelfDamage            = false,
+      noSelfDamage            = true,
       numbounce               = 3,
-      range                   = 270,
-      reloadtime              = 8,
+      range                   = 300,
+      reloadtime              = 5.5,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
-      soundStartVolume        = 8,
+      soundStartVolume        = 5,
       startVelocity           = 5,
       tolerance               = 1000000,
       tracks                  = true,
-      turnRate                = 30000,
+      turnRate                = 50000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 15,
+      weaponAcceleration      = 12,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 280,
     },
     
     FAKE_DEPTHCHARGE = {
-      name                    = [[Fake Depth Charge]],
-      areaOfEffect            = 290,
+      name                    = [[Rolled Charge]],
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       bounceSlip              = 0.4,
       bounceRebound           = 0.4,
@@ -137,7 +137,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 900.5,
+        default = 620.5,
       },
 
       edgeEffectiveness       = 0.4,
@@ -146,15 +146,15 @@ unitDef = {
       flightTime              = 4,
       groundBounce            = true,
       heightMod               = 0,
-      impulseBoost            = 0.4,
-      impulseFactor           = 1,
+      impulseBoost            = 0.2,
+      impulseFactor           = 0.9,
       interceptedByShieldType = 1,
       model                   = [[depthcharge_big.s3o]],
       myGravity               = 0.2,
-      noSelfDamage            = false,
+      noSelfDamage            = true,
       numbounce               = 1,
-      range                   = 270,
-      reloadtime              = 8,
+      range                   = 220,
+      reloadtime              = 5.5,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -163,9 +163,8 @@ unitDef = {
       tracks                  = false,
       turnRate                = 0,
       turret                  = true,
-      waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 5,
+      weaponVelocity          = 180,
     },
     
     FAKEGUN = {
@@ -190,8 +189,8 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 75,
-      reloadtime              = 8,
+      range                   = 220,
+      reloadtime              = 5.5,
       size                    = 1E-06,
       smokeTrail              = false,
       targetborder            = 0.9,
@@ -234,6 +233,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverdepthcharge = unitDef })
+} }

@@ -124,8 +124,9 @@ function Object:New(obj)
 				if (t == "metatable") then
 					setmetatable(obj[i], getmetatable(v))
 				end
-			elseif (ot == "nil") then
-				obj[i] = v
+			-- We don't need to copy other types (allegedly)
+			--elseif (ot == "nil") then
+			--	obj[i] = v
 			end
 		end
 	end
@@ -203,7 +204,7 @@ end
 
 function Object:Clone()
 	local newinst = {}
- 	-- FIXME
+	-- FIXME
 	return newinst
 end
 
@@ -830,6 +831,21 @@ end
 function Object:TweakDraw()
 	self:CallChildrenInverse('TweakDraw')
 end
+
+--// =============================================================================
+
+function Object:TraceDebug(parameters)
+	local echo = {}
+	for i = 1, #parameters do
+		echo[#echo + 1] = parameters[i]
+		echo[#echo + 1] = (self[parameters[i]] ~= nil and self[parameters[i]]) or "nil"
+	end
+	Spring.Echo(unpack(echo))
+	if self.parent then
+		self.parent:TraceDebug(parameters)
+	end
+end
+
 
 --// =============================================================================
 

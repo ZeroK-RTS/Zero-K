@@ -31,6 +31,9 @@ local function GetSpeedMod()
 end
 
 local function SetSelfSpeedMod(speedmod)
+	if RELOAD_PENALTY == 1 then
+		return
+	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedmod)
 	GG.UpdateUnitAttributes(unitID)
 end

@@ -13,7 +13,7 @@ function gadget:GetInfo()
 		date      = "2018-11-30", -- v1 2009-11-27
 		license   = "GNU GPL, v2 or later",
 		layer     = -1,
-		enabled   = false,
+		enabled   = true,
 	}
 end
 
@@ -49,13 +49,15 @@ local getMovetype = Spring.Utilities.getMovetype
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
+local DO_CHANGES_EXTERNALLY = true
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
 
 local origUnitSight = {}
 
-local function UpdateSensorAndJamm(unitID, unitDefID, speedFactor)
+local function UpdateSensorAndJamm(unitID, unitDefID, multiplier)
 	if not UnitDefs[unitDefID] then
 		return
 	end
@@ -71,20 +73,36 @@ local function UpdateSensorAndJamm(unitID, unitDefID, speedFactor)
 	end
 	local orig = origUnitSight[unitDefID]
 	
+	if DO_CHANGES_EXTERNALLY then
+		if orig.radar then
+			Spring.SetUnitRulesParam(unitID, "radarRangeOverride", orig.radar*multiplier)
+		end
+		if orig.sonar then
+			Spring.SetUnitRulesParam(unitID, "sonarRangeOverride", orig.sonar*multiplier)
+		end
+		if orig.jammer then
+			Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", orig.jammer*multiplier)
+		end
+		if orig.los then
+			Spring.SetUnitRulesParam(unitID, "sightRangeOverride", orig.los*multiplier)
+		end
+		return
+	end
+	
 	if orig.radar then
-		Spring.SetUnitSensorRadius(unitID, "radar", orig.radar*speedFactor)
+		Spring.SetUnitSensorRadius(unitID, "radar", orig.radar*multiplier)
 	end
 	if orig.sonar then
-		Spring.SetUnitSensorRadius(unitID, "sonar", orig.sonar*speedFactor)
+		Spring.SetUnitSensorRadius(unitID, "sonar", orig.sonar*multiplier)
 	end
 	if orig.jammer then
-		Spring.SetUnitSensorRadius(unitID, "radarJammer", orig.jammer*speedFactor)
+		Spring.SetUnitSensorRadius(unitID, "radarJammer", orig.jammer*multiplier)
 	end
 	if orig.los then
-		Spring.SetUnitSensorRadius(unitID, "los", orig.los*speedFactor)
+		Spring.SetUnitSensorRadius(unitID, "los", orig.los*multiplier)
 	end
 	if orig.airLos then
-		Spring.SetUnitSensorRadius(unitID, "airLos", orig.airLos*speedFactor)
+		Spring.SetUnitSensorRadius(unitID, "airLos", orig.airLos*multiplier)
 	end
 end
 
@@ -94,12 +112,9 @@ end
 
 local origUnitBuildSpeed = {}
 
-local function UpdateBuildSpeed(unitID, ud, speedFactor)
-	if ud.buildSpeed == 0 then
-		return
-	end
-	local unitDefID = ud.id
+local function UpdateEconRate(unitID, unitDefID, speedFactor)
 	if not origUnitBuildSpeed[unitDefID] then
+		local ud = UnitDefs[unitDefID]
 		origUnitBuildSpeed[unitDefID] = {
 			buildSpeed = ud.buildSpeed,
 			maxRepairSpeed = ud.maxRepairSpeed,
@@ -143,10 +158,9 @@ local function UpdatePausedReload(unitID, unitDefID, gameFrame)
 	end
 end
 
-local function UpdateWeapons(unitID, ud, speedFactor, rangeFactor, gameFrame)
-	local unitDefID = ud.id
-	
+local function UpdateWeapons(unitID, unitDefID, weaponMods, speedFactor, rangeFactor, gameFrame)
 	if not origUnitWeapons[unitDefID] then
+		local ud = UnitDefs[unitDefID]
 	
 		origUnitWeapons[unitDefID] = {
 			weapon = {},
@@ -172,41 +186,51 @@ local function UpdateWeapons(unitID, ud, speedFactor, rangeFactor, gameFrame)
 	end
 	
 	local state = origUnitWeapons[unitDefID]
-	Spring.SetUnitMaxRange(unitID, state.maxWeaponRange*rangeFactor)
+	local maxRangeModified = state.maxWeaponRange*rangeFactor
 
 	for i = 1, state.weaponCount do
 		local w = state.weapon[i]
-		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
-		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
-		if speedFactor <= 0 then
-			if not unitReloadPaused[unitID] then
-				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
-				unitReloadPaused[unitID] = unitDefID
-				if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
-				else
-					local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+		
+		if not DO_CHANGES_EXTERNALLY then
+			local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
+			local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
+			if speedFactor <= 0 then
+				if not unitReloadPaused[unitID] then
+					local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+					unitReloadPaused[unitID] = unitDefID
+					if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
+						spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+					else
+						local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+						spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+					end
+					-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 				end
-				-- add UPDATE_PERIOD so that the reload time never advances past what it is now
-			end
-		else
-			if unitReloadPaused[unitID] then
-				unitReloadPaused[unitID] = nil
-				spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
-			end
-			local newReload = w.reload/speedFactor
-			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
 			else
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				if unitReloadPaused[unitID] then
+					unitReloadPaused[unitID] = nil
+					spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
+				end
+				local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
+				local newReload = w.reload/moddedSpeed
+				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+				if w.burstRate then
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
+				else
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				end
 			end
 		end
-		Spring.Echo("w.range*rangeFactor", w.range*rangeFactor)
-		spSetUnitWeaponState(unitID, i, "range", w.range*rangeFactor)
-		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", w.range*rangeFactor)
+		local moddedRange = w.range*((weaponMods and weaponMods[i] and weaponMods[i].rangeMult) or 1)*rangeFactor
+		
+		spSetUnitWeaponState(unitID, i, "range", moddedRange)
+		spSetUnitWeaponDamages(unitID, i, "dynDamageRange", moddedRange)
+		if maxRangeModified < moddedRange then
+			maxRangeModified = moddedRange
+		end
 	end
+	
+	Spring.SetUnitMaxRange(unitID, maxRangeModified)
 end
 
 --------------------------------------------------------------------------------
@@ -215,10 +239,9 @@ end
 
 local origUnitSpeed = {}
 
-local function UpdateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)
-	local unitDefID = ud.id
+local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
 	if not origUnitSpeed[unitDefID] then
-	
+		local ud = UnitDefs[unitDefID]
 		local moveData = spGetUnitMoveTypeData(unitID)
 	
 		origUnitSpeed[unitDefID] = {
@@ -308,6 +331,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Handle by a different gadget
+
+local function ApplyExternalChanges(unitID, weaponMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+	GG.att_genericUsed = true
+
+	GG.att_moveMult[unitID]   = moveMult
+	GG.att_turnMult[unitID]   = turnMult
+	GG.att_accelMult[unitID]  = accelMult
+	GG.att_reloadMult[unitID] = reloadMult
+	GG.att_econMult[unitID]   = econMult
+	GG.att_buildMult[unitID]  = buildMult
+
+	GG.att_weaponMods[unitID] = weaponMods
+
+	GG.UpdateUnitAttributes(unitID)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Attribute Updating
 
 local currentMove = {}
@@ -315,7 +357,7 @@ local currentTurn = {}
 local currentAccel = {}
 local currentReload = {}
 local currentRange = {}
-local currentBuild = {}
+local currentEcon = {}
 local currentSense = {}
 
 local function RemoveUnit(unitID)
@@ -326,7 +368,7 @@ local function RemoveUnit(unitID)
 	currentAccel[unitID] = nil
 	currentReload[unitID] = nil
 	currentRange[unitID] = nil
-	currentBuild[unitID] = nil
+	currentEcon[unitID] = nil
 	currentSense[unitID] = nil
 end
 
@@ -342,42 +384,69 @@ local function UpdateUnitAttributes(unitID, attList)
 	
 	local frame = spGetGameFrame()
 	
-	local ud = UnitDefs[unitDefID]
-	
 	local moveMult = 1
 	local turnMult = 1
 	local accelMult = 1
 	local reloadMult = 1
 	local rangeMult = 1
+	local econMult = 1
 	local buildMult = 1
 	local senseMult = 1
+	local weaponSpecificMods = false
 	
-	for _, data in attList.Iterator() do
+	for _, data in IterableMap.Iterator(attList) do
 		moveMult = moveMult*(data.move or 1)
 		turnMult = turnMult*(data.turn or 1)
 		accelMult = accelMult*(data.accel or 1)
-		reloadMult = reloadMult*(data.reload or 1)
-		rangeMult = rangeMult*(data.range or 1)
+		econMult = econMult*(data.econ or 1)
 		buildMult = buildMult*(data.build or 1)
 		senseMult = senseMult*(data.sense or 1)
+		
+		if data.weaponNum then
+			weaponSpecificMods = weaponSpecificMods or {}
+			weaponSpecificMods[data.weaponNum] = weaponSpecificMods[data.weaponNum] or {
+				reloadMult = 1,
+				rangeMult = 1,
+			}
+			local wepData = weaponSpecificMods[data.weaponNum]
+			wepData.reloadMult = wepData.reloadMult*(data.reload or 1)
+			wepData.rangeMult = wepData.rangeMult*(data.range or 1)
+		else
+			reloadMult = reloadMult*(data.reload or 1)
+			rangeMult = rangeMult*(data.range or 1)
+		end
+	end
+	
+	if DO_CHANGES_EXTERNALLY then
+		if (currentSense[unitID] or 1) ~= senseMult then
+			UpdateSensorAndJamm(unitID, unitDefID, senseMult)
+			currentSense[unitID] = senseMult
+		end
+		if weaponSpecificMods or (currentRange[unitID] or 1) ~= rangeMult then
+			UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
+			currentRange[unitID] = rangeMult
+		end
+		
+		ApplyExternalChanges(unitID, weaponSpecificMods, moveMult, turnMult, accelMult, reloadMult, econMult, buildMult)
+		return
 	end
 	
 	if (currentMove[unitID] or 1) ~= moveMult or (currentTurn[unitID] or 1) ~= turnMult or (currentAccel[unitID] or 1) ~= accelMult then
-		UpdateMovementSpeed(unitID, ud, moveMult, turnMult, accelMult)
+		UpdateMovementSpeed(unitID, unitDefID, moveMult, turnMult, accelMult)
 		currentMove[unitID] = moveMult
 		currentTurn[unitID] = turnMult
 		currentAccel[unitID] = accelMult
 	end
 	
-	if (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
-		UpdateWeapons(unitID, ud, reloadMult, rangeMult, frame)
+	if weaponSpecificMods or (currentReload[unitID] or 1) ~= reloadMult or (currentRange[unitID] or 1) ~= rangeMult then
+		UpdateWeapons(unitID, unitDefID, weaponSpecificMods, reloadMult, rangeMult, frame)
 		currentReload[unitID] = reloadMult
 		currentRange[unitID] = rangeMult
 	end
 	
-	if (currentBuild[unitID] or 1) ~= buildMult then
-		UpdateBuildSpeed(unitID, ud, buildMult)
-		currentBuild[unitID] = buildMult
+	if (currentEcon[unitID] or 1) ~= econMult then
+		UpdateEconRate(unitID, unitDefID, econMult)
+		currentEcon[unitID] = econMult
 	end
 	
 	if (currentSense[unitID] or 1) ~= senseMult then
@@ -402,17 +471,19 @@ function Attributes.AddEffect(unitID, key, effect)
 	if not attributeUnits[unitID] then
 		attributeUnits[unitID] = IterableMap.New()
 	end
-	local data = attributeUnits[unitID].Get(key) or {}
+	local data = IterableMap.Get(attributeUnits[unitID], key) or {}
 	
 	data.move = effect.move
 	data.turn = effect.turn or effect.move
 	data.accel = effect.accel or effect.move
 	data.reload = effect.reload
 	data.range = effect.range
+	data.econ = effect.econ
 	data.build = effect.build
 	data.sense = effect.sense
+	data.weaponNum = effect.weaponNum
 	
-	attributeUnits[unitID].Add(key, data) -- Overwrites existing key if it exists
+	IterableMap.Add(attributeUnits[unitID], key, data) -- Overwrites existing key if it exists
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
 		Attributes.RemoveUnit(unitID)
 	end
@@ -422,7 +493,7 @@ function Attributes.RemoveEffect(unitID, key)
 	if not attributeUnits[unitID] then
 		return
 	end
-	attributeUnits[unitID].Remove(key)
+	IterableMap.Remove(attributeUnits[unitID], key)
 	if UpdateUnitAttributes(unitID, attributeUnits[unitID]) then
 		Attributes.RemoveUnit(unitID)
 	end

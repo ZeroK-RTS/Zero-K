@@ -11,7 +11,7 @@ function widget:GetInfo()
   }
 end
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
@@ -488,7 +488,7 @@ function CreateWindow()
 		minHeight = 65,
 		maxHeight = 65,
 		minWidth = 250,
-		draggable = true,
+		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,

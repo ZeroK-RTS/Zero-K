@@ -1,13 +1,13 @@
 function gadget:GetInfo()
-  return {
-    name      = "Grey Goo",
-    desc      = "",
-    author    = "Google Frog",
-    date      = "Nov 21, 2010",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Grey Goo",
+		desc      = "",
+		author    = "Google Frog",
+		date      = "Nov 21, 2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ end
 
 --SYNCED
 if (not gadgetHandler:IsSyncedCode()) then
-   return false
+	return false
 end
 
 local REVERSE_COMPAT = not Spring.Utilities.IsCurrentVersionNewerThan(104, 1120)
@@ -46,12 +46,33 @@ local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
 local CMD_GUARD      = CMD.GUARD
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Commands
+
+local DEFAULT_GOO = 1
+local CMD_STOP = CMD.STOP
+
+include("LuaRules/Configs/customcmds.h.lua")
+
+local gooGatherBehaviour = {
+	id      = CMD_GOO_GATHER,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Goo Gather',
+	action  = 'goostate',
+	tooltip = 'Enable / Disable', --colorful tooltip is written in integral_menu_commands.lua
+	params  = {DEFAULT_GOO, 'Off', 'On', 'Cloak'}
+}
+
+local GOO_OFF = 0
+local GOO_ON = 1
+local GOO_CLOAK = 2
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local UPDATE_FREQUNECY, gooDefs = include("LuaRules/Configs/grey_goo_defs.lua")
-local CEG_SPAWN = [[dirt2]];
-
+local CEG_SPAWN = [[dirt2]]
 
 local units = {}
 local unitIndex = {count = 0, info = {}}
@@ -75,22 +96,23 @@ end
 --------------------------------------------------------------------------------
 
 local function disSQ(x1,y1,x2,y2)
-	return (x1-x2)^2 + (y1-y2)^2
+	return (x1 - x2)^2 + (y1 - y2)^2
 end
 
 local function getStealableAlly(x, z, r, unitID, progress, team)
-
 	local nearby = spGetUnitsInCylinder(x, z, r, team)
-
 	for i = 1, #nearby do
 		local id = nearby[i]
-		if units[id] and id ~= unitID and units[id].progress ~= 0 and (units[id].progress < progress or (units[id].progress == progress and unitID < id)) then
+		if units[id] and id ~= unitID and (not units[id].disabled) and units[id].progress ~= 0 and
+				(units[id].progress < progress or (units[id].progress == progress and unitID < id)) then
 			return id
 		end
 	end
-
 	return false
-	
+end
+
+local function UnitDisabled(unitID)
+	return (spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1))
 end
 
 local function getClosestWreck(x, z, r) -- hopefully to be replaced
@@ -122,66 +144,80 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 function gadget:GameFrame(f)
 	-- putting the localization here because cannot localize in global scope since spring 97
-	local spSpawnCEG = Spring.SpawnCEG;
+	local spSpawnCEG = Spring.SpawnCEG
 
 	if f%UPDATE_FREQUNECY == 3 then
-		
 		local featureMetal = {} -- list of updated feature metal
 		
 		-- loop through units and gain resources
 		for i = 1, unitIndex.count do
-		
 			local unitID = unitIndex[i]
 			local unit = units[unitID]
-			local quota = unit.defs.drain * (spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1)
-			local x,y,z = spGetUnitPosition(unitID)
-			local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
-			-- drain metal while quote not fulfilled
-			while quota > 0 and (not stunned_or_inbuild) and x and z do
+			local cloaked = Spring.GetUnitIsCloaked(unitID)
+			if (not UnitDisabled(unitID)) and unit.gatherState ~= GOO_OFF and (unit.gatherState == GOO_CLOAK or not cloaked) then
+				unit.disabled = false
 				
-				local feature = getClosestWreck(x, z, unit.defs.range)
-				
-				if feature then
+				local quota = unit.defs.drain * (spGetUnitRulesParam(unitID, "totalBuildPowerChange") or 1)
+				local x,y,z = spGetUnitPosition(unitID)
+				-- drain metal while quote not fulfilled
+				while quota > 0 and x and z do
+					local feature = getClosestWreck(x, z, unit.defs.range)
 					
-					spSpawnCEG( CEG_SPAWN,
-					   x,y,z,
-					   0,0,0,
-					   30, 30
-					);
-					local metal = featureMetal[feature] or spGetFeatureResources(feature)
-					-- The 0.0001 is to safeguard against rounding errors possibly introduced by
-					-- the fact that reclaim has a fractional value.
-					if metal - 0.0001 > quota then
-						unit.progress = unit.progress + quota
-						featureMetal[feature] = metal-quota
-						quota = 0
+					if feature then
+						spSpawnCEG(CEG_SPAWN,
+							x, y, z,
+							0, 0, 0,
+							30, 30
+						)
+						local metal = featureMetal[feature] or spGetFeatureResources(feature)
+						-- The 0.0001 is to safeguard against rounding errors possibly introduced by
+						-- the fact that reclaim has a fractional value.
+						if metal - 0.0001 > quota then
+							unit.progress = unit.progress + quota
+							featureMetal[feature] = metal-quota
+							quota = 0
+						else
+							unit.progress = unit.progress + metal
+							killedFeature[feature] = true
+							featureMetal[feature] = nil
+							quota = quota - metal
+						end
+						
+						if cloaked then
+							GG.PokeDecloakUnit(unitID, 25)
+							cloaked = false
+						end
 					else
-						unit.progress = unit.progress + metal
-						killedFeature[feature] = true
-						featureMetal[feature] = nil
-						quota = quota - metal
-					end
-				else
-					if unit.progress ~= 0 then
-						local ally = getStealableAlly(x, z, unit.defs.range, unitID, unit.progress, spGetUnitTeam(unitID))
-						if ally then
-							if units[ally].progress >= quota then
-								unit.progress = unit.progress + quota
-								units[ally].progress = units[ally].progress-quota
-								
-							else
-								unit.progress = unit.progress + units[ally].progress
-								units[ally].progress = 0
+						if unit.progress ~= 0 then
+							local ally = getStealableAlly(x, z, unit.defs.range, unitID, unit.progress, spGetUnitTeam(unitID))
+							if ally then
+								local allyCloaked = Spring.GetUnitIsCloaked(ally)
+								if units[ally].gatherState ~= GOO_OFF and (units[ally].gatherState == GOO_CLOAK or not allyCloaked) then
+									if units[ally].progress >= quota then
+										unit.progress = unit.progress + quota
+										units[ally].progress = units[ally].progress-quota
+									else
+										unit.progress = unit.progress + units[ally].progress
+										units[ally].progress = 0
+									end
+									if cloaked then
+										GG.PokeDecloakUnit(unitID, 25)
+										cloaked = false
+									end
+									if allyCloaked then
+										GG.PokeDecloakUnit(ally, 25)
+									end
+								end
 							end
 						end
+						quota = 0
 					end
-					quota = 0
 				end
+			else
+				unit.disabled = true
 			end
-			
 		end
 		
 		-- update feature status
@@ -191,11 +227,11 @@ function gadget:GameFrame(f)
 			fx = fx+math.random(-20,20);
 			fz = fz+math.random(-20,20);
 			
-			spSpawnCEG( CEG_SPAWN,
-			   fx,fy,fz,
-			   0,0,0,
-			   30, 30
-			);
+			spSpawnCEG(CEG_SPAWN,
+				fx, fy, fz,
+				0, 0, 0,
+				30, 30
+			)
 
 			-- NB: if somebody finishes the reclaim of a partially goo'd feature
 			-- they will receive the "missing" energy as a chunk (for example if you
@@ -211,11 +247,11 @@ function gadget:GameFrame(f)
 		for id, _ in pairs(killedFeature) do
 			local fx, fy, fz = Spring.GetFeaturePosition(id);
 			
-			spSpawnCEG( CEG_SPAWN,
-			   fx,fy,fz,
-			   0,0,0,
-			   30, 30
-			);
+			spSpawnCEG(CEG_SPAWN,
+				fx, fy, fz,
+				0, 0, 0,
+				30, 30
+			)
 
 			spDestroyFeature(id)
 
@@ -243,11 +279,11 @@ function gadget:GameFrame(f)
 					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {movestate}, 0)
 					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
 
-					spSpawnCEG( CEG_SPAWN,
-					   x,y,z,
-					   0,0,0,
-					   30, 30
-					);
+					spSpawnCEG(CEG_SPAWN,
+						x, y, z,
+						0, 0, 0,
+						30, 30
+					)
 				end
 			end
 			if unit.oldProgress ~= unit.progress then
@@ -255,12 +291,48 @@ function gadget:GameFrame(f)
 				spSetUnitRulesParam(unitIndex[i],"gooState",unit.progress/unit.defs.cost, LOS_ACCESS)
 			end
 		end
-	
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Command Handling
+
+local function ToggleCommand(unitID, cmdParams, cmdOptions)
+	if units[unitID] then
+		local state = cmdParams[1]
+		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_GOO_GATHER)
+		if cmdOptions.right then
+			state = (state + 1)%3
+		end
+		if (cmdDescID) then
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = {state, 'Off', 'On', 'Cloak'}})
+		end
+		units[unitID].gatherState = state
+	end
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_GOO_GATHER] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return true
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (cmdID == CMD_GOO_GATHER) then
+		ToggleCommand(unitID, cmdParams, cmdOptions)
+		return false  -- command was used
+	end
+
+	return true  -- command was not used
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	
 	if gooDefs[unitDefID] then
 		unitIndex.count = unitIndex.count + 1
 		unitIndex[unitIndex.count] = unitID
@@ -270,12 +342,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			oldProgress = 0,
 			index = unitIndex.count,
 			defs = gooDefs[unitDefID],
+			gatherState = DEFAULT_GOO,
 		}
+		Spring.InsertUnitCmdDesc(unitID, gooGatherBehaviour)
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-
 	if gooDefs[unitDefID] then
 		unitIndex[units[unitID].index] = unitIndex[unitIndex.count] -- move index from end to index to be deleted
 		units[unitIndex[unitIndex.count]].index = units[unitID].index -- update index of unit at end
@@ -283,7 +356,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		unitIndex.count = unitIndex.count - 1 -- remove index at end too
 		units[unitID] = nil -- remove unit to be deleted
 	end
-
 end
 
 function gadget:Initialize()
@@ -295,5 +367,4 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
-	
 end

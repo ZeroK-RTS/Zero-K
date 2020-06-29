@@ -19,10 +19,8 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return false  --  no unsynced code
 end
 
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local TAU      = 2*math.pi
 local RADIUS   = 10
-local CMD_WAIT = CMD.WAIT
 
 local gunships = {}
 for unitDefID = 1, #UnitDefs do
@@ -36,7 +34,7 @@ end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if gunships[unitDefID] then
-		local cmdID = Spring.Utilities.GetUnitFirstCommand(unitID)
+		local cmdID = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID and (cmdID == CMD_RAW_MOVE or cmdID == CMD_FIGHT) then
 			return
 		end

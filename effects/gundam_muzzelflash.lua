@@ -18,7 +18,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.03	1.0 0.7 0.0 0.0 	0 0 0 0.01]],
+        colormap           = [[1 1.0 1 0.03
+                               1 0.7 0 0.00
+                               0 0.0 0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0,
         fronttexture       = [[shotgunflare]],
@@ -36,7 +38,8 @@ return {
       ground             = true,
       properties = {
         airdrag            = 1,
-        colormap           = [[1.0 0.7 0.0 0.0  1.0 0.7 0.0 0.01]],
+        colormap           = [[1 0.7 0 0.00
+                               1 0.7 0 0.01]],
         directional        = true,
         emitrot            = 3,
         emitrotspread      = 1,
@@ -85,7 +88,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.01	0.0 0.55 0.5 0.01	0 0 0 0.01]],
+        colormap           = [[1 1.00 1.0 0.01
+                               0 0.55 0.5 0.01
+                               0 0.00 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0,
         fronttexture       = [[flash3]],
@@ -107,7 +112,8 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[0.9 0.8 0.1 0.01	0 0 0 0.01]],
+        colormap           = [[0.9 0.8 0.1 0.01
+                               0.0 0.0 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0,
         fronttexture       = [[muzzlefront]],
@@ -146,7 +152,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.01	1 0.5 0.8 0.01	0 0 0 0.01]],
+        colormap           = [[1 1.0 1.0 0.01
+                               1 0.5 0.8 0.01
+                               0 0.0 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.05,
         fronttexture       = [[flash3]],
@@ -166,7 +174,9 @@ return {
       water              = true,
       properties = {
         airdrag            = 1,
-        colormap           = [[1 0.6 0 0.01	0.9 0.8 0.7 0.03	0 0 0 0.01]],
+        colormap           = [[1.0 0.6 0.0 0.01
+                               0.9 0.8 0.7 0.03
+                               0.0 0.0 0.0 0.01]],
         directional        = true,
         emitrot            = 1,
         emitrotspread      = 5,
@@ -197,7 +207,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.01	1 0.5 0.1 0.01	0 0 0 0.01]],
+        colormap           = [[1 1.0 1.0 0.01
+                               1 0.5 0.1 0.01
+                               0 0.0 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.05,
         fronttexture       = [[flash3]],
@@ -219,7 +231,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.01	1 0.9 0.36 0.01		0 0 0 0.01]],
+        colormap           = [[1 1.0 1.00 0.01
+                               1 0.9 0.36 0.01
+                               0 0.0 0.00 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.05,
         fronttexture       = [[flash3]],
@@ -258,7 +272,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 0.7 0.4 0.01    1 0.5 0.2 0.01	0 0 0 0.01]],
+        colormap           = [[1 0.7 0.4 0.01
+                               1 0.5 0.2 0.01
+                               0 0.0 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.05,
         fronttexture       = [[flash3]],
@@ -280,7 +296,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 1 1 0.01    1 0.2 1 0.01 	 0 0 0 0.01]],
+        colormap           = [[1 1.0 1 0.01
+                               1 0.2 1 0.01
+                               0 0.0 0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0,
         fronttexture       = [[flash3]],
@@ -302,7 +320,9 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[1 0.6 0.9 0.01	1 0.5 0.8 0.01	0 0 0 0.01]],
+        colormap           = [[1 0.6 0.9 0.01
+                               1 0.5 0.8 0.01
+                               0 0.0 0.0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.05,
         fronttexture       = [[flash3]],
@@ -322,7 +342,12 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.70,
-        colormap           = [[0.1 0.1 0.1 0.01    0.5 0.3 0.0 0.05    0.5 0.1 0.1 1.0    0.1 0.1 0.1 1.0    0.5 0.5 0.5 1.0   0 0 0 0.01]],
+        colormap           = [[0.1 0.1 0.1 0.01
+                               0.5 0.3 0.0 0.05
+                               0.5 0.1 0.1 1.00
+                               0.1 0.1 0.1 1.00
+                               0.5 0.5 0.5 1.00
+                               0.0 0.0 0.0 0.01]],
         directional        = true,
         emitrot            = 90,
         emitrotspread      = 0,

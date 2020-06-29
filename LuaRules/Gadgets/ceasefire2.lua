@@ -228,12 +228,12 @@ function gadget:GameFrame(f)
 	if (f%32) < 0.1 then
 		checkVotes()
 		checkOffers()
-		local teamList = spGetTeamList()
-		for _,teamID in ipairs(teamList) do
-			if spGetTeamUnitCount(teamID) == 0 then
+		--local teamList = spGetTeamList()
+		--for _,teamID in ipairs(teamList) do
+			--if spGetTeamUnitCount(teamID) == 0 then
 				--gadget:TeamDied(teamID)
-			end
-		end
+			--end
+		--end
 	end
 end
 

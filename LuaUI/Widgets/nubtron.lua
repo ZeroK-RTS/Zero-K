@@ -129,7 +129,7 @@ local lang = 'en'
 --------------------------------------------------------------------------------
 
 local classesByUnit = {}
-local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
+local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.ZIP)
 local unitClasses = nubtronData.unitClasses
 local unitClassNames = nubtronData.unitClassNames
 local mClasses = nubtronData.mClasses
@@ -289,25 +289,25 @@ local function CheckAllUnits()
 	end
 
 	-- commander
-	local cmdID, _, _, cmdParam1 = myCommID and spGetUnitCurrentCommand(myCommID)
-	if cmdID then
-		local udBuilding = UnitDefs[-cmdID]
-		if udBuilding then
-			local buildeeClass = classesByUnit[udBuilding.name]
-			if buildeeClass then
-				setCondition('build' .. buildeeClass)
-			end
+	if myCommID then
+		local cmdID, _, _, cmdParam1 = spGetUnitCurrentCommand(myCommID)
+		if cmdID then
+			local udBuilding = UnitDefs[-cmdID]
+			if udBuilding then
+				local buildeeClass = classesByUnit[udBuilding.name]
+				if buildeeClass then
+					setCondition('build' .. buildeeClass)
+				end
+			elseif cmdID == CMD_REPAIR then
+				local repaireeID = cmdParam1
+				local udRepairee = UnitDefs[GetUnitDefID(repaireeID)]
+				local repaireeClass = classesByUnit[udRepairee.name]
 
-		elseif cmdID == CMD_REPAIR then
-			
-			local repaireeID = cmdParam1
-			local udRepairee = UnitDefs[GetUnitDefID(repaireeID)]
-			local repaireeClass = classesByUnit[udRepairee.name]
-
-			if repaireeClass then
-				local _, _, _, _, repaireeBuildProgress = GetUnitHealth(repaireeID)
-				if repaireeBuildProgress < 1 then
-					setCondition('build' .. repaireeClass)
+				if repaireeClass then
+					local _, _, _, _, repaireeBuildProgress = GetUnitHealth(repaireeID)
+					if repaireeBuildProgress < 1 then
+						setCondition('build' .. repaireeClass)
+					end
 				end
 			end
 		end
@@ -406,7 +406,7 @@ local function addTabText(unitDefID)
 end
 
 local function SetupText(lang)
-	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.RAW_FIRST)
+	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.ZIP)
 	local texts_lang = texts[lang]
 	
 	if not texts_lang then

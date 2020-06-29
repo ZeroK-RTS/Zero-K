@@ -29,6 +29,7 @@ ComboBox = Button:Inherit{
 	minDropDownWidth = 50,
 	topHeight = 7,
 	noFont = false,
+	preferComboUp = false
 }
 
 local ComboBoxWindow      = Window:Inherit{classname = "combobox_window", resizable = false, draggable = false, }
@@ -51,7 +52,7 @@ function ComboBox:Select(itemIdx)
 	if (type(itemIdx) == "number") then
 		local item = self.items[itemIdx]
 		if not item then
- 			return
+			return
 		end
 		self.selected = itemIdx
 
@@ -150,7 +151,7 @@ function ComboBox:MouseDown(x, y)
 
 		local screen = self:FindParent("screen")
 		local y = sy + self.height
-		if y + height > screen.height then
+		if self.preferComboUp or y + height > screen.height then
 			y = sy - height
 		end
 

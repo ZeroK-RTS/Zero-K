@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipheavyskirm = {
   unitname            = [[gunshipheavyskirm]],
   name                = [[Nimbus]],
   description         = [[Fire Support Gunship]],
@@ -22,7 +22,8 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-    modelradius    = [[10]],
+    modelradius      = [[10]],
+    aim_lookahead    = 200,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -135,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipheavyskirm = unitDef })
+} }

@@ -23,6 +23,47 @@ local function isstring(x) return (type(x) == 'string')  end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local mapMetalMult           = 1
+local EMPTY_TABLE            = {}
+
+local mapEnergyMult          = 0.1
+local mapEnergyMultThreshold = 60
+local energyDefaultBound     = 5
+local energyDefault          = 25
+
+-- scale energy/reclaimtime of map's features
+for name, fd in pairs(FeatureDefs) do
+	if not (fd.customparams or EMPTY_TABLE).mod then
+		local metal = (tonumber(fd.metal) or 0)*mapMetalMult
+		
+		local energy = tonumber(fd.energy) or 0
+		if energy > mapEnergyMultThreshold then
+			energy = energy * mapEnergyMult
+		elseif energy > 0 and energy < energyDefaultBound then
+			energy = energyDefault
+		end
+		
+		if metal > 0 or energy > 0 then
+			if fd.reclaimable == false then
+				-- Geocrack
+				energy = 0
+				metal = 0
+			end
+			
+			fd.metal = metal
+			fd.energy = energy
+			
+			fd.reclaimtime = math.max(1, energy + metal) -- Income equal to BP split between metal and energy.
+		end
+		
+		fd.customparams = fd.customparams or {}
+		fd.customparams.is_tracked_map_feature = 1
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local baseModuleWreck = {
 	description		= [[Module Wreck]],
 	blocking		= false,
@@ -81,26 +122,6 @@ local function GenerateModuleWrecks()
 end
 
 GenerateModuleWrecks()
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local mapEnergyMult   = .1  --Used to normalize map features to a mod-specific scale
-local mapMetalMult    = 1
-
-
--- scale energy/reclaimtime of map's features
-for name, fd in pairs(FeatureDefs) do
-	if (type(fd.customparams)~="table") or not(fd.customparams.mod) then
-		if tonumber(fd.energy) then
-			fd.energy = fd.energy * mapEnergyMult
-		end
-		if tonumber(fd.metal) then
-			fd.metal = fd.metal * mapMetalMult
-		end
-		fd.reclaimtime = math.max(fd.energy or 0, fd.metal or 0)
-	end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

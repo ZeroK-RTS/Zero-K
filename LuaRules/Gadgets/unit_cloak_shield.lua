@@ -104,6 +104,7 @@ local function ValidateCloakShieldDefs(mds)
       newData.shrinkRate = def.shrinkRate or 256
       newData.selfCloak  = def.selfCloak or false
       newData.decloakDistance  = def.decloakDistance or false
+      newData.selfDecloakDistance  = def.selfDecloakDistance or false
       newData.radiusException  = def.radiusException or {}
       newData.isTransport = (ud.transportCapacity >= 1)
       newDefs[ud.id] = newData
@@ -201,13 +202,15 @@ local function AddCloakShieldUnit(unitID, cloakShieldDef)
 end
 
 local alliedTrueTable = {allied = true}
-local function SetUnitCloakAndParam(unitID, level, decloakDistance)
+local function SetUnitCloakAndParam(unitID, level, decloakDistance, selfCloak)
 	local newRadius = decloakDistance
 	if level then
 		local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
-		if cannotCloak ~= 1 then
+		if cannotCloak == 1 then
+			SetUnitCloak(unitID, 0, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
+		else
 			local changeRadius = true
-			if cloakers[unitID] and cloakers[unitID].radius > 0 then
+			if (not selfCloak) and cloakers[unitID] and cloakers[unitID].radius > 0 then
 				changeRadius = false
 				newRadius = 0
 			end
@@ -217,7 +220,9 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance)
 		local wantCloak = GetUnitRulesParam(unitID, "wantcloak")
 		if wantCloak == 1 then
 			local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
-			if cannotCloak ~= 1 then
+			if cannotCloak == 1 then
+				SetUnitCloak(unitID, 0, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
+			else
 				SetUnitCloak(unitID, 1, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
 			end
 		else
@@ -312,6 +317,7 @@ local function UpdateCloakees(data)
   local level     = data.def.level
   local selfCloak = data.def.selfCloak
   local decloakDistance = data.def.decloakDistance
+  local selfDecloakDistance = data.def.selfDecloakDistance
   local radiusException = data.def.radiusException
   local x, y, z = GetUnitPosition(unitID)
   if (x == nil) then return end
@@ -327,7 +333,7 @@ local function UpdateCloakees(data)
         cloakees[cloakee] = true
       elseif (selfCloak) then
         --self cloak
-        SetUnitCloakAndParam(cloakee, level, (not radiusException[udid]) and decloakDistance)
+        SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
         cloakees[cloakee] = true
       end
     end
@@ -473,13 +479,13 @@ function gadget:Load(zip)
   
   for unitID, data in pairs(cloakers) do
     local radius = Spring.GetUnitRulesParam(unitID, "cloakerRadius") or 0
-	if radius > 0 then
-	  data.radius = radius
-	  if (data.draw) then
-		SendToUnsynced(SYNCSTR, data.id, radius)
-	  end
-	  UpdateCloakees(data)
-	end
+    if radius > 0 then
+      data.radius = radius
+      if (data.draw) then
+        SendToUnsynced(SYNCSTR, data.id, radius)
+      end
+      UpdateCloakees(data)
+    end
   end
 end
 
@@ -492,6 +498,17 @@ function CloakShieldCommand(unitID, cmdParams)
   local data = cloakShieldUnits[unitID]
   if (not data) then
     return false
+  end
+
+  if data.maxrad < 300 and not cmdParams[2] then
+    local teamID = Spring.GetUnitTeam(unitID)
+    if not teamID then
+      return
+    end
+    local _, _, _, isAiTeam = Spring.GetTeamInfo(teamID)
+    if isAiTeam then
+      return false
+    end
   end
 
   local state = (cmdParams[1] == 1)

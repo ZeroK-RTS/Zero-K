@@ -1,4 +1,4 @@
-unitDef = {
+return { energyheavygeo = {
   unitname                      = [[energyheavygeo]],
   name                          = [[Advanced Geothermal]],
   description                   = [[Large Powerplant (+100) - HAZARDOUS]],
@@ -55,6 +55,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ energyheavygeo = unitDef })
+} }

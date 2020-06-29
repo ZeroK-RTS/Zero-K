@@ -1,4 +1,4 @@
-unitDef = {
+return { wolverine_mine = {
   unitname               = [[wolverine_mine]],
   name                   = [[Claw]],
   description            = [[Badger Mine]],
@@ -111,6 +111,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ wolverine_mine = unitDef })
+} }

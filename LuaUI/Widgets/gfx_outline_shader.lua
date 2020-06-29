@@ -48,13 +48,12 @@ local USE_MATERIAL_INDICES = true
 -----------------------------------------------------------------
 
 local shadersDir = "LuaUI/Widgets/Shaders/"
-local luaShaderDir = "LuaUI/Widgets/Include/"
 
 -----------------------------------------------------------------
 -- Global Variables
 -----------------------------------------------------------------
 
-local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
+local LuaShader = VFS.Include("LuaRules/Gadgets/Include/LuaShader.lua")
 
 local vsx, vsy, vpx, vpy
 
@@ -78,6 +77,8 @@ local applicationShader
 local pingPongIdx = 1
 
 local shadersEnabled = Spring.Utilities.IsCurrentVersionNewerThan(104, 1243) and LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
+
+local unitsVisible = false
 -----------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------
@@ -454,13 +455,20 @@ function widget:Shutdown()
 	applicationShader:Finalize()
 end
 
+function widget:Update()
+	local units = Spring.GetVisibleUnits(-1, nil, false)
+	unitsVisible = #units > 0
+end
+
 function widget:DrawWorld()
+	if not unitsVisible then return end
 	if options.drawUnderCeg.value then
 		EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
 	end
 end
 
 function widget:DrawUnitsPostDeferred()
+	if not unitsVisible then return end
 	EnterLeaveScreenSpace(function ()
 		PrepareOutline(false)
 		DrawOutline(OUTLINE_STRENGTH_BLENDED, false, false)

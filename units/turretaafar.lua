@@ -1,4 +1,4 @@
-unitDef = {
+return { turretaafar = {
   unitname                      = [[turretaafar]],
   name                          = [[Chainsaw]],
   description                   = [[Long-Range Anti-Air Missile Battery]],
@@ -139,6 +139,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretaafar = unitDef })
+} }

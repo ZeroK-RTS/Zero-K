@@ -19,7 +19,7 @@ local buildOpts = {
 	[[factoryspider]],
 	[[factoryjump]],
 	[[factorytank]],
-    [[striderhub]],
+	[[striderhub]],
 	[[factoryship]],
 	[[staticradar]],
 	[[staticheavyradar]],

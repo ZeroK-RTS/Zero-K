@@ -1,11 +1,11 @@
-unitDef = {
+return { corcom1 = {
   unitname            = [[corcom1]],
   name                = [[Battle Commander]],
   description         = [[Heavy Combat Commander, Builds at 10 m/s]],
-  acceleration        = 0.18,
+  acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,
-  brakeRate           = 0.375,
+  brakeRate           = 2.25,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -201,6 +201,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ corcom1 = unitDef })
+} }

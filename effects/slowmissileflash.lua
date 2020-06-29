@@ -1,6 +1,5 @@
 -- slowmissileflash
 return {
- 
 	["slowmissileflash"] = {
 		usedefaultexplosions = false,
 		spikepurple = {
@@ -39,7 +38,6 @@ return {
 				pos					= [[0, 0,0]],
 			},
 		},
-		
 		bigflash = {
 			air                = false,
 			class              = [[CSimpleGroundFlash]],

@@ -87,7 +87,6 @@ return {
         texture            = [[dirtplosion2]],
       },
     },
-	
     waterdrops1 = {
       air                = false,
       class              = [[CSimpleParticleSystem]],
@@ -197,7 +196,6 @@ return {
         texture            = [[kfoam]],
       },
     },
-	
     groundflash = {
       circlealpha        = 1,
       circlegrowth       = 0,

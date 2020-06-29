@@ -90,6 +90,11 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local fireproof = {}
+for i = 1, #UnitDefs do
+	fireproof[i] = (UnitDefs[i].customParams.fireproof == "1")
+end
+
 local unitsOnFire = {}
 local inWater = {}
 local inGameFrame = false
@@ -118,28 +123,40 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
-	if (inGameFrame) then return end  --ignore own AddUnitDamage calls
-  
-	if (flamerWeaponDefs[weaponID]) then
-		local fwd = flamerWeaponDefs[weaponID]
-		if (UnitDefs[unitDefID].customParams.fireproof~="1") then
-			if (random() < fwd.burnChance) then
-				local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
-				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < (burnLength*fwd.burnDamage) then
-					unitsOnFire[unitID] = {
-						endFrame    = gameFrame + burnLength,
-						damageLeft  = burnLength*fwd.burnDamage,
-						fireDmg     = fwd.burnDamage,
-						attackerID  = attackerID,
-						--attackerDefID = attackerDefID,
-						weaponID    = weaponID,
-					}
-					SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
-					GG.UpdateUnitAttributes(unitID)
-				end
-			end
-		end
+	if inGameFrame then
+		-- ignore own AddUnitDamage calls
+		-- FIXME: just toggle the callin in GameFrame
+		return
 	end
+
+	local fwd = flamerWeaponDefs[weaponID]
+	if not fwd then
+		return
+	end
+
+	if fireproof[unitDefID] then
+		return
+	end
+
+	if random() < fwd.burnChance then
+		return
+	end
+
+	local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
+	if unitsOnFire[unitID] and unitsOnFire[unitID].damageLeft > (burnLength*fwd.burnDamage) then
+		return
+	end
+
+	unitsOnFire[unitID] = {
+		endFrame    = gameFrame + burnLength,
+		damageLeft  = burnLength*fwd.burnDamage,
+		fireDmg     = fwd.burnDamage,
+		attackerID  = attackerID,
+		--attackerDefID = attackerDefID,
+		weaponID    = weaponID,
+	}
+	SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
+	GG.UpdateUnitAttributes(unitID)
 end
 
 function gadget:UnitDestroyed(unitID)

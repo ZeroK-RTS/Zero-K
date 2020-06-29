@@ -1,5 +1,4 @@
-
-local retEffects = {
+return {
   ["gauss_tag_l"] = {
     tealflash = {
       air                = true,
@@ -28,14 +27,14 @@ local retEffects = {
         pos                = [[0, 0, 0]],
       },
     },
-	water_trail = {
+    water_trail = {
       air                = false,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
       properties = {
         dir                = [[dir]],
         explosiongenerator = [[custom:GAUSS_BUBBLE_1]],
@@ -43,7 +42,6 @@ local retEffects = {
       },
     },
   },
-  
   ["gauss_bubble_1"] = {
     tealring = {
       air                = false,
@@ -51,8 +49,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
       properties = {
         colormap           = [[0 1 0.5 0.03    0 0 0 0.01]],
         dir                = [[dir]],
@@ -65,14 +63,14 @@ local retEffects = {
         ttl                = 15,
       },
     },
-	waterpop = {
+    waterpop = {
       air                = false,
       class              = [[heatcloud]],
       count              = 3,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
       properties = {
         heat               = 18,
         heatfalloff        = 0.4,
@@ -106,7 +104,7 @@ local retEffects = {
       },
     },
   },
-  
+
   ["gauss_tag_h"] = {
     tealflash = {
       air                = true,
@@ -135,14 +133,14 @@ local retEffects = {
         pos                = [[0, 0, 0]],
       },
     },
-	water_trail = {
+    water_trail = {
       air                = false,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
       properties = {
         dir                = [[dir]],
         explosiongenerator = [[custom:GAUSS_BUBBLE_1]],
@@ -150,7 +148,7 @@ local retEffects = {
       },
     },
   },
-  
+
   ["gauss_bubble_h"] = {
     tealring = {
       air                = false,
@@ -158,8 +156,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
        properties = {
         colormap           = [[0 1 0.5 0.05    0 0 0 0.01]],
         dir                = [[dir]],
@@ -172,14 +170,14 @@ local retEffects = {
         ttl                = 31,
       },
     },
-	waterpop = {
+    waterpop = {
       air                = false,
       class              = [[heatcloud]],
       count              = 6,
       ground             = false,
       water              = true,
-      unit				 = false,
-      underwater		 = true,
+      unit               = false,
+      underwater         = true,
       properties = {
         heat               = 36,
         heatfalloff        = 0.4,
@@ -192,7 +190,7 @@ local retEffects = {
       },
     },
   },
-  
+
   ["gauss_ring_h"] = {
     tealring = {
       air                = true,
@@ -213,8 +211,6 @@ local retEffects = {
       },
     },
   },
-
-
   ["gauss_hit_l"] = {
     sphere = {
       air                = true,
@@ -229,9 +225,9 @@ local retEffects = {
         ttl                = 8,
       },
     },
-	groundflash = {
+    groundflash = {
       air                = false,
-      underwater		 = true,
+      underwater         = true,
       circlealpha        = 0.6,
       circlegrowth       = 2,
       flashalpha         = 0.9,
@@ -251,8 +247,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = false,
-      unit				 = true,
-      underwater		 = true,
+      unit               = true,
+      underwater         = true,
       properties = {
         heat               = 30,
         heatfalloff        = 4,
@@ -270,8 +266,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = false,
-      unit				 = true,
-      underwater		 = true,
+      unit               = true,
+      underwater         = true,
       properties = {
         heat               = 30,
         heatfalloff        = 2,
@@ -284,7 +280,6 @@ local retEffects = {
       },
     },
   },
-  
   ["gauss_hit_m"] = {
     inner = {
       air                = true,
@@ -312,9 +307,9 @@ local retEffects = {
         ttl                = 8,
       },
     },
-	groundflash = {
+    groundflash = {
       air                = false,
-      underwater		 = true,
+      underwater         = true,
       circlealpha        = 0.6,
       circlegrowth       = 2,
       flashalpha         = 0.9,
@@ -334,8 +329,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = false,
-      unit				 = true,
-      underwater		 = true,
+      unit               = true,
+      underwater         = true,
       properties = {
         heat               = 30,
         heatfalloff        = 4,
@@ -353,8 +348,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = false,
-      unit				 = true,
-      underwater		 = true,
+      unit               = true,
+      underwater         = true,
       properties = {
         heat               = 30,
         heatfalloff        = 2,
@@ -367,7 +362,6 @@ local retEffects = {
       },
     },
   },
-  
   ["gauss_hit_h"] = {
     inner = {
       air                = true,
@@ -395,9 +389,9 @@ local retEffects = {
         ttl                = 8,
       },
     },
-	groundflash = {
+    groundflash = {
       air                = false,
-      underwater		 = true,
+      underwater         = true,
       circlealpha        = 0.6,
       circlegrowth       = 2,
       flashalpha         = 0.9,
@@ -417,8 +411,8 @@ local retEffects = {
       count              = 1,
       ground             = false,
       water              = false,
-      unit				 = true,
-      underwater		 = true,
+      unit               = true,
+      underwater         = true,
       properties = {
         heat               = 30,
         heatfalloff        = 4,
@@ -450,7 +444,5 @@ local retEffects = {
       },
     },
   },
-  
 }
 
-return retEffects

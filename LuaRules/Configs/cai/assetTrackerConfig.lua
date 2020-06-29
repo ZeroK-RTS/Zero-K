@@ -41,6 +41,7 @@ local heatmapNames = {
 		["jumpraid"] = {mult = 1},
 		["amphraid"] = {mult = 1},
 		["hoverraid"] = {mult = 1},
+		["hoverheavyraid"] = {mult = 1},
 		["chicken"] = {mult = 1},
 		["chicken_leaper"] = {mult = 1},
         
@@ -188,6 +189,7 @@ local ground = {
 		"jumpraid",
 		"amphraid",
 		"hoverraid",
+		"hoverheavyraid",
 		"chicken",
 		"chicken_leaper",
 	},

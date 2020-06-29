@@ -129,7 +129,7 @@ local base = {
 			"module_energy_cell",
 			"module_energy_cell",
 			"module_energy_cell",
- 			"module_personal_shield",
+			"module_personal_shield",
 			"module_areashield",
 		},
 	},

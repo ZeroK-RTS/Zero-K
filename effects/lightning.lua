@@ -98,7 +98,7 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-	electricsyellow = {
+    electricsyellow = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 3,
@@ -163,6 +163,83 @@ return {
     },
   },
 
+  ["lightningplosion128AoE"] = {
+    electricsblue = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 3,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[1 r10]],
+        explosiongenerator = [[custom:YELLOW_LIGHTNING_BOMB_BLUEBOLTS]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    electricsyellow = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 3,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[1 r20]],
+        explosiongenerator = [[custom:YELLOW_LIGHTNING_STORMBOLT]],
+        pos                = GetCircle(100, 1),
+      },
+    },
+    electricstorm = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 20,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[10 r200]],
+        explosiongenerator = [[custom:LIGHTNINGPLOSION_STORMBOLT]],
+        pos                = GetCircle(100, 1),
+      },
+    },
+    groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 0,
+      flashalpha         = 0.4,
+      flashsize          = 136,
+      ttl                = 32,
+      color = {
+        [1]  = 0.5,
+        [2]  = 0.5,
+        [3]  = 1,
+      },
+    },
+    pikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 15,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 0.8,
+        alphadecay         = 0.1,
+        color              = [[0.5,0.5,1]],
+        dir                = [[-15 r30,-15 r30,-15 r30]],
+        length             = 30,
+        width              = 5,
+      },
+    },
+    yellowbolts = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:YELLOW_LIGHTNING_YELLOWBOLTS]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },
 
   ["lightningplosion_yellowbolts"] = {
     ["electric thingies"] = {
@@ -457,10 +534,10 @@ return {
       },
     },
   },
-  
+
   -- muzzle and groundflash as a single reference
   ["zeus_fire_fx"] = {
-	muzzle = {
+    muzzle = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -470,10 +547,10 @@ return {
         delay              = 0,
         explosiongenerator = [[custom:zeusmuzzle]],
         pos                = [[0, 0, 0]],
-		dir				   = [[dir]],
+        dir                = [[dir]],
       },
     },
-	dust = {
+    dust = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -483,11 +560,11 @@ return {
         delay              = 0,
         explosiongenerator = [[custom:zeusgroundflash]],
         pos                = [[0, 0, 0]],
-		dir				   = [[dir]],
+        dir                = [[dir]],
       },
     },
   },
-  
+
   ["lightningplosion_smallbolts_purple"] = {
     ["electric thingies2"] = {
       air                = true,

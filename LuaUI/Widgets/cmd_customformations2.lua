@@ -371,12 +371,8 @@ local function GetInterpNodes(mUnits)
 	local eZ = ePos[3]
 	local eDist = fDists[2]
 	
-	local sY
-	if haswaterweapon[1] then
-		sY = spGetGroundHeight(sX, sZ)
-	else
-		sY = math.max(0,spGetGroundHeight(sX,sZ))
-	end
+	local sY = math.max(0, spGetGroundHeight(sX,sZ))
+
 	interpNodes[1] = {sX, sY, sZ}
 	
 	for n = 1, number - 2 do
@@ -398,20 +394,14 @@ local function GetInterpNodes(mUnits)
 		local nFrac = (reqDist - sDist) / (eDist - sDist)
 		local nX = sX * (1 - nFrac) + eX * nFrac
 		local nZ = sZ * (1 - nFrac) + eZ * nFrac
-		local nY
-		if haswaterweapon[number+1] then
-			nY = spGetGroundHeight(nX, nZ)
-		else
-			nY = math.max(0,spGetGroundHeight(nX, nZ))
-		end
+		local nY = math.max(0, spGetGroundHeight(nX, nZ))
 		interpNodes[n + 1] = {nX, nY, nZ}
 	end
 	
 	ePos = fNodes[#fNodes]
 	eX = ePos[1]
 	eZ = ePos[3]
-	local eY
-	if haswaterweapon[number] then  eY=spGetGroundHeight(eX, eZ) else eY=math.max(0,spGetGroundHeight(eX, eZ)) end
+	local eY = math.max(0, spGetGroundHeight(eX, eZ))
 	interpNodes[number] = {eX, eY, eZ}
 	
 	--DEBUG for i=1,number do Spring.Echo(interpNodes[i]) end

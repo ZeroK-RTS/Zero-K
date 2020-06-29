@@ -131,7 +131,6 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	gun_1 = not gun_1
 	if gun_1 then
 		EmitSfx(r_gun_barr, GG.Script.UNIT_SFX1)
 		Spin(r_gun_barr, z_axis, math.rad(1000), math.rad(50))
@@ -140,6 +139,10 @@ function script.FireWeapon(num)
 		Spin(l_gun_barr, z_axis, math.rad(1000), math.rad(50))
 	end
 	StartThread(RestoreAfterDelay)
+end
+
+function script.EndBurst(num)
+	gun_1 = not gun_1
 end
 
 function script.Killed(recentDamage, maxHealth)

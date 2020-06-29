@@ -1,4 +1,4 @@
-unitDef = {
+return { staticradar = {
   unitname                      = [[staticradar]],
   name                          = [[Radar Tower]],
   description                   = [[Early Warning System]],
@@ -62,89 +62,6 @@ unitDef = {
 
   },
 
-  weapons                       = {
-    --{
-    --  def                = [[TARGETER]],
-    --  onlyTargetCategory = [[NONE]],
-    --},
-    --{
-    --  def                = [[SCANNERSWEEP]],
-    --  onlyTargetCategory = [[NONE]],
-    --},
-  },
-
-
-  weaponDefs                    = {
-
-    TARGETER = {
-      name                    = [[Scanning Lidar]],
-      avoidFeature            = false,
-      avoidNeutral            = false,
-      beamTime                = 1/30,
-      canattackground         = false,
-      coreThickness           = 0.5,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = -1E-06,
-        planes  = -1E-06,
-      },
-
-      explosionGenerator      = [[custom:NONE]],
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = false,
-      laserFlareSize          = 1,
-      minIntensity            = 1,
-      range                   = 500,
-      reloadtime              = 0.033,
-      rgbColor                = [[0 0.7 0.6]],
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 1,
-      tolerance               = 10000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponType              = [[BeamLaser]],
-    },
-    
-    SCANNERSWEEP    = {
-      name                    = [[Scanner Sweep]],
-      areaOfEffect            = 1200,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = -1E-06,
-      },
-
-      customParams           = {
-    lups_noshockwave = "1",
-    nofriendlyfire = "1",
-      },
-
-      edgeeffectiveness       = 1,
-      explosionGenerator      = [[custom:none]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      noSelfDamage            = true,
-      range                   = 600,
-      reloadtime              = 1,
-      soundHitVolume          = 1,
-      turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 230,
-    },
-
-  },
-
-
   featureDefs                   = {
 
     DEAD  = {
@@ -165,6 +82,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticradar = unitDef })
+} }

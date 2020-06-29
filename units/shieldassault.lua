@@ -1,11 +1,11 @@
-unitDef = {
+return { shieldassault = {
   unitname            = [[shieldassault]],
   name                = [[Thug]],
   description         = [[Shielded Assault Bot]],
-  acceleration        = 0.25,
+  acceleration        = 0.75,
   activateWhenBuilt   = true,
-  brakeRate           = 0.22,
-  buildCostMetal      = 180,
+  brakeRate           = 1.32,
+  buildCostMetal      = 175,
   buildPic            = [[shieldassault.png]],
   canGuard            = true,
   canMove             = true,
@@ -18,7 +18,8 @@ unitDef = {
 
   customParams        = {
     shield_emit_height = 17,
-    cus_noflashlight = 1,
+    cus_noflashlight   = 1,
+    selection_scale    = 0.82,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -151,6 +152,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldassault = unitDef })
+} }

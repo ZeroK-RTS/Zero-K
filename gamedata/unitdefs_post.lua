@@ -32,13 +32,29 @@ local function tobool(val)
   return false
 end
 
+local function lowerkeys(t)
+	local tn = {}
+	if type(t) == "table" then
+		for i,v in pairs(t) do
+			local typ = type(i)
+			if type(v)=="table" then
+				v = lowerkeys(v)
+			end
+			if typ=="string" then
+				tn[i:lower()] = v
+			else
+				tn[i] = v
+			end
+		end
+	end
+	return tn
+end
 
 --deep not safe with circular tables! defaults To false
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 CopyTable = Spring.Utilities.CopyTable
 MergeTable = Spring.Utilities.MergeTable
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -50,6 +66,49 @@ for _, ud in pairs(UnitDefs) do
         ud.customparams = {}
     end
  end
+ 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Balance Testing
+--
+
+-- modOptions.tweakdefs = 'Zm9yIG5hbWUsIHVkIGluIHBhaXJzKFVuaXREZWZzKSBkbwoJaWYgdWQubWF4dmVsb2NpdHkgdGhlbgoJCXVkLm1heHZlbG9jaXR5ID0gdWQubWF4dmVsb2NpdHkqMTAKCWVuZAplbmQ='
+
+do
+	local append = false
+	local name = "tweakdefs"
+	while modOptions[name] and modOptions[name] ~= "" do
+		local postsFuncStr = Spring.Utilities.Base64Decode(modOptions[name])
+		local postfunc, err = loadstring(postsFuncStr)
+		Spring.Echo("Loading tweakdefs modoption", append or 0)
+		if postfunc then
+			postfunc()
+		end
+		append = (append or 0) + 1
+		name = "tweakdefs" .. append
+	end
+end
+
+--modOptions.tweakunits = 'ewpjbG9ha3JhaWQgPSB7YnVpbGRDb3N0TWV0YWwgPSAxMCwKd2VhcG9uRGVmcyA9IHtFTUcgPSB7ZGFtYWdlID0ge2RlZmF1bHQgPSAyMDB9fX19LAp9'
+
+do
+	local append = false
+	local name = "tweakunits"
+	while modOptions[name] and modOptions[name] ~= "" do
+		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[name])
+		if type(tweaks) == "table" then
+			Spring.Echo("Loading tweakunits modoption", append or 0)
+			for name, ud in pairs(UnitDefs) do
+				if tweaks[name] then
+					Spring.Echo("Loading tweakunits for " .. name)
+					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(tweaks[name]), true)
+				end
+			end
+		end
+		append = (append or 0) + 1
+		name = "tweakunits" .. append
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -72,6 +131,18 @@ for _, ud in pairs(UnitDefs) do
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
 local Utilities = VFS.Include('gamedata/utilities.lua')
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Make Terraunit not decloak enemies
+--
+
+if Utilities.IsCurrentVersionNewerThan(104, 1400) and not Utilities.IsCurrentVersionNewerThan(104, 1470) then
+	UnitDefs.terraunit.collisionvolumeoffsets = [[0 -550 0]]
+	UnitDefs.terraunit.selectionvolumeoffsets = [[0 550 0]]
+	UnitDefs.terraunit.customparams.midposoffset   = [[0 -550 0]]
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -136,6 +207,38 @@ for name, ud in pairs(UnitDefs) do
 		ud.buildoptions = buildOpts
 	end
 end
+
+local typeNames = {
+	"CONSTRUCTOR",
+	"RAIDER",
+	"SKIRMISHER",
+	"RIOT",
+	"ASSAULT",
+	"ARTILLERY",
+	"WEIRD_RAIDER",
+	"ANTI_AIR",
+	"HEAVY_SOMETHING",
+	"SPECIAL",
+	"UTILITY",
+}
+local typeNamesLower = {}
+for i = 1, #typeNames do
+	typeNamesLower[i] = "pos_" .. typeNames[i]:lower()
+end
+
+-- Set build options from pos_ customparam
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+for name, ud in pairs(UnitDefs) do
+	local cp = ud.customparams
+	for i = 1, #typeNamesLower do
+		local value = cp[typeNamesLower[i]]
+		if value then
+			ud.buildoptions = ud.buildoptions or {}
+			ud.buildoptions[#ud.buildoptions + 1] = value
+		end
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -316,23 +419,24 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Maneuverability multipliers, useful for testing.
--- TODO: migrate the x3 and x5 ones to defs, leave at x1 for easy testing
 
-local TURNRATE_MULT = 1
-local ACCEL_MULT = 3
-local ACCEL_MULT_HIGH = 5
+local TURNRATE_MULT = 1.2
+local TURNRATE_MULT_HIGH = 1.6
+local ACCEL_MULT = 1
+local ACCEL_MULT_HIGH = 1.2
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 
-		ud.turnrate = ud.turnrate * TURNRATE_MULT
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
-			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
+			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
 		else
+			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
-			ud.brakerate = ud.brakerate * ACCEL_MULT*2
+			ud.brakerate = ud.brakerate * ACCEL_MULT
 		end
 	end
 end
@@ -427,11 +531,13 @@ end
 -- 2x repair speed than BP
 --
 
+local REPAIR_ENERGY_COST_FACTOR = 0.75 -- Game.repairEnergyCostFactor
+
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then
-		unitDef.repairspeed = unitDef.repairspeed * 2
+		unitDef.repairspeed = unitDef.repairspeed / REPAIR_ENERGY_COST_FACTOR
 	elseif (unitDef.workertime) then
-		unitDef.repairspeed = unitDef.workertime * 2
+		unitDef.repairspeed = unitDef.workertime / REPAIR_ENERGY_COST_FACTOR
     end
 end
 
@@ -694,6 +800,8 @@ end
 -- Altered unit health mod option
 --
 
+--modOptions.hpmult = 1.5 -- TEST CHANGE
+
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
     for unitDefID, unitDef in pairs(UnitDefs) do
@@ -798,7 +906,6 @@ for name, ud in pairs (UnitDefs) do
 		if not cp.jump_spread_exception then cp.jump_spread_exception = tostring(jump_defaults.spread_exception) end
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

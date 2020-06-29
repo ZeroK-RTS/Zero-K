@@ -1,9 +1,9 @@
-unitDef = {
+return { bomberprec = {
   unitname            = [[bomberprec]],
   name                = [[Raven]],
   description         = [[Precision Bomber]],
   brakerate           = 0.4,
-  buildCostMetal      = 320,
+  buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[bomberprec.png]],
   canFly              = true,
@@ -25,6 +25,7 @@ unitDef = {
   customParams        = {
     modelradius    = [[15]],
     refuelturnradius = [[120]],
+    reammoseconds    = [[10]],
     requireammo    = [[1]],
   },
 
@@ -40,7 +41,7 @@ unitDef = {
   maxBank             = 0.6,
   maxDamage           = 1000,
   maxElevator         = 0.02,
-  maxRudder           = 0.009,
+  maxRudder           = 0.013,
   maxFuel             = 1000000,
   maxPitch            = 0.4,
   maxVelocity         = 7.8,
@@ -59,7 +60,7 @@ unitDef = {
     },
 
   },
-  sightDistance       = 660,
+  sightDistance       = 780,
   turnRadius          = 300,
   workerTime          = 0,
 
@@ -74,7 +75,7 @@ unitDef = {
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 150,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
     
@@ -145,14 +146,14 @@ unitDef = {
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 3,
-      heightmod                  = 0,
+      heightmod               = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
       leadLimit               = 20,
-      range                   = 150,
+      range                   = 180,
       reloadtime              = 5,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
@@ -171,6 +172,7 @@ unitDef = {
     SHIELD_CHECK = {
       name                    = [[Fake Poker For Shields]],
       areaOfEffect            = 0,
+      burnblow                = true,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidGround             = false,
@@ -190,7 +192,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:NONE]],
-      flightTime              = 2,
+      flightTime              = 0.7,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -264,6 +266,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberprec = unitDef })
+} }

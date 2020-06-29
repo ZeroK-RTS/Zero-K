@@ -134,8 +134,8 @@ function Spring.Utilities.GetDescription(ud, unitID)
 		end
 
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-		if buildPower then
-			buildPower = buildPower*10
+		if buildPower and ud.buildSpeed then
+			buildPower = buildPower*ud.buildSpeed
 			desc = desc .. ", " .. WG.Translate("interface", "builds_at") .. " " .. buildPower .. " m/s"
 		end
 	end
@@ -172,7 +172,7 @@ end
 function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if not unitDefID then
-		return 0
+		return false
 	end
 	local ud = UnitDefs[unitDefID]
 	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0

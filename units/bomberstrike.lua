@@ -1,9 +1,9 @@
-unitDef = {
+return { bomberstrike = {
   unitname            = [[bomberstrike]],
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
   brakerate           = 0.4,
-  buildCostMetal      = 400,
+  buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[bomberstrike.png]],
   canFly              = true,
@@ -20,22 +20,27 @@ unitDef = {
   cruiseAlt           = 160,
 
   customParams        = {
-    --modelradius    = [[10]],
+    reallyabomber    = [[1]],
+    reammoseconds    = [[8]],
+    refuelturnradius = [[150]],
+    requireammo      = [[1]],
+    modelradius      = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
-  iconType            = [[bomber]],
+  iconType            = [[bomberskirm]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxAcc              = 0.5,
-  maxDamage           = 900,
-  maxElevator         = 0.02,
-  maxRudder           = 0.006,
+  maxAileron          = 0.02,
+  maxDamage           = 780,
+  maxElevator         = 0.01,
+  maxRudder           = 0.007,
   maxFuel             = 1000000,
-  maxVelocity         = 7.8,
+  maxVelocity         = 8.4,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -44,8 +49,8 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {},
-  sightDistance       = 660,
-  turnRadius          = 80,
+  sightDistance       = 780,
+  turnRadius          = 500,
   workerTime          = 0,
 
   weapons             = {
@@ -69,35 +74,36 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 450,
-        planes  = 450,
+        default = 270,
+        planes  = 270,
       },
 
       fireStarter             = 70,
       fixedlauncher           = true,
-      flightTime              = 3.5,
+      flightTime              = 3.2,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
-      range                   = 360,
+      range                   = 400,
       reloadtime              = 10,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med5]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/rapid_rocket_fire2]],
       soundStartVolume        = 7,
-      startVelocity           = 190,
+      startVelocity           = 260,
       texture2                = [[lightsmoketrail]],
+      tolerance               = 4000,
       tracks                  = true,
-      trajectoryHeight        = 0.4,
-      turnRate                = 24000,
+      trajectoryHeight        = 0,
+      turnRate                = 8000,
       turret                  = true,
       waterweapon             = true,
-      weaponAcceleration      = 90,
+      weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 260,
     },
     
   },
@@ -122,6 +128,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ bomberstrike = unitDef })
+} }

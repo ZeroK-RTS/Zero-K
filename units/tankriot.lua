@@ -1,9 +1,9 @@
-unitDef = {
+return { tankriot = {
   unitname            = [[tankriot]],
   name                = [[Ogre]],
   description         = [[Heavy Riot Support Tank]],
-  acceleration        = 0.02181,
-  brakeRate           = 0.04282,
+  acceleration        = 0.109,
+  brakeRate           = 0.428,
   buildCostMetal      = 500,
   builder             = false,
   buildPic            = [[tankriot.png]],
@@ -17,7 +17,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    cus_noflashlight = 1,
+    cus_noflashlight  = 1,
+    selection_scale   = 0.92,
+    aim_lookahead     = 200,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -75,14 +77,17 @@ unitDef = {
         smoothradius = [[80]],
         smoothmult   = [[0.25]],
         force_ignore_ground = [[1]],
+
+        script_reload = [[2.3]],
+        script_burst = [[2]],
         
         light_color = [[1.4 1 0.7]],
         light_radius = 320,
       },
       
       damage                  = {
-        default = 420.1,
-        subs    = 22,
+        default = 240.1,
+        subs    = 12,
       },
 
       edgeEffectiveness       = 0.4,
@@ -92,10 +97,11 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.6,
       interceptedByShieldType = 2,
+      leadlimit               = 0,
       model                   = [[corbanishrk.s3o]],
       noSelfDamage            = true,
       range                   = 320,
-      reloadtime              = 2.133,
+      reloadtime              = 0.3,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/missile/banisher_fire]],
@@ -133,6 +139,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankriot = unitDef })
+} }

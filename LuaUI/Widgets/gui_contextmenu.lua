@@ -36,7 +36,7 @@ stats_hide_projectile_speed
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("keysym.h.lua")
+include("keysym.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
@@ -96,7 +96,7 @@ local myTeamID 			= Spring.GetLocalTeamID()
 local ceasefires 		= (not Spring.FixedAllies())
 local marketandbounty 	= false
 
-local window_unitcontext, window_unitstats
+local window_unitcontext
 local statswindows = {}
 
 local colorCyan = {0.2, 0.7, 1, 1}
@@ -312,7 +312,7 @@ function comma_value(amount, displayPlusMinus)
 		formatted = amount .. ""
 	end
 
-  	return formatted
+	return formatted
 end
 
 
@@ -458,7 +458,8 @@ local function weapons2Table(cells, ws, unitID)
 		local stun_time = 0
 
 		local comm_mult = (unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1
-		local val = (tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0) * comm_mult
+		local baseDamage = tonumber(cp.stats_damage) or wd.customParams.shield_damage or 0
+		local val = baseDamage * comm_mult
 
 		if cp.disarmdamagemult then
 			damd = val * cp.disarmdamagemult
@@ -568,6 +569,9 @@ local function weapons2Table(cells, ws, unitID)
 			dam_str = dam_str .. " x " .. mult
 			shield_dam_str = shield_dam_str .. " x " .. mult
 		end
+		if cp.shield_mult then
+			shield_dam_str = shield_dam_str .. " x " .. math.floor(100*cp.shield_mult) .. '%'
+		end
 		
 		local show_damage = not cp.stats_hide_damage
 		local show_dps = not cp.stats_hide_dps
@@ -601,12 +605,12 @@ local function weapons2Table(cells, ws, unitID)
 			if cp.damage_vs_shield then
 				cells[#cells+1] = ' - Shield damage:'
 				cells[#cells+1] = numformat(cp.stats_shield_damage)
-			elseif tonumber(cp.stats_shield_damage) ~= dam then
+			elseif tonumber(cp.stats_shield_damage) ~= baseDamage then
 				cells[#cells+1] = ' - Shield damage:'
 				if damageTypes > 1 or mult > 1 then
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2) .. " (" .. shield_dam_str .. ")"
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult), 2) .. " (" .. shield_dam_str .. ")"
 				else
-					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult), 2)
+					cells[#cells+1] = numformat(math.floor(cp.stats_shield_damage * mult * comm_mult), 2)
 				end
 			end
 		end
@@ -770,6 +774,12 @@ local function weapons2Table(cells, ws, unitID)
 
 		if cp.smoothradius then
 			cells[#cells+1] = ' - Smoothes ground'
+			--cells[#cells+1] = cp.smoothradius .. " radius" -- overlaps
+			cells[#cells+1] = ''
+		end
+
+		if cp.movestructures then
+			cells[#cells+1] = ' - Smoothes under structures'
 			--cells[#cells+1] = cp.smoothradius .. " radius" -- overlaps
 			cells[#cells+1] = ''
 		end
@@ -1117,6 +1127,12 @@ local function printAbilities(ud, unitID)
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
+		cells[#cells+1] = 'Light Speed: '
+		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		if not ud.customParams.islighttransport then
+			cells[#cells+1] = 'Heavy Speed: '
+			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
+		end
 	end
 
 	if ud.customParams.nuke_coverage then
@@ -1432,7 +1448,22 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
-	
+
+	if isCommander then
+		local batDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_droneheavyslow")
+		if batDrones and batDrones > 0 then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Battle Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = batDrones, textColor = color.stats_fg, }
+		end
+		local compDrones = Spring.GetUnitRulesParam(unitID, "carrier_count_drone")
+		if compDrones and compDrones > 0 then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Companion Drones: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = compDrones, textColor = color.stats_fg, }
+		end
+	-- else
+		-- Do something for Reef and other carriers
+	end
+
 	if ud.customParams.reload_move_penalty then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Reload move mult: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(100*tonumber(ud.customParams.reload_move_penalty)) .. "%", textColor = color.stats_fg, }
@@ -1572,7 +1603,6 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	}
 	
 	local helptext_stack = StackPanel:New{
-		resizeItems = false,
 		orientation = 'vertical',
 		autoArrangeV  = false,
 		autoArrangeH  = false,
@@ -1674,10 +1704,6 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			--classname = "back_button",
 		}
 	}
-
-	if window_unitstats then
-		window_unitstats:Dispose()
-	end
 
 	statswindows[num] = Window:New{
 		x = x,
@@ -1791,8 +1817,6 @@ local function PriceWindow(unitID, action)
 end
 
 local function MakeUnitContextMenu(unitID,x,y)
-	--hideWindow(window_unitstats)
-					
 	local udid 			= spGetUnitDefID(unitID)
 	local ud 			= UnitDefs[udid]
 	if not ud then return end
@@ -1971,11 +1995,6 @@ function widget:MousePress(x,y,button)
 	--[[
 	if window_unitcontext and window_unitcontext.visible and (not screen0.hoveredControl or not screen0.hoveredControl:IsDescendantOf(window_unitcontext)) then
 		hideWindow(window_unitcontext)
-		return true
-	end
-	
-	if window_unitstats and window_unitstats.visible and (not screen0.hoveredControl or not screen0.hoveredControl:IsDescendantOf(window_unitstats)) then
-		hideWindow(window_unitstats)
 		return true
 	end
 	--]]

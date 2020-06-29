@@ -14,7 +14,7 @@ end
 options_path = 'Settings/Graphics/Effects/Depth of Field'
 
 options_order = {'useDoF', 'highQuality', 'autofocus', 'mousefocus',  'autofocusLabel', 'autofocusInFocusMultiplier', 'autofocusPower', 
-'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
+  'autofocusFocalLength', 'manualfocusLabel', 'focusDepth', 'fStop'}
 
 options = {
 	useDoF =
@@ -276,42 +276,42 @@ function InitTextures()
 		baseBlurFBO = gl.CreateFBO({
 			color0 = baseBlurTex,
 			color1 = baseNearBlurTex,
-	     drawbuffers = {
-	     	GL_COLOR_ATTACHMENT0_EXT,
-	     	GL_COLOR_ATTACHMENT1_EXT
-	     }
-			})
+			drawbuffers = {
+				GL_COLOR_ATTACHMENT0_EXT,
+				GL_COLOR_ATTACHMENT1_EXT
+			}
+		})
 
 		intermediateBlurFBO = gl.CreateFBO({
 			color0 = intermediateBlurTex0,
 			color1 = intermediateBlurTex1,
 			color2 = intermediateBlurTex2,
 			color3 = intermediateBlurTex3,
-	     drawbuffers = {
-	     	GL_COLOR_ATTACHMENT0_EXT,
-	     	GL_COLOR_ATTACHMENT1_EXT,
-	     	GL_COLOR_ATTACHMENT2_EXT,
-	     	GL_COLOR_ATTACHMENT3_EXT
-	     }
-			})
+			drawbuffers = {
+				GL_COLOR_ATTACHMENT0_EXT,
+				GL_COLOR_ATTACHMENT1_EXT,
+				GL_COLOR_ATTACHMENT2_EXT,
+				GL_COLOR_ATTACHMENT3_EXT
+			}
+		})
 	else
 		baseBlurFBO = gl.CreateFBO({
 			color0 = baseBlurTex,
-	     drawbuffers = {
-	     	GL_COLOR_ATTACHMENT0_EXT
-	     }
-			})
+			drawbuffers = {
+				GL_COLOR_ATTACHMENT0_EXT
+			}
+		})
 		
 		intermediateBlurFBO = gl.CreateFBO({
 			color0 = intermediateBlurTex0,
 			color1 = intermediateBlurTex1,
 			color2 = intermediateBlurTex2,
-	     drawbuffers = {
-	     	GL_COLOR_ATTACHMENT0_EXT,
-	     	GL_COLOR_ATTACHMENT1_EXT,
-	     	GL_COLOR_ATTACHMENT2_EXT
-	     }
-			})
+			drawbuffers = {
+				GL_COLOR_ATTACHMENT0_EXT,
+				GL_COLOR_ATTACHMENT1_EXT,
+				GL_COLOR_ATTACHMENT2_EXT
+			}
+		})
 	end
 
 	if not intermediateBlurTex0 or not intermediateBlurTex1 or not intermediateBlurTex2

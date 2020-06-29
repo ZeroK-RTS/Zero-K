@@ -1,10 +1,10 @@
-unitDef = {
+return { terraunit = {
   unitname               = [[terraunit]],
   name                   = [[Terraform]],
   description            = [[Spent: 0]],
   acceleration           = 0,
   brakeRate              = 0,
-  buildCostMetal         = 1000000,
+  buildCostMetal         = 100000,
   builder                = false,
   buildPic               = [[levelterra.png]],
   capturable             = false,
@@ -28,11 +28,8 @@ unitDef = {
   idleAutoHeal           = 0,
   idleTime               = 1800,
   isFeature              = false,
-  kamikaze               = true,
-  kamikazeDistance       = 0,
-  kamikazeUseLOS         = true,
   levelGround            = false,
-  maxDamage              = 1000000,
+  maxDamage              = 100000,
   maxSlope               = 255,
   maxVelocity            = 0,
   minCloakDistance       = 0,
@@ -46,6 +43,4 @@ unitDef = {
   upright                = false,
   workerTime             = 0,
   yardMap                = [[yyyy]],
-}
-
-return lowerkeys({ terraunit = unitDef })
+} }

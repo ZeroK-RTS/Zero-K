@@ -92,6 +92,11 @@ local cos = math.cos
 local sin = math.sin
 local pi = math.pi
 
+local CMD_GUARD     = CMD.GUARD
+local CMD_STOP      = CMD.STOP
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	canGuardUnitDefIDs[i] = not ud.isImmobile or ud.isFactory
@@ -120,13 +125,13 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	local cmdOptions2 = cmdOptions.coded
 	
     if #cmdParams == 1 then
-        Spring.GiveOrderToUnit(unitID, CMD.GUARD, {cmdParams[1]}, cmdOptions2)
+        spGiveOrderToUnit(unitID, CMD_GUARD, cmdParams[1], cmdOptions2)
         return
     end
 	
 	if (not cmdOptions.shift) then
-		Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, cmdOptions2)
-		cmdOptions2 = cmdOptions2 + CMD.OPT_SHIFT
+		spGiveOrderToUnit(unitID, CMD_STOP, 0, cmdOptions2)
+		cmdOptions2 = cmdOptions2 + CMD_OPT_SHIFT
 	end
 	
 	local alreadyGuarding = {}
@@ -159,7 +164,7 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
-				Spring.GiveOrderToUnit(unitID, CMD.GUARD, {otherUnitID}, cmdOptions2)
+				spGiveOrderToUnit(unitID, CMD_GUARD, otherUnitID, cmdOptions2)
 			end
 		end
     end

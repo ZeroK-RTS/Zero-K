@@ -1,4 +1,4 @@
-unitDef = {
+return { raveparty = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
@@ -225,6 +225,8 @@ unitDef = {
         gatherradius = [[384]],
         smoothradius = [[192]],
         smoothmult   = [[0.7]],
+        smoothexponent = [[0.45]],
+        movestructures = [[1]],
         restrict_in_widgets = 1,
         script_reload = [[6]],
       },
@@ -268,7 +270,10 @@ unitDef = {
       },
 
       damage                  = {
-        default        = 12003,
+        --[[ huge value to burst Funnelweb shields, since most of DRP's
+             power is in effects normally crappy vs them but we don't want
+             DRP to arbitrarily suck vs Funnel if the other supers don't ]]
+        default        = 30000,
       },
 
       edgeEffectiveness       = 0.75,
@@ -357,6 +362,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ raveparty = unitDef })
+} }

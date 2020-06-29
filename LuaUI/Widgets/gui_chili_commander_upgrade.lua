@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local Chili
@@ -859,8 +859,6 @@ local upgradeSignature = {}
 local savedSlotLoadout = {}
 
 function SendUpgradeCommand(newModules)
-	table.sort(upgradeSignature.alreadyOwned)
-
 	-- Find selected eligible units
 	local units = Spring.GetSelectedUnits()
 	local upgradableUnits = {}
@@ -939,6 +937,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 		local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 		alreadyOwned[#alreadyOwned + 1] = module
 	end
+	table.sort(alreadyOwned)
 	
 	-- Record the signature of the morphing unit for later application.
 	upgradeSignature.level = level
@@ -1012,27 +1011,6 @@ function widget:SelectionChanged(selectedUnits)
 	cachedSelectedUnits = selectedUnits
 end
 
-function deepcopy(orig, copies)
-    copies = copies or {}
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        if copies[orig] then
-            copy = copies[orig]
-        else
-            copy = {}
-            copies[orig] = copy
-            setmetatable(copy, deepcopy(getmetatable(orig), copies))
-            for orig_key, orig_value in next, orig, nil do
-                copy[deepcopy(orig_key, copies)] = deepcopy(orig_value, copies)
-            end
-        end
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
 function widget:CommandsChanged()
 	local units = cachedSelectedUnits or Spring.GetSelectedUnits()
 	if mainWindowShown then
@@ -1048,13 +1026,9 @@ function widget:CommandsChanged()
 					local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 					alreadyOwned[#alreadyOwned + 1] = module
 				end
-				
 				table.sort(alreadyOwned)
 
-				local ourComOwns = deepcopy(upgradeSignature.alreadyOwned)
-				table.sort(ourComOwns)
-
-				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, ourComOwns) then
+				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, upgradeSignature.alreadyOwned) then
 					foundMatchingComm = true
 					break
 				end

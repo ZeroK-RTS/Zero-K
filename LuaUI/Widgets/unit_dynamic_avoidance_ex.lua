@@ -535,7 +535,7 @@ function DoCalculation(passedInfo)
 					end
 					if reachedTarget then --if reached target
 						if not idTargetOutput["newCommand"] then
-							spGiveOrderToUnit(unitID,CMD_REMOVE,{cQueue[1].tag,},{}) --remove previously given (avoidance) command if reached target
+							spGiveOrderToUnit(unitID,CMD_REMOVE,{cQueue[1].tag,},0) --remove previously given (avoidance) command if reached target
 						end
 						persistentData["commandIndexTable"][unitID]=nil --empty the commandIndex (command history)
 					else --execute when target not reached yet
@@ -665,7 +665,7 @@ function RefreshWatchdogList (unitID, commandTTL)
 					if cmdID and
 					( firstParam == commandTTL[unitID][i].widgetCommand[1]) and
 					(secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then delete it
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, {} )
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
 					end
 					commandTTL[unitID][i] = nil --empty watchdog entry
 					commandTTL[unitID][1] = i-1 --refresh table lenght

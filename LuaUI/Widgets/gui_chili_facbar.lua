@@ -173,8 +173,6 @@ local function UpdateFac(i, facInfo)
 	local buildList   = facInfo.buildList
 	local buildQueue  = GetBuildQueue(facInfo.unitID)
 	for j,unitDefIDb in ipairs(buildList) do
-		local unitDefIDb = unitDefIDb
-		
 		if not facs[i].boStack then
 		  echo('<Chili Facbar> Strange error #1' )
 		else
@@ -492,7 +490,6 @@ RecreateFacbar = function()
 		local buildList   = facInfo.buildList
 		local buildQueue  = GetBuildQueue(facInfo.unitID)
 		for j,unitDefIDb in ipairs(buildList) do
-			local unitDefIDb = unitDefIDb
 			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, i) )
 			qStore[i .. '|' .. unitDefIDb] = MakeButton(unitDefIDb, facInfo.unitID, i)
 		end

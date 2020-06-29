@@ -516,7 +516,7 @@
     },
     "gunshipbomb": {
         "name": "Blastwing",
-        "description": "Uçan Bomba (Kazar)",
+        "description": "Uçan Bomba Gözcü (Kazar)",
         "helptext": "Blastwing, LLT'ler, rüzgar çiftlikleri ve nanotonları çıkarmak için uygun, ancak daha uygun bir yumruk kütlesi sunmasına rağmen, sadece küçük bir hasar verir. Bombanın yörüngesinde öldükten sonra devam edecek olan yönelimli şarapnel olduğu için, hareket hızına ve yönüne dikkat edin. Bu sayede, Blastwing menzildeyken ölse bile, bir metal parçayla bir düşmanı püskürtebilirsiniz. Zincileme patlama olacağı için çok fazla sıkmayın. İnince görünmez."
     },
     "napalmmissile": {
@@ -767,7 +767,7 @@
     "zenith": {
         "name": "Zirve",
         "description": "Meteor Kontrolcüsü",
-        "helptext": "Zirve göktaşlarını gökten toplar (500'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
+        "helptext": "Zirve göktaşlarını gökten toplar (300'e kadar), bir şeyleri parçalamak ya da küçük bir geri kazanılabilir metal kaynağı sağlamak için her yere gönderebilir."
     },
     "vehaa": {
         "name": "Çarpıcı",
@@ -913,11 +913,6 @@
         "name": "Elçi",
         "description": "Kruvazör (Topçu)",
         "helptext": "Bu kruvazör, sabit yer ve kıyı hedeflerini bombalamak için yararlı olan güçlü, uzun menzilli bir top barındırıyor. Uçaklara, denizaltılara ve akıncı gemilerine dikkat edin."
-    },
-    "shiptransport": {
-        "name": "Sörfçü",
-        "description": "Taşıyıcı Platform",
-        "helptext": "Sörf tahtası deniz taşımacılığı ve ateş platformu olarak hizmet eder - yani Sörf Tahtası üzerindeki herhangi bir ünite ateşleyebilir."
     },
     "shipheavyarty": {
         "name": "Pomplalı",
@@ -1076,7 +1071,7 @@
     },
     "planecon": {
         "name": "Vinç",
-        "description": "Mühendis Uçak, 4 m/s de inşa eder",
+        "description": "Mühendis Uçak, 5 m/s de inşa eder",
         "helptext": "Vinç herhangi bir arazide hızla uçuyor, ancak herhangi bir AH için kırılgan. Diğer inşaatçılar ile karşılaştırıldığında nispeten zayıf bir nano güce sahip olmasına rağmen, ulaşılması zor birçok yerde inşa edebilir ve bir hava oyuncuları bölgesini doğrusal olmayan bir şekilde genişletebilir. Hareket kabiliyetinden dolayı, enkazları ve diğer tekrarlayan görevleri geri almak için idealdir."
     },
     "gunshipraid": {

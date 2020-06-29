@@ -121,6 +121,19 @@ local function IdleAnim()
 	end
 end
 
+local stuns = {false, false, true}
+function Stunned (stun_type)
+	stuns[stun_type] = true
+	Signal(SIG_IDLE)
+end
+
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread(IdleAnim)
+	end
+end
+
 local function RestoreAfterDelay()
 	--Sleep(2000)
 	--StartThread(IdleAnim)
@@ -138,13 +151,6 @@ function script.Create()
 	end
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	
-	--Spin(rotating_bas, y_axis, 0.5)
-	
-	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(IdleAnim)
-
-	--Turn(rotating_bas, y_axis, math.rad(-90), 0.5)
 end
 
 function DoAmmoRotate()

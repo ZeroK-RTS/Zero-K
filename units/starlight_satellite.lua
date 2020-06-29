@@ -1,9 +1,9 @@
-starlight_satellite = {
+return { starlight_satellite = {
   unitname               = [[starlight_satellite]],
   name                   = [[Glint]],
   description            = [[Starlight relay satellite]],
-  acceleration           = 0.152,
-  brakeRate              = 0.456,
+  acceleration           = 0.456,
+  brakeRate              = 2.736,
   buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[satellite.png]],
@@ -186,6 +186,4 @@ starlight_satellite = {
 
   },
 
-}
-
-return lowerkeys({ starlight_satellite = starlight_satellite})
+} }

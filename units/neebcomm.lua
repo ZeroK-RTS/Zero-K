@@ -1,9 +1,9 @@
-unitDef = {
+return { neebcomm = {
   unitname            = [[neebcomm]],
   name                = [[Neeb Comm]],
   description         = [[Ugly Turkey]],
-  acceleration        = 0.2,
-  brakeRate           = 0.205,
+  acceleration        = 0.6,
+  brakeRate           = 1.23,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -71,6 +71,4 @@ unitDef = {
   upright             = false,
   workerTime          = 7.5,
 
-}
-
-return lowerkeys({ neebcomm = unitDef })
+} }

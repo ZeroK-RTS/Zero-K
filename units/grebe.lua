@@ -1,10 +1,10 @@
-unitDef = {
+return { grebe = {
   unitname               = [[grebe]],
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
-  acceleration           = 0.2,
+  acceleration           = 0.6,
   activateWhenBuilt      = true,
-  brakeRate              = 0.4,
+  brakeRate              = 2.4,
   buildCostMetal         = 300,
   buildPic               = [[grebe.png]],
   canGuard               = true,
@@ -55,12 +55,6 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-
-    --{
-    --  def                = [[TORPEDO]],
-    --  badTargetCategory  = [[FIXEDWING]],
-    --  onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    --},
   },
 
   weaponDefs             = {
@@ -98,44 +92,6 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },
-
-    TORPEDO = {
-      name                    = [[Torpedo]],
-      areaOfEffect            = 16,
-      avoidFriendly           = false,
-      burnblow                = true,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 200,
-        subs    = 200,
-      },
-
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
-      flightTime              = 6,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      model                   = [[wep_t_longbolt.s3o]],
-      noSelfDamage            = true,
-      range                   = 400,
-      reloadtime              = 3,
-      soundHit                = [[explosion/wet/ex_underwater]],
-      soundStart              = [[weapon/torpedo]],
-      startVelocity           = 90,
-      tolerance               = 1000,
-      tracks                  = true,
-      turnRate                = 10000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponAcceleration      = 25,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 140,
-    },
-
   },
 
   featureDefs            = {
@@ -157,6 +113,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ grebe = unitDef })
+} }

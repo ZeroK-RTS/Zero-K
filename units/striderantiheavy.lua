@@ -1,11 +1,11 @@
-unitDef = {
+return { striderantiheavy = {
   unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
-  acceleration           = 0.18,
+  acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
-  brakeRate              = 0.375,
+  brakeRate              = 2.25,
   buildCostMetal         = 2000,
   buildPic               = [[striderantiheavy.png]],
   canGuard               = true,
@@ -80,6 +80,7 @@ unitDef = {
       areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
+      avoidGround             = false,
       avoidNeutral            = false,
       commandfire             = false,
       craterBoost             = 1,
@@ -90,6 +91,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
+      heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 0,
@@ -132,6 +134,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderantiheavy = unitDef })
+} }

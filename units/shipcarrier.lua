@@ -1,10 +1,10 @@
-unitDef = {
+return { shipcarrier = {
   unitname               = [[shipcarrier]],
   name                   = [[Reef]],
   description            = [[Aircraft Carrier (Bombardment), stockpiles disarm missiles at 5 m/s]],
-  acceleration           = 0.0354,
+  acceleration           = 0.177,
   activateWhenBuilt      = true,
-  brakeRate              = 0.0466,
+  brakeRate              = 0.466,
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[shipcarrier.png]],
@@ -19,15 +19,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Flugzeugträger (Bomber)]],
-    description_fr = [[Porte-Avion Bombardier]],
-    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire disarming missile launcher for disabling enemy capital ships at range and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
     midposoffset   = [[0 -10 0]],
     modelradius    = [[80]],
     stockpiletime  = [[30]],
     stockpilecost  = [[150]],
     priority_misc = 2, -- High
     extradrawrange = 3000,
+    ispad         = 1,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -70,8 +68,8 @@ unitDef = {
 
     {
       def                = [[DISARM_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[SWIM LAND SUB SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
     
   },
@@ -119,8 +117,9 @@ unitDef = {
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
+      tracks                  = true,
       startVelocity           = 200,
-      turnrate                = 25000,
+      turnrate                = 30000,
       waterWeapon             = false,
       weaponAcceleration      = 400,
       weaponTimer             = 1.4,
@@ -190,6 +189,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shipcarrier = unitDef })
+} }

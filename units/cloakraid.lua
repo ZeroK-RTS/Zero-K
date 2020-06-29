@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakraid = {
   unitname               = [[cloakraid]],
   name                   = [[Glaive]],
   description            = [[Light Raider Bot]],
-  acceleration           = 0.5,
-  brakeRate              = 0.4,
+  acceleration           = 1.5,
+  brakeRate              = 2.4,
   buildCostMetal         = 65,
   buildPic               = [[cloakraid.png]],
   canGuard               = true,
@@ -27,7 +27,7 @@ unitDef = {
   idleAutoHeal           = 20,
   idleTime               = 150,
   leaveTracks            = true,
-  maxDamage              = 200,
+  maxDamage              = 230,
   maxSlope               = 36,
   maxVelocity            = 3.85,
   maxWaterDepth          = 22,
@@ -48,7 +48,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 500,
+  sightDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.9,
@@ -86,8 +86,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 12,
-        subs    = 0.567,
+        default = 10.2,
+        subs    = 0.51,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],
@@ -96,6 +96,7 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
+      leadLimit               = 2,
       noGap                   = false,
       noSelfDamage            = true,
       range                   = 185,
@@ -135,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakraid = unitDef })
+} }

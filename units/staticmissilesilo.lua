@@ -1,4 +1,4 @@
-unitDef = {
+return { staticmissilesilo = {
   unitname                      = [[staticmissilesilo]],
   name                          = [[Missile Silo]],
   description                   = [[Produces Tactical Missiles, Builds at 10 m/s]],
@@ -67,6 +67,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticmissilesilo = unitDef })
+} }

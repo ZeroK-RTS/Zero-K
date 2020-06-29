@@ -282,8 +282,8 @@ effectUnitDefs = {
 	bomberstrike = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustl", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustr", onActive=true, noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=10, piece="wingtipl", noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=10, piece="wingtipr", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=10, piece="wingl", noIconDraw = true}},
+		{class='Ribbon', options={width=1, size=10, piece="wingr", noIconDraw = true}},
 	},
 	bomberassault = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustLeft", onActive=true, noIconDraw = true}},

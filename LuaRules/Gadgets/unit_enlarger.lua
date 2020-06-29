@@ -14,8 +14,8 @@ end
 -- speedups
 --------------------------------------------------------------------------------
 
-CMD_DECREASE_SIZE = 33500
-CMD_INCREASE_SIZE = 33501
+local CMD_DECREASE_SIZE = 33500
+local CMD_INCREASE_SIZE = 33501
 
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag, synced)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag)
 	if (cmdID == CMD_DECREASE_SIZE or cmdID == CMD_INCREASE_SIZE) then
 		if (not unitData[unitID]) then
 			unitData[unitID] = { scale = 1.0 }

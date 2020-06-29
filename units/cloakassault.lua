@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakassault = {
   unitname               = [[cloakassault]],
   name                   = [[Knight]],
   description            = [[Lightning Assault Bot]],
-  acceleration           = 0.2,
-  brakeRate              = 0.6,
+  acceleration           = 0.6,
+  brakeRate              = 3.6,
   buildCostMetal         = 350,
   buildPic               = [[cloakassault.png]],
   canGuard               = true,
@@ -51,7 +51,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 325,
+  sightDistance          = 385,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,
@@ -89,7 +89,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 240,
+        default        = 230,
       },
 
       duration                = 10,
@@ -101,7 +101,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
-      range                   = 280,
+      range                   = 350,
       reloadtime              = 2.2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
@@ -136,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakassault = unitDef })
+} }

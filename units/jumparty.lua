@@ -1,9 +1,9 @@
-unitDef = {
+return { jumparty = {
   unitname               = [[jumparty]],
   name                   = [[Firewalker]],
   description            = [[Saturation Artillery Walker]],
-  acceleration           = 0.12,
-  brakeRate              = 0.24,
+  acceleration           = 0.36,
+  brakeRate              = 1.44,
   buildCostMetal         = 900,
   builder                = false,
   buildPic               = [[jumparty.png]],
@@ -17,6 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    selection_scale   = 0.92,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,7 +29,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
-  maxVelocity            = 1.45,
+  maxVelocity            = 1.4,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
@@ -68,52 +69,6 @@ unitDef = {
 
 
   weaponDefs             = {
-
-    NAPALM_MORTAR = {
-      name                    = [[Napalm Mortar]],
-      accuracy                = 400,
-      areaOfEffect            = 256,
-      avoidFeature            = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      customParams              = {
-        setunitsonfire = "1",
-        burntime = 60,
-
-        area_damage = 1,
-        area_damage_radius = 128,
-        area_damage_dps = 20,
-        area_damage_duration = 20,
-
-        --lups_heat_fx = [[firewalker]],
-      },
-      
-      damage                  = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
-      },
-
-      explosionGenerator      = [[custom:napalm_firewalker]],
-      firestarter             = 180,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      myGravity               = 0.1,
-      projectiles             = 2,
-      range                   = 900,
-      reloadtime              = 12,
-      rgbColor                = [[1 0.5 0.2]],
-      size                    = 8,
-      soundHit                = [[weapon/cannon/wolverine_hit]],
-      soundStart              = [[weapon/cannon/wolverine_fire]],
-      sprayangle              = 1024,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 320,
-    },
-    
     NAPALM_SPRAYER = {
       name                    = [[Napalm Mortar]],
       accuracy                = 400,
@@ -186,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumparty = unitDef })
+} }

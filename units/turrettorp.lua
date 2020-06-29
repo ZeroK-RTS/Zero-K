@@ -1,4 +1,4 @@
-unitDef = {
+return { turrettorp = {
   unitname          = [[turrettorp]],
   name              = [[Urchin]],
   description       = [[Torpedo Launcher]],
@@ -37,8 +37,8 @@ unitDef = {
   script            = [[turrettorp.lua]],
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
 
-  sightDistance     = 610,
-  sonarDistance     = 610,
+  sightDistance     = 653, -- Range*1.1 + 48 for radar overshoot
+  sonarDistance     = 653,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
@@ -67,6 +67,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      cegTag                  = [[torpedo_trail]],
 
       damage                  = {
         default = 190,
@@ -117,6 +118,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turrettorp = unitDef })
+} }

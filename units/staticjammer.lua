@@ -1,4 +1,4 @@
-unitDef = {
+return { staticjammer = {
   unitname                      = [[staticjammer]],
   name                          = [[Cornea]],
   description                   = [[Area Cloaker/Jammer]],
@@ -29,7 +29,7 @@ unitDef = {
     area_cloak_radius = 550,
     area_cloak_decloak_distance = 75,
 
-    priority_misc = 2, -- High
+    priority_misc  = 1,
     addfight       = 1,
     addpatrol      = 1,
   },
@@ -76,6 +76,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticjammer = unitDef })
+} }

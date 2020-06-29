@@ -1,4 +1,4 @@
-unitDef = {
+return { fakeunit = {
   unitname                      = [[fakeunit]],
   name                          = [[Fake radar signal]],
   description                   = [[Created by scrambling devices.]],
@@ -39,6 +39,4 @@ unitDef = {
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
   yardMap                       = [[o]],
-}
-
-return lowerkeys({ fakeunit = unitDef })
+} }

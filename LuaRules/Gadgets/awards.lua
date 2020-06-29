@@ -59,7 +59,6 @@ local veryEasyFactor = 0.3
 local empFactor     = veryEasyFactor*4
 local reclaimFactor = veryEasyFactor*0.2 -- wrecks aren't guaranteed to leave more than 0.2 of value
 
-local minFriendRatio = 0.25
 local minReclaimRatio = 0.15
 
 local awardAbsolutes = {
@@ -92,7 +91,7 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
 local awardList = {}
 
-local boats, t3Units, comms = {}, {}, {}
+local boats, comms = {}, {}
 
 local staticO_small = {
 	staticheavyarty = 1,
@@ -325,21 +324,6 @@ local function ProcessAwardData()
 		if awardType == 'vet' then
 			maxVal = expUnitExp
 			winningTeam = expUnitTeam
-		elseif awardType == 'friend' then
-
-			maxVal = 0
-			for team,dmg in pairs(data) do
-
-				--local totalDamage = dmg+damageList[team]
-				local totalDamage = dmg + awardData.pwn[team]
-				local damageRatio = totalDamage>0 and dmg/totalDamage or 0
-
-				if damageRatio > maxVal then
-					winningTeam = team
-					maxVal = damageRatio
-				end
-			end
-
 		else
 			winningTeam, maxVal = getMaxVal(data)
 
@@ -358,7 +342,7 @@ local function ProcessAwardData()
 			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			if maxVal > compare then
 				maxVal = floor(maxVal)
-				maxValWrite = comma_value(maxVal)
+				local maxValWrite = comma_value(maxVal)
 
 				if awardType == 'cap' then
 					message = 'Captured value: ' .. maxValWrite
@@ -378,8 +362,6 @@ local function ProcessAwardData()
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
 					message = 'Reclaimed value: ' .. maxValWrite
-				elseif awardType == 'friend' then
-					message = 'Damage inflicted on allies: '.. floor(maxVal * 100) ..'%'
 				elseif awardType == 'mex' then
 					message = 'Mexes built: '.. maxVal
 				elseif awardType == 'mexkill' then
@@ -454,16 +436,6 @@ function gadget:Initialize()
 		end
 	end
 
-	--[[
-	local t3Facs = {'armshltx', 'corgant', }
-	for _, t3Fac in pairs(t3Facs) do
-		local udT3Fac = UnitDefNames[t3Fac]
-		for _, t3DefID in pairs(udT3Fac.buildOptions) do
-			t3Units[t3DefID] = true
-		end
-	end
-	--]]
-
 	for i=1,#WeaponDefs do
 		local wcp = WeaponDefs[i].customParams or {}
 		if (wcp.setunitsonfire) then
@@ -505,6 +477,12 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	end
 end
 
+-- wtf, why does each shitty chicken get to have its own award?
+local    chicken_dragonDefID = UnitDefNames.chicken_dragon   .id
+local chickenflyerqueenDefID = UnitDefNames.chickenflyerqueen.id
+local  chickenlandqueenDefID = UnitDefNames.chickenlandqueen .id
+local             roostDefID = UnitDefNames.roost            .id
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	local experience = spGetUnitExperience(unitID)
 	if experience > expUnitExp and (experience*UnitDefs[unitDefID].metalCost > 1000) then
@@ -528,19 +506,16 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			AddAwardPoints( 'mexkill', killerTeam, 1 )
 		end
 	else
-		local ud = UnitDefs[unitDefID]
-		if (ud.customParams.dynamic_comm and (not spAreTeamsAllied(killerTeam, unitTeam))) then
+		if (comms[unitDefID] and (not spAreTeamsAllied(killerTeam, unitTeam))) then
 			AddAwardPoints( 'head', killerTeam, 1 )
-		elseif ud.name == "chicken_dragon" then
+		elseif unitDefID == chicken_dragonDefID then
 			AddAwardPoints( 'dragon', killerTeam, 1 )
-		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
+		elseif unitDefID == chickenflyerqueenDefID or unitDefID == chickenlandqueenDefID then
 			for killerFrienz, _ in pairs(awardData['heart']) do --give +1000000000 points for all frienz that kill queen and won
 				AddAwardPoints( 'heart', killerFrienz, awardAbsolutes['heart']) --the extra points is for id purpose. Will deduct later
 			end
-		elseif ud.name == "roost" then
+		elseif unitDefID == roostDefID then
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
-		else
-			--
 		end
 	end
 end
@@ -559,18 +534,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		or (attackerTeam == gaiaTeamID)
 		then return end
 
-	local ud = UnitDefs[unitDefID]
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
-	if spAreTeamsAllied(attackerTeam, unitTeam) then
-		if not paralyzer then
-			AddAwardPoints( 'friend', attackerTeam, costdamage )
-		end
-	else
+	if not spAreTeamsAllied(attackerTeam, unitTeam) then
 		if paralyzer then
 			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		else
-			if ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
+			if unitDefID == chickenflyerqueenDefID or unitDefID == chickenlandqueenDefID then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
 			local ad = UnitDefs[attackerDefID]
@@ -599,9 +569,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 			elseif boats[attackerDefID] then
 				AddAwardPoints( 'navy', attackerTeam, costdamage )
-
-			elseif t3Units[attackerDefID] then
-				AddAwardPoints( 't3', attackerTeam, costdamage )
 
 			elseif comms[attackerDefID] then
 				AddAwardPoints( 'comm', attackerTeam, costdamage )

@@ -1,9 +1,9 @@
-unitDef = {
+return { striderscorpion = {
   unitname               = [[striderscorpion]],
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
-  acceleration           = 0.26,
-  brakeRate              = 0.78,
+  acceleration           = 0.78,
+  brakeRate              = 4.68,
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[striderscorpion.png]],
@@ -303,6 +303,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderscorpion = unitDef })
+} }

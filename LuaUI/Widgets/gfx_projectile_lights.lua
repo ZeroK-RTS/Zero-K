@@ -345,7 +345,7 @@ local function GetBeamLights(lightParams, pID, x, y, z)
 	if lightParams.beamMult then
 		local mult = lightParams.beamMult
 		if lightParams.beamMultFrames then
-			timeToLive = timeToLive or Spring.GetProjectileTimeToLive(pID)
+			timeToLive = Spring.GetProjectileTimeToLive(pID)
 			if (not lightParams.maxTTL) or lightParams.maxTTL < timeToLive then
 				lightParams.maxTTL = timeToLive
 			end
@@ -452,10 +452,10 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 					local drawParams = GetBeamLights(lightParams, pID, x, y, z)
 					beamLightCount = beamLightCount + 1
 					beamLights[beamLightCount] = drawParams
-					if projectileDrawParams then
+					--if projectileDrawParams then
 						-- Don't add beams (for now?)
 						--projectileDrawParams[#projectileDrawParams + 1] = drawParams
-					end
+					--end
 				else -- point type
 					if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 						local drawParams = GetProjectileLight(lightParams, pID, x, y, z)

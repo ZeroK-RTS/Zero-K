@@ -80,7 +80,7 @@ options = {
 	},
 	select_all_visible = { type = 'button',
 		name = 'All Visible Units',
-		desc = 'Select all visibleunits.',
+		desc = 'Select all visible units.',
 		action = 'select Visible++_ClearSelection_SelectAll+',
 	},
 	

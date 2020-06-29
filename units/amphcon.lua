@@ -1,10 +1,10 @@
-unitDef = {
+return { amphcon = {
   unitname            = [[amphcon]],
   name                = [[Conch]],
-  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s]],
-  acceleration        = 0.4,
+  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle]],
+  acceleration        = 1.2,
   activateWhenBuilt   = true,
-  brakeRate           = 0.25,
+  brakeRate           = 1.5,
   buildCostMetal      = 150,
   buildDistance       = 128,
   builder             = true,
@@ -23,6 +23,7 @@ unitDef = {
     amph_submerged_at = 40,
   },
 
+  damageModifier      = 0.25,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -32,7 +33,7 @@ unitDef = {
   leaveTracks         = true,
   maxDamage           = 850,
   maxSlope            = 36,
-  maxVelocity         = 1.7,
+  maxVelocity         = 1.8,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],
@@ -69,6 +70,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphcon = unitDef })
+} }

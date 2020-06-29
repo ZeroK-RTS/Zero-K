@@ -139,7 +139,7 @@ function PostDistortion:BeginDraw()
 	glActiveFBO(fbo, gl.Clear, GL_COLOR_BUFFER_BIT, 0,0,0,0) --//clear jitterTex
 
 	--// copy depthbuffer to a seperated depth texture, so we can use it in the MRT
-	if (pd.copyDepthBuffer) then
+	if (pd.copyDepthBuffer) and depthTex then
 		glCopyToTexture(depthTex, 0, 0, vpx, vpy, vsx, vsy)
 	end
 

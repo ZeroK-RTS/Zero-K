@@ -355,12 +355,7 @@ local function LoadUnits()
 				end
 			end
 			
-			if data.cloak then
-				-- restored on its own by gadgets, but without this code line there is a delay where units are uncloaked and enemy tracks them
-				-- ...actually they track it even with this line, comment it out
-				-- at least the unit should get back under cloak before the attacker can actually fire
-				--Spring.SetUnitCloak(newID, data.cloak)
-			else
+			if not data.cloak then -- cloak is restored on its own by the cloak gadget
 				Spring.SetUnitCloak(newID, false)	-- workaround cloak persisting even when unit's "want cloak" state is false
 			end
 			GG.UpdateUnitAttributes(newID)
@@ -972,11 +967,8 @@ local function SaveUnits()
 			for j,v in ipairs(commandsTemp) do
 				if (type(v) == "table" and v.params) then v.params.n = nil end
 				
-				-- don't save commands from retreat, we'll regenerate those at load)
-				if (retreatTagsMove[unitID] and retreatTagsMove[unitID] == v.tag) or (retreatTagsWait[unitID] and retreatTagsWait[unitID] == v.tag) then
-					-- do nothing
-					--Spring.Echo("Disregarding retreat command", unitID, CMD[v.id] or (v.id == CMD_RAW_MOVE and "raw_move"))
-				else
+				-- don't save commands from retreat, we'll regenerate those at load
+				if not ((retreatTagsMove[unitID] and retreatTagsMove[unitID] == v.tag) or (retreatTagsWait[unitID] and retreatTagsWait[unitID] == v.tag)) then
 					commands[#commands+1] = v
 				end
 			end

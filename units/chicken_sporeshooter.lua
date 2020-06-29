@@ -1,10 +1,10 @@
-unitDef = {
+return { chicken_sporeshooter = {
   unitname            = [[chicken_sporeshooter]],
   name                = [[Sporeshooter]],
   description         = [[All-Terrain Spores (Anti-Air/Skirm)]],
-  acceleration        = 0.36,
+  acceleration        = 1.08,
   activateWhenBuilt   = true,
-  brakeRate           = 0.205,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -121,6 +121,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_sporeshooter = unitDef })
+} }

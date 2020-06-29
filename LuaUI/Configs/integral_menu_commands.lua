@@ -3,164 +3,202 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --FIXME: use this table until state tooltip detection is fixed
 --SIDENOTE: using this table is preferable than editing command description directly because this maintain tooltip's compatibility with other build menu too.(eg: color text is not supported by stock gui)
 
-local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
-local RAIDER          = {order = 2, row = 1, col = 2}
-local SKIRMISHER      = {order = 3, row = 1, col = 3}
-local RIOT            = {order = 4, row = 1, col = 4}
-local ASSAULT         = {order = 5, row = 1, col = 5}
-local ARTILLERY       = {order = 6, row = 1, col = 6}
+local unitTypes = {
+	CONSTRUCTOR     = {order = 1, row = 1, col = 1},
+	RAIDER          = {order = 2, row = 1, col = 2},
+	SKIRMISHER      = {order = 3, row = 1, col = 3},
+	RIOT            = {order = 4, row = 1, col = 4},
+	ASSAULT         = {order = 5, row = 1, col = 5},
+	ARTILLERY       = {order = 6, row = 1, col = 6},
 
-local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
-local ANTI_AIR        = {order = 8, row = 2, col = 3}
-local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
-local SPECIAL         = {order = 10, row = 2, col = 5}
-local UTILITY         = {order = 11, row = 2, col = 6}
+	-- note: row 2 column 1 purposefully skipped, since
+	-- that allows giving facs Attack orders via hotkey
+	WEIRD_RAIDER    = {order = 7, row = 2, col = 2},
+	ANTI_AIR        = {order = 8, row = 2, col = 3},
+	HEAVY_SOMETHING = {order = 9, row = 2, col = 4},
+	SPECIAL         = {order = 10, row = 2, col = 5},
+	UTILITY         = {order = 11, row = 2, col = 6},
+}
+
+local typeNames = {
+	"CONSTRUCTOR",
+	"RAIDER",
+	"SKIRMISHER",
+	"RIOT",
+	"ASSAULT",
+	"ARTILLERY",
+	"WEIRD_RAIDER",
+	"ANTI_AIR",
+	"HEAVY_SOMETHING",
+	"SPECIAL",
+	"UTILITY",
+}
+local typeNamesLower = {}
+for i = 1, #typeNames do
+	typeNamesLower[i] = "pos_" .. typeNames[i]:lower()
+end
 
 local units = {
 	factorycloak = {
-		cloakcon = CONSTRUCTOR,
-		cloakraid = RAIDER,
-		cloakheavyraid = WEIRD_RAIDER,
-		cloakriot = RIOT,
-		cloakskirm = SKIRMISHER,
-		cloakarty = ARTILLERY,
-		cloakaa = ANTI_AIR,
-		cloakassault = ASSAULT,
-		cloaksnipe = HEAVY_SOMETHING,
-		cloakbomb = SPECIAL,
-		cloakjammer = UTILITY,
+		cloakcon = unitTypes.CONSTRUCTOR,
+		cloakraid = unitTypes.RAIDER,
+		cloakheavyraid = unitTypes.WEIRD_RAIDER,
+		cloakriot = unitTypes.RIOT,
+		cloakskirm = unitTypes.SKIRMISHER,
+		cloakarty = unitTypes.ARTILLERY,
+		cloakaa = unitTypes.ANTI_AIR,
+		cloakassault = unitTypes.ASSAULT,
+		cloaksnipe = unitTypes.HEAVY_SOMETHING,
+		cloakbomb = unitTypes.SPECIAL,
+		cloakjammer = unitTypes.UTILITY,
 	},
 	factoryshield = {
-		shieldcon = CONSTRUCTOR,
-		shieldscout = WEIRD_RAIDER,
-		shieldraid = RAIDER,
-		shieldriot = RIOT,
-		shieldskirm = SKIRMISHER,
-		shieldarty = ARTILLERY,
-		shieldaa = ANTI_AIR,
-		shieldassault = ASSAULT,
-		shieldfelon = HEAVY_SOMETHING,
-		shieldbomb = SPECIAL,
-		shieldshield = UTILITY,
+		shieldcon = unitTypes.CONSTRUCTOR,
+		shieldscout = unitTypes.WEIRD_RAIDER,
+		shieldraid = unitTypes.RAIDER,
+		shieldriot = unitTypes.RIOT,
+		shieldskirm = unitTypes.SKIRMISHER,
+		shieldarty = unitTypes.ARTILLERY,
+		shieldaa = unitTypes.ANTI_AIR,
+		shieldassault = unitTypes.ASSAULT,
+		shieldfelon = unitTypes.HEAVY_SOMETHING,
+		shieldbomb = unitTypes.SPECIAL,
+		shieldshield = unitTypes.UTILITY,
 	},
 	factoryveh = {
-		vehcon = CONSTRUCTOR,
-		vehscout = WEIRD_RAIDER,
-		vehraid = RAIDER,
-		vehriot = RIOT,
-		vehsupport = SKIRMISHER, -- Not really but nowhere else to go
-		veharty = ARTILLERY,
-		vehaa = ANTI_AIR,
-		vehassault = ASSAULT,
-		vehheavyarty = HEAVY_SOMETHING,
-		vehcapture = SPECIAL,
+		vehcon = unitTypes.CONSTRUCTOR,
+		vehscout = unitTypes.WEIRD_RAIDER,
+		vehraid = unitTypes.RAIDER,
+		vehriot = unitTypes.RIOT,
+		vehsupport = unitTypes.SKIRMISHER, -- Not really but nowhere else to go
+		veharty = unitTypes.ARTILLERY,
+		vehaa = unitTypes.ANTI_AIR,
+		vehassault = unitTypes.ASSAULT,
+		vehheavyarty = unitTypes.HEAVY_SOMETHING,
+		vehcapture = unitTypes.SPECIAL,
 	},
 	factoryhover = {
-		hovercon = CONSTRUCTOR,
-		hoverraid = RAIDER,
-		hoverdepthcharge = SPECIAL,
-		hoverriot = RIOT,
-		hoverskirm = SKIRMISHER,
-		hoverarty = ARTILLERY,
-		hoveraa = ANTI_AIR,
-		hoverassault = ASSAULT,
+		hovercon = unitTypes.CONSTRUCTOR,
+		hoverraid = unitTypes.RAIDER,
+		hoverheavyraid = unitTypes.WEIRD_RAIDER,
+		hoverdepthcharge = unitTypes.SPECIAL,
+		hoverriot = unitTypes.RIOT,
+		hoverskirm = unitTypes.SKIRMISHER,
+		hoverarty = unitTypes.ARTILLERY,
+		hoveraa = unitTypes.ANTI_AIR,
+		hoverassault = unitTypes.ASSAULT,
 	},
 	factorygunship = {
-		gunshipcon = CONSTRUCTOR,
-		gunshipemp = WEIRD_RAIDER,
-		gunshipraid = RAIDER,
-		gunshipheavyskirm = ARTILLERY,
-		gunshipskirm = SKIRMISHER,
-		gunshiptrans = SPECIAL,
-		gunshipheavytrans = UTILITY,
-		gunshipaa = ANTI_AIR,
-		gunshipassault = ASSAULT,
-		gunshipkrow = HEAVY_SOMETHING,
-		gunshipbomb = RIOT,
+		gunshipcon = unitTypes.CONSTRUCTOR,
+		gunshipemp = unitTypes.WEIRD_RAIDER,
+		gunshipraid = unitTypes.RAIDER,
+		gunshipheavyskirm = unitTypes.ARTILLERY,
+		gunshipskirm = unitTypes.SKIRMISHER,
+		gunshiptrans = unitTypes.SPECIAL,
+		gunshipheavytrans = unitTypes.UTILITY,
+		gunshipaa = unitTypes.ANTI_AIR,
+		gunshipassault = unitTypes.ASSAULT,
+		gunshipkrow = unitTypes.HEAVY_SOMETHING,
+		gunshipbomb = unitTypes.RIOT,
 	},
 	factoryplane = {
-		planecon = CONSTRUCTOR,
-		planefighter = RAIDER,
-		bomberriot = RIOT,
+		planecon = unitTypes.CONSTRUCTOR,
+		planefighter = unitTypes.RAIDER,
+		bomberriot = unitTypes.RIOT,
+		bomberstrike = unitTypes.SKIRMISHER,
 		-- No Plane Artillery
-		planeheavyfighter = WEIRD_RAIDER,
-		planescout = UTILITY,
-		planelightscout = ARTILLERY,
-		bomberprec = ASSAULT,
-		bomberheavy = HEAVY_SOMETHING,
-		bomberdisarm = SPECIAL,
+		planeheavyfighter = unitTypes.WEIRD_RAIDER,
+		planescout = unitTypes.UTILITY,
+		planelightscout = unitTypes.ARTILLERY,
+		bomberprec = unitTypes.ASSAULT,
+		bomberheavy = unitTypes.HEAVY_SOMETHING,
+		bomberdisarm = unitTypes.SPECIAL,
 	},
 	factoryspider = {
-		spidercon = CONSTRUCTOR,
-		spiderscout = RAIDER,
-		spiderriot = RIOT,
-		spiderskirm = SKIRMISHER,
+		spidercon = unitTypes.CONSTRUCTOR,
+		spiderscout = unitTypes.RAIDER,
+		spiderriot = unitTypes.RIOT,
+		spiderskirm = unitTypes.SKIRMISHER,
 		-- No Spider Artillery
-		spideraa = ANTI_AIR,
-		spideremp = WEIRD_RAIDER,
-		spiderassault = ASSAULT,
-		spidercrabe = HEAVY_SOMETHING,
-		spiderantiheavy = SPECIAL,
+		spideraa = unitTypes.ANTI_AIR,
+		spideremp = unitTypes.WEIRD_RAIDER,
+		spiderassault = unitTypes.ASSAULT,
+		spidercrabe = unitTypes.HEAVY_SOMETHING,
+		spiderantiheavy = unitTypes.SPECIAL,
 	},
 	factoryjump = {
-		jumpcon = CONSTRUCTOR,
-		jumpscout = WEIRD_RAIDER,
-		jumpraid = RAIDER,
-		jumpblackhole = RIOT,
-		jumpskirm = SKIRMISHER,
-		jumparty = ARTILLERY,
-		jumpaa = ANTI_AIR,
-		jumpassault = ASSAULT,
-		jumpsumo = HEAVY_SOMETHING,
-		jumpbomb = SPECIAL,
+		jumpcon = unitTypes.CONSTRUCTOR,
+		jumpscout = unitTypes.WEIRD_RAIDER,
+		jumpraid = unitTypes.RAIDER,
+		jumpblackhole = unitTypes.RIOT,
+		jumpskirm = unitTypes.SKIRMISHER,
+		jumparty = unitTypes.ARTILLERY,
+		jumpaa = unitTypes.ANTI_AIR,
+		jumpassault = unitTypes.ASSAULT,
+		jumpsumo = unitTypes.HEAVY_SOMETHING,
+		jumpbomb = unitTypes.SPECIAL,
 	},
 	factorytank = {
-		tankcon =  CONSTRUCTOR,
-		tankraid = WEIRD_RAIDER,
-		tankheavyraid = RAIDER,
-		tankriot = RIOT,
-		tankarty = ARTILLERY,
-		tankheavyarty = UTILITY,
-		tankaa = ANTI_AIR,
-		tankassault = ASSAULT,
-		tankheavyassault = HEAVY_SOMETHING,
+		tankcon = unitTypes. CONSTRUCTOR,
+		tankraid = unitTypes.WEIRD_RAIDER,
+		tankheavyraid = unitTypes.RAIDER,
+		tankriot = unitTypes.RIOT,
+		tankarty = unitTypes.ARTILLERY,
+		tankheavyarty = unitTypes.UTILITY,
+		tankaa = unitTypes.ANTI_AIR,
+		tankassault = unitTypes.ASSAULT,
+		tankheavyassault = unitTypes.HEAVY_SOMETHING,
 	},
 	factoryamph = {
-		amphcon = CONSTRUCTOR,
-		amphraid = RAIDER,
-		amphimpulse = WEIRD_RAIDER,
-		amphriot = RIOT,
-		amphfloater = SKIRMISHER,
+		amphcon = unitTypes.CONSTRUCTOR,
+		amphraid = unitTypes.RAIDER,
+		amphimpulse = unitTypes.WEIRD_RAIDER,
+		amphriot = unitTypes.RIOT,
+		amphfloater = unitTypes.SKIRMISHER,
 		-- No Amph Artillery
-		amphaa = ANTI_AIR,
-		amphassault = HEAVY_SOMETHING,
-		amphlaunch = ARTILLERY,
-		amphbomb = SPECIAL,
-		amphtele = UTILITY,
+		amphaa = unitTypes.ANTI_AIR,
+		amphassault = unitTypes.HEAVY_SOMETHING,
+		amphlaunch = unitTypes.ARTILLERY,
+		amphbomb = unitTypes.SPECIAL,
+		amphtele = unitTypes.UTILITY,
 	},
 	factoryship = {
-		shipcon = CONSTRUCTOR,
-		shiptorpraider = RAIDER,
-		shipriot = RIOT,
-		shipskirm = SKIRMISHER,
-		shiparty = ARTILLERY,
-		shipaa = ANTI_AIR,
-		shipscout = WEIRD_RAIDER,
-		shipassault = ASSAULT,
+		shipcon = unitTypes.CONSTRUCTOR,
+		shiptorpraider = unitTypes.RAIDER,
+		shipriot = unitTypes.RIOT,
+		shipskirm = unitTypes.SKIRMISHER,
+		shiparty = unitTypes.ARTILLERY,
+		shipaa = unitTypes.ANTI_AIR,
+		shipscout = unitTypes.WEIRD_RAIDER,
+		shipassault = unitTypes.ASSAULT,
 		-- No Ship HEAVY_SOMETHING (yet)
-		subraider = SPECIAL,
+		subraider = unitTypes.SPECIAL,
 	},
 	pw_bomberfac = {
-		bomberriot = RIOT,
-		bomberprec = ASSAULT,
-		bomberheavy = HEAVY_SOMETHING,
-		bomberdisarm = SPECIAL,
+		bomberriot = unitTypes.RIOT,
+		bomberprec = unitTypes.ASSAULT,
+		bomberheavy = unitTypes.HEAVY_SOMETHING,
+		bomberdisarm = unitTypes.SPECIAL,
 	},
 	pw_dropfac = {
-		gunshiptrans = SPECIAL,
-		gunshipheavytrans = UTILITY,
+		gunshiptrans = unitTypes.SPECIAL,
+		gunshipheavytrans = unitTypes.UTILITY,
 	},
 }
+
+-- Tweakunits support
+for unitName, factoryData in pairs(units) do
+	local ud = UnitDefNames[unitName]
+	if ud then
+		local cp = ud.customParams
+		for i = 1, #typeNamesLower do
+			local value = cp[typeNamesLower[i]]
+			if value then
+				factoryData[value] = unitTypes[typeNames[i]]
+			end
+		end
+	end
+end
 
 local function AddBuildQueue(name)
 	units[name] = {}
@@ -333,6 +371,7 @@ local tooltips = {
 	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
 	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
 	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
+	GOO_GATHER = "Puppy Goo (_STATE_)\n  Set when Puppies reclaim metal.",
 	DISABLE_ATTACK = "Allow attack commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
@@ -490,6 +529,14 @@ local overrides = {
 	[CMD_UNIT_KILL_SUBORDINATES] = {
 		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
 		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Kill")}
+	},
+	[CMD_GOO_GATHER] = {
+		texture = {imageDir .. 'states/goo_off.png', imageDir .. 'states/goo_on.png', imageDir .. 'states/goo_cloak.png'},
+		stateTooltip = {
+			tooltips.GOO_GATHER:gsub("_STATE_", "Off"),
+			tooltips.GOO_GATHER:gsub("_STATE_", "On except cloaked"),
+			tooltips.GOO_GATHER:gsub("_STATE_", "On always")
+		}
 	},
 	[CMD_DISABLE_ATTACK] = {
 		texture = {imageDir .. 'states/disableattack_off.png', imageDir .. 'states/disableattack_on.png'},

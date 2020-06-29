@@ -172,7 +172,7 @@ local function DoSomeHax()
 	Sleep(33)
 	local commands = Spring.GetCommandQueue(unitID, 0)
 	if commands == 0 then
-		Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+		Spring.GiveOrderToUnit(unitID, CMD.STOP, 0, 0)
 	end
 end
 

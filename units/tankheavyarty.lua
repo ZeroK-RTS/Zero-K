@@ -1,10 +1,10 @@
-unitDef = {
+return { tankheavyarty = {
   unitname               = [[tankheavyarty]],
   name                   = [[Tremor]],
   description            = [[Heavy Saturation Artillery Tank]],
-  acceleration           = 0.05952,
-  brakeRate              = 0.124,
-  buildCostMetal         = 1500,
+  acceleration           = 0.3,
+  brakeRate              = 1.24,
+  buildCostMetal         = 1600,
   builder                = false,
   buildPic               = [[tankheavyarty.png]],
   canGuard               = true,
@@ -17,8 +17,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[17]],
-    cus_noflashlight = 1,
+    modelradius       = [[17]],
+    cus_noflashlight  = 1,
+    selection_scale   = 0.92,
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -31,7 +32,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 2045,
   maxSlope               = 18,
-  maxVelocity            = 1.7,
+  maxVelocity            = 1.35,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK4]],
@@ -76,7 +77,7 @@ unitDef = {
     PLASMA = {
       name                    = [[Rapid-Fire Plasma Artillery]],
       accuracy                = 1400,
-      areaOfEffect            = 160,
+      areaOfEffect            = 140,
       avoidFeature            = false,
       avoidGround             = false,
       craterAreaOfEffect      = 5,
@@ -108,7 +109,7 @@ unitDef = {
       interceptedByShieldType = 1,
       myGravity               = 0.1,
       noSelfDamage            = false,
-      range                   = 1300,
+      range                   = 1220,
       reloadtime              = 0.333,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/tremor_fire]],
@@ -140,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankheavyarty = unitDef })
+} }

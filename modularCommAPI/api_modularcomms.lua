@@ -100,8 +100,6 @@ local function LoadCommData()
 					if not success then
 						err = playerCommProfileIDs
 						playerCommProfileIDs = {}
-					else
-						--playerCommProfileIDs = legacyTranslators.TranslatePlayerCustomkeys(playerCommProfileIDs)
 					end
 				end
 			end

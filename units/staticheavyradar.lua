@@ -1,4 +1,4 @@
-unitDef = {
+return { staticheavyradar = {
   unitname                      = [[staticheavyradar]],
   name                          = [[Advanced Radar]],
   description                   = [[Long-Range Radar]],
@@ -63,6 +63,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticheavyradar = unitDef })
+} }

@@ -38,6 +38,7 @@ local UPDATE_FREQUENCY = 25
 local growUnit = {}
 local offsets = {}
 local modelRadii = {}
+local noGrowUnitDefs = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -59,6 +60,9 @@ for i=1,#UnitDefs do
 	local aimPosOffset = ud.customParams.aimposoffset
 	local modelRadius  = ud.customParams.modelradius
 	local modelHeight  = ud.customParams.modelheight
+	if ud.customParams.no_grow then
+		noGrowUnitDefs[i] = true
+	end
 	if midPosOffset or aimPosOffset then
 		local mid = (midPosOffset and UnpackInt3(midPosOffset)) or {0,0,0}
 		local aim = (aimPosOffset and UnpackInt3(aimPosOffset)) or mid
@@ -139,8 +143,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spSetUnitRadiusAndHeight(unitID, mr.radius, mr.height)
 	end
 	
-	local buildProgress = select(5, spGetUnitHealth(unitID))
+	if noGrowUnitDefs[unitDefID] then
+		return
+	end
 	
+	local buildProgress = select(5, spGetUnitHealth(unitID))
 	if buildProgress > FULL_GROW then
 		return
 	end

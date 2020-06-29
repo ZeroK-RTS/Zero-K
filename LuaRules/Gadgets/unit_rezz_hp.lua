@@ -27,7 +27,7 @@ function gadget:GetInfo() return {
 	-- Engine multiplies rezzed unit HP by 0.05 just after UnitCreated so their HP has to be changed 1 frame later
 	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		if (builderID) then
-			if Spring.Utilities.GetUnitFirstCommand(builderID) == CMD_RESURRECT then
+			if Spring.GetUnitCurrentCommand(builderID) == CMD_RESURRECT then
 				--spSetUnitHealth(unitID, maxHealth)  -- does nothing, hp overwritten by engine
 
 				-- queue resurrected unit

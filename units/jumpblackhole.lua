@@ -1,9 +1,9 @@
-unitDef = {
+return { jumpblackhole = {
   unitname              = [[jumpblackhole]],
   name                  = [[Placeholder]],
   description           = [[Black Hole Launcher]],
-  acceleration          = 0.4,
-  brakeRate             = 1.2,
+  acceleration          = 1.2,
+  brakeRate             = 7.2,
   buildCostMetal        = 250,
   builder               = false,
   buildPic              = [[jumpblackhole.png]],
@@ -152,6 +152,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ jumpblackhole = unitDef })
+} }

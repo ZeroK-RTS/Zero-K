@@ -315,10 +315,12 @@ end
 
 local function KillOldChicken()
 	local now = spGetGameSeconds()
-	for unitID, birthDate in pairs(data.chickenBirths) do
-		local age = now - birthDate
-		if (age > maxAge + random(10)) then
-			Spring.DestroyUnit(unitID)
+	if data.chickenBirths then
+		for unitID, birthDate in pairs(data.chickenBirths) do
+			local age = now - birthDate
+			if (age > maxAge + random(10)) then
+				Spring.DestroyUnit(unitID)
+			end
 		end
 	end
 end
@@ -984,7 +986,7 @@ local function MorphQueen()
 	
 	-- perform switcheroo
 	data.queenID = nil
-	Spring.DestroyUnit(tempID, false, true)
+	Spring.DestroyUnit(tempID, false, true, tempID, true)
 	if data.morphed == true then
 		data.queenID = spCreateUnit(queenName, x, y, z, "n", queenOwner)
 	else
@@ -1148,7 +1150,7 @@ function gadget:GameFrame(n)
 			local chickens = spGetTeamUnits(chickenTeamID)
 			for i=1,#chickens do
 				local unitID = chickens[i]
-				if (not Spring.Utilities.GetUnitFirstCommand(unitID)) then
+				if not Spring.GetUnitCurrentCommand(unitID) then
 					--AttackNearestEnemy(unitID)
 					if (difficulty > 1) and (unitID == data.queenID) then
 						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, CMD.OPT_SHIFT)

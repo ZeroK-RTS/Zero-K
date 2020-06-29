@@ -1,9 +1,9 @@
-unitDef = {
+return { shieldarty = {
   unitname               = [[shieldarty]],
   name                   = [[Racketeer]],
   description            = [[Disarming Artillery]],
-  acceleration           = 0.25,
-  brakeRate              = 0.75,
+  acceleration           = 0.75,
+  brakeRate              = 4.5,
   buildCostMetal         = 350,
   buildPic               = [[SHIELDARTY.png]],
   canGuard               = true,
@@ -24,7 +24,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 780,
   maxSlope               = 36,
-  maxVelocity            = 1.8,
+  maxVelocity            = 1.7,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ shieldarty = unitDef })
+} }

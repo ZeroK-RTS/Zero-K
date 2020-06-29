@@ -1,4 +1,4 @@
-unitDef = {
+return { chicken_rafflesia = {
   unitname                      = [[chicken_rafflesia]],
   name                          = [[Rafflesia]],
   description                   = [[Chicken Shield (Static)]],
@@ -94,6 +94,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chicken_rafflesia = unitDef })
+} }

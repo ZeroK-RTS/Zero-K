@@ -233,7 +233,7 @@ function widget:Update(dt)
 		newTrackWait = newTrackWait + 1
 		local PlayerTeam = Spring.GetMyTeamID()
 		numVisibleEnemy = 0
-		local doods = Spring.GetVisibleUnits()
+		local doods = Spring.GetVisibleUnits(-1, nil, true)
 		for i=1,#doods do
 			if (Spring.IsUnitAllied(doods[i]) ~= true) then
 				numVisibleEnemy = numVisibleEnemy + 1

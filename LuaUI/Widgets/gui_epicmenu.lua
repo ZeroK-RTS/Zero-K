@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
-include("utility_two.lua") --contain file backup function
+local CheckLUAFileAndBackup = VFS.Include("LuaUI/file_backups.lua", nil, VFS.GAME)
 
 --CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
 --1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
@@ -53,7 +53,8 @@ do
 		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
 	end
 	--check for validity, backup or delete
-	CheckLUAFileAndBackup(keybind_dir .. keybind_file, '') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
+	CheckLUAFileAndBackup(keybind_dir .. keybind_file)
+
 	--load default keybinds:
 	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
 	local default_keybind_file = keybind_dir .. confdata.default_source_file
@@ -78,6 +79,7 @@ local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 -- Chili control classes
 local Chili
+local Control
 local Button
 local Label
 local Colorbars
@@ -165,7 +167,7 @@ local languages, flagByLang, langByFlag = VFS.Include("LuaUI/Headers/languages.l
 --    If so, it uses that command.
 -- Lastly, it checks uikeys.txt (read-only).
 
-include("keysym.h.lua")
+include("keysym.lua")
 local keysyms = {}
 for k, v in pairs(KEYSYMS) do
 	keysyms['' .. v] = k
@@ -1653,7 +1655,7 @@ local function SearchElement(termToSearch, path)
 	
 	local roughNumberOfHit = #filtered_pathOptions
 	if roughNumberOfHit == 0 then
-		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.postit}
+		tree_children[1] = Label:New{caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.postit}
 	elseif  roughNumberOfHit > maximumResult then
 		tree_children[1] = Label:New{caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.postit}
 		tree_children[2] = Label:New{caption = "- please navigate the menu to see all options -",  textColor = color.postit}
@@ -1834,7 +1836,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			local icon = option.icon
 			local numberPanel = Panel:New{
 				width = "100%",
-				height = 42,
+				height = 35,
 				backgroundColor = {0, 0, 0, 0},
 				padding = {0, 0, 0, 0},
 				margin = {0, 0, 0, 0},
@@ -1842,17 +1844,17 @@ MakeSubWindow = function(path, pause, labelScroll)
 				autosize = false,
 			}
 			if icon then
-				numberPanel:AddChild(Image:New{file = icon, width = 16, height = 16, x = 4, y = 7})
-				numberPanel:AddChild(Label:New{caption = option.name, textColor = color.sub_fg, x = 20, y = 7, HitTest = returnSelf})
+				numberPanel:AddChild(Image:New{file = icon, width = 16, height = 16, x = 4, y = 0})
+				numberPanel:AddChild(Label:New{caption = option.name, textColor = color.sub_fg, x = 20, y = 0, HitTest = returnSelf})
 			else
-				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 7, textColor = color.sub_fg, HitTest = returnSelf})
+				numberPanel:AddChild(Label:New{padding = {0, 0, 0, 0}, caption = option.name, tooltip = option.desc, y = 0, textColor = color.sub_fg, HitTest = returnSelf})
 			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
 			numberPanel:AddChild(
 				Trackbar:New{
-					y = 20,
+					y = 14,
 					width = "100%",
 					caption = option.name,
 					value = option.value,
@@ -1892,7 +1894,8 @@ MakeSubWindow = function(path, pause, labelScroll)
 			}
 			]]--
 		elseif option.type == 'radioButton' then
-			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header}
+			tree_children[#tree_children+1] = Control:New{height = 1, minHeight = 0, padding = {0, 0, 0, 0},}
+			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_header,}
 			for i = 1, #option.items do
 				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT
@@ -1909,10 +1912,10 @@ MakeSubWindow = function(path, pause, labelScroll)
 					round = true,
 				}
 				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey, nil, 2)
-					
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey, nil, 1)
+				
 			end
-			tree_children[#tree_children+1] = Label:New{caption = ''}
+			tree_children[#tree_children+1] = Control:New{height = 2, minHeight = 0, padding = {0, 6, 0, 0},}
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{caption = option.name, textColor = color.sub_fg}
@@ -2811,6 +2814,7 @@ function widget:Initialize()
 
 	-- setup Chili
 	Chili = WG.Chili
+	Control = Chili.Control
 	Button = Chili.Button
 	Label = Chili.Label
 	Colorbars = Chili.Colorbars

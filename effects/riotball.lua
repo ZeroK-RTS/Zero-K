@@ -55,7 +55,6 @@ return {
       },
     },
   },
-  
   ["riotball_small"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -86,7 +85,6 @@ return {
       },
     },
   },
-  
   ["riotball_dark"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -136,7 +134,6 @@ return {
       },
     },
   },
-  
   ["riotballplus"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -167,7 +164,6 @@ return {
       },
     },
   },
-  
   ["riotballplus2_purple"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -198,12 +194,9 @@ return {
       },
     },
   },
-  
-    
   ["riotballplus2_purple_limpet"] = {
     usedefaultexplosions = false,
-	
-	groundflash = {
+    groundflash = {
       circlealpha        = 1,
       circlegrowth       = 12,
       flashalpha         = 2.15,
@@ -229,9 +222,7 @@ return {
         ttl                = 22,
       },
     },
-	
   },
-  
   ["riotballgrav"] = {
     usedefaultexplosions = false,
     groundflash = {

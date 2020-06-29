@@ -176,9 +176,9 @@ local function GetCaptureWeaponPriorityModifier(unitID)
 		
 		local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
 		
-		local priority = stunned*2 + (15 * (1 - buildProgress))
+		local priority = stunned*2 + (30 * (1 - buildProgress))
 		if buildProgress < 1 then
-			priority = priority + 3
+			priority = priority + 15
 		end
 		
 		local overkill = GG.OverkillPrevention_IsDoomed(unitID)

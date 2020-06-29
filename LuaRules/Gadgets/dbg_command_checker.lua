@@ -45,12 +45,16 @@ local function HeavyCheck(cmd, line, words, player)
 	end
 end
 
+local SIZE_LIMIT = 10^8
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if heavyCheckEnabled and Spring.GetGameFrame() >= heavyCheckEnabled then
 		Spring.Utilities.UnitEcho(unitID, cmdID)
 		Spring.Echo("T", teamID, "C", cmdID)
 		Spring.Utilities.TableEcho(cmdParams, "cmdParams")
 		Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+		for i = 1, #cmdParams do
+			Spring.Echo("Param", i, cmdParams[i], cmdParams[i] < -SIZE_LIMIT or cmdParams[i] > SIZE_LIMIT)
+		end
 	elseif lightCheckEnabled then
 		Spring.Echo("T", teamID, "C", cmdID, "P", cmdParams and #cmdParams)
 	end

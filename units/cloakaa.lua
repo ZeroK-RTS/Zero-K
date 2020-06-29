@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakaa = {
   unitname               = [[cloakaa]],
   name                   = [[Gremlin]],
   description            = [[Cloaked Anti-Air Bot]],
-  acceleration           = 0.5,
-  brakeRate              = 0.32,
+  acceleration           = 1.5,
+  brakeRate              = 1.92,
   buildCostMetal         = 150,
   buildPic               = [[cloakaa.png]],
   canGuard               = true,
@@ -136,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakaa = unitDef })
+} }

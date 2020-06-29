@@ -1,7 +1,5 @@
-
 return {
-
-["sumosmoke"] = {
+  ["sumosmoke"] = {
     muzzlesmoke = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -30,8 +28,7 @@ return {
       },
     },
   },
-  
-   ["sumoland"] = {
+  ["sumoland"] = {
     dustcloud = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -87,7 +84,7 @@ return {
         texture            = [[debris2]],
       },
     },
-  fanny = {
+    fanny = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
@@ -99,5 +96,5 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-	},
+  },
 }

@@ -1,9 +1,9 @@
-unitDef = {
+return { vehassault = {
   unitname               = [[vehassault]],
   name                   = [[Ravager]],
   description            = [[Assault Rover]],
-  acceleration           = 0.027,
-  brakeRate              = 0.0385,
+  acceleration           = 0.135,
+  brakeRate              = 0.385,
   buildCostMetal         = 250,
   builder                = false,
   buildPic               = [[vehassault.png]],
@@ -100,7 +100,7 @@ unitDef = {
       soundStart              = [[weapon/cannon/medplasma_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 215,
+      weaponVelocity          = 225,
     },
 
   },
@@ -115,7 +115,7 @@ unitDef = {
       footprintZ       = 2,
       collisionVolumeOffsets = [[0 -5 0]],
       collisionVolumeScales  = [[42 42 42]],
-      collisionVolumeType    = [[ellipsoid]], 
+      collisionVolumeType    = [[ellipsoid]],
       object           = [[corraid_dead.s3o]],
     },
 
@@ -129,6 +129,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ vehassault = unitDef })
+} }

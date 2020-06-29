@@ -312,9 +312,9 @@ local validTexturePrefixes = {
 	["$"] = true
 }
 local function GetObjectMaterial(rendering, objectDefID)
-	local mat = rendering.bufMaterials[objectDefID]
-	if mat then
-		return mat
+	local cachedMat = rendering.bufMaterials[objectDefID]
+	if cachedMat then
+		return cachedMat
 	end
 
 
@@ -374,9 +374,9 @@ local function GetObjectMaterial(rendering, objectDefID)
 end
 
 local function GetObjectShadowMaterial(rendering, objectDefID)
-	local mat = rendering.bufShadowMaterials[objectDefID]
-	if mat then
-		return mat
+	local cachedMat = rendering.bufShadowMaterials[objectDefID]
+	if cachedMat then
+		return cachedMat
 	end
 
 

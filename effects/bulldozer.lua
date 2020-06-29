@@ -25,6 +25,7 @@ return {
       count                 = 4,
       ground                = true,
       water                 = true,
+      underwater            = true,
       properties = {
         length              = 55,
         width               = 86,
@@ -41,6 +42,7 @@ return {
       count                 = 1,
       ground                = true,
       water                 = true,
+      underwater            = true,
       properties = {
         alpha               = 0.2,
         color               = [[0,0.5,0.1]],
@@ -82,6 +84,7 @@ return {
       count                 = 5,
       ground                = true,
       water                 = true,
+      underwater            = true,
       properties = {
         airdrag             = 0.98,
         alwaysvisible       = true,
@@ -110,6 +113,7 @@ return {
       count                 = 1,
       ground                = true,
       water                 = true,
+      underwater            = true,
       properties = {
         airdrag             = 0.8,
         alwaysvisible       = true,
@@ -166,6 +170,7 @@ return {
       count                 = 10,
       ground                = true,
       water                 = true,
+      underwater            = true,
       properties = {
         airdrag             = 0.8,
         alwaysvisible       = true,
@@ -194,6 +199,7 @@ return {
       count              = 50,
       ground             = true,
       water              = true,
+      underwater            = true,
       properties = {
         delay              = [[5 r200]],
         explosiongenerator = [[custom:GREEN_VAPOR]],
@@ -261,6 +267,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 0 0 0.01 0.2 0.4 0.05 0.01 0 0 0 0.01]],

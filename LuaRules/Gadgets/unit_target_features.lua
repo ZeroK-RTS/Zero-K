@@ -66,16 +66,7 @@ local function WantAttackGround(unitID)
 		return true
 	end
 	
-	local cmdID, cp_3
-	if Spring.Utilities.COMPAT_GET_ORDER then
-		local queue = Spring.GetCommandQueue(unitID, 1)
-		if queue and queue[1] then
-			cmdID, cp_3 = queue[1].id, queue[1].params[3]
-		end
-	else
-		cmdID, _, _, _, _, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-	end
-		
+	local cmdID, _, _, _, _, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 	if not cmdID then
 		return false, true
 	end
@@ -125,20 +116,20 @@ end
 -- Callins
 
 function gadget:GameFrame(n)
-	local totalUnits = weaponUnits.GetIndexMax()
+	local totalUnits = IterableMap.GetIndexMax(weaponUnits)
 	if totalUnits > n%UPDATE_FREQUENCY then
 		local thisFrame = math.ceil(totalUnits/UPDATE_FREQUENCY)
 		for i = 1, thisFrame do
-			local unitID, unitData = weaponUnits.Next()
+			local unitID, unitData = IterableMap.Next(weaponUnits)
 			if UpdateTargets(unitID, unitData) then
-				weaponUnits.Remove(unitID)
+				IterableMap.Remove(weaponUnits, unitID)
 			end
 		end
 	end
 end
 
 local function AddUnit(unitID, unitDefID)
-	weaponUnits.Add(unitID, {
+	IterableMap.Add(weaponUnits, unitID, {
 		weaponData = {
 			count = weaponCounts[unitDefID],
 			ignoreGround = ignoreGroundWeapons[unitDefID],
@@ -149,7 +140,7 @@ end
 
 function GG.UnitSetGroundTarget(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID and weaponCounts[unitDefID] and not weaponUnits.Get(unitID) then
+	if unitDefID and weaponCounts[unitDefID] and not IterableMap.Get(weaponUnits, unitID) then
 		AddUnit(unitID, unitDefID)
 	end
 end
@@ -163,7 +154,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		return true
 	end
 	
-	if cmdID == CMD.ATTACK and #cmdParams > 2 and not weaponUnits.Get(unitID) then
+	if cmdID == CMD.ATTACK and #cmdParams > 2 and not IterableMap.Get(weaponUnits, unitID) then
 		AddUnit(unitID, unitDefID)
 	end
 	
@@ -175,6 +166,6 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if weaponCounts[unitDefID] then
-		weaponUnits.Remove(unitID)
+		IterableMap.Remove(weaponUnits, unitID)
 	end
 end

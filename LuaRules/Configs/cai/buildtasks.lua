@@ -354,9 +354,10 @@ factionBuildConfig = {
 				
 				[3] = { -- raider
 					importanceMult = 1,
-					count = 2,
+					count = 3,
 					[1] = {ID = UnitDefNames['hoverraid'].id, chance = 0.5},
-					[2] = {ID = UnitDefNames['hoverassault'].id, chance = 0.5},
+					[2] = {ID = UnitDefNames['hoverheavyraid'].id, chance = 0.3},
+					[3] = {ID = UnitDefNames['hoverassault'].id, chance = 0.2},
 				},
 				
 				[4] = { -- arty

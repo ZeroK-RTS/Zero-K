@@ -53,9 +53,9 @@ LayoutPanel = Control:Inherit{
 	centerItems   = true,
 
 	--[[ takes weights into account when resizing items (instead of same size for all)
- 			- e.g. "component1.weight = 1, component2.weight = 2" => component2 will be 2 times larger than component1
- 			- if all components have same weight - > same layout as without weightedResize
- 			- default value is 1 (nil interpreted as 1)
+			- e.g. "component1.weight = 1, component2.weight = 2" => component2 will be 2 times larger than component1
+			- if all components have same weight - > same layout as without weightedResize
+			- default value is 1 (nil interpreted as 1)
 	]]
 	weightedResize = false,
 
@@ -431,8 +431,8 @@ function LayoutPanel:_LayoutChildrenResizeItems()
 	local max_iy = math.floor(self.clientArea[4] / self.minItemHeight)
 
 	if (max_ix * max_iy < cn_count)   or
- 		(max_ix < (self.columns or 0)) or
- 		(max_iy < (self.rows or 0))
+		(max_ix < (self.columns or 0)) or
+		(max_iy < (self.rows or 0))
 	then
 		--FIXME add autoEnlarge/autoAdjustSize?
 		--error"LayoutPanel: not enough space"

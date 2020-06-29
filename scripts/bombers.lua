@@ -23,7 +23,7 @@ local function ReloadQueue(queue, cmdTag)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local firestate = Spring.GetUnitStates(unitID).firestate
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 0, 0)
 	Spring.GiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	for i=start,#queue do
 		local cmd = queue[i]
@@ -35,7 +35,7 @@ local function ReloadQueue(queue, cmdTag)
 		local cmd = queue[1]
 		spGiveOrderToUnit(unitID, cmd.id, cmd.params, CMD.OPT_SHIFT)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, firestate, 0)
 	
 	return re
 end
@@ -51,13 +51,13 @@ local function ReloadQueue(queue, cmd)
 	-- workaround for RemoveCommand not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local firestate = Spring.GetUnitStates(unitID).firestate
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
-	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 0, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmd.tag, 0)
 	
 	if re then
 		spGiveOrderToUnit(unitID, cmd.id, cmd.params, CMD.OPT_SHIFT)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, firestate, 0)
 	
 	return re
 end

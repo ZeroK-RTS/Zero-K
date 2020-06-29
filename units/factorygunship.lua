@@ -1,4 +1,4 @@
-unitDef = {
+return { factorygunship = {
   unitname                      = [[factorygunship]],
   name                          = [[Gunship Plant]],
   description                   = [[Produces Gunships, Builds at 10 m/s]],
@@ -61,7 +61,7 @@ unitDef = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[CORPLAS.s3o]],
+  objectName                    = [[factorygunship.s3o]],
   script                        = [[factorygunship.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
@@ -78,8 +78,8 @@ unitDef = {
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 7,
-      footprintZ       = 6,
-      object           = [[corplas_dead.s3o]],
+      footprintZ       = 7,
+      object           = [[factorygunship_dead.s3o]],
       collisionVolumeOffsets        = [[0 -20 0]],
       collisionVolumeScales         = [[86 86 86]],
       collisionVolumeType           = [[ellipsoid]],
@@ -95,6 +95,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ factorygunship = unitDef })
+} }

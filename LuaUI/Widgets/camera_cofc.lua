@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-include("keysym.h.lua")
+include("keysym.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
@@ -1259,7 +1259,7 @@ end
 local function DriftToCenter(cs, gx, gy, gz, mx, my)
 	if options.drifttocenter.value then
 		mx = mx + (mx - vsx/2)/(vsx/2) * horizAspectCorrectionFactor * centerDriftFactor --Seems to produce the same apparent size on centered object independent of FOV
-	 	my = my + (my - vsy/2)/(vsy/2) * vertAspectCorrectionFactor * centerDriftFactor
+		my = my + (my - vsy/2)/(vsy/2) * vertAspectCorrectionFactor * centerDriftFactor
 		local dirx, diry, dirz = Spring.GetPixelDir(mx, vsy - my)
 		local distanceFactor = 0
 		if diry ~= 0 then
@@ -1705,15 +1705,15 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	end
 end
 
-local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
+local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 	local cs = GetTargetCameraState()
 	local cs1 = cs
 	lastMouseX = nil
 	if cs.rx then
 		
 		local trfactor = (tilt and options.tiltfactor.value or options.rotatefactor.value) / 2000
-		cs.rx = cs.rx + dy * trfactor
-		cs.ry = cs.ry - dx * trfactor
+		cs.rx = cs.rx + rdy * trfactor
+		cs.ry = cs.ry - rdx * trfactor
 		
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
@@ -1731,11 +1731,11 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 			-- SetLockSpot2(cs) --set lockspot to middle of screen
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then
-				local x,y,z = spGetUnitPosition( selUnits[1] )
-				if x then --set lockspot to the unit
-					ls_x,ls_y,ls_z = x,y,z
+				local ux, uy, uz = spGetUnitPosition( selUnits[1] )
+				if ux then --set lockspot to the unit
+					ls_x,ls_y,ls_z = ux,uy,uz
 					local px,py,pz = cs.px,cs.py,cs.pz
-					local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+					local dx,dy,dz = ux-px, uy-py, uz-pz
 					ls_onmap = true
 					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
 					ls_have = true
@@ -2665,7 +2665,7 @@ local spGetUnitGroup = Spring.GetUnitGroup
 local spGetGroupList  = Spring.GetGroupList
 
 
---include("keysym.h.lua")
+--include("keysym.lua")
 local previousGroup =99
 local currentIteration = 1
 local currentIterations = {}

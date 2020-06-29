@@ -1,9 +1,9 @@
-unitDef = {
+return { hoverminer = {
   unitname            = [[hoverminer]],
   name                = [[Dampener]],
   description         = [[Minelaying Hover]],
-  acceleration        = 0.0435,
-  brakeRate           = 0.205,
+  acceleration        = 0.2175,
+  brakeRate           = 2.05,
   buildCostMetal      = 200,
   builder             = false,
   buildPic            = [[hoverminer.png]],
@@ -123,6 +123,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverminer = unitDef })
+} }

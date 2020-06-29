@@ -14,7 +14,7 @@ local turnSpeed = math.rad(20)
 
 local isWind, baseWind, rangeWind
 
-function BobTidal()
+local function BobTidal()
 	baseDirection = baseDirection + math.random(0,math.rad(2))
 	while true do
 		Turn(cradle, y_axis, baseDirection, math.rad(1))

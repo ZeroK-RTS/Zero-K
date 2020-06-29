@@ -1,9 +1,9 @@
-unitDef = {
+return { cloakheavyraid = {
   unitname               = [[cloakheavyraid]],
   name                   = [[Scythe]],
   description            = [[Cloaked Raider Bot]],
-  acceleration           = 0.5,
-  brakeRate              = 0.3,
+  acceleration           = 1.5,
+  brakeRate              = 1.8,
   buildCostMetal         = 250,
   buildPic               = [[cloakheavyraid.png]],
   canGuard               = true,
@@ -143,6 +143,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakheavyraid = unitDef })
+} }

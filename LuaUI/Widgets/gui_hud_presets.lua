@@ -225,9 +225,9 @@ local function SetupMissionGUI(preset)
 	elseif (preset == "newMinimapLeft") then
 		persistentY = 32 + screenHeight * 0.2	-- thin menu bar height + console height
 	elseif (preset == "ensemble") then
-		persistentY = 50	-- menu bar height
+		persistentY = 50 -- menu bar height
 	elseif (preset == "crafty") then
-		persistentY = 100	-- approximate resbar height
+		persistentY = 100 -- approximate resbar height
 	end
 	
 	-- mission persistent messagebox

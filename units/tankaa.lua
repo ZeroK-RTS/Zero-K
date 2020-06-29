@@ -1,9 +1,9 @@
-unitDef = {
+return { tankaa = {
   unitname               = [[tankaa]],
   name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
-  acceleration           = 0.05952,
-  brakeRate              = 0.14875,
+  acceleration           = 0.3,
+  brakeRate              = 1.5,
   buildCostMetal         = 500,
   builder                = false,
   buildPic               = [[tankaa.png]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankaa = unitDef })
+} }

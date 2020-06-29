@@ -1,11 +1,11 @@
-unitDef = {
+return { striderdetriment = {
   unitname               = [[striderdetriment]],
   name                   = [[Detriment]],
   description            = [[Ultimate Assault Strider]],
-  acceleration           = 0.1092,
+  acceleration           = 0.328,
   activateWhenBuilt      = true,
   autoheal               = 30,
-  brakeRate              = 0.2392,
+  brakeRate              = 1.435,
   buildCostMetal         = 20000,
   builder                = false,
   buildPic               = [[striderdetriment.png]],
@@ -172,54 +172,6 @@ unitDef = {
       weaponVelocity          = 2200,
     },
 
-    DISRUPTOR = {
-      name                    = [[Disruptor Pulse Beam]],
-      areaOfEffect            = 32,
-      beamdecay               = 0.95,
-      beamTime                = 1/30,
-      beamttl                 = 90,
-      coreThickness           = 0.25,
-      craterBoost             = 0,
-      craterMult              = 0,
-  
-      customParams            = {
-        --timeslow_preset = [[module_disruptorbeam]],
-        timeslow_damagefactor = [[2]],
-        reaim_time = 1,
-      },
-      
-      damage                  = {
-        default = 600,
-      },
-  
-      explosionGenerator      = [[custom:flash2purple]],
-      fireStarter             = 30,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 4.33,
-      minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 2,
-      rgbColor                = [[0.3 0 0.4]],
-      soundStart              = [[weapon/laser/heavy_laser5]],
-      soundStartVolume        = 3,
-      soundTrigger            = true,
-      sweepfire               = false,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 18,
-      tolerance               = 18000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,
-    },
-    
     TRILASER = {
       name                    = [[High-Energy Laserbeam]],
       areaOfEffect            = 14,
@@ -283,6 +235,8 @@ unitDef = {
         gatherradius = [[180]],
         smoothradius = [[120]],
         smoothmult   = [[0.25]],
+        smoothexponent = [[0.45]],
+        movestructures = [[1]],
         
         light_color = [[1 1.4 0.35]],
         light_radius = 400,
@@ -339,6 +293,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderdetriment = unitDef })
+} }

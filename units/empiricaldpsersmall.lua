@@ -1,4 +1,4 @@
-unitDef = {
+return { empiricaldpsersmall = {
   unitname                = [[empiricaldpsersmall]],
   name                    = [[Empirical DPS thing (small)]],
   description             = [[Shoot at it for science.]],
@@ -28,6 +28,4 @@ unitDef = {
   useBuildingGroundDecal  = true,
   workerTime              = 0,
   yardMap                 = [[yyyy]],
-}
-
-return lowerkeys({ empiricaldpsersmall = unitDef })
+} }

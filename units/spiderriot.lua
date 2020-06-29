@@ -1,9 +1,9 @@
-unitDef = {
+return { spiderriot = {
   unitname               = [[spiderriot]],
   name                   = [[Redback]],
   description            = [[Riot Spider]],
-  acceleration           = 0.22,
-  brakeRate              = 0.66,
+  acceleration           = 0.66,
+  brakeRate              = 3.96,
   buildCostMetal         = 240,
   buildPic               = [[spiderriot.png]],
   canGuard               = true,
@@ -83,7 +83,7 @@ unitDef = {
       laserFlareSize          = 7.5,
       minIntensity            = 1,
       range                   = 300,
-      reloadtime              = 0.3 + 1/30,
+      reloadtime              = 0.3,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 6,
@@ -114,6 +114,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ spiderriot = unitDef })
+} }

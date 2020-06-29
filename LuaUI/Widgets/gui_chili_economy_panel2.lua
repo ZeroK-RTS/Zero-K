@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 local MIN_STORAGE = 0.5
 
@@ -100,6 +100,7 @@ local blinkM_status = false
 local blinkE_status = false
 local excessE = false
 local flashModeEnabled = true
+local externalForceHide = false
 
 local strings = {
 	local_metal_economy = "",
@@ -186,7 +187,11 @@ local function option_recreateWindow()
 			return false
 		end
 	end
-		
+	
+	if externalForceHide then
+		return false
+	end
+	
 	CreateWindow(x,y,w,h)
 	return true
 end
@@ -587,12 +592,15 @@ local function Format(input, override)
 	end
 end
 
+local  metalWarnOpt = options.metalWarning
+local energyWarnOpt = options.energyWarning
+
 local initialReserveSet = false
 function widget:GameFrame(n)
 
 	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then
-        return
-    end
+		return
+	end
 	
 	if not window then
 		if not option_recreateWindow() then
@@ -732,8 +740,10 @@ function widget:GameFrame(n)
 	end
 
 	-- Warnings
-	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
-	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or ((not metalWarning) and eStor <= 1 and eInco < mInco)
+	local  metalWarnLevel =  metalWarnOpt.value
+	local energyWarnLevel = energyWarnOpt.value
+	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
 	
@@ -898,7 +908,7 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 		width  = 200,
 		caption = text,
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		parent = holder,
@@ -951,7 +961,7 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 		width  = "90%",
 		caption = strings.resbar_no_storage,
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		parent = holder,
@@ -1026,6 +1036,7 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
+	externalForceHide = not newVisibility
 	if dispose then
 		local x,y,w,h = DestroyWindow()
 		if newVisibility then
@@ -1234,7 +1245,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
@@ -1383,7 +1394,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}

@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		version   = "v1.1",
 		date      = "November 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = -math.huge + 5,
+		layer     = -999999, -- after start_boxes (NB: can't apply arithmetic to math.huge), but before everything else
 		enabled   = true
 	}
 end

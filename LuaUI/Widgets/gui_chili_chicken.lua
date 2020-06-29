@@ -51,11 +51,11 @@ local waveTime
 --------------------------------------------------------------------------------
 
 -- include the unsynced (widget) config data
-local file 				= LUAUI_DIRNAME .. 'Configs/chickengui_config.lua'
-local configs 			= VFS.Include(file, nil, VFS.RAW_FIRST)
---local difficulties 		= configs.difficulties
-local roostName 		= configs.roostName
-local chickenColorSet 	= configs.colorSet
+local file              = LUAUI_DIRNAME .. 'Configs/chickengui_config.lua'
+local configs           = VFS.Include(file, nil, VFS.ZIP)
+--local difficulties    = configs.difficulties
+local roostName         = configs.roostName
+local chickenColorSet   = configs.colorSet
 
 local chickenNamesPlural = {}
 for chickenName, color in pairs(chickenColorSet) do

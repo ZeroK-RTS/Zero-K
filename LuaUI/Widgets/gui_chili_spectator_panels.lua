@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
@@ -604,7 +604,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		height = incomeHeight,
 		caption = "0.0",
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = options.resourceMainFontSize.value,
@@ -623,7 +623,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		height = textHeight,
 		caption = "OD: 0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.resourceFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
@@ -636,7 +636,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		height = textHeight,
 		caption = "Re: 0",
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {size = options.resourceFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
@@ -785,7 +785,7 @@ local function CreatePlayerWindow()
 		bottom = texBottom,
 		caption = GetTimeString(),
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize),
@@ -804,7 +804,7 @@ local function CreatePlayerWindow()
 		bottom = texBottom,
 		caption = allyTeamData[1].name,
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {
 			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize),
@@ -823,7 +823,7 @@ local function CreatePlayerWindow()
 		bottom = texBottom,
 		caption = allyTeamData[2].name,
 		valign = "center",
- 		align  = "right",
+		align  = "right",
 		autosize = false,
 		font   = {
 			size = math.round(options.playerMainFontSize.value*allyTeamData[2].nameSize),
@@ -842,7 +842,7 @@ local function CreatePlayerWindow()
 		bottom = texBottom,
 		caption = allyTeamData[1].winString,
 		valign = "center",
- 		align  = "left",
+		align  = "left",
 		autosize = false,
 		font   = {
 			size = options.playerMainFontSize.value,
@@ -861,7 +861,7 @@ local function CreatePlayerWindow()
 		bottom = texBottom,
 		caption = allyTeamData[2].winString,
 		valign = "center",
- 		align  = "right",
+		align  = "right",
 		autosize = false,
 		font   = {
 			size = options.playerMainFontSize.value,
@@ -958,6 +958,7 @@ function option_CheckEnable(self)
 			RemovePlayerWindow()
 			RemoveEconomyWindows()
 			enabled = false
+			WG.SpectatorPanels_enabled = false
 		end
 		return false
 	end
@@ -968,17 +969,20 @@ function option_CheckEnable(self)
 			RemovePlayerWindow()
 			RemoveEconomyWindows()
 			enabled = false
+			WG.SpectatorPanels_enabled = false
 		end
 		return false
 	end
 	
 	if enabled then
+		WG.SpectatorPanels_enabled = true
 		return true
 	end
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
 		enabled = false
+		WG.SpectatorPanels_enabled = false
 		return false
 	end
 	
@@ -993,6 +997,7 @@ function option_CheckEnable(self)
 	option_UpdateFonts()
 
 	enabled = true
+	WG.SpectatorPanels_enabled = true
 	return true
 end
 
@@ -1024,7 +1029,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Shutdown()
-	--window:Dispose()
+	WG.SpectatorPanels_enabled = false
 end
 
 function widget:PlayerChanged(pID)

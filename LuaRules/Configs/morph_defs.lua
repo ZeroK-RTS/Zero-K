@@ -31,19 +31,38 @@ local baseComMorph = {
 --------------------------------------------------------------------------------
 -- customparams
 --------------------------------------------------------------------------------
-for i=1,#UnitDefs do
+
+for i = 1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local cp = ud.customParams
 	local name = ud.name
-	local morphTo = cp.morphto
-	if morphTo then
+
+	local morphList = (cp.morphto_1 and true) or false
+	local index = 1
+	local append = (morphList and ("_" .. index)) or ""
+
+	while true do
+		local morphTo = cp["morphto" .. append]
+		if not morphTo then
+			break
+		end
+		
 		local targetDef = UnitDefNames[morphTo]
 		morphDefs[name] = morphDefs[name] or {}
 		morphDefs[name][#morphDefs[name] + 1] = {
 			into = morphTo,
-			time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
-			combatMorph = cp.combatmorph == "1",
+			time = cp["morphtime" .. append] or (cp["level" .. append] and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp["level" .. append] + 1)))),	-- or 30,
+			metal = tonumber(cp["morphcost" .. append]),
+			energy = tonumber(cp["morphcost" .. append]),
+			combatMorph = (cp["combatmorph" .. append] == "1"),
 		}
+		
+		if morphList then
+			index = index + 1
+			append = ("_" .. index)
+		else
+			break
+		end
 	end
 end
 
@@ -213,7 +232,7 @@ local function BuildMorphDef(udSrc, morphData)
 		newData.into = udDst.id
 		newData.time = morphData.time or math.floor(unitDef.buildTime*7/UPGRADING_BUILD_SPEED)
 		newData.increment = (1 / (30 * newData.time))
-		newData.metal	= morphData.metal or DefCost('metalCost', udSrc, udDst)
+		newData.metal = morphData.metal or DefCost('metalCost', udSrc, udDst)
 		newData.energy = morphData.energy or DefCost('energyCost', udSrc, udDst)
 		newData.combatMorph = morphData.combatMorph or false
 		newData.resTable = {
@@ -221,6 +240,7 @@ local function BuildMorphDef(udSrc, morphData)
 			e = (newData.increment * newData.energy)
 		}
 		newData.facing = morphData.facing
+		newData.tooltip = 'Morph ' .. newData.into .. ' ' .. newData.time .. ' ' .. newData.metal
 
 		MAX_MORPH = MAX_MORPH + 1 -- CMD_MORPH is the "generic" morph command. "Specific" morph command start at CMD_MORPH+1
 		newData.cmd = CMD_MORPH + MAX_MORPH
@@ -236,7 +256,6 @@ local function BuildMorphDef(udSrc, morphData)
 		GG.MorphInfo["MAX_MORPH"] = MAX_MORPH
 
 		newData.texture = morphData.texture
-		newData.text = morphData.text
 		return newData
 	end
 end

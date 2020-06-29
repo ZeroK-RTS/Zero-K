@@ -44,7 +44,7 @@ end
 
 local function count_leading_ones(num)
 	return
-	 	((math.bit_and(num, 0xF0) == 0xF0) and 4)
+		((math.bit_and(num, 0xF0) == 0xF0) and 4)
 	or ((math.bit_and(num, 0xE0) == 0xE0) and 3)
 	or ((math.bit_and(num, 0xC0) == 0xC0) and 2)
 	or ((math.bit_and(num, 0x80) == 0x80) and 1)

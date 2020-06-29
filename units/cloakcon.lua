@@ -1,10 +1,10 @@
-unitDef = {
+return { cloakcon = {
   unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
   description            = [[Cloaked Construction Bot, Builds at 5 m/s]],
-  acceleration           = 0.5,
+  acceleration           = 1.5,
   activateWhenBuilt      = true,
-  brakeRate              = 1.5,
+  brakeRate              = 9.0,
   buildCostMetal         = 120,
   buildDistance          = 128,
   builder                = true,
@@ -27,6 +27,17 @@ unitDef = {
   customParams           = {
     modelradius    = [[14]],
     cus_noflashlight = 1,
+
+    area_cloak = 1,
+	area_cloak_init = 0,
+    area_cloak_upkeep = 8,
+    area_cloak_radius = 192,
+    area_cloak_decloak_distance = 75,
+    area_cloak_self_decloak_distance = 192,
+    area_cloak_grow_rate = 350,
+    area_cloak_shrink_rate = 1400,
+
+    priority_misc = 2, -- High
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -37,15 +48,15 @@ unitDef = {
   idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
-  maxDamage              = 450,
+  maxDamage              = 600,
   maxSlope               = 36,
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],
-  radarDistanceJam       = 256,
-    script                 = [[cloakcon.lua]],
+  radarDistanceJam       = 192,
+  script                 = [[cloakcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 375,
@@ -77,6 +88,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ cloakcon = unitDef })
+} }

@@ -48,8 +48,8 @@ function gadget:Initialize()
 	GG.TerrainTexture = TerrainTextureFunctions
 end
 
-function GG.Terrain_Texture_changeBlockList(blockList)
-	_G.SentBlockList = blockList
+function GG.Terrain_Texture_changeBlockList(blockX, blockZ, blockTex)
+	_G.SentBlockList = {blockX, blockZ, blockTex}
 	SendToUnsynced("changeBlockList")
 end
 
@@ -61,7 +61,7 @@ function gadget:Load(zip)
 
 	local loadData = GG.SaveLoad.ReadFile(zip, "Terrain Texture", SAVE_FILE) or {}
 	if loadData and #loadData > 0 then
-		GG.Terrain_Texture_changeBlockList(loadData)
+		GG.Terrain_Texture_changeBlockList(loadData1[1], loadData1[2], loadData1[3])
 	end
 	SendToUnsynced("UpdateAll")
 end
@@ -160,9 +160,7 @@ local function ChangeTextureBlock(x, z, myTex)
 			blockMap[x][z] = nil
 			blockList.data[blockList.count] = nil
 			blockList.count = blockList.count - 1
-		elseif myTex == otherTex then
-			-- There is nothing to do, changes are the same.
-		else
+		elseif myTex ~= otherTex then
 			-- Replace pending change
 			blockList.data[otherIndex].tex = myTex
 		end
@@ -197,8 +195,11 @@ end
 local function changeBlockList()
 	local blockList = SYNCED.SentBlockList
 	if type(blockList) == "table" then
-		for i, v in spairs(blockList) do
-			ChangeTextureBlock(v.x, v.z, v.tex)
+		local blockX, blockZ, blockTex = blockList[1], blockList[2], blockList[3]
+		local i = 1
+		while blockX[i] do
+			ChangeTextureBlock(blockX[i], blockZ[i], blockTex[i])
+			i = i + 1
 		end
 	end
 end
@@ -276,7 +277,7 @@ function gadget:DrawGenesis()
 				end
 				
 				if not mapTex[sx][sz] then
-					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz] 
+					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz]
 							and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
 						mapTex[sx][sz] = {
 							orig = GG.mapgen_squareTexture[sx][sz],
@@ -439,11 +440,15 @@ function gadget:Save(zip)
 		return
 	end
 	
-	local blockList = {}
+	local blockX = {}
+	local blockZ = {}
+	local blockTex = {}
 	-- Save the current texture
 	for x, rest in pairs(blockStateMap) do
 		for z, tex in pairs(rest) do
-			table.insert(blockList, {x = x, z = z, tex = tex})
+			blockX[#blockX + 1] = x
+			blockZ[#blockZ + 1] = z
+			blockTex[#blockTex + 1] = tex
 		end
 	end
 	
@@ -453,11 +458,14 @@ function gadget:Save(zip)
 			local chunkBlocks = chunk.blockList
 			for i = 1, chunkBlocks.count do
 				local b = chunkBlocks.data[i]
-				table.insert(blockList, {x = b.x, z = b.z, tex = b.tex})
+				blockX[#blockX + 1] = b.x
+				blockZ[#blockZ + 1] = b.z
+				blockTex[#blockTex + 1] = b.tex
 			end
 		end
 	end
-
+	
+	local saveData = {blockX, blockZ, blockTex}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(blockList, "Terrain Texture"))
 end
 

@@ -1,4 +1,4 @@
-unitDef = {
+return { roost = {
   unitname          = [[roost]],
   name              = [[Roost]],
   description       = [[Spawns Chicken]],
@@ -114,6 +114,4 @@ unitDef = {
   featureDefs       = {
   },
 
-}
-
-return lowerkeys({ roost = unitDef })
+} }

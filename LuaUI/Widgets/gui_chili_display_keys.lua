@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 local keyData, mouseData
 
@@ -87,7 +87,7 @@ local function InitializeDisplayLabelControl(name)
 		bottom = 12,
 		caption = "",
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 36,
@@ -186,7 +186,7 @@ local function InitializeMouseButtonControl(name)
 		right  = 10,
 		bottom = 12,
 		caption = "",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 36,
@@ -202,7 +202,7 @@ local function InitializeMouseButtonControl(name)
 		right  = 10,
 		bottom = 12,
 		caption = "",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 36,

@@ -79,6 +79,11 @@
 		"description" : "Fast Attack Hovercraft",
 		"helptext" : "The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets."
 	},
+	"hoverheavyraid" : {
+		"name" : "Bolas",
+		"description" : "Disruptor Hovercraft",
+		"helptext" : "The Bolas is a heavy raider hovercraft armed with a rapid-fire disruptor beam. While its damage output is quite noticeable, it works even better alongside Maces or Scalpels to hit the slowed-down enemies harder."
+	},
 	"chicken_digger" : {
 		"name" : "Digger",
 		"description" : "Burrowing Scout/Raider",
@@ -516,7 +521,7 @@
 	},
 	"gunshipbomb" : {
 		"name" : "Blastwing",
-		"description" : "Flying Bomb (Burrows)",
+		"description" : "Flying Bomb/Scout (Burrows)",
 		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"napalmmissile" : {
@@ -606,7 +611,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Jumpjet Constructor, Builds at 4 m/s",
+		"description" : "Jumpjet Constructor, Builds at 5 m/s",
 		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
 	},
 	"chicken_blimpy" : {
@@ -767,7 +772,7 @@
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",
-		"helptext" : "The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal."
+		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"vehaa" : {
 		"name" : "Crasher",
@@ -806,7 +811,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s",
+		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
 		"helptext" : "The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land."
 	},
 	"spiderriot" : {
@@ -908,11 +913,6 @@
 		"name" : "Zephyr",
 		"description" : "Anti-Air Frigate",
 		"helptext" : "With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
-	},
-	"shiptransport" : {
-		"name" : "Surfboard",
-		"description" : "Transport Platform",
-		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
 	},
 	"shipheavyarty" : {
 		"name" : "Shogun",
@@ -1052,7 +1052,7 @@
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
-		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance."
+		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance. It can also enable a short-range cloaking field, which unlike the aforementioned abilities costs energy to maintain."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",
@@ -1071,7 +1071,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Construction Aircraft, Builds at 4 m/s",
+		"description" : "Construction Aircraft, Builds at 5 m/s",
 		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
 	},
 	"gunshipraid" : {

@@ -40,7 +40,36 @@ return {
       },
     },
   },
-  
+  ["flamer_koda"] = {
+    fire = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.95,
+        colormap           = [[0.7 0.7 0.7 0.01  1 0.5 0.5 0.5   0 0 0 0]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 0,
+        emitvector         = [[dir]],
+        gravity            = [[0.15 r-0.3, 0.2 r-0.3, 0.15 r-0.3]],
+        numparticles       = 1,
+        particlelife       = 8,
+        particlelifespread = 5,
+        particlesize       = 8,
+        particlesizespread = 4,
+        particlespeed      = 0.1,
+        particlespeedspread = 0.1,
+        pos                = [[6 r-12, 6 r-12, 6 r-12]],
+        sizegrowth         = 0.7,
+        sizemod            = 1.0,
+        texture            = [[flame]],
+      },
+    },
+  },
+
   ["gravityless_flamer"] = {
     fire = {
       air                = true,
@@ -71,7 +100,7 @@ return {
       },
     },
   },
-  
+
   ["fire1_burn1_flame1"] = {
     fire = {
       air                = true,

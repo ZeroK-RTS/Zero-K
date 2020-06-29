@@ -508,7 +508,7 @@ function DrawRepeatingTiledWindow(obj)
 	gl.Texture(0, false)
 
 	if (obj.caption) and not obj.noFont then
- 		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
+		_GetControlFont(obj):Print(obj.caption, w*0.5, 9, "center")
 	end
 end
 
@@ -1253,6 +1253,9 @@ function DrawTreeviewNodeTree(self)
 	local image = self.ImageExpanded or self.treeview.ImageExpanded
 	if (not self.expanded) then
 		image = self.ImageCollapsed or self.treeview.ImageCollapsed
+		if self.highlight and (self.ImageHighlight or self.treeview.ImageHighlight) then
+			image = self.ImageHighlight or self.treeview.ImageHighlight
+		end
 	end
 
 	TextureHandler.LoadTexture(0, image, self)

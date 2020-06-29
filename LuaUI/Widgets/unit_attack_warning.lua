@@ -17,7 +17,7 @@ local lastWarning = 0			--in frames
 local localTeamID = Spring.GetLocalTeamID ()
 
 local under_attack_translation
-function languageChanged ()
+local function languageChanged ()
 	under_attack_translation = WG.Translate ("interface", "unit_under_attack")
 end
 

@@ -68,7 +68,6 @@ options = {
 	showpriority = {
 		name = "Priority state visibility",
 		desc = "When to show an icon for prioritized units.",
-		type = 'bool',
 		type = 'radioButton',
 		value = 'shift',
 		items = {
@@ -94,7 +93,7 @@ options = {
 	},
 }
 
-include("keysym.h.lua")
+include("keysym.lua")
 
 local imageDir = 'LuaUI/Images/commands/'
 local fireStateIcons = {

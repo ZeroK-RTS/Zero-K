@@ -1,10 +1,10 @@
-unitDef = {
+return { hoverriot = {
   unitname            = [[hoverriot]],
   name                = [[Mace]],
   description         = [[Riot Hover]],
-  acceleration        = 0.03,
+  acceleration        = 0.14,
   activateWhenBuilt   = true,
-  brakeRate           = 0.036,
+  brakeRate           = 0.36,
   buildCostMetal      = 400,
   builder             = false,
   buildPic            = [[hoverriot.png]],
@@ -18,6 +18,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    selection_scale   = 0.92,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -28,7 +29,7 @@ unitDef = {
   idleTime            = 1800,
   maxDamage           = 1300,
   maxSlope            = 36,
-  maxVelocity         = 2.2,
+  maxVelocity         = 2.05,
   minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
   noAutoFire          = false,
@@ -49,7 +50,7 @@ unitDef = {
   sightDistance       = 407,
   sonarDistance       = 407,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 375,
   workerTime          = 0,
 
   weapons             = {
@@ -135,6 +136,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverriot = unitDef })
+} }

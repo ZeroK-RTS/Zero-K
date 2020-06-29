@@ -101,8 +101,9 @@ function Object:New(obj)
         if (t=="metatable") then
           setmetatable(obj[i], getmetatable(v))
         end
-      elseif (ot == "nil") then
-        obj[i] = v
+      -- We don't need to copy other types (allegedly)
+      --elseif (ot == "nil") then
+      --  obj[i] = v
       end
     end
   end

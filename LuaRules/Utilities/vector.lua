@@ -7,6 +7,10 @@ local function DistSq(x1,z1,x2,z2)
 	return (x1 - x2)*(x1 - x2) + (z1 - z2)*(z1 - z2)
 end
 
+local function Dist3D(x1,y1,z1,x2,y2,z2)
+	return sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) + (z1 - z2)*(z1 - z2))
+end
+
 local function Mult(b, v)
 	return {b*v[1], b*v[2]}
 end
@@ -102,13 +106,78 @@ local function AngleSpringHeaving(x, z)
 	end
 end
 
+local function GetAngleBetweenUnitVectors(u, v)
+	return math.acos(Dot(u, v))
+end
+
 local function PolarToCart(mag, dir)
 	return {mag*cos(dir), mag*sin(dir)}
 end
 
+local function InverseBasis(a, b, c, d)
+	local det = a*d - b*c
+	return d/det, -b/det, -c/det, a/det
+end
+
+local function ChangeBasis(v, a, b, c, d)
+	return {v[1]*a + v[2]*b, v[1]*c + v[2]*d}
+end
+
+local function GetBoundedLineIntersection(line1, line2)
+	local x1, y1, x2, y2 = line1[1][1], line1[1][2], line1[2][1], line1[2][2]
+	local x3, y3, x4, y4 = line2[1][1], line2[1][2], line2[2][1], line2[2][2]
+	
+	local denominator = ((x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4))
+	if denominator == 0 then
+		return false
+	end
+	local first = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4))/denominator
+	local second = -1*((x1 - x2)*(y1 - y3) - (y1 - y2)*(x1 - x3))/denominator
+	
+	if first < 0 or first > 1 or (second < 0 or second > 1) then
+		return false
+	end
+	
+	local px = x1 + first*(x2 - x1)
+	local py = y1 + first*(y2 - y1)
+	
+	return {px, py}
+end
+
+local function IsPositiveIntersect(lineInt, lineMid, lineDir)
+	return Dot(Subtract(lineInt, lineMid), lineDir) > 0
+end
+
+local function DistanceToBoundedLineSq(point, line)
+	local startToPos = Subtract(point, line[1])
+	local startToEnd = Subtract(line[2], line[1])
+	local normal, projection = Normal(startToPos, startToEnd)
+	local projFactor = Dot(projection, startToEnd)
+	local normalFactor = Dot(normalFactor, startToEnd)
+	if projFactor < 0 then
+		return Dist(line[1], point)
+	end
+	if projFactor > 1 then
+		return Dist(line[2], point)
+	end
+	return AbsValSq(Subtract(startToPos, normal)), normalFactor
+end
+
+local function DistanceToBoundedLine(point, line)
+	local distSq, normalFactor = DistanceToBoundedLineSq(point, line)
+	return sqrt(distSq), normalFactor
+end
+
+local function DistanceToLineSq(point, line)
+	local startToPos = Subtract(point, line[1])
+	local startToEnd = Subtract(line[2], line[1])
+	local normal, projection = Normal(startToPos, startToEnd)
+	return AbsValSq(normal)
+end
 
 Spring.Utilities.Vector = {
 	DistSq = DistSq,
+	Dist3D = Dist3D,
 	Mult = Mult,
 	AbsVal = AbsVal,
 	Unit = Unit,
@@ -121,4 +190,12 @@ Spring.Utilities.Vector = {
 	PolarToCart = PolarToCart,
 	Add = Add,
 	Subtract = Subtract,
+	GetAngleBetweenUnitVectors = GetAngleBetweenUnitVectors,
+	InverseBasis = InverseBasis,
+	ChangeBasis = ChangeBasis,
+	GetBoundedLineIntersection = GetBoundedLineIntersection,
+	IsPositiveIntersect = IsPositiveIntersect,
+	DistanceToBoundedLineSq = DistanceToBoundedLineSq,
+	DistanceToBoundedLine = DistanceToBoundedLine,
+	DistanceToLineSq = DistanceToLineSq,
 }

@@ -9,8 +9,8 @@
 --------------------------------------------------------------------------------
 
 local common_depthmodparams = {
-	quadraticCoeff = 0,
-	linearCoeff = 0.07,
+	quadraticCoeff = 0.0027,
+	linearCoeff = 0.02,
 }
 
 local moveDefs = {
@@ -228,7 +228,7 @@ local moveDefs = {
 	UBOAT3 = {
 		footprintx = 3,
 		footprintz = 3,
-		minwaterdepth = 15,
+		minwaterdepth = 5,
 		crushstrength = 150,
 		subMarine = 1,
 	},

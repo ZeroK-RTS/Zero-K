@@ -108,7 +108,7 @@ local comms = {}
 local function GetCommAttributes(unitID, unitDefID)
   local team = GetUnitTeam(unitID)
   local _, player = GetTeamInfo(team, false)
-  local name = GetPlayerInfo(player, false) or 'Robert Paulson'
+  local name = GetPlayerInfo(player, false) or 'name unknown'
   local r, g, b, a = GetTeamColor(team)
   local height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + heightOffset
   local pm = spGetUnitPieceMap(unitID)
@@ -163,7 +163,7 @@ function widget:Initialize()
 end
 
 
-function spGetUnitPieceMap(unitID,piecename)
+function spGetUnitPieceMap(unitID)
   local pieceMap = {}
   for piecenum,piecename in pairs(Spring.GetUnitPieceList(unitID)) do
     pieceMap[piecename] = piecenum

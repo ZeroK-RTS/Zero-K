@@ -1,11 +1,11 @@
 local unitArray = {}
-local UPDATE_FREQUNECY = 30
+local UPDATE_FREQUENCY = 30
 
 for i=1,#UnitDefs do
 	local cp = UnitDefs[i].customParams
 	if cp.grey_goo then
 		unitArray[i] = {
-			drain = tonumber (cp.grey_goo_drain)*UPDATE_FREQUNECY/30,
+			drain = tonumber (cp.grey_goo_drain)*UPDATE_FREQUENCY/30,
 			cost = tonumber (cp.grey_goo_cost),
 			range = tonumber (cp.grey_goo_range),
 			spawns = cp.grey_goo_spawn,
@@ -13,4 +13,4 @@ for i=1,#UnitDefs do
 	end
 end
 
-return UPDATE_FREQUNECY, unitArray
+return UPDATE_FREQUENCY, unitArray

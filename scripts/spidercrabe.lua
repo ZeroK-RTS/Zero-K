@@ -27,6 +27,9 @@ local gflash = piece 'gflash'
 
 local smokePiece = {base, turret}
 
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
+local CMD_MOVE = CMD.MOVE
+
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -52,7 +55,7 @@ local legBackwardAngleMinor = math.rad(10)
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local bCurling = false
+local armored = false
 local nocurl = true
 
 local gun_0 = 0
@@ -104,7 +107,9 @@ local function Walk()
 end
 
 local function Curl()
-	if nocurl then return end
+	if nocurl or armored then
+		return
+	end
 	--Spring.Echo("Initiating curl")
 	
 	Signal(SIG_MOVE)
@@ -117,7 +122,6 @@ local function Curl()
 	end
 	
 	Sleep(100)
-	bCurling = true
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.1)
 	GG.UpdateUnitAttributes(unitID)
@@ -153,8 +157,8 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 	
-	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
+	armored = true
 end
 
 local function ResetLegs()
@@ -183,14 +187,18 @@ end
 
 local function Uncurl()
 	--Spring.Echo("Initiating uncurl", Spring.GetGameFrame())
-	bCurling = true
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdID == CMD_RAW_MOVE or cmdID == CMD_MOVE then
+		Sleep(100)
+	else
+		Sleep(700)
+	end
 	
 	ResetLegs()
 	Move(canon, y_axis, 0, 2.5)
 	Move(base, y_axis, 0, 2.5)
 	Move(base, z_axis, 0, 2.5)
 
-	Sleep(400)
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
 	Spring.SetUnitArmored(unitID,false)
 	
@@ -202,7 +210,6 @@ local function Uncurl()
 	--Spring.Echo("speeding up", Spring.GetGameFrame())
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	bCurling = false
 end
 
 local function BlinkingLight()
@@ -226,18 +233,19 @@ end
 local function Motion()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
+	armored = false
 	Sleep(30)
 	Uncurl()
 	Walk()
 end
 
 function script.StartMoving()
-	--Spring.Utilities.UnitEcho(unitID, "A")
+	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
 end
 
 function script.StopMoving()
-	--Spring.Utilities.UnitEcho(unitID, "P")
+	--Spring.Utilities.UnitEcho(unitID, "P " .. ((armored and "T") or "F"))
 	StartThread(Curl)
 end
 
@@ -251,7 +259,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.02)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
@@ -298,7 +306,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(canon, x_axis)
 		StartThread(RestoreAfterDelay1)
-		return (not bCurling)
+		return true
 	elseif num == 2 then
 		Signal(SIG_AIM2)
 		SetSignalMask(SIG_AIM2)

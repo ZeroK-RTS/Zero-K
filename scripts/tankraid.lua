@@ -18,8 +18,8 @@ local SIG_AIM1 = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
-local TURRET_TURN_SPEED = math.rad(900)
-local GUN_TURN_SPEED = math.rad(400)
+local TURRET_TURN_SPEED = math.rad(340)
+local GUN_TURN_SPEED = math.rad(100)
 
 local WHEEL_TURN_SPEED1 = 480
 local WHEEL_TURN_SPEED1_ACCELERATION = 75
@@ -36,7 +36,7 @@ local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	
 	Turn(turret, y_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
-	Turn(sleeve, x_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
+	Turn(sleeve, x_axis, math.rad(0), math.rad(GUN_TURN_SPEED/2))
 end
 
 ----------------------------------------------------------
@@ -223,7 +223,11 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 125, 50)
+	if Spring.ValidUnitID(targetID) then
+		local hitTime = (Spring.GetUnitSeparation(unitID, targetID) or 0)*0.1
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 58, hitTime)
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

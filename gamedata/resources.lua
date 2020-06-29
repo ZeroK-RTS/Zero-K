@@ -55,7 +55,8 @@ local resources = {
 
 		projectiletextures = {
       -- MANUAL
-			----------Spring Effects--------
+      ----------Spring Effects--------
+      bubbletexture='randdots.tga',
 			circularthingy='circularthingy.tga',
 			laserend='laserend.tga',
 			laserfalloff='laserfalloff.tga',
@@ -113,9 +114,11 @@ local resources = {
       flashside1= "cc/flashside1.tga",
       flashside2= "cc/flashside2.tga",
       flowerflash= "pd/flowerflash.tga",
+	  glow2 = "gpl/glow2.tga",
 	  greenlight= "other/light_green.png",
       greennovaexplo= "cc/greennovaexplo.tga",
       gunshot= "cc/gunshot.tga",
+      gunshotglow= "gpl/gunshotglow.tga",
       kburst= "other/burst.tga",
       kfoam= "other/foam.tga",
       kfoom= "other/foom.tga",
@@ -131,6 +134,7 @@ local resources = {
       lightsmoketrail= "lightsmoketrail.tga",
       muzzlefront= "muzzlefront.tga",
       muzzleside= "muzzleside.tga",
+      muzzleside2= "gpl/muzzleside.tga",
 	  new_dirta = "smoke/new_dirta.png",
       null= "pd/null.tga",
       orangesmoke= "pd/orangesmoke.tga",
@@ -168,7 +172,20 @@ local resources = {
       whitelightb= "pd/whitelightningball.tga",
 	  whitelightgpl = 'GPL/lightw.png',
 	  sonic_glow = "sonic_glow.png",
-	  sonic_glow2 = "sonic_glow2.png",
+      sonic_glow2 = "sonic_glow2.png",
+      bubble= "other/bubble.tga",
+    csmoke0 = 'smoke/smoke00.tga',
+    csmoke1 = 'smoke/smoke01.tga',
+    csmoke2 = 'smoke/smoke02.tga',
+    csmoke3 = 'smoke/smoke03.tga',
+    csmoke4 = 'smoke/smoke04.tga',
+    csmoke5 = 'smoke/smoke05.tga',
+    csmoke6 = 'smoke/smoke06.tga',
+    csmoke7 = 'smoke/smoke07.tga',
+    csmoke8 = 'smoke/smoke08.tga',
+    csmoke9 = 'smoke/smoke09.tga',
+    csmoke10 = 'smoke/smoke10.tga',
+    csmoke11 = 'smoke/smoke11.tga',
 	  },
 	},
 }

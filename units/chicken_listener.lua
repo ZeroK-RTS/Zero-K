@@ -1,10 +1,10 @@
-unitDef = {
+return { chicken_listener = {
   unitname            = [[chicken_listener]],
   name                = [[Listener]],
   description         = [[Burrowing Mobile Seismic Detector]],
-  acceleration        = 0.16,
+  acceleration        = 0.48,
   activateWhenBuilt   = true,
-  brakeRate           = 0.205,
+  brakeRate           = 1.23,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -59,6 +59,4 @@ unitDef = {
   upright             = false,
   waterline           = 8,
   workerTime          = 0,
-}
-
-return lowerkeys({ chicken_listener = unitDef })
+} }

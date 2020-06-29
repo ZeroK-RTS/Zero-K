@@ -60,18 +60,9 @@ local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every f
 		return
 	end
 	for unitID, factoryDefID in pairs(ordersToRemove) do
-		local cmdID, cmdTag
-		if Spring.Utilities.COMPAT_GET_ORDER then
-			local queue = Spring.GetCommandQueue(unitID, 1)
-			if queue and queue[1] then
-				cmdID, cmdTag = queue[1].id, queue[1].tag
-			end
-		else
-			cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
-		end
-		
+		local cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, CMD.OPT_ALT)
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, CMD.OPT_ALT)
 		end
 	end
 	ordersToRemove = nil
@@ -447,7 +438,7 @@ local function StartUnitPicked(playerID, name)
 		local frame = Spring.GetGameFrame() + 3
 		if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
 		scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
-	else
+	--else
 		--[[
 		if startPosition[teamID] then
 			local oldCommID = prespawnedCommIDs[teamID]

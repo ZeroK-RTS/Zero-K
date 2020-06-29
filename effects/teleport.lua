@@ -6,7 +6,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         airdrag            = .9,
         colormap           = [[.9 .9 1 .1   .2 .2 1 .1   0 0 0 0]],
@@ -32,7 +32,7 @@ return {
       class              = [[CBitmapMuzzleFlame]],
       ground             = true,
       water              = true,
-	  underwater         = true,
+      underwater         = true,
       properties = {
         colormap           = [[.8 .8 1 .1   .2 .2 1 .1   0 0 0 0]],
         dir                = [[dir]],
@@ -58,9 +58,6 @@ return {
         [3]  = 0.8,
       },
     },
-	
   },
-  
-
 }
 

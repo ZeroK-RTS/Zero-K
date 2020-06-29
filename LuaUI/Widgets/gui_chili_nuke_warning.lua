@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("colors.h.lua")
+include("colors.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
 local Chili
@@ -75,7 +75,6 @@ local function CreateWindow()
 		parent = screen0,
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
-		dockable = true,
 		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
@@ -98,7 +97,7 @@ local function CreateWindow()
 		bottom = 0,
 		caption = WG.Translate ("interface", "nuclear_launch_detected"),
 		valign = "center",
- 		align  = "center",
+		align  = "center",
 		autosize = false,
 		font   = {
 			size = 32,

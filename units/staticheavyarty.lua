@@ -1,4 +1,4 @@
-unitDef = {
+return { staticheavyarty = {
   unitname                      = [[staticheavyarty]],
   name                          = [[Big Bertha]],
   description                   = [[Strategic Plasma Cannon]],
@@ -129,6 +129,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticheavyarty = unitDef })
+} }

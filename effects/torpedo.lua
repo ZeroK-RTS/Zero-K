@@ -11,7 +11,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = false,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -38,7 +38,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = false,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -52,7 +52,7 @@ return {
       count              = 16,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.125,
@@ -66,7 +66,7 @@ return {
       class              = [[CSpherePartSpawner]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 0.25,
         alwaysvisible      = false,
@@ -75,15 +75,90 @@ return {
         ttl                = 8,
       },
     },
+    collapsar = {
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = false,
+      underwater         = true,
+      water              = false,
+      unit               = false,
+      air                = false,
+      properties = {
+        airdrag            = 0.5,
+        alwaysvisible      = false,
+        colormap           = [[1 1 1 0.01   0.01 0.01 0.005 0.01]],
+        directional        = true,
+        emitrot            = 180,
+        emitrotspread      = 180,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = [[1]],
+        particlelife       = [[30]],
+        particlelifespread = 2,
+        particlesize       = [[30]],
+        particlesizespread = 0.5,
+        particlespeed      = [[0]],
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = -0.2,
+        sizemod            = 0.95,
+        texture            = [[kfoam]],
+      },
+    },
+    bubbles_rising = {
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = false,
+      underwater         = true,
+      air                = false,
+      water              = false,
+      unit               = false,
+      properties = {
+        airdrag            = 0.5,
+        alwaysvisible      = false,
+        colormap           = [[1 1 1 0.05
+                               0.8 0.8 0.8 0.02
+                               0.5 0.5 0.5 0.01
+                               0.01 0.01 0.002 0.001]],
+        directional        = true,
+        emitrot            = 180,
+        emitrotspread      = 180,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0.2, 0]],
+        numparticles       = [[20]],
+        particlelife       = [[15]],
+        particlelifespread = 20,
+        particlesize       = [[0.5]],
+        particlesizespread = 0.25,
+        particlespeed      = [[10]],
+        particlespeedspread = 20,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 0.995,
+        texture            = [[bubble]],
+      },
+    },
+    bubblesphere = {
+      class              = [[CSpherePartSpawner]],
+      count              = 1,
+      water              = false,
+      underwater         = true,
+      properties = {
+        alpha              = 0.25,
+        alwaysvisible      = false,
+        color              = [[0.8,0.8,1]],
+        expansionspeed     = 4,
+        ttl                = 10,
+      },
+    },
   },
-  
   ["torpedo_hit_med"] = {
     usedefaultexplosions = false,
     droplets = {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = false,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -110,7 +185,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -124,7 +199,7 @@ return {
       count              = 16,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.125,
@@ -138,7 +213,7 @@ return {
       class              = [[CSpherePartSpawner]],
       count              = 1,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 0.25,
         alwaysvisible      = false,
@@ -148,14 +223,13 @@ return {
       },
     },
   },
-  
   ["torpedo_hit_large_weak"] = {
     usedefaultexplosions = false,
     droplets = {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -182,7 +256,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -211,7 +285,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -238,7 +312,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -252,7 +326,7 @@ return {
       count              = 16,
       ground             = true,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.125,
@@ -276,34 +350,32 @@ return {
       },
     },
   },
-  
   ["torpedohithuge"] = {
     usedefaultexplosions = false,
-    
-	-- on land
-	dirt1 = {
+    -- on land
+    dirt1 = {
       air                = false,
-      useairlos       = false,
+      useairlos          = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
       water              = false,
-	  unit				 = true,
+      unit               = true,
       properties = {
         airdrag            = 0.8,
         colormap           = [[1 0.5 0.3 0.13    0.45 0.37 0.3 0.13	0.05 0.05 0.04 0.1  0 0 0 0]],
         directional        = true,
-        emitrot            = 0,
+        emitrot            = 90,
         emitrotspread      = 45,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 0, 0]],
         numparticles       = 20,
-        particlelife       = 40,
+        particlelife       = 25,
         particlelifespread = 5,
         particlesize       = 2,
         particlesizespread = 3,
         particlespeed      = 0,
-        particlespeedspread = 14,
+        particlespeedspread = 8,
         pos                = [[0, 2, 0]],
         sizegrowth         = 3,
         sizemod            = 1.0,
@@ -314,7 +386,7 @@ return {
       circlealpha        = 0.2,
       circlegrowth       = 4,
       flashalpha         = 0.9,
-      flashsize          = 210,
+      flashsize          = 105,
       ttl                = 26,
       color = {
         [1]  = 1,
@@ -332,17 +404,16 @@ return {
       properties = {
         alpha              = 0.30,
         color              = [[1,0.6,0]],
-        expansionspeed     = 9,
+        expansionspeed     = 5,
         ttl                = 14,
       },
     },
-	
-	-- underwater
-	droplets = {
+    -- underwater
+    droplets = {
       class              = [[CSimpleParticleSystem]],
       count              = 3,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -355,8 +426,8 @@ return {
         numparticles       = 20,
         particlelife       = 10,
         particlelifespread = 6,
-        particlesize       = 24,
-        particlesizespread = 8,
+        particlesize       = 15,
+        particlesizespread = 6,
         particlespeed      = 5,
         particlespeedspread = 6,
         pos                = [[0, 15, 0]],
@@ -369,7 +440,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -377,11 +448,11 @@ return {
         pos                = [[0, 15, 0]],
       },
     },
-	mainhithuge = {
+    mainhithuge = {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -395,14 +466,14 @@ return {
       count              = 20,
       ground             = true,
       water              = true,
-      underwater		 = true,
+      underwater         = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.125,
         color              = [[1,0.5,0]],
         dir                = [[-4 r8, -4 r8, -4 r8]],
         length             = 2,
-        width              = 20,
+        width              = 12,
       },
     },
     watersphere = {
@@ -414,12 +485,32 @@ return {
         alpha              = 0.25,
         alwaysvisible      = false,
         color              = [[0.8,0.8,1]],
-        expansionspeed     = 10,
+        expansionspeed     = 6,
         ttl                = 10,
       },
     },
   },
-  
+  ['torpedo_hit_wake'] = {
+    torpedo_hit_wake = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      underwater         = true,
+      properties = {
+        colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
+        dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
+        frontoffset        = 0,
+        fronttexture       = [[wake]],
+        length             = [[36 r24]],
+        sidetexture        = [[null]],
+        size               = [[9 r6]],
+        sizegrowth         = 2,
+        ttl                = 50,
+      },
+    },
+  },
   ["torpedo_hit_main"] = {
     mainhit = {
       air                = true,
@@ -427,7 +518,7 @@ return {
       count              = 4,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
@@ -440,8 +531,21 @@ return {
         ttl                = 12,
       },
     },
+    wake = {
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      water              = true,
+      underwater         = true,
+      unit               = true,
+      air                = true,
+      properties = {
+        delay              = 0,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:torpedo_hit_wake]],
+        pos                = [[0, -15, 0]],
+      },
+    },
   },
-  
   ["torpedo_hit_main_med"] = {
     mainhit = {
       air                = true,
@@ -449,7 +553,7 @@ return {
       count              = 4,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
@@ -463,7 +567,6 @@ return {
       },
     },
   },
-  
   ["torpedo_hit_main_large_weak"] = {
     mainhit = {
       air                = true,
@@ -471,7 +574,7 @@ return {
       count              = 4,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.35  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
@@ -485,7 +588,6 @@ return {
       },
     },
   },
-  
   ["torpedo_hit_main_large"] = {
     mainhit = {
       air                = true,
@@ -493,7 +595,7 @@ return {
       count              = 4,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
@@ -507,15 +609,14 @@ return {
       },
     },
   },
-  
-   ["torpedo_hit_main_huge"] = {
+  ["torpedo_hit_main_huge"] = {
     mainhit = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 4,
       ground             = true,
       water              = true,
-	  underwater		 = true,
+      underwater         = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
@@ -523,14 +624,65 @@ return {
         fronttexture       = [[splashbase]],
         length             = [[48 r32]],
         sidetexture        = [[splashside]],
-        size               = [[50 r8]],
+        size               = [[25 r8]],
         sizegrowth         = 1.4,
         ttl                = 24,
       },
     },
   },
-  
   ["torpedo_trail"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    trail_water = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = true,
+      water              = true,
+      properties = {
+        colormap           = [[0.6 0.6 0.6 0.01 0.4 0.4 0.4 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 1,
+        fronttexture       = [[wake]],
+        length             = 1,
+        sidetexture        = [[wake]],
+        size               = 2,
+        sizegrowth         = 0.4,
+        ttl                = 10,
+      },
+    },
+    trail_underwater = {
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = false,
+      underwater         = true,
+      water              = false,
+      unit               = true,
+      properties = {
+        airdrag            = 0.65,
+        alwaysvisible      = false,
+        colormap           = [[1 1 1 0.01   0.01 0.01 0.005 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 0,
+        emitvector         = [[-1 r2 -1 r2 -1 r2]],
+        gravity            = [[0, 0.1, 0]],
+        numparticles       = [[3 r2]],
+        particlelife       = [[40]],
+        particlelifespread = 20,
+        particlesize       = [[2]],
+        particlesizespread = 0.5,
+        particlespeed      = [[0.5]],
+        particlespeedspread = 0.5,
+        pos                = [[r10 -5, r10 -5, r10 -5]],
+        sizegrowth         = 0,
+        sizemod            = 0.95,
+        texture            = [[bubble]],
+      },
+    },
+  },
+  ["torpedo_trail_long"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
     trail_water = {
@@ -541,19 +693,19 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
+        colormap           = [[0.6 0.6 0.6 0.01 0.4 0.4 0.4 0.01 0 0 0 0.01]],
         dir                = [[dir]],
         frontoffset        = 1,
         fronttexture       = [[wake]],
-        length             = 1,
+        length             = 1.2,
         sidetexture        = [[wake]],
         size               = 2,
         sizegrowth         = 0.4,
-        ttl                = 20,
+        ttl                = 10,
       },
     },
   },
-    ["torptrailpurple"] = {
+  ["torptrailpurple"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
     trail_water = {
@@ -638,7 +790,7 @@ return {
         ttl                = 40,
       },
     },
-	groundflash = {
+    groundflash = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,

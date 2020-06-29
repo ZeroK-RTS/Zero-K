@@ -38,7 +38,7 @@ local function FlattenRectangle(left, top, right, bottom, height)
 	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
 end
 
-function FlattenFactory(unitID, unitDefID)
+local function FlattenFactory(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	local sX = ud.xsize*4
 	local sZ = ud.zsize*4

@@ -30,8 +30,8 @@ local SIG_ACTIVATE = 8
 
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spSetUnitWeaponState = Spring.SetUnitWeaponState
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetGameFrame	 = Spring.GetGameFrame
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spGetGameFrame       = Spring.GetGameFrame
 
 local waveWeaponDef = WeaponDefNames["shieldriot_blast"]
 local WAVE_RELOAD = math.floor(waveWeaponDef.reload * Game.gameSpeed)
@@ -151,21 +151,23 @@ function AutoAttack_Thread()
 		Sleep(100)
 		local reloaded = select(2, spGetUnitWeaponState(unitID,3))
 		if reloaded then
-			local gameFrame = spGetGameFrame()
-			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
-			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
-			GG.PokeDecloakUnit(unitID,100)
-			
-			EmitSfx(emit, GG.Script.UNIT_SFX1)
-			EmitSfx(emit, GG.Script.DETO_W2)
-			FireAnim()
+			local height = select(5, Spring.GetUnitPosition(unitID, true))
+			if height > -8 then -- Matches offset of AimFromWeapon position for FAKEGUN2
+				local gameFrame = spGetGameFrame()
+				local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
+				local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
+				spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
+				GG.PokeDecloakUnit(unitID,100)
+				
+				EmitSfx(emit, GG.Script.UNIT_SFX1)
+				EmitSfx(emit, GG.Script.DETO_W2)
+				FireAnim()
+			end
 		end
 	end
 end
 
 function FireAnim()
-	
 	local mspeed = 4
 	Move (l_gun, x_axis, 2, mspeed*3)
 	Move (r_gun, x_axis, -2, mspeed*3)

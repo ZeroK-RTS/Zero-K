@@ -16,6 +16,27 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local sunDir = 0
+local sunPitch = math.pi*0.8
+
+local function SunDirectionFunc(newDir, newPitch)
+	sunDir = newDir or sunDir
+	sunPitch = newPitch or sunPitch
+	
+	local sunX = math.cos(sunPitch)*math.cos(sunDir)
+	local sunY = math.sin(sunPitch)
+	local sunZ = math.cos(sunPitch)*math.sin(sunDir)
+	
+	Spring.SetSunDirection(sunX, sunY, sunZ)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local sunPath = 'Settings/Graphics/Sun and Fog/Sun'
+local fogPath = 'Settings/Graphics/Sun and Fog/Fog'
+local dirPath = 'Settings/Graphics/Sun and Fog/Direction'
+
 local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
 local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
@@ -45,8 +66,9 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		sun = GetOptionsTable('Settings/Graphics/Sun and Fog/Sun'),
-		fog = GetOptionsTable('Settings/Graphics/Sun and Fog/Fog')
+		sun = GetOptionsTable(sunPath),
+		fog = GetOptionsTable(fogPath),
+		direction = GetOptionsTable(dirPath)
 	}
 	
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
@@ -63,6 +85,14 @@ local function LoadSunAndFogSettings()
 		for name, value in pairs(sun) do
 			options[name].value = value
 		end
+	end
+	
+	local direction = OVERRIDE_CONFIG.direction
+	if direction then
+		SunDirectionFunc(direction.sunDir, direction.sunPitch)
+		
+		options["sunDir"].value = direction.sunDir
+		options["sunPitch"].value = direction.sunPitch
 	end
 	
 	local fog = OVERRIDE_CONFIG.fog
@@ -93,9 +123,6 @@ end
 --------------------------------------------------------------------------------
 
 local function GetOptions()
-	local fogPath = 'Settings/Graphics/Sun and Fog/Fog'
-	local sunPath = 'Settings/Graphics/Sun and Fog/Sun'
-	
 	local options = {}
 	local options_order = {}
 	
@@ -127,12 +154,16 @@ local function GetOptions()
 		options[name] = {
 			name = humanName,
 			type = 'number',
-			value = 0,
-			min = -5, max = 5, step = 0.01,
+			value = default or 0,
+			min = minVal or -5, max = maxVal or 5, step = 0.01,
 			OnChange = function (self)
 				if initialized then
-					Spring.Echo("NumberFunction", name, self.value)
-					NumberFunction({[name] = self.value})
+					if NumberFunction then
+						Spring.Echo("NumberFunction", name, self.value)
+						NumberFunction({[name] = self.value})
+					elseif AdvFunc then
+						AdvFunc(self.value, AdvFuncParam)
+					end
 				end
 			end,
 			advanced = true,
@@ -151,6 +182,38 @@ local function GetOptions()
 	end
 	
 	AddNumberOption("specularExponent", "Specular Exponent", sunPath, Spring.SetSunLighting)
+	
+	options["sunDir"] = {
+		name = "Sun Direction",
+		type = 'number',
+		value = sunDir,
+		min = 0, max = 2*math.pi, step = 0.01,
+		OnChange = function (self)
+			if initialized then
+				SunDirectionFunc(self.value, false)
+			end
+		end,
+		advanced = true,
+		developmentOnly = true,
+		path = dirPath
+	}
+	options_order[#options_order + 1] = "sunDir"
+	
+	options["sunPitch"] = {
+		name = "Sun pitch",
+		type = 'number',
+		value = sunPitch,
+		min = -0.5*math.pi, max = 0.5*math.pi, step = 0.01,
+		OnChange = function (self)
+			if initialized then
+				SunDirectionFunc(false, self.value)
+			end
+		end,
+		advanced = true,
+		developmentOnly = true,
+		path = dirPath
+	}
+	options_order[#options_order + 1] = "sunPitch"
 	
 	local fogThings = {"sun", "sky", "cloud", "fog"}
 	for _, thing in ipairs(fogThings) do

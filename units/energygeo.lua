@@ -1,4 +1,4 @@
-unitDef = {
+return { energygeo = {
   unitname                      = [[energygeo]],
   name                          = [[Geothermal Generator]],
   description                   = [[Medium Powerplant (+25)]],
@@ -76,6 +76,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ energygeo = unitDef })
+} }

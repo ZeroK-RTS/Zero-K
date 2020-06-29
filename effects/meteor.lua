@@ -108,7 +108,6 @@ return {
       },
     },
   },
-  
   ["meteor_fall"] = {
     usedefaultexplosions = false,
     glow = {

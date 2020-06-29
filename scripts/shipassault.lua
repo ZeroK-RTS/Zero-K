@@ -45,19 +45,26 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	for i=1,#missiles do
+	for i = 1, #missiles do
 		Turn(missiles[i], x_axis, -math.rad(90))
 	end
+	
+	Move(flare1, z_axis, -8)
+	Move(flare2, z_axis, -8)
 end
 
 function script.QueryWeapon(num)
-	if num == 1 then return gunPieces[gun_1].flare
-	else return	missiles[missileNum]
+	if num == 1 then
+		return gunPieces[gun_1].flare
+	else
+		return	missiles[missileNum]
 	end
 end
 
 function script.AimFromWeapon(num)
-	if num == 1 then return sleeves end
+	if num == 1 then
+		return turret
+	end
 	return missiles[missileNum]
 end
 
@@ -108,7 +115,6 @@ function script.Shot(num)
 		EmitSfx(missiles[missileNum], 1025)
 	end
 end
-
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

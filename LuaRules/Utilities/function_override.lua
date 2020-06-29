@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------------
 -- Overrides some inbuilt spring functions
 
-VFS.Include("LuaRules/Utilities/versionCompare.lua")
+VFS.Include("LuaRules/Utilities/versionCompare.lua", nil, VFS.GAME)
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------

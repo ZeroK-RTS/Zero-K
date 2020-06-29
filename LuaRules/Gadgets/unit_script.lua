@@ -832,7 +832,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 		callins[k] = function(...)
 			PushActiveUnitID(unitID)
-			ret = fun(...)
+			local ret = fun(...)
 			PopActiveUnitID()
 
 			return ret

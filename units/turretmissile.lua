@@ -1,4 +1,4 @@
-unitDef = {
+return { turretmissile = {
   unitname                      = [[turretmissile]],
   name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
@@ -48,7 +48,7 @@ unitDef = {
     },
 
   },
-  sightDistance                 = 660,
+  sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -141,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ turretmissile = unitDef })
+} }

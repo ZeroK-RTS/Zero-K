@@ -1,4 +1,4 @@
-unitDef = {
+return { nebula = {
   unitname               = [[nebula]],
   name                   = [[Nebula]],
   description            = [[Atmospheric Mothership]],
@@ -187,6 +187,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ nebula = unitDef })
+} }

@@ -1,10 +1,10 @@
-unitDef = {
+return { hoverraid = {
   unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
-  acceleration        = 0.066,
+  acceleration        = 0.32,
   activateWhenBuilt   = true,
-  brakeRate           = 0.0835,
+  brakeRate           = 0.835,
   buildCostMetal      = 80,
   builder             = false,
   buildPic            = [[hoverraid.png]],
@@ -29,7 +29,7 @@ unitDef = {
   idleTime            = 1800,
   maxDamage           = 300,
   maxSlope            = 36,
-  maxVelocity         = 4.8,
+  maxVelocity         = 4.75,
   minCloakDistance    = 75,
   movementClass       = [[HOVER2]],
   noAutoFire          = false,
@@ -47,10 +47,10 @@ unitDef = {
 
   },
 
-  sightDistance       = 560,
-  sonarDistance       = 560,
+  sightDistance       = 640,
+  sonarDistance       = 640,
   turninplace         = 0,
-  turnRate            = 673,
+  turnRate            = 540,
   workerTime          = 0,
   
   weapons             = {
@@ -88,7 +88,7 @@ unitDef = {
       },
       
       damage                  = {
-        default = 100.1,
+        default = 100.01,
       },
       
       explosionGenerator      = [[custom:gauss_hit_l]],
@@ -97,11 +97,12 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,
-      range                   = 210,
-      reloadtime              = 3,
+      range                   = 212,
+      reloadtime              = 2.8 + 1/30,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
       size                    = 0.8,
@@ -140,6 +141,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverraid = unitDef })
+} }

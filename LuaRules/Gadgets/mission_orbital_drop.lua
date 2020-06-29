@@ -213,7 +213,7 @@ function gadget:GameFrame(frame)
 		--	Spring.SetUnitNeutral(unitID, true)
 		--end
       else
-	  	-- unit is falling
+		-- unit is falling
 		if frame % 2 == 0 then
 			Spring.SpawnCEG("raventrail", x, y - 40, z) -- meteor trail
 		end

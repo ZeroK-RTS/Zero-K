@@ -1,9 +1,9 @@
-unitDef = {
+return { tankheavyassault = {
   unitname            = [[tankheavyassault]],
   name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
-  acceleration        = 0.0282,
-  brakeRate           = 0.052,
+  acceleration        = 0.141,
+  brakeRate           = 0.52,
   buildCostMetal      = 2200,
   builder             = false,
   buildPic            = [[tankheavyassault.png]],
@@ -156,53 +156,6 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
-
-    tankheavyassault_FLAMETHROWER = {
-      name                    = [[Flamethrower]],
-      areaOfEffect            = 64,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      collideFeature          = false,
-      collideGround           = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customParams              = {
-        flamethrower = [[1]],
-        setunitsonfire = "1",
-        burntime = [[360]],
-      },
-      
-      damage                  = {
-        default = 5,
-        subs    = 0.05,
-      },
-
-      duration                = 0.1,
-      explosionGenerator      = [[custom:SMOKE]],
-      fallOffRate             = 1,
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      intensity               = 0.1,
-      interceptedByShieldType = 0,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 280,
-      reloadtime              = 0.133,
-      rgbColor                = [[1 1 1]],
-      soundStart              = [[weapon/flamethrower]],
-      soundTrigger            = true,
-      texture1                = [[fireball]],
-      texture2                = [[fireball]],
-      thickness               = 12,
-      tolerance               = 5000,
-      turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 800,
-    },
-
-
   },
 
 
@@ -226,6 +179,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ tankheavyassault = unitDef })
+} }

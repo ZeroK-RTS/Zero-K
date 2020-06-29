@@ -73,6 +73,7 @@ local ground = {
 		"jumpraid",
 		"amphraid",
 		"hoverraid",
+		"hoverheavyraid",
 		"chicken",
 		"chicken_leaper",
 	},

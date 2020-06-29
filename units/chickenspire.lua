@@ -1,4 +1,4 @@
-unitDef = {
+return { chickenspire = {
   unitname                      = [[chickenspire]],
   name                          = [[Chicken Spire]],
   description                   = [[Static Artillery]],
@@ -72,46 +72,6 @@ unitDef = {
 
 
   weaponDefs                    = {
-
-    LRBLOBBER = {
-      name                    = [[Scatterblob]],
-      areaOfEffect            = 96,
-      burst                   = 11,
-      burstrate               = 0.033,
-      craterBoost             = 0,
-      craterMult              = 0,
-            
-            customParams            = {
-        light_radius = 0,
-      },
-
-      damage                  = {
-        default = 180,
-        planes  = 180,
-        subs    = 8,
-      },
-
-      explosionGenerator      = [[custom:blobber_goo]],
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0.7,
-      interceptedByShieldType = 1,
-      mygravity               = 0.1,
-      range                   = 3500,
-      reloadtime              = 10,
-      rgbColor                = [[0.2 0.6 0.0]],
-      size                    = 8,
-      sizeDecay               = 0,
-      soundHit                = [[chickens/acid_hit]],
-      soundStart              = [[chickens/acid_fire]],
-      sprayAngle              = 512,
-      tolerance               = 5000,
-      turret                  = true,
-      waterweapon             = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
-    },
-  
     SLAMSPORE = {
       name                    = [[Slammer Spore]],
       areaOfEffect            = 160,
@@ -159,6 +119,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ chickenspire = unitDef })
+} }

@@ -40,7 +40,7 @@ local up = 1
 
 local gun = false
 
-local smokePiece = {base, barrel}
+local smokePiece = {base, lbarrel, rbarrel}
 
 function script.Create()
 	Turn(lfrontleg, y_axis, math.rad(45))

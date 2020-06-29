@@ -59,7 +59,22 @@ GG.Script.DETO_W8 = 4103
 
 GG.Script.SMOKEPUFF = 258
 
+local csmoke = {
+	[[csmoke0]],
+	[[csmoke1]],
+	[[csmoke2]],
+	[[csmoke3]],
+	[[csmoke4]],
+	[[csmoke5]],
+	[[csmoke6]],
+	[[csmoke7]],
+	[[csmoke8]],
+	[[csmoke9]],
+	[[csmoke10]],
+	[[csmoke11]],
+}
 -- useful functions
+
 function GG.Script.SmokeUnit(unitID, smokePiece, multiplier)
 	multiplier = multiplier or 1
 	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
@@ -75,8 +90,13 @@ function GG.Script.SmokeUnit(unitID, smokePiece, multiplier)
 		--How is the unit doing?
 		local healthPercent = GetUnitValue(COB.HEALTH)
 		if (healthPercent < 66) and not spGetUnitIsCloaked(unitID) then -- only smoke if less then 2/3rd health left
-			--common.CustomEmitter(smokePiece[math.random(1,#smokePiece)], "blacksmoke")
-			EmitSfx(smokePiece[math.random(1,#smokePiece)], GG.Script.SMOKEPUFF)
+			local p = smokePiece[math.random(1,#smokePiece)]
+			local x,y,z = Spring.GetUnitPiecePosDir(unitID,p)
+			if y >= -40 then
+				EmitSfx(p, GG.Script.SMOKEPUFF)
+			else
+				Spring.SpawnCEG('bubbles_medium', x,y,z,0,1,0,-1*y,-1*y)
+			end
 		end
 		Sleep((8*healthPercent + math.random(100,200)) / multiplier)
 	end

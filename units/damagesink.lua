@@ -1,4 +1,4 @@
-unitDef = {
+return { damagesink = {
   unitname                = [[damagesink]],
   name                    = [[Damage Sink thing]],
   description             = [[Does not care if you shoot at it.]],
@@ -27,6 +27,4 @@ unitDef = {
   useBuildingGroundDecal  = true,
   workerTime              = 0,
   yardMap                 = [[yyyy]],
-}
-
-return lowerkeys({ damagesink = unitDef })
+} }

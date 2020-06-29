@@ -1,4 +1,4 @@
-unitDef = {
+return { gunshipkrow = {
   unitname               = [[gunshipkrow]],
   name                   = [[Krow]],
   description            = [[Flying Fortress]],
@@ -137,34 +137,6 @@ unitDef = {
       weaponVelocity          = 2300,
     },
 
-    TIMEDISTORT    = {
-      name                    = [[Time Distortion Field]],
-      areaOfEffect            = 600,
-      burst                   = 100,
-      burstRate               = 0.1,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 100,
-      },
-
-      edgeeffectiveness       = 0.75,
-      explosionGenerator      = [[custom:riotball_dark]],
-      explosionSpeed          = 3,
-      impulseBoost            = 1,
-      impulseFactor           = -2,
-      interceptedByShieldType = 1,
-      myGravity               = 10,
-      noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 30,
-      soundHitVolume          = 1,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 230,
-    },
-    
     CLUSTERBOMB = {
       name                    = [[Cluster Bomb]],
       accuracy                = 200,
@@ -225,6 +197,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ gunshipkrow = unitDef })
+} }

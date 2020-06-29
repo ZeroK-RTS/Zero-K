@@ -1,5 +1,5 @@
 -- $Id: unit_transport_ai.lua 4460 2009-04-20 20:36:16Z licho $
-include("keysym.h.lua")
+include("keysym.lua")
 
 function widget:GetInfo()
 	return {
@@ -187,6 +187,7 @@ local ignoredCommand = {
 	[CMD_ABANDON_PW] = true,
 	[CMD_RECALL_DRONES] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_GOO_GATHER] = true,
 	[CMD_DISABLE_ATTACK] = true,
 	[CMD_PUSH_PULL] = true,
 	[CMD_UNIT_AI] = true,

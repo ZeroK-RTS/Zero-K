@@ -22,7 +22,7 @@ local Chili
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function CreateWindow()
+local function CreateWindow()
 	window = Chili.Window:New{
 		name = "SpaceWaster_1",
 		backgroundColor = {0, 0, 0, 0},

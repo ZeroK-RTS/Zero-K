@@ -1,10 +1,10 @@
-unitDef = {
+return { subscout = {
   unitname              = [[subscout]],
   name                  = [[Lancelet]],
   description           = [[Scout/Suicide Minisub]],
-  acceleration          = 0.032,
+  acceleration          = 0.16,
   activateWhenBuilt     = true,
-  brakeRate             = 0.25,
+  brakeRate             = 2.5,
   buildCostMetal        = 200,
   builder               = false,
   buildPic              = [[subscout.png]],
@@ -71,6 +71,4 @@ unitDef = {
             },
         },
     },
-}
-
-return lowerkeys({ subscout = unitDef })
+} }

@@ -28,6 +28,7 @@ local windDefs = {
 	[ UnitDefNames['energywind'].id ] = true,
 }
 
+local WIND_HEALTH = UnitDefNames['energywind'].health
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local windmills = IterableMap.New()
@@ -85,9 +86,9 @@ end
 -- Debug
 
 local function ToggleWindAnimation(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then
+	--if not Spring.IsCheatingEnabled() then
 		--return
-	end
+	--end
 	GG.Wind_SpinDisabled = not GG.Wind_SpinDisabled
 	
 	if GG.Wind_SpinDisabled then
@@ -110,7 +111,7 @@ end
 
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		if (not windmills.IsEmpty()) then
+		if (not IterableMap.IsEmpty(windmills)) then
 			if step_count > 0 then
 				strength = strength + strength_step
 				step_count = step_count - 1
@@ -127,7 +128,7 @@ function gadget:GameFrame(n)
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
-			local indexMax, keyByIndex, dataByKey = windmills.GetBarbarianData()
+			local indexMax, keyByIndex, dataByKey = IterableMap.GetBarbarianData(windmills)
 			for i = 1, indexMax do
 				local unitID = keyByIndex[i]
 				local entry = dataByKey[unitID]
@@ -173,12 +174,12 @@ local function SetupUnit(unitID)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
 		local health = Spring.GetUnitHealth(unitID)
-		if health == 130 then
+		if health == WIND_HEALTH then
 			Spring.SetUnitHealth(unitID, 400)
 		end
-		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
-		Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
-		Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
+		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
+		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
+		Spring.SetUnitRulesParam(unitID, "midpos_override", 5 - midy)
 		Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
 		return false
 	end
@@ -198,7 +199,7 @@ local function SetupUnit(unitID)
 		" (E " .. round(windMin+windRange*windData.myMin,1) .. "-" .. round(windMax,1) .. ")"
 	)
 	
-	windmills.Add(unitID, windData)
+	IterableMap.Add(windmills, unitID, windData)
 	
 	return true, windMin+windRange*windData.myMin, windRange*(1-windData.myMin)
 end
@@ -226,9 +227,9 @@ function gadget:Initialize()
 		minWindMult = tonumber(mapInfo.custom.zkminwindmult)
 	end
 	
-	local groundMin, groundMax = Spring.GetGroundExtremes()
+	local nominalGroundMin, nominalGroundMax = Spring.GetGroundExtremes()
 	local waterlevel = Spring.GetGameRulesParam("waterlevel")
-	local groundMin, groundMax = math.max(groundMin - waterlevel,0), math.max(groundMax - waterlevel, 1)
+	local groundMin, groundMax = math.max(nominalGroundMin - waterlevel,0), math.max(nominalGroundMax - waterlevel, 1)
 	local mexHeight = math.max(0, Spring.GetGameRulesParam("mex_min_height") or groundMin)
 
 	GG.WindGroundMin = (groundMin + mexHeight)/2
@@ -257,16 +258,16 @@ end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
 	if (windDefs[unitDefID]) then
-		local data = windmills.Get(unitID)
+		local data = IterableMap.Get(windmills, unitID)
 		if data then
 			data.teamID = unitTeam
-			windmills.Set(unitID, data)
+			IterableMap.Set(windmills, unitID, data)
 		end
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (windDefs[unitDefID]) then
-		windmills.Remove(unitID)
+		IterableMap.Remove(windmills, unitID)
 	end
 end

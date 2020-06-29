@@ -220,7 +220,7 @@ local function BringingDownTheHeavens(unitID)
 	if (UnitDefs[unitDefID].canAttack) then
 		near_ally = GetUnitNearestAlly(unitID, 300)
 		if (near_ally) then
-			if Spring.Utilities.GetUnitFirstCommand(near_ally) == CMD_GUARD then -- oh
+			if Spring.GetUnitCurrentCommand(near_ally) == CMD_GUARD then
 				near_ally = nil -- i dont want chain guards...
 			end
 		end

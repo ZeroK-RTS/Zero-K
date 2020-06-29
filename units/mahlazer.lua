@@ -1,4 +1,4 @@
-unitDef = {
+return { mahlazer = {
   unitname                      = [[mahlazer]],
   name                          = [[Starlight]],
   description                   = [[Planetary Energy Chisel]],
@@ -229,6 +229,4 @@ unitDef = {
     },
 
   },
-}
-
-return lowerkeys({ mahlazer = unitDef })
+} }

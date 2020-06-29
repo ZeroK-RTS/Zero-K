@@ -1,9 +1,9 @@
-unitDef = {
+return { striderdante = {
   unitname            = [[striderdante]],
   name                = [[Dante]],
   description         = [[Assault/Riot Strider]],
-  acceleration        = 0.0984,
-  brakeRate           = 0.2392,
+  acceleration        = 0.295,
+  brakeRate           = 1.435,
   buildCostMetal      = 3500,
   builder             = false,
   buildPic            = [[striderdante.png]],
@@ -13,8 +13,9 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND]],
   corpse              = [[DEAD]],
-  
+
   customParams        = {
+    aim_lookahead = 200,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -323,6 +324,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ striderdante = unitDef })
+} }

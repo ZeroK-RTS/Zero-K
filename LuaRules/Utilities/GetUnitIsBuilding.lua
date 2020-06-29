@@ -44,16 +44,7 @@ function Spring.Utilities.GetUnitNanoTarget(unitID)
 		end
 		local buildRange = CachedBuildDistance[unitDefID]
 		
-		local cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6
-		if Spring.Utilities.COMPAT_GET_ORDER then
-			local queue = Spring.GetCommandQueue(unitID, 1)
-			if queue and queue[1] then
-				local par = queue[1].params
-				cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = queue[1].id, par[1], par[2], par[3], par[4], par[5], par[6]
-			end
-		else
-			cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
-		end
+		local cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
 		
 		if cmdID then
 			if cmdID == CMD.RECLAIM then

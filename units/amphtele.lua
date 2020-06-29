@@ -1,10 +1,10 @@
-unitDef = {
+return { amphtele = {
   unitname               = [[amphtele]],
   name                   = [[Djinn]],
   description            = [[Amphibious Teleport Bridge]],
-  acceleration           = 0.25,
+  acceleration           = 0.75,
   activateWhenBuilt      = true,
-  brakeRate              = 0.75,
+  brakeRate              = 4.5,
   buildCostMetal         = 750,
   buildPic               = [[amphtele.png]],
   canGuard               = true,
@@ -69,6 +69,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ amphtele = unitDef })
+} }

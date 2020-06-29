@@ -115,7 +115,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function PokeDecloakUnit(unitID, duration)
+local function PokeDecloakUnit(unitID, duration)
 	if recloakUnit[unitID] then
 		recloakUnit[unitID] = duration or DEFAULT_DECLOAK_TIME
 	else

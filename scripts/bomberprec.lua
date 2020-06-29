@@ -50,10 +50,10 @@ local highBehaviour = {
 local lowBehaviour = {
 	maxPitch = 0.72,
 	maxBank = 0.5,
-	turnRadius = 100,
+	turnRadius = 80,
 	maxAileron = 0.004,
 	maxElevator = 0.018,
-	maxRudder = 0.015,
+	maxRudder = 0.02,
 }
 
 local currentBehaviour = {
@@ -300,32 +300,52 @@ function script.BlockShot(num, targetID)
 	local sinHeading = math.sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
+	local isMobile = not GG.IsUnitIdentifiedStructure(true, targetID)
+	local damage = (isMobile and 400.05) or 800.1
+	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	
-	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
-		Move(drop, x_axis, dx)
-		Move(drop, z_axis, dz)
-		dy = math.max(dy, -30)
-		Move(drop, y_axis, dy)
-		local distance = (Spring.GetUnitSeparation(unitID, targetID) or 0)
-		local unitHeight = (GG.GetUnitHeight and GG.GetUnitHeight(targetID)) or 0
-		distance = math.max(0, distance - unitHeight/2)
-		local projectileTime = 35*math.min(1, distance/340)
-		
-		if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, projectileTime, false, false, true) then
-			-- Remove attack command on blocked target, it's already dead so move on.
-			local cQueue = Spring.GetCommandQueue(unitID, 1)
-			if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {} )
-			end
-			return true
+	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 60, false, false, false) then
+		-- Remove attack command on blocked target, it's already dead so move on.
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
+		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
 		end
-		return false
+		return true
 	end
-	return true
+	
+	if dy > 0 then
+		return true
+	end
+	
+	if isMobile and (dz > 30 or dz < -30 or dx > 80 or dx < -80) then
+		return true
+	end
+	
+	if isMobile then
+		dx = math.min(math.max(-50, dx), 50)
+		dz = math.min(math.max(-20, dz), 20)
+		dy = math.max(dy, -20)
+	else
+		dx = math.min(math.max(-30, dx), 30)
+		dz = math.min(math.max(-10, dz), 10)
+		dy = math.max(dy, -5)
+	end
+	
+	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
+	Move(drop, x_axis, dx)
+	Move(drop, z_axis, dz)
+	Move(drop, y_axis, dy)
+	local distance = math.max((Spring.GetUnitSeparation(unitID, targetID) or 1) - 25, 1)
+	local unitHeight = (GG.GetUnitHeight and GG.GetUnitHeight(targetID)) or 0
+	distance = math.max(0, distance - unitHeight/2)
+	local projectileTime = 35*math.min(1, distance/340)
+	
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, projectileTime, false, false, false) then
+		return true
+	end
+	return false
 end
 
 local function SpamFireCheck()

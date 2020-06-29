@@ -2,7 +2,8 @@ include "constants.lua"
 
 local base = piece 'base'
 local turret = piece 'turret'
-local gun = piece 'barrel1'
+local barrel1 = piece 'barrel1'
+local aim = piece 'aim'
 local wheels = {piece 'frdirt', piece 'fldirt', piece 'rrdirt', piece 'rldirt'}
 local frpontoon = piece 'frpontoon'
 local flpontoon = piece 'flpontoon'
@@ -79,7 +80,7 @@ end
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	Turn(turret, y_axis, 0, math.rad(30))
-	Turn(gun, x_axis, 0, math.rad(10))
+	Turn(barrel1, x_axis, 0, math.rad(10))
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -93,9 +94,9 @@ function script.AimWeapon(num, heading, pitch)
 	GG.DontFireRadar_CheckAim(unitID)
 	
 	Turn(turret, y_axis, heading, math.rad(70))
-	Turn(gun, x_axis, -pitch, math.rad(60))
+	Turn(barrel1, x_axis, -pitch, math.rad(60))
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(gun, x_axis)
+	WaitForTurn(barrel1, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
@@ -105,7 +106,7 @@ function script.BlockShot(num, targetID)
 end
 
 function script.AimFromWeapon(num)
-	return gun
+	return aim
 end
 
 function script.QueryWeapon(num)
@@ -122,17 +123,17 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
-		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, SFX.NONE)
 		Explode(turret, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
-		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL)
 		return 1
 	elseif severity <= .99 then
-		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
@@ -141,7 +142,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rrpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	else
-		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(barrel1, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, SFX.NONE)
 		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)

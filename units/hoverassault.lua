@@ -1,10 +1,10 @@
-unitDef = {
+return { hoverassault = {
   unitname            = [[hoverassault]],
   name                = [[Halberd]],
   description         = [[Blockade Runner Hover]],
-  acceleration        = 0.048,
+  acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 0.043,
+  brakeRate           = 0.43,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[hoverassault.png]],
@@ -133,6 +133,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ hoverassault = unitDef })
+} }

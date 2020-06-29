@@ -1,10 +1,10 @@
-unitDef = {
+return { dynassault1 = {
   unitname            = [[dynassault1]],
   name                = [[Guardian Commander]],
   description         = [[Heavy Combat Commander]],
-  acceleration        = 0.18,
+  acceleration        = 0.54,
   activateWhenBuilt   = true,
-  brakeRate           = 0.375,
+  brakeRate           = 2.25,
   buildCostMetal      = 1200,
   buildDistance       = 144,
   builder             = true,
@@ -101,7 +101,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ dynassault1 = unitDef })
-
+} }
