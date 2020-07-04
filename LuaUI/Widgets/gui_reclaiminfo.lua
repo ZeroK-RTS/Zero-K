@@ -139,14 +139,14 @@ function widget:DrawScreen()
 		end
 		metal = math.floor(metal)
 		energy = math.floor(energy)
-		local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128".." E:"..energy)
+		local textwidth = 12*gl.GetTextWidth("	WG.Translate("interface", "metal_oneletter_reclaiminfo"):"..metal.."\255\255\255\128".." WG.Translate("interface", "energy_oneletter_reclaiminfo"):"..energy)
 		if(textwidth+x>vsx) then
 			x = x - textwidth - 10
 		end
 		if(12+y>vsy) then
 			y = y - form
 		end
-		gl.Text("	M:"..metal.."\255\255\255\128".." E:"..energy,x,y,form)
+		gl.Text("	WG.Translate("interface", "metal_oneletter_reclaiminfo"):"..metal.."\255\255\255\128".." WG.Translate("interface", "energy_oneletter_reclaiminfo"):"..energy,x,y,form)
 	end
 	--Unit resource info when mouse on one
 	if (nonground == "Reclaim") and (rangestart ~= nil) and ((energy == 0) or (metal == 0)) and (b1 == false) then
@@ -155,7 +155,7 @@ function widget:DrawScreen()
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local _,_,_,_,buildprogress = Spring.GetUnitHealth(unitID)
 			metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress)
-			local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128")
+			local textwidth = 12*gl.GetTextWidth("	WG.Translate("interface", "metal_oneletter_reclaiminfo"):"..metal.."\255\255\255\128")
 			if (textwidth+x>vsx) then
 				x = x - textwidth - 10
 			end
@@ -166,7 +166,7 @@ function widget:DrawScreen()
 			if not UnitDefs[Spring.GetUnitDefID(unitID)].reclaimable then
 				color = "\255\220\10\10"
 			end
-			gl.Text(color.."	M:"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
+			gl.Text(color.."	WG.Translate("interface", "metal_oneletter_reclaiminfo"):"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
 		end
 	end
 	--
