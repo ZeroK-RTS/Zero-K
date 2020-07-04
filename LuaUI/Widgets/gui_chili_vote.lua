@@ -38,11 +38,11 @@ local pollActive = false
 local hidePoll = false
 local votingForceStart = false
 
-local string_success = "END:SUCCESS"
-local string_fail = "END:FAILED"
+local string_success = WG.Translate("interface", "vote_success")
+local string_fail = WG.Translate("interface", "vote_failed")
 local string_vote = {"!y=", "!n="}
-local string_titleStart = "Poll: "
-local string_endvote = " poll cancelled"
+local string_titleStart = WG.Translate("interface", "vote:")
+local string_endvote = WG.Translate("interface", "vote_cancelled")
 local string_titleEnd = "?"
 local string_noVote = "There is no poll going on, start some first"
 local string_votemove = "Do you want to join"
@@ -142,9 +142,9 @@ function widget:AddConsoleMessage(msg)
 				local isSameAllyTeam = (not spec) and (allyTeamID == Spring.GetLocalAllyTeamID())
 				local canVoteAsSpec = spec and (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") == 1) and CAN_RESIGN_VOTE_WHILE_RESIGNED
 				if isSameAllyTeam or canVoteAsSpec then
-					title = "Vote: resign?"
+					title = WG.Translate("interface", "resign_vote")
 				else
-					title = teamName .. " voting on resign..."
+					title = teamName .. WG.Translate("interface", "team_resigning_vote")
 					button_vote[1]:Hide()
 					button_vote[2]:Hide()
 				end
@@ -273,7 +273,7 @@ function widget:Initialize()
 			width = "20%",
 			height = "100%",
 			classname = "overlay_button",
-			caption = (i==1) and 'Yes' or 'No',
+			caption = (i==1) and WG.Translate("interface", "vote_yes") or WG.Translate("interface", "vote_nope"),
 			OnClick = {	function ()
 					--if voteAntiSpam then return end
 					--voteAntiSpam = true
@@ -299,7 +299,7 @@ function widget:Initialize()
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
 		caption="";
-		tooltip = "Hide this vote";
+		tooltip = WG.Translate("interface", "hide_vote");
 		OnClick = {function()
 				screen0:RemoveChild(window)
 				hidePoll = true
