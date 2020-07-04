@@ -262,6 +262,16 @@
 	"states_smthng_low" : "Low",
 	"states_smthng_normal" : "Normal",
 	"states_smthng_high" : "High",
-		
+	"mainpanel_orders" : "Orders",
+	"mainpanel_economy" : "Econ",
+	"mainpanel_defence" : "Defence",
+	"mainpanel_special" : "Special",
+	"mainpanel_factory" : "Factory",
+	"mainpanel_units" : "Units",	
+	"terra_build_ramp" : "Build a Ramp - Click and drag between two positions.",
+	"terra_level_terrain" : "Level the terrain - Click and drag a line or closed shape.",
+	"terra_raise_lower" : "Raises/Lower terrain - Click and drag a line or closed shape.",
+	"terra_smooth" : "Smooth the terrain - Click and drag a line or closed shape.",
+	"terra_restore" : "Restore the terrain to its original shape - Click and drag a line or closed shape.",
 	}
 }
