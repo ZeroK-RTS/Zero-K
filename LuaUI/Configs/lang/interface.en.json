@@ -105,7 +105,7 @@
 		"one" : "%{count} unit in queue",
 		"few" : "%{count} units in queue",
 		"many" : "%{count} units in queue",
-		"other" : "%{count} units in queue"
+		"other" : "%{count} units in queue",
 	"defences_range" : "Defense Ranges",
 	"ally_ground_defence_range" : "Show Ally Ground Defence",
 	"ally_air_defence_range" : "Show Ally Air Defence",
