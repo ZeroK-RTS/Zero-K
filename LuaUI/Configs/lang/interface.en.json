@@ -272,6 +272,6 @@
 	"terra_level_terrain" : "Level the terrain - Click and drag a line or closed shape.",
 	"terra_raise_lower" : "Raises/Lower terrain - Click and drag a line or closed shape.",
 	"terra_smooth" : "Smooth the terrain - Click and drag a line or closed shape.",
-	"terra_restore" : "Restore the terrain to its original shape - Click and drag a line or closed shape.",
+	"terra_restore" : "Restore the terrain to its original shape - Click and drag a line or closed shape."
 	}
 }
