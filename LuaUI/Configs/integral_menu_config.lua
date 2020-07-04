@@ -117,7 +117,7 @@ end
 
 local commandPanels = {
 	{
-		humanName = "Orders",
+		humanName = WG.Translate("interface", "mainpanel_orders"),
 		name = "orders",
 		inclusionFunction = function(cmdID)
 			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
@@ -126,7 +126,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.command,
 	},
 	{
-		humanName = "Econ",
+		humanName = WG.Translate("interface", "mainpanel_economy"),
 		name = "economy",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdEconomy[cmdID]
@@ -140,7 +140,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = "Defence",
+		humanName = WG.Translate("interface", "mainpanel_defence"),
 		name = "defence",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdDefence[cmdID]
@@ -154,7 +154,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = "Special",
+		humanName = WG.Translate("interface", "mainpanel_special"),
 		name = "special",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdSpecial[cmdID]
@@ -170,7 +170,7 @@ local commandPanels = {
 		buttonLayoutOverride = specialButtonLayoutOverride,
 	},
 	{
-		humanName = "Factory",
+		humanName = WG.Translate("interface", "mainpanel_factory"),
 		name = "factory",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdFactory[cmdID]
@@ -184,7 +184,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = "Units",
+		humanName = WG.Translate("interface", "mainpanel_units"),
 		name = "units_mobile",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
 			return not factoryUnitDefID -- Only called if previous funcs don't
@@ -196,7 +196,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = "Units",
+		humanName = WG.Translate("interface", "mainpanel_units"),
 		name = "units_factory",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
 			if not (factoryUnitDefID and buildCmdUnits[factoryUnitDefID]) then
