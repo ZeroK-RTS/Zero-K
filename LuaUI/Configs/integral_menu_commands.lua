@@ -319,50 +319,50 @@ local imageDir = 'LuaUI/Images/commands/'
 --autoCallTransport =
 
 local tooltips = {
-	WANT_ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
-	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
-	REPEAT = "Repeat (_STATE_)\n  Loop command queue. Construction queue for factories.",
-	WANT_CLOAK = "Cloak (_STATE_)\n  Makes the unit invisible, unless it fires, takes damage, or is too close to an enemy unit.",
-	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloaks all friendly units in an area.",
-	PRIORITY = "Construction Priority (_STATE_)\n  Higher priority constructors receive resources before those of lower priority.",
-	MISC_PRIORITY = "Misc. Priority (_STATE_)\n  Priority for non-constructor resource usage (morph, stockpile, and energy upkeep).",
-	FACTORY_GUARD = "Auto Assist (_STATE_)\n  Newly built constructors automatically assist their factory.",
-	AUTO_CALL_TRANSPORT = "Call Transports (_STATE_)\n  Automatically call transports between constructor tasks.",
-	GLOBAL_BUILD = "Global Build Command (_STATE_)\n  Sets constructors to execute global build orders.",
-	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
-	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
-	RETREAT = "Retreat (_STATE_)\n  Automatically retreat to closest retreat point or airpad when damaged. Right click to disable.",
-	IDLEMODE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
-	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
-	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
-	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
-	GOO_GATHER = "Puppy Goo (_STATE_)\n  Set when Puppies reclaim metal.",
-	DISABLE_ATTACK = "Allow attack commands (_STATE_)\n  Set whether the unit responds to attack commands.",
-	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
-	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
-	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
-	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
-	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
-	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain amphibious units to float to the surface.",
-	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
-	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
+	WANT_ONOFF = WG.Translate("interface", "states_activation") (_STATE_)\n  WG.Translate("interface", "states_activation_tooltip"),
+	UNIT_AI = WG.Translate("interface", "states_unitai") (_STATE_)\n  WG.Translate("interface", "states_unitai_tooltip"),
+	REPEAT = WG.Translate("interface", "states_repeat") (_STATE_)\n  WG.Translate("interface", "states_repeat_tooltip"),
+	WANT_CLOAK = WG.Translate("interface", "states_perscloak") (_STATE_)\n  WG.Translate("interface", "states_percloak_tooltip"),
+	CLOAK_SHIELD = WG.Translate("interface", "states_areacloak") (_STATE_)\n  WG.Translate("interface", "states_areacloak_tooltip"),
+	PRIORITY = WG.Translate("interface", "states_priority") (_STATE_)\n  WG.Translate("interface", "states_priority_tooltip"),
+	MISC_PRIORITY = WG.Translate("interface", "states_miscpriority") (_STATE_)\n  WG.Translate("interface", "states_miscpriority_tooltip"),
+	FACTORY_GUARD = WG.Translate("interface", "states_autoassist") (_STATE_)\n  WG.Translate("interface", "states_autoassist_tooltip"),
+	AUTO_CALL_TRANSPORT = WG.Translate("interface", "states_calltransport") (_STATE_)\n  WG.Translate("interface", "states_calltransport_tooltip"),
+	GLOBAL_BUILD = WG.Translate("interface", "states_glbuild") (_STATE_)\n  WG.Translate("interface", "states_glbuild_tooltip"),
+	MOVE_STATE = WG.Translate("interface", "states_manuever") (_STATE_)\n  WG.Translate("interface", "states_manuever_tooltip"),
+	FIRE_STATE = WG.Translate("interface", "states_firestate") (_STATE_)\n  WG.Translate("interface", "states_firestate_tooltip"),
+	RETREAT = WG.Translate("interface", "states_retreat") (_STATE_)\n  WG.Translate("interface", "states_retreat_tooltip"),
+	IDLEMODE = WG.Translate("interface", "states_planeland") (_STATE_)\n  WG.Translate("interface", "states_planeland_tooltip"),
+	AP_FLY_STATE = WG.Translate("interface", "states_applaneland") (_STATE_)\n  WG.Translate("interface", "states_applaneland_tooltip"),
+	UNIT_BOMBER_DIVE_STATE = WG.Translate("interface", "states_divebombing") (_STATE_)\n  WG.Translate("interface", "states_divebombing_tooltip"),
+	UNIT_KILL_SUBORDINATES = WG.Translate("interface", "states_killcap") (_STATE_)\n  WG.Translate("interface", "states_killcap_tooltip"),
+	GOO_GATHER = WG.Translate("interface", "states_pupgoo") (_STATE_)\n  WG.Translate("interface", "states_pupgoo_tooltip"),
+	DISABLE_ATTACK = WG.Translate("interface", "states_attackcom") (_STATE_)\n  WG.Translate("interface", "states_attackcom_tooltip"),
+	PUSH_PULL = WG.Translate("interface", "states_pushpull") (_STATE_)\n  WG.Translate("interface", "states_pushpull_tooltip"),
+	DONT_FIRE_AT_RADAR = WG.Translate("interface", "states_radartargeting") (_STATE_)\n  WG.Translate("interface", "states_radartargeting_tooltip"),
+	PREVENT_OVERKILL = WG.Translate("interface", "states_overkill") (_STATE_)\n  WG.Translate("interface", "states_overkill_tooltip"),
+	TRAJECTORY = WG.Translate("interface", "states_firearc") (_STATE_)\n  WG.Translate("interface", "states_firearc_tooltip"),
+	AIR_STRAFE = WG.Translate("interface", "states_gsstrafe") (_STATE_)\n  WG.Translate("interface", "states_gsstrafe_tooltip"),
+	UNIT_FLOAT_STATE = WG.Translate("interface", "states_waterfloat") (_STATE_)\n  WG.Translate("interface", "states_waterfloat_tooltip"),
+	SELECTION_RANK = WG.Translate("interface", "states_selectionrank") (_STATE_)\n  WG.Translate("interface", "states_selectionrank_tooltip"),
+	TOGGLE_DRONES = WG.Translate("interface", "states_drones") (_STATE_)\n  WG.Translate("interface", "states_drones_tooltip")
 }
 
 local overrides = {
-	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target or position."},
+	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = WG.Translate("interface", "commands_forcefire")},
 	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
-	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets on the way."},
+	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = WG.Translate("interface", "commands_attackmove")},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
-	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', tooltip = "Wait: Pause the units command queue and have it hold its current position."},
+	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', tooltip = WG.Translate("interface", "commands_wait")},
 
 	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png'},
 	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
 	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {texture = imageDir .. 'Bold/build.png'},
-	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the unit's special weapon."},
+	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = WG.Translate("interface", "commands_dgun")},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
@@ -375,13 +375,13 @@ local overrides = {
 	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
 
-	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
+	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = WG.Translate("interface", "commands_guard")},
 
 	[CMD_AREA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
 
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 
-	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest repair pad for health and ammo."},
+	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = WG.Translate("interface", "commands_resupply")},
 
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
@@ -402,137 +402,137 @@ local overrides = {
 	-- states
 	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
-		stateTooltip = {tooltips.WANT_ONOFF:gsub("_STATE_", "Off"), tooltips.WANT_ONOFF:gsub("_STATE_", "On")}
+		stateTooltip = {tooltips.WANT_ONOFF:gsub("_STATE_", WG.Translate("interface", "states_smthng_off")), tooltips.WANT_ONOFF:gsub("_STATE_", WG.Translate("interface", "states_smthng_on"))}
 	},
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
-		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.UNIT_AI:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))},
 	},
 	[CMD.REPEAT] = {
 		texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'},
-		stateTooltip = {tooltips.REPEAT:gsub("_STATE_", "Disabled"), tooltips.REPEAT:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.REPEAT:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.REPEAT:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD_WANT_CLOAK] = {
 		texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		stateTooltip = {tooltips.WANT_CLOAK:gsub("_STATE_", "Disabled"), tooltips.WANT_CLOAK:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.WANT_CLOAK:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.WANT_CLOAK:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD_CLOAK_SHIELD] = {
 		texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'},
-		stateTooltip = {tooltips.CLOAK_SHIELD:gsub("_STATE_", "Disabled"), tooltips.CLOAK_SHIELD:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.CLOAK_SHIELD:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.CLOAK_SHIELD:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD_PRIORITY] = {
 		texture = {imageDir .. 'states/wrench_low.png', imageDir .. 'states/wrench_med.png', imageDir .. 'states/wrench_high.png'},
 		stateTooltip = {
-			tooltips.PRIORITY:gsub("_STATE_", "Low"),
-			tooltips.PRIORITY:gsub("_STATE_", "Normal"),
-			tooltips.PRIORITY:gsub("_STATE_", "High")
+			tooltips.PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_low")),
+			tooltips.PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_normal")),
+			tooltips.PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_high"))
 		}
 	},
 	[CMD_MISC_PRIORITY] = {
 		texture = {imageDir .. 'states/wrench_low_other.png', imageDir .. 'states/wrench_med_other.png', imageDir .. 'states/wrench_high_other.png'},
 		stateTooltip = {
-			tooltips.MISC_PRIORITY:gsub("_STATE_", "Low"),
-			tooltips.MISC_PRIORITY:gsub("_STATE_", "Normal"),
-			tooltips.MISC_PRIORITY:gsub("_STATE_", "High")
+			tooltips.MISC_PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_low")),
+			tooltips.MISC_PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_normal")),
+			tooltips.MISC_PRIORITY:gsub("_STATE_", WG.Translate("interface", "states_smthng_high"))
 		}
 	},
 	[CMD_FACTORY_GUARD] = {
 		texture = {imageDir .. 'states/autoassist_off.png',
 		imageDir .. 'states/autoassist_on.png'},
-		stateTooltip = {tooltips.FACTORY_GUARD:gsub("_STATE_", "Disabled"), tooltips.FACTORY_GUARD:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.FACTORY_GUARD:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.FACTORY_GUARD:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD_AUTO_CALL_TRANSPORT] = {
 		texture = {imageDir .. 'states/auto_call_off.png', imageDir .. 'states/auto_call_on.png'},
-		stateTooltip = {tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", "Disabled"), tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.AUTO_CALL_TRANSPORT:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD_GLOBAL_BUILD] = {
 		texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
-		stateTooltip = {tooltips.GLOBAL_BUILD:gsub("_STATE_", "Disabled"), tooltips.GLOBAL_BUILD:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.GLOBAL_BUILD:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.GLOBAL_BUILD:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD.MOVE_STATE] = {
 		texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 		stateTooltip = {
-			tooltips.MOVE_STATE:gsub("_STATE_", "Hold Position"),
-			tooltips.MOVE_STATE:gsub("_STATE_", "Maneuver"),
-			tooltips.MOVE_STATE:gsub("_STATE_", "Roam")
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_hold")),
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_abit")),
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_roam"))
 		}
 	},
 	[CMD.FIRE_STATE] = {
 		texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
 		stateTooltip = {
-			tooltips.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
-			tooltips.FIRE_STATE:gsub("_STATE_", "Return Fire"),
-			tooltips.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+			tooltips.FIRE_STATE:gsub("_STATE_", WG.Translate("interface", "states_firestate_hold")),
+			tooltips.FIRE_STATE:gsub("_STATE_", WG.Translate("interface", "states_firestate_return")),
+			tooltips.FIRE_STATE:gsub("_STATE_", WG.Translate("interface", "states_firestate_weaponsfree"))
 		}
 	},
 	[CMD_RETREAT] = {
 		texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
 		stateTooltip = {
-			tooltips.RETREAT:gsub("_STATE_", "Disabled"),
-			tooltips.RETREAT:gsub("_STATE_", "30%% Health"),
-			tooltips.RETREAT:gsub("_STATE_", "65%% Health"),
-			tooltips.RETREAT:gsub("_STATE_", "99%% Health")
+			tooltips.RETREAT:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")),
+			tooltips.RETREAT:gsub("_STATE_", "30%%" WG.Translate("interface", "states_retreat_healthleft")),
+			tooltips.RETREAT:gsub("_STATE_", "65%%" WG.Translate("interface", "states_retreat_healthleft")),
+			tooltips.RETREAT:gsub("_STATE_", "99%%" WG.Translate("interface", "states_retreat_healthleft"))
 		}
 	},
 	[CMD.IDLEMODE] = {
 		texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'},
-		stateTooltip = {tooltips.IDLEMODE:gsub("_STATE_", "Fly"), tooltips.IDLEMODE:gsub("_STATE_", "Land")}
+		stateTooltip = {tooltips.IDLEMODE:gsub("_STATE_", WG.Translate("interface", "states_planeland_no")), tooltips.IDLEMODE:gsub("_STATE_", WG.Translate("interface", "states_planeland_yes"))}
 	},
 	[CMD_AP_FLY_STATE] = {
 		texture = {imageDir .. 'states/fly_on.png', imageDir .. 'states/fly_off.png'},
-		stateTooltip = {tooltips.AP_FLY_STATE:gsub("_STATE_", "Fly"), tooltips.AP_FLY_STATE:gsub("_STATE_", "Land")}
+		stateTooltip = {tooltips.AP_FLY_STATE:gsub("_STATE_", WG.Translate("interface", "states_planeland_no")), tooltips.AP_FLY_STATE:gsub("_STATE_", WG.Translate("interface", "states_planeland_yes"))}
 	},
 	[CMD_UNIT_BOMBER_DIVE_STATE] = {
 		texture = {imageDir .. 'states/divebomb_off.png', imageDir .. 'states/divebomb_shield.png', imageDir .. 'states/divebomb_attack.png', imageDir .. 'states/divebomb_always.png'},
 		stateTooltip = {
-			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Always Fly High"),
-			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Against Shields and Units"),
-			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Against Units"),
-			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", "Always Fly Low")
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_divebombing_flyhigh")),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_divebombing_shieldandunits")),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_divebombing_units")),
+			tooltips.UNIT_BOMBER_DIVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_divebombing_golow"))
 		}
 	},
 	[CMD_UNIT_KILL_SUBORDINATES] = {
 		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
-		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", "Kill")}
+		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_keep")"Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_kill")"Kill")}
 	},
 	[CMD_GOO_GATHER] = {
 		texture = {imageDir .. 'states/goo_off.png', imageDir .. 'states/goo_on.png', imageDir .. 'states/goo_cloak.png'},
 		stateTooltip = {
-			tooltips.GOO_GATHER:gsub("_STATE_", "Off"),
-			tooltips.GOO_GATHER:gsub("_STATE_", "On except cloaked"),
-			tooltips.GOO_GATHER:gsub("_STATE_", "On always")
+			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_smthng_off")),
+			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_pupgoo_onbutcloaked")),
+			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_pupgoo_onalways"))
 		}
 	},
 	[CMD_DISABLE_ATTACK] = {
 		texture = {imageDir .. 'states/disableattack_off.png', imageDir .. 'states/disableattack_on.png'},
-		stateTooltip = {tooltips.DISABLE_ATTACK:gsub("_STATE_", "Allowed"), tooltips.DISABLE_ATTACK:gsub("_STATE_", "Blocked")}
+		stateTooltip = {tooltips.DISABLE_ATTACK:gsub("_STATE_", WG.Translate("interface", "states_attackcom_allowed")), tooltips.DISABLE_ATTACK:gsub("_STATE_", WG.Translate("interface", "states_attackcom_blocked"))}
 	},
 	[CMD_PUSH_PULL] = {
 		texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'},
-		stateTooltip = {tooltips.PUSH_PULL:gsub("_STATE_", "Pull"), tooltips.PUSH_PULL:gsub("_STATE_", "Push")}
+		stateTooltip = {tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_pull")), tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_push")"Push")}
 	},
 	[CMD_DONT_FIRE_AT_RADAR] = {
 		texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'},
-		stateTooltip = {tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", "Fire"), tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", "Hold Fire")}
+		stateTooltip = {tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", WG.Translate("interface", "states_radartargeting_fire")), tooltips.DONT_FIRE_AT_RADAR:gsub("_STATE_", WG.Translate("interface", "states_radartargeting_hold"))}
 	},
 	[CMD_PREVENT_OVERKILL] = {
 		texture = {imageDir .. 'states/overkill_off.png', imageDir .. 'states/overkill_on.png'},
-		stateTooltip = {tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Disabled"), tooltips.PREVENT_OVERKILL:gsub("_STATE_", "Enabled")}
+		stateTooltip = {tooltips.PREVENT_OVERKILL:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")), tooltips.PREVENT_OVERKILL:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled"))}
 	},
 	[CMD.TRAJECTORY] = {
 		texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'},
-		stateTooltip = {tooltips.TRAJECTORY:gsub("_STATE_", "Low"), tooltips.TRAJECTORY:gsub("_STATE_", "High")}
+		stateTooltip = {tooltips.TRAJECTORY:gsub("_STATE_", WG.Translate("interface", "states_firearc_low")), tooltips.TRAJECTORY:gsub("_STATE_", WG.Translate("interface", "states_firearc_high"))}
 	},
 	[CMD_AIR_STRAFE] = {
 		texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'},
-		stateTooltip = {tooltips.AIR_STRAFE:gsub("_STATE_", "No Strafe"), tooltips.AIR_STRAFE:gsub("_STATE_", "Strafe")}
+		stateTooltip = {tooltips.AIR_STRAFE:gsub("_STATE_", WG.Translate("interface", "states_gsstrafe_no")), tooltips.AIR_STRAFE:gsub("_STATE_", WG.Translate("interface", "states_gsstrafe_yes"))}
 	},
 	[CMD_UNIT_FLOAT_STATE] = {
 		texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'},
 		stateTooltip = {
-			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Never Float"),
-			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Float To Fire"),
-			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", "Always Float")
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_never")),
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_tofire")),
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_always")")
 		}
 	},
 	[CMD_SELECTION_RANK] = {
@@ -547,8 +547,8 @@ local overrides = {
 	[CMD_TOGGLE_DRONES] = {
 		texture = {imageDir .. 'states/drones_off.png', imageDir .. 'states/drones_on.png'},
 		stateTooltip = {
-			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Disabled"),
-			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Enabled"),
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")),
+			tooltips.TOGGLE_DRONES:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled")),
 		}
 	},
 }
