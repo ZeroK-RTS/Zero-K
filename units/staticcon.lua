@@ -1,7 +1,7 @@
 return { staticcon = {
   unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
-  description                   = [[Construction Assistant, Builds at 10 m/s]],
+  description                   = [[Construction Assistant]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostMetal                = 180,

@@ -1,7 +1,7 @@
 return { factoryamph = {
   unitname         = [[factoryamph]],
   name             = [[Amphbot Factory]],
-  description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
+  description      = [[Produces Amphibious Bots]],
   buildCostMetal   = Shared.FACTORY_COST,
   builder          = true,
   buildingGroundDecalDecaySpeed = 30,

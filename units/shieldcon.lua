@@ -1,7 +1,7 @@
 return { shieldcon = {
   unitname            = [[shieldcon]],
   name                = [[Convict]],
-  description         = [[Shielded Construction Bot, Builds at 5 m/s]],
+  description         = [[Shielded Construction Bot]],
   acceleration        = 1.5,
   activateWhenBuilt   = true,
   brakeRate           = 1.8,

@@ -1,7 +1,7 @@
 return { striderhub = {
   unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
-  description                   = [[Constructs Striders, Builds at 10 m/s]],
+  description                   = [[Constructs Striders]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostMetal                = Shared.FACTORY_COST,

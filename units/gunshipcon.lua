@@ -1,7 +1,7 @@
 return { gunshipcon = {
   unitname            = [[gunshipcon]],
   name                = [[Wasp]],
-  description         = [[Heavy Construction Aircraft, Builds at 7.5 m/s]],
+  description         = [[Heavy Construction Aircraft]],
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,

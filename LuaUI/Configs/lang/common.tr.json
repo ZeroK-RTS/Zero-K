@@ -4,7 +4,7 @@
 	"geospot" : "Jeotermal Havalandırma\nBuraya Jeotermal Jeneratör Yerleştirebilirsin",
 	"build_eta" : "Zaman:",
 	"lvl" : "svy",
-	"builds_at" : "Kurar",
+	"builds_at" : "%{desc}, %{bp} m/s de inşa eder",
 	"disabled_no_grid" : "Devre dışı - ızgara yok",
 	"grid" : "Izgara",
 	"wind_range" : "Rüzgar aralığı",

@@ -1,7 +1,7 @@
 return { factoryhover = {
   unitname         = [[factoryhover]],
   name             = [[Hovercraft Platform]],
-  description      = [[Produces Hovercraft, Builds at 10 m/s]],
+  description      = [[Produces Hovercraft]],
   acceleration     = 0,
   brakeRate        = 0,
   buildCostMetal   = Shared.FACTORY_COST,

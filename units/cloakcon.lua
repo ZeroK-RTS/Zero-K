@@ -1,7 +1,7 @@
 return { cloakcon = {
   unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
-  description            = [[Cloaked Construction Bot, Builds at 5 m/s]],
+  description            = [[Cloaked Construction Bot]],
   acceleration           = 1.5,
   activateWhenBuilt      = true,
   brakeRate              = 9.0,

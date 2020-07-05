@@ -1,7 +1,7 @@
 return { planecon = {
   unitname            = [[planecon]],
   name                = [[Crane]],
-  description         = [[Construction Aircraft, Builds at 5 m/s]],
+  description         = [[Construction Aircraft]],
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,

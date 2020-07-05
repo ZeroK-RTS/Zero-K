@@ -4,7 +4,7 @@
 	"geospot" : "Gejzer\nMożna postawić elektrownię geotermiczną",
 	"build_eta" : "Gotowe za",
 	"lvl" : "poz.",
-	"builds_at" : "moc",
+	"builds_at" : "%{desc}, moc budowy %{bp} m/s",
 	"disabled_no_grid" : "Niepodłączony do sieci",
 	"grid" : "Sieć",
 	"wind_range" : "Siła wiatru",

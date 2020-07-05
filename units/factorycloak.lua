@@ -1,7 +1,7 @@
 return { factorycloak = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloakbot Factory]],
-  description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
+  description                   = [[Produces Cloaked, Mobile Robots]],
   buildCostMetal                = Shared.FACTORY_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,

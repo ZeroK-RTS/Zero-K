@@ -133,10 +133,10 @@ function Spring.Utilities.GetDescription(ud, unitID)
 			return customTooltip
 		end
 
-		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-		if buildPower and ud.buildSpeed then
-			buildPower = buildPower*ud.buildSpeed
-			desc = desc .. ", " .. WG.Translate("interface", "builds_at") .. " " .. buildPower .. " m/s"
+		local buildSpeedRaw = ud.buildSpeed
+		if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
+			local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+			desc = WG.Translate("interface", "builds_at", {desc = desc, bp = buildSpeed}) or desc
 		end
 	end
 	return desc

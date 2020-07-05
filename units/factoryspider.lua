@@ -1,7 +1,7 @@
 return { factoryspider = {
   unitname                      = [[factoryspider]],
   name                          = [[Spider Factory]],
-  description                   = [[Produces Spiders, Builds at 10 m/s]],
+  description                   = [[Produces Spiders]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,

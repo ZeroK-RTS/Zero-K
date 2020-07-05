@@ -1,7 +1,7 @@
 return { factoryjump = {
   unitname                      = [[factoryjump]],
   name                          = [[Jumpbot Factory]],
-  description                   = [[Produces Jumpjet Equipped Robots, Builds at 10 m/s]],
+  description                   = [[Produces Jumpjet Equipped Robots]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,

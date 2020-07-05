@@ -16,7 +16,7 @@
 	},
 	"factorycloak" : {
 		"name" : "Cloakbot Factory",
-		"description" : "Produziert Tarnroboter, Baut mit 10 M/s",
+		"description" : "Produziert Tarnroboter",
 		"helptext" : "List statt pure Gewalt lautet hier das Motto. Die Cloakbot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Ronin, Reaver, Knight, Sling"
 	},
 	"hoverdepthcharge" : {
@@ -46,7 +46,7 @@
 	},
 	"athena" : {
 		"name" : "Athena",
-		"description" : "Fliegender SpecOps Bauleiter, Baut mit 15 m/s",
+		"description" : "Fliegender SpecOps Bauleiter",
 		"helptext" : "Athene ist die Spitze der Tarnungsschlagkraft. Ausgerüstet mit einem Verhüllungsgeräte und einem Radarstörer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann Verwüstung nachsichziehen werden und die gegnerische Logistik vernichten können."
 	},
 	"spideremp" : {
@@ -71,7 +71,7 @@
 	},
 	"factoryplane" : {
 		"name" : "Airplane Plant",
-		"description" : "Produziert Flugzeuge, Baut mit 10 M/s",
+		"description" : "Produziert Flugzeuge",
 		"helptext" : "Das Airplane Plant ermöglicht den Bau vielfältiger Starrflügelflugzeuge, um deine Bedürfnisse zu stillen. Wähle zwischen Allzweckjägern, die sowohl leichte Attacken fliegen können, als auch als Abfangjäger fungieren, und präzisen Bombern, um spezielle Ziele zu vernichten. Es befüllt außerdem die Bomber."
 	},
 	"shieldassault" : {
@@ -86,7 +86,7 @@
 	},
 	"spidercon" : {
 		"name" : "Weaver",
-		"description" : "Konstruktionsspinne, Baut mit 7.5 M/s",
+		"description" : "Konstruktionsspinne",
 		"helptext" : "Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann. Er hat auch ein Radar."
 	},
 	"vehriot" : {
@@ -131,12 +131,12 @@
 	},
 	"factoryamph" : {
 		"name" : "Amphbot Factory",
-		"description" : "Produziert amhpibische Roboter, Baut mit 10 M/s",
+		"description" : "Produziert amhpibische Roboter",
 		"helptext" : "Diese Fabrik stellt langsame jedoch robuste, amphibische Roboter her. Unterwasser reparieren sich diese Roboter meist automatisch. "
 	},
 	"factoryship" : {
 		"name" : "Shipyard",
-		"description" : "Produziert Schiffe, Baut mit 10 M/s",
+		"description" : "Produziert Schiffe",
 		"helptext" : "Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen."
 	},
 	"vehcapture" : {
@@ -146,7 +146,7 @@
 	},
 	"factoryjump" : {
 		"name" : "Jumpbot Factory",
-		"description" : "Produziert Spezial- und Sprungdüsenroboter, Baut mit 10 M/s",
+		"description" : "Produziert Spezial- und Sprungdüsenroboter",
 		"helptext" : "Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Jugglenaut"
 	},
 	"raveparty" : {
@@ -236,7 +236,7 @@
 	},
 	"hovercon" : {
 		"name" : "Quill",
-		"description" : "Konstruktionsluftkissenboot, Baut mit 5 M/s",
+		"description" : "Konstruktionsluftkissenboot",
 		"helptext" : "Quill erlaubt dir leichtgängige Expansionen über Land und See."
 	},
 	"turretriot" : {
@@ -251,7 +251,7 @@
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
-		"description" : "Getarnter Konstruktionsroboter, Baut mit 5 M/s",
+		"description" : "Getarnter Konstruktionsroboter",
 		"helptext" : "Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können. Er ist auch mit einem kleinen Tarnschild ausgestattet, der im Gegensatz zu den vorgenannten Fähigkeiten nutzt Energie."
 	},
 	"gunshipaa" : {
@@ -361,7 +361,7 @@
 	},
 	"factoryveh" : {
 		"name" : "Rover Assembly",
-		"description" : "Produziert Radfahrzeug, Baut mit 10 M/s",
+		"description" : "Produziert Radfahrzeug",
 		"helptext" : "Der Traditionalist unter den Fabriken. Die Rover Assembly ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Ripper, Fencer"
 	},
 	"turretaaflak" : {
@@ -401,7 +401,7 @@
 	},
 	"factoryhover" : {
 		"name" : "Hovercraft Platform",
-		"description" : "Produziert Aerogleiter, Baut mit 10 M/s",
+		"description" : "Produziert Aerogleiter",
 		"helptext" : "Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Dagger, Halberd, Scalpel, Mace, Lance"
 	},
 	"chickend" : {
@@ -476,7 +476,7 @@
 	},
 	"tankcon" : {
 		"name" : "Welder",
-		"description" : "Bewaffneter Konstruktionspanzer, Baut mit 7.5 M/s",
+		"description" : "Bewaffneter Konstruktionspanzer",
 		"helptext" : "Mit einem kleinen Verteidigungsturm bewaffnet, kann der Welder sich selbst gegen leichte gegnerische Attacken wehren."
 	},
 	"spiderskirm" : {
@@ -491,7 +491,7 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Erzeugt Strider, Baut mit 10 M/s",
+		"description" : "Erzeugt Strider",
 		"helptext" : "Das Strider Hub erzeugt Strider, welche sehr gefürchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benötigt, um ein Projekt zu starten, nicht, um es zu vollenden."
 	},
 	"cloakskirm" : {
@@ -526,7 +526,7 @@
 	},
 	"gunshipcon" : {
 		"name" : "Wasp",
-		"description" : "Schwere Konstruktionsdrohne, baut mit 7.5 m/s",
+		"description" : "Schwere Konstruktionsdrohne",
 		"helptext" : "Eine schwere Konstruktionsdrohne, welche flugtauglich ist und schnell baut."
 	},
 	"subraider" : {
@@ -581,7 +581,7 @@
 	},
 	"shieldcon" : {
 		"name" : "Convict",
-		"description" : "Konstruktionsroboter mit Schild, Baut mit 5 M/s",
+		"description" : "Konstruktionsroboter mit Schild",
 		"helptext" : "Der Convict ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er hat ein Schild um sich zu schutzen."
 	},
 	"striderarty" : {
@@ -641,7 +641,7 @@
 	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
-		"description" : "Produziert Spinnen, Baut mit 10 M/s",
+		"description" : "Produziert Spinnen",
 		"helptext" : "Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crab"
 	},
 	"amphtele" : {
@@ -661,7 +661,7 @@
 	},
 	"staticmissilesilo" : {
 		"name" : "Missile Silo",
-		"description" : "Produziert Raketen, Baut mit 10 M/s",
+		"description" : "Produziert Raketen",
 		"helptext" : "Das Raketensilo erzeugt und lagert bis zu vier verschiedene Marschflugkörper, jede mit einem einzigartigen Sprengkopf. Das Silo bietet hervorragende Schlagkraft in Pattsituationen, sowohl für offensive, als auch defensive Zwecke."
 	},
 	"staticmex" : {
@@ -676,7 +676,7 @@
 	},
 	"vehcon" : {
 		"name" : "Mason",
-		"description" : "Konstruktionsfahrzeug, Baut mir 5 M/s",
+		"description" : "Konstruktionsfahrzeug",
 		"helptext" : "Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet."
 	},
 	"spiderscout" : {
@@ -756,7 +756,7 @@
 	},
 	"staticcon" : {
 		"name" : "Caretaker",
-		"description" : "Nanoturm, Baut mit 10 M/s",
+		"description" : "Nanoturm",
 		"helptext" : "Die effektivste Quelle an Baukraft: der Caretake ist ideal, um die Produktionsrate von Fabriken zu erhöhen oder nahegelegene Verteidigungsanlagen zu reparieren. Der Caretaker kann aber selbst keine neuen Bauten beginnen."
 	},
 	"shipscout" : {
@@ -816,7 +816,7 @@
 	},
 	"shipcon" : {
 		"name" : "Mariner",
-		"description" : "Konstruktionsschiff, Baut mit 7,5 M/s",
+		"description" : "Konstruktionsschiff",
 		"helptext" : "Obwohl teuer, bietet diese Konstruktionseinheit extrem hohe Nanoleistung, kombiniert mit robuster Panzerung und Schnelligkeit."
 	},
 	"cloakaa" : {
@@ -826,7 +826,7 @@
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amphibious Construction Bot, Builds at 7.5 m/s - Armored When Idle",
+		"description" : "Amphibious Construction Bot - Armored When Idle",
 		"helptext" : "Ein robuster und effizienter Konstruktionsroboter der sowohl im Wasser als auch an Land seine Arbeit verrichtet."
 	},
 	"bomberassault" : {
@@ -881,7 +881,7 @@
 	},
 	"factoryshield" : {
 		"name" : "Shieldbot Factory",
-		"description" : "Produziert zähe Roboter, Baut mit 10 M/s",
+		"description" : "Produziert zähe Roboter",
 		"helptext" : "Die Shieldbot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Snitch, Dirtbag"
 	},
 	"shieldscout" : {
@@ -901,7 +901,7 @@
 	},
 	"factorygunship" : {
 		"name" : "Gunship Plant",
-		"description" : "Produziert Kampfhubschrauber, Baut mit 10 M/s",
+		"description" : "Produziert Kampfhubschrauber",
 		"helptext" : "Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit."
 	},
 	"chickena" : {
@@ -956,7 +956,7 @@
 	},
 	"factorytank" : {
 		"name" : "Tank Foundry",
-		"description" : "Produziert schwere und speziallisierte Fahrzeuge, Baut mit 10 M/s",
+		"description" : "Produziert schwere und speziallisierte Fahrzeuge",
 		"helptext" : "Die Tank Foundry ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Emissary, Minotaur, Ogre, Cyclops"
 	},
 	"empmissile" : {
@@ -981,7 +981,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Konstruktionsjumpjet, Baut mit 5 M/s",
+		"description" : "Konstruktionsjumpjet",
 		"helptext" : "Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion."
 	},
 	"jumparty" : {
@@ -1051,7 +1051,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Konstruktionsflugzeug, Baut mit 5 m/s",
+		"description" : "Konstruktionsflugzeug",
 		"helptext" : "Der Crane bewegt sich flink über das Terrain, ist aber auch anfällig gegenüber AA. Obwohl er ziemlich wenig Baukraft hat, ist er in der Lage auch auf außergewöhnlichen Plätzen zu bauen. Durch seine Mobilität ist er ideal dafür geschaffen, Wracks zu absorbieren und daraus das Metall zu gewinnen."
 	},
 	"turretsunlance" : {
