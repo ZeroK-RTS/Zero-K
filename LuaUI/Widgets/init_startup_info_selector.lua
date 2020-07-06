@@ -109,8 +109,8 @@ end
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Hide default commanders',
-		desc = 'You can customize your commanders on the Zero-K site: https://zero-k.info',
+		name = WG.Translate("interface", "startup_commenu_hidedefault"),
+		desc = WG.Translate("interface", "startup_commenu_sitelink"),
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
@@ -126,7 +126,7 @@ options = {
 		end
 	},
 	showModules = {
-		name = 'Module tooltips',
+		name = WG.Translate("interface", "startup_commenu_tooltips"),
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -274,7 +274,7 @@ local function CreateWindow()
 		y = math.floor((vsy - WINDOW_HEIGHT)/2),
 		classname = "main_window",
 		parent = screen0,
-		caption = "COMMANDER SELECTOR",
+		caption = WG.Translate("interface", "startup_commenu_title"),
 		}
 	--scroll = ScrollPanel:New{
 	--	parent = mainWindow,
@@ -310,7 +310,7 @@ local function CreateWindow()
 			padding = {5,5,5,5},
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
-				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
+				Spring.SendCommands({WG.Translate("interface", "startup_chatmessage")..option.name..'!'})
 				Close(false, true)
 			end},
 		}
@@ -356,7 +356,7 @@ local function CreateWindow()
 	local cbWidth = WINDOW_WIDTH*0.4
 	local closeButton = Button:New{
 		parent = mainWindow,
-		caption = "CLOSE",
+		caption = WG.Translate("interface", "startup_commenu_close"),
 		width = cbWidth,
 		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
@@ -465,7 +465,7 @@ function widget:Initialize()
 		button = Button:New{
 			parent = buttonWindow,
 			caption = '',
-			tooltip = "Open comm selection screen",
+			tooltip = WG.Translate("interface", "startup_commenu_open"),
 			width = "100%",
 			height = "100%",
 			x = 0,
