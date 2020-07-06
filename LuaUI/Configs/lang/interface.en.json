@@ -279,6 +279,11 @@
 	"startup_commenu_title" : "COMMANDER SELECTOR",
 	"startup_chatmessage" : "say a:I choose: ",
 	"startup_commenu_open" : "Open comm selection screen",
-	"startup_commenu_close" : "CLOSE"
+	"startup_commenu_close" : "CLOSE",
+	"com_upgrademenu_title" : "Modules",
+	"com_upgrademenu_start" : "Start upgrade",
+	"com_upgrademenu_currentupgrades" : "View current modules",
+	"com_upgrademenu_cancel" : "Cancel module selection",
+	"com_upgrademenu_tooltip" : "Upgrade Commander"
 	}
 }
