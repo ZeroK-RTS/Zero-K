@@ -85,7 +85,7 @@ end
 local UPGRADE_CMD_DESC = {
 	id      = CMD_UPGRADE_UNIT,
 	type    = CMDTYPE.ICON,
-	tooltip = WG.Translate("resbars","wind_range"),
+	tooltip = WG.Translate("resbars", "com_upgrademenu_tooltip"),
 	cursor  = 'Repair',
 	action  = 'upgradecomm',
 	params  = {},
