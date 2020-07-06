@@ -272,6 +272,13 @@
 	"terra_level_terrain" : "Level the terrain - Click and drag a line or closed shape.",
 	"terra_raise_lower" : "Raises/Lower terrain - Click and drag a line or closed shape.",
 	"terra_smooth" : "Smooth the terrain - Click and drag a line or closed shape.",
-	"terra_restore" : "Restore the terrain to its original shape - Click and drag a line or closed shape."
+	"terra_restore" : "Restore the terrain to its original shape - Click and drag a line or closed shape.",
+	"startup_commenu_hidedefault" : "Hide default commanders",
+	"startup_commenu_sitelink" : "You can customize your commanders on the Zero-K site: https://zero-k.info",
+	"startup_commenu_tooltips" : "Module tooltips",
+	"startup_commenu_title" : "COMMANDER SELECTOR",
+	"startup_chatmessage" : "say a:I choose: ",
+	"startup_commenu_open" : "Open comm selection screen",
+	"startup_commenu_close" : "CLOSE"
 	}
 }
