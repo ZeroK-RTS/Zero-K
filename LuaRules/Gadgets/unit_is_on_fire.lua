@@ -138,7 +138,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
-	if random() < fwd.burnChance then
+	if random() > fwd.burnChance then
 		return
 	end
 
