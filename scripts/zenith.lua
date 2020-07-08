@@ -51,6 +51,8 @@ local gravityDefs = {
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local gaiaTeam = Spring.GetGaiaTeamID()
+local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
+local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
 
 local launchInProgress = false
 local currentlyStunned
@@ -191,8 +193,9 @@ local function SpawnProjectileThread()
 			RegainControlOfMeteors()
 			currentlyStunned = false
 		end
-		
-		SpawnMeteor()
+		if #spGetUnitsInCylinder(ux,uz,20) + #spGetFeaturesInCylinder(ux,uz,20) == 1 then -- Only spawn if there's a clear view to the sky
+			SpawnMeteor()
+		end
 	end
 end
 
