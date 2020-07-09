@@ -192,7 +192,7 @@ local function SpawnProjectileThread()
 			RegainControlOfMeteors()
 			currentlyStunned = false
 		end
-		if spGetUnitRulesParam(unitID,"meteorSpawnBlocked") ~= 0 then -- Only spawn if there's a clear view to the sky
+		if spGetUnitRulesParam(unitID,"meteorSpawnBlocked") ~= 1 then -- Only spawn if there's a clear view to the sky
 			SpawnMeteor()
 		end
 		spSetUnitRulesParam(unitID,"meteorSpawnBlocked",0)
