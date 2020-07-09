@@ -3,15 +3,15 @@ if not gadgetHandler:IsSyncedCode() then
 end
 
 function gadget:GetInfo()
-  return {
-    name      = "Zenith Skyline Checker",
-    desc      = "Blocks Zenith Meteor spawn when the beam is broken",
-    author    = "Shaman",
-    date      = "July 8 2020",
-    license   = "CC-0",
-    layer     = -1,
-    enabled   = true,
-  }
+	return {
+		name    = "Zenith Skyline Checker",
+		desc    = "Blocks Zenith Meteor spawn when the beam is broken",
+		author  = "Shaman",
+		date    = "July 8 2020",
+		license = "CC-0",
+		layer   = -1,
+		enabled = true,
+	}
 end	
 
 
