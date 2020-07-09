@@ -20,10 +20,10 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 function gadget:Explosion(weaponDefID, px, py, pz, AttackerID, ProjectileID)
 	if weaponDefID == gravityWeaponDefID then
-		spSetUnitRulesParam(AttackerID, "isBlocked", 1)
+		spSetUnitRulesParam(AttackerID, "meteorSpawnBlocked", 1)
 	end
 end
 
 function gadget:Initialize()
-	Script.SetWatchWeapon(gravityWeaponDefID, true)
+	Script.SetWatchExplosion(gravityWeaponDefID, true)
 end
