@@ -284,6 +284,10 @@
 	"com_upgrademenu_start" : "Start upgrade",
 	"com_upgrademenu_currentupgrades" : "View current modules",
 	"com_upgrademenu_cancel" : "Cancel module selection",
-	"com_upgrademenu_tooltip" : "Upgrade Commander"
+	"com_upgrademenu_tooltip" : "Upgrade Commander",
+	"drawboard_tooltip_draw" : ": Draw on map. \n",
+	"drawboard_tooltip_erase" : ": Erase. \n",
+	"drawboard_tooltip_mark" : ": Place marker. \n",
+	"drawboard_tooltip_label" : ": Place marker with label."
 	}
 }
