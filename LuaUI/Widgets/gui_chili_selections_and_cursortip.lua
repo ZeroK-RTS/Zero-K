@@ -104,10 +104,10 @@ local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" ,
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
 local terraformGeneralTip =
-	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
-	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
-	green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
-	green.. 'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
+	green.. WG.Translate("interface", "rmb")'Click&Drag'..white..': Free draw terraform. \n'..
+	green.. WG.Translate("interface", "rmb")'Alt+Click&Drag'..white..': Box terraform. \n'..
+	green.. WG.Translate("interface", "rmb")'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
+	green.. WG.Translate("interface", "rmb")'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
 	'\n'
 
 local terraCmdTip = {
@@ -156,10 +156,10 @@ local terraCmdTip = {
 }
 
 local DRAWING_TOOLTIP =
-	green.. 'Left click'..white..': Draw on map. \n' ..
-	green.. 'Right click'..white..': Erase. \n' ..
-	green.. 'Middle click'..white..': Place marker. \n' ..
-	green.. 'Double click'..white..': Place marker with label.'
+	green.. WG.Translate("interface", "lmb")..white..WG.Translate("interface", "drawboard_tooltip_draw") ..
+	green.. WG.Translate("interface", "rmb")..white..WG.Translate("interface", "drawboard_tooltip_erase") ..
+	green.. WG.Translate("interface", "mmb")..white..WG.Translate("interface", "drawboard_tooltip_mark") ..
+	green.. WG.Translate("interface", "dlmb")..white..WG.Translate("interface", "drawboard_tooltip_label")
 
 
 local reloadBarColor = {013, 245, 243, 1}
