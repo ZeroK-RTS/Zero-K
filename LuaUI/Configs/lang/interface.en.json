@@ -277,7 +277,7 @@
 	"startup_commenu_sitelink" : "You can customize your commanders on the Zero-K site: https://zero-k.info",
 	"startup_commenu_tooltips" : "Module tooltips",
 	"startup_commenu_title" : "COMMANDER SELECTOR",
-	"startup_chatmessage" : "say a:I choose: ",
+	"startup_chatmessage" : "I choose: %{comcallsign}!",
 	"startup_commenu_open" : "Open comm selection screen",
 	"startup_commenu_close" : "CLOSE",
 	"com_upgrademenu_title" : "Modules",
