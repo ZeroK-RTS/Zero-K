@@ -104,10 +104,10 @@ local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" ,
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
 local terraformGeneralTip =
-	green.. WG.Translate("interface", "rmb")'Click&Drag'..white..': Free draw terraform. \n'..
-	green.. WG.Translate("interface", "rmb")'Alt+Click&Drag'..white..': Box terraform. \n'..
-	green.. WG.Translate("interface", "rmb")'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
-	green.. WG.Translate("interface", "rmb")'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
+	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
+	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
+	green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
+	green.. 'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
 	'\n'
 
 local terraCmdTip = {
