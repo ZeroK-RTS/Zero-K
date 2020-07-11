@@ -310,7 +310,7 @@ local function CreateWindow()
 			padding = {5,5,5,5},
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
-				Spring.SendCommands({WG.Translate("interface", "startup_chatmessage")..option.name..'!'})
+				Spring.SendCommands({'say a:'WG.Translate("interface", "startup_chatmessage", { comcallsign = option.name })})
 				Close(false, true)
 			end},
 		}
