@@ -23,7 +23,11 @@ local allyTeamByTeam
 
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetUnitHealth = Spring.GetUnitHealth
+local spGetTeamResources = Spring.GetTeamResources
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
+local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local GetUnitCost = Spring.Utilities.GetUnitCost
+
 
 local SetHiddenTeamRulesParam = Spring.Utilities.SetHiddenTeamRulesParam
 local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
@@ -251,14 +255,17 @@ local function RegenerateNanoframeValues()
 	end
 end
 
+local max = math.max
 local function GetEnergyIncome (teamID)
-	return (select(4, Spring.GetTeamResources(teamID, "energy")) or 0) +
-		(Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0) -
-		math.max(0, (Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0))
+	local _, _, _, e = spGetTeamResources(teamID, "energy")
+	return (e or 0) +
+		(spGetTeamRulesParam(teamID, "OD_energyIncome") or 0) -
+		max(0, (spGetTeamRulesParam(teamID, "OD_energyChange") or 0))
 end
 
 local function GetMetalIncome (teamID)
-	return (select(4, Spring.GetTeamResources(teamID, "metal")) or 0)
+	local _, _, _, m = spGetTeamResources(teamID, "metal")
+	return m or 0
 end
 
 local stats_index
@@ -281,48 +288,48 @@ function gadget:GameFrame(n)
 		local teamID = teamList[i]
 		mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
 		eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
-		mIncomeBase     [teamID] = mIncomeBase     [teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalBase"     ) or 0)
-		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
-		mTotalOverdrive[teamID] = mTotalOverdrive[teamID] + (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
+		mIncomeBase     [teamID] = mIncomeBase     [teamID] + (spGetTeamRulesParam(teamID, "OD_metalBase"     ) or 0)
+		mIncomeOverdrive[teamID] = mIncomeOverdrive[teamID] + (spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
+		mTotalOverdrive[teamID] = mTotalOverdrive[teamID] + (spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
 
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamHax[teamID])
 		SetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_current", unitValueKilledByTeamHax[teamID])
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamNonhax[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_overdrive_current", mTotalOverdrive[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_current", unitValueLostByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeamNonhax[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_overdrive_current", mTotalOverdrive[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_lost_current", unitValueLostByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 		
 		if isSpringStatsHistoryFrame then
 			SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamHax[teamID])
 			SetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_"    .. stats_index, unitValueKilledByTeamHax[teamID])
-			Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamNonhax[teamID])
-			Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_" .. stats_index, damageReceivedByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_overdrive_" .. stats_index, mTotalOverdrive[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. stats_index, -reclaimListByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_" .. stats_index, metalExcessByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_"  .. stats_index, mIncome[teamID] / sum_count, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_base_"  .. stats_index, mIncomeBase[teamID] / sum_count, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_od_"  .. stats_index, mIncomeOverdrive[teamID] / sum_count, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_" .. stats_index, unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_" .. stats_index, unitValueLostByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, unitValueByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_" .. stats_index, unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_" .. stats_index, unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_" .. stats_index, unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_" .. stats_index, unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
-			Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeamNonhax[teamID])
+			spSetTeamRulesParam(teamID, "stats_history_damage_received_" .. stats_index, damageReceivedByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_overdrive_" .. stats_index, mTotalOverdrive[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. stats_index, -reclaimListByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_excess_" .. stats_index, metalExcessByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_income_"  .. stats_index, mIncome[teamID] / sum_count, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_income_base_"  .. stats_index, mIncomeBase[teamID] / sum_count, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_metal_income_od_"  .. stats_index, mIncomeOverdrive[teamID] / sum_count, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_killed_" .. stats_index, unitValueKilledByTeamNonhax[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_lost_" .. stats_index, unitValueLostByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, unitValueByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_army_" .. stats_index, unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_def_" .. stats_index, unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_econ_" .. stats_index, unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_unit_value_other_" .. stats_index, unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_nano_partial_" .. stats_index, partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+			spSetTeamRulesParam(teamID, "stats_history_nano_total_" .. stats_index, totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
 			mIncome         [teamID] = 0
 			mIncomeBase     [teamID] = 0
@@ -393,51 +400,51 @@ function gadget:Initialize()
 		mIncomeOverdrive[teamID] = 0
 		eIncome         [teamID] = 0
 
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_excess_current", spGetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0, ALLIED_VISIBLE)
 		SetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current", GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0)
 		SetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_current", GetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0)
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_current", Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_lost_current") or 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_dealt_current", spGetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_received_current", spGetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_lost_current", spGetTeamRulesParam(teamID, "stats_history_unit_value_lost_current") or 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_killed_current", spGetTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0, ALLIED_VISIBLE)
 
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_current", unitValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_army_current", unitCategoryValueByTeam[teamID].army, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_def_current", unitCategoryValueByTeam[teamID].def, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_econ_current", unitCategoryValueByTeam[teamID].econ, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_other_current", unitCategoryValueByTeam[teamID].other, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_partial_current", partialNanoValueByTeam[teamID], ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_total_current", totalNanoValueByTeam[teamID], ALLIED_VISIBLE)
 
 		SetHiddenTeamRulesParam (teamID, "stats_history_damage_dealt_0"     , 0)
 		SetHiddenTeamRulesParam (teamID, "stats_history_unit_value_killed_0", 0)
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_0"     , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_0"  , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_0"    , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_0"     , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_0"     , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_base_0", 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_od_0"  , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_0"    , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_0"       , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_army_0"  , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_def_0"   , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_econ_0"  , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_other_0" , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_killed_0", 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_lost_0"  , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_partial_0"     , 0, ALLIED_VISIBLE)
-		Spring.SetTeamRulesParam(teamID, "stats_history_nano_total_0"       , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_dealt_0"     , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_damage_received_0"  , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_reclaim_0"    , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_excess_0"     , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_income_0"     , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_income_base_0", 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_metal_income_od_0"  , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_energy_income_0"    , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_0"       , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_army_0"  , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_def_0"   , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_econ_0"  , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_other_0" , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_killed_0", 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_unit_value_lost_0"  , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_partial_0"     , 0, ALLIED_VISIBLE)
+		spSetTeamRulesParam(teamID, "stats_history_nano_total_0"       , 0, ALLIED_VISIBLE)
 
-		mTotalOverdrive     [teamID] = Spring.GetTeamRulesParam(teamID, "stats_history_metal_overdrive_current") or 0
-		reclaimListByTeam   [teamID] = -Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
-		metalExcessByTeam   [teamID] = Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
+		mTotalOverdrive     [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_overdrive_current") or 0
+		reclaimListByTeam   [teamID] = -spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
+		metalExcessByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
 		damageDealtByTeamHax[teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
-		damageDealtByTeamNonhax[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
+		damageDealtByTeamNonhax[teamID] =  spGetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
 		unitValueKilledByTeamHax[teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0
-		unitValueKilledByTeamNonhax[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0
-		unitValueLostByTeam[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_lost_current") or 0
+		unitValueKilledByTeamNonhax[teamID] =  spGetTeamRulesParam(teamID, "stats_history_unit_value_killed_current") or 0
+		unitValueLostByTeam[teamID] =  spGetTeamRulesParam(teamID, "stats_history_unit_value_lost_current") or 0
 		damageReceivedByTeam[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0
 	end
 end

@@ -33,6 +33,7 @@ local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spUseUnitResource   = Spring.UseUnitResource
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spValidUnitID = Spring.ValidUnitID
 
 local unitMap = {}
 local unitList = {}
@@ -126,7 +127,7 @@ function gadget:GameFrame(n)
 		local data = unitList[i]
 		local unitID = data.unitID
 		
-		if Spring.ValidUnitID(unitID) then
+		if spValidUnitID(unitID) then
 			local activeState = Spring.Utilities.GetUnitActiveState(unitID)
 			
 			local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)

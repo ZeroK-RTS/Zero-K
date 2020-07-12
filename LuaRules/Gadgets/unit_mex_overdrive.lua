@@ -41,6 +41,7 @@ local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetTeamResources  = Spring.GetTeamResources
 local spAddTeamResource   = Spring.AddTeamResource
 local spUseTeamResource   = Spring.UseTeamResource
+local spSetTeamResource   = Spring.SetTeamResource
 local spGetTeamInfo       = Spring.GetTeamInfo
 
 -------------------------------------------------------------------------------------
@@ -1560,7 +1561,7 @@ function gadget:GameFrame(n)
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
 				if metalStorageToSet[i] then
-					Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
+					spSetTeamResource(teamID, "metal", metalStorageToSet[i])
 				end
 				spAddTeamResource(teamID, "m", totalMetalIncome[i])
 			end
