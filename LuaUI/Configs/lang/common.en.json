@@ -38,7 +38,7 @@
 	"repeating" : "repeating",
 	"current_project" : "Current project",
 	"lmb" : "Left-click",
-	"dlmb" : 'Double click',
+	"dlmb" : 'Double left-click',
 	"mmb" : "Middle-click",
 	"rmb" : "Right-click",
 	"clear" : "Clear",
