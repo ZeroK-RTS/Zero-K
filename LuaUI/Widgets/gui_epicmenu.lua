@@ -684,7 +684,7 @@ local function MakeFlags()
 	local window_height = 300
 	local window_width = 170
 	window_flags = Window:New{
-		caption = 'Choose Language',
+		caption = WG.Translate("interface", "choose_lang"),
 		x = settings.sub_pos_x,
 		y = settings.sub_pos_y,
 		clientWidth  = window_width,
@@ -709,7 +709,7 @@ local function MakeFlags()
 				}
 			},
 			--close button
-			Button:New{caption = 'Close',  x = 5, y = 0-B_HEIGHT, bottom = 5, right = 5,
+			Button:New{caption = WG.Translate("interface", "close"),  x = 5, y = 0-B_HEIGHT, bottom = 5, right = 5,
 				name = 'makeFlagCloseButton';
 				OnClick = {function(self) window_flags:Dispose(); window_flags = nil; end },
 				width = window_width-20,
@@ -746,7 +746,7 @@ local function MakeHelp(caption, text)
 			},
 			--Close button
 			Button:New{
-				caption = 'Close', OnClick = {function(self) self.parent:Dispose() end },
+				caption = WG.Translate("interface", "close"), OnClick = {function(self) self.parent:Dispose() end },
 				x = 45, bottom = 1, right = 45, height = B_HEIGHT,
 				name = 'makeHelpCloseButton';
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
@@ -1402,10 +1402,10 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 	
 	UnassignKeyBind(kb_action, true) -- 2nd param = verbose
 	--otset( keybounditems, kb_action, nil )
-	otset( keybounditems, kb_action, 'None' )
+	otset( keybounditems, kb_action, WG.Translate("interface", "hotkey_none_exists") )
 		
 	window_getkey = Window:New{
-		caption = 'Set a HotKey',
+		caption = WG.Translate("interface", "hotkey_caption_title"),
 		x = (scrW-window_width)/2,
 		y = (scrH-window_height)/2,
 		classname = "main_window_small_flat",
@@ -1416,8 +1416,8 @@ local function MakeKeybindWindow( path, option, hotkeyButton, optionControl, opt
 		resizable = false,
 		draggable = false,
 		children = {
-			Label:New{x = 8, y = 20, caption = 'Press a key combo', textColor = color.sub_fg},
-			Label:New{x = 8, y = 38, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg},
+			Label:New{x = 8, y = 20, caption = WG.Translate("interface", "hotkey_caption_press"), textColor = color.sub_fg},
+			Label:New{x = 8, y = 38, caption = WG.Translate("interface", "hotkey_caption_esc"), textColor = color.sub_fg},
 		}
 	}
 end
@@ -1489,7 +1489,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			--classname = "submenu_navigation_button",
 			--backgroundColor = color.sub_button_bg,
 			--textColor = color.sub_button_fg,
-			tooltip = 'Hotkey: ' .. hotkeystring,
+			tooltip = WG.Translate("interface", "hotkey") .. hotkeystring,
 		}
 		
 		--local children = {}
@@ -1985,14 +1985,14 @@ MakeSubWindow = function(path, pause, labelScroll)
 		right = 5,
 		bottom = B_HEIGHT + 5;
 		
-		caption = 'Simple Settings',
+		caption = WG.Translate("interface", "adv_settings"),
 		checked = settings.simpleSettingsMode,
 		OnChange = {function(self)
 			settings.simpleSettingsMode = not settings.simpleSettingsMode
 			RemakeEpicMenu()
 		end },
 		textColor = color.sub_fg,
-		tooltip   = 'For experienced users only.',
+		tooltip   = WG.Translate("interface", "adv_settings_tooltip"),
 	}
 	
 	window_children[#window_children+1] = buttonBar
@@ -2016,7 +2016,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Back', x = 24, y = 4}
+				Label:New{caption = WG.Translate("interface", "back"), x = 24, y = 4}
 			}
 		}
 	end
@@ -2031,7 +2031,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Search', x = 24, y = 4}
+			Label:New{caption = WG.Translate("interface", "searh"), x = 24, y = 4}
 		}
 	}
 	
@@ -2041,13 +2041,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 			OnClick = {function() ResetWinSettings(path); RemakeEpicMenu(); end },
 			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
 			--classname = "navigation_button",
-			tooltip = "Reset the settings within this submenu. Use 'Settings/Reset Settings' to reset all settings.",
+			tooltip = WG.Translate("interface", "reset_tooltip"),
 			height = B_HEIGHT,
 			padding = {2, 2, 2, 2},
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Reset', x = 24, y = 4}
+				Label:New{caption = WG.Translate("interface", "reset"), x = 24, y = 4}
 			}
 		}
 	end
@@ -2062,7 +2062,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Close', x = 24, y = 4}
+			Label:New{caption = WG.Translate("interface", "close"), x = 24, y = 4}
 		}
 	}
 	
@@ -2273,7 +2273,7 @@ local function GetMainPanel(parent, width, height)
 		}
 		holderWidth = holderWidth + 80
 		
-		stackChildren[#stackChildren + 1] = Image:New{tooltip = 'Volume', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18}
+		stackChildren[#stackChildren + 1] = Image:New{tooltip = WG.Translate("interface", "soundsvolume_tooltip"), file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18}
 		stackChildren[#stackChildren + 1] = Grid:New{
 			height = 24,
 			width = sliderWidth - 25,
@@ -2287,7 +2287,7 @@ local function GetMainPanel(parent, width, height)
 			
 			children = {
 				Trackbar:New{
-					tooltip = 'Volume',
+					tooltip = WG.Translate("interface", "soundsvolume_tooltip"),
 					height = 12,
 					width = sliderWidth - 25,
 					trackColor = color.main_fg,
@@ -2303,7 +2303,7 @@ local function GetMainPanel(parent, width, height)
 				},
 				
 				Trackbar:New{
-					tooltip = 'Music',
+					tooltip = WG.Translate("interface", "music_tooltip"),
 					height = 12,
 					width = sliderWidth - 25,
 					min = 0,
@@ -2416,9 +2416,9 @@ local function GetMainPanel(parent, width, height)
 			
 			children = {
 				--Label:New{caption = 'Vol', width = 20, textColor = color.main_fg },
-				Image:New{tooltip = 'Volume', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18},
+				Image:New{tooltip = WG.Translate("interface", "soundsvolume_tooltip"), file = LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width = 18, height = 18},
 				Trackbar:New{
-					tooltip = 'Volume',
+					tooltip = WG.Translate("interface", "soundsvolume_tooltip"),
 					height = 15,
 					width = sliderWidth - 25,
 					trackColor = color.main_fg,
@@ -2433,9 +2433,9 @@ local function GetMainPanel(parent, width, height)
 					},
 				},
 				
-				Image:New{tooltip = 'Music', file = LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width = 18, height = 18},
+				Image:New{tooltip = WG.Translate("interface", "music_tooltip"), file = LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width = 18, height = 18},
 				Trackbar:New{
-					tooltip = 'Music',
+					tooltip = WG.Translate("interface", "music_tooltip"),
 					height = 15,
 					width = sliderWidth - 25,
 					min = 0,
@@ -2482,7 +2482,7 @@ local function GetMainPanel(parent, width, height)
 		textColor = color.game_fg,
 		height = height - 9,
 		width = B_WIDTH_TOMAINMENU + 1,
-		caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
+		caption = WG.Translate("interface", "menu_button") "(\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
 		padding = btn_padding,
 		margin = btn_margin,
 		tooltip = '',
@@ -2500,7 +2500,7 @@ local function GetMainPanel(parent, width, height)
 			textColor = color.game_fg,
 			height = height - 9,
 			width = B_WIDTH_TOMAINMENU + 1,
-			caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
+			caption = WG.Translate("interface", "lobby_button") "(\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
 			padding = btn_padding,
 			margin = btn_margin,
 			tooltip = '',
@@ -2595,7 +2595,7 @@ local function MakeMenuBar()
 	lbl_fps = Label:New{name = 'lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin = {0, 5, 0, 0}}
 	lbl_gtime = Label:New{name = 'lbl_gtime', caption = '00:00', width = 55, height = 5, textColor = color.sub_header}
 	lbl_clock = Label:New{name = 'lbl_clock', caption = 'Clock', width = 45, height = 5, textColor = color.main_fg} -- autosize = false}
-	img_flag = Image:New{tooltip = 'Choose Language', file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. flagByLang[settings.lang] ..'.png', width = 16, height = 11, OnClick = {MakeFlags }, padding = {4, 4, 4, 6}  }
+	img_flag = Image:New{tooltip = WG.Translate("interface", "choose_lang"), file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. flagByLang[settings.lang] ..'.png', width = 16, height = 11, OnClick = {MakeFlags }, padding = {4, 4, 4, 6}  }
 	
 	local screen_width, screen_height = Spring.GetWindowGeometry()
 	
@@ -2650,8 +2650,8 @@ local function MakeSaveLoadButtons()
 	AddOption('',
 	{
 		type='button',
-		name='Save Game',
-		desc = 'Save game (not available in multiplayer and tutorials).',
+		name=WG.Translate("interface", "save_button"),
+		desc = WG.Translate("interface", "save_button_desc"),
 		OnChange = function()
 				if WG.SaveGame and CanSaveGame() then
 					WG.SaveGame.CreateSaveWindow()
@@ -2665,7 +2665,7 @@ local function MakeSaveLoadButtons()
 	AddOption('',
 	{
 		type='button',
-		name='Load Game',
+		name=WG.Translate("interface", "load_button"),
 		desc = '',
 		OnChange = function()
 				if WG.SaveGame then
@@ -2689,8 +2689,8 @@ local function MakeQuitButtons()
 
 	AddOption('', {
 		type = 'button',
-		name = 'Vote Resign',
-		desc = "Ask teammates to resign",
+		name = WG.Translate("interface", "resign_button"),
+		desc = WG.Translate("interface", "resign_button_desc"),
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
 				if not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission) then
@@ -2705,12 +2705,12 @@ local function MakeQuitButtons()
 	})
 	AddOption('', {
 		type = 'button',
-		name = 'Resign',
-		desc = "Abandon team and become spectator",
+		name = WG.Translate("interface", "resignself_button"),
+		desc = WG.Translate("interface", "resignself_button_desc"),
 		icon = imgPath..'epicmenu/whiteflag.png',
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
-					MakeExitConfirmWindow("Are you sure you want to resign?", function()
+					MakeExitConfirmWindow(WG.Translate("interface", "resignself_button_confirmwindow"), function()
 						if AllowPauseOnMenuChange(true) then
 							spSendCommands("pause 1")
 						end
@@ -2733,15 +2733,15 @@ local function MakeQuitButtons()
 	})
 	AddOption('', {
 		type = 'button',
-		name = 'Restart',
-		desc = "Restart the game",
+		name = WG.Translate("interface", "restart_button"),
+		desc = WG.Translate("interface", "restart_button_desc"),
 		icon = imgPath..'epicmenu/undo.png',
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
 				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
 					if myPing and myPing < 40 then
-						MakeExitConfirmWindow("Are you sure you want to restart?", function()
+						MakeExitConfirmWindow(WG.Translate("interface", "restart_button_confirmwindow"), function()
 							Spring.SendLuaMenuMsg("restartGame")
 						end, nil, false, true)
 					end
@@ -2759,11 +2759,11 @@ local function MakeQuitButtons()
 	})
 	AddOption('', {
 		type = 'button',
-		name = 'Exit to Lobby',
-		desc = "Leave the game.",
+		name = WG.Translate("interface", "exit_button"),
+		desc = WG.Translate("interface", "exit_button_desc"),
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function()
-			MakeExitConfirmWindow("Are you sure you want to leave the battle?", function()
+			MakeExitConfirmWindow(WG.Translate("interface", "exit_button_confirmwindow"), function()
 				if AllowPauseOnMenuChange(true) then
 					spSendCommands("pause 1")
 				end
@@ -3015,7 +3015,7 @@ function widget:Initialize()
 				local indirectActionName = GetActionName(path, option)
 				local directActionName = option.action
 				if indirectActionName == actionName or directActionName == actionName then
-					option.hotkey = hotkey or "None" --update pathoption hotkey for Chili menu display & prevent conflict with hotkey registerd by Chili . Note: LUA is referencing table, so we don't need to change same table elsewhere.
+					option.hotkey = hotkey or WG.Translate("interface", "hotkey_none_exists") --update pathoption hotkey for Chili menu display & prevent conflict with hotkey registerd by Chili . Note: LUA is referencing table, so we don't need to change same table elsewhere.
 				end
 			end
 		end
