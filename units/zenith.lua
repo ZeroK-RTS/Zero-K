@@ -106,6 +106,7 @@ return { zenith = {
       waterWeapon             = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 6000,
+      waterWeapon             = true,
     },
 
     METEOR      = {

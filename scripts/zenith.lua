@@ -21,7 +21,7 @@ local fireRange = WeaponDefNames["zenith_meteor"].range
 local smokePiece = {base}
 
 local Vector = Spring.Utilities.Vector
-
+local isBlocked = false
 local projectiles = {}
 local projectileCount = 0
 local oldestProjectile = 1 -- oldestProjectile is for when the projectile table is being cyclicly overridden.
@@ -50,6 +50,7 @@ local gravityDefs = {
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local gaiaTeam = Spring.GetGaiaTeamID()
 
 local launchInProgress = false
@@ -191,8 +192,17 @@ local function SpawnProjectileThread()
 			RegainControlOfMeteors()
 			currentlyStunned = false
 		end
-		
-		SpawnMeteor()
+		if not currentlyStunned and isBlocked and spGetUnitRulesParam(unitID, "meteorSpawnBlocked") ~= 1 then
+			RegainControlOfMeteors()
+			isBlocked = false
+		elseif not currentlyStunned and spGetUnitRulesParam(unitID, "meteorSpawnBlocked") == 1 then
+			LoseControlOfMeteors()
+			isBlocked = true
+		end
+		if spGetUnitRulesParam(unitID, "meteorSpawnBlocked") ~= 1 then -- Only spawn if there's a clear view to the sky
+			SpawnMeteor()
+		end
+		spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
 	end
 end
 
@@ -277,10 +287,11 @@ function OnLoadGame()
 end
 
 function script.Create()
+	spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
 	if Spring.GetGameRulesParam("loadPurge") ~= 1 then
 		Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 	end
-	Spring.SetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
 	
