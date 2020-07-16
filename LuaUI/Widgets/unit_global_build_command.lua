@@ -1440,8 +1440,9 @@ function GiveWorkToUnit(unitID)
 			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
 				local target = localUnits[i]
 				local udid = spGetUnitDefID(target)
+				-- Note: This can be nil if eg. it's a radar dot we don't know the unit type for
 				local unitDef = UnitDefs[udid]
-				if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+				if unitDef and string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
 					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
 					break
 				end
