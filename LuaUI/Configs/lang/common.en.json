@@ -38,7 +38,7 @@
 	"repeating" : "repeating",
 	"current_project" : "Current project",
 	"lmb" : "Left-click",
-	"dlmb" : 'Double left-click',
+	"dlmb" : "Double click",
 	"mmb" : "Middle-click",
 	"rmb" : "Right-click",
 	"clear" : "Clear",
@@ -56,7 +56,7 @@
 	"green" : "Green",
 	"press" : "Press",
 	"and" : "&",
-	"and_2")' and '
+	"and_2" : " and ",
 	"or" : " or ",
 	"health" : "Health",
 	"value" : "Value",
