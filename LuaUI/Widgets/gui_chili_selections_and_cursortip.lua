@@ -104,55 +104,55 @@ local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" ,
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
 local terraformGeneralTip =
-	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
-	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
-	green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
-	green.. 'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
+	green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_freedraw")..
+	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_box")..
+	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white...WG.Translate("interface", "tera_gtooltip_hollowbox")..
+	green.. WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click_on_unit")..white..WG.Translate("interface", "tera_gtooltip_around")..
 	'\n'
 
 local terraCmdTip = {
 	[CMD_RAMP] =
-		yellow..'[Ramp between two points]\n'..
-		'1: ' .. green.. 'Click&Drag'..white..' from start to end. \n' ..
-		'2: ' .. green.. 'Click' ..white..' again to set width. \n'..
+		yellow..WG.Translate("interface", "tera_tooltip_bridge_name")..
+		'1: ' .. green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_tooltip_bridge_draw") ..
+		'2: ' .. green.. WG.Translate("common", "click").. ..white..WG.Translate("interface", "tera_tooltip_bridge_width")..
 		'\n'..
-		yellow..'[Ramp with raised end]\n'..
-		'1: ' .. green.. 'Click'..white..' at start. \n'..
-		'2: ' .. green.. 'Click&Drag'..white..' at end to set height. \n'..
-		'3: ' .. green.. 'Click' ..white..' again to set width. \n'..
+		yellow..WG.Translate("interface", "tera_tooltip_ramp_name")..
+		'1: ' .. green.. WG.Translate("common", "click")..white..WG.Translate("interface", "tera_tooltip_ramp_start")..
+		'2: ' .. green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_tooltip_ramp_height")..
+		'3: ' .. green.. WG.Translate("common", "click") ..white..WG.Translate("interface", "tera_tooltip_ramp_width")..
 		'\n'..
-		yellow..'[Modifiers]\n'..
-		'- Hold '.. green..'Ctrl or Alt'..white..' and '.. green..'drag' ..white..' in Step 1 to set start height. \n'..
-		'- Hold '.. green..'Alt'..white..' to snap height or gradient. \n'..
-		'- Press '..green.. 'Space'..white..' to cycle raise/lower. \n'..
+		yellow..WG.Translate("interface", "tera_tooltip_modifiers_start")..
+		'-'.. WG.Translate("common", "hold").. green..WG.Translate("common", "ctrl")..WG.Translate("common", "or")..WG.Translate("common", "alt")..white..WG.Translate("common", "and_2").. green..WG.Translate("common", "drag") ..white..WG.Translate("interface", "tera_tooltip_modifiers_start")..
+		'-'.. WG.Translate("common", "hold").. green..WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_modifiers_snap")..
+		'-'.. WG.Translate("common", "press")..green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_modifiers_cycle")..
 		'\n'..
-		yellow..'[Wireframe indicator colors]\n'..
-		green.. 'Green'..white..': All units can traverse. \n'..
-		green.. 'Yellow'..white..': Vehicles cannot traverse. \n'..
-		green.. 'Red'..white..': Only all-terrain units can traverse.',
+		yellow..WG.Translate("interface", "tera_tooltip_indicators_name")..
+		green.. WG.Translate("common", "green")..white..WG.Translate("interface", "tera_tooltip_indicators_all")..
+		green.. WG.Translate("common", "yellow")..white..WG.Translate("interface", "tera_tooltip_indicators_nowheels")..
+		green.. WG.Translate("common", "redd")..white..WG.Translate("interface", "tera_tooltip_indicators_onlyallterrain"),
 	[CMD_LEVEL] = terraformGeneralTip ..
-		yellow..'[During Terraform Draw]\n'..
-		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		yellow..WG.Translate("interface", "tera_gtooltip_during")..
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
 		'\n'..
-		yellow..'[After Terraform Draw]\n'..
-		green.. 'Alt'..white..': Snap to starting height / below water level (prevent ships) / below water level (prevent land units). \n'..
-		green.. 'Ctrl'..white..': Hold and point at terrain to level to height pointed at.\n'..
+		yellow..WG.Translate("interface", "tera_gtooltip_after")..
+		green.. WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_level_snap")..
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_level_hold")..
 		'\n'..
-		yellow..'[Any Time]\n'..
-		green.. 'Space'..white..': Cycle through only raise/lower',
+		yellow..WG.Translate("interface", "tera_gtooltip_any")..
+		green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_level_cycle"),
 	[CMD_RAISE] = terraformGeneralTip ..
-		yellow..'[During Terraform Draw]\n'..
-		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		yellow..WG.Translate("interface", "tera_gtooltip_during")..
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
 		'\n'..
-		yellow..'[After Terraform Draw]\n'..
-		green.. 'Alt'..white..': Snap to steps of 15 height. \n'..
-		green.. 'Ctrl'..white..': Snap to 0 height.',
+		yellow..WG.Translate("interface", "tera_gtooltip_after")..
+		green.. WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_raise_snap15")..
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_raise_snap0")': Snap to 0 height.',
 	[CMD_SMOOTH] = terraformGeneralTip ..
-		yellow..'[During Terraform Draw]\n'..
-		green.. 'Ctrl'..white..': Draw straight line segment.',
+		yellow..WG.Translate("interface", "tera_gtooltip_during")..
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line"),
 	[CMD_RESTORE] = terraformGeneralTip ..
-		yellow..'[Any Time]\n'..
-		green.. 'Space'..white..': Limit to only raise/lower',
+		yellow..WG.Translate("interface", "tera_gtooltip_any")..
+		green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_restore_height"),
 }
 
 local DRAWING_TOOLTIP =
