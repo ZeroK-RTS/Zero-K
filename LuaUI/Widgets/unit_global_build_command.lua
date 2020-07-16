@@ -282,6 +282,7 @@ local myTeamID = spGetMyTeamID()
 local statusColor = {1.0, 1.0, 1.0, 0.85}
 local queueColor = {1.0, 1.0, 1.0, 0.9}
 local textSize = 12.0
+local terraunitDefID = UnitDefNames.terraunit.id
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
 local rec_icon = "LuaUI/Images/commands/Bold/reclaim.png"
@@ -1441,8 +1442,7 @@ function GiveWorkToUnit(unitID)
 				local target = localUnits[i]
 				local udid = spGetUnitDefID(target)
 				-- Note: This can be nil if eg. it's a radar dot we don't know the unit type for
-				local unitDef = UnitDefs[udid]
-				if unitDef and string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+				if terraunitDefID == udid and spGetUnitTeam(target) == myTeamID then
 					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
 					break
 				end
