@@ -373,14 +373,28 @@ function widget:Initialize()
 				territoryCenter.z = territoryPos.z/territoryCount
 			end
 		end
-	
+	local commandQueueCache
+	local commandQueueCacheFrame = -1
 	-- ZK compatability stuff
 	WG.icons.SetPulse('gbcidle', true)
 	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
-		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+		IsGBCBuilder = function(unitID)
+			return includedBuilders[unitID] ~= nil
+		end,
+		GetCommandQueue = function()
+			if commandQueueCacheFrame == frame then return commandQueueCache end
+			local ret = {}
+			for i,v in pairs(buildQueue) do
+				ret[#ret+1] = {id=v.id, params={v.x,v.y,v.z}}
+			end
+			commandQueueCache = ret
+			commandQueueCacheFrame = frame
+			return ret
+		end
 	}
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then

@@ -86,6 +86,7 @@ local lastFrame = 2
 local highlightQueue = false
 local prevCmdID
 local lastCommandsCount
+local lastGBCCommandsCount
 
 local function ForceRedraw()
 	lastDrawnFrame = 0
@@ -232,8 +233,22 @@ function widget:GameFrame(f)
 	end
 end
 
+local drawGroundCircle
+local function drawBuildQueue(cmdQueue)
+	if cmdQueue then
+		for i = 1, #cmdQueue do
+			local cmd = cmdQueue[i]
+			local radius = pylonDefs[-cmd.id]
+			if radius then
+				glColor(disabledColor)
+				drawGroundCircle(cmd.params[1], cmd.params[3], radius)
+			end
+		end
+	end
+end
+
 local function makePylonListVolume(onlyActive, onlyDisabled)
-	local drawGroundCircle = options.mergeCircles.value and gl.Utilities.DrawMergedGroundCircle or gl.Utilities.DrawGroundCircle
+	drawGroundCircle = options.mergeCircles.value and gl.Utilities.DrawMergedGroundCircle or gl.Utilities.DrawGroundCircle
 	local i = 1
 	while i <= pylons.count do
 		local data = pylons.data[i]
@@ -256,25 +271,24 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			pylons.count = pylons.count - 1
 		end
 	end
+	local drawGBC = false
 	if highlightQueue and not onlyActive then
 		local selUnits = spGetSelectedUnits()
 		for i=1,#selUnits do
 			local unitID = selUnits[i]
 			local unitDefID = spGetUnitDefID(unitID)
 			if unitDefID and isBuilder[unitDefID] then
-				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
-				if cmdQueue then
-					for i = 1, #cmdQueue do
-						local cmd = cmdQueue[i]
-						local radius = pylonDefs[-cmd.id]
-						if radius then
-							glColor(disabledColor)
-							drawGroundCircle(cmd.params[1], cmd.params[3], radius)
-						end
-					end
+				if not drawGBC and WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsGBCBuilder(unitID) then
+					drawGBC = true
 				end
+				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
+				drawBuildQueue(cmdQueue)
 				break
 			end
+		end
+		if drawGBC then
+			local cmdQueue = WG.GlobalBuildCommand.GetCommandQueue()
+			drawBuildQueue(cmdQueue)
 		end
 	end
 	-- Keep clean for everyone after us
@@ -345,9 +359,11 @@ function widget:DrawWorldPreUnit()
 						break
 					end
 				end
-				if commandsCount ~= lastCommandsCount then
+				local gbcCommandsCount = WG.GlobalBuildCommand and #WG.GlobalBuildCommand.GetCommandQueue()
+				if commandsCount ~= lastCommandsCount or gbcCommandsCount ~= lastGBCCommandsCount then
 					-- force regenerating the lists if a building was placed/removed
 					lastCommandsCount = commandsCount
+					lastGBCCommandsCount = gbcCommandsCount
 					lastDrawnFrame = 0
 				end
 			end
