@@ -15,25 +15,17 @@ for i = 1, #WeaponDefs do
 end
 
 function Spring.Utilities.IsPureSlowWeapon(weaponID)
-	if pureSlowWeapons[weaponID] then
-		return true
-	else
-		return false
-	end
+	return (pureSlowWeapons[weaponID] and true) or false
 end
 
 function Spring.Utilities.IsCaptureWeapon(weaponID)
-	if captureWeapons[weaponID] then
-		return true
-	else
-		return false
-	end
+	return (captureWeapons[weaponID] and true) or false
 end
 
 function Spring.Utilities.IsPureDisarmWeapon(weaponID)
-	if pureDisarmWeapons[weaponID] then
-		return true
-	else
-		return false
-	end
+	return (pureDisarmWeapons[weaponID] and true) or false
+end
+
+function Spring.Utilities.GetWeaponHasStatusEffect(weaponID) -- Single call for checking all three
+	return (pureDisarmWeapons[weaponID] and true) or (captureWeapons[weaponID] and true) or (pureSlowWeapons[weaponID] and true)
 end

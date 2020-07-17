@@ -9,6 +9,7 @@ local fakes = {piece 'fakebase', piece 'fakedish1', piece 'fakedish2', piece 'fa
 
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitHealth = Spring.GetUnitHealth
+local spGetWeaponHasStatusEffect = Spring.Utilities.GetWeaponHasStatusEffect
 
 include "constants.lua"
 
@@ -116,7 +117,7 @@ end
 
 -- this happens before PreDamaged but only in 97.0+
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	if (damage > 0 or Spring.Utilities.IsPureSlowWeapon(weaponDefID) or Spring.Utilities.IsCaptureWeapon(weaponDefID) or Spring.Utilities.IsPureDisarmWeapon(weaponDefID)) and not (weaponDefID and noFFWeaponDefs[weaponDefID]) then
+	if (damage > 0 or spGetWeaponHasStatusEffect(weaponDefID)) and not (weaponDefID and noFFWeaponDefs[weaponDefID]) then
 		StartThread(DefensiveManeuver)
 	end
 end
