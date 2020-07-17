@@ -323,8 +323,8 @@ end
 function gadget:Initialize()
 	local cp
 	for i=1, #WeaponDefs do -- cache pure slow and disarm damage weapons
-		cp = WeaponDefs[i].customParams
-		if cp.disarmdamageonly == '1' or cp.customParams.timeslow_onlyslow == '1' then
+		cp = WeaponDefs[i].customParams or {}
+		if cp.disarmdamageonly == '1' or cp.timeslow_onlyslow == '1' then
 			forceDecloakWeapons[i] = true
 		end
 	end
