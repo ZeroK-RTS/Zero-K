@@ -91,9 +91,9 @@ return { vehraid = {
       },
 
       damage                  = {
-        default = 26.5,
-        planes  = 26.5,
-        subs    = 1.25,
+        default = 28.5,
+        planes  = 28.5,
+        subs    = 1.42,
       },
 
       duration                = 0.3,
