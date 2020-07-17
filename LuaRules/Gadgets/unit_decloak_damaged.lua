@@ -321,14 +321,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:Initialize()
-	local cp
 	for i=1, #WeaponDefs do -- cache pure slow and disarm damage weapons
-		cp = WeaponDefs[i].customParams or {}
+		local cp = WeaponDefs[i].customParams
 		if cp.disarmdamageonly == '1' or cp.timeslow_onlyslow == '1' then
 			forceDecloakWeapons[i] = true
 		end
 	end
-	cp = nil
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
