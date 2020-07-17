@@ -3,6 +3,10 @@ if GG.TransportAllowed then
 end
 
 function GG.TransportAllowed(passengerID)
+	local disarmed = Spring.GetUnitRulesParam(unitID, "disarmed")
+	if (disarmed and disarmed == 1) then
+		return false
+	end
 	if Spring.GetUnitAllyTeam(unitID) == Spring.GetUnitAllyTeam(passengerID) then
 		return true
 	end
