@@ -130,7 +130,7 @@ GG.PokeDecloakUnit = PokeDecloakUnit
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
-	if damage > 0 and
+	if  (damage > 0 or WeaponDefs[weaponID].customParams.disarmdamageonly == '1' or WeaponDefs[weaponID].customParams.timeslow_onlyslow == '1') and
 		not (attackerTeam and
 		weaponID and
 		noFFWeaponDefs[weaponID] and
