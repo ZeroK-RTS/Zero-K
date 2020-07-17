@@ -386,12 +386,13 @@ function script.MoveRate(curRate)
 end
 
 function script.BeginTransport(passengerID)
+	local disarmed = Spring.GetUnitRulesParam(unitID, "disarmed")
 	if loaded then
 		return
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
-	if not GG.TransportAllowed(passengerID) then
+	if not GG.TransportAllowed(passengerID) or (disarmed and disarmed == 1) then
 		Sleep(10)
 		unitLoaded = passengerID
 		ForceDropUnit()
