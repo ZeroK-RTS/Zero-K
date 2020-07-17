@@ -116,7 +116,7 @@ end
 
 -- this happens before PreDamaged but only in 97.0+
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	if (damage > 0 or WeaponDefs[weaponDefID].customParams.disarmdamageonly == '1' or WeaponDefs[weaponDefID].customParams.is_capture == '1' or WeaponDefs[weaponDefID].customParams.timeslow_onlyslow == '1') and not (weaponDefID and noFFWeaponDefs[weaponDefID]) then
+	if (damage > 0 or Spring.Utilities.IsPureSlowWeapon(weaponDefID) or Spring.Utilities.IsCaptureWeapon(weaponDefID) or Spring.Utilities.IsPureDisarmWeapon(weaponDefID)) and not (weaponDefID and noFFWeaponDefs[weaponDefID]) then
 		StartThread(DefensiveManeuver)
 	end
 end
