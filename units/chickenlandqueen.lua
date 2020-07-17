@@ -40,6 +40,7 @@ return { chickenlandqueen = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chickenflyerqueen.s3o]],
   power                  = 65536,
+  reclaimable            = false,
   script                 = [[chickenlandqueen.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 

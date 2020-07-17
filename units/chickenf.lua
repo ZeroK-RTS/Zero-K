@@ -40,6 +40,7 @@ return { chickenf = {
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],
   power               = 450,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

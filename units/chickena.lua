@@ -35,6 +35,7 @@ return { chickena = {
   noChaseCategory     = [[SHIP SWIM FLOAT TERRAFORM FIXEDWING SATELLITE GUNSHIP MINE]],
   objectName          = [[chickena.s3o]],
   power               = 420,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

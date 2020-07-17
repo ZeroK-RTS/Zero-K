@@ -39,6 +39,7 @@ return { chicken_tiamat = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 350,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

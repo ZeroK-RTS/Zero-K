@@ -34,6 +34,7 @@ return { chicken = {
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken.s3o]],
   power               = 100,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

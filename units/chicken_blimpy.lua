@@ -40,7 +40,8 @@ return { chicken_blimpy = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
-    script              = [[chicken_blimpy.lua]],
+  script              = [[chicken_blimpy.lua]],
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

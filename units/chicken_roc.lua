@@ -42,6 +42,7 @@ return { chicken_roc = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chicken_roc.s3o]],
   power               = 1250,
+  reclaimable         = false,
   script              = [[chicken_roc.lua]],
   selfDestructAs      = [[NOWEAPON]],
 

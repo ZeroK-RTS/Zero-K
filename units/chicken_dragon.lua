@@ -41,6 +41,7 @@ return { chicken_dragon = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chicken_dragon.s3o]],
   power                  = 10500,
+  reclaimable            = false,
   script                 = [[chicken_dragon.cob]],
   selfDestructAs         = [[SMALL_UNITEX]],
 

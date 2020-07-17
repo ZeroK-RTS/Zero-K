@@ -36,6 +36,7 @@ return { chickenr = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MOBILE STUPIDTARGET MINE]],
   objectName          = [[chickenr.s3o]],
   power               = 400,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

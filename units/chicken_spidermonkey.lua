@@ -35,6 +35,7 @@ return { chicken_spidermonkey = {
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET MINE]],
   objectName          = [[chicken_spidermonkey.s3o]],
   power               = 500,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
