@@ -42,6 +42,7 @@ return { chicken_drone = {
   onoffable           = true,
   power               = 60,
   pushResistant       = 0,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

@@ -38,6 +38,7 @@ return { chicken_dodo = {
   objectName            = [[chicken_dodo.s3o]],
   onoffable             = true,
   power                 = 170,
+  reclaimable           = false,
   selfDestructAs        = [[DODO_DEATH]],
   selfDestructCountdown = 0,
 

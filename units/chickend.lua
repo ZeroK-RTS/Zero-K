@@ -37,6 +37,7 @@ return { chickend = {
   objectName                    = [[tube.s3o]],
   onoffable                     = true,
   power                         = 120,
+  reclaimable                   = false,
   script                        = [[chickend.lua]],
   selfDestructAs                = [[NOWEAPON]],
 

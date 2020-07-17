@@ -36,6 +36,7 @@ return { chickenblobber = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MOBILE STUPIDTARGET MINE]],
   objectName          = [[chickenblobber.s3o]],
   power               = 400,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
   
 

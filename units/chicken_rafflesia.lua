@@ -32,6 +32,7 @@ return { chicken_rafflesia = {
   objectName                    = [[chicken_rafflesia.s3o]],
   onoffable                     = true,
   power                         = 480,
+  reclaimable                   = false,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {
