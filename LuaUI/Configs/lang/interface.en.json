@@ -302,6 +302,7 @@
 	"tera_tooltip_raise_snap15" : ": Snap to steps of 15 height. \n",
 	"tera_tooltip_raise_snap0" : ": Snap to 0 height.",
 	"tera_tooltip_restore_height" : ": Limit to only raise/lower",
+	"tera_cancel" : "Cancel selected terraform units.",
 	"startup_commenu_hidedefault" : "Hide default commanders",
 	"startup_commenu_sitelink" : "You can customize your commanders on the Zero-K site: https://zero-k.info",
 	"startup_commenu_tooltips" : "Module tooltips",
@@ -349,5 +350,15 @@
 	"hotkey_caption_press" : "Press a key combo",
 	"hotkey_caption_esc" : "(Hit Escape to clear keybinding)",
 	"hotkey_none_exists" : "None"
+	"walkingbomb_detonate" : "Detonate",
+	"walkingbomb_detonate_tooltip" : "Detonate: Kill selected bomb units.",
+	"gskrow_dgun" : "Carpet Bomb",
+	"gskrow_dgun_tooltip" : "Drop Bombs: Drop a huge number of bombs in a circle under the Krow",
+	"bombdisarm_run" : "Start Run",
+	"bombdisarm_run_tooltip" : "Unleash Lightning: Manually activate Thunderbird run.",
+	"swift_kesselrun" : "Speed Boost",
+	"swift_kesselrun_tooltip" : "Speed boost (5x for 1 second)",
+	"transport_eject" : "Drop Cargo",
+	"transport_eject_tooltip" : "Eject Cargo",
 	}
 }
