@@ -18,6 +18,8 @@ include("keysym.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
+local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
+
 --WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
 --						 	WG.COFC_SetCameraTargetBox: {number minX, number minZ, number maxX, number maxZ, number minDist(, number maxY(, number smoothness(,boolean useSmoothMeshSetting)))} -> {}, Set Camera to contain input box. maxY should be the highest point in the box, defaults to ground height of box center
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
@@ -737,6 +739,39 @@ local keys = {
 	[273] = 'up',
 	[274] = 'down',
 }
+
+local function HotkeyChangeNotification()
+	keys = {}
+
+	local key = WG.crude.GetHotkeyRaw("moveleft")
+	local keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'left'
+	key_code.left = keycode;
+	
+	key = WG.crude.GetHotkeyRaw("moveright")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'right'
+	key_code.right = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveforward")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'up'
+	key_code.up = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveback")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'down'
+	key_code.down = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveup")
+	keycode = ToKeysyms(key and key[1])
+	key_code.pageup = keycode;
+
+	key = WG.crude.GetHotkeyRaw("movedown")
+	keycode = ToKeysyms(key and key[1])
+	key_code.pagedown = keycode;
+end
+
 local icon_size = 20
 local cycle = 1
 local camcycle = 1
@@ -2574,6 +2609,7 @@ function widget:Initialize()
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
+		HotkeyChangeNotification() --TODO: change this to be triggered by the epicmenu camera hotkeys changing
 	end
 
 	WG.COFC_Enabled = true

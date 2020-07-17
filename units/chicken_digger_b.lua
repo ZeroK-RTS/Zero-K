@@ -39,6 +39,7 @@ return { chicken_digger_b = {
   objectName          = [[chicken_digger_b.s3o]],
   onoffable           = true,
   power               = 40,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

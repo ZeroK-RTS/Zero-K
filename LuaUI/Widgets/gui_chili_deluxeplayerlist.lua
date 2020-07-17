@@ -1508,7 +1508,7 @@ SetupPanels = function ()
 	
 	window_cpl = Window:New{
 		dockable = true,
-		name = "Player List",
+		name = "Deluxe Player List",
 		color = {0,0,0,0},
 		x = x,
 		y = y,

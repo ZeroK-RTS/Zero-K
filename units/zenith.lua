@@ -103,8 +103,10 @@ return { zenith = {
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,
+      waterWeapon             = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 6000,
+      waterWeapon             = true,
     },
 
     METEOR      = {

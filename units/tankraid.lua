@@ -32,7 +32,7 @@ return { tankraid = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[tankscout]],
-  idleAutoHeal        = 10,
+  idleAutoHeal        = 5,
   idleTime            = 300,
   leaveTracks         = true,
   maxDamage           = 670,
@@ -125,7 +125,7 @@ return { tankraid = {
       soundStartVolume        = 5,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 220,
+      weaponVelocity          = 240,
     },
 
   },

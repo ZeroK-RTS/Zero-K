@@ -538,6 +538,52 @@ local function give(cmd,line,words,player)
 	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
+local function SortUnits(a, b)
+	return UnitDefs[a].metalCost < UnitDefs[b].metalCost
+end
+
+local function givesort(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "1") or 1))
+	local build = (nanoAmount < 1)
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	
+	local units = {}
+	
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		if ud.buildOptions and #ud.buildOptions > 0 then
+			local sublist = ud.buildOptions
+			for j = 1, #sublist do
+				local subUdid = sublist[j]
+				if Spring.Utilities.getMovetype(UnitDefs[subUdid]) == 2 then -- Land or sea
+					units[#units + 1] = subUdid
+				end
+			end
+		end
+	end
+	
+	table.sort(units, SortUnits)
+	
+	local increment = 6100/#units
+	local zPos = 4000
+	
+	local orderUnit = {}
+	for i = 1, #units do
+		Spring.Echo(UnitDefs[units[i]].humanName, UnitDefs[units[i]].metalCost)
+		local height = Spring.GetGroundHeight(increment*i, zPos)
+		local unitID = Spring.CreateUnit(units[i], increment*i, height, zPos, 0, 0, false)
+		orderUnit[#orderUnit + 1] = unitID
+	end
+	
+	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
+end
+
 local function PlanetwarsGive(cmd,line,words,player)
 	if not spIsCheatingEnabled() then
 		return
@@ -839,6 +885,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"rotateunit", RotateUnit, "Rotates a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
+	gadgetHandler.actionHandler.AddChatAction(self,"givesort",givesort,"Gives mobiles sorted by cost.")
 	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nf",nanoFrame,"Sets nanoframe values.")

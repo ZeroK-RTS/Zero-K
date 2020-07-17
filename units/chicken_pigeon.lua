@@ -37,6 +37,7 @@ return { chicken_pigeon = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

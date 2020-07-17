@@ -34,6 +34,7 @@ return { chickens = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
   objectName          = [[chickens.s3o]],
   power               = 200,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
