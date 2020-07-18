@@ -234,7 +234,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 			end
 		end
 		
-		newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
+		local newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
 		if forceUpdateControls or newIsAfk ~= entryData.isAfk then
 			entryData.isAfk = newIsAfk
 			if controls and not (entryData.isDead or entryData.isLagging or entryData.isWaiting) then
