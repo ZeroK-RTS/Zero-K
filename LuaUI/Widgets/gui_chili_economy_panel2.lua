@@ -298,7 +298,7 @@ options = {
 				bar_metal.font.size = self.value and 20 or 16
 				bar_metal.fontOffset = self.value and -2 or 1
 				if bar_metal.net then
-					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, positiveColourStr, negativeColourStr))
+					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, negativeColourStr, positiveColourStr))
 				end
 				bar_metal:Invalidate()
 			end
@@ -884,7 +884,7 @@ function widget:GameFrame(n)
 	lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
 
 	--// Net income indicator on resource bars.
-	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, negativeColourStr, positiveColourStr))
 	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
 
 	-- save so that we can switch representation without recalculating
