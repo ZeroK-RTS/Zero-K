@@ -1,7 +1,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Crude Player List",
+		name      = "Buttery Player List",
 		desc      = "An inexpensive playerlist.",
 		author    = "GoogleFrog",
 		date      = "8 November 2019",
@@ -623,7 +623,7 @@ local function InitializePlayerlist()
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name = "Player List",
+		name = "Buttery Player List",
 		padding = {0, 0, 0, 0},
 		x = screenWidth - windowWidth,
 		y = math.floor(screenHeight/10),
