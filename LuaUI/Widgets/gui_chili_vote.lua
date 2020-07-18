@@ -142,9 +142,9 @@ function widget:AddConsoleMessage(msg)
 				local isSameAllyTeam = (not spec) and (allyTeamID == Spring.GetLocalAllyTeamID())
 				local canVoteAsSpec = spec and (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") == 1) and CAN_RESIGN_VOTE_WHILE_RESIGNED
 				if isSameAllyTeam or canVoteAsSpec then
-					title = WG.Translate("interface", "resign_vote")
+					title = WG.Translate("interface", "vote_resign")
 				else
-					title = teamName .. WG.Translate("interface", "team_resigning_vote")
+					title = teamName .. WG.Translate("interface", "vote_team_resigning")
 					button_vote[1]:Hide()
 					button_vote[2]:Hide()
 				end
