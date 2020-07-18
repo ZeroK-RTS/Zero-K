@@ -742,7 +742,7 @@ function widget:GameFrame(n)
 	-- Warnings
 	local  metalWarnLevel =  metalWarnOpt.value
 	local energyWarnLevel = energyWarnOpt.value
-	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local  metalWarning = netMetal > 0 and ((mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and metalWarnLevel < 1))
 	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
