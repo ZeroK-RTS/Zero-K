@@ -653,6 +653,11 @@ local function InitializePlayerlist()
 	
 	local gaiaTeamID = Spring.GetGaiaTeamID
 	local teamList = Spring.GetTeamList()
+
+	-- Crude and Buttery both crash if they see two teams with the same leaderID (any squadding)
+	-- This is a terrible, terrible workaround in the meantime.
+	local leadersSeenBodge = {}
+
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		if teamID ~= gaiaTeamID then
@@ -665,13 +670,18 @@ local function InitializePlayerlist()
 				if isAiTeam then
 					leaderID = nil
 				end
-				
-				local controls = GetUserControls(leaderID, teamID, allyTeamID, isAiTeam, isDead, playerlistWindow)
-				
-				listControls[#listControls + 1] = controls
-				teamByTeamID[teamID] = controls
-				if leaderID then
-					playersByPlayerID[leaderID] = controls
+
+				if not (leaderID and leadersSeenBodge[leaderID]) then
+					if leaderID then
+						leadersSeenBodge[leaderID] = true
+					end
+					local controls = GetUserControls(leaderID, teamID, allyTeamID, isAiTeam, isDead, playerlistWindow)
+
+					listControls[#listControls + 1] = controls
+					teamByTeamID[teamID] = controls
+					if leaderID then
+						playersByPlayerID[leaderID] = controls
+					end
 				end
 			end
 		end
