@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Chili Economy Panel Default",
-    desc      = "",
-    author    = "jK, Shadowfury333, GoogleFrog",
-    date      = "2014",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true
-  }
+	return {
+		name      = "Chili Economy Panel Default",
+		desc      = "",
+		author    = "jK, Shadowfury333, GoogleFrog",
+		date      = "2014",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -815,8 +815,8 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
 	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
+	"\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
@@ -830,7 +830,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
 	"\n" ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
@@ -844,8 +844,8 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\n" .. strings["team_energy_economy"] ..
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
@@ -857,7 +857,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 	
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
@@ -1079,7 +1079,7 @@ function widget:Initialize()
 
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
-    --widgetHandler:RegisterGlobal("ReserveState", ReserveState)
+	--widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
