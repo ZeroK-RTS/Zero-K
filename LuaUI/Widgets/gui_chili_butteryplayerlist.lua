@@ -117,16 +117,16 @@ local IMAGE_PING   = ":n:" .. LUAUI_DIRNAME .. "Images/playerlist/ping.png"
 
 local function PingTimeOut(pingTime)
 	if pingTime < 1 then
-		return "Ping " .. (math.floor(pingTime*1000) ..'ms')
+		return "Ping: " .. (math.floor(pingTime*1000) ..'ms')
 	elseif pingTime > 999 then
-		return "Ping " .. ('' .. (math.floor(pingTime*100/60)/100)):sub(1,4) .. 'min'
+		return "Ping: " .. ('' .. (math.floor(pingTime*100/60)/100)):sub(1,4) .. 'min'
 	end
 	--return (math.floor(pingTime*100))/100
-	return "Ping " .. ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
+	return "Ping: " .. ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
 end
 
 local function CpuUsageOut(cpuUsage)
-	return "CPU usage " .. math.ceil(cpuUsage*100) .. "%"
+	return "CPU: " .. math.ceil(cpuUsage*100) .. "%"
 end
 
 local function ToGrey(v)
