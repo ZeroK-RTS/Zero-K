@@ -21,7 +21,6 @@ local fireRange = WeaponDefNames["zenith_meteor"].range
 local smokePiece = {base}
 
 local Vector = Spring.Utilities.Vector
-local isBlocked = false
 local projectiles = {}
 local projectileCount = 0
 local oldestProjectile = 1 -- oldestProjectile is for when the projectile table is being cyclicly overridden.
@@ -54,7 +53,8 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local gaiaTeam = Spring.GetGaiaTeamID()
 
 local launchInProgress = false
-local currentlyStunned
+local isBlocked = true
+local currentlyEnabled = false
 
 local INLOS_ACCESS = {inlos = true}
 
@@ -63,6 +63,11 @@ local ux, uy, uz
 local function IsDisabled()
 	local state = Spring.GetUnitStates(unitID)
 	if not (state and state.active) then
+		return true
+	end
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	local y = Spring.GetGroundHeight(x, z)
+	if y < -95 then
 		return true
 	end
 	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
@@ -162,9 +167,22 @@ local function SpawnMeteor()
 	end
 end
 
+local function UpdateEnabled(newEnabled)
+	if currentlyEnabled == newEnabled then
+		return
+	end
+	currentlyEnabled = newEnabled
+	if currentlyEnabled then
+		RegainControlOfMeteors()
+	else
+		LoseControlOfMeteors()
+		isBlocked = true -- Block until a projectile is fired successfully.
+	end
+end
+
 local function SpawnProjectileThread()
-	
 	local reloadMult = 1
+	GG.zenith_spawnBlocked = GG.zenith_spawnBlocked or {}
 	
 	while true do
 		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
@@ -178,31 +196,20 @@ local function SpawnProjectileThread()
 		
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
-		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
 		while IsDisabled() do
-			if not currentlyStunned then
-				LoseControlOfMeteors()
-				currentlyStunned = true
-			end
+			UpdateEnabled(false)
 			Sleep(500)
 		end
 		EmitSfx(flare, 2049)
+		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
 		
-		if currentlyStunned then
-			RegainControlOfMeteors()
-			currentlyStunned = false
-		end
-		if not currentlyStunned and isBlocked and spGetUnitRulesParam(unitID, "meteorSpawnBlocked") ~= 1 then
-			RegainControlOfMeteors()
-			isBlocked = false
-		elseif not currentlyStunned and spGetUnitRulesParam(unitID, "meteorSpawnBlocked") == 1 then
-			LoseControlOfMeteors()
-			isBlocked = true
-		end
-		if spGetUnitRulesParam(unitID, "meteorSpawnBlocked") ~= 1 then -- Only spawn if there's a clear view to the sky
+		UpdateEnabled(not isBlocked)
+		if currentlyEnabled then
 			SpawnMeteor()
 		end
-		spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
+		
+		isBlocked = GG.zenith_spawnBlocked[unitID]
+		GG.zenith_spawnBlocked[unitID] = false
 	end
 end
 
@@ -294,8 +301,6 @@ function script.Create()
 	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
-	
-	currentlyStunned = IsDisabled()
 	
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))

@@ -12,15 +12,16 @@ function gadget:GetInfo()
 		layer   = -1,
 		enabled = true,
 	}
-end	
+end
 
+GG.zenith_spawnBlocked = {}
 
 local gravityWeaponDefID = WeaponDefNames["zenith_gravity_neg"].id
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
-function gadget:Explosion(weaponDefID, px, py, pz, AttackerID, ProjectileID)
+function gadget:Explosion(weaponDefID, px, py, pz, attackerID, projectileID)
 	if weaponDefID == gravityWeaponDefID then
-		spSetUnitRulesParam(AttackerID, "meteorSpawnBlocked", 1)
+		GG.zenith_spawnBlocked[attackerID] = true
 	end
 end
 
