@@ -41,6 +41,7 @@ local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
 local torpRange = WeaponDefNames["amphraid_torpedo"].range
 local shotRange = WeaponDefNames["amphraid_torpmissile"].range
 local longRange = true
+local ROCKET_DEPTH = -32
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -129,13 +130,15 @@ end
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -32 then
+		if height < ROCKET_DEPTH then
 			if longRange then
 				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+				Spring.SetUnitMaxRange(unitID, torpRange)
 				longRange = false
 			end
 		elseif not longRange then
 			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+			Spring.SetUnitMaxRange(unitID, shotRange)
 			longRange = true
 		end
 		Sleep(200)
