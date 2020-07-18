@@ -218,57 +218,57 @@ end
 options = {
 	label = { type = 'label', name = WG.Translate("interface", "defences_range") },
 	allyground = {
-		name = WG.Translate("interface", "ally_ground_defence_range"),
+		name = WG.Translate("interface", "defence_range_ally_ground"),
 		type = 'bool',
 		value = false,
 	},
 	allyair = {
-		name = WG.Translate("interface", "ally_air_defence_range"),
+		name = WG.Translate("interface", "defence_range_ally_air"),
 		type = 'bool',
 		value = false,
 	},
 	allynuke = {
-		name = WG.Translate("interface", "ally_nuke_defence_range"),
+		name = WG.Translate("interface", "defence_range_ally_nuke"),
 		type = 'bool',
 		value = true,
 	},
 	enemyground = {
-		name = WG.Translate("interface", "enemy_ground_defence_range"),
+		name = WG.Translate("interface", "defence_range_enemy_ground"),
 		type = 'bool',
 		value = true,
 	},
 	enemyair = {
-		name = WG.Translate("interface", "enemy_air_defence_range"),
+		name = WG.Translate("interface", "defence_range_enemy_air"),
 		type = 'bool',
 		value = true,
 	},
 	enemynuke = {
-		name = WG.Translate("interface", "enemy_nuke_defence_range"),
+		name = WG.Translate("interface", "defence_range_enemy_nuke_defence"),
 		type = 'bool',
 		value = true,
 	},
 	enemyshield = {
-		name = WG.Translate("interface", "enemy_shields"),
+		name = WG.Translate("interface", "defence_range_enemy_shields"),
 		type = 'bool',
 		value = true,
 	},
 	enemyradar = {
-		name = WG.Translate("interface", "enemy_radar_range"),
+		name = WG.Translate("interface", "defence_range_enemy_radar"),
 		type = 'bool',
 		value = false,
 	},
 	specground = {
-		name = WG.Translate("interface", "spec_defence_range"),
+		name = WG.Translate("interface", "defence_range_spec"),
 		type = 'bool',
 		value = false,
 	},
 	specair = {
-		name = WG.Translate("interface", "spec_air_defence_range"),
+		name = WG.Translate("interface", "defence_range_spec_air"),
 		type = 'bool',
 		value = false,
 	},
 	specnuke = {
-		name = WG.Translate("interface", "spec_nuke_defence_range"),
+		name = WG.Translate("interface", "defence_range_spec_nuke"),
 		type = 'bool',
 		value = true,
 	},
