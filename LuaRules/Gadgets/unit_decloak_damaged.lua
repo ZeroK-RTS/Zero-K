@@ -60,6 +60,7 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local DEFAULT_AREA_DECLOAK_TIME = 180
 local DEFAULT_DECLOAK_TIME = 100
 local UPDATE_FREQUENCY = 10
 local CLOAK_MOVE_THRESHOLD = math.sqrt(0.2)
@@ -137,7 +138,11 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
-		PokeDecloakUnit(unitID)
+		if cloakUnitDefID[unitDefID] then
+			PokeDecloakUnit(unitID)
+		else
+			PokeDecloakUnit(unitID,DEFAULT_AREA_DECLOAK_TIME)
+		end
 	end
 end
 
@@ -241,7 +246,9 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 end
 
 function gadget:AllowUnitDecloak(unitID, objectID, weaponID)
-	recloakFrame[unitID] = currentFrame + DEFAULT_DECLOAK_TIME
+	local recloakTime = 0
+	if cloakUnitDefID[spGetUnitDefID(unitID)] then recloakTime = DEFAULT_DECLOAK_TIME else recloakTime = DEFAULT_AREA_DECLOAK_TIME end
+	recloakFrame[unitID] = currentFrame + recloakTime
 end
 
 --------------------------------------------------------------------------------
