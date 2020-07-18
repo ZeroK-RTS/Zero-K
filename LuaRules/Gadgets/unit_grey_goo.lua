@@ -186,7 +186,7 @@ function gadget:GameFrame(f)
 						end
 						
 						if cloaked then
-							GG.PokeDecloakUnit(unitID, 25)
+							GG.PokeDecloakUnit(unitID)
 							cloaked = false
 						end
 					else
@@ -203,11 +203,11 @@ function gadget:GameFrame(f)
 										units[ally].progress = 0
 									end
 									if cloaked then
-										GG.PokeDecloakUnit(unitID, 25)
+										GG.PokeDecloakUnit(unitID)
 										cloaked = false
 									end
 									if allyCloaked then
-										GG.PokeDecloakUnit(ally, 25)
+										GG.PokeDecloakUnit(ally)
 									end
 								end
 							end

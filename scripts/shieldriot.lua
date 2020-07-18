@@ -157,7 +157,7 @@ function AutoAttack_Thread()
 				local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 				local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
 				spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
-				GG.PokeDecloakUnit(unitID,100)
+				GG.PokeDecloakUnit(unitID, unitDefID)
 				
 				EmitSfx(emit, GG.Script.UNIT_SFX1)
 				EmitSfx(emit, GG.Script.DETO_W2)

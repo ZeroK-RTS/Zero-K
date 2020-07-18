@@ -38,15 +38,13 @@ end
 
 local alliedTrueTable = {allied = true}
 
-local Spring = Spring
-local spAreTeamsAllied = Spring.AreTeamsAllied
-
-local spSetUnitCloak = Spring.SetUnitCloak
-local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitIsDead = Spring.GetUnitIsDead
+local spAreTeamsAllied           = Spring.AreTeamsAllied
+local spSetUnitCloak             = Spring.SetUnitCloak
+local spGetUnitIsCloaked         = Spring.GetUnitIsCloaked
+local spGetUnitRulesParam        = Spring.GetUnitRulesParam
+local spSetUnitRulesParam        = Spring.SetUnitRulesParam
+local spGetUnitDefID             = Spring.GetUnitDefID
+local spGetUnitIsDead            = Spring.GetUnitIsDead
 local spIsWeaponPureStatusEffect = Spring.Utilities.IsWeaponPureStatusEffect
 
 local recloakUnit = {}
@@ -60,17 +58,26 @@ for i = 1, #WeaponDefs do
 	end
 end
 
-local DEFAULT_DECLOAK_TIME = 100
+local DEFAULT_DECLOAK_TIME = 150
+local PERSONAL_DECLOAK_TIME = 90
+
+local DEFAULT_PROXIMITY_DECLOAK_TIME = 75
+local PERSONAL_PROXIMITY_DECLOAK_TIME = 45
+
 local UPDATE_FREQUENCY = 10
 local CLOAK_MOVE_THRESHOLD = math.sqrt(0.2)
 
 local currentFrame = 0
 
 local cloakUnitDefID = {}
+local commDefID = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.canCloak and not ud.customParams.dynamic_comm then
 		cloakUnitDefID[i] = true
+	end
+	if ud.customParams.dynamic_comm then
+		commDefID[i] = true
 	end
 end
 
@@ -116,15 +123,28 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function PokeDecloakUnit(unitID, duration)
-	if recloakUnit[unitID] then
-		recloakUnit[unitID] = duration or DEFAULT_DECLOAK_TIME
-	else
+local function GetProximityDecloakTime(unitID, unitDefID)
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
+	if commDefID[unitDefID] and GG.Upgrades_UnitCanCloak(unitID) then
+		return PERSONAL_PROXIMITY_DECLOAK_TIME
+	end
+	return (cloakUnitDefID[unitDefID] and PERSONAL_PROXIMITY_DECLOAK_TIME) or DEFAULT_PROXIMITY_DECLOAK_TIME
+end
+
+local function GetActionDecloakTime(unitID, unitDefID)
+	unitDefID = unitDefID or spGetUnitDefID(unitID)
+	if commDefID[unitDefID] and GG.Upgrades_UnitCanCloak(unitID) then
+		return PERSONAL_DECLOAK_TIME
+	end
+	return (cloakUnitDefID[unitDefID] and PERSONAL_DECLOAK_TIME) or DEFAULT_DECLOAK_TIME
+end
+
+local function PokeDecloakUnit(unitID, unitDefID)
+	if not recloakUnit[unitID] then
 		spSetUnitRulesParam(unitID, "cannotcloak", 1, alliedTrueTable)
 		spSetUnitCloak(unitID, 0)
-		recloakUnit[unitID] = duration or DEFAULT_DECLOAK_TIME
 	end
-
+	recloakUnit[unitID] = GetActionDecloakTime(unitID, unitDefID)
 end
 
 GG.PokeDecloakUnit = PokeDecloakUnit
@@ -137,7 +157,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
-		PokeDecloakUnit(unitID)
+		PokeDecloakUnit(unitID, unitDefID)
 	end
 end
 
@@ -205,6 +225,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 			-- For some reason enemyID indicates that the unit is being transported.
 			return Spring.GetUnitIsCloaked(transID)
 		end
+		recloakFrame[unitID] = currentFrame + GetProximityDecloakTime(unitID)
 		return false
 	end
 	
@@ -241,7 +262,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 end
 
 function gadget:AllowUnitDecloak(unitID, objectID, weaponID)
-	recloakFrame[unitID] = currentFrame + DEFAULT_DECLOAK_TIME
+	recloakFrame[unitID] = currentFrame + GetActionDecloakTime(unitID)
 end
 
 --------------------------------------------------------------------------------
