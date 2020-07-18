@@ -194,7 +194,6 @@
 	"states_firestate_weaponsfree" : "Fire At Will",
 	"states_firestate_tooltip" : "Sets when a unit will automatically shoot.",
 	"states_retreat" : "Retreat",
-	"states_retreat_healthleft" : "Health",
 	"states_retreat_tooltip" : "Automatically retreat to closest retreat point or airpad when damaged. Right click to disable.",
 	"states_planeland" : "Idle State",
 	"states_planeland_no" : "Fly",
