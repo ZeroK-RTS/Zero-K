@@ -255,6 +255,8 @@
 	"commands_dgun" : "Fire Special Weapon: Fire the unit's special weapon.",
 	"commands_guard" : "Guard: Protect the target and assist its production.",
 	"commands_resupply" : "Resupply: Return to nearest repair pad for health and ammo.",
+	"commands_settarget" : "Set Target: Set a priority target that is indepdent of the units command queue.",
+	"commands_canceltarget" : "Cancel Target: Cancel the units priority target.",
 	"states_smthng_off" : "Off",
 	"states_smthng_on" : "On",
 	"states_smthng_disabled" : "Disabled",
