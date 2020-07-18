@@ -430,7 +430,7 @@ local function GetBarDrawer()
 		if freeStockpile then
 			glText(numStockpiled, barWidth + 1.7, -(11*barHeight - 2) - 16, 7.5, "cno")
 		else
-			glText(numStockpiled .. '/' .. numStockpileQued, barWidth + 1.7, -(11*barHeight-2)-16, 7.5, "cno")
+			glText(numStockpiled .. '/' .. (numStockpiled + numStockpileQued), barWidth + 1.7, -(11*barHeight-2)-16, 7.5, "cno")
 		end
 	end
 
