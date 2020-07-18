@@ -493,7 +493,7 @@ local overrides = {
 	},
 	[CMD_UNIT_KILL_SUBORDINATES] = {
 		texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'},
-		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_keep")"Keep"), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_kill")"Kill")}
+		stateTooltip = {tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_keep")), tooltips.UNIT_KILL_SUBORDINATES:gsub("_STATE_", WG.Translate("interface", "states_killcap_kill"))}
 	},
 	[CMD_GOO_GATHER] = {
 		texture = {imageDir .. 'states/goo_off.png', imageDir .. 'states/goo_on.png', imageDir .. 'states/goo_cloak.png'},
@@ -509,7 +509,7 @@ local overrides = {
 	},
 	[CMD_PUSH_PULL] = {
 		texture = {imageDir .. 'states/pull_alt.png', imageDir .. 'states/push_alt.png'},
-		stateTooltip = {tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_pull")), tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_push")"Push")}
+		stateTooltip = {tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_pull")), tooltips.PUSH_PULL:gsub("_STATE_", WG.Translate("interface", "states_pushpull_push"))}
 	},
 	[CMD_DONT_FIRE_AT_RADAR] = {
 		texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'},
