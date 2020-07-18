@@ -78,10 +78,13 @@ local lbl_storage_metal
 local lbl_storage_energy
 local lbl_expense_metal
 local lbl_expense_energy
+local lbl_waste_metal
+local lbl_waste_energy
 local lbl_income_metal
 local lbl_income_energy
 
 local positiveColourStr
+local usageColourStr
 local negativeColourStr
 local col_income
 local col_expense
@@ -218,6 +221,7 @@ end
 
 local function option_colourBlindUpdate()
 	positiveColourStr = (options.colourBlind.value and YellowStr) or GreenStr
+	usageColourStr = CyanStr
 	negativeColourStr = (options.colourBlind.value and BlueStr) or RedStr
 	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
 	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
@@ -858,9 +862,15 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
 	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
-	
-	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
-	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
+
+	-- teamMetalWaste is negative if metal waste is happening
+	lbl_waste_metal:SetCaption( negativeColourStr..Format(teamMetalWaste, " -") )
+	lbl_waste_metal:SetVisibility(teamMetalWaste < -0.001)
+	-- cp.team_energyWaste is positive if energy waste is happening
+	lbl_waste_energy:SetCaption( negativeColourStr..Format(cp.team_energyWaste, " -") )
+	lbl_waste_energy:SetVisibility(cp.team_energyWaste > 0.001)
+	lbl_expense_metal:SetCaption( usageColourStr..Format(mPull, " -") )
+	lbl_expense_energy:SetCaption( usageColourStr..Format(realEnergyPull, " -") )
 	lbl_income_metal:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_income_energy:SetCaption( Format(eInco, positiveColourStr.."+") )
 	lbl_storage_energy:SetCaption(("%.0f"):format(eCurr))
@@ -1179,8 +1189,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local imageHeight = "80%"
 	
 	local storageX    = "18%"
-	local incomeX     = "44%"
-	local pullX       = "70%"
+	local incomeX     = "38%"
+	local pullX       = "59%"
+	local wasteX      = "80%"
 	local textY       = "47%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
@@ -1253,6 +1264,18 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	lbl_expense_metal = Chili.Label:New{
 		parent = window_metal,
 		x      = pullX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		caption = usageColourStr.."-0.0",
+		valign = "center",
+		align  = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
+	lbl_waste_metal = Chili.Label:New{
+		parent = window_metal,
+		x      = wasteX,
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
@@ -1402,6 +1425,18 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	lbl_expense_energy = Chili.Label:New{
 		parent = window_energy,
 		x      = pullX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		caption = usageColourStr.."-0.0",
+		valign = "center",
+		align  = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
+	lbl_waste_energy = Chili.Label:New{
+		parent = window_energy,
+		x      = wasteX,
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
