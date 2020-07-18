@@ -82,6 +82,7 @@ local lbl_waste_metal
 local lbl_waste_energy
 local lbl_income_metal
 local lbl_income_energy
+local lbl_prod_efficiency
 
 local positiveColourStr
 local usageColourStr
@@ -101,6 +102,7 @@ local blinkEnergy = 0
 local BLINK_UPDATE_RATE = 0.1
 local blinkM_status = false
 local blinkE_status = false
+local blinkF_status = false
 local excessE = false
 local flashModeEnabled = true
 local externalForceHide = false
@@ -525,6 +527,10 @@ local function UpdateBlink(dt)
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], BlinkStatusFunc[blinkE_status](blinkIndex))
 	end
 	
+	if blinkF_status then
+		lbl_prod_efficiency.font.color = Mix({col_expense[1], col_expense[2], col_expense[3], 1}, {1,1,0,1}, BlinkStatusFunc[blinkF_status](blinkIndex))
+	end
+
 	metalNoStorage.UpdateFlash(blinkIndex)
 	energyNoStorage.UpdateFlash(blinkIndex)
 end
@@ -599,6 +605,7 @@ end
 local  metalWarnOpt = options.metalWarning
 local energyWarnOpt = options.energyWarning
 
+local efficiency_flash_debounce = 0
 local initialReserveSet = false
 function widget:GameFrame(n)
 
@@ -883,6 +890,32 @@ function widget:GameFrame(n)
 	-- save so that we can switch representation without recalculating
 	bar_metal.net = netMetal
 	bar_overlay_energy.net = netEnergy
+
+	local metal_consumption_ratio = teamMPull / teamMInco
+	local energy_consumption_ratio = totalPull / teamEnergyIncome
+
+	local consumption = ("%.0f%%"):format(metal_consumption_ratio * 100)
+
+	local do_efficiency_warning = false
+	if metal_consumption_ratio < 1 then
+		if efficiency_flash_debounce == n - TEAM_SLOWUPDATE_RATE then
+			do_efficiency_warning = true
+		end
+		efficiency_flash_debounce = n
+	end
+
+	if do_efficiency_warning then
+		-- Blink more insistently if we're under 50% consumption
+		blinkF_status = metal_consumption_ratio < .5 and 2 or 1
+	else
+		-- Bright cyan if we can consume under 130% of output, dull cyan otherwise
+		lbl_prod_efficiency.font.color = metal_consumption_ratio < 1.3 and {0,1,1,1} or {0,.7,.8,1}
+		blinkF_status = false
+	end
+
+	lbl_prod_efficiency.x = (lbl_prod_efficiency.parent.width - lbl_prod_efficiency.font:GetTextWidth(consumption, 30)) / 2
+	lbl_prod_efficiency:SetCaption(consumption)
+	lbl_prod_efficiency.tooltip = "Using up to " .. RedStr .. ("%.2f"):format(teamMPull) .. WhiteStr .. " of " .. GreenStr .. ("%.2f"):format(teamMInco) .. WhiteStr .. " per second."
 end
 
 --------------------------------------------------------------------------------
@@ -1124,7 +1157,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local mouseDownOnReserve = false
 	
 	--// Some (only some) Configuration for shared values
-	local subWindowWidth = '50%'
+	local subWindowWidth = '42%'
 	local screenHorizCentre = screenWidth / 2
 	local economyPanelWidth = math.min(660,screenWidth-10)
 
@@ -1362,6 +1395,43 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	metalNoStorage = GetNoStorageWarning(window_metal, barX, barY, barRight, barHeight, metalBarHolder)
 	
+	--// Efficiency
+
+	local eff_panel = Chili.Panel:New{
+		classname = fancySkinLeft,
+		parent = window_main_display,
+		name = "Efficiency Panel",
+		y = 0,
+		x = "42%",
+		width = "16%",
+		bottom = 0,
+		backgroundColor = {1,1,1,options.opacity.value},
+		dockable = false,
+		draggable = false,
+		resizable = false
+	}
+
+	local lbl_eff_title = Chili.Label:New{
+		parent = eff_panel,
+		x = 0,
+		y = "0%",
+		caption = "Usage",
+	}
+	lbl_eff_title.x = (lbl_eff_title.parent.width - lbl_eff_title.font:GetTextWidth(lbl_eff_title.caption)) / 2
+	lbl_eff_title.font.color = {.7,.9,1,1}
+
+	lbl_prod_efficiency = Chili.Label:New{
+		parent = eff_panel,
+		x      = "0%",
+		y      = "13%",
+		height = "100%",
+		width  = "100%",
+		caption = "?%",
+		valign = "center",
+		align = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value * 1.4, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
 	--// ENERGY
 
 	window_energy = Chili.Panel:New{
@@ -1369,7 +1439,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_main_display,
 		name = "Energy",
 		y      = 0,
-		x      = '50%',
+		x      = '58%',
 		width  = subWindowWidth,
 		bottom = 0,
 		backgroundColor = {1,1,1,options.opacity.value},
@@ -1547,6 +1617,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	function lbl_income_metal:HitTest(x,y) return self end
 	function lbl_expense_energy:HitTest(x,y) return self end
 	function lbl_expense_metal:HitTest(x,y) return self end
+	function lbl_prod_efficiency:HitTest(x,y) return self end
 
 	-- set translatable strings
 	languageChanged ()
