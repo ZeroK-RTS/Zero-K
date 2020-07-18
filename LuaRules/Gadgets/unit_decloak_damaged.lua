@@ -36,7 +36,6 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
-local forceDecloakWeapons = {}
 local alliedTrueTable = {allied = true}
 
 local Spring = Spring
@@ -48,6 +47,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitIsDead = Spring.GetUnitIsDead
+local spIsWeaponPureStatusEffect = Spring.Utilities.IsWeaponPureStatusEffect
 
 local recloakUnit = {}
 local recloakFrame = {}
@@ -131,7 +131,7 @@ GG.PokeDecloakUnit = PokeDecloakUnit
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
-	if  (damage > 0 or forceDecloakWeapons[weaponID]) and
+	if  (damage > 0 or spIsWeaponPureStatusEffect(weaponID)) and
 		not (attackerTeam and
 		weaponID and
 		noFFWeaponDefs[weaponID] and
@@ -321,12 +321,6 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:Initialize()
-	for i=1, #WeaponDefs do -- cache pure slow and disarm damage weapons
-		local cp = WeaponDefs[i].customParams
-		if cp.disarmdamageonly == '1' or cp.timeslow_onlyslow == '1' then
-			forceDecloakWeapons[i] = true
-		end
-	end
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
