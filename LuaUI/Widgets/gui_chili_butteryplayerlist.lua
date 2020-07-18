@@ -516,9 +516,14 @@ local listControls = {}
 local playersByPlayerID = {}
 local teamByTeamID = {}
 
-local function Compare(ac, bc)
-	local a, b = ac.entryData, bc.entryData
-	
+local function Compare(lc, rc)
+	local a, b
+	if options.alignToTop.value then
+		a, b = lc.entryData, rc.entryData
+	else
+		a, b = rc.entryData, lc.entryData
+	end
+
 	if not a.isMe ~= not b.isMe then
 		return b.isMe
 	end
