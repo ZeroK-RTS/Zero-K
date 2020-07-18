@@ -321,6 +321,10 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 		elseif customKeys.faction and customKeys.faction ~= "" then
 			entryData.clan = "LuaUI/Configs/Factions/" .. customKeys.faction .. ".png"
 		end
+
+		if customKeys.elo and customKeys.elo ~= "" then
+			entryData.elo = customKeys.elo
+		end
 	end
 	
 	if isAiTeam then
@@ -535,6 +539,10 @@ local function Compare(ac, bc)
 		return a.isAiTeam
 	end
 	
+	if a.elo ~= b.elo then
+		return a.elo > b.elo
+	end
+
 	if a.teamID ~= b.teamID then
 		return a.teamID > b.teamID
 	end
