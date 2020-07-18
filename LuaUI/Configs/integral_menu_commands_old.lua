@@ -1,4 +1,4 @@
-local factory_commands, econ_commands, defense_commands, special_commands, units_factory_commands, overrides, widgetSpaceHidden = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands, units_factory_commands, overrides, widgetSpaceHidden = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 local units = {
 }

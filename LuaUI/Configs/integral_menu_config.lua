@@ -1,4 +1,4 @@
-local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands = include("Configs/integral_menu_commands.lua")
+local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 local function CommandClickFunction()
 	local _,_, meta,_ = Spring.GetModKeyState()
