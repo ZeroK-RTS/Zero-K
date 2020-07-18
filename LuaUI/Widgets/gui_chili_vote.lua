@@ -44,8 +44,8 @@ local string_vote = {"!y=", "!n="}
 local string_titleStart = WG.Translate("interface", "vote:")
 local string_endvote = WG.Translate("interface", "vote_cancelled")
 local string_titleEnd = "?"
-local string_noVote = "There is no poll going on, start some first"
-local string_votemove = "Do you want to join"
+local string_noVote = WG.Translate("interface", "vote_none")
+local string_votemove = WG.Translate("interface", "vote_roommove")
 
 local springieName = Spring.GetModOptions().springiename or ''
 
