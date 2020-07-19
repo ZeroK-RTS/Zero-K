@@ -1247,9 +1247,8 @@ function widget:Update(dt)
 end
 
 function widget:PlayerChanged(playerID)
+	local updateAll = false
 	if playerID == myPlayerID then
-		local updateAll = false
-		
 		if mySpectating ~= Spring.GetSpectatingState() then
 			updateAll = true
 			mySpectating = Spring.GetSpectatingState()
@@ -1262,18 +1261,18 @@ function widget:PlayerChanged(playerID)
 			updateAll = true
 			myTeamID = (not mySpectating and Spring.GetMyTeamID())
 		end
-		
-		if changedTeam then
-			local toSort = false
-			for i = 1, #listControls do
-				toSort = UpdateEntryData(listControls[i].entryData, listControls[i], false, true) or toSort
-			end
-			
-			if toSort then
-				SortEntries()
-			end
-			return
+	end
+
+	if updateAll then
+		local toSort = false
+		for i = 1, #listControls do
+			toSort = UpdateEntryData(listControls[i].entryData, listControls[i], false, true) or toSort
 		end
+
+		if toSort then
+			SortEntries()
+		end
+		return
 	end
 	
 	UpdatePlayer(playerID)
