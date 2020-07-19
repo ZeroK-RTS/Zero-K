@@ -1037,7 +1037,16 @@ local function SortEntries()
 	
 	local toTop = options.alignToTop.value
 	local offset = 0
+	local lastAllyTeamID = nil
 	for i = 1, #listControls do
+		local allyTeamID = listControls[i].entryData.allyTeamID
+		if allyTeamID ~= lastAllyTeamID then
+			if i ~= 1 then
+				offset = offset + 5
+			end
+			lastAllyTeamID = allyTeamID
+		end
+
 		if toTop then
 			listControls[i].mainControl._relativeBounds.top = offset
 			listControls[i].mainControl._relativeBounds.bottom = nil
