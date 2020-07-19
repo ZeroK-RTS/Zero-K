@@ -286,6 +286,7 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 	local newIsDead = ((isSpectator or Spring.GetTeamRulesParam(entryData.teamID, "isDead")) and true) or false
 	if forceUpdateControls or newIsDead ~= entryData.isDead then
 		entryData.isDead = newIsDead
+		resortRequired = true
 		if controls then
 			controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
 			controls.textName.font.color = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
@@ -525,23 +526,27 @@ local function Compare(lc, rc)
 	end
 
 	if not a.isMe ~= not b.isMe then
-		return b.isMe
+		return a.isMe
 	end
 	
 	if not a.isMyTeam ~= not b.isMyTeam then
-		return b.isMyTeam
+		return a.isMyTeam
 	end
 	
 	if not a.isMyAlly ~= not b.isMyAlly then
-		return b.isMyAlly
+		return a.isMyAlly
 	end
 	
 	if a.allyTeamID ~= b.allyTeamID then
-		return a.allyTeamID > b.allyTeamID
+		return b.allyTeamID > a.allyTeamID
 	end
 	
+	if not a.isDead ~= not b.isDead then
+		return b.isDead
+	end
+
 	if not a.isAiTeam ~= not b.isAiTeam then
-		return a.isAiTeam
+		return b.isAiTeam
 	end
 	
 	if a.elo ~= b.elo then
