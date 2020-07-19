@@ -863,7 +863,8 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		min = 0,
 		max = 500 or 1,
 		allyTooltip = "Double click to share 100 metal to " .. userName,
-		OnDblClick = {function()
+		OnDblClick = {function(self)
+			if not self.canGift then return end
 			GiveResource(userControls.entryData.teamID,"metal",100)
 		end},
 		SetCanBeSharedTo = function(self, canGift)
@@ -872,6 +873,7 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 			else
 				self.tooltip = ""
 			end
+			self.canGift = canGift
 			self:Invalidate()
 		end,
 		parent = userControls.mainControl
@@ -890,7 +892,8 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		min = 0,
 		max = 500 or 1,
 		allyTooltip = "Double click to share 100 energy to " .. userName,
-		OnDblClick = {function()
+		OnDblClick = {function(self)
+			if not self.canGift then return end
 			GiveResource(userControls.entryData.teamID,"energy",100)
 		end},
 		SetCanBeSharedTo = function(self, canGift)
@@ -899,6 +902,7 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 			else
 				self.tooltip = ""
 			end
+			self.canGift = canGift
 			self:Invalidate()
 		end,
 		parent = userControls.mainControl
