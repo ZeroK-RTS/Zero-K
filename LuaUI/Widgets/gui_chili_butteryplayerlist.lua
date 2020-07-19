@@ -623,7 +623,7 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 		end
 
 		if customKeys.elo and customKeys.elo ~= "" then
-			entryData.elo = customKeys.elo
+			entryData.elo = tonumber(customKeys.elo)
 		end
 	end
 	
