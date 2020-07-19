@@ -555,7 +555,7 @@ local function Compare(lc, rc)
 	if a.playerID then
 		return (not b.playerID) or a.playerID > b.playerID
 	end
-	return (not b.playerID)
+	return (not not b.playerID)
 end
 
 local function SortEntries()
