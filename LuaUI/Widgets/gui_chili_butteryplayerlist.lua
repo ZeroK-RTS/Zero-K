@@ -3,7 +3,7 @@ function widget:GetInfo()
 	return {
 		name      = "Buttery Player List",
 		desc      = "An inexpensive playerlist.",
-		author    = "GoogleFrog",
+		author    = "GoogleFrog, esainane",
 		date      = "8 November 2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = 50,
@@ -73,6 +73,8 @@ local myPlayerID            = Spring.GetMyPlayerID()
 local mySpectating          = Spring.GetSpectatingState()
 local spGetPlayerRulesParam = Spring.GetPlayerRulesParam
 
+VFS.Include("LuaRules/Configs/constants.lua")
+
 if mySpectating then
 	myTeamID = false
 	myAllyTeamID = false
@@ -90,6 +92,8 @@ local function GetColorChar(colorTable)
 	return string.char(col[4],col[1],col[2],col[3])
 end
 
+local metalBarColor, energyBarColor, noStorageBarColor = {.7,.75,.9,1}, {1,1,0,1}, {.9,0,0,1}
+
 local pingCpuColors = {
 	{0, 1, 0, 1},
 	{0.7, 1, 0, 1},
@@ -99,12 +103,14 @@ local pingCpuColors = {
 	{1, 1, 1, 1},
 }
 
+local textHeightToWidth = .7
+
 local ALLY_COLOR  = {0, 1, 1, 1}
 local ENEMY_COLOR = {1, 0, 0, 1}
 
 local PING_TIMEOUT = 2000 -- ms
 
-local MAX_NAME_LENGTH = 150
+local MAX_NAME_LENGTH = 150 * textHeightToWidth
 
 local UPDATE_PERIOD = 1
 
@@ -178,87 +184,344 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateControls)
-	local newTeamID, newAllyTeamID = entryData.teamID, entryData.allyTeamID
-	local newIsLagging = entryData.isLagging
-	local newIsWaiting = entryData.isWaiting
-	local isSpectator = false
-	
-	if entryData.playerID then
-		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank = Spring.GetPlayerInfo(entryData.playerID, false)
-		newTeamID, newAllyTeamID = teamID, allyTeamID
-		
-		entryData.isMe = (entryData.playerID == myPlayerID)
-		
-		if spectator then
-			isSpectator = true
-			newTeamID, newAllyTeamID = entryData.initTeamID,  entryData.initAllyTeamID
-		end
-		
-		local pingBucket = (active and math.max(1, math.min(5, math.ceil(math.min(pingTime, 1) * 5)))) or 6
-		if forceUpdateControls or pingBucket ~= entryData.pingBucket then
-			entryData.pingBucket = pingBucket
-			if controls then
-				controls.imPing.color = pingCpuColors[entryData.pingBucket]
-				controls.imPing:Invalidate()
-			end
-		end
-		
-		local cpuBucket = (active and math.max(1, math.min(5, math.ceil(cpuUsage * 5)))) or 6
-		if forceUpdateControls or cpuBucket ~= entryData.cpuBucket then
-			entryData.cpuBucket = cpuBucket
-			if controls then
-				controls.imCpu.color = pingCpuColors[entryData.cpuBucket]
-				controls.imCpu:Invalidate()
-			end
-		end
-		
-		if controls then
-			controls.imCpu.tooltip = CpuUsageOut(cpuUsage)
-			controls.imPing.tooltip = PingTimeOut(pingTime)
-		end
-		
-		newIsLagging = ((pingTime > PING_TIMEOUT) and true) or false
-		if forceUpdateControls or newIsLagging ~= entryData.isLagging then
-			entryData.isLagging = newIsLagging
-			if controls and not entryData.isDead then
-				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
-			end
-		end
-		
-		newIsWaiting = (not active)
-		if forceUpdateControls or newIsWaiting ~= entryData.isWaiting then
-			entryData.isWaiting = newIsWaiting
-			if controls and not (entryData.isDead or entryData.isLagging) then
-				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
-			end
-		end
-		
-		local newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
-		if forceUpdateControls or newIsAfk ~= entryData.isAfk then
-			entryData.isAfk = newIsAfk
-			if controls and not (entryData.isDead or entryData.isLagging or entryData.isWaiting) then
-				controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
-			end
-		end
-		
-		if pingCpuOnly then
-			return false
-		end
-	elseif pingCpuOnly then
-		return false
+local function FormatResourceAsStr(input)
+	if input < 0.05 then
+		return "0"
+	elseif input < 100 then
+		return ("%.1f"):format(input)
+	elseif input < 10^3 - 0.5 then
+		return ("%.0f"):format(input)
+	elseif input < 10^4 then
+		return ("%.2f"):format(input/10^3) .. "k"
+	elseif input < 10^5 then
+		return ("%.1f"):format(input/10^3) .. "k"
+	elseif input < 10^6 - 0.5 then
+		return ("%.0f"):format(input/10^3) .. "k"
+	elseif input < 10^7 then
+		return ("%.2f"):format(input/10^6) .. "M"
+	elseif input < 10^8 then
+		return ("%.1f"):format(input/10^6) .. "M"
+	else
+		return ("%.0f"):format(input/10^6) .. "M"
 	end
-	
-	-- Ping and CPU cannot resort
+end
+
+local MIN_STORAGE = 0.5
+local function GetResourceState(teamID)
+	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
+	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
+	if mCurr == nil or mStor == nil or eCurr == nil or eStor == nil or eInco == nil or mInco == nil or mReci == nil then
+		return nil, nil, nil, nil, nil, nil
+	end
+	mStor = math.max(mStor - HIDDEN_STORAGE, MIN_STORAGE)
+	eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
+
+	if eInco then
+		local energyIncome = Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0
+		local energyChange = Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0
+		eInco = eInco + energyIncome - math.max(0, energyChange)
+	end
+
+	local mLocalIncome = mInco + mReci
+
+	-- cap by storage
+	if eCurr > eStor then
+		eCurr = eStor
+	end
+	if mCurr > mStor then
+		mCurr = mStor
+	end
+
+	return mCurr, mStor, mLocalIncome, eCurr, eStor, eInco
+end
+
+local function BuildColumnOffsets()
+	local o = {}
+	local offset = 0
+
+	offset = offset + 1
+	o.allyTeam = offset
+	offset = offset + options.text_height.value * textHeightToWidth
+
+	offset = offset + 1
+	o.clan = offset
+	offset = offset + options.text_height.value + 3
+
+	offset = offset + 1
+	o.country = offset
+	offset = offset + options.text_height.value + 3
+
+	offset = offset + 1
+	o.rank = offset
+	offset = offset + options.text_height.value + 4
+
+	offset = offset + 2
+	o.elo = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.name = offset
+	offset = offset + MAX_NAME_LENGTH
+
+	offset = offset
+	o.army = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.def = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.eco = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.metalLabel = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.energyLabel = offset
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	o.metalBar = offset
+	offset = offset + 24
+
+	offset = offset + 2
+	o.energyBar = offset
+	offset = offset + 24
+
+	offset = offset + 1
+	o.cpu = offset
+	offset = offset + options.text_height.value
+
+	offset = offset + 1
+	o.ping = offset
+	offset = offset + options.text_height.value
+
+	offset = offset + 1
+	o.share = offset
+	offset = offset + options.text_height.value + 1
+
+	o.total = offset
+
+	return o
+end
+
+local function UpdateHumanVolatile(entryData, controls, volatileOnly, forceUpdateControls)
+	-- Shared human updates - applies to both participants and spectators, as long as there's a real connection.
+	-- Ping, CPU, lagging, waiting, or AFK.
+	local _, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, _, _ = Spring.GetPlayerInfo(entryData.playerID, false)
+	local isSpectator = false
+	local newTeamID, newAllyTeamID = teamID, allyTeamID
+
+	entryData.isMe = (entryData.playerID == myPlayerID)
+
+	if spectator then
+		isSpectator = true
+		newTeamID, newAllyTeamID = entryData.initTeamID,  entryData.initAllyTeamID
+	end
+
+	local pingBucket = (active and math.max(1, math.min(5, math.ceil(math.min(pingTime, 1) * 5)))) or 6
+	if forceUpdateControls or pingBucket ~= entryData.pingBucket then
+		entryData.pingBucket = pingBucket
+		if controls then
+			controls.imPing.color = pingCpuColors[entryData.pingBucket]
+			controls.imPing:Invalidate()
+		end
+	end
+
+	local cpuBucket = (active and math.max(1, math.min(5, math.ceil(cpuUsage * 5)))) or 6
+	if forceUpdateControls or cpuBucket ~= entryData.cpuBucket then
+		entryData.cpuBucket = cpuBucket
+		if controls then
+			controls.imCpu.color = pingCpuColors[entryData.cpuBucket]
+			controls.imCpu:Invalidate()
+		end
+	end
+
+	if controls then
+		controls.imCpu.tooltip = CpuUsageOut(cpuUsage)
+		controls.imPing.tooltip = PingTimeOut(pingTime)
+	end
+
+	local changeName = false
+
+	local newIsLagging = ((pingTime > PING_TIMEOUT) and true) or false
+	if forceUpdateControls or newIsLagging ~= entryData.isLagging then
+		entryData.isLagging = newIsLagging
+		if not entryData.isDead then
+			changeName = true
+		end
+	end
+
+	local newIsWaiting = (not active)
+	if forceUpdateControls or newIsWaiting ~= entryData.isWaiting then
+		entryData.isWaiting = newIsWaiting
+		if not (entryData.isDead or entryData.isLagging) then
+			changeName = true
+		end
+	end
+
+	local newIsAfk = (spGetPlayerRulesParam(entryData.playerID, "lagmonitor_lagging") and true) or false
+	if forceUpdateControls or newIsAfk ~= entryData.isAfk then
+		entryData.isAfk = newIsAfk
+		if not (entryData.isDead or entryData.isLagging or entryData.isWaiting) then
+			changeName = true
+		end
+	end
+
+	if controls and changeName then
+		controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
+	end
+
+	return isSpectator, newTeamID, newAllyTeamID
+end
+
+local function UpdateParticipantVolatile(entryData, controls, volatileOnly, forceUpdateControls)
+	-- Shared volatile updates - applies to both bots and humans, as long as they're in the battle
+	-- Army sizes, resource income, etc.
+	local teamID = entryData.teamID
+	local mCurr, mStor, mLocalIncome, eCurr, eStor, eInco = GetResourceState(teamID)
+	if forceUpdateControls or mCurr ~= entryData.mCurr or mStor ~= entryData.mStor then
+		if controls then
+			if mCurr == nil or mStor == nil then
+				controls.metalBar:SetVisibility(false)
+			else
+				if mStor == MIN_STORAGE then
+					controls.metalBar.color = noStorageBarColor
+					controls.metalBar.value = 1
+					controls.metalBar.max = 1
+				else
+					controls.metalBar.color = metalBarColor
+					controls.metalBar.value = mCurr
+					controls.metalBar.max = mStor
+				end
+				if forceUpdateControls or entryData.mCurr == nil or entryData.mStor == nil then
+					controls.metalBar:SetVisibility(true)
+				end
+			controls.metalBar:Invalidate()
+			end
+		end
+		entryData.mCurr = mCurr
+		entryData.mStor = mStor
+	end
+
+	if forceUpdateControls or eCurr ~= entryData.eCurr or eStor ~= entryData.eStor then
+		if controls then
+			if eCurr == nil or eStor == nil then
+				controls.energyBar:SetVisibility(false)
+			else
+				if eStor == MIN_STORAGE then
+					controls.energyBar.color = noStorageBarColor
+					controls.energyBar.value = 1
+					controls.energyBar.max = 1
+				else
+					controls.energyBar.color = energyBarColor
+					controls.energyBar.value = eCurr
+					controls.energyBar.max = eStor
+				end
+				if forceUpdateControls or entryData.eCurr == nil or entryData.eStor == nil then
+					controls.energyBar:SetVisibility(true)
+				end
+			end
+			controls.energyBar:Invalidate()
+		end
+		entryData.eCurr = eCurr
+		entryData.eStor = eStor
+	end
+	if forceUpdateControls or mLocalIncome ~= entryData.mLocalIncome then
+		if controls then
+			if mLocalIncome == nil then
+				controls.metalLabel:SetVisibility(false)
+			else
+				controls.metalLabel:SetCaption(FormatResourceAsStr(mLocalIncome))
+				if forceUpdateControls or entryData.mLocalIncome == nil then
+					controls.metalLabel:SetVisibility(true)
+				end
+			end
+		end
+		entryData.mLocalIncome = mLocalIncome
+	end
+	if forceUpdateControls or eInco ~= entryData.eInco then
+		if controls then
+			if eInco == nil then
+				controls.energyLabel:SetVisibility(false)
+			else
+				controls.energyLabel:SetCaption(FormatResourceAsStr(eInco))
+				if forceUpdateControls or entryData.eInco == nil then
+					controls.energyLabel:SetVisibility(true)
+				end
+			end
+		end
+		entryData.eInco = eInco
+	end
+
+	local statsLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
+	local armyTotal = Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_army_" .. statsLength)
+	local defTotal = Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_def_" .. statsLength)
+	local ecoTotal = Spring.GetTeamRulesParam(teamID, "stats_history_unit_value_econ_" .. statsLength)
+	if forceUpdateControls or armyTotal ~= entryData.armyTotal then
+		if controls then
+			if armyTotal == nil then
+				controls.armyLabel:SetVisibility(false)
+			else
+				controls.armyLabel:SetCaption(FormatResourceAsStr(armyTotal))
+				if forceUpdateControls or controls.armyTotal == nil then
+					controls.armyLabel:SetVisibility(true)
+				end
+			end
+		end
+		entryData.armyTotal = armyTotal
+	end
+	if forceUpdateControls or defTotal ~= entryData.defTotal then
+		if controls then
+			if defTotal == nil then
+				controls.defLabel:SetVisibility(false)
+			else
+				controls.defLabel:SetCaption(FormatResourceAsStr(defTotal))
+				if forceUpdateControls or entryData.defTotal == nil then
+					controls.defLabel:SetVisibility(true)
+				end
+			end
+		end
+		entryData.defTotal = defTotal
+	end
+	if forceUpdateControls or ecoTotal ~= entryData.ecoTotal then
+		if controls then
+			if ecoTotal == nil then
+				controls.ecoLabel:SetVisibility(false)
+			else
+				controls.ecoLabel:SetCaption(FormatResourceAsStr(ecoTotal))
+				if forceUpdateControls or entryData.ecoTotal == nil then
+					controls.ecoLabel:SetVisibility(true)
+				end
+			end
+		end
+		entryData.ecoTotal = ecoTotal
+	end
+end
+
+local function UpdateBase(entryData, controls, volatileOnly, forceUpdateControls, newTeamID, newAllyTeamID, isSpectator)
+	-- Updates long term controls that don't need to change often.
+	-- Controls that take team color on team color change, alliance change, resignation or defeat, etc.
 	local resortRequired = false
 	
+	local teamColoredLabels = {}
+	if controls then
+		teamColoredLabels = {controls.eloLabel, controls.textName, controls.armyLabel, controls.defLabel, controls.ecoLabel, controls.metalLabel, controls.energyLabel}
+	end
+
 	if forceUpdateControls or newTeamID ~= entryData.teamID then
 		entryData.teamID = newTeamID
 		entryData.isMyTeam = (entryData.teamID == myTeamID)
 		resortRequired = true
 		if controls then
-			controls.textName.font.color = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
-			controls.textName:Invalidate()
+			local newTeamColor = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
+			for i,v in ipairs(teamColoredLabels) do
+				v.font.color = newTeamColor
+				v:Invalidate()
+			end
 		end
 	end
 	
@@ -278,8 +541,6 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 		if controls then
 			controls.textAllyTeam.font.color = entryData.allyTeamColor
 			controls.textAllyTeam:Invalidate()
-			
-			controls.btnShare:SetVisibility((myAllyTeamID and entryData.isMyAlly and not entryData.isDead and (entryData.teamID ~= myTeamID) and true) or false)
 		end
 	end
 	
@@ -288,13 +549,48 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 		entryData.isDead = newIsDead
 		resortRequired = true
 		if controls then
+			local newTeamColor = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
 			controls.textName:SetCaption(GetName(entryData.name, controls.textName.font, entryData))
-			controls.textName.font.color = GetPlayerTeamColor(entryData.teamID, entryData.isDead)
-			controls.textName:Invalidate()
+			for i,v in ipairs(teamColoredLabels) do
+				v.font.color = newTeamColor
+				v:Invalidate()
+			end
+			local activeControls = {controls.armyLabel, controls.defLabel, controls.ecoLabel, controls.metalLabel, controls.energyLabel, controls.metalBar, controls.energyBar}
+			local newIsActive = not newIsDead
+			for i,v in ipairs(activeControls) do
+				v:SetVisibility(newIsActive)
+			end
 		end
 	end
 	
+	local newCanBeSharedTo = not (mySpectating or entryData.isMyTeam or not entryData.isMyAlly)
+	if forceUpdateControls or newCanBeSharedTo ~= entryData.canBeSharedTo then
+		entryData.canBeSharedTo = newCanBeSharedTo
+		if controls then
+			controls.metalBar:SetCanBeSharedTo(newCanBeSharedTo)
+			controls.energyBar:SetCanBeSharedTo(newCanBeSharedTo)
+			controls.btnShare:SetVisibility(newCanBeSharedTo)
+		end
+	end
+
 	return resortRequired
+end
+
+local function UpdateEntryData(entryData, controls, volatileOnly, forceUpdateControls)
+	local isSpectator = entryData.isSpectator
+	local newIsSpectator = false
+	local newTeamID, newAllyTeamID = entryData.teamID, entryData.allyTeamID
+
+	if entryData.playerID then
+		newIsSpectator, newTeamID, newAllyTeamID = UpdateHumanVolatile(entryData, controls, volatileOnly, forceUpdateControls)
+	end
+	if not newIsSpectator then
+		UpdateParticipantVolatile(entryData, controls, volatileOnly, forceUpdateControls)
+	end
+	if volatileOnly then
+		return false
+	end
+	return UpdateBase(entryData, controls, volatileOnly, forceUpdateControls, newTeamID, newAllyTeamID, newIsSpectator)
 end
 
 local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
@@ -307,16 +603,19 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 		isAiTeam = isAiTeam,
 		isDead = isDead,
 	}
-	
-	if playerID then
+
+	if isAiTeam then
+		local _, name = Spring.GetAIInfo(teamID)
+		entryData.name = name
+	elseif playerID then
 		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
 		customKeys = customKeys or {}
-		
+
 		entryData.isMe = (entryData.playerID == myPlayerID)
 		entryData.name = playerName
 		entryData.country = (country and country ~= '' and ("LuaUI/Images/flags/" .. country ..".png"))
 		entryData.rank = ("LuaUI/Images/LobbyRanks/" .. (customKeys.icon or "0_0") .. ".png")
-		
+
 		if customKeys.clan and customKeys.clan ~= "" then
 			entryData.clan = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
 		elseif customKeys.faction and customKeys.faction ~= "" then
@@ -326,11 +625,6 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 		if customKeys.elo and customKeys.elo ~= "" then
 			entryData.elo = customKeys.elo
 		end
-	end
-	
-	if isAiTeam then
-		local _, name = Spring.GetAIInfo(teamID)
-		entryData.name = name
 	end
 	
 	if not entryData.name then
@@ -344,6 +638,20 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+-- TODO: This should probably be factored out into an API function, see gui_chili_share
+local function GiveResource(target,kind,num)
+	local _, leader, _, isAI = Spring.GetTeamInfo(target, false)
+	local name = select(1,Spring.GetPlayerInfo(leader, false))
+	if isAI then
+		name = select(2,Spring.GetAIInfo(target))
+	end
+	if #Spring.GetPlayerList(target,true) > 1 then
+		name = name .. "'s squad"
+	end
+	Spring.SendCommands("say a: I gave " .. math.floor(num) .. " " .. kind .. " to " .. name .. ".")
+	Spring.ShareResources(target,kind,num)
+end
 
 local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, parent)
 	local offset             = 0
@@ -362,6 +670,37 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		padding = {0, 0, 0, 0},
 		parent = parent
 	}
+
+	offset = offset + 1
+	userControls.textAllyTeam = Chili.Label:New {
+		name = "textAllyTeam",
+		x = offset,
+		y = offsetY + 1,
+		right = 0,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = userControls.entryData.allyTeamID + 1,
+		textColor = userControls.entryData.allyTeamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
+	}
+	offset = offset + options.text_height.value * textHeightToWidth
+
+	offset = offset + 1
+	if userControls.entryData.clan then
+		userControls.imClan = Chili.Image:New {
+			name = "imClan",
+			x = offset,
+			y = offsetY,
+			width = options.text_height.value + 3,
+			height = options.text_height.value + 3,
+			parent = userControls.mainControl,
+			keepAspect = true,
+			file = userControls.entryData.clan,
+		}
+	end
+	offset = offset + options.text_height.value + 3
 
 	offset = offset + 1
 	if userControls.entryData.country then
@@ -391,40 +730,31 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 			file = userControls.entryData.rank,
 		}
 	end
-	offset = offset + options.text_height.value + 3
-	
-	offset = offset + 1
-	if userControls.entryData.clan then
-		userControls.imClan = Chili.Image:New {
-			name = "imClan",
+	offset = offset + options.text_height.value + 4
+
+
+	local teamColor = GetPlayerTeamColor(userControls.entryData.teamID, userControls.entryData.isDead)
+
+	offset = offset + 2
+	if userControls.entryData.elo and userControls.entryData.elo ~= "" then
+		userControls.eloLabel = Chili.Label:New {
+			name = "eloLabel",
 			x = offset,
-			y = offsetY,
-			width = options.text_height.value + 3,
-			height = options.text_height.value + 3,
+			y = offsetY + 1,
+			right = 0,
+			bottom = 3,
 			parent = userControls.mainControl,
-			keepAspect = true,
-			file = userControls.entryData.clan,
+			caption = userControls.entryData.elo,
+			textColor = teamColor,
+			fontsize = options.text_height.value,
+			fontShadow = true,
+			autosize = false,
 		}
 	end
-	offset = offset + options.text_height.value + 3
-	
-	offset = offset + 15
-	userControls.textAllyTeam = Chili.Label:New {
-		name = "textAllyTeam",
-		x = offset,
-		y = offsetY + 1,
-		right = 0,
-		bottom = 3,
-		parent = userControls.mainControl,
-		caption = userControls.entryData.allyTeamID + 1,
-		textColor = userControls.entryData.allyTeamColor,
-		fontsize = options.text_height.value,
-		fontShadow = true,
-		autosize = false,
-	}
-	offset = offset + options.text_height.value + 3
-	
-	offset = offset + 2
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	local userName = userControls.entryData.name
+	offset = offset
 	userControls.textName = Chili.Label:New {
 		name = "textName",
 		x = offset,
@@ -433,42 +763,148 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 		bottom = 3,
 		align = "left",
 		parent = userControls.mainControl,
-		caption = GetName(userControls.entryData.name, nil, userControls.entryData),
-		textColor = GetPlayerTeamColor(userControls.entryData.teamID, userControls.entryData.isDead),
+		caption = GetName(userName, nil, userControls.entryData),
+		textColor = teamColor,
 		fontsize = options.text_height.value,
 		fontShadow = true,
 		autosize = false,
 	}
-	userControls.textName:SetCaption(GetName(userControls.entryData.name, userControls.textName.font, userControls.entryData))
+	userControls.textName:SetCaption(GetName(userName, userControls.textName.font, userControls.entryData))
 	offset = offset + MAX_NAME_LENGTH
 
-	offset = offset + 1
-	userControls.btnShare = Chili.Button:New {
-		name = "btnShare",
-		x = offset + 2,
-		y = offsetY + 2,
-		width = options.text_height.value - 1,
-		height = options.text_height.value - 1,
-		parent = userControls.mainControl,
-		caption = "",
-		tooltip = "Double click to share the units you have selected to this player.",
-		padding ={0,0,0,0},
-		OnDblClick = {function(self)
-			ShareUnits(userControls.entryData.name, userControls.entryData.teamID)
-		end, },
-	}
-	Chili.Image:New {
-		name = "imShare",
-		x = 0,
-		y = 0,
+	offset = offset
+	userControls.armyLabel = Chili.Label:New {
+		name = "armyLabel",
+		x = offset,
+		y = offsetY + 1,
 		right = 0,
-		bottom = 0,
-		parent = userControls.btnShare,
-		keepAspect = true,
-		file = IMAGE_SHARE,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = "?",
+		textColor = teamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
 	}
-	userControls.btnShare:SetVisibility((userControls.entryData.isMyAlly and (userControls.entryData.teamID ~= myTeamID) and true) or false)
-	offset = offset + options.text_height.value + 1
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	userControls.defLabel = Chili.Label:New {
+		name = "defLabel",
+		x = offset,
+		y = offsetY + 1,
+		right = 0,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = "?",
+		textColor = teamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
+	}
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	userControls.ecoLabel = Chili.Label:New {
+		name = "ecoLabel",
+		x = offset,
+		y = offsetY + 1,
+		right = 0,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = "?",
+		textColor = teamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
+	}
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	userControls.metalLabel = Chili.Label:New {
+		name = "metalLabel",
+		x = offset,
+		y = offsetY + 1,
+		right = 0,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = "?",
+		textColor = teamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
+	}
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	userControls.energyLabel = Chili.Label:New {
+		name = "energyLabel",
+		x = offset,
+		y = offsetY + 1,
+		right = 0,
+		bottom = 3,
+		parent = userControls.mainControl,
+		caption = "?",
+		textColor = teamColor,
+		fontsize = options.text_height.value,
+		fontShadow = true,
+		autosize = false,
+	}
+	offset = offset + 4 * options.text_height.value * textHeightToWidth
+
+	offset = offset
+	userControls.metalBar = Chili.Progressbar:New {
+		name = "metalBar",
+		x = offset,
+		y = offsetY,
+		height = options.text_height.value,
+		width = 24,
+		color = metalBarColor,
+		min = 0,
+		max = 500 or 1,
+		allyTooltip = "Double click to share 100 metal to " .. userName,
+		OnDblClick = {function()
+			GiveResource(userControls.entryData.teamID,"metal",100)
+		end},
+		SetCanBeSharedTo = function(self, canGift)
+			if canGift then
+				self.tooltip = self.allyTooltip
+			else
+				self.tooltip = ""
+			end
+			self:Invalidate()
+		end,
+		parent = userControls.mainControl
+	}
+	function userControls.metalBar:HitTest(x,y) return self end
+	offset = offset + 24
+
+	offset = offset + 2
+	userControls.energyBar = Chili.Progressbar:New {
+		name = "energyBar",
+		x = offset,
+		y = offsetY,
+		height = options.text_height.value,
+		width = 24,
+		color = energyBarColor,
+		min = 0,
+		max = 500 or 1,
+		allyTooltip = "Double click to share 100 energy to " .. userName,
+		OnDblClick = {function()
+			GiveResource(userControls.entryData.teamID,"energy",100)
+		end},
+		SetCanBeSharedTo = function(self, canGift)
+			if canGift then
+				self.tooltip = self.allyTooltip
+			else
+				self.tooltip = ""
+			end
+			self:Invalidate()
+		end,
+		parent = userControls.mainControl
+	}
+	function userControls.energyBar:HitTest(x,y) return self end
+	offset = offset + 24
 
 	offset = offset + 1
 	if userControls.entryData.cpuBucket then
@@ -504,6 +940,34 @@ local function GetUserControls(playerID, teamID, allyTeamID, isAiTeam, isDead, p
 	end
 	offset = offset + options.text_height.value
 
+	offset = offset + 1
+	userControls.btnShare = Chili.Button:New {
+		name = "btnShare",
+		x = offset + 2,
+		y = offsetY + 2,
+		width = options.text_height.value - 1,
+		height = options.text_height.value - 1,
+		parent = userControls.mainControl,
+		caption = "",
+		tooltip = "Double click to share selected units to " .. userControls.entryData.name,
+		padding ={0,0,0,0},
+		OnDblClick = {function(self)
+			ShareUnits(userControls.entryData.name, userControls.entryData.teamID)
+		end},
+	}
+	Chili.Image:New {
+		name = "imShare",
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = userControls.btnShare,
+		keepAspect = true,
+		file = IMAGE_SHARE,
+	}
+	userControls.btnShare:SetVisibility(userControls.entryData.canBeSharedTo)
+	offset = offset + options.text_height.value + 1
+
 	UpdateEntryData(userControls.entryData, userControls, false, true)
 
 	return userControls
@@ -514,6 +978,7 @@ end
 
 local playerlistWindow
 local listControls = {}
+local header = nil
 local playersByPlayerID = {}
 local teamByTeamID = {}
 
@@ -584,6 +1049,17 @@ local function SortEntries()
 		
 		offset = offset + options.text_height.value + 2
 	end
+
+	if header then
+		if toTop then
+			header._relativeBounds.top = offset
+			header._relativeBounds.bottom = nil
+		else
+			header._relativeBounds.top = nil
+			header._relativeBounds.bottom = offset
+		end
+		header:UpdateClientArea(false)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -633,7 +1109,9 @@ local function InitializePlayerlist()
 		teamByTeamID = {}
 	end
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local windowWidth = MAX_NAME_LENGTH + 10*(options.text_height.value or 13)
+	local offsets = BuildColumnOffsets()
+
+	local windowWidth = offsets.total
 
 	--// WINDOW
 	playerlistWindow = Chili.Window:New{
@@ -655,7 +1133,31 @@ local function InitializePlayerlist()
 		tweakResizable = true,
 		minimizable = false,
 	}
-	
+
+	header = Chili.Control:New{
+		name = "Player List Column Headers",
+		x = 0,
+		bottom = 0,
+		right = 0,
+		height = options.text_height.value + 4,
+		padding = {0,0,0,0},
+		parent = playerlistWindow
+	}
+	for i,v in ipairs({{"allyTeam","A"},{"clan","C",3},{"country","L"},{"rank","R"},{"elo","Elo"},{"name","Player"},{"army","Army"},{"def","Porc"},{"eco","Eco"},{"metalLabel","Metal"},{"energyLabel","Energy"},{"cpu","C"},{"ping","P"},{"share","S"}}) do
+		Chili.Label:New{
+			name = v[1] .. " Header",
+			x = offsets[v[1]] + (v[3] or 0),
+			y = 1,
+			right = 0,
+			bottom = 3,
+			parent = header,
+			caption = v[2],
+			fontsize = options.text_height.value,
+			fontShadow = true,
+			autosize = false
+		}
+	end
+
 	local gaiaTeamID = Spring.GetGaiaTeamID
 	local teamList = Spring.GetTeamList()
 
