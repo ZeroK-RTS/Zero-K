@@ -345,43 +345,43 @@ local function ProcessAwardData()
 				local maxValWrite = comma_value(maxVal)
 
 				if awardType == 'cap' then
-					message = 'Captured value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_cap_tooltip", { value = maxValWrite })
 				elseif awardType == 'share' then
-					message = 'Shared value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_sharebear_tooltip", { value = maxValWrite })
 				elseif awardType == 'terra' then
-					message = 'Terraform: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_tera_tooltip", { value = maxValWrite })
 				elseif awardType == 'rezz' then
-					message = 'Resurrected value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_res_tooltip", { value = maxValWrite })
 				elseif awardType == 'fire' then
-					message = 'Burnt value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_firewiz_tooltip", { value = maxValWrite })
 				elseif awardType == 'emp' then
-					message = 'Stunned value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_empwiz_tooltip", { value = maxValWrite })
 				elseif awardType == 'slow' then
-					message = 'Slowed value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_slowwiz_tooltip", { value = maxValWrite })
 				elseif awardType == 'ouch' then
-					message = 'Damage received: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_punchbag_tooltip", { value = maxValWrite })
 				elseif awardType == 'reclaim' then
-					message = 'Reclaimed value: ' .. maxValWrite
+					message = WG.Translate("interface", "awards_rec_tooltip", { value = maxValWrite })
 				elseif awardType == 'mex' then
-					message = 'Mexes built: '.. maxVal
+					message = WG.Translate("interface", "awards_ecoman_tooltip", { value = maxVal })
 				elseif awardType == 'mexkill' then
-					message = 'Mexes destroyed: '.. maxVal
+					message = WG.Translate("interface", "awards_raider_tooltip", { value = maxVal })
 				elseif awardType == 'head' then
-					message = maxVal .. ' Commanders eliminated'
+					message = WG.Translate("interface", "awards_comsniper_tooltip", { value = maxVal })
 				elseif awardType == 'dragon' then
-					message = maxVal .. ' White Dragons annihilated'
+					message = WG.Translate("interface", "awards_dragonslayer_tooltip", { value = maxVal })
 				elseif awardType == 'heart' then
 					local maxQueenKillDamage = maxVal - absolute --remove the queen kill signature: +1000000000 from the total damage
-					message = 'Damage: '.. comma_value(maxQueenKillDamage)
+					message = WG.Translate("interface", "awards_queenslayer_tooltip", { value = comma_value(maxQueenKillDamage) }))
 				elseif awardType == 'sweeper' then
-					message = maxVal .. ' Nests wiped out'
+					message = WG.Translate("interface", "awards_pestcontrol_tooltip", { value = maxVal })
 
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 					local expUnitExpRounded = floor(expUnitExp * 100)
-					message = vetName ..', '.. expUnitExpRounded .. "% cost made"
+					message = WG.Translate("interface", "awards_vet_tooltip", { vetname = vetName}, { costmade = expUnitExpRounded})
 				else
-					message = 'Damaged value: '.. maxValWrite
+					message = WG.Translate("interface", "awards_ta_tooltip", { value = maxValWrite })
 				end
 			end
 		end --if winningTeam
