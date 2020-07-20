@@ -606,6 +606,24 @@ end
 -- New with Minimap Left
 ----------------------------------------------------
 
+-- XXX: Pokes internals, FIXME
+local function GetPlayerListControl()
+	local screen =  WG.Chili.Screen0
+	local needle = "Player List"
+	local cn = screen.children
+	for i = 1, #cn do
+		if (cn[i].name:find(needle)) then
+			return cn[i]
+		end
+	end
+
+	for c in pairs(screen.children_hidden) do
+		if (c.name:find(needle)) then
+			return MakeWeakLink(c)
+		end
+	end
+end
+
 local function SetupNewWidgets()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
@@ -623,7 +641,7 @@ local function SetupNewWidgets()
 	widgetHandler:EnableWidget("Chili Selections & CursorTip v2")
 	widgetHandler:EnableWidget("Chili Global Commands")
 
-	if not WG.Chili.Screen0:GetChildByName("Player List") then
+	if not GetPlayerListControl() then
 		widgetHandler:EnableWidget("Chili Crude Player List")
 	end
 	
@@ -708,7 +726,7 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 		-- Player List
 	local playerlistWidth = 310
 	local playerlistHeight = screenHeight/2
-	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	local playerListControl = GetPlayerListControl()
 	if playerListControl then
 		playerlistWidth = playerListControl.minWidth
 	end
