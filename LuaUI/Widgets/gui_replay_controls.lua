@@ -211,7 +211,7 @@ function CreateTheUI()
 			padding = {0, 0, 0,0},
 			margin = {0, 0, 0, 0},
 			caption=speeds[i] .."x",
-			tooltip = "play at " .. speeds[i] .. "x speed";
+			tooltip = WG.Translate("interface", "replaypanel_playspeed", { speed = speeds[i] });
 			OnClick = {
 				function()
 					snapButton(i)
@@ -247,8 +247,8 @@ function CreateTheUI()
 			parent=window;
 			padding = {0, 0, 0,0},
 			margin = {0, 0, 0, 0},
-			caption="skip pregame chatter",
-			tooltip = "Skip the pregame chat and startposition choosing, go directly to the action!";
+			caption= WG.Translate("interface", "replaypanel_skippregame"),
+			tooltip = WG.Translate("interface", "replaypanel_skippregame_tooltip");
 			OnClick = {function()
 				skipPreGameChatter ()
 				end}
@@ -276,8 +276,8 @@ function CreateTheUI()
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		caption="pause", --pause/continue
-		tooltip = "pause or continue playback";
+		caption= WG.Translate("interface", "replaypanel_pauseplay_pause"), --pause/continue
+		tooltip = WG.Translate("interface", "replaypanel_pauseplay_tooltip");
 		OnClick = {function()
 			currentFrameTime = -3
 			if (isPaused) then
@@ -335,7 +335,7 @@ function pause(supressCommand)
 		Spring.SendCommands ("pause 1")
 	end
 	isPaused = true
-	button_startStop:SetCaption ("play")
+	button_startStop:SetCaption (WG.Translate("interface", "replaypanel_pauseplay_play")"play")
 	--window:SetColor ({1,0,0, 1})
 	--window:SetCaption ("trololo")--button stays pressed down and game lags	ANY INVALID CODE MAKES IT LAG, REASON WHY COM MORPH LAGS?
 end
@@ -346,7 +346,7 @@ function unpause(supressCommand)
 		Spring.SendCommands ("pause 0")
 	end
 	isPaused = false
-	button_startStop:SetCaption ("pause")
+	button_startStop:SetCaption (WG.Translate("interface", "replaypanel_pauseplay_pause"))
 end
 
 
