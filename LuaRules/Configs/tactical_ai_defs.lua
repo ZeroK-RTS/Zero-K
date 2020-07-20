@@ -205,6 +205,7 @@ end
 local longRangeSkirmieeArray = NameToDefID({
 	"cloakskirm",
 	"jumpskirm",
+	"jumpblackhole",
 	"amphfloater",
 	"hoverskirm", -- hover janus
 	"vehcapture",
