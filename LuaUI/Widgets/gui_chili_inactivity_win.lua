@@ -68,7 +68,7 @@ local function SetupWindow()
 		autosize = false;
 		align  = "center";
 		valign = "top";
-		text   = "Connection problems detected for opponent";
+		text   = WG.Translate("interface", "connection_trbl");
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 	}
 	local label_text_lower = TextBox:New{
@@ -79,7 +79,7 @@ local function SetupWindow()
 		autosize = false;
 		align  = "center";
 		valign = "top";
-		text   = "Wait  or";
+		text   = WG.Translate("interface", "connection_trbl_wait");
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 	}
 	
@@ -92,9 +92,9 @@ local function SetupWindow()
 		parent = newMainWindow;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		caption = "Win";
+		caption = WG.Translate("interface", "connection_trbl_win");
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
-		tooltip = "Stop waiting for dropped players and declare yourself the winner.";
+		tooltip = WG.Translate("interface", "connection_trbl_win_tooltip");
 		OnClick = {
 			function()
 				Spring.SendCommands("luarules inactivitywin")
