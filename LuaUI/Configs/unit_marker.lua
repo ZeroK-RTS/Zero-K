@@ -5,7 +5,7 @@ local unitlistNames = {
 	cloakjammer = { mark_each_appearance = true, },
 
 	energyheavygeo = {},
-	energyfusion = {}
+	energyfusion = {},
 	energysingu = {},
 
 	chicken_dragon = {},
