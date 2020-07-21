@@ -379,7 +379,7 @@ local function ProcessAwardData()
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 					local expUnitExpRounded = floor(expUnitExp * 100)
-					message = WG.Translate("interface", "awards_vet_tooltip", { vetname = vetName}, { costmade = expUnitExpRounded})
+					message = WG.Translate("interface", "awards_vet_tooltip", { vetname = vetName, costmade = expUnitExpRounded})
 				else
 					message = WG.Translate("interface", "awards_ta_tooltip", { value = maxValWrite })
 				end
