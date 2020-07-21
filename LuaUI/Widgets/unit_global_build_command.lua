@@ -1263,8 +1263,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						-- Cancel inverse jobs
 						if id == CMD_RECLAIM then
 							-- A reclaim command on a target cancels jobs to repair, resurect, or build that target.
-							local inverseHash
-							inverseHash = BuildHash({id=CMD_REPAIR, target=target})
+							local inverseHash = BuildHash({id=CMD_REPAIR, target=target})
 							if buildQueue[inverseHash] then
 								StopAnyWorker(inverseHash)
 								buildQueue[inverseHash] = nil
