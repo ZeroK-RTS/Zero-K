@@ -115,16 +115,16 @@ function widget:Update (dt)
 	movingAvg[movingAvgIndex] = currentCatchUpRate
 	movingAvgIndex = (movingAvgIndex % MOVING_AVG_COUNT) + 1
 
-	progress_bar:SetCaption("The server is " .. ParseFrameTime(framesLeft) .. " ahead, at " .. ParseFrameTime(serverFrame))
+	progress_bar:SetCaption(WG.Translate("interface", "reconnect_bar", { ahead = ParseFrameTime(framesLeft) }, { currenttime = ParseFrameTime(serverFrame) }))
 	progress_bar:SetValue(localFrame / serverFrame)
 
 	if movingAvgTotal > 0 then
 		local avgCatchupRatePerPeriod = movingAvgTotal / MOVING_AVG_COUNT
 		local avgCatchupRatePerFrame = avgCatchupRatePerPeriod / UPDATE_RATE_F
 		local etaFrames = framesLeft / avgCatchupRatePerFrame
-		label_title:SetCaption("Catching up, ETA: " .. ParseFrameTime(etaFrames))
+		label_title:SetCaption(WG.Translate("interface", "reconnect_bar_etaknown", { time = ParseFrameTime(etaFrames) }))
 	else
-		label_title:SetCaption("Catching up, ETA: unknown")
+		label_title:SetCaption(WG.Translate("interface", "reconnect_bar_eta_unknown"))
 	end
 end
 
@@ -184,6 +184,6 @@ function widget:Initialize()
 	}
 
 	progress_bar:SetValue(0)
-	label_title:SetCaption("Catching up...")
+	label_title:SetCaption(WG.Translate("interface", "reconnect_bar_catchingup"))
 end
 
