@@ -395,6 +395,10 @@
 	"replaypanel_pauseplay_pause" : "pause",
 	"replaypanel_pauseplay_play" : "play",
 	"replaypanel_pauseplay_tooltip" : "pause or continue playback",
-	"replaypanel_playspeed" : "play at %{speed}x speed"
+	"replaypanel_playspeed" : "play at %{speed}x speed",
+	"reconnect_bar" : "The server is %{ahead} ahead, at %{currenttime}",
+	"reconnect_bar_eta_known") : "Catching up, ETA: %{time}",
+	"reconnect_bar_eta_unknown" : "Catching up, ETA: unknown",
+	"reconnect_bar_catchingup" : "Catching up..."
 	}
 }
