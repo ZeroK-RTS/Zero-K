@@ -115,7 +115,7 @@ function widget:Update (dt)
 	movingAvg[movingAvgIndex] = currentCatchUpRate
 	movingAvgIndex = (movingAvgIndex % MOVING_AVG_COUNT) + 1
 
-	progress_bar:SetCaption(WG.Translate("interface", "reconnect_bar", { ahead = ParseFrameTime(framesLeft) }, { currenttime = ParseFrameTime(serverFrame) }))
+	progress_bar:SetCaption(WG.Translate("interface", "reconnect_bar", { ahead = ParseFrameTime(framesLeft), currenttime = ParseFrameTime(serverFrame) }))
 	progress_bar:SetValue(localFrame / serverFrame)
 
 	if movingAvgTotal > 0 then
