@@ -498,9 +498,9 @@ local function InvitePlayer(playerid)
 	local leaderID = select(2,Spring.GetTeamInfo(teamID, false))
 	Spring.SendLuaRulesMsg("sharemode invite " .. playerid)
 	if #Spring.GetPlayerList(teamID) > 1 and playerid == leaderID then
-		Spring.SendCommands("say a:I invited " .. name .. "'s squad to a merger.")
+		Spring.SendCommands("say a:"..WG.Translate("interface", "squadmerge_invitation", { player = name }))
 	else
-		Spring.SendCommands("say a:I invited " .. name .. " to join my squad.")
+		Spring.SendCommands("say a:"..WG.Translate("interface", "squad_invitation", { player = name }))
 	end
 end
 
@@ -548,7 +548,7 @@ end
 local function LeaveMySquad()
 	local leader = select(2,Spring.GetTeamInfo(Spring.GetMyTeamID(), false))
 	local name = select(1,Spring.GetPlayerInfo(leader, false))
-	Spring.SendCommands("say a: I left " .. name .. "'s squad.")
+	Spring.SendCommands("say a:"..WG.Translate("interface", "squad_left", { squadname = name }))
 	Spring.SendLuaRulesMsg("sharemode unmerge")
 end
 
@@ -564,7 +564,7 @@ local function Hideme()
 end
 
 local function KickPlayer(playerid)
-	Spring.SendCommands("say a: I kicked " .. select(1,Spring.GetPlayerInfo(playerid, false)) .. " from my squad.")
+	Spring.SendCommands("say a:"..WG.Translate("interface", "squad_kicked", { player = select(1,Spring.GetPlayerInfo(playerid, false))}))
 	Spring.SendLuaRulesMsg("sharemode kick " .. playerid)
 end
 
@@ -590,9 +590,9 @@ local function GiveUnit(target)
 		name = select(2,Spring.GetAIInfo(target))
 	end
 	if #playerslist > 1 then
-		name = name .. "'s squad"
+		name = WG.Translate("interface", "squad_name", { leader = name })
 	end
-	Spring.SendCommands("say a: I gave " .. num .. " " .. units .. " to " .. name .. ".")
+	Spring.SendCommands("say a:"..WG.Translate("interface", "sharethebear_gave", { ammount = num, units = units, player = name }))
 	Spring.ShareResources(target,"units")
 end
 
@@ -610,7 +610,7 @@ local function GiveResource(target,kind)
 	end
 	local playerslist = Spring.GetPlayerList(target,true)
 	if #playerslist > 1 then
-		name = name .. "'s squad"
+		name = WG.Translate("interface", "squad_name", { leader = name })
 	end
 	local num = 0
 	if mod == "all" then
@@ -620,7 +620,7 @@ local function GiveResource(target,kind)
 	else
 		return
 	end
-	Spring.SendCommands("say a: I gave " .. math.floor(num) .. " " .. kind .. " to " .. name .. ".")
+	Spring.SendCommands("say a:"..WG.Translate("interface", "sharethebear_gave_2", { ammount = math.floor(num), stuff = kind, player = name}))
 	Spring.ShareResources(target,kind,num)
 end
 
@@ -639,7 +639,6 @@ local function InitName(subject, playerPanel)
 	
 	givemebuttons[subject.id]["text"] = chili.TextBox:New{
 		parent=playerPanel,
-		height='100%',
 		width=146,
 		height = sizefont+1,
 		fontsize=sizefont + 1,
@@ -672,7 +671,7 @@ local function InitName(subject, playerPanel)
 			children = {chili.Image:New{file=images.give,
 			width='100%',
 			height='100%'}},
-			tooltip="Give selected units.",
+			tooltip=WG.Translate("interface", "sharethebear_tooltip"),
 			caption=" "
 		}
 		givemebuttons[subject.id]["metal"] = chili.Button:New{
@@ -687,7 +686,7 @@ local function InitName(subject, playerPanel)
 				end
 			},
 			padding={2,2,2,2},
-			tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.",
+			tooltip = WG.Translate("interface", "sharethemetal_tooltip"),
 			children={
 				chili.Image:New{
 					file=images.giftmetal,
@@ -709,7 +708,7 @@ local function InitName(subject, playerPanel)
 				end
 			},
 			padding={1,1,1,1},
-			tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.",
+			tooltip = WG.Translate("interface", "sharethebills_tooltip"),
 			children={
 				chili.Image:New{
 					file=images.giftenergy,
@@ -775,7 +774,7 @@ local function InitName(subject, playerPanel)
 		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 3,
 		y = givemebuttons[subject.id]["text"].y - 2,
 		height=buttonsize,
-		tooltip = "This player's network delay (ping)"
+		tooltip = WG.Translate("interface", "player_ping")
 	}
 	
 	givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
@@ -788,7 +787,7 @@ local function InitName(subject, playerPanel)
 		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
-		tooltip = "Your ally's metal."
+		tooltip = WG.Translate("interface", "player_metal)
 	}
 	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
 		parent = playerPanel,
@@ -800,7 +799,7 @@ local function InitName(subject, playerPanel)
 		x=givemebuttons[subject.id]["metalbar"].x,
 		y=givemebuttons[subject.id]["metalbar"].y + 12,
 		color={.93,.93,0,1},
-		tooltip = "Your ally's energy."
+		tooltip = WG.Translate("interface", "player_energy)
 	}
 	
 	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
@@ -810,7 +809,7 @@ local function InitName(subject, playerPanel)
 		fontsize=smallerFontSize,
 		x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
 		y=givemebuttons[subject.id]["metalbar"].y + 1,
-		tooltip = "Your ally's metal income."
+		tooltip = WG.Translate("interface", "player_metal_inc")
 	}
 	givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
 		parent=playerPanel,
@@ -819,7 +818,7 @@ local function InitName(subject, playerPanel)
 		fontsize=smallerFontSize,
 		x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
 		y=givemebuttons[subject.id]["energybar"].y + 1,
-		tooltip = "Your ally's energy income."
+		tooltip = WG.Translate("interface", "player_energy_inc")
 	}
 	givemebuttons[subject.id]["offHolder"] = chili.Control:New{
 		parent=playerPanel,
@@ -842,7 +841,7 @@ local function InitName(subject, playerPanel)
 		x = bottomInfoStartX,
 		y = bottomRowStartY + 1,
 		height=20,
-		tooltip = "This player's offensive units"
+		tooltip = WG.Translate("interface", "player_army")
 	}
 	givemebuttons[subject.id]["defHolder"] = chili.Control:New{
 		parent=playerPanel,
@@ -865,7 +864,7 @@ local function InitName(subject, playerPanel)
 		x = bottomInfoStartX + infoSize,
 		y = bottomRowStartY + 1,
 		height=20,
-		tooltip = "This player's defence"
+		tooltip = WG.Translate("interface", "player_def")
 	}
 	
 	if subject.player ~= Spring.GetMyPlayerID() then
@@ -881,7 +880,7 @@ local function InitName(subject, playerPanel)
 				y= commshareButtonY,
 				OnClick = {function () InviteChange(subject.player,true) end},
 				padding={1,1,1,1},
-				tooltip = "Click this to accept this player's invite!",
+				tooltip = WG.Translate("interface", "squad_accept"),
 				children={
 					chili.Image:New{
 						file=images.merge,
@@ -899,7 +898,7 @@ local function InitName(subject, playerPanel)
 				y= commshareButtonY,
 				OnClick = {function () InvitePlayer(subject.player,false) end},
 				padding={1,1,1,1},
-				tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
+				tooltip = WG.Translate("interface", "squad_invite"),
 				children={
 					chili.Image:New{
 						file=images.inviteplayer,
@@ -917,7 +916,7 @@ local function InitName(subject, playerPanel)
 				y= commshareButtonY,
 				OnClick = {function () KickPlayer(subject.player) end},
 				padding={1,1,1,1},
-				tooltip = "Kick this player from your squad.",
+				tooltip = WG.Translate("interface", "squad_kick"),
 				children={
 					chili.Image:New{
 						file=images.leave,
@@ -935,7 +934,7 @@ local function InitName(subject, playerPanel)
 				y= givemebuttons[subject.id]["text"].y - 6,
 				OnClick = {function () BattleKickPlayer(subject) end},
 				padding={1,1,1,1},
-				tooltip = "Kick this player from the battle.",
+				tooltip = WG.Translate("interface", "vote_kick"),
 				children={
 					chili.Image:New{
 						file=images.kick,
@@ -955,7 +954,7 @@ local function InitName(subject, playerPanel)
 			y=bottomRowStartY,
 			OnClick = {function () LeaveMySquad() end},
 			padding={1,1,1,1},
-			tooltip = "Leave your squad.",
+			tooltip = WG.Translate("interface", "squad_leave"),
 			children={
 				chili.Image:New{
 					file=images.leave,
@@ -1044,7 +1043,7 @@ local function InitName(subject, playerPanel)
 			x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
 			y= givemebuttons[subject.id]["text"].y - 4,
 			padding={1,1,1,1},
-			tooltip = "Zero-K Administrator",
+			tooltip = WG.Translate("interface", "admin"),
 			children={
 				chili.Image:New{
 					file=adminImg,
@@ -1156,10 +1155,10 @@ local function Buildme()
 			--Spring.Echo(playerpanels[allyTeamID])
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
 			if (not name) then
-				name = "Team " .. allyTeamID
+				name = WG.Translate("interface", "team") .. allyTeamID
 			end
 			if (allyTeamID >= 100) then
-				name = "Spectators"
+				name = WG.Translate("interface", "specs")
 			end
 			local height = #playerpanels[allyTeamID] * playerHeight + 20
 			local color = {0,1,0,1}
@@ -1245,7 +1244,7 @@ local function Buildme()
 		height = '20%',
 		x='43%',
 		y=10,
-		text="P L A Y E R S",
+		text=WG.Translate("interface", "players"),
 		fontsize=17,
 		textColor={1.0,1.0,1.0,1.0}
 	}
