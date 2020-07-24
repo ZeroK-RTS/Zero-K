@@ -425,6 +425,8 @@
 	"sharethebills_tooltip" : "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.",
 	"sharethebear_gave" : "I gave %{ammount} %{units} to %{player}.",
         "sharethebear_gave_2" : "I gave %{ammount} %{stuff} to %{player}.",
-	"vote_kick" : "Kick this player from the battle."
+	"vote_kick" : "Kick this player from the battle.",
+	"facqueue_tooltip_1" : "Add to/subtract from queue",
+	"facqueue_tooltip_2" : "Drag to a different position in queue"
 	}
 }
