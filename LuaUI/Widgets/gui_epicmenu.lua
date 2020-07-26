@@ -47,7 +47,7 @@ do
 	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
 	--assign keybind file:
 	keybind_dir = LUAUI_DIRNAME .. 'Configs/'
-	keybind_file = Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
+	keybind_file = 'zk_keys.lua'
 	if isMission then
 		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
 		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua

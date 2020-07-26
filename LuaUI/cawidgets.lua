@@ -44,9 +44,8 @@ vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
 local CheckLUAFileAndBackup = vfsInclude("LuaUI/file_backups.lua", nil, vfsGame)
 local MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
-local modShortUpper = Game.modShortName:upper()
-local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
-local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_data.lua'
+local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/ZK_order.lua'
+local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/ZK_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
 
 -- make/load backup config in case of corruption
