@@ -83,20 +83,20 @@ local MESSAGE_RULES = {
 		output = {
 			{
 				name = "Show label text in white",
-				format = '#p$playername#e added label: $argument',
+				format = WG.Translate("interface", "label_msg_1", { name = #p$playername#e , text = $argument}),
 				default = true
 			},
 			{
 				name = "Show label text in 'ally' color",
-				format = '#p$playername#e added label: #a$argument',
+				format = WG.Translate("interface", "label_msg_2", { name = #p$playername#e , text = #a$argument}),
 			},
 			{
 				name = "Show label text in the player's color",
-				format = '#p$playername#e added label: #p$argument'
+				format = WG.Translate("interface", "label_msg_3", { name = #p$playername#e , text = #p$argument})
 			},
 		}
 	},
-	point = { format = '#p$playername#e added point.' },
+	point = { format = WG.Translate("interface", "point_msg", { name = #p$playername#e }) },
 	autohost = { format = '#o> $argument', noplayername = true },
 	other = { format = '#o$text' }, -- no pattern... will match anything else
 	game_message = { format = '#o$text' } -- no pattern...
