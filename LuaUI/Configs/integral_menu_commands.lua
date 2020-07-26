@@ -532,7 +532,7 @@ local overrides = {
 		stateTooltip = {
 			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_never")),
 			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_tofire")),
-			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_always")")
+			tooltips.UNIT_FLOAT_STATE:gsub("_STATE_", WG.Translate("interface", "states_waterfloat_always"))
 		}
 	},
 	[CMD_SELECTION_RANK] = {
