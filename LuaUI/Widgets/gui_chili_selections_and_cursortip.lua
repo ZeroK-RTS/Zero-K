@@ -106,7 +106,7 @@ local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.l
 local terraformGeneralTip =
 	green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_freedraw")..
 	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_box")..
-	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white...WG.Translate("interface", "tera_gtooltip_hollowbox")..
+	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_hollowbox")..
 	green.. WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click_on_unit")..white..WG.Translate("interface", "tera_gtooltip_around")..
 	'\n'
 
