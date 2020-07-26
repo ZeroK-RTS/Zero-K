@@ -114,7 +114,7 @@ local terraCmdTip = {
 	[CMD_RAMP] =
 		yellow..WG.Translate("interface", "tera_tooltip_bridge_name")..
 		'1: ' .. green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_tooltip_bridge_draw") ..
-		'2: ' .. green.. WG.Translate("common", "click").. ..white..WG.Translate("interface", "tera_tooltip_bridge_width")..
+		'2: ' .. green.. WG.Translate("common", "click")..white..WG.Translate("interface", "tera_tooltip_bridge_width")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_tooltip_ramp_name")..
 		'1: ' .. green.. WG.Translate("common", "click")..white..WG.Translate("interface", "tera_tooltip_ramp_start")..
