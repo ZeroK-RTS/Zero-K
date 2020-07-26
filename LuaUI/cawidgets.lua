@@ -14,9 +14,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- stable release?
 local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
-local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
@@ -437,10 +435,6 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
-  if Game.modVersion:find("stable",1,true) then
-    isStable = true
-  end
-
   -- Add ignorelist --
   Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
@@ -609,11 +603,6 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
       ((order == nil) and  -- unknown widget
        (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) or info.alwaysStart
 
-  -- experimental widget, disabled by default in stable
-  if info.experimental and isStable then
-    enabled = false
-  end
-
   if resetWidgetDetailLevel and info.detailsDefault ~= nil then
 	if type(info.detailsDefault) == "table" then
 		enabled = info.detailsDefault[detailLevel] and true
@@ -682,8 +671,6 @@ function widgetHandler:NewWidget()
   wh.Unignore = function (_,name) ignorelist.ignorees[name] = nil;ignorelist.count = ignorelist.count - 1 end
   wh.GetIgnoreList = function (_) return ignorelist["ignorees"],ignorelist.count end
 
-  wh.isStable = function (_) return self:isStable() end
-
   wh.UpdateCallIn = function (_, name)
     self:UpdateWidgetCallIn(name, widget)
   end
@@ -749,14 +736,6 @@ function widgetHandler:FinalizeWidget(widget, filename, basename)
     wi.license  = wi.license or ""
     wi.enabled  = wi.enabled or false
     wi.api      = wi.api or false
-
-    -- exprimental widget
-    -- change name for separate settings and disable by default
-    if info.experimental and isStable then
-      wi.name = wi.name .. " (experimental)"
-      wi.enabled = false
-    end
-
   end
 
   widget.whInfo = {}  --  a proxy table
@@ -1263,10 +1242,6 @@ end
 
 function widgetHandler:ConfigLayoutHandler(data)
   ConfigLayoutHandler(data)
-end
-
-function widgetHandler:isStable()
-  return isStable
 end
 
 --------------------------------------------------------------------------------

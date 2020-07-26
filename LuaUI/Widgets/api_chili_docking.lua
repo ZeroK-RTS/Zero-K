@@ -8,7 +8,6 @@ function widget:GetInfo()
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    experimental = false,
     handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
     enabled   = true,  --  loaded by default?
     alwaysStart = true,
