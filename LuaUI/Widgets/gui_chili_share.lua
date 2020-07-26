@@ -788,7 +788,7 @@ local function InitName(subject, playerPanel)
 		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
-		tooltip = WG.Translate("interface", "player_metal)
+		tooltip = WG.Translate("interface", "player_metal")
 	}
 	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
 		parent = playerPanel,
@@ -800,7 +800,7 @@ local function InitName(subject, playerPanel)
 		x=givemebuttons[subject.id]["metalbar"].x,
 		y=givemebuttons[subject.id]["metalbar"].y + 12,
 		color={.93,.93,0,1},
-		tooltip = WG.Translate("interface", "player_energy)
+		tooltip = WG.Translate("interface", "player_energy")
 	}
 	
 	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
