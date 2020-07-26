@@ -38,6 +38,7 @@ return { tankaa = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[corsent.s3o]],
+  script                 = [[tankaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   
   sfxtypes               = {
