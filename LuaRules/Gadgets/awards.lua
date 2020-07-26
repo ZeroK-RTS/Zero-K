@@ -372,7 +372,7 @@ local function ProcessAwardData()
 					message = WG.Translate("interface", "awards_dragonslayer_tooltip", { value = maxVal })
 				elseif awardType == 'heart' then
 					local maxQueenKillDamage = maxVal - absolute --remove the queen kill signature: +1000000000 from the total damage
-					message = WG.Translate("interface", "awards_queenslayer_tooltip", { value = comma_value(maxQueenKillDamage) }))
+					message = WG.Translate("interface", "awards_queenslayer_tooltip", { value = comma_value(maxQueenKillDamage) })
 				elseif awardType == 'sweeper' then
 					message = WG.Translate("interface", "awards_pestcontrol_tooltip", { value = maxVal })
 
