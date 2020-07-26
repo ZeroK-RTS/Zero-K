@@ -42,7 +42,7 @@ vfsInclude("LuaUI/callins.lua"                       , nil, vfsGame)
 vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
 
 local CheckLUAFileAndBackup = vfsInclude("LuaUI/file_backups.lua", nil, vfsGame)
-local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
+local MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
 local modShortUpper = Game.modShortName:upper()
 local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
@@ -210,9 +210,7 @@ local flexCallIns = {
   'DrawInMiniMap',
   'RecvSkirmishAIMessage',
   'SelectionChanged',
-  'AddTransmitLine',
   'AddConsoleMessage',
-  'VoiceCommand',
   'Save',
   'Load',
 }
@@ -1425,22 +1423,6 @@ function widgetHandler:AddConsoleLine(msg, priority)
 
   if StringStarts(msg, "Error: Invalid command received") or StringStarts(msg, "Error: Dropped command ") then
 	return
-  elseif StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
-    return -- ignore
-  elseif StringStarts(msg, transmitMagic) then -- receiving from the lobby
-    if StringStarts(msg, voiceMagic) then
-      local tableString = string.sub(msg, string.len(voiceMagic) + 1) -- strip the magic string
-      local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form
-      for _,w in r_ipairs(self.VoiceCommandList) do
-        w:VoiceCommand(voiceCommandParams.commandName, voiceCommandParams)
-      end
-      return
-    else
-      for _,w in r_ipairs(self.AddTransmitLineList) do
-        w:AddTransmitLine(msg, priority)
-      end
-      return
-    end
   else
 	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 	local newMsg = { text = msg, priority = priority }
