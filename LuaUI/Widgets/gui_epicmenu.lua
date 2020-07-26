@@ -140,13 +140,13 @@ local showTidal = false
 if not confdata.description then confdata.description = '' end
 local gameInfoText = ''
 	..Game.modName ..br..br
-	..'Spring Engine version: '..Spring.Utilities.GetEngineVersion()..br..br
-	..'Map: ' ..Game.mapName ..br
+	..WG.Translate("interface", "spring_vers")..": "..Spring.Utilities.GetEngineVersion()..br..br
+	..WG.Translate("interface", "map")..": " ..Game.mapName ..br
 	
-	..'    Size: '..Game.mapX..' x '..Game.mapY..br
-	..'    Gravity: '..math.round(Game.gravity)..br
-	.. (showTidal and ('    Tidal Power: '..Game.tidal..br) or '')
-	..'    Water Damage: '..Game.waterDamage..br
+	.."    "..WG.Translate("interface", "size")..": "..Game.mapX..' x '..Game.mapY..br
+	.."    "..WG.Translate("interface", "gravity")..": "..math.round(Game.gravity)..br
+	.. (showTidal and ("    "..WG.Translate("interface", "tidal_power")..": "..Game.tidal..br) or '')
+	.."    "..WG.Translate("interface", "floor_is_lava")..": "..Game.waterDamage..br
 	..'    '.. Game.mapDescription..br
 	..br..br
 	..confdata.description
