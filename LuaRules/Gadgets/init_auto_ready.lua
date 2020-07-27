@@ -151,7 +151,7 @@ local function GetStartText()
 				end
 				text = text .. name .. ", "
 			end
-			text = text .. "\n\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_force", { command = !force })
+			text = text .. "\n\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_force", { command = "!force" })
 		end
 	elseif string.find(text, WG.Translate("interface", "startup_setupmenu_choose")) then
 		return "\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_starting")
