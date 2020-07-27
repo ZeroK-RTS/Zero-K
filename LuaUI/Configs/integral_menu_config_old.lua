@@ -84,7 +84,7 @@ local buttonLayoutConfig = {
 		},
 		showCost = false,
 		queueButton = true,
-		tooltipOverride = "\255\1\255\1"..WG.Translate("common", "leftrightmb").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_1".."\n\255\1\255\1"..WG.Translate("common", "hold").." "..WG.Translate("common", "lmb_1").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_2"),
+		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
 		dragAndDrop = true,
 	},
 	queueWithDots = {
@@ -99,7 +99,7 @@ local buttonLayoutConfig = {
 		showCost = false,
 		queueButton = true,
 		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
-		tooltipOverride = "\255\1\255\1"..WG.Translate("common", "leftrightmb").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_1".."\n\255\1\255\1"..WG.Translate("common", "hold").." "..WG.Translate("common", "lmb_1").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_2"),
+		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
 		dragAndDrop = true,
 		dotDotOnOverflow = true,
 	}
@@ -117,7 +117,7 @@ end
 
 local commandPanels = {
 	{
-		humanName = WG.Translate("interface", "mainpanel_orders"),
+		humanName = "Orders",
 		name = "orders",
 		inclusionFunction = function(cmdID)
 			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
@@ -126,7 +126,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.command,
 	},
 	{
-		humanName = WG.Translate("interface", "mainpanel_factory"),
+		humanName = "Factory",
 		name = "factory",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdFactory[cmdID]
@@ -140,7 +140,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = WG.Translate("interface", "mainpanel_economy"),
+		humanName = "Econ",
 		name = "economy",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdEconomy[cmdID]
@@ -154,7 +154,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = WG.Translate("interface", "mainpanel_defence"),
+		humanName = "Defence",
 		name = "defence",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdDefence[cmdID]
@@ -168,7 +168,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
-		humanName = WG.Translate("interface", "mainpanel_special"),
+		humanName = "Special",
 		name = "special",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdSpecial[cmdID]
@@ -184,7 +184,7 @@ local commandPanels = {
 		buttonLayoutOverride = specialButtonLayoutOverride,
 	},
 	{
-		humanName = WG.Translate("interface", "mainpanel_units"),
+		humanName = "Units",
 		name = "units_mobile",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
 			return not factoryUnitDefID -- Only called if previous funcs don't
