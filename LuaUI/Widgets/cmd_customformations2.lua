@@ -450,6 +450,9 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 		for i = 1, #selUnits do
 			local ud = UnitDefs[spGetUnitDefID(selUnits[i])]
 			local uSpeed = ud and ud.speed
+			if ud and (ud.customParams.level or ud.customParams.dynamic_comm) then
+				uSpeed = uSpeed * (Spring.GetUnitRulesParam(selUnits[i], "upgradesSpeedMult") or 1)
+			end
 			if uSpeed and uSpeed > 0 and uSpeed < wantedSpeed then
 				wantedSpeed = uSpeed
 			end
