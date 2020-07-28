@@ -275,6 +275,7 @@
 	"states_selectionrank_tooltip" : "Priority for selection filtering.",
 	"states_drones" : "Drone Construction",
 	"states_drones_tooltip" : "Toggle drone creation.",
+	"commands_newton_firezone" : "Set a Newton firezone. Newtons will fire at all units in the area (including allies).",
 	"commands_forcefire" : "Force Fire: Shoot at a particular target or position.",
 	"commands_attackmove" : "Attack Move: Move to a position engaging targets on the way.",
 	"commands_wait" : "Wait: Pause the units command queue and have it hold its current position.",
