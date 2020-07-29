@@ -10,8 +10,8 @@
 	Caveat Emptor: Probably doesn't work for non-Trinity projectiles.
 
 	USAGE:
-	Call StarburstPredictPrecache(weaponDefID) prior to any use of a weaponDefID.
-	Call StarburstPredict(projectileID, weaponDefID, curFrame) to receive
+	Call Spring.Utilities.StarburstPredictPrecache(weaponDefID) prior to any use of a weaponDefID.
+	Call Spring.Utilities.StarburstPredict(projectileID, weaponDefID, curFrame) to receive
 	  {impactX,impactY,impactZ,impactFrame}
 --]]
 
@@ -50,7 +50,7 @@ local accel = {}
 
 local sqrt = math.sqrt
 
-function StarburstPredictPrecache(weaponDefID)
+function Spring.Utilities.StarburstPredictPrecache(weaponDefID)
 	local weaponDef = WeaponDefs[weaponDefID]
 	initialFlightTime[weaponDefID] = weaponDef.flightTime
 	uptime[weaponDefID] = weaponDef.uptime * UPDATES_PER_SECOND - 1
@@ -87,7 +87,7 @@ local function Normalize(dx,dy,dz,dist)
 	return dx/dist,dy/dist,dz/dist,dist
 end
 
-function StarburstPredict(projectileID, weaponDefID, curFrame, targetPosition)
+function Spring.Utilities.StarburstPredict(projectileID, weaponDefID, curFrame, targetPosition)
 	-- Initial projectile values
 	local ix,iy,iz,idx,idy,idz,age = GetProjectileParameters(projectileID, weaponDefID, curFrame)
 	local x,y,z,dx,dy,dz = ix,iy,iz,idx,idy,idz
