@@ -4,13 +4,13 @@
 --  file:    unit_global_build_command.lua
 --  brief:   Fork of Central Build AI, which originally replaced Central Build Group AI
 --
---	author: aeonios (mtroyka)
---	Copyright (C) 2015.
+--  author: aeonios (mtroyka)
+--  Copyright (C) 2015.
 --
---	original by:  Troy H. Cheek
+--  original by:  Troy H. Cheek
 --  Copyright (C) 2009.
 --
---	Licensed under the terms of the GNU GPL, v2 or later.
+--  Licensed under the terms of the GNU GPL, v2 or later.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --              CAUTION! CAUTION! CAUTION!
@@ -36,10 +36,10 @@ function widget:GetInfo()
 end
 
 --  Global Build Command creates and manages a global, persistent build queue for all
---	workers that automatically assigns workers to the nearest jobs based on a cost model.
---	It manages all the workers that are added to a user-configurable control group
+--  workers that automatically assigns workers to the nearest jobs based on a cost model.
+--  It manages all the workers that are added to a user-configurable control group
 --  and captures and manages build jobs as well as repair, reclaim and resurrect
---	in both single-target and area forms.
+--  in both single-target and area forms.
 
 -- Organization:
 -- 1) Top (init, GameFrame)
@@ -53,40 +53,40 @@ end
 -- on the forums or email me at aeonioshaplo@gmail.com.
 
 -- CHANGELOG (NEW) --
---	v1.0 (aeonios) Apr, 2015 --
---		-Removed code for detecting enemies, due to bad/intractable behavior.
---		-Cleaned/organized/reduced the old code. Added comments, sections, and section headers for easier browsing.
---		-Simplified the way workers are handled and removed references to 'assist' and 'guard' mechanics.
---		-Implemented a simplified, consistent cost model to replace the old convoluted one.
---		-Implemented handling of reclaim/repair/resurrect and area forms.
---		-Implemented an area job remove tool.
---		-Added user configurability through Chili options.
---		-Improved performance somewhat and fixed numerous bugs and unhandled edge cases from the old code.
---		-Improved the interface a bit and made it more consistent with the game's normal interface conventions.
---		- ++ bells and whistles.
+--  v1.0 (aeonios) Apr, 2015 --
+--    -Removed code for detecting enemies, due to bad/intractable behavior.
+--    -Cleaned/organized/reduced the old code. Added comments, sections, and section headers for easier browsing.
+--    -Simplified the way workers are handled and removed references to 'assist' and 'guard' mechanics.
+--    -Implemented a simplified, consistent cost model to replace the old convoluted one.
+--    -Implemented handling of reclaim/repair/resurrect and area forms.
+--    -Implemented an area job remove tool.
+--    -Added user configurability through Chili options.
+--    -Improved performance somewhat and fixed numerous bugs and unhandled edge cases from the old code.
+--    -Improved the interface a bit and made it more consistent with the game's normal interface conventions.
+--    - ++ bells and whistles.
 
 ---- CHANGELOG (OLD)-----
---	the following is from Central Build AI, which contains information that I found useful in understanding
---	how the code works, and which documents certain Spring/ZK quirks that you may want to know about.
+--  the following is from Central Build AI, which contains information that I found useful in understanding
+--  how the code works, and which documents certain Spring/ZK quirks that you may want to know about.
 --
--- msafwan(xponen)	v1.355	(26Jan2015)	:	1) all builder re-assign job every 4 second (even if already assigned a job)
---											2) keep queue for unfinished building
---											3) lower priority (and/or removal) for queue at enemy infested area
+-- msafwan(xponen)v1.355  (26Jan2015)    :  1) all builder re-assign job every 4 second (even if already assigned a job)
+--                                          2) keep queue for unfinished building
+--                                          3) lower priority (and/or removal) for queue at enemy infested area
 --
--- msafwan,			v1.21	(7oct2012)	: 	fix some cases where unit become 'idle' but failed to be registered by CBA,
---											make CBA assign all job at once rather than sending 1 by 1 after every some gameframe delay,
--- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue,
---											reduce the tendency to make a huge blob of constructor (where all constructor do same job),
---											reduce chance of some constructor not given job when player have alot of constructor,
--- rafal,			v1.1	(2May2012)	:	Don't fetch full Spring.GetCommandQueue in cases when only the first command is needed - instead using
---											GetCommandQueue(unitID, 1)
--- KingRaptor,		v1.1	(24dec2011)	:	Removed the "remove in 85.0" stuff
--- versus666,		v1.1	(16dec2011)	: 	mostly changed the layer order to get a logical priority among widgets.
--- KingRaptor,		v1.1	(8dec2011)	:	Fixed the remaining unitdef tags for 85.0
--- versus666,		v1.1	(7jan2011)	: 	Made CBA, cmd_retreat, gui_nuke_button, gui_team_platter.lua, unit_auto_group to obey F5 (gui hidden).
--- KingRaptor,		v1.1	(2Nov2010)	:	Moved version number from name to description.
--- lccquantum,		v1.1	(2Nov2010)	:	central_build_AI is disabled by default (people will wonder why their builders are acting wierd when in group 0)
--- versus666,		v1.1	(1Nov2010)	: 	introduced into ZK
+-- msafwan,       v1.21   (7oct2012)     :  fix some cases where unit become 'idle' but failed to be registered by CBA,
+--                                          make CBA assign all job at once rather than sending 1 by 1 after every some gameframe delay,
+-- msafwan,       v1.2    (4sept2012)    :  made it work with ZK "cmd_mex_placement.lua" mex queue,
+--                                          reduce the tendency to make a huge blob of constructor (where all constructor do same job),
+--                                          reduce chance of some constructor not given job when player have alot of constructor,
+-- rafal,         v1.1    (2May2012)     :  Don't fetch full Spring.GetCommandQueue in cases when only the first command is needed - instead using
+--                      GetCommandQueue(unitID, 1)
+-- KingRaptor,    v1.1    (24dec2011)    :  Removed the "remove in 85.0" stuff
+-- versus666,     v1.1    (16dec2011)    :  mostly changed the layer order to get a logical priority among widgets.
+-- KingRaptor,    v1.1    (8dec2011)     :  Fixed the remaining unitdef tags for 85.0
+-- versus666,     v1.1    (7jan2011)     :  Made CBA, cmd_retreat, gui_nuke_button, gui_team_platter.lua, unit_auto_group to obey F5 (gui hidden).
+-- KingRaptor,    v1.1    (2Nov2010)     :  Moved version number from name to description.
+-- lccquantum,    v1.1    (2Nov2010)     :  central_build_AI is disabled by default (people will wonder why their builders are acting wierd when in group 0)
+-- versus666,     v1.1    (1Nov2010)     :  introduced into ZK
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -198,59 +198,59 @@ include('LuaUI/Widgets/gbc/Rendering.lua', nil, VFS.RAW_FIRST)
 -- luacheck: read globals UpdateOneWorkerPathing UpdateOneJobPathing CleanPathing
 
 -- "Localized" API calls, because they run ~33% faster in lua.
-local Echo					= Spring.Echo
-local spIsGUIHidden			= Spring.IsGUIHidden
-local spGetUnitDefID		= Spring.GetUnitDefID
-local spGetFeatureDefID		= Spring.GetFeatureDefID
-local spGetSelectedUnits	= Spring.GetSelectedUnits
-local spGetTeamUnits		= Spring.GetTeamUnits
-local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
-local spGetCommandQueue    	= Spring.GetCommandQueue
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitDirection	= Spring.GetUnitDirection
-local spGetUnitHealth		= Spring.GetUnitHealth
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spIsUnitAllied		= Spring.IsUnitAllied
-local spGiveOrderToUnit    	= Spring.GiveOrderToUnit
-local spGetMyTeamID			= Spring.GetMyTeamID
-local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
-local spGetFeaturePosition	= Spring.GetFeaturePosition
+local Echo                    = Spring.Echo
+local spIsGUIHidden           = Spring.IsGUIHidden
+local spGetUnitDefID          = Spring.GetUnitDefID
+local spGetFeatureDefID       = Spring.GetFeatureDefID
+local spGetSelectedUnits      = Spring.GetSelectedUnits
+local spGetTeamUnits          = Spring.GetTeamUnits
+local spGetUnitsInCylinder    = Spring.GetUnitsInCylinder
+local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitPosition       = Spring.GetUnitPosition
+local spGetUnitDirection      = Spring.GetUnitDirection
+local spGetUnitHealth         = Spring.GetUnitHealth
+local spGetUnitTeam           = Spring.GetUnitTeam
+local spIsUnitAllied          = Spring.IsUnitAllied
+local spGiveOrderToUnit       = Spring.GiveOrderToUnit
+local spGetMyTeamID           = Spring.GetMyTeamID
+local spGetMyAllyTeamID       = Spring.GetMyAllyTeamID
+local spGetFeaturePosition    = Spring.GetFeaturePosition
 local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
-local spGetAllFeatures		= Spring.GetAllFeatures
-local spGetSpectatingState	= Spring.GetSpectatingState
-local spGetKeyState			= Spring.GetKeyState
-local spTestBuildOrder		= Spring.TestBuildOrder
-local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
-local spValidUnitID			= Spring.ValidUnitID
-local spValidFeatureID		= Spring.ValidFeatureID
-local spUnitIsDead			= Spring.GetUnitIsDead
-local spIsPosInLos			= Spring.IsPosInLos
-local spGetGroundHeight		= Spring.GetGroundHeight
+local spGetAllFeatures        = Spring.GetAllFeatures
+local spGetSpectatingState    = Spring.GetSpectatingState
+local spGetKeyState           = Spring.GetKeyState
+local spTestBuildOrder        = Spring.TestBuildOrder
+local spGetUnitIsStunned      = Spring.GetUnitIsStunned
+local spValidUnitID           = Spring.ValidUnitID
+local spValidFeatureID        = Spring.ValidFeatureID
+local spUnitIsDead            = Spring.GetUnitIsDead
+local spIsPosInLos            = Spring.IsPosInLos
+local spGetGroundHeight       = Spring.GetGroundHeight
 
-local spWorldToScreenCoords = Spring.WorldToScreenCoords
-local spTraceScreenRay		= Spring.TraceScreenRay
+local spWorldToScreenCoords   = Spring.WorldToScreenCoords
+local spTraceScreenRay        = Spring.TraceScreenRay
 
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_RESURRECT = CMD.RESURRECT
 local CMD_REMOVE    = CMD.REMOVE
-local CMD_RECLAIM	  = CMD.RECLAIM
-local CMD_STOP		  = CMD.STOP
+local CMD_RECLAIM   = CMD.RECLAIM
+local CMD_STOP      = CMD.STOP
 local CMD_OPT_ALT   = CMD.OPT_ALT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 
-local abs	= math.abs
-local sqrt 	= math.sqrt
-local max	= math.max
+local abs  = math.abs
+local sqrt = math.sqrt
+local max  = math.max
 
 local EMPTY_TABLE = {}
 
 local frame = 0
-local longCount	= 0
+local longCount = 0
 local myTeamID = spGetMyTeamID()
 local terraunitDefID = UnitDefNames.terraunit.id
 
---	"global" for this widget.  This is probably not a recommended practice.
-local includedBuilders = {}	--  list of units in the Central Build group, of the form includedBuilders[unitID] = commandType
+--  "global" for this widget.  This is probably not a recommended practice.
+local includedBuilders = {}  --  list of units in the Central Build group, of the form includedBuilders[unitID] = commandType
 local buildQueue = {}  --  list of commands for Central Build group, of the form buildQueue[BuildHash(cmd)] = cmd
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
@@ -327,7 +327,7 @@ function widget:Shutdown()
 	WG.icons.SetDisplay('gbcidle', false)
 end
 
---	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
+--  The main process loop, which calls the core code to update state and assign orders as often as ping allows.
 function widget:GameFrame(thisFrame)
 	frame = thisFrame
 	if frame % 15 == 0 then
@@ -368,7 +368,7 @@ function widget:GameFrame(thisFrame)
 
 	if frame % (4 - (options.updateRate.value - 1)) == 0 then
 		CleanBusy() -- removes workers from busyUnits if the job they're assigned to doesn't exist. Prevents crashes.
-		local unitToWork = FindEligibleWorker()	-- get an eligible worker and assign it a job.
+		local unitToWork = FindEligibleWorker()  -- get an eligible worker and assign it a job.
 		if unitToWork then
 			CleanPathing(unitToWork, includedBuilders, buildQueue) -- garbage collect pathing for jobs that no longer exist
 			GiveWorkToUnit(unitToWork)
@@ -675,7 +675,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 end
 
---	If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
+--  If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if includedBuilders[unitID] then -- if it's one of ours
 		idlers[#idlers+1] = unitID -- add it to the idle list to be double-checked at assignment time.
@@ -721,14 +721,14 @@ function widget:CommandsChanged()
 	end
 end
 
---	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
+--  A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
 function CommandNotifyPreQue(unitID)
 	if includedBuilders[unitID] then
 		includedBuilders[unitID].cmdtype = commandType.drec
 	end
 end
 
---	A ZK compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
+--  A ZK compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options, isAreaMex)
 	local groundHeight = spGetGroundHeight(params[1],params[3])
 	params[2] = max(0, groundHeight)
@@ -841,8 +841,8 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	end
 
 	local selectedUnits = spGetSelectedUnits()
-	for _, unitID in pairs(selectedUnits) do	-- check selected units...
-		if includedBuilders[unitID] then	--  was issued to one of our units.
+	for _, unitID in pairs(selectedUnits) do  -- check selected units...
+		if includedBuilders[unitID] then  --  was issued to one of our units.
 			if ( id < 0 ) then --if the order is for building something
 				local hotkey = string.byte("q")
 				local isQ = spGetKeyState(hotkey)
@@ -855,12 +855,12 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				end
 				local hash = BuildHash(myCmd)
 				if CleanOrders(myCmd, true) or not options.shift then -- check if the job site is obstructed, and clear up any other jobs that overlap.
-					buildQueue[hash] = myCmd	-- add it to queue if clear
+					buildQueue[hash] = myCmd  -- add it to queue if clear
 					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 
 				if ( options.shift ) then -- if the command was given with shift
-					return true	-- we return true to take ownership of the command from Spring.
+					return true  -- we return true to take ownership of the command from Spring.
 				else -- for direct orders
 					if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
 						buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
@@ -1172,7 +1172,7 @@ end
 function FindCheapestJob(unitID)
 	local cachedJob = nil -- the cheapest job that we've seen
 	local cachedCost = 0 -- the cost of the currently cached cheapest job
-	local ux, _, uz = spGetUnitPosition(unitID)	-- unit location
+	local ux, _, uz = spGetUnitPosition(unitID)  -- unit location
 
 	-- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
 	-- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
@@ -1932,7 +1932,7 @@ function RemoveJobs(x, z, r)
 	end
 end
 
---	Borrowed distance calculation from Google Frog's Area Mex
+--  Borrowed distance calculation from Google Frog's Area Mex
 function Distance(x1,z1,x2,z2)
 	local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
 	return dis
@@ -1949,7 +1949,7 @@ function GetNormalizedDirection(x1, z1, x2, z2)
 	return x, z
 end
 
---	Generate unique key value for each command using its parameters.
+--  Generate unique key value for each command using its parameters.
 --  Much easier than expected once I learned Lua can use *anything* for a key.
 function BuildHash(myCmd)
 	if myCmd.id < 0 then -- for build orders
