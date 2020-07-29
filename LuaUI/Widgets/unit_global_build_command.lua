@@ -218,7 +218,6 @@ local spRequestPath			= Spring.RequestPath
 
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 local spTraceScreenRay		= Spring.TraceScreenRay
-local spGetMouseState		= Spring.GetMouseState
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
@@ -293,11 +292,6 @@ local hasRes = false
 local territoryPos = {x = 0, z = 0}
 local territoryCount = 0
 local territoryCenter = {x = 0, z = 0}
-
--- variables used by the area job remove feature
-local selectionStarted = false
-local selectionCoords = {}
-local selectionRadius = 0
 
 -- drawing lists for GL
 local buildList = {}
@@ -454,16 +448,6 @@ function widget:Update(dt)
 		return
 	end
 
-	-- update ground circle information for the area job removal selection.
-	if selectionStarted then
-		local x, y, _,_,_ = spGetMouseState()
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then
-			local sx, sz = coords[1], coords[3]
-			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
-		end
-	end
-
 	-- update icons for builders
 	if options.drawIcons.value then
 		WG.icons.SetDisplay('gbcicon', true)
@@ -548,14 +532,6 @@ function widget:DrawWorldPreUnit()
 	end
 
 	local alt, ctrl, meta, shift = spGetModKeyState()
-	-- Draw The selection circle for area job remove tool, if active
-	if selectionStarted and selectionRadius > 0 then
-		glColor(1.0, 0.0, 0.0, 0.6)
-		glLineWidth(4)
-		glGroundCircle(selectionCoords.x, selectionCoords.y, selectionCoords.z, selectionRadius, 64)
-		glColor(1, 1, 1, 1)
-		glLineWidth(1)
-	end
 
 	if shift or options.alwaysShow.value then
 		glColor(1.0, 0.5, 0.1, 1) -- building outline color
@@ -750,17 +726,6 @@ HOW THIS WORKS:
 	widget:CommandNotify()
 		This captures all the build-related commands from units in our group,
 		and adds them to the global queue.
-
- -- area job removal tool stuff --
-	widget:MousePress()
-		Captures the starting coords for the area select, sets state.
-	widget:MouseMove()
-		Tracks the mouse after a selection has started, and updates the selection
-		radius for drawing.
-	widget:MouseRelease()
-		Captures the final values for the area select and activates the removal function.
-		Also updates state depending on shift, to allow for additional selections or to deactivate
-		the tool.
 ]]--
 
 
@@ -1147,9 +1112,6 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	if id == CMD_GBCANCEL then -- implements the job cancelling command
 		local x, _, z, r = unpack(params)
 		RemoveJobs(x, z, r)
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
 		return true
 	end
 
@@ -1333,21 +1295,6 @@ function ApplyStateToggle()
 	end
 end
 
-
--- The following functions are used by the area job removal tool --
--------------------------------------------------------------------
-function widget:MousePress(x, y, button)
-	local _, cmdid = spGetActiveCommand()
-	if cmdid == CMD_GBCANCEL then
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then -- nil check in case the mouse points to an area that does not refer to world-space
-			local sx, sy, sz = coords[1], coords[2], coords[3]
-			selectionCoords = {x=sx, y=sy, z=sz}
-			selectionStarted = true
-		end
-	end
-	return false
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Core Logic ------------------------------------------------------------------
