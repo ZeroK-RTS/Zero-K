@@ -93,7 +93,7 @@ local unitSetTargetCmdDesc = {
 	name    = 'Set Target',
 	action  = 'settarget',
 	cursor  = 'SetTarget',
-	tooltip = WG.Translate("interface", "commands_settarget"),
+	tooltip = 'Set Target: Set a priority target that is independent of the units command queue.',
 	hidden = true,
 }
 
@@ -103,7 +103,7 @@ local unitSetTargetCircleCmdDesc = {
 	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
 	cursor  = 'SetTarget',
-	tooltip = WG.Translate("interface", "commands_settarget"),
+	tooltip = 'Set Target: Set a priority target that is independent of the units command queue.',
 	hidden = false,
 }
 
@@ -112,7 +112,7 @@ local unitCancelTargetCmdDesc = {
 	type    = CMDTYPE.ICON,
 	name    = 'Cancel Target',
 	action  = 'canceltarget',
-	tooltip = WG.Translate("interface", "commands_canceltarget"),
+	tooltip = 'Cancel Target: Cancel the units priority target.',
 	hidden = false,
 }
 
