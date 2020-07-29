@@ -181,15 +181,28 @@ options = {
 	},
 }
 
+include('LuaUI/Widgets/gbc/Pathfinding.lua', nil, VFS.RAW_FIRST)
+-- luacheck: read globals RenderUpdate RenderPreUnit RenderWorld RenderCleanupUnit
+
+-- This is made visible to Rendering for display.
+--List of prefix used as value for includedBuilders[]
+commandType = {
+	drec = 'drec', -- indicates direct orders from the user, or from other source external to this widget.
+	buildQueue = 'queu', -- indicates that the worker is under GBC control.
+	idle = 'idle',
+	mov = 'mov', -- indicates that the constructor was in the way of another constructor's job, and is being moved
+	ckn = 'ckn' -- indicates that the unit is running away from enemies (only applies to autoreclaim)
+}
+
+include('LuaUI/Widgets/gbc/Rendering.lua', nil, VFS.RAW_FIRST)
+-- luacheck: read globals UpdateOneWorkerPathing UpdateOneJobPathing CleanPathing
+
 -- "Localized" API calls, because they run ~33% faster in lua.
 local Echo					= Spring.Echo
 local spIsGUIHidden			= Spring.IsGUIHidden
-local spGetActiveCommand	= Spring.GetActiveCommand
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spGetSelectedUnits	= Spring.GetSelectedUnits
-local spIsAABBInView		= Spring.IsAABBInView
-local spIsSphereInView		= Spring.IsSphereInView
 local spGetTeamUnits		= Spring.GetTeamUnits
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spGetCommandQueue    	= Spring.GetCommandQueue
@@ -205,7 +218,6 @@ local spGetFeaturePosition	= Spring.GetFeaturePosition
 local spGetFeaturesInCylinder = Spring.GetFeaturesInCylinder
 local spGetAllFeatures		= Spring.GetAllFeatures
 local spGetSpectatingState	= Spring.GetSpectatingState
-local spGetModKeyState		= Spring.GetModKeyState
 local spGetKeyState			= Spring.GetKeyState
 local spTestBuildOrder		= Spring.TestBuildOrder
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
@@ -214,27 +226,9 @@ local spValidFeatureID		= Spring.ValidFeatureID
 local spUnitIsDead			= Spring.GetUnitIsDead
 local spIsPosInLos			= Spring.IsPosInLos
 local spGetGroundHeight		= Spring.GetGroundHeight
-local spRequestPath			= Spring.RequestPath
 
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 local spTraceScreenRay		= Spring.TraceScreenRay
-
-local glPushMatrix	= gl.PushMatrix
-local glPopMatrix	= gl.PopMatrix
-local glLoadIdentity = gl.LoadIdentity
-local glTranslate	= gl.Translate
-local glBillboard	= gl.Billboard
-local glColor		= gl.Color
-local glTexture		= gl.Texture
-local glTexRect		= gl.TexRect
-local glBeginEnd	= gl.BeginEnd
-local GL_LINE_STRIP	= GL.LINE_STRIP
-local glDepthTest	= gl.DepthTest
-local glRotate		= gl.Rotate
-local glUnitShape	= gl.UnitShape
-local glVertex		= gl.Vertex
-local glGroundCircle = gl.DrawGroundCircle
-local glLineWidth	=	gl.LineWidth
 
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_RESURRECT = CMD.RESURRECT
@@ -253,26 +247,7 @@ local EMPTY_TABLE = {}
 local frame = 0
 local longCount	= 0
 local myTeamID = spGetMyTeamID()
-local statusColor = {1.0, 1.0, 1.0, 0.85}
-local queueColor = {1.0, 1.0, 1.0, 0.9}
 local terraunitDefID = UnitDefNames.terraunit.id
-
--- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
-local rec_icon = "LuaUI/Images/commands/Bold/reclaim.png"
-local rep_icon = "LuaUI/Images/commands/Bold/repair.png"
-local res_icon = "LuaUI/Images/commands/Bold/resurrect.png"
-local rec_color = {0.6, 0.0, 1.0, 1.0}
-local rep_color = {0.0, 0.8, 0.4, 1.0}
-local res_color = {0.4, 0.8, 1.0, 1.0}
-
-local imgpath = "LuaUI/Images/commands/Bold/"
-local no_icon = {name = 'gbcicon'}
-local noidle_icon = {name = 'gbcidle'}
-local idle_icon = {name = 'gbcidle', texture=imgpath .. "buildsmall.png"}
-local queue_icon = {name = 'gbcicon', texture=imgpath .. "build_light.png", color=queueColor}
-local drec_icon = {name = 'gbcicon', texture=imgpath .. "action.png", color=statusColor}
-local move_icon = {name = 'gbcicon', texture=imgpath .. "move.png", color=statusColor}
-local chicken_icon = {name = 'gbcidle', texture="LuaUI/Images/commands/states/retreat_90.png"} -- the chicken icon uses the idle icon slot because it flashes
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local includedBuilders = {}	--  list of units in the Central Build group, of the form includedBuilders[unitID] = commandType
@@ -293,21 +268,6 @@ local territoryPos = {x = 0, z = 0}
 local territoryCount = 0
 local territoryCenter = {x = 0, z = 0}
 
--- drawing lists for GL
-local buildList = {}
-local areaList = {}
-local stRepList = {}
-local stRecList = {}
-local stResList = {}
---------------------------------------------
---List of prefix used as value for includedBuilders[]
-local commandType = {
-	drec = 'drec', -- indicates direct orders from the user, or from other source external to this widget.
-	buildQueue = 'queu', -- indicates that the worker is under GBC control.
-	idle = 'idle',
-	mov = 'mov', -- indicates that the constructor was in the way of another constructor's job, and is being moved
-	ckn = 'ckn' -- indicates that the unit is running away from enemies (only applies to autoreclaim)
-}
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
@@ -330,7 +290,7 @@ function widget:Initialize()
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
 					end
-					UpdateOneWorkerPathing(uid) -- then precalculate pathing info
+					UpdateOneWorkerPathing(uid, includedBuilders, buildQueue) -- then precalculate pathing info
 				end
 			end
 
@@ -410,7 +370,7 @@ function widget:GameFrame(thisFrame)
 		CleanBusy() -- removes workers from busyUnits if the job they're assigned to doesn't exist. Prevents crashes.
 		local unitToWork = FindEligibleWorker()	-- get an eligible worker and assign it a job.
 		if unitToWork then
-			CleanPathing(unitToWork) -- garbage collect pathing for jobs that no longer exist
+			CleanPathing(unitToWork, includedBuilders, buildQueue) -- garbage collect pathing for jobs that no longer exist
 			GiveWorkToUnit(unitToWork)
 		end
 	end
@@ -419,110 +379,14 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- GL Drawing Code -------------------------------------------------------------
---[[
-HOW THIS WORKS:
-	widget:Update()
-		Pre-sorts buildQueue by visibility and type for drawing.
-	widget:DrawWorldPreUnit()
-		Calls the functions for drawing building outlines and area command circles, since these need to be drawn first.
-	widget:DrawWorld()
-		Draws status tags on units, calls the functions for drawing building "ghosts" for build jobs, and
-		command icons for other jobs.
-	widget:DrawScreen()
-		Changes the cursor if the area job remove tool is active.
-	DrawBuildLines()
-		Draws building outlines for build jobs, using DrawOutline().
-	DrawAreaLines()
-		Draws ground circles for area commands.
-	DrawBuildingGhosts()
-		Produces the gl code for drawing building ghosts for build jobs.
-	DrawSTIcons()
-		Draws command icons for single-target commands, takes a list as input rather than globals
-		directly, since it's used to draw 3 different icon types.
-]]--
+-- GL Drawing Callins  ---------------------------------------------------------
 
 -- Run pre-draw visibility checks, and sort buildQueue for drawing.
 function widget:Update(dt)
 	if spIsGUIHidden() then
 		return
 	end
-
-	-- update icons for builders
-	if options.drawIcons.value then
-		WG.icons.SetDisplay('gbcicon', true)
-		WG.icons.SetDisplay('gbcidle', true)
-		for unitID, data in pairs(allBuilders) do
-			if data.include and includedBuilders[unitID] then
-				local myCmd = includedBuilders[unitID]
-				if myCmd.cmdtype == commandType.idle then
-					WG.icons.SetUnitIcon(unitID, idle_icon)
-					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle/chicken icons
-				elseif myCmd.cmdtype == commandType.ckn then
-					WG.icons.SetUnitIcon(unitID, chicken_icon)
-					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle/chicken icons
-				elseif myCmd.cmdtype == commandType.buildQueue then
-					WG.icons.SetUnitIcon(unitID, queue_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				elseif myCmd.cmdtype == commandType.mov then
-					WG.icons.SetUnitIcon(unitID, move_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				else
-					WG.icons.SetUnitIcon(unitID, drec_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				end
-			else
-				WG.icons.SetUnitIcon(unitID, no_icon)
-				WG.icons.SetUnitIcon(unitID, noidle_icon)
-			end
-		end
-	else
-		WG.icons.SetDisplay('gbcicon', false)
-		WG.icons.SetDisplay('gbcidle', false)
-	end
-
-	buildList = {}
-	areaList = {}
-	stRepList = {}
-	stRecList = {}
-	stResList = {}
-
-	local alt, ctrl, meta, shift = spGetModKeyState()
-	if shift or options.alwaysShow.value then
-		for _, myCmd in pairs(buildQueue) do
-			local cmd = myCmd.id
-			if cmd < 0 then -- check visibility for building jobs
-				local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-				if spIsAABBInView(x-1,y-1,z-1,x+1,y+1,z+1) then
-					buildList[#buildList+1] = myCmd
-				end
-			elseif not myCmd.target then -- check visibility for area commands
-				local x, y, z, r = myCmd.x, myCmd.y, myCmd.z, myCmd.r
-				if spIsSphereInView(x, y, z, r+25) then
-					areaList[#areaList+1] = myCmd
-				end
-			elseif myCmd.x -- check visibility for single-target commands
-			or spValidUnitID(myCmd.target) then -- note we have to check units for validity to avoid nil errors, since the main validity checks may not have been run yet
-				local x, y, z
-				if myCmd.x then
-					x, y, z = myCmd.x, myCmd.y, myCmd.z
-				else
-					x, y, z = spGetUnitPosition(myCmd.target)
-				end
-				local newCmd = {x=x, y=y, z=z}
-				if spIsSphereInView(x, y, z, 100) then
-					if cmd == CMD_REPAIR then
-						stRepList[#stRepList+1] = newCmd
-					elseif cmd == CMD_RECLAIM then
-						stRecList[#stRecList+1] = newCmd
-					else
-						-- skip assigning x, y, z since res only targets features, which don't move
-						stResList[#stResList+1] = newCmd
-					end
-				end
-			end
-		end
-	end
+	RenderUpdate(dt, includedBuilders, allBuilders, buildQueue)
 end
 
 -- Draw area command circles, building outlines and other ground decals
@@ -531,24 +395,7 @@ function widget:DrawWorldPreUnit()
 		return
 	end
 
-	local alt, ctrl, meta, shift = spGetModKeyState()
-
-	if shift or options.alwaysShow.value then
-		glColor(1.0, 0.5, 0.1, 1) -- building outline color
-		glLineWidth(1)
-
-		DrawBuildLines() -- draw building outlines
-
-		if shift and options.alwaysShow.value then
-			glLineWidth(4)
-		else
-			glLineWidth(2)
-		end
-
-		DrawAreaLines() -- draw circles for area repair/reclaim/res
-	end
-	glColor(1, 1, 1, 1)
-	glLineWidth(1)
+	RenderPreUnit()
 end
 
 --  Paint 'cb' tags on units, draw ghosts of items in central build queue.
@@ -558,135 +405,7 @@ function widget:DrawWorld()
 	if spIsGUIHidden() then
 		return
 	end
-	local alt, ctrl, meta, shift = spGetModKeyState()
-
-	if shift or options.alwaysShow.value then
-		if shift and options.alwaysShow.value then
-			glColor(1, 1, 1, 0.5) -- 0.5 alpha
-		else
-			glColor(1, 1, 1, 0.35) -- 0.35 alpha
-		end
-
-		glDepthTest(true)
-		DrawBuildingGhosts() -- draw building ghosts
-		glDepthTest(false)
-
-		glTexture(true)
-		if shift and options.alwaysShow.value then -- increase the opacity of command icons when shift is held
-			glColor(1, 1, 1, 0.8)
-		else
-			glColor(1, 1, 1, 0.6)
-		end
-
-		DrawAreaIcons() -- draw icons for area commands
-
-		if shift and options.alwaysShow.value then -- increase the opacity of command icons when shift is held
-			glColor(1, 1, 1, 0.7)
-		else
-			glColor(1, 1, 1, 0.4)
-		end
-
-		-- draw icons for single-target commands
-		if not (options.autoRepair.value and not shift) then -- don't draw repair icons if autorepair is enabled, unless shift is held
-			glTexture(rep_icon)
-			DrawSTIcons(stRepList)
-		end
-
-		glTexture(rec_icon)
-		DrawSTIcons(stRecList)
-
-		glTexture(res_icon)
-		DrawSTIcons(stResList)
-	end
-
-	glTexture(false)
-	glColor(1, 1, 1, 1)
-end
-
-function DrawBuildLines()
-	for _,cmd in pairs(buildList) do -- draw outlines for building jobs
-		--local cmd = buildList[i]
-		local x, y, z, h = cmd.x, cmd.y, cmd.z, cmd.h
-		local bcmd = abs(cmd.id)
-		glBeginEnd(GL_LINE_STRIP, DrawOutline, bcmd, x, y, z, h)
-	end
-end
-
-function DrawOutline(cmd,x,y,z,h)
-	local ud = UnitDefs[cmd]
-	local baseX = ud.xsize * 4 -- ud.buildingDecalSizeX
-	local baseZ = ud.zsize * 4 -- ud.buildingDecalSizeY
-	if (h == 1 or h==3) then
-		baseX,baseZ = baseZ,baseX
-	end
-	glVertex(x-baseX,y,z-baseZ)
-	glVertex(x-baseX,y,z+baseZ)
-	glVertex(x+baseX,y,z+baseZ)
-	glVertex(x+baseX,y,z-baseZ)
-	glVertex(x-baseX,y,z-baseZ)
-end
-
-function DrawAreaLines()
-	for _,cmd in pairs(areaList) do -- draw circles for area repair/reclaim/resurrect jobs
-		--local cmd = areaList[i]
-		local x, y, z, r = cmd.x, cmd.y, cmd.z, cmd.r
-		if cmd.id == CMD_REPAIR then
-			glColor(rep_color)
-		elseif cmd.id == CMD_RECLAIM then
-			glColor(rec_color)
-		else
-			glColor(res_color)
-		end
-		glGroundCircle(x, y, z, r, 32)
-	end
-end
-
-function DrawBuildingGhosts()
-	for _,myCmd in pairs(buildList) do -- draw building "ghosts"
-		--local myCmd = buildList[i]
-		local bcmd = abs(myCmd.id)
-		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-		local degrees = h * 90
-		glPushMatrix()
-		glLoadIdentity()
-		glTranslate(x, y, z)
-		glRotate(degrees, 0, 1.0, 0 )
-		glUnitShape(bcmd, myTeamID, false, false, false)
-		glPopMatrix()
-	end
-end
-
-function DrawAreaIcons()
-	for i=1, #areaList do -- draw area command icons
-		local myCmd = areaList[i]
-		local x, y, z = myCmd.x, myCmd.y, myCmd.z
-		glPushMatrix()
-		if myCmd.id == CMD_REPAIR then
-			glTexture(rep_icon)
-		elseif myCmd.id == CMD_RECLAIM then
-			glTexture(rec_icon)
-		else
-			glTexture(res_icon)
-		end
-		glRotate(0, 0, 1.0, 0)
-		glTranslate(x-75, y, z+75)
-		glBillboard()
-		glTexRect(0, 0, 150, 150)
-		glPopMatrix()
-	end
-end
-
-function DrawSTIcons(myList)
-	for i=1, #myList do -- draw single-target command icons
-		local myCmd = myList[i]
-		local x, y, z = myCmd.x, myCmd.y, myCmd.z
-		glPushMatrix()
-		glRotate(0, 0, 1.0, 0)
-		glTranslate(x-33, y, z+33)
-		glBillboard()
-		glTexRect(0, 0, 66, 66)
-		glPopMatrix()
-	end
+	RenderWorld(myTeamID)
 end
 
 
@@ -760,7 +479,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if myCmd.tfparams then -- ZK-Specific: For combo terraform-build commands, convert to normal build commands once the building has started
 			buildQueue[key].tfparams = nil
-			UpdateOneJobPathing(key) -- update pathing, since terraform can change the results
+			UpdateOneJobPathing(key, includedBuilders, buildQueue) -- update pathing, since terraform can change the results
 		end
 
 		if myCmd.q then -- if given with 'start-only', then cancel the job as soon as it's started
@@ -780,7 +499,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		local _,_,nanoframe = spGetUnitIsStunned(unitID)
 		if not nanoframe then
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
-			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+			UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
 			return -- don't apply constructor separator to commanders
 		end
 
@@ -825,7 +544,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
 		end
-		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
 		newBuilders[unitID] = true
 	end
 end
@@ -875,8 +594,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	end
 	if allBuilders[unitID] then
 		allBuilders[unitID] = nil
-		WG.icons.SetUnitIcon(unitID, no_icon)
-		WG.icons.SetUnitIcon(unitID, noidle_icon)
+		RenderCleanupUnit(unitID)
 	end
 
 	if includedBuilders[unitID] then
@@ -914,7 +632,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 		else -- otherwise we mark it as idle
 			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
 		end
-		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
 		GiveWorkToUnit(unitID)
 	end
 end
@@ -928,7 +646,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		if not buildQueue[hash] then
 			buildQueue[hash] = myCmd
 			if UnitDefs[unitDefID].isImmobile then
-				UpdateOneJobPathing(hash)
+				UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 			end
 		end
 	end
@@ -1079,7 +797,7 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, shift)
 	local hash = BuildHash(myCmd)
 
 	buildQueue[hash] = myCmd
-	UpdateOneJobPathing(hash)
+	UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 	if shift then
 		return true -- tell the terraform widget not to give any orders besides terraform internal, so that our units won't be disturbed.
 	else
@@ -1138,7 +856,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				local hash = BuildHash(myCmd)
 				if CleanOrders(myCmd, true) or not options.shift then -- check if the job site is obstructed, and clear up any other jobs that overlap.
 					buildQueue[hash] = myCmd	-- add it to queue if clear
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 
 				if ( options.shift ) then -- if the command was given with shift
@@ -1176,7 +894,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					local hash = BuildHash(myCmd)
 					buildQueue[hash] = myCmd -- add the job to the queue
 					areaCmdList[hash] = myCmd -- and also to the area command update list, for capturing single targets.
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 					if options.shift then -- for queued jobs
 						return true -- capture the command
 					else -- for direct orders
@@ -1233,7 +951,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					if not buildQueue[hash] then -- if the job wasn't already on the queue
 						buildQueue[hash] = myCmd -- add the command to the queue
 						if myCmd.x then -- if our target is not a unit
-							UpdateOneJobPathing(hash) -- then cache pathing info
+							UpdateOneJobPathing(hash, includedBuilders, buildQueue) -- then cache pathing info
 						end
 					elseif options.shift then -- if it was already on the queue, and given with shift then cancel it
 						StopAnyWorker(hash)
@@ -1282,7 +1000,7 @@ function ApplyState(desiredState)
 					else -- otherwise we mark it as idle
 						includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
 					end
-					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+					UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
 				end
 			elseif includedBuilders[unitID] then
 				-- newly disabled
@@ -1760,7 +1478,7 @@ function SplitAreaCommand(id, x, z, r)
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 			end
 		end
@@ -1777,7 +1495,7 @@ function SplitAreaCommand(id, x, z, r)
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 			elseif FeatureDefs[fdef].reclaimable and options.autoConvertRes.value then -- otherwise if it's reclaimable, and res-conversion is enabled convert to a reclaim order
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
@@ -1786,7 +1504,7 @@ function SplitAreaCommand(id, x, z, r)
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 			end
 		end
@@ -1883,7 +1601,7 @@ function CleanWrecks()
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash) -- and to prevent redundant pathing calculations
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue) -- and to prevent redundant pathing calculations
 				end
 			elseif string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") then -- otherwise if it's a reclaimable wreck
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
@@ -1892,7 +1610,7 @@ function CleanWrecks()
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 			end
 		end
@@ -1909,7 +1627,7 @@ function CleanWrecks()
 				local hash = BuildHash(myCmd)
 				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
 					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash)
+					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
 				end
 			end
 		end
@@ -2134,21 +1852,6 @@ end
 HOW THIS WORKS:
 	UpdateOneGroupsDetails()
 		Adds and removes units from includedBuilders as they enter or leave the exclusion group, or when the exclusion group number changes.
-	CanBuildThis()
-		Determines whether a given worker can perform a given job or not.
-	IsTargetReachable()
-		Checks pathing between a unit and destination, to determine if a worker
-		can reach a given build site.
-	UpdateOneWorkerPathing()
-		Caches pathing info for one worker for every job in buildQueue. This is called
-		whenever a new unit enters our group, and adds the hash of any job that cannot be reached
-		and/or performed to 'includedBuilders[unitID].unreachable'. Does not do anything for commands targetting
-		units (ie repair, reclaim), since they may move and invalidate cached pathing info.
-	UpdateOneJobPathing()
-		Caches pathing info for one job for every worker in includedBuilders. This is called whenever a new
-		job is added to the queue, and does basically the same thing as UpdateOneWorkerPathing().
-	CleanPathing()
-		Performs garbage collection for unreachable caches, removing jobs that are no longer on the queue.
 	RemoveJobs()
 		Takes an area select as input, and removes any job from the queue that falls within it. Used by the job
 		removal tool.
@@ -2163,119 +1866,6 @@ HOW THIS WORKS:
 		them idle if not under direct orders. Called when jobs are finished, cancelled, or otherwise
 		invalidated.
 --]]
-
---This function tells us if a unit can perform the job in question.
-function CanBuildThis(cmdID, unitID)
-	local unitDefID = spGetUnitDefID(unitID)
-	local unitDef = UnitDefs[unitDefID]
-	if cmdID < 0 then -- for build jobs
-		local bcmd = abs(cmdID) -- abs the command ID to get the unitDefID that it refers to
-		for _, options in ipairs(unitDef.buildOptions) do
-			if ( options == bcmd ) then -- check whether our unit can build it
-				return true
-			end
-		end
-		return false
-	elseif cmdID == CMD_REPAIR or cmdID == CMD_RECLAIM then -- for repair and reclaim, all builders can do this, return true
-		return true
-	elseif unitDef.canResurrect then -- for ressurect
-		return true
-	end
-	return false
-end
-
--- This function process result of Spring.PathRequest() to say whether target is reachable or not
-function IsTargetReachable(unitID, tx,ty,tz)
-	local ox, oy, oz = spGetUnitPosition(unitID)	-- unit location
-	local unitDefID = spGetUnitDefID(unitID)
-	local buildDist = UnitDefs[unitDefID].buildDistance -- build range
-	local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
-	if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
-		local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
-		if path then
-			local waypoints = path:GetPathWayPoints()
-			local finalCoord = waypoints[#waypoints]
-			if finalCoord then -- unknown why sometimes NIL
-				local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-				local dist = sqrt(dx*dx + dz*dz)
-				if dist < buildDist + 40 then -- is within radius?
-					return true -- within reach
-				else
-					return false -- not within reach
-				end
-			else
-				return true -- if finalCoord is nil for some reason, return true
-			end
-		else
-			return true -- if path is nil for some reason, return true
-			-- note: it usually returns nil for very short distances, which is why returning true is a much better default here
-		end
-	else
-		return true --for air units; always reachable
-	end
-end
-
--- This function caches pathing when a new worker enters the group.
-function UpdateOneWorkerPathing(unitID)
-	for hash, cmd in pairs(buildQueue) do -- check pathing vs each job in the queue, mark any that can't be reached
-		local jx, jy, jz
-		-- get job position
-		if cmd.x or cmd.id == CMD_REPAIR then -- for all jobs not targetting units (ie not repair or unit reclaim)
-			local valid = true
-			if cmd.x then
-				jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
-			elseif spValidUnitID(cmd.target) and spIsUnitAllied(cmd.target) and not spUnitIsDead(cmd.target) then -- for repair jobs, only cache pathing for buildings, since they don't move.
-				jx, jy, jz = spGetUnitPosition(cmd.target)
-				if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
-					valid = false
-				end
-			else
-				valid = false
-			end
-
-			if valid and not IsTargetReachable(unitID, jx, jy, jz) or not CanBuildThis(cmd.id, unitID) then -- if the worker can't reach the job, or can't build it, add it to the worker's unreachable list
-				includedBuilders[unitID].unreachable[hash] = true
-			end
-		end
-	end
-end
-
--- This function caches pathing when a new job is added to the queue
-function UpdateOneJobPathing(hash)
-	local cmd = buildQueue[hash]
-	local jx, jy, jz
-	-- get job position
-	if cmd.x or cmd.id == CMD_REPAIR then -- for build jobs, and non-repair jobs that we cache the coords and pathing for
-		local valid = true
-		if cmd.x then
-			jx, jy, jz = cmd.x, cmd.y, cmd.z --the location of the current job
-		else
-			jx, jy, jz = spGetUnitPosition(cmd.target)
-			if not UnitDefs[spGetUnitDefID(cmd.target)].isImmobile then
-				valid = false
-			end
-		end
-
-		if not valid then return end -- don't check pathing for repair jobs targeting mobiles.
-
-		for unitID, _ in pairs(includedBuilders) do -- check pathing for each unit, mark any that can't be reached.
-			if spValidUnitID(unitID) then -- note that this function can be called before validity checks are run, and some of our units may have died.
-				if not IsTargetReachable(unitID, jx, jy, jz) or not CanBuildThis(cmd.id, unitID) then -- if the worker can't reach the job, or can't build it, add it to the worker's unreachable list
-					includedBuilders[unitID].unreachable[hash] = true
-				end
-			end
-		end
-	end
-end
-
--- This function performs garbage collection for cached pathing
-function CleanPathing(unitID)
-	for hash,_ in pairs(includedBuilders[unitID].unreachable) do
-		if not buildQueue[hash] then -- remove old, invalid jobs from the unreachable list
-			includedBuilders[unitID].unreachable[hash] = nil
-		end
-	end
-end
 
 -- This function implements area removal for GBC jobs.
 function RemoveJobs(x, z, r)
