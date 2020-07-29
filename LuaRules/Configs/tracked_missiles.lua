@@ -15,8 +15,6 @@ local trackedMissiles = {
 		humanName = "Nuclear Missile",
 		fadeIn = 30*UPDATES_PER_SECOND
 	},
-}
-	--[[ Disable everything except Trinity for now, until missile prediction with acceleration is fixed
 	-- EOS/Tacnuke
 	[WeaponDefNames.tacnuke_weapon.id] = {
 		color = redDefault,
@@ -58,6 +56,5 @@ for i=0,8 do
   -- S.L.A.M variants
   trackedMissiles[WeaponDefNames[i .. '_commweapon_slamrocket'].id] = slamDefaults
 end
---]]
 
 return trackedMissiles

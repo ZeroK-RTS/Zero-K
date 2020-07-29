@@ -46,6 +46,7 @@ local UPDATES_PER_SECOND = 30
 local initialFlightTime = {}
 local uptime = {}
 local turnRate = {}
+local accel = {}
 
 local sqrt = math.sqrt
 
@@ -58,6 +59,7 @@ function StarburstPredictPrecache(weaponDefID)
 		myTurnRate = 0.06
 	end
 	turnRate[weaponDefID] = myTurnRate
+	accel[weaponDefID] = weaponDef.weaponAcceleration
 end
 
 local function GetProjectileParameters(projectileID, weaponDefID,curFrame)
@@ -106,14 +108,18 @@ function StarburstPredict(projectileID, weaponDefID, curFrame, targetPosition)
 			return nil
 		end
 	end
-	-- Speed is constant
-	local ndx,ndy,ndz,speed = Normalize(dx,dy,dz)
+	-- Acceleration is constant
+	local myAccel = accel[weaponDefID]
 
 	--
 	-- Stage 1: Shoot vertically upwards
 	--
 	local s1FramesRemaining = uptime[weaponDefID] - age
-	y = y + s1FramesRemaining * dy
+	y = y + s1FramesRemaining * (dy + myAccel * (s1FramesRemaining + 1) / 2)
+	dy = dy + myAccel * s1FramesRemaining
+
+	-- Speed is constant throughout stage 2
+	local ndx,ndy,ndz,speed = Normalize(dx,dy,dz)
 
 	--
 	-- Stage 2: Rotate around with a fixed velocity to face the target
@@ -169,7 +175,18 @@ function StarburstPredict(projectileID, weaponDefID, curFrame, targetPosition)
 	--
 	local distX, distY, distZ = tx-x, ty-y, tz-z
 	local dist = sqrt(distX*distX + distY*distY + distZ*distZ)
-	local s3FramesRemaining = dist / speed
+	local s3FramesRemaining
+	if myAccel > 0 then
+		-- How long does it take to travel `dist` at speed `speed` and acceleration `myAccel`?
+		-- dist = remainingFrames * (speed + myAccel * (remainingFrames + 1) / 2)
+		-- 0    = myAccel/2 * remainingFrames**2 + myAccel * remainingFrames / 2 + remainingFrames * speed - dist
+		-- QF: a = myAccel/2; b = speed + myAccel / 2, c = -dist
+		-- One could probably simplify this a lot if they really cared
+		local a,b,c = myAccel/2, speed + myAccel / 2, -dist
+		s3FramesRemaining = (-b + sqrt(b*b - 4 * a * c)) / (2*a)
+	else
+		s3FramesRemaining = dist / speed
+	end
 
 	-- END OF PREDICTION
 
