@@ -38,8 +38,8 @@ local pollActive = false
 local hidePoll = false
 local votingForceStart = false
 
-local string_success = WG.Translate("interface", "vote_success")
-local string_fail = WG.Translate("interface", "vote_failed")
+local string_success = WG.Translate("interface", "vote_ended_success")
+local string_fail = WG.Translate("interface", "vote_ended_failed")
 local string_vote = {"!y=", "!n="}
 local string_titleStart = WG.Translate("interface", "vote:")
 local string_endvote = WG.Translate("interface", "vote_cancelled")
