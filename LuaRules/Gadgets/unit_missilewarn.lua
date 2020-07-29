@@ -15,8 +15,8 @@ end
 -- Common code
 --
 -- Protocol numbers and which missiles to handle are used in both synced and unsynced
-local MAGIC_FIRED     = 0
-local MAGIC_DESTROYED = 1
+local MAGIC_FIRED     = 'missile_fired'
+local MAGIC_DESTROYED = 'missile_destroyed'
 
 local trackedMissiles = include("LuaRules/Configs/tracked_missiles.lua")
 
@@ -100,7 +100,10 @@ function gadget:RecvFromSynced(magic, ...)
 		ProjectileCreated(...)
 	elseif magic == MAGIC_DESTROYED then
 		ProjectileDestroyed(...)
+	else
+		return false
 	end
+	return true
 end
 
 function gadget:GameFrame(n)
