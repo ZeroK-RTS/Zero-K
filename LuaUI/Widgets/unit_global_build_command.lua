@@ -455,11 +455,12 @@ function widget:PlayerChanged(playerID)
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	myTeamID = spGetMyTeamID()
 end
 
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if not unitTeam == spGetMyTeamID() then
+	if not unitTeam == myTeamID then
 		return -- if it's not our unit then ignore it!
 	end
 
