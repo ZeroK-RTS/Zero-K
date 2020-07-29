@@ -45,15 +45,15 @@ else
 --
 
 -- Impact ETA is an IMPORTANT FEATURE that is NOT SUNK COST at all
-include("LuaRules/Utilities/StarburstPredict.lua")
--- luacheck: read globals StarburstPredictPrecache StarburstPredict
+local StarburstPredictPrecache = Spring.Utilities.StarburstPredictPrecache
+local StarburstPredict         = Spring.Utilities.StarburstPredict
 
-local spAreTeamsAllied       = Spring.AreTeamsAllied
-local spGetMyTeamID          = Spring.GetMyTeamID
-local spGetSpectatingState   = Spring.GetSpectatingState
-local spGetUnitTeam          = Spring.GetUnitTeam
-local scriptMissileFired     = Script.LuaUI.MissileFired
-local scriptMissileDestroyed = Script.LuaUI.MissileDestroyed
+local spAreTeamsAllied         = Spring.AreTeamsAllied
+local spGetMyTeamID            = Spring.GetMyTeamID
+local spGetSpectatingState     = Spring.GetSpectatingState
+local spGetUnitTeam            = Spring.GetUnitTeam
+local scriptMissileFired       = Script.LuaUI.MissileFired
+local scriptMissileDestroyed   = Script.LuaUI.MissileDestroyed
 
 local curFrame = -1
 
