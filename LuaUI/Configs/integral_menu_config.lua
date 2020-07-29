@@ -84,7 +84,7 @@ local buttonLayoutConfig = {
 		},
 		showCost = false,
 		queueButton = true,
-		tooltipOverride = "\255\1\255\1"..WG.Translate("common", "leftrightmb").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_1".."\n\255\1\255\1"..WG.Translate("common", "hold").." "..WG.Translate("common", "lmb_1").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_2"),
+		tooltipOverride = "\255\1\255\1"..WG.Translate("common", "leftrightmb").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_1").."\n\255\1\255\1"..WG.Translate("common", "hold").." "..WG.Translate("common", "lmb_1").." \255\255\255\255: "..WG.Translate("interface", "facqueue_tooltip_2"),
 		dragAndDrop = true,
 	},
 	queueWithDots = {
