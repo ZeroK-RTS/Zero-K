@@ -4,34 +4,34 @@ local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
 	terraunit = {
-		{ functionToCall = "Detonate", name = WG.Translate("common", "cancel"), tooltip = WG.Translate("interface", "tera_cancel"), texture = "LuaUI/Images/Commands/Bold/cancel.png", partBuilt = true},
+		{ functionToCall = "Detonate", name = "Cancel", tooltip = "Cancel selected terraform units.", texture = "LuaUI/Images/Commands/Bold/cancel.png", partBuilt = true},
 	},
 	gunshipkrow = {
-		{ functionToCall = "ClusterBomb", reloadTime = 854, name = WG.Translate("interface", "gskrow_dgun"), tooltip = WG.Translate("interface", "gskrow_dgun_tooltip"), weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},
+		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop Bombs: Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	--hoverdepthcharge = {
 	--	{ functionToCall = "ShootDepthcharge", reloadTime = 256, name = "Drop Depthcharge", tooltip = "Drop Depthcharge: Drops a on the sea surface or ground.", weaponToReload = 1, texture = "LuaUI/Images/Commands/Bold/dgun.png",},
 	--},
 	cloakbomb = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"),  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	shieldbomb = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"), texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	jumpbomb = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"),  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	gunshipbomb = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"), texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	amphbomb = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"),  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	shieldscout = {
-		{ functionToCall = "Detonate", name = WG.Translate("interface", "walkingbomb_detonate"), tooltip = WG.Translate("interface", "walkingbomb_detonate_tooltip"), texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	bomberdisarm = {
-		{ functionToCall = "StartRun", name = WG.Translate("interface", "bombdisarm_run"), tooltip = WG.Translate("interface", "bombdisarm_run_tooltip"), texture = "LuaUI/Images/Commands/Bold/bomb.png",},
+		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Unleash Lightning: Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	--[[
 	tankraid = {
@@ -39,16 +39,16 @@ local oneClickWepDefNames = {
 	},
 	--]]
 	planefighter = {
-		{ functionToCall = "Sprint", reloadTime = 850, name = WG.Translate("interface", "swift_kesselrun"), tooltip = WG.Translate("interface", "swift_kesselrun_tooltip"), useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--planescout = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
 	--},
 	gunshipheavytrans = {
-		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = WG.Translate("interface", "transport_eject"), tooltip = WG.Translate("interface", "transport_eject_tooltip"), useSpecialReloadFrame = true,},
+		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject Cargo", useSpecialReloadFrame = true,},
 	},
 	gunshiptrans = {
-		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = WG.Translate("interface", "transport_eject"), tooltip = WG.Translate("interface", "transport_eject_tooltip"), useSpecialReloadFrame = true,},
+		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject Cargo", useSpecialReloadFrame = true,},
 	},
 	
 	--staticmissilesilo = {
