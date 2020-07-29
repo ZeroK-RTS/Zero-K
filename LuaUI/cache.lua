@@ -28,6 +28,7 @@ local spGetProjectileTeamID = Spring.GetProjectileTeamID
 local spGetMyTeamID = Spring.GetMyTeamID
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetProjectileDefID = Spring.GetProjectileDefID
+local spGetSpectatingState = Spring.GetSpectatingState
 local filteredWeaponDefID = {}
 for wdid, wd in pairs(WeaponDefs) do
 	if wd.customParams.restrict_in_widgets then
@@ -35,6 +36,10 @@ for wdid, wd in pairs(WeaponDefs) do
 	end
 end
 local function FilterOutRestrictedProjectiles(projectiles)
+	local isSpectator, hasFullView = spGetSpectatingState()
+	if isSpectator and hasFullView then
+		return projectiles
+	end
 	local i = 1
 	local n = #projectiles
 	local myTeamID = spGetMyTeamID()
