@@ -129,14 +129,14 @@ local function GetStartText()
 	
 	local text = lastLabel
 	if text == nil then
-		text = WG.Translate("interface", "startup_setupmenu_waiting")
+		text = "Waiting for people "
 	end
 	
 	if (next(waitingFor) ~= nil) then
 		if singleplayer then
-			text = "\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_choosepos")
+			text = "\255\255\255\255Choose start position"
 		else
-			text = text .. "\n\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_waitingfor")
+			text = text .. "\n\255\255\255\255Waiting for "
 			
 			local cnt = 0
 			for name, state in pairs(waitingFor) do
@@ -151,10 +151,10 @@ local function GetStartText()
 				end
 				text = text .. name .. ", "
 			end
-			text = text .. "\n\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_force", { command = "!force" })
+			text = text .. "\n\255\255\255\255 Say !force to start sooner"
 		end
-	elseif string.find(text, WG.Translate("interface", "startup_setupmenu_choose")) then
-		return "\255\255\255\255"..WG.Translate("interface", "startup_setupmenu_starting")
+	elseif string.find(text, "Choose") then
+		return "\255\255\255\255Starting"
 	end
 	return text
 end
