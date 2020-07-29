@@ -261,7 +261,7 @@ local rampCmdDesc = {
 	name    = 'Ramp',
 	cursor  = 'Ramp',
 	action  = 'rampground',
-	tooltip = WG.Translate("interface", "terra_build_ramp"),
+	tooltip = 'Build a Ramp - Click and drag between two positions.',
 }
 
 local levelCmdDesc = {
@@ -270,7 +270,7 @@ local levelCmdDesc = {
 	name    = 'Level',
 	cursor  = 'Level',
 	action  = 'levelground',
-	tooltip = WG.Translate("interface", "terra_level_terrain"),
+	tooltip = 'Level the terrain - Click and drag a line or closed shape.',
 }
 
 local raiseCmdDesc = {
@@ -279,7 +279,7 @@ local raiseCmdDesc = {
 	name    = 'Raise',
 	cursor  = 'Raise',
 	action  = 'raiseground',
-	tooltip = WG.Translate("interface", "terra_raise_lower"),
+	tooltip = 'Raises/Lower terrain - Click and drag a line or closed shape.',
 }
 
 local smoothCmdDesc = {
@@ -288,7 +288,7 @@ local smoothCmdDesc = {
 	name    = 'Smooth',
 	cursor  = 'Smooth',
 	action  = 'smoothground',
-	tooltip = WG.Translate("interface", "terra_smooth"),
+	tooltip = 'Smooth the terrain - Click and drag a line or closed shape.',
 }
 
 local restoreCmdDesc = {
@@ -297,7 +297,7 @@ local restoreCmdDesc = {
 	name    = 'Restore2',
 	cursor  = 'Restore2',
 	action  = 'restoreground',
-	tooltip = WG.Translate("interface", "terra_restore"),
+	tooltip = 'Restore the terrain to its original shape - Click and drag a line or closed shape.',
 }
 
 local bumpyCmdDesc = {
