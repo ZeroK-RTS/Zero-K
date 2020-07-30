@@ -146,7 +146,7 @@ local terraCmdTip = {
 		'\n'..
 		yellow..WG.Translate("interface", "tera_gtooltip_after")..
 		green.. WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_raise_snap15")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_raise_snap0")': Snap to 0 height.',
+		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_raise_snap0"),
 	[CMD_SMOOTH] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_during")..
 		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line"),
