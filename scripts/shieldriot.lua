@@ -264,5 +264,8 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_ACTIVATE) -- prevent pulsing while undead
+
+	-- keep the unit technically alive (but hidden) for some time so that any inbound
+	-- pulses know who their owner is (so that they can do no damage to allies)
 	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
