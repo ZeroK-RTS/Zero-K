@@ -113,7 +113,7 @@
 	"defence_range_ally_nuke" : "Show Ally Nuke Defence",
 	"defence_range_enemy_ground" : "Show Enemy Ground Defence",
 	"defence_range_enemy_air" : "Show Enemy Air Defence",
-	"defence_range_enemy_nuke" : "Show Enemy Nuke Defence",
+	"defence_range_enemy_nuke_defence" : "Show Enemy Nuke Defence",
 	"defence_range_enemy_shields" : "Show Enemy Shields",
 	"defence_range_enemy_radar" : "Show Enemy Radar Coverage",
 	"defence_range_spec" : "Show Ground Defence as Spectator",
