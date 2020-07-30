@@ -124,6 +124,8 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	-- keep the unit technically alive (but hidden) for some time so that the death
+	-- blast can tell who its owner is (so that it can do no damage to allies)
 	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
 
