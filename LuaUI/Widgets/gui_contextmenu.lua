@@ -1948,6 +1948,11 @@ function widget:MousePress(x,y,button)
 		if cmd_id then
 			return false
 		end
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 		
 		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
@@ -1984,11 +1989,6 @@ function widget:MousePress(x,y,button)
 					return true
 				end
 			end
-		end
-
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
 		end
 	end
 
