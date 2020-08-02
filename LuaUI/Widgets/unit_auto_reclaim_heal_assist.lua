@@ -41,7 +41,7 @@ local ConController = {
 	
 	
 	handle=function(self)
-		local cmdQueue = Spring.GetUnitCommands(self.unitID, 2);
+		local cmdQueue = Spring.GetUnitCommands(self.unitID, 3);
 		if (#cmdQueue == 0) then
 			if (not Spring.IsUnitSelected(self.unitID)) then              --if unit is not selected
 				self.cmdPos = {GetUnitPosition(self.unitID)}
@@ -51,11 +51,12 @@ local ConController = {
 		else
 			-- Want to issue the order to stop doing stuff if con has finished its work and is returning to its original location so that com can get through reclaim fields
 			-- Also want to be very very sure we're only issuing this stop command if the only commands the unit has is the one this widget inserted
-			if #cmdQueue == 2 and self.cmdPos and #cmdQueue[2].params == 3 then
-				local posCmd1 = cmdQueue[2].params
+			if #cmdQueue == 2 and self.cmdPos and cmdQueue[1].id == CMD.FIGHT and cmdQueue[2].id == CMD.FIGHT then
+				local posCmd1 = cmdQueue[1].params
 				local posCmd2 = cmdQueue[2].params
 				if posCmd2[1] == self.cmdPos[1] and posCmd2[2] == self.cmdPos[2] and posCmd2[3] == self.cmdPos[3] and posCmd1[1] == self.cmdPos[1] and posCmd1[2] == self.cmdPos[2] and posCmd1[3] == self.cmdPos[3] then
 					GiveOrderToUnit(self.unitID,CMD.STOP, {}, {""},1)
+					self.cmdPos = nil
 				end
 			end
 		end
