@@ -1851,8 +1851,6 @@ end
 -- Helper Functions ------------------------------------------------------------
 --[[
 HOW THIS WORKS:
-	UpdateOneGroupsDetails()
-		Adds and removes units from includedBuilders as they enter or leave the exclusion group, or when the exclusion group number changes.
 	RemoveJobs()
 		Takes an area select as input, and removes any job from the queue that falls within it. Used by the job
 		removal tool.
