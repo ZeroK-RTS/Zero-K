@@ -2220,8 +2220,6 @@ end
 -- Helper Functions ------------------------------------------------------------
 --[[
 HOW THIS WORKS:
-	UpdateOneGroupsDetails()
-		Adds and removes units from includedBuilders as they enter or leave the exclusion group, or when the exclusion group number changes.
 	CanBuildThis()
 		Determines whether a given worker can perform a given job or not.
 	IsTargetReachable()
