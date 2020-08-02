@@ -1197,11 +1197,11 @@ function FindCheapestJob(unitID)
 		local buildDist = UnitDefs[unitDefID].buildDistance
 		local moveID = UnitDefs[unitDefID].moveDef.id
 
-		if moveID then -- for ground units, just cache the cost
+		if moveID then -- for ground units, cache the cost, and only very slightly reduce the cost of the current job to avoid eg. repeat turning around for builders with a low turn rate
 			if options.intelliCost.value then
-				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz)
+				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz) - 30
 			else
-				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz)
+				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz) - 30
 			end
 		else -- for air units, reduce the cost of their current job since they tend to wander around while building
 			if options.intelliCost.value then
