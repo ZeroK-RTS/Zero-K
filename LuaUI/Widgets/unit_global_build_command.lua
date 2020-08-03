@@ -1078,84 +1078,64 @@ function GiveWorkToUnit(unitID)
 	end
 end
 
+local function TryJobCandidate(unitID, ux, uz, hash, job, doCheckReachable)
+	if not job then job = buildQueue[hash] end
+	local jx, jz, _
+
+	if job.x then -- for jobs with explicit locations, or for which we've cached locations
+		jx,jz = job.x, job.z --the location of the current job
+	else -- for repair jobs and reclaim jobs targetting units
+		if unitID == job.target then return nil end -- ignore self-targeting commands
+		jx,_,jz = spGetUnitPosition(job.target)
+	end
+
+	if doCheckReachable then
+		-- check pathing and/or whether the worker can build the job or not (stored in the same key)
+		if includedBuilders[unitID].unreachable[hash] then -- check cached values
+			return
+		elseif not job.x then -- for jobs targeting units, which may be mobile, always calculate pathing.
+			-- FIXME: It is impossible for CleanOrders to trigger pathing recalculation. This logic does not work.
+			if not CleanOrders(job, false) or includedBuilders[unitID].unreachable[hash] then
+				return
+			end
+		end
+	end
+
+	local CostFunction = options.intellicost.value and IntelliCost or FlatCost
+	return CostFunction(unitID, hash, ux, uz, jx, jz), jx, jz
+end
+
 -- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob().
 function FindCheapestJob(unitID)
 	local cachedJob = nil -- the cheapest job that we've seen
-	local cachedCost = 0 -- the cost of the currently cached cheapest job
+	local cachedCost = math.huge -- the cost of the currently cached cheapest job
 	local ux, _, uz = spGetUnitPosition(unitID)  -- unit location
+	local unitDefID = spGetUnitDefID(unitID)
+	local buildDist = UnitDefs[unitDefID].buildDistance
 
 	-- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
 	-- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
 	-- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
 	if busyUnits[unitID] and CleanOrders(buildQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
 		local key = busyUnits[unitID]
-		local jx, jz
 		cachedJob = buildQueue[key]
 
-		if not cachedJob then
-			Spring.Echo("GBC FindCheapestJob: cachedJob doesn't exist!!!")
-		end
+		local cost = TryJobCandidate(unitID, ux, uz, key, cachedJob)
 
-		if cachedJob.x then -- for jobs with explicit locations, or for which we've cached locations
-			jx, jy, jz = cachedJob.x, cachedJob.y, cachedJob.z --the location of the current job
-		else -- for repair jobs and reclaim jobs targetting units
-			jx, jy, jz = spGetUnitPosition(cachedJob.target)
-		end
-
-		local unitDefID = spGetUnitDefID(unitID)
-		local buildDist = UnitDefs[unitDefID].buildDistance
 		local moveID = UnitDefs[unitDefID].moveDef.id
 
 		if moveID then -- for ground units, cache the cost, and only very slightly reduce the cost of the current job to avoid eg. repeat turning around for builders with a low turn rate
-			if options.intelliCost.value then
-				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz) - 30
-			else
-				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz) - 30
-			end
+			cachedCost = cost - 30
 		else -- for air units, reduce the cost of their current job since they tend to wander around while building
-			if options.intelliCost.value then
-				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz) - (buildDist + 40)
-			else
-				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz) - (buildDist + 40)
-			end
+			cachedCost = cost - (buildDist + 40)
 		end
 	end
 
 	for hash, tmpJob in pairs(buildQueue) do -- here we compare our unit to each job in the queue
-		local jx, jz
-
-		if not tmpJob.target or tmpJob.target ~= unitID then -- ignore self-targetting commands
-
-			-- get job position
-			if tmpJob.x then -- for jobs with explicit locations, or for which we've cached locations
-				jx, jy, jz = tmpJob.x, tmpJob.y, tmpJob.z --the location of the current job
-			else -- for repair jobs and reclaim jobs targetting units
-				jx, jy, jz = spGetUnitPosition(tmpJob.target)
-			end
-
-			-- check pathing and/or whether the worker can build the job or not (stored in the same key)
-			local isReachableAndBuildable = true
-			if includedBuilders[unitID].unreachable[hash] then -- check cached values
-				isReachableAndBuildable = false
-			elseif not tmpJob.x then -- for jobs targetting units, which may be mobile, always calculate pathing.
-				-- FIXME: It is impossible for CleanOrders to trigger pathing recalculation. This logic does not work.
-				if not CleanOrders(tmpJob, false) or includedBuilders[unitID].unreachable[hash] then
-					isReachableAndBuildable = false
-				end
-			end
-
-			if isReachableAndBuildable then
-				local tmpCost -- calculate the job cost, depending on the cost model the user has chosen
-				if options.intelliCost.value then
-					tmpCost = IntelliCost(unitID, hash, ux, uz, jx, jz)
-				else
-					tmpCost = FlatCost(unitID, hash, ux, uz, jx, jz)
-				end
-				if not cachedJob or tmpCost < cachedCost then -- then if there is no cached job or if tmpJob is cheaper, replace the cached job with tmpJob and update the cost
-					cachedJob = tmpJob
-					cachedCost = tmpCost
-				end
-			end
+		local cost = TryJobCandidate(unitID, ux, uz, hash, tmpJob, true)
+		if cost and cost < cachedCost then -- then if there is no cached job or if tmpJob is cheaper, replace the cached job with tmpJob and update the cost
+			cachedJob = tmpJob
+			cachedCost = cost
 		end
 	end
 	return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
