@@ -286,29 +286,7 @@ function widget:Initialize()
 	local units = spGetTeamUnits(myTeamID)
 		for _, uid in ipairs(units) do
 			local unitDefID = spGetUnitDefID(uid)
-			local ud = UnitDefs[unitDefID]
-			local _,_,nanoframe = spGetUnitIsStunned(uid)
-			if ud.isMobileBuilder then -- if the unit is a mobile builder
-				allBuilders[uid] = true -- add it to the group of all workers
-
-				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
-					if spGetCommandQueue(uid, 0) ~= 0 then -- if so we mark it as drec
-						includedBuilders[uid] = {cmdtype=commandType.drec, unreachable={}}
-					else -- otherwise we mark it as idle
-						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
-					end
-					UpdateOneWorkerPathing(uid, includedBuilders, buildQueue) -- then precalculate pathing info
-				end
-			end
-
-			if unitDefID == Mex_ID then
-				local x, _, z = spGetUnitPosition(uid)
-				territoryPos.x = territoryPos.x + x
-				territoryPos.z = territoryPos.z + z
-				territoryCount = territoryCount + 1
-				territoryCenter.x = territoryPos.x/territoryCount
-				territoryCenter.z = territoryPos.z/territoryCount
-			end
+			UnitGained(uid, unitDefID, myTeamID)
 		end
 
 	-- ZK compatability stuff
@@ -465,20 +443,62 @@ function widget:PlayerChanged(playerID)
 	myTeamID = spGetMyTeamID()
 end
 
+-- Returns true if this is now one of our units that we should immediately direct.
+function UnitGained(unitID, unitDefID, unitTeam, doInitialCheck)
+	if unitTeam ~= myTeamID then return end
+
+	-- update territory info when new mexes are created.
+	if unitDefID == Mex_ID and not doInitialCheck then
+		-- To make sure Gained and Gone have a one to one relationship wrt
+		-- territory processing, only update territory center on completed mexes.
+		local _,_,nanoframe = spGetUnitIsStunned(unitID)
+		if not nanoframe then
+			local x, _, z = spGetUnitPosition(unitID)
+			territoryPos.x = territoryPos.x + x
+			territoryPos.z = territoryPos.z + z
+			territoryCount = territoryCount + 1
+			territoryCenter.x = territoryPos.x/territoryCount
+			territoryCenter.z = territoryPos.z/territoryCount
+		end
+		return false
+	end
+
+	local ud = UnitDefs[unitDefID]
+	if not ud.isMobileBuilder then return false end
+	-- if the new unit is a mobile builder
+	local builderState = allBuilders[unitID]
+	if builderState == nil then
+		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
+		allBuilders[unitID] = true
+	elseif not builderState then
+		-- We expressly removed this from GBC (while it was still a nanoframe?)
+		return false
+	end
+	allBuilders[unitID] = true
+
+	if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
+		includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
+	else -- otherwise we mark it as idle
+		includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
+	end
+	UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
+
+	if doInitialCheck then
+		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
+		local _,_,nanoframe = spGetUnitIsStunned(unitID)
+		if not nanoframe then
+			includedBuilders[unitID].cmdtype = commandType.idle
+			return -- don't apply constructor separator to commanders
+		end
+	end
+
+	return true
+end
+
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if not unitTeam == myTeamID then
 		return -- if it's not our unit then ignore it!
-	end
-
-	-- update territory info when new mexes are created.
-	if unitDefID == Mex_ID then
-		local x, _, z = spGetUnitPosition(unitID)
-		territoryPos.x = territoryPos.x + x
-		territoryPos.z = territoryPos.z + z
-		territoryCount = territoryCount + 1
-		territoryCenter.x = territoryPos.x/territoryCount
-		territoryCenter.z = territoryPos.z/territoryCount
 	end
 
 	if busyUnits[builderID] then -- if the builder is one of our busy workers
@@ -497,19 +517,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	end
 
-	-- add new workers to the tracking group, and commanders to includedBuilders.
-	local ud = UnitDefs[unitDefID]
-	if ud.isMobileBuilder then -- if the new unit is a mobile builder
-		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
-		allBuilders[unitID] = true
-		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
-		local _,_,nanoframe = spGetUnitIsStunned(unitID)
-		if not nanoframe then
-			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
-			UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
-			return -- don't apply constructor separator to commanders
-		end
-
+	if UnitGained(unitID, unitDefID) then
 		-- constructor separator
 		if options.separateConstructors.value then -- if constructor separator is enabled
 			local facDef = UnitDefs[spGetUnitDefID(builderID)]
@@ -543,14 +551,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		activeJobs[unitID] = nil
 	end
 
-	-- add new workers to the active workers list if they're GBC-enabled.
-	if allBuilders[unitID] then
-		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
-			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
-		else -- otherwise we mark it as idle
-			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
-		end
-		UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
+	if UnitGained(unitID, unitDefID, unitTeam) then
 		newBuilders[unitID] = true
 	end
 end
@@ -609,15 +610,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 		return -- if it doesn't involve us, don't do anything.
 	end
 
-	local ud = UnitDefs[unitDefID]
-	if ud.isMobileBuilder then -- if the new unit is a mobile builder
-		allBuilders[unitID] = true
-		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
-			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
-		else -- otherwise we mark it as idle
-			includedBuilders[unitID] = {cmdtype=commandType.idle, unreachable={}}
-		end
-		UpdateOneWorkerPathing(unitID, includedBuilders, buildQueue) -- then precalculate pathing info
+	if UnitGained(unitID, unitDefID, newTeam) then
 		GiveWorkToUnit(unitID)
 	end
 end
