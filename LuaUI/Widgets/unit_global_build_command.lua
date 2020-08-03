@@ -568,7 +568,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		movingUnits[unitID] = nil
 		if busyUnits[unitID] then
 			local key = busyUnits[unitID]
-			buildQueue[key].assignedUnits[unitID] = nil
+			UnassignWorker(key, unitID)
 			busyUnits[unitID] = nil
 		end
 	elseif activeJobs[unitID] then
@@ -611,7 +611,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 		if busyUnits[unitID] then
 			local key = busyUnits[unitID]
 			if buildQueue[key] then
-				buildQueue[key].assignedUnits[unitID] = nil
+				UnassignWorker(key, unitID)
 			end
 			busyUnits[unitID] = nil
 		end
@@ -677,7 +677,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		includedBuilders[unitID].cmdtype = commandType.ckn
 		movingUnits[unitID] = frame
 		local key = busyUnits[unitID]
-		buildQueue[key].assignedUnits[unitID] = nil
+		UnassignWorker(key, unitID)
 		busyUnits[unitID] = nil
 	end
 end
@@ -766,7 +766,7 @@ function CommandNotifyTF(unitArray, shift)
 			if includedBuilders[unitID] then -- if it's one of our units
 				if busyUnits[unitID] then -- if the worker is also still on our busy list
 					local key = busyUnits[unitID]
-					buildQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+					UnassignWorker(key, unitID) -- remove it from its current job listing
 					busyUnits[unitID] = nil -- and from busy units
 				end
 
@@ -814,10 +814,10 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, shift)
 			if includedBuilders[unitID] then -- if it's one of our units
 				if busyUnits[unitID] then -- if the worker is also still on our busy list
 					local key = busyUnits[unitID]
-					buildQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+					UnassignWorker(key, unitID) -- remove it from its current job listing
 				end
 				busyUnits[unitID] = hash -- and update its info in busy units
-				buildQueue[hash].assignedUnits[unitID] = true -- add it to the tf/build task so that the building will be correctly identified when created.
+				AssignWorker(hash, unitID) -- add it to the tf/build task so that the building will be correctly identified when created.
 				includedBuilders[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it.
 				movingUnits[unitID] = nil
 			end
@@ -870,11 +870,11 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					return true  -- we return true to take ownership of the command from Spring.
 				else -- for direct orders
 					if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-						buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+						UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
 					end
 					busyUnits[unitID] = hash -- add the worker to our busy list
 					includedBuilders[unitID].cmdtype = commandType.drec -- and mark it as under direct orders
-					buildQueue[hash].assignedUnits[unitID] = true -- add it to the assignment list for its new job
+					AssignWorker(hash, unitID) -- add it to the assignment list for its new job
 					movingUnits[unitID] = nil
 				end
 			elseif id == CMD_REPAIR or id == CMD_RECLAIM or id == CMD_RESURRECT then -- if the command is for repair, reclaim or ressurect
@@ -906,12 +906,12 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						return true -- capture the command
 					else -- for direct orders
 						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-							buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+							UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
 						end
 						busyUnits[unitID] = hash -- add the worker to our busy list
 						includedBuilders[unitID].cmdtype = commandType.drec -- and mark it as under direct orders
 						movingUnits[unitID] = nil
-						buildQueue[hash].assignedUnits[unitID] = true -- add it to the assignment list for its new job
+						AssignWorker(hash, unitID) -- add it to the assignment list for its new job
 					end
 				else --otherwise if it was single-target
 					local target = params[1]
@@ -971,11 +971,11 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						return true -- return true to capture it
 					else
 						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-							buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+							UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
 						end
 						includedBuilders[unitID].cmdtype = commandType.drec -- otherwise mark it as under user direction
 						busyUnits[unitID] = hash -- and add it to our busy list for cost calculations
-						buildQueue[hash].assignedUnits[unitID] = true
+						AssignWorker(hash, unitID)
 						movingUnits[unitID] = nil
 					end
 				end
@@ -983,7 +983,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				includedBuilders[unitID].cmdtype = commandType.drec -- then the unit is just marked as under user direction and we let spring handle it.
 				movingUnits[unitID] = nil
 				if busyUnits[unitID] then -- if our unit was interrupted by a direct non-build order while performing a job
-					buildQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+					UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
 					busyUnits[unitID] = nil -- we remove it from the list of workers with building jobs
 				end
 			end
@@ -1015,7 +1015,7 @@ function ApplyState(desiredState)
 				lastCommand[unitID] = nil
 				if busyUnits[unitID] then
 					local key = busyUnits[unitID]
-					buildQueue[key].assignedUnits[unitID] = nil
+					UnassignWorker(key, unitID)
 					busyUnits[unitID] = nil
 				end
 			end
@@ -1069,7 +1069,7 @@ function FindEligibleWorker()
 		-- clean units that don't exist, are dead, or no longer belong to our team..
 			if busyUnits[unitID] then -- if the unit has an assigned job, update bookkeeping
 				local myJob = busyUnits[unitID]
-				buildQueue[myJob].assignedUnits[unitID] = nil
+				UnassignWorker(myJob, unitID)
 				busyUnits[unitID] = nil
 			end
 			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
@@ -1121,7 +1121,7 @@ function GiveWorkToUnit(unitID)
 		-- if we're reassigning, we need to update the entry stored in the queue
 		if buildQueue[lastHash] then
 			-- this was nil sometimes - deleting a terraunit?
-			buildQueue[lastHash].assignedUnits[unitID] = nil
+			UnassignWorker(lastHash, unitID)
 		end
 	end
 	-- if the unit has already been assigned to the same job, we also prevent order spam
@@ -1132,7 +1132,7 @@ function GiveWorkToUnit(unitID)
 			lastCommand[unitID] = frame
 			busyUnits[unitID] = hash -- save the command info for bookkeeping
 			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
+			AssignWorker(hash, unitID) -- save info for CostOfJob and StopAnyWorker
 		else -- ZK-Specific: for combination raise-and-build jobs
 			local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
 			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
@@ -1147,7 +1147,7 @@ function GiveWorkToUnit(unitID)
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD_OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
 			busyUnits[unitID] = hash -- save the command info for bookkeeping
 			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			buildQueue[hash].assignedUnits[unitID] = true
+			AssignWorker(hash, unitID)
 		end -- end zk-specific guard
 	else -- for repair/reclaim/resurrect
 		if not myJob.target then -- for area commands
@@ -1165,12 +1165,12 @@ function GiveWorkToUnit(unitID)
 			end
 			busyUnits[unitID] = hash -- save the command info for bookkeeping
 			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			buildQueue[hash].assignedUnits[unitID] = true
+			AssignWorker(hash, unitID)
 		else -- for single-target commands
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
 			busyUnits[unitID] = hash -- save the command info for bookkeeping
 			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			buildQueue[hash].assignedUnits[unitID] = true
+			AssignWorker(hash, unitID)
 		end
 	end
 end
@@ -1666,7 +1666,7 @@ function CleanBuilders()
 		-- if a unit does not exist, is dead, or no longer belongs to our team..
 			if busyUnits[unitID] then -- if the unit has an assigned job, update bookkeeping
 				local myJob = busyUnits[unitID]
-				buildQueue[myJob].assignedUnits[unitID] = nil
+				UnassignWorker(myJob, unitID)
 				busyUnits[unitID] = nil
 			end
 			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
@@ -1744,7 +1744,7 @@ function CleanOrders(cmd, isNew)
 					movingUnits[blockerID] = frame
 					if busyUnits[blockerID] then -- also remove it from busyUnits if necessary, and remove its assignment listing from buildQueue
 						local key = busyUnits[blockerID]
-						buildQueue[key].assignedUnits[blockerID] = nil
+						UnassignWorker(key, blockerID)
 						busyUnits[blockerID] = nil
 					end
 				end
@@ -1988,4 +1988,12 @@ function StopAnyWorker(key)
 			busyUnits[unit] = nil -- we remove the unit from busyUnits and let Spring handle it until it goes idle on its own.
 		end
 	end
+end
+
+function AssignWorker(key, unitID)
+	buildQueue[key].assignedUnits[unitID] = true
+end
+
+function UnassignWorker(key, unitID)
+	buildQueue[key].assignedUnits[unitID] = nil
 end
