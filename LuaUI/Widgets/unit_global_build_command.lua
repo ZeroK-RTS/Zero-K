@@ -1604,8 +1604,6 @@ function CleanOrders(cmd, isNew)
 	local isClear = true
 	local hash = BuildHash(cmd)
 	if cmd.id < 0 then -- for build orders
-		local xSize --variables for checking queue overlaping
-		local zSize
 		local isNano = false
 		local isObstructed = false
 
@@ -1622,13 +1620,7 @@ function CleanOrders(cmd, isNew)
 		local cz = cmd.z
 		local ch = cmd.h -- building facing
 
-		if ch == 0 or ch == 2 then --get building facing. Reference: unit_prevent_lab_hax.lua by googlefrog
-			xSize = UnitDefs[cmdID].xsize*4
-			zSize = UnitDefs[cmdID].zsize*4
-		else
-			xSize = UnitDefs[cmdID].zsize*4
-			zSize = UnitDefs[cmdID].xsize*4
-		end
+		local xSize, zSize = GetBuildingSize(cmdID, ch)
 
 		local canBuildThisThere,_ = spTestBuildOrder(cmdID,cx,cy,cz,ch) --check if build site is blocked by buildings & terrain
 
@@ -1675,19 +1667,9 @@ function CleanOrders(cmd, isNew)
 			for key,qcmd in pairs(buildQueue) do
 				if qcmd.id < 0 then -- if the command we're looking at is actually a build order
 					local x, z, h = qcmd.x, qcmd.z, qcmd.h
-					local xSize_queue
-					local zSize_queue
-
 					local aqcmd = abs(qcmd.id)
 
-
-					if h == 0 or h == 2 then --get building facing for queued jobs. Reference: unit_prevent_lab_hax.lua by googlefrog
-						xSize_queue = UnitDefs[aqcmd].xsize*4
-						zSize_queue = UnitDefs[aqcmd].zsize*4
-					else
-						xSize_queue = UnitDefs[aqcmd].zsize*4
-						zSize_queue = UnitDefs[aqcmd].xsize*4
-					end
+					local xSize_queue, zSize_queue = GetBuildingSize(aqcmd, h)
 
 					local minTolerance = xSize_queue + xSize -- check minimum tolerance in x direction
 					local axisDist = abs (x - cx) -- check actual separation in x direction
@@ -1792,15 +1774,8 @@ function RemoveJobs(x, z, r)
 			local cx = cmd.x
 			local cz = cmd.z
 			local ch = cmd.h -- building facing
-			local xSize, zSize
+			local xSize, zSize = GetBuildingSize(cmdID, ch)
 
-			if ch == 0 or ch == 2 then --get building facing. Reference: unit_prevent_lab_hax.lua by googlefrog
-				xSize = UnitDefs[cmdID].xsize*4
-				zSize = UnitDefs[cmdID].zsize*4
-			else
-				xSize = UnitDefs[cmdID].zsize*4
-				zSize = UnitDefs[cmdID].xsize*4
-			end
 			 -- get the distances to the four corner vertices of the building footprint
 			local dist1 = Distance(x, z, cx, cz)
 			local dist2 = Distance(x, z, cx+xSize, cz)
@@ -1933,4 +1908,14 @@ function UnassignWorker(key, unitID, cmdtype)
 	if not key then return end
 	busyUnits[unitID] = nil
 	buildQueue[key].assignedUnits[unitID] = nil
+end
+
+-- returns: xSize, zSize
+function GetBuildingSize(unitDefID, heading)
+	local unitDef = UnitDefs[unitDefID]
+	if heading == 0 or heading == 2 then --get building facing for queued jobs. Reference: unit_prevent_lab_hax.lua by googlefrog
+		return unitDef.xsize*4, unitDef.zsize*4
+	else
+		return unitDef.zsize*4, unitDef.xsize*4
+	end
 end
