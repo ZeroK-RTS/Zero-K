@@ -555,20 +555,27 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
--- This function cleans up when workers or building nanoframes are killed
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-	if not unitTeam == myTeamID then
+local function UnitGone(unitID, unitDefID, unitTeam, doRemoveMatchingJobs)
+	if unitTeam ~= myTeamID then
 		return
 	end
 
 	if includedBuilders[unitID] then
 		UnassignWorker(nil, unitID, nil)
 	elseif activeJobs[unitID] then
+		if doRemoveMatchingJobs then
+			-- check if the captured unit was a nanoframe
+			local key = activeJobs[unitID]
+			if buildQueue[key] then
+				StopAnyWorker(key) -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
+			end
+		end
 		activeJobs[unitID] = nil
 	end
 
 	if allBuilders[unitID] then
 		allBuilders[unitID] = nil
+		RenderCleanupUnit(unitID)
 	end
 
 	if unitDefID == Mex_ID then
@@ -586,25 +593,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 	end
 end
 
+-- This function cleans up when workers or building nanoframes are killed
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+	UnitGone(unitID, unitDefID, unitTeam)
+end
+
 -- This function cleans up when workers or nanoframes are captured by an enemy
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-	if unitTeam ~= myTeamID then
-		return -- if it doesn't involve us, don't do anything.
-	end
-	if allBuilders[unitID] then
-		allBuilders[unitID] = nil
-		RenderCleanupUnit(unitID)
-	end
-
-	if includedBuilders[unitID] then
-		UnassignWorker(nil, unitID, nil)
-	elseif activeJobs[unitID] then -- check if the captured unit was a nanoframe
-		local key = activeJobs[unitID]
-		if buildQueue[key] then
-			StopAnyWorker(key) -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
-		end
-		activeJobs[unitID] = nil
-	end
+	UnitGone(unitID, unitDefID, unitTeam)
 end
 
 -- This function adds new workers when they are captured from the enemy.
