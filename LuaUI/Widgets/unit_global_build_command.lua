@@ -2421,7 +2421,7 @@ function RemoveJobs(x, z, r)
 					local udid = spGetUnitDefID(target)
 					local unitDef = UnitDefs[udid]
 					if unitDID == terraunitDefID then
-						spGiveOrderToUnit(target, 65, EMPTY_TABLE, 0)
+						spGiveOrderToUnit(target, CMD.SELFD, EMPTY_TABLE, 0)
 					end
 				end
 			end
