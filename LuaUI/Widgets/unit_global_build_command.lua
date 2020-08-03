@@ -2390,9 +2390,9 @@ function RemoveJobs(x, z, r)
 				zSize = UnitDefs[cmdID].xsize*4
 			end
 			 -- get the distances to the four corner vertices of the building footprint
-			local dist1 = Distance(x, z, cx, cz)
-			local dist2 = Distance(x, z, cx+xSize, cz)
-			local dist3 = Distance(x, z, cx, cz+zSize)
+			local dist1 = Distance(x, z, cx-xSize, cz-zSize)
+			local dist2 = Distance(x, z, cx+xSize, cz-zSize)
+			local dist3 = Distance(x, z, cx-xSize, cz+zSize)
 			local dist4 = Distance(x, z, cx+xSize, cz+zSize)
 			
 			if dist1 < r or dist2 < r or dist3 < r or dist4 < r then -- if any of the corners falls within the radius, then mark the job for removal
