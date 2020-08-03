@@ -237,6 +237,7 @@ local CMD_RECLAIM   = CMD.RECLAIM
 local CMD_STOP      = CMD.STOP
 local CMD_OPT_ALT   = CMD.OPT_ALT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_SELFD     = 65 -- See: rts/Sim/Units/CommandAI/Command.h
 
 local abs  = math.abs
 local sqrt = math.sqrt
@@ -1808,7 +1809,7 @@ function RemoveJobs(x, z, r)
 					inRadius = true
 					local udid = spGetUnitDefID(target)
 					if udid == Terraunit_ID then -- if the target was a 'terraunit', self-destruct it
-						spGiveOrderToUnit(target, 65, EMPTY_TABLE, 0)
+						spGiveOrderToUnit(target, CMD_SELFD, EMPTY_TABLE, 0)
 					end
 				end
 			end
