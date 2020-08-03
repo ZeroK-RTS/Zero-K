@@ -492,7 +492,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if myCmd.q then -- if given with 'start-only', then cancel the job as soon as it's started
 			StopAnyWorker(key)
-			buildQueue[key] = nil
 		else -- otherwise track the unitID in activeJobs so that UnitFinished can remove it from the queue
 			activeJobs[unitID] = key
 		end
@@ -540,7 +539,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		local key = activeJobs[unitID]
 		if buildQueue[key] then
 			StopAnyWorker(key)
-			buildQueue[key] = nil
 		end
 		activeJobs[unitID] = nil
 	end
@@ -603,8 +601,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	elseif activeJobs[unitID] then -- check if the captured unit was a nanoframe
 		local key = activeJobs[unitID]
 		if buildQueue[key] then
-			StopAnyWorker(key)
-			buildQueue[key] = nil -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
+			StopAnyWorker(key) -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
 		end
 		activeJobs[unitID] = nil
 	end
@@ -887,26 +884,22 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 							local inverseHash = BuildHash({id=CMD_REPAIR, target=target})
 							if buildQueue[inverseHash] then
 								StopAnyWorker(inverseHash)
-								buildQueue[inverseHash] = nil
 							end
 							inverseHash = BuildHash({id=CMD_RESURRECT, target=target})
 							if buildQueue[inverseHash] then
 								StopAnyWorker(inverseHash)
-								buildQueue[inverseHash] = nil
 							end
 							local ux,_,uz = spGetUnitPosition(target)
 							local udID = spGetUnitDefID(target)
 							inverseHash = BuildHash({id=-udID, x=ux, z=uz})
 							if buildQueue[inverseHash] then
 								StopAnyWorker(inverseHash)
-								buildQueue[inverseHash] = nil
 							end
 						elseif id == CMD_RESURRECT or id == CMD_REPAIR then
 							-- A resurect or repair command cancels jobs to reclaim that target.
 							local inverseHash = BuildHash({id=CMD_RECLAIM, target=target})
 							if buildQueue[inverseHash] then
 								StopAnyWorker(inverseHash)
-								buildQueue[inverseHash] = nil
 							end
 						end
 					end
@@ -919,7 +912,6 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						end
 					elseif options.shift then -- if it was already on the queue, and given with shift then cancel it
 						StopAnyWorker(hash)
-						buildQueue[hash] = nil
 					end
 
 					-- note: area repair/reclaim/resurrect commands are add only, and do not cancel anything if used twice on the same targets.
@@ -1477,8 +1469,7 @@ function CheckIdlers()
 						local key = busyUnits[unitID]
 						if areaCmdList[key] then -- if it was an area command
 							areaCmdList[key] = nil -- remove it from the area update list
-							StopAnyWorker(key)
-							buildQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
+							StopAnyWorker(key) -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
 							busyUnits[unitID] = nil
 						end
 					end
@@ -1658,7 +1649,6 @@ function CleanOrders(cmd, isNew)
 			if isObstructed and not isNano then -- note, we need to wait until ALL obstructions have been accounted for before cleaning up blocked jobs, or else we may not correctly identify the nanoframe if it's the main obstructor.
 				if buildQueue[hash] then
 					StopAnyWorker(hash)
-					buildQueue[hash] = nil
 				end
 				isClear = false
 			end
@@ -1680,7 +1670,6 @@ function CleanOrders(cmd, isNew)
 						if axisDist < minTolerance then -- if too close in z direction
 							-- then there is overlap and we should remove the old job from the queue.
 							StopAnyWorker(key)
-							buildQueue[key] = nil
 							isClear = false
 						end
 					end
@@ -1701,7 +1690,6 @@ function CleanOrders(cmd, isNew)
 			end
 			if not good then -- if our target is no longer valid, or has full hp
 				StopAnyWorker(hash)
-				buildQueue[hash] = nil
 				isClear = false
 			end
 		else -- for reclaim and resurrect orders
@@ -1719,7 +1707,6 @@ function CleanOrders(cmd, isNew)
 				end
 			elseif cmd.id == CMD_RESURRECT then -- otherwise if there are no units that can resurrect in our group, remove res orders
 				StopAnyWorker(hash)
-				buildQueue[hash] = nil
 				return false
 			end
 
@@ -1735,7 +1722,6 @@ function CleanOrders(cmd, isNew)
 			end
 			if not good then -- if our target no longer exists, ie fully reclaimed or resurrected
 				StopAnyWorker(hash)
-				buildQueue[hash] = nil
 				isClear = false
 			end
 		end
@@ -1815,8 +1801,7 @@ function RemoveJobs(x, z, r)
 			end
 		end
 		if inRadius then -- if the job was inside of our circle
-			StopAnyWorker(key) -- release any workers assigned to the job
-			buildQueue[key] = nil -- and remove it from the queue
+			StopAnyWorker(key) -- release any workers assigned to the job and remove it from the queue
 			areaCmdList[key] = nil -- and from area commands
 		end
 	end
@@ -1876,6 +1861,7 @@ function StopAnyWorker(key)
 			busyUnits[unit] = nil -- we remove the unit from busyUnits and let Spring handle it until it goes idle on its own.
 		end
 	end
+	buildQueue[key] = nil
 end
 
 -- Marks a worker as assigned to one of our jobs.
