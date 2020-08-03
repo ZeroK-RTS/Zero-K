@@ -1242,10 +1242,10 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 			else
 				cost = distance + (200 * costMod)
 			end
-		elseif job.id == CMD_REPAIR or job.id == CMD_RECLAIM then -- for reclaim
+		elseif job.id == CMD_RECLAIM then -- for reclaim
 			cost = distance + (200 * costMod)
-		else -- for all other small build jobs
-			cost = distance + (600 * costMod)
+		else
+			cost = distance + (600 * costMod) -- for all other jobs, assist is expensive
 		end
 	end
 	return cost
