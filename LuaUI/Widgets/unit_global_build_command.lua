@@ -709,7 +709,7 @@ function widget:CommandsChanged()
 	end
 end
 
---  A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
+--  A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific)
 function CommandNotifyPreQue(unitID)
 	if includedBuilders[unitID] then
 		includedBuilders[unitID].cmdtype = commandType.drec
@@ -1911,7 +1911,7 @@ end
 function UnassignWorker(key, unitID, cmdtype)
 	movingUnits[unitID] = nil
 	if cmdtype == commandType.idle then
-		reassignedUnits[unitID] = nil -- and remove them from our reassigned units list, so that they will be immediately processed
+		reassignedUnits[unitID] = nil -- Remove them from our reassigned units list, so that they will be immediately processed
 	end
 	if not cmdtype then
 		-- Destroy ALL state tracking this builder (except allBuilders?)
