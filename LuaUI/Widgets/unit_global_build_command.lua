@@ -1113,6 +1113,7 @@ function GiveWorkToUnit(unitID)
 					break
 				end
 			end
+			lastCommand[unitID] = frame
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD_OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
 			AssignWorker(hash, unitID, commandType.buildQueue)
 		end -- end zk-specific guard
