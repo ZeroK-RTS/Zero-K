@@ -1101,7 +1101,9 @@ local function TryJobCandidate(unitID, ux, uz, hash, job, doCheckReachable)
 	end
 
 	local CostFunction = options.intellicost.value and IntelliCost or FlatCost
-	return CostFunction(unitID, hash, ux, uz, jx, jz), jx, jz
+	local cost, distance = CostFunction(unitID, hash, ux, uz, jx, jz)
+
+	return cost, distance
 end
 
 -- This function returns the cheapest job for a given worker, given the cost model implemented in CostOfJob().
@@ -1131,7 +1133,7 @@ function FindCheapestJob(unitID)
 	end
 
 	for hash, tmpJob in pairs(buildQueue) do -- here we compare our unit to each job in the queue
-		local cost, jx, jz = TryJobCandidate(unitID, ux, uz, hash, tmpJob, true)
+		local cost, dist = TryJobCandidate(unitID, ux, uz, hash, tmpJob, true)
 		if cost and cost < cachedCost then -- then if there is no cached job or if tmpJob is cheaper, replace the cached job with tmpJob and update the cost
 			cachedJob = tmpJob
 			cachedCost = cost
@@ -1143,25 +1145,7 @@ end
 -- This function implements the 'intelligent' cost model for assigning jobs.
 function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local job = buildQueue[hash]
-	local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
-
-	local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
-
-	-- note we only count workers that are roughly closer/equal distance to the job,
-	-- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
-	-- at the same time. You probably should not change this, since it accounts for a lot of edge cases
-	-- but does not directly determine the behavior.
-	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
-		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
-			local ix, _, iz = spGetUnitPosition(unit)
-			local idist = Distance(ix, iz, jx, jz)
-			local rdist = max(distance, 200) -- round distance up to 200, to equalize priority at small distances
-			local deltadist = abs(idist - distance) -- calculate the absolute difference in distance, for considering large distances
-			if idist < rdist or (distance > 500 and deltadist < 500) then -- and for each one that is rounded closer/equal-dist to the job vs our worker, we increment our cost weight.
-				costMod = costMod + 1 -- this way we naturally prioritize closer workers so that more distant workers won't kick us off an otherwise efficient job.
-			end
-		end
-	end
+	local jobID = job.id
 
 	-- The following cost calculation produces a number of different effects:
 
@@ -1190,65 +1174,25 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	-- Metal cost for "expensive" jobs is also based on Zero-K scaling, so you may want to adjust that if porting.
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 
-	local cost
-	local unitDef = nil
-	local unitDefID
-	if job.id < 0 then
-		unitDefID = abs(job.id)
-		unitDef = UnitDefs[unitDefID]
-	end
-	local metalCost = false
-
-	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.metalCost
-	end
-
-	if costMod == 1 then -- for starting new jobs
-		if (metalCost and metalCost > 300) then -- for expensive jobs
-			cost = (distance/sqrt(sqrt(distance))) + 400
-		elseif job.id == CMD_RECLAIM then -- for reclaim
-			cost = distance + 400
-		elseif job.id == CMD_REPAIR then -- for repair
-			if job.target then
-				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
-					cost = distance - 150
-				else
-					cost = distance + 400
-				end
-			else
-				cost = distance + 400
-			end
-		elseif (unitDef and unitDef.reloadTime > 0) or job.id == CMD_RESURRECT then -- for small defenses and resurrect
+	local cost, distance, unitDefID, costMod, isExpensive, isSmallPorc = FlatCost(unitID, hash, ux, uz, jx, jz)
+	if isSmallPorc then
+		cost = cost - 150
+	elseif costMod == 1 then -- new job
+		if isExpensive then
+			cost = distance/sqrt(sqrt(distance)) + 400
+		elseif jobID == CMD_RESURRECT then -- Prioritise resurrection
 			cost = distance - 150
-		elseif unitDef and (unitDefID == Solar_ID or unitDefID == Wind_ID) then -- for small energy
+		elseif unitDefID == Solar_ID or unitDefID == Wind_ID then -- Prioritise mexes over small energy
 			cost = distance + 100
-		else -- for resurrect and all other small build jobs
-			cost = distance
 		end
-	else -- for assisting other workers
-		if (metalCost and metalCost > 300) or job.id == CMD_RESURRECT then -- for expensive buildings and resurrect
-			cost = (distance/2) + (200 * (costMod - 2))
-		elseif unitDef and (unitDefID == Caretaker_ID or unitDef.reloadTime > 0) then -- for small defenses and caretakers, allow up to two workers before increasing cost
-			cost = distance - 150 + (800 * (costMod - 2))
-		elseif job.id == CMD_REPAIR then -- for repair
-			if job.target then
-				unitDef = UnitDefs[spGetUnitDefID(job.target)]
-				if unitDef.isImmobile and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
-					cost = distance - 150 + (800 * (costMod - 2))
-				else
-					cost = distance + (200 * costMod)
-				end
-			else
-				cost = distance + (200 * costMod)
-			end
-		elseif job.id == CMD_RECLAIM then -- for reclaim
-			cost = distance + (200 * costMod)
-		else
-			cost = distance + (600 * costMod) -- for all other jobs, assist is expensive
+	else -- assisting other workers
+		if isExpensive or jobID == CMD_RESURRECT then
+			cost = distance/2 + 200 * (costMod - 2)
+		elseif unitDefID == Caretaker_ID then -- allow up to two builders to build caretakers before penalty
+			cost = distance - 150 + 800 * (costMod - 2)
 		end
 	end
-	return cost
+	return cost, distance, unitDefID, costMod, isExpensive, isSmallPorc
 end
 
 -- This function implements the 'flat' cost model for assigning jobs.
@@ -1294,14 +1238,24 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 
 	local cost
 	local unitDef = nil
+	local unitDefID = nil
 	if job.id < 0 then
-		unitDef = UnitDefs[abs(job.id)]
+		unitDefID = abs(job.id)
+		unitDef = UnitDefs[unitDefID]
+	elseif job.id == CMD_REPAIR then
+		unitDefID = job.target
+		unitDef = UnitDefs[unitDefID]
 	end
-	local metalCost = false
+	local isExpensive = false
 
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = unitDef.metalCost
+		local metalCost = unitDef.metalCost
+		if metalCost > 300 then
+			isExpensive = true
+		end
 	end
+
+	local isSmallPorc = (not isExpensive) and unitDef and unitDef.reloadTime > 0
 
 	if costMod == 1 then -- for starting new jobs
 		if job.id == CMD_REPAIR or job.id == CMD_RECLAIM then -- for repair and reclaim
@@ -1310,9 +1264,9 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 			cost = distance
 		end
 	else -- for assisting other workers
-		if (metalCost and metalCost > 300) or job.id == CMD_RESURRECT then -- for expensive jobs and resurrect, no mobbing penalty
+		if isExpensive or job.id == CMD_RESURRECT then -- for expensive jobs and resurrect, no mobbing penalty
 			cost = distance
-		elseif unitDef and unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+		elseif isSmallPorc then -- for small defenses, allow up to two workers before increasing cost
 			cost = distance + (800 * (costMod - 2))
 		elseif job.id == CMD_REPAIR or job.id == CMD_RECLAIM then -- for repair and reclaim
 			cost = distance + (200 * costMod)
@@ -1320,7 +1274,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 			cost = distance + (600 * costMod) -- for all other jobs, assist is expensive
 		end
 	end
-	return cost
+	return cost, distance, unitDefID, costMod, isExpensive, isSmallPorc
 end
 
 -- This function checks if our group includes a unit that can resurrect
