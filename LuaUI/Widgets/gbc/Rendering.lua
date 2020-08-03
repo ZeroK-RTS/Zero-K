@@ -89,39 +89,56 @@ HOW THIS WORKS:
 		directly, since it's used to draw 3 different icon types.
 ]]--
 
+local lastDrawIconsValue = nil
+
+local lastUnitCmdTypeByUnit = {}
+
 -- Run pre-draw visibility checks, and sort buildQueue for drawing.
 function RenderUpdate(dt, includedBuilders, allBuilders, buildQueue)
 	-- update icons for builders
-	if options.drawIcons.value then
-		WG.icons.SetDisplay('gbcicon', true)
-		WG.icons.SetDisplay('gbcidle', true)
-		for unitID, included in pairs(allBuilders) do
-			if included and includedBuilders[unitID] then
-				local myCmd = includedBuilders[unitID]
-				if myCmd.cmdtype == commandType.idle then
-					WG.icons.SetUnitIcon(unitID, idle_icon)
-					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle/chicken icons
-				elseif myCmd.cmdtype == commandType.ckn then
-					WG.icons.SetUnitIcon(unitID, chicken_icon)
-					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle/chicken icons
-				elseif myCmd.cmdtype == commandType.buildQueue then
-					WG.icons.SetUnitIcon(unitID, queue_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				elseif myCmd.cmdtype == commandType.mov then
-					WG.icons.SetUnitIcon(unitID, move_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				else
-					WG.icons.SetUnitIcon(unitID, drec_icon)
-					WG.icons.SetUnitIcon(unitID, noidle_icon)
-				end
-			else
+	local newOptionsDrawIconsValue = options.drawIcons.value
+	if newOptionsDrawIconsValue ~= lastDrawIconsValue then
+		lastDrawIconsValue = newOptionsDrawIconsValue
+		if newOptionsDrawIconsValue then
+			WG.icons.SetDisplay('gbcicon', true)
+			WG.icons.SetDisplay('gbcidle', true)
+		else
+			WG.icons.SetDisplay('gbcicon', false)
+			WG.icons.SetDisplay('gbcidle', false)
+		end
+	end
+
+	for unitID, included in pairs(allBuilders) do
+		local newUnitCmdType = "unincluded"
+		if included and includedBuilders[unitID] then
+			local myCmd = includedBuilders[unitID]
+			newUnitCmdType = myCmd.cmdtype
+		end
+		local lastUnitCmdType = lastUnitCmdTypeByUnit[unitID]
+		if newUnitCmdType ~= lastUnitCmdType then
+			lastUnitCmdTypeByUnit[unitID] = newUnitCmdType
+			if newUnitCmdType == commandType.idle then
+				WG.icons.SetUnitIcon(unitID, idle_icon)
+				WG.icons.SetUnitIcon(unitID, no_icon)
+			elseif newUnitCmdType == commandType.ckn then
+				WG.icons.SetUnitIcon(unitID, chicken_icon)
+				WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle/chicken icons
+			elseif newUnitCmdType == commandType.buildQueue then
+				WG.icons.SetUnitIcon(unitID, queue_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			elseif newUnitCmdType == commandType.mov then
+				WG.icons.SetUnitIcon(unitID, move_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			elseif newUnitCmdType == commandType.drec then
+				WG.icons.SetUnitIcon(unitID, drec_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			elseif newUnitCmdType == "unincluded" then
 				WG.icons.SetUnitIcon(unitID, no_icon)
 				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			else
+				WG.Debug.Yell('GBC:RenderUpdate: newUnitCmdType', newUnitCmdType, 'is not handled')
 			end
 		end
-	else
-		WG.icons.SetDisplay('gbcicon', false)
-		WG.icons.SetDisplay('gbcidle', false)
 	end
 
 	buildList = {}
@@ -325,4 +342,5 @@ end
 function RenderCleanupUnit(unitID)
 	WG.icons.SetUnitIcon(unitID, no_icon)
 	WG.icons.SetUnitIcon(unitID, noidle_icon)
+	lastUnitCmdTypeByUnit[unitID] = nil
 end
