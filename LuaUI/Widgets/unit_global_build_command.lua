@@ -1010,17 +1010,13 @@ function FindEligibleWorker()
 			-- remove the unit from the list of constructors
 			UnassignWorker(nil, unitID, nil)
 		elseif myCmd.cmdtype == commandType.idle and not reassignedUnits[unitID] then -- first we assign idle units
-			reassignedUnits[unitID] = true
 			return unitID
 		end
 	end
 	--if there are no idlers available, reassign an already assigned unit to see if there is a better job it can be doing.
 	for unitID,cmdstate in pairs(includedBuilders) do
-		if (not reassignedUnits[unitID]) then
-			if cmdstate.cmdtype == commandType.buildQueue then
-				reassignedUnits[unitID] = true
-				return unitID
-			end
+		if (not reassignedUnits[unitID]) and cmdstate.cmdtype == commandType.buildQueue then
+			return unitID
 		end
 	end
 	reassignedUnits = {} --no more unit to be reassigned? then reset list
@@ -1029,6 +1025,7 @@ end
 
 -- This function finds work for all the workers compiled in our eligible worker list and issues the orders.
 function GiveWorkToUnit(unitID)
+	reassignedUnits[unitID] = true -- We have tried to give this unit work, so don't try to reassign it right away.
 	local myJob = FindCheapestJob(unitID) -- find the cheapest job
 	if not myJob then
 		-- Nothing to do, mark us as idle
@@ -1469,20 +1466,19 @@ function CheckIdlers()
 			-- we need to check that the unit's command queue is empty, because other gadgets may invoke UnitIdle erroneously.
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
 			if spGetCommandQueue(unitID, 0) == 0 then
-				includedBuilders[unitID].cmdtype = commandType.idle -- then mark it as idle
+				-- If we were previously busy, store the old key before we clear it
+				local wasBusyJob = busyUnits[unitID]
+				UnassignWorker(nil, unitID, commandType.idle) -- then mark it as idle
 				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
 					newBuilders[unitID] = nil
 					GiveWorkToUnit(unitID)
-					reassignedUnits[unitID] = true
 				else
-					reassignedUnits[unitID] = nil
 					movingUnits[unitID] = nil
-					if busyUnits[unitID] then -- if the worker is also still on our busy list
-						local key = busyUnits[unitID]
-						if areaCmdList[key] then -- if it was an area command
-							areaCmdList[key] = nil -- remove it from the area update list
-							StopAnyWorker(key)
-							buildQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
+					if wasBusyJob then -- if the worker was also still on our busy list
+						if areaCmdList[wasBusyJob] then -- if it was an area command
+							areaCmdList[wasBusyJob] = nil -- remove it from the area update list
+							StopAnyWorker(wasBusyJob)
+							buildQueue[wasBusyJob] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
 							busyUnits[unitID] = nil
 						end
 					end
@@ -1509,8 +1505,7 @@ function CheckMovingUnits()
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {CMD_RAW_MOVE}, CMD_OPT_ALT) -- remove the current order
 				-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
 				spGiveOrderToUnit(unitID, CMD_STOP, EMPTY_TABLE, 0) -- and replace it with a stop order
-				includedBuilders[unitID].cmdtype = commandType.idle
-				reassignedUnits[unitID] = nil
+				UnassignWorker(nil, unitID, commandType.idle)
 			end
 		else -- for units that are actually dead, etc.
 			movingUnits[unitID] = nil
@@ -1895,9 +1890,7 @@ function StopAnyWorker(key)
 			-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
 			spGiveOrderToUnit(unit, CMD_STOP, EMPTY_TABLE, 0) -- and replace it with a stop order
 			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we also have to use CMD_REMOVE here.
-			includedBuilders[unit].cmdtype = commandType.idle -- mark them as idle
-			busyUnits[unit] = nil -- remove their entries from busyUnits, since the job is done
-			reassignedUnits[unit] = nil -- and remove them from our reassigned units list, so that they will be immediately processed
+			UnassignWorker(nil, unit, commandType.idle) -- mark them as idle
 		else -- otherwise for units under drec
 			busyUnits[unit] = nil -- we remove the unit from busyUnits and let Spring handle it until it goes idle on its own.
 		end
@@ -1917,6 +1910,9 @@ end
 -- when cmdtype is nil, removes all state related to the unit.
 function UnassignWorker(key, unitID, cmdtype)
 	movingUnits[unitID] = nil
+	if cmdtype == commandType.idle then
+		reassignedUnits[unitID] = nil -- and remove them from our reassigned units list, so that they will be immediately processed
+	end
 	if not cmdtype then
 		-- Destroy ALL state tracking this builder (except allBuilders?)
 		includedBuilders[unitID] = nil
