@@ -563,14 +563,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 	end
 
 	if includedBuilders[unitID] then
-		includedBuilders[unitID] = nil
-		lastCommand[unitID] = nil
-		movingUnits[unitID] = nil
-		if busyUnits[unitID] then
-			local key = busyUnits[unitID]
-			UnassignWorker(key, unitID)
-			busyUnits[unitID] = nil
-		end
+		UnassignWorker(nil, unitID, nil)
 	elseif activeJobs[unitID] then
 		activeJobs[unitID] = nil
 	end
@@ -605,16 +598,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	end
 
 	if includedBuilders[unitID] then
-		includedBuilders[unitID] = nil
-		lastCommand[unitID] = nil
-		movingUnits[unitID] = nil
-		if busyUnits[unitID] then
-			local key = busyUnits[unitID]
-			if buildQueue[key] then
-				UnassignWorker(key, unitID)
-			end
-			busyUnits[unitID] = nil
-		end
+		UnassignWorker(nil, unitID, nil)
 	elseif activeJobs[unitID] then -- check if the captured unit was a nanoframe
 		local key = activeJobs[unitID]
 		if buildQueue[key] then
@@ -674,11 +658,8 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		spGiveOrderToUnit(unitID, CMD_STOP, EMPTY_TABLE, 0)
 		local y = spGetGroundHeight(territoryCenter.x, territoryCenter.z)
 		spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {territoryCenter.x, y, territoryCenter.z}, 0)
-		includedBuilders[unitID].cmdtype = commandType.ckn
+		UnassignWorker(nil, unitID, commandType.ckn)
 		movingUnits[unitID] = frame
-		local key = busyUnits[unitID]
-		UnassignWorker(key, unitID)
-		busyUnits[unitID] = nil
 	end
 end
 
@@ -764,14 +745,8 @@ function CommandNotifyTF(unitArray, shift)
 		for i=1, #unitArray do
 			local unitID = unitArray[i]
 			if includedBuilders[unitID] then -- if it's one of our units
-				if busyUnits[unitID] then -- if the worker is also still on our busy list
-					local key = busyUnits[unitID]
-					UnassignWorker(key, unitID) -- remove it from its current job listing
-					busyUnits[unitID] = nil -- and from busy units
-				end
-
-				includedBuilders[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
-				movingUnits[unitID] = nil
+				-- mark our unit as under direct orders and let gui_lasso_terraform handle it
+				UnassignWorker(nil, unitID, commandType.drec)
 			end
 		end
 	end
@@ -955,12 +930,8 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					end
 				end
 			else -- if the order is not for build-power related things, ex move orders
-				includedBuilders[unitID].cmdtype = commandType.drec -- then the unit is just marked as under user direction and we let spring handle it.
-				movingUnits[unitID] = nil
-				if busyUnits[unitID] then -- if our unit was interrupted by a direct non-build order while performing a job
-					UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
-					busyUnits[unitID] = nil -- we remove it from the list of workers with building jobs
-				end
+				-- then the unit is just marked as under user direction and we let spring handle it.
+				UnassignWorker(nil, unitID, commandType.drec)
 			end
 		end
 	end
@@ -986,13 +957,7 @@ function ApplyState(desiredState)
 				end
 			elseif includedBuilders[unitID] then
 				-- newly disabled
-				includedBuilders[unitID] = nil
-				lastCommand[unitID] = nil
-				if busyUnits[unitID] then
-					local key = busyUnits[unitID]
-					UnassignWorker(key, unitID)
-					busyUnits[unitID] = nil
-				end
+				UnassignWorker(nil, unitID, nil)
 			end
 		end
 	end
@@ -1041,14 +1006,9 @@ HOW THIS WORKS:
 function FindEligibleWorker()
 	for unitID,myCmd in pairs(includedBuilders) do
 		if not spValidUnitID(unitID) or spUnitIsDead(unitID) or spGetUnitTeam(unitID) ~= myTeamID then
-		-- clean units that don't exist, are dead, or no longer belong to our team..
-			if busyUnits[unitID] then -- if the unit has an assigned job, update bookkeeping
-				local myJob = busyUnits[unitID]
-				UnassignWorker(myJob, unitID)
-				busyUnits[unitID] = nil
-			end
-			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
-			lastCommand[unitID] = nil
+			-- clean units that don't exist, are dead, or no longer belong to our team..
+			-- remove the unit from the list of constructors
+			UnassignWorker(nil, unitID, nil)
 		elseif myCmd.cmdtype == commandType.idle and not reassignedUnits[unitID] then -- first we assign idle units
 			reassignedUnits[unitID] = true
 			return unitID
@@ -1627,14 +1587,9 @@ end
 function CleanBuilders()
 	for unitID,_ in pairs(includedBuilders) do
 		if not spValidUnitID(unitID) or spUnitIsDead(unitID) or spGetUnitTeam(unitID) ~= myTeamID then
-		-- if a unit does not exist, is dead, or no longer belongs to our team..
-			if busyUnits[unitID] then -- if the unit has an assigned job, update bookkeeping
-				local myJob = busyUnits[unitID]
-				UnassignWorker(myJob, unitID)
-				busyUnits[unitID] = nil
-			end
-			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
-			lastCommand[unitID] = nil
+			-- if a unit does not exist, is dead, or no longer belongs to our team..
+			-- remove the unit from the list of constructors
+			UnassignWorker(nil, unitID, nil)
 		end
 	end
 end
@@ -1704,13 +1659,8 @@ function CleanOrders(cmd, isNew)
 					dx = dx*75
 					dz = dz*75
 					spGiveOrderToUnit(blockerID, CMD_RAW_MOVE, {x+dx, y, z+dz}, 0) -- move it out of the way
-					includedBuilders[blockerID].cmdtype = commandType.mov -- and mark it with a special state so the move order doesn't get clobbered
+					UnassignWorker(nil, blockerID, commandType.mov) -- and mark it with a special state so the move order doesn't get clobbered
 					movingUnits[blockerID] = frame
-					if busyUnits[blockerID] then -- also remove it from busyUnits if necessary, and remove its assignment listing from buildQueue
-						local key = busyUnits[blockerID]
-						UnassignWorker(key, blockerID)
-						busyUnits[blockerID] = nil
-					end
 				end
 			end
 
@@ -1945,9 +1895,7 @@ function StopAnyWorker(key)
 			-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
 			spGiveOrderToUnit(unit, CMD_STOP, EMPTY_TABLE, 0) -- and replace it with a stop order
 			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we also have to use CMD_REMOVE here.
-			includedBuilders[unit].cmdtype = commandType.idle -- mark them as idle
-			busyUnits[unit] = nil -- remove their entries from busyUnits, since the job is done
-			reassignedUnits[unit] = nil -- and remove them from our reassigned units list, so that they will be immediately processed
+			UnassignWorker(nil, unit, commandType.idle) -- mark them as idle
 		else -- otherwise for units under drec
 			busyUnits[unit] = nil -- we remove the unit from busyUnits and let Spring handle it until it goes idle on its own.
 		end
@@ -1955,18 +1903,37 @@ function StopAnyWorker(key)
 end
 
 -- Marks a worker as assigned to one of our jobs.
--- cmdType is commandType.drec when this assignment came from a direct order.
--- cmdType is commandType.buildQueue when this assignment was automatic.
-function AssignWorker(key, unitID, cmdType)
-	UnassignWorker(nil, unitID)
+-- cmdtype is commandType.drec when this assignment came from a direct order.
+-- cmdtype is commandType.buildQueue when this assignment was automatic.
+function AssignWorker(key, unitID, cmdtype)
+	UnassignWorker(nil, unitID, cmdtype)
 	busyUnits[unitID] = key
-	includedBuilders[unitID].cmdType = cmdType
 	buildQueue[key].assignedUnits[unitID] = true
-	movingUnits[unitID] = nil
 end
 
-function UnassignWorker(key, unitID)
+-- Marks a worker as not assigned to one of our jobs.
+-- when cmdtype is nil, removes all state related to the unit.
+function UnassignWorker(key, unitID, cmdtype)
+	movingUnits[unitID] = nil
+	if not cmdtype then
+		-- Destroy ALL state tracking this builder (except allBuilders?)
+		includedBuilders[unitID] = nil
+		-- We don't remove from idlers, since CheckIdlers explicitly handles removal via includedBuilders check.
+		lastCommand[unitID] = nil
+		-- allBuilders is handled separately. While often this branch is taken
+		--   when a builder is destroyed or otherwise removed, we can also
+		--   expressly ask for a builder to not be under GBC control.
+		-- newBuilders retains units only very briefly.
+		-- However, CheckIdlers only processes a unit if includedBuilders is not nil.
+		-- This would leak a very small amount every time a builder was killed
+		-- almost immediately after being created.
+		newBuilders[unitID] = nil
+		-- reassignedUnits resets itself regularly
+	else
+		includedBuilders[unitID].cmdtype = cmdtype
+	end
 	if not key then key = busyUnits[unitID] end
 	if not key then return end
+	busyUnits[unitID] = nil
 	buildQueue[key].assignedUnits[unitID] = nil
 end
