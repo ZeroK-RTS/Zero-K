@@ -709,7 +709,7 @@ function widget:CommandsChanged()
 	end
 end
 
---  A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
+--  A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific)
 function CommandNotifyPreQue(unitID)
 	if includedBuilders[unitID] then
 		includedBuilders[unitID].cmdtype = commandType.drec
