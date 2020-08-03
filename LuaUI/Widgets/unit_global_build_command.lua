@@ -289,7 +289,7 @@ function widget:Initialize()
 			local ud = UnitDefs[unitDefID]
 			local _,_,nanoframe = spGetUnitIsStunned(uid)
 			if ud.isMobileBuilder then -- if the unit is a mobile builder
-				allBuilders[uid] = {include=true} -- add it to the group of all workers
+				allBuilders[uid] = true -- add it to the group of all workers
 
 				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
 					if spGetCommandQueue(uid, 0) ~= 0 then -- if so we mark it as drec
@@ -501,7 +501,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder then -- if the new unit is a mobile builder
 		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
-		allBuilders[unitID] = {include=true}
+		allBuilders[unitID] = true
 		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
 		local _,_,nanoframe = spGetUnitIsStunned(unitID)
 		if not nanoframe then
@@ -544,7 +544,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 
 	-- add new workers to the active workers list if they're GBC-enabled.
-	if (allBuilders[unitID] and allBuilders[unitID].include) then
+	if allBuilders[unitID] then
 		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
@@ -611,7 +611,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
 
 	local ud = UnitDefs[unitDefID]
 	if ud.isMobileBuilder then -- if the new unit is a mobile builder
-		allBuilders[unitID] = {include=true}
+		allBuilders[unitID] = true
 		if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
 			includedBuilders[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
@@ -670,10 +670,10 @@ end
 function widget:CommandsChanged()
 	local units = Spring.GetSelectedUnits()
 	for i, id in pairs(units) do
-		if allBuilders[id] then
+		if allBuilders[id] ~= nil then
 			local customCommands = widgetHandler.customCommands
 			local order = 0
-			if allBuilders[id].include then
+			if allBuilders[id] then
 				order = 1
 			end
 			-- add state toggle command
@@ -931,9 +931,9 @@ function ApplyState(desiredState)
 	local selectedUnits = spGetSelectedUnits()
 	for _,unitID in pairs(selectedUnits) do
 		-- if we know about the builder, and it's not already in its desired state...
-		if allBuilders[unitID] and allBuilders[unitID].include ~= desiredState then
-			allBuilders[unitID].include = desiredState
-			if desiredState then
+		if allBuilders[unitID] ~= nil and allBuilders[unitID] ~= desiredState then
+			allBuilders[unitID] = desiredState
+			if allBuilders[unitID] then
 				-- newly enabled
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then

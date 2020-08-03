@@ -95,8 +95,8 @@ function RenderUpdate(dt, includedBuilders, allBuilders, buildQueue)
 	if options.drawIcons.value then
 		WG.icons.SetDisplay('gbcicon', true)
 		WG.icons.SetDisplay('gbcidle', true)
-		for unitID, data in pairs(allBuilders) do
-			if data.include and includedBuilders[unitID] then
+		for unitID, included in pairs(allBuilders) do
+			if included and includedBuilders[unitID] then
 				local myCmd = includedBuilders[unitID]
 				if myCmd.cmdtype == commandType.idle then
 					WG.icons.SetUnitIcon(unitID, idle_icon)
