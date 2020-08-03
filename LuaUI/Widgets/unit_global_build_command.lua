@@ -1490,7 +1490,7 @@ function CheckIdlers()
 			end
 		end
 	end
-	idlers = {} -- clear the idle list, since we've processed it.
+	table.clear(idlers) -- clear the idle list, since we've processed it.
 	idleCheck = false -- reset the flag
 end
 
