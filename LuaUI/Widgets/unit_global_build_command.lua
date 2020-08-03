@@ -811,15 +811,8 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, shift)
 		-- if the order was direct, we need to update our workers' status and set them to drec.
 		for i=1, #unitArray do
 			local unitID = unitArray[i]
-			if includedBuilders[unitID] then -- if it's one of our units
-				if busyUnits[unitID] then -- if the worker is also still on our busy list
-					local key = busyUnits[unitID]
-					UnassignWorker(key, unitID) -- remove it from its current job listing
-				end
-				busyUnits[unitID] = hash -- and update its info in busy units
-				AssignWorker(hash, unitID) -- add it to the tf/build task so that the building will be correctly identified when created.
-				includedBuilders[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it.
-				movingUnits[unitID] = nil
+			if includedBuilders[unitID] then
+				AssignWorker(hash, unitID, commandType.drec)
 			end
 		end
 	end
@@ -869,13 +862,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				if ( options.shift ) then -- if the command was given with shift
 					return true  -- we return true to take ownership of the command from Spring.
 				else -- for direct orders
-					if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-						UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
-					end
-					busyUnits[unitID] = hash -- add the worker to our busy list
-					includedBuilders[unitID].cmdtype = commandType.drec -- and mark it as under direct orders
-					AssignWorker(hash, unitID) -- add it to the assignment list for its new job
-					movingUnits[unitID] = nil
+					AssignWorker(hash, unitID, commandType.drec)
 				end
 			elseif id == CMD_REPAIR or id == CMD_RECLAIM or id == CMD_RESURRECT then -- if the command is for repair, reclaim or ressurect
 				if #params > 1 then -- if the order is an area order
@@ -905,13 +892,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					if options.shift then -- for queued jobs
 						return true -- capture the command
 					else -- for direct orders
-						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-							UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
-						end
-						busyUnits[unitID] = hash -- add the worker to our busy list
-						includedBuilders[unitID].cmdtype = commandType.drec -- and mark it as under direct orders
-						movingUnits[unitID] = nil
-						AssignWorker(hash, unitID) -- add it to the assignment list for its new job
+						AssignWorker(hash, unitID, commandType.drec)
 					end
 				else --otherwise if it was single-target
 					local target = params[1]
@@ -970,13 +951,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					if options.shift then --and if the command was given with shift
 						return true -- return true to capture it
 					else
-						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
-							UnassignWorker(busyUnits[unitID], unitID) -- remove it from the list of workers assigned to its previous job
-						end
-						includedBuilders[unitID].cmdtype = commandType.drec -- otherwise mark it as under user direction
-						busyUnits[unitID] = hash -- and add it to our busy list for cost calculations
-						AssignWorker(hash, unitID)
-						movingUnits[unitID] = nil
+						AssignWorker(hash, unitID, commandType.drec)
 					end
 				end
 			else -- if the order is not for build-power related things, ex move orders
@@ -1118,11 +1093,7 @@ function GiveWorkToUnit(unitID)
 				-- Spring.Echo('GBC: Warning, unit was supposed to working on something, but has empty command queue. Assigning work anyway, check the cache state!')
 			end
 		end
-		-- if we're reassigning, we need to update the entry stored in the queue
-		if buildQueue[lastHash] then
-			-- this was nil sometimes - deleting a terraunit?
-			UnassignWorker(lastHash, unitID)
-		end
+		-- Spring.Echo('GBC: Reassigning unit', unitID, 'from', lastHash, 'to', hash)
 	end
 	-- if the unit has already been assigned to the same job, we also prevent order spam
 	-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
@@ -1130,9 +1101,7 @@ function GiveWorkToUnit(unitID)
 		if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
 			lastCommand[unitID] = frame
-			busyUnits[unitID] = hash -- save the command info for bookkeeping
-			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			AssignWorker(hash, unitID) -- save info for CostOfJob and StopAnyWorker
+			AssignWorker(hash, unitID, commandType.buildQueue)
 		else -- ZK-Specific: for combination raise-and-build jobs
 			local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
 			for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
@@ -1145,9 +1114,7 @@ function GiveWorkToUnit(unitID)
 				end
 			end
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, CMD_OPT_SHIFT) -- add the build part of the command to the end of the queue with options shift
-			busyUnits[unitID] = hash -- save the command info for bookkeeping
-			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			AssignWorker(hash, unitID)
+			AssignWorker(hash, unitID, commandType.buildQueue)
 		end -- end zk-specific guard
 	else -- for repair/reclaim/resurrect
 		if not myJob.target then -- for area commands
@@ -1163,14 +1130,10 @@ function GiveWorkToUnit(unitID)
 			else -- for normal area jobs
 				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, 0)
 			end
-			busyUnits[unitID] = hash -- save the command info for bookkeeping
-			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			AssignWorker(hash, unitID)
+			AssignWorker(hash, unitID, commandType.buildQueue)
 		else -- for single-target commands
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, 0) -- issue the cheapest job as an order to the unit
-			busyUnits[unitID] = hash -- save the command info for bookkeeping
-			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-			AssignWorker(hash, unitID)
+			AssignWorker(hash, unitID, commandType.buildQueue)
 		end
 	end
 end
@@ -1990,10 +1953,19 @@ function StopAnyWorker(key)
 	end
 end
 
-function AssignWorker(key, unitID)
+-- Marks a worker as assigned to one of our jobs.
+-- cmdType is commandType.drec when this assignment came from a direct order.
+-- cmdType is commandType.buildQueue when this assignment was automatic.
+function AssignWorker(key, unitID, cmdType)
+	UnassignWorker(nil, unitID)
+	busyUnits[unitID] = key
+	includedBuilders[unitID].cmdType = cmdType
 	buildQueue[key].assignedUnits[unitID] = true
+	movingUnits[unitID] = nil
 end
 
 function UnassignWorker(key, unitID)
+	if not key then key = busyUnits[unitID] end
+	if not key then return end
 	buildQueue[key].assignedUnits[unitID] = nil
 end
