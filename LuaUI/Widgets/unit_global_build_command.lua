@@ -1138,6 +1138,7 @@ function FindCheapestJob(unitID)
 			if includedBuilders[unitID].unreachable[hash] then -- check cached values
 				isReachableAndBuildable = false
 			elseif not tmpJob.x then -- for jobs targetting units, which may be mobile, always calculate pathing.
+				-- FIXME: It is impossible for CleanOrders to trigger pathing recalculation. This logic does not work.
 				if not CleanOrders(tmpJob, false) or includedBuilders[unitID].unreachable[hash] then
 					isReachableAndBuildable = false
 				end
