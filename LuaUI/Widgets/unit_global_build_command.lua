@@ -1474,51 +1474,34 @@ function CheckMovingUnits()
 	end
 end
 
+local function AutoAddFeatureJob(type, featureID)
+	local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
+	local tx, ty, tz = spGetFeaturePosition(featureID)
+	local myCmd = {id=CMD_RECLAIM, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
+	local hash = BuildHash(myCmd)
+	if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
+		buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
+		UpdateOneJobPathing(hash, includedBuilders, buildQueue)
+	end
+end
+
 --This function captures res/reclaim targets near the player's base/workers.
 function CleanWrecks()
 	local featureList = spGetAllFeatures() -- returns all features in LOS, as well as all map features, which we ignore here because they may cause units to suicide into enemy territory.
 
+	local actionOnRezzable = CMD_RECLAIM
 	if hasRes and options.autoConvertRes.value then
-		for i=1, #featureList do
-			local featureID = featureList[i]
-			local fdef = spGetFeatureDefID(featureID)
-			local thisfeature = FeatureDefs[fdef]
-			if string.match(thisfeature["tooltip"], "reck") then -- if it's resurrectable
-				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
-				local tx, ty, tz = spGetFeaturePosition(featureID)
-				local myCmd = {id=CMD_RESURRECT, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
-				local hash = BuildHash(myCmd)
-				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
-					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash, includedBuilders, buildQueue) -- and to prevent redundant pathing calculations
-				end
-			elseif string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") then -- otherwise if it's a reclaimable wreck
-				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
-				local tx, ty, tz = spGetFeaturePosition(featureID)
-				local myCmd = {id=CMD_RECLAIM, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
-				local hash = BuildHash(myCmd)
-				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
-					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
-				end
-			end
-		end
-	else
-		for i=1, #featureList do
-			local featureID = featureList[i]
-			local fdef = spGetFeatureDefID(featureID)
-			local thisfeature = FeatureDefs[fdef]
+		actionOnRezzable = CMD_RESURRECT
+	end
 
-			if string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") or string.match(thisfeature["tooltip"], "reck") then -- if it's a non-map-feature reclaimable
-				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
-				local tx, ty, tz = spGetFeaturePosition(featureID)
-				local myCmd = {id=CMD_RECLAIM, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
-				local hash = BuildHash(myCmd)
-				if not buildQueue[hash] then -- if the job isn't already on the queue, add it.
-					buildQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
-					UpdateOneJobPathing(hash, includedBuilders, buildQueue)
-				end
-			end
+	for i=1, #featureList do
+		local featureID = featureList[i]
+		local fdef = spGetFeatureDefID(featureID)
+		local thisfeature = FeatureDefs[fdef]
+		if string.match(thisfeature["tooltip"], "reck") then -- if it's resurrectable
+			AutoAddFeatureJob(actionOnRezzable, featureID)
+		elseif string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") then -- otherwise if it's a reclaimable wreck
+			AutoAddFeatureJob(CMD_RECLAIM, featureID)
 		end
 	end
 end
