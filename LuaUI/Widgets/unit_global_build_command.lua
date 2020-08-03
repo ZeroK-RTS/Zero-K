@@ -1094,7 +1094,7 @@ local function TryJobCandidate(unitID, ux, uz, hash, job, doCheckReachable)
 		if includedBuilders[unitID].unreachable[hash] then -- check cached values
 			return
 		elseif not job.x then -- for jobs targeting units, which may be mobile, always calculate pathing.
-			if not CleanOrders(job, false) or includedBuilders[unitID].unreachable[hash] then
+			if not CleanOrders(job, false) then
 				return
 			end
 		end
