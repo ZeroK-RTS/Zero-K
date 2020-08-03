@@ -247,7 +247,13 @@ local EMPTY_TABLE = {}
 local frame = 0
 local longCount = 0
 local myTeamID = spGetMyTeamID()
-local terraunitDefID = UnitDefNames.terraunit.id
+
+local Terraunit_ID = UnitDefNames.terraunit.id
+local Solar_ID     = UnitDefNames.energysolar.id
+local Wind_ID      = UnitDefNames.energywind.id
+local Caretaker_ID = UnitDefNames.staticcon.id
+local Mex_ID       = UnitDefNames.staticmex.id
+local Claw_ID      = UnitDefNames.wolverine_mine.id
 
 --  "global" for this widget.  This is probably not a recommended practice.
 local includedBuilders = {}  --  list of units in the Central Build group, of the form includedBuilders[unitID] = commandType
@@ -294,7 +300,7 @@ function widget:Initialize()
 				end
 			end
 
-			if ud.name == 'staticmex' then
+			if unitDefID == Mex_ID then
 				local x, _, z = spGetUnitPosition(uid)
 				territoryPos.x = territoryPos.x + x
 				territoryPos.z = territoryPos.z + z
@@ -465,7 +471,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 
 	-- update territory info when new mexes are created.
-	if UnitDefs[unitDefID].name == 'staticmex' then
+	if unitDefID == Mex_ID then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x + x
 		territoryPos.z = territoryPos.z + z
@@ -573,7 +579,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		allBuilders[unitID] = nil
 	end
 
-	if UnitDefs[unitDefID].name == 'staticmex' then
+	if unitDefID == Mex_ID then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x - x
 		territoryPos.z = territoryPos.z - z
@@ -641,7 +647,7 @@ end
 
 -- This function implements auto-repair
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
-	if spIsUnitAllied(unitID) and options.autoRepair.value and UnitDefs[unitDefID].name ~= 'wolverine_mine' then
+	if spIsUnitAllied(unitID) and options.autoRepair.value and unitDefID ~= Claw_ID then
 		local myCmd = {id=CMD_REPAIR, target=unitID, assignedUnits={}}
 		local hash = BuildHash(myCmd)
 		if not buildQueue[hash] then
@@ -1133,7 +1139,7 @@ function GiveWorkToUnit(unitID)
 				local target = localUnits[i]
 				local udid = spGetUnitDefID(target)
 				-- Note: This can be nil if eg. it's a radar dot we don't know the unit type for
-				if terraunitDefID == udid and spGetUnitTeam(target) == myTeamID then
+				if Terraunit_ID == udid and spGetUnitTeam(target) == myTeamID then
 					spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, 0)
 					break
 				end
@@ -1303,8 +1309,10 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 
 	local cost
 	local unitDef = nil
+	local unitDefID
 	if job.id < 0 then
-		unitDef = UnitDefs[abs(job.id)]
+		unitDefID = abs(job.id)
+		unitDef = UnitDefs[unitDefID]
 	end
 	local metalCost = false
 
@@ -1330,7 +1338,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 			end
 		elseif (unitDef and unitDef.reloadTime > 0) or job.id == CMD_RESURRECT then -- for small defenses and resurrect
 			cost = distance - 150
-		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind")) then -- for small energy
+		elseif unitDef and (unitDefID == Solar_ID or unitDefID == Wind_ID) then -- for small energy
 			cost = distance + 100
 		else -- for resurrect and all other small build jobs
 			cost = distance
@@ -1338,7 +1346,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == CMD_RESURRECT then -- for expensive buildings and resurrect
 			cost = (distance/2) + (200 * (costMod - 2))
-		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'staticcon') then -- for small defenses and caretakers, allow up to two workers before increasing cost
+		elseif unitDef and (unitDefID == Caretaker_ID or unitDef.reloadTime > 0) then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
@@ -1641,8 +1649,7 @@ function CaptureTF()
 	for i=1, #teamUnits do
 		local unitID = teamUnits[i]
 		local unitDID = spGetUnitDefID(unitID)
-		local unitDef = UnitDefs[unitDID]
-		if string.match(unitDef.humanName, "erraform") then -- identify 'terraunits'
+		if unitDID == Terraunit_ID then -- identify 'terraunits'
 			local myCmd = {id=CMD_REPAIR, target=unitID, assignedUnits={}}
 			local hash = BuildHash(myCmd)
 			if not buildQueue[hash] then -- add repair jobs for them if they're not already on the queue
@@ -1916,8 +1923,7 @@ function RemoveJobs(x, z, r)
 				if jdist < r then
 					inRadius = true
 					local udid = spGetUnitDefID(target)
-					local unitDef = UnitDefs[udid]
-					if string.match(unitDef.humanName, "erraform") ~= nil then -- if the target was a 'terraunit', self-destruct it
+					if udid == Terraunit_ID then -- if the target was a 'terraunit', self-destruct it
 						spGiveOrderToUnit(target, 65, EMPTY_TABLE, 0)
 					end
 				end
