@@ -1766,6 +1766,7 @@ HOW THIS WORKS:
 -- This function implements area removal for GBC jobs.
 function RemoveJobs(x, z, r)
 	local _
+	local rSq = r*r
 	for key, cmd in pairs(buildQueue) do
 		local inRadius = false
 
@@ -1777,17 +1778,17 @@ function RemoveJobs(x, z, r)
 			local xSize, zSize = GetBuildingSize(cmdID, ch)
 
 			 -- get the distances to the four corner vertices of the building footprint
-			local dist1 = Distance(x, z, cx, cz)
-			local dist2 = Distance(x, z, cx+xSize, cz)
-			local dist3 = Distance(x, z, cx, cz+zSize)
-			local dist4 = Distance(x, z, cx+xSize, cz+zSize)
+			local dist1 = DistanceSq(x, z, cx, cz)
+			local dist2 = DistanceSq(x, z, cx+xSize, cz)
+			local dist3 = DistanceSq(x, z, cx, cz+zSize)
+			local dist4 = DistanceSq(x, z, cx+xSize, cz+zSize)
 
-			if dist1 < r or dist2 < r or dist3 < r or dist4 < r then -- if any of the corners falls within the radius, then mark the job for removal
+			if dist1 < rSq or dist2 < rSq or dist3 < rSq or dist4 < rSq then -- if any of the corners falls within the radius, then mark the job for removal
 				inRadius = true
 			end
 		elseif cmd.x then -- for area reclaim/repair/resurrect
-			local jdist = Distance(x, z, cmd.x, cmd.z)
-			if jdist < r then
+			local jdist = DistanceSq(x, z, cmd.x, cmd.z)
+			if jdist < rSq then
 				inRadius = true
 			end
 		else -- for single-target repair/reclaim/resurrect
@@ -1796,14 +1797,14 @@ function RemoveJobs(x, z, r)
 			local target = cmd.target
 			if target >= Game.maxUnits and spValidFeatureID(target-Game.maxUnits) then -- note wrecks and things become invalid/nil when outside of LOS, which we need to check for
 				jx, _, jz = spGetFeaturePosition(target-Game.maxUnits)
-				jdist = Distance(x, z, jx, jz)
-				if jdist < r then
+				jdist = DistanceSq(x, z, jx, jz)
+				if jdist < rSq then
 					inRadius = true
 				end
 			elseif target < Game.maxUnits and spValidUnitID(target)then
 				jx, _, jz = spGetUnitPosition(target)
-				jdist = Distance(x, z, jx, jz)
-				if jdist < r then
+				jdist = DistanceSq(x, z, jx, jz)
+				if jdist < rSq then
 					inRadius = true
 					local udid = spGetUnitDefID(target)
 					if udid == Terraunit_ID then -- if the target was a 'terraunit', self-destruct it
@@ -1820,10 +1821,15 @@ function RemoveJobs(x, z, r)
 	end
 end
 
---  Borrowed distance calculation from Google Frog's Area Mex
 function Distance(x1,z1,x2,z2)
-	local dis = sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
-	return dis
+	local dist = sqrt(DistanceSq(x1,z1,x2,z2))
+	return dist
+end
+
+function DistanceSq(x1,z1,x2,z2)
+	local dx, dz = x1-x2, z1-z2
+	local distSq = dx*dx+dz*dz
+	return distSq
 end
 
 -- Produces a normalized direction from two points.
