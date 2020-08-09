@@ -49,9 +49,7 @@ return { tankraid = {
   sfxtypes               = {
     explosiongenerators = {
       [[custom:WARMUZZLE]],
-      [[custom:emg_shells_l]],
     },
-
   },
 
   sightDistance       = 600,
@@ -67,17 +65,10 @@ return { tankraid = {
   weapons             = {
 
     {
-      def                = [[NAPALM_BOMBLET]],
+      def                = [[AUTOCANNON]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
-    
-    --{
-    --  def                = [[BOGUS_FAKE_NAPALM_BOMBLET]],
-    --  badTargetCategory  = [[GUNSHIP]],
-    --  onlyTargetCategory = [[]],
-    --},
-
   },
 
 
@@ -94,8 +85,6 @@ return { tankraid = {
       craterMult              = 0,
 
       customParams            = {
-        muzzleEffectShot = [[custom:WARMUZZLE]],
-        miscEffectShot = [[custom:DEVA_SHELLS]],
         light_color = [[0.8 0.76 0.38]],
         light_radius = 180,
         reaim_time = 1,
