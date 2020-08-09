@@ -219,6 +219,7 @@ function script.Shot(num)
 	EmitSfx(firepoint, GG.Script.FIRE_W2)
 	Turn(firepoint, y_axis, 0)
 	--]]
+	EmitSfx(firepoint, 1024)
 	StartThread(Recoil)
 end
 

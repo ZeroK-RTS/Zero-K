@@ -20,7 +20,6 @@ return { tankraid = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    fireproof      = [[1]],
     specialreloadtime = [[850]],
     modelradius       = [[20]],
     aimposoffset      = [[0 5 0]],
@@ -46,6 +45,15 @@ return { tankraid = {
   objectName          = [[logkoda.s3o]],
   script              = [[tankraid.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
+
+  sfxtypes               = {
+    explosiongenerators = {
+      [[custom:WARMUZZLE]],
+      [[custom:emg_shells_l]],
+    },
+
+  },
+
   sightDistance       = 600,
   trackOffset         = 6,
   trackStrength       = 5,
@@ -76,29 +84,21 @@ return { tankraid = {
   weaponDefs          = {
 
     NAPALM_BOMBLET = {
-      name                    = [[Flame Bomb]],
+      name                    = [[Autocannon]],
       accuracy                = 1300,
       areaOfEffect            = 96,
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
-      cegTag                  = [[flamer_koda]],
       craterBoost             = 0,
       craterMult              = 0,
 
-      customParams              = {
-        setunitsonfire = "1",
-        burnchance     = "1",
-        burntime       = 30,
-
-        area_damage = 1,
-        area_damage_radius = 54,
-        area_damage_dps = 35,
-        area_damage_plateau_radius = 20,
-        area_damage_duration = 1.5,
-        
-        light_color = [[1.6 0.8 0.32]],
-        light_radius = 320,
+      customParams            = {
+        muzzleEffectShot = [[custom:WARMUZZLE]],
+        miscEffectShot = [[custom:DEVA_SHELLS]],
+        light_color = [[0.8 0.76 0.38]],
+        light_radius = 180,
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -107,25 +107,27 @@ return { tankraid = {
         subs    = 2.3,
       },
 
-      explosionGenerator      = [[custom:napalm_koda_small]],
+      explosionGenerator      = [[custom:EMG_HIT_HE]],
       fireStarter             = 65,
       flameGfxTime            = 0.1,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
       leadLimit               = 90,
-      model                   = [[wep_b_fabby.s3o]],
       myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 230,
       reloadtime              = 0.4 + 2/30,
-      soundHit                = [[FireHit]],
+      rgbColor                = [[1 0.95 0.4]],
+      separation              = 1.5,
+      soundHit                = [[weapon/cannon/emg_hit]],
       soundHitVolume          = 5,
       soundStart              = [[FireLaunch]],
-      soundStartVolume        = 5,
+      soundStartVolume        = 7,
+      stages                  = 10,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 240,
+      weaponVelocity          = 550,
     },
 
   },
