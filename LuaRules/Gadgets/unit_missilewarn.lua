@@ -45,8 +45,8 @@ else
 --
 
 -- Impact ETA is an IMPORTANT FEATURE that is NOT SUNK COST at all
-local StarburstPredictPrecache = Spring.Utilities.StarburstPredictPrecache
-local StarburstPredict         = Spring.Utilities.StarburstPredict
+include("LuaRules/Gadgets/Include/StarburstPredict.lua")
+-- luacheck: read globals StarburstPredictPrecache StarburstPredict
 
 local spAreTeamsAllied         = Spring.AreTeamsAllied
 local spGetMyTeamID            = Spring.GetMyTeamID
