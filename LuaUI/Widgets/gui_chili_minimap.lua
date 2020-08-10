@@ -828,7 +828,7 @@ MakeMinimapWindow = function()
 	
 	window = Chili.Window:New{
 		parent = Chili.Screen0,
-		name   = 'Minimap Window',
+		name   = 'Minimap Window', -- NB: this exact string is expected by other code
 		color = {0, 0, 0, 0},
 		padding = {0, 0, 0, 0},
 		width = (window and window.width) or width,
