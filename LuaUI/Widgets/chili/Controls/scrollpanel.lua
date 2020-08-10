@@ -246,7 +246,7 @@ function ScrollPanel:IsRectInView(x, y, w, h)
 		return false
 	end
 
-	if self._inrtt then
+	if self.useRTT then
 		return true
 	end
 
