@@ -66,6 +66,7 @@ local function ProjectileCreated(...)
 end
 
 local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
+	if not trackedMissiles[weaponDefID] then return end
 	local teamID = spGetUnitTeam(proOwnerID)
 	local spec, specFullView = spGetSpectatingState()
 	local isAlly = spAreTeamsAllied(teamID, spGetMyTeamID())
