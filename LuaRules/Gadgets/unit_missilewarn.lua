@@ -27,7 +27,7 @@ if gadgetHandler:IsSyncedCode() then
 --
 function gadget:Initialize()
 	for weaponDefID in pairs(trackedMissiles) do
-		Script.SetWatchWeapon(weaponDefID, true)
+		Script.SetWatchProjectile(weaponDefID, true)
 	end
 end
 
