@@ -1185,6 +1185,7 @@ local function MakeMessageStack(margin)
 		itemMargin  = { margin, margin, margin, margin },
 		autosize = true,
 		preserveChildrenOrder = true,
+		useRTT = false,
 	}
 end
 
