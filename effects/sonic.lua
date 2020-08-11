@@ -132,6 +132,20 @@ local altforms = {
       },
     },
   },
+  sonic_40 = {
+    source = "sonic",
+    modifications = {
+      groundflash = {
+    properties = {flashsize = 40},
+      },
+      expand = {
+     properties = {size = 40, sizegrowth = 12},
+      },
+      contract = {
+     properties = {size = 40, sizegrowth = -12},
+      },
+    },
+  },
 }
 
 local suMergeTable = Spring.Utilities.MergeTable

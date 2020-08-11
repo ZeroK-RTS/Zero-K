@@ -46,19 +46,6 @@ local SIG_BOB = 32
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetGroundHeight = Spring.GetGroundHeight
-
-local wd = WeaponDefNames["amphimpulse_watercannon"]
-
-local impulse = tonumber(wd.customParams.impulse)
-local maxProjectiles = 8
-
-local impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
-local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
 -- Weapon config
 
 local SOUND_PERIOD = 2
