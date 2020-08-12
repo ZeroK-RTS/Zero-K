@@ -43,6 +43,7 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
+local UNDERWATER_DEPTH = -22
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -376,6 +377,11 @@ function script.AimWeapon(num, heading, pitch)
 		GG.Floating_AimWeapon(unitID)
 		return false
 	end
+end
+
+function script.BlockShot(num, targetID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	return y < UNDERWATER_DEPTH
 end
 
 function script.QueryWeapon(num)
