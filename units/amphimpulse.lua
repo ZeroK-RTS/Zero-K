@@ -14,11 +14,10 @@ return { amphimpulse = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 40,
+    amph_regen = 10,
     amph_submerged_at = 40,
     sink_on_emp    = 1,
     floattoggle    = [[1]],
-    aim_lookahead     = 100,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -90,7 +89,7 @@ return { amphimpulse = {
         },
 
         damage                  = {
-            default = 60.01,
+            default = 80.01,
         },
         
         cegTag                  = [[sonictrail]],
@@ -104,7 +103,7 @@ return { amphimpulse = {
         myGravity               = 0.01,
         noSelfDamage            = true,
         range                   = 260,
-        reloadtime              = 0.5,
+        reloadtime              = 0.66,
         size                    = 50,
         sizeDecay               = 0.2,
         soundStart              = [[weapon/sonicgun2]],
