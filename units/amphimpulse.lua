@@ -18,6 +18,7 @@ return { amphimpulse = {
     amph_submerged_at = 40,
     sink_on_emp    = 1,
     floattoggle    = [[1]],
+    aim_lookahead     = 100,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -89,7 +90,7 @@ return { amphimpulse = {
         },
 
         damage                  = {
-            default = 80,
+            default = 60.01,
         },
         
         cegTag                  = [[sonictrail]],
@@ -97,7 +98,7 @@ return { amphimpulse = {
         explosionGenerator      = [[custom:sonic_40]],
         edgeEffectiveness       = 0.5,
         fireStarter             = 150,
-        impulseBoost            = 300,
+        impulseBoost            = 200,
         impulseFactor           = 0.5,
         interceptedByShieldType = 1,
         myGravity               = 0.01,
