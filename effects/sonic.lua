@@ -122,34 +122,20 @@ local altforms = {
     source = "sonic",
     modifications = {
       groundflash = {
-    properties = {flashsize = 80},
+        properties = {flashsize = 80},
       },
       expand = {
-     properties = {size = 80, sizegrowth = 24},
+        properties = {size = 80, sizegrowth = 24},
       },
       contract = {
-     properties = {size = 80, sizegrowth = -24},
+        properties = {size = 80, sizegrowth = -24},
       },
     },
   },
-  sonic_40 = {
-    source = "sonic",
-    modifications = {
-      groundflash = {
-    properties = {flashsize = 40},
-      },
-      expand = {
-     properties = {size = 40, sizegrowth = 12},
-      },
-      contract = {
-     properties = {size = 40, sizegrowth = -12},
-      },
-    },
-  },
-}
 
 local suMergeTable = Spring.Utilities.MergeTable
 for cegName, info in pairs(altforms) do
+  Spring.Echo(cegName)
   fx[cegName] = suMergeTable(info.modifications, fx[info.source], true)
 end
 
