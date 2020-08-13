@@ -469,9 +469,9 @@ local overrides = {
 		texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
 		stateTooltip = {
 			tooltips.RETREAT:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")),
-			tooltips.RETREAT:gsub("_STATE_", "30%%"..WG.Translate("common", "health")),
-			tooltips.RETREAT:gsub("_STATE_", "65%%"..WG.Translate("common", "health")),
-			tooltips.RETREAT:gsub("_STATE_", "99%%"..WG.Translate("common", "health"))
+			tooltips.RETREAT:gsub("_STATE_", "30%%"..WG.Translate("interface", "health")),
+			tooltips.RETREAT:gsub("_STATE_", "65%%"..WG.Translate("interface", "health")),
+			tooltips.RETREAT:gsub("_STATE_", "99%%"..WG.Translate("interface", "health"))
 		}
 	},
 	[CMD.IDLEMODE] = {
