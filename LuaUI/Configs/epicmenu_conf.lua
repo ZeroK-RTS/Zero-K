@@ -654,8 +654,8 @@ local pathAudio = 'Settings/Audio'
 			local prevValue = WG.music_volume
 			--settings.music_volume = self.value
 			WG.music_volume = self.value
-			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end
-			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end
+			--if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end
+			--if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end
 		end,
 		simpleMode = true,
 		everyMode = true,
