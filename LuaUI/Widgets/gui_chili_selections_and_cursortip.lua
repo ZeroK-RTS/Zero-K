@@ -104,55 +104,55 @@ local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" ,
 local UNIT_BURST_DAMAGES = VFS.Include(LUAUI_DIRNAME .. "Configs/burst_damages.lua" , nil, VFS.ZIP)
 
 local terraformGeneralTip =
-	green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_freedraw")..
-	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_box")..
-	green.. WG.Translate("common", "alt")..'+'..WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_gtooltip_hollowbox")..
-	green.. WG.Translate("common", "ctrl")..'+'..WG.Translate("common", "click_on_unit")..white..WG.Translate("interface", "tera_gtooltip_around")..
+	green.. WG.Translate("interface", "click")..WG.Translate("interface", "and")..WG.Translate("interface", "drag")..white..WG.Translate("interface", "tera_gtooltip_freedraw")..
+	green.. WG.Translate("interface", "alt")..'+'..WG.Translate("interface", "click")..WG.Translate("interface", "and")..WG.Translate("interface", "drag")..white..WG.Translate("interface", "tera_gtooltip_box")..
+	green.. WG.Translate("interface", "alt")..'+'..WG.Translate("interface", "ctrl")..'+'..WG.Translate("interface", "click")..WG.Translate("interface", "and")..WG.Translate("interface", "drag")..white..WG.Translate("interface", "tera_gtooltip_hollowbox")..
+	green.. WG.Translate("interface", "ctrl")..'+'..WG.Translate("interface", "click_on_unit")..white..WG.Translate("interface", "tera_gtooltip_around")..
 	'\n'
 
 local terraCmdTip = {
 	[CMD_RAMP] =
 		yellow..WG.Translate("interface", "tera_tooltip_bridge_name")..
-		'1: ' .. green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_tooltip_bridge_draw") ..
-		'2: ' .. green.. WG.Translate("common", "click")..white..WG.Translate("interface", "tera_tooltip_bridge_width")..
+		'1: ' .. green.. WG.Translate("interface", "click")..WG.Translate("interface", "and")..WG.Translate("interface", "drag")..white..WG.Translate("interface", "tera_tooltip_bridge_draw") ..
+		'2: ' .. green.. WG.Translate("interface", "click")..white..WG.Translate("interface", "tera_tooltip_bridge_width")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_tooltip_ramp_name")..
-		'1: ' .. green.. WG.Translate("common", "click")..white..WG.Translate("interface", "tera_tooltip_ramp_start")..
-		'2: ' .. green.. WG.Translate("common", "click")..WG.Translate("common", "and")..WG.Translate("common", "drag")..white..WG.Translate("interface", "tera_tooltip_ramp_height")..
-		'3: ' .. green.. WG.Translate("common", "click") ..white..WG.Translate("interface", "tera_tooltip_ramp_width")..
+		'1: ' .. green.. WG.Translate("interface", "click")..white..WG.Translate("interface", "tera_tooltip_ramp_start")..
+		'2: ' .. green.. WG.Translate("interface", "click")..WG.Translate("interface", "and")..WG.Translate("interface", "drag")..white..WG.Translate("interface", "tera_tooltip_ramp_height")..
+		'3: ' .. green.. WG.Translate("interface", "click") ..white..WG.Translate("interface", "tera_tooltip_ramp_width")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_tooltip_modifiers_start")..
-		'-'.. WG.Translate("common", "hold").. green..WG.Translate("common", "ctrl")..WG.Translate("common", "or")..WG.Translate("common", "alt")..white..WG.Translate("common", "and_2").. green..WG.Translate("common", "drag") ..white..WG.Translate("interface", "tera_tooltip_modifiers_start")..
-		'-'.. WG.Translate("common", "hold").. green..WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_modifiers_snap")..
-		'-'.. WG.Translate("common", "press")..green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_modifiers_cycle")..
+		'-'.. WG.Translate("interface", "hold").. green..WG.Translate("interface", "ctrl")..WG.Translate("interface", "or")..WG.Translate("interface", "alt")..white..WG.Translate("interface", "and_2").. green..WG.Translate("interface", "drag") ..white..WG.Translate("interface", "tera_tooltip_modifiers_start")..
+		'-'.. WG.Translate("interface", "hold").. green..WG.Translate("interface", "alt")..white..WG.Translate("interface", "tera_tooltip_modifiers_snap")..
+		'-'.. WG.Translate("interface", "press")..green.. WG.Translate("interface", "space")..white..WG.Translate("interface", "tera_tooltip_modifiers_cycle")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_tooltip_indicators_name")..
-		green.. WG.Translate("common", "green")..white..WG.Translate("interface", "tera_tooltip_indicators_all")..
-		green.. WG.Translate("common", "yellow")..white..WG.Translate("interface", "tera_tooltip_indicators_nowheels")..
-		green.. WG.Translate("common", "redd")..white..WG.Translate("interface", "tera_tooltip_indicators_onlyallterrain"),
+		green.. WG.Translate("interface", "green")..white..WG.Translate("interface", "tera_tooltip_indicators_all")..
+		green.. WG.Translate("interface", "yellow")..white..WG.Translate("interface", "tera_tooltip_indicators_nowheels")..
+		green.. WG.Translate("interface", "redd")..white..WG.Translate("interface", "tera_tooltip_indicators_onlyallterrain"),
 	[CMD_LEVEL] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_during")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
+		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_gtooltip_after")..
-		green.. WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_level_snap")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_level_hold")..
+		green.. WG.Translate("interface", "alt")..white..WG.Translate("interface", "tera_tooltip_level_snap")..
+		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_tooltip_level_hold")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_gtooltip_any")..
-		green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_level_cycle"),
+		green.. WG.Translate("interface", "space")..white..WG.Translate("interface", "tera_tooltip_level_cycle"),
 	[CMD_RAISE] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_during")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
+		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
 		'\n'..
 		yellow..WG.Translate("interface", "tera_gtooltip_after")..
-		green.. WG.Translate("common", "alt")..white..WG.Translate("interface", "tera_tooltip_raise_snap15")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_tooltip_raise_snap0"),
+		green.. WG.Translate("interface", "alt")..white..WG.Translate("interface", "tera_tooltip_raise_snap15")..
+		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_tooltip_raise_snap0"),
 	[CMD_SMOOTH] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_during")..
-		green.. WG.Translate("common", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line"),
+		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line"),
 	[CMD_RESTORE] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_any")..
-		green.. WG.Translate("common", "space")..white..WG.Translate("interface", "tera_tooltip_restore_height"),
+		green.. WG.Translate("interface", "space")..white..WG.Translate("interface", "tera_tooltip_restore_height"),
 }
 
 local DRAWING_TOOLTIP =

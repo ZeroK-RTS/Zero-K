@@ -221,6 +221,8 @@
 	"states_divebombing_golow" : "Always Fly Low",
 	"states_divebombing_tooltip" : "Set when Ravens dive.",
 	"states_killcap" : "Kill Captured",
+	"states_killcap_kill" : "Kill",
+	"states_killcap_keep" : "Keep",
 	"states_killcap_tooltip" : "Set whether to kill captured units.",
 	"states_pupgoo" : "Puppy Goo",
 	"states_pupgoo_onbutcloaked" : "On except cloaked",
@@ -247,8 +249,6 @@
 	"states_gsstrafe" : "Gunship Strafe",
 	"states_gsstrafe_no" : "No Strafe",
 	"states_gsstrafe_yes" : "Strafe",
-	"states_gsstrafe_tooltip" : "Set whether gunships strafe when fighting.",
-	"states_gsstrafe" : "Gunship Strafe",
 	"states_gsstrafe_tooltip" : "Set whether gunships strafe when fighting.",
 	"states_waterfloat" : "Float State",
 	"states_waterfloat_never" : "Never Float",
@@ -297,7 +297,7 @@
 	"tera_tooltip_ramp_height" : " at end to set height. \n",
 	"tera_tooltip_ramp_width" : " again to set width. \n",
 	"tera_tooltip_modifiers_start" : "[Modifiers]\n",
-	"tera_tooltip_modifiers_start" : " in Step 1 to set start height. \n",
+	"tera_tooltip_modifiers_start_step" : " in Step 1 to set start height. \n",
 	"tera_tooltip_modifiers_snap" : " to snap height or gradient. \n",
 	"tera_tooltip_modifiers_cycle" : " to cycle raise/lower. \n",
 	"tera_tooltip_indicators_name" : "[Wireframe indicator colors]\n",
@@ -402,5 +402,4 @@
 	"vote_kick" : "Kick this player from the battle.",
 	"facqueue_tooltip_1" : "Add to/subtract from queue",
 	"facqueue_tooltip_2" : "Drag to a different position in queue"
-	}
 }
