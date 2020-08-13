@@ -73,6 +73,8 @@ local myTeam = Spring.GetMyTeamID()
 local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 local defeat = false
 
+local spToggleSoundStreamPaused = Spring.PauseSoundStream
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function GetMusicType()
@@ -284,15 +286,11 @@ function widget:Update(dt)
 			--Spring.Echo("Track: " .. newTrack)
 		end
 		if not musicPaused and totalTime > 0 and paused and options.pausemusic.value then -- game got paused with the pausemusic option enabled, so pause the music stream.
-			Spring.PauseSoundStream()
+			spToggleSoundStreamPaused()
 			musicPaused = true
 		end
-		if musicPaused and paused and not options.pausemusic.value then -- user disabled pausemusic option, unpause the music.
-			Spring.PauseSoundStream()
-			musicPaused = false
-		end
-		if musicPaused and paused == false then -- resume playing the current track
-			Spring.PauseSoundStream()
+		if musicPaused and (not paused or not options.pausemusic.value) then -- user disabled pausemusic option or game gets unpaused so unpause the music.
+			spToggleSoundStreamPaused()
 			musicPaused = false
 		end
 	end
@@ -303,7 +301,7 @@ function widget:GameStart()
 		gameStarted = true
 		previousTrackType = musicType
 		musicType = "peace"
-		if select(1,Spring.GetSoundStreamTime()) > 0 then -- if there's a briefing track playing, stop it and start peace track.
+		if Spring.GetSoundStreamTime() > 0 then -- if there's a briefing track playing, stop it and start peace track.
 			Spring.StopSoundStream()
 		end
 	end
@@ -311,11 +309,12 @@ function widget:GameStart()
 	--Spring.Echo("Track: " .. newTrack)
 end
 
--- Safety of a heisenbug
---[[function widget:GameFrame() -- this looks safe to remove. In testing removing this changed nothing
+-- Safety of a heisenbug. (Running game through chobby)
+-- see: https://github.com/ZeroK-RTS/Zero-K/commit/0d2398cbc7c05eabda9f25dc3eeb56363793164e#diff-55f47403c24513e47b4350a108deb5f0)
+function widget:GameFrame()
 	widget:GameStart()
 	widgetHandler:RemoveCallIn('GameFrame')
-end]]
+end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	if unitExceptions[unitDefID] then
@@ -393,6 +392,7 @@ end
 
 function widget:GameOver()
 	PlayGameOverMusic(not defeat)
+	widgetHandler:RemoveCallIn('Update') -- stop music player on game over.
 end
 
 function widget:Initialize()
