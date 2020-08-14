@@ -347,7 +347,6 @@ local commandType = {
 
 function widget:Initialize()
 	-- add all existing workers to GBC.
-	if #Spring.GetPlayerList(spGetMyTeamID()) > 1 then widgetHandler:RemoveWidget() end -- GBC breaks with commshare
 	local units = spGetTeamUnits(myTeamID)
 		for _, uid in ipairs(units) do
 			local unitDefID = spGetUnitDefID(uid)
@@ -792,11 +791,15 @@ HOW THIS WORKS:
 
 --  Detect when player enters spectator mode (thanks to SeanHeron).
 function widget:PlayerChanged(playerID)
-	if spGetSpectatingState() or Spring.GetMyTeamID() ~= myTeamID then
-		Echo( "<Global Build Command> Spectator mode. Widget removed." )
+	if spGetSpectatingState() then
+		Echo( "<Global Build Command> Spectator mode or commshare detected. Widget removed." )
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	if #Spring.GetPlayerList(spGetMyTeamID()) > 1 then -- GBC breaks with commshare
+		Spring.Echo("<Global Build Command> Commshare detected. Widget removed.")
+		widgetHandler:RemoveWidget() 
+	end 
 end
 
 -- This function detects when our workers have started a job
