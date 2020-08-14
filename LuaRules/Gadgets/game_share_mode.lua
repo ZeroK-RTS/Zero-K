@@ -71,7 +71,7 @@ end
 --------------------------------------------------------
 -- Variables
 local debug = false
-local playerstates = {}
+local playerstates = {} -- keeps track of player states so that we can remerge them if necessary.
 local invites = {}
 local controlledTeams = {} -- contains which team a team of players should be under.
 local originalTeamID = {} -- takes playerID as the key, gives the team as the value.
