@@ -402,7 +402,7 @@
 	"helpmenu_mstates" : "Move States",
 	"helpmenu_mstates_txt" : "You can control your units' aggressiveness using move states.\n\nRoam (green) means the unit can chase its targets without restrictions.\nManeuver (yellow) makes units chase enemies, but only a limited distance from their original location.\nHold Position (red) means units will never chase enemies unless given a direct attack order.",
 	"helpmenu_map" : "Map overlays",
-	"helpmenu_map_txt" : "In top-left conner there are multiple options for customizing your view of the map.\n\F1 toggles Height Map, allowing you to more easily read elevation.\n\F2 turns on Pathfinding Map, showing you available routes for currently selected untis and building placement zones.\n\F4 toggles the Economy Display, showing metal extractors, grid connections and geotermal vents.",
+	"helpmenu_map_txt" : "In top-left conner there are multiple options for customizing your view of the map.\n\nF1 toggles Height Map, allowing you to more easily read elevation.\n\nF2 turns on Pathfinding Map, showing you available routes for currently selected untis and building placement zones.\n\nF4 toggles the Economy Display, showing metal extractors, grid connections and geotermal vents.",
 	"load_button" : "Load Game",
 	"resign_button" : "Голосовать за сдачу",
 	"resign_button_desc" : "Начинает голосование за капитуляцию команды.",

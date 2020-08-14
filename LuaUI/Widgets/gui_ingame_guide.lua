@@ -1,4 +1,4 @@
-function idget:GetInfo() return {
+function widget:GetInfo() return {
 	name = "In-game Guide",
 	enabled = enable,
 } end
@@ -137,6 +137,6 @@ options_order = {}
 
 for key, value in pairs(options) do
 	value.type = 'text'
-	value.path = options_path .. "/" .. value.path
+	value.path = options_path .. '/' .. value.path
 	options_order[#options_order+1] = key
 end
