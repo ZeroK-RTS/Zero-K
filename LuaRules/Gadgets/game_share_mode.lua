@@ -414,8 +414,9 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if spGetTeamRulesParam(orgTeamID,"isCommsharing") then
-		DebugEcho("Commshare: unitCreated triggered for " .. unitTeam .. ", given to " .. spGetTeamRulesParam(orgTeamID,"isCommsharing"))
-		spTransferUnit(unitID, spGetTeamRulesParam(orgTeamID,"isCommsharing"), true) -- this is in case of late commer coms,etc.
+		local commshareTeamID = spGetTeamRulesParam(orgTeamID,"isCommsharing")
+		DebugEcho("Commshare: unitCreated triggered for " .. unitTeam .. ", given to " .. commshareTeamID)
+		spTransferUnit(unitID, commshareTeamID, true) -- this is in case of late commer coms,etc.
 	end
 end
 --[[ No longer needed since share menu does not allow empty teams to receive units. Unbind sharedialogue instead!
