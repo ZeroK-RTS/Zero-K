@@ -163,6 +163,7 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 				end
 			end
 			spSetTeamRulesParam(originalTeamID[playerID], "isCommsharing", nil)
+			spSetPlayerRulesParam(playerID,"commshare_team_id",nil)
 			originalUnits[orgTeamID], controlledPlayers[playerID] = nil, nil
 		else
 			DebugEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)")
