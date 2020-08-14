@@ -73,7 +73,7 @@ return { amphimpulse = {
 
     SONIC         = {
         name                    = [[Sonic Blaster]],
-        areaOfEffect            = 128,
+        areaOfEffect            = 96,
         avoidFeature            = true,
         avoidFriendly           = true,
         burnblow                = true,
