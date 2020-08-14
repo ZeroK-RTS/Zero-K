@@ -119,6 +119,16 @@
 	"defence_range_spec" : "Show Ground Defence as Spectator",
 	"defence_range_spec_air" : "Show Air Defence as Spectator",
 	"defence_range_spec_nuke" : "Show Nuke Defence as Spectator",
+	"default_playercolor" : "Default"
+	"default_playercolor_tooltip" : "The default team colors. Allies are blue-ish, enemies are red-ish, self is green."
+	"simple_playercolor" : "Simple"
+	"simple_playercolor_tooltip" : "Simple colors. Allies are blue, enemies are red, self is green."
+	"selfteal_playercolor" : "Self Teal"
+	"selfteal_playercolor_tooltip" : "Allies are blue/green-ish, enemies are red/yellow-ish, self is teal."
+	"colorblind_playercolor" : "Colorblind"
+	"colorblind_playercolor_tooltip" : "Allies are blue-ish, enemies are red-ish, self is teal."
+	"scolorblind_playercolor" : "Simple Colorblind"
+	"scolorblind_playercolor_tooltip" : "Enemies are red, allies are blue, self is teal."
 	"vote_ended_success" : "END:SUCCESS",
 	"vote_ended_failed" : "END:FAILED",
 	"vote_none" : "There is no poll going on, start some first",

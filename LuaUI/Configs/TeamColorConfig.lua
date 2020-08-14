@@ -151,32 +151,32 @@ local simpleColorblind = {
 local colorConfigs = {
 	default = {
 		order = 1,
-		name = "Default",
-		desc = "The default team colors. Allies are blue-ish, enemies are red-ish, self is green.",
+		name = WG.Translate("interface", "default_playercolor"),
+		desc = WG.Translate("interface", "default_playercolor_tooltip"),
 		colors = colors
 	},
 	simple = {
 		order = 2,
-		name = "Simple",
-		desc = "Simple colors. Allies are blue, enemies are red, self is green.",
+		name = WG.Translate("interface", "simple_playercolor"),
+		desc = WG.Translate("interface", "simple_playercolor_tooltip"),
 		colors = simpleColors
 	},
 	defaultTeal = {
 		order = 3,
-		name = "Self Teal",
-		desc = "Allies are blue/green-ish, enemies are red/yellow-ish, self is teal.",
+		name = WG.Translate("interface", "selfteal_playercolor"),
+		desc = WG.Translate("interface", "selfteal_playercolor_tooltip"),
 		colors = colorsTeal
 	},
 	colorblind = {
 		order = 4,
-		name = "Colorblind",
-		desc = "Allies are blue-ish, enemies are red-ish, self is teal.",
+		name = WG.Translate("interface", "colorblind_playercolor"),
+		desc = WG.Translate("interface", "colorblind_playercolor_tooltip"),
 		colors = colorblind
 	},
 	simpleColorblind = {
 		order = 5,
-		name = "Simple Colorblind",
-		desc = "Enemies are red, allies are blue, self is teal.",
+		name = WG.Translate("interface", "scolorblind_playercolor"),
+		desc = WG.Translate("interface", "scolorblind_playercolor_tooltip"),
 		colors = simpleColorblind
 	},
 }

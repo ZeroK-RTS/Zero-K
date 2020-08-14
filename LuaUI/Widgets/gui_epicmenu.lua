@@ -676,7 +676,7 @@ local function MakeFlags()
 		flagChildren[#flagChildren + 1] = Button:New{
 			caption = langData.name,
 			name = 'countryButton' .. langData.lang;
-			width = '50%',
+			width = '100%',
 			lang = langData.lang,
 			OnClick = {SetLang }
 		}
@@ -1441,7 +1441,7 @@ local function GetHotkeyData(path, option)
 		return option.hotkey
 	end
 	
-	return 'None' --show "none" on epicmenu's menu
+	return WG.Translate("interface", "hotkey_none_exists") --show "none" on epicmenu's menu
 end
 
 --Make a stack with control and its hotkey button
@@ -2062,7 +2062,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = WG.Translate("interface", "close"), x = 24, y = 4}
+			Label:New{caption = WG.Translate("interface", "close_1"), x = 24, y = 4}
 		}
 	}
 	
@@ -2179,7 +2179,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 	Button:New{
 		name = 'confirmExitYesButton';
 		parent = window_exit_confirm,
-		caption = "Yes",
+		caption = WG.Translate("interface", "yes"),
 		OnClick = {
 			function()
 				action()
@@ -2197,7 +2197,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 	Button:New{
 		name = 'confirmExitNoButton';
 		parent = window_exit_confirm,
-		caption = "No",
+		caption = WG.Translate("interface", "no"),
 		OnClick = {
 			function()
 				LeaveExitConfirmWindow()
