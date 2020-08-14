@@ -525,7 +525,7 @@ function UpdateUnitAttributes(unitID, frame)
 
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (completeDisable == 1)
 	if cloakBlocked then
-		GG.PokeDecloakUnit(unitID, 1)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 	end
 
 	-- remove the attributes if nothing is being changed

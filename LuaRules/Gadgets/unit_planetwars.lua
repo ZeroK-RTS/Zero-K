@@ -486,12 +486,12 @@ local function SpawnStructure(info, teamID, boxData)
 		end
 	end
 	
-	if (unitDef.oddX) then
+	if oddX then
 		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
-	if (unitDef.oddZ) then
+	if oddZ then
 		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
@@ -567,12 +567,12 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 		end
 	end
 	
-	if (unitDef.oddX) then
+	if oddX then
 		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
-	if (unitDef.oddZ) then
+	if oddZ then
 		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
@@ -741,7 +741,6 @@ local function InitializeUnitsToSpawn()
 	local pwDataRaw = modOptions.planetwarsstructures
 	local pwDataFunc, err, success, unitData
 	if not (pwDataRaw and type(pwDataRaw) == 'string') then
-		err = "Planetwars data entry in modoption is empty or in invalid format"
 		return {}, false
 	else
 		pwDataRaw = string.gsub(pwDataRaw, '_', '=')

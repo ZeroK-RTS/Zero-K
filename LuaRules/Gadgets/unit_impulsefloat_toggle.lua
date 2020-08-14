@@ -333,7 +333,7 @@ function gadget:GameFrame(f)
 						if not validMove then
 							local nx, ny, nz = Spring.GetGroundNormal(data.x, data.z)
 							Spring.AddUnitImpulse(unitID, nx, 0, ny)
-							--GG.UnitEcho(unitID, nx .. "  " ..  ny .. "  " .. nz)
+							--Spring.Utilities.UnitEcho(unitID, nx .. "  " ..  ny .. "  " .. nz)
 						end
 					end
 				else --rising

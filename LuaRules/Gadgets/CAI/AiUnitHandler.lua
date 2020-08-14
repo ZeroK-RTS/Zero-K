@@ -67,7 +67,7 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 			str = str .. ", Defense Require Unit"
 		end
 		
-		GG.UnitEcho(unitID, str)
+		Spring.Utilities.UnitEcho(unitID, str)
 	end
 	
 	local function RemoveUnit(unitID, unitDefID)

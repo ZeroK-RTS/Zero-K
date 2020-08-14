@@ -814,7 +814,20 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_disableattack"
+	end
 	
+	if ud.canStockpile then
+		options[defName .. "_stockpile"] = {
+			name = "  Initial Stockpile",
+			desc = "Initial Stockpile: The default stockpile limit of the unit.",
+			type = 'number',
+			value = (ud.name == "turretaaheavy" and 100 or 10),
+			min = 0,
+			max = 100,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_stockpile"
 	end
 end
 
@@ -846,7 +859,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -932,6 +945,27 @@ local function QueueState(unitDefName, stateName, cmdID, cmdArray, invertBool)
 		value = value and 1 or 0
 	end
 	cmdArray[#cmdArray + 1] = {cmdID, {value}, CMD.OPT_SHIFT}
+end
+
+local function StockpileUnit(unitID, wanted, orderArray)
+	local stocked, queued = Spring.GetUnitStockpile(unitID)
+	local to_add = wanted - stocked - queued
+	while to_add > 0 do
+		local added = 1
+		local code = 0
+		if to_add >= 100 then
+			code = CMD.OPT_SHIFT + CMD.OPT_CTRL
+			added = 100
+		elseif to_add >= 20 then
+			code = CMD.OPT_CTRL
+			added = 20
+		elseif to_add >= 5 then
+			code = CMD.OPT_SHIFT
+			added = 5
+		end
+		orderArray[#orderArray + 1] = {CMD.STOCKPILE, {}, code}
+		to_add = to_add - added
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -1130,6 +1164,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "tactical_ai_transport")
 		if value and WG.AddTransport then
 			WG.AddTransport(unitID, unitDefID)
+		end
+		
+		value = GetStateValue(name, "stockpile")
+		if value then
+			StockpileUnit(unitID, value, orderArray)
 		end
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)

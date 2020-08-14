@@ -18,14 +18,10 @@ function widget:GetInfo()
 		author    = "trepan",
 		date      = "Jan 8, 2007",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = 2, -- after unit_start_state.lua
 		enabled   = true  --  loaded by default?
 	}
 end
-
-local constantStockpile = {
-	[UnitDefNames["turretaaheavy"].id] = true,
-}
 
 local CMD_STOCKPILE = CMD.STOCKPILE
 local EMPTY_TABLE = {}
@@ -40,30 +36,9 @@ function widget:Initialize()
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	local ud = UnitDefs[unitDefID]
-	if ((ud ~= nil) and (unitTeam == Spring.GetMyTeamID())) then
-		if (ud.canStockpile) then
-			local stocked, queued = Spring.GetUnitStockpile(unitID)
-			if (not queued) or queued < 50 then
-				-- give stockpilers 100 units to build
-				Spring.GiveOrderToUnit(unitID, CMD.STOCKPILE, EMPTY_TABLE, CMD.OPT_CTRL + CMD.OPT_SHIFT)
-			end
-		end
-	end
-end
-
-function widget:GameFrame(n)
-	if n > 1 then
-		for _, unitID in ipairs(Spring.GetAllUnits()) do
-			widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
-		end
-		widgetHandler:RemoveCallIn("GameFrame")
-	end
-end
-
 function widget:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
-	if constantStockpile[unitDefID] then
+	if newCount < oldCount then
+		-- We just launched a missile, so build a replacement.
 		Spring.GiveOrderToUnit(unitID, CMD_STOCKPILE, EMPTY_TABLE, 0)
 	end
 end

@@ -157,7 +157,7 @@ function AutoAttack_Thread()
 				local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 				local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
 				spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
-				GG.PokeDecloakUnit(unitID,100)
+				GG.PokeDecloakUnit(unitID, unitDefID)
 				
 				EmitSfx(emit, GG.Script.UNIT_SFX1)
 				EmitSfx(emit, GG.Script.DETO_W2)
@@ -264,5 +264,8 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_ACTIVATE) -- prevent pulsing while undead
+
+	-- keep the unit technically alive (but hidden) for some time so that any inbound
+	-- pulses know who their owner is (so that they can do no damage to allies)
 	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end

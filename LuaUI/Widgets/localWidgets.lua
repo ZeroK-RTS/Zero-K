@@ -40,11 +40,11 @@ function widget:Initialize()
 
   widgetHandler:AddAction(localWidgetsAction, CreateWindow, nil, "t")
 
-  if settings.localWidgets == nil then
-    settings.localWidgets = false
+  if settings.useLocalWidgets == nil then
+    settings.useLocalWidgets = true
   end
-  if settings.localWidgetsFirst == nil then
-    settings.localWidgetsFirst = false
+  if settings.useLocalWidgetsFirst == nil then
+    settings.useLocalWidgetsFirst = true
   end
 
 end
@@ -87,11 +87,11 @@ function CreateWindow()
   contentPane:AddChild(label)
   check1 = Chili.Checkbox:New{
     caption = "Enable local widgets",
-    checked = settings.localWidgets,
+    checked = settings.useLocalWidgets,
   }
   check2 = Chili.Checkbox:New{
     caption = "Load local widgets first",
-    checked = settings.localWidgetsFirst,
+    checked = settings.useLocalWidgetsFirst,
   }
   contentPane:AddChild(check1)
   contentPane:AddChild(check2)
@@ -108,8 +108,8 @@ function Close()
 
   if window0 ~= nil then
 
-    settings.localWidgets = check1.checked
-    settings.localWidgetsFirst = check2.checked
+    settings.useLocalWidgets = check1.checked
+    settings.useLocalWidgetsFirst = check2.checked
 
     window0:Dispose()
     window0 = nil

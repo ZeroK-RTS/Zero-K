@@ -340,7 +340,7 @@ end
 
 local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
-		return false --already reserved an airpad, do not reserve another one again
+		return true --already reserved an airpad, do not reserve another one again
 	end
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then

@@ -508,6 +508,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
+	StartThread(ForceDropUnit)
 	if severity <= 0.25 then
 		Explode(body, SFX.NONE)
 		Explode(RUpperClaw1, SFX.SHATTER	)

@@ -6,7 +6,6 @@ function widget:GetInfo()
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    experimental = false,
     enabled   = true,
   }
 end
@@ -144,7 +143,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -245,7 +244,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
@@ -1948,6 +1947,11 @@ function widget:MousePress(x,y,button)
 		if cmd_id then
 			return false
 		end
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 		
 		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
@@ -1984,11 +1988,6 @@ function widget:MousePress(x,y,button)
 					return true
 				end
 			end
-		end
-
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
 		end
 	end
 

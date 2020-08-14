@@ -74,7 +74,7 @@ if gadgetHandler:IsSyncedCode() then
 		end
 
 		if damage and damage ~= -1 then
-			--GG.TableEcho(wd.damages)
+			--Spring.Utilities.TableEcho(wd.damages)
 			--Spring.Echo("dmg=", dmg, dmg * dmgMod)
 			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
 			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
@@ -230,7 +230,7 @@ local function DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	local hitData = unitData.hitData
 	local found = false
 	--Spring.Echo(unitData.unitID, "#hitData", #hitData)
-	--GG.TableEcho(hitData)
+	--Spring.Utilities.TableEcho(hitData)
 	for _, hitInfo in ipairs(hitData) do
 		if hitInfo then
 			local dist = math.sqrt( ((hitInfo.theta - theta)/PI)^2 + ((hitInfo.phi - phi)/PI)^2  )

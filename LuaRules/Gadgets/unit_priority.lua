@@ -401,7 +401,7 @@ function gadget:GameFrame(n)
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
 							
 							if debugMode and debugOnUnits then
-								GG.UnitEcho(unitID, "Energy Priority: " ..  pri ..
+								Spring.Utilities.UnitEcho(unitID, "Energy Priority: " ..  pri ..
 									", BP: " .. buildSpeed ..
 									", Pull: " .. buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
 								)
@@ -412,7 +412,7 @@ function gadget:GameFrame(n)
 						spending[pri] = spending[pri] + buildSpeed*(buildSpeedMod[unitID] or 1)
 						
 						if debugMode and debugOnUnits then
-							GG.UnitEcho(unitID, "Priority: " .. pri ..
+							Spring.Utilities.UnitEcho(unitID, "Priority: " .. pri ..
 								", BP: " ..  buildSpeed*(buildSpeedMod[unitID] or 1)
 							)
 						end
@@ -431,7 +431,7 @@ function gadget:GameFrame(n)
 								realEnergyOnlyPull = realEnergyOnlyPull + drain*scaleEnergy[pri]
 								
 								if debugMode and debugOnUnits then
-									GG.UnitEcho(unitID, "Misc Energy Priority " .. index .. ": " ..  pri ..
+									Spring.Utilities.UnitEcho(unitID, "Misc Energy Priority " .. index .. ": " ..  pri ..
 										", BP: " .. drain ..
 										", Pull: " .. realEnergyOnlyPull + drain*scaleEnergy[pri]
 									)
@@ -440,7 +440,7 @@ function gadget:GameFrame(n)
 						else
 							spending[pri] = spending[pri] + drain
 							if debugMode and debugOnUnits then
-								GG.UnitEcho(unitID, "Misc Priority " .. index .. ": " ..  pri ..
+								Spring.Utilities.UnitEcho(unitID, "Misc Priority " .. index .. ": " ..  pri ..
 									", BP: " .. drain
 								)
 							end

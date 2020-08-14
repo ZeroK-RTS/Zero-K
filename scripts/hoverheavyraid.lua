@@ -10,6 +10,8 @@ local fire = {
 	piece 'fire3',
 }
 
+local SIG_AIM = 1
+
 local body = piece 'body'
 local wakes_1 = piece 'jetl'
 local wakes_2 = piece 'jetr'

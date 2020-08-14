@@ -24,7 +24,7 @@ local function BuildDecloakThread()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
 	while true do
-		GG.PokeDecloakUnit(unitID, 50)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 		Sleep(1000)
 	end
 end

@@ -96,7 +96,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 			str = str .. ", Economy Cluster Unit"
 		end
 		
-		GG.UnitEcho(unitID, str)
+		Spring.Utilities.UnitEcho(unitID, str)
 	end
 	
 	local function RemoveUnit(unitID, unitDefID)

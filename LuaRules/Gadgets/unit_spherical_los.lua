@@ -36,7 +36,7 @@ local function AddSphericalLOSCheck(unitID, unitDefID)
 	else
 		local ud = UnitDefs[unitDefID]
 		units.count = units.count + 1
-		--GG.UnitEcho(unitID, "added")
+		--Spring.Utilities.UnitEcho(unitID, "added")
 		units.data[units.count] = {
 			unitID = unitID,
 			los = ud.losRadius,
@@ -95,7 +95,7 @@ function gadget:GameFrame(f)
 			if valid and (flying or f < data.removeAfter) then
 				i = i + 1
 			else
-				--GG.UnitEcho(unitID, "removed")
+				--Spring.Utilities.UnitEcho(unitID, "removed")
 				unitsByID[unitID] = nil
 				unitsByID[units.data[units.count].unitID] = i
 				units.data[i] = units.data[units.count]

@@ -65,6 +65,8 @@ local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
+local REPAIR_COST_FACTOR = Game.repairEnergyCostFactor
+
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
 
@@ -160,7 +162,7 @@ local function SitOnPad(unitID)
 	local ud               = UnitDefs[unitDefID]
 	local cost             = ud.metalCost
 	local maxHP            = ud.health
-	local healPerFrame     = 2*landData.repairBp*maxHP/(30*cost)
+	local healPerFrame     = landData.repairBp*maxHP/(REPAIR_COST_FACTOR*30*cost)
 	local repairFrameDrain = landData.repairBp/30
 	local reammoMaxTime     = reammoFrames[unitDefID]
 	

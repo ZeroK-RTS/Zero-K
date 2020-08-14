@@ -54,7 +54,7 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 		if teleporterValid then
 			GG.PokeDecloakUnit(teleporter)
 		end
-		GG.PokeDecloakUnit(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 		soundIndex = soundIndex + 1
 		if soundIndex > 8 then
 			if teleportieeValid then

@@ -8,7 +8,6 @@ function widget:GetInfo()
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
-    experimental = true,
     layer     = 0,
     enabled   = false,
   }

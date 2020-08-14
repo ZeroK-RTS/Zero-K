@@ -77,8 +77,8 @@ function script.StopMoving()
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
 	
 	Turn(turretheading, y_axis, 0, 1.9)

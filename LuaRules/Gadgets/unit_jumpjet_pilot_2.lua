@@ -25,11 +25,9 @@ VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
 local spRequestPath = Spring.RequestPath
 
 local leaperDefID = UnitDefNames.chicken_leaper.id
-local gridSize = math.floor(350/2)
+local gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
 local leapersCommand
 local noRecursion = false
-
-gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
 
 local function Dist(x,y,z, x2, y2, z2)
 	local xd = x2-x

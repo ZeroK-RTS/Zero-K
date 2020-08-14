@@ -138,7 +138,7 @@ local tasks = nubtronData.tasks
 local taskOrder = nubtronData.taskOrder
 nubtronData = nil
 
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

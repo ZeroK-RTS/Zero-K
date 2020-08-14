@@ -34,8 +34,6 @@ local legacyToDyncommChassisMap = legacyTranslators.legacyToDyncommChassisMap
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 
-local NUM_COMM_LEVELS = 5
-
 local commData = {}	-- { players = {[playerID1] = {profiles...}, [playerID2] = {profiles...}}, static = {[staticProfileID1] = {}} }
 local commProfilesByProfileID = {}
 local commProfileIDsByPlayerID = {}
@@ -163,10 +161,6 @@ local function LoadCommData()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- TODO
-local function GetModulesCost(modulesList)
-	return 0
-end
 
 local function GetCommProfileInfo(commProfileID)
 	return commProfilesByProfileID[commProfileID]

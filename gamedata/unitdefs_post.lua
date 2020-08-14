@@ -531,7 +531,7 @@ end
 -- 2x repair speed than BP
 --
 
-local REPAIR_ENERGY_COST_FACTOR = 0.75 -- Game.repairEnergyCostFactor
+local REPAIR_ENERGY_COST_FACTOR = (Game and Game.repairEnergyCostFactor) or 0.666 -- Game.repairEnergyCostFactor
 
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then

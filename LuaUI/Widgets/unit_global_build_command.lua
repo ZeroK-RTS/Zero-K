@@ -1259,6 +1259,35 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 						myCmd = {id=id, target=target, x=x, y=y, z=z, assignedUnits={}}
 					else -- if the target is a unit
 						myCmd = {id=id, target=target, assignedUnits={}}
+
+						-- Cancel inverse jobs
+						if id == CMD_RECLAIM then
+							-- A reclaim command on a target cancels jobs to repair, resurect, or build that target.
+							local inverseHash = BuildHash({id=CMD_REPAIR, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+							inverseHash = BuildHash({id=CMD_RESURRECT, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+							local ux,_,uz = spGetUnitPosition(target)
+							local udID = spGetUnitDefID(target)
+							inverseHash = BuildHash({id=-udID, x=ux, z=uz})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+						elseif id == CMD_RESURRECT or id == CMD_REPAIR then
+							-- A resurect or repair command cancels jobs to reclaim that target.
+							local inverseHash = BuildHash({id=CMD_RECLAIM, target=target})
+							if buildQueue[inverseHash] then
+								StopAnyWorker(inverseHash)
+								buildQueue[inverseHash] = nil
+							end
+						end
 					end
 					
 					local hash = BuildHash(myCmd)

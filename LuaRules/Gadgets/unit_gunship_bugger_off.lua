@@ -32,6 +32,10 @@ for unitDefID = 1, #UnitDefs do
 	end
 end
 
+local customCmds = VFS.Include("LuaRules/Configs/customcmds.lua")
+local CMD_RAW_MOVE = customCmds.RAW_MOVE
+local CMD_FIGHT = CMD.FIGHT
+
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if gunships[unitDefID] then
 		local cmdID = Spring.GetUnitCurrentCommand(unitID)

@@ -14,7 +14,7 @@ local SIG_AIM = 2
 local SIG_MOVE = 1
 
 local RESTORE_DELAY = 5000
-local LOAD_DELAY = 500
+local LOAD_DELAY = 4800
 local TRACK_PERIOD = 50
 
 local BAY_DISTANCE = -10

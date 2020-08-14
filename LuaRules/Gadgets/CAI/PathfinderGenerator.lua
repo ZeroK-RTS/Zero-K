@@ -366,7 +366,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 					linked = false
 				end
 			end
-			--GG.TableEcho(linkRelationMap)
+			--Spring.Utilities.TableEcho(linkRelationMap)
 			--Spring.Echo(dx .. "  " .. dz)
 			--Spring.Echo((linkRelationMap[dx] and linkRelationMap[dx][dz] and "link") or "no link")
 			return linked

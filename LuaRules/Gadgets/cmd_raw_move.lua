@@ -22,6 +22,7 @@ local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spMoveCtrlGetTag    = Spring.MoveCtrl.GetTag
 local spGetCommandQueue   = Spring.GetCommandQueue
 local spGiveOrderToUnit   = Spring.GiveOrderToUnit
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local mapSizeX = Game.mapSizeX
 local mapSizeZ = Game.mapSizeZ
@@ -490,7 +491,7 @@ end
 
 local function CheckUnitQueues()
 	for unitID,_ in pairs(unitQueuesToCheck) do
-		if Spring.GetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
+		if spGetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
 			StopRawMoveUnit(unitID)
 		end
 		unitQueuesToCheck[unitID] = nil
@@ -543,7 +544,7 @@ end
 local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 	local _
 	if cmdID == CMD_RAW_BUILD then
-		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID, 2)
+		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID, 2)
 	end
 	if not cmdID then
 		return false
@@ -585,7 +586,7 @@ local function CheckConstructorBuild(unitID)
 		return
 	end
 	
-	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID)
 	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
@@ -696,7 +697,7 @@ end
 -- Move replacement
 
 local function ReplaceMoveCommand(unitID)
-	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = spGetUnitCurrentCommand(unitID)
 	if cmdID == CMD_MOVE and cmdParam_3 then
 		if fromFactory[unitID] then
 			fromFactory[unitID] = nil

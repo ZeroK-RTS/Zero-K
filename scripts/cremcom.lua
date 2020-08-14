@@ -187,11 +187,11 @@ end
 
 function beginJump()
 	script.StopMoving()
-	GG.PokeDecloakUnit(unitID, 50)
+	GG.PokeDecloakUnit(unitID, unitDefID)
 end
 
 function jumping()
-	GG.PokeDecloakUnit(unitID, 50)
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	for i=1,4 do
 		EmitSfx(jets[i], 1028)
 	end

@@ -117,10 +117,12 @@ local function WeaponRangeUpdate()
 		if height < -35 then
 			if not longRange then
 				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+				Spring.SetUnitMaxRange(unitID, torpRange)
 				longRange = true
 			end
 		elseif longRange then
 			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+			Spring.SetUnitMaxRange(unitID, shotRange)
 			longRange = false
 		end
 		Sleep(200)

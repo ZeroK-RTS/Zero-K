@@ -623,7 +623,7 @@ local function InitializePlayerlist()
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name = "Player List",
+		name = "Player List", -- NB: this exact string is needed for HUD preset playerlist handling
 		padding = {0, 0, 0, 0},
 		x = screenWidth - windowWidth,
 		y = math.floor(screenHeight/10),

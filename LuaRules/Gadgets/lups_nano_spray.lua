@@ -80,6 +80,8 @@ local GetFeatureRadius     = Spring.GetFeatureRadius
 local spGetFeatureDefID    = Spring.GetFeatureDefID
 local spGetTeamColor       = Spring.GetTeamColor
 local spGetGameFrame       = Spring.GetGameFrame
+local spGetUnitCurrentBuildPower = Spring.GetUnitCurrentBuildPower
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 
 local type  = type
 local pairs = pairs
@@ -276,7 +278,7 @@ function gadget:GameFrame(frame)
 	for i = 1, #builders do
 		local unitID = builders[i]
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
-			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1) -- * 16
+			local strength = (spGetUnitCurrentBuildPower(unitID) or 0)*(spGetUnitRulesParam(unitID, "totalEconomyChange") or 1) -- * 16
 			if (strength > 0) then
 				local targetType, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 

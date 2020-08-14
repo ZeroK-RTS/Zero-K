@@ -41,6 +41,7 @@ local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spSetUnitRulesParam      = Spring.SetUnitRulesParam
 local spGetUnitRulesParam      = Spring.GetUnitRulesParam
 local spGetFeatureDefID        = Spring.GetFeatureDefID
+local spSpawnCEG               = Spring.SpawnCEG
 
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -145,9 +146,6 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GameFrame(f)
-	-- putting the localization here because cannot localize in global scope since spring 97
-	local spSpawnCEG = Spring.SpawnCEG
-
 	if f%UPDATE_FREQUNECY == 3 then
 		local featureMetal = {} -- list of updated feature metal
 		
@@ -186,7 +184,7 @@ function gadget:GameFrame(f)
 						end
 						
 						if cloaked then
-							GG.PokeDecloakUnit(unitID, 25)
+							GG.PokeDecloakUnit(unitID)
 							cloaked = false
 						end
 					else
@@ -203,11 +201,11 @@ function gadget:GameFrame(f)
 										units[ally].progress = 0
 									end
 									if cloaked then
-										GG.PokeDecloakUnit(unitID, 25)
+										GG.PokeDecloakUnit(unitID)
 										cloaked = false
 									end
 									if allyCloaked then
-										GG.PokeDecloakUnit(ally, 25)
+										GG.PokeDecloakUnit(ally)
 									end
 								end
 							end
