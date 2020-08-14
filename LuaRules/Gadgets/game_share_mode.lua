@@ -73,7 +73,6 @@ end
 local debug = false
 local playerstates = {} -- keeps track of player states so that we can remerge them if necessary.
 local invites = {}
-local controlledTeams = {} -- contains which team a team of players should be under.
 local originalTeamID = {} -- takes playerID as the key, gives the team as the value.
 local originalUnits = {} -- contains which units are owned by a team that has commshared.
 
@@ -153,7 +152,6 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 		if originalTeamID[playerID] then
 			local orgTeamID = originalTeamID[playerID]
 			spAssignPlayerToTeam(playerID,orgTeamID)
-			controlledTeams[orgTeamID] = nil
 			local unitID
 			for i = 1, #originalUnits[orgTeamID] do
 				unitID = originalUnits[orgTeamID][i]
@@ -195,7 +193,6 @@ local function MergePlayer(playerID,target)
 		if GetSquadSize(orgTeamID) - 1 == 0 then
 			local metal = spGetTeamResources(orgTeamID,"metal")
 			local energy = spGetTeamResources(orgTeamID,"energy")
-			controlledTeams[orgTeamID] = target
 			spShareTeamResource(orgTeamID,target,"metal",metal)
 			spShareTeamResource(orgTeamID,target,"energy",energy)
 			MergeUnits(orgTeamID,target)
@@ -416,9 +413,9 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if controlledTeams[unitTeam] then
-		DebugEcho("Commshare: unitCreated triggered for " .. unitTeam .. ", given to " .. controlledTeams[unitTeam])
-		spTransferUnit(unitID, controlledTeams[unitTeam], true) -- this is in case of late commer coms,etc.
+	if spGetTeamRulesParam(orgTeamID,"isCommsharing") then
+		DebugEcho("Commshare: unitCreated triggered for " .. unitTeam .. ", given to " .. spGetTeamRulesParam(orgTeamID,"isCommsharing"))
+		spTransferUnit(unitID, spGetTeamRulesParam(orgTeamID,"isCommsharing"), true) -- this is in case of late commer coms,etc.
 	end
 end
 --[[ No longer needed since share menu does not allow empty teams to receive units. Unbind sharedialogue instead!
