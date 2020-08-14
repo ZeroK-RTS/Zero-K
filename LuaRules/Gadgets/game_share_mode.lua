@@ -73,7 +73,6 @@ end
 local debug = false
 local playerstates = {}
 local invites = {}
-local controlledPlayers = {} -- table containing which team a playerID should be under.
 local controlledTeams = {} -- contains which team a team of players should be under.
 local originalTeamID = {} -- takes playerID as the key, gives the team as the value.
 local originalUnits = {} -- contains which units are owned by a team that has commshared.
@@ -164,7 +163,7 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 			end
 			spSetTeamRulesParam(originalTeamID[playerID], "isCommsharing", nil)
 			spSetPlayerRulesParam(playerID,"commshare_team_id",nil)
-			originalUnits[orgTeamID], controlledPlayers[playerID] = nil, nil
+			originalUnits[orgTeamID] = nil
 		else
 			DebugEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)")
 		end
@@ -207,9 +206,8 @@ local function MergePlayer(playerID,target)
 		if originalTeamID[playerID] == nil then
 			originalTeamID[playerID] = orgTeamID
 		end
-		controlledPlayers[playerID] = target
 	else
-		DebugEcho("[Commshare] Merger error.")
+		DebugEcho("[Commshare] Merge error.")
 	end
 end
 
@@ -347,7 +345,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		if strFind(command,"unmerge") then
 			local afk = IsTeamAfk(GetTeamID(playerID))
 			DebugEcho("team is afk: " .. tostring(afk))
-			if controlledPlayers[playerID] and not afk then
+			if spGetPlayerRulesParam(targetID, "commshare_team_id") and not afk then
 				UnmergePlayer(playerID)
 				return
 			else
