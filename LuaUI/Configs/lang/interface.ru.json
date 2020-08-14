@@ -119,16 +119,16 @@
 	"defence_range_spec" : "Показывать дальность всех наземных сооружений в режиме наблюдателя",
 	"defence_range_spec_air" : "Показывать дальность всех сооружений ПВО в режиме наблюдателя",
 	"defence_range_spec_nuke" : "Показывать радиус покрытия всех систем ПРО в режиме наблюдателя",
-	"default_playercolor" : "Стандартный"
-	"default_playercolor_tooltip" : "Цвета команд по умолчанию. Союзники имеют синие оттенки, противники красные, игрок зелёный."
-	"simple_playercolor" : "Простой"
-	"simple_playercolor_tooltip" : "Простые цвета. Союзники синие, противники красные, игрок зелёный."
-	"selfteal_playercolor" : "Игрок циан"
-	"selfteal_playercolor_tooltip" : "Союзники имеют синие и зелёные оттенки, противники красные и жёлтые, игрок циановый."
-	"colorblind_playercolor" : "Для дальтоников"
-	"colorblind_playercolor_tooltip" : "Союзники имеют синие оттенки, противники красные, игрок циановый."
-	"scolorblind_playercolor" : "Для дальтоников 2"
-	"scolorblind_playercolor_tooltip" : "Союзники синие, противники красные, игрок циановый."
+	"default_playercolor" : "Стандартный",
+	"default_playercolor_tooltip" : "Цвета команд по умолчанию. Союзники имеют синие оттенки, противники красные, игрок зелёный.",
+	"simple_playercolor" : "Простой",
+	"simple_playercolor_tooltip" : "Простые цвета. Союзники синие, противники красные, игрок зелёный.",
+	"selfteal_playercolor" : "Игрок циан",
+	"selfteal_playercolor_tooltip" : "Союзники имеют синие и зелёные оттенки, противники красные и жёлтые, игрок циановый.",
+	"colorblind_playercolor" : "Для дальтоников",
+	"colorblind_playercolor_tooltip" : "Союзники имеют синие оттенки, противники красные, игрок циановый.",
+	"scolorblind_playercolor" : "Для дальтоников 2",
+	"scolorblind_playercolor_tooltip" : "Союзники синие, противники красные, игрок циановый.",
 	"vote_ended_success" : "ОКОНЧЕНО:УСПЕХ",
 	"vote_ended_failed" : "ОКОНЧЕНО:ПРОВАЛ",
 	"vote_none" : "Сейчас не происходит голосование, сначала начните его",
