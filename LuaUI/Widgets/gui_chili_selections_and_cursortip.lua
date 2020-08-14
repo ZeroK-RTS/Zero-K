@@ -129,7 +129,7 @@ local terraCmdTip = {
 		yellow..WG.Translate("interface", "tera_tooltip_indicators_name")..
 		green.. WG.Translate("interface", "green")..white..WG.Translate("interface", "tera_tooltip_indicators_all")..
 		green.. WG.Translate("interface", "yellow")..white..WG.Translate("interface", "tera_tooltip_indicators_nowheels")..
-		green.. WG.Translate("interface", "redd")..white..WG.Translate("interface", "tera_tooltip_indicators_onlyallterrain"),
+		green.. WG.Translate("interface", "red")..white..WG.Translate("interface", "tera_tooltip_indicators_onlyallterrain"),
 	[CMD_LEVEL] = terraformGeneralTip ..
 		yellow..WG.Translate("interface", "tera_gtooltip_during")..
 		green.. WG.Translate("interface", "ctrl")..white..WG.Translate("interface", "tera_gtooltip_line")..
