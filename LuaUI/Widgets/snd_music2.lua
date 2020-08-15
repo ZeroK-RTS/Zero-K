@@ -13,7 +13,7 @@
 
 function widget:GetInfo()
 	return {
-		name	= "Music Player",
+		name	= "Music Player v2",
 		desc	= "Plays music based on situation",
 		author	= "cake, trepan, Smoth, Licho, xponen",
 		date	= "Mar 01, 2008, Aug 20 2009, Nov 23 2011",
