@@ -13,7 +13,7 @@
 
 function widget:GetInfo()
 	return {
-		name	= "Music Player",
+		name	= "Music Player v2",
 		desc	= "Plays music based on situation",
 		author	= "cake, trepan, Smoth, Licho, xponen",
 		date	= "Mar 01, 2008, Aug 20 2009, Nov 23 2011",
@@ -46,8 +46,6 @@ options = {
 
 local unitExceptions = include("Configs/snd_music_exception.lua")
 
-local windows = {}
-
 local warThreshold = 5000
 local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
@@ -61,29 +59,21 @@ local timeframetimer_short = 0
 local loopTrack = ''
 local previousTrack = ''
 local previousTrackType = ''
-local newTrackWait = 1000
 local numVisibleEnemy = 0
-local fadeVol
-local curTrack	= "no name"
-local songText	= "no name"
 local haltMusic = false
 local looping = false
-local paused = false
-local lastTrackTime = -1
+local musicMuted = false
+local musicPaused = false
 
 local warTracks, peaceTracks, briefingTracks, victoryTracks, defeatTracks
 
-local firstTime = false
-local wasPaused = false
-local firstFade = true
-local initSeed = 0
 local initialized = false
 local gameStarted = Spring.GetGameFrame() > 0
-local gameOver = false
-
 local myTeam = Spring.GetMyTeamID()
 local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 local defeat = false
+
+local spToggleSoundStreamPaused = Spring.PauseSoundStream
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -99,7 +89,6 @@ local function StartLoopingTrack(trackInit, trackLoop)
 	Spring.StopSoundStream()
 	musicType = 'custom'
 	
-	curTrack = trackInit
 	loopTrack = trackLoop
 	Spring.PlaySoundStream(trackInit, WG.music_volume or 0.5)
 	looping = 0.5
@@ -140,18 +129,7 @@ local function StartTrack(track)
 			tries = tries + 1
 		until newTrack ~= previousTrack or tries >= 10
 	end
-	-- for key, val in pairs(oggInfo) do
-		-- Spring.Echo(key, val)
-	-- end
-	firstFade = false
 	previousTrack = newTrack
-	
-	-- if (oggInfo.comments.TITLE and oggInfo.comments.TITLE) then
-		-- Spring.Echo("Song changed to: " .. oggInfo.comments.TITLE .. " By: " .. oggInfo.comments.ARTIST)
-	-- else
-		-- Spring.Echo("Song changed but unable to get the artist and title info")
-	-- end
-	curTrack = newTrack
 	Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5)
 	
 	WG.music_start_volume = WG.music_volume
@@ -185,9 +163,6 @@ local function SetPeaceThreshold(num)
 end
 
 function widget:Update(dt)
-	if gameOver then
-		return
-	end
 	if not initialized then
 		math.randomseed(os.clock()* 100)
 		initialized=true
@@ -214,8 +189,6 @@ function widget:Update(dt)
 	if timeframetimer_short > 0.03 then
 		local playedTime, totalTime = Spring.GetSoundStreamTime()
 		playedTime = tonumber( ("%.2f"):format(playedTime) )
-		paused = (playedTime == lastTrackTime)
-		lastTrackTime = playedTime
 		if looping then
 			if looping == 0.5 then
 				looping = 1
@@ -226,11 +199,16 @@ function widget:Update(dt)
 		end
 		timeframetimer_short = 0
 	end
-	
+	if not musicMuted and WG.music_volume == 0 then
+		Spring.StopSoundStream()
+		musicMuted = true
+		musicPaused = false
+	elseif musicMuted and WG.music_volume > 0 then
+		musicMuted = false
+	end
 	timeframetimer = timeframetimer + dt
 	if (timeframetimer > UPDATE_PERIOD) then	-- every second
 		timeframetimer = 0
-		newTrackWait = newTrackWait + 1
 		local PlayerTeam = Spring.GetMyTeamID()
 		numVisibleEnemy = 0
 		local doods = Spring.GetVisibleUnits(-1, nil, true)
@@ -262,45 +240,25 @@ function widget:Update(dt)
 			end
 		end
 		
-		if (not firstTime) then
-			StartTrack()
-			firstTime = true -- pop this cherry
-		end
-		
 		local playedTime, totalTime = Spring.GetSoundStreamTime()
 		playedTime = math.floor(playedTime)
 		totalTime = math.floor(totalTime)
-		--Spring.Echo(playedTime, totalTime)
-		
-		--Spring.Echo(playedTime, totalTime, newTrackWait)
-		
-		--if((totalTime - playedTime) <= 6 and (totalTime >= 1) ) then
-			--Spring.Echo("time left:", (totalTime - playedTime))
-			--Spring.Echo("volume:", (totalTime - playedTime)/6)
-			--if ((totalTime - playedTime)/6 >= 0) then
-			--	Spring.SetSoundStreamVolume((totalTime - playedTime)/6)
-			--else
-			--	Spring.SetSoundStreamVolume(0.1)
-			--end
-		--elseif(playedTime <= 5 )then--and not firstFade
-			--Spring.Echo("time playing:", playedTime)
-			--Spring.Echo("volume:", playedTime/5)
-			--Spring.SetSoundStreamVolume( playedTime/5)
-		--end
-		--Spring.Echo(previousTrackType, musicType)
+		local _, _, paused = Spring.GetGameSpeed()
 		if ( previousTrackType == "peace" and musicType == 'war' )
 		 or (playedTime >= totalTime)	-- both zero means track stopped
 		 and not(haltMusic or looping) then
 			previousTrackType = musicType
-			StartTrack()
-			
-			--Spring.Echo("Track: " .. newTrack)
-			newTrackWait = 0
+			if not musicMuted and not (paused and options.pausemusic.value) then -- prevents music player from starting again until it is not muted and not "paused" (see: pausemusic option).
+				StartTrack()
+			end
 		end
-		local _, _, paused = Spring.GetGameSpeed()
-		if (paused ~= wasPaused) and options.pausemusic.value then
-			Spring.PauseSoundStream()
-			wasPaused = paused
+		if not musicPaused and totalTime > 0 and paused and options.pausemusic.value then -- game got paused with the pausemusic option enabled, so pause the music stream.
+			spToggleSoundStreamPaused()
+			musicPaused = true
+		end
+		if musicPaused and (not paused or not options.pausemusic.value) then -- user disabled pausemusic option or game gets unpaused so unpause the music.
+			spToggleSoundStreamPaused()
+			musicPaused = false
 		end
 	end
 end
@@ -310,14 +268,14 @@ function widget:GameStart()
 		gameStarted = true
 		previousTrackType = musicType
 		musicType = "peace"
-		StartTrack()
+		if Spring.GetSoundStreamTime() > 0 then -- if there's a briefing track playing, stop it and start peace track.
+			Spring.StopSoundStream()
+		end
 	end
-	
-	--Spring.Echo("Track: " .. newTrack)
-	newTrackWait = 0
 end
 
--- Safety of a heisenbug
+-- Safety of a heisenbug. (Running game through chobby)
+-- see: https://github.com/ZeroK-RTS/Zero-K/commit/0d2398cbc7c05eabda9f25dc3eeb56363793164e#diff-55f47403c24513e47b4350a108deb5f0)
 function widget:GameFrame()
 	widget:GameStart()
 	widgetHandler:RemoveCallIn('GameFrame')
@@ -399,6 +357,7 @@ end
 
 function widget:GameOver()
 	PlayGameOverMusic(not defeat)
+	widgetHandler:RemoveCallIn('Update') -- stop music player on game over.
 end
 
 function widget:Initialize()
@@ -410,15 +369,6 @@ function widget:Initialize()
 	WG.Music.SetPeaceThreshold = SetPeaceThreshold
 	WG.Music.GetMusicType = GetMusicType
 	WG.Music.PlayGameOverMusic = PlayGameOverMusic
-
-	-- Spring.Echo(math.random(), math.random())
-	-- Spring.Echo(os.clock())
- 
-	-- for TrackName,TrackDef in pairs(peaceTracks) do
-		-- Spring.Echo("Track: " .. TrackDef)
-	-- end
-	--math.randomseed(os.clock()* 101.01)--lurker wants you to burn in hell rgn
-	-- for i=1,20 do Spring.Echo(math.random()) end
 	
 	for i = 1, 30, 1 do
 		dethklok[i]=0
@@ -428,10 +378,6 @@ end
 function widget:Shutdown()
 	Spring.StopSoundStream()
 	WG.Music = nil
-	
-	for i=1,#windows do
-		(windows[i]):Dispose()
-	end
 end
 
 --------------------------------------------------------------------------------

@@ -2320,16 +2320,6 @@ local function GetMainPanel(parent, width, height)
 							end
 							settings.music_volume = self.value
 							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <= 0) then
-								widgetHandler:DisableWidget("Music Player")
-							end
-							if (self.prevValue <= 0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player")
-							end
 							self.prevValue = self.value
 						end
 					},
