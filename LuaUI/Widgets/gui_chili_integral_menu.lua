@@ -187,7 +187,7 @@ options = {
 	},
 	label_apply = {
 		type = 'label',
-		name = 'Changes require application or restart',
+		name = 'Click to apply changes. They are also applied the next time the game is launched.',
 		path = customGridPath
 	},
 	label_tab = {
