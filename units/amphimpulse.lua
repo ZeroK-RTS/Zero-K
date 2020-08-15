@@ -97,7 +97,6 @@ return { amphimpulse = {
         explosionGenerator      = [[custom:sonic]],
         edgeEffectiveness       = 0.5,
         fireStarter             = 150,
-        heightBoostFactor       = 0.0,
         impulseBoost            = 140,
         impulseFactor           = 0.5,
         interceptedByShieldType = 1,
