@@ -123,7 +123,7 @@ return { amphimpulse = {
     },
     FAKE_SONIC         = {
       name                    = [[Sonic Blaster]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 96,
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
@@ -146,7 +146,6 @@ return { amphimpulse = {
       explosionGenerator      = [[custom:sonic]],
       edgeEffectiveness       = 0.5,
       fireStarter             = 150,
-      heightBoostFactor       = 0.0,
       impulseBoost            = 200,
       impulseFactor           = 0.5,
       interceptedByShieldType = 1,
