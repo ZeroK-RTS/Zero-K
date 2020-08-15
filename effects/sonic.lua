@@ -132,6 +132,7 @@ local altforms = {
       },
     },
   },
+}
 
 local suMergeTable = Spring.Utilities.MergeTable
 for cegName, info in pairs(altforms) do
