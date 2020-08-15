@@ -132,10 +132,10 @@ local altforms = {
       },
     },
   },
+}
 
 local suMergeTable = Spring.Utilities.MergeTable
 for cegName, info in pairs(altforms) do
-  Spring.Echo(cegName)
   fx[cegName] = suMergeTable(info.modifications, fx[info.source], true)
 end
 
