@@ -4,7 +4,8 @@ include "constants.lua"
 include "utility.lua"
 include 'letsNotFailAtTrig.lua'
 
-local base, pelvis, body = piece('base', 'pelvis', 'body')
+-- unused piece: base
+local pelvis, body = piece('pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
 local holder, sphere = piece('holder', 'sphere')
 

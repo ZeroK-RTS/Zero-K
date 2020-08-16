@@ -3,11 +3,7 @@ local lWing = piece 'lWing'
 local rWing = piece 'rWing'
 local gun1 = piece 'gun1'
 local gun2 = piece 'gun2'
-local muzz1 = piece 'muzzle1'
-local muzz2 = piece 'muzzle2'
-
-local thrust1 = piece 'thrust1'
-local thrust2 = piece 'thrust2'
+-- unused pieces: muzzle[12], thrust[12]
 
 local smokePiece = {base}
 

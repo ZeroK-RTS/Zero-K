@@ -1,7 +1,7 @@
 local body = piece 'body'
 local turret = piece 'turret'
 local flare = piece 'flare'
-local barrel = piece 'barrel'
+-- unused piece: 'barrel'
 local lfupleg = piece 'lfupleg'
 local lrupleg = piece 'lrupleg'
 local rrupleg = piece 'rrupleg'
