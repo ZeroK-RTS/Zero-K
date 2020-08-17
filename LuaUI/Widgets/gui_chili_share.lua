@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name    = "Chili Share menu v1.24",
 		desc    = "Press H to bring up the chili share menu.",
-		author  = "Commshare by _Shaman, Playerlist by DeinFreund",
+		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
-		license = "Do whatever with it (cuz a license isn't going to stop you ;) )",
+		license = "PD",
 		layer   = 2000,
 		enabled = true,
 	}

@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name      = "Command Watcher",
 		desc      = "Watches commands and messages visible to the player.",
-		author    = "_Shaman",
+		author    = "Shaman",
 		date      = "November 11, 2018",
-		license   = "Lubglub",
+		license   = "PD",
 		layer     = 5,
 		enabled   = false,
 	}
