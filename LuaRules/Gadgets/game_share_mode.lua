@@ -4,7 +4,7 @@ function gadget:GetInfo()
 		desc	 = "Allows one to share control of resources and units with other players.",
 		author	 = "Shaman",
 		date	 = "6-23-2016",
-		license	 = "CC-0",
+		license	 = "PD",
 		layer	 = 0,
 		enabled	 = true,
 	}
