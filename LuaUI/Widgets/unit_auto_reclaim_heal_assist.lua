@@ -117,7 +117,7 @@ local function DisableForSpec()
 	end
 end
 
-local function DisableForCommshare() -- this breaks commshare very badly.
+local function DisableForCommshare() -- this breaks commshare very badly by not allowing them to issue orders to our cons unless they rapidly issue orders to them.
 	if Spring.GetMyTeamID() ~= myteam or #Spring.GetPlayerList(Spring.GetMyTeamID()) > 1 then
 		widgetHandler:RemoveWidget()
 	end

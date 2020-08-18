@@ -798,7 +798,7 @@ function widget:PlayerChanged(playerID)
 	end
 	if #Spring.GetPlayerList(spGetMyTeamID()) > 1 then -- GBC breaks with commshare
 		Spring.Echo("<Global Build Command> Commshare detected. Widget removed.")
-		widgetHandler:RemoveWidget() 
+		widgetHandler:RemoveWidget(widget) 
 	end 
 end
 
