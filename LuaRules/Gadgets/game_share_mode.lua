@@ -28,6 +28,7 @@ local strLower = string.lower
 
 -- Spring API --
 local spEcho = Spring.Echo
+local spIsGameOver = Spring.IsGameOver
 local spGetPlayerRulesParam = Spring.GetPlayerRulesParam
 local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
 local spGetPlayerInfo = Spring.GetPlayerInfo
@@ -75,7 +76,8 @@ local debug = false
 local playerstates = {} -- keeps track of player states so that we can remerge them if necessary.
 local invites = {} -- the invites people have out.
 local originalUnits = {} -- contains which units are owned by a team that has commshared.
-local deadplayers = {count = 0, players = {}}
+local updateplayers = {}
+local updateplayercount = 0
 
 local firstMintime = true -- Partial initialize in gameframe after the game starts
 
@@ -157,8 +159,9 @@ end
 
 local function UnmergeUnits(orgTeamID, newOwner)
 	local unitID
-	for i = 1, #originalUnits[orgTeamID] do
-		unitID = originalUnits[orgTeamID][i]
+	local units = originalUnits[orgTeamID]
+	for i = 1, #units do
+		unitID = units[i]
 		if spValidUnitID(unitID) and spAreTeamsAllied(spGetUnitTeam(unitID), orgTeamID) then
 			spTransferUnit(unitID, newOwner, true)
 		end
@@ -209,8 +212,9 @@ end
 local function MergeUnits(teamID, target)
 	originalUnits[teamID] = spGetTeamUnits(teamID)
 	local unitID
-	for i = 1, #originalUnits[teamID] do
-		unitID = originalUnits[teamID][i]
+	local units = originalUnits[teamID]
+	for i = 1, #units do
+		unitID = units[i]
 		if spValidUnitID(unitID) then
 			spTransferUnit(unitID, target, true)
 		end
@@ -327,8 +331,11 @@ local function AcceptInvite(player,target)
 	end
 end
 
-local function DisposePlayer(playerID) -- clean up this player.
-	local name,_ = spGetPlayerInfo(playerID,false)
+local function DisposePlayer(playerID) -- clean up this player. Called 1 frame after players resign (to prevent multiple calls)
+	if spIsGameOver() then -- Don't even bother processing.
+		return
+	end
+	local name = spGetPlayerInfo(playerID,false)
 	local teamid = playerstates[playerID].teamid
 	DebugEcho("[Commshare] Disposing of player " .. name)
 	DebugEcho("TeamID: " .. tostring(teamid) .. "\nIsTeamLeader: " .. tostring(IsTeamLeader(playerID)) .. "\nSquadsize: " .. GetSquadSize(teamid))
@@ -352,7 +359,7 @@ local function DisposePlayer(playerID) -- clean up this player.
 		local squadsize = GetSquadSize(teamid) + 1
 		local newleader = select(2,spGetTeamInfo(teamid,false))
 		local newleadername,_ = spGetPlayerInfo(newleader,false)
-		if squadsize > 2 then -- needed because often times squad members resign and there's
+		if squadsize > 2 then -- needed because often times squad members resign and there's no resign message. (This is because lagmonitor doesn't see a team dying I think. We're dealing with players after all.)
 			spEcho("game_message: " .. name .. " resigned, transfering squad lead to " .. newleadername .. ".")
 		elseif squadsize == 2 then
 			spEcho("game_message: " .. name .. " resigned. Squad broken!")
@@ -360,6 +367,36 @@ local function DisposePlayer(playerID) -- clean up this player.
 	end
 	spSetPlayerRulesParam(playerID, "commshare_orig_teamid",nil)
 	playerstates[playerID] = nil
+end
+
+local function CheckIfAlreadyExists(targetID)
+	if updateplayercount == 0 then
+		return false
+	end
+	for i=1, updateplayercount do
+		if updateplayers[updateplayercount].playerID == targetID then
+			return true
+		end
+	end
+	return false
+end
+
+local function AddUpdatePlayer(targetID, status)
+	if CheckIfAlreadyExists(targetID) then
+		return
+	end
+	updateplayercount = updateplayercount + 1
+	if updateplayers[updateplayercount] then
+		updateplayers[updateplayercount].playerID = targetID
+		updateplayers[updateplayercount].status = status
+	else
+		updateplayers[updateplayercount] = {playerID = targetID, status = status}
+	end
+end
+
+local function RemergePlayer(targetID)
+	local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
+	MergePlayer(targetID,commshareID)
 end
 
 ------------------ Callins ------------------
@@ -396,12 +433,17 @@ function gadget:GameFrame(frame)
 		MergeAll()
 		firstMintime = false
 	end
-	if deadplayers.count > 0 then
-		for id,_ in pairs(deadplayers.players) do
-			DisposePlayer(id)
-			deadplayers.players[id] = nil
+	if updateplayercount > 0 and not spIsGameOver() then -- this is prevent excessive processing on game over.
+		local player
+		for i=1, updateplayercount do
+			player = updateplayers[i]
+			if player.status == "dead" then
+				DisposePlayer(updateplayers[i].playerID)
+			elseif player.status == "remerge" then
+				RemergePlayer(updateplayers[i].playerID)
+			end
 		end
-		deadplayers.count = 0
+		updateplayercount = 0
 	end
 end
 
@@ -453,7 +495,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			elseif not spectator then
 				DebugEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[playerID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[playerID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID))
 				if active ~= playerstates[targetID].active and active and commshareID then -- this player has reconnected.
-					MergePlayer(targetID,commshareID)
+					AddUpdatePlayer(targetID,"remerge")
 					DebugEcho("Commshare: Remerged " .. name)
 				end
 				playerstates[targetID].active = active
@@ -461,8 +503,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				playerstates[targetID].teamid = teamID
 			elseif spectator and playerstates[targetID] then -- this player resigned
 				DebugEcho("Commshare: Disposing of " .. name)
-				deadplayers.count = deadplayers.count + 1
-				deadplayers.players[targetID] = true
+				AddUpdatePlayer(targetID,"dead")
 				return
 			end
 		elseif strFind(command, "accept") then
