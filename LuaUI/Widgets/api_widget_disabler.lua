@@ -26,11 +26,13 @@ local spEcho = Spring.Echo
 local badwidgets = {
 	[1] = "*Mearth Location Tags*1.0", -- Map: Mearth_v4.
 	[2] = "Metalspot Finder (map)", -- oktogon v3
+	[3] = "Auto LLT", -- troublesome public widget
 }
 
 local reason = {
 	[1] = "Causes black ground on some graphics cards, possible copyright issues.",
 	[2] = "breaks everything mex-related",
+	[3] = "Majorly inefficient use of commands that can lag games out. WARNING: USE AT YOUR OWN RISK. USE OF THIS WIDGET MAY GET YOU BANNED. YOU HAVE BEEN WARNED.",
 }
 
 -- callins --
