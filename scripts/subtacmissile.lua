@@ -4,6 +4,8 @@ local door2 = piece "door2"
 local missile = piece "missile"
 local aimpoint = piece "aimpoint"
 
+local smokePiece = {base}
+
 include "constants.lua"
 
 local SIG_AIM = 1
@@ -17,6 +19,18 @@ function script.AimFromWeapon()
 end
 
 local respawning_rocket = false
+
+local function MoveScript()
+	while true do
+		if moving and not Spring.GetUnitIsCloaked(unitID) then
+			local x,y,z = Spring.GetUnitPosition(unitID);
+			if y > criticalHeight then
+				EmitSfx(missile, 3)
+			end
+		end
+		Sleep(150)
+	end
+end
 
 local function RestoreAfterDelay ()
 	SetSignalMask (SIG_AIM)
@@ -68,24 +82,18 @@ function script.FireWeapon()
 	Show(missile)
 end
 
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0)
-		then submerged = false
-		else submerged = true
-	end
+function script.StopMoving()
+	moving = false
 end
 
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damageTable = WeaponDefs[weaponDefID].damages
-		return damage * (damageTable[elseArmorClass] / damageTable[subArmorClass])
-	end
-	return damage
+function script.StartMoving()
+	moving = true
+end
+
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(MoveScript)
+	criticalHeight = -1 * Spring.GetUnitHeight(unitID) + 5
 end
 
 function script.Killed(recentDamage, maxHealth)

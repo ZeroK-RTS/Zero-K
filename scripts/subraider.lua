@@ -3,6 +3,22 @@
 local wake = piece "wake"
 local base = piece "base"
 local firepoint = piece "firepoint"
+local smokePiece = {base}
+local moving = false
+local criticalHeight = 0
+
+local function MoveScript()
+	while true do
+		if moving and not Spring.GetUnitIsCloaked(unitID) then
+			local x,y,z = Spring.GetUnitPosition(unitID);
+			if y > criticalHeight then
+				EmitSfx(wake, 3)
+				EmitSfx(firepoint, 3)
+			end
+		end
+		Sleep(150)
+	end
+end
 
 function script.QueryWeapon(num)
 	return firepoint
@@ -19,26 +35,18 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 240, 25, 0.5) -- Leeway for amph regen
 end
 
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0) then
-		submerged = false
-	else
-		submerged = true
-	end
+function script.StopMoving()
+	moving = false
 end
 
+function script.StartMoving()
+	moving = true
+end
 
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damages = WeaponDefs[weaponDefID].damages
-		return damage * (damages[elseArmorClass] / damages[subArmorClass])
-	end
-	return damage
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(MoveScript)
+	criticalHeight = -1 * Spring.GetUnitHeight(unitID) + 10
 end
 
 function script.Killed(recentDamage, maxHealth)
