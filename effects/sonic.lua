@@ -134,6 +134,23 @@ local altforms = {
   },
 }
 
+local altforms = {
+  sonicarcher = {
+    source = "sonictrail",
+    modifications = {
+      groundflash = {
+        properties = {flashsize = 3,},
+      },
+      airpop = {
+        properties = {size = 5,},
+      },
+      waterpop = {
+        properties = {size = 5,},
+      },
+    },
+  },
+}
+
 local suMergeTable = Spring.Utilities.MergeTable
 for cegName, info in pairs(altforms) do
   fx[cegName] = suMergeTable(info.modifications, fx[info.source], true)
