@@ -39,7 +39,7 @@ return { amphimpulse = {
 
   sfxtypes               = {
     explosiongenerators = {
-    [[custom:watercannon_muzzle]],
+      [[custom:watercannon_muzzle]],
     },
   },
 
@@ -88,7 +88,7 @@ return { amphimpulse = {
         },
 
         damage                  = {
-            default = 36.01,
+            default = 72.01,
         },
         
         cegTag                  = [[sonicarcher]],
@@ -102,7 +102,7 @@ return { amphimpulse = {
         myGravity               = 0.01,
         noSelfDamage            = true,
         range                   = 260,
-        reloadtime              = 1/3,
+        reloadtime              = 20/30,
         size                    = 50,
         sizeDecay               = 0.2,
         soundStart              = [[weapon/sonicgun2]],

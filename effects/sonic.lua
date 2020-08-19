@@ -139,7 +139,7 @@ local altforms = {
     source = "sonictrail",
     modifications = {
       groundflash = {
-        properties = {flashsize = 3,},
+        properties = {flashsize = 1,},
       },
       airpop = {
         properties = {size = 5,},
