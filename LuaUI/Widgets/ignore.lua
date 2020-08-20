@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name	= "In-game Ignore",
 		desc	= "Adds ignore/unignore commands.",
-		author	= "_Shaman",
+		author	= "Shaman",
 		date	= "8-1-2016",
-		license	= "Apply as needed",
+		license	= "PD",
 		layer	= 0,
 		enabled	= true,
 	}
