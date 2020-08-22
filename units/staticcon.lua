@@ -23,11 +23,11 @@ return { staticcon = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-
-    aimposoffset   = [[0 18 0]],
-    midposoffset   = [[0 -4 0]],
-    modelradius    = [[24]],
-    default_spacing = 1,
+    aimposoffset     = [[0 18 0]],
+    midposoffset     = [[0 -4 0]],
+    modelradius      = [[24]],
+    default_spacing  = 1,
+    like_structure   = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],
