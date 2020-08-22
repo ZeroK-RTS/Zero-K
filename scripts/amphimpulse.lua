@@ -43,20 +43,8 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
+local UNDERWATER_DEPTH = -32
 
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
-
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetGroundHeight = Spring.GetGroundHeight
-
-local wd = WeaponDefNames["amphimpulse_watercannon"]
-
-local impulse = tonumber(wd.customParams.impulse)
-local maxProjectiles = 8
-
-local impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
-local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Weapon config
@@ -389,6 +377,11 @@ function script.AimWeapon(num, heading, pitch)
 		GG.Floating_AimWeapon(unitID)
 		return false
 	end
+end
+
+function script.BlockShot(num, targetID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	return y < UNDERWATER_DEPTH
 end
 
 function script.QueryWeapon(num)

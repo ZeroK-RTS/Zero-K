@@ -122,13 +122,30 @@ local altforms = {
     source = "sonic",
     modifications = {
       groundflash = {
-    properties = {flashsize = 80},
+        properties = {flashsize = 80},
       },
       expand = {
-     properties = {size = 80, sizegrowth = 24},
+        properties = {size = 80, sizegrowth = 24},
       },
       contract = {
-     properties = {size = 80, sizegrowth = -24},
+        properties = {size = 80, sizegrowth = -24},
+      },
+    },
+  },
+}
+
+local altforms = {
+  sonicarcher = {
+    source = "sonictrail",
+    modifications = {
+      groundflash = {
+        properties = {flashsize = 1,},
+      },
+      airpop = {
+        properties = {size = 5,},
+      },
+      waterpop = {
+        properties = {size = 5,},
       },
     },
   },

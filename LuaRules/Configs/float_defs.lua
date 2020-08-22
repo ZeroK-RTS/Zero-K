@@ -48,7 +48,7 @@ local floatDefs = {
 
 	[UnitDefNames["amphimpulse"].id] = {
 		initialRiseSpeed = 5,
-		riseAccel = 0.15,
+		riseAccel = 0.20,
 		riseUpDrag = 0.99,
 		riseDownDrag = 0.7,
 		sinkAccel = -0.12,
