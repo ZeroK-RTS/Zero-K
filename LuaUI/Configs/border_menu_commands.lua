@@ -36,7 +36,20 @@ local buildoptions = {
 		{ "factoryshield",  notSea=true },
 		{ "factoryjump",  notSea=true },
 		{ "factorytank",  notSea=true },
-
+		
+		-- plates
+		{ "platecloak", notSea=true },
+		{ "plateveh", notSea=true },
+		{ "platespider",  notSea=true },
+		{ "plateship",  sea=true },
+		{ "plateamph" },
+		{ "platehover" },
+		{ "plategunship" },
+		{ "plateplane" },
+		{ "plateshield",  notSea=true },
+		{ "platejump",  notSea=true },
+		{ "platetank",  notSea=true },
+		
 		{ "striderhub" },
 	},
 

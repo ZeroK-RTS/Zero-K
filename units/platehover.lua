@@ -1,5 +1,5 @@
-return { padhover = {
-  unitname         = [[padhover]],
+return { platehover = {
+  unitname         = [[platehover]],
   name             = [[Hovercraft Platform]],
   description      = [[Produces Hovercraft]],
   acceleration     = 0,

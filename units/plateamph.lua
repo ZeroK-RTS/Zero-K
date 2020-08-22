@@ -1,5 +1,5 @@
-return { padamph = {
-  unitname         = [[padamph]],
+return { plateamph = {
+  unitname         = [[plateamph]],
   name             = [[Amphbot Pad]],
   description      = [[Produces Amphibious Bots]],
   buildCostMetal   = Shared.FACTORY_COST,

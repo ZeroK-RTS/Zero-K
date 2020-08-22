@@ -831,30 +831,33 @@ local function addUnit(defName, path)
 	end
 end
 
-local function AddFactoryOfUnits(defName)
+local function AddFactoryOfUnits(defName, plateDefName)
 	if unitAlreadyAdded[defName] then
 		return
 	end
 	local ud = UnitDefNames[defName]
 	local name = string.gsub(ud.humanName, "/", "-")
 	addUnit(defName, name)
+	if plateDefName then
+		addUnit(plateDefName, name)
+	end
 	for i = 1, #ud.buildOptions do
 		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
 		unitsToFactory[UnitDefs[ud.buildOptions[i]].name] = defName
 	end
 end
 
-AddFactoryOfUnits("factoryshield")
-AddFactoryOfUnits("factorycloak")
-AddFactoryOfUnits("factoryveh")
-AddFactoryOfUnits("factoryplane")
-AddFactoryOfUnits("factorygunship")
-AddFactoryOfUnits("factoryhover")
-AddFactoryOfUnits("factoryamph")
-AddFactoryOfUnits("factoryspider")
-AddFactoryOfUnits("factoryjump")
-AddFactoryOfUnits("factorytank")
-AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("factoryshield",  "plateshield")
+AddFactoryOfUnits("factorycloak",   "platecloak")
+AddFactoryOfUnits("factoryveh",     "plateveh")
+AddFactoryOfUnits("factoryplane",   "plateplane")
+AddFactoryOfUnits("factorygunship", "plategunship")
+AddFactoryOfUnits("factoryhover",   "platehover")
+AddFactoryOfUnits("factoryamph",    "plateamph")
+AddFactoryOfUnits("factoryspider",  "platespider")
+AddFactoryOfUnits("factoryjump",    "platejump")
+AddFactoryOfUnits("factorytank",    "platetank")
+AddFactoryOfUnits("factoryship",    "plateship")
 AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 

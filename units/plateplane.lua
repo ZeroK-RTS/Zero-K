@@ -1,6 +1,6 @@
-return { padplane = {
-  unitname                      = [[padplane]],
-  name                          = [[Airplane Pad]],
+return { plateplane = {
+  unitname                      = [[plateplane]],
+  name                          = [[Airplane Plate]],
   description                   = [[Produces Airplanes]],
   acceleration                  = 0,
   activateWhenBuilt             = false,

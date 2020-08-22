@@ -1,5 +1,5 @@
-return { padship = {
-  unitname               = [[padship]],
+return { plateship = {
+  unitname               = [[plateship]],
   name                   = [[Ship Pad]],
   description            = [[Produces Naval Units]],
   acceleration           = 0,

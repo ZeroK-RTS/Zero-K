@@ -1,5 +1,5 @@
-return { padcloak = {
-  unitname                      = [[padcloak]],
+return { platecloak = {
+  unitname                      = [[platecloak]],
   name                          = [[Cloakbot Pad]],
   description                   = [[Produces Cloaked, Mobile Robots]],
   buildCostMetal                = Shared.FACTORY_COST,

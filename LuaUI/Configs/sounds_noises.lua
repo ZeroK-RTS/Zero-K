@@ -1235,6 +1235,74 @@ local sounds = {
 		},
 	},
 	
+	-- plates
+	platecloak = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plateshield = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	platejump = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	platespider = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plateamph = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plateveh = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	platetank = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	platehover = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plateplane = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plategunship = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	plateship = {
+		build = { "builder_start" },
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	
 	-- Intel
 	staticsonar = {
 		select = {

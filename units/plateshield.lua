@@ -1,0 +1,86 @@
+return { plateshield = {
+  unitname                      = [[plateshield]],
+  name                          = [[Shieldbot Plate]],
+  description                   = [[Produces Tough, Shielded Robots]],
+  acceleration                  = 0,
+  brakeRate                     = 0,
+  buildCostMetal                = Shared.FACTORY_COST,
+  builder                       = true,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 12,
+  buildingGroundDecalSizeY      = 12,
+  buildingGroundDecalType       = [[factoryshield_aoplane.dds]],
+
+  buildoptions                  = {
+    [[shieldcon]],
+    [[shieldscout]],
+    [[shieldraid]],
+    [[shieldskirm]],
+    [[shieldassault]],
+    [[shieldriot]],
+    [[shieldfelon]],
+    [[shieldarty]],
+    [[shieldaa]],
+    [[shieldbomb]],
+    [[shieldshield]],
+  },
+
+  buildPic                      = [[padshield.png]],
+  canMove                       = true,
+  canPatrol                     = true,
+  category                      = [[SINK UNARMED]],
+  corpse                        = [[DEAD]],
+
+  customParams                  = {
+    sortName       = [[1]],
+    midposoffset   = [[0 0 -24]],
+    solid_factory  = [[6]],
+    unstick_help    = [[1]],
+    factorytab       = 1,
+    shared_energy_gen = 1,
+  },
+
+  energyUse                     = 0,
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  footprintX                    = 6,
+  footprintZ                    = 9,
+  iconType                      = [[facwalker]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  maxDamage                     = 4000,
+  maxSlope                      = 15,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  moveState                     = 1,
+  noAutoFire                    = false,
+  objectName                    = [[factory_pad.s3o]],
+  script                        = "padshield.lua",
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  showNanoSpray                 = false,
+  sightDistance                 = 273,
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = Shared.FACTORY_BUILDPOWER,
+  yardMap                       = [[oooooo occcco occcco occcco occcco occcco yyyyyy yyyyyy yyyyyy]],
+
+  featureDefs                   = {
+
+    DEAD  = {
+      blocking         = true,
+      featureDead      = [[HEAP]],
+      footprintX       = 5,
+      footprintZ       = 6,
+      object           = [[factory_dead.s3o]],
+    },
+
+    HEAP  = {
+      blocking         = false,
+      footprintX       = 5,
+      footprintZ       = 5,
+      object           = [[debris4x4a.s3o]],
+    },
+
+  },
+
+} }

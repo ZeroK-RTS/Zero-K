@@ -1,5 +1,5 @@
-return { padtank = {
-  unitname                      = [[padtank]],
+return { platetank = {
+  unitname                      = [[platetank]],
   name                          = [[Tank Pad]],
   description                   = [[Produces Heavy Tracked Vehicles]],
   acceleration                  = 0,

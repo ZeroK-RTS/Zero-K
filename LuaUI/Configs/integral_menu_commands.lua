@@ -186,6 +186,19 @@ local units = {
 	},
 }
 
+-- Factory pads
+units.platecloak   = Spring.Utilities.CopyTable(units.factorycloak)
+units.plateshield  = Spring.Utilities.CopyTable(units.factoryshield)
+units.plateveh     = Spring.Utilities.CopyTable(units.factoryveh)
+units.platehover   = Spring.Utilities.CopyTable(units.factoryhover)
+units.plategunship = Spring.Utilities.CopyTable(units.factorygunship)
+units.plateplane   = Spring.Utilities.CopyTable(units.factoryplane)
+units.platespider  = Spring.Utilities.CopyTable(units.factoryspider)
+units.platejump    = Spring.Utilities.CopyTable(units.factoryjump)
+units.platetank    = Spring.Utilities.CopyTable(units.factorytank)
+units.plateamph    = Spring.Utilities.CopyTable(units.factoryamph)
+units.plateship    = Spring.Utilities.CopyTable(units.factoryship)
+
 -- Tweakunits support
 for unitName, factoryData in pairs(units) do
 	local ud = UnitDefNames[unitName]
