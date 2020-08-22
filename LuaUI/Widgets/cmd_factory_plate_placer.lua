@@ -224,7 +224,6 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 	if not (parentOfPlate[unitDefID] and teamID == myTeamID) then
 		return
 	end
-	Spring.Utilities.UnitEcho(unitID, parentOfPlate[unitDefID])
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	IterableMap.Add(factories, unitID, {
 		unitDefID = unitDefID,

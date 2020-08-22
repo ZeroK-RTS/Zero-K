@@ -538,6 +538,13 @@ function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
 end
 
+function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
+	if builderID and currentBuildpower[builderID] == 0 then
+		return false
+	end
+	return true
+end
+
 function gadget:GameFrame(f)
 	if f % UPDATE_PERIOD == 1 then
 		for unitID, unitDefID in pairs(unitReloadPaused) do
