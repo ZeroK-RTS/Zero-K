@@ -1178,6 +1178,63 @@ local icontypes = {
     radiusadjust=0,
   },
 
+  --plates
+  padair = {
+    bitmap='icons/padair.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padamph = {
+    bitmap='icons/padamph.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padbot = {
+    bitmap='icons/padbot.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padgunship = {
+    bitmap='icons/padgunship.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padhover = {
+    bitmap='icons/padhover.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padjump = {
+    bitmap='icons/padjumpjet.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padship = {
+    bitmap='icons/padship.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padspider = {
+    bitmap='icons/padspider.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padtank = {
+    bitmap='icons/padtank.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padveh = {
+    bitmap='icons/padveh.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padwalker = {
+    bitmap='icons/padwalker.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+
   --chicken
   chicken = {
     --bitmap='icons/chicken.dds',

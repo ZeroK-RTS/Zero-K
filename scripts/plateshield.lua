@@ -5,6 +5,16 @@ local base, turret, arm_1, arm_2, arm_3, nanobase, rightpiece, leftpiece, nanoem
 local nanoPieces = { nanoemit }
 local smokePiece = { base }
 
+local openState = false
+local factoryState = false
+
+local function UpdateInbuild(newOpen, newFactory)
+	openState = newOpen
+	factoryState = newFactory
+	--Spring.Utilities.UnitEcho(unitID, (openState and "OPEN " or "_ ") .. (factoryState and " ACT" or " _"))
+	SetUnitValue (COB.INBUILDSTANCE, (openState and factoryState and 1) or 0)
+end
+
 local function Open ()
 	Signal (1)
 	SetSignalMask (1)
@@ -16,7 +26,7 @@ local function Open ()
 	WaitForTurn (nanobase, x_axis)
 
 	SetUnitValue (COB.YARD_OPEN, 1)
-	SetUnitValue (COB.INBUILDSTANCE, 1)
+	UpdateInbuild(true, factoryState)
 	SetUnitValue (COB.BUGGER_OFF, 1)
 end
 
@@ -26,12 +36,16 @@ local function Close()
 
 	SetUnitValue (COB.YARD_OPEN, 0)
 	SetUnitValue (COB.BUGGER_OFF, 0)
-	SetUnitValue (COB.INBUILDSTANCE, 0)
+	UpdateInbuild(false, factoryState)
 
 	Turn (arm_1, x_axis, 0, math.rad(34))
 	Turn (arm_2, x_axis, 0, math.rad(68))
 	Turn (arm_3, x_axis, 0, math.rad(24))
 	Turn (nanobase, x_axis, 0, math.rad(4))
+end
+
+function SetFactoryAccess(newFactoryState)
+	UpdateInbuild(openState, newFactoryState)
 end
 
 function script.Create()
@@ -68,7 +82,6 @@ function script.Killed (recentDamage, maxHealth)
 		return 1
 	else
 		Explode (back, SFX.SHATTER)
-		Explode (centre, SFX.SHATTER)
 		Explode (leftpiece, SFX.SHATTER)
 		Explode (rightpiece, SFX.SHATTER)
 		return 2

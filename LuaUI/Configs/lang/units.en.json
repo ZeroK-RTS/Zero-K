@@ -384,6 +384,11 @@
 		"description" : "Produces Tough Robots",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
 	},
+	"plateshield" : {
+		"name" : "Shieldbot Plate",
+		"description" : "Augments Production",
+		"helptext" : "A construction plate is the cheapest way to increase unit production, trading the flexibility of a Caretaker for even greater cost efficiency. The parallel nature of the plate build queue can also be a boon in its own right. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
 	"chickena" : {
 		"name" : "Cockatrice",
 		"description" : "Assault/Anti-Armor",

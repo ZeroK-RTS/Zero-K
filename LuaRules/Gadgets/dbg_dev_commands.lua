@@ -479,27 +479,41 @@ local function give(cmd,line,words,player)
 	local orderUnit = {}
 	for i = 1, #buildlist do
 		local udid = buildlist[i]
-		local x, z = INCREMENT, i*INCREMENT
-		local y = Spring.GetGroundHeight(x,z)
-		local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
-		if build then
-			SetupNanoUnit(unitID, nanoAmount)
-		end
 		local ud = UnitDefs[udid]
-		if ud.buildOptions and #ud.buildOptions > 0 then
-			local sublist = ud.buildOptions
-			for j = 1, #sublist do
-				local subUdid = sublist[j]
-				local x2, z2 = (j+1)*INCREMENT, i*INCREMENT
-				local y2 = Spring.GetGroundHeight(x2,z2)
-				local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
-				if build then
-					SetupNanoUnit(subUnitID, nanoAmount)
+		if not ud.customParams.child_of_factory then
+			local x, z = INCREMENT, i*INCREMENT
+			local y = Spring.GetGroundHeight(x,z)
+			local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
+			if build then
+				SetupNanoUnit(unitID, nanoAmount)
+			end
+			if ud.buildOptions and #ud.buildOptions > 0 then
+				local sublist = ud.buildOptions
+				local offset = 1
+				if ud.customParams.parent_of_plate then
+					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
+					local x2, z2 = (1 + offset)*INCREMENT, i*INCREMENT
+					local y2 = Spring.GetGroundHeight(x2,z2)
+					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2, 0, 0, build)
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					offset = offset + 1
 				end
-				orderUnit[#orderUnit + 1] = subUnitID
-				--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
-				--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
-				--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
+				for j = 1, #sublist do
+					local subUdid = sublist[j]
+					local x2, z2 = (j+offset)*INCREMENT, i*INCREMENT
+					local y2 = Spring.GetGroundHeight(x2,z2)
+					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
+					--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
+					--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
+				end
 			end
 		end
 	end

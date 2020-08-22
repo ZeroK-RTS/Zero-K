@@ -17,19 +17,16 @@ end
 --------------------------------------------------------------------------------
 -- Speedup
 
+include("keysym.lua")
+include("LuaRules/Configs/constants.lua")
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay
 local spGetMouseState    = Spring.GetMouseState
-local spTraceScreenRay   = Spring.TraceScreenRay
 local spGetGroundHeight  = Spring.GetGroundHeight
-local spGetCameraState   = Spring.GetCameraState
-
 
 local floor = math.floor
-local cos = math.cos
-local sin = math.sin
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
 
@@ -52,7 +49,22 @@ local glLineStipple         = gl.LineStipple
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local FACTORY_RANGE_SQ = 450^2
+options_path = 'Settings/Interface/Building Placement'
+options_order = { 'ctrl_toggle'}
+options = {
+	ctrl_toggle = {
+		name = "Ctrl toggles Factory/Plate",
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'When placing a factory or plate, press Ctrl to select whether a factory or construction plate is placed.',
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local FACTORY_RANGE_SQ = FACTORY_PLATE_RANGE^2 -- see LuaRules/Configs/constants.lua
 
 local outCircle = {
 	range = math.sqrt(FACTORY_RANGE_SQ),
@@ -93,18 +105,16 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local nanoUnitDefID = UnitDefNames["staticcon"].id
-oddX[nanoUnitDefID] = (UnitDefNames["staticcon"].xsize % 4)*4
-oddZ[nanoUnitDefID] = (UnitDefNames["staticcon"].zsize % 4)*4
-
 local myPlayerID = Spring.GetLocalPlayerID()
-local myTeamID = Spring.GetMyTeamID()
+local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local factories = IterableMap.New()
 
 local currentFactoryDefID
+local currentPlateDefID
 local closestFactoryData
+local activeCmdOverride
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -128,6 +138,18 @@ local function GetClosestFactory(x, z, unitDefID)
 	return nearID, nearDistSq, nearData
 end
 
+local function SnapBuildToGrid(mx, mz, unitDefID)
+	local facing = Spring.GetBuildFacing()
+	local offFacing = (facing == 1 or facing == 3)
+	if offFacing then
+		mx = math.floor((mx + 8 - oddZ[unitDefID])/16)*16 + oddZ[unitDefID]
+		mz = math.floor((mz + 8 - oddX[unitDefID])/16)*16 + oddX[unitDefID]
+	else
+		mx = math.floor((mx + 8 - oddX[unitDefID])/16)*16 + oddX[unitDefID]
+		mz = math.floor((mz + 8 - oddZ[unitDefID])/16)*16 + oddZ[unitDefID]
+	end
+	return mx, mz
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -142,17 +164,13 @@ local function GetMousePos()
 end
 
 local function CheckTransformPlateIntoFactory(plateDefID)
-	local alt, ctrl = Spring.GetModKeyState()
-	if alt and ctrl then
-		return
-	end
-	
 	local mx, mz = GetMousePos()
 	if not mx then
 		return
 	end
 	
 	local factoryDefID = childOfFactory[plateDefID]
+	mx, mz = SnapBuildToGrid(mx, mz, plateDefID) -- Make sure the plate is in range when it is placed
 	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, factoryDefID)
 	if not unitID then
 		return
@@ -166,17 +184,13 @@ local function CheckTransformPlateIntoFactory(plateDefID)
 end
 
 local function CheckTransformFactoryIntoPlate(factoryDefID)
-	local alt, ctrl = Spring.GetModKeyState()
-	if alt and ctrl then
-		return
-	end
-	
 	local mx, mz = GetMousePos()
 	if not mx then
 		return
 	end
 	
 	local plateDefID = parentOfPlate[factoryDefID]
+	mx, mz = SnapBuildToGrid(mx, mz, plateDefID) -- Make sure the plate is in range when it is placed
 	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, factoryDefID)
 	if not unitID then
 		return
@@ -199,13 +213,21 @@ function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	if cmdID then
 		local unitDefID = -cmdID
+		if activeCmdOverride then
+			if (unitDefID == currentFactoryDefID or unitDefID == currentPlateDefID) then
+				return
+			end
+			activeCmdOverride = nil
+		end
 		if parentOfPlate[unitDefID] then
 			currentFactoryDefID = unitDefID
+			currentPlateDefID = parentOfPlate[unitDefID]
 			CheckTransformFactoryIntoPlate(unitDefID)
 			return
 		end
 		if childOfFactory[unitDefID] then
 			currentFactoryDefID = childOfFactory[unitDefID]
+			currentPlateDefID = unitDefID
 			CheckTransformPlateIntoFactory(unitDefID)
 			return
 		end
@@ -213,6 +235,7 @@ function widget:Update()
 	
 	if currentFactoryDefID then
 		currentFactoryDefID = nil
+		currentPlateDefID = nil
 		closestFactoryData = nil
 	end
 end
@@ -220,8 +243,33 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:UnitCreated(unitID, unitDefID, teamID)
-	if not (parentOfPlate[unitDefID] and teamID == myTeamID) then
+function widget:KeyPress(key, mods, isRepeat, label, unicode)
+	if isRepeat then
+		return
+	end
+	if not (currentFactoryDefID and currentPlateDefID) then
+		return
+	end
+	if not (options.ctrl_toggle.value and (key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL)) then
+		return
+	end
+	
+	activeCmdOverride = true
+	local _, cmdID = spGetActiveCommand()
+	local unitDefID = -cmdID
+	if unitDefID == currentFactoryDefID then
+		Spring.SetActiveCommand(buildAction[currentPlateDefID])
+	else
+		Spring.SetActiveCommand(buildAction[currentFactoryDefID])
+	end
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function widget:UnitCreated(unitID, unitDefID)
+	if not (parentOfPlate[unitDefID] and Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
 		return
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)
@@ -251,10 +299,10 @@ end
 function widget:Initialize()
 	IterableMap.Clear(factories)
 	
-	local units = Spring.GetTeamUnits(myTeamID)
+	local units = Spring.GetAllUnits()
 	for i = 1, #units do
 		local unitID = units[i]
-		widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), myTeamID)
+		widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
 end
 
@@ -262,7 +310,10 @@ function widget:PlayerChanged(playerID)
 	if myPlayerID ~= playerID then
 		return
 	end
-	myTeamID = Spring.GetMyTeamID()
+	if myAllyTeamID == Spring.GetMyAllyTeamID() then
+		return
+	end
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 	widget:Initialize()
 end
 
@@ -291,15 +342,7 @@ local function DrawFactoryLine(x, y, z, drawDef)
 		return
 	end
 	
-	local facing = Spring.GetBuildFacing()
-	local offFacing = (facing == 1 or facing == 3)
-	if offFacing then
-		mx = math.floor((mx + 8 - oddZ[-cmdID])/16)*16 + oddZ[-cmdID]
-		mz = math.floor((mz + 8 - oddX[-cmdID])/16)*16 + oddX[-cmdID]
-	else
-		mx = math.floor((mx + 8 - oddX[-cmdID])/16)*16 + oddX[-cmdID]
-		mz = math.floor((mz + 8 - oddZ[-cmdID])/16)*16 + oddZ[-cmdID]
-	end
+	mx, mz = SnapBuildToGrid(mx, mz, -cmdID)
 
 	local my = spGetGroundHeight(mx, mz)
 
@@ -320,6 +363,7 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	if not mx then
 		return
 	end
+	mx, mz = SnapBuildToGrid(mx, mz, currentPlateDefID)
 	
 	local drawn = false
 	for unitID, data in IterableMap.Iterator(factories) do
@@ -353,6 +397,7 @@ function widget:DrawWorld()
 	if not mx then
 		return
 	end
+	mx, mz = SnapBuildToGrid(mx, mz, currentPlateDefID)
 	
 	local drawn = false
 	local drawInRange = false
