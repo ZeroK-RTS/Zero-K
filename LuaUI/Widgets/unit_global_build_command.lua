@@ -306,6 +306,7 @@ local includedBuilders = {}	--  list of units in the Central Build group, of the
 local buildQueue = {}  --  list of commands for Central Build group, of the form buildQueue[BuildHash(cmd)] = cmd
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
+local lastCommand = {} -- Mapping of units to frame of last command we sent. Work gets assigned anyway if the last command we sent was more than five seconds (150 frames) ago.
 local allBuilders = {} -- list of all mobile builders, which saves whether they are GBC-enabled or not.
 local newBuilders = {} -- a list of newly finished builders that have been added to includedBuilders. These units are assigned immediately on UnitIdle and then removed from the list.
 local activeJobs = {} -- list of jobs that have been started, using the UnitID of the building so that we can check completeness via UnitFinished
@@ -898,6 +899,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 	
 	if includedBuilders[unitID] then
 		includedBuilders[unitID] = nil
+		lastCommand[unitID] = nil
 		movingUnits[unitID] = nil
 		if busyUnits[unitID] then
 			local key = busyUnits[unitID]
@@ -940,6 +942,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	
 	if includedBuilders[unitID] then
 		includedBuilders[unitID] = nil
+		lastCommand[unitID] = nil
 		movingUnits[unitID] = nil
 		if busyUnits[unitID] then
 			local key = busyUnits[unitID]
@@ -1345,6 +1348,7 @@ function ApplyStateToggle()
 				end
 			elseif includedBuilders[unitID] then
 				includedBuilders[unitID] = nil
+				lastCommand[unitID] = nil
 				if busyUnits[unitID] then
 					local key = busyUnits[unitID]
 					buildQueue[key].assignedUnits[unitID] = nil
@@ -1421,6 +1425,7 @@ function FindEligibleWorker()
 				busyUnits[unitID] = nil
 			end
 			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
+			lastCommand[unitID] = nil
 		elseif myCmd.cmdtype == commandType.idle and not reassignedUnits[unitID] then -- first we assign idle units
 			reassignedUnits[unitID] = true
 			return unitID
@@ -1451,17 +1456,32 @@ function GiveWorkToUnit(unitID)
 	local lastHash = busyUnits[unitID]
 	if lastHash then
 		if (lastHash == hash) then
-			-- We're already on it
-			return
+			-- Extra sanity check: Is the unit actually doing what it's supposed to be doing?
+			-- This works somewhat around very bad lag conditions
+			if spGetCommandQueue(unitID, 0) ~= 0 then
+				-- We're already on it
+				return
+			else
+				if myJob.id < 0 and lastCommand[unitID] and lastCommand[unitID] + 150 >= frame then
+					-- Try to compensate for lag (?) in order assignment when it comes to build orders, which cancel each other out. If we sent the same build order to this unit recently, don't try sending one again so soon.
+					-- Spring.Echo('GBC: Warning: Withholding recent repeat build order ' .. hash .. ' to unitID ' .. unitID .. ' (for another ' .. (lastCommand[unitID] + 150 - frame) .. ' frames)')
+					return
+				end
+				-- Spring.Echo('GBC: Warning, unit was supposed to working on something, but has empty command queue. Assigning work anyway, check the cache state!')
+			end
 		end
 		-- if we're reassigning, we need to update the entry stored in the queue
-		buildQueue[lastHash].assignedUnits[unitID] = nil
+		if buildQueue[lastHash] then
+			-- this was nil sometimes - deleting a terraunit?
+			buildQueue[lastHash].assignedUnits[unitID] = nil
+		end
 	end
 	-- if the unit has already been assigned to the same job, we also prevent order spam
 	-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
 	if myJob.id < 0 then -- for build jobs
 		if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
 			spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, 0) -- issue the cheapest job as an order to the unit
+			lastCommand[unitID] = frame
 			busyUnits[unitID] = hash -- save the command info for bookkeeping
 			includedBuilders[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
 			buildQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
@@ -2002,6 +2022,7 @@ function CleanBuilders()
 				busyUnits[unitID] = nil
 			end
 			includedBuilders[unitID] = nil -- remove the unit from the list of constructors
+			lastCommand[unitID] = nil
 		end
 	end
 end
