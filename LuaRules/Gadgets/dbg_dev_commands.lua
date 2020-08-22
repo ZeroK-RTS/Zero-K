@@ -477,11 +477,13 @@ local function give(cmd,line,words,player)
 	local buildlist = UnitDefNames["armcom1"].buildOptions
 	local INCREMENT = 128
 	local orderUnit = {}
+	local zOffset = 0
 	for i = 1, #buildlist do
 		local udid = buildlist[i]
 		local ud = UnitDefs[udid]
 		if not ud.customParams.child_of_factory then
-			local x, z = INCREMENT, i*INCREMENT
+			zOffset = zOffset + 1
+			local x, z = INCREMENT, zOffset*INCREMENT
 			local y = Spring.GetGroundHeight(x,z)
 			local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
 			if build then
@@ -492,7 +494,7 @@ local function give(cmd,line,words,player)
 				local offset = 1
 				if ud.customParams.parent_of_plate then
 					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
-					local x2, z2 = (1 + offset)*INCREMENT, i*INCREMENT
+					local x2, z2 = (1 + offset)*INCREMENT, zOffset*INCREMENT
 					local y2 = Spring.GetGroundHeight(x2,z2)
 					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2, 0, 0, build)
 					if build then
@@ -503,7 +505,7 @@ local function give(cmd,line,words,player)
 				end
 				for j = 1, #sublist do
 					local subUdid = sublist[j]
-					local x2, z2 = (j+offset)*INCREMENT, i*INCREMENT
+					local x2, z2 = (j+offset)*INCREMENT, zOffset*INCREMENT
 					local y2 = Spring.GetGroundHeight(x2,z2)
 					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
 					if build then

@@ -46,6 +46,7 @@ return { factoryamph = {
     factorytab       = 1,
     shared_energy_gen = 1,
     cus_noflashlight = 1,
+    parent_of_plate   = [[plateamph]],
   },
 
   energyUse        = 0,

@@ -42,12 +42,13 @@ return { plateship = {
     default_spacing        = 4,
     selectionscalemult     = 1,
     cus_noflashlight       = 1,
+    child_of_factory       = [[factoryship]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[FAC_PLATEEX]],
-  footprintX                    = 7,
-  footprintZ                    = 9,
+  footprintX                    = 6,
+  footprintZ                    = 8,
   iconType                      = [[padship]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -65,7 +66,7 @@ return { plateship = {
   turnRate                      = 0,
   waterline                     = 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooccccc ooccccc ooccccc ooccccc ooccccc ooccccc ooccccc ooccccc ooccccc]],
+  yardMap                       = [[ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy ooyyyy]],
 
   featureDefs            = {
 

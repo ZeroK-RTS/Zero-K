@@ -43,7 +43,7 @@ return { factoryshield = {
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 6,
+  footprintX                    = 7,
   footprintZ                    = 9,
   iconType                      = [[facwalker]],
   idleAutoHeal                  = 5,

@@ -1204,7 +1204,7 @@ local icontypes = {
     size=2.15,
     radiusadjust=0,
   },
-  padjump = {
+  padjumpjet = {
     bitmap='icons/padjumpjet.png',
     size=2.15,
     radiusadjust=0,

@@ -46,6 +46,7 @@ return { factorytank = {
     selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[platetank]],
   },
 
   energyUse                     = 0,

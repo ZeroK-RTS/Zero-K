@@ -1,15 +1,15 @@
 return { plateplane = {
   unitname                      = [[plateplane]],
   name                          = [[Airplane Plate]],
-  description                   = [[Produces Airplanes]],
+  description                   = [[Augments Production]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,
-  buildCostMetal                = Shared.FACTORY_COST,
+  buildCostMetal                = Shared.FACTORY_PLATE_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 11,
-  buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[pad_decal_square.dds]],
 
   buildoptions                  = {
@@ -24,34 +24,31 @@ return { plateplane = {
     [[planelightscout]],
   },
 
-  buildPic                      = [[factoryplane.png]],
+  buildPic                      = [[plateplane.png]],
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[FLOAT UNARMED]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    pad_count = 1,
-    landflystate   = [[0]],
-    sortName = [[4]],
-    modelradius    = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
-    midposoffset   = [[0 20 0]],
-    nongroundfac = [[1]],
-    default_spacing = 8,
-    factorytab       = 1,
-    shared_energy_gen = 1,
-    ispad         = 1,
+    landflystate       = [[0]],
+    sortName           = [[4]],
+    modelradius        = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
+    midposoffset       = [[0 20 0]],
+    nongroundfac       = [[1]],
+    default_spacing    = 4,
+    child_of_factory   = [[factoryplane]],
   },
 
   energyUse                     = 0,
-  explodeAs                     = [[LARGE_BUILDINGEX]],
+  explodeAs                     = [[FAC_PLATEEX]],
   fireState                     = 0,
-  footprintX                    = 8,
+  footprintX                    = 6,
   footprintZ                    = 7,
-  iconType                      = [[facair]],
+  iconType                      = [[padair]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  maxDamage                     = 4000,
+  maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
@@ -66,7 +63,7 @@ return { plateplane = {
   useBuildingGroundDecal        = true,
   waterline                     = 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[oooooooo oooooooo oooooooo occooooo occooooo oooooooo oooooooo]],
+  yardMap                       = [[oooooo oooooo oooooo oooooo oooooo oooooo oooooo]],
 
   featureDefs                   = {
 

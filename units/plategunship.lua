@@ -1,14 +1,14 @@
 return { plategunship = {
   unitname                      = [[plategunship]],
-  name                          = [[Gunship Pad]],
-  description                   = [[Produces Gunships]],
+  name                          = [[Gunship Plate]],
+  description                   = [[Augments Production]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostMetal                = Shared.FACTORY_COST,
+  buildCostMetal                = Shared.FACTORY_PLATE_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 10,
-  buildingGroundDecalSizeY      = 10,
+  buildingGroundDecalSizeX      = 8,
+  buildingGroundDecalSizeY      = 8,
   buildingGroundDecalType       = [[pad_decal_square.dds]],
 
   buildoptions                  = {
@@ -25,7 +25,7 @@ return { plategunship = {
     [[gunshipheavytrans]],
   },
 
-  buildPic                      = [[factorygunship.png]],
+  buildPic                      = [[plategunship.png]],
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[FLOAT UNARMED]],
@@ -38,24 +38,23 @@ return { plategunship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    landflystate   = [[0]],
-    sortName = [[3]],
-    modelradius    = [[43]],
-    nongroundfac = [[1]],
-    default_spacing = 8,
+    landflystate       = [[0]],
+    sortName           = [[3]],
+    modelradius        = [[43]],
+    nongroundfac       = [[1]],
+    default_spacing    = 4,
     selectionscalemult = 1,
-    factorytab       = 1,
-    shared_energy_gen = 1,
+    child_of_factory   = [[factorygunship]],
   },
 
   energyUse                     = 0,
-  explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 7,
-  footprintZ                    = 7,
-  iconType                      = [[facgunship]],
+  explodeAs                     = [[FAC_PLATEEX]],
+  footprintX                    = 5,
+  footprintZ                    = 5,
+  iconType                      = [[padgunship]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  maxDamage                     = 4000,
+  maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
@@ -70,7 +69,7 @@ return { plategunship = {
   useBuildingGroundDecal        = true,
   waterline                     = 0,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[yyoooyy yoooooy ooooooo ooooooo ooooooo yoooooy yyoooyy]],
+  yardMap                       = [[yoooy ooooo ooooo ooooo yoooy]],
 
   featureDefs                   = {
 

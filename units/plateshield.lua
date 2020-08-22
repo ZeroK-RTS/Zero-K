@@ -52,7 +52,7 @@ return { plateshield = {
 
   energyUse                     = 0,
   explodeAs                     = [[FAC_PLATEEX]],
-  footprintX                    = 6,
+  footprintX                    = 5,
   footprintZ                    = 7,
   iconType                      = [[padwalker]],
   idleAutoHeal                  = 5,
@@ -72,7 +72,7 @@ return { plateshield = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[ooooo ooooo ooooo yyyyy yyyyy yyyyy]],
+  yardMap                       = [[oooooo oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy]],
 
   featureDefs                   = {
 
