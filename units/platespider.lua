@@ -1,10 +1,10 @@
 return { platespider = {
   unitname                      = [[platespider]],
-  name                          = [[Spider Pad]],
-  description                   = [[Produces Spiders]],
+  name                          = [[Spider Plate]],
+  description                   = [[Augments Production]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostMetal                = Shared.FACTORY_COST,
+  buildCostMetal                = Shared.FACTORY_PLATE_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
@@ -51,7 +51,7 @@ return { platespider = {
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 7,
+  footprintX                    = 5,
   footprintZ                    = 7,
   iconType                      = [[facspider]],
   idleAutoHeal                  = 5,
