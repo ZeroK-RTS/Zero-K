@@ -32,12 +32,13 @@ return { factoryshield = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    sortName       = [[1]],
-    midposoffset   = [[0 0 -24]],
-    solid_factory  = [[6]],
-    unstick_help    = [[1]],
-    factorytab       = 1,
+    sortName          = [[1]],
+    midposoffset      = [[0 0 -24]],
+    solid_factory     = [[6]],
+    unstick_help      = [[1]],
+    factorytab        = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[plateshield]],
   },
 
   energyUse                     = 0,

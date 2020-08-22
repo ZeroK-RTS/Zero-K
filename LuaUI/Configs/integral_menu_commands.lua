@@ -186,7 +186,7 @@ local units = {
 	},
 }
 
--- Factory pads
+-- Factory plates
 units.platecloak   = Spring.Utilities.CopyTable(units.factorycloak)
 units.plateshield  = Spring.Utilities.CopyTable(units.factoryshield)
 units.plateveh     = Spring.Utilities.CopyTable(units.factoryveh)
@@ -198,6 +198,20 @@ units.platejump    = Spring.Utilities.CopyTable(units.factoryjump)
 units.platetank    = Spring.Utilities.CopyTable(units.factorytank)
 units.plateamph    = Spring.Utilities.CopyTable(units.factoryamph)
 units.plateship    = Spring.Utilities.CopyTable(units.factoryship)
+
+local factoryPlates = {
+	"platecloak",
+	"plateshield",
+	"plateveh",
+	"platehover",
+	"plategunship",
+	"plateplane",
+	"platespider",
+	"platejump",
+	"platetank",
+	"plateamph",
+	"plateship",
+}
 
 -- Tweakunits support
 for unitName, factoryData in pairs(units) do
@@ -610,5 +624,11 @@ local widgetSpaceHidden = {
 	[CMD_SET_FERRY] = true,
 	[CMD.MOVE] = true,
 }
+
+-- Hide factory plates
+for i = 1, #factoryPlates do
+	local plateDefID = UnitDefNames[factoryPlates[i]].id
+	widgetSpaceHidden[-plateDefID] = true
+end
 
 return factory_commands, econ_commands, defense_commands, special_commands, units_factory_commands, overrides, widgetSpaceHidden

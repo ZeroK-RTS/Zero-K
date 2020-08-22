@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Factory Caretaker Replacer",
-		desc      = "Replaces factory placement with caretaker when placing near a factory of the same type.",
+		name      = "Factory Plate Placer",
+		desc      = "Replaces factory placement with plates of the appropriate type.",
 		author    = "GoogleFrog",
 		date      = "20 July 2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = -1,
-		enabled   = false,
+		enabled   = true,
 	}
 end
 
@@ -72,18 +72,27 @@ local inCircle = {
 
 local oddX = {}
 local oddZ = {}
-local factoryBuildAction = {}
+local buildAction = {}
+local childOfFactory = {}
+local parentOfPlate = {}
+
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local cp = ud.customParams
-	if (ud.isFactory or (cp.isfakefactory and ud.speed == 0)) and not cp.notreallyafactory then
-		factoryBuildAction[i] = "buildunit_" .. ud.name
+	if (cp.parent_of_plate or cp.child_of_factory) then
+		buildAction[i] = "buildunit_" .. ud.name
 		oddX[i] = (ud.xsize % 4)*4
 		oddZ[i] = (ud.zsize % 4)*4
+		
+		if cp.child_of_factory then
+			childOfFactory[i] = UnitDefNames[cp.child_of_factory].id
+		end
+		if cp.parent_of_plate then
+			parentOfPlate[i] = UnitDefNames[cp.parent_of_plate].id
+		end
 	end
 end
 
-local nanoBuildAction = "buildunit_staticcon"
 local nanoUnitDefID = UnitDefNames["staticcon"].id
 oddX[nanoUnitDefID] = (UnitDefNames["staticcon"].xsize % 4)*4
 oddZ[nanoUnitDefID] = (UnitDefNames["staticcon"].zsize % 4)*4
@@ -132,7 +141,7 @@ local function GetMousePos()
 	return mouse[1], mouse[3]
 end
 
-local function CheckFactoryTransformRange(unitDefID)
+local function CheckTransformPlateIntoFactory(plateDefID)
 	local alt, ctrl = Spring.GetModKeyState()
 	if alt and ctrl then
 		return
@@ -143,48 +152,46 @@ local function CheckFactoryTransformRange(unitDefID)
 		return
 	end
 	
-	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, unitDefID)
-	if not unitID then
-		return
-	end
-	
-	-- Check whether any selected units can build nano turrets.
-	-- Nano turrets could be disabled by modoptions or otherwise unavailible.
-	local cmdDescID = Spring.GetCmdDescIndex(-nanoUnitDefID)
-	if not cmdDescID then
-		return
-	end
-	
-	closestFactoryData = factoryData
-	if distSq < FACTORY_RANGE_SQ then
-		Spring.SetActiveCommand(nanoBuildAction)
-	end
-	
-	currentFactoryDefID = unitDefID
-	return true
-end
-
-local function CheckNanoTransformRange()
-	local alt, ctrl = Spring.GetModKeyState()
-	if alt and ctrl then
-		return
-	end
-	
-	local mx, mz = GetMousePos()
-	if not mx then
-		return
-	end
-	
-	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, currentFactoryDefID)
+	local factoryDefID = childOfFactory[plateDefID]
+	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, factoryDefID)
 	if not unitID then
 		return
 	end
 	
 	closestFactoryData = factoryData
 	if distSq >= FACTORY_RANGE_SQ then
-		Spring.SetActiveCommand(factoryBuildAction[currentFactoryDefID])
+		Spring.SetActiveCommand(buildAction[factoryDefID])
+	end
+	return true
+end
+
+local function CheckTransformFactoryIntoPlate(factoryDefID)
+	local alt, ctrl = Spring.GetModKeyState()
+	if alt and ctrl then
+		return
 	end
 	
+	local mx, mz = GetMousePos()
+	if not mx then
+		return
+	end
+	
+	local plateDefID = parentOfPlate[factoryDefID]
+	local unitID, distSq, factoryData = GetClosestFactory(mx, mz, factoryDefID)
+	if not unitID then
+		return
+	end
+	
+	-- Plates could be disabled by modoptions or otherwise unavailible.
+	local cmdDescID = Spring.GetCmdDescIndex(-plateDefID)
+	if not cmdDescID then
+		return
+	end
+	
+	closestFactoryData = factoryData
+	if distSq < FACTORY_RANGE_SQ then
+		Spring.SetActiveCommand(buildAction[plateDefID])
+	end
 	return true
 end
 
@@ -192,15 +199,15 @@ function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	if cmdID then
 		local unitDefID = -cmdID
-		if factoryBuildAction[unitDefID] and CheckFactoryTransformRange(unitDefID) then
+		if parentOfPlate[unitDefID] then
+			currentFactoryDefID = unitDefID
+			CheckTransformFactoryIntoPlate(unitDefID)
 			return
 		end
-		
-		if currentFactoryDefID and unitDefID == nanoUnitDefID then
-			if CheckNanoTransformRange() then
-				return
-			end
-			Spring.SetActiveCommand(factoryBuildAction[currentFactoryDefID])
+		if childOfFactory[unitDefID] then
+			currentFactoryDefID = childOfFactory[unitDefID]
+			CheckTransformPlateIntoFactory(unitDefID)
+			return
 		end
 	end
 	
@@ -214,9 +221,10 @@ end
 --------------------------------------------------------------------------------
 
 function widget:UnitCreated(unitID, unitDefID, teamID)
-	if not (factoryBuildAction[unitDefID] and teamID == myTeamID) then
+	if not (parentOfPlate[unitDefID] and teamID == myTeamID) then
 		return
 	end
+	Spring.Utilities.UnitEcho(unitID, parentOfPlate[unitDefID])
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	IterableMap.Add(factories, unitID, {
 		unitDefID = unitDefID,
@@ -227,7 +235,7 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
-	if not factoryBuildAction[unitDefID] then
+	if not parentOfPlate[unitDefID] then
 		return
 	end
 	IterableMap.Remove(factories, unitID)
@@ -266,7 +274,14 @@ local function DoLine(x1, y1, z1, x2, y2, z2)
 	gl.Vertex(x2, y2, z2)
 end
 
-local function DrawFactoryLine(x, y, z)
+local function GetDrawDef(mx, mz, data)
+	if DistSq(mx, mz, data.x, data.z) < FACTORY_RANGE_SQ then
+		return inCircle, true
+	end
+	return outCircle, false
+end
+
+local function DrawFactoryLine(x, y, z, drawDef)
 	local mx, mz = GetMousePos()
 	if not mx then
 		return
@@ -289,20 +304,13 @@ local function DrawFactoryLine(x, y, z)
 
 	local my = spGetGroundHeight(mx, mz)
 
-	glLineWidth(inCircle.width)
-	glColor(inCircle.color[1], inCircle.color[2], inCircle.color[3], inCircle.color[4])
+	glLineWidth(drawDef.width)
+	glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
 	gl.BeginEnd(GL.LINE_STRIP, DoLine, x, y, z, mx, my, mz)
 
 	glLineStipple(false)
 	glLineWidth(1)
 	glColor(1, 1, 1, 1)
-end
-
-local function GetDrawDef(mx, mz, data)
-	if DistSq(mx, mz, data.x, data.z) < FACTORY_RANGE_SQ then
-		return inCircle
-	end
-	return outCircle
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
@@ -348,10 +356,12 @@ function widget:DrawWorld()
 	end
 	
 	local drawn = false
+	local drawInRange = false
 	for unitID, data in IterableMap.Iterator(factories) do
 		if data.unitDefID == currentFactoryDefID then
 			drawn = true
-			local drawDef = GetDrawDef(mx, mz, data)
+			local drawDef, inRange = GetDrawDef(mx, mz, data)
+			drawInRange = drawInRange or inRange
 			
 			gl.DepthTest(false)
 			glLineWidth(drawDef.width)
@@ -368,7 +378,7 @@ function widget:DrawWorld()
 	end
 	
 	if closestFactoryData then
-		DrawFactoryLine(closestFactoryData.x, closestFactoryData.y, closestFactoryData.z)
+		DrawFactoryLine(closestFactoryData.x, closestFactoryData.y, closestFactoryData.z, drawInRange and inCircle or outCircle)
 	end
 end
 
