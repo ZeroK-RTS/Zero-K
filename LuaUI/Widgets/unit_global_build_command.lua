@@ -1105,7 +1105,7 @@ end
 --  Thanks to Niobium for pointing out CommandNotify().
 function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	if id == CMD_GLOBAL_BUILD then
-		ApplyStateToggle()
+		ApplyState(params and params[1] == 1)
 		return true
 	end
 
@@ -1267,12 +1267,14 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	return false
 end
 
-function ApplyStateToggle()
+function ApplyState(desiredState)
 	local selectedUnits = spGetSelectedUnits()
 	for _,unitID in pairs(selectedUnits) do
-		if allBuilders[unitID] then
-			allBuilders[unitID].include = not allBuilders[unitID].include
-			if allBuilders[unitID].include then
+		-- if we know about the builder, and it's not already in its desired state...
+		if allBuilders[unitID] and allBuilders[unitID].include ~= desiredState then
+			allBuilders[unitID].include = desiredState
+			if desiredState then
+				-- newly enabled
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then
 					if spGetCommandQueue(unitID, 0) ~= 0 then -- if so we mark it as drec
@@ -1283,6 +1285,7 @@ function ApplyStateToggle()
 					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 				end
 			elseif includedBuilders[unitID] then
+				-- newly disabled
 				includedBuilders[unitID] = nil
 				lastCommand[unitID] = nil
 				if busyUnits[unitID] then
