@@ -300,7 +300,7 @@ function widget:Initialize()
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then
 		Echo( "<Global Build Command>: Spectator mode. Widget removed." )
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget)
 		return
 	end--]]
 end
