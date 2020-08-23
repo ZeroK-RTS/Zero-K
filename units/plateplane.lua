@@ -54,8 +54,8 @@ return { plateplane = {
   minCloakDistance              = 150,
   moveState                     = 2,
   noAutoFire                    = false,
-  objectName                    = [[pad_plane.dae]],
-  script                        = [[factoryplane.lua]],
+  objectName                    = [[plate_plane.s3o]],
+  script                        = [[plateplane.lua]],
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
@@ -70,16 +70,16 @@ return { plateplane = {
     DEAD = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 7,
-      footprintZ       = 6,
-      object           = [[corap_dead.s3o]],
+      footprintX       = 6,
+      footprintZ       = 7,
+      object           = [[plate_plane_dead.s3o]],
     },
 
 
     HEAP = {
       blocking         = false,
       footprintX       = 6,
-      footprintZ       = 6,
+      footprintZ       = 7,
       object           = [[debris4x4c.s3o]],
     },
 
