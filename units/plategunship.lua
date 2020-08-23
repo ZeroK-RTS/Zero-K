@@ -38,6 +38,7 @@ return { plategunship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aimposoffset       = [[0 10 0]],
     landflystate       = [[0]],
     sortName           = [[3]],
     modelradius        = [[43]],

@@ -736,7 +736,7 @@ local function GetDimensions(scale)
 	return dimensions, largest
 end
 
-local VISUALIZE_SELECTION_VOLUME = true
+local VISUALIZE_SELECTION_VOLUME = false
 local CYL_SCALE = 1.1
 local CYL_LENGTH = 0.8
 local CYL_ADD = 5
