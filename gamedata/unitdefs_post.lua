@@ -399,7 +399,7 @@ for name, ud in pairs (UnitDefs) do
 		ud.builddistance = FACTORY_PLATE_RANGE -- Matches plate range in constants
 	end
 	if ud.customparams.child_of_factory then
-		ud.builddistance = 0 -- Disable build range drawing to cut down on excess info
+		ud.builddistance = FACTORY_PLATE_RANGE -- Too many circles?
 	end
 end
 

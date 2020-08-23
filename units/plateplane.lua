@@ -1,7 +1,7 @@
 return { plateplane = {
   unitname                      = [[plateplane]],
   name                          = [[Airplane Plate]],
-  description                   = [[Augments Production]],
+  description                   = [[Parallel Unit Production]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,

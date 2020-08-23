@@ -4,6 +4,7 @@
 
 local buildTimes = {}
 local planetwarsStructure = {}
+local buildPlate = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
 }
@@ -16,6 +17,9 @@ for i = 1, #UnitDefs do
 	end
 	if ud.customParams.planetwars_structure then
 		planetwarsStructure[i] = true
+	end
+	if ud.customParams.child_of_factory then
+		buildPlate[i] = true
 	end
 end
 
@@ -90,6 +94,24 @@ local function GetPlanetwarsTooltip(unitID, ud)
 	return desc .. " - Disabled"
 end
 
+local function GetPlateTooltip(unitID, ud)
+	if not buildPlate[ud.id] then
+		return false
+	end
+	local disabled = (Spring.GetUnitRulesParam(unitID, "nofactory") == 1)
+	if not disabled then
+		return
+	end
+	local name_override = ud.customParams.statsname or ud.name
+	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
+	local buildSpeedRaw = ud.buildSpeed
+	if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
+		local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = buildSpeed}) or desc
+	end
+	return desc .. " Disabled - Too far from operational factory"
+end
+
 local function GetCustomTooltip (unitID, ud)
 	return GetGridTooltip(unitID)
 	or GetMexTooltip(unitID)
@@ -97,6 +119,7 @@ local function GetCustomTooltip (unitID, ud)
 	or GetZenithTooltip(unitID)
 	or GetAvatarTooltip(unitID)
 	or GetPlanetwarsTooltip(unitID, ud)
+	or GetPlateTooltip(unitID, ud)
 end
 
 function Spring.Utilities.GetHumanName(ud, unitID)

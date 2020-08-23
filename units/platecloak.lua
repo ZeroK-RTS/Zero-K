@@ -1,7 +1,7 @@
 return { platecloak = {
   unitname                      = [[platecloak]],
   name                          = [[Cloakbot Plate]],
-  description                   = [[Augments Production]],
+  description                   = [[Parallel Unit Production]],
   buildCostMetal                = Shared.FACTORY_PLATE_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,

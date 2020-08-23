@@ -1,7 +1,7 @@
 return { plateamph = {
   unitname                      = [[plateamph]],
   name                          = [[Amphbot Plate]],
-  description                   = [[Augments Production]],
+  description                   = [[Parallel Unit Production]],
   buildCostMetal                = Shared.FACTORY_PLATE_COST,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,

@@ -1,7 +1,7 @@
 return { platejump = {
   unitname                      = [[platejump]],
   name                          = [[Jumpbot Plate]],
-  description                   = [[Augments Production]],
+  description                   = [[Parallel Unit Production]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_PLATE_COST,
