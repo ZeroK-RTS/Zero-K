@@ -340,16 +340,16 @@ function script.Create()
 	--StartThread(Walk)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(WeaponRangeUpdate) -- Equal range so not required
-	local height = select(2, Spring.GetUnitPosition(unitID))
-	if height < -20 then
-		if not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-			longRange = true
-		end
-	elseif longRange then
-		Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-		longRange = false
-	end
+	--local height = select(2, Spring.GetUnitPosition(unitID))
+	--if height < -20 then
+	--	if not longRange then
+	--		Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+	--		longRange = true
+	--	end
+	--elseif longRange then
+	--	Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+	--	longRange = false
+	--end
 end
 
 function script.StartMoving()
@@ -433,10 +433,9 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 2 then -- torpedoes
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		-- Lower than real damage (180) to help against Duck regen case.
-		return y < -22 or GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
+	if num == 2 and targetID then -- torpedoes
+		-- Lower than real damage (104) to help against Duck regen case.
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 92, 40)
 	end
 	return false
 end

@@ -1077,7 +1077,7 @@
 	"amphimpulse" : {
 		"name" : "Archer",
 		"description" : "Amphibious Raider/Riot Bot",
-		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. Archers can float to surface in order to fight naval units."
+		"helptext" : "The Archer uses a powerful sonic cannon to hit units above or below the water. It does not work while wet, so Archers must float to fire."
 	},
 	"fakeunit" : {
 		"name" : "Fake radar signal",
