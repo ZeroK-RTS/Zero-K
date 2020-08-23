@@ -60,8 +60,8 @@ return { plategunship = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[pad_gunship.dae]],
-  script                        = [[factorygunship.lua]],
+  objectName                    = [[plate_gunship.s3o]],
+  script                        = [[plategunship.lua]],
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
@@ -76,19 +76,16 @@ return { plategunship = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 7,
-      footprintZ       = 7,
-      object           = [[factorygunship_dead.s3o]],
-      collisionVolumeOffsets        = [[0 -20 0]],
-      collisionVolumeScales         = [[86 86 86]],
-      collisionVolumeType           = [[ellipsoid]],
+      footprintX       = 5,
+      footprintZ       = 5,
+      object           = [[plate_gunship_dead.s3o]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 6,
-      footprintZ       = 6,
+      footprintX       = 5,
+      footprintZ       = 5,
       object           = [[debris4x4c.s3o]],
     },
 
