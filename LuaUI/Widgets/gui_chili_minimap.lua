@@ -640,8 +640,8 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		updateRunOnceRan = true
 	end
 
-	local cs = Spring.GetCameraState()
 	if not options.hideOnOverview.value then
+		local cs = Spring.GetCameraState()
 		if cs.name == "ov" and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
