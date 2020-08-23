@@ -61,9 +61,9 @@ return { platehover = {
   minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
-  objectName       = [[pad_hover.dae]],
-  script           = [[factoryhover.lua]],
-  selfDestructAs   = [[LARGE_BUILDINGEX]],
+  objectName       = [[plate_hover.s3o]],
+  script           = [[platehover.lua]],
+  selfDestructAs   = [[FAC_PLATEEX]],
   showNanoSpray    = false,
   sightDistance    = 273,
   turnRate         = 0,
@@ -77,20 +77,17 @@ return { platehover = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 8,
-      footprintZ       = 7,
-      object           = [[factoryhover_dead.s3o]],
-      collisionVolumeOffsets  = [[0 -2 -50]],
-      collisionVolumeScales   = [[124 32 124]],
-      collisionVolumeType     = [[cylY]],
+      footprintX       = 6,
+      footprintZ       = 6,
+      object           = [[plate_hover_dead.s3o]],
 
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 8,
-      footprintZ       = 7,
+      footprintX       = 6,
+      footprintZ       = 6,
       object           = [[debris4x4c.s3o]],
     },
 

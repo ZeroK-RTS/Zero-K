@@ -52,9 +52,9 @@ return { platecloak = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[pad_cloak.dae]],
-  script                        = [[factorycloak.lua]],
-  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  objectName                    = [[plate_cloak.s3o]],
+  script                        = [[platecloak.lua]],
+  selfDestructAs                = [[FAC_PLATEEX]],
 
   sfxtypes                      = {
 
@@ -75,15 +75,15 @@ return { platecloak = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 7,
-      footprintZ       = 7,
-      object           = [[cremfactorywreck.s3o]],
+      footprintX       = 5,
+      footprintZ       = 6,
+      object           = [[plate_cloak_dead.s3o]],
     },
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 7,
-      footprintZ       = 7,
+      footprintX       = 5,
+      footprintZ       = 6,
       object           = [[debris4x4b.s3o]],
     },
 

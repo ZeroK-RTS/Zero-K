@@ -64,7 +64,7 @@ return { plateshield = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[factory_pad.s3o]],
+  objectName                    = [[plate_shield.s3o]],
   script                        = "plateshield.lua",
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
@@ -79,15 +79,15 @@ return { plateshield = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[wreck3x3c.s3o]],
+      footprintX           = 5,
+      footprintZ           = 7,
+      object           = [[plate_shield_dead.s3o]],
     },
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 5,
+      footprintZ       = 7,
       object           = [[debris4x4a.s3o]],
     },
 

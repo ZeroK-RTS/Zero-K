@@ -1,7 +1,7 @@
 include "constants.lua"
 include "plates.lua"
 
-local base, turret, arm_1, arm_2, arm_3, nanobase, rightpiece, leftpiece, nanoemit, pad, nozzle, cylinder, back = piece ('base', 'turret', 'arm_1', 'arm_2', 'arm_3', 'nanobase', 'rightpiece', 'leftpiece', 'nanoemit', 'pad', 'nozzle', 'cylinder', 'back')
+local base, turret, arm_1, arm_2, arm_3, nanobase, nanoemit, pad, nozzle, cylinder, body = piece ('base', 'turret', 'arm_1', 'arm_2', 'arm_3', 'nanobase', 'nanoemit', 'pad', 'nozzle', 'cylinder', 'body')
 
 local nanoPieces = { nanoemit }
 local smokePiece = { base }
@@ -68,9 +68,7 @@ function script.Killed (recentDamage, maxHealth)
 	if (severity <= .5) then
 		return 1
 	else
-		Explode (back, SFX.SHATTER)
-		Explode (leftpiece, SFX.SHATTER)
-		Explode (rightpiece, SFX.SHATTER)
+		Explode (body, SFX.SHATTER)
 		return 2
 	end
 end
