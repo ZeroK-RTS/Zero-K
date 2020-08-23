@@ -32,14 +32,14 @@ return { plateshield = {
   collisionVolumeOffsets        = [[0 -6 -10]],
   collisionVolumeScales         = [[66 26 36]],
   collisionVolumeType           = [[box]],
-  selectionVolumeOffsets        = [[0 0 0]],
-  selectionVolumeScales         = [[88 48 104]],
+  selectionVolumeOffsets        = [[0 0 30]],
+  selectionVolumeScales         = [[70 42 96]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     sortName           = [[1]],
-    modelradius        = [[40]],
+    modelradius        = [[50]],
     aimposoffset       = [[0 16 -25]],
     midposoffset       = [[0 16 -25]],
     solid_factory      = [[3]],

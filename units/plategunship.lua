@@ -32,8 +32,8 @@ return { plategunship = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[86 86 86]],
   collisionVolumeType           = [[ellipsoid]],
-  selectionVolumeOffsets        = [[0 10 0]],
-  selectionVolumeScales         = [[104 60 96]],
+  selectionVolumeOffsets        = [[0 15 0]],
+  selectionVolumeScales         = [[70 40 70]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 

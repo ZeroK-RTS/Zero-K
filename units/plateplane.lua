@@ -28,6 +28,12 @@ return { plateplane = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[FLOAT UNARMED]],
+  collisionVolumeOffsets        = [[0 0 -16]],
+  collisionVolumeScales         = [[104 70 36]],
+  collisionVolumeType           = [[box]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[64 30 70]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

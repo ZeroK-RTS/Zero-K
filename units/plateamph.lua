@@ -29,13 +29,13 @@ return { plateamph = {
   collisionVolumeOffsets        = [[0 0 -16]],
   collisionVolumeScales         = [[104 70 36]],
   collisionVolumeType           = [[box]],
-  selectionVolumeOffsets        = [[0 0 14]],
-  selectionVolumeScales         = [[104 70 96]],
+  selectionVolumeOffsets        = [[0 15 10]],
+  selectionVolumeScales         = [[70 40 96]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    modelradius        = [[100]],
+    modelradius        = [[50]],
     aimposoffset       = [[0 0 -26]],
     midposoffset       = [[0 0 -10]],
     sortName           = [[8]],
