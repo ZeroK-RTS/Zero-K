@@ -64,8 +64,8 @@ return { platejump = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[pad_jump.dae]],
-  script                        = [[factoryjump.lua]],
+  objectName                    = [[plate_jump.s3o]],
+  script                        = [[platejump.lua]],
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
@@ -80,18 +80,15 @@ return { platejump = {
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
-      footprintZ       = 6,
-      object           = [[factoryjump_dead.s3o]],
-      collisionVolumeOffsets        = [[0 0 -18]],
-      collisionVolumeScales         = [[104 70 40]],
-      collisionVolumeType           = [[box]],
+      footprintZ       = 7,
+      object           = [[plate_jump_dead.s3o]],
     },
 
 
     HEAP  = {
       blocking         = false,
       footprintX       = 5,
-      footprintZ       = 5,
+      footprintZ       = 7,
       object           = [[debris4x4c.s3o]],
     },
 

@@ -11,6 +11,7 @@ Spring.Echo("Loading UnitDefs_posts")
 -- Constants?
 --
 
+VFS.Include("LuaRules/Configs/constants.lua")
 local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------
@@ -386,6 +387,20 @@ for name, ud in pairs (UnitDefs) do
 		end
 	end
 	]]--
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Use build range to draw factory plate ranges
+--
+
+for name, ud in pairs (UnitDefs) do
+	if ud.customparams.parent_of_plate then
+		ud.builddistance = FACTORY_PLATE_RANGE -- Matches plate range in constants
+	end
+	if ud.customparams.child_of_factory then
+		ud.builddistance = 0 -- Disable build range drawing to cut down on excess info
+	end
 end
 
 --------------------------------------------------------------------------------
