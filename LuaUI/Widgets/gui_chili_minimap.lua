@@ -955,7 +955,11 @@ end
 function widget:Initialize()
 	if (Spring.GetMiniMapDualScreen()) then
 		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
-		widgetHandler:RemoveWidget()
+		-- we still depend on the minimap widget to provide fog of war / radar and config, so we can't outright disable it.
+		widgetHandler:RemoveCallIn("DrawScreen")
+		widgetHandler:RemoveCallIn("MousePress")
+		widgetHandler:RemoveCallIn("MouseMove")
+		widgetHandler:RemoveCallIn("MouseRelease")
 		return
 	end
 
