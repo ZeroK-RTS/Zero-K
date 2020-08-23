@@ -1,6 +1,6 @@
 return { plateship = {
   unitname                      = [[plateship]],
-  name                          = [[Naval Plate]],
+  name                          = [[Ship Plate]],
   description                   = [[Augments Production]],
   acceleration                  = 0,
   brakeRate                     = 0,
@@ -58,7 +58,7 @@ return { plateship = {
   minCloakDistance              = 150,
   minWaterDepth                 = 15,
   moveState                     = 1,
-  objectName                    = [[pad_ship.dae]],
+  objectName                    = [[plate_ship.s3o]],
   script                        = [[plateship.lua]],
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
@@ -73,16 +73,16 @@ return { plateship = {
     DEAD  = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[wreck4x4a.s3o]],
+      footprintX       = 6,
+      footprintZ       = 8,
+      object           = [[plate_ship_dead.s3o]],
     },
 
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 8,
+      footprintX       = 6,
       footprintZ       = 8,
       object           = [[debris4x4c.s3o]],
     },

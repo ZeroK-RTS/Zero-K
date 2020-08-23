@@ -425,7 +425,7 @@
 		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
 	},
 	"plateship" : {
-		"name" : "Naval Plate",
+		"name" : "Ship Plate",
 		"description" : "Augments Production",
 		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
 	},
