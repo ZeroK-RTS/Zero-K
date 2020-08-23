@@ -89,7 +89,7 @@ return { platetank = {
     HEAP = {
       blocking         = false,
       footprintX       = 6,
-      footprintZ       = 6,
+      footprintZ       = 8,
       object           = [[debris4x4a.s3o]],
     },
 

@@ -63,8 +63,8 @@ return { plateveh = {
   minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
-  objectName                    = [[pad_rover.dae]],
-  script                        = [[factoryveh.lua]],
+  objectName                    = [[plate_veh.s3o]],
+  script                        = [[plateveh.lua]],
   selfDestructAs                = [[FAC_PLATEEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,
@@ -78,9 +78,9 @@ return { plateveh = {
     DEAD  = {
       blocking         = true,
       featureDead      = [[HEAP]],
-      footprintX       = 8,
-      footprintZ       = 8,
-      object           = [[factoryveh_d.dae]],
+      footprintX       = 6,
+      footprintZ       = 6,
+      object           = [[plate_veh_dead.s3o]],
       collisionVolumeOffsets = [[0 0 -20]],
       collisionVolumeScales  = [[110 35 75]],
       collisionVolumeType    = [[box]],
@@ -89,8 +89,8 @@ return { plateveh = {
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 7,
-      footprintZ       = 7,
+      footprintX       = 6,
+      footprintZ       = 6,
       object           = [[debris4x4c.s3o]],
     },
 
