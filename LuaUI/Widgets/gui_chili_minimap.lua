@@ -430,6 +430,7 @@ options = {
 			{key = 'arnone',    name = 'Map Fills Window'},
 		},
 		OnChange = function(self)
+			if not window then return end
 			local arwindow = self.value == 'arwindow'
 			window.fixedRatio = arwindow
 			if arwindow then
@@ -454,7 +455,6 @@ options = {
 			final_opacity = self.value * last_alpha
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed
 			MakeMinimapWindow()
-			window:Invalidate()
 		end,
 		path = minimap_path,
 	},
@@ -536,6 +536,7 @@ options = {
 			{key = 'panel_1001', name = 'Top Left',},
 		},
 		OnChange = function (self)
+			if not Chili then return end
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
@@ -715,6 +716,10 @@ local function MakeMinimapButton(file, params)
 end
 
 MakeMinimapWindow = function()
+	if not Chili then
+		return
+	end
+
 	if (window) then
 		window:Dispose()
 	end
