@@ -614,7 +614,7 @@ local function InitializePlayerlist()
 		playersByPlayerID = {}
 		teamByTeamID = {}
 	end
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local windowWidth = MAX_NAME_LENGTH + 10*(options.text_height.value or 13)
 
 	--// WINDOW

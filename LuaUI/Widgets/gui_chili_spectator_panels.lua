@@ -698,7 +698,7 @@ local function AddEconomyWindows()
 	else
 		Spring.SendCommands("resbar 0")
 		
-		local screenWidth,screenHeight = Spring.GetWindowGeometry()
+		local screenWidth,screenHeight = Spring.GetViewGeometry()
 		local screenHorizCentre = screenWidth / 2
 		local spacing = 360
 		local econWidth = 480
@@ -726,7 +726,7 @@ end
 local function CreatePlayerWindow()
 	local data = {}
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local screenHorizCentre = screenWidth / 2
 	local playerWindowWidth = 500
 

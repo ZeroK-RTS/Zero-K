@@ -547,7 +547,7 @@ function CreateWindow()
 	end
 	
 	-- Set the size for the default settings.
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local width = 430
 	local x = math.min(screenWidth/2 - width/2, screenWidth - 400 - width)
 	

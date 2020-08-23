@@ -409,8 +409,6 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	
 	local labelHeight = 22
 	local fontSize = 16
 	

@@ -729,7 +729,7 @@ MakeMinimapWindow = function()
 	end
 	
 	-- Set the size for the default settings.
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local width, height = screenWidth/6, screenWidth/6
 	
 	if options.buttonsOnRight.value then
