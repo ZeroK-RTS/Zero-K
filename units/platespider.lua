@@ -9,7 +9,7 @@ return { platespider = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[platespider_aoplane.dds]],
 
   buildoptions                  = {
     [[spidercon]],

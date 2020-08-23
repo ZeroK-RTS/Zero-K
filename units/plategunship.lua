@@ -9,7 +9,7 @@ return { plategunship = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[pad_decal_square.dds]],
+  buildingGroundDecalType       = [[plategunship_aoplane.dds]],
 
   buildoptions                  = {
     [[gunshipcon]],

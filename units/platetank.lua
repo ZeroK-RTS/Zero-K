@@ -9,7 +9,7 @@ return { platetank = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[platetank_aoplane.dds]],
 
   buildoptions                  = {
     [[tankcon]],

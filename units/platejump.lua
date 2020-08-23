@@ -9,7 +9,7 @@ return { platejump = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[platejump_aoplane.dds]],
 
   buildoptions                  = {
     [[jumpcon]],

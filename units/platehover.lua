@@ -9,7 +9,7 @@ return { platehover = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 9,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[platehover_aoplane.dds]],
 
   buildoptions     = {
     [[hovercon]],

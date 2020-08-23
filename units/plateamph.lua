@@ -7,7 +7,7 @@ return { plateamph = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[plateamph_aoplane.dds]],
 
   buildoptions     = {
     [[amphcon]],

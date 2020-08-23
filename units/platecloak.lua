@@ -7,7 +7,7 @@ return { platecloak = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 9,
-  buildingGroundDecalType       = [[pad_decal.dds]],
+  buildingGroundDecalType       = [[platecloak_aoplane.dds]],
 
   buildoptions                  = {
     [[cloakcon]],

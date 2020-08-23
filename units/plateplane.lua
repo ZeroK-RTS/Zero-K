@@ -10,7 +10,7 @@ return { plateplane = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[pad_decal_square.dds]],
+  buildingGroundDecalType       = [[plateplane_aoplane.dds]],
 
   buildoptions                  = {
     [[planecon]],
