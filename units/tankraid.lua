@@ -53,7 +53,7 @@ return { tankraid = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 800,
+  turnRate            = 720,
   workerTime          = 0,
 
   weapons             = {
@@ -125,7 +125,7 @@ return { tankraid = {
       soundStartVolume        = 5,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 480,
+      weaponVelocity          = 580,
     },
 
   },
