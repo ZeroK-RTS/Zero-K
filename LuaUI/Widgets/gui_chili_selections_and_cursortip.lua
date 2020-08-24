@@ -55,7 +55,7 @@ local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ":
 local Chili
 local screen0
 
-local screenWidth, screenHeight = Spring.GetWindowGeometry()
+local screenWidth, screenHeight = Spring.GetViewGeometry()
 
 local tooltipWindow
 local selectionWindow

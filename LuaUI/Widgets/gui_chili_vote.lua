@@ -190,7 +190,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
 	

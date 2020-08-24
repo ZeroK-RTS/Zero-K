@@ -1816,7 +1816,7 @@ local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 

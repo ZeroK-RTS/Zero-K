@@ -2146,7 +2146,7 @@ end
 WG.crude.UnpauseFromExitConfirmWindow = UnpauseFromExitConfirmWindow
 
 local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
-	local screen_width, screen_height = Spring.GetWindowGeometry()
+	local screen_width, screen_height = Spring.GetViewGeometry()
 	local menu_width = 320
 	local menu_height = height or 64
 

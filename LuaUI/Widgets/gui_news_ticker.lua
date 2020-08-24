@@ -428,8 +428,6 @@ function widget:Initialize()
 	Panel = Chili.Panel
 	screen0 = Chili.Screen0
 	
-	--local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	
 	window_ticker = Window:New{
 		padding = {0,0,0,0},
 		--itemMargin = {0, 0, 0, 0},

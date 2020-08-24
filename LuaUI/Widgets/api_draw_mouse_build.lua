@@ -87,7 +87,7 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
-	screenHeight = select(2, Spring.GetWindowGeometry())
+	screenHeight = select(2, Spring.GetViewGeometry())
 	WG.DrawMouseBuild = externalFunctions
 	widgetHandler:RemoveWidgetCallIn("DrawScreen", widget)
 end

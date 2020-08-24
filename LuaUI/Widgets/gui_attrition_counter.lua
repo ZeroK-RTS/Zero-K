@@ -467,7 +467,6 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function CreateWindow()
-	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local countsOffset = 43;
 	
 	--// WINDOW

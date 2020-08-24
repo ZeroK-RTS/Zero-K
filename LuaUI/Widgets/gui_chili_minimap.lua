@@ -430,6 +430,7 @@ options = {
 			{key = 'arnone',    name = 'Map Fills Window'},
 		},
 		OnChange = function(self)
+			if not window then return end
 			local arwindow = self.value == 'arwindow'
 			window.fixedRatio = arwindow
 			if arwindow then
@@ -454,7 +455,6 @@ options = {
 			final_opacity = self.value * last_alpha
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed
 			MakeMinimapWindow()
-			window:Invalidate()
 		end,
 		path = minimap_path,
 	},
@@ -536,6 +536,7 @@ options = {
 			{key = 'panel_1001', name = 'Top Left',},
 		},
 		OnChange = function (self)
+			if not Chili then return end
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
@@ -638,9 +639,10 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
+	if not window then return end
 
-	local cs = Spring.GetCameraState()
 	if not options.hideOnOverview.value then
+		local cs = Spring.GetCameraState()
 		if cs.name == "ov" and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
@@ -715,6 +717,10 @@ local function MakeMinimapButton(file, params)
 end
 
 MakeMinimapWindow = function()
+	if not Chili then
+		return
+	end
+
 	if (window) then
 		window:Dispose()
 	end
@@ -724,7 +730,7 @@ MakeMinimapWindow = function()
 	end
 	
 	-- Set the size for the default settings.
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local width, height = screenWidth/6, screenWidth/6
 	
 	if options.buttonsOnRight.value then
@@ -949,7 +955,11 @@ end
 function widget:Initialize()
 	if (Spring.GetMiniMapDualScreen()) then
 		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
-		widgetHandler:RemoveWidget()
+		-- we still depend on the minimap widget to provide fog of war / radar and config, so we can't outright disable it.
+		widgetHandler:RemoveCallIn("DrawScreen")
+		widgetHandler:RemoveCallIn("MousePress")
+		widgetHandler:RemoveCallIn("MouseMove")
+		widgetHandler:RemoveCallIn("MouseRelease")
 		return
 	end
 

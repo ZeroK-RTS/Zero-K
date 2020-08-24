@@ -324,7 +324,7 @@ function widget:Initialize()
 	Image       = Chili.Image
 	screen0     = Chili.Screen0
 	
-	local vsx, vsy = Spring.GetWindowGeometry()
+	local vsx, vsy = Spring.GetViewGeometry()
 	local width, height = 480, 240
 	local y = vsy * 0.20 + 50	-- put it under proconsole
 	
