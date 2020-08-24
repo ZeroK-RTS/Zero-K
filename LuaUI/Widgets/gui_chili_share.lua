@@ -89,6 +89,12 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
+	remerge = {
+		name = 'Manual Remerge',
+		desc = 'Use this in case you weren\'t remerged automatically.',
+		type = 'button',
+		OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
+	},
 	fixHotkeys = {
 		name  = "Fix hotkeys on start",
 		type  = "bool",

@@ -94,9 +94,7 @@ local function CheckDeathTeam(teamID)
 		ghRemoveCallIn(gh, 'AllowCommand')
 		spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
 		ghUpdateCallIn(gh, 'AllowCommand')
-		if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
-			GG.ResignTeam(teamID)
-		end
+		GG.ResignTeam(teamID)
 	end
 end
 

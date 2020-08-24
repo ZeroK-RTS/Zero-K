@@ -333,10 +333,6 @@ function widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
 
-function widget:PlayerChanged()
-	teamID = Spring.GetMyTeamID()
-end
-
 function widget:Shutdown()
 	WG.GetAutoCallTransportState = nil
 	widgetHandler:DeregisterGlobal(widget, 'taiEmbark')
