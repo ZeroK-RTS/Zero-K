@@ -22,7 +22,6 @@ return { amphimpulse = {
     sink_on_emp       = 1,
     floattoggle       = [[1]],
     selection_scale   = 0.8,
-    aim_lookahead     = 15,
   },
 
   explodeAs              = [[BIG_UNITEX]],
