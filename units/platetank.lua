@@ -5,6 +5,7 @@ return { platetank = {
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_PLATE_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,

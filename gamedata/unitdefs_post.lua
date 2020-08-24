@@ -391,20 +391,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Use build range to draw factory plate ranges
---
-
-for name, ud in pairs (UnitDefs) do
-	if ud.customparams.parent_of_plate then
-		ud.builddistance = FACTORY_PLATE_RANGE -- Matches plate range in constants
-	end
-	if ud.customparams.child_of_factory then
-		ud.builddistance = FACTORY_PLATE_RANGE -- Too many circles?
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Lua implementation of energyUse
 --
 

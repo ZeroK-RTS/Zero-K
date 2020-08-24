@@ -3,6 +3,7 @@ return { factorycloak = {
   name                          = [[Cloakbot Factory]],
   description                   = [[Produces Cloaked, Mobile Robots]],
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 13,

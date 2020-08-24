@@ -5,6 +5,7 @@ return { factoryship = {
   acceleration           = 0,
   brakeRate              = 0,
   buildCostMetal         = Shared.FACTORY_COST,
+  buildDistance          = Shared.FACTORY_PLATE_RANGE,
   builder                = true,
 
   buildoptions           = {
