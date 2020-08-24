@@ -792,14 +792,10 @@ HOW THIS WORKS:
 --  Detect when player enters spectator mode (thanks to SeanHeron).
 function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
-		Echo( "<Global Build Command> Spectator mode or commshare detected. Widget removed." )
+		Echo( "<Global Build Command> Spectator mode. Widget removed." )
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
-	if #Spring.GetPlayerList(spGetMyTeamID()) > 1 then -- GBC breaks with commshare. It doesn't take squad actions into account and it eats squadmates' orders.
-		Spring.Echo("<Global Build Command> Commshare detected. Widget removed.")
-		widgetHandler:RemoveWidget(widget) 
-	end 
 end
 
 -- This function detects when our workers have started a job

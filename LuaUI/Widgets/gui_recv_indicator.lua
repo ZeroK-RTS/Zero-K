@@ -358,7 +358,6 @@ end
 --2 functions
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end --//widget will unload when we become spectator.
-	myTeamID_gbl = Spring.GetMyTeamID() -- commshare support.
 end
 
 function widget:GameProgress(serverFrameNum) --//see if me are lagging behind the server in the current game. If me is lagging then trigger a switch, (this switch will tell the widget to stop counting received units).

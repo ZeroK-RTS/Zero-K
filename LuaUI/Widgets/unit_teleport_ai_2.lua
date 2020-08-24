@@ -118,10 +118,6 @@ function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitCreated(unitID, unitDefID, newTeamID)
 end
 
-function widget:PlayerChange()
-	teamID = Spring.GetMyTeamID()
-end
-
 ------------------------------------------------------------
 ------------------------------------------------------------
 local function GetNearbyBeacon(ex,ez,beaconData)
