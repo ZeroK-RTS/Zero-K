@@ -17,16 +17,16 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "UnitPriority",
-    desc      = "Adds controls to change spending priority on constructions/repairs etc",
-    author    = "Licho",
-    date      = "19.4.2009", --24.2.2013
-    license   = "GNU GPL, v2 or later",
-	-- Must start before unit_morph.lua gadget to register GG.AddMiscPriority() first.
-	-- Must be before mex_overdrive
-    layer     = -5,
-    enabled   = true
+	return {
+		name      = "UnitPriority",
+		desc      = "Adds controls to change spending priority on constructions/repairs etc",
+		author    = "Licho",
+		date      = "19.4.2009", --24.2.2013
+		license   = "GNU GPL, v2 or later",
+		-- Must start before unit_morph.lua gadget to register GG.AddMiscPriority() first.
+		-- Must be before mex_overdrive
+		layer     = -5,
+		enabled   = true
   }
 end
 
@@ -49,22 +49,22 @@ local DefaultState = 1
 
 local CommandOrder = 123456
 local CommandDesc = {
-	id          = CMD_PRIORITY,
-	type        = CMDTYPE.ICON_MODE,
-	name        = 'Construction Priority',
-	action      = 'priority',
-	tooltip 	= 'Construction Priority' .. TooltipsA[DefaultState + 1],
-	params      = {DefaultState, 'Low','Normal','High'}
+	id      = CMD_PRIORITY,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Construction Priority',
+	action  = 'priority',
+	tooltip = 'Construction Priority' .. TooltipsA[DefaultState + 1],
+	params  = {DefaultState, 'Low','Normal','High'}
 }
 
 local MiscCommandOrder = 123457
 local MiscCommandDesc = {
-	id          = CMD_MISC_PRIORITY,
-	type        = CMDTYPE.ICON_MODE,
-	name        = 'Morph&Stock Priority',
-	action      = 'miscpriority',
-	tooltip 	= 'Morph&Stock Priority' .. TooltipsA[DefaultState + 1],
-	params      = {DefaultState, 'Low','Normal','High'}
+	id      = CMD_MISC_PRIORITY,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Morph&Stock Priority',
+	action  = 'miscpriority',
+	tooltip = 'Morph&Stock Priority' .. TooltipsA[DefaultState + 1],
+	params  = {DefaultState, 'Low','Normal','High'}
 }
 
 local StateCount = #CommandDesc.params-1
@@ -289,7 +289,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if debugBuildUnit and debugBuildUnit[unitID] then
 		Spring.Echo("AUBS", builderID, teamID, unitID, unitDefID, step, Spring.GetUnitHealth(unitID))
 	end
-	if (step<=0) then
+	if (step <= 0) then
 		--// Reclaiming and null buildpower (waited cons) aren't prioritized
 		return true
 	end
