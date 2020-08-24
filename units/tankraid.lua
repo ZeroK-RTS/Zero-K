@@ -77,7 +77,7 @@ return { tankraid = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      accuracy                = 1300,
+      accuracy                = 1200,
       areaOfEffect            = 96,
       avoidFeature            = true,
       avoidFriendly           = true,
@@ -93,18 +93,18 @@ return { tankraid = {
 
         area_damage = 1,
         area_damage_radius = 54,
-        area_damage_dps = 35,
+        area_damage_dps = 43,
         area_damage_plateau_radius = 20,
-        area_damage_duration = 1.5,
+        area_damage_duration = 1.6,
         
         light_color = [[1.6 0.8 0.32]],
         light_radius = 320,
       },
       
       damage                  = {
-        default = 46,
-        planes  = 46,
-        subs    = 2.3,
+        default = 40,
+        planes  = 40,
+        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda_small]],
@@ -115,9 +115,9 @@ return { tankraid = {
       interceptedByShieldType = 1,
       leadLimit               = 90,
       model                   = [[wep_b_fabby.s3o]],
-      myGravity               = 0.1,
+      myGravity               = 0.2,
       noSelfDamage            = true,
-      range                   = 220,
+      range                   = 215,
       reloadtime              = 0.5,
       soundHit                = [[FireHit]],
       soundHitVolume          = 5,
@@ -125,7 +125,7 @@ return { tankraid = {
       soundStartVolume        = 5,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 580,
+      weaponVelocity          = 520,
     },
 
   },
