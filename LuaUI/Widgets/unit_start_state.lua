@@ -94,7 +94,7 @@ end
 --------------------------------------------------------------------------------
 
 local function IsGround(ud)
-    return not ud.canFly and not ud.isFactory
+    return not ud.canFly
 end
 
 local impulseUnitDefID = {}
