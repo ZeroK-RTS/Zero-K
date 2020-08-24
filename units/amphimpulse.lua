@@ -5,7 +5,7 @@ return { amphimpulse = {
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 2.4,
-  buildCostMetal         = 200,
+  buildCostMetal         = 180,
   buildPic               = [[amphimpulse.png]],
   canGuard               = true,
   canMove                = true,
@@ -21,7 +21,7 @@ return { amphimpulse = {
     amph_submerged_at = 40,
     sink_on_emp       = 1,
     floattoggle       = [[1]],
-    selection_scale   = 0.85,
+    selection_scale   = 0.8,
     aim_lookahead     = 15,
   },
 

@@ -151,7 +151,7 @@
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
-		"description" : "Gauss Turret, 20 health/s when closed",
+		"description" : "Gauss Turret, 10 health/s when closed",
 		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
