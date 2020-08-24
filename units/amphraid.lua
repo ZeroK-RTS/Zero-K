@@ -12,7 +12,7 @@ return { amphraid = {
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[28 28 28]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
