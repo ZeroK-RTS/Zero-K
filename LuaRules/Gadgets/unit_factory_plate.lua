@@ -231,11 +231,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	gadget:UnitCreated(unitID, unitDefID, teamID)
+	gadget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function gadget:Initialize()
