@@ -31,8 +31,10 @@ local GiveOrderToUnit = Spring.GiveOrderToUnit
 local GetUnitDefID = Spring.GetUnitDefID
 
 local AIRPLANT = {
-	[UnitDefNames["factoryplane"].id] = {land = true},
-	[UnitDefNames["factorygunship"].id] = {land = false},
+	[UnitDefNames.factoryplane.id] = {land = true},
+	[UnitDefNames.factorygunship.id] = {land = false},
+	[UnitDefNames.plateplane.id] = {land = true},
+	[UnitDefNames.plategunship.id] = {land = false},
 }
 
 if UnitDefNames["pw_bomberfac"] then
