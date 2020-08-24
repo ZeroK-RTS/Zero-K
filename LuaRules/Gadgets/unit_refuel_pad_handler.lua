@@ -225,23 +225,20 @@ local function SitOnPad(unitID)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
-			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)*GG.REPAIR_RESOURCE_MULT
+			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)
 			if updateCost ~= oldUpdateCost or oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost
 				if updateCost > 0 then
-					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, not GG.REPAIR_COSTS_METAL, miscPriorityKey)
+					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, true, miscPriorityKey)
 				else
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 				end
 			end
 			
 			if (updateCost > 0) then
-				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, not GG.REPAIR_COSTS_METAL)
+				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
 				resTable.e = updateCost*updateRate
-				if GG.REPAIR_COSTS_METAL then
-					resTable.m = resTable.e
-				end
 			else
 				updateRate = 1
 			end
