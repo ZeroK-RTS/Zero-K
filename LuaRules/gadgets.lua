@@ -428,7 +428,7 @@ function gadgetHandler:LoadGadget(filename)
   end
 
   if info and ECHO_DESCRIPTIONS then
-    Spring.Echo(info.name, info.desc)
+    Spring.Echo(filename, info.name, info.desc)
   end
 
   return gadget
