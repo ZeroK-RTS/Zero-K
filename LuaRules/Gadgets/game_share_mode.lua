@@ -125,12 +125,6 @@ local function GetSquadSize(teamID)
 	return #spGetPlayerList(teamID, true)
 end
 
-local function DebugEcho(str)
-	if debug then
-		spEcho(str)
-	end
-end
-
 local function ProccessCommand(str)
 	local command, targetID
 	local i = 1
@@ -201,8 +195,6 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 					spAssignPlayerToTeam(playerlist[i],leaderTeam)
 				end
 			end
-		else
-			DebugEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)")
 		end
 	else
 		spEcho("[Commshare]: Unmerging is forbidden in this game mode!")
@@ -223,7 +215,6 @@ end
 	
 local function MergePlayer(playerID,target)
 	if playerID == nil then
-		DebugEcho("[Commshare] Tried to merge a nil player!")
 		return
 	end
 	local orgTeamID = GetTeamID(playerID)
@@ -246,8 +237,6 @@ local function MergePlayer(playerID,target)
 			spSetTeamRulesParam(target,"isCommsharing",nil)
 		end
 		spAssignPlayerToTeam(playerID,target)
-	else
-		DebugEcho("[Commshare] Merge error.")
 	end
 end
 
@@ -264,14 +253,11 @@ local function MergeAllHumans(teamlist)
 		local _, teamLeader, _, AI = spGetTeamInfo(teamlist[i], false)
 		local human = not AI and teamLeader ~= -1
 		if human and mergeid ~= -1 then
-			DebugEcho("[Commshare] Merging team " .. teamlist[i])
 			-- Needed because of recursion error. Only one player on a team at game start anyways.
 			MergePlayer(teamLeader,mergeid)
 		elseif human and mergeid == -1 then
 			mergeid = teamlist[i]
 			DebugEcho("[Commshare] MergeID is " .. mergeid)
-		else
-			DebugEcho("[Commshare] Skipping team " .. i .. " [inhuman]")
 		end
 	end
 end
@@ -281,7 +267,6 @@ local function MergeAll()
 	for i = 1, #ally do
 		local teamlist = spGetTeamList(ally[i])
 		if #teamlist > 1 then
-			DebugEcho("[Commshare] Merging alliance " .. i)
 			MergeAllHumans(teamlist)
 		end
 	end
@@ -292,11 +277,9 @@ local function SendInvite(player, target) -- targetid is which player is the mer
 		local targetspec = select(3, spGetPlayerInfo(target, false))
 		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target), false)
 		if player == target or GetTeamID(target) == GetTeamID(player) then
-			DebugEcho("[Commshare] " .. select(1,spGetPlayerInfo(player, false)) .. " tried to merge with theirself or a squad member!")
 			return
 		end
 		if targetspec then
-			DebugEcho("[Commshare] " .. select(1,spGetPlayerInfo(player, false)) .. " tried to merge with a spectator!")
 			return
 		end
 		if targetid == player then
@@ -315,7 +298,6 @@ end
 local function AcceptInvite(player,target)
 	spEcho("verifying invite")
 	if invites[player][target] then
-		DebugEcho("[Commshare] invite verified")
 		local teamID = GetTeamID(player)
 		if GetTeamLeader(teamID) == player and GetSquadSize(teamID) > 1 then
 			MergeTeams(GetTeamID(player),GetTeamID(target))
@@ -326,8 +308,6 @@ local function AcceptInvite(player,target)
 		if invites[target] then
 			invites[target][player] = nil
 		end
-	else
-		DebugEcho("[Commshare] Invalid invite: " .. player,target .. "!")
 	end
 end
 
@@ -337,8 +317,6 @@ local function DisposePlayer(playerID) -- clean up this player. Called 1 frame a
 	end
 	local name = spGetPlayerInfo(playerID,false)
 	local teamid = playerstates[playerID].teamid
-	DebugEcho("[Commshare] Disposing of player " .. name)
-	DebugEcho("TeamID: " .. tostring(teamid) .. "\nIsTeamLeader: " .. tostring(IsTeamLeader(playerID)) .. "\nSquadsize: " .. GetSquadSize(teamid))
 	if invites[playerID] then
 		local i = 0
 		for key,data in pairs(invites[playerID]) do -- kill off invites.
@@ -407,7 +385,6 @@ function gadget:GameFrame(frame)
 		for player, playerInvites in pairs(invites) do
 			invitecount = 0
 			for key,data in pairs(playerInvites) do
-				DebugEcho("player: " .. player .. ", invite: " .. key)
 				invitecount = invitecount+1
 				if data.timeleft > 0 then
 					data.timeleft = data.timeleft - 1
@@ -464,12 +441,10 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		end
 		if strFind(command,"unmerge") then
 			local afk = IsTeamAfk(GetTeamID(playerID))
-			DebugEcho("team is afk: " .. tostring(afk))
 			if not afk and #spGetPlayerList(playerID) > 1 then
 				UnmergePlayer(playerID)
 				return
 			else
-				DebugEcho("[Commshare] " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
 				return
 			end
 		end
@@ -477,7 +452,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		if type(targetID) ~= "number" then
 			return
 		end
-		DebugEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID)
 		-- Do commands --
 		if strFind(command, "invite") then
 			SendInvite(playerID, targetID)
@@ -485,24 +459,24 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				AcceptInvite(playerID,targetID)
 			end
 		elseif command:find("playerchanged") then -- hack in remerging. this is sent
-			DebugEcho("[Commshare] Playerchanged: " .. targetID)
+			--spEcho("[Commshare] Playerchanged: " .. targetID)
 			local name, active, spectator, teamID = spGetPlayerInfo(targetID)
 			local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
-			DebugEcho("playerstates: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator))
+			--spEcho("playerstates: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator))
 			if playerstates[targetID] == nil and not spectator then -- this player has commshared or changed state.
-				DebugEcho("[Commshare] generated playerstate table.")
+				--spEcho("[Commshare] generated playerstate table.")
 				playerstates[targetID] = {active = active, spectator = spectator, teamid = teamID}
 			elseif not spectator then
-				DebugEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[playerID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[playerID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID))
+				--spEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[playerID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[playerID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID))
 				if active ~= playerstates[targetID].active and active and commshareID then -- this player has reconnected.
 					AddUpdatePlayer(targetID,"remerge")
-					DebugEcho("Commshare: Remerged " .. name)
+					--spEcho("Commshare: Remerged " .. name)
 				end
 				playerstates[targetID].active = active
 				playerstates[targetID].spectator = spectator
 				playerstates[targetID].teamid = teamID
 			elseif spectator and playerstates[targetID] then -- this player resigned
-				DebugEcho("Commshare: Disposing of " .. name)
+				--spEcho("Commshare: Disposing of " .. name)
 				AddUpdatePlayer(targetID,"dead")
 				return
 			end
