@@ -87,6 +87,7 @@ local oddZ = {}
 local buildAction = {}
 local childOfFactory = {}
 local parentOfPlate = {}
+local floatOnWater = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -95,6 +96,7 @@ for i = 1, #UnitDefs do
 		buildAction[i] = "buildunit_" .. ud.name
 		oddX[i] = (ud.xsize % 4)*4
 		oddZ[i] = (ud.zsize % 4)*4
+		floatOnWater[i] = ud.floatOnWater
 		
 		if cp.child_of_factory then
 			childOfFactory[i] = UnitDefNames[cp.child_of_factory].id
@@ -153,9 +155,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetMousePos()
+local function GetMousePos(ignoreWater)
 	local mouseX, mouseY = spGetMouseState()
-	local _, mouse = spTraceScreenRay(mouseX, mouseY, true, true)
+	local _, mouse = spTraceScreenRay(mouseX, mouseY, true, true, false, ignoreWater)
 	if not mouse then
 		return
 	end
@@ -164,7 +166,7 @@ local function GetMousePos()
 end
 
 local function CheckTransformPlateIntoFactory(plateDefID)
-	local mx, mz = GetMousePos()
+	local mx, mz = GetMousePos(not floatOnWater[plateDefID])
 	if not mx then
 		return
 	end
@@ -184,7 +186,7 @@ local function CheckTransformPlateIntoFactory(plateDefID)
 end
 
 local function CheckTransformFactoryIntoPlate(factoryDefID)
-	local mx, mz = GetMousePos()
+	local mx, mz = GetMousePos(not floatOnWater[factoryDefID])
 	if not mx then
 		return
 	end
