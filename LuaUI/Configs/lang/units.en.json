@@ -192,7 +192,7 @@
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a quarter. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
