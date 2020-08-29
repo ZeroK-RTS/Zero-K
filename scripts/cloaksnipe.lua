@@ -43,10 +43,10 @@ local smokePiece = {torsoTrue, backpack}
 -- constants
 --------------------------------------------------------------------------------
 -- Signal definitions
+local SIG_IDLE = 1
 local SIG_AIM = 2
 local SIG_PACK = 4
 local SIG_WALK = 8
-local SIG_IDLE = 1
 local SIG_RESTORE = 16
 
 -- future-proof running animation against balance tweaks
@@ -329,7 +329,6 @@ function script.FireWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Signal(SIG_MOVE)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		--[[

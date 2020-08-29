@@ -64,25 +64,25 @@ local otherData
 local otherMobile
 local function UpdateLink(unitID, unitData)
 	if unitID ~= otherID and (otherMobile or unitData.mobile) then
-		local currentlyNeighbors = (otherData.neighbors.InMap(unitID) or unitData.neighbors.InMap(otherID))
+		local currentlyNeighbors = (IterableMap.InMap(otherData.neighbors, unitID) or IterableMap.InMap(unitData.neighbors, otherID))
 		local touching = ShieldsAreTouching(unitData, otherData)
 		if currentlyNeighbors and not touching then
 			--Spring.Utilities.UnitEcho(unitID, "-")
 			--Spring.Utilities.UnitEcho(otherID, "-")
-			otherData.neighbors.Remove(unitID)
-			unitData.neighbors.Remove(otherID)
+			IterableMap.Remove(otherData.neighbors, unitID)
+			IterableMap.Remove(unitData.neighbors, otherID)
 		elseif touching and not currentlyNeighbors then
 			--Spring.Utilities.UnitEcho(unitID, "+")
 			--Spring.Utilities.UnitEcho(otherID, "+")
-			otherData.neighbors.Add(unitID)
-			unitData.neighbors.Add(otherID)
+			IterableMap.Add(otherData.neighbors, unitID)
+			IterableMap.Add(unitData.neighbors, otherID)
 		end
 	end
 end
 
 local function AdjustLinks(unitID, shieldUnits)
 	otherID = unitID
-	otherData = shieldUnits.Get(unitID)
+	otherData = IterableMap.Get(shieldUnits, unitID)
 	if otherData then
 		if otherData.mobilesAdded then
 			otherMobile = otherData.mobile
@@ -90,13 +90,13 @@ local function AdjustLinks(unitID, shieldUnits)
 			otherData.mobilesAdded = true
 			otherMobile = true
 		end
-		shieldUnits.Apply(UpdateLink)
+		IterableMap.Apply(shieldUnits, UpdateLink)
 	end
 end
 
 local function PossiblyUpdateLinks(unitID, allyTeamID)
 	local shieldUnits = allyTeamShields[allyTeamID]
-	local unitData = shieldUnits.Get(unitID)
+	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if not unitData then
 		return
 	end
@@ -107,13 +107,13 @@ local function PossiblyUpdateLinks(unitID, allyTeamID)
 end
 
 local function RemoveNeighbor(unitID, _, _, thisShieldTeam, toRemoveID)
-	if thisShieldTeam.InMap(unitID) then
-		thisShieldTeam.Get(unitID).neighbors.Remove(toRemoveID)
+	if IterableMap.InMap(thisShieldTeam, unitID) then
+		IterableMap.Remove(IterableMap.Get(thisShieldTeam, unitID).neighbors, toRemoveID)
 	end
 end
 
 local function RemoveUnitFromNeighbors(thisShieldTeam, unitID, neighbors)
-	neighbors.Apply(RemoveNeighbor, thisShieldTeam, unitID)
+	IterableMap.Apply(neighbors, RemoveNeighbor, thisShieldTeam, unitID)
 end
 
 local function UpdatePosition(unitID, unitData)
@@ -150,7 +150,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if shieldWeaponDefID then
 		local shieldWep = WeaponDefs[shieldWeaponDefID]
 		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID)) then
+		if not (allyTeamShields[allyTeamID] and IterableMap.InMap(allyTeamShields[allyTeamID], unitID)) then
 			-- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
 			
@@ -166,7 +166,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				z = uz,
 				mobile = Spring.Utilities.getMovetype(ud) and true
 			}
-			allyTeamShields[allyTeamID].Add(unitID, shieldData)
+			IterableMap.Add(allyTeamShields[allyTeamID], unitID, shieldData)
 			AdjustLinks(unitID, allyTeamShields[allyTeamID])
 		end
 	end
@@ -178,24 +178,25 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID].InMap(unitID) then
-		local unitData = allyTeamShields[allyTeamID].Get(unitID)
+	if allyTeamShields[allyTeamID] and IterableMap.InMap(allyTeamShields[allyTeamID], unitID) then
+		local unitData = IterableMap.Get(allyTeamShields[allyTeamID], unitID)
 		if unitData then
 			RemoveUnitFromNeighbors(allyTeamShields[allyTeamID], unitID, unitData.neighbors)
 		end
-		allyTeamShields[allyTeamID].Remove(unitID)
+		IterableMap.Remove(allyTeamShields[allyTeamID], unitID)
 	end
 end
 
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam, false)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam].InMap(unitID) then
+	if allyTeamID and allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
+		
 		local unitData
-		if allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam].InMap(unitID) then
-			unitData = allyTeamShields[oldAllyTeam].Get(unitID)
+		if allyTeamShields[oldAllyTeam] and IterableMap.InMap(allyTeamShields[oldAllyTeam], unitID) then
+			unitData = IterableMap.Get(allyTeamShields[oldAllyTeam], unitID)
 			
-			allyTeamShields[oldAllyTeam].Remove(unitID)
+			IterableMap.Remove(allyTeamShields[oldAllyTeam], unitID)
 			RemoveUnitFromNeighbors(allyTeamShields[oldAllyTeam], unitID, unitData.neighbors)
 			unitData.neighbors = IterableMap.New()
 			unitData.allyTeamID = allyTeamID
@@ -203,7 +204,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		if unitData then
 			--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or IterableMap.New()
-			allyTeamShields[allyTeamID].Add(unitID, unitData)
+			IterableMap.Add(allyTeamShields[allyTeamID], unitID, unitData)
 		end
 	end
 end
@@ -222,7 +223,7 @@ function gadget:GameFrame(n)
 	gameFrame = n
 	if n%13 == 7 then
 		for allyTeamID, unitList in pairs(allyTeamShields) do
-			unitList.ApplyNoArg(UpdatePosition)
+			IterableMap.ApplyNoArg(unitList, UpdatePosition)
 		end
 	end
 end
@@ -257,17 +258,17 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 		damage = damage - charge
 		local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 		PossiblyUpdateLinks(unitID, allyTeamID)
-		local shieldData = allyTeamShields[allyTeamID].Get(unitID)
+		local shieldData = IterableMap.Get(allyTeamShields[allyTeamID], unitID)
 		
 		if shieldData then
 			totalCharge = 0
 			shieldCharges = {}
-			shieldData.neighbors.ApplyNoArg(SumCharge)
+			IterableMap.ApplyNoArg(shieldData.neighbors, SumCharge)
 
 			if damage < totalCharge then
 				Spring.SetUnitShieldState(unitID, -1, true, realDamage)
 				chargeProportion = 1 - damage/totalCharge
-				shieldData.neighbors.ApplyNoArg(SetCharge)
+				IterableMap.ApplyNoArg(shieldData.neighbors, SetCharge)
 				shieldCharges = nil
 				return false
 			end

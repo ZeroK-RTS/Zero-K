@@ -1,7 +1,7 @@
 return { commrecon1 = {
   unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
-  description         = [[High Mobility Commander, Builds at 10 m/s]],
+  description         = [[High Mobility Commander]],
   acceleration        = 0.75,
   activateWhenBuilt   = true,
   autoHeal            = 5,

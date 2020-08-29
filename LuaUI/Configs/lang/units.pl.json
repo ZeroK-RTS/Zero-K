@@ -31,7 +31,7 @@
 	},
 	"staticmissilesilo" : {
 		"name" : "Silos rakietowy",
-		"description" : "Buduje rakiety taktyczne, moc 10 m/s",
+		"description" : "Buduje rakiety taktyczne",
 		"helptext" : "Silos rakietowy buduje rakiety taktyczne. Do wyboru jest kilka różnych głowic, co zapewnia świetne możliwości zarówno defensywne, jak i ofensywne. Silos może składować do czterech rakiet."
 	},
 	"spiderscout" : {
@@ -141,7 +141,7 @@
 	},
 	"factoryveh" : {
 		"name" : "Fabryka pojazdów",
-		"description" : "Buduje pojazdy, moc 10 m/s",
+		"description" : "Buduje pojazdy",
 		"helptext" : "Fabryka pojazdów to ucieleśnienie wojny błyskawicznej - oddaje do dyspozycji szybkie, agresywne jednostki skuteczne w bezpośredniej walce."
 	},
 	"turretgauss" : {
@@ -261,7 +261,7 @@
 	},
 	"shieldcon" : {
 		"name" : "Convict",
-		"description" : "Bot konstruktor z tarczą, moc 5 m/s",
+		"description" : "Bot konstruktor z tarczą",
 		"helptext" : "Convict to bot budowniczy z tarczą, którą ochrania siebie i to, co buduje."
 	},
 	"energysingu" : {
@@ -301,7 +301,7 @@
 	},
 	"staticcon" : {
 		"name" : "Caretaker",
-		"description" : "Wieżyczka budowlana, moc 10 m/s",
+		"description" : "Wieżyczka budowlana",
 		"helptext" : "Jako najtańsze źródło mocy budowlanej, Caretaker świetnie sprawuje się do pomocy fabrykom, naprawy jednostek i zbierania złomu. Nie jest jednak w stanie samemu rozpoczynać żadnej budowy."
 	},
 	"terraunit" : {
@@ -376,7 +376,7 @@
 	},
 	"factoryshield" : {
 		"name" : "Fabryka tarczowników",
-		"description" : "Buduje harde boty, moc 10 m/s",
+		"description" : "Buduje harde boty",
 		"helptext" : "Boty tu produkowane z reguły wyposażone są w tarcze, co daje im wysoką wytrzymałość. Łączenie tarcz powoduje, że dobrze działają w grupach. Dobra fabryka dla nowicjuszy."
 	},
 	"chickena" : {
@@ -491,7 +491,7 @@
 	},
 	"spidercon" : {
 		"name" : "Weaver",
-		"description" : "Pająk konstruktor, moc 7.5 m/s",
+		"description" : "Pająk konstruktor",
 		"helptext" : "Weaver to pajęczy konstruktor, który może wspinać się po dowolnej powierzchni. Jest także wyposażony w radar."
 	},
 	"hoverdepthcharge" : {
@@ -511,12 +511,12 @@
 	},
 	"factoryplane" : {
 		"name" : "Lotnisko",
-		"description" : "Buduje samoloty, moc 10 m/s",
+		"description" : "Buduje samoloty",
 		"helptext" : "Lotnisko produkuje samoloty; oferuje przede wszystkim myśliwce i bombowce, aczkolwiek nie tylko. Na lotnisku znajduje się jedno lądowisko do naprawy samolotów i przeładowywania bombowców."
 	},
 	"gunshipbomb" : {
 		"name" : "Blastwing",
-		"description" : "Latająca bomba (zakopuje się)",
+		"description" : "Latająca bomba zwiadowcza (zakopuje się)",
 		"helptext" : "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
 	},
 	"napalmmissile" : {
@@ -526,12 +526,12 @@
 	},
 	"factoryamph" : {
 		"name" : "Fabryka amfibii",
-		"description" : "Buduje amfibie, moc 10 m/s",
+		"description" : "Buduje amfibie",
 		"helptext" : "Tutaj budowane są boty amfibijne, które są w stanie walczyć na lądzie i w wodzie. Zanurzone amfibie regenerują się."
 	},
 	"factoryship" : {
 		"name" : "Stocznia",
-		"description" : "Buduje statki, moc 10 m/s",
+		"description" : "Buduje statki",
 		"helptext" : "Stocznia buduje statki i łodzie podwodne. Pozostałe jednostki wodne, tj. poduszkowce i amfibie, mają osobne fabryki."
 	},
 	"vehassault" : {
@@ -556,7 +556,7 @@
 	},
 	"tankcon" : {
 		"name" : "Welder",
-		"description" : "Uzbrojony czołg konstruktor, moc 7.5 m/s",
+		"description" : "Uzbrojony czołg konstruktor",
 		"helptext" : "Welder to konstruktor, który może sam się bronić przed lekkimi atakami dzięki wbudowanemu działku."
 	},
 	"shieldarty" : {
@@ -606,7 +606,7 @@
 	},
 	"jumpcon" : {
 		"name" : "Constable",
-		"description" : "Skoczek konstruktor, moc 5 m/s",
+		"description" : "Skoczek konstruktor",
 		"helptext" : "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
 	},
 	"chicken_blimpy" : {
@@ -621,7 +621,7 @@
 	},
 	"athena" : {
 		"name" : "Athena",
-		"description" : "Konstruktor specjalistyczny, moc 15 m/s",
+		"description" : "Konstruktor specjalistyczny",
 		"helptext" : "Athena to technologiczne cacko wyposażone w niewidzialność, zakłócacz radaru i możliwość odbudowy jednostek bezpośrednio ze złomu. Ponadto jest w stanie budować jednostki na polu bitwy bez użycia fabryki i działać jak normalny konstruktor."
 	},
 	"staticsonar" : {
@@ -646,7 +646,7 @@
 	},
 	"factoryhover" : {
 		"name" : "Fabryka poduszkowców",
-		"description" : "Buduje poduszkowce, moc 10 m/s",
+		"description" : "Buduje poduszkowce",
 		"helptext" : "Poduszkowce są śmiercionośne i szybko poruszają się zarówno po powierzchni wody, jak i po płaskim terenie."
 	},
 	"gunshipassault" : {
@@ -726,7 +726,7 @@
 	},
 	"factoryspider" : {
 		"name" : "Fabryka pająków",
-		"description" : "Buduje pająki, moc 10 m/s",
+		"description" : "Buduje pająki",
 		"helptext" : "Stworzone do walki na trudnym terenie, pająki polegają na zasięgu i ruchliwości bardziej niż na sile ognia."
 	},
 	"chicken_dragon" : {
@@ -801,12 +801,12 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Buduje mechy, moc 10 m/s",
+		"description" : "Buduje mechy",
 		"helptext" : "Centrum konstrukcyjne mechów powołuje do życia ogromne roboty, ostateczną pięść pancerną natarcia powodującą zniszczenie i przerażenie w szeregach przeciwnika. W przeciwieństwie do zwykłej fabryki, centrum konstrukcyjne wymagane jest jedynie do zainicjowania budowy jednostki."
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amfibijny bot konstruktor, moc 7.5 m/s",
+		"description" : "Amfibijny bot konstruktor",
 		"helptext" : "Conch to wytrzymały konstruktor, który swoje obowiązki wykonuje zarówno na lądzie, jak i pod wodą."
 	},
 	"spiderriot" : {
@@ -851,7 +851,7 @@
 	},
 	"vehcon" : {
 		"name" : "Mason",
-		"description" : "Pojazd konstruktor, moc 5 m/s",
+		"description" : "Pojazd konstruktor",
 		"helptext" : "Mason to prędki i wytrzymały konstruktor idealny do szybkiego zajmowania kopalń."
 	},
 	"amphtele" : {
@@ -861,7 +861,7 @@
 	},
 	"shipcon" : {
 		"name" : "Mariner",
-		"description" : "Statek konstruktor, moc 7.5 m/s",
+		"description" : "Statek konstruktor",
 		"helptext" : "Mimo wysokiego kosztu, Mariner łączy wysoką moc budowy z wytrzymałym pancerzem i dobrą prędkością."
 	},
 	"shipscout" : {
@@ -909,11 +909,6 @@
 		"description" : "Fregata przeciwlotnicza",
 		"helptext" : "Zapewnia flocie ochronę przed wrogim lotnictwem przy użyciu podwójych działek laserowych."
 	},
-	"shiptransport" : {
-		"name" : "Surfboard",
-		"description" : "Statek transportowy",
-		"helptext" : "Surfboard jest statkiem transportowym; jednostki, które przewozi, mogą strzelać w trakcie przewozu."
-	},
 	"shipheavyarty" : {
 		"name" : "Shogun",
 		"description" : "Ciężki pancernik artyleryjski",
@@ -921,7 +916,7 @@
 	},
 	"factorygunship" : {
 		"name" : "Fabryka statków powietrznych",
-		"description" : "Buduje statki powietrzne, moc 10 m/s",
+		"description" : "Buduje statki powietrzne",
 		"helptext" : "W tej fabryce produkuje się statki powietrzne, zarówno bojowe, jak i transportowe."
 	},
 	"turretheavy" : {
@@ -961,7 +956,7 @@
 	},
 	"factorytank" : {
 		"name" : "Fabryka czołgów",
-		"description" : "Buduje czołgi, moc 10 m/s",
+		"description" : "Buduje czołgi",
 		"helptext" : "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
 	},
 	"striderbantha" : {
@@ -981,7 +976,7 @@
 	},
 	"factoryjump" : {
 		"name" : "Fabryka skoczków",
-		"description" : "Buduje skoczki i roboty specjalistyczne, moc 10 m/s",
+		"description" : "Buduje skoczki i roboty specjalistyczne",
 		"helptext" : "W tej fabryce produkowane są skoczki i jednostki specjalistyczne. Skok pozwala im na szybkie zbliżenie się do przeciwnika, ucieczkę lub ominięcie trudnego terenu."
 	},
 	"jumpsumo" : {
@@ -1001,7 +996,7 @@
 	},
 	"hovercon" : {
 		"name" : "Quill",
-		"description" : "Poduszkowiec konstruktor, moc 5 m/s",
+		"description" : "Poduszkowiec konstruktor",
 		"helptext" : "Quill pozwala na bezproblemową rozbudowę zarówno na ziemi, jak i w wodzie."
 	},
 	"jumpaa" : {
@@ -1051,7 +1046,7 @@
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
-		"description" : "Niewidzialny bot konstruktor, moc 5 m/s",
+		"description" : "Niewidzialny bot konstruktor",
 		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem radaru krótkiego zasięgu. Może też włączyć pole niewidzialności, co jednak w przeciwieństwie do wcześniej wymienionych umiejętności wymaga energii do działania."
 	},
 	"turretsunlance" : {
@@ -1071,7 +1066,7 @@
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Statek powietrzny konstruktor, moc 5 m/s",
+		"description" : "Statek powietrzny konstruktor",
 		"helptext" : "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
 	},
 	"gunshipraid" : {

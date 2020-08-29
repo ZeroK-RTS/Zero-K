@@ -163,7 +163,7 @@ function widget:Initialize()
 end
 
 
-function spGetUnitPieceMap(unitID,piecename)
+function spGetUnitPieceMap(unitID)
   local pieceMap = {}
   for piecenum,piecename in pairs(Spring.GetUnitPieceList(unitID)) do
     pieceMap[piecename] = piecenum

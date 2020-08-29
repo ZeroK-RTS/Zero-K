@@ -14,9 +14,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- stable release?
 local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
-local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
@@ -42,11 +40,10 @@ vfsInclude("LuaUI/callins.lua"                       , nil, vfsGame)
 vfsInclude("LuaUI/savetable.lua"                     , nil, vfsGame)
 
 local CheckLUAFileAndBackup = vfsInclude("LuaUI/file_backups.lua", nil, vfsGame)
-local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
+local MessageProcessor = vfsInclude("LuaUI/chat_preprocess.lua", nil, vfsGame)
 
-local modShortUpper = Game.modShortName:upper()
-local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
-local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_data.lua'
+local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/ZK_order.lua'
+local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/ZK_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
 
 -- make/load backup config in case of corruption
@@ -87,8 +84,8 @@ if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to
   if not disableLocalWidgets then
     local cadata = VFS.Include(CONFIG_FILENAME)
     if cadata and cadata["Local Widgets Config"] then
-      localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
-      localWidgets = cadata["Local Widgets Config"].localWidgets
+      localWidgetsFirst = cadata["Local Widgets Config"].useLocalWidgetsFirst or true
+      localWidgets = cadata["Local Widgets Config"].useLocalWidgets or true
     end
   end
 end
@@ -210,9 +207,7 @@ local flexCallIns = {
   'DrawInMiniMap',
   'RecvSkirmishAIMessage',
   'SelectionChanged',
-  'AddTransmitLine',
   'AddConsoleMessage',
-  'VoiceCommand',
   'Save',
   'Load',
 }
@@ -440,10 +435,6 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
-  if Game.modVersion:find("stable",1,true) then
-    isStable = true
-  end
-
   -- Add ignorelist --
   Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
@@ -540,7 +531,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   end
   local chunk, err = loadstring(text, filename)
   if (chunk == nil) then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename, err)
     return nil
   end
   
@@ -548,7 +539,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   setfenv(chunk, widget)
   local success, err = pcall(chunk)
   if (not success) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Echo('Failed to load: ' .. basename, err)
     return nil
   end
   if (err == false) then
@@ -611,11 +602,6 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   local enabled = ((order ~= nil) and (order > 0)) or
       ((order == nil) and  -- unknown widget
        (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) or info.alwaysStart
-
-  -- experimental widget, disabled by default in stable
-  if info.experimental and isStable then
-    enabled = false
-  end
 
   if resetWidgetDetailLevel and info.detailsDefault ~= nil then
 	if type(info.detailsDefault) == "table" then
@@ -685,8 +671,6 @@ function widgetHandler:NewWidget()
   wh.Unignore = function (_,name) ignorelist.ignorees[name] = nil;ignorelist.count = ignorelist.count - 1 end
   wh.GetIgnoreList = function (_) return ignorelist["ignorees"],ignorelist.count end
 
-  wh.isStable = function (_) return self:isStable() end
-
   wh.UpdateCallIn = function (_, name)
     self:UpdateWidgetCallIn(name, widget)
   end
@@ -752,14 +736,6 @@ function widgetHandler:FinalizeWidget(widget, filename, basename)
     wi.license  = wi.license or ""
     wi.enabled  = wi.enabled or false
     wi.api      = wi.api or false
-
-    -- exprimental widget
-    -- change name for separate settings and disable by default
-    if info.experimental and isStable then
-      wi.name = wi.name .. " (experimental)"
-      wi.enabled = false
-    end
-
   end
 
   widget.whInfo = {}  --  a proxy table
@@ -1268,10 +1244,6 @@ function widgetHandler:ConfigLayoutHandler(data)
   ConfigLayoutHandler(data)
 end
 
-function widgetHandler:isStable()
-  return isStable
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1425,22 +1397,6 @@ function widgetHandler:AddConsoleLine(msg, priority)
 
   if StringStarts(msg, "Error: Invalid command received") or StringStarts(msg, "Error: Dropped command ") then
 	return
-  elseif StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
-    return -- ignore
-  elseif StringStarts(msg, transmitMagic) then -- receiving from the lobby
-    if StringStarts(msg, voiceMagic) then
-      local tableString = string.sub(msg, string.len(voiceMagic) + 1) -- strip the magic string
-      local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form
-      for _,w in r_ipairs(self.VoiceCommandList) do
-        w:VoiceCommand(voiceCommandParams.commandName, voiceCommandParams)
-      end
-      return
-    else
-      for _,w in r_ipairs(self.AddTransmitLineList) do
-        w:AddTransmitLine(msg, priority)
-      end
-      return
-    end
   else
 	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 	local newMsg = { text = msg, priority = priority }

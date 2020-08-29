@@ -2953,7 +2953,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 				edgeSpending = pyramindCost
 			end
 			
-			--Spring.Echo("costDiff", costDiff, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
+			EchoDebug(id, "costDiff", costDiff, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
 			
 			costDiff = costDiff - edgeSpending
 			edgeTerraMult = edgeSpending/pyramindCost
@@ -2973,6 +2973,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	if terraformUpdateProgress > 1 or terra.progress >= 1 then
 		terraformUpdateProgress = 1
 		edgeTerraMult = 1
+		terra.progress = 1
 	end
 	--Spring.Echo("progress", terraformUpdateProgress, "edgeTerraMult", edgeTerraMult, "pyramindCost", pyramindCost)
 

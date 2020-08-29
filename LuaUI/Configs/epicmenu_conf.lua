@@ -589,7 +589,11 @@ local pathAudio = 'Settings/Audio'
 		min = 0,
 		max = 100,
 		springsetting = 'snd_volmaster',
-		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end,
+		OnChange = function(self)
+			if WG.crude and WG.crude.SetMasterVolume then
+				WG.crude.SetMasterVolume(self.value)
+			end
+		end,
 		simpleMode = true,
 		everyMode = true,
 	})
@@ -646,16 +650,9 @@ local pathAudio = 'Settings/Audio'
 		-- springsetting = 'snd_volmusic', -- TODO: we should probably switch from WG to this at some point
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)
-			if (WG.music_start_volume or 0 > 0) then
-				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-			else
-				Spring.SetSoundStreamVolume(self.value)
+			if WG.crude and WG.crude.SetMusicVolume then
+				WG.crude.SetMusicVolume(self.value)
 			end
-			local prevValue = WG.music_volume
-			--settings.music_volume = self.value
-			WG.music_volume = self.value
-			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end
-			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end
 		end,
 		simpleMode = true,
 		everyMode = true,

@@ -115,6 +115,9 @@ end
 
 function TreeView:UpdateLayout()
 	local c = self.root
+	if not c then
+		return false
+	end
 	c:_UpdateConstraints(0, 0, self.clientWidth)
 	c:Realign()
 

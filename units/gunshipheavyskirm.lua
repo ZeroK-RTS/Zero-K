@@ -22,7 +22,8 @@ return { gunshipheavyskirm = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-    modelradius    = [[10]],
+    modelradius      = [[10]],
+    aim_lookahead    = 200,
   },
 
   explodeAs           = [[GUNSHIPEX]],

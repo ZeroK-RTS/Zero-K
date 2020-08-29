@@ -1,16 +1,22 @@
 local unitlistNames = {
-	energyheavygeo = {},
-	staticantinuke = {},
-	staticheavyarty = {},
 	athena = { mark_each_appearance = true, show_owner = true, },
 	cloaksnipe = { mark_each_appearance = true, },
+	cloakheavyraid = { mark_each_appearance = true, },
+	cloakjammer = { mark_each_appearance = true, },
+
+	energyheavygeo = {},
+	energyfusion = {},
 	energysingu = {},
+
 	chicken_dragon = {},
 	chickenflyerqueen = {},
 	chickenlandqueen = {},
 	roost = {},
 	chickenspire = {},
+
+	staticantinuke = {},
 	staticnuke = {},
+
 	factoryamph = { show_owner = true, },
 	factorycloak = { show_owner = true, },
 	factorygunship = { show_owner = true, },
@@ -25,12 +31,21 @@ local unitlistNames = {
 	staticmissilesilo = {},
 	pw_hq_attacker = {},
 	pw_hq_defender = {},
-	raveparty = {},
-	cloakheavyraid = { mark_each_appearance = true, },
-	cloakjammer = { mark_each_appearance = true, },
 	striderhub = {},
-	zenith = {},
+
+	staticarty = {},
+	staticheavyarty = {},
+
+	turretantiheavy = {},
+	turretheavy = {},
 	turretaaheavy = {},
+
+	-- these announce their presence globally, but
+	-- are still worth marking in case they get scouted
+	-- as a nanoframe or when toggled off
+	mahlazer = {},
+	zenith = {},
+	raveparty = {},
 }
 
 local unitList = {}

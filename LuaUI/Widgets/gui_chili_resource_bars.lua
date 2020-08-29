@@ -547,7 +547,7 @@ function CreateWindow()
 	end
 	
 	-- Set the size for the default settings.
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local width = 430
 	local x = math.min(screenWidth/2 - width/2, screenWidth - 400 - width)
 	
@@ -671,7 +671,6 @@ function CreateWindow()
 
 	bar_energy_overlay = Chili.Progressbar:New{
 		parent = window,
-		color  = col_energy,
 		height = p(100/bars),
 		value  = 100,
 		color  = {0,0,0,0},
@@ -686,7 +685,6 @@ function CreateWindow()
 		parent = window,
 		color  = {0.5,0.5,0.5,0.5},
 		height = p(100/bars),
-		right  = 26,
 		 value = 0,
 		min = 0,
 		max = 1,

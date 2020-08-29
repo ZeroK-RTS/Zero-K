@@ -48,7 +48,7 @@ options = {
 	},
 	ingameguide_roles_skirm = {
 		name = "Skirmisher",
-		value= "Skirishers are units designed to stay at range and kite their targets. Good in numbers and against slow units such as assaults and riots.",
+		value= "Skirmishers are units designed to stay at range and kite their targets. Good in numbers and against slow units such as assaults and riots.",
 		path = "Unit Roles"
 	},
 	ingameguide_roles_riot = {

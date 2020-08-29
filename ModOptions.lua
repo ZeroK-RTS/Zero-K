@@ -415,6 +415,14 @@ local options = {
     type    = "string",
     def     = "",
   },
+  {
+    key     = "tweakdefs",
+    name    = "Tweak Defs",
+    desc    = "A base64 encoded snippet of code that modifies game definitions.",
+    section = 'experimental',
+    type    = "string",
+    def     = "",
+  },
 --[[
   {
     key    = 'damagemult',
@@ -579,6 +587,7 @@ local options = {
       { key = 'Chicken: Custom', name = "Chicken: Custom", desc = 'Customize your chicken.' },
     },
   },
+--[[ broken, prevent newbie footgun (cf. #3567 gameside ticket)
   {
     key = "playerchickens",
     name = "Players as chickens",
@@ -587,6 +596,7 @@ local options = {
     def = false,
     section = 'chicken',
   },
+]]
   {
     key	= "eggs",
     name = "Chicken Eggs",
@@ -655,7 +665,8 @@ local options = {
     section= 'chicken',
     def    = 1,
     min    = 0.1,
-    max    = 30,
+    max    = 1000, --[[ keep in mind that this can get further increased by playercount-based mults,
+                        and that at such extreme values float errors appear (uncharted territory) ]]
     step   = 0.05,
   },
   {
@@ -735,6 +746,30 @@ local options = {
 	step   = 1,
   },
 }
+
+for i = 1, 9 do
+	options[#options + 1] =  {
+		key     = "tweakunits" .. i,
+		name    = "Tweak Units " .. i,
+		desc    = "A base64 encoded lua table of unit parameters to change.",
+		section = 'experimental',
+		type    = "string",
+		def     = "",
+		noLobby = true,
+	}
+end
+
+for i = 1, 9 do
+	options[#options + 1] =  {
+		key     = "tweakdefs" .. i,
+		name    = "Tweak Defs " .. i,
+		desc    = "A base64 encoded snippet of code that modifies game definitions.",
+		section = 'experimental',
+		type    = "string",
+		def     = "",
+		noLobby = true,
+	}
+end
 
 --// add key-name to the description (so you can easier manage modoptions in springie)
 for i=1,#options do

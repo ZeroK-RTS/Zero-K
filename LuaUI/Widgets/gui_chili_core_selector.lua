@@ -350,7 +350,6 @@ options = {
 	},
 	leftsideofscreen = {
 		name = 'Left side of screen',
-		type = 'number',
 		type = 'bool',
 		value = true,
 		hidden = true,
@@ -1510,8 +1509,8 @@ local function HasDoubleCommand(unitID, cmdID)
 		if cmdsLen == 0 then -- Occurs in the case of SELFD
 			return true
 		elseif cmdsLen == 1 then
-			local cmdID = Spring.GetUnitCurrentCommand(unitID)
-			return cmdID == CMD.WAIT
+			local currCmdID = Spring.GetUnitCurrentCommand(unitID)
+			return currCmdID == CMD.WAIT
 		end
 	end
 	return false
@@ -1561,7 +1560,7 @@ end
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local BUTTON_HEIGHT = 55*options.buttonSizeLong.value/60
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)

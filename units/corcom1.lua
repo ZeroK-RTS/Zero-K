@@ -1,7 +1,7 @@
 return { corcom1 = {
   unitname            = [[corcom1]],
   name                = [[Battle Commander]],
-  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
+  description         = [[Heavy Combat Commander]],
   acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,

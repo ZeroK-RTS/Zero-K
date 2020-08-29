@@ -1,7 +1,7 @@
 return { benzcom1 = {
   unitname            = [[benzcom1]],
   name                = [[Siege Commander]],
-  description         = [[Standoff Combat Commander, Builds at 10 m/s]],
+  description         = [[Standoff Combat Commander]],
   acceleration        = 0.54,
   activateWhenBuilt   = true,
   autoHeal            = 5,

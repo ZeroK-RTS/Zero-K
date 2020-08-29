@@ -13,8 +13,9 @@ return { striderdante = {
   canPatrol           = true,
   category            = [[LAND]],
   corpse              = [[DEAD]],
-  
+
   customParams        = {
+    aim_lookahead = 200,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -209,6 +210,7 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 1125, -- 37.5s
         reaim_time = 1,
       },
       
@@ -260,6 +262,7 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 1125, -- 37.5s
         
         light_color = [[0.8 0.4 0.1]],
         light_radius = 320,

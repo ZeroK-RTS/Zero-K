@@ -245,7 +245,7 @@ function TargetingLaser()
 		
 		SetFiringState(not isStunned)
 		
-		if not isStunned then
+		if (not isStunned) and satUnitID then
 			--// Aiming
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 			local otherCurrentHeading = GetDir(satUnitID)

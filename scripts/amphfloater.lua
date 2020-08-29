@@ -195,8 +195,10 @@ local function WeaponRangeUpdate()
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
 			Spring.SetUnitWeaponState(unitID, 2, {range = 400-height})
+			Spring.SetUnitMaxRange(unitID, 400-height)
 		else
 			Spring.SetUnitWeaponState(unitID, 2, {range = 450})
+			Spring.SetUnitMaxRange(unitID, 450)
 		end
 		Sleep(500)
 	end

@@ -1508,7 +1508,7 @@ SetupPanels = function ()
 	
 	window_cpl = Window:New{
 		dockable = true,
-		name = "Player List",
+		name = "Player List", -- NB: needs to be this exact name for HUD preset playerlist handling
 		color = {0,0,0,0},
 		x = x,
 		y = y,

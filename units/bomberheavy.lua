@@ -30,6 +30,7 @@ return { bomberheavy = {
     reammoseconds    = [[20]],
     refuelturnradius = [[150]],
     reallyabomber    = [[1]],
+    fighter_pullup_dist = 800, -- pullup at the end of attack dive to avoid hitting terrain
   },
 
   explodeAs           = [[GUNSHIPEX]],

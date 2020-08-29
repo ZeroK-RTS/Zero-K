@@ -31,8 +31,8 @@ local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.
 local SIG_Walk = 2
 
 local function Walk()
-	Signal(Sig_Walk)
-	SetSignalMask(Sig_Walk)
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 	while true do
 		Turn(base, y_axis, rollAmount, rollSpeed)		 	-- body roll left
 		
@@ -94,7 +94,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(Sig_Walk)
+	Signal(SIG_Walk)
 	
 	StopSpin(wheell1, x_axis, 8)
 	StopSpin(wheell2, x_axis, 8)
@@ -124,6 +124,8 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	-- keep the unit technically alive (but hidden) for some time so that the death
+	-- blast can tell who its owner is (so that it can do no damage to allies)
 	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
 

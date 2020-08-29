@@ -153,7 +153,7 @@ function ShootDepthcharge()
 	Move(gun, y_axis, -2)
 	Move(gun, y_axis, 2, 2)
 
-	GG.PokeDecloakUnit(unitID,100)
+	GG.PokeDecloakUnit(unitID, unitDefID)
 end
 
 local function FakeWeaponShoot(targetID)

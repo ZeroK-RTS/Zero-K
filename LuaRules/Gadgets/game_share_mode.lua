@@ -356,7 +356,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		-- Do commands --
 		if strFind(command, "invite") then
 			SendInvite(playerID, targetID)
-			if invites[playerID] and invites[playerID][targetID] and invites[targetID][playerID] then
+			if invites[playerID] and invites[playerID][targetID] and invites[targetID] and invites[targetID][playerID] then
 				AcceptInvite(playerID,targetID)
 			end
 		elseif strFind(command, "accept") then
@@ -367,7 +367,9 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid accept command: " .. targetID .. " doesn't exist.")
 			end
 		elseif strFind(command,"decline") then
-			invites[playerID][targetID] = nil
+			if invites[playerID] then
+				invites[playerID][targetID] = nil
+			end
 		elseif strFind(command,"kick") then
 			if IsTeamLeader(playerID) then
 				if IsPlayerOnSameTeam(playerID,targetID) then

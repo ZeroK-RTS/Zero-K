@@ -52,19 +52,12 @@ local readyNukeCount = 0
 local highProgress = -1
 local lastTime
 local nukeList = {}
-local curUnitList
+local curUnitList = { staticnuke = true }
 
 
 local config = {}
 config["buttonXPer"] = 0.935
 config["buttonYPer"] = 0.765
-
-
---Game Config ------------------------------------
-local unitList = {}
-unitList["ZK"] = {} --initialize table
-unitList["ZK"]["staticnuke"] = {}
---End
 
 local upper                 = string.upper
 local floor                 = math.floor
@@ -137,15 +130,6 @@ function widget:Initialize()
 	ResizeButtonsToScreen()
 
 	myPlayerID = spGetMyPlayerID() --spGetLocalTeamID()
-	curModID = upper(Game.modShortName or "")
-	
-	if ( unitList[curModID] == nil ) then
-		spEcho("<Nuke Icon>: Unsupported Game, shutting down...")
-		widgetHandler:RemoveWidget()
-		return
-	end
-	
-	curUnitList = unitList[curModID]
 	
 	--add all already existing nukes
 	searchAndAddNukes()

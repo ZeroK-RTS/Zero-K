@@ -8,7 +8,6 @@ function widget:GetInfo()
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
-    experimental = true,
     layer     = 0,
     enabled   = false,
   }
@@ -172,7 +171,7 @@ local uCycle = 1
 
 
 local function GetVisibleUnits()
-  local units = spGetVisibleUnits(-1, 30, true)
+  local units = spGetVisibleUnits(-1, nil, false)
   --local visibleUnits = {}
   local boxedUnits = GetUnitsInSelectionBox();
 
@@ -354,17 +353,14 @@ local function DrawWorldFunc()
 	local visUnit,visCloakUnit,n,nc = {},{},1, 1
     for i=1, #visibleSelected do
         local unitID = visibleSelected[i]
-        if IsUnitVisible(unitID,nil,true) then
-			if Spring.GetUnitIsCloaked(unitID) then
-			--if true then
-				visCloakUnit[nc] = unitID
-				nc = nc+1
-			else
-				visUnit[n] = unitID
-				n = n+1
-			end
-			
-        end
+		if Spring.GetUnitIsCloaked(unitID) then
+		--if true then
+			visCloakUnit[nc] = unitID
+			nc = nc+1
+		else
+			visUnit[n] = unitID
+			n = n+1
+		end
     end
     n = n - 1
     nc = nc - 1

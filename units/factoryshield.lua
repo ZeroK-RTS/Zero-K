@@ -1,10 +1,11 @@
 return { factoryshield = {
   unitname                      = [[factoryshield]],
   name                          = [[Shieldbot Factory]],
-  description                   = [[Produces Tough, Shielded Robots, Builds at 10 m/s]],
+  description                   = [[Produces Tough, Shielded Robots]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 12,
@@ -32,17 +33,18 @@ return { factoryshield = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    sortName       = [[1]],
-    midposoffset   = [[0 0 -24]],
-    solid_factory  = [[6]],
-    unstick_help    = [[1]],
-    factorytab       = 1,
+    sortName          = [[1]],
+    midposoffset      = [[0 0 -24]],
+    solid_factory     = [[6]],
+    unstick_help      = [[1]],
+    factorytab        = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[plateshield]],
   },
 
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 6,
+  footprintX                    = 7,
   footprintZ                    = 9,
   iconType                      = [[facwalker]],
   idleAutoHeal                  = 5,
@@ -62,7 +64,7 @@ return { factoryshield = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[oooooo occcco occcco occcco occcco occcco yyyyyy yyyyyy yyyyyy]],
+  yardMap                       = [[ooooooo occccco occccco occccco occccco occccco yyyyyyy yyyyyyy yyyyyyy]],
 
   featureDefs                   = {
 

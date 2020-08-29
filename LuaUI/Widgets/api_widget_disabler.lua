@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name      = "Disable Bad Widgets",
 		desc      = "Disables broken widgets based on config.",
-		author    = "_Shaman",
+		author    = "Shaman",
 		date      = "09/24/18",
-		license   = "CC0",
+		license   = "PD",
 		layer     = 5,
 		enabled   = true,
 		alwaysStart = true,

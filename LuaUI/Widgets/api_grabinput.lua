@@ -52,7 +52,6 @@ options = {
 		tooltip = "Disables input grabbing when the lobby overlay is visible.",
 		type = "bool",
 		value = true,
-		noHotkey = false,
 		OnChange = function (self)
 			if self.value and lobbyOverlayActive then
 				Spring.SendCommands("grabinput 1")
@@ -67,7 +66,6 @@ options = {
 		tooltip = "Disables input grabbing when the game is paused.",
 		type = "bool",
 		value = false,
-		noHotkey = false,
 		OnChange = function (self)
 			if self.value then
 				widgetHandler:UpdateCallIn("GamePaused")

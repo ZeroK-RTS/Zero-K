@@ -1,8 +1,9 @@
 return { factorycloak = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloakbot Factory]],
-  description                   = [[Produces Cloaked, Mobile Robots, Builds at 10 m/s]],
+  description                   = [[Produces Cloaked, Mobile Robots]],
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 13,
@@ -38,6 +39,7 @@ return { factorycloak = {
     selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[platecloak]],
   },
 
   energyUse                     = 0,

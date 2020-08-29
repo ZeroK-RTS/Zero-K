@@ -5,6 +5,9 @@ def.areaOfEffect = def.areaOfEffect * 1.5 -- other napalms are 1.25 tho?
 for armorType, damage in pairs (def.damage) do
 	def.damage[armorType] = damage * 0.75
 end
+def.customParams.burntime = 450
+def.customParams.burnchance = 1
+def.customParams.setunitsonfire = 1
 def.craterBoost = 1
 def.craterMult = 1
 

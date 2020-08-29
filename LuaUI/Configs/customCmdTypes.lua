@@ -191,6 +191,7 @@ local usedActions = {
 	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
+	["globalbuild"] = true,
 	["upgradecommstop"] = true,
 	["autoeco"] = true,
 	["evacuate"] = true,

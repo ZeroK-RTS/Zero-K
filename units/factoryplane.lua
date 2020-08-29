@@ -1,11 +1,12 @@
 return { factoryplane = {
   unitname                      = [[factoryplane]],
   name                          = [[Airplane Plant]],
-  description                   = [[Produces Airplanes, Builds at 10 m/s]],
+  description                   = [[Produces Airplanes]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -41,6 +42,7 @@ return { factoryplane = {
     factorytab       = 1,
     shared_energy_gen = 1,
     ispad         = 1,
+    parent_of_plate   = [[plateplane]],
   },
 
   energyUse                     = 0,

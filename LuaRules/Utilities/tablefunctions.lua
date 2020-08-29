@@ -126,7 +126,8 @@ local function TableEcho(data, name, indent, tableChecked)
 	end
 	Spring.Echo(indent .. name .. " = {")
 	local newIndent = indent .. "    "
-	for name, v in pairs(data) do
+	for nameRaw, v in pairs(data) do
+		local name = tostring(nameRaw)
 		local ty = type(v)
 		if ty == "table" then
 			TableEcho(v, name, newIndent, true)

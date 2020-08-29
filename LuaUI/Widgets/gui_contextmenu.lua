@@ -6,7 +6,6 @@ function widget:GetInfo()
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    experimental = false,
     enabled   = true,
   }
 end
@@ -124,6 +123,9 @@ local function AddFactoryOfUnits(defName)
 	local name = string.gsub(ud.humanName, "/", "-")
 	local path = BEHAVIOUR_PATH .. name
 	behaviourPath[ud.id] = path
+	if ud.customParams.parent_of_plate then
+		behaviourPath[UnitDefNames[ud.customParams.parent_of_plate].id] = path
+	end
 	for i = 1, #ud.buildOptions do
 		behaviourPath[ud.buildOptions[i]] = path
 	end
@@ -144,7 +146,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -245,7 +247,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
@@ -1127,6 +1129,12 @@ local function printAbilities(ud, unitID)
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
+		cells[#cells+1] = 'Light Speed: '
+		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		if not ud.customParams.islighttransport then
+			cells[#cells+1] = 'Heavy Speed: '
+			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
+		end
 	end
 
 	if ud.customParams.nuke_coverage then
@@ -1597,7 +1605,6 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	}
 	
 	local helptext_stack = StackPanel:New{
-		resizeItems = false,
 		orientation = 'vertical',
 		autoArrangeV  = false,
 		autoArrangeH  = false,
@@ -1943,6 +1950,11 @@ function widget:MousePress(x,y,button)
 		if cmd_id then
 			return false
 		end
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 		
 		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
@@ -1979,11 +1991,6 @@ function widget:MousePress(x,y,button)
 					return true
 				end
 			end
-		end
-
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
 		end
 	end
 

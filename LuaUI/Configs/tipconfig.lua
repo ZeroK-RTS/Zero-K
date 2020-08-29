@@ -145,6 +145,7 @@ bomberDefs = {
 	"bomberriot",
 	"bomberdisarm",
 	"bomberheavy",
+	"bomberstrike",
 }
 
 conDefs = {

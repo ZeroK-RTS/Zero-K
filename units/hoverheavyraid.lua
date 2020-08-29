@@ -27,7 +27,7 @@ return { hoverheavyraid = {
   iconType            = [[hoversupport]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 780,
+  maxDamage           = 720,
   maxSlope            = 36,
   maxVelocity         = 3.15,
   minCloakDistance    = 75,
@@ -76,7 +76,7 @@ return { hoverheavyraid = {
       craterMult              = 0,
   
       customParams            = {
-        timeslow_damagefactor = 3,
+        timeslow_damagefactor = 2,
         
         light_camera_height = 2000,
         light_color = [[0.85 0.33 1]],

@@ -41,6 +41,7 @@ local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetTeamResources  = Spring.GetTeamResources
 local spAddTeamResource   = Spring.AddTeamResource
 local spUseTeamResource   = Spring.UseTeamResource
+local spSetTeamResource   = Spring.SetTeamResource
 local spGetTeamInfo       = Spring.GetTeamInfo
 
 -------------------------------------------------------------------------------------
@@ -224,37 +225,6 @@ local function sendTeamInformationToAwards(teamID, baseMetal, overdriveMetal, ov
 		overdriveMetal = overdriveMetal,
 		overdriveEnergyChange = overdriveEnergyChange,
 	}
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- Debug Functions
-
- function TableEcho(data, indent)
-	indent = indent or ""
-	for name, v in pairs(data) do
-		local ty =  type(v)
-		if ty == "table" then
-			Spring.Echo(indent .. name .. " = {")
-			TableEcho(v, indent .. "    ")
-			--Spring.Echo(indent .. "}")
-		elseif ty == "boolean" then
-			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
-		else
-			Spring.Echo(indent .. name .. " = " .. v)
-		end
-	end
-end
-
-function UnitEcho(unitID, st)
-	st = st or unitID
-	if Spring.ValidUnitID(unitID) then
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.MarkerAddPoint(x,y,z, st)
-	else
-		Spring.Echo("Invalid unitID")
-		Spring.Echo(unitID)
-	end
 end
 
 -------------------------------------------------------------------------------------
@@ -529,7 +499,7 @@ local function AddPylon(unitID, unitDefID, range)
 
 	if debugGridMode then
 		Spring.Echo("AddPylon " .. unitID)
-		UnitEcho(unitID, list.count .. ", " .. unitID)
+		Spring.Utilities.UnitEcho(unitID, list.count .. ", " .. unitID)
 	end
 
 	-- check for mexes
@@ -655,8 +625,8 @@ local function RemovePylon(unitID)
 
 	if debugGridMode then
 		Spring.Echo("RemovePylon start " .. unitID)
-		TableEcho(pylonList[allyTeamID])
-		TableEcho(pylon[allyTeamID])
+		Spring.Utilities.TableEcho(pylonList[allyTeamID])
+		Spring.Utilities.TableEcho(pylon[allyTeamID])
 	end
 
 	RemovePylonsFromGridQueue(unitID)
@@ -743,8 +713,8 @@ local function RemovePylon(unitID)
 
 	if debugGridMode then
 		Spring.Echo("RemovePylon end " .. unitID)
-		TableEcho(pylonList[allyTeamID])
-		TableEcho(pylon[allyTeamID])
+		Spring.Utilities.TableEcho(pylonList[allyTeamID])
+		Spring.Utilities.TableEcho(pylon[allyTeamID])
 	end
 
 end
@@ -1560,7 +1530,7 @@ function gadget:GameFrame(n)
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
 				if metalStorageToSet[i] then
-					Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
+					spSetTeamResource(teamID, "metal", metalStorageToSet[i])
 				end
 				spAddTeamResource(teamID, "m", totalMetalIncome[i])
 			end
@@ -1740,7 +1710,7 @@ local function OverdriveDebugToggle()
 				local list = pylonList[allyTeamID]
 				for j = 1, list.count do
 					local unitID = list.data[j]
-					UnitEcho(unitID, j .. ", " .. unitID)
+					Spring.Utilities.UnitEcho(unitID, j .. ", " .. unitID)
 				end
 			end
 		end

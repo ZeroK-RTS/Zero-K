@@ -107,6 +107,8 @@ local GL_ONE     = GL.ONE
 local GL_SRC_ALPHA = GL.SRC_ALPHA
 local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
 
+local isWidget = (widgetHandler and true) or false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -259,8 +261,9 @@ end
 --------------------------------------------------------------------------------
 
 --// saves all particles
-particles = {}
-local particles = particles
+-- An IterableMap version has already had some testing and found to have little
+-- effect. Run a benchmark on that old version before reapplying it.
+local particles = {}
 local particlesCount = 0
 
 local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][fx]
@@ -518,7 +521,7 @@ local function RadarDotCheck(unitID)
 	return true
 end
 
-local function Draw(extension,layer)
+local function Draw(extension,layer,water)
 	local FxLayer = RenderSequence[layer];
 	if (not FxLayer) then return end
 
@@ -563,7 +566,7 @@ local function Draw(extension,layer)
 							--// render effects
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) then
+								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
 									if (fx.piecenum) then
 										--// enter piece space
 										glPushMatrix()
@@ -588,7 +591,7 @@ local function Draw(extension,layer)
 							------------------------------------------------------------------------------------
 							for i=1,#UnitEffects do
 								local fx = UnitEffects[i]
-								if (fx.alwaysVisible or fx.visible) then
+								if (fx.alwaysVisible or fx.visible) and (not water or not fx.nowater) then
 									glPushMatrix()
 									if fx.projectile and not fx.worldspace then
 										local x,y,z = spGetProjectilePosition(fx.projectile)
@@ -684,7 +687,7 @@ local function DrawParticlesWater()
 	--// Draw() (layers: -50 upto 50)
 	glAlphaTest(GL_GREATER, 0)
 	for i=-50,50 do
-		Draw("",i)
+		Draw("",i,true)
 	end
 	glAlphaTest(false)
 end
@@ -769,7 +772,7 @@ local function IsUnitFXVisible(fx)
 	end
 	--Spring.Utilities.UnitEcho(unitID, "w")
 	if (unitActive) then
-		if fx.alwaysVisible then
+		if (isWidget and not fx.noIconDraw) or fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then
 			return fx:Visible()
@@ -899,7 +902,6 @@ local function GameFrame(_,n)
 	thisGameFrame = n
 	if ((not next(particles)) and (not effectsInDelay[1])) then return end
 
-	UpdateAllyTeamStatus()
 	--// create delayed FXs
 	if (effectsInDelay[1]) then
 		local remaingFXs,cnt={},1
@@ -958,8 +960,9 @@ local function GameFrame(_,n)
 end
 
 local function Update(_,dt)
-	--// update frameoffset
+	--// update frameoffset and self allyteam
 	frameOffset = spGetFrameTimeOffset()
+	UpdateAllyTeamStatus()
 
 	--// Game Frame Update
 	local x = spGetGameFrame()

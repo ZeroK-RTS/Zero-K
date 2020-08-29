@@ -244,7 +244,7 @@ local function GetVisibleUnits()
 		local boxedUnits, boxedUnitsIDs = GetBoxedUnits()
 
 		if IsSelectionBoxActive() then --It's not worth rebuilding visible selected lists for selection box, but selection box needs to be updated per-frame
-			local units = spGetVisibleUnits(-1, 30, true)
+			local units = spGetVisibleUnits(-1, nil, false)
 			for i = 1, #units do
 				local unitID = units[i]
 				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
@@ -258,7 +258,7 @@ local function GetVisibleUnits()
 	end
 
 	if (HasVisibilityChanged()) then
-		local units = spGetVisibleUnits(-1, 30, true)
+		local units = spGetVisibleUnits(-1, nil, false)
 		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
@@ -663,7 +663,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	-- gl.PolygonOffset(-1.0,-1.0)
 	-- gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
 	-- gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	-- local visibleUnits = spGetVisibleUnits(-1, 30, true)
+	-- local visibleUnits = spGetVisibleUnits(-1, nil, true)
 	-- for i=1, #visibleUnits do
 	-- 	gl.Unit(visibleUnits[i], true)
 	-- end

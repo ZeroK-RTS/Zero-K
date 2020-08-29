@@ -834,6 +834,21 @@ end
 
 --// =============================================================================
 
+function Object:TraceDebug(parameters)
+	local echo = {}
+	for i = 1, #parameters do
+		echo[#echo + 1] = parameters[i]
+		echo[#echo + 1] = (self[parameters[i]] ~= nil and self[parameters[i]]) or "nil"
+	end
+	Spring.Echo(unpack(echo))
+	if self.parent then
+		self.parent:TraceDebug(parameters)
+	end
+end
+
+
+--// =============================================================================
+
 function Object:LocalToParent(x, y)
 	return x + self.x, y + self.y
 end

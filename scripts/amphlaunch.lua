@@ -77,8 +77,8 @@ function script.StopMoving()
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
 	
 	Turn(turretheading, y_axis, 0, 1.9)
@@ -112,6 +112,9 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
+	if num == 1 and GG.Thrower and GG.Thrower.BlockAttack(unitID) then
+		return true
+	end
 	local x, y, z = spGetUnitPosition(unitID)
 	if not x then
 		return true

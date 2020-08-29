@@ -43,20 +43,8 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
+local UNDERWATER_DEPTH = -32
 
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
-
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetGroundHeight = Spring.GetGroundHeight
-
-local wd = WeaponDefNames["amphimpulse_watercannon"]
-
-local impulse = tonumber(wd.customParams.impulse)
-local maxProjectiles = 8
-
-local impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
-local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Weapon config
@@ -351,7 +339,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_START_FLOAT)
 	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end
@@ -376,20 +363,25 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then
-		Signal(SIG_AIM1)
-		SetSignalMask(SIG_AIM1)
-		Turn(torso, y_axis, heading, math.rad(480))
-		Turn(lshoulder, x_axis, -pitch, math.rad(200))
-		Turn(rshoulder, x_axis, -pitch, math.rad(200))
-		WaitForTurn(torso, y_axis)
-		WaitForTurn(lshoulder, x_axis)
-		StartThread(RestoreAfterDelay)
+	GG.Floating_AimWeapon(unitID)
+	Signal(SIG_AIM1)
+	SetSignalMask(SIG_AIM1)
+	Turn(torso, y_axis, heading, math.rad(480))
+	Turn(lshoulder, x_axis, -pitch, math.rad(200))
+	Turn(rshoulder, x_axis, -pitch, math.rad(200))
+	WaitForTurn(torso, y_axis)
+	WaitForTurn(lshoulder, x_axis)
+	StartThread(RestoreAfterDelay)
+	return true
+end
+
+function script.BlockShot(num, targetID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	if y < UNDERWATER_DEPTH then
 		return true
-	elseif num == 2 then
-		GG.Floating_AimWeapon(unitID)
-		return false
 	end
+	-- Lower than real damage (155) to help against Duck regen case.
+	return (targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, 142, 10)) and true or false
 end
 
 function script.QueryWeapon(num)
@@ -399,6 +391,10 @@ end
 function script.Shot(num)
 	GG.Floating_AimWeapon(unitID)
 	EmitSfx(firepoints[gun_1], 1024)
+end
+
+-- EndBurst so that the projectile fires from the correct gun
+function script.EndBurst()
 	gun_1 = 1 - gun_1
 end
 

@@ -187,7 +187,7 @@
     "spidercrabe": {
         "name": "Yengeç",
         "description": "Ağır İsyan / Çatışma Böceği - Sabitken Zırhlı Forma Geçer",
-        "helptext": "Yengeç'in büyük topları, büyük miktarda ucuz ünite kümesini yok eder ve aynı zamanda temel savunmaları yenebilir. Yürümeyi bıraktığında, yengeç üçte bir gelen hasarı azaltarak zırhlı formda kıvrılıyor. Yengeç in temel zayıflığı, hız eksikliğidir."
+        "helptext": "Yengeç'in büyük topları, büyük miktarda ucuz ünite kümesini yok eder ve aynı zamanda temel savunmaları yenebilir. Yürümeyi bıraktığında, yengeç dörtte bir gelen hasarı azaltarak zırhlı formda kıvrılıyor. Yengeç in temel zayıflığı, hız eksikliğidir."
     },
     "subscout": {
         "name": "Mızrak",
@@ -261,7 +261,7 @@
     },
     "shieldcon": {
         "name": "Mahkum",
-        "description": "Kalkanlı İnşa Botu, 5 m/s de inşa eder",
+        "description": "Kalkanlı İnşa Botu",
         "helptext": "Mahkum, standart bir yapı botudur ve burkulmuştur: kendini savunmak ve müttefik kalkanları desteklemek için hafif bir kalkanlıdır."
     },
     "energysingu": {
@@ -301,7 +301,7 @@
     },
     "staticcon": {
         "name": "Bakımcı",
-        "description": "Statik Mühendis, 10 m/s de inşa eder",
+        "description": "Statik Mühendis",
         "helptext": "En uygun maliyetli yapı gücü kaynağı olan Bakımcı, fabrikaların üretimini artırmak veya yakındaki savunmaları otomatik olarak onarmak için idealdir. Ancak herhangi bir inşaat projesine başlayamaz."
     },
     "terraunit": {
@@ -376,7 +376,7 @@
     },
     "factoryshield": {
         "name": "Kalkanbot Fabrikası",
-        "description": "Sert Robotlar Üretir, 10 m/s de inşa eder",
+        "description": "Sert Robotlar Üretir",
         "helptext": "Kalkan Bot Fabrikası zor ama esnektir. Birimleri, hareketten ödün vermeksizin, ağrıyı gidermek ve geri almak için inşa edilmiştir. Akıllı ünite taraklarının akıllıca kullanılması iyi ödüllendirilir. Anahtar birimler: Haydut, Eşkıya, Yasadışı, Serseri, Şantajcı"
     },
     "chickena": {
@@ -491,7 +491,7 @@
     },
     "spidercon": {
         "name": "Dokumacı",
-        "description": "Mühendis Böcek, 7.5 m/s de inşa eder",
+        "description": "Mühendis Böcek",
         "helptext": "Dokumacı, herhangi bir engeli aşabilecek ve yüksek zeminde savunmalar kurabilecek bir inşaatçıdır. Aynı zamanda kısa menzilli bir radar ile donatılmıştır."
     },
     "hoverdepthcharge": {
@@ -511,12 +511,12 @@
     },
     "factoryplane": {
         "name": "Uçak Santrali",
-        "description": "Uçaklar Üretir, 10 m/s de inşa eder",
+        "description": "Uçaklar Üretir",
         "helptext": "Uçak Fabrikası ihtiyaçlarınızı karşılamak için çeşitli sabit kanatlı uçaklar sunar. Hafif saldırganlar veya özel yakalayıcılar olarak ikiye katlayabilen çok amaçlı avcılar arasında ve belirli hedefleri çekmek için hassas bombardıman uçakları veya sürüleri yok etmek için doyma benzerleri arasından seçim yapın. Tesis aynı zamanda bir arka tampon ile birlikte gelir."
     },
     "gunshipbomb": {
         "name": "Blastwing",
-        "description": "Uçan Bomba (Kazar)",
+        "description": "Uçan Bomba Gözcü (Kazar)",
         "helptext": "Blastwing, LLT'ler, rüzgar çiftlikleri ve nanotonları çıkarmak için uygun, ancak daha uygun bir yumruk kütlesi sunmasına rağmen, sadece küçük bir hasar verir. Bombanın yörüngesinde öldükten sonra devam edecek olan yönelimli şarapnel olduğu için, hareket hızına ve yönüne dikkat edin. Bu sayede, Blastwing menzildeyken ölse bile, bir metal parçayla bir düşmanı püskürtebilirsiniz. Zincileme patlama olacağı için çok fazla sıkmayın. İnince görünmez."
     },
     "napalmmissile": {
@@ -526,12 +526,12 @@
     },
     "factoryamph": {
         "name": "Amfibot Fabrikası",
-        "description": "Amfibi Botlar Üretir, 10m/s de inşa eder",
+        "description": "Amfibi Botlar Üretir",
         "helptext": "Amfibi Operasyonlar Tesisi karada ve denizde savaşa alternatif bir yaklaşım sunarak yavaş ama sağlam amfibi botlar inşa eder. Bu fabrikadaki birimler tipik olarak su altındayken yenilenirler."
     },
     "factoryship": {
         "name": "Tersane",
-        "description": "Deniz Üniteleri Üretir, 10 m/s de inşa eder",
+        "description": "Deniz Üniteleri Üretir",
         "helptext": "Tersane, hem gemilerin hem de denizaltıların inşa edildiği yerdir. Hover ve amfibi botlar gibi diğer su kaynaklı birimler ayrı fabrikalara sahiptir."
     },
     "vehassault": {
@@ -556,7 +556,7 @@
     },
     "tankcon": {
         "name": "Kaynakçı",
-        "description": "Silahlı Mühendis Tankı, 7.5 m/s de inşa eder",
+        "description": "Silahlı Mühendis Tankı",
         "helptext": "Küçük bir savunma kulesi ile donanmış olan Kaynakçı, hafif düşman saldırılarına karşı kendini savunabilir."
     },
     "shieldarty": {
@@ -606,7 +606,7 @@
     },
     "jumpcon": {
         "name": "Memur",
-        "description": "SıçrayanJet Mühendis 5 m/s de inşa eder",
+        "description": "SıçrayanJet Mühendis",
         "helptext": "Hızlı ve kısa mesafelerde veya yüksekliklerde atlayabilen Memur, hızlı genişleme için ideal bir kurucudur. Hafif bir ışıltıyla donanmış, aynı zamanda savaş desteği sağlayabilir."
     },
     "chicken_blimpy": {
@@ -621,7 +621,7 @@
     },
     "athena": {
         "name": "Athena",
-        "description": "Hava ÖzelHrkt Mühendis, 15 m/s de inşa eder",
+        "description": "Hava ÖzelHrkt Mühendis",
         "helptext": "Athena, gizli grev kabiliyetinin zirvesidir. Bir gizleme tertibatı ve bir radar sıkıştırıcısı ile donatılmış olarak, düşman hatlarından kayarak akıncı ekiplerini bir araya getirerek muhalefetin lojistik sistemine zarar verebilir. Athena ayrıca savaş alanındaki enkazları dirilterek ordunuza ekleyebilir."
     },
     "staticsonar": {
@@ -646,7 +646,7 @@
     },
     "factoryhover": {
         "name": "Hover Platformu",
-        "description": "Hoverlar Üretir, 10 m/s de inşa eder",
+        "description": "Hoverlar Üretir",
         "helptext": "Hover Platformu hızlı ve ölümcül, denizi ve ovaları geçip düşmanı ön plana çıkaracak. Anahtar birimler: Hançer, Teber, Neşter, Topuz, Mızrak"
     },
     "gunshipassault": {
@@ -726,7 +726,7 @@
     },
     "factoryspider": {
         "name": "Böcek Fabrikası",
-        "description": "Böcekler Üretir, 10 m/s de inşa eder",
+        "description": "Böcekler Üretir",
         "helptext": "Engebeli araziler için optimize edilmiş BöcekFabrikası, öncelikli olarak kaba kuvvet yerine menzil ve manevra kabiliyetine güveniyor. Anahtar üniteler: Pire, Münzevi, Hermit, Yengeç"
     },
     "chicken_dragon": {
@@ -811,12 +811,12 @@
     },
     "striderhub": {
         "name": "Strider Merkezi",
-        "description": "Striderlar Üretir, 10 m/s de inşa eder",
+        "description": "Striderlar Üretir",
         "helptext": "Strider Merkezi, savaş alanında huşu ve korku uyandıran \"koskocaman makina\" olan striders'ı dağıtır. Normal bir fabrikadan farklı olarak, merkez projeyi bitirmek için değil, sadece bir projeyi başlatmak için gereklidir."
     },
     "amphcon": {
         "name": "Conch",
-        "description": "Amfibi Mühendis Bot, 7.5 m/s de inşa eder",
+        "description": "Amfibi Mühendis Bot",
         "helptext": "Conch, karada olduğu gibi derin denizde de inşa edebilen ya da geri kazanabilen sağlam bir kurucudur."
     },
     "shipaa": {
@@ -866,7 +866,7 @@
     },
     "vehcon": {
         "name": "Mason",
-        "description": "Mühendis Araba, 5 m/s de inşa eder",
+        "description": "Mühendis Araba",
         "helptext": "Çok hareketli ve dayak atma yeteneğine sahip olan Mason, hızla geniş bir alana yayılabilir."
     },
     "amphtele": {
@@ -876,7 +876,7 @@
     },
     "shipcon": {
         "name": "Denizci",
-        "description": "İnşa Gemisi, 7.5 m/s de inşa eder",
+        "description": "İnşa Gemisi",
         "helptext": "Pahalı olmasına rağmen, İnşaat Gemisi sert zırh ve iyi hız ile birlikte son derece yüksek nano gücüne sahiptir."
     },
     "shipscout": {
@@ -914,11 +914,6 @@
         "description": "Kruvazör (Topçu)",
         "helptext": "Bu kruvazör, sabit yer ve kıyı hedeflerini bombalamak için yararlı olan güçlü, uzun menzilli bir top barındırıyor. Uçaklara, denizaltılara ve akıncı gemilerine dikkat edin."
     },
-    "shiptransport": {
-        "name": "Sörfçü",
-        "description": "Taşıyıcı Platform",
-        "helptext": "Sörf tahtası deniz taşımacılığı ve ateş platformu olarak hizmet eder - yani Sörf Tahtası üzerindeki herhangi bir ünite ateşleyebilir."
-    },
     "shipheavyarty": {
         "name": "Pomplalı",
         "description": "Savaşgemisi (Ağır Topçu)",
@@ -926,7 +921,7 @@
     },
     "factorygunship": {
         "name": "Kopter Santrali",
-        "description": "Kopterler Üretir, 10 m/s de inşa eder",
+        "description": "Kopterler Üretir",
         "helptext": "Kopter Tesisi yakın hava desteği için tasarlanmıştır. Kara birimlerini çekmek için çeşitli nakliye araçları ve çeşitli saldırı veya savunma rollerini yerine getirebilecek olan savaş silahlarıyla mücadele içerir."
     },
     "turretheavy": {
@@ -966,7 +961,7 @@
     },
     "factorytank": {
         "name": "Tank Dökümhanesi",
-        "description": "Ağır Paletli Araçlar Üretir, 10 m/s de inşa eder",
+        "description": "Ağır Paletli Araçlar Üretir",
         "helptext": "Tank Dökümhanesi kaba kuvvet yöntemlerinde son noktadır - hiçbirşey işini sürekli topçu barajı gibi yapmaz ve ardından sahadaki en büyük tanklarla belirleyici bir baskı yapar. Anahtar birimler: Emisser, Boğa, Cin, Cyclops"
     },
     "striderbantha": {
@@ -986,7 +981,7 @@
     },
     "factoryjump": {
         "name": "SıçramaJet Fabrikası",
-        "description": "SıçramaJetli Robotlar Üretir, 10 m/s de inşa eder",
+        "description": "SıçramaJetli Robotlar Üretir",
         "helptext": "Ezoterik SıçramaJet Fabrikası, bir bıçakla savaşta mesafeyi hızla kapatmak ya da düşman hatlarında bir yolu kesmek için tepeleri ve nehirleri aşmak için benzersiz taktik seçenekler sunar. Anahtar birimler: Ateş, Moderatör, Kriko, YürüyenAteş, Jugglenaut"
     },
     "jumpsumo": {
@@ -1006,7 +1001,7 @@
     },
     "hovercon": {
         "name": "Tüy",
-        "description": "Mühendis Hover, 5 m/s de inşa eder",
+        "description": "Mühendis Hover",
         "helptext": "Tüy, hem karada hem de denizde pürüzsüz bir genişleme sağlar."
     },
     "jumpaa": {
@@ -1056,7 +1051,7 @@
     },
     "cloakcon": {
         "name": "Efsuncu",
-        "description": "Görünmez Mühendis Bot, 5 m/s de inşa eder",
+        "description": "Görünmez Mühendis Bot",
         "helptext": "Efsuncu, kısa mesafeli bir bozucu ve gizli bir genişletme ve temel bakım için bir gizleme aygıtı içerir."
     },
     "turretsunlance": {
@@ -1076,7 +1071,7 @@
     },
     "planecon": {
         "name": "Vinç",
-        "description": "Mühendis Uçak, 5 m/s de inşa eder",
+        "description": "Mühendis Uçak",
         "helptext": "Vinç herhangi bir arazide hızla uçuyor, ancak herhangi bir AH için kırılgan. Diğer inşaatçılar ile karşılaştırıldığında nispeten zayıf bir nano güce sahip olmasına rağmen, ulaşılması zor birçok yerde inşa edebilir ve bir hava oyuncuları bölgesini doğrusal olmayan bir şekilde genişletebilir. Hareket kabiliyetinden dolayı, enkazları ve diğer tekrarlayan görevleri geri almak için idealdir."
     },
     "gunshipraid": {

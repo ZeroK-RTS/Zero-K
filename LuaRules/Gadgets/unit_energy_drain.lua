@@ -33,6 +33,7 @@ local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spUseUnitResource   = Spring.UseUnitResource
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spValidUnitID = Spring.ValidUnitID
 
 local unitMap = {}
 local unitList = {}
@@ -126,42 +127,44 @@ function gadget:GameFrame(n)
 		local data = unitList[i]
 		local unitID = data.unitID
 		
-		local activeState = Spring.Utilities.GetUnitActiveState(unitID)
-		
-		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
-		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
-		local morphing = (spGetUnitRulesParam(unitID, "morphDisable") == 1)
-		
-		local def = drainUnitDefID[data.unitDefID]
-		if activeState and not (stunned_or_inbuild or disarmed or morphing) then
-			-- Get upkeep based on run systems
-			local newUpkeep, upkeepPerUpdate = GetUnitUpkeep(unitID, def)
+		if spValidUnitID(unitID) then
+			local activeState = Spring.Utilities.GetUnitActiveState(unitID)
 			
-			if newUpkeep ~= data.oldUpkeep then
-				GG.StartMiscPriorityResourcing(unitID, newUpkeep, true, 3)
+			local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
+			local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
+			local morphing = (spGetUnitRulesParam(unitID, "morphDisable") == 1)
+			
+			local def = drainUnitDefID[data.unitDefID]
+			if activeState and not (stunned_or_inbuild or disarmed or morphing) then
+				-- Get upkeep based on run systems
+				local newUpkeep, upkeepPerUpdate = GetUnitUpkeep(unitID, def)
 				
-				data.oldUpkeep = newUpkeep
-				data.resTable.e = upkeepPerUpdate
-			end
+				if newUpkeep ~= data.oldUpkeep then
+					GG.StartMiscPriorityResourcing(unitID, newUpkeep, true, 3)
+					
+					data.oldUpkeep = newUpkeep
+					data.resTable.e = upkeepPerUpdate
+				end
 
-			-- Check drain
-			local enabled = (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable))
-			
-			if enabled ~= data.oldEnabled then
-				spSetUnitRulesParam(unitID, "forcedOff", (enabled and 0) or 1, INLOS_ACCESS)
-				GG.UpdateUnitAttributes(unitID)
-				data.oldEnabled = enabled
+				-- Check drain
+				local enabled = (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable))
 				
-				ScriptUpdate(unitID, data.env, enabled)
-			end
-		else
-			if data.oldUpkeep ~= 0 then
-				GG.StopMiscPriorityResourcing(unitID, 3)
-				data.oldUpkeep = 0
-			end
-			if data.oldEnabled then
-				ScriptUpdate(unitID, data.env, false)
-				data.oldEnabled = false
+				if enabled ~= data.oldEnabled then
+					spSetUnitRulesParam(unitID, "forcedOff", (enabled and 0) or 1, INLOS_ACCESS)
+					GG.UpdateUnitAttributes(unitID)
+					data.oldEnabled = enabled
+					
+					ScriptUpdate(unitID, data.env, enabled)
+				end
+			else
+				if data.oldUpkeep ~= 0 then
+					GG.StopMiscPriorityResourcing(unitID, 3)
+					data.oldUpkeep = 0
+				end
+				if data.oldEnabled then
+					ScriptUpdate(unitID, data.env, false)
+					data.oldEnabled = false
+				end
 			end
 		end
 	end

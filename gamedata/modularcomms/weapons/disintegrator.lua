@@ -4,6 +4,7 @@ local weaponDef = {
 	areaOfEffect            = 48,
 	avoidFeature            = false,
 	avoidFriendly           = false,
+	avoidGround             = false,
 	avoidNeutral            = false,
 	commandfire             = true,
 	craterBoost             = 1,

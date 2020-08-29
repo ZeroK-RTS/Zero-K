@@ -10,6 +10,8 @@ for i = 1, 8 do
 	wakes[i] = piece('wake0' .. i)
 end
 
+local SIG_AIM = 1
+
 local weaponRange = WeaponDefNames["hoverraid_gauss"].range
 local rangeChanged = false
 

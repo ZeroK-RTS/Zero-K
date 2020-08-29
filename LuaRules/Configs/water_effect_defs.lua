@@ -1,21 +1,13 @@
+-- No water cannons are left in the game after rework of Archer away from impulse
+-- Keeping this file for now to make it easy to re-add water cannons in the future
+
 local waterCannonIterable = {
-	WeaponDefNames["amphimpulse_watercannon"].id,
 }
 
 local waterCannonIndexable = {
-	[WeaponDefNames["amphimpulse_watercannon"].id] = true,
 }
 
 local unitDefData = {
-	[UnitDefNames["amphimpulse"].id] = {
-		tankMax = 180,
-		shotCost = 0,
-		tankRegenRate = 14,
-		baseHeight = 5,
-		bonusProjectiles = 6.5,
-		scalingRange = 200,
-		baseRange = 100,
-	},
 }
 
 return unitDefData, waterCannonIterable, waterCannonIndexable

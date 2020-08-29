@@ -365,6 +365,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Remove submarine damage modifier
+-- TODO: also remove from defs
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.damage then
+		if weaponDef.damage.subs and weaponDef.damage.default then
+			weaponDef.damage.subs = weaponDef.damage.default
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Fix the canAttack tag
 --
 

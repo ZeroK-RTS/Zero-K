@@ -22,7 +22,7 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
 local hotkeysPath = "Hotkeys/Selection/Control Groups"
 options_path = 'Settings/Camera/Control Group Zoom'
-options_order = { 'enabletimeout', 'timeoutlength', 'lbl_group'}
+options_order = { 'enabletimeout', 'timeoutlength', 'lbl_group', 'shift_adds'}
 options = {
 	enabletimeout = {
 		name = "Enable Timeout",
@@ -42,6 +42,14 @@ options = {
 	lbl_group = {
 		type = 'label',
 		name = 'Control Groups',
+		path = hotkeysPath,
+	},
+	shift_adds = {
+		name = "Shift Adds To Group",
+		type = 'bool',
+		value = false,
+		desc = "When enabled, hold shift and press a group hotkey to add the selected units to the group.",
+		noHotkey = true,
 		path = hotkeysPath,
 	},
 }
@@ -113,6 +121,21 @@ local currentIteration = 1
 local previousKey = 99
 local previousTime = spGetTimer()
 
+local function CheckShiftAdd(key, modifier, isRepeat)
+	if (not modifier.shift) then
+		return false
+	end
+	local group = key and groupNumber[key]
+	if not group then
+		return false
+	end
+	local selectedUnit = spGetSelectedUnits()
+	for i = 1,#selectedUnit do
+		Spring.SetUnitGroup(selectedUnit[i], group)
+	end
+	return false -- also select the group when added.
+end
+
 local function GroupRecallFix(key, modifier, isRepeat)
 	if (not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local group
@@ -153,8 +176,11 @@ local function GroupRecallFix(key, modifier, isRepeat)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if options.enabletimeout.value then
-		return GroupRecallFix(key, modifier, isRepeat)
+	if options.enabletimeout.value and GroupRecallFix(key, modifier, isRepeat) then
+		return true
+	end
+	if options.shift_adds.value and CheckShiftAdd(key, modifier, isRepeat) then
+		return true
 	end
 end
 

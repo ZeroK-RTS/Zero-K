@@ -363,38 +363,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function GG.TableEcho(data, tableName, indent)
-	indent = indent or ""
-	tableName = tableName or "TableEcho"
-	Spring.Echo(indent .. tableName .. " = {")
-	for name, v in pairs(data) do
-		local ty =  type(v)
-		if ty == "table" then
-			GG.TableEcho(v, name, indent .. "    ")
-		elseif ty == "boolean" then
-			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
-		else
-			Spring.Echo(indent .. name .. " = " .. v)
-		end
-	end
-	Spring.Echo(indent .. "}")
-end
-
-function GG.UnitEcho(unitID, st)
-	st = st or unitID
-	if Spring.ValidUnitID(unitID) then
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.MarkerAddPoint(x,y,z, st)
-	else
-		Spring.Echo("Invalid unitID")
-		Spring.Echo(unitID)
-		Spring.Echo(st)
-	end
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
 if (gadgetHandler:IsSyncedCode()) then
    
 
@@ -509,32 +477,94 @@ local function give(cmd,line,words,player)
 	local buildlist = UnitDefNames["armcom1"].buildOptions
 	local INCREMENT = 128
 	local orderUnit = {}
+	local zOffset = 0
 	for i = 1, #buildlist do
 		local udid = buildlist[i]
-		local x, z = INCREMENT, i*INCREMENT
-		local y = Spring.GetGroundHeight(x,z)
-		local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
-		if build then
-			SetupNanoUnit(unitID, nanoAmount)
+		local ud = UnitDefs[udid]
+		if not ud.customParams.child_of_factory then
+			zOffset = zOffset + 1
+			local x, z = INCREMENT, zOffset*INCREMENT
+			local y = Spring.GetGroundHeight(x,z)
+			local unitID = Spring.CreateUnit(udid, x, y, z, 0, 0, build)
+			if build then
+				SetupNanoUnit(unitID, nanoAmount)
+			end
+			if ud.buildOptions and #ud.buildOptions > 0 then
+				local sublist = ud.buildOptions
+				local offset = 1
+				if ud.customParams.parent_of_plate then
+					local subUdid = UnitDefNames[ud.customParams.parent_of_plate].id
+					local x2, z2 = (1 + offset)*INCREMENT, zOffset*INCREMENT
+					local y2 = Spring.GetGroundHeight(x2,z2)
+					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2, 0, 0, build)
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					offset = offset + 1
+				end
+				for j = 1, #sublist do
+					local subUdid = sublist[j]
+					local x2, z2 = (j+offset)*INCREMENT, zOffset*INCREMENT
+					local y2 = Spring.GetGroundHeight(x2,z2)
+					local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
+					if build then
+						SetupNanoUnit(subUnitID, nanoAmount)
+					end
+					orderUnit[#orderUnit + 1] = subUnitID
+					--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
+					--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
+					--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
+				end
+			end
 		end
+	end
+	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
+end
+
+local function SortUnits(a, b)
+	return UnitDefs[a].metalCost < UnitDefs[b].metalCost
+end
+
+local function givesort(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local nanoAmount = math.max(0.01, math.min(1, tonumber(words[1] or "1") or 1))
+	local build = (nanoAmount < 1)
+	
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	
+	local units = {}
+	
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
 		local ud = UnitDefs[udid]
 		if ud.buildOptions and #ud.buildOptions > 0 then
 			local sublist = ud.buildOptions
 			for j = 1, #sublist do
 				local subUdid = sublist[j]
-				local x2, z2 = (j+1)*INCREMENT, i*INCREMENT
-				local y2 = Spring.GetGroundHeight(x2,z2)
-				local subUnitID = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, build)
-				if build then
-					SetupNanoUnit(subUnitID, nanoAmount)
+				if Spring.Utilities.getMovetype(UnitDefs[subUdid]) == 2 then -- Land or sea
+					units[#units + 1] = subUdid
 				end
-				orderUnit[#orderUnit + 1] = subUnitID
-				--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
-				--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
-				--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
 			end
 		end
 	end
+	
+	table.sort(units, SortUnits)
+	
+	local increment = 6100/#units
+	local zPos = 4000
+	
+	local orderUnit = {}
+	for i = 1, #units do
+		Spring.Echo(UnitDefs[units[i]].humanName, UnitDefs[units[i]].metalCost)
+		local height = Spring.GetGroundHeight(increment*i, zPos)
+		local unitID = Spring.CreateUnit(units[i], increment*i, height, zPos, 0, 0, false)
+		orderUnit[#orderUnit + 1] = unitID
+	end
+	
 	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
@@ -839,6 +869,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"rotateunit", RotateUnit, "Rotates a unit.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
+	gadgetHandler.actionHandler.AddChatAction(self,"givesort",givesort,"Gives mobiles sorted by cost.")
 	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nf",nanoFrame,"Sets nanoframe values.")

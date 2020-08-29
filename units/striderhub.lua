@@ -1,7 +1,7 @@
 return { striderhub = {
   unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
-  description                   = [[Constructs Striders, Builds at 10 m/s]],
+  description                   = [[Constructs Striders]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostMetal                = Shared.FACTORY_COST,
@@ -38,13 +38,14 @@ return { striderhub = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset    = [[0 0 0]],
-    midposoffset    = [[0 -10 0]],
-    modelradius     = [[35]],
-    isfakefactory   = [[1]],
-    selection_rank  = [[2]],
-    factorytab       = 1,
+    aimposoffset      = [[0 0 0]],
+    midposoffset      = [[0 -10 0]],
+    modelradius       = [[35]],
+    isfakefactory     = [[1]],
+    selection_rank    = [[2]],
+    factorytab        = 1,
     shared_energy_gen = 1,
+    like_structure    = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

@@ -80,6 +80,7 @@ return { striderantiheavy = {
       areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
+      avoidGround             = false,
       avoidNeutral            = false,
       commandfire             = false,
       craterBoost             = 1,
@@ -90,6 +91,7 @@ return { striderantiheavy = {
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
+      heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 0,

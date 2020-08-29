@@ -36,7 +36,20 @@ local buildoptions = {
 		{ "factoryshield",  notSea=true },
 		{ "factoryjump",  notSea=true },
 		{ "factorytank",  notSea=true },
-
+		
+		-- plates
+		{ "platecloak", notSea=true },
+		{ "plateveh", notSea=true },
+		{ "platespider",  notSea=true },
+		{ "plateship",  sea=true },
+		{ "plateamph" },
+		{ "platehover" },
+		{ "plategunship" },
+		{ "plateplane" },
+		{ "plateshield",  notSea=true },
+		{ "platejump",  notSea=true },
+		{ "platetank",  notSea=true },
+		
 		{ "striderhub" },
 	},
 
@@ -303,7 +316,6 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	jump=1,
 	find_pad=1,
 	embark=1,
-	disembark=1,
 	oneclickwep=1,
 	settarget=1,
 	canceltarget=1,

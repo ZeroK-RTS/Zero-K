@@ -74,7 +74,7 @@ if gadgetHandler:IsSyncedCode() then
 		end
 
 		if damage and damage ~= -1 then
-			--GG.TableEcho(wd.damages)
+			--Spring.Utilities.TableEcho(wd.damages)
 			--Spring.Echo("dmg=", dmg, dmg * dmgMod)
 			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
 			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
@@ -173,20 +173,20 @@ local function AddUnit(unitID, unitDefID)
 		unitData.needsUpdate = false
 	end
 
-	shieldUnits.Add(unitID, unitData)
+	IterableMap.Add(shieldUnits, unitID, unitData)
 
 	local _, fullview = spGetSpectatingState()
 	UpdateVisibility(unitID, unitData, fullview, true)
 end
 
 local function RemoveUnit(unitID)
-	local unitData = shieldUnits.Get(unitID)
+	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if unitData then
 		for i = 1, #unitData.fxTable do
 			local fxID = unitData.fxTable[i]
 			Lups.RemoveParticles(fxID)
 		end
-		shieldUnits.Remove(unitID)
+		IterableMap.Remove(shieldUnits, unitID)
 	end
 end
 
@@ -230,7 +230,7 @@ local function DoAddShieldHitData(unitData, hitFrame, dmg, theta, phi)
 	local hitData = unitData.hitData
 	local found = false
 	--Spring.Echo(unitData.unitID, "#hitData", #hitData)
-	--GG.TableEcho(hitData)
+	--Spring.Utilities.TableEcho(hitData)
 	for _, hitInfo in ipairs(hitData) do
 		if hitInfo then
 			local dist = math.sqrt( ((hitInfo.theta - theta)/PI)^2 + ((hitInfo.phi - phi)/PI)^2  )
@@ -276,7 +276,7 @@ end
 local MIN_DAMAGE = 1
 
 local function GetShieldHitPositions(unitID)
-	local unitData = shieldUnits.Get(unitID)
+	local unitData = IterableMap.Get(shieldUnits, unitID)
 	return (((unitData and unitData.hitData) and unitData.hitData) or nil)
 end
 
@@ -316,7 +316,7 @@ local function ProcessHitTable(unitData, gameFrame)
 end
 
 local function AddShieldHitData(_, hitFrame, unitID, dmg, dx, dy, dz)
-	local unitData = shieldUnits.Get(unitID)
+	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if unitData and unitData.hitData then
 		--Spring.Echo(hitFrame, unitID, dmg)
 		local rdx, rdy, rdz = dx - unitData.shieldPos[1], dy - unitData.shieldPos[2], dz - unitData.shieldPos[3]
@@ -339,7 +339,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, newTeam, oldTeam)
-	local unitData = shieldUnits.Get(unitID)
+	local unitData = IterableMap.Get(shieldUnits, unitID)
 	if unitData then
 		unitData.allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	end
@@ -352,7 +352,7 @@ end
 function gadget:GameFrame(n)
 	if highEnoughQuality and hitUpdateNeeded and (n % HIT_UPDATE_PERIOD == 0) then
 		hitUpdateNeeded = false
-		for unitID, unitData in shieldUnits.Iterator() do
+		for unitID, unitData in IterableMap.Iterator(shieldUnits) do
 			if unitData and unitData.hitData then
 				--Spring.Echo(n, unitID, unitData.unitID)
 				local phtRes = ProcessHitTable(unitData, n)
@@ -363,7 +363,7 @@ function gadget:GameFrame(n)
 
 	if n % LOS_UPDATE_PERIOD == 0 then
 		local _, fullview = spGetSpectatingState()
-		for unitID, unitData in shieldUnits.Iterator() do
+		for unitID, unitData in IterableMap.Iterator(shieldUnits) do
 			UpdateVisibility(unitID, unitData, fullview)
 		end
 	end

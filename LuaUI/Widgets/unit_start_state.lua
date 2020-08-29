@@ -94,7 +94,11 @@ end
 --------------------------------------------------------------------------------
 
 local function IsGround(ud)
-    return not ud.canFly and not ud.isFactory
+	return not ud.canFly
+end
+
+local function IsFactory(ud)
+	return ud.customParams.factorytab or ud.customParams.child_of_factory
 end
 
 local impulseUnitDefID = {}
@@ -118,6 +122,7 @@ options_order = {
 	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
+	'setFactoryRanksToThree', 'setFactoryRanksToTwo',
 	'categorieslabel',
 	'commander_label',
 	'commander_firestate0',
@@ -346,7 +351,7 @@ options = {
 	},
 	setRanksToDefault = {
 		type = 'button',
-		name = "Set Selection Ranks to Default",
+		name = "Set Select Rank to Default",
 		desc = "Resets selection ranks to default, 1 for structures, 2 for constructors and 3 for combat units (including commander).",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -364,7 +369,7 @@ options = {
 	},
 	setRanksToThree = {
 		type = 'button',
-		name = "Set Selection Ranks to Three",
+		name = "Set All Select Rank to 3",
 		desc = "Effectively disables selection ranking while retaining the ability to manually set ranks.",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -374,6 +379,42 @@ options = {
 				local find = string.find(opt, "_selection_rank")
 				if find then
 					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToThree = {
+		type = 'button',
+		name = "Factory Select Rank to 3",
+		desc = "Sets Factories and Plates to have selection rank 3.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToTwo = {
+		type = 'button',
+		name = "Factory Select Rank to 2",
+		desc = "Sets Factories and Plates to have selection rank 2.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 2
 				end
 			end
 		end,
@@ -466,7 +507,6 @@ options = {
 		min = 0,
 		max = 3,
 		step = 1,
-		path = path,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.selectionrank,
 	},
@@ -815,39 +855,55 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_disableattack"
+	end
 	
+	if ud.canStockpile then
+		options[defName .. "_stockpile"] = {
+			name = "  Initial Stockpile",
+			desc = "Initial Stockpile: The default stockpile limit of the unit.",
+			type = 'number',
+			value = (ud.name == "turretaaheavy" and 100 or 10),
+			min = 0,
+			max = 100,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_stockpile"
 	end
 end
 
-local function AddFactoryOfUnits(defName)
+local function AddFactoryOfUnits(defName, plateDefName)
 	if unitAlreadyAdded[defName] then
 		return
 	end
 	local ud = UnitDefNames[defName]
 	local name = string.gsub(ud.humanName, "/", "-")
 	addUnit(defName, name)
+	if plateDefName then
+		addUnit(plateDefName, name)
+	end
 	for i = 1, #ud.buildOptions do
 		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
 		unitsToFactory[UnitDefs[ud.buildOptions[i]].name] = defName
 	end
 end
 
-AddFactoryOfUnits("factoryshield")
-AddFactoryOfUnits("factorycloak")
-AddFactoryOfUnits("factoryveh")
-AddFactoryOfUnits("factoryplane")
-AddFactoryOfUnits("factorygunship")
-AddFactoryOfUnits("factoryhover")
-AddFactoryOfUnits("factoryamph")
-AddFactoryOfUnits("factoryspider")
-AddFactoryOfUnits("factoryjump")
-AddFactoryOfUnits("factorytank")
-AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("factoryshield",  "plateshield")
+AddFactoryOfUnits("factorycloak",   "platecloak")
+AddFactoryOfUnits("factoryveh",     "plateveh")
+AddFactoryOfUnits("factoryplane",   "plateplane")
+AddFactoryOfUnits("factorygunship", "plategunship")
+AddFactoryOfUnits("factoryhover",   "platehover")
+AddFactoryOfUnits("factoryamph",    "plateamph")
+AddFactoryOfUnits("factoryspider",  "platespider")
+AddFactoryOfUnits("factoryjump",    "platejump")
+AddFactoryOfUnits("factorytank",    "platetank")
+AddFactoryOfUnits("factoryship",    "plateship")
 AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -933,6 +989,27 @@ local function QueueState(unitDefName, stateName, cmdID, cmdArray, invertBool)
 		value = value and 1 or 0
 	end
 	cmdArray[#cmdArray + 1] = {cmdID, {value}, CMD.OPT_SHIFT}
+end
+
+local function StockpileUnit(unitID, wanted, orderArray)
+	local stocked, queued = Spring.GetUnitStockpile(unitID)
+	local to_add = wanted - stocked - queued
+	while to_add > 0 do
+		local added = 1
+		local code = 0
+		if to_add >= 100 then
+			code = CMD.OPT_SHIFT + CMD.OPT_CTRL
+			added = 100
+		elseif to_add >= 20 then
+			code = CMD.OPT_CTRL
+			added = 20
+		elseif to_add >= 5 then
+			code = CMD.OPT_SHIFT
+			added = 5
+		end
+		orderArray[#orderArray + 1] = {CMD.STOCKPILE, {}, code}
+		to_add = to_add - added
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -1131,6 +1208,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "tactical_ai_transport")
 		if value and WG.AddTransport then
 			WG.AddTransport(unitID, unitDefID)
+		end
+		
+		value = GetStateValue(name, "stockpile")
+		if value then
+			StockpileUnit(unitID, value, orderArray)
 		end
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)

@@ -42,6 +42,7 @@ return { chicken_drone_starter = {
   objectName          = [[chicken_drone.s3o]],
   onoffable           = true,
   power               = 60,
+  reclaimable         = false,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

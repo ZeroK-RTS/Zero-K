@@ -11,6 +11,7 @@ Spring.Echo("Loading UnitDefs_posts")
 -- Constants?
 --
 
+VFS.Include("LuaRules/Configs/constants.lua")
 local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------
@@ -72,18 +73,41 @@ for _, ud in pairs(UnitDefs) do
 -- Balance Testing
 --
 
+-- modOptions.tweakdefs = 'Zm9yIG5hbWUsIHVkIGluIHBhaXJzKFVuaXREZWZzKSBkbwoJaWYgdWQubWF4dmVsb2NpdHkgdGhlbgoJCXVkLm1heHZlbG9jaXR5ID0gdWQubWF4dmVsb2NpdHkqMTAKCWVuZAplbmQ='
+
+do
+	local append = false
+	local name = "tweakdefs"
+	while modOptions[name] and modOptions[name] ~= "" do
+		local postsFuncStr = Spring.Utilities.Base64Decode(modOptions[name])
+		local postfunc, err = loadstring(postsFuncStr)
+		Spring.Echo("Loading tweakdefs modoption", append or 0)
+		if postfunc then
+			postfunc()
+		end
+		append = (append or 0) + 1
+		name = "tweakdefs" .. append
+	end
+end
+
 --modOptions.tweakunits = 'ewpjbG9ha3JhaWQgPSB7YnVpbGRDb3N0TWV0YWwgPSAxMCwKd2VhcG9uRGVmcyA9IHtFTUcgPSB7ZGFtYWdlID0ge2RlZmF1bHQgPSAyMDB9fX19LAp9'
 
-if modOptions.tweakunits and modOptions.tweakunits ~= "" then
-	local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions.tweakunits)
-	if type(tweaks) == "table" then
-		Spring.Echo("Loading tweakunits modoption")
-		for name, ud in pairs(UnitDefs) do
-			if tweaks[name] then
-				Spring.Echo("Loading tweakunits for " .. name)
-				Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(tweaks[name]), true)
+do
+	local append = false
+	local name = "tweakunits"
+	while modOptions[name] and modOptions[name] ~= "" do
+		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[name])
+		if type(tweaks) == "table" then
+			Spring.Echo("Loading tweakunits modoption", append or 0)
+			for name, ud in pairs(UnitDefs) do
+				if tweaks[name] then
+					Spring.Echo("Loading tweakunits for " .. name)
+					Spring.Utilities.OverwriteTableInplace(ud, lowerkeys(tweaks[name]), true)
+				end
 			end
 		end
+		append = (append or 0) + 1
+		name = "tweakunits" .. append
 	end
 end
 
@@ -184,6 +208,38 @@ for name, ud in pairs(UnitDefs) do
 		ud.buildoptions = buildOpts
 	end
 end
+
+local typeNames = {
+	"CONSTRUCTOR",
+	"RAIDER",
+	"SKIRMISHER",
+	"RIOT",
+	"ASSAULT",
+	"ARTILLERY",
+	"WEIRD_RAIDER",
+	"ANTI_AIR",
+	"HEAVY_SOMETHING",
+	"SPECIAL",
+	"UTILITY",
+}
+local typeNamesLower = {}
+for i = 1, #typeNames do
+	typeNamesLower[i] = "pos_" .. typeNames[i]:lower()
+end
+
+-- Set build options from pos_ customparam
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+for name, ud in pairs(UnitDefs) do
+	local cp = ud.customparams
+	for i = 1, #typeNamesLower do
+		local value = cp[typeNamesLower[i]]
+		if value then
+			ud.buildoptions = ud.buildoptions or {}
+			ud.buildoptions[#ud.buildoptions + 1] = value
+		end
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -476,7 +532,7 @@ end
 -- 2x repair speed than BP
 --
 
-local REPAIR_ENERGY_COST_FACTOR = 0.75 -- Game.repairEnergyCostFactor
+local REPAIR_ENERGY_COST_FACTOR = (Game and Game.repairEnergyCostFactor) or 0.666 -- Game.repairEnergyCostFactor
 
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then

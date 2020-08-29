@@ -22,8 +22,9 @@ return { jumpraid = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 1,
-    fireproof      = [[1]],
+    fireproof          = [[1]],
     stats_show_death_explosion = 1,
+    aim_lookahead      = 100,
   },
 
   explodeAs             = [[PYRO_DEATH]],

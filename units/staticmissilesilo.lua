@@ -1,7 +1,7 @@
 return { staticmissilesilo = {
   unitname                      = [[staticmissilesilo]],
   name                          = [[Missile Silo]],
-  description                   = [[Produces Tactical Missiles, Builds at 10 m/s]],
+  description                   = [[Produces Tactical Missiles]],
   buildCostMetal                = 1200,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,

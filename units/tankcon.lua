@@ -1,7 +1,7 @@
 return { tankcon = {
   unitname               = [[tankcon]],
   name                   = [[Welder]],
-  description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
+  description            = [[Armed Construction Tank]],
   acceleration           = 0.33,
   brakeRate              = 15.0,
   buildCostMetal         = 200,
@@ -36,7 +36,7 @@ return { tankcon = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 2000,
+  maxDamage              = 1800,
   maxSlope               = 18,
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,

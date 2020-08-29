@@ -77,9 +77,9 @@ return { amphriot = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 48,
       burst                   = 2,
-      burstRate               = 0.2,
+      burstRate               = 0.3,
       avoidFriendly           = false,
       bouncerebound           = 0.7,
       bounceslip              = 1,
@@ -91,11 +91,11 @@ return { amphriot = {
       cegTag                  = [[torpedo_trail]],
    
       damage                  = {
-        default = 90.1,
+        default = 52.1,
       },
 
       edgeEffectiveness       = 0.6,
-      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
+      explosionGenerator      = [[custom:TORPEDO_HIT_SMALL_WEAK]],
       flightTime              = 1.5,
       groundbounce            = 1,
       impactOnly              = false,
@@ -107,7 +107,7 @@ return { amphriot = {
       model                   = [[diskball.s3o]],
       numBounce               = 4,
       range                   = 270,
-      reloadtime              = 1.4,
+      reloadtime              = 2,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
       --soundStart            = [[weapon/torpedo]],

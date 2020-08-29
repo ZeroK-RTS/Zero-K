@@ -1,11 +1,6 @@
 --Chat preprocessor. Provide preprocessed chat message for Chili Chat widget
 --last update: 20 May 2014
 
-local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false) or "nonanme"
-local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
-local voiceMagic = "> ["..myName.."]!transmit voice" -- Lobby is sending a voice command to LuaUI
-local transmitLobbyMagic = "!transmitlobby" -- LuaUI is sending to lobby
-
 function StringStarts(s, start)
    return string.sub(s, 1, string.len(start)) == start
 end
@@ -181,4 +176,4 @@ end
 
 SetupPlayers()
 MessageProcessor:Initialize()
-return myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor
+return MessageProcessor

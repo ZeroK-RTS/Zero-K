@@ -467,7 +467,6 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function CreateWindow()
-	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local countsOffset = 43;
 	
 	--// WINDOW
@@ -488,7 +487,7 @@ function CreateWindow()
 		minHeight = 65,
 		maxHeight = 65,
 		minWidth = 250,
-		draggable = true,
+		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,

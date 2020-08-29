@@ -65,6 +65,8 @@ local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
+local REPAIR_COST_FACTOR = Game.repairEnergyCostFactor
+
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
 
@@ -122,7 +124,7 @@ local function GetBuildRate(unitID)
 end
 
 local function ForceImmediateAbort(unitID, padID, isLanded)
-	if not spGetUnitIsDead(unitID) then
+	if (not spGetUnitIsDead(unitID)) and Spring.ValidUnitID(unitID) then
 		spSetUnitLeaveTracks(unitID, true)
 		if isLanded then
 			spSetUnitVelocity(unitID, 0, 0, 0)
@@ -131,19 +133,19 @@ local function ForceImmediateAbort(unitID, padID, isLanded)
 			Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		end
 		mcDisable(unitID)
-		unitMovectrled[unitID] = nil
 		GG.UpdateUnitAttributes(unitID)
 	end
+	unitMovectrled[unitID] = nil
 	landingUnit[unitID] = nil
 	return true
 end
 
 local function AbortCheck(unitID, padID, isLanded)
 	if (not landingUnit[unitID]) or landingUnit[unitID].abort then
-		ForceImmediateAbort(unitID, padID, isLanded)
+		return ForceImmediateAbort(unitID, padID, isLanded)
 	end
 	
-	return false
+	return spGetUnitIsDead(unitID) or (not Spring.ValidUnitID(unitID))
 end
 
 local function SitOnPad(unitID)
@@ -160,7 +162,7 @@ local function SitOnPad(unitID)
 	local ud               = UnitDefs[unitDefID]
 	local cost             = ud.metalCost
 	local maxHP            = ud.health
-	local healPerFrame     = 2*landData.repairBp*maxHP/(30*cost)
+	local healPerFrame     = landData.repairBp*maxHP/(REPAIR_COST_FACTOR*30*cost)
 	local repairFrameDrain = landData.repairBp/30
 	local reammoMaxTime     = reammoFrames[unitDefID]
 	
@@ -199,6 +201,8 @@ local function SitOnPad(unitID)
 		local oldUpdateCost = 0
 		local updateRate = 1
 		
+		Sleep() -- Avoid recursion in instantly cancelled commands.
+		
 		local health, buildRate, updateCost, drainScale, padTeamID
 		while true do
 			if AbortCheck(unitID, landData.padID, true) then
@@ -221,23 +225,20 @@ local function SitOnPad(unitID)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
-			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)*GG.REPAIR_RESOURCE_MULT
+			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)
 			if updateCost ~= oldUpdateCost or oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost
 				if updateCost > 0 then
-					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, not GG.REPAIR_COSTS_METAL, miscPriorityKey)
+					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, true, miscPriorityKey)
 				else
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 				end
 			end
 			
 			if (updateCost > 0) then
-				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, not GG.REPAIR_COSTS_METAL)
+				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
 				resTable.e = updateCost*updateRate
-				if GG.REPAIR_COSTS_METAL then
-					resTable.m = resTable.e
-				end
 			else
 				updateRate = 1
 			end
@@ -266,7 +267,7 @@ local function SitOnPad(unitID)
 			landDuration = landDuration + 1
 			-- Check crashing every 10s as safety for a rare bug. Otherwise the pad will be oocupied forever.
 			if landDuration%300 == 0 then
-				if Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing" then
+				if spGetUnitIsDead(unitID) or (not Spring.ValidUnitID(unitID)) or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 					Spring.DestroyUnit(unitID)
 				end
@@ -483,6 +484,10 @@ local function CircleToLand(unitID, goal)
 		while currentDistance + currentSpeed < totalDist do
 			
 			if AbortCheck(unitID) then
+				return
+			end
+			if (Spring.GetUnitRulesParam(unitID, "crashing") == 1) then
+				ForceImmediateAbort(unitID, padID, isLanded)
 				return
 			end
 			

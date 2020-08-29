@@ -18,6 +18,8 @@ include("keysym.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
+local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
+
 --WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
 --						 	WG.COFC_SetCameraTargetBox: {number minX, number minZ, number maxX, number maxZ, number minDist(, number maxY(, number smoothness(,boolean useSmoothMeshSetting)))} -> {}, Set Camera to contain input box. maxY should be the highest point in the box, defaults to ground height of box center
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
@@ -737,6 +739,39 @@ local keys = {
 	[273] = 'up',
 	[274] = 'down',
 }
+
+local function HotkeyChangeNotification()
+	keys = {}
+
+	local key = WG.crude.GetHotkeyRaw("moveleft")
+	local keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'left'
+	key_code.left = keycode;
+	
+	key = WG.crude.GetHotkeyRaw("moveright")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'right'
+	key_code.right = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveforward")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'up'
+	key_code.up = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveback")
+	keycode = ToKeysyms(key and key[1])
+	keys[keycode] = 'down'
+	key_code.down = keycode;
+
+	key = WG.crude.GetHotkeyRaw("moveup")
+	keycode = ToKeysyms(key and key[1])
+	key_code.pageup = keycode;
+
+	key = WG.crude.GetHotkeyRaw("movedown")
+	keycode = ToKeysyms(key and key[1])
+	key_code.pagedown = keycode;
+end
+
 local icon_size = 20
 local cycle = 1
 local camcycle = 1
@@ -1705,15 +1740,15 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	end
 end
 
-local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
+local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 	local cs = GetTargetCameraState()
 	local cs1 = cs
 	lastMouseX = nil
 	if cs.rx then
 		
 		local trfactor = (tilt and options.tiltfactor.value or options.rotatefactor.value) / 2000
-		cs.rx = cs.rx + dy * trfactor
-		cs.ry = cs.ry - dx * trfactor
+		cs.rx = cs.rx + rdy * trfactor
+		cs.ry = cs.ry - rdx * trfactor
 		
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
@@ -1731,11 +1766,11 @@ local function RotateCamera(x, y, dx, dy, smooth, lock, tilt)
 			-- SetLockSpot2(cs) --set lockspot to middle of screen
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then
-				local x,y,z = spGetUnitPosition( selUnits[1] )
-				if x then --set lockspot to the unit
-					ls_x,ls_y,ls_z = x,y,z
+				local ux, uy, uz = spGetUnitPosition( selUnits[1] )
+				if ux then --set lockspot to the unit
+					ls_x,ls_y,ls_z = ux,uy,uz
 					local px,py,pz = cs.px,cs.py,cs.pz
-					local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+					local dx,dy,dz = ux-px, uy-py, uz-pz
 					ls_onmap = true
 					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
 					ls_have = true
@@ -2574,6 +2609,7 @@ function widget:Initialize()
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
+		HotkeyChangeNotification() --TODO: change this to be triggered by the epicmenu camera hotkeys changing
 	end
 
 	WG.COFC_Enabled = true

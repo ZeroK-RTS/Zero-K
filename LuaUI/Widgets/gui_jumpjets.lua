@@ -147,8 +147,6 @@ local ignore = {
 local curve = ListToSet({CMD_MOVE, CMD_RAW_MOVE, CMD_JUMP, CMD_FIGHT})
 local line = ListToSet({CMD_ATTACK})
 
-local lastJump = {}
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -256,45 +254,6 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 			DrawArc(unitID, unitDefID, queue[i].params, queue[i].params[1], queue[i].params[2], queue[i].params[3], groundPos, range > dist, range, isEstimate, quality)
 		end
 	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function widget:CommandNotify(id, params, options)
-	if (id ~= CMD_JUMP) then
-		return
-	end
-	local units = spGetSelectedUnits()
-	for i=1,#units do
-		unitID = units[i]
-		local _, _, _, shift   = spGetModKeyState()
-		local queue = spGetCommandQueue(unitID, 0)
-		if queue and (queue == 0 or not shift) then
-			local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
-			lastJump[unitID] = {
-				pos   = {ux,uy,uz},
-				frame = spGetGameFrame(),
-			}
-		end
-	end
-end
-
-function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
-	if jumpDefs[unitDefID] then
-		local cmdID = Spring.GetUnitCurrentCommand(unitID, 2)
-		if cmdID == CMD_JUMP then
-			local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
-			lastJump[unitID] = {
-				pos = {ux,uy,uz},
-				frame = spGetGameFrame(),
-			}
-		end
-	end
-end
-
-function widget:UnitDestroyed(unitID)
-	lastJump[unitID] = nil
 end
 
 function widget:DrawWorld()

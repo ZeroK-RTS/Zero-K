@@ -13,7 +13,6 @@ end
 local GetGroundHeight = Spring.GetGroundHeight
 
 local nux = {}
-local defaultSuccessExplosion = [[LONDON_FLAT]]
 local defaultInterceptExplosion = [[ANTINUKE]]
 
 if (not gadgetHandler:IsSyncedCode()) then

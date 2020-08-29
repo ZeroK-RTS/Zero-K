@@ -88,7 +88,8 @@ return { vehcapture = {
       },
 
       damage                  = {
-        default = 11.1,
+        default = 22,
+        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -115,7 +116,6 @@ return { vehcapture = {
       thickness               = 4.2,
       tolerance               = 5000,
       turret                  = true,
-      waterweapon             = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },

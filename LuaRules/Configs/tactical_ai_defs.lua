@@ -108,6 +108,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"shieldbomb",
 	"chicken",
 	"chickena",
+	"chicken_leaper",
 	"chicken_tiamat",
 	"chicken_dragon",
 	"hoverdepthcharge",
@@ -129,6 +130,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 local shortToRiotRangeSkirmieeArray = NameToDefID({
 	"hoverraid",
 	"amphriot",
+	"amphimpulse",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
@@ -179,7 +181,6 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 local medRangeSkirmieeArray = NameToDefID({
 	"spiderriot",
 	"cloakassault",
-	"amphimpulse",
 	
 	"spiderassault",
 	"vehriot",
@@ -204,6 +205,7 @@ end
 local longRangeSkirmieeArray = NameToDefID({
 	"cloakskirm",
 	"jumpskirm",
+	"jumpblackhole",
 	"amphfloater",
 	"hoverskirm", -- hover janus
 	"vehcapture",
@@ -295,13 +297,6 @@ local explodableFull = Union(
 	Union(diverExplodables,
 	medRangeExplodables
 )))
-
-for name, data in pairs(UnitDefNames) do -- avoid factory death explosions.
-	if string.match(name, "factory") or string.match(name, "hub") then
-		shortRangeExplodables[data.id] = true
-		medRangeExplodables[data.id] = true
-	end
-end
 
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
@@ -462,6 +457,7 @@ local behaviourDefaults = {
 local behaviourConfig = {
 	-- swarmers
 	["cloakbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -475,6 +471,7 @@ local behaviourConfig = {
 	},
 	
 	["shieldbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -488,6 +485,7 @@ local behaviourConfig = {
 	},
 	
 	["amphbomb"] = {
+		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -633,6 +631,7 @@ local behaviourConfig = {
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
+		velocityPrediction = 20,
 	},
 	
 	["hoverscout"] = {

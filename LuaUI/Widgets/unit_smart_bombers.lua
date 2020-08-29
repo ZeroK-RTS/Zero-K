@@ -37,6 +37,7 @@ local bomberDefIDs = {
 	[UnitDefNames["bomberriot"].id] = true,
 	[UnitDefNames["bomberdisarm"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
+	[UnitDefNames["bomberstrike"].id] = true,
 }
 
 --------------------------------------------------------------------------------

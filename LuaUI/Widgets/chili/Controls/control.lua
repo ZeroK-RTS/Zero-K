@@ -50,7 +50,7 @@ Control = Object:Inherit{
 
 	fixedRatio      = false,
 	tooltip         = nil, --// JUST TEXT
-	greedyHitText   = false, --// Enable to do hit test if the control has any mouse events.
+	greedyHitTest   = false, --// Enable to do hit test if the control has any mouse events.
 
 	font = {
 		font          = "FreeSansBold.otf",
@@ -78,7 +78,7 @@ Control = Object:Inherit{
 
 	drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
 
-	useRTT = false and ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+	useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
 	useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
 
 	OnResize        = {},
@@ -1321,6 +1321,11 @@ function Control:DrawForList()
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then
 		self:InvalidateSelf()
 	end
+	
+	if self.debugPosition then
+		Spring.Echo("DrawForList non-integer position")
+		self:TraceDebug({"name", "x", "y"})
+	end
 
 	if (self._tex_all and not self._inrtt) then
 		if WG.ChiliRedraw then
@@ -1381,7 +1386,7 @@ function Control:DrawForList()
 			local t = 1 - self.scrollPosY / contHeight
 			local u = s + clientWidth / contWidth
 			local v = t - clientHeight / contHeight
-			gl.TexRect(clientX, clientY, clientX + clientWidth, clientY + clientHeight, s, t, u, v)
+			gl.TexRect(0, 0, clientWidth, clientHeight, s, t, u, v)
 			gl.Texture(0, false)
 			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
 		elseif (self._children_dlist) then
@@ -1406,6 +1411,11 @@ function Control:Draw()
 		self:InvalidateSelf()
 	end
 
+	if self.debugPosition then
+		Spring.Echo("Draw non-integer position")
+		self:TraceDebug({"name", "x", "y"})
+	end
+	
 	if (self._tex_all) then
 		if WG.ChiliRedraw then
 			WG.ChiliRedraw.AddControl(self, "Draw_tex_all")
@@ -1522,7 +1532,7 @@ function Control:HitTest(x, y)
 		end
 	end
 
-	if (self.noClickThrough and not IsTweakMode()) or (self.greedyHitText and (
+	if (self.noClickThrough and not IsTweakMode()) or (self.greedyHitTest and (
 		(self.tooltip)
 		or (#self.OnMouseDown > 0)
 		or (#self.OnMouseUp > 0)

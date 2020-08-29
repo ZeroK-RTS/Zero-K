@@ -1,10 +1,11 @@
 return { factoryjump = {
   unitname                      = [[factoryjump]],
   name                          = [[Jumpbot Factory]],
-  description                   = [[Produces Jumpjet Equipped Robots, Builds at 10 m/s]],
+  description                   = [[Produces Jumpjet Equipped Robots]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
@@ -48,6 +49,7 @@ return { factoryjump = {
     selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[platejump]],
   },
 
   energyUse                     = 0,

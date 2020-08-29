@@ -19,6 +19,7 @@ return { turretriot = {
   customParams                  = {
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
+    aim_lookahead  = 100,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

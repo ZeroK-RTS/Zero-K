@@ -77,12 +77,14 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["gunshipassault"].id] = 1,
 	[UnitDefNames["cloaksnipe"].id] = 1,
 	[UnitDefNames["amphraid"].id] = 1,
+	[UnitDefNames["amphimpulse"].id] = 1,
 	[UnitDefNames["amphriot"].id] = 1,
 	[UnitDefNames["shieldaa"].id] = 1,
 	[UnitDefNames["vehsupport"].id] = 1,
 	[UnitDefNames["tankriot"].id] = 1, --HT's banisher
 	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
 	[UnitDefNames["bomberprec"].id] = 1,
+	[UnitDefNames["bomberstrike"].id] = 1,
 	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
 	[UnitDefNames["shiptorpraider"].id] = 1,
 	[UnitDefNames["shipskirm"].id] = 1,
@@ -128,7 +130,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Prevent Overkill", "Fire at anything"}
+	params 	= {0, "Fire at anything", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------

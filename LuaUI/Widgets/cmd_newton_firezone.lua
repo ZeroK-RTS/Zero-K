@@ -176,9 +176,6 @@ options = {
 --------------
 --VARIABLE----
 --------------
-local springPoints = {}			--[newtonGroupID] -> {points}
-springPoints[100] = {y = 100}
-springPoints[100] = nil
 local tempPoints = {}
 
 local groups = {count = 0, data = {}}

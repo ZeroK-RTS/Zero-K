@@ -34,6 +34,7 @@ return { chicken_leaper = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken_leaper.s3o]],
   power               = 100,
+  reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

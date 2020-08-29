@@ -55,7 +55,7 @@ local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ":
 local Chili
 local screen0
 
-local screenWidth, screenHeight = Spring.GetWindowGeometry()
+local screenWidth, screenHeight = Spring.GetViewGeometry()
 
 local tooltipWindow
 local selectionWindow
@@ -2500,7 +2500,7 @@ function widget:Initialize()
 	end
 	
 	selectionWindow = GetSelectionWindow()
-	tooltipWindow = GetTooltipWindow()
+	tooltipWindow = (WG.Modding_TooltipOverride and WG.Modding_TooltipOverride()) or GetTooltipWindow()
 	InitializeWindParameters()
 end
 

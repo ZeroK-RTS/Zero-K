@@ -277,7 +277,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
 			end
 			--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
 		else
-			screwyWaypointUnits.Add(unitID, {})
+			IterableMap.Add(screwyWaypointUnits, unitID, {})
 		end
 	end
 end
@@ -285,7 +285,7 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
 	createdFrame[unitID] = nil
-	screwyWaypointUnits.Remove(unitID)
+	IterableMap.Remove(screwyWaypointUnits, unitID)
 	--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
 
@@ -308,7 +308,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		if gr ~= nil then
 			SetUnitGroup(unitID, gr)
 		end
-		screwyWaypointUnits.Remove(unitID)
+		IterableMap.Remove(screwyWaypointUnits, unitID)
 	end
 	createdFrame[unitID] = nil
 	finiGroup[unitID] = nil
@@ -321,7 +321,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 			SetUnitGroup(unitID, gr)
 			--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
-		screwyWaypointUnits.Remove(unitID)
+		IterableMap.Remove(screwyWaypointUnits, unitID)
 		finiGroup[unitID] = nil
 	end
 end
@@ -454,18 +454,22 @@ local function UnstickUpdate(unitID, unitData)
 	if not Spring.ValidUnitID(unitID) then
 		return true
 	end
-	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, cmdOpts, cmdTag = Spring.GetUnitCurrentCommand(unitID)
 	if not cmdID then
 		widget:UnitIdle(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		return true
 	end
 	if cmdID == CMD.FIGHT then
+		local queueSize = Spring.GetCommandQueue(unitID, 0)
+		if queueSize and queueSize > 1 then
+			return
+		end
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		if not unitData.x then
 			unitData.x, unitData.y, unitData.z = x, y, z
 			return
 		end
-		if math.abs(x - unitData.x) < 64 and math.abs(z - unitData.z) < 64 then
+		if math.abs(x - unitData.x) < 32 and math.abs(z - unitData.z) < 32 then
 			Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 			return true
 		end
@@ -475,7 +479,7 @@ end
 
 function widget:GameFrame(n)
 	if n%113 == 7 then
-		screwyWaypointUnits.Apply(UnstickUpdate)
+		IterableMap.Apply(screwyWaypointUnits, UnstickUpdate)
 	end
 end
 

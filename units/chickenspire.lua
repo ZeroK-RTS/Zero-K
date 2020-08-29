@@ -41,6 +41,7 @@ return { chickenspire = {
   objectName                    = [[spire.s3o]],
   onoffable                     = true,
   power                         = 2500,
+  reclaimable                   = false,
   selfDestructAs                = [[NOWEAPON]],
   script                        = [[chickenspire.lua]],
 

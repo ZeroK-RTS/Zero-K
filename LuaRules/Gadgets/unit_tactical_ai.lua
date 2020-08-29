@@ -612,7 +612,7 @@ local function updateUnits(frame, start, increment)
 					if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
 						enemy = (spGetUnitNearestEnemy(unitID,behaviour.searchRange,true) or false)
 					end
-					--GG.UnitEcho(enemy)
+					--Spring.Utilities.UnitEcho(enemy)
 					--Spring.Echo("enemy spotted 2")
 					-- don't get info on out of los units
 					--Spring.Echo("enemy in los")

@@ -1,7 +1,7 @@
 return { staticcon = {
   unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
-  description                   = [[Construction Assistant, Builds at 10 m/s]],
+  description                   = [[Construction Assistant]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostMetal                = 180,
@@ -23,11 +23,11 @@ return { staticcon = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-
-    aimposoffset   = [[0 18 0]],
-    midposoffset   = [[0 -4 0]],
-    modelradius    = [[24]],
-    default_spacing = 1,
+    aimposoffset     = [[0 18 0]],
+    midposoffset     = [[0 -4 0]],
+    modelradius      = [[24]],
+    default_spacing  = 1,
+    like_structure   = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],

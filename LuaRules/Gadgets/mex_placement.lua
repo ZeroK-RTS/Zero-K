@@ -151,7 +151,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 				spotByID[unitID] = spotID
 				spotData[spotID] = {unitID = unitID}
 				Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotID].metal, inlosTrueTable)
-				--GG.UnitEcho(unitID,spotID)
+				--Spring.Utilities.UnitEcho(unitID,spotID)
 			else
 		        local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
 				if spotData[spotindex] == nil and dist < MEX_DISTANCE then

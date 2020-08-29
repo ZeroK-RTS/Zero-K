@@ -20,7 +20,6 @@ end
 
 local spSpawnCEG = Spring.SpawnCEG;
 local spGetFeaturePosition     = Spring.GetFeaturePosition;
-local spGetFeatureResources    = Spring.GetFeatureResources;
 local spGetFeatureRadius       = Spring.GetFeatureRadius;
 
 local CEG_SPAWN = [[feature_poof_spawner]];

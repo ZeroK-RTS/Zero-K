@@ -37,6 +37,7 @@ return { chicken_listener_b = {
   objectName          = [[chicken_listener_b.s3o]],
   onoffable           = true,
   power               = 300,
+  reclaimable         = false,
   seismicDistance     = 2350,
   selfDestructAs      = [[SMALL_UNITEX]],
 

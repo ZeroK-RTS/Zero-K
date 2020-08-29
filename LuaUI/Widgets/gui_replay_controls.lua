@@ -118,7 +118,7 @@ end
 
 function CreateTheUI()
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local windowY = math.floor(screenWidth*2/11 + 32)
 	

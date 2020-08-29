@@ -89,7 +89,10 @@ options = {
 	structure_holdMouse = {
 		name = "Terraform by holding mouse click",
 		type = "bool",
-		value = false,
+		value = false, --[[ disabled by default because it is easy to accidentally enable this UI;
+		                    having your mouse anchored to a spot on your screen because you click
+		                    and hold for too long (likely to happen if you want to line build, or
+		                    are considering options) is really bad if you don't know what is coming ]]
 		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
 	},
 	structure_altSelect = {

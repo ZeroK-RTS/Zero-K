@@ -19,7 +19,6 @@ function gadget:GetInfo()
   }
 end
 
-local spGetUnitDefID = Spring.GetUnitDefID
 local spGetGameFrame = Spring.GetGameFrame
 local spSetUnitBlocking = Spring.SetUnitBlocking
 local spGetUnitIsDead = Spring.GetUnitIsDead

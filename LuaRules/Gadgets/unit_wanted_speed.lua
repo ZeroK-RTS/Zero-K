@@ -27,8 +27,15 @@ local wantedCommand = {
 	[CMD_WANTED_SPEED] = true,
 }
 
-local getMovetype = Spring.Utilities.getMovetype
 local units = {}
+
+local moveTypeByDefID = {}
+do
+	local getMovetype = Spring.Utilities.getMovetype
+	for i = 1, #UnitDefs do
+		moveTypeByDefID[i] = getMovetype(UnitDefs[i])
+	end
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -41,8 +48,7 @@ local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed, forceUpdate)
 		if not (forceUpdate or wantedSpeed) then
 			return
 		end
-		local ud = UnitDefs[unitDefID]
-		local moveType = getMovetype(ud)
+		local moveType = moveTypeByDefID[unitDefID]
 		units[unitID] = {
 			unhandled = (moveType ~= 1) and (moveType ~= 2), -- Planes are unhandled.
 			moveType = moveType,

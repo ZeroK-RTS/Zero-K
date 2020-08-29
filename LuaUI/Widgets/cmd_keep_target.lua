@@ -97,8 +97,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		for i = 1, #units do
 			local unitID = units[i]
 			if isValidUnit(unitID) then
-				local cmdID, cmdOpts, _, cmdParam1, cmdParam2 = Spring.GetUnitCurrentCommand(unitID)
-				if cmdID == CMD.ATTACK and not cmdParam2 and (cmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) then
+				local currCmdID, cmdOpts, _, cmdParam1, cmdParam2 = Spring.GetUnitCurrentCommand(unitID)
+				if currCmdID == CMD.ATTACK and not cmdParam2 and (cmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) then
 					orderParamTable[1] = cmdParam1
 					Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 				end
@@ -124,8 +124,8 @@ end
 function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOpts)
 	if TargetKeepingCommand[cmdID] and options.keepTarget.value then
 		if isValidUnit(unitID) then
-			local cmdID, cmdOpts, _, cmdParam1, cmdParam2 = Spring.GetUnitCurrentCommand(unitID)
-			if cmdID == CMD.ATTACK and not cmdParam2 and (cmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) then
+			local currCmdID, currCmdOpts, _, cmdParam1, cmdParam2 = Spring.GetUnitCurrentCommand(unitID)
+			if currCmdID == CMD.ATTACK and not cmdParam2 and (currCmdOpts % (2*CMD_OPT_INTERNAL) < CMD_OPT_INTERNAL) then
 				orderParamTable[1] = cmdParam1
 				Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, orderParamTable, CMD_OPT_INTERNAL)
 			end

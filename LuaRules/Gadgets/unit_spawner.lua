@@ -315,10 +315,12 @@ end
 
 local function KillOldChicken()
 	local now = spGetGameSeconds()
-	for unitID, birthDate in pairs(data.chickenBirths) do
-		local age = now - birthDate
-		if (age > maxAge + random(10)) then
-			Spring.DestroyUnit(unitID)
+	if data.chickenBirths then
+		for unitID, birthDate in pairs(data.chickenBirths) do
+			local age = now - birthDate
+			if (age > maxAge + random(10)) then
+				Spring.DestroyUnit(unitID)
+			end
 		end
 	end
 end
