@@ -26,6 +26,7 @@ local HANDLER_DIR = 'LuaGadgets/'
 local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
 local SCRIPT_DIR = Script.GetName() .. '/'
 
+local ECHO_DESCRIPTIONS = false
 
 local VFSMODE = VFS.ZIP_ONLY
 if (Spring.IsDevLuaEnabled()) then
@@ -293,6 +294,10 @@ function gadgetHandler:Initialize()
 --    Spring.Echo('gf1 = ' .. gf) -- FIXME
 --  end
 
+  if ECHO_DESCRIPTIONS then
+    Spring.Echo("=== Start Gadgets ===")
+  end
+
   -- stuff the gadgets into unsortedGadgets
   for k,gf in ipairs(gadgetFiles) do
 --    Spring.Echo('gf2 = ' .. gf) -- FIXME
@@ -300,6 +305,10 @@ function gadgetHandler:Initialize()
     if (gadget) then
       table.insert(unsortedGadgets, gadget)
     end
+  end
+
+  if ECHO_DESCRIPTIONS then
+    Spring.Echo("=== End Gadgets ===")
   end
 
   -- sort the gadgets
@@ -416,6 +425,10 @@ function gadgetHandler:LoadGadget(filename)
     self.orderList[name] = 0
     self.knownGadgets[name].active = false
     return nil
+  end
+
+  if info and ECHO_DESCRIPTIONS then
+    Spring.Echo(filename, info.name, info.desc)
   end
 
   return gadget
