@@ -73,7 +73,7 @@ return { plateshield = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = Shared.FACTORY_BUILDPOWER,
-  yardMap                       = [[oooooo oooooo oooooo yyyyyy yyyyyy yyyyyy yyyyyy]],
+  yardMap                       = [[ooooo ooooo ooooo yyyyy yyyyy yyyyy yyyyy]],
 
   featureDefs                   = {
 
