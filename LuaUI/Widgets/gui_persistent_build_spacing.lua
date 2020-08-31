@@ -103,10 +103,12 @@ local function UpdateOptionsDisplay(options_path)
     end
     -- refreshing menu if it's active
     for _,v in pairs(WG.Chili.Screen0.children) do
-        if 	type(v)=='table' and v.classname=="main_window_tall" then
-            if v.caption==options_path then
-                WG.crude.OpenPath(options_path)
-            end
+        if  type(v)     == 'table'
+        and v.classname == "main_window_tall"
+        and v.caption   == options_path
+        then
+            WG.crude.OpenPath(options_path)
+            break
         end
     end
 end
@@ -131,7 +133,7 @@ options = {
         type            = 'label',
         path            = hotkeys_path
     },
-  hotkey_inc = {
+    hotkey_inc = {
         name            = 'Increase Build Spacing',
         type            = 'button',
         desc            = 'Increase the spacing between structures queued in a line or rectangle. Hold Shift to queue a line of structures. Add Alt to queue a rectangle. Add Ctrl to queue a hollow rectangle.',
@@ -305,7 +307,7 @@ options = {
 
 -- for drawing later...
 local function IdentifyPlacement(PID,facing)
-    local ud = UnitDefs[PID]
+    local ud = UnitDefs[-PID]
     local offFacing = facing==1 or facing==3
     local sx = ud.xsize*8 
     local sz = ud.zsize*8 
@@ -322,29 +324,29 @@ local function toValidPlacement(x,z,oddx,oddz)
     z = floor((z + 8 - oddz)/16)*16 + oddz
     return x,z
 end
-local function DrawFlatRect(rect,y)
-    local x,z,sx,sz = unpack(rect)
-    local sx,sz= sx/2,sz/2
+local function makeCorners(x,z,sx,sz)
+    local y = spGetGroundHeight(x,z)
     local c1= {x-sx, y, z-sz}
     local c2= {x-sx, y, z+sz}
     local c3= {x+sx, y, z+sz}
     local c4= {x+sx, y, z-sz}
-    local cornersdraw={c1,c2,c2,c3,c3,c4,c4,c1}
-    for i,corner in ipairs(cornersdraw) do
+    return {c1,c2,c2,c3,c3,c4,c4,c1}
+end
+local function DrawCorners(cornersDraw)
+    for i,corner in ipairs(cornersDraw) do
         glVertex(unpack(corner))
     end
 end
 --
 -- Callins
 function widget:KeyPress(key)
-    if cmdID and cmdID<0 then
+
+    if cmdID then
         local change = key==spacingIncrease and 1 or key==spacingDecrease and -1
         if change then 
             spacing=spacing+change
             spacing=spacing>0 and spacing or 0
-            time=0
             newspacing=true
-            buildStarted=false
             if preGame then
                 spSetBuildSpacing(spacing)-- action is recognized but still doesnt work, so we do change spacing directly
                 return true -- make it override construction tab hotkey in pregame as it would do in game
@@ -353,19 +355,15 @@ function widget:KeyPress(key)
     end
 end
 
-function widget:MouseWheel(up,value)
-    local shift = select(4,spGetModKeyState())
-    if wheelSpacing and shift and cmdID then
+function widget:MouseWheel(_,value)
+    if cmdID and  wheelSpacing and select(4,spGetModKeyState()) then
         spacing = spacing + reverseWheel*value
         spacing = spacing>0 and spacing or 0
         spSetBuildSpacing(spacing)
-        time=0
         newspacing = true
-        buildStarted = false
-        return true -- blocking the zooming
+        return true -- blocking the zoom
     end
 end
-
 function widget:Update(dt)
     if requestUpdate then
         UpdateOptionsDisplay(requestUpdate)
@@ -373,26 +371,36 @@ function widget:Update(dt)
     end
     
     cmdID = select(2,spGetActiveCommand())
-    if not cmdID or cmdID>=0 then
-        time=0
+    cmdID = cmdID and cmdID<0 and -cmdID
+    if not cmdID then
         draw=false
         buildStarted=nil
         return
     end
-    
+    if buildStarted==nil then
+        buildStarted='new'
+        time=0
+    end
+    if newspacing then
+        buildStarted=false
+        time=0
+        buildSpacing[cmdID] = spacing
+    end
+
+
     if preGame then preGame=spGetGameSeconds()<0.1 end    
     
-    if buildStarted==nil then buildStarted=true end
-    
     if cmdID ~= lastCmdID then
-        spacing=buildSpacing[-cmdID] or tonumber(UnitDefs[-cmdID].customParams.default_spacing) or defaultSpacing
+        spacing=buildSpacing[cmdID] or tonumber(UnitDefs[cmdID].customParams.default_spacing) or defaultSpacing
         spSetBuildSpacing(spacing)
         lastCmdID = cmdID
         identified=false
         time=0
     end
-    if newspacing then buildSpacing[-cmdID] = spacing end
-    
+
+
+
+   
     -- Drawing set up
     draw, drawRects, drawValue = true,true,true
     
@@ -402,6 +410,7 @@ function widget:Update(dt)
         then
         drawRects=false
     end
+
     if not showSpacingValue
         or time>showValueTime
         or showValueOnChange and buildStarted
@@ -425,28 +434,32 @@ function widget:Update(dt)
     
     local pos = select(2,spTraceScreenRay(mx, my, true, false, false, p.floatOnWater))
     if not pos then draw=false return end
-    
+
     local nx,nz = toValidPlacement(pos[1],pos[3],p.oddx,p.oddz)
-    if x==nx and z==nz and not(newspacing or buildStarted) then return end -- only recalculate rectangles when needed
-    
+    if x==nx and z==nz and not (newspacing or buildStarted=='new') then  return end -- only recalculate when needed
+    if buildStarted=='new' then buildStarted=true end
     newspacing = false
     x,z=nx,nz
     
-    y = spGetGroundHeight(x,z)
-    local count=0
-    local sx,sz = p.sx,p.sz
-    for offx=-1,1 do
-        for offz=-1,1 do
-            if not(offx==0 and offz==0) then -- skipping the middle one
-                if not only2Rects or offz==0 then
-                    count=count+1
-                    spacedRects[count]={ x + offx*(spacing*16 + sx), z + offz*(spacing*16 + sz), sx, sz}
+    if drawValue then y = spGetGroundHeight(x,z) end
+    if drawRects then    
+        local count=0
+        local sx, sz = p.sx, p.sz
+        local realspacing = spacing*16
+        for offx=-1,1 do
+            for offz=-1,1 do
+                if not(offx==0 and offz==0) then -- skipping the middle one
+                    if not only2Rects or offz==0 then
+                        count=count+1
+                        spacedRects[count]=makeCorners ( x + offx*(realspacing + sx), -- prepare corners directly here instead of recalculating them in DrawWorld
+                                                         z + offz*(realspacing + sz),
+                                                        sx/2, sz/2  )
+                    end
                 end
             end
         end
     end
     if not dwOn then widgetHandler:UpdateCallIn("DrawWorld") end
-    --
 end
 
 
@@ -459,15 +472,14 @@ function widget:DrawWorld()
         if time<(showRectsTime-1) then
             alpha = 0.6
         else
-            local ftime = time-(showRectsTime-1)
-            alpha = 0.6/(ftime+1)^ftime -- fading out in the last second
+            local ftime = time-(showRectsTime-1) -- make the last second 0... to 1
+            alpha = 0.6/(ftime+1)^ftime -- fading out in that last second
         end
         glLineWidth(1.5)
         glColor(0.5, 1, 0.5, alpha)
         glLineStipple(true)
         for _,rect in ipairs(spacedRects) do
-            local y = spGetGroundHeight(rect[1],rect[2])
-            glBeginEnd(GL_LINES, DrawFlatRect, rect, y)
+            glBeginEnd(GL_LINES, DrawCorners, rect)
         end
         glLineWidth(1)
         glLineStipple(false)
