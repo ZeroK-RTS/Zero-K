@@ -19,6 +19,7 @@ return { hoverheavyraid = {
   customParams        = {
     modelradius       = [[25]],
     selection_scale   = 0.85,
+    aim_lookahead     = 120,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -77,10 +78,9 @@ return { hoverheavyraid = {
   
       customParams            = {
         timeslow_damagefactor = 2,
-        
-        light_camera_height = 2000,
-        light_color = [[0.85 0.33 1]],
-        light_radius = 120,
+        light_camera_height   = 2000,
+        light_color           = [[0.85 0.33 1]],
+        light_radius          = 120,
       },
       
       damage                  = {

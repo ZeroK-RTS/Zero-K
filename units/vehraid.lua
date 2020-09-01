@@ -20,7 +20,8 @@ return { vehraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[10]],
+    modelradius        = [[10]],
+    aim_lookahead      = 160,
   },
 
   explodeAs              = [[BIG_UNITEX]],

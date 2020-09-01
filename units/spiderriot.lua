@@ -16,7 +16,8 @@ return { spiderriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aimposoffset   = [[0 10 0]],
+    aimposoffset       = [[0 10 0]],
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[BIG_UNITEX]],

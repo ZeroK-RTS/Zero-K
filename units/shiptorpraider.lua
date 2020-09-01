@@ -18,8 +18,9 @@ return { shiptorpraider = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[14]],
-    turnatfullspeed = [[1]],
+    modelradius        = [[14]],
+    turnatfullspeed    = [[1]],
+    aim_lookahead      = 80,
   },
 
 
@@ -74,9 +75,9 @@ return { shiptorpraider = {
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
 
-            customParams = {
-                burst = Shared.BURST_RELIABLE,
-            },
+      customParams = {
+          burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
 

@@ -25,7 +25,7 @@ return { tankraid = {
     modelradius       = [[20]],
     aimposoffset      = [[0 5 0]],
     selection_scale   = 0.85,
-    aim_lookahead     = 200,
+    aim_lookahead     = 180,
   },
 
   explodeAs           = [[BIG_UNITEX]],

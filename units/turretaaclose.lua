@@ -16,6 +16,7 @@ return { turretaaclose = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    aim_lookahead      = 120,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],

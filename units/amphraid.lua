@@ -17,8 +17,9 @@ return { amphraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 5,
+    amph_regen        = 5,
     amph_submerged_at = 40,
+    aim_lookahead     = 80,
   },
 
   explodeAs              = [[BIG_UNITEX]],
