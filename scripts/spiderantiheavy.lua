@@ -154,7 +154,21 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) or false
+	if (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) then
+		return true
+	end
+	if targetID and not Spring.MoveCtrl.GetTag(targetID) then
+		local bx, by, bz = Spring.GetUnitPosition(targetID)
+		if bx then
+			local height = Spring.GetGroundHeight(bx, bz)
+			if math.abs(height - by) < 0.01 then
+				Spring.SetUnitPosition(targetID, bx, bz)
+			elseif by < 0.1 and by > -0.01 then
+				Spring.SetUnitPosition(targetID, bx, bz, true)
+			end
+		end
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)
