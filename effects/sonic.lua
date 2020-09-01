@@ -11,7 +11,6 @@ local fx = {
       ttl                = 12,
       unit               = true,
       water              = true,
-      underwater         = true,
       color = {
         [1]  = 0,
         [2]  = 0.55,
