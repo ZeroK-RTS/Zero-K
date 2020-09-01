@@ -364,6 +364,7 @@ function widget:MouseWheel(_,value)
         return true -- blocking the zoom
     end
 end
+
 function widget:Update(dt)
     if requestUpdate then
         UpdateOptionsDisplay(requestUpdate)
@@ -384,23 +385,22 @@ function widget:Update(dt)
     if newspacing then
         buildStarted=false
         time=0
-        buildSpacing[cmdID] = spacing
+
     end
 
 
     if preGame then preGame=spGetGameSeconds()<0.1 end    
     
     if cmdID ~= lastCmdID then
-        spacing=buildSpacing[cmdID] or tonumber(UnitDefs[cmdID].customParams.default_spacing) or defaultSpacing
+        spacing = buildSpacing[cmdID] or tonumber(UnitDefs[cmdID].customParams.default_spacing) or defaultSpacing
         spSetBuildSpacing(spacing)
         lastCmdID = cmdID
         identified=false
         time=0
     end
-
-
-
-   
+    spacing=spGetBuildSpacing() -- changed mind, if another widget wants to change the spacing, we have to know it
+    buildSpacing[cmdID]=spacing
+ 
     -- Drawing set up
     draw, drawRects, drawValue = true,true,true
     
