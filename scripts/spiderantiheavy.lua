@@ -157,6 +157,10 @@ function script.BlockShot(num, targetID)
 	if (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) then
 		return true
 	end
+
+	-- Hax to refresh the target's quadfield presence, since otherwise
+	-- the lightning bolt can fail to connect due to stale quad cache.
+	-- See https://springrts.com/mantis/view.php?id=6421
 	if targetID and not Spring.MoveCtrl.GetTag(targetID) then
 		local bx, by, bz = Spring.GetUnitPosition(targetID)
 		if bx then
@@ -168,6 +172,7 @@ function script.BlockShot(num, targetID)
 			end
 		end
 	end
+
 	return false
 end
 
