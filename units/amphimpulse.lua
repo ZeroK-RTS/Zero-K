@@ -44,7 +44,7 @@ return { amphimpulse = {
 
   sfxtypes               = {
     explosiongenerators = {
-      [[custom:watercannon_muzzle]],
+      [[custom:sonicfire]],
     },
   },
 

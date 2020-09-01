@@ -394,7 +394,9 @@ end
 
 function script.Shot(num)
 	GG.Floating_AimWeapon(unitID)
+	Move(firepoints[gun_1], z_axis, 4)
 	EmitSfx(firepoints[gun_1], 1024)
+	Move(firepoints[gun_1], z_axis, 0)
 end
 
 -- EndBurst so that the projectile fires from the correct gun
