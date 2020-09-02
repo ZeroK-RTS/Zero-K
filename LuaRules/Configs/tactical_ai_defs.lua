@@ -245,6 +245,7 @@ local slasherSkirmieeArray = NameToDefID({
 	"vehassault",
 	"vehriot",
 	"hoverriot",
+	"hoverskirm",
 	"tankriot",
 	"shieldfelon",
 	"tankassault",
