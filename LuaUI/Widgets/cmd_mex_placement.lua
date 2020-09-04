@@ -624,8 +624,14 @@ function widget:Initialize()
 end
 
 local firstUpdate = true
-function widget:Update()
+local cumDt = 0
+local camDir
+local debounceCamUpdate
+local incomeLabelList
+local DrawIncomeLabels
+function widget:Update(dt)
 	widget:Initialize()
+	cumDt = cumDt + dt
 	
 	if firstUpdate then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
@@ -647,6 +653,25 @@ function widget:Update()
 			if unitDefID == mexDefID then
 				widget:UnitCreated(unitID, unitDefID, teamID)
 			end
+		end
+	end
+
+	if debounceCamUpdate then
+		debounceCamUpdate = debounceCamUpdate - dt
+		if debounceCamUpdate < 0 then
+			debounceCamUpdate = nil
+		end
+	else
+		local cx, cy, cz = Spring.GetCameraDirection()
+		local newCamDir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
+		if newCamDir ~= camDir then
+			camDir = newCamDir
+			gl.DeleteList(incomeLabelList)
+			incomeLabelList = glCreateList(DrawIncomeLabels)
+			debounceCamUpdate = .1
+		else
+			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
+			debounceCamUpdate = 1
 		end
 	end
 
@@ -686,7 +711,7 @@ local function getSpotColor(id)
 	return Spring.GetTeamColor(teamID)
 end
 
-function calcMainMexDrawList()
+local function calcMainMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -718,7 +743,7 @@ function calcMainMexDrawList()
 	glColor(1,1,1,1)
 end
 
-function calcMinimapMexDrawList()
+local function calcMinimapMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -747,13 +772,10 @@ function calcMinimapMexDrawList()
 	glColor(1,1,1,1)
 end
 
-local function DrawIncomeLabels()
+DrawIncomeLabels = function()
 	glTexture("LuaUI/Images/ibeam.png")
 	glDepthTest(false)
 	glColor(1,1,1)
-
-	local cx, cy, cz = Spring.GetCameraDirection()
-	local dir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
 
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
@@ -763,7 +785,7 @@ local function DrawIncomeLabels()
 		glPushMatrix()
 		glTranslate(x,y+5,z)
 		glRotate(90,1,0,0)
-		glRotate(-dir, 0, 0, 1)
+		glRotate(-camDir, 0, 0, 1)
 
 		if options.drawicons.value then
 			local metal = spot.metal
@@ -799,7 +821,7 @@ local function DrawIncomeLabels()
 
 			glTranslate(x, y, z)
 			glRotate(-90, 1, 0, 0)
-			glRotate(dir, 0, 0, 1)
+			glRotate(camDir, 0, 0, 1)
 			glTranslate(0, -40 - options.size.value, 0)
 			glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 
@@ -836,6 +858,10 @@ function widget:Shutdown()
 		gl.DeleteList(minimapDrawList)
 	end
 	minimapDrawList = nil
+	if incomeLabelList then
+		gl.DeleteList(incomeLabelList)
+	end
+	incomeLabelList = nil
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -860,7 +886,7 @@ function widget:DrawWorldPreUnit()
 		gl.DepthMask(true)
 
 		if drawMexSpots then
-			DrawIncomeLabels() -- ideally this would also be a call list but I don't know how to do rotation that way. Each mex its own call list I guess?
+			glCallList(incomeLabelList)
 		end
 		glCallList(circleOnlyMexDrawList)
 
