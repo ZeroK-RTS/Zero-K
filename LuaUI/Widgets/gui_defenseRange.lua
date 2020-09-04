@@ -320,6 +320,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local defNeedingLosChecks = {}
+local defNeedingBuildingChecks = {}
+
+local function RemoveUnit(unitID)
+	defNeedingLosChecks[unitID] = nil
+	defNeedingBuildingChecks[unitID] = nil
+	local def = defences[unitID]
+	if not def then return end
+	if def.drawList then
+		glDeleteList(def.drawList)
+	end
+	defences[unitID] = nil
+end
+
 local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 	if not unitDefID then
 		return
@@ -344,9 +358,7 @@ local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 		if not alwaysUpdate and not configData.colorInBuild or inBuild == defenceData.isBuild then
 			return
 		end
-		if defenceData.drawList then
-			glDeleteList(defenceData.drawList)
-		end
+		RemoveUnit(unitID)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
@@ -355,9 +367,11 @@ local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 		x = x, y = y, z = z,
 		inBuild = inBuild,
 		isAlly = isAlly,
-		checkCompleteness = (not isAlly) and inBuild and configData.colorInBuild and true,
 		unitDefID = unitDefID,
 	}
+	if (not isAlly) and inBuild and configData.colorInBuild then
+		defNeedingBuildingChecks[unitID] = true
+	end
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
@@ -418,13 +432,27 @@ function widget:UnitDestroyed(unitID)
 		return
 	end
 
-	glDeleteList(def.drawList)
-	defences[unitID] = nil
+	RemoveUnit(unitID)
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- if this is defence we knew about, we don't need to poll the position for los anymore
+		defNeedingLosChecks[unitID] = nil
+	end
 	UnitDetected(unitID, Spring.GetUnitDefID(unitID), false)
+end
+
+function widget:UnitLeftLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- slow poll this defence's position to see if the position entered los, but the unit didn't, meaning it was destroyed out of los
+		defNeedingLosChecks[unitID] = true
+		-- we invoke UnitDetected on UnitEnteredLos anyway, and if it is still incomplete then, it'll be re-added to defNeedingBuildingChecks
+		defNeedingBuildingChecks[unitID] = nil
+	end
 end
 
 local function RedrawDrawRanges()
@@ -453,8 +481,7 @@ end
 
 local function DoFullUnitReload()
 	for unitID,def in pairs(defences) do
-		glDeleteList(def.drawList)
-		defences[unitID] = nil
+		RemoveUnit(unitID)
 	end
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local units = Spring.GetAllUnits()
@@ -465,37 +492,25 @@ local function DoFullUnitReload()
 	end
 end
 
-function widget:UnitEnteredRadar(unitID, unitTeam)
-	local def = defences[unitID]
-	if def then
-		def.checklos = nil
-	end
-end
-
-function widget:UnitLeftRadar(unitID, unitTeam)
-	local def = defences[unitID]
-	if def then
-		def.checklos = true
-	end
-end
-
 function widget:GameFrame(n)
 	if (n % 30) ~= 0 then
 		return
 	end
 
-	for unitID, def in pairs(defences) do
+	for unitID in pairs(defNeedingBuildingChecks) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID then
-			if def.checkCompleteness then
-				-- Not allied because this check is only required for enemies.
-				-- Allied units are detected in UnitFinished.
-				UnitDetected(unitID, unitDefID, false)
+			UnitDetected(unitID, unitDefID, false)
+		end
+	end
+
+	for unitID in pairs(defNeedingLosChecks) do
+		if not spGetUnitDefID(unitID) then
+			local def = defences[unitID]
+			if select(2, spGetPositionLosState(def.x, def.y, def.z)) then
+				RemoveUnit(unitID)
+				needRedraw = needRedraw or REDRAW_TIME
 			end
-		elseif def.checklos and select(2, spGetPositionLosState(def.x, def.y, def.z)) then
-			glDeleteList(def.drawList)
-			defences[unitID] = nil
-			needRedraw = needRedraw or REDRAW_TIME
 		end
 	end
 end
