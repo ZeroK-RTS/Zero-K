@@ -20,12 +20,12 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	  canjump            = 1,
-    jump_range         = 1500,
-    jump_height        = 1000,
-    jump_speed         = 12,
+	canjump            = 1,
+    jump_range         = 3000,
+    jump_height        = 1500,
+    jump_speed         = 8,
     jump_delay         = 100,
-    jump_reload        = 40,
+    jump_reload        = 120,
     jump_from_midair   = 1,
     jump_rotate_midair = 1,		
     modelradius    = [[95]],
@@ -38,9 +38,9 @@ return { striderdetriment = {
   iconType               = [[krogoth]],
   leaveTracks            = true,
   losEmitHeight          = 100,
-  maxDamage              = 100000,
+  maxDamage              = 150000,
   maxSlope               = 37,
-  maxVelocity            = 1.2,
+  maxVelocity            = 1.6,
   maxWaterDepth          = 5000,
   minCloakDistance       = 150,
   movementClass          = [[AKBOT6]],  
@@ -54,7 +54,7 @@ return { striderdetriment = {
   selfDestructCountdown  = 10,
   sfxtypes            = {
     explosiongenerators = {
-      [[custom:sumosmoke]],
+      [[custom:dirtyfootstep]],
 	    [[custom:WARMUZZLE]],
       [[custom:emg_shells_l]],
 	    [[custom:extra_large_muzzle_flash_flame]],
@@ -77,23 +77,23 @@ return { striderdetriment = {
   weapons                = {
 
     {
-      def                = [[PLASMA]],
+      def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
     },	
 		
-	  {
-      def                = [[PLASMA]],
+	{
+      def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },	
 
     {
       def                = [[SNITCH_LAUNCHER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 	
-	  {
+	{
       def                = [[LANDING]],
       badTargetCategory  = [[]],
       mainDir            = [[1 0 0]],
@@ -101,59 +101,77 @@ return { striderdetriment = {
       onlyTargetCategory = [[]],
     },
 	
+	{
+      def                = [[FOOTCRATER]],
+      badTargetCategory  = [[]],
+      mainDir            = [[1 0 0]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[]],
+    },
+	
+	
+	
 	
   },
 
 
   weaponDefs             = {
   
-	PLASMA  = {
-      name                    = [[Heavy Plasma Impulse Cannon]],
-	    accuracy                = 2000,
-      areaOfEffect            = 384,
-      avoidFeature            = false,
-      burnBlow                = true,	  
-      craterBoost             = 1.5,
-      craterMult              = 4.2,
-
-      customParams            = {
-	    timeslow_damagefactor = 10,
-        light_color = [[2.2 1.6 0.9]],
-        light_radius = 550,
+	GAUSS         = {
+      name                    = [[Gauss Battery]],
+      alphaDecay              = 0.12,
+      areaOfEffect            = 16,
+      avoidfeature            = false,
+      bouncerebound           = 0.15,
+      bounceslip              = 1,
+      --burst                   = 3,
+      --burstrate               = 0.4,
+      cegTag                  = [[gauss_tag_h]],
+      craterBoost             = 0,
+      craterMult              = 0,
+      
+      customParams = {
+        single_hit_multi = true,
+        --reaim_time = 1,
       },
 
       damage                  = {
-        default = 800,
-        subs    = 800,
+        default = 500.1,        
       },
 
-      edgeEffectiveness       = 0.5,	  
-      explosionGenerator      = [[custom:flashbigbuilding]],
-	    explosionSpeed          = 500,	  
-      fireStarter             = 99,
-      fireTolerance		      = 8192,  
-	    impulseBoost            = 3000,
-      impulseFactor           = 0.4,
+      explosionGenerator      = [[custom:gauss_hit_h]],
+      groundbounce            = 1,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
+      noExplode               = true,
       noSelfDamage            = true,
-      proximityPriority       = 6,
-      range                   = 600,	  
-      reloadtime              = 1,    
-      soundHit                = [[weapon/cannon/cannon_hit4]],
-      soundHitVolume          = 15,
-      soundStart              = [[weapon/cannon/heavy_cannon2]],
-	    soundStartVolume        = 16,      
+      numbounce               = 40,
+      range                   = 600,
+      reloadtime              = 0.4,
+      rgbColor                = [[0.5 1 1]],
+      separation              = 0.5,
+      size                    = 2.0,
+      sizeDecay               = -0.1,
+      soundHit                = [[weapon/gauss_hit]],
+      soundStart              = [[weapon/gauss_fire]],
+      sprayangle              = 900,
+      stages                  = 32,
+	  fireTolerance		      = 8192,  
+      --tolerance               = 8192,
       turret                  = true,
+      waterweapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 1100,
-    },	
+      weaponVelocity          = 900,
+    },
 	
 	SNITCH_LAUNCHER = {
       name                    = [[Snitch Launcher]],
       areaOfEffect       	  = 384,     
       avoidFeature            = false,
       avoidFriendly           = false,
-      burst                   = 10,
+      burst                   = 12,
       burstrate               = 0.2,      
       commandFire             = true, 
       craterBoost             = 2,
@@ -181,11 +199,11 @@ return { striderdetriment = {
 	    myGravity               = 0.095,
       noSelfDamage            = true,         
       range                   = 1200,
-      reloadtime              = 30,      
+      reloadtime              = 60,      
       soundHit           	  = "explosion/mini_nuke",
       soundStart              = [[weapon/cannon/pillager_fire]],
       soundStartVolume        = 25,
-	    sprayAngle              = 1000, 
+	    sprayAngle              = 1500, 
       tolerance               = 512,
       turret                  = true,   
       weaponType              = [[Cannon]],
@@ -223,6 +241,37 @@ return { striderdetriment = {
         hidden = true
       }
     },	
+	
+	FOOTCRATER = {
+      name                    = [[Detriment walking]],
+      areaOfEffect            = 150,
+      canattackground         = false,
+      craterBoost             = 20,
+      craterMult              = 15,
+
+      damage                  = {
+        default = 200.1,        
+      },
+
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:dirtyfootstep]],
+      impulseBoost            = 0.5,
+      impulseFactor           = 1,
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      range                   = 5,
+      reloadtime              = 13,
+      soundHit                = [[weapon/cannon/reaper_hit]],
+      --soundStart              = [[ex_small12]],
+      soundHitVolume        = 3,
+      turret                  = false,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 5,
+
+      customParams            = {
+        hidden = true
+      }
+    },
   },
 
 

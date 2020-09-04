@@ -21,15 +21,16 @@ local gunFlares = {
 	{larmflare1, larmflare2, larmflare3},	
 	{rarmflare1, rarmflare2, rarmflare3},		
 	{shoulderflare},	
+	{lfoot},
 	{lfoot}
 }
 
 local barrelsL = {larmbarrel1, larmbarrel2, larmbarrel3}
 local barrelsR = {rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {larm, rarm, shoulderflare, lfoot}
+local aimpoints = {larm, rarm, shoulderflare, lfoot, lfoot}
 
-local gunIndex = {1,1,1,1}
-local gunFixEmit = {true, true, false, false}
+local gunIndex = {1,1,1,1,1}
+local gunFixEmit = {true, true, false, false, false}
 
 local gunFlareCount = {}
 for i = 1, #gunFlares do
@@ -104,6 +105,7 @@ local muzzle_smoke_large = 1028
 local jetfeet = 1029
 local jetfeet_fire = 1030
 local crater = 4099 --Weapon 4
+local footcrater = 4100 --Weapon 5
 
 
 local unitDefID = Spring.GetUnitDefID(unitID)
@@ -122,7 +124,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
 
-local function Step(frontLeg, backLeg)
+local function Step(frontLeg, backLeg, impactFoot)
 
 -- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -158,7 +160,8 @@ local function Step(frontLeg, backLeg)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
 	end
-
+	EmitSfx(impactFoot, dirtfling)
+	EmitSfx(impactFoot, footcrater)
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
 
@@ -174,8 +177,8 @@ local function Walk()
 	SetSignalMask(SIG_Walk)
 	
 	while (true) do
-		Step(leftLeg, rightLeg)
-		Step(rightLeg, leftLeg)
+		Step(leftLeg, rightLeg, lfoot)
+		Step(rightLeg, leftLeg, rfoot)
 	end
 end
 
@@ -217,11 +220,12 @@ local function BeginJumpThread()
 end
 
 local function EndJumpThread()
-	EmitSfx(lfoot, crater)	
+	EmitSfx(lfoot, crater)
+	EmitSfx(lfoot, dirtfling)	
 	Turn(torso, x_axis, -30, math.rad(500))
 	Turn(larm, x_axis,  math.rad(-60), math.rad(500))
 	Turn(rarm, x_axis,  math.rad(-60), math.rad(500))	
-	WaitForTurn(torso, x_axis)
+	WaitForTurn(torso, x_axis)	
 	WaitForTurn(larm, x_axis)
 	WaitForTurn(rarm, x_axis)
 	Sleep(200)
@@ -331,7 +335,7 @@ function script.Shot(num)
 		EmitSfx(larmflare3, muzzle_smoke_large2)		
 		Move(barrelsL[gunIndex[1]], z_axis, -40)		
 		EmitSfx(larmflare3, muzzle_flash_large)
-		Move(barrelsL[gunIndex[1]], z_axis, 0, 15)
+		Move(barrelsL[gunIndex[1]], z_axis, 0, 30)
 	end
 	
 	-- Plasma right
@@ -339,7 +343,7 @@ function script.Shot(num)
 		EmitSfx(rarmflare3, muzzle_smoke_large2)		
 		Move(barrelsR[gunIndex[2]], z_axis, -40)		
 		EmitSfx(rarmflare3, muzzle_flash_large)
-		Move(barrelsR[gunIndex[2]], z_axis, 0, 15)
+		Move(barrelsR[gunIndex[2]], z_axis, 0, 30)
 	end
 	
 	if gunFixEmit[num] then
