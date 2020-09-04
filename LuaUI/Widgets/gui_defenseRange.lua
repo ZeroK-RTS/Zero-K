@@ -320,7 +320,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function UnitDetected(unitID, unitDefID, isAlly)
+local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 	if not unitDefID then
 		return
 	end
@@ -341,8 +341,11 @@ local function UnitDetected(unitID, unitDefID, isAlly)
 
 	local defenceData = defences[unitID]
 	if defenceData then
-		if not configData.colorInBuild or inBuild == defenceData.isBuild then
+		if not alwaysUpdate and not configData.colorInBuild or inBuild == defenceData.isBuild then
 			return
+		end
+		if defenceData.drawList then
+			glDeleteList(defenceData.drawList)
 		end
 	end
 
@@ -448,6 +451,34 @@ function widget:Update(dt)
 	end
 end
 
+local function DoFullUnitReload()
+	for unitID,def in pairs(defences) do
+		glDeleteList(def.drawList)
+		defences[unitID] = nil
+	end
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam, true)
+	end
+end
+
+function widget:UnitEnteredRadar(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		def.checklos = nil
+	end
+end
+
+function widget:UnitLeftRadar(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		def.checklos = true
+	end
+end
+
 function widget:GameFrame(n)
 	if (n % 30) ~= 0 then
 		return
@@ -456,12 +487,12 @@ function widget:GameFrame(n)
 	for unitID, def in pairs(defences) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID then
-			if defences[unitID].checkCompleteness then
+			if def.checkCompleteness then
 				-- Not allied because this check is only required for enemies.
 				-- Allied units are detected in UnitFinished.
 				UnitDetected(unitID, unitDefID, false)
 			end
-		elseif select(2, spGetPositionLosState(def.x, def.y, def.z)) then
+		elseif def.checklos and select(2, spGetPositionLosState(def.x, def.y, def.z)) then
 			glDeleteList(def.drawList)
 			defences[unitID] = nil
 			needRedraw = needRedraw or REDRAW_TIME
@@ -469,12 +500,30 @@ function widget:GameFrame(n)
 	end
 end
 
+local myTeam = Spring.GetMyTeamID()
+local fullView = false
 function widget:PlayerChanged(playerID)
 	if myPlayerID ~= playerID then
 		return
 	end
 
-	local newSpectating = Spring.GetSpectatingState()
+	local newMyTeam = Spring.GetMyTeamID()
+	local newSpectating, newFullView = Spring.GetSpectatingState()
+	-- we can avoid a lot of expensive recalulation if we're only moving from spectating one team under fullview to another
+	if fullView ~= newFullView or (not fullView and myTeam ~= newMyTeam) then
+		if fullView then
+			widgetHandler:RemoveCallIn('GameFrame')
+			-- we now know everything, but callins for entering radar/los won't trigger in this transition.
+		else
+			widgetHandler:UpdateCallIn('GameFrame')
+			-- we don't know everything anymore, and callins for leaving radar/los won't trigger in this transition.
+		end
+		-- callins for units entering radar/los won't trigger during team/spectator change
+		-- so we could miss incomplete or completed units suddenly appearing in los, or fail to mark units suddenly leaving los/radar for loschecks.
+		DoFullUnitReload()
+		fullView = newFullView
+	end
+	myTeam = newMyTeam
 	if spectating ~= newSpectating then
 		spectating = newSpectating
 		needRedraw = needRedraw or REDRAW_TIME
@@ -585,15 +634,16 @@ local function SetupChiliStuff()
 end
 
 function widget:Initialize()
+	widget:PlayerChanged(Spring.GetMyPlayerID())
 	SetupChiliStuff()
 
 	RedoUnitList()
 
-	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
-		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
-		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam)
+	DoFullUnitReload()
+end
+
+function widget:Shutdown()
+	for unitID,def in pairs(defences) do
+		glDeleteList(def.drawList)
 	end
 end
