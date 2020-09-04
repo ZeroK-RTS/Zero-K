@@ -145,6 +145,10 @@ options = {
 	},
 }
 
+local centerX
+local centerZ
+local extraction = 0
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Mexes and builders
@@ -717,10 +721,6 @@ end
 ------------------------------------------------------------
 -- Drawing
 ------------------------------------------------------------
-
-local centerX
-local centerZ
-local extraction = 0
 
 local circleOnlyMexDrawList = 0
 local minimapDrawList = 0
