@@ -192,7 +192,7 @@ local myPlayerID = Spring.GetLocalPlayerID()
 
 local defences = {}
 local needRedraw = false
-local defenseRangeDrawList = false
+local defenseRangeDrawList
 
 -- Chili buttonry
 
@@ -328,9 +328,7 @@ local function RemoveUnit(unitID)
 	defNeedingBuildingChecks[unitID] = nil
 	local def = defences[unitID]
 	if not def then return end
-	if def.drawList then
-		glDeleteList(def.drawList)
-	end
+	glDeleteList(def.drawList)
 	defences[unitID] = nil
 end
 
@@ -351,7 +349,7 @@ local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 		return
 	end
 
-	local inBuild = select(3, Spring.GetUnitIsStunned(unitID))
+	local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
 
 	local defenceData = defences[unitID]
 	if defenceData then
@@ -470,9 +468,7 @@ function widget:Update(dt)
 	if needRedraw then
 		needRedraw = needRedraw - dt
 		if needRedraw < 0 then
-			if defenseRangeDrawList then
-				gl.DeleteList(defenseRangeDrawList)
-			end
+			glDeleteList(defenseRangeDrawList)
 			defenseRangeDrawList = glCreateList(RedrawDrawRanges)
 			needRedraw = false
 		end
@@ -504,10 +500,11 @@ function widget:GameFrame(n)
 		end
 	end
 
-	for unitID in pairs(defNeedingLosChecks) do
+	for unitID in pairs(defNeedingLosChecks) do -- TODO: rarely updated but constantly iterated, consider IndexableArray
 		if not spGetUnitDefID(unitID) then
 			local def = defences[unitID]
-			if select(2, spGetPositionLosState(def.x, def.y, def.z)) then
+			local _, inLos = spGetPositionLosState(def.x, def.y, def.z)
+			if inLos then
 				RemoveUnit(unitID)
 				needRedraw = needRedraw or REDRAW_TIME
 			end
@@ -661,4 +658,5 @@ function widget:Shutdown()
 	for unitID,def in pairs(defences) do
 		glDeleteList(def.drawList)
 	end
+	glDeleteList(defenseRangeDrawList)
 end
