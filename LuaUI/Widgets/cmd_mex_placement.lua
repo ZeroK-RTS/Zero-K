@@ -623,6 +623,27 @@ function widget:Initialize()
 	end
 end
 
+local wasFullView
+
+local function CheckNeedsRecalculating()
+	if not WG.metalSpots then
+		return false
+	end
+
+	local isSpectating, isFullView = spGetSpectatingState()
+
+	if wasSpectating ~= isSpectating then
+		wasSpectating = isSpectating
+		wasFullView = isFullView
+		return true
+	end
+	if isSpectating and isFullView ~= wasFullView then
+		wasFullView = isFullView
+		return true
+	end
+	return false
+end
+
 local firstUpdate = true
 local cumDt = 0
 local camDir
@@ -641,11 +662,9 @@ function widget:Update(dt)
 		firstUpdate = false
 	end
 
-	local isSpectating = spGetSpectatingState()
-	if WG.metalSpots and (wasSpectating ~= isSpectating) then
+	if CheckNeedsRecalculating() then
 		spotByID = {}
 		spotData = {}
-		wasSpectating = isSpectating
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
