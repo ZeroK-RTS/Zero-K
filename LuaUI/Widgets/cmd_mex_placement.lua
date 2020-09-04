@@ -876,27 +876,31 @@ function widget:DrawWorld()
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco or WG.showeco_always_mexes
-	local pregame = (spGetGameFrame() < 1)
-	local peruse = pregame or showecoMode or spGetMapDrawMode() == 'metal'
+	local isMexCmd = -mexDefID == cmdID
 
-
-	local mx, my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
 
 	mexSpotToDraw = false
 
-	if WG.metalSpots and pos and (-mexDefID == cmdID or ((pregame or WG.selectionEntirelyCons) and (peruse or CMD_AREA_MEX == cmdID))) then
+	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and (isMexCmd or (
+		-- peruse
+		(spGetGameFrame() < 1) or -- pregame
+		(WG.showeco or WG.showeco_always_mexes) or -- showecoMode
+		spGetMapDrawMode() == 'metal'
+	) or CMD_AREA_MEX == cmdID) then
+		local mx, my = spGetMouseState()
+		local _, pos = spTraceScreenRay(mx, my, true)
+
+		if not pos then return end
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
-		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
-		if -mexDefID ~= cmdID then
-			bx, by, bz = pos[1], pos[2], pos[3]
-		end
 
-		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
+		if closestSpot and (isMexCmd or distance <= 60) and IsSpotBuildable(index) then
+			local bface = Spring.GetBuildFacing()
+			if not isMexCmd then
+				bx, by, bz = pos[1], pos[2], pos[3]
+			end
 
 			mexSpotToDraw = closestSpot
 
@@ -922,10 +926,10 @@ function widget:DrawWorld()
 
 			gl.DepthTest(false)
 			gl.DepthMask(false)
+			gl.Color(1, 1, 1, 1)
 		end
 	end
 
-	gl.Color(1, 1, 1, 1)
 end
 
 function widget:DefaultCommand(type, id)
