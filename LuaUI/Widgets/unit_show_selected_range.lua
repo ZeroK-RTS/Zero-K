@@ -26,8 +26,11 @@ options = {
 		OnChange = function (self)
 			if self.value then
 				widgetHandler:UpdateCallIn("DrawWorldPreUnit")
+				widgetHandler:UpdateCallIn("SelectionChanged")
+				widget:SelectionChanged()
 			else
 				widgetHandler:RemoveCallIn("DrawWorldPreUnit")
+				widgetHandler:RemoveCallIn("SelectionChanged")
 			end
 		end,
 	},
@@ -93,6 +96,12 @@ local function DrawUnitsRanges(uDefID, uIDs)
 	end
 end
 
+local selUnits
+
+function widget:SelectionChanged(selectedUnits)
+	selUnits = spGetSelUnitsSorted()
+end
+
 function widget:DrawWorldPreUnit()
 	if spIsGUIHidden() then
 		return
@@ -100,7 +109,6 @@ function widget:DrawWorldPreUnit()
 
 	glLineWidth(1.5)
 
-	local selUnits = spGetSelUnitsSorted()
 	for uDefID, uIDs in pairs(selUnits) do
 		if commDefIDs[uDefID] then -- Dynamic comm have different ranges and different weapons activated
 			DrawComRanges(uDefID, uIDs)
@@ -115,4 +123,5 @@ end
 
 function widget:Initialize()
 	widgetHandler:RemoveCallIn("DrawWorldPreUnit")
+	widgetHandler:RemoveCallIn("SelectionChanged")
 end
