@@ -163,6 +163,8 @@ local flexCallIns = {
   'WorldTooltip',
   'MapDrawCmd',
   'DefaultCommand',
+  'MissileFired',
+  'MissileDestroyed',
   'UnitCreated',
   'UnitFinished',
   'UnitReverseBuilt',
@@ -2086,6 +2088,25 @@ function widgetHandler:DefaultCommand(...)
   return nil  --  not a number, use the default engine command
 end
 
+--------------------------------------------------------------------------------
+--
+-- Projectile call-ins
+--
+
+function widgetHandler:MissileFired(...)
+  for _,w in r_ipairs(self.MissileFiredList) do
+    w:MissileFired(...)
+  end
+  return
+end
+
+
+function widgetHandler:MissileDestroyed(...)
+  for _,w in r_ipairs(self.MissileDestroyedList) do
+    w:MissileDestroyed(...)
+  end
+  return
+end
 
 --------------------------------------------------------------------------------
 --
