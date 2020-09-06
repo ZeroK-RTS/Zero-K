@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Chili Economy Panel Default",
-    desc      = "",
-    author    = "jK, Shadowfury333, GoogleFrog",
-    date      = "2014",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true
-  }
+	return {
+		name      = "Chili Economy Panel Default",
+		desc      = "",
+		author    = "jK, Shadowfury333, GoogleFrog",
+		date      = "2014",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -78,10 +78,14 @@ local lbl_storage_metal
 local lbl_storage_energy
 local lbl_expense_metal
 local lbl_expense_energy
+local lbl_waste_metal
+local lbl_waste_energy
 local lbl_income_metal
 local lbl_income_energy
+local lbl_prod_efficiency
 
 local positiveColourStr
+local usageColourStr
 local negativeColourStr
 local col_income
 local col_expense
@@ -98,6 +102,7 @@ local blinkEnergy = 0
 local BLINK_UPDATE_RATE = 0.1
 local blinkM_status = false
 local blinkE_status = false
+local blinkF_status = false
 local excessE = false
 local flashModeEnabled = true
 local externalForceHide = false
@@ -218,6 +223,7 @@ end
 
 local function option_colourBlindUpdate()
 	positiveColourStr = (options.colourBlind.value and YellowStr) or GreenStr
+	usageColourStr = CyanStr
 	negativeColourStr = (options.colourBlind.value and BlueStr) or RedStr
 	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
 	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
@@ -292,7 +298,7 @@ options = {
 				bar_metal.font.size = self.value and 20 or 16
 				bar_metal.fontOffset = self.value and -2 or 1
 				if bar_metal.net then
-					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, positiveColourStr, negativeColourStr))
+					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, negativeColourStr, positiveColourStr))
 				end
 				bar_metal:Invalidate()
 			end
@@ -521,6 +527,10 @@ local function UpdateBlink(dt)
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], BlinkStatusFunc[blinkE_status](blinkIndex))
 	end
 	
+	if blinkF_status then
+		lbl_prod_efficiency.font.color = Mix({col_expense[1], col_expense[2], col_expense[3], 1}, {1,1,0,1}, BlinkStatusFunc[blinkF_status](blinkIndex))
+	end
+
 	metalNoStorage.UpdateFlash(blinkIndex)
 	energyNoStorage.UpdateFlash(blinkIndex)
 end
@@ -595,6 +605,7 @@ end
 local  metalWarnOpt = options.metalWarning
 local energyWarnOpt = options.energyWarning
 
+local efficiency_flash_debounce = 0
 local initialReserveSet = false
 function widget:GameFrame(n)
 
@@ -742,7 +753,7 @@ function widget:GameFrame(n)
 	-- Warnings
 	local  metalWarnLevel =  metalWarnOpt.value
 	local energyWarnLevel = energyWarnOpt.value
-	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local  metalWarning = netMetal > 0 and ((mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and metalWarnLevel < 1))
 	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
@@ -815,8 +826,8 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
 	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
+	"\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
@@ -830,7 +841,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
 	"\n" ..
 	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
 	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
@@ -844,8 +855,8 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
 	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\n" .. strings["team_energy_economy"] ..
 	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
@@ -857,22 +868,54 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
-	
-	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
-	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
+	"\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+
+	-- teamMetalWaste is negative if metal waste is happening
+	lbl_waste_metal:SetCaption( negativeColourStr..Format(teamMetalWaste, " -") )
+	lbl_waste_metal:SetVisibility(teamMetalWaste < -0.001)
+	-- cp.team_energyWaste is positive if energy waste is happening
+	lbl_waste_energy:SetCaption( negativeColourStr..Format(cp.team_energyWaste, " -") )
+	lbl_waste_energy:SetVisibility(cp.team_energyWaste > 0.001)
+	lbl_expense_metal:SetCaption( usageColourStr..Format(mPull, " -") )
+	lbl_expense_energy:SetCaption( usageColourStr..Format(realEnergyPull, " -") )
 	lbl_income_metal:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_income_energy:SetCaption( Format(eInco, positiveColourStr.."+") )
 	lbl_storage_energy:SetCaption(("%.0f"):format(eCurr))
 	lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
 
 	--// Net income indicator on resource bars.
-	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, negativeColourStr, positiveColourStr))
 	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
 
 	-- save so that we can switch representation without recalculating
 	bar_metal.net = netMetal
 	bar_overlay_energy.net = netEnergy
+
+	local metal_consumption_ratio = teamMPull / teamMInco
+	local energy_consumption_ratio = totalPull / teamEnergyIncome
+
+	local consumption = ("%.0f%%"):format(metal_consumption_ratio * 100)
+
+	local do_efficiency_warning = false
+	if metal_consumption_ratio < 1 then
+		if efficiency_flash_debounce == n - TEAM_SLOWUPDATE_RATE then
+			do_efficiency_warning = true
+		end
+		efficiency_flash_debounce = n
+	end
+
+	if do_efficiency_warning then
+		-- Blink more insistently if we're under 50% consumption
+		blinkF_status = metal_consumption_ratio < .5 and 2 or 1
+	else
+		-- Bright cyan if we can consume under 130% of output, dull cyan otherwise
+		lbl_prod_efficiency.font.color = metal_consumption_ratio < 1.3 and {0,1,1,1} or {0,.7,.8,1}
+		blinkF_status = false
+	end
+
+	lbl_prod_efficiency.x = (lbl_prod_efficiency.parent.width - lbl_prod_efficiency.font:GetTextWidth(consumption, 30)) / 2
+	lbl_prod_efficiency:SetCaption(consumption)
+	lbl_prod_efficiency.tooltip = "Using up to " .. RedStr .. ("%.2f"):format(teamMPull) .. WhiteStr .. " of " .. GreenStr .. ("%.2f"):format(teamMInco) .. WhiteStr .. " per second."
 end
 
 --------------------------------------------------------------------------------
@@ -1079,7 +1122,7 @@ function widget:Initialize()
 
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
-    --widgetHandler:RegisterGlobal("ReserveState", ReserveState)
+	--widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
@@ -1114,7 +1157,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local mouseDownOnReserve = false
 	
 	--// Some (only some) Configuration for shared values
-	local subWindowWidth = '50%'
+	local subWindowWidth = '42%'
 	local screenHorizCentre = screenWidth / 2
 	local economyPanelWidth = math.min(660,screenWidth-10)
 
@@ -1179,8 +1222,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	local imageHeight = "80%"
 	
 	local storageX    = "18%"
-	local incomeX     = "44%"
-	local pullX       = "70%"
+	local incomeX     = "38%"
+	local pullX       = "59%"
+	local wasteX      = "80%"
 	local textY       = "47%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
@@ -1253,6 +1297,18 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	lbl_expense_metal = Chili.Label:New{
 		parent = window_metal,
 		x      = pullX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		caption = usageColourStr.."-0.0",
+		valign = "center",
+		align  = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
+	lbl_waste_metal = Chili.Label:New{
+		parent = window_metal,
+		x      = wasteX,
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
@@ -1339,6 +1395,43 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	metalNoStorage = GetNoStorageWarning(window_metal, barX, barY, barRight, barHeight, metalBarHolder)
 	
+	--// Efficiency
+
+	local eff_panel = Chili.Panel:New{
+		classname = fancySkinLeft,
+		parent = window_main_display,
+		name = "Efficiency Panel",
+		y = 0,
+		x = "42%",
+		width = "16%",
+		bottom = 0,
+		backgroundColor = {1,1,1,options.opacity.value},
+		dockable = false,
+		draggable = false,
+		resizable = false
+	}
+
+	local lbl_eff_title = Chili.Label:New{
+		parent = eff_panel,
+		x = 0,
+		y = "0%",
+		caption = "Usage",
+	}
+	lbl_eff_title.x = (lbl_eff_title.parent.width - lbl_eff_title.font:GetTextWidth(lbl_eff_title.caption)) / 2
+	lbl_eff_title.font.color = {.7,.9,1,1}
+
+	lbl_prod_efficiency = Chili.Label:New{
+		parent = eff_panel,
+		x      = "0%",
+		y      = "13%",
+		height = "100%",
+		width  = "100%",
+		caption = "?%",
+		valign = "center",
+		align = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value * 1.4, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
 	--// ENERGY
 
 	window_energy = Chili.Panel:New{
@@ -1346,7 +1439,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_main_display,
 		name = "Energy",
 		y      = 0,
-		x      = '50%',
+		x      = '58%',
 		width  = subWindowWidth,
 		bottom = 0,
 		backgroundColor = {1,1,1,options.opacity.value},
@@ -1402,6 +1495,18 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	lbl_expense_energy = Chili.Label:New{
 		parent = window_energy,
 		x      = pullX,
+		y      = textY,
+		height = textWidth,
+		width  = textHeight,
+		caption = usageColourStr.."-0.0",
+		valign = "center",
+		align  = "left",
+		autosize = false,
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+	}
+	lbl_waste_energy = Chili.Label:New{
+		parent = window_energy,
+		x      = wasteX,
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
@@ -1512,6 +1617,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	function lbl_income_metal:HitTest(x,y) return self end
 	function lbl_expense_energy:HitTest(x,y) return self end
 	function lbl_expense_metal:HitTest(x,y) return self end
+	function lbl_prod_efficiency:HitTest(x,y) return self end
 
 	-- set translatable strings
 	languageChanged ()
