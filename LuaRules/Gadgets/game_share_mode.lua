@@ -467,7 +467,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				return
 			end
 		end
-
 		if type(targetID) ~= "number" then
 			return
 		end
@@ -478,25 +477,27 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			if invites[playerID] and invites[playerID][targetID] and invites[targetID] and invites[targetID][playerID] then
 				AcceptInvite(playerID,targetID)
 			end
-		elseif command:find("playerchanged") then -- hack in remerging. this is sent
+		elseif command:find("debug") and (name == "Shaman" or (cp and cp.admin and cp.admin == 1)) then -- allow admins/myself to toggle debug.
+			debug = not debug
+		elseif command:find("playerchanged") then -- hack in remerging. this is sent by the gadget's unsynced stuff.
 			if debug then spEcho("[Commshare] Playerchanged: " .. targetID) end
-			local name, active, spectator, teamID = spGetPlayerInfo(targetID)
+			local name, active, spectator, teamID,_,_,_,_,_,cp = spGetPlayerInfo(targetID)
 			local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
 			if debug then spEcho("playerstates: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator)) end
 			if playerstates[targetID] == nil and not spectator then -- this player has commshared or changed state.
 				if debug then spEcho("[Commshare] generated playerstate table.") end
 				playerstates[targetID] = {active = active, spectator = spectator, teamid = teamID}
-			elseif not spectator then -- error occurs here?
-				if debug then spEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[playerID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[playerID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID)) end
+			elseif not spectator then
+				if debug then spEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[targetID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[targetID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID)) end
 				if active ~= playerstates[targetID].active and active and commshareID then -- this player has reconnected.
 					AddUpdatePlayer(targetID,"remerge")
-					if debug then spEcho("Commshare: Remerged " .. name) end
+					if debug then spEcho("[Commshare] Remerged " .. name) end
 				end
 				playerstates[targetID].active = active
 				playerstates[targetID].spectator = spectator
 				playerstates[targetID].teamid = teamID
 			elseif spectator and playerstates[targetID] then -- this player resigned
-				if debug then spEcho("Commshare: Disposing of " .. name) end
+				if debug then spEcho("[Commshare] Disposing of " .. name) end
 				AddUpdatePlayer(targetID,"dead")
 				return
 			end
