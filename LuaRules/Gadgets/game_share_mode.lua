@@ -444,7 +444,7 @@ end
 function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to interact with the gadget. Also handles PlayerChanged.
 	if strFind(message, "sharemode") then
 		local command,targetID = ProccessCommand(strLower(message))
-		local name = select(1, spGetPlayerInfo(playerID, false))
+		local name, active, spectator, teamID,_,_,_,_,_,cp = spGetPlayerInfo(playerID, false)
 		if command == nil then
 			spEcho("[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
 			return
@@ -467,28 +467,31 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				return
 			end
 		end
+		if debug then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
+		-- targetID-less commands --
+		if command:find("debug") and (name == "Shaman" or (cp and cp.admin and cp.admin == 1)) then -- allow admins/myself to toggle debug.
+			debug = not debug
+			if debug then spEcho("[Commshare] Debug enabled.") else spEcho("[Commshare] Debug disabled.") end
+			return
+		end
 		if type(targetID) ~= "number" then
 			return
 		end
-		if debug then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
-		-- Do commands --
+		-- Commands with a targetID associated with them--
 		if strFind(command, "invite") then
 			SendInvite(playerID, targetID)
 			if invites[playerID] and invites[playerID][targetID] and invites[targetID] and invites[targetID][playerID] then
 				AcceptInvite(playerID,targetID)
 			end
-		elseif command:find("debug") and (name == "Shaman" or (cp and cp.admin and cp.admin == 1)) then -- allow admins/myself to toggle debug.
-			debug = not debug
 		elseif command:find("playerchanged") then -- hack in remerging. this is sent by the gadget's unsynced stuff.
 			if debug then spEcho("[Commshare] Playerchanged: " .. targetID) end
-			local name, active, spectator, teamID,_,_,_,_,_,cp = spGetPlayerInfo(targetID)
 			local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
 			if debug then spEcho("playerstates: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator)) end
 			if playerstates[targetID] == nil and not spectator then -- this player has commshared or changed state.
 				if debug then spEcho("[Commshare] generated playerstate table.") end
 				playerstates[targetID] = {active = active, spectator = spectator, teamid = teamID}
 			elseif not spectator then
-				if debug then spEcho("Commshare: PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[targetID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[targetID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID)) end
+				if debug then spEcho("[Commshare] PlayerChange: " .. name .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[targetID].active) .. "->" .. tostring(active) .. "\nSpectator: " .. tostring(playerstates[targetID].spectator) .. "->" .. tostring(spectator) .."\nMergeID: " .. tostring(commshareID)) end
 				if active ~= playerstates[targetID].active and active and commshareID then -- this player has reconnected.
 					AddUpdatePlayer(targetID,"remerge")
 					if debug then spEcho("[Commshare] Remerged " .. name) end
@@ -532,7 +535,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if spGetTeamRulesParam(unitTeam,"isCommsharing") then
 		local commshareTeamID = spGetTeamRulesParam(unitTeam,"isCommsharing")
-		if debug then Echo("Commshare: unitCreated triggered for " .. unitTeam .. ", given to " .. commshareTeamID) end
+		if debug then Echo("[Commshare] unitCreated triggered for " .. unitTeam .. ", given to " .. commshareTeamID) end
 		spTransferUnit(unitID, commshareTeamID, true) -- this is in case of late commer coms,etc.
 	end
 end
