@@ -16,8 +16,9 @@ return { cloakraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[16]],
-    cus_noflashlight = 1,
+    modelradius        = [[16]],
+    cus_noflashlight   = 1,
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -96,7 +97,7 @@ return { cloakraid = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      leadLimit               = 2,
+      leadLimit               = 0,
       noGap                   = false,
       noSelfDamage            = true,
       range                   = 185,

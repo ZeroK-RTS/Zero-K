@@ -5,6 +5,7 @@ return { factorygunship = {
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostMetal                = Shared.FACTORY_COST,
+  buildDistance                 = Shared.FACTORY_PLATE_RANGE,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
@@ -46,6 +47,7 @@ return { factorygunship = {
     selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
+    parent_of_plate   = [[plategunship]],
   },
 
   energyUse                     = 0,

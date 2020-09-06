@@ -134,7 +134,7 @@ local function TakeMouseOffEdge()
 		return
 	end
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local changed = false
 	
 	if mx < SCREEN_EDGE then
@@ -256,7 +256,7 @@ local function InitializeBriefingWindow()
 	
 	local externalFunctions = {}
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	local briefingWindow = Chili.Window:New{
 		classname = "main_window",

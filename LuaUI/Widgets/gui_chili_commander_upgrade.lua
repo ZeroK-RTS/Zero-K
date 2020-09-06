@@ -184,7 +184,7 @@ local function CreateModuleSelectionWindow()
 		children = {selectionButtonPanel}
 	}
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local minimapHeight = screenWidth/6 + 45
 	
 	local selectionWindowMain = Window:New{
@@ -600,7 +600,7 @@ local function HideMainWindow()
 end
 
 local function CreateMainWindow()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local minimapHeight = screenWidth/6 + 45
 	
 	local mainHeight = math.min(420, math.max(325, screenHeight - 450))

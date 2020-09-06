@@ -1185,15 +1185,15 @@ local function MakeMessageStack(margin)
 		itemMargin  = { margin, margin, margin, margin },
 		autosize = true,
 		preserveChildrenOrder = true,
+		useRTT = false,
 	}
 end
 
 local function MakeMessageWindow(name, enabled, ParentFunc)
 
 	local x,y,bottom,width,height
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	if name == "ProChat" then
-		local screenWidth, screenHeight = Spring.GetWindowGeometry()
 		local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 		local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 		width = 450

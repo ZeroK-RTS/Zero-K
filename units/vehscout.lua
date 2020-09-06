@@ -21,7 +21,7 @@ return { vehscout = {
 
   customParams           = {
     modelradius    = [[7]],
-    aim_lookahead  = 50,
+    aim_lookahead  = 80,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

@@ -195,7 +195,7 @@ local ret = {
 	},
 }
 
-if Spring.GetModOptions().campaign_chassis == "1" then
+if Spring.GetModOptions and Spring.GetModOptions().campaign_chassis == "1" then
 	ret.dyntrainer_knight = {
 		name = "Campaign",
 		chassis = "knight",

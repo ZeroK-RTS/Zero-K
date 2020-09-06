@@ -16,7 +16,8 @@ return { shieldraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[12]],
+    modelradius        = [[12]],
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -91,7 +92,7 @@ return { shieldraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      leadLimit               = 3,
+      leadLimit               = 0,
       noSelfDamage            = true,
       range                   = 245,
       reloadtime              = 0.1,

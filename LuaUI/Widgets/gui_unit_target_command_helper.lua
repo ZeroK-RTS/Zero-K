@@ -14,7 +14,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local SIZE_FACTOR = ((select(1, Spring.GetWindowGeometry()) > 3000) and 2) or 1
+local SIZE_FACTOR = ((select(1, Spring.GetViewGeometry()) > 3000) and 2) or 1
 
 local function SetCircleDragThreshold(value)
 	value = value*SIZE_FACTOR

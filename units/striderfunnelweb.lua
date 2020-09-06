@@ -5,7 +5,7 @@ return { striderfunnelweb = {
   acceleration           = 0.166,
   activateWhenBuilt      = true,
   brakeRate              = 0.825,
-  buildCostMetal         = 3000,
+  buildCostMetal         = 3500,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -41,7 +41,7 @@ return { striderfunnelweb = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 6500,
+  maxDamage              = 4500,
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,

@@ -20,7 +20,8 @@ return { vehraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[10]],
+    modelradius        = [[10]],
+    aim_lookahead      = 160,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -91,9 +92,9 @@ return { vehraid = {
       },
 
       damage                  = {
-        default = 28.5,
-        planes  = 28.5,
-        subs    = 1.42,
+        default = 30,
+        planes  = 30,
+        subs    = 1.5,
       },
 
       duration                = 0.3,
@@ -107,7 +108,7 @@ return { vehraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      leadLimit               = 10,
+      leadLimit               = 5,
       lodDistance             = 10000,
       noSelfDamage            = true,
       proximityPriority       = 10,

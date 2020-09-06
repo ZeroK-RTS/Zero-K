@@ -94,7 +94,11 @@ end
 --------------------------------------------------------------------------------
 
 local function IsGround(ud)
-    return not ud.canFly and not ud.isFactory
+	return not ud.canFly
+end
+
+local function IsFactory(ud)
+	return ud.customParams.factorytab or ud.customParams.child_of_factory
 end
 
 local impulseUnitDefID = {}
@@ -118,6 +122,7 @@ options_order = {
 	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
+	'setFactoryRanksToThree', 'setFactoryRanksToTwo',
 	'categorieslabel',
 	'commander_label',
 	'commander_firestate0',
@@ -346,7 +351,7 @@ options = {
 	},
 	setRanksToDefault = {
 		type = 'button',
-		name = "Set Selection Ranks to Default",
+		name = "Set Select Rank to Default",
 		desc = "Resets selection ranks to default, 1 for structures, 2 for constructors and 3 for combat units (including commander).",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -364,7 +369,7 @@ options = {
 	},
 	setRanksToThree = {
 		type = 'button',
-		name = "Set Selection Ranks to Three",
+		name = "Set All Select Rank to 3",
 		desc = "Effectively disables selection ranking while retaining the ability to manually set ranks.",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -374,6 +379,42 @@ options = {
 				local find = string.find(opt, "_selection_rank")
 				if find then
 					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToThree = {
+		type = 'button',
+		name = "Factory Select Rank to 3",
+		desc = "Sets Factories and Plates to have selection rank 3.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToTwo = {
+		type = 'button',
+		name = "Factory Select Rank to 2",
+		desc = "Sets Factories and Plates to have selection rank 2.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 2
 				end
 			end
 		end,
@@ -831,30 +872,33 @@ local function addUnit(defName, path)
 	end
 end
 
-local function AddFactoryOfUnits(defName)
+local function AddFactoryOfUnits(defName, plateDefName)
 	if unitAlreadyAdded[defName] then
 		return
 	end
 	local ud = UnitDefNames[defName]
 	local name = string.gsub(ud.humanName, "/", "-")
 	addUnit(defName, name)
+	if plateDefName then
+		addUnit(plateDefName, name)
+	end
 	for i = 1, #ud.buildOptions do
 		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
 		unitsToFactory[UnitDefs[ud.buildOptions[i]].name] = defName
 	end
 end
 
-AddFactoryOfUnits("factoryshield")
-AddFactoryOfUnits("factorycloak")
-AddFactoryOfUnits("factoryveh")
-AddFactoryOfUnits("factoryplane")
-AddFactoryOfUnits("factorygunship")
-AddFactoryOfUnits("factoryhover")
-AddFactoryOfUnits("factoryamph")
-AddFactoryOfUnits("factoryspider")
-AddFactoryOfUnits("factoryjump")
-AddFactoryOfUnits("factorytank")
-AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("factoryshield",  "plateshield")
+AddFactoryOfUnits("factorycloak",   "platecloak")
+AddFactoryOfUnits("factoryveh",     "plateveh")
+AddFactoryOfUnits("factoryplane",   "plateplane")
+AddFactoryOfUnits("factorygunship", "plategunship")
+AddFactoryOfUnits("factoryhover",   "platehover")
+AddFactoryOfUnits("factoryamph",    "plateamph")
+AddFactoryOfUnits("factoryspider",  "platespider")
+AddFactoryOfUnits("factoryjump",    "platejump")
+AddFactoryOfUnits("factorytank",    "platetank")
+AddFactoryOfUnits("factoryship",    "plateship")
 AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 

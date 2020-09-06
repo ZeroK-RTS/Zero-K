@@ -184,6 +184,12 @@ local transkey = include("Configs/transkey.lua")
 
 local wantToReapplyBinding = false
 
+local hackyOptionMemory = {}
+local hackyOptionMemoryWhitelist = {
+	['Master Volume'] = true,
+	['Music Volume'] = true,
+}
+
 --------------------------------------------------------------------------------
 -- Widget globals
 WG.crude = {}
@@ -395,6 +401,40 @@ local function otvalidate(t)
 end
 --end cool new framework
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local musicTrackbar, masterVolumeTrackbar
+
+WG.crude.SetMasterVolume = function (newVolume, viaTrackbar)
+	spSendCommands{"set snd_volmaster " .. newVolume}
+	if viaTrackbar then
+		if hackyOptionMemory['Master Volume'] then
+			hackyOptionMemory['Master Volume'].value = newVolume
+		end
+	elseif masterVolumeTrackbar then
+		masterVolumeTrackbar:SetValue(newVolume)
+	end
+end
+
+WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
+	if (WG.music_start_volume or 0 > 0) then
+		Spring.SetSoundStreamVolume(newVolume / WG.music_start_volume)
+	else
+		Spring.SetSoundStreamVolume(newVolume)
+	end
+	settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	WG.music_volume = newVolume
+	if viaTrackbar then
+		if hackyOptionMemory['Music Volume'] then
+			hackyOptionMemory['Music Volume'].value = newVolume
+		end
+	elseif musicTrackbar then
+		musicTrackbar:SetValue(newVolume)
+	end
+end
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 WG.crude.SetSkin = function(Skin)
@@ -1178,6 +1218,10 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	
 	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
 	
+	-- hax
+	if hackyOptionMemoryWhitelist[option.name] then
+		hackyOptionMemory[option.name] = option
+	end
 end
 
 local function RemOption(path, option, wname )
@@ -2146,7 +2190,7 @@ end
 WG.crude.UnpauseFromExitConfirmWindow = UnpauseFromExitConfirmWindow
 
 local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpauseOnNo)
-	local screen_width, screen_height = Spring.GetWindowGeometry()
+	local screen_width, screen_height = Spring.GetViewGeometry()
 	local menu_width = 320
 	local menu_height = height or 64
 
@@ -2293,7 +2337,7 @@ local function GetMainPanel(parent, width, height)
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
 						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
+							WG.crude.SetMasterVolume(self.value, true)
 							if WG.ttsNotify then
 								WG.ttsNotify()
 							end
@@ -2309,33 +2353,19 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.music_volume or 0.5,
-					prevValue = settings.music_volume or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
 					OnChange = {
 						function(self)
-							if ((WG.music_start_volume or 0) > 0) then
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-							else
-								Spring.SetSoundStreamVolume(self.value)
+							if WG.crude and WG.crude.SetMusicVolume then
+								WG.crude.SetMusicVolume(self.value, true)
 							end
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <= 0) then
-								widgetHandler:DisableWidget("Music Player")
-							end
-							if (self.prevValue <= 0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player")
-							end
-							self.prevValue = self.value
 						end
 					},
 				},
 			},
 		}
+		masterVolumeTrackbar = stackChildren[#stackChildren].children[1]
+		musicTrackbar = stackChildren[#stackChildren].children[2]
 		--stackChildren[#stackChildren + 1] = Trackbar:New{
 		--    tooltip = 'Volume',
 		--    height = 15,
@@ -2424,7 +2454,7 @@ local function GetMainPanel(parent, width, height)
 					value = spGetConfigInt("snd_volmaster", 50),
 					OnChange = {
 						function(self)
-							spSendCommands{"set snd_volmaster " .. self.value}
+							WG.crude.SetMasterVolume(self.value, true)
 							if WG.ttsNotify then
 								WG.ttsNotify()
 							end
@@ -2441,33 +2471,19 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.music_volume or 0.5,
-					prevValue = settings.music_volume or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
 					OnChange = {
 						function(self)
-							if ((WG.music_start_volume or 0) > 0) then
-								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-							else
-								Spring.SetSoundStreamVolume(self.value)
+							if WG.crude and WG.crude.SetMusicVolume then
+								WG.crude.SetMusicVolume(self.value, true)
 							end
-							settings.music_volume = self.value
-							WG.music_volume = self.value
-							if (self.prevValue > 0 and self.value <= 0) then
-								widgetHandler:DisableWidget("Music Player")
-							end
-							if (self.prevValue <= 0 and self.value > 0) then
-								-- Disable first in case widget is already enabled.
-								-- This is required for it to notice the volume
-								-- change from 0 in some cases.
-								widgetHandler:DisableWidget("Music Player")
-								widgetHandler:EnableWidget("Music Player")
-							end
-							self.prevValue = self.value
 						end
 					},
 				},
 			},
 		}
+		masterVolumeTrackbar = stackChildren[#stackChildren].children[2]
+		musicTrackbar = stackChildren[#stackChildren].children[4]
 		
 		holderWidth = holderWidth + sliderWidth + 2
 	end
@@ -3206,7 +3222,12 @@ function widget:SetConfigData(data)
 
 	WG.lang(settings.lang)
 
-	WG.music_volume = settings.music_volume or 0.5
+	if settings.music_volume then
+		settings.config["epic_Settings/Audio_Music_Volume"] = settings.music_volume
+		settings.music_volume = nil
+	end
+
+	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or 0.5)
 	LoadKeybinds()
 end
 

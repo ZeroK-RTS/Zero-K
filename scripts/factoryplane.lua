@@ -110,24 +110,22 @@ local function Close()
 
 	Move(bay, 1, 0, 11)
 	WaitForMove(bay,1)
-	
-	
 end
 
 local function padchange()
 	while true do
-	Sleep(1200)
-	Hide(pad1)
-	Show(pad2)
-	Sleep(1200)
-	Hide(pad2)
-	Show(pad3)
-	Sleep(1200)
-	Hide(pad3)
-	Show(pad2)
-	Sleep(1200)
-	Hide(pad2)
-	Show(pad1)
+		Sleep(1200)
+		Hide(pad1)
+		Show(pad2)
+		Sleep(1200)
+		Hide(pad2)
+		Show(pad3)
+		Sleep(1200)
+		Hide(pad3)
+		Show(pad2)
+		Sleep(1200)
+		Hide(pad2)
+		Show(pad1)
 	end
 end
 

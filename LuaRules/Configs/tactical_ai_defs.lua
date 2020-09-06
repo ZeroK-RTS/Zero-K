@@ -130,6 +130,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 local shortToRiotRangeSkirmieeArray = NameToDefID({
 	"hoverraid",
 	"amphriot",
+	"amphimpulse",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
@@ -180,7 +181,6 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 local medRangeSkirmieeArray = NameToDefID({
 	"spiderriot",
 	"cloakassault",
-	"amphimpulse",
 	
 	"spiderassault",
 	"vehriot",
@@ -245,6 +245,7 @@ local slasherSkirmieeArray = NameToDefID({
 	"vehassault",
 	"vehriot",
 	"hoverriot",
+	"hoverskirm",
 	"tankriot",
 	"shieldfelon",
 	"tankassault",

@@ -5,6 +5,7 @@ return { factoryship = {
   acceleration           = 0,
   brakeRate              = 0,
   buildCostMetal         = Shared.FACTORY_COST,
+  buildDistance          = Shared.FACTORY_PLATE_RANGE,
   builder                = true,
 
   buildoptions           = {
@@ -44,6 +45,7 @@ return { factoryship = {
     factorytab       = 1,
     shared_energy_gen = 1,
     cus_noflashlight = 1,
+    parent_of_plate   = [[plateship]],
   },
 
   energyUse              = 0,

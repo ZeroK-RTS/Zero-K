@@ -461,6 +461,9 @@ function widget:SetConfigData(data)
 	local minimap
 
 	local vsx, vsy = gl.GetViewSizes()
+	if WG.uiScale and WG.uiScale > 0 then
+		vsx, vsy = vsx/WG.uiScale, vsy/WG.uiScale
+	end
 	for k, v in pairs (data) do
 		if v[5] then
 			v[1] = v[1] + vsx
@@ -509,6 +512,9 @@ end
 function widget:GetConfigData()
 	local data = Spring.Utilities.CopyTable(settings, true)
 	local vsx, vsy = gl.GetViewSizes()
+	if WG.uiScale and WG.uiScale > 0 then
+		vsx, vsy = vsx/WG.uiScale, vsy/WG.uiScale
+	end
 	for k, v in pairs (data) do
 		-- if closer to the edge opposite 0, save relative to it (to keep stuff at edge if someone migrates to a larger screen)
 		if vsx - v[3] < v[1] then

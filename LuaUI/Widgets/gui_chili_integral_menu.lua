@@ -187,7 +187,7 @@ options = {
 	},
 	label_apply = {
 		type = 'label',
-		name = 'Changes require application or restart',
+		name = 'Click to apply changes. They are also applied the next time the game is launched.',
 		path = customGridPath
 	},
 	label_tab = {
@@ -1816,7 +1816,7 @@ local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 

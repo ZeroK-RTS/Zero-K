@@ -24,7 +24,7 @@ return { jumpraid = {
     jump_from_midair   = 1,
     fireproof          = [[1]],
     stats_show_death_explosion = 1,
-    aim_lookahead      = 100,
+    aim_lookahead      = 80,
   },
 
   explodeAs             = [[PYRO_DEATH]],
@@ -124,7 +124,7 @@ return { jumpraid = {
       impulseFactor           = 0,
       intensity               = 0.3,
       interceptedByShieldType = 1,
-      leadLimit               = 10,
+      leadLimit               = 2,
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 260,

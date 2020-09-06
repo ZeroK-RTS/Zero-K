@@ -45,7 +45,7 @@ return { shipassault = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:brawlermuzzle]],
+      [[custom:sonicfire_80]],
       [[custom:emg_shells_l]],
     },
 

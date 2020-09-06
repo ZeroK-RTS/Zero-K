@@ -11,6 +11,7 @@ Spring.Echo("Loading UnitDefs_posts")
 -- Constants?
 --
 
+VFS.Include("LuaRules/Configs/constants.lua")
 local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------

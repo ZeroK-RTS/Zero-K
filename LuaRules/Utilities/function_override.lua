@@ -65,6 +65,58 @@ end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
+-- Inspect callout behavour
+
+if false and Spring.SetUnitPosition then -- only in gadget space
+	Spring.Echo("FUNCTION_OVERRIDE_LOADING")
+	local funcList = {
+		--"SetUnitPosition",
+		--"SetUnitVelocity",
+		--"AddUnitImpulse",
+		--"SetUnitPhysics",
+		--"SetUnitRulesParam",
+		"GiveOrderToUnit",
+	}
+	
+	local unitWhitelist = {
+		[18399] = true,
+		--[26879] = true,
+	}
+	
+	for i = 1, #funcList do
+		local funcName = funcList[i]
+		local origFunc = Spring[funcName]
+		Spring[funcName] = function (unitID, ...)
+			if unitID and unitWhitelist[unitID] and Spring.GetGameFrame() > 27630 then
+				Spring.Echo(funcName, unitID)
+				Spring.Utilities.TableEcho({...}, "table")
+				Spring.Utilities.UnitEcho(unitID)
+			end
+			origFunc(unitID, ...)
+		end
+	end
+	
+	local moveBlackist = {
+		["GetTag"] = true,
+	}
+	
+	for funcName, origFunc in pairs(Spring.MoveCtrl) do
+		if not moveBlackist[funcName] then
+			Spring.Echo("FUNCTION_OVERRIDE_LOADING", funcName)
+			Spring.MoveCtrl[funcName] = function (unitID, ...)
+				if unitID and unitWhitelist[unitID] and Spring.GetGameFrame() > 27630 then
+					Spring.Echo(funcName, unitID)
+					Spring.Utilities.TableEcho({...}, "table")
+					Spring.Utilities.UnitEcho(unitID)
+				end
+				origFunc(unitID, ...)
+			end
+		end
+	end
+end
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 if Script.IsEngineMinVersion(104, 0, 50) then
 	local origGetGroundInfo = Spring.GetGroundInfo

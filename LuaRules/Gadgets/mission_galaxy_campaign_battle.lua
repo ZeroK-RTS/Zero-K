@@ -1093,6 +1093,14 @@ local function SetTeamUnlocks(teamID, customKeys)
 			unlockCount = unlockCount + 1
 			Spring.SetTeamRulesParam(teamID, "unlockedUnit" .. unlockCount, ud.name, alliedTrueTable)
 			unlockedUnits[ud.id] = true
+			if ud.customParams.parent_of_plate then
+				local pud = UnitDefNames[ud.customParams.parent_of_plate]
+				if pud and not unlockedUnits[pud.id] then
+					unlockCount = unlockCount + 1
+					Spring.SetTeamRulesParam(teamID, "unlockedUnit" .. unlockCount, pud.name, alliedTrueTable)
+					unlockedUnits[pud.id] = true
+				end
+			end
 		end
 	end
 	Spring.SetTeamRulesParam(teamID, "unlockedUnitCount", unlockCount, alliedTrueTable)

@@ -21,7 +21,7 @@ return { turretgauss = {
     modelradius    = [[15]],
     midposoffset   = [[0 15 0]],
     aimposoffset   = [[0 25 0]],
-    armored_regen  = [[20]],
+    armored_regen  = [[10]],
   },
 
   damageModifier                = 0.25,

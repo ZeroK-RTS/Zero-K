@@ -123,6 +123,9 @@ local function AddFactoryOfUnits(defName)
 	local name = string.gsub(ud.humanName, "/", "-")
 	local path = BEHAVIOUR_PATH .. name
 	behaviourPath[ud.id] = path
+	if ud.customParams.parent_of_plate then
+		behaviourPath[UnitDefNames[ud.customParams.parent_of_plate].id] = path
+	end
 	for i = 1, #ud.buildOptions do
 		behaviourPath[ud.buildOptions[i]] = path
 	end

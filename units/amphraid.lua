@@ -12,13 +12,14 @@ return { amphraid = {
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[28 28 28]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen = 5,
+    amph_regen        = 5,
     amph_submerged_at = 40,
+    aim_lookahead     = 80,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -92,7 +93,7 @@ return { amphraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      leadlimit               = 0,
+      leadlimit               = 1,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
       projectiles             = 1,

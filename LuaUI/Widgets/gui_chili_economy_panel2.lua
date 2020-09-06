@@ -1110,7 +1110,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end
 	end
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local mouseDownOnReserve = false
 	
 	--// Some (only some) Configuration for shared values

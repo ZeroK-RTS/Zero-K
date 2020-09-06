@@ -151,7 +151,7 @@
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
-		"description" : "Gauss Turret, 20 health/s when closed",
+		"description" : "Gauss Turret, 10 health/s when closed",
 		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
@@ -192,7 +192,7 @@
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a quarter. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -383,6 +383,61 @@
 		"name" : "Shieldbot Factory",
 		"description" : "Produces Tough Robots",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
+	},
+	"platecloak" : {
+		"name" : "Cloakbot Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plateshield" : {
+		"name" : "Shieldbot Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"platespider" : {
+		"name" : "Spider Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"platejump" : {
+		"name" : "Jumpbot Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plateveh" : {
+		"name" : "Rover Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"platetank" : {
+		"name" : "Tank Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"platehover" : {
+		"name" : "Hovercraft Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plateamph" : {
+		"name" : "Amphbot Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plateship" : {
+		"name" : "Ship Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plateplane" : {
+		"name" : "Plane Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
+	},
+	"plategunship" : {
+		"name" : "Gunship Plate",
+		"description" : "Parallel Unit Production",
+		"helptext" : "Construction plates increase the production capacity of nearby factories by acting as an independent build queue. Plates are the cheapest way to increase unit production, eschewing the versatility of Caretaker for greater efficiency. Be warned, a plate will not function without a nearby factory of the appropriate type."
 	},
 	"chickena" : {
 		"name" : "Cockatrice",
@@ -1022,7 +1077,7 @@
 	"amphimpulse" : {
 		"name" : "Archer",
 		"description" : "Amphibious Raider/Riot Bot",
-		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. Archers can float to surface in order to fight naval units."
+		"helptext" : "The Archer uses a powerful sonic cannon to hit units above or below the water. It does not work while wet, so Archers must float to fire."
 	},
 	"fakeunit" : {
 		"name" : "Fake radar signal",

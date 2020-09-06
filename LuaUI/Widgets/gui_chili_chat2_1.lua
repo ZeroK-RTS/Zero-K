@@ -959,7 +959,7 @@ function widget:Initialize()
 	
 	local inputsize = 33
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	stack_console = WG.Chili.StackPanel:New{
 		name = "stack_console",

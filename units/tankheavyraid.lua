@@ -17,8 +17,9 @@ return { tankheavyraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[10]],
+    modelradius       = [[10]],
     selection_scale   = 0.85,
+    aim_lookahead     = 120,
   },
 
   explodeAs              = [[BIG_UNITEX]],
