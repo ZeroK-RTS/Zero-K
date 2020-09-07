@@ -332,7 +332,15 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = options.alt
+		local makeMexEnergy = options.alt or options.ctrl
+		local energyToMake = 4
+		if options.ctrl then
+			if options.alt then
+				energyToMake = 1
+			else
+				energyToMake = 2
+			end
+		end
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
@@ -344,7 +352,6 @@ function widget:CommandNotify(cmdID, params, options)
 
 		local noCommands = #commands
 		while noCommands > 0 do
-
 			tasort(commands, function(a,b) return a.d < b.d end)
 			orderedCommands[#orderedCommands+1] = commands[1]
 			aveX = commands[1].x
@@ -379,7 +386,7 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i = 1, #addons do
+					for i = 1, energyToMake do
 						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]

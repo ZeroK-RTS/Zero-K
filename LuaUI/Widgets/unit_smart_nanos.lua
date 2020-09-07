@@ -218,7 +218,9 @@ end
 
 function widget:Update(deltaTime)
 
-	if (next(nanoTurrets) == nil) then return false end
+	if (next(nanoTurrets) == nil) then
+		return false
+	end
 
 	if (timeCounter > UPDATE) then
 		timeCounter = 0
