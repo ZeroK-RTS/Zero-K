@@ -691,7 +691,7 @@ function widget:Update(dt)
 			camDir = newCamDir
 			gl.DeleteList(incomeLabelList)
 			incomeLabelList = glCreateList(DrawIncomeLabels)
-			debounceCamUpdate = .1
+			debounceCamUpdate = 0.1
 		else
 			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
 			debounceCamUpdate = 1
@@ -1000,4 +1000,3 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		glPopMatrix()
 	end
 end
-
