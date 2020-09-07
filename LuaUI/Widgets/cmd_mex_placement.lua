@@ -333,12 +333,12 @@ function widget:CommandNotify(cmdID, params, options)
 		end
 		
 		local makeMexEnergy = options.alt or options.ctrl
-		local energyToMake = 4
+		local energyToMake = 2 -- Just Alt
 		if options.ctrl then
 			if options.alt then
-				energyToMake = 1
+				energyToMake = 4
 			else
-				energyToMake = 2
+				energyToMake = 1
 			end
 		end
 
