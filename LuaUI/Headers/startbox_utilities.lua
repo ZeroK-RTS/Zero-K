@@ -57,4 +57,51 @@ local function GetTriangulatedBoxes()
 	return boxes
 end
 
-return GetRawBoxes, GetTriangulatedBoxes
+local function GetAllyTeamOctant(allyTeamID)
+	-- Counterclockwise 1 to 8 starting from North-East-East
+	-- Octants are open on their trailing edge and closed on their leading edge.
+	-- Eg, the line between 1 and 2 belongs to 1.
+	if not allyTeamID then
+		return false
+	end
+	local teamX = Spring.GetGameRulesParam("allyteam_origin_x_" .. allyTeamID)
+	local teamZ = Spring.GetGameRulesParam("allyteam_origin_z_" .. allyTeamID)
+	if not (teamX and teamZ) then
+		return false
+	end
+	local mapX, mapZ = Game.mapSizeX, Game.mapSizeZ
+	local posX, posZ = teamX/mapX, teamZ/mapZ
+	
+	-- Do some ad hoc nonsense.
+	if posX > posZ then
+		-- Top right
+		if posX < 0.5 then
+			return 3
+		elseif posZ >= 0.5 then
+			return 8
+		elseif posX + posZ < 1 then
+			return 2
+		else
+			return 1
+		end
+	elseif posX == posZ then
+		if posX < 0.5 then
+			return 3
+		else
+			return 7
+		end
+	else
+		-- Bottom left
+		if posZ <= 0.5 then
+			return 4
+		elseif posX > 0.5 then
+			return 7
+		elseif posX + posZ <= 1 then
+			return 5
+		else
+			return 6
+		end
+	end
+end
+
+return GetRawBoxes, GetTriangulatedBoxes, GetAllyTeamOctant
