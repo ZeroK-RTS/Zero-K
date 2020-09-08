@@ -17,11 +17,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local function IsTeamAfk(teamID)
 	local _, shares = GG.Lagmonitor.GetResourceShares()
-	if shares == 0 then
-		return true
-	else
-		return false
-	end
+	return shares == 0
 end
 
 function gadget:AllowResourceTransfer(oldTeam, newTeam, resource_type, amount)
