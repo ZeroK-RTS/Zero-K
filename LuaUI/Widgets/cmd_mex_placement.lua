@@ -174,7 +174,7 @@ for udid, ud in ipairs(UnitDefs) do
 end
 
 local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed by allyTeam start position
-                 -- The first two mexes are in front, this is partially to make use of solar tankiness,
+                 -- The first two solars are in front, this is partially to make use of solar tankiness,
                  -- but also because cons typically approach from the back so would otherwise be standing
                  -- on the buildspot and have to waste time moving away
 	{ -- North East East
