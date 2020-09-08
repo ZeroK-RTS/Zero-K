@@ -64,8 +64,9 @@ local function GetAllyTeamOctant(allyTeamID)
 	if not allyTeamID then
 		return false
 	end
-	local teamX = Spring.GetGameRulesParam("allyteam_origin_x_" .. allyTeamID)
-	local teamZ = Spring.GetGameRulesParam("allyteam_origin_z_" .. allyTeamID)
+	local teamID = Spring.GetTeamList(allyTeamID)[1]
+	local teamX = Spring.GetTeamRulesParam(teamID, "allyteam_origin_x")
+	local teamZ = Spring.GetTeamRulesParam(teamID, "allyteam_origin_z")
 	if not (teamX and teamZ) then
 		return false
 	end

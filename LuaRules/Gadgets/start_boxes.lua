@@ -423,8 +423,9 @@ function gadget:Initialize()
 		if boxID then
 			local boxX, boxZ = GetAverageStartpoint(boxID)
 			if boxX and boxZ then
-				Spring.SetGameRulesParam("allyteam_origin_x_" .. allyTeamID, boxX)
-				Spring.SetGameRulesParam("allyteam_origin_z_" .. allyTeamID, boxZ)
+				local teamID = Spring.GetTeamList(allyTeamID)[1]
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_x", boxX)
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_z", boxZ)
 				--Spring.MarkerAddPoint(boxX, 0, boxZ, "ally origin " .. allyTeamID)
 			end
 		end
