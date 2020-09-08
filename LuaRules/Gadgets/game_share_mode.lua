@@ -144,11 +144,8 @@ end
 
 local function IsTeamAfk(teamID)
 	local _, shares = GG.Lagmonitor.GetResourceShares()
-	if shares == 0 then
-		return true
-	else
-		return false
-	end
+	if debug then spEcho("Shares: " .. tostring(shares[teamID])) end
+	return shares[teamID] == 0
 end
 
 local function UnmergeUnits(orgTeamID, newOwner)
