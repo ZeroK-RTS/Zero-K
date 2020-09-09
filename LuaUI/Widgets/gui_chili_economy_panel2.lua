@@ -861,10 +861,10 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
 	"\n      " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. energyMisc ..
+	"\n      " .. strings["resbar_other"] .. ": " .. energyOther ..
 	"\n   " .. strings["resbar_expenses"] ..
 	"\n      " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
-	"\n      " .. strings["resbar_other"] .. ": " .. energyOther ..
 	"\n   " .. strings["resbar_storage"] ..
     "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
     "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
@@ -875,14 +875,14 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n      " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
+	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n   " .. strings["resbar_expenses"] ..
 	"\n      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
 	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice .. 	
-	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
- 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste .. 
 	"\n   " .. strings["resbar_storage"] ..
 	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 
