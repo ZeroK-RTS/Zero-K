@@ -27,6 +27,10 @@ entire announcer folder contents
 Kmar:
 entire announcer/kmar folder contents
 
+Thomas1:
+click-full.wav      (zapsplat_multimedia_button_click_solid_hard_001_49162)
+click-empty.wav     (zapsplat_multimedia_button_click_solid_hard_002_49163)
+ 
 Sunniterri:
 All zombie sounds (derived from http://www.freesound.org/people/sunnyterri/sounds/168204/)
 
