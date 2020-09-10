@@ -234,7 +234,7 @@ local function MergePlayer(playerID,target)
 		if spGetPlayerRulesParam(playerID, "commshare_orig_teamid") == nil then -- first merges always store their original teamIDs.
 			spSetPlayerRulesParam(playerID, "commshare_orig_teamid",orgTeamID,public)
 		end
-		if spGetTeamRulesParam(target,"isCommsharing") then -- completely delete this nasty bug where rejoining and inviting your original squad would neuter your team.
+		if spGetTeamRulesParam(target,"isCommsharing") then -- completely delete this nasty bug where rejoining and inviting your original squad would give all nanoframes to your old team ID, rendering your squad useless.
 			spSetTeamRulesParam(target,"isCommsharing",nil)
 		end
 		spAssignPlayerToTeam(playerID,target)
@@ -279,7 +279,7 @@ local function MergeAll()
 	end
 end
 
-local function SendInvite(player, target) -- targetid is which player is the merger
+local function SendInvite(player, target) -- target is which player the player is trying to merge with.
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target, false))
 		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target), false)
@@ -391,6 +391,15 @@ local function RemergePlayer(targetID)
 	MergePlayer(targetID,commshareID)
 end
 
+---------------- Debug ---------------------
+
+local function ToggleDebug()
+	if spIsCheatingEnabled() then -- toggle debug
+		debug = not debug
+		if debug then spEcho("[Commshare] Debug enabled.") else spEcho("[Commshare] Debug disabled.") end
+	end
+end
+
 ------------------ Callins ------------------
 	
 function gadget:GameFrame(frame)
@@ -454,6 +463,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				targetID = tonumber(targetID)
 			end
 		end
+		if debug then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
 		if strFind(command,"unmerge") then
 			local afk = IsTeamAfk(GetTeamID(playerID))
 			if debug then spEcho("team is afk: " .. tostring(afk)) end
@@ -464,13 +474,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
 				return
 			end
-		end
-		if debug then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
-		-- targetID-less commands --
-		if command:find("debug") and spIsCheatingEnabled() then -- toggle debug
-			debug = not debug
-			if debug then spEcho("[Commshare] Debug enabled.") else spEcho("[Commshare] Debug disabled.") end
-			return
 		end
 		if type(targetID) ~= "number" then
 			return
@@ -484,7 +487,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		elseif command:find("playerchanged") then -- hack in remerging. this is sent by the gadget's unsynced stuff.
 			if debug then spEcho("[Commshare] Playerchanged: " .. targetID) end
 			local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
-			if debug then spEcho("playerstates: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator)) end
+			if debug then spEcho("[Commshare] playerstates exists for player: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(spectator)) end
 			if playerstates[targetID] == nil and not spectator then -- this player has commshared or changed state.
 				if debug then spEcho("[Commshare] generated playerstate table.") end
 				playerstates[targetID] = {active = active, spectator = spectator, teamid = teamID}
@@ -523,7 +526,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 					return
 				end
 			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't a leader! Cannot kick this player.")
+				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't a leader! Kick is not allowed.")
 				return
 			end
 		end
@@ -536,4 +539,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if debug then Echo("[Commshare] unitCreated triggered for " .. unitTeam .. ", given to " .. commshareTeamID) end
 		spTransferUnit(unitID, commshareTeamID, true) -- this is in case of late commer coms,etc.
 	end
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddChatAction("debugcommshare", ToggleDebug, "Toggles Commshare debug echos.")
 end
