@@ -164,7 +164,6 @@ local function Walk()
 		Turn(ltoer, x_axis, 0, math.rad(100.021978))
 		Move(pelvis, y_axis, 4, 2)
 		Turn(pelvis, z_axis, math.rad(-(3.5)), math.rad(8))
-		Sleep(2)
 	end
 end
 
@@ -238,12 +237,14 @@ function script.Shot(num)
 end
 
 function script.QueryWeapon(num)
-	if gun_1 > 1 and gun_1 < 21 then
+	if gun_1 > 0 and gun_1 < 21 then
 		if gun_1_side then
 			return rfires[gun_1]
 		else
 			return lfires[gun_1]
 		end
+	else
+		return launchers
 	end
 end
 
