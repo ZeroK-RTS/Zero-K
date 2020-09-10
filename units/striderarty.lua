@@ -73,7 +73,6 @@ return { striderarty = {
       craterMult              = 2,
       
       customParams              = {
-        reaim_time = 8, -- COB
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,
