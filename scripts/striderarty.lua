@@ -66,6 +66,14 @@ bAiming = false
 gun_1 = 1
 gun_1_side = 0
 
+--Create an array to hold all left and right fire poitns
+local lfires = {}
+local rfires = {}
+for i = 1, 20 do
+	lfires[i] = piece('lfire' .. i)
+	rfires[i] = piece('rfire' .. i)
+end
+
 -- Signal definitions
 local SIG_WALK = 1
 local SIG_AIM = 4
@@ -218,7 +226,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.FireWeapon(num)
-	gun_1 = -1
+	gun_1 = 0
 	gun_1_side = 1
 end
 
@@ -230,15 +238,13 @@ function script.Shot(num)
 end
 
 function script.QueryWeapon(num)
-	if gun_1 >= 0 and gun_1 < 20 then
+	if gun_1 > 1 and gun_1 < 21 then
 		if gun_1_side then
-			return (rfire1 + gun_1)
+			return rfires[gun_1]
 		else
-			return (lfire1 + gun_1)
+			return lfires[gun_1]
 		end
-	else
-		return launchers
-    end
+	end
 end
 
 function script.AimWeapon(num, heading, pitch)
