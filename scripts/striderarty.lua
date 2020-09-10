@@ -88,7 +88,7 @@ local function Walk()
 		Turn(lfoot, x_axis, math.rad(-15.016484), math.rad(70.016484))
 		Turn(rfoot, x_axis, math.rad(5), math.rad(50.010989))
 		Turn(rleg, x_axis, math.rad(-10), math.rad(70.016484))
-		if bAiming then
+		if not bAiming then
 			Turn(torso, x_axis, math.rad(-1), math.rad(5))
 		end
 		Sleep(304)
@@ -125,7 +125,7 @@ local function Walk()
 		Turn(rupleg, x_axis, math.rad(-20.016484), math.rad(50.010989))
 		Turn(lfoot, x_axis, math.rad(-20.016484), math.rad(130.027473))
 		Turn(rleg, x_axis, math.rad(-20.016484), math.rad(100.021978))
-		if bAiming then
+		if not bAiming then
 			Turn(torso, y_axis, math.rad(2.5), math.rad(12))
 			Turn(torso, x_axis, math.rad(1), math.rad(6))
 		end
@@ -147,7 +147,7 @@ local function Walk()
 		Turn(rupleg, x_axis, math.rad(20.016484), math.rad(50.010989))
 		Turn(rfoot, x_axis, math.rad(-20.016484), math.rad(130.027473))
 		Turn(lleg, x_axis, math.rad(-20.016484), math.rad(100.021978))
-		if bAiming then
+		if not bAiming then
 			Turn(torso, y_axis, math.rad(-2.5), math.rad(12))
 			Turn(torso, x_axis, math.rad(-1), math.rad(6))
 		end
