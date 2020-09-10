@@ -27,6 +27,7 @@ local strFind = string.find
 local strLower = string.lower
 
 -- Spring API --
+local spIsCheatingEnabled = Spring.IsCheatingEnabled
 local spEcho = Spring.Echo
 local spIsGameOver = Spring.IsGameOver
 local spGetPlayerRulesParam = Spring.GetPlayerRulesParam
@@ -466,7 +467,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		end
 		if debug then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
 		-- targetID-less commands --
-		if command:find("debug") and (name == "Shaman" or (cp and cp.admin and cp.admin == 1)) then -- allow admins/myself to toggle debug.
+		if command:find("debug") and spIsCheatingEnabled() then -- toggle debug
 			debug = not debug
 			if debug then spEcho("[Commshare] Debug enabled.") else spEcho("[Commshare] Debug disabled.") end
 			return
