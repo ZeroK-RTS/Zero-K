@@ -167,7 +167,7 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, {torso})
+	StartThread(GG.Script.SmokeUnit, unitID, {torso, rlauncher, llauncher})
 	Turn(ltoef1, y_axis, math.rad(45))
 	Turn(ltoef2, y_axis, math.rad(-45))
 	Turn(rtoef1, y_axis, math.rad(45))
@@ -224,29 +224,13 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= 0.25 then
-		Explode(lfoot, SFX.SMOKE + SFX.EXPLODE)
-		Explode(lleg, SFX.SMOKE + SFX.EXPLODE)
-		Explode(rfoot, SFX.SMOKE + SFX.EXPLODE)
-		Explode(rleg, SFX.SMOKE + SFX.EXPLODE)
-		Explode(torso, SFX.FIRE + SFX.EXPLODE)
-		return 1
-    elseif severity <= 0.50 then
+	if severity <= 0.50 then
 		Explode(lfoot, SFX.FALL + SFX.EXPLODE)
 		Explode(lleg, SFX.FALL + SFX.EXPLODE)
-		Explode(pelvis, SFX.FALL + SFX.EXPLODE)
-		Explode(rfoot, SFX.FALL + SFX.EXPLODE)
-		Explode(rleg, SFX.FALL + SFX.EXPLODE)
-		Explode(torso, SFX.SHATTER + SFX.EXPLODE)
+		Explode(pelvis, SFX.EXPLODE)
+		Explode(rfoot, SFX.EXPLODE)
+		Explode(rleg, SFX.EXPLODE)
 		return 1
-	elseif severity <= 0.99 then
-		Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(lleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(pelvis, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(rleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-		Explode(torso, SFX.SHATTER + SFX.EXPLODE)
-		return 2
 	end
 	
 	Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
@@ -255,5 +239,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 	Explode(rleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 	Explode(torso, SFX.SHATTER + SFX.EXPLODE)
+	Explode(rlauncher, SFX.FALL + SFX.SHATTER + SFX.EXPLODE)
+	Explode(llauncher, SFX.FALL + SFX.SHATTER + SFX.EXPLODE)
 	return 2
 end
