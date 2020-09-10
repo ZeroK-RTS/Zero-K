@@ -537,9 +537,3 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		spTransferUnit(unitID, commshareTeamID, true) -- this is in case of late commer coms,etc.
 	end
 end
---[[ No longer needed since share menu does not allow empty teams to receive units. Unbind sharedialogue instead!
-function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	if controlledTeams[newTeam] and GetSquadSize(oldTeam) > 0 then
-		spTransferUnit(unitID, controlledTeams[newTeam], true)
-	end
-end]]
