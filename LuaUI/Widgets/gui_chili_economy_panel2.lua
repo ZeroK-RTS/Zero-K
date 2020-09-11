@@ -834,15 +834,14 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
 	"\n   " .. strings["resbar_expenses"] ..
-	"\n      " .. strings["resbar_sharing"] .. ": " .. metalShare ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
+	"\n      " .. strings["resbar_sharing"] .. ": " .. metalShare ..
 	"\n   " .. strings["resbar_storage"] ..
     "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
     "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
-	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
-	"\n   " .. strings["resbar_other"] ..
 	"\n      " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
 	"\n      " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
+	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n " ..
 	"\n" .. strings["team_metal_economy"] ..
 	"\n   " .. strings["resbar_income"] ..
@@ -852,16 +851,15 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_reclaim"] .. " : " .. team_metalReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
 	"\n   " .. strings["resbar_expenses"] ..
+	"\n      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n      " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
-	"\n      " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0) ..
-	"\n      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
 	"\n   " .. strings["resbar_storage"] ..
-	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
 	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
-	"\n   " .. strings["resbar_other"] ..
 	"\n      " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
-	"\n      " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0)
+	"\n      " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0) ..
+	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
+	"\n      " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0)
 	
 	image_energy.tooltip = strings["local_energy_economy"] ..
 	"\n   " .. strings["resbar_income"] ..
@@ -885,11 +883,11 @@ function widget:GameFrame(n)
 	"\n   " .. strings["resbar_expenses"] ..
 	"\n      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
+ 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice .. 	
-	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
- 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice ..
 	"\n   " .. strings["resbar_storage"] ..
 	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 
