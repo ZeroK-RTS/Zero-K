@@ -291,11 +291,11 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	widget:UnitDestroyed(unitID, unitDefID, teamID)
+	widget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	widget:UnitCreated(unitID, unitDefID, teamID)
+	widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:Initialize()

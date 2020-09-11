@@ -15,6 +15,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 
 ------------------------------------------------------------
 -- Speedups
@@ -172,11 +173,58 @@ for udid, ud in ipairs(UnitDefs) do
 	end
 end
 
-local addons = { -- coordinates of solars for the Alt modifier key
-	{ 16, -64 },
-	{ 64,  16 },
-	{-16,  64 },
-	{-64, -16 },
+local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed by allyTeam start position
+                 -- The first two solars are in front, this is partially to make use of solar tankiness,
+                 -- but also because cons typically approach from the back so would otherwise be standing
+                 -- on the buildspot and have to waste time moving away
+	{ -- North East East
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+	},
+	{ -- North North East
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+	},
+	{ -- North North West
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+	},
+	{ -- Nort West West
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+	},
+	{ -- South West West
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+	},
+	{ -- South South West
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+	},
+	{ -- South South East
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+	},
+	{ -- South East East
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -196,6 +244,9 @@ local metalSpotsNil = true
 
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 local metalmultInv = metalmult > 0 and (1/metalmult) or 1
+
+local myPlayerID = Spring.GetMyPlayerID()
+local myOctant = 1
 
 ------------------------------------------------------------
 -- Functions
@@ -332,7 +383,15 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = options.alt
+		local makeMexEnergy = options.alt or options.ctrl
+		local energyToMake = 2 -- Just Alt
+		if options.ctrl then
+			if options.alt then
+				energyToMake = 4
+			else
+				energyToMake = 1
+			end
+		end
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
@@ -344,7 +403,6 @@ function widget:CommandNotify(cmdID, params, options)
 
 		local noCommands = #commands
 		while noCommands > 0 do
-
 			tasort(commands, function(a,b) return a.d < b.d end)
 			orderedCommands[#orderedCommands+1] = commands[1]
 			aveX = commands[1].x
@@ -379,8 +437,8 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i = 1, #addons do
-						local addon = addons[i]
+					for i = 1, energyToMake do
+						local addon = addons[myOctant][i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
@@ -616,9 +674,22 @@ end
 local mexSpotToDraw = false
 local drawMexSpots = false
 
+local function UpdateOctant()
+	myOctant = GetAllyTeamOctant(Spring.GetMyAllyTeamID()) or myOctant
+	--Spring.Echo("myOctant", myOctant, GetAllyTeamOctant(Spring.GetMyAllyTeamID()))
+end
+
+function widget:PlayerChanged(playerID)
+	if myPlayerID ~= playerID then
+		return
+	end
+	UpdateOctant()
+end
+
 function widget:Initialize()
 	if metalSpotsNil and WG.metalSpots ~= nil then
 		Initialize()
+		UpdateOctant()
 		metalSpotsNil = false
 	end
 end

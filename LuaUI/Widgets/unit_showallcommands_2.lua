@@ -44,6 +44,7 @@ local TARGET_GROUND = 1
 local TARGET_UNIT= 2
 
 local CMD_ATTACK = CMD.ATTACK
+local setTargetAlpha = math.min(0.5, (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7) - 0.05)
 
 local selectedUnitCount = 0
 local selectedUnits
@@ -304,8 +305,8 @@ function widget:DrawWorld()
 		glPushAttrib(GL.LINE_BITS)
 		gl.LineStipple("springdefault")
 		glDepthTest(false)
-		glLineWidth(2)
-		glColor(1, 0.75, 0, 0.5)
+		glLineWidth(1)
+		glColor(1, 0.8, 0, setTargetAlpha)
 		glCallList(drawList)
 		glColor(1, 1, 1, 1)
 		glLineStipple(false)
