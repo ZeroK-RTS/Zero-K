@@ -40,7 +40,6 @@ local badwidgets = {
 		reason = "Breaks everything mex-related.", 
 		type = 'map', -- oktogon v3
 	},
-
 }
 
 -- callins --
@@ -57,15 +56,11 @@ function widget:Initialize()
 			widgetHandler:DisableWidget(widget.name)
 		end
 	end
-	if spGetGameFrame() > -1 and userContentDisabled then -- in case of reload
-		spEcho("game_message: " .. msg)
-		widgetHandler:RemoveWidget(widget)
-	end
 end
 
-function widget:GameStart()
+function widget:Update()
 	if userContentDisabled then
 		spEcho("game_message: " .. msg)
-		widgetHandler:RemoveWidget(widget)
 	end
+	widgetHandler:RemoveWidget(widget)
 end
