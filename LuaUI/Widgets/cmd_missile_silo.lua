@@ -82,7 +82,6 @@ local function RemoveAttackCommandIfFirst(unitID)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0)
 	
 	local rpt = Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) --Spring.Utilities.GetUnitRepeat(unitID)
-	Spring.Echo("cmdOpt", cmdOpt, rpt)
 	if rpt then
 		orderParamsTable[1] = cmdX
 		orderParamsTable[2] = cmdY
