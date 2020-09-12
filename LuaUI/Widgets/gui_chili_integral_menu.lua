@@ -522,11 +522,9 @@ end
 local function GetButtonTooltip(displayConfig, command, state)
 	local PARAGRAPH = "\n  "
 
-	local tooltip
-	if displayConfig and state then
-		tooltip = (displayConfig.stateTooltip and displayConfig.stateTooltip[state]) or displayConfig.tooltip
-	elseif command then
-		tooltip = command.tooltip
+	local tooltip = state and displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
+	if not tooltip then
+		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
 	end
 	if not tooltip then
 		return nil
