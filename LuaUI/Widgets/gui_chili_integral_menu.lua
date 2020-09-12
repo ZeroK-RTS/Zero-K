@@ -41,8 +41,8 @@ local screen0
 
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
-local COMMAND_SECTION_WIDTH = 74 -- percent
-local STATE_SECTION_WIDTH = 24 -- percent
+local commandSectionWidth = 74 -- percent
+local stateSectionWidth = 24 -- percent
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -87,7 +87,7 @@ end
 -- Command Handling and lower variables
 
 configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull -- In Initialize = include("Configs/integral_menu_config.lua")
 
 local fontObjects = {} -- Filled in init
 
@@ -104,7 +104,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
-	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'simple_mode', 'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -113,7 +113,28 @@ options_order = {
 local commandPanelPath = 'Hotkeys/Command Panel'
 local customGridPath = 'Hotkeys/Command Panel/Custom'
 
+local function UpdateHolderSizes(simpleMode)
+	if statePanel.buttons then
+		if simpleMode then
+			statePanel.buttons.SetDimensions(3, 2, false)
+		else
+			statePanel.buttons.SetDimensions(5, 3, true)
+		end
+	end
+end
+
 options = {
+	simple_mode = {
+		name = "Simple Mode",
+		desc = "When enabled, extraneous commands and state toggles are hidden.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			--commandSectionWidth = self.value and 75 or 74 -- percent
+			--stateSectionWidth = self.value and 25 or 24 -- percent
+			UpdateHolderSizes(self.value)
+		end,
+	},
 	background_opacity = {
 		name = "Opacity",
 		type = "number",
@@ -231,9 +252,6 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function()
-			ClearData(true)
-		end,
 	},
 	tabFontSize = {
 		name = "Tab Font Size",
@@ -246,9 +264,6 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function()
-			ClearData(true)
-		end,
 	},
 	flushLeft = {
 		name = 'Flush Left',
@@ -1239,6 +1254,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		y = y + button.height/2
 		return x, y, button.width, button.height
 	end
+	
+	function externalFunctionsAndData.Delete()
+		button:Dispose()
+	end
 
 	return externalFunctionsAndData
 end
@@ -1263,6 +1282,14 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 				parent:RemoveChild(button.button)
 			end
 		end
+	end
+	
+	function externalFunctions.DeleteButtons()
+		for i = 1, #buttonList do
+			buttonList[i].Delete()
+		end
+		buttons = {}
+		buttonList = {}
 	end
 	
 	function externalFunctions.GetButton(x, y, selectionIndex)
@@ -1349,6 +1376,13 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 			buttonList[i].OnVisibleGridKeyUpdate()
 		end
 		gridUpdatedSinceVisible = false
+	end
+	
+	function externalFunctions.SetDimensions(newRows, newColumns, newVertical)
+		rows, columns, vertical = newRows, newColumns, newVertical
+		width = tostring(100/columns) .. "%"
+		height = tostring(100/rows) .. "%"
+		externalFunctions.DeleteButtons()
 	end
 	
 	return externalFunctions
@@ -1653,7 +1687,7 @@ local function GetSelectionValues()
 end
 
 local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
-	if hiddenCommands[command.id] or command.hidden then
+	if hiddenCommands[command.id] or command.hidden or (options.simple_mode.value and simpleModeCull and simpleModeCull[command.id]) then
 		return
 	end
 
@@ -1890,7 +1924,7 @@ local function InitializeControls()
 		local commandHolder = Control:New{
 			x = "0%",
 			y = "0%",
-			width = COMMAND_SECTION_WIDTH .. "%",
+			width = commandSectionWidth .. "%",
 			height = "100%",
 			padding = {4, 6, 0, 4},
 			parent = buttonsHolder,
@@ -1940,16 +1974,17 @@ local function InitializeControls()
 	end
 	
 	statePanel.holder = Control:New{
-		x = (100 - STATE_SECTION_WIDTH) .. "%",
+		x = (100 - stateSectionWidth) .. "%",
 		y = "0%",
-		width = STATE_SECTION_WIDTH .. "%",
+		width = stateSectionWidth .. "%",
 		height = "100%",
 		padding = {0, 6, 3, 4},
 		parent = buttonsHolder,
 	}
 	statePanel.holder:SetVisibility(false)
 	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel", 5, 3, true, buttonLayoutConfig.command)
+	local simple = options.simple_mode.value
+	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel", simple and 3 or 3, simple and 2 or 3, not simple, buttonLayoutConfig.command)
 	
 	SetIntegralVisibility(false)
 end
@@ -2190,7 +2225,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands = include(configurationName)
+	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull = include(configurationName)
 	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")

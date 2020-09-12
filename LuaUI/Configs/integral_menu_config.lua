@@ -245,4 +245,45 @@ local instantCommands = {
 	[CMD_RESETMOVE] = true,
 }
 
-return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands
+local simpleModeCull = {
+	[CMD.SELFD] = true,
+	[CMD.WAIT] = true,
+	[CMD_EMBARK] = true,
+	[CMD_DISEMBARK] = true,
+	[CMD.AREA_ATTACK] = true,
+	[CMD_AREA_GUARD] = true,
+	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+	[CMD_UNIT_CANCEL_TARGET] = true,
+	
+	-- states
+	--[CMD_RETREAT] = true,
+	--[CMD_WANT_ONOFF] = true,
+	--[CMD.REPEAT] = true,
+	--[CMD_WANT_CLOAK] = true,
+	--[CMD.TRAJECTORY] = true,
+	--[CMD_UNIT_FLOAT_STATE] = true,
+	--[CMD_PRIORITY] = true,
+	--[CMD_MISC_PRIORITY] = true,
+	--[CMD_FACTORY_GUARD] = true,
+	--[CMD_TOGGLE_DRONES] = true,
+	--[CMD_PUSH_PULL] = true,
+	--[CMD.IDLEMODE] = true,
+	--[CMD_AP_FLY_STATE] = true,
+	[CMD_UNIT_AI] = true,
+	[CMD_CLOAK_SHIELD] = true,
+	[CMD_AUTO_CALL_TRANSPORT] = true,
+	[CMD_GLOBAL_BUILD] = true,
+	[CMD.MOVE_STATE] = true,
+	[CMD.FIRE_STATE] = true,
+	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_GOO_GATHER] = true,
+	[CMD_DISABLE_ATTACK] = true,
+	[CMD_DONT_FIRE_AT_RADAR] = true,
+	[CMD_PREVENT_OVERKILL] = true,
+	[CMD_AIR_STRAFE] = true,
+	[CMD_SELECTION_RANK] = true,
+
+}
+
+return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull
