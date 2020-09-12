@@ -11,6 +11,9 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+VFS.Include("LuaRules/Configs/constants.lua")
+
+local logfile
 
 function widget:GetInfo()
   return {
@@ -26,19 +29,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Speeups
+-- Speedups
 
+local CMD_INSERT        = CMD.INSERT
 local CMD_MOVE_STATE    = CMD.MOVE_STATE
 local CMD_PATROL        = CMD.PATROL
+local CMD_RECLAIM       = CMD.RECLAIM
+local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP          = CMD.STOP
 local spGetGameFrame    = Spring.GetGameFrame
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
+local spEcho            = Spring.Echo
+local spGetTeamResources = Spring.GetTeamResources
 
 local abs = math.abs
 
@@ -47,11 +56,27 @@ local mapCenterZ = Game.mapSizeZ / 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Constants
+
+-- Check that a unit is still doing the right thing every `checkInterval`
+-- seconds.
+local checkInterval = 20
+-- Don't issue a new command if less than `settleInterval` seconds have passed,
+-- even if the unit became idle.
+local settleInterval = 5
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Variables
 
 local stoppedUnit = {}
 local enableIdleNanos = true
 local stopHalts = true
+-- Map from unitID -> { command, commandArgs, checkTime }
+local trackedUnits = {}
+-- The current time, in seconds (I think)
+local time = 0
+local nextCheck
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -60,27 +85,99 @@ local stopHalts = true
 VFS.Include("LuaRules/Utilities/ClampPosition.lua")
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
+local function Log(msg)
+	spEcho("[uapn] " .. msg)
+end
+
+local function LogTable(table, prefix)
+	prefix = prefix or ""
+	for key, value in pairs(table) do
+		if type(value) == "table" then
+			Log(prefix .. tostring(key) .. ":")
+			LogTable(value, prefix .. "  ")
+		else
+			Log(prefix .. tostring(key) .. ": " .. tostring(value))
+		end
+	end
+end
+
+local function UpdateNextCheck()
+	nextCheck = nil
+	for _, info in pairs(trackedUnits) do
+		if nextCheck == nil or info.checkTime < nextCheck then
+			nextCheck = info.checkTime
+		end
+	end
+	Log("Update nextCheck to " .. tostring(nextCheck))
+end
+
 local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local function SetupUnit(unitID)
-	-- set immobile builders (nanotowers?) to the ROAM movestate,
-	-- and give them a PATROL order (does not matter where, afaict)
-	local cmdID = spGetUnitCurrentCommand(unitID)
-	if cmdID and cmdID ~= CMD_PATROL then
-		return
-	end
-	
-	local x, y, z = spGetUnitPosition(unitID)
-	if (x) then
-		-- point patrol towards map center
+local function CommandPriorities(x, y, z, buildDistance)
+	-- TODO: Cache for a few seconds
+    local teamID = spGetMyTeamID()
+	--local energy, energyStorage = spGetTeamResources(teamID, "energy")
+	--energyStorage = energyStorage - HIDDEN_STORAGE
+	local metal, metalStorage, metalPull, metalIncome = spGetTeamResources(teamID, "metal")
+	metalStorage = metalStorage - HIDDEN_STORAGE
+	Log("metal=" .. metal .. "; metalStorage=" .. metalStorage ..
+		"; metalPull=" .. metalPull .. "; metalIncome=" .. metalIncome)
+	if metal < 5 + metalIncome then
+		Log("reclaim")
+		return {{CMD_RECLAIM, {x, y, z, buildDistance}}}
+	elseif metal > metalStorage - 5 then
+		Log("repair")
+		return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+	else
+		Log("patrol")
+		-- Patrolling doesn't do anything if you target the current location of
+		-- the unit. Point patrol towards map center.
 		vx = mapCenterX - x
 		vz = mapCenterZ - z
 		x = x + vx*25/abs(vx)
 		z = z + vz*25/abs(vz)
 
-		GiveClampedOrderToUnit(unitID, CMD_PATROL, { x, y, z }, {})
+		return {{CMD_PATROL, {x, y, z}}}
+	end
+end
+
+local function SetupUnit(unitID)
+	-- set immobile builders (nanotowers?) to the ROAM movestate,
+	-- and give them a PATROL order (does not matter where, afaict)
+
+	-- TODO: Don't override user commands.
+--	local cmdID = spGetUnitCurrentCommand(unitID)
+--	Log("SetupUnit(" .. unitID ..") executing " .. tostring(cmdID), "\n")
+--	if cmdID and cmdID ~= CMD_PATROL then
+--		return
+--	end
+	
+	local x, y, z = spGetUnitPosition(unitID)
+	if (x) then
+		local unitDefID = spGetUnitDefID(unitID)
+		local buildDistance = UnitDefs[unitDefID].buildDistance
+		trackedUnits[unitID] = trackedUnits[unitID] or {}
+		trackedUnits[unitID].settleTime = time + settleInterval
+		trackedUnits[unitID].checkTime = time + checkInterval
+		local priorities = CommandPriorities(x, y, z, buildDistance)
+		--Log("priorities: " .. tostring(priorities))
+		--LogTable(priorities, "  ")
+		local first = true
+		for _, cmd in pairs(priorities) do
+			Log("give order " .. cmd[1] .. " to " .. unitID)
+			if first then
+				spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
+			else
+				local params = {-1, cmd[1], 0}
+				for _, v in pairs(cmd[2]) do
+					table.insert(params, v)
+				end
+				spGiveOrderToUnit(unitID, CMD_INSERT, params, {})
+			end
+			first = false
+		end
 	end
 end
 
@@ -91,6 +188,7 @@ local function SetupAll()
 			SetupUnit(unitID)
 		end
 	end
+	UpdateNextCheck()
 end
 
 --------------------------------------------------------------------------------
@@ -133,6 +231,7 @@ options = {
 -- Callins
 
 function widget:Initialize()
+	logfile = io.open("/home/tnewsome/zerok.log", "w")
 	SetupAll()
 end
 
@@ -144,6 +243,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 
 	SetupUnit(unitID)
+	UpdateNextCheck()
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
@@ -163,13 +263,13 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 			stoppedUnit[unitID] = nil
 		end
 	end
+	UpdateNextCheck()
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
-local idleCheckUnits
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
@@ -186,20 +286,30 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	idleCheckUnits = idleCheckUnits or {}
-	idleCheckUnits[unitID] = true
+	Log(tostring(nextCheck))
+	trackedUnits[unitID] = trackedUnits[unitID] or {checkTime=0}
+	trackedUnits[unitID].checkTime =
+			math.min(trackedUnits[unitID].checkTime, trackedUnits[unitID].settleTime)
+	nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
 end
 
 function widget:Update(dt)
-	if not idleCheckUnits then
-		return
-	end
-	for unitID, _ in pairs(idleCheckUnits) do
-		if Spring.ValidUnitID(unitID) and Spring.GetCommandQueue(unitID, 0) == 0 then
-			SetupUnit(unitID)
+	time = time + dt
+	if nextCheck ~= nil and time > nextCheck then
+		Log("time to check (" .. time .. ")")
+		for unitID, _ in pairs(trackedUnits) do
+			if Spring.ValidUnitID(unitID) then
+				local commandQueue = Spring.GetCommandQueue(unitID, -1)
+				Log(time .. "; cmd for " .. unitID .. ":" .. tostring(commandQueue) .. " ("
+					.. type(commandQueue) .. ")")
+				LogTable(commandQueue)
+				SetupUnit(unitID)
+			else
+				trackedUnits[unitID] = nil
+			end
 		end
-	end
-	idleCheckUnits = nil
+		UpdateNextCheck()
+    end
 end
 
 --------------------------------------------------------------------------------
