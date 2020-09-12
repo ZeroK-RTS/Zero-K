@@ -62,7 +62,9 @@ local mapCenterZ = Game.mapSizeZ / 2
 -- seconds.
 local checkInterval = 20
 -- Don't issue a new command if less than `settleInterval` seconds have passed,
--- even if the unit became idle.
+-- even if the unit became idle. This is a simple rate limiter on issuing
+-- commands in case there are caretakers with nothing to do for their current
+-- state.
 local settleInterval = 5
 
 --------------------------------------------------------------------------------
@@ -148,6 +150,10 @@ local function SetupUnit(unitID)
 	-- and give them a PATROL order (does not matter where, afaict)
 
 	-- TODO: Don't override user commands.
+	local commandQueue = Spring.GetCommandQueue(unitID, -1)
+	Log(time .. "; cmd for " .. unitID .. ":" .. tostring(commandQueue) .. " ("
+		.. type(commandQueue) .. ")")
+	LogTable(commandQueue)
 --	local cmdID = spGetUnitCurrentCommand(unitID)
 --	Log("SetupUnit(" .. unitID ..") executing " .. tostring(cmdID), "\n")
 --	if cmdID and cmdID ~= CMD_PATROL then
@@ -286,11 +292,18 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	Log(tostring(nextCheck))
-	trackedUnits[unitID] = trackedUnits[unitID] or {checkTime=0}
+	Log("UnitIdle:")
+	LogTable(trackedUnits[unitID], "- ")
+	-- Check soon, but not right away. This time has to be long enough that the
+	-- factory we're assisting (while in repair mode) has started the next unit.
 	trackedUnits[unitID].checkTime =
-			math.min(trackedUnits[unitID].checkTime, trackedUnits[unitID].settleTime)
+		math.max(
+			math.min(
+				trackedUnits[unitID].checkTime,
+				trackedUnits[unitID].settleTime),
+			time + 0.5)
 	nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
+	LogTable(trackedUnits[unitID], "+ ")
 end
 
 function widget:Update(dt)
@@ -299,10 +312,6 @@ function widget:Update(dt)
 		Log("time to check (" .. time .. ")")
 		for unitID, _ in pairs(trackedUnits) do
 			if Spring.ValidUnitID(unitID) then
-				local commandQueue = Spring.GetCommandQueue(unitID, -1)
-				Log(time .. "; cmd for " .. unitID .. ":" .. tostring(commandQueue) .. " ("
-					.. type(commandQueue) .. ")")
-				LogTable(commandQueue)
 				SetupUnit(unitID)
 			else
 				trackedUnits[unitID] = nil
