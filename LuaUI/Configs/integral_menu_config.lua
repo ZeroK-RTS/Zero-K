@@ -296,13 +296,22 @@ local cmdPosDef = {
 	[CMD_AREA_GUARD]    = {pos = 1, priority = 10},
 	[CMD.AREA_ATTACK]   = {pos = 1, priority = 11},
 	
+	
+	[CMD_UPGRADE_UNIT]    = {pos = 7, priority = -10},
+	[CMD_UPGRADE_STOP]    = {pos = 7, priority = -9},
+	[CMD_MORPH]           = {pos = 7, priority = -8},
+	
+	[CMD_STOP_NEWTON_FIREZONE] = {pos = 7, priority = -4},
+	[CMD_NEWTON_FIREZONE]      = {pos = 7, priority = -3},
+	
 	[CMD.MANUALFIRE]      = {pos = 7, priority = 0.1},
 	[CMD_PLACE_BEACON]    = {pos = 7, priority = 0.2},
+	[CMD.STOCKPILE]       = {pos = 7, priority = 0.25},
 	[CMD_ABANDON_PW]      = {pos = 7, priority = 0.3},
 	[CMD_GBCANCEL]        = {pos = 7, priority = 0.4},
 	[CMD_ONECLICK_WEAPON] = {pos = 7, priority = 0.5},
-	[CMD_RECALL_DRONES]   = {pos = 7, priority = 0.6},
 	[CMD_STOP_PRODUCTION] = {pos = 7, priority = 0.7},
+	
 	
 	[CMD_BUILD]         = {pos = 7, priority = 0.8},
 	[CMD_AREA_MEX]      = {pos = 7, priority = 1},
@@ -314,8 +323,9 @@ local cmdPosDef = {
 	
 	[CMD.LOAD_UNITS]    = {pos = 7, priority = 7},
 	[CMD.UNLOAD_UNITS]  = {pos = 7, priority = 8},
+	[CMD_RECALL_DRONES] = {pos = 7, priority = 10},
 	
-	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 1},
+	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 2},
 	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 2},
 	[CMD_EMBARK]        = {pos = 13, priority = 5},
 	[CMD_DISEMBARK]     = {pos = 13, priority = 6},
@@ -339,9 +349,9 @@ local cmdPosDef = {
 	[CMD_TOGGLE_DRONES]    = {pos = 1, priority = 16},
 	[CMD_PUSH_PULL]        = {pos = 1, priority = 17},
 	[CMD.IDLEMODE]         = {pos = 1, priority = 18},
-	[CMD_AUTO_CALL_TRANSPORT] = {pos = 1, priority = 18.5},
 	[CMD_AP_FLY_STATE]     = {pos = 1, priority = 19},
 	[CMD_CLOAK_SHIELD]     = {pos = 1, priority = 20},
+	[CMD_AUTO_CALL_TRANSPORT] = {pos = 1, priority = 21},
 
 }
 

@@ -634,6 +634,22 @@ local function UpdateBackgroundSkin()
 	end
 end
 
+local function GetCmdPosParameters(cmdID)
+	local def = cmdPosDef[cmdID]
+	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 1000 then
+		def = cmdPosDef[CMD_MORPH]
+	end
+	
+	if def then
+		if simpleModeEnabled and def.posSimple then
+			return def.posSimple, def.priority
+		end
+		return def.pos, def.priority
+	end
+	--Spring.Echo("Unknown GetCmdPosParameters", cmdID)
+	return 1, 100
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Queue Editing Implementation
@@ -1367,19 +1383,16 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	end
 	
 	function externalFunctions.AddCommandPosition(cmdID)
-		local pos
-		if simpleModeEnabled and (cmdPosDef[cmdID] and cmdPosDef[cmdID].posSimple) then
-			pos = cmdPosDef[cmdID].posSimple
-		else
-			pos = (cmdPosDef[cmdID] and cmdPosDef[cmdID].pos) or 1
-		end
+		local pos, priority = GetCmdPosParameters(cmdID)
 		while positionCmd[pos] do
 			local otherCmdID = positionCmd[pos]
-			if ((cmdPosDef[cmdID] and cmdPosDef[cmdID].priority) or 100) < ((cmdPosDef[otherCmdID] and cmdPosDef[otherCmdID].priority) or 100) then
+			local _, otherPriority = GetCmdPosParameters(otherCmdID)
+			if (priority < otherPriority) then
 				-- Displace old command. Priority 1 displaces priority 2.
 				cmdPosition[cmdID] = pos
 				positionCmd[pos] = cmdID
 				cmdID = otherCmdID
+				priority = otherPriority
 			end
 			pos = pos + 1
 		end

@@ -27,6 +27,8 @@ local cmds = {
 	FACTORY_GUARD = 13921,
 	AREA_GUARD = 13922,
 
+	UPGRADE_UNIT = 11432,
+
 	-- ORBIT_DRAW is an evil on the order of CMD.SET_WANTED_MAX_SPEED.
 	-- It is required because ORBIT needs two parameters but this
 	-- causes it to not draw in the command queue.
