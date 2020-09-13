@@ -14,6 +14,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local spGetPlayerInfo = Spring.GetPlayerInfo
+local playerstate = {} -- for PlayerChangedTeam, PlayerResigned
 local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
@@ -150,6 +152,8 @@ widgetHandler = {
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
+  'PlayerChangedTeam',
+  'PlayerResigned',
   'GameOver',
   'GamePaused',
   'GameFrame',
@@ -238,6 +242,8 @@ for _,ci in ipairs(reverseCallIns) do
 end
 
 local callInLists = {
+  'PlayerChangedTeam',
+  'PlayerResigned',
   'GamePreload',
   'GameStart',
   'Shutdown',
@@ -435,6 +441,11 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
+  local playerlist = Spring.GetPlayerList()
+  for p=1, #playerlist do
+    local _,_,spectator,t,_ = spGetPlayerInfo(playerlist[p])
+    playerstate[playerlist[p]] = {team = t, spectator = spectator}
+  end
   -- Add ignorelist --
   Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
@@ -1997,11 +2008,24 @@ end
 
 
 function widgetHandler:PlayerChanged(playerID) --when player Change from Spectator to Player or Player to Spectator.
-  MessageProcessor:UpdatePlayer(playerID)
-  for _,w in r_ipairs(self.PlayerChangedList) do
-    w:PlayerChanged(playerID)
-  end
-  return
+	MessageProcessor:UpdatePlayer(playerID)
+	local _,_,spectator,teamID,_ = Spring.GetPlayerInfo(playerID)
+	if spectator ~= playerstate[playerID].spectator and spectator then
+		for _,w in r_ipairs(self.PlayerResignedList) do
+			w:PlayerResigned(playerID)
+		end
+	end
+	if teamID ~= playerstate[playerID].team and not spectator then
+		for _,w in r_ipairs(self.PlayerChangedTeamList) do
+			w:PlayerChangedTeam(playerID,playerstate[playerID].team,teamID)
+		end
+	end
+	playerstate[playerID].spectator = spectator
+	playerstate[playerID].team = teamID
+	for _,w in r_ipairs(self.PlayerChangedList) do
+		w:PlayerChanged(playerID)
+	end
+	return
 end
 
 
