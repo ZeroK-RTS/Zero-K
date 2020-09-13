@@ -248,12 +248,13 @@ local instantCommands = {
 local simpleModeCull = {
 	[CMD.SELFD] = true,
 	[CMD.WAIT] = true,
-	[CMD_EMBARK] = true,
+	--[CMD_EMBARK] = true,
 	[CMD_DISEMBARK] = true,
 	[CMD.AREA_ATTACK] = true,
 	[CMD_AREA_GUARD] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
 	[CMD_UNIT_CANCEL_TARGET] = true,
+	[CMD_STOP_PRODUCTION] = true,
 	
 	-- states
 	--[CMD_RETREAT] = true,
@@ -270,11 +271,11 @@ local simpleModeCull = {
 	--[CMD.IDLEMODE] = true,
 	--[CMD_AP_FLY_STATE] = true,
 	[CMD_UNIT_AI] = true,
-	[CMD_CLOAK_SHIELD] = true,
-	[CMD_AUTO_CALL_TRANSPORT] = true,
+	--[CMD_CLOAK_SHIELD] = true,
+	--[CMD_AUTO_CALL_TRANSPORT] = true,
 	[CMD_GLOBAL_BUILD] = true,
-	[CMD.MOVE_STATE] = true,
-	[CMD.FIRE_STATE] = true,
+	--[CMD.MOVE_STATE] = true,
+	--[CMD.FIRE_STATE] = true,
 	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
 	[CMD_GOO_GATHER] = true,
@@ -283,7 +284,65 @@ local simpleModeCull = {
 	[CMD_PREVENT_OVERKILL] = true,
 	[CMD_AIR_STRAFE] = true,
 	[CMD_SELECTION_RANK] = true,
+}
+
+local cmdPosDef = {
+	[CMD.STOP]          = {pos = 1, priority = 1},
+	[CMD.FIGHT]         = {pos = 1, priority = 2},
+	[CMD_RAW_MOVE]      = {pos = 1, priority = 3},
+	[CMD.PATROL]        = {pos = 1, priority = 4},
+	[CMD.ATTACK]        = {pos = 1, priority = 5},
+	[CMD_JUMP]          = {pos = 1, priority = 6},
+	[CMD_AREA_GUARD]    = {pos = 1, priority = 10},
+	[CMD.AREA_ATTACK]   = {pos = 1, priority = 11},
+	
+	[CMD.MANUALFIRE]      = {pos = 7, priority = 0.1},
+	[CMD_PLACE_BEACON]    = {pos = 7, priority = 0.2},
+	[CMD_ABANDON_PW]      = {pos = 7, priority = 0.3},
+	[CMD_GBCANCEL]        = {pos = 7, priority = 0.4},
+	[CMD_ONECLICK_WEAPON] = {pos = 7, priority = 0.5},
+	[CMD_RECALL_DRONES]   = {pos = 7, priority = 0.6},
+	[CMD_STOP_PRODUCTION] = {pos = 7, priority = 0.7},
+	
+	[CMD_BUILD]         = {pos = 7, priority = 0.8},
+	[CMD_AREA_MEX]      = {pos = 7, priority = 1},
+	[CMD.REPAIR]        = {pos = 7, priority = 2},
+	[CMD.RECLAIM]       = {pos = 7, priority = 3},
+	[CMD.RESURRECT]     = {pos = 7, priority = 4},
+	[CMD.WAIT]          = {pos = 7, priority = 5},
+	[CMD_FIND_PAD]      = {pos = 7, priority = 6},
+	
+	[CMD.LOAD_UNITS]    = {pos = 7, priority = 7},
+	[CMD.UNLOAD_UNITS]  = {pos = 7, priority = 8},
+	
+	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 1},
+	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 2},
+	[CMD_EMBARK]        = {pos = 13, priority = 5},
+	[CMD_DISEMBARK]     = {pos = 13, priority = 6},
+
+	-- States
+	[CMD.REPEAT]           = {pos = 1, priority = 1},
+	[CMD_RETREAT]          = {pos = 1, priority = 2},
+	
+	[CMD.MOVE_STATE]       = {pos = 6, posSimple = 5, priority = 1},
+	[CMD.FIRE_STATE]       = {pos = 6, posSimple = 5, priority = 2},
+	[CMD_FACTORY_GUARD]    = {pos = 6, posSimple = 5, priority = 3},
+	
+	[CMD_SELECTION_RANK]   = {pos = 5, priority = 1},
+	
+	[CMD_PRIORITY]         = {pos = 1, priority = 10},
+	[CMD_MISC_PRIORITY]    = {pos = 1, priority = 11},
+	[CMD_WANT_ONOFF]       = {pos = 1, priority = 12},
+	[CMD_WANT_CLOAK]       = {pos = 1, priority = 13},
+	[CMD.TRAJECTORY]       = {pos = 1, priority = 14},
+	[CMD_UNIT_FLOAT_STATE] = {pos = 1, priority = 15},
+	[CMD_TOGGLE_DRONES]    = {pos = 1, priority = 16},
+	[CMD_PUSH_PULL]        = {pos = 1, priority = 17},
+	[CMD.IDLEMODE]         = {pos = 1, priority = 18},
+	[CMD_AUTO_CALL_TRANSPORT] = {pos = 1, priority = 18.5},
+	[CMD_AP_FLY_STATE]     = {pos = 1, priority = 19},
+	[CMD_CLOAK_SHIELD]     = {pos = 1, priority = 20},
 
 }
 
-return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull
+return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull, cmdPosDef

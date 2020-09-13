@@ -42,7 +42,10 @@ local screen0
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
 local commandSectionWidth = 74 -- percent
-local stateSectionWidth = 24 -- percent
+local stateSectionWidth = 26 -- percent
+
+local bigStateWidth, bigStateHeight = 4, 3
+local smallStateWidth, smallStateHeight = 5, 3.4
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -87,7 +90,7 @@ end
 -- Command Handling and lower variables
 
 configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull, cmdPosDef -- In Initialize = include("Configs/integral_menu_config.lua")
 
 local fontObjects = {} -- Filled in init
 
@@ -96,6 +99,7 @@ local tabPanel
 local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
+local simpleModeEnabled = true
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -116,9 +120,9 @@ local customGridPath = 'Hotkeys/Command Panel/Custom'
 local function UpdateHolderSizes(simpleMode)
 	if statePanel.buttons then
 		if simpleMode then
-			statePanel.buttons.SetDimensions(3, 2, false)
+			statePanel.buttons.SetDimensions(bigStateWidth, bigStateHeight, true)
 		else
-			statePanel.buttons.SetDimensions(5, 3, true)
+			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
 		end
 	end
 end
@@ -132,6 +136,7 @@ options = {
 		OnChange = function(self)
 			--commandSectionWidth = self.value and 75 or 74 -- percent
 			--stateSectionWidth = self.value and 25 or 24 -- percent
+			simpleModeEnabled = self.value
 			UpdateHolderSizes(self.value)
 		end,
 	},
@@ -1266,8 +1271,12 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	local buttons = {}
 	local buttonList = {}
 	
+	local cmdPosition = {}
+	local positionCmd = {}
+	
 	local width = tostring(100/columns) .. "%"
 	local height = tostring(100/rows) .. "%"
+	local buttonSpace = math.floor(rows)*math.floor(columns)
 	
 	local gridMap, override
 	local gridEnabled = true
@@ -1346,6 +1355,39 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		end
 	end
 	
+	function externalFunctions.CommandToPosition(cmdID, count)
+		local index = cmdPosition[cmdID] or count or 1
+		local x, y = externalFunctions.IndexToPosition(index)
+		return x, y, index <= buttonSpace
+	end
+	
+	function externalFunctions.ResetCommandPositions(cmdID)
+		cmdPosition = {}
+		positionCmd = {}
+	end
+	
+	function externalFunctions.AddCommandPosition(cmdID)
+		local pos
+		if simpleModeEnabled and (cmdPosDef[cmdID] and cmdPosDef[cmdID].posSimple) then
+			pos = cmdPosDef[cmdID].posSimple
+		else
+			pos = (cmdPosDef[cmdID] and cmdPosDef[cmdID].pos) or 1
+		end
+		while positionCmd[pos] do
+			local otherCmdID = positionCmd[pos]
+			if ((cmdPosDef[cmdID] and cmdPosDef[cmdID].priority) or 100) < ((cmdPosDef[otherCmdID] and cmdPosDef[otherCmdID].priority) or 100) then
+				-- Displace old command. Priority 1 displaces priority 2.
+				cmdPosition[cmdID] = pos
+				positionCmd[pos] = cmdID
+				cmdID = otherCmdID
+			end
+			pos = pos + 1
+		end
+		cmdPosition[cmdID] = pos
+		positionCmd[pos] = cmdID
+		return
+	end
+	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
 		gridMap = newGridMap or gridMap
 		override = newOverride or override
@@ -1382,6 +1424,7 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		rows, columns, vertical = newRows, newColumns, newVertical
 		width = tostring(100/columns) .. "%"
 		height = tostring(100/rows) .. "%"
+		buttonSpace = math.floor(rows)*math.floor(columns)
 		externalFunctions.DeleteButtons()
 	end
 	
@@ -1686,8 +1729,34 @@ local function GetSelectionValues()
 	return false, nil, nil, #selection
 end
 
+local function HiddenCommand(command)
+	return hiddenCommands[command.id] or command.hidden or (options.simple_mode.value and simpleModeCull and simpleModeCull[command.id])
+end
+
+local function ProcessCommandPosition(command)
+	if HiddenCommand(command) then
+		return
+	end
+
+	local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+	if isStateCommand then
+		statePanel.buttons.AddCommandPosition(command.id)
+		return
+	end
+	
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if not data.isBuild then
+			local found, position = data.inclusionFunction(command.id, factoryUnitDefID)
+			if found then
+				data.buttons.AddCommandPosition(command.id)
+			end
+		end
+	end
+end
+
 local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
-	if hiddenCommands[command.id] or command.hidden or (options.simple_mode.value and simpleModeCull and simpleModeCull[command.id]) then
+	if HiddenCommand(command) then
 		return
 	end
 
@@ -1695,7 +1764,11 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 	if isStateCommand then
 		statePanel.commandCount = statePanel.commandCount + 1
 		
-		local x, y = statePanel.buttons.IndexToPosition(statePanel.commandCount)
+		local x, y, spaceAvailible = statePanel.buttons.CommandToPosition(command.id, statePanel.commandCount)
+		if not spaceAvailible then
+			statePanel.commandCount = statePanel.commandCount - 1
+			return
+		end
 		local button = statePanel.buttons.GetButton(x, y, selectionIndex)
 		button.SetCommand(command)
 		return
@@ -1711,7 +1784,7 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 			if position then
 				x, y = position.col, position.row
 			else
-				x, y = data.buttons.IndexToPosition(data.commandCount)
+				x, y = data.buttons.CommandToPosition(command.id, data.commandCount)
 			end
 			
 			local button = data.buttons.GetButton(x, y, selectionIndex)
@@ -1743,9 +1816,21 @@ local function ProcessAllCommands(commands, customCommands)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		data.commandCount = 0
+		if not data.isBuild then
+			data.buttons.ResetCommandPositions()
+		end
 	end
 	
 	statePanel.commandCount = 0
+	statePanel.buttons.ResetCommandPositions()
+	
+	for i = 1, #commands do
+		ProcessCommandPosition(commands[i])
+	end
+	
+	for i = 1, #customCommands do
+		ProcessCommandPosition(customCommands[i])
+	end
 	
 	for i = 1, #commands do
 		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
@@ -1984,7 +2069,12 @@ local function InitializeControls()
 	statePanel.holder:SetVisibility(false)
 	
 	local simple = options.simple_mode.value
-	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel", simple and 3 or 3, simple and 2 or 3, not simple, buttonLayoutConfig.command)
+	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel",
+		simple and bigStateWidth or smallStateWidth,
+		simple and bigStateHeight or smallStateHeight,
+		true,
+		buttonLayoutConfig.command
+	)
 	
 	SetIntegralVisibility(false)
 end
@@ -2225,7 +2315,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull = include(configurationName)
+	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull, cmdPosDef = include(configurationName)
 	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")
