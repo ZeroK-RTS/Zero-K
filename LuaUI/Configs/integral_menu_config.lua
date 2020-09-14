@@ -295,7 +295,7 @@ local cmdPosDef = {
 	[CMD.FIRE_STATE]       = {pos = 6, posSimple = 5, priority = 2},
 	[CMD_FACTORY_GUARD]    = {pos = 6, posSimple = 5, priority = 3},
 	
-	[CMD_SELECTION_RANK]   = {pos = 6, posSimple = 1, priority = 0.5}, -- At the start of simple settings, since it always appears.
+	[CMD_SELECTION_RANK]   = {pos = 6, posSimple = 1, priority = 1.5},
 	
 	[CMD_PRIORITY]         = {pos = 1, priority = 10},
 	[CMD_MISC_PRIORITY]    = {pos = 1, priority = 11},
