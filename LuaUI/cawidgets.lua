@@ -441,11 +441,20 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
-  local playerlist = Spring.GetPlayerList()
-  for p=1, #playerlist do
-    local _,_,spectator,t,_ = spGetPlayerInfo(playerlist[p])
-    playerstate[playerlist[p]] = {team = t, spectator = spectator}
-  end
+	local gaia = Spring.GetGaiaTeamID()
+	local allys = Spring.GetAllyTeamList()
+	for a=1, #allys do
+		local teamlist = Spring.GetTeamList(ally[a])
+		for t=1, #teamlist do
+			if teamlist[t] ~= gaia then
+				local playerlist = Spring.GetPlayerList(teamlist[t])
+				for p=1, #playerlist do
+					local _,_,spectator,_ = spGetPlayerInfo(playerlist[p])
+					playerstate[playerlist[p]] = {team = teamlist[t], spectator = spectator}
+				end
+			end
+		end
+	end
   -- Add ignorelist --
   Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
