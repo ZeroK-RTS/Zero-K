@@ -74,7 +74,7 @@ local recallDronesCmdDesc = {
 	name    = 'Recall Drones',
 	cursor  = 'Load units',
 	action  = 'recalldrones',
-	tooltip = 'Recall any owned drones to the mothership.',
+	tooltip = 'Recall Drones: Return controlled drones to the host unit.',
 }
 
 local toggleDronesCmdDesc = {

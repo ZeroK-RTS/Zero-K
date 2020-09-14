@@ -254,7 +254,7 @@ local simpleModeCull = {
 	[CMD_AREA_GUARD] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
 	[CMD_UNIT_CANCEL_TARGET] = true,
-	[CMD_STOP_PRODUCTION] = true,
+	--[CMD_STOP_PRODUCTION] = true,
 	
 	-- states
 	--[CMD_RETREAT] = true,
@@ -278,7 +278,7 @@ local simpleModeCull = {
 	--[CMD.FIRE_STATE] = true,
 	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
-	[CMD_GOO_GATHER] = true,
+	--[CMD_GOO_GATHER] = true,
 	[CMD_DISABLE_ATTACK] = true,
 	[CMD_DONT_FIRE_AT_RADAR] = true,
 	[CMD_PREVENT_OVERKILL] = true,

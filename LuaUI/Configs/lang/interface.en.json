@@ -49,7 +49,7 @@
 	"toggle_cheatsheet_name" : "Toggle Cheat Sheet",
 	"toggle_cheatsheet_desc" : "Shows a menu which contains various handy cheats.",
 	"place_retreat_zone_name" : "Place Retreat Zone",
-	"place_retreat_zone_desc" : "Hold shift to place multiple zones. Click on existing zones to remove.",
+	"place_retreat_zone_desc" : "Place a Retreat Zone or click existing zones to remove. Hold shift to place multiple zones at once.",
 	"place_ferry_route_name" : "Place Ferry Route",
 	"place_ferry_route_desc" : "Hold shift to queue and edit waypoints. Click on existing route heads to remove.",
 	"clearmapmarks_name" : "Erase Map Drawings",
