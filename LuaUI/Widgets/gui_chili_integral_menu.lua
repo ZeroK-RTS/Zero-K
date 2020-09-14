@@ -118,9 +118,9 @@ options_order = {
 local commandPanelPath = 'Hotkeys/Command Panel'
 local customGridPath = 'Hotkeys/Command Panel/Custom'
 
-local function UpdateHolderSizes(simpleMode)
+local function UpdateHolderSizes()
 	if statePanel.buttons then
-		if simpleMode then
+		if simpleModeEnabled then
 			statePanel.buttons.SetDimensions(bigStateWidth, bigStateHeight, true)
 		else
 			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
@@ -139,7 +139,7 @@ options = {
 		value = true,
 		OnChange = function(self)
 			simpleModeEnabled = self.value
-			UpdateHolderSizes(self.value)
+			UpdateHolderSizes()
 		end,
 	},
 	enable_return_fire = {
@@ -148,7 +148,11 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
-			WG.RemoveRoamState = not self.value
+			WG.RemoveReturnFireState = not self.value
+			if commandDisplayConfig then
+				commandDisplayConfig[CMD.FIRE_STATE].useAltConfig = self.value
+			end
+			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
 	},
 	enable_roam = {
@@ -158,6 +162,10 @@ options = {
 		value = false,
 		OnChange = function(self)
 			WG.RemoveRoamState = not self.value
+			if commandDisplayConfig then
+				commandDisplayConfig[CMD.MOVE_STATE].useAltConfig = self.value
+			end
+			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
 	},
 	background_opacity = {
@@ -583,6 +591,10 @@ local function GetButtonTooltip(displayConfig, command, state)
 
 	-- Append State hotkeys if any are set
 	local states, hotkeys_for_states, number_of_set_hotkeys = GetHotkeysForStatesText(action_name)
+	if displayConfig and displayConfig.stateNameOverride then
+		states = displayConfig.stateNameOverride
+	end
+	
 	if hotkeys_for_states and number_of_set_hotkeys > 0 then
 		tooltip = tooltip .. PARAGRAPH .. "State Hotkeys:"
 		for i = 1, #states do
@@ -668,6 +680,17 @@ local function GetCmdPosParameters(cmdID)
 	end
 	--Spring.Echo("Unknown GetCmdPosParameters", cmdID)
 	return 1, 100
+end
+
+local function GetDisplayConfig(cmdID)
+	local displayConfig = commandDisplayConfig[cmdID]
+	if not displayConfig then
+		return
+	end
+	if displayConfig.useAltConfig then
+		return displayConfig.altConfig
+	end
+	return displayConfig
 end
 
 --------------------------------------------------------------------------------
@@ -1213,7 +1236,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 			if isStateCommand then
 				local state = command.params[1] + 1
-				local displayConfig = commandDisplayConfig[cmdID]
+				local displayConfig = GetDisplayConfig(cmdID)
 				if displayConfig then
 					local texture = displayConfig.texture[state]
 					if displayConfig.stateTooltip then
@@ -1253,7 +1276,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
-		local displayConfig = commandDisplayConfig[cmdID]
+		local displayConfig = GetDisplayConfig(cmdID)
 		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
 		
 		if command.action then
@@ -1768,7 +1791,7 @@ local function GetSelectionValues()
 end
 
 local function HiddenCommand(command)
-	return hiddenCommands[command.id] or command.hidden or (options.simple_mode.value and simpleModeCull and simpleModeCull[command.id])
+	return hiddenCommands[command.id] or command.hidden or (simpleModeEnabled and simpleModeCull and simpleModeCull[command.id])
 end
 
 local function ProcessCommandPosition(command)
@@ -2106,10 +2129,9 @@ local function InitializeControls()
 	}
 	statePanel.holder:SetVisibility(false)
 	
-	local simple = options.simple_mode.value
 	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel",
-		simple and bigStateWidth or smallStateWidth,
-		simple and bigStateHeight or smallStateHeight,
+		simpleModeEnabled and bigStateWidth or smallStateWidth,
+		simpleModeEnabled and bigStateHeight or smallStateHeight,
 		true,
 		buttonLayoutConfig.command
 	)

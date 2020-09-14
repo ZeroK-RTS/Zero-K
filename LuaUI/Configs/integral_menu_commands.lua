@@ -391,8 +391,8 @@ local tooltips = {
 	FACTORY_GUARD = "Auto Assist (_STATE_)\n  Newly built constructors automatically assist their factory.",
 	AUTO_CALL_TRANSPORT = "Call Transports (_STATE_)\n  Automatically call transports between constructor tasks.",
 	GLOBAL_BUILD = "Global Build Command (_STATE_)\n  Sets constructors to execute global build orders.",
-	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
-	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
+	MOVE_STATE = "Hold Position (_STATE_)\n  Prevent units from moving when idle. States are persistent and togglable.",
+	FIRE_STATE = "Hold Fire (_STATE_)\n  Prevent units firing without a direct Force Fire command. States are persistent and togglable.",
 	RETREAT = "Retreat (_STATE_)\n  Automatically retreat to closest retreat point or airpad when damaged. Right click to disable.",
 	IDLEMODE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
 	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
@@ -408,6 +408,11 @@ local tooltips = {
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain amphibious units to float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
+}
+
+local tooltipsAlternate = {
+	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
+	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
 }
 
 local overrides = {
@@ -514,17 +519,35 @@ local overrides = {
 	[CMD.MOVE_STATE] = {
 		texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 		stateTooltip = {
-			tooltips.MOVE_STATE:gsub("_STATE_", "Hold Position"),
-			tooltips.MOVE_STATE:gsub("_STATE_", "Maneuver"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Enabled"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Disabled"),
 			tooltips.MOVE_STATE:gsub("_STATE_", "Roam")
+		},
+		stateNameOverride = {"Enabled", "Disabled", "Roam (not in toggle)"},
+		altConfig = {
+			texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
+			stateTooltip = {
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Hold Position"),
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Maneuver"),
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Roam")
+			},
 		}
 	},
 	[CMD.FIRE_STATE] = {
 		texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
 		stateTooltip = {
-			tooltips.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
+			tooltips.FIRE_STATE:gsub("_STATE_", "Enabled"),
 			tooltips.FIRE_STATE:gsub("_STATE_", "Return Fire"),
-			tooltips.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+			tooltips.FIRE_STATE:gsub("_STATE_", "Disabled")
+		},
+		stateNameOverride = {"Enabled", "Return Fire (not in toggle)", "Disabled"},
+		altConfig = {
+			texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
+			stateTooltip = {
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Return Fire"),
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+			},
 		}
 	},
 	[CMD_RETREAT] = {
