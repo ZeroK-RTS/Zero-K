@@ -158,8 +158,8 @@ local flexCallIns = {
   'GameSetup',
   'TeamDied',
   'TeamChanged',
-	'PlayerChangedTeam', -- ZK callin.
-	'PlayerResigned', -- ZK callin.
+  'PlayerChangedTeam', -- ZK callin.
+  'PlayerResigned', -- ZK callin.
   'PlayerAdded',
   'PlayerChanged',
   "PlayerRemoved",
@@ -242,8 +242,6 @@ for _,ci in ipairs(reverseCallIns) do
 end
 
 local callInLists = {
-	'PlayerChangedTeam', -- zk callin
-	'PlayerResigned', -- zk callin
   'GamePreload',
   'GameStart',
   'Shutdown',
@@ -2022,7 +2020,7 @@ function widgetHandler:PlayerChanged(playerID) --when player Change from Spectat
 			w:PlayerResigned(playerID)
 		end
 	end
-	if teamID ~= player.team and not spectator then
+	if teamID ~= status.team and not spectator then
 		for _,w in r_ipairs(self.PlayerChangedTeamList) do
 			w:PlayerChangedTeam(playerID,status.team,teamID)
 		end
