@@ -108,7 +108,8 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
-	'simple_mode', 'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
+	'simple_mode', 'enable_return_fire', 'enable_roam',
+	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
@@ -127,6 +128,9 @@ local function UpdateHolderSizes(simpleMode)
 	end
 end
 
+WG.RemoveReturnFireState = true -- matches default
+WG.RemoveRoamState = true -- matches default
+
 options = {
 	simple_mode = {
 		name = "Simple Mode",
@@ -134,10 +138,26 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
-			--commandSectionWidth = self.value and 75 or 74 -- percent
-			--stateSectionWidth = self.value and 25 or 24 -- percent
 			simpleModeEnabled = self.value
 			UpdateHolderSizes(self.value)
+		end,
+	},
+	enable_return_fire = {
+		name = "Enable return fire state",
+		desc = "When enabled, turns Hold Fire into a triple-toggle state with Return Fire as an additional option.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			WG.RemoveRoamState = not self.value
+		end,
+	},
+	enable_roam = {
+		name = "Enable roam move state",
+		desc = "When enabled, turns Hold Position into a triple-toggle state with Roam as an additional option.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			WG.RemoveRoamState = not self.value
 		end,
 	},
 	background_opacity = {
@@ -1239,6 +1259,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		if command.action then
 			local hotkey = GetHotkeyText(command.action)
 			if not (isStateCommand or usingGrid) then
+				hotkeyText = hotkey
+				SetText(textConfig.topLeft.name, hotkey)
+			end
+			if simpleModeEnabled and isStateCommand then
+				hotkey = hotkey and not string.find(hotkey, "+") and hotkey -- Only show short hotkeys.
 				hotkeyText = hotkey
 				SetText(textConfig.topLeft.name, hotkey)
 			end
