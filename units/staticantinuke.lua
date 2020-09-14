@@ -23,6 +23,7 @@ return { staticantinuke = {
 
   customParams                  = {
     removewait     = 1,
+    removestop     = 1,
     nuke_coverage  = 2500,
     modelradius      = [[50]],
     selectionscalemult = 1,

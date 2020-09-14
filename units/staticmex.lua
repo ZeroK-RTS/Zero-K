@@ -23,6 +23,7 @@ return { staticmex = {
     midposoffset       = [[0 -10 0]],
     modelradius        = [[15]],
     removewait         = 1,
+    removestop     = 1,
     selectionscalemult = 1.4,
   },
 
