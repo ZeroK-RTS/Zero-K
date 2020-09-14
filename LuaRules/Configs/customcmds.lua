@@ -23,11 +23,10 @@ local cmds = {
 	NEWTON_FIREZONE = 10283,
 	STOP_NEWTON_FIREZONE = 10284,
 	SET_FERRY = 11000,
+	UPGRADE_UNIT = 11432,
 	CHEAT_GIVE = 13337,
 	FACTORY_GUARD = 13921,
 	AREA_GUARD = 13922,
-
-	UPGRADE_UNIT = 11432,
 
 	-- ORBIT_DRAW is an evil on the order of CMD.SET_WANTED_MAX_SPEED.
 	-- It is required because ORBIT needs two parameters but this
