@@ -636,7 +636,7 @@ end
 
 local function GetCmdPosParameters(cmdID)
 	local def = cmdPosDef[cmdID]
-	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 1000 then
+	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 2000 then -- Includes CMD_MORPH and CMD_MORPH_STOP
 		def = cmdPosDef[CMD_MORPH]
 	end
 	
