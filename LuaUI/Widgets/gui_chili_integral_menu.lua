@@ -22,6 +22,7 @@ include("colors.lua")
 include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
+local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
 
 -- Chili classes
 local Chili
@@ -90,7 +91,7 @@ end
 -- Command Handling and lower variables
 
 configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull, cmdPosDef -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef -- In Initialize = include("Configs/integral_menu_config.lua")
 
 local fontObjects = {} -- Filled in init
 
@@ -113,10 +114,12 @@ options_order = {
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
+	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
 
 local commandPanelPath = 'Hotkeys/Command Panel'
 local customGridPath = 'Hotkeys/Command Panel/Custom'
+local commandOptPath = 'Settings/Interface/Commands'
 
 local function UpdateHolderSizes()
 	if statePanel.buttons then
@@ -133,8 +136,8 @@ WG.RemoveRoamState = true -- matches default
 
 options = {
 	simple_mode = {
-		name = "Simple Mode",
-		desc = "When enabled, extraneous commands and state toggles are hidden.",
+		name = "Large State Icons",
+		desc = "Increases state toggle size and allows them to draw unmodified tooltips. Some states may need to be culled under Settings/Commands for large stats to fit.",
 		type = 'bool',
 		value = true,
 		OnChange = function(self)
@@ -154,6 +157,7 @@ options = {
 			end
 			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
+		path = commandOptPath,
 	},
 	enable_roam = {
 		name = "Enable roam move state",
@@ -167,6 +171,7 @@ options = {
 			end
 			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
+		path = commandOptPath,
 	},
 	background_opacity = {
 		name = "Opacity",
@@ -317,6 +322,91 @@ options = {
 		name = 'Tab specific overrides',
 		path = customGridPath
 	},
+	
+	helpwindow = {
+		name = 'Command Visibility',
+		type = 'text',
+		value = "Show or hide each command or state on the command panel. Hotkeys can be used to issue commands or toggle states even when hidden.",
+		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
+	},
+	commands_reset_default = {
+		type = 'button',
+		name = "Reset to default",
+		desc = "Show the basic commands and hide the advanced ones",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = data.default
+					commandCulling[data.cmdID] = not data.default
+				end
+			end
+		end,
+		path = commandOptPath .. '/Show Presets',
+	},
+	commands_enable_all = {
+		type = 'button',
+		name = "Show all commands",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and not data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = true
+					commandCulling[data.cmdID] = false
+				end
+			end
+		end,
+		path = commandOptPath .. '/Show Presets',
+	},
+	commands_disable_all = {
+		type = 'button',
+		name = "Hide all commands",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and not data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = false
+					commandCulling[data.cmdID] = true
+				end
+			end
+		end,
+		path = commandOptPath .. '/Show Presets',
+	},
+	states_enable_all = {
+		type = 'button',
+		name = "Show all states",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = true
+					commandCulling[data.cmdID] = false
+				end
+			end
+		end,
+		path = commandOptPath .. '/Show Presets',
+	},
+	states_disable_all = {
+		type = 'button',
+		name = "Hide all states",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = false
+					commandCulling[data.cmdID] = true
+				end
+			end
+		end,
+		path = commandOptPath .. '/Show Presets',
+	},
 }
 
 local function AddCustomGridOptions()
@@ -378,6 +468,41 @@ local function TabClickFunction(mouse)
 	WG.crude.ShowMenu() --make epic Chili menu appear.
 	return true
 end
+
+local function AddCommandCullOptions()
+	for i = 1, #cullingSettingsList do
+		local data = cullingSettingsList[i]
+		if data.label then
+			local name = "integralCommands" .. data.label
+			options[name] = {
+				type = 'label',
+				name = data.label,
+				path = commandOptPath,
+				simpleMode = true,
+				everyMode = true,
+			}
+			options_order[#options_order + 1] = name
+		else
+			local name = "cmd_" .. data.cmdID
+			options[name] = {
+				name = data.name,
+				desc = "Show the " .. data.name .. (data.state and " state" or " command") ..  " on the command panel.",
+				type = 'bool',
+				value = not commandCulling[data.cmdID],
+				noHotkey = true,
+				OnChange = function(self)
+					commandCulling[data.cmdID] = not self.value
+				end,
+				path = commandOptPath,
+				simpleMode = true,
+				everyMode = true,
+			}
+			options_order[#options_order + 1] = name
+		end
+	end
+end
+
+AddCommandCullOptions()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -667,7 +792,7 @@ local function UpdateBackgroundSkin()
 end
 
 local function GetCmdPosParameters(cmdID)
-	local def = cmdPosDef[cmdID]
+	local def =  cmdPosDef[cmdID]
 	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 2000 then -- Includes CMD_MORPH and CMD_MORPH_STOP
 		def = cmdPosDef[CMD_MORPH]
 	end
@@ -1791,7 +1916,7 @@ local function GetSelectionValues()
 end
 
 local function HiddenCommand(command)
-	return hiddenCommands[command.id] or command.hidden or (simpleModeEnabled and simpleModeCull and simpleModeCull[command.id])
+	return hiddenCommands[command.id] or command.hidden or (commandCulling and commandCulling[command.id])
 end
 
 local function ProcessCommandPosition(command)
@@ -2375,7 +2500,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, simpleModeCull, cmdPosDef = include(configurationName)
+	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include(configurationName)
 	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")

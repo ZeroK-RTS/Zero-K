@@ -178,7 +178,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
-	['Settings/Interface/Area Commands']            = imgPath..'commands/bold/areaattack.png',
+	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -197,6 +197,7 @@ confdata.subMenuIcons = {
 confdata.simpleModeDirectory = {
 	['Reset Settings'] = true,
 	['Interface'] = true,
+	['Commands'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
 	['Camera'] = true,
