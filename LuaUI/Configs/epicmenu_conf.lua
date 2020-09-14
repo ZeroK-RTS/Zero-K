@@ -198,6 +198,7 @@ confdata.simpleModeDirectory = {
 	['Reset Settings'] = true,
 	['Interface'] = true,
 	['Commands'] = true,
+	['Presets'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
 	['Camera'] = true,

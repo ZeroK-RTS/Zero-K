@@ -326,7 +326,7 @@ options = {
 	helpwindow = {
 		name = 'Command Visibility',
 		type = 'text',
-		value = "Show or hide each command or state on the command panel. Hotkeys can be used to issue commands or toggle states even when hidden.",
+		value = "Each command can be hidden from the command panel, with some advanced ones hidden by default. Hotkeys can be used to issue commands or toggle states even when hidden.",
 		path = commandOptPath,
 		simpleMode = true,
 		everyMode = true,
@@ -345,7 +345,9 @@ options = {
 				end
 			end
 		end,
-		path = commandOptPath .. '/Show Presets',
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 	commands_enable_all = {
 		type = 'button',
@@ -360,7 +362,9 @@ options = {
 				end
 			end
 		end,
-		path = commandOptPath .. '/Show Presets',
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 	commands_disable_all = {
 		type = 'button',
@@ -375,7 +379,9 @@ options = {
 				end
 			end
 		end,
-		path = commandOptPath .. '/Show Presets',
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 	states_enable_all = {
 		type = 'button',
@@ -390,7 +396,9 @@ options = {
 				end
 			end
 		end,
-		path = commandOptPath .. '/Show Presets',
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 	states_disable_all = {
 		type = 'button',
@@ -405,7 +413,9 @@ options = {
 				end
 			end
 		end,
-		path = commandOptPath .. '/Show Presets',
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 }
 
