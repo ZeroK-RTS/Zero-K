@@ -30,7 +30,7 @@ local Echo                  = Spring.Echo
 
 local floor,round,huge = math.floor,math.round,math.huge
 
-local GL_LINES      = GL.LINES
+local GL_LINE_STRIP = GL.LINE_STRIP
 local glLineWidth   = gl.LineWidth
 local glColor       = gl.Color
 local glBeginEnd    = gl.BeginEnd
@@ -330,11 +330,11 @@ local function makeCorners(x,z,sx,sz)
     local c2= {x-sx, y, z+sz}
     local c3= {x+sx, y, z+sz}
     local c4= {x+sx, y, z-sz}
-    return {c1,c2,c2,c3,c3,c4,c4,c1}
+    return {c1,c2,c3,c4}
 end
-local function DrawCorners(cornersDraw)
-    for i,corner in ipairs(cornersDraw) do
-        glVertex(unpack(corner))
+local function DrawCorners(corners)
+    for i=1,5 do
+        glVertex(unpack(corners[i] or corners[1]))
     end
 end
 --
@@ -479,7 +479,7 @@ function widget:DrawWorld()
         glColor(0.5, 1, 0.5, alpha)
         glLineStipple(true)
         for _,rect in ipairs(spacedRects) do
-            glBeginEnd(GL_LINES, DrawCorners, rect)
+            glBeginEnd(GL_LINE_STRIP, DrawCorners, rect)
         end
         glLineWidth(1)
         glLineStipple(false)
