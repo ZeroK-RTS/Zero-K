@@ -48,6 +48,7 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
+local spGetSelectedUnits = Spring.GetSelectedUnits
 
 local abs = math.abs
 
@@ -92,6 +93,10 @@ local function Log(msg)
 end
 
 local function LogTable(table, prefix)
+	if table == nil then
+		Log(prefix .. "nil")
+		return
+	end
 	prefix = prefix or ""
 	for key, value in pairs(table) do
 		if type(value) == "table" then
@@ -126,10 +131,21 @@ local function CommandPriorities(x, y, z, buildDistance)
 	metalStorage = metalStorage - HIDDEN_STORAGE
 	Log("metal=" .. metal .. "; metalStorage=" .. metalStorage ..
 		"; metalPull=" .. metalPull .. "; metalIncome=" .. metalIncome)
-	if metal < 5 + metalIncome then
+
+	if metalStorage < 1 then
+		if metalPull <= metalIncome then
+			Log("repair")
+			return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+        else
+			Log("reclaim")
+			return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+		end
+	end
+
+	if metal < 5 + metalIncome or metal < metalStorage * 0.1 then
 		Log("reclaim")
 		return {{CMD_RECLAIM, {x, y, z, buildDistance}}}
-	elseif metal > metalStorage - 5 then
+	elseif metal > metalStorage - 5 or metal > metalStorage * 0.9 then
 		Log("repair")
 		return {{CMD_REPAIR, {x, y, z, buildDistance}}}
 	else
@@ -146,19 +162,16 @@ local function CommandPriorities(x, y, z, buildDistance)
 end
 
 local function SetupUnit(unitID)
-	-- set immobile builders (nanotowers?) to the ROAM movestate,
-	-- and give them a PATROL order (does not matter where, afaict)
+	--local commandQueue = Spring.GetCommandQueue(unitID, -1)
+	--Log(time .. "; cmd queue for " .. unitID .. ":")
+	--LogTable(commandQueue, "  ")
 
-	-- TODO: Don't override user commands.
-	local commandQueue = Spring.GetCommandQueue(unitID, -1)
-	Log(time .. "; cmd for " .. unitID .. ":" .. tostring(commandQueue) .. " ("
-		.. type(commandQueue) .. ")")
-	LogTable(commandQueue)
---	local cmdID = spGetUnitCurrentCommand(unitID)
---	Log("SetupUnit(" .. unitID ..") executing " .. tostring(cmdID), "\n")
---	if cmdID and cmdID ~= CMD_PATROL then
---		return
---	end
+	--local cmd = {spGetUnitCurrentCommand(unitID)}
+	--Log(time .. "; cmd for " .. unitID .. ":")
+	--LogTable(cmd, "  ")
+	--if cmdID and cmdID ~= CMD_PATROL then
+		--return
+	--end
 	
 	local x, y, z = spGetUnitPosition(unitID)
 	if (x) then
@@ -252,24 +265,63 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	UpdateNextCheck()
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if not IsImmobileBuilder(UnitDefs[unitDefID]) then
-		return
-	end
-	if cmdID == CMD_PATROL and (not cmdOptions.shift) then
-		local x, y, z = spGetUnitPosition(unitID)
-		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
-			SetupUnit(unitID)
+-- Called whenever a unit receives a command for any reason, including by
+-- widgets.
+--function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+--	Log("UnitCommand(unitID=" .. unitID ..
+--		", unitDefID=" .. unitDefID ..
+--		", cmdID=" .. cmdID .. ")")
+--	Log("cmdParams=")
+--	LogTable(cmdParams, '  ')
+--	Log("cmdOptions=")
+--	LogTable(cmdOptions, '  ')
+--	if not IsImmobileBuilder(UnitDefs[unitDefID]) then
+--		return
+--	end
+--	if cmdID == CMD_PATROL and (not cmdOptions.shift) then
+--		local x, y, z = spGetUnitPosition(unitID)
+--		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
+--			SetupUnit(unitID)
+--		end
+--	end
+--	if stopHalts then
+--		if cmdID == CMD_STOP then
+--			stoppedUnit[unitID] = true
+--		elseif stoppedUnit[unitID] then
+--			stoppedUnit[unitID] = nil
+--		end
+--	end
+--	UpdateNextCheck()
+--end
+
+-- Called (I think) when a user issues a command after selecting some unit.
+function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	--Log("CommandNotify(cmdID=" .. cmdID .. ")")
+	--Log("cmdParams=")
+	--LogTable(cmdParams, '  ')
+	--Log("cmdOptions=")
+	--LogTable(cmdOptions, '  ')
+
+	local selectedUnits = spGetSelectedUnits()
+	for _, unitID in ipairs(selectedUnits) do
+		if trackedUnits[unitID] ~= nil then
+			Log("Ignore unit " .. unitID .. " until it becomes idle.")
+		end
+		trackedUnits[unitID] = nil
+		if stopHalts then
+			if cmdID == CMD_STOP then
+				if stoppedUnit[unitID] == nil then
+					Log("Ignore unit " .. unitID .. " until it is given a command.")
+				end
+				stoppedUnit[unitID] = true
+			elseif stoppedUnit[unitID] then
+				if stoppedUnit[unitID] ~= nil then
+					Log("Pay attention to unit " .. unitID .. "again.")
+				end
+				stoppedUnit[unitID] = nil
+			end
 		end
 	end
-	if stopHalts then
-		if cmdID == CMD_STOP then
-			stoppedUnit[unitID] = true
-		elseif stoppedUnit[unitID] then
-			stoppedUnit[unitID] = nil
-		end
-	end
-	UpdateNextCheck()
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
@@ -296,13 +348,20 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	LogTable(trackedUnits[unitID], "- ")
 	-- Check soon, but not right away. This time has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
+	delta = 0.5
+	trackedUnits[unitID] = trackedUnits[unitID] or 
+			{checkTime=time + delta, settleTime=time+delta}
 	trackedUnits[unitID].checkTime =
 		math.max(
 			math.min(
 				trackedUnits[unitID].checkTime,
 				trackedUnits[unitID].settleTime),
-			time + 0.5)
-	nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
+			time + delta)
+	if nextCheck == nil then
+		nextCheck = time + delta
+	else
+		nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
+	end
 	LogTable(trackedUnits[unitID], "+ ")
 end
 
