@@ -859,11 +859,15 @@ local function ProcessSpecialPowers()
 	
 	if selection.tieToBurrow then
 		local burrowsOrdered = {}
+		local burrowsOrderedCount = 0
 		for id in pairs(data.burrows) do
-			burrowsOrdered[#burrowsOrdered + 1] = id
+			burrowsOrderedCount = burrowsOrderedCount + 1
+			burrowsOrdered[burrowsOrderedCount] = id
 		end
-		local burrowID = burrowsOrdered[math.random(#burrowsOrdered)]
-		SpawnTurret(burrowID, selection.unit, count, true)
+		if burrowsOrderedCount > 0 then
+			local burrowID = burrowsOrdered[math.random(burrowsOrderedCount)]
+			SpawnTurret(burrowID, selection.unit, count, true)
+		end
 	else
 		local target = selection.targetHuman and ChooseTarget()
 		SpawnUnit(selection.unit, count, selection.minDist, selection.maxDist, target)
