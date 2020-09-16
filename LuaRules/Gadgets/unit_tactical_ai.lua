@@ -12,11 +12,13 @@ function gadget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 if (not gadgetHandler:IsSyncedCode()) then
 	return false  --  no unsynced code
 end
 
-
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Speedups
 
@@ -57,6 +59,7 @@ local ALLY_TABLE = {
 local AVOID_HEIGHT_DIFF = 25
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Globals
 
 local unit = {}
@@ -66,6 +69,7 @@ local externallyHandledUnit = {}
 
 local HEADING_TO_RAD = (math.pi*2/2^16)
 
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Commands
 
@@ -88,13 +92,42 @@ local unitAICmdDesc = {
 	tooltip = 'Toggles smart unit AI for the unit',
 	params  = {0, 'AI Off','AI On'}
 }
---------------------------
----- Unit AI
---------------------------
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Utilities
 
 local function distance(x1,y1,x2,y2)
 	return sqrt((x1-x2)^2 + (y1-y2)^2)
 end
+
+local function GetUnitVisibleInformation(unitID, allyTeamID)
+	if (not unitID) or select(2, spGetUnitIsStunned(unitID)) then
+		return
+	end
+	local states = spGetUnitLosState(unitID, allyTeamID, false)
+	return spGetUnitDefID(unitID), states and states.typed
+end
+
+local function GetUnitBehavior(unitID, unitDefID)
+	if unitAIBehaviour[unitDefID].waterline then
+		local bx,by,bz = spGetUnitPosition(unitID, true)
+		if unitAIBehaviour[unitDefID].floatWaterline then
+			by = Spring.GetGroundHeight(bx, bz)
+		end
+		if by < unitAIBehaviour[unitDefID].waterline then
+			return unitAIBehaviour[unitDefID].sea
+		else
+			return unitAIBehaviour[unitDefID].land
+		end
+	else
+		return unitAIBehaviour[unitDefID]
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Unit AI
 
 local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
@@ -122,31 +155,49 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 	elseif cmdID == CMD_ATTACK then -- if I attack
 		local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 		if ((not holdPos) or (cmdID_2 == CMD_FIGHT)) then
-			local target, check = cp_1, cp_2
-			if (not check) and spValidUnitID(target) then -- if I target a unit
-				if not (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
-					return target, false
-				else
-					return -1, false, true, target
+			local target, twoParams = cp_1, cp_2
+			if twoParams then
+				if (cmdID == CMD_FIGHT) then
+					--  if I target the ground and have fight or patrol comman
+					return -1, false, nil, nil, cp_1, cp_2, cp_3
 				end
-			elseif (cmdID == CMD_FIGHT) then --  if I target the ground and have fight or patrol command
-				return -1, false, nil, nil, cp_1, cp_2, cp_3
+			elseif spValidUnitID(target) then -- if I target a unit
+				if (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT) then
+					-- Do not skirm single target with FIGHT
+					return -1, false, true, target 
+				elseif Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) then
+					-- Do no skirm single target when it is auto attack
+					return -1, false, false, target
+				else
+					-- only skirm single target when given the order manually
+					return target, false
+				end
 			end
 		end
 	elseif (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and (cp_1 == data.cx) and (cp_2 == data.cy) and (cp_3 == data.cz) then
 		local cmdID_2, cmdOpts_2, _, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID, 2)
-		if cmdID_2 then
-			local cmdID_3 = Spring.GetUnitCurrentCommand(unitID, 3)
-			if cmdID_2 == CMD_FIGHT or (cmdID_2 == CMD_ATTACK and ((not holdPos) or cmdID_3 == CMD_FIGHT)) then -- if the next command is attack, patrol or fight
-				local target, check = cps_1, cps_2
-				if not check then -- if I target a unit
-					if not (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT or Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts_2, CMD.OPT_INTERNAL)) then -- only skirm single target when given the order manually
-						return target, true, nil, nil, cps_1, cps_2, cps_3
-					else
-						return -1, true, true, target, cps_1, cps_2, cps_3
-					end
-				elseif (cmdID_2 == CMD_FIGHT) then -- if I target the ground and have fight or patrol command
+		if not cmdID_2 then
+			return false
+		end
+		local cmdID_3 = Spring.GetUnitCurrentCommand(unitID, 3)
+		if cmdID_2 == CMD_FIGHT or (cmdID_2 == CMD_ATTACK and ((not holdPos) or cmdID_3 == CMD_FIGHT)) then -- if the next command is attack, patrol or fight
+			local target, twoParams = cps_1, cps_2
+			if twoParams then
+				if (cmdID_2 == CMD_FIGHT) then
+					-- if I target the ground and have fight or patrol command
 					return -1, true, true, nil, cps_1, cps_2, cps_3
+				end
+			elseif spValidUnitID(target) then -- if I target a unit
+				-- if I target a unit
+				if (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT) then 
+					-- Do not skirm single target with FIGHT
+					return -1, true, true, target, cps_1, cps_2, cps_3
+				elseif Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts_2, CMD.OPT_INTERNAL) then
+					-- Do no skirm single target when it is auto attack
+					return -1, true, false, target, cps_1, cps_2, cps_3
+				else
+					-- only skirm single target when given the order manually
+					return target, true, false, nil, cps_1, cps_2, cps_3 
 				end
 			end
 		end
@@ -495,14 +546,6 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	return false
 end
 
-local function GetUnitVisibleInformation(unitID, allyTeamID)
-	if (not unitID) or select(2, spGetUnitIsStunned(unitID)) then
-		return
-	end
-	local states = spGetUnitLosState(unitID, allyTeamID, false)
-	return spGetUnitDefID(unitID), states and states.typed
-end
-
 local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx, fy, fz, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
 	-- Apologies for this function.
 	local usefulEnemy = false
@@ -550,19 +593,86 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx
 	return usefulEnemy
 end
 
-local function updateUnits(frame, start, increment)
+local function DoUnitUpdate(unitID, frame)
+	local data = unit[unitID]
+	
+	if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
+		if data.receivedOrder then
+			local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return
+	end
+	
+	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	local holdPos = (Spring.Utilities.GetUnitMoveState(unitID) == 0)
+	
+	if data.queueReturnX then
+		local rx, rz = data.queueReturnX, data.queueReturnZ
+		data.queueReturnX = nil
+		data.queueReturnZ = nil
+		data.idleWantReturn = nil
+		if not (cmdID or holdPos) then
+			-- If the command queue is empty (ie still idle) then return to position
+			local ry = math.max(0, Spring.GetGroundHeight(rx, rz) or 0)
+			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
+			return
+		end
+	end
+	
+	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+	local isIdleAttack = autoAttackEnemyID and not haveFight
+	
+	data.idleWantReturn = (data.idleWantReturn and not enemy) or isIdleAttack
+	
+	--if isIdleAttack then
+	--	Spring.Utilities.UnitEcho(unitID, "auto")
+	--end
+	
+	if (enemy) then -- if I am fighting/patroling ground or targeting an enemy
+		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
+		local behaviour = GetUnitBehavior(unitID, data.udID)
+		
+		local alwaysJink = (behaviour.alwaysJinkFight and ((cmdID == CMD_FIGHT) or move))
+		local enemyUnitDef = false
+		local typeKnown = false
+		
+		if not alwaysJink then
+			if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
+				enemy = (spGetUnitNearestEnemy(unitID,behaviour.searchRange,true) or false)
+			end
+			--Spring.Utilities.UnitEcho(enemy)
+			--Spring.Echo("enemy spotted 2")
+			-- don't get info on out of los units
+			--Spring.Echo("enemy in los")
+			-- use AI on target
+
+			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
+		end
+		
+		local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
+			data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
+		
+		if autoAttackEnemyID and not usefulEnemy then
+			enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
+			DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
+				data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
+		end
+	end
+end
+
+local function UpdateUnits(frame, start, increment)
 	--[[
 	for unitID, data in pairs(unit) do
 		if not spValidUnitID(unitID) then
 			Spring.Echo("stuff")
 		else
 	--]]
-		
+	
 	local index = start
 	local listData = unitList.data
 	while index <= unitList.count do
 		local unitID = listData[index]
-	
 		if not spValidUnitID(unitID) then
 			listData[index] = listData[unitList.count]
 			listData[unitList.count] = nil
@@ -570,83 +680,49 @@ local function updateUnits(frame, start, increment)
 			unit[unitID] = nil
 		else
 			index = index + increment
-			local data = unit[unitID]
-			
-			--Spring.Echo("unit parsed")
-			if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
-				if data.receivedOrder then
-					local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-				end
-				break
-			end
-			
-			local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-			local holdPos = (Spring.Utilities.GetUnitMoveState(unitID) == 0)
-			local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
-			
-			--local ux,uy,uz = spGetUnitPosition(unitID)
-			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
-			if (enemy) then -- if I am fighting/patroling ground or targeting an enemy
-				local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
-				local behaviour
-				if unitAIBehaviour[data.udID].waterline then
-					local bx,by,bz = spGetUnitPosition(unitID, true)
-					if unitAIBehaviour[data.udID].floatWaterline then
-						by = Spring.GetGroundHeight(bx, bz)
-					end
-					if by < unitAIBehaviour[data.udID].waterline then
-						behaviour = unitAIBehaviour[data.udID].sea
-					else
-						behaviour = unitAIBehaviour[data.udID].land
-					end
-				else
-					behaviour = unitAIBehaviour[data.udID]
-				end
-				
-				local alwaysJink = (behaviour.alwaysJinkFight and ((cmdID == CMD_FIGHT) or move))
-				local enemyUnitDef = false
-				local typeKnown = false
-				
-				if not alwaysJink then
-					if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
-						enemy = (spGetUnitNearestEnemy(unitID,behaviour.searchRange,true) or false)
-					end
-					--Spring.Utilities.UnitEcho(enemy)
-					--Spring.Echo("enemy spotted 2")
-					-- don't get info on out of los units
-					--Spring.Echo("enemy in los")
-					-- use AI on target
-
-					enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
-				end
-				
-				local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
-					data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
-				
-				if autoAttackEnemyID and not usefulEnemy then
-					enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
-					DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
-						data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
-				end
-			end
+			DoUnitUpdate(unitID, frame)
 		end
 	end
 end
 
 function gadget:GameFrame(n)
- 
-	-- update orders
-	--if (n%20<1) then
-	--	updateUnits(n, 1, 1)
-	--end
-	 
-	updateUnits(n, n%20+1, 20)
-  
+	UpdateUnits(n, n%20+1, 20)
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Command Handling
+local function AddIdleUnit(unitID, unitDefID)
+	if not unit[unitID] then
+		return
+	end
+	local data = unit[unitID]
+	local behaviour = GetUnitBehavior(unitID, unitDefID)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
+	if nearbyEnemy then
+		
+	end
+	
+	if unit[unitID].idleWantReturn and unit[unitID].idleX then
+		unit[unitID].queueReturnX = unit[unitID].idleX
+		unit[unitID].queueReturnZ = unit[unitID].idleZ
+		return
+	end
+	unit[unitID].idleX = x
+	unit[unitID].idleZ = z
+	unit[unitID].wasIdle = true
+	--Spring.Utilities.UnitEcho(unitID, "idle")
+end
+
+function gadget:UnitIdle(unitID, unitDefID)
+	AddIdleUnit(unitID, unitDefID)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Command Handling
+
 local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 	if unit[unitID] or externallyHandledUnit[unitID] then
 		local state = cmdParams[1]
@@ -680,7 +756,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return false  -- command was used
 end
 
-------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Load Ai behaviour
 
 local function GetBehaviourTable(behaviourData, ud)
@@ -712,6 +789,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.skirmOrderDis           = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis)
 	behaviourData.velocityPrediction      = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction)
 	behaviourData.searchRange             = (behaviourData.searchRange or math.max(weaponRange + 100, 800))
+	behaviourData.leashAgressRange        = weaponRange
 	behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
 	behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
 	behaviourData.minFleeRange            = behaviourData.minFleeRange - behaviourData.fleeLeeway
@@ -750,6 +828,7 @@ local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 	end
 end
 
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit adding/removal
 
@@ -809,6 +888,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			receivedOrder = false,
 			allyTeam = spGetUnitAllyTeam(unitID),
 		}
+		AddIdleUnit(unitID, unitDefID)
 		
 		if (behaviour.defaultAIState == 1) then
 			AIToggleCommand(unitID, {1}, {})

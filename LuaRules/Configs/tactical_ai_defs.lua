@@ -433,6 +433,9 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- minFleeRange (defaults to 0): minumun range at which the unit will flee, will flee at higher range if the attacking unit outranges it
 -- fleeOrderDis (defaults to 120): max distance the move order is from the unit when fleeing
 
+--*** idleFlee (defaults to empty): Units that this unit will flea when idle and not on hold position.
+-- 
+
 --*** hugs(defaults to empty): the table of units to close range with.
 -- hugRange (default in config): Range to close to
 
@@ -516,6 +519,7 @@ local behaviourConfig = {
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
+		idleFlee = NameToDefID({"cloakriot",}),
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
