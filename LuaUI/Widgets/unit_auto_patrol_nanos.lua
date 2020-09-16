@@ -5,9 +5,28 @@
 --  file:    unit_immobile_buider.lua
 --  brief:   sets immobile builders to ROAMING, and gives them a PATROL order
 --  author:  Dave Rodgers
---
 --  Copyright (C) 2007.
 --  Licensed under the terms of the GNU GPL, v2 or later.
+--
+-- Features:
+--   1. Idle caretakers will be set to area repair if metal is high, area reclaim
+--      when metal is low, and patrol otherwise. (Unless patrol_idle_nanos option is
+--      false.)
+--   2. For each caretaker under this widget's control, re-evaluate the behavior based
+--		on the economy every 20 seconds. (Controlled by checkInterval.)
+--   3. For each caretaker, never issue a command more than once every 5 seconds.
+--      (Controlled by settleInterval.)
+--   4. When a user issues a stop command, this behavior is inhibited, until a
+--      different command issued by the user completes. (Unless stop_disables option
+--      is false.)
+--
+-- Limitations:
+--   1. Area reclaim does not reclaim energy sources. We'd have to call
+--      GetFeaturesInRectangle() to improve this.
+--   2. Area repair either assists in build (using both metal and energy) or
+--      repairs damage (using only energy). Since assisting a factory is the most
+--      common use for caretakers, we tell caretakers to reclaim if metal is low.
+--      We'd have to call GetUnitsInCylinder() to do better.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -122,15 +141,26 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
+local resourceCacheInterval = 1
+local resourceCache = {
+	updated=nil
+}
 local function CommandPriorities(x, y, z, buildDistance)
 	-- TODO: Cache for a few seconds
-    local teamID = spGetMyTeamID()
-	--local energy, energyStorage = spGetTeamResources(teamID, "energy")
-	--energyStorage = energyStorage - HIDDEN_STORAGE
-	local metal, metalStorage, metalPull, metalIncome = spGetTeamResources(teamID, "metal")
-	metalStorage = metalStorage - HIDDEN_STORAGE
-	Log("metal=" .. metal .. "; metalStorage=" .. metalStorage ..
-		"; metalPull=" .. metalPull .. "; metalIncome=" .. metalIncome)
+	if resourceCache.updated == nil or
+			resourceCache.updated + resourceCacheInterval < time then
+		resourceCache.metal,
+			resourceCache.metalStorage,
+			resourceCache.metalPull,
+			resourceCache.metalIncome = spGetTeamResources(spGetMyTeamID(), "metal")
+		resourceCache.metalStorage = resourceCache.metalStorage - HIDDEN_STORAGE
+		resourceCache.updated = time
+	end
+
+	local metal = resourceCache.metal
+	local metalStorage = resourceCache.metalStorage
+	local metalPull = resourceCache.metalPull
+	local metalIncome = resourceCache.metalIncome
 
 	if metalStorage < 1 then
 		if metalPull <= metalIncome then
@@ -162,6 +192,7 @@ local function CommandPriorities(x, y, z, buildDistance)
 end
 
 local function SetupUnit(unitID)
+	-- TODO: Don't reissue a command that's still going.
 	--local commandQueue = Spring.GetCommandQueue(unitID, -1)
 	--Log(time .. "; cmd queue for " .. unitID .. ":")
 	--LogTable(commandQueue, "  ")
@@ -265,43 +296,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	UpdateNextCheck()
 end
 
--- Called whenever a unit receives a command for any reason, including by
--- widgets.
---function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
---	Log("UnitCommand(unitID=" .. unitID ..
---		", unitDefID=" .. unitDefID ..
---		", cmdID=" .. cmdID .. ")")
---	Log("cmdParams=")
---	LogTable(cmdParams, '  ')
---	Log("cmdOptions=")
---	LogTable(cmdOptions, '  ')
---	if not IsImmobileBuilder(UnitDefs[unitDefID]) then
---		return
---	end
---	if cmdID == CMD_PATROL and (not cmdOptions.shift) then
---		local x, y, z = spGetUnitPosition(unitID)
---		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
---			SetupUnit(unitID)
---		end
---	end
---	if stopHalts then
---		if cmdID == CMD_STOP then
---			stoppedUnit[unitID] = true
---		elseif stoppedUnit[unitID] then
---			stoppedUnit[unitID] = nil
---		end
---	end
---	UpdateNextCheck()
---end
-
 -- Called (I think) when a user issues a command after selecting some unit.
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	--Log("CommandNotify(cmdID=" .. cmdID .. ")")
-	--Log("cmdParams=")
-	--LogTable(cmdParams, '  ')
-	--Log("cmdOptions=")
-	--LogTable(cmdOptions, '  ')
-
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in ipairs(selectedUnits) do
 		if trackedUnits[unitID] ~= nil then
@@ -367,6 +363,9 @@ end
 
 function widget:Update(dt)
 	time = time + dt
+	if not enableIdleNanos then
+		return
+	end
 	if nextCheck ~= nil and time > nextCheck then
 		Log("time to check (" .. time .. ")")
 		for unitID, _ in pairs(trackedUnits) do
