@@ -211,7 +211,7 @@ local function ClearOrder(unitID,data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 	if data.receivedOrder then
 		if (cmdID and (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE)) then -- if I am moving
 			if (cp_1 == data.cx) and (cp_2 == data.cy) and (cp_3 == data.cz) then -- if I was given this move command by this gadget
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0)
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 				GG.StopRawMoveUnit(unitID, true)
 			end
 		end
@@ -247,8 +247,8 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		end
 		
 		if move then
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -294,11 +294,8 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			local cmdID1, _, cmdTag1 = Spring.GetUnitCurrentCommand(unitID)
-			local cmdID2, _, cmdTag2 = Spring.GetUnitCurrentCommand(unitID, 2)
-			Spring.Echo("cmdTag", cmdTag, "cmdID1", cmdID1, cmdTag1, "cmdTag2", cmdID2, cmdTag2, math.random())
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -342,11 +339,8 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			local cmdID1, _, cmdTag1 = Spring.GetUnitCurrentCommand(unitID)
-			local cmdID2, _, cmdTag2 = Spring.GetUnitCurrentCommand(unitID, 2)
-			Spring.Echo("cmdTag", cmdTag, "cmdID1", cmdID1, cmdTag1, "cmdTag2", cmdID2, cmdTag2, math.random())
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -472,8 +466,8 @@ local function DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID,
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -483,6 +477,7 @@ local function DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID,
 		return true
 	elseif cmdID and move and not behaviour.skirmKeepOrder then
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+		return true
 	end
 
 	return behaviour.skirmKeepOrder
@@ -526,8 +521,8 @@ local function DoFleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mo
 
 		if cmdID then
 			if move then
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			else
 				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			end
@@ -580,7 +575,8 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 		--Spring.Echo("unit checking skirm")
-		if not DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame, haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+		if not DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame,
+				haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
 			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true
