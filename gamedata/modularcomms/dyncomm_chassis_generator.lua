@@ -108,6 +108,7 @@ local chassisDefs = {
 	{
 		name = "dynknight1",
 		weapons = {
+			-- Aiming from earlier weapons is overridden by 
 			"commweapon_peashooter",
 			"commweapon_rocketlauncher", -- 430
 			"commweapon_rocketlauncher_napalm", -- 430
