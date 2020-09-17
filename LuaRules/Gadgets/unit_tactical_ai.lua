@@ -206,7 +206,7 @@ local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 	return false
 end
 
-local function clearOrder(unitID,data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+local function ClearOrder(unitID,data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 	-- removes move order
 	if data.receivedOrder then
 		if (cmdID and (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE)) then -- if I am moving
@@ -219,140 +219,137 @@ local function clearOrder(unitID,data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 	end
 end
 
-local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fightX, fightY, fightZ, n)
-
+local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fightX, fightY, fightZ, n)
 	local data = unit[unitID]
 
-	if enemy and typeKnown then
-	
-		local pointDis = spGetUnitSeparation(enemy,unitID,true)
+	if not (enemy and typeKnown) then
+		if not (((cmdID == CMD_FIGHT) or move) and fightZ) then
+			return false
+		end
+		local ex,ey,ez = fightX, fightY, fightZ
+		local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+		local cx,cy,cz -- command position
 		
-		if pointDis then
-			local enemyRange = behaviour.swarmEnemyDefaultRange
-			if enemyUnitDef and typeKnown then
-				enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
-			end
-			if pointDis < enemyRange+behaviour.swarmLeeway then -- if I am within enemy range
-				if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
-					
-					local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-					local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-					local cx,cy,cz -- command position
-					
-					-- insert move commands to jink towards enemy
-					data.jinkDir = data.jinkDir*-1
-					
-					-- jink towards the enemy
-					if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
-						cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-						cy = uy
-						cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-					else
-						cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-						cy = ey
-						cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-					end
-					
-					GG.recursion_GiveOrderToUnit = true
-					if move then
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-					else
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-					end
-					GG.recursion_GiveOrderToUnit = false
-					data.cx,data.cy,data.cz = cx,cy,cz
-					
-					data.receivedOrder = true
-					return true
-				else
-					-- if I can shoot at the enemy
-					local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-					local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-					local cx,cy,cz -- command position
-					
-					if behaviour.circleStrafe then
-						-- jink around the enemy
-						local up = 0
-						local ep = 1
-						if pointDis < behaviour.minCircleStrafeDistance then
-							up = 1
-							ep = 0
-						end
-						
-						cx = ux*up+ex*ep+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
-						cy = uy
-						cz = uz*up+ez*ep-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
-						
-					else
-						if pointDis > behaviour.minSwarmRange then
-							-- jink at max range
-							cx = ux+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
-							cy = uy
-							cz = uz-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
-							data.rot = data.rot*-1
-						else
-							data.jinkDir = data.jinkDir*-1 -- jink away
-							cx = ux-(-(ux-ex)*behaviour.jinkAwayParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-							cy = uy
-							cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-						end
-					end
-					
-					GG.recursion_GiveOrderToUnit = true
-					if move then
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-					else
-						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-					end
-					GG.recursion_GiveOrderToUnit = false
-					data.cx,data.cy,data.cz = cx,cy,cz
-					data.receivedOrder = true
-				end
-				return true
-			end
+		local pointDis = distance(ex,ez,ux,uz)
+		
+		-- insert move commands to jink towards enemy
+		data.jinkDir = data.jinkDir*-1
+		
+		-- jink towards the enemy
+		if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+			cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+			cy = uy
+			cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+		else
+			cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+			cy = ey
+			cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
 		
-	else
-		
-		if ((cmdID == CMD_FIGHT) or move) and fightZ then
-			local ex,ey,ez = fightX, fightY, fightZ
-			local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-			local cx,cy,cz -- command position
-			
-			local pointDis = distance(ex,ez,ux,uz)
-			
-			-- insert move commands to jink towards enemy
-			data.jinkDir = data.jinkDir*-1
-			
-			-- jink towards the enemy
-			if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
-				cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-				cy = uy
-				cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-			else
-				cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-				cy = ey
-				cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
-			end
-			
-			if move then
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-			else
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
-			end
-			--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
-			data.cx,data.cy,data.cz = cx,cy,cz
-				
-			data.receivedOrder = true
-			return true
+		if move then
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+		else
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
+		--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
+		data.cx,data.cy,data.cz = cx,cy,cz
+		
+		data.receivedOrder = true
+		return true
 	end
 	
-	return false
+	local pointDis = spGetUnitSeparation(enemy,unitID,true)
+	if not pointDis then
+		return false
+	end
 	
+	local enemyRange = behaviour.swarmEnemyDefaultRange
+	if enemyUnitDef and typeKnown then
+		enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
+	end
+	
+	if not (pointDis < enemyRange + behaviour.swarmLeeway) then
+		return false -- if I am not within enemy range then don't swarm
+	end
+	
+	if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
+		local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+		local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+		local cx,cy,cz -- command position
+		
+		-- insert move commands to jink towards enemy
+		data.jinkDir = data.jinkDir*-1
+		
+		-- jink towards the enemy
+		if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+			cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+			cy = uy
+			cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+		else
+			cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+			cy = ey
+			cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+		end
+		
+		GG.recursion_GiveOrderToUnit = true
+		if move then
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+		else
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+		end
+		GG.recursion_GiveOrderToUnit = false
+		data.cx,data.cy,data.cz = cx,cy,cz
+		
+		data.receivedOrder = true
+	else
+		-- if I can shoot at the enemy
+		local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+		local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+		local cx,cy,cz -- command position
+		
+		if behaviour.circleStrafe then
+			-- jink around the enemy
+			local up = 0
+			local ep = 1
+			if pointDis < behaviour.minCircleStrafeDistance then
+				up = 1
+				ep = 0
+			end
+			
+			cx = ux*up+ex*ep+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
+			cy = uy
+			cz = uz*up+ez*ep-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
+			
+		else
+			if pointDis > behaviour.minSwarmRange then
+				-- jink at max range
+				cx = ux+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
+				cy = uy
+				cz = uz-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
+				data.rot = data.rot*-1
+			else
+				data.jinkDir = data.jinkDir*-1 -- jink away
+				cx = ux-(-(ux-ex)*behaviour.jinkAwayParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+				cy = uy
+				cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+			end
+		end
+		
+		GG.recursion_GiveOrderToUnit = true
+		if move then
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+		else
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+		end
+		GG.recursion_GiveOrderToUnit = false
+		data.cx,data.cy,data.cz = cx,cy,cz
+		data.receivedOrder = true
+	end
+	
+	return true
 end
 
 local function HeadingAllowReloadSkirmBlock(unitID, blockThreshold, ex, ez)
@@ -365,8 +362,7 @@ local function HeadingAllowReloadSkirmBlock(unitID, blockThreshold, ex, ez)
 	return dot < blockThreshold
 end
 
-local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, n, haveFightAndHoldPos, doHug)
-
+local function DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, n, haveFightAndHoldPos, doHug)
 	local data = unit[unitID]
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
@@ -486,10 +482,8 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, c
 	return behaviour.skirmKeepOrder
 end
 
-local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, n)
-
+local function DoFleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, n)
 	local data = unit[unitID]
-
 	local enemyRange = behaviour.minFleeRange
 	
 	if enemyUnitDef and typeKnown then
@@ -513,7 +507,6 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
 	if enemyRange + behaviour.fleeLeeway > pointDis then
-
 		local dis = behaviour.fleeOrderDis
 		local f = dis/pointDis
 		if (pointDis+dis > behaviour.skirmRange-behaviour.stoppingDistance) then
@@ -561,10 +554,10 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	local didSwarm = false
 	if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
 		--Spring.Echo("unit checking swarm")
-		if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fx, fy, fz, frame) then
+		if DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fx, fy, fz, frame) then
 			didSwarm = true
 		else
-			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 	end
 	
@@ -581,15 +574,15 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 		--Spring.Echo("unit checking skirm")
-		if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame, haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
-			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		if not DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame, haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true
 	end
 	
 	if behaviour.fleeEverything then
-		if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
-			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		if not DoFleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
+			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true
 	end
@@ -602,8 +595,8 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 			or (not typeKnown and behaviour.fleeRadar) then
 		-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
 		-- if I do not have los and flee radar dot, flee
-		if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
-			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		if not DoFleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
+			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return true
 	end
@@ -617,7 +610,7 @@ local function DoUnitUpdate(unitID, frame)
 	if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
 		if data.receivedOrder then
 			local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+			ClearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 		return
 	end
