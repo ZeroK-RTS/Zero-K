@@ -129,7 +129,7 @@ end
 --------------------------------------------------------------------------------
 ---- Unit AI
 
-local function getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+local function GetUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
 	--        Return false means the unit does not want orders from tactical ai.
 	-- ret 2: true if there is a move command at the start of queue which will need removal.
@@ -247,8 +247,8 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		end
 		
 		if move then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		else
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -294,6 +294,9 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
+			local cmdID1, _, cmdTag1 = Spring.GetUnitCurrentCommand(unitID)
+			local cmdID2, _, cmdTag2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			Spring.Echo("cmdTag", cmdTag, "cmdID1", cmdID1, cmdTag1, "cmdTag2", cmdID2, cmdTag2, math.random())
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		else
@@ -339,8 +342,11 @@ local function DoSwarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, m
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			local cmdID1, _, cmdTag1 = Spring.GetUnitCurrentCommand(unitID)
+			local cmdID2, _, cmdTag2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			Spring.Echo("cmdTag", cmdTag, "cmdID1", cmdID1, cmdTag1, "cmdTag2", cmdID2, cmdTag2, math.random())
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -466,8 +472,8 @@ local function DoSkirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID,
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		else
 			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
 		end
@@ -631,7 +637,7 @@ local function DoUnitUpdate(unitID, frame)
 		end
 	end
 	
-	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = GetUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	local isIdleAttack = autoAttackEnemyID and not haveFight
 	
 	data.idleWantReturn = (data.idleWantReturn and move and not enemy) or isIdleAttack
@@ -661,6 +667,7 @@ local function DoUnitUpdate(unitID, frame)
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
 		end
 		
+		--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
 		local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 			fightX, fightY, fightZ, data, behaviour, enemy, enemyUnitDef, typeKnown,
 			move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
