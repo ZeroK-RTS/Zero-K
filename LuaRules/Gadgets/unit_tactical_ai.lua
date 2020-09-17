@@ -546,51 +546,69 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	return false
 end
 
-local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fx, fy, fz, data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
-	-- Apologies for this function.
-	local usefulEnemy = false
-	if not (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
-		if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
-			behaviour = behaviour.fightOnlyOverride
-		end
-		
-		local checkSkirm = true
-
-		if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
-			--Spring.Echo("unit checking swarm")
-			usefulEnemy = true
-			if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fx, fy, fz, frame) then
-				checkSkirm = false
-			else
-				clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-			end
-		end
-		if checkSkirm then
-			local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
-			if enemy and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
-				--Spring.Echo("unit checking skirm")
-				usefulEnemy = true
-				if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame, haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
-					clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-				end
-			else
-				if (enemy and behaviour.fleeEverything) or not((not enemy)
-						or (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL))
-						-- if I have been given attack order manually do not flee
-						or not ((typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef])))
-						-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
-						or (not typeKnown and behaviour.fleeRadar))) then
-						-- if I do not have los and flee radar dot, flee
-					usefulEnemy = true
-					if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
-						clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
-					end
-					--Spring.Echo("unit checking flee")
-				end
-			end
+local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+		fx, fy, fz, data, behaviour, enemy, enemyUnitDef, typeKnown,
+		move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
+	
+	if (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
+		return false -- Do not tactical AI enemy if it is fight-only.
+	end
+	
+	if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
+		behaviour = behaviour.fightOnlyOverride
+	end
+	
+	local didSwarm = false
+	if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
+		--Spring.Echo("unit checking swarm")
+		if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, fx, fy, fz, frame) then
+			didSwarm = true
+		else
+			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
 	end
-	return usefulEnemy
+	
+	if didSwarm then
+		-- Units can immediately transition to skirm after swarming.
+		-- This can happen if a known auto-target becomes too far away.
+		return true
+	end
+	
+	if not enemy then
+		return false
+	end
+	
+	local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
+	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+		--Spring.Echo("unit checking skirm")
+		if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cmdID, cmdTag, frame, haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true
+	end
+	
+	if behaviour.fleeEverything then
+		if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
+			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true
+	end
+	
+	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then
+		return false -- if I have been given attack order manually do not flee
+	end
+	
+	if (typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef])))
+			or (not typeKnown and behaviour.fleeRadar) then
+		-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
+		-- if I do not have los and flee radar dot, flee
+		if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cmdID, cmdTag, frame) then
+			clearOrder(unitID, data, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true
+	end
+	
+	return false
 end
 
 local function DoUnitUpdate(unitID, frame)
@@ -623,7 +641,7 @@ local function DoUnitUpdate(unitID, frame)
 	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = getUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	local isIdleAttack = autoAttackEnemyID and not haveFight
 	
-	data.idleWantReturn = (data.idleWantReturn and not enemy) or isIdleAttack
+	data.idleWantReturn = (data.idleWantReturn and move and not enemy) or isIdleAttack
 	
 	--if isIdleAttack then
 	--	Spring.Utilities.UnitEcho(unitID, "auto")
@@ -650,13 +668,15 @@ local function DoUnitUpdate(unitID, frame)
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
 		end
 		
-		local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
-			data, behaviour, enemy, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
+		local usefulEnemy = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+			fightX, fightY, fightZ, data, behaviour, enemy, enemyUnitDef, typeKnown,
+			move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
 		
 		if autoAttackEnemyID and not usefulEnemy then
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
-			DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3, fightX, fightY, fightZ,
-				data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown, move, haveFight, holdPos, particularEnemy, frame, alwaysJink)
+			DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+				fightX, fightY, fightZ, data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
+				move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
 		end
 	end
 end
