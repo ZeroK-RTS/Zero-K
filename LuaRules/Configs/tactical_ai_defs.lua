@@ -432,6 +432,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- fleeRadar (defaults to false): does the unit flee radar dots?
 -- minFleeRange (defaults to 0): minumun range at which the unit will flee, will flee at higher range if the attacking unit outranges it
 -- fleeOrderDis (defaults to 120): max distance the move order is from the unit when fleeing
+-- fleeVelPredicton (defaults to false): velocity prediction that overrides general velocity prediction for fleeing.
 
 --*** idleFlee (defaults to empty): Units that this unit will flea when idle and not on hold position.
 -- 
@@ -456,6 +457,7 @@ local behaviourDefaults = {
 	defaultSkirmOrderDis = 120,
 	defaultVelocityPrediction = 30,
 	defaultHugRange = 50,
+	defaultLeashAgressRangeBonus = 50,
 }
 
 local behaviourConfig = {
@@ -519,7 +521,7 @@ local behaviourConfig = {
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
-		idleFlee = NameToDefID({"cloakriot",}),
+		idleFlee = NameToDefID({"cloakriot", "shieldraid"}),
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -528,6 +530,9 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 140,
 		stoppingDistance = 10,
+		fleeLeeway = 120,
+		fleeDistance = 100,
+		fleeVelPrediction = 10,
 	},
 	
 	["spiderscout"] = {
