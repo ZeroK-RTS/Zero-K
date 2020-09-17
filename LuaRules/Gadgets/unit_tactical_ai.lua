@@ -443,7 +443,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	return true
 end
 
-local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, move, isIdleAttack, cmdID, cmdTag, frame, haveFightAndHoldPos, doHug)
+local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame, haveFightAndHoldPos, doHug)
 	local data = unit[unitID]
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
@@ -498,7 +498,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, mo
 	end
 	
 	if isIdleAttack then
-		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, 0, predictedDist, ux, uz, origEx, origEz)
+		local enemyRange = 250
+		if enemyUnitDef and typeKnown then
+			enemyRange = GetEnemyRange(enemyUnitDef)
+		end
+		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, predictedDist, ux, uz, origEx, origEz)
 	end
 	
 	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
@@ -695,7 +699,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 		--Spring.Echo("unit checking skirm")
-		if not DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, move, isIdleAttack, cmdID, cmdTag, frame,
+		if not DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame,
 				haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
