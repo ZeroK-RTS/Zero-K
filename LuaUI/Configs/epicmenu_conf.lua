@@ -175,7 +175,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
-	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
+	['Settings/Interface/Gesture Menus']            = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
@@ -389,9 +389,9 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
-local pathGesture = 'Settings/Interface/Gesture Menu'
-	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
-  
+local pathGesture = 'Settings/Interface/Gesture Menus'
+	ShButton(pathGesture, 'Toggle gesture build menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
+
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
