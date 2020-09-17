@@ -530,8 +530,9 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 140,
 		stoppingDistance = 10,
-		fleeLeeway = 120,
-		fleeDistance = 100,
+		
+		fleeLeeway = 140,
+		fleeDistance = 120,
 		fleeVelPrediction = 10,
 	},
 	
