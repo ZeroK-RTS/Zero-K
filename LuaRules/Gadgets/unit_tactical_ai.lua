@@ -653,10 +653,12 @@ local function DoUnitUpdate(unitID, frame)
 	
 	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 	local moveState = Spring.Utilities.GetUnitMoveState(unitID)
+	local roamState = (moveState == 2)
 	local holdPos = (moveState == 0)
 	
 	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = GetUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
-	local isIdleAttack = (not cmdID) or (autoAttackEnemyID and not haveFight)
+	
+	local isIdleAttack = (not roamState) and ((not cmdID) or (autoAttackEnemyID and not haveFight))
 	--Spring.Echo("haveFight", haveFight, isIdleAttack, fightX, data.rx, math.random())
 	if haveFight and (not isIdleAttack) and data.rx then
 		if (fightX == data.rx) and (fightY == data.ry) and (fightZ == data.rz) and (not holdPos) then
@@ -711,7 +713,7 @@ local function DoUnitUpdate(unitID, frame)
 		data.queueReturnX = nil
 		data.queueReturnZ = nil
 		data.idleWantReturn = nil
-		if moveState == 2 then -- Roam
+		if roamState then -- Roam
 			data.setReturn = false
 		elseif (sentTacticalAiOrder or cmdID or holdPos) then
 			-- Save for next idle
