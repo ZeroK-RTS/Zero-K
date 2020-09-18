@@ -71,10 +71,18 @@ end
 
 local function AddFacCategory(name)
 	local ud = UnitDefNames[name]
-
 	local unitList = {name}
-	for i = 1, #ud.buildOptions do
-		unitList[i + 1] = UnitDefs[ud.buildOptions[i]].name
+	local offset = 1
+
+	local plateName = ud.customParams.parent_of_plate
+	if plateName then
+		offset = 2
+		unitList[offset] = plateName
+	end
+
+	local bo = ud.buildOptions
+	for i = 1, #bo do
+		unitList[i + offset] = UnitDefs[bo[i]].name
 	end
 
 	AddCategory("roster_" .. name, unitList)

@@ -85,6 +85,7 @@ return {
 		{	"clearmapmarks", "Alt+`"},
 		{	"buildfacing dec",	{"Any+delete", "]","Shift+]",}, },
 		{	"attack",	"f",},
+		{	"movestate",	"h",},
 		{	"areaattack",	"Alt+a",},
 		{	"debug",	"Ctrl+Alt+n",},
 		{	"debugcolvol",	"Ctrl+Alt+b",},

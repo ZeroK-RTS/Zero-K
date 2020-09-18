@@ -13,18 +13,17 @@ local r_doorslid = piece 'r_doorslid'
 local r_flare = piece 'r_flare'
 local l_thigh = piece 'l_thigh'
 local l_leg = piece 'l_leg'
-local l_shin = piece 'l_shin'
 local l_foot = piece 'l_foot'
 local l_toe = piece 'l_toe'
 local lf_toe = piece 'lf_toe'
 local lb_toe = piece 'lb_toe'
 local r_thigh = piece 'r_thigh'
 local r_leg = piece 'r_leg'
-local r_shin = piece 'r_shin'
 local r_foot = piece 'r_foot'
 local r_toe = piece 'r_toe'
 local rf_toe = piece 'rf_toe'
 local rb_toe = piece 'rb_toe'
+-- unused piece: [lr]_shin
 
 include "constants.lua"
 

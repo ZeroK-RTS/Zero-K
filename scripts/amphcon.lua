@@ -3,7 +3,8 @@
 include "constants.lua"
 include 'reliableStartMoving.lua'
 
-local base, pelvis, torso = piece('base', 'pelvis', 'torso')
+-- unused piece: base
+local pelvis, torso = piece('pelvis', 'torso')
 local rleg, rfoot, lleg, lfoot = piece('rleg', 'rfoot', 'lleg', 'lfoot')
 local rdoor, rnozzle, rnano, ldoor, lnozzle, lnano = piece('rdoor', 'rnozzle', 'rnano', 'ldoor', 'lnozzle', 'lnano')
 

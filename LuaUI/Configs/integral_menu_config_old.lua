@@ -1,4 +1,4 @@
-local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands = include("Configs/integral_menu_commands_old.lua")
+local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands, cmdPosDef = include("Configs/integral_menu_commands_old.lua")
 
 local function CommandClickFunction()
 	local _,_, meta,_ = Spring.GetModKeyState()
@@ -245,4 +245,4 @@ local instantCommands = {
 	[CMD_RESETMOVE] = true,
 }
 
-return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands
+return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef

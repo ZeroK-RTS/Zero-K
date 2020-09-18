@@ -24,6 +24,7 @@ return { energysingu = {
     midposoffset   = [[0 12 0]],
     modelradius    = [[60]],
     removewait     = 1,
+    removestop     = 1,
     selectionscalemult = 1.15,
   },
 

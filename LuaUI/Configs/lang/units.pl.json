@@ -6,7 +6,7 @@
 	},
 	"gunshipcon" : {
 		"name" : "Wasp",
-		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",
+		"description" : "Ciężki powietrzny konstruktor",
 		"helptext" : "Wasp łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
 	},
 	"gunshipskirm" : {
@@ -16,7 +16,7 @@
 	},
 	"factorycloak" : {
 		"name" : "Fabryka cichociemnych",
-		"description" : "Buduje cichociemne boty, moc 10 m/s",
+		"description" : "Buduje cichociemne boty",
 		"helptext" : "Jednostki z tej fabryki cechują się zwinnością i nieuchwytnością bardziej niż siłą ognia i wytrzymałością. Wiele z nich posiada maskowanie lub broń EMP, co promuje sprytne podejście do walki."
 	},
 	"amphlaunch" : {
@@ -146,7 +146,7 @@
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
-		"description" : "Działo Gaussa, +20 HP/s gdy nie strzela",
+		"description" : "Działo Gaussa, +10 HP/s gdy nie strzela",
 		"helptext" : "Wytrzymała wiezyczka uzbrojona w działo Gaussa, która może atakować także cele podwodne. Gdy jest zamknięta, otrzymuje tylko ćwierć obrażeń i regeneruje 20 punktów wytrzymałości na sekundę."
 	},
 	"nebula" : {

@@ -36,7 +36,7 @@ local custom_cmd_actions = {
 	wantcloak = {cmdType = 2, name = "Cloak", states = {'Off', 'On'}},
 	movestate = {cmdType = 2, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
 	firestate = {cmdType = 2, name = "Fire State", states = {'Hold Fire', 'Return Fire', 'Fire At Will'}},
-	idlemode = {cmdType = 2, name = "Land/Fly", states = {'Land', 'Fly'}},
+	idlemode = {cmdType = 2, name = "Air Idle State", states = {'Land', 'Fly'}},
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
 	preventoverkill = {cmdType = 2, name = "Prevent Overkill", states = {'Off', 'On'}},
 
@@ -61,7 +61,7 @@ local custom_cmd_actions = {
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
 	--selectmissiles = {cmdType = 3, name = "Select Missiles"},	-- doesn't seem to appear, maybe it doesn't support widget commands?
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
-	placebeacon = {cmdType = 1, name = "Place Teleport Beacon"},
+	placebeacon = {cmdType = 1, name = "Place Lamp"},
 	recalldrones = {cmdType = 3, name = "Recall Drones to Carrier"},
 	buildprev = {cmdType = 1, name = "Build Previous"},
 	areaguard = {cmdType = 1, name = "Area Guard"},
@@ -91,7 +91,7 @@ local custom_cmd_actions = {
 	['luaui noretreat'] = {cmdType = 2, name = "luaui noretreat"},
 	priority = {cmdType = 2, name = "Construction Priority", states = {'Low', 'Normal', 'High'}},
 	miscpriority = {cmdType = 2, name = "Misc. Priority", states = {'Low', 'Normal', 'High'}},
-	ap_fly_state = {cmdType = 2, name = "Land/Fly", states = {'Land', 'Fly'}},
+	ap_fly_state = {cmdType = 2, name = "Air Idle State", states = {'Land', 'Fly'}},
 	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair", states = {'Off', '30%', '50%', '80%'}},
 	floatstate = {cmdType = 2, name = "Float State", states = {'Sink', 'When Shooting', 'Float'}},
 	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", states = {'Off', 'On'}},

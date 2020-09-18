@@ -15,6 +15,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
 
 ------------------------------------------------------------
 -- Speedups
@@ -145,6 +146,10 @@ options = {
 	},
 }
 
+local centerX
+local centerZ
+local extraction = 0
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Mexes and builders
@@ -172,11 +177,58 @@ for udid, ud in ipairs(UnitDefs) do
 	end
 end
 
-local addons = { -- coordinates of solars for the Alt modifier key
-	{ 16, -64 },
-	{ 64,  16 },
-	{-16,  64 },
-	{-64, -16 },
+local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed by allyTeam start position
+                 -- The first two solars are in front, this is partially to make use of solar tankiness,
+                 -- but also because cons typically approach from the back so would otherwise be standing
+                 -- on the buildspot and have to waste time moving away
+	{ -- North East East
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+	},
+	{ -- North North East
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+	},
+	{ -- North North West
+		{-16,  64 },
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+	},
+	{ -- Nort West West
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+		{-16, -64 },
+	},
+	{ -- South West West
+		{ 64,  16 },
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+	},
+	{ -- South South West
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+		{-64,  16 },
+	},
+	{ -- South South East
+		{ 16, -64 },
+		{-64, -16 },
+		{-16,  64 },
+		{ 64,  16 },
+	},
+	{ -- South East East
+		{-64,  16 },
+		{-16, -64 },
+		{ 64, -16 },
+		{ 16,  64 },
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -196,6 +248,9 @@ local metalSpotsNil = true
 
 local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 local metalmultInv = metalmult > 0 and (1/metalmult) or 1
+
+local myPlayerID = Spring.GetMyPlayerID()
+local myOctant = 1
 
 ------------------------------------------------------------
 -- Functions
@@ -332,7 +387,15 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = options.alt
+		local makeMexEnergy = options.alt or options.ctrl
+		local energyToMake = 2 -- Just Alt
+		if options.ctrl then
+			if options.alt then
+				energyToMake = 4
+			else
+				energyToMake = 1
+			end
+		end
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
@@ -344,7 +407,6 @@ function widget:CommandNotify(cmdID, params, options)
 
 		local noCommands = #commands
 		while noCommands > 0 do
-
 			tasort(commands, function(a,b) return a.d < b.d end)
 			orderedCommands[#orderedCommands+1] = commands[1]
 			aveX = commands[1].x
@@ -379,8 +441,8 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 
 				if makeMexEnergy then
-					for i = 1, #addons do
-						local addon = addons[i]
+					for i = 1, energyToMake do
+						local addon = addons[myOctant][i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
@@ -616,16 +678,56 @@ end
 local mexSpotToDraw = false
 local drawMexSpots = false
 
+local function UpdateOctant()
+	myOctant = GetAllyTeamOctant(Spring.GetMyAllyTeamID()) or myOctant
+	--Spring.Echo("myOctant", myOctant, GetAllyTeamOctant(Spring.GetMyAllyTeamID()))
+end
+
+function widget:PlayerChanged(playerID)
+	if myPlayerID ~= playerID then
+		return
+	end
+	UpdateOctant()
+end
+
 function widget:Initialize()
 	if metalSpotsNil and WG.metalSpots ~= nil then
 		Initialize()
+		UpdateOctant()
 		metalSpotsNil = false
 	end
 end
 
+local wasFullView
+
+local function CheckNeedsRecalculating()
+	if not WG.metalSpots then
+		return false
+	end
+
+	local isSpectating, isFullView = spGetSpectatingState()
+
+	if wasSpectating ~= isSpectating then
+		wasSpectating = isSpectating
+		wasFullView = isFullView
+		return true
+	end
+	if isSpectating and isFullView ~= wasFullView then
+		wasFullView = isFullView
+		return true
+	end
+	return false
+end
+
 local firstUpdate = true
-function widget:Update()
+local cumDt = 0
+local camDir
+local debounceCamUpdate
+local incomeLabelList
+local DrawIncomeLabels
+function widget:Update(dt)
 	widget:Initialize()
+	cumDt = cumDt + dt
 	
 	if firstUpdate then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
@@ -635,11 +737,9 @@ function widget:Update()
 		firstUpdate = false
 	end
 
-	local isSpectating = spGetSpectatingState()
-	if WG.metalSpots and (wasSpectating ~= isSpectating) then
+	if CheckNeedsRecalculating() then
 		spotByID = {}
 		spotData = {}
-		wasSpectating = isSpectating
 		local units = spGetAllUnits()
 		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
@@ -647,6 +747,25 @@ function widget:Update()
 			if unitDefID == mexDefID then
 				widget:UnitCreated(unitID, unitDefID, teamID)
 			end
+		end
+	end
+
+	if debounceCamUpdate then
+		debounceCamUpdate = debounceCamUpdate - dt
+		if debounceCamUpdate < 0 then
+			debounceCamUpdate = nil
+		end
+	else
+		local cx, cy, cz = Spring.GetCameraDirection()
+		local newCamDir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
+		if newCamDir ~= camDir then
+			camDir = newCamDir
+			gl.DeleteList(incomeLabelList)
+			incomeLabelList = glCreateList(DrawIncomeLabels)
+			debounceCamUpdate = 0.1
+		else
+			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
+			debounceCamUpdate = 1
 		end
 	end
 
@@ -674,10 +793,6 @@ end
 -- Drawing
 ------------------------------------------------------------
 
-local centerX
-local centerZ
-local extraction = 0
-
 local circleOnlyMexDrawList = 0
 local minimapDrawList = 0
 
@@ -686,7 +801,7 @@ local function getSpotColor(id)
 	return Spring.GetTeamColor(teamID)
 end
 
-function calcMainMexDrawList()
+local function calcMainMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -718,7 +833,7 @@ function calcMainMexDrawList()
 	glColor(1,1,1,1)
 end
 
-function calcMinimapMexDrawList()
+local function calcMinimapMexDrawList()
 	if not WG.metalSpots then
 		return
 	end
@@ -747,13 +862,10 @@ function calcMinimapMexDrawList()
 	glColor(1,1,1,1)
 end
 
-local function DrawIncomeLabels()
+DrawIncomeLabels = function()
 	glTexture("LuaUI/Images/ibeam.png")
 	glDepthTest(false)
 	glColor(1,1,1)
-
-	local cx, cy, cz = Spring.GetCameraDirection()
-	local dir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
 
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
@@ -763,7 +875,7 @@ local function DrawIncomeLabels()
 		glPushMatrix()
 		glTranslate(x,y+5,z)
 		glRotate(90,1,0,0)
-		glRotate(-dir, 0, 0, 1)
+		glRotate(-camDir, 0, 0, 1)
 
 		if options.drawicons.value then
 			local metal = spot.metal
@@ -799,7 +911,7 @@ local function DrawIncomeLabels()
 
 			glTranslate(x, y, z)
 			glRotate(-90, 1, 0, 0)
-			glRotate(dir, 0, 0, 1)
+			glRotate(camDir, 0, 0, 1)
 			glTranslate(0, -40 - options.size.value, 0)
 			glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 
@@ -836,6 +948,10 @@ function widget:Shutdown()
 		gl.DeleteList(minimapDrawList)
 	end
 	minimapDrawList = nil
+	if incomeLabelList then
+		gl.DeleteList(incomeLabelList)
+	end
+	incomeLabelList = nil
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -860,7 +976,7 @@ function widget:DrawWorldPreUnit()
 		gl.DepthMask(true)
 
 		if drawMexSpots then
-			DrawIncomeLabels() -- ideally this would also be a call list but I don't know how to do rotation that way. Each mex its own call list I guess?
+			glCallList(incomeLabelList)
 		end
 		glCallList(circleOnlyMexDrawList)
 
@@ -876,27 +992,31 @@ function widget:DrawWorld()
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco or WG.showeco_always_mexes
-	local pregame = (spGetGameFrame() < 1)
-	local peruse = pregame or showecoMode or spGetMapDrawMode() == 'metal'
+	local isMexCmd = -mexDefID == cmdID
 
-
-	local mx, my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
 
 	mexSpotToDraw = false
 
-	if WG.metalSpots and pos and (-mexDefID == cmdID or ((pregame or WG.selectionEntirelyCons) and (peruse or CMD_AREA_MEX == cmdID))) then
+	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and (isMexCmd or (
+		-- peruse
+		(spGetGameFrame() < 1) or -- pregame
+		(WG.showeco or WG.showeco_always_mexes) or -- showecoMode
+		spGetMapDrawMode() == 'metal'
+	) or CMD_AREA_MEX == cmdID) then
+		local mx, my = spGetMouseState()
+		local _, pos = spTraceScreenRay(mx, my, true)
+
+		if not pos then return end
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
-		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
-		if -mexDefID ~= cmdID then
-			bx, by, bz = pos[1], pos[2], pos[3]
-		end
 
-		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and IsSpotBuildable(index) then
+		if closestSpot and (isMexCmd or distance <= 60) and IsSpotBuildable(index) then
+			local bface = Spring.GetBuildFacing()
+			if not isMexCmd then
+				bx, by, bz = pos[1], pos[2], pos[3]
+			end
 
 			mexSpotToDraw = closestSpot
 
@@ -922,10 +1042,10 @@ function widget:DrawWorld()
 
 			gl.DepthTest(false)
 			gl.DepthMask(false)
+			gl.Color(1, 1, 1, 1)
 		end
 	end
 
-	gl.Color(1, 1, 1, 1)
 end
 
 function widget:DefaultCommand(type, id)
@@ -951,4 +1071,3 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		glPopMatrix()
 	end
 end
-

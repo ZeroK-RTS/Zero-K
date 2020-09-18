@@ -415,6 +415,21 @@ function gadget:Initialize()
 			Spring.SetGameRulesParam("allyteam_long_name_"  .. clan[3], clanName)
 		end
 	end
+	
+	-- AllyTeam 'origin'
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local boxID = GetBoxID(allyTeamID)
+		if boxID then
+			local boxX, boxZ = GetAverageStartpoint(boxID)
+			if boxX and boxZ then
+				local teamID = Spring.GetTeamList(allyTeamID)[1]
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_x", boxX)
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_z", boxZ)
+				--Spring.MarkerAddPoint(boxX, 0, boxZ, "ally origin " .. allyTeamID)
+			end
+		end
+	end
 end
 
 function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry, rz)

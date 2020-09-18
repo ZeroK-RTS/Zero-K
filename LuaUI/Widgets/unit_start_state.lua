@@ -517,7 +517,9 @@ local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical
 local tacticalAIUnits = {}
 
 for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-	tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+	if not behaviourData.onlyIdleHandling then
+		tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+	end
 end
 
 local unitAlreadyAdded = {}

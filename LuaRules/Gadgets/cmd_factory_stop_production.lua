@@ -44,12 +44,12 @@ end
 --------------------------------------------------------------------------------
 
 local stopProductionCmdDesc = {
-	id			= CMD_STOP_PRODUCTION,
-	type		= CMDTYPE.ICON,
-	name		= 'Stop Production',
-	action	    = 'stopproduction',
-	cursor      = 'Stop', -- Probably does nothing
-	tooltip     = 'Clear the unit production queue.',
+	id      = CMD_STOP_PRODUCTION,
+	type    = CMDTYPE.ICON,
+	name    = 'Stop Production',
+	action  = 'stopproduction',
+	cursor  = 'Stop', -- Probably does nothing
+	tooltip = 'Stop Production: Clear factory production queue.',
 }
 
 --------------------------------------------------------------------------------

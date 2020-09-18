@@ -1,3 +1,7 @@
+if not Script.GetSynced() then
+	return
+end
+
 function gadget:GetInfo()
   return {
     name      = "Torpedo Stay Underwater",
@@ -9,14 +13,6 @@ function gadget:GetInfo()
     enabled   = true,
   }
 end
-
--------------------------------------------------------------
--------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then
-	return false
-end
--------------------------------------------------------------
--------------------------------------------------------------
 
 local projectileDefs = {
 	[WeaponDefNames["subraider_torpedo"].id] = true,
@@ -30,13 +26,15 @@ local projectiles = {}
 local projectileIndex = {}
 
 local function RemoveProjectile(proID)
-	if not projectileIndex[proID] then
+	local index = projectileIndex[proID]
+	if not index then
 		return
 	end
-	local index = projectileIndex[proID]
-	projectiles[index] = projectiles[#projectiles]
-	projectileIndex[projectiles[index]] = index
-	projectiles[#projectiles] = nil
+	local lastIndex = #projectiles
+	local lastID = projectiles[lastIndex]
+	projectiles[index] = lastID
+	projectileIndex[lastID] = index
+	projectiles[lastIndex] = nil
 	projectileIndex[proID] = nil
 end
 
@@ -53,8 +51,9 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		return
 	end
 	if py > 0 then
-		projectiles[#projectiles + 1] = proID
-		projectileIndex[proID] = #projectiles
+		local index = #projectiles + 1
+		projectiles[index] = proID
+		projectileIndex[proID] = index
 		return
 	end
 	spSetProjectileGravity(proID, -1)
@@ -64,8 +63,10 @@ function gadget:GameFrame(n)
 	if n%3 ~= 0 then
 		return
 	end
-	
-	for i = 1, #projectiles do
+
+	local cnt = #projectiles
+	local i = 1
+	while i <= cnt do
 		local proID = projectiles[i]
 		if proID then
 			local _, py = Spring.GetProjectilePosition(proID)
@@ -75,8 +76,10 @@ function gadget:GameFrame(n)
 				end
 				RemoveProjectile(proID)
 				i = i - 1
+				cnt = cnt - 1
 			end
 		end
+		i = i + 1
 	end
 end
 

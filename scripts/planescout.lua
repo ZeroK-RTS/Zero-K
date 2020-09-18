@@ -4,7 +4,8 @@ include "fixedwingTakeOff.lua"
 --------------------------------------------------------------------
 -- constants/vars
 --------------------------------------------------------------------
-local base, nozzle, thrust = piece("base", "nozzle", "thrust")
+local base, nozzle = piece("base", "nozzle")
+-- unused piece: 'thrust'
 local smokePiece = {base}
 
 local SIG_CLOAK = 1

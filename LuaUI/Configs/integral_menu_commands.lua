@@ -381,54 +381,60 @@ local imageDir = 'LuaUI/Images/commands/'
 --autoCallTransport =
 
 local tooltips = {
-	WANT_ONOFF = "Activation (_STATE_)\n  Toggles some unit abilities.",
+	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
-	REPEAT = "Repeat (_STATE_)\n  Loop command queue. Construction queue for factories.",
-	WANT_CLOAK = "Cloak (_STATE_)\n  Makes the unit invisible, unless it fires, takes damage, or is too close to an enemy unit.",
-	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloaks all friendly units in an area.",
-	PRIORITY = "Construction Priority (_STATE_)\n  Higher priority constructors receive resources before those of lower priority.",
-	MISC_PRIORITY = "Misc. Priority (_STATE_)\n  Priority for non-constructor resource usage (morph, stockpile, and energy upkeep).",
-	FACTORY_GUARD = "Auto Assist (_STATE_)\n  Newly built constructors automatically assist their factory.",
+	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
+	WANT_CLOAK = "Cloak (_STATE_)\n  Turn invisible. Disrupted by damage, firing, abilities, and nearby enemies.",
+	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloak all friendly units in the area. Does not apply to structures or shield bearers.",
+	PRIORITY = "Construction Priority (_STATE_)\n  Higher priority construction takes resources before lower priorities.",
+	MISC_PRIORITY = "Misc. Priority (_STATE_)\n  Priority for other resource use, such as morph, stockpile and radar.",
+	FACTORY_GUARD = "Auto Assist (_STATE_)\n  Newly built constructors stay to assist and boost production.",
 	AUTO_CALL_TRANSPORT = "Call Transports (_STATE_)\n  Automatically call transports between constructor tasks.",
 	GLOBAL_BUILD = "Global Build Command (_STATE_)\n  Sets constructors to execute global build orders.",
-	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
-	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
-	RETREAT = "Retreat (_STATE_)\n  Automatically retreat to closest retreat point or airpad when damaged. Right click to disable.",
-	IDLEMODE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
-	AP_FLY_STATE = "Idle State (_STATE_)\n  Set whether aircraft lands when idle.",
-	UNIT_BOMBER_DIVE_STATE = "Dive State (_STATE_)\n  Set when Ravens dive.",
+	MOVE_STATE = "Hold Position (_STATE_)\n  Prevent units from moving when idle. States are persistent and togglable.",
+	FIRE_STATE = "Hold Fire (_STATE_)\n  Prevent units from firing unless a direct command or target is set.",
+	RETREAT = "Retreat (_STATE_)\n  Retreat to the closest Airpad or Retreat Zone (placed via the top left of the screen). Right click to disable.",
+	IDLEMODE = "Air Idle State (_STATE_)\n  Set whether aircraft land when idle.",
+	AP_FLY_STATE = "Air Factory Idle State (_STATE_)\n  Set whether produced aircraft land when idle.",
+	UNIT_BOMBER_DIVE_STATE = "Bomber Dive State (_STATE_)\n  Set when Ravens dive.",
 	UNIT_KILL_SUBORDINATES = "Kill Captured (_STATE_)\n  Set whether to kill captured units.",
-	GOO_GATHER = "Puppy Goo (_STATE_)\n  Set when Puppies reclaim metal.",
-	DISABLE_ATTACK = "Allow attack commands (_STATE_)\n  Set whether the unit responds to attack commands.",
+	GOO_GATHER = "Puppy Replication (_STATE_)\n  Set whether Puppies use nearby wrecks to make more Puppies.",
+	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
-	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set the conditions which cause certain amphibious units to float to the surface.",
+	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }
 
+local tooltipsAlternate = {
+	MOVE_STATE = "Move State (_STATE_)\n  Sets how far out of its way a unit will move to attack enemies.",
+	FIRE_STATE = "Fire State (_STATE_)\n  Sets when a unit will automatically shoot.",
+}
+
 local overrides = {
-	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target or position."},
-	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
-	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets on the way."},
+	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target. Units will move to find a clear shot."},
+	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png', tooltip = "Stop: Halt the unit and clear its command queue."},
+	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets along the way."},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
-	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
+	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png', tooltip = "Patrol: Attack Move back and forth between one or more waypoints."},
 	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', tooltip = "Wait: Pause the units command queue and have it hold its current position."},
 
-	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png'},
-	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
-	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
+	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png', tooltip = "Repair: Assist construction or repair a unit. Click and drag for area repair."},
+	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png', tooltip = "Reclaim: Take resources from a wreck. Click and drag for area reclaim."},
+	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png', tooltip = "Resurrect: Spend energy to turn a wreck into a unit."},
 	[CMD_BUILD] = {texture = imageDir .. 'Bold/build.png'},
 	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the unit's special weapon."},
+	[CMD.STOCKPILE] = {tooltip = "Stockpile: Queue missile production. Right click to reduce the queue."},
 
-	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
-	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
-	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png'},
+	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', tooltip = "Load: Pick up a unit. Click and drag to load unit in an area."},
+	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', tooltip = "Unload: Set down a carried unit. Click and drag to unload in an area."},
+	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', tooltip = "Area Attack: Indiscriminately bomb the terrain in an area."},
 
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
@@ -443,7 +449,7 @@ local overrides = {
 
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 
-	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest repair pad for health and ammo."},
+	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest Airpad for repairs and, for bombers, ammo."},
 
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
@@ -514,17 +520,35 @@ local overrides = {
 	[CMD.MOVE_STATE] = {
 		texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 		stateTooltip = {
-			tooltips.MOVE_STATE:gsub("_STATE_", "Hold Position"),
-			tooltips.MOVE_STATE:gsub("_STATE_", "Maneuver"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Enabled"),
+			tooltips.MOVE_STATE:gsub("_STATE_", "Disabled"),
 			tooltips.MOVE_STATE:gsub("_STATE_", "Roam")
+		},
+		stateNameOverride = {"Enabled", "Disabled", "Roam (not in toggle)"},
+		altConfig = {
+			texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
+			stateTooltip = {
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Hold Position"),
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Maneuver"),
+				tooltipsAlternate.MOVE_STATE:gsub("_STATE_", "Roam")
+			},
 		}
 	},
 	[CMD.FIRE_STATE] = {
 		texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
 		stateTooltip = {
-			tooltips.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
+			tooltips.FIRE_STATE:gsub("_STATE_", "Enabled"),
 			tooltips.FIRE_STATE:gsub("_STATE_", "Return Fire"),
-			tooltips.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+			tooltips.FIRE_STATE:gsub("_STATE_", "Disabled")
+		},
+		stateNameOverride = {"Enabled", "Return Fire (not in toggle)", "Disabled"},
+		altConfig = {
+			texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
+			stateTooltip = {
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Hold Fire"),
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Return Fire"),
+				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Fire At Will")
+			},
 		}
 	},
 	[CMD_RETREAT] = {
@@ -561,7 +585,7 @@ local overrides = {
 		texture = {imageDir .. 'states/goo_off.png', imageDir .. 'states/goo_on.png', imageDir .. 'states/goo_cloak.png'},
 		stateTooltip = {
 			tooltips.GOO_GATHER:gsub("_STATE_", "Off"),
-			tooltips.GOO_GATHER:gsub("_STATE_", "On except cloaked"),
+			tooltips.GOO_GATHER:gsub("_STATE_", "On except when cloaked"),
 			tooltips.GOO_GATHER:gsub("_STATE_", "On always")
 		}
 	},

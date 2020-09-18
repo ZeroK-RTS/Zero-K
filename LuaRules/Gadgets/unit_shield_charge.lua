@@ -155,7 +155,7 @@ end
 -- Unit Tracking
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if (shieldUnitDefID[unitDefID] or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
+	if ((shieldUnitDefID[unitDefID] and shieldUnitDefID[unitDefID].chargePerUpdate) or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
 		GG.AddMiscPriorityUnit(unitID)
 	end
 end

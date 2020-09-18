@@ -89,12 +89,6 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
-	remerge = {
-		name = 'Manual Remerge',
-		desc = 'Use this in case you weren\'t remerged automatically.',
-		type = 'button',
-		OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
-	},
 	fixHotkeys = {
 		name  = "Fix hotkeys on start",
 		type  = "bool",
@@ -1332,8 +1326,8 @@ local function EloComparator(subject1, subject2)
 	if (not subject2.player and not subject1.player) then return subject1.id > subject2.id end
 	if (not subject2.player) then return true end
 	if (not subject1.player) then return false end
-	local elo1 = select(10,Spring.GetPlayerInfo(subject1.player)).elo
-	local elo2 = select(10,Spring.GetPlayerInfo(subject2.player)).elo
+	local elo1 = tonumber(select(10,Spring.GetPlayerInfo(subject1.player)).elo)
+	local elo2 = tonumber(select(10,Spring.GetPlayerInfo(subject2.player)).elo)
 	if (not elo2 and not elo1) then return subject1.id > subject2.id end
 	if (not elo2) then return true end
 	if (not elo1) then return false end

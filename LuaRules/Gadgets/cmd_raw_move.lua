@@ -173,7 +173,7 @@ local moveRawCmdDesc = {
 	name    = 'Move',
 	cursor  = 'Move', -- add with LuaUI?
 	action  = 'rawmove',
-	tooltip = 'Move: Order the unit to move to a position.',
+	tooltip = 'Move: Move to a position. Click and drag to line move.',
 }
 
 local TEST_MOVE_SPACING = 16
