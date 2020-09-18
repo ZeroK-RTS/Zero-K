@@ -146,7 +146,6 @@ local resourceCache = {
 	updated=nil
 }
 local function CommandPriorities(x, y, z, buildDistance)
-	-- TODO: Cache for a few seconds
 	if resourceCache.updated == nil or
 			resourceCache.updated + resourceCacheInterval < time then
 		resourceCache.metal,
@@ -155,12 +154,16 @@ local function CommandPriorities(x, y, z, buildDistance)
 			resourceCache.metalIncome = spGetTeamResources(spGetMyTeamID(), "metal")
 		resourceCache.metalStorage = resourceCache.metalStorage - HIDDEN_STORAGE
 		resourceCache.updated = time
+		Log("Updated resource cache:")
+		LogTable(resourceCache, '  ')
 	end
 
-	local metal = resourceCache.metal
 	local metalStorage = resourceCache.metalStorage
 	local metalPull = resourceCache.metalPull
 	local metalIncome = resourceCache.metalIncome
+	local metal = resourceCache.metal + metalIncome - metalPull
+
+	local slop = 5
 
 	if metalStorage < 1 then
 		if metalPull <= metalIncome then
@@ -172,10 +175,10 @@ local function CommandPriorities(x, y, z, buildDistance)
 		end
 	end
 
-	if metal < 5 + metalIncome or metal < metalStorage * 0.1 then
+	if metal < slop or metal < metalStorage * 0.1 then
 		Log("reclaim")
 		return {{CMD_RECLAIM, {x, y, z, buildDistance}}}
-	elseif metal > metalStorage - 5 or metal > metalStorage * 0.9 then
+	elseif metal > metalStorage - slop or metal > metalStorage * 0.9 then
 		Log("repair")
 		return {{CMD_REPAIR, {x, y, z, buildDistance}}}
 	else
