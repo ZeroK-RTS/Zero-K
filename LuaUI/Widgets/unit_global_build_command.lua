@@ -792,7 +792,7 @@ HOW THIS WORKS:
 --  Detect when player enters spectator mode (thanks to SeanHeron).
 function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
-		Echo( "<Global Build Command> Spectator mode. Widget removed." )
+		Echo( "<Global Build Command> Spectator mode or commshare detected. Widget removed." )
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
