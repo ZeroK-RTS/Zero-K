@@ -97,7 +97,7 @@ local unitAICmdDesc = {
 	name    = 'Unit AI',
 	action  = 'unitai',
 	tooltip = 'Toggles smart unit AI for the unit',
-	params  = {0, 'AI Off','AI On'}
+	params  = {0, 'AI Off', 'AI On'}
 }
 
 --------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ end
 
 local function GetUnitBehavior(unitID, unitDefID)
 	if unitAIBehaviour[unitDefID].waterline then
-		local bx,by,bz = spGetUnitPosition(unitID, true)
+		local bx, by, bz = spGetUnitPosition(unitID, true)
 		if unitAIBehaviour[unitDefID].floatWaterline then
 			by = Spring.GetGroundHeight(bx, bz)
 		end
@@ -313,7 +313,7 @@ end
 
 
 local function GetAiExitEarly(unitID, unitData, behaviour)
-	if (unitData.active) and (spGetUnitRulesParam(unitID,"disable_tac_ai") ~= 1) then
+	if (unitData.active) and (spGetUnitRulesParam(unitID, "disable_tac_ai") ~= 1) then
 		return false
 	end
 	if unitData.receivedOrder then
@@ -334,9 +334,9 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		if not (((cmdID == CMD_FIGHT) or move) and fightZ) then
 			return false
 		end
-		local ex,ey,ez = fightX, fightY, fightZ
-		local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-		local cx,cy,cz -- command position
+		local ex, ey, ez = fightX, fightY, fightZ
+		local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+		local cx, cy, cz -- command position
 		
 		local pointDis = Dist(ex, ez, ux, uz)
 		
@@ -355,12 +355,12 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		end
 		
 		if move then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 		end
-		--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
+		--Spring.SetUnitMoveGoal(unitID, cx, cy, cz)
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
 		
 		unitData.receivedOrder = true
@@ -381,9 +381,9 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		return false -- if I am not within enemy range then don't swarm
 	end
 	
-	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local cx,cy,cz -- command position
+	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
+	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+	local cx, cy, cz -- command position
 	
 	if isIdleAttack then
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
@@ -406,13 +406,13 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 		end
 		GG.recursion_GiveOrderToUnit = false
-		unitData.cx, unitData. cy,unitData.cz = cx, cy, cz
+		unitData.cx, unitData. cy, unitData.cz = cx, cy, cz
 		
 		unitData.receivedOrder = true
 	else
@@ -446,10 +446,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -461,11 +461,11 @@ end
 
 local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame, haveFightAndHoldPos, doHug)
 	local unitData = unit[unitID]
-	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
+	--local pointDis = spGetUnitSeparation (enemy, unitID, true)
 	
-	local vx,vy,vz, enemySpeed = spGetUnitVelocity(enemy)
-	local ex,ey,ez,_,aimY = spGetUnitPosition(enemy, false, true) -- enemy position
-	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+	local vx, vy, vz, enemySpeed = spGetUnitVelocity(enemy)
+	local ex, ey, ez, _, aimY = spGetUnitPosition(enemy, false, true) -- enemy position
+	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
 
 	if not (ex and vx) then
 		return behaviour.skirmKeepOrder
@@ -492,10 +492,10 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	predict = predict*behaviour.velocityPrediction
 	
 	-- The d vector is also relative to unit position.
-	local dx,dy,dz = ex + vx*predict, ey + vy*predict, ez + vz*predict
+	local dx, dy, dz = ex + vx*predict, ey + vy*predict, ez + vz*predict
 	if behaviour.selfVelocityPrediction then
-		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
-		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
+		local uvx, uvy, uvz = spGetUnitVelocity(unitID)
+		dx, dy, dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
 	end
 	
 	local eDistSq = ex^2 + ey^2 + ez^2
@@ -573,10 +573,10 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -602,13 +602,13 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 	end
 
 	local prediction = behaviour.fleeVelPrediction or behaviour.velocityPrediction
-	local vx,vy,vz = spGetUnitVelocity(enemy)
-	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local dx,dy,dz = ex + vx*prediction, ey + vy*prediction, ez + vz*prediction
+	local vx, vy, vz = spGetUnitVelocity(enemy)
+	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
+	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+	local dx, dy, dz = ex + vx*prediction, ey + vy*prediction, ez + vz*prediction
 	if behaviour.selfVelocityPrediction then
-		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
-		dx,dy,dz = dx - uvx*prediction, dy - uvy*prediction, dz - uvz*prediction
+		local uvx, uvy, uvz = spGetUnitVelocity(unitID)
+		dx, dy, dz = dx - uvx*prediction, dy - uvy*prediction, dz - uvz*prediction
 	end
 	
 	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
@@ -631,15 +631,15 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 
 		if cmdID then
 			if move then
-				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+				cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			else
-				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, CMD.OPT_ALT )
+				cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			end
 		elseif isIdleAttack then
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {cx,cy,cz }, CMD_OPT_RIGHT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz }, CMD_OPT_RIGHT )
 		else
-			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx, cy, cz }, CMD_OPT_RIGHT )
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -663,8 +663,8 @@ local function DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enem
 		enemyRange = GetEnemyRange(enemyUnitDef)
 	end
 	
-	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
+	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
 	
 	UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
 end
@@ -799,7 +799,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if not alwaysJink then
 			if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
-				enemy = (spGetUnitNearestEnemy(unitID, behaviour.searchRange,true) or false)
+				enemy = (spGetUnitNearestEnemy(unitID, behaviour.searchRange, true) or false)
 			end
 			--Spring.Utilities.UnitEcho(enemy)
 			--Spring.Echo("enemy spotted 2")
@@ -1002,8 +1002,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		unit[unitID] = {
 			cx = 0, cy = 0, cz = 0,
 			udID = unitDefID,
-			jinkDir = random(0,1)*2-1,
-			rot = random(0,1)*2-1,
+			jinkDir = random(0, 1)*2-1,
+			rot = random(0, 1)*2-1,
 			active = false,
 			receivedOrder = false,
 			allyTeam = spGetUnitAllyTeam(unitID),
