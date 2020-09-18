@@ -60,7 +60,6 @@ return { plateplane = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
-  moveState                     = 2,
   noAutoFire                    = false,
   objectName                    = [[plate_plane.s3o]],
   script                        = [[plateplane.lua]],

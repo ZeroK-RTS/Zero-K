@@ -367,7 +367,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		return true
 	end
 	
-	local pointDis = spGetUnitSeparation(enemy,unitID,true)
+	local pointDis = spGetUnitSeparation(enemy, unitID, true)
 	if not pointDis then
 		return false
 	end
