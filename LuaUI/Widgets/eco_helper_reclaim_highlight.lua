@@ -1,17 +1,21 @@
 
 function widget:GetInfo()
-  return {
-    name      = "Reclaim Highlight",
-    desc      = "Highlights clusters of reclaimable material",
-    author    = "ivand, refactored by esainane",
-    date      = "2020",
-    license   = "public",
-    layer     = 0,
-    enabled   = false  --  loaded by default?
-  }
+	return {
+		name      = "Reclaim Field Highlight",
+		desc      = "Highlights clusters of reclaimable material",
+		author    = "ivand, refactored by esainane",
+		date      = "2020",
+		license   = "public",
+		layer     = 0,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Options
 
 local flashStrength = 0.0
 local fontScaling = 25 / 40
@@ -20,53 +24,71 @@ local fontSizeMax = 250
 
 local textParametersChanged = false
 
-options_path = "Settings/Interface/Reclaim Field Highlight"
-options_order = { 'flashStrength', 'fontSizeMin', 'fontSizeMax', 'fontScaling' }
+options_path = "Settings/Interface/Reclaim Highlight"
+options_order = { 'showhighlight', 'flashStrength', 'fontSizeMin', 'fontSizeMax', 'fontScaling' }
 options = {
+	showhighlight = {
+		name = 'Show Field Summary',
+		type = 'radioButton',
+		value = 'constructors',
+		items = {
+			{key ='always', name='Always'},
+			{key ='withecon', name='With the Economy Overlay'},
+			{key ='constructors',  name='With Constructors Selected'},
+			{key ='conorecon',  name='With Constructors or Overlay'},
+			{key ='conandecon',  name='With Constructors and Overlay'},
+			{key ='reclaiming',  name='When Reclaiming'},
+		},
+		noHotkey = true,
+	},
 	flashStrength = {
 		name = "Field flashing strength",
 		type = 'number',
+		value = flashStrength,
+		min = 0.0, max = 0.5, step = 0.05,
+		desc = "How intensely the reclaim fields should pulse over time",
 		OnChange = function()
 			flashStrength = options.flashStrength.value
 		end,
-		value = flashStrength,
-		min=0.0, max=0.5, step=0.05,
-		desc = "How intensely the reclaim fields should pulse over time"
 	},
 	fontSizeMin = {
 		name = "Minimum font size",
 		type = 'number',
+		value = fontSizeMin,
+		min = 20, max = 100, step = 10,
+		desc = "The smallest font size to use for the smallest reclaim fields",
 		OnChange = function()
 			fontSizeMin = options.fontSizeMin.value
 			textParametersChanged = true
 		end,
-		value = fontSizeMin,
-		min = 20, max=100, step=10,
-		desc = "The smallest font size to use for the smallest reclaim fields"
 	},
 	fontSizeMax = {
 		name = "Maximum font size",
 		type = 'number',
+		value = fontSizeMax,
+		min = 20, max = 300, step = 10,
+		desc = "The largest font size to use for the largest reclaim fields",
 		OnChange = function()
 			fontSizeMax = options.fontSizeMax.value
 			textParametersChanged = true
 		end,
-		value = fontSizeMax,
-		min = 20, max=300, step=10,
-		desc = "The largest font size to use for the largest reclaim fields"
 	},
 	fontScaling = {
 		name = "Font scaling factor",
 		type = 'number',
+		value = fontScaling,
+		min = 0.2, max = 0.8, step = 0.025,
+		desc = "How quickly the font size of the metal value display should grow with the size of the field",
 		OnChange = function()
 			fontScaling = options.fontScaling.value
 			textParametersChanged = true
 		end,
-		value = fontScaling,
-		min = 0.2, max=0.8, step=0.025,
-		desc = "How quickly the font size of the metal value display should grow with the size of the field"
 	}
 }
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Speedups
 
 local glBeginEnd = gl.BeginEnd
 local glBlending = gl.Blending
@@ -97,18 +119,19 @@ local spIsGUIHidden = Spring.IsGUIHidden
 local spIsPosInLos = Spring.IsPosInLos
 local spTraceScreenRay = Spring.TraceScreenRay
 local spValidFeatureID = Spring.ValidFeatureID
+local spGetActiveCommand = Spring.GetActiveCommand
+local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Data
 
 local screenx, screeny
 
 local gaiaTeamId = spGetGaiaTeamID()
 local myAllyTeamID
-local function UpdateTeamAndAllyTeamID()
-	myAllyTeamID = spGetMyAllyTeamID()
-end
-
-local Benchmark = VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
-local benchmark = Benchmark.new()
+local Benchmark = false and VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
+local benchmark = Benchmark and Benchmark.new()
 
 local scanInterval = 1 * Game.gameSpeed
 local scanForRemovalInterval = 10 * Game.gameSpeed --10 sec
@@ -118,7 +141,46 @@ local minSqDistance = minDistance^2
 local minPoints = 2
 local minFeatureMetal = 8 --flea
 
+local drawEnabled = true
+
 local knownFeatures = {}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- State update
+
+local function UpdateTeamAndAllyTeamID()
+	myAllyTeamID = spGetMyAllyTeamID()
+end
+
+local function UpdateDrawEnabled()
+	if (options.showhighlight.value == 'always')
+			or (options.showhighlight.value == 'withecon' and WG.showeco)
+			or (options.showhighlight.value == "constructors" and conSelected)
+			or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
+			or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then
+		return true
+	end
+	
+	local currentCmd = spGetActiveCommand()
+	if currentCmd then
+		local activeCmdDesc = spGetActiveCmdDesc(currentCmd)
+		return (activeCmdDesc and (activeCmdDesc.name == "Reclaim" or activeCmdDesc.name == "Resurrect"))
+	end
+	return false
+end
+
+function widget:SelectionChanged(units)
+	if (WG.selectionEntirelyCons) then
+		conSelected = true
+	else
+		conSelected = false
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Feature Tracking
 
 local featureNeighborsMatrix = {}
 local function UpdateFeatureNeighborsMatrix(fID, added, posChanged, removed)
@@ -158,10 +220,14 @@ local featuresUpdated = false
 local clusterMetalUpdated = false
 
 local function UpdateFeatures(gf)
-	benchmark:Enter("UpdateFeatures")
+	if benchmark then
+		benchmark:Enter("UpdateFeatures")
+	end
 	featuresUpdated = false
 	clusterMetalUpdated = false
-	benchmark:Enter("UpdateFeatures 1loop")
+	if benchmark then
+		benchmark:Enter("UpdateFeatures 1loop")
+	end
 	for _, fID in ipairs(spGetAllFeatures()) do
 		local metal, _, energy = spGetFeatureResources(fID)
 		metal = metal + energy * E2M
@@ -225,9 +291,12 @@ local function UpdateFeatures(gf)
 			end
 		end
 	end
-	benchmark:Leave("UpdateFeatures 1loop")
 
-	benchmark:Enter("UpdateFeatures 2loop")
+	if benchmark then
+		benchmark:Leave("UpdateFeatures 1loop")
+		benchmark:Enter("UpdateFeatures 2loop")
+	end
+
 	for fID, fInfo in pairs(knownFeatures) do
 
 		if fInfo.isGaia and spValidFeatureID(fID) == false then
@@ -255,14 +324,19 @@ local function UpdateFeatures(gf)
 			knownFeatures[fID].clID = nil
 		end
 	end
-	benchmark:Leave("UpdateFeatures 2loop")
-	benchmark:Leave("UpdateFeatures")
+	
+	if benchmark then
+		benchmark:Leave("UpdateFeatures 2loop")
+		benchmark:Leave("UpdateFeatures")
+	end
 end
 
 local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
 
 local function ClusterizeFeatures()
-	benchmark:Enter("ClusterizeFeatures")
+	if benchmark then
+		benchmark:Enter("ClusterizeFeatures")
+	end
 	local pointsTable = {}
 
 	local unclusteredPoints  = {}
@@ -281,13 +355,19 @@ local function ClusterizeFeatures()
 	--TableEcho(featureNeighborsMatrix, "featureNeighborsMatrix")
 
 	local opticsObject = Optics.new(pointsTable, featureNeighborsMatrix, minPoints, benchmark)
-	benchmark:Enter("opticsObject:Run()")
+	if benchmark then
+		benchmark:Enter("opticsObject:Run()")
+	end
 	opticsObject:Run()
-	benchmark:Leave("opticsObject:Run()")
-
-	benchmark:Enter("opticsObject:Clusterize(minDistance)")
+	
+	if benchmark then
+		benchmark:Leave("opticsObject:Run()")
+		benchmark:Enter("opticsObject:Clusterize(minDistance)")
+	end
 	featureClusters = opticsObject:Clusterize(minDistance)
-	benchmark:Leave("opticsObject:Clusterize(minDistance)")
+	if benchmark then
+		benchmark:Leave("opticsObject:Clusterize(minDistance)")
+	end
 
 	--spEcho("#featureClusters", #featureClusters)
 
@@ -335,7 +415,9 @@ local function ClusterizeFeatures()
 		knownFeatures[fID].clID = #featureClusters
 	end
 
-	benchmark:Leave("ClusterizeFeatures")
+	if benchmark then
+		benchmark:Leave("ClusterizeFeatures")
+	end
 end
 
 local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
@@ -344,12 +426,16 @@ local minDim = 100
 
 local featureConvexHulls = {}
 local function ClustersToConvexHull()
-	benchmark:Enter("ClustersToConvexHull")
+	if benchmark then
+		benchmark:Enter("ClustersToConvexHull")
+	end
 	featureConvexHulls = {}
 	--spEcho("#featureClusters", #featureClusters)
 	for fc = 1, #featureClusters do
 		local clusterPoints = {}
-		benchmark:Enter("ClustersToConvexHull 1st Part")
+		if benchmark then
+			benchmark:Enter("ClustersToConvexHull 1st Part")
+		end
 		for fcm = 1, #featureClusters[fc].members do
 			local fID = featureClusters[fc].members[fcm]
 			clusterPoints[#clusterPoints + 1] = {
@@ -359,12 +445,16 @@ local function ClustersToConvexHull()
 			}
 			--spMarkerAddPoint(knownFeatures[fID].x, 0, knownFeatures[fID].z, string.format("%i(%i)", fc, fcm))
 		end
-		benchmark:Leave("ClustersToConvexHull 1st Part")
-
+		if benchmark then
+			benchmark:Leave("ClustersToConvexHull 1st Part")
+		end
+		
 		--- TODO perform pruning as described in the article below, if convex hull algo will start to choke out
 		-- http://mindthenerd.blogspot.ru/2012/05/fastest-convex-hull-algorithm-ever.html
-
-		benchmark:Enter("ClustersToConvexHull 2nd Part")
+		
+		if benchmark then
+			benchmark:Enter("ClustersToConvexHull 2nd Part")
+		end
 		local convexHull
 		if #clusterPoints >= 3 then
 			--spEcho("#clusterPoints >= 3")
@@ -408,9 +498,12 @@ local function ClustersToConvexHull()
 			cz = cz + convexHullPoint.z
 			cy = math.max(cy, convexHullPoint.y)
 		end
-		benchmark:Leave("ClustersToConvexHull 2nd Part")
 
-		benchmark:Enter("ClustersToConvexHull 3rd Part")
+		if benchmark then
+			benchmark:Leave("ClustersToConvexHull 2nd Part")
+			benchmark:Enter("ClustersToConvexHull 3rd Part")
+		end
+		
 		local totalArea = 0
 		local pt1 = convexHull[1]
 		for i = 2, #convexHull - 1 do
@@ -425,8 +518,10 @@ local function ClustersToConvexHull()
 			local triangleArea = math.sqrt(p * (p - a) * (p - b) * (p - c))
 			totalArea = totalArea + triangleArea
 		end
-		benchmark:Leave("ClustersToConvexHull 3rd Part")
-
+		if benchmark then
+			benchmark:Leave("ClustersToConvexHull 3rd Part")
+		end
+		
 		convexHull.area = totalArea
 		convexHull.center = {x = cx/#convexHull, z = cz/#convexHull, y = cy + 1}
 
@@ -437,7 +532,9 @@ local function ClustersToConvexHull()
 			spMarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
 		end
 ]]--
-		benchmark:Leave("ClustersToConvexHull")
+		if benchmark then
+			benchmark:Leave("ClustersToConvexHull")
+		end
 	end
 end
 
@@ -451,18 +548,17 @@ local function ColorMul(scalar, actionColor)
 	return {scalar * actionColor[1], scalar * actionColor[2], scalar * actionColor[3], actionColor[4]}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:Initialize()
-	-- This information is pretty useful as a spectator too
-	-- CheckSpecState(widgetName)
-
 	UpdateTeamAndAllyTeamID()
-
-	--local iconDist = spGetConfigInt("UnitIconDist")
-
 	screenx, screeny = widgetHandler:GetViewSizes()
-
-	--ToggleIdle()
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Drawing
 
 local color
 local cameraScale
@@ -550,7 +646,9 @@ function widget:Update(dt)
 		cameraScale = 1.0
 	end
 
-	local frame=spGetGameFrame()
+	drawEnabled = UpdateDrawEnabled()
+
+	local frame = spGetGameFrame()
 	color = 0.5 + flashStrength * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
 	if color < 0 then color = 0 end
 	if color > 1 then color = 1 end
@@ -558,8 +656,12 @@ end
 
 function widget:GameFrame(frame)
 	local frameMod = frame % checkFrequency
-	if frameMod ~= 0 then return end
-	benchmark:Enter("GameFrame UpdateFeatures")
+	if frameMod ~= 0 then
+		return
+	end
+	if benchmark then
+		benchmark:Enter("GameFrame UpdateFeatures")
+	end
 	UpdateFeatures(frame)
 	--spEcho("featuresUpdated", featuresUpdated)
 	if featuresUpdated then
@@ -572,7 +674,9 @@ function widget:GameFrame(frame)
 	end
 
 	if featuresUpdated or drawFeatureConvexHullSolidList == nil then
-		benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+		if benchmark then
+			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+		end
 		--spEcho("featuresUpdated")
 		if drawFeatureConvexHullSolidList then
 			glDeleteList(drawFeatureConvexHullSolidList)
@@ -587,11 +691,15 @@ function widget:GameFrame(frame)
 
 		drawFeatureConvexHullSolidList = glCreateList(DrawFeatureConvexHullSolid)
 		drawFeatureConvexHullEdgeList = glCreateList(DrawFeatureConvexHullEdge)
-		benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+		if benchmark then
+			benchmark:Leave("featuresUpdated or drawFeatureConvexHullSolidList == nil")
+		end
 	end
 
 	if textParametersChanged or featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil then
-		benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+		if benchmark then
+			benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+		end
 		--spEcho("clusterMetalUpdated")
 		if drawFeatureClusterTextList then
 			glDeleteList(drawFeatureClusterTextList)
@@ -599,9 +707,13 @@ function widget:GameFrame(frame)
 		end
 		drawFeatureClusterTextList = glCreateList(DrawFeatureClusterText)
 		textParametersChanged = false
-		benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+		if benchmark then
+			benchmark:Leave("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
+		end
 	end
-	benchmark:Leave("GameFrame UpdateFeatures")
+	if benchmark then
+		benchmark:Leave("GameFrame UpdateFeatures")
+	end
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
@@ -609,7 +721,10 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:DrawWorld()
-	if spIsGUIHidden() then return end
+	if spIsGUIHidden() or not drawEnabled then
+		return
+	end
+
 	glDepthTest(false)
 	--glDepthTest(true)
 
@@ -648,5 +763,7 @@ function widget:Shutdown()
 	if drawFeatureClusterTextList then
 		glDeleteList(drawFeatureClusterTextList)
 	end
-	benchmark:PrintAllStat()
+	if benchmark then
+		benchmark:PrintAllStat()
+	end
 end

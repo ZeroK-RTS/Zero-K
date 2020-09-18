@@ -1,8 +1,8 @@
 local Benchmark = {}
 
 function Benchmark.new()
-    local object = setmetatable({}, {
-        __index = {
+	local object = setmetatable({}, {
+		__index = {
 			timer = {},
 			cumTime = {},
 			num = {},
@@ -39,8 +39,8 @@ function Benchmark.new()
 					Spring.Echo(name.." <====> "..self:GetAverageTime(name))
 				end
 			end,
-        }
-    })
+		}
+	})
 
 	return object
 end

@@ -165,7 +165,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
-	['Settings/Interface/Reclaim Field Highlight']  = imgPath..'epicmenu/reclaimfield.png',
+	['Settings/Interface/Reclaim Highlight']        = imgPath..'epicmenu/reclaimfield.png',
 	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
 	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
@@ -390,8 +390,8 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
-local pathReclaimHighlight = "Settings/Interface/Reclaim Field Highlight"
-	ShButton(pathReclaimHighlight, 'Toggle Reclaim Field Highlight', function() spSendCommands{"luaui togglewidget Reclaim Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
+local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
+	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")

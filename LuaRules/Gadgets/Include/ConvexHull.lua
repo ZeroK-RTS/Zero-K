@@ -20,7 +20,9 @@ local function isCCW(p, q, r) return cross(p, q, r) < 0 end
 -- points  : an array of points
 -- returns : the convex hull as an array of points
 local function JarvisMarch(points, benchmark)
-	benchmark:Enter("JarvisMarch")
+	if benchmark then
+		benchmark:Enter("JarvisMarch")
+	end
 	-- We need at least 3 points
 	local numPoints = #points
 	if numPoints < 3 then return end
@@ -52,7 +54,9 @@ local function JarvisMarch(points, benchmark)
 		p = q  -- p is now q for the next iteration
 	until (p == lbMostPointIndex)
 
-	benchmark:Leave("JarvisMarch")
+	if benchmark then
+		benchmark:Leave("JarvisMarch")
+	end
 	return hull
 end
 --- JARVIS MARCH
@@ -65,7 +69,9 @@ end
 -- Direct port from Javascript version
 
 local function MonotoneChain(points, benchmark)
-	benchmark:Enter("MonotoneChain")
+	if benchmark then
+		benchmark:Enter("MonotoneChain")
+	end
 	local numPoints = #points
 	if numPoints < 3 then return end
 
@@ -75,32 +81,34 @@ local function MonotoneChain(points, benchmark)
 		end
 	)
 
-    local lower = {}
-    for i = 1, numPoints do
-        while (#lower >= 2 and cross(lower[#lower - 1], lower[#lower], points[i]) <= 0) do
-            table.remove(lower, #lower)
-        end
+	local lower = {}
+	for i = 1, numPoints do
+		while (#lower >= 2 and cross(lower[#lower - 1], lower[#lower], points[i]) <= 0) do
+			table.remove(lower, #lower)
+		end
 
-        table.insert(lower, points[i])
-    end
+		table.insert(lower, points[i])
+	end
 
-    local upper = {}
-    for i = numPoints, 1, -1 do
-        while (#upper >= 2 and cross(upper[#upper - 1], upper[#upper], points[i]) <= 0) do
-            table.remove(upper, #upper)
-        end
+	local upper = {}
+	for i = numPoints, 1, -1 do
+		while (#upper >= 2 and cross(upper[#upper - 1], upper[#upper], points[i]) <= 0) do
+			table.remove(upper, #upper)
+		end
 
-        table.insert(upper, points[i])
-    end
+		table.insert(upper, points[i])
+	end
 
-    table.remove(upper, #upper)
-    table.remove(lower, #lower)
-    for _, point in ipairs(lower) do
-        table.insert(upper, point)
-    end
+	table.remove(upper, #upper)
+	table.remove(lower, #lower)
+	for _, point in ipairs(lower) do
+		table.insert(upper, point)
+	end
 
-	benchmark:Leave("MonotoneChain")
-    return upper
+	if benchmark then
+		benchmark:Leave("MonotoneChain")
+	end
+	return upper
 end
 
 
