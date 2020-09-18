@@ -60,7 +60,6 @@ local ALLY_TABLE = {
 
 local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
-local TRACK_FIGHT_RETURN = false -- Fight does not need tracking as returning units are aggressive
 
 local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 
@@ -296,11 +295,13 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	local myIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ux, uz)
 	--Spring.Utilities.UnitEcho(unitID, "C")
 	--Spring.Echo("enemyRange", math.floor(enemyRange), math.floor(enemyDist), math.floor(behaviour.idleCommitDist), "ux, uz, ex, ez", math.floor(ux), math.floor(uz), math.floor(ex), math.floor(ez), "Distances", math.floor(math.sqrt(behaviour.idlePushAggressDistSq)), math.floor(math.sqrt(myIdleDistSq)), math.floor(math.sqrt(DistSq(unitData.idleX, unitData.idleZ, ex, ez))), math.random())
+	
+	local enemyIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ex, ez)
+	local enemyCloserToIdlePos = enemyIdleDistSq < myIdleDistSq
+	unitData.wantFightReturn = enemyCloserToIdlePos -- Return with fight if you need to return through an enemy
+	
 	if enemyDist < enemyRange or behaviour.idlePushAggressDistSq < myIdleDistSq then
-		local enemyIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ex, ez)
-		local enemyCloserToIdlePos = enemyIdleDistSq < myIdleDistSq
 		local myIdleDist = math.sqrt(myIdleDistSq) 
-		unitData.wantFightReturn = enemyCloserToIdlePos -- Return with fight if you need to return through an enemy
 		if enemyCloserToIdlePos or enemyDist + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
 			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
 			SetIdleAgression(unitID, unitData, enemy, frame)
@@ -774,7 +775,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local isIdleAttack = (not roamState) and ((not cmdID) or (autoAttackEnemyID and not haveFight))
 	--Spring.Echo("haveFight", haveFight, isIdleAttack, fightX, unitData.rx, math.random())
 	
-	if TRACK_FIGHT_RETURN and haveFight and (not isIdleAttack) and unitData.rx then
+	if haveFight and (not isIdleAttack) and unitData.rx then
 		if (fightX == unitData.rx) and (fightY == unitData.ry) and (fightZ == unitData.rz) and (not holdPos) then
 			isIdleAttack = true
 		else
@@ -846,7 +847,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			GiveClampedOrderToUnit(unitID, unitData.wantFightReturn and CMD_FIGHT or CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
 			unitData.setReturn = nil
 			unitData.forceReturn = nil
-			if TRACK_FIGHT_RETURN then
+			if unitData.wantFightReturn then
 				unitData.rx, unitData.ry, unitData.rz = rx, ry, rz
 			end
 		end
