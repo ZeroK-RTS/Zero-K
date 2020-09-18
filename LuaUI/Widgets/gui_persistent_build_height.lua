@@ -196,6 +196,8 @@ local function SendCommand()
 			end
 		end
 	end
+
+	pointY = math.max(pointY, -UnitDefs[buildingPlacementID].maxWaterDepth)
 	
 	-- Setup parameters for terraform command
 	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
