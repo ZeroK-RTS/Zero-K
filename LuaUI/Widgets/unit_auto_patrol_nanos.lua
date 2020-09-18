@@ -127,6 +127,22 @@ local function LogTable(table, prefix)
 	end
 end
 
+local function TableEqual(a, b)
+	for k, v in pairs(a) do
+		if b[k] ~= v then
+			return false
+		end
+	end
+
+	for k, v in pairs(b) do
+		if a[k] ~= v then
+			return false
+		end
+	end
+
+	return true
+end
+
 local function UpdateNextCheck()
 	nextCheck = nil
 	for _, info in pairs(trackedUnits) do
@@ -134,7 +150,7 @@ local function UpdateNextCheck()
 			nextCheck = info.checkTime
 		end
 	end
-	Log("Update nextCheck to " .. tostring(nextCheck))
+	--Log("Update nextCheck to " .. tostring(nextCheck))
 end
 
 local function IsImmobileBuilder(ud)
@@ -142,10 +158,8 @@ local function IsImmobileBuilder(ud)
 end
 
 local resourceCacheInterval = 1
-local resourceCache = {
-	updated=nil
-}
-local function CommandPriorities(x, y, z, buildDistance)
+local resourceCache = { updated=nil }
+local function DecideCommand(x, y, z, buildDistance)
 	if resourceCache.updated == nil or
 			resourceCache.updated + resourceCacheInterval < time then
 		resourceCache.metal,
@@ -154,8 +168,6 @@ local function CommandPriorities(x, y, z, buildDistance)
 			resourceCache.metalIncome = spGetTeamResources(spGetMyTeamID(), "metal")
 		resourceCache.metalStorage = resourceCache.metalStorage - HIDDEN_STORAGE
 		resourceCache.updated = time
-		Log("Updated resource cache:")
-		LogTable(resourceCache, '  ')
 	end
 
 	local metalStorage = resourceCache.metalStorage
@@ -168,19 +180,19 @@ local function CommandPriorities(x, y, z, buildDistance)
 	if metalStorage < 1 then
 		if metalPull <= metalIncome then
 			Log("repair")
-			return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+			return {CMD_REPAIR, {x, y, z, buildDistance}}
         else
 			Log("reclaim")
-			return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+			return {CMD_REPAIR, {x, y, z, buildDistance}}
 		end
 	end
 
 	if metal < slop or metal < metalStorage * 0.1 then
 		Log("reclaim")
-		return {{CMD_RECLAIM, {x, y, z, buildDistance}}}
+		return {CMD_RECLAIM, {x, y, z, buildDistance}}
 	elseif metal > metalStorage - slop or metal > metalStorage * 0.9 then
 		Log("repair")
-		return {{CMD_REPAIR, {x, y, z, buildDistance}}}
+		return {CMD_REPAIR, {x, y, z, buildDistance}}
 	else
 		Log("patrol")
 		-- Patrolling doesn't do anything if you target the current location of
@@ -190,15 +202,12 @@ local function CommandPriorities(x, y, z, buildDistance)
 		x = x + vx*25/abs(vx)
 		z = z + vz*25/abs(vz)
 
-		return {{CMD_PATROL, {x, y, z}}}
+		return {CMD_PATROL, {x, y, z}}
 	end
 end
 
 local function SetupUnit(unitID)
 	-- TODO: Don't reissue a command that's still going.
-	--local commandQueue = Spring.GetCommandQueue(unitID, -1)
-	--Log(time .. "; cmd queue for " .. unitID .. ":")
-	--LogTable(commandQueue, "  ")
 
 	--local cmd = {spGetUnitCurrentCommand(unitID)}
 	--Log(time .. "; cmd for " .. unitID .. ":")
@@ -212,25 +221,29 @@ local function SetupUnit(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
-		trackedUnits[unitID].settleTime = time + settleInterval
 		trackedUnits[unitID].checkTime = time + checkInterval
-		local priorities = CommandPriorities(x, y, z, buildDistance)
-		--Log("priorities: " .. tostring(priorities))
-		--LogTable(priorities, "  ")
-		local first = true
-		for _, cmd in pairs(priorities) do
-			Log("give order " .. cmd[1] .. " to " .. unitID)
-			if first then
-				spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
-			else
-				local params = {-1, cmd[1], 0}
-				for _, v in pairs(cmd[2]) do
-					table.insert(params, v)
-				end
-				spGiveOrderToUnit(unitID, CMD_INSERT, params, {})
+		local cmd = DecideCommand(x, y, z, buildDistance)
+
+		local commandQueue = Spring.GetCommandQueue(unitID, -1)
+		--Log(time .. "; cmd queue for " .. unitID .. ":")
+		--LogTable(commandQueue, "  ")
+
+		--LogTable(cmd, "cmd: ")
+		for _, current in pairs(commandQueue) do
+			--LogTable(current, "current:")
+			--Log(tostring(current.options.internal))
+			--Log(tostring(current.id == cmd[1]))
+			--Log(tostring(TableEqual(cmd[2], current.params)))
+			if not current.options.internal and 
+					current.id == cmd[1] and
+					TableEqual(cmd[2], current.params) then
+				Log("command already issued")
+				return
 			end
-			first = false
 		end
+		Log("give order " .. cmd[1] .. " to " .. unitID)
+		spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
+		trackedUnits[unitID].settleTime = time + settleInterval
 	end
 end
 
@@ -315,7 +328,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				stoppedUnit[unitID] = true
 			elseif stoppedUnit[unitID] then
 				if stoppedUnit[unitID] ~= nil then
-					Log("Pay attention to unit " .. unitID .. "again.")
+					Log("Pay attention to unit " .. unitID .. " again.")
 				end
 				stoppedUnit[unitID] = nil
 			end
@@ -343,8 +356,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	Log("UnitIdle:")
-	LogTable(trackedUnits[unitID], "- ")
+	--Log("UnitIdle:")
+	--LogTable(trackedUnits[unitID], "- ")
 	-- Check soon, but not right away. This time has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
 	delta = 0.5
@@ -361,7 +374,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	else
 		nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
 	end
-	LogTable(trackedUnits[unitID], "+ ")
+	--LogTable(trackedUnits[unitID], "+ ")
 end
 
 function widget:Update(dt)
@@ -370,7 +383,7 @@ function widget:Update(dt)
 		return
 	end
 	if nextCheck ~= nil and time > nextCheck then
-		Log("time to check (" .. time .. ")")
+		--Log("time to check (" .. time .. ")")
 		for unitID, _ in pairs(trackedUnits) do
 			if Spring.ValidUnitID(unitID) then
 				SetupUnit(unitID)
