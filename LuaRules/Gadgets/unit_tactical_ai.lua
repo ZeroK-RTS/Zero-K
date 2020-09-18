@@ -61,7 +61,7 @@ local ALLY_TABLE = {
 local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
 
-local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
+local unitAIBehaviour, commanderBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -119,7 +119,10 @@ local function GetUnitVisibleInformation(unitID, allyTeamID)
 	return spGetUnitDefID(unitID), states and states.typed
 end
 
-local function GetUnitBehavior(unitID, unitDefID)
+local function GetUnitBehavior(unitID, unitDefID, isCommander)
+	if isCommander then
+		return commanderBehaviour
+	end
 	if unitAIBehaviour[unitDefID].waterline then
 		local bx, by, bz = spGetUnitPosition(unitID, true)
 		if unitAIBehaviour[unitDefID].floatWaterline then
@@ -774,7 +777,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		if exitEarly then
 			return
 		end
-		behaviour = GetUnitBehavior(unitID, unitData.udID)
+		behaviour = GetUnitBehavior(unitID, unitData.udID, unitData.isCommander)
 		if behaviour.onlyIdleHandling then
 			return
 		end
@@ -801,7 +804,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
 		
-		behaviour = behaviour or GetUnitBehavior(unitID, unitData.udID)
+		behaviour = behaviour or GetUnitBehavior(unitID, unitData.udID, unitData.isCommander)
 		local alwaysJink = (behaviour.alwaysJinkFight and ((cmdID == CMD_FIGHT) or move))
 		local enemyUnitDef = false
 		local typeKnown = false
@@ -907,7 +910,7 @@ local function AddIdleUnit(unitID, unitDefID)
 		return
 	end
 	
-	local behaviour = GetUnitBehavior(unitID, unitDefID)
+	local behaviour = GetUnitBehavior(unitID, unitDefID, unitData.isCommander)
 	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	
@@ -997,48 +1000,55 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	local ud = UnitDefs[unitDefID]
 	-- add swarmers
-	if unitAIBehaviour[unitDefID] then
-		local behaviour = unitAIBehaviour[unitDefID]
-		
-		if not behaviour.onlyIdleHandling then
-			spInsertUnitCmdDesc(unitID, unitAICmdDesc)
-		end
-		
-		if behaviour.externallyHandled then
-			externallyHandledUnit[unitID] = true
-			if (behaviour.defaultAIState == 1) then
-				AIToggleCommand(unitID, {1}, {})
-			else
-				AIToggleCommand(unitID, {0}, {})
-			end
+	local behaviour = unitAIBehaviour[unitDefID]
+	local isCommander = nil
+	if not behaviour then
+		local ud = UnitDefs[unitDefID]
+		if not ud.customParams.dynamic_comm then
 			return
 		end
-		
-		--Spring.Echo("unit added")
-		if not unit[unitID] then
-			unitList.count = unitList.count + 1
-			unitList.data[unitList.count] = unitID
+		behaviour = commanderBehaviour
+		isCommander = true
+	end
+	
+	if not behaviour.onlyIdleHandling then
+		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
+	end
+	
+	if behaviour.externallyHandled then
+		externallyHandledUnit[unitID] = true
+		if (behaviour.defaultAIState == 1) then
+			AIToggleCommand(unitID, {1}, {})
+		else
+			AIToggleCommand(unitID, {0}, {})
 		end
-		
-		unit[unitID] = {
-			cx = 0, cy = 0, cz = 0,
-			udID = unitDefID,
-			jinkDir = random(0, 1)*2-1,
-			rot = random(0, 1)*2-1,
-			active = false,
-			receivedOrder = false,
-			allyTeam = spGetUnitAllyTeam(unitID),
-		}
-		AddIdleUnit(unitID, unitDefID)
-		
-		if not behaviour.onlyIdleHandling then
-			if (behaviour.defaultAIState == 1) then
-				AIToggleCommand(unitID, {1}, {})
-			else
-				AIToggleCommand(unitID, {0}, {})
-			end
+		return
+	end
+	
+	--Spring.Echo("unit added")
+	if not unit[unitID] then
+		unitList.count = unitList.count + 1
+		unitList.data[unitList.count] = unitID
+	end
+	
+	unit[unitID] = {
+		cx = 0, cy = 0, cz = 0,
+		udID = unitDefID,
+		jinkDir = random(0, 1)*2-1,
+		rot = random(0, 1)*2-1,
+		active = false,
+		receivedOrder = false,
+		allyTeam = spGetUnitAllyTeam(unitID),
+		isCommander = isCommander,
+	}
+	AddIdleUnit(unitID, unitDefID)
+	
+	if not behaviour.onlyIdleHandling then
+		if (behaviour.defaultAIState == 1) then
+			AIToggleCommand(unitID, {1}, {})
+		else
+			AIToggleCommand(unitID, {0}, {})
 		end
 	end
 end
