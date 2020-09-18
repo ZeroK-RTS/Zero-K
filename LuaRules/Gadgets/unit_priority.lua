@@ -778,7 +778,6 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 			spRemoveUnitCmdDesc(unitID, cmdDescID)
 		end
 	end
-
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
