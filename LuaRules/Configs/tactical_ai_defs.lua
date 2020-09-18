@@ -427,12 +427,12 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 --*** flees(defaults to empty): the table of units that this unit will flee like the coward it is!!!
 -- fleeCombat (defaults to false): if true will flee everything without catergory UNARMED
 -- fleeEverything (defaults to false): if true will flee all enemies
--- fleeLeeway (defaults to 100): adds to enemy range when fleeing
--- fleeDistance (defaults to 100): unit will flee to enemy range + fleeDistance away from enemy
+-- fleeLeeway (defaults to 120): adds to enemy range when fleeing
+-- fleeDistance (defaults to 120): unit will flee to enemy range + fleeDistance away from enemy
 -- fleeRadar (defaults to false): does the unit flee radar dots?
 -- minFleeRange (defaults to 0): minumun range at which the unit will flee, will flee at higher range if the attacking unit outranges it
 -- fleeOrderDis (defaults to 120): max distance the move order is from the unit when fleeing
--- fleeVelPredicton (defaults to false): velocity prediction that overrides general velocity prediction for fleeing.
+-- fleeVelPrediction (defaults to 10): velocity prediction that overrides general velocity prediction for fleeing.
 
 --*** idleFlee (defaults to empty): Units that this unit will flea when idle and not on hold position.
 -- 
@@ -521,7 +521,6 @@ local behaviourConfig = {
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
-		idleFlee = NameToDefID({"cloakriot", "shieldraid"}),
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -530,10 +529,8 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 140,
 		stoppingDistance = 10,
-		
+		idleFlee = NameToDefID({"cloakriot", "shieldraid"}),
 		fleeLeeway = 140,
-		fleeDistance = 120,
-		fleeVelPrediction = 10,
 	},
 	
 	["spiderscout"] = {
@@ -1492,6 +1489,53 @@ local behaviourConfig = {
 		fleeDistance = 850,
 	},
 	
+	-- only handle idleness
+	["shieldscout"] = {
+		onlyIdleHandling = true,
+	},
+	["cloakheavyraid"] = {
+		onlyIdleHandling = true,
+	},
+	["gunshipraid"] = {
+		onlyIdleHandling = true,
+	},
+	["gunshipheavyskirm"] = {
+		onlyIdleHandling = true,
+	},
+	["gunshipassault"] = {
+		onlyIdleHandling = true,
+	},
+	["hoverassault"] = {
+		onlyIdleHandling = true,
+	},
+	["spidercrabe"] = {
+		onlyIdleHandling = true,
+	},
+	["jumpassault"] = {
+		onlyIdleHandling = true,
+	},
+	["tankcon"] = {
+		onlyIdleHandling = true,
+	},
+	["tankheavyarty"] = {
+		onlyIdleHandling = true,
+	},
+	["subraid"] = {
+		onlyIdleHandling = true,
+	},
+	["striderantiheavy"] = {
+		onlyIdleHandling = true,
+	},
+	["striderscorpion"] = {
+		onlyIdleHandling = true,
+	},
+	["striderdetriment"] = {
+		onlyIdleHandling = true,
+	},
+	["shipheavyarty"] = {
+		onlyIdleHandling = true,
+	},
+	
 	-- chickens
 	["chicken_tiamat"] = {
 		skirms = {},
@@ -1523,7 +1567,102 @@ local behaviourConfig = {
 	},
 }
 
-return behaviourConfig, behaviourDefaults
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Load Ai behaviour
+
+local function GetBehaviourTable(behaviourData, ud)
+	
+	local weaponRange
+	if behaviourData.weaponNum and ud.weapons[behaviourData.weaponNum] then
+		local weaponDefID = ud.weapons[behaviourData.weaponNum].weaponDef
+		weaponRange = WeaponDefs[weaponDefID].range
+	else
+		weaponRange = ud.maxWeaponRange
+	end
+	
+	behaviourData.weaponNum               = (behaviourData.weaponNum or 1)
+	behaviourData.searchRange             = (behaviourData.searchRange or math.max(weaponRange + 100, 800))
+	
+	-- Used for idle leash
+	behaviourData.leashAgressRange        = weaponRange + behaviourDefaults.defaultLeashAgressRangeBonus
+	behaviourData.idlePushAggressDistSq   = (behaviourData.idlePushAggressDist or math.min(500, weaponRange + 50))^2
+	behaviourData.idleChaseEnemyLeeway    = behaviourData.idleChaseEnemyLeeway or 100
+	behaviourData.idleCommitDist          = behaviourData.idleCommitDist or math.min(400, weaponRange/2 + 50)
+	behaviourData.idleCommitDistMult      = behaviourData.idleCommitDistMult or 0.2
+	
+	local hasFlee = (behaviourData.flees or behaviourData.fleeEverything or behaviourData.fleeCombat or behaviourData.idleFlee or behaviourData.idleFleeCombat)
+	if hasFlee then
+		behaviourData.fleeVelPrediction       = behaviourData.fleeVelPrediction or 10
+		behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
+		behaviourData.fleeLeeway              = (behaviourData.fleeLeeway or 100)
+		behaviourData.fleeDistance            = (behaviourData.fleeDistance or 120)
+		behaviourData.minFleeRange            = (behaviourData.minFleeRange or 0) - behaviourData.fleeLeeway
+	end
+	
+	if hasFlee or behaviourData.skirms then
+		-- Used by skirm and flee.
+		behaviourData.skirmRange              = weaponRange
+		behaviourData.stoppingDistance        = (behaviourData.stoppingDistance or 0)
+	end
+	
+	if behaviourData.skirms then
+		behaviourData.mySpeed                 = ud.speed/30
+		behaviourData.skirmOrderDis           = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis)
+		behaviourData.velocityPrediction      = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction)
+		behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
+		behaviourData.skirmLeeway             = (behaviourData.skirmLeeway or 0)
+	end
+	
+	if behaviourData.alwaysJinkFight or behaviourData.swarms then
+		behaviourData.maxSwarmRange           = weaponRange - (behaviourData.maxSwarmLeeway or 0)
+		behaviourData.minSwarmRange           = weaponRange - (behaviourData.minSwarmLeeway or weaponRange/2)
+		behaviourData.minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance)
+		behaviourData.jinkTangentLength       = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength)
+		behaviourData.jinkParallelLength      = (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength)
+		behaviourData.jinkAwayParallelLength  = (behaviourData.jinkAwayParallelLength or behaviourDefaults.defaultJinkAwayParallelLength)
+		behaviourData.localJinkOrder          = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder)
+		behaviourData.strafeOrderLength       = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength)
+		behaviourData.swarmLeeway             = (behaviourData.swarmLeeway or 50)
+	end
+	
+	if behaviourData.fightOnlyOverride then
+		for k, v in pairs(behaviourData) do
+			if not (k == "fightOnlyOverride" or behaviourData.fightOnlyOverride[k]) then
+				behaviourData.fightOnlyOverride[k] = v
+			end
+		end
+		behaviourData.fightOnlyOverride = GetBehaviourTable(behaviourData.fightOnlyOverride, ud)
+	end
+	
+	return behaviourData
+end
+
+local function LoadBehaviour()
+	local unitAIBehaviour = {}
+	for unitDef, behaviourData in pairs(behaviourConfig) do
+		local ud = UnitDefNames[unitDef]
+		
+		if ud then
+			if behaviourData.land and behaviourData.sea then
+				unitAIBehaviour[ud.id] = {
+					defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
+					waterline = (behaviourData.waterline or 0),
+					floatWaterline = behaviourData.floatWaterline,
+					land = GetBehaviourTable(behaviourData.land, ud),
+					sea = GetBehaviourTable(behaviourData.sea, ud),
+				}
+			else
+				unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
+				unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
+			end
+		end
+	end
+	
+	return unitAIBehaviour
+end
+
+return LoadBehaviour()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
