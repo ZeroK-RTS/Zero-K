@@ -6,9 +6,10 @@ function widget:GetInfo() return {
 
 local function ToggleTeamhighlight(self)
 	if self.value then
-		Spring.SendCommands({"teamhighlight 2"})
+		-- at 1, flashing doesn't happen if you're a spec (inconsistent)
+		Spring.SendCommands("teamhighlight 2")
 	else
-		Spring.SendCommands({"teamhighlight 0"})
+		Spring.SendCommands("teamhighlight 0")
 	end
 end
 

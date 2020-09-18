@@ -192,7 +192,7 @@ local myPlayerID = Spring.GetLocalPlayerID()
 
 local defences = {}
 local needRedraw = false
-local defenseRangeDrawList = false
+local defenseRangeDrawList
 
 -- Chili buttonry
 
@@ -320,7 +320,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function UnitDetected(unitID, unitDefID, isAlly)
+local defNeedingLosChecks = {}
+local defNeedingBuildingChecks = {}
+
+local function RemoveUnit(unitID)
+	defNeedingLosChecks[unitID] = nil
+	defNeedingBuildingChecks[unitID] = nil
+	local def = defences[unitID]
+	if not def then return end
+	glDeleteList(def.drawList)
+	defences[unitID] = nil
+end
+
+local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 	if not unitDefID then
 		return
 	end
@@ -337,13 +349,14 @@ local function UnitDetected(unitID, unitDefID, isAlly)
 		return
 	end
 
-	local inBuild = select(3, Spring.GetUnitIsStunned(unitID))
+	local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
 
 	local defenceData = defences[unitID]
 	if defenceData then
-		if not configData.colorInBuild or inBuild == defenceData.isBuild then
+		if not alwaysUpdate and not configData.colorInBuild or inBuild == defenceData.isBuild then
 			return
 		end
+		RemoveUnit(unitID)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
@@ -352,9 +365,11 @@ local function UnitDetected(unitID, unitDefID, isAlly)
 		x = x, y = y, z = z,
 		inBuild = inBuild,
 		isAlly = isAlly,
-		checkCompleteness = (not isAlly) and inBuild and configData.colorInBuild and true,
 		unitDefID = unitDefID,
 	}
+	if (not isAlly) and inBuild and configData.colorInBuild then
+		defNeedingBuildingChecks[unitID] = true
+	end
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
@@ -415,13 +430,27 @@ function widget:UnitDestroyed(unitID)
 		return
 	end
 
-	glDeleteList(def.drawList)
-	defences[unitID] = nil
+	RemoveUnit(unitID)
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- if this is defence we knew about, we don't need to poll the position for los anymore
+		defNeedingLosChecks[unitID] = nil
+	end
 	UnitDetected(unitID, Spring.GetUnitDefID(unitID), false)
+end
+
+function widget:UnitLeftLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- slow poll this defence's position to see if the position entered los, but the unit didn't, meaning it was destroyed out of los
+		defNeedingLosChecks[unitID] = true
+		-- we invoke UnitDetected on UnitEnteredLos anyway, and if it is still incomplete then, it'll be re-added to defNeedingBuildingChecks
+		defNeedingBuildingChecks[unitID] = nil
+	end
 end
 
 local function RedrawDrawRanges()
@@ -439,12 +468,23 @@ function widget:Update(dt)
 	if needRedraw then
 		needRedraw = needRedraw - dt
 		if needRedraw < 0 then
-			if defenseRangeDrawList then
-				gl.DeleteList(defenseRangeDrawList)
-			end
+			glDeleteList(defenseRangeDrawList)
 			defenseRangeDrawList = glCreateList(RedrawDrawRanges)
 			needRedraw = false
 		end
+	end
+end
+
+local function DoFullUnitReload()
+	for unitID,def in pairs(defences) do
+		RemoveUnit(unitID)
+	end
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam, true)
 	end
 end
 
@@ -453,28 +493,49 @@ function widget:GameFrame(n)
 		return
 	end
 
-	for unitID, def in pairs(defences) do
+	for unitID in pairs(defNeedingBuildingChecks) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID then
-			if defences[unitID].checkCompleteness then
-				-- Not allied because this check is only required for enemies.
-				-- Allied units are detected in UnitFinished.
-				UnitDetected(unitID, unitDefID, false)
+			UnitDetected(unitID, unitDefID, false)
+		end
+	end
+
+	for unitID in pairs(defNeedingLosChecks) do -- TODO: rarely updated but constantly iterated, consider IndexableArray
+		if not spGetUnitDefID(unitID) then
+			local def = defences[unitID]
+			local _, inLos = spGetPositionLosState(def.x, def.y, def.z)
+			if inLos then
+				RemoveUnit(unitID)
+				needRedraw = needRedraw or REDRAW_TIME
 			end
-		elseif select(2, spGetPositionLosState(def.x, def.y, def.z)) then
-			glDeleteList(def.drawList)
-			defences[unitID] = nil
-			needRedraw = needRedraw or REDRAW_TIME
 		end
 	end
 end
 
+local myTeam = Spring.GetMyTeamID()
+local fullView = false
 function widget:PlayerChanged(playerID)
 	if myPlayerID ~= playerID then
 		return
 	end
 
-	local newSpectating = Spring.GetSpectatingState()
+	local newMyTeam = Spring.GetMyTeamID()
+	local newSpectating, newFullView = Spring.GetSpectatingState()
+	-- we can avoid a lot of expensive recalulation if we're only moving from spectating one team under fullview to another
+	if fullView ~= newFullView or (not fullView and myTeam ~= newMyTeam) then
+		if fullView then
+			widgetHandler:RemoveCallIn('GameFrame')
+			-- we now know everything, but callins for entering radar/los won't trigger in this transition.
+		else
+			widgetHandler:UpdateCallIn('GameFrame')
+			-- we don't know everything anymore, and callins for leaving radar/los won't trigger in this transition.
+		end
+		-- callins for units entering radar/los won't trigger during team/spectator change
+		-- so we could miss incomplete or completed units suddenly appearing in los, or fail to mark units suddenly leaving los/radar for loschecks.
+		DoFullUnitReload()
+		fullView = newFullView
+	end
+	myTeam = newMyTeam
 	if spectating ~= newSpectating then
 		spectating = newSpectating
 		needRedraw = needRedraw or REDRAW_TIME
@@ -585,15 +646,17 @@ local function SetupChiliStuff()
 end
 
 function widget:Initialize()
+	widget:PlayerChanged(Spring.GetMyPlayerID())
 	SetupChiliStuff()
 
 	RedoUnitList()
 
-	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
-		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
-		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam)
+	DoFullUnitReload()
+end
+
+function widget:Shutdown()
+	for unitID,def in pairs(defences) do
+		glDeleteList(def.drawList)
 	end
+	glDeleteList(defenseRangeDrawList)
 end

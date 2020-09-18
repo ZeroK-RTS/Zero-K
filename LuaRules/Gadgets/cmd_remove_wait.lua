@@ -20,16 +20,19 @@ local CMD_WAIT = CMD.WAIT
 
 local removeCommands = {
 	CMD.WAIT,
-	CMD.STOP,
 	CMD.REPEAT,
 }
 
 local waitRemoveDefs = {}
+local stopRemoveDefs = {}
 
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams and ud.customParams.removewait then
 		waitRemoveDefs[unitDefID] = true
+	end
+	if ud.customParams and ud.customParams.removestop then
+		stopRemoveDefs[unitDefID] = true
 	end
 end
 
@@ -55,6 +58,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 			if cmdDesc then
 				spRemoveUnitCmdDesc(unitID, cmdDesc)
 			end
+		end
+	end
+	if stopRemoveDefs[unitDefID] then
+		local cmdDesc = spFindUnitCmdDesc(unitID, CMD.STOP)
+		if cmdDesc then
+			spRemoveUnitCmdDesc(unitID, cmdDesc)
 		end
 	end
 end

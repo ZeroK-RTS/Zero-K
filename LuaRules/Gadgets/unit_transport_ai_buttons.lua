@@ -52,7 +52,7 @@ local embarkCmdDesc = {
   name    = 'Embark',
   cursor  = 'Attack',
   action  = 'embark',
-  tooltip = 'Transport to location, or queue Embark point (SHIFT)',
+  tooltip = 'Call transports to take selected units to the end of their Move order queues, or queue and Embark point (SHIFT).',
   params  = {"alt"}
 }
 

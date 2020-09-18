@@ -107,6 +107,9 @@ local strings = {
 	local_energy_economy = "",
 	team_metal_economy = "",
 	team_energy_economy = "",
+	resbar_expenses = "",
+	resbar_income = "",
+	resbar_storage = "",
 	resbar_base_extraction = "",
 	resbar_overdrive = "",
 	resbar_reclaim = "",
@@ -127,14 +130,18 @@ local strings = {
 	resbar_unit_value = "",
 	resbar_nano_value = "",
 	resbar_overdrive_efficiency = "",
-	metal = "",
-	metal_excess_warning = "",
+	resbar_economy_advice = "",
+	advie_add_metal = "",
+	advice_add_energy = "",
+	advice_expand_both = "",
+	metal = "",	
+	metal_excess_warning = "",	
 	energy_stall_warning = "",
 }
 
 function languageChanged ()
 	for k, v in pairs(strings) do
-		strings[k] = WG.Translate ("interface", k)
+		strings[k] = WG.Translate ("interface", k) or "MISSING " .. k
 	end
 	if lbl_storage_metal then
 		lbl_storage_metal.tooltip = WG.Translate("interface", "resbar_metal_storage_tooltip")
@@ -808,57 +815,82 @@ function widget:GameFrame(n)
 	local odColor = GetGridColor((odEff < 1) and 0 or (odEff < 4.2 and 4.2 or odEff)) -- grids below 4.2 have dark colors which make the text illegible; 0 is okay though
 	local odEffStr = string.char(255, odColor[1] * 255, odColor[2] * 255, odColor[3] * 255) .. ("%.1f"):format(odEff) .. WhiteStr
 
+	--Figure out what advice to show
+
+	local advice = strings["advice_expand_both"]
+
+	if odEff < 5 then
+		advice = strings["advice_expand_both"]
+	elseif odEff < 8 and odEff > 5 then
+		advice = strings["advice_add_energy"]
+	elseif odEff > 8 then
+		advice = strings["advie_add_metal"]
+	end
+
 	image_metal.tooltip = strings["local_metal_economy"] ..
-	"\n  " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
-	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
-	"\n  " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
-	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
-	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
-	"\n " ..
-	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
-	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
-	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
+	"\n   " .. strings["resbar_income"] ..
+	"\n      " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
+	"\n      " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
+	"\n      " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
+	"\n      " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
+	"\n   " .. strings["resbar_expenses"] ..
+	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
+	"\n      " .. strings["resbar_sharing"] .. ": " .. metalShare ..
+	"\n   " .. strings["resbar_storage"] ..
+    "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
+    "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
+	"\n      " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.metalValue or 0) ..
+	"\n      " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.nanoframeValue or 0) .. " / " .. math.ceil(cp.nanoframeTotal or 0) ..
+	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.metalReclaimTotal or 0) ..
 	"\n " ..
 	"\n" .. strings["team_metal_economy"] ..
-	"\n  " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
-	"\n  " .. strings["resbar_base_extraction"] .. ": " .. team_metalBase ..
-	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_metalOverdrive ..
-	"\n  " .. strings["resbar_reclaim"] .. " : " .. team_metalReclaim ..
-	"\n  " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
-	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
-	"\n" ..
-	"\n  " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
-	"\n  " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
-	"\n  " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0) ..
-	"\n  " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0)
+	"\n   " .. strings["resbar_income"] ..
+	"\n      " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome ..
+	"\n      " .. strings["resbar_base_extraction"] .. ": " .. team_metalBase ..
+	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_metalOverdrive ..
+	"\n      " .. strings["resbar_reclaim"] .. " : " .. team_metalReclaim ..
+	"\n      " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
+	"\n   " .. strings["resbar_expenses"] ..
+	"\n      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
+	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
+	"\n      " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
+	"\n   " .. strings["resbar_storage"] ..
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity) ..
+	"\n      " .. strings["resbar_unit_value"] .. ": " .. math.ceil(cp.team_metalValue or 0) ..
+	"\n      " .. strings["resbar_nano_value"] .. ": " .. math.ceil(cp.team_nanoframeValue or 0) .. " / " .. math.ceil(cp.team_nanoframeTotal or 0) ..
+	"\n      " .. strings["resbar_reclaim_total"] .. ": " .. math.ceil(cp.team_metalReclaimTotal or 0) ..
+	"\n      " .. strings["resbar_waste_total"] .. ": " .. math.ceil(cp.team_metalExcess or 0)
 	
 	image_energy.tooltip = strings["local_energy_economy"] ..
-	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
-	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
-	"\n  " .. strings["resbar_cons"] .. ": " .. energyMisc ..
-	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
-	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
-    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n   " .. strings["resbar_income"] ..
+	"\n      " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
+	"\n      " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
+	"\n      " .. strings["resbar_cons"] .. ": " .. energyMisc ..
+	"\n   " .. strings["resbar_expenses"] ..
+	"\n      " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive ..
+	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
+	"\n      " .. strings["resbar_other"] .. ": " .. energyOther ..
+	"\n   " .. strings["resbar_storage"] ..
+    "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+    "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\n" .. strings["team_energy_economy"] ..
-	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
-	"\n  " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
-	"\n  " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
-	"\n  " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
-	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
-	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
-	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
-	"\n  " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
-	
+	"\n   " .. strings["resbar_income"] ..
+	"\n      " .. strings["resbar_inc"] .. ": " .. team_energyIncome ..       
+	"\n      " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
+	"\n      " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
+	"\n      " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
+	"\n   " .. strings["resbar_expenses"] ..
+	"\n      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
+	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
+ 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
+	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
+	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
+	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice ..
+	"\n   " .. strings["resbar_storage"] ..
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
 	lbl_income_metal:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )

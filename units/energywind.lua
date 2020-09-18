@@ -21,6 +21,7 @@ return { energywind = {
     windgen        = true,
     modelradius    = [[12]],
     removewait     = 1,
+    removestop     = 1,
     default_spacing = 2,
   },
 

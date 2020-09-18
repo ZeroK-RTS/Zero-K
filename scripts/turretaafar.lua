@@ -3,11 +3,12 @@ include 'constants.lua'
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local anteny = piece 'anteny'
+
+-- unused pieces: anteny, ozdoba
+
 local cervena = piece 'cervena'
 local modra = piece 'modra'
 local zelena = piece 'zelena'
-local ozdoba = piece 'ozdoba'
 local spodni_zebra = piece 'spodni_zebra'
 local vrchni_zebra = piece 'vrchni_zebra'
 local trubky = piece 'trubky'

@@ -54,9 +54,6 @@ local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, _, moduleDefNames 
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
--- This command is entirely internal. Does not hit gadget land.
-local CMD_UPGRADE_UNIT = 11432
-
 -- Configurable things, possible to add to Epic Menu later.
 local BUTTON_SIZE = 55
 local ROW_COUNT = 6

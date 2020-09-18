@@ -16,6 +16,7 @@ return { energyheavygeo = {
   customParams                  = {
     pylonrange     = 150,
     removewait     = 1,
+    removestop     = 1,
   },
 
   energyMake                    = 100,

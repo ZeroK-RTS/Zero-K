@@ -21,6 +21,7 @@ return { energysolar = {
     midposoffset    = [[0 0 0]],
     auto_close_time = 4, -- Unit AI off time.
     removewait      = 1,
+    removestop     = 1,
     default_spacing = 0,
   },
 

@@ -1592,11 +1592,9 @@ function widget:MouseRelease(mx, my, button)
 				
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then
-					
 					if mouseUnit.id then
 						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
-							
 							local x,_,z = spGetUnitPosition(mouseUnit.id)
 							local face = spGetUnitBuildFacing(mouseUnit.id)
 							
@@ -1710,7 +1708,6 @@ function widget:MouseRelease(mx, my, button)
 				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				local x,z
 				if legalPos(pos) then
-				
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
 						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
@@ -1745,7 +1742,9 @@ function widget:MouseRelease(mx, my, button)
 								loop = 0
 							end
 							
-							
+							if presetTerraHeight then
+								terraformHeight = presetTerraHeight
+							end
 							SendCommand()
 							local a,c,m,s = spGetModKeyState()
 							stopCommand(s)

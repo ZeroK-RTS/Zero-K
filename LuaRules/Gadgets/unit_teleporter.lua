@@ -15,7 +15,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
---local BEACON_PLACE_RANGE_SQR = 80000^2	-- causes SIGFPE, max tested value is ~46340^2 (see http://code.google.com/p/zero-k/issues/detail?id=1506)
+--local BEACON_PLACE_RANGE_SQR = 80000^2 -- causes SIGFPE, max tested value is ~46340^2 (see http://code.google.com/p/zero-k/issues/detail?id=1506)
 --local BEACON_PLACE_RANGE_MOVE = 75000
 local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
@@ -46,7 +46,7 @@ local placeBeaconCmdDesc = {
 	name    = 'Beacon',
 	cursor  = 'Unload units',
 	action  = 'placebeacon',
-	tooltip = 'Place teleport entrance at selected location.',
+	tooltip = 'Place Lamp: Once placed, right click the Lamp to teleport to the Djinn.',
 }
 
 local waitAtBeaconCmdDesc = {

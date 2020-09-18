@@ -1,8 +1,7 @@
 --by Chris Mackey
 
-local wake = piece "wake"
-local base = piece "base"
-local firepoint = piece "firepoint"
+-- unused piece: 'wake'
+local base, firepoint = piece ("base", "firepoint")
 
 function script.QueryWeapon(num)
 	return firepoint
@@ -42,12 +41,8 @@ function script.HitByWeapon (x, z, weaponDefID, damage)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	local severity = recentDamage / maxHealth
-	if (severity <= .25) then
-		Explode(base, SFX.NONE)
-		return 1 -- corpsetype
-	elseif (severity <= .5) then
-		Explode(base, SFX.SHATTER)
+	-- the whole mesh is 1 piece so not much room to do anything fancy
+	if recentDamage * 2 < maxHealth then
 		return 1
 	else
 		Explode(base, SFX.SHATTER)

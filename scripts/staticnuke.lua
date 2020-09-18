@@ -2,7 +2,7 @@ local base = piece 'base'
 local tube = piece 'tube'
 local tower = piece 'tower'
 local nuke = piece 'nuke'
-local hoses = piece 'hoses'
+-- unused piece: hoses
 local doorl = piece 'doorl'
 local doorr = piece 'doorr'
 local point = piece 'point'

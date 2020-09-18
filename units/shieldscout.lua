@@ -40,6 +40,7 @@ return { shieldscout = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
+  moveState              = 0, -- Used to make blockages.
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[clogger.s3o]],
   script                 = [[shieldscout.lua]],

@@ -89,7 +89,7 @@ local jumpCmdDesc = {
 	name    = 'Jump',
 	cursor  = 'Jump', -- add with LuaUI? No.
 	action  = 'jump',
-	tooltip = 'Jump to selected position.',
+	tooltip = 'Jump: Leap over terrain to a location. Requires time to recharge.',
 }
 
 local blockingStructure = {}
