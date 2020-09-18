@@ -108,8 +108,20 @@ local debugBuildUnit
 --  COMMON
 --------------------------------------------------------------------------------
 
-local function isFactory(UnitDefID)
-  return UnitDefs[UnitDefID].isFactory or false
+local isFactoryUnitDef = {}
+local havePriorityUnitDef = {}
+local buildSpeedUnitDef = {}
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.isFactory and not ud.customParams.notreallyafactory then
+		isFactoryUnitDef[unitDefID] = true
+	end
+	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then
+		havePriorityUnitDef[unitDefID] = true
+	end
+	if ud.buildSpeed ~= 0 then
+		buildSpeedUnitDef[unitDefID] = ud.buildSpeed
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -374,7 +386,7 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if UnitOnlyEnergy[unitID] then
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
+						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
 						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
@@ -387,7 +399,7 @@ function gadget:GameFrame(n)
 							end
 						end
 					else
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
+						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
 						spending[pri] = spending[pri] + buildSpeed
 						
 						if debugMode and debugOnUnits then
@@ -600,7 +612,6 @@ end
 function AddMiscPriorityUnit(unitID) --remotely add a priority command.
 	if not UnitMiscPriority[unitID] then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
 		spInsertUnitCmdDesc(unitID, MiscCommandOrder, MiscCommandDesc)
 		SetPriorityState(unitID, DefaultState, CMD_MISC_PRIORITY)
 	end
@@ -634,7 +645,6 @@ function RemoveMiscPriorityUnit(unitID) --remotely remove a forced priority comm
 			MiscUnitOnlyEnergy[unitID] = nil
 		end
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_MISC_PRIORITY)
 		if (cmdDescID) then
 			spRemoveUnitCmdDesc(unitID, cmdDescID)
@@ -738,24 +748,28 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
-function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID)
-	local prio  = DefaultState
-	if (builderID ~= nil)  then
-		local unitDefID = spGetUnitDefID(builderID)
-		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then
-			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
-			LastUnitFromFactory[builderID] = UnitID
+function gadget:UnitCreated(unitID, unitDefID, TeamID, builderID)
+	if not havePriorityUnitDef[unitDefID] then
+		local _,_,inBuild = spGetUnitIsStunned(unitID)
+		if not inBuild then
+			return -- Do not add priority to completed units
 		end
 	end
-	UnitPriority[UnitID] =  prio
+	local prio  = DefaultState
+	if (builderID ~= nil)  then
+		local builderDefID = spGetUnitDefID(builderID)
+		if (builderDefID ~= nil and isFactoryUnitDef[builderDefID]) then
+			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
+			LastUnitFromFactory[builderID] = unitID
+		end
+	end
+	UnitPriority[unitID] =  prio
 	CommandDesc.params[1] = prio
-	spInsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
+	spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
-	
-	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then
+	if havePriorityUnitDef[unitDefID] then
 		SetPriorityState(unitID, DefaultState, CMD_PRIORITY)
 	else  -- not a builder priority makes no sense now
 		UnitPriority[unitID] = nil
