@@ -550,7 +550,6 @@ local behaviourDefaults = {
 	defaultSkirmOrderDis = 120,
 	defaultVelocityPrediction = 30,
 	defaultHugRange = 50,
-	defaultLeashAgressRangeBonus = 50,
 }
 
 local behaviourConfig = {
@@ -624,7 +623,7 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 90,
 		stoppingDistance = 10,
-		fleeLeeway = 120,
+		fleeLeeway = 140,
 		idleCommitDistMult = 0.05,
 	},
 	{
@@ -642,7 +641,7 @@ local behaviourConfig = {
 		stoppingDistance = 0,
 		strafeOrderLength = 90,
 		minCircleStrafeDistance = 20,
-		fleeLeeway = 120,
+		fleeLeeway = 160,
 		fleeDistance = 150,
 	},
 	{
@@ -665,7 +664,7 @@ local behaviourConfig = {
 		swarmLeeway = 40,
 		stoppingDistance = 25,
 		minCircleStrafeDistance = 50,
-		fleeLeeway = 100,
+		fleeLeeway = 140,
 		fleeDistance = 150,
 	},
 	-- longer ranged swarmers
@@ -684,6 +683,7 @@ local behaviourConfig = {
 		jinkTangentLength = 90,
 		stoppingDistance = 10,
 		minCircleStrafeDistance = 10,
+		fleeLeeway = 140,
 		velocityPrediction = 30,
 	},
 	{
@@ -703,6 +703,7 @@ local behaviourConfig = {
 			jinkTangentLength = 90,
 			stoppingDistance = 25,
 			minCircleStrafeDistance = 10,
+			fleeLeeway = 140,
 			velocityPrediction = 30,
 		},
 		sea = {
@@ -710,7 +711,7 @@ local behaviourConfig = {
 			skirms = shortRangeSkirmieeArray,
 			swarms = lowRangeSwarmieeArray,
 			--flees = {},
-			idleFlee = underwaterIdleFleeArray,
+			idleFlee = torpedoIdleFleeArray,
 			avoidHeightDiff = explodableFull,
 			fightOnlyUnits = shortRangeExplodables,
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -720,6 +721,7 @@ local behaviourConfig = {
 			stoppingDistance = 25,
 			minCircleStrafeDistance = 10,
 			velocityPrediction = 30,
+			fleeLeeway = 180,
 		},
 	},
 	{
@@ -743,6 +745,7 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		stoppingDistance = 8,
 		velocityPrediction = 20,
+		fleeLeeway = 120,
 		idlePushAggressDist = 320,
 	},
 	{
@@ -774,6 +777,7 @@ local behaviourConfig = {
 		swarmLeeway = 40,
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
+		fleeLeeway = 120,
 	},
 	{
 		name = "hoverheavyraid",
@@ -802,7 +806,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 200,
 		swarmLeeway = 30,
 		stoppingDistance = 8,
-		velocityPrediction = 20
+		velocityPrediction = 20,
+		fleeLeeway = 120,
 	},
 	{
 		name = "tankraid",
@@ -819,6 +824,7 @@ local behaviourConfig = {
 		reloadSkirmLeeway = 1.2,
 		skirmOrderDis = 150,
 		idlePushAggressDist = 350,
+		fleeLeeway = 120,
 	},
 	{
 		name = "tankheavyraid",
@@ -853,7 +859,7 @@ local behaviourConfig = {
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
-		idleFlee = shortRangeRaiderIdleFleeArray,
+		idleFlee = Union(shortRangeRaiderIdleFleeArray, NameToDefID({"subraider"})),
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -1730,9 +1736,9 @@ local behaviourConfig = {
 		onlyIdleHandling = true,
 	},
 	{
-		name = "subraid",
+		name = "subraider",
 		onlyIdleHandling = true,
-		idleFlee = underwaterIdleFleeArray,
+		idleFlee = torpedoIdleFleeArray,
 	},
 	{
 		name = "striderantiheavy",
@@ -1789,7 +1795,6 @@ local behaviourConfig = {
 -- Load Ai behaviour
 
 local function GetBehaviourTable(behaviourData, ud)
-	
 	local weaponRange
 	if behaviourData.weaponNum and ud.weapons[behaviourData.weaponNum] then
 		local weaponDefID = ud.weapons[behaviourData.weaponNum].weaponDef
@@ -1800,9 +1805,11 @@ local function GetBehaviourTable(behaviourData, ud)
 	
 	behaviourData.weaponNum               = (behaviourData.weaponNum or 1)
 	behaviourData.searchRange             = (behaviourData.searchRange or math.max(weaponRange + 100, 800))
+	behaviourData.idleSearchRange         = 500
 	
 	-- Used for idle leash
-	behaviourData.leashAgressRange        = weaponRange + behaviourDefaults.defaultLeashAgressRangeBonus
+	behaviourData.leashAgressRange        = 400
+	behaviourData.leashEnemyRangeLeeway   = 20
 	behaviourData.idlePushAggressDistSq   = (behaviourData.idlePushAggressDist or math.min(500, weaponRange + 50))^2
 	behaviourData.idleChaseEnemyLeeway    = behaviourData.idleChaseEnemyLeeway or 350
 	behaviourData.idleCommitDist          = behaviourData.idleCommitDist or math.min(500, weaponRange*0.3 + 150)

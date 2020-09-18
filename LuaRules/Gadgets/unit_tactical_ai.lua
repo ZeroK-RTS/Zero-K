@@ -282,14 +282,16 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	-- * Stop fleeing, via ReturnUnitToIdlePos(unitID, unitData, true)
 	-- * Nothing
 	if not unitData.idleX then
-		return
+		return true
 	end
 	
 	if not unitData.idleAgression then
 		if CheckTargetAggression(enemy, frame) then
 			SetIdleAgression(unitID, unitData, enemy, frame)
-			return
+			--Spring.Utilities.UnitEcho(unitID, "A")
+			return true
 		end
+		--Spring.Utilities.UnitEcho(unitID, "O")
 	end
 	
 	local myIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ux, uz)
@@ -310,6 +312,7 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 			ReturnUnitToIdlePos(unitID, unitData, true)
 		end
 	end
+	return false
 end
 
 
@@ -618,7 +621,9 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 	local pointDis = ((predictDistSq < origDistSq) and math.sqrt(predictDistSq)) or math.sqrt(origDistSq)
 
 	if isIdleAttack then
-		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
+		if UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez) then
+			return false
+		end
 	end
 	
 	if enemyRange + behaviour.fleeLeeway > pointDis then
@@ -803,7 +808,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if not alwaysJink then
 			if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
-				enemy = (spGetUnitNearestEnemy(unitID, behaviour.searchRange, true) or false)
+				enemy = (spGetUnitNearestEnemy(unitID, (cmdID and behaviour.idleSearchRange) or behaviour.searchRange, true) or false)
 			end
 			--Spring.Utilities.UnitEcho(enemy)
 			--Spring.Echo("enemy spotted 2")
@@ -909,6 +914,21 @@ local function AddIdleUnit(unitID, unitDefID)
 	unitData.idleX = x
 	unitData.idleZ = z
 	unitData.wantFightReturn = nil
+	unitData.idleWantReturn = nil
+	
+	if nearbyEnemy then
+		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
+		if enemyUnitDef and typeKnown then
+			local enemyRange = GetEnemyRange(enemyUnitDef)
+			if enemyRange and enemyRange > 0 then
+				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
+				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
+					nearbyEnemy = false -- Don't aggress against nearby enemy that cannot shoot.
+				end
+			end
+		end
+	end
+	
 	SetIdleAgression(unitID, unitData, nearbyEnemy)
 	--Spring.Utilities.UnitEcho(unitID, "I")
 end
