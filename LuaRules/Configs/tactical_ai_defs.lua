@@ -94,6 +94,99 @@ medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
 ---------------------------------------------------------------------------
+-- Idle flee arrays
+---------------------------------------------------------------------------
+
+-- The riot flee arrrays. Mostly useful for bots as they have turn rate.
+local skirmRangeRiotIdleFleeArray = NameToDefID({
+	"hoverskirm",
+	"jumpskirm",
+	"jumpblackhole",
+	"shieldfelon",
+	
+	"cloakskirm",
+	"shieldskirm",
+	"spiderskirm",
+	"amphfloater",
+})
+
+local longRangeRiotIdleFleeArray = NameToDefID({
+	"tankriot",
+	"hoverriot",
+	"cloakassault",
+})
+
+local medRangeRiotIdleFleeArray = NameToDefID({
+	"spiderriot",
+})
+
+local shortRangeRiotIdleFleeArray = NameToDefID({
+	"vehriot",
+	"cloakriot",
+})
+
+longRangeRiotIdleFleeArray = Union(longRangeRiotIdleFleeArray, skirmRangeRiotIdleFleeArray)
+medRangeRiotIdleFleeArray = Union(medRangeRiotIdleFleeArray, longRangeRiotIdleFleeArray)
+shortRangeRiotIdleFleeArray = Union(shortRangeRiotIdleFleeArray, medRangeRiotIdleFleeArray)
+
+-- Things that raiders should back away from when idle, or be sniped.
+local longRangeRaiderIdleFleeArray = NameToDefID({
+	"cloakriot",
+	"cloakassault",
+	
+	"shieldfelon",
+	"shieldriot",
+	
+	"vehriot",
+	
+	"hoverheavyraid",
+	"hoverriot",
+	"hoverskirm",
+	
+	"tankheavyraid",
+	"tankriot",
+	
+	"spiderriot",
+	
+	"jumpraid",
+	"jumpskirm",
+	"jumpblackhole",
+	
+	"amphimpulse",
+	"amphriot",
+	
+	"shipriot",
+	"striderdante",
+})
+
+local medRangeRaiderIdleFleeArray = NameToDefID({
+	"tankraid",
+	"vehraid",
+	"hoverraid",
+	"spideremp",
+})
+
+local shortRangeRaiderIdleFleeArray = NameToDefID({
+	"amphraid",
+	"shieldraid",
+})
+
+local veryShortRangeRaiderIdleFleeArray = NameToDefID({
+	"cloakraid",
+})
+
+local torpedoIdleFleeArray = NameToDefID({
+	"shiptorpraider",
+	"subraider",
+	"amphraid",
+	"amphriot",
+})
+
+medRangeRaiderIdleFleeArray = Union(medRangeRaiderIdleFleeArray, longRangeRaiderIdleFleeArray)
+shortRangeRaiderIdleFleeArray = Union(shortRangeRaiderIdleFleeArray, medRangeRaiderIdleFleeArray)
+veryShortRangeRaiderIdleFleeArray = Union(veryShortRangeRaiderIdleFleeArray, shortRangeRaiderIdleFleeArray)
+
+---------------------------------------------------------------------------
 -- skirm arrays
 ---------------------------------------------------------------------------
 -- these are not strictly required they just help with inputting the units
@@ -522,6 +615,7 @@ local behaviourConfig = {
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = veryShortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -530,14 +624,15 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 90,
 		stoppingDistance = 10,
-		idleFlee = NameToDefID({"cloakriot", "shieldraid"}),
 		fleeLeeway = 140,
+		idleCommitDistMult = 0.05,
 	},
 	{
 		name = "spiderscout",
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = fleeables,
+		idleFlee = veryShortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -555,6 +650,7 @@ local behaviourConfig = {
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = fleeables,
+		idleFlee = veryShortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = veryShortRangeExplodables,
 		fightOnlyOverride = {
@@ -578,6 +674,8 @@ local behaviourConfig = {
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = shortRangeRaiderIdleFleeArray,
+		idleFlee = medRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -596,6 +694,7 @@ local behaviourConfig = {
 			skirms = shortRangeSkirmieeArray,
 			swarms = lowRangeSwarmieeArray,
 			--flees = {},
+			idleFlee = shortRangeRaiderIdleFleeArray,
 			avoidHeightDiff = explodableFull,
 			fightOnlyUnits = shortRangeExplodables,
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -611,6 +710,7 @@ local behaviourConfig = {
 			skirms = shortRangeSkirmieeArray,
 			swarms = lowRangeSwarmieeArray,
 			--flees = {},
+			idleFlee = underwaterIdleFleeArray,
 			avoidHeightDiff = explodableFull,
 			fightOnlyUnits = shortRangeExplodables,
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -627,6 +727,7 @@ local behaviourConfig = {
 		skirms = diverSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = medRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		hugs = shortRangeDiveArray,
 		fightOnlyUnits = shortRangeExplodables,
@@ -642,6 +743,7 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		stoppingDistance = 8,
 		velocityPrediction = 20,
+		idlePushAggressDist = 320,
 	},
 	{
 		name = "hoverscout",
@@ -663,6 +765,7 @@ local behaviourConfig = {
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = shortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -677,6 +780,7 @@ local behaviourConfig = {
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = longRangeRaiderIdleFleeArray,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		strafeOrderLength = 180,
@@ -690,6 +794,7 @@ local behaviourConfig = {
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = longRangeRaiderIdleFleeArray,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		jinkAwayParallelLength = 150,
@@ -704,6 +809,7 @@ local behaviourConfig = {
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = medRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -712,12 +818,14 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		reloadSkirmLeeway = 1.2,
 		skirmOrderDis = 150,
+		idlePushAggressDist = 350,
 	},
 	{
 		name = "tankheavyraid",
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = longRangeRaiderIdleFleeArray,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		strafeOrderLength = 180,
@@ -731,6 +839,7 @@ local behaviourConfig = {
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = longRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -744,6 +853,7 @@ local behaviourConfig = {
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = shortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
@@ -781,11 +891,16 @@ local behaviourConfig = {
 		skirms = riotRangeSkirmieeArray,
 		--swarms = {},
 		--flees = {},
+		idleFlee = longRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		maxSwarmLeeway = 0,
 		skirmLeeway = 20,
-		velocityPrediction = 20
+		velocityPrediction = 20,
+		idlePushAggressDist = 100,
+		idleChaseEnemyLeeway = 200,
+		idleCommitDistMult = 0.5,
+		idleEnemyDistMult = 0.5,
 	},
 	{
 		name = "jumpcon",
@@ -796,31 +911,38 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
 		skirmLeeway = 0,
-		velocityPrediction = 20
+		velocityPrediction = 20,
 	},
 	{
 		name = "spiderriot",
 		skirms = lowMedRangeSkirmieeArray,
 		--swarms = {},
 		--flees = {},
+		idleFlee = medRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
 		skirmLeeway = 0,
-		velocityPrediction = 20
+		velocityPrediction = 20,
+		idlePushAggressDist = 100,
+		idleChaseEnemyLeeway = 200,
+		idleCommitDistMult = 0.5,
+		idleEnemyDistMult = 0.5,
 	},
 	{
 		name = "spideremp",
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = shortRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		maxSwarmLeeway = 40,
 		skirmLeeway = 30,
 		minCircleStrafeDistance = 10,
-		velocityPrediction = 20
+		velocityPrediction = 20,
+		idlePushAggressDist = 200,
 	},
 	{
 		name = "shieldriot",
@@ -831,13 +953,14 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables,
 		maxSwarmLeeway = 0,
 		skirmLeeway = 50,
-		velocityPrediction = 20
+		velocityPrediction = 20,
 	},
 	{
 		name = "vehriot",
 		skirms = lowMedRangeSkirmieeArray,
 		--swarms = {},
 		--flees = {},
+		idleFlee = skirmRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
@@ -847,6 +970,10 @@ local behaviourConfig = {
 			skirmLeeway = 10,
 			stoppingDistance = 10,
 		},
+		idlePushAggressDist = 100,
+		idleChaseEnemyLeeway = 200,
+		idleCommitDistMult = 0.5,
+		idleEnemyDistMult = 0.5,
 	},
 	{
 		name = "shieldfelon",
@@ -865,6 +992,7 @@ local behaviourConfig = {
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
+		idleFlee = skirmRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
@@ -875,12 +1003,17 @@ local behaviourConfig = {
 		fightOnlyOverride = {
 			skirmLeeway = 10,
 		},
+		idlePushAggressDist = 100,
+		idleChaseEnemyLeeway = 200,
+		idleCommitDistMult = 0.5,
+		idleEnemyDistMult = 0.5,
 	},
 	{
 		name = "tankriot",
 		skirms = medRangeSkirmieeArray,
 		--swarms = {},
 		--flees = {},
+		idleFlee = skirmRangeRiotIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0,
@@ -891,6 +1024,10 @@ local behaviourConfig = {
 		fightOnlyOverride = {
 			skirmLeeway = 10,
 		},
+		idlePushAggressDist = 100,
+		idleChaseEnemyLeeway = 200,
+		idleCommitDistMult = 0.5,
+		idleEnemyDistMult = 0.5,
 	},
 	{
 		name = "amphriot",
@@ -900,12 +1037,17 @@ local behaviourConfig = {
 			skirms = riotRangeSkirmieeArray,
 			--swarms = {},
 			--flees = {},
+			idleFlee = medRangeRiotIdleFleeArray,
 			avoidHeightDiff = explodableFull,
 			fightOnlyUnits = shortRangeExplodables,
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
 			maxSwarmLeeway = 40,
 			skirmLeeway = 30,
 			minCircleStrafeDistance = 10,
+			idlePushAggressDist = 100,
+			idleChaseEnemyLeeway = 200,
+			idleCommitDistMult = 0.5,
+			idleEnemyDistMult = 0.5,
 		},
 		sea = {
 			weaponNum = 2,
@@ -951,6 +1093,7 @@ local behaviourConfig = {
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = subfleeables,
+		idleFlee = shortRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		maxSwarmLeeway = 40,
@@ -1555,6 +1698,8 @@ local behaviourConfig = {
 	{
 		name = "gunshipraid",
 		onlyIdleHandling = true,
+		idleFlee = longRangeRaiderIdleFleeArray,
+		idleChaseEnemyLeeway = 350,
 	},
 	{
 		name = "gunshipheavyskirm",
@@ -1587,6 +1732,7 @@ local behaviourConfig = {
 	{
 		name = "subraid",
 		onlyIdleHandling = true,
+		idleFlee = underwaterIdleFleeArray,
 	},
 	{
 		name = "striderantiheavy",
@@ -1658,9 +1804,10 @@ local function GetBehaviourTable(behaviourData, ud)
 	-- Used for idle leash
 	behaviourData.leashAgressRange        = weaponRange + behaviourDefaults.defaultLeashAgressRangeBonus
 	behaviourData.idlePushAggressDistSq   = (behaviourData.idlePushAggressDist or math.min(500, weaponRange + 50))^2
-	behaviourData.idleChaseEnemyLeeway    = behaviourData.idleChaseEnemyLeeway or 100
-	behaviourData.idleCommitDist          = behaviourData.idleCommitDist or math.min(400, weaponRange/2 + 50)
-	behaviourData.idleCommitDistMult      = behaviourData.idleCommitDistMult or 0.2
+	behaviourData.idleChaseEnemyLeeway    = behaviourData.idleChaseEnemyLeeway or 350
+	behaviourData.idleCommitDist          = behaviourData.idleCommitDist or math.min(500, weaponRange*0.3 + 150)
+	behaviourData.idleCommitDistMult      = behaviourData.idleCommitDistMult or 0.15
+	behaviourData.idleEnemyDistMult       = behaviourData.idleEnemyDistMult or 0.85
 	
 	local hasFlee = (behaviourData.flees or behaviourData.fleeEverything or behaviourData.fleeCombat or behaviourData.idleFlee or behaviourData.idleFleeCombat)
 	if hasFlee then

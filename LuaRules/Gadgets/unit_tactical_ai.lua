@@ -297,15 +297,15 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	--Spring.Echo("enemyRange", math.floor(enemyRange), math.floor(enemyDist), math.floor(behaviour.idleCommitDist), "ux, uz, ex, ez", math.floor(ux), math.floor(uz), math.floor(ex), math.floor(ez), "Distances", math.floor(math.sqrt(behaviour.idlePushAggressDistSq)), math.floor(math.sqrt(myIdleDistSq)), math.floor(math.sqrt(DistSq(unitData.idleX, unitData.idleZ, ex, ez))), math.random())
 	
 	local enemyIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ex, ez)
-	local enemyCloserToIdlePos = enemyIdleDistSq < myIdleDistSq
-	unitData.wantFightReturn = enemyCloserToIdlePos -- Return with fight if you need to return through an enemy
+	local enemyPushingMe = (enemyIdleDistSq < myIdleDistSq) or (enemyIdleDistSq < enemyRange^2)
+	unitData.wantFightReturn = enemyPushingMe -- Return with fight if you need to return through an enemy
 	
 	if enemyDist < enemyRange or behaviour.idlePushAggressDistSq < myIdleDistSq then
 		local myIdleDist = math.sqrt(myIdleDistSq) 
-		if enemyCloserToIdlePos or enemyDist + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
+		if enemyPushingMe or enemyDist*behaviour.idleEnemyDistMult + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
 			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
 			SetIdleAgression(unitID, unitData, enemy, frame)
-		elseif behaviour.idleChaseEnemyLeeway + enemyRange < myIdleDist then
+		elseif behaviour.idleChaseEnemyLeeway < myIdleDist then
 			-- Enemy is not blocking my retreat to idle pos, retreat.
 			ReturnUnitToIdlePos(unitID, unitData, true)
 		end
@@ -990,7 +990,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			else
 				AIToggleCommand(unitID, {0}, {})
 			end
-			Spring.Utilities.UnitEcho(unitID, "External")
 			return
 		end
 		
