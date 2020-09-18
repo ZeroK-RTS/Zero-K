@@ -61,7 +61,7 @@ local ALLY_TABLE = {
 local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
 
-local unitAIBehaviour, commanderBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
+local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -119,10 +119,7 @@ local function GetUnitVisibleInformation(unitID, allyTeamID)
 	return spGetUnitDefID(unitID), states and states.typed
 end
 
-local function GetUnitBehavior(unitID, unitDefID, isCommander)
-	if isCommander then
-		return commanderBehaviour
-	end
+local function GetUnitBehavior(unitID, unitDefID)
 	if unitAIBehaviour[unitDefID].waterline then
 		local bx, by, bz = spGetUnitPosition(unitID, true)
 		if unitAIBehaviour[unitDefID].floatWaterline then
@@ -777,7 +774,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		if exitEarly then
 			return
 		end
-		behaviour = GetUnitBehavior(unitID, unitData.udID, unitData.isCommander)
+		behaviour = GetUnitBehavior(unitID, unitData.udID)
 		if behaviour.onlyIdleHandling then
 			return
 		end
@@ -804,7 +801,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
 		
-		behaviour = behaviour or GetUnitBehavior(unitID, unitData.udID, unitData.isCommander)
+		behaviour = behaviour or GetUnitBehavior(unitID, unitData.udID)
 		local alwaysJink = (behaviour.alwaysJinkFight and ((cmdID == CMD_FIGHT) or move))
 		local enemyUnitDef = false
 		local typeKnown = false
@@ -910,7 +907,7 @@ local function AddIdleUnit(unitID, unitDefID)
 		return
 	end
 	
-	local behaviour = GetUnitBehavior(unitID, unitDefID, unitData.isCommander)
+	local behaviour = GetUnitBehavior(unitID, unitDefID)
 	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	
@@ -1001,16 +998,10 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	-- add swarmers
-	local behaviour = unitAIBehaviour[unitDefID]
-	local isCommander = nil
-	if not behaviour then
-		local ud = UnitDefs[unitDefID]
-		if not ud.customParams.dynamic_comm then
-			return
-		end
-		behaviour = commanderBehaviour
-		isCommander = true
+	if not unitAIBehaviour[unitDefID] then
+		return
 	end
+	local behaviour = unitAIBehaviour[unitDefID]
 	
 	if not behaviour.onlyIdleHandling then
 		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
@@ -1040,7 +1031,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		active = false,
 		receivedOrder = false,
 		allyTeam = spGetUnitAllyTeam(unitID),
-		isCommander = isCommander,
 	}
 	AddIdleUnit(unitID, unitDefID)
 	

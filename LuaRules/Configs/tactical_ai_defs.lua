@@ -1794,15 +1794,13 @@ local behaviourConfig = {
 --------------------------------------------------------------------------------
 -- Load Ai behaviour
 
-local function GetBehaviourTable(behaviourData, ud, rangeOverride)
-	local weaponRange = rangeOverride
-	if not weaponRange then
-		if behaviourData.weaponNum and ud.weapons[behaviourData.weaponNum] then
-			local weaponDefID = ud.weapons[behaviourData.weaponNum].weaponDef
-			weaponRange = WeaponDefs[weaponDefID].range
-		else
-			weaponRange = ud.maxWeaponRange
-		end
+local function GetBehaviourTable(behaviourData, ud)
+	local weaponRange
+	if behaviourData.weaponNum and ud.weapons[behaviourData.weaponNum] then
+		local weaponDefID = ud.weapons[behaviourData.weaponNum].weaponDef
+		weaponRange = WeaponDefs[weaponDefID].range
+	else
+		weaponRange = ud.maxWeaponRange
 	end
 	
 	behaviourData.weaponNum               = (behaviourData.weaponNum or 1)
@@ -1889,10 +1887,7 @@ local function LoadBehaviour()
 		end
 	end
 	
-	local commanderBehaviour = GetBehaviourTable({onlyIdleHandling = true,}, false, 350)
-	commanderBehaviour.defaultAIState = behaviourDefaults.defaultState
-	
-	return unitAIBehaviour, commanderBehaviour
+	return unitAIBehaviour
 end
 
 return LoadBehaviour()
