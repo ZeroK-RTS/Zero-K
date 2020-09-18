@@ -462,7 +462,8 @@ local behaviourDefaults = {
 
 local behaviourConfig = {
 	-- swarmers
-	["cloakbomb"] = {
+	{
+		name = "cloakbomb",
 		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
@@ -475,8 +476,8 @@ local behaviourConfig = {
 		swarmLeeway = 30,
 		alwaysJinkFight = true,
 	},
-	
-	["shieldbomb"] = {
+	{
+		name = "shieldbomb",
 		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
@@ -489,8 +490,8 @@ local behaviourConfig = {
 		swarmLeeway = 30,
 		alwaysJinkFight = true,
 	},
-	
-	["amphbomb"] = {
+	{
+		name = "amphbomb",
 		defaultAIState = 0,
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
@@ -503,8 +504,8 @@ local behaviourConfig = {
 		swarmLeeway = 30,
 		alwaysJinkFight = true,
 	},
-	
-	["jumpscout"] = {
+	{
+		name = "jumpscout",
 		skirms = {},
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -516,8 +517,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 100,
 		swarmLeeway = 200,
 	},
-  
-	["cloakraid"] = {
+	{
+		name = "cloakraid",
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -527,13 +528,13 @@ local behaviourConfig = {
 		maxSwarmLeeway = 35,
 		swarmLeeway = 50,
 		skirmLeeway = 10,
-		jinkTangentLength = 140,
+		jinkTangentLength = 90,
 		stoppingDistance = 10,
 		idleFlee = NameToDefID({"cloakriot", "shieldraid"}),
 		fleeLeeway = 140,
 	},
-	
-	["spiderscout"] = {
+	{
+		name = "spiderscout",
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = fleeables,
@@ -544,12 +545,13 @@ local behaviourConfig = {
 		maxSwarmLeeway = 5,
 		swarmLeeway = 30,
 		stoppingDistance = 0,
-		strafeOrderLength = 100,
+		strafeOrderLength = 90,
 		minCircleStrafeDistance = 20,
 		fleeLeeway = 150,
 		fleeDistance = 150,
 	},
-	["vehscout"] = {
+	{
+		name = "vehscout",
 		skirms = veryShortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = fleeables,
@@ -570,9 +572,9 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 150,
 	},
-  
 	-- longer ranged swarmers
-	["shieldraid"] = {
+	{
+		name = "shieldraid",
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -581,13 +583,13 @@ local behaviourConfig = {
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
 		maxSwarmLeeway = 35,
 		swarmLeeway = 30,
-		jinkTangentLength = 140,
+		jinkTangentLength = 90,
 		stoppingDistance = 10,
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 30,
 	},
-	
-	["amphraid"] = {
+	{
+		name = "amphraid",
 		waterline = -5,
 		land = {
 			weaponNum = 1,
@@ -599,7 +601,7 @@ local behaviourConfig = {
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
 			maxSwarmLeeway = 35,
 			swarmLeeway = 30,
-			jinkTangentLength = 140,
+			jinkTangentLength = 90,
 			stoppingDistance = 25,
 			minCircleStrafeDistance = 10,
 			velocityPrediction = 30,
@@ -614,14 +616,14 @@ local behaviourConfig = {
 			circleStrafe = ENABLE_OLD_JINK_STRAFE,
 			maxSwarmLeeway = 35,
 			swarmLeeway = 30,
-			jinkTangentLength = 140,
+			jinkTangentLength = 90,
 			stoppingDistance = 25,
 			minCircleStrafeDistance = 10,
 			velocityPrediction = 30,
 		},
 	},
-	
-	["vehraid"] = {
+	{
+		name = "vehraid",
 		skirms = diverSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -641,8 +643,8 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		velocityPrediction = 20,
 	},
-	
-	["hoverscout"] = {
+	{
+		name = "hoverscout",
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -656,8 +658,8 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
 	},
-	
-	["hoverraid"] = {
+	{
+		name = "hoverraid",
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -670,7 +672,8 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
 	},
-	["hoverheavyraid"] = {
+	{
+		name = "hoverheavyraid",
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -682,8 +685,8 @@ local behaviourConfig = {
 		stoppingDistance = 15,
 		skirmOrderDis = 150,
 	},
-
-	["jumpraid"] = {
+	{
+		name = "jumpraid",
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -696,8 +699,8 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		velocityPrediction = 20
 	},
-	
-	["tankraid"] = {
+	{
+		name = "tankraid",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -710,8 +713,8 @@ local behaviourConfig = {
 		reloadSkirmLeeway = 1.2,
 		skirmOrderDis = 150,
 	},
-  
-	["tankheavyraid"] = {
+	{
+		name = "tankheavyraid",
 		skirms = shortToRiotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -723,8 +726,8 @@ local behaviourConfig = {
 		stoppingDistance = 15,
 		skirmOrderDis = 150,
 	},
-	
-	["amphimpulse"] = {
+	{
+		name = "amphimpulse",
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -736,8 +739,8 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 20
 	},
-	
-	["shiptorpraider"] = {
+	{
+		name = "shiptorpraider",
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -752,7 +755,8 @@ local behaviourConfig = {
 	},
 	
 	-- could flee subs but isn't fast enough for it to be useful
-	["shipriot"] = {
+	{
+		name = "shipriot",
 		skirms = diverSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -772,7 +776,8 @@ local behaviourConfig = {
 	},
 	
 	-- riots
-	["cloakriot"] = {
+	{
+		name = "cloakriot",
 		skirms = riotRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -782,7 +787,8 @@ local behaviourConfig = {
 		skirmLeeway = 20,
 		velocityPrediction = 20
 	},
-	["jumpcon"] = {
+	{
+		name = "jumpcon",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -792,7 +798,8 @@ local behaviourConfig = {
 		skirmLeeway = 0,
 		velocityPrediction = 20
 	},
-	["spiderriot"] = {
+	{
+		name = "spiderriot",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -802,7 +809,8 @@ local behaviourConfig = {
 		skirmLeeway = 0,
 		velocityPrediction = 20
 	},
-	["spideremp"] = {
+	{
+		name = "spideremp",
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -814,7 +822,8 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 20
 	},
-	["shieldriot"] = {
+	{
+		name = "shieldriot",
 		skirms = riotRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -824,7 +833,8 @@ local behaviourConfig = {
 		skirmLeeway = 50,
 		velocityPrediction = 20
 	},
-	["vehriot"] = {
+	{
+		name = "vehriot",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -850,8 +860,8 @@ local behaviourConfig = {
 		stoppingDistance = 5,
 		skirmBlockedApproachFrames = 40,
 	},
-	
-	["hoverriot"] = {
+	{
+		name = "hoverriot",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -866,7 +876,8 @@ local behaviourConfig = {
 			skirmLeeway = 10,
 		},
 	},
-	["tankriot"] = {
+	{
+		name = "tankriot",
 		skirms = medRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -881,7 +892,8 @@ local behaviourConfig = {
 			skirmLeeway = 10,
 		},
 	},
-	["amphriot"] = {
+	{
+		name = "amphriot",
 		waterline = -5,
 		land = {
 			weaponNum = 1,
@@ -907,8 +919,8 @@ local behaviourConfig = {
 			minCircleStrafeDistance = 10,
 		},
 	},
-	
-	["ampharty"] = {
+	{
+		name = "ampharty",
 		waterline = -5,
 		land = {
 			weaponNum = 1,
@@ -934,7 +946,8 @@ local behaviourConfig = {
 			skirmLeeway = 40,
 		},
 	},
-	["shipscout"] = { -- scout boat
+	{
+		name = "shipscout", -- scout boat
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = subfleeables,
@@ -949,7 +962,8 @@ local behaviourConfig = {
 		fleeLeeway = 250,
 		fleeDistance = 300,
 	},
-	["shipassault"] = {
+	{
+		name = "shipassault",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -961,7 +975,8 @@ local behaviourConfig = {
 		skirmOrderDis = 30,
 		velocityPrediction = 30,
 	},
-	["hoverdepthcharge"] = {
+	{
+		name = "hoverdepthcharge",
 		waterline = -5,
 		floatWaterline = true,
 		land = {
@@ -990,7 +1005,8 @@ local behaviourConfig = {
 	},
 	
 	--assaults
-	["cloakassault"] = {
+	{
+		name = "cloakassault",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1001,7 +1017,8 @@ local behaviourConfig = {
 		skirmLeeway = 40,
 		skirmBlockedApproachFrames = 10,
 	},
-	["shieldassault"] = {
+	{
+		name = "shieldassault",
 		skirms = riotRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1011,7 +1028,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 120,
 		skirmLeeway = 40,
 	},
-	["spiderassault"] = {
+	{
+		name = "spiderassault",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1021,8 +1039,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 120,
 		skirmLeeway = 40,
 	},
-	
-	["shipraider"] = {
+	{
+		name = "shipraider",
 		skirms = riotRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
@@ -1032,8 +1050,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 90,
 		skirmLeeway = 60,
 	},
-
-	["vehassault"] = {
+	{
+		name = "vehassault",
 		skirms = riotRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -1043,7 +1061,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 120,
 		skirmLeeway = 40,
 	},
-	["tankassault"] = {
+	{
+		name = "tankassault",
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -1054,7 +1073,8 @@ local behaviourConfig = {
 	},
 	
 	-- med range skirms
-	["cloakskirm"] = {
+	{
+		name = "cloakskirm",
 		skirms = Union(medRangeSkirmieeArray, NameToDefID({"turretriot"})),
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1065,7 +1085,8 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		skirmBlockedApproachFrames = 40,
 	},
-	["jumpskirm"] = {
+	{
+		name = "jumpskirm",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1076,7 +1097,8 @@ local behaviourConfig = {
 		skirmLeeway = 20,
 		skirmBlockedApproachFrames = 40,
 	},
-	["striderdante"] = {
+	{
+		name = "striderdante",
 		skirms = medRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -1084,7 +1106,8 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		skirmLeeway = 40,
 	},
-	["amphfloater"] = {
+	{
+		name = "amphfloater",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1094,7 +1117,8 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		skirmBlockedApproachFrames = 40,
 	},
-	["hoverskirm"] = {
+	{
+		name = "hoverskirm",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1108,7 +1132,8 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 60,
 		skirmBlockApproachHeadingBlock = 0,
 	},
-	["tankheavyassault"] = {
+	{
+		name = "tankheavyassault",
 		skirms = medRangeSkirmieeArray,
 		swarms = {},
 		flees = {},
@@ -1118,7 +1143,8 @@ local behaviourConfig = {
 		skirmLeeway = 50,
 		skirmBlockedApproachFrames = 60,
 	},
-	["gunshipskirm"] = {
+	{
+		name = "gunshipskirm",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1130,7 +1156,8 @@ local behaviourConfig = {
 	},
 	
 	-- long range skirms
-	["jumpblackhole"] = {
+	{
+		name = "jumpblackhole",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1140,7 +1167,8 @@ local behaviourConfig = {
 		skirmLeeway = 20,
 		skirmBlockedApproachFrames = 40,
 	},
-	["shieldskirm"] = {
+	{
+		name = "shieldskirm",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1150,7 +1178,8 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		skirmBlockedApproachFrames = 40,
 	},
-	["spiderskirm"] = {
+	{
+		name = "spiderskirm",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1160,7 +1189,8 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		skirmBlockedApproachFrames = 40,
 	},
-	["amphassault"] = {
+	{
+		name = "amphassault",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1170,7 +1200,8 @@ local behaviourConfig = {
 		skirmLeeway = 20,
 		skirmBlockedApproachFrames = 40,
 	},
-	["gunshipkrow"] = {
+	{
+		name = "gunshipkrow",
 		skirms = medRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		flees = {},
@@ -1180,7 +1211,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 130,
 		skirmLeeway = 20,
 	},
-	["vehcapture"] = {
+	{
+		name = "vehcapture",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1193,7 +1225,8 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 40,
 		skirmBlockApproachHeadingBlock = -0.3,
 	},
-	["shipskirm"] = {
+	{
+		name = "shipskirm",
 		skirms = longRangeSkirmieeArray,
 		swarms = longRangeSwarmieeArray,
 		flees = {},
@@ -1208,7 +1241,8 @@ local behaviourConfig = {
 	},
 	
 	-- weird stuff
-	["vehsupport"] = {
+	{
+		name = "vehsupport",
 		defaultAIState = 0,
 		skirms = slasherSkirmieeArray,
 		swarms = {},
@@ -1221,7 +1255,8 @@ local behaviourConfig = {
 	},
 	
 	-- arty range skirms
-	["cloaksnipe"] = {
+	{
+		name = "cloaksnipe",
 		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {},
@@ -1230,8 +1265,8 @@ local behaviourConfig = {
 		skirmBlockedApproachOnFight = true,
 		skirmBlockedApproachFrames = 120,
 	},
-	
-	["veharty"] = {
+	{
+		name = "veharty",
 		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {},
@@ -1240,8 +1275,8 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		skirmOrderDisMin = 100, -- Make it turn around.
 	},
-	
-	["vehheavyarty"] = {
+	{
+		name = "vehheavyarty",
 		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {},
@@ -1250,8 +1285,8 @@ local behaviourConfig = {
 		stoppingDistance = -80,
 		velocityPrediction = 0,
 	},
-	
-	["tankarty"] = {
+	{
+		name = "tankarty",
 		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {},
@@ -1263,16 +1298,16 @@ local behaviourConfig = {
 		skirmOrderDis = 250,
 		skirmOnlyNearEnemyRange = 120,
 	},
-	
-	["striderarty"] = {
+	{
+		name = "striderarty",
 		skirms = allMobileGround,
 		skirmRadar = true,
 		swarms = {},
 		flees = {},
 		skirmLeeway = 100,
 	},
-	
-	["cloakarty"] = {
+	{
+		name = "cloakarty",
 		skirms = allMobileGround,
 		swarms = {},
 		flees = {},
@@ -1280,7 +1315,8 @@ local behaviourConfig = {
 		skirmLeeway = 40,
 		skirmBlockedApproachFrames = 40,
 	},
-	["jumparty"] = {
+	{
+		name = "jumparty",
 		skirms = allMobileGround,
 		swarms = {},
 		flees = {},
@@ -1289,7 +1325,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 130,
 		skirmLeeway = 20,
 	},
-	["shieldarty"] = {
+	{
+		name = "shieldarty",
 		skirms = Union(artyRangeSkirmieeArray, skirmableAir),
 		swarms = {},
 		flees = {},
@@ -1299,7 +1336,8 @@ local behaviourConfig = {
 		minSwarmLeeway = 130,
 		skirmLeeway = 150,
 	},
-	["hoverarty"] = {
+	{
+		name = "hoverarty",
 		skirms = allMobileGround,
 		swarms = {},
 		flees = {},
@@ -1310,7 +1348,8 @@ local behaviourConfig = {
 		stoppingDistance = -100,
 		velocityPrediction = 0,
 	},
-	["striderbantha"] = {
+	{
+		name = "striderbantha",
 		defaultAIState = 0,
 		skirms = allMobileGround,
 		swarms = {},
@@ -1318,7 +1357,8 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 120,
 	},
-	["shiparty"] = {
+	{
+		name = "shiparty",
 		skirms = allMobileGround,
 		swarms = {},
 		flees = {},
@@ -1330,7 +1370,8 @@ local behaviourConfig = {
 	
 	-- cowardly support units
 	--[[
-	["example"] = {
+	{
+		name = "example",
 		skirms = {},
 		swarms = {},
 		flees = {},
@@ -1342,7 +1383,8 @@ local behaviourConfig = {
 	--]]
 
 	-- support
-	["cloakjammer"] = {
+	{
+		name = "cloakjammer",
 		skirms = {},
 		swarms = {},
 		flees = armedLand,
@@ -1350,8 +1392,8 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 400,
 	},
-	
-	["shieldshield"] = {
+	{
+		name = "shieldshield",
 		skirms = {},
 		swarms = {},
 		flees = armedLand,
@@ -1361,19 +1403,21 @@ local behaviourConfig = {
 	},
 	
 	-- mobile AA
-	["cloakaa"] = {
+	{
+		name = "cloakaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 150,
+		skirmLeeway = 150,
 		swarmLeeway = 250,
 		minSwarmLeeway = 300,
 		maxSwarmLeeway = 200,
 	},
-	["shieldaa"] = {
+	{
+		name = "shieldaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1383,7 +1427,8 @@ local behaviourConfig = {
 		minFleeRange = 500,
         skirmLeeway = 50,
 	},
-	["vehaa"] = {
+	{
+		name = "vehaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1392,9 +1437,10 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 	},
-	["jumpaa"] = {
+	{
+		name = "jumpaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1404,7 +1450,8 @@ local behaviourConfig = {
 		minFleeRange = 500,
         skirmLeeway = 50,
 	},
-	["hoveraa"] = {
+	{
+		name = "hoveraa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1412,10 +1459,11 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 		skirmOrderDis = 200,
 	},
-	["spideraa"] = {
+	{
+		name = "spideraa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1423,9 +1471,10 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 	},
-	["tankaa"] = {
+	{
+		name = "tankaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1433,20 +1482,22 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 		skirmOrderDis = 200,
 	},
-	["amphaa"] = {
+	{
+		name = "amphaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 		skirmOrderDis = 200,
 	},
-	["gunshipaa"] = {
+	{
+		name = "gunshipaa",
 		skirms = skirmableAir,
 		swarms = brawler,
 		flees = armedLand,
@@ -1454,10 +1505,11 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50,
+		skirmLeeway = 50,
 		skirmOrderDis = 200,
 	},
-	["shipaa"] = {
+	{
+		name = "shipaa",
 		skirms = skirmableAir,
 		swarms = {},
 		flees = {},
@@ -1468,7 +1520,8 @@ local behaviourConfig = {
 	},
 	
 	-- Flying scouts
-	["planelightscout"] = {
+	{
+		name = "planelightscout",
 		skirms = {},
 		swarms = {},
 		flees = {},
@@ -1478,7 +1531,8 @@ local behaviourConfig = {
 		fleeLeeway = 650,
 		fleeDistance = 650,
 	},
-	["planescout"] = {
+	{
+		name = "planescout",
 		skirms = {},
 		swarms = {},
 		flees = {},
@@ -1490,70 +1544,86 @@ local behaviourConfig = {
 	},
 	
 	-- only handle idleness
-	["shieldscout"] = {
+	{
+		name = "shieldscout",
 		onlyIdleHandling = true,
 	},
-	["cloakheavyraid"] = {
+	{
+		name = "cloakheavyraid",
 		onlyIdleHandling = true,
 	},
-	["gunshipraid"] = {
+	{
+		name = "gunshipraid",
 		onlyIdleHandling = true,
 	},
-	["gunshipheavyskirm"] = {
+	{
+		name = "gunshipheavyskirm",
 		onlyIdleHandling = true,
 	},
-	["gunshipassault"] = {
+	{
+		name = "gunshipassault",
 		onlyIdleHandling = true,
 	},
-	["hoverassault"] = {
+	{
+		name = "hoverassault",
 		onlyIdleHandling = true,
 	},
-	["spidercrabe"] = {
+	{
+		name = "spidercrabe",
 		onlyIdleHandling = true,
 	},
-	["jumpassault"] = {
+	{
+		name = "jumpassault",
 		onlyIdleHandling = true,
 	},
-	["tankcon"] = {
+	{
+		name = "tankcon",
 		onlyIdleHandling = true,
 	},
-	["tankheavyarty"] = {
+	{
+		name = "tankheavyarty",
 		onlyIdleHandling = true,
 	},
-	["subraid"] = {
+	{
+		name = "subraid",
 		onlyIdleHandling = true,
 	},
-	["striderantiheavy"] = {
+	{
+		name = "striderantiheavy",
 		onlyIdleHandling = true,
 	},
-	["striderscorpion"] = {
+	{
+		name = "striderscorpion",
 		onlyIdleHandling = true,
 	},
-	["striderdetriment"] = {
+	{
+		name = "striderdetriment",
 		onlyIdleHandling = true,
 	},
-	["shipheavyarty"] = {
+	{
+		name = "shipheavyarty",
 		onlyIdleHandling = true,
 	},
 	
 	-- chickens
-	["chicken_tiamat"] = {
+	{
+		name = "chicken_tiamat",
 		skirms = {},
 		swarms = {},
 		flees = {},
 		hugs = allGround,
 		hugRange = 100,
 	},
-	
-	["chicken_dragon"] = {
+	{
+		name = "chicken_dragon",
 		skirms = {},
 		swarms = {},
 		flees = {},
 		hugs = allGround,
 		hugRange = 150,
 	},
-	
-	["chickenlandqueen"] = {
+	{
+		name = "chickenlandqueen",
 		skirms = {},
 		swarms = {},
 		flees = {},
@@ -1562,7 +1632,8 @@ local behaviourConfig = {
 	},
 	
 	-- Externally handled units
-	["energysolar"] = {
+	{
+		name = "energysolar",
 		externallyHandled = true,
 	},
 }
@@ -1640,8 +1711,9 @@ end
 
 local function LoadBehaviour()
 	local unitAIBehaviour = {}
-	for unitDef, behaviourData in pairs(behaviourConfig) do
-		local ud = UnitDefNames[unitDef]
+	for i = 1, #behaviourConfig do
+		local behaviourData = behaviourConfig[i]
+		local ud = UnitDefNames[behaviourConfig[i].name]
 		
 		if ud then
 			if behaviourData.land and behaviourData.sea then
