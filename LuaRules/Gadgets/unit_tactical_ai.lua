@@ -60,7 +60,7 @@ local ALLY_TABLE = {
 
 local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
-local USE_FIGHT_RETURN = false
+local TRACK_FIGHT_RETURN = false -- Fight does not need tracking as returning units are aggressive
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ local function GetUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 	elseif (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and (cp_1 == data.cx) and (cp_2 == data.cy) and (cp_3 == data.cz) then
 		local cmdID_2, cmdOpts_2, _, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID, 2)
 		if not cmdID_2 then
-			return false, true
+			return -1, true
 		end
 		local cmdID_3 = Spring.GetUnitCurrentCommand(unitID, 3)
 		if cmdID_2 == CMD_FIGHT or (cmdID_2 == CMD_ATTACK and ((not holdPos) or cmdID_3 == CMD_FIGHT)) then -- if the next command is attack, patrol or fight
@@ -220,7 +220,7 @@ local function GetUnitOrderState(unitID, data, cmdID, cmdOpts, cp_1, cp_2, cp_3,
 				end
 			end
 		end
-		return false, true
+		return -1, true
 	end
 
 	return false
@@ -293,14 +293,17 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	end
 	
 	local myIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ux, uz)
+	--Spring.Utilities.UnitEcho(unitID, "C")
 	--Spring.Echo("enemyRange", math.floor(enemyRange), math.floor(enemyDist), math.floor(behaviour.idleCommitDist), "ux, uz, ex, ez", math.floor(ux), math.floor(uz), math.floor(ex), math.floor(ez), "Distances", math.floor(math.sqrt(behaviour.idlePushAggressDistSq)), math.floor(math.sqrt(myIdleDistSq)), math.floor(math.sqrt(DistSq(unitData.idleX, unitData.idleZ, ex, ez))), math.random())
 	if enemyDist < enemyRange or behaviour.idlePushAggressDistSq < myIdleDistSq then
 		local enemyIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ex, ez)
 		local enemyCloserToIdlePos = enemyIdleDistSq < myIdleDistSq
-		if enemyCloserToIdlePos or enemyDist < behaviour.idleCommitDist then
-			-- I am further from where I started than my enemy, or I am already committed to fighting. Agress.
+		local myIdleDist = math.sqrt(myIdleDistSq) 
+		unitData.wantFightReturn = enemyCloserToIdlePos -- Return with fight if you need to return through an enemy
+		if enemyCloserToIdlePos or enemyDist + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
+			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
 			SetIdleAgression(unitID, unitData, enemy, frame)
-		elseif behaviour.idleChaseEnemyLeeway + enemyRange < math.sqrt(myIdleDistSq) then
+		elseif behaviour.idleChaseEnemyLeeway + enemyRange < myIdleDist then
 			-- Enemy is not blocking my retreat to idle pos, retreat.
 			ReturnUnitToIdlePos(unitID, unitData, true)
 		end
@@ -750,7 +753,8 @@ local function DoUnitUpdate(unitID, frame)
 	
 	local isIdleAttack = (not roamState) and ((not cmdID) or (autoAttackEnemyID and not haveFight))
 	--Spring.Echo("haveFight", haveFight, isIdleAttack, fightX, data.rx, math.random())
-	if haveFight and (not isIdleAttack) and data.rx then
+	
+	if TRACK_FIGHT_RETURN and haveFight and (not isIdleAttack) and data.rx then
 		if (fightX == data.rx) and (fightY == data.ry) and (fightZ == data.rz) and (not holdPos) then
 			isIdleAttack = true
 		else
@@ -758,10 +762,9 @@ local function DoUnitUpdate(unitID, frame)
 		end
 	end
 	
-	--Spring.Echo("data.idleWantReturn", cmdID, data.idleWantReturn, move, enemy, isIdleAttack, math.random())
+	--Spring.Echo("BEFORE", cmdID, data.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	data.idleWantReturn = (data.idleWantReturn and (enemy == -1 or move)) or isIdleAttack
-	
-	--Spring.Echo("data.idleWantReturn", cmdID, data.idleWantReturn, move, enemy, isIdleAttack, math.random())
+	--Spring.Echo("data", cmdID, data.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	--Spring.Utilities.UnitEcho(unitID, data.idleWantReturn and "W" or "O_O")
 	
 	local sentTacticalAiOrder = false
@@ -786,16 +789,18 @@ local function DoUnitUpdate(unitID, frame)
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, data.allyTeam)
 		end
 		
-		--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
-		sentTacticalAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
-			fightX, fightY, fightZ, data, behaviour, enemy, enemyUnitDef, typeKnown,
-			move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
-		
-		if autoAttackEnemyID and not sentTacticalAiOrder then
-			enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
+		if not behaviour.onlyIdleHandling then
+			--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
 			sentTacticalAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
-				fightX, fightY, fightZ, data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
-				move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
+				fightX, fightY, fightZ, data, behaviour, enemy, enemyUnitDef, typeKnown,
+				move, haveFight, holdPos, data.idleWantReturn, particularEnemy, frame, alwaysJink)
+			
+			if autoAttackEnemyID and not sentTacticalAiOrder then
+				enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, data.allyTeam)
+				sentTacticalAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+					fightX, fightY, fightZ, data, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
+					move, haveFight, holdPos, data.idleWantReturn, particularEnemy, frame, alwaysJink)
+			end
 		end
 		
 		if enemy and autoAttackEnemyID and not sentTacticalAiOrder then
@@ -818,10 +823,10 @@ local function DoUnitUpdate(unitID, frame)
 		else
 			-- If the command queue is empty (ie still idle) then return to position
 			local ry = math.max(0, Spring.GetGroundHeight(rx, rz) or 0)
-			GiveClampedOrderToUnit(unitID, USE_FIGHT_RETURN and CMD_FIGHT or CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
+			GiveClampedOrderToUnit(unitID, data.wantFightReturn and CMD_FIGHT or CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
 			data.setReturn = nil
 			data.forceReturn = nil
-			if USE_FIGHT_RETURN then
+			if TRACK_FIGHT_RETURN then
 				data.rx, data.ry, data.rz = rx, ry, rz
 			end
 		end
@@ -878,6 +883,7 @@ local function AddIdleUnit(unitID, unitDefID)
 	
 	data.idleX = x
 	data.idleZ = z
+	data.wantFightReturn = nil
 	SetIdleAgression(unitID, data, nearbyEnemy)
 	--Spring.Utilities.UnitEcho(unitID, "I")
 end
@@ -964,6 +970,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.idlePushAggressDistSq   = (weaponRange + 50)^2
 	behaviourData.idleChaseEnemyLeeway    = 100
 	behaviourData.idleCommitDist          = weaponRange/2 + 50
+	behaviourData.idleCommitDistMult      = 0.2
 	
 	if behaviourData.fightOnlyOverride then
 		for k, v in pairs(behaviourData) do
