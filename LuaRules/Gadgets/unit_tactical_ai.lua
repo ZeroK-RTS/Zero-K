@@ -62,7 +62,7 @@ local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
 local TRACK_FIGHT_RETURN = false -- Fight does not need tracking as returning units are aggressive
 
-local unitAIBehaviour -- Loaded in initialise for some reason
+local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -955,14 +955,6 @@ end
 -- Unit adding/removal
 
 function gadget:Initialize()
-	-- import config
-	unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
-	if not unitAIBehaviour then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "LuaRules/Configs/tactical_ai_defs.lua not found")
-		gadgetHandler:RemoveGadget()
-		return
-	end
-
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_AI)
 	
