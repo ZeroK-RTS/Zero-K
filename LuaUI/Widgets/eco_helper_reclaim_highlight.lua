@@ -1,10 +1,7 @@
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
-
-local widgetName = "Reclaim Highlight"
 
 function widget:GetInfo()
   return {
-    name      = widgetName,
+    name      = "Reclaim Highlight",
     desc      = "Highlights clusters of reclaimable material",
     author    = "ivand, refactored by esainane",
     date      = "2020",
@@ -13,6 +10,8 @@ function widget:GetInfo()
     enabled   = false  --  loaded by default?
   }
 end
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local flashStrength = 0.0
 local fontScaling = 25 / 40
