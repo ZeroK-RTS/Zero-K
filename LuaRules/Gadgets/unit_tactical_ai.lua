@@ -612,7 +612,10 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 		dx, dy, dz = dx - uvx*prediction, dy - uvy*prediction, dz - uvz*prediction
 	end
 	
-	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
+	-- Don't use velocity to overestimate distance when fleeing.
+	local predictDistSq = DistSq(ux, uz, dx, dz)
+	local origDistSq = DistSq(ux, uz, ex, ez)
+	local pointDis = ((predictDistSq < origDistSq) and math.sqrt(predictDistSq)) or math.sqrt(origDistSq)
 
 	if isIdleAttack then
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
@@ -713,8 +716,8 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		return false
 	end
 	
-	local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
-	if behaviour.skirms and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+	local typeSkirm = typeKnown and behaviour.skirms and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
+	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 		--Spring.Echo("unit checking skirm")
 		if not DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame,
 				haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
@@ -758,10 +761,11 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 	local moveState = Spring.Utilities.GetUnitMoveState(unitID)
 	local roamState = (moveState == 2)
+	local middleMoveState = (moveState == 1)
 	local holdPos = (moveState == 0)
 	
 	local behaviour
-	if (roamState or holdPos) then
+	if not middfleMoveState then
 		if exitEarly then
 			return
 		end
@@ -772,8 +776,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	end
 	
 	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
-	local isIdleAttack = (not roamState) and ((not cmdID) or (autoAttackEnemyID and not haveFight))
-	--Spring.Echo("haveFight", haveFight, isIdleAttack, fightX, unitData.rx, math.random())
+	local isIdleAttack = middleMoveState and ((not cmdID) or (autoAttackEnemyID and not haveFight))
 	
 	if haveFight and (not isIdleAttack) and unitData.rx then
 		if (fightX == unitData.rx) and (fightY == unitData.ry) and (fightZ == unitData.rz) and (not holdPos) then
@@ -785,7 +788,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	
 	--Spring.Echo("BEFORE", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	
-	unitData.idleWantReturn = (unitData.idleWantReturn and (enemy == -1 or move)) or isIdleAttack
+	unitData.idleWantReturn = (unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack
 	--Spring.Echo("unitData", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	--Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	
@@ -824,7 +827,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			end
 		end
 		
-		if enemy and enemy ~= -1 and autoAttackEnemyID and not sentTacticalAiOrder then
+		if enemy and enemy ~= -1 and unitData.idleWantReturn and not sentTacticalAiOrder then
 			DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enemyUnitDef, typeKnown)
 		end
 	end

@@ -624,7 +624,7 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		jinkTangentLength = 90,
 		stoppingDistance = 10,
-		fleeLeeway = 140,
+		fleeLeeway = 120,
 		idleCommitDistMult = 0.05,
 	},
 	{
@@ -642,7 +642,7 @@ local behaviourConfig = {
 		stoppingDistance = 0,
 		strafeOrderLength = 90,
 		minCircleStrafeDistance = 20,
-		fleeLeeway = 150,
+		fleeLeeway = 120,
 		fleeDistance = 150,
 	},
 	{
@@ -1810,29 +1810,31 @@ local function GetBehaviourTable(behaviourData, ud)
 	behaviourData.idleEnemyDistMult       = behaviourData.idleEnemyDistMult or 0.85
 	
 	local hasFlee = (behaviourData.flees or behaviourData.fleeEverything or behaviourData.fleeCombat or behaviourData.idleFlee or behaviourData.idleFleeCombat)
+	local hasSkirm = (behaviourData.skirms or behaviourData.skirmRadar or behaviourData.skirmEverything)
+	local hasSwarm = (behaviourData.alwaysJinkFight or behaviourData.swarms)
+	
 	if hasFlee then
-		behaviourData.fleeVelPrediction       = behaviourData.fleeVelPrediction or 10
 		behaviourData.fleeOrderDis            = (behaviourData.fleeOrderDis or 120)
 		behaviourData.fleeLeeway              = (behaviourData.fleeLeeway or 100)
 		behaviourData.fleeDistance            = (behaviourData.fleeDistance or 120)
 		behaviourData.minFleeRange            = (behaviourData.minFleeRange or 0) - behaviourData.fleeLeeway
 	end
 	
-	if hasFlee or behaviourData.skirms then
+	if hasFlee or hasSkirm then
 		-- Used by skirm and flee.
 		behaviourData.skirmRange              = weaponRange
 		behaviourData.stoppingDistance        = (behaviourData.stoppingDistance or 0)
+		behaviourData.velocityPrediction      = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction)
 	end
 	
-	if behaviourData.skirms then
+	if hasSkirm then
 		behaviourData.mySpeed                 = ud.speed/30
 		behaviourData.skirmOrderDis           = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis)
-		behaviourData.velocityPrediction      = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction)
 		behaviourData.hugRange                = (behaviourData.hugRange or behaviourDefaults.defaultHugRange)
 		behaviourData.skirmLeeway             = (behaviourData.skirmLeeway or 0)
 	end
 	
-	if behaviourData.alwaysJinkFight or behaviourData.swarms then
+	if hasSwarm then
 		behaviourData.maxSwarmRange           = weaponRange - (behaviourData.maxSwarmLeeway or 0)
 		behaviourData.minSwarmRange           = weaponRange - (behaviourData.minSwarmLeeway or weaponRange/2)
 		behaviourData.minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance)
