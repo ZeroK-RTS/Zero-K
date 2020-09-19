@@ -365,12 +365,19 @@ end
 --------------------------------------------------------------------------------
 -- Panel Configuration and Layout
 
-local function CommandClickFunction()
+local function CommandClickFunction(isInstantCommand, isStateCommand)
 	local _,_, meta,_ = Spring.GetModKeyState()
 	if not meta then
 		return false
 	end
-	WG.crude.OpenPath("Hotkeys/Commands")
+	
+	if isStateCommand then
+		WG.crude.OpenPath("Hotkeys/Commands/State")
+	elseif isInstantCommand then
+		WG.crude.OpenPath("Hotkeys/Commands/Instant")
+	else
+		WG.crude.OpenPath("Hotkeys/Commands/Targeted")
+	end
 	WG.crude.ShowMenu() --make epic Chili menu appear.
 	return true
 end

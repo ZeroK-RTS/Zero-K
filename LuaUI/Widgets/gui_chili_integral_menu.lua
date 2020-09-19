@@ -1013,6 +1013,7 @@ end
 
 local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
+	local isStateCommand
 	local usingGrid
 	local factoryUnitID
 	local fakeFactory
@@ -1024,7 +1025,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local keyToShowWhenVisible
 	
 	local function DoClick(_, _, _, mouse)
-		if buttonLayout.ClickFunction and buttonLayout.ClickFunction() then
+		if buttonLayout.ClickFunction and buttonLayout.ClickFunction(cmdID and instantCommands[cmdID], isStateCommand) then
 			return false
 		end
 		if isDisabled then
@@ -1366,8 +1367,8 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetText(textConfig.bottomRightLarge.name, command.name)
 		end
 		
+		isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 		if cmdID == newCmdID then
-			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 			if isStateCommand then
 				local state = command.params[1] + 1
 				local displayConfig = GetDisplayConfig(cmdID)
@@ -1409,7 +1410,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		
-		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 		local displayConfig = GetDisplayConfig(cmdID)
 		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
 		

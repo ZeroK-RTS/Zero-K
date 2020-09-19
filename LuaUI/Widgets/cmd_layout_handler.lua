@@ -49,7 +49,7 @@ local function AddHotkeyOptions()
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
-			path = 'Hotkeys/Commands',
+			path = 'Hotkeys/Commands' .. ((number == 2 and "/State") or (number == 3 and "/Instant") or "/Targeted"),
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdname_disp
@@ -63,26 +63,26 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Hotkeys/Commands',}
-	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Hotkeys/Commands',}
-	options.lblstate	= { type='label', name='State Commands', path = 'Hotkeys/Commands',}
+	--options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Hotkeys/Commands',}
+	--options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Hotkeys/Commands',}
+	--options.lblstate	= { type='label', name='State Commands', path = 'Hotkeys/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)
 	table.sort(options_order_tmp_cmd_instant)
 	table.sort(options_order_tmp_states)
 
-	options_order[#options_order+1] = 'lblcmd'
+	--options_order[#options_order+1] = 'lblcmd'
 	for i=1, #options_order_tmp_cmd do
 		options_order[#options_order+1] = options_order_tmp_cmd[i]
 	end
 	
-	options_order[#options_order+1] = 'lblcmdinstant'
+	--options_order[#options_order+1] = 'lblcmdinstant'
 	for i=1, #options_order_tmp_cmd_instant do
 		options_order[#options_order+1] = options_order_tmp_cmd_instant[i]
 	end
 	
-	options_order[#options_order+1] = 'lblstate'
+	--options_order[#options_order+1] = 'lblstate'
 	for i=1, #options_order_tmp_states do
 		options_order[#options_order+1] = options_order_tmp_states[i]
 	end
