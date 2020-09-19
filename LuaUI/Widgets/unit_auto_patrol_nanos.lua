@@ -50,16 +50,20 @@ end
 --------------------------------------------------------------------------------
 -- Speedups
 
-local CMD_INSERT        = CMD.INSERT
-local CMD_MOVE_STATE    = CMD.MOVE_STATE
 local CMD_PATROL        = CMD.PATROL
 local CMD_RECLAIM       = CMD.RECLAIM
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP          = CMD.STOP
-local spGetGameFrame    = Spring.GetGameFrame
+
+local CommandNames = {
+	[CMD_PATROL] = "PATROL",
+	[CMD_RECLAIM] = "RECLAIM",
+	[CMD_REPAIR] = "REPAIR",
+	[CMD_STOP] = "STOP"
+}
+
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
-local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -68,6 +72,7 @@ local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
 local spGetSelectedUnits = Spring.GetSelectedUnits
+local spValidUnitID		= Spring.ValidUnitID
 
 local abs = math.abs
 
@@ -94,7 +99,7 @@ local settleInterval = 5
 local stoppedUnit = {}
 local enableIdleNanos = true
 local stopHalts = true
--- Map from unitID -> { command, commandArgs, checkTime }
+-- Map from unitID -> { checkTime, settleTime }
 local trackedUnits = {}
 -- The current time, in seconds (I think)
 local time = 0
@@ -103,9 +108,6 @@ local nextCheck
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Functions
-
-VFS.Include("LuaRules/Utilities/ClampPosition.lua")
-local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 local function Log(msg)
 	spEcho("[uapn] " .. msg)
@@ -179,22 +181,22 @@ local function DecideCommand(x, y, z, buildDistance)
 
 	if metalStorage < 1 then
 		if metalPull <= metalIncome then
-			Log("repair")
+			--Log("repair")
 			return {CMD_REPAIR, {x, y, z, buildDistance}}
         else
-			Log("reclaim")
+			--Log("reclaim")
 			return {CMD_REPAIR, {x, y, z, buildDistance}}
 		end
 	end
 
 	if metal < slop or metal < metalStorage * 0.1 then
-		Log("reclaim")
+		--Log("reclaim")
 		return {CMD_RECLAIM, {x, y, z, buildDistance}}
 	elseif metal > metalStorage - slop or metal > metalStorage * 0.9 then
-		Log("repair")
+		--Log("repair")
 		return {CMD_REPAIR, {x, y, z, buildDistance}}
 	else
-		Log("patrol")
+		--Log("patrol")
 		-- Patrolling doesn't do anything if you target the current location of
 		-- the unit. Point patrol towards map center.
 		vx = mapCenterX - x
@@ -207,15 +209,6 @@ local function DecideCommand(x, y, z, buildDistance)
 end
 
 local function SetupUnit(unitID)
-	-- TODO: Don't reissue a command that's still going.
-
-	--local cmd = {spGetUnitCurrentCommand(unitID)}
-	--Log(time .. "; cmd for " .. unitID .. ":")
-	--LogTable(cmd, "  ")
-	--if cmdID and cmdID ~= CMD_PATROL then
-		--return
-	--end
-	
 	local x, y, z = spGetUnitPosition(unitID)
 	if (x) then
 		local unitDefID = spGetUnitDefID(unitID)
@@ -224,7 +217,7 @@ local function SetupUnit(unitID)
 		trackedUnits[unitID].checkTime = time + checkInterval
 		local cmd = DecideCommand(x, y, z, buildDistance)
 
-		local commandQueue = Spring.GetCommandQueue(unitID, -1)
+		local commandQueue = spGetCommandQueue(unitID, -1)
 		--Log(time .. "; cmd queue for " .. unitID .. ":")
 		--LogTable(commandQueue, "  ")
 
@@ -237,11 +230,11 @@ local function SetupUnit(unitID)
 			if not current.options.internal and 
 					current.id == cmd[1] and
 					TableEqual(cmd[2], current.params) then
-				Log("command already issued")
+				--Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
 				return
 			end
 		end
-		Log("give order " .. cmd[1] .. " to " .. unitID)
+		Log("give order " .. CommandNames[cmd[1]] .. " to " .. unitID)
 		spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
 		trackedUnits[unitID].settleTime = time + settleInterval
 	end
@@ -314,6 +307,7 @@ end
 
 -- Called (I think) when a user issues a command after selecting some unit.
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	-- TODO: How does this work when commanders are shared?
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in ipairs(selectedUnits) do
 		if trackedUnits[unitID] ~= nil then
@@ -385,7 +379,7 @@ function widget:Update(dt)
 	if nextCheck ~= nil and time > nextCheck then
 		--Log("time to check (" .. time .. ")")
 		for unitID, _ in pairs(trackedUnits) do
-			if Spring.ValidUnitID(unitID) then
+			if spValidUnitID(unitID) then
 				SetupUnit(unitID)
 			else
 				trackedUnits[unitID] = nil
