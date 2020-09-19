@@ -30,6 +30,7 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 local init = true
 local trackmode = false --before options
 local thirdperson_trackunit = false
+local overrideTiltValue = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -72,6 +73,8 @@ options_order = {
 	'targetmouse',
 	-- 'rotateonedge',
 	'inverttilt',
+	'overridetilt',
+	'tiltoverride',
 	'tiltfactor',
 	'groundrot',
 	
@@ -83,6 +86,9 @@ options_order = {
 	'smoothscroll',
 	'smoothmeshscroll',
 	
+	'disableshift',
+	'disablectrl',
+	'disablealt',
 	'lblMisc',
 	'fov',
 	'overviewmode',
@@ -124,6 +130,7 @@ local GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProp
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
 local ApplyCenterBounds = function(cs) end
+local TiltOverrideFunc
 
 options = {
 	
@@ -354,6 +361,30 @@ options = {
 		noHotkey = true,
 		path = rotatePath,
 	},
+	overridetilt = {
+		name = 'Override tilt',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if TiltOverrideFunc then
+				TiltOverrideFunc()
+			end
+		end,
+		path = rotatePath,
+	},
+	tiltoverride = {
+		name = 'Tilt override value',
+		type = 'number',
+		min = 0, max = 1, step = 0.01,
+		value = 1,
+		OnChange = function(self)
+			if TiltOverrideFunc then
+				TiltOverrideFunc()
+			end
+		end,
+		path = rotatePath,
+	},
 	tiltfactor = {
 		name = 'Tilt speed',
 		type = 'number',
@@ -421,6 +452,27 @@ options = {
 	-- 	value = 1,
 	-- 	OnChange = function(self) init = true; end,
 	-- },
+	disableshift = {
+		name = 'Disable Shift',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
+	disablectrl = {
+		name = 'Disable Ctrl',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
+	disablealt = {
+		name = 'Disable Alt',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
 	fov = {
 		name = 'Field of View (Degrees)',
 		--desc = "FOV (25 deg - 100 deg).",
@@ -1750,6 +1802,10 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 		cs.rx = cs.rx + rdy * trfactor
 		cs.ry = cs.ry - rdx * trfactor
 		
+		if overrideTiltValue then
+			cs.rx = overrideTiltValue
+		end
+		
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
 		
@@ -1897,6 +1953,15 @@ local function Tilt(s, dir)
 	return true
 end
 
+function TiltOverrideFunc()
+	if options.overridetilt.value then
+		overrideTiltValue = -math.pi/2 * options.tiltoverride.value
+		Tilt(0, 0)
+	else
+		overrideTiltValue = false
+	end
+end
+
 local function ScrollCam(cs, mxm, mym, smoothlevel)
 	scrnRay_cache.previous.fov = -999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation but scrollcam always have cursor at midscreen
 	lastMouseX = nil
@@ -1962,6 +2027,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local missedMouseRelease = false
+local firstUpdate = true
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
 	
@@ -2059,9 +2125,17 @@ function widget:Update(dt)
 
 	cs = GetTargetCameraState()
 	
+	if firstUpdate and options.overridetilt.value then
+		TiltOverrideFunc()
+	end
+	firstUpdate = false
+	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
 	local a,c,m,s = spGetModKeyState()
+	s = s and not options.disableshift.value
+	c = c and not options.disablectrl.value
+	a = a and not options.disablealt.value
 
 	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
     
@@ -2310,6 +2384,9 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 	
 	local a,ctrl,m,s = spGetModKeyState()
+	s = s and not options.disableshift.value
+	ctrl = ctrl and not options.disablectrl.value
+	a = a and not options.disablealt.value
 	
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
@@ -2407,6 +2484,10 @@ function widget:MouseWheel(wheelUp, value)
     if fpsmode then return end
 	local alt,ctrl,m,shift = spGetModKeyState()
 	
+	shift = shift and not options.disableshift.value
+	ctrl = ctrl and not options.disablectrl.value
+	alt = alt and not options.disablealt.value
+	
 	if ctrl then
 		return Tilt(shift, wheelUp and 1 or -1)
 	elseif alt then
@@ -2444,16 +2525,19 @@ function widget:KeyPress(key, modifier, isRepeat)
 
 	--ls_have = false
 	tilting = false
+	local shift = modifier.shift and not options.disableshift.value
+	local ctrl = modifier.ctrl and not options.disablectrl.value
+	local alt = modifier.alt and not options.disablealt.value
 	
 	if thirdperson_trackunit then  --move key for edge Scroll in 3rd person trackmode
-		if keys[key] and not (modifier.ctrl or modifier.alt) then
+		if keys[key] and not (ctrl or modifier.alt) then
 			movekey = true
 			move[keys[key]] = true
 		end
 	end
 	if fpsmode then return end
 	if keys[key] then
-		if modifier.ctrl or modifier.alt then
+		if ctrl or alt then
 		
 			local cs = GetTargetCameraState()
 			SetLockSpot2(cs)
@@ -2463,12 +2547,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 			
 
 		
-			local speed = (modifier.shift and 30 or 10)
+			local speed = (shift and 30 or 10)
 
-			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt, false)
-			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt, false)
-			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt, false)
-			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt, false)
+			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not alt, false)
+			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not alt, false)
+			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not alt, false)
+			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not alt, false)
 			end
 			return
 		else
@@ -2476,25 +2560,25 @@ function widget:KeyPress(key, modifier, isRepeat)
 			move[keys[key]] = true
 		end
 	elseif key == key_code.pageup then
-		if modifier.ctrl then
-			Tilt(modifier.shift, 1)
+		if ctrl then
+			Tilt(shift, 1)
 			return
-		elseif modifier.alt then
-			Altitude(true, modifier.shift)
+		elseif alt then
+			Altitude(true, shift)
 			return
 		else
-			Zoom(true, modifier.shift, true)
+			Zoom(true, shift, true)
 			return
 		end
 	elseif key == key_code.pagedown then
 		if modifier.ctrl then
-			Tilt(modifier.shift, -1)
+			Tilt(shift, -1)
 			return
-		elseif modifier.alt then
-			Altitude(false, modifier.shift)
+		elseif alt then
+			Altitude(false, shift)
 			return
 		else
-			Zoom(false, modifier.shift, true)
+			Zoom(false, shift, true)
 			return
 		end
 	end
