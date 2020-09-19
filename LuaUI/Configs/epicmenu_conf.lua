@@ -720,7 +720,7 @@ local pathHelp = 'Help'
 		name='Ingame Tutorial',
 		value = [[The following tutorial guides you through setting up a base and producing units. It can be disabled at any time.]]
 	})
-	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron 2.0"} end )
 	AddOption(pathHelp,
 	{
 		type='label',

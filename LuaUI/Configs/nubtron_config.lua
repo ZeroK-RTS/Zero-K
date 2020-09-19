@@ -70,12 +70,12 @@ local unitClasses = {
 local unitClassNames = {
 	Mex		= 'Mex',
 	Solar	= 'Solar Collector',
-	LLT		= 'LLT',
-	BotLab	= 'Bot Lab',
-	Radar	= 'Radar',
+	LLT		= 'Lotus',
+	BotLab	= 'Cloakbot Factory',
+	Radar	= 'Radar Tower',
 
-	Con		= 'Constructor',
-	Raider	= 'Raider',
+	Con		= 'Conjurer',
+	Raider	= 'Glaive',
 }
 --mobile units
 local mClasses = { Con=1, Raider=1, }
@@ -109,11 +109,14 @@ local steps = {
 	},
 	showMetalMap = {
 		--message		= 'View the metal map by pressing <F4>.',
-		passIfAny	= {}, --{ 'metalMapView' }
+		passIfAny	= { 'metalMapView' }
 	},
 	hideMetalMap = {
 		--message		= 'Hide the metal map by pressing <F4>.',
-		passIfAnyNot	= {}, --{ 'metalMapView' }
+		passIfAnyNot	= { 'metalMapView' }
+	},
+	selectAreaMex = {
+		passIfAny	= { 'cmdAreaMex' }
 	},
 
 	selectBotLab = {
@@ -124,13 +127,22 @@ local steps = {
 	selectCon = {
 		--message		= 'Select one constructor by clicking on it (the blue circles will help you find it).',
 		--image		= { arm='unitpics/'.. unitClasses.Con[1] ..'.png', core='unitpics/'.. unitClasses.Con[2] ..'.png' },
-		image		= unitClasses.Con[1] ..'.png',
+		image		= 'unitpics/' .. unitClasses.Con[1] ..'.png',
 		passIfAny	= { 'ConSelected' },
 	},
 
 	guardFac = {
 		--message		= 'Have the constructor guard your Bot Lab by right clicking on the Lab. The constructor will assist it until you give it a different order.',
 		errIfAnyNot	= { 'ConSelected' },
+	},
+
+	raiderTipState = {
+		image		= 'unitpics/' .. unitClasses.Raider[1] ..'.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	repeatTipState = {
+		image		= 'LuaUI/Images/nubtron/repeatTip.png',
+		passIfAny	= { 'clickedNubtron' },
 	},
 
 	--[[
@@ -140,6 +152,67 @@ local steps = {
 		passIfAny	= { 'clickedNubtron' }
 	},
 	--]]
+	epilogue1 = {
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue2 = {
+		image		= 'LuaUI/Images/nubtron/lineMove.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue3 = {
+		image		= 'unitpics/' .. unitClasses.Raider[1] ..'.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue4 = {
+		image		= 'LuaUI/Images/nubtron/roninReaver.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue5 = {
+		image		= 'LuaUI/Images/nubtron/knightSling.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue6 = {
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue7 = {
+		image		= 'unitpics/' .. unitClasses.Con[1] ..'.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue8 = {
+		image		= 'LuaUI/Images/commands/Bold/mex.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue9 = {
+		image		= 'LuaUI/Images/nubtron/areaMexTip.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue10 = {
+		image		= 'LuaUI/Images/commands/Bold/repair.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue11 = {
+		image		= 'LuaUI/Images/commands/Bold/repair.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue12 = {
+		image		= 'LuaUI/Images/commands/Bold/reclaim.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue13 = {
+		image		= 'LuaUI/Images/ibeam.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue14 = {
+		image		= 'unitpics/staticcon.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue15 = {
+		image		= 'unitpics/platecloak.png',
+		passIfAny	= { 'clickedNubtron' },
+	},
+	epilogue16 = {
+		passIfAny	= { 'clickedNubtron' },
+	},
 	tutorialEnd = {
 		--message		= 'This is the end of the tutorial. It is now safe to shut off Nubtron. Goodbye! (Click here to restart tutorial)',
 		passIfAny	= {'clickedNubtron'}
@@ -154,13 +227,15 @@ local taskOrder = {
 	'buildMex',
 	'buildSolar',
 	'buildLLT',
-	'buildMex2',
-	'buildSolar2',
 	'buildFac',
 	'buildRadar',
 	'buildCon',
 	'conAssist',
 	'buildRaider',
+	'raiderTip',
+	'buildMex2',
+	'buildSolar2',
+	'epilogue',
 	'congrats',
 }
 --use "states" from the steps table above.
@@ -168,7 +243,7 @@ local tasks = {
 	
 	intro = {
 		--desc		= 'Introduction',
-		states		= {'intro', 'intro2', 'intro3', 'intro4', 'intro5', },
+		states		= {'intro', 'intro3', 'intro4', 'intro5', },
 	},
 	restoreInterface = {
 		--desc		= 'Restore your interface',
@@ -177,81 +252,81 @@ local tasks = {
 	buildMex = {
 		--desc		= 'Building a Metal Extractor (mex)',
 		--tip			= 'Metal extractors output metal which is the heart of your economy.',
-		states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap' },
+		states		= { 'selectComm', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex'},
+		--states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap' },
 		passIfAll	= { 'haveMex',},
 	},
 	buildSolar = {
 		--desc		= 'Building a Solar Collector',
 		--tip			= 'Energy generating structures power your mexes and factories.',
 		states		= { 'selectComm', 'finishSolar', 'selectBuildSolar', 'startSolar', 'buildSolar'},
-		errIfAny	= { 'metalMapView' },
-		errIfAnyNot	= { 'haveMex' },
+		--errIfAnyNot	= { 'haveMex' },
 		passIfAll	= { 'haveSolar',},
 	},
 	buildLLT = {
 		--desc		= 'Building a Light Laser Tower (LLT)',
 		states		= { 'selectComm', 'finishLLT', 'selectBuildLLT', 'startLLT', 'buildLLT' },
-		errIfAny	= { 'metalMapView' },
-		errIfAnyNot	= { 'haveMex', 'haveSolar' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar' },
 		passIfAll	= { 'haveLLT',},
-	},
-	buildMex2 = {
-		--desc		= 'Building another mex on a different metal spot.',
-		---tip			= 'Always try to acquire more metal spots to build more mexes.',
-		states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap'},
-		errIfAnyNot	= { 'haveMex', 'haveSolar' },
-		passIfAnyNot	= { 'lowMetalIncome', },
-	},
-	buildSolar2 = {
-		--desc		= 'Building another Solar Collector',
-		--tip			= 'Always try and build more energy structures to keep your economy growing.',
-		states		= { 'selectComm', 'finishSolar', 'selectBuildSolar', 'startSolar', 'buildSolar', },
-		errIfAny	= { 'metalMapView', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar' },
-		passIfAnyNot	= { 'lowEnergyIncome', }
 	},
 	buildFac = {
 		--desc		= 'Building a Factory',
 		states		= { 'selectComm', 'finishBotLab', 'selectBuildBotLab', 'startBotLab', 'buildBotLab' },
-		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT' },
 		passIfAll	= { 'haveBotLab',},
 	},
 	buildRadar = {
 		--desc		= 'Building a Radar',
 		--tip			= 'Radar coverage shows you distant enemy units as blips.',
 		states		= { 'selectComm', 'finishRadar', 'selectBuildRadar', 'startRadar', 'buildRadar' },
-		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab' },
 		passIfAll	= { 'haveRadar',},
 	},
 	buildCon = {
 		--desc		= 'Building a Constructor',
 		--tip			= 'Just like your Commander, Constructors build (and assist building of) structures.',
 		states		= { 'selectBotLab', 'selectBuildCon', 'buildCon' },
-		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar' },
 		passIfAll	= { 'haveCon',},
 	},
 	conAssist = {
 		--desc		= 'Using a constructor to assist your factory',
 		--tip			= 'Factories that are assisted by constructors build faster.',
 		states		= { 'selectCon', 'guardFac', },
-		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon' },
 		passIfAll	= { 'guardFac',},
 	},
 	buildRaider = {
 		--desc		= 'Building Raider Bots in your factory.',
 		--tip			= 'Combat units are used to attack your enemies and make them suffer.',
 		states		= { 'selectBotLab', 'selectBuildRaider', 'buildRaider', },
-		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
-		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon', 'guardFac' },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon', 'guardFac' },
 		passIfAll	= { 'haveRaider',},
+	},
+	raiderTip = {
+		states = { 'raiderTipState', 'repeatTipState', },
+	},
+	buildMex2 = {
+		--desc		= 'Building another mex on a different metal spot.',
+		---tip			= 'Always try to acquire more metal spots to build more mexes.',
+		states		= { 'selectComm', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex'},
+		--errIfAnyNot	= { 'haveMex', 'haveSolar' },
+		passIfAnyNot	= { 'lowMetalIncome', },
+	},
+	buildSolar2 = {
+		--desc		= 'Building another Solar Collector',
+		--tip			= 'Always try and build more energy structures to keep your economy growing.',
+		states		= { 'selectComm', 'finishSolar', 'selectBuildSolar', 'startSolar', 'buildSolar', },
+		--errIfAnyNot	= { 'haveMex', 'haveSolar' },
+		passIfAnyNot	= { 'lowEnergyIncome', }
+	},
+	epilogue = {
+		--desc		= 'Congratulations!',
+		states		= { 'epilogue1', 'epilogue2', 'epilogue3', 'epilogue4', 'epilogue5', 'epilogue6', 'epilogue7',
+					'epilogue8', 'epilogue9', 'epilogue10', 'epilogue11', 'epilogue12', 'epilogue13', 'epilogue14', 'epilogue15', 'epilogue16'},
 	},
 	congrats = {
 		--desc		= 'Congratulations!',
-		errIfAny	= { 'metalMapView' },
 		states		= { 'tutorialEnd'},
 	},
 }

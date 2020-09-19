@@ -23,8 +23,9 @@ local echo = Spring.Echo
 
 -- config
 include("keysym.lua")
-local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
-	
+local factory_commands,econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
+local _, _, overrides = include("Configs/integral_menu_config.lua", nil, VFS.RAW_FIRST)
+
 local build_menu_use = include("Configs/marking_menu_menus.lua")
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 

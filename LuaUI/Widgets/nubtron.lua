@@ -6,7 +6,7 @@ local rank = playerID and select(9, Spring.GetPlayerInfo(playerID, false))
 
 function widget:GetInfo()
   return {
-    name      = "Nubtron",
+    name      = "Nubtron 2.0",
     desc      = "v0.411 Friendly Tutorial Robot",
     author    = "CarRepairer",
     date      = "2008-08-18",
@@ -14,14 +14,25 @@ function widget:GetInfo()
     layer     = 1,
 --[[before enabling, read commit message 5482]]
     --enabled   = (rank and rank == 1) or true,
-    enabled   = false
+    enabled   = true
   }
 end
 
-if VFS.FileExists("mission.lua") then
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function SingleplayerMode()
+	local playerList = Spring.GetPlayerList()
+	return #playerList == 1
+end
+
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+if VFS.FileExists("mission.lua") or campaignBattleID then
   -- don't run in a mission
 	return
 end
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -77,8 +88,9 @@ local Image
 local Progressbar
 local Control
 
-local window_nubtron, title, tip, blurb, img, button_next
-local wantClickNubtron, showImage = true, true
+local window_nubtron, title, tip, blurb, button_next
+local wantClickNubtron = true
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -97,8 +109,8 @@ local h			= 85
 local px		= -1
 local py		= -1
 
-local mThresh		= 6
-local eThresh		= 10
+local mThresh		= 9
+local eThresh		= 11
 
 local metalIncome, energyIncome	= 0,0
 local myTeamID, myFaction, myCommID, guardingConID
@@ -122,8 +134,7 @@ local tempConditions = {
 }
 
 local lang = 'en'
-
-
+local NUBTRON_IMAGE = 'LuaUI/Images/advisor2.jpg'
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -138,7 +149,7 @@ local tasks = nubtronData.tasks
 local taskOrder = nubtronData.taskOrder
 nubtronData = nil
 
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -213,6 +224,8 @@ CheckState = function()
 	local curStep = steps[curTask.states[curStepNum]]
 	local taskStates = curTask.states
 	
+	--Spring.Echo("CheckState", curTaskNum, curStepNum, math.random())
+	
 	if curStep.passIfAny and curStep.passIfAny[1] == 'clickedNubtron' then
 		if not wantClickNubtron then
 			wantClickNubtron = true
@@ -247,7 +260,11 @@ CheckState = function()
 	elseif taskPass then
 		resetTempConditions()
 		curStepNum = 1
-		curTaskNum = (curTaskNum % #taskOrder)+1
+		curTaskNum = curTaskNum +1
+		if curTaskNum > #taskOrder then
+			Spring.SendCommands({"luaui togglewidget Nubtron"})
+			return
+		end
 		CheckState()
 		return
 	end
@@ -266,14 +283,21 @@ CheckState = function()
 	if stepPass then
 		resetTempConditions()
 		if curStepNum < #taskStates then
+			--Spring.Echo("stepPass", curTaskNum, curStepNum, math.random())
 			curStepNum = curStepNum + 1
 		else
+			--Spring.Echo("stepPass reset", curTaskNum, curStepNum, math.random())
 			curStepNum = 1
-			curTaskNum = (curTaskNum % #taskOrder)+1
+			curTaskNum = curTaskNum +1
+			if curTaskNum > #taskOrder then
+				Spring.SendCommands({"luaui togglewidget Nubtron"})
+				return
+			end
 		end
 		
 		CheckState()
 	elseif stepErr then
+		--Spring.Echo("stepErr", curTaskNum, curStepNum, math.random())
 		resetTempConditions()
 		curStepNum = 1
 		CheckState()
@@ -345,6 +369,9 @@ local function CheckAllUnits()
 	--- building a structure ---
 	local activeCmdIndex,activeid ,_,buildUnitName = GetActiveCommand()
 	--Spring.Echo('act cmd index, id', aciveCmdIndex, activeid)
+	if activeid == CMD_AREA_MEX then
+		setCondition('cmdAreaMex' )
+	end
 
 	if classesByUnit[buildUnitName] then
 		setCondition('selbuild' .. classesByUnit[buildUnitName] )
@@ -353,7 +380,6 @@ local function CheckAllUnits()
 	--Spring.Echo ("active cmd", unitName)
 	--Spring.Echo ("active cmddesc", cmddesc[1][1])
 	CheckState()
-
 end
 
 local function addFinishedUnit(unitClass, unitID)
@@ -418,7 +444,7 @@ local function SetupText(lang)
 		tasks[taskName].tip = texts_lang.tasks.tips[taskName]
 	end
 	for k,_ in pairs(steps) do
-		steps[k].message = texts_lang.steps[k]
+		steps[k].message = texts_lang.steps[k] or "Missing Text"
 	end
 	
 	for unitClass, units in pairs(unitClasses) do
@@ -442,40 +468,26 @@ local function SetupText_test(_,_,words)
 end
 
 local function SetupNubtronWindow()
-	local imgsize = 54
-	local nextbuttonwidth = 54
+	local imgsize = 80
+	local nextbuttonwidth = 68
 	title = Label:New {
+		x=imgsize+6,
+		y = 2,
 		width="100%";
-		--height="100%";
-		x=imgsize+2,
 		
 		autosize=false;
 		align="left";
-		valign="top";
+		valign="center";
 		caption = 'Title';
 		fontSize = 16;
-		fontShadow = true;
-		parent = button;
-	}
-	tip = Label:New {
-		width="100%";
-		--height="100%";
-		x=imgsize+2,
-		y=18,
-		
-		autosize=false;
-		align="left";
-		valign="top";
-		caption = 'Tip';
-		fontSize = 12;
 		fontShadow = true;
 		parent = button;
 	}
 	blurb = TextBox:New {
 		width="100%";
 		--height="100%";
-		x=imgsize+2,
-		y=35,
+		x=imgsize+6,
+		y=26,
 		bottom=0,
 		right = 4 + nextbuttonwidth,
 		
@@ -483,30 +495,38 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = text;
-		fontSize = 12;
+		fontSize = 13;
+		fontShadow = true;
+		parent = button;
+	}
+	tip = Label:New {
+		width="100%";
+		--height="100%";
+		x=imgsize+6,
+		bottom=2,
+		
+		autosize=false;
+		align="left";
+		valign="center";
+		caption = 'Tip';
+		fontSize = 13;
 		fontShadow = true;
 		parent = button;
 	}
 	
 	imgnubtron = Image:New {
+		y = 4,
 		width = imgsize;
 		height = imgsize;
-		file = 'LuaUI/Images/friendly.png';
-	}
-	img = Image:New {
-		width = imgsize;
-		height = imgsize * (4/5);
-		keepAspect = false,
-		right=0,
-		bottom=0,
-		file = '';
+		file = NUBTRON_IMAGE;
 	}
 	button_next = Button:New {
 		width = nextbuttonwidth;
 		height = 50;
 		caption = 'Next',
 		right = 2,
-		bottom = 0,
+		bottom = 4,
+		fontsize = 16,
 		OnClick = {
 			function(self)
 				setCondition('clickedNubtron')
@@ -514,9 +534,11 @@ local function SetupNubtronWindow()
 		}
 	}
 	local button_x = Button:New {
-		width = 20;
-		height = 20;
+		y = 4,
+		width = 18;
+		height = 18;
 		caption = 'X',
+		tooltip = 'Disable the tutorial. It can be re-enabled through the Menu (F10) under Help',
 		right = 2,
 		captionColor = {1,0,0,1},
 		OnClick = {
@@ -534,19 +556,18 @@ local function SetupNubtronWindow()
 		width = 550;
 		height = imgsize+20;
 		x = 30;
-		bottom = '28%';
+		bottom = '36%';
 		dockable = false;
 		draggable = true,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		padding = {10, 10, 10, 10},
+		padding = {10, 6, 10, 6},
 		--itemMargin  = {0, 0, 0, 0},
 		children = {
 			title,
 			tip,
 			blurb,
-			img,
 			imgnubtron,
 			button_next,
 			button_x,
@@ -720,7 +741,7 @@ function widget:Initialize()
 			steps['selectBuild'.. unitClass] = {
 				--message		= 'Select the '.. unitClassName ..' from your build menu (build-icon shown here). ',
 				--image		= { arm='unitpics/'.. unitClasses[unitClass][1] ..'.png', core='unitpics/'.. unitClasses[unitClass][2] ..'.png' },
-				image		= 'unitpics/'.. unitClasses[unitClass][1] ..'.png',
+				image		= 'LuaUI/Images/nubtron/build'.. unitClass ..'.png',
 				errIfAnyNot	= { 'commSelected', },
 				passIfAny	= { 'selbuild'.. unitClass, 'build'.. unitClass }
 				}
@@ -737,8 +758,8 @@ function widget:Initialize()
 	end
 
 	--steps.startMex.message = 'Place it on a green patch.'
-	steps.startMex.errIfAnyNot[#steps.startMex.errIfAnyNot + 1] = 'metalMapView'
-	steps.selectBuildMex.errIfAnyNot[#steps.selectBuildMex.errIfAnyNot + 1] = 'metalMapView'
+	--steps.startMex.errIfAnyNot[#steps.startMex.errIfAnyNot + 1] = 'metalMapView'
+	--steps.selectBuildMex.errIfAnyNot[#steps.selectBuildMex.errIfAnyNot + 1] = 'metalMapView'
 	--steps.selectBuildMex.message = 'The build-icon for the mex is shown to the right. Select it in your build menu on the left.'
 	--steps.startBotLab.message = 'Before placing it, you can rotate the structure with the <[> and <]> keys. <Turn it and place it so that units can easily exit the front>. It will turn red if you try to place it on uneven terrain.'
 
@@ -828,7 +849,6 @@ function widget:Update()
 			setCondition('gameStarted')
 		end
 		
-		
 		--- metal map or showeco---
 		if GetMapDrawMode() == 'metal' or WG.showeco == true then
 			setCondition('metalMapView')
@@ -860,12 +880,13 @@ function widget:Update()
 		
 		if metalIncome < mThresh then
 			setCondition('lowMetalIncome')
-		elseif metalIncome > mThresh+1 then
+		elseif metalIncome > mThresh then
 			remCondition('lowMetalIncome')
 		end
+		
 		if energyIncome < eThresh then
 			setCondition('lowEnergyIncome')
-		elseif energyIncome > eThresh+1 then
+		elseif energyIncome > eThresh then
 			remCondition('lowEnergyIncome')
 		end
 		
@@ -883,17 +904,11 @@ function widget:Update()
 		else
 			imageToUse = curStep.image
 		end
-		if not showImage then
-			showImage = true
-			window_nubtron:AddChild(img)
-		end
-		img.file = imageToUse
-		img:Invalidate()
+		imgnubtron.file = imageToUse
+		imgnubtron:Invalidate()
 	else
-		if showImage then
-			showImage = false
-			window_nubtron:RemoveChild(img)
-		end
+		imgnubtron.file = NUBTRON_IMAGE
+		imgnubtron:Invalidate()
 	end
 	
 	title:SetCaption(curTask.desc)
@@ -902,7 +917,7 @@ function widget:Update()
 	blurb:SetText(formattedLine)
 	
 end
-	
-	
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
