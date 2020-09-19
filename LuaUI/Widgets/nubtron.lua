@@ -262,8 +262,9 @@ CheckState = function()
 		curStepNum = 1
 		curTaskNum = curTaskNum +1
 		if curTaskNum > #taskOrder then
-			Spring.SendCommands({"luaui togglewidget Nubtron"})
-			return
+			curTaskNum = 1
+			--Spring.SendCommands({"luaui togglewidget Nubtron"})
+			--return
 		end
 		CheckState()
 		return
@@ -288,10 +289,11 @@ CheckState = function()
 		else
 			--Spring.Echo("stepPass reset", curTaskNum, curStepNum, math.random())
 			curStepNum = 1
-			curTaskNum = curTaskNum +1
+			curTaskNum = curTaskNum + 1
 			if curTaskNum > #taskOrder then
-				Spring.SendCommands({"luaui togglewidget Nubtron"})
-				return
+				curTaskNum = 1
+				--Spring.SendCommands({"luaui togglewidget Nubtron"})
+				--return
 			end
 		end
 		

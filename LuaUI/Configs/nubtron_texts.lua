@@ -48,8 +48,8 @@ return {
 			selectBotLab = [[Select only your Cloakbot Factory by clicking on it (the blue circles will help you find it).]],
 			selectCon = [[Select one constructor by clicking on it (the blue circles will help you find it).]],
 			guardFac = [[Have the constructor guard your factory by right clicking on the factory. The constructor will assist it until you give it a different order.]],
-			tutorialEnd = [[This is the end of the tutorial. Check out the <campaign> for a more thorough introduction. I can be re-enabled under <Help> in the <Menu>. Goodbye!
-<(Click next to end the tutorial)>]],
+			tutorialEnd = [[This is the end of the tutorial. Check out the <campaign> for a more thorough introduction. I can be re-enabled in the <Menu (F10)> under <Help>. Goodbye!
+<(Click next to cycle tips, or X to close the tutorial)>]],
 			
 			selectBuild_m = [[Select the #replace# from your build menu (build-icon shown here)]],
 			build_m = [[You are now building a #replace#. <Wait for it to finish.>]],
@@ -79,7 +79,7 @@ return {
 <(Click next to continue)>]],
 			epilogue5 = [[Knight and Sling are great at busting entrenched positions. Knight has the health to assault heavy turrets, while Sling can wear down defenses at long range.
 <(Click next to continue)>]],
-			epilogue6 = [[I'll skip describing the other units. <Hold space and click> on a button, unit or wreck to bring up a detailed description of the unit. Experiment with other units and factories.
+			epilogue6 = [[I'll skip describing the other units. <Hold space and click> on a unit, wreck, or construction icon to display a description of the unit. Experiment with other units and factories.
 <(Click next to continue)>]],
 			epilogue7 = [[Your commander is essentially an armed constructor. Always have your commander and at least one constructors out on the map building extra Metal Extractors.
 <(Click next to continue)>]],
@@ -89,17 +89,17 @@ return {
 <(Click next to continue)>]],
 			epilogue10 = [[You can also <click and drag> Repair, Reclaim and Force Fire to affect everything in an area.
 <(Click next to continue)>]],
-			epilogue11 = [[Repair heals units at the cost of energy and assists construction in an area.
+			epilogue11 = [[Repair assists construction, and uses energy to heal units.
 <(Click next to continue)>]],
-			epilogue12 = [[Reclaim gathers metal from destroyed units, and can be used on live units for a 50% refund.
+			epilogue12 = [[Reclaim gathers metal from wrecked units, and can be used on live units for a 50% refund.
 <(Click next to continue)>]],
 			epilogue13 = [[Everything costs equal amounts of metal and energy. Metal is harder to attain so try to have 1.5-2x more energy income than metal income. Keep your metal storage empty.
 <(Click next to continue)>]],
-			epilogue14 = [[Constructors spend at most their <buildpower> in metal and energy per second. A few <Caretakers> near a factory can increase production, but having too many is redudant.
+			epilogue14 = [[Constructors spend at most their <buildpower> in metal and energy per second. A few <Caretakers> near a factory can increase production, but having too many is redundant.
 <(Click next to continue)>]],
 			epilogue15 = [[Alternately, you can build a <Construction Plate>. To make one, select <Cloakbot Factory> from the <Factory> tab and place it in the circle that appears around your existing factory.
 <(Click next to continue)>]],
-			epilogue16 = [[Keep up production, expand your territory, and gather more resource. Perhaps diversify your forces with a new factory, such as a <Tank Foundry> or <Gunship Plant>.
+			epilogue16 = [[Keep up production, expand your territory, and gather more resources. Perhaps diversify your forces with a new factory, such as a <Tank Foundry> or <Gunship Plant>.
 <(Click next to continue)>]],
 		}
 	}, --end en
