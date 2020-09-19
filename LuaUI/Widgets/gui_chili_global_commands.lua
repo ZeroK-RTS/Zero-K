@@ -221,7 +221,7 @@ local commandButtonMouseDown = {
 		if not meta then
 			return false
 		end
-		WG.crude.OpenPath("Hotkeys/Commands")
+		WG.crude.OpenPath("Hotkeys/Commands/Targeted")
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
 	end

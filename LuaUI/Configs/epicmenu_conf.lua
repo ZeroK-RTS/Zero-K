@@ -326,19 +326,25 @@ local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Move Left', 'moveleft')
 	ShButton(camerHotkeys, 'Move Right', 'moveright')
 	ShLabel(camerHotkeys, '')
-	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
-	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Overview Mode', 'toggleoverview')
 	ShButton(camerHotkeys, 'Track unit', 'track')
 	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
-
-	ShLabel(camerHotkeys, '')
 	ShButton(camerHotkeys, 'Panning mode','mousestate', 'Note: must be bound to a key for use', true)
-	ShButton(camerHotkeys, 'Switch Default', 'viewta', nil, true)
-	ShButton(camerHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	ShButton(camerHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
-	ShButton(camerHotkeys, 'Switch Total War', 'viewtw', nil, true)
+	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
+	
+	ShLabel(camerHotkeys, 'Saving Position and Switching Camera')
+
+local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
+	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
+	
+local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
+	ShLabel(camerTypeHotkeys, 'Default and Rotatable work the best')
+	ShButton(camerTypeHotkeys, 'Switch Default', 'viewta', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
