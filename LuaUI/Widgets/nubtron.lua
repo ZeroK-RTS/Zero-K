@@ -263,7 +263,7 @@ CheckState = function()
 		curTaskNum = curTaskNum +1
 		if curTaskNum > #taskOrder then
 			curTaskNum = 1
-			--Spring.SendCommands({"luaui togglewidget Nubtron"})
+			--Spring.SendCommands({"luaui togglewidget Nubtron 2.0"})
 			--return
 		end
 		CheckState()
@@ -292,7 +292,7 @@ CheckState = function()
 			curTaskNum = curTaskNum + 1
 			if curTaskNum > #taskOrder then
 				curTaskNum = 1
-				--Spring.SendCommands({"luaui togglewidget Nubtron"})
+				--Spring.SendCommands({"luaui togglewidget Nubtron 2.0"})
 				--return
 			end
 		end
@@ -545,7 +545,7 @@ local function SetupNubtronWindow()
 		captionColor = {1,0,0,1},
 		OnClick = {
 			function(self)
-				Spring.SendCommands({"luaui togglewidget Nubtron"})
+				Spring.SendCommands({"luaui togglewidget Nubtron 2.0"})
 				--widgetHandler:RemoveWidget() --when using this, it requires two clicks to restart the widget from the menu
 			end
 		}
