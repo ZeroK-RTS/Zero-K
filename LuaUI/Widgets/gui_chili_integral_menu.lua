@@ -116,8 +116,8 @@ options_order = {
 	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
 
-local commandPanelPath = 'Hotkeys/Command Panel'
-local customGridPath = 'Hotkeys/Command Panel/Custom'
+local commandPanelPath = 'Hotkeys/Grid Hotkeys'
+local customGridPath = 'Hotkeys/Grid Hotkeys/Custom'
 local commandOptPath = 'Settings/Interface/Commands'
 
 local function UpdateHolderSizes()

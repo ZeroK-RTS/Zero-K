@@ -442,8 +442,8 @@ local function SetupText_test(_,_,words)
 end
 
 local function SetupNubtronWindow()
-	local imgsize = 80
-	local nextbuttonwidth = 40
+	local imgsize = 54
+	local nextbuttonwidth = 54
 	title = Label:New {
 		width="100%";
 		--height="100%";
@@ -453,7 +453,7 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = 'Title';
-		fontSize = 14;
+		fontSize = 16;
 		fontShadow = true;
 		parent = button;
 	}
@@ -467,7 +467,7 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = 'Tip';
-		fontSize = 10;
+		fontSize = 12;
 		fontShadow = true;
 		parent = button;
 	}
@@ -477,7 +477,7 @@ local function SetupNubtronWindow()
 		x=imgsize+2,
 		y=35,
 		bottom=0,
-		right = imgsize+2 + nextbuttonwidth,
+		right = 4 + nextbuttonwidth,
 		
 		autosize=false;
 		align="left";
@@ -505,7 +505,7 @@ local function SetupNubtronWindow()
 		width = nextbuttonwidth;
 		height = 50;
 		caption = 'Next',
-		right = imgsize+2,
+		right = 2,
 		bottom = 0,
 		OnClick = {
 			function(self)
@@ -515,7 +515,7 @@ local function SetupNubtronWindow()
 	}
 	local button_x = Button:New {
 		width = 20;
-		height = 15;
+		height = 20;
 		caption = 'X',
 		right = 2,
 		captionColor = {1,0,0,1},
@@ -527,16 +527,14 @@ local function SetupNubtronWindow()
 		}
 	}
 	
-		
-	
 	window_nubtron = Window:New{
 		parent = screen0,
 		name   = 'nubtron';
 		--color = {0, 0, 0, 0},
 		width = 550;
 		height = imgsize+20;
-		x = 450;
-		bottom = 52;
+		x = 30;
+		bottom = '28%';
 		dockable = false;
 		draggable = true,
 		resizable = false,
@@ -850,6 +848,13 @@ function widget:Update()
 		--local mCurrentLevel, mStorage, mPull, mIncome, mExpense, mShare, mSent, mReceived = GetTeamResources('teamID')
 		local mCurrentLevel, mStorage, mPull, mIncome = GetTeamResources(myTeamID, 'metal')
 		local eCurrentLevel, eStorage, ePull, eIncome = GetTeamResources(myTeamID, 'energy')
+		
+		if eIncome then
+			local energyIncome = Spring.GetTeamRulesParam(myTeamID, "OD_energyIncome") or 0
+			local energyChange = Spring.GetTeamRulesParam(myTeamID, "OD_energyChange") or 0
+			eIncome = eIncome + energyIncome - math.max(0, energyChange)
+		end
+		
 		metalIncome = mIncome
 		energyIncome = eIncome
 		

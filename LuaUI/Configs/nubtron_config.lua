@@ -109,11 +109,11 @@ local steps = {
 	},
 	showMetalMap = {
 		--message		= 'View the metal map by pressing <F4>.',
-		passIfAny	= { 'metalMapView' }
+		passIfAny	= {}, --{ 'metalMapView' }
 	},
 	hideMetalMap = {
 		--message		= 'Hide the metal map by pressing <F4>.',
-		passIfAnyNot	= { 'metalMapView' }
+		passIfAnyNot	= {}, --{ 'metalMapView' }
 	},
 
 	selectBotLab = {

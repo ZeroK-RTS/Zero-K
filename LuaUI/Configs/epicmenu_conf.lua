@@ -148,8 +148,15 @@ confdata.subMenuIcons = {
 	['Hotkeys/Camera']              = imgPath..'epicmenu/video_camera.png',
 	['Hotkeys/Construction']        = imgPath..'factory.png',
 	['Hotkeys/Selection']           = imgPath..'epicmenu/selection.png',
-	['Hotkeys/Commands']            = imgPath..'epicmenu/fingertap.png',
-	['Hotkeys/Command Panel']       = imgPath..'epicmenu/control_panel.png',
+	['Hotkeys/Commands']            = imgPath..'commands/Bold/move.png',
+	['Hotkeys/Grid Hotkeys']       = imgPath..'epicmenu/grid.png',
+	
+	['Hotkeys/Commands/Targeted']   = imgPath..'commands/Bold/attack.png',
+	['Hotkeys/Commands/Instant']    = imgPath..'commands/Bold/action.png',
+	['Hotkeys/Commands/State']      = imgPath..'commands/states/move_engage.png',
+	
+	['Hotkeys/Camera/Camera Position Hotkeys']     = imgPath..'epicmenu/marker.png',
+	['Hotkeys/Camera/Camera Mode Hotkeys']         = imgPath..'epicmenu/move.png',
 	
 	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
 	['Settings/Audio']              = imgPath..'epicmenu/vol.png',
@@ -160,6 +167,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Presets']        = imgPath..'epicmenu/speed-test-icon.png',
 	['Settings/Interface']          = imgPath..'epicmenu/robotarm.png',
 	['Settings/Misc']               = imgPath..'epicmenu/misc.png',
+	['Settings/Tips']    = imgPath..'epicmenu/questionmark.png',
 	
 	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
@@ -193,6 +201,12 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
 	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
 	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
+	['Settings/HUD Panels/Command Panel']           = imgPath..'epicmenu/control_panel.png',
+	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
+	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
+	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Spectator Panels']        = imgPath..'advplayerlist/spec.png',
+	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 }
 
 confdata.simpleModeDirectory = {
@@ -345,8 +359,10 @@ local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
 	ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
 	ShButton(camerTypeHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
 	ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
-	
-	
+
+-- Control menu order
+ShLabel('Hotkeys/Commands', 'Command Categories')
+
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
@@ -690,17 +706,31 @@ AddOption("Settings/HUD Panels/Pause Screen",
 	})
 
 --- HELP ---
-local pathHelp = 'Settings/Nag'
+local pathHelp = 'Help'
 	AddOption(pathHelp,
 	{
 		type='text',
-		name='Tips',
-		value = [[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options.
-		          You can also space-click on menu elements to see context settings. ]]
+		name='Space + Click Tips',
+		value = [[Hold Space and click on a unit or wreck to display detailed information.
+		  You can also space-click on commands and other interface elements to open their hotkey settings. ]]
 	})
-	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	AddOption(pathHelp,
+	{
+		type='text',
+		name='Ingame Tutorial',
+		value = [[The following tutorial guides you through setting up a base and producing units. It can be disabled at any time.]]
+	})
+	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	AddOption(pathHelp,
+	{
+		type='label',
+		name='Unit Lists and Concepts',
+	})
+	
+--- TIPS ---
+local pathTips = 'Settings/Tips'
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-local pathClippy = 'Settings/Nag/Clippy Comments'
+local pathClippy = 'Settings/Tips/Clippy Comments'
 	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC
