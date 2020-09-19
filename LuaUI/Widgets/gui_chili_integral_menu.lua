@@ -90,8 +90,7 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling and lower variables
 
-configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include("Configs/integral_menu_config.lua")
 
 local fontObjects = {} -- Filled in init
 
@@ -2510,8 +2509,6 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include(configurationName)
-	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")
 	initialized = true
