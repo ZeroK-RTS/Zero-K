@@ -75,6 +75,8 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spValidUnitID		= Spring.ValidUnitID
 
 local abs = math.abs
+local min = math.min
+local max = math.max
 
 local mapCenterX = Game.mapSizeX / 2
 local mapCenterZ = Game.mapSizeZ / 2
@@ -99,7 +101,7 @@ local settleInterval = 5
 local stoppedUnit = {}
 local enableIdleNanos = true
 local stopHalts = true
--- Map from unitID -> { checkTime, settleTime }
+-- Map from unitID -> { checkTime, settleTime, command }
 local trackedUnits = {}
 -- The current time, in seconds (I think)
 local time = 0
@@ -222,21 +224,43 @@ local function SetupUnit(unitID)
 		--LogTable(commandQueue, "  ")
 
 		--LogTable(cmd, "cmd: ")
+		local foundIssuedCommand = false
+		local foundAnyCommand = false
 		for _, current in pairs(commandQueue) do
 			--LogTable(current, "current:")
 			--Log(tostring(current.options.internal))
 			--Log(tostring(current.id == cmd[1]))
 			--Log(tostring(TableEqual(cmd[2], current.params)))
-			if not current.options.internal and 
-					current.id == cmd[1] and
+
+			if not current.options.internal then
+				foundAnyCommand = true
+				if current.id == cmd[1] and
 					TableEqual(cmd[2], current.params) then
-				--Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
-				return
+					Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
+					return
+				end
+
+				if trackedUnits[unitID].command and
+						current.id == trackedUnits[unitID].command[1] and
+						TableEqual(current.params, trackedUnits[unitID].command[2]) then
+				    foundIssuedCommand = true
+				end
 			end
 		end
-		Log("give order " .. CommandNames[cmd[1]] .. " to " .. unitID)
+
+		if foundAnyCommand and not foundIssuedCommand then
+			Log("Ignore unit " .. unitID .. " until it becomes idle.")
+			LogTable(commandQueue, "  command queue:")
+			trackedUnits[unitID] = nil
+			return
+		end
+
+		Log("give order " .. CommandNames[cmd[1]] .. " to " .. unitID ..
+				" @ " .. x .. ", " .. y .. ", " .. z)
+		LogTable(cmd[2], "  order args: ")
 		spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
 		trackedUnits[unitID].settleTime = time + settleInterval
+		trackedUnits[unitID].command = cmd
 	end
 end
 
@@ -305,30 +329,45 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	UpdateNextCheck()
 end
 
--- Called (I think) when a user issues a command after selecting some unit.
-function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	-- TODO: How does this work when commanders are shared?
-	local selectedUnits = spGetSelectedUnits()
-	for _, unitID in ipairs(selectedUnits) do
-		if trackedUnits[unitID] ~= nil then
-			Log("Ignore unit " .. unitID .. " until it becomes idle.")
-		end
-		trackedUnits[unitID] = nil
-		if stopHalts then
-			if cmdID == CMD_STOP then
-				if stoppedUnit[unitID] == nil then
-					Log("Ignore unit " .. unitID .. " until it is given a command.")
-				end
-				stoppedUnit[unitID] = true
-			elseif stoppedUnit[unitID] then
-				if stoppedUnit[unitID] ~= nil then
-					Log("Pay attention to unit " .. unitID .. " again.")
-				end
-				stoppedUnit[unitID] = nil
+-- Called whenever a unit gets a command from any source, including this script!
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if trackedUnits[unitID] == nil then
+		return
+	end
+
+	--Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
+	--LogTable(cmdParams, "  params: ")
+	--LogTable(cmdOptions, "  options: ")
+
+	if stopHalts then
+		if cmdID == CMD_STOP then
+			if stoppedUnit[unitID] == nil then
+				Log("Ignore unit " .. unitID .. " until it is given a command.")
 			end
+			stoppedUnit[unitID] = true
+		elseif stoppedUnit[unitID] then
+			if stoppedUnit[unitID] ~= nil then
+				Log("Pay attention to unit " .. unitID .. " again.")
+			end
+			stoppedUnit[unitID] = nil
 		end
 	end
 end
+
+-- Called (I think) when a user issues a command after selecting some unit.
+--function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+--	Log("CommandNotify(" .. cmdID .. ")")
+--	LogTable(cmdParams, "  params: ")
+--	LogTable(cmdOptions, "  options: ")
+--	-- TODO: How does this work when commanders are shared?
+--	local selectedUnits = spGetSelectedUnits()
+--	for _, unitID in ipairs(selectedUnits) do
+--		if trackedUnits[unitID] ~= nil then
+--			Log("Ignore unit " .. unitID .. " until it becomes idle.")
+--		end
+--		trackedUnits[unitID] = nil
+--	end
+--end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
@@ -358,15 +397,15 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	trackedUnits[unitID] = trackedUnits[unitID] or 
 			{checkTime=time + delta, settleTime=time+delta}
 	trackedUnits[unitID].checkTime =
-		math.max(
-			math.min(
+		max(
+			min(
 				trackedUnits[unitID].checkTime,
 				trackedUnits[unitID].settleTime),
 			time + delta)
 	if nextCheck == nil then
 		nextCheck = time + delta
 	else
-		nextCheck = math.min(nextCheck, trackedUnits[unitID].checkTime)
+		nextCheck = min(nextCheck, trackedUnits[unitID].checkTime)
 	end
 	--LogTable(trackedUnits[unitID], "+ ")
 end
