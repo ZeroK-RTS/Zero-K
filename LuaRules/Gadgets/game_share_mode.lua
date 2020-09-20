@@ -2,18 +2,20 @@ function gadget:GetInfo()
 	return {
 		name	 = "Share mode",
 		desc	 = "Allows one to share control of resources and units with other players.",
-		author	 = "_Shaman",
+		author	 = "Shaman",
 		date	 = "6-23-2016",
-		license	 = "Do whatever you want with it, just give credit",
+		license	 = "PD",
 		layer	 = 0,
 		enabled	 = true,
 	}
 end
 
--- Remove unsync and remove if off --
 
-if gadgetHandler:IsSyncedCode() == false then
-	return
+if not gadgetHandler:IsSyncedCode() then
+	local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
+	function gadget:PlayerChanged(playerID)
+		spSendLuaRulesMsg("sharemode playerchanged " .. playerID) -- tell synced land that I changed status.
+	end
 end
 
 --------------------------------------------------------
@@ -25,7 +27,10 @@ local strFind = string.find
 local strLower = string.lower
 
 -- Spring API --
+local spIsCheatingEnabled = Spring.IsCheatingEnabled
 local spEcho = Spring.Echo
+local spIsGameOver = Spring.IsGameOver
+local spGetPlayerRulesParam = Spring.GetPlayerRulesParam
 local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetTeamInfo = Spring.GetTeamInfo
@@ -36,6 +41,7 @@ local spShareTeamResource = Spring.ShareTeamResource
 local spValidUnitID = Spring.ValidUnitID
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local spGetTeamList = Spring.GetTeamList
 local spGetTeamResources = Spring.GetTeamResources
 local spGetUnitTeam = Spring.GetUnitTeam
@@ -44,7 +50,7 @@ local spGetAllyTeamList = Spring.GetAllyTeamList
 local spGetGameFrame = Spring.GetGameFrame
 
 -- Other --
-local public = {public = true}
+local public = {public = true} -- this is a speedup for gamerules playerrules, etc.
 local GaiaID = Spring.GetGaiaTeamID()
 
 --------------------------------------------------------
@@ -67,11 +73,13 @@ end
 
 --------------------------------------------------------
 -- Variables
-local invites = {}
-local controlledPlayers = {} -- table containing which team a playerID should be under.
-local controlledTeams = {} -- contains which team a team of players should be under.
-local originalTeamID = {} -- takes playerID as the key, gives the team as the value.
+local debugMode = false
+local firstError = true
+local playerstates = {} -- keeps track of player states so that we can remerge them if necessary.
+local invites = {} -- the invites people have out.
 local originalUnits = {} -- contains which units are owned by a team that has commshared.
+local updateplayers = {}
+local updateplayercount = 0
 
 local firstMintime = true -- Partial initialize in gameframe after the game starts
 
@@ -93,6 +101,15 @@ local function IsTeamLeader(playerID)
 		return true
 	else
 		return false
+	end
+end
+
+local function GetNewLeader(teamID)
+	local playerlist = spGetPlayerList(teamID)
+	for i=1, #playerlist do
+		if not IsTeamLeader(playerlist[i]) then
+			return playerlist[i]
+		end
 	end
 end
 
@@ -129,10 +146,21 @@ end
 
 local function IsTeamAfk(teamID)
 	local _, shares = GG.Lagmonitor.GetResourceShares()
-	if shares == 0 then
-		return true
-	else
-		return false
+	if debugMode then spEcho("Shares: " .. tostring(shares[teamID])) end
+	return shares[teamID] == 0
+end
+
+local function UnmergeUnits(orgTeamID, newOwner)
+	local unitID
+	local units = originalUnits[orgTeamID]
+	for i = 1, #units do
+		unitID = units[i]
+		if spValidUnitID(unitID) and spAreTeamsAllied(spGetUnitTeam(unitID), orgTeamID) then
+			spTransferUnit(unitID, newOwner, true)
+		end
+	end
+	if newOwner == orgTeamID then
+		originalUnits[orgTeamID] = nil
 	end
 end
 
@@ -140,21 +168,34 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 	local name = spGetPlayerInfo(playerID, false)
 	if not config.permanentMerge then
 		spEcho("game_message: Unmerging player " .. name)
-		if originalTeamID[playerID] then
-			local orgTeamID = originalTeamID[playerID]
+		if spGetPlayerRulesParam(playerID,"commshare_orig_teamid") then
+			local orgTeamID = spGetPlayerRulesParam(playerID,"commshare_orig_teamid")
 			spAssignPlayerToTeam(playerID,orgTeamID)
-			controlledTeams[orgTeamID] = nil
-			local unitID
-			for i = 1, #originalUnits[orgTeamID] do
-				unitID = originalUnits[orgTeamID][i]
-				if spValidUnitID(unitID) and spAreTeamsAllied(spGetUnitTeam(unitID), orgTeamID) then
-					spTransferUnit(unitID, orgTeamID, true)
+			UnmergeUnits(orgTeamID, orgTeamID)
+			spSetTeamRulesParam(orgTeamID, "isCommsharing", nil)
+			spSetPlayerRulesParam(playerID,"commshare_team_id",nil)
+			spSetPlayerRulesParam(playerID,"commshare_orig_teamid",nil)
+		elseif IsTeamLeader(playerID) then -- leader wants to unmerge
+			local myteamid = GetTeamID(playerID)
+			local playerlist = spGetPlayerList(myteamid)
+			local newleader = GetNewLeader(myteamid)
+			local leaderTeam = spGetPlayerRulesParam(newleader,"commshare_orig_teamid")
+			spSetTeamRulesParam(leaderTeam, "isCommsharing", nil) -- clean up the new leader.
+			spSetPlayerRulesParam(newleader,"commshare_team_id",nil)
+			spSetPlayerRulesParam(newleader,"commshare_orig_teamid",nil)
+			spAssignPlayerToTeam(newleader,leaderTeam)
+			UnmergeUnits(leaderTeam, leaderTeam)
+			for i=1, #playerlist do
+				if playerlist[i] ~= playerID and playerlist[i] ~= newleader then -- don't reproccess
+					local myOldTeam = spGetPlayerRulesParam(newleader,"commshare_orig_teamid")
+					UnmergeUnits(myOldTeam, leaderTeam)
+					spSetTeamRulesParam(myOldTeam,"isCommsharing",newleader,public)
+					spSetPlayerRulesParam(playerlist[i],"commshare_team_id",leaderTeam)
+					spAssignPlayerToTeam(playerlist[i],leaderTeam)
 				end
 			end
-			spSetTeamRulesParam(originalTeamID[playerID], "isCommsharing", nil)
-			originalUnits[orgTeamID], controlledPlayers[playerID] = nil, nil
 		else
-			spEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)")
+			if debugMode then spEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)") end
 		end
 	else
 		spEcho("[Commshare]: Unmerging is forbidden in this game mode!")
@@ -164,8 +205,9 @@ end
 local function MergeUnits(teamID, target)
 	originalUnits[teamID] = spGetTeamUnits(teamID)
 	local unitID
-	for i = 1, #originalUnits[teamID] do
-		unitID = originalUnits[teamID][i]
+	local units = originalUnits[teamID]
+	for i = 1, #units do
+		unitID = units[i]
 		if spValidUnitID(unitID) then
 			spTransferUnit(unitID, target, true)
 		end
@@ -174,29 +216,31 @@ end
 	
 local function MergePlayer(playerID,target)
 	if playerID == nil then
-		spEcho("[Commshare] Tried to merge a nil player!")
+		if debugMode then spEcho("[Commshare] Tried to merge a nil player!") end
 		return
 	end
 	local orgTeamID = GetTeamID(playerID)
 	local name,_,spec,_,_,allyteam  = spGetPlayerInfo(playerID, false)
 	if spAreTeamsAllied(orgTeamID,target) and (not spec) and target ~= GaiaID then
-		spEcho("[Commshare] Assigning player id " .. playerID .. "(" .. name .. ") to team " .. target)
+		if debugMode then spEcho("[Commshare] Assigning player id " .. playerID .. "(" .. name .. ") to team " .. target) end
 		if GetSquadSize(orgTeamID) - 1 == 0 then
 			local metal = spGetTeamResources(orgTeamID,"metal")
 			local energy = spGetTeamResources(orgTeamID,"energy")
-			controlledTeams[orgTeamID] = target
 			spShareTeamResource(orgTeamID,target,"metal",metal)
 			spShareTeamResource(orgTeamID,target,"energy",energy)
+			spSetTeamRulesParam(orgTeamID,"isCommsharing",target,public) -- this team is commsharing under this teamid.
 			MergeUnits(orgTeamID,target)
-			spSetTeamRulesParam(orgTeamID,"isCommsharing",target,public)
+		end
+		spSetPlayerRulesParam(playerID, "commshare_team_id",target,public) -- this player is commsharing under this teamid
+		if spGetPlayerRulesParam(playerID, "commshare_orig_teamid") == nil then -- first merges always store their original teamIDs.
+			spSetPlayerRulesParam(playerID, "commshare_orig_teamid",orgTeamID,public)
+		end
+		if spGetTeamRulesParam(target,"isCommsharing") then -- completely delete this nasty bug where rejoining and inviting your original squad would give all nanoframes to your old team ID, rendering your squad useless.
+			spSetTeamRulesParam(target,"isCommsharing",nil)
 		end
 		spAssignPlayerToTeam(playerID,target)
-		if originalTeamID[playerID] == nil then
-			originalTeamID[playerID] = orgTeamID
-		end
-		controlledPlayers[playerID] = target
 	else
-		spEcho("[Commshare] Merger error.")
+		spEcho("[Commshare] Merge error.")
 	end
 end
 
@@ -213,14 +257,14 @@ local function MergeAllHumans(teamlist)
 		local _, teamLeader, _, AI = spGetTeamInfo(teamlist[i], false)
 		local human = not AI and teamLeader ~= -1
 		if human and mergeid ~= -1 then
-			spEcho("[Commshare] Merging team " .. teamlist[i])
+			if debugMode then spEcho("[Commshare] Merging team " .. teamlist[i]) end
 			-- Needed because of recursion error. Only one player on a team at game start anyways.
 			MergePlayer(teamLeader,mergeid)
 		elseif human and mergeid == -1 then
 			mergeid = teamlist[i]
-			spEcho("[Commshare] MergeID is " .. mergeid)
+			if debugMode then spEcho("[Commshare] MergeID is " .. mergeid) end
 		else
-			spEcho("[Commshare] Skipping team " .. i .. " [inhuman]")
+			if debugMode then spEcho("[Commshare] Skipping team " .. i .. " [inhuman]") end
 		end
 	end
 end
@@ -230,13 +274,13 @@ local function MergeAll()
 	for i = 1, #ally do
 		local teamlist = spGetTeamList(ally[i])
 		if #teamlist > 1 then
-			spEcho("[Commshare] Merging alliance " .. i)
+			if debugMode then spEcho("[Commshare] Merging alliance " .. i) end
 			MergeAllHumans(teamlist)
 		end
 	end
 end
 
-local function SendInvite(player, target) -- targetid is which player is the merger
+local function SendInvite(player, target) -- target is which player the player is trying to merge with.
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target, false))
 		local _,_,dead,ai = spGetTeamInfo(GetTeamID(target), false)
@@ -264,7 +308,7 @@ end
 local function AcceptInvite(player,target)
 	spEcho("verifying invite")
 	if invites[player][target] then
-		spEcho("invite verified")
+		if debugMode then spEcho("[Commshare] invite verified") end
 		local teamID = GetTeamID(player)
 		if GetTeamLeader(teamID) == player and GetSquadSize(teamID) > 1 then
 			MergeTeams(GetTeamID(player),GetTeamID(target))
@@ -280,6 +324,83 @@ local function AcceptInvite(player,target)
 	end
 end
 
+local function DisposePlayer(playerID) -- clean up this player. Called 1 frame after players resign (to prevent multiple calls)
+	if spIsGameOver() then -- Don't even bother processing.
+		return
+	end
+	local name = spGetPlayerInfo(playerID,false)
+	local teamid = playerstates[playerID].teamid
+	if debugMode then spEcho("[Commshare] Disposing of player " .. name) end
+	if debugMode then spEcho("TeamID: " .. tostring(teamid) .. "\nIsTeamLeader: " .. tostring(IsTeamLeader(playerID)) .. "\nSquadsize: " .. GetSquadSize(teamid)) end
+	if invites[playerID] then
+		local i = 0
+		for key,data in pairs(invites[playerID]) do -- kill off invites.
+			i = i + 1
+			spSetPlayerRulesParam(player, "commshare_invite_" .. i .. "_id", nil)
+			spSetPlayerRulesParam(player, "commshare_invite_" .. i .. "_timeleft", nil)
+			spSetPlayerRulesParam(player, "commshare_invitecount",nil)
+		end
+		invites[playerID] = nil
+	end
+	spSetPlayerRulesParam(playerID,"commshare_team_id", nil)
+	local origteam = spGetPlayerRulesParam(playerID,"commshare_orig_teamid")
+	if origteam then -- force original team to resign.
+		spEcho("game_message: " .. name .. " resigned.")
+		originalUnits[origteam] = nil
+		spSetTeamRulesParam(origteam,"isCommsharing",nil)
+	else
+		local squadsize = GetSquadSize(teamid) + 1
+		local newleader = select(2,spGetTeamInfo(teamid,false))
+		local newleadername,_ = spGetPlayerInfo(newleader,false)
+		if squadsize > 2 then -- needed because often times squad members resign and there's no resign message. (This is because lagmonitor doesn't see a team dying I think. We're dealing with players after all.)
+			spEcho("game_message: " .. name .. " resigned, transfering squad lead to " .. newleadername .. ".")
+		elseif squadsize == 2 then
+			spEcho("game_message: " .. name .. " resigned. Squad broken!")
+		end
+	end
+	spSetPlayerRulesParam(playerID, "commshare_orig_teamid",nil)
+	playerstates[playerID] = nil
+end
+
+local function CheckIfAlreadyExists(targetID)
+	if updateplayercount == 0 then
+		return false
+	end
+	for i=1, updateplayercount do
+		if updateplayers[updateplayercount].playerID == targetID then
+			return true
+		end
+	end
+	return false
+end
+
+local function AddUpdatePlayer(targetID, status)
+	if CheckIfAlreadyExists(targetID) then
+		return
+	end
+	updateplayercount = updateplayercount + 1
+	if updateplayers[updateplayercount] then
+		updateplayers[updateplayercount].playerID = targetID
+		updateplayers[updateplayercount].status = status
+	else
+		updateplayers[updateplayercount] = {playerID = targetID, status = status}
+	end
+end
+
+local function RemergePlayer(targetID)
+	local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
+	MergePlayer(targetID,commshareID)
+end
+
+---------------- Debug ---------------------
+
+local function ToggleDebug()
+	if spIsCheatingEnabled() then -- toggle debugMode
+		debugMode = not debugMode
+		if debugMode then spEcho("[Commshare] Debug enabled.") else spEcho("[Commshare] Debug disabled.") end
+	end
+end
+
 ------------------ Callins ------------------
 	
 function gadget:GameFrame(frame)
@@ -288,6 +409,7 @@ function gadget:GameFrame(frame)
 		for player, playerInvites in pairs(invites) do
 			invitecount = 0
 			for key,data in pairs(playerInvites) do
+				if debugMode then spEcho("player: " .. player .. ", invite: " .. key) end
 				invitecount = invitecount+1
 				if data.timeleft > 0 then
 					data.timeleft = data.timeleft - 1
@@ -313,88 +435,123 @@ function gadget:GameFrame(frame)
 		MergeAll()
 		firstMintime = false
 	end
+	if updateplayercount > 0 and not spIsGameOver() then -- this is prevent excessive processing on game over.
+		local player
+		for i=1, updateplayercount do
+			player = updateplayers[i]
+			if player.status == "dead" then
+				DisposePlayer(updateplayers[i].playerID)
+			elseif player.status == "remerge" then
+				RemergePlayer(updateplayers[i].playerID)
+			end
+		end
+		updateplayercount = 0
+	end
 end
 
-function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to interact with the gadget
-	if strFind(message, "sharemode") then
-		local command,targetID = ProccessCommand(strLower(message))
-		local name = select(1, spGetPlayerInfo(playerID, false))
-		if command == nil then
-			spEcho("[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
+function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to interact with the gadget. Also handles PlayerChanged.
+	if not (message and strFind(message, "sharemode")) then
+		return
+	end
+	local command,targetID = ProccessCommand(strLower(message))
+	local name, active, spectator, teamID,_,_,_,_,_,cp = spGetPlayerInfo(playerID, false)
+	
+	if command == nil and (debugMode or firstError) then
+		spEcho("LUA_ERRRUN", "[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
+		firstError = false
+		return
+	end
+	
+	-- process augs --
+	if targetID then
+		targetID = strGsub(targetID,"%D","")
+		if targetID ~= "" then
+			targetID = tonumber(targetID)
+		end
+	end
+	
+	if debugMode then spEcho("[Commshare] Command: " .. tostring(command) .. " from " .. playerID) end
+	if strFind(command,"unmerge") then
+		local afk = IsTeamAfk(GetTeamID(playerID))
+		if debugMode then spEcho("team is afk: " .. tostring(afk)) end
+		if not afk and #spGetPlayerList(playerID) > 1 then
+			UnmergePlayer(playerID)
+			return
+		else
+			spEcho("[Commshare] " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
 			return
 		end
-		-- process augs --
-		if targetID then
-			targetID = strGsub(targetID,"%D","")
-			if targetID ~= "" then
-				targetID = tonumber(targetID)
-			end
+	end
+	
+	if type(targetID) ~= "number" then
+		return
+	end
+	
+	-- Commands with a targetID associated with them--
+	if strFind(command, "invite") then
+		SendInvite(playerID, targetID)
+		if invites[playerID] and invites[playerID][targetID] and invites[targetID] and invites[targetID][playerID] then
+			AcceptInvite(playerID,targetID)
 		end
-
-		if strFind(command,"remerge") then -- remerging seems impossible gadget side.
-			local _,active,spec,_ = spGetPlayerInfo(playerID, false)
-			if controlledPlayers[playerID] and not spec then
-				spAssignPlayerToTeam(playerID, controlledPlayers[playerID])
-				spEcho("game_message: Player " .. name .. " has been remerged!")
-			end
-		elseif strFind(command,"unmerge") then
-			local afk = IsTeamAfk(GetTeamID(playerID))
-			spEcho("team is afk: " .. tostring(afk))
-			if controlledPlayers[playerID] and not afk then
-				UnmergePlayer(playerID)
-				return
+	elseif command:find("playerchanged") then -- hack in remerging. this is sent by the gadget's unsynced stuff.
+		local targetName, targetActive, targetSpectator, targetTeamID = spGetPlayerInfo(targetID, false)
+		if debugMode then spEcho("[Commshare] Playerchanged: " .. targetID .. "( " .. targetName .. ")") end
+		local commshareID = spGetPlayerRulesParam(targetID, "commshare_team_id")
+		if debugMode then spEcho("[Commshare] playerstates exists for player: " .. tostring(playerstates[targetID] == nil) .. "\nSpectator: " .. tostring(targetSpectator))) end
+		if not targetSpectator then
+			if not playerstates[targetID] then -- this player has commshared or changed state.
+				if debugMode then spEcho("[Commshare] generated playerstate table for playerID " .. targetID .. " (" .. targetName .. ")") end
+				playerstates[targetID] = {active = targetActive, spectator = targetSpectator, teamid = targetTeamID}
 			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't on a squad!")
-				return
-			end
-		end
-
-		if type(targetID) ~= "number" then
-			return
-		end
-
-		-- Do commands --
-		if strFind(command, "invite") then
-			SendInvite(playerID, targetID)
-			if invites[playerID] and invites[playerID][targetID] and invites[targetID] and invites[targetID][playerID] then
-				AcceptInvite(playerID,targetID)
-			end
-		elseif strFind(command, "accept") then
-			if invites[playerID] and invites[playerID][targetID] then
-				AcceptInvite(playerID,targetID)
-				return
-			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid accept command: " .. targetID .. " doesn't exist.")
-			end
-		elseif strFind(command,"decline") then
-			if invites[playerID] then
-				invites[playerID][targetID] = nil
-			end
-		elseif strFind(command,"kick") then
-			if IsTeamLeader(playerID) then
-				if IsPlayerOnSameTeam(playerID,targetID) then
-					UnmergePlayer(targetID)
-					return
-				else
-					spEcho("[Commshare] " .. playerID .. "(" .. name .. ") tried to kick a player that isn't on their team! ID: " .. targetID)
-					return
+				if debugMode then spEcho("[Commshare] PlayerChange: " .. targetName .."(ID: " .. targetID ..")\nActive: " .. tostring(playerstates[targetID].active) .. "->" .. tostring(targetActive) .. "\nSpectator: " .. tostring(playerstates[targetID].spectator) .. "->" .. tostring(targetSpectator) .."\nMergeID: " .. tostring(commshareID)) end
+				if targetActive ~= playerstates[targetID].active and targetActive and commshareID then -- this player has reconnected.
+					AddUpdatePlayer(targetID,"remerge")
+					if debugMode then spEcho("[Commshare] Remerged " .. targetName) end
 				end
+				playerstates[targetID].active = targetActive
+				playerstates[targetID].spectator = targetSpectator
+				playerstates[targetID].teamid = targetTeamID
+			end
+		elseif spectator and playerstates[targetID] then -- this player resigned
+			if debugMode then spEcho("[Commshare] Disposing of " .. targetName) end
+			AddUpdatePlayer(targetID,"dead")
+			return
+		end
+	elseif strFind(command, "accept") then
+		if invites[playerID] and invites[playerID][targetID] then
+			AcceptInvite(playerID,targetID)
+			return
+		else
+			spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid accept command: " .. targetID .. " doesn't exist.")
+		end
+	elseif strFind(command,"decline") then
+		if invites[playerID] then
+			invites[playerID][targetID] = nil
+		end
+	elseif strFind(command,"kick") then
+		if IsTeamLeader(playerID) then
+			if IsPlayerOnSameTeam(playerID,targetID) then
+				UnmergePlayer(targetID)
+				return
 			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't a leader! Cannot kick this player.")
+				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") tried to kick a player that isn't on their team! ID: " .. targetID)
 				return
 			end
+		else
+			spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't a leader! Kick is not allowed.")
+			return
 		end
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if controlledTeams[unitTeam] then
-		spTransferUnit(unitID, controlledTeams[unitTeam], true) -- this is in case of late commer coms,etc.
+	if spGetTeamRulesParam(unitTeam,"isCommsharing") then
+		local commshareTeamID = spGetTeamRulesParam(unitTeam,"isCommsharing")
+		if debugMode then Echo("[Commshare] unitCreated triggered for " .. unitTeam .. ", given to " .. commshareTeamID) end
+		spTransferUnit(unitID, commshareTeamID, true) -- this is in case of late commer coms,etc.
 	end
 end
---[[ No longer needed since share menu does not allow empty teams to receive units. Unbind sharedialogue instead!
-function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	if controlledTeams[newTeam] and GetSquadSize(oldTeam) > 0 then
-		spTransferUnit(unitID, controlledTeams[newTeam], true)
-	end
-end]]
+
+function gadget:Initialize()
+	gadgetHandler:AddChatAction("debugcommshare", ToggleDebug, "Toggles Commshare debugMode echos.")
+end
