@@ -20,9 +20,10 @@ local lastAlertX, lastAlertY, lastAlertZ
 local zoomTime = 0
 local recallTime = 0
 local savedCameraPositions = {}
+local savedCameraStates = {}
 
 options_path = 'Hotkeys/Camera/Camera Position Hotkeys'
-options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'pos_zoom_speed', 'recallStartPos'}
+options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'savezoom', 'pos_zoom_speed', 'recallStartPos'}
 options = {
 	lbl_alert = {
 		type = 'label',
@@ -70,6 +71,13 @@ options = {
 		type = 'label',
 		name = 'Position Save/Recall Hotkeys',
 	},
+	savezoom = {
+		name = 'Save zoom as well as position',
+		desc = 'Save more information about the camera state. This may break if you change camera type midgame.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
 	pos_zoom_speed = {
 		name = 'Position transition time',
 		type = "number",
@@ -101,8 +109,12 @@ for i = 1, 10 do
 		name = "Save Camera Position " .. i,
 		type = 'button',
 		OnChange = function()
-			local cx, cy, cz = Spring.GetCameraPosition()
-			savedCameraPositions[i] = {cx, cy, cz}
+			if options.savezoom.value then
+				savedCameraStates[i] = Spring.GetCameraState()
+			else
+				local cx, cy, cz = Spring.GetCameraPosition()
+				savedCameraPositions[i] = {cx, cy, cz}
+			end
 		end
 	}
 	options_order[#options_order + 1] = saveName
@@ -111,9 +123,15 @@ for i = 1, 10 do
 		name = "Recall Camera Position " .. i,
 		type = 'button',
 		OnChange = function()
-			local data = savedCameraPositions[i]
-			if data[1] and data[2] and data[3] then
-				Spring.SetCameraTarget(data[1], data[2], data[3], recallTime)
+			if options.savezoom.value then
+				if savedCameraStates[i] then
+					Spring.SetCameraState(savedCameraStates[i], recallTime)
+				end
+			else
+				local data = savedCameraPositions[i]
+				if data[1] and data[2] and data[3] then
+					Spring.SetCameraTarget(data[1], data[2], data[3], recallTime)
+				end
 			end
 		end
 	}
