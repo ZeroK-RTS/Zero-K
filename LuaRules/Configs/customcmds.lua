@@ -44,7 +44,6 @@ local cmds = {
 	AREA_MEX = 30100,
 	STEALTH = 31100,
 	CLOAK_SHIELD = 31101,
-	MINE = 	31105, -- easymetal2
 	RAW_MOVE = 31109, --cmd_raw_move.lua
 	RAW_BUILD = 31110, --cmd_raw_move.lua -- unregistered raw move
 	EMBARK = 31200, --unit_transport_ai_button.lua
