@@ -29,7 +29,7 @@ end
 
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 	if (capture
-	or (spAreTeamsAllied(oldTeam, newTeam) and not IsTeamAfk(newTeam))
+	or (spAreTeamsAllied(oldTeam, newTeam)) -- and not IsTeamAfk(newTeam))
 	or spIsCheatingEnabled()
 	or ((newTeam == gaiaTeamID) and (spGetUnitRulesParam(unitID, "can_share_to_gaia") == 1)) -- for Planet Wars
 	) then
