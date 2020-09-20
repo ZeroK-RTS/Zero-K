@@ -457,7 +457,7 @@ Complete Overhead/Free Camera has six actions:
 	scrollhelp = {
 		name = 'Scroll Hotkeys',
 		type = 'text',
-		value = [[Scroll hotkeys can be set by navigating to Hotkeys/Camera.]],
+		value = [[The scroll keys (arrow keys by default) can be set in Hotkeys/Camera.]],
 		path = scrollPath,
 	},
 

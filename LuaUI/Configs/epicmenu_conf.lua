@@ -359,10 +359,10 @@ local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
 		name='Camera Modes',
 		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
 	})
-	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
 	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
 	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
 	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
 
 -- Control menu order
