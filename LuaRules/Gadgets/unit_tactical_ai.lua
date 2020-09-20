@@ -1049,7 +1049,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		receivedOrder = false,
 		allyTeam = spGetUnitAllyTeam(unitID),
 	}
-	AddIdleUnit(unitID, unitDefID)
 	
 	if not behaviour.onlyIdleHandling then
 		if (behaviour.defaultAIState == 1) then
