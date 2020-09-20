@@ -717,13 +717,14 @@ local pathHelp = 'Help'
 		type='text',
 		name='Space + Click Tips',
 		value = [[Hold Space and click on a unit or wreck to display detailed information.
-		  You can also space-click on commands and other interface elements to open their hotkey settings. ]]
+        You can also space-click on commands and other interface elements to open their hotkey settings. ]]
 	})
 	AddOption(pathHelp,
 	{
 		type='text',
 		name='Ingame Tutorial',
-		value = [[Enable an interactive tutorial about setting up a base and producing units. It can be disabled at any time. Only availible when playing (not spectating) a non-campaign game.]]
+		value = [[The button below guides you through the whys and hows of setting up a base and advancing with an army. It can be disabled at any time.
+        This tutorial is not availible in the campaign or when spectating.]]
 	})
 	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron 2.0"} end )
 	AddOption(pathHelp,
