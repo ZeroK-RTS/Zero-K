@@ -136,6 +136,8 @@ local tempConditions = {
 local lang = 'en'
 local NUBTRON_IMAGE = 'LuaUI/Images/advisor2.jpg'
 
+local NUBTRON_NAME = "nubtron_progress:task_"
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -266,6 +268,9 @@ CheckState = function()
 			--Spring.SendCommands({"luaui togglewidget Nubtron 2.0"})
 			--return
 		end
+		if WG.Analytics then
+			WG.Analytics.SendOnetimeEvent(NUBTRON_NAME .. curTaskNum .. "_step_" .. curStepNum)
+		end
 		CheckState()
 		return
 	end
@@ -286,6 +291,9 @@ CheckState = function()
 		if curStepNum < #taskStates then
 			--Spring.Echo("stepPass", curTaskNum, curStepNum, math.random())
 			curStepNum = curStepNum + 1
+			if WG.Analytics then
+				WG.Analytics.SendOnetimeEvent(NUBTRON_NAME .. curTaskNum .. "_step_" .. curStepNum)
+			end
 		else
 			--Spring.Echo("stepPass reset", curTaskNum, curStepNum, math.random())
 			curStepNum = 1
@@ -294,6 +302,9 @@ CheckState = function()
 				curTaskNum = 1
 				--Spring.SendCommands({"luaui togglewidget Nubtron 2.0"})
 				--return
+			end
+			if WG.Analytics then
+				WG.Analytics.SendOnetimeEvent(NUBTRON_NAME .. curTaskNum .. "_step_" .. curStepNum)
 			end
 		end
 		
