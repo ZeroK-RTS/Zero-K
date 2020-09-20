@@ -27,8 +27,8 @@ local function SingleplayerMode()
 end
 
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
-if VFS.FileExists("mission.lua") or campaignBattleID then
-  -- don't run in a mission
+if VFS.FileExists("mission.lua") or campaignBattleID or Spring.GetSpectatingState() then
+  -- don't run in a mission or when spectating.
 	return
 end
 
