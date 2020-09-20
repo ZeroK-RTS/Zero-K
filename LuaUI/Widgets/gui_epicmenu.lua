@@ -3357,6 +3357,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 			get_key_bind_notify_function = false
 		end
 		
+		if WG.COFC_HotkeyChangeNotification then
+			WG.COFC_HotkeyChangeNotification()
+		end
+		
 		return true
 	end
 	

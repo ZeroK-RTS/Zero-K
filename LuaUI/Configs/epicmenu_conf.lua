@@ -308,11 +308,11 @@ local cameraPath = 'Settings/Camera'
 	ShRadio( cameraPath,
 		'Camera Type', {
 			{name = 'Default camera', key='Default', desc='Default camera', hotkey=nil},
-			{name = 'FPS',key='FPS', hotkey=nil},
-			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
-			{name = 'Total War',key='Total War',  hotkey=nil},
-			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'COFC (highly configurable)',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'FPS (experimental)',key='FPS', hotkey=nil},
+			{name = 'Free (experimental)',key='Free', hotkey=nil},
+			{name = 'Total War (experimental)',key='Total War',  hotkey=nil},
 		},'Default',
 		function(self)
 			local key = self.value
@@ -353,12 +353,17 @@ local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
 	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
 	
 local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
-	ShLabel(camerTypeHotkeys, 'Default and Rotatable work the best')
-	ShButton(camerTypeHotkeys, 'Switch Default', 'viewta', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
-	ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
+	AddOption(camerTypeHotkeys,
+	{
+		type='text',
+		name='Camera Modes',
+		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
+	})
+	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta', nil, true)
+	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot', nil, true)
+	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
 
 -- Control menu order
 ShLabel('Hotkeys/Commands', 'Command Categories')

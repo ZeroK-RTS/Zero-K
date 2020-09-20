@@ -35,12 +35,12 @@ local overrideTiltValue = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Camera/Camera Controls'
-local zoomPath = 'Settings/Camera/Camera Controls/Zoom Behaviour'
-local rotatePath = 'Settings/Camera/Camera Controls/Rotation Behaviour'
-local scrollPath = 'Settings/Camera/Camera Controls/Scroll Behaviour'
-local miscPath = 'Settings/Camera/Camera Controls/Misc'
-local cameraFollowPath = 'Settings/Camera/Camera Following'
+options_path = 'Settings/Camera/COFC Controls'
+local zoomPath = 'Settings/Camera/COFC Zoom Behaviour'
+local rotatePath = 'Settings/Camera/COFC Rotation Behaviour'
+local scrollPath = 'Settings/Camera/COFC Scroll Behaviour'
+local miscPath = 'Settings/Camera/COFC Controls'
+local cameraFollowPath = 'Settings/Camera/COFC Following'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = {
 	'helpwindow',
@@ -51,7 +51,9 @@ options_order = {
 
 	'middleMouseButton',
 	
+	'lblMisc',
 	'smoothness',
+	'fov',
 	
 	'lblZoom',
 	-- 'zoomintocursor',
@@ -80,17 +82,19 @@ options_order = {
 	
 	'lblScroll',
 	'speedFactor',
+	'speedFactor_mult',
 	'speedFactor_k',
+	'speedFactor_k_mult',
 	-- 'edgemove',
 	'invertscroll',
 	'smoothscroll',
 	'smoothmeshscroll',
+	'scrollhelp',
 	
+	'disablelabel',
 	'disableshift',
 	'disablectrl',
 	'disablealt',
-	'lblMisc',
-	'fov',
 	'overviewmode',
 	'overviewset',
 	'rotatebackfromov',
@@ -138,7 +142,7 @@ options = {
 	lblRotate = {name='Rotation Behaviour', type='label', path=rotatePath},
 	lblScroll = {name='Scroll Behaviour', type='label', path=scrollPath},
 	lblZoom = {name='Zoom Behaviour', type='label', path=zoomPath},
-	lblMisc = {name='Misc.', type='label', path=miscPath},
+	lblMisc = {name='General Parameters', type='label', path=miscPath},
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
@@ -205,20 +209,13 @@ options = {
 		name = 'COFCam Help',
 		type = 'text',
 		value = [[
-			Complete Overhead/Free Camera has six main actions...
-			
-			Zoom..... <Mousewheel>
-			Tilt World..... <Ctrl> + <Mousewheel>
-			Altitude..... <Alt> + <Mousewheel>
-			Mouse Scroll..... <Middlebutton-drag>
-			Rotate World..... <Ctrl> + <Middlebutton-drag>
-			Rotate Camera..... <Alt> + <Middlebutton-drag>
-			
-			Additional actions:
-			Keyboard: <arrow keys> replicate middlebutton drag while <pgup/pgdn> replicate mousewheel. You can use these with ctrl, alt & shift to replicate mouse camera actions.
-			Use <Shift> to speed up camera movements.
-			Reset Camera..... <Ctrl> + <Alt> + <Middleclick>
-		]],
+Complete Overhead/Free Camera has six actions:
+	Zoom Camera..... <Mousewheel>
+	Tilt World..... <Ctrl> + <Mousewheel>
+	Altitude..... <Alt> + <Mousewheel>
+	Mouse Scroll..... <MMB-drag>
+	Rotate World..... <Ctrl> + <MMB-drag>
+	Rotate Camera..... <Alt> + <MMB-drag>]],
 	},
 
 	zoominfactor = { --should be lower than zoom-out-speed to help user aim tiny units
@@ -363,6 +360,7 @@ options = {
 	},
 	overridetilt = {
 		name = 'Override tilt',
+		desc = 'Disable tilt, instead keeping the camera at a fixed tilt set by Tilt override value.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -376,7 +374,7 @@ options = {
 	tiltoverride = {
 		name = 'Tilt override value',
 		type = 'number',
-		min = 0, max = 1, step = 0.01,
+		min = 0.01, max = 1, step = 0.01,
 		value = 1,
 		OnChange = function(self)
 			if TiltOverrideFunc then
@@ -406,16 +404,30 @@ options = {
 		name = 'Mouse scroll speed',
 		desc = 'This speed applies to scrolling with the middle button.',
 		type = 'number',
-		min = 10, max = 40,
+		min = 10, max = 100,
 		value = 25,
+		path = scrollPath,
+	},
+	speedFactor_mult = {
+		name = 'Multiply the above by 10',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 		path = scrollPath,
 	},
 	speedFactor_k = {
 		name = 'Keyboard/edge scroll speed',
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
-		min = 1, max = 50,
+		min = 1, max = 100,
 		value = 40,
+		path = scrollPath,
+	},
+	speedFactor_k_mult = {
+		name = 'Multiply the above by 10',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 		path = scrollPath,
 	},
 	invertscroll = {
@@ -442,7 +454,13 @@ options = {
 		noHotkey = true,
 		path = scrollPath,
 	},
-    
+	scrollhelp = {
+		name = 'Scroll Hotkeys',
+		type = 'text',
+		value = [[Scroll hotkeys can be set by navigating to Hotkeys/Camera.]],
+		path = scrollPath,
+	},
+
 	-- mingrounddist = {
 	-- 	name = 'Minimum Ground Distance',
 	-- 	desc = 'Getting too close to the ground allows strange camera positioning.',
@@ -452,8 +470,11 @@ options = {
 	-- 	value = 1,
 	-- 	OnChange = function(self) init = true; end,
 	-- },
+	disablelabel = {name='Hotkeys and Modifiers', type='label', path=miscPath},
+	
 	disableshift = {
 		name = 'Disable Shift',
+		desc = 'Make the camera unaffected by holding Shift.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -461,6 +482,7 @@ options = {
 	},
 	disablectrl = {
 		name = 'Disable Ctrl',
+		desc = 'Make the camera unaffected by holding Ctrl.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -468,6 +490,7 @@ options = {
 	},
 	disablealt = {
 		name = 'Disable Alt',
+		desc = 'Make the camera unaffected by holding Alt.',
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -484,7 +507,7 @@ options = {
 		path=miscPath,
 	},
 	overviewmode = {
-		name = "COFC Overview",
+		name = "Toggle map overview",
 		desc = "Go to overview mode, then restore view to cursor position.",
 		type = 'button',
 		hotkey = {key='tab', mod=''},
@@ -2197,12 +2220,12 @@ function widget:Update(dt)
 		local heightFactor = (cs.py/1000)
 		if smoothscroll then
 			--local speed = dt * options.speedFactor.value * heightFactor
-			local speed = math.max( dt * options.speedFactor.value * heightFactor, 0.005 )
+			local speed = math.max( dt * options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * heightFactor, 0.005 )
 			mxm = speed * (x - cx)
 			mym = speed * (y - cy)
 		elseif use_lockspringscroll then
 			--local speed = options.speedFactor.value * heightFactor / 10
-			local speed = math.max( options.speedFactor.value * heightFactor / 10, 0.05 )
+			local speed = math.max( options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * heightFactor / 10, 0.05 )
 			local dir = options.invertscroll.value and -1 or 1
 			mxm = speed * (x - mx) * dir
 			mym = speed * (y - my) * dir
@@ -2210,7 +2233,7 @@ function widget:Update(dt)
 			spWarpMouse(cx, cy)
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
-			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
+			local speed = math.max( options.speedFactor_k.value * ((options.speedFactor_k_mult.value and 10) or 1) * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
 			
 			if move.right or move2.right then
 				mxm = speed
@@ -2354,7 +2377,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 
 		local cs = GetTargetCameraState()
 		
-		local speed = options.speedFactor.value * cs.py/1000 / 10
+		local speed = options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * cs.py/1000 / 10
 		local mxm = speed * dx * dir
 		local mym = speed * dy * dir
 		ScrollCam(cs, mxm, mym, 0)
@@ -2544,8 +2567,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 			if not ls_have then
 				return
 			end
-			
-
 		
 			local speed = (shift and 30 or 10)
 
@@ -2693,7 +2714,7 @@ function widget:Initialize()
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
-		HotkeyChangeNotification() --TODO: change this to be triggered by the epicmenu camera hotkeys changing
+		HotkeyChangeNotification()
 	end
 
 	WG.COFC_Enabled = true
@@ -2706,7 +2727,8 @@ function widget:Initialize()
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
-
+	
+	WG.COFC_HotkeyChangeNotification = HotkeyChangeNotification
 end
 
 function widget:Shutdown()
