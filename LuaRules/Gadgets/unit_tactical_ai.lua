@@ -898,7 +898,7 @@ end
 -- Idle Handling
 
 local function AddIdleUnit(unitID, unitDefID)
-	if not unit[unitID] then
+	if not (unit[unitID] and spValidUnitID(unitID)) then
 		return
 	end
 	local unitData = unit[unitID]
@@ -910,7 +910,7 @@ local function AddIdleUnit(unitID, unitDefID)
 		return
 	end
 	
-	local behaviour = GetUnitBehavior(unitID, unitDefID)
+	local behaviour = GetUnitBehavior(unitID, unitData.udID)
 	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	

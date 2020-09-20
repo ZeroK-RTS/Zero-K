@@ -10,6 +10,10 @@ function widget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 local myPlayerID = Spring.GetMyPlayerID()
 local myTeamID = Spring.GetMyTeamID()
@@ -21,6 +25,9 @@ local zoomTime = 0
 local recallTime = 0
 local savedCameraPositions = {}
 local savedCameraStates = {}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 options_path = 'Hotkeys/Camera/Camera Position Hotkeys'
 options_order = {'lbl_alert', 'zoom_speed', 'zoomAlert', 'zoomDamage', 'zoomMessage', 'lbl_pos', 'savezoom', 'pos_zoom_speed', 'recallStartPos'}
@@ -45,7 +52,7 @@ options = {
 		type = 'button',
 		OnChange = function()
 			if lastDamageX then
-				Spring.SetCameraTarget(lastAlertX, lastAlertY, lastAlertZ, zoomTime)
+				SetCameraTarget(lastAlertX, lastAlertY, lastAlertZ, zoomTime)
 			end
 		end
 	},
@@ -54,7 +61,7 @@ options = {
 		type = 'button',
 		OnChange = function()
 			if lastDamageX then
-				Spring.SetCameraTarget(lastDamageX, lastDamageY, lastDamageZ, zoomTime)
+				SetCameraTarget(lastDamageX, lastDamageY, lastDamageZ, zoomTime)
 			end
 		end
 	},
@@ -63,7 +70,7 @@ options = {
 		type = 'button',
 		OnChange = function()
 			if lastMarkX then
-				Spring.SetCameraTarget(lastMarkX, lastMarkY, lastMarkZ, zoomTime)
+				SetCameraTarget(lastMarkX, lastMarkY, lastMarkZ, zoomTime)
 			end
 		end
 	},
@@ -95,7 +102,7 @@ options = {
 		OnChange = function()
 			local x, y, z = Spring.GetTeamStartPosition(myTeamID)
 			if x then
-				Spring.SetCameraTarget(x, y, z, recallTime)
+				SetCameraTarget(x, y, z, recallTime)
 			end
 		end
 	},
@@ -130,7 +137,7 @@ for i = 1, 10 do
 			else
 				local data = savedCameraPositions[i]
 				if data[1] and data[2] and data[3] then
-					Spring.SetCameraTarget(data[1], data[2], data[3], recallTime)
+					SetCameraTarget(data[1], data[2], data[3], recallTime)
 				end
 			end
 		end
@@ -138,8 +145,11 @@ for i = 1, 10 do
 	options_order[#options_order + 1] = recallName
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-	if unitTeam ~= myTeamID or damage < 1 then
+	if unitTeam ~= myTeamID or (not damage) or (damage < 1) then
 		return
 	end
 	
@@ -161,3 +171,6 @@ function widget:PlayerChanged(playerID)
 	end
 	myTeamID = Spring.GetMyTeamID()
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
