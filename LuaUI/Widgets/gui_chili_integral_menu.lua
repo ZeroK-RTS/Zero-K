@@ -157,6 +157,8 @@ options = {
 			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
 		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
 	},
 	enable_roam = {
 		name = "Enable roam move state",
@@ -171,6 +173,8 @@ options = {
 			UpdateHolderSizes() -- Need to delete buttons to change tooltips
 		end,
 		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
 	},
 	background_opacity = {
 		name = "Opacity",
