@@ -99,6 +99,8 @@ local unitAICmdDesc = {
 	params  = {0, 'AI Off', 'AI On'}
 }
 
+local stateCommands = include("LuaRules/Configs/state_commands.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 ---- Utilities
@@ -770,7 +772,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local holdPos = (moveState == 0)
 	
 	local behaviour
-	if not middfleMoveState then
+	if not (middleMoveState and unitData.wasIdle) then
 		if exitEarly then
 			return
 		end
@@ -783,7 +785,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
 	local isIdleAttack = middleMoveState and ((not cmdID) or (autoAttackEnemyID and not haveFight))
 	
-	if haveFight and (not isIdleAttack) and unitData.rx then
+	if unitData.wasIdle and haveFight and (not isIdleAttack) and unitData.rx then
 		if (fightX == unitData.rx) and (fightY == unitData.ry) and (fightZ == unitData.rz) and (not holdPos) then
 			isIdleAttack = true
 		else
@@ -793,7 +795,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	
 	--Spring.Echo("BEFORE", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	
-	unitData.idleWantReturn = (unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack
+	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack)
 	--Spring.Echo("unitData", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
 	--Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	
@@ -900,6 +902,7 @@ local function AddIdleUnit(unitID, unitDefID)
 		return
 	end
 	local unitData = unit[unitID]
+	unitData.wasIdle = true
 	
 	if unitData.idleWantReturn and unitData.idleX then
 		ReturnUnitToIdlePos(unitID, unitData)
@@ -935,6 +938,20 @@ end
 
 function gadget:UnitIdle(unitID, unitDefID)
 	AddIdleUnit(unitID, unitDefID)
+end
+
+function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+	if playerID == -1 or fromLua then
+		return
+	end
+	if cmdID and stateCommands[cmdID] then
+		return
+	end
+	local unitData = unit[unitID]
+	if not unitData then
+		return
+	end
+	unitData.wasIdle = false
 end
 
 --------------------------------------------------------------------------------
