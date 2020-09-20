@@ -100,6 +100,7 @@ local steps = {
 	},
 	intro5 = {
 		--message		= 'Place your starting position by clicking on a nice flat spot on the map, then click on the <Ready> button',
+		image		= 'LuaUI/Images/nubtron/mexSpotTip.png',
 		passIfAny	= { 'gameStarted' },
 
 	},
@@ -191,11 +192,11 @@ local steps = {
 		passIfAny	= { 'clickedNubtron' },
 	},
 	epilogue11 = {
-		image		= 'LuaUI/Images/commands/Bold/repair.png',
+		image		= 'LuaUI/Images/nubtron/repairReclaim.png',
 		passIfAny	= { 'clickedNubtron' },
 	},
 	epilogue12 = {
-		image		= 'LuaUI/Images/commands/Bold/reclaim.png',
+		image		= 'LuaUI/Images/nubtron/barsTip.png',
 		passIfAny	= { 'clickedNubtron' },
 	},
 	epilogue13 = {
@@ -203,7 +204,7 @@ local steps = {
 		passIfAny	= { 'clickedNubtron' },
 	},
 	epilogue14 = {
-		image		= 'unitpics/staticcon.png',
+		image		= 'LuaUI/Images/nubtron/buildNano.png',
 		passIfAny	= { 'clickedNubtron' },
 	},
 	epilogue15 = {
@@ -223,11 +224,10 @@ local steps = {
 -- use any names you wish here, so long as they match up to the tasks table
 local taskOrder = {
 	'intro',
-	'restoreInterface',
 	'buildMex',
+	'buildFac',
 	'buildSolar',
 	'buildLLT',
-	'buildFac',
 	'buildRadar',
 	'buildCon',
 	'conAssist',
@@ -235,7 +235,10 @@ local taskOrder = {
 	'raiderTip',
 	'buildMex2',
 	'buildSolar2',
-	'epilogue',
+	'epilogue_start',
+	'epilogue_units',
+	'epilogue_constructors',
+	'epilogue_economy',
 	'congrats',
 }
 --use "states" from the steps table above.
@@ -320,10 +323,21 @@ local tasks = {
 		--errIfAnyNot	= { 'haveMex', 'haveSolar' },
 		passIfAnyNot	= { 'lowEnergyIncome', }
 	},
-	epilogue = {
+	epilogue_start = {
 		--desc		= 'Congratulations!',
-		states		= { 'epilogue1', 'epilogue2', 'epilogue3', 'epilogue4', 'epilogue5', 'epilogue6', 'epilogue7',
-					'epilogue8', 'epilogue9', 'epilogue10', 'epilogue11', 'epilogue12', 'epilogue13', 'epilogue14', 'epilogue15', 'epilogue16'},
+		states		= { 'epilogue1'},
+	},
+	epilogue_units = {
+		--desc		= 'Congratulations!',
+		states		= { 'epilogue2', 'epilogue3', 'epilogue4', 'epilogue5', 'epilogue6'},
+	},
+	epilogue_constructors = {
+		--desc		= 'Congratulations!',
+		states		= { 'epilogue7', 'epilogue8', 'epilogue9', 'epilogue10', 'epilogue11'},
+	},
+	epilogue_economy = {
+		--desc		= 'Congratulations!',
+		states		= { 'epilogue12', 'epilogue13', 'epilogue14', 'epilogue15', 'epilogue16'},
 	},
 	congrats = {
 		--desc		= 'Congratulations!',

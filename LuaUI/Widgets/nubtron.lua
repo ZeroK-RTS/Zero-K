@@ -422,15 +422,15 @@ end
 
 local function addTabText(unitDefID)
 	if factory_commands[-unitDefID] then
-		return " under the Factory tab."
+		return " under the <Factory> tab."
 	elseif econ_commands[-unitDefID] then
-		return " under the Econ tab."
+		return " under the <Econ> tab."
 	elseif defense_commands[-unitDefID] then
-		return " under the Defense tab."
+		return " under the <Defense> tab."
 	elseif special_commands[-unitDefID] then
-		return " under the Special tab."
+		return " under the <Special> tab."
 	end
-	return " under the Units tab."
+	return " under the <Units> tab."
 end
 
 local function SetupText(lang)
@@ -462,6 +462,7 @@ local function SetupText(lang)
 		end
 	end
 	steps.startMex.message 			= texts_lang.steps.startMex
+	steps.startMex.image			= 'LuaUI/Images/nubtron/mexSpotBuildTip.png'
 	steps.selectBuildMex.message 	= texts_lang.steps.selectBuildMex
 	steps.startBotLab.message		= texts_lang.steps.startBotLab
 end
@@ -540,7 +541,7 @@ local function SetupNubtronWindow()
 		width = 18;
 		height = 18;
 		caption = 'X',
-		tooltip = 'Disable the tutorial. It can be re-enabled through the Menu (F10) under Help',
+		tooltip = 'Close the tutorial. It can be re-enabled through the Menu (F10) under Help.',
 		right = 2,
 		captionColor = {1,0,0,1},
 		OnClick = {
