@@ -236,7 +236,7 @@ local function SetupUnit(unitID)
 				foundAnyCommand = true
 				if current.id == cmd[1] and
 					TableEqual(cmd[2], current.params) then
-					Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
+					--Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
 					return
 				end
 
@@ -257,7 +257,7 @@ local function SetupUnit(unitID)
 
 		Log("give order " .. CommandNames[cmd[1]] .. " to " .. unitID ..
 				" @ " .. x .. ", " .. y .. ", " .. z)
-		LogTable(cmd[2], "  order args: ")
+		--LogTable(cmd[2], "  order args: ")
 		spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
 		trackedUnits[unitID].settleTime = time + settleInterval
 		trackedUnits[unitID].command = cmd
