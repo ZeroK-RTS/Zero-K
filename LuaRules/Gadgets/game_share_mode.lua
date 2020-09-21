@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author	 = "Shaman",
 		date	 = "6-23-2016",
 		license	 = "PD",
-		layer	 = 0,
+		layer	 = 10, -- after lagmonitor
 		enabled	 = true,
 	}
 end
