@@ -97,11 +97,7 @@ end
 local function IsTeamLeader(playerID)
 	local teamID = GetTeamID(playerID)
 	local teamleaderid = select(2, spGetTeamInfo(teamID, false))
-	if playerID == teamleaderid then
-		return true
-	else
-		return false
-	end
+	return playerID == teamleaderid
 end
 
 local function GetNewLeader(teamID)
@@ -116,11 +112,7 @@ end
 local function IsPlayerOnSameTeam(playerID,playerid2)
 	local id1 = GetTeamID(playerID)
 	local id2 = GetTeamID(playerid2)
-	if id1 == id2 then
-		return true
-	else
-		return false
-	end
+	return id1 == id2
 end
 
 local function GetSquadSize(teamID)
@@ -144,9 +136,9 @@ local function ProccessCommand(str)
 	return command, targetID -- less creating tables this way. Old version would create a table, this one is slightly smarter.
 end
 
-local function IsTeamAfk(teamID)
+local function IsTeamAfk(teamID) -- TODO: Replace me with race condition AFK check when avaliable.
 	local _, shares = GG.Lagmonitor.GetResourceShares()
-	if debugMode then spEcho("Shares: " .. tostring(shares[teamID])) end
+	if debugMode then spEcho("[Commshare] " .. teamID .. " shares: " .. tostring(shares[teamID])) end
 	return shares[teamID] == 0
 end
 
@@ -195,10 +187,10 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 				end
 			end
 		else
-			if debugMode then spEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)") end
+			if debugMode then spEcho("[Commshare] Tried to unmerge a player that never merged (Perhaps cheated in?)") end
 		end
 	else
-		spEcho("[Commshare]: Unmerging is forbidden in this game mode!")
+		spEcho("[Commshare] Unmerging is forbidden in this game mode!")
 	end
 end
 
@@ -240,7 +232,7 @@ local function MergePlayer(playerID,target)
 		end
 		spAssignPlayerToTeam(playerID,target)
 	else
-		spEcho("[Commshare] Merge error.")
+		spEcho("[Commshare] Merge error: " .. playerID .. "," .. target)
 	end
 end
 
