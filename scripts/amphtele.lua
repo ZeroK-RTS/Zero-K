@@ -100,38 +100,36 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Deploy into static mode animation and delay
-local DEPLOY_SPEED = 0.3
+local DEPLOY_SPEED = 0.9
 
 local function DeployTeleport_Thread()
-	
 	Signal(SIG_DEPLOY)
 	StopCreateBeacon()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_DEPLOY)
 	
-	Turn(rthigh, x_axis, 0, math.rad(1000))
-	Turn(rshin, x_axis, 0, math.rad(1000))
-	Turn(rfoot, x_axis, 0, math.rad(1000))
-	Turn(lthigh, x_axis, 0, math.rad(1000))
-	Turn(lshin, x_axis, 0, math.rad(1000))
-	Turn(lfoot, x_axis, 0, math.rad(1000))
-	Turn(pelvis, z_axis, 0, math.rad(1000))
+	Turn(rthigh, x_axis, 0, math.rad(300))
+	Turn(rshin, x_axis, 0, math.rad(300))
+	Turn(rfoot, x_axis, 0, math.rad(300))
+	Turn(lthigh, x_axis, 0, math.rad(300))
+	Turn(lshin, x_axis, 0, math.rad(300))
+	Turn(lfoot, x_axis, 0, math.rad(300))
+	Turn(pelvis, z_axis, 0, math.rad(300))
 	Move(pelvis, y_axis, 0, 10)
 	
-	Sleep(33)
+	Sleep(100)
 	
-	Sleep(33)
 	Turn(body, x_axis, math.rad(90), math.rad(90*DEPLOY_SPEED))
-	Move(pelvis, y_axis, 11, 11*DEPLOY_SPEED)
-	Move(pelvis, z_axis, -6, 6*DEPLOY_SPEED)
+	Move(pelvis, y_axis, 10, 10*DEPLOY_SPEED)
+	Move(pelvis, z_axis, -5, 5*DEPLOY_SPEED)
 	
-	Turn(rthigh, x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED))
-	Turn(rshin, x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED))
-	Turn(rfoot, x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED))
+	Turn(rthigh, x_axis, math.rad(-36), math.rad(36*DEPLOY_SPEED))
+	Turn(rshin, x_axis, math.rad(64), math.rad(64*DEPLOY_SPEED))
+	Turn(rfoot, x_axis, math.rad(-28), math.rad(28*DEPLOY_SPEED))
 	
-	Turn(lthigh, x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED))
-	Turn(lshin, x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED))
-	Turn(lfoot, x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED))
+	Turn(lthigh, x_axis, math.rad(-36), math.rad(36*DEPLOY_SPEED))
+	Turn(lshin, x_axis, math.rad(64), math.rad(64*DEPLOY_SPEED))
+	Turn(lfoot, x_axis, math.rad(-28), math.rad(28*DEPLOY_SPEED))
 
 	Sleep(1000/DEPLOY_SPEED)
 
@@ -180,15 +178,15 @@ end
 function UndeployTeleport()
 	deployed = false
 	Turn(body, x_axis, math.rad(0), math.rad(90))
-	Move(body, z_axis, 0, 5)
+	Move(body, z_axis, 0, 10)
 	Turn(rthigh, x_axis, 0, math.rad(80))
 	Turn(rshin, x_axis, 0, math.rad(120))
 	Turn(rfoot, x_axis, 0, math.rad(80))
 	Turn(lthigh, x_axis, 0, math.rad(80))
-	Turn(lshin, x_axis, 0, math.rad(80))
+	Turn(lshin, x_axis, 0, math.rad(120))
 	Turn(lfoot, x_axis, 0, math.rad(80))
 	Turn(pelvis, z_axis, 0, math.rad(20))
-	Move(pelvis, y_axis, 0, 12)
+	Move(pelvis, y_axis, 0, 20)
 end
 
 

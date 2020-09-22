@@ -20,7 +20,7 @@ return { amphlaunch = {
   customParams           = {
     amph_regen         = 10,
     amph_submerged_at  = 40,
-    thrower_gather     = 112,
+    thrower_gather     = 160,
     attack_toggle      = [[1]],
   },
 
