@@ -162,7 +162,7 @@ options = {
 	},
 	enable_roam = {
 		name = "Enable roam move state",
-		desc = "When enabled, the Hold Position state is extended to a three-option toggle with with Roam as an additional option.",
+		desc = "When enabled, the Hold Position state is extended to a three-option toggle with Roam as an additional option.",
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
