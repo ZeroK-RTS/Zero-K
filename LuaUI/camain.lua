@@ -53,18 +53,18 @@ forceLayout = true
 
 
 function Update()
-  local currentPage = Spring.GetActivePage()
-  if (forceLayout or (currentPage ~= activePage)) then
-    Spring.ForceLayoutUpdate()  --  for the page number indicator
-    forceLayout = false
-  end
-  activePage = currentPage
-
-  fontHandler.Update()
-
-  widgetHandler:Update()
-
-  return
+	local currentPage = Spring.GetActivePage()
+	if (forceLayout or (currentPage ~= activePage)) then
+		Spring.ForceLayoutUpdate()  --  for the page number indicator
+		forceLayout = false
+	end
+	activePage = currentPage
+	
+	fontHandler.Update()
+	
+	widgetHandler:Update()
+	
+	return
 end
 
 
@@ -75,76 +75,76 @@ end
 --
 
 function Shutdown()
-  return widgetHandler:Shutdown()
+	return widgetHandler:Shutdown()
 end
 
 function ConfigureLayout(command)
-  return widgetHandler:ConfigureLayout(command)
+	return widgetHandler:ConfigureLayout(command)
 end
 
 function CommandNotify(id, params, options)
-  return widgetHandler:CommandNotify(id, params, options)
+	return widgetHandler:CommandNotify(id, params, options)
 end
 
 function UnitCommandNotify(unitID, id, params, options)
-  return widgetHandler:UnitCommandNotify(unitID, id, params, options)
+	return widgetHandler:UnitCommandNotify(unitID, id, params, options)
 end
 
 function DrawScreen(vsx, vsy)
-  return widgetHandler:DrawScreen()
+	return widgetHandler:DrawScreen()
 end
 
 function KeyPress(key, mods, isRepeat)
-  return widgetHandler:KeyPress(key, mods, isRepeat)
+	return widgetHandler:KeyPress(key, mods, isRepeat)
 end
 
 function KeyRelease(key, mods)
-  return widgetHandler:KeyRelease(key, mods)
+	return widgetHandler:KeyRelease(key, mods)
 end
 
 function TextInput(utf8, ...)
-  return widgetHandler:TextInput(utf8, ...)
+	return widgetHandler:TextInput(utf8, ...)
 end
 
 function MouseMove(x, y, dx, dy, button)
-  return widgetHandler:MouseMove(x, y, dx, dy, button)
+	return widgetHandler:MouseMove(x, y, dx, dy, button)
 end
 
 function MousePress(x, y, button)
-  return widgetHandler:MousePress(x, y, button)
+	return widgetHandler:MousePress(x, y, button)
 end
 
 function MouseRelease(x, y, button)
-  return widgetHandler:MouseRelease(x, y, button)
+	return widgetHandler:MouseRelease(x, y, button)
 end
 
 function IsAbove(x, y)
-  return widgetHandler:IsAbove(x, y)
+	return widgetHandler:IsAbove(x, y)
 end
 
 function GetTooltip(x, y)
-  return widgetHandler:GetTooltip(x, y)
+	return widgetHandler:GetTooltip(x, y)
 end
 
 function AddConsoleLine(msg, priority)
-  return widgetHandler:AddConsoleLine(msg, priority)
+	return widgetHandler:AddConsoleLine(msg, priority)
 end
 
 function GroupChanged(groupID)
-  return widgetHandler:GroupChanged(groupID)
+	return widgetHandler:GroupChanged(groupID)
 end
 
 local allModOptions = Spring.GetModOptions()
 function Spring.GetModOption(s,bool,default)
-  if (bool) then
-    local modOption = allModOptions[s]
-    if (modOption==nil) then modOption = (default and "1") end
-    return (modOption=="1")
-  else
-    local modOption = allModOptions[s]
-    if (modOption==nil) then modOption = default end
-    return modOption
-  end
+	if (bool) then
+		local modOption = allModOptions[s]
+		if (modOption==nil) then modOption = (default and "1") end
+		return (modOption=="1")
+	else
+		local modOption = allModOptions[s]
+		if (modOption==nil) then modOption = default end
+		return modOption
+	end
 end
 
 --

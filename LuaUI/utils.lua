@@ -4,9 +4,11 @@
 
 --  returns:  basename, dirname
 function Basename(fullpath)
-	local _,_,base = fullpath:find("([^\\/:]*)$")
-	local _,_,path = fullpath:find("(.*[\\/:])[^\\/:]*$")
-	if (path == nil) then path = "" end
+	local _, _, base = fullpath:find("([^\\/:]*)$")
+	local _, _, path = fullpath:find("(.*[\\/:])[^\\/:]*$")
+	if (path == nil) then
+		path = ""
+	end
 	return base, path
 end
 
