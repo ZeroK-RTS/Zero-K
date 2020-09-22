@@ -209,7 +209,7 @@ local fullCustomCmdActions = {}
 for name, data in pairs(custom_cmd_actions) do
 	if data.states then
 		for i = 1, #data.states do
-			local cmdName = (data.actionOverride and data.actionOverride[i]) or (name .. " " .. (i-1))
+			local cmdName = (data.actionOverride and data.actionOverride[i]) or (name .. " " .. (i - 1))
 			fullCustomCmdActions[cmdName] = {
 				cmdType = data.cmdType,
 				name = data.name .. ": set " .. data.states[i],
