@@ -1,5 +1,5 @@
 local allModOptions = Spring.GetModOptions()
-function Spring.GetModOption(s,bool,default)
+function Spring.GetModOption(s, bool, default)
 	if (bool) then
 		local modOption = allModOptions[s]
 		if (modOption == nil) then
