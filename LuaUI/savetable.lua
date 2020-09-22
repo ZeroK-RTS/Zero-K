@@ -26,7 +26,7 @@ local keyWords = {
 	"until", "while"
 }
 local keyWordSet = {}
-for _,w in ipairs(keyWords) do
+for _, w in ipairs(keyWords) do
 	keyWordSet[w] = true
 end
 keyWords = nil  -- don't need the array anymore
@@ -95,7 +95,7 @@ end
 
 local function MakeSortedTable(t)
 	local st = {}
-	for k,v in pairs(t) do
+	for k, v in pairs(t) do
 		if (keyTypes[type(k)] and valueTypes[type(v)]) then
 			table.insert(st, { k, v })
 		end
@@ -110,7 +110,7 @@ local function SaveTable(t, file, indent)
 	
 	local st = MakeSortedTable(t)
 	
-	for _,kv in ipairs(st) do
+	for _, kv in ipairs(st) do
 		local k, v = kv[1], kv[2]
 		local ktype = type(k)
 		local vtype = type(v)
@@ -160,10 +160,12 @@ function table.save(t, filename, header)
 		file:write(header..'\n')
 	end
 	file:write('return {\n')
-	if (type(t)=="table")or(type(t)=="metatable") then SaveTable(t, file, '') end
+	if (type(t) == "table") or (type(t) == "metatable") then
+		SaveTable(t, file, '')
+	end
 	file:write('}\n')
 	file:close()
-	for k,v in pairs(savedTables) do
+	for k, v in pairs(savedTables) do
 		savedTables[k] = nil
 	end
 end

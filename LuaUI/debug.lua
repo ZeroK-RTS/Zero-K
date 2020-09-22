@@ -20,8 +20,8 @@ end
 function PrintBuildQueue(unitID)
 	local queue, count = Spring.GetRealBuildQueue(unitID)
 	print("BuildQueue(" .. unitID .."): " .. count)
-	for i,v in pairs(queue) do
-		for i2,v2 in pairs(v) do
+	for i, v in pairs(queue) do
+		for i2, v2 in pairs(v) do
 			print('  ' .. i .. ': ' .. i2 .. '  x' .. v2)
 		end
 	end
@@ -33,18 +33,18 @@ function PrintSelection()
 	print("Selected Group = " .. selectedGroup)
 	print("Selected: " .. udTable.n .. " types")
 	udTable.n = nil
-	for udid,uTable in pairs(udTable) do
+	for udid, uTable in pairs(udTable) do
 		print('  ' .. udid .. '=' .. UnitDefs[udid].name .. ' count ' .. uTable.n)
 		uTable.n = nil
-		for _,uid in ipairs(uTable) do
+		for _, uid in ipairs(uTable) do
 			local health, maxHealth, paralyze, capture, build = Spring.GetUnitHealth(uid)
 			print('  ', uid, health, maxHealth, paralyze, capture, build)
 			PrintCommandQueue(uid)
 		end
 	end
-	for udid,uTable in pairs(udTable) do
+	for udid, uTable in pairs(udTable) do
 		uTable.n = nil
-		for uid,udid2 in pairs(uTable) do
+		for uid, udid2 in pairs(uTable) do
 			PrintBuildQueue(uid)
 		end
 	end
@@ -55,7 +55,7 @@ function PrintCommandQueue(uid)
 	if (queue ~= nil) then
 		local msg = ''
 		local count = 0
-		for i,cmd in pairs(queue) do
+		for i, cmd in pairs(queue) do
 			local name = CommandNames[cmd]
 			if (name ~= nil) then
 				count = count + 1
@@ -74,7 +74,9 @@ function PrintGroups()
 	print("GetGroupList: " .. tostring(count))
 	for i, v in pairs(groupList) do
 		local groupName = Spring.GetGroupAIName(i)
-		if (groupName == nil) then groupName = "" end
+		if (groupName == nil) then
+			groupName = ""
+		end
 		print('  ' .. i .. '\t' .. v .. '\t' .. groupName)
 	end
 	
@@ -83,10 +85,10 @@ function PrintGroups()
 		local udTable = Spring.GetGroupUnitsSorted(g)
 		print("  MyTeamUnits: " .. udTable.n .. " types")
 		udTable.n = nil
-		for udid,uTable in pairs(udTable) do
+		for udid, uTable in pairs(udTable) do
 			print('    ' .. udid .. '=' .. UnitDefs[udid].name .. ' count ' .. uTable.n)
 			uTable.n = nil
-			for _,uid in ipairs(uTable) do
+			for _, uid in ipairs(uTable) do
 				print('    ', uid)
 			end
 		end
@@ -104,7 +106,7 @@ function PrintTeamUnits(team)
 	for udid,uTable in pairs(udTable) do
 		print('  ' .. udid .. '=' .. UnitDefs[udid].name .. ' count ' .. uTable.n)
 		uTable.n = nil
-		for _,uid in ipairs(uTable) do
+		for _, uid in ipairs(uTable) do
 			print('  ', uid)
 		end
 	end
@@ -117,7 +119,7 @@ function PrintTeamUnitsCounts(team)
 		return
 	end
 	countTable.n = nil
-	for udid,count in pairs(countTable) do
+	for udid, count in pairs(countTable) do
 		print('  ' .. udid .. '=' .. UnitDefs[udid].name .. ': ' .. count)
 	end
 end
@@ -126,7 +128,7 @@ function PrintAlliedUnits()
 	local teamTable = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 	--  print("AlliedUnits: " .. teamTable.n .. " teams")
 	teamTable.n = nil
-	for n,tid in pairs(teamTable) do
+	for n, tid in pairs(teamTable) do
 		PrintTeamUnits(tid);
 	end
 end
@@ -135,7 +137,7 @@ function PrintAllyTeamList()
 	local allyTeamTable = Spring.GetAllyTeamList()
 	local msg = "AllyTeams(" .. allyTeamTable.n .. ")"
 	allyTeamTable.n = nil
-	for n,atid in pairs(allyTeamTable) do
+	for n, atid in pairs(allyTeamTable) do
 		msg = msg .. " " .. atid
 	end
 	print(msg)
@@ -154,7 +156,7 @@ function PrintTeamList(allyTeam)
 	
 	local msg = "Teams(" .. teamTable.n .. ")"
 	teamTable.n = nil
-	for n,tid in pairs(teamTable) do
+	for n, tid in pairs(teamTable) do
 		msg = msg .. " " .. tid
 	end
 	print(msg)
@@ -173,7 +175,7 @@ function PrintPlayerList(team)
 	
 	local msg = "Players(" .. playerTable.n .. ")"
 	playerTable.n = nil
-	for n,pid in pairs(playerTable) do
+	for n, pid in pairs(playerTable) do
 		msg = msg .. " " .. pid
 	end
 	print(msg)
@@ -181,13 +183,13 @@ end
 
 function PrintPlayerTree()
 	local atTable = Spring.GetAllyTeamList()
-	for atn,atid in ipairs(atTable) do
+	for atn, atid in ipairs(atTable) do
 		print('Ally team: ' .. atid)
 		local tTable = Spring.GetTeamList(atid)
-		for tn,tid in ipairs(tTable) do
+		for tn, tid in ipairs(tTable) do
 			print('  Team: ' .. tid)
 			local pTable = Spring.GetPlayerList(tid)
-			for pn,pid in ipairs(pTable) do
+			for pn, pid in ipairs(pTable) do
 				local pname, active = Spring.GetPlayerInfo(pid)
 				if (active) then
 					print('    Player: ' .. pid .. " " .. pname)
@@ -208,8 +210,7 @@ function PrintTeamInfo(teamID)
 end
 
 function PrintTeamResources(teamID, type)
-	local current, storage, pull, income, expense,
-	share, sent, received = Spring.GetTeamResources(teamID, type)
+	local current, storage, pull, income, expense, share, sent, received = Spring.GetTeamResources(teamID, type)
 	if (current ~= nil) then
 		print('Team number: ' .. teamID)
 		print('  ' .. type .. ':           ' .. current)
@@ -258,7 +259,7 @@ function PrintCommands(commands)
 					txt = txt .. tostring(v2) .. ', '
 				else
 					txt = txt .. '{ '
-					for i3,v3 in pairs(v2) do
+					for i3, v3 in pairs(v2) do
 						txt = txt .. '"' .. v3 .. '", '
 					end
 					txt = txt .. '}, '
@@ -272,12 +273,12 @@ function PrintCommands(commands)
 end
 
 function Debug()
-	for i,v in pairs(UnitDefs) do
+	for i, v in pairs(UnitDefs) do
 		if (v ~= nil) then
 			print(i ..' '.. v.name)
 		end
 	end
-	for i,v in pairs(WeaponDefs) do
+	for i, v in pairs(WeaponDefs) do
 		if (v ~= nil) then
 			print(i ..' '.. v.name)
 		end

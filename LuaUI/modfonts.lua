@@ -139,7 +139,7 @@ local function MakeDisplayLists(fontSpecs)
 	local lists = {}
 	local xs = fontSpecs.xTexSize
 	local ys = fontSpecs.yTexSize
-	for _,gi in pairs(fontSpecs.glyphs) do
+	for _, gi in pairs(fontSpecs.glyphs) do
 		local list = glCreateList(function ()
 			glTexRect(gi.oxn, gi.oyn, gi.oxp, gi.oyp, gi.txn / xs, 1.0 - (gi.tyn / ys), gi.txp / xs, 1.0 - (gi.typ / ys))
 			glTranslate(gi.adv, 0, 0)
@@ -155,7 +155,7 @@ local function MakeOutlineDisplayLists(fontSpecs)
 	local tw = fontSpecs.xTexSize
 	local th = fontSpecs.yTexSize
 	
-	for _,gi in pairs(fontSpecs.glyphs) do
+	for _, gi in pairs(fontSpecs.glyphs) do
 		local texa = gi.txn / tw
 		local texb = 1.0 - (gi.tyn / th)
 		local texc = gi.txp / tw
@@ -368,7 +368,7 @@ local function LoadFont(fontName)
 	end
 	
 	local baseName = fontName
-	local _,_,options,bn = fontName:find("(:.-:)(.*)")
+	local _, _, options, bn = fontName:find("(:.-:)(.*)")
 	if (options) then
 		baseName = bn
 	else
@@ -453,7 +453,7 @@ local function FreeCache(fontName)
 	if (not font) then
 		return
 	end
-	for text,data in pairs(font.cache) do
+	for text, data in pairs(font.cache) do
 		glDeleteList(data[1])
 	end
 end
@@ -465,10 +465,10 @@ local function FreeFont(fontName)
 		return
 	end
 	
-	for _,list in pairs(font.lists) do
+	for _, list in pairs(font.lists) do
 		glDeleteList(list)
 	end
-	for text,data in pairs(font.cache) do
+	for text, data in pairs(font.cache) do
 		glDeleteList(data[1])
 	end
 	glDeleteTexture(font.image)
@@ -500,7 +500,7 @@ local function Update()
 				print(fontName .. " removed string list(" .. data[1] .. ") " .. text)
 			end
 		end
-		for _,text in ipairs(killList) do
+		for _, text in ipairs(killList) do
 			font.cache[text] = nil
 		end
 	end

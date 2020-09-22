@@ -8,13 +8,13 @@ end
 local function Deserialize(text)
 	local f, err = loadstring(text)
 	if not f then
-		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): "..tostring(err))
+		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): " .. tostring(err))
 		return
 	end
 	setfenv(f, {}) -- sandbox
 	local success, arg = pcall(f)
 	if not success then
-		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): "..tostring(arg))
+		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): " .. tostring(arg))
 		return
 	end
 	return arg
@@ -64,7 +64,7 @@ end
 
 function MessageProcessor:Initialize()
 	local escapedPlayernamePattern = escapePatternReplacementChars(PLAYERNAME_PATTERN)
-	for _,def in ipairs(self.MESSAGE_DEFINITIONS) do
+	for _, def in ipairs(self.MESSAGE_DEFINITIONS) do
 		if def.pattern then
 			def.pattern = def.pattern:gsub('PLAYERNAME', escapedPlayernamePattern) -- patch definition pattern so it is an actual lua pattern string
 		end
@@ -100,10 +100,10 @@ local function SetupPlayers()
 	local gaiaTeamID = Spring.GetGaiaTeamID()
 	local spGetTeamInfo = Spring.GetTeamInfo
 	local spGetAIInfo = Spring.GetAIInfo
-	for i=1,#teamsSorted do
+	for i=1, #teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= gaiaTeamID then
-			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID, false)
+			local _, _, _, isAI, _, allyTeamId = spGetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name = spGetAIInfo(teamID)
 				--Note: to make AI appears like its doing an ally chat, do: Spring.Echo("<botname> Allies: bot_say_something")
@@ -168,7 +168,7 @@ end
 
 function MessageProcessor:ProcessConsoleBuffer(count)
 	local bufferMessages = Spring.GetConsoleBuffer(count)
-	for i = 1,#bufferMessages do
+	for i = 1, #bufferMessages do
 		self:ProcessConsoleLine(bufferMessages[i])
 	end
 	return bufferMessages

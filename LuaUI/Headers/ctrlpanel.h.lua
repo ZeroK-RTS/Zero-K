@@ -1,8 +1,8 @@
 local ctrlPanel = {}
 
 local function ParseCtrlPanelTXT(filename)
-	local f,it,isFile = nil,nil,false
-	f  = io.open(filename,'r')
+	local f, it, isFile = nil, nil, false
+	f  = io.open(filename, 'r')
 	if f then
 		it = f:lines()
 		isFile = true
@@ -29,13 +29,13 @@ local function ParseCtrlPanelTXT(filename)
 		else
 			_, _, n, r = line:lower():find(sp)
 			if n then
-				ctrlPanel[n]= r
+				ctrlPanel[n] = r
 			end
 		end
 	end
 	
 	if isFile then f:close() end
-	f,it,wp,cp,sp=nil,nil,nil,nil,nil
+	f, it, wp, cp, sp = nil, nil, nil, nil, nil
 end
 
 ParseCtrlPanelTXT('ctrlpanel.txt')
