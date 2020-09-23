@@ -1,4 +1,3 @@
--- $Id$
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -19,6 +18,8 @@
 --   4. When a user issues a stop command, this behavior is inhibited, until a
 --      different command issued by the user completes. (Unless stop_disables option
 --      is false.)
+--   5. When a user issues some other kind of command, the widget ignores the unit
+--      until it becomes idle again.
 --
 -- Limitations:
 --   1. Area reclaim does not reclaim energy sources. We'd have to call
@@ -27,17 +28,21 @@
 --      repairs damage (using only energy). Since assisting a factory is the most
 --      common use for caretakers, we tell caretakers to reclaim if metal is low.
 --      We'd have to call GetUnitsInCylinder() to do better.
+--   3. When the widget chooses repair only, there's a 0.5 second delay between
+--      a unit becoming idle and being told to repair. This is to give the factory
+--      that's being assisted time to start the next unit. It is not perfect, and the
+--      factory will be assisted less than if a patrol was issued. This could be
+--      improved by reducing the delay, and implementing a fancier incremental
+--      back-off than the simple 0.5s - 5s that is currently implemented.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 VFS.Include("LuaRules/Configs/constants.lua")
 
-local logfile
-
 function widget:GetInfo()
   return {
     name      = "Auto Patrol Nanos",
-    desc      = "Sets nano towers to ROAM, with a PATROL command",
+    desc      = "Make caretakers patrol, reclaim, or repair, depending on metal storage.",
     author    = "trepan",
     date      = "Jan 8, 2007",
     license   = "GNU GPL, v2 or later",
@@ -314,7 +319,6 @@ options = {
 -- Callins
 
 function widget:Initialize()
-	logfile = io.open("/home/tnewsome/zerok.log", "w")
 	SetupAll()
 end
 
@@ -354,21 +358,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	end
 end
 
--- Called (I think) when a user issues a command after selecting some unit.
---function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
---	Log("CommandNotify(" .. cmdID .. ")")
---	LogTable(cmdParams, "  params: ")
---	LogTable(cmdOptions, "  options: ")
---	-- TODO: How does this work when commanders are shared?
---	local selectedUnits = spGetSelectedUnits()
---	for _, unitID in ipairs(selectedUnits) do
---		if trackedUnits[unitID] ~= nil then
---			Log("Ignore unit " .. unitID .. " until it becomes idle.")
---		end
---		trackedUnits[unitID] = nil
---	end
---end
-
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
@@ -391,6 +380,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	--Log("UnitIdle:")
 	--LogTable(trackedUnits[unitID], "- ")
+
 	-- Check soon, but not right away. This time has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
 	delta = 0.5
