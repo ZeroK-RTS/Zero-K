@@ -627,8 +627,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				-- return to carrier unless in combat
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
-				for j=1, (cQueue and #cQueue or 0) do
-					if cQueue[j].id == CMD.FIGHT and firestate > 0 then
+				for j = 1, (cQueue and #cQueue or 0) do
+					if cQueue[j].id == CMD.ATTACK and firestate > 0 then
 						-- if currently fighting AND not on hold fire
 						engaged = true
 						break
@@ -859,6 +859,12 @@ function gadget:Initialize()
 		if build == 1 then
 			gadget:UnitFinished(unitID, unitDefID, team)
 		end
+	end
+end
+
+function gadget:Shutdown()
+	for unitID in pairs(droneList) do
+		Spring.DestroyUnit(unitID, true)
 	end
 end
 

@@ -14,7 +14,7 @@ local carrierDefNames = {
 			maxDrones = 8,
 			spawnSize = 1,
 			range = 1000,
-			maxChaseRange = 1300,
+			maxChaseRange = 1500,
 			buildTime = 25,
 			maxBuild = 4,
 			offsets = {0, 0, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -30,7 +30,7 @@ local carrierDefNames = {
 			maxDrones = 8,
 			spawnSize = 2,
 			range = 1000,
-			maxChaseRange = 1300,
+			maxChaseRange = 1500,
 			buildTime = 3,
 			maxBuild = 1,
 			offsets = {0, 8, 15, colvolMidX = 0, colvolMidY = 30, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0} --shift colvol to avoid collision.
@@ -44,7 +44,7 @@ local carrierDefNames = {
 			maxDrones = 8,
 			spawnSize = 1,
 			range = 800,
-			maxChaseRange = 1100,
+			maxChaseRange = 1300,
 			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -58,7 +58,7 @@ local carrierDefNames = {
 			maxDrones = 6,
 			spawnSize = 1,
 			range = 800,
-			maxChaseRange = 1100,
+			maxChaseRange = 1300,
 			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 5, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -72,7 +72,7 @@ local carrierDefNames = {
 			maxDrones = 6,
 			spawnSize = 1,
 			range = 500,
-			maxChaseRange = 1400,
+			maxChaseRange = 1200,
 			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -85,8 +85,8 @@ local carrierDefNames = {
 			reloadTime = 10,
 			maxDrones = 6,
 			spawnSize = 1,
-			range = 500,
-			maxChaseRange = 1400,
+			range = 600,
+			maxChaseRange = 1200,
 			buildTime = 5,
 			maxBuild = 1,
 			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -101,7 +101,7 @@ local presets = {
 		maxDrones = 2,
 		spawnSize = 1,
 		range = 600,
-		maxChaseRange = 900,
+		maxChaseRange = 1200,
 		buildTime = 6,
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -112,7 +112,7 @@ local presets = {
 		maxDrones = 1,
 		spawnSize = 1,
 		range = 600,
-		maxChaseRange = 900,
+		maxChaseRange = 1200,
 		buildTime = 9,
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -125,8 +125,8 @@ local unitRulesCarrierDefs = {
 		reloadTime = 12,
 		maxDrones = 2,
 		spawnSize = 1,
-		range = 450,
-		maxChaseRange = 800,
+		range = 600,
+		maxChaseRange = 1200,
 		buildTime = 10,
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
@@ -137,7 +137,7 @@ local unitRulesCarrierDefs = {
 		maxDrones = 1,
 		spawnSize = 1,
 		range = 600,
-		maxChaseRange = 900,
+		maxChaseRange = 1200,
 		buildTime = 15,
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
