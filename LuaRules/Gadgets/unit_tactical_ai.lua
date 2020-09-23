@@ -302,7 +302,9 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	if not unitData.idleAgression then
 		if CheckTargetAggression(enemy, frame) then
 			SetIdleAgression(unitID, unitData, enemy, frame)
-			Spring.Utilities.UnitEcho(unitID, "A")
+			if doDebug then
+				Spring.Utilities.UnitEcho(unitID, "A")
+			end
 			return true
 		end
 	end
