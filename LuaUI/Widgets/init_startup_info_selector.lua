@@ -89,7 +89,7 @@ local commTips = {
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
 local function ToggleTrainerButtons(bool)
 	for i=1,#buttonData do
-		if buttonData[i].trainer then
+		if buttonData[i].trainer and (#buttonData > 4) then
 			if bool then
 				grid:AddChild(buttonData[i].control)
 			else
@@ -296,7 +296,7 @@ local function CreateWindow()
 	local i = 0
 	for index, option in ipairs(optionData) do
 		i = i + 1
-		local hideButton = options.hideTrainers.value and option.trainer
+		local hideButton = options.hideTrainers.value and option.trainer and (#optionData > 4)
 		
 		local tooltip = ((options.showModules.value and (option.tooltip .. "\n\n\n")) or "") .. (commTips[option.image] or "")
 		
