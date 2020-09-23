@@ -75,6 +75,9 @@ local aggressiveTarget = {}
 
 local HEADING_TO_RAD = (math.pi*2/2^16)
 
+local debugAll = false
+local debugUnit = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Commands
@@ -287,31 +290,52 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 		return true
 	end
 	
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if doDebug then
+		Spring.Echo("=== Update Idle Aggresion", unitID, " ===")
+		Spring.Utilities.UnitEcho(unitID, "unit")
+		if enemy and enemy ~= -1 then
+			Spring.Utilities.UnitEcho(enemy, "enemy")
+		end
+	end
+	
 	if not unitData.idleAgression then
 		if CheckTargetAggression(enemy, frame) then
 			SetIdleAgression(unitID, unitData, enemy, frame)
-			--Spring.Utilities.UnitEcho(unitID, "A")
+			Spring.Utilities.UnitEcho(unitID, "A")
 			return true
 		end
-		--Spring.Utilities.UnitEcho(unitID, "O")
 	end
 	
 	local myIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ux, uz)
 	--Spring.Utilities.UnitEcho(unitID, "C")
-	--Spring.Echo("enemyRange", math.floor(enemyRange), math.floor(enemyDist), math.floor(behaviour.idleCommitDist), "ux, uz, ex, ez", math.floor(ux), math.floor(uz), math.floor(ex), math.floor(ez), "Distances", math.floor(math.sqrt(behaviour.idlePushAggressDistSq)), math.floor(math.sqrt(myIdleDistSq)), math.floor(math.sqrt(DistSq(unitData.idleX, unitData.idleZ, ex, ez))), math.random())
-	
 	local enemyIdleDistSq = DistSq(unitData.idleX, unitData.idleZ, ex, ez)
 	local enemyPushingMe = (enemyIdleDistSq < myIdleDistSq) or (enemyIdleDistSq < enemyRange^2)
 	unitData.wantFightReturn = enemyPushingMe -- Return with fight if you need to return through an enemy
+	
+	if doDebug then
+		Spring.Echo("enemyRange", math.floor(enemyRange), "enemyDist", math.floor(enemyDist), "range", math.floor(enemyRange), "commit", math.floor(behaviour.idleCommitDist))
+		Spring.Echo("ux, uz, ex, ez", math.floor(ux), math.floor(uz), math.floor(ex), math.floor(ez))
+		Spring.Echo("agress", math.floor(math.sqrt(behaviour.idlePushAggressDistSq)), "meToIdle", math.floor(math.sqrt(myIdleDistSq)), "enemyToIdle", math.floor(math.sqrt(DistSq(unitData.idleX, unitData.idleZ, ex, ez))))
+		Spring.Echo("Check 1", enemyDist < enemyRange, behaviour.idlePushAggressDistSq < myIdleDistSq)
+		Spring.Echo("Check 2", enemyPushingMe, enemyDist*behaviour.idleEnemyDistMult + math.sqrt(myIdleDistSq) *behaviour.idleCommitDistMult < behaviour.idleCommitDist)
+		Spring.Echo("Check 3", behaviour.idleChaseEnemyLeeway < math.sqrt(myIdleDistSq))
+	end
 	
 	if enemyDist < enemyRange or behaviour.idlePushAggressDistSq < myIdleDistSq then
 		local myIdleDist = math.sqrt(myIdleDistSq) 
 		if enemyPushingMe or enemyDist*behaviour.idleEnemyDistMult + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
 			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
 			SetIdleAgression(unitID, unitData, enemy, frame)
+			if doDebug then
+				Spring.Echo("Set Aggression")
+			end
 		elseif behaviour.idleChaseEnemyLeeway < myIdleDist then
 			-- Enemy is not blocking my retreat to idle pos, retreat.
 			ReturnUnitToIdlePos(unitID, unitData, true)
+			if doDebug then
+				Spring.Echo("Set Return")
+			end
 		end
 	end
 	return false
@@ -392,6 +416,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	local cx, cy, cz -- command position
 	
 	if isIdleAttack then
+		if (debugUnit and debugUnit[unitID]) or debugAll then
+			Spring.Echo("=== DoSwarmEnemy", unitID, " ===")
+		end
+		
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
 	end
 	
@@ -524,6 +552,9 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		if enemyUnitDef and typeKnown then
 			enemyRange = GetEnemyRange(enemyUnitDef)
 		end
+		if (debugUnit and debugUnit[unitID]) or debugAll then
+			Spring.Echo("=== DoSkirmEnemy", unitID, " ===")
+		end
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, predictedDist, ux, uz, origEx, origEz)
 	end
 	
@@ -623,6 +654,9 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 	local pointDis = ((predictDistSq < origDistSq) and math.sqrt(predictDistSq)) or math.sqrt(origDistSq)
 
 	if isIdleAttack then
+		if (debugUnit and debugUnit[unitID]) or debugAll then
+			Spring.Echo("=== DoFleeEnemy", unitID, " ===")
+		end
 		if UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez) then
 			return false
 		end
@@ -676,6 +710,12 @@ local function DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enem
 	
 	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
 	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+	
+	if (debugUnit and debugUnit[unitID]) or debugAll then
+		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
+		Spring.Echo("=== DoAiLessIdleCheck", unitID, " ===")
+		Spring.Echo("ex, ey, ez", ex, ey, ez, "ux, uy, uz", ux, uy, uz, "enemyRange", enemyRange)
+	end
 	
 	UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
 end
@@ -774,10 +814,12 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local behaviour
 	if not (middleMoveState and unitData.wasIdle) then
 		if exitEarly then
+			unitData.idleWantReturn = false
 			return
 		end
 		behaviour = GetUnitBehavior(unitID, unitData.udID)
 		if behaviour.onlyIdleHandling then
+			unitData.idleWantReturn = false
 			return
 		end
 	end
@@ -793,11 +835,20 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		end
 	end
 	
-	--Spring.Echo("BEFORE", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if doDebug then
+		Spring.Echo("=== DoUnitAIUpdate", unitID, " ===")
+		Spring.Utilities.UnitEcho(unitID, "update " .. unitID)
+		Spring.Echo("cmdID", cmdID, "enemy", enemy, "move", move, "haveFight", haveFight, "autoAttackEnemyID", autoAttackEnemyID)
+		Spring.Echo("wasIdle", unitData.wasIdle, "isIdleAttack", isIdleAttack, "idleWantReturn", unitData.idleWantReturn)
+		Spring.Echo("queueReturnX queueReturnZ", unitData.queueReturnX, unitData.queueReturnZ, "setReturn", unitData.setReturn)
+	end
 	
 	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack)
-	--Spring.Echo("unitData", cmdID, unitData.idleWantReturn, move, enemy, isIdleAttack, math.random())
-	--Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
+	if doDebug then
+		Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
+		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
+	end
 	
 	local sentTacticalAiOrder = false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
@@ -904,9 +955,17 @@ local function AddIdleUnit(unitID, unitDefID)
 	local unitData = unit[unitID]
 	unitData.wasIdle = true
 	
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if doDebug then
+		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
+		Spring.Echo("=== Unit Idle", unitID, " ===")
+	end
+	
 	if unitData.idleWantReturn and unitData.idleX then
+		if doDebug then
+			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
+		end
 		ReturnUnitToIdlePos(unitID, unitData)
-		--Spring.Utilities.UnitEcho(unitID, "Q")
 		return
 	end
 	
@@ -918,6 +977,10 @@ local function AddIdleUnit(unitID, unitDefID)
 	unitData.idleZ = z
 	unitData.wantFightReturn = nil
 	unitData.idleWantReturn = nil
+
+	if doDebug then
+		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
+	end
 	
 	if nearbyEnemy then
 		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
@@ -930,6 +993,10 @@ local function AddIdleUnit(unitID, unitDefID)
 				end
 			end
 		end
+	end
+	
+	if doDebug then
+		Spring.Echo("After nearby check", nearbyEnemy)
 	end
 	
 	SetIdleAgression(unitID, unitData, nearbyEnemy)
@@ -952,6 +1019,7 @@ function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 		return
 	end
 	unitData.wasIdle = false
+	unitData.idleWantReturn = false
 end
 
 --------------------------------------------------------------------------------
@@ -993,6 +1061,46 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Debug
+
+local function toggleDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	debugAll = not debugAll
+	Spring.Echo("Debug Idle All", debugAll)
+end
+
+local function ToggleDebugIdleUnit(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local unitID = tonumber(words[1])
+	Spring.Echo("Debug Idle")
+	if not unitID then
+		Spring.Echo("Disabled")
+		debugUnit = nil
+		return
+	end
+	
+	Spring.Echo("Adding unitID", unitID)
+	Spring.Utilities.UnitEcho(unitID)
+	debugUnit = debugUnit or {}
+	debugUnit[unitID] = true
+end
+
+local function PrintUnits(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local listData = unitList.data
+	for i = 1, unitList.count do
+		Spring.Utilities.UnitEcho(listData[i])
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Unit adding/removal
 
 function gadget:Initialize()
@@ -1005,6 +1113,10 @@ function gadget:Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+	
+	gadgetHandler:AddChatAction("debugidleall", ToggleDebugIdleAll, "")
+	gadgetHandler:AddChatAction("debugidle", ToggleDebugIdleUnit, "")
+	gadgetHandler:AddChatAction("printunits", PrintUnits, "")
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
