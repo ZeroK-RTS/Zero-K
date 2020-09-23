@@ -243,6 +243,17 @@ local function Teleport_AllowCommand(unitID, unitDefID, cmdID, cmdParams, cmdOpt
 	return gadget:AllowCommand(unitID, unitDefID, false, cmdID, cmdParams, cmdOptions)
 end
 
+local function GetExitDirection(unitID, tx, tz)
+	local cmdID, _, _, cp1, cp2, cp3 = Spring.GetUnitCurrentCommand(unitID, 2)
+	if cp1 and not cp2 and Spring.ValidUnitID(cp1) then
+		cp1, cp2, cp3 = Spring.GetUnitPosition(cp1)
+	end
+	if not cp3 then
+		return math.random()*2*math.pi
+	end
+	return Spring.Utilities.Vector.Angle(cp1 - tx, cp3 - tz) - 0.5 + math.random()
+end
+
 -- pick a point on map (towards random one of 8 directions) to teleport to
 -- ud is teleportiee's unitdef, tx and tz are Djinn's position
 local function GetTeleTargetPos(ud, unitDefID, tx, tz)
@@ -265,10 +276,11 @@ local function GetTeleTargetPos(ud, unitDefID, tx, tz)
 	return nil
 end
 
-local function GetTeleTargetPosRandomNoBuildTest(ud, unitDefID, tx, ty, tz)
+local function GetTeleTargetPosRandomNoBuildTest(ud, unitID, unitDefID, tx, ty, tz)
 	local size = ud.xsize
-	local direction = math.random()*2*math.pi
+	local direction = GetExitDirection(unitID, tx, tz)
 	local distance = size*4 + 40
+	local offset = ((math.random() > 0.5) and math.pi/4) or -math.pi/4
 	for i = 1, 8 do -- Just try 10 times
 		local ux, uz = math.cos(direction), math.sin(direction)
 		if ud.canFly then
@@ -286,7 +298,7 @@ local function GetTeleTargetPosRandomNoBuildTest(ud, unitDefID, tx, ty, tz)
 		if passed and spTestMoveOrder(unitDefID, tx + distance*ux, 0, tz + distance*uz, 0, 0, 0, true, true, false) then
 			return tx + distance*ux, tz + distance*uz
 		end
-		direction = direction + math.pi*7/9
+		direction = direction + offset
 	end
 	return nil
 end
@@ -496,7 +508,6 @@ function gadget:GameFrame(f)
 				
 				-- pick a unit to start teleporting
 				if not tele[tid].teleFrame then
-				
 					local bx, bz = beacon[bid].x, beacon[bid].z
 					local _, _, _, tx, ty, tz = Spring.GetUnitPosition(tid, true)
 					local units = Spring.GetUnitsInCylinder(bx, bz, BEACON_TELEPORT_RADIUS)
@@ -516,7 +527,7 @@ function gadget:GameFrame(f)
 									local unitDefID = Spring.GetUnitDefID(nid)
 									local ud = unitDefID and UnitDefs[unitDefID]
 									if ud then
-										local spotX, spotZ = GetTeleTargetPosRandomNoBuildTest(ud, unitDefID, tx, ty, tz)
+										local spotX, spotZ = GetTeleTargetPosRandomNoBuildTest(ud, nid, unitDefID, tx, ty, tz)
 										if spotX and spotZ then
 											teleportiee = nid
 											bestPriority = priority

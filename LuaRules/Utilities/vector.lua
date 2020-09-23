@@ -53,7 +53,7 @@ local function Norm(b, v)
 	end
 end
 
-local function Angle(x,z)
+local function Angle(x, z)
 	if not z then
 		x,z = x[1], x[2]
 	end

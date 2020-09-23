@@ -28,7 +28,7 @@ local beaconCreateX, beaconCreateZ
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local BEACON_SPAWN_SPEED = 9 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
+local BEACON_SPAWN_SPEED = 8 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
 
 
 local function Create_Beacon_Thread(x,z)
@@ -48,7 +48,8 @@ local function Create_Beacon_Thread(x,z)
 	GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
 		local speedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1) * BEACON_SPAWN_SPEED
-		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
+		
+		Turn(body, y_axis, math.rad(i*4), math.rad(50*speedMult))
 		Sleep(100/speedMult)
 		if i == 1 then
 			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
