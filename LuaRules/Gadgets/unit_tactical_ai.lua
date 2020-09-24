@@ -47,6 +47,7 @@ local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
 local unitDefRanges = {}
+local unitDefRealRanges = {}
 local armedUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	if not UnitDefs[i].modCategories["unarmed"] then
@@ -142,9 +143,18 @@ end
 
 local function GetEnemyRange(enemyDefID)
 	if not unitDefRanges[enemyDefID] then
-		unitDefRanges[enemyDefID] = UnitDefs[enemyDefID].maxWeaponRange
+		local ud = UnitDefs[enemyDefID]
+		unitDefRanges[enemyDefID] = (ud.customParams.percieved_range and tonumber(ud.customParams.percieved_range)) or ud.maxWeaponRange
 	end
 	return unitDefRanges[enemyDefID]
+end
+
+local function GetEnemyRealRange(enemyDefID)
+	if not unitDefRealRanges[enemyDefID] then
+		local ud = UnitDefs[enemyDefID]
+		unitDefRealRanges[enemyDefID] = ud.maxWeaponRange
+	end
+	return unitDefRealRanges[enemyDefID]
 end
 
 --------------------------------------------------------------------------------
@@ -987,7 +997,7 @@ local function AddIdleUnit(unitID, unitDefID)
 	if nearbyEnemy then
 		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
 		if enemyUnitDef and typeKnown then
-			local enemyRange = GetEnemyRange(enemyUnitDef)
+			local enemyRange = GetEnemyRealRange(enemyUnitDef)
 			if enemyRange and enemyRange > 0 then
 				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
 				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
