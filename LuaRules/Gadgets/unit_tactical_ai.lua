@@ -283,7 +283,7 @@ end
 
 local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, enemyDist, ux, uz, ex, ez)
 	-- This function uses three locations (enemypos, unitpos, unit idle pos) and decides to do one of three things
-	-- * Stop fighting, via ReturnUnitToIdlePos(unitID, unitData, true, frame)
+	-- * Stop fighting, via SetIdleAgression(unitID, unitData, true, frame)
 	-- * Stop fleeing, via ReturnUnitToIdlePos(unitID, unitData, true)
 	-- * Nothing
 	if not unitData.idleX then
