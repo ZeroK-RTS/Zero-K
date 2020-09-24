@@ -77,6 +77,7 @@ local aggressiveTarget = {}
 local HEADING_TO_RAD = (math.pi*2/2^16)
 
 local debugAll = false
+local debugAction = false
 local debugUnit = false
 
 --------------------------------------------------------------------------------
@@ -291,13 +292,18 @@ local function CheckTargetAggression(enemy, frame)
 	return true
 end
 
-local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, enemyDist, ux, uz, ex, ez)
+local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyUnitDefID, defaultEnemyRange, enemyDist, ux, uz, ex, ez, ignoreCloseEnemyAggress)
 	-- This function uses three locations (enemypos, unitpos, unit idle pos) and decides to do one of three things
 	-- * Stop fighting, via SetIdleAgression(unitID, unitData, true, frame)
 	-- * Stop fleeing, via ReturnUnitToIdlePos(unitID, unitData, true)
 	-- * Nothing
 	if not unitData.idleX then
 		return true
+	end
+	
+	local enemyRange = defaultEnemyRange
+	if enemyUnitDefID then
+		enemyRange = GetEnemyRealRange(enemyUnitDefID)
 	end
 	
 	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
@@ -334,7 +340,10 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 		Spring.Echo("Check 3", behaviour.idleChaseEnemyLeeway < math.sqrt(myIdleDistSq))
 	end
 	
-	if enemyDist < enemyRange or behaviour.idlePushAggressDistSq < myIdleDistSq then
+	-- Do not switch from flee to skirm unless pushed as it is often a bad idea.
+	local ignoreCloseEnemyAggress = enemyUnitDefID and (behaviour.skirms and behaviour.skirms[enemyUnitDefID] and not (behaviour.hugs and behaviour.hugs[enemyUnitDefID]))
+	
+	if (enemyDist < enemyRange and not ignoreCloseEnemyAggress) or behaviour.idlePushAggressDistSq < myIdleDistSq then
 		local myIdleDist = math.sqrt(myIdleDistSq) 
 		if enemyPushingMe or enemyDist*behaviour.idleEnemyDistMult + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
 			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
@@ -372,6 +381,10 @@ end
 local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, fightX, fightY, fightZ, frame)
 	local unitData = unit[unitID]
 
+	if debugAction then
+		Spring.Utilities.UnitEcho(unitID, "flee")
+	end
+	
 	if not (enemy and typeKnown) then
 		if not (((cmdID == CMD_FIGHT) or move) and fightZ) then
 			return false
@@ -432,7 +445,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			Spring.Echo("=== DoSwarmEnemy", unitID, " ===")
 		end
 		
-		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
+		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, behaviour.swarmEnemyDefaultRange, pointDis, ux, uz, ex, ez)
 	end
 	
 	if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
@@ -517,6 +530,10 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		return behaviour.skirmKeepOrder
 	end
 	
+	if debugAction then
+		Spring.Utilities.UnitEcho(unitID, "skirm")
+	end
+	
 	local origEx, origEz = ex, ez
 	
 	if enemyUnitDef and behaviour.avoidHeightDiff and behaviour.avoidHeightDiff[enemyUnitDef] then
@@ -560,14 +577,10 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	end
 	
 	if isIdleAttack then
-		local enemyRange = 250
-		if enemyUnitDef and typeKnown then
-			enemyRange = GetEnemyRange(enemyUnitDef)
-		end
 		if (debugUnit and debugUnit[unitID]) or debugAll then
 			Spring.Echo("=== DoSkirmEnemy", unitID, " ===")
 		end
-		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, predictedDist, ux, uz, origEx, origEz)
+		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, 250, predictedDist, ux, uz, origEx, origEz)
 	end
 	
 	local skirmRange = (doHug and behaviour.hugRange) or ((GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
@@ -649,7 +662,9 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 			enemyRange = range
 		end
 	end
-
+	if debugAction then
+		Spring.Utilities.UnitEcho(unitID, "flee")
+	end
 	local prediction = behaviour.fleeVelPrediction or behaviour.velocityPrediction
 	local vx, vy, vz = spGetUnitVelocity(enemy)
 	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
@@ -669,17 +684,17 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 		if (debugUnit and debugUnit[unitID]) or debugAll then
 			Spring.Echo("=== DoFleeEnemy", unitID, " ===")
 		end
-		if UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez) then
+		if UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, behaviour.minFleeRange, pointDis, ux, uz, ex, ez) then
 			return false
 		end
 	end
 	
 	if enemyRange + behaviour.fleeLeeway > pointDis then
 		local dis = behaviour.fleeOrderDis
-		local f = dis/pointDis
 		if (pointDis+dis > behaviour.skirmRange-behaviour.stoppingDistance) then
-			f = (enemyRange+behaviour.fleeDistance-pointDis)/pointDis
+			dis = (enemyRange+behaviour.fleeDistance-pointDis)
 		end
+		local f = dis/pointDis
 		local cx = ux+(ux-ex)*f
 		local cy = uy
 		local cz = uz+(uz-ez)*f
@@ -715,9 +730,8 @@ local function DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enem
 		return false
 	end
 	
-	local enemyRange = 0
-	if enemyUnitDef and typeKnown then
-		enemyRange = GetEnemyRange(enemyUnitDef)
+	if debugAction then
+		Spring.Utilities.UnitEcho(unitID, "check")
 	end
 	
 	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
@@ -726,10 +740,10 @@ local function DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enem
 	if (debugUnit and debugUnit[unitID]) or debugAll then
 		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
 		Spring.Echo("=== DoAiLessIdleCheck", unitID, " ===")
-		Spring.Echo("ex, ey, ez", ex, ey, ez, "ux, uy, uz", ux, uy, uz, "enemyRange", enemyRange)
+		Spring.Echo("ex, ey, ez", ex, ey, ez, "ux, uy, uz", ux, uy, uz)
 	end
 	
-	UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, enemyRange, pointDis, ux, uz, ex, ez)
+	UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, 250, pointDis, ux, uz, ex, ez)
 end
 
 --------------------------------------------------------------------------------
@@ -1075,12 +1089,20 @@ end
 --------------------------------------------------------------------------------
 -- Debug
 
-local function toggleDebug(cmd, line, words, player)
+local function ToggleDebugIdleAll(cmd, line, words, player)
 	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	debugAll = not debugAll
 	Spring.Echo("Debug Idle All", debugAll)
+end
+
+local function ToggleDebugAiAction(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	debugAction = not debugAction
+	Spring.Echo("Debug Tactical AI", debugAction)
 end
 
 local function ToggleDebugIdleUnit(cmd, line, words, player)
@@ -1127,6 +1149,7 @@ function gadget:Initialize()
 	end
 	
 	gadgetHandler:AddChatAction("debugidleall", ToggleDebugIdleAll, "")
+	gadgetHandler:AddChatAction("debugai", ToggleDebugAiAction, "")
 	gadgetHandler:AddChatAction("debugidle", ToggleDebugIdleUnit, "")
 	gadgetHandler:AddChatAction("printunits", PrintUnits, "")
 end
