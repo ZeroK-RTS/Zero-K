@@ -512,13 +512,18 @@ options = {
 	},
 }
 
-local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
-
 local tacticalAIUnits = {}
-
-for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-	if not behaviourData.onlyIdleHandling then
-		tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+do
+	local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
+	for unitDefID, behaviourData in pairs(tacticalAIDefs) do
+		if not behaviourData.onlyIdleHandling then
+			local unitDefName = unitDefID and UnitDefs[unitDefID]
+			unitDefName = unitDefName and unitDefName.name
+			if unitDefName then
+				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+			end
+			Spring.Echo("unitDefName", unitDefName, tacticalAIUnits[unitDefName])
+		end
 	end
 end
 
