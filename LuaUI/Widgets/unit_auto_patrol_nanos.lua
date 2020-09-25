@@ -59,6 +59,10 @@ local CMD_PATROL        = CMD.PATROL
 local CMD_RECLAIM       = CMD.RECLAIM
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP          = CMD.STOP
+local CMD_INSERT        = CMD.INSERT
+local CMD_OPT_CTRL      = CMD.OPT_CTRL
+local CMD_OPT_ALT       = CMD.OPT_ALT
+local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
 
 local CommandNames = {
 	[CMD_PATROL] = "PATROL",
@@ -76,7 +80,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
-local spGetSelectedUnits = Spring.GetSelectedUnits
 local spValidUnitID		= Spring.ValidUnitID
 
 local abs = math.abs
@@ -168,7 +171,7 @@ end
 
 local resourceCacheInterval = 1
 local resourceCache = { updated=nil }
-local function DecideCommand(x, y, z, buildDistance)
+local function DecideCommands(x, y, z, buildDistance)
 	if resourceCache.updated == nil or
 			resourceCache.updated + resourceCacheInterval < time then
 		resourceCache.metal,
@@ -176,6 +179,12 @@ local function DecideCommand(x, y, z, buildDistance)
 			resourceCache.metalPull,
 			resourceCache.metalIncome = spGetTeamResources(spGetMyTeamID(), "metal")
 		resourceCache.metalStorage = resourceCache.metalStorage - HIDDEN_STORAGE
+		resourceCache.energy,
+			resourceCache.energyStorage,
+			resourceCache.energyPull,
+			resourceCache.energyIncome = spGetTeamResources(spGetMyTeamID(), "energy")
+		resourceCache.energyStorage = resourceCache.energyStorage - HIDDEN_STORAGE
+
 		resourceCache.updated = time
 	end
 
@@ -184,35 +193,87 @@ local function DecideCommand(x, y, z, buildDistance)
 	local metalIncome = resourceCache.metalIncome
 	local metal = resourceCache.metal + metalIncome - metalPull
 
+	local energyStorage = resourceCache.energyStorage
+	local energyPull = resourceCache.energyPull
+	local energyIncome = resourceCache.energyIncome
+	local energy = resourceCache.energy + energyIncome - energyPull
+
 	local slop = 5
 
+	local get_metal, get_energy, use_metal, use_energy
+
 	if metalStorage < 1 then
-		if metalPull <= metalIncome then
-			--Log("repair")
-			return {CMD_REPAIR, {x, y, z, buildDistance}}
-        else
-			--Log("reclaim")
-			return {CMD_REPAIR, {x, y, z, buildDistance}}
+		get_metal = metalPull >= metalIncome
+		use_metal = metalPull <= metalIncome
+	else
+		get_metal = metal < metalStorage - slop and
+				metal < metalStorage * 0.9
+		use_metal = metal > slop and metal > metalStorage * 0.1
+	end
+
+	if energyStorage < 1 then
+		get_energy = energyPull >= energyIncome
+		use_energy = energyPull <= energyIncome
+	else
+		get_energy = energy < energyStorage - slop and
+				energy < energyStorage * 0.9
+		use_energy = energy > slop and energy > energyStorage * 0.1
+	end
+
+	Log("get_metal=" .. tostring(get_metal) .. ", " ..
+		"use_metal=" .. tostring(use_metal) .. ", " ..
+		"get_energy=" .. tostring(get_energy) .. ", " ..
+		"use_energy=" .. tostring(use_energy))
+
+	local reclaim_metal = {CMD_RECLAIM, {x, y, z, buildDistance}, 0, "reclaim metal"}
+	local reclaim_energy = {CMD_RECLAIM, {x, y, z, buildDistance}, CMD_OPT_CTRL, "reclaim energy"}
+	-- TODO: This doesn't work right. When we issue this command it still
+	-- assists in building units.
+	local repair_units = {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_CTRL, "repair units"}
+	local build_assist = {CMD_REPAIR, {x, y, z, buildDistance}, 0, "build assist"}
+
+	-- Patrolling doesn't do anything if you target the current location of
+	-- the unit. Point patrol towards map center.
+	local vx = mapCenterX - x
+	local vz = mapCenterZ - z
+	local patrol = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
+
+	local commands = {}
+
+	if get_metal and use_metal and use_energy then
+		table.insert(commands, patrol)
+	else
+		if use_metal and use_energy then
+			table.insert(commands, build_assist)
+		end
+		if use_energy then
+			table.insert(commands, repair_units)
+		end
+		if get_metal and get_energy then
+			if metal > energy then
+				table.insert(commands, reclaim_energy)
+				table.insert(commands, reclaim_metal)
+			else
+				table.insert(commands, reclaim_metal)
+				table.insert(commands, reclaim_energy)
+			end
+		elseif get_metal then
+			table.insert(commands, reclaim_metal)
+		elseif get_energy then
+			table.insert(commands, reclaim_energy)
 		end
 	end
 
-	if metal < slop or metal < metalStorage * 0.1 then
-		--Log("reclaim")
-		return {CMD_RECLAIM, {x, y, z, buildDistance}}
-	elseif metal > metalStorage - slop or metal > metalStorage * 0.9 then
-		--Log("repair")
-		return {CMD_REPAIR, {x, y, z, buildDistance}}
-	else
-		--Log("patrol")
-		-- Patrolling doesn't do anything if you target the current location of
-		-- the unit. Point patrol towards map center.
-		vx = mapCenterX - x
-		vz = mapCenterZ - z
-		x = x + vx*25/abs(vx)
-		z = z + vz*25/abs(vz)
+	return commands
+end
 
-		return {CMD_PATROL, {x, y, z}}
+local function AllTrue(table)
+	for _, v in pairs(table) do
+		if not v then
+			return false
+		end
 	end
+	return true
 end
 
 local function SetupUnit(unitID)
@@ -222,15 +283,22 @@ local function SetupUnit(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
 		trackedUnits[unitID].checkTime = time + checkInterval
-		local cmd = DecideCommand(x, y, z, buildDistance)
+		local cmds = DecideCommands(x, y, z, buildDistance)
+		--LogTable(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
 		--Log(time .. "; cmd queue for " .. unitID .. ":")
-		--LogTable(commandQueue, "  ")
+		--LogTable(commandQueue, "commandQueue: ")
 
 		--LogTable(cmd, "cmd: ")
 		local foundIssuedCommand = false
 		local foundAnyCommand = false
+
+		local foundCommand = {}
+		for i, _ in ipairs(cmds) do
+			foundCommand[i] = false
+		end
+
 		for _, current in pairs(commandQueue) do
 			--LogTable(current, "current:")
 			--Log(tostring(current.options.internal))
@@ -239,33 +307,46 @@ local function SetupUnit(unitID)
 
 			if not current.options.internal then
 				foundAnyCommand = true
-				if current.id == cmd[1] and
-					TableEqual(cmd[2], current.params) then
-					--Log("order " .. CommandNames[cmd[1]] .. " to " .. unitID .. " already issued")
-					return
+				for i, cmd in ipairs(cmds) do
+					if current.id == cmd[1] and
+							TableEqual(cmd[2], current.params) then
+						foundCommand[i] = true
+					end
 				end
 
-				if trackedUnits[unitID].command and
-						current.id == trackedUnits[unitID].command[1] and
-						TableEqual(current.params, trackedUnits[unitID].command[2]) then
-				    foundIssuedCommand = true
+				if trackedUnits[unitID].commands then
+					for i, cmd in ipairs(trackedUnits[unitID].commands) do
+						if current.id == cmd[1] and
+								TableEqual(current.params, cmd[2]) then
+							foundIssuedCommand = true
+						end
+					end
 				end
 			end
 		end
 
+		if AllTrue(foundCommand) then
+			Log("All commands were already issued")
+			return
+		end
+
 		if foundAnyCommand and not foundIssuedCommand then
 			Log("Ignore unit " .. unitID .. " until it becomes idle.")
-			LogTable(commandQueue, "  command queue:")
 			trackedUnits[unitID] = nil
 			return
 		end
 
-		Log("give order " .. CommandNames[cmd[1]] .. " to " .. unitID ..
-				" @ " .. x .. ", " .. y .. ", " .. z)
-		--LogTable(cmd[2], "  order args: ")
-		spGiveOrderToUnit(unitID, cmd[1], cmd[2], {})
+		for i, cmd in ipairs(cmds) do
+			Log("give order " .. cmd[4] .. " to " .. unitID ..
+					" @ " .. x .. ", " .. y .. ", " .. z)
+			if i == 1 then
+				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
+			else
+				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
+			end
+		end
 		trackedUnits[unitID].settleTime = time + settleInterval
-		trackedUnits[unitID].command = cmd
+		trackedUnits[unitID].commands = cmds
 	end
 end
 
@@ -383,8 +464,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	-- Check soon, but not right away. This time has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
-	delta = 0.5
-	trackedUnits[unitID] = trackedUnits[unitID] or 
+	local delta = 0.5
+	trackedUnits[unitID] = trackedUnits[unitID] or
 			{checkTime=time + delta, settleTime=time+delta}
 	trackedUnits[unitID].checkTime =
 		max(
