@@ -8,9 +8,9 @@
 --  Licensed under the terms of the GNU GPL, v2 or later.
 --
 -- Features:
---   1. Idle caretakers will be set to area repair if metal is high, area reclaim
---      when metal is low, and patrol otherwise. (Unless patrol_idle_nanos option is
---      false.)
+--   1. Idle caretakers will be set to area repair units, area assist build (which
+--      includes repair units), area reclaim metal, area reclaim energy, or patrol,
+--      depending on available resources.
 --   2. For each caretaker under this widget's control, re-evaluate the behavior based
 --		on the economy every 20 seconds. (Controlled by checkInterval.)
 --   3. For each caretaker, never issue a command more than once every 5 seconds.
@@ -22,13 +22,7 @@
 --      until it becomes idle again.
 --
 -- Limitations:
---   1. Area reclaim does not reclaim energy sources. We'd have to call
---      GetFeaturesInRectangle() to improve this.
---   2. Area repair either assists in build (using both metal and energy) or
---      repairs damage (using only energy). Since assisting a factory is the most
---      common use for caretakers, we tell caretakers to reclaim if metal is low.
---      We'd have to call GetUnitsInCylinder() to do better.
---   3. When the widget chooses repair only, there's a 0.5 second delay between
+--   1. When the widget chooses repair only, there's a 0.5 second delay between
 --      a unit becoming idle and being told to repair. This is to give the factory
 --      that's being assisted time to start the next unit. It is not perfect, and the
 --      factory will be assisted less than if a patrol was issued. This could be
