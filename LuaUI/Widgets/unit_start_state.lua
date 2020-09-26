@@ -522,7 +522,6 @@ do
 			if unitDefName then
 				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
 			end
-			Spring.Echo("unitDefName", unitDefName, tacticalAIUnits[unitDefName])
 		end
 	end
 end
