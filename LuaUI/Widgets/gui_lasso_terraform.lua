@@ -84,8 +84,12 @@ local Grid = 16 -- grid size, do not change without other changes.
 local HOTKEY_PATH = 'Hotkeys/Construction'
 
 options_path = 'Settings/Interface/Building Placement'
-options_order = {'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
+options_order = {'catlabel', 'structure_holdMouse', 'structure_altSelect', 'staticMouseTime', 'label_preset', 'text_hotkey_level', 'text_hotkey_raise'}
 options = {
+	catlabel = {
+		name = 'Build Height',
+		type = 'label',
+	},
 	structure_holdMouse = {
 		name = "Terraform by holding mouse click",
 		type = "bool",

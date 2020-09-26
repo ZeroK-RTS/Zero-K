@@ -22,7 +22,6 @@ local spGetMouseState       = Spring.GetMouseState
 local spTraceScreenRay      = Spring.TraceScreenRay
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetModKeyState      = Spring.GetModKeyState
 local Echo                  = Spring.Echo
 
@@ -58,9 +57,9 @@ local dwOn, draw, drawValue, drawRects
 
 -- related to options
 local requestUpdate
-local wheelSpacing, reverseWheel
-local showSpacingRects, only2Rects, showRectsOnChange
-local showSpacingValue, showValueOnChange
+local wheelSpacing, reverseWheel = false, false
+local showSpacingRects, only2Rects, showRectsOnChange = true, false, true
+local showSpacingValue, showValueOnChange = false, false
 local showRectsTime = 1
 local showValueTime = 1
 local spacingIncrease
@@ -74,6 +73,7 @@ local function UpdateKeys()
 	key = WG.crude.GetHotkeyRaw("buildspacing dec")
 	spacingDecrease = ToKeysyms(key and key[1])
 end
+
 -- Menu detection, update and refresh
 local function UpdateOptionsDisplay(options_path)
 	local greyed = "\255\155\155\155"
@@ -83,23 +83,24 @@ local function UpdateOptionsDisplay(options_path)
 		local parents   = option.parents
 		local children  = option.children
 		if parents then
---if the option is a child -- CANDO: better with scanning child by parents instead of parents by child, keep in mind child can have multiple parents
+			--if the option is a child -- CANDO: better with scanning child by parents instead of parents by child, keep in mind child can have multiple parents
 			-- greying out if its value is false/nil
 			if origname then
-				option.name = value and origname or greyed..origname
+				option.name = value and origname or greyed .. origname
 			end
 			-- masking itself if all its parents have false/nil value
 			local parentsVal
 			for _, parentname in pairs(parents) do
 				parentsVal = options[parentname].value
 				if parentsVal then
-break end
+					break
+				end
 			end
 			option.hidden = not parentsVal
 		end
 		if children and origname then
--- if its a parent
-			option.name = value and origname or origname.."..."
+			-- if its a parent
+			option.name = value and origname or origname .. "..."
 		end
 	end
 	-- refreshing menu if it's active
@@ -113,8 +114,8 @@ break end
 		end
 	end
 end
--------
 
+-------
 -------- Options
 local hotkeys_path = 'Hotkeys/Construction'
 options_path = 'Settings/Interface/Building Placement'
@@ -125,7 +126,6 @@ options_order = {
 	'wheel_spacing', 'reverse_wheel',
 	'show_spacing_rects', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
 	'show_spacing_value', 'show_value_only_on_change', 'show_time_value',
-	'separator_label'
 }
 -- hotkeys
 options = {
@@ -176,37 +176,40 @@ options = {
 	},
 	-- wheel
 	wheel_spacing = {
-		origname        = 'On Shift + MouseWheel',
+		origname        = 'Change with Shift + MouseWheel',
 		type            = 'bool',        
 		desc            = 'Change the spacing with the Mousewheel and Shift down',
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self) 
-						    wheelSpacing = self.value
-						    requestUpdate = options_path
-						  end,
+			wheelSpacing = self.value
+			requestUpdate = options_path
+		end,
 		children        = {'reverse_wheel'}
 	},
 	reverse_wheel = {
-		origname        = ' ..reversed',
+		origname        = ' ..invert scroll.',
 		type            = 'bool',
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
-						    reverseWheel = self.value and -1 or 1
-						    requestUpdate = options_path
-						  end,
+			reverseWheel = self.value and -1 or 1
+			requestUpdate = options_path
+		end,
 		parents         = {'wheel_spacing'}
 	},
 	-- rectangle showing options
 	show_spacing_rects = {
-		origname        = 'Previsualization',
+		origname        = 'Visualise spacing',
 		type            = 'bool',
 		desc            = "Briefly show spaced rectangles in all directions around the cursor",
+		value           = true,
 		noHotkey        = true,
-		OnChange        = function(self) 
-						    showSpacingRects = self.value
-						    spacedRects = {}
-						    requestUpdate = options_path
-						  end,
+		OnChange        = function(self)
+			showSpacingRects = self.value
+			spacedRects = {}
+			requestUpdate = options_path
+		end,
 		children        = {'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects'}
 	},
 	
@@ -214,44 +217,47 @@ options = {
 		origname        = ' ..of only two rectangles, ',
 		type            = 'bool',
 		desc            = "If 8 rectangles bug you too much, only show 2 horizontal rectangles",
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
-						    spacedRects = {}
-						    only2Rects = self.value
-						    requestUpdate = options_path
-						  end,
+			spacedRects = {}
+			only2Rects = self.value
+			requestUpdate = options_path
+		end,
 		parents         = {'show_spacing_rects'}
 	},
 	show_rects_only_on_change = {
 		origname        = ' ..only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see those rectangles until you change the current spacing",
+		value           = true,
 		noHotkey        = true,
 		OnChange        = function(self)
-		                  showRectsOnChange = self.value
-		                  requestUpdate = options_path
-		                end,
+			showRectsOnChange = self.value
+			requestUpdate = options_path
+		end,
 		parents         = {'show_spacing_rects'}
 	},
 	show_time_rects = {
-		name            = ' ..within 1 sec.',
+		name            = ' ..for 1 seconds.',
 		type            = 'number',
 		min             = 0.1,
 		max             = 5,
 		step            = 0.1,
 		value           = 1,
 		tooltipFunction = function(self)
-						    return self.value < 5 and round(self.value, 1).." sec" or "forever"
-						  end,
+			return self.value < 5 and round(self.value, 1).." seconds" or "forever"
+		end,
 		OnChange        = function(self)
-						    showRectsTime = self.value < 5 and self.value or huge
-						    local str = self.tooltipFunction(self) -- just using the return
-						    if str == 'forever'
-						    then
-self.name = " ..forever."
-						    else self.name = ' ..within '..str..'.' end
-						    requestUpdate = options_path
-						  end,
+			showRectsTime = self.value < 5 and self.value or huge
+			local str = self.tooltipFunction(self) -- just using the return
+			if str == 'forever' then
+				self.name = " ..forever."
+			else
+				self.name = ' ..for '..str..'.'
+			end
+			requestUpdate = options_path
+		end,
 		parents        = {'show_spacing_rects'}
 	},
 	-- value showing options
@@ -259,11 +265,12 @@ self.name = " ..forever."
 		origname        = 'Show spacing value',
 		type            = 'bool',
 		desc            = "Briefly show separation value",
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
-						    showSpacingValue = self.value
-						    requestUpdate = options_path
-						  end,
+			showSpacingValue = self.value
+			requestUpdate = options_path
+		end,
 		children        = {'show_value_only_on_change', 'show_time_value'}
 	},
 	
@@ -271,42 +278,36 @@ self.name = " ..forever."
 		origname        = ' ..only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see the above helper until you change the current spacing",
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
-						    showValueOnChange = self.value
-						    requestUpdate = options_path
-						  end,
+			showValueOnChange = self.value
+			requestUpdate = options_path
+		end,
 		parents         = {'show_spacing_value'}
 	},
 	
 	show_time_value = {
-		name            = ' ..within 1 sec.',
+		name            = ' ..for 1 seconds.',
 		type            = 'number',
 		min             = 0.1,
 		max             = 5,
 		step            = 0.1,
 		value           = 1,
 		tooltipFunction    = function(self)
-						    return self.value < 5 and round(self.value, 1).." sec" or "forever"
-						  end,
+			return self.value < 5 and round(self.value, 1).." seconds" or "forever"
+		end,
 		OnChange        = function(self)
-						    showValueTime = self.value < 5 and self.value or huge
-						    local str = self.tooltipFunction(self) -- just using the return
-						    if str == 'forever'
-						    then
-self.name = " ..forever."
-						    else self.name = ' ..within '..str..'.' end
-						    requestUpdate = options_path
-						  end,
+			showValueTime = self.value < 5 and self.value or huge
+			local str = self.tooltipFunction(self) -- just using the return
+			if str == 'forever' then
+				self.name = " ..forever."
+			else self.name = ' ..for '..str..'.' end
+			requestUpdate = options_path
+		end,
 		parents         = {'show_spacing_value'},
 	},
-	--
-	separator_label = {
-		name = '¯¯',
-		type = 'label',
-	},
 }
---
 
 -- for drawing later...
 local function IdentifyPlacement(PID, facing)
@@ -391,7 +392,7 @@ function widget:Update(dt)
 		return
 	end
 	if buildStarted == nil then
-		buildStarted = 'new'
+		buildStarted = 1
 		waitTime = 0
 	end
 	if newspacing then
@@ -415,17 +416,15 @@ function widget:Update(dt)
  
 	-- Drawing set up
 	draw, drawRects, drawValue = true, true, true
-	if not showSpacingRects
-		or waitTime > showRectsTime
-		or showRectsOnChange and buildStarted
-		then
+	if not showSpacingRects or
+			waitTime > showRectsTime or
+			showRectsOnChange and buildStarted then
 		drawRects = false
 	end
 
-	if not showSpacingValue
-		or waitTime > showValueTime
-		or showValueOnChange and buildStarted
-		then
+	if not showSpacingValue or
+			waitTime > showValueTime or
+			showValueOnChange and buildStarted then
 		drawValue = false
 	end
 	
@@ -456,11 +455,11 @@ function widget:Update(dt)
 	end
 
 	local nx, nz = ToValidPlacement(pos[1], pos[3], placement.oddx, placement.oddz)
-	if x == nx and z == nz and not (newspacing or buildStarted == 'new') then
+	if x == nx and z == nz and not (newspacing or buildStarted == 1) then
 		-- only recalculate when needed
 		return
 	end
-	if buildStarted == 'new' then
+	if buildStarted == 1 then
 		buildStarted = true
 	end
 	newspacing = false
@@ -476,7 +475,7 @@ function widget:Update(dt)
 		for offx = -1, 1 do
 			for offz = -1, 1 do
 				if not(offx == 0 and offz == 0) then
--- skipping the middle one
+					-- skipping the middle one
 					if not only2Rects or offz == 0 then
 						count = count+1
 						spacedRects[count] = MakeCorners(
@@ -493,7 +492,6 @@ function widget:Update(dt)
 		widgetHandler:UpdateCallIn("DrawWorld")
 	end
 end
-
 
 ------------- Drawing
 function widget:DrawWorld()
@@ -521,8 +519,7 @@ function widget:DrawWorld()
 		glLineWidth(1)
 		glLineStipple(false)
 		glColor(1, 1, 1, 1)
-	end    
-	--
+	end
 	if drawValue then
 		glPushMatrix()
 		glTranslate(x, y, z)
@@ -532,10 +529,9 @@ function widget:DrawWorld()
 		glPopMatrix()
 		glColor(1, 1, 1, 1)
 	end
-	--
 end
-------------
 
+------------
 -- Save/Load spacing values
 function widget:GetConfigData()
 	local spacingByName = {}
@@ -560,10 +556,6 @@ end
 
 -- Init
 function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
-	if spGetSpectatingState() then
-		widgetHandler:RemoveWidget()
-	end
 	UpdateKeys() 
+	UpdateOptionsDisplay(options_path)
 end
-
-
