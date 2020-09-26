@@ -36,7 +36,7 @@ return { factoryamph = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    modelradius    = [[100]],
+    modelradius    = [[50]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName = [[8]],
