@@ -310,22 +310,28 @@ options = {
 }
 
 -- for drawing later...
-local function IdentifyPlacement(PID, facing)
-	local ud = UnitDefs[-PID]
+local placementCache = {}
+local placementCacheOff = {}
+local function IdentifyPlacement(unitDefID, facing)
 	local offFacing = (facing == 1 or facing == 3)
-	local sx = ud.xsize*8
-	local sz = ud.zsize*8
-	if offFacing then
-		sx, sz = sz, sx
+	local placeTable = (offFacing and placementCacheOff) or placementCache
+	if not placementCache[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		local sx = ud.xsize*8
+		local sz = ud.zsize*8
+		if offFacing then
+			sx, sz = sz, sx
+		end
+		local oddx, oddz = (sx/2)%16, (sz/2)%16
+		placeTable[unitDefID] = {
+			oddx = oddx,
+			oddz = oddz,
+			sx = sx,
+			sz = sz,
+			floatOnWater = ud.floatOnWater,
+		}
 	end
-	local oddx, oddz = (sx/2)%16, (sz/2)%16
-	return {
-		oddx = oddx,
-		oddz = oddz,
-		sx = sx,
-		sz = sz,
-		floatOnWater = ud.floatOnWater,
-	}
+	return placeTable[unitDefID]
 end
 
 local function ToValidPlacement(x, z, oddx, oddz)
@@ -395,11 +401,6 @@ function widget:Update(dt)
 		buildStarted = 1
 		waitTime = 0
 	end
-	if newspacing then
-		buildStarted = false
-		waitTime = 0
-	end
-
 	if preGame then
 		preGame = spGetGameSeconds() < 0.1
 	end
@@ -414,16 +415,30 @@ function widget:Update(dt)
 	spacing = spGetBuildSpacing() -- changed mind, if another widget wants to change the spacing, we have to know it
 	buildSpacing[cmdID] = spacing
  
+	--Spring.Echo("showSpacingRects", showSpacingRects, waitTime, showRectsTime, showRectsOnChange, buildStarted, newspacing)
+	local mx, my, leftClick, _, rightClick = spGetMouseState()
+	if leftClick or rightClick then
+		draw = false
+		waitTime = false
+		newspacing = false
+		return
+	end
+	
+	if newspacing then
+		buildStarted = false
+		waitTime = 0
+	end
+
 	-- Drawing set up
 	draw, drawRects, drawValue = true, true, true
 	if not showSpacingRects or
-			waitTime > showRectsTime or
+			(waitTime and waitTime > showRectsTime) or
 			showRectsOnChange and buildStarted then
 		drawRects = false
 	end
 
 	if not showSpacingValue or
-			waitTime > showValueTime or
+			(waitTime and waitTime > showValueTime) or
 			showValueOnChange and buildStarted then
 		drawValue = false
 	end
@@ -433,19 +448,15 @@ function widget:Update(dt)
 		return
 	end
 	
-	waitTime = waitTime + dt
+	if waitTime then
+		waitTime = waitTime + dt
+	end
 	
 	local f = spGetBuildFacing()
 	if facing~= f or not identified then
 		facing = f
-		placement = IdentifyPlacement(-cmdID, facing)
+		placement = IdentifyPlacement(cmdID, facing)
 		identified = true
-	end
-	
-	local mx, my, leftClick, _, rightClick = spGetMouseState()
-	if leftClick or rightClick then
-		draw = false
-		return
 	end
 	
 	local pos = select(2, spTraceScreenRay(mx, my, true, false, false, placement.floatOnWater))
@@ -462,7 +473,6 @@ function widget:Update(dt)
 	if buildStarted == 1 then
 		buildStarted = true
 	end
-	newspacing = false
 	x, z = nx, nz
 	
 	if drawValue then
@@ -502,7 +512,7 @@ function widget:DrawWorld()
 		return
 	end
 	dwOn = true
-	if drawRects then
+	if drawRects and waitTime then
 		local alpha
 		if waitTime < (showRectsTime-1) then
 			alpha = 0.6
