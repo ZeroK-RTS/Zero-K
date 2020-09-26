@@ -162,7 +162,7 @@ function gadget:GetInfo()
 	  name    = "ExcludeAirpad",
 	  action  = "excludeairpads",
 	  cursor  = 'Repair',
-	  type    = CMDTYPE.ICON,
+	  type    = CMDTYPE.ICON_MAP,
 	  tooltip = "Excludes an airpad from the running.", --Need to think of a better desc here
 	  texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
 	  hidden  = false,
@@ -760,8 +760,9 @@ function gadget:GetInfo()
 		  return true,true
 	  end
 	  if cmdID == CMD_EXCLUDEAIRPAD then
-		  --excludeAirpad(unitID)
-		  Spring.Echo("Hi")
+		  excludeAirpad(unitID)
+		  --Spring.Echo("Hi")
+		  return true,true
 	  end
 	  return false -- command not used
   end
@@ -880,7 +881,6 @@ function gadget:GetInfo()
 	  gadgetHandler:RegisterCMDID(CMD_REARM)
 	  Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
 	  Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
-	  --Spring.SetCustomCommandDrawData(CMD_EXCLUDEAIRPAD, "Guard", {0, 1, 1, 0.7})
   end
   
   end
