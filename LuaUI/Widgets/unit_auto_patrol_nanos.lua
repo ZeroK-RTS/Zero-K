@@ -59,17 +59,9 @@ local CMD_PATROL        = CMD.PATROL
 local CMD_RECLAIM       = CMD.RECLAIM
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP          = CMD.STOP
-local CMD_INSERT        = CMD.INSERT
 local CMD_OPT_CTRL      = CMD.OPT_CTRL
-local CMD_OPT_ALT       = CMD.OPT_ALT
 local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
-
-local CommandNames = {
-	[CMD_PATROL] = "PATROL",
-	[CMD_RECLAIM] = "RECLAIM",
-	[CMD_REPAIR] = "REPAIR",
-	[CMD_STOP] = "STOP"
-}
+local CMD_OPT_META      = CMD.OPT_META
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
@@ -220,16 +212,14 @@ local function DecideCommands(x, y, z, buildDistance)
 		use_energy = energy > slop and energy > energyStorage * 0.1
 	end
 
-	Log("get_metal=" .. tostring(get_metal) .. ", " ..
-		"use_metal=" .. tostring(use_metal) .. ", " ..
-		"get_energy=" .. tostring(get_energy) .. ", " ..
-		"use_energy=" .. tostring(use_energy))
+	--Log("get_metal=" .. tostring(get_metal) .. ", " ..
+	--	"use_metal=" .. tostring(use_metal) .. ", " ..
+	--	"get_energy=" .. tostring(get_energy) .. ", " ..
+	--	"use_energy=" .. tostring(use_energy))
 
 	local reclaim_metal = {CMD_RECLAIM, {x, y, z, buildDistance}, 0, "reclaim metal"}
 	local reclaim_energy = {CMD_RECLAIM, {x, y, z, buildDistance}, CMD_OPT_CTRL, "reclaim energy"}
-	-- TODO: This doesn't work right. When we issue this command it still
-	-- assists in building units.
-	local repair_units = {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_CTRL, "repair units"}
+	local repair_units = {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_META, "repair units"}
 	local build_assist = {CMD_REPAIR, {x, y, z, buildDistance}, 0, "build assist"}
 
 	-- Patrolling doesn't do anything if you target the current location of
@@ -326,7 +316,7 @@ local function SetupUnit(unitID)
 		end
 
 		if AllTrue(foundCommand) then
-			Log("All commands were already issued")
+			--Log("All commands were already issued")
 			return
 		end
 
@@ -337,12 +327,14 @@ local function SetupUnit(unitID)
 		end
 
 		for i, cmd in ipairs(cmds) do
-			Log("give order " .. cmd[4] .. " to " .. unitID ..
-					" @ " .. x .. ", " .. y .. ", " .. z)
 			if i == 1 then
 				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
+				Log("give order " .. cmd[4] .. " to " .. unitID ..
+						" @ " .. x .. ", " .. y .. ", " .. z)
 			else
 				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
+				Log("queue order " .. cmd[4] .. " to " .. unitID ..
+						" @ " .. x .. ", " .. y .. ", " .. z)
 			end
 		end
 		trackedUnits[unitID].settleTime = time + settleInterval
