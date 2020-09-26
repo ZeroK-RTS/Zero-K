@@ -26,10 +26,10 @@ local resources = {
 		},
 
 		scars = {
-			'unknown/scars/scar1.png',
-			'unknown/scars/scar2.png',
-			'unknown/scars/scar3.png',
-			'unknown/scars/scar4.png',
+			'unknown/enlarge/scar1.png',
+			'unknown/enlarge/scar2.png',
+			'unknown/enlarge/scar3.png',
+			'unknown/enlarge/scar4.png',
 		},
 
 		trees = {
