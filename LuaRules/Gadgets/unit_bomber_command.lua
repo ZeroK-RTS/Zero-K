@@ -525,9 +525,19 @@ function gadget:GetInfo()
 	  end
   end
   
+  local function findAirpadUnderCursour (cmdParams) 
+	local mouseX,mouseY,mouseZ = cmdParams[1], cmdParams[2], cmdParams[3]
+	--local mouseX, mouseY = Spring.GetMouseState()
+	local type, id = Spring.TraceScreenRay(mouseX, mouseY, false)
+	if type == "unit" then
+		Spring.Echo(id)
+	end
+  end
+
   local function excludeAirpad (unitID)
    
 	  Spring.Echo("Hello")
+	  findAirpadUnderCursour()
   --Check if unitID exists in airpad ids list
   --Add it to the exlusion list like how it's done in recvluarulesmsg
   
@@ -557,9 +567,9 @@ function gadget:GetInfo()
   --HI HI HI HI HI HI HI HI HI                          HI HI HI
   --HI HI HI HI HI HI HI HI HI                          HI HI HI
   --HI HI HI HI HI HI HI HI HI                          HI HI HI
-  --HI HI HI         	HI HI HI                          HI HI HI
   --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI 	        HI HI HI                          HI HI HI
+  --HI HI HI          HI HI HI                          HI HI HI
+  --HI HI HI 	      HI HI HI                          HI HI HI
   --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
   --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
   --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
@@ -764,8 +774,8 @@ function gadget:GetInfo()
 		  return true,true
 	  end
 	  if cmdID == CMD_EXCLUDEAIRPAD then
-		  excludeAirpad(unitID)
-		  Spring.Echo("Hi")
+		  --findAirpadUnderCursour(cmdParams)
+		 -- Spring.Echo("Hi")
 		  return true,true
 	  end
 	  return false -- command not used
