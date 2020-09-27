@@ -328,15 +328,6 @@ function gadget:GetInfo()
 	  return count
   end
   
-  local function contains(table, element)
-	for _, value in pairs(table) do
-	  if value == element then
-		return true
-	  end
-	end
-	return false
-  end
-  
   local function FindNearestAirpad(unitID, team)
 	  --Spring.Echo(unitID.." checking for closest pad")
 	  local allyTeam = spGetUnitAllyTeam(unitID)
@@ -353,7 +344,7 @@ function gadget:GetInfo()
 			  end
 			  airpadsPerAllyteam[allyTeam][airpadID] = nil
 		  else
-			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap and not contains(excludedPads, airpadID)) then
+			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap and not excludedPads[airpadID] then
 				  freePads[airpadID] = true
 				  freePadCount = freePadCount + 1
 			  end
@@ -379,7 +370,7 @@ function gadget:GetInfo()
 		  end
 	  end
   
-	  -- if contains (excludedPads, closestPad)
+	  -- if not excludedPads[airpadID] --Check if it contains the airpad
   
 	  -- end
 	  return closestPad
@@ -535,7 +526,7 @@ function gadget:GetInfo()
 	  end
   end
   
-  --[[DUMB DUMB PAY ATTAENTION TO THIS /!\ LOOK DOWN
+  --[[Put his here so that I can find my code faster... Will be removed soon.
   --
   --
   --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
@@ -569,10 +560,11 @@ function gadget:GetInfo()
 
 	 Spring.Echo(msg_table[2])
 
-	 Spring.Echo(contains(excludedPads, msg_table[2]))
+	 Spring.Echo(excludedPads[msg_table[2]])
 	  --Check if the unit is an airpad and if it already exists
-	  if airpadDefs[spGetUnitDefID(msg_table[2])] and not contains(excludedPads, msg_table[2]) then
+	  if airpadDefs[spGetUnitDefID(msg_table[2])] and not excludedPads[msg_table[2]] then
 		  table.insert(excludedPads, msg_table[2])
+		  excludedPads[msg_table[2]] = true
 		  Spring.Echo("Added it!")
 	  else
 		Spring.Echo("Not an airpad!")
