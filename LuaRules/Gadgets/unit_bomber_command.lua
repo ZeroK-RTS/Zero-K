@@ -328,15 +328,13 @@ function gadget:GetInfo()
 	  return count
   end
   
-  local function contains (array, value)
-	  for index, value in ipairs(array) do
-		  -- We grab the first index of our sub-table instead
-		  if value[1] == val then
-			  return true
-		  end
+  local function contains(table, element)
+	for _, value in pairs(table) do
+	  if value == element then
+		return true
 	  end
-  
-	  return false
+	end
+	return false
   end
   
   local function FindNearestAirpad(unitID, team)
@@ -525,24 +523,6 @@ function gadget:GetInfo()
 	  end
   end
   
-  local function findAirpadUnderCursour (cmdParams) 
-	local mouseX,mouseY,mouseZ = cmdParams[1], cmdParams[2], cmdParams[3]
-	--local mouseX, mouseY = Spring.GetMouseState()
-	local type, id = Spring.TraceScreenRay(mouseX, mouseY, false)
-	if type == "unit" then
-		Spring.Echo(id)
-	end
-  end
-
-  local function excludeAirpad (unitID)
-   
-	  Spring.Echo("Hello")
-	  findAirpadUnderCursour()
-  --Check if unitID exists in airpad ids list
-  --Add it to the exlusion list like how it's done in recvluarulesmsg
-  
-  end
-  
   function ReserveAirpad(bomberID,airpadID)
 	  spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	  local reservations = airpadsData[airpadID].reservations
@@ -583,9 +563,22 @@ function gadget:GetInfo()
 	  if msg_table[1] ~= 'addExclusion' then
 		  return
 	  end
-	  table.insert(excludedPads, msg_table[2])
+	  for index, value in ipairs(excludedPads) do
+		Spring.Echo(value)
+	 end
+
+	 Spring.Echo(msg_table[2])
+
+	 Spring.Echo(contains(excludedPads, msg_table[2]))
+	  --Check if the unit is an airpad and if it already exists
+	  if airpadDefs[spGetUnitDefID(msg_table[2])] and not contains(excludedPads, msg_table[2]) then
+		  table.insert(excludedPads, msg_table[2])
+		  Spring.Echo("Added it!")
+	  else
+		Spring.Echo("Not an airpad!")
+	  end
 	  --Spring.Echo(msg_table[2])
-	  Spring.Echo(excludedPads[#excludedPads])
+	  --Spring.Echo('added' .. excludedPads[#excludedPads])
   end
   
   function gadget:UnitDestroyed(unitID, unitDefID, team)
@@ -771,11 +764,6 @@ function gadget:GetInfo()
 		  if airDefs[unitDefID] then
 			  rearmRequest[unitID] = true
 		  end
-		  return true,true
-	  end
-	  if cmdID == CMD_EXCLUDEAIRPAD then
-		  --findAirpadUnderCursour(cmdParams)
-		 -- Spring.Echo("Hi")
 		  return true,true
 	  end
 	  return false -- command not used

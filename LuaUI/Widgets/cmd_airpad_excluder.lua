@@ -14,19 +14,20 @@ function widget:GetInfo()
     }
 end
 
-local function findAirpadUnderCursour (cmdParams) 
-	local mouseX,mouseY,mouseZ = cmdParams[1], cmdParams[2], cmdParams[3]
-	--local mouseX, mouseY = Spring.GetMouseState()
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local function findUnitUnderCursour (cmdParams) 
+	--local mouseX,mouseY,mouseZ = cmdParams[1], cmdParams[2], cmdParams[3]
+	local mouseX, mouseY = Spring.GetMouseState()
 	local type, id = Spring.TraceScreenRay(mouseX, mouseY, false)
 	if type == "unit" then
-		Spring.Echo(id)
+		Spring.SendLuaRulesMsg('addExclusion|' .. id)
 	end
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
     if cmdID == CMD_EXCLUDEAIRPAD then
-        findAirpadUnderCursour(cmdParams)
-        Spring.Echo("Hi")
+        findUnitUnderCursour(cmdParams)
         return true,true
     end
     return false -- command not used
