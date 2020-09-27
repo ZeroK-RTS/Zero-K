@@ -213,6 +213,7 @@ local volumeSelection = 0
 
 local currentlyActiveCommand = false
 local presetTerraHeight = false
+local presetTerraLevelToCursor = false
 local mouseBuilding = false
 
 local buildToGive = false
@@ -242,6 +243,39 @@ local mexDefID = UnitDefNames.staticmex.id
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Hotkeys
+
+for i = 1, 3 do
+	options["level_cursor_radio_" .. i]  = {
+		name = 'Level to Cursor Hotkey ' .. i,
+		type = 'radioButton',
+		path = HOTKEY_PATH .. "/Level",
+		value = i - 1,
+		items = {
+			{key = 0, name = 'Add and Subtract', desc = 'Terraform the entire area to the selected height.'},
+			{key = 1, name = 'Only Add', desc = 'Raise lower parts of the terrain up to the selected height.'},
+			{key = 2, name = 'Only Subtract', desc = 'Lower high parts of the terrain up to the selected height.'},
+		},
+		noHotkey = true,
+	}
+	options_order[#options_order + 1] = "level_cursor_radio_" .. i
+
+	options["level_cursor_button_" .. i] = {
+		type = 'button',
+		name = 'Level to Cursor Hotkey ' .. i,
+		desc = 'Set this hotkey to Level to the height of the terrain at the start of the lasson drawing.',
+		path = HOTKEY_PATH .. "/Level",
+		OnChange = function ()
+			local cmdDesc = Spring.GetCmdDescIndex(CMD_LEVEL)
+			if cmdDesc then
+				Spring.SetActiveCommand(cmdDesc)
+				volumeSelection = options["level_cursor_radio_" .. i].value
+				presetTerraHeight = 0
+				presetTerraLevelToCursor = true
+			end
+		end,
+	}
+	options_order[#options_order + 1] = "level_cursor_button_" .. i
+end
 
 for i = 1, 10 do
 	options["level_type_" .. i]  = {
@@ -330,6 +364,7 @@ end
 local function stopCommand(shiftHeld)
 	if not shiftHeld then
 		presetTerraHeight = false
+		presetTerraLevelToCursor = false
 	end
 	if not presetTerraHeight then
 		volumeSelection = 0
@@ -358,6 +393,7 @@ end
 
 local function completelyStopCommand()
 	presetTerraHeight = false
+	presetTerraLevelToCursor = false
 	volumeSelection = 0
 	
 	currentlyActiveCommand = false
@@ -1557,7 +1593,7 @@ function widget:MouseRelease(mx, my, button)
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				end
 				if points ~= 0 then
-					if presetTerraHeight then
+					if presetTerraHeight and not presetTerraLevelToCursor then
 						terraformHeight = presetTerraHeight
 					end
 					SendCommand()
@@ -1740,7 +1776,7 @@ function widget:MouseRelease(mx, my, button)
 								loop = 0
 							end
 							
-							if presetTerraHeight then
+							if presetTerraHeight and not presetTerraLevelToCursor then
 								terraformHeight = presetTerraHeight
 							end
 							SendCommand()
@@ -1784,7 +1820,7 @@ function widget:MouseRelease(mx, my, button)
 				end
 
 				if points ~= 0 then
-					if presetTerraHeight then
+					if presetTerraHeight and not presetTerraLevelToCursor then
 						terraformHeight = presetTerraHeight
 					end
 					SendCommand()
