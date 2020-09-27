@@ -19,7 +19,7 @@ local configList = {
 	{cmdID = CMD_FIND_PAD              , default = true, name = "Resupply"},
 	{cmdID = CMD.RESURRECT             , default = true, name = "Resurrect"},
 	{cmdID = CMD.UNLOAD_UNITS          , default = true, name = "Unload"},
-	{cmdId = CMD.EXCLUDEAIRPAD		   , default = true, name = "Exclude"},
+	--{cmdId = CMD.EXCLUDEAIRPAD		   , default = true, name = "Exclude"},
 	
 	{label = "Advanced Commands (hidden by default)"},
 	{cmdID = CMD.AREA_ATTACK           , default = false, name = "Area Attack"},

@@ -43,6 +43,7 @@ local custom_cmd_actions = {
 
 	--CUSTOM COMMANDS
 	sethaven = {cmdType = 1, name = "Add Retreat Zone"},
+	excludeairpad = {cmdType = 1, name = "Exclude an Airpad"},
 	--build = {cmdType = 1, name = "--build"},
 	areamex = {cmdType = 1, name = "Area Mex"},
 	mine = {cmdType = 1, name = "Mine"},

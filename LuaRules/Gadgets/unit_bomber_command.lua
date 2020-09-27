@@ -148,25 +148,29 @@ function gadget:GetInfo()
 	  hidden	= true,
   }
   
-  --local cmdEXCLUDEAIRPAD = {
-  --	id      = CMD_EXCLUDEAIRPAD,
-	--	type    = CMDTYPE.ICON_UNIT,
-   -- 	name    = "Exclude",
-  --	tooltip = 'Excludes an airpad from the fighter running',
-  --	texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
-  --	hidden  = false,
-  --}
+ local cmdEXCLUDEAIRPAD = {
+	 	id 		= CMD_EXCLUDEAIRPAD,
+		type    = CMDTYPE.ICON_MAP,
+		tooltip = 'Excludes an airpad from the running.',
+		cursor  = 'Repair',
+		action  = 'excludeairpad',
+		params  = { },
+		texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
+		hidden  = false;
+
+		--pos = {123},
+  }
   
-  local cmdEXCLUDEAIRPAD = {
+ --[[ local cmdEXCLUDEAIRPAD = {
 	  id      = CMD_EXCLUDEAIRPAD,
 	  name    = "ExcludeAirpad",
-	  action  = "excludeairpads",
+	  action  = "excludeairpad",
 	  cursor  = 'Repair',
 	  type    = CMDTYPE.ICON_MAP,
 	  tooltip = "Excludes an airpad from the running.", --Need to think of a better desc here
 	  texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
 	  hidden  = false,
-  }
+  }]]--
   
   local findPadCMD = {
 	  id      = CMD_FIND_PAD,
@@ -761,7 +765,7 @@ function gadget:GetInfo()
 	  end
 	  if cmdID == CMD_EXCLUDEAIRPAD then
 		  excludeAirpad(unitID)
-		  --Spring.Echo("Hi")
+		  Spring.Echo("Hi")
 		  return true,true
 	  end
 	  return false -- command not used
