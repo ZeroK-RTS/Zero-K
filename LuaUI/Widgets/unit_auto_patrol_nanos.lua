@@ -105,6 +105,13 @@ local nextCheck
 --------------------------------------------------------------------------------
 -- Functions
 
+-- Slightly randomize intervals, to prevent all caretakers from getting synced
+-- up and all of them deciding to reclaim now, while really what needs to happen
+-- is just some of them reclaiming.
+local function RandomInterval(interval)
+	return interval / 2 + math.random() * interval
+end
+
 local function Log(msg)
 	spEcho("[uapn] " .. msg)
 end
@@ -266,7 +273,7 @@ local function SetupUnit(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
-		trackedUnits[unitID].checkTime = time + checkInterval
+		trackedUnits[unitID].checkTime = time + RandomInterval(checkInterval)
 		local cmds = DecideCommands(x, y, z, buildDistance)
 		--LogTable(cmds, "cmds: ")
 
@@ -331,7 +338,7 @@ local function SetupUnit(unitID)
 						" @ " .. x .. ", " .. y .. ", " .. z)
 			end
 		end
-		trackedUnits[unitID].settleTime = time + settleInterval
+		trackedUnits[unitID].settleTime = time + RandomInterval(settleInterval)
 		trackedUnits[unitID].commands = cmds
 	end
 end
