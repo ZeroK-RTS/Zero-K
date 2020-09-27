@@ -344,7 +344,7 @@ function gadget:GetInfo()
 			  end
 			  airpadsPerAllyteam[allyTeam][airpadID] = nil
 		  else
-			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap and not excludedPads[airpadID] then
+			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap and not excludedPads[airpadID]) then
 				  freePads[airpadID] = true
 				  freePadCount = freePadCount + 1
 			  end
@@ -460,6 +460,7 @@ function gadget:GetInfo()
   function gadget:UnitFinished(unitID, unitDefID, team)
 	  if airpadDefs[unitDefID] then
 		  --Spring.Echo("Adding unit "..unitID.." to airpad list")
+		  table.insert(excludedPads, unitID)
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		  airpadsData[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		  airpadsData[unitID].reservations = {count = 0, units = {}}
@@ -555,17 +556,19 @@ function gadget:GetInfo()
 		  return
 	  end
 	  for index, value in ipairs(excludedPads) do
-		Spring.Echo(value)
+		Spring.Echo(index .. ': ' .. value)
 	 end
 
-	 Spring.Echo(msg_table[2])
+	 Spring.Echo('unit id: ' .. msg_table[2])
 
-	 Spring.Echo(excludedPads[msg_table[2]])
 	  --Check if the unit is an airpad and if it already exists
-	  if airpadDefs[spGetUnitDefID(msg_table[2])] and not excludedPads[msg_table[2]] then
-		  table.insert(excludedPads, msg_table[2])
+	  if airpadDefs[spGetUnitDefID(msg_table[2])] then
+		if not excludedPads[msg_table[2]] then
 		  excludedPads[msg_table[2]] = true
-		  Spring.Echo("Added it!")
+		  Spring.Echo("Added airpad.")
+		else
+		  Spring.Echo("Already exists. Consider removing it.")
+		end
 	  else
 		Spring.Echo("Not an airpad!")
 	  end
