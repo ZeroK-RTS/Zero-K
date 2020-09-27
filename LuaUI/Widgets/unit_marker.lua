@@ -1,6 +1,6 @@
 function widget:GetInfo() return {
 	name    = "Unit Marker Zero-K",
-	desc    = "[v1.3.10] Marks spotted buildings of interest and commander corpse.",
+	desc    = "[v1.3.11] Marks spotted buildings of interest and commander corpse.",
 	author  = "Sprung",
 	date    = "2015-04-11",
 	license = "GNU GPL v2",
@@ -12,6 +12,11 @@ local knownUnits = {}
 local unitList = {}
 
 local markingActive = false
+local lastseen = {}
+local removeunits = {}
+local delay = 30*5
+local lifespan = 30*10
+local pings = {}
 
 if VFS.FileExists("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW) then
 	unitList = VFS.Include("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW)
@@ -139,10 +144,45 @@ function widget:UnitEnteredLos (unitID, teamID)
 
 			markerText = markerText .. " (" .. owner_name .. ")"
 		end
-		Spring.MarkerAddPoint (x, y, z, markerText, true)
+		if lastseen[unitID] == nil then
+			Spring.MarkerAddPoint (x, y, z, markerText, true)
+			local f = Spring.GetGameFrame()
+			if pings[f+lifespan] and unitList[unitDefID].mark_each_appearance then
+				pings[f+lifespan][#pings[f+lifespan]+1] = {x,y,z}
+			elseif unitList[unitDefID].mark_each_appearance then
+				pings[f+lifespan] = {[1] = {x,y,z}}
+			end
+			lastseen[unitID] = f
+			if removeunits[f+delay] then
+				removeunits[f+delay][#removeunits[f+delay]+1] = unitID
+			else
+				removeunits[f+delay] = {[1] = unitID}
+			end
+		end
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	knownUnits[unitID] = nil
+end
+
+function widget:GameFrame(f)
+	if removeunits[f] then
+		for i=1, #removeunits[f] do
+			lastseen[removeunits[f][i]] = nil
+		end
+		removeunits[f] = nil
+	end
+	if pings[f] then
+		local x,y,z
+		for i=1, #pings[f] do
+			x = pings[f][i][1]
+			y = pings[f][i][2]
+			z = pings[f][i][3]
+			if x and y and z then
+				Spring.MarkerErasePosition(x,y,z)
+			end
+		end
+		pings[f] = nil
+	end
 end
