@@ -13,15 +13,15 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-return {
-name      = "ReclaimInfo",
-desc      = "Shows the amount of metal/energy when using area reclaim.",
-author    = "Pendrokar",
-date      = "Nov 17, 2007",
-license   = "GNU GPL, v2 or later",
-layer     = 0,
-enabled   = true -- loaded by default?
-}
+	return {
+		name      = "ReclaimInfo",
+		desc      = "Shows the amount of metal/energy when using area reclaim.",
+		author    = "Pendrokar",
+		date      = "Nov 17, 2007",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true -- loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -58,9 +58,6 @@ local function MinimapToWorld(rx,ry)
 	else
 		return {-1,-1,-1}
 	end
-end
-
-function widget:Initialize()
 end
 
 function widget:DrawScreen()
@@ -139,14 +136,16 @@ function widget:DrawScreen()
 		end
 		metal = math.floor(metal)
 		energy = math.floor(energy)
-		local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128".." E:"..energy)
+		local textwidth = 12*gl.GetTextWidth("    M:" .. metal .. " E:" .. energy)
 		if(textwidth+x>vsx) then
 			x = x - textwidth - 10
 		end
 		if(12+y>vsy) then
 			y = y - form
 		end
-		gl.Text("	M:"..metal.."\255\255\255\128".." E:"..energy,x,y,form)
+		gl.PushMatrix()
+			gl.Text("    M:" .. metal .. "\255\255\255\128".." E:" .. energy, x, y, form)
+		gl.PopMatrix()
 	end
 	--Unit resource info when mouse on one
 	if (nonground == "Reclaim") and (rangestart ~= nil) and ((energy == 0) or (metal == 0)) and (b1 == false) then
@@ -155,7 +154,7 @@ function widget:DrawScreen()
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local _,_,_,_,buildprogress = Spring.GetUnitHealth(unitID)
 			metal = math.floor(Spring.Utilities.GetUnitCost(unitID, unitDefID)*buildprogress)
-			local textwidth = 12*gl.GetTextWidth("	M:"..metal.."\255\255\255\128")
+			local textwidth = 12*gl.GetTextWidth("    M:" .. metal)
 			if (textwidth+x>vsx) then
 				x = x - textwidth - 10
 			end
@@ -166,7 +165,9 @@ function widget:DrawScreen()
 			if not UnitDefs[Spring.GetUnitDefID(unitID)].reclaimable then
 				color = "\255\220\10\10"
 			end
-			gl.Text(color.."	M:"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
+			gl.PushMatrix()
+				gl.Text(color .. "    M:" .. metal*0.5, x, y, form) -- multiply metal by unit reclaim mult in gamerules
+			gl.PopMatrix()
 		end
 	end
 	--
