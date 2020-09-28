@@ -75,7 +75,7 @@ return {
 <(Click next to continue)>]],
 			epilogue2 = [[Select your Glaives then <right click and drag> on the map. This spreads units along a line and is vital for maintaining free firing lines and avoiding area-of-effect.
 <(Click next to continue)>]],
-			epilogue3 = [[Glaives are great at raiding lightly defended expansion and intercepting enemy raids, however, will need heavier units as the battle progresses.
+			epilogue3 = [[Glaives are great at raiding lightly defended expansion and intercepting enemy raids, however, you will need heavier units as the battle progresses.
 <(Click next to continue)>]],
 			epilogue4 = [[Ronin and Reaver can be mixed to create a stong early army. Reaver has low range but annihilates raiders, while Ronin can harass enemies at range.
 <(Click next to continue)>]],
