@@ -5,12 +5,12 @@ local pelvis = piece 'pelvis'
 local torso = piece 'torso'
 local emit = piece 'emit'
 local fire = piece 'fire'
-local Lleg = piece 'lleg'
-local Rleg = piece 'rleg'
-local lowerLleg = piece 'lowerlleg'
-local lowerRleg = piece 'lowerrleg'
-local Lfoot = piece 'lfoot'
-local Rfoot = piece 'rfoot'
+local lleg = piece 'lleg'
+local rleg = piece 'rleg'
+local lowerlleg = piece 'lowerlleg'
+local lowerrleg = piece 'lowerrleg'
+local lfoot = piece 'lfoot'
+local rfoot = piece 'rfoot'
 
 local l_gun = piece 'l_gun'
 local r_gun = piece 'r_gun'
@@ -40,102 +40,73 @@ local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local PACE = 2.8
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
+	Move(pelvis, y_axis, 2, PACE*2)
+	Turn(lleg, x_axis, math.rad(20),  PACE*math.rad(50))
+	Turn(rleg, x_axis, math.rad(-20), PACE*math.rad(50))
+	Turn(lfoot,  x_axis, math.rad(-15), PACE*math.rad(70))
+	Turn(rfoot,  x_axis, math.rad(5),   PACE*math.rad(50))
+	Turn(lowerrleg,  x_axis, math.rad(-15), PACE*math.rad(70))
+	Sleep(360/PACE)
+	
+	Turn(lfoot,  x_axis, math.rad(20),  PACE*math.rad(100))
+	Turn(rfoot,  x_axis, math.rad(10),  PACE*math.rad(50))
+	Turn(lowerrleg,  x_axis, math.rad(20),  PACE*math.rad(100))
+	Sleep(360/PACE)
+	
+	Move(pelvis, y_axis, 2.5, PACE*2)
+	Turn(pelvis, z_axis, math.rad(-3.5), PACE*math.rad(3))
+	Turn(lleg, x_axis, math.rad(-20),  PACE*math.rad(50))
+	Turn(rleg, x_axis, math.rad(20),   PACE*math.rad(50))
+	Turn(rfoot,  x_axis, math.rad(-20),  PACE*math.rad(130))
+	Turn(lowerlleg,  x_axis, math.rad(-25),  PACE*math.rad(100))
+	Sleep(650/PACE)
+	
+	Turn(rfoot,  x_axis, math.rad(20),   PACE*math.rad(100))
+	Turn(lowerlleg,  x_axis, math.rad(20),   PACE*math.rad(100))
+	Move(pelvis, y_axis, 0, 2)
+	Sleep(360/PACE)
+	
 	while true do
-		Move(torso, y_axis, 0.000000)
-		Turn(Rleg, x_axis, 0)
-		Turn(lowerRleg, x_axis, 0)
-		Turn(Rfoot, x_axis, 0)
-		Turn(Lleg, x_axis, 0)
-		Turn(lowerLleg, x_axis, 0)
-		Turn(Lfoot, x_axis, 0)
-		Sleep(67)
-	
-		Move(torso, y_axis, 0.300000)
-		Turn(Rleg, x_axis, math.rad(-10.000000))
-		Turn(lowerRleg, x_axis, math.rad(-20.000000))
-		Turn(Rfoot, x_axis, math.rad(20.000000))
-		Turn(Lleg, x_axis, math.rad(10.000000))
-		Turn(lowerLleg, x_axis, math.rad(20.000000))
-		Turn(Lfoot, x_axis, math.rad(-20.000000))
-		Sleep(67)
-	
-		Move(torso, y_axis, 0.700000)
-		Turn(Rleg, x_axis, math.rad(-20.000000))
-		Turn(lowerRleg, x_axis, math.rad(-30.005495))
-		Turn(Rfoot, x_axis, math.rad(30.005495))
-		Turn(lowerLleg, x_axis, math.rad(20.000000))
-		Turn(Lfoot, x_axis, math.rad(-20.000000))
-		Sleep(67)
-	
-		Move(torso, y_axis, 0.300000)
-		Turn(Rleg, x_axis, math.rad(-30.005495))
-		Turn(lowerRleg, x_axis, math.rad(-20.000000))
-		Turn(Rfoot, x_axis, math.rad(40.005495))
-		Turn(lowerLleg, x_axis, math.rad(30.005495))
-		Turn(Lfoot, x_axis, math.rad(-30.005495))
-		Sleep(67)
-	
-		Move(torso, y_axis, 0.000000)
-		Turn(Rleg, x_axis, math.rad(-20.000000))
-		Turn(lowerRleg, x_axis, math.rad(-10.000000))
-		Turn(Rfoot, x_axis, math.rad(30.005495))
-		Turn(lowerLleg, x_axis, math.rad(40.005495))
-		Turn(Lfoot, x_axis, math.rad(-40.005495))
-		Sleep(67)
-	
-		Move(torso, y_axis, -0.100000)
-		Turn(Rleg, x_axis, 0)
-		Turn(lowerRleg, x_axis, 0)
-		Turn(Rfoot, x_axis, 0)
-		Turn(Lleg, x_axis, 0)
-		Turn(lowerLleg, x_axis, 0)
-		Turn(Lfoot, x_axis, 0)
-		Sleep(67)
-	
-		Move(torso, y_axis, -0.200000)
-		Turn(Rleg, x_axis, math.rad(10.000000))
-		Turn(lowerRleg, x_axis, math.rad(20.000000))
-		Turn(Rfoot, x_axis, math.rad(-20.000000))
-		Turn(Lleg, x_axis, math.rad(-10.000000))
-		Turn(lowerLleg, x_axis, math.rad(-20.000000))
-		Turn(Lfoot, x_axis, math.rad(20.000000))
-		Sleep(67)
-
-		Move(torso, y_axis, -0.300000)
-		Turn(lowerRleg, x_axis, math.rad(20.000000))
-		Turn(Rfoot, x_axis, math.rad(-20.000000))
-		Turn(Lleg, x_axis, math.rad(-20.000000))
-		Turn(lowerLleg, x_axis, math.rad(-30.005495))
-		Turn(Lfoot, x_axis, math.rad(30.005495))
-		Sleep(67)
-
-		Move(torso, y_axis, -0.400000)
-		Turn(lowerRleg, x_axis, math.rad(30.005495))
-		Turn(Rfoot, x_axis, math.rad(-30.005495))
-		Turn(Lleg, x_axis, math.rad(-30.005495))
-		Turn(lowerLleg, x_axis, math.rad(-20.000000))
-		Turn(Lfoot, x_axis, math.rad(40.005495))
-		Sleep(67)
-
-		Move(torso, y_axis, -0.500000)
-		Turn(lowerRleg, x_axis, math.rad(40.005495))
-		Turn(Rfoot, x_axis, math.rad(-40.005495))
-		Turn(Lleg, x_axis, math.rad(-20.000000))
-		Turn(lowerLleg, x_axis, math.rad(-10.000000))
-		Turn(Lfoot, x_axis, math.rad(30.005495))
-		Sleep(67)
-
-		Move(torso, y_axis, 0.000000)
-		Turn(lowerRleg, x_axis, 0, math.rad(200.000000))
-		Turn(Rleg, x_axis, 0, math.rad(200.000000))
-		Turn(Rfoot, x_axis, 0, math.rad(200.000000))
-		Turn(Lleg, x_axis, 0)
-		Turn(lowerLleg, x_axis, 0)
-		Turn(Lfoot, x_axis, 0)
-		Sleep(67)
+		Move(pelvis, y_axis, 3.2, PACE*2)
+		Turn(pelvis, z_axis, math.rad(3.5), PACE*math.rad(8))
+		
+		Turn(rleg, x_axis, math.rad(-24), PACE*math.rad(70))
+		Turn(lowerrleg,  x_axis, math.rad(-20), PACE*math.rad(100))
+		Turn(lleg, x_axis, math.rad(20),  PACE*math.rad(70))
+		Turn(lfoot,  x_axis, math.rad(-40), PACE*math.rad(50))
+		
+		Sleep(650/PACE)
+		
+		Turn(lfoot,  x_axis, math.rad(20),  PACE*math.rad(80))
+		Turn(lowerrleg,  x_axis, math.rad(30),  PACE*math.rad(100))
+		Turn(rfoot,  x_axis, math.rad(-5),  PACE*math.rad(80))
+		Move(pelvis, y_axis, 0, PACE*2)
+		Sleep(360/PACE)
+		
+		Move(pelvis, y_axis, 3.2, PACE*2)
+		Turn(pelvis, z_axis, math.rad(-3.50), PACE*math.rad(8))
+		
+		Turn(lleg, x_axis, math.rad(-24),   PACE*math.rad(70))
+		Turn(lowerlleg,  x_axis, math.rad(-20),   PACE*math.rad(100))
+		Turn(rleg, x_axis, math.rad(20),    PACE*math.rad(70))
+		Turn(rfoot,  x_axis, math.rad(-40),   PACE*math.rad(50))
+		
+		Sleep(650/PACE)
+		
+		Turn(rfoot, x_axis, math.rad(20), PACE*math.rad(80))
+		Turn(lowerlleg, x_axis, math.rad(30), PACE*math.rad(100))
+		Turn(lfoot,  x_axis, math.rad(-5),  PACE*math.rad(80))
+		Move(pelvis, y_axis, 0, PACE*2)
+		Sleep(360/PACE)
 	end
 end
 
@@ -192,6 +163,16 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	Turn(lleg, x_axis, 0,  PACE*math.rad(50))
+	Turn(rleg, x_axis, 0, PACE*math.rad(50))
+	Turn(lfoot,  x_axis, 0, PACE*math.rad(70))
+	Turn(rfoot,      x_axis, 0,   PACE*math.rad(50))
+	Turn(lowerrleg,  x_axis, 0,  PACE*math.rad(100))
+	Turn(lowerlleg,  x_axis, 0, PACE*math.rad(70))
+	
+	Move(pelvis, y_axis, 0, PACE*10)
+	Turn(pelvis, z_axis, 0, PACE*math.rad(8))
+	
 	Signal(SIG_WALK)
 end
 
@@ -220,44 +201,44 @@ local function Killed(recentDamage, maxHealth)
 	if severity <= .25 then
 		Explode(base, SFX.NONE)
 		Explode(torso, SFX.NONE)
-		Explode(Rleg, SFX.NONE)
-		Explode(Lleg, SFX.NONE)
-		Explode(lowerRleg, SFX.NONE)
-		Explode(lowerLleg, SFX.NONE)
-		Explode(Rfoot, SFX.NONE)
-		Explode(Lfoot, SFX.NONE)
+		Explode(rleg, SFX.NONE)
+		Explode(lleg, SFX.NONE)
+		Explode(lowerrleg, SFX.NONE)
+		Explode(lowerlleg, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(lfoot, SFX.NONE)
 		return 1
 	elseif severity <= .50 then
 		Explode(base, SFX.NONE)
 		Explode(torso, SFX.NONE)
-		Explode(Rleg, SFX.NONE)
-		Explode(Lleg, SFX.NONE)
-		Explode(lowerRleg, SFX.NONE)
-		Explode(lowerLleg, SFX.NONE)
-		Explode(Rfoot, SFX.NONE)
-		Explode(Lfoot, SFX.NONE)
+		Explode(rleg, SFX.NONE)
+		Explode(lleg, SFX.NONE)
+		Explode(lowerrleg, SFX.NONE)
+		Explode(lowerlleg, SFX.NONE)
+		Explode(rfoot, SFX.NONE)
+		Explode(lfoot, SFX.NONE)
 		return 1
 	elseif severity <= .99 then
 		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(torso, SFX.NONE)
 
-		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lowerRleg, SFX.NONE)
-		Explode(lowerLleg, SFX.NONE)
-		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lfoot, SFX.NONE)
+		Explode(rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lowerrleg, SFX.NONE)
+		Explode(lowerlleg, SFX.NONE)
+		Explode(rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lfoot, SFX.NONE)
 		return 2
 	else
 		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(torso, SFX.NONE)
 	
-		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lowerRleg, SFX.NONE)
-		Explode(lowerLleg, SFX.NONE)
-		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(Lfoot, SFX.NONE)
+		Explode(rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lowerrleg, SFX.NONE)
+		Explode(lowerlleg, SFX.NONE)
+		Explode(rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lfoot, SFX.NONE)
 		return 2
 	end
 end

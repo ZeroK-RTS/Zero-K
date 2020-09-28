@@ -17,6 +17,7 @@ return { shieldriot = {
   selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],

@@ -15,9 +15,10 @@ return { amphsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[13]],
-    aimposoffset   = [[0 10 0]],
-    chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
+    modelradius       = [[13]],
+    aimposoffset      = [[0 10 0]],
+    chase_everything  = [[1]], -- Does not get stupidtarget added to noChaseCats
+    selection_scale   = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],

@@ -45,112 +45,85 @@ local SIG_DEPLOY = 4
 local moving = false
 local deployed = false
 
+local PACE = 1.8
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+
+	Move(pelvis, y_axis, 0, 8)
+	
+	Move(base, y_axis, 2, PACE*2)
+	Turn(lthigh, x_axis, math.rad(20),  PACE*math.rad(50))
+	Turn(rthigh, x_axis, math.rad(-20), PACE*math.rad(50))
+	Turn(lfoot,  x_axis, math.rad(-15), PACE*math.rad(70))
+	Turn(rfoot,  x_axis, math.rad(5),   PACE*math.rad(50))
+	Turn(rcalf,  x_axis, math.rad(-15), PACE*math.rad(70))
+	Sleep(360/PACE)
+	
+	Turn(lfoot,  x_axis, math.rad(20),  PACE*math.rad(100))
+	Turn(rfoot,  x_axis, math.rad(10),  PACE*math.rad(50))
+	Turn(rcalf,  x_axis, math.rad(20),  PACE*math.rad(100))
+	Sleep(360/PACE)
+	
+	Move(base, y_axis, 3, PACE*2)
+	Turn(pelvis, z_axis, math.rad(-3.5), PACE*math.rad(3))
+	Turn(lthigh, x_axis, math.rad(-20),  PACE*math.rad(50))
+	Turn(rthigh, x_axis, math.rad(20),   PACE*math.rad(50))
+	Turn(rfoot,  x_axis, math.rad(-20),  PACE*math.rad(130))
+	Turn(lcalf,  x_axis, math.rad(-25),  PACE*math.rad(100))
+	Sleep(650/PACE)
+	
+	Turn(rfoot,  x_axis, math.rad(20),   PACE*math.rad(100))
+	Turn(lcalf,  x_axis, math.rad(20),   PACE*math.rad(100))
+	Move(base, y_axis, 0, 2)
+	Sleep(360/PACE)
+	
 	while true do
-		Move(pelvis, y_axis, 0.000000)
-		Turn(rthigh, x_axis, 0)
-		Turn(rcalf, x_axis, 0)
-		Turn(rfoot, x_axis, 0)
-		Turn(lthigh, x_axis, 0)
-		Turn(lcalf, x_axis, 0)
-		Turn(lfoot, x_axis, 0)
-		Sleep(67)
-	
-		Move(pelvis, y_axis, 0.300000)
-		Turn(rthigh, x_axis, math.rad(-10.000000))
-		Turn(rcalf, x_axis, math.rad(-20.000000))
-		Turn(rfoot, x_axis, math.rad(20.000000))
-		Turn(lthigh, x_axis, math.rad(10.000000))
-		Turn(lcalf, x_axis, math.rad(20.000000))
-		Turn(lfoot, x_axis, math.rad(-20.000000))
-		Sleep(67)
-	
-		Move(pelvis, y_axis, 0.700000)
-		Turn(rthigh, x_axis, math.rad(-20.000000))
-		Turn(rcalf, x_axis, math.rad(-30.005495))
-		Turn(rfoot, x_axis, math.rad(30.005495))
-		Turn(lcalf, x_axis, math.rad(20.000000))
-		Turn(lfoot, x_axis, math.rad(-20.000000))
-		Sleep(67)
-	
-		Move(pelvis, y_axis, 0.300000)
-		Turn(rthigh, x_axis, math.rad(-30.005495))
-		Turn(rcalf, x_axis, math.rad(-20.000000))
-		Turn(rfoot, x_axis, math.rad(40.005495))
-		Turn(lcalf, x_axis, math.rad(30.005495))
-		Turn(lfoot, x_axis, math.rad(-30.005495))
-		Sleep(67)
-	
-		Move(pelvis, y_axis, 0.000000)
-		Turn(rthigh, x_axis, math.rad(-20.000000))
-		Turn(rcalf, x_axis, math.rad(-10.000000))
-		Turn(rfoot, x_axis, math.rad(30.005495))
-		Turn(lcalf, x_axis, math.rad(40.005495))
-		Turn(lfoot, x_axis, math.rad(-40.005495))
-		Sleep(67)
-	
-		Move(pelvis, y_axis, -0.100000)
-		Turn(rthigh, x_axis, 0)
-		Turn(rcalf, x_axis, 0)
-		Turn(rfoot, x_axis, 0)
-		Turn(lthigh, x_axis, 0)
-		Turn(lcalf, x_axis, 0)
-		Turn(lfoot, x_axis, 0)
-		Sleep(67)
-	
-		Move(pelvis, y_axis, -0.200000)
-		Turn(rthigh, x_axis, math.rad(10.000000))
-		Turn(rcalf, x_axis, math.rad(20.000000))
-		Turn(rfoot, x_axis, math.rad(-20.000000))
-		Turn(lthigh, x_axis, math.rad(-10.000000))
-		Turn(lcalf, x_axis, math.rad(-20.000000))
-		Turn(lfoot, x_axis, math.rad(20.000000))
-		Sleep(67)
-
-		Move(pelvis, y_axis, -0.300000)
-		Turn(rcalf, x_axis, math.rad(20.000000))
-		Turn(rfoot, x_axis, math.rad(-20.000000))
-		Turn(lthigh, x_axis, math.rad(-20.000000))
-		Turn(lcalf, x_axis, math.rad(-30.005495))
-		Turn(lfoot, x_axis, math.rad(30.005495))
-		Sleep(67)
-
-		Move(pelvis, y_axis, -0.400000)
-		Turn(rcalf, x_axis, math.rad(30.005495))
-		Turn(rfoot, x_axis, math.rad(-30.005495))
-		Turn(lthigh, x_axis, math.rad(-30.005495))
-		Turn(lcalf, x_axis, math.rad(-20.000000))
-		Turn(lfoot, x_axis, math.rad(40.005495))
-		Sleep(67)
-
-		Move(pelvis, y_axis, -0.500000)
-		Turn(rcalf, x_axis, math.rad(40.005495))
-		Turn(rfoot, x_axis, math.rad(-40.005495))
-		Turn(lthigh, x_axis, math.rad(-20.000000))
-		Turn(lcalf, x_axis, math.rad(-10.000000))
-		Turn(lfoot, x_axis, math.rad(30.005495))
-		Sleep(67)
-
-		Move(pelvis, y_axis, 0.000000)
-		Turn(rcalf, x_axis, 0, math.rad(200.000000))
-		Turn(rthigh, x_axis, 0, math.rad(200.000000))
-		Turn(rfoot, x_axis, 0, math.rad(200.000000))
-		Turn(lthigh, x_axis, 0)
-		Turn(lcalf, x_axis, 0)
-		Turn(lfoot, x_axis, 0)
-		Sleep(67)
+		Move(base, y_axis, 3.5, PACE*2)
+		Turn(pelvis, z_axis, math.rad(3.5), PACE*math.rad(8))
+		
+		Turn(rthigh, x_axis, math.rad(-24), PACE*math.rad(70))
+		Turn(rcalf,  x_axis, math.rad(-20), PACE*math.rad(100))
+		Turn(lthigh, x_axis, math.rad(20),  PACE*math.rad(70))
+		Turn(lfoot,  x_axis, math.rad(-40), PACE*math.rad(50))
+		
+		Sleep(650/PACE)
+		
+		Turn(lfoot,  x_axis, math.rad(20),  PACE*math.rad(80))
+		Turn(rcalf,  x_axis, math.rad(30),  PACE*math.rad(100))
+		Turn(rfoot,  x_axis, math.rad(-5),  PACE*math.rad(80))
+		Move(base, y_axis, 0, PACE*2)
+		Sleep(360/PACE)
+		
+		Move(base, y_axis, 3.5, PACE*2)
+		Turn(pelvis, z_axis, math.rad(-3.50), PACE*math.rad(8))
+		
+		Turn(lthigh, x_axis, math.rad(-24),   PACE*math.rad(70))
+		Turn(lcalf,  x_axis, math.rad(-20),   PACE*math.rad(100))
+		Turn(rthigh, x_axis, math.rad(20),    PACE*math.rad(70))
+		Turn(rfoot,  x_axis, math.rad(-40),   PACE*math.rad(50))
+		
+		Sleep(650/PACE)
+		
+		Turn(rfoot, x_axis, math.rad(20), PACE*math.rad(80))
+		Turn(lcalf, x_axis, math.rad(30), PACE*math.rad(100))
+		Turn(lfoot,  x_axis, math.rad(-5),  PACE*math.rad(80))
+		Move(pelvis, y_axis, 0, PACE*2)
+		Sleep(360/PACE)
 	end
 end
 
 local function AnimateDeployment(distance, speed, wait)
+	Move(base, y_axis, 0, 16*speed)
+	Turn(pelvis, z_axis, 0, math.rad(30))
+	
 	if wait then
 		Move(pelvis, z_axis, 0, 4*speed)
-		Move(pelvis, y_axis, 0, 4*speed)
+		Move(pelvis, y_axis, 0, 3*speed)
 		
 		Turn(rthigh, x_axis, 0, math.rad(120)*speed)
 		Turn(rcalf, x_axis, 0, math.rad(120)*speed)
@@ -171,22 +144,22 @@ local function AnimateDeployment(distance, speed, wait)
 	Move(laxel, x_axis, 3*distance, 6*speed)
 	
 	Move(pelvis, z_axis, -4*distance, 4*speed)
-	Move(pelvis, y_axis, -4*distance, 4*speed)
+	Move(pelvis, y_axis, -3*distance, 3*speed)
 	Turn(pelvis, x_axis,  math.rad(-10)*distance, math.rad(-10)*speed)
 	
-	Turn(rthigh, x_axis, math.rad(-45)*distance, math.rad(45)*speed)
-	Turn(rcalf, x_axis, math.rad(-8)*distance, math.rad(16)*speed)
+	Turn(rthigh, x_axis, math.rad(-48)*distance, math.rad(48)*speed)
+	Turn(rcalf, x_axis, math.rad(-7)*distance, math.rad(14)*speed)
 	Turn(rfoot, x_axis, math.rad(60)*distance, math.rad(90)*speed)
 	
-	Turn(lthigh, x_axis, math.rad(-45)*distance, math.rad(45)*speed)
-	Turn(lcalf, x_axis, math.rad(-8)*distance, math.rad(16)*speed)
+	Turn(lthigh, x_axis, math.rad(-48)*distance, math.rad(48)*speed)
+	Turn(lcalf, x_axis, math.rad(-7)*distance, math.rad(14)*speed)
 	Turn(lfoot, x_axis, math.rad(60)*distance, math.rad(90)*speed)
 	
 	if wait then
 		Sleep(300)
 		Turn(cthigh, x_axis, math.rad(-118)*distance, math.rad(30)*speed)
-		Turn(ccalf, x_axis, math.rad(0)*distance, math.rad(65)*speed)
-		Turn(cfoot, x_axis, math.rad(-25)*distance, math.rad(65)*speed)
+		Turn(ccalf, x_axis, math.rad(0)*distance, math.rad(55)*speed)
+		Turn(cfoot, x_axis, math.rad(-25)*distance, math.rad(70)*speed)
 	
 		WaitForTurn(lcalf, x_axis)
 	end
@@ -222,7 +195,7 @@ local function SetDeploy(wantDeploy)
 		AnimateDeployment(1, 1, true)
 		deployed = true
 	else
-		AnimateDeployment(0, 1, false)
+		AnimateDeployment(0, 1.2, false)
 		deployed = false
 	end
 end

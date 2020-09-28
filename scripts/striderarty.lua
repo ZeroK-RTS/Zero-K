@@ -124,10 +124,6 @@ local function Walk()
 		Turn(rtoef2, x_axis, math.rad(22.5), math.rad(100))
 		Turn(rtoer, x_axis, math.rad(-22.5), math.rad(100))
 		Sleep(360)
-		
-		Turn(ltoer, x_axis, 0, math.rad(100))
-		Move(pelvis, y_axis, 4, 2)
-		Turn(pelvis, z_axis, math.rad(3.5), math.rad(8))
 	end
 end
 
