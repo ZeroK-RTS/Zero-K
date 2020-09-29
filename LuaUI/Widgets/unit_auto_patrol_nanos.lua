@@ -68,6 +68,8 @@ local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
 local spValidUnitID		= Spring.ValidUnitID
 
+local TableEcho = Spring.Utilities.TableEcho
+
 local abs = math.abs
 local min = math.min
 local max = math.max
@@ -114,22 +116,6 @@ end
 
 local function Log(msg)
 	spEcho("[uapn] " .. msg)
-end
-
-local function LogTable(table, prefix)
-	if table == nil then
-		Log(prefix .. "nil")
-		return
-	end
-	prefix = prefix or ""
-	for key, value in pairs(table) do
-		if type(value) == "table" then
-			Log(prefix .. tostring(key) .. ":")
-			LogTable(value, prefix .. "  ")
-		else
-			Log(prefix .. tostring(key) .. ": " .. tostring(value))
-		end
-	end
 end
 
 local function TableEqual(a, b)
@@ -275,13 +261,12 @@ local function SetupUnit(unitID)
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
 		trackedUnits[unitID].checkTime = time + RandomInterval(checkInterval)
 		local cmds = DecideCommands(x, y, z, buildDistance)
-		--LogTable(cmds, "cmds: ")
+		TableEcho(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
 		--Log(time .. "; cmd queue for " .. unitID .. ":")
-		--LogTable(commandQueue, "commandQueue: ")
+		--TableEcho(commandQueue, "commandQueue: ")
 
-		--LogTable(cmd, "cmd: ")
 		local foundIssuedCommand = false
 		local foundAnyCommand = false
 
@@ -291,7 +276,7 @@ local function SetupUnit(unitID)
 		end
 
 		for _, current in pairs(commandQueue) do
-			--LogTable(current, "current:")
+			--TableEcho(current, "current:")
 			--Log(tostring(current.options.internal))
 			--Log(tostring(current.id == cmd[1]))
 			--Log(tostring(TableEqual(cmd[2], current.params)))
@@ -414,8 +399,8 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	end
 
 	--Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
-	--LogTable(cmdParams, "  params: ")
-	--LogTable(cmdOptions, "  options: ")
+	--TableEcho(cmdParams, "  params: ")
+	--TableEcho(cmdOptions, "  options: ")
 
 	if stopHalts then
 		if cmdID == CMD_STOP then
@@ -453,7 +438,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
 	--Log("UnitIdle:")
-	--LogTable(trackedUnits[unitID], "- ")
+	--TableEcho(trackedUnits[unitID], "- ")
 
 	-- Check soon, but not right away. This time has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
@@ -471,7 +456,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	else
 		nextCheck = min(nextCheck, trackedUnits[unitID].checkTime)
 	end
-	--LogTable(trackedUnits[unitID], "+ ")
+	--TableEcho(trackedUnits[unitID], "+ ")
 end
 
 function widget:Update(dt)
