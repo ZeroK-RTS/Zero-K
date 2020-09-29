@@ -118,15 +118,13 @@ local function Log(msg)
 	spEcho("[uapn] " .. msg)
 end
 
-local function TableEqual(a, b)
-	for k, v in pairs(a) do
-		if b[k] ~= v then
-			return false
-		end
+local function ITableEqual(a, b)
+	if #a ~= #b then
+		return false
 	end
 
-	for k, v in pairs(b) do
-		if a[k] ~= v then
+	for i = 1, #a do
+		if a[i] ~= b[i] then
 			return false
 		end
 	end
@@ -150,6 +148,9 @@ end
 
 local resourceCacheInterval = 1
 local resourceCache = { updated=nil }
+-- TODO:
+-- We should return which commands we do and which we do not want issued,
+-- so we will reissue if we have strictly fewer options than before.
 local function DecideCommands(x, y, z, buildDistance)
 	if resourceCache.updated == nil or
 			resourceCache.updated + resourceCacheInterval < time then
@@ -279,13 +280,14 @@ local function SetupUnit(unitID)
 			--TableEcho(current, "current:")
 			--Log(tostring(current.options.internal))
 			--Log(tostring(current.id == cmd[1]))
-			--Log(tostring(TableEqual(cmd[2], current.params)))
+			--Log(tostring(ITableEqual(cmd[2], current.params)))
 
 			if not current.options.internal then
 				foundAnyCommand = true
+				-- TODO: here and below also check cmd[3]
 				for i, cmd in ipairs(cmds) do
 					if current.id == cmd[1] and
-							TableEqual(cmd[2], current.params) then
+							ITableEqual(cmd[2], current.params) then
 						foundCommand[i] = true
 					end
 				end
@@ -293,7 +295,7 @@ local function SetupUnit(unitID)
 				if trackedUnits[unitID].commands then
 					for i, cmd in ipairs(trackedUnits[unitID].commands) do
 						if current.id == cmd[1] and
-								TableEqual(current.params, cmd[2]) then
+								ITableEqual(current.params, cmd[2]) then
 							foundIssuedCommand = true
 						end
 					end
