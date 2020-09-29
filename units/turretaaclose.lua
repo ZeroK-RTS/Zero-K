@@ -81,7 +81,7 @@ return { turretaaclose = {
 
       damage                  = {
         default = 50.1,
-        planes  = 500.1,
+        planes  = 575.1,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
