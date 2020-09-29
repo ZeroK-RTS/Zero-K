@@ -261,7 +261,7 @@ local function SetupUnit(unitID)
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
 		trackedUnits[unitID].checkTime = time + RandomInterval(checkInterval)
 		local cmds = DecideCommands(x, y, z, buildDistance)
-		TableEcho(cmds, "cmds: ")
+		--TableEcho(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
 		--Log(time .. "; cmd queue for " .. unitID .. ":")
