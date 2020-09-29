@@ -156,21 +156,8 @@ function gadget:GetInfo()
 		action  = 'excludeairpad',
 		params  = { },
 		texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
-		hidden  = false;
-
-		--pos = {123},
+		hidden  = false,
   }
-  
- --[[ local cmdEXCLUDEAIRPAD = {
-	  id      = CMD_EXCLUDEAIRPAD,
-	  name    = "ExcludeAirpad",
-	  action  = "excludeairpad",
-	  cursor  = 'Repair',
-	  type    = CMDTYPE.ICON_MAP,
-	  tooltip = "Excludes an airpad from the running.", --Need to think of a better desc here
-	  texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
-	  hidden  = false,
-  }]]--
   
   local findPadCMD = {
 	  id      = CMD_FIND_PAD,
@@ -251,6 +238,8 @@ function gadget:GetInfo()
   GG.InsertCommand = InsertCommand
   
   local function RefreshEmptyPad(airpadID,airpadDefID)
+	Spring.Echo("Refresh Empty Pad called..")
+
 	  if airpadDefs[airpadDefID] then
 		  local piecesList = spGetUnitPieceMap(airpadID)
 		  local padPieceName = airpadDefs[airpadDefID].padPieceName
@@ -277,6 +266,7 @@ function gadget:GetInfo()
   end
   
   local function RefreshEmptyspot_minusBomberLanding()
+	Spring.Echo("Refresh Empty spot minus bomber landing called..")
 	  for allyTeam in pairs(airpadsPerAllyteam) do --all airpads
 		  for airpadID,airpadUnitDefID in pairs (airpadsPerAllyteam[allyTeam]) do
 			  if spGetUnitIsDead(airpadID) then --rare case. Can happen if airpad is built & die in same frame
@@ -316,7 +306,8 @@ function gadget:GetInfo()
 			  end
 		  end
 	  end
-  
+	  
+	  Spring.Echo("Find best airpad at coords run")
 	  return bestPadID
   end
   
@@ -329,7 +320,7 @@ function gadget:GetInfo()
   end
   
   local function FindNearestAirpad(unitID, team)
-	  --Spring.Echo(unitID.." checking for closest pad")
+	  Spring.Echo(unitID.." checking for closest pad")
 	  local allyTeam = spGetUnitAllyTeam(unitID)
 	  local freePads = {}
 	  local freePadCount = 0
@@ -344,7 +335,7 @@ function gadget:GetInfo()
 			  end
 			  airpadsPerAllyteam[allyTeam][airpadID] = nil
 		  else
-			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap and not excludedPads[airpadID]) then
+			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) then
 				  freePads[airpadID] = true
 				  freePadCount = freePadCount + 1
 			  end
@@ -352,7 +343,7 @@ function gadget:GetInfo()
 	  end
 	  -- if no free pads, just use all of them
 	  if freePadCount == 0 then
-		  --Spring.Echo("No free pads, directing to closest one")
+		  Spring.Echo("No free pads, directing to closest one - Will need to override this.")
 		  freePads = airpadsPerAllyteam[allyTeam]
 	  end
 	  
@@ -369,14 +360,27 @@ function gadget:GetInfo()
 			  closestPad = airpadID
 		  end
 	  end
+
+	  Spring.Echo(excludedPads[closestPad])
+	  Spring.Echo(closestPad)
   
-	  -- if not excludedPads[airpadID] --Check if it contains the airpad
-  
-	  -- end
+	  if excludedPads[closestPad] then --Check if it contains the airpad
+	  		return
+	  end
+
+	  for index, value in ipairs(excludedPads) do
+		Spring.Echo(index .. ': ' .. value)
+	 end
+
+	 for index, value in ipairs(excludedPads) do
+		Spring.Echo(excludedPads[index])
+	 end
+
 	  return closestPad
   end
   
   local function RequestRearm(unitID, team, forceNow, replaceExisting)
+	Spring.Echo("Rearm requested")
 	  if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
 		  return true --already reserved an airpad, do not reserve another one again
 	  end
@@ -460,7 +464,7 @@ function gadget:GetInfo()
   function gadget:UnitFinished(unitID, unitDefID, team)
 	  if airpadDefs[unitDefID] then
 		  --Spring.Echo("Adding unit "..unitID.." to airpad list")
-		  table.insert(excludedPads, unitID)
+		  excludedPads[unitID] = false
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		  airpadsData[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		  airpadsData[unitID].reservations = {count = 0, units = {}}
@@ -516,6 +520,7 @@ function gadget:GetInfo()
   end
   
   function ReserveAirpad(bomberID,airpadID)
+	Spring.Echo("Reserve airpad called..")
 	  spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	  local reservations = airpadsData[airpadID].reservations
 	  if not reservations.units[bomberID] then
@@ -565,9 +570,11 @@ function gadget:GetInfo()
 	  if airpadDefs[spGetUnitDefID(msg_table[2])] then
 		if not excludedPads[msg_table[2]] then
 		  excludedPads[msg_table[2]] = true
-		  Spring.Echo("Added airpad.")
+		  Spring.Echo("Added airpad: " .. msg_table[2])
+		  Spring.Echo(excludedPads[msg_table[2]])
 		else
-		  Spring.Echo("Already exists. Consider removing it.")
+		  Spring.Echo("Already exists. Removed.")
+		  excludedPads[msg_table[2]] = false
 		end
 	  else
 		Spring.Echo("Not an airpad!")
