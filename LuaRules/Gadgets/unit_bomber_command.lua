@@ -238,7 +238,6 @@ function gadget:GetInfo()
   GG.InsertCommand = InsertCommand
   
   local function RefreshEmptyPad(airpadID,airpadDefID)
-	Spring.Echo("Refresh Empty Pad called..")
 
 	  if airpadDefs[airpadDefID] then
 		  local piecesList = spGetUnitPieceMap(airpadID)
@@ -266,7 +265,6 @@ function gadget:GetInfo()
   end
   
   local function RefreshEmptyspot_minusBomberLanding()
-	Spring.Echo("Refresh Empty spot minus bomber landing called..")
 	  for allyTeam in pairs(airpadsPerAllyteam) do --all airpads
 		  for airpadID,airpadUnitDefID in pairs (airpadsPerAllyteam[allyTeam]) do
 			  if spGetUnitIsDead(airpadID) then --rare case. Can happen if airpad is built & die in same frame
@@ -320,7 +318,7 @@ function gadget:GetInfo()
   end
   
   local function FindNearestAirpad(unitID, team)
-	  Spring.Echo(unitID.." checking for closest pad")
+	  --Spring.Echo(unitID.." checking for closest pad")
 	  local allyTeam = spGetUnitAllyTeam(unitID)
 	  local freePads = {}
 	  local freePadCount = 0
@@ -335,7 +333,7 @@ function gadget:GetInfo()
 			  end
 			  airpadsPerAllyteam[allyTeam][airpadID] = nil
 		  else
-			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) then
+			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[airpadID] then
 				  freePads[airpadID] = true
 				  freePadCount = freePadCount + 1
 			  end
@@ -343,7 +341,6 @@ function gadget:GetInfo()
 	  end
 	  -- if no free pads, just use all of them
 	  if freePadCount == 0 then
-		  Spring.Echo("No free pads, directing to closest one - Will need to override this.")
 		  freePads = airpadsPerAllyteam[allyTeam]
 	  end
 	  
@@ -361,26 +358,14 @@ function gadget:GetInfo()
 		  end
 	  end
 
-	  Spring.Echo(excludedPads[closestPad])
-	  Spring.Echo(closestPad)
-  
-	  if excludedPads[closestPad] then --Check if it contains the airpad
+	  if excludedPads[closestPad] then --Check if it contains the airpad and then return nil this will only happen when their are no other free airpads.
 	  		return
 	  end
-
-	  for index, value in ipairs(excludedPads) do
-		Spring.Echo(index .. ': ' .. value)
-	 end
-
-	 for index, value in ipairs(excludedPads) do
-		Spring.Echo(excludedPads[index])
-	 end
 
 	  return closestPad
   end
   
   local function RequestRearm(unitID, team, forceNow, replaceExisting)
-	Spring.Echo("Rearm requested")
 	  if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
 		  return true --already reserved an airpad, do not reserve another one again
 	  end
@@ -464,7 +449,6 @@ function gadget:GetInfo()
   function gadget:UnitFinished(unitID, unitDefID, team)
 	  if airpadDefs[unitDefID] then
 		  --Spring.Echo("Adding unit "..unitID.." to airpad list")
-		  excludedPads[unitID] = false
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		  airpadsData[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		  airpadsData[unitID].reservations = {count = 0, units = {}}
@@ -520,7 +504,6 @@ function gadget:GetInfo()
   end
   
   function ReserveAirpad(bomberID,airpadID)
-	Spring.Echo("Reserve airpad called..")
 	  spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	  local reservations = airpadsData[airpadID].reservations
 	  if not reservations.units[bomberID] then
@@ -532,59 +515,34 @@ function gadget:GetInfo()
 	  end
   end
   
-  --[[Put his here so that I can find my code faster... Will be removed soon.
-  --
-  --
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI HI HI HI HI HI HI                          HI HI HI
-  --HI HI HI HI HI HI HI HI HI                          HI HI HI
-  --HI HI HI HI HI HI HI HI HI                          HI HI HI
-  --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI          HI HI HI                          HI HI HI
-  --HI HI HI 	      HI HI HI                          HI HI HI
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --HI HI HI          HI HI HI                 HI HI HI HI HI HI HI HI HI
-  --
-  ---
-  --]]--
-  
-  
   function gadget:RecvLuaMsg(msg, playerID)
 	  local msg_table = Spring.Utilities.ExplodeString('|', msg)
-	  if msg_table[1] ~= 'addExclusion' then
-		  return
-	  end
-	  for index, value in ipairs(excludedPads) do
-		Spring.Echo(index .. ': ' .. value)
-	 end
 
-	 Spring.Echo('unit id: ' .. msg_table[2])
+	  if msg_table[1] ~= 'addExclusion' then
+		  return --Not a messege for us
+	  end
+
+	  local padID = tonumber(msg_table[2])
+
+	 --Spring.Echo('unit id: ' .. padID)
 
 	  --Check if the unit is an airpad and if it already exists
-	  if airpadDefs[spGetUnitDefID(msg_table[2])] then
-		if not excludedPads[msg_table[2]] then
-		  excludedPads[msg_table[2]] = true
-		  Spring.Echo("Added airpad: " .. msg_table[2])
-		  Spring.Echo(excludedPads[msg_table[2]])
+	  if airpadDefs[spGetUnitDefID(padID)] then
+		if not excludedPads[padID] then
+		  excludedPads[padID] = true
+		  --Spring.Echo("Added airpad: " .. padID)
 		else
-		  Spring.Echo("Already exists. Removed.")
-		  excludedPads[msg_table[2]] = false
+		  --Already exists, remove
+		  excludedPads[padID] = false
 		end
 	  else
-		Spring.Echo("Not an airpad!")
+		--Spring.Echo("Not an airpad!")
 	  end
-	  --Spring.Echo(msg_table[2])
-	  --Spring.Echo('added' .. excludedPads[#excludedPads])
   end
   
   function gadget:UnitDestroyed(unitID, unitDefID, team)
 	  if airpadsData[unitID] then
+		  excludedPads[unitID] = nil
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
 		  --Spring.Echo("Removing unit "..unitID.." from airpad list")
 		  airpadsPerAllyteam[allyTeam][unitID] = nil
