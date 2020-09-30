@@ -760,8 +760,10 @@ function widget:Update(dt)
 		local newCamDir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
 		if newCamDir ~= camDir then
 			camDir = newCamDir
-			gl.DeleteList(incomeLabelList)
-			incomeLabelList = glCreateList(DrawIncomeLabels)
+			if WG.metalSpots then
+				gl.DeleteList(incomeLabelList)
+				incomeLabelList = glCreateList(DrawIncomeLabels)
+			end
 			debounceCamUpdate = 0.1
 		else
 			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
@@ -975,7 +977,7 @@ function widget:DrawWorldPreUnit()
 		gl.DepthTest(true)
 		gl.DepthMask(true)
 
-		if drawMexSpots then
+		if drawMexSpots and incomeLabelList then
 			glCallList(incomeLabelList)
 		end
 		glCallList(circleOnlyMexDrawList)
