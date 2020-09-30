@@ -219,26 +219,26 @@ local function DecideCommands(x, y, z, buildDistance)
 	local commands = {}
 
 	if get_metal and use_metal and use_energy then
-		table.insert(commands, patrol)
+		commands[#commands + 1] = patrol
 	else
 		if use_metal and use_energy then
-			table.insert(commands, build_assist)
+			commands[#commands + 1] = build_assist
 		end
 		if use_energy then
-			table.insert(commands, repair_units)
+			commands[#commands + 1] = repair_units
 		end
 		if get_metal and get_energy then
 			if metal > energy then
-				table.insert(commands, reclaim_energy)
-				table.insert(commands, reclaim_metal)
+				commands[#commands + 1] = reclaim_energy
+				commands[#commands + 1] = reclaim_metal
 			else
-				table.insert(commands, reclaim_metal)
-				table.insert(commands, reclaim_energy)
+				commands[#commands + 1] = reclaim_metal
+				commands[#commands + 1] = reclaim_energy
 			end
 		elseif get_metal then
-			table.insert(commands, reclaim_metal)
+			commands[#commands + 1] = reclaim_metal
 		elseif get_energy then
-			table.insert(commands, reclaim_energy)
+			commands[#commands + 1] = reclaim_energy
 		end
 	end
 
