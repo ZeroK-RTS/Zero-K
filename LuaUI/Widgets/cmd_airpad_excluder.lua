@@ -17,8 +17,10 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local function findUnitUnderCursour (cmdParams) 
-	--local mouseX,mouseY,mouseZ = cmdParams[1], cmdParams[2], cmdParams[3]
-	local mouseX, mouseY = Spring.GetMouseState()
+    local mouseX,mouseY = cmdParams[1], cmdParams[2]
+    Spring.Echo("cmd x: " .. mouseX .. " y: " .. mouseY)
+    local bmouseX, bmouseY = Spring.GetMouseState()
+    Spring.Echo("spring x: " .. bmouseX .. " y: " .. bmouseY)
 	local type, id = Spring.TraceScreenRay(mouseX, mouseY, false)
 	if type == "unit" then
 		Spring.SendLuaRulesMsg('addExclusion|' .. id)

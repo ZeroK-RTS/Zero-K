@@ -150,12 +150,12 @@ function gadget:GetInfo()
   
  local cmdEXCLUDEAIRPAD = {
 	 	id 		= CMD_EXCLUDEAIRPAD,
-		type    = CMDTYPE.ICON_MAP,
+		type    = CMDTYPE.ICON_UNIT,
 		tooltip = 'Excludes an airpad from the running.',
 		cursor  = 'Repair',
 		action  = 'excludeairpad',
 		params  = { },
-		texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
+		--texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
 		hidden  = false,
   }
   
@@ -305,16 +305,7 @@ function gadget:GetInfo()
 		  end
 	  end
 	  
-	  Spring.Echo("Find best airpad at coords run")
 	  return bestPadID
-  end
-  
-  local function tablelength(T)
-	  local count = 0
-	  for _ in pairs(T) do
-		  count = count + 1 
-	  end
-	  return count
   end
   
   local function FindNearestAirpad(unitID, team)
@@ -520,6 +511,10 @@ function gadget:GetInfo()
 
 	  if msg_table[1] ~= 'addExclusion' then
 		  return --Not a messege for us
+	  end
+
+	  if msg_table[2] == nil then
+		return
 	  end
 
 	  local padID = tonumber(msg_table[2])
