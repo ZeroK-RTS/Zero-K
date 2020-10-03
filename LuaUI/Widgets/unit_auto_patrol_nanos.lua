@@ -100,7 +100,7 @@ local stopHalts = true
 -- Map from unitID -> { checkTime, settleTime, command }
 local trackedUnits = {}
 -- The current time, in seconds (I think)
-local time = 0
+local currentTime = 0
 local nextCheck
 
 --------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ local resourceCache = { updated=nil }
 -- so we will reissue if we have strictly fewer options than before.
 local function DecideCommands(x, y, z, buildDistance)
 	if resourceCache.updated == nil or
-			resourceCache.updated + resourceCacheInterval < time then
+			resourceCache.updated + resourceCacheInterval < currentTime then
 		resourceCache.metal,
 			resourceCache.metalStorage,
 			resourceCache.metalPull,
@@ -165,7 +165,7 @@ local function DecideCommands(x, y, z, buildDistance)
 			resourceCache.energyIncome = spGetTeamResources(spGetMyTeamID(), "energy")
 		resourceCache.energyStorage = resourceCache.energyStorage - HIDDEN_STORAGE
 
-		resourceCache.updated = time
+		resourceCache.updated = currentTime
 	end
 
 	local metalStorage = resourceCache.metalStorage
@@ -260,12 +260,12 @@ local function SetupUnit(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
-		trackedUnits[unitID].checkTime = time + RandomInterval(checkInterval)
+		trackedUnits[unitID].checkTime = currentTime + RandomInterval(checkInterval)
 		local cmds = DecideCommands(x, y, z, buildDistance)
 		--TableEcho(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
-		--Log(time .. "; cmd queue for " .. unitID .. ":")
+		--Log(currentTime .. "; cmd queue for " .. unitID .. ":")
 		--TableEcho(commandQueue, "commandQueue: ")
 
 		local foundIssuedCommand = false
@@ -325,7 +325,7 @@ local function SetupUnit(unitID)
 						" @ " .. x .. ", " .. y .. ", " .. z)
 			end
 		end
-		trackedUnits[unitID].settleTime = time + RandomInterval(settleInterval)
+		trackedUnits[unitID].settleTime = currentTime + RandomInterval(settleInterval)
 		trackedUnits[unitID].commands = cmds
 	end
 end
@@ -442,19 +442,19 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	--Log("UnitIdle:")
 	--TableEcho(trackedUnits[unitID], "- ")
 
-	-- Check soon, but not right away. This time has to be long enough that the
+	-- Check soon, but not right away. This currentTime has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
 	local delta = 0.5
 	trackedUnits[unitID] = trackedUnits[unitID] or
-			{checkTime=time + delta, settleTime=time+delta}
+			{checkTime=currentTime + delta, settleTime=currentTime+delta}
 	trackedUnits[unitID].checkTime =
 		max(
 			min(
 				trackedUnits[unitID].checkTime,
 				trackedUnits[unitID].settleTime),
-			time + delta)
+			currentTime + delta)
 	if nextCheck == nil then
-		nextCheck = time + delta
+		nextCheck = currentTime + delta
 	else
 		nextCheck = min(nextCheck, trackedUnits[unitID].checkTime)
 	end
@@ -462,12 +462,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 end
 
 function widget:Update(dt)
-	time = time + dt
+	currentTime = currentTime + dt
 	if not enableIdleNanos then
 		return
 	end
-	if nextCheck ~= nil and time > nextCheck then
-		--Log("time to check (" .. time .. ")")
+	if nextCheck ~= nil and currentTime > nextCheck then
+		--Log("time to check (" .. currentTime .. ")")
 		for unitID, _ in pairs(trackedUnits) do
 			if spValidUnitID(unitID) then
 				SetupUnit(unitID)
@@ -477,6 +477,10 @@ function widget:Update(dt)
 		end
 		UpdateNextCheck()
     end
+end
+
+-- Called for every game simulation frame (30 per second).
+function widget:GameFrame(frame)
 end
 
 --------------------------------------------------------------------------------
