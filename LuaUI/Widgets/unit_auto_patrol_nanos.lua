@@ -33,6 +33,8 @@
 --------------------------------------------------------------------------------
 VFS.Include("LuaRules/Configs/constants.lua")
 
+local PriorityQueue = VFS.Include("LuaRules/Gadgets/Include/PriorityQueue.lua")
+
 function widget:GetInfo()
   return {
     name      = "Auto Patrol Nanos",
@@ -83,12 +85,12 @@ local mapCenterZ = Game.mapSizeZ / 2
 
 -- Check that a unit is still doing the right thing every `checkInterval`
 -- seconds.
-local checkInterval = 20
+local checkInterval = 20 * 30
 -- Don't issue a new command if less than `settleInterval` seconds have passed,
 -- even if the unit became idle. This is a simple rate limiter on issuing
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
-local settleInterval = 5
+local settleInterval = 5 * 30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -97,11 +99,16 @@ local settleInterval = 5
 local stoppedUnit = {}
 local enableIdleNanos = true
 local stopHalts = true
--- Map from unitID -> { checkTime, settleTime, command }
+
+-- Units that we track have an entry both in trackedUnits (so we can quickly
+-- tell if a unit is being tracked) and in queue (so we can only iterate over
+-- units that need it).
+-- Map from unitID -> { checkFrame, settleFrame, command }
 local trackedUnits = {}
--- The current time, in seconds (I think)
-local currentTime = 0
-local nextCheck
+-- The queue contains {checkFrame, unitID} pairs.
+local queue = PriorityQueue.new(function(a, b) return a[1] < b[1] end)
+
+local currentFrame = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -132,16 +139,6 @@ local function ITableEqual(a, b)
 	return true
 end
 
-local function UpdateNextCheck()
-	nextCheck = nil
-	for _, info in pairs(trackedUnits) do
-		if nextCheck == nil or info.checkTime < nextCheck then
-			nextCheck = info.checkTime
-		end
-	end
-	--Log("Update nextCheck to " .. tostring(nextCheck))
-end
-
 local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
@@ -153,7 +150,7 @@ local resourceCache = { updated=nil }
 -- so we will reissue if we have strictly fewer options than before.
 local function DecideCommands(x, y, z, buildDistance)
 	if resourceCache.updated == nil or
-			resourceCache.updated + resourceCacheInterval < currentTime then
+			resourceCache.updated + resourceCacheInterval < currentFrame then
 		resourceCache.metal,
 			resourceCache.metalStorage,
 			resourceCache.metalPull,
@@ -165,7 +162,7 @@ local function DecideCommands(x, y, z, buildDistance)
 			resourceCache.energyIncome = spGetTeamResources(spGetMyTeamID(), "energy")
 		resourceCache.energyStorage = resourceCache.energyStorage - HIDDEN_STORAGE
 
-		resourceCache.updated = currentTime
+		resourceCache.updated = currentFrame
 	end
 
 	local metalStorage = resourceCache.metalStorage
@@ -260,12 +257,12 @@ local function SetupUnit(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
-		trackedUnits[unitID].checkTime = currentTime + RandomInterval(checkInterval)
+		trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
 		local cmds = DecideCommands(x, y, z, buildDistance)
 		--TableEcho(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
-		--Log(currentTime .. "; cmd queue for " .. unitID .. ":")
+		--Log(currentFrame .. "; cmd queue for " .. unitID .. ":")
 		--TableEcho(commandQueue, "commandQueue: ")
 
 		local foundIssuedCommand = false
@@ -303,14 +300,15 @@ local function SetupUnit(unitID)
 			end
 		end
 
-		if AllTrue(foundCommand) then
-			--Log("All commands were already issued")
-			return
-		end
-
 		if foundAnyCommand and not foundIssuedCommand then
 			Log("Ignore unit " .. unitID .. " until it becomes idle.")
 			trackedUnits[unitID] = nil
+			return
+		end
+
+		queue:push({trackedUnits[unitID].checkFrame, unitID})
+		if AllTrue(foundCommand) then
+			--Log("All commands were already issued")
 			return
 		end
 
@@ -325,7 +323,7 @@ local function SetupUnit(unitID)
 						" @ " .. x .. ", " .. y .. ", " .. z)
 			end
 		end
-		trackedUnits[unitID].settleTime = currentTime + RandomInterval(settleInterval)
+		trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
 		trackedUnits[unitID].commands = cmds
 	end
 end
@@ -337,7 +335,6 @@ local function SetupAll()
 			SetupUnit(unitID)
 		end
 	end
-	UpdateNextCheck()
 end
 
 --------------------------------------------------------------------------------
@@ -391,7 +388,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 
 	SetupUnit(unitID)
-	UpdateNextCheck()
 end
 
 -- Called whenever a unit gets a command from any source, including this script!
@@ -442,45 +438,53 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	--Log("UnitIdle:")
 	--TableEcho(trackedUnits[unitID], "- ")
 
-	-- Check soon, but not right away. This currentTime has to be long enough that the
+	-- Check soon, but not right away. This delta has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
-	local delta = 0.5
+	local delta = 15
 	trackedUnits[unitID] = trackedUnits[unitID] or
-			{checkTime=currentTime + delta, settleTime=currentTime+delta}
-	trackedUnits[unitID].checkTime =
+			{checkFrame=currentFrame + delta, settleFrame=currentFrame+delta}
+	trackedUnits[unitID].checkFrame =
 		max(
 			min(
-				trackedUnits[unitID].checkTime,
-				trackedUnits[unitID].settleTime),
-			currentTime + delta)
-	if nextCheck == nil then
-		nextCheck = currentTime + delta
-	else
-		nextCheck = min(nextCheck, trackedUnits[unitID].checkTime)
-	end
+				trackedUnits[unitID].checkFrame,
+				trackedUnits[unitID].settleFrame),
+			currentFrame + delta)
+	queue:push({trackedUnits[unitID].checkFrame, unitID})
 	--TableEcho(trackedUnits[unitID], "+ ")
-end
-
-function widget:Update(dt)
-	currentTime = currentTime + dt
-	if not enableIdleNanos then
-		return
-	end
-	if nextCheck ~= nil and currentTime > nextCheck then
-		--Log("time to check (" .. currentTime .. ")")
-		for unitID, _ in pairs(trackedUnits) do
-			if spValidUnitID(unitID) then
-				SetupUnit(unitID)
-			else
-				trackedUnits[unitID] = nil
-			end
-		end
-		UpdateNextCheck()
-    end
 end
 
 -- Called for every game simulation frame (30 per second).
 function widget:GameFrame(frame)
+	if not enableIdleNanos then
+		return
+	end
+
+	currentFrame = frame
+
+	while true do
+		local entry = queue:peek()
+		if entry and frame >= entry[1] then
+			queue:pop()
+
+			unitID = entry[2]
+
+			Log("Process unit " .. unitID .. " because " .. frame .. " >= ".. entry[1])
+
+			if trackedUnits[unitID] and entry[1] == trackedUnits[unitID].checkFrame then
+				-- Otherwise, we queued this unit multiple times and this is not
+				-- the "real" one so discard it. That's simpler than removing a
+				-- stale entry from the queue.
+
+				if spValidUnitID(unitID) then
+					SetupUnit(unitID)
+				else
+					trackedUnits[unitID] = nil
+				end
+			end
+		else
+			break
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
