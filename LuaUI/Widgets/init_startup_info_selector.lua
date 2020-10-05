@@ -109,7 +109,7 @@ end
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = WG.Translate("interface", "startup_commenu_hidedefault"),
+		name = 'Hide default commanders',
 		desc = WG.Translate("interface", "startup_commenu_sitelink"),
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
@@ -310,7 +310,7 @@ local function CreateWindow()
 			padding = {5,5,5,5},
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
-				Spring.SendCommands({'say a:'..WG.Translate("interface", "startup_chatmessage", { comcallsign = option.name })})
+				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
 				Close(false, true)
 			end},
 		}

@@ -10,18 +10,18 @@ local tooltips = {
 	WANT_ONOFF = WG.Translate("interface", "states_activation")..' (_STATE_)\n  '..WG.Translate("interface", "states_activation_tooltip"),
 	UNIT_AI = WG.Translate("interface", "states_unitai")..' (_STATE_)\n  '..WG.Translate("interface", "states_unitai_tooltip"),
 	REPEAT = WG.Translate("interface", "states_repeat")..' (_STATE_)\n  '..WG.Translate("interface", "states_repeat_tooltip"),
-	WANT_CLOAK = WG.Translate("interface", "states_perscloak")..' (_STATE_)\n  '..WG.Translate("interface", "states_percloak_tooltip"),
+	WANT_CLOAK = WG.Translate("interface", "states_perscloak")..' (_STATE_)\n  '..WG.Translate("interface", "states_perscloak_tooltip"),
 	CLOAK_SHIELD = WG.Translate("interface", "states_areacloak")..' (_STATE_)\n  '..WG.Translate("interface", "states_areacloak_tooltip"),
 	PRIORITY = WG.Translate("interface", "states_priority")..' (_STATE_)\n  '..WG.Translate("interface", "states_priority_tooltip"),
 	MISC_PRIORITY = WG.Translate("interface", "states_miscpriority")..' (_STATE_)\n  '..WG.Translate("interface", "states_miscpriority_tooltip"),
 	FACTORY_GUARD = WG.Translate("interface", "states_autoassist")..' (_STATE_)\n  '..WG.Translate("interface", "states_autoassist_tooltip"),
 	AUTO_CALL_TRANSPORT = WG.Translate("interface", "states_calltransport")..' (_STATE_)\n  '..WG.Translate("interface", "states_calltransport_tooltip"),
 	GLOBAL_BUILD = WG.Translate("interface", "states_glbuild")..' (_STATE_)\n  '..WG.Translate("interface", "states_glbuild_tooltip"),
-	MOVE_STATE = WG.Translate("interface", "states_manuever")..' (_STATE_)\n  '..WG.Translate("interface", "states_manuever_tooltip"),
+	MOVE_STATE = WG.Translate("interface", "states_movestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_movestate_tooltip"),
 	FIRE_STATE = WG.Translate("interface", "states_firestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_firestate_tooltip"),
 	RETREAT = WG.Translate("interface", "states_retreat")..' (_STATE_)\n  '..WG.Translate("interface", "states_retreat_tooltip"),
 	IDLEMODE = WG.Translate("interface", "states_planeland")..' (_STATE_)\n  '..WG.Translate("interface", "states_planeland_tooltip"),
-	AP_FLY_STATE = WG.Translate("interface", "states_planeland")..' (_STATE_)\n  '..WG.Translate("interface", "states_planeland_tooltip"),
+	AP_FLY_STATE = WG.Translate("interface", "states_factoryplaneland")..' (_STATE_)\n  '..WG.Translate("interface", "states_factoryplaneland_tooltip"),
 	UNIT_BOMBER_DIVE_STATE = WG.Translate("interface", "states_divebombing")..' (_STATE_)\n  '..WG.Translate("interface", "states_divebombing_tooltip"),
 	UNIT_KILL_SUBORDINATES = WG.Translate("interface", "states_killcap")..' (_STATE_)\n  '..WG.Translate("interface", "states_killcap_tooltip"),
 	GOO_GATHER = WG.Translate("interface", "states_pupgoo")..' (_STATE_)\n  '..WG.Translate("interface", "states_pupgoo_tooltip"),
@@ -148,15 +148,15 @@ local commandDisplayConfig = {
 		stateTooltip = {
 			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_smthng_enabled")),
 			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")),
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_roam"))
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_roam"))
 		},
 		stateNameOverride = {"Enabled", "Disabled", "Roam (not in toggle)"},
 		altConfig = {
 			texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 			stateTooltip = {
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_hold")),
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_abit")),
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_manuever_roam"))
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_hold")),
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_manuever")),
+			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_roam"))
 			},
 		}
 	},
