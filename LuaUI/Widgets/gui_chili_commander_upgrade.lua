@@ -82,7 +82,7 @@ end
 local UPGRADE_CMD_DESC = {
 	id      = CMD_UPGRADE_UNIT,
 	type    = CMDTYPE.ICON,
-	tooltip = 'Upgrade Commander',
+	tooltip = WG.Translate("interface", "com_upgrademenu_tooltip"),
 	cursor  = 'Repair',
 	action  = 'upgradecomm',
 	params  = {},
@@ -631,7 +631,7 @@ local function CreateMainWindow()
 		height = 35,
 		valign = "center",
 		align  = "center",
-		caption = "Modules",
+		caption = WG.Translate("interface", "com_upgrademenu_title"),
 		autosize = false,
 		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
 		parent = mainWindow,
@@ -705,7 +705,7 @@ local function CreateMainWindow()
 		height = 55,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
-		tooltip = "Start upgrade",
+		tooltip = WG.Translate("interface", "com_upgrademenu_start"),
 		OnClick = {
 			function()
 				if mainWindowShown then
@@ -724,7 +724,7 @@ local function CreateMainWindow()
 		height = 55,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
-		tooltip = "View current modules",
+		tooltip = WG.Translate("interface", "com_upgrademenu_currentupgrades"),
 		OnClick = {
 			function(self)
 				AlreadyOwnedModuleClick(self)
@@ -741,7 +741,7 @@ local function CreateMainWindow()
 		height = 55,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {0.5,0.5,0.5,0.5},
-		tooltip = "Cancel module selection",
+		tooltip = WG.Translate("interface", "com_upgrademenu_cancel"),
 		OnClick = {
 			function()
 				--Spring.Echo("Upgrade UI Debug - Cancel Clicked")
@@ -1058,7 +1058,7 @@ function widget:CommandsChanged()
 			customCommands[#customCommands+1] = {
 				id      = CMD_UPGRADE_UNIT,
 				type    = CMDTYPE.ICON,
-				tooltip = 'Upgrade Commander',
+				tooltip = WG.Translate("interface", "com_upgrademenu_tooltip"),
 				cursor  = 'Repair',
 				action  = 'upgradecomm',
 				params  = {},

@@ -138,7 +138,10 @@ local function shutdownTranslation(widget_name)
 end
 
 local function Translate (db, text, data)
-	return translations[db].i18n(text, data)
+	if not translations[db] then
+		Spring.Log("i18n", LOG.ERROR, "attempt to translate string "..text.." from absent db "..db);
+	end
+	return translations[db].i18n(text, data) or text
 end
 
 WG.lang = lang
