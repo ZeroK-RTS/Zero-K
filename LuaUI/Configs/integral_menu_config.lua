@@ -17,14 +17,14 @@ local tooltips = {
 	FACTORY_GUARD = WG.Translate("interface", "states_autoassist")..' (_STATE_)\n  '..WG.Translate("interface", "states_autoassist_tooltip"),
 	AUTO_CALL_TRANSPORT = WG.Translate("interface", "states_calltransport")..' (_STATE_)\n  '..WG.Translate("interface", "states_calltransport_tooltip"),
 	GLOBAL_BUILD = WG.Translate("interface", "states_glbuild")..' (_STATE_)\n  '..WG.Translate("interface", "states_glbuild_tooltip"),
-	MOVE_STATE = WG.Translate("interface", "states_movestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_movestate_tooltip"),
-	FIRE_STATE = WG.Translate("interface", "states_firestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_firestate_tooltip"),
+	MOVE_STATE = WG.Translate("interface", "states_holdposition")..' (_STATE_)\n  '..WG.Translate("interface", "states_holdposition_tooltip"),
+	FIRE_STATE = WG.Translate("interface", "states_holdfire")..' (_STATE_)\n  '..WG.Translate("interface", "states_holdfire_tooltip"),
 	RETREAT = WG.Translate("interface", "states_retreat")..' (_STATE_)\n  '..WG.Translate("interface", "states_retreat_tooltip"),
-	IDLEMODE = WG.Translate("interface", "states_planeland")..' (_STATE_)\n  '..WG.Translate("interface", "states_planeland_tooltip"),
-	AP_FLY_STATE = WG.Translate("interface", "states_factoryplaneland")..' (_STATE_)\n  '..WG.Translate("interface", "states_factoryplaneland_tooltip"),
+	IDLEMODE = WG.Translate("interface", "states_airidle")..' (_STATE_)\n  '..WG.Translate("interface", "states_airidle_tooltip"),
+	AP_FLY_STATE = WG.Translate("interface", "states_factoryairidle")..' (_STATE_)\n  '..WG.Translate("interface", "states_factoryairidle_tooltip"),
 	UNIT_BOMBER_DIVE_STATE = WG.Translate("interface", "states_divebombing")..' (_STATE_)\n  '..WG.Translate("interface", "states_divebombing_tooltip"),
 	UNIT_KILL_SUBORDINATES = WG.Translate("interface", "states_killcap")..' (_STATE_)\n  '..WG.Translate("interface", "states_killcap_tooltip"),
-	GOO_GATHER = WG.Translate("interface", "states_pupgoo")..' (_STATE_)\n  '..WG.Translate("interface", "states_pupgoo_tooltip"),
+	GOO_GATHER = WG.Translate("interface", "states_puppygoo")..' (_STATE_)\n  '..WG.Translate("interface", "states_puppygoo_tooltip"),
 	DISABLE_ATTACK = WG.Translate("interface", "states_attackcom")..' (_STATE_)\n  '..WG.Translate("interface", "states_attackcom_tooltip"),
 	PUSH_PULL = WG.Translate("interface", "states_pushpull")..' (_STATE_)\n  '..WG.Translate("interface", "states_pushpull_tooltip"),
 	DONT_FIRE_AT_RADAR = WG.Translate("interface", "states_radartargeting")..' (_STATE_)\n  '..WG.Translate("interface", "states_radartargeting_tooltip"),
@@ -37,7 +37,7 @@ local tooltips = {
 }
 
 local tooltipsAlternate = {
-	MOVE_STATE = WG.Translate("interface", "states_manuever")..' (_STATE_)\n  '..WG.Translate("interface", "states_manuever_tooltip"),
+	MOVE_STATE = WG.Translate("interface", "states_movestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_movestate_tooltip"),
 	FIRE_STATE = WG.Translate("interface", "states_firestate")..' (_STATE_)\n  '..WG.Translate("interface", "states_firestate_tooltip"),
 }
 
@@ -154,9 +154,9 @@ local commandDisplayConfig = {
 		altConfig = {
 			texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 			stateTooltip = {
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_hold")),
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_manuever")),
-			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_roam"))
+				tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_hold")),
+				tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_manuever")),
+				tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_roam"))
 			},
 		}
 	},
@@ -211,8 +211,8 @@ local commandDisplayConfig = {
 		texture = {imageDir .. 'states/goo_off.png', imageDir .. 'states/goo_on.png', imageDir .. 'states/goo_cloak.png'},
 		stateTooltip = {
 			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_smthng_off")),
-			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_pupgoo_onbutcloaked")),
-			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_pupgoo_onalways"))
+			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_puppygoo_onbutcloaked")),
+			tooltips.GOO_GATHER:gsub("_STATE_", WG.Translate("interface", "states_puppygoo_onalways"))
 		}
 	},
 	[CMD_DISABLE_ATTACK] = {
