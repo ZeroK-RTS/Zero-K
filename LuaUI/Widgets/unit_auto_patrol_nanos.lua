@@ -202,40 +202,40 @@ local function DecideCommands(x, y, z, buildDistance)
 	--	"get_energy=" .. tostring(get_energy) .. ", " ..
 	--	"use_energy=" .. tostring(use_energy))
 
-	local reclaim_metal = {CMD_RECLAIM, {x, y, z, buildDistance}, 0, "reclaim metal"}
-	local reclaim_energy = {CMD_RECLAIM, {x, y, z, buildDistance}, CMD_OPT_CTRL, "reclaim energy"}
-	local repair_units = {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_META, "repair units"}
-	local build_assist = {CMD_REPAIR, {x, y, z, buildDistance}, 0, "build assist"}
+	local function reclaim_metal() return {CMD_RECLAIM, {x, y, z, buildDistance}, 0, "reclaim metal"} end
+	local function reclaim_energy() return {CMD_RECLAIM, {x, y, z, buildDistance}, CMD_OPT_CTRL, "reclaim energy"} end
+	local function repair_units() return {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_META, "repair units"} end
+	local function build_assist() return {CMD_REPAIR, {x, y, z, buildDistance}, 0, "build assist"} end
 
 	-- Patrolling doesn't do anything if you target the current location of
 	-- the unit. Point patrol towards map center.
 	local vx = mapCenterX - x
 	local vz = mapCenterZ - z
-	local patrol = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
+	local function patrol() return {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"} end
 
 	local commands = {}
 
 	if get_metal and use_metal and use_energy then
-		commands[#commands + 1] = patrol
+		commands[#commands + 1] = patrol()
 	else
 		if use_metal and use_energy then
-			commands[#commands + 1] = build_assist
+			commands[#commands + 1] = build_assist()
 		end
 		if use_energy then
-			commands[#commands + 1] = repair_units
+			commands[#commands + 1] = repair_units()
 		end
 		if get_metal and get_energy then
 			if metal > energy then
-				commands[#commands + 1] = reclaim_energy
-				commands[#commands + 1] = reclaim_metal
+				commands[#commands + 1] = reclaim_energy()
+				commands[#commands + 1] = reclaim_metal()
 			else
-				commands[#commands + 1] = reclaim_metal
-				commands[#commands + 1] = reclaim_energy
+				commands[#commands + 1] = reclaim_metal()
+				commands[#commands + 1] = reclaim_energy()
 			end
 		elseif get_metal then
-			commands[#commands + 1] = reclaim_metal
+			commands[#commands + 1] = reclaim_metal()
 		elseif get_energy then
-			commands[#commands + 1] = reclaim_energy
+			commands[#commands + 1] = reclaim_energy()
 		end
 	end
 
@@ -263,7 +263,7 @@ local function SetupUnit(unitID)
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
 		--Log(currentFrame .. "; cmd queue for " .. unitID .. ":")
-		--TableEcho(commandQueue, "commandQueue: ")
+		TableEcho(commandQueue, "commandQueue: ")
 
 		local foundIssuedCommand = false
 		local foundAnyCommand = false
@@ -278,6 +278,25 @@ local function SetupUnit(unitID)
 			--Log(tostring(current.options.internal))
 			--Log(tostring(current.id == cmd[1]))
 			--Log(tostring(ITableEqual(cmd[2], current.params)))
+
+			-- A single command looks like:
+			-- id = 15
+			-- tag = 121
+			-- options = {
+			--     alt = false
+			--     ctrl = false
+			--     internal = false
+			--     coded = 0
+			--     right = false
+			--     meta = false
+			--     shift = false
+			-- },
+			-- params = {
+			--     1 = 4624
+			--     2 = 170.444534
+			--     3 = 4436
+			-- },
+
 
 			if not current.options.internal then
 				foundAnyCommand = true
@@ -466,7 +485,7 @@ function widget:GameFrame(frame)
 		if entry and frame >= entry[1] then
 			queue:pop()
 
-			unitID = entry[2]
+			local unitID = entry[2]
 
 			Log("Process unit " .. unitID .. " because " .. frame .. " >= ".. entry[1])
 
