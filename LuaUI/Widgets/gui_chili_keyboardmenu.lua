@@ -154,7 +154,7 @@ options = {
 			{key='qwerty', name='QWERTY', },
 			{key='qwertz', name='QWERTZ', },
 			{key='azerty', name='AZERTY', },
-			{key='dvorak', name='DVORAK', },
+			{key='dvorak', name='Dvorak', },
 			
 		},
 	},
