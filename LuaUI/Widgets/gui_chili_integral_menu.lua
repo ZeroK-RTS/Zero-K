@@ -23,6 +23,7 @@ include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
+local transkey = include("Configs/transkey.lua")
 
 -- Chili classes
 local Chili
@@ -192,6 +193,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'DVORAK (standard)', key = 'dvorak', hotkey = nil},
 			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
@@ -1255,7 +1257,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	
 	local function SetGridKey(key)
 		usingGrid = true
-		hotkeyText = GetGreenStr(key)
+		hotkeyText = GetGreenStr(transkey[string.lower(key)] or key)
 		SetText(textConfig.topLeft.name, hotkeyText)
 	end
 	
