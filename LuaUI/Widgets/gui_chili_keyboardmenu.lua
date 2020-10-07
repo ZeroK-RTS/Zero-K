@@ -154,6 +154,7 @@ options = {
 			{key='qwerty', name='QWERTY', },
 			{key='qwertz', name='QWERTZ', },
 			{key='azerty', name='AZERTY', },
+			{key='dvorak', name='Dvorak', },
 			
 		},
 	},
@@ -779,6 +780,10 @@ SetupKeybuttons = function()
 		keyRows = options.sevenperrow.value
 			and	{ 'AZERTYU', 'QSDFGHJ', 'WXCVBN,' }
 			or 	{ 'AZERTY', 'QSDFGH', 'WXCVBN' }
+	elseif options.layout.value == 'dvorak' then
+		keyRows = options.sevenperrow.value
+			and	{ '\',.PYFG', 'AOEUIDH', ';QJKXBM' }
+			or 	{ '\',.PYF', 'AOEUID', ';QJKXB' }
 	else
 		keyRows = options.sevenperrow.value
 			and	{ 'QWERTYU', 'ASDFGHJ', 'ZXCVBNM' }
