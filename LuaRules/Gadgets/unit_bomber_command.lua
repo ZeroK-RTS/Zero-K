@@ -152,10 +152,9 @@ function gadget:GetInfo()
 	 	id 		= CMD_EXCLUDEAIRPAD,
 		type    = CMDTYPE.ICON_UNIT,
 		tooltip = 'Excludes an airpad from the running.',
-		cursor  = 'Repair',
+		cursor  = 'Normal',
 		action  = 'excludeairpad',
 		params  = { },
-		--texture = 'LuaUI/Images/commands/states/divebomb_shield.png',
 		hidden  = false,
   }
   
