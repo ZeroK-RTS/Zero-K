@@ -83,10 +83,16 @@ local mapCenterZ = Game.mapSizeZ / 2
 --------------------------------------------------------------------------------
 -- Constants
 
+local PATROL = 1
+local RECLAIM_METAL = 2
+local RECLAIM_ENERGY = 3
+local REPAIR_UNITS = 4
+local BUILD_ASSIST = 5
+
 -- Check that a unit is still doing the right thing every `checkInterval`
--- seconds.
+-- frames.
 local checkInterval = 20 * 30
--- Don't issue a new command if less than `settleInterval` seconds have passed,
+-- Don't issue a new command if less than `settleInterval` frames have passed,
 -- even if the unit became idle. This is a simple rate limiter on issuing
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
@@ -143,37 +149,27 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local resourceCacheInterval = 1
-local resourceCache = { updated=nil }
+local decisionCacheInterval = 9
+local decisionCache = { updated=nil }
 -- TODO:
 -- We should return which commands we do and which we do not want issued,
 -- so we will reissue if we have strictly fewer options than before.
-local function DecideCommands(x, y, z, buildDistance)
-	if resourceCache.updated == nil or
-			resourceCache.updated + resourceCacheInterval < currentFrame then
-		resourceCache.metal,
-			resourceCache.metalStorage,
-			resourceCache.metalPull,
-			resourceCache.metalIncome = spGetTeamResources(spGetMyTeamID(), "metal")
-		resourceCache.metalStorage = resourceCache.metalStorage - HIDDEN_STORAGE
-		resourceCache.energy,
-			resourceCache.energyStorage,
-			resourceCache.energyPull,
-			resourceCache.energyIncome = spGetTeamResources(spGetMyTeamID(), "energy")
-		resourceCache.energyStorage = resourceCache.energyStorage - HIDDEN_STORAGE
-
-		resourceCache.updated = currentFrame
+local function DecideCommands()
+	if decisionCache.updated ~= nil and
+			decisionCache.updated + decisionCacheInterval > currentFrame then
+		return decisionCache.commands
 	end
 
-	local metalStorage = resourceCache.metalStorage
-	local metalPull = resourceCache.metalPull
-	local metalIncome = resourceCache.metalIncome
-	local metal = resourceCache.metal + metalIncome - metalPull
+	decisionCache.updated = currentFrame
 
-	local energyStorage = resourceCache.energyStorage
-	local energyPull = resourceCache.energyPull
-	local energyIncome = resourceCache.energyIncome
-	local energy = resourceCache.energy + energyIncome - energyPull
+	local metal, metalStorage, metalPull, metalIncome =
+			spGetTeamResources(spGetMyTeamID(), "metal")
+	metal = metal + metalIncome - metalPull
+	metalStorage = metalStorage - HIDDEN_STORAGE
+	local energy, energyStorage, energyPull, energyIncome =
+			spGetTeamResources(spGetMyTeamID(), "energy")
+	energy = energy + energyIncome - energyPull
+	energyStorage = energyStorage - HIDDEN_STORAGE
 
 	local slop = 5
 
@@ -202,40 +198,59 @@ local function DecideCommands(x, y, z, buildDistance)
 	--	"get_energy=" .. tostring(get_energy) .. ", " ..
 	--	"use_energy=" .. tostring(use_energy))
 
-	local function reclaim_metal() return {CMD_RECLAIM, {x, y, z, buildDistance}, 0, "reclaim metal"} end
-	local function reclaim_energy() return {CMD_RECLAIM, {x, y, z, buildDistance}, CMD_OPT_CTRL, "reclaim energy"} end
-	local function repair_units() return {CMD_REPAIR, {x, y, z, buildDistance}, CMD_OPT_META, "repair units"} end
-	local function build_assist() return {CMD_REPAIR, {x, y, z, buildDistance}, 0, "build assist"} end
-
-	-- Patrolling doesn't do anything if you target the current location of
-	-- the unit. Point patrol towards map center.
-	local vx = mapCenterX - x
-	local vz = mapCenterZ - z
-	local function patrol() return {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"} end
-
 	local commands = {}
 
 	if get_metal and use_metal and use_energy then
-		commands[#commands + 1] = patrol()
+		commands[#commands + 1] = PATROL
 	else
 		if use_metal and use_energy then
-			commands[#commands + 1] = build_assist()
+			commands[#commands + 1] = BUILD_ASSIST
 		end
 		if use_energy then
-			commands[#commands + 1] = repair_units()
+			commands[#commands + 1] = REPAIR_UNITS
 		end
 		if get_metal and get_energy then
 			if metal > energy then
-				commands[#commands + 1] = reclaim_energy()
-				commands[#commands + 1] = reclaim_metal()
+				commands[#commands + 1] = RECLAIM_ENERGY
+				commands[#commands + 1] = RECLAIM_METAL
 			else
-				commands[#commands + 1] = reclaim_metal()
-				commands[#commands + 1] = reclaim_energy()
+				commands[#commands + 1] = RECLAIM_METAL
+				commands[#commands + 1] = RECLAIM_ENERGY
 			end
 		elseif get_metal then
-			commands[#commands + 1] = reclaim_metal()
+			commands[#commands + 1] = RECLAIM_METAL
 		elseif get_energy then
-			commands[#commands + 1] = reclaim_energy()
+			commands[#commands + 1] = RECLAIM_ENERGY
+		end
+	end
+
+	decisionCache.commands = commands
+
+	return commands
+end
+
+local function MakeCommands(decidedCommands, x, y, z, buildDistance)
+	local commands = {}
+
+	local area = {x, y, z, buildDistance}
+
+	for i, decided in ipairs(decidedCommands) do
+		if decided == PATROL then
+			-- Patrolling doesn't do anything if you target the current location
+			-- of the unit. Point patrol towards map center.
+			local vx = mapCenterX - x
+			local vz = mapCenterZ - z
+			commands[i] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
+		elseif decided == RECLAIM_METAL then
+			commands[i] = {CMD_RECLAIM, area, 0, "reclaim metal"}
+		elseif decided == RECLAIM_ENERGY then
+			commands[i] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
+		elseif decided == REPAIR_UNITS then
+			commands[i] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
+		elseif decided == BUILD_ASSIST then
+			commands[i] = {CMD_REPAIR, area, 0, "build assist"}
+		else
+			Log("ERROR: Invalid value in decidedCommands: " .. tostring(decided))
 		end
 	end
 
@@ -258,7 +273,8 @@ local function SetupUnit(unitID)
 		local buildDistance = UnitDefs[unitDefID].buildDistance
 		trackedUnits[unitID] = trackedUnits[unitID] or {}
 		trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
-		local cmds = DecideCommands(x, y, z, buildDistance)
+		local decisions = DecideCommands()
+		local cmds = MakeCommands(decisions, x, y, z, buildDistance)
 		--TableEcho(cmds, "cmds: ")
 
 		local commandQueue = spGetCommandQueue(unitID, -1)
@@ -296,7 +312,6 @@ local function SetupUnit(unitID)
 			--     2 = 170.444534
 			--     3 = 4436
 			-- },
-
 
 			if not current.options.internal then
 				foundAnyCommand = true
@@ -411,13 +426,13 @@ end
 
 -- Called whenever a unit gets a command from any source, including this script!
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if trackedUnits[unitID] == nil then
+	if trackedUnits[unitID] == nil or cmdOptions.internal then
 		return
 	end
 
-	--Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
-	--TableEcho(cmdParams, "  params: ")
-	--TableEcho(cmdOptions, "  options: ")
+	Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
+	TableEcho(cmdParams, "  params: ")
+	TableEcho(cmdOptions, "  options: ")
 
 	if stopHalts then
 		if cmdID == CMD_STOP then
