@@ -55,6 +55,7 @@ local CMD_PATROL        = CMD.PATROL
 local CMD_RECLAIM       = CMD.RECLAIM
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP          = CMD.STOP
+local CMD_OPT_ALT       = CMD.OPT_ALT
 local CMD_OPT_CTRL      = CMD.OPT_CTRL
 local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
 local CMD_OPT_META      = CMD.OPT_META
@@ -277,74 +278,7 @@ local function SetupUnit(unitID)
 		local cmds = MakeCommands(decisions, x, y, z, buildDistance)
 		--TableEcho(cmds, "cmds: ")
 
-		local commandQueue = spGetCommandQueue(unitID, -1)
-		--Log(currentFrame .. "; cmd queue for " .. unitID .. ":")
-		TableEcho(commandQueue, "commandQueue: ")
-
-		local foundIssuedCommand = false
-		local foundAnyCommand = false
-
-		local foundCommand = {}
-		for i, _ in ipairs(cmds) do
-			foundCommand[i] = false
-		end
-
-		for _, current in pairs(commandQueue) do
-			--TableEcho(current, "current:")
-			--Log(tostring(current.options.internal))
-			--Log(tostring(current.id == cmd[1]))
-			--Log(tostring(ITableEqual(cmd[2], current.params)))
-
-			-- A single command looks like:
-			-- id = 15
-			-- tag = 121
-			-- options = {
-			--     alt = false
-			--     ctrl = false
-			--     internal = false
-			--     coded = 0
-			--     right = false
-			--     meta = false
-			--     shift = false
-			-- },
-			-- params = {
-			--     1 = 4624
-			--     2 = 170.444534
-			--     3 = 4436
-			-- },
-
-			if not current.options.internal then
-				foundAnyCommand = true
-				-- TODO: here and below also check cmd[3]
-				for i, cmd in ipairs(cmds) do
-					if current.id == cmd[1] and
-							ITableEqual(cmd[2], current.params) then
-						foundCommand[i] = true
-					end
-				end
-
-				if trackedUnits[unitID].commands then
-					for i, cmd in ipairs(trackedUnits[unitID].commands) do
-						if current.id == cmd[1] and
-								ITableEqual(current.params, cmd[2]) then
-							foundIssuedCommand = true
-						end
-					end
-				end
-			end
-		end
-
-		if foundAnyCommand and not foundIssuedCommand then
-			Log("Ignore unit " .. unitID .. " until it becomes idle.")
-			trackedUnits[unitID] = nil
-			return
-		end
-
 		queue:push({trackedUnits[unitID].checkFrame, unitID})
-		if AllTrue(foundCommand) then
-			--Log("All commands were already issued")
-			return
-		end
 
 		for i, cmd in ipairs(cmds) do
 			if i == 1 then
@@ -352,7 +286,8 @@ local function SetupUnit(unitID)
 				Log("give order " .. cmd[4] .. " to " .. unitID ..
 						" @ " .. x .. ", " .. y .. ", " .. z)
 			else
-				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
+				cmd[3] = cmd[3] + CMD_OPT_SHIFT
+				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
 				Log("queue order " .. cmd[4] .. " to " .. unitID ..
 						" @ " .. x .. ", " .. y .. ", " .. z)
 			end
@@ -424,15 +359,59 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	SetupUnit(unitID)
 end
 
+-- Convert a cmdOptions table to an int representing the value used to issue
+-- that command.
+function OptionValue(cmdOptions)
+	local value = 0
+	if cmdOptions.alt then
+		value = value + CMD_OPT_ALT
+	end
+	if cmdOptions.ctrl then
+		value = value + CMD_OPT_CTRL
+	end
+	if cmdOptions.shift then
+		value = value + CMD_OPT_SHIFT
+	end
+	if cmdOptions.meta then
+		value = value + CMD_OPT_META
+	end
+	return value
+end
+
 -- Called whenever a unit gets a command from any source, including this script!
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if trackedUnits[unitID] == nil or cmdOptions.internal then
+	if not enableIdleNanos
+			or cmdOptions.internal
+			or unitTeam ~= spGetMyTeamID()
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
+
+	-- This is a command issued to a caretaker that we track. Check if it's a
+	-- command that we issued, or one issued by the user.
 
 	Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
 	TableEcho(cmdParams, "  params: ")
 	TableEcho(cmdOptions, "  options: ")
+	Log("options: " .. OptionValue(cmdOptions))
+
+	if trackedUnits[unitID] and trackedUnits[unitID].commands then
+		for _, command in ipairs(trackedUnits[unitID].commands) do
+			Log("Compare against")
+			TableEcho(command)
+			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
+					command[3] == OptionValue(cmdOptions) then
+				Log("We issued this command. Ignore it.")
+				return
+			end
+		end
+	end
+	-- TODO: Patrol seems to issue its own commands that are not flagged as
+	-- internal. We don't want to consider them user commands, because they
+	-- might take a long time complete (e.g. build/reclaim a detriment).
+
+	Log("Found a user issued command!")
 
 	if stopHalts then
 		if cmdID == CMD_STOP then
@@ -446,6 +425,11 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 			end
 			stoppedUnit[unitID] = nil
 		end
+	end
+
+	if stoppedUnit[unitID] ~= nil then
+		Log("Ignore unit " .. unitID .. " until it becomes idle.")
+		trackedUnits[unitID] = nil
 	end
 end
 
@@ -469,8 +453,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	--Log("UnitIdle:")
-	--TableEcho(trackedUnits[unitID], "- ")
+	Log("UnitIdle(" .. unitID .. "):")
+	TableEcho(trackedUnits[unitID], "- ")
 
 	-- Check soon, but not right away. This delta has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
