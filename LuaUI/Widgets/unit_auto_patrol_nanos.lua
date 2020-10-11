@@ -59,6 +59,7 @@ local CMD_OPT_ALT       = CMD.OPT_ALT
 local CMD_OPT_CTRL      = CMD.OPT_CTRL
 local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
 local CMD_OPT_META      = CMD.OPT_META
+local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
@@ -70,6 +71,7 @@ local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
 local spValidUnitID		= Spring.ValidUnitID
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local TableEcho = Spring.Utilities.TableEcho
 
@@ -92,12 +94,12 @@ local BUILD_ASSIST = 5
 
 -- Check that a unit is still doing the right thing every `checkInterval`
 -- frames.
-local checkInterval = 20 * 30
+local checkInterval = 300
 -- Don't issue a new command if less than `settleInterval` frames have passed,
 -- even if the unit became idle. This is a simple rate limiter on issuing
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
-local settleInterval = 5 * 30
+local settleInterval = 75
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -201,29 +203,36 @@ local function DecideCommands()
 
 	local commands = {}
 
-	if get_metal and use_metal and use_energy then
-		commands[#commands + 1] = PATROL
-	else
-		if use_metal and use_energy then
-			commands[#commands + 1] = BUILD_ASSIST
-		end
-		if use_energy then
-			commands[#commands + 1] = REPAIR_UNITS
-		end
-		if get_metal and get_energy then
-			if metal > energy then
-				commands[#commands + 1] = RECLAIM_ENERGY
-				commands[#commands + 1] = RECLAIM_METAL
-			else
-				commands[#commands + 1] = RECLAIM_METAL
-				commands[#commands + 1] = RECLAIM_ENERGY
-			end
-		elseif get_metal then
+	-- When we issue patrol, patrol itself will issue further commands which are
+	-- not all tagged as internal. We don't have a good way to differentiate
+	-- them from user commands, so then we treat them as user commands, which
+	-- means we won't use this logic to switch from e.g. building to reclaiming
+	-- when necessary. To work around this, don't issue patrol commands but
+	-- queue everything manually.
+
+	--if get_metal and use_metal and use_energy then
+	--	commands[#commands + 1] = PATROL
+	--else
+	if use_metal and use_energy then
+		commands[#commands + 1] = BUILD_ASSIST
+	end
+	if use_energy then
+		commands[#commands + 1] = REPAIR_UNITS
+	end
+	if get_metal and get_energy then
+		if metal > energy then
+			commands[#commands + 1] = RECLAIM_ENERGY
 			commands[#commands + 1] = RECLAIM_METAL
-		elseif get_energy then
+		else
+			commands[#commands + 1] = RECLAIM_METAL
 			commands[#commands + 1] = RECLAIM_ENERGY
 		end
+	elseif get_metal then
+		commands[#commands + 1] = RECLAIM_METAL
+	elseif get_energy then
+		commands[#commands + 1] = RECLAIM_ENERGY
 	end
+	--end
 
 	decisionCache.commands = commands
 
@@ -276,7 +285,44 @@ local function SetupUnit(unitID)
 		trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
 		local decisions = DecideCommands()
 		local cmds = MakeCommands(decisions, x, y, z, buildDistance)
-		--TableEcho(cmds, "cmds: ")
+
+		TableEcho(cmds, "want to issue cmds")
+		TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
+
+		if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
+			Log("List lengths equal")
+			-- Maybe nothing's changed and we don't need to reissue these
+			-- commands.
+			local equal = true
+			for i = 1, #cmds do
+				if cmds[i][1] ~= trackedUnits[unitID].commands[i][1] then
+					equal = false
+					Log("Command unequal")
+					break
+				end
+			end
+			-- We expect at most one internal command to be issued.
+			local currentCmd, currentOpts
+			local i = 1
+			while true do
+				currentCmd, currentOpts = spGetUnitCurrentCommand(unitID, i)
+				Log("currentCmd: " .. tostring(currentCmd))
+				Log("currentOpts: " .. tostring(currentOpts))
+				if currentCmd == nil or math.bit_and(currentOpts, CMD_OPT_INTERNAL) == 0 then
+					break
+				end
+				Log("Command " .. i .. " is internal; opts=" .. currentOpts)
+				i = i + 1
+			end
+			Log("Equal: " .. tostring(equal))
+			Log("currentCmd: " .. tostring(currentCmd) .. "; cmds[1][1]: " .. cmds[1][1])
+			Log("currentOpts: " .. tostring(currentOpts) .. "; cmds[1][3]: " .. cmds[1][3])
+			if equal and currentCmd == cmds[1][1] and
+					math.bit_and(currentOpts, cmds[1][3]) == cmds[1][3] then
+				Log("Don't issue the same set of commands again.")
+				return
+			end
+		end
 
 		queue:push({trackedUnits[unitID].checkFrame, unitID})
 
@@ -391,15 +437,15 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	-- This is a command issued to a caretaker that we track. Check if it's a
 	-- command that we issued, or one issued by the user.
 
-	Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
-	TableEcho(cmdParams, "  params: ")
-	TableEcho(cmdOptions, "  options: ")
-	Log("options: " .. OptionValue(cmdOptions))
+	--Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
+	--TableEcho(cmdParams, "  params: ")
+	--TableEcho(cmdOptions, "  options: ")
+	--Log("options: " .. OptionValue(cmdOptions))
 
 	if trackedUnits[unitID] and trackedUnits[unitID].commands then
 		for _, command in ipairs(trackedUnits[unitID].commands) do
-			Log("Compare against")
-			TableEcho(command)
+			--Log("Compare against")
+			--TableEcho(command)
 			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
 					command[3] == OptionValue(cmdOptions) then
 				Log("We issued this command. Ignore it.")
@@ -453,8 +499,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	Log("UnitIdle(" .. unitID .. "):")
-	TableEcho(trackedUnits[unitID], "- ")
+	--Log("UnitIdle(" .. unitID .. "):")
+	--TableEcho(trackedUnits[unitID], "- ")
 
 	-- Check soon, but not right away. This delta has to be long enough that the
 	-- factory we're assisting (while in repair mode) has started the next unit.
