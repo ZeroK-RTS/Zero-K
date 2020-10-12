@@ -1,4 +1,4 @@
-return { staticrearm = {
+unitDef = {
   unitname            = [[staticrearm]],
   name                = [[Airpad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
@@ -40,7 +40,7 @@ return { staticrearm = {
   maxSlope            = 18,
   maxVelocity         = 0,
   minCloakDistance    = 150,
-  objectName          = [[airpad.s3o]],
+  objectName          = [[airpad.dae]],
   script              = [[staticrearm.lua]],
   selfDestructAs      = [[LARGE_BUILDINGEX]],
   showNanoSpray       = false,
@@ -69,4 +69,6 @@ return { staticrearm = {
 
   },
 
-} }
+}
+
+return lowerkeys({ staticrearm = unitDef })
