@@ -291,8 +291,7 @@ local function SetupUnit(unitID)
 
 		if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
 			Log("List lengths equal")
-			-- Maybe nothing's changed and we don't need to reissue these
-			-- commands.
+
 			local equal = true
 			for i = 1, #cmds do
 				if cmds[i][1] ~= trackedUnits[unitID].commands[i][1] then
@@ -301,26 +300,27 @@ local function SetupUnit(unitID)
 					break
 				end
 			end
-			-- We expect at most one internal command to be issued.
-			local currentCmd, currentOpts
-			local i = 1
-			while true do
-				currentCmd, currentOpts = spGetUnitCurrentCommand(unitID, i)
-				Log("currentCmd: " .. tostring(currentCmd))
-				Log("currentOpts: " .. tostring(currentOpts))
-				if currentCmd == nil or math.bit_and(currentOpts, CMD_OPT_INTERNAL) == 0 then
-					break
-				end
-				Log("Command " .. i .. " is internal; opts=" .. currentOpts)
-				i = i + 1
-			end
 			Log("Equal: " .. tostring(equal))
-			Log("currentCmd: " .. tostring(currentCmd) .. "; cmds[1][1]: " .. cmds[1][1])
-			Log("currentOpts: " .. tostring(currentOpts) .. "; cmds[1][3]: " .. cmds[1][3])
-			if equal and currentCmd == cmds[1][1] and
-					math.bit_and(currentOpts, cmds[1][3]) == cmds[1][3] then
-				Log("Don't issue the same set of commands again.")
-				return
+
+			if equal then
+				-- We're going to issue the exact same commands we issued last time.
+				-- Maybe the first one is still running and we don't need to reissue
+				-- these commands.
+
+				-- Area repair commands end up changed into some internal format
+				-- when we issue them. Rather than relying on this internal format,
+				-- just assume that if the first command in the queue is the same as
+				-- the first one we issued (regardless of options) that it's still
+				-- executing the first command. As a bonus, that's faster, too.
+
+				-- We expect at most one internal command to be issued.
+				currentCmd = spGetUnitCurrentCommand(unitID)
+				Log("currentCmd: " .. tostring(currentCmd))
+
+				if currentCmd == cmds[1][1] then
+					Log("Don't issue the same set of commands again.")
+					return
+				end
 			end
 		end
 
