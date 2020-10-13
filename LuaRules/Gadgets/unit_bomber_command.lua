@@ -148,8 +148,8 @@ function gadget:GetInfo()
 	  hidden	= true,
   }
   
- local cmdEXCLUDEAIRPAD = {
-	 	id 		= CMD_EXCLUDEAIRPAD,
+ local excludeAirpadCMD = {
+		id      = CMD_EXCLUDEAIRPAD,
 		type    = CMDTYPE.ICON_UNIT,
 		tooltip = 'Excludes an airpad from the running.',
 		cursor  = 'Normal',
@@ -420,7 +420,7 @@ function gadget:GetInfo()
 	  if airDefs[unitDefID] then
 		  Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
 		  Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
-		  Spring.InsertUnitCmdDesc(unitID, 402, cmdEXCLUDEAIRPAD)
+		  Spring.InsertUnitCmdDesc(unitID, 402, excludeAirpadCMD)
 		  bomberUnitIDs[unitID] = true
 	  end
 	  --[[
