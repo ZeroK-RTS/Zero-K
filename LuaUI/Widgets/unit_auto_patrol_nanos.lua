@@ -12,8 +12,8 @@
 --      includes repair units), area reclaim metal, area reclaim energy, or patrol,
 --      depending on available resources.
 --   2. For each caretaker under this widget's control, re-evaluate the behavior based
---		on the economy every 20 seconds. (Controlled by checkInterval.)
---   3. For each caretaker, never issue a command more than once every 5 seconds.
+--		on the economy every 10 seconds. (Controlled by checkInterval.)
+--   3. For each caretaker, never issue a command more than once every 2.5 seconds.
 --      (Controlled by settleInterval.)
 --   4. When a user issues a stop command, this behavior is inhibited, until a
 --      different command issued by the user completes. (Unless stop_disables option
@@ -86,6 +86,8 @@ local mapCenterZ = Game.mapSizeZ / 2
 --------------------------------------------------------------------------------
 -- Constants
 
+local FPS = 30
+
 local PATROL = 1
 local RECLAIM_METAL = 2
 local RECLAIM_ENERGY = 3
@@ -94,12 +96,12 @@ local BUILD_ASSIST = 5
 
 -- Check that a unit is still doing the right thing every `checkInterval`
 -- frames.
-local checkInterval = 300
+local checkInterval = 10 * FPS
 -- Don't issue a new command if less than `settleInterval` frames have passed,
 -- even if the unit became idle. This is a simple rate limiter on issuing
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
-local settleInterval = 75
+local settleInterval = 2.5 * FPS
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -164,11 +166,12 @@ local function DecideCommands()
 
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
-	metal = metal + metalIncome - metalPull
+	metal = metal + checkInterval * (metalIncome - metalPull) / FPS
 	metalStorage = metalStorage - HIDDEN_STORAGE
+	Log("metal=" .. metal .. "; storage=" .. metalStorage .. "; pull=" .. metalPull .. "; income=" .. metalIncome)
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
-	energy = energy + energyIncome - energyPull
+	energy = energy + checkInterval * (energyIncome - energyPull) / FPS
 	energyStorage = energyStorage - HIDDEN_STORAGE
 
 	local slop = 5
