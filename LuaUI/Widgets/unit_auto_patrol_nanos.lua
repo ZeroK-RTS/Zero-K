@@ -274,8 +274,8 @@ local function SetupUnit(unitID)
 
 	queue:push({trackedUnits[unitID].checkFrame, unitID})
 
-	TableEcho(cmds, "want to issue cmds")
-	TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
+	--TableEcho(cmds, "want to issue cmds")
+	--TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
 
 	if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
 		--Log("List lengths equal")
@@ -298,25 +298,21 @@ local function SetupUnit(unitID)
 			-- If the first command was a patrol, then it must still be
 			-- running, since patrol never terminates.
 			if cmds[1][1] == CMD_PATROL then
-				Log("Don't issue patrol again.")
+				--Log("Don't issue patrol again.")
 				return
 			end
 
 			-- Area repair commands end up changed into some internal format
 			-- when we issue them. Rather than relying on this internal format,
-			-- just compare command IDs and call it good enough.
+			-- just compare command IDs and call it good enough. This ignores
+			-- the difference between reclaim metal/energy and build
+			-- assist/repair units.
 
-			-- We expect at most one internal command to be issued.
 			local currentCmd, currentOpt = spGetUnitCurrentCommand(unitID)
 			--Log("currentCmd: " .. tostring(currentCmd))
-			
-			-- If CMD_OPT_ALT is set, it wasn't done by us. On repair unit
-			-- commands this has the effect of making them take forever, which
-			-- might end up with the caretaker stuck doing nothing and us not
-			-- reissuing because we think something is happening.
-			if currentCmd == cmds[1][1] and
-					math.bit_and(currentOpt, CMD_OPT_ALT) == 0 then
-				Log("Don't issue the same set of commands again.")
+
+			if currentCmd == cmds[1][1] then
+				--Log("Don't issue the same set of commands again.")
 				return
 			end
 		end
@@ -327,8 +323,7 @@ local function SetupUnit(unitID)
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
 			Log("give order " .. cmd[4] .. " to " .. unitID)
 		else
-			cmd[3] = cmd[3] + CMD_OPT_SHIFT
-			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
+			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
 			Log("queue order " .. cmd[4] .. " to " .. unitID)
 		end
 	end
