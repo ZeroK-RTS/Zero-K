@@ -46,6 +46,7 @@ local facplopTexture = 'Luaui/Images/factory.png'
 local nofacTexture = 'Luaui/Images/nofactory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
 local retreatTexture = 'LuaUI/Images/unit_retreat.png'
+local excludedPadTexture = 'LuaUI/Images/commands/Bold/excludeairpad.png'
 
 local waitTexture = {
 	[CMD_WAITCODE_NONE  ] = 'LuaUI/Images/commands/Bold/wait.png',
@@ -62,12 +63,14 @@ local lastRearm = {}
 local lastRetreat = {}
 local lastWait = {}
 local everWait = {}
+local lastExcludedPad = {}
 
 local lowPowerUnitDef = {}
 local facPlopUnitDef = {}
 local facPlateUnitDef = {}
 local rearmUnitDef = {}
 local retreatUnitDef = {}
+local excludedPadUnitDef = {}
 local waitUnitDef = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]

@@ -505,18 +505,10 @@ function gadget:GetInfo()
 	  end
   end
   
-  function gadget:RecvLuaMsg(msg, playerID)
-	  local msg_table = Spring.Utilities.ExplodeString('|', msg)
-
-	  if msg_table[1] ~= 'addExclusion' then
-		  return --Not a messege for us
-	  end
-
-	  if msg_table[2] == nil then
+  local function addOrRemoveExclusion(padID)
+	  if padID == nil then
 		return
 	  end
-
-	  local padID = tonumber(msg_table[2])
 
 	 --Spring.Echo('unit id: ' .. padID)
 
@@ -524,7 +516,7 @@ function gadget:GetInfo()
 	  if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[padID] then
 		  excludedPads[padID] = true
-		  --Spring.Echo("Added airpad: " .. padID)
+		  Spring.Echo("Added airpad: " .. padID)
 		else
 		  --Already exists, remove
 		  excludedPads[padID] = false
@@ -693,35 +685,39 @@ function gadget:GetInfo()
   end
   ]]--
   
-  function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,cmdTag)
-	  if cmdID == CMD_REARM then	-- return to pad
-		  if not airDefs[unitDefID] then
-			  return true, true	-- trying to REARM using unauthorized unit
-		  end
-		  if rearmRemove[unitID] then
-			  rearmRemove[unitID] = nil
-			  return true, true
-		  end
-		  if bomberLanding[unitID] then
-			  return true, false --keep command while landing
-		  end
-		  --Spring.Echo("Returning to base")
-		  local targetAirpad = cmdParams[1]
-		  if not airpadsData[targetAirpad] then
-			  return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
-		  end
-		  ReserveAirpad(unitID,targetAirpad) --Reserve the airpad specified in RE-ARM params (if not yet reserved)
-		  local x, y, z = Spring.GetUnitPosition(targetAirpad)
-		  Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
-		  return true, false	-- command used, don't remove
-	  elseif cmdID == CMD_FIND_PAD then
-		  if airDefs[unitDefID] then
-			  rearmRequest[unitID] = true
-		  end
-		  return true,true
-	  end
-	  return false -- command not used
-  end
+function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,cmdTag)
+	if cmdID == CMD_REARM then	-- return to pad
+			if not airDefs[unitDefID] then
+				return true, true	-- trying to REARM using unauthorized unit
+			end
+			if rearmRemove[unitID] then
+				rearmRemove[unitID] = nil
+				return true, true
+			end
+			if bomberLanding[unitID] then
+				return true, false --keep command while landing
+			end
+			--Spring.Echo("Returning to base")
+			local targetAirpad = cmdParams[1]
+			if not airpadsData[targetAirpad] then
+				return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
+			end
+			ReserveAirpad(unitID,targetAirpad) --Reserve the airpad specified in RE-ARM params (if not yet reserved)
+			local x, y, z = Spring.GetUnitPosition(targetAirpad)
+			Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
+			return true, false	-- command used, don't remove
+		elseif cmdID == CMD_FIND_PAD then
+			if airDefs[unitDefID] then
+				rearmRequest[unitID] = true
+			end
+			return true,true
+		end
+	if cmdID == CMD_EXCLUDEAIRPAD then
+		addOrRemoveExclusion(cmdParams[1])
+		return true,true
+	end
+		return false -- command not used
+end
   
   function gadget:AllowCommand_GetWantedCommand()
 	  return defaultCommands --command which is expected by gadget, other command is unhandled cases
@@ -773,7 +769,8 @@ function gadget:GetInfo()
   end
   ]]--
   
-  else
+else
+
   --------------------------------------------------------------------------------
   -- UNSYNCED
   --------------------------------------------------------------------------------
@@ -838,5 +835,4 @@ function gadget:GetInfo()
 	  Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
 	  Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
   end
-  
-  end
+end
