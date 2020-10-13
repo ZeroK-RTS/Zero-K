@@ -154,9 +154,6 @@ end
 
 local decisionCacheInterval = 9
 local decisionCache = { updated=nil }
--- TODO:
--- We should return which commands we do and which we do not want issued,
--- so we will reissue if we have strictly fewer options than before.
 local function DecideCommands()
 	if decisionCache.updated ~= nil and
 			decisionCache.updated + decisionCacheInterval > currentFrame then
@@ -203,144 +200,140 @@ local function DecideCommands()
 
 	local commands = {}
 
-	-- When we issue patrol, patrol itself will issue further commands which are
-	-- not all tagged as internal. We don't have a good way to differentiate
-	-- them from user commands, so then we treat them as user commands, which
-	-- means we won't use this logic to switch from e.g. building to reclaiming
-	-- when necessary. To work around this, don't issue patrol commands but
-	-- queue everything manually.
-
-	--if get_metal and use_metal and use_energy then
-	--	commands[#commands + 1] = PATROL
-	--else
-	if use_metal and use_energy then
-		commands[#commands + 1] = BUILD_ASSIST
-	end
-	if use_energy then
-		commands[#commands + 1] = REPAIR_UNITS
-	end
-	if get_metal and get_energy then
-		if metal > energy then
-			commands[#commands + 1] = RECLAIM_ENERGY
+	if get_metal and not get_energy and use_metal and use_energy then
+		commands[#commands + 1] = PATROL
+	else
+		if use_metal and use_energy then
+			commands[#commands + 1] = BUILD_ASSIST
+		end
+		if use_energy then
+			commands[#commands + 1] = REPAIR_UNITS
+		end
+		if get_metal and get_energy then
+			if metal > energy then
+				commands[#commands + 1] = RECLAIM_ENERGY
+				commands[#commands + 1] = RECLAIM_METAL
+			else
+				commands[#commands + 1] = RECLAIM_METAL
+				commands[#commands + 1] = RECLAIM_ENERGY
+			end
+		elseif get_metal then
 			commands[#commands + 1] = RECLAIM_METAL
-		else
-			commands[#commands + 1] = RECLAIM_METAL
+		elseif get_energy then
 			commands[#commands + 1] = RECLAIM_ENERGY
 		end
-	elseif get_metal then
-		commands[#commands + 1] = RECLAIM_METAL
-	elseif get_energy then
-		commands[#commands + 1] = RECLAIM_ENERGY
 	end
-	--end
 
 	decisionCache.commands = commands
 
 	return commands
 end
 
-local function MakeCommands(decidedCommands, x, y, z, buildDistance)
+local function MakeCommands(decidedCommands, unitID)
+	if trackedUnits[unitID].commandTables == nil then
+		local x, y, z = spGetUnitPosition(unitID)
+		if not x then
+			return nil
+		end
+
+		trackedUnits[unitID].commandTables = {}
+
+		local unitDefID = spGetUnitDefID(unitID)
+		local buildDistance = UnitDefs[unitDefID].buildDistance
+
+		-- Patrolling doesn't do anything if you target the current location
+		-- of the unit. Point patrol towards map center.
+		local vx = mapCenterX - x
+		local vz = mapCenterZ - z
+		trackedUnits[unitID].commandTables[PATROL] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
+
+		local area = {x, y, z, buildDistance}
+		trackedUnits[unitID].commandTables[RECLAIM_METAL] = {CMD_RECLAIM, area, 0, "reclaim metal"}
+		trackedUnits[unitID].commandTables[RECLAIM_ENERGY] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
+		trackedUnits[unitID].commandTables[REPAIR_UNITS] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
+		trackedUnits[unitID].commandTables[BUILD_ASSIST] = {CMD_REPAIR, area, 0, "build assist"}
+	end
+
 	local commands = {}
 
-	local area = {x, y, z, buildDistance}
-
 	for i, decided in ipairs(decidedCommands) do
-		if decided == PATROL then
-			-- Patrolling doesn't do anything if you target the current location
-			-- of the unit. Point patrol towards map center.
-			local vx = mapCenterX - x
-			local vz = mapCenterZ - z
-			commands[i] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
-		elseif decided == RECLAIM_METAL then
-			commands[i] = {CMD_RECLAIM, area, 0, "reclaim metal"}
-		elseif decided == RECLAIM_ENERGY then
-			commands[i] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
-		elseif decided == REPAIR_UNITS then
-			commands[i] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
-		elseif decided == BUILD_ASSIST then
-			commands[i] = {CMD_REPAIR, area, 0, "build assist"}
-		else
-			Log("ERROR: Invalid value in decidedCommands: " .. tostring(decided))
-		end
+		commands[i] = trackedUnits[unitID].commandTables[decided]
 	end
 
 	return commands
 end
 
-local function AllTrue(table)
-	for _, v in pairs(table) do
-		if not v then
-			return false
-		end
-	end
-	return true
-end
-
 local function SetupUnit(unitID)
-	local x, y, z = spGetUnitPosition(unitID)
-	if (x) then
-		local unitDefID = spGetUnitDefID(unitID)
-		local buildDistance = UnitDefs[unitDefID].buildDistance
-		trackedUnits[unitID] = trackedUnits[unitID] or {}
-		trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
-		local decisions = DecideCommands()
-		local cmds = MakeCommands(decisions, x, y, z, buildDistance)
-
-		TableEcho(cmds, "want to issue cmds")
-		TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
-
-		if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
-			Log("List lengths equal")
-
-			local equal = true
-			for i = 1, #cmds do
-				if cmds[i][1] ~= trackedUnits[unitID].commands[i][1] then
-					equal = false
-					Log("Command unequal")
-					break
-				end
-			end
-			Log("Equal: " .. tostring(equal))
-
-			if equal then
-				-- We're going to issue the exact same commands we issued last time.
-				-- Maybe the first one is still running and we don't need to reissue
-				-- these commands.
-
-				-- Area repair commands end up changed into some internal format
-				-- when we issue them. Rather than relying on this internal format,
-				-- just assume that if the first command in the queue is the same as
-				-- the first one we issued (regardless of options) that it's still
-				-- executing the first command. As a bonus, that's faster, too.
-
-				-- We expect at most one internal command to be issued.
-				currentCmd = spGetUnitCurrentCommand(unitID)
-				Log("currentCmd: " .. tostring(currentCmd))
-
-				if currentCmd == cmds[1][1] then
-					Log("Don't issue the same set of commands again.")
-					return
-				end
-			end
-		end
-
-		queue:push({trackedUnits[unitID].checkFrame, unitID})
-
-		for i, cmd in ipairs(cmds) do
-			if i == 1 then
-				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
-				Log("give order " .. cmd[4] .. " to " .. unitID ..
-						" @ " .. x .. ", " .. y .. ", " .. z)
-			else
-				cmd[3] = cmd[3] + CMD_OPT_SHIFT
-				spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
-				Log("queue order " .. cmd[4] .. " to " .. unitID ..
-						" @ " .. x .. ", " .. y .. ", " .. z)
-			end
-		end
-		trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
-		trackedUnits[unitID].commands = cmds
+	trackedUnits[unitID] = trackedUnits[unitID] or {}
+	trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
+	local decisions = DecideCommands()
+	local cmds = MakeCommands(decisions, unitID)
+	if cmds == nil then
+		return
 	end
+
+	queue:push({trackedUnits[unitID].checkFrame, unitID})
+
+	TableEcho(cmds, "want to issue cmds")
+	TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
+
+	if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
+		--Log("List lengths equal")
+
+		local equal = true
+		for i = 1, #cmds do
+			if cmds[i][1] ~= trackedUnits[unitID].commands[i][1] then
+				equal = false
+				--Log("Command unequal")
+				break
+			end
+		end
+		--Log("Equal: " .. tostring(equal))
+
+		if equal then
+			-- We're going to issue the exact same commands we issued last time.
+			-- Maybe the first one is still running and we don't need to reissue
+			-- these commands.
+
+			-- If the first command was a patrol, then it must still be
+			-- running, since patrol never terminates.
+			if cmds[1][1] == CMD_PATROL then
+				Log("Don't issue patrol again.")
+				return
+			end
+
+			-- Area repair commands end up changed into some internal format
+			-- when we issue them. Rather than relying on this internal format,
+			-- just compare command IDs and call it good enough.
+
+			-- We expect at most one internal command to be issued.
+			local currentCmd, currentOpt = spGetUnitCurrentCommand(unitID)
+			--Log("currentCmd: " .. tostring(currentCmd))
+			
+			-- If CMD_OPT_ALT is set, it wasn't done by us. On repair unit
+			-- commands this has the effect of making them take forever, which
+			-- might end up with the caretaker stuck doing nothing and us not
+			-- reissuing because we think something is happening.
+			if currentCmd == cmds[1][1] and
+					math.bit_and(currentOpt, CMD_OPT_ALT) == 0 then
+				Log("Don't issue the same set of commands again.")
+				return
+			end
+		end
+	end
+
+	for i, cmd in ipairs(cmds) do
+		if i == 1 then
+			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
+			Log("give order " .. cmd[4] .. " to " .. unitID)
+		else
+			cmd[3] = cmd[3] + CMD_OPT_SHIFT
+			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
+			Log("queue order " .. cmd[4] .. " to " .. unitID)
+		end
+	end
+	trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
+	trackedUnits[unitID].commands = cmds
 end
 
 local function SetupAll()
@@ -448,7 +441,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 			--TableEcho(command)
 			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
 					command[3] == OptionValue(cmdOptions) then
-				Log("We issued this command. Ignore it.")
+				--Log("We issued this command. Ignore it.")
 				return
 			end
 		end
@@ -457,7 +450,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	-- internal. We don't want to consider them user commands, because they
 	-- might take a long time complete (e.g. build/reclaim a detriment).
 
-	Log("Found a user issued command!")
+	--Log("Found a user issued command!")
 
 	if stopHalts then
 		if cmdID == CMD_STOP then
@@ -532,7 +525,7 @@ function widget:GameFrame(frame)
 
 			local unitID = entry[2]
 
-			Log("Process unit " .. unitID .. " because " .. frame .. " >= ".. entry[1])
+			--Log("Process unit " .. unitID .. " because " .. frame .. " >= ".. entry[1])
 
 			if trackedUnits[unitID] and entry[1] == trackedUnits[unitID].checkFrame then
 				-- Otherwise, we queued this unit multiple times and this is not
