@@ -150,7 +150,7 @@ local commandDisplayConfig = {
 			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled")),
 			tooltips.MOVE_STATE:gsub("_STATE_", WG.Translate("interface", "states_movestate_roam"))
 		},
-		stateNameOverride = {"Enabled", "Disabled", "Roam (not in toggle)"},
+		stateNameOverride = {WG.Translate("interface", "states_smthng_enabled"), WG.Translate("interface", "states_smthng_disabled"), WG.Translate("interface", "states_holdposition_roam")},
 		altConfig = {
 			texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'},
 			stateTooltip = {
@@ -167,7 +167,7 @@ local commandDisplayConfig = {
 			tooltips.FIRE_STATE:gsub("_STATE_", WG.Translate("interface", "states_firestate_return")),
 			tooltips.FIRE_STATE:gsub("_STATE_", WG.Translate("interface", "states_smthng_disabled"))
 		},
-		stateNameOverride = {"Enabled", "Return Fire (not in toggle)", "Disabled"},
+		stateNameOverride = {WG.Translate("interface", "states_smthng_enabled"), WG.Translate("interface", "states_holdfire_return"), WG.Translate("interface", "states_smthng_disabled")},
 		altConfig = {
 			texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'},
 			stateTooltip = {
