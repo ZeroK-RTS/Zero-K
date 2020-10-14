@@ -517,8 +517,7 @@ function gadget:GetInfo()
 		if not excludedPads[padID] then
 		  excludedPads[padID] = true
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 1, ALLY_ACCESS)
-		  Spring.Echo("Added airpad: " .. padID)
-		  Spring.Echo(Spring.GetUnitRulesParam(padID, "padExcluded"))
+		  --Spring.Echo("Added airpad: " .. padID)
 		else
 		  --Already exists, remove
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 0, ALLY_ACCESS)
