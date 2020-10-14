@@ -92,6 +92,9 @@ for unitDefID = 1, #UnitDefs do
 	if not ud.customParams.removewait then
 		waitUnitDef[unitDefID] = true
 	end
+	if ud.customParams.ispad then
+		excludedPadUnitDef[unitDefID] = true
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -107,6 +110,7 @@ local function RemoveUnit(unitID)
 	unitDefIDMap[unitID] = nil
 	lastLowPower[unitID] = nil
 	lastFacPlop[unitID] = nil
+	lastExcludedPad[unitID] = nil
 	lastNofactory[unitID] = nil
 	lastRearm[unitID] = nil
 	lastRetreat[unitID] = nil
@@ -217,6 +221,18 @@ function SetIcons()
 			end
 		end
 
+		local padExcluded = excludedPadUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "padExcluded")
+		if padExcluded then
+			if (not lastExcludedPad[unitID]) or lastExcludedPad[unitID] ~= padExcluded then
+				lastExcludedPad[unitID] = padExcluded
+				if padExcluded ~= 0 then
+					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture} )
+				else
+					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=nil} )
+				end
+			end
+		end
+
 		if everWait[unitID] and waitUnitDef[unitDefID] then
 			local wait = isWaiting(unitID)
 			if lastWait[unitID] ~= wait then
@@ -232,7 +248,7 @@ function SetIcons()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if not (lowPowerUnitDef[unitDefID] or facPlopUnitDef[unitDefID] or rearmUnitDef[unitDefID] or retreatUnitDef[unitDefID] or waitUnitDef[unitDefID]) then
+	if not (lowPowerUnitDef[unitDefID] or facPlopUnitDef[unitDefID] or rearmUnitDef[unitDefID] or retreatUnitDef[unitDefID] or waitUnitDef[unitDefID] or excludedPadUnitDef[unitDefID]) then
 		return
 	end
 	if unitIndex[unitID] then
@@ -253,6 +269,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='wait', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=nil} )
 	
 	if unitIndex[unitID] then
 		RemoveUnit(unitID)

@@ -148,14 +148,14 @@ function gadget:GetInfo()
 	  hidden	= true,
   }
   
- local excludeAirpadCMD = {
-		id      = CMD_EXCLUDEAIRPAD,
-		type    = CMDTYPE.ICON_UNIT,
-		tooltip = 'Excludes an airpad from the running.',
-		cursor  = 'Normal',
-		action  = 'excludeairpad',
-		params  = { },
-		hidden  = false,
+  local excludeAirpadCMD = {
+	  id      = CMD_EXCLUDEAIRPAD,
+	  type    = CMDTYPE.ICON_UNIT,
+	  tooltip = 'Excludes an airpad from the running.',
+	  cursor  = 'Normal',
+	  action  = 'excludeairpad',
+	  params  = { },
+	  hidden  = false,
   }
   
   local findPadCMD = {
@@ -506,7 +506,7 @@ function gadget:GetInfo()
   end
   
   local function addOrRemoveExclusion(padID)
-	  if padID == nil then
+	  if padID == nil then --Also check if it's a valid unit
 		return
 	  end
 
@@ -516,9 +516,12 @@ function gadget:GetInfo()
 	  if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[padID] then
 		  excludedPads[padID] = true
+		  Spring.SetUnitRulesParam(padID, "padExcluded", 1, ALLY_ACCESS)
 		  Spring.Echo("Added airpad: " .. padID)
+		  Spring.Echo(Spring.GetUnitRulesParam(padID, "padExcluded"))
 		else
 		  --Already exists, remove
+		  Spring.SetUnitRulesParam(padID, "padExcluded", 0, ALLY_ACCESS)
 		  excludedPads[padID] = false
 		end
 	  else
