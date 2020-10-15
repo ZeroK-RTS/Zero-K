@@ -8,26 +8,31 @@
 --  Licensed under the terms of the GNU GPL, v2 or later.
 --
 -- Features:
---   1. Idle caretakers will be set to area repair units, area assist build (which
---      includes repair units), area reclaim metal, area reclaim energy, or patrol,
---      depending on available resources.
---   2. For each caretaker under this widget's control, re-evaluate the behavior based
---		on the economy every 10 seconds. (Controlled by checkInterval.)
---   3. For each caretaker, never issue a command more than once every 2.5 seconds.
---      (Controlled by settleInterval.)
---   4. When a user issues a stop command, this behavior is inhibited, until a
---      different command issued by the user completes. (Unless stop_disables option
---      is false.)
---   5. When a user issues some other kind of command, the widget ignores the unit
---      until it becomes idle again.
+-- 1. Idle caretakers will be set to area repair units, area assist build (which
+--    includes repair units), area reclaim metal, area reclaim energy, or patrol,
+--    depending on available resources.
+-- 2. For each caretaker under this widget's control, re-evaluate the behavior based
+--	n the economy every 10 seconds. (Controlled by checkInterval.)
+-- 3. For each caretaker, never issue a command more than once every 2.5 seconds.
+--    (Controlled by settleInterval.)
+-- 4. When a user issues a stop command, this behavior is inhibited, until a
+--    different command issued by the user completes. (Unless stop_disables option
+--    is false.)
+-- 5. When a user issues some other kind of command, the widget ignores the unit
+--    until it becomes idle again.
 --
 -- Limitations:
---   1. When the widget chooses repair only, there's a 0.5 second delay between
---      a unit becoming idle and being told to repair. This is to give the factory
---      that's being assisted time to start the next unit. It is not perfect, and the
---      factory will be assisted less than if a patrol was issued. This could be
---      improved by reducing the delay, and implementing a fancier incremental
---      back-off than the simple 0.5s - 5s that is currently implemented.
+-- 1. When the widget chooses repair only, there's a 0.5 second delay between
+--    a unit becoming idle and being told to repair. This is to give the factory
+--    that's being assisted time to start the next unit. It is not perfect, and the
+--    factory will be assisted less than if a patrol was issued. This could be
+--    improved by reducing the delay, and implementing a fancier incremental
+--    back-off than the simple 0.5s - 5s that is currently implemented.
+-- 2. When economy changes such that the best commands switch from
+--    reclaim-metal;reclaim-energy to reclaim-energy;reclaim-metal, caretakers
+--    won't actually switch until they complete reclaiming whatever they are
+--    reclaiming. This is a problem if caretakers are reclaiming something huge and
+--    they might excess metal until that is completely reclaimed.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -59,11 +64,9 @@ local CMD_OPT_ALT       = CMD.OPT_ALT
 local CMD_OPT_CTRL      = CMD.OPT_CTRL
 local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
 local CMD_OPT_META      = CMD.OPT_META
-local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
@@ -102,6 +105,13 @@ local checkInterval = 10 * FPS
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
 local settleInterval = 2.5 * FPS
+-- Update the decision about economics at most once every
+-- `decisionCacheInterval` frames.
+local decisionCacheInterval = 9
+-- When a caretaker becomes idle, issue it a new command soon but not right
+-- away. This interval has to be long enough that the factory we're assisting
+-- (while in repair mode) has started the next unit.
+local idleWaitInterval = 0.5 * FPS
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -154,7 +164,6 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local decisionCacheInterval = 9
 local decisionCache = { updated=nil }
 local function DecideCommands()
 	if decisionCache.updated ~= nil and
@@ -168,7 +177,8 @@ local function DecideCommands()
 			spGetTeamResources(spGetMyTeamID(), "metal")
 	metal = metal + checkInterval * (metalIncome - metalPull) / FPS
 	metalStorage = metalStorage - HIDDEN_STORAGE
-	Log("metal=" .. metal .. "; storage=" .. metalStorage .. "; pull=" .. metalPull .. "; income=" .. metalIncome)
+	-- Log("metal=" .. metal .. "; storage=" .. metalStorage .. "; pull=" ..
+	-- 		metalPull .. "; income=" .. metalIncome)
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
 	energy = energy + checkInterval * (energyIncome - energyPull) / FPS
@@ -234,6 +244,8 @@ end
 
 local function MakeCommands(decidedCommands, unitID)
 	if trackedUnits[unitID].commandTables == nil then
+		-- Cache commands inside trackedUnits. This saves a ton of table
+		-- creation.
 		local x, y, z = spGetUnitPosition(unitID)
 		if not x then
 			return nil
@@ -298,8 +310,10 @@ local function SetupUnit(unitID)
 			-- Maybe the first one is still running and we don't need to reissue
 			-- these commands.
 
-			-- If the first command was a patrol, then it must still be
-			-- running, since patrol never terminates.
+			-- If the first command was a patrol, then it must still be running,
+			-- since patrol never terminates. This is a special case because
+			-- patrol inserts all kinds of commands in the front of the command
+			-- queue that are hard to recognize.
 			if cmds[1][1] == CMD_PATROL then
 				--Log("Don't issue patrol again.")
 				return
@@ -311,7 +325,7 @@ local function SetupUnit(unitID)
 			-- the difference between reclaim metal/energy and build
 			-- assist/repair units.
 
-			local currentCmd, currentOpt = spGetUnitCurrentCommand(unitID)
+			local currentCmd = spGetUnitCurrentCommand(unitID)
 			--Log("currentCmd: " .. tostring(currentCmd))
 
 			if currentCmd == cmds[1][1] then
@@ -415,7 +429,11 @@ function OptionValue(cmdOptions)
 	return value
 end
 
--- Called whenever a unit gets a command from any source, including this script!
+-- Called whenever a unit gets a command from any source, including this widget!
+-- But does not get called when patrol or area reclaim/repair commands modify
+-- the command queue.
+-- TODO: Does it get called when comsharing? If not, then the widget on somebody
+-- else's client will always override any commands you give manually.
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if not enableIdleNanos
 			or cmdOptions.internal
@@ -444,9 +462,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 			end
 		end
 	end
-	-- TODO: Patrol seems to issue its own commands that are not flagged as
-	-- internal. We don't want to consider them user commands, because they
-	-- might take a long time complete (e.g. build/reclaim a detriment).
 
 	--Log("Found a user issued command!")
 
@@ -493,17 +508,14 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	--Log("UnitIdle(" .. unitID .. "):")
 	--TableEcho(trackedUnits[unitID], "- ")
 
-	-- Check soon, but not right away. This delta has to be long enough that the
-	-- factory we're assisting (while in repair mode) has started the next unit.
-	local delta = 15
 	trackedUnits[unitID] = trackedUnits[unitID] or
-			{checkFrame=currentFrame + delta, settleFrame=currentFrame+delta}
+			{checkFrame=currentFrame + idleWaitInterval, settleFrame=currentFrame+idleWaitInterval}
 	trackedUnits[unitID].checkFrame =
 		max(
 			min(
 				trackedUnits[unitID].checkFrame,
 				trackedUnits[unitID].settleFrame),
-			currentFrame + delta)
+			currentFrame + idleWaitInterval)
 	queue:push({trackedUnits[unitID].checkFrame, unitID})
 	--TableEcho(trackedUnits[unitID], "+ ")
 end
