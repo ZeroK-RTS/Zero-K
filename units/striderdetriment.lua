@@ -89,7 +89,7 @@ return { striderdetriment = {
     },	
 
     {
-      def                = [[SNITCH_LAUNCHER]],
+      def                = [[BOMB_LAUNCHER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 	
