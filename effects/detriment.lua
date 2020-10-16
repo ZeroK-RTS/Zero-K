@@ -204,7 +204,7 @@ return {
         texture            = [[flame]],
       },
     },
-    smoke = {
+    smokeair = {
       air                = true,
 	  class              = [[CSmokeProjectile2]],
       count              = 4,
@@ -222,7 +222,26 @@ return {
 		wantedpos          = [[r-256 r256, r-600, r-256 r256]],
 		glowfalloff        = 6.0,
       },
-    },    
+    },   
+	smokeground = {
+	  air                = false,
+	  class              = [[CSmokeProjectile2]],
+	  count              = 200,
+	  ground             = true,
+	  water              = false,
+	  properties = {
+		agespeed           = 0.004,
+		color	           = 1.0,
+		pos                = [[r-1 r1, 0, r-1 r1]],
+		size               = 70,
+		sizeexpansion      = 0.8,
+		sizegrowth         = 70,
+		speed              = [[r-10.5 r10.5, 0 r1, r-10.5 r10.5]],
+		startsize          = 10,
+		wantedpos          = [[r-386 r386, r200, r-386 r386]],
+		glowfalloff        = 6.0,
+	  },
+	},   	
 	dirtypoof = {
       class              = [[dirt]],
       count              = 50,

@@ -22,15 +22,16 @@ local gunFlares = {
 	{rarmflare1, rarmflare2, rarmflare3},		
 	{shoulderflare},	
 	{lfoot},
+	{lfoot},
 	{lfoot}
 }
 
 local barrelsL = {larmbarrel1, larmbarrel2, larmbarrel3}
 local barrelsR = {rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {larm, rarm, shoulderflare, lfoot, lfoot}
+local aimpoints = {torso, torso, shoulderflare, lfoot, lfoot, lfoot}
 
-local gunIndex = {1,1,1,1,1}
-local gunFixEmit = {true, true, false, false, false}
+local gunIndex = {1,1,1,1,1,1}
+local gunFixEmit = {true, true, false, false, false, false}
 
 local gunFlareCount = {}
 for i = 1, #gunFlares do
@@ -75,28 +76,8 @@ local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(30) * PACE
 
 local isFiring = false
-local lgunpod_not_aimed = true
-local rgunpod_not_aimed = true
 
-local CHARGE_TIME = 60	-- frames
-local FIRE_TIME = 120
-
-
-
-local sp1 = 1.2
-local sp2 = 1
-local lf_angle = math.rad(25)
-local rf_angle = math.rad(-25)
-local lb_angle = math.rad(-65)
-local rb_angle = math.rad(65)
-
-local p_angle = -.3
-local th_angle = -.3
-local th_speed = 1.1
-local sh_angle = .4
-local sh_speed = 1
-local drop = .8
-
+-- Effects
 local dirtfling = 1024
 local muzzle_flash = 1025
 local shells = 1026
@@ -104,9 +85,11 @@ local muzzle_flash_large = 1027
 local muzzle_smoke_large = 1028
 local jetfeet = 1029
 local jetfeet_fire = 1030
-local crater = 4099 --Weapon 4
-local footcrater = 4100 --Weapon 5
 
+-- Weapons
+local landing_explosion = 4099 --Weapon 4
+local footcrater = 4100 --Weapon 5
+local takeoff_explosion = 4101 --Weapon 6
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
@@ -210,9 +193,47 @@ function script.StopMoving()
 end
 
 -- Jumping
+local function PreJumpThread(turn,lineDist,flightDist,duration)
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 
-local function BeginJumpThread()
-	Signal(SIG_Walk)	
+	local startHeading = Spring.GetUnitHeading(unitID) + 2^15		
+	
+	local pi2    = math.pi*2
+	local rotUnit      = 2^16 / (pi2)	
+		
+	local defSpeed         = 64
+	
+	local speed = defSpeed * lineDist/flightDist
+	local step = speed/lineDist
+	
+	
+	Spring.MoveCtrl.SetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
+	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)		
+	Sleep(1600)
+	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
+	
+	Move(torso, y_axis, 0, 1)
+	for i,p in pairs(leftLeg) do
+		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
+		Turn(rightLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
+	end
+	Turn(pelvis, z_axis, 0, math.rad(30))
+	Turn(torso, x_axis, 0, math.rad(30))
+	if not(isFiring) then
+		Turn(torso, y_axis, 0, math.rad(140))
+		WaitForTurn(torso, y_axis)
+	end
+	Move(pelvis, y_axis, 0, 1)
+	Turn(rarm, x_axis,  math.rad(-65), ARM_FRONT_SPEED)
+	Turn(larm, x_axis,  math.rad(-65), ARM_FRONT_SPEED)
+	EmitSfx(lfoot, jetfeet)
+	EmitSfx(rfoot, jetfeet)
+end
+
+local function BeginJumpThread()		
+	EmitSfx(lfoot, takeoff_explosion)
+	EmitSfx(lfoot, dirtfling)	
 	EmitSfx(lfoot, jetfeet)
 	EmitSfx(rfoot, jetfeet)
 	local x,y,z = Spring.GetUnitPosition(unitID, true)	
@@ -220,7 +241,7 @@ local function BeginJumpThread()
 end
 
 local function EndJumpThread()
-	EmitSfx(lfoot, crater)
+	EmitSfx(lfoot, landing_explosion)
 	EmitSfx(lfoot, dirtfling)	
 	Turn(torso, x_axis, -30, math.rad(500))
 	Turn(larm, x_axis,  math.rad(-60), math.rad(500))
@@ -237,8 +258,8 @@ local function EndJumpThread()
 	WaitForTurn(rarm, x_axis)
 end
 
-function preJump(turn,distance)
-	StartThread(StopWalk)	
+function preJump(turn,lineDist,flightDist,duration)	
+	StartThread(PreJumpThread, turn,lineDist,flightDist,duration)
 end
 
 function beginJump()	
@@ -297,20 +318,16 @@ function script.AimWeapon(num, heading, pitch)
 	
 	StartThread(RestoreAfterDelay)
 	
-	if num == 1 then  -- Left gunpod
-		lgunpod_not_aimed = true
+	if num == 1 then  -- Left gunpod		
 		Turn(torso, y_axis, heading, math.rad(140))
 		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))		
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis)
-		lgunpod_not_aimed = false
-	elseif num == 2 then -- Right gunpod
-		rgunpod_not_aimed = true
+		WaitForTurn(larm, x_axis)		
+	elseif num == 2 then -- Right gunpod		
 		Turn(torso, y_axis, heading, math.rad(140))		
 		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(rarm, x_axis)	
-		rgunpod_not_aimed = false			
+		WaitForTurn(rarm, x_axis)				
 	elseif num == 3 then
 		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
@@ -330,7 +347,7 @@ local function BumpGunNum(num, doSleep)
 end
 
 function script.Shot(num)
-	-- Plasma Left
+	-- Left
 	if num == 1 then		
 		EmitSfx(larmflare3, muzzle_smoke_large2)		
 		Move(barrelsL[gunIndex[1]], z_axis, -40)		
@@ -338,7 +355,7 @@ function script.Shot(num)
 		Move(barrelsL[gunIndex[1]], z_axis, 0, 30)
 	end
 	
-	-- Plasma right
+	-- right
 	if num == 2 then	
 		EmitSfx(rarmflare3, muzzle_smoke_large2)		
 		Move(barrelsR[gunIndex[2]], z_axis, -40)		
@@ -354,13 +371,6 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 1 and lgunpod_not_aimed then
-		return true
-	end
-	if num == 2 and rgunpod_not_aimed then
-		return true
-	end	
-	
 	if not targetID then
 		return false
 	end

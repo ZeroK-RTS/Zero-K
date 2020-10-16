@@ -26,19 +26,19 @@ return { striderdetriment = {
     jump_speed         = 8,
     jump_delay         = 100,
     jump_reload        = 120,
-    jump_from_midair   = 1,
-    jump_rotate_midair = 1,		
+    jump_from_midair   = 0,
+    jump_rotate_midair = 0,		
     modelradius    = [[95]],
-    extradrawrange = 925,
+    --extradrawrange = 925, -- Huh? This just adds an extra range that doesn't work.
   },
 
-  explodeAs              = [[NUCLEAR_MISSILE]],
+  explodeAs              = [[ATOMIC_BLAST]],
   footprintX             = 6,
   footprintZ             = 6,
   iconType               = [[krogoth]],
   leaveTracks            = true,
   losEmitHeight          = 100,
-  maxDamage              = 150000,
+  maxDamage              = 100000,
   maxSlope               = 37,
   maxVelocity            = 1.6,
   maxWaterDepth          = 5000,
@@ -50,7 +50,7 @@ return { striderdetriment = {
   radarDistance          = 1200,
   radarEmitHeight        = 12,
   script                 = [[striderdetriment.lua]],
-  selfDestructAs         = [[NUCLEAR_MISSILE]],
+  selfDestructAs         = [[ATOMIC_BLAST]],
   selfDestructCountdown  = 10,
   sfxtypes            = {
     explosiongenerators = {
@@ -65,12 +65,12 @@ return { striderdetriment = {
   },
   
   sightDistance          = 910,
-  sonarDistance          = 910,
-  trackOffset            = 0,
-  trackStrength          = 8,
-  trackStretch           = 0.8,
-  trackType              = [[ComTrack]],
-  trackWidth             = 60,
+  sonarDistance          = 1200,
+  --trackOffset            = 0,
+  --trackStrength          = 8,
+  --trackStretch           = 0.8,
+  --trackType              = [[ComTrack]],
+  --trackWidth             = 60,
   turnRate               = 482,
   upright                = true,
 
@@ -109,6 +109,14 @@ return { striderdetriment = {
       onlyTargetCategory = [[]],
     },
 	
+	{
+      def                = [[TAKEOFF]],
+      badTargetCategory  = [[]],
+      mainDir            = [[1 0 0]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[]],
+    },
+	
 	
 	
 	
@@ -132,7 +140,7 @@ return { striderdetriment = {
       
       customParams = {
         single_hit_multi = true,
-        --reaim_time = 1,
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -141,6 +149,8 @@ return { striderdetriment = {
 
       explosionGenerator      = [[custom:gauss_hit_h]],
       groundbounce            = 1,
+	  heightBoostFactor       = 0, -- stops shooting at ground while jumping
+	  heightMod			      = 1.2,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -158,8 +168,8 @@ return { striderdetriment = {
       soundStart              = [[weapon/gauss_fire]],
       sprayangle              = 900,
       stages                  = 32,
-	  fireTolerance		      = 8192,  
-      --tolerance               = 8192,
+	  fireTolerance		      = 16384,  
+      tolerance               = 16384,
       turret                  = true,
       waterweapon             = true,
       weaponType              = [[Cannon]],
@@ -177,10 +187,10 @@ return { striderdetriment = {
       craterBoost             = 2,
       craterMult              = 5,
       customParams            = {
-	      burst = Shared.BURST_RELIABLE,
+	    burst = Shared.BURST_RELIABLE,
         light_color = [[0.65 0.65 0.18]],
         light_radius = 380,        
-		    reaim_time = 8, -- COB
+		reaim_time = 8, -- COB
       },
 
       damage                  = {
@@ -189,22 +199,22 @@ return { striderdetriment = {
       
       edgeEffectiveness  = 0.4,
       explosionGenerator = "custom:ROACHPLOSION",
-	    explosionSpeed     = 10000,
+	  explosionSpeed     = 10000,
       fireStarter             = 100,    
       highTrajectory		  = 1,
       impulseBoost            = 2,
       impulseFactor           = 2.8,
       interceptedByShieldType = 2,
       model                   = [[logroach.s3o]], 
-	    myGravity               = 0.095,
+	  myGravity               = 0.095,
       noSelfDamage            = true,         
       range                   = 1200,
       reloadtime              = 60,      
       soundHit           	  = "explosion/mini_nuke",
       soundStart              = [[weapon/cannon/pillager_fire]],
       soundStartVolume        = 25,
-	    sprayAngle              = 1500, 
-      tolerance               = 512,
+	  sprayAngle              = 1500, 
+      tolerance               = 16384,
       turret                  = true,   
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
@@ -212,10 +222,10 @@ return { striderdetriment = {
 	
 	LANDING = {
       name                    = [[Detriment Landing]],
-      areaOfEffect            = 900,
+      areaOfEffect            = 500,
       canattackground         = false,
-      craterBoost             = 10,
-      craterMult              = 12,
+      craterBoost             = 100,
+      craterMult              = 15,
 
       damage                  = {
         default = 6000,
@@ -223,13 +233,13 @@ return { striderdetriment = {
 
       edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:FLASH64]],
-	    explosionSpeed          = 500,
-      impulseBoost            = 6000,
+	  explosionSpeed          = 500,
+      impulseBoost            = 1000,
       impulseFactor           = 25,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 5,
-      reloadtime              = 13,
+      range                   = 400,
+      reloadtime              = 120,
       soundHit           	  = "explosion/mini_nuke",
       soundStart              = [[krog_stomp]],
       soundStartVolume        = 10,
@@ -244,7 +254,8 @@ return { striderdetriment = {
 	
 	FOOTCRATER = {
       name                    = [[Detriment walking]],
-      areaOfEffect            = 150,
+	  areaOfEffect			  = 10,
+      craterAreaOfEffect      = 150,
       canattackground         = false,
       craterBoost             = 20,
       craterMult              = 15,
@@ -254,16 +265,46 @@ return { striderdetriment = {
       },
 
       edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:dirtyfootstep]],
-      impulseBoost            = 0.5,
-      impulseFactor           = 1,
+      explosionGenerator      = [[custom:dirtyfootstep]],	  
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 5,
       reloadtime              = 13,
       soundHit                = [[weapon/cannon/reaper_hit]],
-      --soundStart              = [[ex_small12]],
-      soundHitVolume        = 3,
+     
+      soundHitVolume        = 1,
+      turret                  = false,
+      weaponType              = [[Melee]],
+      weaponVelocity          = 5,
+
+      customParams            = {
+        hidden = true
+      }
+    },
+	
+	TAKEOFF = {
+      name                    = [[Detriment Takeoff]],
+      areaOfEffect            = 500,
+      canattackground         = false,
+      craterBoost             = 30,
+      craterMult              = 15,
+
+      damage                  = {
+        default = 1000,
+      },
+
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:FLASH64]],
+	  explosionSpeed          = 500,
+      impulseBoost            = 100,
+      impulseFactor           = 10,
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      range                   = 400,
+      reloadtime              = 120,
+      soundHit           	  = "explosion/mini_nuke",
+      soundStart              = [[krog_stomp]],
+      soundStartVolume        = 10,
       turret                  = false,
       weaponType              = [[Cannon]],
       weaponVelocity          = 5,
@@ -271,7 +312,7 @@ return { striderdetriment = {
       customParams            = {
         hidden = true
       }
-    },
+    },	
   },
 
 
