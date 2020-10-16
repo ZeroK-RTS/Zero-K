@@ -175,16 +175,12 @@ local function DecideCommands()
 
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
-	metal = metal + checkInterval * (metalIncome - metalPull) / FPS
 	metalStorage = metalStorage - HIDDEN_STORAGE
 	-- Log("metal=" .. metal .. "; storage=" .. metalStorage .. "; pull=" ..
 	-- 		metalPull .. "; income=" .. metalIncome)
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
-	energy = energy + checkInterval * (energyIncome - energyPull) / FPS
 	energyStorage = energyStorage - HIDDEN_STORAGE
-
-	local slop = 5
 
 	local get_metal, get_energy, use_metal, use_energy
 
@@ -192,18 +188,23 @@ local function DecideCommands()
 		get_metal = metalPull >= metalIncome
 		use_metal = metalPull <= metalIncome
 	else
-		get_metal = metal < metalStorage - slop and
-				metal < metalStorage * 0.9
-		use_metal = metal > slop and metal > metalStorage * 0.1
+		local futureMetal = metal + checkInterval * (metalIncome - metalPull) / FPS
+		-- Only get metal if we currently have available storage. Otherwise it
+		-- might technically be right to get it, but it just looks wrong to be
+		-- reclaiming when your storage is full.
+		get_metal = futureMetal < metalStorage and
+				metal < metalStorage * 0.75
+		use_metal = futureMetal > 0 and metal > metalStorage * 0.1
 	end
 
 	if energyStorage < 1 then
 		get_energy = energyPull >= energyIncome
 		use_energy = energyPull <= energyIncome
 	else
-		get_energy = energy < energyStorage - slop and
+		local futureEnergy = energy + checkInterval * (energyIncome - energyPull) / FPS
+		get_energy = futureEnergy < energyStorage and
 				energy < energyStorage * 0.9
-		use_energy = energy > slop and energy > energyStorage * 0.1
+		use_energy = futureEnergy > 0 and energy > energyStorage * 0.1
 	end
 
 	--Log("get_metal=" .. tostring(get_metal) .. ", " ..
