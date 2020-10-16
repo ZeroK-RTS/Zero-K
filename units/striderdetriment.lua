@@ -176,8 +176,8 @@ return { striderdetriment = {
       weaponVelocity          = 900,
     },
 	
-	SNITCH_LAUNCHER = {
-      name                    = [[Snitch Launcher]],
+	BOMB_LAUNCHER = {
+      name                    = [[Bomb Launcher]],
       areaOfEffect       	  = 384,     
       avoidFeature            = false,
       avoidFriendly           = false,
@@ -205,7 +205,7 @@ return { striderdetriment = {
       impulseBoost            = 2,
       impulseFactor           = 2.8,
       interceptedByShieldType = 2,
-      model                   = [[logroach.s3o]], 
+      model                   = [[zeppelin_bomb.dae]], 
 	  myGravity               = 0.095,
       noSelfDamage            = true,         
       range                   = 1200,
