@@ -89,7 +89,7 @@ local mapCenterZ = Game.mapSizeZ / 2
 --------------------------------------------------------------------------------
 -- Constants
 
-local FPS = 30
+local FPS = Game.gameSpeed
 
 local PATROL = 1
 local RECLAIM_METAL = 2
