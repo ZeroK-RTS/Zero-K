@@ -57,7 +57,7 @@ end
 -- Speedups
 
 local CMD_PATROL        = CMD.PATROL		-- 15
-local CMD_FIGHT         = CMD.CMD_FIGHT		-- 16
+local CMD_FIGHT         = CMD.FIGHT			-- 16
 local CMD_RECLAIM       = CMD.RECLAIM		-- 90
 local CMD_REPAIR        = CMD.REPAIR		-- 40
 local CMD_STOP          = CMD.STOP
@@ -146,20 +146,6 @@ end
 
 local function Log(msg)
 	spEcho("[uapn] " .. msg)
-end
-
-local function ITableEqual(a, b)
-	if #a ~= #b then
-		return false
-	end
-
-	for i = 1, #a do
-		if a[i] ~= b[i] then
-			return false
-		end
-	end
-
-	return true
 end
 
 local function IsImmobileBuilder(ud)
@@ -291,19 +277,19 @@ end
 local remove_shift_internal = math.bit_inv(CMD_OPT_SHIFT + CMD_OPT_INTERNAL)
 local function IssuedCausesCurrent(issued, currentID, currentOpt,
 		currentParam1, currentParam2, currentParam3, currentParam4, currentParam5)
-	Log("compare")
-	Log("    issued : " .. issued[1] .. "(" ..
-		tostring(issued[2][1]) .. ", " ..
-		tostring(issued[2][2]) .. ", " ..
-		tostring(issued[2][3]) .. ", " ..
-		tostring(issued[2][4]) .. ", " ..
-		tostring(issued[2][5]) .. ") " .. issued[3] .. " (" .. issued[4] .. ")")
-	Log("    current: " .. tostring(currentID) .. "(" ..
-		tostring(currentParam1) .. ", " ..
-		tostring(currentParam2) .. ", " ..
-		tostring(currentParam3) .. ", " ..
-		tostring(currentParam4) .. ", " ..
-		tostring(currentParam5) .. ") " .. tostring(currentOpt))
+--	Log("compare")
+--	Log("    issued : " .. issued[1] .. "(" ..
+--		tostring(issued[2][1]) .. ", " ..
+--		tostring(issued[2][2]) .. ", " ..
+--		tostring(issued[2][3]) .. ", " ..
+--		tostring(issued[2][4]) .. ", " ..
+--		tostring(issued[2][5]) .. ") " .. issued[3] .. " (" .. issued[4] .. ")")
+--	Log("    current: " .. tostring(currentID) .. "(" ..
+--		tostring(currentParam1) .. ", " ..
+--		tostring(currentParam2) .. ", " ..
+--		tostring(currentParam3) .. ", " ..
+--		tostring(currentParam4) .. ", " ..
+--		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
 	if currentID == nil then
 		return false
@@ -317,7 +303,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][4] == currentParam4 and
 			issued[2][5] == currentParam5 and
 			issued[3] == currentOpt then
-		Log("    -> equal")
+		--Log("    -> equal")
 		return true
 	end
 
@@ -332,7 +318,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][3] == currentParam4 and
 			issued[2][4] == currentParam5 and
 			issued[3] == math.bit_and(currentOpt, remove_shift_internal) then
-		Log("    -> repair/reclaim")
+		--Log("    -> repair/reclaim")
 		return true
 	end
 
@@ -343,19 +329,19 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 		if (currentID == CMD_REPAIR or currentID == CMD_RECLAIM) and
 				currentOpt == CMD_OPT_INTERNAL and
 				currentParam5 ~= nil then
-			Log("    -> patrol, repair")
+			--Log("    -> patrol, repair")
 			return true
 		elseif currentID == CMD_PATROL then
-			Log("    -> patrol")
+			--Log("    -> patrol")
 			return true
 		elseif currentID == CMD_FIGHT and
 				currentOpt == CMD_OPT_INTERNAL then
-			Log("    -> patrol, fight")
+			--Log("    -> patrol, fight")
 			return true
 		end
 	end
 
-	Log("    -> false")
+	--Log("    -> false")
 	return false
 end
 
@@ -376,12 +362,12 @@ local function SetupUnit(unitID)
 	local currentID, currentOpt, _, currentParam1,
 			currentParam2, currentParam3, currentParam4, currentParam5 =
 			spGetUnitCurrentCommand(unitID)
-	Log(unitID .. "; currently executing " .. tostring(currentID) .. "(" ..
-		tostring(currentParam1) .. ", " ..
-		tostring(currentParam2) .. ", " ..
-		tostring(currentParam3) .. ", " ..
-		tostring(currentParam4) .. ", " ..
-		tostring(currentParam5) .. ") " .. tostring(currentOpt))
+--	Log(unitID .. "; currently executing " .. tostring(currentID) .. "(" ..
+--		tostring(currentParam1) .. ", " ..
+--		tostring(currentParam2) .. ", " ..
+--		tostring(currentParam3) .. ", " ..
+--		tostring(currentParam4) .. ", " ..
+--		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
 	if currentID then
 		if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
@@ -389,7 +375,7 @@ local function SetupUnit(unitID)
 				currentParam4, currentParam5) then
 			-- The unit is doing something that could be caused by the top command
 			-- we were going to issue. That's good enough.
-			Log("Unit is doing good work. Don't touch it.")
+			--Log("Unit is doing good work. Don't touch it.")
 			return
 		end
 
@@ -408,12 +394,12 @@ local function SetupUnit(unitID)
 		if not isIssued then
 			-- Unit is doing something we never asked for. Must have been commanded
 			-- by a user.
-			Log(unitID .. " was commanded " .. tostring(currentID) .. "(" ..
-				tostring(currentParam1) .. ", " ..
-				tostring(currentParam2) .. ", " ..
-				tostring(currentParam3) .. ", " ..
-				tostring(currentParam4) .. ", " ..
-				tostring(currentParam5) .. ") " .. tostring(currentOpt))
+--			Log(unitID .. " was commanded " .. tostring(currentID) .. "(" ..
+--				tostring(currentParam1) .. ", " ..
+--				tostring(currentParam2) .. ", " ..
+--				tostring(currentParam3) .. ", " ..
+--				tostring(currentParam4) .. ", " ..
+--				tostring(currentParam5) .. ") " .. tostring(currentOpt))
 			Log("Ignore unit " .. unitID .. " until it becomes idle.")
 			trackedUnits[unitID] = nil
 			return
@@ -536,28 +522,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 		return
 	end
 
-	-- This is a command issued to a caretaker that we track. Check if it's a
-	-- command that we issued, or one issued by the user.
-
-	--Log("UnitCommand(" .. unitID .. ", " .. unitDefID .. ", " .. unitTeam .. ", " .. cmdID .. ")")
-	--TableEcho(cmdParams, "  params: ")
-	--TableEcho(cmdOptions, "  options: ")
-	--Log("options: " .. OptionValue(cmdOptions))
-
---	if trackedUnits[unitID] and trackedUnits[unitID].commands then
---		for _, command in ipairs(trackedUnits[unitID].commands) do
---			--Log("Compare against")
---			--TableEcho(command)
---			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
---					command[3] == OptionValue(cmdOptions) then
---				--Log("We issued this command. Ignore it.")
---				return
---			end
---		end
---	end
-
-	--Log("Found a user issued command!")
-
 	if stopHalts then
 		if cmdID == CMD_STOP then
 			if stoppedUnit[unitID] == nil then
@@ -571,11 +535,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 			stoppedUnit[unitID] = nil
 		end
 	end
-
---	if stoppedUnit[unitID] ~= nil then
---		Log("Ignore unit " .. unitID .. " until it becomes idle.")
---		trackedUnits[unitID] = nil
---	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
