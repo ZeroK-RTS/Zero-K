@@ -56,14 +56,15 @@ end
 --------------------------------------------------------------------------------
 -- Speedups
 
-local CMD_PATROL        = CMD.PATROL
-local CMD_RECLAIM       = CMD.RECLAIM
-local CMD_REPAIR        = CMD.REPAIR
+local CMD_PATROL        = CMD.PATROL		-- 15
+local CMD_RECLAIM       = CMD.RECLAIM		-- 90
+local CMD_REPAIR        = CMD.REPAIR		-- 40
 local CMD_STOP          = CMD.STOP
-local CMD_OPT_ALT       = CMD.OPT_ALT
-local CMD_OPT_CTRL      = CMD.OPT_CTRL
-local CMD_OPT_SHIFT     = CMD.OPT_SHIFT
-local CMD_OPT_META      = CMD.OPT_META
+local CMD_OPT_ALT       = CMD.OPT_ALT		-- 128
+local CMD_OPT_CTRL      = CMD.OPT_CTRL		-- 64
+local CMD_OPT_SHIFT     = CMD.OPT_SHIFT		-- 32
+local CMD_OPT_META      = CMD.OPT_META		-- 4
+local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL	-- 8
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
@@ -279,16 +280,65 @@ local function MakeCommands(decidedCommands, unitID)
 	return commands
 end
 
+-- Return truee iff the issued command could cause the current command. This
+-- includes internal commands, because some area commands replace the command
+-- with an internal to track of their state, instead of inserting new commands
+-- into the queue. If we ignore all internal commands, then we cannot determine
+-- whether such commands are still running or not.
+-- This code relies on implementation details of the spring engine, but I don't
+-- see any way around that.
+local remove_shift_internal = math.bit_inv(CMD_OPT_SHIFT + CMD_OPT_INTERNAL)
+local function IssuedCausesCurrent(issued, currentID, currentOpt,
+		currentParam1, currentParam2, currentParam3, currentParam4, currentParam5)
+	Log("compare")
+	Log("    issued : " .. issued[1] .. "(" ..
+		tostring(issued[2][1]) .. ", " ..
+		tostring(issued[2][2]) .. ", " ..
+		tostring(issued[2][3]) .. ", " ..
+		tostring(issued[2][4]) .. ", " ..
+		tostring(issued[2][5]) .. ") " .. issued[3] .. " (" .. issued[4] .. ")")
+	Log("    current: " .. currentID .. "(" ..
+		tostring(currentParam1) .. ", " ..
+		tostring(currentParam2) .. ", " ..
+		tostring(currentParam3) .. ", " ..
+		tostring(currentParam4) .. ", " ..
+		tostring(currentParam5) .. ") " .. currentOpt)
+
+	currentOpt = math.bit_and(currentOpt, remove_shift_internal)
+	Log("    currentOpt now " .. currentOpt)
+	Log("    remove shift internal " .. remove_shift_internal)
+
+	-- Area repair/reclaim command. The spring engine puts the unit being
+	-- repaired/reclaimed(?) as the first parameter, and moves the issued
+	-- parameters down one.
+	if currentID == issued[1] and
+			(currentID == CMD_RECLAIM or currentID == CMD_REPAIR) and
+			#issued[2] == 4 and
+			issued[2][1] == currentParam2 and
+			issued[2][2] == currentParam3 and
+			issued[2][3] == currentParam4 and
+			issued[2][4] == currentParam5 and
+			issued[3] == currentOpt then
+		Log("    -> repair/reclaim")
+		return true
+	end
+
+	-- TODO: patrol commands
+
+	Log("    -> false")
+	return false
+end
+
 local function SetupUnit(unitID)
 	trackedUnits[unitID] = trackedUnits[unitID] or {}
 	trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
+	queue:push({trackedUnits[unitID].checkFrame, unitID})
+
 	local decisions = DecideCommands()
 	local cmds = MakeCommands(decisions, unitID)
 	if cmds == nil then
 		return
 	end
-
-	queue:push({trackedUnits[unitID].checkFrame, unitID})
 
 	--TableEcho(cmds, "want to issue cmds")
 	--TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
@@ -326,12 +376,51 @@ local function SetupUnit(unitID)
 			-- the difference between reclaim metal/energy and build
 			-- assist/repair units.
 
-			local currentCmd = spGetUnitCurrentCommand(unitID)
-			--Log("currentCmd: " .. tostring(currentCmd))
+			local i = 1
+			local isIssued = false
+			-- TODO: This isn't working right. Sometimes I issue a command, and
+			-- it gets overriden.
+			while true do
+				local currentID, currentOpt, _, currentParam1,
+						currentParam2, currentParam3, currentParam4, currentParam5 =
+						spGetUnitCurrentCommand(unitID, i)
+				if currentID == nil then
+					break
+				end
+				--if math.bit_and(currentOpt, CMD_OPT_INTERNAL) == 0 then
+				if true then -- <<<<
+					if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
+							currentParam1, currentParam2, currentParam3,
+							currentParam4, currentParam5) then
+						Log("Don't issue the same set of commands again.")
+						return
+					end
 
-			if currentCmd == cmds[1][1] then
-				--Log("Don't issue the same set of commands again.")
-				return
+					for j = 2, #cmds do
+						if IssuedCausesCurrent(cmds[j], currentID, currentOpt,
+								currentParam1, currentParam2, currentParam3,
+								currentParam4, currentParam5) then
+							isIssued = true
+							break
+						end
+					end
+
+					if not isIssued then
+						Log(unitID .. " was commanded " .. currentID .. "(" ..
+							tostring(currentParam1) .. ", " ..
+							tostring(currentParam2) .. ", " ..
+							tostring(currentParam3) .. ", " ..
+							tostring(currentParam4) .. ", " ..
+							tostring(currentParam5) .. ") " .. currentOpt)
+						Log("Ignore unit " .. unitID .. " until it becomes idle.")
+						trackedUnits[unitID] = nil
+						return
+					end
+
+					break
+				end
+				-- To skip internal commands.
+				i = i + 1
 			end
 		end
 	end
@@ -339,10 +428,20 @@ local function SetupUnit(unitID)
 	for i, cmd in ipairs(cmds) do
 		if i == 1 then
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
-			Log("give order " .. cmd[4] .. " to " .. unitID)
+			Log(unitID .. "; give order " .. cmd[1] .. "(" ..
+				tostring(cmd[2][1]) .. ", " ..
+				tostring(cmd[2][2]) .. ", " ..
+				tostring(cmd[2][3]) .. ", " ..
+				tostring(cmd[2][4]) .. ", " ..
+				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
 		else
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
-			Log("queue order " .. cmd[4] .. " to " .. unitID)
+			Log(unitID .. "; queue order " .. cmd[1] .. "(" ..
+				tostring(cmd[2][1]) .. ", " ..
+				tostring(cmd[2][2]) .. ", " ..
+				tostring(cmd[2][3]) .. ", " ..
+				tostring(cmd[2][4]) .. ", " ..
+				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
 		end
 	end
 	trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
@@ -433,8 +532,6 @@ end
 -- Called whenever a unit gets a command from any source, including this widget!
 -- But does not get called when patrol or area reclaim/repair commands modify
 -- the command queue.
--- TODO: Does it get called when comsharing? If not, then the widget on somebody
--- else's client will always override any commands you give manually.
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if not enableIdleNanos
 			or cmdOptions.internal
@@ -452,17 +549,17 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	--TableEcho(cmdOptions, "  options: ")
 	--Log("options: " .. OptionValue(cmdOptions))
 
-	if trackedUnits[unitID] and trackedUnits[unitID].commands then
-		for _, command in ipairs(trackedUnits[unitID].commands) do
-			--Log("Compare against")
-			--TableEcho(command)
-			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
-					command[3] == OptionValue(cmdOptions) then
-				--Log("We issued this command. Ignore it.")
-				return
-			end
-		end
-	end
+--	if trackedUnits[unitID] and trackedUnits[unitID].commands then
+--		for _, command in ipairs(trackedUnits[unitID].commands) do
+--			--Log("Compare against")
+--			--TableEcho(command)
+--			if command[1] == cmdID and ITableEqual(command[2], cmdParams) and
+--					command[3] == OptionValue(cmdOptions) then
+--				--Log("We issued this command. Ignore it.")
+--				return
+--			end
+--		end
+--	end
 
 	--Log("Found a user issued command!")
 
@@ -480,10 +577,10 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 		end
 	end
 
-	if stoppedUnit[unitID] ~= nil then
-		Log("Ignore unit " .. unitID .. " until it becomes idle.")
-		trackedUnits[unitID] = nil
-	end
+--	if stoppedUnit[unitID] ~= nil then
+--		Log("Ignore unit " .. unitID .. " until it becomes idle.")
+--		trackedUnits[unitID] = nil
+--	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
