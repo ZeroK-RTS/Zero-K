@@ -57,6 +57,7 @@ end
 -- Speedups
 
 local CMD_PATROL        = CMD.PATROL		-- 15
+local CMD_FIGHT         = CMD.CMD_FIGHT		-- 16
 local CMD_RECLAIM       = CMD.RECLAIM		-- 90
 local CMD_REPAIR        = CMD.REPAIR		-- 40
 local CMD_STOP          = CMD.STOP
@@ -297,16 +298,28 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 		tostring(issued[2][3]) .. ", " ..
 		tostring(issued[2][4]) .. ", " ..
 		tostring(issued[2][5]) .. ") " .. issued[3] .. " (" .. issued[4] .. ")")
-	Log("    current: " .. currentID .. "(" ..
+	Log("    current: " .. tostring(currentID) .. "(" ..
 		tostring(currentParam1) .. ", " ..
 		tostring(currentParam2) .. ", " ..
 		tostring(currentParam3) .. ", " ..
 		tostring(currentParam4) .. ", " ..
-		tostring(currentParam5) .. ") " .. currentOpt)
+		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
-	currentOpt = math.bit_and(currentOpt, remove_shift_internal)
-	Log("    currentOpt now " .. currentOpt)
-	Log("    remove shift internal " .. remove_shift_internal)
+	if currentID == nil then
+		return false
+	end
+
+	-- Commands that were exactly what we issued.
+	if currentID == issued[1] and
+			issued[2][1] == currentParam1 and
+			issued[2][2] == currentParam2 and
+			issued[2][3] == currentParam3 and
+			issued[2][4] == currentParam4 and
+			issued[2][5] == currentParam5 and
+			issued[3] == currentOpt then
+		Log("    -> equal")
+		return true
+	end
 
 	-- Area repair/reclaim command. The spring engine puts the unit being
 	-- repaired/reclaimed(?) as the first parameter, and moves the issued
@@ -318,12 +331,29 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][2] == currentParam3 and
 			issued[2][3] == currentParam4 and
 			issued[2][4] == currentParam5 and
-			issued[3] == currentOpt then
+			issued[3] == math.bit_and(currentOpt, remove_shift_internal) then
 		Log("    -> repair/reclaim")
 		return true
 	end
 
-	-- TODO: patrol commands
+	if issued[1] == CMD_PATROL then
+		-- Patrol commands are issued with a location, but that locations is
+		-- changed so we can't rely on it. Maybe it's getting changed because we
+		-- issue a location out of range or something. That might be fixable.
+		if (currentID == CMD_REPAIR or currentID == CMD_RECLAIM) and
+				currentOpt == CMD_OPT_INTERNAL and
+				currentParam5 ~= nil then
+			Log("    -> patrol, repair")
+			return true
+		elseif currentID == CMD_PATROL then
+			Log("    -> patrol")
+			return true
+		elseif currentID == CMD_FIGHT and
+				currentOpt == CMD_OPT_INTERNAL then
+			Log("    -> patrol, fight")
+			return true
+		end
+	end
 
 	Log("    -> false")
 	return false
@@ -343,91 +373,50 @@ local function SetupUnit(unitID)
 	--TableEcho(cmds, "want to issue cmds")
 	--TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
 
-	if trackedUnits[unitID].commands and #cmds == #trackedUnits[unitID].commands then
-		--Log("List lengths equal")
+	local currentID, currentOpt, _, currentParam1,
+			currentParam2, currentParam3, currentParam4, currentParam5 =
+			spGetUnitCurrentCommand(unitID)
+	Log(unitID .. "; currently executing " .. tostring(currentID) .. "(" ..
+		tostring(currentParam1) .. ", " ..
+		tostring(currentParam2) .. ", " ..
+		tostring(currentParam3) .. ", " ..
+		tostring(currentParam4) .. ", " ..
+		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
-		local equal = true
-		for i = 1, #cmds do
-			if cmds[i][1] ~= trackedUnits[unitID].commands[i][1] then
-				equal = false
-				--Log("Command unequal")
-				break
+	if currentID then
+		if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
+				currentParam1, currentParam2, currentParam3,
+				currentParam4, currentParam5) then
+			-- The unit is doing something that could be caused by the top command
+			-- we were going to issue. That's good enough.
+			Log("Unit is doing good work. Don't touch it.")
+			return
+		end
+
+		local isIssued = false
+		if trackedUnits[unitID].commands then
+			for i = 1, #trackedUnits[unitID].commands do
+				if IssuedCausesCurrent(trackedUnits[unitID].commands[i], currentID,
+						currentOpt, currentParam1, currentParam2, currentParam3,
+						currentParam4, currentParam5) then
+					isIssued = true
+					break
+				end
 			end
 		end
-		--Log("Equal: " .. tostring(equal))
 
-		if equal then
-			-- We're going to issue the exact same commands we issued last time.
-			-- Maybe the first one is still running and we don't need to reissue
-			-- these commands.
-
-			-- If the first command was a patrol, then it must still be running,
-			-- since patrol never terminates. This is a special case because
-			-- patrol inserts all kinds of commands in the front of the command
-			-- queue that are hard to recognize.
-			if cmds[1][1] == CMD_PATROL then
-				--Log("Don't issue patrol again.")
-				return
-			end
-
-			-- Area repair commands end up changed into some internal format
-			-- when we issue them. Rather than relying on this internal format,
-			-- just compare command IDs and call it good enough. This ignores
-			-- the difference between reclaim metal/energy and build
-			-- assist/repair units.
-
-			local i = 1
-			local isIssued = false
-			-- TODO: This isn't working right. Sometimes I issue a command, and
-			-- it gets overriden.
-			while true do
-				local currentID, currentOpt, _, currentParam1,
-						currentParam2, currentParam3, currentParam4, currentParam5 =
-						spGetUnitCurrentCommand(unitID)
-				Log(unitID .. "; currently executing " .. tostring(currentID) .. "(" ..
-					tostring(currentParam1) .. ", " ..
-					tostring(currentParam2) .. ", " ..
-					tostring(currentParam3) .. ", " ..
-					tostring(currentParam4) .. ", " ..
-					tostring(currentParam5) .. ") " .. tostring(currentOpt))
-				if currentID == nil then
-					break
-				end
-				--if math.bit_and(currentOpt, CMD_OPT_INTERNAL) == 0 then
-				if true then -- <<<<
-					if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
-							currentParam1, currentParam2, currentParam3,
-							currentParam4, currentParam5) then
-						Log("Don't issue the same set of commands again.")
-						return
-					end
-
-					for j = 2, #cmds do
-						if IssuedCausesCurrent(cmds[j], currentID, currentOpt,
-								currentParam1, currentParam2, currentParam3,
-								currentParam4, currentParam5) then
-							isIssued = true
-							break
-						end
-					end
-
-					if not isIssued then
-						Log(unitID .. " was commanded " .. currentID .. "(" ..
-							tostring(currentParam1) .. ", " ..
-							tostring(currentParam2) .. ", " ..
-							tostring(currentParam3) .. ", " ..
-							tostring(currentParam4) .. ", " ..
-							tostring(currentParam5) .. ") " .. currentOpt)
-						Log("Ignore unit " .. unitID .. " until it becomes idle.")
-						trackedUnits[unitID] = nil
-						return
-					end
-
-					break
-				end
-				-- To skip internal commands.
-				i = i + 1
-			end
+		if not isIssued then
+			-- Unit is doing something we never asked for. Must have been commanded
+			-- by a user.
+			Log(unitID .. " was commanded " .. tostring(currentID) .. "(" ..
+				tostring(currentParam1) .. ", " ..
+				tostring(currentParam2) .. ", " ..
+				tostring(currentParam3) .. ", " ..
+				tostring(currentParam4) .. ", " ..
+				tostring(currentParam5) .. ") " .. tostring(currentOpt))
+			Log("Ignore unit " .. unitID .. " until it becomes idle.")
+			trackedUnits[unitID] = nil
+			return
 		end
 	end
 
@@ -640,8 +629,8 @@ function widget:GameFrame(frame)
 			local unitID = entry[2]
 
 			if trackedUnits[unitID] then
-				Log(unitID .. "; " .. frame .. " >= ".. entry[1] ..
-						"; checkFrame=" .. tostring(trackedUnits[unitID].checkFrame))
+				--Log(unitID .. "; " .. frame .. " >= ".. entry[1] ..
+				--		"; checkFrame=" .. tostring(trackedUnits[unitID].checkFrame))
 
 				if entry[1] == trackedUnits[unitID].checkFrame then
 					-- Otherwise, we queued this unit multiple times and this is not
