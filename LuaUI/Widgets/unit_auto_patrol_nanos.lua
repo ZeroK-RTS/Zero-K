@@ -140,7 +140,7 @@ local currentFrame = 0
 -- up and all of them deciding to reclaim now, while really what needs to happen
 -- is just some of them reclaiming.
 local function RandomInterval(interval)
-	return interval / 2 + math.random() * interval
+	return math.floor(interval / 2 + math.random() * interval)
 end
 
 local function Log(msg)
@@ -383,7 +383,13 @@ local function SetupUnit(unitID)
 			while true do
 				local currentID, currentOpt, _, currentParam1,
 						currentParam2, currentParam3, currentParam4, currentParam5 =
-						spGetUnitCurrentCommand(unitID, i)
+						spGetUnitCurrentCommand(unitID)
+				Log(unitID .. "; currently executing " .. tostring(currentID) .. "(" ..
+					tostring(currentParam1) .. ", " ..
+					tostring(currentParam2) .. ", " ..
+					tostring(currentParam3) .. ", " ..
+					tostring(currentParam4) .. ", " ..
+					tostring(currentParam5) .. ") " .. tostring(currentOpt))
 				if currentID == nil then
 					break
 				end
@@ -633,17 +639,20 @@ function widget:GameFrame(frame)
 
 			local unitID = entry[2]
 
-			--Log("Process unit " .. unitID .. " because " .. frame .. " >= ".. entry[1])
+			if trackedUnits[unitID] then
+				Log(unitID .. "; " .. frame .. " >= ".. entry[1] ..
+						"; checkFrame=" .. tostring(trackedUnits[unitID].checkFrame))
 
-			if trackedUnits[unitID] and entry[1] == trackedUnits[unitID].checkFrame then
-				-- Otherwise, we queued this unit multiple times and this is not
-				-- the "real" one so discard it. That's simpler than removing a
-				-- stale entry from the queue.
+				if entry[1] == trackedUnits[unitID].checkFrame then
+					-- Otherwise, we queued this unit multiple times and this is not
+					-- the "real" one so discard it. That's simpler than removing a
+					-- stale entry from the queue.
 
-				if spValidUnitID(unitID) then
-					SetupUnit(unitID)
-				else
-					trackedUnits[unitID] = nil
+					if spValidUnitID(unitID) then
+						SetupUnit(unitID)
+					else
+						trackedUnits[unitID] = nil
+					end
 				end
 			end
 		else
