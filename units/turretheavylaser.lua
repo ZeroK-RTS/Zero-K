@@ -1,4 +1,4 @@
-return { turretheavylaser = {
+unitDef = {
   unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
@@ -36,7 +36,7 @@ return { turretheavylaser = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[hlt.s3o]],
+  objectName                    = [[turretheavylaser.dae]],
   script                        = [[turretheavylaser.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
@@ -142,4 +142,6 @@ return { turretheavylaser = {
 
   },
 
-} }
+}
+
+return lowerkeys({ turretheavylaser = unitDef })
