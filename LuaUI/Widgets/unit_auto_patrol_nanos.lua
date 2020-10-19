@@ -286,7 +286,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 --		tostring(currentParam4) .. ", " ..
 --		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
-	if currentID == nil then
+	if currentID == nil or issued == nil then
 		return false
 	end
 
