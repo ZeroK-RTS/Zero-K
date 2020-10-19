@@ -12,7 +12,7 @@
 --    includes repair units), area reclaim metal, area reclaim energy, or patrol,
 --    depending on available resources.
 -- 2. For each caretaker under this widget's control, re-evaluate the behavior based
---	n the economy every 10 seconds. (Controlled by checkInterval.)
+--    on the economy every 10 seconds. (Controlled by checkInterval.)
 -- 3. For each caretaker, never issue a command more than once every 2.5 seconds.
 --    (Controlled by settleInterval.)
 -- 4. When a user issues a stop command, this behavior is inhibited, until a
@@ -28,11 +28,6 @@
 --    factory will be assisted less than if a patrol was issued. This could be
 --    improved by reducing the delay, and implementing a fancier incremental
 --    back-off than the simple 0.5s - 5s that is currently implemented.
--- 2. When economy changes such that the best commands switch from
---    reclaim-metal;reclaim-energy to reclaim-energy;reclaim-metal, caretakers
---    won't actually switch until they complete reclaiming whatever they are
---    reclaiming. This is a problem if caretakers are reclaiming something huge and
---    they might excess metal until that is completely reclaimed.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -409,20 +404,20 @@ local function SetupUnit(unitID)
 	for i, cmd in ipairs(cmds) do
 		if i == 1 then
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
-			Log(unitID .. "; give order " .. cmd[1] .. "(" ..
-				tostring(cmd[2][1]) .. ", " ..
-				tostring(cmd[2][2]) .. ", " ..
-				tostring(cmd[2][3]) .. ", " ..
-				tostring(cmd[2][4]) .. ", " ..
-				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
+--			Log(unitID .. "; give order " .. cmd[1] .. "(" ..
+--				tostring(cmd[2][1]) .. ", " ..
+--				tostring(cmd[2][2]) .. ", " ..
+--				tostring(cmd[2][3]) .. ", " ..
+--				tostring(cmd[2][4]) .. ", " ..
+--				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
 		else
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
-			Log(unitID .. "; queue order " .. cmd[1] .. "(" ..
-				tostring(cmd[2][1]) .. ", " ..
-				tostring(cmd[2][2]) .. ", " ..
-				tostring(cmd[2][3]) .. ", " ..
-				tostring(cmd[2][4]) .. ", " ..
-				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
+--			Log(unitID .. "; queue order " .. cmd[1] .. "(" ..
+--				tostring(cmd[2][1]) .. ", " ..
+--				tostring(cmd[2][2]) .. ", " ..
+--				tostring(cmd[2][3]) .. ", " ..
+--				tostring(cmd[2][4]) .. ", " ..
+--				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
 		end
 	end
 	trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
