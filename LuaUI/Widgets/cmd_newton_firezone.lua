@@ -837,6 +837,28 @@ end
 
 function widget:Initialize()
 	--IsSpectatorAndExit()
+
+	cmdFirezone = {
+		id      = CMD_NEWTON_FIREZONE,
+		type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
+		tooltip = WG.Translate("interface", "commands_newton_firezone"),
+		cursor  = 'Attack',
+		action  = 'setfirezone',
+		params  = { },
+		texture = 'LuaUI/Images/commands/Bold/capture.png',
+		pos     = {CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
+	}
+
+	cmdStopFirezone = {
+		id      = CMD_STOP_NEWTON_FIREZONE,
+		type    = CMDTYPE.ICON ,
+		tooltip = WG.Translate("interface", "commands_newton_firezone_stop"),
+		cursor  = 'Stop',
+		action  = 'cancelfirezone',
+		params  = { },
+		texture = 'LuaUI/Images/commands/Bold/stop.png',
+		pos     = {CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
+	}
 	
 	local circleVertex = function()
 			local circleDivs, PI = 64 , math.pi
