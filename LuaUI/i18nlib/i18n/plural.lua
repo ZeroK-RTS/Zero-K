@@ -67,7 +67,12 @@ pluralization[f2] = words("ak am bh fil guw hi ln mg nso ti tl wa")
 
 local f3 = function(n)
 	if not isInteger(n) then return 'other' end
-	return (n == 0 and "zero") or (n == 1 and "one") or (n == 2 and "two") or (between(n % 100, 3, 10) and "few") or (between(n % 100, 11, 99) and "many") or "other"
+	return (n == 0 and "zero") or 
+			(n == 1 and "one") or 
+			(n == 2 and "two") or 
+			(between(n % 100, 3, 10) and "few") or 
+			(between(n % 100, 11, 99) and "many") or 
+			"other"
 end
 pluralization[f3] = {'ar'}
 
@@ -84,7 +89,10 @@ local f5 = function(n)
 		return 'other'
 	end
 	local n_10, n_100 = n % 10, n % 100
-	return (n_10 == 1 and n_100 ~= 11 and 'one') or (between(n_10, 2, 4) and not between(n_100, 12, 14) and 'few') or ((n_10 == 0 or between(n_10, 5, 9) or between(n_100, 11, 14)) and 'many') or 'other'
+	return (n_10 == 1 and n_100 ~= 11 and 'one') or 
+			(between(n_10, 2, 4) and not between(n_100, 12, 14) and 'few') or 
+			((n_10 == 0 or between(n_10, 5, 9) or between(n_100, 11, 14)) and 'many') or 
+			'other'
 end
 pluralization[f5] = words('be bs hr ru sh sr uk')
 
@@ -93,17 +101,28 @@ local f6 = function(n)
 		return 'other'
 	end
 	local n_10, n_100 = n % 10, n % 100
-	return (n_10 == 1 and not inside(n_100, {11,71,91}) and 'one') or (n_10 == 2 and not inside(n_100, {12,72,92}) and 'two') or (inside(n_10, {3,4,9}) and not between(n_100, 10, 19) and not between(n_100, 70, 79) and not between(n_100, 90, 99) and 'few') or (n ~= 0 and n % 1000000 == 0 and 'many') or 'other'
+	return (n_10 == 1 and not inside(n_100, {11,71,91}) and 'one') or 
+			(n_10 == 2 and not inside(n_100, {12,72,92}) and 'two') or 
+			(inside(n_10, {3,4,9}) and not between(n_100, 10, 19) and not between(n_100, 70, 79) and not between(n_100, 90, 99) and 'few') or 
+			(n ~= 0 and n % 1000000 == 0 and 'many') or 
+			'other'
 end
 pluralization[f6] = {'br'}
 
 local f7 = function(n)
-	return (n == 1 and 'one') or ((n == 2 or n == 3 or n == 4) and 'few') or 'other'
+	return (n == 1 and 'one') or 
+			((n == 2 or n == 3 or n == 4) and 'few') or 
+			'other'
 end
 pluralization[f7] = {'cz', 'sk'}
 
 local f8 = function(n)
-	return (n == 0 and 'zero') or (n == 1 and 'one') or (n == 2 and 'two') or (n == 3 and 'few') or (n == 6 and 'many') or 'other'
+	return (n == 0 and 'zero') or
+			(n == 1 and 'one') or
+			(n == 2 and 'two') or
+			(n == 3 and 'few') or
+			(n == 6 and 'many') or
+			'other'
 end
 pluralization[f8] = {'cy'}
 
@@ -113,12 +132,19 @@ end
 pluralization[f9] = {'ff', 'fr', 'kab'}
 
 local f10 = function(n)
-	return (n == 1 and 'one') or (n == 2 and 'two') or ((n == 3 or n == 4 or n == 5 or n == 6) and 'few') or ((n == 7 or n == 8 or n == 9 or n == 10) and 'many') or 'other'
+	return (n == 1 and 'one') or 
+			(n == 2 and 'two') or
+			((n == 3 or n == 4 or n == 5 or n == 6) and 'few') or
+			((n == 7 or n == 8 or n == 9 or n == 10) and 'many') or
+			'other'
 end
 pluralization[f10] = {'ga'}
 
 local f11 = function(n)
-	return ((n == 1 or n == 11) and 'one') or ((n == 2 or n == 12) and 'two') or (isInteger(n) and (between(n, 3, 10) or between(n, 13, 19)) and 'few') or 'other'
+	return ((n == 1 or n == 11) and 'one') or 
+			((n == 2 or n == 12) and 'two') or 
+			(isInteger(n) and (between(n, 3, 10) or between(n, 13, 19)) and 'few') or 
+			'other'
 end
 pluralization[f11] = {'gd'}
 
@@ -191,7 +217,10 @@ local f21 = function(n)
 	end
 	local n_10, n_100 = n % 10, n % 100
 
-	return ((between(n_10, 2, 4) and not between(n_100, 12, 14)) and 'few') or ((n_10 == 0 or n_10 == 1 or between(n_10, 5, 9) or between(n_100, 12, 14)) and 'many') or 'other'
+	return ((between(n_10, 2, 4) and not between(n_100, 12, 14)) and 'few') or 
+			((n_10 == 0 or n_10 == 1 or between(n_10, 5, 9) or 
+			between(n_100, 12, 14)) and 'many') or
+			'other'
 end
 pluralization[f21] = {'pl'}
 
