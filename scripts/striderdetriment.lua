@@ -19,7 +19,9 @@ local smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
 	{larmflare1, larmflare2, larmflare3},	
-	{rarmflare1, rarmflare2, rarmflare3},		
+	{rarmflare1, rarmflare2, rarmflare3},
+	{aaflare1, aaflare2},
+	{headlaser1, headlaser2, headlaser3},
 	{shoulderflare},	
 	{lfoot},
 	{lfoot},
@@ -28,10 +30,10 @@ local gunFlares = {
 
 local barrelsL = {larmbarrel1, larmbarrel2, larmbarrel3}
 local barrelsR = {rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {torso, torso, shoulderflare, lfoot, lfoot, lfoot}
+local aimpoints = {torso, torso, aaturret, headlaser2, shouldercannon, lfoot, lfoot, lfoot}
 
-local gunIndex = {1,1,1,1,1,1}
-local gunFixEmit = {true, true, false, false, false, false}
+local gunIndex = {1,1,1,1,1,1,1,1}
+local gunFixEmit = {true, true, false, false, false, false, false, false}
 
 local gunFlareCount = {}
 for i = 1, #gunFlares do
@@ -87,9 +89,9 @@ local jetfeet = 1029
 local jetfeet_fire = 1030
 
 -- Weapons
-local landing_explosion = 4099 --Weapon 4
-local footcrater = 4100 --Weapon 5
-local takeoff_explosion = 4101 --Weapon 6
+local landing_explosion = 4101 --Weapon 6
+local footcrater = 4102 --Weapon 7
+local takeoff_explosion = 4103 --Weapon 8
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
@@ -143,8 +145,8 @@ local function Step(frontLeg, backLeg, impactFoot)
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
 	end
-	EmitSfx(impactFoot, dirtfling)
-	EmitSfx(impactFoot, footcrater)
+	--EmitSfx(impactFoot, dirtfling)
+	--EmitSfx(impactFoot, footcrater)
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
 
@@ -197,21 +199,21 @@ local function PreJumpThread(turn,lineDist,flightDist,duration)
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
-	local startHeading = Spring.GetUnitHeading(unitID) + 2^15		
+	--local startHeading = Spring.GetUnitHeading(unitID) + 2^15		
 	
-	local pi2    = math.pi*2
-	local rotUnit      = 2^16 / (pi2)	
+	--local pi2    = math.pi*2
+	--local rotUnit      = 2^16 / (pi2)	
 		
-	local defSpeed         = 64
+	--local defSpeed         = 64
 	
-	local speed = defSpeed * lineDist/flightDist
-	local step = speed/lineDist
+	--local speed = defSpeed * lineDist/flightDist
+	--local step = speed/lineDist
 	
 	
-	Spring.MoveCtrl.SetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
-	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)		
-	Sleep(1600)
-	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
+	--Spring.MoveCtrl.SetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
+	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)		
+	--Sleep(1600)
+	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
 	
 	Move(torso, y_axis, 0, 1)
 	for i,p in pairs(leftLeg) do
@@ -225,17 +227,17 @@ local function PreJumpThread(turn,lineDist,flightDist,duration)
 		WaitForTurn(torso, y_axis)
 	end
 	Move(pelvis, y_axis, 0, 1)
-	Turn(rarm, x_axis,  math.rad(-65), ARM_FRONT_SPEED)
-	Turn(larm, x_axis,  math.rad(-65), ARM_FRONT_SPEED)
-	EmitSfx(lfoot, jetfeet)
-	EmitSfx(rfoot, jetfeet)
+	Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
+	Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
+	--EmitSfx(lfoot, jetfeet)
+	--EmitSfx(rfoot, jetfeet)
 end
 
 local function BeginJumpThread()		
-	EmitSfx(lfoot, takeoff_explosion)
-	EmitSfx(lfoot, dirtfling)	
-	EmitSfx(lfoot, jetfeet)
-	EmitSfx(rfoot, jetfeet)
+	--EmitSfx(lfoot, takeoff_explosion)
+	--EmitSfx(lfoot, dirtfling)	
+	--EmitSfx(lfoot, jetfeet)
+	--EmitSfx(rfoot, jetfeet)
 	local x,y,z = Spring.GetUnitPosition(unitID, true)	
 	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)	
 end
@@ -328,7 +330,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)				
-	elseif num == 3 then
+	elseif num == 4 then -- Face laser
 		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
 	end
