@@ -90,7 +90,7 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling and lower variables
 
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef
 
 local fontObjects = {} -- Filled in init
 
@@ -2529,7 +2529,10 @@ function widget:Initialize()
 	Progressbar = Chili.Progressbar
 	Control = Chili.Control
 	screen0 = Chili.Screen0
-	
+
+    commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include("Configs/integral_menu_config.lua")
+
+
 	InitializeFonts()
 	InitializeControls()
 	
