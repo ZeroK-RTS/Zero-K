@@ -78,7 +78,6 @@ local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(30) * PACE
 
 local isFiring = false
-
 -- Effects
 local dirtfling = 1024
 local muzzle_flash = 1025
@@ -107,6 +106,7 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	
 end
 
 local function Step(frontLeg, backLeg, impactFoot)
@@ -295,10 +295,12 @@ local function RestoreAfterDelay()
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
 	Turn(head, y_axis, 0, 2)
+	Move(head, y_axis, -6, 10)
+	Move(head, z_axis, -4, 10)	
 	Turn(torso, y_axis, 0, math.rad(70))
 	Turn(larm, x_axis, 0, math.rad(30))
 	Turn(rarm, x_axis, 0, math.rad(30))
-	Turn(shouldercannon, x_axis, 0, math.rad(90))
+	Turn(shouldercannon, x_axis, 0, math.rad(90))	
 	isFiring = false
 	lastTorsoHeading = 0
 end
@@ -332,8 +334,16 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(rarm, x_axis)				
 	elseif num == 4 then -- Face laser
 		Turn(torso, y_axis, heading, math.rad(90))
+		Move(head, y_axis, 0, 10)
+		Move(head, z_axis, 0, 10)
+		WaitForTurn(torso, y_axis)						
+	elseif num == 5 then -- Shoulder Cannon
+		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
-	end
+		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
+		Move(shouldercannon, y_axis, -2, 0.7)
+		WaitForTurn(shouldercannon, x_axis)		
+	end	
 	lastTorsoHeading = heading
 	return true
 end
@@ -365,6 +375,22 @@ function script.Shot(num)
 		Move(barrelsR[gunIndex[2]], z_axis, 0, 30)
 	end
 	
+	-- face laser
+	if num == 4 then				
+		EmitSfx(head, muzzle_smoke_large2)	
+		EmitSfx(head, muzzle_flash_large)				
+	end
+	
+	if num == 5 then
+		EmitSfx(shoulderflare, muzzle_smoke_large2)
+		Move(shouldercannon, z_axis, -20)
+		Turn(torso, x_axis, math.rad(-17))		
+		EmitSfx(shoulderflare, muzzle_flash_large)		
+		Turn(torso, x_axis, 0, math.rad(10))			
+		Move(shouldercannon, z_axis, 0, 40)			
+		Turn(shouldercannon, x_axis, 0, math.rad(20))		
+	end
+	
 	if gunFixEmit[num] then
 		StartThread(BumpGunNum, num, true)
 	else
@@ -375,7 +401,7 @@ end
 function script.BlockShot(num, targetID)
 	if not targetID then
 		return false
-	end
+	end	
 	
 	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
 		return true
