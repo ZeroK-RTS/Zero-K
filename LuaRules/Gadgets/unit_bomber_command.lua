@@ -152,7 +152,7 @@ function gadget:GetInfo()
 	  id      = CMD_EXCLUDEAIRPAD,
 	  type    = CMDTYPE.ICON_UNIT,
 	  tooltip = 'Excludes an airpad from the running.',
-	  cursor  = 'Normal',
+	  cursor  = 'airpadexclude',
 	  action  = 'excludeairpad',
 	  params  = { },
 	  hidden  = false,
@@ -184,8 +184,12 @@ function gadget:GetInfo()
   
   function gadget:Initialize()
 	  local allyteams = Spring.GetAllyTeamList()
+	  local teams = Spring.GetTeamList()
 	  for i=1,#allyteams do
 		  airpadsPerAllyteam[allyteams[i]] = {}
+	  end
+	  for i=1,#teams do
+		excludedPads[teams[i]] = {}
 	  end
 	  local unitList = Spring.GetAllUnits()
 	  for i=1,#(unitList) do
@@ -310,6 +314,7 @@ function gadget:GetInfo()
   local function FindNearestAirpad(unitID, team)
 	  --Spring.Echo(unitID.." checking for closest pad")
 	  local allyTeam = spGetUnitAllyTeam(unitID)
+	  local teamID = Spring.GetUnitTeam(unitID)
 	  local freePads = {}
 	  local freePadCount = 0
 	  if not airpadsPerAllyteam[allyTeam] then
@@ -323,7 +328,8 @@ function gadget:GetInfo()
 			  end
 			  airpadsPerAllyteam[allyTeam][airpadID] = nil
 		  else
-			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[airpadID] then
+			--- Need to ensure that excludedairpad[teamid][padID] is not nil before running! 
+			  if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[teamID][airpadID] then
 				  freePads[airpadID] = true
 				  freePadCount = freePadCount + 1
 			  end
@@ -348,7 +354,7 @@ function gadget:GetInfo()
 		  end
 	  end
 
-	  if excludedPads[closestPad] then --Check if it contains the airpad and then return nil this will only happen when their are no other free airpads.
+	  if excludedPads[teamID][closestPad] then --Check if it contains the airpad and then return nil - this will only happen when their are no other free airpads.
 	  		return
 	  end
 
@@ -506,22 +512,26 @@ function gadget:GetInfo()
   end
   
   local function addOrRemoveExclusion(padID)
-	  if padID == nil then --Also check if it's a valid unit
+	  if padID == nil or not Spring.ValidUnitID(padID) then --Also check if it's a valid unit
 		return
 	  end
 
+	  local pInfo = Spring.GetPlayerInfo()
+	  local teamID = pInfo[3]
+
+	  Spring.Echo(teamID)
 	 --Spring.Echo('unit id: ' .. padID)
 
 	  --Check if the unit is an airpad and if it already exists
 	  if airpadDefs[spGetUnitDefID(padID)] then
-		if not excludedPads[padID] then
-		  excludedPads[padID] = true
+		if not excludedPads[teamID][padID] then
+		  excludedPads[teamID][padID] = true
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 1, ALLY_ACCESS)
 		  --Spring.Echo("Added airpad: " .. padID)
 		else
 		  --Already exists, remove
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 0, ALLY_ACCESS)
-		  excludedPads[padID] = false
+		  excludedPads[teamID][padID] = false
 		end
 	  else
 		--Spring.Echo("Not an airpad!")
@@ -836,5 +846,6 @@ else
 	  gadgetHandler:RegisterCMDID(CMD_REARM)
 	  Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
 	  Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
+	  Spring.AssignMouseCursor("airpadexclude", "cursorairpadexclude", true, true)
   end
 end

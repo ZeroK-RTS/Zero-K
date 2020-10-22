@@ -1,0 +1,2 @@
+hotspot topleft
+frame  cursorairpadexclude_0.png  5
