@@ -1,4 +1,4 @@
-unitDef = {
+return { staticrearm = {
   unitname            = [[staticrearm]],
   name                = [[Airpad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
@@ -74,6 +74,4 @@ unitDef = {
 
   },
 
-}
-
-return lowerkeys({ staticrearm = unitDef })
+} }
