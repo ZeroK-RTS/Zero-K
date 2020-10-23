@@ -2120,10 +2120,9 @@ function widgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam, factID, fact
 end
 
 
-function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, pre)
-	if pre == false then return end
+function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID, attackerDefID, attackerTeam)
 	for _, w in r_ipairs(self.UnitDestroyedList) do
-		w:UnitDestroyed(unitID, unitDefID, unitTeam)
+		w:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID, attackerDefID, attackerTeam)
 	end
 	return
 end
