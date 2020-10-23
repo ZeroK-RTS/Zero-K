@@ -154,6 +154,7 @@ function gadget:GetInfo()
 	  tooltip = 'Excludes an airpad from the running.',
 	  cursor  = 'airpadexclude',
 	  action  = 'excludeairpad',
+	  name    = 'Exclude',
 	  params  = { },
 	  hidden  = false,
   }
@@ -511,26 +512,25 @@ function gadget:GetInfo()
 	  end
   end
   
-  local function addOrRemoveExclusion(padID)
-	  if padID == nil or not Spring.ValidUnitID(padID) then --Also check if it's a valid unit
+  local function addOrRemoveExclusion(padID, teamID)
+	  if padID == nil or not Spring.ValidUnitID(padID)then --Also check if it's a valid unit
 		return
 	  end
 
-	  local pInfo = Spring.GetPlayerInfo()
-	  local teamID = pInfo[3]
-
-	  Spring.Echo(teamID)
+	  if not Spring.GetUnitTeam(padID) == teamID then
+	     return
+	  end
 	 --Spring.Echo('unit id: ' .. padID)
 
 	  --Check if the unit is an airpad and if it already exists
 	  if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[teamID][padID] then
 		  excludedPads[teamID][padID] = true
-		  Spring.SetUnitRulesParam(padID, "padExcluded", 1, ALLY_ACCESS)
+		  Spring.SetUnitRulesParam(padID, "padExcluded", 1)
 		  --Spring.Echo("Added airpad: " .. padID)
 		else
 		  --Already exists, remove
-		  Spring.SetUnitRulesParam(padID, "padExcluded", 0, ALLY_ACCESS)
+		  Spring.SetUnitRulesParam(padID, "padExcluded", 0)
 		  excludedPads[teamID][padID] = false
 		end
 	  else
@@ -725,7 +725,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			return true,true
 		end
 	if cmdID == CMD_EXCLUDEAIRPAD then
-		addOrRemoveExclusion(cmdParams[1])
+		addOrRemoveExclusion(cmdParams[1], unitTeam)
 		return true,true
 	end
 		return false -- command not used
