@@ -1271,21 +1271,19 @@ end
 function gadget:AICallIn(data)
 	if type(data) == "string" then
 		local message = split(data)
-		if message[1] == "Shard" or true then-- Because other AI shall be allowed to send such morph command without having to pretend to be Shard
-			if message[2] == "morph" and message[3] then
-				local unitID = tonumber(message[3])
-				if unitID and Spring.ValidUnitID(unitID) then
-					if message[4] then
-						local destDefId=tonumber(message[4])
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
-					else
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
-					end
+		if message[2] == "morph" and message[3] then
+			local unitID = tonumber(message[3])
+			if unitID and Spring.ValidUnitID(unitID) then
+				if message[4] then
+					local destDefId=tonumber(message[4])
+					--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
+					Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
 				else
-					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
+					--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
+					Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
 				end
+			else
+				Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
 			end
 		end
 	end
