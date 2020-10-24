@@ -147,14 +147,14 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local decisionCache = { updated=nil }
+local decisionCache = { validUntil=nil }
 local function DecideCommands()
-	if decisionCache.updated ~= nil and
-			decisionCache.updated + decisionCacheInterval > currentFrame then
+	if decisionCache.validUntil ~= nil and
+			decisionCache.validUntil > currentFrame then
 		return decisionCache.commands
 	end
 
-	decisionCache.updated = currentFrame
+	decisionCache.validUntil = currentFrame + decisionCacheInterval
 
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
@@ -227,7 +227,7 @@ local function DecideCommands()
 end
 
 local function MakeCommands(decidedCommands, unitID)
-	if trackedUnits[unitID].commandTables == nil then
+	if not trackedUnits[unitID].commandTables then
 		-- Cache commands inside trackedUnits. This saves a ton of table
 		-- creation.
 		local x, y, z = spGetUnitPosition(unitID)
@@ -286,7 +286,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 --		tostring(currentParam4) .. ", " ..
 --		tostring(currentParam5) .. ") " .. tostring(currentOpt))
 
-	if currentID == nil or issued == nil then
+	if not currentID or not issued then
 		return false
 	end
 
@@ -342,12 +342,13 @@ end
 
 local function SetupUnit(unitID)
 	trackedUnits[unitID] = trackedUnits[unitID] or {}
-	trackedUnits[unitID].checkFrame = currentFrame + RandomInterval(checkInterval)
-	queue:push({trackedUnits[unitID].checkFrame, unitID})
+	local trackedUnit = trackedUnits[unitID]
+	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
+	queue:push({trackedUnit.checkFrame, unitID})
 
 	local decisions = DecideCommands()
 	local cmds = MakeCommands(decisions, unitID)
-	if cmds == nil then
+	if not cmds then
 		return
 	end
 
@@ -375,9 +376,9 @@ local function SetupUnit(unitID)
 		end
 
 		local isIssued = false
-		if trackedUnits[unitID].commands then
-			for i = 1, #trackedUnits[unitID].commands do
-				if IssuedCausesCurrent(trackedUnits[unitID].commands[i], currentID,
+		if trackedUnit.commands then
+			for i = 1, #trackedUnit.commands do
+				if IssuedCausesCurrent(trackedUnit.commands[i], currentID,
 						currentOpt, currentParam1, currentParam2, currentParam3,
 						currentParam4, currentParam5) then
 					isIssued = true
@@ -420,8 +421,8 @@ local function SetupUnit(unitID)
 --				tostring(cmd[2][5]) .. ") " .. cmd[3] .. " (" .. cmd[4] .. ")")
 		end
 	end
-	trackedUnits[unitID].settleFrame = currentFrame + RandomInterval(settleInterval)
-	trackedUnits[unitID].commands = cmds
+	trackedUnit.settleFrame = currentFrame + RandomInterval(settleInterval)
+	trackedUnit.commands = cmds
 end
 
 local function SetupAll()
@@ -519,7 +520,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 
 	if stopHalts then
 		if cmdID == CMD_STOP then
-			if stoppedUnit[unitID] == nil then
+			if not stoppedUnit[unitID] then
 				Log("Ignore unit " .. unitID .. " until it is given a command.")
 			end
 			stoppedUnit[unitID] = true
