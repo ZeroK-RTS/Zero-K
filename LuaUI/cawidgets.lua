@@ -14,8 +14,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-local ignorelist = {count = 0, ignorees = {} } -- Ignore workaround for WG table.
 local resetWidgetDetailLevel = false -- has widget detail level changed
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local playerstate = {} -- for PlayerChangedTeam, PlayerResigned
