@@ -1266,42 +1266,6 @@ local function split(msg,sep)
 	return t
 end
 
--- Exemple of AI messages:
--- "aiShortName|morph|762" -- morph the unit of unitId 762
--- "aiShortName|morph|861|12" -- morph the unit of unitId 861 into an unit of unitDefId 12
---
--- Does not work because apparently Spring.GiveOrderToUnit from unsynced gadgets are ignored.
---
-function gadget:AICallIn(data)
-	if type(data) == "string" then
-		local message = split(data)
-		if message[1] == "Shard" or true then-- Because other AI shall be allowed to send such morph command without having to pretend to be Shard
-			if message[2] == "morph" and message[3] then
-				local unitID = tonumber(message[3])
-				if unitID and Spring.ValidUnitID(unitID) then
-					if message[4] then
-						local destDefId=tonumber(message[4])
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
-					else
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
-					end
-				else
-					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
-				end
-			end
-		end
-	end
-end
-
--- Just something to test the above AICallIn
---function gadget:KeyPress(key)
---	if key == 32 then--space key
---	gadget:AICallIn("asn|morph|762")
---	end
---end
-
 function gadget:Save(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
