@@ -598,6 +598,10 @@ local function UpdateMorph(unitID, morphData)
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
 	end
+	if not morphData.combatMorph then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
+	end
 	return true
 end
 
