@@ -1244,8 +1244,9 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
+		skirmOrderDis = 150,
 		skirmLeeway = 5,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 60,
 	},
 	{
 		name = "striderdante",

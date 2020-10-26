@@ -59,8 +59,13 @@ local ALLY_TABLE = {
 	ally = true,
 }
 
+local DEBUG_NAME = "TACTICAL AI"
+
 local AGGRESSIVE_FRAMES = 80
 local AVOID_HEIGHT_DIFF = 25
+
+local UPDATE_RATE = 20
+local MAX_UPRATE_RATE = 2
 
 local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 
@@ -73,6 +78,8 @@ local unitList = {count = 0, data = {}}
 local externallyHandledUnit = {}
 
 local aggressiveTarget = {}
+
+local needNextUpdate = false
 
 local HEADING_TO_RAD = (math.pi*2/2^16)
 
@@ -178,7 +185,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 		end
 		return false -- no queue and on hold position.
 	end
-	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then
+	if (holdPos and cmdID == CMD_ATTACK and Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
 		if spGetCommandQueue(unitID, 0) == 1 then
 			return false -- set to hold position and is auto-acquiring target
 		end
@@ -200,7 +207,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 				if (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT) then
 					-- Do not skirm single target with FIGHT
 					return -1, false, true, spValidUnitID(target) and target 
-				elseif Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) then
+				elseif Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL) then
 					-- Do no skirm single target when it is auto attack
 					return -1, false, false, spValidUnitID(target) and target
 				elseif spValidUnitID(target) then
@@ -227,7 +234,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 				if (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT) then 
 					-- Do not skirm single target with FIGHT
 					return -1, true, true, target, cps_1, cps_2, cps_3
-				elseif Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts_2, CMD.OPT_INTERNAL) then
+				elseif Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts_2, CMD.OPT_INTERNAL) then
 					-- Do no skirm single target when it is auto attack
 					return -1, true, false, target, cps_1, cps_2, cps_3
 				else
@@ -806,7 +813,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		return true
 	end
 	
-	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL)) then
+	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
 		return false -- if I have been given attack order manually do not flee
 	end
 	
@@ -825,6 +832,11 @@ end
 
 local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local unitData = unit[unitID]
+	
+	if unitData.lastUpdate and unitData.lastUpdate + MAX_UPRATE_RATE > frame then
+		return
+	end
+	unitData.lastUpdate = frame
 	
 	local exitEarly = GetAiExitEarly(unitID, unitData)
 	if exitEarly and not slowUpdate then
@@ -964,10 +976,19 @@ local function UpdateUnits(frame, start, increment)
 			DoUnitUpdate(unitID, frame, slowUpdate)
 		end
 	end
+	
+	if needNextUpdate then
+		for i = 1, #needNextUpdate do
+			if spValidUnitID(needNextUpdate[i]) then
+				DoUnitUpdate(needNextUpdate[i], frame, false)
+			end
+		end
+		needNextUpdate = false
+	end
 end
 
 function gadget:GameFrame(n)
-	UpdateUnits(n, n%20+1, 20)
+	UpdateUnits(n, n%UPDATE_RATE + 1, UPDATE_RATE)
 end
 
 --------------------------------------------------------------------------------
@@ -1033,7 +1054,7 @@ function gadget:UnitIdle(unitID, unitDefID)
 	AddIdleUnit(unitID, unitDefID)
 end
 
-function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
+function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
 	if playerID == -1 or fromLua then
 		return
 	end
@@ -1043,6 +1064,10 @@ function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	local unitData = unit[unitID]
 	if not unitData then
 		return
+	end
+	if (cmdID == CMD_FIGHT or cmdID == CMD_ATTACK) and unitData.receivedOrder and not cmdOpts.shift then
+		needNextUpdate = needNextUpdate or {}
+		needNextUpdate[#needNextUpdate + 1] = unitID
 	end
 	unitData.wasIdle = false
 	unitData.idleWantReturn = false
