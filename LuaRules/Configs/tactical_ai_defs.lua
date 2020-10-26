@@ -114,6 +114,7 @@ local longRangeRiotIdleFleeArray = NameToDefID({
 	"tankriot",
 	"hoverriot",
 	"cloakassault",
+	"amphimpulse",
 })
 
 local medRangeRiotIdleFleeArray = NameToDefID({
@@ -1243,7 +1244,7 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
-		skirmLeeway = 20,
+		skirmLeeway = 5,
 		skirmBlockedApproachFrames = 40,
 	},
 	{
