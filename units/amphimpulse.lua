@@ -17,7 +17,7 @@ return { amphimpulse = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen        = 25,
+    amph_regen        = 15,
     amph_submerged_at = 40,
     sink_on_emp       = 1,
     floattoggle       = [[1]],
