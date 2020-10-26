@@ -72,7 +72,7 @@ return { shipaa = {
 
     AALASER       = {
       name                    = [[Anti-Air Laser]],
-      accuracy                = 128,
+      accuracy                = 50,
       areaOfEffect            = 8,
       canattackground         = false,
       collideFriendly         = false,
