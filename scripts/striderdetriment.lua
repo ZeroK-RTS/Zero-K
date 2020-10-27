@@ -381,14 +381,15 @@ function script.Shot(num)
 		EmitSfx(head, muzzle_flash_large)				
 	end
 	
+	-- Shoulder cannon
 	if num == 5 then
 		EmitSfx(shoulderflare, muzzle_smoke_large2)
 		Move(shouldercannon, z_axis, -20)
 		Turn(torso, x_axis, math.rad(-17))		
 		EmitSfx(shoulderflare, muzzle_flash_large)		
-		Turn(torso, x_axis, 0, math.rad(10))			
-		Move(shouldercannon, z_axis, 0, 40)			
-		Turn(shouldercannon, x_axis, 0, math.rad(20))		
+		Turn(torso, x_axis, 0, math.rad(20))			
+		Move(shouldercannon, z_axis, 0, 50)			
+		Turn(shouldercannon, x_axis, 0, math.rad(40))		
 	end
 	
 	if gunFixEmit[num] then
