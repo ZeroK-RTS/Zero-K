@@ -517,7 +517,8 @@ function gadget:GetInfo()
 		return
 	  end
 
-	  if not Spring.GetUnitTeam(padID) == teamID then
+	  local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
+	  if Spring.GetUnitAllyTeam(padID) ~= allyTeamID then
 	     return
 	  end
 	 --Spring.Echo('unit id: ' .. padID)
