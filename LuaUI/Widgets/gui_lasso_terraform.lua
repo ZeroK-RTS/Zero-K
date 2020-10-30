@@ -161,8 +161,8 @@ local maxWallPoints = 700 -- max points that makeup a wall
 -- bounding ramp dimensions, reduces slowdown MUST AGREE WITH GADGET VALUES
 local maxRampLength = 3000
 local maxRampWidth = 800
-local minRampLength = 40
-local minRampWidth = 24
+local minRampLength = 64
+local minRampWidth = 36
 
 local startRampWidth = 60
 

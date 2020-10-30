@@ -150,8 +150,8 @@ local perimeterEdgeCost = {
 --ramp dimensions
 local maxTotalRampLength = 3000
 local maxTotalRampWidth = 800
-local minTotalRampLength = 40
-local minTotalRampWidth = 24
+local minTotalRampLength = 64
+local minTotalRampWidth = 36
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
 local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
@@ -1011,6 +1011,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
