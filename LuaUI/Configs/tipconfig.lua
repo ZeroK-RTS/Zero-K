@@ -201,7 +201,7 @@ needPowerDefs = {
 }
 
 for name in pairs(UnitDefNames) do
-	if string.find(name, "factory") then factoryDefs[#factoryDefs+1] = name end
+	if string.find(name, "factory") then factoryDefs[#factoryDefs + 1] = name end
 end
 
 --unitDefID-indexed versions
