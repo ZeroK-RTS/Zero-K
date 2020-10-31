@@ -14,8 +14,10 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local ignorelist = {count = 0, ignorees = {} } -- Ignore workaround for WG table.
 local resetWidgetDetailLevel = false -- has widget detail level changed
+local spGetPlayerInfo = Spring.GetPlayerInfo
+local playerstate = {} -- for PlayerChangedTeam, PlayerResigned
+local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
 local DATA_VERSION = 9 -- change this to reset widget settings
@@ -156,6 +158,8 @@ local flexCallIns = {
 	'GameSetup',
 	'TeamDied',
 	'TeamChanged',
+	'PlayerChangedTeam', -- ZK callin.
+	'PlayerResigned', -- ZK callin.
 	'PlayerAdded',
 	'PlayerChanged',
 	"PlayerRemoved",
@@ -433,9 +437,20 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
+	local allys = Spring.GetAllyTeamList()
+	for a=1, #allys do
+		local teamlist = Spring.GetTeamList(ally[a])
+		for t=1, #teamlist do
+			local playerlist = Spring.GetPlayerList(teamlist[t])
+			for p=1, #playerlist do
+				local _,_,spectator = spGetPlayerInfo(playerlist[p])
+				playerstate[playerlist[p]] = {team = teamlist[t], spectator = spectator}
+			end
+		end
+	end
 	-- Add ignorelist --
 	Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
-	local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
+	local customkeys = select(10, spGetPlayerInfo(Spring.GetMyPlayerID(), true))
 	Spring.Echo("Spring.GetMyPlayerID() done", customkeys)
 	if customkeys["ignored"] then
 		if string.find(customkeys["ignored"], ",") then
@@ -1382,7 +1397,7 @@ do
 		for i = 1, #playerList do
 			local playerID = playerList[i]
 			if playerID then
-				local name, _, spectating = Spring.GetPlayerInfo(playerID, false)
+				local name, _, spectating = spGetPlayerInfo(playerID, false)
 				if not spectating then
 					playerNameToID[name] = playerID
 				end
@@ -1410,7 +1425,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 				newMsg.msgtype = 'spec_to_specs'
 			end
 			local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
-			local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))
+			local customkeys = select(10, spGetPlayerInfo(playerID_msg))
 			if customkeys and (customkeys.muted or (newMsg.msgtype == 'spec_to_everyone' and ((customkeys.can_spec_chat or '1') == '0'))) then
 				local myPlayerID = Spring.GetLocalPlayerID()
 				if myPlayerID == playerID_msg then --if I am the muted, then:
@@ -1422,7 +1437,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 				--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 			end
 			-- IGNORE FEATURE--
-			if ignorelist.ignorees[select(1, Spring.GetPlayerInfo(playerID_msg, false))] then
+			if ignorelist.ignorees[select(1, spGetPlayerInfo(playerID_msg, false))] then
 				return
 			end
 		end
@@ -1436,7 +1451,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 					if endChar then
 						local name = string.sub(newMsg.argument, 2, endChar-1)
 						if playerNameToID[name] then
-							local spectating = select(3, Spring.GetPlayerInfo(playerNameToID[name], false))
+							local spectating = select(3, spGetPlayerInfo(playerNameToID[name], false))
 							if spectating then
 								playerNameToID[name] = nil
 								return
@@ -1942,7 +1957,7 @@ function widgetHandler:GameStart()
 			local _, _, _, ai, side, ally = Spring.GetTeamInfo(teamID, false)
 			if (not ai) then
 				for _, pid in ipairs(Spring.GetPlayerList(teamID)) do
-					local name, active, spec = Spring.GetPlayerInfo(pid, false)
+					local name, active, spec = spGetPlayerInfo(pid, false)
 					if active and not spec then plist = plist .. "," .. name end
 				end
 			end
@@ -1996,7 +2011,21 @@ end
 
 function widgetHandler:PlayerChanged(playerID) --when player Change from Spectator to Player or Player to Spectator.
 	MessageProcessor:UpdatePlayer(playerID)
-	for _, w in r_ipairs(self.PlayerChangedList) do
+	local status = playerstate[playerID]
+	local _,_,spectator,teamID = spGetPlayerInfo(playerID)
+	if spectator ~= status.spectator and spectator then
+		for _,w in r_ipairs(self.PlayerResignedList) do
+			w:PlayerResigned(playerID)
+		end
+	end
+	if teamID ~= status.team and not spectator then
+		for _,w in r_ipairs(self.PlayerChangedTeamList) do
+			w:PlayerChangedTeam(playerID,status.team,teamID)
+		end
+	end
+	playerstate[playerID].spectator = spectator
+	playerstate[playerID].team = teamID
+	for _,w in r_ipairs(self.PlayerChangedList) do
 		w:PlayerChanged(playerID)
 	end
 	return
@@ -2047,7 +2076,7 @@ end
 
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
-	local playerName, _, _, _, _, _, _, _, _, customkeys = Spring.GetPlayerInfo(playerID)
+	local playerName, _, _, _, _, _, _, _, _, customkeys = spGetPlayerInfo(playerID)
 	if ignorelist.ignorees[playerName] or (customkeys and customkeys.muted) then
 		return true
 	end
