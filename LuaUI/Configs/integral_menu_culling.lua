@@ -39,6 +39,7 @@ local configList = {
 	{cmdID = CMD_PRIORITY              , state = true, default = true, name = "Construction Priority"},
 	{cmdID = CMD_TOGGLE_DRONES         , state = true, default = true, name = "Drone Construction"},
 	{cmdID = CMD_UNIT_FLOAT_STATE      , state = true, default = true, name = "Float State"},
+	{cmdID = CMD_AIR_STRAFE            , state = true, default = true, name = "Gunship Strafe"},
 	{cmdID = CMD.FIRE_STATE            , state = true, default = true, name = "Hold Fire (Fire State)"},
 	{cmdID = CMD.MOVE_STATE            , state = true, default = true, name = "Hold Position (Move State)"},
 	{cmdID = CMD_PUSH_PULL             , state = true, default = true, name = "Impulse Mode"},
@@ -53,7 +54,6 @@ local configList = {
 	{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
 	{cmdID = CMD_AUTO_CALL_TRANSPORT   , state = true, default = false, name = "Call Transports"},
 	{cmdID = CMD_GLOBAL_BUILD          , state = true, default = false, name = "Global Build"},
-	{cmdID = CMD_AIR_STRAFE            , state = true, default = false, name = "Gunship Strafe"},
 	{cmdID = CMD_UNIT_KILL_SUBORDINATES, state = true, default = false, name = "Kill Captured"},
 	{cmdID = CMD_PREVENT_OVERKILL      , state = true, default = false, name = "Overkill Prevention"},
 	{cmdID = CMD_SELECTION_RANK        , state = true, default = false, name = "Selection Rank"},
@@ -97,7 +97,7 @@ local defaultValues = {
 	[CMD_DISABLE_ATTACK] = true,
 	--[CMD_DONT_FIRE_AT_RADAR] = true,
 	[CMD_PREVENT_OVERKILL] = true,
-	[CMD_AIR_STRAFE] = true,
+	--[CMD_AIR_STRAFE] = true,
 	[CMD_SELECTION_RANK] = true,
 }
 
