@@ -136,7 +136,7 @@ local currentFrame = 0
 -- up and all of them deciding to reclaim now, while really what needs to happen
 -- is just some of them reclaiming.
 local function RandomInterval(interval)
-	return math.floor(interval / 2 + math.random() * interval)
+	return math.floor(interval + (math.random() * interval * 0.2 - 0.1))
 end
 
 local function Log(msg)
