@@ -177,7 +177,7 @@ local function DecideCommands()
 		-- reclaiming when your storage is full.
 		get_metal = futureMetal < metalStorage and
 				metal < metalStorage * 0.75
-		use_metal = futureMetal > 0 and metal > metalStorage * 0.1
+		use_metal = futureMetal > 0 and metal > 0
 	end
 
 	if energyStorage < 1 then
@@ -187,7 +187,7 @@ local function DecideCommands()
 		local futureEnergy = energy + checkInterval * (energyIncome - energyPull) / FPS
 		get_energy = futureEnergy < energyStorage and
 				energy < energyStorage * 0.9
-		use_energy = futureEnergy > 0 and energy > energyStorage * 0.1
+		use_energy = futureEnergy > 0 and energy > 0
 	end
 
 	--Log("get_metal=" .. tostring(get_metal) .. ", " ..
