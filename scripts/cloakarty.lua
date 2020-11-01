@@ -120,7 +120,12 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon(num)
+function script.FireWeapon()
+	EmitSfx(flare, GG.Script.UNIT_SFX1)
+	EmitSfx(flare, GG.Script.UNIT_SFX2)
+end
+
+function script.EndBurst()
 	Turn (torso, y_axis, math.rad(20))
 	Move (barrel, z_axis, -6.25)
 	WaitForTurn (torso, y_axis)
