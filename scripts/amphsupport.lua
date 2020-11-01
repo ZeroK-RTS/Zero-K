@@ -32,6 +32,8 @@ local smokePiece = {head}
 --------------------------------------------------------------------------------
 
 local spGetUnitVelocity = Spring.GetUnitVelocity
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetGroundHeight = Spring.GetGroundHeight
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -40,6 +42,8 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_DEPLOY = 4
+local SIG_FLOAT = 8
+local SIG_BOB = 16
 
 local GUN_DEPLOY_DIST = 6
 local AIM_SPEED = 180
@@ -48,10 +52,121 @@ local AIM_SPEED = 180
 --------------------------------------------------------------------------------
 
 local moving = false
+local floating = false
 local deployed = false
 local gun = false
 
 local PACE = 1.8
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim functions
+
+local function Bob()
+	Signal(SIG_BOB)
+	SetSignalMask(SIG_BOB)
+	while true do
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)))
+		Sleep(2000)
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)))
+		Sleep(2000)
+	end
+end
+
+local function SinkBubbles()
+	SetSignalMask(SIG_FLOAT)
+	while true do
+		EmitSfx(cthigh, SFX.BUBBLE)
+		EmitSfx(lbarrel, SFX.BUBBLE)
+		EmitSfx(rbarrel, SFX.BUBBLE)
+		Sleep(66)
+	end
+end
+
+local function dustBottom()
+	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID,rfoot)
+	Spring.SpawnCEG("uw_amphlift", x1, y1+5, z1, 0, 0, 0, 0)
+	local x2,y2,z2 = Spring.GetUnitPiecePosDir(unitID,lfoot)
+	Spring.SpawnCEG("uw_amphlift", x2, y2+5, z2, 0, 0, 0, 0)
+end
+
+local function FloatThread(sign)
+	Signal(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT)
+	local speed = 0.7
+	local cycle = 0
+	
+	Turn(rthigh, x_axis, math.rad(-100 + 9*sign), math.rad(80)*speed)
+	Turn(rcalf, x_axis,  math.rad(115  + 9*sign), math.rad(100)*speed)
+	Turn(rfoot, x_axis,  math.rad(-10  + 9*sign), math.rad(100)*speed)
+	Turn(lthigh, x_axis, math.rad(-100 + 9*sign), math.rad(80)*speed)
+	Turn(lcalf, x_axis,  math.rad(115  + 9*sign), math.rad(100)*speed)
+	Turn(lfoot, x_axis,  math.rad(-10  + 9*sign), math.rad(100)*speed)
+	Turn(cthigh, x_axis, math.rad(-90  - 9*sign), math.rad(80)*speed)
+	Turn(ccalf, x_axis,  math.rad(-70  - 9*sign), math.rad(100)*speed)
+	Turn(cfoot, x_axis,  math.rad(10   + 9*sign), math.rad(100)*speed)
+	Sleep(150)
+	
+	while true do
+		Turn(rthigh, x_axis, math.rad(-100 + ((cycle + 0)%3 - 1)*9), math.rad(80)*speed)
+		Turn(rcalf, x_axis,  math.rad(115  + ((cycle + 0)%3 - 1)*9), math.rad(100)*speed)
+		Turn(rfoot, x_axis,  math.rad(-10  + ((cycle + 0)%3 - 1)*9), math.rad(100)*speed)
+		
+		Turn(lthigh, x_axis, math.rad(-100 + ((cycle + 1)%3 - 1)*9), math.rad(80)*speed)
+		Turn(lcalf, x_axis,  math.rad(115  + ((cycle + 1)%3 - 1)*9), math.rad(100)*speed)
+		Turn(lfoot, x_axis,  math.rad(-10  + ((cycle + 1)%3 - 1)*9), math.rad(100)*speed)
+		
+		Turn(cthigh, x_axis, math.rad(-90  - ((cycle + 2)%3 - 1)*9), math.rad(80)*speed)
+		Turn(ccalf, x_axis,  math.rad(-70  - ((cycle + 2)%3 - 1)*9), math.rad(100)*speed)
+		Turn(cfoot, x_axis,  math.rad(10   + ((cycle + 2)%3 - 1)*9), math.rad(100)*speed)
+	
+		Sleep(900)
+		speed = 0.1
+		cycle = (cycle + 1)%3
+	end
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim gadget callins
+
+function Float_startFromFloor()
+	dustBottom()
+	Signal(SIG_WALK)
+	Signal(SIG_FLOAT)
+	StartThread(FloatThread, 1)
+	StartThread(Bob)
+end
+
+function Float_stopOnFloor()
+	dustBottom()
+	Signal(SIG_BOB)
+	Signal(SIG_FLOAT)
+end
+
+function Float_rising()
+end
+
+function Float_sinking()
+	Signal(SIG_FLOAT)
+	StartThread(SinkBubbles)
+end
+
+function Float_crossWaterline(speed)
+	Signal(SIG_FLOAT)
+	StartThread(FloatThread, -1)
+end
+
+function Float_stationaryOnSurface()
+end
+
+function unit_teleported(position)
+	return GG.Floating_UnitTeleported(unitID, position)
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -194,6 +309,9 @@ local function AnimateDeployment(distance, speed, wait)
 	end
 end
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
 local function SetDeploy(wantDeploy)
 	Signal(SIG_DEPLOY)
 	SetSignalMask(SIG_DEPLOY)
@@ -215,28 +333,70 @@ end
 function StartMoving()
 	moving = true
 	StartThread(SetDeploy, false)
+	Signal(SIG_FLOAT)
+	Signal(SIG_BOB)
 	StartThread(Walk)
 end
 
 function StopMoving()
 	moving = false
-	StartThread(SetDeploy, true)
+	if floating then
+		Signal(SIG_FLOAT)
+		StartThread(FloatThread, 1)
+	else
+		StartThread(SetDeploy, true)
+	end
 	Signal(SIG_WALK)
+end
+
+function script.StopMoving()
+	GG.Floating_StopMoving(unitID)
+end
+
+local function IsMoving()
+	local speed = select(4, spGetUnitVelocity(unitID))
+	floating = false
+	if speed <= 0.05 then
+		return false
+	end
+	local x, y, z = spGetUnitPosition(unitID)
+	if y > -2 then
+		return true
+	end
+	-- Deploy if floating somewhere in the water.
+	floating = (spGetGroundHeight(x, z) + 2 > y)
+	return floating
 end
 
 local function CheckMoving()
 	while true do
-		local speed = select(4,spGetUnitVelocity(unitID))
 		if moving then
-			if speed <= 0.05 then
+			if not IsMoving() then
 				StopMoving()
 			end
 		else
-			if speed > 0.05 then
+			if IsMoving()  then
 				StartMoving()
 			end
 		end
 		Sleep(33)
+	end
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
+local function WeaponRangeUpdate()
+	while true do
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		if height < -20 then
+			Spring.SetUnitWeaponState(unitID, 2, {range = 550 - height})
+			Spring.SetUnitMaxRange(unitID, 550 - height)
+		else
+			Spring.SetUnitWeaponState(unitID, 2, {range = 600})
+			Spring.SetUnitMaxRange(unitID, 600)
+		end
+		Sleep(500)
 	end
 end
 
@@ -248,7 +408,11 @@ function script.Create()
 	StartThread(SetDeploy, true)
 	StartThread(CheckMoving)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(WeaponRangeUpdate)
 end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 
 local function RestoreAfterDelay()
 	Sleep(2750)
@@ -287,7 +451,7 @@ function script.AimWeapon(num, heading, pitch)
 			return true
 		end
 	elseif num == 2 then
-		--GG.Floating_AimWeapon(unitID)
+		GG.Floating_AimWeapon(unitID)
 		return false
 	end
 end
@@ -297,12 +461,12 @@ local function recoil()
 		EmitSfx(lflare, 1024)
 		EmitSfx(lflare, 1025)
 		Move(lbarrel, z_axis, -2)
-		Move(lbarrel, z_axis, GUN_DEPLOY_DIST, 3)
+		Move(lbarrel, z_axis, GUN_DEPLOY_DIST, 4.2)
 	else
 		EmitSfx(rflare, 1024)
 		EmitSfx(rflare, 1025)
 		Move(rbarrel, z_axis, -2)
-		Move(rbarrel, z_axis, GUN_DEPLOY_DIST, 3)
+		Move(rbarrel, z_axis, GUN_DEPLOY_DIST, 4.2)
 	end
 end
 
@@ -312,15 +476,19 @@ end
 
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/350
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 141.1, 30 * distMult, false, false, true)
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 120 * distMult, false, false, true)
 	end
 	return false
 end
 
+
 function script.EndBurst()
 	gun = not gun
 end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

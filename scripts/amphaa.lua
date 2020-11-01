@@ -66,7 +66,7 @@ end
 
 local function FloatBubbles()
 	--[[
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
 		--EmitSfx(vent, SFX.BUBBLE)
@@ -93,7 +93,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 		--StartThread(FloatBubbles)
 
 	Turn(lthigh,x_axis, math.rad(30), math.rad(240))
@@ -142,7 +142,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lcalf,x_axis, math.rad(-55-20), math.rad(50))
 	Turn(lfoot,x_axis, math.rad(80+20), math.rad(50))
@@ -186,7 +186,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
 	Turn(rcalf, x_axis, 0, math.rad(120)*PACE)
