@@ -5,7 +5,7 @@ local ignoreweapon =
 	armaas = {1},
 	armraz = {2},
 	
-	shieldriot = {1, 3},
+	shieldriot = {1,3},
 	coraak = {1},
 	coramph = {2},
 }
