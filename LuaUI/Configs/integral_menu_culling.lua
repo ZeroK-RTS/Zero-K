@@ -19,7 +19,6 @@ local configList = {
 	{cmdID = CMD_FIND_PAD              , default = true, name = "Resupply"},
 	{cmdID = CMD.RESURRECT             , default = true, name = "Resurrect"},
 	{cmdID = CMD.UNLOAD_UNITS          , default = true, name = "Unload"},
-	--{cmdId = CMD.EXCLUDEAIRPAD		   , default = true, name = "Exclude"},
 	
 	{label = "Advanced Commands (hidden by default)"},
 	{cmdID = CMD.AREA_ATTACK           , default = false, name = "Area Attack"},
@@ -28,6 +27,7 @@ local configList = {
 	{cmdID = CMD_AREA_GUARD            , default = false, name = "Guard"},
 	{cmdID = CMD_UNIT_SET_TARGET_CIRCLE, default = false, name = "Set Target"},
 	{cmdID = CMD.WAIT                  , default = false, name = "Wait"},
+	{cmdID = CMD_EXCLUDEAIRPAD		   , default = false, name = "Exclude Airpad"},
 	
 	{label = "Basic States"},
 	{cmdID = CMD_WANT_ONOFF            , state = true, default = true, name = "Activation"},
