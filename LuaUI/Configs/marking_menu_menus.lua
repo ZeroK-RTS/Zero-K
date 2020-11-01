@@ -5,9 +5,9 @@ local menu_chickenbroodqueen = include("Configs/marking_menu_menu_chickenbroodqu
 
 
 local menu_use = {
-	athena = menu_athena,
-	striderhub = menu_striderhub,
-	chickenbroodqueen = menu_chickenbroodqueen,
+  athena = menu_athena,
+  striderhub = menu_striderhub,
+  chickenbroodqueen = menu_chickenbroodqueen,
 }
 
 for name,udef in pairs(UnitDefNames) do

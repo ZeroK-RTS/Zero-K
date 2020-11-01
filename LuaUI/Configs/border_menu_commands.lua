@@ -20,11 +20,11 @@ local buildoptions = {
 
 	{-- factories
 		-- basic
-		{ "factorycloak", notSea = true },
-		{ "factoryveh", notSea = true },
-		{ "factoryspider",  notSea = true },
+		{ "factorycloak", notSea=true },
+		{ "factoryveh", notSea=true },
+		{ "factoryspider",  notSea=true },
 
-		{ "factoryship",  sea = true },
+		{ "factoryship",  sea=true },
 
 		-- support both
 		{ "factoryamph" },
@@ -33,22 +33,22 @@ local buildoptions = {
 		{ "factoryplane" },
 
 		-- support land-only
-		{ "factoryshield",  notSea = true },
-		{ "factoryjump",  notSea = true },
-		{ "factorytank",  notSea = true },
+		{ "factoryshield",  notSea=true },
+		{ "factoryjump",  notSea=true },
+		{ "factorytank",  notSea=true },
 		
 		-- plates
-		{ "platecloak", notSea = true },
-		{ "plateveh", notSea = true },
-		{ "platespider",  notSea = true },
-		{ "plateship",  sea = true },
+		{ "platecloak", notSea=true },
+		{ "plateveh", notSea=true },
+		{ "platespider",  notSea=true },
+		{ "plateship",  sea=true },
 		{ "plateamph" },
 		{ "platehover" },
 		{ "plategunship" },
 		{ "plateplane" },
-		{ "plateshield",  notSea = true },
-		{ "platejump",  notSea = true },
-		{ "platetank",  notSea = true },
+		{ "plateshield",  notSea=true },
+		{ "platejump",  notSea=true },
+		{ "platetank",  notSea=true },
 		
 		{ "striderhub" },
 	},
@@ -57,31 +57,31 @@ local buildoptions = {
 		-- common
 		{ "staticmex" },
 		{ "energywind" },-- wind
-		{ "energysolar",  notSea = true },
+		{ "energysolar",  notSea=true },
 		{ "staticcon" },-- caretaker
-		{ "energygeo",  notSea = true },
+		{ "energygeo",  notSea=true },
 		{ "staticrearm" },-- repair pad
 
 		-- adv
-		{ "energypylon",  tech = 2 },-- pylon
-		{ "staticstorage",  tech = 2 },-- storage
-		{ "energyfusion",  tech = 2 },
-		{ "energysingu",  tech = 2 },-- singularity
+		{ "energypylon",  tech=2 },-- pylon
+		{ "staticstorage",  tech=2 },-- storage
+		{ "energyfusion",  tech=2 },
+		{ "energysingu",  tech=2 },-- singularity
 	},
 
 
 	{-- point_defense
-		{ "turretlaser",  notSea = true },
-		{ "turretemp",  notSea = true },-- Faraday
-		{ "turrettorp",  notLand = true },-- you can build it on land, but torpedoes are only useful around water.
+		{ "turretlaser",  notSea=true },
+		{ "turretemp",  notSea=true },-- Faraday
+		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
 		{ "turretriot" },-- Stardust
-		{ "turretimpulse",  notSea = true },-- newton
-		{ "turretgauss",  notSea = true },-- Popup gauss
-		{ "turretheavylaser",  tech = 2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
-		{ "turretheavy",  tech = 2, notSea = true },
-		{ "turretantiheavy",  tech = 3, notSea = true },
-		{ "staticarty",  tech = 3, notSea = true },
-		{ "staticantinuke",  tech = 3, notSea = true },-- Antinuke
+		{ "turretimpulse",  notSea=true },-- newton
+		{ "turretgauss",  notSea=true },-- Popup gauss
+		{ "turretheavylaser",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
+		{ "turretheavy",  tech=2, notSea=true },
+		{ "turretantiheavy",  tech=3, notSea=true },
+		{ "staticarty",  tech=3, notSea=true },
+		{ "staticantinuke",  tech=3, notSea=true },-- Antinuke
 	},
 
 	{-- air_defense
@@ -90,30 +90,30 @@ local buildoptions = {
 		{ "turretaaclose" },-- hacksaw
 		{ "turretaaflak" },
 
-		{ "turretaafar",  tech = 2 },-- chainsaw
-		{ "turretaaheavy",  tech = 3 },
+		{ "turretaafar",  tech=2 },-- chainsaw
+		{ "turretaaheavy",  tech=3 },
 	},
 
 	{-- special
 		{ "staticradar" },
-		{ "staticheavyradar",  tech = 2 },
-		{ "staticshield",  tech = 2 },-- Aegis
-		{ "staticjammer",  tech = 2 },-- Cornea
-		{ "staticmissilesilo",  tech = 2 },
-		{ CMD_RAMP,  tech = 3 },
-		{ CMD_LEVEL,  tech = 3 },
-		{ CMD_RAISE,  tech = 3 },
-		{ CMD_SMOOTH,  tech = 3 },
-		{ CMD_RESTORE,  tech = 3 },
-		{ CMD_BUMPY,  tech = 3 },
-		{ "staticheavyarty",  tech = 3, notSea = true },
-		{ "staticnuke",  tech = 3, notSea = true },-- Nuke
+		{ "staticheavyradar",  tech=2 },
+		{ "staticshield",  tech=2 },-- Aegis
+		{ "staticjammer",  tech=2 },-- Cornea
+		{ "staticmissilesilo",  tech=2 },
+		{ CMD_RAMP,  tech=3 },
+		{ CMD_LEVEL,  tech=3 },
+		{ CMD_RAISE,  tech=3 },
+		{ CMD_SMOOTH,  tech=3 },
+		{ CMD_RESTORE,  tech=3 },
+		{ CMD_BUMPY,  tech=3 },
+		{ "staticheavyarty",  tech=3, notSea=true },
+		{ "staticnuke",  tech=3, notSea=true },-- Nuke
 	},
 
 	{-- super
-		{ "zenith",  tech = 4, notSea = true },
-		{ "raveparty",  tech = 4, notSea = true },
-		{ "mahlazer",  tech = 4, notSea = true },
+		{ "zenith",  tech=4, notSea=true },
+		{ "raveparty",  tech=4, notSea=true },
+		{ "mahlazer",  tech=4, notSea=true },
 	},
 }
 
@@ -140,25 +140,25 @@ if true then
 			if udef then
 				if not unit.tech or unit.tech == 1 then
 					if not unit.notLand then
-						land = land + 1
-						land_commands[-udef.id] = { order = land }
+						land=land+1
+						land_commands[-udef.id] = { order=land }
 					end
 					if not unit.notSea then
-						sea = sea + 1
-						sea_commands[-udef.id] = { order = sea }
+						sea=sea+1
+						sea_commands[-udef.id] = { order=sea }
 					end
 				elseif unit.tech == 2 then
 					if not unit.notLand then
-						advland = advland + 1
+						advland=advland+1
 						advland_commands[-udef.id] = { order=advland }
 					end
 					if not unit.notSea then
-						advsea = advsea + 1
-						advsea_commands[-udef.id] = { order = advsea }
+						advsea=advsea+1
+						advsea_commands[-udef.id] = { order=advsea }
 					end
 				elseif unit.tech == 3 or unit.tech == 4 then-- in the same list, because we have only a few special units.
-						special = special + 1
-					special_commands[-udef.id] = { order = special }
+						special=special+1
+					special_commands[-udef.id] = { order=special }
 				end
 			end
 		end
@@ -277,84 +277,84 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 
 	--SPRING COMMANDS
 
-	selfd = 1,
-	attack = 1,
-	stop = 1,
-	fight = 1,
-	guard = 1,
-	move = 1,
-	patrol = 1,
-	wait = 1,
-	repair = 1,
-	reclaim = 1,
-	resurrect = 1,
-	manualfire = 1,
-	loadunits = 1,
-	unloadunits = 1,
-	areaattack = 1,
+	selfd=1,
+	attack=1,
+	stop=1,
+	fight=1,
+	guard=1,
+	move=1,
+	patrol=1,
+	wait=1,
+	repair=1,
+	reclaim=1,
+	resurrect=1,
+	manualfire=1,
+	loadunits=1,
+	unloadunits=1,
+	areaattack=1,
 
-	rawmove = 1,
+	rawmove=1,
 
 	-- states
-	wantonoff = 2,
-	['repeat'] = 2,
-	cloak = 2,
-	movestate = 2,
-	firestate = 2,
-	idlemode = 2,
-	autorepairlevel = 2,
+	wantonoff=2,
+	['repeat']=2,
+	cloak=2,
+	movestate=2,
+	firestate=2,
+	idlemode=2,
+	autorepairlevel=2,
 
 
 	--CUSTOM COMMANDS
 
-	sethaven = 1,
-	--build = 1,
-	areamex = 1,
-	disembark = 1,
-	mine = 1,
-	build = 1,
-	jump = 1,
-	find_pad = 1,
-	embark = 1,
-	oneclickwep = 1,
-	settarget = 1,
-	canceltarget = 1,
-	setferry = 1,
-	radialmenu = 1,
-	placebeacon = 1,
-	evacuate = 1,
+	sethaven=1,
+	--build=1,
+	areamex=1,
+	disembark=1,
+	mine=1,
+	build=1,
+	jump=1,
+	find_pad=1,
+	embark=1,
+	oneclickwep=1,
+	settarget=1,
+	canceltarget=1,
+	setferry=1,
+	radialmenu=1,
+	placebeacon=1,
+	evacuate=1,
 
 	-- terraform
-	rampground = 1,
-	levelground = 1,
-	raiseground = 1,
-	smoothground = 1,
-	restoreground = 1,
-	--terraform_internal = 1,
+	rampground=1,
+	levelground=1,
+	raiseground=1,
+	smoothground=1,
+	restoreground=1,
+	--terraform_internal=1,
 
-	resetfire = 1,
-	resetmove = 1,
+	resetfire=1,
+	resetmove=1,
 
 	--states
---	stealth = 2, --no longer applicable
-	cloak_shield = 2,
-	retreat = 2,
-	['luaui noretreat'] = 2,
-	priority = 2,
-	ap_fly_state = 2,
-	ap_autorepairlevel = 2,
-	floatstate = 2,
-	dontfireatradar = 2,
-	antinukezone = 2,
-	unitai = 2,
-	unit_kill_subordinates = 2,
-	goostate = 1,
-	disableattack = 2,
-	pushpull = 2,
-	autoassist = 2,
-	autocalltransport = 2,
-	airstrafe = 2,
-	divestate = 2,
+--	stealth=2, --no longer applicable
+	cloak_shield=2,
+	retreat=2,
+	['luaui noretreat']=2,
+	priority=2,
+	ap_fly_state=2,
+	ap_autorepairlevel=2,
+	floatstate=2,
+	dontfireatradar=2,
+	antinukezone=2,
+	unitai=2,
+	unit_kill_subordinates=2,
+	goostate=1,
+	disableattack=2,
+	pushpull=2,
+	autoassist=2,
+	autocalltransport=2,
+	airstrafe=2,
+	divestate=2,
 	selection_rank = 2,
 }
 

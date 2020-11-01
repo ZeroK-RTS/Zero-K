@@ -53,7 +53,7 @@ local colorModule = "\255\128\128\255"
 local function WriteTooltip(profileID)
 	local commData = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 	local str = ''
-	for i=1, #commData.modules do
+	for i=1,#commData.modules do
 		str = str .. "\nLEVEL "..(i + 1) .. "\n\tModules:"	-- TODO calculate metal cost
 		for j, modulename in pairs(commData.modules[i]) do
 			if moduleDefNames[modulename] then
@@ -99,7 +99,7 @@ end
 local i = 0
 for i = 1, numComms do
 	local option = GetCommSelectTemplate(i, commDataOrdered[i])
-	optionData[#optionData + 1] = option
+	optionData[#optionData+1] = option
 end
 
 
