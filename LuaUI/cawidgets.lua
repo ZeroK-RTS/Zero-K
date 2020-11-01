@@ -15,6 +15,7 @@
 --------------------------------------------------------------------------------
 
 local ignorelist = {count = 0, ignorees = {} } -- Ignore workaround for WG table.
+local playerstate = {} -- for PlayerChangedTeam, PlayerResigned
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
@@ -150,6 +151,8 @@ widgetHandler = {
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
+	'PlayerChangedTeam',
+	'PlayerResigned',
 	'GameOver',
 	'GamePaused',
 	'GameFrame',
@@ -238,6 +241,8 @@ for _, ci in ipairs(reverseCallIns) do
 end
 
 local callInLists = {
+	'PlayerChangedTeam',
+	'PlayerResigned',
 	'GamePreload',
 	'GameStart',
 	'Shutdown',
@@ -433,10 +438,24 @@ end
 --------------------------------------------------------------------------------
 
 function widgetHandler:Initialize()
+	local gaia = Spring.GetGaiaTeamID()
+	local allyteamlist = Spring.GetAllyTeamList()
+	for a = 1, #allyteamlist do
+		local teamlist = Spring.GetTeamList(allyteamlist[a])
+		for t = 1, #teamlist do
+			if teamlist[t] ~= gaia then
+				local playerlist = Spring.GetPlayerList(teamlist[t])
+				for p = 1, #playerlist do
+					local _, _, spectator = Spring.GetPlayerInfo(playerlist[p])
+					playerstate[playerlist[p]] = {team = teamlist[t], spectator = spectator}
+				end
+			end
+		end
+	end
 	-- Add ignorelist --
-	Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
+	--Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
 	local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), true))
-	Spring.Echo("Spring.GetMyPlayerID() done", customkeys)
+	--Spring.Echo("Spring.GetMyPlayerID() done", customkeys)
 	if customkeys["ignored"] then
 		if string.find(customkeys["ignored"], ",") then
 			local newignorelist = string.gsub(customkeys["ignored"], ",", " ")
@@ -664,17 +683,17 @@ function widgetHandler:NewWidget()
 		end
 	end
 	wh.Ignore = function (_, name) 
-		if not ignorelist.ignorees[name] then 
+		if not ignorelist.ignorees[name] then
 			ignorelist.ignorees[name] = true
-			ignorelist.count = ignorelist.count + 1 
+			ignorelist.count = ignorelist.count + 1
 		end
 	end
 	wh.Unignore = function (_, name) 
 		ignorelist.ignorees[name] = nil
-		ignorelist.count = ignorelist.count - 1 
+		ignorelist.count = ignorelist.count - 1
 	end
 	
-	wh.GetIgnoreList = function (_) 
+	wh.GetIgnoreList = function (_)
 		return ignorelist["ignorees"], ignorelist.count
 	end
 
@@ -1996,6 +2015,19 @@ end
 
 function widgetHandler:PlayerChanged(playerID) --when player Change from Spectator to Player or Player to Spectator.
 	MessageProcessor:UpdatePlayer(playerID)
+	local _, _, spectator, teamID, _ = Spring.GetPlayerInfo(playerID)
+	if spectator ~= playerstate[playerID].spectator and spectator then
+		for _, w in r_ipairs(self.PlayerResignedList) do
+			w:PlayerResigned(playerID)
+		end
+	end
+	if teamID ~= playerstate[playerID].team and not spectator then
+		for _, w in r_ipairs(self.PlayerChangedTeamList) do
+			w:PlayerChangedTeam(playerID,playerstate[playerID].team,teamID)
+		end
+	end
+	playerstate[playerID].spectator = spectator
+	playerstate[playerID].team = teamID
 	for _, w in r_ipairs(self.PlayerChangedList) do
 		w:PlayerChanged(playerID)
 	end
