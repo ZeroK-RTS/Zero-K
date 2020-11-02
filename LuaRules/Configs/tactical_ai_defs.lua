@@ -1292,7 +1292,7 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 75,
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
-		wardFireRange = 425,
+		wardFireRange = 445,
 		wardFireHeight = 20,
 	},
 	{
