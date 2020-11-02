@@ -181,7 +181,7 @@ function script.BlockShot(num, targetID)
 	if num == 2 then
 		local tx, ty, tz = Spring.GetUnitPosition(targetID)
 		local gy = Spring.GetGroundHeight(tx, tz)
-		if ty - gy > 15 and gy > -10 then -- is in the air
+		if ty - gy > 5 and gy > -5 then -- is in the air
 			return false
 		end
 		FakeWeaponShoot(targetID)
