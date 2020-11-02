@@ -25,27 +25,27 @@ end
 local GetHiddenTeamRulesParam = Spring.Utilities.GetHiddenTeamRulesParam
 
 local buttongroups = {
-	{"Economy", {
-		{"metalProduced"   , "Metal Produced", "Cumulative total of metal produced."},
-		{"metalUsed"       , "Metal Used", "Cumulative total of metal used."},
-		{"metal_income"    , "Metal Income", "Total metal income."},
-		{"metal_overdrive" , "Metal Overdrive", "Cumulative total of metal produced by overdrive."},
-		{"metal_reclaim"   , "Metal Reclaimed", "Cumulative total of metal reclaimed. Includes wreckage, unit reclaim and construction cancellation."},
-		{"metal_excess"    , "Metal Excess", "Cumulative total of metal lost to excess."},
-		{"energy_income"   , "Energy Income", "Total energy income."},
+	{WG.Translate("interface", "graph_economy_section"), {
+		{"metalProduced"   , WG.Translate("interface", "graph_metal_produced"), WG.Translate("interface", "graph_metal_produced_tooltip")},
+		{"metalUsed"       , WG.Translate("interface", "graph_metal_used"), WG.Translate("interface", "graph_metal_used_tooltip")},
+		{"metal_income"    , WG.Translate("interface", "graph_metal_income"), WG.Translate("interface", "graph_metal_income_tooltip")},
+		{"metal_overdrive" , WG.Translate("interface", "graph_metal_overdrive"), WG.Translate("interface", "graph_metal_overdrive_tooltip")},
+		{"metal_reclaim"   , WG.Translate("interface", "graph_metal_reclaimed"), WG.Translate("interface", "graph_metal_reclaimed_tooltip")},
+		{"metal_excess"    , WG.Translate("interface", "graph_metal_excess"), WG.Translate("interface", "graph_metal_excess_tooltip")},
+		{"energy_income"   , WG.Translate("interface", "graph_energy_income"), WG.Translate("interface", "graph_energy_income_tooltip")},
 		},
 	},
 
-	{"Units", {
-		{"unit_value"      , "Total Value", "Total value of units and structures."},
-		{"unit_value_army" , "Army Value", "Value of mobile units excluding constructors, commanders, Iris, Owl, Djinn, Charon and Hercules."},
-		{"unit_value_def"  , "Defense Value", "Value of armed structures (and shields) with range up to and including Cerberus and Artemis."},
-		{"unit_value_econ" , "Economy Value", "Value of economic structures, factories and constructors."},
-		{"unit_value_other", "Other Value", "Value of units and structures that do not fit any other category."},
-		{"unit_value_killed", "Value Killed", "Cumulative total of value of enemy units and structured destroyed by the team. Includes nanoframes."},
-		{"unit_value_lost" , "Value Lost", "Cumulative total of value of the teams destroyed units and structures. Includes nanoframes."},
-		{"damage_dealt"    , "Damage Dealt", "Cumulative damage inflicted measured by the cost of the damaged unit in proportion to damage dealt."},
-		{"damage_received" , "Damage Received", "Cumulative damage received measured by the cost of the damaged unit in proportion to damage dealt."},
+	{WG.Translate("interface", "graph_unit_section"), {
+		{"unit_value"      , WG.Translate("interface", "graph_total_value"), WG.Translate("interface", "graph_total_value_tooltip")},
+		{"unit_value_army" , WG.Translate("interface", "graph_army_value"), WG.Translate("interface", "graph_army_value_tooltip")},
+		{"unit_value_def"  , WG.Translate("interface", "graph_defence_value"), WG.Translate("interface", "graph_defence_value_tooltip")},
+		{"unit_value_econ" , WG.Translate("interface", "graph_economy_value"), WG.Translate("interface", "graph_economy_value_tooltip")},
+		{"unit_value_other", WG.Translate("interface", "graph_other_value"), WG.Translate("interface", "graph_other_value_tooltip")},
+		{"unit_value_killed", WG.Translate("interface", "graph_killed_value"), WG.Translate("interface", "graph_killed_value_tooltip")},
+		{"unit_value_lost" , WG.Translate("interface", "graph_lost_value"), WG.Translate("interface", "graph_lost_value_tooltip")},
+		{"damage_dealt"    , WG.Translate("interface", "graph_dmg_dealt"), WG.Translate("interface", "graph_dmg_dealt_tooltip")},
+		{"damage_received" , WG.Translate("interface", "graph_dmg_received"), WG.Translate("interface", "graph_dmg_received_tooltip")},
 		},
 	},
 }

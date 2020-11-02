@@ -41,7 +41,7 @@ local function GetGridTooltip(unitID)
 	local gridMaximum = Spring.GetUnitRulesParam(unitID, "OD_gridMaximum") or 0
 	local gridMetal = Spring.GetUnitRulesParam(unitID, "OD_gridMetal") or 0
 
-	return WG.Translate("interface", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
+	return WG.Translate("interface", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " " .. WG.Translate("interface", "energy_oneletter") .. " => " .. math.round(gridMetal,2) .. " " .. WG.Translate("interface", "metal_oneletter") .. " " .. windStr
 end
 
 local function GetMexTooltip(unitID)

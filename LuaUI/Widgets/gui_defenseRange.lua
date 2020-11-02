@@ -216,59 +216,59 @@ local function OnOptChange(self)
 end
 
 options = {
-	label = { type = 'label', name = 'Defense Ranges' },
+	label = { type = 'label', name = WG.Translate("interface", "defences_range") },
 	allyground = {
-		name = 'Show Ally Ground Defence',
+		name = WG.Translate("interface", "defence_range_ally_ground"),
 		type = 'bool',
 		value = false,
 	},
 	allyair = {
-		name = 'Show Ally Air Defence',
+		name = WG.Translate("interface", "defence_range_ally_air"),
 		type = 'bool',
 		value = false,
 	},
 	allynuke = {
-		name = 'Show Ally Nuke Defence',
+		name = WG.Translate("interface", "defence_range_ally_nuke"),
 		type = 'bool',
 		value = true,
 	},
 	enemyground = {
-		name = 'Show Enemy Ground Defence',
+		name = WG.Translate("interface", "defence_range_enemy_ground"),
 		type = 'bool',
 		value = true,
 	},
 	enemyair = {
-		name = 'Show Enemy Air Defence',
+		name = WG.Translate("interface", "defence_range_enemy_air"),
 		type = 'bool',
 		value = true,
 	},
 	enemynuke = {
-		name = 'Show Enemy Nuke Defence',
+		name = WG.Translate("interface", "defence_range_enemy_nuke_defence"),
 		type = 'bool',
 		value = true,
 	},
 	enemyshield = {
-		name = 'Show Enemy Shields',
+		name = WG.Translate("interface", "defence_range_enemy_shields"),
 		type = 'bool',
 		value = true,
 	},
 	enemyradar = {
-		name = 'Show Enemy Radar Coverage',
+		name = WG.Translate("interface", "defence_range_enemy_radar"),
 		type = 'bool',
 		value = false,
 	},
 	specground = {
-		name = 'Show Ground Defence as Spectator',
+		name = WG.Translate("interface", "defence_range_spec"),
 		type = 'bool',
 		value = false,
 	},
 	specair = {
-		name = 'Show Air Defence as Spectator',
+		name = WG.Translate("interface", "defence_range_spec_air"),
 		type = 'bool',
 		value = false,
 	},
 	specnuke = {
-		name = 'Show Nuke Defence as Spectator',
+		name = WG.Translate("interface", "defence_range_spec_nuke"),
 		type = 'bool',
 		value = true,
 	},
