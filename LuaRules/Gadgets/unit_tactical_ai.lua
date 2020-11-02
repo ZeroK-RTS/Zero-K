@@ -577,7 +577,11 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	-- Calculate predicted enemy distance
 	local predictedDist = eDist
 	if predProj > 0 then
-		predictedDist = predictedDist*predProj
+		if behaviour.velPredChaseFactor and predProj > 1 then
+			predictedDist = predictedDist*((predProj - 1)*behaviour.velPredChaseFactor + 1)
+		else
+			predictedDist = predictedDist*predProj
+		end
 	else
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
@@ -600,6 +604,16 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			if reloadFrames > 0 then
 				skirmRange = skirmRange + reloadFrames*behaviour.reloadSkirmLeeway
 			end
+		end
+	end
+	
+	if enemyUnitDef and behaviour.bonusRangeUnits and behaviour.bonusRangeUnits[enemyUnitDef] then
+		local oldSkirmRange = skirmRange
+		skirmRange = skirmRange + behaviour.bonusRangeUnits[enemyUnitDef]
+		if behaviour.wardFireRange and skirmRange > predictedDist and predictedDist > oldSkirmRange then
+			local tx, tz = ux + behaviour.wardFireRange*ex/eDist, uz + behaviour.wardFireRange*ez/eDist
+			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
+			GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, 40)
 		end
 	end
 	

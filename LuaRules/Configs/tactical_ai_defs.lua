@@ -361,6 +361,15 @@ longRangeSkirmieeArray        = Union(longRangeSkirmieeArray, medRangeSkirmieeAr
 artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
 
 ---------------------------------------------------------------------------
+-- Personal shield draining
+---------------------------------------------------------------------------
+
+local personalShieldUnits = {
+	[UnitDefNames["shieldassault"].id] = 80,
+	[UnitDefNames["shieldfelon"].id] = 130,
+}
+
+---------------------------------------------------------------------------
 -- Explosion avoidance
 ---------------------------------------------------------------------------
 
@@ -479,6 +488,10 @@ local subfleeables = NameToDefID({
 -- Some short ranged units dive everything that they don't skirm or swarm.
 local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lowRangeSwarmieeArray)
 
+---------------------------------------------------------------------------
+-- Unit tables
+---------------------------------------------------------------------------
+
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
 -- floatWaterline (defalts to false): Use ground height instead of unit height for waterline check
 -- sea: table of behaviour for sea. Note that these tables are optional.
@@ -498,12 +511,16 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
 -- skirmKeepOrder (defaults to false): If true the unit does not clear its move order when too far away from the unit it is skirming.
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
+-- velPredChaseFactor (from 0 to 1, default false): values closer to 0 reduce the degree to which units use velocityPrediction to chase units running away.
 -- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
 -- reloadSkirmLeeway (defaults to false): Increase skirm range by reloadSkirmLeeway*remainingReloadFrames when reloading.
 -- skirmBlockedApproachOnFight (defaults to false): Applies skirmBlockedApproachFrames to all commands.
 -- skirmBlockedApproachFrames (defaults to false): Stop skirming after this many frames of being fully reloaded if not set to attack move.
 -- skirmBlockApproachHeadingBlock (defaults to false): Blocks the effect of skirmBlockedApproachFrames if the dot product of enemyVector and unitFacing exceeds skirmBlockApproachHeadingBlock.
 -- avoidHeightDiff (default in config): A table of targets that are not skirmed if they are too far above or below the unit.
+-- bonusRangeUnits: a map indexed by unitDefID of extra skirm range against particular units.
+-- wardFireRange (defaults to false): Range at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
+-- wardFireHeight (defaults to false): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -1234,7 +1251,11 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 10,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 75,
+		velPredChaseFactor = 0.5,
+		bonusRangeUnits = personalShieldUnits,
+		wardFireRange = 425,
+		wardFireHeight = 20,
 	},
 	{
 		name = "jumpskirm",
@@ -1267,7 +1288,11 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 10,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 75,
+		velPredChaseFactor = 0.5,
+		bonusRangeUnits = personalShieldUnits,
+		wardFireRange = 425,
+		wardFireHeight = 20,
 	},
 	{
 		name = "hoverskirm",

@@ -148,6 +148,10 @@ local function IsValidTargetBasedOnAllyTeam(targetID, myAllyTeamID)
 end
 
 local function setTarget(data, sendToWidget)
+	if data.lingerOnly then
+		clearTarget(data.id)
+		return false
+	end
 	if spValidUnitID(data.id) then
 		if not data.targetID then
 			if locationInRange(data.id, data.unitDefID, data.x, data.y, data.z) then
@@ -195,9 +199,17 @@ end
 --------------------------------------------------------------------------------
 -- Unit adding/removal
 
+local function addUnitRaw(unitID, data)
+	if spValidUnitID(unitID) then
+		unit.count = unit.count + 1
+		unit.data[unit.count] = data
+		unitById[unitID] = unit.count
+	end
+end
+
 local function addUnit(unitID, data)
 	if spValidUnitID(unitID) then
-		-- clear current traget
+		-- clear current target
 		clearTarget(unitID)
 		if setTarget(data, true) then
 			if unitById[unitID] then
@@ -253,7 +265,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		spInsertUnitCmdDesc(unitID, unitSetTargetCircleCmdDesc)
 		spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
 	end
-	
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
@@ -329,7 +340,6 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
 		if validUnits[unitDefID] then
 			if #cmdParams == 6 then
@@ -454,6 +464,21 @@ function GG.SetUnitTarget(unitID, targetID)
 	end
 end
 
+function GG.SetTemporaryPosTarget(unitID, tx, ty, tz, userCommand, lingerTime)
+	--Spring.MarkerAddPoint(tx, ty, tz, "")
+	Spring.SetUnitTarget(unitID, tx, ty, tz, false, userCommand)
+	if unitById[unitID] then
+		unit.data[unitById[unitID]].tempFrame = Spring.GetGameFrame() + lingerTime
+		return
+	end
+	
+	addUnitRaw(unitID, {
+		id = unitID,
+		lingerOnly = true,
+		tempFrame = Spring.GetGameFrame() + lingerTime,
+	})
+end
+
 --------------------------------------------------------------------------------
 -- Target update
 
@@ -464,7 +489,10 @@ function gadget:GameFrame(n)
 
 		local toRemove = {count = 0, data = {}}
 		for i = 1, unit.count do
-			if not setTarget(unit.data[i], false) then
+			if unit.data[i].lingerFrame and unit.data[i].tempFrame < n then
+				unit.data[i].tempFrame = nil
+			end
+			if not (unit.data[i].tempFrame or setTarget(unit.data[i], false)) then
 				toRemove.count = toRemove.count + 1
 				toRemove.data[toRemove.count] = unit.data[i].id
 			end
@@ -487,5 +515,4 @@ function gadget:GameFrame(n)
 			removeUnit(toRemove.data[i])
 		end
 	end
-	
 end
