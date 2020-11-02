@@ -29,7 +29,7 @@ return { striderdetriment = {
     jump_from_midair   = 1,
     jump_rotate_midair = 1,		
     modelradius    = [[95]],
-    extradrawrange = 700, -- Huh? This just adds an extra range that doesn't work.
+    extradrawrange = 700,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],
@@ -322,7 +322,7 @@ return { striderdetriment = {
       interceptedByShieldType = 1,
       lodDistance             = 10000,
       range                   = 900,
-      reloadtime              = 0.1,	  
+      reloadtime              = 30,	  
       rgbColor                = [[1 0 0]],
       soundHit           	  = "explosion/mini_nuke",
       soundStart              = [[weapon/laser/heavylaser_fire]],
