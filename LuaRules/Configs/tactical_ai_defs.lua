@@ -365,8 +365,8 @@ artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeA
 ---------------------------------------------------------------------------
 
 local personalShieldUnits = {
-	[UnitDefNames["shieldassault"].id] = 80,
-	[UnitDefNames["shieldfelon"].id] = 130,
+	[UnitDefNames["shieldassault"].id] = 70,
+	[UnitDefNames["shieldfelon"].id] = 120,
 }
 
 ---------------------------------------------------------------------------
@@ -1251,7 +1251,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 10,
-		skirmBlockedApproachFrames = 75,
+		skirmBlockedApproachFrames = 90,
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
 		wardFireRange = 425,
@@ -1269,6 +1269,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 		skirmLeeway = 5,
 		skirmBlockedApproachFrames = 60,
+		velPredChaseFactor = 0.5,
 	},
 	{
 		name = "striderdante",
@@ -1342,7 +1343,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 20,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 90,
 	},
 	{
 		name = "shieldskirm",
@@ -1353,7 +1354,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 10,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 90,
 	},
 	{
 		name = "spiderskirm",
@@ -1364,7 +1365,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
 		skirmLeeway = 10,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 90,
 	},
 	{
 		name = "amphassault",
@@ -1375,7 +1376,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130,
 		skirmLeeway = 20,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 60,
 	},
 	{
 		name = "gunshipkrow",
@@ -1399,7 +1400,7 @@ local behaviourConfig = {
 		skirmLeeway = -5,
 		skirmOrderDis = 120,
 		velocityPrediction = 135,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 90,
 		skirmBlockApproachHeadingBlock = -0.3,
 	},
 	{
@@ -1413,7 +1414,7 @@ local behaviourConfig = {
 		skirmLeeway = 10,
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
-		skirmBlockedApproachFrames = 40,
+		skirmBlockedApproachFrames = 90,
 		skirmBlockApproachHeadingBlock = -0.2,
 	},
 	
@@ -1428,7 +1429,8 @@ local behaviourConfig = {
 		skirmOrderDis = 700,
 		skirmKeepOrder = true,
 		velocityPrediction = 10,
-		skirmOnlyNearEnemyRange = 80
+		skirmOnlyNearEnemyRange = 80,
+		velPredChaseFactor = 0.5,
 	},
 	
 	-- arty range skirms

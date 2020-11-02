@@ -570,6 +570,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	
 	local eDistSq = ex^2 + ey^2 + ez^2
 	local eDist = sqrt(eDistSq)
+	local bonusSkirmRange = enemyUnitDef and behaviour.bonusRangeUnits and behaviour.bonusRangeUnits[enemyUnitDef]
 	
 	-- Scalar projection of prediction vector onto enemy vector
 	local predProj = (ex*dx + ey*dy + ez*dz)/eDistSq
@@ -577,8 +578,14 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	-- Calculate predicted enemy distance
 	local predictedDist = eDist
 	if predProj > 0 then
-		if behaviour.velPredChaseFactor and predProj > 1 then
-			predictedDist = predictedDist*((predProj - 1)*behaviour.velPredChaseFactor + 1)
+		if predProj > 1 then
+			if bonusSkirmRange then
+				-- Do nothing as we really want to avoid this unit
+			elseif behaviour.velPredChaseFactor then
+				predictedDist = predictedDist*((predProj - 1)*behaviour.velPredChaseFactor + 1)
+			else
+				predictedDist = predictedDist*predProj
+			end
 		else
 			predictedDist = predictedDist*predProj
 		end
@@ -607,9 +614,9 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		end
 	end
 	
-	if enemyUnitDef and behaviour.bonusRangeUnits and behaviour.bonusRangeUnits[enemyUnitDef] then
+	if bonusSkirmRange then
 		local oldSkirmRange = skirmRange
-		skirmRange = skirmRange + behaviour.bonusRangeUnits[enemyUnitDef]
+		skirmRange = skirmRange + bonusSkirmRange
 		if behaviour.wardFireRange and skirmRange > predictedDist and predictedDist > oldSkirmRange then
 			local tx, tz = ux + behaviour.wardFireRange*ex/eDist, uz + behaviour.wardFireRange*ez/eDist
 			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
@@ -626,7 +633,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			end
 		end
 		
-		if (not doHug) and (behaviour.skirmBlockedApproachOnFight or not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
+		if (not doHug) and (not bonusSkirmRange) and (behaviour.skirmBlockedApproachOnFight or not haveFightAndHoldPos) and behaviour.skirmBlockedApproachFrames then
 			if not reloadFrames then
 				local reloadState = spGetUnitWeaponState(unitID, behaviour.weaponNum, 'reloadState')
 				if reloadState then
