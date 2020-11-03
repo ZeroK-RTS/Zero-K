@@ -216,22 +216,22 @@ function Suspension()
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 		if moving then
-			if speed <= 0.05 then
+			if speed <= 0.1 then
 				StopMoving()
 			end
 		else
-			if speed > 0.05 then
+			if speed > 0.1 then
 				StartMoving()
 			end
 		end
 
-		if speed > 0.05 then
+		if speed > 0.1 then
 			settleTimer = 0
 		elseif settleTimer < SETTLE_PERIODS then
 			settleTimer = settleTimer + 1
 		end
 		
-		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
+		if speed > 0.1 or (settleTimer < SETTLE_PERIODS) then
 			x,y,z = spGetUnitPosition(unitID)
 			height = spGetGroundHeight(x,z)
 			

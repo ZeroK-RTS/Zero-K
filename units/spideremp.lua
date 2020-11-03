@@ -83,7 +83,7 @@ return { spideremp = {
       },
 
       damage                  = {
-        default        = 40.01,
+        default        = 75.01,
       },
 
       duration                = 8,
@@ -95,9 +95,9 @@ return { spideremp = {
       intensity               = 12,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      paralyzeTime            = 3,
-      range                   = 240,
-      reloadtime              = 1.5,
+      paralyzeTime            = 1,
+      range                   = 250,
+      reloadtime              = 32/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

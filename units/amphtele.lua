@@ -11,9 +11,9 @@ return { amphtele = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
-  --collisionVolumeOffsets = [[0 1 0]],
-  --collisionVolumeScales  = [[36 49 35]],
-  --collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[36 49 36]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

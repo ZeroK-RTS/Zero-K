@@ -91,8 +91,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 25,
-        planes  = 25,
+        default = 23,
+        planes  = 23,
         subs    = 0.1,
       },
 
@@ -104,7 +104,7 @@ return { shieldriot = {
         timeslow_damagefactor = 3,
       },
 
-      edgeeffectiveness       = 1,
+      edgeeffectiveness       = 0.95,
       explosionGenerator      = [[custom:NONE]],
       explosionSpeed          = 12,
       impulseBoost            = 0,

@@ -16,6 +16,7 @@ return { factoryamph = {
     [[amphimpulse]],
     [[amphfloater]],
     [[amphriot]],
+    [[amphsupport]],
     [[amphassault]],
     [[amphlaunch]],
     [[amphaa]],

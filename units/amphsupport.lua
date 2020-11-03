@@ -1,17 +1,20 @@
 return { amphsupport = {
-  unitname               = [[amphsupport]],
+  unitname               = [[Bulkhead]],
   name                   = [[amphsupport]],
   description            = [[Deployable Amphibious Fire Support (must stop to fire)]],
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 2.4,
-  buildCostMetal         = 280,
+  buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[amphsupport.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
+  collisionVolumeOffsets = [[0 4 0]],
+  collisionVolumeScales  = [[38 50 38]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -28,11 +31,11 @@ return { amphsupport = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[vehiclesupport]],
+  iconType               = [[amphsupport]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1250,
+  maxDamage              = 1800,
   maxSlope               = 36,
   maxVelocity            = 1.7,
   minCloakDistance       = 75,
@@ -62,7 +65,7 @@ return { amphsupport = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1200,
+  turnRate               = 1000,
   upright                = false,
 
   weapons                = {
@@ -82,38 +85,37 @@ return { amphsupport = {
 
     CANNON = {
       name                    = [[Light Plasma Cannon]],
-      accuracy                = 220,
-      areaOfEffect            = 16,
+      accuracy                = 480,
+      areaOfEffect            = 40,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams        = {
         light_camera_height = 1400,
         light_color = [[0.80 0.54 0.23]],
-        light_radius = 200,
+        light_radius = 230,
       },
 
       damage                  = {
-        default = 150.1,
-        planes  = 150.1,
+        default = 165.1,
+        planes  = 165.1,
         subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.1,
-      explosionGenerator      = [[custom:MARY_SUE]],
-      impactOnly              = true,
+      explosionGenerator      = [[custom:INGEBORG]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity               = 0.09,
+      myGravity               = 0.12,
       noSelfDamage            = true,
       range                   = 600,
-      reloadtime              = 2,
+      reloadtime              = 1.8,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 270,
+      weaponVelocity          = 320,
     },
 
     FAKE_CANNON = {
@@ -125,13 +127,12 @@ return { amphsupport = {
       craterMult              = 2,
 
       customparams = {
-        timeslow_damagefactor = 1.7,
         bogus = 1,
       },
   
       damage                  = {
-        default = 150,
-        subs    = 7.5,
+        default = 170.1,
+        subs    = 8.5,
       },
 
       explosionGenerator      = [[custom:flashslowwithsparks]],
@@ -152,7 +153,7 @@ return { amphsupport = {
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 340,
+      weaponVelocity          = 380,
     },
 
   },
@@ -164,7 +165,7 @@ return { amphsupport = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[cormist_dead_new.s3o]],
+      object           = [[amphdeploy_dead.s3o]],
     },
 
     HEAP  = {

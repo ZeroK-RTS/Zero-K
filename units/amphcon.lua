@@ -19,6 +19,8 @@ return { amphcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    morphto        = [[amphtele]],
+    morphtime      = 20,
     amph_regen = 10,
     amph_submerged_at = 40,
   },

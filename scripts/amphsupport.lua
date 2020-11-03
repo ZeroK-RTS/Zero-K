@@ -56,7 +56,7 @@ local floating = false
 local deployed = false
 local gun = false
 
-local PACE = 1.8
+local PACE = 1.75
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ end
 local function IsMoving()
 	local speed = select(4, spGetUnitVelocity(unitID))
 	floating = false
-	if speed <= 0.05 then
+	if speed <= 0.1 then
 		return false
 	end
 	local x, y, z = spGetUnitPosition(unitID)
@@ -405,10 +405,15 @@ function script.Create()
 	Turn(raxel, x_axis, math.rad(-10))
 	Turn(laxel, x_axis, math.rad(-10))
 	moving = false
-	StartThread(SetDeploy, true)
+	
 	StartThread(CheckMoving)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(WeaponRangeUpdate)
+	
+	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
+	if not stunned_or_inbuild then
+		StartThread(SetDeploy, true)
+	end
 end
 
 --------------------------------------------------------------------------------------
@@ -477,7 +482,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 120 * distMult, false, false, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 180.1, 50 * distMult, false, false, true)
 	end
 	return false
 end
@@ -492,47 +497,28 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25 then
+	if severity <= 0.5 then
 		Explode(base, SFX.NONE)
 		Explode(head, SFX.NONE)
-		Explode(rthigh, SFX.NONE)
-		Explode(lthigh, SFX.NONE)
-		Explode(rcalf, SFX.NONE)
-		Explode(lcalf, SFX.NONE)
-		Explode(rfoot, SFX.NONE)
-		Explode(lfoot, SFX.NONE)
-		return 1
-	elseif severity <= .50 then
-		Explode(base, SFX.NONE)
-		Explode(head, SFX.NONE)
-		Explode(rthigh, SFX.NONE)
-		Explode(lthigh, SFX.NONE)
-		Explode(rcalf, SFX.NONE)
-		Explode(lcalf, SFX.NONE)
-		Explode(rfoot, SFX.NONE)
-		Explode(lfoot, SFX.NONE)
-		return 1
-	elseif severity <= .99 then
-		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(head, SFX.NONE)
-
-		Explode(rthigh, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rthigh, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(lthigh, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(rcalf, SFX.NONE)
-		Explode(lcalf, SFX.NONE)
+		Explode(rcalf, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lcalf, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-		Explode(lfoot, SFX.NONE)
-		return 2
+		Explode(lfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		return 1
 	end
 	
 	Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-	Explode(head, SFX.NONE)
+	Explode(head, SFX.SHATTER + SFX.FIRE)
+	Explode(rbarrel, SFX.SHATTER + SFX.FIRE)
+	Explode(lbarrel, SFX.SHATTER + SFX.FIRE)
 
 	Explode(rthigh, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 	Explode(lthigh, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-	Explode(rcalf, SFX.NONE)
-	Explode(lcalf, SFX.NONE)
+	Explode(rcalf, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+	Explode(lcalf, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 	Explode(rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
-	Explode(lfoot, SFX.NONE)
+	Explode(lfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

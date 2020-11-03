@@ -1219,6 +1219,11 @@
 		"description" : "Heavy Amphibious Skirmisher Bot",
 		"helptext" : "The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating."
 	},
+	"amphsupport" : {
+		"name" : "Bulkhead",
+		"description" : "Deployable Amphibious Fire Support (must stop to fire)",
+		"helptext" : "The Bulkhead is a heavily armored dual plasma cannon balanced atop a cheap set of legs. While this gives it an impressive combination of health and range, it is unable to aim or fire its cannons without first stopping to brace itself. This drawback is less pronounced in the water, where it can float to fire then sink to reposition."
+	},
 	"dynknight1" : {
 		"name" : "Commander",
 		"description" : "Mobile Assault Commander",

@@ -326,6 +326,10 @@ unitConfigs = {
     unfold  = true,
     wait = 60,
   },
+  [UnitDefNames.amphsupport.id] = {
+    unfold = true,
+    wait   = 120,
+  },
 }
 
 for i=1,#UnitDefs do
