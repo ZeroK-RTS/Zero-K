@@ -23,103 +23,103 @@ function gadget:GetInfo()
 	  layer     = 0,
 	  enabled   = true  --  loaded by default?
 	}
+end
+
+--------------------------------------------------------------------------------
+-- speedups
+--------------------------------------------------------------------------------
+local spGetUnitTeam        = Spring.GetUnitTeam
+local spGetUnitAllyTeam    = Spring.GetUnitAllyTeam
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetUnitIsDead      = Spring.GetUnitIsDead
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spSetUnitRulesParam  = Spring.SetUnitRulesParam
+local spAreTeamsAllied     = Spring.AreTeamsAllied
+
+local CMD_FIGHT  = CMD.FIGHT
+local CMD_INSERT = CMD.INSERT
+local CMD_REMOVE = CMD.REMOVE
+local CMD_STOP   = CMD.STOP
+
+local CMD_FIRE_STATE = CMD.FIRE_STATE
+
+local CMD_OPT_ALT      = CMD.OPT_ALT
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_OPT_SHIFT    = CMD.OPT_SHIFT
+
+include "LuaRules/Configs/customcmds.h.lua"
+
+local airpadDefs = {
+  [UnitDefNames["factoryplane"].id] = {
+	  mobile = false,
+	  cap = 1,
+	  padPieceName={"land"}
+  },
+  [UnitDefNames["staticrearm"].id] = {
+	  mobile = false,
+	  cap = 4,
+	  padPieceName={"land1","land2","land3","land4"}
+  },
+  [UnitDefNames["shipcarrier"].id] = {
+	  mobile = true,
+	  cap = 2,
+	  padPieceName={"LandingFore","LandingAft"}
+  },
+}
+
+-- land if pad is within this range
+local fixedwingPadRadius = 600
+local gunshipPadRadius = 160
+local DEFAULT_PAD_RADIUS = 300
+
+local airDefs = {}
+local excludedPads = {}
+local boolAirDefs = {}
+for i = 1, #UnitDefs do
+  local unitDef = UnitDefs[i]
+  local movetype = Spring.Utilities.getMovetype(unitDef)
+  if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
+	  airDefs[i] = {
+		  builder   = unitDef.isBuilder,
+		  fixedwing = (movetype == 0),
+		  padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius
+	  }
+	  boolAirDefs[i] = true
   end
-  
-  --------------------------------------------------------------------------------
-  -- speedups
-  --------------------------------------------------------------------------------
-  local spGetUnitTeam        = Spring.GetUnitTeam
-  local spGetUnitAllyTeam    = Spring.GetUnitAllyTeam
-  local spGetUnitDefID       = Spring.GetUnitDefID
-  local spGetUnitIsDead      = Spring.GetUnitIsDead
-  local spGetUnitRulesParam  = Spring.GetUnitRulesParam
-  local spSetUnitRulesParam  = Spring.SetUnitRulesParam
-  local spAreTeamsAllied     = Spring.AreTeamsAllied
-  
-  local CMD_FIGHT  = CMD.FIGHT
-  local CMD_INSERT = CMD.INSERT
-  local CMD_REMOVE = CMD.REMOVE
-  local CMD_STOP   = CMD.STOP
-  
-  local CMD_FIRE_STATE = CMD.FIRE_STATE
-  
-  local CMD_OPT_ALT      = CMD.OPT_ALT
-  local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
-  local CMD_OPT_SHIFT    = CMD.OPT_SHIFT
-  
-  include "LuaRules/Configs/customcmds.h.lua"
-  
-  local airpadDefs = {
-	  [UnitDefNames["factoryplane"].id] = {
-		  mobile = false,
-		  cap = 1,
-		  padPieceName={"land"}
-	  },
-	  [UnitDefNames["staticrearm"].id] = {
-		  mobile = false,
-		  cap = 4,
-		  padPieceName={"land1","land2","land3","land4"}
-	  },
-	  [UnitDefNames["shipcarrier"].id] = {
-		  mobile = true,
-		  cap = 2,
-		  padPieceName={"LandingFore","LandingAft"}
-	  },
-  }
-  
-   -- land if pad is within this range
-  local fixedwingPadRadius = 600
-  local gunshipPadRadius = 160
-  local DEFAULT_PAD_RADIUS = 300
-  
-  local airDefs = {}
-  local excludedPads = {}
-  local boolAirDefs = {}
-  for i = 1, #UnitDefs do
-	  local unitDef = UnitDefs[i]
-	  local movetype = Spring.Utilities.getMovetype(unitDef)
-	  if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
-		  airDefs[i] = {
-			  builder   = unitDef.isBuilder,
-			  fixedwing = (movetype == 0),
-			  padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius
-		  }
-		  boolAirDefs[i] = true
-	  end
-  end
-  
-  local bomberDefs = {}
-  for i = 1, #UnitDefs do
-	  local ud = UnitDefs[i]
-	  bomberDefs[i] = (ud.isBomber or ud.customParams.reallyabomber)
-  end
-  
-  if (gadgetHandler:IsSyncedCode()) then
-  --------------------------------------------------------------------------------
-  -- SYNCED
-  --------------------------------------------------------------------------------
-  local spGiveOrderToUnit = Spring.GiveOrderToUnit
-  local spGetUnitsInBox	= Spring.GetUnitsInBox
-  local spGetUnitPieceMap = Spring.GetUnitPieceMap
-  local spGetUnitPosition = Spring.GetUnitPosition
-  local spGetUnitPiecePosition = Spring.GetUnitPiecePosition
-  local spGetUnitVectors = Spring.GetUnitVectors
-  local spGetUnitIsStunned = Spring.GetUnitIsStunned
-  local spGetCommandQueue = Spring.GetCommandQueue
-  
-  --------------------------------------------------------------------------------
-  -- config
-  --------------------------------------------------------------------------------
-  local combatCommands = {	-- commands that require ammo to execute
+end
+
+local bomberDefs = {}
+for i = 1, #UnitDefs do
+  local ud = UnitDefs[i]
+  bomberDefs[i] = (ud.isBomber or ud.customParams.reallyabomber)
+end
+
+if (gadgetHandler:IsSyncedCode()) then
+	--------------------------------------------------------------------------------
+	-- SYNCED
+	--------------------------------------------------------------------------------
+	local spGiveOrderToUnit = Spring.GiveOrderToUnit
+	local spGetUnitsInBox	= Spring.GetUnitsInBox
+	local spGetUnitPieceMap = Spring.GetUnitPieceMap
+	local spGetUnitPosition = Spring.GetUnitPosition
+	local spGetUnitPiecePosition = Spring.GetUnitPiecePosition
+	local spGetUnitVectors = Spring.GetUnitVectors
+	local spGetUnitIsStunned = Spring.GetUnitIsStunned
+	local spGetCommandQueue = Spring.GetCommandQueue
+
+	--------------------------------------------------------------------------------
+	-- config
+	--------------------------------------------------------------------------------
+	local combatCommands = {	-- commands that require ammo to execute
 	  [CMD.ATTACK] = true,
 	  [CMD.AREA_ATTACK] = true,
 	  [CMD_FIGHT] = true,
 	  [CMD.PATROL] = true,
 	  [CMD.GUARD] = true,
 	  [CMD.MANUALFIRE] = true,
-  }
-  
-  local defaultCommands = { -- commands that is processed by gadget
+	}
+
+	local defaultCommands = { -- commands that is processed by gadget
 	  [CMD.ATTACK] = true,
 	  [CMD.AREA_ATTACK] = true,
 	  [CMD_FIGHT] = true,
@@ -134,12 +134,12 @@ function gadget:GetInfo()
 	  [CMD_REMOVE] = true,
 	  [CMD_INSERT] = true,
 	  [CMD_EXCLUDEAIRPAD] = true,
-  }
-  
-  --------------------------------------------------------------------------------
-  --------------------------------------------------------------------------------
-  
-  local rearmCMD = {
+	}
+
+	--------------------------------------------------------------------------------
+	--------------------------------------------------------------------------------
+
+	local rearmCMD = {
 	  id      = CMD_REARM,
 	  name    = "Rearm",
 	  action  = "rearm",
@@ -147,9 +147,9 @@ function gadget:GetInfo()
 	  type    = CMDTYPE.ICON_UNIT,
 	  tooltip = "Select an airpad to return to for rearm",
 	  hidden	= true,
-  }
-  
-  local excludeAirpadCMD = {
+	}
+
+	local excludeAirpadCMD = {
 	  id      = CMD_EXCLUDEAIRPAD,
 	  type    = CMDTYPE.ICON_UNIT,
 	  tooltip = 'Excludes an airpad from the running.',
@@ -158,9 +158,9 @@ function gadget:GetInfo()
 	  name    = 'Exclude',
 	  params  = { },
 	  hidden  = false,
-  }
-  
-  local findPadCMD = {
+	}
+
+	local findPadCMD = {
 	  id      = CMD_FIND_PAD,
 	  name    = "Rearm",
 	  action  = "find_pad",
@@ -168,23 +168,23 @@ function gadget:GetInfo()
 	  type    = CMDTYPE.ICON,
 	  tooltip = "Search for nearest available airpad to return to for rearm",
 	  hidden	= false,
-  }
-  
-  local emptyTable = {}
-  
-  local airpadsData = {}         -- stores data
-  local airpadsPerAllyteam = {}  -- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
-  local bomberUnitIDs = {}
-  local bomberToPad = {}         -- [bomberID] = detination pad ID
-  local bomberLanding = {}       -- [bomberID] = true
-  local rearmRequest = {}        -- [bomberID] = true (used to avoid recursion in UnitIdle)
-  local rearmRemove = {}
-  local cmdIgnoreSelf = false
-  -- local totalReservedPad = 0
-  
-  _G.airpadsData = airpadsData
-  
-  function gadget:Initialize()
+	}
+
+	local emptyTable = {}
+
+	local airpadsData = {}         -- stores data
+	local airpadsPerAllyteam = {}  -- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
+	local bomberUnitIDs = {}
+	local bomberToPad = {}         -- [bomberID] = detination pad ID
+	local bomberLanding = {}       -- [bomberID] = true
+	local rearmRequest = {}        -- [bomberID] = true (used to avoid recursion in UnitIdle)
+	local rearmRemove = {}
+	local cmdIgnoreSelf = false
+	-- local totalReservedPad = 0
+
+	_G.airpadsData = airpadsData
+
+	function gadget:Initialize()
 	  local allyteams = Spring.GetAllyTeamList()
 	  local teams = Spring.GetTeamList()
 	  for i=1,#allyteams do
@@ -200,13 +200,13 @@ function gadget:GetInfo()
 		  gadget:UnitCreated(unitList[i], ud, team)
 		  gadget:UnitFinished(unitList[i], ud, team)
 	  end
-  end
-  
-  local function MakeOptsWithShift(opts)
+	end
+
+	local function MakeOptsWithShift(opts)
 	  return opts.coded + (opts.shift and 0 or CMD_OPT_SHIFT)
-  end
-  
-  local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
+	end
+
+	local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	  --Note: 'toReplace==true' means command at 'index' is replaced with 'cmdID' instead of being sandwiched between old commands at 'index'
 	  
 	  -- workaround for STOP not clearing attack order due to auto-attack
@@ -239,10 +239,10 @@ function gadget:GetInfo()
 		  end
 	  end
 	  spGiveOrderToUnit(unitID, CMD_FIRE_STATE, firestate, 0)
-  end
-  GG.InsertCommand = InsertCommand
-  
-  local function RefreshEmptyPad(airpadID,airpadDefID)
+	end
+	GG.InsertCommand = InsertCommand
+
+	local function RefreshEmptyPad(airpadID,airpadDefID)
 
 	  if airpadDefs[airpadDefID] then
 		  local piecesList = spGetUnitPieceMap(airpadID)
@@ -267,9 +267,9 @@ function gadget:GetInfo()
 			  end
 		  end
 	  end
-  end
-  
-  local function RefreshEmptyspot_minusBomberLanding()
+	end
+
+	local function RefreshEmptyspot_minusBomberLanding()
 	  for allyTeam in pairs(airpadsPerAllyteam) do --all airpads
 		  for airpadID,airpadUnitDefID in pairs (airpadsPerAllyteam[allyTeam]) do
 			  if spGetUnitIsDead(airpadID) then --rare case. Can happen if airpad is built & die in same frame
@@ -289,14 +289,14 @@ function gadget:GetInfo()
 			  end
 		  end
 	  end
-  end
-  
-  local function FindBestAirpadAt(unitID, x, z, r) -- picks the least crowded pad in R radius around X/Z
+	end
+
+	local function FindBestAirpadAt(unitID, x, z, r) -- picks the least crowded pad in R radius around X/Z
 	  local allyTeam = spGetUnitAllyTeam(unitID)
 	  if not airpadsPerAllyteam[allyTeam] then
 		  return
 	  end
-  
+
 	  local bestPadID
 	  local bestPadBookFactor = 9001
 	  for airpadID, airpadDefID in pairs(airpadsPerAllyteam[allyTeam]) do
@@ -311,9 +311,9 @@ function gadget:GetInfo()
 	  end
 	  
 	  return bestPadID
-  end
-  
-  local function FindNearestAirpad(unitID, team)
+	end
+
+	local function FindNearestAirpad(unitID, team)
 	  --Spring.Echo(unitID.." checking for closest pad")
 	  local allyTeam = spGetUnitAllyTeam(unitID)
 	  local teamID = Spring.GetUnitTeam(unitID)
@@ -357,13 +357,13 @@ function gadget:GetInfo()
 	  end
 
 	  if excludedPads[teamID][closestPad] then --Check if it contains the airpad and then return nil - this will only happen when their are no other free airpads.
-	  		return
+			return
 	  end
 
 	  return closestPad
-  end
-  
-  local function RequestRearm(unitID, team, forceNow, replaceExisting)
+	end
+
+	local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	  if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
 		  return true --already reserved an airpad, do not reserve another one again
 	  end
@@ -419,12 +419,12 @@ function gadget:GetInfo()
 		  cmdIgnoreSelf = false
 		  return targetPad, index
 	  end
-  end
-  
-  GG.RequestRearm = RequestRearm
-  GG.FindBestAirpadAt = FindBestAirpadAt
-  
-  function gadget:UnitCreated(unitID, unitDefID, team)
+	end
+
+	GG.RequestRearm = RequestRearm
+	GG.FindBestAirpadAt = FindBestAirpadAt
+
+	function gadget:UnitCreated(unitID, unitDefID, team)
 	  if airDefs[unitDefID] then
 		  Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
 		  Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
@@ -442,9 +442,9 @@ function gadget:GetInfo()
 		  end
 	  end
 	  ]]--
-  end
-  
-  function gadget:UnitFinished(unitID, unitDefID, team)
+	end
+
+	function gadget:UnitFinished(unitID, unitDefID, team)
 	  if airpadDefs[unitDefID] then
 		  --Spring.Echo("Adding unit "..unitID.." to airpad list")
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
@@ -456,10 +456,10 @@ function gadget:GetInfo()
 		  
 		  GG.AddMiscPriorityUnit(unitID) -- For refuel pad handler
 	  end
-  end
-  
-  -- we don't need the airpad for now, free up a slot
-  local function CancelAirpadReservation(unitID)
+	end
+
+	-- we don't need the airpad for now, free up a slot
+	local function CancelAirpadReservation(unitID)
 	  spSetUnitRulesParam(unitID, "airpadReservation",0)
 	  if GG.LandAborted then
 		  GG.LandAborted(unitID)
@@ -487,7 +487,7 @@ function gadget:GetInfo()
 	  if not targetPad then
 		  return
 	  end
-  
+
 	  --Spring.Echo("Clearing reservation by "..unitID.." at pad "..targetPad)
 	  if not airpadsData[targetPad] then
 		  return
@@ -499,9 +499,9 @@ function gadget:GetInfo()
 		  reservations.count = math.max(reservations.count - 1, 0)
 		  spSetUnitRulesParam(targetPad,"unreservedPad",math.max(0,airpadsData[targetPad].cap-reservations.count)) --hint widgets
 	  end
-  end
-  
-  function ReserveAirpad(bomberID,airpadID)
+	end
+
+	function ReserveAirpad(bomberID,airpadID)
 	  spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	  local reservations = airpadsData[airpadID].reservations
 	  if not reservations.units[bomberID] then
@@ -511,16 +511,16 @@ function gadget:GetInfo()
 		  reservations.count = reservations.count + 1
 		  spSetUnitRulesParam(airpadID,"unreservedPad",math.max(0,airpadsData[airpadID].cap-reservations.count)) --hint widgets
 	  end
-  end
-  
-  local function addOrRemoveExclusion(padID, teamID)
+	end
+
+	local function addOrRemoveExclusion(padID, teamID)
 	  if padID == nil or not Spring.ValidUnitID(padID)then --Also check if it's a valid unit
 		return
 	  end
 
 	  local allyTeamID = select(6, Spring.GetTeamInfo(teamID, false))
 	  if Spring.GetUnitAllyTeam(padID) ~= allyTeamID then
-	     return
+		 return
 	  end
 
 	  --Check if the unit is an airpad and if it already exists
@@ -534,9 +534,9 @@ function gadget:GetInfo()
 		  excludedPads[teamID][padID] = false
 		end
 	  end
-  end
-  
-  function gadget:UnitDestroyed(unitID, unitDefID, team)
+	end
+
+	function gadget:UnitDestroyed(unitID, unitDefID, team)
 	  if airpadsData[unitID] then
 		  excludedPads[unitID] = nil
 		  local allyTeam = select(6, Spring.GetTeamInfo(team, false))
@@ -550,24 +550,24 @@ function gadget:GetInfo()
 		  CancelAirpadReservation(unitID)
 		  bomberUnitIDs[unitID] = nil
 	  end
-  end
-  
-  function GG.AircraftCrashingDown(unitID)
+	end
+
+	function GG.AircraftCrashingDown(unitID)
 	  CancelAirpadReservation(unitID)
 	  bomberUnitIDs[unitID] = nil
 	  --note: we don't worry about user re-doing REARM cmd or CommandFallback re-doing reservation because crashing airplane do not call CommandFallback
 	  --and unit_aircraft_crash.lua SetUnitNoSelect
-  end
-  
-  function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	end
+
+	function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	  if not spAreTeamsAllied(oldTeam, newTeam) then
 		  gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
 		  gadget:UnitCreated(unitID, unitDefID, newTeam)
 		  gadget:UnitFinished(unitID, unitDefID, newTeam)
 	  end
-  end
-  
-  function gadget:GameFrame(n)
+	end
+
+	function gadget:GameFrame(n)
 	  -- if n%30 == 0 then
 		  -- Spring.Echo(totalReservedPad)
 	  -- end
@@ -640,20 +640,20 @@ function gadget:GetInfo()
 			  end
 		  end
 	  end
-  end
-  
-  function GG.RequireRefuel(bomberID)
+	end
+
+	function GG.RequireRefuel(bomberID)
 	  return (spGetUnitRulesParam(bomberID, "noammo") == 2)
-  end
-  
-  function GG.RefuelComplete(bomberID)
+	end
+
+	function GG.RefuelComplete(bomberID)
 	  spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing/ not refueling anymore
-  end
-  
-  function GG.LandComplete(bomberID)
+	end
+
+	function GG.LandComplete(bomberID)
 	  local bomberData = bomberLanding[bomberID]
 	  local padID = bomberData and bomberData.padID
-  
+
 	  CancelAirpadReservation(bomberID) -- cancel reservation and mark bomber as free to fire
 	  spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
 	  spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
@@ -681,22 +681,22 @@ function gadget:GetInfo()
 	  if cmdID == CMD_REARM then
 		  rearmRemove[bomberID] = true --remove current RE-ARM command
 	  end
-  end
-  
-  function gadget:UnitIdle(unitID, unitDefID, team)
+	end
+
+	function gadget:UnitIdle(unitID, unitDefID, team)
 	  if airDefs[unitDefID] and spGetUnitRulesParam(unitID, "noammo") == 1 then
 		  rearmRequest[unitID] = true
 	  end
-  end
-  
-  --[[
-  function gadget:UnitCmdDone(unitID, unitDefID, team, cmdID, cmdTag)
+	end
+
+	--[[
+	function gadget:UnitCmdDone(unitID, unitDefID, team, cmdID, cmdTag)
 	  if airDefs[unitDefID] then RequestRearm(unitID) end
-  end
-  ]]--
-  
-function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,cmdTag)
-	if cmdID == CMD_REARM then	-- return to pad
+	end
+	]]--
+
+	function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,cmdTag)
+		if cmdID == CMD_REARM then	-- return to pad
 			if not airDefs[unitDefID] then
 				return true, true	-- trying to REARM using unauthorized unit
 			end
@@ -722,22 +722,18 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			end
 			return true,true
 		end
-	if cmdID == CMD_EXCLUDEAIRPAD then
-		addOrRemoveExclusion(cmdParams[1], unitTeam)
-		return true,true
-	end
 		return false -- command not used
-end
+	end
   
-  function gadget:AllowCommand_GetWantedCommand()
+	function gadget:AllowCommand_GetWantedCommand()
 	  return defaultCommands --command which is expected by gadget, other command is unhandled cases
-  end
-  
-  function gadget:AllowCommand_GetWantedUnitDefID()
+	end
+
+	function gadget:AllowCommand_GetWantedUnitDefID()
 	  return boolAirDefs --gadget:AllowCommand only check bombers/gunships
-  end
-  
-  function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	end
+
+	function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	  if cmdIgnoreSelf then  --don't re-read rewritten bomber's command
 		  return true
 	  end
@@ -765,43 +761,47 @@ end
 			  CancelAirpadReservation(unitID) --don't leave airpad reservation hanging, empty them when bomber is given other task
 		  end
 	  end
+	  if cmdID == CMD_EXCLUDEAIRPAD then
+		addOrRemoveExclusion(cmdParams[1], unitTeam)
+		return false
+	  end
 	  
 	  return true
-  end
-  
-  -- not worth the system resources until bombers using reverse built pads is fixed for real
-  --[[
-  function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
+	end
+
+	-- not worth the system resources until bombers using reverse built pads is fixed for real
+	--[[
+	function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	  if step < 0 and airpadsData[unitID] and select(5,Spring.GetUnitHealth(unitID)) == 1 then
 		  gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	  end
 	  return true
-  end
-  ]]--
-  
+	end
+	]]--
+
 else
 
-  --------------------------------------------------------------------------------
-  -- UNSYNCED
-  --------------------------------------------------------------------------------
-  local spGetLocalTeamID = Spring.GetLocalTeamID
-  local spGetSpectatingState = Spring.GetSpectatingState
-  local spValidUnitID = Spring.ValidUnitID
-  local spGetSelectedUnits = Spring.GetSelectedUnits
-  
-  function gadget:DefaultCommand(type, targetID)
+	--------------------------------------------------------------------------------
+	-- UNSYNCED
+	--------------------------------------------------------------------------------
+	local spGetLocalTeamID = Spring.GetLocalTeamID
+	local spGetSpectatingState = Spring.GetSpectatingState
+	local spValidUnitID = Spring.ValidUnitID
+	local spGetSelectedUnits = Spring.GetSelectedUnits
+
+	function gadget:DefaultCommand(type, targetID)
 	  if (type == 'unit') and airpadDefs[spGetUnitDefID(targetID)] then
 		  local targetTeam = spGetUnitTeam(targetID)
 		  local selfTeam = spGetLocalTeamID()
 		  if not (spAreTeamsAllied(targetTeam, selfTeam)) then
 			  return
 		  end
-  
+
 		  local selUnits = spGetSelectedUnits()
 		  if (not selUnits[1]) then
 			  return  -- no selected units
 		  end
-  
+
 		  local unitID, unitDefID
 		  for i = 1, #selUnits do
 			  unitID    = selUnits[i]
@@ -812,17 +812,17 @@ else
 		  end
 		  return
 	  end
-  end
-  
-  --[[ widget
-  local noAmmoTexture = 'LuaUI/Images/noammo.png'
-  local function DrawUnitFunc(yshift)
+	end
+
+	--[[ widget
+	local noAmmoTexture = 'LuaUI/Images/noammo.png'
+	local function DrawUnitFunc(yshift)
 	  gl.Translate(0,yshift,0)
 	  gl.Billboard()
 	  gl.TexRect(-10, -10, 10, 10)
-  end
-  local phase = 0
-  function gadget:DrawWorld()
+	end
+	local phase = 0
+	function gadget:DrawWorld()
 	  if Spring.IsGUIHidden() then return end
 	  local myAllyID = Spring.GetMyAllyTeamID()
 	  local isSpec, fullView = spGetSpectatingState()
@@ -838,12 +838,12 @@ else
 		  end
 	  end
 	  gl.Texture("")
-  end
-  --]]
-  function gadget:Initialize()
-	  gadgetHandler:RegisterCMDID(CMD_REARM)
-	  Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
-	  Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
-	  Spring.AssignMouseCursor("airpadexclude", "cursorairpadexclude", true, true)
-  end
+	end
+	--]]
+	function gadget:Initialize()
+		gadgetHandler:RegisterCMDID(CMD_REARM)
+		Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
+		Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
+		Spring.AssignMouseCursor("airpadexclude", "cursorairpadexclude", true, true)
+	end
 end
