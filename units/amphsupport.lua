@@ -84,7 +84,7 @@ return { amphsupport = {
   weaponDefs             = {
 
     CANNON = {
-      name                    = [[Light Plasma Cannon]],
+      name                    = [[Plasma Cannon]],
       accuracy                = 480,
       areaOfEffect            = 40,
       craterBoost             = 0,
@@ -119,41 +119,38 @@ return { amphsupport = {
     },
 
     FAKE_CANNON = {
-      name                    = [[Fake Disruption Cannon]],
-      accuracy                = 200,
-      areaOfEffect            = 32,
-      cegTag                  = [[beamweapon_muzzle_purple]],
-      craterBoost             = 1,
-      craterMult              = 2,
+      name                    = [[Fake Plasma Cannon]],
+      accuracy                = 480,
+      areaOfEffect            = 40,
+      avoidFriendly           = false,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       customparams = {
         bogus = 1,
       },
-  
+
       damage                  = {
-        default = 170.1,
-        subs    = 8.5,
+        default = 165.1,
+        planes  = 165.1,
+        subs    = 7.5,
       },
 
-      explosionGenerator      = [[custom:flashslowwithsparks]],
-      fireStarter             = 180,
-      impactOnly              = true,
+      edgeEffectiveness       = 0.1,
+      explosionGenerator      = [[custom:INGEBORG]],
       impulseBoost            = 0,
-      impulseFactor           = 0.2,
-      interceptedByShieldType = 2,
-      myGravity               = 0.2,
-      range                   = 450,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 0.12,
+      noSelfDamage            = true,
+      range                   = 600,
       reloadtime              = 1.8,
-      rgbcolor                = [[0.9 0.1 0.9]],
-      soundHit                = [[weapon/laser/small_laser_fire]],
-      soundHitVolume          = 2.2,
-      soundStart              = [[weapon/laser/small_laser_fire3]],
-      soundStartVolume        = 3.5,
-      soundTrigger            = true,
+      soundHit                = [[explosion/ex_med5]],
+      soundStart              = [[weapon/cannon/cannon_fire1]],
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 380,
+      weaponVelocity          = 320,
     },
 
   },

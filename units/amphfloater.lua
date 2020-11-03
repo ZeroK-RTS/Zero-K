@@ -118,6 +118,7 @@ return { amphfloater = {
       name                    = [[Fake Disruption Cannon]],
       accuracy                = 200,
       areaOfEffect            = 32,
+      avoidFriendly           = false,
       cegTag                  = [[beamweapon_muzzle_purple]],
       craterBoost             = 1,
       craterMult              = 2,

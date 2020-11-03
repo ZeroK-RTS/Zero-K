@@ -340,11 +340,10 @@ end
 
 function StopMoving()
 	moving = false
+	StartThread(SetDeploy, true)
 	if floating then
 		Signal(SIG_FLOAT)
 		StartThread(FloatThread, 1)
-	else
-		StartThread(SetDeploy, true)
 	end
 	Signal(SIG_WALK)
 end
@@ -360,12 +359,13 @@ local function IsMoving()
 		return false
 	end
 	local x, y, z = spGetUnitPosition(unitID)
-	if y > -2 then
+	if (y > -2) then
 		return true
 	end
 	-- Deploy if floating somewhere in the water.
-	floating = (spGetGroundHeight(x, z) + 2 > y)
-	return floating
+	local height = spGetGroundHeight(x, z)
+	floating = (y > height + 1) and (height < -20)
+	return not floating
 end
 
 local function CheckMoving()
