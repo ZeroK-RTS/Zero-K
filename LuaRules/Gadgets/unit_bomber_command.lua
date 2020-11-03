@@ -530,7 +530,7 @@ function gadget:GetInfo()
 		  Spring.SetUnitRulesParam(padID, "padExcluded" .. teamID, 1)
 		else
 		  --Already exists, remove
-		  Spring.SetUnitRulesParam(padID, "padExcluded", 0)
+		  Spring.SetUnitRulesParam(padID, "padExcluded" .. teamID, 0)
 		  excludedPads[teamID][padID] = false
 		end
 	  end
