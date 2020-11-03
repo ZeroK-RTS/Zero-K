@@ -221,7 +221,7 @@ function SetIcons()
 			end
 		end
 
-		local padExcluded = excludedPadUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "padExcluded")
+		local padExcluded = excludedPadUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "padExcluded" .. Spring.GetMyTeamID())
 		if padExcluded then
 			if (not lastExcludedPad[unitID]) or lastExcludedPad[unitID] ~= padExcluded then
 				lastExcludedPad[unitID] = padExcluded

@@ -527,7 +527,7 @@ function gadget:GetInfo()
 	  if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[teamID][padID] then
 		  excludedPads[teamID][padID] = true
-		  Spring.SetUnitRulesParam(padID, "padExcluded", 1)
+		  Spring.SetUnitRulesParam(padID, "padExcluded" .. teamID, 1)
 		else
 		  --Already exists, remove
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 0)
