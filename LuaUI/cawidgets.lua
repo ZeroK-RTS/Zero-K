@@ -434,23 +434,18 @@ function widgetHandler:SendConfigData()
 	end
 end
 
-
 --------------------------------------------------------------------------------
+
+local function InitPlayerData(playerID)
+	local _, _, spectator, teamID = Spring.GetPlayerInfo(playerID)
+	return {team = teamID, spectator = spectator}
+end
 
 function widgetHandler:Initialize()
 	local gaia = Spring.GetGaiaTeamID()
-	local allyteamlist = Spring.GetAllyTeamList()
-	for a = 1, #allyteamlist do
-		local teamlist = Spring.GetTeamList(allyteamlist[a])
-		for t = 1, #teamlist do
-			if teamlist[t] ~= gaia then
-				local playerlist = Spring.GetPlayerList(teamlist[t])
-				for p = 1, #playerlist do
-					local _, _, spectator = Spring.GetPlayerInfo(playerlist[p])
-					playerstate[playerlist[p]] = {team = teamlist[t], spectator = spectator}
-				end
-			end
-		end
+	local playerList = Spring.GetPlayerList()
+	for i = 1, #playerList do
+		playerstate[playerList[i]] = InitPlayerData(playerList[i])
 	end
 	-- Add ignorelist --
 	--Spring.Echo("Spring.GetMyPlayerID()", Spring.GetMyPlayerID())
@@ -2016,6 +2011,7 @@ end
 function widgetHandler:PlayerChanged(playerID) --when player Change from Spectator to Player or Player to Spectator.
 	MessageProcessor:UpdatePlayer(playerID)
 	local _, _, spectator, teamID, _ = Spring.GetPlayerInfo(playerID)
+	playerstate[playerID] = playerstate[playerID] or InitPlayerData(playerID)
 	if spectator ~= playerstate[playerID].spectator and spectator then
 		for _, w in r_ipairs(self.PlayerResignedList) do
 			w:PlayerResigned(playerID)
