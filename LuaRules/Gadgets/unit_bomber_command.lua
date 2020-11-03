@@ -10,6 +10,7 @@
 --------------------------------------------------------------------------------
 -- TODO:
 -- Handle planes waiting around if no airpads exist at all - send to pad once one is built
+-- This comment appears to be a lie
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
@@ -521,21 +522,17 @@ function gadget:GetInfo()
 	  if Spring.GetUnitAllyTeam(padID) ~= allyTeamID then
 	     return
 	  end
-	 --Spring.Echo('unit id: ' .. padID)
 
 	  --Check if the unit is an airpad and if it already exists
 	  if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[teamID][padID] then
 		  excludedPads[teamID][padID] = true
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 1)
-		  --Spring.Echo("Added airpad: " .. padID)
 		else
 		  --Already exists, remove
 		  Spring.SetUnitRulesParam(padID, "padExcluded", 0)
 		  excludedPads[teamID][padID] = false
 		end
-	  else
-		--Spring.Echo("Not an airpad!")
 	  end
   end
   
