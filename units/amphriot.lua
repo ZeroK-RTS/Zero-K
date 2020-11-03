@@ -91,7 +91,7 @@ return { amphriot = {
       cegTag                  = [[torpedo_trail]],
    
       damage                  = {
-        default = 52.1,
+        default = 48.01,
       },
 
       edgeEffectiveness       = 0.6,

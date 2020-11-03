@@ -271,6 +271,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	
 	"shipscout",
 	"shipriot",
+	"shipassault",
 })
 
 local medRangeSkirmieeArray = NameToDefID({
@@ -287,8 +288,6 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tankheavyassault",
 	"tankriot", -- banisher
 	"striderscorpion",
-	
-	"shipassault",
 })
 
 for name, data in pairs(UnitDefNames) do -- add all comms to mid ranged skirm because they might be short ranged (and also explode)

@@ -113,7 +113,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	StartThread(WeaponRangeUpdate)
+	--StartThread(WeaponRangeUpdate) -- Not required as ranges are equal.
 end
 
 function script.QueryWeapon(num)
@@ -179,10 +179,12 @@ function script.BlockShot(num, targetID)
 		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 500, 60)
 	end
 	if num == 2 then
-		local tx, ty, tz = Spring.GetUnitPosition(targetID)
-		local gy = Spring.GetGroundHeight(tx, tz)
-		if ty - gy > 5 and gy > -5 then -- is in the air
-			return false
+		if targetID then
+			local tx, ty, tz = Spring.GetUnitPosition(targetID)
+			local gy = Spring.GetGroundHeight(tx, tz)
+			if ty - gy > 5 and gy > -5 then -- is in the air
+				return false
+			end
 		end
 		FakeWeaponShoot(targetID)
 	end
