@@ -83,7 +83,7 @@ return { spideremp = {
       },
 
       damage                  = {
-        default        = 75.01,
+        default        = 70.01,
       },
 
       duration                = 8,
@@ -97,7 +97,7 @@ return { spideremp = {
       noSelfDamage            = true,
       paralyzeTime            = 1,
       range                   = 250,
-      reloadtime              = 32/30,
+      reloadtime              = 33/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
