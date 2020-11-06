@@ -210,9 +210,15 @@ function Suspension()
 	local ztilt, ztiltv, ztilta = 0, 0, 0
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
+	local prevSpeed = 0
 	
 	while true do
 		speed = select(4,spGetUnitVelocity(unitID))
+		if speed > prevSpeed then
+			speed, prevSpeed = prevSpeed, speed
+		else
+			prevSpeed = speed
+		end
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 		if moving then

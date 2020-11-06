@@ -352,10 +352,16 @@ function script.StopMoving()
 	GG.Floating_StopMoving(unitID)
 end
 
+local prevSpeed = false
 local function IsMoving()
 	local speed = select(4, spGetUnitVelocity(unitID))
 	floating = false
 	if speed <= 0.1 then
+		prevSpeed = false
+		return false
+	end
+	if not prevSpeed then
+		prevSpeed = true
 		return false
 	end
 	local x, y, z = spGetUnitPosition(unitID)
