@@ -143,6 +143,7 @@ return { turretheavy = {
       customParams            = {
         light_color = [[2.2 1.6 0.9]],
         light_radius = 550,
+        overshoot = 1.0,
       },
 
       damage                  = {

@@ -16,7 +16,9 @@ end
 
 local overshootdefs = {} -- unitdefs to watch
 local overwatch = {} -- units that have the ai enabled.
+local watchlist = {} -- list of all the unitdefs this has
 local updaterate = 5
+local terrainupdaterate = 45/updaterate
 
 local spSetUnitTarget = Spring.SetUnitTarget
 local spGetUnitWeaponTestTarget = Spring.GetUnitWeaponTestTarget
@@ -26,22 +28,27 @@ local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetTeamList = Spring.GetTeamList
+local spGetTeamUnitsByDefs = Spring.GetTeamUnitsByDefs
+local spUtilitiesGetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local EMPTY = {}
 
 for i = 1, #UnitDefs do
 	local weapons = UnitDefs[i].weapons
 	if #weapons > 0 then
+		local c = 0
 		for w = 1, #weapons do
 			local WeaponDefID = weapons[w].weaponDef
 			local WeaponDef = WeaponDefs[WeaponDefID]
 			local cp = WeaponDef.customParams
-			if cp and cp.overshoot then
-				if overshootdefs[i] then
-					overshootdefs[i][w] = {aoe = WeaponDef.damageAreaOfEffect, bonus = tonumber(cp.overshoot), range = WeaponDef.range}
-				else
+			if cp and cp.overshoot then -- NOTE: overshoot field is a multiplier to unit range. Use 1 for things that aren't like stardust. 
+				c = c + 1
+				if overshootdefs[i] == nil then
 					overshootdefs[i] = {}
-					overshootdefs[i][w] = {aoe = WeaponDef.damageAreaOfEffect, bonus = tonumber(cp.overshoot), range = WeaponDef.range}
+					watchlist[#watchlist + 1] = i
 				end
+				overshootdefs[i][c] = {id = w, aoe = WeaponDef.damageAreaOfEffect, bonus = tonumber(cp.overshoot), range = WeaponDef.range}
 			end
 		end
 	end
@@ -52,15 +59,15 @@ local function GetDistance(x, z, x2, z2)
 end
 
 local function GetLowestHeightOnCircle(x, z, radius, points)
-	local anglepercheck = math.rad((2 * math.pi) / points + 1)
+	local anglepercheck = math.rad(360 / (points + 1))
 	local currentangle = 0
 	local lowest = math.huge
 	for i = 1, points + 1 do
-		local cx = x + radius * math.sin(currentangle)
-		local cz = z + radius * math.cos(currentangle)
+		local cx = x + radius * math.cos(currentangle)
+		local cz = z + radius * math.sin(currentangle)
 		currentangle = currentangle + anglepercheck
 		local groundy = spGetGroundHeight(cx, cz)
-		if groundy < lowest  then
+		if groundy < lowest then
 			lowest = groundy
 		end
 	end
@@ -70,54 +77,57 @@ local function GetLowestHeightOnCircle(x, z, radius, points)
 	return lowest
 end
 
-
 local function GetFirePoint(radius, x, z, targetx, targetz)
-	local angle = math.atan2((z - targetz), (x - targetx))
-	angle = -angle + math.rad(270) -- I hate trig in spring. Don't ask me how this works, it just does.
-	--local angle = Spring.Utilities.Vector.Angle(x - targetx, z - targetz) -- this doesn't seem to work, gives wrong angle.
-	local tx = x + (radius * math.sin(angle))
-	local tz = z + (radius * math.cos(angle))
+	local angle = Spring.Utilities.Vector.Angle(targetx - x, targetz - z)
+	local tx = x + (radius * math.cos(angle))
+	local tz = z + (radius * math.sin(angle))
 	return tx, tz
 end
 
 local function AttackPosition(unitID, x, y, z, weaponID)
-	local testresult = spGetUnitWeaponTestTarget(unitID, weaponID, x, y, z)
-	if spGetUnitWeaponTestTarget(unitID, weaponID, x, y, z) then -- probably needs some friendly fire test
-		spSetUnitTarget(unitID, x, y, z, false, true, weaponID)
-		overwatch[unitID].engaged = true
-	end
+	GG.SetTemporaryPosTarget(unitID, x, y, z, false, updaterate + 1)
+	overwatch[unitID].engaged = true
 end
 
-local function ClearAttack(unitID) -- this probably needs some changing. I couldn't figure out how to clear targets without issuing a command and didn't want stardusts to sit shooting at a spot indefinitely
-	spSetUnitTarget(unitID, nil)
-	overwatch[unitID].engaged = false
-	spGiveOrderToUnit(unitID, CMD.STOP, EMPTY, EMPTY)
+local function UpdateWeaponRange(unitID, unitDefID, weaponID) -- updates weapon range every 45 frames. Note: Not all units get their range update on the same update tick.
+	local x, y, z = spGetUnitPosition(unitID, true, false) -- use midpoint.
+	local overshootdef = overshootdefs[unitDefID][weaponID]
+	local originalrange = overshootdef.range
+	local oy = math.min(spGetGroundOrigHeight(x, z), GetLowestHeightOnCircle(x, z, originalrange, 9)) -- tests 10 equidistant points on the unit's edge of range. This is a crude way of detecting cliffs and stuff.
+	local newrange = spUtilitiesGetEffectiveWeaponRange(unitDefID, y - oy, weaponID)
+	local effectiverange = ((newrange + 1) * overshootdef.bonus) + overshootdef.aoe
+	overwatch[unitID]["weapons"][weaponID].effectiverange = effectiverange
 end
 
 local function UpdateUnitTarget(unitID, unitDefID, weaponID)
-	local x2, y2, z2 = spGetUnitPosition(unitID)
-	local overshootdef = overshootdefs[unitDefID][weaponID]
-	local originalrange = overshootdef.range
-	local oy = math.min(spGetGroundOrigHeight(x2, z2), GetLowestHeightOnCircle(x2, z2, originalrange, 9)) -- rudimentary check for cliffs and stuff.
-	local truerange = Spring.Utilities.GetEffectiveWeaponRange(unitDefID, y2 - oy, weaponID)
-	local effectiverange = truerange + (overshootdef.aoe * overshootdef.bonus)
-	local enemy = spGetUnitNearestEnemy(unitID, effectiverange, true)
+	local myX, myY, myZ = spGetUnitPosition(unitID, true) -- midpoint
+	local weapon = overwatch[unitID]["weapons"][weaponID]
+	local theoreticalEffectiveRange = weapon.effectiverange -- our theoretical effective range
+	local enemy = spGetUnitNearestEnemy(unitID, theoreticalEffectiveRange, true)
+	local distance, actualRange
 	if enemy then
-		local x, y, z = spGetUnitPosition(enemy)
-		if GetDistance(x, z, x2, z2) > truerange then -- only attack when there's nothing in our actual range.
-			local tx, tz = GetFirePoint(truerange, x2, z2, x, z)
-			AttackPosition(unitID, tx, y, tz, weaponID)
-		elseif overwatch[unitID].engaged then -- when there's things in our range, we want to clear our overshot target and start blasting whatever's in our range instead
-			ClearAttack(unitID)
+		local enemyX, enemyY, enemyZ = spGetUnitPosition(enemy)
+		distance = GetDistance(myX, myZ, enemyX, enemyZ)
+		local groundUnderEnemy = spGetGroundHeight(enemyX, enemyZ)
+		actualRange = spUtilitiesGetEffectiveWeaponRange(unitDefID, myY - enemyY, weaponID) -- the actual range we have against the unit. Needed to be able to set the target.
+		if distance > actualRange and enemyY - groundUnderEnemy < 5 then -- only attack when there's nothing in our actual range that isn't flying
+			local targetX, targetZ = GetFirePoint(actualRange, myX, myZ, enemyX, enemyZ)
+			AttackPosition(unitID, targetX, groundUnderEnemy, targetZ, weaponID)
 		end
-	elseif overwatch[unitID].engaged then
-		ClearAttack(unitID)
+	end
+	if overwatch[unitID].engaged and (not enemy or distance <= actualRange) then
+		spGiveOrderToUnit(unitID, CMD.STOP, EMPTY, 0)
+		overwatch[unitID].engaged = false
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if overshootdefs[unitDefID] then
-		overwatch[unitID] = {def = unitDefID, engaged = false}
+		overwatch[unitID] = {def = unitDefID, engaged = false, weapons = {}, updatecount = 0}
+		for i = 1, #overshootdefs[unitDefID] do
+			overwatch[unitID].weapons[i] = {effectiverange = 0, id = overshootdefs[unitDefID][i].id}
+			UpdateWeaponRange(unitID, unitDefID, i)
+		end
 	end
 end
 
@@ -131,11 +141,32 @@ end
 
 function gadget:GameFrame(f)
 	if f%updaterate == 0 then
-		for id, data in pairs(overwatch) do
-			local unitdefID = data.def
-			if #spGetCommandQueue(id, 1) == 0 then -- has no active command, so feel free to engage. Note this check is mostly so that users can override the AI.
-				for weapon, _ in pairs(overshootdefs[unitdefID]) do
-					UpdateUnitTarget(id, unitdefID, weapon)
+		local teamlist = spGetTeamList()
+		for t = 1, #teamlist do
+			local teamID = teamlist[t]
+			for d = 1, #watchlist do
+				local unitDefID = watchlist[d]
+				local units = spGetTeamUnitsByDefs(teamID, watchlist[d])
+				if #units ~= 0 then
+					for u = 1, #units do
+						local unitID = units[u]
+						local data = overwatch[unitID]
+						if data and #spGetCommandQueue(unitID, 1) == 0 then
+							local weapons = data.weapons
+							for w = 1, #weapons do
+								local weaponID = weapons[w].id
+								UpdateUnitTarget(unitID, unitDefID, weaponID)
+								if data.updatecount == terrainupdaterate then
+									UpdateWeaponRange(unitID, unitDefID, w)
+								end
+							end
+							if data.updatecount == terrainupdaterate then
+								overwatch[unitID].updatecount = 0
+							else
+								overwatch[unitID].updatecount = overwatch[unitID].updatecount + 1
+							end
+						end
+					end
 				end
 			end
 		end
