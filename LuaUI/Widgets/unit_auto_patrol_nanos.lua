@@ -82,6 +82,8 @@ local max = math.max
 local mapCenterX = Game.mapSizeX / 2
 local mapCenterZ = Game.mapSizeZ / 2
 
+local debug = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Constants
@@ -101,14 +103,14 @@ local checkInterval = 10 * FPS
 -- even if the unit became idle. This is a simple rate limiter on issuing
 -- commands in case there are caretakers with nothing to do for their current
 -- state.
-local settleInterval = 2.5 * FPS
+local settleInterval = .8 * FPS
 -- Update the decision about economics at most once every
 -- `decisionCacheInterval` frames.
-local decisionCacheInterval = 9
+local decisionCacheInterval = 1
 -- When a caretaker becomes idle, issue it a new command soon but not right
 -- away. This interval has to be long enough that the factory we're assisting
 -- (while in repair mode) has started the next unit.
-local idleWaitInterval = 0.5 * FPS
+local idleWaitInterval = .3 * FPS
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -151,7 +153,7 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local decisionCache = { validUntil=nil }
+local decisionCache = { validUntil=nil, commands={} }
 local function DecideCommands()
 	if decisionCache.validUntil ~= nil and
 			decisionCache.validUntil > currentFrame then
@@ -163,8 +165,10 @@ local function DecideCommands()
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
 	metalStorage = metalStorage - HIDDEN_STORAGE
-	Log("metal=", metal, "; storage=", metalStorage, "; pull=",
-			metalPull, "; income=", metalIncome)
+	if debug then
+		Log("metal=", metal, "; storage=", metalStorage, "; pull=",
+				metalPull, "; income=", metalIncome)
+	end
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
 	energyStorage = energyStorage - HIDDEN_STORAGE
@@ -181,7 +185,7 @@ local function DecideCommands()
 		-- reclaiming when your storage is full.
 		get_metal = futureMetal < metalStorage and
 				metal < metalStorage * 0.75
-		use_metal = futureMetal > 0 and metal > 1
+		use_metal = futureMetal > 0 and metal > metalStorage * 0.1
 	end
 
 	if energyStorage < 1 then
@@ -194,40 +198,53 @@ local function DecideCommands()
 		use_energy = futureEnergy > 0 and energy > energyStorage * 0.1
 	end
 
-	Log("get_metal=", get_metal, ", ", "use_metal=", use_metal, ", ",
-		"get_energy=", get_energy, ", ", "use_energy=", use_energy)
+	if debug then
+		Log("get_metal=", get_metal, ", ", "use_metal=", use_metal, ", ",
+			"get_energy=", get_energy, ", ", "use_energy=", use_energy)
+	end
 
-	local commands = {}
+	-- Reuse commands to avoid table allocation
+	commands = decisionCache.commands
+	local i = 1
 
 	if get_metal and not get_energy and use_metal and use_energy then
-		commands[#commands + 1] = PATROL
+		commands[i] = PATROL
+		i = i + 1
 	else
 		if use_metal and use_energy then
-			commands[#commands + 1] = BUILD_ASSIST
+			commands[i] = BUILD_ASSIST
+			i = i + 1
 		end
 		if use_energy then
-			commands[#commands + 1] = REPAIR_UNITS
+			commands[i] = REPAIR_UNITS
+			i = i + 1
 		end
 		if get_metal and get_energy then
 			if metal > energy then
-				commands[#commands + 1] = RECLAIM_ENERGY
-				commands[#commands + 1] = RECLAIM_METAL
+				commands[i] = RECLAIM_ENERGY
+				commands[i + 1] = RECLAIM_METAL
 			else
-				commands[#commands + 1] = RECLAIM_METAL
-				commands[#commands + 1] = RECLAIM_ENERGY
+				commands[i] = RECLAIM_METAL
+				commands[i + 1] = RECLAIM_ENERGY
 			end
+			i = i + 2
 		elseif get_metal then
-			commands[#commands + 1] = RECLAIM_METAL
+			commands[i] = RECLAIM_METAL
+			i = i + 1
 		elseif get_energy then
-			commands[#commands + 1] = RECLAIM_ENERGY
+			commands[i] = RECLAIM_ENERGY
+			i = i + 1
 		end
 	end
 
+	-- Terminate the list with nil
+	commands[i] = nil
 	decisionCache.commands = commands
 
 	return commands
 end
 
+local madeCommands = {}
 local function MakeCommands(decidedCommands, unitID)
 	if not trackedUnits[unitID].commandTables then
 		-- Cache commands inside trackedUnits. This saves a ton of table
@@ -258,13 +275,16 @@ local function MakeCommands(decidedCommands, unitID)
 	local commands = {}
 
 	for i, decided in ipairs(decidedCommands) do
+		if not decided then
+			break
+		end
 		commands[i] = trackedUnits[unitID].commandTables[decided]
 	end
 
 	return commands
 end
 
--- Return truee iff the issued command could cause the current command. This
+-- Return true iff the issued command could cause the current command. This
 -- includes internal commands, because some area commands replace the command
 -- with an internal to track of their state, instead of inserting new commands
 -- into the queue. If we ignore all internal commands, then we cannot determine
@@ -274,13 +294,13 @@ end
 local remove_shift_internal = math.bit_inv(CMD_OPT_SHIFT + CMD_OPT_INTERNAL)
 local function IssuedCausesCurrent(issued, currentID, currentOpt,
 		currentParam1, currentParam2, currentParam3, currentParam4, currentParam5)
-	Log("compare")
-	Log(" issued : ", issued[1], "(", issued[2][1], ", ", issued[2][2], ", ",
-		issued[2][3], ", ", issued[2][4], ", ", issued[2][5], ") ",
-		issued[3], " (", issued[4], ")")
-	Log(" current: ", currentID, "(", currentParam1, ", ", currentParam2,
-		", ", currentParam3, ", ", currentParam4, ", ", currentParam5, ") ",
-		currentOpt)
+	--Log("compare")
+	--Log(" issued : ", issued[1], "(", issued[2][1], ", ", issued[2][2], ", ",
+	--	issued[2][3], ", ", issued[2][4], ", ", issued[2][5], ") ",
+	--	issued[3], " (", issued[4], ")")
+	--Log(" current: ", currentID, "(", currentParam1, ", ", currentParam2,
+	--	", ", currentParam3, ", ", currentParam4, ", ", currentParam5, ") ",
+	--	currentOpt)
 
 	if not currentID or not issued then
 		return false
@@ -294,7 +314,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][4] == currentParam4 and
 			issued[2][5] == currentParam5 and
 			issued[3] == currentOpt then
-		Log("    -> equal")
+		--Log("    -> equal")
 		return true
 	end
 
@@ -309,7 +329,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][3] == currentParam4 and
 			issued[2][4] == currentParam5 and
 			issued[3] == math.bit_and(currentOpt, remove_shift_internal) then
-		Log("    -> repair/reclaim")
+		--Log("    -> repair/reclaim")
 		return true
 	end
 
@@ -320,19 +340,19 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 		if (currentID == CMD_REPAIR or currentID == CMD_RECLAIM) and
 				currentOpt == CMD_OPT_INTERNAL and
 				currentParam5 ~= nil then
-			Log("    -> patrol, repair")
+			--Log("    -> patrol, repair")
 			return true
 		elseif currentID == CMD_PATROL then
-			Log("    -> patrol")
+			--Log("    -> patrol")
 			return true
 		elseif currentID == CMD_FIGHT and
 				currentOpt == CMD_OPT_INTERNAL then
-			Log("    -> patrol, fight")
+			--Log("    -> patrol, fight")
 			return true
 		end
 	end
 
-	Log("    -> false")
+	--Log("    -> false")
 	return false
 end
 
@@ -354,9 +374,9 @@ local function SetupUnit(unitID)
 	local currentID, currentOpt, _, currentParam1,
 			currentParam2, currentParam3, currentParam4, currentParam5 =
 			spGetUnitCurrentCommand(unitID)
-	Log(unitID, "; currently executing ", currentID, "(", currentParam1,
-		", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
-		currentParam5, ") ", currentOpt)
+	--Log(unitID, "; currently executing ", currentID, "(", currentParam1,
+	--	", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
+	--	currentParam5, ") ", currentOpt)
 
 	if currentID then
 		if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
@@ -364,7 +384,7 @@ local function SetupUnit(unitID)
 				currentParam4, currentParam5) then
 			-- The unit is doing something that could be caused by the top command
 			-- we were going to issue. That's good enough.
-			Log("Unit is doing good work. Don't touch it.")
+			--Log("Unit is doing good work. Don't touch it.")
 			return
 		end
 
@@ -383,13 +403,13 @@ local function SetupUnit(unitID)
 		if not isIssued then
 			-- Unit is doing something we never asked for. Must have been commanded
 			-- by a user.
-			Log(unitID, " was commanded ", currentID, "(",
-				currentParam1, ", ",
-				currentParam2, ", ",
-				currentParam3, ", ",
-				currentParam4, ", ",
-				currentParam5, ") ", currentOpt)
-			Log("Ignore unit ", unitID, " until it becomes idle.")
+			--Log(unitID, " was commanded ", currentID, "(",
+			--	currentParam1, ", ",
+			--	currentParam2, ", ",
+			--	currentParam3, ", ",
+			--	currentParam4, ", ",
+			--	currentParam5, ") ", currentOpt)
+			--Log("Ignore unit ", unitID, " until it becomes idle.")
 			trackedUnits[unitID] = nil
 			return
 		end
@@ -398,14 +418,18 @@ local function SetupUnit(unitID)
 	for i, cmd in ipairs(cmds) do
 		if i == 1 then
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3])
-			Log(unitID, "; give order ", cmd[1], "(", cmd[2][1], ", ",
-					cmd[2][2], ", ", cmd[2][3], ", ", cmd[2][4], ", ",
-					cmd[2][5], ") ", cmd[3], " (", cmd[4], ")")
+			if debug then
+				Log(unitID, "; give order ", cmd[1], "(", cmd[2][1], ", ",
+						cmd[2][2], ", ", cmd[2][3], ", ", cmd[2][4], ", ",
+						cmd[2][5], ") ", cmd[3], " (", cmd[4], ")")
+			end
 		else
 			spGiveOrderToUnit(unitID, cmd[1], cmd[2], cmd[3] + CMD_OPT_SHIFT)
-			Log(unitID, "; queue order ", cmd[1], "(", cmd[2][1], ", ",
-					cmd[2][2], ", ", cmd[2][3], ", ", cmd[2][4], ", ",
-					cmd[2][5], ") ", cmd[3], " (", cmd[4], ")")
+			if debug then
+				Log(unitID, "; queue order ", cmd[1], "(", cmd[2][1], ", ",
+						cmd[2][2], ", ", cmd[2][3], ", ", cmd[2][4], ", ",
+						cmd[2][5], ") ", cmd[3], " (", cmd[4], ")")
+			end
 		end
 	end
 	trackedUnit.settleFrame = currentFrame + RandomInterval(settleInterval)
@@ -540,7 +564,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	Log("UnitIdle(", unitID, "):")
+	if trackedUnits[unitID] then
+		--Log("UnitIdle(", unitID, "), checkFrame=", trackedUnits[unitID].checkFrame,
+		--			", settleFrame=", trackedUnits[unitID].settleFrame)
+	else
+		--Log("UnitIdle(", unitID, ")")
+	end
 	--TableEcho(trackedUnits[unitID], "- ")
 
 	trackedUnits[unitID] = trackedUnits[unitID] or
@@ -552,6 +581,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 				trackedUnits[unitID].settleFrame),
 			currentFrame + idleWaitInterval)
 	queue:push({trackedUnits[unitID].checkFrame, unitID})
+	--Log("  set checkFrame to ", trackedUnits[unitID].checkFrame)
 	--TableEcho(trackedUnits[unitID], "+ ")
 end
 
@@ -571,8 +601,8 @@ function widget:GameFrame(frame)
 			local unitID = entry[2]
 
 			if trackedUnits[unitID] then
-				Log(unitID, "; ", frame, " >= ".. entry[1],
-						"; checkFrame=", trackedUnits[unitID].checkFrame)
+				--Log(unitID, "; ", frame, " >= ".. entry[1],
+				--		"; checkFrame=", trackedUnits[unitID].checkFrame)
 
 				if entry[1] == trackedUnits[unitID].checkFrame then
 					-- Otherwise, we queued this unit multiple times and this is not
