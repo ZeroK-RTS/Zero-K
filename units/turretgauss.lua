@@ -36,7 +36,7 @@ return { turretgauss = {
   maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  maxWaterDepth                 = 0, -- model-derived would be 305: 35 elmo legs + 6x45 elmo pillar segments should be enough for everyone
+  maxWaterDepth                 = 305, -- model-derived would be 305: 35 elmo legs + 6x45 elmo pillar segments should be enough for everyone
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
@@ -51,6 +51,7 @@ return { turretgauss = {
   },
 
   sightDistance                 = 664, -- Range*1.1 + 48 for radar overshoot
+  sonarDistance                 = 664,
   useBuildingGroundDecal        = true,
   yardmap                       = [[ooooooooo]],
 
