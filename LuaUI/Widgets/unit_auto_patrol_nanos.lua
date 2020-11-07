@@ -98,19 +98,10 @@ local BUILD_ASSIST = 5
 
 -- Check that a unit is still doing the right thing every `checkInterval`
 -- frames.
-local checkInterval = 10 * FPS
--- Don't issue a new command if less than `settleInterval` frames have passed,
--- even if the unit became idle. This is a simple rate limiter on issuing
--- commands in case there are caretakers with nothing to do for their current
--- state.
-local settleInterval = .8 * FPS
+local checkInterval = 4 * FPS
 -- Update the decision about economics at most once every
 -- `decisionCacheInterval` frames.
 local decisionCacheInterval = 1
--- When a caretaker becomes idle, issue it a new command soon but not right
--- away. This interval has to be long enough that the factory we're assisting
--- (while in repair mode) has started the next unit.
-local idleWaitInterval = .3 * FPS
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -204,7 +195,7 @@ local function DecideCommands()
 	end
 
 	-- Reuse commands to avoid table allocation
-	commands = decisionCache.commands
+	local commands = decisionCache.commands
 	local i = 1
 
 	if get_metal and not get_energy and use_metal and use_energy then
@@ -244,7 +235,6 @@ local function DecideCommands()
 	return commands
 end
 
-local madeCommands = {}
 local function MakeCommands(decidedCommands, unitID)
 	if not trackedUnits[unitID].commandTables then
 		-- Cache commands inside trackedUnits. This saves a ton of table
@@ -356,9 +346,26 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 	return false
 end
 
+local function caretaker_new(unitID)
+	return {
+		unitID=unitID,
+		idleWait=1,
+		checkFrame=currentFrame + checkInterval,
+		resetIdle=0,
+		idleAt=0
+	}
+end
+
+local function caretaker_string(caretaker)
+	return caretaker.unitID .. " (iW=" .. caretaker.idleWait ..
+			", cF=" .. caretaker.checkFrame .. ", rI=" .. caretaker.resetIdle .. ")"
+end
+
 local function SetupUnit(unitID)
-	trackedUnits[unitID] = trackedUnits[unitID] or {}
+	trackedUnits[unitID] = trackedUnits[unitID] or caretaker_new(unitID)
+
 	local trackedUnit = trackedUnits[unitID]
+
 	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
 	queue:push({trackedUnit.checkFrame, unitID})
 
@@ -432,7 +439,6 @@ local function SetupUnit(unitID)
 			end
 		end
 	end
-	trackedUnit.settleFrame = currentFrame + RandomInterval(settleInterval)
 	trackedUnit.commands = cmds
 end
 
@@ -564,22 +570,30 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
-	if trackedUnits[unitID] then
-		--Log("UnitIdle(", unitID, "), checkFrame=", trackedUnits[unitID].checkFrame,
-		--			", settleFrame=", trackedUnits[unitID].settleFrame)
-	else
-		--Log("UnitIdle(", unitID, ")")
+	if not trackedUnits[unitID] then
+		trackedUnits[unitID] = caretaker_new(unitID)
+	end
+	local trackedUnit = trackedUnits[unitID]
+
+	if currentFrame <= trackedUnit.idleAt then
+		-- UnitIdle can get called multiple times per frame. If that happens, we
+		-- don't want to bump idleWait every time, so exit early.
+		return
+	end
+	trackedUnit.idleAt = currentFrame
+
+	if debug then
+		Log("UnitIdle(", caretaker_string(trackedUnit), ")")
 	end
 	--TableEcho(trackedUnits[unitID], "- ")
 
-	trackedUnits[unitID] = trackedUnits[unitID] or
-			{checkFrame=currentFrame + idleWaitInterval, settleFrame=currentFrame+idleWaitInterval}
-	trackedUnits[unitID].checkFrame =
-		max(
-			min(
-				trackedUnits[unitID].checkFrame,
-				trackedUnits[unitID].settleFrame),
-			currentFrame + idleWaitInterval)
+	if currentFrame > trackedUnit.resetIdle then
+		trackedUnit.idleWait = 1
+	end
+	trackedUnit.checkFrame = currentFrame + RandomInterval(trackedUnit.idleWait)
+	trackedUnit.idleWait = min(trackedUnit.idleWait * 2, checkInterval)
+	-- If we're not idle at that point, we must have found some work to do.
+	trackedUnit.resetIdle = trackedUnit.checkFrame + 1
 	queue:push({trackedUnits[unitID].checkFrame, unitID})
 	--Log("  set checkFrame to ", trackedUnits[unitID].checkFrame)
 	--TableEcho(trackedUnits[unitID], "+ ")
