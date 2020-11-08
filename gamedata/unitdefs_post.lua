@@ -422,7 +422,7 @@ end
 -- Maneuverability multipliers, useful for testing.
 
 local TURNRATE_MULT = 1
-local TURNRATE_MULT_HIGH = 1.6
+local TURNRATE_MULT_HIGH = 1
 local ACCEL_MULT = 1
 local ACCEL_MULT_HIGH = 1.2
 

@@ -44,7 +44,7 @@ return { shiptorpraider = {
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 560,
   sonarDistance       = 560,
-  turnRate            = 800,
+  turnRate            = 1280,
   waterline           = 0,
   workerTime          = 0,
 

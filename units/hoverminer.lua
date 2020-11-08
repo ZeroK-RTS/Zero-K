@@ -45,7 +45,7 @@ return { hoverminer = {
   },
   sightDistance       = 484,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 800,
   workerTime          = 0,
 
   weapons             = {

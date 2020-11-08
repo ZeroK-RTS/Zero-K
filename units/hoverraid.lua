@@ -51,7 +51,7 @@ return { hoverraid = {
   sightDistance       = 640,
   sonarDistance       = 640,
   turninplace         = 0,
-  turnRate            = 540,
+  turnRate            = 864,
   workerTime          = 0,
   
   weapons             = {

@@ -54,7 +54,7 @@ return { tankraid = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 720,
+  turnRate            = 1152,
   workerTime          = 0,
 
   weapons             = {

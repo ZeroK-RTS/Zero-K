@@ -55,7 +55,7 @@ return { hoverarty = {
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
-  turnRate            = 290,
+  turnRate            = 464,
   workerTime          = 0,
 
   weapons             = {

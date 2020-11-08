@@ -51,7 +51,7 @@ return { vehheavyarty = {
   trackType           = [[StdTank]],
   trackWidth          = 44,
   turninplace         = 0,
-  turnRate            = 460,
+  turnRate            = 736,
 
   weapons             = {
 

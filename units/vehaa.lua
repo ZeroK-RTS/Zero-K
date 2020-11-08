@@ -56,7 +56,7 @@ return { vehaa = {
   trackType              = [[StdTank]],
   trackWidth             = 32,
   turninplace            = 0,
-  turnRate               = 653,
+  turnRate               = 1044,
   upright                = false,
   workerTime             = 0,
 

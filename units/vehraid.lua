@@ -57,7 +57,7 @@ return { vehraid = {
   trackType              = [[StdTank]],
   trackWidth             = 28,
   turninplace            = 0,
-  turnRate               = 703,
+  turnRate               = 1125,
   workerTime             = 0,
 
   weapons                = {

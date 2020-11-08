@@ -47,7 +47,7 @@ return { tankriot = {
   trackType           = [[StdTank]],
   trackWidth          = 50,
   turninplace         = 0,
-  turnRate            = 355,
+  turnRate            = 568,
   workerTime          = 0,
 
   weapons             = {

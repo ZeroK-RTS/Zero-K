@@ -51,7 +51,7 @@ return { hoverheavyraid = {
   sightDistance       = 560,
   sonarDistance       = 560,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 896,
 
   weapons             = {
 

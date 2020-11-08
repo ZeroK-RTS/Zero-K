@@ -61,7 +61,7 @@ return { vehsupport = {
   trackType              = [[StdTank]],
   trackWidth             = 34,
   turninplace            = 0,
-  turnRate               = 420,
+  turnRate               = 672,
   workerTime             = 0,
 
   weapons                = {

@@ -53,7 +53,7 @@ return { shipskirm = {
   sightDistance          = 720,
   sonarDistance          = 720,
   turninplace            = 0,
-  turnRate               = 460,
+  turnRate               = 736,
   waterline              = 4,
   workerTime             = 0,
 

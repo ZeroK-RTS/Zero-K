@@ -47,7 +47,7 @@ return { shipscout = {
   sightDistance          = 800,
   sonarDistance          = 800,
   turninplace            = 0,
-  turnRate               = 740,
+  turnRate               = 1184,
   waterline              = 2,
 
   weapons                = {

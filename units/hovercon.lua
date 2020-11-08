@@ -57,7 +57,7 @@ return { hovercon = {
   sightDistance       = 300,
   sonarDistance       = 300,
   turninplace         = 0,
-  turnRate            = 550,
+  turnRate            = 880,
   workerTime          = 5,
 
   featureDefs         = {

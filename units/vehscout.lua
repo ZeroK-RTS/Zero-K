@@ -50,7 +50,7 @@ return { vehscout = {
   trackType              = [[Motorbike]],
   trackWidth             = 24,
   turninplace            = 0,
-  turnRate               = 1097,
+  turnRate               = 1755,
   workerTime             = 0,
 
   weapons                = {

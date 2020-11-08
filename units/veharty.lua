@@ -56,7 +56,7 @@ return { veharty = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 399,
+  turnRate            = 640,
   workerTime          = 0,
 
   weapons             = {

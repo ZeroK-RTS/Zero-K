@@ -54,7 +54,7 @@ return { vehcon = {
   trackType              = [[StdTank]],
   trackWidth             = 32,
   turninplace            = 0,
-  turnRate               = 625,
+  turnRate               = 1000,
   workerTime             = 5,
 
   featureDefs            = {

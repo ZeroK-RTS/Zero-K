@@ -65,7 +65,7 @@ return { tankcon = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 625,
+  turnRate               = 1000,
   workerTime             = 7.5,
 
   weapons                = {

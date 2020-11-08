@@ -56,7 +56,7 @@ return { vehassault = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 430,
+  turnRate               = 688,
   workerTime             = 0,
 
   weapons                = {

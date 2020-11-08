@@ -54,7 +54,7 @@ return { shipassault = {
   sightDistance          = 440,
   sonarDistance          = 440,
   turninplace            = 0,
-  turnRate               = 240,
+  turnRate               = 384,
   workerTime             = 0,
 
   weapons                = {
