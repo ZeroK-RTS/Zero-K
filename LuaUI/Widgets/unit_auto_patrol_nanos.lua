@@ -82,7 +82,7 @@ local max = math.max
 local mapCenterX = Game.mapSizeX / 2
 local mapCenterZ = Game.mapSizeZ / 2
 
-local debug = false
+local debug = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -99,9 +99,6 @@ local BUILD_ASSIST = 5
 -- Check that a unit is still doing the right thing every `checkInterval`
 -- frames.
 local checkInterval = 4 * FPS
--- Update the decision about economics at most once every
--- `decisionCacheInterval` frames.
-local decisionCacheInterval = 1
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -144,21 +141,19 @@ local function IsImmobileBuilder(ud)
 	return(ud and ud.isBuilder and not ud.canMove and not ud.isFactory)
 end
 
-local decisionCache = { validUntil=nil, commands={} }
-local function DecideCommands()
-	if decisionCache.validUntil ~= nil and
-			decisionCache.validUntil > currentFrame then
-		return decisionCache.commands
-	end
+local function DecideCommands(unitID)
+	-- For now, assume the unit is currently idle. We really ought to figure out
+	-- if it is doing something because there's a big different between going
+	-- from idle to repair and going from reclaiming metal to repair.
 
-	decisionCache.validUntil = currentFrame + decisionCacheInterval
+	local trackedUnit = trackedUnits[unitID]
 
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
 	metalStorage = metalStorage - HIDDEN_STORAGE
 	if debug then
-		Log("metal=", metal, "; storage=", metalStorage, "; pull=",
-				metalPull, "; income=", metalIncome)
+		Log("metal=", metal, "; storage=",
+				metalStorage, "; pull=", metalPull, "; income=", metalIncome)
 	end
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
@@ -170,12 +165,10 @@ local function DecideCommands()
 		get_metal = metalPull >= metalIncome
 		use_metal = metalPull <= metalIncome
 	else
-		local futureMetal = metal + checkInterval * (metalIncome - metalPull) / FPS
-		-- Only get metal if we currently have available storage. Otherwise it
-		-- might technically be right to get it, but it just looks wrong to be
-		-- reclaiming when your storage is full.
-		get_metal = futureMetal < metalStorage and
-				metal < metalStorage * 0.75
+		local futureMetal = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalPull) / FPS))
+		local metalProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
+		-- Only get metal if we won't waste any metal by doing so.
+		get_metal = futureMetal + metalProduction <= metalStorage
 		use_metal = futureMetal > 0 and metal > metalStorage * 0.1
 	end
 
@@ -195,7 +188,7 @@ local function DecideCommands()
 	end
 
 	-- Reuse commands to avoid table allocation
-	local commands = decisionCache.commands
+	local commands = {}
 	local i = 1
 
 	if get_metal and not get_energy and use_metal and use_energy then
@@ -230,7 +223,6 @@ local function DecideCommands()
 
 	-- Terminate the list with nil
 	commands[i] = nil
-	decisionCache.commands = commands
 
 	return commands
 end
@@ -345,7 +337,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 	return false
 end
 
-local function caretaker_new(unitID)
+local function unit_new(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 
 	return {
@@ -354,7 +346,10 @@ local function caretaker_new(unitID)
 		checkFrame=currentFrame + checkInterval,
 		resetIdle=0,
 		idleAt=0,
-		buildDistance=UnitDefs[unitDefID].buildDistance
+		buildDistance=UnitDefs[unitDefID].buildDistance,
+		buildSpeed=UnitDefs[unitDefID].buildSpeed,
+		repairSpeed=UnitDefs[unitDefID].repairSpeed,
+		reclaimSpeed=UnitDefs[unitDefID].reclaimSpeed
 	}
 end
 
@@ -364,21 +359,21 @@ local function caretaker_string(caretaker)
 end
 
 local function SetupUnit(unitID)
-	trackedUnits[unitID] = trackedUnits[unitID] or caretaker_new(unitID)
+	trackedUnits[unitID] = trackedUnits[unitID] or unit_new(unitID)
 
 	local trackedUnit = trackedUnits[unitID]
 
 	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
 	queue:push({trackedUnit.checkFrame, unitID})
 
-	local decisions = DecideCommands()
+	local decisions = DecideCommands(unitID)
 	local cmds = MakeCommands(decisions, unitID)
+
+	--TableEcho(cmds, "want to issue cmds")
+
 	if not cmds then
 		return
 	end
-
-	--TableEcho(cmds, "want to issue cmds")
-	--TableEcho(spGetCommandQueue(unitID, -1), "current command queue")
 
 	local currentID, currentOpt, _, currentParam1,
 			currentParam2, currentParam3, currentParam4, currentParam5 =
@@ -573,7 +568,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
 	if not trackedUnits[unitID] then
-		trackedUnits[unitID] = caretaker_new(unitID)
+		trackedUnits[unitID] = unit_new(unitID)
 	end
 	local trackedUnit = trackedUnits[unitID]
 
