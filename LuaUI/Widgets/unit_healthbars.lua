@@ -119,7 +119,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages',
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
@@ -146,6 +146,13 @@ options = {
 		noHotkey = true,
 		desc = 'Shows percentages next to bars',
 		OnChange = OptionsChanged,
+	},
+	flashJump = {
+		name = 'Jump reload flash',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Set jump reload to flashes when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -1262,7 +1269,7 @@ do
 		-- Processing
 		sec = sec+dt
 		blink = (sec%1) < 0.5
-		blink_j = (activeCmdID == CMD_JUMP) and ((sec%0.5) < 0.25)
+		blink_j = options.flashJump.value and (activeCmdID == CMD_JUMP) and ((sec%0.5) < 0.25)
 
 		gameFrame = GetGameFrame()
 		visibleUnits = GetVisibleUnits(-1, nil, false) --this don't need any delayed update or caching or optimization since its already done in "LUAUI/cache.lua"
