@@ -421,23 +421,24 @@ end
 --------------------------------------------------------------------------------
 -- Maneuverability multipliers, useful for testing.
 
-local TURNRATE_MULT = 1
-local TURNRATE_MULT_HIGH = 1
-local ACCEL_MULT = 1
-local ACCEL_MULT_HIGH = 1.2
+local TURNRATE_MULT_BOT = 1
+local TURNRATE_MULT_VEH = 1
+local ACCEL_MULT_BOT = 1
+local ACCEL_MULT_VEH = 1.2
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
-			ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
-			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
-			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
+			-- NB: also contains some water-walking chickens (as hover)
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_VEH
+			ud.acceleration = ud.acceleration * ACCEL_MULT_VEH
+			ud.brakerate = ud.brakerate * ACCEL_MULT_VEH
 		else
-			ud.turnrate = ud.turnrate * TURNRATE_MULT
-			ud.acceleration = ud.acceleration * ACCEL_MULT
-			ud.brakerate = ud.brakerate * ACCEL_MULT
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_BOT
+			ud.acceleration = ud.acceleration * ACCEL_MULT_BOT
+			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
 		end
 	end
 end
