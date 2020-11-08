@@ -57,7 +57,7 @@ return { shieldriot = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2000,
+  turnRate               = 2400,
   upright                = true,
 
   weapons                = {

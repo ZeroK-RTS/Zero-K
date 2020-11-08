@@ -48,7 +48,7 @@ return { amphtele = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 24,
-  turnRate               = 700,
+  turnRate               = 840,
 
   featureDefs            = {
 

@@ -55,7 +55,7 @@ return { spideremp = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1600,
+  turnRate               = 1920,
 
   weapons                = {
 

@@ -60,7 +60,7 @@ return { spiderscout = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 18,
-  turnRate            = 2100,
+  turnRate            = 2520,
 
   weapons             = {
 

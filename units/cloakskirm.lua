@@ -54,7 +54,7 @@ return { cloakskirm = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 16,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
 
   weapons                = {

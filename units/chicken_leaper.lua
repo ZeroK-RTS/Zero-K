@@ -47,7 +47,7 @@ return { chicken_leaper = {
 
   },
   sightDistance       = 256,
-  turnRate            = 1600,
+  turnRate            = 1920,
   upright             = true,
   workerTime          = 0,
 

@@ -59,7 +59,7 @@ return { striderantiheavy = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
 
   weapons                = {

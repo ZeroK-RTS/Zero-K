@@ -55,7 +55,7 @@ return { cloakraid = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 14,
-  turnRate               = 2500,
+  turnRate               = 3000,
   upright                = true,
 
   weapons                = {

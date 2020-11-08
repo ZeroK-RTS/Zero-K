@@ -54,7 +54,7 @@ return { spiderassault = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 30,
-  turnRate               = 1600,
+  turnRate               = 1920,
 
   weapons                = {
 

@@ -52,7 +52,7 @@ return { chickenwurm = {
   sightDistance       = 384,
   sonarDistance       = 384,
   stealth             = true,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

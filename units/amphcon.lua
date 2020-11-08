@@ -49,7 +49,7 @@ return { amphcon = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 22,
-  turnRate            = 1000,
+  turnRate            = 1200,
   upright             = false,
   workerTime          = 7.5,
 

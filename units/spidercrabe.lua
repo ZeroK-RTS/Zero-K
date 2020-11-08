@@ -59,7 +59,7 @@ return { spidercrabe = {
   trackStretch           = 1,
   trackType              = [[crossFoot]],
   trackWidth             = 50,
-  turnRate               = 600,
+  turnRate               = 720,
 
   weapons                = {
 

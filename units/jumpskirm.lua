@@ -59,7 +59,7 @@ return { jumpskirm = {
   trackStretch        = 0.8,
   trackType           = [[ComTrack]],
   trackWidth          = 14,
-  turnRate            = 2400,
+  turnRate            = 2880,
   upright             = true,
   workerTime          = 0,
 

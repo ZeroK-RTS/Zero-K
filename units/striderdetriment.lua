@@ -49,7 +49,7 @@ return { striderdetriment = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 60,
-  turnRate               = 482,
+  turnRate               = 580,
   upright                = true,
 
   weapons                = {

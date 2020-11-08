@@ -54,7 +54,7 @@ return { chicken_sporeshooter = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 70,
-  turnRate            = 1200,
+  turnRate            = 1440,
   upright             = false,
   workerTime          = 0,
 

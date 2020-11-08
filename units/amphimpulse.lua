@@ -55,7 +55,7 @@ return { amphimpulse = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1200,
+  turnRate               = 1440,
   upright                = true,
 
   weapons                = {

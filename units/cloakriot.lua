@@ -58,7 +58,7 @@ return { cloakriot = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 20,
-  turnRate               = 1800,
+  turnRate               = 2160,
   upright                = true,
 
   weapons                = {

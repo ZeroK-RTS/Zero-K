@@ -54,7 +54,7 @@ return { jumparty = {
   trackStretch           = 0.6,
   trackType              = [[ComTrack]],
   trackWidth             = 33,
-  turnRate               = 600,
+  turnRate               = 720,
   upright                = true,
   workerTime             = 0,
 

@@ -53,7 +53,7 @@ return { spidercon = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1400,
+  turnRate               = 1680,
   workerTime             = 7.5,
 
   featureDefs            = {

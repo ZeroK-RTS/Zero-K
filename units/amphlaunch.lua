@@ -57,7 +57,7 @@ return { amphlaunch = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1800,
+  turnRate               = 2160,
   upright                = true,
 
   weapons                = {

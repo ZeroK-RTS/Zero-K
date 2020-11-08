@@ -59,7 +59,7 @@ return { striderbantha = {
   trackStretch           = 0.5,
   trackType              = [[ComTrack]],
   trackWidth             = 42,
-  turnRate               = 1056,
+  turnRate               = 1268,
   upright                = true,
   workerTime             = 0,
 

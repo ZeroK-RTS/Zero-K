@@ -50,7 +50,7 @@ return { cloakjammer = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2100,
+  turnRate               = 2520,
 
   featureDefs            = {
 

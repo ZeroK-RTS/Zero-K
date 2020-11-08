@@ -57,7 +57,7 @@ return { cloakassault = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 24,
-  turnRate               = 1400,
+  turnRate               = 1680,
   upright                = true,
 
   weapons                = {

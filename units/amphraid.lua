@@ -51,7 +51,7 @@ return { amphraid = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1750,
+  turnRate               = 2100,
   upright                = true,
 
   weapons                = {

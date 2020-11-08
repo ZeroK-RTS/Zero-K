@@ -52,7 +52,7 @@ return { shieldraid = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2500,
+  turnRate               = 3000,
   upright                = true,
 
   weapons                = {

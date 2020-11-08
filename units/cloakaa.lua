@@ -57,7 +57,7 @@ return { cloakaa = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 16,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
 
   weapons                = {

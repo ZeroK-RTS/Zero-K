@@ -66,7 +66,7 @@ return { shieldbomb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 20,
-  turnRate               = 3000,
+  turnRate               = 3600,
   
   featureDefs            = {
 

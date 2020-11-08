@@ -51,7 +51,7 @@ return { striderdante = {
   trackStretch        = 0.6,
   trackType           = [[ComTrack]],
   trackWidth          = 38,
-  turnRate            = 597,
+  turnRate            = 720,
   upright             = true,
   workerTime          = 0,
 

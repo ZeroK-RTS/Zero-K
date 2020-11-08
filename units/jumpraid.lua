@@ -64,7 +64,7 @@ return { jumpraid = {
   trackStretch          = 1,
   trackType             = [[ComTrack]],
   trackWidth            = 22,
-  turnRate              = 1800,
+  turnRate              = 2160,
   upright               = true,
   workerTime            = 0,
 

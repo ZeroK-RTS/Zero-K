@@ -40,7 +40,7 @@ return { spideraa = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 1700,
+  turnRate               = 2040,
 
   weapons                = {
 

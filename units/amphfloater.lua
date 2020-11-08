@@ -53,7 +53,7 @@ return { amphfloater = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1100,
+  turnRate               = 1320,
   upright                = true,
 
   weapons                = {

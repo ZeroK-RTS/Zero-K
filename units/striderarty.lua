@@ -44,7 +44,7 @@ return { striderarty = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 36,
-  turnRate               = 990,
+  turnRate               = 1188,
   upright                = true,
   workerTime             = 0,
 
