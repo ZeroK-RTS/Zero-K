@@ -166,10 +166,12 @@ local function DecideCommands(unitID)
 		use_metal = metalPull <= metalIncome
 	else
 		local futureMetal = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalPull) / FPS))
-		local metalProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
 		-- Only get metal if we won't waste any metal by doing so.
+		local metalProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
 		get_metal = futureMetal + metalProduction <= metalStorage
-		use_metal = futureMetal > 0 and metal > metalStorage * 0.1
+		-- Only use metal if we won't waste any build power by doing so.
+		local metalUse = checkInterval * trackedUnit.buildSpeed / FPS
+		use_metal = futureMetal - metalUse >= 0
 	end
 
 	if energyStorage < 1 then
@@ -177,9 +179,14 @@ local function DecideCommands(unitID)
 		use_energy = energyPull <= energyIncome
 	else
 		local futureEnergy = energy + checkInterval * (energyIncome - energyPull) / FPS
-		get_energy = futureEnergy < energyStorage and
-				energy < energyStorage * 0.9
-		use_energy = futureEnergy > 0 and energy > energyStorage * 0.1
+		-- Only get energy if we have storage for it.
+		local energyProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
+		get_energy = futureEnergy + energyProduction <= energyStorage
+		-- Only use energy if we won't waste any build power by doing so. It
+		-- would go to overdrive, but it's better to keep reserves on the
+		-- ground.
+		local energyUse = checkInterval * trackedUnit.repairSpeed / FPS
+		use_energy = futureEnergy - energyUse >= 0
 	end
 
 	if debug then
@@ -191,34 +198,40 @@ local function DecideCommands(unitID)
 	local commands = {}
 	local i = 1
 
-	if get_metal and not get_energy and use_metal and use_energy then
-		commands[i] = PATROL
+	if use_metal and use_energy then
+		commands[i] = BUILD_ASSIST
 		i = i + 1
-	else
-		if use_metal and use_energy then
-			commands[i] = BUILD_ASSIST
-			i = i + 1
-		end
-		if use_energy then
-			commands[i] = REPAIR_UNITS
-			i = i + 1
-		end
-		if get_metal and get_energy then
-			if metal > energy then
-				commands[i] = RECLAIM_ENERGY
-				commands[i + 1] = RECLAIM_METAL
-			else
-				commands[i] = RECLAIM_METAL
-				commands[i + 1] = RECLAIM_ENERGY
-			end
-			i = i + 2
-		elseif get_metal then
-			commands[i] = RECLAIM_METAL
-			i = i + 1
-		elseif get_energy then
+	end
+	if use_energy then
+		commands[i] = REPAIR_UNITS
+		i = i + 1
+	end
+	if get_metal and get_energy then
+		if metal > energy then
 			commands[i] = RECLAIM_ENERGY
-			i = i + 1
+			commands[i + 1] = RECLAIM_METAL
+		else
+			commands[i] = RECLAIM_METAL
+			commands[i + 1] = RECLAIM_ENERGY
 		end
+		i = i + 2
+	elseif get_metal then
+		commands[i] = RECLAIM_METAL
+		i = i + 1
+	elseif get_energy then
+		commands[i] = RECLAIM_ENERGY
+		i = i + 1
+	end
+
+	-- Queue up commands that would waste build power at the end, because build
+	-- power cannot be stored.
+	if not use_metal or not use_energy then
+		commands[i] = BUILD_ASSIST
+		i = i + 1
+	end
+	if not use_energy then
+		commands[i] = REPAIR_UNITS
+		i = i + 1
 	end
 
 	-- Terminate the list with nil
