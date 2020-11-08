@@ -246,8 +246,7 @@ local function MakeCommands(decidedCommands, unitID)
 
 		trackedUnits[unitID].commandTables = {}
 
-		local unitDefID = spGetUnitDefID(unitID)
-		local buildDistance = UnitDefs[unitDefID].buildDistance
+		local buildDistance = trackedUnits[unitID].buildDistance
 
 		-- Patrolling doesn't do anything if you target the current location
 		-- of the unit. Point patrol towards map center.
@@ -347,12 +346,15 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 end
 
 local function caretaker_new(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
+
 	return {
 		unitID=unitID,
 		idleWait=1,
 		checkFrame=currentFrame + checkInterval,
 		resetIdle=0,
-		idleAt=0
+		idleAt=0,
+		buildDistance=UnitDefs[unitDefID].buildDistance
 	}
 end
 
