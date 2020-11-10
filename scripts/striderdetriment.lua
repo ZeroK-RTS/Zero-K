@@ -271,7 +271,7 @@ function jumping(jumpPercent)
 	if jumpPercent < 30 then
 		GG.PokeDecloakUnit(unitID, 50)
 		EmitSfx(lfoot, jetfeet_fire)
-		EmitSfx(rfoot, jetfeet_fire)			
+		EmitSfx(rfoot, jetfeet_fire)
 	end
 
 	if jumpPercent > 95 and not landing then
@@ -321,27 +321,27 @@ function script.AimWeapon(num, heading, pitch)
 
 	StartThread(RestoreAfterDelay)
 
-	if num == 1 then  -- Left gunpod	
+	if num == 1 then  -- Left gunpod
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))	
+		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis)	
-	elseif num == 2 then -- Right gunpod	
+		WaitForTurn(larm, x_axis)
+	elseif num == 2 then -- Right gunpod
 		Turn(torso, y_axis, heading, math.rad(140))	
 		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(rarm, x_axis)			
-	elseif num == 4 then -- Face laser
-		Turn(torso, y_axis, heading, math.rad(90))
-		Move(head, y_axis, 0, 10)
-		Move(head, z_axis, 0, 10)
-		WaitForTurn(torso, y_axis)					
-	elseif num == 5 then -- Shoulder Cannon
+		WaitForTurn(rarm, x_axis)
+	elseif num == 3 then -- Shoulder Cannon
 		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
 		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
 		Move(shouldercannon, y_axis, -2, 0.7)
-		WaitForTurn(shouldercannon, x_axis)	
+		WaitForTurn(shouldercannon, x_axis)
+	elseif num == 5 then -- Face laser
+		Turn(torso, y_axis, heading, math.rad(90))
+		Move(head, y_axis, 0, 10)
+		Move(head, z_axis, 0, 10)
+		WaitForTurn(torso, y_axis)
 	end
 	lastTorsoHeading = heading
 	return true
@@ -360,35 +360,35 @@ end
 function script.Shot(num)
 	-- Left
 	if num == 1 then	
-		EmitSfx(larmflare3, muzzle_smoke_large2)	
-		Move(barrelsL[gunIndex[1]], z_axis, -40)	
+		EmitSfx(larmflare3, muzzle_smoke_large2)
+		Move(barrelsL[gunIndex[1]], z_axis, -40)
 		EmitSfx(larmflare3, muzzle_flash_large)
 		Move(barrelsL[gunIndex[1]], z_axis, 0, 30)
 	end
 
 	-- right
 	if num == 2 then
-		EmitSfx(rarmflare3, muzzle_smoke_large2)	
-		Move(barrelsR[gunIndex[2]], z_axis, -40)	
+		EmitSfx(rarmflare3, muzzle_smoke_large2)
+		Move(barrelsR[gunIndex[2]], z_axis, -40)
 		EmitSfx(rarmflare3, muzzle_flash_large)
 		Move(barrelsR[gunIndex[2]], z_axis, 0, 30)
 	end
 
-	-- face laser
-	if num == 4 then			
-		EmitSfx(head, muzzle_smoke_large2)
-		EmitSfx(head, muzzle_flash_large)			
-	end
-
 	-- Shoulder cannon
-	if num == 5 then
+	if num == 3 then
 		EmitSfx(shoulderflare, muzzle_smoke_large2)
 		Move(shouldercannon, z_axis, -20)
-		Turn(torso, x_axis, math.rad(-17))	
-		EmitSfx(shoulderflare, muzzle_flash_large)	
-		Turn(torso, x_axis, 0, math.rad(20))		
-		Move(shouldercannon, z_axis, 0, 50)		
-		Turn(shouldercannon, x_axis, 0, math.rad(40))	
+		Turn(torso, x_axis, math.rad(-17))
+		EmitSfx(shoulderflare, muzzle_flash_large)
+		Turn(torso, x_axis, 0, math.rad(20))
+		Move(shouldercannon, z_axis, 0, 50)
+		Turn(shouldercannon, x_axis, 0, math.rad(40))
+	end
+
+	-- face laser
+	if num == 5 then
+		EmitSfx(head, muzzle_smoke_large2)
+		EmitSfx(head, muzzle_flash_large)
 	end
 
 	if gunFixEmit[num] then
@@ -402,11 +402,6 @@ function script.BlockShot(num, targetID)
 	if not targetID then
 		return false
 	end
-
-	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
-		return true
-	end
-
 	return false
 end
 

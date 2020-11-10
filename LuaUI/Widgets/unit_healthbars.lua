@@ -1102,16 +1102,20 @@ function widget:Initialize()
 
 	--// find real primary weapon and its reloadtime
 	for _, ud in pairs(UnitDefs) do
-		ud.reloadTime    = 0;
-		ud.primaryWeapon = 1;
-		ud.shieldPower   = 0;
+		ud.reloadTime    = 0
+		ud.primaryWeapon = 1
+		ud.shieldPower   = 0
+		local numOverride = ud.customParams.draw_reload_num and tonumber(ud.customParams.draw_reload_num)
 
 		for i = 1, #ud.weapons do
 			local WeaponDefID = ud.weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
-			if (WeaponDef.reload > ud.reloadTime) then
-				ud.reloadTime    = WeaponDef.reload;
-				ud.primaryWeapon = i;
+			if (WeaponDef.reload > ud.reloadTime) or numOverride == i then
+				ud.reloadTime    = WeaponDef.reload
+				ud.primaryWeapon = i
+				if numOverride == i then
+					break
+				end
 			end
 		end
 		local shieldDefID = ud.shieldWeaponDef

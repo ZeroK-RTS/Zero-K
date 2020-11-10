@@ -30,6 +30,7 @@ return { striderdetriment = {
     jump_rotate_midair = 1,
     modelradius        = [[95]],
     extradrawrange     = 700,
+    draw_reload_num    = 3,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],
@@ -87,6 +88,10 @@ return { striderdetriment = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
+      def                = [[OBLITERATION_BLASTER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+    },
+    {
       def                = [[AALASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
@@ -94,10 +99,6 @@ return { striderdetriment = {
     {
       def                = [[TRILASER]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-    {
-      def                = [[OBLITERATION_BLASTER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
     {
       def                = [[LANDING]],
@@ -133,7 +134,7 @@ return { striderdetriment = {
       bouncerebound           = 0.15,
       bounceslip              = 1,
       burst                   = 3,
-      burstrate               = 0.6,
+      burstrate               = 0.2,
       cegTag                  = [[gauss_tag_h]],
       craterBoost             = 0,
       craterMult              = 0,
@@ -144,13 +145,14 @@ return { striderdetriment = {
       },
 
       damage                  = {
-        default = 500.1,
+        default = 400.1,
       },
 
       explosionGenerator      = [[custom:gauss_hit_h]],
+      fireTolerance           = 4000,
       groundbounce            = 1,
       heightBoostFactor       = 0, -- stops shooting at ground while jumping
-      heightMod                  = 1.2,
+      heightMod               = 1.2,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -159,7 +161,7 @@ return { striderdetriment = {
       noSelfDamage            = true,
       numbounce               = 40,
       range                   = 550,
-      reloadtime              = 2.5,
+      reloadtime              = 1.8,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
       size                    = 2.0,
@@ -168,7 +170,6 @@ return { striderdetriment = {
       soundStart              = [[weapon/gauss_fire]],
       sprayangle              = 900,
       stages                  = 32,
-      fireTolerance              = 4000,  
       tolerance               = 4000,
       turret                  = true,
       waterweapon             = true,
