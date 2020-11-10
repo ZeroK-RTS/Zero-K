@@ -308,7 +308,7 @@ local function RestoreAfterDelay()
 	Turn(larm, x_axis, 0, math.rad(30))
 	Turn(larmcannon, y_axis, 0, math.rad(10))
 	Turn(rarm, x_axis, 0, math.rad(30))
-	Turn(larmcannon, y_axis, 0, math.rad(10))
+	Turn(rarmcannon, y_axis, 0, math.rad(10))
 	Turn(shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
@@ -339,8 +339,14 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		lastGunAverageHeading = heading
 		
+		local armAngle = leftTorsoHeading - heading
+		if armAngle > 3 then
+			armAngle = armAngle - 2*math.pi
+		end
+		armAngle = math.min(0, math.max(-0.2, armAngle))
+		
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larmcannon, y_axis, leftTorsoHeading - heading, math.rad(20))
+		Turn(larmcannon, y_axis, armAngle, math.rad(20))
 		Turn(larm, x_axis, -pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
@@ -352,8 +358,10 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		lastGunAverageHeading = heading
 		
+		local armAngle = math.min(0.2, math.max(0, rightTorsoHeading - heading))
+		
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(rarmcannon, y_axis, rightTorsoHeading - heading, math.rad(20))
+		Turn(rarmcannon, y_axis, armAngle, math.rad(20))
 		Turn(rarm, x_axis, -pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
