@@ -77,6 +77,8 @@ local commandDisplayConfig = {
 
 	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest Airpad for repairs and, for bombers, ammo."},
 
+	[CMD_EXCLUDEAIRPAD] = {texture = imageDir .. 'Bold/excludeairpad.png'},
+
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
 

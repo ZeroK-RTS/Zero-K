@@ -77,7 +77,7 @@ local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconoffset = 22
+local iconoffsetDefault = 22
 
 
 local iconUnitTexture = {}
@@ -176,6 +176,11 @@ function WG.icons.SetUnitIcon(unitID, data)
 	local iconName = data.name
 	local texture = data.texture
 	local color = data.color
+	local iconoffset = data.offset
+
+	if iconoffset == nil or iconoffset == 0 then
+		iconoffset = iconoffsetDefault
+	end
 	
 	if not iconOrders[iconName] then
 		SetOrder(iconName, math.huge)

@@ -27,6 +27,7 @@ local configList = {
 	{cmdID = CMD_AREA_GUARD            , default = false, name = "Guard"},
 	{cmdID = CMD_UNIT_SET_TARGET_CIRCLE, default = false, name = "Set Target"},
 	{cmdID = CMD.WAIT                  , default = false, name = "Wait"},
+	{cmdID = CMD_EXCLUDEAIRPAD		   , default = false, name = "Exclude Airpad"},
 	
 	{label = "Basic States"},
 	{cmdID = CMD_WANT_ONOFF            , state = true, default = true, name = "Activation"},

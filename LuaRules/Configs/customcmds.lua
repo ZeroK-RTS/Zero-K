@@ -60,6 +60,7 @@ local cmds = {
 	REARM = 33410, -- bomber control
 	FIND_PAD = 33411, -- bomber control
 	UNIT_FLOAT_STATE = 33412,
+	EXCLUDEAIRPAD = 33413,
 	PRIORITY = 34220,
 	MISC_PRIORITY = 34221,
 	RETREAT = 34223,
