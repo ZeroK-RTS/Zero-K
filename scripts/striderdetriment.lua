@@ -1,5 +1,7 @@
 include 'constants.lua'
 
+local AngleAverageShortest = Spring.Utilities.Vector.AngleAverageShortest
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- pieces
@@ -32,7 +34,7 @@ local barrels = {
 	{larmbarrel1, larmbarrel2, larmbarrel3},
 	{rarmbarrel1, rarmbarrel2, rarmbarrel3},
 }
-local aimpoints = {torso, torso, aaturret, headlaser2, shouldercannon, lfoot, lfoot, lfoot}
+local aimpoints = {larmcannon, rarmcannon, aaturret, headlaser2, shouldercannon, lfoot, lfoot, lfoot}
 
 local gunIndex = {1,1,1,1,1,1,1,1}
 local gunFixEmit = {true, true, false, false, false, false, false, false}
@@ -43,6 +45,7 @@ for i = 1, #gunFlares do
 end
 
 local lastTorsoHeading = 0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --signals
@@ -79,6 +82,11 @@ local ARM_FRONT_SPEED = math.rad(35) * PACE
 local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(30) * PACE
 
+local leftTorsoHeading = false
+local rightTorsoHeading = false
+local lastGunAverageHeading = false
+
+
 local isFiring = false
 -- Effects
 local dirtfling = 1024
@@ -108,7 +116,7 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-
+	Spring.SetUnitMaxRange(unitID, 510)
 end
 
 local function Step(frontLeg, backLeg, impactFoot)
@@ -234,7 +242,7 @@ local function PreJumpThread(turn,lineDist,flightDist,duration)
 	--EmitSfx(rfoot, jetfeet)
 end
 
-local function BeginJumpThread()	
+local function BeginJumpThread()
 	--EmitSfx(lfoot, takeoff_explosion)
 	--EmitSfx(lfoot, dirtfling)
 	--EmitSfx(lfoot, jetfeet)
@@ -298,7 +306,9 @@ local function RestoreAfterDelay()
 	Move(head, z_axis, -4, 10)
 	Turn(torso, y_axis, 0, math.rad(70))
 	Turn(larm, x_axis, 0, math.rad(30))
+	Turn(larmcannon, y_axis, 0, math.rad(10))
 	Turn(rarm, x_axis, 0, math.rad(30))
+	Turn(larmcannon, y_axis, 0, math.rad(10))
 	Turn(shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
@@ -322,13 +332,29 @@ function script.AimWeapon(num, heading, pitch)
 	StartThread(RestoreAfterDelay)
 
 	if num == 1 then  -- Left gunpod
+		leftTorsoHeading = heading
+		if rightTorsoHeading then
+			heading = AngleAverageShortest(rightTorsoHeading, leftTorsoHeading)
+			rightTorsoHeading = false
+		end
+		lastGunAverageHeading = heading
+		
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larm, x_axis, math.rad(-10) - pitch, math.rad(40))
+		Turn(larmcannon, y_axis, leftTorsoHeading - heading, math.rad(20))
+		Turn(larm, x_axis, -pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 	elseif num == 2 then -- Right gunpod
+		rightTorsoHeading = heading
+		if leftTorsoHeading then
+			heading = AngleAverageShortest(rightTorsoHeading, leftTorsoHeading)
+			leftTorsoHeading = false
+		end
+		lastGunAverageHeading = heading
+		
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(rarm, x_axis, math.rad(-10) - pitch, math.rad(40))
+		Turn(rarmcannon, y_axis, rightTorsoHeading - heading, math.rad(20))
+		Turn(rarm, x_axis, -pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 	elseif num == 3 then -- Shoulder Cannon
@@ -338,6 +364,10 @@ function script.AimWeapon(num, heading, pitch)
 		Move(shouldercannon, y_axis, -2, 0.7)
 		WaitForTurn(shouldercannon, x_axis)
 	elseif num == 5 then -- Face laser
+		if lastGunAverageHeading then
+			heading = lastGunAverageHeading
+			lastGunAverageHeading = false
+		end
 		Turn(torso, y_axis, heading, math.rad(90))
 		Move(head, y_axis, 0, 10)
 		Move(head, z_axis, 0, 10)
@@ -370,18 +400,12 @@ function script.Shot(num)
 
 	-- Shoulder cannon
 	if num == 3 then
-		EmitSfx(shoulderflare, muzzle_smoke_large2)
 		Move(shouldercannon, z_axis, -20)
 		Turn(torso, x_axis, math.rad(-17))
 		EmitSfx(shoulderflare, muzzle_flash_large)
 		Turn(torso, x_axis, 0, math.rad(20))
 		Move(shouldercannon, z_axis, 0, 50)
 		Turn(shouldercannon, x_axis, 0, math.rad(40))
-	end
-
-	-- face laser
-	if num == 5 then
-		EmitSfx(head, muzzle_smoke_large2)
 	end
 
 	if gunFixEmit[num] then
