@@ -4,13 +4,13 @@ return { striderdetriment = {
   description            = [[Ultimate Assault Strider]],
   acceleration           = 0.328,
   activateWhenBuilt      = true,
-  autoheal               = 30,
+  autoheal               = 60,
   brakeRate              = 1.435,
   buildCostMetal         = 20000,
   builder                = false,
   buildPic               = [[striderdetriment.png]],
   canGuard               = true,
-  --canManualFire          = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
@@ -20,8 +20,16 @@ return { striderdetriment = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+	canjump            = 1,
+    jump_range         = 1200,
+    jump_height        = 700,
+    jump_speed         = 8,
+    jump_delay         = 100,
+    jump_reload        = 120,
+    jump_from_midair   = 1,
+    jump_rotate_midair = 1,		
     modelradius    = [[95]],
-    extradrawrange = 925,
+    extradrawrange = 700,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],
@@ -30,58 +38,109 @@ return { striderdetriment = {
   iconType               = [[krogoth]],
   leaveTracks            = true,
   losEmitHeight          = 100,
-  maxDamage              = 86000,
+  maxDamage              = 100000,
   maxSlope               = 37,
   maxVelocity            = 1.2,
   maxWaterDepth          = 5000,
   minCloakDistance       = 150,
-  movementClass          = [[AKBOT6]],
+  movementClass          = [[AKBOT6]],  
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[detriment.s3o]],
+  radarDistance          = 1200,
+  radarEmitHeight        = 12,
   script                 = [[striderdetriment.lua]],
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
+  sfxtypes            = {
+    explosiongenerators = {
+      [[custom:dirtyfootstep]],
+	    [[custom:WARMUZZLE]],
+      [[custom:emg_shells_l]],
+	    [[custom:extra_large_muzzle_flash_flame]],
+	    [[custom:extra_large_muzzle_flash_smoke]],	  
+	    [[custom:vindiback_large]],
+	    [[custom:rocketboots_muzzle]],
+    },
+  },
+  
   sightDistance          = 910,
-  sonarDistance          = 910,
+  sonarDistance          = 1200,
   trackOffset            = 0,
   trackStrength          = 8,
-  trackStretch           = 0.8,
+  trackStretch           = 0.6,
   trackType              = [[ComTrack]],
   trackWidth             = 60,
+<<<<<<< master
+  turnRate               = 400,
+=======
   turnRate               = 580,
+>>>>>>> master
   upright                = true,
 
   weapons                = {
 
     {
       def                = [[GAUSS]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-    {
+    },	
+		
+	{
+      def                = [[GAUSS]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },	
+	
+	{
       def                = [[AALASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
-
-    {
-      def                = [[ORCONE_ROCKET]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
-    },
-
-    {
+	
+	{
       def                = [[TRILASER]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
+	},
 
+    {
+      def                = [[OBLITERATION_BLASTER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+    },
+	
+	{
+      def                = [[LANDING]],
+      badTargetCategory  = [[]],
+      mainDir            = [[1 0 0]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[]],
+    },
+	
+	{
+      def                = [[FOOTCRATER]],
+      badTargetCategory  = [[]],
+      mainDir            = [[1 0 0]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[]],
+    },
+	
+	{
+      def                = [[TAKEOFF]],
+      badTargetCategory  = [[]],
+      mainDir            = [[1 0 0]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[]],
+    },
+	
+	
+	
+	
   },
 
 
   weaponDefs             = {
-
-    GAUSS         = {
+  
+	GAUSS         = {
       name                    = [[Gauss Battery]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
@@ -89,7 +148,7 @@ return { striderdetriment = {
       bouncerebound           = 0.15,
       bounceslip              = 1,
       burst                   = 3,
-      burstrate               = 0.2,
+      burstrate               = 0.6,
       cegTag                  = [[gauss_tag_h]],
       craterBoost             = 0,
       craterMult              = 0,
@@ -100,12 +159,13 @@ return { striderdetriment = {
       },
 
       damage                  = {
-        default = 200.1,
-        planes  = 200.1,
+        default = 500.1,        
       },
 
       explosionGenerator      = [[custom:gauss_hit_h]],
       groundbounce            = 1,
+	  heightBoostFactor       = 0, -- stops shooting at ground while jumping
+	  heightMod			      = 1.2,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -113,24 +173,25 @@ return { striderdetriment = {
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,
-      range                   = 600,
-      reloadtime              = 1.2,
+      range                   = 550,
+      reloadtime              = 2.5,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
-      size                    = 0.8,
+      size                    = 2.0,
       sizeDecay               = -0.1,
       soundHit                = [[weapon/gauss_hit]],
       soundStart              = [[weapon/gauss_fire]],
-      sprayangle              = 800,
+      sprayangle              = 900,
       stages                  = 32,
-      tolerance               = 4096,
+	  fireTolerance		      = 4000,  
+      tolerance               = 4000,
       turret                  = true,
       waterweapon             = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 900,
     },
-
-    AALASER         = {
+	
+	AALASER         = {
       name                    = [[Anti-Air Laser Battery]],
       areaOfEffect            = 12,
       beamDecay               = 0.736,
@@ -187,8 +248,8 @@ return { striderdetriment = {
       },
       
       damage                  = {
-        default = 600,
-        planes  = 600,
+        default = 1000,
+        planes  = 1000,
         subs    = 45,
       },
 
@@ -204,7 +265,7 @@ return { striderdetriment = {
       minIntensity            = 1,
       noSelfDamage            = true,
       projectiles             = 3,
-      range                   = 600,
+      range                   = 700,
       reloadtime              = 6,
       rgbColor                = [[0 1 0]],
       scrollSpeed             = 5,
@@ -217,59 +278,162 @@ return { striderdetriment = {
       texture4                = [[smallflare]],
       thickness               = 8,
       tileLength              = 300,
-      tolerance               = 10000,
+	  fireTolerance		      = 4200, -- about 50 degrees
+      tolerance               = 4200, -- about 50 degrees
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 2250,
     },
-    
-    ORCONE_ROCKET = {
-      name                    = [[Medium-Range Missiles]],
-      areaOfEffect            = 160,
-      cegTag                  = [[seismictrail]],
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-      
-      customParams            = {
-        gatherradius = [[180]],
-        smoothradius = [[120]],
-        smoothmult   = [[0.25]],
-        smoothexponent = [[0.45]],
-        movestructures = [[1]],
-        
-        light_color = [[1 1.4 0.35]],
-        light_radius = 400,
-        reaim_time = 1,
+	
+	
+	OBLITERATION_BLASTER  = {
+      name                    = [[Obliteration Blaster]],
+      areaOfEffect            = 200,
+	  avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidGround             = false,
+      avoidNeutral            = false,
+	  burst = 10,
+	  burstRate = 0.1,
+	  sprayAngle = 2000,
+      collideFriendly         = true,
+      coreThickness           = 0.5,
+      craterBoost             = 6,
+      craterMult              = 14,
+	  commandFire             = true, 
+      customparams = {
+        light_radius = 380,
+        light_color = [[3.0 0.2 0.2]],
+		gatherradius = [[10]],
+        smoothradius = [[64]],
+        smoothmult   = [[0.5]],
+        smoothheightoffset = [[40]],
+		movestructures = [[1]],	  
       },
+	  
+      damage                  = {
+        default = 1500.1,
+        subs    = 0.36,
+      },
+
+      duration                = 0.032,
+      edgeEffectiveness       = 0.5,
+      explosionGenerator      = [[custom:slam]],
+	  fallOffRate = 0.1,
+      fireStarter             = 10,
+      --impactOnly              = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      lodDistance             = 10000,
+      range                   = 900,
+      reloadtime              = 30,	  
+      rgbColor                = [[1 0 0]],
+      soundHit           	  = "explosion/mini_nuke",
+      soundStart              = [[weapon/laser/heavylaser_fire]],
+      soundTrigger            = false,
+      sweepfire               = false,
+	  texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      thickness               = 10,
+      tolerance               = 2000,
+      turret                  = true,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 2000,
+    },	
+	
+	LANDING = {
+      name                    = [[Detriment Landing]],
+      areaOfEffect            = 500,
+      canattackground         = false,
+      craterBoost             = 100,
+      craterMult              = 15,
 
       damage                  = {
-        default = 851,
-        subs    = 42.5,
+        default = 2000,
       },
 
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:TESS]],
-      fireStarter             = 55,
-      flightTime              = 10,
-      impulseBoost            = 0,
-      impulseFactor           = 0.8,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_kickback.s3o]],
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:FLASH64]],
+	  explosionSpeed          = 500,
+      impulseBoost            = 10,
+      impulseFactor           = 2,
+      interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 925,
-      reloadtime              = 1.533,
-      smokeTrail              = false,
-      soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
-      turnrate                = 18000,
-      weaponAcceleration      = 245,
-      weaponTimer             = 2,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 10000,
+      range                   = 400,
+      reloadtime              = 120,
+      soundHit           	  = "explosion/mini_nuke",
+      soundStart              = [[krog_stomp]],
+      soundStartVolume        = 10,
+      turret                  = false,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 5,
+
+      customParams            = {
+        hidden = true
+      }
+    },	
+	
+	FOOTCRATER = {
+      name                    = [[Detriment walking]],
+	  areaOfEffect			  = 10,
+      craterAreaOfEffect      = 150,
+      canattackground         = false,
+      craterBoost             = 20,
+      craterMult              = 15,
+
+      damage                  = {
+        default = 200.1,        
+      },
+
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:dirtyfootstep]],	  
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      range                   = 5,
+      reloadtime              = 13,
+      soundHit                = [[weapon/cannon/reaper_hit]],
+     
+      soundHitVolume        = 1,
+      turret                  = false,
+      weaponType              = [[Melee]],
+      weaponVelocity          = 5,
+
+      customParams            = {
+        hidden = true
+      }
     },
+	
+	TAKEOFF = {
+      name                    = [[Detriment Takeoff]],
+      areaOfEffect            = 300,
+      canattackground         = false,
+      craterBoost             = 2,
+      craterMult              = 5,
 
+      damage                  = {
+        default = 500,
+      },
 
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:FLASH64]],
+	  explosionSpeed          = 500,
+      impulseBoost            = 2,
+      impulseFactor           = 2,
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      range                   = 300,
+      reloadtime              = 120,
+      soundHit           	  = "explosion/mini_nuke",
+      soundStart              = [[krog_stomp]],
+      soundStartVolume        = 5,
+      turret                  = false,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 5,
+
+      customParams            = {
+        hidden = true
+      }
+    },	
   },
 
 

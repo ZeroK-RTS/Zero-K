@@ -48,6 +48,8 @@ local secondPart = 0
 local mouseDistance = 1000
 local extraDrawRange
 local sumoSelected = false
+local detrimentSelected = false
+local detrimentUnitID = nil
 
 --------------------------------------------------------------------------------
 --speedups
@@ -98,6 +100,12 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local sumoDefID = UnitDefNames.jumpsumo.id
 local sumoAoE = WeaponDefNames.jumpsumo_landing.damageAreaOfEffect
 local sumoEE = WeaponDefNames.jumpsumo_landing.edgeEffectiveness
+
+local detrimentDefID = UnitDefNames.striderdetriment.id
+local detrimentLandingAoE = WeaponDefNames.striderdetriment_landing.damageAreaOfEffect
+local detrimentLandingEE = WeaponDefNames.striderdetriment_landing.edgeEffectiveness
+local detrimentTakeoffAoE = WeaponDefNames.striderdetriment_takeoff.damageAreaOfEffect
+local detrimentTakeoffEE = WeaponDefNames.striderdetriment_takeoff.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions
@@ -343,14 +351,22 @@ local function UpdateSelection()
 	dgunUnitID = nil
 	aoeUnitID = nil
 	sumoSelected = false
+	detrimentSelected = false
+	detrimentUnitID = nil
 
 	for unitDefID, unitIDs in pairs(sel) do
 		if unitDefID ~= "n" then
+			local unitID = unitIDs[1]			
+		
 			if unitDefID == sumoDefID then
 				sumoSelected = true
 			end
-
-			local unitID = unitIDs[1]
+			
+			if unitDefID == detrimentDefID then
+				detrimentSelected = true
+				detrimentUnitID = unitID
+			end
+			
 			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
 			
 			if dynamicComm and not unitHasBeenSetup[unitID] then
@@ -732,6 +748,11 @@ function widget:DrawWorld()
 		unitID = dgunUnitID
 	elseif (cmd == CMD_JUMP and sumoSelected) then
 		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
+		return
+	elseif (cmd == CMD_JUMP and detrimentSelected) then
+		local _,_,_,fx, fy, fz = GetUnitPosition(detrimentUnitID, true)
+		DrawAoE(fx, fy, fz, detrimentTakeoffAoE, detrimentTakeoffEE)
+		DrawAoE(tx, ty, tz, detrimentLandingAoE, detrimentLandingEE)
 		return
 	else
 		return

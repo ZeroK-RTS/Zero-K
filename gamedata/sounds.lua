@@ -60,6 +60,11 @@ local Sounds = {
 			maxconcurrent = 4, --- some reasonable limits
 			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
 		},
+		DetrimentJump = {
+			file = "sounds/detriment_jump.wav",
+			pitchmod = 0.1,
+			gainmod = 0.05,
+		},
 		Sparks = {
 			file = "sounds/sparks.wav",
 			priority = -10,
