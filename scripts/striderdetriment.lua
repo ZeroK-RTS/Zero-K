@@ -129,14 +129,6 @@ local function DoRestore()
 	lastTorsoHeading = 0
 end
 
-function script.Create()
-	Turn(larm, z_axis, -0.1)
-	Turn(rarm, z_axis, 0.1)
-	Turn(shoulderflare, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Spring.SetUnitMaxRange(unitID, 510)
-end
-
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	mainLeg, offLeg = offLeg, mainLeg 
 	
@@ -294,17 +286,11 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
 	end
 	Move(torso, y_axis, 0, 1)
-	Move(pelvis, y_axis, -20, 20)
-	Move(pelvis, z_axis, -10, 10)
+	Move(pelvis, y_axis, -20, 16)
+	Move(pelvis, z_axis, -10, 8)
 	Turn(torso, x_axis, math.rad(20), math.rad(30))
 	
 	Turn(pelvis, z_axis, 0, math.rad(30))
-	if not(isFiring) then
-		Turn(torso, y_axis, 0, math.rad(140))
-		WaitForTurn(torso, y_axis)
-	end
-	Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
-	Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
 end
@@ -312,19 +298,13 @@ end
 local function EndJumpThread()
 	EmitSfx(lfoot, landing_explosion)
 	EmitSfx(lfoot, dirtfling)
-	Turn(torso, x_axis, -30, math.rad(500))
-	Turn(larm, x_axis,  math.rad(-60), math.rad(500))
-	Turn(rarm, x_axis,  math.rad(-60), math.rad(500))
-	WaitForTurn(torso, x_axis)
-	WaitForTurn(larm, x_axis)
-	WaitForTurn(rarm, x_axis)
-	Sleep(200)
+	Turn(torso, x_axis, math.rad(45))
+	Turn(larm, x_axis,  math.rad(-40))
+	Turn(rarm, x_axis,  math.rad(-40))
+	Sleep(50)
 	Turn(torso, x_axis, 0, math.rad(35))
 	Turn(larm, x_axis, 0, math.rad(35))
 	Turn(rarm, x_axis, 0, math.rad(35))
-	WaitForTurn(torso, x_axis)
-	WaitForTurn(larm, x_axis)
-	WaitForTurn(rarm, x_axis)
 end
 
 function preJump(turn,lineDist,flightDist,duration)
@@ -338,10 +318,6 @@ function beginJump()
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID, true)
 	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)
-	
-	Move(pelvis, y_axis, 0, 5)
-	Move(pelvis, z_axis, 0, 3)
-	Turn(torso, x_axis, 0, math.rad(10))
 end
 
 function jumping(jumpPercent)
@@ -349,7 +325,12 @@ function jumping(jumpPercent)
 		GG.PokeDecloakUnit(unitID, 50)
 		EmitSfx(lfoot, jetfeet_fire)
 		EmitSfx(rfoot, jetfeet_fire)
-	else
+	end
+	
+	if weaponBlocked and jumpPercent >= 25 then
+		Move(pelvis, y_axis, 0, 5)
+		Move(pelvis, z_axis, 0, 3)
+		Turn(torso, x_axis, 0, math.rad(10))
 		weaponBlocked = false
 	end
 
@@ -364,6 +345,14 @@ end
 function endJump()
 	landing = false
 	StartThread(EndJumpThread)
+end
+
+function script.Create()
+	Turn(larm, z_axis, -0.1)
+	Turn(rarm, z_axis, 0.1)
+	Turn(shoulderflare, x_axis, math.rad(-90))
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	Spring.SetUnitMaxRange(unitID, 510)
 end
 
 local function RestoreAfterDelay()
