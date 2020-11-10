@@ -6,7 +6,7 @@ return { striderdetriment = {
   activateWhenBuilt      = true,
   autoheal               = 60,
   brakeRate              = 1.435,
-  buildCostMetal         = 20000,
+  buildCostMetal         = 24000,
   builder                = false,
   buildPic               = [[striderdetriment.png]],
   canGuard               = true,
@@ -279,7 +279,7 @@ return { striderdetriment = {
       avoidNeutral            = false,
       burst                   = 10,
       burstRate               = 0.1 + 1/30,
-      coreThickness           = 1.2,
+      coreThickness           = 1.5,
       craterBoost             = 6,
       craterMult              = 14,
       commandFire             = true,
@@ -296,7 +296,6 @@ return { striderdetriment = {
       
       damage                  = {
         default = 1200.1,
-        subs    = 0.36,
       },
 
       duration                = 0.06,

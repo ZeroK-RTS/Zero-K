@@ -73,10 +73,10 @@ local TORSO_SPEED_MOTION = math.rad(15)*PACE
 local TORSO_TILT_ANGLE = math.rad(15)
 local TORSO_TILT_SPEED = math.rad(15)*PACE
 
-local PELVIS_LIFT_HEIGHT = 6
-local PELVIS_LIFT_SPEED = 16
-local PELVIS_LOWER_HEIGHT = 2
-local PELVIS_LOWER_SPEED = 16
+local PELVIS_LIFT_HEIGHT = 10
+local PELVIS_LIFT_SPEED = 20
+local PELVIS_LOWER_HEIGHT = 8
+local PELVIS_LOWER_SPEED = 12
 
 local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(35) * PACE
@@ -191,7 +191,7 @@ local function StopWalk()
 	if not(isFiring) then
 		Turn(torso, y_axis, 0, math.rad(30))
 	end
-	Move(pelvis, y_axis, 0, 1)
+	Move(pelvis, y_axis, 0, 2)
 	Turn(rarm, x_axis, 0, math.rad(30))
 	Turn(larm, x_axis, 0, math.rad(10))
 end
@@ -384,6 +384,12 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
 		Move(shouldercannon, y_axis, -2, 0.7)
 		WaitForTurn(shouldercannon, x_axis)
+	elseif num == 4 then
+		Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
+		Turn(aagun, x_axis, -pitch, math.rad(240))
+		WaitForTurn(aaturret, y_axis)
+		WaitForTurn(aagun, x_axis)
+		return true
 	elseif num == 5 then -- Face laser
 		if lastGunAverageHeading then
 			heading = lastGunAverageHeading
