@@ -20,16 +20,18 @@ local smokePiece = { torso, head, shouldercannon }
 local gunFlares = {
 	{larmflare1, larmflare2, larmflare3},
 	{rarmflare1, rarmflare2, rarmflare3},
+	{shoulderflare},
 	{aaflare1, aaflare2},
 	{headlaser1, headlaser2, headlaser3},
-	{shoulderflare},
 	{lfoot},
 	{lfoot},
 	{lfoot}
 }
 
-local barrelsL = {larmbarrel1, larmbarrel2, larmbarrel3}
-local barrelsR = {rarmbarrel1, rarmbarrel2, rarmbarrel3}
+local barrels = {
+	{larmbarrel1, larmbarrel2, larmbarrel3},
+	{rarmbarrel1, rarmbarrel2, rarmbarrel3},
+}
 local aimpoints = {torso, torso, aaturret, headlaser2, shouldercannon, lfoot, lfoot, lfoot}
 
 local gunIndex = {1,1,1,1,1,1,1,1}
@@ -279,7 +281,6 @@ function jumping(jumpPercent)
 	end
 end
 
-
 function halfJump()
 end
 
@@ -287,7 +288,6 @@ function endJump()
 	landing = false
 	StartThread(EndJumpThread)
 end
-
 
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
@@ -323,12 +323,12 @@ function script.AimWeapon(num, heading, pitch)
 
 	if num == 1 then  -- Left gunpod
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))
+		Turn(larm, x_axis, math.rad(-10) - pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 	elseif num == 2 then -- Right gunpod
-		Turn(torso, y_axis, heading, math.rad(140))	
-		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
+		Turn(torso, y_axis, heading, math.rad(140))
+		Turn(rarm, x_axis, math.rad(-10) - pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 	elseif num == 3 then -- Shoulder Cannon
@@ -347,31 +347,25 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-local function BumpGunNum(num, doSleep)
-	if doSleep then
-		Sleep(33)
-	end
+local function BumpGunNum(num)
 	gunIndex[num] = gunIndex[num] + 1
 	if gunIndex[num] > gunFlareCount[num] then
 		gunIndex[num] = 1
 	end
 end
 
+local function Recoil(num)
+	Sleep(33)
+	EmitSfx(gunFlares[num][gunIndex[num]], muzzle_flash_large)
+	Move(barrels[num][gunIndex[num]], z_axis, -40)
+	Move(barrels[num][gunIndex[num]], z_axis, 0, 30)
+	BumpGunNum(num)
+end
+
 function script.Shot(num)
 	-- Left
-	if num == 1 then	
-		EmitSfx(larmflare3, muzzle_smoke_large2)
-		Move(barrelsL[gunIndex[1]], z_axis, -40)
-		EmitSfx(larmflare3, muzzle_flash_large)
-		Move(barrelsL[gunIndex[1]], z_axis, 0, 30)
-	end
-
-	-- right
-	if num == 2 then
-		EmitSfx(rarmflare3, muzzle_smoke_large2)
-		Move(barrelsR[gunIndex[2]], z_axis, -40)
-		EmitSfx(rarmflare3, muzzle_flash_large)
-		Move(barrelsR[gunIndex[2]], z_axis, 0, 30)
+	if num == 1 or num == 2 then
+		StartThread(Recoil, num, true)
 	end
 
 	-- Shoulder cannon
@@ -388,7 +382,6 @@ function script.Shot(num)
 	-- face laser
 	if num == 5 then
 		EmitSfx(head, muzzle_smoke_large2)
-		EmitSfx(head, muzzle_flash_large)
 	end
 
 	if gunFixEmit[num] then
