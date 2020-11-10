@@ -18,6 +18,8 @@ local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece('rupleg', 'rmidleg', 'r
 local leftLeg = { thigh=piece'lupleg', knee=piece'lmidleg', shin=piece'lleg', foot=piece'lfoot', toef=piece'lftoe', toeb=piece'lbtoe' }
 local rightLeg = { thigh=piece'rupleg', knee=piece'rmidleg', shin=piece'rleg', foot=piece'rfoot', toef=piece'rftoe', toeb=piece'rbtoe' }
 
+local mainLeg, offLeg = leftLeg, rightLeg
+
 local smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
@@ -38,7 +40,8 @@ local barrels = {
 local aimpoints = {larmcannon, rarmcannon, aaturret, headlaser2, shouldercannon, lfoot, lfoot, lfoot}
 
 local gunIndex = {1,1,1,1,1,1,1,1}
-local gunFixEmit = {true, true, false, false, false, false, false, false}
+
+local blockGauss = {false, false}
 
 local gunFlareCount = {}
 for i = 1, #gunFlares do
@@ -46,6 +49,8 @@ for i = 1, #gunFlares do
 end
 
 local lastTorsoHeading = 0
+local manualfireAimOverride = false
+local weaponBlocked = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -68,8 +73,8 @@ local LEG_BACK_SPEEDS     = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, s
 local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
 local LEG_BENT_SPEEDS     = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=math.rad(8), toef=math.rad(0), toeb=math.rad(0) }
-local LEG_STEP_SPEEDS     = { thigh=math.rad(15)*PACE, knee=math.rad(50)*PACE, shin=math.rad(50)*PACE, foot=math.rad(50)*PACE, toef=math.rad(50)*PACE, toeb=math.rad(50)*PACE }
+local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=math.rad(0), toef=math.rad(8), toeb=math.rad(0) }
+local LEG_STEP_SPEEDS     = { thigh=math.rad(15)*PACE, knee=math.rad(50)*PACE, shin=math.rad(36.6)*PACE, foot=math.rad(50)*PACE, toef=math.rad(13.3)*PACE, toeb=math.rad(50)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
@@ -107,15 +112,23 @@ local landing_explosion = 4101 --Weapon 6
 local footcrater = 4102 --Weapon 7
 local takeoff_explosion = 4103 --Weapon 8
 
-local unitDefID = Spring.GetUnitDefID(unitID)
-local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
-local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
-
-wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
-local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function DoRestore()
+	Turn(head, y_axis, 0, 2)
+	Move(head, y_axis, -6, 10)
+	Move(head, z_axis, -4, 10)
+	Turn(torso, y_axis, 0, math.rad(70))
+	Turn(larm, x_axis, 0, math.rad(30))
+	Turn(larmcannon, y_axis, 0, math.rad(10))
+	Turn(rarm, x_axis, 0, math.rad(30))
+	Turn(rarmcannon, y_axis, 0, math.rad(10))
+	Turn(shouldercannon, x_axis, 0, math.rad(90))
+	isFiring = false
+	lastTorsoHeading = 0
+end
+
 function script.Create()
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
@@ -125,6 +138,8 @@ function script.Create()
 end
 
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
+	mainLeg, offLeg = offLeg, mainLeg 
+	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
@@ -186,8 +201,8 @@ local function Walk()
 	
 	local first = true
 	while (true) do
-		Step(leftLeg, rightLeg, lfoot, (first and 2) or 1)
-		Step(rightLeg, leftLeg, rfoot, (first and 1.2) or 1)
+		Step(mainLeg, offLeg, lfoot, (first and 2) or 1)
+		Step(mainLeg, offLeg, rfoot, (first and 1.2) or 1)
 		first = false
 	end
 end
@@ -224,6 +239,9 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
+	DoRestore()
+	weaponBlocked = true
+	
 	local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
 	Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
 	
@@ -272,14 +290,15 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Sleep(600)
 	
 	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
-		Turn(rightLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+		Turn(leftLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+		Turn(rightLeg[i], x_axis, 1.66*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
 	end
 	Move(torso, y_axis, 0, 1)
-	Move(pelvis, y_axis, -8, 18)
+	Move(pelvis, y_axis, -20, 20)
+	Move(pelvis, z_axis, -10, 10)
+	Turn(torso, x_axis, math.rad(20), math.rad(30))
 	
 	Turn(pelvis, z_axis, 0, math.rad(30))
-	Turn(torso, x_axis, 0, math.rad(30))
 	if not(isFiring) then
 		Turn(torso, y_axis, 0, math.rad(140))
 		WaitForTurn(torso, y_axis)
@@ -319,6 +338,10 @@ function beginJump()
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID, true)
 	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)
+	
+	Move(pelvis, y_axis, 0, 5)
+	Move(pelvis, z_axis, 0, 3)
+	Turn(torso, x_axis, 0, math.rad(10))
 end
 
 function jumping(jumpPercent)
@@ -326,6 +349,8 @@ function jumping(jumpPercent)
 		GG.PokeDecloakUnit(unitID, 50)
 		EmitSfx(lfoot, jetfeet_fire)
 		EmitSfx(rfoot, jetfeet_fire)
+	else
+		weaponBlocked = false
 	end
 
 	if jumpPercent > 95 and not landing then
@@ -345,17 +370,7 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	Turn(head, y_axis, 0, 2)
-	Move(head, y_axis, -6, 10)
-	Move(head, z_axis, -4, 10)
-	Turn(torso, y_axis, 0, math.rad(70))
-	Turn(larm, x_axis, 0, math.rad(30))
-	Turn(larmcannon, y_axis, 0, math.rad(10))
-	Turn(rarm, x_axis, 0, math.rad(30))
-	Turn(rarmcannon, y_axis, 0, math.rad(10))
-	Turn(shouldercannon, x_axis, 0, math.rad(90))
-	isFiring = false
-	lastTorsoHeading = 0
+	DoRestore()
 end
 
 function script.AimFromWeapon(num)
@@ -368,10 +383,23 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local SIG_AIM = 2^(num+1)
-
+	
 	isFiring = true
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	if manualfireAimOverride and (num == 1 or num == 2 or num == 5) then
+		manualfireAimOverride = manualfireAimOverride - 1
+		if manualfireAimOverride <= 0 then
+			manualfireAimOverride = false
+			Turn(shouldercannon, x_axis, 0, math.rad(90))
+		end
+		Sleep(500)
+		return false
+	end
+
+	if weaponBlocked and (num == 1 or num == 2 or num == 3 or num == 5) then
+		return false
+	end
 
 	StartThread(RestoreAfterDelay)
 
@@ -422,6 +450,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 	elseif num == 3 then -- Shoulder Cannon
+		manualfireAimOverride = 60
 		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
 		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
@@ -470,6 +499,7 @@ function script.Shot(num)
 
 	-- Shoulder cannon
 	if num == 3 then
+		manualfireAimOverride = 60
 		Move(shouldercannon, z_axis, -30)
 		Turn(torso, x_axis, math.rad(-5))
 		EmitSfx(shoulderflare, muzzle_flash_large)
@@ -477,18 +507,25 @@ function script.Shot(num)
 		Move(shouldercannon, z_axis, 0, 50)
 		Turn(shouldercannon, x_axis, 0, math.rad(10))
 	end
-
-	if gunFixEmit[num] then
-		StartThread(BumpGunNum, num, true)
-	else
-		BumpGunNum(num)
-	end
 end
 
 function script.BlockShot(num, targetID)
-	if not targetID then
+	if weaponBlocked and (num == 1 or num == 2 or num == 3 or num == 5) then
+		return true
+	end
+	
+	if num > 2 then
 		return false
 	end
+	
+	if blockGauss[num] then
+		blockGauss[num] = blockGauss[num] - 1
+		if blockGauss[num] <= 0 then
+			blockGauss[num] = false
+		end
+		return true
+	end
+	blockGauss[3 - num] = 20
 	return false
 end
 
