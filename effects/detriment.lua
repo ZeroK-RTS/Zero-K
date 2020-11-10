@@ -40,7 +40,7 @@ return {
         speed              = [[r-2 r2, ri-0.20 ri0.20, r-2 r2]],
         wantedpos          = [[-32 r32, r32, -32 r32]],
       },
-    },		
+    },
   },
   ["vindiback_large"] = {
     fire = {
@@ -127,7 +127,7 @@ return {
         texture            = [[kfoam]],
       },
     },
-	dirtypoof = {
+    dirtypoof = {
       class              = [[dirt]],
       count              = 5,
       ground             = true,
@@ -142,7 +142,7 @@ return {
   },
   
   ["dirtyfootstep"] = {
-	dirtypoof = {
+    dirtypoof = {
       class              = [[dirt]],
       count              = 40,
       ground             = true,
@@ -157,7 +157,7 @@ return {
   },
   
   ["rocketboots_muzzle"] = {
-	muzzleflame = {
+    muzzleflame = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,
@@ -186,7 +186,7 @@ return {
         airdrag            = 1.0,
         colormap           = [[0.7 0.7 0.7 0.01  1 0.3 0.3 0.5   0 0 0 0]],
         directional        = true,
-		--emitmul            = [[0, 4, 0]],
+        --emitmul            = [[0, 4, 0]],
         emitrot            = 0,
         emitrotspread      = 0,
         emitvector         = [[r1 r-1, -10 -10, r1 r-1]],
@@ -206,43 +206,43 @@ return {
     },
     smokeair = {
       air                = true,
-	  class              = [[CSmokeProjectile2]],
+      class              = [[CSmokeProjectile2]],
       count              = 2,
       ground             = false,
       water              = false,
       properties = {
         agespeed           = 0.01,
-		color	           = 1.0,
+        color               = 1.0,
         pos                = [[r-2 r2, r-100 -10, r-2 r2]],
         size               = 35,
         sizeexpansion      = 0.4,
         sizegrowth         = 35,
         speed              = [[r-1.5 r1.5, -5 r-5.3, r-1.5 r1.5]],
         startsize          = 5,
-		wantedpos          = [[r-128 r128, r-300, r-128 r128]],
-		glowfalloff        = 6.0,
+        wantedpos          = [[r-128 r128, r-300, r-128 r128]],
+        glowfalloff        = 6.0,
       },
     },   
-	smokeground = {
-	  air                = false,
-	  class              = [[CSmokeProjectile2]],
-	  count              = 100,
-	  ground             = true,
-	  water              = false,
-	  properties = {
-		agespeed           = 0.01,
-		color	           = 1.0,
-		pos                = [[r-1 r1, 0, r-1 r1]],
-		size               = 10,
-		sizeexpansion      = 0.8,
-		sizegrowth         = 10,
-		speed              = [[r-5.5 r5.5, 0 r1, r-5.5 r5.5]],
-		startsize          = 5,
-		wantedpos          = [[r-100 r100, r50, r-100 r100]],
-		glowfalloff        = 6.0,
-	  },
-	},   	
-	dirtypoof = {
+    smokeground = {
+      air                = false,
+      class              = [[CSmokeProjectile2]],
+      count              = 100,
+      ground             = true,
+      water              = false,
+      properties = {
+        agespeed           = 0.01,
+        color              = 1.0,
+        pos                = [[r-1 r1, 0, r-1 r1]],
+        size               = 10,
+        sizeexpansion      = 0.8,
+        sizegrowth         = 10,
+        speed              = [[r-5.5 r5.5, 0 r1, r-5.5 r5.5]],
+        startsize          = 5,
+        wantedpos          = [[r-100 r100, r50, r-100 r100]],
+        glowfalloff        = 6.0,
+      },
+    },
+    dirtypoof = {
       class              = [[dirt]],
       count              = 20,
       ground             = true,

@@ -18,11 +18,11 @@ local rightLeg = { thigh=piece'rupleg', knee=piece'rmidleg', shin=piece'rleg', f
 local smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
-	{larmflare1, larmflare2, larmflare3},	
+	{larmflare1, larmflare2, larmflare3},
 	{rarmflare1, rarmflare2, rarmflare3},
 	{aaflare1, aaflare2},
 	{headlaser1, headlaser2, headlaser3},
-	{shoulderflare},	
+	{shoulderflare},
 	{lfoot},
 	{lfoot},
 	{lfoot}
@@ -106,12 +106,11 @@ function script.Create()
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	
+
 end
 
 local function Step(frontLeg, backLeg, impactFoot)
-
--- contact: legs fully extended in stride
+	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
@@ -140,7 +139,7 @@ local function Step(frontLeg, backLeg, impactFoot)
 		WaitForTurn(backLeg[i], x_axis)
 	end
 
--- passing (front foot flat under body, back foot passing with bent knee)
+	-- passing (front foot flat under body, back foot passing with bent knee)
 	for i, p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
@@ -160,7 +159,7 @@ end
 local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	
+
 	while (true) do
 		Step(leftLeg, rightLeg, lfoot)
 		Step(rightLeg, leftLeg, rfoot)
@@ -170,7 +169,7 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	
+
 	Move(torso, y_axis, 0, 1)
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
@@ -199,22 +198,22 @@ local function PreJumpThread(turn,lineDist,flightDist,duration)
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
-	--local startHeading = Spring.GetUnitHeading(unitID) + 2^15		
-	
+	--local startHeading = Spring.GetUnitHeading(unitID) + 2^15	
+
 	--local pi2    = math.pi*2
-	--local rotUnit      = 2^16 / (pi2)	
-		
-	--local defSpeed         = 64
+	--local rotUnit      = 2^16 / (pi2)
 	
+	--local defSpeed         = 64
+
 	--local speed = defSpeed * lineDist/flightDist
 	--local step = speed/lineDist
-	
-	
+
+
 	--Spring.MoveCtrl.SetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
-	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)		
+	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)	
 	--Sleep(1600)
 	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
-	
+
 	Move(torso, y_axis, 0, 1)
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
@@ -233,22 +232,22 @@ local function PreJumpThread(turn,lineDist,flightDist,duration)
 	--EmitSfx(rfoot, jetfeet)
 end
 
-local function BeginJumpThread()		
+local function BeginJumpThread()	
 	--EmitSfx(lfoot, takeoff_explosion)
-	--EmitSfx(lfoot, dirtfling)	
+	--EmitSfx(lfoot, dirtfling)
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
-	local x,y,z = Spring.GetUnitPosition(unitID, true)	
-	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)	
+	local x,y,z = Spring.GetUnitPosition(unitID, true)
+	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)
 end
 
 local function EndJumpThread()
 	EmitSfx(lfoot, landing_explosion)
-	EmitSfx(lfoot, dirtfling)	
+	EmitSfx(lfoot, dirtfling)
 	Turn(torso, x_axis, -30, math.rad(500))
 	Turn(larm, x_axis,  math.rad(-60), math.rad(500))
-	Turn(rarm, x_axis,  math.rad(-60), math.rad(500))	
-	WaitForTurn(torso, x_axis)	
+	Turn(rarm, x_axis,  math.rad(-60), math.rad(500))
+	WaitForTurn(torso, x_axis)
 	WaitForTurn(larm, x_axis)
 	WaitForTurn(rarm, x_axis)
 	Sleep(200)
@@ -260,11 +259,11 @@ local function EndJumpThread()
 	WaitForTurn(rarm, x_axis)
 end
 
-function preJump(turn,lineDist,flightDist,duration)	
+function preJump(turn,lineDist,flightDist,duration)
 	StartThread(PreJumpThread, turn,lineDist,flightDist,duration)
 end
 
-function beginJump()	
+function beginJump()
 	StartThread(BeginJumpThread)
 end
 
@@ -272,11 +271,11 @@ function jumping(jumpPercent)
 	if jumpPercent < 30 then
 		GG.PokeDecloakUnit(unitID, 50)
 		EmitSfx(lfoot, jetfeet_fire)
-		EmitSfx(rfoot, jetfeet_fire)				
+		EmitSfx(rfoot, jetfeet_fire)			
 	end
-	
+
 	if jumpPercent > 95 and not landing then
-		landing = true		
+		landing = true	
 	end
 end
 
@@ -286,7 +285,7 @@ end
 
 function endJump()
 	landing = false
-	StartThread(EndJumpThread)	
+	StartThread(EndJumpThread)
 end
 
 
@@ -296,11 +295,11 @@ local function RestoreAfterDelay()
 	Sleep(2000)
 	Turn(head, y_axis, 0, 2)
 	Move(head, y_axis, -6, 10)
-	Move(head, z_axis, -4, 10)	
+	Move(head, z_axis, -4, 10)
 	Turn(torso, y_axis, 0, math.rad(70))
 	Turn(larm, x_axis, 0, math.rad(30))
 	Turn(rarm, x_axis, 0, math.rad(30))
-	Turn(shouldercannon, x_axis, 0, math.rad(90))	
+	Turn(shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
 end
@@ -315,35 +314,35 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	local SIG_AIM = 2^(num+1)
-	
+
 	isFiring = true
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	
+
 	StartThread(RestoreAfterDelay)
-	
-	if num == 1 then  -- Left gunpod		
+
+	if num == 1 then  -- Left gunpod	
 		Turn(torso, y_axis, heading, math.rad(140))
-		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))		
+		Turn(larm, x_axis, math.rad(-10)-pitch, math.rad(40))	
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis)		
-	elseif num == 2 then -- Right gunpod		
-		Turn(torso, y_axis, heading, math.rad(140))		
+		WaitForTurn(larm, x_axis)	
+	elseif num == 2 then -- Right gunpod	
+		Turn(torso, y_axis, heading, math.rad(140))	
 		Turn(rarm, x_axis, math.rad(-10)-pitch, math.rad(40))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(rarm, x_axis)				
+		WaitForTurn(rarm, x_axis)			
 	elseif num == 4 then -- Face laser
 		Turn(torso, y_axis, heading, math.rad(90))
 		Move(head, y_axis, 0, 10)
 		Move(head, z_axis, 0, 10)
-		WaitForTurn(torso, y_axis)						
+		WaitForTurn(torso, y_axis)					
 	elseif num == 5 then -- Shoulder Cannon
 		Turn(torso, y_axis, heading, math.rad(90))
 		WaitForTurn(torso, y_axis)
 		Turn(shouldercannon, x_axis, -pitch+math.rad(90),  math.rad(90))
 		Move(shouldercannon, y_axis, -2, 0.7)
-		WaitForTurn(shouldercannon, x_axis)		
-	end	
+		WaitForTurn(shouldercannon, x_axis)	
+	end
 	lastTorsoHeading = heading
 	return true
 end
@@ -360,38 +359,38 @@ end
 
 function script.Shot(num)
 	-- Left
-	if num == 1 then		
-		EmitSfx(larmflare3, muzzle_smoke_large2)		
-		Move(barrelsL[gunIndex[1]], z_axis, -40)		
+	if num == 1 then	
+		EmitSfx(larmflare3, muzzle_smoke_large2)	
+		Move(barrelsL[gunIndex[1]], z_axis, -40)	
 		EmitSfx(larmflare3, muzzle_flash_large)
 		Move(barrelsL[gunIndex[1]], z_axis, 0, 30)
 	end
-	
+
 	-- right
-	if num == 2 then	
-		EmitSfx(rarmflare3, muzzle_smoke_large2)		
-		Move(barrelsR[gunIndex[2]], z_axis, -40)		
+	if num == 2 then
+		EmitSfx(rarmflare3, muzzle_smoke_large2)	
+		Move(barrelsR[gunIndex[2]], z_axis, -40)	
 		EmitSfx(rarmflare3, muzzle_flash_large)
 		Move(barrelsR[gunIndex[2]], z_axis, 0, 30)
 	end
-	
+
 	-- face laser
-	if num == 4 then				
-		EmitSfx(head, muzzle_smoke_large2)	
-		EmitSfx(head, muzzle_flash_large)				
+	if num == 4 then			
+		EmitSfx(head, muzzle_smoke_large2)
+		EmitSfx(head, muzzle_flash_large)			
 	end
-	
+
 	-- Shoulder cannon
 	if num == 5 then
 		EmitSfx(shoulderflare, muzzle_smoke_large2)
 		Move(shouldercannon, z_axis, -20)
-		Turn(torso, x_axis, math.rad(-17))		
-		EmitSfx(shoulderflare, muzzle_flash_large)		
-		Turn(torso, x_axis, 0, math.rad(20))			
-		Move(shouldercannon, z_axis, 0, 50)			
-		Turn(shouldercannon, x_axis, 0, math.rad(40))		
+		Turn(torso, x_axis, math.rad(-17))	
+		EmitSfx(shoulderflare, muzzle_flash_large)	
+		Turn(torso, x_axis, 0, math.rad(20))		
+		Move(shouldercannon, z_axis, 0, 50)		
+		Turn(shouldercannon, x_axis, 0, math.rad(40))	
 	end
-	
+
 	if gunFixEmit[num] then
 		StartThread(BumpGunNum, num, true)
 	else
@@ -402,12 +401,12 @@ end
 function script.BlockShot(num, targetID)
 	if not targetID then
 		return false
-	end	
-	
+	end
+
 	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
 		return true
 	end
-	
+
 	return false
 end
 
@@ -420,7 +419,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rarmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(larmcannon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
 		Explode(larm, SFX.SHATTER)
-		
+	
 		return 1 -- corpsetype
 	else
 		Explode(torso, SFX.SHATTER)
