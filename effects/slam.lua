@@ -909,7 +909,7 @@ return {
         color = [[1, 0.75, 0]],
       },
     },
-        shock3 = {
+    shock3 = {
       air                = true,
       class              = [[CSpherePartSpawner]],
       count              = 1,
@@ -927,7 +927,7 @@ return {
     pop1 = {
       air                = true,
       class              = [[heatcloud]],
-      count              = 16,
+      count              = 2,
       ground             = true,
       water              = true,
 	  underwater		 = true,
@@ -935,7 +935,7 @@ return {
         alwaysvisible      = true,
         heat               = 375,
         heatfalloff        = 10,
-        maxheat            = 5000,
+        maxheat            = 4000,
         pos                = [[r35 r-35, 35 r-20, r60 r-60]],
         size               = 300,
         sizegrowth         = -1,
