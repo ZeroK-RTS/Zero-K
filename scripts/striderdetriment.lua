@@ -242,33 +242,34 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 
 	--Spring.MoveCtrl.SetRotation(unitID, 0, heading + rotationRequired, 0) -- keep current heading
 	--Sleep(2000)
-	
-	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, rotationRequired/rotationFrames, 0)
-	while true do
-		StepInPlace(leftLeg, rightLeg)
-		rotationFrames = rotationFrames - 12
-		if rotationFrames <= 0 then
-			break
-		end
-		
-		Move(pelvis, y_axis, 4, 7)
-		Sleep(400)
-		rotationFrames = rotationFrames - 12
-		if rotationFrames <= 0 then
-			break
-		end
-		
-		StepInPlace(rightLeg, leftLeg)
-		rotationFrames = rotationFrames - 12
-		if rotationFrames <= 0 then
-			break
-		end
-		
-		Move(pelvis, y_axis, 4, 7)
-		Sleep(400)
-		rotationFrames = rotationFrames - 12
-		if rotationFrames <= 0 then
-			break
+	if rotationFrames > 0 then
+		Spring.MoveCtrl.SetRotationVelocity(unitID, 0, rotationRequired/rotationFrames, 0)
+		while true do
+			StepInPlace(leftLeg, rightLeg)
+			rotationFrames = rotationFrames - 12
+			if rotationFrames <= 0 then
+				break
+			end
+			
+			Move(pelvis, y_axis, 4, 7)
+			Sleep(400)
+			rotationFrames = rotationFrames - 12
+			if rotationFrames <= 0 then
+				break
+			end
+			
+			StepInPlace(rightLeg, leftLeg)
+			rotationFrames = rotationFrames - 12
+			if rotationFrames <= 0 then
+				break
+			end
+			
+			Move(pelvis, y_axis, 4, 7)
+			Sleep(400)
+			rotationFrames = rotationFrames - 12
+			if rotationFrames <= 0 then
+				break
+			end
 		end
 	end
 	
