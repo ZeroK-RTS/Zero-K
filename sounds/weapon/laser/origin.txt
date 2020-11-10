@@ -35,3 +35,4 @@ heavy_laser3.wav - Kanoba & Nanoblobs
 laser_fire_test1.wav - GoogleFrog
 
 pulse_laser.wav - Skorpio
+pulse_laser_start.wav - Skorpio

@@ -1,6 +1,7 @@
 include 'constants.lua'
 
-local AngleAverageShortest = Spring.Utilities.Vector.AngleAverageShortest
+local AngleAverageShortest  = Spring.Utilities.Vector.AngleAverageShortest
+local AngleSubtractShortest = Spring.Utilities.Vector.AngleSubtractShortest
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -343,7 +344,7 @@ function script.AimWeapon(num, heading, pitch)
 		if armAngle > 3 then
 			armAngle = armAngle - 2*math.pi
 		end
-		armAngle = math.min(0, math.max(-0.2, armAngle))
+		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
 		Turn(torso, y_axis, heading, math.rad(140))
 		Turn(larmcannon, y_axis, armAngle, math.rad(20))
@@ -358,7 +359,19 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		lastGunAverageHeading = heading
 		
-		local armAngle = math.min(0.2, math.max(0, rightTorsoHeading - heading))
+		local armAngle = rightTorsoHeading - heading
+		if armAngle > 3 then
+			armAngle = armAngle - 2*math.pi
+		end
+		
+		-- The right arm avoids aiming if there is too much conflict between the arms.
+		if math.abs(armAngle) > 0.7 then
+			lastGunAverageHeading = false
+			rightTorsoHeading = false
+			return false
+		end
+		
+		armAngle = math.min(0.2, math.max(-0.2, armAngle))
 		
 		Turn(torso, y_axis, heading, math.rad(140))
 		Turn(rarmcannon, y_axis, armAngle, math.rad(20))

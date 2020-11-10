@@ -104,8 +104,6 @@ local sumoEE = WeaponDefNames.jumpsumo_landing.edgeEffectiveness
 local detrimentDefID = UnitDefNames.striderdetriment.id
 local detrimentLandingAoE = WeaponDefNames.striderdetriment_landing.damageAreaOfEffect
 local detrimentLandingEE = WeaponDefNames.striderdetriment_landing.edgeEffectiveness
-local detrimentTakeoffAoE = WeaponDefNames.striderdetriment_takeoff.damageAreaOfEffect
-local detrimentTakeoffEE = WeaponDefNames.striderdetriment_takeoff.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions
@@ -751,7 +749,6 @@ function widget:DrawWorld()
 		return
 	elseif (cmd == CMD_JUMP and detrimentSelected) then
 		local _,_,_,fx, fy, fz = GetUnitPosition(detrimentUnitID, true)
-		DrawAoE(fx, fy, fz, detrimentTakeoffAoE, detrimentTakeoffEE)
 		DrawAoE(tx, ty, tz, detrimentLandingAoE, detrimentLandingEE)
 		return
 	else

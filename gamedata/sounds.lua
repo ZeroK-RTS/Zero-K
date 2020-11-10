@@ -29,6 +29,13 @@ local Sounds = {
 			MapEntryValExtract(items, "rolloff", rolloff);
 		},
 		--]]
+		PulseLaser = {
+			file = "sounds/weapon/laser/pulse_laser_start.wav",
+			pitchmod = 0.15,
+			gainmod = 0.1,
+			pitch = 1,
+			gain = 1.5,
+		},
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
 			pitchmod = 0.1,
