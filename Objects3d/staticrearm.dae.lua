@@ -1,5 +1,5 @@
 return {
-	height = 65.0,
+	height = 80.0,
 	midpos = {0,5,0},
 	radius = 90,
 	tex1 = "core_color.dds",

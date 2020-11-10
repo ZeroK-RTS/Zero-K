@@ -24,10 +24,10 @@ local configList = {
 	{cmdID = CMD.AREA_ATTACK           , default = false, name = "Area Attack"},
 	{cmdID = CMD_UNIT_CANCEL_TARGET    , default = false, name = "Cancel Target"},
 	{cmdID = CMD_DISEMBARK             , default = false, name = "Disembark"},
+	{cmdID = CMD_EXCLUDE_PAD           , default = false, name = "Exclude Airpad"},
 	{cmdID = CMD_AREA_GUARD            , default = false, name = "Guard"},
 	{cmdID = CMD_UNIT_SET_TARGET_CIRCLE, default = false, name = "Set Target"},
 	{cmdID = CMD.WAIT                  , default = false, name = "Wait"},
-	{cmdID = CMD_EXCLUDEAIRPAD		   , default = false, name = "Exclude Airpad"},
 	
 	{label = "Basic States"},
 	{cmdID = CMD_WANT_ONOFF            , state = true, default = true, name = "Activation"},
@@ -69,6 +69,7 @@ local defaultValues = {
 	[CMD_AREA_GUARD] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
 	[CMD_UNIT_CANCEL_TARGET] = true,
+	[CMD_EXCLUDE_PAD] = true,
 	--[CMD_EMBARK] = true,
 	--[CMD_STOP_PRODUCTION] = true,
 	

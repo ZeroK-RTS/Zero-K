@@ -55,6 +55,7 @@ local cmdPosDef = {
 	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 2},
 	[CMD_EMBARK]        = {pos = 13, priority = 5},
 	[CMD_DISEMBARK]     = {pos = 13, priority = 6},
+	[CMD_EXCLUDE_PAD]   = {pos = 13, priority = 7},
 
 	-- States
 	[CMD.REPEAT]           = {pos = 1, priority = 1},

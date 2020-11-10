@@ -226,13 +226,7 @@ function SetIcons()
 			if (not lastExcludedPad[unitID]) or lastExcludedPad[unitID] ~= padExcluded then
 				lastExcludedPad[unitID] = padExcluded
 				if padExcluded ~= 0 then
-					if unitDefID == UnitDefNames.staticrearm.id then
-						WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture, offset=55} )
-					elseif unitDefID == UnitDefNames.factoryplane.id then
-						WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture, offset=-30} )
-					else
-						WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture, offset=30} )
-					end
+					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture} )
 				else
 					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=nil} )
 				end
