@@ -64,7 +64,7 @@ return { amphsupport = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ComTrack]],
-  trackWidth             = 22,
+  trackWidth             = 32,
   turnRate               = 1200,
   upright                = false,
 
