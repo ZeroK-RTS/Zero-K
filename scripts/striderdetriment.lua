@@ -68,15 +68,18 @@ local LEG_BACK_SPEEDS     = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, s
 local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
 local LEG_BENT_SPEEDS     = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
+local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=math.rad(8), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STEP_SPEEDS     = { thigh=math.rad(15)*PACE, knee=math.rad(50)*PACE, shin=math.rad(50)*PACE, foot=math.rad(50)*PACE, toef=math.rad(50)*PACE, toeb=math.rad(50)*PACE }
+
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
 local TORSO_TILT_ANGLE = math.rad(15)
 local TORSO_TILT_SPEED = math.rad(15)*PACE
 
-local PELVIS_LIFT_HEIGHT = 10
-local PELVIS_LIFT_SPEED = 20
-local PELVIS_LOWER_HEIGHT = 8
-local PELVIS_LOWER_SPEED = 12
+local PELVIS_LIFT_HEIGHT = 11.5
+local PELVIS_LIFT_SPEED = 14
+local PELVIS_LOWER_HEIGHT = 6.5
+local PELVIS_LOWER_SPEED = 15
 
 local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(35) * PACE
@@ -87,6 +90,7 @@ local leftTorsoHeading = false
 local rightTorsoHeading = false
 local lastGunAverageHeading = false
 
+local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 
 local isFiring = false
 -- Effects
@@ -120,7 +124,7 @@ function script.Create()
 	Spring.SetUnitMaxRange(unitID, 510)
 end
 
-local function Step(frontLeg, backLeg, impactFoot)
+local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
@@ -141,8 +145,8 @@ local function Step(frontLeg, backLeg, impactFoot)
 			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 	end
-
-	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED)
+	
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED*pelvisMult)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED)
 
 	for i, p in pairs(frontLeg) do
@@ -157,7 +161,7 @@ local function Step(frontLeg, backLeg, impactFoot)
 	end
 	--EmitSfx(impactFoot, dirtfling)
 	--EmitSfx(impactFoot, footcrater)
-	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED*pelvisMult)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
 
 	for i, p in pairs(frontLeg) do
@@ -167,13 +171,24 @@ local function Step(frontLeg, backLeg, impactFoot)
 	Sleep(0)
 end
 
+local function StepInPlace(leftLeg, rightLeg)
+	Move(pelvis, y_axis, 2, 6)
+	for i, p in pairs(leftLeg) do
+		Turn(leftLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+		Turn(rightLeg[i], x_axis, -0.5*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+	end
+	Sleep(400)
+end
+
 local function Walk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-
+	
+	local first = true
 	while (true) do
-		Step(leftLeg, rightLeg, lfoot)
-		Step(rightLeg, leftLeg, rfoot)
+		Step(leftLeg, rightLeg, lfoot, (first and 2) or 1)
+		Step(rightLeg, leftLeg, rfoot, (first and 1.2) or 1)
+		first = false
 	end
 end
 
@@ -191,7 +206,7 @@ local function StopWalk()
 	if not(isFiring) then
 		Turn(torso, y_axis, 0, math.rad(30))
 	end
-	Move(pelvis, y_axis, 0, 2)
+	Move(pelvis, y_axis, 0, 20)
 	Turn(rarm, x_axis, 0, math.rad(30))
 	Turn(larm, x_axis, 0, math.rad(10))
 end
@@ -205,51 +220,74 @@ function script.StopMoving()
 end
 
 -- Jumping
-local function PreJumpThread(turn,lineDist,flightDist,duration)
+local function PreJumpThread(turn, lineDist, flightDist, duration)
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 
-	--local startHeading = Spring.GetUnitHeading(unitID) + 2^15	
-
-	--local pi2    = math.pi*2
-	--local rotUnit      = 2^16 / (pi2)
+	local heading = -Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
+	Spring.MoveCtrl.SetRotation(unitID, 0, heading, 0) -- keep current heading
 	
-	--local defSpeed         = 64
+	local rotationRequired = -turn*GG.Script.headingToRad
+	local rotationFrames = math.ceil(math.abs(rotationRequired/JUMP_TURN_SPEED)/12)*12
 
-	--local speed = defSpeed * lineDist/flightDist
-	--local step = speed/lineDist
-
-
-	--Spring.MoveCtrl.SetRotation(unitID, 0, (2^15 - startHeading)/rotUnit, 0) -- keep current heading
-	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, -turn/rotUnit*step, 0)	
-	--Sleep(1600)
-	--Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
-
-	Move(torso, y_axis, 0, 1)
-	for i,p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
-		Turn(rightLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
+	--Spring.MoveCtrl.SetRotation(unitID, 0, heading + rotationRequired, 0) -- keep current heading
+	--Sleep(2000)
+	
+	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, rotationRequired/rotationFrames, 0)
+	while true do
+		StepInPlace(leftLeg, rightLeg)
+		rotationFrames = rotationFrames - 12
+		if rotationFrames <= 0 then
+			break
+		end
+		
+		Move(pelvis, y_axis, 4, 7)
+		Sleep(400)
+		rotationFrames = rotationFrames - 12
+		if rotationFrames <= 0 then
+			break
+		end
+		
+		StepInPlace(rightLeg, leftLeg)
+		rotationFrames = rotationFrames - 12
+		if rotationFrames <= 0 then
+			break
+		end
+		
+		Move(pelvis, y_axis, 4, 7)
+		Sleep(400)
+		rotationFrames = rotationFrames - 12
+		if rotationFrames <= 0 then
+			break
+		end
 	end
+	
+	Spring.MoveCtrl.SetRotationVelocity(unitID, 0, 0, 0)
+	
+	for i,p in pairs(leftLeg) do
+		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+	end
+	Move(pelvis, y_axis, 0, 8)
+	Sleep(600)
+	
+	for i,p in pairs(leftLeg) do
+		Turn(leftLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+		Turn(rightLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+	end
+	Move(torso, y_axis, 0, 1)
+	Move(pelvis, y_axis, -8, 18)
+	
 	Turn(pelvis, z_axis, 0, math.rad(30))
 	Turn(torso, x_axis, 0, math.rad(30))
 	if not(isFiring) then
 		Turn(torso, y_axis, 0, math.rad(140))
 		WaitForTurn(torso, y_axis)
 	end
-	Move(pelvis, y_axis, 0, 1)
 	Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
 	Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_FRONT_SPEED)
 	--EmitSfx(lfoot, jetfeet)
 	--EmitSfx(rfoot, jetfeet)
-end
-
-local function BeginJumpThread()
-	--EmitSfx(lfoot, takeoff_explosion)
-	--EmitSfx(lfoot, dirtfling)
-	--EmitSfx(lfoot, jetfeet)
-	--EmitSfx(rfoot, jetfeet)
-	local x,y,z = Spring.GetUnitPosition(unitID, true)
-	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)
 end
 
 local function EndJumpThread()
@@ -275,7 +313,12 @@ function preJump(turn,lineDist,flightDist,duration)
 end
 
 function beginJump()
-	StartThread(BeginJumpThread)
+	for i,p in pairs(leftLeg) do
+		Turn(leftLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+		Turn(rightLeg[i], x_axis, 0, LEG_STEP_SPEEDS[i])
+	end
+	local x,y,z = Spring.GetUnitPosition(unitID, true)
+	GG.PlayFogHiddenSound("DetrimentJump", 15, x, y, z)
 end
 
 function jumping(jumpPercent)

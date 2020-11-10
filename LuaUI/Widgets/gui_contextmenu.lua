@@ -816,7 +816,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.noExplode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
-			if not cp.single_hit then
+			if not (cp.single_hit or cp.single_hit_multi) then
 				cells[#cells+1] = ' - Damage increase vs large units'
 				cells[#cells+1] = ''
 			end

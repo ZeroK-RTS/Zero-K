@@ -275,6 +275,10 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	end
 	local turn = goalHeading - startHeading
 	
+	if jumpDef.delayTurnScale then
+		delay = delay + math.floor(math.abs(turn*jumpDef.delayTurnScale))
+	end
+	
 	jumping[unitID] = true
 
 	mcEnable(unitID)
