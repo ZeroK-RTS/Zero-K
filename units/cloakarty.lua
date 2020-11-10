@@ -54,7 +54,7 @@ return { cloakarty = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1500,
+  turnRate               = 1800,
   upright                = true,
 
   weapons                = {

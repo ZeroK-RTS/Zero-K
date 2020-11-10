@@ -19,6 +19,7 @@ return { staticheavyradar = {
   customParams                  = {
     modelradius    = [[16]],
     removewait     = 1,
+    removestop     = 1,
     priority_misc  = 2, -- High
   },
 

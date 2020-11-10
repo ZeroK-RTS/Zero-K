@@ -11,9 +11,9 @@ return { amphtele = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
-  --collisionVolumeOffsets = [[0 1 0]],
-  --collisionVolumeScales  = [[36 49 35]],
-  --collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[36 49 36]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -21,8 +21,8 @@ return { amphtele = {
     amph_submerged_at = 40,
 
     teleporter = 1,
-    teleporter_throughput = 120, -- mass per second
-    teleporter_beacon_spawn_time = 9,
+    teleporter_throughput = 150, -- mass per second
+    teleporter_beacon_spawn_time = 8,
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -48,7 +48,7 @@ return { amphtele = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 24,
-  turnRate               = 700,
+  turnRate               = 840,
 
   featureDefs            = {
 

@@ -1394,16 +1394,22 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then
-		return
-	end
-	
-	if msg.msgtype == 'other' and (msg.argument):find('added point') then
-		return
-	end
-	
-	if msg.msgtype == 'other' and (msg.argument):find("LuaMenuServerMessage") then
-		return
+	if msg.msgtype == 'other' then
+		if options.error_opengl_source.value and (msg.argument):find('Error: OpenGL: source') then
+			return
+		end
+		
+		if (msg.argument):find('added point') then
+			return
+		end
+		
+		if (msg.argument):find("LuaMenuServerMessage") then
+			return
+		end
+		
+		if (msg.argument):find("GroundDetail set to") then
+			return
+		end
 	end
 	
 	local isChat = isChat(msg)

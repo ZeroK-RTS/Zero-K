@@ -86,7 +86,7 @@ return { chickenbroodqueen = {
   trackType           = [[ChickenTrack]],
   trackWidth          = 40,
   turninplace         = 0,
-  turnRate            = 573,
+  turnRate            = 687,
   upright             = false,
   workerTime          = 8,
 

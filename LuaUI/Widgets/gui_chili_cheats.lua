@@ -71,17 +71,25 @@ end
 
 local function AddFacCategory(name)
 	local ud = UnitDefNames[name]
-
 	local unitList = {name}
-	for i = 1, #ud.buildOptions do
-		unitList[i + 1] = UnitDefs[ud.buildOptions[i]].name
+	local offset = 1
+
+	local plateName = ud.customParams.parent_of_plate
+	if plateName then
+		offset = 2
+		unitList[offset] = plateName
+	end
+
+	local bo = ud.buildOptions
+	for i = 1, #bo do
+		unitList[i + offset] = UnitDefs[bo[i]].name
 	end
 
 	AddCategory("roster_" .. name, unitList)
 end
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 local econ_list, defense_list, special_list = {}, {}, {}
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -716,6 +724,12 @@ function widget:AddConsoleLine(msg)
 		return
 	end
 	if msg == "Cheating is disabled!" then
+		--[[ Don't disable the controls (in particular, keep
+		     the button on the top bar). This is so that:
+		     * you can easily reenable cheats
+		     * check status (since /cheat just sets whether
+		       you can toggle other cheats, not their effects)
+		     * serves as a taint mark to detect haxed games. ]]
 		chbox.cheat.state.checked = false
 		chbox.cheat:Invalidate()
 		return
@@ -769,6 +783,11 @@ function widget:Initialize()
 
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
+	--[[ Don't display the controls (esp. the top bar button) before
+	     cheats are actually enabled for the first time. This way:
+	     * clutter is avoided (most MP games won't have cheats)
+	     * the button's presence is a soft "game is tainted" cheat mark
+	     * having to manually type a /command first gives the ~HACKERMAN~ vibes ]]
 	if Spring.IsCheatingEnabled() then
 		InitializeControls()
 	end

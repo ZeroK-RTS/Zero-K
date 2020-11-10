@@ -61,9 +61,11 @@ function widget:CommandNotify(id, params, cmdOptions)
 		local unitID = units[i]
 		if IsValidUnit(unitID) then
 			local cmd = Spring.GetCommandQueue(unitID, -1)
-			for c = 1, #cmd do
-				if removableCommand[cmd[c].id] then
-					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd[c].tag}, 0)
+			if cmd then
+				for c = 1, #cmd do
+					if removableCommand[cmd[c].id] then
+						Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd[c].tag}, 0)
+					end
 				end
 			end
 		end

@@ -76,7 +76,7 @@ return { armcom1 = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
   workerTime             = 10,
 

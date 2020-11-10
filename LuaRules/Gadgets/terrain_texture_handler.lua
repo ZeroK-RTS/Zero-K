@@ -114,6 +114,7 @@ local blockStateMap = {} -- keeps track of drawn texture blocks.
 local chunkMap = {} -- map of UHM chunk that stores pending changes.
 local chunkUpdateList = {count = 0, data = {}} -- list of chuncks to update
 local chunkUpdateMap = {} -- map of chunks which are in list. Prevent duplicate entry if UHMU is called twice
+local wantMapTessellateUpdate = false
 
 local syncedHeights = {} -- list of synced heightmap point values
 
@@ -246,181 +247,184 @@ function gadget:DrawGenesis()
 	end
 
 	--Apply the required texture updates
-	if chunkUpdateList.count ~= 0 then
-		
-		--gl.DepthMask(false)
-		--gl.DepthTest(false)
-		--gl.Color(1,1,1,1)
-		--gl.AlphaTest(false)
-		
-		gl.ResetState()
-		gl.ResetMatrices()
-		
-		-- Find and sort the required texture updates
-		local toRestore = {count = 0, data = {}}
-		local restoreMap = {}
-		local toTexture = {}
-		for c = 1, chunkUpdateList.count do
-			local chunkUpdate = chunkUpdateList.data[c]
-			local chunk = chunkMap[chunkUpdate.x][chunkUpdate.z]
-			local blockList = chunk.blockList
-			for i = 1, blockList.count do
-				local block = blockList.data[i]
-				local x = block.x
-				local z = block.z
-				local tex = block.tex
-				local sx = floor(x/SQUARE_SIZE)
-				local sz = floor(z/SQUARE_SIZE)
-				
-				if not mapTex[sx] then
-					mapTex[sx] = {}
-				end
-				
-				if not mapTex[sx][sz] then
-					if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz]
-							and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
-						mapTex[sx][sz] = {
-							orig = GG.mapgen_squareTexture[sx][sz],
-							cur  = GG.mapgen_currentTexture[sx][sz],
-						}
-					else
-						mapTex[sx][sz] = {
-							cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-								wrap_s = GL.CLAMP_TO_EDGE,
-								wrap_t = GL.CLAMP_TO_EDGE,
-								fbo = true,
-								min_filter = GL.LINEAR_MIPMAP_NEAREST,
-							}),
-							orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
-								wrap_s = GL.CLAMP_TO_EDGE,
-								wrap_t = GL.CLAMP_TO_EDGE,
-								fbo = true,
-							}),
-						}
-						if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
-							spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
-							gl.Texture(mapTex[sx][sz].orig)
-							gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
-						else
-							if mapTex[sx][sz].cur then
-								gl.DeleteTextureFBO(mapTex[sx][sz].cur)
-							end
-							if mapTex[sx][sz].orig then
-								gl.DeleteTextureFBO(mapTex[sx][sz].orig)
-							end
-							mapTex[sx][sz] = nil
-						end
-					end
-				end
-				
-				if texturePool[tex] then --if texture (tex: 1,2,3) have been set to this chunk
-					-- Set Texture
-					blockStateMap[x] = blockStateMap[x] or {}
-					blockStateMap[x][z] = tex
-					
-					if not toTexture[tex] then
-						toTexture[tex] = {
-							count = 0,
-							data = {}
-						}
-					end
-					
-					local toTex = toTexture[tex]
-					toTex.count = toTex.count + 1
-					toTex.data[toTex.count] = {x = x, z = z, sx = sx, sz = sz}
+	if chunkUpdateList.count == 0 then
+		return
+	end
+	
+	wantMapTessellateUpdate = true
+	
+	--gl.DepthMask(false)
+	--gl.DepthTest(false)
+	--gl.Color(1,1,1,1)
+	--gl.AlphaTest(false)
+	
+	gl.ResetState()
+	gl.ResetMatrices()
+	
+	-- Find and sort the required texture updates
+	local toRestore = {count = 0, data = {}}
+	local restoreMap = {}
+	local toTexture = {}
+	for c = 1, chunkUpdateList.count do
+		local chunkUpdate = chunkUpdateList.data[c]
+		local chunk = chunkMap[chunkUpdate.x][chunkUpdate.z]
+		local blockList = chunk.blockList
+		for i = 1, blockList.count do
+			local block = blockList.data[i]
+			local x = block.x
+			local z = block.z
+			local tex = block.tex
+			local sx = floor(x/SQUARE_SIZE)
+			local sz = floor(z/SQUARE_SIZE)
+			
+			if not mapTex[sx] then
+				mapTex[sx] = {}
+			end
+			
+			if not mapTex[sx][sz] then
+				if GG.mapgen_squareTexture and GG.mapgen_squareTexture[sx] and GG.mapgen_squareTexture[sx][sz]
+						and GG.mapgen_currentTexture and GG.mapgen_currentTexture[sx] and GG.mapgen_currentTexture[sx][sz] then
+					mapTex[sx][sz] = {
+						orig = GG.mapgen_squareTexture[sx][sz],
+						cur  = GG.mapgen_currentTexture[sx][sz],
+					}
 				else
-					-- Restore Texture
-					if blockStateMap[x] then
-						blockStateMap[x][z] = nil
+					mapTex[sx][sz] = {
+						cur = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+							wrap_s = GL.CLAMP_TO_EDGE,
+							wrap_t = GL.CLAMP_TO_EDGE,
+							fbo = true,
+							min_filter = GL.LINEAR_MIPMAP_NEAREST,
+						}),
+						orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
+							wrap_s = GL.CLAMP_TO_EDGE,
+							wrap_t = GL.CLAMP_TO_EDGE,
+							fbo = true,
+						}),
+					}
+					if mapTex[sx][sz].orig and mapTex[sx][sz].cur then
+						spGetMapSquareTexture(sx, sz, 0, mapTex[sx][sz].orig)
+						gl.Texture(mapTex[sx][sz].orig)
+						gl.RenderToTexture(mapTex[sx][sz].cur, drawCopySquare)
+					else
+						if mapTex[sx][sz].cur then
+							gl.DeleteTextureFBO(mapTex[sx][sz].cur)
+						end
+						if mapTex[sx][sz].orig then
+							gl.DeleteTextureFBO(mapTex[sx][sz].orig)
+						end
+						mapTex[sx][sz] = nil
 					end
-					
-					if not (restoreMap[sx] and restoreMap[sx][sz]) then
-						toRestore.count = toRestore.count + 1
-						toRestore.data[toRestore.count] = {
-							sx = sx,
-							sz = sz,
-							count = 0,
-							data = {}
-						}
-						restoreMap[sx] = restoreMap[sx] or {}
-						restoreMap[sx][sz] = toRestore.count
-					end
-					
-					local square = toRestore.data[restoreMap[sx][sz]]
-					square.count = square.count + 1
-					square.data[square.count] = {x = x, z = z}
-				end
-			end
-		end
-
-		-- Restore texture to original
-		for i = 1, toRestore.count do
-			local square = toRestore.data[i]
-			local sx = square.sx
-			local sz = square.sz
-			if mapTex[sx][sz] then
-				gl.Texture(mapTex[sx][sz].orig)
-				for j = 1, square.count do
-					local x = square.data[j].x
-					local z = square.data[j].z
-					local sourceX = (x-sx*SQUARE_SIZE)/SQUARE_SIZE
-					local sourceZ = (z-sz*SQUARE_SIZE)/SQUARE_SIZE
-					local sourceSize = BLOCK_SIZE/SQUARE_SIZE
-					gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, sourceX, sourceZ, sourceSize)
-				end
-			end
-		end
-		
-		-- Apply Map Texture
-		for t = 1, TEXTURE_COUNT do
-			if toTexture[t] then
-				local toTex = toTexture[t]
-				local tex = texturePool[t]
-				gl.Texture(tex.texture)
-				for i = 1, toTex.count do
-					local block = toTex.data[i]
-					local x = block.x
-					local z = block.z
-					local sx = block.sx
-					local sz = block.sz
-					local dx = (x/tex.size)%1
-					local dz = (z/tex.size)%1
-					if mapTex[sx][sz] then
-						gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, dx, dz, tex.tile)
-					end
-				end
-			end
-		end
-		
-		-- Set modified squares (no more than once each)
-		local updatedSquareMap = {} -- map of squares which have already been updated
-		for c = 1, chunkUpdateList.count do
-			local chunkUpdate = chunkUpdateList.data[c]
-			local chunk = chunkMap[chunkUpdate.x][chunkUpdate.z]
-
-			local squareList = chunk.squareList
-			for i = 1, squareList.count do
-				local square = squareList.data[i]
-				local sx = square.x
-				local sz = square.z
-				if mapTex[sx][sz] and not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
-					gl.GenerateMipmap(mapTex[sx][sz].cur)
-					spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
-					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
-					updatedSquareMap[sx] = updatedSquareMap[sx] or {}
-					updatedSquareMap[sx][sz] = true
 				end
 			end
 			
-			-- Wipe updated chunks
-			chunkMap[chunkUpdate.x][chunkUpdate.z] = nil
-			chunkUpdateMap[chunkUpdate.x][chunkUpdate.z] = nil
+			if texturePool[tex] then --if texture (tex: 1,2,3) have been set to this chunk
+				-- Set Texture
+				blockStateMap[x] = blockStateMap[x] or {}
+				blockStateMap[x][z] = tex
+				
+				if not toTexture[tex] then
+					toTexture[tex] = {
+						count = 0,
+						data = {}
+					}
+				end
+				
+				local toTex = toTexture[tex]
+				toTex.count = toTex.count + 1
+				toTex.data[toTex.count] = {x = x, z = z, sx = sx, sz = sz}
+			else
+				-- Restore Texture
+				if blockStateMap[x] then
+					blockStateMap[x][z] = nil
+				end
+				
+				if not (restoreMap[sx] and restoreMap[sx][sz]) then
+					toRestore.count = toRestore.count + 1
+					toRestore.data[toRestore.count] = {
+						sx = sx,
+						sz = sz,
+						count = 0,
+						data = {}
+					}
+					restoreMap[sx] = restoreMap[sx] or {}
+					restoreMap[sx][sz] = toRestore.count
+				end
+				
+				local square = toRestore.data[restoreMap[sx][sz]]
+				square.count = square.count + 1
+				square.data[square.count] = {x = x, z = z}
+			end
+		end
+	end
+
+	-- Restore texture to original
+	for i = 1, toRestore.count do
+		local square = toRestore.data[i]
+		local sx = square.sx
+		local sz = square.sz
+		if mapTex[sx][sz] then
+			gl.Texture(mapTex[sx][sz].orig)
+			for j = 1, square.count do
+				local x = square.data[j].x
+				local z = square.data[j].z
+				local sourceX = (x-sx*SQUARE_SIZE)/SQUARE_SIZE
+				local sourceZ = (z-sz*SQUARE_SIZE)/SQUARE_SIZE
+				local sourceSize = BLOCK_SIZE/SQUARE_SIZE
+				gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, sourceX, sourceZ, sourceSize)
+			end
+		end
+	end
+	
+	-- Apply Map Texture
+	for t = 1, TEXTURE_COUNT do
+		if toTexture[t] then
+			local toTex = toTexture[t]
+			local tex = texturePool[t]
+			gl.Texture(tex.texture)
+			for i = 1, toTex.count do
+				local block = toTex.data[i]
+				local x = block.x
+				local z = block.z
+				local sx = block.sx
+				local sz = block.sz
+				local dx = (x/tex.size)%1
+				local dz = (z/tex.size)%1
+				if mapTex[sx][sz] then
+					gl.RenderToTexture(mapTex[sx][sz].cur, drawTextureOnSquare, x-sx*SQUARE_SIZE,z-sz*SQUARE_SIZE, BLOCK_SIZE, dx, dz, tex.tile)
+				end
+			end
+		end
+	end
+	
+	-- Set modified squares (no more than once each)
+	local updatedSquareMap = {} -- map of squares which have already been updated
+	for c = 1, chunkUpdateList.count do
+		local chunkUpdate = chunkUpdateList.data[c]
+		local chunk = chunkMap[chunkUpdate.x][chunkUpdate.z]
+
+		local squareList = chunk.squareList
+		for i = 1, squareList.count do
+			local square = squareList.data[i]
+			local sx = square.x
+			local sz = square.z
+			if mapTex[sx][sz] and not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
+				gl.GenerateMipmap(mapTex[sx][sz].cur)
+				spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
+				--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
+				updatedSquareMap[sx] = updatedSquareMap[sx] or {}
+				updatedSquareMap[sx][sz] = true
+			end
 		end
 		
-		chunkUpdateList = {count = 0, data = {}}
-		
-		glTexture(false)
+		-- Wipe updated chunks
+		chunkMap[chunkUpdate.x][chunkUpdate.z] = nil
+		chunkUpdateMap[chunkUpdate.x][chunkUpdate.z] = nil
 	end
+	
+	chunkUpdateList = {count = 0, data = {}}
+	
+	glTexture(false)
 end
 
 function gadget:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
@@ -433,6 +437,50 @@ local function UpdateAll()
 		UMHU_updatequeue[#UMHU_updatequeue+1] = {0, z, MAP_WIDTH/8 - 8, z + 8}
 	end
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Terrain update
+
+local UPDATE_PERIOD = 20
+local sinceLastUpdate = false
+local toSet = false
+
+function gadget:GameFrame(n)
+	if sinceLastUpdate then
+		sinceLastUpdate = sinceLastUpdate - 1
+		if sinceLastUpdate < 0 then
+			sinceLastUpdate = false
+		end
+		return
+	end
+	
+	-- Set and unset GroundDetail one higher than the configured value to force an update.
+	-- Always reset GroundDetail even if wantMapTessellateUpdate is not required, to reduce
+	-- the chance of coming afoul of widget-space configuration changes.
+	if wantMapTessellateUpdate then
+		sinceLastUpdate = UPDATE_PERIOD
+	end
+	
+	if toSet then
+		Spring.SendCommands{"GroundDetail " .. toSet}
+		wantMapTessellateUpdate = false
+		toSet = false
+		return
+	end
+	
+	if not wantMapTessellateUpdate then
+		return
+	end
+	
+	toSet = Spring.GetConfigInt("GroundDetail", 90) -- Default in epic menu
+	Spring.SendCommands{"GroundDetail " .. (toSet + 1)}
+	wantMapTessellateUpdate = false
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Gadget Interface
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then
@@ -498,7 +546,6 @@ function gadget:Initialize()
 	--		ChangeTextureBlock(x,z,math.ceil(math.random(3)))
 	--	end
 	--end
-	
 	
 	gadgetHandler:AddSyncAction("changeBlockList", changeBlockList)
 	gadgetHandler:AddSyncAction("UpdateAll", UpdateAll)

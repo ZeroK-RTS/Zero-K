@@ -49,7 +49,7 @@ return { spiderantiheavy = {
   trackStretch          = 1,
   trackType             = [[ChickenTrackPointyShort]],
   trackWidth            = 45,
-  turnRate              = 1800,
+  turnRate              = 2160,
 
   weapons               = {
 

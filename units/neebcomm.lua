@@ -67,7 +67,7 @@ return { neebcomm = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 40,
-  turnRate            = 573,
+  turnRate            = 687,
   upright             = false,
   workerTime          = 7.5,
 

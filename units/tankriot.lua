@@ -19,7 +19,7 @@ return { tankriot = {
   customParams        = {
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
-    aim_lookahead     = 200,
+    aim_lookahead     = 160,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -47,7 +47,7 @@ return { tankriot = {
   trackType           = [[StdTank]],
   trackWidth          = 50,
   turninplace         = 0,
-  turnRate            = 355,
+  turnRate            = 568,
   workerTime          = 0,
 
   weapons             = {

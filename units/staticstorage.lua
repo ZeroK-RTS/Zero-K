@@ -36,6 +36,7 @@ return { staticstorage = {
   customParams                  = {
     modelradius    = [[30]],
     removewait     = 1,
+    removestop     = 1,
     default_spacing = 0,
     selectionscalemult = 1.15,
   },

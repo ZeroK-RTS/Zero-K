@@ -18,7 +18,8 @@ return { hoverriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    selection_scale   = 0.92,
+    selection_scale    = 0.92,
+    aim_lookahead      = 80,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -50,7 +51,7 @@ return { hoverriot = {
   sightDistance       = 407,
   sonarDistance       = 407,
   turninplace         = 0,
-  turnRate            = 375,
+  turnRate            = 600,
   workerTime          = 0,
 
   weapons             = {

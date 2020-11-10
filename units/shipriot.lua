@@ -52,7 +52,7 @@ return { shipriot = {
   
   sonarDistance          = 500,
   turninplace            = 0,
-  turnRate               = 500,
+  turnRate               = 800,
   waterline              = 0,
   workerTime             = 0,
 

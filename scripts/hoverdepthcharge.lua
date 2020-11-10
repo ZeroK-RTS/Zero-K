@@ -113,7 +113,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	StartThread(WeaponRangeUpdate)
+	--StartThread(WeaponRangeUpdate) -- Not required as ranges are equal.
 end
 
 function script.QueryWeapon(num)
@@ -159,8 +159,8 @@ end
 local function FakeWeaponShoot(targetID)
 	local reloaded = select(2, spGetUnitWeaponState(unitID,1))
 	if reloaded then
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		local h = Spring.GetGroundHeight(x,z)
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		local h = Spring.GetGroundHeight(x, z)
 		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 400, 30) then
 			local gameFrame = spGetGameFrame()
 			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
@@ -179,6 +179,13 @@ function script.BlockShot(num, targetID)
 		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 500, 60)
 	end
 	if num == 2 then
+		if targetID then
+			local tx, ty, tz = Spring.GetUnitPosition(targetID)
+			local gy = Spring.GetGroundHeight(tx, tz)
+			if ty - gy > 5 and gy > -5 then -- is in the air
+				return false
+			end
+		end
 		FakeWeaponShoot(targetID)
 	end
 	return true

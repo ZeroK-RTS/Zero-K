@@ -900,12 +900,6 @@ function gadgetHandler:GetHourTimer()
   return hourTimer
 end
 
-
-function gadgetHandler:GetViewSizes()
-  return self.xViewSize, self.yViewSize
-end
-
-
 function gadgetHandler:RegisterCMDID(gadget, id)
   if not id then
     Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
@@ -965,56 +959,6 @@ function gadgetHandler:GameFrame(frameNum)
   return
 end
 
-
-function gadgetHandler:RecvFromSynced(...)
-  if (actionHandler.RecvFromSynced(...)) then
-    return
-  end
-  for _,g in r_ipairs(self.RecvFromSyncedList) do
-    if (g:RecvFromSynced(...)) then
-      return
-    end
-  end
-  return
-end
-
-
---function gadgetHandler:GotChatMsg(msg, player)
---  if ((player == 0) and Spring.IsCheatingEnabled()) then
---    local sp = '^%s*'    -- start pattern
---    local ep = '%s+(.*)' -- end pattern
---    local s, e, match
---    s, e, match = string.find(msg, sp..'togglegadget'..ep)
---    if (match) then
---      self:ToggleGadget(match)
---      return true
---    end
---    s, e, match = string.find(msg, sp..'enablegadget'..ep)
---    if (match) then
---      self:EnableGadget(match)
---      return true
---    end
---    s, e, match = string.find(msg, sp..'disablegadget'..ep)
---	if (match) then
---      self:DisableGadget(match)
---      return true
---    end
---  end
---
---  if (actionHandler.GotChatMsg(msg, player)) then
---    return true
---  end
---
---  for _,g in r_ipairs(self.GotChatMsgList) do
---    if (g:GotChatMsg(msg, player)) then
---      return true
---    end
---  end
---
---  return false
---end
-
-
 function gadgetHandler:RecvLuaMsg(msg, player)
   for _,g in r_ipairs(self.RecvLuaMsgList) do
     if (g:RecvLuaMsg(msg, player)) then
@@ -1023,33 +967,6 @@ function gadgetHandler:RecvLuaMsg(msg, player)
   end
   return false
 end
-
-
---------------------------------------------------------------------------------
---
---  Drawing call-ins
---
-
--- generates ViewResize() calls for the gadgets
-function gadgetHandler:SetViewSize(vsx, vsy)
-  self.xViewSize = vsx
-  self.yViewSize = vsy
-  if ((self.xViewSizeOld ~= vsx) or
-      (self.yViewSizeOld ~= vsy)) then
-    gadgetHandler:ViewResize(vsx, vsy)
-    self.xViewSizeOld = vsx
-    self.yViewSizeOld = vsy
-  end
-end
-
-
-function gadgetHandler:ViewResize(vsx, vsy)
-  for _,g in r_ipairs(self.ViewResizeList) do
-    g:ViewResize(vsx, vsy)
-  end
-  return
-end
-
 
 --------------------------------------------------------------------------------
 --
@@ -1148,13 +1065,6 @@ function gadgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
       return dataRet
     end
   end
-end
-
-function gadgetHandler:SunChanged()
-  for _,g in r_ipairs(self.SunChangedList) do
-    g:SunChanged()
-  end
-  return
 end
 
 function gadgetHandler:ScriptFireWeapon(unitID, unitDefID, weaponNum)
@@ -1601,30 +1511,6 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 	return rDam, rImp
 end
 
---[[ Old
-function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponDefID,
-								   projectileID, attackerID, attackerDefID, attackerTeam)
-
-  local rDam = damage
-  local rImp = 1.0
-
-  for _,g in r_ipairs(self.UnitPreDamagedList) do
-    dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
-                  rDam, paralyzer, weaponDefID,
-                  attackerID, attackerDefID, attackerTeam,
-				  projectileID)
-    if (dam ~= nil) then
-      rDam = dam
-    end
-    if (imp ~= nil) then
-      rImp = math.min(imp, rImp)
-    end
-  end
-
-  return rDam, rImp
-end
---]]
 
 local UnitDamaged_first = true
 local UnitDamaged_count = 0
@@ -1651,20 +1537,6 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 	end
 	return
 end
-
---[[ Old
-function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID,
-                                   attackerID, attackerDefID, attackerTeam)
-
-  for _,g in r_ipairs(self.UnitDamagedList) do
-    g:UnitDamaged(unitID, unitDefID, unitTeam,
-                  damage, paralyzer, weaponID,
-                  attackerID, attackerDefID, attackerTeam)
-  end
-  return
-end
---]]
 
 
 function gadgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
@@ -1894,16 +1766,6 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 	end
 	return noGfx or false
 end
-
---[[ Base
-function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
-  local noGfx = false
-  for _,g in r_ipairs(self.ExplosionList) do
-	noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
-  end
-  return noGfx
-end
---]]
 
 --------------------------------------------------------------------------------
 --
@@ -2208,21 +2070,6 @@ function gadgetHandler:RecvFromSynced(cmd,...)
   return
 end
 
--- base
---[[
-function gadgetHandler:RecvFromSynced(...)
-  if (actionHandler.RecvFromSynced(...)) then
-    return
-  end
-  for _,g in r_ipairs(self.RecvFromSyncedList) do
-    if (g:RecvFromSynced(...)) then
-      return
-    end
-  end
-  return
-end
---]]
-
 function gadgetHandler:GotChatMsg(msg, player)
 
   if (((player == 0) or (player == 255)) and Spring.IsCheatingEnabled()) then	-- ours
@@ -2271,28 +2118,6 @@ function gadgetHandler:ViewResize(viewGeometry)
   end
   return
 end
-
--- base
---[[
-function gadgetHandler:ViewResize(vsx, vsy)
-  for _,g in r_ipairs(self.ViewResizeList) do
-    g:ViewResize(vsx, vsy)
-  end
-  return
-end
-
--- generates ViewResize() calls for the gadgets
-function gadgetHandler:SetViewSize(vsx, vsy)
-  self.xViewSize = vsx
-  self.yViewSize = vsy
-  if ((self.xViewSizeOld ~= vsx) or
-      (self.yViewSizeOld ~= vsy)) then
-    gadgetHandler:ViewResize(vsx, vsy)
-    self.xViewSizeOld = vsx
-    self.yViewSizeOld = vsy
-  end
-end
---]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -2362,17 +2187,6 @@ function gadgetHandler:GameSetup(state, ready, playerStates)
   end
   return false
 end
-
---[[
--- makes available to gadgets with handler = true
-function gadgetHandler:AddSyncAction(gadget, cmd, func, help)
-	return actionHandler.AddSyncAction(gadget, cmd, func, help)
-end
-
-function gadgetHandler:RemoveSyncAction(gadget, cmd)
-	return actionHandler.RemoveSyncAction(gadget, cmd)
-end
-]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

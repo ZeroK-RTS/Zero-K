@@ -148,8 +148,15 @@ confdata.subMenuIcons = {
 	['Hotkeys/Camera']              = imgPath..'epicmenu/video_camera.png',
 	['Hotkeys/Construction']        = imgPath..'factory.png',
 	['Hotkeys/Selection']           = imgPath..'epicmenu/selection.png',
-	['Hotkeys/Commands']            = imgPath..'epicmenu/fingertap.png',
-	['Hotkeys/Command Panel']       = imgPath..'epicmenu/control_panel.png',
+	['Hotkeys/Commands']            = imgPath..'commands/Bold/move.png',
+	['Hotkeys/Grid Hotkeys']       = imgPath..'epicmenu/grid.png',
+	
+	['Hotkeys/Commands/Targeted']   = imgPath..'commands/Bold/attack.png',
+	['Hotkeys/Commands/Instant']    = imgPath..'commands/Bold/action.png',
+	['Hotkeys/Commands/State']      = imgPath..'commands/states/move_engage.png',
+	
+	['Hotkeys/Camera/Camera Position Hotkeys']     = imgPath..'epicmenu/marker.png',
+	['Hotkeys/Camera/Camera Mode Hotkeys']         = imgPath..'epicmenu/move.png',
 	
 	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
 	['Settings/Audio']              = imgPath..'epicmenu/vol.png',
@@ -160,11 +167,13 @@ confdata.subMenuIcons = {
 	['Settings/HUD Presets']        = imgPath..'epicmenu/speed-test-icon.png',
 	['Settings/Interface']          = imgPath..'epicmenu/robotarm.png',
 	['Settings/Misc']               = imgPath..'epicmenu/misc.png',
+	['Settings/Tips']    = imgPath..'epicmenu/questionmark.png',
 	
 	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Reclaim Highlight']        = imgPath..'epicmenu/reclaimfield.png',
 	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
 	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
@@ -178,7 +187,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
-	['Settings/Interface/Area Commands']            = imgPath..'commands/bold/areaattack.png',
+	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -192,11 +201,19 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
 	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
 	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
+	['Settings/HUD Panels/Command Panel']           = imgPath..'epicmenu/control_panel.png',
+	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
+	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
+	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Spectator Panels']        = imgPath..'advplayerlist/spec.png',
+	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 }
 
 confdata.simpleModeDirectory = {
 	['Reset Settings'] = true,
 	['Interface'] = true,
+	['Commands'] = true,
+	['Presets'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
 	['Camera'] = true,
@@ -291,11 +308,11 @@ local cameraPath = 'Settings/Camera'
 	ShRadio( cameraPath,
 		'Camera Type', {
 			{name = 'Default camera', key='Default', desc='Default camera', hotkey=nil},
-			{name = 'FPS',key='FPS', hotkey=nil},
-			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
-			{name = 'Total War',key='Total War',  hotkey=nil},
-			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'COFC (highly configurable)',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'FPS (experimental)',key='FPS', hotkey=nil},
+			{name = 'Free (experimental)',key='Free', hotkey=nil},
+			{name = 'Total War (experimental)',key='Total War',  hotkey=nil},
 		},'Default',
 		function(self)
 			local key = self.value
@@ -323,21 +340,34 @@ local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Move Left', 'moveleft')
 	ShButton(camerHotkeys, 'Move Right', 'moveright')
 	ShLabel(camerHotkeys, '')
-	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
-	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Overview Mode', 'toggleoverview')
 	ShButton(camerHotkeys, 'Track unit', 'track')
 	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
-
-	ShLabel(camerHotkeys, '')
 	ShButton(camerHotkeys, 'Panning mode','mousestate', 'Note: must be bound to a key for use', true)
-	ShButton(camerHotkeys, 'Switch Default', 'viewta', nil, true)
-	ShButton(camerHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	ShButton(camerHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
-	ShButton(camerHotkeys, 'Switch Total War', 'viewtw', nil, true)
+	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	
+	ShLabel(camerHotkeys, 'Saving Position and Switching Camera')
+
+local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
+	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
 	
+local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
+	AddOption(camerTypeHotkeys,
+	{
+		type='text',
+		name='Camera Modes',
+		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
+	})
+	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
+	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
+	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
+
+-- Control menu order
+ShLabel('Hotkeys/Commands', 'Command Categories')
+
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
@@ -386,6 +416,9 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
+
+local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
+	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
@@ -678,17 +711,32 @@ AddOption("Settings/HUD Panels/Pause Screen",
 	})
 
 --- HELP ---
-local pathHelp = 'Settings/Nag'
+local pathHelp = 'Help'
 	AddOption(pathHelp,
 	{
 		type='text',
-		name='Tips',
-		value = [[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options.
-		          You can also space-click on menu elements to see context settings. ]]
+		name='Space + Click Tips',
+		value = [[Hold Space and click on a unit or wreck to display detailed information.
+        You can also space-click on commands and other interface elements to open their hotkey settings. ]]
 	})
-	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	AddOption(pathHelp,
+	{
+		type='text',
+		name='Ingame Tutorial',
+		value = [[The button below guides you through the whys and hows of setting up a base and advancing with an army. It can be disabled at any time.
+        This tutorial is not availible in the campaign or when spectating.]]
+	})
+	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron 2.0"} end )
+	AddOption(pathHelp,
+	{
+		type='label',
+		name='Unit Lists and Concepts',
+	})
+	
+--- TIPS ---
+local pathTips = 'Settings/Tips'
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-local pathClippy = 'Settings/Nag/Clippy Comments'
+local pathClippy = 'Settings/Tips/Clippy Comments'
 	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC

@@ -89,7 +89,7 @@ local jumpCmdDesc = {
 	name    = 'Jump',
 	cursor  = 'Jump', -- add with LuaUI? No.
 	action  = 'jump',
-	tooltip = 'Jump to selected position.',
+	tooltip = 'Jump: Leap over terrain to a location. Requires time to recharge.',
 }
 
 local blockingStructure = {}
@@ -275,7 +275,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	end
 	local turn = goalHeading - startHeading
 	
-	jumping[unitID] = {vector[1]*step, vector[2]*step, vector[3]*step}
+	jumping[unitID] = true
 
 	mcEnable(unitID)
 	Spring.SetUnitVelocity(unitID,0,0,0)
@@ -333,21 +333,23 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	
 		local hitStructure, structureCollisionData
 		local halfJump
+		
+		local lastX, lastY, lastZ = start[1], start[2], start[3]
 		local i = 0
 		while i <= 1 do
 			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
 				return
 			end
 
-			local x0, y0, z0 = spGetUnitPosition(unitID)
 			local x = start[1] + vector[1]*i
 			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
 			local z = start[3] + vector[3]*i
+			
 			mcSetPosition(unitID, x, y, z)
-			if x0 then
-				jumping[unitID] = {x - x0, y - y0, z - z0}
-				spSetUnitVelocity(unitID, (x - x0), (y - y0), (z - z0)) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
-			end
+			
+			-- for the benefit of unit AI and possibly target prediction (probably not the latter)
+			Spring.MoveCtrl.SetVelocity(unitID, (x - lastX), (y - lastY), (z - lastZ))
+			lastX, lastY, lastZ = x, y, z
 
 			Spring.UnitScript.CallAsUnit(unitID, env.jumping, i * 100)
 		
@@ -476,7 +478,6 @@ function gadget:UnitDamaged(unitID)
 	local jump_dir = jumping[unitID]
 	if (Spring.GetUnitHealth(unitID) < 0) and jump_dir then
 		mcDisable(unitID)
-		Spring.AddUnitImpulse(unitID,jump_dir[1],jump_dir[2],jump_dir[3])
 		jumping[unitID] = nil
 	end
 end

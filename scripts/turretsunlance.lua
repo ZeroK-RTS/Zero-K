@@ -2,7 +2,8 @@ include "constants.lua"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local base, turret, breech, barrel1, barrel2, flare = piece("base", "turret", "breech", "barrel1", "barrel2", "flare")
+local base, turret, breech, barrel2, flare = piece("base", "turret", "breech", "barrel2", "flare")
+-- unused piece: barrel1
 local smokePiece = {base, turret}
 
 -- Signal definitions

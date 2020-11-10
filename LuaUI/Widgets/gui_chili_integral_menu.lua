@@ -22,6 +22,8 @@ include("colors.lua")
 include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
+local cullingSettingsList, commandCulling =  include("Configs/integral_menu_culling.lua")
+local transkey = include("Configs/transkey.lua")
 
 -- Chili classes
 local Chili
@@ -41,8 +43,11 @@ local screen0
 
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
-local COMMAND_SECTION_WIDTH = 74 -- percent
-local STATE_SECTION_WIDTH = 24 -- percent
+local commandSectionWidth = 74 -- percent
+local stateSectionWidth = 26 -- percent
+
+local bigStateWidth, bigStateHeight = 4, 3
+local smallStateWidth, smallStateHeight = 5, 3.4
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -86,8 +91,7 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling and lower variables
 
-configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands, cmdPosDef = include("Configs/integral_menu_config.lua")
 
 local fontObjects = {} -- Filled in init
 
@@ -96,6 +100,7 @@ local tabPanel
 local selectionIndex = 0
 local background
 local returnToOrdersCommand = false
+local simpleModeEnabled = true
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -104,16 +109,74 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = {
+	'simple_mode', 'enable_return_fire', 'enable_roam',
 	'background_opacity', 'keyboardType2',  'selectionClosesTab', 'selectionClosesTabOnSelect', 'altInsertBehind',
 	'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating', 'applyCustomGrid', 'label_apply',
 	'label_tab', 'tab_economy', 'tab_defence', 'tab_special', 'tab_factory', 'tab_units',
 	'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning',
+	'helpwindow', 'commands_reset_default', 'commands_enable_all', 'commands_disable_all', 'states_enable_all', 'states_disable_all',
 }
 
-local commandPanelPath = 'Hotkeys/Command Panel'
-local customGridPath = 'Hotkeys/Command Panel/Custom'
+local commandPanelPath = 'Hotkeys/Grid Hotkeys'
+local customGridPath = 'Hotkeys/Grid Hotkeys/Custom'
+local commandOptPath = 'Settings/Interface/Commands'
+
+local function UpdateHolderSizes()
+	if statePanel.buttons then
+		if simpleModeEnabled then
+			statePanel.buttons.SetDimensions(bigStateWidth, bigStateHeight, true)
+		else
+			statePanel.buttons.SetDimensions(smallStateWidth, smallStateHeight, true)
+		end
+	end
+end
+
+WG.RemoveReturnFireState = true -- matches default
+WG.RemoveRoamState = true -- matches default
 
 options = {
+	simple_mode = {
+		name = "Large State Icons",
+		desc = "Large state icons are arranged in four rows and display their hotkey (if the hotkey is short). When disabled, the icons are arranged in five rows and do not display hotkeys. Individual states can be added or removed under Settings -> Interface -> Commands.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			simpleModeEnabled = self.value
+			UpdateHolderSizes()
+		end,
+	},
+	enable_return_fire = {
+		name = "Enable return fire state",
+		desc = "When enabled, the Hold Fire state is extended to a three-option toggle with Return Fire as an additional option.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			WG.RemoveReturnFireState = not self.value
+			if commandDisplayConfig then
+				commandDisplayConfig[CMD.FIRE_STATE].useAltConfig = self.value
+			end
+			UpdateHolderSizes() -- Need to delete buttons to change tooltips
+		end,
+		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
+	},
+	enable_roam = {
+		name = "Enable roam move state",
+		desc = "When enabled, the Hold Position state is extended to a three-option toggle with Roam as an additional option.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			WG.RemoveRoamState = not self.value
+			if commandDisplayConfig then
+				commandDisplayConfig[CMD.MOVE_STATE].useAltConfig = self.value
+			end
+			UpdateHolderSizes() -- Need to delete buttons to change tooltips
+		end,
+		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
+	},
 	background_opacity = {
 		name = "Opacity",
 		type = "number",
@@ -130,6 +193,7 @@ options = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Dvorak (standard)', key = 'dvorak', hotkey = nil},
 			{name = 'Configure in "Custom" (below)', key = 'custom', hotkey = nil},
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
@@ -231,9 +295,6 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function()
-			ClearData(true)
-		end,
 	},
 	tabFontSize = {
 		name = "Tab Font Size",
@@ -246,9 +307,6 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 500, step=1,
-		OnChange = function()
-			ClearData(true)
-		end,
 	},
 	flushLeft = {
 		name = 'Flush Left',
@@ -268,6 +326,101 @@ options = {
 		type = 'label',
 		name = 'Tab specific overrides',
 		path = customGridPath
+	},
+	
+	helpwindow = {
+		name = 'Command Visibility',
+		type = 'text',
+		value = "Each command can be hidden from the command panel, with some advanced ones hidden by default. Hotkeys can be used to issue commands or toggle states even when hidden.",
+		path = commandOptPath,
+		simpleMode = true,
+		everyMode = true,
+	},
+	commands_reset_default = {
+		type = 'button',
+		name = "Reset to default",
+		desc = "Show the basic commands and hide the advanced ones",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = data.default
+					commandCulling[data.cmdID] = not data.default
+				end
+			end
+		end,
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
+	},
+	commands_enable_all = {
+		type = 'button',
+		name = "Show all commands",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and not data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = true
+					commandCulling[data.cmdID] = false
+				end
+			end
+		end,
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
+	},
+	commands_disable_all = {
+		type = 'button',
+		name = "Hide all commands",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and not data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = false
+					commandCulling[data.cmdID] = true
+				end
+			end
+		end,
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
+	},
+	states_enable_all = {
+		type = 'button',
+		name = "Show all states",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = true
+					commandCulling[data.cmdID] = false
+				end
+			end
+		end,
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
+	},
+	states_disable_all = {
+		type = 'button',
+		name = "Hide all states",
+		OnChange = function ()
+			for i = 1, #cullingSettingsList do
+				local data = cullingSettingsList[i]
+				if data.cmdID and data.state then
+					local name = "cmd_" .. data.cmdID
+					options[name].value = false
+					commandCulling[data.cmdID] = true
+				end
+			end
+		end,
+		path = commandOptPath .. '/Presets',
+		simpleMode = true,
+		everyMode = true,
 	},
 }
 
@@ -330,6 +483,41 @@ local function TabClickFunction(mouse)
 	WG.crude.ShowMenu() --make epic Chili menu appear.
 	return true
 end
+
+local function AddCommandCullOptions()
+	for i = 1, #cullingSettingsList do
+		local data = cullingSettingsList[i]
+		if data.label then
+			local name = "integralCommands" .. data.label
+			options[name] = {
+				type = 'label',
+				name = data.label,
+				path = commandOptPath,
+				simpleMode = true,
+				everyMode = true,
+			}
+			options_order[#options_order + 1] = name
+		else
+			local name = "cmd_" .. data.cmdID
+			options[name] = {
+				name = data.name,
+				desc = "Show the " .. data.name .. (data.state and " state" or " command") ..  " on the command panel.",
+				type = 'bool',
+				value = not commandCulling[data.cmdID],
+				noHotkey = true,
+				OnChange = function(self)
+					commandCulling[data.cmdID] = not self.value
+				end,
+				path = commandOptPath,
+				simpleMode = true,
+				everyMode = true,
+			}
+			options_order[#options_order + 1] = name
+		end
+	end
+end
+
+AddCommandCullOptions()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -522,11 +710,9 @@ end
 local function GetButtonTooltip(displayConfig, command, state)
 	local PARAGRAPH = "\n  "
 
-	local tooltip
-	if displayConfig and state then
-		tooltip = (displayConfig.stateTooltip and displayConfig.stateTooltip[state]) or displayConfig.tooltip
-	elseif command then
-		tooltip = command.tooltip
+	local tooltip = state and displayConfig and displayConfig.stateTooltip and displayConfig.stateTooltip[state]
+	if not tooltip then
+		tooltip = (displayConfig and displayConfig.tooltip) or (command and command.tooltip)
 	end
 	if not tooltip then
 		return nil
@@ -545,6 +731,10 @@ local function GetButtonTooltip(displayConfig, command, state)
 
 	-- Append State hotkeys if any are set
 	local states, hotkeys_for_states, number_of_set_hotkeys = GetHotkeysForStatesText(action_name)
+	if displayConfig and displayConfig.stateNameOverride then
+		states = displayConfig.stateNameOverride
+	end
+	
 	if hotkeys_for_states and number_of_set_hotkeys > 0 then
 		tooltip = tooltip .. PARAGRAPH .. "State Hotkeys:"
 		for i = 1, #states do
@@ -614,6 +804,33 @@ local function UpdateBackgroundSkin()
 		buttonsHolder.padding = newClass.padding
 		buttonsHolder:UpdateClientArea()
 	end
+end
+
+local function GetCmdPosParameters(cmdID)
+	local def =  cmdPosDef[cmdID]
+	if (not def) and cmdID >= CMD_MORPH and cmdID < CMD_MORPH + 2000 then -- Includes CMD_MORPH and CMD_MORPH_STOP
+		def = cmdPosDef[CMD_MORPH]
+	end
+	
+	if def then
+		if simpleModeEnabled and def.posSimple then
+			return def.posSimple, def.priority
+		end
+		return def.pos, def.priority
+	end
+	--Spring.Echo("Unknown GetCmdPosParameters", cmdID)
+	return 1, 100
+end
+
+local function GetDisplayConfig(cmdID)
+	local displayConfig = commandDisplayConfig[cmdID]
+	if not displayConfig then
+		return
+	end
+	if displayConfig.useAltConfig then
+		return displayConfig.altConfig
+	end
+	return displayConfig
 end
 
 --------------------------------------------------------------------------------
@@ -802,6 +1019,7 @@ end
 
 local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
+	local isStateCommand
 	local usingGrid
 	local factoryUnitID
 	local fakeFactory
@@ -813,7 +1031,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	local keyToShowWhenVisible
 	
 	local function DoClick(_, _, _, mouse)
-		if buttonLayout.ClickFunction and buttonLayout.ClickFunction() then
+		if buttonLayout.ClickFunction and buttonLayout.ClickFunction(cmdID and instantCommands[cmdID], isStateCommand) then
 			return false
 		end
 		if isDisabled then
@@ -1039,7 +1257,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 	
 	local function SetGridKey(key)
 		usingGrid = true
-		hotkeyText = GetGreenStr(key)
+		hotkeyText = GetGreenStr(transkey[string.lower(key)] or key)
 		SetText(textConfig.topLeft.name, hotkeyText)
 	end
 	
@@ -1155,11 +1373,11 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			SetText(textConfig.bottomRightLarge.name, command.name)
 		end
 		
+		isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 		if cmdID == newCmdID then
-			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 			if isStateCommand then
 				local state = command.params[1] + 1
-				local displayConfig = commandDisplayConfig[cmdID]
+				local displayConfig = GetDisplayConfig(cmdID)
 				if displayConfig then
 					local texture = displayConfig.texture[state]
 					if displayConfig.stateTooltip then
@@ -1198,13 +1416,17 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 			return
 		end
 		
-		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
-		local displayConfig = commandDisplayConfig[cmdID]
+		local displayConfig = GetDisplayConfig(cmdID)
 		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
 		
 		if command.action then
 			local hotkey = GetHotkeyText(command.action)
 			if not (isStateCommand or usingGrid) then
+				hotkeyText = hotkey
+				SetText(textConfig.topLeft.name, hotkey)
+			end
+			if simpleModeEnabled and isStateCommand then
+				hotkey = hotkey and not string.find(hotkey, "+") and hotkey -- Only show short hotkeys.
 				hotkeyText = hotkey
 				SetText(textConfig.topLeft.name, hotkey)
 			end
@@ -1241,6 +1463,10 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		y = y + button.height/2
 		return x, y, button.width, button.height
 	end
+	
+	function externalFunctionsAndData.Delete()
+		button:Dispose()
+	end
 
 	return externalFunctionsAndData
 end
@@ -1249,8 +1475,12 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 	local buttons = {}
 	local buttonList = {}
 	
+	local cmdPosition = {}
+	local positionCmd = {}
+	
 	local width = tostring(100/columns) .. "%"
 	local height = tostring(100/rows) .. "%"
+	local buttonSpace = math.floor(rows)*math.floor(columns)
 	
 	local gridMap, override
 	local gridEnabled = true
@@ -1265,6 +1495,14 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 				parent:RemoveChild(button.button)
 			end
 		end
+	end
+	
+	function externalFunctions.DeleteButtons()
+		for i = 1, #buttonList do
+			buttonList[i].Delete()
+		end
+		buttons = {}
+		buttonList = {}
 	end
 	
 	function externalFunctions.GetButton(x, y, selectionIndex)
@@ -1321,6 +1559,36 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 		end
 	end
 	
+	function externalFunctions.CommandToPosition(cmdID, count)
+		local index = cmdPosition[cmdID] or count or 1
+		local x, y = externalFunctions.IndexToPosition(index)
+		return x, y, index <= buttonSpace
+	end
+	
+	function externalFunctions.ResetCommandPositions(cmdID)
+		cmdPosition = {}
+		positionCmd = {}
+	end
+	
+	function externalFunctions.AddCommandPosition(cmdID)
+		local pos, priority = GetCmdPosParameters(cmdID)
+		while positionCmd[pos] do
+			local otherCmdID = positionCmd[pos]
+			local _, otherPriority = GetCmdPosParameters(otherCmdID)
+			if (priority < otherPriority) then
+				-- Displace old command. Priority 1 displaces priority 2.
+				cmdPosition[cmdID] = pos
+				positionCmd[pos] = cmdID
+				cmdID = otherCmdID
+				priority = otherPriority
+			end
+			pos = pos + 1
+		end
+		cmdPosition[cmdID] = pos
+		positionCmd[pos] = cmdID
+		return
+	end
+	
 	function externalFunctions.ApplyGridHotkeys(newGridMap, newOverride, updateNonVisible)
 		gridMap = newGridMap or gridMap
 		override = newOverride or override
@@ -1351,6 +1619,14 @@ local function GetButtonPanel(parent, name, rows, columns, vertical, generalButt
 			buttonList[i].OnVisibleGridKeyUpdate()
 		end
 		gridUpdatedSinceVisible = false
+	end
+	
+	function externalFunctions.SetDimensions(newRows, newColumns, newVertical)
+		rows, columns, vertical = newRows, newColumns, newVertical
+		width = tostring(100/columns) .. "%"
+		height = tostring(100/rows) .. "%"
+		buttonSpace = math.floor(rows)*math.floor(columns)
+		externalFunctions.DeleteButtons()
 	end
 	
 	return externalFunctions
@@ -1654,8 +1930,34 @@ local function GetSelectionValues()
 	return false, nil, nil, #selection
 end
 
+local function HiddenCommand(command)
+	return hiddenCommands[command.id] or command.hidden or (commandCulling and commandCulling[command.id])
+end
+
+local function ProcessCommandPosition(command)
+	if HiddenCommand(command) then
+		return
+	end
+
+	local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+	if isStateCommand then
+		statePanel.buttons.AddCommandPosition(command.id)
+		return
+	end
+	
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if not data.isBuild then
+			local found, position = data.inclusionFunction(command.id, factoryUnitDefID)
+			if found then
+				data.buttons.AddCommandPosition(command.id)
+			end
+		end
+	end
+end
+
 local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
-	if hiddenCommands[command.id] or command.hidden then
+	if HiddenCommand(command) then
 		return
 	end
 
@@ -1663,7 +1965,11 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 	if isStateCommand then
 		statePanel.commandCount = statePanel.commandCount + 1
 		
-		local x, y = statePanel.buttons.IndexToPosition(statePanel.commandCount)
+		local x, y, spaceAvailible = statePanel.buttons.CommandToPosition(command.id, statePanel.commandCount)
+		if not spaceAvailible then
+			statePanel.commandCount = statePanel.commandCount - 1
+			return
+		end
 		local button = statePanel.buttons.GetButton(x, y, selectionIndex)
 		button.SetCommand(command)
 		return
@@ -1679,7 +1985,7 @@ local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, fakeFact
 			if position then
 				x, y = position.col, position.row
 			else
-				x, y = data.buttons.IndexToPosition(data.commandCount)
+				x, y = data.buttons.CommandToPosition(command.id, data.commandCount)
 			end
 			
 			local button = data.buttons.GetButton(x, y, selectionIndex)
@@ -1711,9 +2017,21 @@ local function ProcessAllCommands(commands, customCommands)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		data.commandCount = 0
+		if not data.isBuild then
+			data.buttons.ResetCommandPositions()
+		end
 	end
 	
 	statePanel.commandCount = 0
+	statePanel.buttons.ResetCommandPositions()
+	
+	for i = 1, #commands do
+		ProcessCommandPosition(commands[i])
+	end
+	
+	for i = 1, #customCommands do
+		ProcessCommandPosition(customCommands[i])
+	end
 	
 	for i = 1, #commands do
 		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, fakeFactory, selectionIndex)
@@ -1892,7 +2210,7 @@ local function InitializeControls()
 		local commandHolder = Control:New{
 			x = "0%",
 			y = "0%",
-			width = COMMAND_SECTION_WIDTH .. "%",
+			width = commandSectionWidth .. "%",
 			height = "100%",
 			padding = {4, 6, 0, 4},
 			parent = buttonsHolder,
@@ -1942,16 +2260,21 @@ local function InitializeControls()
 	end
 	
 	statePanel.holder = Control:New{
-		x = (100 - STATE_SECTION_WIDTH) .. "%",
+		x = (100 - stateSectionWidth) .. "%",
 		y = "0%",
-		width = STATE_SECTION_WIDTH .. "%",
+		width = stateSectionWidth .. "%",
 		height = "100%",
 		padding = {0, 6, 3, 4},
 		parent = buttonsHolder,
 	}
 	statePanel.holder:SetVisibility(false)
 	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel", 5, 3, true, buttonLayoutConfig.command)
+	statePanel.buttons = GetButtonPanel(statePanel.holder, "statePanel",
+		simpleModeEnabled and bigStateWidth or smallStateWidth,
+		simpleModeEnabled and bigStateHeight or smallStateHeight,
+		true,
+		buttonLayoutConfig.command
+	)
 	
 	SetIntegralVisibility(false)
 end
@@ -2192,8 +2515,6 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands = include(configurationName)
-	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")
 	initialized = true

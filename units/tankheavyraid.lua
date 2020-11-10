@@ -17,8 +17,9 @@ return { tankheavyraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[10]],
+    modelradius       = [[10]],
     selection_scale   = 0.85,
+    aim_lookahead     = 120,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -54,7 +55,7 @@ return { tankheavyraid = {
   trackType              = [[StdTank]],
   trackWidth             = 32,
   turninplace            = 0,
-  turnRate               = 616,
+  turnRate               = 985,
   workerTime             = 0,
 
   weapons                = {

@@ -30,16 +30,17 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 local init = true
 local trackmode = false --before options
 local thirdperson_trackunit = false
+local overrideTiltValue = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Camera/Camera Controls'
-local zoomPath = 'Settings/Camera/Camera Controls/Zoom Behaviour'
-local rotatePath = 'Settings/Camera/Camera Controls/Rotation Behaviour'
-local scrollPath = 'Settings/Camera/Camera Controls/Scroll Behaviour'
-local miscPath = 'Settings/Camera/Camera Controls/Misc'
-local cameraFollowPath = 'Settings/Camera/Camera Following'
+options_path = 'Settings/Camera/COFC Controls'
+local zoomPath = 'Settings/Camera/COFC Zoom Behaviour'
+local rotatePath = 'Settings/Camera/COFC Rotation Behaviour'
+local scrollPath = 'Settings/Camera/COFC Scroll Behaviour'
+local miscPath = 'Settings/Camera/COFC Controls'
+local cameraFollowPath = 'Settings/Camera/COFC Following'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = {
 	'helpwindow',
@@ -50,7 +51,9 @@ options_order = {
 
 	'middleMouseButton',
 	
+	'lblMisc',
 	'smoothness',
+	'fov',
 	
 	'lblZoom',
 	-- 'zoomintocursor',
@@ -72,19 +75,26 @@ options_order = {
 	'targetmouse',
 	-- 'rotateonedge',
 	'inverttilt',
+	'overridetilt',
+	'tiltoverride',
 	'tiltfactor',
 	'groundrot',
 	
 	'lblScroll',
 	'speedFactor',
+	'speedFactor_mult',
 	'speedFactor_k',
+	'speedFactor_k_mult',
 	-- 'edgemove',
 	'invertscroll',
 	'smoothscroll',
 	'smoothmeshscroll',
+	'scrollhelp',
 	
-	'lblMisc',
-	'fov',
+	'disablelabel',
+	'disableshift',
+	'disablectrl',
+	'disablealt',
 	'overviewmode',
 	'overviewset',
 	'rotatebackfromov',
@@ -124,6 +134,7 @@ local GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProp
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
 local ApplyCenterBounds = function(cs) end
+local TiltOverrideFunc
 
 options = {
 	
@@ -131,7 +142,7 @@ options = {
 	lblRotate = {name='Rotation Behaviour', type='label', path=rotatePath},
 	lblScroll = {name='Scroll Behaviour', type='label', path=scrollPath},
 	lblZoom = {name='Zoom Behaviour', type='label', path=zoomPath},
-	lblMisc = {name='Misc.', type='label', path=miscPath},
+	lblMisc = {name='General Parameters', type='label', path=miscPath},
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
@@ -198,20 +209,13 @@ options = {
 		name = 'COFCam Help',
 		type = 'text',
 		value = [[
-			Complete Overhead/Free Camera has six main actions...
-			
-			Zoom..... <Mousewheel>
-			Tilt World..... <Ctrl> + <Mousewheel>
-			Altitude..... <Alt> + <Mousewheel>
-			Mouse Scroll..... <Middlebutton-drag>
-			Rotate World..... <Ctrl> + <Middlebutton-drag>
-			Rotate Camera..... <Alt> + <Middlebutton-drag>
-			
-			Additional actions:
-			Keyboard: <arrow keys> replicate middlebutton drag while <pgup/pgdn> replicate mousewheel. You can use these with ctrl, alt & shift to replicate mouse camera actions.
-			Use <Shift> to speed up camera movements.
-			Reset Camera..... <Ctrl> + <Alt> + <Middleclick>
-		]],
+Complete Overhead/Free Camera has six actions:
+	Zoom Camera..... <Mousewheel>
+	Tilt World..... <Ctrl> + <Mousewheel>
+	Altitude..... <Alt> + <Mousewheel>
+	Mouse Scroll..... <MMB-drag>
+	Rotate World..... <Ctrl> + <MMB-drag>
+	Rotate Camera..... <Alt> + <MMB-drag>]],
 	},
 
 	zoominfactor = { --should be lower than zoom-out-speed to help user aim tiny units
@@ -354,6 +358,31 @@ options = {
 		noHotkey = true,
 		path = rotatePath,
 	},
+	overridetilt = {
+		name = 'Override tilt',
+		desc = 'Disable tilt, instead keeping the camera at a fixed tilt set by Tilt override value.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if TiltOverrideFunc then
+				TiltOverrideFunc()
+			end
+		end,
+		path = rotatePath,
+	},
+	tiltoverride = {
+		name = 'Tilt override value',
+		type = 'number',
+		min = 0.01, max = 1, step = 0.01,
+		value = 1,
+		OnChange = function(self)
+			if TiltOverrideFunc then
+				TiltOverrideFunc()
+			end
+		end,
+		path = rotatePath,
+	},
 	tiltfactor = {
 		name = 'Tilt speed',
 		type = 'number',
@@ -375,16 +404,30 @@ options = {
 		name = 'Mouse scroll speed',
 		desc = 'This speed applies to scrolling with the middle button.',
 		type = 'number',
-		min = 10, max = 40,
+		min = 10, max = 100,
 		value = 25,
+		path = scrollPath,
+	},
+	speedFactor_mult = {
+		name = 'Multiply the above by 10',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 		path = scrollPath,
 	},
 	speedFactor_k = {
 		name = 'Keyboard/edge scroll speed',
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
-		min = 1, max = 50,
+		min = 1, max = 100,
 		value = 40,
+		path = scrollPath,
+	},
+	speedFactor_k_mult = {
+		name = 'Multiply the above by 10',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
 		path = scrollPath,
 	},
 	invertscroll = {
@@ -411,7 +454,13 @@ options = {
 		noHotkey = true,
 		path = scrollPath,
 	},
-    
+	scrollhelp = {
+		name = 'Scroll Hotkeys',
+		type = 'text',
+		value = [[The scroll keys (arrow keys by default) can be set in Hotkeys/Camera.]],
+		path = scrollPath,
+	},
+
 	-- mingrounddist = {
 	-- 	name = 'Minimum Ground Distance',
 	-- 	desc = 'Getting too close to the ground allows strange camera positioning.',
@@ -421,6 +470,32 @@ options = {
 	-- 	value = 1,
 	-- 	OnChange = function(self) init = true; end,
 	-- },
+	disablelabel = {name='Hotkeys and Modifiers', type='label', path=miscPath},
+	
+	disableshift = {
+		name = 'Disable Shift',
+		desc = 'Make the camera unaffected by holding Shift.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
+	disablectrl = {
+		name = 'Disable Ctrl',
+		desc = 'Make the camera unaffected by holding Ctrl.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
+	disablealt = {
+		name = 'Disable Alt',
+		desc = 'Make the camera unaffected by holding Alt.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = miscPath,
+	},
 	fov = {
 		name = 'Field of View (Degrees)',
 		--desc = "FOV (25 deg - 100 deg).",
@@ -432,7 +507,7 @@ options = {
 		path=miscPath,
 	},
 	overviewmode = {
-		name = "COFC Overview",
+		name = "Toggle map overview",
 		desc = "Go to overview mode, then restore view to cursor position.",
 		type = 'button',
 		hotkey = {key='tab', mod=''},
@@ -1750,6 +1825,10 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 		cs.rx = cs.rx + rdy * trfactor
 		cs.ry = cs.ry - rdx * trfactor
 		
+		if overrideTiltValue then
+			cs.rx = overrideTiltValue
+		end
+		
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
 		
@@ -1897,6 +1976,15 @@ local function Tilt(s, dir)
 	return true
 end
 
+function TiltOverrideFunc()
+	if options.overridetilt.value then
+		overrideTiltValue = -math.pi/2 * options.tiltoverride.value
+		Tilt(0, 0)
+	else
+		overrideTiltValue = false
+	end
+end
+
 local function ScrollCam(cs, mxm, mym, smoothlevel)
 	scrnRay_cache.previous.fov = -999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation but scrollcam always have cursor at midscreen
 	lastMouseX = nil
@@ -1962,6 +2050,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local missedMouseRelease = false
+local firstUpdate = true
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
 	
@@ -2059,9 +2148,17 @@ function widget:Update(dt)
 
 	cs = GetTargetCameraState()
 	
+	if firstUpdate and options.overridetilt.value then
+		TiltOverrideFunc()
+	end
+	firstUpdate = false
+	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
 	local a,c,m,s = spGetModKeyState()
+	s = s and not options.disableshift.value
+	c = c and not options.disablectrl.value
+	a = a and not options.disablealt.value
 
 	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
     
@@ -2123,12 +2220,12 @@ function widget:Update(dt)
 		local heightFactor = (cs.py/1000)
 		if smoothscroll then
 			--local speed = dt * options.speedFactor.value * heightFactor
-			local speed = math.max( dt * options.speedFactor.value * heightFactor, 0.005 )
+			local speed = math.max( dt * options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * heightFactor, 0.005 )
 			mxm = speed * (x - cx)
 			mym = speed * (y - cy)
 		elseif use_lockspringscroll then
 			--local speed = options.speedFactor.value * heightFactor / 10
-			local speed = math.max( options.speedFactor.value * heightFactor / 10, 0.05 )
+			local speed = math.max( options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * heightFactor / 10, 0.05 )
 			local dir = options.invertscroll.value and -1 or 1
 			mxm = speed * (x - mx) * dir
 			mym = speed * (y - my) * dir
@@ -2136,7 +2233,7 @@ function widget:Update(dt)
 			spWarpMouse(cx, cy)
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
-			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
+			local speed = math.max( options.speedFactor_k.value * ((options.speedFactor_k_mult.value and 10) or 1) * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
 			
 			if move.right or move2.right then
 				mxm = speed
@@ -2280,7 +2377,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 
 		local cs = GetTargetCameraState()
 		
-		local speed = options.speedFactor.value * cs.py/1000 / 10
+		local speed = options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * cs.py/1000 / 10
 		local mxm = speed * dx * dir
 		local mym = speed * dy * dir
 		ScrollCam(cs, mxm, mym, 0)
@@ -2310,6 +2407,9 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 	
 	local a,ctrl,m,s = spGetModKeyState()
+	s = s and not options.disableshift.value
+	ctrl = ctrl and not options.disablectrl.value
+	a = a and not options.disablealt.value
 	
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
@@ -2407,6 +2507,10 @@ function widget:MouseWheel(wheelUp, value)
     if fpsmode then return end
 	local alt,ctrl,m,shift = spGetModKeyState()
 	
+	shift = shift and not options.disableshift.value
+	ctrl = ctrl and not options.disablectrl.value
+	alt = alt and not options.disablealt.value
+	
 	if ctrl then
 		return Tilt(shift, wheelUp and 1 or -1)
 	elseif alt then
@@ -2444,31 +2548,32 @@ function widget:KeyPress(key, modifier, isRepeat)
 
 	--ls_have = false
 	tilting = false
+	local shift = modifier.shift and not options.disableshift.value
+	local ctrl = modifier.ctrl and not options.disablectrl.value
+	local alt = modifier.alt and not options.disablealt.value
 	
 	if thirdperson_trackunit then  --move key for edge Scroll in 3rd person trackmode
-		if keys[key] and not (modifier.ctrl or modifier.alt) then
+		if keys[key] and not (ctrl or modifier.alt) then
 			movekey = true
 			move[keys[key]] = true
 		end
 	end
 	if fpsmode then return end
 	if keys[key] then
-		if modifier.ctrl or modifier.alt then
+		if ctrl or alt then
 		
 			local cs = GetTargetCameraState()
 			SetLockSpot2(cs)
 			if not ls_have then
 				return
 			end
-			
-
 		
-			local speed = (modifier.shift and 30 or 10)
+			local speed = (shift and 30 or 10)
 
-			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt, false)
-			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt, false)
-			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt, false)
-			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt, false)
+			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not alt, false)
+			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not alt, false)
+			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not alt, false)
+			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not alt, false)
 			end
 			return
 		else
@@ -2476,25 +2581,25 @@ function widget:KeyPress(key, modifier, isRepeat)
 			move[keys[key]] = true
 		end
 	elseif key == key_code.pageup then
-		if modifier.ctrl then
-			Tilt(modifier.shift, 1)
+		if ctrl then
+			Tilt(shift, 1)
 			return
-		elseif modifier.alt then
-			Altitude(true, modifier.shift)
+		elseif alt then
+			Altitude(true, shift)
 			return
 		else
-			Zoom(true, modifier.shift, true)
+			Zoom(true, shift, true)
 			return
 		end
 	elseif key == key_code.pagedown then
 		if modifier.ctrl then
-			Tilt(modifier.shift, -1)
+			Tilt(shift, -1)
 			return
-		elseif modifier.alt then
-			Altitude(false, modifier.shift)
+		elseif alt then
+			Altitude(false, shift)
 			return
 		else
-			Zoom(false, modifier.shift, true)
+			Zoom(false, shift, true)
 			return
 		end
 	end
@@ -2609,7 +2714,7 @@ function widget:Initialize()
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
-		HotkeyChangeNotification() --TODO: change this to be triggered by the epicmenu camera hotkeys changing
+		HotkeyChangeNotification()
 	end
 
 	WG.COFC_Enabled = true
@@ -2622,7 +2727,8 @@ function widget:Initialize()
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
-
+	
+	WG.COFC_HotkeyChangeNotification = HotkeyChangeNotification
 end
 
 function widget:Shutdown()

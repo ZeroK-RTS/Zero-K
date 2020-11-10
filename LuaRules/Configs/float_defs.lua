@@ -45,7 +45,6 @@ local floatDefs = {
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
-
 	[UnitDefNames["amphimpulse"].id] = {
 		initialRiseSpeed = 5,
 		riseAccel = 0.20,
@@ -64,7 +63,6 @@ local floatDefs = {
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
-	
 	[UnitDefNames["amphriot"].id] = {
 		initialRiseSpeed = 3,
 		riseAccel = 0.13,
@@ -77,6 +75,26 @@ local floatDefs = {
 		airDrag = 0.99,
 		waterHitDrag = 0.7,
 		floatPoint = -18,
+		surfaceDampen = 10,
+		depthRequirement = -20,
+		stopSpeedLeeway = 0.05,
+		stopPositionLeeway = 0.1,
+		surfaceWaitPos = -30,
+		surfaceMinWait = 80,
+		surfaceMaxWait = 120,
+	},
+	[UnitDefNames["amphsupport"].id] = {
+		initialRiseSpeed = 2.2,
+		riseAccel = 0.1,
+		riseUpDrag = 0.92,
+		riseDownDrag = 0.9,
+		sinkAccel = -0.12,
+		sinkUpDrag = 0.9,
+		sinkDownDrag = 0.85,
+		airAccel = -0.1, -- aka gravity, only effective out of water
+		airDrag = 0.99,
+		waterHitDrag = 0.3,
+		floatPoint = -22,
 		surfaceDampen = 10,
 		depthRequirement = -20,
 		stopSpeedLeeway = 0.05,

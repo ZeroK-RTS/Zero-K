@@ -5,7 +5,7 @@ return { amphriot = {
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
-  buildCostMetal         = 280,
+  buildCostMetal         = 260,
   buildPic               = [[amphriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -54,7 +54,7 @@ return { amphriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1000,
+  turnRate               = 1200,
   upright                = false,
 
   weapons                = {
@@ -91,7 +91,7 @@ return { amphriot = {
       cegTag                  = [[torpedo_trail]],
    
       damage                  = {
-        default = 52.1,
+        default = 48.01,
       },
 
       edgeEffectiveness       = 0.6,

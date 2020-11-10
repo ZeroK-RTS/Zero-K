@@ -102,17 +102,7 @@ local function UpdateSimpleEnemyColor(self)
 		if campaignBattleID then
 			colorEnemiesByAllyTeam = true
 		elseif self.value == "autoffa" then
-			local teamList = Spring.GetTeamList()
-			local allyTeamSeen = {}
-			local allyTeamCount = 0
-			for i = 1, #teamList do
-				local allyTeam = select(6, Spring.GetTeamInfo(teamList[i], false))
-				if not allyTeamSeen[allyTeam] then
-					allyTeamCount = allyTeamCount + 1
-					allyTeamSeen[allyTeam] = true
-				end
-			end
-			colorEnemiesByAllyTeam = (allyTeamCount > 3)
+			colorEnemiesByAllyTeam = (Spring.Utilities.GetTeamCount() > 2)
 		else
 			colorEnemiesByAllyTeam = false
 		end

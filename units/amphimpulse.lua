@@ -5,7 +5,7 @@ return { amphimpulse = {
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 2.4,
-  buildCostMetal         = 180,
+  buildCostMetal         = 200,
   buildPic               = [[amphimpulse.png]],
   canGuard               = true,
   canMove                = true,
@@ -17,11 +17,12 @@ return { amphimpulse = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    amph_regen        = 25,
+    amph_regen        = 15,
     amph_submerged_at = 40,
     sink_on_emp       = 1,
     floattoggle       = [[1]],
     selection_scale   = 0.8,
+    aim_lookahead     = 180,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -43,7 +44,7 @@ return { amphimpulse = {
 
   sfxtypes               = {
     explosiongenerators = {
-      [[custom:watercannon_muzzle]],
+      [[custom:sonicfire]],
     },
   },
 
@@ -54,7 +55,7 @@ return { amphimpulse = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1200,
+  turnRate               = 1440,
   upright                = true,
 
   weapons                = {

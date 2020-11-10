@@ -50,7 +50,7 @@ return { vehcapture = {
   trackType           = [[StdTank]],
   trackWidth          = 28,
   turninplace         = 0,
-  turnRate            = 420,
+  turnRate            = 672,
   workerTime          = 0,
 
   weapons             = {

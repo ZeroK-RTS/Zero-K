@@ -1,7 +1,8 @@
 include "constants.lua"
 include "pieceControl.lua"
 
-local base, body, aim = piece('base', 'body', 'aim')
+-- unused piece: 'base'
+local body, aim = piece('body', 'aim')
 local door1, door2, hinge1, hinge2 = piece('door1', 'door2', 'hinge1', 'hinge2')
 local turret, launcher, firep1, firep2 = piece('turret', 'launcher', 'firep1', 'firep2')
 

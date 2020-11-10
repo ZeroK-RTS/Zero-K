@@ -2,22 +2,22 @@
 --last update: 20 May 2014
 
 function StringStarts(s, start)
-   return string.sub(s, 1, string.len(start)) == start
+	return string.sub(s, 1, string.len(start)) == start
 end
 
 local function Deserialize(text)
-  local f, err = loadstring(text)
-  if not f then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): "..tostring(err))
-    return
-  end
-  setfenv(f, {}) -- sandbox
-  local success, arg = pcall(f)
-  if not success then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): "..tostring(arg))
-    return
-  end
-  return arg
+	local f, err = loadstring(text)
+	if not f then
+		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): " .. tostring(err))
+		return
+	end
+	setfenv(f, {}) -- sandbox
+	local success, arg = pcall(f)
+	if not success then
+		Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): " .. tostring(arg))
+		return
+	end
+	return arg
 end
 
 
@@ -59,12 +59,12 @@ MessageProcessor.MESSAGE_DEFINITIONS = {
 }
 
 local function escapePatternReplacementChars(s)
-  return string.gsub(s, "%%", "%%%%")
+	return string.gsub(s, "%%", "%%%%")
 end
 
 function MessageProcessor:Initialize()
 	local escapedPlayernamePattern = escapePatternReplacementChars(PLAYERNAME_PATTERN)
-	for _,def in ipairs(self.MESSAGE_DEFINITIONS) do
+	for _, def in ipairs(self.MESSAGE_DEFINITIONS) do
 		if def.pattern then
 			def.pattern = def.pattern:gsub('PLAYERNAME', escapedPlayernamePattern) -- patch definition pattern so it is an actual lua pattern string
 		end
@@ -100,10 +100,10 @@ local function SetupPlayers()
 	local gaiaTeamID = Spring.GetGaiaTeamID()
 	local spGetTeamInfo = Spring.GetTeamInfo
 	local spGetAIInfo = Spring.GetAIInfo
-	for i=1,#teamsSorted do
+	for i=1, #teamsSorted do
 		local teamID = teamsSorted[i]
 		if teamID ~= gaiaTeamID then
-			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID, false)
+			local _, _, _, isAI, _, allyTeamId = spGetTeamInfo(teamID, false)
 			if isAI then
 				local skirmishAIID, name = spGetAIInfo(teamID)
 				--Note: to make AI appears like its doing an ally chat, do: Spring.Echo("<botname> Allies: bot_say_something")
@@ -123,43 +123,43 @@ end
 -- update msg members msgtype, argument, source and playername (when relevant)
 --loop thru all pattern combination (self.MESSAGE_DEFINITIONS) until a match is found
 function MessageProcessor:ParseMessage(msg)
-  for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
-    if candidate.pattern == nil then -- for fallback/other messages
-      msg.msgtype = candidate.msgtype
-      msg.argument = msg.text
-	  msg.source = 'other'
-      return
-    end
-	--else
-    local capture1, capture2 = msg.text:match(candidate.pattern)
-    if capture1 then
-      msg.msgtype = candidate.msgtype
-      if candidate.noplayername then
-        msg.argument = capture1
-        msg.source = 'other'
-        return
-      elseif candidate.isgamemessage then
-        local message = capture2
-        if (capture1 ~= " ") then --skip any whitespace 1st char after "game_message:" (for display tidyness!)
-            message = capture1 .. message
-        end
-        msg.text = message
-        msg.argument = message
-        msg.source = 'widget/gadget'
-        return
-      else
-        local playername = capture1
-		local player = players[playername]
-        if player then
-	      msg.player = player
-	      msg.source = getSource(player.spec, player.allyTeamId)
-	      msg.playername = playername
-	      msg.argument = capture2
-	      return
-        end
-      end
-    end
-  end
+	for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
+		if candidate.pattern == nil then -- for fallback/other messages
+			msg.msgtype = candidate.msgtype
+			msg.argument = msg.text
+			msg.source = 'other'
+			return
+		end
+		--else
+		local capture1, capture2 = msg.text:match(candidate.pattern)
+		if capture1 then
+			msg.msgtype = candidate.msgtype
+			if candidate.noplayername then
+				msg.argument = capture1
+				msg.source = 'other'
+				return
+			elseif candidate.isgamemessage then
+				local message = capture2
+				if (capture1 ~= " ") then --skip any whitespace 1st char after "game_message:" (for display tidyness!)
+					message = capture1 .. message
+				end
+				msg.text = message
+				msg.argument = message
+				msg.source = 'widget/gadget'
+				return
+			else
+				local playername = capture1
+				local player = players[playername]
+				if player then
+					msg.player = player
+					msg.source = getSource(player.spec, player.allyTeamId)
+					msg.playername = playername
+					msg.argument = capture2
+					return
+				end
+			end
+		end
+	end
 end
 
 function MessageProcessor:ProcessConsoleLine(msg)
@@ -168,7 +168,7 @@ end
 
 function MessageProcessor:ProcessConsoleBuffer(count)
 	local bufferMessages = Spring.GetConsoleBuffer(count)
-	for i = 1,#bufferMessages do
+	for i = 1, #bufferMessages do
 		self:ProcessConsoleLine(bufferMessages[i])
 	end
 	return bufferMessages

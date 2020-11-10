@@ -62,7 +62,7 @@ return { striderscorpion = {
   trackStretch           = 1,
   trackType              = [[crossFoot]],
   trackWidth             = 76,
-  turnRate               = 400,
+  turnRate               = 480,
   workerTime             = 0,
 
   weapons                = {

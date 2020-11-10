@@ -67,7 +67,7 @@ return { jumpsumo = {
   trackStretch        = 1,
   trackType           = [[crossFoot]],
   trackWidth          = 66,
-  turnRate            = 500,
+  turnRate            = 600,
   upright             = false,
   workerTime          = 0,
 

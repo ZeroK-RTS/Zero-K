@@ -20,7 +20,7 @@ return { amphlaunch = {
   customParams           = {
     amph_regen         = 10,
     amph_submerged_at  = 40,
-    thrower_gather     = 112,
+    thrower_gather     = 160,
     attack_toggle      = [[1]],
   },
 
@@ -57,7 +57,7 @@ return { amphlaunch = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1800,
+  turnRate               = 2160,
   upright                = true,
 
   weapons                = {

@@ -16,7 +16,8 @@ return { spiderriot = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aimposoffset   = [[0 10 0]],
+    aimposoffset       = [[0 10 0]],
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -42,7 +43,7 @@ return { spiderriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 1700,
+  turnRate               = 2040,
 
   weapons                = {
 

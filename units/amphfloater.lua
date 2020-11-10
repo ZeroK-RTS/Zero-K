@@ -53,7 +53,7 @@ return { amphfloater = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1200,
+  turnRate               = 1320,
   upright                = true,
 
   weapons                = {
@@ -100,7 +100,7 @@ return { amphfloater = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
-      myGravity               = 0.2,
+      myGravity               = 0.18,
       range                   = 450,
       reloadtime              = 1.8,
       rgbcolor                = [[0.9 0.1 0.9]],
@@ -111,13 +111,14 @@ return { amphfloater = {
       soundTrigger            = true,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 340,
+      weaponVelocity          = 300,
     },
 
     FAKE_CANNON = {
       name                    = [[Fake Disruption Cannon]],
       accuracy                = 200,
       areaOfEffect            = 32,
+      avoidFriendly           = false,
       cegTag                  = [[beamweapon_muzzle_purple]],
       craterBoost             = 1,
       craterMult              = 2,

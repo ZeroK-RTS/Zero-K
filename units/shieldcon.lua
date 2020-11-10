@@ -49,7 +49,7 @@ return { shieldcon = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 2200,
+  turnRate            = 2640,
   upright             = true,
   workerTime          = 5,
 

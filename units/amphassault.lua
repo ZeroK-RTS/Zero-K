@@ -59,7 +59,7 @@ return { amphassault = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 66,
-  turnRate            = 500,
+  turnRate            = 600,
   upright             = false,
 
   weapons                       = {

@@ -17,8 +17,7 @@ local armr1 = piece 'armr1'
 local arml1 = piece 'arml1'
 local gunr = piece 'gunr'
 local gunl = piece 'gunl'
-local barrel1r, barrel2r, barrel3r = piece('barrel1r', 'barrel2r', 'barrel3r')
-local barrel1l, barrel2l, barrel3l = piece('barrel1l', 'barrel2l', 'barrel3l')
+-- unused pieces: barrel[123][rl]
 local flare1r, flare2r, flare3r = piece('flare1r', 'flare2r', 'flare3r')
 local flare1l, flare2l, flare3l = piece('flare1l', 'flare2l', 'flare3l')
 

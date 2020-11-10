@@ -38,40 +38,7 @@ local CMD_OPT_ALT = CMD.OPT_ALT
 
 local MAX_UNITS = Game.maxUnits
 
-local rawBuildUpdateIgnore = {
-	[CMD.ONOFF] = true,
-	[CMD.FIRE_STATE] = true,
-	[CMD.MOVE_STATE] = true,
-	[CMD.REPEAT] = true,
-	[CMD.CLOAK] = true,
-	[CMD.STOCKPILE] = true,
-	[CMD.TRAJECTORY] = true,
-	[CMD.IDLEMODE] = true,
-	[CMD_GLOBAL_BUILD] = true,
-	[CMD_STEALTH] = true,
-	[CMD_CLOAK_SHIELD] = true,
-	[CMD_UNIT_FLOAT_STATE] = true,
-	[CMD_PRIORITY] = true,
-	[CMD_MISC_PRIORITY] = true,
-	[CMD_RETREAT] = true,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
-	[CMD_AP_FLY_STATE] = true,
-	[CMD_AP_AUTOREPAIRLEVEL] = true,
-	[CMD_UNIT_SET_TARGET] = true,
-	[CMD_UNIT_CANCEL_TARGET] = true,
-	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
-	[CMD_ABANDON_PW] = true,
-	[CMD_RECALL_DRONES] = true,
-	[CMD_UNIT_KILL_SUBORDINATES] = true,
-	[CMD_GOO_GATHER] = true,
-	[CMD_PUSH_PULL] = true,
-	[CMD_UNIT_AI] = true,
-	[CMD_WANT_CLOAK] = true,
-	[CMD_DONT_FIRE_AT_RADAR] = true,
-	[CMD_AIR_STRAFE] = true,
-	[CMD_PREVENT_OVERKILL] = true,
-	[CMD_SELECTION_RANK] = true,
-}
+local rawBuildUpdateIgnore = include("LuaRules/Configs/state_commands.lua")
 
 local stopCommand = {
 	[CMD.GUARD] = true,
@@ -173,7 +140,7 @@ local moveRawCmdDesc = {
 	name    = 'Move',
 	cursor  = 'Move', -- add with LuaUI?
 	action  = 'rawmove',
-	tooltip = 'Move: Order the unit to move to a position.',
+	tooltip = 'Move: Move to a position. Click and drag to line move.',
 }
 
 local TEST_MOVE_SPACING = 16

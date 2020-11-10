@@ -150,8 +150,8 @@ local perimeterEdgeCost = {
 --ramp dimensions
 local maxTotalRampLength = 3000
 local maxTotalRampWidth = 800
-local minTotalRampLength = 40
-local minTotalRampWidth = 24
+local minTotalRampLength = 64
+local minTotalRampWidth = 36
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
 local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
@@ -1011,6 +1011,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -3677,15 +3678,15 @@ local dirtbagPosZ =
 	              32, 32, 32}
 
 local dirtbagPosY =
-	            {2 , 3 , 2 ,
-	         2 , 3 , 7 , 3 , 2 ,
-	     2 , 5 , 20, 21, 20, 4 , 2 ,
-	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
-	 3 , 7 , 21, 26, 28, 26, 21, 7 , 3 ,
-	 2 , 3 , 20, 25, 26, 25, 20, 3 , 2 ,
-	     2 , 4 , 20, 21, 20, 5 , 2 ,
-	          2, 3 , 7 , 3 , 2 ,
-	             2 , 3 , 2 }
+	            {3 , 4 , 3 ,
+	         3 , 5 , 9 , 5 , 3 ,
+	     3 , 6 , 25, 27, 25, 6 , 3 ,
+	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
+	 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
+	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
+	     3 , 6 , 25, 27, 25, 6 , 3 ,
+	          3, 5 , 9 , 5 , 3 ,
+	             3 , 4 , 3 }
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 

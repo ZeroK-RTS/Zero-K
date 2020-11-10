@@ -60,7 +60,7 @@ return { chickenlandqueen = {
   trackStretch           = 1,
   trackType              = [[ChickenTrack]],
   trackWidth             = 100,
-  turnRate               = 399,
+  turnRate               = 480,
   upright                = true,
   workerTime             = 0,
 

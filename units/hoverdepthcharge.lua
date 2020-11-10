@@ -5,7 +5,7 @@ return { hoverdepthcharge = {
   acceleration        = 0.12,
   activateWhenBuilt   = true,
   brakeRate           = 1.3,
-  buildCostMetal      = 320,
+  buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoverdepthcharge.png]],
   canGuard            = true,
@@ -49,7 +49,7 @@ return { hoverdepthcharge = {
   sightDistance       = 385,
   sonarDistance       = 385,
   turninplace         = 0,
-  turnRate            = 390,
+  turnRate            = 624,
   workerTime          = 0,
 
   weapons             = {
@@ -91,7 +91,7 @@ return { hoverdepthcharge = {
       },
 
       damage                  = {
-        default = 620.5,
+        default = 400.1,
       },
 
       edgeEffectiveness       = 0.4,
@@ -109,7 +109,7 @@ return { hoverdepthcharge = {
       noSelfDamage            = true,
       numbounce               = 3,
       range                   = 300,
-      reloadtime              = 5.5,
+      reloadtime              = 2.8,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -117,7 +117,7 @@ return { hoverdepthcharge = {
       startVelocity           = 5,
       tolerance               = 1000000,
       tracks                  = true,
-      turnRate                = 50000,
+      turnRate                = 60000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 12,
@@ -132,12 +132,13 @@ return { hoverdepthcharge = {
       bounceSlip              = 0.4,
       bounceRebound           = 0.4,
       canAttackGround         = false,
+      collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 620.5,
+        default = 420.1,
       },
 
       edgeEffectiveness       = 0.4,
@@ -153,8 +154,8 @@ return { hoverdepthcharge = {
       myGravity               = 0.2,
       noSelfDamage            = true,
       numbounce               = 1,
-      range                   = 220,
-      reloadtime              = 5.5,
+      range                   = 300,
+      reloadtime              = 2.8,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -164,7 +165,7 @@ return { hoverdepthcharge = {
       turnRate                = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 180,
+      weaponVelocity          = 280,
     },
     
     FAKEGUN = {
@@ -189,8 +190,8 @@ return { hoverdepthcharge = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 220,
-      reloadtime              = 5.5,
+      range                   = 300,
+      reloadtime              = 2.8,
       size                    = 1E-06,
       smokeTrail              = false,
       targetborder            = 0.9,
@@ -204,10 +205,10 @@ return { hoverdepthcharge = {
       turnrate                = 10000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 200,
+      weaponAcceleration      = 240,
       weaponTimer             = 0.1,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 280,
     },
 
   },

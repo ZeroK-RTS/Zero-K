@@ -10,7 +10,7 @@ function widget:GetInfo()
    }
 end
 
-
+local myteam = Spring.GetMyTeamID()
 local UPDATE_FRAME=5
 local ConStack = {}
 local GetUnitPosition = Spring.GetUnitPosition
@@ -117,9 +117,15 @@ local function DisableForSpec()
 	end
 end
 
+local function DisableForCommshare() -- this breaks commshare very badly by not allowing them to issue orders to our cons unless they rapidly issue orders to them.
+	if Spring.GetMyTeamID() ~= myteam or #Spring.GetPlayerList(Spring.GetMyTeamID()) > 1 then
+		widgetHandler:RemoveWidget()
+	end
+end
 
 function widget:Initialize()
 	DisableForSpec()
+	DisableForCommshare()
 	local units = Spring.GetTeamUnits(Spring.GetMyTeamID())
 	-- Echo("IdleConAssist initializing")
 	for i=1, #units do
@@ -135,4 +141,5 @@ end
 
 function widget:PlayerChanged (playerID)
 	DisableForSpec()
+	DisableForCommshare()
 end

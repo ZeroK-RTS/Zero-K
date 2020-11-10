@@ -25,7 +25,8 @@ return { tankraid = {
     modelradius       = [[20]],
     aimposoffset      = [[0 5 0]],
     selection_scale   = 0.85,
-    aim_lookahead     = 200,
+    aim_lookahead     = 180,
+    percieved_range   = 270, -- How much range enemy units think Kodachi has
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -53,7 +54,7 @@ return { tankraid = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 720,
+  turnRate            = 1152,
   workerTime          = 0,
 
   weapons             = {

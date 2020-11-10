@@ -29,7 +29,7 @@ return { vehassault = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1850,
+  maxDamage              = 1920,
   maxSlope               = 18,
   maxVelocity            = 2.95,
   maxWaterDepth          = 22,
@@ -56,7 +56,7 @@ return { vehassault = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 430,
+  turnRate               = 688,
   workerTime             = 0,
 
   weapons                = {

@@ -48,7 +48,7 @@ return { hoverskirm2 = {
 
   sightDistance       = 450,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 800,
 
   weapons             = {
 

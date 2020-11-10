@@ -519,7 +519,8 @@ local function give(cmd,line,words,player)
 			end
 		end
 	end
-	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
+	
+	--Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
 local function SortUnits(a, b)

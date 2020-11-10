@@ -55,7 +55,7 @@ return { hoveraa = {
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
-  turnRate            = 616,
+  turnRate            = 985,
   workerTime          = 0,
   weapons             = {
 

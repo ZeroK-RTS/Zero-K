@@ -89,7 +89,7 @@ local commTips = {
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
 local function ToggleTrainerButtons(bool)
 	for i=1,#buttonData do
-		if buttonData[i].trainer then
+		if buttonData[i].trainer and (#buttonData > 4) then
 			if bool then
 				grid:AddChild(buttonData[i].control)
 			else
@@ -110,7 +110,7 @@ options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
 		name = 'Hide default commanders',
-		desc = 'You can customize your commanders on the Zero-K site: https://zero-k.info',
+		desc = 'You can customise your commanders for use in multiplayer on the Zero-K site: https://zero-k.info',
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
@@ -296,7 +296,7 @@ local function CreateWindow()
 	local i = 0
 	for index, option in ipairs(optionData) do
 		i = i + 1
-		local hideButton = options.hideTrainers.value and option.trainer
+		local hideButton = options.hideTrainers.value and option.trainer and (#optionData > 4)
 		
 		local tooltip = ((options.showModules.value and (option.tooltip .. "\n\n\n")) or "") .. (commTips[option.image] or "")
 		
@@ -363,28 +363,30 @@ local function CreateWindow()
 		bottom = 5,
 		OnClick = {function() Close(false, false) end}
 	}
-	trainerCheckbox = Chili.Checkbox:New{
-		parent = mainWindow,
-		x = 6,
-		bottom = 5,
-		width = 180,
-		caption = options.hideTrainers.name,
-		tooltip = options.hideTrainers.desc,
-		checked = options.hideTrainers.value,
-		OnChange = { function(self)
-			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
-			if options.hideTrainers.epic_reference then
-				options.hideTrainers.epic_reference.checked = not self.checked
-				options.hideTrainers.epic_reference.state.checked = not self.checked
-				options.hideTrainers.epic_reference:Invalidate()
-			end
-			options.hideTrainers.value = not self.checked
-			ToggleTrainerButtons(self.checked)
-		end },
-	}
+	if #optionData > 4 then
+		trainerCheckbox = Chili.Checkbox:New{
+			parent = mainWindow,
+			x = 160,
+			bottom = 5,
+			width = 180,
+			caption = options.hideTrainers.name,
+			tooltip = options.hideTrainers.desc,
+			checked = options.hideTrainers.value,
+			OnChange = { function(self)
+				-- this is called *before* the 'checked' value is swapped, hence negation everywhere
+				if options.hideTrainers.epic_reference then
+					options.hideTrainers.epic_reference.checked = not self.checked
+					options.hideTrainers.epic_reference.state.checked = not self.checked
+					options.hideTrainers.epic_reference:Invalidate()
+				end
+				options.hideTrainers.value = not self.checked
+				ToggleTrainerButtons(self.checked)
+			end },
+		}
+	end
 	showModulesCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
-		x = 220,
+		x = 16,
 		bottom = 5,
 		width = 115,
 		caption = options.showModules.name,

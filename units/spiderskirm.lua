@@ -40,7 +40,7 @@ return { spiderskirm = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 52,
-  turnRate               = 1400,
+  turnRate               = 1680,
 
   weapons                = {
 

@@ -20,7 +20,7 @@ local gravityWeaponDefID = WeaponDefNames["zenith_gravity_neg"].id
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 function gadget:Explosion(weaponDefID, px, py, pz, attackerID, projectileID)
-	if weaponDefID == gravityWeaponDefID then
+	if weaponDefID == gravityWeaponDefID and attackerID then
 		GG.zenith_spawnBlocked[attackerID] = true
 	end
 end

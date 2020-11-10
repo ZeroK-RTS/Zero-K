@@ -55,7 +55,7 @@ return { shipcarrier = {
   sightDistance          = 660,
   sonarDistance          = 660,
   turninplace            = 0,
-  turnRate               = 233,
+  turnRate               = 372,
   waterline              = 20,
 
   weapons                = {

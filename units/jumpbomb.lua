@@ -65,7 +65,7 @@ return { jumpbomb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 34,
-  turnRate               = 2000,
+  turnRate               = 2400,
   workerTime             = 0,
   
   featureDefs            = {

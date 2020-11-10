@@ -60,7 +60,7 @@ return { chicken_tiamat = {
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
   turninplace         = 0,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

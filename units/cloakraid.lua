@@ -16,8 +16,9 @@ return { cloakraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[16]],
-    cus_noflashlight = 1,
+    modelradius        = [[16]],
+    cus_noflashlight   = 1,
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -54,7 +55,7 @@ return { cloakraid = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 14,
-  turnRate               = 2500,
+  turnRate               = 3000,
   upright                = true,
 
   weapons                = {
@@ -86,8 +87,8 @@ return { cloakraid = {
       },
 
       damage                  = {
-        default = 10.2,
-        subs    = 0.51,
+        default = 10.5,
+        subs    = 0.525,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],
@@ -96,7 +97,7 @@ return { cloakraid = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      leadLimit               = 2,
+      leadLimit               = 0,
       noGap                   = false,
       noSelfDamage            = true,
       range                   = 185,

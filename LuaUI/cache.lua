@@ -57,8 +57,8 @@ local function FilterOutRestrictedProjectiles(projectiles)
 end
 
 local GetProjectilesInRectangle = Spring.GetProjectilesInRectangle
-function Spring.GetProjectilesInRectangle(x1,z1,x2,z2)
-	local projectiles = GetProjectilesInRectangle(x1,z1,x2,z2)
+function Spring.GetProjectilesInRectangle(x1, z1, x2, z2)
+	local projectiles = GetProjectilesInRectangle(x1, z1, x2, z2)
 	return FilterOutRestrictedProjectiles(projectiles)
 end
 
@@ -91,13 +91,19 @@ function Spring.SetUnitNoSelect(unitID, value)
 end
 
 local function buildIndex(teamID, radius, Icons)
-  --local index = tostring(teamID)..":"..tostring(radius)..":"..tostring(Icons)
-  local t = {}
-  if teamID then t[#t+1] = teamID end
-  if radius then t[#t+1] = radius end
-  -- concat wants a table where all elements are strings or numbers
-  if Icons then t[#t+1] = 1 end
-  return table.concat(t, ":")
+	--local index = tostring(teamID)..":"..tostring(radius)..":"..tostring(Icons)
+	local t = {}
+	if teamID then
+		t[#t + 1] = teamID
+	end
+	if radius then
+		t[#t + 1] = radius
+	end
+	-- concat wants a table where all elements are strings or numbers
+	if Icons then
+		t[#t+1] = 1
+	end
+	return table.concat(t, ":")
 end
 
 -- returns unitTable = { [1] = number unitID, ... }
@@ -128,21 +134,21 @@ end
 
 --Workaround for Spring.SetCameraTarget() not working in Freestyle mode.
 local SetCameraTarget = Spring.SetCameraTarget
-function Spring.SetCameraTarget(x,y,z,transTime)
+function Spring.SetCameraTarget(x, y, z, transTime)
 	local cs = Spring.GetCameraState()
 	if cs.mode == 4 then --if using Freestyle cam, especially when using "camera_cofc.lua"
 		--"0.46364757418633" is the default pitch given to FreeStyle camera (the angle between Target->Camera->Ground, tested ingame) and is the only pitch that original "Spring.SetCameraTarget()" is based upon.
 		--"cs.py-y" is the camera height.
 		--"math.pi/2 + cs.rx" is the current pitch for Freestyle camera (the angle between Target->Camera->Ground). Freestyle camera can change its pitch by rotating in rx-axis.
 		--The original equation is: "x/y = math.tan(rad)" which is solved for "x"
-		local ori_zDist = math.tan(0.46364757418633)*(cs.py-y) --the ground distance (at z-axis) between default FreeStyle camera and the target. We know this is only for z-axis from our test.
-		local xzDist = math.tan(math.pi/2 + cs.rx)*(cs.py-y) --the ground distance (at xz-plane) between FreeStyle camera and the target.
-		local xDist = math.sin(cs.ry)*xzDist ----break down "xzDist" into x and z component.
-		local zDist = math.cos(cs.ry)*xzDist
-		x = x-xDist --add current FreeStyle camera to x-component
-		z = z-ori_zDist-zDist --remove default FreeStyle z-component, then add current Freestyle camera to z-component
+		local ori_zDist = math.tan(0.46364757418633) * (cs.py - y) --the ground distance (at z-axis) between default FreeStyle camera and the target. We know this is only for z-axis from our test.
+		local xzDist = math.tan(math.pi / 2 + cs.rx) * (cs.py - y) --the ground distance (at xz-plane) between FreeStyle camera and the target.
+		local xDist = math.sin(cs.ry) * xzDist ----break down "xzDist" into x and z component.
+		local zDist = math.cos(cs.ry) * xzDist
+		x = x - xDist --add current FreeStyle camera to x-component
+		z = z - ori_zDist - zDist --remove default FreeStyle z-component, then add current Freestyle camera to z-component
 	end
 	if x and y and z then
-		return SetCameraTarget(x,y,z,transTime) --return new results
+		return SetCameraTarget(x, y, z, transTime) --return new results
 	end
 end

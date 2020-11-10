@@ -68,7 +68,7 @@ local function Bob()
 end
 
 local function SinkBubbles()
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(rfleg, x_axis, math.rad(0),math.rad(20))
 	Turn(rffoot, x_axis, math.rad(0),math.rad(20))

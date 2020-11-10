@@ -42,7 +42,7 @@ return { shiparty = {
   sightDistance          = 660,
   sonarDistance          = 660,
   turninplace            = 0,
-  turnRate               = 350,
+  turnRate               = 560,
   waterline              = 0,
 
   weapons                = {

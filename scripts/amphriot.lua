@@ -158,7 +158,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lfleg, x_axis, 0, math.rad(800))
 	Turn(lffoot, x_axis, 0, math.rad(800))
@@ -207,7 +207,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(lfleg,x_axis, math.rad(55-15), math.rad(60))
 	Turn(rfleg,x_axis, math.rad(55+15), math.rad(60))
@@ -260,7 +260,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	Signal(SIG_BOB)
 
 	Turn(lfleg, x_axis, 0, math.rad(80))

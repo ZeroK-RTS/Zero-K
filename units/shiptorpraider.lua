@@ -18,8 +18,9 @@ return { shiptorpraider = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[14]],
-    turnatfullspeed = [[1]],
+    modelradius        = [[14]],
+    turnatfullspeed    = [[1]],
+    aim_lookahead      = 80,
   },
 
 
@@ -31,7 +32,7 @@ return { shiptorpraider = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
-  maxDamage           = 310,
+  maxDamage           = 360,
   maxVelocity         = 4.2,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
@@ -43,7 +44,7 @@ return { shiptorpraider = {
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 560,
   sonarDistance       = 560,
-  turnRate            = 800,
+  turnRate            = 1280,
   waterline           = 0,
   workerTime          = 0,
 
@@ -74,14 +75,14 @@ return { shiptorpraider = {
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
 
-            customParams = {
-                burst = Shared.BURST_RELIABLE,
-            },
+      customParams = {
+          burst = Shared.BURST_RELIABLE,
+      },
 
       damage                  = {
 
-        default = 200.1,
-        subs    = 200.1,
+        default = 220.1,
+        subs    = 220.1,
       },
 
       edgeEffectiveness       = 0.6,
@@ -98,9 +99,8 @@ return { shiptorpraider = {
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
-
-      range                   = 230,
-      reloadtime              = 2.5,
+      range                   = 240,
+      reloadtime              = 2.6,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.8,
       soundStart              = [[weapon/torp_land]],

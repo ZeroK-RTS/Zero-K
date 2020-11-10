@@ -77,7 +77,7 @@ local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconoffset = 22
+local iconoffset = 26
 
 
 local iconUnitTexture = {}

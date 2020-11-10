@@ -146,7 +146,7 @@
     },
     "turretgauss": {
         "name": "Gaus",
-        "description": "Gaus Tareti, kapalıyken 20 can/s yeniler",
+        "description": "Gaus Tareti, kapalıyken 10 can/s yeniler",
         "helptext": "Gaus, orta menzilli bir gaus topuyla birlikte kompakt ve esnek bir tarettir. Patlatıldığında, gelen hasarın dörtte birini ve ayrıca az miktarda sağlık rejenerasyonunu alır. Aynı zamanda sualtı hedeflerine de saldırabilir."
     },
     "nebula": {

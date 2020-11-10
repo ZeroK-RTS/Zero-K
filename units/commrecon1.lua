@@ -84,7 +84,7 @@ return { commrecon1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1350,
+  turnRate            = 1620,
   upright             = true,
   workerTime          = 10,
 

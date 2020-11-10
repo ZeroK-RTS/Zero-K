@@ -51,7 +51,7 @@ return { hoverassault = {
   sightDistance       = 385,
   sonarDistance       = 385,
   turninplace         = 0,
-  turnRate            = 616,
+  turnRate            = 985,
   workerTime          = 0,
 
   weapons             = {

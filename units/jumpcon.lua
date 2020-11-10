@@ -65,7 +65,7 @@ return { jumpcon = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1400,
+  turnRate            = 1680,
   upright             = true,
   workerTime          = 5,
  

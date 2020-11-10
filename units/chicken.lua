@@ -53,7 +53,7 @@ return { chicken = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 18,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

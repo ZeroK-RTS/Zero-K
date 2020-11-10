@@ -94,6 +94,7 @@ local HandledUnitDefIDs = {
 
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
+	[UnitDefNames["amphsupport"].id] = 1,
 	[UnitDefNames["vehheavyarty"].id] = 1,
 	[UnitDefNames["shieldskirm"].id] = 1,
 	[UnitDefNames["shieldassault"].id] = 1,

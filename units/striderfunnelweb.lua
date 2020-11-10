@@ -71,7 +71,7 @@ return { striderfunnelweb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 85,
-  turnRate               = 520,
+  turnRate               = 624,
   workerTime             = 40,
 
   weapons                = {

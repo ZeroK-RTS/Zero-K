@@ -36,7 +36,7 @@ return { striderarty = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[catapult.s3o]],
-  script                 = [[striderarty.cob]],
+  script                 = [[striderarty.lua]],
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   sightDistance          = 660,
   trackOffset            = 0,
@@ -44,7 +44,7 @@ return { striderarty = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 36,
-  turnRate               = 990,
+  turnRate               = 1188,
   upright                = true,
   workerTime             = 0,
 
@@ -73,7 +73,6 @@ return { striderarty = {
       craterMult              = 2,
       
       customParams              = {
-        reaim_time = 8, -- COB
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,

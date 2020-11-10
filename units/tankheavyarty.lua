@@ -56,7 +56,7 @@ return { tankheavyarty = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 312,
+  turnRate               = 500,
   workerTime             = 0,
 
   weapons                = {

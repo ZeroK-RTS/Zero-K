@@ -56,7 +56,7 @@ return { tankassault = {
   trackType           = [[StdTank]],
   trackWidth          = 42,
   turninplace         = 0,
-  turnRate            = 364,
+  turnRate            = 583,
   workerTime          = 0,
 
   weapons             = {

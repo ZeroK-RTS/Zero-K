@@ -44,6 +44,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetGameFrame      = Spring.GetGameFrame
 local spGetUnitVelocity   = Spring.GetUnitVelocity
+local spGetUnitSeparation = Spring.GetUnitSeparation
 local random              = math.random
 local CMD_ATTACK          = CMD.ATTACK
 
@@ -74,7 +75,7 @@ local recallDronesCmdDesc = {
 	name    = 'Recall Drones',
 	cursor  = 'Load units',
 	action  = 'recalldrones',
-	tooltip = 'Recall any owned drones to the mothership.',
+	tooltip = 'Recall Drones: Return controlled drones to the host unit.',
 }
 
 local toggleDronesCmdDesc = {
@@ -591,13 +592,11 @@ local function UpdateCarrierTarget(carrierID, frame)
 	local rx, rz
 	
 	for i = 1, #carrierList[carrierID].droneSets do
-	
 		local set = carrierList[carrierID].droneSets[i]
 		local tempCONTAINER
 		
-		
 		for droneID in pairs(set.drones) do
-			tempCONTAINER = droneList[droneID]
+			tempCONTAINER = droneList[droneID] -- wtf
 			droneList[droneID] = nil -- to keep AllowCommand from blocking the order
 			
 			if attackOrder or setTargetOrder then
@@ -609,7 +608,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
 			end
 			
-			if recallDrones then
+			local separation = spGetUnitSeparation(droneID, carrierID, true)
+			if recallDrones or (separation and separation > set.config.maxChaseRange) then
 				-- move drones to carrier
 				px, py, pz = spGetUnitPosition(carrierID)
 				rx, rz = RandomPointInUnitCircle()
@@ -627,8 +627,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				-- return to carrier unless in combat
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
-				for j=1, (cQueue and #cQueue or 0) do
-					if cQueue[j].id == CMD.FIGHT and firestate > 0 then
+				for j = 1, (cQueue and #cQueue or 0) do
+					if cQueue[j].id == CMD.ATTACK and firestate > 0 then
 						-- if currently fighting AND not on hold fire
 						engaged = true
 						break
@@ -859,6 +859,12 @@ function gadget:Initialize()
 		if build == 1 then
 			gadget:UnitFinished(unitID, unitDefID, team)
 		end
+	end
+end
+
+function gadget:Shutdown()
+	for unitID in pairs(droneList) do
+		Spring.DestroyUnit(unitID, true)
 	end
 end
 

@@ -46,7 +46,7 @@ return { jumpaa = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 28,
-  turnRate            = 1400,
+  turnRate            = 1680,
   upright             = true,
 
   weapons             = {

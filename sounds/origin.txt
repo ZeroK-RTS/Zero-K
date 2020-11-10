@@ -49,3 +49,7 @@ Claw missile launch sound (derived from https://www.freesound.org/people/Audiona
 Apelsinsaft:
 jump.wav
 jump_land.wav
+
+Kingstad:
+badger_fire.wav
+badger_hit.wav

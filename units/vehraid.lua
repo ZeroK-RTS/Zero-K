@@ -4,7 +4,7 @@ return { vehraid = {
   description            = [[Raider Rover]],
   acceleration           = 0.285,
   brakeRate              = 0.7,
-  buildCostMetal         = 130,
+  buildCostMetal         = 125,
   builder                = false,
   buildPic               = [[vehraid.png]],
   canGuard               = true,
@@ -20,7 +20,8 @@ return { vehraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[10]],
+    modelradius        = [[10]],
+    aim_lookahead      = 160,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -56,7 +57,7 @@ return { vehraid = {
   trackType              = [[StdTank]],
   trackWidth             = 28,
   turninplace            = 0,
-  turnRate               = 703,
+  turnRate               = 1125,
   workerTime             = 0,
 
   weapons                = {
@@ -107,7 +108,7 @@ return { vehraid = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      leadLimit               = 10,
+      leadLimit               = 5,
       lodDistance             = 10000,
       noSelfDamage            = true,
       proximityPriority       = 10,

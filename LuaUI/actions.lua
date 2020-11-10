@@ -129,7 +129,7 @@ local function TryAction(actionMap, cmd, optLine, optWords, isRepeat, release)
 	if not callInfoList then
 		return false
 	end
-	for i,callInfo in ipairs(callInfoList) do
+	for i, callInfo in ipairs(callInfoList) do
 		--local addon = callInfo[1]
 		local func   = callInfo[2]
 		local data   = callInfo[3]
@@ -223,7 +223,7 @@ local function KeyAction(press, key, mods, isRepeat, _)
 		else
 			actionSet = keyReleaseActions
 		end
-		for b,bAction in ipairs(defBinds) do
+		for b, bAction in ipairs(defBinds) do
 			local bCmd, bOpts = next(bAction, nil)
 			local words = MakeWords(bOpts)
 			if (TryAction(actionSet, bCmd, bOpts, words, isRepeat, not press)) then
@@ -245,7 +245,7 @@ local function TextAction(line, _)
 	end
 	-- remove the command from the words list and the raw line
 	table.remove(words, 1)
-	local _,_,line = line:find("[^%s]+[%s]+(.*)")
+	local _, _, line = line:find("[^%s]+[%s]+(.*)")
 	if not line then
 		line = ""  -- no args
 	end

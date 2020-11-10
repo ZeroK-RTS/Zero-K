@@ -35,7 +35,7 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Map/Reclaimables'
+options_path = 'Settings/Interface/Reclaim Highlight'
 options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
 options = {
 	showhighlight = {
@@ -83,7 +83,10 @@ local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 function widget:Update()
 	if Spring.IsGUIHidden() then
-		Spring.SendCommands("luarules metal_highlight 0")
+		if enableCondOld then
+			Spring.SendCommands("luarules metal_highlight 0")
+			enableCondOld = false
+		end
 		return
 	end
 
@@ -112,6 +115,11 @@ function widget:Update()
 		or (options.showhighlight.value == "constructors" and conSelected)
 		or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
 		or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
+
+	if Spring.GetConfigInt("ForceDisableShaders") == 1 then
+		enableCondOld = false
+		return
+	end
 
 	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
 		minMetalShownOld = minMetalShownNew

@@ -108,7 +108,8 @@ local SOUND_DIRNAME_SHORT = 'reply/'
 local LUAUI_DIRNAME = 'LuaUI/'
 local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
-local myTeamID
+local myPlayerID = Spring.GetMyPlayerID()
+local myTeamID = Spring.GetMyTeamID()
 local cooldown = {}
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
@@ -257,9 +258,14 @@ function externalFunctions.PlayResponse(unitID, cmdID)
 	PlayResponse(unitID, cmdID)
 end
 
+function widget:PlayerChanged(playerID)
+	if playerID ~= myPlayerID then
+		return
+	end
+	myTeamID = Spring.GetMyTeamID()
+end
+
 function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-	myTeamID = team
 	WG.noises = externalFunctions
 end
 

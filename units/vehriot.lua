@@ -56,7 +56,7 @@ return { vehriot = {
   trackType           = [[StdTank]],
   trackWidth          = 28,
   turninplace         = 0,
-  turnRate            = 390,
+  turnRate            = 624,
   workerTime          = 0,
 
   weapons             = {

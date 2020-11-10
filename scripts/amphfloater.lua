@@ -44,11 +44,6 @@ local UNPACK_TIME = 1/3
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-
-local gun_1 = 1
-
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
 -- Swim functions
 
 local function Bob()
@@ -67,7 +62,7 @@ local function Bob()
 end
 
 local function SinkBubbles()
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	while true do
 		EmitSfx(vent1, SFX.BUBBLE)
 		EmitSfx(vent2, SFX.BUBBLE)
@@ -82,6 +77,7 @@ local function dustBottom()
 	local x2,y2,z2 = Spring.GetUnitPiecePosDir(unitID,lfoot)
 	Spring.SpawnCEG("uw_amphlift", x2, y2+5, z2, 0, 0, 0, 0)
 end
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim gadget callins
@@ -194,8 +190,8 @@ local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
-			Spring.SetUnitWeaponState(unitID, 2, {range = 400-height})
-			Spring.SetUnitMaxRange(unitID, 400-height)
+			Spring.SetUnitWeaponState(unitID, 2, {range = 400 - height})
+			Spring.SetUnitMaxRange(unitID, 400 - height)
 		else
 			Spring.SetUnitWeaponState(unitID, 2, {range = 450})
 			Spring.SetUnitMaxRange(unitID, 450)

@@ -57,7 +57,7 @@ return { cloakbomb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShortLarge]],
   trackWidth             = 20,
-  turnRate               = 3000,
+  turnRate               = 3600,
   
   featureDefs            = {
 

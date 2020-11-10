@@ -12,6 +12,8 @@ local function round_to_frames(name, wd, key)
 
 	local sanitized_value = frames / Game.gameSpeed
 	if math.abs (original_value - sanitized_value) > 1E-3 then
+		-- don't just silently fix since else people can change values around
+		-- thinking they're doing something while not having any effect
 		error (name.."."..key.. " is set to " .. original_value .. " but would actually be " .. sanitized_value .. " ingame! Please put the correct value in the def (with 3 digit precision)")
 	end
 

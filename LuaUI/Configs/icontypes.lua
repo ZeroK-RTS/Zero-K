@@ -317,6 +317,10 @@ local icontypes = {
     bitmap='icons/amphskirm.png',
     size=1.8,
   },
+  amphsupport = {
+    bitmap='icons/amphsupport.png',
+    size=1.8,
+  },
   amphassault = {
     bitmap='icons/amphassault.png',
     size=2.6,

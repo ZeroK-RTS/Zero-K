@@ -19,6 +19,8 @@ return { amphcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    morphto        = [[amphtele]],
+    morphtime      = 20,
     amph_regen = 10,
     amph_submerged_at = 40,
   },
@@ -47,7 +49,7 @@ return { amphcon = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 22,
-  turnRate            = 1000,
+  turnRate            = 1200,
   upright             = false,
   workerTime          = 7.5,
 

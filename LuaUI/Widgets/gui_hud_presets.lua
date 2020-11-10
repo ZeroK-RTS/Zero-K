@@ -1483,7 +1483,8 @@ options = {
 			--{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
 			--{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
 			--{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
-			{key = 'default', name = 'None', desc = "No preset. Select this if you want to modify your UI and have the changes rememberd on subsequent launches.",},
+			{key = 'default', name = 'None', desc = [[This allows you to modify your UI with Alt+F11 and have the changes rememberd on subsequent launches.
+You must untick 'Stay up to date' above to select this options.]],},
 		},
 		noHotkey = true,
 		OnChange = UpdateInterfacePreset

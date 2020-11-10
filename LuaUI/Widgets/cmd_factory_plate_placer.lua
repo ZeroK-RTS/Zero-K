@@ -291,11 +291,11 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	widget:UnitDestroyed(unitID, unitDefID, teamID)
+	widget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	widget:UnitCreated(unitID, unitDefID, teamID)
+	widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:Initialize()
@@ -334,7 +334,7 @@ local function GetDrawDef(mx, mz, data)
 end
 
 local function DrawFactoryLine(x, y, z, drawDef)
-	local mx, mz = GetMousePos()
+	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
 	if not mx then
 		return
 	end
@@ -361,7 +361,7 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	if not currentFactoryDefID then
 		return
 	end
-	local mx, mz = GetMousePos()
+	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
 	if not mx then
 		return
 	end
@@ -395,7 +395,7 @@ function widget:DrawWorld()
 	if not currentFactoryDefID then
 		return
 	end
-	local mx, mz = GetMousePos()
+	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
 	if not mx then
 		return
 	end

@@ -27,7 +27,7 @@ return { shipscout = {
   iconType               = [[shipscout]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 240,
+  maxDamage              = 260,
   maxVelocity            = 5.2,
   minCloakDistance       = 75,
   movementClass          = [[BOAT3]],
@@ -47,7 +47,7 @@ return { shipscout = {
   sightDistance          = 800,
   sonarDistance          = 800,
   turninplace            = 0,
-  turnRate               = 740,
+  turnRate               = 1184,
   waterline              = 2,
 
   weapons                = {

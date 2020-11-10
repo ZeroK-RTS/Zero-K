@@ -6,53 +6,103 @@ return {
 			descs = {
 				intro = 'Introduction',
 				restoreInterface = 'Restore your interface',
-				buildMex = 'Building a Metal Extractor (mex)',
+				buildMex = 'Building a Metal Extractor',
 				buildSolar = 'Building a Solar Collector',
-				buildLLT = 'Building a Light Laser Tower (LLT)',
-				buildMex2 = 'Building another mex on a different metal spot.',
+				buildLLT = 'Building a Lotus',
+				buildMex2 = 'Building another Metal Extractor',
 				buildSolar2 = 'Building another Solar Collector',
 				buildFac = 'Building a Factory',
 				buildRadar = 'Building a Radar',
 				buildCon = 'Building a Constructor',
-				conAssist = 'Using a constructor to assist your factory',
-				buildRaider = 'Building Raider Bots in your factory.',
+				conAssist = 'Using a Constructor to assist your Factory',
+				buildRaider = 'Building Combat Units',
+				raiderTip = 'Keep Producing Units',
+				epilogue_start = 'Tips and tricks',
+				epilogue_units = 'Armies and Combat',
+				epilogue_constructors = 'Constructors and Expansion',
+				epilogue_economy = 'Ramping up Production',
 				congrats = 'Congratulations!',
 			},
 			tips = {
-				buildSolar = 'Energy generating structures power your mexes and factories.',
-				buildMex2 = 'Always try to acquire more metal spots to build more mexes.',
-				buildSolar2 = 'Always try and build more energy structures to keep your economy growing.',
-				buildRadar = 'Radar coverage shows you distant enemy units as blips.',
-				buildCon = 'Just like your Commander, Constructors build (and assist building of) structures.',
+				buildMex = 'Metal is used for construction and requires metal spots.',
+				buildSolar = 'Energy is used to build and repair. It can be produced anywhere.',
+				buildLLT = 'Turrets protect territory, but be careful to not build too many.',
+				buildFac = 'Factories are quite expensive, however, the first one is free.',
+				buildMex2 = 'Always seek out more metal spots to increase your income.',
+				buildSolar2 = 'It is advisable to build at least one Solar per Mex.',
+				buildRadar = 'Radar coverage shows distant enemy units as radar blips.',
+				buildCon = 'Constructors can build, repair, reclaim and assist construction.',
 				conAssist = 'Factories that are assisted by constructors build faster.',
 				buildRaider = 'Combat units are used to attack your enemies and make them suffer.',
 			},
 		},
-		steps = {
-			intro = [[Hello! I am Nubtron, the multilingual friendly robot. I will teach you how to play Zero-K. <(Click next to continue)>]],
+		steps = { -- I am Nubtron, the multilingual friendly robot.
+			intro = [[Hello! I will teach you how to play Zero-K. Just follow my instructions and learn at your own pace.
+<(Click next to continue)>]],
 			intro2 = [[Just follow my instructions and learn at your own pace. <(Click next to continue)>]],
-			intro3 = [[Practice zooming the camera in and out with your mouse's scroll wheel or <Page Down> and <Page Up>. <(Click next to continue)>]],
-			intro4 = [[Practice panning the camera by holding down the middle mouse button and dragging. <(Click next to continue)>]],
-			intro5 =  [[Place your starting position by clicking on a nice flat spot on the map.]],
-			selectComm = [[Select only your commander by clicking on it or pressing <ctrl+c>.]],
+			intro3 = [[Move the camera with the <arrow keys>, <middle mouse button>, or moving your cursor to the <screen edge>.
+<(Click next to continue)>]],
+			intro4 = [[Zoom the camera with your mouse's <scroll wheel> or <Page Down> and <Page Up>.
+<(Click next to continue)>]],
+			intro5 =  [[If you have not done so already, select a commander. Then <left click> near a <metal spot> (grey ring) within the green overlay on the map to place your start position.]],
+			selectComm = [[Select your commander by <left clicking> on it or pressing <ctrl+c>.]],
 			showMetalMap = [[View the metal map by pressing <F4>.]],
 			hideMetalMap = [[Hide the metal map by pressing <F4>.]],
-			selectBotLab = [[Select only your Bot Lab by clicking on it (the blue circles will help you find it).]],
-			selectCon = [[Select one constructor by clicking on it (the blue circles will help you find it).]],
-			guardFac = [[Have the constructor guard your Bot Lab by right clicking on the Lab. The constructor will assist it until you give it a different order.]],
-			tutorialEnd = [[This is the end of the tutorial. It is now safe to shut off Nubtron. Goodbye! (Click next to restart the tutorial)]],
+			selectBotLab = [[Select your <Cloakbot Factory> by <left clicking> on it (look for the flashing blue circles).]],
+			selectCon = [[Select your constructor by <left clicking> on it (look for the flashing blue circles).]],
+			guardFac = [[Have the constructor guard your factory by right clicking on the factory. The constructor will assist it until you give it a different order.]],
+			tutorialEnd = [[This is the end of the tutorial. Check out the <campaign> for a more thorough introduction to Zero-K. I can be re-enabled in the <Menu (F10)> under <Help>. Goodbye!
+<(Click next to cycle tips, or X to close the tutorial)>]],
 			
-			selectBuild_m = [[Select the #replace# from your build menu (build-icon shown here)]],
+			selectBuild_m = [[Select the <#replace#> from your build menu (build-icon shown here)]],
 			build_m = [[You are now building a #replace#. <Wait for it to finish.>]],
 			
-			finish = [[You have an unfinished #replace# shown by the red circles. <Right click on it to finish building>. ]],
-			selectBuild = [[Select the #replace# from your build menu (build-icon shown here)]],
+			finish = [[You have an unfinished <#replace#> shown by the red circles. <Right click on it to finish building>. ]],
+			selectBuild = [[Select the <#replace#> from your build menu (build-icon shown here)]],
 			start = [[<Place it near your other structures.> It will turn red if you try to place it on uneven terrain.]],
 			build = [[Good work! You are now building a #replace#. <Wait for it to finish.>]],
 			
-			startMex = [[Place it on a green patch.]],
-			selectBuildMex = [[The build-icon for the mex is shown to the right. Select it in your build menu on the left under the Econ tab.]],
-			startBotLab = [[Before placing it, you can rotate the structure with the <[> and <]> keys. <Turn it and place it so that units can easily exit the front>. It will turn red if you try to place it on uneven terrain.]],
+			startMex = [[<Left click> near a <metal spot> (grey ring) to begin construction.]],
+			selectBuildMex = [[Click on the <Econ> tab in the command panel below and select the <Metal Extractor>.]],
+			startBotLab = [[You can rotate structures with the <[> and <]> keys before placing them. Turn the Cloakbot Factory and place it so that units can easily exit the front.]],
+			
+			raiderTipState = [[Queue five more more Glaives by <shift-clicking> its button in the build menu.
+<(Click next to continue)>]],
+			repeatTipState = [[<Repeat> mode can be toggled to loop production, which is good for keeping up production. Queue units while holding <alt> to order non-looped production.
+<(Click next to continue)>]],
+
+			epilogue1 = [[Your base is set up and ready to support an army. I will leave you with a few pointers.
+<(Click next to continue)>]],
+			epilogue2 = [[Select your Glaives then <right click and drag> on the map. This spreads units along a line and is vital for maintaining free firing lines and avoiding area-of-effect.
+<(Click next to continue)>]],
+			epilogue3 = [[Glaives are great at raiding lightly defended expansion and intercepting enemy raids, however, you will need heavier units as the battle progresses.
+<(Click next to continue)>]],
+			epilogue4 = [[Ronin and Reaver can be mixed to create a stong early army. Reaver has low range but annihilates raiders, while Ronin can harass enemies at range.
+<(Click next to continue)>]],
+			epilogue5 = [[Knight and Sling are great at busting entrenched positions. Knight has the health to assault heavy turrets, while Sling can wear down defenses from far away.
+<(Click next to continue)>]],
+			epilogue6 = [[To learn more about a unit <hold space and click> on it, its wreck, or its build button, to bring up its description. Experiment with other units and factories.
+<(Click next to continue)>]],
+			epilogue7 = [[Your commander is essentially an armed constructor. Always have your commander and at least one constructor out on the map building extra Metal Extractors.
+<(Click next to continue)>]],
+			epilogue8 = [[Constructors can be given an <Area Mex> command to quickly queue multiple Metal Extractors.
+<(Click next to continue)>]],
+			epilogue9 = [[Select a <Constructor>, select <Area Mex (W)>, then <click and drag> an area with a few metal spots. Optionally, hold <Ctrl> to queue one Solar near each Mex.
+<(Click next to continue)>]],
+			epilogue10 = [[You can also <click and drag> Repair, Reclaim and Force Fire to issue a command that targets everything in an area.
+<(Click next to continue)>]],
+			epilogue11 = [[<Repair> assists construction, and uses energy to heal units. <Reclaim> gathers metal from wrecked units, and can be used on live units for a 50% refund.
+<(Click next to continue)>]],
+			epilogue12 = [[Your <metal> and <energy> storage are shown as bars at the top of the screen. The central green numbers are <income> while the rightmost red numbers are <demand>.
+<(Click next to continue)>]],
+			epilogue13 = [[All construction costs equal amounts metal and energy. Metal is scarce, so aim to keep both your <metal demand> and <energy income> greater than your <metal income>.
+<(Click next to continue)>]],
+			epilogue14 = [[Constructors spend at a rate equal to their <buildpower>. A few <Caretakers> can boost production, but building many more than you can sustain is redundant.
+<(Click next to continue)>]],
+			epilogue15 = [[<Construction Plates> can also boost production. To build one, select <Cloakbot Factory> from the <Factory> tab and place it in the circle that appears around your existing factory.
+<(Click next to continue)>]],
+			epilogue16 = [[Keep producing, expand your territory, and crush the opposition. Perhaps diversify your forces with a new factory, such as a <Tank Foundry> or <Gunship Plant>.
+<(Click next to continue)>]],
 		}
 	}, --end en
 	--I let this part between quote because I never used a ' in it.

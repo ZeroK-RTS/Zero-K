@@ -5,7 +5,7 @@ local ret = {
 	"dyntrainer_strike_base",
 }
 
-if Spring.GetModOptions().campaign_chassis == "1" then
+if Spring.GetModOptions and Spring.GetModOptions().campaign_chassis == "1" then
 	--[[ Not sure about this, nabs like to feel special.
 	     We could always limit it to hard/brutal and it's
 	     not that amazing anyway ]]

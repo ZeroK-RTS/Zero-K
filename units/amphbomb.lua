@@ -63,7 +63,7 @@ return { amphbomb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShortLarge]],
   trackWidth             = 30,
-  turnRate               = 3000,
+  turnRate               = 3600,
   
   featureDefs            = {
 

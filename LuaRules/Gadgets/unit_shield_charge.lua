@@ -99,44 +99,46 @@ function gadget:GameFrame(n)
 		local unitID = data.unitID
 		
 		local enabled, charge = IsShieldEnabled(unitID)
-		
-		local def = data.def
-		local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame") or -999999
-		local currTime = Spring.GetGameFrame()
-		local inCooldown = false
-		if def.rechargeDelay then
-			local remainingTime = hitTime + def.rechargeDelay * 30 - currTime
-			inCooldown = (remainingTime >= 0)
-			if (setParam or currTime - hitTime < 3) and remainingTime > -70 then
-				spSetUnitRulesParam(unitID, "shieldRegenTimer", remainingTime, losTable)
+		if data.resTable then
+			-- The engine handles charging for free shields.
+			local def = data.def
+			local hitTime = Spring.GetUnitRulesParam(unitID, "shieldHitFrame") or -999999
+			local currTime = Spring.GetGameFrame()
+			local inCooldown = false
+			if def.rechargeDelay then
+				local remainingTime = hitTime + def.rechargeDelay * 30 - currTime
+				inCooldown = (remainingTime >= 0)
+				if (setParam or currTime - hitTime < 3) and remainingTime > -70 then
+					spSetUnitRulesParam(unitID, "shieldRegenTimer", remainingTime, losTable)
+				end
 			end
-		end
-		if enabled and charge < def.maxCharge and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
-			-- Get changed charge rate based on slow
-			local newChargeRate = GetChargeRate(unitID)
-			if data.oldChargeRate ~= newChargeRate then
-				GG.StartMiscPriorityResourcing(unitID, def.perSecondCost*newChargeRate, true)
+			if enabled and charge < def.maxCharge and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
+				-- Get changed charge rate based on slow
+				local newChargeRate = GetChargeRate(unitID)
+				if data.oldChargeRate ~= newChargeRate then
+					GG.StartMiscPriorityResourcing(unitID, def.perSecondCost*newChargeRate, true)
+					
+					data.oldChargeRate = newChargeRate
+					data.resTable.e = def.perUpdateCost*newChargeRate
+				end
 				
-				data.oldChargeRate = newChargeRate
-				data.resTable.e = def.perUpdateCost*newChargeRate
-			end
-			
-			-- Deal with overflow
-			local chargeAdd = newChargeRate*def.chargePerUpdate
-			if charge + chargeAdd > def.maxCharge then
-				local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
-				data.resTable.e = data.resTable.e*overProportion
-				chargeAdd = chargeAdd*overProportion
-			end
+				-- Deal with overflow
+				local chargeAdd = newChargeRate*def.chargePerUpdate
+				if charge + chargeAdd > def.maxCharge then
+					local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
+					data.resTable.e = data.resTable.e*overProportion
+					chargeAdd = chargeAdd*overProportion
+				end
 
-			-- Check if the change can be carried out
-			if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable)) then
-				spSetUnitShieldState(unitID, data.shieldNum, charge + chargeAdd)
-			end
-		else
-			if data.oldChargeRate ~= 0 then
-				GG.StopMiscPriorityResourcing(unitID)
-				data.oldChargeRate = 0
+				-- Check if the change can be carried out
+				if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable)) then
+					spSetUnitShieldState(unitID, data.shieldNum, charge + chargeAdd)
+				end
+			else
+				if data.oldChargeRate ~= 0 then
+					GG.StopMiscPriorityResourcing(unitID)
+					data.oldChargeRate = 0
+				end
 			end
 		end
 		
@@ -155,7 +157,7 @@ end
 -- Unit Tracking
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if (shieldUnitDefID[unitDefID] or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
+	if ((shieldUnitDefID[unitDefID] and shieldUnitDefID[unitDefID].chargePerUpdate) or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
 		GG.AddMiscPriorityUnit(unitID)
 	end
 end
@@ -175,24 +177,22 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 			spSetUnitShieldState(unitID, shieldNum, def.startPower)
 		end
 		
-		if def.perUpdateCost then
-			unitCount = unitCount + 1
-			local data = {
-				unitID = unitID,
-				index = unitCount,
-				unitDefID = unitDefID,
-				teamID = teamID,
-				resTable = {
-					m = 0,
-					e = def.perUpdateCost
-				},
-				shieldNum = shieldNum,
-				def = def
-			}
-			
-			unitList[unitCount] = data
-			unitMap[unitID] = data
-		end
+		unitCount = unitCount + 1
+		local data = {
+			unitID = unitID,
+			index = unitCount,
+			unitDefID = unitDefID,
+			teamID = teamID,
+			resTable = def.perUpdateCost and {
+				m = 0,
+				e = def.perUpdateCost
+			},
+			shieldNum = shieldNum,
+			def = def
+		}
+		
+		unitList[unitCount] = data
+		unitMap[unitID] = data
 	end
 end
 

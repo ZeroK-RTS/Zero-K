@@ -65,7 +65,7 @@ return { jumpscout = {
   trackStretch           = 0.6,
   trackType              = [[ComTrack]],
   trackWidth             = 12,
-  turnRate               = 1800,
+  turnRate               = 2160,
   workerTime             = 0,
 
   weapons                = {

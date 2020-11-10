@@ -22,6 +22,7 @@ return { energypylon = {
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
     removewait     = 1,
+    removestop     = 1,
     default_spacing = 41, -- Diagonal connection.
     selectionscalemult = 1.15,
   },

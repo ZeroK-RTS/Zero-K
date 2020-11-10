@@ -54,7 +54,7 @@ return { tankaa = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 653,
+  turnRate               = 1044,
   upright                = false,
   workerTime             = 0,
 

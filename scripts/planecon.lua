@@ -5,17 +5,13 @@ local base = piece 'base'
 local body = piece 'body'
 local engine1 = piece 'engine1'
 local engine2 = piece 'engine2'
-local nozzle = piece 'nozzle'
 local nano = piece 'nano'
 
 --New bits
 local centreClaw 		= piece 'CentreClaw'
 local centreClawBit 	= piece 'CentreClawBit'
-local CentreNano		= piece 'CentreNano'
 local leftClaw 			= piece 'LeftClaw'
 local leftClawBit 		= piece 'LeftClawBit'
-local leftNano 			= piece 'LeftNano'
-local rightNano 		= piece 'RightNano'
 local rightClaw 		= piece 'RightClaw'
 local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
@@ -23,8 +19,9 @@ local engShield2 		= piece 'EngShield2'
 
 local smokePiece = {base, engine1, engine2}
 
--- intentionally not {CentreNano, leftNano, rightNano}
--- 3 beams look too powerful for a low 4 BP constructor
+-- unused pieces: nozzle, CentreNano, LeftNano, RightNano
+-- the latter 3 intentionally not used as nano beam pieces
+-- 3 beams look too powerful for a low BP constructor
 local nanoPieces = {nano}
 
 local SIG_TILT = 1

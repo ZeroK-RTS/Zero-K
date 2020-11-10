@@ -22,6 +22,8 @@ function widget:GetInfo()
 	}
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -117,7 +119,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages',
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
@@ -144,6 +146,13 @@ options = {
 		noHotkey = true,
 		desc = 'Shows percentages next to bars',
 		OnChange = OptionsChanged,
+	},
+	flashJump = {
+		name = 'Jump reload flash',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Set jump reload to flashes when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -285,7 +294,8 @@ local barColors = {
 	reload         = { 0.00, 0.60, 0.60, barAlpha },
 	reload2        = { 0.80, 0.60, 0.00, barAlpha },
 	reammo         = { 0.00, 0.60, 0.60, barAlpha },
-	jump           = { 0.00, 0.90, 0.00, barAlpha },
+	jump           = { 0.00, 0.80, 0.00, barAlpha },
+	jump_p         = { 0.80, 0.50, 0.00, barAlpha },
 	sheath         = { 0.00, 0.20, 1.00, barAlpha },
 	fuel           = { 0.70, 0.30, 0.00, barAlpha },
 	slow           = { 0.50, 0.10, 0.70, barAlpha },
@@ -304,6 +314,7 @@ local barColors = {
 --------------------------------------------------------------------------------
 
 local blink = false
+local blink_j = false
 local gameFrame = 0
 
 local empDecline = 1/40
@@ -862,7 +873,7 @@ do
 		if ci.canJump then
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
-				barDrawer.AddBar(addTitle and messages.jump, jumpReload, "jump", (addPercent and floor(jumpReload*100) .. '%'))
+				barDrawer.AddBar(addTitle and messages.jump, jumpReload, ((blink_j and "jump_p") or "jump"), (addPercent and floor(jumpReload*100) .. '%'))
 			end
 		end
 		
@@ -1253,10 +1264,12 @@ do
 		if not IsCameraBelowMaxHeight() then
 			return false
 		end
-
+		
+		local _, activeCmdID = Spring.GetActiveCommand()
 		-- Processing
 		sec = sec+dt
 		blink = (sec%1) < 0.5
+		blink_j = options.flashJump.value and (activeCmdID == CMD_JUMP) and ((sec%0.5) < 0.25)
 
 		gameFrame = GetGameFrame()
 		visibleUnits = GetVisibleUnits(-1, nil, false) --this don't need any delayed update or caching or optimization since its already done in "LUAUI/cache.lua"

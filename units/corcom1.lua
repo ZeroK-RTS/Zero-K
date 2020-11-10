@@ -76,7 +76,7 @@ return { corcom1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1148,
+  turnRate            = 1377,
   upright             = true,
   workerTime          = 10,
 
