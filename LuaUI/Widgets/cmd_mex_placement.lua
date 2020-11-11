@@ -429,6 +429,14 @@ function widget:CommandNotify(cmdID, params, options)
 					unitArrayToReceive[#unitArrayToReceive+1] = unitID
 				end
 			end
+			
+			-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
+			-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
+			-- where hold even when it is not. I do not know why this issue is absent when no modkey are held.
+			if makeMexEnergy and not (options.shift or options.meta) then
+				commandArrayToIssue[#commandArrayToIssue+1] = {CMD.STOP, {} }
+			end
+			
 			--prepare command list
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
