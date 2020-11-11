@@ -45,7 +45,7 @@ return { turretriot = {
 
   },
 
-  sightDistance                 = 461, -- Range*1.1 + 48 for radar overshoot
+  sightDistance                 = 455, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 
@@ -77,7 +77,7 @@ return { turretriot = {
         light_color = [[0.8 0.76 0.38]],
         light_radius = 180,
         proximity_priority = 5, -- Don't use this unless required as it causes O(N^2) seperation checks per slow update.
-        overshoot = 1.18,
+        overshoot = 1,
       },
 
       damage                  = {
@@ -93,7 +93,7 @@ return { turretriot = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 375,
+      range                   = 370,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,

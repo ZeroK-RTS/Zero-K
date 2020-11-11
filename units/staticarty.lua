@@ -80,6 +80,9 @@ return { staticarty = {
 
       customParams            = {
         light_color = [[1.4 0.8 0.3]],
+        overshoot = 1,
+        overshoot_maxvel = 2.0, -- the maximum velocity of a unit to engage. 0.0 will mean it will only shoot at static targets at overshoot range.
+        overshoot_override = 35, -- the additional range bonus for behe.
       },
 
       damage                  = {
