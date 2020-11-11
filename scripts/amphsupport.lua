@@ -312,12 +312,19 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 
+local function SetSpeedMult(mult)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", mult)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", mult)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 local function SetDeploy(wantDeploy)
 	Signal(SIG_DEPLOY)
 	SetSignalMask(SIG_DEPLOY)
 	if wantDeploy then
 		AnimateDeployment(1, 1, true)
 		deployed = true
+		SetSpeedMult(0.25)
 	else
 		deployed = false
 		Turn(head, y_axis, 0, math.rad(AIM_SPEED))
@@ -327,6 +334,8 @@ local function SetDeploy(wantDeploy)
 		--WaitForTurn(head, laxel)
 
 		AnimateDeployment(0, 1.2, false)
+		Sleep(800)
+		SetSpeedMult(1)
 	end
 end
 
