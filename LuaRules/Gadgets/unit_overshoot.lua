@@ -1,9 +1,9 @@
 function gadget:GetInfo()
 	return {
-		name      = "Overshoot AI",
+		name      = "Glancefire AI",
 		desc      = "Shoot at things beyond a unit's range using AOE",
 		author    = "Shaman",
-		date      = "10-22-2020",
+		date      = "November 9, 2020",
 		license   = "PD",
 		layer     = 5,
 		enabled   = true,
@@ -17,9 +17,10 @@ end
 local overshootdefs = {} -- unitdefs to watch
 local overwatch = {} -- units that have the ai enabled.
 local unitstocheck = {}
-local updaterate = 5 -- the rate we update units.
-local terrainupdaterate = 12 -- update range checks every 12 updates. EG: update rate of 5 means we update ranges every 60 frames.
+local updaterate = 3 -- the rate we update units.
+local terrainupdaterate = 20 -- update range checks every 12 updates. EG: update rate of 5 means we update ranges every 60 frames.
 
+local spGetUnitWeaponTarget = Spring.GetUnitWeaponTarget
 local spSetUnitTarget = Spring.SetUnitTarget
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -56,7 +57,10 @@ for i = 1, #UnitDefs do
 				if cp.overshoot_override then
 					bonus = tonumber(cp.overshoot_override)
 				end
-				overshootdefs[i][c] = {id = w, aoe = WeaponDef.damageAreaOfEffect, bonus = bonus, range = WeaponDef.range, velocity = WeaponDef.projectilespeed}
+				overshootdefs[i][c] = {id = w, aoe = WeaponDef.damageAreaOfEffect, bonus = bonus, range = WeaponDef.range, velocity = WeaponDef.projectilespeed, attackuw = cp.attempt_underwater ~= nil}
+				if cp.attempt_underwater then
+					overshootdefs[i].attacksubmerged = true
+				end
 				if cp.overshoot_maxvel then
 					overshootdefs[i][c].maxvel = tonumber(cp.overshoot_maxvel)
 				end
@@ -162,6 +166,10 @@ local function UpdateWeaponRange(unitID, unitDefID, weaponID) -- updates weapon 
 	--Spring.Echo("New range: " .. effectiverange .. "(Bonus: " .. overshootdef.bonus .. ")")
 end
 
+local function GetWeaponIsFiringAtSomething(unitID, weaponID)
+	return spGetUnitWeaponTarget(unitID, weaponID) == 1
+end
+
 local function UpdateUnitTarget(unitID, unitDefID, weaponID)
 	local myX, myY, myZ = spGetUnitPosition(unitID)
 	local weapon = overwatch[unitID].weapons[weaponID]
@@ -170,12 +178,16 @@ local function UpdateUnitTarget(unitID, unitDefID, weaponID)
 	-- look slightly beyond our theoretical range. This tries to help compensate for how coarse the theoretical range finder is when it's looking at terrain.
 	local enemy = spGetUnitNearestEnemy(unitID, theoreticalEffectiveRange, true)
 	local distance, actualRange, actualEffectiveRange
+	local attacking = false
 	if enemy then
 		local _, enemybaseY, _, _, _, _, enemyX, enemyY, enemyZ = spGetUnitPosition(enemy, true, true)
 		distance = spGetUnitSeparation(unitID, enemy)
 		local groundUnderEnemy = math.max(spGetGroundHeight(enemyX, enemyZ), 0)
 		local overshootdef = overshootdefs[unitDefID][weaponID]
-		local miny = - (overshootdef.aoe / 2) -- because attacking SUBMERGED is just lol
+		local miny = -15 -- because attacking SUBMERGED is just lol
+		if weapon.canattackuw then
+			miny = - overshootdef.aoe
+		end
 		--actualRange = math.floor(spUtilitiesGetEffectiveWeaponRange(unitDefID, myY - enemyY, weaponNum)) -- the actual range we have against the unit. Needed to be able to set the target reliably.
 		actualRange = math.floor(Spring.Utilities.GetEffectiveWeaponRange(unitDefID, myY - enemyY, weaponNum))
 		local pvelocity = overshootdef.velocity
@@ -186,16 +198,18 @@ local function UpdateUnitTarget(unitID, unitDefID, weaponID)
 		wantedZ = enemyZ + (traveltime * velz)
 		local wantedRange = Distance(myX, myZ, wantedX, wantedZ)
 		actualEffectiveRange = actualRange + overshootdef.bonus + overshootdef.aoe -- this is the range after weapon inaccuracy range gain takes effect.
+		Spring.Echo("Can attack UW: " .. tostring(weapon.canattackuw))
 		--Spring.Echo("Actual range: " .. actualEffectiveRange .. "(" .. actualRange .. ", " ..  distance .. ")" .. "\n")
-		if distance > actualRange and enemybaseY - groundUnderEnemy < 5 and enemyY >= miny and wantedRange <= actualEffectiveRange and (overshootdef.maxvel == nil or enemyvel <= overshootdef.maxvel) then -- only attack when there's nothing in our actual range that isn't flying
+		if (distance > actualRange or (enemybaseY < -5 and weapon.canattackuw and weapon.notbeingused == 2)) and enemybaseY - groundUnderEnemy < 5 and enemyY >= miny and wantedRange <= actualEffectiveRange and (overshootdef.maxvel == nil or enemyvel <= overshootdef.maxvel) then -- only attack when there's nothing in our actual range that isn't flying
 			local targetX, targetZ = GetFirePoint(wantedRange, myX, myZ, wantedX, wantedZ)
 			local targetY
 			targetX, targetY, targetZ = WeaponCorrection(unitID, weaponNum, targetX, groundUnderEnemy, targetZ, actualRange, enemyX, enemyZ, myX, myZ)
 			--Spring.MarkerAddPoint(targetX, 0, targetZ, "Targeting " .. targetX .. "," .. targetZ, true)
 			AttackPosition(unitID, targetX, targetY, targetZ, weaponNum)
+			attacking = true
 		end
 	end
-	if overwatch[unitID].engaged and (not enemy or distance <= actualRange or (enemy and distance > actualEffectiveRange)) then
+	if overwatch[unitID].engaged and not attacking then
 		--Spring.Echo("STOP")
 		spGiveOrderToUnit(unitID, CMD.STOP, EMPTY, 0)
 		overwatch[unitID].engaged = false
@@ -204,9 +218,9 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if overshootdefs[unitDefID] then
-		overwatch[unitID] = {def = unitDefID, engaged = false, weapons = {}, updatecount = 0, index = #unitstocheck + 1}
+		overwatch[unitID] = {def = unitDefID, engaged = false, weapons = {}, updatecount = 0, index = #unitstocheck + 1, attacksubmerged = overshootdefs[unitDefID].attacksubmerged}
 		for i = 1, #overshootdefs[unitDefID] do
-			overwatch[unitID].weapons[i] = {effectiverange = 0, id = overshootdefs[unitDefID][i].id}
+			overwatch[unitID].weapons[i] = {effectiverange = 0, id = overshootdefs[unitDefID][i].id, canattackuw = overshootdefs[unitDefID][i].attackuw, notbeingused = 0}
 			UpdateWeaponRange(unitID, unitDefID, i)
 		end
 		unitstocheck[#unitstocheck + 1] = unitID
@@ -231,9 +245,10 @@ function gadget:GameFrame(f)
 				local weapons = data.weapons
 				if #spGetCommandQueue(unitID, 1) == 0 then
 					for w = 1, #weapons do
-						UpdateUnitTarget(unitID, unitDefID, w)
+						local weaponID = weapons[w].id
+						UpdateUnitTarget(unitID, unitDefID, weaponID)
 						if data.updatecount == terrainupdaterate then
-							UpdateWeaponRange(unitID, unitDefID, w)
+							UpdateWeaponRange(unitID, unitDefID, weaponID)
 						end
 					end
 				end
@@ -241,6 +256,24 @@ function gadget:GameFrame(f)
 					overwatch[unitID].updatecount = 0
 				else
 					overwatch[unitID].updatecount = overwatch[unitID].updatecount + 1
+				end
+			end
+		end
+	end
+	if f%updaterate == updaterate - 1 then
+		for i = 1, #unitstocheck do
+			local unitID = unitstocheck[i]
+			local data = overwatch[unitID]
+			if data and data.attacksubmerged then
+				local weapons = data.weapons
+				for w = 1, #weapons do
+					local weaponID = weapons[w].id
+					local isusefultargeting = GetWeaponIsFiringAtSomething(unitID, weaponID)
+					if isusefultargeting or weapons[w].notbeingused > 2 then
+						overwatch[unitID].weapons[w].notbeingused = 0
+					else
+						overwatch[unitID].weapons[w].notbeingused = overwatch[unitID].weapons[w].notbeingused + 1
+					end
 				end
 			end
 		end
