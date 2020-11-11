@@ -162,7 +162,7 @@ local maxWallPoints = 700 -- max points that makeup a wall
 local maxRampLength = 3000
 local maxRampWidth = 800
 local minRampLength = 64
-local minRampWidth = 36
+local minRampWidth = 48
 
 local startRampWidth = 60
 

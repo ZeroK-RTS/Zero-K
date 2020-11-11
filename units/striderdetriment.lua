@@ -4,7 +4,7 @@ return { striderdetriment = {
   description            = [[Ultimate Assault Strider]],
   acceleration           = 0.328,
   activateWhenBuilt      = true,
-  autoheal               = 60,
+  autoheal               = 20,
   brakeRate              = 1.435,
   buildCostMetal         = 24000,
   builder                = false,
@@ -231,8 +231,8 @@ return { striderdetriment = {
       },
       
       damage                  = {
-        default = 1000.1,
-        planes  = 1000.1,
+        default = 800.1,
+        planes  = 800.1,
         subs    = 50.1,
       },
 

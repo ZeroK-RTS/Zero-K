@@ -151,7 +151,7 @@ local perimeterEdgeCost = {
 local maxTotalRampLength = 3000
 local maxTotalRampWidth = 800
 local minTotalRampLength = 64
-local minTotalRampWidth = 36
+local minTotalRampWidth = 48
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
 local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
