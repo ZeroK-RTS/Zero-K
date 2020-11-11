@@ -1327,10 +1327,6 @@ local sounds = {
 	-- Factory
 	factorycloak = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1338,10 +1334,6 @@ local sounds = {
 	},
 	factoryshield = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1349,10 +1341,6 @@ local sounds = {
 	},
 	factoryjump = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1360,10 +1348,6 @@ local sounds = {
 	},
 	factoryspider = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1371,10 +1355,6 @@ local sounds = {
 	},
 	factoryamph = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1382,10 +1362,6 @@ local sounds = {
 	},
 	factoryveh = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1393,10 +1369,6 @@ local sounds = {
 	},
 	factorytank = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1404,10 +1376,6 @@ local sounds = {
 	},
 	factoryhover = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1415,10 +1383,6 @@ local sounds = {
 	},
 	factoryplane = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1426,10 +1390,6 @@ local sounds = {
 	},
 	factorygunship = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1437,10 +1397,6 @@ local sounds = {
 	},
 	factoryship = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1450,10 +1406,6 @@ local sounds = {
 	-- plates
 	platecloak = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1461,10 +1413,6 @@ local sounds = {
 	},
 	plateshield = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1472,10 +1420,6 @@ local sounds = {
 	},
 	platejump = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1483,10 +1427,6 @@ local sounds = {
 	},
 	platespider = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1494,10 +1434,6 @@ local sounds = {
 	},
 	plateamph = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1505,10 +1441,6 @@ local sounds = {
 	},
 	plateveh = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1516,10 +1448,6 @@ local sounds = {
 	},
 	platetank = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1527,10 +1455,6 @@ local sounds = {
 	},
 	platehover = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1538,10 +1462,6 @@ local sounds = {
 	},
 	plateplane = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1549,10 +1469,6 @@ local sounds = {
 	},
 	plategunship = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1560,10 +1476,6 @@ local sounds = {
 	},
 	plateship = {
 		build = { "builder_start" },
-		ok = {
-			volume = 0.9,
-			[1] = "turret_move",
-		},
 		select = {
 			volume = 0.5,
 			[1] = "factory_select",
@@ -1925,7 +1837,10 @@ local function applyCustomParamSound(soundDef, soundName, customParams)
 	end
 
 	soundDef = soundDef or {}
-	soundDef[soundName] = { sound }
+	soundDef[soundName] = {
+		volume = tonumber(customParams["sound" .. soundName .. "_vol"] or 1),
+		[1] = sound,
+	}
 	return soundDef
 end
 

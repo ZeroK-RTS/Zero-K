@@ -28,6 +28,8 @@ return { benzcom1 = {
     statsname = [[dynassault1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[5]],
   },
