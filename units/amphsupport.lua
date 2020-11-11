@@ -66,7 +66,7 @@ return { amphsupport = {
   trackType              = [[ComTrack]],
   trackWidth             = 32,
   turnRate               = 1200,
-  upright                = false,
+  upright                = true,
 
   weapons                = {
     {
