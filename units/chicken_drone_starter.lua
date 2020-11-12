@@ -1,3 +1,7 @@
+--[[ NB: this is a legacy def without any purpose in ZK itself,
+     but is kept for compatibility because some mods (specifically
+     Zero Wars, possibly others) have already started using it ]]
+
 return { chicken_drone_starter = {
   unitname            = [[chicken_drone_starter]],
   name                = [[Drone]],
