@@ -72,6 +72,7 @@ local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
 local spValidUnitID		= Spring.ValidUnitID
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGetUnitResources = Spring.GetUnitResources
 
 local TableEcho = Spring.Utilities.TableEcho
 
@@ -148,16 +149,29 @@ local function DecideCommands(unitID)
 
 	local trackedUnit = trackedUnits[unitID]
 
+	local metalMake, metalUse, energyMake, energyUse = spGetUnitResources(unitID)
+
 	local metal, metalStorage, metalPull, metalIncome =
 			spGetTeamResources(spGetMyTeamID(), "metal")
 	metalStorage = metalStorage - HIDDEN_STORAGE
 	if debug then
-		Log("metal=", metal, "; storage=",
-				metalStorage, "; pull=", metalPull, "; income=", metalIncome)
+		Log("metal=", metal, "; storage=", metalStorage, "; pull=", metalPull,
+				" -", metalUse, "; income=", metalIncome, " -", metalMake)
 	end
 	local energy, energyStorage, energyPull, energyIncome =
 			spGetTeamResources(spGetMyTeamID(), "energy")
 	energyStorage = energyStorage - HIDDEN_STORAGE
+	if debug then
+		Log("energy=", energy, "; storage=", energyStorage, "; pull=", energyPull,
+				" -", energyUse, "; income=", energyIncome, " -", energyMake)
+	end
+
+	-- Subtract what the unit is currently doing from the overall metal/energy
+	-- use/production.
+	metalPull = metalPull - metalUse
+	metalIncome = metalIncome - metalMake
+	energyPull = energyPull - energyUse
+	energyIncome = energyIncome - energyMake
 
 	local get_metal, get_energy, use_metal, use_energy
 
@@ -165,28 +179,26 @@ local function DecideCommands(unitID)
 		get_metal = metalPull >= metalIncome
 		use_metal = metalPull <= metalIncome
 	else
-		local futureMetal = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalPull) / FPS))
+		local future = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalPull) / FPS))
 		-- Only get metal if we won't waste any metal by doing so.
-		local metalProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
-		get_metal = futureMetal + metalProduction <= metalStorage
+		local production = checkInterval * trackedUnit.reclaimSpeed / FPS
+		get_metal = future + production <= metalStorage
 		-- Only use metal if we won't waste any build power by doing so.
-		local metalUse = checkInterval * trackedUnit.buildSpeed / FPS
-		use_metal = futureMetal - metalUse >= 0
+		use_metal = future >= checkInterval * trackedUnit.buildSpeed / FPS
 	end
 
 	if energyStorage < 1 then
 		get_energy = energyPull >= energyIncome
 		use_energy = energyPull <= energyIncome
 	else
-		local futureEnergy = energy + checkInterval * (energyIncome - energyPull) / FPS
+		local future = energy + checkInterval * (energyIncome - energyPull) / FPS
 		-- Only get energy if we have storage for it.
-		local energyProduction = checkInterval * trackedUnit.reclaimSpeed / FPS
-		get_energy = futureEnergy + energyProduction <= energyStorage
+		local production = checkInterval * trackedUnit.reclaimSpeed / FPS
+		get_energy = future + production <= energyStorage
 		-- Only use energy if we won't waste any build power by doing so. It
 		-- would go to overdrive, but it's better to keep reserves on the
 		-- ground.
-		local energyUse = checkInterval * trackedUnit.repairSpeed / FPS
-		use_energy = futureEnergy - energyUse >= 0
+		use_energy = future >= checkInterval * trackedUnit.buildSpeed / FPS
 	end
 
 	if debug then
@@ -313,8 +325,9 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 	end
 
 	-- Area repair/reclaim command. The spring engine puts the unit being
-	-- repaired/reclaimed(?) as the first parameter, and moves the issued
-	-- parameters down one.
+	-- repaired/reclaimed as the first parameter, and moves the issued
+	-- parameters down one. (See CBuilderCAI::FindReclaimTargetAndReclaim() and
+	-- CBuilderCAI::FindRepairTargetAndRepair().)
 	if currentID == issued[1] and
 			(currentID == CMD_RECLAIM or currentID == CMD_REPAIR) and
 			#issued[2] == 4 and
@@ -323,7 +336,6 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][3] == currentParam4 and
 			issued[2][4] == currentParam5 and
 			issued[3] == math.bit_and(currentOpt, remove_shift_internal) then
-		--Log("    -> repair/reclaim")
 		return true
 	end
 
@@ -378,6 +390,7 @@ local function SetupUnit(unitID)
 
 	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
 	queue:push({trackedUnit.checkFrame, unitID})
+	Log(unitID, "; push for ", trackedUnit.checkFrame)
 
 	local decisions = DecideCommands(unitID)
 	local cmds = MakeCommands(decisions, unitID)
@@ -391,9 +404,9 @@ local function SetupUnit(unitID)
 	local currentID, currentOpt, _, currentParam1,
 			currentParam2, currentParam3, currentParam4, currentParam5 =
 			spGetUnitCurrentCommand(unitID)
-	--Log(unitID, "; currently executing ", currentID, "(", currentParam1,
-	--	", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
-	--	currentParam5, ") ", currentOpt)
+	Log(unitID, "; currently executing ", currentID, "(", currentParam1,
+		", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
+		currentParam5, ") ", currentOpt)
 
 	if currentID then
 		if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
@@ -604,9 +617,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	trackedUnit.idleWait = min(trackedUnit.idleWait * 2, checkInterval)
 	-- If we're not idle at that point, we must have found some work to do.
 	trackedUnit.resetIdle = trackedUnit.checkFrame + 1
-	queue:push({trackedUnits[unitID].checkFrame, unitID})
-	--Log("  set checkFrame to ", trackedUnits[unitID].checkFrame)
-	--TableEcho(trackedUnits[unitID], "+ ")
+	queue:push({trackedUnit.checkFrame, unitID})
+	Log(unitID, "; push for ", trackedUnit.checkFrame)
 end
 
 -- Called for every game simulation frame (30 per second).
@@ -625,8 +637,8 @@ function widget:GameFrame(frame)
 			local unitID = entry[2]
 
 			if trackedUnits[unitID] then
-				--Log(unitID, "; ", frame, " >= ".. entry[1],
-				--		"; checkFrame=", trackedUnits[unitID].checkFrame)
+				Log(unitID, "; ", frame, " >= ".. entry[1],
+						"; checkFrame=", trackedUnits[unitID].checkFrame)
 
 				if entry[1] == trackedUnits[unitID].checkFrame then
 					-- Otherwise, we queued this unit multiple times and this is not
