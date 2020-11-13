@@ -47,10 +47,17 @@ end
 
      2) VFS.Include is broken in the same way on old engines (specifically
         on 104-287 which we want to keep supporting for the time being).
-	 This means that the gameside posts would instead be included twice. ]]
+     This means that the gameside posts would instead be included twice. ]]
+
 local MAPSIDE_POSTS_FILEPATH = 'gamedata/unitdefs_map.lua'
 if VFS.FileExists(MAPSIDE_POSTS_FILEPATH, VFS_MAP) then
 	VFS_Include(MAPSIDE_POSTS_FILEPATH, nil, VFS_MAP)
+end
+
+--[[ This lets mutators add a bit of unitdefs_posts processing without
+     losing access to future gameside updates to unitdefs_posts.]]
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS_GAME) then
+	VFS_Include(MODSIDE_POSTS_FILEPATH, nil, VFS_GAME)
 end
 
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
