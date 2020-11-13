@@ -128,6 +128,7 @@ local unitIsHeavy = {
 
 local unitPriorityModifier = {
 	[UnitDefNames["gunshipemp"].id] = -0.8,
+	[UnitDefNames["striderantiheavy"].id] = -0.8,
 }
 
 -- Hardcode weapons that are bad against fast moving stuff.
