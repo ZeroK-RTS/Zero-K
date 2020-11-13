@@ -32,6 +32,7 @@ local cegs = {
       count              = 6,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_75]],
