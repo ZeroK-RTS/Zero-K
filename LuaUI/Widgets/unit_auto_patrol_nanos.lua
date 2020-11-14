@@ -83,7 +83,7 @@ local max = math.max
 local mapCenterX = Game.mapSizeX / 2
 local mapCenterZ = Game.mapSizeZ / 2
 
-local debug = true
+local debug = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -143,10 +143,6 @@ local function IsImmobileBuilder(ud)
 end
 
 local function DecideCommands(unitID)
-	-- For now, assume the unit is currently idle. We really ought to figure out
-	-- if it is doing something because there's a big different between going
-	-- from idle to repair and going from reclaiming metal to repair.
-
 	local trackedUnit = trackedUnits[unitID]
 
 	local metalMake, metalUse, energyMake, energyUse = spGetUnitResources(unitID)
@@ -390,7 +386,7 @@ local function SetupUnit(unitID)
 
 	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
 	queue:push({trackedUnit.checkFrame, unitID})
-	Log(unitID, "; push for ", trackedUnit.checkFrame)
+	--Log(unitID, "; push for ", trackedUnit.checkFrame)
 
 	local decisions = DecideCommands(unitID)
 	local cmds = MakeCommands(decisions, unitID)
@@ -404,9 +400,9 @@ local function SetupUnit(unitID)
 	local currentID, currentOpt, _, currentParam1,
 			currentParam2, currentParam3, currentParam4, currentParam5 =
 			spGetUnitCurrentCommand(unitID)
-	Log(unitID, "; currently executing ", currentID, "(", currentParam1,
-		", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
-		currentParam5, ") ", currentOpt)
+	--Log(unitID, "; currently executing ", currentID, "(", currentParam1,
+	--	", ", currentParam2, ", ", currentParam3, ", ", currentParam4, ", ",
+	--	currentParam5, ") ", currentOpt)
 
 	if currentID then
 		if IssuedCausesCurrent(cmds[1], currentID, currentOpt,
@@ -618,7 +614,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	-- If we're not idle at that point, we must have found some work to do.
 	trackedUnit.resetIdle = trackedUnit.checkFrame + 1
 	queue:push({trackedUnit.checkFrame, unitID})
-	Log(unitID, "; push for ", trackedUnit.checkFrame)
+	--Log(unitID, "; push for ", trackedUnit.checkFrame)
 end
 
 -- Called for every game simulation frame (30 per second).
@@ -637,8 +633,8 @@ function widget:GameFrame(frame)
 			local unitID = entry[2]
 
 			if trackedUnits[unitID] then
-				Log(unitID, "; ", frame, " >= ".. entry[1],
-						"; checkFrame=", trackedUnits[unitID].checkFrame)
+				--Log(unitID, "; ", frame, " >= ".. entry[1],
+				--		"; checkFrame=", trackedUnits[unitID].checkFrame)
 
 				if entry[1] == trackedUnits[unitID].checkFrame then
 					-- Otherwise, we queued this unit multiple times and this is not
