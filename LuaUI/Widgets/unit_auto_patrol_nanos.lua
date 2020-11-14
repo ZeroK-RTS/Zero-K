@@ -12,9 +12,9 @@
 --    includes repair units), area reclaim metal, area reclaim energy, or patrol,
 --    depending on available resources.
 -- 2. For each caretaker under this widget's control, re-evaluate the behavior based
---    on the economy every 10 seconds. (Controlled by checkInterval.)
--- 3. For each caretaker, never issue a command more than once every 2.5 seconds.
---    (Controlled by settleInterval.)
+--    on the economy every 4 seconds. (Controlled by checkInterval.)
+-- 3. When a caretaker becomes idle, quickly issue new commands. This is
+--    essential to effectively assist factories.
 -- 4. When a user issues a stop command, this behavior is inhibited, until a
 --    different command issued by the user completes. (Unless stop_disables option
 --    is false.)
@@ -22,12 +22,12 @@
 --    until it becomes idle again.
 --
 -- Limitations:
--- 1. When the widget chooses repair only, there's a 0.5 second delay between
---    a unit becoming idle and being told to repair. This is to give the factory
---    that's being assisted time to start the next unit. It is not perfect, and the
---    factory will be assisted less than if a patrol was issued. This could be
---    improved by reducing the delay, and implementing a fancier incremental
---    back-off than the simple 0.5s - 5s that is currently implemented.
+-- 1. When a unit is assisting a factory and there is sufficient available
+--    metal/energy storage, then the unit will spend some time reclaiming
+--    metal/energy after the factory has finished building something, before being
+--    told to assist the factory again. This does not happen in a "normal" economy
+--    where you are limited by metal and have an energy surplus.
+--    As a workaround you can give a caretaker a patrol order.
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
