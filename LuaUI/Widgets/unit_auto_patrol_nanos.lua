@@ -202,85 +202,36 @@ local function DecideCommands(unitID)
 			"get_energy=", get_energy, ", ", "use_energy=", use_energy)
 	end
 
-	-- Reuse commands to avoid table allocation
 	local commands = {}
-	local i = 1
+	local commandTables = trackedUnit.commandTables
 
 	if use_metal and use_energy then
-		commands[i] = BUILD_ASSIST
-		i = i + 1
+		commands[#commands + 1] = commandTables[BUILD_ASSIST]
 	end
 	if use_energy then
-		commands[i] = REPAIR_UNITS
-		i = i + 1
+		commands[#commands + 1] = commandTables[REPAIR_UNITS]
 	end
 	if get_metal and get_energy then
 		if metal > energy then
-			commands[i] = RECLAIM_ENERGY
-			commands[i + 1] = RECLAIM_METAL
+			commands[#commands + 1] = commandTables[RECLAIM_ENERGY]
+			commands[#commands + 1] = commandTables[RECLAIM_METAL]
 		else
-			commands[i] = RECLAIM_METAL
-			commands[i + 1] = RECLAIM_ENERGY
+			commands[#commands + 1] = commandTables[RECLAIM_METAL]
+			commands[#commands + 1] = commandTables[RECLAIM_ENERGY]
 		end
-		i = i + 2
 	elseif get_metal then
-		commands[i] = RECLAIM_METAL
-		i = i + 1
+		commands[#commands + 1] = commandTables[RECLAIM_METAL]
 	elseif get_energy then
-		commands[i] = RECLAIM_ENERGY
-		i = i + 1
+		commands[#commands + 1] = commandTables[RECLAIM_ENERGY]
 	end
 
 	-- Queue up commands that would waste build power at the end, because build
 	-- power cannot be stored.
 	if not use_metal or not use_energy then
-		commands[i] = BUILD_ASSIST
-		i = i + 1
+		commands[#commands + 1] = trackedUnit.commandTables[BUILD_ASSIST]
 	end
 	if not use_energy then
-		commands[i] = REPAIR_UNITS
-		i = i + 1
-	end
-
-	-- Terminate the list with nil
-	commands[i] = nil
-
-	return commands
-end
-
-local function MakeCommands(decidedCommands, unitID)
-	if not trackedUnits[unitID].commandTables then
-		-- Cache commands inside trackedUnits. This saves a ton of table
-		-- creation.
-		local x, y, z = spGetUnitPosition(unitID)
-		if not x then
-			return nil
-		end
-
-		trackedUnits[unitID].commandTables = {}
-
-		local buildDistance = trackedUnits[unitID].buildDistance
-
-		-- Patrolling doesn't do anything if you target the current location
-		-- of the unit. Point patrol towards map center.
-		local vx = mapCenterX - x
-		local vz = mapCenterZ - z
-		trackedUnits[unitID].commandTables[PATROL] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
-
-		local area = {x, y, z, buildDistance}
-		trackedUnits[unitID].commandTables[RECLAIM_METAL] = {CMD_RECLAIM, area, 0, "reclaim metal"}
-		trackedUnits[unitID].commandTables[RECLAIM_ENERGY] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
-		trackedUnits[unitID].commandTables[REPAIR_UNITS] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
-		trackedUnits[unitID].commandTables[BUILD_ASSIST] = {CMD_REPAIR, area, 0, "build assist"}
-	end
-
-	local commands = {}
-
-	for i, decided in ipairs(decidedCommands) do
-		if not decided then
-			break
-		end
-		commands[i] = trackedUnits[unitID].commandTables[decided]
+		commands[#commands + 1] = trackedUnit.commandTables[REPAIR_UNITS]
 	end
 
 	return commands
@@ -358,8 +309,25 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 	return false
 end
 
-local function unit_new(unitID)
+local function unitNew(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
+
+	-- Precompute commands. This saves a ton of table creation.
+	local x, y, z = spGetUnitPosition(unitID)
+
+	local commandTables = {}
+
+	-- Patrolling doesn't do anything if you target the current location
+	-- of the unit. Point patrol towards map center.
+	local vx = mapCenterX - x
+	local vz = mapCenterZ - z
+	commandTables[PATROL] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
+
+	local area = {x, y, z, UnitDefs[unitDefID].buildDistance}
+	commandTables[RECLAIM_METAL] = {CMD_RECLAIM, area, 0, "reclaim metal"}
+	commandTables[RECLAIM_ENERGY] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
+	commandTables[REPAIR_UNITS] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
+	commandTables[BUILD_ASSIST] = {CMD_REPAIR, area, 0, "build assist"}
 
 	return {
 		unitID=unitID,
@@ -370,17 +338,18 @@ local function unit_new(unitID)
 		buildDistance=UnitDefs[unitDefID].buildDistance,
 		buildSpeed=UnitDefs[unitDefID].buildSpeed,
 		repairSpeed=UnitDefs[unitDefID].repairSpeed,
-		reclaimSpeed=UnitDefs[unitDefID].reclaimSpeed
+		reclaimSpeed=UnitDefs[unitDefID].reclaimSpeed,
+		commandTables=commandTables
 	}
 end
 
-local function caretaker_string(caretaker)
-	return caretaker.unitID .. " (iW=" .. caretaker.idleWait ..
-			", cF=" .. caretaker.checkFrame .. ", rI=" .. caretaker.resetIdle .. ")"
+local function unitString(unit)
+	return unit.unitID .. " (iW=" .. unit.idleWait ..
+			", cF=" .. unit.checkFrame .. ", rI=" .. unit.resetIdle .. ")"
 end
 
 local function SetupUnit(unitID)
-	trackedUnits[unitID] = trackedUnits[unitID] or unit_new(unitID)
+	trackedUnits[unitID] = trackedUnits[unitID] or unitNew(unitID)
 
 	local trackedUnit = trackedUnits[unitID]
 
@@ -388,8 +357,7 @@ local function SetupUnit(unitID)
 	queue:push({trackedUnit.checkFrame, unitID})
 	--Log(unitID, "; push for ", trackedUnit.checkFrame)
 
-	local decisions = DecideCommands(unitID)
-	local cmds = MakeCommands(decisions, unitID)
+	local cmds = DecideCommands(unitID)
 
 	--TableEcho(cmds, "want to issue cmds")
 
@@ -590,7 +558,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	If the command was ordered with SHIFT it would get appended after the patrol. ]]
 
 	if not trackedUnits[unitID] then
-		trackedUnits[unitID] = unit_new(unitID)
+		trackedUnits[unitID] = unitNew(unitID)
 	end
 	local trackedUnit = trackedUnits[unitID]
 
@@ -602,7 +570,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	trackedUnit.idleAt = currentFrame
 
 	if debug then
-		Log("UnitIdle(", caretaker_string(trackedUnit), ")")
+		Log("UnitIdle(", unitString(trackedUnit), ")")
 	end
 	--TableEcho(trackedUnits[unitID], "- ")
 
