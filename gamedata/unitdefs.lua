@@ -56,6 +56,7 @@ end
 
 --[[ This lets mutators add a bit of unitdefs_posts processing without
      losing access to future gameside updates to unitdefs_posts.]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/unitdefs_mod.lua'
 if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS_GAME) then
 	VFS_Include(MODSIDE_POSTS_FILEPATH, nil, VFS_GAME)
 end
