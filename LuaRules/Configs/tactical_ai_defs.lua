@@ -527,6 +527,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- jinkTangentLength (default in config): component of jink vector tangent to direction to enemy
 -- jinkParallelLength (default in config): component of jink vector parallel to direction to enemy
 -- jinkAwayParallelLength (defaults in config): component of jink vector parallel to direction to enemy when jinking away due to being too close
+-- jinkPeriod (defaults to false): Multiplier for jink direction change. Set higher jinkPeriod for units that aim slowly.
 -- circleStrafe (defaults to false): when set to true the unit will run all around the target unit, false will cause the unit to jink back and forth
 -- minCircleStrafeDistance (default in config): (weapon range - minCircleStrafeDistance) = distance at which the circle strafer will attempt to move away from target
 -- strafeOrderLength (default in config): length of move order while strafing
@@ -1181,6 +1182,7 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 90,
+		jinkPeriod = 2,
 		skirmLeeway = 40,
 		skirmBlockedApproachFrames = 10,
 	},
@@ -1193,6 +1195,7 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables,
 		maxSwarmLeeway = 50,
 		minSwarmLeeway = 120,
+		jinkPeriod = 2,
 		skirmLeeway = 40,
 	},
 	{
@@ -1204,6 +1207,7 @@ local behaviourConfig = {
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 50,
 		minSwarmLeeway = 120,
+		jinkPeriod = 2,
 		skirmLeeway = 40,
 	},
 	{

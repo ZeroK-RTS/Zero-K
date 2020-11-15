@@ -369,7 +369,6 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	return false
 end
 
-
 local function GetAiExitEarly(unitID, unitData, behaviour)
 	if (unitData.active) and (spGetUnitRulesParam(unitID, "disable_tac_ai") ~= 1) then
 		return false
@@ -381,13 +380,37 @@ local function GetAiExitEarly(unitID, unitData, behaviour)
 	return true
 end
 
+local function UpdateJink(behaviour, unitData)
+	if not behaviour.jinkPeriod then
+		unitData.jinkDir = unitData.jinkDir*-1
+		return
+	end
+	unitData.jinkAccumulator = (unitData.jinkAccumulator or 0) + 1
+	if unitData.jinkAccumulator >= behaviour.jinkPeriod then
+		unitData.jinkAccumulator = 0
+		unitData.jinkDir = unitData.jinkDir*-1
+	end
+end
+
+local function UpdateJinkRotation(behaviour, unitData)
+	if not behaviour.jinkPeriod then
+		unitData.rot = unitData.rot*-1
+		return
+	end
+	unitData.jinkAccumulator = (unitData.jinkAccumulator or 0) + 1
+	if unitData.jinkAccumulator >= behaviour.jinkPeriod then
+		unitData.jinkAccumulator = 0
+		unitData.rot = unitData.rot*-1
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 ---- Unit AI Execution
 
 local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, fightX, fightY, fightZ, frame)
 	local unitData = unit[unitID]
-
+	
 	if debugAction then
 		Spring.Utilities.UnitEcho(unitID, "flee")
 	end
@@ -401,9 +424,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx, cy, cz -- command position
 		
 		local pointDis = Dist(ex, ez, ux, uz)
-		
-		-- insert move commands to jink towards enemy
-		unitData.jinkDir = unitData.jinkDir*-1
+		UpdateJink(behaviour, unitData)
 		
 		-- jink towards the enemy
 		if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
@@ -456,8 +477,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	end
 	
 	if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
-		-- insert move commands to jink towards enemy
-		unitData.jinkDir = unitData.jinkDir*-1
+		UpdateJink(behaviour, unitData)
 		
 		-- jink towards the enemy
 		if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
@@ -501,9 +521,9 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				cx = ux + unitData.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
 				cy = uy
 				cz = uz - unitData.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
-				unitData.rot = unitData.rot*-1
+				UpdateJinkRotation(behaviour, unitData)
 			else
-				unitData.jinkDir = unitData.jinkDir*-1 -- jink away
+				UpdateJink(behaviour, unitData)
 				cx = ux-(-(ux-ex)*behaviour.jinkAwayParallelLength-(uz-ez)*unitData.jinkDir*behaviour.jinkTangentLength)/pointDis
 				cy = uy
 				cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength)/pointDis
