@@ -453,10 +453,20 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(aagun, x_axis)
 		return true
 	elseif num == 5 then -- Face laser
+		local wantedHeading = heading
 		if lastGunAverageHeading then
 			heading = lastGunAverageHeading
 			lastGunAverageHeading = false
 		end
+		
+		local diffAngle = wantedHeading - heading
+		if diffAngle > 3 then
+			diffAngle = diffAngle - 2*math.pi
+		end
+		if math.abs(diffAngle) > 0.7 then
+			return false
+		end
+		
 		Turn(torso, y_axis, heading, math.rad(90))
 		Move(head, y_axis, 0, 10)
 		Move(head, z_axis, 0, 10)
@@ -517,6 +527,13 @@ function script.BlockShot(num, targetID)
 	end
 	blockGauss[3 - num] = 20
 	return false
+end
+
+-- EndBurst so that the projectile fires from the correct gun
+function script.EndBurst(num)
+	if num == 4 then
+		gunIndex[num] = 3 - gunIndex[num]
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
