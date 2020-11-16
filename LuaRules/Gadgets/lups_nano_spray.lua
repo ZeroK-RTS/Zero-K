@@ -381,7 +381,7 @@ function gadget:Update()
   end
 
   --// enable freaky arm nano fx when quality>3
-  if ((Lups.Config["quality"] or 3) >= 3) then
+  if ((Lups.Config.quality or 3) >= 3) and not (Lups.Config.disablefx and Lups.Config.disablefx.NanoParticles) then
     factionsNanoFx.default = factionsNanoFx["default_high_quality"]
   end
 
