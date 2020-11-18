@@ -33,9 +33,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local sunPath = 'Settings/Graphics/Sun and Fog/Sun'
-local fogPath = 'Settings/Graphics/Sun and Fog/Fog'
-local dirPath = 'Settings/Graphics/Sun and Fog/Direction'
+local sunPath   = 'Settings/Graphics/Sun, Fog & Water/Sun'
+local fogPath   = 'Settings/Graphics/Sun, Fog & Water/Fog'
+local waterpath = 'Settings/Graphics/Sun, Fog & Water/Water'
 
 local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
@@ -50,11 +50,12 @@ local skip = {
 	["load_map_settings"] = true,
 }
 
-local function GetOptionsTable(pathMatch)
+local function GetOptionsTable(pathMatch, filter, whitelistFilter)
+	-- Filter is either a blacklist of a whitelist 
 	local retTable = {}
 	for i = 1, #options_order do
 		local name = options_order[i]
-		if not skip[name] then
+		if (not skip[name]) and ((not filter) or (whitelistFilter and filter[name]) or ((not whitelistFilter) and (not filter[name]))) then
 			local option = options[name]
 			if option.path == pathMatch then
 				retTable[name] = option.value
@@ -66,9 +67,10 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		sun = GetOptionsTable(sunPath),
+		sun = GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction = GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
 		fog = GetOptionsTable(fogPath),
-		direction = GetOptionsTable(dirPath)
+		water = GetOptionsTable(waterpath),
 	}
 	
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
@@ -122,6 +124,44 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local waterColorDefaults = {
+	{name = "absorb",        val = {0, 0, 0, 1}},
+	{name = "baseColor",     val = {0, 0, 0, 1}},
+	{name = "minColor",      val = {0, 0, 0, 1}},
+	{name = "planeColor",    val = {0, 0.4, 0, 1}},
+	{name = "surfaceColor",  val = {0.75, 0.8, 0.85, 1}},
+	{name = "diffuseColor",  val = {1, 1, 1, 1}},
+	{name = "specularColor", val = { 0.8, 0.8, 0.8, 1}},
+}
+local waterNumberDefaults = {
+	{name = "ambientFactor", val = 1.0, minVal = 0, maxVal = 3},
+	{name = "diffuseFactor", val = 1.0, minVal = 0, maxVal = 3},
+	{name = "specularFactor", val = 1.0, minVal = 0, maxVal = 3},
+	{name = "specularPower", val = 20.0, minVal = 0, maxVal = 50},
+
+	{name = "surfaceAlpha", val = 0.5, minVal = 0, maxVal = 1},
+
+	{name = "fresnelMin", val = 0.2, minVal = 0, maxVal = 3},
+	{name = "fresnelMax", val = 0.8, minVal = 0, maxVal = 3},
+	{name = "fresnelPower", val = 4.0, minVal = 0, maxVal = 10},
+
+	{name = "reflectionDistortion", val = 1.0, minVal = 0, maxVal = 3},
+
+	{name = "blurBase", val = 2.0, minVal = 0, maxVal = 10},
+	{name = "blurExponent", val = 1.5, minVal = 0, maxVal = 10},
+
+	{name = "perlinStartFreq", val = 8.0, minVal = 0, maxVal = 50},
+	{name = "perlinLacunarity", val = 3.0, minVal = 0, maxVal = 10},
+	{name = "perlinAmplitude", val = 0.9, minVal = 0, maxVal = 10},
+
+	{name = "repeatX", val = 0.0, minVal = 0, maxVal = 50},
+	{name = "repeatY", val = 0.0, minVal = 0, maxVal = 50},
+}
+
+local function ResetWater()
+	Spring.SendCommands("water 4")
+end
+
 local function GetOptions()
 	local options = {}
 	local options_order = {}
@@ -131,38 +171,18 @@ local function GetOptions()
 		options_order[#options_order + 1] = name
 	end
 	
-	local function AddColorOption(name, humanName, path, ColorFunction)
+	local function AddColorOption(name, humanName, path, ColorFunction, defaultVal, ExtraFunc)
 		options[name] = {
 			name = humanName,
 			type = 'colors',
-			value = { 0.8, 0.8, 0.8, 1},
+			value = defaultVal or {0.8, 0.8, 0.8, 1},
 			OnChange = function (self)
 				if initialized then
 					Spring.Echo("ColorFunction")
 					Spring.Utilities.TableEcho(self.value, name)
 					ColorFunction({[name] = self.value})
-				end
-			end,
-			advanced = true,
-			developmentOnly = true,
-			path = path
-		}
-		options_order[#options_order + 1] = name
-	end
-	
-	local function AddNumberOption(name, humanName, path, NumberFunction)
-		options[name] = {
-			name = humanName,
-			type = 'number',
-			value = default or 0,
-			min = minVal or -5, max = maxVal or 5, step = 0.01,
-			OnChange = function (self)
-				if initialized then
-					if NumberFunction then
-						Spring.Echo("NumberFunction", name, self.value)
-						NumberFunction({[name] = self.value})
-					elseif AdvFunc then
-						AdvFunc(self.value, AdvFuncParam)
+					if ExtraFunc then
+						ExtraFunc()
 					end
 				end
 			end,
@@ -173,6 +193,31 @@ local function GetOptions()
 		options_order[#options_order + 1] = name
 	end
 	
+	local function AddNumberOption(name, humanName, path, NumberFunction, defaultVal, minVal, maxVal, ExtraFunc)
+		options[name] = {
+			name = humanName,
+			type = 'number',
+			value = defaultVal or 0,
+			min = minVal or -5, max = maxVal or 5, step = 0.01,
+			OnChange = function (self)
+				if initialized then
+					Spring.Echo("NumberFunction", name, self.value)
+					NumberFunction({[name] = self.value})
+					if ExtraFunc then
+						ExtraFunc()
+					end
+				end
+			end,
+			advanced = true,
+			developmentOnly = true,
+			path = path
+		}
+		options_order[#options_order + 1] = name
+	end
+
+---------------------------------------
+-- Sun
+---------------------------------------
 	local sunThings = {"ground", "unit"}
 	local sunColors = {"Ambient", "Diffuse", "Specular"}
 	for _, thing in ipairs(sunThings) do
@@ -182,7 +227,7 @@ local function GetOptions()
 	end
 	
 	AddNumberOption("specularExponent", "Specular Exponent", sunPath, Spring.SetSunLighting)
-	
+
 	options["sunDir"] = {
 		name = "Sun Direction",
 		type = 'number',
@@ -195,7 +240,7 @@ local function GetOptions()
 		end,
 		advanced = true,
 		developmentOnly = true,
-		path = dirPath
+		path = sunPath
 	}
 	options_order[#options_order + 1] = "sunDir"
 	
@@ -203,7 +248,7 @@ local function GetOptions()
 		name = "Sun pitch",
 		type = 'number',
 		value = sunPitch,
-		min = -0.5*math.pi, max = 0.5*math.pi, step = 0.01,
+		min = 0.05*math.pi, max = 0.5*math.pi, step = 0.01,
 		OnChange = function (self)
 			if initialized then
 				SunDirectionFunc(false, self.value)
@@ -211,17 +256,35 @@ local function GetOptions()
 		end,
 		advanced = true,
 		developmentOnly = true,
-		path = dirPath
+		path = sunPath
 	}
 	options_order[#options_order + 1] = "sunPitch"
-	
+
+---------------------------------------
+-- Fog
+---------------------------------------
 	local fogThings = {"sun", "sky", "cloud", "fog"}
 	for _, thing in ipairs(fogThings) do
 		AddColorOption(thing .. "Color", thing .. " Color", fogPath, Spring.SetAtmosphere)
 	end
 	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere)
 	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere)
-	
+
+---------------------------------------
+-- Water
+---------------------------------------
+	for i = 1, #waterColorDefaults do
+		local data = waterColorDefaults[i]
+		AddColorOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, ResetWater)
+	end
+	for i = 1, #waterNumberDefaults do
+		local data = waterNumberDefaults[i]
+		AddNumberOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, data.minVal, data.maxVal, ResetWater)
+	end
+
+---------------------------------------
+-- Save/Load
+---------------------------------------
 	AddOption("save_map_settings", {
 		name = 'Save Settings',
 		type = 'button',
@@ -236,11 +299,12 @@ local function GetOptions()
 		OnChange = LoadSunAndFogSettings,
 		advanced = true
 	})
+
 	
 	return options, options_order
 end
 
-options_path = 'Settings/Graphics/Sun and Fog'
+options_path = 'Settings/Graphics/Sun, Fog & Water'
 options, options_order = GetOptions()
 
 --------------------------------------------------------------------------------
@@ -249,7 +313,7 @@ options, options_order = GetOptions()
 function widget:Initialize()
 	-- See Mantis https://springrts.com/mantis/view.php?id=5280
 	Spring.Echo("SetSunLighting")
-	Spring.SetSunLighting({groundSpecularColor = {0,0,0,0}})
+	Spring.SetSunLighting({groundSpecularColor = {0, 0, 0, 0}})
 
 	if Spring.GetGameFrame() < 1 then
 		LoadMinimapSettings()

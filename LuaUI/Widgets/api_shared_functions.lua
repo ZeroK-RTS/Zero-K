@@ -195,7 +195,7 @@ function WG.SaveTable(tab, dir, fileName, tabName, params)
 	end
 	local toConcat = WriteTable({}, tab, tabName, params)
 	local str = table.concat(toConcat)
-	file:write(str)
+	file:write(str .. "\n")
 	file:flush()
 	file:close()
 end
