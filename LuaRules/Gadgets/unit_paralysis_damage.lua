@@ -30,6 +30,8 @@ local normalDamageMult = {}
 local wantedWeaponList = {}
 local paraTime = {}
 local overstunDamageMult = {}
+-- Note that having EMP damage decay N times faster when above 100% is mathematically
+-- equivalent multiplying all incoming EMP damage above 100% by of 1/N.
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]

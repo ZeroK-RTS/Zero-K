@@ -76,14 +76,14 @@ return { spideremp = {
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 450,
+        extra_damage = 400,
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
       },
 
       damage                  = {
-        default        = 70.01,
+        default        = 65.01,
       },
 
       duration                = 8,
@@ -96,7 +96,7 @@ return { spideremp = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       paralyzeTime            = 1,
-      range                   = 250,
+      range                   = 245,
       reloadtime              = 33/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
