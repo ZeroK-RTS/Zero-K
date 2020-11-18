@@ -50,6 +50,10 @@ local skip = {
 	["load_map_settings"] = true,
 }
 
+local function ResetWater()
+	Spring.SendCommands("water 4")
+end
+
 local function GetOptionsTable(pathMatch, filter, whitelistFilter)
 	-- Filter is either a blacklist of a whitelist 
 	local retTable = {}
@@ -109,6 +113,7 @@ local function LoadSunAndFogSettings()
 	local water = OVERRIDE_CONFIG.water
 	if water then
 		Spring.SetWaterParams(water)
+		ResetWater()
 	end
 end
 
@@ -157,10 +162,6 @@ local waterNumberDefaults = {
 	{name = "repeatX", val = 0.0, minVal = 0, maxVal = 50},
 	{name = "repeatY", val = 0.0, minVal = 0, maxVal = 50},
 }
-
-local function ResetWater()
-	Spring.SendCommands("water 4")
-end
 
 local function GetOptions()
 	local options = {}
@@ -267,8 +268,8 @@ local function GetOptions()
 	for _, thing in ipairs(fogThings) do
 		AddColorOption(thing .. "Color", thing .. " Color", fogPath, Spring.SetAtmosphere)
 	end
-	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere)
-	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere)
+	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere, 0, -1, 1)
+	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere, -1, -1, 1)
 
 ---------------------------------------
 -- Water
