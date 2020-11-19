@@ -107,7 +107,7 @@ return { shipheavyarty = {
         subs    = 25,
       },
 
-      explosionGenerator      = [[custom:PLASMA_HIT_96]],
+      explosionGenerator      = [[custom:165rlexplode]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
