@@ -414,7 +414,7 @@ local function AddPylonToGrid(unitID)
 
 	-- add econ to new grid
 	-- mexes
-	if pylon[allyTeamID][unitID].mex then
+	if pylon[allyTeamID][unitID].mex and mexes[allyTeamID][0][unitID] then
 		local mid = unitID
 		local orgMetal = mexes[allyTeamID][0][mid]
 		ai.mexMetal = ai.mexMetal + orgMetal

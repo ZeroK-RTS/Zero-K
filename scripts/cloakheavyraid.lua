@@ -197,11 +197,15 @@ local function RestoreAfterDelay()
 	aiming = false
 end
 
-function script.QueryWeapon1() return head end
+function script.QueryWeapon()
+	return head
+end
 
-function script.AimFromWeapon1() return head end
+function script.AimFromWeapon()
+	return head
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	aiming = true
@@ -216,7 +220,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	Turn(lforearm, x_axis, 0.4, 5)
 	Turn(lshoulder, z_axis, - 0, 12)
 	Turn(lshoulder, x_axis, - 0.7, 12)

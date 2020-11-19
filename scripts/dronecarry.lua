@@ -80,11 +80,15 @@ function script.StopMoving()
 
 end
 
-function script.QueryWeapon1() return flare end
+function script.QueryWeapon()
+	return flare
+end
 
-function script.AimFromWeapon1() return gunpod end
+function script.AimFromWeapon()
+	return gunpod
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	Turn(pivot, y_axis, heading, pivotSpeed)
@@ -94,7 +98,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.Shot1()
+function script.Shot()
 	EmitSfx (gunpod, 1025)
 	EmitSfx (flare, 1024)
 end

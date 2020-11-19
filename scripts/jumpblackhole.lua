@@ -136,11 +136,15 @@ local function RestoreAfterDelay()
 	Turn(rshoulder, z_axis, 0, 3)
 end
 
-function script.QueryWeapon1() return flare end
+function script.QueryWeapon()
+	return flare
+end
 
-function script.AimFromWeapon1() return chest end
+function script.AimFromWeapon()
+	return chest
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
@@ -166,7 +170,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	EmitSfx(flare, 1025)
 end
 

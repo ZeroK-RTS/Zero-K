@@ -263,11 +263,11 @@ end
 
 
 local function missilelaunch()
-		Hide (lmissiles)
-		Hide (rmissiles)
-		Sleep(30000)
-		Show (lmissiles)
-		Show (rmissiles)
+	Hide (lmissiles)
+	Hide (rmissiles)
+	Sleep(30000)
+	Show (lmissiles)
+	Show (rmissiles)
 end
 
 local function armrecoil()
@@ -311,6 +311,7 @@ function script.QueryWeapon(num)
 			return rmissiles
 		end
 	end
+	return headflare
 end
 
 function script.AimFromWeapon(num)
@@ -319,6 +320,7 @@ function script.AimFromWeapon(num)
 	elseif num == 2 then
 		return torso
 	end
+	return headflare
 end
 
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
@@ -361,7 +363,7 @@ function script.AimWeapon(num, heading, pitch)
 	elseif num == 3 then
 		return true
 	end
-	return false
+	return true
 end
 
 
