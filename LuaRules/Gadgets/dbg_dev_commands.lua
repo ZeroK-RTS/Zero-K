@@ -815,6 +815,8 @@ local function nocost(cmd,line,words,player)
 	local enabled = not (tonumber(words[1]) == 0)
 	GG.SetFreeMorph(enabled)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
+	GG.Terraform.SetFreeTerraform(enabled)
+	Spring.Echo("Free terraform " .. ((enabled and "enabled") or "disabled") .. ".")
 end
 
 local function EmpiricalDps(cmd,line,words,player)

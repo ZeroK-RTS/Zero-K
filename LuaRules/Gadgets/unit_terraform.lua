@@ -246,6 +246,7 @@ local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because 
 local workaround_recursion_in_cmd_fallback = {}
 local workaround_recursion_in_cmd_fallback_needed = false
 
+local freeTerraform = false
 local debugMode = false
 local debugModeUnitID
 
@@ -3239,7 +3240,7 @@ function gadget:GameFrame(n)
 		nextUpdateCheck = n + updatePeriod
 	end
 	
-	DoTerraformUpdate(n)
+	DoTerraformUpdate(n, freeTerraform)
 	
 	--check constrcutors that are repairing terraform blocks
 	
@@ -3964,6 +3965,10 @@ function TerraformFunctions.SetStructureHeight(unitID, height)
 	if structure[unitID] then
 		structure[unitID].h = height
 	end
+end
+
+function TerraformFunctions.SetFreeTerraform(newFreeTerraform)
+	freeTerraform = newFreeTerraform
 end
 
 function gadget:Initialize()
