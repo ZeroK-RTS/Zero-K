@@ -290,6 +290,7 @@ return { striderdetriment = {
         smoothmult   = [[0.7]],
         smoothexponent = [[0.8]],
         smoothheightoffset = [[22]],
+        -- no `movestructures` because then they can "dodge" via sudden movement
       },
       
       damage                  = {
