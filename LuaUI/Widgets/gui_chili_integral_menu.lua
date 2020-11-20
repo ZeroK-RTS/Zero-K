@@ -1374,14 +1374,14 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+		local state = isStateCommand and (((WG.GetOverriddenState and WG.GetOverriddenState(newCmdID)) or command.params[1]) + 1)
 		if cmdID == newCmdID then
 			if isStateCommand then
-				local state = command.params[1] + 1
 				local displayConfig = GetDisplayConfig(cmdID)
 				if displayConfig then
 					local texture = displayConfig.texture[state]
 					if displayConfig.stateTooltip then
-						button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+						button.tooltip = GetButtonTooltip(displayConfig, command, state)
 					end
 					SetImage(texture)
 				end
@@ -1417,7 +1417,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		end
 		
 		local displayConfig = GetDisplayConfig(cmdID)
-		button.tooltip = GetButtonTooltip(displayConfig, command, isStateCommand and (command.params[1] + 1))
+		button.tooltip = GetButtonTooltip(displayConfig, command, state)
 		
 		if command.action then
 			local hotkey = GetHotkeyText(command.action)
@@ -1434,7 +1434,6 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		
 		if isStateCommand then
 			if displayConfig then
-				local state = command.params[1] + 1
 				local texture = displayConfig.texture[state]
 				SetImage(texture)
 			else
