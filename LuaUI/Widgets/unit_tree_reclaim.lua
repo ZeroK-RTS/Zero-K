@@ -45,6 +45,9 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			cmdOptions.ctrl = true
 			cmdOptions.coded = cmdOptions.coded + CMD.OPT_CTRL
 		end
+		if WG.noises.PlayResponse then
+			WG.noises.PlayResponse(false, CMD.RECLAIM)
+		end
 		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	else
 		if not cmdOptions.ctrl then
@@ -53,6 +56,9 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		else
 			cmdOptions.ctrl = false
 			cmdOptions.coded = cmdOptions.coded - CMD.OPT_CTRL
+		end
+		if WG.noises.PlayResponse then
+			WG.noises.PlayResponse(false, CMD.RECLAIM)
 		end
 		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	end

@@ -189,7 +189,11 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 	end
 end
 
-local function PlayResponse(unitID, cmdID, cooldown)
+local function PlayResponse(unitID, cmdID)
+	unitID = unitID or GetSelectedUnits()[1]
+	if not unitID then
+		return false
+	end
 	local unitDefID = GetUnitDefID(unitID)
 	if not unitDefID then
 		return false
