@@ -19,6 +19,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
@@ -553,6 +554,7 @@ local function addUnit(defName, path)
 		Spring.Echo("Initial States invalid unit " .. defName)
 		return
 	end
+	local unitDefID = ud.id
 
 	options[defName .. "_label"] = {
 		name = "label",
@@ -631,7 +633,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_repeat"
 	end
 	
-	if factoryDefs[ud.id] then
+	if factoryDefs[unitDefID] then
 		options[defName .. "_auto_assist"] = {
 			name = "  Auto Assist",
 			desc = "Newly built constructors assist the factory",
@@ -777,7 +779,7 @@ local function addUnit(defName, path)
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
 		type = 'number',
-		value = defaultSelectionRank[ud.id] or 3,
+		value = defaultSelectionRank[unitDefID] or 3,
 		min = 0,
 		max = 3,
 		step = 1,
@@ -808,15 +810,26 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
 	end
 
-	if dontFireAtRadarUnits[ud.id] ~= nil then
+	if dontFireAtRadarUnits[unitDefID] ~= nil then
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
 			desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
 			type = 'bool',
-			value = dontFireAtRadarUnits[ud.id],
+			value = dontFireAtRadarUnits[unitDefID],
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_fire_at_radar"
+	end
+
+	if overkillPrevention[unitDefID] or overkillPreventionBlackHole[unitDefID] then
+		options[defName .. "_overkill_prevention"] = {
+			name = "  Overkill Prevention",
+			desc = "Check box to make these units avoid firing at targets that are already likely to die due to incoming fire.",
+			type = 'bool',
+			value = true,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_overkill_prevention"
 	end
 
 	if ud.canCloak then
@@ -831,7 +844,7 @@ local function addUnit(defName, path)
 	end
 
 	if ud.onOffable then
-		if impulseUnitDefID[ud.id] then
+		if impulseUnitDefID[unitDefID] then
 			options[defName .. "_impulseMode"] = {
 				name = "  Gravity Gun Push/Pull",
 				desc = "Check box to default to Push.",
@@ -1222,6 +1235,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
+		QueueState(name, "overkill_prevention", CMD_PREVENT_OVERKILL, orderArray)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)

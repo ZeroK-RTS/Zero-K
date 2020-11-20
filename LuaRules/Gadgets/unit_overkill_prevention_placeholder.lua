@@ -63,13 +63,7 @@ for i = 1, #UnitDefs do
 	shotRequirement[i] = shots
 end
 
-local HandledUnitDefIDs = {
-	[UnitDefNames["jumpblackhole"].id] = true,
-}
-
-local HandledWeaponDefIDs = {
-	[WeaponDefNames["jumpblackhole_black_hole"].id] = true,
-}
+local _, handledUnitDefIDs, handledWeaponDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local canHandleUnit = {}
 local units = {}
@@ -169,7 +163,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
-	if not HandledWeaponDefIDs[weaponDefID] then
+	if not handledWeaponDefIDs[weaponDefID] then
 		return
 	end
 	
@@ -301,7 +295,7 @@ end
 -- Unit Handling
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if HandledUnitDefIDs[unitDefID] then
+	if handledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
 		PreventOverkillToggleCommand(unitID, {1})
@@ -325,7 +319,7 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
-	for w,_ in pairs(HandledWeaponDefIDs) do
+	for w,_ in pairs(handledWeaponDefIDs) do
 		Script.SetWatchProjectile(w, true)
 	end
 end

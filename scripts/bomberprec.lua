@@ -301,7 +301,7 @@ function script.BlockShot(num, targetID)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
 	local isMobile = not GG.IsUnitIdentifiedStructure(true, targetID)
-	local damage = (isMobile and 400.05) or 800.1
+	local damage = (isMobile and 500.05) or 750.1
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
