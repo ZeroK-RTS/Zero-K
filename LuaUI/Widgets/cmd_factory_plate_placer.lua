@@ -224,13 +224,17 @@ function widget:Update()
 		if parentOfPlate[unitDefID] then
 			currentFactoryDefID = unitDefID
 			currentPlateDefID = parentOfPlate[unitDefID]
-			CheckTransformFactoryIntoPlate(unitDefID)
+			if not CheckTransformFactoryIntoPlate(unitDefID) then
+				closestFactoryData = false
+			end
 			return
 		end
 		if childOfFactory[unitDefID] then
 			currentFactoryDefID = childOfFactory[unitDefID]
 			currentPlateDefID = unitDefID
-			CheckTransformPlateIntoFactory(unitDefID)
+			if not CheckTransformPlateIntoFactory(unitDefID) then
+				closestFactoryData = false
+			end
 			return
 		end
 	end
