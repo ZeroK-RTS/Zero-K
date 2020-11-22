@@ -123,6 +123,7 @@ local applicationShader
 
 local blurShaderHalfKernal = 6
 local strengthMult = 1
+local cacheIndex   = 1
 local weightsCache = {}
 local offsetsCache = {}
 
@@ -154,7 +155,7 @@ local function GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, valMult)
 end
 
 --see http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-local function GetGaussLinearWeightsOffsets(sigma, cacheIndex, kernelHalfSize, valMult)
+local function GetGaussLinearWeightsOffsets(sigma, kernelHalfSize, valMult)
 	if weightsCache[cacheIndex] then
 		return weightsCache[cacheIndex], offsetsCache[cacheIndex]
 	end
@@ -176,7 +177,7 @@ local function GetGaussLinearWeightsOffsets(sigma, cacheIndex, kernelHalfSize, v
 end
 
 local function SetThickness()
-	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, math.floor(strengthMult*WEIGHT_CACHE_FIDELITY), blurShaderHalfKernal, strengthMult*OUTLINE_STRENGTH)
+	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, blurShaderHalfKernal, strengthMult*OUTLINE_STRENGTH)
 	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("weights", gaussWeights)
 	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("offsets", gaussOffsets)
 end
@@ -237,6 +238,7 @@ local function GetZoomScale()
 	return scaleFactor
 end
 
+local oldCacheIndex = false
 local function UpdateThicknessWithZoomScale()
 	strengthMult = configStrengthMult*GetZoomScale()*STRENGTH_MAGIC_NUMBER
 	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
@@ -247,7 +249,12 @@ local function UpdateThicknessWithZoomScale()
 		gaussianBlurShader[blurShaderHalfKernal] = GetGaussianBlurShader(blurShaderHalfKernal)
 	end
 	
-	--Spring.Echo("strengthMult", strengthMult, blurShaderHalfKernal)
+	local cacheIndex = math.floor(strengthMult*WEIGHT_CACHE_FIDELITY)
+	if cacheIndex ~= oldCacheIndex then
+		oldCacheIndex = cacheIndex
+		return true
+	end
+	return false
 end
 
 -----------------------------------------------------------------
@@ -463,7 +470,8 @@ local function EnterLeaveScreenSpace(functionName, ...)
 end
 
 function widget:DrawWorld()
-	UpdateThicknessWithZoomScale()
-	gaussianBlurShader[blurShaderHalfKernal]:ActivateWith(SetThickness)
+	if UpdateThicknessWithZoomScale() then
+		gaussianBlurShader[blurShaderHalfKernal]:ActivateWith(SetThickness)
+	end
 	EnterLeaveScreenSpace(DoDrawOutline, false)
 end
