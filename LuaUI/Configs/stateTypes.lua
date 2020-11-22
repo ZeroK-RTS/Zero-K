@@ -22,7 +22,7 @@ local stateData = {
 	[CMD.TRAJECTORY] = 2,
 	[CMD_DISABLE_ATTACK] = 2,
 	[CMD_UNIT_BOMBER_DIVE_STATE] = 4,
-	[CMD_AUTO_CALL_TRANSPORT] = 2,
+	--[CMD_AUTO_CALL_TRANSPORT] = 2, -- Handled entirely in luaUI so not included here.
 	[CMD_GLOBAL_BUILD] = 2,
 	[CMD_UNIT_KILL_SUBORDINATES] = 2,
 	[CMD_PREVENT_OVERKILL] = 2,
@@ -41,4 +41,11 @@ local specialHandling = {
 	end,
 }
 
-return stateData, specialHandling
+local gadgetReverse = {
+	[CMD_PRIORITY] = true,
+	[CMD_UNIT_FLOAT_STATE] = true,
+	[CMD_MISC_PRIORITY] = true,
+	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+}
+
+return stateData, gadgetReverse, specialHandling

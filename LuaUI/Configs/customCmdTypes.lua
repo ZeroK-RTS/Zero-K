@@ -1,6 +1,9 @@
 -- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)
 -- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
 -- This table is used in Epicmenu for hotkey management.
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 local custom_cmd_actions = {
 	-- cmdTypes are:
 	-- 1: Targeted commands (eg attack)
@@ -31,14 +34,14 @@ local custom_cmd_actions = {
 	rawmove = {cmdType = 1, name = "Move"},
 
 	-- states
-	wantonoff = {cmdType = 2, name = "On/Off", states = {'Off', 'On'}},
-	['repeat'] = {cmdType = 2, name = "Repeat", states = {'Off', 'On'}},
-	wantcloak = {cmdType = 2, name = "Cloak", states = {'Off', 'On'}},
-	movestate = {cmdType = 2, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
-	firestate = {cmdType = 2, name = "Fire State", states = {'Hold Fire', 'Return Fire', 'Fire At Will'}},
-	idlemode = {cmdType = 2, name = "Air Idle State", states = {'Land', 'Fly'}},
+	wantonoff =       {cmdType = 2, cmdID = CMD_WANT_ONOFF, name = "On/Off", states = {'Off', 'On'}},
+	['repeat'] =      {cmdType = 2, cmdID = CMD.REPEAT, name = "Repeat", states = {'Off', 'On'}},
+	wantcloak =       {cmdType = 2, cmdID = CMD_WANT_CLOAK, name = "Cloak", states = {'Off', 'On'}},
+	movestate =       {cmdType = 2, cmdID = CMD.MOVE_STATE, name = "Move State", states = {'Hold Position', 'Maneuver', 'Roam'}},
+	firestate =       {cmdType = 2, cmdID = CMD.FIRE_STATE, name = "Fire State", states = {'Hold Fire', 'Return Fire', 'Fire At Will'}},
+	idlemode =        {cmdType = 2, cmdID = CMD.IDLEMODE, name = "Air Idle State", states = {'Land', 'Fly'}},
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
-	preventoverkill = {cmdType = 2, name = "Prevent Overkill", states = {'Off', 'On'}},
+	preventoverkill = {cmdType = 2, cmdID = CMD_PREVENT_OVERKILL, name = "Prevent Overkill", states = {'Off', 'On'}},
 
 
 	--CUSTOM COMMANDS
@@ -88,28 +91,28 @@ local custom_cmd_actions = {
 
 	--states
 --	stealth = {cmdType = 2, name = "stealth"}, --no longer applicable
-	cloak_shield = {cmdType = 2, name = "Area Cloaker", states = {'Off', 'On'}},
-	retreat = {cmdType = 2, name = "Retreat Threshold", states = {'Off', '30%', '65%', '99%'}, actionOverride = {'cancelretreat'}},
+	cloak_shield =      {cmdType = 2, cmdID = CMD_CLOAK_SHIELD, name = "Area Cloaker", states = {'Off', 'On'}},
+	retreat =           {cmdType = 2, cmdID = CMD_RETREAT, name = "Retreat Threshold", states = {'Off', '30%', '65%', '99%'}, actionOverride = {'cancelretreat'}},
 	['luaui noretreat'] = {cmdType = 2, name = "luaui noretreat"},
-	priority = {cmdType = 2, name = "Construction Priority", states = {'Low', 'Normal', 'High'}},
-	miscpriority = {cmdType = 2, name = "Misc. Priority", states = {'Low', 'Normal', 'High'}},
-	ap_fly_state = {cmdType = 2, name = "Air Idle State", states = {'Land', 'Fly'}},
+	priority =          {cmdType = 2, cmdID = CMD_PRIORITY, name = "Construction Priority", states = {'Low', 'Normal', 'High'}},
+	miscpriority =      {cmdType = 2, cmdID = CMD_MISC_PRIORITY, name = "Misc. Priority", states = {'Low', 'Normal', 'High'}},
+	ap_fly_state =      {cmdType = 2, cmdID = CMD_AP_FLY_STATE, name = "Air Idle State", states = {'Land', 'Fly'}},
 	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair", states = {'Off', '30%', '50%', '80%'}},
-	floatstate = {cmdType = 2, name = "Float State", states = {'Sink', 'When Shooting', 'Float'}},
-	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", states = {'Off', 'On'}},
-	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
-	unitai = {cmdType = 2, name = "Unit AI", states = {'Off', 'On'}},
-	selection_rank = {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
+	floatstate =        {cmdType = 2, name = "Float State", states = {'Sink', 'When Shooting', 'Float'}},
+	dontfireatradar =   {cmdType = 2, cmdID = CMD_DONT_FIRE_AT_RADAR, name = "Firing at Radar Dots", states = {'Off', 'On'}},
+	antinukezone =      {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
+	unitai =            {cmdType = 2, cmdID = CMD_UNIT_AI, name = "Unit AI", states = {'Off', 'On'}},
+	selection_rank =    {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
-	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Kill", states = {'Off', 'On'}},
-	goostate = {cmdType = 2, name = "Goo State", states = {'Off', 'When uncloaked', 'On'}},
-	disableattack = {cmdType = 2, name = "Allow Attack", states = {'Allowed', 'Blocked'}},
-	pushpull = {cmdType = 2, name = "Impulse Mode", states = {'Pull', 'Push'}},
-	autoassist = {cmdType = 2, name = "Factory Auto Assist", states = {'Off', 'On'}},
-	airstrafe = {cmdType = 2, name = "Gunship Strafe", states = {'Off', 'On'}},
-	divestate = {cmdType = 2, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
-	globalbuild = {cmdType = 2, name = "Constructor Global AI", states = {'Off', 'On'}},
-	toggledrones = {cmdType = 2, name = "Drone Construction.", states = {'Off', 'On'}},
+	unit_kill_subordinates = {cmdType = 2, cmdID = CMD_UNIT_KILL_SUBORDINATES, name = "Dominatrix Kill", states = {'Off', 'On'}},
+	goostate =     {cmdType = 2, cmdID = CMD_GOO_GATHER, name = "Goo State", states = {'Off', 'When uncloaked', 'On'}},
+	disableattack = {cmdType = 2, cmdID = CMD_DISABLE_ATTACK, name = "Allow Attack", states = {'Allowed', 'Blocked'}},
+	pushpull =      {cmdType = 2, cmdID = CMD_PUSH_PULL, name = "Impulse Mode", states = {'Pull', 'Push'}},
+	autoassist =    {cmdType = 2, cmdID = CMD_FACTORY_GUARD, name = "Factory Auto Assist", states = {'Off', 'On'}},
+	airstrafe =     {cmdType = 2, cmdID = CMD_AIR_STRAFE, name = "Gunship Strafe", states = {'Off', 'On'}},
+	divestate =     {cmdType = 2, cmdID = CMD_UNIT_BOMBER_DIVE_STATE, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
+	globalbuild =   {cmdType = 2, cmdID = CMD_GLOBAL_BUILD, name = "Constructor Global AI", states = {'Off', 'On'}},
+	toggledrones =  {cmdType = 2, cmdID = CMD_TOGGLE_DRONES, name = "Drone Construction.", states = {'Off', 'On'}},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -216,6 +219,8 @@ for name, data in pairs(custom_cmd_actions) do
 			fullCustomCmdActions[cmdName] = {
 				cmdType = data.cmdType,
 				name = data.name .. ": set " .. data.states[i],
+				setValue = (i - 1),
+				cmdID = data.cmdID,
 			}
 		end
 		data.name = data.name .. ": toggle"

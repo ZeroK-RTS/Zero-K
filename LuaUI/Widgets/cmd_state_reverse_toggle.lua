@@ -20,11 +20,21 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
 
+local STANDARD_OPTS = {
+	alt = false,
+	ctrl = false,
+	internal = false,
+	coded = 0,
+	right = false,
+	meta = false,
+	shift = false,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Configuration
 
-local stateTypes, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua")
+local stateTypes, gadgetReverse, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua")
 
 local PING_UPDATE_RATE = 0.5
 local PING_MEMORY = 4
@@ -84,44 +94,65 @@ local function GetOverriddenState(cmdID)
 	return overriddenStates[cmdID]
 end
 
+local function HandleCommand(cmdID, params, options, nonToggle)
+	if not (stateTypes[cmdID] and params and params[1]) then
+		return
+	end
+	--Spring.Utilities.TableEcho(params, "params")
+	--Spring.Utilities.TableEcho(options, "options")
+	--Spring.Echo("overrideState", currentTime, overriddenStateExpiry[cmdID], currentOverrideTime, GetOverriddenState(cmdID))
+	
+	local overrideState = GetOverriddenState(cmdID)
+	overriddenStateExpiry[cmdID] = currentTime + currentOverrideTime
+	if not nonToggle then
+		if not overrideState then
+			-- Note that params[1] is the desired state
+			if specialHandling[cmdID] then
+				params[1] = specialHandling[cmdID]((params[1])%stateTypes[cmdID], options)
+			elseif gadgetReverse[cmdID] and options.right then
+				params[1] = (params[1] - 2)%stateTypes[cmdID]
+				options.right = false
+			end
+		elseif specialHandling[cmdID] then
+			params[1] = specialHandling[cmdID]((overriddenStates[cmdID] + 1)%stateTypes[cmdID], options)
+		elseif gadgetReverse[cmdID] and options.right then
+			params[1] = (overriddenStates[cmdID] - 1)%stateTypes[cmdID]
+			options.right = false
+		else
+			params[1] = (overriddenStates[cmdID] + 1)%stateTypes[cmdID]
+		end
+	
+		if (WG.RemoveReturnFireState and cmdID == CMD_FIRE_STATE) or (WG.RemoveRoamState and cmdID == CMD_MOVE_STATE) then
+			local state = params[1]
+			if state == removableStates[cmdID] then
+				ReverseToggle(cmdID, state)
+				return true
+			end
+		elseif multiStates[cmdID] then
+			if options.right then
+				ReverseToggle(cmdID, params[1])
+				return true
+			end
+		end
+	end
+	
+	overriddenStates[cmdID] = params[1]
+	Spring.GiveOrder(cmdID, params, options)
+	return true
+end
+
+local function SetStateToggle(cmdID, value)
+	HandleCommand(cmdID, {value}, STANDARD_OPTS, true)
+	if WG.IntegralMenu then
+		WG.IntegralMenu.UpdateCommands()
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:CommandNotify(cmdID, params, options)
-	if not stateTypes[cmdID] then
-		return
-	end
-	--Spring.Echo("overrideState", currentTime, overriddenStateExpiry[cmdID], currentOverrideTime)
-	
-	local overrideState = GetOverriddenState(cmdID)
-	overriddenStateExpiry[cmdID] = currentTime + currentOverrideTime
-	if not overrideState then
-		-- Note that params[1] is the desired state
-		if specialHandling[cmdID] then
-			params[1] = specialHandling[cmdID]((params[1])%stateTypes[cmdID], options)
-		end
-	elseif specialHandling[cmdID] then
-		params[1] = specialHandling[cmdID]((overriddenStates[cmdID] + 1)%stateTypes[cmdID], options)
-	else
-		params[1] = (overriddenStates[cmdID] + 1)%stateTypes[cmdID]
-	end
-	
-	if (WG.RemoveReturnFireState and cmdID == CMD_FIRE_STATE) or (WG.RemoveRoamState and cmdID == CMD_MOVE_STATE) then
-		local state = params[1]
-		if state == removableStates[cmdID] then
-			ReverseToggle(cmdID, state)
-			return true
-		end
-	elseif multiStates[cmdID] then
-		if options.right then
-			ReverseToggle(cmdID, params[1])
-			return true
-		end
-	end
-	
-	Spring.GiveOrder(cmdID, params, options)
-	overriddenStates[cmdID] = params[1]
-	return true
+	return HandleCommand(cmdID, params, options)
 end
 
 --------------------------------------------------------------------------------
@@ -152,12 +183,22 @@ function widget:Update(dt)
 	end
 end
 
+function widget:SelectionChanged(selection, subselection)
+	if subselection then
+		return
+	end
+	-- Remove cache on new selection
+	overriddenStateExpiry = {}
+end
+
 function widget:Initialize()
 	WG.GetOverriddenState = GetOverriddenState
+	WG.SetStateToggle = SetStateToggle
 end
 
 function widget:Shutdown()
 	WG.GetOverriddenState = nil
+	WG.SetStateToggle = nil
 end
 
 --------------------------------------------------------------------------------

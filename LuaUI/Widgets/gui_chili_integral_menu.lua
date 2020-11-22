@@ -2410,6 +2410,7 @@ options.fancySkinning.OnChange = UpdateBackgroundSkin
 -- External functions
 
 local externalFunctions = {} -- Appear unused in repo but are used by missions.
+local initialized = false
 
 function externalFunctions.GetCommandButtonPosition(cmdID)
 	if not buttonsByCommand[cmdID] then
@@ -2434,11 +2435,19 @@ function externalFunctions.GetTabPosition(tabName)
 	return false
 end
 
+function externalFunctions.UpdateCommands()
+	if not initialized then
+		return
+	end
+
+	local commands = widgetHandler.commands
+	local customCommands = widgetHandler.customCommands
+	ProcessAllCommands(commands, customCommands)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Interface
-
-local initialized = false
 
 function widget:Update()
 	local _,cmdID = Spring.GetActiveCommand()
@@ -2492,13 +2501,7 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:CommandsChanged()
-	if not initialized then
-		return
-	end
-
-	local commands = widgetHandler.commands
-	local customCommands = widgetHandler.customCommands
-	ProcessAllCommands(commands, customCommands)
+	externalFunctions.UpdateCommands()
 end
 
 function widget:GameFrame(n)
