@@ -46,12 +46,14 @@ if (not gl.CreateShader) then
 end
 
 -----------------------------------------------------------------
--- File path Constants
+-- Constants
 -----------------------------------------------------------------
 
 local MATERIALS_DIR = "ModelMaterials/"
 local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
 local DEFAULT_VERSION = "#version 150 compatibility"
+
+local USE_OBJECT_DAMAGE = false
 
 -----------------------------------------------------------------
 -- Includes and classes loading
@@ -993,6 +995,11 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("reloadcus", ReloadCUS)
 	gadgetHandler:AddChatAction("disablecus", DisableCUS)
 	gadgetHandler:AddChatAction("cusdisable", DisableCUS)
+	
+	if not USE_OBJECT_DAMAGE then
+		gadgetHandler:RemoveCallIn("UnitDamaged")
+		gadgetHandler:RemoveCallIn("FeatureDamages")
+	end
 end
 
 function gadget:Shutdown()
