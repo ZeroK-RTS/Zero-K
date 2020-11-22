@@ -28,7 +28,7 @@ local stateTypes, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateT
 
 local PING_UPDATE_RATE = 0.5
 local PING_MEMORY = 4
-local OVERRIDE_PADDING = 0.07
+local OVERRIDE_PADDING = 0.1
 
 local removableStates = {
 	[CMD_FIRE_STATE] = 1,
@@ -78,7 +78,7 @@ local function GetOverriddenState(cmdID)
 		return
 	end
 	if overriddenStateExpiry[cmdID] < currentTime then
-		overriddenStateExpiry[cmdID] = nil
+		overriddenStateExpiry[cmdID] = false
 		return
 	end
 	return overriddenStates[cmdID]
@@ -91,13 +91,16 @@ function widget:CommandNotify(cmdID, params, options)
 	if not stateTypes[cmdID] then
 		return
 	end
-	overriddenStateExpiry[cmdID] = currentTime + currentOverrideTime
+	--Spring.Echo("overrideState", currentTime, overriddenStateExpiry[cmdID], currentOverrideTime)
 	
 	local overrideState = GetOverriddenState(cmdID)
+	overriddenStateExpiry[cmdID] = currentTime + currentOverrideTime
 	if not overrideState then
-		overriddenStates[cmdID] = params[1]
-	end
-	if specialHandling[cmdID] then
+		-- Note that params[1] is the desired state
+		if specialHandling[cmdID] then
+			params[1] = specialHandling[cmdID]((params[1])%stateTypes[cmdID], options)
+		end
+	elseif specialHandling[cmdID] then
 		params[1] = specialHandling[cmdID]((overriddenStates[cmdID] + 1)%stateTypes[cmdID], options)
 	else
 		params[1] = (overriddenStates[cmdID] + 1)%stateTypes[cmdID]
@@ -136,6 +139,7 @@ local function UpdatePing()
 		end
 	end
 	currentOverrideTime = currentPing + OVERRIDE_PADDING
+	--Spring.Echo("currentPing", pingTime, currentPing)
 end
 
 local pingUpdateTimer = 0
