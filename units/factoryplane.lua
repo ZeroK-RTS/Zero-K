@@ -29,6 +29,9 @@ return { factoryplane = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[FLOAT UNARMED]],
+  collisionVolumeOffsets        = [[0 -10 -25]],
+  collisionVolumeScales         = [[110 60 0]],
+  collisionVolumeType           = [[cylX]]
   corpse                        = [[DEAD]],
 
   customParams                  = {
