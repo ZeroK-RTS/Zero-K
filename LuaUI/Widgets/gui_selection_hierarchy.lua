@@ -375,6 +375,9 @@ function widget:CommandNotify(id, params, options)
 	for i = 1, #selectedUnits do
 		selectionRank[selectedUnits[i]] = newRank
 	end
+	if WG.noises and selectedUnits[1] then
+		WG.noises.PlayResponse(selectedUnits[1], CMD_SELECTION_RANK)
+	end
 	return true
 end
 
