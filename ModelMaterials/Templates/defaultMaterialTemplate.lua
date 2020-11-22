@@ -57,9 +57,6 @@ vertex = [[
 		// main light vector(s)
 		vec3 worldCameraDir;
 
-		// main textureCoord
-		vec2 modelUV;
-
 		// shadowPosition
 		vec4 shadowVertexPos;
 
@@ -122,15 +119,15 @@ vertex = [[
 		vec4 modelVertexPos = gl_Vertex;
 		vec3 modelVertexNormal = gl_Normal;
 
-		modelUV = gl_MultiTexCoord0.xy;
+		gl_TexCoord[0] = gl_MultiTexCoord0;
 
 		if (BITMASK_FIELD(bitOptions, OPTION_MOVING_THREADS)) {
 			const vec4 treadBoundaries = vec4(0.6279296875, 0.74951171875, 0.5702890625, 0.6220703125);
 
 			if ( all(bvec4(
-					greaterThanEqual(modelUV, treadBoundaries.xz),
-					lessThanEqual(modelUV, treadBoundaries.yw)))) {
-				modelUV.x += floatOptions[0];
+					greaterThanEqual(gl_TexCoord[0].xy, treadBoundaries.xz),
+					lessThanEqual(gl_TexCoord[0].xy, treadBoundaries.yw)))) {
+				gl_TexCoord[0].x += floatOptions[0];
 			}
 		}
 
@@ -166,7 +163,7 @@ vertex = [[
 			}
 
 			if (BITMASK_FIELD(bitOptions, OPTION_VERTEX_AO)) {
-				aoTerm = clamp(1.0 * fract(modelUV.x * 16384.0), 0.1, 1.0);
+				aoTerm = clamp(1.0 * fract(gl_TexCoord[0].x * 16384.0), 0.1, 1.0);
 			} else {
 				aoTerm = 1.0;
 			}
@@ -332,9 +329,6 @@ fragment = [[
 
 		// main light vector(s)
 		vec3 worldCameraDir;
-
-		// main textureCoord
-		vec2 modelUV;
 
 		// shadowPosition
 		vec4 shadowVertexPos;
@@ -540,7 +534,7 @@ fragment = [[
 	void main(void){
 		#line 30540
 
-		vec2 myUV = modelUV;
+		vec2 myUV = gl_TexCoord[0].xy;
 
 		if (BITMASK_FIELD(bitOptions, OPTION_NORMALMAP_FLIP)) {
 			myUV.y = 1.0 - myUV.y;
@@ -670,12 +664,15 @@ fragment = [[
 		#endif
 	}
 #else //shadow pass
+	// unused due to AMD shadow bug
+	/*
 	void main(void){
-		vec4 texColor2 = texture(texture2, modelUV);
+		vec4 texColor2 = texture(texture2, gl_TexCoord[0].xy);
 		if (texColor2.a < 0.5)
 			discard;
 
 	}
+	*/
 #endif
 ]],
 	uniformInt = {

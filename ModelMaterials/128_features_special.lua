@@ -42,41 +42,40 @@ local GL_FLOAT = 0x1406
 local mhArray = {[1] = 0.0}
 local metalInfo = {}
 local abs = math.abs
-local function GameFrameSlow(gf, mat, isDeferred)
-	local highlightActive
-	if isDeferred then
-		highlightActive = mat.deferredOptions.metal_highlight
-	else
-		highlightActive = mat.shaderOptions.metal_highlight
+local function GameFrameSlow(gf, mat)
+	if not mat.hasStandardShader then
+		return
 	end
 
-	if highlightActive then
-		local fs = Spring.GetAllFeatures()
-		--local fs = Spring.GetVisibleFeatures(-1, 30, false)
-		for _, fID in ipairs(fs) do
-			local metalHere = Spring.GetFeatureResources(fID)
+	if not mat.shaderOptions.metal_highlight then
+		return
+	end
 
-			--only update when metalHere has changed or object has never been seen before
-			if not metalInfo[fID] or abs(metalInfo[fID] - metalHere) > 1.0 then
-				metalInfo[fID] = metalHere
-				mhArray[1] = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
-				
-				if not (frSetMaterialUniform and frSetMaterialUniform[isDeferred]) then
-					if not sentError then
-						sentError = true
-						Spring.Echo("LUA_ERRRUN", "ModelMaterials/128_features_special.lua", "GameFrameSlow")
-						Spring.Echo("frSetMaterialUniform", frSetMaterialUniform)
-						Spring.Echo("isDeferred", isDeferred)
-						Spring.Echo("fID", fID)
-						local fx, fy, fz = Spring.GetFeaturePosition(fID)
-						Spring.Echo("fx, fy, fz", fx, fy, fz)
-					end
-					return
+	local fs = Spring.GetAllFeatures()
+	--local fs = Spring.GetVisibleFeatures(-1, 30, false)
+	for _, fID in ipairs(fs) do
+		local metalHere = Spring.GetFeatureResources(fID)
+
+		--only update when metalHere has changed or object has never been seen before
+		if not metalInfo[fID] or abs(metalInfo[fID] - metalHere) > 1.0 then
+			metalInfo[fID] = metalHere
+			mhArray[1] = ((metalHere >= metalWreckTreshold) and metalHere) or 0.0
+
+			if not (frSetMaterialUniform and frSetMaterialUniform[false]) then
+				if not sentError then
+					sentError = true
+					Spring.Echo("LUA_ERRRUN", "ModelMaterials/128_features_special.lua", "GameFrameSlow")
+					Spring.Echo("frSetMaterialUniform", frSetMaterialUniform)
+					Spring.Echo("fID", fID)
+					local fx, fy, fz = Spring.GetFeaturePosition(fID)
+					Spring.Echo("fx, fy, fz", fx, fy, fz)
 				end
-				frSetMaterialUniform[isDeferred](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, mhArray)
+				return
 			end
 
+			frSetMaterialUniform[false](fID, "opaque", 3, "floatOptions[1]", GL_FLOAT, mhArray)
 		end
+
 	end
 end
 
