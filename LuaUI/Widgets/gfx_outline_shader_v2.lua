@@ -367,7 +367,9 @@ function widget:Shutdown()
 
 	shapeShader:Finalize()
 	for i = BLUR_HALF_KERNEL_SIZE_MIN, BLUR_HALF_KERNEL_SIZE_MAX do
-		gaussianBlurShader[i]:Finalize()
+		if gaussianBlurShader[i] then
+			gaussianBlurShader[i]:Finalize()
+		end
 	end
 	applicationShader:Finalize()
 end
