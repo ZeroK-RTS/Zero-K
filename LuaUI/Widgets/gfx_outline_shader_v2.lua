@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author    = "ivand",
 		date      = "2019",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge,
+		layer     = 0,
 		enabled   = false  --  loaded by default?
 	}
 end
@@ -21,15 +21,74 @@ local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 -- Configuration Constants
 -----------------------------------------------------------------
 
-local BLUR_HALF_KERNEL_SIZE = 3 -- (BLUR_HALF_KERNEL_SIZE + BLUR_HALF_KERNEL_SIZE + 1) samples are used to perform the blur.
 local BLUR_PASSES = 2 -- number of blur passes
 local BLUR_SIGMA = 1
 
+local BLUR_HALF_KERNEL_SIZE_MIN = 3
+local BLUR_HALF_KERNEL_SIZE_MAX = 8
+
+local STRENGTH_MULT_MIN = 0.1
+local STRENGTH_MULT_MAX = 10
+
 local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
-local OUTLINE_STRENGTH = 2.5 -- make it much smaller for softer edges
+local OUTLINE_STRENGTH = 6 -- make it much smaller for softer edges
 
 local USE_MATERIAL_INDICES = true
 
+local DEFAULT_STRENGTH_MULT = 0.5
+
+local SUBTLE_MIN = 300
+local SUBTLE_MAX = 3000
+
+local WEIGHT_CACHE_FIDELITY = 60
+
+-----------------------------------------------------------------
+-- Configuration
+-----------------------------------------------------------------
+
+local configStrengthMult = DEFAULT_STRENGTH_MULT
+local scaleWithHeight = true
+local functionScaleWithHeight = true
+
+options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options = {
+	thickness = {
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 0.2, max = 2, step = 0.01,
+		value = DEFAULT_STRENGTH_MULT,
+		OnChange = function (self)
+			configStrengthMult = self.value
+		end,
+	},
+	scaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			scaleWithHeight = self.value
+			if not scaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Subtle Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+			if not functionScaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+}
 
 -----------------------------------------------------------------
 -- File path Constants
@@ -49,7 +108,6 @@ local firstTime
 local screenQuadList
 local screenWideList
 
-
 local shapeTex
 local blurTexes = {}
 
@@ -57,9 +115,13 @@ local shapeFBO
 local blurFBOs = {}
 
 local shapeShader
-local gaussianBlurShader
+local gaussianBlurShader = {}
 local applicationShader
 
+local blurShaderHalfKernal = 6
+local strengthMult = 1
+local weightsCache = {}
+local offsetsCache = {}
 
 -----------------------------------------------------------------
 -- Local Functions
@@ -89,7 +151,11 @@ local function GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, valMult)
 end
 
 --see http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
-local function GetGaussLinearWeightsOffsets(sigma, kernelHalfSize, valMult)
+local function GetGaussLinearWeightsOffsets(sigma, cacheIndex, kernelHalfSize, valMult)
+	if weightsCache[cacheIndex] then
+		return weightsCache[cacheIndex], offsetsCache[cacheIndex]
+	end
+
 	local dWeights, dOffsets = GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, 1.0)
 
 	local weights = {dWeights[1]}
@@ -100,7 +166,86 @@ local function GetGaussLinearWeightsOffsets(sigma, kernelHalfSize, valMult)
 		weights[i + 1] = newWeight * valMult
 		offsets[i + 1] = (dOffsets[2 * i] * dWeights[2 * i] + dOffsets[2 * i + 1] * dWeights[2 * i + 1]) / newWeight
 	end
+
+	weightsCache[cacheIndex] = weights
+	offsetsCache[cacheIndex] = offsets
 	return weights, offsets
+end
+
+local function SetThickness()
+	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, math.floor(strengthMult*WEIGHT_CACHE_FIDELITY), blurShaderHalfKernal, strengthMult*OUTLINE_STRENGTH)
+	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("weights", gaussWeights)
+	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("offsets", gaussOffsets)
+end
+
+local function GetGaussianBlurShader(halfKernalSize)
+	local blurFrag = VFS.LoadFile(shadersDir.."gaussianBlur.frag.glsl")
+
+	blurFrag = blurFrag:gsub("###BLUR_HALF_KERNEL_SIZE###", tostring(halfKernalSize))
+	
+	local blurShader = LuaShader({
+		vertex = identityShaderVert,
+		fragment = blurFrag,
+		uniformInt = {
+			tex = 0,
+		},
+		uniformFloat = {
+			viewPortSize = {vsx, vsy},
+		},
+	}, wiName..": Gaussian Blur")
+	blurShader:Initialize()
+
+	return blurShader
+end
+
+-----------------------------------------------------------------
+-- Zoom Scale Functions
+-----------------------------------------------------------------
+
+local function GetZoomScale()
+	if not (scaleWithHeight or functionScaleWithHeight) then
+		return 1
+	end
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	cameraHeight = math.max(1.0, cameraHeight)
+	--Spring.Echo("cameraHeight", cameraHeight)
+
+	if functionScaleWithHeight then
+		if cameraHeight < SUBTLE_MIN then
+			return 1
+		end
+		if cameraHeight > SUBTLE_MAX then
+			return 0.5
+		end
+
+		return (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
+	end
+
+	local scaleFactor = 250.0 / cameraHeight
+	scaleFactor = math.min(math.max(0.5, scaleFactor), 1.0)
+	--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
+	return scaleFactor
+end
+
+local function UpdateThicknessWithZoomScale()
+	-- Warning: Magic numbers
+	strengthMult = configStrengthMult*GetZoomScale()*0.6
+	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
+	
+	blurShaderHalfKernal = math.floor(strengthMult*7 + 0.5)
+	blurShaderHalfKernal = math.max(BLUR_HALF_KERNEL_SIZE_MIN, math.min(BLUR_HALF_KERNEL_SIZE_MAX, blurShaderHalfKernal))
+	if not gaussianBlurShader[blurShaderHalfKernal] then
+		gaussianBlurShader[blurShaderHalfKernal] = GetGaussianBlurShader(blurShaderHalfKernal)
+	end
+	
+	--Spring.Echo("strengthMult", strengthMult, blurShaderHalfKernal)
 end
 
 -----------------------------------------------------------------
@@ -181,29 +326,6 @@ function widget:Initialize()
 	}, wiName..": Shape drawing")
 	shapeShader:Initialize()
 
-	local gaussianBlurFrag = VFS.LoadFile(shadersDir.."gaussianBlur.frag.glsl")
-
-	gaussianBlurFrag = gaussianBlurFrag:gsub("###BLUR_HALF_KERNEL_SIZE###", tostring(BLUR_HALF_KERNEL_SIZE))
-
-	gaussianBlurShader = LuaShader({
-		vertex = identityShaderVert,
-		fragment = gaussianBlurFrag,
-		uniformInt = {
-			tex = 0,
-		},
-		uniformFloat = {
-			viewPortSize = {vsx, vsy},
-		},
-	}, wiName..": Gaussian Blur")
-	gaussianBlurShader:Initialize()
-
-	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, BLUR_HALF_KERNEL_SIZE, OUTLINE_STRENGTH)
-
-	gaussianBlurShader:ActivateWith( function()
-		gaussianBlurShader:SetUniformFloatArrayAlways("weights", gaussWeights)
-		gaussianBlurShader:SetUniformFloatArrayAlways("offsets", gaussOffsets)
-	end)
-
 	local applicationFrag = VFS.LoadFile(shadersDir.."outlineApplication2.frag.glsl")
 
 	applicationShader = LuaShader({
@@ -244,7 +366,9 @@ function widget:Shutdown()
 	end
 
 	shapeShader:Finalize()
-	gaussianBlurShader:Finalize()
+	for i = BLUR_HALF_KERNEL_SIZE_MIN, BLUR_HALF_KERNEL_SIZE_MAX do
+		gaussianBlurShader[i]:Finalize()
+	end
 	applicationShader:Finalize()
 end
 
@@ -283,16 +407,17 @@ local function DoDrawOutline(isScreenSpace)
 
 	gl.Texture(0, shapeTex)
 
+	local blurShader = gaussianBlurShader[blurShaderHalfKernal]
 	for i = 1, BLUR_PASSES do
-		gaussianBlurShader:ActivateWith( function ()
+		blurShader:ActivateWith( function ()
 
-			gaussianBlurShader:SetUniform("dir", 1.0, 0.0) --horizontal blur
+			blurShader:SetUniform("dir", 1.0, 0.0) --horizontal blur
 			gl.ActiveFBO(blurFBOs[1], function()
 				gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
 			end)
 			gl.Texture(0, blurTexes[1])
 
-			gaussianBlurShader:SetUniform("dir", 0.0, 1.0) --vertical blur
+			blurShader:SetUniform("dir", 0.0, 1.0) --vertical blur
 			gl.ActiveFBO(blurFBOs[2], function()
 				gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
 			end)
@@ -334,5 +459,7 @@ local function EnterLeaveScreenSpace(functionName, ...)
 end
 
 function widget:DrawWorld()
+	UpdateThicknessWithZoomScale()
+	gaussianBlurShader[blurShaderHalfKernal]:ActivateWith(SetThickness)
 	EnterLeaveScreenSpace(DoDrawOutline, false)
 end
