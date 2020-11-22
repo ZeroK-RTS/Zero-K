@@ -6,8 +6,8 @@ function widget:GetInfo()
 		author    = "ivand",
 		date      = "2019",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge,
-		enabled   = true, --  loaded by default?
+		layer     = 0,
+		enabled   = true  --  loaded by default?
 	}
 end
 
@@ -17,74 +17,36 @@ end
 
 local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 
-local GL_RGBA = 0x1908
---GL_DEPTH_COMPONENT32F is the default for deferred depth textures, but Lua API only works correctly with GL_DEPTH_COMPONENT32
-local GL_DEPTH_COMPONENT32 = 0x81A7
-
-local PI = math.pi
-
 -----------------------------------------------------------------
 -- Configuration Constants
 -----------------------------------------------------------------
 
-local SUBTLE_MIN = 500
-local SUBTLE_MAX = 3000
+local BLUR_PASSES = 2 -- number of blur passes
+local BLUR_SIGMA = 1
 
-local DILATE_SINGLE_PASS = false --true is slower on my system
-local DILATE_HALF_KERNEL_SIZE = 3
-local DILATE_PASSES = 1
+local BLUR_HALF_KERNEL_SIZE_MIN = 3
+local BLUR_HALF_KERNEL_SIZE_MAX = 8
+
+local STRENGTH_MULT_MIN = 0.1
+local STRENGTH_MULT_MAX = 10
 
 local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
---local OUTLINE_COLOR = {0.75, 0.75, 0.75, 1.0}
---local OUTLINE_COLOR = {0.0, 0.0, 0.0, 1.0}
-local OUTLINE_STRENGTH_BLENDED = 1.0
-local OUTLINE_STRENGTH_ALWAYS_ON = 0.6
+local OUTLINE_STRENGTH = 6 -- make it much smaller for softer edges
 
 local USE_MATERIAL_INDICES = true
 
+local DEFAULT_STRENGTH_MULT = 0.5
 
------------------------------------------------------------------
--- File path Constants
------------------------------------------------------------------
+local SUBTLE_MIN = 300
+local SUBTLE_MAX = 3000
 
-local shadersDir = "LuaUI/Widgets/Shaders/"
+local WEIGHT_CACHE_FIDELITY = 60
 
------------------------------------------------------------------
--- Global Variables
------------------------------------------------------------------
-
-local LuaShader = VFS.Include("LuaRules/Gadgets/Include/LuaShader.lua")
-
-local vsx, vsy, vpx, vpy
-
-local screenQuadList
-local screenWideList
-
-
-local shapeDepthTex
-local shapeColorTex
-
-local dilationDepthTexes = {}
-local dilationColorTexes = {}
-
-local shapeFBO
-local dilationFBOs = {}
-
-local shapeShader
-local dilationShader
-local applicationShader
-
-local pingPongIdx = 1
-
-local shadersEnabled = Spring.Utilities.IsCurrentVersionNewerThan(104, 1243) and LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
-
-local unitsVisible = false
 -----------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------
 
-local DEFAULT_THICKNESS = 0.5
-local thickness = DEFAULT_THICKNESS
+local configStrengthMult = DEFAULT_STRENGTH_MULT
 local scaleWithHeight = true
 local functionScaleWithHeight = true
 
@@ -94,10 +56,10 @@ options = {
 		name = 'Outline Thickness',
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
-		min = 0.2, max = 1, step = 0.01,
-		value = DEFAULT_THICKNESS,
+		min = 0.2, max = 2, step = 0.01,
+		value = DEFAULT_STRENGTH_MULT,
 		OnChange = function (self)
-			thickness = self.value
+			configStrengthMult = self.value
 		end,
 	},
 	scaleWithHeight = {
@@ -126,16 +88,118 @@ options = {
 			end
 		end,
 	},
-	drawUnderCeg = {
-		name = 'Draw through effects',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
-		type = 'bool',
-		value = false,
-	},
 }
 
 -----------------------------------------------------------------
+-- File path Constants
+-----------------------------------------------------------------
+
+local shadersDir = "LuaUI/Widgets/Shaders/"
+
+-----------------------------------------------------------------
+-- Global Variables
+-----------------------------------------------------------------
+
+local LuaShader = VFS.Include("LuaRules/Gadgets/Include/LuaShader.lua")
+
+local vsx, vsy, vpx, vpy
+local firstTime
+
+local screenQuadList
+local screenWideList
+
+local shapeTex
+local blurTexes = {}
+
+local shapeFBO
+local blurFBOs = {}
+
+local shapeShader
+local gaussianBlurShader = {}
+local applicationShader
+
+local blurShaderHalfKernal = 6
+local strengthMult = 1
+local weightsCache = {}
+local offsetsCache = {}
+
+-----------------------------------------------------------------
 -- Local Functions
+-----------------------------------------------------------------
+
+local function G(x, sigma)
+	return ( 1 / ( math.sqrt(2 * math.pi) * sigma ) ) * math.exp( -(x * x) / (2 * sigma * sigma) )
+end
+
+local function GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, valMult)
+	local weights = {}
+	local offsets = {}
+
+	weights[1] = G(0, sigma)
+	local sum = weights[1]
+
+	for i = 1, kernelHalfSize - 1 do
+		weights[i + 1] = G(i, sigma)
+		sum = sum + 2.0 * weights[i + 1]
+	end
+
+	for i = 0, kernelHalfSize - 1 do --normalize so the weights sum up to valMult
+		weights[i + 1] = weights[i + 1] / sum * valMult
+		offsets[i + 1] = i
+	end
+	return weights, offsets
+end
+
+--see http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+local function GetGaussLinearWeightsOffsets(sigma, cacheIndex, kernelHalfSize, valMult)
+	if weightsCache[cacheIndex] then
+		return weightsCache[cacheIndex], offsetsCache[cacheIndex]
+	end
+
+	local dWeights, dOffsets = GetGaussDiscreteWeightsOffsets(sigma, kernelHalfSize, 1.0)
+
+	local weights = {dWeights[1]}
+	local offsets = {dOffsets[1]}
+
+	for i = 1, (kernelHalfSize - 1) / 2 do
+		local newWeight = dWeights[2 * i] + dWeights[2 * i + 1]
+		weights[i + 1] = newWeight * valMult
+		offsets[i + 1] = (dOffsets[2 * i] * dWeights[2 * i] + dOffsets[2 * i + 1] * dWeights[2 * i + 1]) / newWeight
+	end
+
+	weightsCache[cacheIndex] = weights
+	offsetsCache[cacheIndex] = offsets
+	return weights, offsets
+end
+
+local function SetThickness()
+	local gaussWeights, gaussOffsets = GetGaussLinearWeightsOffsets(BLUR_SIGMA, math.floor(strengthMult*WEIGHT_CACHE_FIDELITY), blurShaderHalfKernal, strengthMult*OUTLINE_STRENGTH)
+	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("weights", gaussWeights)
+	gaussianBlurShader[blurShaderHalfKernal]:SetUniformFloatArrayAlways("offsets", gaussOffsets)
+end
+
+local function GetGaussianBlurShader(halfKernalSize)
+	local blurFrag = VFS.LoadFile(shadersDir.."gaussianBlur.frag.glsl")
+
+	blurFrag = blurFrag:gsub("###BLUR_HALF_KERNEL_SIZE###", tostring(halfKernalSize))
+	
+	local blurShader = LuaShader({
+		vertex = identityShaderVert,
+		fragment = blurFrag,
+		uniformInt = {
+			tex = 0,
+		},
+		uniformFloat = {
+			viewPortSize = {vsx, vsy},
+		},
+	}, wiName..": Gaussian Blur")
+	blurShader:Initialize()
+
+	return blurShader
+end
+
+-----------------------------------------------------------------
+-- Zoom Scale Functions
 -----------------------------------------------------------------
 
 local function GetZoomScale()
@@ -161,7 +225,7 @@ local function GetZoomScale()
 			return 0.5
 		end
 
-		return (((math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
+		return (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
 	end
 
 	local scaleFactor = 250.0 / cameraHeight
@@ -170,15 +234,167 @@ local function GetZoomScale()
 	return scaleFactor
 end
 
-local function PrepareOutline(cleanState)
-	gl.DepthTest(true)
-	gl.DepthTest(GL.ALWAYS)
+local function UpdateThicknessWithZoomScale()
+	-- Warning: Magic numbers
+	strengthMult = configStrengthMult*GetZoomScale()*0.6
+	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
+	
+	blurShaderHalfKernal = math.floor(strengthMult*7 + 0.5)
+	blurShaderHalfKernal = math.max(BLUR_HALF_KERNEL_SIZE_MIN, math.min(BLUR_HALF_KERNEL_SIZE_MAX, blurShaderHalfKernal))
+	if not gaussianBlurShader[blurShaderHalfKernal] then
+		gaussianBlurShader[blurShaderHalfKernal] = GetGaussianBlurShader(blurShaderHalfKernal)
+	end
+	
+	--Spring.Echo("strengthMult", strengthMult, blurShaderHalfKernal)
+end
+
+-----------------------------------------------------------------
+-- Widget Functions
+-----------------------------------------------------------------
+
+function widget:ViewResize()
+	widget:Shutdown()
+	widget:Initialize()
+end
+
+function widget:Initialize()
+	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
+	if not canContinue then
+		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
+	end
+
+	firstTime = true
+	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
+
+	local commonTexOpts = {
+		target = GL_TEXTURE_2D,
+		border = false,
+		min_filter = GL.NEAREST,
+		mag_filter = GL.LINEAR,
+
+		wrap_s = GL.CLAMP_TO_EDGE,
+		wrap_t = GL.CLAMP_TO_EDGE,
+	}
+
+	shapeTex = gl.CreateTexture(vsx, vsy, commonTexOpts)
+
+	for i = 1, 2 do
+		blurTexes[i] = gl.CreateTexture(vsx, vsy, commonTexOpts)
+	end
+
+
+
+	shapeFBO = gl.CreateFBO({
+		color0 = shapeTex,
+		drawbuffers = {GL_COLOR_ATTACHMENT0_EXT},
+	})
+
+	if not gl.IsValidFBO(shapeFBO) then
+		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Invalid shapeFBO"))
+	end
+
+	for i = 1, 2 do
+		blurFBOs[i] = gl.CreateFBO({
+			color0 = blurTexes[i],
+			drawbuffers = {GL_COLOR_ATTACHMENT0_EXT},
+		})
+		if not gl.IsValidFBO(blurFBOs[i]) then
+			Spring.Echo(string.format("Error in [%s] widget: %s", wiName, string.format("Invalid blurFBOs[%d]", i)))
+		end
+	end
+
+
+	local identityShaderVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
+
+	local shapeShaderFrag = VFS.LoadFile(shadersDir.."outlineShape2.frag.glsl")
+
+	shapeShaderFrag = shapeShaderFrag:gsub("###USE_MATERIAL_INDICES###", tostring((USE_MATERIAL_INDICES and 1) or 0))
+
+	shapeShader = LuaShader({
+		vertex = identityShaderVert,
+		fragment = shapeShaderFrag,
+		uniformInt = {
+			-- be consistent with gfx_deferred_rendering.lua
+			--	glTexture(1, "$model_gbuffer_zvaltex")
+			modelDepthTex = 1,
+			modelMiscTex = 2,
+			mapDepthTex = 3,
+		},
+		uniformFloat = {
+			outlineColor = OUTLINE_COLOR,
+		},
+	}, wiName..": Shape drawing")
+	shapeShader:Initialize()
+
+	local applicationFrag = VFS.LoadFile(shadersDir.."outlineApplication2.frag.glsl")
+
+	applicationShader = LuaShader({
+		vertex = identityShaderVert,
+		fragment = applicationFrag,
+		uniformInt = {
+			tex = 0,
+			modelDepthTex = 1,
+			mapDepthTex = 3,
+		},
+		uniformFloat = {
+			viewPortSize = {vsx, vsy},
+		},
+	}, wiName..": Outline Application")
+	applicationShader:Initialize()
+end
+
+function widget:Shutdown()
+	firstTime = nil
+
+	if screenQuadList then
+		gl.DeleteList(screenQuadList)
+	end
+
+	if screenWideList then
+		gl.DeleteList(screenWideList)
+	end
+
+	gl.DeleteTexture(shapeTex)
+
+	for i = 1, 2 do
+		gl.DeleteTexture(blurTexes[i])
+	end
+
+	gl.DeleteFBO(shapeFBO)
+	for i = 1, 2 do
+		gl.DeleteFBO(blurFBOs[i])
+	end
+
+	shapeShader:Finalize()
+	for i = BLUR_HALF_KERNEL_SIZE_MIN, BLUR_HALF_KERNEL_SIZE_MAX do
+		if gaussianBlurShader[i] then
+			gaussianBlurShader[i]:Finalize()
+		end
+	end
+	applicationShader:Finalize()
+end
+
+local function DoDrawOutline(isScreenSpace)
+	gl.DepthTest(false)
+	gl.DepthMask(false)
+	gl.Blending(false)
+
+	if firstTime then
+		screenQuadList = gl.CreateList(gl.TexRect, -1, -1, 1, 1)
+		if isScreenSpace then
+			--screenWideList = gl.CreateList(gl.TexRect, 0, vsy, vsx, 0)
+			screenWideList = gl.CreateList(gl.TexRect, 0, vsy, vsx, 0)
+		else
+			screenWideList = gl.CreateList(gl.TexRect, -1, -1, 1, 1, false, true)
+		end
+		firstTime = false
+	end
 
 	gl.ActiveFBO(shapeFBO, function()
 		shapeShader:ActivateWith( function ()
-			gl.Texture(2, "$model_gbuffer_zvaltex")
+			gl.Texture(1, "$model_gbuffer_zvaltex")
 			if USE_MATERIAL_INDICES then
-				gl.Texture(1, "$model_gbuffer_misctex")
+				gl.Texture(2, "$model_gbuffer_misctex")
 			end
 			gl.Texture(3, "$map_gbuffer_zvaltex")
 
@@ -186,91 +402,45 @@ local function PrepareOutline(cleanState)
 
 			--gl.Texture(1, false) --will reuse later
 			if USE_MATERIAL_INDICES then
-				gl.Texture(1, false)
+				gl.Texture(2, false)
 			end
 		end)
 	end)
 
+	gl.Texture(0, shapeTex)
 
-	gl.Texture(0, shapeDepthTex)
-	gl.Texture(1, shapeColorTex)
+	local blurShader = gaussianBlurShader[blurShaderHalfKernal]
+	for i = 1, BLUR_PASSES do
+		blurShader:ActivateWith( function ()
 
-	for i = 1, DILATE_PASSES do
-		dilationShader:ActivateWith( function ()
-			strength = thickness * GetZoomScale()
-			dilationShader:SetUniformFloat("strength", strength)
+			blurShader:SetUniform("dir", 1.0, 0.0) --horizontal blur
+			gl.ActiveFBO(blurFBOs[1], function()
+				gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
+			end)
+			gl.Texture(0, blurTexes[1])
 
-			if DILATE_SINGLE_PASS then
-				pingPongIdx = (pingPongIdx + 1) % 2
-				gl.ActiveFBO(dilationFBOs[pingPongIdx + 1], function()
-					gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
-				end)
-				gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
-				gl.Texture(1, dilationColorTexes[pingPongIdx + 1])
+			blurShader:SetUniform("dir", 0.0, 1.0) --vertical blur
+			gl.ActiveFBO(blurFBOs[2], function()
+				gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
+			end)
+			gl.Texture(0, blurTexes[2])
 
-			else
-				pingPongIdx = (pingPongIdx + 1) % 2
-				dilationShader:SetUniform("dir", 1.0, 0.0) --horizontal dilation
-				gl.ActiveFBO(dilationFBOs[pingPongIdx + 1], function()
-					gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
-				end)
-				gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
-				gl.Texture(1, dilationColorTexes[pingPongIdx + 1])
-
-				pingPongIdx = (pingPongIdx + 1) % 2
-				dilationShader:SetUniform("dir", 0.0, 1.0) --vertical dilation
-				gl.ActiveFBO(dilationFBOs[pingPongIdx + 1], function()
-					gl.CallList(screenQuadList) -- gl.TexRect(-1, -1, 1, 1)
-				end)
-				gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
-				gl.Texture(1, dilationColorTexes[pingPongIdx + 1])
-			end
 		end)
 	end
+	
+	gl.Blending(true)
+	gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --alpha NO pre-multiply
 
-	if cleanState then
-		gl.DepthTest(GL.LEQUAL) --default mode
-
-		gl.Texture(0, false)
-		gl.Texture(1, false)
-		gl.Texture(2, false)
-		gl.Texture(3, false)
-	end
-end
-
-local function DrawOutline(strength, loadTextures, drawWorld)
-	if loadTextures then
-		gl.Texture(0, dilationDepthTexes[pingPongIdx + 1])
-		gl.Texture(1, dilationColorTexes[pingPongIdx + 1])
-		gl.Texture(2, shapeDepthTex)
-		gl.Texture(3, "$map_gbuffer_zvaltex")
-	end
-
-	gl.AlphaTest(true)
-	gl.AlphaTest(GL.GREATER, 0.0);
-	gl.DepthTest(GL.LEQUAL) --restore default mode
-	gl.Blending("alpha")
+	--gl.Texture(1, "$model_gbuffer_zvaltex") -- already bound
 
 	applicationShader:ActivateWith( function ()
-		-- For drawing through terrain
-		--applicationShader:SetUniformFloat("alwaysShowOutLine", (drawWorld and 1.0) or 0.0)
-		applicationShader:SetUniformFloat("strength", strength)
 		gl.CallList(screenWideList)
 	end)
 
 	gl.Texture(0, false)
 	gl.Texture(1, false)
-	gl.Texture(2, false)
 	gl.Texture(3, false)
-
-	gl.DepthTest(not drawWorld)
-	if not drawWorld then
-		gl.Blending(false)
-	end
-	gl.AlphaTest(GL.GREATER, 0.5);  --default mode
-	gl.AlphaTest(false)
 end
-
 
 local function EnterLeaveScreenSpace(functionName, ...)
 	gl.MatrixMode(GL.MODELVIEW)
@@ -290,187 +460,8 @@ local function EnterLeaveScreenSpace(functionName, ...)
 	gl.PopMatrix()
 end
 
------------------------------------------------------------------
--- Widget Functions
------------------------------------------------------------------
-
-function widget:ViewResize()
-	widget:Shutdown()
-	widget:Initialize()
-end
-
-function widget:Initialize()
-	if not shadersEnabled then
-		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
-		WG.HudEnableWidget("Outline No Shader")
-		widgetHandler:RemoveWidget()
-		return
-	end
-	WG.HudDisableWidget("Outline No Shader")
-
-	local configName = "AllowDrawModelPostDeferredEvents"
-	if Spring.GetConfigInt(configName, 0) == 0 then
-		Spring.SetConfigInt(configName, 1) --required to enable receiving DrawUnitsPostDeferred/DrawFeaturesPostDeferred
-	end
-
-	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
-
-	-- depth textures
-	local commonTexOpts = {
-		target = GL_TEXTURE_2D,
-		border = false,
-		min_filter = GL.NEAREST,
-		mag_filter = GL.NEAREST,
-
-		format = GL_DEPTH_COMPONENT32,
-
-		wrap_s = GL.CLAMP_TO_EDGE,
-		wrap_t = GL.CLAMP_TO_EDGE,
-	}
-
-	shapeDepthTex = gl.CreateTexture(vsx, vsy, commonTexOpts)
-	for i = 1, 2 do
-		dilationDepthTexes[i] = gl.CreateTexture(vsx, vsy, commonTexOpts)
-	end
-
-	-- color textures
-	commonTexOpts.format = GL_RGBA
-	shapeColorTex = gl.CreateTexture(vsx, vsy, commonTexOpts)
-	for i = 1, 2 do
-		dilationColorTexes[i] = gl.CreateTexture(vsx, vsy, commonTexOpts)
-	end
-
-	shapeFBO = gl.CreateFBO({
-		depth = shapeDepthTex,
-		color0 = shapeColorTex,
-		drawbuffers = {GL_COLOR_ATTACHMENT0_EXT},
-	})
-
-	if not gl.IsValidFBO(shapeFBO) then
-		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Invalid shapeFBO"))
-	end
-
-	for i = 1, 2 do
-		dilationFBOs[i] = gl.CreateFBO({
-			depth = dilationDepthTexes[i],
-			color0 = dilationColorTexes[i],
-			drawbuffers = {GL_COLOR_ATTACHMENT0_EXT},
-		})
-		if not gl.IsValidFBO(dilationFBOs[i]) then
-			Spring.Echo(string.format("Error in [%s] widget: %s", wiName, string.format("Invalid dilationFBOs[%d]", i)))
-		end
-	end
-
-	local identityShaderVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
-
-	local shapeShaderFrag = VFS.LoadFile(shadersDir.."outlineShape.frag.glsl")
-
-	shapeShaderFrag = shapeShaderFrag:gsub("###USE_MATERIAL_INDICES###", tostring((USE_MATERIAL_INDICES and 1) or 0))
-
-	shapeShader = LuaShader({
-		vertex = identityShaderVert,
-		fragment = shapeShaderFrag,
-		uniformInt = {
-			modelDepthTex = 2,
-			modelMiscTex = 1,
-			mapDepthTex = 3,
-		},
-		uniformFloat = {
-			outlineColor = OUTLINE_COLOR,
-			--viewPortSize = {vsx, vsy},
-		},
-	}, wiName..": Shape identification")
-	shapeShader:Initialize()
-
-	local dilationShaderFrag = VFS.LoadFile(shadersDir.."outlineDilate.frag.glsl")
-	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_SINGLE_PASS###", tostring((DILATE_SINGLE_PASS and 1) or 0))
-	dilationShaderFrag = dilationShaderFrag:gsub("###DILATE_HALF_KERNEL_SIZE###", tostring(DILATE_HALF_KERNEL_SIZE))
-	dilationShaderFrag = dilationShaderFrag:gsub("###STRICT_GL###", tostring((Platform.gpuVendor == "Nvidia" and 0) or 1))
-
-	dilationShader = LuaShader({
-		vertex = identityShaderVert,
-		fragment = dilationShaderFrag,
-		uniformInt = {
-			depthTex = 0,
-			colorTex = 1,
-		},
-		uniformFloat = {
-			viewPortSize = {vsx, vsy},
-		}
-	}, wiName..": Dilation")
-	dilationShader:Initialize()
-
-
-	local applicationFrag = VFS.LoadFile(shadersDir.."outlineApplication.frag.glsl")
-
-	applicationShader = LuaShader({
-		vertex = identityShaderVert,
-		fragment = applicationFrag,
-		uniformInt = {
-			dilatedDepthTex = 0,
-			dilatedColorTex = 1,
-			shapeDepthTex = 2,
-			mapDepthTex = 3,
-		},
-		uniformFloat = {
-			viewPortSize = {vsx, vsy},
-		},
-	}, wiName..": Outline Application")
-	applicationShader:Initialize()
-
-	screenQuadList = gl.CreateList(gl.TexRect, -1, -1, 1, 1)
-	screenWideList = gl.CreateList(gl.TexRect, -1, -1, 1, 1, false, true)
-end
-
-function widget:Shutdown()
-	if not shadersEnabled then
-		return
-	end
-
-	if screenQuadList then
-		gl.DeleteList(screenQuadList)
-	end
-
-	if screenWideList then
-		gl.DeleteList(screenWideList)
-	end
-
-	gl.DeleteTexture(shapeDepthTex)
-	gl.DeleteTexture(shapeColorTex)
-
-	for i = 1, 2 do
-		gl.DeleteTexture(dilationColorTexes[i])
-		gl.DeleteTexture(dilationDepthTexes[i])
-	end
-
-
-	gl.DeleteFBO(shapeFBO)
-
-	for i = 1, 2 do
-		gl.DeleteFBO(dilationFBOs[i])
-	end
-
-	shapeShader:Finalize()
-	dilationShader:Finalize()
-	applicationShader:Finalize()
-end
-
-function widget:Update()
-	local units = Spring.GetVisibleUnits(-1, nil, false)
-	unitsVisible = #units > 0
-end
-
 function widget:DrawWorld()
-	if not unitsVisible then return end
-	if options.drawUnderCeg.value then
-		EnterLeaveScreenSpace(DrawOutline, OUTLINE_STRENGTH_ALWAYS_ON, true, true)
-	end
-end
-
-function widget:DrawUnitsPostDeferred()
-	if not unitsVisible then return end
-	EnterLeaveScreenSpace(function ()
-		PrepareOutline(false)
-		DrawOutline(OUTLINE_STRENGTH_BLENDED, false, false)
-	end)
+	UpdateThicknessWithZoomScale()
+	gaussianBlurShader[blurShaderHalfKernal]:ActivateWith(SetThickness)
+	EnterLeaveScreenSpace(DoDrawOutline, false)
 end
