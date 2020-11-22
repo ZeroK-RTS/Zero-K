@@ -42,7 +42,7 @@ local custom_cmd_actions = {
 	idlemode =        {cmdType = 2, cmdID = CMD.IDLEMODE, name = "Air Idle State", states = {'Land', 'Fly'}},
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
 	preventoverkill = {cmdType = 2, cmdID = CMD_PREVENT_OVERKILL, name = "Prevent Overkill", states = {'Off', 'On'}},
-
+	trajectory      = {cmdType = 2, cmdID = CMD.TRAJECTORY, name = "Trajectory", states = {'Low', 'High'}},
 
 	--CUSTOM COMMANDS
 	sethaven = {cmdType = 1, name = "Add Retreat Zone"},
