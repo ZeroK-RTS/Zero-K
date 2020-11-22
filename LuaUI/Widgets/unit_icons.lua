@@ -278,6 +278,7 @@ local function DrawWorldFunc()
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
 	glDepthTest(true)
+	gl.Blending(true)
 	glAlphaTest(GL_GREATER, 0.001)
 	
 	--for texture, units in pairs(textureUnitsXshift) do
@@ -320,6 +321,7 @@ local function DrawWorldFunc()
 	glAlphaTest(false)
 	glDepthTest(false)
 	glDepthMask(false)
+	gl.Blending(false)
 end
 
 function widget:DrawWorld()

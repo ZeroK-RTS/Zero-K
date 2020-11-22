@@ -107,6 +107,18 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	return false
 end
 
+function GG.OverkillPrevention_GetHealthThreshold(targetID, realDamage, fudgeDamage)
+	-- Don't do this on unidentified radar dots
+	local _, maxHealth = Spring.GetUnitHealth(targetID)
+	if not maxHealth then
+		return fudgeDamage
+	end
+	if maxHealth <= realDamage then
+		return realDamage
+	end
+	return fudgeDamage
+end
+
 local function IsUnitIdentifiedStructure(identified, unitID)
 	if not identified then
 		return false
