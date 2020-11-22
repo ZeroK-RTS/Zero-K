@@ -518,14 +518,11 @@ function script.BlockShot(num, targetID)
 		return false
 	end
 	
-	if blockGauss[num] then
-		blockGauss[num] = blockGauss[num] - 1
-		if blockGauss[num] <= 0 then
-			blockGauss[num] = false
-		end
+	local frame = Spring.GetGameFrame()
+	if (blockGauss[num] or 0) > frame then
 		return true
 	end
-	blockGauss[3 - num] = 20
+	blockGauss[3 - num] = frame + 20
 	return false
 end
 
