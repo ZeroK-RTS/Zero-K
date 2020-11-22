@@ -274,13 +274,13 @@ local function GetOptions()
 ---------------------------------------
 -- Water
 ---------------------------------------
-	for i = 1, #waterColorDefaults do
-		local data = waterColorDefaults[i]
-		AddColorOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, ResetWater)
-	end
 	for i = 1, #waterNumberDefaults do
 		local data = waterNumberDefaults[i]
 		AddNumberOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, data.minVal, data.maxVal, ResetWater)
+	end
+	for i = 1, #waterColorDefaults do
+		local data = waterColorDefaults[i]
+		AddColorOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, ResetWater)
 	end
 
 ---------------------------------------
