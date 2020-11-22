@@ -42,6 +42,9 @@ local SUBTLE_MAX = 3000
 
 local WEIGHT_CACHE_FIDELITY = 60
 
+local STRENGTH_MAGIC_NUMBER = 0.64
+local KERNAL_MAGIC_NUMBER   = 7
+
 -----------------------------------------------------------------
 -- Configuration
 -----------------------------------------------------------------
@@ -235,11 +238,10 @@ local function GetZoomScale()
 end
 
 local function UpdateThicknessWithZoomScale()
-	-- Warning: Magic numbers
-	strengthMult = configStrengthMult*GetZoomScale()*0.6
+	strengthMult = configStrengthMult*GetZoomScale()*STRENGTH_MAGIC_NUMBER
 	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
 	
-	blurShaderHalfKernal = math.floor(strengthMult*7 + 0.5)
+	blurShaderHalfKernal = math.floor(strengthMult*KERNAL_MAGIC_NUMBER + 0.5)
 	blurShaderHalfKernal = math.max(BLUR_HALF_KERNEL_SIZE_MIN, math.min(BLUR_HALF_KERNEL_SIZE_MAX, blurShaderHalfKernal))
 	if not gaussianBlurShader[blurShaderHalfKernal] then
 		gaussianBlurShader[blurShaderHalfKernal] = GetGaussianBlurShader(blurShaderHalfKernal)
