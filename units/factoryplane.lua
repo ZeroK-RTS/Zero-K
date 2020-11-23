@@ -29,6 +29,9 @@ return { factoryplane = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[FLOAT UNARMED]],
+  collisionVolumeOffsets        = [[0 -8 -25]],
+  collisionVolumeScales         = [[110 46 0]],
+  collisionVolumeType           = [[cylX]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -36,6 +39,7 @@ return { factoryplane = {
     landflystate   = [[0]],
     sortName = [[4]],
     modelradius    = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
+  	aimposoffset   = [[0 23 -25]],
     midposoffset   = [[0 20 0]],
     nongroundfac = [[1]],
     default_spacing = 8,
