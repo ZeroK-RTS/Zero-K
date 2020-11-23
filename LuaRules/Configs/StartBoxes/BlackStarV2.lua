@@ -1,13 +1,13 @@
 return {
 	[0] = {
-		nameLong = "South-West",
-		nameShort = "SW",
+		nameLong = "North-East",
+		nameShort = "NE",
 		startpoints = {
-			{1229,2458},
+			{7000,3333},
 		},
 		boxes = {
 			{
-				{6767, 3394},
+			{6767, 3394},
 			{6773, 3404},
 			{6778, 3415},
 			{6785, 3425},
@@ -147,14 +147,14 @@ return {
 		},
 	},
 	[1] = {
-		nameLong = "South-East",
-		nameShort = "SE",
+		nameLong = "North",
+		nameShort = "N",
 		startpoints = {
-			{6963,2048},
+			{4180,1140},
 		},
 		boxes = {
 			{
-				{3924, 1271},
+			{3924, 1271},
 			{3935, 1282},
 			{3945, 1288},
 			{3954, 1299},
@@ -300,14 +300,14 @@ return {
 		},
 	},
 	[2] = {
-		nameLong = "North-East",
-		nameShort = "NE",
+		nameLong = "North-West",
+		nameShort = "NW",
 		startpoints = {
-			{5325,6963},
+			{900,3366},
 		},
 		boxes = {
 			{
-				{671, 3442},
+			{671, 3442},
 			{677, 3453},
 			{684, 3464},
 			{693, 3475},
@@ -452,15 +452,15 @@ return {
 			},
 		},
 	},
-	[0] = {
-		nameLong = "North",
-		nameShort = "N",
+	[3] = {
+		nameLong = "South-West",
+		nameShort = "SW",
 		startpoints = {
-			{1229,2458},
+			{2228,6488},
 		},
 		boxes = {
 			{
-				{1952, 6552},
+			{1952, 6552},
 			{1956, 6563},
 			{1966, 6574},
 			{1975, 6586},
@@ -600,15 +600,15 @@ return {
 			},
 		},
 	},
-	[0] = {
-		nameLong = "North-West",
-		nameShort = "NW",
+	[4] = {
+		nameLong = "South-East",
+		nameShort = "SE",
 		startpoints = {
-			{1229,2458},
+			{5800,6500},
 		},
 		boxes = {
 			{
-				{5533, 6583},
+			{5533, 6583},
 			{5543, 6595},
 			{5553, 6607},
 			{5564, 6615},
