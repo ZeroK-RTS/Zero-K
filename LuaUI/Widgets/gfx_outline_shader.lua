@@ -46,54 +46,6 @@ local STRENGTH_MAGIC_NUMBER = 0.64
 local KERNAL_MAGIC_NUMBER   = 7
 
 -----------------------------------------------------------------
--- Configuration
------------------------------------------------------------------
-
-local configStrengthMult = DEFAULT_STRENGTH_MULT
-local scaleWithHeight = true
-local functionScaleWithHeight = true
-
-options_path = 'Settings/Graphics/Unit Visibility/Outline'
-options = {
-	thickness = {
-		name = 'Outline Thickness',
-		desc = 'How thick the outline appears around objects',
-		type = 'number',
-		min = 0.2, max = 2, step = 0.01,
-		value = DEFAULT_STRENGTH_MULT,
-		OnChange = function (self)
-			configStrengthMult = self.value
-		end,
-	},
-	scaleWithHeight = {
-		name = 'Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out.',
-		type = 'bool',
-		value = false,
-		noHotkey = true,
-		OnChange = function (self)
-			scaleWithHeight = self.value
-			if not scaleWithHeight then
-				thicknessMult = 1
-			end
-		end,
-	},
-	functionScaleWithHeight = {
-		name = 'Subtle Scale With Distance',
-		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-		OnChange = function (self)
-			functionScaleWithHeight = self.value
-			if not functionScaleWithHeight then
-				thicknessMult = 1
-			end
-		end,
-	},
-}
-
------------------------------------------------------------------
 -- File path Constants
 -----------------------------------------------------------------
 
@@ -118,14 +70,90 @@ local shapeFBO
 local blurFBOs = {}
 
 local shapeShader
-local gaussianBlurShader = {}
 local applicationShader
 
 local blurShaderHalfKernal = 6
 local strengthMult = 1
-local cacheIndex   = 1
-local weightsCache = {}
-local offsetsCache = {}
+
+local cacheIndex    = 1
+local oldCacheIndex = false
+local weightsCache  = {}
+local offsetsCache  = {}
+local gaussianBlurShader = {}
+
+local function ResetCache()
+	cacheIndex    = 1
+	oldCacheIndex = false
+	weightsCache  = {}
+	offsetsCache  = {}
+	for i = BLUR_HALF_KERNEL_SIZE_MIN, BLUR_HALF_KERNEL_SIZE_MAX do
+		if gaussianBlurShader[i] then
+			gaussianBlurShader[i]:Finalize()
+		end
+	end
+	gaussianBlurShader = {}
+end
+
+-----------------------------------------------------------------
+-- Configuration
+-----------------------------------------------------------------
+
+local configStrengthMult = DEFAULT_STRENGTH_MULT
+local scaleWithHeight = true
+local functionScaleWithHeight = true
+local zoomScaleRange = 0.5
+
+options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options = {
+	thickness = {
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 0.2, max = 2, step = 0.01,
+		value = DEFAULT_STRENGTH_MULT,
+		OnChange = function (self)
+			configStrengthMult = self.value
+			ResetCache()
+		end,
+	},
+	scaleRange = {
+		name = 'Zoom Scale Minimum',
+		desc = 'Minimum outline thickness muliplier when zoomed out.',
+		type = 'number',
+		min = 0, max = 1, step = 0.01,
+		value = zoomScaleRange,
+		OnChange = function (self)
+			zoomScaleRange = self.value
+			ResetCache()
+		end,
+	},
+	scaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			scaleWithHeight = self.value
+			if not scaleWithHeight then
+				configStrengthMult = 1
+			end
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Subtle Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+			if not functionScaleWithHeight then
+				configStrengthMult = 1
+			end
+		end,
+	},
+}
 
 -----------------------------------------------------------------
 -- Local Functions
@@ -219,26 +247,26 @@ local function GetZoomScale()
 		cameraHeight = cs.py - gy
 	end
 	cameraHeight = math.max(1.0, cameraHeight)
-	--Spring.Echo("cameraHeight", cameraHeight)
+	--Spring.Echo("cameraHeight", cameraHeight, zoomScaleRange)
 
 	if functionScaleWithHeight then
 		if cameraHeight < SUBTLE_MIN then
 			return 1
 		end
 		if cameraHeight > SUBTLE_MAX then
-			return 0.5
+			return zoomScaleRange
 		end
-
-		return (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
+		
+		local zoomScale = (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)
+		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
 	end
 
 	local scaleFactor = 250.0 / cameraHeight
-	scaleFactor = math.min(math.max(0.5, scaleFactor), 1.0)
-	--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
+	scaleFactor = math.min(math.max(zoomScaleRange, scaleFactor), 1.0)
+	--Spring.Echo("cameraHeight", cameraHeight, "scaleFactor", scaleFactor)
 	return scaleFactor
 end
 
-local oldCacheIndex = false
 local function UpdateThicknessWithZoomScale()
 	strengthMult = configStrengthMult*GetZoomScale()*STRENGTH_MAGIC_NUMBER
 	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
@@ -249,7 +277,8 @@ local function UpdateThicknessWithZoomScale()
 		gaussianBlurShader[blurShaderHalfKernal] = GetGaussianBlurShader(blurShaderHalfKernal)
 	end
 	
-	local cacheIndex = math.floor(strengthMult*WEIGHT_CACHE_FIDELITY)
+	cacheIndex = math.floor(strengthMult*WEIGHT_CACHE_FIDELITY)
+	--Spring.Echo("strengthMult", strengthMult, blurShaderHalfKernal, cacheIndex)
 	if cacheIndex ~= oldCacheIndex then
 		oldCacheIndex = cacheIndex
 		return true
@@ -374,12 +403,8 @@ function widget:Shutdown()
 		gl.DeleteFBO(blurFBOs[i])
 	end
 
+	ResetCache()
 	shapeShader:Finalize()
-	for i = BLUR_HALF_KERNEL_SIZE_MIN, BLUR_HALF_KERNEL_SIZE_MAX do
-		if gaussianBlurShader[i] then
-			gaussianBlurShader[i]:Finalize()
-		end
-	end
 	applicationShader:Finalize()
 end
 
