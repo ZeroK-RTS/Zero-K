@@ -31,9 +31,11 @@ local frame = Spring.GetGameFrame()
 
 local function AddSphericalLOSCheck(unitID, unitDefID)
 	if unitsByID[unitID] then
+		--Spring.Utilities.UnitEcho(unitID, "Add check exists")
 		local index = unitsByID[unitID]
 		units.data[index].removeAfter = frame + 40
 	else
+		--Spring.Utilities.UnitEcho(unitID, "Add check new")
 		local ud = UnitDefs[unitDefID]
 		units.count = units.count + 1
 		--Spring.Utilities.UnitEcho(unitID, "added")
@@ -85,20 +87,26 @@ local function CheckUnit(unitID, los, airLos)
 end
 
 function gadget:GameFrame(f)
+	frame = f
 	if f%UPDATE_FREQUENCY == 3 then
-		frame = f
 		local i = 1
 		while i <= units.count do
 			local data = units.data[i]
 			local unitID = data.unitID
 			local valid, flying = CheckUnit(unitID, data.los, data.airLos)
 			if valid and (flying or f < data.removeAfter) then
+				--if flying then
+				--	Spring.Utilities.UnitEcho(unitID, "F")
+				--else
+				--	Spring.Utilities.UnitEcho(unitID, "N")
+				--end
 				i = i + 1
 			else
 				--Spring.Utilities.UnitEcho(unitID, "removed")
-				unitsByID[unitID] = nil
 				unitsByID[units.data[units.count].unitID] = i
 				units.data[i] = units.data[units.count]
+				unitsByID[unitID] = nil
+				units.data[units.count] = nil
 				units.count = units.count - 1
 			end
 		end
