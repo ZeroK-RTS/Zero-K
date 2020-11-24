@@ -25,6 +25,7 @@ local cloaked = COB.CLOAKED
 local stealth = COB.STEALTH
 
 local smokePiece = {base}
+local movingData = {}
 
 local burrowed = false
 local SIG_BURROW = 1
@@ -216,6 +217,7 @@ local function UnBurrow()
 end
 
 function script.StartMoving()
+	movingData.moving = true
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -225,6 +227,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	movingData.moving = false
 	StartThread(Burrow)
 end
 
@@ -234,7 +237,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end

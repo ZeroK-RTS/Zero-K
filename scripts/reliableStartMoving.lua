@@ -2,7 +2,7 @@ if GG.StartStopMovingControl then
 	return
 end
 
-function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving)
+function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local spGetUnitVelocity = Spring.GetUnitVelocity
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -18,6 +18,9 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 		x,y,z = spGetUnitPosition(unitID)
 		if not x then
 			return
+		end
+		if externalDataAccess then
+			moving = externalDataAccess.moving
 		end
 		height = spGetGroundHeight(x,z)
 		if y - height < 1 then

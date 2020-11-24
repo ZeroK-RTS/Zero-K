@@ -36,6 +36,7 @@ local pause = 300
 local dirtfling = 1024+2
 
 local smokePiece = {body}
+local movingData = {}
 
 --variables
 local burrowed = false
@@ -58,9 +59,9 @@ local function Burrow()
 	Signal(SIG_BURROW)
 	SetSignalMask(SIG_BURROW)
 	Sleep(400)
+	burrowed = true
 	
 	Signal(SIG_Walk)
-	burrowed = true
 	EmitSfx(digger, dirtfling)
 	
 	--burrow
@@ -172,6 +173,8 @@ local function Talk()
 end
 
 function script.StartMoving()
+	--Spring.Utilities.UnitEcho(unitID, "a")
+	movingData.moving = true
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -182,6 +185,8 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	--Spring.Utilities.UnitEcho(unitID, "p")
+	movingData.moving = false
 	StartThread(Burrow)
 end
 
@@ -191,7 +196,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end

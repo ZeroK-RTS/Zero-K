@@ -57,6 +57,7 @@ local legBackwardAngleMinor = math.rad(10)
 --------------------------------------------------------------------------------
 local armored = false
 local nocurl = true
+local movingData = {}
 
 local gun_0 = 0
 
@@ -240,11 +241,13 @@ local function Motion()
 end
 
 function script.StartMoving()
+	movingData.moving = true
 	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
 end
 
 function script.StopMoving()
+	movingData.moving = false
 	--Spring.Utilities.UnitEcho(unitID, "P " .. ((armored and "T") or "F"))
 	StartThread(Curl)
 end
@@ -259,7 +262,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1, false, movingData)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
