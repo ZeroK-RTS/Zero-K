@@ -323,7 +323,7 @@ end
 
 function jumping(jumpPercent)
 	if jumpPercent < 30 then
-		GG.PokeDecloakUnit(unitID, 50)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 		EmitSfx(lfoot, jetfeet_fire)
 		EmitSfx(rfoot, jetfeet_fire)
 	end

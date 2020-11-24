@@ -373,6 +373,7 @@ local function UpdateTrajectory(unitID, data)
 end
 
 local function ReinstatePhysics(unitID, data)
+	GG.PokeDecloakUnit(unitID, data.unitDefID)
 	if data.drag then
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
 		data.drag = data.drag + 0.05
