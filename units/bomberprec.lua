@@ -25,7 +25,7 @@ return { bomberprec = {
   customParams        = {
     modelradius    = [[15]],
     refuelturnradius = [[120]],
-    reammoseconds    = [[10]],
+    reammoseconds    = [[8]],
     requireammo    = [[1]],
   },
 
