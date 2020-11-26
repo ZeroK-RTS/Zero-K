@@ -51,16 +51,16 @@ end
 --------------------------------------------------------------------------------
 -- Speedups
 
-local CMD_PATROL        = CMD.PATROL		-- 15
-local CMD_FIGHT         = CMD.FIGHT			-- 16
-local CMD_RECLAIM       = CMD.RECLAIM		-- 90
-local CMD_REPAIR        = CMD.REPAIR		-- 40
+local CMD_PATROL        = CMD.PATROL        -- 15
+local CMD_FIGHT         = CMD.FIGHT	        -- 16
+local CMD_RECLAIM       = CMD.RECLAIM       -- 90
+local CMD_REPAIR        = CMD.REPAIR        -- 40
 local CMD_STOP          = CMD.STOP
-local CMD_OPT_ALT       = CMD.OPT_ALT		-- 128
-local CMD_OPT_CTRL      = CMD.OPT_CTRL		-- 64
-local CMD_OPT_SHIFT     = CMD.OPT_SHIFT		-- 32
-local CMD_OPT_META      = CMD.OPT_META		-- 4
-local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL	-- 8
+local CMD_OPT_ALT       = CMD.OPT_ALT       -- 128
+local CMD_OPT_CTRL      = CMD.OPT_CTRL      -- 64
+local CMD_OPT_SHIFT     = CMD.OPT_SHIFT     -- 32
+local CMD_OPT_META      = CMD.OPT_META      -- 4
+local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL  -- 8
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
@@ -70,7 +70,7 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
-local spValidUnitID		= Spring.ValidUnitID
+local spValidUnitID     = Spring.ValidUnitID
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitResources = Spring.GetUnitResources
 
