@@ -44,17 +44,17 @@ local cameraFollowPath = 'Settings/Camera/COFC Following'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = {
 	'helpwindow',
-	
+
 	'topBottomEdge',
 
 	'leftRightEdge',
 
 	'middleMouseButton',
-	
+
 	'lblMisc',
 	'smoothness',
 	'fov',
-	
+
 	'lblZoom',
 	-- 'zoomintocursor',
 	-- 'zoomoutfromcursor',
@@ -79,7 +79,7 @@ options_order = {
 	'tiltoverride',
 	'tiltfactor',
 	'groundrot',
-	
+
 	'lblScroll',
 	'speedFactor',
 	'speedFactor_mult',
@@ -90,7 +90,7 @@ options_order = {
 	'smoothscroll',
 	'smoothmeshscroll',
 	'scrollhelp',
-	
+
 	'disablelabel',
 	'disableshift',
 	'disablectrl',
@@ -102,12 +102,12 @@ options_order = {
 	--'mingrounddist',
 	'resetcam',
 	'freemode',
-	
+
 	--following:
-	
+
 	'lblFollowCursor',
 	'follow',
-	
+
 	'lblFollowUnit',
 	'trackmode',
 	'persistenttrackmode',
@@ -121,7 +121,7 @@ options_order = {
 	'followzoomoutspeed',
 	'followzoommindist',
 	'followzoommaxdist',
-	
+
 	'label_controlgroups',
 	'enableCycleView',
 	'groupSelectionTapTimeout',
@@ -137,17 +137,17 @@ local ApplyCenterBounds = function(cs) end
 local TiltOverrideFunc
 
 options = {
-	
+
 	lblblank1 = {name='', type='label'},
 	lblRotate = {name='Rotation Behaviour', type='label', path=rotatePath},
 	lblScroll = {name='Scroll Behaviour', type='label', path=scrollPath},
 	lblZoom = {name='Zoom Behaviour', type='label', path=zoomPath},
 	lblMisc = {name='General Parameters', type='label', path=miscPath},
-	
+
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
 	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
-	
+
 	topBottomEdge = {
 		name = 'Top/Bottom Edge Behaviour',
 		type = 'radioButton',
@@ -203,8 +203,8 @@ options = {
 		--
 		-- Smoothness for rotation and tilt are handled by the rotsmoothness option instead
 	},
-	
-	
+
+
 	helpwindow = {
 		name = 'COFCam Help',
 		type = 'text',
@@ -471,7 +471,7 @@ Complete Overhead/Free Camera has six actions:
 	-- 	OnChange = function(self) init = true; end,
 	-- },
 	disablelabel = {name='Hotkeys and Modifiers', type='label', path=miscPath},
-	
+
 	disableshift = {
 		name = 'Disable Shift',
 		desc = 'Make the camera unaffected by holding Shift.',
@@ -546,8 +546,8 @@ Complete Overhead/Free Camera has six actions:
 		noHotkey = true,
 		path=miscPath,
 	},
-	
-	
+
+
 	-- follow cursor
 	follow = {
 		name = "Follow player's cursor",
@@ -622,7 +622,7 @@ Complete Overhead/Free Camera has six actions:
 		path = cameraFollowPath,
 	},
 	-- end follow cursor
-	
+
 	-- follow unit
 	trackmode = {
 		name = "Activate Trackmode",
@@ -640,7 +640,7 @@ Complete Overhead/Free Camera has six actions:
 			Spring.Echo("COFC: Unit tracking ON")
 		end,
 	},
-	
+
 	persistenttrackmode = {
 		name = "Persistent trackmode state",
 		desc = "Trackmode will not cancel when deselecting unit. Trackmode will always attempt to track newly selected unit. Press mouse midclick to cancel this mode.",
@@ -648,7 +648,7 @@ Complete Overhead/Free Camera has six actions:
 		value = false,
 		path = cameraFollowPath,
 	},
-    
+
     thirdpersontrack = {
 		name = "Enter 3rd Person Trackmode",
 		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, or move mouse to edge of screen to jump to current unit selection (will exit mode if no selection).",
@@ -674,8 +674,8 @@ Complete Overhead/Free Camera has six actions:
 			end
         end,
 	},
-	
-	
+
+
 	label_controlgroups = {name='Pan To Cluster', type='label', path = 'Settings/Interface/Control Groups'},
 	enableCycleView = {
 		name = "Pan to cluster",
@@ -820,31 +820,43 @@ local function HotkeyChangeNotification()
 
 	local key = WG.crude.GetHotkeyRaw("moveleft")
 	local keycode = ToKeysyms(key and key[1])
-	keys[keycode] = 'left'
-	key_code.left = keycode;
-	
+	if keycode then
+		keys[keycode] = 'left'
+		key_code.left = keycode;
+	end
+
 	key = WG.crude.GetHotkeyRaw("moveright")
 	keycode = ToKeysyms(key and key[1])
-	keys[keycode] = 'right'
-	key_code.right = keycode;
+	if keycode then
+		keys[keycode] = 'right'
+		key_code.right = keycode;
+	end
 
 	key = WG.crude.GetHotkeyRaw("moveforward")
 	keycode = ToKeysyms(key and key[1])
-	keys[keycode] = 'up'
-	key_code.up = keycode;
+	if keycode then
+		keys[keycode] = 'up'
+		key_code.up = keycode;
+	end
 
 	key = WG.crude.GetHotkeyRaw("moveback")
 	keycode = ToKeysyms(key and key[1])
-	keys[keycode] = 'down'
-	key_code.down = keycode;
+	if keycode then
+		keys[keycode] = 'down'
+		key_code.down = keycode;
+	end
 
 	key = WG.crude.GetHotkeyRaw("moveup")
 	keycode = ToKeysyms(key and key[1])
-	key_code.pageup = keycode;
+	if keycode then
+		key_code.pageup = keycode;
+	end
 
 	key = WG.crude.GetHotkeyRaw("movedown")
 	keycode = ToKeysyms(key and key[1])
-	key_code.pagedown = keycode;
+	if keycode then
+		key_code.pagedown = keycode;
+	end
 end
 
 local icon_size = 20
@@ -892,7 +904,7 @@ end
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
-	
+
 	currentFOVhalf_rad = (fov/2) * RADperDEGREE
 	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax) --adjust maximum TAB/Overview distance based on camera FOV
 
@@ -967,7 +979,7 @@ local function GetDist(x1,y1,z1, x2,y2,z2)
 	local d1 = x2-x1
 	local d2 = y2-y1
 	local d3 = z2-z1
-	
+
 	return sqrt(d1*d1 + d2*d2 + d3*d3)
 end
 
@@ -1080,7 +1092,7 @@ local function MoveRotatedCam(cs, mxm, mym)
 	if not cs.dy then
 		return cs
 	end
-	
+
 	-- forward, up, right, top, bottom, left, right
 	local camVecs = spGetCameraVectors()
 	local cf = camVecs.forward
@@ -1091,29 +1103,29 @@ local function MoveRotatedCam(cs, mxm, mym)
 	local len = sqrt((cr[1] * cr[1]) + (cr[3] * cr[3]))
 	local drx = cr[1] / len
 	local drz = cr[3] / len
-	
+
 	local vecDist = (- cs.py) / cs.dy
-	
+
 	local ddx = (mxm * drx) + (mym * dfx)
 	local ddz = (mxm * drz) + (mym * dfz)
-	
+
 	local gx1, gz1 = cs.px + vecDist*cs.dx,			cs.pz + vecDist*cs.dz --note me: what does cs.dx mean?
 	local gx2, gz2 = cs.px + vecDist*cs.dx + ddx,	cs.pz + vecDist*cs.dz + ddz
-	
+
 	local extra = 500
-	
+
 	if gx2 > MWIDTH + extra then
 		ddx = MWIDTH + extra - gx1
 	elseif gx2 < 0 - extra then
 		ddx = -gx1 - extra
 	end
-	
+
 	if gz2 > MHEIGHT + extra then
 		ddz = MHEIGHT - gz1 + extra
 	elseif gz2 < 0 - extra then
 		ddz = -gz1 - extra
 	end
-	
+
 	cs.px = cs.px + ddx
 	cs.pz = cs.pz + ddz
 	return cs
@@ -1137,14 +1149,14 @@ local function VirtTraceRay(x,y, cs)
 
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
-		
+
 		if gx < 0 or gx > MWIDTH or gz < 0 or gz > MHEIGHT then --out of map
 			return false, gx, gy, gz
 		else
 			return true, gx, gy, gz
 		end
 	end
-	
+
 	if not cs or not cs.dy or cs.dy == 0 then
 		return false, false
 	end
@@ -1153,7 +1165,7 @@ local function VirtTraceRay(x,y, cs)
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
 	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,nil,nil,nil) --use override if spTraceScreenRay() do not have results
-	
+
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
 end
@@ -1213,7 +1225,7 @@ local function SetLockSpot2(cs, x, y, useSmoothMeshSetting) --set an anchor on t
 	if ls_have then --if lockspot is locked
 		return
 	end
-	
+
 	local x, y = x, y
 	if not x then
 		x, y = cx, cy --center of screen
@@ -1235,13 +1247,13 @@ local function UpdateCam(cs)
 		--return cstemp
 		return false
 	end
-	
+
 	local alt = sin(cstemp.rx) * ls_dist
 	local opp = cos(cstemp.rx) * ls_dist --OR same as: sqrt(ls_dist * ls_dist - alt * alt)
 	cstemp.px = ls_x - sin(cstemp.ry) * opp
 	cstemp.py = ls_y - alt
 	cstemp.pz = ls_z - cos(cstemp.ry) * opp
-	
+
 	if not options.freemode.value then
 		local gndheight = spGetGroundHeight(cstemp.px, cstemp.pz) + 10
 		if cstemp.py < gndheight then --prevent camera from going underground
@@ -1252,7 +1264,7 @@ local function UpdateCam(cs)
 			end
 		end
 	end
-	
+
 	return cstemp
 end
 
@@ -1482,10 +1494,10 @@ local function Zoom(zoomin, shift, forceCenter)
 		else
 			return false
 		end
-		
+
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 		-- Spring.Echo("Zoom Speed: "..sp)
-		
+
 		local zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 		local new_px = cs.px + zox --a zooming that get slower the closer you are to the target.
 		local new_py = cs.py + zoy
@@ -1493,12 +1505,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 
 		local groundMinimum = GetMapBoundedGroundHeight(new_px, new_pz) + 20
-		
+
 		if not options.freemode.value then
 			if new_py < groundMinimum then --zooming underground?
 				sp = (groundMinimum - cs.py) / dy
 				-- Spring.Echo("Zoom Speed at ground: "..sp)
-				
+
 				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 				new_px = cs.px + zox --a zooming that get slower the closer you are to the ground.
 				new_py = cs.py + zoy
@@ -1514,7 +1526,7 @@ local function Zoom(zoomin, shift, forceCenter)
 				new_pz = cs.pz + zoz
 				-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 			end
-			
+
 		end
 
 		if new_py == new_py then
@@ -1533,12 +1545,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		--//
 
 		ls_have = false
-		
+
 	else
 
 		--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
 		local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs) --This doesn't seem to provide the exact center, thus later bounding
-		
+
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
 			gx,gz = GetMapBoundedCoords(gx,gz)
@@ -1555,12 +1567,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		-- if not options.freemode.value and ls_dist >= maxDistY then
 			-- return
 		-- end
-	    
+
 		local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
-		
+
 		local ls_dist_new = ls_dist + max(min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
 		ls_dist_new = max(ls_dist_new, 20)
-		
+
 		if not options.freemode.value and ls_dist_new > maxDistY - gy then --limit camera distance to maximum distance
 			-- return
 			ls_dist_new = maxDistY - gy
@@ -1575,7 +1587,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		else
 			lockPoint = {}
 		end
-		
+
 		if cstemp then cs = cstemp; end
 	end
 
@@ -1593,12 +1605,12 @@ end
 local function Altitude(up, s)
 	ls_have = false
 	onTiltZoomTrack = false
-	
+
 	local up = up
 	if options.invertalt.value then
 		up = not up
 	end
-	
+
 	local cs = GetTargetCameraState()
 	local py = max(1, abs(cs.py) )
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
@@ -1656,7 +1668,7 @@ OverviewAction = function()
 			spSendCommands('trackoff')
 			spSendCommands('viewfree')
 		end
-		
+
 		local cs = GetTargetCameraState()
 		SetLockSpot2(cs)
 		last_ls_dist = ls_dist
@@ -1711,7 +1723,7 @@ OverviewAction = function()
 			-- spSetCameraState(cs, 1)
 			OverrideSetCameraStateInterpolate(cs,1,lockPoint)
 		end
-		
+
 		if thirdperson_trackunit then
 			local selUnits = spGetSelectedUnits() --player's new unit to track
 			if not (selUnits and selUnits[1]) then --if player has no new unit to track
@@ -1731,7 +1743,7 @@ OverviewAction = function()
 			end
 		end
 	end
-	
+
 	overview_mode = not overview_mode
 end
 --==End option menu function (function that is attached to epic menu button)^^
@@ -1820,24 +1832,24 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 	local cs1 = cs
 	lastMouseX = nil
 	if cs.rx then
-		
+
 		local trfactor = (tilt and options.tiltfactor.value or options.rotatefactor.value) / 2000
 		cs.rx = cs.rx + rdy * trfactor
 		cs.ry = cs.ry - rdx * trfactor
-		
+
 		if overrideTiltValue then
 			cs.rx = overrideTiltValue
 		end
-		
+
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
-		
+
 		if cs.rx < -HALFPIMINUS then
 			cs.rx = -HALFPIMINUS
 		elseif cs.rx > max_rx then
 			cs.rx = max_rx
 		end
-		
+
         -- [[
         if trackmode then --rotate world instead of camera during trackmode (during tracking unit)
             lock = true --lock camera to lockspot while rotating
@@ -1968,7 +1980,7 @@ local function Tilt(s, dir)
 		return
 	end
     local dir = dir * (options.inverttilt.value and -1 or 1)
-    
+
 
 	local speed = dir * (s and 30 or 10)
 	RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, true, true) --smooth, lock, tilt
@@ -1996,7 +2008,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	if not ls_onmap then
 		smoothlevel = 0.5
 	end
-	
+
 	-- forward, up, right, top, bottom, left, right
 	local camVecs = spGetCameraVectors()
 	local cf = camVecs.forward
@@ -2016,21 +2028,21 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	-- if corrected then ComputeLockSpotParams(cs) end
 
 	local vecDist = (- cs.py) / cs.dy
-	
+
 	local ddx = (mxm * drx) + (mym * dfx)
 	local ddz = (mxm * drz) + (mym * dfz)
-	
+
 	ls_x = ls_x + ddx
 	ls_z = ls_z + ddz
-	
+
 	if not options.freemode.value then
 		ls_x = min(ls_x, maxX-3) --limit camera movement, either to map area or (if options.zoomouttocenter.value is true) to a set distance from map center
 		ls_x = max(ls_x, minX+3) --Do not replace with GetMapBoundedCoords or GetMapBoundedGroundHeight, those functions only (and should only) respect map area.
-		
+
 		ls_z = min(ls_z, maxZ-3)
 		ls_z = max(ls_z, minZ+3)
 	end
-	
+
 	ls_y = GetSmoothOrGroundHeight(ls_x, ls_z, true)
 
 	local csnew = UpdateCam(cs)
@@ -2044,7 +2056,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
     -- spSetCameraState(csnew, smoothlevel)
 	OverrideSetCameraStateInterpolate(csnew,smoothlevel)
   end
-	
+
 end
 
 --------------------------------------------------------------------------------
@@ -2053,7 +2065,7 @@ local missedMouseRelease = false
 local firstUpdate = true
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
-	
+
 	if hideCursor then
 		spSetMouseCursor('%none%')
 	end
@@ -2131,7 +2143,7 @@ function widget:Update(dt)
 			Spring.Echo("COFC: Unit tracking OFF")
 		end
 	end
-	
+
 	--//HANDLE TRACK CURSOR
 	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
 	if (camcycle == 0 and
@@ -2147,12 +2159,12 @@ function widget:Update(dt)
 	end
 
 	cs = GetTargetCameraState()
-	
+
 	if firstUpdate and options.overridetilt.value then
 		TiltOverrideFunc()
 	end
 	firstUpdate = false
-	
+
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
 	local a,c,m,s = spGetModKeyState()
@@ -2161,12 +2173,12 @@ function widget:Update(dt)
 	a = a and not options.disablealt.value
 
 	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
-    
+
 	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person
 	(rot.right or rot.left or rot.up or rot.down))
 	then
-		
+
 		cs = GetTargetCameraState()
 
 		local speed = (options.rotatefactor.value / 2000) * (s and 500 or 250) * fpsCompensationFactor
@@ -2179,7 +2191,7 @@ function widget:Update(dt)
 		elseif rot.left then
 			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have, false)
 		end
-		
+
 		if (rot.up or rot.down) and options.topBottomEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
 		elseif options.topBottomEdge.value == 'rotate' then
@@ -2191,9 +2203,9 @@ function widget:Update(dt)
 			RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, ls_have, false)
 		end
 		ls_have = false
-		
+
 	end
-	
+
 	--//HANDLE MOVE CAMERA
 	if (not thirdperson_trackunit and  --block 3rd Person
 	(smoothscroll or
@@ -2202,21 +2214,21 @@ function widget:Update(dt)
 	use_lockspringscroll))
 	then
 		cs = GetTargetCameraState()
-		
+
 		local x, y, lmb, mmb, rmb = spGetMouseState()
-		
+
 		if (c) then
 			return
 		end
-		
+
 		local smoothlevel = 0
-		
+
 		-- clear the velocities
 		cs.vx  = 0; cs.vy  = 0; cs.vz  = 0
 		cs.avx = 0; cs.avy = 0; cs.avz = 0
-				
+
 		local mxm, mym = 0,0
-		
+
 		local heightFactor = (cs.py/1000)
 		if smoothscroll then
 			--local speed = dt * options.speedFactor.value * heightFactor
@@ -2229,37 +2241,37 @@ function widget:Update(dt)
 			local dir = options.invertscroll.value and -1 or 1
 			mxm = speed * (x - mx) * dir
 			mym = speed * (y - my) * dir
-			
+
 			spWarpMouse(cx, cy)
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
 			local speed = math.max( options.speedFactor_k.value * ((options.speedFactor_k_mult.value and 10) or 1) * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
-			
+
 			if move.right or move2.right then
 				mxm = speed
 			elseif move.left or move2.left then
 				mxm = -speed
 			end
-			
+
 			if move.up or move2.up then
 				mym = speed
 			elseif move.down or move2.down then
 				mym = -speed
 			end
 			smoothlevel = options.smoothness.value
-			
+
 			if spDiffTimers(spGetTimer(),last_move)>1 then --if edge scroll is 'first time': unlock lockspot once
 				ls_have = false
 			end
 			last_move = spGetTimer()
 		end
-		
+
 		ScrollCam(cs, mxm, mym, smoothlevel)
-		
+
 	end
-	
+
 	mx, my = spGetMouseState()
-	
+
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if not (WG.IsGUIHidden and WG.IsGUIHidden()) then --not in mission or (in mission but) not GuiHidden()
 		if options.leftRightEdge.value == 'pan' then
@@ -2270,7 +2282,7 @@ function widget:Update(dt)
 			elseif mx < 2 then
 				move2.left = true
 			end
-			
+
 		elseif options.leftRightEdge.value == 'rotate' or options.leftRightEdge.value == 'orbit' then
 			rot.right = false
 			rot.left = false
@@ -2300,7 +2312,7 @@ function widget:Update(dt)
 			end
 		end
 	end
-	
+
 	--//HANDLE MOUSE/KEYBOARD'S 3RD-PERSON (TRACK UNIT) RETARGET
 	if 	(thirdperson_trackunit and
 	not overview_mode and --block 3rd person scroll when in overview mode
@@ -2308,7 +2320,7 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 	then
-		
+
 		cs = GetTargetCameraState()
 
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
@@ -2334,7 +2346,7 @@ function widget:Update(dt)
 			end
 		end
 	end
-	
+
 	if missedMouseRelease and camcycle==0 then
 		--Workaround/Fix for middle-mouse button release event not detected:
 		--We request MouseRelease event for middle-mouse release in MousePress by returning "true",
@@ -2364,9 +2376,9 @@ function widget:MouseMove(x, y, dx, dy, button)
 		if abs(dx) > 0 or abs(dy) > 0 then
 			RotateCamera(x, y, dx, dy, true, ls_have, false)
 		end
-		
+
 		spWarpMouse(msx, msy)
-		
+
 		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	elseif springscroll then
 
@@ -2376,12 +2388,12 @@ function widget:MouseMove(x, y, dx, dy, button)
 		local dir = options.invertscroll.value and -1 or 1
 
 		local cs = GetTargetCameraState()
-		
+
 		local speed = options.speedFactor.value * ((options.speedFactor_mult.value and 10) or 1) * cs.py/1000 / 10
 		local mxm = speed * dx * dir
 		local mym = speed * dy * dir
 		ScrollCam(cs, mxm, mym, 0)
-		
+
 		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	end
 end
@@ -2398,19 +2410,19 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		lockspringscroll = false
 		return true
 	end
-	
+
 	-- Not Middle Click --
 	if (button ~= 2) then
 		return false
 	end
-	
+
 	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
-	
+
 	local a,ctrl,m,s = spGetModKeyState()
 	s = s and not options.disableshift.value
 	ctrl = ctrl and not options.disablectrl.value
 	a = a and not options.disablealt.value
-	
+
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
 	if not (options.persistenttrackmode.value and (ctrl or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
@@ -2420,26 +2432,26 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		trackmode = false
 	end
 	thirdperson_trackunit = false
-	
-	
+
+
 	-- Reset --
 	if a and ctrl then
 		ResetCam()
 		return true
 	end
-	
+
 	-- Above Minimap --
 	if (spIsAboveMiniMap(x, y)) then
 		return false
 	end
-	
+
 	local cs = GetTargetCameraState()
-	
+
 	msx = x
 	msy = y
-	
+
 	spSendCommands({'trackoff'})
-	
+
 	rotate = false
 	-- Rotate --
 	if a or options.middleMouseButton.value == 'rotate' then
@@ -2454,31 +2466,31 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		rotate_transit = nil
 		onTiltZoomTrack = false
 		if options.targetmouse.value then --if rotate world at mouse cursor:
-			
+
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
 			if gx and (options.freemode.value or onmap) then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
 				SetLockSpot2(cs,x,y) --set lockspot at cursor position
-				
+
 				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor (cursor's "ls_dist" has bigger value than midscreen "ls_dist")//--
 				local _,cgx,cgy,cgz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
 				local dx,dy,dz = cgx-cs.px, cgy-cs.py, cgz-cs.pz
 				ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground
-				
+
 				SetCameraTarget(gx,gy,gz,1) --transit to cursor position
 				rotate_transit = spGetTimer() --trigger smooth in-transit effect in widget:MouseMove()
 			end
-			
+
 		else
 			SetLockSpot2(cs) --lockspot at center of screen
 		end
-		
+
 		spWarpMouse(cx, cy) --move cursor to center of screen
 		rotate = true
 		msx = cx
 		msy = cy
 		return true
 	end
-	
+
 	-- Scrolling --
 	if options.smoothscroll.value then
 		spWarpMouse(cx, cy)
@@ -2487,9 +2499,9 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		springscroll = true
 		-- lockspringscroll = not lockspringscroll
 	end
-	
+
 	return true
-	
+
 end
 
 function widget:MouseRelease(x, y, button)
@@ -2506,11 +2518,11 @@ end
 function widget:MouseWheel(wheelUp, value)
     if fpsmode then return end
 	local alt,ctrl,m,shift = spGetModKeyState()
-	
+
 	shift = shift and not options.disableshift.value
 	ctrl = ctrl and not options.disablectrl.value
 	alt = alt and not options.disablealt.value
-	
+
 	if ctrl then
 		return Tilt(shift, wheelUp and 1 or -1)
 	elseif alt then
@@ -2525,7 +2537,7 @@ function widget:MouseWheel(wheelUp, value)
 		end
 		return Altitude(wheelUp, shift)
 	end
-	
+
 	if overview_mode then --cancel overview_mode if Overview_mode + ZOOM-in
 		local zoomin = not wheelUp
 		if options.invertzoom.value then
@@ -2535,7 +2547,7 @@ function widget:MouseWheel(wheelUp, value)
 			overview_mode = false
 		else return; end --skip wheel if Overview_mode + ZOOM-out
 	end
-	
+
 	follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	return Zoom(not wheelUp, shift)
 end
@@ -2551,7 +2563,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	local shift = modifier.shift and not options.disableshift.value
 	local ctrl = modifier.ctrl and not options.disablectrl.value
 	local alt = modifier.alt and not options.disablealt.value
-	
+
 	if thirdperson_trackunit then  --move key for edge Scroll in 3rd person trackmode
 		if keys[key] and not (ctrl or modifier.alt) then
 			movekey = true
@@ -2561,13 +2573,13 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if fpsmode then return end
 	if keys[key] then
 		if ctrl or alt then
-		
+
 			local cs = GetTargetCameraState()
 			SetLockSpot2(cs)
 			if not ls_have then
 				return
 			end
-		
+
 			local speed = (shift and 30 or 10)
 
 			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not alt, false)
@@ -2636,22 +2648,22 @@ function widget:DrawScreen()
 
   hideCursor = false
 	if not cx then return end
-    
+
 	local x, y
 	if smoothscroll then
 		x, y = spGetMouseState()
 		glLineWidth(2)
 		glBeginEnd(GL_LINES, DrawLine, x, y, green, cx, cy, red)
 		glLineWidth(1)
-		
+
 		DrawPoint(cx, cy, black, 14)
 		DrawPoint(cx, cy, white, 11)
 		DrawPoint(cx, cy, black,  8)
 		DrawPoint(cx, cy, red,    5)
-	
+
 		DrawPoint(x, y, { 0, 1, 0 },  5)
 	end
-	
+
 	local filefound
 	if smoothscroll then --or (rotate and ls_have) then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows.png')
@@ -2659,9 +2671,9 @@ function widget:DrawScreen()
 	--elseif rotate or lockspringscroll or springscroll then
 		--filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows.png')
 	end
-	
+
 	if filefound then
-	
+
 		if smoothscroll then
 			glColor(0,1,0,1)
 		elseif (rotate and ls_have) then
@@ -2677,9 +2689,9 @@ function widget:DrawScreen()
 				glColor(0,1,1,1)
 			end
 		end
-		
+
 		glAlphaTest(GL_GREATER, 0)
-		
+
 		-- if not (springscroll and not lockspringscroll) then
 		    -- hideCursor = true
 		-- end
@@ -2723,11 +2735,11 @@ function widget:Initialize()
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0
-	
+
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
-	
+
 	WG.COFC_HotkeyChangeNotification = HotkeyChangeNotification
 end
 
@@ -2747,7 +2759,7 @@ function widget:Shutdown()
 end
 
 function widget:TextCommand(command)
-	
+
 	if command == "cofc help" then
 		for i, text in ipairs(helpText) do
 			echo('<COFCam['.. i ..']> '.. text)
@@ -2859,7 +2871,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 			end
 			previousKey = key
 			previousTime = spGetTimer()
-			
+
 			if options.enableCycleView.value then
 				if (currentIterations[group]) then
 					currentIteration = currentIterations[group]
