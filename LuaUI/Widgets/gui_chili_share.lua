@@ -47,6 +47,7 @@ local images = {
 	pending = 'LuaUI/Images/epicmenu/questionmark.png',
 	leave = 'LuaUI/Images/epicmenu/exit.png',
 	kick = 'LuaUI/Images/advplayerslist/cross.png', -- REPLACE ME
+	report = 'LuaUI/Images/Crystal_Clear_app_error.png', -- REPLACE ME
 	merge = 'LuaUI/Images/Commshare_Merge.png',
 	give = 'LuaUI/Images/gift2.png',
 	giftmetal = 'LuaUI/Images/ibeam.png',
@@ -566,6 +567,21 @@ local function BattleKickPlayer(subject)
 	Spring.SendCommands("say !poll kick " .. subject.name)
 end
 
+local function ReportPlayer(subject)
+	local extraText = ""
+	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
+	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
+	
+	local teamCountFirst = #(Spring.GetTeamList(0) or {})
+	local teamCountSecond = #(Spring.GetTeamList(1) or {})
+	extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond .. " on " .. Game.mapName
+	
+	local seconds = math.floor(Spring.GetGameFrame()/30)
+	local minutes = math.floor(seconds/60)
+	extraText = extraText .. " at " .. string.format("%d:%02d", minutes, seconds - 60*minutes)
+	Spring.SendLuaMenuMsg("reportUser_" .. subject.name .. "_" .. extraText)
+end
+
 local function GiveUnit(target)
 	local num = Spring.GetSelectedUnitsCount()
 	if num == 0 then
@@ -926,18 +942,36 @@ local function InitName(subject, playerPanel)
 				width = buttonsize,
 				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
 				y= givemebuttons[subject.id]["text"].y - 6,
-				OnClick = {function () BattleKickPlayer(subject) end},
-				padding={1,1,1,1},
-				tooltip = "Kick this player from the battle.",
+				OnClick = {function () ReportPlayer(subject) end},
+				padding={2,2,2,2},
+				tooltip = "Report this player to moderators.",
 				children={
 					chili.Image:New{
-						file=images.kick,
+						file=images.report,
 						width='100%',
 						height='100%'
 					}
 				},
 				caption=" "
 			}
+			--givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			--	parent = playerPanel,
+			--	height = buttonsize,
+			--	width = buttonsize,
+			--	x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			--	y= givemebuttons[subject.id]["text"].y - 6,
+			--	OnClick = {function () BattleKickPlayer(subject) end},
+			--	padding={1,1,1,1},
+			--	tooltip = "Kick this player from the battle.",
+			--	children={
+			--		chili.Image:New{
+			--			file=images.kick,
+			--			width='100%',
+			--			height='100%'
+			--		}
+			--	},
+			--	caption=" "
+			--}
 		end
 	else
 		givemebuttons[subject.id]["leave"] = chili.Button:New{
@@ -956,6 +990,24 @@ local function InitName(subject, playerPanel)
 					height='100%',
 					x='0%',
 					y=0
+				}
+			},
+			caption=" "
+		}
+		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			y= givemebuttons[subject.id]["text"].y - 6,
+			OnClick = {function () ReportPlayer(subject) end},
+			padding={2,2,2,2},
+			tooltip = "Report this player to moderators.",
+			children={
+				chili.Image:New{
+					file=images.report,
+					width='100%',
+					height='100%'
 				}
 			},
 			caption=" "
@@ -1027,28 +1079,28 @@ local function InitName(subject, playerPanel)
 		}
 	end
 	if (adminImg) then
-		if givemebuttons[subject.id]["battlekick"] then
-			givemebuttons[subject.id]["battlekick"]:Dispose()
-		end
-		givemebuttons[subject.id]["admin"] = chili.Button:New{
-			parent = playerPanel,
-			height = buttonsize,
-			width = buttonsize,
-			x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
-			y= givemebuttons[subject.id]["text"].y - 4,
-			padding={1,1,1,1},
-			tooltip = "Zero-K Administrator",
-			children={
-				chili.Image:New{
-					file=adminImg,
-					width=16,
-					height=16,
-					x = 2,
-					y = 2
-				}
-			},
-			caption=" "
-		}
+		--if givemebuttons[subject.id]["battlekick"] then
+		--	givemebuttons[subject.id]["battlekick"]:Dispose()
+		--end
+		--givemebuttons[subject.id]["admin"] = chili.Button:New{
+		--	parent = playerPanel,
+		--	height = buttonsize,
+		--	width = buttonsize,
+		--	x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
+		--	y= givemebuttons[subject.id]["text"].y - 4,
+		--	padding={1,1,1,1},
+		--	tooltip = "Zero-K Administrator",
+		--	children={
+		--		chili.Image:New{
+		--			file=adminImg,
+		--			width=16,
+		--			height=16,
+		--			x = 2,
+		--			y = 2
+		--		}
+		--	},
+		--	caption=" "
+		--}
 	end
 	--if (countryImg) then
 	--	chili.Image:New{parent=playerPanel,
