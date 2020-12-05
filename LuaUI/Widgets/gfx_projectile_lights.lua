@@ -41,11 +41,14 @@ local FPS_WORRY_TIME = 60
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
 local radiusOverride = 200
+local strengthMult = 1
 local overrideParam = {r = 1, g = 1, b = 1, radius = 200}
 local doOverride = false
 
 local wantLoadParams = false
 
+local GetLightsFromUnitDefs
+local projectileLightTypes = {}
 
 local function Format(value)
 	return string.format("%.2f", value)
@@ -81,7 +84,7 @@ local function LoadParams(param)
 end
 
 options_path = 'Settings/Graphics/Lighting'
-options_order = {'light_projectile_enable', 'useLOD', 'projectileFade', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options_order = {'light_projectile_enable', 'light_strength_mult', 'useLOD', 'projectileFade', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
 	light_projectile_enable = {
 		name = "Enable Projectile Lights",
@@ -91,6 +94,16 @@ options = {
 			lightsEnabled = self.value
 		end,
 		noHotkey = true,
+	},
+	light_strength_mult = {
+		name = 'Strength Multiplier',
+		type = 'number',
+		value = 1,
+		min = 0.01, max = 1, step = 0.01,
+		OnChange = function (self)
+			strengthMult = self.value
+			projectileLightTypes = GetLightsFromUnitDefs()
+		end,
 	},
 	useLOD = {
 		name = 'Use LOD',
@@ -163,13 +176,6 @@ local gibParams = {r = 0.5, g = 0.5, b = 0.25, radius = 100}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local projectileLightTypes = {}
-	--[1] red
-	--[2] green
-	--[3] blue
-	--[4] radius
-	--[5] BEAMTYPE, true if BEAM
-
 local function Split(s, separator)
 	local results = {}
 	for part in s:gmatch("[^"..separator.."]+") do
@@ -182,7 +188,7 @@ end
 --------------------------------------------------------------------------------
 -- Light Defs
 
-local function GetLightsFromUnitDefs()
+function GetLightsFromUnitDefs()
 	--Spring.Echo('GetLightsFromUnitDefs init')
 	local plighttable = {}
 	for weaponDefID = 1, #WeaponDefs do
@@ -278,6 +284,10 @@ local function GetLightsFromUnitDefs()
 			weaponData.g = colorList[2]
 			weaponData.b = colorList[3]
 		end
+		
+		weaponData.r = weaponData.r * strengthMult
+		weaponData.g = weaponData.g * strengthMult
+		weaponData.b = weaponData.b * strengthMult
 		
 		if weaponData.radius > 0 and not customParams.fake_weapon then
 			plighttable[weaponDefID] = weaponData
