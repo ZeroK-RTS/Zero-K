@@ -54,16 +54,15 @@ return {
 			float airlos = getTexel(tex1, texCoord).r;
 
 			gl_FragColor  = vec4(0.0);
-			//gl_FragColor  = alwaysColor;
-			gl_FragColor += jamColor * radarJammer.g;
-			gl_FragColor += radarColor2 * step(0.8, radarJammer.r) * radarJammer.r  * (1.0-floor(los));
+			gl_FragColor += radarColor2 * step(0.8, radarJammer.r) * radarJammer.r  * (1.0-floor(los));  // Radar area
 			gl_FragColor.rgb = fract(gl_FragColor.rgb);
 
-			gl_FragColor += losColor * (los * 0.9 + airlos * 0.1);
+			gl_FragColor += alwaysColor + losColor * (los * 0.9 + airlos * 0.1);
+			gl_FragColor = min(gl_FragColor, alwaysColor + losColor);
+			gl_FragColor += jamColor * radarJammer.g;  // Jammer area - additive over LOS
 
-			gl_FragColor += radarColor * step(0.2, fract(1 - radarJammer.r));
+			gl_FragColor += radarColor * step(0.2, fract(1 - radarJammer.r));  // Radar edge/fringing
 
-			gl_FragColor += alwaysColor;
 			gl_FragColor.a = 0.05;
 		}
 	]],
