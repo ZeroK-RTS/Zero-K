@@ -51,16 +51,16 @@ end
 --------------------------------------------------------------------------------
 -- Speedups
 
-local CMD_PATROL        = CMD.PATROL		-- 15
-local CMD_FIGHT         = CMD.FIGHT			-- 16
-local CMD_RECLAIM       = CMD.RECLAIM		-- 90
-local CMD_REPAIR        = CMD.REPAIR		-- 40
+local CMD_PATROL        = CMD.PATROL        -- 15
+local CMD_FIGHT         = CMD.FIGHT	        -- 16
+local CMD_RECLAIM       = CMD.RECLAIM       -- 90
+local CMD_REPAIR        = CMD.REPAIR        -- 40
 local CMD_STOP          = CMD.STOP
-local CMD_OPT_ALT       = CMD.OPT_ALT		-- 128
-local CMD_OPT_CTRL      = CMD.OPT_CTRL		-- 64
-local CMD_OPT_SHIFT     = CMD.OPT_SHIFT		-- 32
-local CMD_OPT_META      = CMD.OPT_META		-- 4
-local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL	-- 8
+local CMD_OPT_ALT       = CMD.OPT_ALT       -- 128
+local CMD_OPT_CTRL      = CMD.OPT_CTRL      -- 64
+local CMD_OPT_SHIFT     = CMD.OPT_SHIFT     -- 32
+local CMD_OPT_META      = CMD.OPT_META      -- 4
+local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL  -- 8
 
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
@@ -70,7 +70,7 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spEcho            = Spring.Echo
 local spGetTeamResources = Spring.GetTeamResources
-local spValidUnitID		= Spring.ValidUnitID
+local spValidUnitID     = Spring.ValidUnitID
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitResources = Spring.GetUnitResources
 
@@ -323,7 +323,10 @@ local function unitNew(unitID)
 	local vz = mapCenterZ - z
 	commandTables[PATROL] = {CMD_PATROL, {x + vx*25/abs(vx), y, z + vz*25/abs(vz)}, 0, "patrol"}
 
-	local area = {x, y, z, UnitDefs[unitDefID].buildDistance}
+	-- Instead of using a range of UnitDefs[unitDefID].buildDistance, we make
+	-- the range giant so that when you hold down shift you don't see circles
+	-- around every caretaker.
+	local area = {x, y, z, 50000}
 	commandTables[RECLAIM_METAL] = {CMD_RECLAIM, area, 0, "reclaim metal"}
 	commandTables[RECLAIM_ENERGY] = {CMD_RECLAIM, area, CMD_OPT_CTRL, "reclaim energy"}
 	commandTables[REPAIR_UNITS] = {CMD_REPAIR, area, CMD_OPT_META, "repair units"}
