@@ -38,11 +38,11 @@ local USE_MATERIAL_INDICES = true
 local DEFAULT_STRENGTH_MULT = 0.5
 
 local SUBTLE_MIN = 300
-local SUBTLE_MAX = 3000
+local SUBTLE_MAX = 2800
 
 local WEIGHT_CACHE_FIDELITY = 60
 
-local STRENGTH_MAGIC_NUMBER = 0.64
+local STRENGTH_MAGIC_NUMBER = 0.6
 local KERNAL_MAGIC_NUMBER   = 7
 
 -----------------------------------------------------------------
