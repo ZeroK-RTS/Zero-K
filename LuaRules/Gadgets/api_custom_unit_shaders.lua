@@ -995,10 +995,10 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("reloadcus", ReloadCUS)
 	gadgetHandler:AddChatAction("disablecus", DisableCUS)
 	gadgetHandler:AddChatAction("cusdisable", DisableCUS)
-	
+
 	if not USE_OBJECT_DAMAGE then
 		gadgetHandler:RemoveCallIn("UnitDamaged")
-		gadgetHandler:RemoveCallIn("FeatureDamages")
+		gadgetHandler:RemoveCallIn("FeatureDamaged")
 	end
 end
 
