@@ -424,7 +424,7 @@ end
 local TURNRATE_MULT_BOT = 1
 local TURNRATE_MULT_VEH = 1
 local ACCEL_MULT_BOT = 1
-local ACCEL_MULT_VEH = 1.2
+local ACCEL_MULT_VEH = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then

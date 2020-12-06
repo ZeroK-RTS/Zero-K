@@ -3,9 +3,9 @@ return { shipaa = {
 
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
-  acceleration           = 0.249,
+  acceleration           = 0.3,
   activateWhenBuilt   = true,
-  brakeRate              = 0.808,
+  brakeRate              = 1.0,
 
   buildCostMetal         = 400,
   builder                = false,
