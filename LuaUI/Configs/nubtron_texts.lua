@@ -77,7 +77,7 @@ return {
 <(Click next to continue)>]],
 			epilogue3 = [[Glaives are great at raiding lightly defended expansion and intercepting enemy raids, however, you will need heavier units as the battle progresses.
 <(Click next to continue)>]],
-			epilogue4 = [[Ronin and Reaver can be mixed to create a stong early army. Reaver has low range but annihilates raiders, while Ronin can harass enemies at range.
+			epilogue4 = [[Ronin and Reaver can be mixed to create a strong early army. Reaver has low range but annihilates raiders, while Ronin can harass enemies at range.
 <(Click next to continue)>]],
 			epilogue5 = [[Knight and Sling are great at busting entrenched positions. Knight has the health to assault heavy turrets, while Sling can wear down defenses from far away.
 <(Click next to continue)>]],
