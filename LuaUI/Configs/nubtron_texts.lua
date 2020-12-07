@@ -91,7 +91,7 @@ return {
 <(Click next to continue)>]],
 			epilogue10 = [[You can also <click and drag> Repair, Reclaim and Force Fire to issue a command that targets everything in an area.
 <(Click next to continue)>]],
-			epilogue11 = [[<Repair> assists construction, and uses energy to heal units. <Reclaim> gathers metal from wrecked units, and can be used on live units for a 50% refund.
+			epilogue11 = [[<Repair> assists construction, and uses energy to heal units. <Reclaim> gathers metal from wrecked units, up to 40% of their original value, and can be used on live units for a 50% refund.
 <(Click next to continue)>]],
 			epilogue12 = [[Your <metal> and <energy> storage are shown as bars at the top of the screen. The central green numbers are <income> while the rightmost red numbers are <demand>.
 <(Click next to continue)>]],
