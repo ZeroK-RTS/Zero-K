@@ -20,6 +20,7 @@ include("Widgets/COFCTools/ExportUtilities.lua")
 
 local spGetMouseState = Spring.GetMouseState
 local spTraceScreenRay = Spring.TraceScreenRay
+local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameRulesParam = Spring.GetGameRulesParam
@@ -34,6 +35,7 @@ local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
 local GetDescription = Spring.Utilities.GetDescription
+local GetHelptext = Spring.Utilities.GetHelptext
 
 local strFormat = string.format
 
@@ -47,7 +49,10 @@ local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ":
 	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
 	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
 	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
-	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
+	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") ..
+	"\n" .. green .. WG.Translate("interface", "space_click_show_stats")
+
+local singleSelectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. "Center view" .. "\n" .. green .. WG.Translate("interface", "space_click_show_stats")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -579,6 +584,14 @@ local function GetUnitSelectionTooltip(ud, unitDefID, unitID)
 	return unitSelectionTooltipCache[unitDefID]
 end
 
+local unitSingleSelectionTooltipCache = {}
+local function GetSingleUnitSelectionTooltip(ud, unitDefID, unitID)
+	if not unitSingleSelectionTooltipCache[unitDefID] then
+		unitSingleSelectionTooltipCache[unitDefID] = GetHelptext(ud) .. singleSelectionTooltip
+	end
+	return unitSingleSelectionTooltipCache[unitDefID]
+end
+
 local function GetWeaponReloadStatus(unitID, weapNum, reloadTime)
 	local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
 	if weaponReloadFrame then
@@ -846,7 +859,7 @@ local function UpdateMouseCursor(holdingDrawKey)
 	if not (holdingDrawKey and options.showDrawTools.value) then
 		return
 	end
-	local x, y, drawing, addingPoint, erasing = Spring.GetMouseState()
+	local x, y, drawing, addingPoint, erasing = spGetMouseState()
 	if addingPoint then
 		Spring.SetMouseCursor(CURSOR_POINT_NAME)
 	elseif erasing then
@@ -863,7 +876,14 @@ local function SelectionsIconClick(button, unitID, unitList, unitDefID)
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
-	
+
+	if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+		local x, y = spGetMouseState()
+		local udid = UnitDefs[spGetUnitDefID(unitID)]
+		WG.MakeStatsWindow(udid, x, y, unitID)
+		return true
+	end
+
 	-- selectedUnitsList is global and has the same ordering as unitList
 	local newSelectedUnits
 	
@@ -1439,7 +1459,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		local unitID, unitDefID
 		for i = 1, total_count do
 			unitID = selectedUnits[i]
-			unitDefID = Spring.GetUnitDefID(unitID)
+			unitDefID = spGetUnitDefID(unitID)
 			if unitDefID and not filterUnitDefIDs[unitDefID] then
 				selectedUnitDefID[i] = unitDefID
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
@@ -1617,7 +1637,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		local selectionSortOrder = {}
 		for i = 1, #displayUnits do
 			local unitID = displayUnits[i]
-			local unitDefID = Spring.GetUnitDefID(unitID) or 0
+			local unitDefID = spGetUnitDefID(unitID) or 0
 			local byDefID = displayUnitsByDefID[unitDefID] or {}
 			byDefID[#byDefID + 1] = unitID
 			displayUnitsByDefID[unitDefID] = byDefID
@@ -1691,11 +1711,20 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	}
 
 	if not isTooltipVersion then
-		unitImage.OnClick[#unitImage.OnClick + 1] = function()
-			if selectedUnitID then
-				local x,y,z = Spring.GetUnitPosition(selectedUnitID)
-				SetCameraTarget(x, y, z, 1)
+		unitImage.OnClick[#unitImage.OnClick + 1] = function(_,_,_,button)
+			if not selectedUnitID then
+				return false
 			end
+			local _, _, meta, _ = spGetModKeyState()
+			if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+				local x, y = spGetMouseState()
+				local ud = UnitDefs[spGetUnitDefID(selectedUnitID)]
+				WG.MakeStatsWindow(ud, x, y, selectedUnitID)
+				return true
+			end
+			local x,y,z = Spring.GetUnitPosition(selectedUnitID)
+			SetCameraTarget(x, y, z, 1)
+			return true
 		end
 	end
 	
@@ -1913,7 +1942,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if unitDefID then
 			ud = UnitDefs[unitDefID]
-			
+
+			if ud and not isTooltipVersion then
+				unitImage.tooltip = GetSingleUnitSelectionTooltip(ud, unitDefID)
+			end
+
 			unitImage.file = "#" .. unitDefID
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
@@ -2231,7 +2264,7 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		if ignoreDelay or (thingID == sameObjectID) then
 			if ignoreDelay or (sameObjectIDTime > options.independant_world_tooltip_delay.value) then
 				if thingIsUnit then
-					local thingDefID = Spring.GetUnitDefID(thingID)
+					local thingDefID = spGetUnitDefID(thingID)
 					if ShowUnitCheck(holdingSpace) then
 						tooltipWindow.SetUnitishTooltip(thingID, thingDefID, nil, nil, false, nil, nil, nil, nil, requiredOnly)
 						return true
@@ -2321,13 +2354,13 @@ local function GetSelectionWindow()
 		bottom = 0,
 		padding = {8, 4, 4, 2},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
-		OnMouseDown = {
+		OnClick = {
 			function(self)
 				local _,_, meta,_ = spGetModKeyState()
 				if not meta then
 					return false
 				end
-				WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')
+				WG.crude.OpenPath(selPath)
 				WG.crude.ShowMenu()
 				return true --skip button function, else clicking on build pic will also select the unit.
 			end
@@ -2346,8 +2379,8 @@ local function GetSelectionWindow()
 	local externalFunctions = {}
 	
 	function externalFunctions.ShowSingleUnit(unitID)
-		singleUnitID, singleUnitDefID = unitID, Spring.GetUnitDefID(unitID)
-		singleUnitDisplay.SetDisplay(unitID, Spring.GetUnitDefID(unitID))
+		singleUnitID, singleUnitDefID = unitID, spGetUnitDefID(unitID)
+		singleUnitDisplay.SetDisplay(unitID, spGetUnitDefID(unitID))
 		singleUnitDisplay.SetVisible(true)
 		multiUnitDisplay.SetUnitDisplay()
 		selectionStatsDisplay.ChangeSelection({unitID})

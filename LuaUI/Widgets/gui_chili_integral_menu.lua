@@ -16,8 +16,26 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Configuration
+-- Spring localizations
+local spEcho = Spring.Echo
+local spGetActiveCommand = Spring.GetActiveCommand
+local spGetCmdDescIndex = Spring.GetCmdDescIndex
+local spGetFactoryCommands = Spring.GetFactoryCommands
+local spGetModKeyState = Spring.GetModKeyState
+local spGetMouseState = Spring.GetMouseState
+local spGetRealBuildQueue = Spring.GetRealBuildQueue
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetSelectedUnitsCount = Spring.GetSelectedUnitsCount
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitHealth = Spring.GetUnitHealth
+local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
+local spGetUnitRepeat = Spring.Utilities.GetUnitRepeat
+local spGetViewGeometry = Spring.GetViewGeometry
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spSetActiveCommand = Spring.SetActiveCommand
 
+-- Configuration
 include("colors.lua")
 include("keysym.lua")
 local specialKeyCodes = include("Configs/integral_menu_special_keys.lua")
@@ -72,7 +90,7 @@ EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 local modOptions = Spring.GetModOptions()
 local disabledTabs = {}
 
-if Spring.GetModOptions().campaign_debug_units ~= "1" then
+if modOptions.campaign_debug_units ~= "1" then
 	if modOptions.integral_disable_economy == "1" then
 		disabledTabs.economy = true
 	end
@@ -475,7 +493,7 @@ local function TabClickFunction(mouse)
 	if not mouse then
 		return false
 	end
-	local _,_, meta,_ = Spring.GetModKeyState()
+	local _,_, meta,_ = spGetModKeyState()
 	if not meta then
 		return false
 	end
@@ -574,7 +592,7 @@ local function UpdateReturnToOrders(cmdID)
 	end
 	
 	if (not returnToOrdersCommand) and options.ctrlDisableGrid.value then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		local alt, ctrl, meta, shift = spGetModKeyState()
 		SetGridHotkeysEnabled(not ctrl)
 	else
 		SetGridHotkeysEnabled(not returnToOrdersCommand)
@@ -657,7 +675,7 @@ local function GenerateGridKeyMap(name)
 			if key then
 				ret[key] = {i, j}
 			else
-				Spring.Echo("LUA_ERRRUN", "Integral menu missing key for", i, j, name)
+				spEcho("LUA_ERRRUN", "Integral menu missing key for", i, j, name)
 			end
 		end
 	end
@@ -771,7 +789,7 @@ local function UpdateBackgroundSkin()
 	local newClass
 	
 	if options.fancySkinning.value then
-		local selectedCount = Spring.GetSelectedUnitsCount()
+		local selectedCount = spGetSelectedUnitsCount()
 		if selectedCount and selectedCount > 0 then
 			if options.flushLeft.value then
 				newClass = skin.panel_0120_small
@@ -818,7 +836,7 @@ local function GetCmdPosParameters(cmdID)
 		end
 		return def.pos, def.priority
 	end
-	--Spring.Echo("Unknown GetCmdPosParameters", cmdID)
+	--spEcho("Unknown GetCmdPosParameters", cmdID)
 	return 1, 100
 end
 
@@ -855,11 +873,11 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 			end
 	
 			alreadyRemovedTag[cmdTag] = true
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
+			spGiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, CMD.OPT_CTRL)
 			if reinsertPosition then
 				local opts = thisCmd.options
 				local coded = opts.coded
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
+				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, coded}, CMD.OPT_CTRL + CMD.OPT_ALT)
 			end
 			j = j + 1
 		end
@@ -868,7 +886,7 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 end
 
 local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID, -1)
+	local commands = spGetFactoryCommands(factoryUnitID, -1)
 	if not commands then
 		return
 	end
@@ -923,7 +941,7 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 end
 
 local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID, -1)
+	local commands = spGetFactoryCommands(factoryUnitID, -1)
 	if not commands then
 		return true
 	end
@@ -973,25 +991,40 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	end
 	
 	for i = 1, inputMult do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
+		spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 	end
 	return true
 end
 
 local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, queueBlock)
 	local left, right = mouse == 1, mouse == 3
-	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	local alt, ctrl, meta, shift = spGetModKeyState()
 	if factoryUnitID and isQueueButton then
+		if meta and cmdID then
+			local bq = Spring.GetUnitCmdDescs(factoryUnitID)
+			local bqidx = Spring.FindUnitCmdDesc(factoryUnitID, cmdID)
+			if bqidx then
+				local cmddsc = bq[bqidx]
+				if cmddsc then
+					local udid = UnitDefNames[cmddsc.name]
+					if udid then
+						local x, y = spGetMouseState()
+						WG.MakeStatsWindow(udid, x, y, factoryUnitID)
+					end
+				end
+			end
+		else
 		QueueClickFunc(mouse, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
+		end
 		return true
 	end
 
 	if alt and factoryUnitID and options.altInsertBehind.value and (not fakeFactory) then
 		-- Repeat alt has to be handled by engine so that the command is removed after completion.
-		if not Spring.Utilities.GetUnitRepeat(factoryUnitID) then
+		if not spGetUnitRepeat(factoryUnitID) then
 			local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 			for i = 1, inputMult do
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
+				spGiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, CMD.OPT_ALT + CMD.OPT_CTRL)
 			end
 			if WG.noises then
 				WG.noises.PlayResponse(factoryUnitID, cmdID)
@@ -1000,9 +1033,9 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, 
 		end
 	end
 	
-	local index = Spring.GetCmdDescIndex(cmdID)
+	local index = spGetCmdDescIndex(cmdID)
 	if index then
-		Spring.SetActiveCommand(index, mouse or 1, left, right, alt, ctrl, meta, shift)
+		spSetActiveCommand(index, mouse or 1, left, right, alt, ctrl, meta, shift)
 		if not instantCommands[cmdID] then
 			UpdateButtonSelection(cmdID)
 		end
@@ -1037,12 +1070,12 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		if isDisabled then
 			return false
 		end
-		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, x)
-		if sucess and onClick then
+		local success = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, x)
+		if success and onClick then
 			-- Don't do the onClick if the command was not eaten by the menu.
 			onClick(cmdID)
 		end
-		return sucess
+		return success
 	end
 	
 	local button = Button:New {
@@ -1316,7 +1349,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 						if not currentOverflow then
 							return
 						end
-						local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
+						local buildQueue = spGetRealBuildQueue(factoryUnitID)
 						
 						local overflowString = ""
 						for i = x, #buildQueue do
@@ -1437,7 +1470,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 				local texture = displayConfig.texture[state]
 				SetImage(texture)
 			else
-				Spring.Echo("Error, missing command config", cmdID)
+				spEcho("Error, missing command config", cmdID)
 			end
 		else
 			local texture = (displayConfig and displayConfig.texture) or command.texture
@@ -1664,12 +1697,12 @@ local function GetQueuePanel(parent, columns)
 		if not button then
 			return
 		end
-		local unitBuildID = Spring.GetUnitIsBuilding(factoryUnitID)
+		local unitBuildID = spGetUnitIsBuilding(factoryUnitID)
 		if not unitBuildID then
 			button.SetProgressBar(0)
 			return
 		end
-		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
+		local progress = select(5, spGetUnitHealth(unitBuildID))
 		button.SetProgressBar(progress)
 	end
 	
@@ -1686,7 +1719,7 @@ local function GetQueuePanel(parent, columns)
 		factoryUnitID = newFactoryUnitID
 		factoryUnitDefID = newFactoryUnitDefID
 	
-		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
+		local buildQueue = spGetRealBuildQueue(factoryUnitID)
 	
 		local buildDefIDCounts = {}
 		if buildQueue then
@@ -1918,10 +1951,10 @@ end
 -- Command Handling
 
 local function GetSelectionValues()
-	local selection = Spring.GetSelectedUnits()
+	local selection = spGetSelectedUnits()
 	for i = 1, #selection do
 		local unitID = selection[i]
-		local defID = Spring.GetUnitDefID(unitID)
+		local defID = spGetUnitDefID(unitID)
 		if defID and (UnitDefs[defID].isFactory or UnitDefs[defID].customParams.isfakefactory) and (not UnitDefs[defID].customParams.notreallyafactory) then
 			return unitID, defID, UnitDefs[defID].customParams.isfakefactory, #selection
 		end
@@ -2133,7 +2166,7 @@ local gridKeyMap, gridMap, gridCustomOverrides -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	local screenWidth, screenHeight = spGetViewGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 
@@ -2301,7 +2334,7 @@ function options.applyCustomGrid.OnChange()
 end
 
 function options.hide_when_spectating.OnChange(self)
-	local isSpec = Spring.GetSpectatingState()
+	local isSpec = spGetSpectatingState()
 	background:SetVisibility(WG.IntegralVisible and not (self.value and isSpec))
 end
 
@@ -2320,7 +2353,7 @@ end
 
 local function CheckTabHotkeyAllowed()
 	if options.ctrlDisableGrid.value then
-		local _, ctrl = Spring.GetModKeyState()
+		local _, ctrl = spGetModKeyState()
 		if ctrl then
 			return false
 		end
@@ -2450,7 +2483,7 @@ end
 -- Widget Interface
 
 function widget:Update()
-	local _,cmdID = Spring.GetActiveCommand()
+	local _,cmdID = spGetActiveCommand()
 	UpdateButtonSelection(cmdID)
 	UpdateReturnToOrders(cmdID)
 end
@@ -2495,7 +2528,7 @@ end
 
 function widget:PlayerChanged(playerID)
 	if options.hide_when_spectating.value then
-		local isSpec = Spring.GetSpectatingState()
+		local isSpec = spGetSpectatingState()
 		background:SetVisibility(WG.IntegralVisible and not isSpec)
 	end
 end

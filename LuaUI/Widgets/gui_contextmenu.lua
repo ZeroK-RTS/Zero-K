@@ -2030,6 +2030,7 @@ function widget:Initialize()
 
 	widget:ViewResize(Spring.GetViewGeometry())
 	
+	WG.MakeStatsWindow = MakeStatsWindow
 end
 
 function widget:Shutdown()
