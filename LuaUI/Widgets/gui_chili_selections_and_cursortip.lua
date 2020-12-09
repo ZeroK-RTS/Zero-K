@@ -49,8 +49,8 @@ local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ":
 	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
 	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
 	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
-	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") ..
-	"\n" .. green .. WG.Translate("interface", "space_click_show_stats")
+	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") .. "\n" .. 
+	green .. WG.Translate("interface", "space_click_show_stats")
 
 local singleSelectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. "Center view" .. "\n" .. green .. WG.Translate("interface", "space_click_show_stats")
 
