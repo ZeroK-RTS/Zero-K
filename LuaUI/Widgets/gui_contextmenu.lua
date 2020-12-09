@@ -1631,10 +1631,9 @@ local function tooltipBreakdown(tooltip)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
-		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
-		local udef = GetUnitDefByHumanName(unitHumanName)
+		local unitDefID = tooltip:match('(%d+)')
+		local udef = UnitDefs[tonumber(unitDefID)]
 		return udef or false
-			
 	elseif tooltip:find('Selected', 1, true) == 1 then
 		local start,fin = tooltip:find([[ - ]], 1, true)
 		if start and fin then
