@@ -3288,7 +3288,7 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:KeyPress(key, modifier, isRepeat)
+function widget:KeyPress(key, modifier, isRepeat, label)
 	if not get_key_bind_mod then
 		if key == KEYSYMS.LCTRL
 			or key == KEYSYMS.RCTRL
@@ -3327,9 +3327,15 @@ function widget:KeyPress(key, modifier, isRepeat)
 			get_key_bind_without_mod = false
 			get_key_bind_with_any = false
 		end
-		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
-		--local hotkey = {key = translatedkey, mod = modstring}
-		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
+		Spring.Echo('start TEST')
+
+		if key == 0 and label:sub(0, 2) == '0x' then
+			translatedkey = label
+		else
+			translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
+			--local hotkey = {key = translatedkey, mod = modstring}
+			translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
+		end
 		local hotkey = modstring .. translatedkey
 		
 		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
