@@ -1386,6 +1386,12 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 					SetImage(texture)
 				end
 			end
+			if not notGlobal then
+				buttonsByCommand[cmdID] = externalFunctionsAndData
+			end
+			if buildProgress then
+				externalFunctionsAndData.SetProgressBar(0)
+			end
 			if command then
 				SetDisabled(command.disabled)
 			end
