@@ -80,9 +80,9 @@ end
 local function SinkBubbles()
 	SetSignalMask(SIG_FLOAT)
 	while true do
-		EmitSfx(cthigh, SFX.BUBBLE)
-		EmitSfx(lbarrel, SFX.BUBBLE)
-		EmitSfx(rbarrel, SFX.BUBBLE)
+		EmitSfx(cthigh, 1027)
+		EmitSfx(lbarrel, 1027)
+		EmitSfx(rbarrel, 1027)
 		Sleep(66)
 	end
 end

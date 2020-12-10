@@ -277,13 +277,13 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random()))
 
 	while true do
-		EmitSfx(lfleg, SFX.BUBBLE)
+		EmitSfx(lfleg, 1026)
 		Sleep(66)
-		EmitSfx(rfleg, SFX.BUBBLE)
+		EmitSfx(rfleg, 1026)
 		Sleep(66)
-		EmitSfx(lbleg, SFX.BUBBLE)
+		EmitSfx(lbleg, 1026)
 		Sleep(66)
-		EmitSfx(rbleg, SFX.BUBBLE)
+		EmitSfx(rbleg, 1026)
 		Sleep(66)
 	end
 

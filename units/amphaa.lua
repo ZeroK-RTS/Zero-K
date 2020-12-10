@@ -46,6 +46,7 @@ return { amphaa = {
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
       [[custom:STORMBACK]],
+      [[custom:bubbles_small]],
     },
   },
 

@@ -48,6 +48,7 @@ return { amphassault = {
 
     explosiongenerators = {
       [[custom:watercannon_muzzle]],
+      [[custom:bubbles_small]],
     },
 
   },

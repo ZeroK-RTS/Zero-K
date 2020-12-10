@@ -90,7 +90,7 @@ local function SinkBubbles()
 	
 	while true do
 		for i=1,#vents do
-			EmitSfx(vents[i], SFX.BUBBLE)
+			EmitSfx(vents[i], 1025)
 		end
 		Sleep(66)
 	end

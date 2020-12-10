@@ -64,9 +64,9 @@ end
 local function SinkBubbles()
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	while true do
-		EmitSfx(vent1, SFX.BUBBLE)
-		EmitSfx(vent2, SFX.BUBBLE)
-		EmitSfx(vent3, SFX.BUBBLE)
+		EmitSfx(vent1, 1024)
+		EmitSfx(vent2, 1024)
+		EmitSfx(vent3, 1024)
 		Sleep(66)
 	end
 end

@@ -45,6 +45,7 @@ return { amphimpulse = {
   sfxtypes               = {
     explosiongenerators = {
       [[custom:sonicfire]],
+      [[custom:bubbles_small]],
     },
   },
 

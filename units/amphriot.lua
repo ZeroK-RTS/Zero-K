@@ -44,6 +44,7 @@ return { amphriot = {
     explosiongenerators = {
       [[custom:HEAVY_CANNON_MUZZLE]],
       [[custom:RIOT_SHELL_L]],
+      [[custom:bubbles_small]],
     },
   },
 

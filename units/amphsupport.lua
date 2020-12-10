@@ -54,6 +54,7 @@ return { amphsupport = {
       [[custom:RAIDMUZZLE]],
       [[custom:RAIDDUST]],
       [[custom:THUDDUST]],
+      [[custom:bubbles_small]],
     },
 
   },

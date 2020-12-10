@@ -69,7 +69,7 @@ local function FloatBubbles()
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
-		--EmitSfx(vent, SFX.BUBBLE)
+		--EmitSfx(vent, 1026)
 
 		if isSubmerged then -- water breaking anim - kind of overkill?
 			local x,y,z = Spring.GetUnitPosition(unitID)
@@ -202,7 +202,7 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random(1,2)))
 
 	while true do --FIXME: not stopped when sinking ends!
-		EmitSfx(vent, SFX.BUBBLE)
+		EmitSfx(vent, 1026)
 		Sleep(66)
 	end
 
