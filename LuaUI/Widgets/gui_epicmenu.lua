@@ -3327,7 +3327,6 @@ function widget:KeyPress(key, modifier, isRepeat, label)
 			get_key_bind_without_mod = false
 			get_key_bind_with_any = false
 		end
-		Spring.Echo('start TEST')
 
 		if key == 0 and label:sub(0, 2) == '0x' then
 			translatedkey = label
