@@ -37,13 +37,13 @@ local USE_MATERIAL_INDICES = true
 
 local DEFAULT_STRENGTH_MULT = 0.5
 
-local SUBTLE_MIN = 300
+local SUBTLE_MIN = 400
 local SUBTLE_MAX = 4000
 
 local WEIGHT_CACHE_FIDELITY = 60
 
-local STRENGTH_MAGIC_NUMBER = 0.6
-local KERNAL_MAGIC_NUMBER   = 7
+local STRENGTH_MAGIC_NUMBER = 0.525
+local KERNAL_MAGIC_NUMBER   = 7.5
 
 -----------------------------------------------------------------
 -- File path Constants
