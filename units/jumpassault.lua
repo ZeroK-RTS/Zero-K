@@ -101,6 +101,7 @@ return { jumpassault = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       lodDistance             = 10000,
+      minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 125,
       reloadtime              = 1,
