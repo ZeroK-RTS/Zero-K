@@ -2358,8 +2358,11 @@ function options.unitsHotkeys2.OnChange(self)
 end
 
 local function CheckTabHotkeyAllowed()
+	local alt, ctrl = spGetModKeyState()
+	if alt then
+		return false
+	end
 	if options.ctrlDisableGrid.value then
-		local _, ctrl = spGetModKeyState()
 		if ctrl then
 			return false
 		end

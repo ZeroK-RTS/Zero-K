@@ -133,10 +133,14 @@ options = {
 ---------------------------------
 -- Terraform hotkey presets
 
-local levelPresets = {0, -8, -20, -24}
-local levelTypePreset = {0, 0, 0, 0}
-local raisePresets = {12, -12, 24, -30}
-local raiseTypePreset = {1, 2, 1, 2}
+local hotkeyDefaults = {
+	levelPresets = {0, -8, -20, -24},
+	levelTypePreset = {0, 0, 0, 0},
+	raisePresets = {12, 24, 40, 240, -120},
+	raiseTypePreset = {1, 1, 1},
+	levelCursorHotkey = {"alt+g"},
+	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j"},
+}
 
 ---------------------------------
 -- Config
@@ -264,6 +268,7 @@ for i = 1, 3 do
 		name = 'Level to Cursor Hotkey ' .. i,
 		desc = 'Set this hotkey to Level to the height of the terrain at the start of the lasson drawing.',
 		path = HOTKEY_PATH .. "/Level",
+		hotkey = hotkeyDefaults.levelCursorHotkey[i],
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_LEVEL)
 			if cmdDesc then
@@ -282,7 +287,7 @@ for i = 1, 10 do
 		name = 'Level Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Level",
-		value = levelTypePreset[i] or 0,
+		value = hotkeyDefaults.levelTypePreset[i] or 0,
 		items = {
 			{key = 0, name = 'Add and Subtract', desc = 'Terraform the entire area to the selected height.'},
 			{key = 1, name = 'Only Add', desc = 'Raise lower parts of the terrain up to the selected height.'},
@@ -296,8 +301,8 @@ for i = 1, 10 do
 		name = "Level height " .. i,
 		type = "number",
 		path = HOTKEY_PATH .. "/Level",
-		value = levelPresets[i] or 0,
-		min = -300, max = 300, step = 2,
+		value = hotkeyDefaults.levelPresets[i] or 0,
+		min = -400, max = 400, step = 2,
 	}
 	options_order[#options_order + 1] = "level_value_" .. i
 	
@@ -321,7 +326,7 @@ for i = 1, 10 do
 		name = 'Raise Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Raise",
-		value = raiseTypePreset[i] or 0,
+		value = hotkeyDefaults.raiseTypePreset[i] or 0,
 		items = {
 			{key = 0, name = 'Full', desc = 'Raise or lower the entire area.'},
 			{key = 1, name = 'Cull Cliffs', desc = 'Avoid raising sections of the terrain over the edge of cliffs.'},
@@ -335,8 +340,8 @@ for i = 1, 10 do
 		name = "Raise amount " .. i,
 		type = "number",
 		path = HOTKEY_PATH .. "/Raise",
-		value = raisePresets[i] or 0,
-		min = -300, max = 300, step = 2,
+		value = hotkeyDefaults.raisePresets[i] or 0,
+		min = -400, max = 400, step = 2,
 	}
 	options_order[#options_order + 1] = "raise_value_" .. i
 	
@@ -345,6 +350,7 @@ for i = 1, 10 do
 		name = 'Raise Hotkey ' .. i,
 		desc = 'Set this hotkey to issue a Raise command with these parameters.',
 		path = HOTKEY_PATH .. "/Raise",
+		hotkey = hotkeyDefaults.raiseHotkey[i],
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_RAISE)
 			if cmdDesc then
