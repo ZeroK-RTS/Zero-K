@@ -58,6 +58,8 @@ local defaultamount = 100
 local UpdateListFunction
 local wantRebuild = false
 
+local KICK_USER = "StartKickPoll_"
+
 local pingCpuColors = {
 	'\255\0\255\0',
 	'\255\178\255\0',
@@ -565,6 +567,19 @@ end
 
 local function BattleKickPlayer(subject)
 	Spring.SendCommands("say !poll kick " .. subject.name)
+end
+
+local function HandleKickMessage(msg)
+	if string.find(msg, KICK_USER) ~= 1 then
+		return
+	end
+	local data = msg:split("_")
+	if not (data and data[2]) then
+		return
+	end
+	
+	Spring.SendCommands("say !poll kick " .. data[2])
+	return true
 end
 
 local function ReportPlayer(subject)
@@ -1538,6 +1553,10 @@ function widget:Update(dt)
 		end
 		UpdatePlayers()
 	end
+end
+
+function widget:RecvLuaMsg(msg)
+	HandleKickMessage(msg)
 end
 
 function widget:Initialize()
