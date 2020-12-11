@@ -34,7 +34,7 @@ return { jumpraid = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
-  maxDamage             = 700,
+  maxDamage             = 670,
   maxSlope              = 36,
   maxVelocity           = 3,
   maxWaterDepth         = 22,
@@ -111,7 +111,7 @@ return { jumpraid = {
       },
     
       damage                  = {
-        default = 9.2,
+        default = 8.9,
         subs    = 0.01,
       },
 
