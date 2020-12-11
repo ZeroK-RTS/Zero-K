@@ -5,7 +5,7 @@ return { shieldriot = {
   acceleration           = 0.75,
   activateWhenBuilt      = true,
   brakeRate              = 4.5,
-  buildCostMetal         = 250,
+  buildCostMetal         = 260,
   buildPic               = [[shieldriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -104,7 +104,7 @@ return { shieldriot = {
         timeslow_damagefactor = 3,
       },
 
-      edgeeffectiveness       = 0.95,
+      edgeeffectiveness       = 0.6,
       explosionGenerator      = [[custom:NONE]],
       explosionSpeed          = 12,
       impulseBoost            = 0,
