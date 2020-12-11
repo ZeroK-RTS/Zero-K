@@ -37,6 +37,7 @@ local fadeProjectiles, fadeProjectileTimes = {}, {}
 local lightsEnabled = true
 local FADE_TIME = 5
 local FPS_WORRY_TIME = 60
+local BASE_STR_MULT = 1/1.15
 
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
@@ -99,7 +100,7 @@ options = {
 		name = 'Strength Multiplier',
 		type = 'number',
 		value = 1,
-		min = 0.01, max = 1, step = 0.01,
+		min = 0.01, max = 1.15, step = 0.01,
 		OnChange = function (self)
 			strengthMult = self.value
 			projectileLightTypes = GetLightsFromUnitDefs()
@@ -285,9 +286,9 @@ function GetLightsFromUnitDefs()
 			weaponData.b = colorList[3]
 		end
 		
-		weaponData.r = weaponData.r * strengthMult
-		weaponData.g = weaponData.g * strengthMult
-		weaponData.b = weaponData.b * strengthMult
+		weaponData.r = weaponData.r * strengthMult * BASE_STR_MULT
+		weaponData.g = weaponData.g * strengthMult * BASE_STR_MULT
+		weaponData.b = weaponData.b * strengthMult * BASE_STR_MULT
 		
 		if weaponData.radius > 0 and not customParams.fake_weapon then
 			plighttable[weaponDefID] = weaponData
