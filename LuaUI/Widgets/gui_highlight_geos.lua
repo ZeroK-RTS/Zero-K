@@ -91,10 +91,12 @@ function widget:DrawWorld()
 	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1
 	
 	if drawGeos then
+		gl.Blending(true)
 		glLineWidth(20)
 		glDepthTest(true)
 		glCallList(geoDisplayList)
 		glLineWidth(1)
+		gl.Blending(false)
 	end
 end
 
@@ -127,9 +129,7 @@ function widget:DefaultCommand(type, id)
 end
 
 function widget:DrawInMiniMap()
-
 	if drawGeos then
-	
 		gl.PushMatrix()
 		gl.LoadIdentity()
 		gl.Translate(0,1,0)
