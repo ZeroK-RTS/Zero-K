@@ -15,29 +15,6 @@ end
 include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
----- CHANGELOG -----
--- versus666,		v3.03	(17dec2011)	: 	Back to alt BACKQUOTE to remove selected units from group
---											to please licho, changed help accordingly.
--- versus666,		v3.02	(16dec2011)	: 	Fixed for 84, removed unused features, now alt backspace to remove
---											selected units from group, changed help accordingly.
--- versus666,		v3.01	(07jan2011)	: 	Added check to comply with F5.
--- wagonrepairer	v3.00	(07dec2010)	:	'Chilified' autogroup.
--- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
--- versus666, 		v2.24	(27oct2010)	:	Added switch to auto add units when built from factories.
---											Add group label numbers to units in group.
---											Sped up some routines & cleaned code.
---		?,			v2,23				:	Unknown.
--- very_bad_solider,v2.22				:	Ignores buildings and factories.
---											Does not react when META (+ALT) is pressed.
--- CarRepairer,		v2.00				:	Autogroups key is alt instead of alt+ctrl.
---											Added commands: help, loadgroups, cleargroups, verboseMode, addall.
--- Licho,			v1.0				:	Creation.
-
---REMINDER :
--- none
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
