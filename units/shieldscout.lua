@@ -98,6 +98,7 @@ return { shieldscout = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       lodDistance             = 10000,
+      minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 50,
       reloadtime              = 2,
