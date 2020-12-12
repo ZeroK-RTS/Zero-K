@@ -1246,6 +1246,7 @@ local function DrawWorldFunc()
 	)
 	glDepthTest(false)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	glCulling(false)
 	phase = phase + .06
 end
 
