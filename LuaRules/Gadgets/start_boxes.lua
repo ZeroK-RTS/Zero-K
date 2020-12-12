@@ -31,7 +31,7 @@ local function GetAverageStartpoint(boxID)
 	return x, z
 end
 
-local function RegtangularizeTrapezoid(edgeA, edgeB)
+local function RectangularizeTrapezoid(edgeA, edgeB)
 	local vector = Spring.Utilities.Vector
 	local origin = edgeA[1]
 	local unit = vector.Unit(vector.Subtract(edgeA[2], edgeA[1]))
@@ -148,7 +148,7 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 		local edgesA = GetEdgePoints(pointA)
 		local edgesB = GetEdgePoints(pointB)
 		
-		return RegtangularizeTrapezoid(edgesA, edgesB)
+		return RectangularizeTrapezoid(edgesA, edgesB)
 	end
 
 	return {
