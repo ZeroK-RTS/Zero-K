@@ -530,6 +530,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if (hp < 0) then
 		damage = damage + hp
 	end
+	if damage < 0 then
+		-- can happen with the EMP component of mixed weapons, when last-hitting
+		return
+	end
 	AddAwardPoints( 'ouch', unitTeam, damage )
 
 	if (not attackerTeam)

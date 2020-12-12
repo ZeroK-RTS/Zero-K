@@ -62,7 +62,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                                weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if paralyzer then -- the weapon deals paralysis damage
 		local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
-		if health and maxHealth and health ~= 0 then -- taking no chances.
+		if health and maxHealth and health > 0 then -- taking no chances.
 			if not (weaponDefID and overstunDamageMult[weaponDefID]) then
 				return damage*maxHealth/health
 			end
