@@ -290,6 +290,8 @@ local function InitializeBriefingWindow()
 	local SCROLL_POS = 70
 	local SCROLL_HEIGHT = 170
 	
+	local wantUnpause = true
+	
 	local externalFunctions = {}
 	
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
@@ -394,9 +396,13 @@ local function InitializeBriefingWindow()
 		if not withoutPause then
 			if gameNotStarted then
 				wantPause = true
+				wantUnpause = true
 			else
 				local paused = select(3, Spring.GetGameSpeed())
-				if not paused then
+				if paused then
+					wantUnpause = false
+				else
+					wantUnpause = true
 					Spring.SendCommands("pause")
 				end
 			end
@@ -410,10 +416,12 @@ local function InitializeBriefingWindow()
 		if WG.PauseScreen_SetEnabled then
 			WG.PauseScreen_SetEnabled(true)
 		end
-		wantPause = false
-		local paused = select(3, Spring.GetGameSpeed())
-		if paused then
-			Spring.SendCommands("pause")
+		if wantUnpause then
+			wantPause = false
+			local paused = select(3, Spring.GetGameSpeed())
+			if paused then
+				Spring.SendCommands("pause")
+			end
 		end
 		briefingWindow:SetVisibility(false)
 	end
