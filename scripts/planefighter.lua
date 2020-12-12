@@ -129,7 +129,7 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	if num == 2 then
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 133, 35)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, 130, 530, 38, 0.1, false, 100)
 	end
 	return false
 end

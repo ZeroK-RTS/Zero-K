@@ -101,10 +101,7 @@ function script.AimWeapon(id, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 190, 55, 0.25) then -- leaving at 190 for the case of amph regen
-		return true
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 180, 240, 28, 0.05, true, 100)
 end
 
 local explodables = {sonar, turret}

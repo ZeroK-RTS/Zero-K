@@ -58,7 +58,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1600.1, 50)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 1600, 2400, 44, 0.1, true, 100)
 end
 
 function script.Killed(recentDamage, maxHealth)

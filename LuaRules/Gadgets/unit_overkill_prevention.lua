@@ -170,7 +170,7 @@ end
 	noFire -- The unit is just testing whether it would be blocked. It is not neccessarily creating a projectile frrom this test.
 ]]--
 local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly, noFire)
-
+	Spring.Utilities.UnitEcho(unitID, timeout + gameFrame)
 	-- Modify timeout based on unit speed and fastMult
 	local unitDefID = Spring.GetUnitDefID(targetID)
 	if fastMult and fastMult ~= 1 then
@@ -384,6 +384,10 @@ end
 
 --------------------------------------------------------------------------------
 -- Unit Handling
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,  weaponID, attackerID, attackerDefID, attackerTeam)
+    Spring.Utilities.UnitEcho(unitID, Spring.GetGameFrame())
+end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if handledUnitDefIDs[unitDefID] then

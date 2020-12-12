@@ -125,6 +125,19 @@ function GG.Script.NonBlockingWaitTurn(piece, axis, angle, leeway)
 	end
 end
 
+function GG.Script.OverkillPreventionCheck(unitID, targetID, damage, range, fullTime, hitTimeMod, useTargetSpeed, minRange, fastMult, radarMult, staticOnly)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = math.max(minRange or 0, Spring.GetUnitSeparation(unitID, targetID) or 0)/range
+		if useTargetSpeed then
+			local _, _, _, speed = Spring.GetUnitVelocity(targetID)
+			hitTimeMod = hitTimeMod + speed/range
+		end
+		local timeout = math.floor(fullTime*math.max(0, distMult - hitTimeMod))
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
+	end
+	return false
+end
+
 function GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, KillFunc, delayTime)
 	
 	local wreckLevel = KillFunc(recentDamage, maxHealth)

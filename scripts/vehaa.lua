@@ -202,11 +202,7 @@ function script.QueryWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/730
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 290.1, 40 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, 280.1, 730, 30, 0.05, true)
 end
 
 function script.AimWeapon()
