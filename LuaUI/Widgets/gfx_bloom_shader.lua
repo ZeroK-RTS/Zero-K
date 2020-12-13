@@ -197,13 +197,17 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Update(dt)
-	if initialized == false then return end
+	if initialized == false then
+		return
+	end
 	camX, camY, camZ = Spring.GetCameraPosition()
 	camDirX,camDirY,camDirZ = Spring.GetCameraDirection()
 end
 
 function widget:DrawWorldPreUnit()
-	if initialized == false or drawWorldPreUnitAlpha <= 0.05 then return end
+	if initialized == false or drawWorldPreUnitAlpha <= 0.05 then
+		return
+	end
 	gl.PushMatrix()
 	gl.Color(0,0,0,drawWorldPreUnitAlpha)
 	gl.Translate(camX+(camDirX*360),camY+(camDirY*360),camZ+(camDirZ*360))
@@ -213,13 +217,17 @@ function widget:DrawWorldPreUnit()
 end
 
 function widget:DrawWorld()
-	if initialized == false or drawWorldAlpha <= 0.05 then return end
+	if initialized == false or drawWorldAlpha <= 0.05 then
+		return
+	end
+	gl.Blending(true)
 	gl.PushMatrix()
 	gl.Color(0,0,0,drawWorldAlpha)
 	gl.Translate(camX+(camDirX*360),camY+(camDirY*360),camZ+(camDirZ*360))
 	gl.Billboard()
 	gl.Rect(-500, -500, 500, 500)
 	gl.PopMatrix()
+	gl.Blending(false)
 end
 
 
