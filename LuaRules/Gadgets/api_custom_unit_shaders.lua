@@ -850,6 +850,23 @@ function gadget:GameFrame(gf)
 	_GameFrame(gf)
 end
 
+local oldTime = Spring.GetTimer()
+function gadget:Update()
+	local frame, _, paused = Spring.GetGameSpeed()
+	paused = paused or Spring.GetGameFrame() < 1
+	if not paused then
+		oldTime = false
+		return
+	end
+	local currentTime = Spring.GetTimer()
+	oldTime = oldTime or currentTime
+	local timeDiff = Spring.DiffTimers(currentTime, oldTime)
+	if timeDiff > 1 then
+		_GameFrameSlow()
+		oldTime = currentTime
+	end
+end
+
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
