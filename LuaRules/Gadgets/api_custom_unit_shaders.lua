@@ -850,20 +850,29 @@ function gadget:GameFrame(gf)
 	_GameFrame(gf)
 end
 
-local oldTime = Spring.GetTimer()
+local slowTime = Spring.GetTimer()
+local fastTime = Spring.GetTimer()
 function gadget:Update()
-	local frame, _, paused = Spring.GetGameSpeed()
-	paused = paused or Spring.GetGameFrame() < 1
+	local _, _, paused = Spring.GetGameSpeed()
+	local frame = Spring.GetGameFrame()
+	paused = paused or frame < 1
 	if not paused then
-		oldTime = false
+		slowTime = false
+		fastTime = false
 		return
 	end
+
 	local currentTime = Spring.GetTimer()
-	oldTime = oldTime or currentTime
-	local timeDiff = Spring.DiffTimers(currentTime, oldTime)
-	if timeDiff > 1 then
-		_GameFrameSlow()
-		oldTime = currentTime
+	slowTime = slowTime or currentTime
+	fastTime = fastTime or currentTime
+
+	if Spring.DiffTimers(currentTime, fastTime) > 0.0333 then
+		_GameFrame(frame)
+		fastTime = currentTime
+	end
+	if Spring.DiffTimers(currentTime, slowTime) > 1 then
+		_GameFrameSlow(frame)
+		slowTime = currentTime
 	end
 end
 
