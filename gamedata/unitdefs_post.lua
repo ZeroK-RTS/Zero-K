@@ -311,6 +311,7 @@ for name, ud in pairs(UnitDefs) do
 			for _, wd in pairs(ud.weapondefs) do
 				if wd.weapontype == "Shield" then
 					hasShield = true
+					ud.activatewhenbuilt = true
 					ud.customparams.shield_radius = wd.shieldradius
 					ud.customparams.shield_power = wd.shieldpower
 					ud.customparams.shield_recharge_delay = (wd.customparams or {}).shield_recharge_delay or wd.shieldrechargedelay
