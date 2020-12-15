@@ -862,7 +862,6 @@ do
 	function DrawStockpile(numStockpiled, numStockpileQued)
 		--// DRAW STOCKPILED MISSLES
 		glColor(1, 1, 1, 1)
-		gl.Blending(true)
 		glTexture("LuaUI/Images/nuke.png")
 		local xoffset = barWidth+16
 		for i = 1, ((numStockpiled > 3) and 3) or numStockpiled do
@@ -870,7 +869,6 @@ do
 			xoffset = xoffset-8
 		end
 		glTexture(false)
-		gl.Blending(false)
 
 		glText(numStockpiled..'/'..numStockpileQued, barWidth+1.7, -(11*barHeight-2)-16, 6.5, "cno")
 	end

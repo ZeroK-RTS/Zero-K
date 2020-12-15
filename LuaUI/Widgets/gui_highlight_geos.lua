@@ -91,12 +91,10 @@ function widget:DrawWorld()
 	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1
 	
 	if drawGeos then
-		gl.Blending(true)
 		glLineWidth(20)
 		glDepthTest(true)
 		glCallList(geoDisplayList)
 		glLineWidth(1)
-		gl.Blending(false)
 	end
 end
 

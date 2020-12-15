@@ -303,7 +303,6 @@ end
 
 function widget:DrawWorld()
 	gl.Fog(false)
-	gl.Blending(true)
 
 	gl.CallList(boxList)
 
@@ -342,7 +341,6 @@ function widget:DrawWorld()
 	end
 
 	gl.Fog(true)
-	gl.Blending(false)
 end
 
 local function GetTeamName(teamID)

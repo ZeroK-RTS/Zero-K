@@ -220,14 +220,12 @@ function widget:DrawWorld()
 	if initialized == false or drawWorldAlpha <= 0.05 then
 		return
 	end
-	gl.Blending(true)
 	gl.PushMatrix()
 	gl.Color(0,0,0,drawWorldAlpha)
 	gl.Translate(camX+(camDirX*360),camY+(camDirY*360),camZ+(camDirZ*360))
 	gl.Billboard()
 	gl.Rect(-500, -500, 500, 500)
 	gl.PopMatrix()
-	gl.Blending(false)
 end
 
 

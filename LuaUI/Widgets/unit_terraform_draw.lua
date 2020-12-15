@@ -189,7 +189,6 @@ function widget:DrawWorld()
 		return
 	end
 	gl.DepthTest(false)
-	gl.Blending(true)
 	for unitID, info in pairs(terraUnits) do
 		if info and info.terraformType > 0 and Spring.IsUnitVisible(unitID, 550, true) then
 			local state = Spring.GetUnitLosState(unitID, info.allyTeamID, false)
@@ -209,5 +208,4 @@ function widget:DrawWorld()
 			end
 		end
 	end
-	gl.Blending(false)
 end
