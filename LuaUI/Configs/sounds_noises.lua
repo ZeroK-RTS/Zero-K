@@ -1,5 +1,10 @@
 -- needs select[1] and ok[1] (and build for cons)
 
+local volumeOverrides = {
+	heavy_bot_move = 0.36,
+	bot_select = 0.42,
+}
+
 local sounds = {
 	-- Misc
 	staticrearm = {
@@ -1838,7 +1843,7 @@ local function applyCustomParamSound(soundDef, soundName, customParams)
 
 	soundDef = soundDef or {}
 	soundDef[soundName] = {
-		volume = tonumber(customParams["sound" .. soundName .. "_vol"] or 1),
+		volume = volumeOverrides[sound] or tonumber(customParams["sound" .. soundName .. "_vol"] or 1),
 		[1] = sound,
 	}
 	return soundDef
@@ -1858,6 +1863,12 @@ local function applyCommanderSound(soundDef, customParams)
 	return soundDef
 end
 
+local function OverrideVolume(def)
+	if def and def[1] and volumeOverrides[def[1]] then
+		def.volume = volumeOverrides[def[1]]
+	end
+end
+
 local ret = {}
 for udid, ud in pairs(UnitDefs) do
 	local soundDef = sounds[ud.name]
@@ -1866,6 +1877,12 @@ for udid, ud in pairs(UnitDefs) do
 	soundDef = applyCustomParamSound(soundDef, "select", cp)
 	soundDef = applyCustomParamSound(soundDef, "build" , cp)
 	soundDef = applyCommanderSound(soundDef, cp, ud.name)
+	
+	if soundDef then
+		OverrideVolume(soundDef.ok)
+		OverrideVolume(soundDef.select)
+		OverrideVolume(soundDef.build)
+	end
 	ret[udid] = soundDef
 end
 
