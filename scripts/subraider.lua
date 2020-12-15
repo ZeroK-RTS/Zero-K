@@ -7,11 +7,15 @@ function script.QueryWeapon(num)
 	return firepoint
 end
 function script.AimFromWeapon(num)
-	return base
+	return firepoint
 end
 
 function script.AimWeapon(num, heading, pitch)
 	return num == 2
+end
+
+function script.Create()
+	Move(firepoint, y_axis, 10)
 end
 
 function script.BlockShot(num, targetID)

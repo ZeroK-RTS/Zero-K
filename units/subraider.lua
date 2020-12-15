@@ -19,7 +19,7 @@ return { subraider = {
 
   customParams           = {
     modelradius    = [[13]],
-    aimposoffset   = [[0 -5 0]],
+    aimposoffset   = [[0 1 0]],
     midposoffset   = [[0 -5 0]],
     turnatfullspeed = [[1]],
   },
@@ -45,7 +45,7 @@ return { subraider = {
   turninplace            = 0,
   turnRate               = 1056,
   upright                = true,
-  waterline              = 55,
+  waterline              = 45,
   workerTime             = 0,
 
   weapons                = {
