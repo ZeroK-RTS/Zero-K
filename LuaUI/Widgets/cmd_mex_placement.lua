@@ -7,7 +7,7 @@ function widget:GetInfo()
 		version   = "v1",
 		date      = "22 April, 2012", --2 April 2013
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = 1001, -- Under Chili
 		enabled   = true,
 		alwaysStart = true,
 		handler   = true
@@ -255,6 +255,7 @@ local myOctant = 1
 ------------------------------------------------------------
 -- Functions
 ------------------------------------------------------------
+
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
@@ -348,7 +349,83 @@ end
 -- Command Handling
 ------------------------------------------------------------
 
+local function MakeOptions()
+	local a, c, m, s = Spring.GetModKeyState()
+	local coded = (a and CMD.OPT_ALT or 0) +
+	              (c and CMD.OPT_CTRL or 0) +
+	              (m and CMD.OPT_META or 0) +
+	              (s and CMD.OPT_SHIFT or 0)
+	
+	return {
+		alt   = a and true or false,
+		ctrl  = c and true or false,
+		meta  = m and true or false,
+		shift = s and true or false,
+		coded = coded,
+		internal = false,
+		right = false,
+	}
+end
+
+local function PlaceSingleMex(bx, bz, facing, options)
+	facing = facing or Spring.GetBuildFacing() or 0
+	options = options or MakeOptions()
+
+	local closestSpot = GetClosestMetalSpot(bx, bz)
+	if closestSpot then
+		local units = spGetUnitsInRectangle(closestSpot.x-1, closestSpot.z-1, closestSpot.x+1, closestSpot.z+1)
+		local foundUnit = false
+		local foundEnemy = false
+		for i = 1, #units do
+			local unitID = units[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if unitDefID and mexDefID == unitDefID then
+				if spGetUnitAllyTeam(unitID) == spGetMyAllyTeamID() then
+					foundUnit = unitID
+				else
+					foundEnemy = true
+				end
+				break
+			end
+		end
+
+		if foundEnemy then
+			return true, true
+		elseif foundUnit then
+			local build = select(5, spGetUnitHealth(foundUnit))
+			if build ~= 1 then
+				if options.meta then
+					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
+				else
+					spGiveOrder(CMD.REPAIR, {foundUnit}, options)
+				end
+				WG.noises.PlayResponse(false, CMD.REPAIR)
+				return true, options.shift
+			end
+			return true, true
+		else
+			-- check if some other widget wants to handle the command before sending it to units.
+			local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
+			if Spring.TestBuildOrder(mexDefID, closestSpot.x, commandHeight, closestSpot.z, facing) == 0 then
+				return true, true
+			end
+			local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options, false)
+			if not GBC_processed then
+				if options.meta then
+					WG.CommandInsert(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+				else
+					spGiveOrder(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+				end
+				WG.noises.PlayResponse(false, -mexDefID)
+			end
+			return true, options.shift
+		end
+	end
+	return false, options.shift
+end
+
 function widget:CommandNotify(cmdID, params, options)
+	Spring.Echo("CommandNotify", math.random())
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
 
@@ -474,48 +551,10 @@ function widget:CommandNotify(cmdID, params, options)
 	end
 
 	if -mexDefID == cmdID and WG.metalSpots then
-
+		-- This will probably never be called now that this is handled by widget:MousePress
 		local bx, bz = params[1], params[3]
-		local closestSpot = GetClosestMetalSpot(bx, bz)
-		if closestSpot then
-			local units = spGetUnitsInRectangle(closestSpot.x-1, closestSpot.z-1, closestSpot.x+1, closestSpot.z+1)
-			local foundUnit = false
-			local myAlly = spGetMyAllyTeamID()
-			for i = 1, #units do
-				local unitID = units[i]
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				if unitDefID and mexDefID == unitDefID and spGetUnitAllyTeam(unitID) == myAlly then
-					foundUnit = unitID
-					break
-				end
-			end
-
-			if foundUnit then
-				local build = select(5, spGetUnitHealth(foundUnit))
-				if build ~= 1 then
-					if options.meta then
-						WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
-					else
-						spGiveOrder(CMD.REPAIR, {foundUnit}, options)
-					end
-				end
-				return true
-			else
-				-- check if some other widget wants to handle the command before sending it to units.
-				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
-				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
-				if not GBC_processed then
-					if options.meta then
-						WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
-					else
-						spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
-					end
-				end
-				return true
-			end
-		end
+		return PlaceSingleMex(bx, bz, params[4], options)
 	end
-
 end
 
 
@@ -541,7 +580,6 @@ function widget:UnitEnteredLos(unitID, teamID)
 end
 
 local function DidMexDie(unitID, expectedSpotID) --> dead, idReusedForAnotherMex
-
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID ~= mexDefID then -- not just a nil check, the unitID could have gotten recycled for another unit
 		return true, false
@@ -603,6 +641,34 @@ local function CheckAllTerrainChanges()
 		CheckEnemyMexes(i)
 		CheckTerrainChange(i)
 	end
+end
+
+------------------------------------------------------------
+-- Callins
+------------------------------------------------------------
+
+function widget:MousePress(x, y, button)
+	local _, cmdID = spGetActiveCommand()
+	if (-mexDefID == cmdID and WG.metalSpots) then
+		return true
+	end
+	return false
+end
+
+function widget:MouseRelease(x, y, button)
+	if button ~= 1 then
+		Spring.SetActiveCommand(-1)
+		return false
+	end
+	local mx, my = spGetMouseState()
+	local _, coords = spTraceScreenRay(mx, my, true, true)
+	if coords then
+		local _, retain = PlaceSingleMex(coords[1], coords[3])
+		if not retain then
+			Spring.SetActiveCommand(-1)
+		end
+	end
+	return true
 end
 
 function widget:GameFrame(n)
