@@ -16,10 +16,48 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local sunPath   = 'Settings/Graphics/Sun, Fog & Water/Sun'
+local fogPath   = 'Settings/Graphics/Sun, Fog & Water/Fog'
+local waterpath = 'Settings/Graphics/Sun, Fog & Water/Water'
+
+local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
+local MAP_FILE        = (Game.mapName or "") .. ".lua"
+local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
+local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
+
+local initialized              = false
+local sunSettingsChanged       = false
+local directionSettingsChanged = false
+local fogSettingsChanged       = false
+local waterSettingsChanged     = false
+
+local skip = {
+	["enable_fog"] = true,
+	["save_map_settings"] = true,
+	["load_map_settings"] = true,
+}
+
+local defaultWaterFixParams = {
+	["ambientFactor"] = 0.8,
+	["blurExponent"]= 1.8,
+	["diffuseFactor"]= 1.15,
+	["fresnelMin"]= 0.07,
+	["surfaceAlpha"] = 0.32,
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Settings Updates
+
+local function ResetWater()
+	Spring.SendCommands("water 4")
+end
+
 local sunDir = 0
 local sunPitch = math.pi*0.8
 
 local function SunDirectionFunc(newDir, newPitch)
+	directionSettingsChanged = true
 	sunDir = newDir or sunDir
 	sunPitch = newPitch or sunPitch
 	
@@ -30,29 +68,24 @@ local function SunDirectionFunc(newDir, newPitch)
 	Spring.SetSunDirection(sunX, sunY, sunZ)
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local sunPath   = 'Settings/Graphics/Sun, Fog & Water/Sun'
-local fogPath   = 'Settings/Graphics/Sun, Fog & Water/Fog'
-local waterpath = 'Settings/Graphics/Sun, Fog & Water/Water'
-
-local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
-local MAP_FILE        = (Game.mapName or "") .. ".lua"
-local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
-local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
-
-local initialized = false
-
-local skip = {
-	["enable_fog"] = true,
-	["save_map_settings"] = true,
-	["load_map_settings"] = true,
-}
-
-local function ResetWater()
-	Spring.SendCommands("water 4")
+local function UpdateSunValue(name, value)
+	Spring.SetSunLighting({[name] = value})
+	sunSettingsChanged = true
 end
+
+local function UpdateFogValue(name, value)
+	Spring.SetAtmosphere({[name] = value})
+	fogSettingsChanged = true
+end
+
+local function UpdateWaterValue(name, value)
+	Spring.SetWaterParams({[name] = value})
+	ResetWater()
+	waterSettingsChanged = true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function GetOptionsTable(pathMatch, filter, whitelistFilter)
 	-- Filter is either a blacklist of a whitelist 
@@ -71,10 +104,26 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		sun = GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction = GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog = GetOptionsTable(fogPath),
-		water = GetOptionsTable(waterpath),
+		sun       = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog       = fogSettingsChanged       and GetOptionsTable(fogPath),
+		water     = waterSettingsChanged     and GetOptionsTable(waterpath),
+	}
+	
+	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+end
+
+local function ApplyDefaultWaterFix()
+	Spring.SetWaterParams(defaultWaterFixParams)
+	ResetWater()
+end
+
+local function SaveDefaultWaterFix()
+	local writeTable = {
+		fixDefaultWater = true,
+		sun       = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog       = fogSettingsChanged       and GetOptionsTable(fogPath),
 	}
 	
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
@@ -87,6 +136,7 @@ local function LoadSunAndFogSettings()
 	local sun = OVERRIDE_CONFIG.sun
 	if sun then
 		Spring.SetSunLighting(sun)
+		sunSettingsChanged = true
 		
 		for name, value in pairs(sun) do
 			options[name].value = value
@@ -104,6 +154,7 @@ local function LoadSunAndFogSettings()
 	local fog = OVERRIDE_CONFIG.fog
 	if fog then
 		Spring.SetAtmosphere(fog)
+		fogSettingsChanged = true
 		
 		for name, value in pairs(fog) do
 			options[name].value = value
@@ -113,7 +164,12 @@ local function LoadSunAndFogSettings()
 	local water = OVERRIDE_CONFIG.water
 	if water then
 		Spring.SetWaterParams(water)
+		waterSettingsChanged = true
 		ResetWater()
+	end
+	
+	if OVERRIDE_CONFIG.fixDefaultWater then
+		ApplyDefaultWaterFix()
 	end
 end
 
@@ -172,19 +228,15 @@ local function GetOptions()
 		options_order[#options_order + 1] = name
 	end
 	
-	local function AddColorOption(name, humanName, path, ColorFunction, defaultVal, ExtraFunc)
+	local function AddColorOption(name, humanName, path, ApplyFunc, defaultVal)
 		options[name] = {
 			name = humanName,
 			type = 'colors',
 			value = defaultVal or {0.8, 0.8, 0.8, 1},
 			OnChange = function (self)
 				if initialized then
-					Spring.Echo("ColorFunction")
 					Spring.Utilities.TableEcho(self.value, name)
-					ColorFunction({[name] = self.value})
-					if ExtraFunc then
-						ExtraFunc()
-					end
+					ApplyFunc(name, self.value)
 				end
 			end,
 			advanced = true,
@@ -194,7 +246,7 @@ local function GetOptions()
 		options_order[#options_order + 1] = name
 	end
 	
-	local function AddNumberOption(name, humanName, path, NumberFunction, defaultVal, minVal, maxVal, ExtraFunc)
+	local function AddNumberOption(name, humanName, path, ApplyFunc, defaultVal, minVal, maxVal)
 		options[name] = {
 			name = humanName,
 			type = 'number',
@@ -202,11 +254,7 @@ local function GetOptions()
 			min = minVal or -5, max = maxVal or 5, step = 0.01,
 			OnChange = function (self)
 				if initialized then
-					Spring.Echo("NumberFunction", name, self.value)
-					NumberFunction({[name] = self.value})
-					if ExtraFunc then
-						ExtraFunc()
-					end
+					ApplyFunc(name, self.value)
 				end
 			end,
 			advanced = true,
@@ -223,11 +271,11 @@ local function GetOptions()
 	local sunColors = {"Ambient", "Diffuse", "Specular"}
 	for _, thing in ipairs(sunThings) do
 		for _, color in ipairs(sunColors) do
-			AddColorOption(thing .. color .. "Color", thing .. " " .. color .. "Color", sunPath, Spring.SetSunLighting)
+			AddColorOption(thing .. color .. "Color", thing .. " " .. color .. "Color", sunPath, UpdateSunValue)
 		end
 	end
 	
-	AddNumberOption("specularExponent", "Specular Exponent", sunPath, Spring.SetSunLighting)
+	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue)
 
 	options["sunDir"] = {
 		name = "Sun Direction",
@@ -266,21 +314,21 @@ local function GetOptions()
 ---------------------------------------
 	local fogThings = {"sun", "sky", "cloud", "fog"}
 	for _, thing in ipairs(fogThings) do
-		AddColorOption(thing .. "Color", thing .. " Color", fogPath, Spring.SetAtmosphere)
+		AddColorOption(thing .. "Color", thing .. " Color", fogPath, UpdateFogValue)
 	end
-	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere, 0, -1, 1)
-	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere, -1, -1, 1)
+	AddNumberOption("fogStart", "Fog Start", fogPath, UpdateFogValue, 0, -1, 1)
+	AddNumberOption("fogEnd", "Fog End", fogPath, UpdateFogValue, -1, -1, 1)
 
 ---------------------------------------
 -- Water
 ---------------------------------------
 	for i = 1, #waterNumberDefaults do
 		local data = waterNumberDefaults[i]
-		AddNumberOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, data.minVal, data.maxVal, ResetWater)
+		AddNumberOption(data.name, data.name, waterpath, UpdateWaterValue, data.val, data.minVal, data.maxVal)
 	end
 	for i = 1, #waterColorDefaults do
 		local data = waterColorDefaults[i]
-		AddColorOption(data.name, data.name, waterpath, Spring.SetWaterParams, data.val, ResetWater)
+		AddColorOption(data.name, data.name, waterpath, UpdateWaterValue, data.val)
 	end
 
 ---------------------------------------
@@ -300,8 +348,20 @@ local function GetOptions()
 		OnChange = LoadSunAndFogSettings,
 		advanced = true
 	})
-
-	
+	AddOption("save_water_fix", {
+		name = 'Save Water Fix',
+		type = 'button',
+		desc = "Save settings to infolog, overriding water with a minimal fix for default water.",
+		OnChange = SaveDefaultWaterFix,
+		advanced = true
+	})
+	AddOption("apply_water_fix", {
+		name = 'Apply Water Fix',
+		type = 'button',
+		desc = "Test the minimal fix for default water.",
+		OnChange = ApplyDefaultWaterFix,
+		advanced = true
+	})
 	return options, options_order
 end
 
