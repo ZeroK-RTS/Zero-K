@@ -251,6 +251,7 @@ local metalmultInv = metalmult > 0 and (1/metalmult) or 1
 
 local myPlayerID = Spring.GetMyPlayerID()
 local myOctant = 1
+local pregame = true
 
 ------------------------------------------------------------
 -- Functions
@@ -647,6 +648,10 @@ end
 ------------------------------------------------------------
 
 function widget:MousePress(x, y, button)
+	if pregame then
+		-- Let initial queue handle mex placement
+		return false
+	end
 	local _, cmdID = spGetActiveCommand()
 	if (-mexDefID == cmdID and WG.metalSpots) then
 		return true
@@ -671,6 +676,7 @@ function widget:MouseRelease(x, y, button)
 end
 
 function widget:GameFrame(n)
+	pregame = false
 	if not WG.metalSpots or (n % 5) ~= 0 then
 		return
 	end
@@ -740,6 +746,7 @@ local function Initialize()
 		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
 
+	pregame = (Spring.GetGameFrame() < 1)
 	updateMexDrawList()
 
 	WG.GetClosestMetalSpot = GetClosestMetalSpot
