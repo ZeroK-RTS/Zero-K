@@ -1576,9 +1576,20 @@ end
 
 
 function widgetHandler:DrawWorld()
+	--local doEcho = math.random() > 0.01
+	--if doEcho then
+	--	local enabled, params = gl.GetFixedState("blending")
+	--	Spring.Echo("enabled, params", enabled, params, "Initial")
+	--	Spring.Utilities.TableEcho(params, "params")
+	--end
 	for _, w in r_ipairs(self.DrawWorldList) do
 		gl.Fog(true)
 		w:DrawWorld()
+		--if doEcho then
+		--	local enabled, params = gl.GetFixedState("blending")
+		--	Spring.Echo("enabled, params", enabled, params, w:GetInfo().name)
+		--	Spring.Utilities.TableEcho(params, "params")
+		--end
 	end
 	gl.Fog(false)
 end

@@ -474,7 +474,7 @@ local function DoDrawOutline(isScreenSpace)
 	gl.Texture(0, false)
 	gl.Texture(1, false)
 	gl.Texture(3, false)
-	gl.Blending(false)
+	gl.Blending(true)
 end
 
 local function EnterLeaveScreenSpace(functionName, ...)
