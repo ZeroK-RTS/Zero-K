@@ -147,35 +147,51 @@ local function DecideCommands(unitID)
 
 	local metalMake, metalUse, energyMake, energyUse = spGetUnitResources(unitID)
 
-	local metal, metalStorage, metalPull, metalIncome =
+	local metal, metalStorage, metalPull, metalIncome, metalExpense,
+			metalShare, metalSent, metalReceived, metalExcess =
 			spGetTeamResources(spGetMyTeamID(), "metal")
 	metalStorage = metalStorage - HIDDEN_STORAGE
 	if debug then
-		Log("metal=", metal, "; storage=", metalStorage, "; pull=", metalPull,
-				" -", metalUse, "; income=", metalIncome, " -", metalMake)
+		Log("metal=", metal,
+				"; storage=", metalStorage,
+				"; pull=", metalPull,
+				"; income=", metalIncome, " - ", metalMake,
+				"; expense=", metalExpense, " - ", metalUse,
+				"; share=", metalShare,
+				"; sent=", metalSent,
+				"; received=", metalReceived,
+				"; excess=", metalExcess)
 	end
-	local energy, energyStorage, energyPull, energyIncome =
+	local energy, energyStorage, energyPull, energyIncome, energyExpense,
+			energyShare, energySent, energyReceived, energyExcess =
 			spGetTeamResources(spGetMyTeamID(), "energy")
 	energyStorage = energyStorage - HIDDEN_STORAGE
 	if debug then
-		Log("energy=", energy, "; storage=", energyStorage, "; pull=", energyPull,
-				" -", energyUse, "; income=", energyIncome, " -", energyMake)
+		Log("energy=", energy,
+				"; storage=", energyStorage,
+				"; pull=", energyPull,
+				"; income=", energyIncome, " - ", energyMake,
+				"; expense=", energyExpense, " - ", energyUse,
+				"; share=", energyShare,
+				"; sent=", energySent,
+				"; received=", energyReceived,
+				"; excess=", energyExcess)
 	end
 
 	-- Subtract what the unit is currently doing from the overall metal/energy
 	-- use/production.
-	metalPull = metalPull - metalUse
+	metalExpense = metalExpense - metalUse
 	metalIncome = metalIncome - metalMake
-	energyPull = energyPull - energyUse
+	energyExpense = energyExpense - energyUse
 	energyIncome = energyIncome - energyMake
 
 	local get_metal, get_energy, use_metal, use_energy
 
 	if metalStorage < 1 then
-		get_metal = metalPull >= metalIncome
-		use_metal = metalPull <= metalIncome
+		get_metal = metalExpense >= metalIncome
+		use_metal = metalExpense <= metalIncome
 	else
-		local future = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalPull) / FPS))
+		local future = max(0, min(metalStorage, metal + checkInterval * (metalIncome - metalExpense) / FPS))
 		-- Only get metal if we won't waste any metal by doing so.
 		local production = checkInterval * trackedUnit.reclaimSpeed / FPS
 		get_metal = future + production <= metalStorage
@@ -184,10 +200,10 @@ local function DecideCommands(unitID)
 	end
 
 	if energyStorage < 1 then
-		get_energy = energyPull >= energyIncome
-		use_energy = energyPull <= energyIncome
+		get_energy = energyExpense >= energyIncome
+		use_energy = energyExpense <= energyIncome
 	else
-		local future = energy + checkInterval * (energyIncome - energyPull) / FPS
+		local future = energy + checkInterval * (energyIncome - energyExpense) / FPS
 		-- Only get energy if we have storage for it.
 		local production = checkInterval * trackedUnit.reclaimSpeed / FPS
 		get_energy = future + production <= energyStorage
