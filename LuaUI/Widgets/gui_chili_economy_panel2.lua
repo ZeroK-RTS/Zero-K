@@ -233,7 +233,7 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
+	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalFlash', 'metalWarning', 'opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve', 'flowAsArrows',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
  
@@ -281,6 +281,12 @@ options = {
 		type  = "number",
 		value = 0.1, min = 0,max = 1, step = 0.02,
 		desc = "Recieve a warning when energy storage drops below this value."
+	},
+	metalFlash = {
+		name  = "Metal Excess Flash",
+		type  = "number",
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Metal storage will flash when metal storage exceeds this value."
 	},
 	metalWarning = {
 		name  = "Metal Excess Warning",
@@ -700,9 +706,10 @@ function widget:GameFrame(n)
 	end
 	
 	-- Metal Blink
-	if flashModeEnabled and (mCurr >= mStor or teamMetalWaste > 0) then
+	local metalFlashOptValue = options.metalFlash.value
+	if flashModeEnabled and (mCurr >= mStor or teamMetalWaste > 0) and metalFlashOptValue < 1 then
 		blinkM_status = 2
-	elseif flashModeEnabled and mCurr >= mStor * 0.9 then
+	elseif flashModeEnabled and mCurr >= mStor * metalFlashOptValue and metalFlashOptValue < 1 then
 		-- Blink less fast
 		blinkM_status = 1
 	elseif blinkM_status then
@@ -1080,6 +1087,7 @@ function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 end
 
 function externalFunctions.SetFlashEnabled(newEnabled)
+	-- Probably used in tutorial missions
 	flashModeEnabled = newEnabled
 end
 
