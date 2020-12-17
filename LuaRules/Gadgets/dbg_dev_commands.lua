@@ -813,6 +813,8 @@ local function nocost(cmd,line,words,player)
 		return
 	end
 	local enabled = not (tonumber(words[1]) == 0)
+	GG.SetFreeStockpile(enabled)
+	Spring.Echo("Free stockpile " .. ((enabled and "enabled") or "disabled") .. ".")
 	GG.SetFreeMorph(enabled)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
 	GG.Terraform.SetFreeTerraform(enabled)
