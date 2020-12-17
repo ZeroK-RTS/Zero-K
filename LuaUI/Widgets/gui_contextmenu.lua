@@ -85,6 +85,7 @@ local color2incolor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local WINDOW_WIDTH  = 450
 local B_HEIGHT 		= 30
 local icon_size 	= 18
 
@@ -168,16 +169,47 @@ end
 local function MakeStatsWindow()
 end
 
-options_order = {'shortNotation', 'text_hotkey'}
+options_order = {'shortNotation', 'window_height', 'window_to_cursor', 'window_pos_x', 'window_pos_y', 'text_hotkey'}
 options_path = 'Help/Unit List'
 options = {
-		
 	shortNotation = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_height = {
+		name = "Window Height",
+		type = 'number',
+		value = 450,
+		min = 450,
+		max = 1000,
+		desc = 'Set default window height.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_to_cursor = {
+		name = "Create window under cursor",
+		type = 'bool',
+		value = true,
+		desc = 'Creates the window under the mouse cursor, otherwise uses the values below for position.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_x = {
+		name = "Window Default X",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_y = {
+		name = "Window Default Y",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
@@ -1677,11 +1709,13 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		y = scrH / 3
 	end
 	
-	local window_width = 450
-	local window_height = 450
+	
+	if not options.window_to_cursor.value then
+		x = options.window_pos_x.value
+		y = options.window_pos_y.value
+	end
 
 	local num = #statswindows+1
-	
 	local children = {
 		ScrollPanel:New{
 			--horizontalScrollbar = false,
@@ -1709,8 +1743,8 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	statswindows[num] = Window:New{
 		x = x,
 		y = y,
-		width  = window_width,
-		height = window_height,
+		width  = WINDOW_WIDTH,
+		height = options.window_height.value,
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg,
