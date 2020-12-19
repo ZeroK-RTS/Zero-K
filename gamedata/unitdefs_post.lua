@@ -94,9 +94,9 @@ end
 
 do
 	local append = false
-	local name = "tweakunits"
-	while modOptions[name] and modOptions[name] ~= "" do
-		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[name])
+	local modoptName = "tweakunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
 		if type(tweaks) == "table" then
 			Spring.Echo("Loading tweakunits modoption", append or 0)
 			for name, ud in pairs(UnitDefs) do
@@ -107,7 +107,7 @@ do
 			end
 		end
 		append = (append or 0) + 1
-		name = "tweakunits" .. append
+		modoptName = "tweakunits" .. append
 	end
 end
 
@@ -228,7 +228,6 @@ for i = 1, #typeNames do
 end
 
 -- Set build options from pos_ customparam
-local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 for name, ud in pairs(UnitDefs) do
 	local cp = ud.customparams
 	for i = 1, #typeNamesLower do
