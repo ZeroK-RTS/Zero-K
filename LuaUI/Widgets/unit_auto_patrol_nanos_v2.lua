@@ -73,6 +73,7 @@ local spGetTeamResources = Spring.GetTeamResources
 local spValidUnitID     = Spring.ValidUnitID
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitResources = Spring.GetUnitResources
+local spGetUnitHealth = Spring.GetUnitHealth
 
 local TableEcho = Spring.Utilities.TableEcho
 
@@ -367,14 +368,14 @@ local function unitString(unit)
 			", cF=" .. unit.checkFrame .. ", rI=" .. unit.resetIdle .. ")"
 end
 
-local function SetupUnit(unitID)
-	trackedUnits[unitID] = trackedUnits[unitID] or unitNew(unitID)
-
+local function UpdateUnit(unitID)
 	local trackedUnit = trackedUnits[unitID]
 
 	trackedUnit.checkFrame = currentFrame + RandomInterval(checkInterval)
 	queue:push({trackedUnit.checkFrame, unitID})
-	--Log(unitID, "; push for ", trackedUnit.checkFrame)
+	if debug then
+		Log(unitID, "; push for ", trackedUnit.checkFrame)
+	end
 
 	local cmds = DecideCommands(unitID)
 
@@ -397,7 +398,9 @@ local function SetupUnit(unitID)
 				currentParam4, currentParam5) then
 			-- The unit is doing something that could be caused by the top command
 			-- we were going to issue. That's good enough.
-			--Log("Unit is doing good work. Don't touch it.")
+			if debug then
+				Log(unitID, "; Unit is doing good work. Don't touch it.")
+			end
 			return
 		end
 
@@ -416,13 +419,15 @@ local function SetupUnit(unitID)
 		if not isIssued then
 			-- Unit is doing something we never asked for. Must have been commanded
 			-- by a user.
-			--Log(unitID, " was commanded ", currentID, "(",
-			--	currentParam1, ", ",
-			--	currentParam2, ", ",
-			--	currentParam3, ", ",
-			--	currentParam4, ", ",
-			--	currentParam5, ") ", currentOpt)
-			--Log("Ignore unit ", unitID, " until it becomes idle.")
+			if debug then
+				Log(unitID, "; was commanded ", currentID, "(",
+					currentParam1, ", ",
+					currentParam2, ", ",
+					currentParam3, ", ",
+					currentParam4, ", ",
+					currentParam5, ") ", currentOpt)
+				Log(unitID, "; Ignore until it becomes idle.")
+			end
 			trackedUnits[unitID] = nil
 			return
 		end
@@ -446,6 +451,18 @@ local function SetupUnit(unitID)
 		end
 	end
 	trackedUnit.commands = cmds
+end
+
+local function SetupUnit(unitID)
+	trackedUnits[unitID] = trackedUnits[unitID] or unitNew(unitID)
+
+	-- health, maxHealth, paralyzeDamage, captureProress, buildProgress
+	local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+	if buildProgress >= 1 then
+		UpdateUnit(unitID)
+	end
+	-- If the unit isn't done building, we'll hear about it when it becomes idle
+	-- in UnitIdle().
 end
 
 local function SetupAll()
@@ -507,6 +524,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		return
 	end
 
+	if debug then
+		Log(unitID, "; created")
+	end
+
 	SetupUnit(unitID)
 end
 
@@ -557,7 +578,19 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam)
+	if debug then
+		Log(unitID, "; given")
+	end
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitFinished(unitID)
+	if trackedUnits[unitID] then
+		if debug then
+			Log(unitID, "; finished")
+		end
+		UpdateUnit(unitID)
+	end
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
@@ -589,7 +622,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	trackedUnit.idleAt = currentFrame
 
 	if debug then
-		Log("UnitIdle(", unitString(trackedUnit), ")")
+		Log(unitID, "; UnitIdle(", unitString(trackedUnit), ")")
 	end
 	--TableEcho(trackedUnits[unitID], "- ")
 
@@ -601,7 +634,9 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	-- If we're not idle at that point, we must have found some work to do.
 	trackedUnit.resetIdle = trackedUnit.checkFrame + 1
 	queue:push({trackedUnit.checkFrame, unitID})
-	--Log(unitID, "; push for ", trackedUnit.checkFrame)
+	if debug then
+		Log(unitID, "; push for ", trackedUnit.checkFrame)
+	end
 end
 
 -- Called for every game simulation frame (30 per second).
@@ -629,7 +664,7 @@ function widget:GameFrame(frame)
 					-- stale entry from the queue.
 
 					if spValidUnitID(unitID) then
-						SetupUnit(unitID)
+						UpdateUnit(unitID)
 					else
 						trackedUnits[unitID] = nil
 					end
