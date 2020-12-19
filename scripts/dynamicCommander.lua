@@ -336,9 +336,11 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	local heading = math.random(65536)
 	local mag = 60 + math.random()*(30 + 5*math.min(totalCount, 15))
 	local horScale = mag*math.cos(pitch)
-	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
-	
-	local featureID = Spring.CreateFeature(featureDefID, x + vx, y, z + vz, heading, teamID)
+
+	local dx = vx + math.cos(dir)*horScale
+	local dz = vz + math.sin(dir)*horScale
+
+	local featureID = Spring.CreateFeature(featureDefID, x + dx, y, z + dz, heading, teamID)
 end
 
 local function SpawnModuleWrecks(wreckLevel)

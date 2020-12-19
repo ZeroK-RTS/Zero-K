@@ -45,34 +45,7 @@ local SIG_RESTORE_TORSO = 32
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local PACE = 1.8
-local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
-local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-PACE = PACE * VELOCITY/BASE_VELOCITY
-
-local THIGH_FRONT_ANGLE = -math.rad(45)
-local THIGH_FRONT_SPEED = math.rad(42) * PACE
-local THIGH_BACK_ANGLE = math.rad(30)
-local THIGH_BACK_SPEED = math.rad(40) * PACE
-local SHIN_FRONT_ANGLE = math.rad(40)
-local SHIN_FRONT_SPEED = math.rad(60) * PACE
-local SHIN_BACK_ANGLE = math.rad(15)
-local SHIN_BACK_SPEED = math.rad(60) * PACE
-
-local ARM_FRONT_ANGLE = -math.rad(15)
-local ARM_FRONT_SPEED = math.rad(14.5) * PACE
-local ARM_BACK_ANGLE = math.rad(5)
-local ARM_BACK_SPEED = math.rad(14.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
---[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
-local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(40) * PACE
-]]--
-
-local TORSO_ANGLE_MOTION = math.rad(8)
-local TORSO_SPEED_MOTION = math.rad(7)*PACE
 
 local RESTORE_DELAY = 2500
 
@@ -97,10 +70,9 @@ end
 -- Walking
 --------------------------------------------------------------------------------
 local PACE_MULT = 0.7
-local PACE = 2*PACE_MULT
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-local PACE = PACE * VELOCITY/BASE_VELOCITY
+local PACE = 2*PACE_MULT * VELOCITY/BASE_VELOCITY
 
 local SLEEP_TIME = 360/PACE_MULT
 

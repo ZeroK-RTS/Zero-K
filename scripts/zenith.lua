@@ -181,19 +181,18 @@ local function UpdateEnabled(newEnabled)
 end
 
 local function SpawnProjectileThread()
-	local reloadMult = 1
 	GG.zenith_spawnBlocked = GG.zenith_spawnBlocked or {}
-	
+
 	while true do
-		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-		
+		local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
 		--	pos = {1000,1000,1000},
 		--	speed = {10, 0 ,10},
 		--	ttl = 100,
 		--	maxRange = 1000,
 		--})
-		
+
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
 		while IsDisabled() do
@@ -202,12 +201,12 @@ local function SpawnProjectileThread()
 		end
 		EmitSfx(flare, 2049)
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
-		
+
 		UpdateEnabled(not isBlocked)
 		if currentlyEnabled then
 			SpawnMeteor()
 		end
-		
+
 		isBlocked = GG.zenith_spawnBlocked[unitID]
 		GG.zenith_spawnBlocked[unitID] = false
 	end
