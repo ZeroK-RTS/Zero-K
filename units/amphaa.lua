@@ -1,4 +1,4 @@
-  return { amphaa = {
+ return { amphaa = {
   unitname               = [[amphaa]],
   name                   = [[Angler]],
   description            = [[Amphibious Anti-Air Bot]],
