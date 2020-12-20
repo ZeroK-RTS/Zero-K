@@ -649,7 +649,7 @@ end
 
 function widget:MousePress(x, y, button)
 	if pregame then
-		-- Let initial queue handle mex placement
+		-- Let initial queue handle mex placement.
 		return false
 	end
 	local _, cmdID = spGetActiveCommand()
@@ -660,6 +660,10 @@ function widget:MousePress(x, y, button)
 end
 
 function widget:MouseRelease(x, y, button)
+	if pregame or (WG.Terraform_GetIsPlacingStructure and WG.Terraform_GetIsPlacingStructure()) then
+		-- Let initial queue and terraform handle mex placement.
+		return false
+	end
 	if button ~= 1 then
 		Spring.SetActiveCommand(-1)
 		return false

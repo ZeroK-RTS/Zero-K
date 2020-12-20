@@ -213,6 +213,8 @@ local commandMap = {
 	CMD_RESTORE
 }
 
+local terraTag=-1
+
 local volumeSelection = 0
 
 local currentlyActiveCommand = false
@@ -423,12 +425,6 @@ local function completelyStopCommand()
 	simpleDrawingRamp = false
 	points = 0
 	terraform_type = 0
-end
-
-local terraTag=-1
-function WG.Terraform_GetNextTag()
-	terraTag = terraTag + 1
-	return terraTag
 end
 
 local function SendCommand()
@@ -1531,7 +1527,6 @@ function widget:Update(dt)
 			widget:MousePress(mx, my, 1)
 		end
 	end
-
 end
 
 function widget:MouseRelease(mx, my, button)
@@ -2004,6 +1999,15 @@ local function Terraform_SetPlacingRectangleCheck()
 	return options.structure_altSelect.value
 end
 
+function WG.Terraform_GetNextTag()
+	terraTag = terraTag + 1
+	return terraTag
+end
+
+function WG.Terraform_GetIsPlacingStructure()
+	return (placingRectangle or buildToGive) and true
+end
+
 function widget:Initialize()
 	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
 	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
@@ -2051,7 +2055,6 @@ local function DrawRampStart(dis)
 end
 
 local function DrawRampMiddleEnd(dis)
-	
 	local perpendicular = {x = terraformHeight*(point[1].z-point[2].z)/dis, z = -terraformHeight*(point[1].x-point[2].x)/dis}
 	
 	glVertex(point[2].x-perpendicular.x,point[2].y,point[2].z-perpendicular.z)
@@ -2169,9 +2172,11 @@ function widget:DrawScreen()
 		end
 	end
 end
+
 --------------------------------------------------------------------------------
 -- Drawing
 --------------------------------------------------------------------------------
+
 function widget:Shutdown()
 	if (volumeDraw) then
 		gl.DeleteList(volumeDraw); volumeDraw=nil
