@@ -77,7 +77,7 @@ function Reload()
 		end
 	end
 	Spring.SetUnitRulesParam(unitID, "noammo", 1)
-	local targetPad, index = GG.RequestRearm(unitID)
+	local targetPad, index = GG.RequestRearm(unitID, false, false, false, true)
 	if areaAttack and index and not re then
 		GG.InsertCommand(unitID, index, cmdID, areaAttack)
 	end

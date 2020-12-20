@@ -361,7 +361,25 @@ local function FindNearestAirpad(unitID, team)
 	return closestPad
 end
 
-local function RequestRearm(unitID, team, forceNow, replaceExisting)
+local function FollowNextMoveBlock(unitID, queue, index)
+	local foundMove = #queue
+	for i = math.max(1, index), #queue do
+		local cmdID = queue[i].id
+		if cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE then
+			foundMove = i
+		elseif foundMove then
+			break
+		end
+	end
+	for i = foundMove, math.max(1, index), -1 do
+		local cmd = queue[i]
+		if cmd.id == CMD.MOVE or cmd.id == CMD_RAW_MOVE then
+			spGiveOrderToUnit(unitID, CMD_INSERT, {index, cmd.id, CMD_OPT_SHIFT + CMD_OPT_INTERNAL, cmd.params[1], cmd.params[2] + 2, cmd.params[3], cmd.params[4]}, CMD_OPT_ALT) --Internal to avoid repeat
+		end
+	end
+end
+
+local function RequestRearm(unitID, team, forceNow, replaceExisting, followMove)
 	if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
 		return true --already reserved an airpad, do not reserve another one again
 	end
@@ -414,8 +432,14 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, index, 0)
 		end
 		spGiveOrderToUnit(unitID, CMD_INSERT, {index, CMD_REARM, CMD_OPT_SHIFT + CMD_OPT_INTERNAL, targetPad}, CMD_OPT_ALT) --Internal to avoid repeat
+		if followMove then
+			FollowNextMoveBlock(unitID, queue, index)
+		end
 		cmdIgnoreSelf = false
 		return targetPad, index
+	elseif followMove then
+		-- Follow move block anyway.
+		FollowNextMoveBlock(unitID, queue, index)
 	end
 end
 
@@ -635,7 +659,7 @@ function gadget:GameFrame(n)
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
 				local cmdID = Spring.GetUnitCurrentCommand(unitID)
 				if (not cmdID) or combatCommands[cmdID] then --should never happen... (all should be catch by AllowCommand)
-					RequestRearm(unitID, nil, true)
+					RequestRearm(unitID, nil, true, false, true)
 				end
 			end
 		end
@@ -658,7 +682,7 @@ function GG.LandComplete(bomberID)
 	spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
 	spGiveOrderToUnit(bomberID,CMD.WAIT, 0, 0)
 	
- -- Check queue inheritence
+	-- Check queue inheritence
 	local queueLength = spGetCommandQueue(bomberID, 0)
 	local cmdID = Spring.GetUnitCurrentCommand(bomberID)
 	if (queueLength == 0 or (queueLength == 1 and (cmdID == CMD_REARM or cmdID == 0))) and
