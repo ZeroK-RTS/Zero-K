@@ -134,6 +134,7 @@ local function GetSpeedMod()
 end
 
 local animSpeed = GetSpeedMod()
+local walking = false
 
 -- Generated from dirtbag.blend in https://github.com/psimyn/zk-blender 
 -- Created by https://github.com/Beherith/Skeletor_S3O V((0, 3, 6))
@@ -141,19 +142,21 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	-- Frame:4
-	Turn(box, z_axis, math.rad(-2.568975), math.rad(77.069238) / animSpeed) -- delta=2.57
-	Turn(box, y_axis, math.rad(7.341211), math.rad(220.236334) / animSpeed) -- delta=7.34
-	Turn(lcalf, x_axis, math.rad(-1.514041), math.rad(45.421220) / animSpeed) -- delta=1.51
-	Turn(lfoot, x_axis, math.rad(59.743439), math.rad(1792.303178) / animSpeed) -- delta=-59.74
-	Turn(lfoot, y_axis, math.rad(0.108250), math.rad(3.247494) / animSpeed) -- delta=0.11
-	Turn(lthigh, x_axis, math.rad(-100.054410), math.rad(3001.632294) / animSpeed) -- delta=100.05
-	Turn(lthigh, z_axis, math.rad(0.336249), math.rad(10.087457) / animSpeed) -- delta=-0.34
-	Turn(lthigh, y_axis, math.rad(0.314874), math.rad(9.446212) / animSpeed) -- delta=0.31
-	Turn(rcalf, x_axis, math.rad(29.110341), math.rad(873.310233) / animSpeed) -- delta=-29.11
-	Turn(rfoot, x_axis, math.rad(-61.844453), math.rad(1855.333543) / animSpeed) -- delta=61.84
-	Turn(rthigh, x_axis, math.rad(36.897792), math.rad(1106.933707) / animSpeed) -- delta=-36.90
-	Sleep((33 * animSpeed) -1)
-	while true do
+	if walking then
+		Turn(box, z_axis, math.rad(-2.568975), math.rad(77.069238) / animSpeed) -- delta=2.57
+		Turn(box, y_axis, math.rad(7.341211), math.rad(220.236334) / animSpeed) -- delta=7.34
+		Turn(lcalf, x_axis, math.rad(-1.514041), math.rad(45.421220) / animSpeed) -- delta=1.51
+		Turn(lfoot, x_axis, math.rad(59.743439), math.rad(1792.303178) / animSpeed) -- delta=-59.74
+		Turn(lfoot, y_axis, math.rad(0.108250), math.rad(3.247494) / animSpeed) -- delta=0.11
+		Turn(lthigh, x_axis, math.rad(-100.054410), math.rad(3001.632294) / animSpeed) -- delta=100.05
+		Turn(lthigh, z_axis, math.rad(0.336249), math.rad(10.087457) / animSpeed) -- delta=-0.34
+		Turn(lthigh, y_axis, math.rad(0.314874), math.rad(9.446212) / animSpeed) -- delta=0.31
+		Turn(rcalf, x_axis, math.rad(29.110341), math.rad(873.310233) / animSpeed) -- delta=-29.11
+		Turn(rfoot, x_axis, math.rad(-61.844453), math.rad(1855.333543) / animSpeed) -- delta=61.84
+		Turn(rthigh, x_axis, math.rad(36.897792), math.rad(1106.933707) / animSpeed) -- delta=-36.90
+		Sleep((33 * animSpeed) -1)
+	end
+	while walking do
 		animSpeed = GetSpeedMod()
 		-- Frame:8
 		Turn(box, z_axis, math.rad(5.601302), math.rad(245.108284) / animSpeed) -- delta=-8.17
@@ -293,7 +296,6 @@ local function StopWalking()
 	Turn(rthigh, x_axis, 0, math.rad(4036.535313) / animSpeed)
 end
 
-local walking = false
 function script.StartMoving()
 	if not walking then
 		walking = true
