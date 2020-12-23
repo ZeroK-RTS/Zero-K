@@ -34,7 +34,8 @@ local STANDARD_OPTS = {
 --------------------------------------------------------------------------------
 -- Configuration
 
-local stateTypes, gadgetReverse, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua")
+local VFSMODE = VFS.RAW_FIRST
+local stateTypes, gadgetReverse, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua", nil, VFSMODE)
 
 local PING_UPDATE_RATE = 0.5
 local PING_MEMORY = 4
