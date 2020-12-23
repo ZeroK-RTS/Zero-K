@@ -52,9 +52,10 @@ local function CanBuildThis(cmdID, unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
 	if cmdID < 0 then -- for build jobs
-		local bcmd = abs(cmdID) -- abs the command ID to get the unitDefID that it refers to
-		for _, options in ipairs(unitDef.buildOptions) do
-			if ( options == bcmd ) then -- check whether our unit can build it
+		local bcmd = -cmdID -- invert the command ID to get the unitDefID that it refers to
+		local bo = unitDef.buildOptions
+		for i = 1, #bo do
+			if bo[i] == bcmd then
 				return true
 			end
 		end
@@ -73,28 +74,26 @@ local function IsTargetReachable(unitID, tx,ty,tz)
 	local unitDefID = spGetUnitDefID(unitID)
 	local buildDist = UnitDefs[unitDefID].buildDistance -- build range
 	local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
-	if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
-		local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
-		if path then
-			local waypoints = path:GetPathWayPoints()
-			local finalCoord = waypoints[#waypoints]
-			if finalCoord then -- unknown why sometimes NIL
-				local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-				local dist = sqrt(dx*dx + dz*dz)
-				if dist < buildDist + 40 then -- is within radius?
-					return true -- within reach
-				else
-					return false -- not within reach
-				end
-			else
-				return true -- if finalCoord is nil for some reason, return true
-			end
-		else
-			return true -- if path is nil for some reason, return true
-			-- note: it usually returns nil for very short distances, which is why returning true is a much better default here
-		end
-	else
+	if not moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
 		return true --for air units; always reachable
+	end
+
+	local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
+	if not path then
+		return true -- if path is nil for some reason, return true
+		-- note: it usually returns nil for very short distances, which is why returning true is a much better default here
+	end
+	local waypoints = path:GetPathWayPoints()
+	local finalCoord = waypoints[#waypoints]
+	if not finalCoord then -- unknown why sometimes NIL
+		return true -- if finalCoord is nil for some reason, return true
+	end
+	local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+	local dist = sqrt(dx*dx + dz*dz)
+	if dist < buildDist + 40 then -- is within radius?
+		return true -- within reach
+	else
+		return false -- not within reach
 	end
 end
 
