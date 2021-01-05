@@ -133,6 +133,9 @@ local function GetSpeedParams()
 		return 0, 300
 	end
 	local sleepFrames = math.floor(ANIM_FRAMES / attMod + 0.5)
+	if sleepFrames < 1 then
+		sleepFrames = 1	
+	end
 	local speedMod = 1 / sleepFrames
 	return speedMod, 33*sleepFrames
 end
