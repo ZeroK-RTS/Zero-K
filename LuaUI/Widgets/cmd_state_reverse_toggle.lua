@@ -34,7 +34,7 @@ local STANDARD_OPTS = {
 --------------------------------------------------------------------------------
 -- Configuration
 
-local VFSMODE = VFS.RAW_FIRST
+local VFSMODE = VFS.RAW_FIRST -- so that users' own commands can also have reversing
 local stateTypes, gadgetReverse, specialHandling = VFS.Include(LUAUI_DIRNAME .. "Configs/stateTypes.lua", nil, VFSMODE)
 
 local PING_UPDATE_RATE = 0.5
