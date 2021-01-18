@@ -10,6 +10,7 @@ local launcher1 = piece 'launcher1'
 local launcher2 = piece 'launcher2'
 local firepoint1 = piece 'firepoint1'
 local firepoint2 = piece 'firepoint2'
+local housing = piece 'Housing'
 
 local aiming = false
 local shot = 0
@@ -119,6 +120,7 @@ function script.Create()
 	scriptReload.SetupScriptReload(2, 15 * gameSpeed)
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(RestoreAfterDelay)
+	Hide(housing)
 end
 
 function script.Killed(recentDamage, maxHealth)
