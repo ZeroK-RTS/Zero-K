@@ -213,6 +213,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	if disarmWeapons[weaponDefID] then
 		local def = disarmWeapons[weaponDefID]
 		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, overstunDamageMult[weaponDefID])
+		
+		if GG.Awards and GG.Awards.AddAwardPoints then
+			local ud = UnitDefs[unitDefID]
+			local cost_disarm = damage * def.damageMult / ud.health * ud.metalCost
+			GG.Awards.AddAwardPoints ('disarm', attackerTeam, cost_disarm)
+		end
+		
 		return damage*def.normalDamage
 	end
 

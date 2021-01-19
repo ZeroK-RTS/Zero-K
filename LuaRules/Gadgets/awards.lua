@@ -361,6 +361,8 @@ local function ProcessAwardData()
 					message = 'Stunned value: ' .. maxValWrite
 				elseif awardType == 'slow' then
 					message = 'Slowed value: ' .. maxValWrite
+				elseif awardType == 'disarm' then
+					message = 'Disarmed value: ' .. maxValWrite
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then

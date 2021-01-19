@@ -7,6 +7,7 @@ return {
 	fire    = 'Master Grill-Chef',
 	emp     = 'EMP Wizard',
 	slow    = 'Traffic Cop',
+	disarm  = 'Peacemaker',
 	t3      = 'Experimental Engineer',
 	cap     = 'Master of Puppets',
 	share   = 'Share Bear',
