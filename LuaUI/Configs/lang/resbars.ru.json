@@ -4,8 +4,15 @@
 	"team_metal_economy" : "Металл команды",
 	"team_energy_economy" : "Энергия команды",
 	"resbar_base_extraction" : "Базовая добыча",
+	"resbar_expenses" : "Затраты",
+	"resbar_income" : "Доход",
+	"resbar_storage" : "Хранилище",
 	"resbar_overdrive" : "Перегрузка",
 	"resbar_overdrive_efficiency" : "Эффективность перегрузки",
+	"resbar_economy_advice" : "Совет",
+	"advie_add_metal" : "Постройте больше добывающих шахт для повышения эффективности перезагрузки",
+	"advice_add_energy" : "Увеличьте производство энергии построив больше электростанций",
+	"advice_expand_both" : "Стройте больше добывающих шахт и электростанций",
 	"resbar_reclaim" : "Переработка",
 	"resbar_cons" : "Пассивный доход",
 	"resbar_sharing" : "Передача",
@@ -21,8 +28,8 @@
 	"resbar_waste" : "Излишки",
 	"resbar_waste_total" : "Всего излишков",
 	"resbar_reclaim_total" : "Всего переработано",
-	"resbar_unit_value" : "Стоймость юнитов",
-	"resbar_nano_value" : "Стоймость проектов в процессе",
+	"resbar_unit_value" : "Стоимость юнитов",
+	"resbar_nano_value" : "Стоимость проектов в процессе",
 	"resbar_metal_storage_tooltip" : "Ваш запас металла.",
 	"resbar_energy_storage_tooltip" : "Ваш запас энергии.",
 	"resbar_metal_income_tooltip" : "Ваша добыча металла.\nМеталл добывается с помощью переработки, шахт и их перегрузки.",
@@ -32,5 +39,5 @@
 	"resbar_metal_expense_tooltip" : "Ваша потребность в металле. Строительство, создание юнитов и улучшения требуют металл.",
 	"resbar_energy_expense_tooltip" : "Ваша потребность в энергии. Строительство, ремонт и некоторые способности требуют энергию для поддержания.",
 	"metal_excess_warning" : "Постройте/займите больше строителей работой, чтобы использовать свой металл.",
-	"energy_stall_warning" : "Постройте больше генераторов, чтобы предотвратить нехватку энергии."
+	"energy_stall_warning" : "Постройте больше электростанций, чтобы предотвратить нехватку энергии."
 }
