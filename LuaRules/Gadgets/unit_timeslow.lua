@@ -35,6 +35,7 @@ local spGetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy
+local GetUnitCost           = Spring.Utilities.GetUnitCost
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
@@ -115,7 +116,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 
 	if GG.Awards and GG.Awards.AddAwardPoints then
-		local cost_slowdown = (slowdown / Spring.GetUnitHealth(unitID)) * Spring.Utilities.GetUnitCost(unitID)
+		local _, maxHp = spGetUnitHealth(unitID)
+		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID)
 		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
 	end
 

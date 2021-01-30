@@ -19,6 +19,8 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
+local GetUnitCost           = Spring.Utilities.GetUnitCost
+
 local FRAMES_PER_SECOND = Game.gameSpeed
 
 local DECAY_FRAMES = 40 * FRAMES_PER_SECOND -- time in frames it takes to decay 100% para to 0
@@ -215,7 +217,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, overstunDamageMult[weaponDefID])
 		
 		if GG.Awards and GG.Awards.AddAwardPoints then
-			local cost_disarm = damage * def.damageMult / Spring.GetUnitHealth(unitID) * Spring.Utilities.GetUnitCost(unitID)
+			local _, maxHP = Spring.GetUnitHealth(unitID)
+			local cost_disarm = (damage * def.damageMult / maxHP) * GetUnitCost(unitID)
 			GG.Awards.AddAwardPoints ('disarm', attackerTeam, cost_disarm)
 		end
 		
