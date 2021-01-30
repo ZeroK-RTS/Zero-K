@@ -115,8 +115,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 
 	if GG.Awards and GG.Awards.AddAwardPoints then
-		local ud = UnitDefs[unitDefID]
-		local cost_slowdown = (slowdown / ud.health) * ud.metalCost
+		local cost_slowdown = (slowdown / Spring.GetUnitHealth(unitID)) * Spring.Utilities.GetUnitCost(unitID)
 		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
 	end
 
