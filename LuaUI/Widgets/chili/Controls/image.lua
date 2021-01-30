@@ -39,6 +39,7 @@ Image = Button:Inherit{
 	noFont = true,
 }
 
+chili_imageAlreadyDrawn = {}
 
 local this = Image
 local inherited = this.inherited
@@ -111,16 +112,18 @@ function Image:DrawControl()
 		if (file2) then
 			gl.Color(self.color2 or self.color)
 			TextureHandler.LoadTexture(0, file2, self)
-			if self.firstDraw then
+			if not chili_imageAlreadyDrawn[file2] then
 				gl.TextureInfo(file2)
+				chili_imageAlreadyDrawn[file2] = true
 			end
 			gl.TexRect(0, 0, self.width, self.height, false, self.flip2)
 		end
 		if (file) then
 			gl.Color(self.color)
 			TextureHandler.LoadTexture(0, file, self)
-			if self.firstDraw then
+			if not chili_imageAlreadyDrawn[file] then
 				gl.TextureInfo(file)
+				chili_imageAlreadyDrawn[file] = true
 			end
 			gl.TexRect(0, 0, self.width, self.height, false, self.flip)
 		end

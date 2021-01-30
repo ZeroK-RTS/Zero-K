@@ -85,6 +85,7 @@ end
 
 
 function ScrollPanel:Update(...)
+	local trans = 1
 	if self.smoothScroll and self._smoothScrollEnd then
 		local trans = Spring.DiffTimers(Spring.GetTimer(), self._smoothScrollEnd)
 		trans = trans / self.smoothScrollTime
@@ -201,8 +202,8 @@ function ScrollPanel:_DetermineContentArea()
 
 	self:UpdateClientArea()
 
-	contentArea = self.contentArea
-	clientArea = self.clientArea
+	local contentArea = self.contentArea
+	local clientArea = self.clientArea
 	if (contentArea[4] < clientArea[4]) then
 		contentArea[4] = clientArea[4]
 	end
@@ -246,7 +247,7 @@ function ScrollPanel:IsRectInView(x, y, w, h)
 		return false
 	end
 
-	if self.useRTT then
+	if self._inrtt then
 		return true
 	end
 

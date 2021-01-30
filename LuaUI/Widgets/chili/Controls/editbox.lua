@@ -744,6 +744,7 @@ function EditBox:ClearSelected()
 	self.selEnd = nil
 	self.selEndY = nil
 	self:Invalidate()
+	inherited.TextModified(self)
 end
 
 -- TODO only works/tested for not multiline things, joy ^_^
@@ -820,6 +821,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 			else
 				self.text, self.cursor = Utf8BackspaceAt(self.text, self.cursor)
 			end
+			inherited.TextModified(self)
 		else
 			self:ClearSelected()
 		end
@@ -834,6 +836,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 				self.text = Utf8DeleteAt(txt, cp)
 				self:UpdateLine(1, self.text)
 			end
+			inherited.TextModified(self)
 		else
 			self:ClearSelected()
 		end
@@ -930,6 +933,7 @@ function EditBox:TextInput(utf8char, ...)
 
 	self._interactedTime = Spring.GetTimer()
 	inherited.TextInput(self, utf8char, ...)
+	inherited.TextModified(self, utf8char, ...)
 	self:UpdateLayout()
 	self:Invalidate()
 	return self

@@ -103,7 +103,7 @@ function ComboBox:MouseDown(x, y)
 	self.state.pressed = true
 	if not self._dropDownWindow then
 		local sx, sy = self:LocalToScreen(0, 0)
-		
+
 		local selectByName = self.selectByName
 		local labels = {}
 

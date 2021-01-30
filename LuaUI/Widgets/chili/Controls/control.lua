@@ -78,7 +78,7 @@ Control = Object:Inherit{
 
 	drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
 
-	useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+	useRTT = false and ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
 	useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
 
 	OnResize        = {},
@@ -1386,7 +1386,7 @@ function Control:DrawForList()
 			local t = 1 - self.scrollPosY / contHeight
 			local u = s + clientWidth / contWidth
 			local v = t - clientHeight / contHeight
-			gl.TexRect(0, 0, clientWidth, clientHeight, s, t, u, v)
+			gl.TexRect(clientX, clientY, clientX + clientWidth, clientY + clientHeight, s, t, u, v)
 			gl.Texture(0, false)
 			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
 		elseif (self._children_dlist) then
