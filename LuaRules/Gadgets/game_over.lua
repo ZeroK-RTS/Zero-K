@@ -257,11 +257,11 @@ local function CheckForVictory()
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam
-	for _,a in pairs(allylist) do
-		if not destroyedAlliances[a] and (a ~= gaiaAllyTeamID) then
-			--Spring.Echo("Alliance " .. a .. " remains in the running")
+	for _, allyTeamID in pairs(allylist) do
+		if not destroyedAlliances[allyTeamID] and (allyTeamID ~= gaiaAllyTeamID) then
+			--Spring.Echo("Alliance " .. allyTeamID .. " remains in the running")
 			count = count + 1
-			lastAllyTeam = a
+			lastAllyTeam = allyTeamID
 		end
 	end
 	if count < 2 then
@@ -393,9 +393,9 @@ local function CauseVictory(allyTeamID)
 	end
 	local allylist = spGetAllyTeamList()
 	local count = 0
-	for _,a in pairs(allylist) do
-		if a ~= allyTeamID and a ~= gaiaAllyTeamID then
-			DestroyAlliance(a)
+	for _, allyTeamID in pairs(allylist) do
+		if allyTeamID ~= allyTeamID and allyTeamID ~= gaiaAllyTeamID then
+			DestroyAlliance(allyTeamID)
 		end
 	end
 	--GameOver(lastAllyTeam)
@@ -494,9 +494,7 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID, delayLossToNextGame
 	elseif vitalConstructorAllyTeam[allianceID] and HasNoVitalUnits(allianceID) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID, delayLossToNextGameFrame)
-	end
-	
-	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
+	elseif (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID, delayLossToNextGameFrame)
 	end
@@ -548,47 +546,62 @@ local function ProcessLastAlly()
 	local lastActive = nil
 	for i = 1, #allylist do
 		repeat
-		local a = allylist[i]
-		if (a == gaiaAllyTeamID) then break end -- continue
-		if (destroyedAlliances[a]) then break end -- continue
-		local teamlist = spGetTeamList(a)
-		if (not teamlist) then break end -- continue
-		local hasActiveTeam = false
-		local hasDroppedTeam = false
-		for j=1,#teamlist do
-			local t = teamlist[j]
-			-- any team without units is dead to us; so only teams who are active AND have units matter
-			-- except chicken, who are alive even without units
-			local numAlive = aliveCount[t]
-			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
-			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then
-				-- count AI teams as active
-				local _,_,_,isAiTeam = spGetTeamInfo(t, false)
-				if isAiTeam then
-					hasActiveTeam = true
-				else
-					local playerlist = spGetPlayerList(t) -- active players
-					if playerlist then
-						for k = 1, #playerlist do
-							local name,active,spec = spGetPlayerInfo(playerlist[k], false)
-							if not spec then
-								if active then
-									hasActiveTeam = true
-								else
-									hasDroppedTeam = true
+			local allyTeamID = allylist[i]
+			if (allyTeamID == gaiaAllyTeamID) then
+				break
+			end -- continue
+			if (destroyedAlliances[allyTeamID]) then
+				break
+			end -- continue
+			local teamlist = spGetTeamList(allyTeamID)
+			if (not teamlist) then
+				break
+			end -- continue
+			local hasActiveTeam = false
+			local hasDroppedTeam = false
+			
+			local defeatConfig = GG.GalaxyCampaignHandler and GG.GalaxyCampaignHandler.GetDefeatConfig(allyTeamID)
+			if defeatConfig and defeatConfig.ignoreUnitLossDefeat then
+				hasActiveTeam = true
+			else
+				for j = 1, #teamlist do
+					local t = teamlist[j]
+					-- any team without units is dead to us; so only teams who are active AND have units matter
+					-- except chicken, who are alive even without units
+					-- WTF is this? Why is aliveCount[t] tracked but then overridden by Spring.GetTeamUnits(t)?
+					local numAlive = aliveCount[t]
+					if #(Spring.GetTeamUnits(t)) == 0 then
+						numAlive = 0
+					end
+					if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then
+						-- count AI teams as active
+						local _,_,_,isAiTeam = spGetTeamInfo(t, false)
+						if isAiTeam then
+							hasActiveTeam = true
+						else
+							local playerlist = spGetPlayerList(t) -- active players
+							if playerlist then
+								for k = 1, #playerlist do
+									local name,active,spec = spGetPlayerInfo(playerlist[k], false)
+									if not spec then
+										if active then
+											hasActiveTeam = true
+										else
+											hasDroppedTeam = true
+										end
+									end
 								end
 							end
 						end
 					end
 				end
 			end
-		end
-		if hasActiveTeam then
-			activeAllies[#activeAllies+1] = a
-			lastActive = a
-		elseif hasDroppedTeam then
-			droppedAllies[#droppedAllies+1] = a
-		end
+			if hasActiveTeam then
+				activeAllies[#activeAllies+1] = allyTeamID
+				lastActive = allyTeamID
+			elseif hasDroppedTeam then
+				droppedAllies[#droppedAllies+1] = allyTeamID
+			end
 		until true
 	end -- for
 	
@@ -606,9 +619,9 @@ local function ProcessLastAlly()
 		if supreme then
 			EchoUIMessage("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
 			for i=1, #allylist do
-				local a = allylist[i]
-				if (a ~= supreme) and (a ~= gaiaAllyTeamID) then
-					RevealAllianceUnits(a)
+				local allyTeamID = allylist[i]
+				if (allyTeamID ~= supreme) and (allyTeamID ~= gaiaAllyTeamID) then
+					RevealAllianceUnits(allyTeamID)
 					revealed = true
 				end
 			end
@@ -625,9 +638,9 @@ local function ProcessLastAlly()
 			if #activeAllies == 1 then
 				-- remove every unit except for last active alliance
 				for i=1, #allylist do
-					local a = allylist[i]
-					if (a ~= lastActive) and (a ~= gaiaAllyTeamID) then
-						DestroyAlliance(a)
+					local allyTeamID = allylist[i]
+					if (allyTeamID ~= lastActive) and (allyTeamID ~= gaiaAllyTeamID) then
+						DestroyAlliance(allyTeamID)
 					end
 				end
 			else -- no active team. For example two roaches were left and blew up each other
