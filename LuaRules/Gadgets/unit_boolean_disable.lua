@@ -213,6 +213,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	if disarmWeapons[weaponDefID] then
 		local def = disarmWeapons[weaponDefID]
 		addParalysisDamageToUnit(unitID, damage*def.damageMult, def.disarmTimer, overstunDamageMult[weaponDefID])
+		
+		if GG.Awards and GG.Awards.AddAwardPoints then
+			local cost_disarm = damage * def.damageMult / Spring.GetUnitHealth(unitID) * Spring.Utilities.GetUnitCost(unitID)
+			GG.Awards.AddAwardPoints ('disarm', attackerTeam, cost_disarm)
+		end
+		
 		return damage*def.normalDamage
 	end
 
