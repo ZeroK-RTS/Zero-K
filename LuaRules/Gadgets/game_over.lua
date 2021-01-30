@@ -387,14 +387,14 @@ local function DestroyAlliance(allianceID, delayLossToNextGameFrame)
 end
 GG.DestroyAlliance = DestroyAlliance
 
-local function CauseVictory(allyTeamID)
+local function CauseVictory(victoryAllyTeamID)
 	if DEBUG_MSG then
-		Spring.Echo("CauseVictory", allyTeamID)
+		Spring.Echo("CauseVictory", victoryAllyTeamID)
 	end
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	for _, allyTeamID in pairs(allylist) do
-		if allyTeamID ~= allyTeamID and allyTeamID ~= gaiaAllyTeamID then
+		if allyTeamID ~= victoryAllyTeamID and allyTeamID ~= gaiaAllyTeamID then
 			DestroyAlliance(allyTeamID)
 		end
 	end
