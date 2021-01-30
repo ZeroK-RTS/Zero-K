@@ -238,10 +238,11 @@ local function SitOnPad(unitID)
 			
 			if (updateCost > 0) then
 				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
-				resTable.e = updateCost*updateRate
 			else
 				updateRate = 1
 			end
+			updateRate = updateRate*buildRate
+			resTable.e = updateCost*updateRate
 			
 			if reammoProgress then
 				if (updateRate > 0) and ((updateCost == 0) or spUseUnitResource(landData.padID, resTable)) then
