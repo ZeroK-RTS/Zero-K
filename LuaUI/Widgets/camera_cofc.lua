@@ -20,7 +20,8 @@ include("Widgets/COFCtools/TraceScreenRay.lua")
 
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
---WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
+--WG Exports: 	WG.COFC_SetCameraState: {table cs(, number smoothness)} -> {}, Set Camera State, ensures all COFC camera state changes go through the same logic chain
+--							WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
 --						 	WG.COFC_SetCameraTargetBox: {number minX, number minZ, number maxX, number maxZ, number minDist(, number maxY(, number smoothness(,boolean useSmoothMeshSetting)))} -> {}, Set Camera to contain input box. maxY should be the highest point in the box, defaults to ground height of box center
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
 
@@ -2730,6 +2731,7 @@ function widget:Initialize()
 	end
 
 	WG.COFC_Enabled = true
+	WG.COFC_SetCameraState = OverrideSetCameraStateInterpolate
 	WG.COFC_SetCameraTarget = SetCameraTarget
 	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
