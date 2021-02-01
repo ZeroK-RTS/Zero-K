@@ -459,6 +459,11 @@ function widget:Update(dt)
 		identified = true
 	end
 	
+	if not placement then --Can happen when rotation changes rapidly
+		draw = false
+		return
+	end
+
 	local pos = select(2, spTraceScreenRay(mx, my, true, false, false, placement.floatOnWater))
 	if not pos then
 		draw = false
@@ -530,7 +535,7 @@ function widget:DrawWorld()
 		glLineStipple(false)
 		glColor(1, 1, 1, 1)
 	end
-	if drawValue then
+	if drawValue and placement then
 		glPushMatrix()
 		glTranslate(x, y, z)
 		glBillboard()
