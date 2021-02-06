@@ -53,6 +53,8 @@ local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 local CMD_WAIT = CMD.WAIT
 
+local HALF_FRAME = 1/60
+
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
 -- For generic attributes support
@@ -240,10 +242,11 @@ local function UpdateReloadSpeed(unitID, unitDefID, weaponMods, speedFactor, gam
 			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
 			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+			-- Add HALF_FRAME to round reloadTime to the closest multiple of 1/30, since the the engine rounds down to a multiple of 1/30.
 			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed + HALF_FRAME})
 			else
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload})
 			end
 		end
 	end
@@ -359,6 +362,9 @@ end
 --------------------------------------------------------------------------------
 -- UnitRulesParam Handling
 
+GG.att_EconomyChange = {}
+GG.att_ReloadChange = {}
+
 local currentEcon = {}
 local currentBuildpower = {}
 local currentReload = {}
@@ -380,6 +386,9 @@ local function removeUnit(unitID)
 	currentMovement[unitID] = nil
 	currentTurn[unitID] = nil
 	currentAcc[unitID] = nil
+	
+	GG.att_EconomyChange[unitID] = nil
+	GG.att_ReloadChange[unitID] = nil
 end
 
 function UpdateUnitAttributes(unitID, frame)
@@ -464,6 +473,10 @@ function UpdateUnitAttributes(unitID, frame)
 		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
+		
+		-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
+		GG.att_EconomyChange[unitID] = econMult
+		GG.att_ReloadChange[unitID] = reloadMult
 		
 		unitSlowed[unitID] = moveMult < 1
 		if weaponMods or reloadMult ~= currentReload[unitID] then

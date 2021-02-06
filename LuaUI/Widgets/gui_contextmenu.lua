@@ -1477,6 +1477,15 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.pylonrange) .. " elmo", textColor = color.stats_fg, }
 	end
 
+	if ud.customParams.heat_per_shot then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Per Shot: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_per_shot*100) .. "%", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Decay: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_decay*100) .. "%/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Max Slow: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_max_slow*100) .. "%", textColor = color.stats_fg, }
+	end
+
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }

@@ -85,6 +85,7 @@ local messages = {
 	teleport = "teleport",
 	teleport_pw = "teleport",
 	ability = "ability",
+	heat = "heat",
 	reload = "reload",
 	reammo = "reammo",
 	slow = "slow",
@@ -596,6 +597,7 @@ do
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
+				heat          = ud.customParams.heat_per_shot,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -802,6 +804,14 @@ do
 			if (specialReloadState and specialReloadState > gameFrame) then
 				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
 				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+			end
+		end
+		
+		--// HEAT
+		if ci.heat and build == 1 then
+			local heatState = GetUnitRulesParam(unitID, "heat_bar")
+			if (heatState and heatState > 0) then
+				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
 			end
 		end
 		
