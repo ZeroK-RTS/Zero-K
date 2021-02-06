@@ -215,22 +215,30 @@ end
 
 
 local function GetUnitDefRealRadius(udid)
-  local radius = realRadii[udid]
-  if (radius) then
-    return radius
-  end
+	local radius = realRadii[udid]
+	if (radius) then
+		return radius
+	end
 
-  local ud = UnitDefs[udid]
-  if (ud == nil) then return nil end
+	local ud = UnitDefs[udid]
+	if (ud == nil) then
+		return nil
+	end
 
-  local dims = spGetUnitDefDimensions(udid)
-  if (dims == nil) then return nil end
+	local dims = spGetUnitDefDimensions(udid)
+	if (dims == nil) then
+		return nil
+	end
 
-  local scale = ud.hitSphereScale -- missing in 0.76b1+
-  scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
-  radius = dims.radius / scale
-  realRadii[udid] = radius
-  return radius
+	local scale = ud.hitSphereScale -- missing in 0.76b1+
+	scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
+	radius = dims.radius / scale
+	realRadii[udid] = radius
+	if ud.customParams and ud.customParams.selection_scale then
+		local factor = (tonumber(ud.customParams.selection_scale) or 1)
+		realRadii[udid] = realRadii[udid] * factor
+	end
+	return radius
 end
 
 
