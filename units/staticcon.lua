@@ -60,7 +60,7 @@ return { staticcon = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[debris4x4a.s3o]],
+      object           = [[armsenan_dead.dae]],
     },
 
     HEAP = {
