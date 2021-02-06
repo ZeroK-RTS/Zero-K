@@ -19,15 +19,23 @@ function GG.SetupAimPosTerraform(unitID, floatOnWater, defaultMid, defaultAim, m
 	local function UpdateAimPos()
 		while true do
 			local nearbyHeight = baseHeight
+			local nearbyLowHeight = baseHeight
 			for i = -1, 1, 1 do
 				for j = -1, 1, 1 do
 					if i ~= 0 or j ~= 0 then
-						nearbyHeight = math.max(nearbyHeight, GetHeight(i, j))
+						local height = GetHeight(i, j)
+						nearbyHeight = math.max(nearbyHeight, height)
+						nearbyLowHeight = math.min(nearbyLowHeight, height)
 					end
 				end
 			end
 			local newAimHeight = nearbyHeight - baseHeight + cliffPeek
-			defaultAim[2] = math.max(minAimOffset, math.min(maxAimOffset, newAimHeight))
+			if nearbyLowHeight - baseHeight < -120 then
+				-- Make it easier to shoot up at turrets over the lip of tall cliffs by moving the aim upwards.
+				defaultAim[2] = (minAimOffset + maxAimOffset)/2
+			else
+				defaultAim[2] = math.max(minAimOffset, math.min(maxAimOffset, newAimHeight))
+			end
 			
 			if GG.OverrideMidAndAimPos then
 				GG.OverrideMidAndAimPos(unitID, defaultMid, defaultAim)
