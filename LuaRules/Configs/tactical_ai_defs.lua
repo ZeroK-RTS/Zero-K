@@ -1469,6 +1469,7 @@ local behaviourConfig = {
 	},
 	{
 		name = "tankarty",
+		defaultAIState = 0,
 		skirms = allMobileGround,
 		skirmRadar = true,
 		--swarms = {},
