@@ -15,6 +15,15 @@ end
 --------------------------------------------------------------------------------
 
 local function SetupCommandColors(state)
+	if state then
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 1) - 1
+		if WG.widgets_handling_selection > 0 then
+			return
+		end
+	else
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 0) + 1
+	end
+
 	local alpha = state and 1 or 0
 	Spring.LoadCmdColorsConfig('unitBox  0 1 0 ' .. alpha)
 end

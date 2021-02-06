@@ -300,14 +300,23 @@ end
 
 
 local function ShowSelectionSquares(state)
-  local alpha = state and 1 or 0
-  local f = io.open('cmdcolors.tmp', 'w+')
-  if (f) then
-    f:write('unitBox  0 1 0 ' .. alpha)
-    f:close()
-    Spring.SendCommands({'cmdcolors cmdcolors.tmp'})
-  end
-  os.remove('cmdcolors.tmp')
+	if state then
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 1) - 1
+		if WG.widgets_handling_selection > 0 then
+			return
+		end
+	else
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 0) + 1
+	end
+
+	local alpha = state and 1 or 0
+	local f = io.open('cmdcolors.tmp', 'w+')
+	if (f) then
+		f:write('unitBox  0 1 0 ' .. alpha)
+		f:close()
+		Spring.SendCommands({'cmdcolors cmdcolors.tmp'})
+	end
+	os.remove('cmdcolors.tmp')
 end
 
 --------------------------------------------------------------------------------
