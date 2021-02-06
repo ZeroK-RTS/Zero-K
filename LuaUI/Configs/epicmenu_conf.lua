@@ -80,6 +80,14 @@ confdata.eopt = {}
 local function nullFunc()
 end
 
+local function SetWidgetEnableState(widget, state)
+	if state then
+		spSendCommands{"luaui enablewidget " .. widget}
+	else
+		spSendCommands{"luaui disablewidget " .. widget}
+	end
+end
+
 local function AddOption(path, option)
 	option.path = path or "Settings/Broken Paths"
 	if not option.key then
@@ -596,11 +604,51 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	{
 		name = 'Shiny Units',
 		type = 'bool',
+		advanced = true,
 		springsetting = 'AdvUnitShading',
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
-	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
-	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+	ShLabel(pathUnitVisiblity, 'Unit Highlight Options')
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Halos',
+		desc = "Shows a thin halo of team colour around units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Halo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Baseplatter',
+		desc = "Highlight the base of units with a disk of their team colour.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Fancy Teamplatter", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Halo',
+		desc = "Add a large halo around selected and hovered units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Selection BlurryHalo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Shapes (default)',
+		desc = "Show appropriate shapes around the base of selected and hovered units. This is the default option.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			SetWidgetEnableState("UnitShapes", self.value)
+		end,
+	} )
 	
 	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
 	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
