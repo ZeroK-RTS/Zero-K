@@ -76,6 +76,7 @@ local function Open()
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.YARD_OPEN, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()

@@ -180,3 +180,11 @@ function GG.Script.InitializeDeathAnimation(unitID)
 	local paralyzeDamage = select(3, Spring.GetUnitHealth(unitID))
 	Spring.SetUnitRulesParam(unitID, "real_para", paralyzeDamage or 0)
 end
+
+function GG.Script.UnstickFactory(unitID)
+	while true do
+		SetUnitValue (COB.YARD_OPEN, 1)
+		SetUnitValue (COB.BUGGER_OFF, 1)
+		Sleep(1000 + math.random()*1000)
+	end
+end

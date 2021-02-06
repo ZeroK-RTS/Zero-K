@@ -19,6 +19,7 @@ local nanoPieces = { claw1 }
 local smokePiece = { doorl, doorr, roofr, roofl, arm1, arm2 }
 
 local function Open ()
+	Signal (1)
 	SetSignalMask (1)
 
 	-- move the pieces
@@ -53,10 +54,12 @@ local function Open ()
 	SetUnitValue (COB.YARD_OPEN, 1)
 	SetUnitValue (COB.INBUILDSTANCE, 1)
 	SetUnitValue (COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
 	Signal (1)
+	SetSignalMask (1)
 
 	-- set values
 	SetUnitValue (COB.YARD_OPEN, 0)
