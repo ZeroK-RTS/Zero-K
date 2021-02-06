@@ -166,7 +166,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 			coded = coded - CMD.OPT_META
 		end
 
-		if not shift then
+		if not (shift or id == CMD_AREA_MEX) then
 			Spring.GiveOrder(CMD.INSERT, {sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
 			return true
 		end
