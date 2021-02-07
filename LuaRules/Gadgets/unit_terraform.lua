@@ -438,8 +438,8 @@ local function SetTooltip(unitID, spent, estimatedCost)
 	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, ALLIED_TABLE)
 end
 
-local function IsPositionTerraformable(x, z)
-	if HasStructure(x, z) then
+local function IsPositionTerraformable(x, z, ignoreStructure)
+	if (not ignoreStructure) and HasStructure(x, z) then
 		return false
 	end
 	if GG.map_AllowPositionTerraform then
@@ -3455,7 +3455,7 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 	
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
-			if not HasStructure(i, j) then
+			if IsPositionTerraformable(i, j) then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
 					if smoothExponent then
@@ -3490,16 +3490,18 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 			if not structTested[unitID] then
 				local structData = structure[unitID]
 				local disSQ = (x - structData.x)^2 + (z - structData.z)^2
-				if disSQ <= smoothradiusSQ then
+				if disSQ <= smoothradiusSQ
+						and IsPositionTerraformable(structData.minx, structData.minz, true) and IsPositionTerraformable(structData.maxx, structData.minz, true)
+						and IsPositionTerraformable(structData.minx, structData.maxz, true) and IsPositionTerraformable(structData.maxx, structData.maxz, true) then
 					local gh = spGetGroundHeight(i,j)
 					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent) + gh
 					structHeight[unitID] = structData.h
 					-- Causes structures to become non-blocking.
 					--local unitDefID = Spring.GetUnitDefID(unitID)
 					--if unitDefID then
-					--	local mvoeHeight = (UnitDefs[unitDefID].floatOnWater and math.max(structData.h, 0)) or structData.h
+					--	local moveHeight = (UnitDefs[unitDefID].floatOnWater and math.max(structData.h, 0)) or structData.h
 					--	Spring.MoveCtrl.Enable(unitID)
-					--	Spring.MoveCtrl.SetPosition(unitID, structData.x, mvoeHeight, structData.z)
+					--	Spring.MoveCtrl.SetPosition(unitID, structData.x, moveHeight, structData.z)
 					--	Spring.MoveCtrl.Disable(unitID)
 					--end
 				end
