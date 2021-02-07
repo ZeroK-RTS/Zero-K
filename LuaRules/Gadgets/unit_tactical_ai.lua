@@ -169,7 +169,7 @@ end
 --------------------------------------------------------------------------------
 ---- Unit AI Utilities
 
-local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, cmdTag, holdPos)
 	-- ret 1: enemy ID, value of -1 means no manual target set so the nearest enemy should be used.
 	--        Return false means the unit does not want orders from tactical ai.
 	-- ret 2: true if there is a move command at the start of queue which will need removal.
@@ -192,7 +192,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 	end
 	
 	if cmdID == CMD_FIGHT then
-		return -1, false, true, nil, cp_1, cp_2, cp_3
+		return -1, false, true, nil, nil, cp_1, cp_2, cp_3
 	elseif cmdID == CMD_ATTACK then -- if I attack
 		local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 		if ((not holdPos) or (cmdID_2 == CMD_FIGHT)) then
@@ -200,16 +200,16 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 			if twoParams then
 				if (cmdID == CMD_FIGHT) then
 					--  if I target the ground and have fight or patrol comman
-					return -1, false, nil, nil, cp_1, cp_2, cp_3
+					return -1, false, nil, nil, nil, cp_1, cp_2, cp_3
 				end
 			else
 				-- if I target a unit
 				if (cmdID == CMD_FIGHT or cmdID_2 == CMD_FIGHT) then
 					-- Do not skirm single target with FIGHT
-					return -1, false, true, spValidUnitID(target) and target 
+					return -1, false, true, spValidUnitID(target) and target, cmdTag
 				elseif Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL) then
 					-- Do no skirm single target when it is auto attack
-					return -1, false, false, spValidUnitID(target) and target
+					return -1, false, false, spValidUnitID(target) and target, cmdTag
 				elseif spValidUnitID(target) then
 					-- only skirm single target when given the order manually
 					return target, false
@@ -217,7 +217,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 			end
 		end
 	elseif (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and (cp_1 == unitData.cx) and (cp_2 == unitData.cy) and (cp_3 == unitData.cz) then
-		local cmdID_2, cmdOpts_2, _, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID, 2)
+		local cmdID_2, cmdOpts_2, cmdTag_2, cps_1, cps_2, cps_3 = Spring.GetUnitCurrentCommand(unitID, 2)
 		if not cmdID_2 then
 			return -1, true
 		end
@@ -227,19 +227,19 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 			if twoParams then
 				if (cmdID_2 == CMD_FIGHT) then
 					-- if I target the ground and have fight or patrol command
-					return -1, true, true, nil, cps_1, cps_2, cps_3
+					return -1, true, true, nil, nil, cps_1, cps_2, cps_3
 				end
 			elseif spValidUnitID(target) then -- if I target a unit
 				-- if I target a unit
 				if (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT) then 
 					-- Do not skirm single target with FIGHT
-					return -1, true, true, target, cps_1, cps_2, cps_3
+					return -1, true, true, target, cmdTag_2, cps_1, cps_2, cps_3
 				elseif Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts_2, CMD.OPT_INTERNAL) then
 					-- Do no skirm single target when it is auto attack
-					return -1, true, false, target, cps_1, cps_2, cps_3
+					return -1, true, false, target, cmdTag_2, cps_1, cps_2, cps_3
 				else
 					-- only skirm single target when given the order manually
-					return target, true, false, nil, cps_1, cps_2, cps_3 
+					return target, true, false, nil, nil, cps_1, cps_2, cps_3 
 				end
 			end
 		end
@@ -844,11 +844,13 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		behaviour = behaviour.fightOnlyOverride
 	end
 	
-	if isIdleAttack and enemy and (not unitData.idleAgression) and typeKnown and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
-		if not DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame) then
+	if isIdleAttack and enemy and (not unitData.idleAgression) and typeKnown
+			and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
-		return true
+		return true, orderSent
 	end
 	
 	local didSwarm = false
@@ -864,7 +866,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	if didSwarm then
 		-- Units can immediately transition to skirm after swarming.
 		-- This can happen if a known auto-target becomes too far away.
-		return true
+		return true, true
 	end
 	
 	if not enemy then
@@ -874,18 +876,23 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	local typeSkirm = typeKnown and behaviour.skirms and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
 	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 		--Spring.Echo("unit checking skirm")
-		if not DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame,
-				haveFight and holdPos, particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+		local orderSent = DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown,
+			move, isIdleAttack, cmdID, cmdTag, frame,
+			haveFight and holdPos,
+			particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])
+		)
+		if not orderSent then
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
-		return true
+		return true, orderSent
 	end
 	
 	if behaviour.fleeEverything then
-		if not DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame) then
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
-		return true
+		return true, orderSent
 	end
 	
 	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
@@ -896,10 +903,11 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 			or (not typeKnown and behaviour.fleeRadar) then
 		-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
 		-- if I do not have los and flee radar dot, flee
-		if not DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame) then
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
 			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
 		end
-		return true
+		return true, orderSent
 	end
 	
 	return false
@@ -923,22 +931,44 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local roamState = (moveState == 2)
 	local middleMoveState = (moveState == 1)
 	local holdPos = (moveState == 0)
-	
+
+	-- This is pretty hacky, but there is no need to do GetUnitOrderState if the unit doesn't have an attack command
+	local continueOnlyToFixNonAiFight = false
 	local behaviour
 	if not (middleMoveState and unitData.wasIdle) then
 		if exitEarly then
 			unitData.idleWantReturn = false
-			return
+			if cmdID == CMD_ATTACK then
+				continueOnlyToFixNonAiFight = true
+			else
+				return
+			end
 		end
 		behaviour = GetUnitBehavior(unitID, unitData.udID)
 		if behaviour.onlyIdleHandling then
 			unitData.idleWantReturn = false
-			return
+			if cmdID == CMD_ATTACK then
+				continueOnlyToFixNonAiFight = true
+			else
+				return
+			end
 		end
 	end
 	
-	local enemy, move, haveFight, autoAttackEnemyID, fightX, fightY, fightZ = GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, holdPos)
+	local enemy, move, haveFight, autoAttackEnemyID, autoCmdTag, fightX, fightY, fightZ = GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, cp_3, cmdTag, holdPos)
 	local isIdleAttack = middleMoveState and ((not cmdID) or (autoAttackEnemyID and not haveFight))
+	
+	if continueOnlyToFixNonAiFight then
+		-- Removes a fight/autotarget-issued attack command if there is a closer enemy.
+		-- Prevents chasing past enemies that are good targets.
+		if enemy == -1 and autoCmdTag and (autoAttackEnemyID or -1) >= 0 then
+			enemy = (spGetUnitNearestEnemy(unitID, (cmdID and behaviour.idleSearchRange) or behaviour.searchRange, true) or false)
+			if enemy and enemy ~= autoAttackEnemyID then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, autoCmdTag, 0)
+			end
+		end
+		return
+	end
 	
 	if unitData.wasIdle and haveFight and (not isIdleAttack) and unitData.rx then
 		if (fightX == unitData.rx) and (fightY == unitData.ry) and (fightZ == unitData.rz) and (not holdPos) then
@@ -963,7 +993,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	end
 	
-	local sentTacticalAiOrder = false
+	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
 		
@@ -986,19 +1016,30 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if not (exitEarly or behaviour.onlyIdleHandling) then
 			--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
-			sentTacticalAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+			aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 				fightX, fightY, fightZ, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
 				move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			
-			if autoAttackEnemyID and not sentTacticalAiOrder then
+			if autoAttackEnemyID and not aiTargetFound then
 				enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, unitData.allyTeam)
-				sentTacticalAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+				aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 					fightX, fightY, fightZ, unitData, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
 					move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			end
 		end
 		
-		if enemy and enemy ~= -1 and unitData.idleWantReturn and not sentTacticalAiOrder then
+		if doDebug then
+			Spring.Echo("sentAiOrder", aiSentOrder, autoCmdTag, autoAttackEnemyID, enemy)
+		end
+		
+		if not aiSentOrder and autoCmdTag and (autoAttackEnemyID or -1) >= 0 and (enemy or -1) >= 0 and autoAttackEnemyID ~= enemy then
+			-- Removes a fight/autotarget-issued attack command if there is a closer enemy.
+			-- Prevents chasing past enemies that are good targets.
+			-- Only do this if no order was sent, so swarming may be less affected, which seems fine.
+			spGiveOrderToUnit(unitID, CMD_REMOVE, autoCmdTag, 0)
+		end
+		
+		if enemy and enemy ~= -1 and unitData.idleWantReturn and not aiTargetFound then
 			DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enemyUnitDef, typeKnown)
 		end
 	end
@@ -1010,7 +1051,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		unitData.idleWantReturn = nil
 		if roamState then -- Roam
 			unitData.setReturn = false
-		elseif (sentTacticalAiOrder or cmdID or holdPos) and not unitData.forceReturn then
+		elseif (aiTargetFound or cmdID or holdPos) and not unitData.forceReturn then
 			-- Save for next idle
 			unitData.idleX = rx
 			unitData.idleZ = rz
