@@ -31,11 +31,8 @@ for unitDefID, _ in pairs(airTransports) do
 	end
 end
 
-local function DistSq(pos1, pos2)
-	local difX = pos1[1] - pos2[1]
-	local difY = pos1[2] - pos2[2]
-	local difZ = pos1[3] - pos2[3]
-	return difX^2 + difY^2 + difZ^2
+local function DistSq(x1, y1, z1, x2, y2, z2)
+	return (x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2
 end
 
 --------------------------------------------------------------------------------
@@ -60,10 +57,16 @@ function gadget:AllowUnitTransportLoad(transporterID, transporterUnitDefID, tran
 	if not airTransports[transporterUnitDefID] then
 		return true
 	end
-	local pos1 = {Spring.GetUnitPosition(transporterID)}
-	local pos2 = {goalX, goalY, goalZ}
-	if DistSq(pos1, pos2) > 256 then
+	local x, y, z = Spring.GetUnitPosition(transporterID)
+	if DistSq(x, y, z, goalX, goalY, goalZ) > 256 then
 		return false
+	end
+	if Spring.GetUnitAllyTeam(transporterID) ~= Spring.GetUnitAllyTeam(transporteeID) then
+		local _,_,_,speed = Spring.GetUnitVelocity(transporteeID)
+		if speed > 0.5 then
+			-- Allow for floating, Crab uncurl, Placeholder, etc.
+			return false
+		end
 	end
 	Spring.SetUnitVelocity(transporterID, 0,0,0)
 	return true
@@ -73,9 +76,8 @@ function gadget:AllowUnitTransportUnload(transporterID, transporterUnitDefID, tr
 	if not airTransports[transporterUnitDefID] then
 		return true
 	end
-	local pos1 = {Spring.GetUnitPosition(transporterID)}
-	local pos2 = {goalX, goalY, goalZ}
-	if DistSq(pos1, pos2) > 256 then
+	local x, y, z = Spring.GetUnitPosition(transporteeID)
+	if DistSq(x, y, z, goalX, goalY, goalZ) > 256 then
 		return false
 	end
 	Spring.SetUnitVelocity(transporterID, 0,0,0)
