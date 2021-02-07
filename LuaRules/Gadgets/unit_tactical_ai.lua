@@ -411,8 +411,12 @@ end
 local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, fightX, fightY, fightZ, frame)
 	local unitData = unit[unitID]
 	
-	if debugAction then
-		Spring.Utilities.UnitEcho(unitID, "flee")
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if debugAction or doDebug then
+		if doDebug then
+			Spring.Echo(" === DoSwarmEnemy", unitID, "===")
+		end
+		Spring.Utilities.UnitEcho(unitID, "Swarm")
 	end
 	
 	if not (enemy and typeKnown) then
@@ -469,8 +473,8 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	local cx, cy, cz -- command position
 	
 	if isIdleAttack then
-		if (debugUnit and debugUnit[unitID]) or debugAll then
-			Spring.Echo("=== DoSwarmEnemy", unitID, " ===")
+		if doDebug then
+			Spring.Echo("=== DoSwarmEnemy Idle", unitID, " ===")
 		end
 		
 		UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, behaviour.swarmEnemyDefaultRange, pointDis, ux, uz, ex, ez)
@@ -553,18 +557,28 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	local ex, ey, ez, _, aimY = spGetUnitPosition(enemy, false, true) -- enemy position
 	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
 
-	if not (ex and vx) then
-		return behaviour.skirmKeepOrder
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if debugAction or doDebug then
+		if doDebug then
+			Spring.Echo(" === DoSkirmEnemy", unitID, "===")
+		end
+		Spring.Utilities.UnitEcho(unitID, "Skirm")
 	end
-	
-	if debugAction then
-		Spring.Utilities.UnitEcho(unitID, "skirm")
+
+	if not (ex and vx) then
+		if doDebug then
+			Spring.Echo("return not (ex and vx)")
+		end
+		return behaviour.skirmKeepOrder
 	end
 	
 	local origEx, origEz = ex, ez
 	
 	if enemyUnitDef and behaviour.avoidHeightDiff and behaviour.avoidHeightDiff[enemyUnitDef] then
 		if ey - uy > AVOID_HEIGHT_DIFF or ey - uy < -AVOID_HEIGHT_DIFF then
+			if doDebug then
+				Spring.Echo("return AVOID_HEIGHT_DIFF", ey, uy, AVOID_HEIGHT_DIFF)
+			end
 			return behaviour.skirmKeepOrder
 		end
 	end
@@ -635,6 +649,9 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	end
 	
 	if bonusSkirmRange then
+		if doDebug then
+			Spring.Echo("bonusSkirmRange", bonusSkirmRange, skirmRange, predictedDist)
+		end
 		local oldSkirmRange = skirmRange
 		skirmRange = skirmRange + bonusSkirmRange
 		if behaviour.wardFireRange and skirmRange > predictedDist and predictedDist > oldSkirmRange then
@@ -644,11 +661,19 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		end
 	end
 	
+	if doDebug then
+		Spring.Echo("doHug or skirmRange > predictedDist", doHug, skirmRange, predictedDist)
+		Spring.Echo("GetEffectiveWeaponRange", GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum), unitData.udID, -dy, behaviour.weaponNum)
+	end
+	
 	--Spring.Echo("skirmRange", skirmRange, "pred", predictedDist, "frame", Spring.GetGameFrame())
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
 			local enemyRange = (GetEffectiveWeaponRange(enemyUnitDef, dy, behaviour.weaponNum) or 0) + behaviour.skirmOnlyNearEnemyRange
 			if enemyRange < predictedDist then
+				if doDebug then
+					Spring.Echo("return enemyRange < predictedDist", enemyRange, predictedDist)
+				end
 				return behaviour.skirmKeepOrder
 			end
 		end
@@ -667,6 +692,9 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				if (not behaviour.skirmBlockApproachHeadingBlock) or HeadingAllowReloadSkirmBlock(unitID, behaviour.skirmBlockApproachHeadingBlock, ex, ez) then
 					if cmdID and move and not behaviour.skirmKeepOrder then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+					end
+					if doDebug then
+						Spring.Echo("return behaviour.skirmBlockedApproachFrames < -reloadFrames", behaviour.skirmBlockedApproachFrames, reloadFrames, reloadState, frame)
 					end
 					return behaviour.skirmKeepOrder
 				end
@@ -710,9 +738,15 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 			enemyRange = range
 		end
 	end
-	if debugAction then
-		Spring.Utilities.UnitEcho(unitID, "flee")
+
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if debugAction or doDebug then
+		if doDebug then
+			Spring.Echo(" === DoFleeEnemy", unitID, "===")
+		end
+		Spring.Utilities.UnitEcho(unitID, "Flee")
 	end
+
 	local prediction = behaviour.fleeVelPrediction or behaviour.velocityPrediction
 	local vx, vy, vz = spGetUnitVelocity(enemy)
 	local ex, ey, ez = spGetUnitPosition(enemy) -- enemy position
@@ -730,7 +764,7 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 
 	if isIdleAttack then
 		if (debugUnit and debugUnit[unitID]) or debugAll then
-			Spring.Echo("=== DoFleeEnemy", unitID, " ===")
+			Spring.Echo("=== DoFleeEnemy Idle", unitID, " ===")
 		end
 		if UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enemy, typeKnown and enemyUnitDef, behaviour.minFleeRange, pointDis, ux, uz, ex, ez) then
 			return false
@@ -1171,12 +1205,12 @@ local function ToggleDebugAiAction(cmd, line, words, player)
 	Spring.Echo("Debug Tactical AI", debugAction)
 end
 
-local function ToggleDebugIdleUnit(cmd, line, words, player)
+local function ToggleDebugUnit(cmd, line, words, player)
 	if not Spring.IsCheatingEnabled() then
 		return
 	end
 	local unitID = tonumber(words[1])
-	Spring.Echo("Debug Idle")
+	Spring.Echo("Debug Detailed Unit")
 	if not unitID then
 		Spring.Echo("Disabled")
 		debugUnit = nil
@@ -1216,7 +1250,7 @@ function gadget:Initialize()
 	
 	gadgetHandler:AddChatAction("debugidleall", ToggleDebugIdleAll, "")
 	gadgetHandler:AddChatAction("debugai", ToggleDebugAiAction, "")
-	gadgetHandler:AddChatAction("debugidle", ToggleDebugIdleUnit, "")
+	gadgetHandler:AddChatAction("debugaiunit", ToggleDebugUnit, "")
 	gadgetHandler:AddChatAction("printunits", PrintUnits, "")
 end
 

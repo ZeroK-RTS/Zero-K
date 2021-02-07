@@ -85,7 +85,7 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	return maxRange, t --return maximum range and flight time.
 end
 
-local function CalculateModdedMaxRange(heightDiff, weapon)
+local function CalculateModdedMaxRange(heightDiff, weapon, doDebug)
 	local effectiveRange = 0
 	local heightModded = (heightDiff)*weapon.customHeightMod
 	--equivalent to: GetRange2D():
@@ -100,8 +100,7 @@ local function CalculateModdedMaxRange(heightDiff, weapon)
 				weapon.heightBoostFactor = (2 - weapon.scaleDown) / math.sqrt(weapon.scaleDown) --such that: heightBoostFactor == 1 when scaleDown == 1
 			end
 		end
-		heightModded = heightModded*weapon.heightBoostFactor
-		local moddedRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,heightModded)
+		local moddedRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,heightModded*weapon.heightBoostFactor)
 		effectiveRange = moddedRange*weapon.scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
 	elseif weapon.modType == 1 then
 		--SPHERE
@@ -113,6 +112,9 @@ local function CalculateModdedMaxRange(heightDiff, weapon)
 	end
 	if weapon.customCylinderTargeting >= 0.01 then --See Example: TestRange() in Spring\rts\Sim\Weapons\Weapon.cpp
 		--STRICT CYLINDER
+		if doDebug then
+			Spring.Echo("STRICT CYLINDER", weapon.customCylinderTargeting * weapon.customMaxRange, math.abs(heightModded), heightDiff, weapon.customHeightMod)
+		end
 		if weapon.customCylinderTargeting * weapon.customMaxRange > math.abs(heightModded) then
 			if weapon.modType == 0 then
 				effectiveRange = math.min(effectiveRange, weapon.customMaxRange) --Ballistic is more complex, physically it have limited range when shooting upward
@@ -131,7 +133,7 @@ end
 --Note: heightDiff is (unitY - targetY)
 --Note2: weaponNumOverride is defaulted to 1 if not specified
 function Spring.Utilities.GetEffectiveWeaponRange(unitDefID, heightDiff, weaponNumOverride)
-	if not unitDefID or not UnitDefs[unitDefID] then
+	if not unitDefID or not unitWeapon[unitDefID] then
 		return 0
 	end
 	local weaponNumber = weaponNumOverride and math.modf(weaponNumOverride)
