@@ -181,6 +181,8 @@ function GG.Script.InitializeDeathAnimation(unitID)
 	Spring.SetUnitRulesParam(unitID, "real_para", paralyzeDamage or 0)
 end
 
+-- engine forcefully closes the yard on EMP
+-- without any event to catch and prevent it
 function GG.Script.UnstickFactory(unitID)
 	while true do
 		SetUnitValue (COB.YARD_OPEN, 1)
