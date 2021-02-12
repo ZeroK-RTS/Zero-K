@@ -2,7 +2,7 @@
 -- extra_large_muzzle_flash_smoke
 -- vindiback_large
 -- rocketboots_muzzle
-return {    
+return {
   ["extra_large_muzzle_flash_flame"] = {
     muzzleflame = {
       air                = true,
@@ -22,9 +22,9 @@ return {
         sizegrowth         = 0.6,
         ttl                = 6,
       },
-    },    
-  },  
-  ["extra_large_muzzle_flash_smoke"] = {    
+    },
+  },
+  ["extra_large_muzzle_flash_smoke"] = {
     muzzlesmoke = {
       air                = true,
       class              = [[CSmokeProjectile2]],
@@ -175,7 +175,7 @@ return {
         sizegrowth         = 0.6,
         ttl                = 1,
       },
-    },  
+    },
     fire = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -221,7 +221,7 @@ return {
         wantedpos          = [[r-128 r128, r-300, r-128 r128]],
         glowfalloff        = 6.0,
       },
-    },   
+    },
     smokeground = {
       air                = false,
       class              = [[CSmokeProjectile2]],
