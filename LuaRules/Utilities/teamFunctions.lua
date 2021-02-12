@@ -32,11 +32,11 @@ do
 
 	if teamCount > 2 then
 		isFFA = true
-		isChicken = false
+		isChickens = false
 	elseif teamCount < 2 then
 		isSandbox = not isChickens
 	else
-		isChicken = false
+		isChickens = false
 		local cnt1 = #Spring.GetTeamList(actualAllyTeamList[1])
 		local cnt2 = #Spring.GetTeamList(actualAllyTeamList[2])
 		if cnt1 == 1 and cnt2 == 1 then
