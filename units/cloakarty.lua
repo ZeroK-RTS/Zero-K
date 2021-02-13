@@ -83,8 +83,8 @@ return { cloakarty = {
       },
 
       damage                  = {
-        default = 150.1,
-        planes  = 150.1,
+        default = 140.1,
+        planes  = 140.1,
         subs    = 7.5,
       },
 
