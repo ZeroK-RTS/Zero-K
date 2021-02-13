@@ -18,7 +18,7 @@ return { cloakjammer = {
 
     area_cloak = 1,
     area_cloak_upkeep = 15,
-    area_cloak_radius = 440,
+    area_cloak_radius = 400,
     area_cloak_decloak_distance = 75,
     
     priority_misc = 1,
@@ -42,7 +42,7 @@ return { cloakjammer = {
   onoffable              = true,
   pushResistant          = 0,
   script                 = [[cloakjammer.lua]],
-  radarDistanceJam       = 440,
+  radarDistanceJam       = 400,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 400,
   trackOffset            = 0,
