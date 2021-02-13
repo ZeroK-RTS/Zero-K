@@ -27,7 +27,7 @@ return { hoverdepthcharge = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 1260,
+  maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.35,
   minCloakDistance    = 75,
@@ -122,7 +122,7 @@ return { hoverdepthcharge = {
       waterWeapon             = true,
       weaponAcceleration      = 12,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 280,
+      weaponVelocity          = 330,
     },
     
     FAKE_DEPTHCHARGE = {
@@ -165,7 +165,7 @@ return { hoverdepthcharge = {
       turnRate                = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 280,
+      weaponVelocity          = 330,
     },
     
     FAKEGUN = {
