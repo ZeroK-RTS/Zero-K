@@ -70,7 +70,7 @@ return { amphraid = {
   weaponDefs             = {
 
     TORPMISSILE = {
-      name                    = [[Torpedo]],
+      name                    = [[Torpedo Missile]],
       areaOfEffect            = 32,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
@@ -107,11 +107,11 @@ return { amphraid = {
       tolerance               = 1000,
       tracks                  = true,
       trajectoryHeight        = 0.4,
-      turnRate                = 18000,
+      turnRate                = 25000,
       turret                  = true,
       weaponAcceleration      = 90,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 220,
     },
 
     TORPEDO = {
