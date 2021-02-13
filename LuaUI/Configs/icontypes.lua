@@ -319,7 +319,7 @@ local icontypes = {
   },
   amphsupport = {
     bitmap='icons/amphsupport.png',
-    size=1.8,
+    size=2,
   },
   amphassault = {
     bitmap='icons/amphassault.png',
