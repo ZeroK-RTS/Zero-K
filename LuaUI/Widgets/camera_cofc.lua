@@ -1830,7 +1830,7 @@ end
 
 local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 	local cs = GetTargetCameraState()
-	local cs1 = cs
+	-- local cs1 = cs
 	lastMouseX = nil
 	if cs.rx then
 
@@ -2378,7 +2378,9 @@ function widget:MouseMove(x, y, dx, dy, button)
 			RotateCamera(x, y, dx, dy, true, ls_have, false)
 		end
 
-		spWarpMouse(msx, msy)
+		-- spWarpMouse(msx, msy) -- doesn't work as desired in Spring 104.0.1-1544, as it seems to trigger widget:MouseMove, leading to jittery behaviour
+														 -- Since the intended behaviour is to keep the cursor from going to screen edge during rotation, maybe something else exists in the engine
+														 -- to keep the cursor centered/not moving normally during the rotation process
 
 		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	elseif springscroll then
@@ -2456,7 +2458,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	rotate = false
 	-- Rotate --
 	if a or options.middleMouseButton.value == 'rotate' then
-		spWarpMouse(cx, cy)
+		-- spWarpMouse(cx, cy)
 		ls_have = false
 		onTiltZoomTrack = false
 		rotate = true
@@ -2485,7 +2487,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 			SetLockSpot2(cs) --lockspot at center of screen
 		end
 
-		spWarpMouse(cx, cy) --move cursor to center of screen
+		-- spWarpMouse(cx, cy) --move cursor to center of screen
 		rotate = true
 		msx = cx
 		msy = cy
