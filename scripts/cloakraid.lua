@@ -54,7 +54,7 @@ local SIG_Walk = 2
 local SIG_Aim = 4
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	return (GG.att_MoveChange[unitID] or 1)
 end
 
 function script.Create()

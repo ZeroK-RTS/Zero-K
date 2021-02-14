@@ -18,7 +18,7 @@ local isAiming = false
 local runspeed = 1.0 * (UnitDefs[unitDefID].speed / 48)
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	return (GG.att_MoveChange[unitID] or 1)
 end
 
 local function Walk()

@@ -364,6 +364,7 @@ end
 
 GG.att_EconomyChange = {}
 GG.att_ReloadChange = {}
+GG.att_MoveChange = {}
 
 local currentEcon = {}
 local currentBuildpower = {}
@@ -389,6 +390,7 @@ local function removeUnit(unitID)
 	
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
+	GG.att_MoveChange[unitID] = nil
 end
 
 function UpdateUnitAttributes(unitID, frame)
@@ -477,6 +479,7 @@ function UpdateUnitAttributes(unitID, frame)
 		-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
 		GG.att_EconomyChange[unitID] = econMult
 		GG.att_ReloadChange[unitID] = reloadMult
+		GG.att_MoveChange[unitID] = moveMult
 		
 		unitSlowed[unitID] = moveMult < 1
 		if weaponMods or reloadMult ~= currentReload[unitID] then

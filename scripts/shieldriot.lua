@@ -44,23 +44,10 @@ local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.
 local ANIM_FRAMES = 4
 local walking = false -- prevent script.StartMoving from spamming threads if already walking
 
-local function GetSpeedParams()
-	local attMod = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
-	if attMod <= 0 then
-		return 0, 300
-	end
-	local sleepFrames = math.floor(ANIM_FRAMES / attMod + 0.5)
-	if sleepFrames < 1 then
-		sleepFrames = 1
-	end
-	local speedMod = 1 / sleepFrames
-	return speedMod, 33*sleepFrames
-end
-
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	local speedMult, sleepTime = GetSpeedParams()
+	local speedMult, sleepTime = GG.Script.GetSpeedParams(unitID, ANIM_FRAMES)
 
 	-- Frame: 5 (first step)
 	Turn(lfoot, x_axis, -1.005157, 36.441551 * speedMult) -- delta=69.60
@@ -90,7 +77,7 @@ local function Walk()
 	Sleep(sleepTime)
 
 	while true do
-		speedMult, sleepTime = GetSpeedParams()
+		speedMult, sleepTime = GG.Script.GetSpeedParams(unitID, ANIM_FRAMES)
 		-- Frame:9
 		Turn(lfoot, x_axis, -0.251141, 22.620467 * speedMult) -- delta=-43.20
 		Turn(lleg, x_axis, 1.005390, 8.962684 * speedMult) -- delta=-17.12
@@ -249,7 +236,7 @@ local function StopWalking()
     Signal(SIG_WALK)
     SetSignalMask(SIG_WALK)
 
-	local speedMult = 0.5 * GetSpeedParams() -- slower restore speed for last step
+	local speedMult = 0.5 * GG.Script.GetSpeedParams(unitID, ANIM_FRAMES) -- slower restore speed for last step
 
 	Move(pelvis, y_axis, -1.852628, 161.407560 * speedMult)
 	Turn(lfoot, x_axis, 0.209562, 91.103878 * speedMult)

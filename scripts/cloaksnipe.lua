@@ -65,7 +65,7 @@ local maintainHeading = false
 local torsoHeading = 0
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	return (GG.att_MoveChange[unitID] or 1)
 end
 
 local function Walk()

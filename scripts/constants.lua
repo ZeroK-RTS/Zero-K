@@ -190,3 +190,16 @@ function GG.Script.UnstickFactory(unitID)
 		Sleep(1000 + math.random()*1000)
 	end
 end
+
+function GG.Script.GetSpeedParams(unitID, animFrames)
+	local attMod = (GG.att_MoveChange[unitID] or 1)
+	if attMod <= 0 then
+		return 0, 300
+	end
+	local sleepFrames = math.floor(animFrames / attMod + 0.5)
+	if sleepFrames < 1 then
+		sleepFrames = 1	
+	end
+	local speedMod = 1 / sleepFrames
+	return speedMod, 33*sleepFrames
+end

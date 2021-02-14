@@ -71,10 +71,10 @@ local function Walk()
 	
 	while true do
 	
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*PACE
+		local speedMult = (GG.att_MoveChange[unitID] or 1)*PACE
 		while speedMult <= 0 do
 			Sleep(200)
-			speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*PACE
+			speedMult = (GG.att_MoveChange[unitID] or 1)*PACE
 		end
 	
 		Move(hips, y_axis, 2.5, 4 * speedMult)

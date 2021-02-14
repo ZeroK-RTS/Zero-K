@@ -243,7 +243,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
+		local speedMult = (GG.att_MoveChange[unitID] or 1)
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
