@@ -34,9 +34,13 @@ local function PadAdjust()
 	end
 end
 
-function script.Activate()
+local function Unstick()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
+	GG.Script.UnstickFactory(unitID)
+end
+
+function script.Activate()
 	--StartThread(PadAdjust)
 	--[[
 	SetUnitValue(YARD_OPEN, 1)	--Tobi said its not necessary
@@ -47,7 +51,7 @@ function script.Activate()
 	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.BUGGER_OFF, 0)
-	GG.Script.UnstickFactory(unitID)
+	StartThread(Unstick0
 end
 
 function script.Deactivate()
@@ -59,7 +63,6 @@ function script.Deactivate()
 	end
 	]]--
 	Signal(SIG_BUILD)
-	SetSignalMask(SIG_BUILD)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	Move(pad, z_axis, 0)
