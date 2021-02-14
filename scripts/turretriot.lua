@@ -94,7 +94,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn (ejector, y_axis, math.rad(-90))
-	Spring.Echo("currentHeat", currentHeat)
 	if currentHeat > 0 then
 		StartThread(HeatUpdateThread)
 	end

@@ -266,15 +266,15 @@ local function StopWalking()
 end
 
 function script.StartMoving()
-    if not walking then
-        walking = true
-        StartThread(Walk)
-    end
+	if not walking then
+		walking = true
+		StartThread(Walk)
+	end
 end
 
 function script.StopMoving()
-    walking = false
-    StartThread(StopWalking)
+	walking = false
+	StartThread(StopWalking)
 end
 
 function AutoAttack_Thread()
@@ -300,6 +300,10 @@ function AutoAttack_Thread()
 	end
 end
 
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+end
+
 function FireAnim()
 	local mspeed = 4
 	Move (l_gun, x_axis, 2, mspeed*3)
@@ -313,11 +317,11 @@ function FireAnim()
 end
 
 function script.Activate()
- StartThread(AutoAttack_Thread)
+	StartThread(AutoAttack_Thread)
 end
 
 function script.Deactivate()
- Signal(SIG_ACTIVATE)
+	Signal(SIG_ACTIVATE)
 end
 
 function script.FireWeapon(num)

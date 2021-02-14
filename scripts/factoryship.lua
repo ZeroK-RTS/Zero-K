@@ -51,7 +51,7 @@ function script.Activate()
 	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.BUGGER_OFF, 0)
-	StartThread(Unstick0
+	StartThread(Unstick)
 end
 
 function script.Deactivate()
