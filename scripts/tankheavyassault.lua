@@ -169,7 +169,7 @@ function script.Shot(num)
 	StartThread(RestoreBarrel)
 end
 
-function script.Killed (recentDamage, maxHealth)
+function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.25) then
 		Explode(turret1, SFX.SMOKE)

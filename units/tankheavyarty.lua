@@ -39,6 +39,7 @@ return { tankheavyarty = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName             = [[cortrem.s3o]],
+  script                 = [[tankheavyarty.lua]],
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {
