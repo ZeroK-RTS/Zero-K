@@ -107,7 +107,7 @@ return { hoverdepthcharge = {
       myGravity               = 0.2,
       noSelfDamage            = true,
       numbounce               = 3,
-      range                   = 300,
+      range                   = 280,
       reloadtime              = 2.8,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
@@ -119,9 +119,9 @@ return { hoverdepthcharge = {
       turnRate                = 60000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 12,
+      weaponAcceleration      = 25,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 330,
+      weaponVelocity          = 400,
     },
     
     FAKE_DEPTHCHARGE = {
@@ -153,7 +153,7 @@ return { hoverdepthcharge = {
       myGravity               = 0.2,
       noSelfDamage            = true,
       numbounce               = 1,
-      range                   = 250,
+      range                   = 280,
       reloadtime              = 2.8,
       soundHitDry             = [[explosion/mini_nuke_short]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
@@ -165,7 +165,7 @@ return { hoverdepthcharge = {
       turnRate                = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 330,
+      weaponVelocity          = 400,
     },
     
     FAKEGUN = {
@@ -190,7 +190,7 @@ return { hoverdepthcharge = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 240,
+      range                   = 280,
       reloadtime              = 2.8,
       size                    = 1E-06,
       smokeTrail              = false,
@@ -208,7 +208,7 @@ return { hoverdepthcharge = {
       weaponAcceleration      = 240,
       weaponTimer             = 0.1,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 280,
+      weaponVelocity          = 400,
     },
 
   },

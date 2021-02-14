@@ -51,12 +51,12 @@ local projectileDefs = {
 		leadMult = 0.6,
 	},
 	[WeaponDefNames["hoverdepthcharge_fake_depthcharge"].id] = {
-		speed = 7, -- For prediction.
+		speed = 8, -- For prediction.
 		alwaysBurnblow = true,
 		moveCtrlSpeed = 5.3,
-		moveCtrlAccel = 0.09,
+		moveCtrlAccel = 0.02,
 		moveCtrlAccelAccel = 0.01,
-		moveCtrlMaxSpeed = 18,
+		moveCtrlMaxSpeed = 30,
 		groundFloat = 5,
 		rangeSqr = 121,
 		leadMult = 0.75,
