@@ -137,7 +137,7 @@ return { hoverdepthcharge = {
       craterMult              = 2,
 
       damage                  = {
-        default = 420.1,
+        default = 400.1,
       },
 
       edgeEffectiveness       = 0.4,
@@ -153,12 +153,13 @@ return { hoverdepthcharge = {
       myGravity               = 0.2,
       noSelfDamage            = true,
       numbounce               = 1,
-      range                   = 300,
+      range                   = 250,
       reloadtime              = 2.8,
       soundHitDry             = [[explosion/mini_nuke_short]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
-      soundStartVolume        = 8,
+      soundStartVolume        = 7,
+      soundHitVolume          = 7,
       tolerance               = 1000000,
       tracks                  = false,
       turnRate                = 0,
@@ -189,7 +190,7 @@ return { hoverdepthcharge = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 300,
+      range                   = 240,
       reloadtime              = 2.8,
       size                    = 1E-06,
       smokeTrail              = false,

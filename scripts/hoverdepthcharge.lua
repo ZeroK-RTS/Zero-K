@@ -113,7 +113,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
-	--StartThread(WeaponRangeUpdate) -- Not required as ranges are equal.
+	StartThread(WeaponRangeUpdate) -- Not required as ranges are equal.
 end
 
 function script.QueryWeapon(num)
