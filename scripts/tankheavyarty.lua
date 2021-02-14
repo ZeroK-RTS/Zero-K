@@ -62,6 +62,9 @@ local function SetAbleToMove(newMove)
 	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
 	GG.UpdateUnitAttributes(unitID)
+	if newMove then
+		GG.WaitWaitMoveUnit(unitID)
+	end
 end
 
 local function TrackControl()
