@@ -96,8 +96,8 @@ local function SetAbleToMove(newMove)
 	end
 	ableToMove = newMove
 	
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.05)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.05)
 	GG.UpdateUnitAttributes(unitID)
 	if newMove then
 		GG.WaitWaitMoveUnit(unitID)
@@ -130,9 +130,14 @@ function script.StartMoving()
 	StartThread(StowGun)
 end
 
-function script.StopMoving()
+local function DelayStopMove()
+	SetSignalMask(SIG_MOVE)
+	Sleep(500)
 	moving = false
+end
+function script.StopMoving()
 	Signal(SIG_STOW)
+	StartThread(DelayStopMove)
 	TrackControlStopMoving()
 end
 

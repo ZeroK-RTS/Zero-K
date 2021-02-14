@@ -59,8 +59,8 @@ local function SetAbleToMove(newMove)
 	end
 	ableToMove = newMove
 	
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.05)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.05)
 	GG.UpdateUnitAttributes(unitID)
 	if newMove then
 		GG.WaitWaitMoveUnit(unitID)
@@ -69,21 +69,33 @@ end
 
 local function TrackControl()
 	SetSignalMask(SIG_MOVE)
+	firstMove = false
 	while isMoving do 
-		tracks = tracks + 1
-		if tracks == 2 then
-			Hide(tracks1)
-			Show(tracks2)
-		elseif tracks == 3 then
-			Hide(tracks2)
-			Show(tracks3)
-		elseif tracks == 4 then
-			Hide(tracks3)
-			Show(tracks4)
-		else 
-			tracks = 1
-			Hide(tracks4)
-			Show(tracks1)
+		if ableToMove then
+			if firstMove then
+				firstMove = true
+				Spin(wheels1, x_axis, WHEEL_SPIN_SPEED_L)
+				Spin(wheels2, x_axis, WHEEL_SPIN_SPEED_L)
+				Spin(wheels3, x_axis, WHEEL_SPIN_SPEED_L)
+				Spin(wheels4, x_axis, WHEEL_SPIN_SPEED_S)
+				Spin(wheels5, x_axis, WHEEL_SPIN_SPEED_S)
+				Spin(wheels6, x_axis, WHEEL_SPIN_SPEED_L)
+			end
+			tracks = tracks + 1
+			if tracks == 2 then
+				Hide(tracks1)
+				Show(tracks2)
+			elseif tracks == 3 then
+				Hide(tracks2)
+				Show(tracks3)
+			elseif tracks == 4 then
+				Hide(tracks3)
+				Show(tracks4)
+			else 
+				tracks = 1
+				Hide(tracks4)
+				Show(tracks1)
+			end
 		end
 		Sleep(TRACK_PERIOD)
 	end
@@ -148,22 +160,24 @@ local function Close()
 	SetAbleToMove(true)
 end
 
-function script.StartMoving() 
+function script.StartMoving()
+	--Spring.Utilities.UnitEcho(unitID, "START")
 	Signal(SIG_MOVE)
 	isMoving = true
 	StartThread(TrackControl)
 	StartThread(Close)
-	Spin(wheels1, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels2, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels3, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels4, x_axis, WHEEL_SPIN_SPEED_S)
-	Spin(wheels5, x_axis, WHEEL_SPIN_SPEED_S)
-	Spin(wheels6, x_axis, WHEEL_SPIN_SPEED_L)
 end
 
-function script.StopMoving() 
-	Signal(SIG_MOVE)
+local function DelayStopMove()
+	SetSignalMask(SIG_MOVE)
+	Sleep(500)
+	--Spring.Utilities.UnitEcho(unitID, "PPP")
 	isMoving = false
+end
+
+function script.StopMoving()
+	Signal(SIG_MOVE)
+	StartThread(DelayStopMove)
 	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_L)
 	StopSpin(wheels2, x_axis, WHEEL_SPIN_DECEL_L)
 	StopSpin(wheels3, x_axis, WHEEL_SPIN_DECEL_L)
