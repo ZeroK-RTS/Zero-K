@@ -77,9 +77,9 @@ return { wolverine_mine = {
       },
       
       damage                  = {
-        default = 32.01,
-        planes  = 32.01,
-        subs    = 3.2,
+        default = 34.01,
+        planes  = 34.01,
+        subs    = 3.4,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],
