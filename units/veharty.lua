@@ -79,8 +79,8 @@ return { veharty = {
 
       customParams            = {
         reaim_time = 8, -- COB
-        damage_vs_shield = [[180]],
-        damage_vs_feature = [[180]],
+        damage_vs_shield = [[190]],
+        damage_vs_feature = [[190]],
 
         spawns_name = "wolverine_mine",
         spawns_expire = 60,
