@@ -92,6 +92,7 @@ local cmds = {
 	TURN = 38530,
 	WANTED_SPEED = 38825,
 	AIR_STRAFE = 39381,
+	MIN_METAL_TO_TARGET = 38293,
 
 	-- terraform
 	RAMP = 39734,
