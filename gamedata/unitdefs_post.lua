@@ -263,6 +263,8 @@ local cloakFootMult = 6 * sqrt(2)
 for name, ud in pairs(UnitDefs) do
 	local fx = ud.customparams.decloak_footprint or (ud.footprintx and tonumber(ud.footprintx) or 1)
 	local fz = ud.customparams.decloak_footprint or (ud.footprintz and tonumber(ud.footprintz) or 1)
+	-- Note that the full power of this equation is never used in practise, since units have square
+	-- footprints and most structures don't cloak (the ones that do have square footprints).
 	local radius = cloakFootMult * sqrt((fx * fx) + (fz * fz)) + 56
 	-- 2x2 = 80
 	-- 3x3 = 92
