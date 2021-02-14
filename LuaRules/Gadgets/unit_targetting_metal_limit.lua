@@ -115,7 +115,7 @@ local function PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams, c
 			preventChaffShootingCmdDesc.params = newParams
 			spEditUnitCmdDesc(unitID, cmdDescID, {params = preventChaffShootingCmdDesc.params})
 		end
-		Spring.SendLuaRulesMsg(minMetalMsg .. " ".. tostring(unitID) .. " " .. tostring(metalThreshholdsByUnitDefIDs[unitDefID][state + 2]))
+		unitMetalMin[unitID] = metalThreshholdsByUnitDefIDs[unitDefID][state + 2]
 		return false
 	end
 	return true
@@ -127,30 +127,6 @@ end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
-end
-
-function gadget:RecvLuaMsg (msg, playerID)
-	if msg:sub(1, #minMetalMsg) ~= minMetalMsg then
-		return
-	end
-
-	-- Break up the message to find unidID and the new metal minimum for targetting
-	local strDividerPos = string.find(msg, " ", #minMetalMsg + 2)
-	if strDividerPos == nil then return end
-	local unitID = tonumber(msg:sub(#minMetalMsg + 2, strDividerPos))
-	if unitID == nil then return end
-	local newMetalMin = tonumber(msg:sub(strDividerPos + 1, #msg))
-	if newMetalMin == nil then return end
-
-	-- Verify this player is authorized
-	local unitTeamId = Spring.GetUnitTeam(unitID)
-	if unitTeamId == nil then return end
-	local _,_,_,playerTeamId = Spring.GetPlayerInfo(playerID)
-	if playerTeamId == nil then return end
-
-	if unitTeamId == playerTeamId then
-		unitMetalMin[unitID] = newMetalMin
-	end
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
