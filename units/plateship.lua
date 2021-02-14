@@ -56,7 +56,6 @@ return { plateship = {
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH * 3 / 2,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   minWaterDepth                 = 15,
   moveState                     = 1,
   objectName                    = [[plate_ship.s3o]],

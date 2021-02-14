@@ -38,7 +38,6 @@ return { amphsupport = {
   maxDamage              = 1720,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noAutoFire             = false,

@@ -38,7 +38,6 @@ return { energywind = {
   losEmitHeight                 = 30,
   maxDamage                     = 150,
   maxSlope                      = 75,
-  minCloakDistance              = 150,
   objectName                    = [[arm_wind_generator.s3o]],
   script                        = [[energywind.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],

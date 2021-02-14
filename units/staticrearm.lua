@@ -43,7 +43,6 @@ return { staticrearm = {
   maxDamage           = 1860,
   maxSlope            = 18,
   maxVelocity         = 0,
-  minCloakDistance    = 150,
   objectName          = [[staticrearm.dae]],
   script              = [[staticrearm.lua]],
   selfDestructAs      = [[LARGE_BUILDINGEX]],

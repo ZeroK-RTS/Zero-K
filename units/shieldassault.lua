@@ -33,7 +33,6 @@ return { shieldassault = {
   maxSlope            = 36,
   maxVelocity         = 1.925,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[thud.s3o]],

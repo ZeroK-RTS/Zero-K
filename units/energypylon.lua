@@ -36,7 +36,6 @@ return { energypylon = {
   levelGround                   = false,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[armestor.s3o]],
   script                        = "energypylon.lua",

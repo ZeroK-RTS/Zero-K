@@ -24,7 +24,6 @@ return { starlight_satellite = {
   idleTime               = 1800,
   maxDamage              = 1500,
   maxVelocity            = 0.001,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[starlight_satellite.dae]],

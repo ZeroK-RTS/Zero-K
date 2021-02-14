@@ -41,7 +41,6 @@ return { jumpscout = {
   maxSlope               = 36,
   maxVelocity            = 3.5,
   maxWaterDepth          = 15,
-  minCloakDistance       = 75,
   movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING]],

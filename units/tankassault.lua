@@ -34,7 +34,6 @@ return { tankassault = {
   maxSlope            = 18,
   maxVelocity         = 2.45,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

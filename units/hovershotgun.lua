@@ -27,7 +27,6 @@ return { hovershotgun = {
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

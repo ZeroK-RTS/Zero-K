@@ -30,7 +30,6 @@ return { turretemp = {
   maxDamage                     = 1600,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armartic]],
   script                        = [[turretemp.lua]],

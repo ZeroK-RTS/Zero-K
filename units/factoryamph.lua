@@ -60,7 +60,6 @@ return { factoryamph = {
   idleTime         = 1800,
   maxDamage        = 4000,
   maxSlope         = 15,
-  minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
   objectName       = [[factory2.s3o]],

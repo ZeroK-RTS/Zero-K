@@ -26,7 +26,6 @@ return { shieldarty = {
   maxSlope               = 36,
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],

@@ -28,7 +28,6 @@ return { chickens = {
   maxDamage           = 600,
   maxSlope            = 36,
   maxVelocity         = 2,
-  minCloakDistance    = 75,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],

@@ -58,7 +58,6 @@ return { factoryship = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  minCloakDistance       = 150,
   minWaterDepth          = 15,
   moveState              = 1,
   objectName             = [[seafac.s3o]],

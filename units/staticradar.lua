@@ -40,7 +40,6 @@ return { staticradar = {
   maxDamage                     = 80,
   maxSlope                      = 36,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[ARADARLVL1.s3o]],
   script                        = [[staticradar.lua]],

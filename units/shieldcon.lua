@@ -36,7 +36,6 @@ return { shieldcon = {
   maxSlope            = 36,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   objectName          = [[conbot.s3o]],
   onoffable           = false,

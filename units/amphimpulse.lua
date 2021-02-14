@@ -35,7 +35,6 @@ return { amphimpulse = {
   maxDamage              = 760,
   maxSlope               = 36,
   maxVelocity            = 2.35,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[amphraider2.s3o]],

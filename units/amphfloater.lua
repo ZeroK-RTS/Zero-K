@@ -34,7 +34,6 @@ return { amphfloater = {
   maxDamage              = 1250,
   maxSlope               = 36,
   maxVelocity            = 1.7,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[can.s3o]],

@@ -36,7 +36,6 @@ return { zenith = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING GUNSHIP SUB STUPIDTARGET]],
   objectName                    = [[zenith.s3o]],
   onoffable                     = true,

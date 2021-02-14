@@ -34,7 +34,6 @@ return { amphaa = {
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],

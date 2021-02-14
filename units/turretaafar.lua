@@ -34,7 +34,6 @@ return { turretaafar = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 5000,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[armcir.s3o]],

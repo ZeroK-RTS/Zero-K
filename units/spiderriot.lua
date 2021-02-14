@@ -31,7 +31,6 @@ return { spiderriot = {
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spiderriot.s3o]],

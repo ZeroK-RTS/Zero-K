@@ -31,7 +31,6 @@ return { shieldriot = {
   maxSlope               = 36,
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],

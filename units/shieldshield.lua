@@ -37,7 +37,6 @@ return { shieldshield = {
   maxSlope               = 36,
   maxVelocity            = 2.05,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   moveState              = 0,
   objectName             = [[m-8.s3o]],

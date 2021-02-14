@@ -32,7 +32,6 @@ return { shieldskirm = {
   maxSlope               = 36,
   maxVelocity            = 1.95,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],

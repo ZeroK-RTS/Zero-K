@@ -32,7 +32,6 @@ return { jumpassault = {
   maxSlope            = 36,
   maxVelocity         = 1.81,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],

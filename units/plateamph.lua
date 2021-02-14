@@ -58,7 +58,6 @@ return { plateamph = {
   idleTime                      = 1800,
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[plate_amph.s3o]],

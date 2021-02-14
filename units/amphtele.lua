@@ -35,7 +35,6 @@ return { amphtele = {
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 2.5,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   objectName             = [[amphteleport.s3o]],
   script                 = [[amphtele.lua]],

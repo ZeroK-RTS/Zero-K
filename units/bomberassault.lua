@@ -40,7 +40,6 @@ return { bomberassault = {
   maxRudder           = 0.003,
   maxFuel             = 1000000,
   maxVelocity         = 6,
-  minCloakDistance    = 75,
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],

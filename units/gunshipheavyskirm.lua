@@ -37,7 +37,6 @@ return { gunshipheavyskirm = {
   maneuverleashlength = [[1280]],
   maxDamage           = 2800,
   maxVelocity         = 3.3,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[stingray.s3o]],

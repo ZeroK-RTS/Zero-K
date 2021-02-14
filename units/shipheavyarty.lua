@@ -32,7 +32,6 @@ return { shipheavyarty = {
   idleTime               = 1800,
   maxDamage              = 8000,
   maxVelocity            = 1.9,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],
   moveState              = 0,

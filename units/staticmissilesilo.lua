@@ -38,7 +38,6 @@ return { staticmissilesilo = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
   script                        = [[staticmissilesilo.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],

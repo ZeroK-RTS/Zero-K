@@ -32,7 +32,6 @@ return { cloakraid = {
   maxSlope               = 36,
   maxVelocity            = 3.85,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],

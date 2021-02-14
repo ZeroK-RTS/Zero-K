@@ -29,7 +29,6 @@ return { energyheavygeo = {
   idleTime                      = 1800,
   maxDamage                     = 3250,
   maxSlope                      = 255,
-  minCloakDistance              = 150,
   objectName                    = [[energyheavygeo.s3o]],
   script                        = [[energyheavygeo.lua]],
   selfDestructAs                = [[NUCLEAR_MISSILE]],

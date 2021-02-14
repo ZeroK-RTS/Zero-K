@@ -59,7 +59,6 @@ return { plateplane = {
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[plate_plane.s3o]],
   script                        = [[plateplane.lua]],

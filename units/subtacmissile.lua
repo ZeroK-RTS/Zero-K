@@ -34,7 +34,6 @@ return { subtacmissile = {
   idleTime               = 1800,
   maxDamage              = 3000,
   maxVelocity            = 2.79,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[UBOAT3]],
   moveState              = 0,

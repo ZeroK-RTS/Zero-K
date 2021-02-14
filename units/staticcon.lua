@@ -41,7 +41,6 @@ return { staticcon = {
   maxDamage                     = 500,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[staticcon.lua]],

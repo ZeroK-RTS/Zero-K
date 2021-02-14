@@ -53,7 +53,6 @@ return { factoryshield = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factory.s3o]],

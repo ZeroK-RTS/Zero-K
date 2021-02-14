@@ -27,7 +27,6 @@ return { turretaaclose = {
   levelGround                   = false,
   maxDamage                     = 580,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[missiletower.s3o]],

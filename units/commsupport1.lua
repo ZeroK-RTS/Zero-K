@@ -52,7 +52,6 @@ return { commsupport1 = {
   maxWaterDepth       = 5000,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commsupport.s3o]],

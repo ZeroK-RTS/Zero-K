@@ -19,7 +19,6 @@ return { asteroid = {
   maxSlope                      = 255,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   objectName                    = [[asteroid.s3o]],
   script                        = [[asteroid.lua]],
   sightDistance                 = 1,

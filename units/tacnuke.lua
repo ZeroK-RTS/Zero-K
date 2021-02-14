@@ -26,7 +26,6 @@ return { tacnuke = {
   idleTime                      = 1800,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   objectName                    = [[wep_tacnuke.s3o]],
   script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[WEAPON]],

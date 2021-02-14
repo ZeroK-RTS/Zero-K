@@ -32,7 +32,6 @@ return { vehriot = {
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

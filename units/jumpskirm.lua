@@ -37,7 +37,6 @@ return { jumpskirm = {
   maxSlope            = 36,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],

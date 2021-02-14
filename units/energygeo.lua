@@ -45,7 +45,6 @@ return { energygeo = {
   maxDamage                     = 1750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[geo.dae]],
   script                        = [[energygeo.lua]],

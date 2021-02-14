@@ -30,7 +30,6 @@ return { chicken_dodo = {
   maxDamage             = 200,
   maxSlope              = 36,
   maxVelocity           = 7,
-  minCloakDistance      = 75,
   movementClass         = [[AKBOT2]],
   movestate             = 2,
   noAutoFire            = false,

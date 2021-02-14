@@ -39,7 +39,6 @@ return { shipcon = {
   idleTime               = 1800,
   maxDamage              = 1400,
   maxVelocity            = 2.5,
-  minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,

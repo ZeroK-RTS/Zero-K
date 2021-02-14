@@ -31,7 +31,6 @@ return { hoverriot = {
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.05,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

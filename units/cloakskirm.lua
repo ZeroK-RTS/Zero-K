@@ -33,7 +33,6 @@ return { cloakskirm = {
   maxSlope               = 36,
   maxVelocity            = 2.3,
   maxWaterDepth          = 20,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],

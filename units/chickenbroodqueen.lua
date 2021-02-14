@@ -57,7 +57,6 @@ return { chickenbroodqueen = {
   maxSlope            = 72,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

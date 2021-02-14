@@ -31,7 +31,6 @@ return { pw_generic = {
   maxDamage                     = 5000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.dae]],
   reclaimable                   = false,

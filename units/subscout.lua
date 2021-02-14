@@ -32,7 +32,6 @@ return { subscout = {
   kamikazeDistance      = 80,
   maxDamage             = 200,
   maxVelocity           = 3.8,
-  minCloakDistance      = 75,
   minWaterDepth         = 15,
   movementClass         = [[UBOAT3]],
   noAutoFire            = false,

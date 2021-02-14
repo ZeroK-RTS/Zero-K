@@ -25,7 +25,6 @@ return { roost = {
   maxSlope          = 36,
   maxVelocity       = 0,
   metalMake         = 2.5,
-  minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
   script            = [[roost.lua]],

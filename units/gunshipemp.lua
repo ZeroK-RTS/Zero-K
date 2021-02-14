@@ -38,7 +38,6 @@ return { gunshipemp = {
   idleTime            = 1800,
   maxDamage           = 370,
   maxVelocity         = 7.5,
-  minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
   objectName          = [[marshmellow.s3o]],
   script              = [[gunshipemp.lua]],

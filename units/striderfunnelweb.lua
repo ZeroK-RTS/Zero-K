@@ -45,7 +45,6 @@ return { striderfunnelweb = {
   maxSlope               = 36,
   maxVelocity            = 1.3666,
   maxWaterDepth          = 22,
-  minCloakDistance       = 150,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],

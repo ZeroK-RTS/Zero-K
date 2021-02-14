@@ -33,7 +33,6 @@ return { amphriot = {
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER]],
   objectName             = [[amphriot.s3o]],

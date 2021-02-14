@@ -29,7 +29,6 @@ return { spideranarchid = {
   maxSlope               = 72,
   maxVelocity            = 1.6,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[spideranarchid.s3o]],

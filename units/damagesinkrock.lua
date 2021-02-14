@@ -19,7 +19,6 @@ return { rocksink = {
   maxSlope                = 18,
   maxVelocity             = 0,
   maxWaterDepth           = 0,
-  minCloakDistance        = 150,
   objectName              = [[zenith.s3o]],
   script                  = [[nullrock.lua]],
   sightDistance           = 660,

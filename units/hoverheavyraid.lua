@@ -31,7 +31,6 @@ return { hoverheavyraid = {
   maxDamage           = 720,
   maxSlope            = 36,
   maxVelocity         = 3.15,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],

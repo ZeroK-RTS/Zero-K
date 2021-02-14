@@ -34,7 +34,6 @@ return { shiptorpraider = {
   maneuverleashlength = [[1280]],
   maxDamage           = 360,
   maxVelocity         = 4.2,
-  minCloakDistance    = 75,
   minWaterDepth       = 5,
   movementClass       = [[BOAT3]],
   noAutoFire          = false,

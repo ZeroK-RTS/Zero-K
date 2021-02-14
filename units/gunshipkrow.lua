@@ -38,7 +38,6 @@ return { gunshipkrow = {
   maneuverleashlength    = [[500]],
   maxDamage              = 16000,
   maxVelocity            = 3.3,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[krow.s3o]],

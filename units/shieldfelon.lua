@@ -31,7 +31,6 @@ return { shieldfelon = {
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[shieldfelon.s3o]],

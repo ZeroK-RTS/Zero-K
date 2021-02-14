@@ -40,7 +40,6 @@ return { tankraid = {
   maxSlope            = 18,
   maxVelocity         = 3.6,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

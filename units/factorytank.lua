@@ -62,7 +62,6 @@ return { factorytank = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[factorytank.s3o]],

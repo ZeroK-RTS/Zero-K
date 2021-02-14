@@ -35,7 +35,6 @@ return { hoverarty = {
   maxSlope            = 18,
   maxVelocity         = 1.75,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
   moveState           = 0,
   noAutoFire          = false,

@@ -30,7 +30,6 @@ return { striderarty = {
   maxSlope               = 36,
   maxVelocity            = 1.2,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
   moveState              = 0,
   noAutoFire             = false,

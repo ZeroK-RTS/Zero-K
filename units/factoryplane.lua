@@ -60,7 +60,6 @@ return { factoryplane = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],
   script                        = [[factoryplane.lua]],

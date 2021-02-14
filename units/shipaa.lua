@@ -35,7 +35,6 @@ return { shipaa = {
   losEmitHeight          = 40,
   maxDamage              = 1900,
   maxVelocity            = 2.84,
-  minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
   moveState              = 0,

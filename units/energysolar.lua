@@ -37,7 +37,6 @@ return { energysolar = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[arm_solar.s3o]],
   onoffable                     = true,

@@ -41,7 +41,6 @@ return { bomberstrike = {
   maxRudder           = 0.007,
   maxFuel             = 1000000,
   maxVelocity         = 8.4,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[bomberstrike.s3o]],

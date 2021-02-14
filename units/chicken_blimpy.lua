@@ -35,7 +35,6 @@ return { chicken_blimpy = {
   maxDamage           = 1850,
   maxSlope            = 18,
   maxVelocity         = 5,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],

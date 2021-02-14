@@ -30,7 +30,6 @@ return { turrettorp = {
   maxDamage         = 1020,
   maxSlope          = 18,
   maxVelocity       = 0,
-  minCloakDistance  = 150,
   noAutoFire        = false,
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName        = [[torpedo launcher.s3o]],

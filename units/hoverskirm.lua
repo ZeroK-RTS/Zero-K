@@ -34,7 +34,6 @@ return { hoverskirm = {
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],

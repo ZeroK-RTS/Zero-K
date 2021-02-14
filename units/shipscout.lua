@@ -29,7 +29,6 @@ return { shipscout = {
   idleTime               = 1800,
   maxDamage              = 260,
   maxVelocity            = 5.2,
-  minCloakDistance       = 75,
   movementClass          = [[BOAT3]],
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[shipscout.s3o]],

@@ -33,7 +33,6 @@ return { spidercrabe = {
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT4]],
   moveState              = 0,
   noChaseCategory        = [[FIXEDWING GUNSHIP]],

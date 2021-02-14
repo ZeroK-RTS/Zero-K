@@ -31,7 +31,6 @@ return { dronecarry = {
   idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 8.56,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[carrydrone.s3o]],

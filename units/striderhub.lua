@@ -60,7 +60,6 @@ return { striderhub = {
   maxDamage                     = 2000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   movementClass                 = [[KBOT4]],
   noAutoFire                    = false,
   objectName                    = [[striderhub.s3o]],

@@ -34,7 +34,6 @@ return { tankheavyarty = {
   maxSlope               = 18,
   maxVelocity            = 1.25,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK4]],
   moveState              = 0,
   noAutoFire             = false,

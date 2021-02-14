@@ -37,7 +37,6 @@ return { amphassault = {
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxReverseVelocity  = 0,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[amphassault.s3o]],

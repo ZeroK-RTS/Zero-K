@@ -34,7 +34,6 @@ return { turretriot = {
   levelGround                   = false,
   maxDamage                     = 1500,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
   script                        = "turretriot.lua",

@@ -46,7 +46,6 @@ return { bomberheavy = {
   maxFuel             = 1000000,
   maxRudder           = 0.0045,
   maxVelocity         = 9,
-  minCloakDistance    = 75,
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],

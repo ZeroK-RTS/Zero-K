@@ -38,7 +38,6 @@ return { gunshipaa = {
   idleTime               = 1800,
   maxDamage              = 900,
   maxVelocity            = 3.8,
-  minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[trifighter.s3o]],

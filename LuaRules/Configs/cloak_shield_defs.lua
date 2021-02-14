@@ -36,8 +36,8 @@ end
 
 local radiusOverrideDefs = {}
 for unitDefID, eud in pairs (UnitDefs) do
-	if eud.decloakDistance > 75 then
-		radiusOverrideDefs[unitDefID] = 75
+	if eud.customParams.cloaker_bestowed_radius then
+		radiusOverrideDefs[unitDefID] = tonumber(eud.customParams.cloaker_bestowed_radius)
 	end
 end
 

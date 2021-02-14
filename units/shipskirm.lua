@@ -33,7 +33,6 @@ return { shipskirm = {
   losEmitHeight          = 30,
   maxDamage              = 650,
   maxVelocity            = 2.1,
-  minCloakDistance       = 350,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,

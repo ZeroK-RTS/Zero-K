@@ -14,6 +14,7 @@ return { tankheavyassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    decloak_footprint     = 5,
   },
 
   explodeAs           = [[BIG_UNIT]],
@@ -27,7 +28,6 @@ return { tankheavyassault = {
   maxSlope            = 18,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],

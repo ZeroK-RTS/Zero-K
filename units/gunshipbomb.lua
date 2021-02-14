@@ -44,7 +44,6 @@ return { gunshipbomb = {
   maxDamage              = 100,
   maxSlope               = 36,
   maxVelocity            = 8.2,
-  minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],

@@ -40,7 +40,6 @@ return { staticantinuke = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   objectName                    = [[antinuke.s3o]],
   radarDistance                 = 2500,
   radarEmitHeight               = 24,

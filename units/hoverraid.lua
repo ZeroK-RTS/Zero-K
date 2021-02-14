@@ -31,7 +31,6 @@ return { hoverraid = {
   maxDamage           = 300,
   maxSlope            = 36,
   maxVelocity         = 4.75,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],

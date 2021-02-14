@@ -20,7 +20,6 @@ return { empiricaldpsersmall = {
   maxSlope                = 18,
   maxVelocity             = 0,
   maxWaterDepth           = 0,
-  minCloakDistance        = 150,
   objectName              = [[claw.s3o]],
   script                  = [[nullscript.lua]],
   sightDistance           = 660,

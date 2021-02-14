@@ -31,7 +31,6 @@ return { shiparty = {
   losEmitHeight          = 25,
   maxDamage              = 2000,
   maxVelocity            = 1.7,
-  minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
   moveState              = 0,

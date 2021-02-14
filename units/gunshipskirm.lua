@@ -33,7 +33,6 @@ return { gunshipskirm = {
   idleTime               = 1800,
   maxDamage              = 1100,
   maxVelocity            = 3.8,
-  minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
   script                 = [[gunshipskirm.lua]],

@@ -33,7 +33,6 @@ return { tankriot = {
   maxSlope            = 18,
   maxVelocity         = 2.3,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],

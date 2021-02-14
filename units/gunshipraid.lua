@@ -35,7 +35,6 @@ return { gunshipraid = {
   idleTime               = 150,
   maxDamage              = 800,
   maxVelocity            = 6.9,
-  minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
   script                 = [[gunshipraid.lua]],

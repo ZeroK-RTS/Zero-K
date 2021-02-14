@@ -39,7 +39,6 @@ return { chicken_drone_starter = {
   maxWaterDepth       = 5000,
   metalMake           = 0,
   metalStorage        = 50,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

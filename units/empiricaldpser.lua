@@ -18,7 +18,6 @@ return { empiricaldpser = {
   maxSlope                = 18,
   maxVelocity             = 0,
   maxWaterDepth           = 0,
-  minCloakDistance        = 150,
   objectName              = [[zenith.s3o]],
   script                  = [[nullscript.lua]],
   sightDistance           = 660,

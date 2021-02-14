@@ -33,7 +33,6 @@ return { chicken_tiamat = {
   maxSlope            = 37,
   maxVelocity         = 2.3,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],

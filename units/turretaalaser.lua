@@ -27,7 +27,6 @@ return { turretaalaser = {
   levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[aapopup.s3o]],

@@ -36,7 +36,6 @@ return { amphcon = {
   maxDamage           = 850,
   maxSlope            = 36,
   maxVelocity         = 1.8,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],
   selfDestructAs      = [[BIG_UNITEX]],

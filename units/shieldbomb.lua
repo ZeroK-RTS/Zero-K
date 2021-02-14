@@ -41,7 +41,6 @@ return { shieldbomb = {
   maxSlope               = 36,
   maxVelocity            = 4,
   maxWaterDepth          = 15,
-  minCloakDistance       = 75,
   movementClass          = [[SKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],

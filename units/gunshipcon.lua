@@ -49,7 +49,6 @@ return { gunshipcon = {
   idleTime            = 1800,
   maxDamage           = 1500,
   maxVelocity         = 2.4,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[bumblebee.dae]],

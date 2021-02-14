@@ -42,7 +42,6 @@ return { dronefighter = {
   maxElevator            = 0.02,
   maxRudder              = 0.006,
   --maxPitch               = 0.1,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SUB]],

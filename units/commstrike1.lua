@@ -49,7 +49,6 @@ return { commstrike1 = {
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
   metalStorage           = 500,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[strikecom.dae]],

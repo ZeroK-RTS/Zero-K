@@ -52,7 +52,6 @@ return { factorycloak = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[cremfactory.s3o]],

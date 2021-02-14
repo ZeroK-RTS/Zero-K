@@ -33,7 +33,6 @@ return { staticnuke = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[Silencer.s3o]],
   script                        = [[staticnuke.lua]],

@@ -35,7 +35,6 @@ return { cloakassault = {
   maxSlope               = 36,
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],

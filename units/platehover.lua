@@ -59,7 +59,6 @@ return { platehover = {
   maxDamage        = Shared.FACTORY_PLATE_HEALTH,
   maxSlope         = 15,
   maxVelocity      = 0,
-  minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
   objectName       = [[plate_hover.s3o]],

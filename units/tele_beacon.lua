@@ -23,7 +23,6 @@ return { tele_beacon = {
   maxDamage                     = 1500,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[amphteleportbeacon.s3o]],
   reclaimable                   = false,

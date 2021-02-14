@@ -27,7 +27,6 @@ return { droneheavyslow = {
   idleTime            = 300,
   maxDamage           = 430,
   maxVelocity         = 5,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[battledrone.s3o]],

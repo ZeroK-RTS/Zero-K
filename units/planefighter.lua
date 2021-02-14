@@ -50,7 +50,6 @@ return { planefighter = {
   maxDamage              = 300,
   maxRudder              = 0.007,
   maxVelocity            = 13,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],

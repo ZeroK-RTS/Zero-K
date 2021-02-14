@@ -29,7 +29,6 @@ return { assaultcruiser = {
   idleTime               = 1800,
   maxDamage              = 9600,
   maxVelocity            = 2.7,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],
   noAutoFire             = false,

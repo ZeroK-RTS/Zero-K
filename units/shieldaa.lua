@@ -29,7 +29,6 @@ return { shieldaa = {
   maxSlope               = 36,
   maxVelocity            = 2.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],

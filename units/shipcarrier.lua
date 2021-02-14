@@ -37,7 +37,6 @@ return { shipcarrier = {
   idleTime               = 1800,
   maxDamage              = 7500,
   maxVelocity            = 2.75,
-  minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT5]],
   objectName             = [[shipcarrier.dae]],

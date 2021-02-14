@@ -15,6 +15,7 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    decloak_footprint     = 5,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
@@ -29,7 +30,6 @@ return { striderdante = {
   maxSlope            = 36,
   maxVelocity         = 1.75,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],

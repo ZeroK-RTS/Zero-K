@@ -21,7 +21,6 @@ return { staticsonar = {
   idleTime          = 1800,
   maxDamage         = 750,
   maxSlope          = 18,
-  minCloakDistance  = 150,
   minWaterDepth     = 10,
   objectName        = [[novasonar.s3o]],
   onoffable         = true,

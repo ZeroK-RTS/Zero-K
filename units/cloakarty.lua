@@ -31,7 +31,6 @@ return { cloakarty = {
   maxSlope               = 36,
   maxVelocity            = 1.6,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
   objectName             = [[cloakarty.s3o]],

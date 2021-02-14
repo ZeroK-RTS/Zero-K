@@ -41,7 +41,6 @@ return { turretantiheavy = {
   maxDamage                     = 6000,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,

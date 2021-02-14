@@ -37,7 +37,6 @@ return { amphlaunch = {
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE STUPIDTARGET]],
   objectName             = [[behecrash.s3o]],

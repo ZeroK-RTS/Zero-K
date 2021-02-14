@@ -40,7 +40,6 @@ return { staticmex = {
   maxSlope               = 28,
   maxVelocity            = 0,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   objectName             = [[AMETALEXTRACTORLVL1.S3O]],
   onoffable              = false,

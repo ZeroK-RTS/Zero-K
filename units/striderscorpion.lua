@@ -23,7 +23,8 @@ return { striderscorpion = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aimposoffset = [[0 10 0]],
+    aimposoffset          = [[0 10 0]],
+    decloak_footprint     = 5,
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],

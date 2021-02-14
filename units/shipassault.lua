@@ -33,7 +33,6 @@ return { shipassault = {
   losEmitHeight          = 25,
   maxDamage              = 5200,
   maxVelocity            = 2.0,
-  minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
   noAutoFire             = false,

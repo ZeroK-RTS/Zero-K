@@ -28,7 +28,6 @@ return { turretimpulse = {
   maxDamage                     = 2000,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[CORGRAV]],

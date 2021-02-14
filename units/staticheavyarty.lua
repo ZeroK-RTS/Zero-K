@@ -32,7 +32,6 @@ return { staticheavyarty = {
   maxDamage                     = 4800,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armbrtha.s3o]],
   script                        = [[staticheavyarty.lua]],

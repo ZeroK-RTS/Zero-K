@@ -40,7 +40,6 @@ return { nebula = {
   idleTime               = 1800,
   maxDamage              = 11000,
   maxVelocity            = 3.3,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[nebula.s3o]],

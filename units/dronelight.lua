@@ -27,7 +27,6 @@ return { dronelight = {
   idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 7,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[attackdrone.s3o]],

@@ -28,7 +28,6 @@ return { chicken = {
   maxDamage           = 270,
   maxSlope            = 36,
   maxVelocity         = 2.9,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

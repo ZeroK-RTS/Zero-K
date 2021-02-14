@@ -31,7 +31,6 @@ return { shieldraid = {
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],

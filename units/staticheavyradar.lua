@@ -34,7 +34,6 @@ return { staticheavyradar = {
   levelGround                   = false,
   maxDamage                     = 330,
   maxSlope                      = 36,
-  minCloakDistance              = 150,
   objectName                    = [[novaradar.s3o]],
   script                        = [[staticheavyradar.lua]],
   onoffable                     = true,

@@ -35,7 +35,6 @@ return { turretaaheavy = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[SCREAMER.s3o]],
   onoffable                     = false,

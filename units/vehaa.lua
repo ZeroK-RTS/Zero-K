@@ -32,7 +32,6 @@ return { vehaa = {
   maxSlope               = 18,
   maxVelocity            = 3.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,

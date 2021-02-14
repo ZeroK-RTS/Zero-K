@@ -33,7 +33,6 @@ return { turretlaser = {
   maxDamage                     = 785,
   maxSlope                      = 36,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[lotustest2.s3o]],

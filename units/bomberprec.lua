@@ -45,7 +45,6 @@ return { bomberprec = {
   maxFuel             = 1000000,
   maxPitch            = 0.4,
   maxVelocity         = 7.8,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[corshad.s3o]],

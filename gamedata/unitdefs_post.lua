@@ -259,13 +259,18 @@ end
 --
 
 local sqrt = math.sqrt
-
+local cloakFootMult = 6 * sqrt(2)
 for name, ud in pairs(UnitDefs) do
+	local fx = ud.customparams.decloak_footprint or (ud.footprintx and tonumber(ud.footprintx) or 1)
+	local fz = ud.customparams.decloak_footprint or (ud.footprintz and tonumber(ud.footprintz) or 1)
+	local radius = cloakFootMult * sqrt((fx * fx) + (fz * fz)) + 56
+	-- 2x2 = 80
+	-- 3x3 = 92
+	-- 4x4 = 104
 	if (not ud.mincloakdistance) then
-		local fx = ud.footprintx and tonumber(ud.footprintx) or 1
-		local fz = ud.footprintz and tonumber(ud.footprintz) or 1
-		local radius = 8 * sqrt((fx * fx) + (fz * fz))
-		ud.mincloakdistance = (radius + 48)
+		ud.mincloakdistance = radius
+	elseif radius < ud.mincloakdistance then
+		ud.customparams.cloaker_bestowed_radius = radius
 	end
 end
 

@@ -31,7 +31,6 @@ return { shipriot = {
   idleTime               = 1800,
   maxDamage              = 1350,
   maxVelocity            = 2.7,
-  minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
   noAutoFire             = false,

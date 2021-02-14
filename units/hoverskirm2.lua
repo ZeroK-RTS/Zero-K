@@ -29,7 +29,6 @@ return { hoverskirm2 = {
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.5,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],

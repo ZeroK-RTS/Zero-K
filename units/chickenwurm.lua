@@ -30,7 +30,6 @@ return { chickenwurm = {
   maxSlope            = 90,
   maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[SHIP FLOAT SWIM TERRAFORM FIXEDWING GUNSHIP SATELLITE STUPIDTARGET MINE]],

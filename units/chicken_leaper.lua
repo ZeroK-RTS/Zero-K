@@ -28,7 +28,6 @@ return { chicken_leaper = {
   maxDamage           = 720,
   maxSlope            = 36,
   maxVelocity         = 4,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

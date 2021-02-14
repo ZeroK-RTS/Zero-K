@@ -39,7 +39,6 @@ return { spidercon = {
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT2]],
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,

@@ -31,7 +31,6 @@ return { hoverassault = {
   maxDamage           = 1250,
   maxSlope            = 36,
   maxVelocity         = 3.2,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],

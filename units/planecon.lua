@@ -47,7 +47,6 @@ return { planecon = {
   idleTime            = 1800,
   maxDamage           = 260,
   maxVelocity         = 6,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[crane.s3o]],

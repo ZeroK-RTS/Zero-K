@@ -33,7 +33,6 @@ return { veharty = {
   maxSlope            = 18,
   maxVelocity         = 2.25,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],

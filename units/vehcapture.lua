@@ -36,7 +36,6 @@ return { vehcapture = {
   maxSlope            = 18,
   maxVelocity         = 1.95,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],

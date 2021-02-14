@@ -29,7 +29,6 @@ return { pw_hq_attacker = {
   maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],
   reclaimable                   = false,

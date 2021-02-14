@@ -29,7 +29,6 @@ return { chicken_sporeshooter = {
   maxSlope            = 72,
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET]],

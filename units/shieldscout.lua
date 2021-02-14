@@ -38,7 +38,6 @@ return { shieldscout = {
   maxSlope               = 36,
   maxVelocity            = 2.6,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0, -- Used to make blockages.
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],

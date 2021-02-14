@@ -27,7 +27,6 @@ return { grebe = {
   maxSlope               = 36,
   maxVelocity            = 2.4,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[amphraider.s3o]],

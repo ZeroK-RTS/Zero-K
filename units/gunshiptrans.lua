@@ -42,7 +42,6 @@ return { gunshiptrans = {
   idleTime            = 1800,
   maxDamage           = 300,
   maxVelocity         = 11.5,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[smallTransport.s3o]],

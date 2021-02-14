@@ -18,10 +18,11 @@ return { striderbantha = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    extradrawrange = 465,
-    aimposoffset   = [[0 -8 0]],
-    midposoffset   = [[0 -8 0]],
-    modelradius    = [[17]],
+    extradrawrange        = 465,
+    aimposoffset          = [[0 -8 0]],
+    midposoffset          = [[0 -8 0]],
+    modelradius           = [[17]],
+    decloak_footprint     = 5,
   },
 
   explodeAs              = [[ATOMIC_BLAST]],
@@ -36,7 +37,6 @@ return { striderbantha = {
   maxSlope               = 36,
   maxVelocity            = 1.55,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],

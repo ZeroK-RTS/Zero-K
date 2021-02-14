@@ -47,7 +47,6 @@ return { planeheavyfighter = {
   maxElevator            = 0.015,
   maxRudder              = 0.008,
   maxVelocity            = 7.6,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],

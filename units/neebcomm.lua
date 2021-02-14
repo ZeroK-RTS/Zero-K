@@ -38,7 +38,6 @@ return { neebcomm = {
   maxWaterDepth       = 22,
   metalMake           = 2,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

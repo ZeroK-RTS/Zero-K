@@ -25,7 +25,6 @@ return { staticstorage = {
   maxDamage                     = 700,
   maxSlope                      = 18,
   metalStorage                  = 500,
-  minCloakDistance              = 150,
   objectName                    = [[pylon.s3o]],
   script                        = "staticstorage.lua",
   selfDestructAs                = [[SMALL_BUILDINGEX]],

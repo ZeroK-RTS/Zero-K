@@ -35,7 +35,6 @@ return { chickenf = {
   maxDamage           = 1200,
   maxSlope            = 18,
   maxVelocity         = 10,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],

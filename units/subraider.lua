@@ -32,7 +32,6 @@ return { subraider = {
   idleTime               = 1800,
   maxDamage              = 650,
   maxVelocity            = 3.7,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[UBOAT3]],
   noAutoFire             = false,

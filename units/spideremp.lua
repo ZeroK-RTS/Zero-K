@@ -33,7 +33,6 @@ return { spideremp = {
   maxSlope               = 72,
   maxVelocity            = 2.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[venom.s3o]],

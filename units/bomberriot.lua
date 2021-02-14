@@ -43,7 +43,6 @@ return { bomberriot = {
   maxRudder           = 0.009,
   maxFuel             = 1000000,
   maxVelocity         = 8,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],

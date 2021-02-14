@@ -31,7 +31,6 @@ return { spiderassault = {
   maxSlope               = 36,
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[hermit.s3o]],

@@ -43,7 +43,6 @@ return { gunshipheavytrans = {
   maneuverleashlength    = [[1280]],
   maxDamage              = 1800,
   maxVelocity            = 9,
-  minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
   script                 = [[gunshipheavytrans.lua]],

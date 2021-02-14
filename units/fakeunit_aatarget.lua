@@ -30,7 +30,6 @@ return { fakeunit_aatarget = {
   maxDamage             = 900000,
   maxVelocity           = 0,
   maxWaterDepth         = 0,
-  minCloakDistance      = 150,
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName            = [[debris1x1b.s3o]],

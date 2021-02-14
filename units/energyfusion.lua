@@ -29,7 +29,6 @@ return { energyfusion = {
   idleTime                      = 1800,
   maxDamage                     = 2200,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   objectName                    = [[energyfusion.s3o]],
   script                        = "energyfusion.lua",
   selfDestructAs                = [[ATOMIC_BLAST]],

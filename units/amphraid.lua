@@ -32,7 +32,6 @@ return { amphraid = {
   maxDamage              = 360,
   maxSlope               = 36,
   maxVelocity            = 3,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[amphraider3.s3o]],

@@ -31,7 +31,6 @@ return { jumparty = {
   maxSlope               = 36,
   maxVelocity            = 1.4,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],

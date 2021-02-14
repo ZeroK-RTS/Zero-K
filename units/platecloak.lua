@@ -58,7 +58,6 @@ return { platecloak = {
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[plate_cloak.s3o]],
