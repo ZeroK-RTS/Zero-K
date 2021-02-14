@@ -1152,6 +1152,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
 		QueueState(name, "airstrafe1", CMD_AIR_STRAFE, orderArray)
 		QueueState(name, "floattoggle", CMD_UNIT_FLOAT_STATE, orderArray)
+		QueueState(name, "goostate", CMD_GOO_GATHER, orderArray)
 		
 		local retreat = GetStateValue(name, "retreatpercent")
 		if retreat == -1 then --if inherit
