@@ -61,7 +61,7 @@ end
 
 local dontCountUnits = {}
 for unitDefID = 1, #UnitDefs do
-	if UnitDefs[unitDefID].customParams.dontcount then
+	if UnitDefs[unitDefID].customParams.dontcount or UnitDefs[unitDefID].customParams.is_drone then
 		dontCountUnits[unitDefID] = true
 	end
 end
