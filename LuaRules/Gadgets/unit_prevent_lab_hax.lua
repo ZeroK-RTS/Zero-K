@@ -90,7 +90,7 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 							local vx, vy, vz = spGetUnitVelocity(unitID)
 							
 							if aimY > -18 and aimY >= clearUnits[5] and aimY <= clearUnits[6] then
-								local isAlly = ally == data.ally
+								local isAlly = (ally == data.ally)
 								
 								local l = abs(ux - clearUnits[1])
 								local t = abs(uz - clearUnits[2])
@@ -282,10 +282,11 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 		
 		if unstickHelp then
 			local data = labList.data[labList.count]
-			data.minBuildX = (((face == 3) and minx) or (minx*0.5 + ux*0.5))
-			data.minBuildZ = (((face == 2) and minz) or (minz*0.5 + uz*0.5))
-			data.maxBuildX = (((face == 1) and maxx) or (maxx*0.5 + ux*0.5))
-			data.maxBuildZ = (((face == 0) and maxz) or (maxz*0.5 + uz*0.5))
+			local buffer = (ud.customParams.unstick_help_buffer and tonumber(ud.customParams.unstick_help_buffer)) or 0.5
+			data.minBuildX = (((face == 3) and minx) or (minx*(1 - buffer) + ux*buffer))
+			data.minBuildZ = (((face == 2) and minz) or (minz*(1 - buffer) + uz*buffer))
+			data.maxBuildX = (((face == 1) and maxx) or (maxx*(1 - buffer) + ux*buffer))
+			data.maxBuildZ = (((face == 0) and maxz) or (maxz*(1 - buffer) + uz*buffer))
 			
 			--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.maxBuildX,0,data.minBuildZ)
 			--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.minBuildX,0,data.maxBuildZ)
