@@ -96,8 +96,8 @@ local function SetAbleToMove(newMove)
 	end
 	ableToMove = newMove
 	
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.25)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.25)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
 	GG.UpdateUnitAttributes(unitID)
 end
 

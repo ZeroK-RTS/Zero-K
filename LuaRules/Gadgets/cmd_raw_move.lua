@@ -102,6 +102,9 @@ for i = 1, #UnitDefs do
 			-- Lower stopping distance for more precise placement on terrain
 			loneStopDist = 4
 		end
+		if ud.customParams.unstick_leeway then
+			startMovingTime[i] = tonumber(ud.customParams.unstick_leeway)
+		end
 		if ud.canFly then
 			canFlyDefs[i] = true
 			stopDist = ud.speed

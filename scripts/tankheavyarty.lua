@@ -19,8 +19,9 @@ local isMoving = false
 -- Signal definitions
 local SIG_AIM = 2
 local SIG_MOVE = 1 --Signal to prevent multiple track motion
+local SIG_OPEN = 4
 
-local RESTORE_DELAY = 10000
+local RESTORE_DELAY = 1000
 
 local WHEEL_SPIN_SPEED_L = math.rad(360)
 local WHEEL_SPIN_ACCEL_L = math.rad(10)
@@ -51,6 +52,18 @@ local TURRET_PITCH_SPEED = math.rad(30)
 
 local TRACK_PERIOD = 50
 
+local ableToMove = true
+local function SetAbleToMove(newMove)
+	if ableToMove == newMove then
+		return
+	end
+	ableToMove = newMove
+	
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.01)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.01)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 local function TrackControl()
 	SetSignalMask(SIG_MOVE)
 	while isMoving do 
@@ -78,30 +91,10 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base, gun})
 end
 
-function script.StartMoving() 
-	Signal(SIG_MOVE)
-	isMoving = true
-	StartThread(TrackControl)
-	Spin(wheels1, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels2, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels3, x_axis, WHEEL_SPIN_SPEED_L)
-	Spin(wheels4, x_axis, WHEEL_SPIN_SPEED_S)
-	Spin(wheels5, x_axis, WHEEL_SPIN_SPEED_S)
-	Spin(wheels6, x_axis, WHEEL_SPIN_SPEED_L)
-end
-
-function script.StopMoving() 
-	Signal(SIG_MOVE)
-	isMoving = false
-	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_L)
-	StopSpin(wheels2, x_axis, WHEEL_SPIN_DECEL_L)
-	StopSpin(wheels3, x_axis, WHEEL_SPIN_DECEL_L)
-	StopSpin(wheels4, x_axis, WHEEL_SPIN_DECEL_S)
-	StopSpin(wheels5, x_axis, WHEEL_SPIN_DECEL_S)
-	StopSpin(wheels6, x_axis, WHEEL_SPIN_DECEL_L)
-end
-
 local function Open()
+	Signal(SIG_OPEN)
+	SetSignalMask(SIG_OPEN)
+	SetAbleToMove(false)
 	Move(bay2, z_axis, BAY2_DIST, BAY_SPEED)
 	Move(bay1, z_axis, BAY1_DIST, BAY_SPEED)
 	Turn(door1, z_axis, -DOOR1_ANGLE, DOOR_SPEED)
@@ -125,7 +118,8 @@ local function Open()
 end
 
 local function Close()
-	Sleep(RESTORE_DELAY)
+	Signal(SIG_OPEN)
+	SetSignalMask(SIG_OPEN)
 	Turn(turret, y_axis, 0, TURRET_YAW_SPEED)
 	Turn(gun, x_axis, 0, TURRET_PITCH_SPEED)
 	WaitForTurn(turret, y_axis)
@@ -147,11 +141,46 @@ local function Close()
 	Turn(door1, z_axis, 0, DOOR_SPEED)
 	Turn(door2, z_axis,0, DOOR_SPEED)
 	Move(bay2, z_axis, 0, BAY_SPEED)
+	
+	SetAbleToMove(true)
+end
+
+function script.StartMoving() 
+	Signal(SIG_MOVE)
+	isMoving = true
+	StartThread(TrackControl)
+	StartThread(Close)
+	Spin(wheels1, x_axis, WHEEL_SPIN_SPEED_L)
+	Spin(wheels2, x_axis, WHEEL_SPIN_SPEED_L)
+	Spin(wheels3, x_axis, WHEEL_SPIN_SPEED_L)
+	Spin(wheels4, x_axis, WHEEL_SPIN_SPEED_S)
+	Spin(wheels5, x_axis, WHEEL_SPIN_SPEED_S)
+	Spin(wheels6, x_axis, WHEEL_SPIN_SPEED_L)
+end
+
+function script.StopMoving() 
+	Signal(SIG_MOVE)
+	isMoving = false
+	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_L)
+	StopSpin(wheels2, x_axis, WHEEL_SPIN_DECEL_L)
+	StopSpin(wheels3, x_axis, WHEEL_SPIN_DECEL_L)
+	StopSpin(wheels4, x_axis, WHEEL_SPIN_DECEL_S)
+	StopSpin(wheels5, x_axis, WHEEL_SPIN_DECEL_S)
+	StopSpin(wheels6, x_axis, WHEEL_SPIN_DECEL_L)
+end
+
+local function RestoreAfterDelay()
+	Sleep(RESTORE_DELAY)
+	Close()
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	if isMoving then
+		return false
+	end
+	
 	if not isOpen then 
 		StartThread(Open)
 		while not isOpen do
@@ -162,11 +191,11 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(gun, x_axis, -pitch, TURRET_PITCH_SPEED)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
-	StartThread(Close)
+	StartThread(RestoreAfterDelay)
 	return true
 end
 
-function script.Shot(num)
+function script.FireWeapon()
 	EmitSfx(shell, 1024)
 	gun_1 = gun_1 + 1
 	if gun_1 > 3 then

@@ -20,6 +20,7 @@ return { tankheavyarty = {
     modelradius       = [[17]],
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
+    unstick_leeway    = 60, -- Don't lose move orders if stuck while packing.
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -64,8 +65,6 @@ return { tankheavyarty = {
     {
       def                = [[PLASMA]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      mainDir            = [[0 0 1]],
-      maxAngleDif        = 270,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 

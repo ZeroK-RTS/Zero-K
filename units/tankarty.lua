@@ -17,6 +17,7 @@ return { tankarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    unstick_leeway    = 30, -- Don't lose move orders if stuck while packing.
   },
 
   explodeAs           = [[BIG_UNITEX]],
