@@ -212,32 +212,29 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
-function script.FireWeapon()
+function script.EndBurst()
 	EmitSfx(shell, 1024)
-	gun_1 = gun_1 + 1
-	if gun_1 > 3 then
-		gun_1 = 1
-	end
 
 	if gun_1 == 1 then
-		Show(flare1)
-		Hide(flare1)
 		Move(brl1, z_axis, BARREL_RECOIL)
 		Move(brl1, z_axis, BARREL_EXTEND, BARREL_RESTORE_SPEED)
 	elseif gun_1 == 2 then
-		Show(flare2)
-		Hide(flare2)
 		Move(brl2, z_axis, BARREL_RECOIL)
 		Move(brl2, z_axis, BARREL_EXTEND, BARREL_RESTORE_SPEED)
 	else
-		Show(flare3)
-		Hide(flare3)
 		Move(brl3, z_axis, BARREL_RECOIL)
 		Move(brl3, z_axis, BARREL_EXTEND, BARREL_RESTORE_SPEED)
 	end
 	Move(bolt, z_axis, BOLT_RECOIL)
 	Move(bolt, z_axis, 0, BOLT_RESTORE_SPEED)
-	Turn(triple, z_axis, math.rad(-120), TRIPLE_SPEED)
+	
+	gun_1 = gun_1 + 1
+	if gun_1 > 3 then
+		gun_1 = 1
+	end
+	
+	Sleep(100)
+	Turn(triple, z_axis, math.rad(-120)*(gun_1 - 1), TRIPLE_SPEED)
 end
 
 function script.QueryWeapon(num)
