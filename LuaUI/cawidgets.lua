@@ -28,6 +28,8 @@ local vfsGame = vfs.GAME
 WG = {}
 Spring.Utilities = {}
 
+currentGameFrame = -1
+
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
@@ -98,6 +100,11 @@ VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
 VFSMODE = VFSMODE or VFS.ZIP
 
 local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 3)
+
+local widgetPoisonWhitelist = {
+	["unit_start_state.lua"] = true, -- Can legitimately send large volumes of commands when units are lost/recevied via afk
+	["cmd_customformations2.lua"] = true, -- Commands are functionally direct from the user
+}
 
 --------------------------------------------------------------------------------
 
@@ -548,6 +555,11 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	end
 	
 	local widget = widgetHandler:NewWidget()
+
+	if not widgetPoisonWhitelist[basename] then
+		PoisonWidget(widget, basename)
+	end
+
 	setfenv(chunk, widget)
 	local success, err = pcall(chunk)
 	if (not success) then
@@ -2051,6 +2063,7 @@ end
 
 
 function widgetHandler:GameFrame(frameNum)
+	currentGameFrame = frameNum
 	for _, w in r_ipairs(self.GameFrameList) do
 		w:GameFrame(frameNum)
 	end
