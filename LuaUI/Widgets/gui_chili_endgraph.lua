@@ -84,6 +84,8 @@ local echo 		= Spring.Echo
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
+local myTeamId = 0
+local isSpec = false
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -277,11 +279,18 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			local w = obj.width
 			local h = obj.height
 
-			gl.Color(teamColor)
 			gl.PushMatrix()
 			gl.Translate(x, y, 0)
 			gl.Scale(w, h, 1)
-			gl.LineWidth(3)
+			if teamID == myTeamId and not isSpec then
+				gl.Color({1,1,1,1})
+				gl.LineWidth(4.5)
+				gl.BeginEnd(GL.LINE_STRIP, drawLine)
+				gl.LineWidth(2.5)
+			else
+				gl.LineWidth(3)
+			end
+			gl.Color(teamColor)
 			gl.BeginEnd(GL.LINE_STRIP, drawLine)
 			gl.PopMatrix()
 		end
@@ -547,6 +556,14 @@ function widget:Initialize()
 			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		teamNames[teamID] = name
+	end
+	myTeamId = Spring.GetMyTeamID()
+	_,_,isSpec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+end
+
+function widget:TeamChanged(id)
+	if id == Spring.GetMyTeamID() and not isSpec then
+		myTeamId = id
 	end
 end
 
