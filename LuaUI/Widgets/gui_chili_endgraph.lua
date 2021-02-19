@@ -84,8 +84,8 @@ local echo 		= Spring.Echo
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
-local myTeamId = 0
-local myAllyTeamId = 0
+local highlightedTeamId = 0
+local highlightedAllyTeamId = 0
 local isSpec = false
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -153,6 +153,25 @@ local function drawIntervals(graphMax)
 	end
 end
 
+local getEngineArrays = function(name, caption) end
+
+local function SetHighlightedTeam(teamID)
+	highlightedTeamId = teamID
+	if curGraph.name then
+		graphPanel:ClearChildren()
+		lineLabels:ClearChildren()
+		getEngineArrays(curGraph.name,curGraph.caption)
+	end
+end
+
+local function SetHighlightedAllyTeam(allyTeamID)
+	highlightedAllyTeamId = allyTeamID
+	if curGraph.name then
+		graphPanel:ClearChildren()
+		lineLabels:ClearChildren()
+		getEngineArrays(curGraph.name,curGraph.caption)
+	end
+end
 
 -- This is broken.
 --
@@ -234,6 +253,8 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		end
 	end
 
+	local isHighlighted = (teamID == (usingAllyteams and highlightedAllyTeamId or highlightedTeamId))
+
 	--gets vertex's from array and plots them
 	local drawLine = function()
 		for i = 1, #graphArray do
@@ -253,6 +274,12 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		font = {color = teamColor},
 	}
 
+	local textOutline = {0,0,0,0}
+	if isHighlighted then
+		textOutline = {1,1,1,1}
+		name = ">"..name.."<"
+	end
+
 	--adds player to Legend
 	if team_num then
 		local label2 = Chili.Label:New{
@@ -261,7 +288,16 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			width = "100%",
 			height = 20,
 			caption = name,
-			font = {color = teamColor}
+			font = {color = teamColor, outline = true, outlineWidth = 2, outlineColor = textOutline},
+			noClickThrough = true,
+			OnMouseDown = 
+			{function(...)
+				if usingAllyteams then
+					SetHighlightedAllyTeam(teamID)
+				else
+					SetHighlightedTeam(teamID)
+				end
+			 end}
 		}
 	end
 
@@ -283,7 +319,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			gl.PushMatrix()
 			gl.Translate(x, y, 0)
 			gl.Scale(w, h, 1)
-			if teamID == (usingAllyteams and myAllyTeamId or myTeamId) and not isSpec then
+			if isHighlighted then
 				gl.Color({1,1,1,1})
 				gl.LineWidth(4.5)
 				gl.BeginEnd(GL.LINE_STRIP, drawLine)
@@ -298,7 +334,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 	}
 end
 
-local function getEngineArrays(statistic, labelCaption)
+getEngineArrays = function(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
 	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
@@ -558,15 +594,15 @@ function widget:Initialize()
 		end
 		teamNames[teamID] = name
 	end
-	myTeamId = Spring.GetMyTeamID()
-	myAllyTeamId = Spring.GetMyAllyTeamID()
-	_,_,isSpec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	highlightedTeamId = Spring.GetMyTeamID()
+	highlightedAllyTeamId = Spring.GetMyAllyTeamID()
+	-- _,_,isSpec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 end
 
 function widget:TeamChanged(id)
 	if id == Spring.GetMyTeamID() and not isSpec then
-		myTeamId = id
-		myAllyTeamId = Spring.GetMyAllyTeamID()
+		highlightedTeamId = id
+		highlightedAllyTeamId = Spring.GetMyAllyTeamID()
 	end
 end
 
