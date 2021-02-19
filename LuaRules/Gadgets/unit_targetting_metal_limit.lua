@@ -13,7 +13,7 @@ function gadget:GetInfo()
     author    = "dyth68",
     date      = "20 April 2020",
     license   = "GNU GPL, v2 or later",
-    layer     = -1,
+    layer     = -1, -- vetoes targets, so is before ones that just modify priority
     enabled   = true  --  loaded by default?
  }
 end
