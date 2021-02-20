@@ -772,7 +772,7 @@
 	"cloakriot" : {
 		"name" : "Reaver",
 		"description" : "Riot Bot",
-		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate damage when out of combat."
+		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate missing health when out of combat."
 	},
 	"chickenspire" : {
 		"name" : "Chicken Spire",
