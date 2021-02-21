@@ -181,7 +181,13 @@ local commandDisplayConfig = {
 		}
 	},
 	[CMD_PREVENT_BAIT] = {
-		texture = {imageDir .. 'states/metal_anything.png', imageDir .. 'states/metal_raiders.png', imageDir .. 'states/metal_medium.png', imageDir .. 'states/metal_heavy.png'},
+		texture = {
+			imageDir .. 'states/bait_off.png',
+			imageDir .. 'states/bait_1.png',
+			imageDir .. 'states/bait_2.png',
+			imageDir .. 'states/bait_3.png',
+			imageDir .. 'states/bait_4.png',
+		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets. Overridden by Force Fire and Attack Move."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Razor, Solar, and closed Halberd."),
