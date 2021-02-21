@@ -58,7 +58,7 @@ local dwOn, draw, drawValue, drawRects
 -- related to options
 local requestUpdate
 local wheelSpacing, reverseWheel = false, false
-local showSpacingRects, only2Rects, showRectsOnChange = true, false, true
+local showSpacingRects, only2Rects, showRectsOnChange = false, false, true
 local showSpacingValue, showValueOnChange = false, false
 local showRectsTime = 1
 local showValueTime = 1
@@ -124,7 +124,7 @@ options_order = {
 	'hotkey_inc', 'hotkey_dec', 'hotkey_facing_inc', 'hotkey_facing_dec',
 	'spacing_label',
 	'wheel_spacing', 'reverse_wheel',
-	'show_spacing_rects', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
+	'show_spacing_rects_2', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
 	'show_spacing_value', 'show_value_only_on_change', 'show_time_value',
 }
 -- hotkeys
@@ -199,11 +199,11 @@ options = {
 		parents         = {'wheel_spacing'}
 	},
 	-- rectangle showing options
-	show_spacing_rects = {
+	show_spacing_rects_2 = {
 		origname        = 'Visualise spacing',
 		type            = 'bool',
 		desc            = "Briefly show spaced rectangles in all directions around the cursor",
-		value           = true,
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showSpacingRects = self.value
@@ -224,7 +224,7 @@ options = {
 			only2Rects = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects'}
+		parents         = {'show_spacing_rects_2'}
 	},
 	show_rects_only_on_change = {
 		origname        = ' ..only on spacing change, ',
@@ -236,7 +236,7 @@ options = {
 			showRectsOnChange = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects'}
+		parents         = {'show_spacing_rects_2'}
 	},
 	show_time_rects = {
 		name            = ' ..for 1 seconds.',
@@ -258,7 +258,7 @@ options = {
 			end
 			requestUpdate = options_path
 		end,
-		parents        = {'show_spacing_rects'}
+		parents        = {'show_spacing_rects_2'}
 	},
 	-- value showing options
 	show_spacing_value = {

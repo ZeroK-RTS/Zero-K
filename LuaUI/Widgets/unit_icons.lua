@@ -18,10 +18,10 @@ end
 
 local echo = Spring.Echo
 
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spIsUnitInView 	= Spring.IsUnitInView
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spIsUnitInView        = Spring.IsUnitInView
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetGameFrame 	= Spring.GetGameFrame
+local spGetGameFrame        = Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
