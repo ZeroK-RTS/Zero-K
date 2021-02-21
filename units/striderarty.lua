@@ -17,6 +17,7 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 2,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],

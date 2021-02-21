@@ -18,6 +18,7 @@ return { turretaafar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
     aimposoffset   = [[0 10 0]],
     modelradius    = [[19]],
   },

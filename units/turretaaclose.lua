@@ -16,6 +16,7 @@ return { turretaaclose = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
     aim_lookahead      = 120,
   },
 

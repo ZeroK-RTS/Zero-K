@@ -20,6 +20,7 @@ return { vehcapture = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     modelradius    = [[13]],
     turnatfullspeed = [[1]],
     cus_noflashlight = 1,

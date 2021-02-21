@@ -48,10 +48,10 @@ include("LuaRules/Configs/customcmds.h.lua")
 local preventChaffShootingCmdDesc = {
 	id      = CMD_PREVENT_BAIT,
 	type    = CMDTYPE.ICON_MODE,
-	name    = "Min metal for kill.",
-	action  = 'preventchaffshootingmetallimit',
-	tooltip = 'Enable to prevent units shooting at units which are very cheap.',
-	params  = {0, 0, 35, 100, 300, 1000}
+	name    = "Prevent Bait.",
+	action  = 'preventbait',
+	tooltip = 'Enable to prevent units shooting at cheap targets.',
+	params  = {0, 0, 35, 100, 300, 600}
 }
 
 function ChaffShootingBlock(unitID, targetID, damage)
@@ -135,9 +135,11 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if baitPreventionDefaults[unitDefID] then
-		spInsertUnitCmdDesc(unitID, preventChaffShootingCmdDesc)
+		-- The gadget sets a default of zero for compatibility with AIs and other uncontrolled units.
+		-- Widget space or the AI interface is responsible for turning this behaviour on.
 		unitBaitLevel[unitID] = 0
-		PreventFiringAtChaffToggleCommand(unitID, unitDefID, baitPreventionDefaults[unitDefID])
+		preventChaffShootingCmdDesc.params[1] = 0
+		spInsertUnitCmdDesc(unitID, preventChaffShootingCmdDesc)
 	end
 end
 

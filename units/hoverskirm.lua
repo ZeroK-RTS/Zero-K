@@ -19,6 +19,7 @@ return { hoverskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     modelradius    = [[25]],
     turnatfullspeed = [[1]],
   },

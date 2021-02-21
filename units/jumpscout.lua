@@ -20,6 +20,7 @@ return { jumpscout = {
   selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    bait_level_default = 1,
     modelradius    = [[10]],
     
     grey_goo = 1,

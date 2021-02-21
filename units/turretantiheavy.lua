@@ -17,6 +17,7 @@ return { turretantiheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
 
     keeptooltip    = [[any string I want]],
 

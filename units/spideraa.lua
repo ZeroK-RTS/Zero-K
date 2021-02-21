@@ -13,6 +13,7 @@ return { spideraa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     cus_noflashlight = 1,
   },
 

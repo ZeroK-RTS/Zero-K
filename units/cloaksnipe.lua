@@ -21,6 +21,7 @@ return { cloaksnipe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 2,
     modelradius    = [[15]],
     dontfireatradarcommand = '0',
   },

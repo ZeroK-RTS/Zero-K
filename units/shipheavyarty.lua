@@ -19,6 +19,7 @@ return { shipheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     modelradius    = [[80]],
   },
 

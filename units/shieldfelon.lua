@@ -14,6 +14,7 @@ return { shieldfelon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     shield_emit_height = 25,
     shield_color_mult = 1.1,
     dontfireatradarcommand = '1',

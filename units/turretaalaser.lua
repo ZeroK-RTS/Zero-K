@@ -16,7 +16,7 @@ return { turretaalaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    bait_level      = 1,
+    bait_level_target      = 1,
   },
 
   damageModifier                = 0.25,

@@ -23,6 +23,7 @@ return { gunshipaa = {
   cruiseAlt              = 110,
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[18]],
     midposoffset   = [[0 15 0]],
     selection_velocity_heading = 1,

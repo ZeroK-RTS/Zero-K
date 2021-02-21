@@ -22,6 +22,7 @@ return { jumpskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     dontfireatradarcommand = '1',
     selection_scale   = 0.85,
   },

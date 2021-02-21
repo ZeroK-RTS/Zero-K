@@ -42,6 +42,7 @@ local custom_cmd_actions = {
 	idlemode =        {cmdType = 2, cmdID = CMD.IDLEMODE, name = "Air Idle State", states = {'Land', 'Fly'}},
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
 	preventoverkill = {cmdType = 2, cmdID = CMD_PREVENT_OVERKILL, name = "Prevent Overkill", states = {'Off', 'On'}},
+	preventbait     = {cmdType = 2, cmdID = CMD_PREVENT_BAIT, name = "Avoid Bad Targets", states = {'Disabled', '40', '100', '300', '600'}},
 	trajectory      = {cmdType = 2, cmdID = CMD.TRAJECTORY, name = "Trajectory", states = {'Low', 'High'}},
 
 	--CUSTOM COMMANDS
@@ -137,6 +138,7 @@ local usedActions = {
 	["areaguard"] = true,
 	["orbitdraw"] = true,
 	["preventoverkill"] = true,
+	["preventbait"] = true,
 	["retreat"] = true,
 	["unitai"] = true,
 	["settarget"] = true,

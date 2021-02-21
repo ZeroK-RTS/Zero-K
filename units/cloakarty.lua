@@ -16,6 +16,7 @@ return { cloakarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius       = [[14]],
     selection_scale   = 0.85,
   },

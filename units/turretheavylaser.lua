@@ -18,6 +18,7 @@ return { turretheavylaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
     aimposoffset   = [[0 15 0]],
   },
 

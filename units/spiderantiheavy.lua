@@ -19,6 +19,7 @@ return { spiderantiheavy = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,
   },

@@ -185,7 +185,7 @@ local commandDisplayConfig = {
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets. Overridden by Force Fire and Attack Move."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Razor, Solar, and closed Halberd."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing less than 100, plus Sparrow, Razor, and closed Halberd"),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid cost less than 100, plus Swift, Sparrow, Razor, and closed Halberd."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600."),
 		}

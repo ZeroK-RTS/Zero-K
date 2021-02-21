@@ -17,6 +17,7 @@ return { tankarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     unstick_leeway    = 30, -- Don't lose move orders if stuck while packing.
   },
 

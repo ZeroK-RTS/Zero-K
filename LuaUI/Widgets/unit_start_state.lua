@@ -86,10 +86,10 @@ local tooltips = {
 	},
 	prevent_bait = {
 		[0] = "Shoot everything.",
-		[1] = "Avoid Razor, Solar, closed Halberd, and units costing less than 40.",
-		[2] = "Previous tier plus Sparrow and units costing less than 100.",
-		[3] = "Previous tier plus Raptor and units costing less than 300.",
-		[4] = "Previous tier plus units costing less than 600.",
+		[1] = "Avoid units costing less than 40, plus Razor, Solar, and closed Halberd.",
+		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor, and closed Halberd.",
+		[3] = "Avoid units costing less than 300, plus Raptor.",
+		[4] = "Avoid units costing less than 600.",
 	},
 }
 

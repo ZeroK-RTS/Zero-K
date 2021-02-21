@@ -19,6 +19,7 @@ return { turretaaheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 2,
     modelradius    = [[37]],
     stockpilecost  = [[80]],
     stockpiletime  = [[20]],

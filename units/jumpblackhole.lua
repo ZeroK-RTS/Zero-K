@@ -17,6 +17,7 @@ return { jumpblackhole = {
   corpse                = [[DEAD]],
 
   customParams          = {
+    bait_level_default = 0,
     midposoffset   = [[0 10 0]],
   },
 
