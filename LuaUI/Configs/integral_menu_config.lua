@@ -182,7 +182,7 @@ local commandDisplayConfig = {
 	},
 	[CMD_PREVENT_BAIT] = {
 		texture = {
-			imageDir .. 'states/bait_off.png',
+			imageDir .. 'states/bait_off_alternate.png',
 			imageDir .. 'states/bait_1.png',
 			imageDir .. 'states/bait_2.png',
 			imageDir .. 'states/bait_3.png',
