@@ -18,7 +18,8 @@ return { hoverassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    modelradius    = [[25]],
+    bait_level_armor  = 1,
+    modelradius       = [[25]],
   },
 
   damageModifier      = 0.25,

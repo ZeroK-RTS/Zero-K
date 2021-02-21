@@ -16,12 +16,13 @@ return { energysolar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level      = 1,
     pylonrange      = 100,
     aimposoffset    = [[0 16 0]],
     midposoffset    = [[0 0 0]],
     auto_close_time = 4, -- Unit AI off time.
     removewait      = 1,
-    removestop     = 1,
+    removestop      = 1,
     default_spacing = 0,
   },
 

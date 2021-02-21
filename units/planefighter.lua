@@ -23,7 +23,6 @@ return { planefighter = {
   cruiseAlt              = 200,
 
   customParams           = {
-
     specialreloadtime = [[850]],
     boost_speed_mult = 5,
     boost_accel_mult = 6,

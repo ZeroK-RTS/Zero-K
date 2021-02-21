@@ -20,6 +20,8 @@ return { planelightscout = {
   cruiseAlt           = 220,
 
   customParams        = {
+    bait_level      = 2,
+
     modelradius    = [[8]],
     refuelturnradius = [[130]],
   },

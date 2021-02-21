@@ -183,11 +183,11 @@ local commandDisplayConfig = {
 	[CMD_PREVENT_BAIT] = {
 		texture = {imageDir .. 'states/metal_anything.png', imageDir .. 'states/metal_raiders.png', imageDir .. 'states/metal_medium.png', imageDir .. 'states/metal_heavy.png'},
 		stateTooltip = {
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets. Attack and Attack Move commands override."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "35"):gsub("_DESC_", "Avoid units costing 35 or less, plus Razor, Solar, and closed Halberd."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing 100 or less, plus fighters, Razor, and closed Halberd"),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing 300 or less. Attack and Attack Move commands override."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing 600 or less. Attack and Attack Move commands override."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets. Overridden by Force Fire and Attack Move."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Razor, Solar, and closed Halberd."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing less than 100, plus Sparrow, Razor, and closed Halberd"),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600."),
 		}
 	},
 	[CMD_RETREAT] = {

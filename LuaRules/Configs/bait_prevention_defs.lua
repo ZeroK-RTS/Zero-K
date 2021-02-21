@@ -1,5 +1,5 @@
-local STATES = {0, 0, 100, 300, 1000} -- first value is the default state of the command
-local metalThreshholdsByUnitDefIDs = {
+
+local baitLevelDefaults = {
 	[UnitDefNames["hoverarty"].id] = 1,
 	[UnitDefNames["cloaksnipe"].id] = 1,
 	[UnitDefNames["turretheavylaser"].id] = 1,
@@ -20,4 +20,32 @@ local metalThreshholdsByUnitDefIDs = {
 	[UnitDefNames["jumpskirm"].id] = 1,
 }
 
-return metalThreshholdsByUnitDefIDs
+local targetBaitLevelDefs = {}
+local targetBaitLevelArmorDefs = {}
+
+local baitLevelCosts = {
+	40,
+	100,
+	300,
+	600,
+}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	local unitCost = ud.buildTime
+	if ud.customParams.bait_level_armor then
+		targetBaitLevelArmorDefs[unitDefID] = tonumber(ud.customParams.bait_level_armor)
+	end
+	if ud.customParams.bait_level then
+		targetBaitLevelDefs[unitDefID] = tonumber(ud.customParams.bait_level)
+	elseif unitCost < baitLevelCosts[#baitLevelCosts] then
+		-- Should we start thinking about caching this via precomputation at some point?
+		for i = 1, #baitLevelCosts do
+			if unitCost >= (baitLevelCosts[i - 1] or 0) and unitCost < baitLevelCosts[i] then
+				targetBaitLevelDefs[unitDefID] = i
+			end
+		end
+	end
+end
+
+return baitLevelDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs

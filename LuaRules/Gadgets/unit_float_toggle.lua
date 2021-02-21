@@ -32,8 +32,8 @@ local unitFloatIdleBehaviour = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Float State',
 	action  = 'floatstate',
-	tooltip	= 'Float / Sink', --colorful tooltip is written in integral_menu_commands.lua
-	params 	= {DEFAULT_FLOAT, 'Sink','Attack','Float'}
+	tooltip = 'Float / Sink', --colorful tooltip is written in integral_menu_commands.lua
+	params  = {DEFAULT_FLOAT, 'Sink','Attack','Float'}
 }
 
 local FLOAT_NEVER = 0
@@ -393,7 +393,8 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 			state = (state + 1)%3
 		end
 		if (cmdDescID) then
-			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = {state, 'Sink','Attack','Float'}})
+			unitFloatIdleBehaviour.params[1] = state
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitFloatIdleBehaviour.params})
 		end
 		floatState[unitID] = state
 		if state == FLOAT_ALWAYS then
@@ -426,6 +427,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if floatDefs[unitDefID] then
 		floatState[unitID] = DEFAULT_FLOAT
+		unitFloatIdleBehaviour.params[1] = DEFAULT_FLOAT
 		Spring.InsertUnitCmdDesc(unitID, unitFloatIdleBehaviour)
 	end
 end
