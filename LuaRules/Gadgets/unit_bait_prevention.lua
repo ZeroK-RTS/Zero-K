@@ -8,8 +8,8 @@ end
 
 function gadget:GetInfo()
   return {
-    name      = "Unit Metal Targetting",
-    desc      = "Prevents some units from firing at units that cost less than.",
+    name      = "Bait Prevention",
+    desc      = "Prevents some units from Idle-firing or Move-firing at low value targets.",
     author    = "dyth68",
     date      = "20 April 2020",
     license   = "GNU GPL, v2 or later",
@@ -37,7 +37,7 @@ local minMetalMsg = "setMinMetalForTargetting"
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Value is the default state of the command
-local metalThreshholdsByUnitDefIDs = include("LuaRules/Configs/unit_targetting_metal_limit_defs.lua")
+local metalThreshholdsByUnitDefIDs = include("LuaRules/Configs/bait_prevention_defs.lua")
 
 local unitMetalMin = {}
 local unitDefCost = {}
@@ -64,7 +64,7 @@ end
 include("LuaRules/Configs/customcmds.h.lua")
 
 local preventChaffShootingCmdDesc = {
-	id      = CMD_MIN_METAL_TO_TARGET,
+	id      = CMD_PREVENT_BAIT,
 	type    = CMDTYPE.ICON_MODE,
 	name    = "Min metal for kill.",
 	action  = 'preventchaffshootingmetallimit',
@@ -106,7 +106,7 @@ end
 local function PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1] or 1
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_MIN_METAL_TO_TARGET)
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_BAIT)
 
 		local newParams = {}
 		if (cmdDescID) then
@@ -122,7 +122,7 @@ local function PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams, c
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_MIN_METAL_TO_TARGET] = true}
+	return {[CMD_PREVENT_BAIT] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -130,7 +130,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD_MIN_METAL_TO_TARGET) then
+	if (cmdID == CMD_PREVENT_BAIT) then
 		return PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams, cmdOptions)
 	else
 		return true  -- command was not used
@@ -166,7 +166,7 @@ end
 
 function gadget:Initialize()
 	-- register command
-	gadgetHandler:RegisterCMDID(CMD_MIN_METAL_TO_TARGET)
+	gadgetHandler:RegisterCMDID(CMD_PREVENT_BAIT)
 	GG.IsUnitIdentifiedStructure = IsUnitIdentifiedStructure
 	
 	-- load active units

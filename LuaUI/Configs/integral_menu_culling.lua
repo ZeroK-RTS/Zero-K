@@ -34,6 +34,7 @@ local configList = {
 	{cmdID = CMD.IDLEMODE              , state = true, default = true, name = "Air Idle State"},
 	{cmdID = CMD_AP_FLY_STATE          , state = true, default = true, name = "Air Factory Idle State"},
 	{cmdID = CMD_CLOAK_SHIELD          , state = true, default = true, name = "Area Cloaker"},
+	{cmdID = CMD_PREVENT_BAIT          , state = true, default = true, name = "Avoid Bad Targets"},
 	{cmdID = CMD_DONT_FIRE_AT_RADAR    , state = true, default = true, name = "Fire At Radar State"},
 	{cmdID = CMD_FACTORY_GUARD         , state = true, default = true, name = "Auto Assist"},
 	{cmdID = CMD_WANT_CLOAK            , state = true, default = true, name = "Cloak"},
