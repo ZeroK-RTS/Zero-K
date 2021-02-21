@@ -28,6 +28,7 @@ local tooltips = {
 	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	MIN_METAL_TO_TARGET = "Minimum Metal to Target (_STATE_)\n  Shooting at units costing _STATE_ or more",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
@@ -177,6 +178,15 @@ local commandDisplayConfig = {
 				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Return Fire"),
 				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Fire At Will")
 			},
+		}
+	},
+	[CMD_MIN_METAL_TO_TARGET] = {
+		texture = {imageDir .. 'states/metal_anything.png', imageDir .. 'states/metal_raiders.png', imageDir .. 'states/metal_medium.png', imageDir .. 'states/metal_heavy.png'},
+		stateTooltip = {
+			'Enable to prevent shooting at units which are very cheap.',
+			tooltips.MIN_METAL_TO_TARGET:gsub("_STATE_", "100"),
+			tooltips.MIN_METAL_TO_TARGET:gsub("_STATE_", "300"),
+			tooltips.MIN_METAL_TO_TARGET:gsub("_STATE_", "1000")
 		}
 	},
 	[CMD_RETREAT] = {

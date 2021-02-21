@@ -20,6 +20,7 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local metalHandledUnitDefIDs = include("LuaRules/Configs/unit_targetting_metal_limit_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
@@ -82,6 +83,12 @@ local tooltips = {
 		[1] = "1",
 		[2] = "2",
 		[3] = "3",
+	},
+	metal_targetting = {
+		[0] = "0",
+		[1] = "100",
+		[2] = "300",
+		[3] = "1000",
 	},
 }
 
@@ -832,6 +839,21 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_overkill_prevention"
 	end
 
+	if metalHandledUnitDefIDs[unitDefID] then
+		options[defName .. "_metal_targetting_limit"] = {
+			name = "  Metal targetting limit",
+			desc = "Metal targetting limit: Enemy units with a cost below this threshhold value will not be targetted by this unit.",
+			type = 'number',
+			value = metalHandledUnitDefIDs[unitDefID][0] or 0,
+			min = 0,
+			max = 3,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.metal_targetting,
+		}
+		options_order[#options_order+1] = defName .. "_metal_targetting_limit"
+	end
+
 	if ud.canCloak then
 		options[defName .. "_personal_cloak_0"] = {
 			name = "  Personal Cloak",
@@ -1216,6 +1238,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "selection_rank")
 		if value and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, value)
+		end
+		
+		value = GetStateValue(name, "metal_targetting_limit")
+		if value then
+			Spring.Echo("Attempting to set metal_targetting")
+			Spring.Echo(value)
+			orderArray[#orderArray + 1] = {CMD_MIN_METAL_TO_TARGET, {value}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "disableattack")
