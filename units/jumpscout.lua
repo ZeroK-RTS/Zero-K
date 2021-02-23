@@ -29,6 +29,7 @@ return { jumpscout = {
     grey_goo_cost = 45,
     grey_goo_range = 120,
     selection_scale = 1, -- Maybe change later
+    select_show_eco = 1,
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],

@@ -284,6 +284,9 @@ for udid, ud in ipairs(UnitDefs) do
 			builderDefs[udid] = true
 		end
 	end
+	if ud.customParams.select_show_eco then
+		builderDefs[udid] = (tonumber(ud.customParams.select_show_eco) ~= 0)
+	end
 end
 
 function widget:SelectionChanged(units)

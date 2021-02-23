@@ -57,6 +57,7 @@ return { athena = {
     modelradius    = [[15]],
     isfakefactory = 1,
     notreallyafactory = 1,
+    select_show_eco = 1,
   },
 
   energyUse           = 0,

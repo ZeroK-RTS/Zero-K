@@ -28,6 +28,7 @@ return { staticcon = {
     modelradius      = [[24]],
     default_spacing  = 1,
     like_structure   = 1,
+    select_show_eco  = 1,
   },
 
   explodeAs                     = [[NANOBOOM2]],
