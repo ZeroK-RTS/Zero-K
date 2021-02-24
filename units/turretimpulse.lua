@@ -32,6 +32,7 @@ return { turretimpulse = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[CORGRAV]],
   onoffable                     = true,
+  script                        = [[turretimpulse.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   sightDistance                 = 554, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
