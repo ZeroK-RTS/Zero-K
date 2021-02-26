@@ -18,6 +18,7 @@ return { turretimpulse = {
 
   customParams                  = {
     modelradius    = [[25]],
+    lookahead      = 120,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
