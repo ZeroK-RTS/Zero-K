@@ -86,10 +86,10 @@ local tooltips = {
 	},
 	prevent_bait = {
 		[0] = "Shoot everything.",
-		[1] = "Avoid units costing less than 40, plus Razor and Solar.",
-		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor and armoured targets.",
-		[3] = "Avoid units costing less than 300, plus Raptor and armoured targets.",
-		[4] = "Avoid units costing less than 600 and armoured targets.",
+		[1] = "Avoid units costing less than 40, plus Razor and Solar. This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
+		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
+		[3] = "Avoid units costing less than 300, plus Raptor and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
+		[4] = "Avoid units costing less than 600 and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
 	},
 }
 
