@@ -101,7 +101,7 @@ VFSMODE = VFSMODE or VFS.ZIP
 
 local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 3)
 
-local widgetPoisonWhitelist = {
+local widgetRateLimitWhitelist = {
 	["unit_start_state.lua"] = true, -- Can legitimately send large volumes of commands when units are lost/recevied via afk
 	["cmd_customformations2.lua"] = true, -- Commands are functionally direct from the user
 }
@@ -556,7 +556,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	
 	local widget = widgetHandler:NewWidget()
 
-	if not widgetPoisonWhitelist[basename] then
+	if not widgetRateLimitWhitelist[basename] then
 		PoisonWidget(widget, basename)
 	end
 
