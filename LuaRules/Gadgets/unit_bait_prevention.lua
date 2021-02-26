@@ -73,16 +73,21 @@ function ChaffShootingBlock(unitID, targetID, damage)
 		if not identified then
 			return true -- radar dots are classic bait.
 		end
-		local unitDefID = spGetUnitDefID(targetID)
-		if debugBait then
-			Spring.Echo("unitDefID", unitDefID)
-			Spring.Echo("unitBaitLevel", unitBaitLevel[unitID])
-			Spring.Echo("targetBaitLevelDefs", targetBaitLevelDefs[unitDefID])
+		local targetDefID = spGetUnitDefID(targetID)
+		if not targetDefID then
+			return false
 		end
-		if unitBaitLevel[unitID] >= targetBaitLevelDefs[unitDefID] then
+		if debugBait or not targetBaitLevelDefs[targetDefID] then
+			Spring.Utilities.UnitEcho(unitID, "U")
+			Spring.Utilities.UnitEcho(targetID, "T")
+			Spring.Echo("targetDefID", targetDefID)
+			Spring.Echo("unitBaitLevel", unitBaitLevel[unitID])
+			Spring.Echo("targetBaitLevelDefs", targetBaitLevelDefs[targetDefID])
+		end
+		if targetBaitLevelDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelDefs[targetDefID] then
 			return true
 		end
-		if targetBaitLevelArmorDefs[unitDefID] and unitBaitLevel[unitID] >= targetBaitLevelArmorDefs[unitDefID] then
+		if targetBaitLevelArmorDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelArmorDefs[targetDefID] then
 			local targetInLoS = (targetVisiblityState == 15)
 			if not targetVisiblityState then
 				return true

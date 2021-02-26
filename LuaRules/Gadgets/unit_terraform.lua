@@ -154,7 +154,7 @@ local minTotalRampLength = 64
 local minTotalRampWidth = 48
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
-local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
+local terraformDecayFrames = 2*60*30 -- how many frames a terrablock can survive for without a repair command
 local decayCheckFrequency = 90 -- frequency of terraform decay checks
 
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
@@ -3151,10 +3151,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
 			
 			local health = spGetUnitHealth(id)
-			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
-			EchoDebug(id, "Valid", diffProgress, terraformUnit[id].progress, health, (n - terraformUnit[id].lastUpdate >= updatePeriod))
-			
-			if diffProgress == 0 then
+			if health - terraformUnit[id].lastHealth == 0 then
 				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
 					EchoUnit(id)
 					EchoDebug(id, "Decay", id)
@@ -3243,7 +3240,6 @@ function gadget:GameFrame(n)
 	DoTerraformUpdate(n, freeTerraform)
 	
 	--check constrcutors that are repairing terraform blocks
-	
 	if constructors ~= 0 then
 		if n % checkInterval == 0 then
 			-- only check 1 con per cycle
@@ -3252,39 +3248,53 @@ function gadget:GameFrame(n)
 				currentCon = 1
 			end
 			
-			local cQueue = spGetCommandQueue(constructorTable[currentCon], -1)
+			local unitID = constructorTable[currentCon]
+			local cQueue = spGetCommandQueue(unitID, -1)
 			if cQueue then
+				local teamID = spGetUnitTeam(unitID)
 				local ncq = #cQueue
 				for i = 1, ncq do
-					if cQueue[i].id == CMD_REPAIR then
-						if #cQueue[i].params == 1 then
+					local cmd = cQueue[i]
+					if fallbackableCommands[cmd.id] then
+						if fallbackCommands[teamID] and cmd.params and cmd.params[4] then
+							local terraCmd = fallbackCommands[teamID][cmd.params[4]]
+							if terraCmd and terraCmd.terraunitList then
+								local terraUnitList = terraCmd.terraunitList
+								for j = 1, #terraUnitList do
+									if terraformUnit[terraUnitList[j]] then
+										terraformUnit[terraUnitList[j]].decayTime = n + terraformDecayFrames
+									end
+								end
+							end
+						end
+					elseif cmd.id == CMD_REPAIR then
+						if #cmd.params == 1 then
 							-- target unit command
-							if terraformUnit[cQueue[i].params[1]] then
-								terraformUnit[cQueue[i].params[1]].decayTime = n + terraformDecayFrames
+							if terraformUnit[cmd.params[1]] then
+								terraformUnit[cmd.params[1]].decayTime = n + terraformDecayFrames
 							end
 							
 							-- bring terraunit towards con
-							if i == 1 and spValidUnitID(cQueue[i].params[1]) and terraformUnit[cQueue[i].params[1] ] then
-								local cx, _, cz = spGetUnitPosition(constructorTable[currentCon])
-								local team = spGetUnitTeam(constructorTable[currentCon])
-								if cx and team then
+							if i == 1 and spValidUnitID(cmd.params[1]) and terraformUnit[cmd.params[1] ] then
+								local cx, _, cz = spGetUnitPosition(unitID)
+								if cx and teamID then
 
-									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
-									local x, y, z = GetTerraunitLeashedSpot(team, tpos.x, tpos.z, cx, cz)
-									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
-									spSetUnitPosition(cQueue[i].params[1], x, y , z)
-									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
-									--Spring.MoveCtrl.SetPosition(cQueue[i].params[1], x, y , z)
-									--Spring.MoveCtrl.Disable(cQueue[i].params[1])
+									local tpos = terraformUnit[cmd.params[1] ].positionAnchor
+									local x, y, z = GetTerraunitLeashedSpot(teamID, tpos.x, tpos.z, cx, cz)
+									terraformUnit[cmd.params[1] ].position = {x = x, z = z}
+									spSetUnitPosition(cmd.params[1], x, y , z)
+									--Spring.MoveCtrl.Enable(cmd.params[1])
+									--Spring.MoveCtrl.SetPosition(cmd.params[1], x, y , z)
+									--Spring.MoveCtrl.Disable(cmd.params[1])
 								end
 							end
 							
-						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want
+						elseif #cmd.params == 4 then -- there is a command with 5 params that I do not want
 							-- area command
-							local radSQ = cQueue[i].params[4]^2
-							local cX, _, cZ = cQueue[i].params[1],cQueue[i].params[2],cQueue[i].params[3]
-							if constructor[constructorTable[currentCon]] and constructor[constructorTable[currentCon]].allyTeam then
-								local allyTeam = constructor[constructorTable[currentCon]].allyTeam
+							local radSQ = cmd.params[4]^2
+							local cX, _, cZ = cmd.params[1],cmd.params[2],cmd.params[3]
+							if constructor[unitID] and constructor[unitID].allyTeam then
+								local allyTeam = constructor[unitID].allyTeam
 								for j = 1, terraformUnitCount do
 									local terra = terraformUnit[terraformUnitTable[j]]
 									if terra.allyTeam == allyTeam then
