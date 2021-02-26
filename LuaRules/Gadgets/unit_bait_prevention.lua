@@ -77,7 +77,7 @@ function ChaffShootingBlock(unitID, targetID, damage)
 		if not targetDefID then
 			return false
 		end
-		if debugBait or not targetBaitLevelDefs[targetDefID] then
+		if debugBait then
 			Spring.Utilities.UnitEcho(unitID)
 			Spring.Utilities.UnitEcho(targetID)
 			Spring.Echo("targetDefID", targetDefID)
@@ -85,6 +85,7 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			Spring.Echo("targetBaitLevelDefs", targetBaitLevelDefs[targetDefID])
 			Spring.Echo("targetBaitLevelArmorDefs", targetBaitLevelArmorDefs[targetDefID])
 		end
+		-- (targetBaitLevelDefs[targetDefID] == nil) is normal for units that cost more than 600.
 		if targetBaitLevelDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelDefs[targetDefID] then
 			return true
 		end
