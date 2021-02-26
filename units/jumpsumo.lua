@@ -30,6 +30,7 @@ return { jumpsumo = {
     aimposoffset   = [[0 6 0]],
     midposoffset   = [[0 6 0]],
     modelradius    = [[32]],
+    lookahead      = 120,
   },
 
   explodeAs           = [[BIG_UNIT]],
