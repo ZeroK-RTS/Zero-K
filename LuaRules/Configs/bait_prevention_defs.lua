@@ -2,6 +2,7 @@
 local baitLevelDefaults = {}
 local targetBaitLevelDefs = {}
 local targetBaitLevelArmorDefs = {}
+local targetCostDefs = {}
 
 local baitLevelCosts = {
 	40,
@@ -13,6 +14,7 @@ local baitLevelCosts = {
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitCost = ud.buildTime
+	targetCostDefs[unitDefID] = unitCost
 	if ud.customParams.bait_level_default then
 		baitLevelDefaults[unitDefID] = tonumber(ud.customParams.bait_level_default)
 	end
@@ -31,4 +33,4 @@ for unitDefID = 1, #UnitDefs do
 	end
 end
 
-return baitLevelDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs
+return baitLevelDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs, targetCostDefs, baitLevelCosts

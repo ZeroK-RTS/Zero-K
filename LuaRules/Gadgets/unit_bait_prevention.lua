@@ -34,7 +34,7 @@ local debugBait = false
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Value is the default state of the command
-local baitPreventionDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs = include("LuaRules/Configs/bait_prevention_defs.lua")
+local baitPreventionDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs, targetCostDefs, baitLevelCosts = include("LuaRules/Configs/bait_prevention_defs.lua")
 
 local unitBaitLevel = {}
 local unitDefCost = {}
@@ -95,6 +95,12 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			end
 			local armored, armorMultiple = Spring.GetUnitArmored(targetID)
 			return (armored and true) or false
+		end
+		local progress = GG.cache_GetUnitStunnedOrInBuild(targetID, true)
+		if progress and progress < 1 then
+			if targetCostDefs[targetDefID] * progress <= baitLevelCosts[unitBaitLevel[unitID]] then
+				return true
+			end
 		end
 	end
 	return false
