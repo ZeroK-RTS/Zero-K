@@ -18,6 +18,8 @@ return { turretgauss = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
+    bait_level_target_armor = 2,
     modelradius    = [[15]],
     midposoffset   = [[0 15 0]],
     aimposoffset   = [[0 22 0]],

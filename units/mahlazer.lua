@@ -23,6 +23,7 @@ return { mahlazer = {
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 0 0]],
     select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
+    bait_level_default = 0,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

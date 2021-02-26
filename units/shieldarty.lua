@@ -13,7 +13,7 @@ return { shieldarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    bait_level_default = 0,
+    bait_level_default = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

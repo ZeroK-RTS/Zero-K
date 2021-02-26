@@ -17,6 +17,7 @@ return { turretaalaser = {
 
   customParams                  = {
     bait_level_target      = 1,
+    bait_level_default = 0,
   },
 
   damageModifier                = 0.25,

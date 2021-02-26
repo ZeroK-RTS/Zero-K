@@ -18,6 +18,7 @@ return { subtacmissile = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[15]],
     stockpiletime  = [[30]],
     stockpilecost  = [[600]],

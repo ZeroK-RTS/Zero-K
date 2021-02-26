@@ -19,6 +19,8 @@ return { turretheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
+    bait_level_target_armor = 2,
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,

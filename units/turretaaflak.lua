@@ -19,6 +19,7 @@ return { turretaaflak = {
 
   customParams                  = {
     aimposoffset   = [[0 16 0]],
+    bait_level_default = 0,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],

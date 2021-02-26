@@ -18,6 +18,7 @@ return { veharty = {
 
   customParams        = {
     selection_scale   = 0.85,
+    bait_level_default = 0,
   },
 
   explodeAs           = [[BIG_UNITEX]],

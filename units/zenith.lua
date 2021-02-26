@@ -22,6 +22,7 @@ return { zenith = {
     --neededlink  = 150,
     --pylonrange  = 150,
     modelradius    = [[45]],
+    bait_level_default = 0,
   },
   
   energyUse                     = 0,

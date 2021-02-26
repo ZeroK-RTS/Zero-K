@@ -18,6 +18,7 @@ return { striderbantha = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default    = 0,
     extradrawrange        = 465,
     aimposoffset          = [[0 -8 0]],
     midposoffset          = [[0 -8 0]],

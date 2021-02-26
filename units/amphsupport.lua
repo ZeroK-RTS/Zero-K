@@ -18,6 +18,7 @@ return { amphsupport = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     amph_regen        = 15,
     amph_submerged_at = 30,
     sink_on_emp       = 0,

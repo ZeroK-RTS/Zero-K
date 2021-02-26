@@ -17,6 +17,7 @@ return { shieldassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     shield_emit_height = 17,
     cus_noflashlight   = 1,
     selection_scale    = 0.82,

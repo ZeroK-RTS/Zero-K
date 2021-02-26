@@ -21,6 +21,7 @@ return { staticarty = {
     pylonrange  = 50,
     aimposoffset   = [[0 26 0]],
     midposoffset   = [[0 10 0]],
+    bait_level_default = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

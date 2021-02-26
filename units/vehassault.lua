@@ -17,6 +17,7 @@ return { vehassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     aimposoffset   = [[0 8 0]],
     midposoffset   = [[0 3 0]],
     modelradius    = [[21]],

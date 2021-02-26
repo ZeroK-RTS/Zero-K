@@ -15,6 +15,7 @@ return { spiderskirm = {
   customParams           = {
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],

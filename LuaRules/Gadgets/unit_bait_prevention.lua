@@ -56,7 +56,7 @@ local preventChaffShootingCmdDesc = {
 
 function ChaffShootingBlock(unitID, targetID, damage)
 	if debugBait then
-		Spring.Echo("==== BAIT CHECK ====", Spring.GetGameFrame())
+		Spring.Echo("==== BAIT CHECK ====", Spring.GetGameFrame(), unitID, targetID)
 		Spring.Utilities.UnitEcho(unitID)
 	end
 	if not (unitID and targetID and unitBaitLevel[unitID] and unitBaitLevel[unitID] ~= 0) then
@@ -78,11 +78,12 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			return false
 		end
 		if debugBait or not targetBaitLevelDefs[targetDefID] then
-			Spring.Utilities.UnitEcho(unitID, "U")
-			Spring.Utilities.UnitEcho(targetID, "T")
+			Spring.Utilities.UnitEcho(unitID)
+			Spring.Utilities.UnitEcho(targetID)
 			Spring.Echo("targetDefID", targetDefID)
 			Spring.Echo("unitBaitLevel", unitBaitLevel[unitID])
 			Spring.Echo("targetBaitLevelDefs", targetBaitLevelDefs[targetDefID])
+			Spring.Echo("targetBaitLevelArmorDefs", targetBaitLevelArmorDefs[targetDefID])
 		end
 		if targetBaitLevelDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelDefs[targetDefID] then
 			return true

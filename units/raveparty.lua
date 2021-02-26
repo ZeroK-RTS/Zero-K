@@ -19,6 +19,7 @@ return { raveparty = {
 
   customParams                  = {
     modelradius    = [[35]],
+    bait_level_default = 0,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

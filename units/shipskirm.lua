@@ -18,6 +18,7 @@ return { shipskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },

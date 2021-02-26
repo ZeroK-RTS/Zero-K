@@ -23,6 +23,7 @@ return { planefighter = {
   cruiseAlt              = 200,
 
   customParams           = {
+    bait_level_default = 0,
     bait_level_target      = 2,
 
     specialreloadtime = [[850]],

@@ -18,6 +18,7 @@ return { turretantiheavy = {
 
   customParams                  = {
     bait_level_default = 1,
+    bait_level_target_armor = 2,
 
     keeptooltip    = [[any string I want]],
 

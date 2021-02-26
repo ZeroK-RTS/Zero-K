@@ -17,6 +17,7 @@ return { amphraid = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     amph_regen        = 5,
     amph_submerged_at = 40,
     aim_lookahead     = 80,

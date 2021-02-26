@@ -19,6 +19,7 @@ return { amphcon = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_target_armor = 2,
     morphto        = [[amphtele]],
     morphtime      = 20,
     amph_regen = 10,

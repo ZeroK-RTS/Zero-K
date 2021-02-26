@@ -17,6 +17,7 @@ return { tankassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     aimposoffset      = [[0 0 0]],
     midposoffset      = [[0 0 0]],
     modelradius       = [[25]],

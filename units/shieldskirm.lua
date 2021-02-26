@@ -19,6 +19,7 @@ return { shieldskirm = {
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],

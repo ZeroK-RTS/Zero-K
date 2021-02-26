@@ -16,8 +16,8 @@ for unitDefID = 1, #UnitDefs do
 	if ud.customParams.bait_level_default then
 		baitLevelDefaults[unitDefID] = tonumber(ud.customParams.bait_level_default)
 	end
-	if ud.customParams.bait_level_armor then
-		targetBaitLevelArmorDefs[unitDefID] = tonumber(ud.customParams.bait_level_armor)
+	if ud.customParams.bait_level_target_armor then
+		targetBaitLevelArmorDefs[unitDefID] = tonumber(ud.customParams.bait_level_target_armor)
 	end
 	if ud.customParams.bait_level_target then
 		targetBaitLevelDefs[unitDefID] = tonumber(ud.customParams.bait_level_target)

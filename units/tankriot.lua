@@ -17,6 +17,7 @@ return { tankriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
     aim_lookahead     = 160,

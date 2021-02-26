@@ -19,6 +19,7 @@ return { gunshipskirm = {
   cruiseAlt              = 140,
 
   customParams           = {
+    bait_level_default = 0,
     airstrafecontrol = [[1]],
     modelradius    = [[16]],
   },
