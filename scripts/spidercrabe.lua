@@ -113,7 +113,6 @@ local function Curl()
 	end
 	--Spring.Echo("Initiating curl")
 	
-	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
 	Sleep(200)
@@ -201,6 +200,7 @@ local function Uncurl()
 	Move(base, z_axis, 0, 2.5)
 
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
+	armored = false
 	Spring.SetUnitArmored(unitID,false)
 	
 	WaitForTurn(leg1, x_axis)
@@ -234,8 +234,7 @@ end
 local function Motion()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	armored = false
-	Sleep(30)
+	Sleep(100)
 	Uncurl()
 	Walk()
 end
@@ -244,9 +243,12 @@ function script.StartMoving()
 	movingData.moving = true
 	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
+	movingData.thresholdSpeed = 0.01
 end
 
 function script.StopMoving()
+	Signal(SIG_MOVE)
+	movingData.thresholdSpeed = 0.3
 	movingData.moving = false
 	--Spring.Utilities.UnitEcho(unitID, "P " .. ((armored and "T") or "F"))
 	StartThread(Curl)
@@ -262,7 +264,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1, false, movingData)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.3, false, movingData, 4)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)

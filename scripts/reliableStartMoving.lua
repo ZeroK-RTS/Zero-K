@@ -2,7 +2,7 @@ if GG.StartStopMovingControl then
 	return
 end
 
-function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess)
+function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess, fallTimeLeeway)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local spGetUnitVelocity = Spring.GetUnitVelocity
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -23,18 +23,28 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 			moving = externalDataAccess.moving
 		end
 		height = spGetGroundHeight(x,z)
-		if y - height < 1 then
-			speed = select(4, spGetUnitVelocity(unitID))
-			--Spring.Echo("speed", speed, "moving", moving, "Spring.GetUnitTravel", Spring.GetUnitTravel(unitID))
-			if moving then
-				if speed <= thresholdSpeed then
-					moving = false
-					stopFunc()
+		--Spring.Echo("y - height", y - height)
+		if y - height < 0.01 then
+			if externalDataAccess and externalDataAccess.fallTime then
+				externalDataAccess.fallTime = externalDataAccess.fallTime - 1
+				if externalDataAccess.fallTime <= 0 then
+					externalDataAccess.fallTime = false
 				end
-			else
-				if speed > thresholdSpeed then
-					moving = true
-					startFunc()
+			end
+			
+			if not (externalDataAccess and externalDataAccess.fallTime) then
+				speed = select(4, spGetUnitVelocity(unitID))
+				--Spring.Echo("speed", speed, "moving", moving, "Spring.GetUnitTravel", Spring.GetUnitTravel(unitID))
+				if moving then
+					if speed <= ((externalDataAccess and externalDataAccess.thresholdSpeed) or thresholdSpeed) then
+						moving = false
+						stopFunc()
+					end
+				else
+					if speed > ((externalDataAccess and externalDataAccess.thresholdSpeed) or thresholdSpeed) then
+						moving = true
+						startFunc()
+					end
 				end
 			end
 		elseif fallingCountsAsMoving then
@@ -42,6 +52,9 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 				moving = true
 				startFunc()
 			end
+		elseif fallTimeLeeway then
+			-- Falling does not count as moving and we have some time to not start moving after hitting the ground
+			externalDataAccess.fallTime = fallTimeLeeway
 		end
 		Sleep(350)
 	end
