@@ -206,7 +206,7 @@ function PoisonWidget(widget, widgetName)
 	local noEnforceWarningYet = true
 
 	-- Actually apply the throttle
-	for i=1,#FUNCTIONS_TO_RATELIMIT do
+	for i = 1, #FUNCTIONS_TO_RATELIMIT do
 		local fname = FUNCTIONS_TO_RATELIMIT[i]
 		local realFunction = localSpring[fname]
 		local function warnExcess(percentage)
