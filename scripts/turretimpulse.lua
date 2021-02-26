@@ -14,12 +14,8 @@ local turret = piece('turret')
 local ring = piece('ring')
 local center = piece('center')
 local firepoint = piece('firepoint')
-local crystals = {}
+local crystals = {piece('crystal1', 'crystal2', 'crystal3', 'crystal4')}
 local state = true
-crystals[1] = piece('crystal1')
-crystals[2] = piece('crystal2')
-crystals[3] = piece('crystal3')
-crystals[4] = piece('crystal4')
 
 local smokePiece = {base}
 
@@ -27,42 +23,20 @@ local function WobbleTurret()
 	while true do
 		Move(turret, y_axis, WOBBLE_DIST, WOBBLE_SPEED)
 		WaitForMove(turret, y_axis)
-		Move(turret, y_axis, -1 * WOBBLE_DIST, WOBBLE_SPEED)
+		Move(turret, y_axis, -WOBBLE_DIST, WOBBLE_SPEED)
 		WaitForMove(turret, y_axis)
-		Sleep(100)
 	end
 end
 
 local function WobbleCrystals()
 	local mult = -1
 	while true do
-		for i = 1, #crystals do
-			if i == 3 then
-				mult = 1
-			elseif i == 4 then
-				mult = -1
-			end
-			if i%2 == 0 then
-				Move(crystals[i], y_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
-			else
-				Move(crystals[i], x_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
-			end
-		end
-		WaitForMove(crystals[4], x_axis)
-		for i = 1, #crystals do
-			if i == 3 then
-				mult = -1
-			elseif i == 4 then
-				mult = 1
-			end
-			if i%2 == 0 then
-				Move(crystals[i], y_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
-			else
-				Move(crystals[i], x_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
-			end
-		end
-		WaitForMove(crystals[4], x_axis)
-		Sleep(100)
+		Move(crystals[1], x_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
+		Move(crystals[2], y_axis, mult * WOBBLE_DIST, WOBBLE_SPEED)
+		Move(crystals[3], x_axis, -mult * WOBBLE_DIST, WOBBLE_SPEED)
+		Move(crystals[4], y_axis, -mult * WOBBLE_DIST, WOBBLE_SPEED)
+		WaitForMove(crystals[4], y_axis)
+		mult = -mult
 	end
 end
 
