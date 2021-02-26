@@ -37,10 +37,10 @@ return { staticheavyradar = {
   objectName                    = [[novaradar.s3o]],
   script                        = [[staticheavyradar.lua]],
   onoffable                     = true,
-  radarDistance                 = 5000,
+  radarDistance                 = 5600,
   radarEmitHeight               = 32,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
-  sightDistance                 = 1100,
+  sightDistance                 = 1120,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooo]],
 
