@@ -17,6 +17,7 @@ return { turretimpulse = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 0,
     modelradius    = [[25]],
     lookahead      = 120,
   },
