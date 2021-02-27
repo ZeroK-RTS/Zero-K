@@ -16,6 +16,7 @@ return { spiderassault = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[12]],
     cus_noflashlight = 1,
   },

@@ -195,8 +195,8 @@ local commandDisplayConfig = {
 		},
 		stateTooltip = {
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets when active, ignored by Force Fire and Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Razor, Solar and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing less than 100, plus Sparrow, Swift, unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Solar and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing less than 100, plus Razor, Sparrow, Swift, unknown radar dots and armoured targets."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor, unknown radar dots and armoured targets."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600 plus unknown radar dots and armoured targets."),
 		}
