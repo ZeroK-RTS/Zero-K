@@ -12,9 +12,9 @@ return { hoverdepthcharge = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets  = [[0 0 0]],
-  collisionVolumeScales   = [[55 55 55]],
-  collisionVolumeType     = [[ellipsoid]],
+  collisionVolumeOffsets  = [[0 -3 0]],
+  collisionVolumeScales   = [[48 32 48]],
+  collisionVolumeType     = [[cylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
