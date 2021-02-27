@@ -309,7 +309,7 @@ function widget:DrawWorld()
 	if (allyStartBox and recommendedStartpoints) then
 		gl.Color (allyStartBoxColor)
 		gl.LineWidth(3)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINES)
+		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 		for i = 1, #recommendedStartpoints do
 			local x = recommendedStartpoints[i][1]
 			local z = recommendedStartpoints[i][2]
