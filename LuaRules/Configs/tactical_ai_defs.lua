@@ -987,6 +987,10 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 20,
 		idlePushAggressDist = 200,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 210,
+		wardFireDefault = true,
 	},
 	{
 		name = "shieldriot",

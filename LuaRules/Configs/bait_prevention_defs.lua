@@ -5,8 +5,8 @@ local targetBaitLevelArmorDefs = {}
 local targetCostDefs = {}
 
 local baitLevelCosts = {
-	40,
-	100,
+	50,
+	120,
 	300,
 	600,
 }
