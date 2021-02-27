@@ -1387,7 +1387,7 @@ local behaviourConfig = {
 		wardFireLeeway = 10,
 		wardFireHeight = 4,
 		wardFirePredict = 20,
-		wardFireShield = 700,
+		wardFireShield = 350,
 		wardFireDefault = false,
 	},
 	{
