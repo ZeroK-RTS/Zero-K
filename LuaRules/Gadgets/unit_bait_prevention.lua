@@ -91,7 +91,7 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			return true
 		end
 		if targetBaitLevelArmorDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelArmorDefs[targetDefID] then
-			local targetInLoS = (targetVisiblityState ?= 2)
+			local targetInLoS = (targetVisiblityState >= 2)
 			if not targetInLoS then
 				return true
 			end
@@ -124,9 +124,7 @@ local function PreventFiringAtChaffToggleCommand(unitID, unitDefID, state, cmdOp
 		end
 		
 		unitBaitLevel[unitID] = state
-		return false
 	end
-	return true
 end
 
 function gadget:AllowCommand_GetWantedCommand()
@@ -139,7 +137,8 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_PREVENT_BAIT) then
-		return PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams[1], cmdOptions)
+		PreventFiringAtChaffToggleCommand(unitID, unitDefID, cmdParams[1], cmdOptions)
+		return false -- command was used
 	end
 	return true  -- command was not used
 end

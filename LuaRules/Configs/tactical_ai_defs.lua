@@ -1978,7 +1978,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	end
 	
 	if behaviourData.wardFireTargets then
-		behaviourData.wardFireLeeway          = behaviourDatawardFireLeeway or 10
+		behaviourData.wardFireLeeway          = behaviourData.wardFireLeeway or 10
 		behaviourData.wardFireHeight          = behaviourData.wardFireHeight or 0
 	end
 	
