@@ -648,19 +648,6 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		end
 	end
 	
-	if bonusSkirmRange then
-		if doDebug then
-			Spring.Echo("bonusSkirmRange", bonusSkirmRange, skirmRange, predictedDist)
-		end
-		local oldSkirmRange = skirmRange
-		skirmRange = skirmRange + bonusSkirmRange
-		if behaviour.wardFireRange and skirmRange > predictedDist and predictedDist > oldSkirmRange then
-			local tx, tz = ux + behaviour.wardFireRange*ex/eDist, uz + behaviour.wardFireRange*ez/eDist
-			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
-			GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, 40)
-		end
-	end
-	
 	if doDebug then
 		Spring.Echo("doHug or skirmRange > predictedDist", doHug, skirmRange, predictedDist)
 		Spring.Echo("GetEffectiveWeaponRange", GetEffectiveWeaponRange(unitData.udID, -dy, behaviour.weaponNum), unitData.udID, -dy, behaviour.weaponNum)

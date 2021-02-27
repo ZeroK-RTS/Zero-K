@@ -16,6 +16,7 @@ return { shieldskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead  = 80,
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],

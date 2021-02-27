@@ -18,11 +18,12 @@ return { amphfloater = {
 
   customParams           = {
     bait_level_default = 0,
-    amph_regen        = 60,
-    amph_submerged_at = 30,
-    sink_on_emp       = 0,
-    floattoggle       = [[1]],
-    selection_scale   = 0.85,
+    aim_lookahead      = 60,
+    amph_regen         = 60,
+    amph_submerged_at  = 30,
+    sink_on_emp        = 0,
+    floattoggle        = [[1]],
+    selection_scale    = 0.85,
   },
 
   explodeAs              = [[BIG_UNITEX]],

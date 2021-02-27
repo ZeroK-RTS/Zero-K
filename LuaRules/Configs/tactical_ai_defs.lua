@@ -365,6 +365,7 @@ artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeA
 
 local personalShieldUnits = {
 	[UnitDefNames["shieldassault"].id] = 70,
+	[UnitDefNames["shieldcon"].id] = 70,
 	[UnitDefNames["shieldfelon"].id] = 120,
 }
 
@@ -520,6 +521,9 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- bonusRangeUnits: a map indexed by unitDefID of extra skirm range against particular units.
 -- wardFireRange (defaults to false): Range at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
 -- wardFireHeight (defaults to false): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
+-- wardFirePredict (default to 0): Multiply target velocity to predict location for ward fire.
+-- wardFireShield (default to false): Set a shield threshold required to ward fire against shielded targets.
+-- wardFireDefault (default to false): Default value for ward fire.
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -1257,8 +1261,12 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 90,
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
-		wardFireRange = 425,
+		wardFireTargets = personalShieldUnits,
+		wardFireRange = 435,
 		wardFireHeight = 20,
+		wardFirePredict = 50,
+		wardFireShield = 80,
+		wardFireDefault = true,
 	},
 	{
 		name = "jumpskirm",
@@ -1273,6 +1281,12 @@ local behaviourConfig = {
 		skirmLeeway = 5,
 		skirmBlockedApproachFrames = 60,
 		velPredChaseFactor = 0.5,
+		wardFireTargets = personalShieldUnits,
+		wardFireRange = 410,
+		wardFireHeight = 20,
+		wardFirePredict = 0,
+		wardFireShield = 900,
+		wardFireDefault = true,
 	},
 	{
 		name = "striderdante",
@@ -1295,8 +1309,12 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 75,
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
-		wardFireRange = 445,
-		wardFireHeight = 20,
+		wardFireTargets = personalShieldUnits,
+		wardFireRange = 430,
+		wardFireHeight = 5,
+		wardFirePredict = 50,
+		wardFireShield = 100,
+		wardFireDefault = true,
 	},
 	{
 		name = "hoverskirm",
@@ -1312,6 +1330,12 @@ local behaviourConfig = {
 		velocityPrediction = 90,
 		skirmBlockedApproachFrames = 60,
 		skirmBlockApproachHeadingBlock = 0,
+		wardFireTargets = personalShieldUnits,
+		wardFireRange = 430,
+		wardFireHeight = 4,
+		wardFirePredict = 20,
+		wardFireShield = 500,
+		wardFireDefault = false,
 	},
 	{
 		name = "tankheavyassault",

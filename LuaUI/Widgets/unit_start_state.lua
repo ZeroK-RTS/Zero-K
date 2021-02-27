@@ -91,6 +91,10 @@ local tooltips = {
 		[3] = "Avoid units costing less than 300, plus Raptor, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
 		[4] = "Avoid units costing less than 600, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
 	},
+	ward_fire = {
+		[0] = "Disabled.",
+		[1] = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+	},
 }
 
 local badTargetDescStr = "\n\nAvoid Bad Targets allows you to tell units to not shoot at low value targets when auto-aiming. The behaviour is ignored for units told to Force Fire at a particular target, or for units on Attack Move or Patrol.\n\nThere are four categories split mostly into units costing less than 40, 100, 300 or 600 metal. Razor, Solar, Swift, Sparrow, Raptor and armoured targets (when armoured) are placed at lower levels because these targets are low value for reasons unrelated to cost. Nanoframes with less than the requist cost threshold are also avoided, as well as unidentified radar dots."
@@ -593,6 +597,7 @@ options = {
 }
 
 local tacticalAIUnits = {}
+local wardFireUnits = {}
 do
 	local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
 	for unitDefID, behaviourData in pairs(tacticalAIDefs) do
@@ -601,6 +606,9 @@ do
 			unitDefName = unitDefName and unitDefName.name
 			if unitDefName then
 				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+			end
+			if behaviourData.wardFireTargets then
+				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
 			end
 		end
 	end
@@ -909,6 +917,18 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_overkill_prevention"
+	end
+
+	if wardFireUnits[defName] then
+		options[defName .. "_ward_fire"] = {
+			name = "  Shoot Shields (Ward Fire)",
+			desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+			type = 'bool',
+			value = (wardFireUnits[defName] == 1),
+			path = path,
+			tooltipFunction = tooltipFunc.prevent_bait,
+		}
+		options_order[#options_order+1] = defName .. "_ward_fire"
 	end
 
 	if baitPreventionDefault[unitDefID] then
@@ -1315,6 +1335,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "prevent_bait")
 		if value then
 			orderArray[#orderArray + 1] = {CMD_PREVENT_BAIT, {value}, CMD.OPT_SHIFT}
+		end
+		
+		value = GetStateValue(name, "ward_fire")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_WARD_FIRE, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "disableattack")
