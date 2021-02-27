@@ -1202,7 +1202,7 @@
 	"gunshipheavytrans" : {
 		"name" : "Hercules",
 		"description" : "Armed Heavy Air Transport",
-		"helptext" : "The Hercules can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
+		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships (except Reef and Shogun). Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
 	},
 	"planescout" : {
 		"name" : "Owl",
