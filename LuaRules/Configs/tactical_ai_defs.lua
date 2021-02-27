@@ -879,7 +879,7 @@ local behaviourConfig = {
 		velocityPrediction = 20,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 130,
+		wardFireShield = 180,
 		wardFirePredict = 10,
 		wardFireDefault = true,
 	},
@@ -970,7 +970,7 @@ local behaviourConfig = {
 		idleEnemyDistMult = 0.5,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 20,
+		wardFireShield = 50,
 		wardFireDefault = true,
 	},
 	{
@@ -1020,7 +1020,7 @@ local behaviourConfig = {
 		idleEnemyDistMult = 0.5,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 200,
+		wardFireShield = 300,
 		wardFirePredict = 5,
 		wardFireDefault = true,
 	},
@@ -1083,7 +1083,7 @@ local behaviourConfig = {
 		idleEnemyDistMult = 0.5,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 200,
+		wardFireShield = 250,
 		wardFirePredict = 20,
 		wardFireDefault = true,
 	},
@@ -1220,7 +1220,7 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 10,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 400,
+		wardFireShield = 450,
 		wardFireDefault = true,
 	},
 	{
@@ -1236,7 +1236,7 @@ local behaviourConfig = {
 		skirmLeeway = 40,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 140,
+		wardFireShield = 180,
 		wardFirePredict = 20,
 		wardFireDefault = true,
 	},
@@ -1253,7 +1253,7 @@ local behaviourConfig = {
 		skirmLeeway = 40,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 110,
+		wardFireShield = 160,
 		wardFirePredict = 30,
 		wardFireDefault = true,
 	},
@@ -1280,7 +1280,7 @@ local behaviourConfig = {
 		skirmLeeway = 40,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 200,
+		wardFireShield = 250,
 		wardFirePredict = 20,
 		wardFireDefault = true,
 	},
@@ -1295,7 +1295,7 @@ local behaviourConfig = {
 		skirmLeeway = 50,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 300,
+		wardFireShield = 350,
 		wardFirePredict = 25,
 		wardFireDefault = true,
 	},
@@ -1318,7 +1318,7 @@ local behaviourConfig = {
 		wardFireLeeway = 10,
 		wardFireHeight = 20,
 		wardFirePredict = 50,
-		wardFireShield = 80,
+		wardFireShield = 200,
 		wardFireDefault = true,
 	},
 	{
@@ -1338,7 +1338,7 @@ local behaviourConfig = {
 		wardFireLeeway = 10,
 		wardFireHeight = 20,
 		wardFirePredict = 0,
-		wardFireShield = 900,
+		wardFireShield = 1100,
 		wardFireDefault = true,
 	},
 	{
@@ -1366,7 +1366,7 @@ local behaviourConfig = {
 		wardFireLeeway = 20,
 		wardFireHeight = 5,
 		wardFirePredict = 50,
-		wardFireShield = 100,
+		wardFireShield = 250,
 		wardFireDefault = true,
 	},
 	{
@@ -1387,7 +1387,7 @@ local behaviourConfig = {
 		wardFireLeeway = 10,
 		wardFireHeight = 4,
 		wardFirePredict = 20,
-		wardFireShield = 500,
+		wardFireShield = 700,
 		wardFireDefault = false,
 	},
 	{
@@ -1904,7 +1904,7 @@ local behaviourConfig = {
 	{
 		name = "turretemp",
 		wardFireTargets = personalShieldUnits,
-		wardFireShield = 0,
+		wardFireShield = 450,
 		wardFireDefault = true,
 	},
 	-- Externally handled units

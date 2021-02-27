@@ -446,7 +446,7 @@ end
 
 function gadget:Initialize()
 	GG.cache_GetUnitStunnedOrInBuild = cache_GetUnitStunnedOrInBuild
-	GG.cache_cache_GetUnitVisibility = cache_cache_GetUnitVisibility
+	GG.cache_GetUnitVisibility = cache_cache_GetUnitVisibility
 
 	for _, unitID in ipairs(spGetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
