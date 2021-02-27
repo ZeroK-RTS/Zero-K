@@ -89,7 +89,7 @@ local function GetUnitSpeed(unitID)
 	return remSpeed[unitID]
 end
 
-local function GetUnitVisibility(unitID, allyTeam)
+local function cache_GetUnitVisibility(unitID, allyTeam)
 	if not (remVisible[allyTeam] and remVisible[allyTeam][unitID]) then
 		if not remVisible[allyTeam] then
 			remVisible[allyTeam] = {}
@@ -353,7 +353,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	--// Radar dot handling. Radar dots are not handled by subsequent areas because a unit which is
 	-- identified but not visible cannot have priority based on health or other status effects.
-	local visiblity = GetUnitVisibility(targetID, allyTeam)
+	local visiblity = cache_GetUnitVisibility(targetID, allyTeam)
 
 	if visiblity ~= 2 then
 		local wobbleAdd = (radarDotPenalty[attackerWeaponDefID] or 0)
@@ -446,6 +446,7 @@ end
 
 function gadget:Initialize()
 	GG.cache_GetUnitStunnedOrInBuild = cache_GetUnitStunnedOrInBuild
+	GG.cache_cache_GetUnitVisibility = cache_cache_GetUnitVisibility
 
 	for _, unitID in ipairs(spGetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)

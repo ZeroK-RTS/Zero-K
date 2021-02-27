@@ -444,6 +444,10 @@ function GG.GetUnitTargetGround(unitID)
 	return false
 end
 
+function GG.GetUnitHasSetTarget(unitID)
+	return (unitById[unitID] and unit.data[unitById[unitID]] and (not unit.data[unitById[unitID]].lingerOnly) and true) or false
+end
+
 function GG.SetUnitTarget(unitID, targetID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if not (unitDefID and validUnits[unitDefID]) then

@@ -519,8 +519,10 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmBlockApproachHeadingBlock (defaults to false): Blocks the effect of skirmBlockedApproachFrames if the dot product of enemyVector and unitFacing exceeds skirmBlockApproachHeadingBlock.
 -- avoidHeightDiff (default in config): A table of targets that are not skirmed if they are too far above or below the unit.
 -- bonusRangeUnits: a map indexed by unitDefID of extra skirm range against particular units.
--- wardFireRange (defaults to false): Range at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
--- wardFireHeight (defaults to false): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
+
+-- wardFireTargets (default false): List of targets, with leeway ranges, to wardfire against.
+-- wardFireLeeway, (defaults to 10): Distance below max range to aim at when ward firing.
+-- wardFireHeight (defaults to 0): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
 -- wardFirePredict (default to 0): Multiply target velocity to predict location for ward fire.
 -- wardFireShield (default to false): Set a shield threshold required to ward fire against shielded targets.
 -- wardFireDefault (default to false): Default value for ward fire.
@@ -551,7 +553,6 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- fleeVelPrediction (defaults to 10): velocity prediction that overrides general velocity prediction for fleeing.
 
 --*** idleFlee (defaults to empty): Units that this unit will flea when idle and not on hold position.
--- 
 
 --*** hugs(defaults to empty): the table of units to close range with.
 -- hugRange (default in config): Range to close to
@@ -875,7 +876,12 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40,
 		skirmLeeway = 30,
 		minCircleStrafeDistance = 10,
-		velocityPrediction = 20
+		velocityPrediction = 20,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 130,
+		wardFirePredict = 10,
+		wardFireDefault = true,
 	},
 	{
 		name = "shiptorpraider",
@@ -930,6 +936,11 @@ local behaviourConfig = {
 		idleChaseEnemyLeeway = 200,
 		idleCommitDistMult = 0.5,
 		idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 20,
+		wardFirePredict = 5,
+		wardFireDefault = true,
 	},
 	{
 		name = "jumpcon",
@@ -957,6 +968,10 @@ local behaviourConfig = {
 		idleChaseEnemyLeeway = 200,
 		idleCommitDistMult = 0.5,
 		idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 20,
+		wardFireDefault = true,
 	},
 	{
 		name = "spideremp",
@@ -1003,6 +1018,11 @@ local behaviourConfig = {
 		idleChaseEnemyLeeway = 200,
 		idleCommitDistMult = 0.5,
 		idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 200,
+		wardFirePredict = 5,
+		wardFireDefault = true,
 	},
 	{
 		name = "shieldfelon",
@@ -1036,6 +1056,10 @@ local behaviourConfig = {
 		idleChaseEnemyLeeway = 200,
 		idleCommitDistMult = 0.5,
 		idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 0,
+		wardFireDefault = true,
 	},
 	{
 		name = "tankriot",
@@ -1057,6 +1081,11 @@ local behaviourConfig = {
 		idleChaseEnemyLeeway = 200,
 		idleCommitDistMult = 0.5,
 		idleEnemyDistMult = 0.5,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 200,
+		wardFirePredict = 20,
+		wardFireDefault = true,
 	},
 	{
 		name = "amphriot",
@@ -1189,6 +1218,10 @@ local behaviourConfig = {
 		jinkPeriod = 2,
 		skirmLeeway = 40,
 		skirmBlockedApproachFrames = 10,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 400,
+		wardFireDefault = true,
 	},
 	{
 		name = "shieldassault",
@@ -1201,6 +1234,11 @@ local behaviourConfig = {
 		minSwarmLeeway = 120,
 		jinkPeriod = 2,
 		skirmLeeway = 40,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 140,
+		wardFirePredict = 20,
+		wardFireDefault = true,
 	},
 	{
 		name = "spiderassault",
@@ -1213,6 +1251,11 @@ local behaviourConfig = {
 		minSwarmLeeway = 120,
 		jinkPeriod = 2,
 		skirmLeeway = 40,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 110,
+		wardFirePredict = 30,
+		wardFireDefault = true,
 	},
 	{
 		name = "shipraider",
@@ -1235,6 +1278,11 @@ local behaviourConfig = {
 		maxSwarmLeeway = 50,
 		minSwarmLeeway = 120,
 		skirmLeeway = 40,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 200,
+		wardFirePredict = 20,
+		wardFireDefault = true,
 	},
 	{
 		name = "tankassault",
@@ -1245,6 +1293,11 @@ local behaviourConfig = {
 		fightOnlyUnits = shortRangeExplodables,
 		skirmOrderDis = 220,
 		skirmLeeway = 50,
+		
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 300,
+		wardFirePredict = 25,
+		wardFireDefault = true,
 	},
 	
 	-- med range skirms
@@ -1262,7 +1315,7 @@ local behaviourConfig = {
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
 		wardFireTargets = personalShieldUnits,
-		wardFireRange = 435,
+		wardFireLeeway = 10,
 		wardFireHeight = 20,
 		wardFirePredict = 50,
 		wardFireShield = 80,
@@ -1282,7 +1335,7 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 60,
 		velPredChaseFactor = 0.5,
 		wardFireTargets = personalShieldUnits,
-		wardFireRange = 410,
+		wardFireLeeway = 10,
 		wardFireHeight = 20,
 		wardFirePredict = 0,
 		wardFireShield = 900,
@@ -1310,7 +1363,7 @@ local behaviourConfig = {
 		velPredChaseFactor = 0.5,
 		bonusRangeUnits = personalShieldUnits,
 		wardFireTargets = personalShieldUnits,
-		wardFireRange = 430,
+		wardFireLeeway = 20,
 		wardFireHeight = 5,
 		wardFirePredict = 50,
 		wardFireShield = 100,
@@ -1331,7 +1384,7 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 60,
 		skirmBlockApproachHeadingBlock = 0,
 		wardFireTargets = personalShieldUnits,
-		wardFireRange = 430,
+		wardFireLeeway = 10,
 		wardFireHeight = 4,
 		wardFirePredict = 20,
 		wardFireShield = 500,
@@ -1841,6 +1894,19 @@ local behaviourConfig = {
 		hugRange = 150,
 	},
 	
+	-- Ward fire only units.
+	{
+		name = "turretlaser",
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 0,
+		wardFireDefault = true,
+	},
+	{
+		name = "turretemp",
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 0,
+		wardFireDefault = true,
+	},
 	-- Externally handled units
 	{
 		name = "energysolar",
@@ -1909,6 +1975,11 @@ local function GetBehaviourTable(behaviourData, ud)
 		behaviourData.localJinkOrder          = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder)
 		behaviourData.strafeOrderLength       = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength)
 		behaviourData.swarmLeeway             = (behaviourData.swarmLeeway or 50)
+	end
+	
+	if behaviourData.wardFireTargets then
+		behaviourData.wardFireLeeway          = behaviourDatawardFireLeeway or 10
+		behaviourData.wardFireHeight          = behaviourData.wardFireHeight or 0
 	end
 	
 	if behaviourData.fightOnlyOverride then

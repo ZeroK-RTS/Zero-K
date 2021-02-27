@@ -64,10 +64,9 @@ function ChaffShootingBlock(unitID, targetID, damage)
 	end
 
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
-		local gameFrame = spGetGameFrame()
-		local targetVisiblityState = spGetUnitLosState(targetID, Spring.GetUnitTeam(unitID), true)
-		Spring.Utilities.UnitEcho(targetID, targetVisiblityState)
-		local identified = (targetVisiblityState%2 == 1)
+		local targetVisiblityState = GG.cache_GetUnitVisibility(targetID, Spring.GetUnitAllyTeam(unitID))
+		--Spring.Utilities.UnitEcho(targetID, targetVisiblityState)
+		local identified = (targetVisiblityState >= 1)
 		if debugBait then
 			Spring.Echo("identified", identified)
 		end
@@ -92,8 +91,8 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			return true
 		end
 		if targetBaitLevelArmorDefs[targetDefID] and unitBaitLevel[unitID] >= targetBaitLevelArmorDefs[targetDefID] then
-			local targetInLoS = (targetVisiblityState == 15)
-			if not targetVisiblityState then
+			local targetInLoS = (targetVisiblityState ?= 2)
+			if not targetInLoS then
 				return true
 			end
 			local armored, armorMultiple = Spring.GetUnitArmored(targetID)

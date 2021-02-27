@@ -77,9 +77,9 @@ local wardFireCmdDesc = {
 local function DoUnitUpdate(unitID, unitData)
 	if doDebug then
 		Spring.Echo("===== DEBUG WARD FIRE", unitID, "=====")
-		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID))
+		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID))
 	end
-	if (not unitData.active) or (Spring.Utilities.GetUnitFireState(unitID) ~= 2) then
+	if (not unitData.active) or (Spring.Utilities.GetUnitFireState(unitID) ~= 2) or GG.GetUnitHasSetTarget(unitID) then
 		return
 	end
 	
@@ -110,7 +110,7 @@ local function DoUnitUpdate(unitID, unitData)
 	end
 	
 	--Spring.Utilities.UnitEcho(enemyID)
-	local wardFireRange = behaviour.wardFireTargets[enemyUnitDefID]
+	local targetLeeway = behaviour.wardFireTargets[enemyUnitDefID]
 	
 	local vx, vy, vz, enemySpeed = spGetUnitVelocity(enemyID)
 	local ex, ey, ez, _, aimY = spGetUnitPosition(enemyID, false, true) -- enemy position
@@ -145,20 +145,20 @@ local function DoUnitUpdate(unitID, unitData)
 		predictedDist = 0
 	end
 	
-	local skirmRange = ((GetEffectiveWeaponRange(unitData.unitDefID, -dy, behaviour.weaponNum) or 0) - behaviour.skirmLeeway)
+	local effectiveRange = (GetEffectiveWeaponRange(unitData.unitDefID, -dy, behaviour.weaponNum) or 0)
+	local wardFireRange = (effectiveRange - behaviour.wardFireLeeway)
 
 	if doDebug then
-		Spring.Echo("wardFireRange", wardFireRange, skirmRange, predictedDist)
+		Spring.Echo("targetLeeway", effectiveRange + targetLeeway, effectiveRange, predictedDist)
 	end
-	local oldSkirmRange = skirmRange
-	skirmRange = skirmRange + wardFireRange
-	if behaviour.wardFireRange and skirmRange > predictedDist and predictedDist > oldSkirmRange then
-		local tx, tz = ux + behaviour.wardFireRange*dx/predictedDist, uz + behaviour.wardFireRange*dz/predictedDist
+	
+	if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway < predictedDist then
+		local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
 		if doDebug then
 			Spring.MarkerAddPoint(tx, 0, tz, "F")
 		end
 		local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
-		GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, 15)
+		GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, UPDATE_RATE)
 	end
 end
 
