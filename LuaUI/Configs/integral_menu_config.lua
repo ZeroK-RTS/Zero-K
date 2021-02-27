@@ -189,11 +189,11 @@ local commandDisplayConfig = {
 			imageDir .. 'states/bait_4.png',
 		},
 		stateTooltip = {
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets. Overridden by Force Fire and Attack Move."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets when active, ignored by Force Fire and Attack Move."),
 			tooltips.PREVENT_BAIT:gsub("_STATE_", "40"):gsub("_DESC_", "Avoid units costing less than 40, plus Razor and Solar."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid cost less than 100, plus Swift, Sparrow and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600 and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "100"):gsub("_DESC_", "Avoid units costing less than 100, plus Sparrow, Swift, unknown radar and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor, unknown radar and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600 plus unknown radar and armoured targets."),
 		}
 	},
 	[CMD_RETREAT] = {

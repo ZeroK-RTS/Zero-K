@@ -86,12 +86,14 @@ local tooltips = {
 	},
 	prevent_bait = {
 		[0] = "Shoot everything.",
-		[1] = "Avoid units costing less than 40, plus Razor and Solar. This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
-		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
-		[3] = "Avoid units costing less than 300, plus Raptor and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
-		[4] = "Avoid units costing less than 600 and armoured targets (excluding Crab). This is overridden (ignored) by manual Force Fire, Attack Move and Patrol commands.",
+		[1] = "Avoid units costing less than 40, plus Razor and Solar.",
+		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor, armoured targets and unknown radar dots.",
+		[3] = "Avoid units costing less than 300, plus Raptor, armoured targets and unknown radar dots.",
+		[4] = "Avoid units costing less than 600, armoured targets and unknown radar dots.",
 	},
 }
+
+local badTargetDescStr = "\n\nAvoid Bad Targets allows you to tell units to not shoot at low value targets when auto-aiming. The behaviour is ignored for units told to Force Fire at a particular target, or for units on Attack Move or Patrol.\n\nThere are four categories split mostly into units costing less than 40, 100, 300 or 600 metal. Razor, Solar, Swift, Sparrow, Raptor and armoured targets (when armoured) are placed at lower levels because these targets are low value for reasons unrelated to cost. Nanoframes with less than the requist cost threshold are also avoided, as well as unidentified radar dots."
 
 for name, values in pairs(tooltips) do
 	tooltipFunc[name] = function (_, v)
@@ -128,6 +130,7 @@ options_order = {
 	'resetMoveStates', 'holdPosition',
 	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition',
 	'enableTacticalAI', 'disableTacticalAI',
+	'preventBaitOff', 'preventBaitDefault', 'preventBaitMinOne', 'preventBaitPlusOne',
 	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
@@ -276,6 +279,74 @@ options = {
 				local ud = name and UnitDefNames[name]
 				if ud then
 					options[opt].value = true
+				end
+			end
+		end,
+	},
+	preventBaitOff = {
+		type = 'button',
+		name = "Disable Avoid Bad Targets",
+		desc = "Disable low value target avoidance for all units." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = 0
+				end
+			end
+		end,
+	},
+	preventBaitDefault = {
+		type = 'button',
+		name = "Default Avoid Bad Targets",
+		desc = "Set low value target avoidance back to the default. This causes some units with costly or high reload shots to ignore targets at the 40 or 100 threshold." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = baitPreventionDefault[ud.id]
+				end
+			end
+		end,
+	},
+	preventBaitMinOne = {
+		type = 'button',
+		name = "Set min Avoid Bad Targets",
+		desc = "Set low value target avoidance to a cost threshold of 40 if the default is not higher." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = math.max(1, baitPreventionDefault[ud.id])
+				end
+			end
+		end,
+	},
+	preventBaitPlusOne = {
+		type = 'button',
+		name = "Set high Avoid Bad Targets",
+		desc = "Set low value target avoidance to one higher than the default for all units." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = baitPreventionDefault[ud.id] + 1
 				end
 			end
 		end,

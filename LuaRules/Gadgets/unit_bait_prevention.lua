@@ -71,7 +71,8 @@ function ChaffShootingBlock(unitID, targetID, damage)
 			Spring.Echo("identified", identified)
 		end
 		if not identified then
-			return true -- radar dots are classic bait.
+			-- Ignore radar dots at the 100 cost threshold.
+			return (unitBaitLevel[unitID] >= 2)
 		end
 		local targetDefID = spGetUnitDefID(targetID)
 		if not targetDefID then
