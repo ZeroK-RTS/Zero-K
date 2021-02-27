@@ -26,6 +26,8 @@ local stateData = {
 	--[CMD_GLOBAL_BUILD] = 2, -- Handled entirely in luaUI so not included here.
 	[CMD_UNIT_KILL_SUBORDINATES] = 2,
 	[CMD_PREVENT_OVERKILL] = 2,
+	[CMD_PREVENT_BAIT] = 5,
+	[CMD_WARD_FIRE] = 2,
 	--[CMD_SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
 	[CMD_UNIT_AI] = 2,
 }
