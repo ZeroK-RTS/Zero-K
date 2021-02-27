@@ -186,7 +186,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetInLoS = (targetVisiblityState == 15)
-	local targetIdentified = (targetVisiblityState > 2)
+	local targetIdentified = (targetVisiblityState%2 == 1)
 
 	-- When true, the projectile damage will be added to the damage to be taken by the unit.
 	-- When false, it will only check whether the shot should be blocked.

@@ -19,7 +19,7 @@ return { hoverassault = {
 
   customParams        = {
     bait_level_default = 0,
-    bait_level_target_armor = 2,
+    bait_level_target_armor = 1,
     modelradius       = [[25]],
   },
 

@@ -86,7 +86,7 @@ local tooltips = {
 	},
 	prevent_bait = {
 		[0] = "Shoot everything.",
-		[1] = "Avoid units costing less than 40, plus Razor and Solar.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
+		[1] = "Avoid units costing less than 40, plus Razor, Solar and armoured targets (excluding Crab).\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
 		[2] = "Avoid cost less than 100, plus Swift, Sparrow, Razor, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
 		[3] = "Avoid units costing less than 300, plus Raptor, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
 		[4] = "Avoid units costing less than 600, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",

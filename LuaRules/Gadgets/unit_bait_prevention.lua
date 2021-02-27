@@ -66,7 +66,8 @@ function ChaffShootingBlock(unitID, targetID, damage)
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		local targetVisiblityState = spGetUnitLosState(targetID, Spring.GetUnitTeam(unitID), true)
-		local identified = (targetVisiblityState > 2)
+		Spring.Utilities.UnitEcho(targetID, targetVisiblityState)
+		local identified = (targetVisiblityState%2 == 1)
 		if debugBait then
 			Spring.Echo("identified", identified)
 		end
