@@ -733,7 +733,7 @@ local icontypes = {
   },
   advradar = {
     bitmap='icons/radar.dds',
-    size=2.8,
+    size=2.5,
   },
    sonar = {
     bitmap='icons/sonar.dds',
