@@ -565,7 +565,7 @@ function DrawButton(obj)
 
 	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
-		font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
+		font:Print(obj.caption, w*obj.alignPadding + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), obj.align, "linecenter")
 	end
 end
 
@@ -613,7 +613,7 @@ function DrawEditBox(obj)
 	local font = _GetControlFont(obj)
 	local displayHint = false
 
-	if text == "" and not obj.state.focused then
+	if text == "" then
 		text = obj.hint
 		displayHint = true
 		font = obj.hintFont

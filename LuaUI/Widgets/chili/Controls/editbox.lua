@@ -11,7 +11,7 @@
 -- @string[opt = "left"] align alignment
 -- @string[opt = "linecenter"] valign vertical alignment
 -- @string[opt = ""] text text contained in the editbox
--- @string[opt = ""] hint hint to be displayed when there is no text and the control isn't focused
+-- @string[opt = ""] hint hint to be displayed when there is no text
 -- @int[opt = 1] cursor cursor position
 -- @bool passwordInput specifies whether the text should be treated as a password
 EditBox = Control:Inherit{
@@ -149,6 +149,11 @@ function EditBox:SetText(newtext)
 	end
 	self:UpdateLayout()
 	self:Invalidate()
+end
+
+function EditBox:Clear()
+	self:SetText("")
+	inherited.TextModified(self)
 end
 
 function EditBox:_LineLog2Phys(logicalLine, pos)

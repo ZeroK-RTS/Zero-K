@@ -27,6 +27,7 @@ Image = Button:Inherit{
 	firstDraw = true,
 
 	keepAspect = true;
+	crop = false;
 	
 	checkFileExists = false;
 	fallbackFile = false;
@@ -69,6 +70,25 @@ local function _DrawTextureAspect(x, y, w, h , tw, th, flipy)
 	gl.TexRect(x, y, right, bottom, false, flipy)
 end
 
+local function _DrawTextureCrop(x, y, w, h , tw, th, flipy)
+	local targetAspect = w/h
+	local imageAspect = tw/th
+
+	local right  = math.ceil(x + w)
+	local bottom = math.ceil(y + h)
+	x = math.ceil(x)
+	y = math.ceil(y)
+
+	local imageX = math.max(0,(1.0 - targetAspect/imageAspect)/2)
+	local imageY = math.max(0,(1.0 - imageAspect/targetAspect)/2)
+
+	if flipy then
+		gl.TexRect(x,y,right,bottom,imageX,imageY,1 -imageX,1-imageY)
+	else
+		gl.TexRect(x,y,right,bottom,imageX,1-imageY,1 -imageX,imageY)
+	end
+end
+
 function Image:DrawControl()
 	local file = self.file
 	local file2 = self.file2
@@ -109,23 +129,42 @@ function Image:DrawControl()
 			_DrawTextureAspect(0, 0, self.width, self.height, tw, th, self.flip)
 		end
 	else
-		if (file2) then
-			gl.Color(self.color2 or self.color)
-			TextureHandler.LoadTexture(0, file2, self)
-			if not chili_imageAlreadyDrawn[file2] then
-				gl.TextureInfo(file2)
-				chili_imageAlreadyDrawn[file2] = true
+		if (self.crop) then
+			-- Don't do the chili_imageAlreadyDrawn white rectangle fix because
+			-- crop already does gl.TextureInfo (although, should it be cached?)
+			if (file2) then
+				gl.Color(self.color2 or self.color)
+				TextureHandler.LoadTexture(0, file2, self)
+				local texInfo = gl.TextureInfo(file2) or {xsize = 1, ysize = 1}
+				local tw, th = texInfo.xsize, texInfo.ysize
+				_DrawTextureCrop(0, 0, self.width, self.height, tw, th, self.flip2)
 			end
-			gl.TexRect(0, 0, self.width, self.height, false, self.flip2)
-		end
-		if (file) then
-			gl.Color(self.color)
-			TextureHandler.LoadTexture(0, file, self)
-			if not chili_imageAlreadyDrawn[file] then
-				gl.TextureInfo(file)
-				chili_imageAlreadyDrawn[file] = true
+			if (file) then
+				gl.Color(self.color)
+				TextureHandler.LoadTexture(0, file, self)
+				local texInfo = gl.TextureInfo(file) or {xsize = 1, ysize = 1}
+				local tw, th = texInfo.xsize, texInfo.ysize
+				_DrawTextureCrop(0, 0, self.width, self.height, tw, th, self.flip)
 			end
-			gl.TexRect(0, 0, self.width, self.height, false, self.flip)
+		else
+			if (file2) then
+				gl.Color(self.color2 or self.color)
+				TextureHandler.LoadTexture(0, file2, self)
+				if not chili_imageAlreadyDrawn[file2] then
+					gl.TextureInfo(file2)
+					chili_imageAlreadyDrawn[file2] = true
+				end
+				gl.TexRect(0, 0, self.width, self.height, false, self.flip2)
+			end
+			if (file) then
+				gl.Color(self.color)
+				TextureHandler.LoadTexture(0, file, self)
+				if not chili_imageAlreadyDrawn[file] then
+					gl.TextureInfo(file)
+					chili_imageAlreadyDrawn[file] = true
+				end
+				gl.TexRect(0, 0, self.width, self.height, false, self.flip)
+			end
 		end
 		self.firstDraw = false
 	end
