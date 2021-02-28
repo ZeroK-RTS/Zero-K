@@ -152,7 +152,7 @@ local function DoUnitUpdate(unitID, unitData)
 		Spring.Echo("targetLeeway", effectiveRange + targetLeeway, effectiveRange, predictedDist)
 	end
 	
-	if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway < predictedDist then
+	if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist then
 		local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
 		if doDebug then
 			Spring.MarkerAddPoint(tx, 0, tz, "F")
