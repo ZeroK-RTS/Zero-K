@@ -24,7 +24,6 @@ return { planefighter = {
 
   customParams           = {
     bait_level_default = 0,
-    bait_level_target      = 2,
 
     specialreloadtime = [[850]],
     boost_speed_mult = 5,

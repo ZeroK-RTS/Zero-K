@@ -17,6 +17,7 @@ return { energywind = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_target = 1,
     pylonrange     = 60,
     windgen        = true,
     modelradius    = [[12]],

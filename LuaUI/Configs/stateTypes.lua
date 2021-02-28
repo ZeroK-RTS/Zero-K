@@ -48,6 +48,7 @@ local gadgetReverse = {
 	[CMD_UNIT_FLOAT_STATE] = true,
 	[CMD_MISC_PRIORITY] = true,
 	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+	[CMD_PREVENT_BAIT] = true,
 }
 
 return stateData, gadgetReverse, specialHandling

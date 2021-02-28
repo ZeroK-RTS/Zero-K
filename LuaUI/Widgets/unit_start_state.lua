@@ -30,6 +30,10 @@ local unitsToFactory = {}	-- [unitDefName] = factoryDefName
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local preventBaitTip = "\nAvoidance is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands."
+local badTargetDescStr = "\n\nAvoid Bad Targets prevents auto-aim at low value targets. It is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands. The lowest level avoids armoured targets (excluding Crab) while levels Light to Heavy ignore unidentified radar dots."
+
+
 local tooltipFunc = {}
 local tooltips = {
 	movestate = {
@@ -85,19 +89,17 @@ local tooltips = {
 		[3] = "3",
 	},
 	prevent_bait = {
-		[0] = "Shoot everything.",
-		[1] = "Avoid units costing less than 50, plus Solar and armoured targets (excluding Crab).\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
-		[2] = "Avoid cost less than 120, plus Swift, Sparrow, Razor, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
-		[3] = "Avoid units costing less than 300, plus Raptor, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
-		[4] = "Avoid units costing less than 600, armoured targets (excluding Crab) and unknown radar dots.\nAvoidance is disabled by Force Fire, Attack Move and Patrol commands.",
+		[0] = "Disable target avoidance.",
+		[1] = "Avoid shooting at light drones, Wind, Solar, Claw, Dirtbag, low value nanoframes and armoured targets (excluding Crab)." .. preventBaitTip,
+		[2] = "Avoid shooting at units costing less than 90, Razor, Sparrow, unknown radar dots, low value nanoframes and armoured targets (except Crab)." .. preventBaitTip,
+		[3] = "Avoid shooting at units costing less than 240 (excluding Stardust) as well as, Raptor, unknown radar dots, low value nanoframes and armoured targets (excluding Crab)." .. preventBaitTip,
+		[4] = "Avoid shooting at  units costing less than 420, unknown radar dots, low value nanoframes and armoured targets (excluding Crab)." .. preventBaitTip,
 	},
 	ward_fire = {
 		[0] = "Disabled.",
 		[1] = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	},
 }
-
-local badTargetDescStr = "\n\nAvoid Bad Targets allows you to tell units to not shoot at low value targets when auto-aiming. The behaviour is ignored for units told to Force Fire at a particular target, or for units on Attack Move or Patrol.\n\nThere are four categories split mostly into units costing less than 40, 100, 300 or 600 metal. Razor, Solar, Swift, Sparrow, Raptor and armoured targets (when armoured) are placed at lower levels because these targets are low value for reasons unrelated to cost. Nanoframes with less than the requist cost threshold are also avoided, as well as unidentified radar dots."
 
 for name, values in pairs(tooltips) do
 	tooltipFunc[name] = function (_, v)

@@ -194,11 +194,11 @@ local commandDisplayConfig = {
 			imageDir .. 'states/bait_4.png',
 		},
 		stateTooltip = {
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Avoid low value targets when active, ignored by Force Fire and Attack Move."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "50"):gsub("_DESC_", "Avoid units costing less than 50, plus Solar and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "120"):gsub("_DESC_", "Avoid units costing less than 120, plus Razor, Sparrow, Swift, unknown radar dots and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "300"):gsub("_DESC_", "Avoid units costing less than 300, plus Raptor, unknown radar dots and armoured targets."),
-			tooltips.PREVENT_BAIT:gsub("_STATE_", "600"):gsub("_DESC_", "Avoid units costing less than 600 plus unknown radar dots and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
 		}
 	},
 	[CMD_RETREAT] = {

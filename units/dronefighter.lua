@@ -21,6 +21,7 @@ return { dronefighter = {
   canLand                = false,
 
   customParams           = {
+    bait_level_target      = 1,
     modelradius    = [[5]],
     refuelturnradius = [[80]],
     is_drone = 1,

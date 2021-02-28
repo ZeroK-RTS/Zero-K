@@ -19,6 +19,7 @@ return { shieldscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_target      = 1,
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6,

@@ -39,6 +39,7 @@ return { dronecarry = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
+    bait_level_target      = 1,
     is_drone = 1,
     modelradius    = [[13]],
   },

@@ -16,7 +16,7 @@ return { energysolar = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    bait_level_target      = 1,
+    bait_level_target = 1,
     pylonrange      = 100,
     aimposoffset    = [[0 16 0]],
     midposoffset    = [[0 0 0]],

@@ -35,7 +35,7 @@ return { droneheavyslow = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-
+    bait_level_target      = 2,
     is_drone = 1,
   },
   

@@ -178,10 +178,28 @@ local function ToggleDebugBait(cmd, line, words, player)
 	Spring.Echo("Debug Bait", debugBait)
 end
 
+local function PrintBait(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = spGetUnitDefID(unitID)
+		if targetBaitLevelDefs[unitDefID] then
+			local ud = UnitDefs[unitDefID]
+			local str = targetBaitLevelDefs[unitDefID]
+			if ud.customParams.bait_level_target then
+				str = str .. "(" .. ud.customParams.bait_level_target .. ")"
+			end
+			Spring.Utilities.UnitEcho(unitID, str)
+		end
+	end
+end
+
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_PREVENT_BAIT)
 	gadgetHandler:AddChatAction("debugbait", ToggleDebugBait, "")
+	gadgetHandler:AddChatAction("printbait", PrintBait, "")
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

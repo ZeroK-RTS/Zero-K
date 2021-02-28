@@ -17,6 +17,7 @@ return { turretriot = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_target = 4,
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
     aim_lookahead  = 50,

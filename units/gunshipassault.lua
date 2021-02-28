@@ -21,7 +21,7 @@ return { gunshipassault = {
   cruiseAlt           = 135,
 
   customParams        = {
-    bait_level_default = 2,
+    bait_level_default = 1,
     airstrafecontrol = [[1]],
     modelradius    = [[10]],
   },

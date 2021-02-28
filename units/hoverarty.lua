@@ -18,7 +18,7 @@ return { hoverarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    bait_level_default = 2,
+    bait_level_default = 1,
     modelradius    = [[32]],
     dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
