@@ -16,7 +16,7 @@ local stateData = {
 	[CMD.MOVE_STATE] = 3,
 	[CMD_PUSH_PULL] = 2,
 	[CMD_MISC_PRIORITY] = 3,
-	[CMD_GOO_GATHER] = 2,
+	[CMD_GOO_GATHER] = 3,
 	[CMD.REPEAT] = 2,
 	[CMD_RETREAT] = 4,
 	[CMD.TRAJECTORY] = 2,
@@ -49,6 +49,7 @@ local gadgetReverse = {
 	[CMD_MISC_PRIORITY] = true,
 	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
 	[CMD_PREVENT_BAIT] = true,
+	[CMD_GOO_GATHER] = true,
 }
 
 return stateData, gadgetReverse, specialHandling
