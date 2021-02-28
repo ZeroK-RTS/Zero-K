@@ -80,7 +80,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		end
 		Spring.Utilities.UnitEcho(unitID, cmdID)
 		commandsfromPlayerID[playerID] = (commandsfromPlayerID[playerID] or 0) + 1
-		Spring.Echo("T", teamID, "C", cmdID, "A", (cmdParams and #cmdParams) or 0, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
+		Spring.Echo("U", unitID, "T", teamID, "C", cmdID, "A", (cmdParams and #cmdParams) or 0, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
 		for i = 1, #cmdParams do
 			Spring.Echo("Param", i, cmdParams[i], cmdParams[i] < -SIZE_LIMIT or cmdParams[i] > SIZE_LIMIT)
 		end
@@ -99,7 +99,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			playerName[playerID] = Spring.GetPlayerInfo(playerID) or ("playerID_" .. playerID)
 		end
 		commandsfromPlayerID[playerID] = (commandsfromPlayerID[playerID] or 0) + 1
-		Spring.Echo("T", teamID, "C", cmdID, "A", cmdParams and #cmdParams, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
+		Spring.Echo("U", unitID, "T", teamID, "C", cmdID, "A", cmdParams and #cmdParams, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
 	end
 	return true
 end
