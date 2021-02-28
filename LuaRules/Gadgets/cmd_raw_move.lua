@@ -729,6 +729,9 @@ local function DoFactoryWaypointManually(unitID)
 end
 
 local function UpdateEngineMoveCheck(frame)
+	-- Maybe this could be done one frame earlier, but I've already written it this
+	-- way and I don't want to unrewrite it if gadget:UnitFromFactory has recursion.
+	-- See https://github.com/ZeroK-RTS/Zero-K/issues/4317 for a test case.
 	if not checkEngineMove then
 		return
 	end
