@@ -23,6 +23,7 @@ return { planeheavyfighter = {
   cruiseAlt              = 220,
 
   customParams           = {
+    bait_level_default = 0,
     bait_level_target      = 3,
 
     midposoffset   = [[0 3 0]],

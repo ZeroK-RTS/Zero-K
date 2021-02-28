@@ -14,6 +14,7 @@ return { jumpaa = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6,

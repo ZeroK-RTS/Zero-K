@@ -18,6 +18,7 @@ return { cloakaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[11]],
     cus_noflashlight = 1,
   },
