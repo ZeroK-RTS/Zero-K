@@ -217,17 +217,24 @@ end
 -- Unit adding/removal
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if not (unitAIBehaviour[unitDefID] and unitAIBehaviour[unitDefID].wardFireTargets) then
+	local behaviour = unitAIBehaviour[unitDefID]
+	if not (behaviour) then
 		return
 	end
+	if not behaviour.wardFireTargets then
+		behaviour = (behaviour.land or false)
+		if not (behaviour and behaviour.wardFireTargets) then
+			return
+		end
+	end
 	
-	local default = unitAIBehaviour[unitDefID].wardFireDefault
+	local default = behaviour.wardFireDefault
 
 	wardFireCmdDesc.params[1] = (default and 1) or 0
 	spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
 
 	local unitData = {
-		def = unitAIBehaviour[unitDefID],
+		def = behaviour,
 		active = default,
 		unitDefID = unitDefID,
 	}

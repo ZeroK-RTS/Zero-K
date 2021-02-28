@@ -528,7 +528,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 
 -- wardFireTargets (default false): List of targets, with leeway ranges, to wardfire against.
 -- wardFireLeeway (defaults to 10): Distance below max range to aim at when ward firing.
--- wardFireEnableLeeway (defaults to 5): Do not ward fire if enemy is within range + wardFireEnableLeeway, to free up targeting for fast moving units.
+-- wardFireEnableLeeway (defaults to 3): Do not ward fire if enemy is within range + wardFireEnableLeeway, to free up targeting for fast moving units.
 -- wardFireHeight (defaults to 0): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
 -- wardFirePredict (default to 0): Multiply target velocity to predict location for ward fire.
 -- wardFireShield (default to false): Set a shield threshold required to ward fire against shielded targets.
@@ -710,7 +710,7 @@ local behaviourConfig = {
 		fleeDistance = 150,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireEnableLeeway = 10,
+		wardFireEnableLeeway = 8,
 		wardFireShield = 50,
 		wardFireDefault = true,
 	},
@@ -734,7 +734,7 @@ local behaviourConfig = {
 		velocityPrediction = 30,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireEnableLeeway = 10,
+		wardFireEnableLeeway = 8,
 		wardFirePredict = 2,
 		wardFireShield = 50,
 		wardFireDefault = true,
@@ -759,9 +759,9 @@ local behaviourConfig = {
 			fleeLeeway = 140,
 			velocityPrediction = 30,
 			
-			wardFireTargets = personalShieldUnits,
+			wardFireTargets = personalShieldUnitsWithSafetyMargin,
 			wardFireEnableLeeway = 10,
-			wardFirePredict = 20,
+			wardFirePredict = 28,
 			wardFireShield = 50,
 			wardFireDefault = true,
 		},
@@ -829,7 +829,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFirePredict = 10,
+		wardFirePredict = 8,
 		wardFireShield = 50,
 		wardFireDefault = true,
 	},
@@ -850,7 +850,7 @@ local behaviourConfig = {
 		fleeLeeway = 120,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireEnableLeeway = 15,
+		wardFireEnableLeeway = 8,
 		wardFirePredict = 10,
 		wardFireShield = 130,
 		wardFireDefault = true,
@@ -934,7 +934,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 		
 		wardFireTargets = personalShieldUnits,
-		wardFireEnableLeeway = 15,
+		wardFireEnableLeeway = 10,
 		wardFireShield = 380,
 		wardFireDefault = true,
 	},
@@ -1121,8 +1121,8 @@ local behaviourConfig = {
 		skirmBlockedApproachFrames = 40,
 		
 		wardFireTargets = personalShieldUnitsWithSafetyMargin,
-		wardFireShield = 100,
-		wardFireDefault = false,
+		wardFireShield = 880,
+		wardFireDefault = true,
 	},
 	{
 		name = "hoverriot",
@@ -1284,9 +1284,9 @@ local behaviourConfig = {
 			skirmOrderDis = 150,
 			
 			wardFireTargets = personalShieldUnitsWithSafetyMargin,
-			wardFireShield = 800,
-			wardFirePredict = 10,
-			wardFireDefault = false,
+			wardFireShield = 500,
+			wardFirePredict = 35,
+			wardFireDefault = true,
 		},
 		sea = {
 			weaponNum = 1,
@@ -1640,7 +1640,7 @@ local behaviourConfig = {
 		
 		wardFireTargets = personalShieldUnits,
 		wardFireLeeway = 10,
-		wardFirePredict = 80,
+		wardFirePredict = 35,
 		wardFireShield = 60,
 		wardFireDefault = true,
 	},
@@ -2039,6 +2039,14 @@ local behaviourConfig = {
 		wardFireShield = 450,
 		wardFireDefault = true,
 	},
+	{
+		name = "amphsupport",
+		wardFireTargets = personalShieldUnits,
+		wardFireShield = 300,
+		wardFirePredict = 35,
+		wardFireDefault = true,
+	},
+	
 	-- Externally handled units
 	{
 		name = "energysolar",
@@ -2111,7 +2119,7 @@ local function GetBehaviourTable(behaviourData, ud)
 	
 	if behaviourData.wardFireTargets then
 		behaviourData.wardFireLeeway          = behaviourData.wardFireLeeway or 10
-		behaviourData.wardFireEnableLeeway    = behaviourData.wardFireEnableLeeway or 10
+		behaviourData.wardFireEnableLeeway    = behaviourData.wardFireEnableLeeway or 3
 		behaviourData.wardFireHeight          = behaviourData.wardFireHeight or 0
 	end
 	
