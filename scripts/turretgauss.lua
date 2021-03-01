@@ -46,9 +46,8 @@ local close = 16
 local function Open()
 	
 	Spring.SetUnitArmored(unitID,false);
-	Signal(close) --kill the closing animation if it is in process
-	SetSignalMask(open) --set the signal to kill the opening animation
-
+	Signal(aim + open + close)
+	SetSignalMask(open)
 	
 	Turn(lidLeft, y_axis, math.rad(0), unpackSpeed);
 	Turn(lidRight, y_axis, math.rad(0), unpackSpeed);
@@ -83,10 +82,8 @@ end
 
 --closing animation of the factory
 local function Close()
-	Signal(aim)
-	Signal(close)
-	Signal(open) --kill the opening animation if it is in process
-	SetSignalMask(close) --set the signal to kill the closing animation
+	Signal(aim + open + close)
+	SetSignalMask(close)
 	is_open = false;
 	
 	Move(barrel1,y_axis,1,2);
@@ -210,7 +207,7 @@ function script.AimFromWeapon(n)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal(aim)
+	Signal(aim + open + close)
 	SetSignalMask(aim)
 	
 	Turn(belt, z_axis, heading, math.rad(200));
