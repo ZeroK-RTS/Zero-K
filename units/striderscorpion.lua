@@ -23,6 +23,7 @@ return { striderscorpion = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     aimposoffset          = [[0 10 0]],
     decloak_footprint     = 5,
   },
