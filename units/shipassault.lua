@@ -137,7 +137,9 @@ return { shipassault = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-
+      customParams            = {
+        combatRange = 265,
+      },
       damage                  = {
         default = 400.01,
       },
