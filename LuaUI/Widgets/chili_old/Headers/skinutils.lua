@@ -344,7 +344,7 @@ function DrawButton(obj)
   gl.Texture(0,false)
 
   if (obj.caption) and not obj.noFont then
-    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
+    obj.font:Print(obj.caption, x + w*obj.alignPadding + (obj.captionHorAlign or 0), y + math.floor(h*0.5 - obj.font.size*0.35), obj.align, "linecenter")
   end
 end
 

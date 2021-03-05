@@ -78,20 +78,34 @@ local usingAllyteams = false
 local curGraph = {}
 
 -- Spring aliases
-local echo 		= Spring.Echo
+local echo = Spring.Echo
 
 -- CHILI CONTROLS
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
-local highlightedTeamId = 0
-local highlightedAllyTeamId = 0
-local isSpec = false
+local highlightedTeamId = false
+local highlightedAllyTeamId = false
+
+local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
+
+local TEAM_WRAP = 20
+
+local teamToPosition = {}
+do
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		if teamID ~= gaiaTeamID then
+			teamToPosition[teamID] = #teamToPosition + 1
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -156,7 +170,11 @@ end
 local getEngineArrays = function(name, caption) end
 
 local function SetHighlightedTeam(teamID)
-	highlightedTeamId = teamID
+	if highlightedTeamId == teamID then
+		highlightedTeamId = false
+	else
+		highlightedTeamId = teamID
+	end
 	if curGraph.name then
 		graphPanel:ClearChildren()
 		lineLabels:ClearChildren()
@@ -165,7 +183,11 @@ local function SetHighlightedTeam(teamID)
 end
 
 local function SetHighlightedAllyTeam(allyTeamID)
-	highlightedAllyTeamId = allyTeamID
+	if highlightedAllyTeamId == allyTeamID then
+		highlightedAllyTeamId = false
+	else
+		highlightedAllyTeamId = allyTeamID
+	end
 	if curGraph.name then
 		graphPanel:ClearChildren()
 		lineLabels:ClearChildren()
@@ -227,7 +249,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graphMax, teamID, team_num)
+local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
 	if #graphArray == 0 then
 		return
 	end
@@ -238,6 +260,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		or teamID
 	)
 	local teamColor = {r,g,b,a}
+	local teamColorDark = {r*0.32,g*0.32,b*0.32,a}
 	local lineLabel = numFormat(graphArray[#graphArray])
 
 	local name = ""
@@ -252,8 +275,6 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			graphMax = graphArray[i]
 		end
 	end
-
-	local isHighlighted = (teamID == (usingAllyteams and highlightedAllyTeamId or highlightedTeamId))
 
 	--gets vertex's from array and plots them
 	local drawLine = function()
@@ -271,39 +292,40 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		bottom = (not labelOffBottom) and 1,
 		width = "100%",
 		caption = lineLabel,
-		font = {color = teamColor},
+		font = {color = (isHighlighted and teamColor) or teamColorDark},
 	}
-
-	local textOutline = {0,0,0,0}
-	if isHighlighted then
-		textOutline = {1,1,1,1}
-		name = ">"..name.."<"
-	end
 
 	--adds player to Legend
 	if team_num then
-		local label2 = Chili.Label:New{
+		local label2 = Chili.Button:New{
 			parent = graphPanel,
-			x = 55, y = (team_num)*20 + 5,
-			width = "100%",
+			x = 40 + 230*math.floor((team_num - 1)/TEAM_WRAP), y = ((team_num - 1)%TEAM_WRAP)*20 + 16,
+			width = 230,
 			height = 20,
+
+			borderColor     = {0, 0, 0, 0},
+			borderColor2    = {0, 0, 0, 0},
+			backgroundColor = {0, 0, 0, 0},
 			caption = name,
-			font = {color = teamColor, outline = true, outlineWidth = 2, outlineColor = textOutline},
+			align= "left",
+			alignPadding = 0.08,
+			font = {color = (isHighlighted and teamColor) or teamColorDark},
 			noClickThrough = true,
-			OnMouseDown = 
-			{function(...)
-				if usingAllyteams then
-					SetHighlightedAllyTeam(teamID)
-				else
-					SetHighlightedTeam(teamID)
-				end
-			 end}
+			OnClick = {
+				function(...)
+					if usingAllyteams then
+						SetHighlightedAllyTeam(teamID)
+					else
+						SetHighlightedTeam(teamID)
+					end
+				 end
+			}
 		}
 	end
 
 	--creates graph element
 	local graph = Chili.Control:New{
-		parent	= graphPanel,
+		parent  = graphPanel,
 		x       = 0,
 		y       = 0,
 		height  = "100%",
@@ -319,19 +341,18 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			gl.PushMatrix()
 			gl.Translate(x, y, 0)
 			gl.Scale(w, h, 1)
+			gl.LineWidth((isHighlighted and 3) or 2)
 			if isHighlighted then
-				gl.Color({1,1,1,1})
-				gl.LineWidth(4.5)
-				gl.BeginEnd(GL.LINE_STRIP, drawLine)
-				gl.LineWidth(2.5)
+				gl.Color(teamColor)
 			else
-				gl.LineWidth(3)
+				gl.Color(teamColorDark)
 			end
-			gl.Color(teamColor)
 			gl.BeginEnd(GL.LINE_STRIP, drawLine)
 			gl.PopMatrix()
 		end
 	}
+	
+	return graph
 end
 
 getEngineArrays = function(statistic, labelCaption)
@@ -370,8 +391,8 @@ getEngineArrays = function(statistic, labelCaption)
 	local teamScores = {}
 	local graphMax = 0
 	local gaia = usingAllyteams
-		and select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
-		or Spring.GetGaiaTeamID()
+		and select(6, Spring.GetTeamInfo(gaiaTeamID, false))
+		or gaiaTeamID
 
 	for i = 1, #teams do
 		local teamID = teams[i]
@@ -409,12 +430,22 @@ getEngineArrays = function(statistic, labelCaption)
 		graphMax = 5
 	end
 	
+	local highlightID = (usingAllyteams and highlightedAllyTeamId)
+	if not usingAllyteams then
+		highlightID = highlightedTeamId
+	end
+	
 	local team_i = 1
-	for k, v in pairs(teamScores) do
-		if k ~= gaia then
-			drawGraph(v, graphMax*1.005, k, team_i)
+	for teamID, v in pairs(teamScores) do
+		if teamID ~= gaia and teamID ~= highlightID then
+			drawGraph(v, graphMax*1.005, teamID, teamToPosition[teamID] or 0, not highlightID)
 		end
-		team_i = team_i + 1
+	end
+	if highlightID then
+		local graph = drawGraph(teamScores[highlightID], graphMax*1.005, highlightID, teamToPosition[highlightID] or 0, true)
+		if graph then
+			graph:BringToFront()
+		end
 	end
 
 	-- Commented out for now because it's broken; see above
@@ -593,16 +624,6 @@ function widget:Initialize()
 			name = Spring.GetPlayerInfo(playerID, false)
 		end
 		teamNames[teamID] = name
-	end
-	highlightedTeamId = Spring.GetMyTeamID()
-	highlightedAllyTeamId = Spring.GetMyAllyTeamID()
-	-- _,_,isSpec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-end
-
-function widget:TeamChanged(id)
-	if id == Spring.GetMyTeamID() and not isSpec then
-		highlightedTeamId = id
-		highlightedAllyTeamId = Spring.GetMyAllyTeamID()
 	end
 end
 
