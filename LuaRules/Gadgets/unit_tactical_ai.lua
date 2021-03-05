@@ -949,7 +949,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		-- Removes a fight/autotarget-issued attack command if there is a closer enemy.
 		-- Prevents chasing past enemies that are good targets.
 		if enemy == -1 and autoCmdTag and (autoAttackEnemyID or -1) >= 0 then
-			enemy = (spGetUnitNearestEnemy(unitID, (cmdID and behaviour.idleSearchRange) or behaviour.searchRange, true) or false)
+			enemy = (spGetUnitNearestEnemy(unitID, behaviour.searchRange, true) or false)
 			if enemy and enemy ~= autoAttackEnemyID then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, autoCmdTag, 0)
 			end
@@ -991,7 +991,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if not alwaysJink then
 			if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
-				enemy = (spGetUnitNearestEnemy(unitID, (cmdID and behaviour.idleSearchRange) or behaviour.searchRange, true) or false)
+				enemy = (spGetUnitNearestEnemy(unitID, (cmdID and behaviour.searchRange) or behaviour.idleSearchRange, true) or false)
 			end
 			--Spring.Utilities.UnitEcho(enemy)
 			--Spring.Echo("enemy spotted 2")
