@@ -2,7 +2,9 @@ if GG.StartStopMovingControl then
 	return
 end
 
-function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess, fallTimeLeeway)
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
+
+function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess, fallTimeLeeway, pileHaxUponHax)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local spGetUnitVelocity = Spring.GetUnitVelocity
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -44,6 +46,12 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 					if speed > ((externalDataAccess and externalDataAccess.thresholdSpeed) or thresholdSpeed) then
 						moving = true
 						startFunc()
+					elseif pileHaxUponHax then
+						local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+						if cmdID == CMD_RAW_MOVE then
+							moving = true
+							startFunc()
+						end
 					end
 				end
 			end

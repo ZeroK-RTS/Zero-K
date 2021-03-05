@@ -243,7 +243,7 @@ function script.StartMoving()
 	movingData.moving = true
 	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
-	movingData.thresholdSpeed = 0.01
+	movingData.thresholdSpeed = 0.02
 end
 
 function script.StopMoving()
@@ -264,7 +264,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.3, false, movingData, 4)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.3, false, movingData, 4, true)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)

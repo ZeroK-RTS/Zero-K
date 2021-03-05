@@ -20,6 +20,7 @@ return { spidercrabe = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -10 0]],
     modelradius    = [[30]],
+    unstick_leeway    = 60, -- Don't lose move orders for longer while preparing to move.
   },
 
   damageModifier         = 0.25,
