@@ -102,11 +102,14 @@ do
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		if teamID ~= gaiaTeamID then
-			teamToPosition[teamID] = #teamToPosition + 1
+			teamToPosition[teamID+1] = #teamToPosition + 1
 		end
 	end
 end
 
+local function TeamToPosition(teamID)
+	return teamToPosition[teamID+1] or 0
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --utilities
@@ -438,11 +441,11 @@ getEngineArrays = function(statistic, labelCaption)
 	local team_i = 1
 	for teamID, v in pairs(teamScores) do
 		if teamID ~= gaia and teamID ~= highlightID then
-			drawGraph(v, graphMax*1.005, teamID, teamToPosition[teamID] or 0, not highlightID)
+			drawGraph(v, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
 		end
 	end
 	if highlightID then
-		local graph = drawGraph(teamScores[highlightID], graphMax*1.005, highlightID, teamToPosition[highlightID] or 0, true)
+		local graph = drawGraph(teamScores[highlightID], graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
 		if graph then
 			graph:BringToFront()
 		end
