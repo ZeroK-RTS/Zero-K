@@ -77,9 +77,13 @@ local wardFireCmdDesc = {
 local function DoUnitUpdate(unitID, unitData)
 	if doDebug then
 		Spring.Echo("===== DEBUG WARD FIRE", unitID, "=====")
-		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID))
+		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID), "bait", GG.baitPrevention_GetLevel(unitID))
 	end
 	if (not unitData.active) or (Spring.Utilities.GetUnitFireState(unitID) ~= 2) or GG.GetUnitHasSetTarget(unitID) then
+		return
+	end
+	local baitLevel = (GG.baitPrevention_GetLevel and GG.baitPrevention_GetLevel(unitID)) or 0
+	if baitLevel > 2 then
 		return
 	end
 	

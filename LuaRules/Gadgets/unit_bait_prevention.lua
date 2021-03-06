@@ -195,6 +195,10 @@ local function PrintBait(cmd, line, words, player)
 	end
 end
 
+function GG.baitPrevention_GetLevel(unitID)
+	return unitID and unitBaitLevel[unitID]
+end
+
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_PREVENT_BAIT)
