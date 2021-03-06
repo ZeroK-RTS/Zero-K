@@ -564,7 +564,7 @@ local function SetupChiliStuff()
 		name      = 'DefenseRangesWindow',
 		x         =  50,
 		y         = 150,
-		width     = 120,
+		width     = 130,
 		height    = 168,
 		padding = {12, 12, 12, 12},
 		dockable  = true,

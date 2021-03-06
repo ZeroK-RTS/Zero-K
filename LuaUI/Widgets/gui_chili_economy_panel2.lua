@@ -184,22 +184,96 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local extraPanels = {
+	efficiency = {
+		title = "Efficiency",
+		labelRight = "0%",
+		colorFunc = function (value)
+			if value <= 0 then
+				return {0.5, 0.8, 0.3}
+			end
+			value = 1/value
+			if value < 0.2 then
+				return {1, 0.3, 0.3}
+			end
+			if value < 1.2 then
+				local prop = (value - 0.2)
+				return {1 - 0.7*prop, 0.3 + 0.7*prop, 0.3}
+			end
+			if value < 2 then
+				return {0.3, 1, 0.3}
+			end
+			if value < 3.5 then
+				local prop = (value - 2)/1.5
+				return {0.3 + 0.2*prop, 1 - 0.2*prop, 0.3}
+			end
+			return {0.5, 0.8, 0.3}
+		end,
+	},
+	usage = {
+		title = "Usage",
+		labelRight = "0%",
+		colorFunc = function (value)
+			if value < 0.2 then
+				return {1, 0.3, 0.3}
+			end
+			if value < 1.2 then
+				local prop = (value - 0.2)
+				return {1 - 0.7*prop, 0.3 + 0.7*prop, 0.3}
+			end
+			if value < 2 then
+				return {0.3, 1, 0.3}
+			end
+			if value < 3.5 then
+				local prop = (value - 2)/1.5
+				return {0.3 + 0.2*prop, 1 - 0.2*prop, 0.3}
+			end
+			return {0.5, 0.8, 0.3}
+		end,
+	},
+	overdrive = {
+		title = "Overdrive",
+		labelCount = 3,
+	},
+	wind = {
+		title = "Wind",
+		labelRight = "0%",
+		colorFunc = function (value)
+			return {1 - 0.7*value, 0.3 + 0.7*value, 0.7}
+		end,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 options_path = 'Settings/HUD Panels/Economy Panel'
+
+local function UpdateExtraPanelHide(wantHide)
+	for key, data in pairs(extraPanels) do
+		if data.window then
+			data.window.SetTempHide(wantHide)
+		end
+	end
+end
 
 local function option_recreateWindow()
 	local x,y,w,h = DestroyWindow()
 	if options.ecoPanelHideSpec.value then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if spectating then
+			UpdateExtraPanelHide(true)
 			return false
 		end
 	end
 	
 	if externalForceHide then
+		UpdateExtraPanelHide(true)
 		return false
 	end
 	
 	CreateWindow(x,y,w,h)
+	UpdateExtraPanelHide(false)
 	return true
 end
 
@@ -232,14 +306,20 @@ local function option_colourBlindUpdate()
 	col_highlight = {1, 0.5, 0.5, 1}
 end
 
+local function option_toggleExtra(self, value)
+	-- Global func
+	DoExtraToggle(self.extraKey, self.value)
+end
+
 options_order = {
 	'lbl_metal', 'metalFlash', 'metalWarning',
 	'lbl_energy', 'energyFlash', 'energyWarning', 'eExcessFlash',
 	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve', 
+	'lbl_extra', 'panel_efficiency', 'panel_usage', 'panel_overdrive', 'panel_wind',
 	'lbl_visual', 'ecoPanelHideSpec', 
 	'flowAsArrows', 'opacity',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
- 
+
 options = {
 	lbl_metal = {name='Metal Warnings', type='label'},
 	metalFlash = {
@@ -291,6 +371,39 @@ options = {
 		name  = "Initial Metal Reserve",
 		type  = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
+	},
+	lbl_extra = {name='Extras', type='label'},
+	panel_efficiency = {
+		name  = 'Show Efficiency',
+		type  = 'bool',
+		value = false,
+		desc = "Show the minimum of Metal Income/Metal Pull and Energy Income/Energy Pull. Use Ctrl+F11 to reposition as Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'efficiency',
+	},
+	panel_usage = {
+		name  = 'Show Usage',
+		type  = 'bool',
+		value = false,
+		desc = "Show the minimum of Metal Pull/Metal Income. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'usage',
+	},
+	panel_overdrive = {
+		name  = 'Show Overdrive',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive values. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'overdrive',
+	},
+	panel_wind = {
+		name  = 'Show Wind',
+		type  = 'bool',
+		value = false,
+		desc = "Show wind strength. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'wind',
 	},
 	lbl_visual = {name='Visuals', type='label'},
 	ecoPanelHideSpec = {
@@ -612,6 +725,15 @@ local function Format(input, override)
 	end
 end
 
+local function FormatPercent(input, colorFunc)
+	local leadingString = ""
+	if colorFunc then
+		local color = colorFunc(input)
+		leadingString = string.char(255, color[1] * 255, color[2] * 255, color[3] * 255)
+	end
+	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
+end
+
 local  metalWarnOpt = options.metalWarning
 local energyWarnOpt = options.energyWarning
 
@@ -900,9 +1022,10 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice ..
 	"\n   " .. strings["resbar_storage"] ..
-	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity) ..
+	"\n " ..
+	"\n" .. strings["resbar_economy_advice"] .. ": " .. advice
 
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
@@ -914,6 +1037,31 @@ function widget:GameFrame(n)
 	--// Net income indicator on resource bars.
 	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
 	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+
+	if extraPanels.overdrive.window then
+		extraPanels.overdrive.window.SetText(odEffStr, 1)
+		extraPanels.overdrive.window.SetText(team_metalOverdrive, 2)
+		extraPanels.overdrive.window.SetText(team_energyOverdrive, 3)
+	end
+	if extraPanels.usage.window then
+		if mInco+mReci > 0 then
+			extraPanels.usage.window.SetText(FormatPercent(mPull/(mInco + mReci), extraPanels.usage.colorFunc))
+		else
+			extraPanels.usage.window.SetText(FormatPercent(0, extraPanels.usage.colorFunc))
+		end
+	end
+	if extraPanels.efficiency.window then
+		local energyEff = (realEnergyPull > 0 and eInco/realEnergyPull) or 0
+		local metalEff = (mPull > 0 and (mInco+mReci)/mPull) or 0
+		local efficiency = math.min(energyEff, metalEff)
+		extraPanels.efficiency.window.SetText(FormatPercent(efficiency, extraPanels.efficiency.colorFunc))
+	end
+	if extraPanels.wind.window then
+		local windStrength = Spring.GetGameRulesParam("WindStrength")
+		if windStrength then
+			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
+		end
+	end
 
 	-- save so that we can switch representation without recalculating
 	bar_metal.net = netMetal
@@ -1077,6 +1225,119 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Extra Panels
+
+local function GetExtraPanel(name, extraData)
+	local show = true
+	extraData.labelCount = extraData.labelCount or 1
+	extraData.minWidth = extraData.minWidth or 100
+	
+	local extraWindow = Chili.Window:New{
+		backgroundColor = {0, 0, 0, 0},
+		color = {0, 0, 0, 0},
+		parent = Chili.Screen0,
+		dockable = true,
+		name = name .. "_extraWindow",
+		padding = {0,0,0,0},
+		x = 150,
+		y = 150,
+		clientWidth  = extraData.minWidth,
+		clientHeight = 37 + 35*extraData.labelCount,
+		minWidth  = extraData.minWidth,
+		minHeight = 72,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+		dockableSavePositionOnly = true,
+	}
+	local holderPanel = Chili.Panel:New{
+		classname = "main_window_small_tall",
+		backgroundColor = {0, 0, 0, 0},
+		parent = extraWindow,
+		padding = {0,0,0,0},
+		y      = 0,
+		x      = 0,
+		right  = 0,
+		bottom = 0,
+		dockable = false;
+		draggable = false,
+		resizable = false,
+	}
+	
+	local title = Chili.Label:New{
+		x      = "5%",
+		y      = 10,
+		width  = "90%",
+		height = 20,
+		caption = extraData.title,
+		valign = "center",
+		align  = "center",
+		autosize = false,
+		parent = holderPanel
+	}
+	
+	local labels = {}
+	for i = 1, extraData.labelCount do
+		labels[i] = Chili.Label:New{
+			x      = "10%",
+			y      = i*35 - 5,
+			right  = extraData.labelRight or "10%",
+			height = 30,
+			caption = "0.0",
+			valign = "center",
+			align  = "center",
+			autosize = false,
+			parent = holderPanel,
+			font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		}
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.SetText(newText, labelIndex)
+		if show then
+			labelIndex = labelIndex or 1
+			labels[labelIndex]:SetCaption(newText)
+		end
+	end
+	
+	function externalFunctions.Show(newShow)
+		if show == newShow then
+			return
+		end
+		show = newShow
+		holderPanel:SetVisibility(show)
+	end
+	
+	function externalFunctions.SetTempHide(shouldHide)
+		if shouldHide then
+			holderPanel:SetVisibility(false)
+			return
+		end
+		holderPanel:SetVisibility(show)
+	end
+	
+	return externalFunctions
+end
+
+function DoExtraToggle(name, value)
+	if not extraPanels[name] then
+		return
+	end
+	Spring.Echo("extraPanels", name, value)
+	local extraData = extraPanels[name]
+	if value and not extraData.window then
+		extraData.window = GetExtraPanel(name, extraData)
+	end
+	if extraData.window then
+		extraData.window.Show(value)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local externalFunctions = {}
 
@@ -1090,6 +1351,7 @@ function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 	else
 		window:SetVisibility(newVisibility)
 	end
+	UpdateExtraPanelHide(not newVisibility)
 end
 
 function externalFunctions.SetFlashEnabled(newEnabled)
