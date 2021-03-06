@@ -21,6 +21,7 @@ return { gunshipheavyskirm = {
   cruiseAlt           = 240,
 
   customParams        = {
+    bait_level_default = 0,
     airstrafecontrol = [[0]],
     modelradius      = [[10]],
     aim_lookahead    = 200,
