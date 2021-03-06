@@ -15,7 +15,7 @@ return { vehheavyarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    bait_level_default = 1,
+    bait_level_default = 2,
     dontfireatradarcommand = '0',
   },
 
