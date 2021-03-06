@@ -95,7 +95,7 @@ local updateOpacity = false
 local reserveSentTimer = false
 local blinkMetal = 0
 local blinkEnergy = 0
-local BLINK_UPDATE_RATE = 0.1
+local BLINK_UPDATE_RATE = 0.06
 local blinkM_status = false
 local blinkE_status = false
 local excessE = false
@@ -233,26 +233,48 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalFlash', 'metalWarning', 'opacity',
-	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve', 'flowAsArrows',
+	'lbl_metal', 'metalFlash', 'metalWarning',
+	'lbl_energy', 'energyFlash', 'energyWarning', 'eExcessFlash',
+	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve', 
+	'lbl_visual', 'ecoPanelHideSpec', 
+	'flowAsArrows', 'opacity',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
  
 options = {
-	ecoPanelHideSpec = {
-		name  = 'Hide if spectating',
-		type  = 'bool',
-		value = false,
-		noHotkey = true,
-		desc = "Should the panel hide when spectating?",
-		OnChange = option_recreateWindow
+	lbl_metal = {name='Metal Warnings', type='label'},
+	metalFlash = {
+		name  = "Metal Excess Flash",
+		type  = "number",
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Metal storage will flash when metal storage exceeds this value."
+	},
+	metalWarning = {
+		name  = "Metal Excess Warning",
+		type  = "number",
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when metal storage exceeds this value."
+	},
+	lbl_energy = {name='Energy Warnings', type='label'},
+	energyFlash = {
+		name  = "Energy Stall Flash",
+		type  = "number",
+		value = 0.1, min=0,max=1,step=0.02,
+		desc = "Energy storage will flash when it drops below this fraction of your total storage."
+	},
+	energyWarning = {
+		name  = "Energy Stall Warning",
+		type  = "number",
+		value = 0.1, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when energy storage drops below this value."
 	},
 	eExcessFlash = {
 		name  = 'Flash On Energy Excess',
 		type  = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
+		desc = "When enabled, energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
+	lbl_reserve = {name='Reserve', type='label'},
 	enableReserveBar = {
 		name  = 'Enable Reserve',
 		type  = 'bool',
@@ -270,29 +292,14 @@ options = {
 		type  = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
-	energyFlash = {
-		name  = "Energy Stall Flash",
-		type  = "number",
-		value = 0.1, min=0,max=1,step=0.02,
-		desc = "Energy storage will flash when it drops below this fraction of your total storage."
-	},
-	energyWarning = {
-		name  = "Energy Stall Warning",
-		type  = "number",
-		value = 0.1, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when energy storage drops below this value."
-	},
-	metalFlash = {
-		name  = "Metal Excess Flash",
-		type  = "number",
-		value = 0.9, min = 0,max = 1, step = 0.02,
-		desc = "Metal storage will flash when metal storage exceeds this value."
-	},
-	metalWarning = {
-		name  = "Metal Excess Warning",
-		type  = "number",
-		value = 0.9, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when metal storage exceeds this value."
+	lbl_visual = {name='Visuals', type='label'},
+	ecoPanelHideSpec = {
+		name  = 'Hide if spectating',
+		type  = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = "Should the panel hide when spectating?",
+		OnChange = option_recreateWindow
 	},
 	flowAsArrows = {
 		name  = "Flow as arrows",
@@ -501,17 +508,17 @@ local BlinkStatusFunc = {
 	[1] = function (index)
 		index = index%12
 		if index < 6 then
-			return index*0.8/5
+			return 0.05 + index*0.9/5
 		else
-			return (11 - index)*0.8/5
+			return 0.05 + (11 - index)*0.9/5
 		end
 	end,
 	[2] = function (index)
 		index = index%8
 		if index < 4 then
-			return 0.25 + index*0.75/3
+			return 0.2 + index*0.8/3
 		else
-			return 0.25 + (7 - index)*0.75/3
+			return 0.2 + (7 - index)*0.8/3
 		end
 	end,
 }
@@ -527,7 +534,7 @@ local function UpdateBlink(dt)
 	blinkIndex = (blinkIndex + 1)%24
 	
 	if blinkM_status then
-		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, BlinkStatusFunc[blinkM_status](blinkIndex)))
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.6}, col_highlight, BlinkStatusFunc[blinkM_status](blinkIndex)))
 	end
 	
 	if blinkE_status then
@@ -704,12 +711,17 @@ function widget:GameFrame(n)
 	if teamTotalMetalStored > teamTotalMetalCapacity then
 		teamTotalMetalStored = teamTotalMetalCapacity
 	end
+
+	--// Storage, income and pull numbers
+	local realEnergyPull = ePull
+	local netMetal = mInco - mPull + mReci
+	local netEnergy = eInco - realEnergyPull
 	
 	-- Metal Blink
 	local metalFlashOptValue = options.metalFlash.value
-	if flashModeEnabled and (mCurr >= mStor or teamMetalWaste > 0) and metalFlashOptValue < 1 then
+	if flashModeEnabled and ((netMetal > 0 and mCurr >= mStor) or teamMetalWaste > 0) and metalFlashOptValue < 1 then
 		blinkM_status = 2
-	elseif flashModeEnabled and mCurr >= mStor * metalFlashOptValue and metalFlashOptValue < 1 then
+	elseif flashModeEnabled and (netMetal > 0 and mCurr >= mStor * metalFlashOptValue and metalFlashOptValue < 1) then
 		-- Blink less fast
 		blinkM_status = 1
 	elseif blinkM_status then
@@ -727,12 +739,6 @@ function widget:GameFrame(n)
 	
 	local ODEFlashThreshold = 0.1
 
-	--// Storage, income and pull numbers
-	local realEnergyPull = ePull
-
-	local netMetal = mInco - mPull + mReci
-	local netEnergy = eInco - realEnergyPull
-	
 	-- Energy Blink
 	local wastingE = false
 	if options.eExcessFlash.value then
@@ -756,7 +762,7 @@ function widget:GameFrame(n)
 	-- Warnings
 	local  metalWarnLevel =  metalWarnOpt.value
 	local energyWarnLevel = energyWarnOpt.value
-	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local  metalWarning = (netMetal > 0 and mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
 	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
@@ -1170,7 +1176,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
 		clientWidth  = oldW or economyPanelWidth,
-		clientHeight = oldH or 110,
+		clientHeight = oldH or 116,
 		minHeight = 100,
 		draggable = false,
 		resizable = false,

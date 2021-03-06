@@ -17,6 +17,7 @@ end
 -- Widget option functions
 
 local CHAT_PADDING = 100
+local DEFAULT_RESOURCE_BAR_HEIGHT = 116
 local USE_SIZE_FACTOR = false
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
@@ -374,7 +375,7 @@ local function SetupDefaultPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
 	local resourceBarRight = resourceBarWidth + resourceBarX
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
@@ -554,7 +555,7 @@ local function SetupNewPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -734,7 +735,7 @@ local function SetupNewUITop()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.max(580 * SIZE_FACTOR, math.min(screenWidth - 700, 660 * SIZE_FACTOR))
-	local resourceBarHeight = 110 * SIZE_FACTOR
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT * SIZE_FACTOR
 	
 	-- Chicken
 	local chickenWidth = 189 * SIZE_FACTOR
@@ -1129,7 +1130,7 @@ local function SetupCraftyPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth + 4)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -1257,7 +1258,7 @@ local function SetupEnsemblePreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -1310,7 +1311,7 @@ local function SetupWestwoodPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = screenWidth*5/22 + 20
-	local resourceBarHeight = 65
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = screenWidth - resourceBarWidth
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
