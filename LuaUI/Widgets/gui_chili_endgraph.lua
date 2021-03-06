@@ -98,18 +98,43 @@ local TEAM_WRAP = 20
 
 local teamToPosition = {}
 do
-	local teamList = Spring.GetTeamList()
-	for i = 1, #teamList do
-		local teamID = teamList[i]
-		if teamID ~= gaiaTeamID then
-			teamToPosition[teamID+1] = #teamToPosition + 1
+	local pos = 1
+	
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeam = false
+	if not spectating then
+		myAllyTeam = Spring.GetMyAllyTeamID()
+		teamToPosition[Spring.GetMyTeamID()] = pos
+		pos = pos + 1
+	end
+	
+	local function SetAllyTeamPositions(allyTeamID)
+		local teamList = Spring.GetTeamList(allyTeamID)
+		for i = 1, #teamList do
+			local teamID = teamList[i]
+			if teamID ~= gaiaTeamID and not teamToPosition[teamID] then
+				teamToPosition[teamID] = pos
+				pos = pos + 1
+			end
+		end
+	end
+	
+	if myAllyTeam then
+		SetAllyTeamPositions(myAllyTeam)
+	end
+	
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		if allyTeamList[i] ~= myAllyTeam then
+			SetAllyTeamPositions(allyTeamList[i])
 		end
 	end
 end
 
 local function TeamToPosition(teamID)
-	return teamToPosition[teamID+1] or 0
+	return teamToPosition[teamID] or 0
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --utilities
