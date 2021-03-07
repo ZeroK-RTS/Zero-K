@@ -72,7 +72,11 @@ function script.FireWeapon(num)
 end
 
 function script.AimFromWeapon(num)
-	return base
+	if waterFire then
+		return base
+	else
+		return turret
+	end
 end
 
 function script.QueryWeapon(num)
