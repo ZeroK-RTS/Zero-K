@@ -227,7 +227,7 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("WindHeading", 0)
 	
 	GG.WindStrength = scaleWind(strength)
-	Spring.SetGameRulesParam("WindStrength", scaleWind(strength))
+	Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)
 
 	local minWindMult = 1
