@@ -109,22 +109,26 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function scaleWind(str) 
+	return (strength - windMin)/windRange
+end
+
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		if (not IterableMap.IsEmpty(windmills)) then
-			if step_count > 0 then
-				strength = strength + strength_step
-				step_count = step_count - 1
-			end
-			local _, _, _, windStrength, x, _, z = spGetWind()
-			local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
-			
-			GG.WindHeading = windHeading
-			GG.WindStrength = (strength - windMin)/windRange
-			Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
-			Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
-			
 		
+		if step_count > 0 then
+			strength = strength + strength_step
+			step_count = step_count - 1
+		end
+		local _, _, _, windStrength, x, _, z = spGetWind()
+		local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
+		
+		GG.WindHeading = windHeading
+		GG.WindStrength = scaleWind(strength)
+		Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
+		Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
+		
+		if (not IterableMap.IsEmpty(windmills)) then
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
@@ -214,12 +218,16 @@ function gadget:Initialize()
 	windMax = 2.5 * energyMult
 	tidalStrength = 1.2 * energyMult
 	windRange = windMax - windMin
+	
+	strength = (rand() * windRange) + windMin
 
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
 	Spring.SetGameRulesParam("tidalStrength",tidalStrength)
 	Spring.SetGameRulesParam("WindHeading", 0)
-	Spring.SetGameRulesParam("WindStrength", 0)
+	
+	GG.WindStrength = scaleWind(strength)
+	Spring.SetGameRulesParam("WindStrength", scaleWind(strength))
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)
 
 	local minWindMult = 1
@@ -246,7 +254,7 @@ function gadget:Initialize()
 	-- effect between 0% (flat maps) and 100% (mountained maps)
 	--slope = minWindMult * 1/(1+math.exp(4 - groundExtreme/105))
 
-	strength = (rand() * windRange) + windMin
+
 
 	for i = 1, #teamList do
 		teamEnergy[teamList[i]] = 0
