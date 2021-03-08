@@ -6,6 +6,12 @@ local arm2 = piece 'arm2'
 local turret = piece 'turret'
 local firepoint = piece 'firepoint'
 
+local spGetUnitBasePosition = Spring.GetUnitBasePosition
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGetUnitPosition = Spring.GetUnitPosition
+local spPlaySoundFile = Spring.PlaySoundFile
+local spGetUnitHealth = Spring.GetUnitHealth
+
 local waterFire = false
 
 local smokePiece = {base}
@@ -27,11 +33,11 @@ local function Bob(rot)
 end
 
 function script.Create()
-	--while select(5, Spring.GetUnitHealth(unitID)) < 1 do
+	--while select(5, spGetUnitHealth(unitID)) < 1 do
 	--	Sleep(400)
 	--end
-	local x,_,z = Spring.GetUnitBasePosition(unitID)
-	local y = Spring.GetGroundHeight(x,z)
+	local x,_,z = spGetUnitBasePosition(unitID)
+	local y = spGetGroundHeight(x,z)
 	if y > 0 then
 		Turn(arm1, z_axis, math.rad(-70), math.rad(80))
 		Turn(arm2, z_axis, math.rad(70), math.rad(80))
@@ -63,16 +69,20 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	local px, py, pz = Spring.GetUnitPosition(unitID)
+	local px, py, pz = spGetUnitPosition(unitID)
 	if waterFire then
-		Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+		spPlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
 	else
-		Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+		spPlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
 	end
 end
 
 function script.AimFromWeapon(num)
-	return base
+	if waterFire then
+		return base
+	else
+		return turret
+	end
 end
 
 function script.QueryWeapon(num)
