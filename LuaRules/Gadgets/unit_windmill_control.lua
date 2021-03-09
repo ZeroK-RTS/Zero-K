@@ -110,7 +110,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function scaleWind(str) 
-	return (strength - windMin)/windRange
+	return (str - windMin)/windRange
 end
 
 function gadget:GameFrame(n)
