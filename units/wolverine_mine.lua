@@ -18,6 +18,7 @@ return { wolverine_mine = {
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    bait_level_default = 0,
     bait_level_target      = 1, -- Just for safety.
     dontcount = [[1]],
     mobilebuilding = [[1]],
