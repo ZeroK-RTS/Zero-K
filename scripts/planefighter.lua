@@ -6,6 +6,8 @@ local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing,
 
 local smokePiece = {base, rwing, lwing}
 
+local active = true
+
 --variables
 local shotCycle = 0
 local flare = {
@@ -97,6 +99,14 @@ function script.StopMoving()
 	deactivate()
 end
 
+function script.Activate ()
+	active = true
+end
+
+function script.Deactivate ()
+	active=false
+end
+
 function script.QueryWeapon(num)
 	if num == 1 then
 		return flare[shotCycle]
@@ -110,7 +120,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1)
+	return active and not (GetUnitValue(COB.CRASHING) == 1)
 end
 
 function script.FireWeapon(num)
