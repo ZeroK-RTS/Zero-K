@@ -104,7 +104,7 @@ function script.Activate ()
 end
 
 function script.Deactivate ()
-	active=false
+	active = false
 end
 
 function script.QueryWeapon(num)
