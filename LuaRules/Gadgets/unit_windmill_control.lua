@@ -120,7 +120,7 @@ function gadget:GameFrame(n)
 			strength = strength + strength_step
 			step_count = step_count - 1
 		end
-		local _, _, _, windStrength, x, _, z = spGetWind()
+		local _, _, _, engineStrength, x, _, z = spGetWind()
 		local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
 		
 		GG.WindHeading = windHeading
