@@ -12,7 +12,7 @@ return { staticantinuke = {
   buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[antinuke_decal.dds]],
   buildPic                      = [[staticantinuke.png]],
-  category                      = [[SINK]],
+  category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 55 110]],
   collisionVolumeType           = [[box]],
@@ -30,6 +30,7 @@ return { staticantinuke = {
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
+  floater                       = true,
   footprintX                    = 5,
   footprintZ                    = 8,
   iconType                      = [[antinuke]],
