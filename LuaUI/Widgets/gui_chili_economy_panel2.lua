@@ -1333,6 +1333,13 @@ function DoExtraToggle(name, value)
 	end
 	if extraData.window then
 		extraData.window.Show(value)
+
+		if value and name=="wind" then 
+			local windStrength = Spring.GetGameRulesParam("WindStrength")
+			if windStrength then
+				extraData.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
+			end
+		end
 	end
 end
 
@@ -1395,6 +1402,7 @@ function widget:Initialize()
 	option_colourBlindUpdate()
 
 	option_recreateWindow()
+
 end
 
 function CreateWindow(oldX, oldY, oldW, oldH)
