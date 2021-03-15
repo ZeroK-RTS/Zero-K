@@ -38,7 +38,7 @@ return { vehassault = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName             = [[corraid.s3o]],
-  script                 = [[vehassault.cob]],
+  script                 = [[vehassault.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
