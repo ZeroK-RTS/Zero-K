@@ -369,8 +369,13 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	end
 	
 	local AddNextDroneFromQueue = function(inputID)
-		if #carrierList[inputID].droneInQueue > 0 then
-			if AddUnitToEmptyPad(inputID, carrierList[inputID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
+		local carrier = carrierList[inputID]
+		local droneQueue = carrier.droneInQueue
+		if #droneQueue > 0 then
+			local droneSetID = droneQueue[1]
+			if AddUnitToEmptyPad(inputID, droneSetID) then --pad cleared, immediately add any unit from queue
+				local set = carrier.droneSets[droneSetID]
+				set.buildCount = set.buildCount + 1
 				table.remove(carrierList[inputID].droneInQueue, 1)
 			end
 		end
