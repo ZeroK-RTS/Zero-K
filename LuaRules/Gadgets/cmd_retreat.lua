@@ -110,8 +110,9 @@ for i = 1, #UnitDefs do
 	local weapons = def.weapons
 	for w = 1, #weapons do
 		local wep = weapons[w].weaponDef
-		if WeaponDefs[wep].shieldPower and WeaponDefs[wep].shieldPower > 0 and shields[i] == nil then
-			shields[i] = WeaponDefs[wep].shieldPower
+		local shieldPower = WeaponDefs[wep].shieldPower
+		if shieldPower and shieldPower > 0 and shields[i] == nil then
+			shields[i] = shieldPower
 			--Spring.Echo("Added shield retreat to " .. i .. " ( has " .. tostring(WeaponDefs[wep].shieldPower) .. ")")
 		end
 	end
@@ -390,10 +391,11 @@ local function CheckSetWantRetreat(unitID)
 		return
 	end
 	local shieldratio
-	local unitdef = spGetUnitDefID(unitID)
-	if shields[unitdef] then
+	local unitDefID = spGetUnitDefID(unitID)
+	local maxShield = shields[unitDefID]
+	if maxShield then
 		local _, currentcharge = spGetUnitShieldState(unitID)
-		shieldratio = currentcharge / shields[unitdef]
+		shieldratio = currentcharge / maxShield
 	else
 		shieldratio = 1
 	end
