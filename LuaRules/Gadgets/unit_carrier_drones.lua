@@ -821,7 +821,8 @@ function gadget:GameFrame(f)
 					elseif (set.droneCount + set.queueCount < set.maxDrones) and set.buildCount < set.config.maxBuild then
 						if generateDrones[carrierID] then
 							for n = 1, set.config.spawnSize do
-								if set.droneCount + set.queueCount >= set.maxDrones then
+								if set.droneCount + set.queueCount >= set.maxDrones
+								or set.buildCount >= set.config.maxBuild then
 									break
 								end
 
