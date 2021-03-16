@@ -23,6 +23,8 @@ local aoeColor             = {1, 0, 0, 1}
 local aoeLineWidthMult     = 64
 local scatterColor         = {1, 1, 0, 1}
 local scatterLineWidthMult = 1024
+local depthColor           = {1, 0, 0, 0.5}
+local depthLineWidth       = 1
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
@@ -75,6 +77,7 @@ local glColor                = gl.Color
 local glDeleteList           = gl.DeleteList
 local glDepthTest            = gl.DepthTest
 local glDrawGroundCircle     = gl.DrawGroundCircle
+local glLineStipple          = gl.LineStipple
 local glLineWidth            = gl.LineWidth
 local glPointSize            = gl.PointSize
 local glPopMatrix            = gl.PopMatrix
@@ -131,16 +134,16 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true)
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true, false, true)
 
 	if (mouseTargetType == "ground") then
-		return mouseTarget[1], mouseTarget[2], mouseTarget[3]
+		return mouseTarget[1], mouseTarget[2], mouseTarget[3], true
 	elseif (mouseTargetType == "unit") then
 		return GetUnitPosition(mouseTarget)
 	elseif (mouseTargetType == "feature") then
-		local _, coords = TraceScreenRay(mx, my, true, true)
+		local _, coords = TraceScreenRay(mx, my, true, true, false, true)
 		if coords and coords[3] then
-			return coords[1], coords[2], coords[3]
+			return coords[1], coords[2], coords[3], true
 		else
 			return GetFeaturePosition(mouseTarget)
 		end
@@ -699,6 +702,20 @@ local function DrawOrbitalScatter(scatter, tx, ty, tz)
 	glColor(1,1,1,1)
 	glLineWidth(1)
 end
+
+--------------------------------------------------------------------------------
+--underwater
+--------------------------------------------------------------------------------
+local function DrawWaterDepth(tx, ty, tz)
+	glColor(depthColor)
+	glLineWidth(depthLineWidth)
+	glLineStipple(1, 255)
+	glBeginEnd(GL_LINES, VertexList, {{tx,0,tz},{tx,ty,tz}})
+	glLineStipple(false)
+	glColor(1,1,1,1)
+	glLineWidth(1)
+end
+
 --------------------------------------------------------------------------------
 --callins
 --------------------------------------------------------------------------------
@@ -717,7 +734,7 @@ end
 function widget:DrawWorld()
 	mouseDistance = GetMouseDistance() or 1000
 
-	local tx, ty, tz = GetMouseTargetPosition()
+	local tx, ty, tz, targetIsGround = GetMouseTargetPosition()
 	if (not tx) then
 		return
 	end
@@ -764,6 +781,9 @@ function widget:DrawWorld()
 		fy = fy + GetUnitRadius(unitID)
 	end
 
+	if ty < 0 and targetIsGround then
+		DrawWaterDepth(tx, ty, tz)
+	end
 	if (not info.waterWeapon) then
 		ty = max(0, ty)
 	end

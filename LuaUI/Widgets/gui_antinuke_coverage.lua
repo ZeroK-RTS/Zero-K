@@ -23,7 +23,6 @@ local nukeDefs = {
 local intDefs = {
 	[UnitDefNames["staticantinuke"].id] = {
 		range = 2500,
-		rangeSq = 2500^2,
 		static = true,
 		oddX = (5 % 2)*8,
 		oddZ = (8 % 2)*8,
@@ -45,6 +44,7 @@ local specUnit = {}
 local spectating = Spring.GetSpectatingState()
 local myTeamID = Spring.GetMyTeamID()
 local myAllyTeamID = Spring.GetMyAllyTeamID()
+local rangeFudgeMargin = 0
 
 --------------------------------------------------------------------------------
 -- Unit handling
@@ -68,7 +68,6 @@ local function AddUnit(unitID, unitDefID, intMap, nukeMap)
 		
 		intMap[unitID] = {
 			range = def.range,
-			rangeSq = def.rangeSq,
 			static = def.static,
 			incomplete = inBuild,
 		}
@@ -243,6 +242,9 @@ local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetMouseState       = Spring.GetMouseState
 local spGetActiveCommand 	= Spring.GetActiveCommand
 local spGetGroundHeight		= Spring.GetGroundHeight
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetFeaturePosition  = Spring.GetFeaturePosition
+local spGetFeatureDefID     = Spring.GetFeatureDefID
 
 local nukeSelected
 local antinukeSelected
@@ -262,7 +264,7 @@ function widget:SelectionChanged(newSelection)
 				if spectating then
 					SortUnitsIntoAllyEnemy(Spring.GetUnitTeam(unitID), Spring.GetUnitAllyTeam(unitID))
 				end
-				local x,y,z = Spring.GetUnitPosition(unitID)
+				local x,y,z = Spring.GetUnitWeaponVectors(unitID, 1)
 				nukeSelected = {x,y,z}
 				return
 			elseif intDefs[unitDefID] then
@@ -319,19 +321,33 @@ local function DrawAntinukeOnMouse(cmdID)
 	--return false
 end
 
+local function GetMouseTargetPosition()
+	local mx, my = spGetMouseState()
+	local targetType, target = spTraceScreenRay(mx, my, false, true, false, true)
+	rangeFudgeMargin = 0
+	if targetType == "ground" then
+		-- Even though nuke is not water-capable, this traces the ray through water to the sea-floor.
+		-- That's what the attack-ground order will do if you click on water, so we have to match it.
+		return {target[1], target[2], target[3]}
+	elseif targetType == "unit" then
+		-- Target coordinate is the center of target unit.
+		return {spGetUnitPosition(target)}
+	elseif targetType == "feature" then
+		-- Target is the exact point where the mouse-ray hits the feature's colvol.
+		-- FIXME But TraceScreenRay doesn't tell us that point, so we have to approximate.
+		rangeFudgeMargin = FeatureDefs[spGetFeatureDefID(target)].radius
+		return {spGetFeaturePosition(target)}
+	else
+		return nil
+	end
+end
+
 local function DrawNukeOnMouse(cmdID)
 	if cmdID ~= CMD.ATTACK then
 		return false
 	end
 	
-	local mx, my = spGetMouseState()
-	local _, mouse = spTraceScreenRay(mx, my, true, true)
-	if not mouse then
-		return false
-	end
-	
-	mouse = {mouse[1], mouse[2], mouse[3]}
-	
+	local mouse = GetMouseTargetPosition()
 	if not mouse then
 		return false
 	end
@@ -471,7 +487,7 @@ local function DrawEnemyInterceptors(inMinimap)
 		end
 		
 		if ux then
-			local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mx, mz, def.rangeSq)
+			local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mx, mz, (def.range + rangeFudgeMargin)^2)
 			if thisIntercepted then
 				if def.incomplete then
 					intercepted = math.max(intercepted, 1)
