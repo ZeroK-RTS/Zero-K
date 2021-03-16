@@ -126,6 +126,7 @@ local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
 		toReturn.droneSets[i].buildCount = 0
+		toReturn.droneSets[i].queueCount = 0
 	end
 	if maxDronesTotal > 0 then
 		Spring.SetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
@@ -376,6 +377,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 			if AddUnitToEmptyPad(inputID, droneSetID) then --pad cleared, immediately add any unit from queue
 				local set = carrier.droneSets[droneSetID]
 				set.buildCount = set.buildCount + 1
+				set.queueCount = set.queueCount - 1
 				table.remove(carrierList[inputID].droneInQueue, 1)
 			end
 		end
@@ -816,17 +818,18 @@ function gadget:GameFrame(f)
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
+					elseif (set.droneCount + set.queueCount < set.maxDrones) and set.buildCount < set.config.maxBuild then
 						if generateDrones[carrierID] then
 							for n = 1, set.config.spawnSize do
-								if (set.droneCount >= set.maxDrones) then
+								if set.droneCount + set.queueCount >= set.maxDrones then
 									break
 								end
-								
-								carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue + 1 ] = i
+
 								if AddUnitToEmptyPad(carrierID, i ) then
-									set.buildCount = set.buildCount + 1;
-									table.remove(carrierList[carrierID].droneInQueue, 1)
+									set.buildCount = set.buildCount + 1
+								else
+									set.queueCount = set.queueCount + 1
+									carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue + 1 ] = i
 								end
 							end
 							set.reload = set.config.reloadTime -- apply reloadtime when queuing construction (not when it actually happens) - helps keep a constant creation rate over time
