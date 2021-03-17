@@ -78,9 +78,10 @@ local function InCircle(x,y,radiusSq)
 end
 
 function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)
-	
+	--Spring.Echo("AllowWeaponInterceptTarget")
 	local unitDefID = Spring.GetUnitDefID(interceptorUnitID)
 	if not interceptorRanges[unitDefID] then
+		--Spring.Echo("No interceptor range")
 		return true
 	end
 	
@@ -88,6 +89,7 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	if targetType ~= 103 then -- ASCII 'g' for ground
 		-- Nukes are only allowed to target ground so if they are not something
 		-- illegal is occuring. Safest to intercept them from across the map.
+		--Spring.Echo("Something illegal happened.")
 		return true
 	end
 	
@@ -105,7 +107,8 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	local tDir
 	if tx == 0 then
 		if tz == 0 then
-			return InCircle(ux, uy, radiusSq)
+			--Spring.Echo("InCircle (tz=0): " .. tostring(InCircle(ux, uz, radiusSq)))
+			return InCircle(ux, uz, radiusSq)
 		elseif tz > 0 then
 			tDir = math.pi/4
 		else
@@ -133,6 +136,7 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 		-- No real solutions so the circle does not intersect x-axis.
 		-- This means that antinuke projectile does not cross intercept
 		-- range.
+		--Spring.Echo("No solution")
 		return false
 	end
 	
@@ -148,8 +152,10 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	-- IF the nuke does not fall short of coverage AND
 	-- the projectile is still within coverage
 	if leftInt < tx and rightInt > 0 then
+		--Spring.Echo("Good solution")
 		return true
 	end
+	--Spring.Echo("Wrong solution")
 	return false
 end
 
