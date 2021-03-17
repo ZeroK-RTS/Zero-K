@@ -379,11 +379,11 @@ local function GetNukeIntercepted(ux, uz, px, pz, tx, tz, radiusSq)
 	local tDir
 	if tx == 0 then
 		if tz == 0 then
-			return InCircle(ux, uy, radiusSq)
+			return InCircle(ux, uz, radiusSq)
 		elseif tz > 0 then
-			tDir = math.pi/4
+			tDir = math.pi/2
 		else
-			tDir = math.pi*3/4
+			tDir = math.pi*3/2
 		end
 	elseif tx > 0 then
 		tDir = math.atan(tz/tx)
