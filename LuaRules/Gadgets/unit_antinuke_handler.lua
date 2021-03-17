@@ -105,7 +105,7 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	local tDir
 	if tx == 0 then
 		if tz == 0 then
-			return InCircle(ux, uy, radiusSq)
+			return InCircle(ux, uz, radiusSq)
 		elseif tz > 0 then
 			tDir = math.pi/4
 		else
