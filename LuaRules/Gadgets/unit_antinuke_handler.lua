@@ -107,9 +107,9 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 		if tz == 0 then
 			return InCircle(ux, uz, radiusSq)
 		elseif tz > 0 then
-			tDir = math.pi/4
+			tDir = math.pi/2
 		else
-			tDir = math.pi*3/4
+			tDir = math.pi*3/2
 		end
 	elseif tx > 0 then
 		tDir = math.atan(tz/tx)
