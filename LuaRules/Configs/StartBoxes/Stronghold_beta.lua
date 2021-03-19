@@ -1202,8 +1202,8 @@ else -- 8 way FFA.
 	end
 	if teamcount > 4 then
 		for i = 4, 7 do
-			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
+			boxes[i] = {startpoints = {}, nameLong = names[i + 1], nameShort = shorts[i + 1], boxes = {}}
+			boxes[i] = {startpoints = {}, nameLong = names[i + 1], nameShort = shorts[i + 1], boxes = {}}
 		end
 		boxes[4].boxes[1] = team5box
 		boxes[5].boxes[1] = team6box
