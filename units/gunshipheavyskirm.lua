@@ -82,7 +82,7 @@ return { gunshipheavyskirm = {
       craterMult              = 0.3,
 
       customparams = {
-        combatrange = 650,
+        combatrange = 630,
         light_camera_height = 2000,
         light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
