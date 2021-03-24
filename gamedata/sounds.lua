@@ -106,7 +106,7 @@ local Sounds = {
 			file = "sounds/weapon/missile/tacnuke_launch.wav",
 			gain = 1.0,
 			pitch = 1.0,
-			priority = 0,
+			priority = 1,
 			maxconcurrent = 30,
 			maxdist = nil,
 		},
