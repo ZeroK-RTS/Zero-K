@@ -1126,7 +1126,7 @@ local behaviourConfig = {
 	},
 	{
 		name = "hoverriot",
-		skirms = lowMedRangeSkirmieeArray,
+		skirms = medRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
 		idleFlee = skirmRangeRiotIdleFleeArray,

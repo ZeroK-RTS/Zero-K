@@ -28,7 +28,7 @@ return { hoverriot = {
   iconType            = [[hoverriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maxDamage           = 1300,
+  maxDamage           = 1400,
   maxSlope            = 36,
   maxVelocity         = 2.05,
   movementClass       = [[HOVER4]],
@@ -82,8 +82,8 @@ return { hoverriot = {
       },
 
       damage                  = {
-        default = 29.68,
-        subs    = 1.75,
+        default = 32.65,
+        subs    = 1.65,
       },
 
       explosionGenerator      = [[custom:flash1green]],
@@ -96,7 +96,7 @@ return { hoverriot = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 345,
+      range                   = 340,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn10]],

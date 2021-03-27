@@ -5,7 +5,7 @@ return { hovercon = {
   acceleration        = 0.4,
   activateWhenBuilt   = true,
   brakeRate           = 18.0,
-  buildCostMetal      = 130,
+  buildCostMetal      = 125,
   buildDistance       = 160,
   builder             = true,
 

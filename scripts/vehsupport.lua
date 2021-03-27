@@ -43,8 +43,8 @@ local RESTORE_DELAY = 3000
 
 local TURRET_TURN_SPEED = math.rad(240)
 local GUN_TURN_SPEED = math.rad(60)
-local ARMS_RAISE_SPEED = 10
-local ARMS_LOWER_SPEED = 10
+local ARMS_RAISE_SPEED = 9.33
+local ARMS_LOWER_SPEED = 9.33
 local WHEEL_TURN_MULT = 1.5
 
 local ANIM_PERIOD = 50
@@ -75,10 +75,12 @@ end
 local function SetDeploy(wantDeploy)
 	Signal(SIG_DEPLOY)
 	SetSignalMask(SIG_DEPLOY)
+	Spring.Echo("Deploy", Spring.GetGameFrame())
 	if wantDeploy then
 		Move(arms, y_axis, 10, ARMS_RAISE_SPEED)
 		WaitForMove(arms, y_axis)
 		deployed = true
+		Spring.Echo("deployeddeployed", Spring.GetGameFrame())
 	else
 		Turn(turret, y_axis, 0, TURRET_TURN_SPEED/2)
 		Turn(gun, x_axis, 0,GUN_TURN_SPEED/2)

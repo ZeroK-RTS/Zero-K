@@ -4,7 +4,7 @@ return { tankcon = {
   description            = [[Armed Construction Tank]],
   acceleration           = 0.4,
   brakeRate              = 18.0,
-  buildCostMetal         = 200,
+  buildCostMetal         = 185,
   buildDistance          = 180,
   builder                = true,
 
@@ -36,7 +36,7 @@ return { tankcon = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1800,
+  maxDamage              = 1700,
   maxSlope               = 18,
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,
@@ -93,9 +93,9 @@ return { tankcon = {
       },
 
       damage                  = {
-        default = 9,
-        planes  = 9,
-        subs    = 0.7,
+        default = 8.64,
+        planes  = 8.64,
+        subs    = 0.6,
       },
 
       duration                = 0.02,
