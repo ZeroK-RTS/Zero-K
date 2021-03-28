@@ -2457,7 +2457,7 @@ local function updateTerraformCost(id)
 	terra.lastProgress = terra.progress
 	terra.lastHealth = terra.progress*terraUnitHP
 	
-	EchoDebug(id, "updateTerraformCost")
+	EchoDebug(id, "updateTerraformCost", "volume", volume, "terra.volCostSpent", terra.volCostSpent, "extra", volume*volumeCost)
 	spSetUnitHealth(id, {
 		health = terra.lastHealth,
 		build  = terra.lastProgress*terraBuildMult
@@ -3855,6 +3855,19 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		else
 			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
 			minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
+		end
+		
+		if structure[unitID].minx == 0 then
+			structure[unitID].minx = -8
+		end
+		if structure[unitID].minz == 0 then
+			structure[unitID].minz = -8
+		end
+		if structure[unitID].maxx == mapWidth then
+			structure[unitID].maxx = mapWidth + 8
+		end
+		if structure[unitID].maxz == mapHeight then
+			structure[unitID].maxz = mapHeight + 8
 		end
 		
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
