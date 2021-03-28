@@ -52,11 +52,11 @@ local function Suspension() -- Shamelessly stolen and adapted from Ripper. Perha
 		s1r = GetWheelHeight(gs1r)
 		s2r = GetWheelHeight(gs2r)
 		s3r = GetWheelHeight(gs3r)
+		s4r = GetWheelHeight(gs4r)
 		s1l = GetWheelHeight(gs1l)
 		s2l = GetWheelHeight(gs2l)
 		s3l = GetWheelHeight(gs3l)
 		s4l = GetWheelHeight(gs4l)
-		s4r = GetWheelHeight(gs4r)
 		xtilta = (s3r + s3l - s1l - s1r)/6000
 		xtiltv = xtiltv*0.99 + xtilta
 		xtilt = xtilt*0.98 + xtiltv
@@ -83,22 +83,22 @@ local function Suspension() -- Shamelessly stolen and adapted from Ripper. Perha
 		Move(rwheel1, y_axis, s1r, 20)
 		Move(rwheel2, y_axis, s2r, 20)
 		Move(rwheel3, y_axis, s3r, 20)
+		Move(rwheel4, y_axis, s4r, 20)
 		Move(lwheel1, y_axis, s1l, 20)
 		Move(lwheel2, y_axis, s2l, 20)
 		Move(lwheel3, y_axis, s3l, 20)
-		Move(lwheel4, y_axis, s3l, 20)
-		Move(rwheel4, y_axis, s3l, 20)
+		Move(lwheel4, y_axis, s4l, 20)
 
 		_, _, _, speed = spGetUnitVelocity(unitID)
 		wheelTurnSpeed = speed * 3
 		Spin (rwheel1, x_axis, wheelTurnSpeed)
 		Spin (rwheel2, x_axis, wheelTurnSpeed)
 		Spin (rwheel3, x_axis, wheelTurnSpeed)
+		Spin (rwheel4, x_axis, wheelTurnSpeed)
 		Spin (lwheel1, x_axis, wheelTurnSpeed)
 		Spin (lwheel2, x_axis, wheelTurnSpeed)
 		Spin (lwheel3, x_axis, wheelTurnSpeed)
 		Spin (lwheel4, x_axis, wheelTurnSpeed)
-		Spin (rwheel4, x_axis, wheelTurnSpeed)
 
 		Sleep (34)
 	end
@@ -137,8 +137,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num) -- Moved off FireWeapon for modders/tweakunits mostly.
-	xtiltv = xtiltv - cos(mainhead) / 69
-	ztiltv = ztiltv - sin(mainhead) / 69
+	xtiltv = xtiltv - cos(mainhead) / 80
+	ztiltv = ztiltv - sin(mainhead) / 80
 	EmitSfx(firepoint, 1024)
 	EmitSfx(firepoint, 1025)
 	StartThread(BarrelRecoil)
