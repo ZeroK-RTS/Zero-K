@@ -123,7 +123,7 @@ local function Curl()
 	
 	Sleep(100)
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.1)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
 	GG.UpdateUnitAttributes(unitID)
 
 	Move(canon, y_axis, 5, 1.5)
