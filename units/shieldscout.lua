@@ -37,7 +37,7 @@ return { shieldscout = {
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 36,
-  maxVelocity            = 2.6,
+  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
   movementClass          = [[KBOT2]],
   moveState              = 0, -- Used to make blockages.
@@ -46,7 +46,7 @@ return { shieldscout = {
   script                 = [[shieldscout.lua]],
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
-  sightDistance          = 560,
+  sightDistance          = 600,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -86,8 +86,8 @@ return { shieldscout = {
       },
 
       damage                  = {
-        default = 45,
-        planes  = 45,
+        default = 55,
+        planes  = 55,
         subs    = 4.5,
       },
 
@@ -101,7 +101,7 @@ return { shieldscout = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 50,
-      reloadtime              = 2,
+      reloadtime              = 1.9,
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[explosion/ex_small4_2]],
       soundStartVolume        = 25,

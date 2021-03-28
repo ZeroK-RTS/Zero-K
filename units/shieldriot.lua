@@ -5,7 +5,7 @@ return { shieldriot = {
   acceleration           = 0.75,
   activateWhenBuilt      = true,
   brakeRate              = 4.5,
-  buildCostMetal         = 260,
+  buildCostMetal         = 250,
   buildPic               = [[shieldriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -27,7 +27,7 @@ return { shieldriot = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1050,
+  maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
@@ -90,8 +90,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 23,
-        planes  = 23,
+        default = 26,
+        planes  = 26,
         subs    = 0.1,
       },
 
