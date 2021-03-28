@@ -77,8 +77,15 @@ function gadget:AllowUnitTransportUnload(transporterID, transporterUnitDefID, tr
 		return true
 	end
 	local x, y, z = Spring.GetUnitPosition(transporteeID)
-	if DistSq(x, y, z, goalX, goalY, goalZ) > 256 then
-		return false
+	if DistSq(x, y, z, goalX, goalY, goalZ) > 144 then
+		if DistSq(x, 0, z, goalX, 0, goalZ) <= 64 then
+			local _,_,_,speed = Spring.GetUnitVelocity(transporterID)
+			if speed > 0.25 then
+				return false
+			end
+		else
+			return false
+		end
 	end
 	Spring.SetUnitVelocity(transporterID, 0,0,0)
 	return true
