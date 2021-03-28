@@ -2550,6 +2550,7 @@ local function finishInitialisingTerraformUnit(id)
 	--checkTerraformIntercepts(id) --Removed Intercept Check
 	
 	updateTerraformEdgePoints(id)
+	EchoDebug(id, "init update cost")
 	updateTerraformCost(id)
 	
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Base " .. terraformUnit[id].baseCost)
@@ -2623,19 +2624,31 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		end
 	end
 	
+	local x, z
 	for i = 1, terra.points do
-		local heightDiff = terra.point[i].prevHeight - spGetGroundHeight(terra.point[i].x, terra.point[i].z)
-		if heightDiff ~= 0 then
-			updateTerraformCost(id)
-			break
-			-- There must be a nicer way to update costs, below is an unstable attempt.
-			--local change = ((1-terra.progress)*terra.point[i].diffHeight + heightDiff)/((1-terra.progress)*terra.point[i].diffHeight)
-			--Spring.Echo(change)
-			--local costChange = (abs(change * terra.point[i].diffHeight) - abs(terra.point[i].diffHeight))*volumeCost
-			--terra.point[i].diffHeight = change * terra.point[i].diffHeight
-			--terra.point[i].orHeight = terra.point[i].aimHeight - terra.point[i].diffHeight
-			--terraformUnit[id].cost = terraformUnit[id].cost + costChange
-			--terraformUnit[id].totalCost = terraformUnit[id].totalCost + costChange
+		x, z = terra.point[i].x, terra.point[i].z
+		-- For some reason the heightDiff check always fails for points on the map edge, so just ignore them.
+		if x > 0 and x < mapWidth and z > 0 and z < mapHeight then
+			local heightDiff = terra.point[i].prevHeight - spGetGroundHeight(x, z)
+			if heightDiff ~= 0 then
+				EchoDebug(id, "heightDiff ~= 0 update cost", terra.point[i].x, terra.point[i].z, "prev", terra.point[i].prevHeight, "now", spGetGroundHeight(terra.point[i].x, terra.point[i].z))
+				--for j = 1, terra.points do
+				--	local heightDiff = terra.point[j].prevHeight - spGetGroundHeight(terra.point[j].x, terra.point[j].z)
+				--	if heightDiff ~= 0 then
+				--		Spring.MarkerAddPoint(terra.point[j].x, 0, terra.point[j].z)
+				--	end
+				--end
+				updateTerraformCost(id)
+				break
+				-- There must be a nicer way to update costs, below is an unstable attempt.
+				--local change = ((1-terra.progress)*terra.point[i].diffHeight + heightDiff)/((1-terra.progress)*terra.point[i].diffHeight)
+				--Spring.Echo(change)
+				--local costChange = (abs(change * terra.point[i].diffHeight) - abs(terra.point[i].diffHeight))*volumeCost
+				--terra.point[i].diffHeight = change * terra.point[i].diffHeight
+				--terra.point[i].orHeight = terra.point[i].aimHeight - terra.point[i].diffHeight
+				--terraformUnit[id].cost = terraformUnit[id].cost + costChange
+				--terraformUnit[id].totalCost = terraformUnit[id].totalCost + costChange
+			end
 		end
 	end
 	
@@ -2673,8 +2686,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 			local makingPyramid = terra.point[i].aimHeight - terra.point[i].orHeight > 0
 			for j = 1, terra.point[i].edges do
 				local thisEdge = terra.point[i].edge[j]
-				local x = thisEdge.x
-				local z = thisEdge.z
+				x, z = thisEdge.x, thisEdge.z
 			
 				local groundHeight = spGetGroundHeight(x, z)
 				local edgeHeight = groundHeight
@@ -2793,7 +2805,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	do
 	
 	local i = 1
-	local x, z, checkIndex
+	local checkIndex
 	local diffX, diffZ
 	while i <= extraPoints do
 		if extraPoint[i].supportID then
@@ -3022,8 +3034,8 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		
 		local drawingList = {}
 		for i = 1, terra.points do
-			local x = terra.point[i].x
-			local z = terra.point[i].z
+			x = terra.point[i].x
+			z = terra.point[i].z
 			local freeLeft = not (terra.area[x-8] and terra.area[x-8][z]) and not (extraPointArea[x-8] and extraPointArea[x-8][z])
 			local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
 			local freeRight = not (terra.area[x+8] and terra.area[x+8][z]) and not (extraPointArea[x+8] and extraPointArea[x+8][z])
@@ -3190,6 +3202,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 					EchoDebug(id, "updateVar", updateVar)
 					while updateVar == -1 and attempts < 10 do
 						if updateTerraformCost(id) then
+							EchoDebug(id, "updateVar == -1 update cost")
 							updateTerraformEdgePoints(id)
 							updateVar = updateTerraform(health,id,i,costDiff)
 							attempts = attempts + 1
@@ -3635,6 +3648,7 @@ local function deregisterStructure(unitID)
 						
 						if recalc then
 							updateTerraformEdgePoints(oid)
+							EchoDebug(id, "deregisterStructure update cost")
 							updateTerraformCost(oid)
 						end
 					end
@@ -3928,6 +3942,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 						end
 						
 						if recalc then
+							EchoDebug(id, "UnitCreated update cost")
 							updateTerraformCost(oid)
 							updateTerraformEdgePoints(oid)
 						end
