@@ -48,8 +48,8 @@ local function Close()
 	aimHelp = true
 	Spin(aimProxy, z_axis, math.rad(270))
 	
+	--animation
 	if not isClosed then
-		--animation
 		Move(barrel1, y_axis, 3, 3);
 		Move(barrel2, y_axis, 2, 2);
 		Move(barrel3, y_axis, 3, 3);
@@ -107,8 +107,10 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay);
 	
+	--hacks to move invisible pieces
 	Move(aimProxy, y_axis, -13)
 	Move(muzzleProxy, y_axis, 6)
+	Turn(muzzle, y_axis, math.rad(-90))
 	
 	Hide(legs);
 	for i = 1,6 do
