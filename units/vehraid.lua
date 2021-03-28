@@ -21,7 +21,7 @@ return { vehraid = {
 
   customParams           = {
     modelradius        = [[10]],
-    aim_lookahead      = 110,
+    aim_lookahead      = 80,
   },
 
   explodeAs              = [[BIG_UNITEX]],
