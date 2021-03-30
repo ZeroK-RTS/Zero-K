@@ -1110,7 +1110,7 @@ local  team8boxstart = {
 }
 
 local boxes = {}
-for i = 1, 2 do -- buildboxes
+for i = 0, 1 do -- buildboxes
 	boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
 end
 
