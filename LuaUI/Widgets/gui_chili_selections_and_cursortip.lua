@@ -30,6 +30,7 @@ local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spGetUnitCurrentBuildPower = Spring.GetUnitCurrentBuildPower
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spScaledGetMouseState = Spring.ScaledGetMouseState
+local spGetUnitShieldState = Spring.GetUnitShieldState
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
@@ -208,10 +209,14 @@ local GAIA_TEAM = Spring.GetGaiaTeamID()
 local UPDATE_FREQUENCY = 0.2
 
 local isCommander = {}
+local maxShield = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.customParams.level or ud.customParams.dynamic_comm then
 		isCommander[i] = true
+	end
+	if ud.customParams.shield_power then
+		maxShield[i] = tonumber(ud.customParams.shield_power)
 	end
 end
 
@@ -1381,6 +1386,7 @@ local function GetSelectionStatsDisplay(parentControl)
 	local total_finishedcost = 0
 	local total_totalbp = 0
 	local total_maxhp = 0
+	local total_maxShield = 0
 	local total_totalburst = 0
 	local unreliableBurst = false
 	local burstClass = 0
@@ -1388,6 +1394,7 @@ local function GetSelectionStatsDisplay(parentControl)
 	local function UpdateDynamicGroupInfo()
 		local total_cost = 0
 		local total_hp = 0
+		local total_shield = 0
 		local total_metalincome = 0
 		local total_metaldrain = 0
 		local total_energyincome = 0
@@ -1410,6 +1417,11 @@ local function GetSelectionStatsDisplay(parentControl)
 					total_hp = total_hp + hp
 				end
 				
+				if maxShield[unitDefID] then
+					local _, power = spGetUnitShieldState(unitID)
+					total_shield = total_shield + (power or 0)
+				end
+				
 				stunned_or_inbuild = spGetUnitIsStunned(unitID)
 				if not stunned_or_inbuild then
 					if mm then
@@ -1427,8 +1439,12 @@ local function GetSelectionStatsDisplay(parentControl)
 		end
 		
 		local unitInfoString = WG.Translate("interface", "selected_units") .. ": " .. Format(total_count) .. "\n" ..
-			WG.Translate("interface", "health") .. ": " .. Format(total_hp) .. " / " ..  Format(total_maxhp) .. "\n" ..
-			WG.Translate("interface", "value") .. ": " .. Format(total_cost) .. " / " ..  Format(total_finishedcost) .. "\n"
+			WG.Translate("interface", "value") .. ": " .. Format(total_cost) .. " / " ..  Format(total_finishedcost) .. "\n" ..
+			WG.Translate("interface", "health") .. ": " .. Format(total_hp) .. " / " ..  Format(total_maxhp) .. "\n"
+		
+		if total_maxShield ~= 0 then
+			unitInfoString = unitInfoString .. "Shield" .. ": " .. Format(total_shield) .. " / " ..  Format(total_maxShield) .. "\n"
+		end
 		if total_metalincome ~= 0 or total_metaldrain ~= 0 or total_energyincome ~= 0 or total_energydrain ~= 0 then
 			unitInfoString = unitInfoString ..
 				WG.Translate("interface", "metal") .. ": " .. FormatPlusMinus(total_metalincome) .. white .. " / " ..  FormatPlusMinus(-total_metaldrain) .. white .. "\n" ..
@@ -1452,6 +1468,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		total_finishedcost = 0
 		total_totalbp = 0
 		total_maxhp = 0
+		total_maxShield = 0
 		total_totalburst = 0
 		unreliableBurst = false
 		burstClass = 0
@@ -1464,6 +1481,7 @@ local function GetSelectionStatsDisplay(parentControl)
 				selectedUnitDefID[i] = unitDefID
 				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, unitDefID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
+				total_maxShield = total_maxShield + (maxShield[unitDefID] or 0)
 				total_finishedcost = total_finishedcost + GetUnitCost(unitID, unitDefID)
 				local burstData = UNIT_BURST_DAMAGES[unitDefID]
 				if burstData and burstClass then
@@ -1806,7 +1824,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if shieldBarUpdate then
 			if ud and (ud.shieldPower > 0 or ud.level) then
 				local shieldPower = spGetUnitRulesParam(unitID, "comm_shield_max") or ud.shieldPower
-				local _, shieldCurrentPower = Spring.GetUnitShieldState(unitID, -1)
+				local _, shieldCurrentPower = spGetUnitShieldState(unitID, -1)
 				if shieldCurrentPower and shieldPower then
 					shieldBarUpdate(true, nil, shieldCurrentPower, shieldPower, (shieldCurrentPower < shieldPower) and GetUnitShieldRegenString(unitID, ud))
 				end
