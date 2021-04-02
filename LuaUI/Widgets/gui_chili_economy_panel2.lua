@@ -734,6 +734,15 @@ local function FormatPercent(input, colorFunc)
 	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
 end
 
+local function UpdateWindPanel()
+	if extraPanels.wind.window then
+		local windStrength = Spring.GetGameRulesParam("WindStrength")
+		if windStrength then
+			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
+		end
+	end
+end
+
 local  metalWarnOpt = options.metalWarning
 local energyWarnOpt = options.energyWarning
 
@@ -1056,12 +1065,7 @@ function widget:GameFrame(n)
 		local efficiency = math.min(energyEff, metalEff)
 		extraPanels.efficiency.window.SetText(FormatPercent(efficiency, extraPanels.efficiency.colorFunc))
 	end
-	if extraPanels.wind.window then
-		local windStrength = Spring.GetGameRulesParam("WindStrength")
-		if windStrength then
-			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
-		end
-	end
+	UpdateWindPanel()
 
 	-- save so that we can switch representation without recalculating
 	bar_metal.net = netMetal
@@ -1823,6 +1827,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 
 	-- set translatable strings
 	languageChanged ()
+
+	-- Initial Wind
+	UpdateWindPanel()
 
 	-- update the flow string font settings
 	local opt_flowstr = options.flowAsArrows

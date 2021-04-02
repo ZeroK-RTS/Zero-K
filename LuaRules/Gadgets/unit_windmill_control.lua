@@ -109,22 +109,27 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function UpdateWindStrengthAndDir()
+	if step_count > 0 then
+		strength = strength + strength_step
+		step_count = step_count - 1
+	end
+	local _, _, _, windStrength, x, _, z = spGetWind()
+	local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
+	
+	GG.WindHeading = windHeading
+	GG.WindStrength = (strength - windMin)/windRange
+	Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
+	Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
+	
+	return strength
+end
+
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		if (not IterableMap.IsEmpty(windmills)) then
-			if step_count > 0 then
-				strength = strength + strength_step
-				step_count = step_count - 1
-			end
-			local _, _, _, windStrength, x, _, z = spGetWind()
-			local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
-			
-			GG.WindHeading = windHeading
-			GG.WindStrength = (strength - windMin)/windRange
-			Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
-			Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
-			
+		local strength = UpdateWindStrengthAndDir()
 		
+		if (not IterableMap.IsEmpty(windmills)) then
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
@@ -254,6 +259,8 @@ function gadget:Initialize()
 	end
 	
 	gadgetHandler:AddChatAction("windanim", ToggleWindAnimation, "Toggles windmill animations.")
+	
+	UpdateWindStrengthAndDir()
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
