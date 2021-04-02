@@ -399,9 +399,9 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_ORBIT_DRAW)
 	Spring.SetCustomCommandDrawData(CMD_ORBIT_DRAW, "Guard", {0.3, 0.3, 1.0, 0.7})
-    for _, unitID in ipairs(Spring.GetAllUnits()) do
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		--local team = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, team)
-    end
+	end
 end
