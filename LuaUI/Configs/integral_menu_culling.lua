@@ -15,6 +15,7 @@ local configList = {
 	{cmdID = CMD.PATROL                , default = true, name = "Patrol"},
 	{cmdID = CMD_RECALL_DRONES         , default = true, name = "Recall Drones"},
 	{cmdID = CMD.RECLAIM               , default = true, name = "Reclaim"},
+	{cmdID = CMD_GREYGOO               , default = true, name = "Reclaim (Grey Goo)"},
 	{cmdID = CMD.REPAIR                , default = true, name = "Repair"},
 	{cmdID = CMD_FIND_PAD              , default = true, name = "Resupply"},
 	{cmdID = CMD.RESURRECT             , default = true, name = "Resurrect"},

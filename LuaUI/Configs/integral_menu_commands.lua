@@ -43,6 +43,7 @@ local cmdPosDef = {
 	[CMD_AREA_MEX]      = {pos = 7, priority = 1},
 	[CMD.REPAIR]        = {pos = 7, priority = 2},
 	[CMD.RECLAIM]       = {pos = 7, priority = 3},
+	[CMD_GREYGOO]       = {pos = 7, priority = 3},
 	[CMD.RESURRECT]     = {pos = 7, priority = 4},
 	[CMD.WAIT]          = {pos = 7, priority = 5},
 	[CMD_FIND_PAD]      = {pos = 7, priority = 6},
