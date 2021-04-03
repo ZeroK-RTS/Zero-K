@@ -10,11 +10,12 @@ function gadget:GetInfo()
 	}
 end
 
+include("LuaRules/Configs/customcmds.h.lua")
+
 if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
 
-include("LuaRules/Configs/customcmds.h.lua")
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 local handled = IterableMap.New()
@@ -25,8 +26,7 @@ local areaGreyGooDesc = {
 	id      = CMD_GREYGOO,
 	type    = CMDTYPE.ICON_UNIT_FEATURE_OR_AREA,
 	name    = 'Grey Goo', -- TODO: better name. Marketing was out today.
-	cursor  = 'Reclaim',
-	action  = 'reclaim',
+	action  = 'greygoo',
 	tooltip	= 'Marks an area or wreckage for grey goo.',
 }
 
@@ -79,7 +79,7 @@ local function GetEligiableWrecksInArea(x, z, radius, allyID) -- Looks for wreck
 	return ret
 end
 
-local function GetClosestWreck(x, z, cx, cz, radius, ally) --
+local function GetClosestWreck(x, z, cx, cz, radius, ally)
 	local wrecks = GetEligiableWrecksInArea(cx, cz, radius, ally)
 	if #wrecks == 0 then -- double safety.
 		return nil
@@ -98,22 +98,9 @@ local function GetClosestWreck(x, z, cx, cz, radius, ally) --
 	return lowestID
 end
 
-local function IsThereEligiableWreckNearby(x, z, radius, allyteam)
-	local check = spGetFeaturesInCylinder(x, z, radius)
-	for i = 1, #check do
-		local featureID = check[i]
-		if featurecache[featureID] then
-			if needLOS then
-				local x, y, z = spGetFeaturePosition(featureID)
-				if spIsPosInLos(x, y, z, allyteam) then
-					return featureID -- return the lowest one in range
-				end
-			else
-				return featureID
-			end
-		end
-	end
-	return nil
+local function IsThereEligiableWreckNearby(x, z, radius, allyteam) -- stupid check. (for when we don't want the closest wreck)
+	local check = GetEligiableWrecksInArea(x, z, radius, allyteam)
+	return #check > 0 and check[1] or nil
 end
 
 function gadget:FeatureCreated(featureID, allyTeamID)
@@ -126,8 +113,11 @@ function gadget:FeatureDestroyed(featureID)
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
-	if cmdID == CMD_GREYGOO and not GooDefs[unitDefID] then -- screen against non-grey gooers using area greygoo.
-		return false
+	if cmdID == CMD_GREYGOO then -- screen against bad things
+		if not GooDefs[unitDefID] or not (#cmdParams == 1 or #cmdParams == 4) then
+			Spring.Echo("Invalid params? " .. tostring(cmdParams[1]) .. ", " .. tostring(cmdParams[2]) .. ", " .. tostring(cmdParams[3]) .. ", " .. tostring(cmdParams[4]))
+			return false
+		end
 	else
 		return true
 	end
@@ -171,7 +161,8 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				--Spring.Echo("GREYGOO: No eligible wrecks nearby")
 				return true, true
 			end
-			IterableMap.Add(handled, unitID, {def = unitDefID, done = false, params = cmdParams, goal = -9999}) -- we found a new unit!
+			local persistent = cmdOptions.alt and #cmdParams > 1
+			IterableMap.Add(handled, unitID, {def = unitDefID, done = false, params = cmdParams, goal = -9999, updates = 0, persistent = persistent}) -- we found a new unit!
 		end
 		return true, false -- we're still not done here.
 	end
@@ -181,19 +172,15 @@ function gadget:GameFrame(f)
 	if f%5 == 0 then -- 6hz
 		for unitID, data in IterableMap.Iterator(handled) do
 			if not data.done then -- don't handle things that are done.
+				data.updates = data.updates + 1
 				--Spring.Echo("GreyGoo: Update " .. unitID .. ": Goal: " .. data.goal)
-				local greygooconfig = GooDefs[data.def]
 				local currentcmd = spGetUnitCommands(unitID, 1)
 				if not spValidUnitID(unitID) or #currentcmd == 0 or currentcmd[1].id ~= CMD_GREYGOO then -- safety. first we check if we have any commands, then if we're not doing grey goo anymore.
 					--Spring.Echo("Invalid unit or not working")
 					IterableMap.Remove(handled, unitID)
 				else
-					local params = data.params
-					local commandRadius = data.params[4]
-					local commandX = data.params[1]
-					local commandZ = data.params[3]
-					local range = greygooconfig.range
-					local wantedrange = range * 0.1 -- puts us clearly in range, and gives us bonus targets (for mostly "free"), potentially.
+					local range = GooDefs[data.def].range
+					local wantedrange = range * 0.1 -- puts us clearly in range
 					if type(data.params) ~= "table" then -- this is a single command
 						local featureID = data.params
 						if spValidFeatureID(featureID) then
@@ -206,21 +193,25 @@ function gadget:GameFrame(f)
 							data.done = true
 						end
 					else -- this is an area command.
+						local commandRadius = data.params[4]
+						local commandX = data.params[1]
+						local commandZ = data.params[3]
 						local allyTeam = spGetUnitAllyTeam(unitID)
+						local x, y, z = spGetUnitPosition(unitID)
 						if data.goal == -9999 or not spValidFeatureID(data.goal) then -- haven't set a goal yet or our current greygoo task is complete.
-							local x, y, z = spGetUnitPosition(unitID)
-							local newgoal = IsThereEligiableWreckNearby(x, z, range, allyTeam)
-							if newgoal then
-								data.goal = newgoal -- set our new goal to a nearby wreck in range (we're still eating something, no sense moving onto other things yet)
-							else
-								local id = GetClosestWreck(x, z, commandX, commandZ, commandRadius, allyTeam)
-								if id then
-									local gx, gy, gz = spGetFeaturePosition(id)
-									spSetUnitMoveGoal(unitID, gx, gy, gz, wantedrange)
-									data.goal = id
-								else
-									data.done = true
-								end
+							local id = GetClosestWreck(x, z, commandX, commandZ, commandRadius, allyTeam)
+							if id then
+								local gx, gy, gz = spGetFeaturePosition(id)
+								spSetUnitMoveGoal(unitID, gx, gy, gz, wantedrange)
+								data.goal = id
+							elseif not data.persistent then
+								data.done = true
+							end
+						elseif data.updates == 3 then -- check if we're within range (fires off every 3rd update, this staggers the check)
+							data.updates = 0
+							local px, py, pz = spGetFeaturePosition(data.goal)
+							if Distance(px, x, pz, z) > range * 0.98 then
+								spSetUnitMoveGoal(unitID, px, py, pz, wantedrange) -- we may have been pushed by allies or other grey gooers. prevents softlock.
 							end
 						end
 					end
@@ -232,6 +223,7 @@ end
 
 function gadget:Initalize()
 	gadgetHandler:RegisterCMDID(CMD_GREYGOO)
+	Spring.SetCustomCommandDrawData(CMD_GREYGOO, "Reclaim", {0.8, 0.3, 0.3, 0.7}, true)
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end

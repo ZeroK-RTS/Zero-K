@@ -42,6 +42,7 @@ local spSetUnitRulesParam      = Spring.SetUnitRulesParam
 local spGetUnitRulesParam      = Spring.GetUnitRulesParam
 local spGetFeatureDefID        = Spring.GetFeatureDefID
 local spSpawnCEG               = Spring.SpawnCEG
+local spGetUnitCommands        = Spring.GetUnitCommands
 
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -275,7 +276,13 @@ function gadget:GameFrame(f)
 					
 					spGiveOrderToUnit(newId, CMD_FIRE_STATE, {firestate}, 0)
 					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {movestate}, 0)
-					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
+					local currentcmd = spGetUnitCommands(unitIndex[i], 1)
+					if currentcmd[1].id == CMD_GREYGOO then
+						spGiveOrderToUnit(newId, CMD_GREYGOO, currentcmd[1].params, 0)
+						spGiveOrderToUnit(newId, CMD_GUARD, {unitIndex[i]}, CMD.OPT_SHIFT)
+					else
+						spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
+					end
 
 					spSpawnCEG(CEG_SPAWN,
 						x, y, z,
