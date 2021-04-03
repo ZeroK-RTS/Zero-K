@@ -74,7 +74,6 @@ local spValidUnitID     = Spring.ValidUnitID
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitResources = Spring.GetUnitResources
 local spGetUnitHealth = Spring.GetUnitHealth
-local spIsReplay		= Spring.IsReplay
 
 local TableEcho = Spring.Utilities.TableEcho
 
@@ -526,14 +525,18 @@ options = {
 -- Callins
 
 function widget:Initialize()
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
+		Spring.Echo("uapn2 disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+
 	SetupAll()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or unitTeam ~= spGetMyTeamID()
 			or not IsImmobileBuilder(UnitDefs[unitDefID])
-			or spGetGameRulesParam("loadPurge") == 1
-			or spIsReplay() then
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -612,8 +615,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
 			or not IsImmobileBuilder(UnitDefs[unitDefID])
-			or spGetGameRulesParam("loadPurge") == 1
-			or spIsReplay() then
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -629,8 +631,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
 			or not IsImmobileBuilder(UnitDefs[unitDefID])
-			or spGetGameRulesParam("loadPurge") == 1
-			or spIsReplay() then
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
