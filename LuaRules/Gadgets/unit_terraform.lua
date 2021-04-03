@@ -2657,7 +2657,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		newProgress = 1
 	end
 	
-	local pyramindCost = 0
+	local pyramidVolumeChange = 0
 	local extraPoint = {}
 	local extraPoints = 0
 	local extraPointArea = {}
@@ -2691,7 +2691,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 				local groundHeight = spGetGroundHeight(x, z)
 				local edgeHeight = groundHeight
 				local overlap, overlapReplaces = false, false
-				local overlapCost = 0
+				local overlapHeightDiff = 0
 				if extraPointArea[x] and extraPointArea[x][z] then
 					overlap = extraPointArea[x][z]
 					if extraPoint[overlap].supportID then
@@ -2699,7 +2699,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					else
 						overlapReplaces = true
 					end
-					overlapCost = extraPoint[overlap].cost
+					overlapHeightDiff = abs(extraPoint[overlap].heightDiff)
 				end
 				
 				local maxDiff
@@ -2730,7 +2730,6 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						z = z,
 						orHeight = groundHeight,
 						heightDiff = newHeight - groundHeight - heightSign*maxDiff,
-						cost = heightSign*(newHeight - groundHeight) - maxDiff,
 						supportX = terra.point[i].x,
 						supportZ = terra.point[i].z,
 						supportH = newHeight,
@@ -2752,7 +2751,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						return -1
 					end
 					
-					pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
+					pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[index].heightDiff) - overlapHeightDiff
 					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
@@ -2785,11 +2784,10 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 								z = z,
 								orHeight = groundHeight,
 								heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
-								cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
 								pyramid = makingPyramid, -- pyramid = rising up, not pyramid = ditch
 							}
 							
-							pyramindCost = pyramindCost + extraPoint[extraPoints].cost
+							pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[extraPoints].heightDiff)
 							
 							if not extraPointArea[x] then
 								extraPointArea[x] = {}
@@ -2834,7 +2832,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					local groundHeight = spGetGroundHeight(x, z)
 					local edgeHeight = groundHeight
 					local overlap, overlapReplaces = false, false
-					local overlapCost = 0
+					local overlapHeightDiff = 0
 					if extraPointArea[x] and extraPointArea[x][z] then
 						overlap = extraPointArea[x][z]
 						if extraPoint[overlap].supportID then
@@ -2842,7 +2840,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						else
 							overlapReplaces = true
 						end
-						overlapCost = extraPoint[overlap].cost
+						overlapHeightDiff = abs(extraPoint[overlap].heightDiff)
 					end
 					local maxHeightDifferenceLocal = GetHeightDiffLocal(abs(x - extraPoint[i].supportX), abs(z - extraPoint[i].supportZ), (not extraPoint[i].pyramid) and maxHeightDiffDownInner)
 
@@ -2866,7 +2864,6 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							z = z,
 							orHeight = groundHeight,
 							heightDiff = newHeight - groundHeight - heightSign*maxHeightDifferenceLocal,
-							cost = heightSign*(newHeight - groundHeight) - maxHeightDifferenceLocal,
 							supportX = extraPoint[i].supportX,
 							supportZ = extraPoint[i].supportZ,
 							supportH = extraPoint[i].supportH,
@@ -2888,7 +2885,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							return -1
 						end
 						
-						pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
+						pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[index].heightDiff) - overlapHeightDiff
 						
 						if not extraPointArea[x] then
 							extraPointArea[x] = {}
@@ -2913,18 +2910,17 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							if (not (extraPointArea[x] and extraPointArea[x][z])) and
 									((extraPoint[i].pyramid and groundHeight < lookAheadHeight + borderHeightDiff) or ((not extraPoint[i].pyramid) and groundHeight > lookAheadHeight - borderHeightDiff)) and
 									IsPositionTerraformable(x, z) then
-							
+								
 								extraPoints = extraPoints + 1
 								extraPoint[extraPoints] = {
 									x = x,
 									z = z,
 									orHeight = groundHeight,
 									heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
-									cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
 									pyramid = extraPoint[i].pyramid, -- pyramid = rising up, not pyramid = ditch
 								}
 								
-								pyramindCost = pyramindCost + extraPoint[extraPoints].cost
+								pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[extraPoints].heightDiff)
 								
 								if not extraPointArea[x] then
 									extraPointArea[x] = {}
@@ -2948,7 +2944,11 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	
 	-- Update costs and determine progress.
 	terraformOperations = terraformOperations + extraPoints
-	pyramindCost = pyramindCost*volumeCost
+	local pyramindCost = pyramidVolumeChange*volumeCost
+	
+	if IsDebug(unitID) then
+		Spring.Echo("costDiff", costDiff)
+	end
 	
 	local edgeTerraMult = 1
 	if costDiff ~= 0 then
@@ -2967,7 +2967,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 				edgeSpending = pyramindCost
 			end
 			
-			EchoDebug(id, "costDiff", costDiff, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
+			EchoDebug(unitID, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "totalCost", terra.totalCost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
 			
 			costDiff = costDiff - edgeSpending
 			edgeTerraMult = edgeSpending/pyramindCost
@@ -3157,7 +3157,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
 		if IsDebug(id) then
-			EchoDebug(id, "Check", Spring.GetUnitHealth(id))
+			-- EchoDebug(id, "Check", Spring.GetUnitHealth(id))
 		end
 		if (spValidUnitID(id)) then
 			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
