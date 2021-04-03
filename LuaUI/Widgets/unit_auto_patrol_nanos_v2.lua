@@ -297,7 +297,7 @@ local function IssuedCausesCurrent(issued, currentID, currentOpt,
 			issued[2][3] == currentParam3 and
 			issued[2][4] == currentParam4 and
 			issued[2][5] == currentParam5 and
-			issued[3] == currentOpt then
+			issued[3] == math.bit_and(currentOpt, remove_shift_internal) then
 		Log("    -> equal")
 		return true
 	end
