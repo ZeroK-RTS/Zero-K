@@ -126,6 +126,13 @@ function GG.Script.NonBlockingWaitTurn(piece, axis, angle, leeway)
 end
 
 function GG.Script.OverkillPreventionCheck(unitID, targetID, damage, range, fullTime, hitTimeMod, useTargetSpeed, minRange, fastMult, radarMult, staticOnly)
+	-- damage: Damage that the projectile deals, or a bit lower to deal with things like repair and wobbles.
+	-- range: 2D weapon range.
+	-- fullTime: Time (in frames) from shot to damage for a target at max range.
+	-- hitTimeMod: Constant fudge factor for overestimating/underestimating impact times. Positive hitTimeMod is the normal use, and makes OKP less strict.
+	-- useTargetSpeed: Add the potential effect of target speed to hitTimeMod
+	-- minRange: Minimum range that a target is at for expected hit time calculations. Use for indirect fire.
+	-- fastMult, radarMult, staticOnly: Paramters for the gadget.
 	if Spring.ValidUnitID(targetID) then
 		local distMult = math.max(minRange or 0, Spring.GetUnitSeparation(unitID, targetID) or 0)/range
 		if useTargetSpeed then
