@@ -43,7 +43,6 @@ local cmdPosDef = {
 	[CMD_AREA_MEX]      = {pos = 7, priority = 1},
 	[CMD.REPAIR]        = {pos = 7, priority = 2},
 	[CMD.RECLAIM]       = {pos = 7, priority = 3},
-	[CMD_GREYGOO]       = {pos = 7, priority = 3},
 	[CMD.RESURRECT]     = {pos = 7, priority = 4},
 	[CMD.WAIT]          = {pos = 7, priority = 5},
 	[CMD_FIND_PAD]      = {pos = 7, priority = 6},
@@ -51,6 +50,7 @@ local cmdPosDef = {
 	[CMD.LOAD_UNITS]    = {pos = 7, priority = 7},
 	[CMD.UNLOAD_UNITS]  = {pos = 7, priority = 8},
 	[CMD_RECALL_DRONES] = {pos = 7, priority = 10},
+	[CMD_GREYGOO]       = {pos = 7, priority = 11},
 	
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 2},
 	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 2},
