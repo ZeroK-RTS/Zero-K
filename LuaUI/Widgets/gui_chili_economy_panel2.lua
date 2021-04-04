@@ -184,7 +184,56 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local extraPanels = {
+local function Format(input, override)
+	local leadingString = positiveColourStr .. "+"
+	if input < 0 then
+		leadingString = negativeColourStr .. "-"
+	end
+	leadingString = override or leadingString
+	input = math.abs(input)
+	
+	if input < 0.05 then
+		if override then
+			return override .. "0.0"
+		end
+		return WhiteStr .. "0"
+	elseif input < 100 then
+		return leadingString .. ("%.1f"):format(input) .. WhiteStr
+	elseif input < 10^3 - 0.5 then
+		return leadingString .. ("%.0f"):format(input) .. WhiteStr
+	elseif input < 10^4 then
+		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
+	elseif input < 10^5 then
+		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
+	else
+		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
+	end
+end
+
+local function FormatPercent(input, colorFunc)
+	local leadingString = ""
+	if colorFunc then
+		local color = colorFunc(input)
+		leadingString = string.char(255, color[1] * 255, color[2] * 255, color[3] * 255)
+	end
+	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local extraPanels
+
+local function UpdateWindPanel()
+	if extraPanels.wind and extraPanels.wind.window then
+		local windStrength = Spring.GetGameRulesParam("WindStrength")
+		if windStrength then
+			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
+		end
+	end
+end
+
+extraPanels = {
 	efficiency = {
 		title = "Efficiency",
 		labelRight = "0%",
@@ -237,6 +286,7 @@ local extraPanels = {
 	},
 	wind = {
 		title = "Wind",
+		onShow = UpdateWindPanel, 
 		labelRight = "0%",
 		colorFunc = function (value)
 			return {1 - 0.7*value, 0.3 + 0.7*value, 0.7}
@@ -697,50 +747,6 @@ local function NoStorageEnergyStall(mInco, mPull, eInco, ePull)
 	end
 	-- The following fails with some priority arrangements.
 	return eInco/ePull > mInco/mPull
-end
-
-local function Format(input, override)
-	local leadingString = positiveColourStr .. "+"
-	if input < 0 then
-		leadingString = negativeColourStr .. "-"
-	end
-	leadingString = override or leadingString
-	input = math.abs(input)
-	
-	if input < 0.05 then
-		if override then
-			return override .. "0.0"
-		end
-		return WhiteStr .. "0"
-	elseif input < 100 then
-		return leadingString .. ("%.1f"):format(input) .. WhiteStr
-	elseif input < 10^3 - 0.5 then
-		return leadingString .. ("%.0f"):format(input) .. WhiteStr
-	elseif input < 10^4 then
-		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
-	elseif input < 10^5 then
-		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
-	else
-		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
-	end
-end
-
-local function FormatPercent(input, colorFunc)
-	local leadingString = ""
-	if colorFunc then
-		local color = colorFunc(input)
-		leadingString = string.char(255, color[1] * 255, color[2] * 255, color[3] * 255)
-	end
-	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
-end
-
-local function UpdateWindPanel()
-	if extraPanels.wind.window then
-		local windStrength = Spring.GetGameRulesParam("WindStrength")
-		if windStrength then
-			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
-		end
-	end
 end
 
 local  metalWarnOpt = options.metalWarning
@@ -1313,6 +1319,9 @@ local function GetExtraPanel(name, extraData)
 		end
 		show = newShow
 		holderPanel:SetVisibility(show)
+		if show and extraData.onShow then
+			extraData.onShow()
+		end
 	end
 	
 	function externalFunctions.SetTempHide(shouldHide)
@@ -1334,6 +1343,9 @@ function DoExtraToggle(name, value)
 	local extraData = extraPanels[name]
 	if value and not extraData.window then
 		extraData.window = GetExtraPanel(name, extraData)
+		if extraData.onShow then
+			extraData.onShow()
+		end
 	end
 	if extraData.window then
 		extraData.window.Show(value)
