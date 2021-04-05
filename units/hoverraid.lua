@@ -67,7 +67,7 @@ return { hoverraid = {
   weaponDefs          = {
 
     GAUSS = {
-      name                    = [[Gauss Cannon]],
+      name                    = [[Light Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
       avoidfeature            = false,

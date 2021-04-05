@@ -69,7 +69,7 @@ return { turretgauss = {
   weaponDefs                    = {
 
     GAUSS = {
-      name                    = [[Light Gauss Cannon]],
+      name                    = [[Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
       avoidfeature            = false,
