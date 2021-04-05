@@ -30,7 +30,7 @@ return { shieldskirm = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 580,
+  maxDamage              = 540,
   maxSlope               = 36,
   maxVelocity            = 1.95,
   maxWaterDepth          = 22,
@@ -83,8 +83,8 @@ return { shieldskirm = {
       },
       
       damage                  = {
-        default = 350,
-        planes  = 350,
+        default = 340,
+        planes  = 340,
         subs    = 17.5,
       },
 
@@ -103,7 +103,7 @@ return { shieldskirm = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
-      startVelocity           = 192,
+      startVelocity           = 185,
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
