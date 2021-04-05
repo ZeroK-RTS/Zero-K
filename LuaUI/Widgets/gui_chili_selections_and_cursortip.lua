@@ -1445,14 +1445,14 @@ local function GetSelectionStatsDisplay(parentControl)
 		if total_maxShield ~= 0 then
 			unitInfoString = unitInfoString .. "Shield" .. ": " .. Format(total_shield) .. " / " ..  Format(total_maxShield) .. "\n"
 		end
+		if total_totalbp ~= 0 then
+			unitInfoString = unitInfoString ..
+				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
+		end
 		if total_metalincome ~= 0 or total_metaldrain ~= 0 or total_energyincome ~= 0 or total_energydrain ~= 0 then
 			unitInfoString = unitInfoString ..
 				WG.Translate("interface", "metal") .. ": " .. FormatPlusMinus(total_metalincome) .. white .. " / " ..  FormatPlusMinus(-total_metaldrain) .. white .. "\n" ..
 				WG.Translate("interface", "energy") .. ": " .. FormatPlusMinus(total_energyincome) .. white .. " / " ..  FormatPlusMinus(-total_energydrain) .. white .. "\n"
-		end
-		if total_totalbp ~= 0 then
-			unitInfoString = unitInfoString ..
-				WG.Translate("interface", "buildpower") .. ": " .. Format(total_usedbp) .. " / " .. Format(total_totalbp) .. "\n"
 		end
 		if burstClass and total_totalburst ~= 0 then
 			unitInfoString = unitInfoString ..
