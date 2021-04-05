@@ -72,7 +72,7 @@ end
 --------------------------------------------------------------------------------
 
 local messages = {
-	shield = "shield",
+	shield_bar = "shield",
 	health_bar = "health",
 	building = "building",
 	morph = "morph",
