@@ -55,7 +55,7 @@ return { shieldskirm = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2640,
+  turnRate               = 2376,
   upright                = true,
 
   weapons                = {
