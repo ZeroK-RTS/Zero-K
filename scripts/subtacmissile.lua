@@ -68,26 +68,6 @@ function script.FireWeapon()
 	Show(missile)
 end
 
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0)
-		then submerged = false
-		else submerged = true
-	end
-end
-
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damageTable = WeaponDefs[weaponDefID].damages
-		return damage * (damageTable[elseArmorClass] / damageTable[subArmorClass])
-	end
-	return damage
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then

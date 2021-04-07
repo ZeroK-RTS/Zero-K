@@ -96,7 +96,6 @@ return { gunshipbomb = {
       damage = {
         default = 80,
         planes  = 80,
-        subs    = 4,
       },
 
       edgeeffectiveness  = 0.7,

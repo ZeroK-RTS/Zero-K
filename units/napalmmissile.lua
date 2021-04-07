@@ -84,7 +84,6 @@ return { napalmmissile = {
 
       damage                  = {
         default = 151,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.4,

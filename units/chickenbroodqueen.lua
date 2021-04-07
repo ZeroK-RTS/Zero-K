@@ -130,7 +130,6 @@ return { chickenbroodqueen = {
       damage                  = {
         default = 40,
         planes  = 40,
-        subs    = 40,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -167,7 +166,6 @@ return { chickenbroodqueen = {
       
       damage                  = {
         default = 30,
-        subs    = 1.5,
       },
 
       dance                   = 60,

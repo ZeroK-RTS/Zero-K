@@ -86,7 +86,6 @@ return { chicken_sporeshooter = {
       
       damage                  = {
         default = 75,
-        subs    = 7.5,
       },
 
       dance                   = 60,

@@ -93,7 +93,6 @@ return { amphfloater = {
 
       damage                  = {
         default = 150.1,
-        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:flashslowwithsparks]],
@@ -132,7 +131,6 @@ return { amphfloater = {
   
       damage                  = {
         default = 150,
-        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:flashslowwithsparks]],

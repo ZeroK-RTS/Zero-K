@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 175,
-		subs    = 175,
 	},
 
 	cegTag			= [[sonictrail]],

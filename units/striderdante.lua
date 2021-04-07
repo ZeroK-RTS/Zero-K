@@ -118,7 +118,6 @@ return { striderdante = {
       
       damage                  = {
         default = 15,
-        subs    = 0.15,
       },
 
       duration                  = 0.01,
@@ -168,7 +167,6 @@ return { striderdante = {
       damage                  = {
         default = 49,
         planes  = 49,
-        subs    = 2.45,
       },
 
       duration                = 0.3,
@@ -215,7 +213,6 @@ return { striderdante = {
       
       damage                  = {
         default = 120.8,
-        subs    = 6,
       },
 
       edgeEffectiveness       = 0.75,
@@ -270,7 +267,6 @@ return { striderdante = {
       
       damage                  = {
         default = 120.8,
-        subs    = 6,
       },
 
       dance                   = 15,

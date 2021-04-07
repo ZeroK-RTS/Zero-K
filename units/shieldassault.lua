@@ -115,7 +115,6 @@ return { shieldassault = {
       damage                  = {
         default = 170,
         planes  = 170,
-        subs    = 8,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],

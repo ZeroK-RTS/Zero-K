@@ -92,7 +92,6 @@ return { tankaa = {
       damage                  = {
         default = 9,
         planes  = 90,
-        subs    = 4.5,
       },
 
       edgeEffectiveness       = 0.85,

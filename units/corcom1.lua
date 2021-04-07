@@ -115,7 +115,6 @@ return { corcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -160,7 +159,6 @@ return { corcom1 = {
       damage                  = {
         default = 240,
         planes  = 240,
-        subs    = 12,
       },
 
       edgeEffectiveness       = 0.75,

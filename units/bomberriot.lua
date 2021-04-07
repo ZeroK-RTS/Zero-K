@@ -96,7 +96,6 @@ return { bomberriot = {
       damage                  = {
         default = 25,
         planes  = 25,
-        subs    = 2.5,
       },
 
       edgeEffectiveness       = 0.7,

@@ -82,7 +82,6 @@ return { zenith = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 2,
@@ -131,7 +130,6 @@ return { zenith = {
 
       damage                  = {
         default = 1600,
-        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -185,7 +183,6 @@ return { zenith = {
 
       damage                  = {
         default = 1600,
-        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -241,7 +238,6 @@ return { zenith = {
 
       damage                  = {
         default = 1600,
-        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,
@@ -299,7 +295,6 @@ return { zenith = {
 
       damage                  = {
         default = 1600,
-        subs    = 80,
       },
 
       edgeEffectiveness       = 0.8,

@@ -87,7 +87,6 @@ return { tankriot = {
       
       damage                  = {
         default = 240.1,
-        subs    = 12,
       },
 
       edgeEffectiveness       = 0.4,

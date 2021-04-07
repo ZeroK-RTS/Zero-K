@@ -104,7 +104,6 @@ return { shipheavyarty = {
       damage                  = {
         default = 501.1,
         planes  = 501.1,
-        subs    = 25,
       },
 
       explosionGenerator      = [[custom:165rlexplode]],

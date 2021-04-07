@@ -81,7 +81,6 @@ return { shiptorpraider = {
       damage                  = {
 
         default = 220.1,
-        subs    = 220.1,
       },
 
       edgeEffectiveness       = 0.6,

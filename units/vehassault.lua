@@ -86,7 +86,6 @@ return { vehassault = {
       damage                  = {
         default = 210,
         planes  = 210,
-        subs    = 11.5,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],

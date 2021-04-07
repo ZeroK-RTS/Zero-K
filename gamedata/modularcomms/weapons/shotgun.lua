@@ -28,7 +28,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 32,
-		subs    = 1.6,
 	},
 
 	duration                = 0.02,

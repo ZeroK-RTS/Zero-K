@@ -98,7 +98,6 @@ return { amphassault = {
       damage                  = {
         default = 750.1,
         planes  = 750.1,
-        subs    = 45.1,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],
@@ -148,7 +147,6 @@ return { amphassault = {
 
       damage                  = {
         default = 300,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],

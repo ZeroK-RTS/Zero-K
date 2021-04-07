@@ -87,7 +87,6 @@ return { spidercrabe = {
 
       damage                  = {
         default = 600.5,
-        subs    = 30,
       },
 
       edgeEffectiveness       = 0.3,

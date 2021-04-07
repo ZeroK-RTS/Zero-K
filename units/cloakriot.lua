@@ -92,7 +92,6 @@ return { cloakriot = {
       damage                  = {
         default = 45,
         planes  = 45,
-        subs    = 2.25,
       },
 
       edgeEffectiveness       = 0.5,

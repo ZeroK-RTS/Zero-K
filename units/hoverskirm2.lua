@@ -74,7 +74,6 @@ return { hoverskirm2 = {
 
       damage                  = {
         default = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:flash1red]],

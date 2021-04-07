@@ -85,7 +85,6 @@ return { shieldskirm = {
       damage                  = {
         default = 340,
         planes  = 340,
-        subs    = 17.5,
       },
 
       fireStarter             = 70,

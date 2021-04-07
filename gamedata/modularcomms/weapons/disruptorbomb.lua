@@ -25,7 +25,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 350,
-		subs    = 17.5,
 	},
 
 	explosionGenerator      = [[custom:riotballplus2_purple]],

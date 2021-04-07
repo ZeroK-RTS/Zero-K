@@ -85,7 +85,6 @@ return { amphraid = {
 
       damage                  = {
         default = 130.01,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],

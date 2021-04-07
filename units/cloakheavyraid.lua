@@ -96,7 +96,6 @@ return { cloakheavyraid = {
       damage                  = {
         default = 200.1,
         planes  = 200,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],

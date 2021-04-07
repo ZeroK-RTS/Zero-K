@@ -84,7 +84,6 @@ return { staticantinuke = {
       
       damage                  = {
         default = 1500,
-        subs    = 75,
       },
 
       --spawning the intercept explosion is handled by exp_nuke_effect_chooser.lua

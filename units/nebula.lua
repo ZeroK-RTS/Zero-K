@@ -109,7 +109,6 @@ return { nebula = {
 
       damage                  = {
         default = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:plasma_hit_32]],

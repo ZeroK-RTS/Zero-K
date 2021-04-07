@@ -83,7 +83,6 @@ return { spiderassault = {
       damage                  = {
         default = 141,
         planes  = 141,
-        subs    = 7,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],

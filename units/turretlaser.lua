@@ -84,7 +84,6 @@ return { turretlaser = {
 
       damage                  = {
         default = 7.5,
-        subs    = 0.375,
       },
 
       explosionGenerator      = [[custom:FLASH1blue]],

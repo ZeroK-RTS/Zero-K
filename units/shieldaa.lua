@@ -86,7 +86,6 @@ return { shieldaa = {
       damage                  = {
         default = 7.2,
         planes  = 72,
-        subs    = 4,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

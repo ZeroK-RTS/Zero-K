@@ -82,7 +82,6 @@ return { turretimpulse = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -128,7 +127,6 @@ return { turretimpulse = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,

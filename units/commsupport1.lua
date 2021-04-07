@@ -152,7 +152,6 @@ return { commsupport1 = {
       damage                  = {
         default = 140,
         planes  = 140,
-        subs    = 8,
       },
       
       customParams = {

@@ -160,7 +160,6 @@ return { chicken_dragon = {
       damage                  = {
         default = 1200,
         planes  = 1200,
-        subs    = 1200,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -192,7 +191,6 @@ return { chicken_dragon = {
         chicken    = 0.001,
 
         planes     = 10,
-        subs       = 5,
       },
 
       edgeEffectiveness       = 1,
@@ -229,7 +227,6 @@ return { chicken_dragon = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 6,
       },
 
       dance                   = 60,

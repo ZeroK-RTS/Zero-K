@@ -68,7 +68,6 @@ return { grebe = {
       damage                  = {
         default = 240,
         planes  = 240,
-        subs    = 12,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_96]],

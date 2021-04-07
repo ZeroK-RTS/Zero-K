@@ -79,7 +79,6 @@ return { hoverminer = {
       damage                  = {
         default = 20,
         planes  = 20,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:teleport_progress]],

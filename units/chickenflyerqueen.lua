@@ -213,7 +213,6 @@ return { chickenflyerqueen = {
       damage                  = {
         default = 1500,
         planes  = 1500,
-        subs    = 30,
       },
 
       explosionGenerator      = [[custom:large_green_goo]],
@@ -255,7 +254,6 @@ return { chickenflyerqueen = {
       damage                  = {
         default = 75,
         planes  = [[150]],
-        subs    = 7.5,
       },
 
       dance                   = 60,

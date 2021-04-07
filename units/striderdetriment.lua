@@ -195,7 +195,6 @@ return { striderdetriment = {
       damage                  = {
         default = 2.05,
         planes  = 20.5,
-        subs    = 1.125,
       },
       
       explosionGenerator      = [[custom:flash_teal7]],
@@ -234,7 +233,6 @@ return { striderdetriment = {
       damage                  = {
         default = 800.1,
         planes  = 800.1,
-        subs    = 50.1,
       },
 
       explosionGenerator      = [[custom:flash1green]],

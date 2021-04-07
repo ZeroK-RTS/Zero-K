@@ -103,7 +103,6 @@ return { chickenwurm = {
       damage                  = {
         default = 50,
         planes  = 50,
-        subs    = 2.5,
       },
 
       explosionGenerator      = [[custom:napalm_firewalker]],

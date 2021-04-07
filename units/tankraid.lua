@@ -104,7 +104,6 @@ return { tankraid = {
       damage                  = {
         default = 40,
         planes  = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda_small]],

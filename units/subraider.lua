@@ -87,7 +87,6 @@ return { subraider = {
 
       damage                  = {
         default = 260.1,
-        subs    = 260.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
@@ -137,7 +136,6 @@ return { subraider = {
       damage                  = {
         default = 0.1,
         planes  = 0.1,
-        subs    = 0.1,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],

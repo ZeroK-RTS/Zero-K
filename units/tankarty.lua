@@ -83,7 +83,6 @@ return { tankarty = {
       damage                  = {
         default = 600.5,
         planes  = 600.5,
-        subs    = 35,
       },
 
       edgeEffectiveness       = 0.5,

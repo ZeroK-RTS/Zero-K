@@ -90,7 +90,6 @@ return { jumpassault = {
 
       damage                  = {
         default = 300.1,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],

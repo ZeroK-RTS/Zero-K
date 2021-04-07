@@ -75,7 +75,6 @@ return { hovershotgun = {
     damage                  = {
         default = 32,
         planes  = 32,
-        subs    = 1.6,
     },
     
     duration                = 0.02,

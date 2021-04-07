@@ -88,7 +88,6 @@ return { shieldscout = {
       damage                  = {
         default = 55,
         planes  = 55,
-        subs    = 4.5,
       },
 
       explosionGenerator      = [[custom:none]],

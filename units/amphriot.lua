@@ -138,7 +138,6 @@ return { amphriot = {
 
       damage                  = {
         default = 23,
-        subs    = 1.6,
       },
 
       duration                = 0.02,

@@ -83,7 +83,6 @@ return { gunshipskirm = {
 
       damage                  = {
         default = 200.1,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],

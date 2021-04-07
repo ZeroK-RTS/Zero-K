@@ -131,7 +131,6 @@ return { bomberprec = {
       damage                  = {
         default = 800.1,
         planes  = 800.1,
-        subs    = 800.1,
       },
       
       customParams            = {

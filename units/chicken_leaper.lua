@@ -77,7 +77,6 @@ return { chicken_leaper = {
       damage                  = {
         default = 50,
         planes  = 50,
-        subs    = 2,
       },
 
       duration                = 0.0333,

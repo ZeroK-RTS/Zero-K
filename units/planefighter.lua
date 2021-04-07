@@ -111,7 +111,6 @@ return { planefighter = {
 
       damage                  = {
         default = 7.1,
-        subs    = 0.36,
       },
 
       duration                = 0.012,
@@ -158,7 +157,6 @@ return { planefighter = {
       damage                  = {
         default = 13.5,
         planes  = 135,
-        subs    = 13.5,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],

@@ -78,7 +78,6 @@ return { tacnuke = {
       
       damage                  = {
         default = 3502.4,
-        subs    = 175,
       },
 
       edgeEffectiveness       = 0.4,

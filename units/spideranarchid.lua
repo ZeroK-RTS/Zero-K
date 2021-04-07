@@ -75,7 +75,6 @@ return { spideranarchid = {
 
       damage                  = {
         default = 5,
-        subs    = 0.25,
       },
 
       explosionGenerator      = [[custom:FLASH1blue]],

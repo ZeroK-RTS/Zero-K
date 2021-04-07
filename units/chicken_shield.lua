@@ -100,7 +100,6 @@ return { chicken_shield = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 6,
       },
 
       dance                   = 60,
@@ -145,7 +144,6 @@ return { chicken_shield = {
       damage                  = {
         default = 0.01,
         planes  = 0.01,
-        subs    = 0.01,
       },
 
       explosionGenerator      = [[custom:NONE]],

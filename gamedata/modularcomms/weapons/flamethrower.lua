@@ -30,7 +30,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 11,
-		subs    = 0.11,
 	},
 
 	explosionGenerator      = [[custom:SMOKE]],

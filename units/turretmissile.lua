@@ -89,7 +89,6 @@ return { turretmissile = {
 
       damage                  = {
         default = 104,
-        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

@@ -89,7 +89,6 @@ return { vehcapture = {
 
       damage                  = {
         default = 22,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:NONE]],

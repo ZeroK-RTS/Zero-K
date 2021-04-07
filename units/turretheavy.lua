@@ -103,7 +103,6 @@ return { turretheavy = {
       damage                  = {
         default = 51.1,
         planes  = 51.1,
-        subs    = 2.625,
       },
 
       duration                = 0.3,
@@ -148,7 +147,6 @@ return { turretheavy = {
 
       damage                  = {
         default = 1201,
-        subs    = 60,
       },
 
       edgeEffectiveness       = 0.7,

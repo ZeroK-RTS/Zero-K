@@ -73,7 +73,6 @@ return { spideraa = {
       damage                  = {
         default = 20,
         planes  = 260,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

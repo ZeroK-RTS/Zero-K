@@ -122,7 +122,6 @@ return { assaultcruiser = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
@@ -159,7 +158,6 @@ return { assaultcruiser = {
       damage                  = {
         default = 200,
         planes  = 200,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:gauss_hit_m]],
@@ -197,7 +195,6 @@ return { assaultcruiser = {
 
       damage                  = {
         default = 160,
-        subs    = 160,
       },
 
       edgeEffectiveness       = 0.5,

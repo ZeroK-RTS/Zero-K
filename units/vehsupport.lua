@@ -90,7 +90,6 @@ return { vehsupport = {
 
       damage                  = {
         default = 40.01,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

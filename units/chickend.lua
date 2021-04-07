@@ -87,7 +87,6 @@ return { chickend = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 60,
       },
 
       dance                   = 60,

@@ -94,7 +94,6 @@ return { gunshipaa = {
       damage                  = {
         default = 20.01,
         planes  = 200.1,
-        subs    = 3.5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

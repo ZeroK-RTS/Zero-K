@@ -115,7 +115,6 @@ return { armcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -157,7 +156,6 @@ return { armcom1 = {
 
       damage                  = {
         default = 15.06,
-        subs    = 0.8,
       },
 
       duration                = 0.1,

@@ -183,7 +183,6 @@ return { hoverdepthcharge = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],

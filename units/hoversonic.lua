@@ -79,7 +79,6 @@ return { hoversonic = {
         damage                  = {
             default = 175,
             planes  = 175,
-            subs    = 175,
         },
         
         cegTag                  = [[sonictrail]],

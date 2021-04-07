@@ -90,7 +90,6 @@ return { chickenblobber = {
       damage                  = {
         default = 180,
         planes  = 180,
-        subs    = 9,
       },
 
       explosionGenerator      = [[custom:blobber_goo]],

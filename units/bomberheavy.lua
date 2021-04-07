@@ -93,7 +93,6 @@ return { bomberheavy = {
       damage                  = {
         default = 2000.1,
         planes  = 2000.1,
-        subs    = 100,
       },
 
       edgeEffectiveness       = 0.5,

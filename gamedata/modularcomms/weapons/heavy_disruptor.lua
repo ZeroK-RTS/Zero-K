@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 600,
-		subs    = 40,
 	},
 
 	explosionGenerator      = [[custom:flash2purple_large]],

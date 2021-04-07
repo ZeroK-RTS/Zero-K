@@ -89,7 +89,6 @@ return { dronefighter = {
 
       damage                  = {
         default = 33,
-        subs    = 2.2,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],

@@ -85,7 +85,6 @@ return { turretaaflak = {
       damage                  = {
         default = 13.2,
         planes  = 132,
-        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

@@ -84,7 +84,6 @@ return { dronelight = {
 
       damage                  = {
         default = 32,
-        subs    = 1.6,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

@@ -149,7 +149,6 @@ return { raveparty = {
       damage                  = {
         default = 300.9,
         planes  = 300,
-        subs    = 15,
       },
 
       edgeeffectiveness       = 0.25,
@@ -189,7 +188,6 @@ return { raveparty = {
       damage                  = {
         default = 801.1,
         planes  = 800,
-        subs    = 800,
       },
 
       edgeeffectiveness       = 0.5,
@@ -234,7 +232,6 @@ return { raveparty = {
       damage                  = {
         default = 401.1,
         planes  = 400,
-        subs    = 20,
       },
 
       explosionGenerator      = [[custom:blobber_goo]],
@@ -316,7 +313,6 @@ return { raveparty = {
       
       damage                  = {
         default = 450.1,
-        subs    = 22.5,
       },
 
       edgeeffectiveness       = 0.8,

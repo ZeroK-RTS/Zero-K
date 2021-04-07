@@ -87,7 +87,6 @@ return { tankassault = {
       damage                  = {
         default = 320,
         planes  = 320,
-        subs    = 16,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],

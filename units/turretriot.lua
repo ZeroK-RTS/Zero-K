@@ -85,7 +85,6 @@ return { turretriot = {
 
       damage                  = {
         default = 45,
-        subs    = 2.25,
       },
 
       edgeEffectiveness       = 0.5,

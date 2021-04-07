@@ -107,7 +107,6 @@ return { striderbantha = {
       damage                  = {
         default = 3000.1,
         planes  = 3000.1,
-        subs    = 150.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

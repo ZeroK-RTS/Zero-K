@@ -92,7 +92,6 @@ return { shieldriot = {
       damage                  = {
         default = 26,
         planes  = 26,
-        subs    = 0.1,
       },
 
       customParams           = {
@@ -129,7 +128,6 @@ return { shieldriot = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -167,7 +165,6 @@ return { shieldriot = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],

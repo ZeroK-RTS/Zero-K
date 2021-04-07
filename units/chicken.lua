@@ -82,7 +82,6 @@ return { chicken = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 80,
       },
 
       explosionGenerator      = [[custom:NONE]],

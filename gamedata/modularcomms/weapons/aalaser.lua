@@ -23,7 +23,6 @@ local weaponDef = {
 	damage                  = {
 		default = 1.88,
 		planes  = 18.8,
-		subs    = 1,
 	},
 
 	explosionGenerator      = [[custom:flash_teal7]],

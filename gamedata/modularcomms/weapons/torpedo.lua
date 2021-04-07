@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 220,
-		subs    = 220,
 	},
 
 	explosionGenerator      = [[custom:TORPEDO_HIT]],

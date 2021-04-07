@@ -11,7 +11,6 @@ local fakeWeapondef = {
 	avoidNeutral            = false,
 	damage                  = {
 		default = 11.34,
-		subs    = 0.567,
 	},
 	explosionGenerator      = [[custom:FLASHPLOSION]],
 	noSelfDamage            = true,

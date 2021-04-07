@@ -82,7 +82,6 @@ return { seismic = {
       
       damage                  = {
         default = 20,
-        subs    = 1,
       },
 
       edgeEffectiveness       = 0.4,

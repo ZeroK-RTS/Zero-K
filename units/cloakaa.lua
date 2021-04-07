@@ -94,7 +94,6 @@ return { cloakaa = {
       damage                  = {
         default = 1.94,
         planes  = 19.4,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

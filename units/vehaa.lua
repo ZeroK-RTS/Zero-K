@@ -91,7 +91,6 @@ return { vehaa = {
       damage                  = {
         default = 29.01,
         planes  = 290.1,
-        subs    = 16,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

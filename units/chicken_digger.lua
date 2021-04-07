@@ -82,7 +82,6 @@ return { chicken_digger = {
       damage                  = {
         default = 40,
         planes  = 40,
-        subs    = 40,
       },
 
       explosionGenerator      = [[custom:NONE]],

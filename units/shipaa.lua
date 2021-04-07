@@ -91,7 +91,6 @@ return { shipaa = {
       damage                  = {
         default = 1.3,
         planes  = 12.7,
-        subs    = 1.5,
       },
 
       duration                = 0.02,

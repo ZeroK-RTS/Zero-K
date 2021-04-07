@@ -86,7 +86,6 @@ return { chicken_spidermonkey = {
 
       damage                  = {
         default = 30,
-        subs    = 0.75,
       },
 
       dance                   = 150,

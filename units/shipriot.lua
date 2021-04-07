@@ -93,7 +93,6 @@ return { shipriot = {
       damage                  = {
           default = 26,
           planes  = 26,
-          subs    = 1.6,
       },
       
       duration                = 0.02,

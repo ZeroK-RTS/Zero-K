@@ -100,7 +100,6 @@ return { amphsupport = {
       damage                  = {
         default = 165.1,
         planes  = 165.1,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.1,
@@ -134,7 +133,6 @@ return { amphsupport = {
       damage                  = {
         default = 165.1,
         planes  = 165.1,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.1,

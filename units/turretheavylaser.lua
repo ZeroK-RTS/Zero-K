@@ -85,7 +85,6 @@ return { turretheavylaser = {
       damage                  = {
         default = 850.1,
         planes  = 850.1,
-        subs    = 45.1,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],

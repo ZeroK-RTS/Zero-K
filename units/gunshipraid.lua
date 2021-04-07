@@ -88,7 +88,6 @@ return { gunshipraid = {
 
       damage                  = {
         default = 7.6,
-        subs    = 0.38,
       },
 
       explosionGenerator      = [[custom:flash1red]],

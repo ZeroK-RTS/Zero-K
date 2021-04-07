@@ -85,7 +85,6 @@ return { staticarty = {
       damage                  = {
         default = 601,
         planes  = 601,
-        subs    = 30,
       },
 
       edgeEffectiveness       = 0.5,

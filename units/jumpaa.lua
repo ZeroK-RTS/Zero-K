@@ -89,7 +89,6 @@ return { jumpaa = {
       damage                  = {
         default = 0.78,
         planes  = 7.8,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:ARCHPLOSION]],
@@ -134,7 +133,6 @@ return { jumpaa = {
       damage                  = {
         default = 1.636,
         planes  = 16.36,
-        subs    = 0.94,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

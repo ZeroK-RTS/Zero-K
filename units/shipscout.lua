@@ -81,7 +81,6 @@ return { shipscout = {
       
       damage                  = {
         default = 35,
-        subs    = 5,
       },
 
       explosionGenerator      = [[custom:mixed_white_lightning_bomb_small]],

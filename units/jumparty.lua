@@ -96,7 +96,6 @@ return { jumparty = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 4,
       },
 
       explosionGenerator      = [[custom:napalm_firewalker_small]],

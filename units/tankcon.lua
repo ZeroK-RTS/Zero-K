@@ -95,7 +95,6 @@ return { tankcon = {
       damage                  = {
         default = 8.64,
         planes  = 8.64,
-        subs    = 0.6,
       },
 
       duration                = 0.02,

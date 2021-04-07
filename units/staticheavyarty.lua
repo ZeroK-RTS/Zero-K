@@ -86,7 +86,6 @@ return { staticheavyarty = {
       
       damage                  = {
         default = 2002.4,
-        subs    = 100,
       },
 
       explosionGenerator      = [[custom:lrpc_expl]],

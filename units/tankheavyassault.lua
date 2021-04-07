@@ -89,7 +89,6 @@ return { tankheavyassault = {
       
       damage                  = {
         default = 1000.1,
-        subs    = 50,
       },
 
       explosionGenerator      = [[custom:TESS]],

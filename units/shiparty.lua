@@ -72,7 +72,6 @@ return { shiparty = {
       damage                  = {
         default = 601.1,
         planes  = 601.1,
-        subs    = 30,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_96]],

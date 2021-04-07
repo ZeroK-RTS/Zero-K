@@ -81,7 +81,6 @@ return { striderarty = {
       damage                  = {
         default = 220.5,
         planes  = 220.5,
-        subs    = 11,
       },
 
       dance                   = 20,

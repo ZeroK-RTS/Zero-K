@@ -87,7 +87,6 @@ return { cloakraid = {
 
       damage                  = {
         default = 10.5,
-        subs    = 0.525,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],

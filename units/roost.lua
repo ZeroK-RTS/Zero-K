@@ -75,7 +75,6 @@ return { roost = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 8,
       },
 
       dance                   = 60,

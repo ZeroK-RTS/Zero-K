@@ -112,7 +112,6 @@ return { gunshipkrow = {
 
       damage                  = {
         default = 37.8,
-        subs    = 1.8,
       },
 
       duration                = 0.02,
@@ -149,7 +148,6 @@ return { gunshipkrow = {
       damage                  = {
         default = 250,
         planes  = 250,
-        subs    = 12.5,
       },
       
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],

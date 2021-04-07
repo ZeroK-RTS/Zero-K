@@ -86,7 +86,6 @@ return { shipskirm = {
       damage                  = {
         default = 200,
         planes  = 200,
-        subs    = 10,
       },
 
       fireStarter             = 70,

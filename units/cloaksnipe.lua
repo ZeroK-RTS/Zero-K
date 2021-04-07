@@ -93,7 +93,6 @@ return { cloaksnipe = {
       damage                  = {
         default = 1500.1,
         planes  = 1500.1,
-        subs    = 75,
       },
 
       explosionGenerator      = [[custom:spectre_hit]],

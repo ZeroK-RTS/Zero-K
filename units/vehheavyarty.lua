@@ -81,7 +81,6 @@ return { vehheavyarty = {
 
       damage         = {
         default = 800.1,
-        subs    = 4,
       },
 
       texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags

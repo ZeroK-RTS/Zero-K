@@ -94,7 +94,6 @@ return { amphaa = {
       damage                  = {
         default = 15.01,
         planes  = 150.1,
-        subs    = 8,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

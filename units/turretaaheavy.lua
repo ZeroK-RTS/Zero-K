@@ -78,7 +78,6 @@ return { turretaaheavy = {
       damage                  = {
         default    = 160.15,
         planes     = 1601.5,
-        subs       = 80,
       },
 
       edgeEffectiveness       = 0.25,

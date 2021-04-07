@@ -122,7 +122,6 @@ return { striderscorpion = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -261,7 +260,6 @@ return { striderscorpion = {
       
       damage                  = {
         default = 70.01,
-        subs    = 3,
       },
 
       explosionGenerator      = [[custom:flash1red]],

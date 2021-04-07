@@ -128,7 +128,6 @@ return { chicken_blimpy = {
       damage                  = {
         default = 1,
         planes  = 1,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:none]],
@@ -171,7 +170,6 @@ return { chicken_blimpy = {
       damage                  = {
         default = 1,
         planes  = 1,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:none]],

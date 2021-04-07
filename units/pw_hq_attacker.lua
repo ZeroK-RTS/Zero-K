@@ -63,7 +63,6 @@ return { pw_hq_attacker = {
       damage                  = {
         default = 11.34,
         planes  = 11.34,
-        subs    = 0.567,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],

@@ -126,7 +126,6 @@ return { chicken_tiamat = {
     
       damage                  = {
         default = 12,
-        subs    = 0.01,
       },
 
       duration          = 0.01,
@@ -232,7 +231,6 @@ return { chicken_tiamat = {
       damage                  = {
         default = 100,
         planes  = 100,
-        subs    = 100,
       },
 
       dance                   = 60,

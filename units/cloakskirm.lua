@@ -89,7 +89,6 @@ return { cloakskirm = {
 
       damage                  = {
         default = 180,
-        subs    = 9,
       },
 
       fireStarter             = 70,

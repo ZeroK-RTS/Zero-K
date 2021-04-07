@@ -88,7 +88,6 @@ return { dronecarry = {
 
       damage                  = {
         default = 8,
-        subs    = 0.4,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],

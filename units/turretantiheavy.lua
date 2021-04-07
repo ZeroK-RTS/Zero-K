@@ -84,7 +84,6 @@ return { turretantiheavy = {
       damage                  = {
         default = 4000.1,
         planes  = 4000.1,
-        subs    = 200.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

@@ -96,7 +96,6 @@ return { planeheavyfighter = {
       damage                  = {
         default = 0.96,
         planes  = 9.6,
-        subs    = 0.96,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

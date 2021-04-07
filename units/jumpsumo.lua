@@ -133,7 +133,6 @@ return { jumpsumo = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -185,7 +184,6 @@ return { jumpsumo = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -230,7 +228,6 @@ return { jumpsumo = {
       damage                  = {
         default = 0.001,
         planes  = 0.001,
-        subs    = 5E-05,
       },
 
       duration                = 0.0333,
@@ -264,7 +261,6 @@ return { jumpsumo = {
       damage                  = {
         default = 1001.1,
         planes  = 1001.1,
-        subs    = 50,
       },
 
       edgeEffectiveness       = 0,

@@ -83,7 +83,6 @@ return { hoverriot = {
 
       damage                  = {
         default = 32.65,
-        subs    = 1.65,
       },
 
       explosionGenerator      = [[custom:flash1green]],

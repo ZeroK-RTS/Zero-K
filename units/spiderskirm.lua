@@ -72,7 +72,6 @@ return { spiderskirm = {
       damage                  = {
         default = 135,
         planes  = 135,
-        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

@@ -99,7 +99,6 @@ return { tankheavyarty = {
       damage                  = {
         default = 145,
         planes  = 145,
-        subs    = 7,
       },
       
       edgeEffectiveness       = 0.5,

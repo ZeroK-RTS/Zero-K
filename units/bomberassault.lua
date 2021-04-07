@@ -76,7 +76,6 @@ return { bomberassault = {
       damage                  = {
         default = 2500,
         planes  = 2500,
-        subs    = 2500,
       },
 
       edgeEffectiveness       = 0.7,

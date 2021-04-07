@@ -91,7 +91,6 @@ return { chickens = {
       damage                  = {
         default = 180,
         planes  = 180,
-        subs    = 180,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],

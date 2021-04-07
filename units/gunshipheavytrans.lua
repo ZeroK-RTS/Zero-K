@@ -116,7 +116,6 @@ return { gunshipheavytrans = {
       
       damage                  = {
         default = 10,
-        subs    = 0.5,
       },
 
       duration                = 0.02,
@@ -160,7 +159,6 @@ return { gunshipheavytrans = {
       damage                  = {
         default = 2,
         planes  = 20,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

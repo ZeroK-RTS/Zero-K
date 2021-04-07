@@ -83,7 +83,6 @@ return { turretaalaser = {
       damage                  = {
         default = 1.49,
         planes  = 14.9,
-        subs    = 0.8,
       },
 
       duration                = 0.02,

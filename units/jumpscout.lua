@@ -96,7 +96,6 @@ return { jumpscout = {
       damage                  = {
         default = 410.1,
         planes  = 410.1,
-        subs    = 20.5,
       },
 
       fireStarter             = 70,

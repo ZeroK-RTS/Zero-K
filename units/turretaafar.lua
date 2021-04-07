@@ -87,7 +87,6 @@ return { turretaafar = {
       damage                  = {
         default = 22.51,
         planes  = 225.1,
-        subs    = 12.5,
       },
 
       explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],

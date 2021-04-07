@@ -270,7 +270,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 400,
         planes  = 400,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -305,7 +304,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 1000,
         planes  = 1000,
-        subs    = 1000,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -342,7 +340,6 @@ return { chickenlandqueen = {
         default    = 10,
         chicken    = 0.001,
         planes     = 10,
-        subs       = 5,
       },
 
       edgeEffectiveness       = 1,
@@ -380,7 +377,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 75,
         planes  = [[150]],
-        subs    = 7.5,
       },
 
       dance                   = 60,

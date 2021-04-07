@@ -111,7 +111,6 @@ return { benzcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       edgeEffectiveness       = 0.99,
@@ -148,7 +147,6 @@ return { benzcom1 = {
       damage                  = {
         default = 360,
         planes  = 360,
-        subs    = 18,
       },
       
       explosionGenerator      = [[custom:INGEBORG]],

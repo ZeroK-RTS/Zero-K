@@ -115,7 +115,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
@@ -157,7 +156,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 16.5,
-        subs    = 8.25,
       },
 
       duration                = 0.1,
