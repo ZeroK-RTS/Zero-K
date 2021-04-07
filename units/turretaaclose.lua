@@ -30,7 +30,7 @@ return { turretaaclose = {
   maxSlope                      = 18,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[missiletower.s3o]],
+  objectName                    = [[turretaaclose.s3o]],
   script                        = [[turretaaclose.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
@@ -119,7 +119,7 @@ return { turretaaclose = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[missiletower_dead.s3o]],
+      object           = [[turretaaclose_dead.s3o]],
     },
 
 
