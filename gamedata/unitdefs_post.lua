@@ -507,13 +507,13 @@ if (modOptions and modOptions.damagemult and modOptions.damagemult ~= 1) then
 			unitDef.idleautoheal = unitDef.idleautoheal * damagemult
 		end
 		
-		if (unitDef.capturespeed) then 
+		if (unitDef.capturespeed) then
 			unitDef.capturespeed = unitDef.capturespeed * damagemult
 		elseif (unitDef.workertime) then
 			unitDef.capturespeed = unitDef.workertime * damagemult
 		end
 		
-		if (unitDef.repairspeed) then 
+		if (unitDef.repairspeed) then
 			unitDef.repairspeed = unitDef.repairspeed * damagemult
 		elseif (unitDef.workertime) then
 			unitDef.repairspeed = unitDef.workertime * damagemult

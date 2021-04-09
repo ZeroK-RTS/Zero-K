@@ -328,7 +328,7 @@ local function FindNearestAirpad(unitID, team)
 			end
 			airpadsPerAllyteam[allyTeam][airpadID] = nil
 		else
-		-- Need to ensure that excludedairpad[teamid][padID] is not nil before running! 
+		-- Need to ensure that excludedairpad[teamid][padID] is not nil before running!
 			if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) and not excludedPads[teamID][airpadID] then
 				freePads[airpadID] = true
 				freePadCount = freePadCount + 1

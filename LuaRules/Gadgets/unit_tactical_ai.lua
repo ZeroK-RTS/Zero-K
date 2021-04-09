@@ -231,7 +231,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 				end
 			elseif spValidUnitID(target) then -- if I target a unit
 				-- if I target a unit
-				if (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT) then 
+				if (cmdID_2 == CMD_FIGHT or cmdID_3 == CMD_FIGHT) then
 					-- Do not skirm single target with FIGHT
 					return -1, true, true, target, cmdTag_2, cps_1, cps_2, cps_3
 				elseif Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts_2, CMD.OPT_INTERNAL) then
@@ -239,7 +239,7 @@ local function GetUnitOrderState(unitID, unitData, cmdID, cmdOpts, cp_1, cp_2, c
 					return -1, true, false, target, cmdTag_2, cps_1, cps_2, cps_3
 				else
 					-- only skirm single target when given the order manually
-					return target, true, false, nil, nil, cps_1, cps_2, cps_3 
+					return target, true, false, nil, nil, cps_1, cps_2, cps_3
 				end
 			end
 		end
@@ -351,7 +351,7 @@ local function UpdateIdleAgressionState(unitID, behaviour, unitData, frame, enem
 	local ignoreCloseEnemyAggress = enemyUnitDefID and (behaviour.skirms and behaviour.skirms[enemyUnitDefID] and not (behaviour.hugs and behaviour.hugs[enemyUnitDefID]))
 	
 	if (enemyDist < enemyRange and not ignoreCloseEnemyAggress) or behaviour.idlePushAggressDistSq < myIdleDistSq then
-		local myIdleDist = math.sqrt(myIdleDistSq) 
+		local myIdleDist = math.sqrt(myIdleDistSq)
 		if enemyPushingMe or enemyDist*behaviour.idleEnemyDistMult + myIdleDist*behaviour.idleCommitDistMult < behaviour.idleCommitDist then
 			-- I am further from where I started than my enemy, or I am already committed to fighting (to a point). Agress.
 			SetIdleAgression(unitID, unitData, enemy, frame)

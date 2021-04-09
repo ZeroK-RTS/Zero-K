@@ -360,11 +360,11 @@ return { striderdetriment = {
       craterMult              = 15,
 
       damage                  = {
-        default = 200.1,        
+        default = 200.1,
       },
 
       edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:dirtyfootstep]],      
+      explosionGenerator      = [[custom:dirtyfootstep]],
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 5,
@@ -410,7 +410,7 @@ return { striderdetriment = {
       customParams            = {
         hidden = true
       }
-    },    
+    },
   },
 
 

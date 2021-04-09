@@ -65,7 +65,7 @@ local small = {
 }
 
 local large = {
-    [0] = {
+	[0] = {
 		startpoints = {
 			{1500,3150},
 		},
@@ -109,13 +109,13 @@ for i = 1, #teamsSorted do
 		if isAI then
 			pcount = pcount + 1
 		end
-	end 
+	end
 end
 -- count humans
 for i = 1, #playerlist do
 	local playerID = playerlist[i]
 	local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID)
-	local isSpec = (teamID == 0 and spectator and (not Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. playerID))) 
+	local isSpec = (teamID == 0 and spectator and (not Spring.GetGameRulesParam("initiallyPlayingPlayer_" .. playerID)))
 	if not isSpec then
 		pcount = pcount + 1
 	end
@@ -123,7 +123,7 @@ end
 
 if pcount > 4 then
 	if pcount > 10 then
-        return large
+		return large
 	else
 		return small
 	end

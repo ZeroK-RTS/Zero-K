@@ -134,8 +134,8 @@ local strings = {
 	advie_add_metal = "",
 	advice_add_energy = "",
 	advice_expand_both = "",
-	metal = "",	
-	metal_excess_warning = "",	
+	metal = "",
+	metal_excess_warning = "",
 	energy_stall_warning = "",
 }
 
@@ -286,7 +286,7 @@ extraPanels = {
 	},
 	wind = {
 		title = "Wind",
-		onShow = UpdateWindPanel, 
+		onShow = UpdateWindPanel,
 		labelRight = "0%",
 		colorFunc = function (value)
 			return {1 - 0.7*value, 0.3 + 0.7*value, 0.7}
@@ -364,9 +364,9 @@ end
 options_order = {
 	'lbl_metal', 'metalFlash', 'metalWarning',
 	'lbl_energy', 'energyFlash', 'energyWarning', 'eExcessFlash',
-	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve', 
+	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve',
 	'lbl_extra', 'panel_efficiency', 'panel_usage', 'panel_overdrive', 'panel_wind',
-	'lbl_visual', 'ecoPanelHideSpec', 
+	'lbl_visual', 'ecoPanelHideSpec',
 	'flowAsArrows', 'opacity',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
 
@@ -1021,19 +1021,19 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
 	"\n      " .. strings["resbar_other"] .. ": " .. energyOther ..
 	"\n   " .. strings["resbar_storage"] ..
-    "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\n" .. strings["team_energy_economy"] ..
 	"\n   " .. strings["resbar_income"] ..
-	"\n      " .. strings["resbar_inc"] .. ": " .. team_energyIncome ..       
+	"\n      " .. strings["resbar_inc"] .. ": " .. team_energyIncome ..
 	"\n      " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n      " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
 	"\n   " .. strings["resbar_expenses"] ..
 	"\n      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
- 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..

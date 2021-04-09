@@ -88,7 +88,7 @@ end
 --------------------------------------------------------------------------------
 
 local function GetOptionsTable(pathMatch, filter, whitelistFilter)
-	-- Filter is either a blacklist of a whitelist 
+	-- Filter is either a blacklist of a whitelist
 	local retTable = {}
 	for i = 1, #options_order do
 		local name = options_order[i]

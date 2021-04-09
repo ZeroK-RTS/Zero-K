@@ -205,7 +205,7 @@ function GG.Script.GetSpeedParams(unitID, animFrames)
 	end
 	local sleepFrames = math.floor(animFrames / attMod + 0.5)
 	if sleepFrames < 1 then
-		sleepFrames = 1	
+		sleepFrames = 1
 	end
 	local speedMod = 1 / sleepFrames
 	return speedMod, 33*sleepFrames

@@ -130,7 +130,7 @@ local function DoRestore()
 end
 
 local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
-	mainLeg, offLeg = offLeg, mainLeg 
+	mainLeg, offLeg = offLeg, mainLeg
 	
 	-- contact: legs fully extended in stride
 	for i,p in pairs(frontLeg) do
@@ -336,7 +336,7 @@ function jumping(jumpPercent)
 	end
 
 	if jumpPercent > 95 and not landing then
-		landing = true	
+		landing = true
 	end
 end
 

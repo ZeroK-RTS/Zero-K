@@ -70,7 +70,7 @@ end
 local function TrackControl()
 	SetSignalMask(SIG_MOVE)
 	firstMove = false
-	while isMoving do 
+	while isMoving do
 		if ableToMove then
 			if firstMove then
 				firstMove = true
@@ -91,7 +91,7 @@ local function TrackControl()
 			elseif tracks == 4 then
 				Hide(tracks3)
 				Show(tracks4)
-			else 
+			else
 				tracks = 1
 				Hide(tracks4)
 				Show(tracks1)
@@ -198,7 +198,7 @@ function script.AimWeapon(num, heading, pitch)
 		return false
 	end
 	
-	if not isOpen then 
+	if not isOpen then
 		StartThread(Open)
 		while not isOpen do
 			Sleep(400)
@@ -238,7 +238,7 @@ function script.EndBurst()
 end
 
 function script.QueryWeapon(num)
-	if gun_1 == 1 then 
+	if gun_1 == 1 then
 		return flare1
 	elseif gun_1 == 2 then
 		return flare2

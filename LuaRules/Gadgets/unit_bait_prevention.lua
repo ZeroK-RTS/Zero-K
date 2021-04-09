@@ -109,7 +109,7 @@ function ChaffShootingBlock(unitID, targetID, damage)
 end
 
 --------------------------------------------------------------------------------
--- Command Handling 
+-- Command Handling
 
 local function PreventFiringAtChaffToggleCommand(unitID, unitDefID, state, cmdOptions)
 	if unitBaitLevel[unitID] then

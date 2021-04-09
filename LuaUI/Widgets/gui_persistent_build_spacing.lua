@@ -177,11 +177,11 @@ options = {
 	-- wheel
 	wheel_spacing = {
 		origname        = 'Change with Shift + MouseWheel',
-		type            = 'bool',        
+		type            = 'bool',
 		desc            = 'Change the spacing with the Mousewheel and Shift down',
 		value           = false,
 		noHotkey        = true,
-		OnChange        = function(self) 
+		OnChange        = function(self)
 			wheelSpacing = self.value
 			requestUpdate = options_path
 		end,
@@ -571,6 +571,6 @@ end
 
 -- Init
 function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
-	UpdateKeys() 
+	UpdateKeys()
 	UpdateOptionsDisplay(options_path)
 end

@@ -677,13 +677,13 @@ function widgetHandler:NewWidget()
 			self.mouseOwner = nil
 		end
 	end
-	wh.Ignore = function (_, name) 
+	wh.Ignore = function (_, name)
 		if not ignorelist.ignorees[name] then
 			ignorelist.ignorees[name] = true
 			ignorelist.count = ignorelist.count + 1
 		end
 	end
-	wh.Unignore = function (_, name) 
+	wh.Unignore = function (_, name)
 		ignorelist.ignorees[name] = nil
 		ignorelist.count = ignorelist.count - 1
 	end

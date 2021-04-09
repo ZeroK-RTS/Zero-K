@@ -867,7 +867,7 @@ local function DrawFormationDots(vertFunction, zoomY, unitCount)
 
 end
 
-local function DrawFormationLines(vertFunction, lineStipple)	
+local function DrawFormationLines(vertFunction, lineStipple)
 	glLineStipple(lineStipple, 4095)
 	glLineWidth(options.linewidth.value)
 	

@@ -1084,7 +1084,7 @@ function widget:DrawWorld()
 	mexSpotToDraw = false
 	local pregame = (spGetGameFrame() < 1)
 
-	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and 
+	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and
 			(isMexCmd or (pregame or (WG.showeco or WG.showeco_always_mexes)) or CMD_AREA_MEX == cmdID) then
 		local mx, my = spGetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)

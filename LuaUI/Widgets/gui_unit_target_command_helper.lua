@@ -105,7 +105,7 @@ local function GetActionCommand(right)
 		-- Left click means the active command should be issued.
 		return activeCmdID
 	elseif (not activeCmdID) and right then
-		-- Right click means the default command should be issued, unless 
+		-- Right click means the default command should be issued, unless
 		-- there is an active command, in which case it is cancelled.
 		local _, defaultCmdID = Spring.GetDefaultCommand()
 		return defaultCmdID

@@ -354,7 +354,7 @@ local function UpdateSelection()
 
 	for unitDefID, unitIDs in pairs(sel) do
 		if unitDefID ~= "n" then
-			local unitID = unitIDs[1]			
+			local unitID = unitIDs[1]
 		
 			if unitDefID == sumoDefID then
 				sumoSelected = true
