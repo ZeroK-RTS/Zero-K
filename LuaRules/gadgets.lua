@@ -492,7 +492,7 @@ function gadgetHandler:NewGadget()
   gh.RemoveGadget = function (_) self:RemoveGadget(gadget)     end
   gh.GetViewSizes = function (_) return self:GetViewSizes()    end
   gh.GetHourTimer = function (_) return self:GetHourTimer()    end
-  gh.IsSyncedCode = function (_) return not IsSyncedCode()         end
+  gh.IsSyncedCode = function (_) return IsSyncedCode()         end
 
   gh.UpdateCallIn = function (_, name)
     self:UpdateGadgetCallIn(name, gadget)
