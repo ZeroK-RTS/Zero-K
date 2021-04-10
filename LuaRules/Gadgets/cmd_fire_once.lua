@@ -28,9 +28,10 @@ local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local fakeWeaponByNum = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.weapons then
-		for j = 1, #ud.weapons do
-			local weaponDefID = ud.weapons[j].weaponDef
+	local weapons = ud.weapons
+	if weapons then
+		for j = 1, #weapons do
+			local weaponDefID = weapons[j].weaponDef
 			local wd = WeaponDefs[weaponDefID]
 			if wd.customParams and wd.customParams.bogus then
 				fakeWeaponByNum[i] = fakeWeaponByNum[i] or {}

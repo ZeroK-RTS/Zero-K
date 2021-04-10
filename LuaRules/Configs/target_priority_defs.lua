@@ -23,10 +23,13 @@ local udCount = #UnitDefs
 
 --Time("START TARGET PRIORITY DEFS")
 
+local weaponsCache = {}
+
 -- Find the weapon bad target cats
 for i = 1, udCount do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
+	weaponsCache[i] = weapons
 	for j = 1, #weapons do
 		local wd = weapons[j]
 		local realWD = wd.weaponDef
@@ -64,9 +67,8 @@ end
 -- Find the things which are unarmed
 local unitIsUnarmed = {}
 for i = 1, udCount do
-	local ud = UnitDefs[i]
-	local weapons = ud.weapons
-	if (not weapons or #weapons == 0) and not ud.canKamikaze then
+	local weapons = weaponsCache[i]
+	if (not weapons or #weapons == 0) and not UnitDefs[i].canKamikaze then
 		unitIsUnarmed[i] = true
 	end
 end
@@ -255,16 +257,15 @@ local radarDotPenalty = {
 --Time("Load more tables")
 
 for i = 1, udCount do
-	local ud = UnitDefs[i]
 	if unitIsBadAgainstGround[i] then
-		local weapons = ud.weapons
+		local weapons = weaponsCache[i]
 		for j = 1, #weapons do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
 			weaponBadCats_ground[realWD] = true
 		end
 	elseif unitIsHeavyHitter[i] then
-		local weapons = ud.weapons
+		local weapons = weaponsCache[i]
 		for j = 1, #weapons do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
