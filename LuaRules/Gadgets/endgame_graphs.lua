@@ -438,7 +438,7 @@ function gadget:Initialize()
 		spSetTeamRulesParam(teamID, "stats_history_nano_total_0"       , 0, ALLIED_VISIBLE)
 
 		mTotalOverdrive     [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_overdrive_current") or 0
-		reclaimListByTeam   [teamID] = -spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
+		reclaimListByTeam   [teamID] = -1*(spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0)
 		metalExcessByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
 		damageDealtByTeamHax[teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
 		damageDealtByTeamNonhax[teamID] =  spGetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0

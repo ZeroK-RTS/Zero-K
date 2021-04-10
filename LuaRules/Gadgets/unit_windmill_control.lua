@@ -233,7 +233,7 @@ function gadget:Initialize()
 	end
 	
 	local nominalGroundMin, nominalGroundMax = Spring.GetGroundExtremes()
-	local waterlevel = Spring.GetGameRulesParam("waterlevel")
+	local waterlevel = Spring.GetGameRulesParam("waterlevel") or 0
 	local groundMin, groundMax = math.max(nominalGroundMin - waterlevel,0), math.max(nominalGroundMax - waterlevel, 1)
 	local mexHeight = math.max(0, Spring.GetGameRulesParam("mex_min_height") or groundMin)
 
