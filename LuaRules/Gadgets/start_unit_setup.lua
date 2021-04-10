@@ -211,7 +211,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 	end
 
 	local startUnit
-	local commProfileID = nil
 
 	if isAI then -- AI that didn't pick comm type gets default comm
 		return UnitDefNames[Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_strike_base"].id
@@ -233,7 +232,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 		local altComm = playerCommProfiles[commChoice[playerID]]
 		if altComm then
 			startUnit = playerCommProfiles[commChoice[playerID]].baseUnitDefID
-			commProfileID = commChoice[playerID]
 		end
 	end
 
