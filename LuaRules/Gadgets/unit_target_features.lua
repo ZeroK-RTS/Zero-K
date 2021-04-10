@@ -43,7 +43,7 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
 	if weapons and #weapons > 0 then
-		weaponCounts[i] = weapons
+		weaponCounts[i] = #weapons
 		local ignoreGround
 		for j = 1, #weapons do
 			local weaponDefID = weapons[j].weaponDef
