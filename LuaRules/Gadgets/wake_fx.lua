@@ -26,63 +26,65 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
-local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
-local spGetUnitPosition  = Spring.GetUnitPosition
-local spGetUnitVelocity  = Spring.GetUnitVelocity
+local spGetUnitIsCloaked     = Spring.GetUnitIsCloaked
+local spGetUnitPosition      = Spring.GetUnitPosition
+local spGetUnitVelocity      = Spring.GetUnitVelocity
+local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 
 local spusCallAsUnit = Spring.UnitScript.CallAsUnit
 local spusEmitSfx    = Spring.UnitScript.EmitSfx
 
 local wadeDepth = {}
 local wadeSfxID = {}
-do
-	local smc = Game.speedModClasses
-	local wadingSMC = {
-		[smc.Tank] = true,
-		[smc.KBot] = true,
-	}
-	local SFXTYPE_WAKE1 = 2
-	local SFXTYPE_WAKE2 = 3
 
-	local UD = UnitDefs
-	local function checkCanWade(unitDef)
-		local moveDef = unitDef.moveDef
-		if not moveDef then
-			return false
-		end
+local smc = Game.speedModClasses
+local wadingSMC = {
+	[smc.Tank] = true,
+	[smc.KBot] = true,
+}
+local SFXTYPE_WAKE1 = 2
+local SFXTYPE_WAKE2 = 3
 
-		local smClass = moveDef.smClass
-		if not smClass or not wadingSMC[smClass] then
-			return false
-		end
-
-		return true
+local function checkCanWade(unitDef)
+	local moveDef = unitDef.moveDef
+	if not moveDef then
+		return false
 	end
-
-	local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
-	for unitDefID = 1, #UD do
-		local unitDef = UD[unitDefID]
-		if checkCanWade(unitDef) then
-			wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
-
-			local cpR = unitDef.customParams.modelradius
-			local r = cpR and tonumber(cpR) or unitDef.radius
-			wadeSfxID[unitDefID] = (((r > 50) or unitDef.customParams.floattoggle) and SFXTYPE_WAKE2) or SFXTYPE_WAKE1
-		else
-			-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
-			-- instead of keeping them `nil` to keep the internal representation an array (faster)
-			wadeDepth[unitDefID] = false
-			wadeSfxID[unitDefID] = false
-		end
+	local smClass = moveDef.smClass
+	if not smClass or not wadingSMC[smClass] then
+		return false
 	end
+	return true
+end
+
+local function GetUnitWakeParams(unitDefID)
+	if wadeDepth[unitDefID] ~= nil then
+		return wadeDepth[unitDefID], wadeSfxID[unitDefID]
+	end
+	
+	local unitDef = UnitDefs[unitDefID]
+	if checkCanWade(unitDef) then
+		wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
+
+		local cpR = unitDef.customParams.modelradius
+		local r = cpR and tonumber(cpR) or unitDef.radius
+		wadeSfxID[unitDefID] = (((r > 50) or unitDef.customParams.floattoggle) and SFXTYPE_WAKE2) or SFXTYPE_WAKE1
+	else
+		-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
+		-- instead of keeping them `nil` to keep the internal representation an array (faster)
+		wadeDepth[unitDefID] = false
+		wadeSfxID[unitDefID] = false
+	end
+	
+	return wadeDepth[unitDefID], wadeSfxID[unitDefID]
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	local maxDepth = wadeDepth[unitDefID]
+	local maxDepth, fxID = GetUnitWakeParams(unitDefID)
 	if maxDepth then
 		unitsCount = unitsCount + 1
 		unitsData[unitsCount] = unitID
-		unit[unitID] = {id = unitsCount, h = maxDepth, fx = wadeSfxID[unitDefID]}
+		unit[unitID] = {id = unitsCount, h = maxDepth, fx = fxID}
 	end
 end
 
@@ -108,11 +110,13 @@ function gadget:GameFrame(n)
 			local x,y,z = spGetUnitPosition(unitID)
 			local h = data.h
 
-			local _, _, _, speed = spGetUnitVelocity(unitID)
-			if speed and y > h and y <= 0 and speed > 0 and not spGetUnitIsCloaked(unitID) then
-				-- 1 is the pieceID, most likely it's usually the base piece
-				-- but even if it isn't, it doesn't really matter
-				spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
+			if y and h and y > h and y <= 0  and not spGetUnitIsCloaked(unitID) then
+				local _, _, _, speed = spGetUnitVelocity(unitID)
+				if speed and speed > 0 then
+					-- 1 is the pieceID, most likely it's usually the base piece
+					-- but even if it isn't, it doesn't really matter
+					spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
+				end
 			end
 		end
 		current_fold = (current_fold % n_folds) + 1

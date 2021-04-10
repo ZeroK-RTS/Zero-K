@@ -45,10 +45,11 @@ end
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.weapons then
+	local weapons = ud.weapons
+	if weapons then
 		immobileUnits[i] = true
-		for j = 1, #ud.weapons do
-			local weaponDefID = ud.weapons[j].weaponDef
+		for j = 1, #weapons do
+			local weaponDefID = weapons[j].weaponDef
 			if fakeWeapons[weaponDefID] then
 				fakeWeaponByNum[i] = fakeWeaponByNum[i] or {}
 				fakeWeaponByNum[i][j] = true

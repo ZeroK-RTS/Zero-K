@@ -41,12 +41,12 @@ local ignoreGroundWeapons = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	local weapons = (ud.weapons and #ud.weapons > 0 and #ud.weapons)
-	if weapons then
+	local weapons = ud.weapons
+	if weapons and #weapons > 0 then
 		weaponCounts[i] = weapons
 		local ignoreGround
-		for j = 1, weapons do
-			local weaponDefID = ud.weapons[j].weaponDef
+		for j = 1, #weapons do
+			local weaponDefID = weapons[j].weaponDef
 			local weaponParam = WeaponDefs[weaponDefID].customParams or {}
 			if weaponParam.force_ignore_ground then
 				ignoreGround = ignoreGround or {}

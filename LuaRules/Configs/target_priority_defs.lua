@@ -5,23 +5,34 @@ local DISARM_BASE = 0.3
 local DISARM_ADD = 0.2
 local DISARM_ADD_TIME = 10*30 -- frames
 
-local weaponBadCats = {}
+local weaponBadCats_fixedwing = {}
+local weaponBadCats_gunship = {}
+local weaponBadCats_ground = {}
+local weaponBadCats_heavy = {}
 local weaponIsAA = {}
 
-for wid = 1, #WeaponDefs do
-	weaponBadCats[wid] = {}
-end
+local wdCount = #WeaponDefs
+local udCount = #UnitDefs
+
+--local lastTime = Spring.GetTimer()
+--local function Time(name)
+--	local timeDiff = Spring.DiffTimers(Spring.GetTimer(), lastTime)
+--	Spring.Echo(name, timeDiff)
+--	lastTime = Spring.GetTimer()
+--end
+
+--Time("START TARGET PRIORITY DEFS")
 
 -- Find the weapon bad target cats
-for i=1, #UnitDefs do
+for i = 1, udCount do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
 	for j = 1, #weapons do
 		local wd = weapons[j]
 		local realWD = wd.weaponDef
 		if wd.badTargets and realWD ~= 0 then
-			weaponBadCats[realWD].fixedwing = wd.badTargets["fixedwing"]
-			weaponBadCats[realWD].gunship = wd.badTargets["gunship"]
+			weaponBadCats_fixedwing[realWD] = wd.badTargets["fixedwing"]
+			weaponBadCats_gunship[realWD] = wd.badTargets["gunship"]
 		end
 		if wd.customParams and realWD ~= 0 and wd.customParams.isaa then
 			weaponIsAA[realWD] = true
@@ -29,12 +40,14 @@ for i=1, #UnitDefs do
 	end
 end
 
+--Time("Find bad target cats")
+
 -- Find the things which are fixedwing or gunship
 local unitIsGunship = {}
 local unitIsFixedwing = {}
 local unitIsGround = {}
 local getMovetype = Spring.Utilities.getMovetype
-for i=1, #UnitDefs do
+for i = 1, udCount do
 	local ud = UnitDefs[i]
 	local unitType = getMovetype(ud) --1 gunship, 0 fixedplane, 2 ground/sea, false everything-else
 	if unitType == 1 then
@@ -46,15 +59,19 @@ for i=1, #UnitDefs do
 	end
 end
 
+--Time("Find fixedwing or gunship")
+
 -- Find the things which are unarmed
 local unitIsUnarmed = {}
-for i=1, #UnitDefs do
+for i = 1, udCount do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
 	if (not weapons or #weapons == 0) and not ud.canKamikaze then
 		unitIsUnarmed[i] = true
 	end
 end
+
+--Time("Find unitIsUnarmed")
 
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
@@ -207,6 +224,8 @@ local gravityWeaponDefs = {
 	[WeaponDefNames["jumpsumo_gravity_pos"].id] = true,
 }
 
+--Time("Load tables")
+
 -- for heatrays
 local proximityWeaponDefs = {}
 for wdid = 1, #WeaponDefs do
@@ -217,6 +236,8 @@ for wdid = 1, #WeaponDefs do
 		proximityWeaponDefs[wdid] = 20
 	end
 end
+
+--Time("Find heatrays")
 
 local radarWobblePenalty = {
 	[WeaponDefNames["vehheavyarty_cortruck_rocket"].id] = 5,
@@ -231,49 +252,67 @@ local radarDotPenalty = {
 	[WeaponDefNames["shieldarty_emp_rocket"].id] = 100,
 }
 
-for i = 1, #UnitDefs do
+--Time("Load more tables")
+
+for i = 1, udCount do
 	local ud = UnitDefs[i]
 	if unitIsBadAgainstGround[i] then
 		local weapons = ud.weapons
 		for j = 1, #weapons do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
-			weaponBadCats[realWD].ground = true
+			weaponBadCats_ground[realWD] = true
 		end
 	elseif unitIsHeavyHitter[i] then
 		local weapons = ud.weapons
 		for j = 1, #weapons do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
-			weaponBadCats[realWD].cheap = true
-			weaponBadCats[realWD].heavy = true
+			weaponBadCats_heavy[realWD] = true
 		end
 	end
 end
 
+--Time("Load more weaponBadCats")
+
 -- Generate transport unit table
 local transportMult = {}
 
-for uid = 1, #UnitDefs do
+for uid = 1, udCount do
 	local ud = UnitDefs[uid]
 	if ud.isTransport then
 		transportMult[uid] = 0.98 -- Priority multiplier for transported unit.
 	end
 end
 
+--Time("Generate transport")
+
+-- Reduce WeaponDefs access from #UnitDefs*#WeaponDefs to #WeaponDefs
+local weaponDamage = {}
+for wid = 1, wdCount do
+	local wd = WeaponDefs[wid]
+	weaponDamage[wid] = wd.damages
+end
+
+--Time("Reduce WeaponDefs access")
+
 -- Generate full target table
 local targetTable = {}
 
-for uid = 1, #UnitDefs do
+local priority, damage
+for uid = 1, udCount do
 	local ud = UnitDefs[uid]
 	local unitHealth = ud.health
-	local unitCost = ud.buildTime
+	local inverseUnitCost = 1 / ud.buildTime
 	local armorType = ud.armorType
 	targetTable[uid] = {}
-	for wid = 1, #WeaponDefs do
-		local wd = WeaponDefs[wid]
-		local damage = wd.damages[armorType]
-		local priority = math.max(damage, unitHealth)/unitCost
+	for wid = 1, wdCount do
+		damage = weaponDamage[wid][armorType]
+		if damage > unitHealth then
+			priority = damage * inverseUnitCost
+		else
+			priority = unitHealth * inverseUnitCost
+		end
 		if priority > 12 then
 			priority = 12 + 0.1*priority
 		end
@@ -282,29 +321,32 @@ for uid = 1, #UnitDefs do
 			targetTable[uid][wid] = priority + 35
 		elseif unitIsClaw[uid] then
 			targetTable[uid][wid] = priority + 1000
-		elseif (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
-			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
-			or (weaponBadCats[wid].ground and unitIsGround[uid]) then
-				targetTable[uid][wid] = priority + 15
+		elseif (weaponBadCats_fixedwing[wid] and unitIsFixedwing[uid]) or (weaponBadCats_gunship[wid] and unitIsGunship[uid]) or (weaponBadCats_ground[wid] and unitIsGround[uid]) then
+			targetTable[uid][wid] = priority + 15
 		elseif (unitIsFighterOrDrone[uid]) then
-			--or (weaponBadCats[wid].cheap and unitIsCheap[uid]) then
-				targetTable[uid][wid] = priority + 10
-		elseif (unitIsBomber[uid] and weaponIsAA[wid])
-			or (weaponBadCats[wid].heavy and unitIsHeavy[uid]) then
+			targetTable[uid][wid] = priority + 10
+		elseif (unitIsBomber[uid] and weaponIsAA[wid]) or (weaponBadCats_heavy[wid] and unitIsHeavy[uid]) then
 			targetTable[uid][wid] = priority*0.3
 		else
 			targetTable[uid][wid] = priority
 		end
-		
-		-- Autogenerate some wobble penalties.
-		if not radarWobblePenalty[wid] then
-			local weaponType = wd.type
-			if weaponType == "BeamLaser" or weaponType == "LaserCannon" or weaponType == "LightningCannon" then
-				radarWobblePenalty[wid] = 5
-			end
+	end
+end
+
+--Time("Generate full target table")
+
+-- Autogenerate some wobble penalties.
+for wid = 1, wdCount do
+	if not radarWobblePenalty[wid] then
+		local wd = WeaponDefs[wid]
+		local wType = wd.type
+		if wType == "BeamLaser" or wType == "LaserCannon" or wType == "LightningCannon" then
+			radarWobblePenalty[wid] = 5
 		end
 	end
 end
+
+--Time("Autogenerate some wobble penalties")
 
 -- Modify the velocity penalty defs to implement 'additional penantly per excess velocity'
 for weaponDefID, data in pairs(velocityPenaltyDefs) do
@@ -314,13 +356,18 @@ for weaponDefID, data in pairs(velocityPenaltyDefs) do
 	data[2] = data[2] - data[1]*data[3]
 end
 
+--Time("Modify the velocity penalty")
+
 local reloadTimeAlpha = 1.8 --seconds, matches Ripper's reload time
 local highAlphaWeaponDamages = {}
-for wid = 1, #WeaponDefs do
+for wid = 1, wdCount do
 	local wd = WeaponDefs[wid]
-	if wd.customParams and wd.customParams.shot_damage and wd.reload >= reloadTimeAlpha then
-		highAlphaWeaponDamages[wid] = tonumber(wd.customParams.shot_damage)
+	local shotDamage = wd.customParams and wd.customParams.shot_damage
+	if shotDamage and wd.reload >= reloadTimeAlpha then
+		highAlphaWeaponDamages[wid] = tonumber(shotDamage)
 	end
 end
+
+--Time("highAlphaWeaponDamages")
 
 return targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME
