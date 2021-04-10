@@ -1,4 +1,7 @@
-if not Script.GetSynced() then return end
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return false
+end
 
 function gadget:GetInfo()
 	return {
