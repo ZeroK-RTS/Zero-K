@@ -64,6 +64,9 @@ local function GetUnitWakeParams(unitDefID)
 	
 	local unitDef = UnitDefs[unitDefID]
 	if checkCanWade(unitDef) then
+		-- note, the code below loads unit model if it's not yet loaded,
+		-- so avoid trying to precache it (increases load times a lot)
+
 		wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
 
 		local cpR = unitDef.customParams.modelradius
