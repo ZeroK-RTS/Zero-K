@@ -141,13 +141,13 @@ local function GetAssimpNormalTex(udef, tex1, tex2)
 	return normaltex
 end
 
-local function GetNormalTex(udef)
+local function GetNormalTex(udef, cp, modeltype)
 	local normalTex = nil
-	if (udef.customParams.normaltex and VFS.FileExists(udef.customParams.normaltex)) then
-		normalTex = udef.customParams.normaltex
-	elseif ((not normalTex) and udef.modeltype == "s3o") then --s3o
+	if (cp.normaltex and VFS.FileExists(cp.normaltex)) then
+		normalTex = cp.normaltex
+	elseif ((not normalTex) and modeltype == "s3o") then --s3o
 		normalTex = GetS3ONormalTex(udef, tex1, tex2)
-	elseif ((not normalTex) and udef.modeltype ~= "3do") then --assimp, 3do crap is handled later as it requires special culling and textures
+	elseif ((not normalTex) and modeltype ~= "3do") then --assimp, 3do crap is handled later as it requires special culling and textures
 		normalTex = GetAssimpNormalTex(udef, tex1, tex2)
 	end
 	return normalTex
@@ -180,24 +180,26 @@ local unitMaterials = {}
 
 for id = 1, #UnitDefs do
 	local udef = UnitDefs[id]
-	if not cusUnitMaterials[id] and udef.modeltype ~= "3do" then
+	local modeltype = udef.modeltype
+	if not cusUnitMaterials[id] and modeltype ~= "3do" then
+		local cp = udef.customParams
 		local tex1 = "%%"..id..":0"
 		local tex2 = "%%"..id..":1"
 
 		local flashlights = true
-		if (udef.customParams.cus_noflashlight and udef.customParams.cus_noflashlight == "1") then
+		if (cp.cus_noflashlight and cp.cus_noflashlight == "1") then
 			flashlights = false
 		end
 
-		if (udef.customParams.altskin and VFS.FileExists(udef.customParams.altskin)) then
-			tex1 = udef.customParams.altskin
+		if (cp.altskin and VFS.FileExists(cp.altskin)) then
+			tex1 = cp.altskin
 		end
 
-		if (udef.customParams.altskin2 and VFS.FileExists(udef.customParams.altskin2)) then
-			tex1 = udef.customParams.altskin2
+		if (cp.altskin2 and VFS.FileExists(cp.altskin2)) then
+			tex1 = cp.altskin2
 		end
 
-		local normalTex = GetNormalTex(udef)
+		local normalTex = GetNormalTex(udef, cp, modeltype)
 
 
 		unitMaterials[id] = GetUnitMaterial(tex1, tex2, normalTex, flashlights)
@@ -210,7 +212,8 @@ for name, data in pairs(skinDefs) do
 	local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
 
 	local flashlights = true
-	if (udefParent.customParams.cus_noflashlight) then
+	local cp = udefParent.customParams
+	if (cp.cus_noflashlight) then
 		flashlights = false
 	end
 
@@ -220,7 +223,7 @@ for name, data in pairs(skinDefs) do
 		tex2 = "%%" .. udefParent.id .. ":1"
 	end
 
-	local normalTex = GetNormalTex(udefParent)
+	local normalTex = GetNormalTex(udefParent, cp, udefParent.modeltype)
 	unitMaterials[name] = GetUnitMaterial(tex1, tex2, normalTex, flashlights)
 end
 
