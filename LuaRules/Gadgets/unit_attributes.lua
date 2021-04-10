@@ -49,7 +49,6 @@ local INLOS_ACCESS = {inlos = true}
 local getMovetype = Spring.Utilities.getMovetype
 
 local spSetUnitCOBValue = Spring.SetUnitCOBValue
-local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 local CMD_WAIT = CMD.WAIT
 
@@ -350,8 +349,8 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
-				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
-				spSetUnitCOBValue(unitID, COB_MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
+				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB.MAX_SPEED))
+				spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 			end
 		end
 	end
