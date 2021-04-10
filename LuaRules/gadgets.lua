@@ -282,9 +282,32 @@ local function Basename(fullpath)
   return base, path
 end
 
+local lastTime = Spring.GetTimer()
+local function Time(name)
+	local timeDiff = Spring.DiffTimers(Spring.GetTimer(), lastTime)
+	Spring.Echo(name, timeDiff)
+	lastTime = Spring.GetTimer()
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+Spring.MoveCtrl = {}
+Spring.COB = {}
+Spring.UnitScript = {}
+Spring.SetGameRulesParam = function () Spring.Echo('SetGameRulesParam') end
+Spring.SetTeamRulesParam = function () Spring.Echo('SetTeamRulesParam') end
+Script.SetWatchProjectile = function () Spring.Echo('SetWatchProjectile') end
+Script.SetWatchExplosion = function () Spring.Echo('SetWatchExplosion') end
+Script.SetWatchAllowTarget = function () Spring.Echo('SetWatchAllowTarget') end
+Script.SetWatchWeapon = function () Spring.Echo('SetWatchWeapon') end
+Spring.SetSquareBuildingMask = function () Spring.Echo('SetSquareBuildingMask') end
+Spring.SetExperienceGrade = function () Spring.Echo('SetExperienceGrade') end
+Spring.SetTerrainTypeData = function () Spring.Echo('SetTerrainTypeData') end
+Spring.GameOver = function () Spring.Echo('GameOver') end
+Spring.SetTerrainTypeData = function () Spring.Echo('SetTerrainTypeData') end
+
 
 function gadgetHandler:Initialize()
   local unsortedGadgets = {}
@@ -302,18 +325,21 @@ function gadgetHandler:Initialize()
   end
 
   -- stuff the gadgets into unsortedGadgets
+  Time("Start loading gadets")
   for k,gf in ipairs(gadgetFiles) do
 --    Spring.Echo('gf2 = ' .. gf) -- FIXME
     local gadget = self:LoadGadget(gf)
     if (gadget) then
       table.insert(unsortedGadgets, gadget)
     end
+    Time("Loaded " .. gf)
   end
 
   if ECHO_DESCRIPTIONS then
     Spring.Echo("=== End Gadgets ===")
   end
 
+  Time("Start sorting gadets")
   -- sort the gadgets
   table.sort(unsortedGadgets, function(g1, g2)
     local l1 = g1.ghInfo.layer
@@ -331,7 +357,9 @@ function gadgetHandler:Initialize()
       return (n1 < n2)
     end
   end)
+  Time("Sorted gadets")
 
+  Time("Start InsertGadget")
   -- add the gadgets
   for _,g in ipairs(unsortedGadgets) do
     gadgetHandler:InsertGadget(g)
@@ -339,6 +367,7 @@ function gadgetHandler:Initialize()
     local name = g.ghInfo.name
     local basename = g.ghInfo.basename
     print(string.format("Loaded gadget:  %-18s  <%s>", name, basename))
+    Time("Loaded gadget " .. name)
   end
 end
 
@@ -463,7 +492,7 @@ function gadgetHandler:NewGadget()
   gh.RemoveGadget = function (_) self:RemoveGadget(gadget)     end
   gh.GetViewSizes = function (_) return self:GetViewSizes()    end
   gh.GetHourTimer = function (_) return self:GetHourTimer()    end
-  gh.IsSyncedCode = function (_) return IsSyncedCode()         end
+  gh.IsSyncedCode = function (_) return not IsSyncedCode()         end
 
   gh.UpdateCallIn = function (_, name)
     self:UpdateGadgetCallIn(name, gadget)

@@ -12,5 +12,5 @@ function Spring.GetModOption(s,bool,default)
 end
 
 Spring.Echo("Synced LuaRules: starting loading")
-VFS.Include('LuaRules/gadgets.lua', nil, VFS.ZIP_ONLY)
+--VFS.Include('LuaRules/gadgets.lua', nil, VFS.ZIP_ONLY)
 Spring.Echo("Synced LuaRules: finished loading")
