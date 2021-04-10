@@ -70,8 +70,6 @@ local function GetUnitWakeParams(unitDefID)
 		local r = cpR and tonumber(cpR) or unitDef.radius
 		wadeSfxID[unitDefID] = (((r > 50) or unitDef.customParams.floattoggle) and SFXTYPE_WAKE2) or SFXTYPE_WAKE1
 	else
-		-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
-		-- instead of keeping them `nil` to keep the internal representation an array (faster)
 		wadeDepth[unitDefID] = false
 		wadeSfxID[unitDefID] = false
 	end
