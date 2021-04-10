@@ -1117,8 +1117,9 @@ function widget:Initialize()
 		ud.shieldPower   = 0
 		local numOverride = ud.customParams.draw_reload_num and tonumber(ud.customParams.draw_reload_num)
 
-		for i = 1, #ud.weapons do
-			local WeaponDefID = ud.weapons[i].weaponDef;
+		local weapons = ud.weapons
+		for i = 1, #weapons do
+			local WeaponDefID = weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
 			if (WeaponDef.reload > ud.reloadTime) or numOverride == i then
 				ud.reloadTime    = WeaponDef.reload

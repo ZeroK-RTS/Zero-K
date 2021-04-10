@@ -211,19 +211,20 @@ local UPDATE_FREQUENCY = 0.2
 local isCommander = {}
 local maxShield = {}
 for i = 1, #UnitDefs do
-	local ud = UnitDefs[i]
-	if ud.customParams.level or ud.customParams.dynamic_comm then
+	local cp = UnitDefs[i].customParams
+	if cp.level or cp.dynamic_comm then
 		isCommander[i] = true
 	end
-	if ud.customParams.shield_power then
-		maxShield[i] = tonumber(ud.customParams.shield_power)
+	if cp.shield_power then
+		maxShield[i] = tonumber(cp.shield_power)
 	end
 end
 
 local manualFireTimeDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
-	local unitWeapon = (ud and ud.weapons and ud.weapons[3])
+	local unitWeapon = (ud and ud.weapons)
+	unitWeapon = unitWeapon and unitWeapon[3]
 	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
 		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
