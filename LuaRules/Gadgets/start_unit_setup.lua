@@ -32,12 +32,10 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, spGetTeamInfo(gaiateam, false))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
 local fixedStartPos = (modOptions.fixedstartpos == "1")
-local ordersToRemove
 
 local storageUnits = {
 	{
@@ -55,27 +53,11 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- Functions shared between missions and non-missions
 
-local function CheckOrderRemoval() -- FIXME: maybe we can remove polling every frame and just remove the orders directly
-	if not ordersToRemove then
-		return
-	end
-	for unitID, factoryDefID in pairs(ordersToRemove) do
-		local cmdID, _, cmdTag = Spring.GetUnitCurrentCommand(unitID)
-		if cmdID == -factoryDefID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, CMD.OPT_ALT)
-		end
-	end
-	ordersToRemove = nil
-end
-
 local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		Spring.SetUnitRulesParam(unitID,"ploppee",1, {private = true})
-		
-		ordersToRemove = ordersToRemove or {}
-		ordersToRemove[builderID] = unitDefID
 		
 		-- Instantly complete factory
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
@@ -117,10 +99,6 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 	end
 
 	function GG.SetStartLocation()
-	end
-
-	function gadget:GameFrame(n)
-		CheckOrderRemoval()
 	end
 	
 	function GG.GiveFacplop(unitID) -- deprecated, use rulesparam directly
@@ -641,7 +619,6 @@ function gadget:RecvLuaMsg(msg, playerID)
 end
 
 function gadget:GameFrame(n)
-	CheckOrderRemoval()
 	if n == (COMM_SELECT_TIMEOUT) then
 		for team in pairs(waitingForComm) do
 			local _,playerID = spGetTeamInfo(team, false)
