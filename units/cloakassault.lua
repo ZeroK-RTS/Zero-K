@@ -21,6 +21,7 @@ return { cloakassault = {
   customParams           = {
     modelradius    = [[12]],
     cus_noflashlight = 1,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],

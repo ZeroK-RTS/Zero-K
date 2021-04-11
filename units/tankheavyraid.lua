@@ -20,6 +20,7 @@ return { tankheavyraid = {
     modelradius       = [[10]],
     selection_scale   = 0.85,
     aim_lookahead     = 120,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],

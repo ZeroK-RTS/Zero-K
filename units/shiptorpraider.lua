@@ -21,6 +21,7 @@ return { shiptorpraider = {
     modelradius        = [[14]],
     turnatfullspeed    = [[1]],
     aim_lookahead      = 80,
+    bait_level_default = 0,
   },
 
 

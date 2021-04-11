@@ -20,6 +20,7 @@ return { hoverraid = {
   customParams        = {
     modelradius        = [[25]],
     aim_lookahead      = 120,
+    bait_level_default = 0,
   },
 
   explodeAs           = [[SMALL_UNITEX]],
