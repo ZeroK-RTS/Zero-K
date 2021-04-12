@@ -263,7 +263,6 @@ local function getMiddleOfStartBox(teamID, n) -- N is the number of times an all
 	if boxID then
 		local startposList = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
 		if startposList then
-			local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
 			local maxpoints = #startposList
 			local startpos = startposList[(n%maxpoints) + 1] -- this cycles the AFKers and unplaced bots to different positions
 			x = startpos[1]
