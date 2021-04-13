@@ -1,3 +1,6 @@
+-- NB: not just armcom, used for any "generic" build list constructor
+-- But don't rename because users may have overridden it locally
+
 local menu_armcom = {
   items = {
   {
