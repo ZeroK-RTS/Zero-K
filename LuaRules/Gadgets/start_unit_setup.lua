@@ -255,7 +255,7 @@ local function GetFacingDirection(x, z, teamID)
 			or ((z>Game.mapSizeZ/2) and "north" or "south")
 end
 
-local function getMiddleOfStartBox(teamID, n) -- N is the number of times an ally team has called this
+local function GetRecommendedStartPosition(teamID, n) -- N is the number of times an ally team has called this
 	local x = Game.mapSizeX / 2
 	local z = Game.mapSizeZ / 2
 
@@ -294,7 +294,7 @@ local function GetStartPos(teamID, teamInfo, isAI)
 	if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
 		local index = allyTeamAFKers[allyTeamID] or 0
 		allyTeamAFKers[allyTeamID] = index + 1
-		local x, y, z = getMiddleOfStartBox(teamID, index)
+		local x, y, z = GetRecommendedStartPosition(teamID, index)
 		return x, y, z
 	end
 	
@@ -305,7 +305,7 @@ local function GetStartPos(teamID, teamInfo, isAI)
 	if boxID and not GG.CheckStartbox(boxID, x, z) then
 		local index = allyTeamAFKers[allyTeamID] or 0
 		allyTeamAFKers[allyTeamID] = index + 1
-		x,y,z = getMiddleOfStartBox(teamID, index)
+		x,y,z = GetRecommendedStartPosition(teamID, index)
 	end
 	return x, y, z
 end
