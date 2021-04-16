@@ -63,6 +63,7 @@ return { turrettorp = {
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
       burnblow                = true,
+      canAttackGround         = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
