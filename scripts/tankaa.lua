@@ -1,12 +1,11 @@
 include "constants.lua"
+include "trackControl.lua"
 include "pieceControl.lua"
 
 local base, turret, guns, aim = piece("base", "turret", "guns", "aim")
 local barrels = {piece("barrel1", "barrel2")}
 local flares = {piece("flare1", "flare2")}
 local a1, a2, neck = piece("a1", "a2", "neck")
-
-local wheels1, wheels2, wheels3, wheels4, wheels5, wheels6 = piece("wheels1", "wheels2", "wheels3", "wheels4", "wheels5", "wheels6")
 
 local currentGun = 1
 local isAiming = false
@@ -15,7 +14,6 @@ local disarmed = false
 local stuns = {false, false, false}
 
 local SIG_AIM = 1
-local SIG_TRACKS = 2
 
 local function RestoreAfterDelay()
 	SetSignalMask (SIG_AIM)
@@ -49,39 +47,12 @@ function Unstunned(stun_type)
 	end
 end
 
-local tracks = { piece("tracks1", "tracks2", "tracks3", "tracks4") }
-local currentTrack = 1
-local function TrackControl()
-	SetSignalMask(SIG_TRACKS)
-	while true do
-		-- he protecc, he attacc, but also he rotate tracc
-		Hide(tracks[currentTrack])
-		currentTrack = (currentTrack % 4) + 1
-		Show(tracks[currentTrack])
-		Sleep(33)
-	end
-end
-
-local bigWheelSpin = 2 * math.pi
-local lilWheelSpin = 3 * math.pi
 function script.StartMoving()
-	Spin(wheels1, x_axis, bigWheelSpin)
-	Spin(wheels2, x_axis, bigWheelSpin)
-	Spin(wheels3, x_axis, bigWheelSpin)
-	Spin(wheels4, x_axis, lilWheelSpin)
-	Spin(wheels5, x_axis, lilWheelSpin)
-	Spin(wheels6, x_axis, lilWheelSpin)
-	StartThread(TrackControl)
+	StartThread(TrackControlStartMoving)
 end
 
 function script.StopMoving()
-	Signal(SIG_TRACKS)
-	StopSpin(wheels1, x_axis)
-	StopSpin(wheels2, x_axis)
-	StopSpin(wheels3, x_axis)
-	StopSpin(wheels4, x_axis)
-	StopSpin(wheels5, x_axis)
-	StopSpin(wheels6, x_axis)
+	TrackControlStopMoving()
 end
 
 function script.AimFromWeapon()
@@ -123,11 +94,27 @@ function script.FireWeapon()
 end
 
 function script.Create()
-	local trax = tracks
+	local trax = {piece("tracks1", "tracks2", "tracks3", "tracks4")}
 	Show(trax[1]) -- in case current != 1 before luarules reload
 	Hide(trax[2])
 	Hide(trax[3])
 	Hide(trax[4])
+
+	InitiailizeTrackControl({
+		wheels = {
+			large = {piece('wheels1', 'wheels2', 'wheels3')},
+			small = {piece('wheels4', 'wheels5', 'wheels6')},
+		},
+		tracks = trax,
+		signal = 2,
+		smallSpeed = math.rad(360),
+		smallAccel = math.rad(60),
+		smallDecel = math.rad(120),
+		largeSpeed = math.rad(540),
+		largeAccel = math.rad(90),
+		largeDecel = math.rad(180),
+		trackPeriod = 50,
+	})
 
 	StartThread (GG.Script.SmokeUnit, unitID, {base, turret, guns})
 end
