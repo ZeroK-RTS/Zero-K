@@ -57,7 +57,7 @@ local dwOn, draw, drawValue, drawRects
 
 -- related to options
 local requestUpdate
-local wheelSpacing, reverseWheel = false, false
+local wheelSpacing, reverseWheel = false, 1
 local showSpacingRects, only2Rects, showRectsOnChange = false, false, true
 local showSpacingValue, showValueOnChange = false, false
 local showRectsTime = 1
