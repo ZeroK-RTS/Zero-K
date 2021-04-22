@@ -29,7 +29,7 @@ local smokePiece = { lidLeft, lidRight, wheel}
 --variables
 local unpackSpeed = math.rad(286);
 local weaponRange = WeaponDefNames["turretgauss_gauss"].range
-local isClosed, aimHelp = false, false--used for aim
+local isClosed = false--used for aim
 local rangeChanged = false
 local restore_delay = 2000;
 local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen or 20) / 2 -- applied every 0.5s
@@ -44,9 +44,6 @@ local SIGrestore = 2
 local function Close()
 	Signal(SIGanimation)
 	SetSignalMask(SIGanimation)
-	
-	aimHelp = true
-	Spin(aimProxy, z_axis, math.rad(270))
 	
 	--animation
 	if not isClosed then
@@ -109,7 +106,7 @@ function script.Create()
 	
 	--hacks to move invisible pieces
 	Move(aimProxy, y_axis, -13)
-	Move(muzzleProxy, y_axis, 6)
+--	Move(muzzleProxy, y_axis, 6)
 	Turn(muzzle, y_axis, math.rad(-90))
 	
 	Hide(legs);
@@ -157,7 +154,7 @@ end
 
 function script.QueryWeapon(n)
 	if isClosed then
-		return muzzleProxy
+		return aimProxy
 	else
 		return muzzle
 	end
@@ -172,12 +169,8 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIGanimation)
 	StartThread(RestoreAfterDelay)
 	
-	Turn(aimProxy, z_axis, heading)
-	if aimHelp then
-		StopSpin(aimProxy, z_axis)
-		aimHelp = false
-		return false
-	end
+--	Turn(aimProxy, z_axis, heading)
+	
 	-- animation handled after here
 	Turn(belt, z_axis, heading, math.rad(200))
 	if isClosed then
