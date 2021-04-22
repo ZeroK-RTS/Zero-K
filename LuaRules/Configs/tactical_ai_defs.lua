@@ -721,7 +721,6 @@ local behaviourConfig = {
 		swarms = lowRangeSwarmieeArray,
 		--flees = {},
 		idleFlee = shortRangeRaiderIdleFleeArray,
-		idleFlee = medRangeRaiderIdleFleeArray,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = shortRangeExplodables,
 		circleStrafe = ENABLE_OLD_JINK_STRAFE,
