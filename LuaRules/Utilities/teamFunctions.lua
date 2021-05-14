@@ -1,5 +1,5 @@
 local teamCount
-local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false
+local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isCompStomp, isFFA, isTeamFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false, false, false
 do
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local allyTeamList = Spring.GetAllyTeamList()
@@ -32,6 +32,12 @@ do
 
 	if teamCount > 2 then
 		isFFA = true
+		for i = 1, teamCount do
+			if #Spring.GetTeamList(actualAllyTeamList[i]) > 1 then
+				isTeamFFA = true
+				break
+			end
+		end
 		isChickens = false
 	elseif teamCount < 2 then
 		isSandbox = not isChickens
@@ -51,8 +57,9 @@ do
 		end
 	end
 
-	if #entirelyHumanAllyTeams == 1 and #Spring.GetTeamList(entirelyHumanAllyTeams[1]) > 1 then
-		isCoop = true
+	if #entirelyHumanAllyTeams == 1 then
+		isCompStomp = true
+		isCoop = (#Spring.GetTeamList(entirelyHumanAllyTeams[1]) > 1)
 	end
 
 	if Spring.GetModOptions().planet then
@@ -71,6 +78,8 @@ Spring.Utilities.Gametype = {
 	isSmallTeams = function () return isSmallTeams end,
 	isChickens   = function () return isChickens   end,
 	isCoop       = function () return isCoop       end,
+	isCompStomp  = function () return isCompStomp  end,
+	isTeamFFA    = function () return isTeamFFA    end,
 	isFFA        = function () return isFFA        end,
 	isSandbox    = function () return isSandbox    end,
 	isPlanetWars = function () return isPlanetWars end,
