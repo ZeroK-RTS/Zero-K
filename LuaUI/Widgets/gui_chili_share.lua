@@ -586,11 +586,24 @@ local function ReportPlayer(subject)
 	local extraText = ""
 	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
 	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
-	
-	local teamCountFirst = #(Spring.GetTeamList(0) or {})
-	local teamCountSecond = #(Spring.GetTeamList(1) or {})
-	extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond .. " on " .. Game.mapName
-	
+
+	local utils = Spring.Utilities
+	local gametype = utils.Gametype
+	if gametype.isCompStomp() then
+		local humans = #(Spring.GetTeamList(0) or {})
+		extraText = extraText .. humans .. " vs " .. (gametype.isChickens() and "Chickens" or "Bots")
+	elseif gametype.isTeamFFA() then
+		local playerCount = #Spring.GetTeamList() - 1 -- ignore gaia
+		extraText = extraText .. playerCount .. "-man, " .. utils.GetTeamCount() .. "-way Team FFA"
+	elseif gametype.isFFA() then
+		extraText = extraText .. utils.GetTeamCount() .. "-way FFA"
+	else
+		local teamCountFirst = #(Spring.GetTeamList(0) or {}) -- fixme: technically the teams dont need to be 0 and 1
+		local teamCountSecond = #(Spring.GetTeamList(1) or {})
+		extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond
+	end
+	extraText = extraText .. " on " .. Game.mapName
+
 	local seconds = math.floor(Spring.GetGameFrame()/30)
 	local minutes = math.floor(seconds/60)
 	extraText = extraText .. " at " .. string.format("%d:%02d", minutes, seconds - 60*minutes)
