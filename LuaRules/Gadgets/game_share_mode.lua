@@ -484,7 +484,7 @@ local function AcceptInvite(player, target)
 end
 
 local function DisposePlayer(playerID) -- clean up this player. Called 1 frame after players resign (to prevent multiple calls)
-	if spIsGameOver() then -- Don't even bother processing.
+	if spIsGameOver() or playerstates[playerID] == nil then -- Don't even bother processing.
 		return
 	end
 	local name = spGetPlayerInfo(playerID, false)
@@ -623,7 +623,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 	local name, active, spectator, teamID, _, _, _, _, _, cp = spGetPlayerInfo(playerID, false)
 	
 	if command == nil and (debugMode or firstError) then
-		spEcho("LUA_ERRRUN", "[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
+		spEcho("LUA_ERRRUN", "[Commshare] player " .. playerID .. "(" .. name .. ") sent an invalid command")
 		firstError = false
 		return
 	end
@@ -648,7 +648,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			UnmergePlayer(playerID)
 			return
 		else
-			spEcho("[Commshare] " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
+			spEcho("[Commshare] player " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
 			return
 		end
 	end
@@ -692,7 +692,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				playerstates[targetID].spectator = targetSpectator
 				playerstates[targetID].teamid = targetTeamID
 			end
-		elseif spectator and playerstates[targetID] then -- this player resigned
+		elseif targetSpectator and playerstates[targetID] then -- this player resigned
 			if debugMode then
 				spEcho("[Commshare] Disposing of " .. targetName)
 			end
