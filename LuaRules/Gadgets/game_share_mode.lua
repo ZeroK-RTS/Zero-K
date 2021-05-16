@@ -623,7 +623,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 	local name, active, spectator, teamID, _, _, _, _, _, cp = spGetPlayerInfo(playerID, false)
 	
 	if command == nil and (debugMode or firstError) then
-		spEcho("LUA_ERRRUN", "[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
+		spEcho("LUA_ERRRUN", "[Commshare] player " .. playerID .. "(" .. name .. ") sent an invalid command")
 		firstError = false
 		return
 	end
@@ -648,7 +648,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			UnmergePlayer(playerID)
 			return
 		else
-			spEcho("[Commshare] " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
+			spEcho("[Commshare] player " .. playerID .. "(" .. name .. ") is afk/not in a squad!")
 			return
 		end
 	end
