@@ -813,26 +813,6 @@ local behaviourConfig = {
 		wardFireDefault = true,
 	},
 	{
-		name = "hoverscout",
-		skirms = shortRangeSkirmieeArray,
-		swarms = lowRangeSwarmieeArray,
-		--flees = {},
-		avoidHeightDiff = explodableFull,
-		fightOnlyUnits = shortRangeExplodables,
-		jinkAwayParallelLength = 100,
-		circleStrafe = ENABLE_OLD_JINK_STRAFE,
-		strafeOrderLength = 180,
-		maxSwarmLeeway = 40,
-		swarmLeeway = 40,
-		stoppingDistance = 8,
-		skirmOrderDis = 150,
-		
-		wardFireTargets = personalShieldUnits,
-		wardFirePredict = 8,
-		wardFireShield = 50,
-		wardFireDefault = true,
-	},
-	{
 		name = "hoverraid",
 		skirms = shortRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
@@ -1212,33 +1192,6 @@ local behaviourConfig = {
 		},
 	},
 	{
-		name = "ampharty",
-		waterline = -5,
-		land = {
-			weaponNum = 1,
-			skirms = artyRangeSkirmieeArray,
-			--swarms = {},
-			--flees = {},
-			fightOnlyUnits = medRangeExplodables,
-			skirmRadar = true,
-			maxSwarmLeeway = 10,
-			minSwarmLeeway = 130,
-			skirmLeeway = 40,
-		},
-		sea = {
-			weaponNum = 2,
-			skirms = medRangeSkirmieeArray,
-			--swarms = {},
-			--flees = {},
-			avoidHeightDiff = explodableFull,
-			fightOnlyUnits = medRangeExplodables,
-			skirmRadar = true,
-			maxSwarmLeeway = 10,
-			minSwarmLeeway = 130,
-			skirmLeeway = 40,
-		},
-	},
-	{
 		name = "shipscout", -- scout boat
 		skirms = lowMedRangeSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
@@ -1353,17 +1306,6 @@ local behaviourConfig = {
 		wardFireShield = 160,
 		wardFirePredict = 30,
 		wardFireDefault = true,
-	},
-	{
-		name = "shipraider",
-		skirms = riotRangeSkirmieeArray,
-		swarms = lowRangeSwarmieeArray,
-		--flees = {},
-		avoidHeightDiff = explodableFull,
-		fightOnlyUnits = shortRangeExplodables,
-		maxSwarmLeeway = 30,
-		minSwarmLeeway = 90,
-		skirmLeeway = 60,
 	},
 	{
 		name = "vehassault",
@@ -2138,21 +2080,19 @@ local function LoadBehaviour()
 	local unitAIBehaviour = {}
 	for i = 1, #behaviourConfig do
 		local behaviourData = behaviourConfig[i]
-		local ud = UnitDefNames[behaviourConfig[i].name]
-		
-		if ud then
-			if behaviourData.land and behaviourData.sea then
-				unitAIBehaviour[ud.id] = {
-					defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
-					waterline = (behaviourData.waterline or 0),
-					floatWaterline = behaviourData.floatWaterline,
-					land = GetBehaviourTable(behaviourData.land, ud),
-					sea = GetBehaviourTable(behaviourData.sea, ud),
-				}
-			else
-				unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
-				unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
-			end
+		local ud = UnitDefNames[behaviourData.name]
+
+		if behaviourData.land and behaviourData.sea then
+			unitAIBehaviour[ud.id] = {
+				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
+				waterline = (behaviourData.waterline or 0),
+				floatWaterline = behaviourData.floatWaterline,
+				land = GetBehaviourTable(behaviourData.land, ud),
+				sea = GetBehaviourTable(behaviourData.sea, ud),
+			}
+		else
+			unitAIBehaviour[ud.id] = GetBehaviourTable(behaviourData, ud)
+			unitAIBehaviour[ud.id].defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState)
 		end
 	end
 	
