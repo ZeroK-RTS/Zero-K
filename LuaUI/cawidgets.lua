@@ -1146,11 +1146,7 @@ local function GetPlayerAbilityToSpecchat(playerID)
 	local boss = cp["room_boss"] or "0"
 	local admin = cp.admin or "0"
 	local helpful = cp.helpful or "0"
-	if boss == "1" or admin == "1" or helpful == "1" then
-		return true
-	else
-		return false
-	end
+	return boss == "1" or admin == "1" or helpful == "1"
 end
 
 
