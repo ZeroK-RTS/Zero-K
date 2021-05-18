@@ -1140,6 +1140,20 @@ local function FindLowestIndex(t, i, layer)
 	return 1
 end
 
+local function GetPlayerAbilityToSpecchat(playerID)
+	-- this function controls when players can bypass the specmute modoption.
+	local cp = select(10, Spring.GetPlayerInfo(playerID))
+	local boss = cp["room_boss"] or "0"
+	local admin = cp.admin or "0"
+	local helpful = cp.helpful or "0"
+	if boss == "1" or admin == "1" or helpful == "1" then
+		return true
+	else
+		return false
+	end
+end
+
+
 
 function widgetHandler:RaiseWidget(widget)
 	if (widget == nil) then
@@ -1440,14 +1454,17 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		local newMsg = { text = msg, priority = priority }
 		MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
 		if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'userinfo' and newMsg.msgtype ~= 'game_message' then
-			if MUTE_SPECTATORS and newMsg.msgtype == 'spec_to_everyone' then
-				local spectating = select(1, Spring.GetSpectatingState())
-				if not spectating then
-					return
-				end
-				newMsg.msgtype = 'spec_to_specs'
-			end
 			local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
+			if MUTE_SPECTATORS and newMsg.msgtype == 'spec_to_everyone' then
+				local bypass = false
+				if playerID_msg then
+					bypass = GetPlayerAbilityToSpecchat(playerID_msg)
+				end
+				local spectating = select(1, Spring.GetSpectatingState())
+				if spectating and not bypass then -- admins and room bosses (see: tournament hosters) can bypass specmute.
+					newMsg.msgtype = 'spec_to_specs' -- for some reason the return here was doing weird things.
+				end
+			end
 			local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))
 			if customkeys and (customkeys.muted or (newMsg.msgtype == 'spec_to_everyone' and ((customkeys.can_spec_chat or '1') == '0'))) then
 				local myPlayerID = Spring.GetLocalPlayerID()
