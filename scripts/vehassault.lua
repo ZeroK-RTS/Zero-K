@@ -47,7 +47,7 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local function Suspension() -- Shamelessly stolen and adapted from Ripper. Perhaps this should be an include or something?
 	local xtilt, ztilt = 0, 0
 	local yv, yp = 0, 0
-	local s1r, s2r, s3r, sl1, s2l, s3l, s4l, s4r, xtilta, ztilta, ya, speed, wheelTurnSpeed
+	local s1r, s2r, s3r, s1l, s2l, s3l, s4l, s4r, xtilta, ztilta, ya, speed, wheelTurnSpeed
 	while true do
 		s1r = GetWheelHeight(gs1r)
 		s2r = GetWheelHeight(gs2r)
