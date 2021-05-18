@@ -280,7 +280,7 @@ local function GetTeleTargetPosRandomNoBuildTest(ud, unitID, unitDefID, tx, ty, 
 	local size = ud.xsize
 	local direction = GetExitDirection(unitID, tx, tz)
 	local distance = size*4 + 40
-	local offset = ((math.random() > 0.5) and math.pi/4) or -math.pi/4
+	local dirOffset = ((math.random() > 0.5) and math.pi/4) or -math.pi/4
 	for i = 1, 8 do -- Just try 10 times
 		local ux, uz = math.cos(direction), math.sin(direction)
 		if ud.canFly then
@@ -298,7 +298,7 @@ local function GetTeleTargetPosRandomNoBuildTest(ud, unitID, unitDefID, tx, ty, 
 		if passed and spTestMoveOrder(unitDefID, tx + distance*ux, 0, tz + distance*uz, 0, 0, 0, true, true, false) then
 			return tx + distance*ux, tz + distance*uz
 		end
-		direction = direction + offset
+		direction = direction + dirOffset
 	end
 	return nil
 end

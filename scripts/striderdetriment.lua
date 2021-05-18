@@ -178,11 +178,11 @@ local function Step(frontLeg, backLeg, impactFoot, pelvisMult)
 	Sleep(0)
 end
 
-local function StepInPlace(leftLeg, rightLeg)
+local function StepInPlace(frontLeg, backLeg)
 	Move(pelvis, y_axis, 2, 6)
-	for i, p in pairs(leftLeg) do
-		Turn(leftLeg[i], x_axis, 0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
-		Turn(rightLeg[i], x_axis, -0.5*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
+	for i, p in pairs(frontLeg) do
+		Turn(frontLeg[i], x_axis,  0.8*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i]*1.4)
+		Turn( backLeg[i], x_axis, -0.5*LEG_STEP_ANGLES[i], LEG_STEP_SPEEDS[i])
 	end
 	Sleep(400)
 end

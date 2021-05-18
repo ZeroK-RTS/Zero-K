@@ -127,7 +127,7 @@ end
 
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		local strength = UpdateWindStrengthAndDir()
+		local curr_strength = UpdateWindStrengthAndDir()
 		
 		if (not IterableMap.IsEmpty(windmills)) then
 			for i = 1, #teamList do
@@ -137,7 +137,7 @@ function gadget:GameFrame(n)
 			for i = 1, indexMax do
 				local unitID = keyByIndex[i]
 				local entry = dataByKey[unitID]
-				local windEnergy = (windMax - strength)*entry.myMin + strength
+				local windEnergy = (windMax - curr_strength)*entry.myMin + curr_strength
 				local paralyzed = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry.teamID
@@ -155,7 +155,7 @@ function gadget:GameFrame(n)
 		end
 		if (((n+16) % (32*30)) < 0.1) then
 			next_strength = (rand() * windRange) + windMin
-			strength_step = (next_strength - strength) * 0.1
+			strength_step = (next_strength - curr_strength) * 0.1
 			step_count = 10
 		end
 	end
