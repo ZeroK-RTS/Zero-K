@@ -5,7 +5,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Order and State Panel Positions
 
 -- Commands are placed in their position, with conflicts resolved by pushng those
--- with less priority (higher number = less priority) along the positions if 
+-- with less priority (higher number = less priority) along the positions if
 -- two or more commands want the same position.
 -- The command panel is propagated left to right, top to bottom.
 -- The state panel is propagate top to bottom, right to left.

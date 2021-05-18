@@ -31,13 +31,13 @@ local userContentDisabled = false
 -- config --
 local badwidgets = {
 	[1] = {
-		name = "*Mearth Location Tags*1.0", 
+		name = "*Mearth Location Tags*1.0",
 		reason = "Causes black ground on some graphics cards, possible copyright issues.",
 		type = 'map', -- Mearth_v4.
 	},
 	[2] = {
 		name = "Metalspot Finder (map)",
-		reason = "Breaks everything mex-related.", 
+		reason = "Breaks everything mex-related.",
 		type = 'map', -- oktogon v3
 	},
 	[3] = {
