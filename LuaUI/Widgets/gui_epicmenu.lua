@@ -1285,7 +1285,11 @@ local function IntegrateWidget(w, addoptions, index)
 	
 	local wname = w.whInfo.name
 	local defaultpath =  w.options_path or ('Settings/Misc/' .. wname)
-	
+
+	-- add the widget's icon to the subMenuIcons table if there isn't one in that spot already
+	if w.whInfo.icon and not confdata.subMenuIcons[defaultpath] then
+		confdata.subMenuIcons[defaultpath] = w.whInfo.icon
+	end
 	
 	--[[
 	--If a widget disables itself in widget:Initialize it will run the removewidget before the insertwidget is complete. this fix doesn't work
