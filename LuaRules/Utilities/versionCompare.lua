@@ -1,5 +1,14 @@
 Spring.Utilities = Spring.Utilities or {}
 
+-- for some reason IsEngineMinVersion breaks on develop (X.1.Y-...) tags
+if (not Script.IsEngineMinVersion(1, 0, 0)) then
+	Spring.Echo("[versionCompare.lua] WARNING: IsEngineMinVersion is not working. This means version constants aren't being set correctly. Note that Zero-K was not designed for .1 releases.")
+	Script.IsEngineMinVersion = function (major, minor, commit)
+		return true -- hacky but if we are on a develop tag we can't really rely on the versioning system
+	end
+end
+
+
 function Spring.Utilities.GetEngineVersion()
 	return (Game and Game.version) or (Engine and Engine.version) or "Engine version error"
 end
