@@ -80,7 +80,9 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if paralyzer then return end
+	if damage <= 0 or paralyzer then
+		return
+	end
 
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
