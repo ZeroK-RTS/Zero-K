@@ -99,7 +99,7 @@ return { chicken_leaper = {
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2200,
+      weaponVelocity          = 3000,
     },
 
   },

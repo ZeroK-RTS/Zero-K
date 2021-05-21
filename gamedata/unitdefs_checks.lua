@@ -20,6 +20,22 @@ local function round_to_frames(name, wd, key)
 	wd[key] = sanitized_value + 1E-5
 end
 
+local function check_lasercannon_range(name, wd)
+	if wd.weapontype ~= "LaserCannon" then
+		return
+	end
+
+	local original_range = wd.range
+	local v = wd.weaponvelocity / Game.gameSpeed
+
+	local sanitized_range = math.max(1, math.floor((original_range + 0.5) / v)) * v
+	if math.abs(original_range - sanitized_range) > 1 then
+		error(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame!\nPlease put the correct value in the def (rounded to the nearest integer) or modify weaponVelocity")
+	end
+
+	wd.range = sanitized_range + 1E-5
+end
+
 local function processWeapons(unitDefName, unitDef)
 	local weaponDefs = unitDef.weapondefs
 	if not weaponDefs then
@@ -30,6 +46,7 @@ local function processWeapons(unitDefName, unitDef)
 		local fullWeaponName = unitDefName .. "." .. weaponDefName
 		round_to_frames(fullWeaponName, weaponDef, "reloadtime")
 		round_to_frames(fullWeaponName, weaponDef, "burstrate")
+		check_lasercannon_range(fullWeaponName, weaponDef)
 	end
 end
 
