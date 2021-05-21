@@ -1049,24 +1049,24 @@ local team8box = {
 }
 
 local names = {}
-names[1] = "Southeast"
-names[2] = "Northwest"
-names[3] = "Northeast"
-names[4] = "Southwest"
-names[5] = "East"
-names[6] = "West"
-names[7] = "South"
-names[8] = "North"
+names[0] = "Southeast"
+names[1] = "Northwest"
+names[2] = "Northeast"
+names[3] = "Southwest"
+names[4] = "East"
+names[5] = "West"
+names[6] = "South"
+names[7] = "North"
 
 local shorts = {}
-shorts[1] = "SE"
-shorts[2] = "NW"
-shorts[3] = "NE"
-shorts[4] = "SW"
-shorts[5] = "E"
-shorts[6] = "W"
-shorts[7] = "S"
-shorts[8] = "N"
+shorts[0] = "SE"
+shorts[1] = "NW"
+shorts[2] = "NE"
+shorts[3] = "SW"
+shorts[4] = "E"
+shorts[5] = "W"
+shorts[6] = "S"
+shorts[7] = "N"
 
 
 local team1boxstart = {
@@ -1149,10 +1149,10 @@ if not isFFA then -- give extra boxes in big teams/coop
 			boxes[0].boxes[3] = team3box
 			boxes[1].boxes[2] = team6box
 			boxes[1].boxes[3] = team4box
-			boxes[0].nameLong = names[5]
-			boxes[1].nameLong = names[6]
-			boxes[0].nameShort = shorts[5]
-			boxes[1].nameShort = shorts[6]
+			boxes[0].nameLong = names[4]
+			boxes[1].nameLong = names[5]
+			boxes[0].nameShort = shorts[4]
+			boxes[1].nameShort = shorts[5]
 		elseif r <= 6 then -- TvB
 			team1 = MergeStarts(team1boxstart, team8boxstart)
 			team1 = MergeStarts(team1, team4boxstart)
@@ -1162,10 +1162,10 @@ if not isFFA then -- give extra boxes in big teams/coop
 			boxes[0].boxes[3] = team4box
 			boxes[1].boxes[2] = team7box
 			boxes[1].boxes[3] = team6box
-			boxes[0].nameLong = names[8]
-			boxes[0].nameShort = shorts[8]
-			boxes[1].nameLong = names[7]
-			boxes[1].nameShort = shorts[7]
+			boxes[0].nameLong = names[7]
+			boxes[0].nameShort = shorts[7]
+			boxes[1].nameLong = names[6]
+			boxes[1].nameShort = shorts[6]
 		else -- SW vs NE
 			team1 = MergeStarts(team1boxstart, team5boxstart)
 			team1 = MergeStarts(team1, team7boxstart)
@@ -1202,8 +1202,8 @@ else -- 8 way FFA.
 	end
 	if teamcount > 4 then
 		for i = 4, 7 do
-			boxes[i] = {startpoints = {}, nameLong = names[i + 1], nameShort = shorts[i + 1], boxes = {}}
-			boxes[i] = {startpoints = {}, nameLong = names[i + 1], nameShort = shorts[i + 1], boxes = {}}
+			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
+			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
 		end
 		boxes[4].boxes[1] = team5box
 		boxes[5].boxes[1] = team6box
