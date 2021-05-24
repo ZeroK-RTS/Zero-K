@@ -5,6 +5,10 @@ local enginer = piece "enginer"
 local wingl = piece "wingl"
 local wingr = piece "wingr"
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 local explodables = {tail, enginel, enginer, wingl, wingr}
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
