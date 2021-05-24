@@ -1201,6 +1201,16 @@ local sounds = {
 			volume = 0.8,
 		},
 	},
+	subscout = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "sub_select",
+			volume = 0.8,
+		},
+	},
 	shipassault = {
 		ok = {
 			[1] = "rumble2",
