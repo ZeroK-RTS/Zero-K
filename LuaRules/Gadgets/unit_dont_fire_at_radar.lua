@@ -101,7 +101,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			--GG.unitEcho(targetID, "target")
 			if (not GG.recursion_GiveOrderToUnit) and wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
+				GG.recursion_GiveOrderToUnit = true
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, CMD.OPT_ALT )
+				GG.recursion_GiveOrderToUnit = false
 				local cmdID, cmdOpts, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 				if isTheRightSortOfCommand(cmdID, cmdOpts, cp_1, cp_2) then
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
