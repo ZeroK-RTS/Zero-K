@@ -38,5 +38,6 @@ function widget:Initialize()
 	Spring.SetCustomCommandDrawData(CMD_RESTORE, "Restore2", terraformColor, false)
 	Spring.SetCustomCommandDrawData(CMD_EXTENDED_LOAD, CMD.LOAD_UNITS, {0,0.6,0.6,cmdAlpha},true)
 	Spring.SetCustomCommandDrawData(CMD_EXTENDED_UNLOAD, CMD.UNLOAD_UNITS, {0.6,0.6,0,cmdAlpha})
-	Spring.SetCustomCommandDrawData(CMD_TURN, "Patrol", {0,1,0,cmdAlpha})
+	Spring.SetCustomCommandDrawData(CMD_TURN, "Patrol", {0, 1, 0, cmdAlpha})
+	Spring.SetCustomCommandDrawData(CMD_GREYGOO, "Reclaim", {0.8, 0.3, 0.3, cmdAlpha}, true)
 end
