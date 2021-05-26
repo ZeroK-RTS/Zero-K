@@ -210,7 +210,8 @@ local function FixQueue(unitID) -- this gets rid of internally generated command
 	local queue = spGetCommandQueue(unitID, 3)
 	for i = 1, #queue do
 		local command = queue[i]
-		if command.options.internal and (command.id == CMD.MOVE or command.id == CMD_RAW_MOVE or command.id == CMD.FIGHT) then
+		local cmdID = command.id
+		if command.options.internal and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) then
 			GG.recursion_GiveOrderToUnit = true
 			local tag = command.tag
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {tag}, 0)
