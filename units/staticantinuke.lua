@@ -40,7 +40,7 @@ return { staticantinuke = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  objectName                    = [[antinuke.s3o]],
+  objectName                    = [[staticantinuke.s3o]],
   radarDistance                 = 2500,
   radarEmitHeight               = 24,
   script                        = [[staticantinuke.lua]],
@@ -94,7 +94,7 @@ return { staticantinuke = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       interceptor             = 1,
-      model                   = [[antinukemissile.s3o]],
+      model                   = [[staticantinuke_projectile.s3o]],
       noSelfDamage            = true,
       range                   = 3800,
       reloadtime              = 6,
@@ -121,7 +121,7 @@ return { staticantinuke = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 8,
-      object           = [[antinuke_dead.s3o]],
+      object           = [[staticantinuke_dead.s3o]],
     },
 
 
