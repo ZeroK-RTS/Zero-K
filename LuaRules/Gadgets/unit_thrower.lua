@@ -426,7 +426,6 @@ local spGetUnitLosState   = Spring.GetUnitLosState
 local spValidUnitID       = Spring.ValidUnitID
 local spGetMyAllyTeamID   = Spring.GetMyAllyTeamID
 local spGetUnitVectors    = Spring.GetUnitVectors
-local spGetLocalTeamID    = Spring.GetLocalTeamID
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 

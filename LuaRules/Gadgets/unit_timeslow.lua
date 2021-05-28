@@ -24,14 +24,10 @@ local SAVE_FILE = "Gadgets/unit_timeslow.lua"
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitCOBValue     = Spring.GetUnitCOBValue
-local spAreTeamsAllied      = Spring.AreTeamsAllied
 local spValidUnitID         = Spring.ValidUnitID
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
-local spGetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy

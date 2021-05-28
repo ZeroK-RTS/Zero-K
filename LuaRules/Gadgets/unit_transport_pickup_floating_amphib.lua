@@ -30,7 +30,6 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
-local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
