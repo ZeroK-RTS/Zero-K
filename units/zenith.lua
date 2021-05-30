@@ -84,7 +84,7 @@ return { zenith = {
         planes  = 0.001,
       },
 
-      duration                = 2,
+      duration                = 1.2,
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
