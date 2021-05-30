@@ -30,7 +30,9 @@ local function check_lasercannon_range(name, wd)
 
 	local sanitized_range = math.max(1, math.floor((original_range + 0.5) / v)) * v
 	if math.abs(original_range - sanitized_range) > 1 then
-		error(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame!\nPlease put the correct value in the def (rounded to the nearest integer) or modify weaponVelocity")
+		-- Warning instead of Error for now, to let mods adjust
+		-- instated on 2021-05-30, change to `error()` later
+		Spring.Echo(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame!\nPlease put the correct value in the def (rounded to the nearest integer) or modify weaponVelocity")
 	end
 
 	wd.range = sanitized_range + 1E-5
