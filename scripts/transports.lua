@@ -2,7 +2,7 @@ if GG.TransportAllowed then
 	return
 end
 
-function GG.TransportAllowed(passengerID)
+function GG.TransportAllowed(unitID, passengerID)
 	if Spring.GetUnitRulesParam(unitID, "disarmed") == 1 then
 		return false
 	end

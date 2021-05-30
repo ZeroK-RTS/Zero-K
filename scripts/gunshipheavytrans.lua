@@ -391,7 +391,7 @@ function script.BeginTransport(passengerID)
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
-	if not GG.TransportAllowed(passengerID) then
+	if not GG.TransportAllowed(unitID, passengerID) then
 		Sleep(10)
 		unitLoaded = passengerID
 		ForceDropUnit()
