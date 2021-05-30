@@ -334,17 +334,12 @@ function jumping(jumpPercent)
 		Turn(torso, x_axis, 0, math.rad(10))
 		weaponBlocked = false
 	end
-
-	if jumpPercent > 95 and not landing then
-		landing = true
-	end
 end
 
 function halfJump()
 end
 
 function endJump()
-	landing = false
 	StartThread(EndJumpThread)
 end
 

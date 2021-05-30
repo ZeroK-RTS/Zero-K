@@ -107,7 +107,7 @@ function GG.Script.onWater(unitID)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local x,_,z = spGetUnitPosition(unitID)
 	if x then
-		h = spGetGroundHeight(x,z)
+		local h = spGetGroundHeight(x,z)
 		if h and h < 0 then
 			return true
 		end

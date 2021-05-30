@@ -332,7 +332,6 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(aimpitch, x_axis, -pitch, math.rad(270)) --up-down
 	WaitForTurn(aimyaw, y_axis)
 	WaitForTurn(aimpitch, x_axis)
-	gunHeading = heading
 	return true
 end
 

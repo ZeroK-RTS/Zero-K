@@ -92,7 +92,7 @@ local function IdleAnim()
 	while true do
 		EmitSfx(zelena, 1025)
 		
-		heading = math.rad(math.random(-90, 90))
+		local heading = math.rad(math.random(-90, 90))
 		if(lastHeading > heading) then
 			rotateWise = 1
 		else
@@ -380,10 +380,8 @@ function script.Shot(num)
 end
 
 function Bum()
-	temp = flare
-	flare = flare2
-	flare2 = temp
-	
+	flare, flare2 = flare2, flare
+
 	if(gun) then
 		Hide(raketa026)
 				
