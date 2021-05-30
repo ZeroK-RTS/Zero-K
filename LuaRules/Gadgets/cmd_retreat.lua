@@ -206,6 +206,19 @@ GG.Retreat_ToggleHaven = ToggleHaven
 ----- Retreat Handling
 ----------------------------
 
+local function FixQueue(unitID) -- this gets rid of internally generated commands by tactical ai and keeps user commands.
+	local queue = spGetCommandQueue(unitID, 3)
+	for i = 1, #queue do
+		local command = queue[i]
+		local cmdID = command.id
+		if command.options.internal and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) then
+			GG.recursion_GiveOrderToUnit = true
+			local tag = command.tag
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {tag}, 0)
+			GG.recursion_GiveOrderToUnit = false
+		end
+	end
+end
 
 local function ResetRetreatData(unitID)
 	isRetreating[unitID] = nil
@@ -284,7 +297,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	local unitIsIdle = IsUnitIdle(unitID)
 	local insertIndex = 0
 	local hy = Spring.GetGroundHeight(hx, hz)
-	
+	FixQueue(unitID) -- remove tactical AI commands so we're not suiciding into enemy stuff.
 	spGiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_WAIT, CMD_OPT_SHIFT}, CMD_OPT_ALT) --SHIFT W
 	GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_RAW_MOVE, CMD_OPT_INTERNAL, hx, hy, hz}, CMD_OPT_ALT) -- ALT makes the 0 positional
 	
