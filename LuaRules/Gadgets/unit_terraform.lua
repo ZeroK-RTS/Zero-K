@@ -52,12 +52,8 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spTestBuildOrder      = Spring.TestBuildOrder
 local spSetHeightMap        = Spring.SetHeightMap
 local spSetHeightMapFunc    = Spring.SetHeightMapFunc
-local spRevertHeightMap     = Spring.RevertHeightMap
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetActiveCommand    = Spring.GetActiveCommand
 local spCreateUnit          = Spring.CreateUnit
 local spDestroyUnit         = Spring.DestroyUnit
 local spGetAllyTeamList     = Spring.GetAllyTeamList
@@ -79,20 +75,10 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
-local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_ALT   = CMD.OPT_ALT
-local CMD_STOP      = CMD.STOP
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_INSERT    = CMD.INSERT
 
-local checkCoord = {
-	{x = -8, z = 0},
-	{x = 8, z = 0},
-	{x = 0, z = -8},
-	{x = 0, z = 8},
-}
-
-local invRoot2 = 1/sqrt(2)
 local SQRT_2 = sqrt(2)
 local ALLIED_TABLE = {allied = true}
 
@@ -159,8 +145,6 @@ local decayCheckFrequency = 90 -- frequency of terraform decay checks
 
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
 
-local terraUnitLimit = 250 -- limit on terraunits per player
-
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local enemyDistConst = 36 -- Constant added to enemy distinct check
@@ -184,8 +168,6 @@ pointExtraAreaCost = pointExtraAreaCost * costMult * inbuiltCostMult
 -- Arrays
 --------------------------------------------------------------------------------
 
-local drawPositions         = {count = 0, data = {}}
-local drawPosMap            = {}
 local steepnessMarkers      = {inner = {count = 0, data = {}, frame = 0}}
 
 local structure             = {}
@@ -820,8 +802,6 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	--]]
 
 	--** Split the ramp into segments and calculate the points within each one**
-	local otherTerraformUnitCount = terraformUnitCount
-
 	local segment = {}
 	local n = 1
 	
@@ -1281,8 +1261,6 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 	
-	local otherTerraformUnitCount = terraformUnitCount
-	
 	local frame = spGetGameFrame()
 
 	for i = 1,n-1 do
@@ -1645,8 +1623,6 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	-- width and height are the witdh and height of segments. They must be squished to all be the same size
 	
 	local segment = {}
-	
-	local otherTerraformUnitCount = terraformUnitCount
 	
 	local wCount = ceil((border.right-border.left)/areaSegMaxSize) - 1
 	local hCount = ceil((border.bottom-border.top)/areaSegMaxSize) - 1
@@ -3032,7 +3008,6 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		local drawEdge = {}
 		local count = 0
 		
-		local drawingList = {}
 		for i = 1, terra.points do
 			x = terra.point[i].x
 			z = terra.point[i].z
@@ -3408,7 +3383,6 @@ local SeismicWeapon = {}
 local DEFAULT_SMOOTH = 0.5
 local HEIGHT_FUDGE_FACTOR = 10
 local HEIGHT_RAD_MULT = 0.8
-local MIN_SMOOTH_RAD = 20
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -3426,39 +3400,6 @@ for i=1,#WeaponDefs do
 			smoothexponent = wd.customParams.smoothexponent,
 		}
 	end
-end
-
-local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-	--local found = {count = 0, data = {}}
-	for i = 1, posCount do
-		if HasStructure(posX[i], posZ[i]) then
-			posY[i] = 0
-			--found.count = found.count + 1
-			--found.data[found.count] = {x = posX[i], z = posZ[i]}
-		end
-	end
-	
-	
-	--[[
-	if found.count == 0 then
-		return posY
-	end
-	
-	for i = 1, posCount do
-		local x = posX[i]
-		local z = posZ[i]
-		for j = 1, found.count do
-			local fx = found.data[j].x
-			local fz = found.data[j].z
-			local maxChange = sqrt((fx-x)^2 + (fz-z)^2)*maxHeightDifference/64
-			if abs(posY[i]) > maxChange then
-				posY[i] = abs(posY[i])/posY[i]*maxChange
-			end
-		end
-	end
-	--]]
-
-	return posY
 end
 
 function gadget:Explosion_GetWantedWeaponDef()
@@ -3540,12 +3481,6 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 			height = height/structCount
 			spSetHeightMap(i, j, height)
 		end
-	end
-end
-
-local function SmoothFromList(xt,zt,ht)
-	for i = 1, #xt, 1 do
-		spAddHeightMap(xt[i],zt[i],ht[i])
 	end
 end
 
