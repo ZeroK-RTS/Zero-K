@@ -61,16 +61,23 @@ local outOfBoundsUnits = IterableMap.New()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function IsOutsideBorder(x, z)
-	return vecDistSq(x, z, circularMapX, circularMapZ) > circularMapRadiusSq
+local function IsInBounds(x, z)
+	-- returns whether (x,z) is inside the playable area.
+	return vecDistSq(x, z, circularMapX, circularMapZ) <= circularMapRadiusSq
 end
 
-local function IsInBorder(x, z)
-	return not IsOutsideBorder(x, z)
-end
-
-local function IsNearBorder(x, z)
+local function IsNearOutOfBounds(x, z)
+	-- returns whether (x,z) is within NEAR_DIST (500) of a border.
 	return vecDistSq(x, z, circularMapX, circularMapZ) > circularMapNearRadiusSq
+end
+
+local function GetClosestBorderPoint(x, z)
+	-- returns position on border closest to (x,z)
+	local vx = x - circularMapX
+	local vz = z - circularMapZ
+	local norm = math.sqrt(vx*vx + vz*vz)
+	vx, vz = vx / norm, vz / norm
+	return circularMapX + circularMapRadius*vx, circularMapZ + circularMapRadius*vz
 end
 
 local function LoadMapBorder()
@@ -80,6 +87,10 @@ local function LoadMapBorder()
 	if not config then
 		return false
 	end
+	
+	IsInBounds = config.IsInBounds or IsInBounds
+	IsNearOutOfBounds = config.IsNearOutOfBounds or IsNearOutOfBounds
+	GetClosestBorderPoint = config.GetClosestBorderPoint or GetClosestBorderPoint
 	
 	circularMapX = config.originX or circularMapX
 	circularMapZ = config.originZ or circularMapZ
@@ -96,7 +107,7 @@ end
 local function SetupTypemapAndMask()
 	for x = 0, MAP_WIDTH - 8, 8 do
 		for z = 0, MAP_HEIGHT - 8, 8 do
-			if IsOutsideBorder(x, z) then
+			if not IsInBounds(x, z) then
 				spSetMapSquareTerrainType(x, z, GG.IMPASSIBLE_TERRAIN)
 				if x%16 == 0 and z%16 == 0 then
 					spSetSquareBuildingMask(x * MASK_SCALE, z * MASK_SCALE, 0)
@@ -112,37 +123,38 @@ end
 
 local function CheckMobileUnit(unitID, moveType)
 	local x, _, z = spGetUnitPosition(unitID)
-	if (moveType == 2 and IsOutsideBorder(x, z)) or (moveType~= 2 and IsNearBorder(x, z)) then
+	if (moveType == 2 and not IsInBounds(x, z)) or (moveType~= 2 and IsNearOutOfBounds(x, z)) then
 		IterableMap.Add(outOfBoundsUnits, unitID, moveType)
 		return true -- remove from mobileUnits
 	end
 end
 
 local function HandleOutOFBoundsUnit(unitID, moveType)
-	local x, _, z = spGetUnitPosition(unitID)
-	if not IsOutsideBorder(x, z) then
-		if moveType ~= 2 and IsNearBorder(x, z) then
+	local ux, _, uz = spGetUnitPosition(unitID)
+	if IsInBounds(ux, uz) then
+		if moveType ~= 2 and IsNearOutOfBounds(ux, uz) then
 			return -- Keep track of aircraft near border.
 		end
 		IterableMap.Add(mobileUnits, unitID, moveType)
 		return true -- Remove from outOfBoundsUnits
 	end
 	
-	local vx = circularMapX - x
-	local vz = circularMapZ - z
+	local bx, bz = GetClosestBorderPoint(ux, uz)
+	local vx = bx - ux
+	local vz = bz - uz
 	local norm = math.sqrt(vx*vx + vz*vz)
+	vx, vz = vx / norm, vz / norm
 	
 	local mag = (impulseMultipliers[moveType] or 1)
-	if norm < RAMP_DIST + circularMapRadius then
+	if norm < RAMP_DIST then
 		if moveType == 2 then
 			-- Ground units only go down to half magnitude, to help with unsticking.
-			mag = mag * (0.5 + 0.5 * (norm - circularMapRadius) / RAMP_DIST)
+			mag = mag * (0.5 + 0.5 * norm / RAMP_DIST)
 		else
-			mag = mag * (norm - circularMapRadius) / RAMP_DIST
+			mag = mag * norm / RAMP_DIST
 		end
 	end
 	
-	vx, vz = vx / norm, vz / norm
 	GG.AddGadgetImpulseRaw(unitID, vx*mag*SIDE_IMPULSE, UP_IMPULSE, vz*mag*SIDE_IMPULSE, true, true)
 end
 
@@ -187,7 +199,7 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
-	GG.map_AllowPositionTerraform = IsInBorder
+	GG.map_AllowPositionTerraform = IsInBounds
 end
 
 -------------------------------------------------------------------------------------
