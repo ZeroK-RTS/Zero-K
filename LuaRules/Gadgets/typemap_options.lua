@@ -17,7 +17,7 @@ end
 local terrainNameToIndex = {}
 local oldTerrain = {}
 
-local IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
+GG.IMPASSIBLE_TERRAIN = 137 -- Hope that this does not conflict with any maps
 local NANOFRAMES_BLOCK = false -- Allows for LOS hax.
 
 local retainImpassException, retainRoadException = VFS.Include("LuaRules/Configs/typemap_options_maps.lua")
@@ -47,7 +47,7 @@ local function SetImpassibleTerrain(x1, z1, x2, z2)
 	-- Override terrain
 	for i = x1, x2, 8 do
 		for j = z1, z2, 8 do
-			Spring.SetMapSquareTerrainType(i, j, IMPASSIBLE_TERRAIN)
+			Spring.SetMapSquareTerrainType(i, j, GG.IMPASSIBLE_TERRAIN)
 		end
 	end
 end
@@ -114,10 +114,10 @@ local function CheckNotImpassible(t, k, h, s)
 end
 
 function gadget:Initialize()
-	Spring.SetTerrainTypeData(IMPASSIBLE_TERRAIN, 0, 0, 0, 0)
+	Spring.SetTerrainTypeData(GG.IMPASSIBLE_TERRAIN, 0, 0, 0, 0)
 	if (Spring.GetModOptions().typemapsetting == "1") or (not RETAIN_MAP_ROAD) then
 		for i = 0, 255 do
-			if i ~= IMPASSIBLE_TERRAIN then
+			if i ~= GG.IMPASSIBLE_TERRAIN then
 				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
 				if CheckNotImpassible(t, k, h, s) then
 					Spring.SetTerrainTypeData(i, 1, 1, 1, 1)
@@ -126,7 +126,7 @@ function gadget:Initialize()
 		end
 	else
 		for i = 0, 255 do
-			if i ~= IMPASSIBLE_TERRAIN then
+			if i ~= GG.IMPASSIBLE_TERRAIN then
 				local name, _, t, k, h, s = Spring.GetTerrainTypeData(i)
 				if name and not terrainNameToIndex[name] then
 					terrainNameToIndex[name] = i

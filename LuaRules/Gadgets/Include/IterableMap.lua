@@ -28,7 +28,9 @@ function IterableMap.Add(self, key, data)
 		self.dataByKey[key] = data
 		return
 	end
-	data = data or true
+	if data == nil then
+		data = true
+	end
 	self.indexMax = self.indexMax + 1
 	self.keyByIndex[self.indexMax] = key
 	self.dataByKey[key] = data
