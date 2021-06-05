@@ -66,7 +66,7 @@ local function IsInBounds(x, z)
 	return vecDistSq(x, z, circularMapX, circularMapZ) <= circularMapRadiusSq
 end
 
-local function IsNearOutOfBounds(x, z)
+local function IsNearBorderOrOutOfBounds(x, z)
 	-- returns whether (x,z) is within NEAR_DIST (500) of a border.
 	return vecDistSq(x, z, circularMapX, circularMapZ) > circularMapNearRadiusSq
 end
@@ -89,7 +89,7 @@ local function LoadMapBorder()
 	end
 	
 	IsInBounds = config.IsInBounds or IsInBounds
-	IsNearOutOfBounds = config.IsNearOutOfBounds or IsNearOutOfBounds
+	IsNearBorderOrOutOfBounds = config.IsNearBorderOrOutOfBounds or IsNearBorderOrOutOfBounds
 	GetClosestBorderPoint = config.GetClosestBorderPoint or GetClosestBorderPoint
 	
 	circularMapX = config.originX or circularMapX
@@ -123,7 +123,7 @@ end
 
 local function CheckMobileUnit(unitID, moveType)
 	local x, _, z = spGetUnitPosition(unitID)
-	if (moveType == 2 and not IsInBounds(x, z)) or (moveType~= 2 and IsNearOutOfBounds(x, z)) then
+	if (moveType == 2 and not IsInBounds(x, z)) or (moveType~= 2 and IsNearBorderOrOutOfBounds(x, z)) then
 		IterableMap.Add(outOfBoundsUnits, unitID, moveType)
 		return true -- remove from mobileUnits
 	end
@@ -132,7 +132,7 @@ end
 local function HandleOutOFBoundsUnit(unitID, moveType)
 	local ux, _, uz = spGetUnitPosition(unitID)
 	if IsInBounds(ux, uz) then
-		if moveType ~= 2 and IsNearOutOfBounds(ux, uz) then
+		if moveType ~= 2 and IsNearBorderOrOutOfBounds(ux, uz) then
 			return -- Keep track of aircraft near border.
 		end
 		IterableMap.Add(mobileUnits, unitID, moveType)
