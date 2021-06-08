@@ -679,17 +679,15 @@ local function InitName(subject, playerPanel)
 		parent=playerPanel,
 		width=146,
 		height = sizefont+1,
-		fontsize=sizefont + 1,
+		objectOverrideFont = WG.GetFont(sizefont + 1),
 		x=69 + 2*buttonsize,
 		text=subject.name ,
 		y=13
 	}
-	givemebuttons[subject.id]["text"].font.shadow = false
 	givemebuttons[subject.id]["text"]:Invalidate()
 	while (givemebuttons[subject.id]["text"].font:GetTextWidth(subject.name) > givemebuttons[subject.id]["text"].width - buttonsize) do
-		givemebuttons[subject.id]["text"].font.size = givemebuttons[subject.id]["text"].font.size - 1
+		givemebuttons[subject.id]["text"].font = WG.GetFont(givemebuttons[subject.id]["text"].font.size - 1)
 		givemebuttons[subject.id]["text"]:Invalidate()
-		
 	end
 	
 	local bottomRowStartX = 67
@@ -710,7 +708,7 @@ local function InitName(subject, playerPanel)
 			width='100%',
 			height='100%'}},
 			tooltip="Give selected units.",
-			caption=" "
+			noFont = true,
 		}
 		givemebuttons[subject.id]["metal"] = chili.Button:New{
 			parent = playerPanel,
@@ -732,7 +730,7 @@ local function InitName(subject, playerPanel)
 					height='100%'
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 		givemebuttons[subject.id]["energy"] = chili.Button:New{
 			parent = playerPanel,
@@ -754,7 +752,7 @@ local function InitName(subject, playerPanel)
 					height='100%'
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 	end
 	givemebuttons[subject.id]["ping"] = chili.TextBox:New{
@@ -764,7 +762,7 @@ local function InitName(subject, playerPanel)
 		x=12,
 		y=3,
 		textColor={1,1,1,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= "100ms"
@@ -775,7 +773,7 @@ local function InitName(subject, playerPanel)
 		x=19,
 		y=5,
 		textColor={1,0.4,0.4,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= ""
@@ -786,7 +784,7 @@ local function InitName(subject, playerPanel)
 		x=19,
 		y=5,
 		textColor={0.52,0.52,1,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= ""
@@ -825,7 +823,8 @@ local function InitName(subject, playerPanel)
 		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
-		tooltip = "Your ally's metal."
+		tooltip = "Your ally's metal.",
+		noFont = true,
 	}
 	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
 		parent = playerPanel,
@@ -837,14 +836,15 @@ local function InitName(subject, playerPanel)
 		x=givemebuttons[subject.id]["metalbar"].x,
 		y=givemebuttons[subject.id]["metalbar"].y + 12,
 		color={.93,.93,0,1},
-		tooltip = "Your ally's energy."
+		tooltip = "Your ally's energy.",
+		noFont = true,
 	}
 	
 	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
 		parent=playerPanel,
 		height='50%',
 		width=100,
-		fontsize=smallerFontSize,
+		objectOverrideFont = WG.GetFont(smallerFontSize),
 		x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
 		y=givemebuttons[subject.id]["metalbar"].y + 1,
 		tooltip = "Your ally's metal income."
@@ -853,7 +853,7 @@ local function InitName(subject, playerPanel)
 		parent=playerPanel,
 		height='50%',
 		width=100,
-		fontsize=smallerFontSize,
+		objectOverrideFont = WG.GetFont(smallerFontSize),
 		x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
 		y=givemebuttons[subject.id]["energybar"].y + 1,
 		tooltip = "Your ally's energy income."
@@ -926,7 +926,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["commshare"] = chili.Button:New{
 				parent = playerPanel,
@@ -944,7 +944,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["kick"] = chili.Button:New{
 				parent = playerPanel,
@@ -962,7 +962,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["battlekick"] = chili.Button:New{
 				parent = playerPanel,
@@ -980,7 +980,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			--givemebuttons[subject.id]["battlekick"] = chili.Button:New{
 			--	parent = playerPanel,
@@ -998,7 +998,7 @@ local function InitName(subject, playerPanel)
 			--			height='100%'
 			--		}
 			--	},
-			--	caption=" "
+			--	noFont = true,
 			--}
 		end
 	else
@@ -1020,7 +1020,7 @@ local function InitName(subject, playerPanel)
 					y=0
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
 			parent = playerPanel,
@@ -1038,7 +1038,7 @@ local function InitName(subject, playerPanel)
 					height='100%'
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 	end
 	local country, icon, badges, clan, avatar, faction, admin
@@ -1253,7 +1253,10 @@ local function Buildme()
 				width=panelWidth,
 				height = titleSize,
 				x = panelX,
-				y = localHeightOffset + 10,caption=name,fontsize=titleSize - 4,textColor=color,
+				y = localHeightOffset + 10,
+				caption=name,
+				objectOverrideFont = WG.GetFont(titleSize - 4),
+				textColor=color,
 				align='center'
 			}
 			allypanels[#allypanels + 1] = label
@@ -1319,7 +1322,7 @@ local function Buildme()
 		x='43%',
 		y=10,
 		text="P L A Y E R S",
-		fontsize=17,
+		objectOverrideFont = WG.GetFont(17),
 		textColor={1.0,1.0,1.0,1.0}
 	}
 	chili.ScrollPanel:New{

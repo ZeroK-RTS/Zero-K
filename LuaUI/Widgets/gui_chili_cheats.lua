@@ -225,9 +225,10 @@ local function AddGodmodeToggle(parent, offset)
 	chbox.godmode = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
 		y = offset[1],
-		right = 0,
+		x = 0,
 		checked = Spring.IsGodModeEnabled(),
 		parent = parent,
+		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
 			-- the param is a bitfield, 1 for allies and 2 for enemies, so
 			-- in theory those could be separate toggles, but I don't think
@@ -251,12 +252,12 @@ end
 local function AddAtmButton(parent, x_offset, y_offset)
 	button.atm = WG.Chili.Button:New{
 		y = y_offset[1],
-		right = x_offset[1],
+		x = x_offset[1],
 		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
-		caption = "",
+		noFont = true,
 
 		OnClick = { function(self)
 			Spring.SendCommands("atm")
@@ -279,12 +280,12 @@ end
 local function AddClearButton(parent, x_offset, y_offset)
 	button.clear = WG.Chili.Button:New{
 		y = y_offset[1],
-		right = x_offset[1],
+		x = x_offset[1],
 		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
-		caption = "",
+		noFont = true,
 
 		OnClick = { function(self)
 			Spring.SendCommands("luarules clear")
@@ -307,12 +308,12 @@ end
 local function AddGentleKillButton(parent, x_offset, y_offset)
 	button.gk = WG.Chili.Button:New{
 		y = y_offset[1],
-		right = x_offset[1],
+		x = x_offset[1],
 		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
-		caption = "",
+		noFont = true,
 
 		OnClick = { function(self)
 			Spring.SendCommands("luarules gk")
@@ -335,12 +336,12 @@ end
 local function AddRezButton(parent, x_offset, y_offset)
 	button.rez = WG.Chili.Button:New{
 		y = y_offset[1],
-		right = x_offset[1],
+		x = x_offset[1],
 		width = BUTTON_SIZE,
 		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
-		caption = "",
+		noFont = true,
 
 		OnClick = { function(self)
 			Spring.SendCommands("luarules rez")
@@ -367,6 +368,7 @@ local function AddNocostToggle(parent, offset)
 		right = 0,
 		checked = GetNoCost(),
 		parent = parent,
+		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
 			Spring.SendCommands(
 				"nocost "          .. (value and 1 or 0),
@@ -393,6 +395,7 @@ local function AddGloballosToggle(parent, offset)
 		right = 0,
 		checked = false, -- FIXME Spring.GetGlobalLos(Spring.GetLocalAllyTeamID())
 		parent = parent,
+		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
 			Spring.SendCommands("globallos " .. Spring.GetLocalAllyTeamID())
 		end},
@@ -417,6 +420,7 @@ local function AddCheatingToggle(parent, offset)
 		right = 0,
 		checked = Spring.IsCheatingEnabled(),
 		parent = parent,
+		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
 			if Spring.GetModOptions().zksearchtag then -- multiplayer
 				Spring.SendCommands("say !hostsay /cheat " .. (value and 1 or 0))
@@ -429,12 +433,13 @@ local function AddCheatingToggle(parent, offset)
 end
 
 local function AddButtons(parent, y_offset)
-	local x_offset = {BUTTON_SPACING}
+	y_offset[1] = y_offset[1] + 15
+	local x_offset = {0}
 	AddAtmButton       (parent, x_offset, y_offset)
 	AddClearButton     (parent, x_offset, y_offset)
 	AddGentleKillButton(parent, x_offset, y_offset)
 	AddRezButton       (parent, x_offset, y_offset)
-	y_offset[1] = y_offset[1] + BUTTON_SIZE + BUTTON_SPACING
+	y_offset[1] = y_offset[1] + BUTTON_SIZE + BUTTON_SPACING - 15
 end
 
 local function AddMiscControls(parent, offset)
@@ -457,6 +462,7 @@ local function MakeUnitPickerComboxes(parent, offset)
 			height = COMBOX_HEIGHT,
 			items = {},
 			parent = parent,
+			objectOverrideFont = WG.GetFont(),
 			OnSelect = {function(self, j)
 				spawnParams.unit = categories[i].unitList[j]
 			end},
@@ -473,6 +479,7 @@ local function MakeUnitPickerComboxes(parent, offset)
 		items = {},
 		parent = parent,
 		selected = 1,
+		objectOverrideFont = WG.GetFont(),
 		OnSelect = {function(self, i)
 			if i == 1 then
 				spawnParams.unit = nil
@@ -501,6 +508,7 @@ local function MakeTeamPickerCombox(parent, offset)
 		topHeight = 10,
 		items = {},
 		parent = parent,
+		objectOverrideFont = WG.GetFont(),
 		OnSelect = {function(self, i)
 			spawnParams.team = teams[i]
 		end},
@@ -536,7 +544,7 @@ local function MakeSpawnButton(parent, offset)
 		height = BUTTON_SIZE,
 
 		padding = {3,3,3,3},
-		caption = "",
+		noFont = true,
 
 		OnClick = {
 			function(self)
@@ -565,7 +573,7 @@ local function MakeSpawnLabel(parent, offset)
 		y = offset[1],
 		height = 25,
 
-		font = { size = 16 },
+		objectOverrideFont = WG.GetFont(16),
 		align = "center",
 		autosize = false,
 
@@ -615,7 +623,9 @@ local function InitializeControls()
 		valign = "center",
 		align  = "center",
 		autosize = false,
-		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(20, "cheat",{
+			size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2
+		}),
 		parent = mainWindow,
 	}
 

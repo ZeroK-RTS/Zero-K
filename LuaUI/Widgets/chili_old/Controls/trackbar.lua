@@ -12,6 +12,7 @@ Trackbar = Control:Inherit{
   defaultHeight    = 20,
 
   hitpadding  = {0, 0, 0, 0},
+  noFont = true,
 
   OnChange = {},
 }

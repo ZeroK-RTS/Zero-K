@@ -561,6 +561,7 @@ options = {
 					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -578,6 +579,7 @@ options = {
 					bottom = 0,
 					right = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -930,14 +932,11 @@ local function AddMessage(msg, target, remake)
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-
-		font = {
+		objectOverrideFont = WG.GetSpecialFont(14, "proconsole", {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
-			
-			--color         = {0,0,0,0},
-		}
+		})
 	}
 	
 	if options.clickable_points.value then
@@ -963,7 +962,7 @@ local function AddMessage(msg, target, remake)
 				caption = '',
 				children = {
 					WG.Chili.Button:New{
-						caption='',
+						noFont = true,
 						x=0;y=0;
 						width = 30,
 						height = 20,
@@ -1221,6 +1220,7 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 		parent = (enabled and screen0) or nil,
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
+		noFont = true,
 		dockable = true,
 		name = name,
 		x = x,
@@ -1597,6 +1597,7 @@ function widget:Initialize()
 		x = (options.backlogArrowOnRight.value and 0) or inputsize,
 		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
+		noFont = true,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
@@ -1618,7 +1619,7 @@ function widget:Initialize()
 		height = inputsize - 3,
 		classname = "overlay_button_tiny",
 		padding = {1,1,1,1},
-		caption = '',
+		noFont = true,
 		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},
 		children={ backlogButtonImage },
@@ -1630,6 +1631,7 @@ function widget:Initialize()
 		x = 0,
 		y = 0,
 		width = '100%',
+		noFont = true,
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
@@ -1656,6 +1658,7 @@ function widget:Initialize()
 		padding = { 3,3,3,3 },
 		x = 0,
 		y = 0,
+		noFont = true,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
@@ -1675,6 +1678,7 @@ function widget:Initialize()
 		y = 5,
 		right = 5,
 		bottom = 5,
+		noFont = true,
 		verticalSmartScroll = true,
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},

@@ -472,7 +472,7 @@ options = {
 		noHotkey = true,
 		OnChange = function(self)
 			if bar_metal then
-				bar_metal.font.size = self.value and 20 or 16
+				bar_metal.font = WG.GetFont((self.value and 20) or 16)
 				bar_metal.fontOffset = self.value and -2 or 1
 				if bar_metal.net then
 					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, positiveColourStr, negativeColourStr))
@@ -480,7 +480,7 @@ options = {
 				bar_metal:Invalidate()
 			end
 			if bar_overlay_energy then
-				bar_overlay_energy.font.size = self.value and 20 or 16
+				bar_overlay_energy.font = WG.GetFont((self.value and 20) or 16)
 				bar_overlay_energy.fontOffset = self.value and -2 or 1
 				if bar_overlay_energy.net then
 					bar_overlay_energy:SetCaption(GetFlowStr(bar_overlay_energy.net, self.value, positiveColourStr, negativeColourStr))
@@ -1113,7 +1113,9 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.warningFontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 		parent = holder,
 	}
 	
@@ -1166,7 +1168,9 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 		valign = "center",
 		align  = "center",
 		autosize = false,
-		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.warningFontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 		parent = holder,
 	}
 	
@@ -1300,7 +1304,9 @@ local function GetExtraPanel(name, extraData)
 			align  = "center",
 			autosize = false,
 			parent = holderPanel,
-			font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+			objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+				outline = true, outlineWidth = 2, outlineWeight = 2,
+			}),
 		}
 	end
 	
@@ -1445,6 +1451,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// WINDOW
 	window = Chili.Window:New{
 		backgroundColor = {0, 0, 0, 0},
+		noFont = true,
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
@@ -1558,7 +1565,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
+			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
+		}),
 	}
 	
 	lbl_income_metal = Chili.Label:New{
@@ -1571,7 +1580,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	lbl_expense_metal = Chili.Label:New{
@@ -1584,7 +1595,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	local metalBarHolder = Chili.Control:New{
@@ -1707,7 +1720,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
+			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
+		}),
 	}
 	
 	lbl_income_energy = Chili.Label:New{
@@ -1720,7 +1735,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	lbl_expense_energy = Chili.Label:New{
@@ -1733,7 +1750,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	local energyBarHolder = Chili.Control:New{

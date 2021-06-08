@@ -717,7 +717,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		y = "5%",
 		right = "5%",
 		bottom = "5%",
-		caption = '',
+		noFont = true,
 		padding = {1,1,1,1},
 		backgroundColor = backgroundColor,
 		OnClick = {
@@ -844,7 +844,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "left",
 				valign = "top",
 				caption = '\255\0\255\0' .. hotkeyText,
-				fontSize = 11,
+				objectOverrideFont = WG.GetFont(11),
 				fontShadow = true,
 				parent = button
 			}
@@ -863,7 +863,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "right",
 				valign = "bottom",
 				caption = caption,
-				fontSize = 16,
+				objectOverrideFont = WG.GetFont(16),
 				autosize = false,
 				fontShadow = true,
 				parent = image,
@@ -1584,6 +1584,7 @@ local function InitializeControls()
 		tweakResizable = true,
 		minWidth = 32,
 		minHeight = 32,
+		noFont = true,
 		color = {0,0,0,0},
 		OnClick = {
 			function(self)

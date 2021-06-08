@@ -591,20 +591,20 @@ local function SetupChiliStuff()
 		mainWindow:AddChild(pic)
 	end
 
-	checkboxes.allyground  = WG.Chili.Checkbox:New { x = 26, y = 28, }
-	checkboxes.enemyground = WG.Chili.Checkbox:New { x = 50, y = 28, }
-	checkboxes.specground  = WG.Chili.Checkbox:New { x = 74, y = 28, }
-	checkboxes.allyair     = WG.Chili.Checkbox:New { x = 26, y = 52, }
-	checkboxes.enemyair    = WG.Chili.Checkbox:New { x = 50, y = 52, }
-	checkboxes.specair     = WG.Chili.Checkbox:New { x = 74, y = 52, }
-	checkboxes.allynuke    = WG.Chili.Checkbox:New { x = 26, y = 76, }
-	checkboxes.enemynuke   = WG.Chili.Checkbox:New { x = 50, y = 76, }
-	checkboxes.specnuke    = WG.Chili.Checkbox:New { x = 74, y = 76, }
+	checkboxes.allyground  = WG.Chili.Checkbox:New { x = 26, y = 28, noFont = true}
+	checkboxes.enemyground = WG.Chili.Checkbox:New { x = 50, y = 28, noFont = true}
+	checkboxes.specground  = WG.Chili.Checkbox:New { x = 74, y = 28, noFont = true}
+	checkboxes.allyair     = WG.Chili.Checkbox:New { x = 26, y = 52, noFont = true}
+	checkboxes.enemyair    = WG.Chili.Checkbox:New { x = 50, y = 52, noFont = true}
+	checkboxes.specair     = WG.Chili.Checkbox:New { x = 74, y = 52, noFont = true}
+	checkboxes.allynuke    = WG.Chili.Checkbox:New { x = 26, y = 76, noFont = true}
+	checkboxes.enemynuke   = WG.Chili.Checkbox:New { x = 50, y = 76, noFont = true}
+	checkboxes.specnuke    = WG.Chili.Checkbox:New { x = 74, y = 76, noFont = true}
 	-- no allyshield
-	checkboxes.enemyshield = WG.Chili.Checkbox:New { x = 50, y = 100, }
+	checkboxes.enemyshield = WG.Chili.Checkbox:New { x = 50, y = 100, noFont = true}
 	-- no specshield
 	-- no allyradar
-	checkboxes.enemyradar  = WG.Chili.Checkbox:New { x = 50, y = 124, }
+	checkboxes.enemyradar  = WG.Chili.Checkbox:New { x = 50, y = 124, noFont = true}
 	-- no specradar
 
 	local function OnCheckboxChangeFunc(self)

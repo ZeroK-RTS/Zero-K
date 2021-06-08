@@ -189,7 +189,8 @@ local function drawIntervals(graphMax)
 				x = 5,
 				bottom = ((i)/5*100 + 1) .. "%",
 				width = "100%",
-				caption = numFormat(graphMax*i/5)
+				caption = numFormat(graphMax*i/5),
+				objectOverrideFont = WG.GetFont(),
 			}
 		end
 	end
@@ -410,7 +411,7 @@ getEngineArrays = function(statistic, labelCaption)
 			caption = "No Data",
 			align = "center",
 			textColor = {1,1,0,1},
-			fontsize = 60,
+			objectOverrideFont = WG.GetFont(fontsize),
 		}
 		return
 	end
@@ -537,7 +538,7 @@ function makePanel()
 		height = 30,
 		align = "center",
 		autosize = true,
-		font = {size = 30,},
+		objectOverrideFont = WG.GetFont(30),
 	}
 	graphTime = Chili.Label:New {
 		parent = window0,
@@ -546,6 +547,7 @@ function makePanel()
 		width = 50,
 		height = 10,
 		caption = "",
+		objectOverrideFont = WG.GetFont(),
 	}
 
 	drawIntervals()
@@ -565,10 +567,7 @@ function makePanel()
 			x = 5,
 			y = 3,
 			caption = buttongroups[i][1],
-			font = {
-				size          = 16,
-				color         = {1,1,0,1},
-			},
+			objectOverrideFont = WG.GetSpecialFont(16, "yellow", {color = {1,1,0,1}}),
 
 		}
 		local groupstack = Chili.StackPanel:New {
@@ -587,6 +586,7 @@ function makePanel()
 				caption = buttongroups[i][2][j][2],
 				tooltip = buttongroups[i][2][j][3],
 				parent = groupstack,
+				objectOverrideFont = WG.GetFont(),
 				OnClick = {
 					function(obj)
 						if window0.buttonPressed then
@@ -608,7 +608,7 @@ function makePanel()
 
 	local allyToggle = Chili.Checkbox:New {
 		parent = window0,
-		caption = " ",
+		noFont = true,
 		right = 32, bottom = 2,
 		checked = false,
 		OnClick = {
@@ -629,6 +629,7 @@ function makePanel()
 		bottom = 5, right = 50,
 		width = 50, height = 10,
 		align = "right",
+		objectOverrideFont = WG.GetFont(),
 	}
 
 	return window0

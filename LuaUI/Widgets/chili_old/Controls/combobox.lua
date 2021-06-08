@@ -115,6 +115,7 @@ function ComboBox:MouseDown(x, y)
             width = '100%',
             height = self.itemHeight,
             fontsize = self.itemFontSize,
+            objectOverrideFont = self.objectOverrideFont,
             state = {focused = (i == self.selected), selected = (i == self.selected)},
             OnMouseUp = {
               function()

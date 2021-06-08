@@ -213,6 +213,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
+		noFont = true,
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
@@ -222,6 +223,7 @@ function widget:Initialize()
 		orientation   = "vertical";
 		height = "100%";
 		width =  "100%";
+		noFont = true,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 		backgroundColor = {0, 0, 0, 0},
@@ -232,6 +234,7 @@ function widget:Initialize()
 		align="center";
 		valign="top";
 		caption = '';
+		objectOverrideFont = WG.GetFont(),
 		height = 16,
 		width = "100%";
 	}
@@ -243,6 +246,7 @@ function widget:Initialize()
 			y = (40*(i-1))+15 ..'%',
 			height = "40%";
 			width =  "100%";
+		noFont = true,
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
 			backgroundColor = {0, 0, 0, 0},
@@ -265,6 +269,7 @@ function widget:Initialize()
 			height	= "100%",
 			max     = 1;
 			caption = "?/?";
+			objectOverrideFont = WG.GetFont(),
 			color   = (i == 1 and {0.2,0.9,0.3,1}) or {0.9,0.15,0.2,1};
 		}
 		button_vote[i] = Button:New{
@@ -282,6 +287,7 @@ function widget:Initialize()
 						Spring.SendCommands({'say !vote '..i})
 					end
 				end},
+			objectOverrideFont = WG.GetFont(),
 			padding = {1,1,1,1},
 			--keepAspect = true,
 		}
@@ -299,6 +305,7 @@ function widget:Initialize()
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
 		caption="";
+		objectOverrideFont = WG.GetFont(),
 		tooltip = "Hide this vote";
 		OnClick = {function()
 				screen0:RemoveChild(window)

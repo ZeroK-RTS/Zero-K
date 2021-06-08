@@ -129,9 +129,9 @@ local function MakeAwardPanel(awardType, record)
 		width=230;
 		height=awardPanelHeight;
 		children = {
-			Image:New{ file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; };
-			Label:New{ caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; fontsize=fontsize; };
-			Label:New{ caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20 };
+			Image:New{ file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; objectOverrideFont = WG.GetFont(), };
+			Label:New{ caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; objectOverrideFont = WG.GetFont(fontsize), };
+			Label:New{ caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20, objectOverrideFont = WG.GetFont(), };
 		}
 	}
 end
@@ -149,9 +149,9 @@ local function SetupAwardsPanel()
 				width=120,
 				height=awardPanelHeight,
 				caption = teamNames[teamID],
-				fontShadow = true,
 				valign='center',
 				autosize=false,
+				objectOverrideFont = WG.GetFont(),
 				textColor=teamColors[teamID],
 			}
 			for awardType, record in pairs(awards) do
@@ -229,7 +229,7 @@ local function SetupControls()
 		name = "GameOver",
 		caption = "",
 		textColor = {0.5,0.5,0.5,1},
-		fontSize = 50,
+		objectOverrideFont = WG.GetFont(50),
 		x = '20%',
 		y = '20%',
 		width  = '60%',
@@ -247,6 +247,7 @@ local function SetupControls()
 		x=10;y=50;
 		bottom=10;right=10;
 		autosize = true,
+		noFont = true,
 		scrollbarSize = 6,
 		horizontalScrollbar = false,
 		hitTestAllowEmpty = true;
@@ -256,6 +257,7 @@ local function SetupControls()
 	statsPanel = ScrollPanel:New{
 		parent = window_endgame,
 		x = 10; y = 10;
+		noFont = true,
 		height = -20; width = -20;
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
@@ -280,6 +282,7 @@ local function SetupControls()
 	awardButton = Button:New{
 		parent = window_endgame;
 		caption="Awards",
+		objectOverrideFont = WG.GetFont(),
 		x=9, y=7,
 		height=B_HEIGHT;
 		OnClick = {
@@ -294,6 +297,7 @@ local function SetupControls()
 		parent = window_endgame;
 		caption="Statistics",
 		x=86, y=7,
+		objectOverrideFont = WG.GetFont(),
 		height=B_HEIGHT;
 		OnClick = {
 			ShowStats
@@ -306,7 +310,7 @@ local function SetupControls()
 		width = 160,
 		height = B_HEIGHT,
 		caption = "Exit to Lobby",
-		fontsize = 18,
+		objectOverrideFont = WG.GetFont(18),
 		OnClick = {
 			function()
 				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then

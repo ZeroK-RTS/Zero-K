@@ -1010,7 +1010,7 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 		itemPadding = {0,0,0,0},
 		padding     = {0,0,0,0},
 		caption = '',
-		font = {size = BAR_FONT},
+		objectOverrideFont = WG.GetFont(BAR_FONT),
 		parent = parentControl
 	}
 	
@@ -1061,7 +1061,7 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 		right = 0,
 		height = LEFT_LABEL_HEIGHT,
 		caption = IMAGE_FONT,
-		fontSize = fontSize,
+		objectOverrideFont = WG.GetFont(fontSize),
 		parent = parentControl,
 	}
 	image:SetVisibility(false)
@@ -1110,7 +1110,7 @@ local function GetMorphInfo(parentControl, yPos)
 		width = 50,
 		valign = 'center',
 		caption = cyan .. 'Morph:',
-		fontSize = BAR_FONT,
+		objectOverrideFont = WG.GetFont(BAR_FONT),
 		parent = holder,
 	}
 	local timeImage = Chili.Image:New{
@@ -1127,7 +1127,7 @@ local function GetMorphInfo(parentControl, yPos)
 		right = 0,
 		height = BAR_SIZE,
 		caption = BAR_FONT,
-		fontSize = fontSize,
+		objectOverrideFont = WG.GetFont(fontSize),
 		parent = holder,
 	}
 	local costImage = Chili.Image:New{
@@ -1144,7 +1144,7 @@ local function GetMorphInfo(parentControl, yPos)
 		right = 0,
 		height = BAR_SIZE,
 		caption = BAR_FONT,
-		fontSize = fontSize,
+		objectOverrideFont = WG.GetFont(fontSize),
 		parent = holder,
 	}
 	
@@ -1249,9 +1249,7 @@ local function GetUnitGroupIconButton(parentControl)
 		height = 25,
 		align  = "right",
 		valign = "top",
-		fontsize = 20,
-		fontshadow = true,
-		fontOutline = true,
+		objectOverrideFont = WG.GetSpecialFont(20, "outline", {outline = true}),
 		parent = unitImage
 	}
 	
@@ -1378,8 +1376,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		y = 3,
 		right = 0,
 		valign  = 'top',
-		fontSize = 12,
-		fontShadow = true,
+		objectOverrideFont = WG.GetFont(12),
 		parent = holder,
 	}
 	
@@ -1755,7 +1752,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		y = 25,
 		right = 0,
 		height = BAR_SIZE,
-		fontSize = DESC_FONT,
+		objectOverrideFont = WG.GetFont(DESC_FONT),
 		parent = rightPanel,
 	}
 	
@@ -1777,7 +1774,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			y = PIC_HEIGHT + 31,
 			right = 0,
 			height = BAR_FONT,
-			fontSize = BAR_FONT,
+			objectOverrideFont = WG.GetFont(BAR_FONT),
 			parent = rightPanel,
 		}
 		spaceClickLabel = Chili.Label:New{
@@ -1786,7 +1783,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			y = PIC_HEIGHT + 55,
 			right = 0,
 			height = 18,
-			fontSize = DESC_FONT,
+			objectOverrideFont = WG.GetFont(DESC_FONT),
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
@@ -2083,6 +2080,7 @@ local function GetTooltipWindow()
 		draggable = false,
 		autosize  = true,
 		minWidth = RIGHT_WIDTH,
+		noFont = true,
 		padding = {6,4,6,2},
 		color = {1, 1, 1, options.tooltip_opacity.value},
 		parent = screen0
@@ -2097,7 +2095,7 @@ local function GetTooltipWindow()
 		height = 5,
 		valign = "ascender",
 		autoHeight = true,
-		font = {size = TOOLTIP_FONT},
+		objectOverrideFont = WG.GetFont(TOOLTIP_FONT),
 		parent = window,
 	}
 	textTooltip:SetVisibility(false)
@@ -2358,6 +2356,7 @@ local function GetSelectionWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
+		noFont = true,
 		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent = screen0,
