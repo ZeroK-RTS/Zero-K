@@ -1802,7 +1802,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
-		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 3)
+		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 4)
 	else
 		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
 		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
@@ -1897,7 +1897,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		unitDesc:Invalidate()
 		
 		if econStructureDefs[unitDefID].isWind then
-			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH, PIC_HEIGHT + 5)
+			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
 		end
 	end
 	
