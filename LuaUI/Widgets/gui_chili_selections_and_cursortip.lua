@@ -72,7 +72,7 @@ local BAR_FONT = 13
 local BAR_SPACING = 24
 local IMAGE_FONT = 12
 local DESC_FONT = 10
-local TOOLTIP_FONT = 12
+local TOOLTIP_FONT = 13
 local NAME_FONT = 14
 local LEFT_SPACE = 24
 local LEFT_LABEL_HEIGHT = 16
@@ -990,7 +990,7 @@ end
 local function GetBarWithImage(parentControl, name, initY, imageFile, color, colorFunc)
 	local image = Chili.Image:New{
 		name = name .. "_image",
-		x = 0,
+		x = 2,
 		y = initY,
 		width = ICON_SIZE,
 		height = ICON_SIZE,
@@ -1000,7 +1000,7 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 	
 	local bar = Chili.Progressbar:New {
 		name = name .. "_bar",
-		x = ICON_SIZE + 1,
+		x = ICON_SIZE + 3,
 		y = initY,
 		right = 0,
 		height = BAR_SIZE,
@@ -1041,13 +1041,14 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 	return UpdateBar
 end
 
-local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset)
+local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
+	xOffset = xOffset or 0
 	
 	local image = Chili.Image:New{
 		name = name .. "_image",
-		x = 0,
+		x = xOffset,
 		y = initY,
 		width = iconSize,
 		height = iconSize,
@@ -1056,7 +1057,7 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 	}
 	local label = Chili.Label:New{
 		name = name .. "_label",
-		x = iconSize + 2,
+		x = xOffset + iconSize + 2,
 		y = initY + (textOffset or 0),
 		right = 0,
 		height = LEFT_LABEL_HEIGHT,
@@ -1093,7 +1094,7 @@ local function GetImageWithText(parentControl, name, initY, imageFile, caption, 
 	return Update
 end
 
-local function GetMorphInfo(parentControl, yPos)
+local function GetCostInfoPanel(parentControl, yPos)
 	local holder = Chili.Control:New{
 		x = 0,
 		y = yPos,
@@ -1103,35 +1104,17 @@ local function GetMorphInfo(parentControl, yPos)
 		parent = parentControl,
 	}
 	
-	local morphLabel = Chili.Label:New{
+	local nameLabel = Chili.Label:New{
 		x = 4,
-		y = 0,
+		y = 2,
 		height = ICON_SIZE,
 		width = 50,
-		valign = 'center',
 		caption = cyan .. 'Morph:',
-		objectOverrideFont = WG.GetFont(BAR_FONT),
-		parent = holder,
-	}
-	local timeImage = Chili.Image:New{
-		x = 54,
-		y = 0,
-		width = ICON_SIZE,
-		height = ICON_SIZE,
-		file = IMAGE.TIME,
-		parent = holder,
-	}
-	local timeLabel = Chili.Label:New{
-		x = 54 + ICON_SIZE + 4,
-		y = 4,
-		right = 0,
-		height = BAR_SIZE,
-		caption = BAR_FONT,
-		objectOverrideFont = WG.GetFont(fontSize),
+		objectOverrideFont = WG.GetFont(NAME_FONT),
 		parent = holder,
 	}
 	local costImage = Chili.Image:New{
-		x = 114,
+		x = 54,
 		y = 0,
 		width = ICON_SIZE,
 		height = ICON_SIZE,
@@ -1139,25 +1122,58 @@ local function GetMorphInfo(parentControl, yPos)
 		parent = holder,
 	}
 	local costLabel = Chili.Label:New{
-		x = 113 + ICON_SIZE + 4,
-		y = 4,
+		x = 54 + ICON_SIZE + 4,
+		y = 2,
 		right = 0,
 		height = BAR_SIZE,
 		caption = BAR_FONT,
-		objectOverrideFont = WG.GetFont(fontSize),
+		objectOverrideFont = WG.GetFont(NAME_FONT),
+		parent = holder,
+	}
+	local timeImage = Chili.Image:New{
+		x = 124,
+		y = 0,
+		width = ICON_SIZE,
+		height = ICON_SIZE,
+		file = IMAGE.TIME,
+		parent = holder,
+	}
+	local timeLabel = Chili.Label:New{
+		x = 124 + ICON_SIZE + 4,
+		y = 2,
+		right = 0,
+		height = BAR_SIZE,
+		caption = BAR_FONT,
+		objectOverrideFont = WG.GetFont(NAME_FONT),
 		parent = holder,
 	}
 	
-	local function Update(visible, newTime, newCost, yPos)
+	local function Update(visible, newTime, newCost, newName, yPos, textX)
 		holder:SetVisibility(visible)
 		if not visible then
 			return
 		end
+		if textX then
+			costImage:SetPos(textX)
+			costLabel:SetPos(textX + ICON_SIZE + 4)
+			timeImage:SetPos(textX + 70)
+			timeLabel:SetPos(textX + 70 + ICON_SIZE + 4)
+		end
 		if yPos then
 			holder:SetPos(nil, yPos, nil, nil, nil, true)
 		end
-		timeLabel:SetCaption(cyan .. newTime)
-		costLabel:SetCaption(cyan .. newCost)
+		if newTime then
+			timeLabel:SetCaption(cyan .. newTime)
+		end
+		if newCost then
+			costLabel:SetCaption(cyan .. newCost)
+			local width = 1 + math.floor(math.log(newCost + 1) / math.log(10))
+			timeImage:SetPos(textX + 35 + width * 7)
+			timeLabel:SetPos(textX + 35 + width * 7 + ICON_SIZE + 4)
+		end
+		if newName then
+			nameLabel:SetCaption(cyan .. newName)
+		end
 	end
 	
 	return Update
@@ -1376,7 +1392,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		y = 3,
 		right = 0,
 		valign  = 'top',
-		objectOverrideFont = WG.GetFont(12),
+		objectOverrideFont = WG.GetFont(NAME_FONT),
 		parent = holder,
 	}
 	
@@ -1743,7 +1759,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 2)
+	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 2, 1)
 	
 	local unitDesc = Chili.TextBox:New{
 		name = "unitDesc",
@@ -1758,14 +1774,14 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 4)
 	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 4)
 	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
-	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2)
+	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 5, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, morphInfo, playerNameLabel, timeInfoUpdate
+	local spaceClickLabel, shieldBarUpdate, buildBarUpdate, costInfo, playerNameLabel
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -1786,8 +1802,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
-		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
-		timeInfoUpdate = GetImageWithText(leftPanel, "timeInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.TIME, nil, nil, ICON_SIZE, 5)
+		costInfoPanel = GetCostInfoPanel(rightPanel, PIC_HEIGHT + 3)
 	else
 		shieldBarUpdate = GetBarWithImage(rightPanel, "shieldBarUpdate", PIC_HEIGHT + 4, IMAGE.SHIELD, {0.3,0,0.9,1})
 		buildBarUpdate = GetBarWithImage(rightPanel, "buildBarUpdate", PIC_HEIGHT + 58, IMAGE.BUILD, {0.8,0.8,0.2,1})
@@ -1882,24 +1897,24 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		unitDesc:Invalidate()
 		
 		if econStructureDefs[unitDefID].isWind then
-			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
+			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH, PIC_HEIGHT + 5)
 		end
 	end
 	
-	local function UpdateBuildTime(unitDefID)
-		if not timeInfoUpdate then
+	local function UpdateBuildTime(unitDefID, buildCost)
+		if not costInfoPanel then
 			return
 		end
 		if (global_totalBuildPower or 0) < 1 then
-			timeInfoUpdate(true,  cyan .. "??", IMAGE.TIME)
+			costInfoPanel(true, "??")
 			return
 		end
-		local buildCost = GetUnitCost(nil, unitDefID)
+		buildCost = buildCost or GetUnitCost(nil, unitDefID)
 		if not buildCost then
-			timeInfoUpdate(false)
+			costInfoPanel(false)
 			return
 		end
-		timeInfoUpdate(true, cyan .. SecondsToMinutesSeconds(math.floor(buildCost/global_totalBuildPower)), IMAGE.TIME)
+		costInfoPanel(true, SecondsToMinutesSeconds(math.floor(buildCost/global_totalBuildPower)))
 	end
 	
 	function externalFunctions.SetDisplay(unitID, unitDefID, featureID, featureDefID, blueprint, morphTime, morphCost, mousePlaceX, mousePlaceY, requiredOnly)
@@ -1965,8 +1980,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage.file = "#" .. unitDefID
 			unitImage.file2 = GetUnitBorder(unitDefID)
 			unitImage:Invalidate()
-			
-			costInfoUpdate(true, cyan .. math.floor(GetUnitCost(unitID, unitDefID) or 0), IMAGE.COST, PIC_HEIGHT + 4)
+
+			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
+			costInfoUpdate(true, cyan .. unitCost, IMAGE.COST, PIC_HEIGHT + 4)
 			
 			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
@@ -1990,25 +2006,24 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			end
 			if (not (unitID and visible)) and not featureDefID then
 				healthBarUpdate(false)
-				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
-				maxHealthShown = true
-				if blueprint then
-					UpdateBuildTime(unitDefID)
-				end
-				if morphTime then
-					morphInfo(true, morphTime, morphCost)
+				local maxHealthPos = PIC_HEIGHT + 5
+				if blueprint and costInfoPanel then
+					costInfoPanel(true, false, unitCost, "Cost:", nil, 46)
+					UpdateBuildTime(unitDefID, unitCost)
+					maxHealthPos = maxHealthPos + LEFT_SPACE
+				elseif morphTime and costInfoPanel then
+					costInfoPanel(true, SecondsToMinutesSeconds(morphTime), morphCost, "Morph:", nil, 58)
 					morphShown = true
+					maxHealthPos = maxHealthPos + LEFT_SPACE
 					if spaceClickLabel then
 						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 30, nil, nil, nil, true)
 					end
 				elseif spaceClickLabel and not unitID then
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
+				maxHealthShown = true
+				maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH, maxHealthPos)
 			end
-		end
-		
-		if timeInfoUpdate and not blueprint then
-			timeInfoUpdate(false)
 		end
 		
 		if unitID then
@@ -2048,8 +2063,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if maxHealthLabel and not maxHealthShown then
 			maxHealthLabel(false)
 		end
-		if morphInfo and not morphShown then
-			morphInfo(false)
+		if costInfoPanel and not (morphShown or blueprint) then
+			costInfoPanel(false)
 		end
 		
 		prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID = unitID, unitDefID, featureID, featureDefID
