@@ -714,7 +714,7 @@ local function MakeFlags()
 		}
 		flagChildren[#flagChildren + 1] = Button:New{
 			caption = langData.name,
-			objectOverrideFont = WG.GetFont(13),
+			objectOverrideFont = WG.GetFont(),
 			name = 'countryButton' .. langData.lang;
 			width = '50%',
 			lang = langData.lang,
@@ -751,7 +751,7 @@ local function MakeFlags()
 			--close button
 			Button:New{caption = 'Close',  x = 5, y = 0-B_HEIGHT, bottom = 5, right = 5,
 				name = 'makeFlagCloseButton';
-				objectOverrideFont = WG.GetFont(13),
+				objectOverrideFont = WG.GetFont(),
 				OnClick = {function(self) window_flags:Dispose(); window_flags = nil; end },
 				width = window_width-20,
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
@@ -788,7 +788,7 @@ local function MakeHelp(caption, text)
 			--Close button
 			Button:New{
 				caption = 'Close', OnClick = {function(self) self.parent:Dispose() end },
-				objectOverrideFont = WG.GetFont(13),
+				objectOverrideFont = WG.GetFont(),
 				x = 45, bottom = 1, right = 45, height = B_HEIGHT,
 				name = 'makeHelpCloseButton';
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
@@ -1525,7 +1525,7 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey, minHei
 			right = 0,
 			width = hklength,
 			caption = hotkeystring,
-			objectOverrideFont = WG.GetFont(13),
+			objectOverrideFont = WG.GetFont(),
 			OnClick = {
 				function(self)
 					if not get_key then
@@ -1841,7 +1841,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 					Image:New{file = icon, width = width, height = width, parent = button, x = pos, y = pos}
 				end
 				
-				Label:New{parent = button, x = 35, y = button_height*0.2,  caption = option.name, objectOverrideFont = WG.GetFont(13),}
+				Label:New{parent = button, x = 35, y = button_height*0.2,  caption = option.name, objectOverrideFont = WG.GetFont(),}
 				
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option, nil, option.isDirectoryButton or option.noHotkey, button_height)
 			end
@@ -1860,7 +1860,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 					width = "100%",
 					minHeight = 30,
 					text = option.value,
-					WG.GetFont(13),
+					WG.GetFont(),
 				}
 			
 		elseif option.type == 'bool' then
@@ -1928,7 +1928,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 						name = option.wname .. " " .. item.name;
 						width = "100%",
 						caption = item.name,
-						objectOverrideFont = WG.GetFont(13),
+						objectOverrideFont = WG.GetFont(),
 						OnClick = {function(self) option.OnChange(item) end },
 						--classname = "submenu_navigation_button",
 						--backgroundColor = color.sub_button_bg,
@@ -2065,7 +2065,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Back', x = 24, y = 4, objectOverrideFont = WG.GetFont(13),}
+				Label:New{caption = 'Back', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 			}
 		}
 	end
@@ -2080,7 +2080,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Search', x = 24, y = 4, objectOverrideFont = WG.GetFont(13),}
+			Label:New{caption = 'Search', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 		}
 	}
 	
@@ -2096,7 +2096,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 			parent = buttonBar,
 			children = {
 				Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/undo_white.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(13),}
+				Label:New{caption = 'Reset', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 			}
 		}
 	end
@@ -2111,7 +2111,7 @@ MakeSubWindow = function(path, pause, labelScroll)
 		parent = buttonBar,
 		children = {
 			Image:New{file = LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16, height = 16, parent = button, x = 4, y = 2},
-			Label:New{caption = 'Close', x = 24, y = 4, objectOverrideFont = WG.GetFont(13),}
+			Label:New{caption = 'Close', x = 24, y = 4, objectOverrideFont = WG.GetFont(),}
 		}
 	}
 	
@@ -2220,7 +2220,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 	Label:New{
 		parent = window_exit_confirm,
 		caption = text,
-		objectOverrideFont = WG.GetFont(13),
+		objectOverrideFont = WG.GetFont(),
 		width = "100%",
 		y = 4,
 		align = "center",
@@ -2230,7 +2230,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 		name = 'confirmExitYesButton';
 		parent = window_exit_confirm,
 		caption = "Yes",
-		objectOverrideFont = WG.GetFont(13),
+		objectOverrideFont = WG.GetFont(),
 		OnClick = {
 			function()
 				action()
@@ -2249,7 +2249,7 @@ local function MakeExitConfirmWindow(text, action, height, unpauseOnYes, unpause
 		name = 'confirmExitNoButton';
 		parent = window_exit_confirm,
 		caption = "No",
-		objectOverrideFont = WG.GetFont(13),
+		objectOverrideFont = WG.GetFont(),
 		OnClick = {
 			function()
 				LeaveExitConfirmWindow()

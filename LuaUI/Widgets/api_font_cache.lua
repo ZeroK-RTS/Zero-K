@@ -23,7 +23,7 @@ local font = {}
 local specialFont = {}
 
 function WG.GetFont(size)
-	size = size or 14
+	size = size or 13
 	if (not font[size]) or DISABLE then
 		font[size] = WG.Chili.Font:New {
 			font          = "FreeSansBold.otf",
@@ -41,7 +41,7 @@ function WG.GetFont(size)
 end
 
 function WG.GetSpecialFont(size, name, data)
-	size = size or 14
+	size = size or 13
 	if not specialFont[size] then
 		specialFont[size] = {}
 	end
