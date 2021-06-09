@@ -70,7 +70,7 @@ local ICON_SIZE = 20
 local BAR_SIZE = 22
 local BAR_FONT = 13
 local BAR_SPACING = 24
-local IMAGE_FONT = 10
+local IMAGE_FONT = 12
 local DESC_FONT = 10
 local TOOLTIP_FONT = 12
 local NAME_FONT = 14
@@ -79,7 +79,7 @@ local LEFT_LABEL_HEIGHT = 16
 local SEL_BUTTON_SHORTENING = 2
 
 local LEFT_WIDTH = 55
-local PIC_HEIGHT = LEFT_WIDTH*4/5
+local PIC_HEIGHT = LEFT_WIDTH*4/5 + 1
 local RIGHT_WIDTH = 235
 local GROUP_STATS_WIDTH = 150
 
@@ -1690,7 +1690,6 @@ end
 -- Unit tooltip window
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
-	
 	local selectedUnitID
 	
 	local leftPanel = Chili.Control:New{
@@ -1744,7 +1743,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 	end
 	
-	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 3)
+	local unitNameUpdate = GetImageWithText(rightPanel, "unitNameUpdate", 1, nil, nil, NAME_FONT, nil, 2)
 	
 	local unitDesc = Chili.TextBox:New{
 		name = "unitDesc",
@@ -1756,10 +1755,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = rightPanel,
 	}
 	
-	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 5)
-	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 5)
-	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 5)
-	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 3)
+	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 4)
+	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 4)
+	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
+	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2)
 	
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
@@ -1774,7 +1773,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			y = PIC_HEIGHT + 31,
 			right = 0,
 			height = BAR_FONT,
-			objectOverrideFont = WG.GetFont(BAR_FONT),
+			objectOverrideFont = WG.GetFont(DESC_FONT),
 			parent = rightPanel,
 		}
 		spaceClickLabel = Chili.Label:New{
@@ -1941,14 +1940,14 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				unitDefID = featureUnitDefID
 				if playerNameLabel then
 					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10, nil, nil, nil, true)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 33, nil, nil, nil, true)
 				end
 			else
 				costInfoUpdate(false)
 				unitNameUpdate(true, featureTooltip, nil)
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT - 10, nil, nil, nil, true)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 14, nil, nil, nil, true)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT - 12, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 12, nil, nil, nil, true)
 				end
 			end
 			
@@ -1985,8 +1984,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			if unitID then
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT + 31, nil, nil, nil, true)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55, nil, nil, nil, true)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 33, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 56, nil, nil, nil, true)
 				end
 			end
 			if (not (unitID and visible)) and not featureDefID then
@@ -2000,10 +1999,10 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					morphInfo(true, morphTime, morphCost)
 					morphShown = true
 					if spaceClickLabel then
-						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31, nil, nil, nil, true)
+						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 30, nil, nil, nil, true)
 					end
 				elseif spaceClickLabel and not unitID then
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34, nil, nil, nil, true)
 				end
 			end
 		end

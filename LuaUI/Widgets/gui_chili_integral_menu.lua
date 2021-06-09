@@ -1084,7 +1084,7 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 		height = height,
 		caption = buttonLayout.caption or false,
 		noFont = not buttonLayout.caption,
-		objectOverrideFont = WG.GetFont(),
+		objectOverrideFont = WG.GetFont(14),
 		padding = {0, 0, 0, 0},
 		parent = parent,
 		preserveChildrenOrder = true,
@@ -1779,7 +1779,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		caption = humanName,
 		padding = {0, 0, 0, 1},
 		tooltip = NO_TOOLTIP,
-		objectOverrideFont = WG.GetFont(),
+		objectOverrideFont = WG.GetFont(14),
 		OnClick = {
 			function()
 				DoClick(true)

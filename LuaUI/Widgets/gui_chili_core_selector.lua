@@ -844,7 +844,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "left",
 				valign = "top",
 				caption = '\255\0\255\0' .. hotkeyText,
-				objectOverrideFont = WG.GetFont(11),
+				objectOverrideFont = WG.GetFont(12),
 				fontShadow = true,
 				parent = button
 			}
@@ -858,12 +858,12 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			bottomLabel = Label:New {
 				x = 0,
 				y = 0,
-				right = 0,
-				bottom = 0,
+				right = 5,
+				bottom = 5,
 				align = "right",
 				valign = "bottom",
 				caption = caption,
-				objectOverrideFont = WG.GetFont(16),
+				objectOverrideFont = WG.GetFont(14),
 				autosize = false,
 				fontShadow = true,
 				parent = image,

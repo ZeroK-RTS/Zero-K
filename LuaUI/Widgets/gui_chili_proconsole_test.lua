@@ -932,7 +932,7 @@ local function AddMessage(msg, target, remake)
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-		objectOverrideFont = WG.GetSpecialFont(13, "proconsole", {
+		objectOverrideFont = WG.GetSpecialFont(14, "proconsole", {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
