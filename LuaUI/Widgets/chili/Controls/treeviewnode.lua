@@ -39,6 +39,7 @@ function TreeViewNode:New(obj)
 	obj.treeview = MakeWeakLink(obj.treeview)
 	obj = inherited.New(self, obj)
 	self.labelFontsize = obj.labelFontsize
+	self.objectOverrideFont = obj.objectOverrideFont
 	
 	self.clickTextToToggle = obj.clickTextToToggle
 	return obj

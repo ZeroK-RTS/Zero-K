@@ -57,7 +57,8 @@ function TreeView:New(obj)
 
 	obj = inherited.New(self, obj)
 	
-	obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = obj.defaultExpanded, clickTextToToggle = obj.clickTextToToggle, labelFontsize = obj.labelFontsize}
+	obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = obj.defaultExpanded,
+		clickTextToToggle = obj.clickTextToToggle, labelFontsize = obj.labelFontsize, objectOverrideFont = obj.objectOverrideFont}
 	if (nodes) then
 		ParseInitTable(obj.root, nodes)
 	end

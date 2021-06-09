@@ -28,7 +28,7 @@ EditBox = Control:Inherit{
 	align    = "left",
 	valign   = "linecenter",
 
-	hintFont = table.merge({ color = {1, 1, 1, 0.7} }, Control.font),
+	hintFont = table.merge({ color = {1, 1, 1, 0.48} }, Control.font),
 
 	text   = "", -- Do NOT use directly.
 	hint   = "",
@@ -84,8 +84,12 @@ function EditBox:New(obj)
 	obj._interactedTime = Spring.GetTimer()
 		--// create font
 	if not obj.noHint then
-		obj.hintFont = Font:New(obj.hintFont)
-		obj.hintFont:SetParent(obj)
+		if obj.objectOverrideHintFont then
+			obj.hintFont = obj.objectOverrideHintFont
+		else
+			obj.hintFont = Font:New(obj.hintFont)
+			obj.hintFont:SetParent(obj)
+		end
 	end
 	local text = obj.text
 	obj.text = nil
@@ -97,7 +101,7 @@ end
 
 function EditBox:Dispose(...)
 	Control.Dispose(self)
-	if not self.noHint then
+	if not (self.noHint or self.objectOverrideHintFont) then
 		self.hintFont:SetParent()
 	end
 end
