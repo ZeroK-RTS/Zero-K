@@ -2011,6 +2011,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					costInfoPanel(true, false, unitCost, "Cost:", nil, 46)
 					UpdateBuildTime(unitDefID, unitCost)
 					maxHealthPos = maxHealthPos + LEFT_SPACE
+					if spaceClickLabel then
+						spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 30, nil, nil, nil, true)
+					end
 				elseif morphTime and costInfoPanel then
 					costInfoPanel(true, SecondsToMinutesSeconds(morphTime), morphCost, "Morph:", nil, 58)
 					morphShown = true
