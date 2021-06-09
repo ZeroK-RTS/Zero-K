@@ -114,12 +114,12 @@ function TreeViewNode:Add(item)
 	
 	local newnode
 	if (type(item) == "string") then
-		local lbl = TextBox:New{text = item; width = "100%"; padding = {2, 3, 2, 2}; minHeight = self.minHeight; fontsize = self.labelFontsize}
-		newnode = TreeViewNode:New{caption = item; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize}
+		local lbl = TextBox:New{text = item; width = "100%"; padding = {2, 3, 2, 2}; minHeight = self.minHeight; fontsize = self.labelFontsize, objectOverrideFont = self.objectOverrideFont}
+		newnode = TreeViewNode:New{caption = item; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize, objectOverrideFont = self.objectOverrideFont}
 		newnode:AddChild(lbl, false)
 		self:AddChild(newnode)
 	elseif (IsObject(item)) then
-		newnode = TreeViewNode:New{caption = ""; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize}
+		newnode = TreeViewNode:New{caption = ""; treeview = self.treeview; minHeight = self.minHeight; expanded = self.expandedt; labelFontsize = self.labelFontsize, objectOverrideFont = self.objectOverrideFont}
 		newnode:AddChild(item, false)
 		self:AddChild(newnode)
 	end

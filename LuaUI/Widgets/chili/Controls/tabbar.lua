@@ -31,6 +31,7 @@ function TabBar:New(obj)
 					caption = obj.tabs[i].caption or obj.tabs[i].name,
 					tooltip = obj.tabs[i].tooltip,
 					font = obj.tabs[i].font,
+					objectOverrideFont = obj.tabs[i].objectOverrideFont,
 					defaultWidth = obj.minItemWidth,
 					defaultHeight = obj.minItemHeight,
 				}
