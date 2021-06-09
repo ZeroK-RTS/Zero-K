@@ -607,16 +607,20 @@ function DrawEditBox(obj)
 	gl.Texture(0, false)
 
 	local text = obj.text and tostring(obj.text)
-		if text and obj.textEditing then
-				text = text .. obj.textEditing
-		end
+	if text and obj.textEditing then
+		text = text .. obj.textEditing
+	end
 	local font = _GetControlFont(obj)
 	local displayHint = false
 
 	if text == "" then
-		text = obj.hint
-		displayHint = true
-		font = obj.hintFont
+		if obj.noHint then
+			text = false
+		else
+			text = obj.hint
+			displayHint = true
+			font = obj.hintFont
+		end
 	end
 
 	if (text) then

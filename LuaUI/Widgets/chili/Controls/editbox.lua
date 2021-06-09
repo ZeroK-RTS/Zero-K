@@ -83,8 +83,10 @@ function EditBox:New(obj)
 	obj = inherited.New(self, obj)
 	obj._interactedTime = Spring.GetTimer()
 		--// create font
-	obj.hintFont = Font:New(obj.hintFont)
-	obj.hintFont:SetParent(obj)
+	if not obj.noHint then
+		obj.hintFont = Font:New(obj.hintFont)
+		obj.hintFont:SetParent(obj)
+	end
 	local text = obj.text
 	obj.text = nil
 	obj:SetText(text)
@@ -95,7 +97,9 @@ end
 
 function EditBox:Dispose(...)
 	Control.Dispose(self)
-	self.hintFont:SetParent()
+	if not self.noHint then
+		self.hintFont:SetParent()
+	end
 end
 
 function EditBox:HitTest(x, y)
