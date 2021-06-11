@@ -1344,7 +1344,7 @@ function DrawTabBarItem(obj)
 
 	if (obj.caption) and not obj.noFont then
 		local cx, cy, cw, ch = unpack4(obj.clientArea)
-		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
+		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "linecenter")
 	end
 end
 
