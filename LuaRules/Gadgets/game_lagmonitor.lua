@@ -26,6 +26,7 @@ end
 
 --Everything else: anti-bug, syntax, methods, ect
 local playerLineageUnits = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
+local unitPriorityState = {} -- Keep track of initial unit priority state.
 local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
@@ -89,7 +90,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if GG.wasMorphedTo and GG.wasMorphedTo[unitID] then --copy playerLineageUnits for unit Morph
 		local newUnitID = GG.wasMorphedTo[unitID]
 		local originalPlayerIDs = playerLineageUnits[unitID]
-		if originalPlayerIDs ~= nil and #originalPlayerIDs > 0 then
+		if originalPlayerIDs and (#originalPlayerIDs > 0) then
 			-- playerLineageUnits of the morphed unit will be the same as its pre-morph
 			playerLineageUnits[newUnitID] = {unpack(originalPlayerIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
 		end
@@ -98,6 +99,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	playerLineageUnits[unitID] = nil --to delete any units that do not need returning.
 	unitAlreadyFinished[unitID] = nil
+	unitPriorityState[unitID] = nil
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
@@ -110,7 +112,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 
 	unitAlreadyFinished[unitID] = true
-	playerLineageUnits[unitID] = {}
 end
 
 local mouseActivityTime = {}
@@ -209,21 +210,23 @@ local function UpdateTeamActivity(teamID)
 		local playerName = Spring.GetPlayerInfo(leaderID, false)
 		local unitsRecieved = false
 		
-		for unitID, playerList in pairs(playerLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
-			local delete = false
-			local unitAllyTeamID = spGetUnitAllyTeam(unitID)
-			if unitAllyTeamID == allyTeamID then
-				for i = 1, #playerList do
-					local otherPlayerID = playerList[i]
-					local otherTeamID = PlayerIDToTeamID(otherPlayerID)
-					if (otherTeamID == teamID) then
-						TransferUnit(unitID, teamID)
-						unitsRecieved = true
-						delete = true
-					end
-					-- remove all teams after the previous owner (inclusive)
-					if delete then
-						playerLineageUnits[unitID][i] = nil
+		if playerLineageUnits then
+			for unitID, playerList in pairs(playerLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
+				local delete = false
+				local unitAllyTeamID = spGetUnitAllyTeam(unitID)
+				if unitAllyTeamID == allyTeamID then
+					for i = 1, #playerList do
+						local otherPlayerID = playerList[i]
+						local otherTeamID = PlayerIDToTeamID(otherPlayerID)
+						if (otherTeamID == teamID) then
+							TransferUnit(unitID, teamID)
+							unitsRecieved = true
+							delete = true
+						end
+						-- remove all teams after the previous owner (inclusive)
+						if delete then
+							playerLineageUnits[unitID][i] = nil
+						end
 					end
 				end
 			end
@@ -278,7 +281,7 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 				if allyTeamID == spGetUnitAllyTeam(unitID) then
 					if givePlayerID then
 						-- add this team to the playerLineageUnits list, then send the unit away
-						if playerLineageUnits[unitID] == nil then
+						if not playerLineageUnits[unitID] then
 							playerLineageUnits[unitID] = {givePlayerID}
 						else
 							-- this unit belonged to someone else before me, add me to the end of the list
