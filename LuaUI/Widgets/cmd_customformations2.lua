@@ -2,8 +2,8 @@ function widget:GetInfo()
 	return {
 		name      = "CustomFormations2",
 		desc      = "Allows you to draw a formation line:"..
-					"\n mouse drag draw various command on ground."..
-					"\n ALT+Attack draw attack command on the ground.",
+		            "\n mouse drag draw various command on ground."..
+		            "\n ALT+Attack draw attack command on the ground.",
 		author    = "Niobium, modified by Skasi", -- Based on 'Custom Formations' by jK and gunblob
 		version   = "v3.4", -- With modified dot drawing from v4.3
 		date      = "Mar, 2010",
@@ -20,8 +20,12 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
+local overrideCmdSingleUnit = {
+	[CMD.GUARD] = true,
+}
+
 options_path = 'Settings/Interface/Command Visibility'--/Formations'
-options_order = { 'drawmode_v2', 'linewidth', 'dotsize' }
+options_order = { 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard' }
 options = {
 	drawmode_v2 = {
 		name = 'Draw mode',
@@ -52,6 +56,22 @@ options = {
 		value = 1,
 		min = 0.5, max = 2, step=0.1,
 	},
+	overrideGuard = {
+		name = "Override Guard on single unit",
+		desc = "When enabled, dragging a short line on a unit will give move commands rather than a guard command.",
+		type = "bool",
+		value = true,
+		path = 'Settings/Interface/Commands',
+		OnChange = function (self)
+			if self.value then
+				overrideCmdSingleUnit = {
+					[CMD.GUARD] = true,
+				}
+			else
+				overrideCmdSingleUnit = {}
+			end
+		end,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -67,9 +87,11 @@ local minFormationLength = 20
 local maxHngTime = 0.05 -- Desired maximum time for hungarian algorithm
 local maxNoXTime = 0.05 -- Strict maximum time for backup algorithm
 
-local defaultHungarianUnits	= 20 -- Need a baseline to start from when no config data saved
-local minHungarianUnits		= 10 -- If we kept reducing maxUnits it can get to a point where it can never increase, so we enforce minimums on the algorithms.
-local unitIncreaseThresh	= 0.85 -- We only increase maxUnits if the units are great enough for time to be meaningful
+local defaultHungarianUnits = 20 -- Need a baseline to start from when no config data saved
+local minHungarianUnits     = 10 -- If we kept reducing maxUnits it can get to a point where it can never increase, so we enforce minimums on the algorithms.
+local unitIncreaseThresh    = 0.85 -- We only increase maxUnits if the units are great enough for time to be meaningful
+
+local SMALL_FORMATION_THRESHOLD = 8 -- For guard override.
 
 -- Alpha loss per second after releasing mouse
 local lineFadeRate = 2.0
@@ -107,10 +129,10 @@ local overrideCmds = {
 }
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
-local positionCmds = {
-	[CMD.MOVE]=true,		[CMD_RAW_MOVE]=true,	[CMD_RAW_BUILD]=true,	[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
-	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.MANUALFIRE]=true,		[CMD_JUMP]=true, -- jump
-	[CMD.UNLOAD_UNIT]=true,	[CMD.UNLOAD_UNITS]=true,[CMD.LOAD_UNITS]=true,	[CMD.GUARD]=true,		[CMD.AREA_ATTACK] = true,
+local positionCmds  =  {
+	[CMD.MOVE] = true,        [CMD_RAW_MOVE] = true,    [CMD_RAW_BUILD] = true,  [CMD.ATTACK] = true,     [CMD.RECLAIM] = true,      [CMD.RESTORE] = true,
+	[CMD.PATROL] = true,      [CMD.CAPTURE] = true,     [CMD.FIGHT] = true,      [CMD.MANUALFIRE] = true, [CMD_JUMP] = true,         [CMD.RESURRECT] = true,
+	[CMD.UNLOAD_UNIT] = true, [CMD.UNLOAD_UNITS] = true,[CMD.LOAD_UNITS] = true, [CMD.GUARD] = true,      [CMD.AREA_ATTACK]  =  true,
 }
 
 --------------------------------------------------------------------------------
@@ -503,11 +525,12 @@ function widget:MousePress(mx, my, mButton)
 		end
 		
 		local _, defaultCmdID = spGetDefaultCommand()
-		if not defaultCmdID then return false end
+		if not defaultCmdID then
+			return false
+		end
 		
 		local overrideCmdID = overrideCmds[defaultCmdID]
 		if overrideCmdID then
-			
 			local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 			if targType == 'unit' then
 				overriddenCmd = defaultCmdID
@@ -659,8 +682,7 @@ function widget:MouseRelease(mx, my, mButton)
 	local usingFormation = true
 	
 	-- Override checking
-	if overriddenCmd then
-		
+	if overriddenCmd and ((not overrideCmdSingleUnit[overriddenCmd]) or #fNodes < SMALL_FORMATION_THRESHOLD) then
 		local targetID
 		local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 		if targType == 'unit' then
@@ -670,23 +692,24 @@ function widget:MouseRelease(mx, my, mButton)
 		end
 		
 		if targetID and targetID == overriddenTarget then
-			
-			-- Signal that we are no longer using the drawn formation
-			usingFormation = false
-			
-			-- Process the original command instead
-			local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingRMB)
-			GiveNotifyingOrder(overriddenCmd, {overriddenTarget}, cmdOpts)
+			local selectedUnits = Spring.GetSelectedUnits()
+			-- The overridden commands cannot be self-issued, so give a move command instead.
+			if not (#selectedUnits == 1 and selectedUnits[1] == targetID) then
+				-- Signal that we are no longer using the drawn formation
+				usingFormation = false
+				
+				-- Process the original command instead
+				local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingRMB)
+				GiveNotifyingOrder(overriddenCmd, {overriddenTarget}, cmdOpts)
+			end
 		end
 	end
 	
 	-- Using path? If so then we do nothing
 	if draggingPath then
-		
 		draggingPath = false
-		
-	-- Using formation? If so then it's time to calculate and issue orders.
 	elseif usingFormation then
+		-- Using formation? If so then it's time to calculate and issue orders.
 		
 		-- Add final position (Sometimes we don't get the last MouseMove before this MouseRelease)
 		if (not inMinimap) or spIsAboveMiniMap(mx, my) then

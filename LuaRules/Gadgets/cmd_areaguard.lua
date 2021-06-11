@@ -123,11 +123,13 @@ end
 
 local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	local cmdOptions2 = cmdOptions.coded
-	
-    if #cmdParams == 1 then
-        spGiveOrderToUnit(unitID, CMD_GUARD, cmdParams[1], cmdOptions2)
-        return
-    end
+
+	if #cmdParams == 1 then
+		if unitID ~= cmdParams[1] then
+			spGiveOrderToUnit(unitID, CMD_GUARD, cmdParams[1], cmdOptions2)
+		end
+		return
+	end
 	
 	if (not cmdOptions.shift) then
 		spGiveOrderToUnit(unitID, CMD_STOP, 0, cmdOptions2)
@@ -340,12 +342,12 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD.GUARD)
-    if cmdDescID then
-        local cmdArray = {hidden = true}
-        Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
+	if cmdDescID then
+		local cmdArray = {hidden = true}
+		Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
 		Spring.InsertUnitCmdDesc(unitID, 500, areaGuardCmd)
 		Spring.InsertUnitCmdDesc(unitID, 501, orbitDrawCmd)
-    end
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, team)
@@ -355,18 +357,22 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_AREA_GUARD] = true, [CMD_ORBIT] = true, [CMD_ORBIT_DRAW] = true}
+	return {[CMD_GUARD] = true, [CMD_AREA_GUARD] = true, [CMD_ORBIT] = true, [CMD_ORBIT_DRAW] = true}
 end
-	
+
 function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-    if cmdID == CMD_AREA_GUARD then
-        DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
-        return false
-    elseif cmdID == CMD_ORBIT or cmdID == CMD_ORBIT_DRAW then
+	if cmdID == CMD_GUARD then
+		if #cmdParams == 1 and unitID == cmdParams[1] then
+			return false
+		end
+	elseif cmdID == CMD_AREA_GUARD then
+		DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
+		return false
+	elseif cmdID == CMD_ORBIT or cmdID == CMD_ORBIT_DRAW then
 		return canGuardUnitDefIDs[unitDefID] and unitID ~= cmdParams[1]
 	end
 	return true
