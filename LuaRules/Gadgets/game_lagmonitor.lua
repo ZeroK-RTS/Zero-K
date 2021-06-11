@@ -49,12 +49,12 @@ local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitHealth       = Spring.SetUnitHealth
 local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
 
-local useAfkDetection = (Spring.GetModOptions().enablelagmonitor ~= "0")
+local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor == "auto" and not Spring.Utilities.Gametype.isCompStomp())
 
 include("LuaRules/Configs/constants.lua")
 
 -- in seconds. The delay considered is (ping + time spent afk)
-local TO_AFK_THRESHOLD = 30 -- going above this marks you AFK
+local TO_AFK_THRESHOLD = 45 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 local PING_TIMEOUT = 2000 -- ms
 
@@ -470,6 +470,9 @@ function gadget:Initialize()
 	end
 
 	GG.Lagmonitor = externalFunctions
-	
+	if useAfkDetection then
+		Spring.SetGameRulesParam("lagmonitor_seconds", TO_AFK_THRESHOLD)
+	end
+
 	gadgetHandler:AddChatAction("debuglag", LagmonitorDebugToggle, "Toggles Lagmonitor debug.")
 end
