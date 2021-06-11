@@ -76,6 +76,8 @@ local DRAW_NAME_COMMANDS = {
 	[CMD.STOCKPILE] = true, -- draws stockpile progress (command handler sends correct string).
 }
 
+local REMOVE_TAG_FRAMES = 600 -- Game frames between reseting the tag removal table.
+
 -- Defined upon learning the appropriate colors
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
@@ -541,6 +543,7 @@ AddCommandCullOptions()
 
 local buttonsByCommand = {}
 local alreadyRemovedTag = {}
+local lastRemovedTagResetFrame = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -997,6 +1000,12 @@ end
 local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, fakeFactory, isQueueButton, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = spGetModKeyState()
+	
+	-- RMB beats Alt since Alt is opposed to the concept of removing orders.
+	if right then
+		alt = false
+	end
+	
 	if factoryUnitID and isQueueButton then
 		if meta and cmdID then
 			local bq = Spring.GetUnitCmdDescs(factoryUnitID)
@@ -1719,7 +1728,10 @@ local function GetQueuePanel(parent, columns)
 	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
 		local buttonCount = 0
 		
-		alreadyRemovedTag = {}
+		if (not lastRemovedTagResetFrame) or lastRemovedTagResetFrame > Spring.GetGameFrame() + REMOVE_TAG_FRAMES then
+			alreadyRemovedTag = {}
+			lastRemovedTagResetFrame = Spring.GetGameFrame()
+		end
 		
 		factoryUnitID = newFactoryUnitID
 		factoryUnitDefID = newFactoryUnitDefID
