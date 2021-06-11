@@ -2,23 +2,23 @@
 -------------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Gadget Icons",
-    desc      = "Shows icons from gadgets that cannot access the widget stuff by themselves.",
-    author    = "CarRepairer and GoogleFrog",
-    date      = "2012-01-28",
-    license   = "GNU GPL, v2 or later",
-    layer     = 5,
-    enabled   = true,
-    alwaysStart = true,
-  }
+	return {
+		name      = "Gadget Icons",
+		desc      = "Shows icons from gadgets that cannot access the widget stuff by themselves.",
+		author    = "CarRepairer and GoogleFrog",
+		date      = "2012-01-28",
+		license   = "GNU GPL, v2 or later",
+		layer     = 5,
+		enabled   = true,
+		alwaysStart = true,
+	}
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local echo = Spring.Echo
-
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local spGetFactoryCommands = Spring.GetFactoryCommands
 
 local min   = math.min
 local floor = math.floor
@@ -68,10 +68,12 @@ local lastExcludedPad = {}
 local lowPowerUnitDef = {}
 local facPlopUnitDef = {}
 local facPlateUnitDef = {}
+local factoryUnitDef = {}
 local rearmUnitDef = {}
 local retreatUnitDef = {}
 local excludedPadUnitDef = {}
 local waitUnitDef = {}
+
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.neededlink then
@@ -82,6 +84,9 @@ for unitDefID = 1, #UnitDefs do
 	end
 	if ud.customParams.child_of_factory then
 		facPlateUnitDef[unitDefID] = true
+	end
+	if ud.isFactory then
+		factoryUnitDef[unitDefID] = true
 	end
 	if ud.customParams.requireammo then
 		rearmUnitDef[unitDefID] = true
@@ -121,9 +126,19 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
-local function isWaiting(unitID)
-	local cmdID, _, _, cmdParam1 = spGetUnitCurrentCommand(unitID)
+local function GetFirstCmdAndFirstParam(unitID, unitDefID)
+	if not factoryUnitDef[unitDefID] then
+		local cmdID, _, _, cmdParam1 = spGetUnitCurrentCommand(unitID)
+		return cmdID, cmdParam1
+	end
+	local cQueue = spGetFactoryCommands(unitID, 1)
+	if cQueue[1] and cQueue[1].params then
+		return cQueue[1].id, cQueue[1].params[1]
+	end
+end
+
+local function isWaiting(unitID, unitDefID)
+	local cmdID, cmdParam = GetFirstCmdAndFirstParam(unitID, unitDefID)
 	if not cmdID then
 		everWait[unitID] = nil
 		return false
@@ -234,7 +249,7 @@ function SetIcons()
 		end
 
 		if everWait[unitID] and waitUnitDef[unitDefID] then
-			local wait = isWaiting(unitID)
+			local wait = isWaiting(unitID, unitDefID)
 			if lastWait[unitID] ~= wait then
 				lastWait[unitID] = wait
 				if wait then
@@ -278,6 +293,7 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
+	everWait[unitID] = true -- For lagmonitor
 end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)

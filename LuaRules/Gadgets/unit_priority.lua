@@ -205,11 +205,11 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID,
                                 cmdID, cmdParams, cmdOptions)
-  if (cmdID ~= CMD_PRIORITY) then
-    return false  -- command was not used
-  end
-  PriorityCommand(unitID, cmdParams, cmdOptions)
-  return true, true  -- command was used, remove it
+	if (cmdID ~= CMD_PRIORITY) then
+		return false  -- command was not used
+	end
+	PriorityCommand(unitID, cmdParams, cmdOptions)
+	return true, true  -- command was used, remove it
 end
 
 -- Misc Priority tasks can get their reduced build rate directly.

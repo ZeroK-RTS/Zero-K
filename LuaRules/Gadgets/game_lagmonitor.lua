@@ -31,24 +31,25 @@ local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
 
-local spAddTeamResource     = Spring.AddTeamResource
-local spEcho                = Spring.Echo
-local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetPlayerInfo       = Spring.GetPlayerInfo
-local spGetTeamInfo         = Spring.GetTeamInfo
-local spGetTeamList         = Spring.GetTeamList
-local spGetTeamResources    = Spring.GetTeamResources
-local spGetTeamUnits        = Spring.GetTeamUnits
-local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
-local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitTeam         = Spring.GetUnitTeam
-local spGetPlayerList       = Spring.GetPlayerList
-local spTransferUnit        = Spring.TransferUnit
-local spUseTeamResource     = Spring.UseTeamResource
-local spGetUnitIsBuilding   = Spring.GetUnitIsBuilding
-local spGetUnitHealth       = Spring.GetUnitHealth
-local spSetUnitHealth       = Spring.SetUnitHealth
-local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
+local spAddTeamResource      = Spring.AddTeamResource
+local spEcho                 = Spring.Echo
+local spGetGameSeconds       = Spring.GetGameSeconds
+local spGetPlayerInfo        = Spring.GetPlayerInfo
+local spGetTeamInfo          = Spring.GetTeamInfo
+local spGetTeamList          = Spring.GetTeamList
+local spGetTeamResources     = Spring.GetTeamResources
+local spGetTeamUnits         = Spring.GetTeamUnits
+local spGetUnitAllyTeam      = Spring.GetUnitAllyTeam
+local spGetUnitDefID         = Spring.GetUnitDefID
+local spGetUnitTeam          = Spring.GetUnitTeam
+local spGetPlayerList        = Spring.GetPlayerList
+local spTransferUnit         = Spring.TransferUnit
+local spUseTeamResource      = Spring.UseTeamResource
+local spGetUnitIsBuilding    = Spring.GetUnitIsBuilding
+local spGetUnitHealth        = Spring.GetUnitHealth
+local spSetUnitHealth        = Spring.SetUnitHealth
+local spSetPlayerRulesParam  = Spring.SetPlayerRulesParam
+local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 
 local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor == "auto" and not Spring.Utilities.Gametype.isCompStomp())
 
@@ -275,6 +276,7 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 		
 		local units = spGetTeamUnits(giveTeamID) or {}
 		if #units > 0 then -- transfer units when number of units in AFK team is > 0
+			local waitUnits = {}
 			-- Transfer Units
 			for j = 1, #units do
 				local unitID = units[j]
@@ -289,7 +291,12 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 						end
 					end
 					TransferUnit(unitID, recieveTeamID)
+					waitUnits[#waitUnits + 1] = unitID
 				end
+			end
+			
+			if #waitUnits > 0 then
+				spGiveOrderToUnitArray (waitUnits, CMD.WAIT, {}, {})
 			end
 		end
 		
