@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "Licho",
 		date      = "4.1.2012",
 		license   = "GPLv2",
-		layer     = -1000,
+		layer     = -1000, -- so the indicator draws in front of Chili.
 		enabled   = true,  --  loaded by default?
 		handler   = false,
 		api       = true,
