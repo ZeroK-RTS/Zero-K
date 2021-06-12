@@ -85,7 +85,7 @@
 	"cheatsheet_chb_globallos" : "Global vision",
 	"cheatsheet_chb_globallos_desc" : "Get line of sight over the entire map.",
 	"cheatsheet_chb_cheat" : "Enable cheats",
-	"cheatsheet_chb_cheat_desc" : "Allow toggling cheats. Note that cheats stay enabled even if cheat control is disabled.",
+	"cheatsheet_chb_cheat_desc" : "Enables unit spawning and the use of the other options below. Note that each cheat stays enabled even if the ability to toggle them is disabled.\nCheats be toggled in any game with '/cheat' in singleplayer or with '!hostsay /cheat' in multiplayer.",
 	"cheatsheet_count_slider" : "Count: %%.0f",
 	"cheatsheet_teampick_desc" : "Who receives the units?",
 	"cheatsheet_pick_category" : "Choose unit category.",

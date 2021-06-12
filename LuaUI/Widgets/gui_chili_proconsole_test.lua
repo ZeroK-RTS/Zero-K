@@ -854,6 +854,9 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'GodModeAction') or
+	string.find(msg.argument,'GlobalLosActionExecutor') or
+	string.find(msg.argument,'Everything%-for%-free') or
 	string.find(msg.argument,'resigned') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player'))
 	--string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)

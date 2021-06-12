@@ -1,13 +1,15 @@
-function widget:GetInfo() return {
-	name      = "Cheat Sheet",
-	desc      = "Handy hax menu.",
-	author    = "GoogleFrog, Sprung",
-	date      = "2017-10-10",
-	license   = "GNU GPL, v2 or later",
-	layer     = 0,
-	handler   = true,
-	enabled   = true,
-} end
+function widget:GetInfo()
+	return {
+		name      = "Cheat Sheet",
+		desc      = "Handy hax menu.",
+		author    = "GoogleFrog, Sprung",
+		date      = "2017-10-10",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		handler   = true,
+		enabled   = true,
+	}
+end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -207,6 +209,14 @@ end
 
 -- helpers
 
+local function SayAsHost(text)
+	if Spring.GetModOptions().zksearchtag then -- multiplayer
+		Spring.SendCommands("say !hostsay /" .. text)
+	else
+		Spring.SendCommands(text)
+	end
+end
+
 local function ToggleIfCheatsEnabled(self)
 	if not chbox.cheat.state.checked then
 		return
@@ -219,35 +229,33 @@ local function GetNoCost() -- hax because there is no relevant Spring callout
 	return UnitDefNames.energysingu.buildTime == 10 -- not 100% reliable but works with /reload
 end
 
--- UI stuff creation
-
-local function AddGodmodeToggle(parent, offset)
-	chbox.godmode = WG.Chili.Checkbox:New{
-		x = CHECKBOX_SIZE + 2,
-		y = offset[1],
-		right = 0,
-		checked = Spring.IsGodModeEnabled(),
-		parent = parent,
-		objectOverrideFont = WG.GetFont(),
-		OnChange = {function(self, value)
-			-- the param is a bitfield, 1 for allies and 2 for enemies, so
-			-- in theory those could be separate toggles, but I don't think
-			-- anybody minds the wider control
-			Spring.SendCommands("godmode " .. (value and 3 or 0))
-		end},
-	}
-
-	local pic = WG.Chili.Image:New{
-		x = 0,
-		y = offset[1],
-		width = CHECKBOX_SIZE,
-		height = CHECKBOX_SIZE,
-		parent = parent,
-		file = 'LuaUI/Images/commands/reclaim.png', -- hand (not the recycle triangle)
-	}
-	chbox.godmode.Toggle = ToggleIfCheatsEnabled
-	offset[1] = offset[1] + CHECKBOX_SIZE
+local function IsCheatingGameSetup()
+	if VFS.FileExists("mission.lua") or Spring.GetModOptions().singleplayercampaignbattleid then
+		return false
+	end
+	local teams = Spring.GetTeamList()
+	local players = 0
+	for i = 1, #teams do
+		local teamID = teams[i]
+		if teamID ~= Spring.GetGaiaTeamID() then
+			local _, _, _, isAiTeam = Spring.GetTeamInfo(teamID)
+			if not isAiTeam then
+				players = players + 1
+				if players > 1 then
+					return false
+				end
+			else
+				local _, aiName = Spring.GetAIInfo(teamID)
+				if not (string.find(aiName, 'Null AI') or string.find(aiName, 'Inactive AI')) then
+					return false
+				end
+			end
+		end
+	end
+	return true
 end
+
+-- UI stuff creation
 
 local function AddAtmButton(parent, x_offset, y_offset)
 	button.atm = WG.Chili.Button:New{
@@ -361,6 +369,34 @@ local function AddRezButton(parent, x_offset, y_offset)
 	x_offset[1] = x_offset[1] + BUTTON_SPACING + BUTTON_SIZE
 end
 
+local function AddGodmodeToggle(parent, offset)
+	chbox.godmode = WG.Chili.Checkbox:New{
+		x = CHECKBOX_SIZE + 2,
+		y = offset[1],
+		right = 0,
+		checked = Spring.IsGodModeEnabled(),
+		parent = parent,
+		objectOverrideFont = WG.GetFont(),
+		OnChange = {function(self, value)
+			-- the param is a bitfield, 1 for allies and 2 for enemies, so
+			-- in theory those could be separate toggles, but I don't think
+			-- anybody minds the wider control
+			SayAsHost("godmode " .. (value and 3 or 0))
+		end},
+	}
+
+	local pic = WG.Chili.Image:New{
+		x = 0,
+		y = offset[1],
+		width = CHECKBOX_SIZE,
+		height = CHECKBOX_SIZE,
+		parent = parent,
+		file = 'LuaUI/Images/commands/reclaim.png', -- hand (not the recycle triangle)
+	}
+	chbox.godmode.Toggle = ToggleIfCheatsEnabled
+	offset[1] = offset[1] + CHECKBOX_SIZE
+end
+
 local function AddNocostToggle(parent, offset)
 	chbox.nocost = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
@@ -422,11 +458,7 @@ local function AddCheatingToggle(parent, offset)
 		parent = parent,
 		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
-			if Spring.GetModOptions().zksearchtag then -- multiplayer
-				Spring.SendCommands("say !hostsay /cheat " .. (value and 1 or 0))
-			else
-				Spring.SendCommands("cheat " .. (value and 1 or 0))
-			end
+			SayAsHost("cheat " .. (value and 1 or 0))
 		end},
 	}
 	offset[1] = offset[1] + CHECKBOX_SIZE
@@ -796,7 +828,7 @@ function widget:Initialize()
 	     * clutter is avoided (most MP games won't have cheats)
 	     * the button's presence is a soft "game is tainted" cheat mark
 	     * having to manually type a /command first gives the ~HACKERMAN~ vibes ]]
-	if Spring.IsCheatingEnabled() then
+	if Spring.IsCheatingEnabled() or IsCheatingGameSetup() then
 		InitializeControls()
 	end
 end
