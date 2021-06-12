@@ -28,11 +28,17 @@ local function check_lasercannon_range(name, wd)
 	local original_range = wd.range
 	local v = wd.weaponvelocity / Game.gameSpeed
 
-	local sanitized_range = math.max(1, math.floor((original_range + 0.5) / v)) * v
+	local frames = math.max(1, math.floor((original_range + 0.5) / v))
+	local sanitized_range = frames * v
+	local next_range = (frames + 1) * v
+	local velocty_for_current_range = (original_range / frames) * Game.gameSpeed
 	if math.abs(original_range - sanitized_range) > 1 then
 		-- Warning instead of Error for now, to let mods adjust
-		-- instated on 2021-05-30, change to `error()` later
-		Spring.Echo(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame!\nPlease put the correct value in the def (rounded to the nearest integer) or modify weaponVelocity")
+		-- stabled in 2021-06, change to `error()` later
+		Spring.Echo(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame! Please either:\n" ..
+			" - set range to " .. math.floor(sanitized_range + 0.5) .. " (no logic change)\n" ..
+			" - set range to " .. math.floor(next_range + 0.5) .. " (next available breakpoint)\n" ..
+			" - set weaponVelocity to " .. velocty_for_current_range .. " (to keep current range)")
 	end
 
 	wd.range = sanitized_range + 1E-5
