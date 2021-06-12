@@ -73,6 +73,7 @@ local BAR_SPACING = 24
 local IMAGE_FONT = 12
 local DESC_FONT = 10
 local TOOLTIP_FONT = 13
+local STATS_FONT = 13
 local NAME_FONT = 14
 local LEFT_SPACE = 24
 local LEFT_LABEL_HEIGHT = 16
@@ -1392,7 +1393,7 @@ local function GetSelectionStatsDisplay(parentControl)
 		y = 3,
 		right = 0,
 		valign  = 'top',
-		objectOverrideFont = WG.GetFont(NAME_FONT),
+		objectOverrideFont = WG.GetFont(STATS_FONT),
 		parent = holder,
 	}
 	
