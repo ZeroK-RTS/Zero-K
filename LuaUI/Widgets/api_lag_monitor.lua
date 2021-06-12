@@ -29,7 +29,7 @@ local glScale                = gl.Scale
 local glTranslate            = gl.Translate
 local glVertex               = gl.Vertex
 
-local WARNING_SECONDS = 5
+local WARNING_SECONDS = 8
 
 local pieColor  = { 1.0, 0.3, 0.3, 1 }
 local circleDivs = 80

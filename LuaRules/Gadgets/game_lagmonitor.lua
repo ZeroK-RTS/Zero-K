@@ -31,36 +31,52 @@ local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
 
-local spAddTeamResource      = Spring.AddTeamResource
-local spEcho                 = Spring.Echo
-local spGetGameSeconds       = Spring.GetGameSeconds
-local spGetPlayerInfo        = Spring.GetPlayerInfo
-local spGetTeamInfo          = Spring.GetTeamInfo
-local spGetTeamList          = Spring.GetTeamList
-local spGetTeamResources     = Spring.GetTeamResources
-local spGetTeamUnits         = Spring.GetTeamUnits
-local spGetUnitAllyTeam      = Spring.GetUnitAllyTeam
-local spGetUnitDefID         = Spring.GetUnitDefID
-local spGetUnitTeam          = Spring.GetUnitTeam
-local spGetPlayerList        = Spring.GetPlayerList
-local spTransferUnit         = Spring.TransferUnit
-local spUseTeamResource      = Spring.UseTeamResource
-local spGetUnitIsBuilding    = Spring.GetUnitIsBuilding
-local spGetUnitHealth        = Spring.GetUnitHealth
-local spSetUnitHealth        = Spring.SetUnitHealth
-local spSetPlayerRulesParam  = Spring.SetPlayerRulesParam
-local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
+local spAddTeamResource       = Spring.AddTeamResource
+local spEcho                  = Spring.Echo
+local spGetGameSeconds        = Spring.GetGameSeconds
+local spGetPlayerInfo         = Spring.GetPlayerInfo
+local spGetTeamInfo           = Spring.GetTeamInfo
+local spGetTeamList           = Spring.GetTeamList
+local spGetTeamResources      = Spring.GetTeamResources
+local spGetTeamUnits          = Spring.GetTeamUnits
+local spGetUnitAllyTeam       = Spring.GetUnitAllyTeam
+local spGetUnitDefID          = Spring.GetUnitDefID
+local spGetUnitTeam           = Spring.GetUnitTeam
+local spGetPlayerList         = Spring.GetPlayerList
+local spTransferUnit          = Spring.TransferUnit
+local spUseTeamResource       = Spring.UseTeamResource
+local spGetUnitIsBuilding     = Spring.GetUnitIsBuilding
+local spGetUnitHealth         = Spring.GetUnitHealth
+local spSetUnitHealth         = Spring.SetUnitHealth
+local spSetPlayerRulesParam   = Spring.SetPlayerRulesParam
+local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor == "auto" and not Spring.Utilities.Gametype.isCompStomp())
 
 include("LuaRules/Configs/constants.lua")
 
 -- in seconds. The delay considered is (ping + time spent afk)
-local TO_AFK_THRESHOLD = 45 -- going above this marks you AFK
+local TO_AFK_THRESHOLD = 40 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 local PING_TIMEOUT = 2000 -- ms
 
+local CMD_WAIT = CMD.WAIT
+
 local debugAllyTeam
+
+local isRealFactoryDef = {}
+local isBpHaverDef = {}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.buildSpeed > 0 and not ud.customParams.nobuildpower then
+		isBpHaverDef[unitDefID] = true
+		if ud.isFactory then
+			isRealFactoryDef[unitDefID] = true
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -81,6 +97,20 @@ end
 
 local function TeamIDToPlayerID(teamID)
 	return select(2, spGetTeamInfo(teamID, false))
+end
+
+local function GetBpHaverAndWait(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
+	if not isBpHaverDef[unitDefID] then
+		return false
+	end
+	if not isRealFactoryDef[unitDefID] then
+		local cmdID = spGetUnitCurrentCommand(unitID)
+		return true, (cmdID == CMD_WAIT)
+	end
+	--local cQueue = Spring.GetFactoryCommands(unitID, 1)
+	-- Return false because factories lose wait when transfered, so should not be treated as having it set.
+	return true, false 
 end
 
 --------------------------------------------------------------------------------
@@ -212,6 +242,7 @@ local function UpdateTeamActivity(teamID)
 		local unitsRecieved = false
 		
 		if playerLineageUnits then
+			local waitUnits = {}
 			for unitID, playerList in pairs(playerLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
 				local delete = false
 				local unitAllyTeamID = spGetUnitAllyTeam(unitID)
@@ -223,6 +254,10 @@ local function UpdateTeamActivity(teamID)
 							TransferUnit(unitID, teamID)
 							unitsRecieved = true
 							delete = true
+							local bpHaver, hasWait = GetBpHaverAndWait(unitID)
+							if bpHaver and hasWait then
+								waitUnits[#waitUnits + 1] = unitID
+							end
 						end
 						-- remove all teams after the previous owner (inclusive)
 						if delete then
@@ -230,6 +265,10 @@ local function UpdateTeamActivity(teamID)
 						end
 					end
 				end
+			end
+			
+			if #waitUnits > 0 then
+				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, {}, {})
 			end
 		end
 		
@@ -291,12 +330,15 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 						end
 					end
 					TransferUnit(unitID, recieveTeamID)
-					waitUnits[#waitUnits + 1] = unitID
+					local bpHaver, hasWait = GetBpHaverAndWait(unitID)
+					if bpHaver and not hasWait then
+						waitUnits[#waitUnits + 1] = unitID
+					end
 				end
 			end
 			
 			if #waitUnits > 0 then
-				spGiveOrderToUnitArray (waitUnits, CMD.WAIT, {}, {})
+				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, {}, {})
 			end
 		end
 		

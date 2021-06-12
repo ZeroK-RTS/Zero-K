@@ -41,6 +41,8 @@ local CMD_WAITCODE_SQUAD  = CMD.WAITCODE_SQUAD
 local CMD_WAITCODE_GATHER = CMD.WAITCODE_GATHER
 local CMD_WAITCODE_TIME   = CMD.WAITCODE_TIME
 
+local COMMAND_LEEWAY = 30
+
 local powerTexture = 'Luaui/Images/visible_energy.png'
 local facplopTexture = 'Luaui/Images/factory.png'
 local nofacTexture = 'Luaui/Images/nofactory.png'
@@ -140,7 +142,9 @@ end
 local function isWaiting(unitID, unitDefID)
 	local cmdID, cmdParam = GetFirstCmdAndFirstParam(unitID, unitDefID)
 	if not cmdID then
-		everWait[unitID] = nil
+		if everWait[unitID] < Spring.GetGameFrame() then
+			everWait[unitID] = nil
+		end
 		return false
 	end
 
@@ -149,6 +153,105 @@ local function isWaiting(unitID, unitDefID)
 	end
 
 	return cmdParam1 or CMD_WAITCODE_NONE
+end
+
+local function UpdateUnitIcons(unitID)
+	local unitDefID = unitDefIDMap[unitID]
+	-- calculate which units can have these states and check them first
+	
+	local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower")
+	if lowpower then
+		local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+		if inbuild then
+			lowpower = 0 -- Draw as if not on low power
+		end
+		if (not lastLowPower[unitID]) or lastLowPower[unitID] ~= lowpower then
+			lastLowPower[unitID] = lowpower
+			if lowpower ~= 0 then
+				WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=powerTexture} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=nil} )
+			end
+		end
+	end
+	
+	local facplop = facPlopUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "facplop")
+	if facplop or lastFacPlop[unitID] == 1 then
+		if not facplop then
+			facplop = 0
+		end
+		if (not lastFacPlop[unitID]) or lastFacPlop[unitID] ~= facplop then
+			lastFacPlop[unitID] = facplop
+			if facplop ~= 0 then
+				WG.icons.SetUnitIcon( unitID, {name='facplop', texture=facplopTexture} )
+				WG.icons.SetPulse( 'facplop', true )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
+			end
+		end
+	end
+	
+	local nofactory = facPlateUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "nofactory")
+	if nofactory then
+		if (not lastNofactory[unitID]) or lastNofactory[unitID] ~= nofactory then
+			lastNofactory[unitID] = nofactory
+			if nofactory == 1 then
+				WG.icons.SetUnitIcon( unitID, {name='nofactory', texture=nofacTexture} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='nofactory', texture=nil} )
+			end
+		end
+	end
+	
+	local rearm = rearmUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "noammo")
+	if rearm then
+		if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
+			lastRearm[unitID] = rearm
+			if rearm == 1 or rearm == 2 then
+				WG.icons.SetUnitIcon( unitID, {name='rearm', texture=rearmTexture} )
+			elseif rearm == 3 then
+				WG.icons.SetUnitIcon( unitID, {name='rearm', texture=repairTexture} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
+			end
+		end
+	end
+	
+	local retreat = retreatUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "retreat")
+	if retreat then
+		if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= retreat then
+			lastRetreat[unitID] = retreat
+			if retreat ~= 0 then
+				WG.icons.SetUnitIcon( unitID, {name='retreat', texture=retreatTexture} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
+			end
+		end
+	end
+
+	local padExcluded = excludedPadUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "padExcluded" .. Spring.GetMyTeamID())
+	if padExcluded then
+		if (not lastExcludedPad[unitID]) or lastExcludedPad[unitID] ~= padExcluded then
+			lastExcludedPad[unitID] = padExcluded
+			if padExcluded ~= 0 then
+				WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=nil} )
+			end
+		end
+	end
+
+	if everWait[unitID] and waitUnitDef[unitDefID] then
+		local wait = isWaiting(unitID, unitDefID)
+		if lastWait[unitID] ~= wait then
+			lastWait[unitID] = wait
+			if wait then
+				WG.icons.SetUnitIcon( unitID, {name='wait', texture=waitTexture[wait]} )
+			else
+				WG.icons.SetUnitIcon( unitID, {name='wait', texture=nil} )
+			end
+		end
+	end
 end
 
 function SetIcons()
@@ -163,102 +266,7 @@ function SetIcons()
 		if not unitID then
 			return
 		end
-		local unitDefID = unitDefIDMap[unitID]
-		-- calculate which units can have these states and check them first
-		
-		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower")
-		if lowpower then
-			local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
-			if inbuild then
-				lowpower = 0 -- Draw as if not on low power
-			end
-			if (not lastLowPower[unitID]) or lastLowPower[unitID] ~= lowpower then
-				lastLowPower[unitID] = lowpower
-				if lowpower ~= 0 then
-					WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=powerTexture} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=nil} )
-				end
-			end
-		end
-		
-		local facplop = facPlopUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "facplop")
-		if facplop or lastFacPlop[unitID] == 1 then
-			if not facplop then
-				facplop = 0
-			end
-			if (not lastFacPlop[unitID]) or lastFacPlop[unitID] ~= facplop then
-				lastFacPlop[unitID] = facplop
-				if facplop ~= 0 then
-					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=facplopTexture} )
-					WG.icons.SetPulse( 'facplop', true )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
-				end
-			end
-		end
-		
-		local nofactory = facPlateUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "nofactory")
-		if nofactory then
-			if (not lastNofactory[unitID]) or lastNofactory[unitID] ~= nofactory then
-				lastNofactory[unitID] = nofactory
-				if nofactory == 1 then
-					WG.icons.SetUnitIcon( unitID, {name='nofactory', texture=nofacTexture} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='nofactory', texture=nil} )
-				end
-			end
-		end
-		
-		local rearm = rearmUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "noammo")
-		if rearm then
-			if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
-				lastRearm[unitID] = rearm
-				if rearm == 1 or rearm == 2 then
-					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=rearmTexture} )
-				elseif rearm == 3 then
-					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=repairTexture} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
-				end
-			end
-		end
-		
-		local retreat = retreatUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "retreat")
-		if retreat then
-			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= retreat then
-				lastRetreat[unitID] = retreat
-				if retreat ~= 0 then
-					WG.icons.SetUnitIcon( unitID, {name='retreat', texture=retreatTexture} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
-				end
-			end
-		end
-
-		local padExcluded = excludedPadUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "padExcluded" .. Spring.GetMyTeamID())
-		if padExcluded then
-			if (not lastExcludedPad[unitID]) or lastExcludedPad[unitID] ~= padExcluded then
-				lastExcludedPad[unitID] = padExcluded
-				if padExcluded ~= 0 then
-					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=excludedPadTexture} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='padExclude', texture=nil} )
-				end
-			end
-		end
-
-		if everWait[unitID] and waitUnitDef[unitDefID] then
-			local wait = isWaiting(unitID, unitDefID)
-			if lastWait[unitID] ~= wait then
-				lastWait[unitID] = wait
-				if wait then
-					WG.icons.SetUnitIcon( unitID, {name='wait', texture=waitTexture[wait]} )
-				else
-					WG.icons.SetUnitIcon( unitID, {name='wait', texture=nil} )
-				end
-			end
-		end
+		UpdateUnitIcons(unitID)
 	end
 end
 
@@ -293,7 +301,7 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	widget:UnitCreated(unitID, unitDefID, unitTeam)
-	everWait[unitID] = true -- For lagmonitor
+	everWait[unitID] = Spring.GetGameFrame() + COMMAND_LEEWAY -- For lagmonitor
 end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
@@ -302,7 +310,7 @@ end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts)
 	if cmdID == CMD_WAIT then
-		everWait[unitID] = true
+		everWait[unitID] = Spring.GetGameFrame() + COMMAND_LEEWAY
 	end
 end
 
