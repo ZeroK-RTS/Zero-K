@@ -1024,7 +1024,7 @@ function gadget:Initialize()
 
 	if not USE_OBJECT_DAMAGE then
 		gadgetHandler:RemoveCallIn("UnitDamaged")
-		gadgetHandler:RemoveCallIn("FeatureDamaged")
+		--gadgetHandler:RemoveCallIn("FeatureDamaged")
 	end
 end
 
