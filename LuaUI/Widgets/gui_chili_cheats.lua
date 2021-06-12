@@ -225,7 +225,7 @@ local function AddGodmodeToggle(parent, offset)
 	chbox.godmode = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
 		y = offset[1],
-		x = 0,
+		right = 0,
 		checked = Spring.IsGodModeEnabled(),
 		parent = parent,
 		objectOverrideFont = WG.GetFont(),
@@ -725,7 +725,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 end
 
 function widget:AddConsoleLine(msg)
-
 	if msg == "Cheating is enabled!" then
 		InitializeControls()
 
@@ -790,7 +789,6 @@ function widget:CommandsChanged()
 end
 
 function widget:Initialize()
-
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
 	--[[ Don't display the controls (esp. the top bar button) before
