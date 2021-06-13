@@ -12,4 +12,15 @@ local explosionDefs = {}
 for i = 1, #files do
 	suCopyTable(vfsInclude(files[i]), false, explosionDefs)
 end
+
+for edName, eDef in pairs(explosionDefs) do
+	for fxName, fxDef in pairs(eDef) do
+		if(type(fxDef) == 'table') then
+			if fxDef.ground and fxDef.voidground == nil then
+				fxDef.voidground = true
+			end
+		end
+	end
+end
+
 return explosionDefs
