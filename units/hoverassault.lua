@@ -82,7 +82,7 @@ return { hoverassault = {
       },
       
       damage                  = {
-        default = 150.1,
+        default = 160.1,
       },
 
       duration                = 0.2,

@@ -6,7 +6,7 @@ return { hovercon = {
   activateWhenBuilt   = true,
   brakeRate           = 18.0,
   buildCostMetal      = 125,
-  buildDistance       = 160,
+  buildDistance       = 170,
   builder             = true,
 
   buildoptions        = {
@@ -37,7 +37,7 @@ return { hovercon = {
   idleTime            = 1800,
   maxDamage           = 960,
   maxSlope            = 36,
-  maxVelocity         = 2.8,
+  maxVelocity         = 2.9,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corch.s3o]],
@@ -56,7 +56,7 @@ return { hovercon = {
   sightDistance       = 300,
   sonarDistance       = 300,
   turninplace         = 0,
-  turnRate            = 880,
+  turnRate            = 920,
   workerTime          = 5,
 
   featureDefs         = {

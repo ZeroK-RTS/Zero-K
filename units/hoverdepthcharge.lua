@@ -91,7 +91,7 @@ return { hoverdepthcharge = {
       },
 
       damage                  = {
-        default = 400.1,
+        default = 520.1,
       },
 
       edgeEffectiveness       = 0.4,
@@ -109,7 +109,7 @@ return { hoverdepthcharge = {
       noSelfDamage            = true,
       numbounce               = 3,
       range                   = 280,
-      reloadtime              = 2.8,
+      reloadtime              = 3.2,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -138,10 +138,10 @@ return { hoverdepthcharge = {
       craterMult              = 2,
 
       damage                  = {
-        default = 400.1,
+        default = 520.1,
       },
 
-      edgeEffectiveness       = 0.4,
+      edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
       flightTime              = 4,

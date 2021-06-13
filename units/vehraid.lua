@@ -111,7 +111,7 @@ return { vehraid = {
       lodDistance             = 10000,
       noSelfDamage            = true,
       proximityPriority       = 10,
-      range                   = 267,
+      range                   = 262,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.1 0]],
       rgbColor2               = [[1 1 0.25]],
@@ -120,7 +120,7 @@ return { vehraid = {
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 500,
+      weaponVelocity          = 491.25,
     },
 
   },
