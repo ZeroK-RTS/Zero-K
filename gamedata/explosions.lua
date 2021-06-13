@@ -16,7 +16,7 @@ end
 for edName, eDef in pairs(explosionDefs) do
 	for fxName, fxDef in pairs(eDef) do
 		if(type(fxDef) == 'table') then
-			if(fxDef.ground) then
+			if fxDef.ground and fxDef.voidground == nil then
 				fxDef.voidground = true
 			end
 		end
