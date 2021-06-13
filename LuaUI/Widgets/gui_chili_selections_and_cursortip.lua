@@ -1790,7 +1790,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			y = PIC_HEIGHT + 31,
 			right = 0,
 			height = BAR_FONT,
-			objectOverrideFont = WG.GetFont(DESC_FONT),
+			objectOverrideFont = WG.GetFont(IMAGE_FONT),
 			parent = rightPanel,
 		}
 		spaceClickLabel = Chili.Label:New{
@@ -1799,7 +1799,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			y = PIC_HEIGHT + 55,
 			right = 0,
 			height = 18,
-			objectOverrideFont = WG.GetFont(DESC_FONT),
+			objectOverrideFont = WG.GetFont(IMAGE_FONT),
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
