@@ -925,7 +925,6 @@ local function AddMessage(msg, target, remake)
 	local textbox = WG.Chili.TextBox:New{
 		width = '100%',
 		align = "left",
-		fontsize = size,
 		valign = "ascender",
 		lineSpacing = 0,
 		padding = { 0, 0, 0, 0 },
@@ -935,7 +934,7 @@ local function AddMessage(msg, target, remake)
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-		objectOverrideFont = WG.GetSpecialFont(14, "proconsole", {
+		objectOverrideFont = WG.GetSpecialFont(size, "proconsole", {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
