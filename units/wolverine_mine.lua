@@ -42,6 +42,7 @@ return { wolverine_mine = {
   objectName             = [[claw.s3o]],
   onoffable              = false,
   reclaimable            = false,
+  repairable             = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script                 = [[wolverine_mine.lua]],
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,

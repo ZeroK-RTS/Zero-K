@@ -35,6 +35,7 @@ return { dronecarry = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[carrydrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script              = [[dronecarry.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   

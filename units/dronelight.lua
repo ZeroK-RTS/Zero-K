@@ -31,6 +31,7 @@ return { dronelight = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[attackdrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   refuelTime          = 10,
   script              = [[dronelight.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],

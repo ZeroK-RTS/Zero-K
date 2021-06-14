@@ -47,6 +47,7 @@ return { dronefighter = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[fighterdrone.dae]],
+  repairable             = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script                 = [[dronefighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 

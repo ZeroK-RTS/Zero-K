@@ -31,6 +31,7 @@ return { droneheavyslow = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[battledrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script              = [[droneheavyslow.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
