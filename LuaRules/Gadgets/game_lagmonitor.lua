@@ -52,18 +52,18 @@ local spSetPlayerRulesParam   = Spring.SetPlayerRulesParam
 local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
-local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor == "auto" and not Spring.Utilities.Gametype.isCompStomp())
+local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor ~= "off" and not Spring.Utilities.Gametype.isCompStomp())
 
 include("LuaRules/Configs/constants.lua")
 
 -- in seconds. The delay considered is (ping + time spent afk)
-local TO_AFK_THRESHOLD = 40 -- going above this marks you AFK
+local TO_AFK_THRESHOLD = 38 -- going above this marks you AFK
 local FROM_AFK_THRESHOLD = 5 -- going below this marks you non-AFK
 local PING_TIMEOUT = 2000 -- ms
 
 local CMD_WAIT = CMD.WAIT
 
-local debugAllyTeam
+local debugAllyTeam, debugPlayerLag, debugPlayerLagAll
 
 local isRealFactoryDef = {}
 local isBpHaverDef = {}
@@ -150,6 +150,9 @@ local mouseActivityTime = {}
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("AFK",1,true) then
 		mouseActivityTime[playerID] = tonumber(msg:sub(4))
+		if (debugPlayerLag and debugPlayerLag[playerID]) or debugPlayerLagAll then
+			Spring.Echo("Lagmonitor activity playerID", playerID, select(1, Spring.GetPlayerInfo(playerID)), mouseActivityTime[playerID])
+		end
 	end
 end
 
@@ -173,6 +176,11 @@ local function GetPlayerActivity(playerID, onlyActive)
 		return false
 	end
 	local name, active, spec, team, allyTeam, ping, _, _, _, customKeys = spGetPlayerInfo(playerID)
+	local doDebug = (debugPlayerLag and debugPlayerLag[playerID]) or debugPlayerLagAll
+	if doDebug then
+		Spring.Echo(" ======= Lagmonitor Debug Player " .. playerID .. " ======= ")
+		Spring.Echo("onlyActive", onlyActive, "active", active, "ping", ping, "passTest", active and ping <= PING_TIMEOUT)
+	end
 	
 	if onlyActive then
 		if (active and ping <= PING_TIMEOUT) then
@@ -181,11 +189,19 @@ local function GetPlayerActivity(playerID, onlyActive)
 		return false
 	end
 	
+	if doDebug then
+		Spring.Echo("spec", spec, "passTest", spec or not (active and ping <= PING_TIMEOUT))
+	end
+	
 	if spec or not (active and ping <= PING_TIMEOUT) then
 		return false
 	end
 	
 	local lastActionTime = spGetGameSeconds() - (mouseActivityTime[playerID] or 0)
+	if doDebug then
+		Spring.Echo("lastActionTime", lastActionTime, "useAfkDetection", useAfkDetection, "modopt", Spring.GetModOptions().enablelagmonitor, "passTest",
+			useAfkDetection and (lastActionTime >= TO_AFK_THRESHOLD or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID]))
+	end
 	
 	if useAfkDetection and (lastActionTime >= TO_AFK_THRESHOLD or lastActionTime >= FROM_AFK_THRESHOLD and playerIsAfk[playerID]) then
 		playerIsAfk[playerID] = true
@@ -375,7 +391,9 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		local resourceShare, teamRank, isHostedAiTeam, isBackupAi = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
 		if debugAllyTeam and debugAllyTeam[allyTeamID] then
-			Spring.Echo("teamID", teamID, "share", resourceShare, "rank", teamRank, "isHostedAi", isHostedAiTeam, "isBackup", isBackupAi)
+			local _, leader = Spring.GetTeamInfo(teamID)
+			local name = leader and Spring.GetPlayerInfo(leader)
+			Spring.Echo("playerID", leader or "none", "name", name or "none", "teamID", teamID, "share", resourceShare, "rank", teamRank, "isHostedAi", isHostedAiTeam, "isBackup", isBackupAi)
 		end
 		
 		if not isBackupAi then
@@ -498,6 +516,31 @@ local function LagmonitorDebugToggle(cmd, line, words, player)
 	end
 end
 
+local function LagmonitorDebugPlayerToggle(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local playerID = tonumber(words[1])
+	Spring.Echo("Debug Lagmonitor for playerID " .. (playerID or "nil"))
+	if playerID then
+		if not debugPlayerLag then
+			debugPlayerLag = {}
+		end
+		if debugPlayerLag[playerID] then
+			debugPlayerLag[playerID] = nil
+			if #debugPlayerLag == 0 then
+				debugPlayerLag = {}
+			end
+			Spring.Echo("Disabled")
+		else
+			debugPlayerLag[playerID] = true
+			Spring.Echo("Enabled")
+		end
+	else
+		debugPlayerLagAll = not debugPlayerLagAll
+	end
+end
+
 ----------------------------------------------------------------------------------------
 -- External Functions
 ----------------------------------------------------------------------------------------
@@ -527,4 +570,5 @@ function gadget:Initialize()
 	end
 
 	gadgetHandler:AddChatAction("debuglag", LagmonitorDebugToggle, "Toggles Lagmonitor debug.")
+	gadgetHandler:AddChatAction("debuglagplayer", LagmonitorDebugPlayerToggle, "Toggles Lagmonitor debug.")
 end
