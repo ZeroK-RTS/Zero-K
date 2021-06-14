@@ -1775,7 +1775,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local costInfoUpdate = GetImageWithText(leftPanel, "costInfoUpdate", PIC_HEIGHT + 4, IMAGE.COST, nil, nil, ICON_SIZE, 4)
 	local metalInfoUpdate = GetImageWithText(leftPanel, "metalInfoUpdate", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.METAL, nil, nil, ICON_SIZE, 4)
 	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
-	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 5, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
+	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
@@ -1876,7 +1876,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
 	local function UpdateDynamicFeatureAttributes(featureID, unitDefID)
 		local metal, _, energy, _, _ = Spring.GetFeatureResources(featureID)
-		local leftOffset = 1
+		local leftOffset = -2
 		if unitDefID then
 			leftOffset = PIC_HEIGHT + LEFT_SPACE
 		end
@@ -1955,14 +1955,14 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			if featureUnitDefID then
 				unitDefID = featureUnitDefID
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT + 10, nil, nil, nil, true)
-					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 33, nil, nil, nil, true)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 8, nil, nil, nil, true)
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 32, nil, nil, nil, true)
 				end
 			else
 				costInfoUpdate(false)
 				unitNameUpdate(true, featureTooltip, nil)
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT - 12, nil, nil, nil, true)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT - 13, nil, nil, nil, true)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 12, nil, nil, nil, true)
 				end
 			end
@@ -1983,7 +1983,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitImage:Invalidate()
 
 			local unitCost = math.floor(GetUnitCost(unitID, unitDefID) or 0)
-			costInfoUpdate(true, cyan .. unitCost, IMAGE.COST, PIC_HEIGHT + 4)
+			local smallCostDisplay = unitCost
+			if smallCostDisplay >= 10000 then
+				smallCostDisplay = math.floor(smallCostDisplay / 1000) .. "k"
+			end
+			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
 			
 			local extraTooltip, healthOverride
 			if not (unitID or featureID) then
@@ -2001,13 +2005,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			if unitID then
 				if playerNameLabel then
-					playerNameLabel:SetPos(nil, PIC_HEIGHT + 33, nil, nil, nil, true)
+					playerNameLabel:SetPos(nil, PIC_HEIGHT + 32, nil, nil, nil, true)
 					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 56, nil, nil, nil, true)
 				end
 			end
 			if (not (unitID and visible)) and not featureDefID then
 				healthBarUpdate(false)
-				local maxHealthPos = PIC_HEIGHT + 5
+				local maxHealthPos = PIC_HEIGHT + 4
 				if blueprint and costInfoPanel then
 					costInfoPanel(true, false, unitCost, "Cost:", nil, 46)
 					UpdateBuildTime(unitDefID, unitCost)
