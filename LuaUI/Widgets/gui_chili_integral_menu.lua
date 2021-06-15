@@ -76,7 +76,7 @@ local DRAW_NAME_COMMANDS = {
 	[CMD.STOCKPILE] = true, -- draws stockpile progress (command handler sends correct string).
 }
 
-local REMOVE_TAG_FRAMES = 600 -- Game frames between reseting the tag removal table.
+local REMOVE_TAG_FRAMES = 180 -- Game frames between reseting the tag removal table.
 
 -- Defined upon learning the appropriate colors
 local BUTTON_COLOR
@@ -859,6 +859,11 @@ end
 local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePosition, inputMult, reinsertPosition)
 	if not commands then
 		return
+	end
+	
+	if (not lastRemovedTagResetFrame) or lastRemovedTagResetFrame + REMOVE_TAG_FRAMES < Spring.GetGameFrame() then
+		alreadyRemovedTag = {}
+		lastRemovedTagResetFrame = Spring.GetGameFrame()
 	end
 	
 	-- delete from back so that the order is not canceled while under construction
@@ -1727,12 +1732,6 @@ local function GetQueuePanel(parent, columns)
 	
 	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
 		local buttonCount = 0
-		
-		if (not lastRemovedTagResetFrame) or lastRemovedTagResetFrame > Spring.GetGameFrame() + REMOVE_TAG_FRAMES then
-			alreadyRemovedTag = {}
-			lastRemovedTagResetFrame = Spring.GetGameFrame()
-		end
-		
 		factoryUnitID = newFactoryUnitID
 		factoryUnitDefID = newFactoryUnitDefID
 	
