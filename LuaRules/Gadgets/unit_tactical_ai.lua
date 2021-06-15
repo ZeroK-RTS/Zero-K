@@ -1251,16 +1251,6 @@ local function ToggleDebugUnit(cmd, line, words, player)
 	debugUnit[unitID] = true
 end
 
-local function PrintUnits(cmd, line, words, player)
-	if not Spring.IsCheatingEnabled() then
-		return
-	end
-	local listData = unitList.data
-	for i = 1, unitList.count do
-		Spring.Utilities.UnitEcho(listData[i])
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit adding/removal
@@ -1279,7 +1269,6 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("debugidleall", ToggleDebugIdleAll, "")
 	gadgetHandler:AddChatAction("debugai", ToggleDebugAiAction, "")
 	gadgetHandler:AddChatAction("debugaiunit", ToggleDebugUnit, "")
-	gadgetHandler:AddChatAction("printunits", PrintUnits, "")
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
