@@ -907,10 +907,10 @@ local function calcMainMexDrawList()
 
 		glColor(0,0,0,0.7)
 		glLineWidth(width*2.4)
-		glDrawGroundCircle(x, 1, z, 40, 21)
+		glDrawGroundCircle(x, 1, z, 50, 21)
 		glColor(r,g,b,0.7)
 		glLineWidth(width*1.5)
-		glDrawGroundCircle(x, 1, z, 40, 21)
+		glDrawGroundCircle(x, 1, z, 50, 21)
 
 		glPopMatrix()
 	end
