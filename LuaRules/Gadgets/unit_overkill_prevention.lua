@@ -68,7 +68,7 @@ for i = 1, #UnitDefs do
 		shieldPowerDef[i] = ud.customParams.shield_power
 		shieldRegenDef[i] = ud.customParams.shield_rate/30
 	end
-	maxEffectiveHealth[i] = (ud.health / ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))
+	maxEffectiveHealth[i] = (ud.health / ud.armoredMultiple + (shieldPowerDef[i] or 0))
 end
 
 include("LuaRules/Configs/customcmds.h.lua")
