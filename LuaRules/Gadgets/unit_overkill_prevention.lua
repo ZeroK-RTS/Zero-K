@@ -61,12 +61,14 @@ local handledUnitDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua
 
 local shieldPowerDef = {}
 local shieldRegenDef = {}
+local maxEffectiveHealth = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.customParams.shield_power then
 		shieldPowerDef[i] = ud.customParams.shield_power
 		shieldRegenDef[i] = ud.customParams.shield_rate/30
 	end
+	maxEffectiveHealth[i] = (ud.health / ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))
 end
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -186,12 +188,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetInLoS = (targetVisiblityState == 15)
-	local targetIdentified = (targetVisiblityState%2 == 1)
+	local targetIdentified = targetInLoS or (math.floor(targetVisiblityState / 4) % 4 == 3)
 
 	-- When true, the projectile damage will be added to the damage to be taken by the unit.
 	-- When false, it will only check whether the shot should be blocked.
 	local addToIncomingDamage = not noFire
-
 	if staticOnly and not noFire then
 		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
 	end
@@ -215,8 +216,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	else
 		timeout = timeout * (radarMult or 1)
-		local ud = UnitDefs[unitDefID]
-		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or false
+		adjHealth = (targetIdentified and maxEffectiveHealth[unitDefID]) or false
 		disarmFrame = (targetIdentified and gameFrame) or false
 	end
 

@@ -24,7 +24,7 @@ local projectiles = {}
 
 local projectileHomingDistance = {
 	[WeaponDefNames["shipcarrier_disarm_rocket"].id] = 600^2,
-	[WeaponDefNames["turretaaheavy_advsam"].id] = 1200^2,
+	[WeaponDefNames["turretaaheavy_advsam"].id] = 1800^2,
 	[WeaponDefNames["amphraid_torpedo"].id] = 200^2,
 }
 
