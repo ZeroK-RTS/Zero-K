@@ -102,8 +102,7 @@ local function SetTeamNamesAndColors()
 			local name = Spring.GetPlayerInfo(leader, false)
 			teamNames[teamID] = name
 		end
-	local r,g,b = Spring.GetTeamColor(teamID)
-	teamColors[teamID] = {r,g,b,1}
+		teamColors[teamID] = Chili.color2incolor(Spring.GetTeamColor(teamID))
 	end
 end
 
@@ -148,11 +147,10 @@ local function SetupAwardsPanel()
 				parent=awardSubPanel,
 				width=120,
 				height=awardPanelHeight,
-				caption = teamNames[teamID],
+				caption = teamColors[teamID] .. teamNames[teamID],
 				valign='center',
 				autosize=false,
 				objectOverrideFont = WG.GetFont(),
-				textColor=teamColors[teamID],
 			}
 			for awardType, record in pairs(awards) do
 				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
