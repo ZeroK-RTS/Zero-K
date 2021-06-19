@@ -181,6 +181,8 @@ for _, defName in pairs({"energywind", "energysolar", "energygeo", "energyheavyg
 end
 econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
+local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
+
 local dynamicTooltipDefs = {
 	[UnitDefNames["terraunit"].id] = true,
 	[UnitDefNames["energypylon"].id] = true,
@@ -764,7 +766,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 			if y then
 				if y <= tidalHeight then
 					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", income)
-					healthOverride = 400
+					healthOverride = TIDAL_HEALTH
 				else
 					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
 					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)

@@ -28,7 +28,9 @@ local windDefs = {
 	[ UnitDefNames['energywind'].id ] = true,
 }
 
-local WIND_HEALTH = UnitDefNames['energywind'].health
+local turbineUnitDef = UnitDefNames['energywind']
+local WIND_HEALTH = turbineUnitDef.health
+local TIDAL_HEALTH = turbineUnitDef.customParams.tidal_health
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local windmills = IterableMap.New()
@@ -176,10 +178,10 @@ local function SetupUnit(unitID)
 	
 	if Spring.GetGroundHeight(x, z) <= TIDAL_HEIGHT then
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
-		Spring.SetUnitMaxHealth(unitID, 400)
+		Spring.SetUnitMaxHealth(unitID, TIDAL_HEALTH)
 		local health = Spring.GetUnitHealth(unitID)
 		if health == WIND_HEALTH then
-			Spring.SetUnitHealth(unitID, 400)
+			Spring.SetUnitHealth(unitID, TIDAL_HEALTH)
 		end
 		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
