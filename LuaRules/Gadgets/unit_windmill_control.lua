@@ -35,7 +35,7 @@ local windmills = IterableMap.New()
 
 local TIDAL_HEIGHT = -10
 
-local windMin, windMax, tidalStrength, windRange
+local windMin, windMax, windRange
 
 local strength, next_strength, strength_step, step_count = 0,0,0,0
 
@@ -216,12 +216,10 @@ function gadget:Initialize()
 
 	windMin = 0 * energyMult
 	windMax = 2.5 * energyMult
-	tidalStrength = 1.2 * energyMult
 	windRange = windMax - windMin
 
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
-	Spring.SetGameRulesParam("tidalStrength",tidalStrength)
 	Spring.SetGameRulesParam("WindHeading", 0)
 	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)

@@ -196,7 +196,6 @@ local filterUnitDefIDs = {
 }
 
 local tidalHeight
-local tidalStrength
 local windMin
 local windMax
 local windGroundMin
@@ -764,8 +763,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 
 			if y then
 				if y <= tidalHeight then
-					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", tidalStrength)
-					income = tidalStrength
+					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", income)
 					healthOverride = 400
 				else
 					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
@@ -2522,7 +2520,6 @@ local function InitializeWindParameters()
 	windGroundMin = spGetGameRulesParam("WindGroundMin")
 	windGroundSlope = spGetGameRulesParam("WindSlope")
 	windMinBound = spGetGameRulesParam("WindMinBound")
-	tidalStrength = Spring.GetGameRulesParam("tidalStrength")
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 end
 
