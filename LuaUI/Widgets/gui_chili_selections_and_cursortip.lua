@@ -172,16 +172,14 @@ local DRAWING_TOOLTIP =
 local reloadBarColor = {013, 245, 243, 1}
 local fullHealthBarColor = {0, 255, 0, 1}
 
--- TODO, autogenerate
 local econStructureDefs = {
-	[UnitDefNames["staticmex"].id] = {cost = 75, mex = true},
-	[UnitDefNames["energywind"].id] = {cost = 35, income = 1.25, isWind = true},
-	[UnitDefNames["energysolar"].id] = {cost = 70, income = 2},
-	[UnitDefNames["energygeo"].id] = {cost = 500, income = 25},
-	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
-	[UnitDefNames["energyfusion"].id] = {cost = 1000, income = 35},
-	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
+	[UnitDefNames.staticmex.id] = {cost = UnitDefNames.staticmex.metalCost, mex = true},
 }
+for _, defName in pairs({"energywind", "energysolar", "energygeo", "energyheavygeo", "energyfusion", "energysingu"}) do
+	local def = UnitDefNames[defName]
+	econStructureDefs[def.id] = { cost = def.metalCost, income = def.customParams.income_energy }
+end
+econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
 local dynamicTooltipDefs = {
 	[UnitDefNames["terraunit"].id] = true,
