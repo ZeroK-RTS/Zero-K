@@ -67,7 +67,6 @@ local spAddHeightMap        = Spring.AddHeightMap
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spSetUnitPosition     = Spring.SetUnitPosition
 local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
-local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
@@ -2140,7 +2139,7 @@ function GG.Terraform_RaiseWater(raiseAmount)
 	end
 	--[[ move commands looks as though it will be messy
 	
-	local allUnits = spGetAllUnits()
+	local allUnits = Spring.GetAllUnits()
 	local allUnitsCount = #allUnits
 	for i = 1, allUnitsCount do
 		if spValidUnitID(allUnits[i]) then

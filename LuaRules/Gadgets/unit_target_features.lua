@@ -19,8 +19,6 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 local spGetUnitWeaponState   = Spring.GetUnitWeaponState
 local spSetUnitWeaponState   = Spring.SetUnitWeaponState
-local spGetUnitWeaponTarget  = Spring.GetUnitWeaponTarget
-local spGetCommandQueue      = Spring.GetCommandQueue
 
 local featureFlag = Game.collisionFlags.noFeatures
 local groundFlag = Game.collisionFlags.noGround

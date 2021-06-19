@@ -19,7 +19,6 @@ return {
 end
 
 local spGetTeamUnits         = Spring.GetTeamUnits
-local spGetUnitAllyTeam      = Spring.GetUnitAllyTeam
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetUnitSelfDTime     = Spring.GetUnitSelfDTime
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray

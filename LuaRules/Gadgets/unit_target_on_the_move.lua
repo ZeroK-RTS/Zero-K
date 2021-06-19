@@ -297,7 +297,7 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
-	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local ux, uy, uz = spGetUnitPosition(unitID)
 	
 	local bestDis = false
 	local bestUnit = false
@@ -306,7 +306,7 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 		for i = 1, #choiceUnits do
 			local tTeam = Spring.GetUnitTeam(choiceUnits[i])
 			if tTeam and (not Spring.AreTeamsAllied(team,tTeam)) then
-				local tx,ty,tz = Spring.GetUnitPosition(choiceUnits[i])
+				local tx,ty,tz = spGetUnitPosition(choiceUnits[i])
 				if tx then
 					local newDis = disSQ(ux,uz,tx,tz)
 					if (not bestDis) or bestDis > newDis then

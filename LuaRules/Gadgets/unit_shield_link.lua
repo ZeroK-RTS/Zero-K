@@ -28,7 +28,6 @@ local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
-local spGetUnitIsActive     = Spring.GetUnitIsActive
 local spGetUnitShieldState  = Spring.GetUnitShieldState
 local spSetUnitShieldState  = Spring.SetUnitShieldState
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
