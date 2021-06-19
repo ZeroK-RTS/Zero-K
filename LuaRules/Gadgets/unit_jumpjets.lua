@@ -100,10 +100,10 @@ for udid = 1, #UnitDefs do
 	end
 end
 
-local spusCallAsUnit = Spring.UnitScript.CallAsUnit
+local spUnitScript = Spring.UnitScript -- CallAsUnit can't be localized directly because a later-layered gadget modifies it
 local function CallAsUnitIfExists(unitID, func, ...)
 	if func then
-		spusCallAsUnit(unitID, func, ...)
+		spUnitScript.CallAsUnit(unitID, func, ...)
 	end
 end
 
