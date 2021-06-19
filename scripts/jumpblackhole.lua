@@ -178,9 +178,6 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, Spring.GetUnitAllyTeam(unitID))
 end
 
-function preJump(turn, distance)
-end
-
 function beginJump()
 	StartThread(StopWalk)
 end
@@ -192,9 +189,6 @@ function jumping()
 	EmitSfx(rfoot, GG.Script.UNIT_SFX2)
 	EmitSfx(lshoulder, GG.Script.UNIT_SFX3)
 	EmitSfx(rshoulder, GG.Script.UNIT_SFX3)
-end
-
-function halfJump()
 end
 
 function endJump()

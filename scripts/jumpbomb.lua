@@ -93,9 +93,6 @@ function endJump ()
 	Turn (Right_Front_Leg, y_axis, 0, pi3)
 end
 
-function preJump () end
-function jumping() end
-
 function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)
 end

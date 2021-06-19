@@ -180,9 +180,6 @@ function beginJump()
 	--StartThread(JumpExhaust)
 end
 
-function jumping()
-end
-
 function halfJump()
 	--Turn(torso, x_axis, math.rad(0), math.rad(80))
 	Move(base, y_axis, 0, 18)
@@ -193,8 +190,6 @@ function halfJump()
 	Turn(rshin, x_axis, math.rad(0), math.rad(200))
 	Turn(rfoot, x_axis, math.rad(0), math.rad(80))
 end
-
-endJump = jumping
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

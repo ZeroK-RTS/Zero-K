@@ -105,9 +105,6 @@ function beginJump(turn,lineDist,flightDist,duration)
 	end
 end
 
-function jumping()
-end
-
 function halfJump()
 	if not doingSomersault then
 		script.StopMoving()

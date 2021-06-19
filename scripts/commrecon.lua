@@ -433,9 +433,6 @@ local function JumpExhaust()
 	end
 end
 
-function preJump(turn, distance)
-end
-
 function beginJump()
 	inJumpMode = true
 	--[[
@@ -447,9 +444,6 @@ function jumping()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	EmitSfx(jx1, 1028)
 	EmitSfx(jx2, 1028)
-end
-
-function halfJump()
 end
 
 function endJump()

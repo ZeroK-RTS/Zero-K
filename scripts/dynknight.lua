@@ -202,9 +202,6 @@ function jumping()
 	end
 end
 
-function halfJump()
-end
-
 function endJump()
 	script.StopMoving()
 	EmitSfx(base, 1029)

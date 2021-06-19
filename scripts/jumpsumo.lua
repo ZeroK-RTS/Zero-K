@@ -314,9 +314,6 @@ function beginJump()
 
 end
 
-function jumping()
-end
-
 function halfJump()
 	Turn(lf_thigh, x_axis, 0, 2)
 	Turn(rf_thigh, x_axis, 0, 2)

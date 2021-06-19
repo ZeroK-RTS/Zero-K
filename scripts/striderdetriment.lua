@@ -336,9 +336,6 @@ function jumping(jumpPercent)
 	end
 end
 
-function halfJump()
-end
-
 function endJump()
 	StartThread(EndJumpThread)
 end
