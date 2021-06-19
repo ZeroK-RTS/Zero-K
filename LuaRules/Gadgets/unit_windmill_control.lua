@@ -175,7 +175,6 @@ local function SetupUnit(unitID)
 	local x, y, z = spGetUnitPosition(unitID)
 	
 	if Spring.GetGroundHeight(x, z) <= TIDAL_HEIGHT then
-		spSetUnitRulesParam(unitID, "wanted_energyIncome", tidalStrength, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
 		local health = Spring.GetUnitHealth(unitID)
