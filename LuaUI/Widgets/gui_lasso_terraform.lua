@@ -1117,7 +1117,7 @@ function widget:MousePress(mx, my, button)
 	end
 	
 	local toolTip = Spring.GetCurrentTooltip()
-	if not (toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
+	if not (toolTip == "" or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
 		return false
 	end
 	
