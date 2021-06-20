@@ -28,7 +28,13 @@ return { energywind = {
     tidal_health = 400,
   },
 
-  energyMake                    = 1.2,
+  energyMake                    = 1.2, --[[ as tidal; NOT added to wind (which is fully gadgeted
+                                            and cannot be found in this unit def file). Also used
+                                            as the income of a "generic" turbine, i.e. unspecified
+                                            whether wind or tidal (for example when hovering over
+                                            the icon on the UI to check OD payback ETA) since it
+                                            approximately averages the income of a wind with some
+                                            penalty for unreliability. ]]
   energyUse                     = 0,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
