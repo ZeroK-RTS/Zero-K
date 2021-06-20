@@ -100,7 +100,7 @@ end
 local function ChangeDroneRulesParam(unitID, diff)
 	local count = Spring.GetUnitRulesParam(unitID, "dronesControlled") or 0
 	count = count + diff
-	Spring.SetUnitRulesParam(unitID, "dronesControlled", count, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "dronesControlled", count, INLOS_ACCESS)
 end
 
 local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
@@ -129,8 +129,8 @@ local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 		toReturn.droneSets[i].queueCount = 0
 	end
 	if maxDronesTotal > 0 then
-		Spring.SetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
-		Spring.SetUnitRulesParam(unitID, "dronesControlledMax", maxDronesTotal, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "dronesControlledMax", maxDronesTotal, INLOS_ACCESS)
 	end
 	return toReturn
 end
@@ -196,8 +196,8 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
-		Spring.SetUnitRulesParam(droneID, "parent_unit_id", unitID)
-		Spring.SetUnitRulesParam(droneID, "drone_set_index", setNum)
+		spSetUnitRulesParam(droneID, "parent_unit_id", unitID)
+		spSetUnitRulesParam(droneID, "drone_set_index", setNum)
 		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.droneCount = droneSet.droneCount + 1
 		ChangeDroneRulesParam(unitID, 1)

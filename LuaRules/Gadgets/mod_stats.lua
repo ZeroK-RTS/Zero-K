@@ -34,7 +34,6 @@ local lastPara = {}
 local plops = {}
 
 local Echo = Spring.Echo
-local spGameOver = Spring.IsGameOver
 local spGetUnitHealth = Spring.GetUnitHealth
 local spAreTeamsAllied = Spring.AreTeamsAllied
 

@@ -18,7 +18,6 @@ function gadget:GetInfo()
    }
 end
 
-local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
 local spSetUnitMidAndAimPos    = Spring.SetUnitMidAndAimPos
 local spSetUnitRadiusAndHeight = Spring.SetUnitRadiusAndHeight
 local spGetUnitPosition        = Spring.GetUnitPosition

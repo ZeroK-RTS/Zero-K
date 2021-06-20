@@ -699,7 +699,7 @@ local function UpdateMoveReplacement()
 end
 
 local function DoFactoryWaypointManually(unitID)
-	local cQueue = Spring.GetCommandQueue(unitID, -1)
+	local cQueue = spGetCommandQueue(unitID, -1)
 	local foundRightOpts = false
 	for i = 1, #cQueue do
 		if cQueue[i].id ~= CMD_MOVE then
@@ -716,7 +716,7 @@ local function DoFactoryWaypointManually(unitID)
 	if not Spring.ValidUnitID(facID) then
 		return
 	end
-	local factoryQueue = Spring.GetCommandQueue(facID, -1)
+	local factoryQueue = spGetCommandQueue(facID, -1)
 	local orderArray = {}
 	for i = 1, #factoryQueue do
 		orderArray[i] = {

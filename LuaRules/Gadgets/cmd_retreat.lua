@@ -59,7 +59,6 @@ local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
 local spInsertUnitCmdDesc 	= Spring.InsertUnitCmdDesc
 local spEditUnitCmdDesc 	= Spring.EditUnitCmdDesc
 local spGetUnitHealth 		= Spring.GetUnitHealth
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam 	= Spring.SetUnitRulesParam
 local spFindUnitCmdDesc 	= Spring.FindUnitCmdDesc
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
@@ -365,7 +364,7 @@ end
 -- mark this unit as wanting to retreat (or not wanting to)
 local function SetWantRetreat(unitID, want)
 	if wantRetreat[unitID] ~= want then
-		Spring.SetUnitRulesParam(unitID, "retreat", want and 1 or 0, alliedTrueTable)
+		spSetUnitRulesParam(unitID, "retreat", want and 1 or 0, alliedTrueTable)
 		if not want then
 			local env = Spring.UnitScript.GetScriptEnv(unitID)
 			if env and env.StopRetreatFunction then

@@ -39,7 +39,6 @@ local evacuateCmdDesc = {
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local spSetHeightMap    = Spring.SetHeightMap
-local spAreTeamsAllied  = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ

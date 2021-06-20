@@ -48,7 +48,6 @@ local spValidUnitID			= Spring.ValidUnitID
 local spGetUnitTeam			= Spring.GetUnitTeam
 --local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
 local spIsPosInRadar		= Spring.IsPosInRadar
-local spGetTeamUnits		= Spring.GetTeamUnits
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 

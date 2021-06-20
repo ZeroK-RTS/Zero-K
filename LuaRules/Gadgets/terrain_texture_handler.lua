@@ -24,7 +24,6 @@ local BLOCK_SIZE = 8
 
 local spSetMapSquareTexture = Spring.SetMapSquareTexture
 local spGetMapSquareTexture = Spring.GetMapSquareTexture
-local spGetMyTeamID         = Spring.GetMyTeamID
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"

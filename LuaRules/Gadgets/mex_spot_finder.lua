@@ -47,7 +47,6 @@ local huge = math.huge
 
 local spGetGroundInfo       = Spring.GetGroundInfo
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
-local spTestBuildOrder      = Spring.TestBuildOrder
 local spSetGameRulesParam   = Spring.SetGameRulesParam
 
 local extractorRadius = Game.extractorRadius

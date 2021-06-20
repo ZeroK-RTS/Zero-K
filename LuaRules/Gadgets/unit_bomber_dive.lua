@@ -39,8 +39,6 @@ local unitBomberDiveState = {
 
 local CMD_ATTACK = CMD.ATTACK
 
-local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
-
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
 local UPDATE_FREQUENCY = 15

@@ -223,7 +223,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		local transID = Spring.GetUnitTransporter(unitID)
 		if transID then
 			-- For some reason enemyID indicates that the unit is being transported.
-			return Spring.GetUnitIsCloaked(transID)
+			return spGetUnitIsCloaked(transID)
 		end
 		recloakFrame[unitID] = currentFrame + GetProximityDecloakTime(unitID)
 		return false

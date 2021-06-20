@@ -30,7 +30,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- SYNCED
 --------------------------------------------------------------------------------
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local oneClickWepCMD = {
     id      = CMD_ONECLICK_WEAPON,

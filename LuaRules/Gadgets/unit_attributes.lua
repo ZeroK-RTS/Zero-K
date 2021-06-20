@@ -35,7 +35,6 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spSetUnitBuildSpeed   = Spring.SetUnitBuildSpeed
 local spSetUnitWeaponState  = Spring.SetUnitWeaponState
 local spGetUnitWeaponState  = Spring.GetUnitWeaponState
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local spGetUnitMoveTypeData    = Spring.GetUnitMoveTypeData
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag

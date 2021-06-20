@@ -125,7 +125,7 @@ local function IsUnitIdentifiedStructure(identified, unitID)
 	if not identified then
 		return false
 	end
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return false
 	end
@@ -176,7 +176,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	--Spring.Utilities.UnitEcho(unitID, timeout + gameFrame)
 
 	-- Modify timeout based on unit speed and fastMult
-	local unitDefID = Spring.GetUnitDefID(targetID)
+	local unitDefID = spGetUnitDefID(targetID)
 	if fastMult and fastMult ~= 1 then
 		if fastUnitDefs[unitDefID] then
 			timeout = timeout * (fastMult or 1)
@@ -420,7 +420,7 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end

@@ -53,7 +53,6 @@ local spGetTeamInfo     = Spring.GetTeamInfo
 local spGetTeamList	= Spring.GetTeamList
 local spGetTeamLuaAI	= Spring.GetTeamLuaAI
 local spGetPlayerInfo	= Spring.GetPlayerInfo
-local spDestroyUnit	= Spring.DestroyUnit
 local spTransferUnit    = Spring.TransferUnit
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
   
