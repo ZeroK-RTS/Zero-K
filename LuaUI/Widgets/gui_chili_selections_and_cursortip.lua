@@ -181,6 +181,8 @@ for _, defName in pairs({"energywind", "energysolar", "energygeo", "energyheavyg
 end
 econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
+local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
+
 local dynamicTooltipDefs = {
 	[UnitDefNames["terraunit"].id] = true,
 	[UnitDefNames["energypylon"].id] = true,
@@ -196,7 +198,6 @@ local filterUnitDefIDs = {
 }
 
 local tidalHeight
-local tidalStrength
 local windMin
 local windMax
 local windGroundMin
@@ -764,9 +765,8 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 
 			if y then
 				if y <= tidalHeight then
-					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", tidalStrength)
-					income = tidalStrength
-					healthOverride = 400
+					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", income)
+					healthOverride = TIDAL_HEALTH
 				else
 					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
 					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
@@ -2522,7 +2522,6 @@ local function InitializeWindParameters()
 	windGroundMin = spGetGameRulesParam("WindGroundMin")
 	windGroundSlope = spGetGameRulesParam("WindSlope")
 	windMinBound = spGetGameRulesParam("WindMinBound")
-	tidalStrength = Spring.GetGameRulesParam("tidalStrength")
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
 end
 
