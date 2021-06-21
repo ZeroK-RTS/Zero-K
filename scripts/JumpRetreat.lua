@@ -9,7 +9,6 @@ local retreating = false
 local function RetreatThread(hx, hy, hz)
 	--Spring.Echo("RetreatThread")
 	local reload, disarmed, ux, uy, uz, moveDistance, disScale, cx, cy, cz, isstunned
-	local realrange = jumpRange * jumpRangeBonus -- this can't be cached for some reason.
 	while retreating do
 		reload = Spring.GetUnitRulesParam(unitID, "jumpReload") or 1
 		disarmed = (Spring.GetUnitRulesParam(unitID, "disarmed") or 0) == 1
@@ -19,13 +18,13 @@ local function RetreatThread(hx, hy, hz)
 			ux, uy, uz = Spring.GetUnitPosition(unitID)
 			moveDistance = math.sqrt(((ux - hx) * (ux - hx)) + ((uz - hz) * (uz - hz)))
 			--Spring.Echo("MoveDistance: " .. moveDistance)
-			if moveDistance >= 200 and moveDistance < realrange then -- jump to finish reteating.
+			if moveDistance >= 200 and moveDistance < jumpRange then -- jump to finish reteating.
 				GiveClampedOrderToUnit(unitID, CMD.INSERT, { 0, CMD_JUMP, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT)
 				retreating = false
 			elseif moveDistance < 200 then -- don't jump around in haven or waste it near it.
 				retreating = false -- stop watching reload states.
 			else
-				disScale = realrange/moveDistance*0.95
+				disScale = jumpRange/moveDistance*0.95
 				cx, cy, cz = ux + disScale*(hx - ux), hy, uz + disScale*(hz - uz)
 				GiveClampedOrderToUnit(unitID, CMD.INSERT, { 0, CMD_JUMP, CMD.OPT_INTERNAL, cx, cy, cz}, CMD.OPT_ALT)
 				if retreattype == "once" then
