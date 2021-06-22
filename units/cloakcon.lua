@@ -37,6 +37,8 @@ return { cloakcon = {
     area_cloak_shrink_rate = 1400,
 
     priority_misc = 2, -- High
+    morphto = [[cloakraid]],
+    morphtime = [[10]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
