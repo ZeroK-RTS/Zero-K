@@ -64,7 +64,6 @@ local longRangeSwarmieeArray = NameToDefID({
 	"shiparty",
 	"cloakarty",
 	"amphsupport",
-	"shiparty",
 })
 
 local medRangeSwarmieeArray = NameToDefID({
@@ -1702,6 +1701,26 @@ local behaviourConfig = {
 		minSwarmLeeway = 130,
 		skirmLeeway = 40,
 	},
+	{
+		name = "shipcarrier",
+		skirms = allMobileGround,
+		--swarms = {},
+		--flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10,
+		minSwarmLeeway = 130,
+		skirmLeeway = 40,
+	},
+	{
+		name = "shipheavyarty",
+		skirms = allMobileGround,
+		--swarms = {},
+		--flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10,
+		minSwarmLeeway = 130,
+		skirmLeeway = 40,
+	},
 	
 	-- cowardly support units
 	--[[
@@ -1936,10 +1955,6 @@ local behaviourConfig = {
 	},
 	{
 		name = "striderdetriment",
-		onlyIdleHandling = true,
-	},
-	{
-		name = "shipheavyarty",
 		onlyIdleHandling = true,
 	},
 	
