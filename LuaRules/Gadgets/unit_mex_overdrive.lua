@@ -789,7 +789,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 
 	local reCalc = true
 	local maxedGrid = {}
-	while reCalc do	-- calculate overdrive for as long as a new grid is not maxed
+	while reCalc do -- calculate overdrive for as long as a new grid is not maxed
 		reCalc = false
 		for i = 1, allyTeamData.grids do -- loop through grids
 			if not (maxedGrid[i] or allyTeamData.nilGrid[i]) then -- do not check maxed grids
@@ -1776,6 +1776,10 @@ end
 function externalFunctions.AddInnateIncome(allyTeamID, metal, energy)
 	if not (allyTeamID and allyTeamInfo[allyTeamID]) then
 		return
+	end
+	if GG.GetAllyTeamIncomeMult then
+		metal = metal * GG.GetAllyTeamIncomeMult(allyTeamID)
+		energy = energy * GG.GetAllyTeamIncomeMult(allyTeamID)
 	end
 	allyTeamInfo[allyTeamID].innateMetal = (allyTeamInfo[allyTeamID].innateMetal or 0) + metal
 	allyTeamInfo[allyTeamID].innateEnergy = (allyTeamInfo[allyTeamID].innateEnergy or 0) + energy

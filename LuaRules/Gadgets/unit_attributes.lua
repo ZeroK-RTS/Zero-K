@@ -419,7 +419,7 @@ function UpdateUnitAttributes(unitID, frame)
 	local upgradesSpeedMult   = spGetUnitRulesParam(unitID, "upgradesSpeedMult")
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
-	local selfIncomeChange = spGetUnitRulesParam(unitID, "selfIncomeChange")
+	local selfIncomeChange = (spGetUnitRulesParam(unitID, "selfIncomeChange") or 1) * (GG.unit_handicap[unitID] or 1)
 	local selfMaxAccelerationChange = spGetUnitRulesParam(unitID, "selfMaxAccelerationChange") --only exist in airplane??
 	
 	-- SLOW --
