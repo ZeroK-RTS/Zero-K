@@ -230,7 +230,7 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+	return (Spring.GetUnitRulesParam(unitID,"totalEconomyChange") or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
