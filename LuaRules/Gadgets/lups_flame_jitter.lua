@@ -89,8 +89,6 @@ else
     local speedx,speedy,speedz = Spring.GetUnitVelocity(unitID)
     local partpos = "x*delay,y*delay,z*delay|x="..speedx..",y="..speedy..",z="..speedz
 
-	local altFlameTexture = wd.customParams.altflametex	-- FIXME: more elegant solution when this is actually implemented (as in, one that doesn't rely on different unitdef)
-	
     particleList[particleCnt] = {
       class        = 'JitterParticles2',
       colormap     = { {1,1,1,1},{1,1,1,1} },
@@ -153,7 +151,7 @@ else
       sizeExp      = 0.7,
 
       --texture     = "bitmaps/smoke/smoke06.tga",
-      texture     = altFlameTexture and "bitmaps/GPL/flame_alt.png" or "bitmaps/GPL/flame.png",
+      texture     = "bitmaps/GPL/flame.png",
     }
     particleCnt = particleCnt + 1
 

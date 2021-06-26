@@ -79,7 +79,7 @@ local fx = {
       sizeExp      = 0.7,
 
       --texture     = "bitmaps/smoke/smoke06.tga",
-      texture     = altFlameTexture and "bitmaps/GPL/flame_alt.png" or "bitmaps/GPL/flame.png",
+      texture     = "bitmaps/GPL/flame.png",
     },
 
     flame2 = {
@@ -108,7 +108,7 @@ local fx = {
       sizeExp      = 0.65,
 
       --texture     = "bitmaps/smoke/smoke06.tga",
-      texture     = altFlameTexture and "bitmaps/GPL/flame_alt.png" or "bitmaps/GPL/flame.png",
+      texture     = "bitmaps/GPL/flame.png",
     },
 }
 
