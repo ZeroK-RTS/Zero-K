@@ -48,9 +48,9 @@ local handledUnitDefIDs = {
 	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
 	[UnitDefNames["spiderskirm"].id] = 1,
+	[UnitDefNames["tankassault"].id] = 1,
 
 	-- Needs LUS
-	--[UnitDefNames["tankassault"].id] = 1,
 	--[UnitDefNames["vehassault"].id] = 1,
 	--[UnitDefNames["tankheavyassault"].id] = 1,
 }

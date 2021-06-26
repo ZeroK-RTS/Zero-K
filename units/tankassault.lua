@@ -39,7 +39,7 @@ return { tankassault = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName          = [[correap.s3o]],
-  script              = [[tankassault.cob]],
+  script              = [[tankassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -80,13 +80,8 @@ return { tankassault = {
       craterBoost             = 0,
       craterMult              = 0,
 
-      customParams        = {
-        reaim_time = 8, -- COB
-      },
-
       damage                  = {
-        default = 320,
-        planes  = 320,
+        default = 320.1,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],
