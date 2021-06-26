@@ -86,6 +86,8 @@ local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local type  = type
 local pairs = pairs
 
+local allyTeamStrengthMult = {}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -318,6 +320,8 @@ function gadget:GameFrame(frame)
 					local teamColor = {Spring.GetTeamColor(teamID)}
 					local nanoPieces = Spring.GetUnitNanoPieces(unitID) or {}
 
+					strength = strength * allyTeamStrengthMult[allyID]
+
 					for j = 1,#nanoPieces do
 						local nanoPieceID = nanoPieces[j]
 						--local nanoPieceIDAlt = Spring.GetUnitScriptPiece(unitID, nanoPieceID)
@@ -439,6 +443,12 @@ function gadget:UnitDestroyed(uid, udid)
 end
 
 function gadget:Initialize()
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		allyTeamStrengthMult[allyTeamID] = 1 / (Spring.GetModOptions()["team_" .. (allyTeamID + 1) .. "_econ"] or 1)
+	end
+	
 	for _,unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitFinished(unitID, unitDefID)

@@ -386,7 +386,7 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if UnitOnlyEnergy[unitID] then
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
 						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
@@ -399,7 +399,7 @@ function gadget:GameFrame(n)
 							end
 						end
 					else
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
 						spending[pri] = spending[pri] + buildSpeed
 						
 						if debugMode and debugOnUnits then

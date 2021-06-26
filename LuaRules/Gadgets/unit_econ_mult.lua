@@ -20,19 +20,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local ALLYTEAM_MAX = 8
-
 GG.unit_handicap = {}
 GG.allyTeamIncomeMult = {}
 
 local teamMults = {}
 local gadgetInUse = false
 
-for i = 1, ALLYTEAM_MAX do
-	local allyTeamID = (i - 1)
-	GG.allyTeamIncomeMult[allyTeamID] = Spring.GetModOptions()["team_" .. i .. "_econ"] or 1
-	if GG.allyTeamIncomeMult[allyTeamID]~= 1 then
-		gadgetInUse = true
+do
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		GG.allyTeamIncomeMult[allyTeamID] = Spring.GetModOptions()["team_" .. (allyTeamID + 1) .. "_econ"] or 1
+		if GG.allyTeamIncomeMult[allyTeamID]~= 1 then
+			gadgetInUse = true
+		end
 	end
 end
 

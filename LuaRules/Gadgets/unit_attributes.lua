@@ -64,6 +64,9 @@ GG.att_econMult   = GG.att_econMult   or {}
 GG.att_buildMult  = GG.att_buildMult  or {}
 GG.att_weaponMods = GG.att_weaponMods or {}
 
+-- To tell other gadgets things without creating RulesParams
+GG.att_out_buildSpeed = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- UnitDefs caching
@@ -145,7 +148,7 @@ local function UpdateBuildSpeed(unitID, unitDefID, speedFactor)
 		return
 	end
 
-	spSetUnitRulesParam(unitID, "buildSpeed", buildSpeed*speedFactor, INLOS_ACCESS)
+	GG.att_out_buildSpeed[unitID] = buildSpeed*speedFactor
 
 	spSetUnitBuildSpeed(unitID,
 		buildSpeed*speedFactor, -- build
@@ -389,6 +392,8 @@ local function removeUnit(unitID)
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
 	GG.att_MoveChange[unitID] = nil
+	
+	GG.att_out_buildSpeed[unitID] = nil
 end
 
 function UpdateUnitAttributes(unitID, frame)

@@ -775,7 +775,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 						healthOverride = TIDAL_HEALTH
 					else
 						local minWindIncome = (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
-						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult1, 1)
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult, 1)
 						income = mult * (minWindIncome + windMax)/2
 					end
 				end
@@ -1454,7 +1454,8 @@ local function GetSelectionStatsDisplay(parentControl)
 					end
 					
 					if ud.buildSpeed ~= 0 then
-						total_usedbp = total_usedbp + (GetCurrentBuildSpeed(unitID, GetUnitBuildSpeed(unitID, unitDefID)) or 0)
+						local _, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+						total_usedbp = total_usedbp + (GetCurrentBuildSpeed(unitID, unhandicappedSpeed) or 0)
 					end
 				end
 			end
@@ -1864,8 +1865,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			if ud and ud.buildSpeed > 0 then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(unitID)
 				
-				local buildSpeed = GetUnitBuildSpeed(unitID, unitDefID)
-				local currentBuild = GetCurrentBuildSpeed(unitID, buildSpeed)
+				local buildSpeed, unhandicappedSpeed = GetUnitBuildSpeed(unitID, unitDefID)
+				local currentBuild = GetCurrentBuildSpeed(unitID, unhandicappedSpeed)
 				buildBarUpdate(true, (healthPos or (PIC_HEIGHT + 4)) + BAR_SPACING, currentBuild or 0, buildSpeed)
 			else
 				buildBarUpdate(false)

@@ -68,11 +68,11 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 		if econMultEnabled then
 			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. spGetUnitAllyTeam(unitID)) or 1)
 		end
-		mult = mult * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		buildPower = buildPower * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 	elseif econMultEnabled and Spring.GetMyAllyTeamID then
 		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetMyAllyTeamID()) or 1)
 	end
-	return mult * buildPower
+	return mult * buildPower, buildPower
 end
 
 local spGetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
