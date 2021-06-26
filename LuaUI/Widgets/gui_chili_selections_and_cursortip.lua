@@ -203,6 +203,7 @@ local windMax
 local windGroundMin
 local windGroundSlope
 local windMinBound
+local econMultEnabled
 
 local GAIA_TEAM = Spring.GetGaiaTeamID()
 
@@ -740,12 +741,16 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	if not econDef then
 		return
 	end
+	local mult = 1
+	if econMultEnabled then
+		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetMyAllyTeamID()) or 1)
+	end
 	
 	if econDef.mex then
 		if mousePlaceX and WG.mouseoverMexIncome then
-			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. string.format("%.2f", WG.mouseoverMexIncome)
+			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(WG.mouseoverMexIncome * mult, 2)
 			if WG.mouseoverMexIncome > 0 then
-				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost/WG.mouseoverMexIncome)
+				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost / (WG.mouseoverMexIncome * mult))
 			else
 				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
 			end
@@ -753,27 +758,31 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		return
 	end
 	
-	local income = econDef.income
+	local income = econDef.income * mult
 	local cost = econDef.cost
 	local extraText = ""
 	local healthOverride = false
-	if econDef.isWind and mousePlaceX and mousePlaceY then
-		local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
-		if pos and pos[1] and pos[3] then
-			local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
-			local y = Spring.GetGroundHeight(x,z)
+	if econDef.isWind then
+		if mousePlaceX and mousePlaceY then
+			local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
+			if pos and pos[1] and pos[3] then
+				local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
+				local y = Spring.GetGroundHeight(x,z)
 
-			if y then
-				if y <= tidalHeight then
-					extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. string.format("%.1f", income)
-					healthOverride = TIDAL_HEALTH
-				else
-					local minWindIncome = windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin)))
-					extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax)
-					income = (minWindIncome+windMax)/2
+				if y then
+					if y <= tidalHeight then
+						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. math.round(income, 1)
+						healthOverride = TIDAL_HEALTH
+					else
+						local minWindIncome = (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult1, 1)
+						income = mult * (minWindIncome + windMax)/2
+					end
 				end
 			end
 		end
+	else
+		extraText = extraText .. " (+" .. math.round(income, ((mult == 1) and 0) or 1) .. ")"
 	end
 	
 	local teamID = Spring.GetLocalTeamID()
@@ -809,9 +818,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		-- Worst case payback assumes that all your OD metal is from
 		-- a single mex and you are going to link your new energy to it.
 		-- It seems to be equal to Uniform case payback and quite accurate.
-		local singleMexMult = math.sqrt(energyOD)/4
-		local mexIncome = metalOD/singleMexMult
-		local worstCasePayback = cost/(mexIncome*math.sqrt(energyOD+income)/4 - metalOD)
+		local singleMexMult = math.sqrt(energyOD) / 4
+		local mexIncome = metalOD / singleMexMult
+		local worstCasePayback = cost / (mexIncome*math.sqrt(energyOD + income)/4 - metalOD)
 		
 		--extraText = extraText
 		--.. "\n overdriveMult: " .. overdriveMult
@@ -2523,6 +2532,7 @@ local function InitializeWindParameters()
 	windGroundSlope = spGetGameRulesParam("WindSlope")
 	windMinBound = spGetGameRulesParam("WindMinBound")
 	tidalHeight = Spring.GetGameRulesParam("tidalHeight")
+	econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 end
 
 local updateTimer = 0

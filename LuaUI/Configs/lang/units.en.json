@@ -41,7 +41,7 @@
 	},
 	"energyfusion" : {
 		"name" : "Fusion Reactor",
-		"description" : "Medium Powerplant (+35)",
+		"description" : "Medium Powerplant",
 		"helptext" : "Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units."
 	},
 	"chickenlandqueen" : {
@@ -271,7 +271,7 @@
 	},
 	"energysingu" : {
 		"name" : "Singularity Reactor",
-		"description" : "Large Powerplant (+225) - HAZARDOUS",
+		"description" : "Large Powerplant HAZARDOUS",
 		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
 	"bomberdisarm" : {
@@ -301,7 +301,7 @@
 	},
 	"energyheavygeo" : {
 		"name" : "Advanced Geothermal",
-		"description" : "Large Powerplant (+100) - HAZARDOUS",
+		"description" : "Large Powerplant HAZARDOUS",
 		"helptext" : "The Advanced Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
 	"staticcon" : {
@@ -371,7 +371,7 @@
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
-		"description" : "Small Powerplant (+2)",
+		"description" : "Small Powerplant",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
@@ -661,7 +661,7 @@
 	},
 	"energygeo" : {
 		"name" : "Geothermal Generator",
-		"description" : "Medium Powerplant (+25)",
+		"description" : "Medium Powerplant",
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
 	},
 	"jumpcon" : {
