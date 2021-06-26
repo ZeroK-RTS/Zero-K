@@ -161,7 +161,7 @@ local function FakeWeaponShoot(targetID)
 	if reloaded then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		local h = Spring.GetGroundHeight(x, z)
-		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 400, 30) then
+		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 520, 30) then
 			local gameFrame = spGetGameFrame()
 			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
