@@ -782,7 +782,7 @@ local function CreateMainWindow()
 	}
 end
 
-local function ShowModuleListWindow(slotDefaults, level, chassis, alreadyOwnedModules)
+local function ShowModuleListWindow(unitID, slotDefaults, level, chassis, alreadyOwnedModules)
 	if not currentModuleList then
 		CreateMainWindow()
 	end
@@ -796,6 +796,9 @@ local function ShowModuleListWindow(slotDefaults, level, chassis, alreadyOwnedMo
 		morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
 	end
 	
+	if Spring.ValidUnitID(unitID) then
+		morphBuildPower = morphBuildPower * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetUnitAllyTeam(unitID)) or 1)
+	end
 	local slots = chassisDefs[chassis].levelDefs[level].upgradeSlots
 
 	if not mainWindowShown then
@@ -959,7 +962,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 	end
 	
 	-- Create the window
-	ShowModuleListWindow(slotDefaults, level + 1, chassis, alreadyOwned)
+	ShowModuleListWindow(unitID, slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
 local function GetCommanderUpgradeAttributes(unitID, cullMorphing)
