@@ -22,14 +22,12 @@ end
 local spGetUnitRadius = Spring.GetUnitRadius
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spEcho = Spring.Echo
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetGroundNormal = Spring.GetGroundNormal
 local spSetUnitPosition = Spring.SetUnitPosition
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitHeight = Spring.GetUnitHeight
 local gameSquareSize = Game.squareSize
 
@@ -225,9 +223,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
         if Spring.GetUnitCurrentCommand(builderID) == CMD_RESURRECT and uDef.isImmobile and
         uDef.name ~= "terraunit" then
             local ux1, uy1, uz1 = spGetUnitPosition(unitID)
-            --local dimensions = spGetUnitDefDimensions(unitDefID)
-            --Debug("Created unit height = " .. dimensions.height)
-            --Debug("Created unit radius = " .. dimensions.radius)
             --Debug("Created unit xsize = " .. uDef.xsize)
             --Debug("Created unit zsize = " .. uDef.zsize)
             local footprintXElmos = uDef.xsize * gameSquareSize

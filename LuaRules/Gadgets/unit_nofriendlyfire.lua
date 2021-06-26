@@ -57,8 +57,6 @@ end
 
 local spAreTeamsAllied      = Spring.AreTeamsAllied
 local spGetProjectileTeamID = Spring.GetProjectileTeamID
-local spGetUnitHealth       = Spring.GetUnitHealth
-local spSetUnitHealth       = Spring.SetUnitHealth
 
 local DefensiveManeuverDefs = {
 	[UnitDefNames["energysolar"].id] = true

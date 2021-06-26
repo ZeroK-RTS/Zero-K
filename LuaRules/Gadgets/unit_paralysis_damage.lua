@@ -20,9 +20,6 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 
 local spGetUnitHealth    = Spring.GetUnitHealth
-local spSetUnitHealth    = Spring.SetUnitHealth
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitArmored   = Spring.GetUnitArmored
 local spAddUnitDamage    = Spring.AddUnitDamage
 

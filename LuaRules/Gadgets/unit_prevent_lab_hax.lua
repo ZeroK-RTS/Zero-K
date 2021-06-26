@@ -19,19 +19,15 @@ function gadget:GetInfo()
 end
 
 -- Speedups
-local spGetGroundHeight        = Spring.GetGroundHeight
 local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
 local spGetUnitAllyTeam        = Spring.GetUnitAllyTeam
 local spGetUnitsInRectangle    = Spring.GetUnitsInRectangle
 local spSetUnitPosition        = Spring.SetUnitPosition
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
-local spGetUnitDirection       = Spring.GetUnitDirection
 local spGetUnitVelocity        = Spring.GetUnitVelocity
 local spSetUnitVelocity        = Spring.SetUnitVelocity
-local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spGetUnitTeam            = Spring.GetUnitTeam
-local spGetUnitIsStunned       = Spring.GetUnitIsStunned
 local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
 local spGetFeaturePosition     = Spring.GetFeaturePosition
 local spSetFeaturePosition     = Spring.SetFeaturePosition
