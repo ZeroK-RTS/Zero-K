@@ -46,9 +46,11 @@ do
 		local players = Spring.GetPlayerList()
 		local allyTeamEloSum = {}
 		local allyTeamPlayers = {}
+		Spring.Echo("Setting up autohandicap")
 		for i = 1, #players do
 			local playerID = players[i]
-			local _, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
+			local name, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
+			Spring.Echo(name, "spectator", spectator, "allyTeamID", allyTeamID, "customKeys.elo", customKeys, customKeys and customKeys.elo)
 			if (not spectator) and customKeys and customKeys.elo then
 				allyTeamEloSum[allyTeamID] = allyTeamID or {}
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers or {}
@@ -56,29 +58,35 @@ do
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] + 1
 			end
 		end
-		allyTeamPlayers[0] = 1
-		allyTeamPlayers[1] = 1
-		allyTeamEloSum[0] = 1200
-		allyTeamEloSum[1] = 1500
+		Spring.Echo("Team 0", allyTeamPlayers[0], allyTeamEloSum[0])
+		Spring.Echo("Team 1", allyTeamPlayers[1], allyTeamEloSum[1])
 		
 		if (allyTeamPlayers[0] or 0) > 0 and (allyTeamPlayers[1] or 0) > 0 then
 			local firstAllyTeamMean = allyTeamEloSum[0] / allyTeamPlayers[0]
 			local secondAllyTeamMean = allyTeamEloSum[1] / allyTeamPlayers[1]
+			Spring.Echo("firstAllyTeamMean", firstAllyTeamMean)
+			Spring.Echo("secondAllyTeamMean", secondAllyTeamMean)
+			
 			local lowerWinChance = GetLowerWinChance(firstAllyTeamMean, secondAllyTeamMean)
+			Spring.Echo("lowerWinChance", lowerWinChance)
+			
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
-			if lowerWinChance < 0.16 then
+			if lowerWinChance > 0.18 then
+				autoHandicapValue = 1.05
+			elseif lowerWinChance > 0.12 then
 				autoHandicapValue = 1.1
-			elseif lowerWinChance < 0.11 then
+			elseif lowerWinChance > 0.08 then
 				autoHandicapValue = 1.15
-			elseif lowerWinChance < 0.07 then
+			elseif lowerWinChance > 0.04 then
 				autoHandicapValue = 1.2
-			elseif lowerWinChance < 0.04 then
+			else
 				autoHandicapValue = 1.3
 			end
 			if autoHandicapValue then
 				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
 				gadgetInUse = true
 			end
+			Spring.Echo("autoHandicapValue", autoHandicapValue)
 		end
 	end
 end
