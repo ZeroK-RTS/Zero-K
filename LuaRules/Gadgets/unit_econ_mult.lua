@@ -28,11 +28,51 @@ local gadgetInUse = false
 
 do
 	local allyTeamList = Spring.GetAllyTeamList()
+	local modoptions = Spring.GetModOptions()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
-		GG.allyTeamIncomeMult[allyTeamID] = Spring.GetModOptions()["team_" .. (allyTeamID + 1) .. "_econ"] or 1
+		GG.allyTeamIncomeMult[allyTeamID] = math.max(0.01, math.min(100, modoptions["team_" .. (allyTeamID + 1) .. "_econ"] or 1))
 		if GG.allyTeamIncomeMult[allyTeamID]~= 1 then
 			gadgetInUse = true
+		end
+	end
+	
+	if (tonumber(modoptions.autohandicap) == 1) then
+		local function GetLowerWinChance(first, second)
+			return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
+		end
+		
+		local players = Spring.GetPlayerList()
+		local allyTeamEloSum = {}
+		local allyTeamPlayers = {}
+		for i = 1, #players do
+			local playerID = players[i]
+			local _, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
+			if (not spectator) and customKeys and customKeys.elo then
+				allyTeamEloSum[allyTeamID] = allyTeamID or {}
+				allyTeamPlayers[allyTeamID] = allyTeamPlayers or {}
+				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] + customKeys.elo
+				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] + 1
+			end
+		end
+		if (allyTeamPlayers[0] or 0) > 0 and (allyTeamPlayers[1] or 0) > 0 then
+			local firstAllyTeamMean = allyTeamEloSum[0] / allyTeamPlayers[0]
+			local secondAllyTeamMean = allyTeamEloSum[1] / allyTeamPlayers[1]
+			local lowerWinChance = GetLowerWinChance(firstAllyTeamMean, secondAllyTeamMean)
+			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
+			if lowerWinChance < 0.15 then
+				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.1
+				gadgetInUse = true
+			elseif lowerWinChance < 0.10 then
+				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.15
+				gadgetInUse = true
+			elseif lowerWinChance < 0.07 then
+				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.2
+				gadgetInUse = true
+			elseif lowerWinChance < 0.04 then
+				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.25
+				gadgetInUse = true
+			end
 		end
 	end
 end

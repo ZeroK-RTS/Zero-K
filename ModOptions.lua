@@ -616,6 +616,14 @@ local options = {
 		step    = 0.05,
 	},
 	{
+		key     = 'autohandicap',
+		name    = 'Automatic Handicap',
+		desc    = 'Add automatically calculated economy multipliers for team 1 or 2 depending on rating.',
+		type    = 'bool',
+		section = 'multipliers',
+		def     = false,
+	},
+	{
 		key     = 'disablemapdamage',
 		name    = 'Disable map deformation',
 		desc    = 'Prevents the map shape from being changed by weapons and terraforming',

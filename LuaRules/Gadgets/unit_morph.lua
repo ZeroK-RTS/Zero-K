@@ -230,7 +230,9 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (Spring.GetUnitRulesParam(unitID,"totalEconomyChange") or 1)
+	-- Do not read full attributes-derived BP multiplier here because morph disables units, so
+	-- BP mult will be zero.
+	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1) * (GG.unit_handicap and GG.unit_handicap[unitID] or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
