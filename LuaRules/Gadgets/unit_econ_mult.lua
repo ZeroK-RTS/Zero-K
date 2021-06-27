@@ -43,16 +43,16 @@ do
 			return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
 		end
 		
+		Spring.Echo("Setting up autohandicap")
 		local players = Spring.GetPlayerList()
 		local allyTeamEloSum = {}
 		local allyTeamPlayers = {}
-		Spring.Echo("Setting up autohandicap")
 		
 		for i = 1, #players do
 			local playerID = players[i]
 			local name, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
 			Spring.Echo(name, "spectator", spectator, "allyTeamID", allyTeamID, "customKeys.elo", customKeys, customKeys and customKeys.elo)
-			if (not spectator) and customKeys and customKeys.elo then
+			if allyTeamID and (not spectator) and customKeys and customKeys.elo then
 				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] or {}
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] or {}
 				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] + customKeys.elo
