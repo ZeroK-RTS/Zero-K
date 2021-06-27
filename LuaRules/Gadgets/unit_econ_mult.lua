@@ -53,8 +53,8 @@ do
 			local name, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
 			Spring.Echo(name, "spectator", spectator, "allyTeamID", allyTeamID, "customKeys.elo", customKeys, customKeys and customKeys.elo)
 			if allyTeamID and (not spectator) and customKeys and customKeys.elo then
-				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] or {}
-				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] or {}
+				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] or 0
+				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] or 0
 				allyTeamEloSum[allyTeamID] = allyTeamEloSum[allyTeamID] + customKeys.elo
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] + 1
 			end
