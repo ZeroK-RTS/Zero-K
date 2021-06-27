@@ -116,6 +116,17 @@ local function RestoreAfterDelay()
 	Turn(sleeve, x_axis, 0, SLEEVE_TURN_SPEED)
 end
 
+local spGetUnitSeparation = Spring.GetUnitSeparation
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		-- TTL at max range determined to be 40f empirically
+		-- at projectile speed 225 elmo/s and 320 range
+		local framesETA = 40 * (spGetUnitSeparation(unitID, targetID) or 0) / 320
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 210.1, framesETA, false, false, true)
+	end
+	return false
+end
+
 function script.AimFromWeapon(num)
 	return turret
 end

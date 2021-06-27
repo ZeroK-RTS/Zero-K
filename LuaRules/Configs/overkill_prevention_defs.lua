@@ -51,10 +51,9 @@ local handledUnitDefIDs = {
 	[UnitDefNames["shiparty"].id] = 1,
 	[UnitDefNames["spiderskirm"].id] = 1,
 	[UnitDefNames["tankassault"].id] = 1,
-
-	-- Needs LUS
-	--[UnitDefNames["vehassault"].id] = 1,
-	--[UnitDefNames["tankheavyassault"].id] = 1,
+	[UnitDefNames["vehassault"].id] = 1,
+	[UnitDefNames["tankheavyassault"].id] = 1,
+	[UnitDefNames["spidercrabe"].id] = 1,
 }
 
 local blackHoleUnitDefs = {

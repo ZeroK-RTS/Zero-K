@@ -285,7 +285,21 @@ local function RockSelf(anglex, anglez)
 	Turn(base, z_axis, 0, math.rad(20))
 	Turn(base, x_axis, 0, math.rad(20))
 end
-	
+
+local spGetUnitSeparation = Spring.GetUnitSeparation
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		-- TTL at max range determined to be 60f empirically
+		-- at projectile speed 290 elmo/s and 600 range, but
+		-- add a few extra frames because that was on flat
+		-- terrain and spiders like uneven terrain where the
+		-- TTL can be a bit larger due to vertical difference
+		local framesETA = 65 * (spGetUnitSeparation(unitID, targetID) or 0) / 600
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, framesETA, false, false, true)
+	end
+	return false
+end
+
 function script.RockUnit(anglex, anglez)
 	StartThread(RockSelf, math.rad(anglex), math.rad(anglez))
 end
