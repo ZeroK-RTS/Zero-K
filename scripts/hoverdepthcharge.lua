@@ -161,7 +161,9 @@ local function FakeWeaponShoot(targetID)
 	if reloaded then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		local h = Spring.GetGroundHeight(x, z)
-		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 520, 30) then
+		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
+		-- target at the same time. They are a bit too random for anything more precise.
+		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 440, 22) then
 			local gameFrame = spGetGameFrame()
 			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
@@ -176,7 +178,7 @@ function script.BlockShot(num, targetID)
 	if num == 1 then
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
-		return GG.Script.OverkillPreventionCheck(unitID, targetID, 320.1, 300, 45, 0.1, false, 30)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, 440, 300, 45, 0.1, false, 30)
 	end
 	if num == 2 then
 		if targetID then
