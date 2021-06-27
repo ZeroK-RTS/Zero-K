@@ -797,7 +797,7 @@ local function ShowModuleListWindow(unitID, slotDefaults, level, chassis, alread
 	end
 	
 	if Spring.ValidUnitID(unitID) then
-		morphBuildPower = morphBuildPower * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetUnitAllyTeam(unitID)) or 1)
+		morphBuildPower = morphBuildPower * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetUnitAllyTeam(unitID) or "")) or 1)
 	end
 	local slots = chassisDefs[chassis].levelDefs[level].upgradeSlots
 

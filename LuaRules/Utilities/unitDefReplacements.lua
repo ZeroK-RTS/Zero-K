@@ -66,11 +66,11 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 	local mult = 1
 	if unitID then
 		if econMultEnabled then
-			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. spGetUnitAllyTeam(unitID)) or 1)
+			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
 		end
 		buildPower = buildPower * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 	elseif econMultEnabled and Spring.GetMyAllyTeamID then
-		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetMyAllyTeamID()) or 1)
+		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
 	end
 	return mult * buildPower, buildPower
 end
@@ -92,7 +92,7 @@ local function GetGridTooltip(unitID)
 		end
 		local maxWind = (Spring.GetGameRulesParam("WindMax") or 2.5)
 		if econMultEnabled then
-			local mult = (Spring.GetGameRulesParam("econ_mult_" .. spGetUnitAllyTeam(unitID)) or 1)
+			local mult = (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
 			minWind = minWind * mult
 			maxWind = maxWind * mult
 		end

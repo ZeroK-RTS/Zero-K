@@ -743,7 +743,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	end
 	local mult = 1
 	if econMultEnabled then
-		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. Spring.GetMyAllyTeamID()) or 1)
+		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
 	end
 	
 	if econDef.mex then
