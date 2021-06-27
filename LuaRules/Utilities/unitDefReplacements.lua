@@ -227,9 +227,6 @@ function Spring.Utilities.GetDescription(ud, unitID)
 	
 	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
 	if buildSpeed > 0 then
-		if isValidUnit and not ud.customParams.nobuildpower then
-			buildSpeed = buildSpeed * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-		end
 		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc
