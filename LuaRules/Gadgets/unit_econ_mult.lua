@@ -47,6 +47,7 @@ do
 		local allyTeamEloSum = {}
 		local allyTeamPlayers = {}
 		Spring.Echo("Setting up autohandicap")
+		
 		for i = 1, #players do
 			local playerID = players[i]
 			local name, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
