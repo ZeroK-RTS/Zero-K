@@ -72,15 +72,15 @@ do
 			
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
 			if lowerWinChance > 0.20 then
-				autoHandicapValue = 1.05
-			elseif lowerWinChance > 0.15 then
 				autoHandicapValue = 1.1
-			elseif lowerWinChance > 0.1 then
+			elseif lowerWinChance > 0.15 then
 				autoHandicapValue = 1.15
-			elseif lowerWinChance > 0.05 then
+			elseif lowerWinChance > 0.1 then
 				autoHandicapValue = 1.2
-			else
+			elseif lowerWinChance > 0.05 then
 				autoHandicapValue = 1.25
+			else
+				autoHandicapValue = 1.3
 			end
 			if autoHandicapValue then
 				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
