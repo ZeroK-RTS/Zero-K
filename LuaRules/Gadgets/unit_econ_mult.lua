@@ -47,7 +47,6 @@ do
 		local players = Spring.GetPlayerList()
 		local allyTeamEloSum = {}
 		local allyTeamPlayers = {}
-		
 		for i = 1, #players do
 			local playerID = players[i]
 			local name, _, spectator, _, allyTeamID, _, _, _, _, customKeys = Spring.GetPlayerInfo(playerID)
