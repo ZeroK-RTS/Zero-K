@@ -25,6 +25,7 @@ GG.allyTeamIncomeMult = {}
 
 local teamMults = {}
 local gadgetInUse = false
+local autoHandicapValue = false
 
 do
 	local allyTeamList = Spring.GetAllyTeamList()
@@ -55,22 +56,27 @@ do
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] + 1
 			end
 		end
+		allyTeamPlayers[0] = 1
+		allyTeamPlayers[1] = 1
+		allyTeamEloSum[0] = 1200
+		allyTeamEloSum[1] = 1500
+		
 		if (allyTeamPlayers[0] or 0) > 0 and (allyTeamPlayers[1] or 0) > 0 then
 			local firstAllyTeamMean = allyTeamEloSum[0] / allyTeamPlayers[0]
 			local secondAllyTeamMean = allyTeamEloSum[1] / allyTeamPlayers[1]
 			local lowerWinChance = GetLowerWinChance(firstAllyTeamMean, secondAllyTeamMean)
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
-			if lowerWinChance < 0.15 then
-				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.1
-				gadgetInUse = true
-			elseif lowerWinChance < 0.10 then
-				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.15
-				gadgetInUse = true
+			if lowerWinChance < 0.16 then
+				autoHandicapValue = 1.1
+			elseif lowerWinChance < 0.11 then
+				autoHandicapValue = 1.15
 			elseif lowerWinChance < 0.07 then
-				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.2
-				gadgetInUse = true
+				autoHandicapValue = 1.2
 			elseif lowerWinChance < 0.04 then
-				GG.allyTeamIncomeMult[handicapAllyTeamID] = 1.25
+				autoHandicapValue = 1.3
+			end
+			if autoHandicapValue then
+				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
 				gadgetInUse = true
 			end
 		end
@@ -111,6 +117,9 @@ function gadget:Initialize()
 		Spring.SetGameRulesParam("econ_mult_" .. allyTeamID, GG.allyTeamIncomeMult[allyTeamID])
 	end
 	Spring.SetGameRulesParam("econ_mult_enabled", 1)
+	if autoHandicapValue then
+		Spring.SetGameRulesParam("econ_mult_auto_value", autoHandicapValue)
+	end
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
