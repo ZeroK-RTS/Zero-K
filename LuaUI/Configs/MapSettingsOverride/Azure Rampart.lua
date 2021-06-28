@@ -8,6 +8,7 @@ return {
 		["specularExponent"]= -1.9299999,
 		["unitDiffuseColor"]= {0.8142857, 0.80952382, 0.83333331, 1},
 		["unitSpecularColor"]= {0.58095241, 0.58095241, 0.69047618, 1},
+		["groundShadowDensity"] = 0.5,
 	},
 	["direction"]= {
 		["sunDir"]= 1.29999995,
