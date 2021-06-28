@@ -255,7 +255,7 @@ local function GetFacingDirection(x, z, teamID)
 			or ((z>Game.mapSizeZ/2) and "north" or "south")
 end
 
-local function GetRecommendedStartPosition(teamID, n) -- N is the number of times an ally team has called this
+local function GetRecommendedStartPosition(teamID, n) -- allyteams can have multiple start positions, go and get the nth one.
 	local x = Game.mapSizeX / 2
 	local z = Game.mapSizeZ / 2
 
@@ -264,7 +264,7 @@ local function GetRecommendedStartPosition(teamID, n) -- N is the number of time
 		local startposList = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
 		if startposList then
 			local maxpoints = #startposList
-			local startpos = startposList[(n%maxpoints) + 1] -- this cycles the AFKers and unplaced bots to different positions
+			local startpos = startposList[(n%maxpoints) + 1] -- recycle if you run out of points.
 			x = startpos[1]
 			z = startpos[2]
 		end
