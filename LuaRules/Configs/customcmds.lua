@@ -124,4 +124,18 @@ SCRAMBLE =      	35128
 WRECK =         	36734
 RESTOREBOMB = 		39735
 ]]--
+
+if VFS.FileExists("LuaRules/Configs/customcmds_mod.lua", VFS.MOD) then
+	local inject = VFS.Include("LuaRules/Configs/customcmds_mod.lua", nil, VFS.MOD)
+	for id, num in pairs(inject) do
+		cmds[id] = num
+	end
+end
+if VFS.FileExists("LuaRules/Configs/customcmds_map.lua", VFS.MAP) then
+	local inject = VFS.Include("LuaRules/Configs/customcmds_map.lua", nil, VFS.MAP)
+	for id, num in pairs(inject) do
+		cmds[id] = num
+	end
+end
+
 return cmds
