@@ -1187,7 +1187,7 @@
 	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Anti-Heavy EMP Drone",
-		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with locust or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to Pickets."
+		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with Locust or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to Pickets."
 	},
 	"bomberriot" : {
 		"name" : "Phoenix",
