@@ -42,6 +42,19 @@ do
 		local function GetLowerWinChance(first, second)
 			return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
 		end
+		local function GetWinChanceThresholdMod(first, second)
+			local lowerElo = math.min(first, second)
+			if lowerElo < 1500 then
+				return 1, 0
+			elseif lowerElo < 2000 then
+				local prog = (lowerElo - 1500) / 500
+				return 0.6 + 0.4 * (1 - prog), 0
+			end
+			if lowerElo < 2500 then
+				local prog = (lowerElo - 2000) / 500
+				return 0.6, -0.03 * prog
+			end
+		end
 		
 		Spring.Echo("Setting up autohandicap")
 		local players = Spring.GetPlayerList()
@@ -71,22 +84,23 @@ do
 			Spring.Echo("lowerWinChance", lowerWinChance)
 			
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
-			if lowerWinChance > 0.20 then
+			local thresholdMult, thresholdOffset = GetWinChanceThresholdMod(firstAllyTeamMean, secondAllyTeamMean)
+			
+			if lowerWinChance > (0.15 + thresholdOffset) * winChanceThresholdMod then
 				autoHandicapValue = 1.1
-			elseif lowerWinChance > 0.15 then
+			elseif lowerWinChance > (0.1 + thresholdOffset) * winChanceThresholdMod then
 				autoHandicapValue = 1.15
-			elseif lowerWinChance > 0.1 then
+			elseif lowerWinChance > (0.05 + thresholdOffset) * winChanceThresholdMod then
 				autoHandicapValue = 1.2
-			elseif lowerWinChance > 0.05 then
-				autoHandicapValue = 1.25
 			else
-				autoHandicapValue = 1.3
+				autoHandicapValue = 1.25
 			end
 			if autoHandicapValue then
 				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
 				gadgetInUse = true
 			end
 			Spring.Echo("autoHandicapValue", autoHandicapValue)
+			Spring.SendCommands("wbynum 255 SPRINGIE:autoHandicapValue," .. autoHandicapValue)
 		end
 	end
 end
