@@ -45,6 +45,7 @@ local function GetWinChanceThresholdMod(first, second)
 		local prog = (lowerElo - 2000) / 500
 		return 0.6, -0.03 * prog
 	end
+	return 0.6, -0.03
 end
 
 local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
@@ -52,15 +53,14 @@ local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
 	Spring.Echo("lowerWinChance", lowerWinChance)
 	local thresholdMult, thresholdOffset = GetWinChanceThresholdMod(firstAllyTeamMean, secondAllyTeamMean)
 	
-	if lowerWinChance > (0.15 + thresholdOffset) * winChanceThresholdMod then
-		autoHandicapValue = 1.1
-	elseif lowerWinChance > (0.1 + thresholdOffset) * winChanceThresholdMod then
-		autoHandicapValue = 1.15
-	elseif lowerWinChance > (0.05 + thresholdOffset) * winChanceThresholdMod then
-		autoHandicapValue = 1.2
-	else
-		autoHandicapValue = 1.25
+	if lowerWinChance > (0.15 + thresholdOffset) * thresholdMult then
+		return 1.1
+	elseif lowerWinChance > (0.1 + thresholdOffset) * thresholdMult then
+		return 1.15
+	elseif lowerWinChance > (0.05 + thresholdOffset) * thresholdMult then
+		return 1.2
 	end
+	return 1.25
 end
 
 do
@@ -136,6 +136,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:Initialize()
+	if RUN_TEST then
+		for i = 1100, 2900, 300 do
+			for j = i + 250, i + 500, 50 do
+				Spring.Echo("P1:", i, "P2:", j, "handicap:", GetAutoHandicapValue(i, j))
+			end
+		end
+	end
+
 	if not gadgetInUse then
 		GG.allyTeamIncomeMult = nil
 		gadgetHandler:RemoveGadget()
@@ -155,13 +163,5 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
-	end
-	
-	if RUN_TEST then
-		for i = 1100, 2900, 300 do
-			for j = i + 250, i + 500, 50 do
-				Spring.Echo("P1:", i, "P2:", j, "handicap:", GetAutoHandicapValue(i, j))
-			end
-		end
 	end
 end
