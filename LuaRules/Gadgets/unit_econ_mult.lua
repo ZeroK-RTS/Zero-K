@@ -27,7 +27,7 @@ local teamMults = {}
 local gadgetInUse = false
 local autoHandicapValue = false
 
-local RUN_TEST = true
+local RUN_TEST = false
 
 local function GetLowerWinChance(first, second)
 	return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
@@ -43,9 +43,9 @@ local function GetWinChanceThresholdMod(first, second)
 	end
 	if lowerElo < 2500 then
 		local prog = (lowerElo - 2000) / 500
-		return 0.6, -0.03 * prog
+		return 0.6, -0.025 * prog
 	end
-	return 0.6, -0.03
+	return 0.6, -0.025
 end
 
 local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
