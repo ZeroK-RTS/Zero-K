@@ -83,6 +83,7 @@ function widget:Initialize()
 	end
 
 	local autoHandicapValue = Spring.GetGameRulesParam("econ_mult_auto_value")
+	--Spring.Echo("Widget_autoHandicapValue", autoHandicapValue)
 	if autoHandicapValue then
 		local index = #customizedModOptions
 		customizedModOptions[index+1] = "Handicap Value: " .. math.round(autoHandicapValue * 100) .. "%"

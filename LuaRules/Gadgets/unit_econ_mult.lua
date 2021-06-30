@@ -91,6 +91,10 @@ do
 				allyTeamPlayers[allyTeamID] = allyTeamPlayers[allyTeamID] + 1
 			end
 		end
+		--allyTeamPlayers[0] = 1
+		--allyTeamPlayers[1] = 1
+		--allyTeamEloSum[0] = 2500
+		--allyTeamEloSum[1] = 2000
 		Spring.Echo("Team 0", allyTeamPlayers[0], allyTeamEloSum[0])
 		Spring.Echo("Team 1", allyTeamPlayers[1], allyTeamEloSum[1])
 		
@@ -101,7 +105,7 @@ do
 			Spring.Echo("secondAllyTeamMean", secondAllyTeamMean)
 			
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
-			local autoHandicapValue = GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
+			autoHandicapValue = GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
 			
 			if autoHandicapValue then
 				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
