@@ -133,7 +133,8 @@ end
 
 function script.BlockShot(num, targetID)
 	-- partial OKP damage because long beam means the unit can dodge and just get grazed
-	return targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 30))
+	-- Underestimate beam time so that fully-hit targets always have more pending damage in reality than in theory.
+	return targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 20))
 end
 
 --[[
