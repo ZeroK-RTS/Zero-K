@@ -27,6 +27,42 @@ local teamMults = {}
 local gadgetInUse = false
 local autoHandicapValue = false
 
+local RUN_TEST = true
+
+local function GetLowerWinChance(first, second)
+	return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
+end
+
+local function GetWinChanceThresholdMod(first, second)
+	local lowerElo = math.min(first, second)
+	if lowerElo < 1500 then
+		return 1, 0
+	elseif lowerElo < 2000 then
+		local prog = (lowerElo - 1500) / 500
+		return 0.6 + 0.4 * (1 - prog), 0
+	end
+	if lowerElo < 2500 then
+		local prog = (lowerElo - 2000) / 500
+		return 0.6, -0.03 * prog
+	end
+end
+
+local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
+	local lowerWinChance = GetLowerWinChance(firstAllyTeamMean, secondAllyTeamMean)
+	Spring.Echo("lowerWinChance", lowerWinChance)
+	local thresholdMult, thresholdOffset = GetWinChanceThresholdMod(firstAllyTeamMean, secondAllyTeamMean)
+	
+	if lowerWinChance > (0.15 + thresholdOffset) * winChanceThresholdMod then
+		autoHandicapValue = 1.1
+	elseif lowerWinChance > (0.1 + thresholdOffset) * winChanceThresholdMod then
+		autoHandicapValue = 1.15
+	elseif lowerWinChance > (0.05 + thresholdOffset) * winChanceThresholdMod then
+		autoHandicapValue = 1.2
+	else
+		autoHandicapValue = 1.25
+	end
+end
+
 do
 	local allyTeamList = Spring.GetAllyTeamList()
 	local modoptions = Spring.GetModOptions()
@@ -39,24 +75,8 @@ do
 	end
 	
 	if (tonumber(modoptions.autohandicap) == 1) then
-		local function GetLowerWinChance(first, second)
-			return 1 / (1 + math.pow(10, math.abs(first - second) / 400))
-		end
-		local function GetWinChanceThresholdMod(first, second)
-			local lowerElo = math.min(first, second)
-			if lowerElo < 1500 then
-				return 1, 0
-			elseif lowerElo < 2000 then
-				local prog = (lowerElo - 1500) / 500
-				return 0.6 + 0.4 * (1 - prog), 0
-			end
-			if lowerElo < 2500 then
-				local prog = (lowerElo - 2000) / 500
-				return 0.6, -0.03 * prog
-			end
-		end
-		
 		Spring.Echo("Setting up autohandicap")
+		
 		local players = Spring.GetPlayerList()
 		local allyTeamEloSum = {}
 		local allyTeamPlayers = {}
@@ -80,21 +100,9 @@ do
 			Spring.Echo("firstAllyTeamMean", firstAllyTeamMean)
 			Spring.Echo("secondAllyTeamMean", secondAllyTeamMean)
 			
-			local lowerWinChance = GetLowerWinChance(firstAllyTeamMean, secondAllyTeamMean)
-			Spring.Echo("lowerWinChance", lowerWinChance)
-			
 			local handicapAllyTeamID = ((firstAllyTeamMean < secondAllyTeamMean) and 0) or 1
-			local thresholdMult, thresholdOffset = GetWinChanceThresholdMod(firstAllyTeamMean, secondAllyTeamMean)
+			local autoHandicapValue = GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
 			
-			if lowerWinChance > (0.15 + thresholdOffset) * winChanceThresholdMod then
-				autoHandicapValue = 1.1
-			elseif lowerWinChance > (0.1 + thresholdOffset) * winChanceThresholdMod then
-				autoHandicapValue = 1.15
-			elseif lowerWinChance > (0.05 + thresholdOffset) * winChanceThresholdMod then
-				autoHandicapValue = 1.2
-			else
-				autoHandicapValue = 1.25
-			end
 			if autoHandicapValue then
 				GG.allyTeamIncomeMult[handicapAllyTeamID] = autoHandicapValue
 				gadgetInUse = true
@@ -147,5 +155,13 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+	
+	if RUN_TEST then
+		for i = 1100, 2900, 300 do
+			for j = i + 250, i + 500, 50 do
+				Spring.Echo("P1:", i, "P2:", j, "handicap:", GetAutoHandicapValue(i, j))
+			end
+		end
 	end
 end
