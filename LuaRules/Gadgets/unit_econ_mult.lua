@@ -39,13 +39,13 @@ local function GetWinChanceThresholdMod(first, second)
 		return 1, 0
 	elseif lowerElo < 2000 then
 		local prog = (lowerElo - 1500) / 500
-		return 0.6 + 0.4 * (1 - prog), 0
+		return 0.66 + 0.34 * (1 - prog), 0
 	end
 	if lowerElo < 2500 then
 		local prog = (lowerElo - 2000) / 500
-		return 0.6, -0.025 * prog
+		return 0.66, -0.03 * prog
 	end
-	return 0.6, -0.025
+	return 0.66, -0.03
 end
 
 local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
@@ -141,7 +141,7 @@ end
 
 function gadget:Initialize()
 	if RUN_TEST then
-		for i = 1100, 2900, 300 do
+		for i = 1000, 2500, 250 do
 			for j = i + 250, i + 500, 50 do
 				Spring.Echo("P1:", i, "P2:", j, "handicap:", GetAutoHandicapValue(i, j))
 			end
