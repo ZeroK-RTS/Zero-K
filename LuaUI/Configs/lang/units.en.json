@@ -1102,7 +1102,7 @@
 	"tankraid" : {
 		"name" : "Kodachi",
 		"description" : "Raider Tank",
-		"helptext" : "The diminutive Kodachi is a unique raider. Its small yet agile chassis has enough armor and speed to get it close enough to fire its weapon, a napalm bomb. The Kodachi should run in, get a shot off, and withdraw before it takes significant damage. Damaged Kodachis regenerate out of combat."
+		"helptext" : "The Kodachi's small yet agile chassis has enough armor and speed to get it close enough to fire its napalm bombs, which set the ground ablaze for a moment. As the lightest unit in the Tank Foundry, it also takes on the scouting and screening roles if need be. Damaged Kodachis regenerate out of combat."
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
