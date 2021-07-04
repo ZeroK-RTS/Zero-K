@@ -1316,17 +1316,20 @@ local function DoInitialTerraform(noBuildings)
 				{x = pos[1], z = pos[4] - 8},
 				{x = pos[1], z = pos[2]},
 			}
-			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 2 then
 			-- Line
 			local points = {
 				{x = pos[1], z = pos[2]},
 				{x = pos[3], z = pos[4]},
 			}
-			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 3 then
 			-- Ramp
-			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction)
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction, terraform.enableDecay)
 		end
 	end
 	GG.Terraform.ForceTerraformCompletion(true)

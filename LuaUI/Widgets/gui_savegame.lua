@@ -66,18 +66,6 @@ options =
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Makes a control grey for disabled, or whitish for enabled
-local function SetControlGreyout(control, state)
-	if state then
-		control.backgroundColor = {0.4, 0.4, 0.4, 1}
-		control.font.color = {0.4, 0.4, 0.4, 1}
-		control:Invalidate()
-	else
-		control.backgroundColor = {.8,.8,.8,1}
-		control.font.color = nil
-		control:Invalidate()
-	end
-end
 
 local function WriteDate(dateTable)
 	return string.format("%02d/%02d/%04d", dateTable.day, dateTable.month, dateTable.year)

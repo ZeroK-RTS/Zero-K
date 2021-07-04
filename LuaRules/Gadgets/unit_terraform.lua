@@ -659,7 +659,7 @@ local function GetUnitAveragePosition(unit, units)
 	return unitsX/units, unitsZ/units
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	--** Initial constructor processing **
 	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
 	if not unitsX then
@@ -1045,6 +1045,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 				
@@ -1083,7 +1084,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
 	--** Initial constructor processing **
@@ -1460,6 +1461,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 				
@@ -1475,7 +1477,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	AddFallbackCommand(team, commandTag, blocks, block, commandX, commandZ)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
 	--** Initial constructor processing **
@@ -1946,6 +1948,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 
@@ -3138,7 +3141,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 			
 			local health = spGetUnitHealth(id)
 			if health - terraformUnit[id].lastHealth == 0 then
-				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
+				if (not forceCompletion) and (n % decayCheckFrequency == 0 and (not terraformUnit[id].noDecay) and terraformUnit[id].decayTime < n) then
 					EchoUnit(id)
 					EchoDebug(id, "Decay", id)
 					deregisterTerraformUnit(id,i,3)
@@ -3923,16 +3926,19 @@ function TerraformFunctions.ForceTerraformCompletion(pregame)
 	end
 end
 
-function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
-function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
-function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
 function TerraformFunctions.SetStructureHeight(unitID, height)

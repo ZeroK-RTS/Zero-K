@@ -1800,8 +1800,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	button.backgroundColor[4] = 0.4
 	
 	if disabled then
-		button.font.outlineColor = {0, 0, 0, 1}
-		button.font.color = {0.6, 0.6, 0.6, 1}
+		button.font = WG.GetSpecialFont(14, "integral_grey", {outlineColor = {0, 0, 0, 1}, color = {0.6, 0.6, 0.6, 1}})
 		button.supressButtonReaction = true
 	end
 	
