@@ -99,6 +99,32 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
+local MEX_WALL_SIZE = 8 * 6
+
+--------------------------------------------------------------------------------
+-- Variables
+--------------------------------------------------------------------------------
+
+WG.mouseoverMexIncome = 0
+
+local spotByID = {}
+local spotData = {}
+local spotHeights = {}
+
+local wantDrawListUpdate = false
+
+local wasSpectating = spGetSpectatingState()
+local metalSpotsNil = true
+
+local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
+local metalmultInv = metalmult > 0 and (1/metalmult) or 1
+
+local myPlayerID = Spring.GetMyPlayerID()
+local myOctant = 1
+local pregame = true
+
+local terraformModeEnabled = false
+
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -109,7 +135,7 @@ local TEXT_CORRECT_Y = 1.25
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Map/Metal Spots'
-options_order = { 'drawicons', 'size', 'rounding'}
+options_order = { 'drawicons', 'size', 'rounding', 'terraform_mex'}
 options = {
 
 	drawicons = {
@@ -143,6 +169,20 @@ options = {
 		advanced = true,
 		tooltip_format = "%.0f", -- show 1 instead of 1.0 (confusion)
 		OnChange = function() updateMexDrawList() end
+	},
+	terraform_mex = {
+		name = "Area Mex with Terraform",
+		type = 'button',
+		action='areamexterra',
+		hotkey = {key='Q', mod='alt+'},
+		OnChange = function(self)
+			local index = Spring.GetCmdDescIndex(CMD_AREA_MEX)
+			if index then
+				Spring.SetActiveCommand(index)
+				terraformModeEnabled = true
+			end
+		end,
+		path = "Hotkeys/Construction"
 	},
 }
 
@@ -230,28 +270,6 @@ local addons = { -- coordinates of solars for the Ctrl Alt modifier key, indexed
 		{ 16,  64 },
 	},
 }
-
---------------------------------------------------------------------------------
--- Variables
---------------------------------------------------------------------------------
-
-WG.mouseoverMexIncome = 0
-
-local spotByID = {}
-local spotData = {}
-local spotHeights = {}
-
-local wantDrawListUpdate = false
-
-local wasSpectating = spGetSpectatingState()
-local metalSpotsNil = true
-
-local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
-local metalmultInv = metalmult > 0 and (1/metalmult) or 1
-
-local myPlayerID = Spring.GetMyPlayerID()
-local myOctant = 1
-local pregame = true
 
 ------------------------------------------------------------
 -- Functions
@@ -425,6 +443,57 @@ local function PlaceSingleMex(bx, bz, facing, options)
 	return false, options.shift
 end
 
+local function MakeMexWall(units, pointX, pointZ, height)
+	if not (units and units[1]) then
+		return false
+	end
+
+	local pointY = Spring.GetGroundHeight(pointX, pointZ)
+	if pointY < -25 then
+		return false
+	end
+	pointY = math.max(pointY, 0)
+	
+	-- Setup parameters for terraform command
+	local team = Spring.GetUnitTeam(units[1]) or Spring.GetMyTeamID()
+	local commandTag = WG.Terraform_GetNextTag()
+	
+	local params = {}
+	params[1] = 1            -- terraform type = level
+	params[2] = team
+	params[3] = pointX
+	params[4] = pointZ
+	params[5] = commandTag
+	params[6] = 1               -- Loop parameter
+	params[7] = pointY + height -- Height parameter of terraform
+	params[8] = 5               -- Five points in the terraform
+	params[9] = #units          -- Number of constructors with the command
+	params[10] = 1              -- Raise-only volume selection
+	
+	-- Rectangle of terraform
+	params[11]  = pointX + MEX_WALL_SIZE
+	params[12] = pointZ + MEX_WALL_SIZE
+	params[13] = pointX + MEX_WALL_SIZE
+	params[14] = pointZ - MEX_WALL_SIZE
+	params[15] = pointX - MEX_WALL_SIZE
+	params[16] = pointZ - MEX_WALL_SIZE
+	params[17] = pointX - MEX_WALL_SIZE
+	params[18] = pointZ + MEX_WALL_SIZE
+	params[19] = pointX + MEX_WALL_SIZE
+	params[20] = pointZ + MEX_WALL_SIZE
+	
+	-- Set constructors
+	local i = 21
+	for j = 1, 1 do
+		params[i] = units[i]
+		i = i + 1
+	end
+	
+	Spring.GiveOrderToUnit(units[1], CMD_TERRAFORM_INTERNAL, params, 0)
+	
+	return {CMD_LEVEL, {pointX, pointY, pointZ, commandTag}}
+end
+
 function widget:CommandNotify(cmdID, params, options)
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
@@ -464,7 +533,7 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = options.alt or options.ctrl
+		local makeMexEnergy = (not terraformModeEnabled) and (options.alt or options.ctrl)
 		local energyToMake = 2 -- Just Alt
 		if options.ctrl then
 			if options.alt then
@@ -477,7 +546,7 @@ function widget:CommandNotify(cmdID, params, options)
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or IsSpotBuildable(i)) then -- circle area, slower
+			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or terraformModeEnabled or IsSpotBuildable(i)) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -522,7 +591,13 @@ function widget:CommandNotify(cmdID, params, options)
 
 				-- check if some other widget wants to handle the command before sending it to units.
 				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
-					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} }
+					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0}}
+					if terraformModeEnabled then
+						local params = MakeMexWall(units, x, z, 40)
+						if params then
+							commandArrayToIssue[#commandArrayToIssue+1] = params
+						end
+					end
 				end
 
 				if makeMexEnergy then
@@ -666,6 +741,7 @@ function widget:MouseRelease(x, y, button)
 	end
 	if button ~= 1 then
 		Spring.SetActiveCommand(-1)
+		terraformModeEnabled = false
 		return false
 	end
 	local mx, my = spGetMouseState()
@@ -674,6 +750,7 @@ function widget:MouseRelease(x, y, button)
 		local _, retain = PlaceSingleMex(coords[1], coords[3])
 		if not retain then
 			Spring.SetActiveCommand(-1)
+			terraformModeEnabled = false
 		end
 	end
 	return true
@@ -819,6 +896,13 @@ function widget:Update(dt)
 			CheckAllTerrainChanges()
 		end
 		firstUpdate = false
+	end
+
+	if terraformModeEnabled then
+		local _, cmdID = Spring.GetActiveCommand()
+		if cmdID ~= CMD_AREA_MEX then
+			terraformModeEnabled = false
+		end
 	end
 
 	if CheckNeedsRecalculating() then
