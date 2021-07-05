@@ -888,8 +888,10 @@ local behaviourConfig = {
 		stoppingDistance = 8,
 		reloadSkirmLeeway = 1.2,
 		skirmOrderDis = 150,
+		velocityPrediction = 40,
 		idlePushAggressDist = 350,
-		fleeLeeway = 120,
+		fleeDistance = 120,
+		fleeLeeway = 150,
 		
 		wardFireTargets = personalShieldUnits,
 		wardFireEnableLeeway = 10,
