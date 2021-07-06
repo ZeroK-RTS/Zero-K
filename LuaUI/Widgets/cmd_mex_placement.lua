@@ -100,6 +100,7 @@ local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
 local MEX_WALL_SIZE = 8 * 6
+local MEX_HOLE_SIZE = 3 * 6
 
 --------------------------------------------------------------------------------
 -- Variables
@@ -443,13 +444,13 @@ local function PlaceSingleMex(bx, bz, facing, options)
 	return false, options.shift
 end
 
-local function MakeMexWall(units, pointX, pointZ, height)
+local function MakeMexTerraform(units, pointX, pointZ, height, holeMode)
 	if not (units and units[1]) then
 		return false
 	end
 
 	local pointY = Spring.GetGroundHeight(pointX, pointZ)
-	if pointY < -25 then
+	if pointY < -25 or (height < 0 and pointY < 0) then
 		return false
 	end
 	pointY = math.max(pointY, 0)
@@ -465,22 +466,23 @@ local function MakeMexWall(units, pointX, pointZ, height)
 	params[4] = pointZ
 	params[5] = commandTag
 	params[6] = 1               -- Loop parameter
-	params[7] = pointY + height -- Height parameter of terraform
+	params[7] = math.max(pointY + height, 0) -- Height parameter of terraform
 	params[8] = 5               -- Five points in the terraform
 	params[9] = #units          -- Number of constructors with the command
-	params[10] = 1              -- Raise-only volume selection
+	params[10] = (height > 0 and 1) or 2 -- Raise-only or lower only depending on direction.
 	
 	-- Rectangle of terraform
-	params[11]  = pointX + MEX_WALL_SIZE
-	params[12] = pointZ + MEX_WALL_SIZE
-	params[13] = pointX + MEX_WALL_SIZE
-	params[14] = pointZ - MEX_WALL_SIZE
-	params[15] = pointX - MEX_WALL_SIZE
-	params[16] = pointZ - MEX_WALL_SIZE
-	params[17] = pointX - MEX_WALL_SIZE
-	params[18] = pointZ + MEX_WALL_SIZE
-	params[19] = pointX + MEX_WALL_SIZE
-	params[20] = pointZ + MEX_WALL_SIZE
+	local rectangleSize = (holeMode and MEX_HOLE_SIZE) or MEX_WALL_SIZE
+	params[11]  = pointX + rectangleSize
+	params[12] = pointZ + rectangleSize
+	params[13] = pointX + rectangleSize
+	params[14] = pointZ - rectangleSize
+	params[15] = pointX - rectangleSize
+	params[16] = pointZ - rectangleSize
+	params[17] = pointX - rectangleSize
+	params[18] = pointZ + rectangleSize
+	params[19] = pointX + rectangleSize
+	params[20] = pointZ + rectangleSize
 	
 	-- Set constructors
 	local i = 21
@@ -533,7 +535,10 @@ function widget:CommandNotify(cmdID, params, options)
 			aveZ = uz/us
 		end
 		
-		local makeMexEnergy = (not terraformModeEnabled) and (options.alt or options.ctrl)
+		local terraMode = terraformModeEnabled
+		local makeMexEnergy = (not terraMode) and (options.alt or options.ctrl)
+		local wallHeight = 40
+		local burryMode = false
 		local energyToMake = 2 -- Just Alt
 		if options.ctrl then
 			if options.alt then
@@ -541,12 +546,17 @@ function widget:CommandNotify(cmdID, params, options)
 			else
 				energyToMake = 1
 			end
+			wallHeight = 75
+		end
+		if terraMode and options.alt then
+			burryMode = true
+			wallHeight = wallHeight*2
 		end
 
 		for i = 1, #WG.metalSpots do
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or terraformModeEnabled or IsSpotBuildable(i)) then -- circle area, slower
+			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or (terraMode and not burryMode) or IsSpotBuildable(i)) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -591,11 +601,17 @@ function widget:CommandNotify(cmdID, params, options)
 
 				-- check if some other widget wants to handle the command before sending it to units.
 				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
-					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0}}
-					if terraformModeEnabled then
-						local params = MakeMexWall(units, x, z, 40)
+					if burryMode then
+						local params = MakeMexTerraform(units, x, z, -wallHeight, true)
 						if params then
-							commandArrayToIssue[#commandArrayToIssue+1] = params
+							commandArrayToIssue[#commandArrayToIssue + 1] = params
+						end
+					end
+					commandArrayToIssue[#commandArrayToIssue + 1] = {-mexDefID, {x,y,z,0}}
+					if terraMode and not burryMode then
+						local params = MakeMexTerraform(units, x, z, wallHeight)
+						if params then
+							commandArrayToIssue[#commandArrayToIssue + 1] = params
 						end
 					end
 				end
