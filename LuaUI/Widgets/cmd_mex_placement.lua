@@ -550,7 +550,7 @@ function widget:CommandNotify(cmdID, params, options)
 		end
 		if terraMode and options.alt then
 			burryMode = true
-			wallHeight = wallHeight*2
+			wallHeight = wallHeight + 15
 		end
 
 		for i = 1, #WG.metalSpots do

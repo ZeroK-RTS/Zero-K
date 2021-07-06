@@ -366,6 +366,7 @@ local personalShieldUnits = {
 	[UnitDefNames["shieldassault"].id] = 68,
 	[UnitDefNames["shieldcon"].id] = 68,
 	[UnitDefNames["shieldfelon"].id] = 118,
+	[UnitDefNames["staticmex"].id] = 118,
 }
 
 local personalShieldUnitsWithSafetyMargin = {

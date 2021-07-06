@@ -1,14 +1,14 @@
 
 function gadget:GetInfo()
-  return {
-    name      = "Mex Placement",
-    desc      = "Controls mex placement and income",
-    author    = "Google Frog", --
-    date      = "21 April 2012",
-    license   = "GNU GPL, v2 or later",
-    layer     = -10,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Mex Placement",
+		desc      = "Controls mex placement and income",
+		author    = "Google Frog", --
+		date      = "21 April 2012",
+		license   = "GNU GPL, v2 or later",
+		layer     = -10,
+		enabled   = true  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -18,10 +18,10 @@ end
 include("LuaRules/Configs/customcmds.h.lua")
 
 local cmdMex = {
-	id      = CMD_AREA_MEX,
-	type    = CMDTYPE.ICON_AREA,
+	id	  = CMD_AREA_MEX,
+	type	= CMDTYPE.ICON_AREA,
 	tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
-	name    = 'Mex',
+	name	= 'Mex',
 	cursor  = 'Mex',
 	action  = 'areamex',
 	params  = {},
@@ -60,6 +60,30 @@ local metalSpotsByPos = {}
 local MEX_DISTANCE = 50
 
 --------------------------------------------------------------------------------
+-- Utilities
+--------------------------------------------------------------------------------
+
+local function GetClosestMetalSpot(x, z, maxDist) --is used by single mex placement, not used by areamex
+	local bestSpot
+	local bestDist = maxDist*maxDist
+	local bestIndex
+	for i = 1, #metalSpots do
+		local spot = metalSpots[i]
+		local dx, dz = x - spot.x, z - spot.z
+		local dist = dx*dx + dz*dz
+		if dist < bestDist then
+			bestSpot = spot
+			bestDist = dist
+			bestIndex = i
+		end
+	end
+	if math.sqrt(bestDist) >= maxDist then
+		return false
+	end
+	return bestSpot, math.sqrt(bestDist), bestIndex
+end
+
+--------------------------------------------------------------------------------
 -- Command Handling
 --------------------------------------------------------------------------------
 
@@ -91,8 +115,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				if not isAI then
 					return false;
 				else
-					local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
-					if spotData[spotindex] == nil and dist < MEX_DISTANCE then
+					local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z, MEX_DISTANCE)
+					if nearestspot and spotData[spotindex] == nil then
 						return true
 					else
 						return false
@@ -107,6 +131,7 @@ end
 function gadget:Initialize()
 	metalSpots = GG.metalSpots
 	metalSpotsByPos = GG.metalSpotsByPos
+	GG.GetClosestMetalSpot = GetClosestMetalSpot
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_AREA_MEX)
 	-- load active units
@@ -145,7 +170,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		if metalSpots then
 			local spotID = metalSpotsByPos[x] and metalSpotsByPos[x][z]
 			if spotID then
-				if spotData[spotID] then	-- spot already taken
+				if spotData[spotID] then -- spot already taken
 					return
 				end
 				spotByID[unitID] = spotID
@@ -153,10 +178,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 				Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotID].metal, inlosTrueTable)
 				--Spring.Utilities.UnitEcho(unitID,spotID)
 			else
-		        local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
-				if spotData[spotindex] == nil and dist < MEX_DISTANCE then
-				        Spring.SetUnitPosition(unitID, nearestspot.x, nearestspot.z)
-					if spotData[spotID] then	-- spot already taken
+				local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z, MEX_DISTANCE)
+				if nearestspot and spotData[spotindex] == nil then
+						Spring.SetUnitPosition(unitID, nearestspot.x, nearestspot.z)
+					if spotData[spotID] then -- spot already taken
 						return
 					end
 					spotByID[unitID] = spotindex
@@ -169,23 +194,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			Spring.SetUnitRulesParam(unitID, "mexIncome", metal, inlosTrueTable)
 		end
 	end
-end
-
-function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
-	local bestSpot
-	local bestDist = math.huge
-	local bestIndex
-	for i = 1, #metalSpots do
-		local spot = metalSpots[i]
-		local dx, dz = x - spot.x, z - spot.z
-		local dist = dx*dx + dz*dz
-		if dist < bestDist then
-			bestSpot = spot
-			bestDist = dist
-			bestIndex = i
-		end
-	end
-	return bestSpot, math.sqrt(bestDist), bestIndex
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)

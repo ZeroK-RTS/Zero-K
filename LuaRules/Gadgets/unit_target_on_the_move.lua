@@ -468,8 +468,11 @@ function GG.SetUnitTarget(unitID, targetID)
 	end
 end
 
-function GG.SetTemporaryPosTarget(unitID, tx, ty, tz, userCommand, lingerTime)
+function GG.SetTemporaryPosTarget(unitID, tx, ty, tz, userCommand, lingerTime, setIgnoreStates)
 	--Spring.MarkerAddPoint(tx, ty, tz, "")
+	if setIgnoreStates then
+		GG.UnitSetGroundTarget(unitID)
+	end
 	Spring.SetUnitTarget(unitID, tx, ty, tz, false, userCommand)
 	if unitById[unitID] then
 		unit.data[unitById[unitID]].tempFrame = Spring.GetGameFrame() + lingerTime

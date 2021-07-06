@@ -29,20 +29,28 @@ local spGetUnitVelocity     = Spring.GetUnitVelocity
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spIsPosInLos          = Spring.IsPosInLos
+local spGetGroundHeight     = Spring.GetGroundHeight
 local sqrt                  = math.sqrt
 
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
 local UPDATE_RATE = 20
+local MEX_UPDATE_RATE = 35
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
 local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
+local mexShootBehaviour = include("LuaRules/Configs/mex_shoot_defs.lua")
+
+local MEX_DEF_ID = UnitDefNames["staticmex"].id
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Globals
 
 local wardUnits = IterableMap.New()
+local mexUnits = IterableMap.New()
 
 local doDebug = false
 
@@ -72,6 +80,33 @@ local wardFireCmdDesc = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+---- Common Funcs
+
+local function IsTooBusyToFire(unitID, unitData)
+	if (not unitData.active) then
+		return true
+	end
+	if GG.GetUnitHasSetTarget(unitID) then
+		return true, GG.GetUnitTarget(unitID)
+	end
+	
+	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
+		-- Manual attack commands should disable this behaviour
+		return true, (not cp_2) and cp_1
+	end
+	local baitLevel = (GG.baitPrevention_GetLevel and GG.baitPrevention_GetLevel(unitID)) or 0
+	if baitLevel > 2 then
+		return true
+	end
+	if (Spring.Utilities.GetUnitFireState(unitID) ~= 2) then
+		return true
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 ---- Unit Ward Behaviour
 
 local function DoUnitUpdate(unitID, unitData)
@@ -79,17 +114,7 @@ local function DoUnitUpdate(unitID, unitData)
 		Spring.Echo("===== DEBUG WARD FIRE", unitID, "=====")
 		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID), "bait", GG.baitPrevention_GetLevel(unitID))
 	end
-	if (not unitData.active) or (Spring.Utilities.GetUnitFireState(unitID) ~= 2) or GG.GetUnitHasSetTarget(unitID) then
-		return
-	end
-	local baitLevel = (GG.baitPrevention_GetLevel and GG.baitPrevention_GetLevel(unitID)) or 0
-	if baitLevel > 2 then
-		return
-	end
-	
-	local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
-		-- Manual attack commands should disable this behaviour
+	if IsTooBusyToFire(unitID, unitData) then
 		return
 	end
 	local behaviour = unitData.def
@@ -168,10 +193,73 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+---- Mex Shooting Behaviour
+
+local function GetMexPos(unitID, behaviour, enemyID)
+	if enemyID then
+		local x, _, z = spGetUnitPosition(enemyID)
+		return x, z
+	end
+	if GG.GetClosestMetalSpot then
+		local x, _, z = spGetUnitPosition(unitID)
+		local spot = GG.GetClosestMetalSpot(x, z, behaviour.weaponRange)
+		if spot then
+			return spot.x, spot.z
+		end
+	end
+	return false
+end
+
+local function DoMexShootUnitUpdate(unitID, unitData)
+	if doDebug then
+		Spring.Echo("===== DEBUG MEX FIRE", unitID, "=====")
+		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID), "bait", GG.baitPrevention_GetLevel(unitID))
+	end
+	local busy, busyUnitID = IsTooBusyToFire(unitID, unitData)
+	if busy and not (busyUnitID and spGetUnitDefID(busyUnitID) == MEX_DEF_ID) then
+		return
+	end
+	local behaviour = unitData.def
+	
+	local enemyID = busyUnitID or spGetUnitNearestEnemy(unitID, behaviour.searchRange, true)
+	local enemyUnitDefID = enemyID and spGetUnitDefID(enemyID)
+	if enemyID and enemyUnitDefID ~= MEX_DEF_ID then
+		return
+	end
+	
+	local spotX, spotZ = GetMexPos(unitID, behaviour, enemyID)
+	if not spotX then
+		return
+	end
+	if (not enemyID) and spIsPosInLos(spotX, 0, spotZ, unitData.allyTeamID) then
+		return
+	end
+	local spotY = math.max(0, CallAsTeam(unitData.teamID, function () return spGetGroundHeight(spotX, spotZ) end))
+	
+	if not behaviour.ignoreHeight then
+		local ux, uy, uz = spGetUnitPosition(unitID)
+		if spotY - uy < behaviour.lowerHeight or spotY - uy > behaviour.upperHeight then
+			if doDebug then
+				Spring.MarkerAddPoint(spotX, 0, spotZ, "height")
+			end
+			return
+		end
+	end
+	
+	spotY = spotY +  behaviour.fireHeight
+	if doDebug then
+		Spring.MarkerAddPoint(spotX, 0, spotZ, "M")
+	end
+	GG.SetTemporaryPosTarget(unitID, spotX, spotY, spotZ, false, MEX_UPDATE_RATE, true)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 ---- Update Rates
 
 function gadget:GameFrame(n)
 	IterableMap.ApplyFraction(wardUnits, UPDATE_RATE, n%UPDATE_RATE, DoUnitUpdate)
+	IterableMap.ApplyFraction(mexUnits, MEX_UPDATE_RATE, n%MEX_UPDATE_RATE, DoMexShootUnitUpdate)
 end
 
 --------------------------------------------------------------------------------
@@ -180,14 +268,20 @@ end
 
 local function StateToggleCommand(unitID, cmdParams, cmdOptions)
 	local unitData = IterableMap.Get(wardUnits, unitID)
-	if unitData then
+	local mexData = IterableMap.Get(mexUnits, unitID)
+	if unitData or mexData then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_WARD_FIRE)
 		
 		if (cmdDescID) then
 			wardFireCmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = wardFireCmdDesc.params})
-			unitData.active = (state == 1)
+			if unitData then
+				unitData.active = (state == 1)
+			end
+			if mexData then
+				mexData.active = (state == 1)
+			end
 		end
 	end
 end
@@ -220,20 +314,19 @@ end
 --------------------------------------------------------------------------------
 -- Unit adding/removal
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+local function AddWardUnit(unitID, unitDefID)
 	local behaviour = unitAIBehaviour[unitDefID]
 	if not (behaviour) then
-		return
+		return false
 	end
 	if not behaviour.wardFireTargets then
 		behaviour = (behaviour.land or false)
 		if not (behaviour and behaviour.wardFireTargets) then
-			return
+			return false
 		end
 	end
-	
-	local default = behaviour.wardFireDefault
 
+	local default = behaviour.wardFireDefault
 	wardFireCmdDesc.params[1] = (default and 1) or 0
 	spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
 
@@ -243,11 +336,46 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		unitDefID = unitDefID,
 	}
 	IterableMap.Add(wardUnits, unitID, unitData)
+	return true
+end
+
+local function AddMexUnit(unitID, unitDefID, teamID, cmdAdded)
+	local behaviour = mexShootBehaviour[unitDefID]
+	if not (behaviour) then
+		return false
+	end
+	
+	if not cmdAdded then
+		wardFireCmdDesc.params[1] = 1
+		spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
+	end
+	
+	local unitData = {
+		def = behaviour,
+		active = true,
+		unitDefID = unitDefID,
+		teamID = teamID,
+		allyTeamID = spGetUnitAllyTeam(unitID),
+	}
+	IterableMap.Add(mexUnits, unitID, unitData)
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- API
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	local cmdAdded = AddWardUnit(unitID, unitDefID)
+	cmdAdded = AddMexUnit(unitID, unitDefID, unitTeam, cmdAdded)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitAIBehaviour[unitDefID] and unitAIBehaviour[unitDefID].wardFireTargets then
 		IterableMap.Remove(wardUnits, unitID)
+	end
+	if mexShootBehaviour[unitDefID] then
+		IterableMap.Remove(mexUnits, unitID)
 	end
 end
 
