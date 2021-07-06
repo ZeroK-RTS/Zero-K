@@ -210,6 +210,7 @@ return { striderdante = {
         burnchance = "1",
         burntime = 1125, -- 37.5s
         reaim_time = 1,
+        force_ignore_ground = [[1]],
       },
       
       damage                  = {

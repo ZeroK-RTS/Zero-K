@@ -76,6 +76,7 @@ return { spideremp = {
       
       customParams            = {
         extra_damage = 400,
+        force_ignore_ground = [[1]],
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,

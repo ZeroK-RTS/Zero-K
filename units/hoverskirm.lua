@@ -80,6 +80,7 @@ return { hoverskirm = {
       
       customParams        = {
         burst = Shared.BURST_RELIABLE,
+        force_ignore_ground = [[1]],
 
         light_camera_height = 3000,
         light_color = [[1 0.58 0.17]],

@@ -90,6 +90,7 @@ return { tankraid = {
         setunitsonfire = "1",
         burnchance     = "1",
         burntime       = 30,
+        force_ignore_ground = [[1]],
 
         area_damage = 1,
         area_damage_radius = 54,

@@ -81,6 +81,7 @@ return { jumparty = {
       customParams              = {
         setunitsonfire = "1",
         burntime = 60,
+        force_ignore_ground = [[1]],
 
         area_damage = 1,
         area_damage_radius = 64,

@@ -82,6 +82,7 @@ return { veharty = {
         reaim_time = 8, -- COB
         damage_vs_shield = [[190]],
         damage_vs_feature = [[190]],
+        force_ignore_ground = [[1]],
 
         spawns_name = "wolverine_mine",
         spawns_expire = 60,

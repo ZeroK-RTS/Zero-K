@@ -73,6 +73,7 @@ return { striderarty = {
       craterMult              = 2,
       
       customParams              = {
+        force_ignore_ground = [[1]],
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,

@@ -88,6 +88,7 @@ return { shipassault = {
         craterMult              = 0,
 
         customParams            = {
+            force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
             miscEffectFire   = [[custom:RIOT_SHELL_L]],
