@@ -23,6 +23,7 @@ return { terraunit = {
     instantselfd   = [[1]],
   },
 
+  explodeAs              = [[NOWEAPON]],
   footprintX             = 2,
   footprintZ             = 2,
   idleAutoHeal           = 0,
@@ -36,6 +37,7 @@ return { terraunit = {
   objectName             = [[sphere.s3o]],
   reclaimable            = false,
   script                 = [[terraunit.lua]],
+  selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
   sightDistance          = 0,
   stealth                = true,
