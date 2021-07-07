@@ -741,7 +741,7 @@ end
 ------------------------------------------------------------
 
 function widget:MousePress(x, y, button)
-	if pregame then
+	if pregame or button ~= 1 then
 		-- Let initial queue handle mex placement.
 		return false
 	end
@@ -983,7 +983,7 @@ function WG.OtherWidgetPlacedMex()
 end
 
 -- widget:KeyRelease is called every time a mex is placed, for some reason, so this code works.
-function widget:KeyRelease(key)
+function widget:KeyRelease(key, modifier, isRepeat)
 	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and placedMexSinceShiftPressed then
 		placedMexSinceShiftPressed = false
 		local _, cmdID = Spring.GetActiveCommand()
