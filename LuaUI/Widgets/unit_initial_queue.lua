@@ -16,6 +16,9 @@ end
 -- august 2013: send queue length to cmd_idle_players (BrainDamage)
 
 --TODO: find way to detect GameStart countdown, so that we can remove button before GameStart (not after gamestart) since it will cause duplicate button error.
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -481,7 +484,6 @@ end
 ------------------------------------------------------------
 
 function widget:GameFrame(n)
-
 	if not gameStarted then
 		gameStarted = true
 	end
@@ -637,6 +639,15 @@ function widget:CommandsChanged()
 		action  = "stop",
 		params  = {},
 	})
+	table.insert(widgetHandler.customCommands, {
+		id      = CMD_AREA_MEX,
+		type    = CMDTYPE.ICON_AREA,
+		tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
+		name    = 'Mex',
+		cursor  = 'Mex',
+		action  = 'areamex',
+		params  = {},
+})
 end
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
@@ -664,8 +675,7 @@ local function CancelQueue()
 	buildTime = bCost / sDef.buildSpeed
 end
 
-
-function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+function WG.InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 	local areSpec = Spring.GetSpectatingState()
 	if areSpec then
 		return false
@@ -701,7 +711,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		
-		if cmdOptions.meta then	-- space insert at front
+		if cmdOptions.meta then -- space insert at front
 			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
 				table.insert(buildQueue, 1, buildData)
@@ -712,7 +722,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 					msg = "IQ|2|".. (MAX_QUEUE + 1)
 				end
 			end
-		elseif cmdOptions.shift then	-- shift-queue
+		elseif cmdOptions.shift then -- shift-queue
 			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
 				if #buildQueue < MAX_QUEUE then	-- disallow if already reached max queue
@@ -741,6 +751,18 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		return true
 	end
 	return false
+end
+
+function WG.InitialQueueGetTail()
+	if not (buildQueue and buildQueue[1]) then
+		return false
+	end
+	local lastQueue = buildQueue[#buildQueue]
+	return lastQueue[2], lastQueue[4]
+end
+
+function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	return WG.InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 end
 
 ------------------------------------------------------------

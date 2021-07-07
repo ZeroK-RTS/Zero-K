@@ -437,12 +437,15 @@ local function PlaceSingleMex(bx, bz, facing, options)
 			if Spring.TestBuildOrder(mexDefID, closestSpot.x, commandHeight, closestSpot.z, facing) == 0 then
 				return true, true
 			end
-			local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options, false)
+			local params = {closestSpot.x, commandHeight, closestSpot.z, facing}
+			local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, params, options, false)
 			if not GBC_processed then
-				if options.meta then
-					WG.CommandInsert(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+				if pregame then
+					WG.InitialQueueHandleCommand(-mexDefID, params, options)
+				elseif options.meta then
+					WG.CommandInsert(-mexDefID, params, options)
 				else
-					spGiveOrder(-mexDefID, {closestSpot.x, commandHeight, closestSpot.z, facing}, options)
+					spGiveOrder(-mexDefID, params, options)
 				end
 				WG.noises.PlayResponse(false, -mexDefID)
 			end
@@ -529,7 +532,6 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		local aveZ = 0
 
 		local units = spGetSelectedUnits()
-
 		for i = 1, #units do
 			local unitID = units[i]
 			if mexBuilder[unitID] then
@@ -540,7 +542,14 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 			end
 		end
 
-		if (us == 0) then
+		if pregame then
+			if WG.InitialQueueGetTail and WG.InitialQueueGetTail() then
+				aveX, aveZ = WG.InitialQueueGetTail()
+			else
+				aveX = Game.mapSizeX / 2
+				aveZ = Game.mapSizeZ / 2
+			end
+		elseif (us == 0) then
 			return
 		else
 			aveX = ux/us
@@ -646,7 +655,14 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 
 			for i = 1, #commandArrayToIssue do
 				local command = commandArrayToIssue[i]
-				WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
+				if pregame then
+					WG.InitialQueueHandleCommand(command[1], command[2], cmdOpts)
+					if i == 1 then
+						cmdOpts.shift = true
+					end
+				else
+					WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
+				end
 			end
 		end
 
