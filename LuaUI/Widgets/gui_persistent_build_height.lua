@@ -258,6 +258,9 @@ local function SendCommand()
 
 		WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
 		WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
+		if WG.OtherWidgetPlacedMex then
+			WG.OtherWidgetPlacedMex()
+		end
 	end
 end
 

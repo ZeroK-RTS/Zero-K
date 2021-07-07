@@ -16,6 +16,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+include("keysym.lua")
 
 ------------------------------------------------------------
 -- Speedups
@@ -125,6 +126,7 @@ local myOctant = 1
 local pregame = true
 
 local terraformModeEnabled = false
+local placedMexSinceShiftPressed = false
 
 ------------------------------------------------------------
 -- Config
@@ -764,6 +766,7 @@ function widget:MouseRelease(x, y, button)
 	local _, coords = spTraceScreenRay(mx, my, true, true)
 	if coords then
 		local _, retain = PlaceSingleMex(coords[1], coords[3])
+		placedMexSinceShiftPressed = true
 		if not retain then
 			Spring.SetActiveCommand(-1)
 			terraformModeEnabled = false
@@ -972,6 +975,22 @@ function widget:Update(dt)
 		end
 		IntegrateMetal(coords[1], coords[3])
 		WG.mouseoverMexIncome = extraction
+	end
+end
+
+function WG.OtherWidgetPlacedMex()
+	placedMexSinceShiftPressed = true
+end
+
+-- widget:KeyRelease is called every time a mex is placed, for some reason, so this code works.
+function widget:KeyRelease(key)
+	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and placedMexSinceShiftPressed then
+		placedMexSinceShiftPressed = false
+		local _, cmdID = Spring.GetActiveCommand()
+		if cmdID == -mexDefID then
+			Spring.SetActiveCommand(-1)
+			terraformModeEnabled = false
+		end
 	end
 end
 
