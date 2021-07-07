@@ -135,12 +135,12 @@ local placedMexSinceShiftPressed = false
 local TEXT_SIZE = 16
 local TEXT_CORRECT_Y = 1.25
 
+local PRESS_DRAG_THRESHOLD_SQR = 25^2
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Map/Metal Spots'
-options_order = { 'drawicons', 'size', 'rounding', 'terraform_mex'}
+options_order = { 'drawicons', 'size', 'rounding', 'terraform_mex', 'area_point_command'}
 options = {
-
 	drawicons = {
 		name = 'Show Income as Icon',
 		type = 'bool',
@@ -172,6 +172,12 @@ options = {
 		advanced = true,
 		tooltip_format = "%.0f", -- show 1 instead of 1.0 (confusion)
 		OnChange = function() updateMexDrawList() end
+	},
+	area_point_command = {
+		name = 'Point click queues mex',
+		type = 'bool',
+		value = true,
+		desc = "Clicking area mex without dragging is like constructing a mex.",
 	},
 	terraform_mex = {
 		name = "Area Mex with Terraform",
@@ -498,8 +504,12 @@ local function MakeMexTerraform(units, pointX, pointZ, height, holeMode)
 	return {CMD_LEVEL, {pointX, pointY, pointZ, commandTag}}
 end
 
-function widget:CommandNotify(cmdID, params, options)
-	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
+function widget:CommandNotify(cmdID, params, cmdOpts)
+	if not WG.metalSpots then
+		return false
+	end
+	
+	if (cmdID == CMD_AREA_MEX) and ((params[4] or 0) > 1 or not options.area_point_command.value) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
 
 		local xmin = cx-cr
@@ -538,19 +548,19 @@ function widget:CommandNotify(cmdID, params, options)
 		end
 		
 		local terraMode = terraformModeEnabled
-		local makeMexEnergy = (not terraMode) and (options.alt or options.ctrl)
+		local makeMexEnergy = (not terraMode) and (cmdOpts.alt or cmdOpts.ctrl)
 		local wallHeight = 40
 		local burryMode = false
 		local energyToMake = 2 -- Just Alt
-		if options.ctrl then
-			if options.alt then
+		if cmdOpts.ctrl then
+			if cmdOpts.alt then
 				energyToMake = 4
 			else
 				energyToMake = 1
 			end
 			wallHeight = 75
 		end
-		if terraMode and options.alt then
+		if terraMode and cmdOpts.alt then
 			burryMode = true
 			wallHeight = wallHeight + 15
 		end
@@ -576,7 +586,7 @@ function widget:CommandNotify(cmdID, params, options)
 			noCommands = noCommands-1
 		end
 
-		local shift = options.shift
+		local shift = cmdOpts.shift
 
 		do --issue ordered order to unit(s)
 			local commandArrayToIssue={}
@@ -591,7 +601,7 @@ function widget:CommandNotify(cmdID, params, options)
 			-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
 			-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
 			-- where hold even when it is not. I do not know why this issue is absent when no modkey are held.
-			if makeMexEnergy and not (options.shift or options.meta) then
+			if makeMexEnergy and not (cmdOpts.shift or cmdOpts.meta) then
 				commandArrayToIssue[#commandArrayToIssue+1] = {CMD.STOP, {} }
 			end
 			
@@ -602,7 +612,7 @@ function widget:CommandNotify(cmdID, params, options)
 				local y = math.max(0, Spring.GetGroundHeight(x, z))
 
 				-- check if some other widget wants to handle the command before sending it to units.
-				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
+				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, cmdOpts, true) then
 					if burryMode then
 						local params = MakeMexTerraform(units, x, z, -wallHeight, true)
 						if params then
@@ -627,7 +637,7 @@ function widget:CommandNotify(cmdID, params, options)
 						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
 
 						-- check if some other widget wants to handle the command before sending it to units.
-						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, options, true) then
+						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, cmdOpts, true) then
 							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0} }
 						end
 					end
@@ -636,17 +646,16 @@ function widget:CommandNotify(cmdID, params, options)
 
 			for i = 1, #commandArrayToIssue do
 				local command = commandArrayToIssue[i]
-				WG.CommandInsert(command[1], command[2], options, i - 1, true)
+				WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
 			end
 		end
 
 		return true
 	end
 
-	if -mexDefID == cmdID and WG.metalSpots then
-		-- This will probably never be called now that this is handled by widget:MousePress
+	if (-mexDefID == cmdID or cmdID == CMD_AREA_MEX) and params[3] then
 		local bx, bz = params[1], params[3]
-		return PlaceSingleMex(bx, bz, params[4], options)
+		return PlaceSingleMex(bx, bz, params[4], cmdOpts)
 	end
 end
 
@@ -1205,22 +1214,41 @@ function widget:DrawWorld()
 
 	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and
 			(isMexCmd or (pregame or (WG.showeco or WG.showeco_always_mexes)) or CMD_AREA_MEX == cmdID) then
-		local mx, my = spGetMouseState()
+		local mx, my, leftPressed = spGetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)
 
-		if not pos then return end
+		if not pos then
+			return
+		end
 
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
+		local wantShow = isMexCmd or distance <= 60
+		if (not wantShow) and (options.area_point_command.value and CMD_AREA_MEX == cmdID) then
+			if leftPressed then
+				local pressX, pressY = Spring.GetMouseStartPosition(1)
+				if pressX then
+					local _, windowHeight = gl.GetViewSizes() -- Not posioned by UI scaling.
+					local distance = (pressX - mx)^2 + (pressY - (windowHeight - my))^2
+					if distance < PRESS_DRAG_THRESHOLD_SQR then
+						wantShow = true
+					end
+				end
+			else
+				wantShow = true
+			end
+		end
 
-		if closestSpot and (isMexCmd or distance <= 60) and IsSpotBuildable(index) then
+		if closestSpot and wantShow and IsSpotBuildable(index) then
 			local bface = Spring.GetBuildFacing()
 			if not isMexCmd then
 				bx, by, bz = pos[1], pos[2], pos[3]
 			end
 
-			mexSpotToDraw = closestSpot
+			if isMexCmd or distance <= 60 then
+				mexSpotToDraw = closestSpot
+			end
 
 			local height = spGetGroundHeight(closestSpot.x,closestSpot.z)
 			height = height > 0 and height or 0
