@@ -217,62 +217,6 @@ end
 local function GetBuildOptions()
 	return buildOptions
 end
-------------------------------------------------------------
--- Initialize/shutdown
-------------------------------------------------------------
-
-local function GetUnlockedBuildOptions(fullOptions)
-	local teamID = Spring.GetMyTeamID()
-	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
-	if not unlockedCount then
-		return fullOptions
-	end
-	local unlockedMap = {}
-	for i = 1, unlockedCount do
-		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
-		if unitDefID then
-			unlockedMap[unitDefID] = true
-		end
-	end
-	local newOptions = {}
-	for i = 1, #fullOptions do
-		if unlockedMap[fullOptions[i]] then
-			newOptions[#newOptions + 1] = fullOptions[i]
-		end
-	end
-	return newOptions
-end
-
-function widget:Initialize()
-	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
-		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-	for uDefID, uDef in pairs(UnitDefs) do
-		if uDef.customParams.ismex then
-			isMex[uDefID] = true
-		end
-
-		if uDef.maxWeaponRange > 16 then
-			weaponRange[uDefID] = uDef.maxWeaponRange
-		end
-	end
-	if UnitDefNames["staticmex"] then
-		isMex[UnitDefNames["staticmex"].id] = true;
-	end
-	WG.InitialQueue = true
-	
-	buildOptions = GetUnlockedBuildOptions(buildOptions)
-end
-
-function widget:Shutdown()
-	WG.InitialQueue = nil
-end
 
 ------------------------------------------------------------
 -- Drawing
@@ -675,7 +619,7 @@ local function CancelQueue()
 	buildTime = bCost / sDef.buildSpeed
 end
 
-function WG.InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
+local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 	local areSpec = Spring.GetSpectatingState()
 	if areSpec then
 		return false
@@ -753,7 +697,7 @@ function WG.InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 	return false
 end
 
-function WG.InitialQueueGetTail()
+local function InitialQueueGetTail()
 	if not (buildQueue and buildQueue[1]) then
 		return false
 	end
@@ -762,7 +706,67 @@ function WG.InitialQueueGetTail()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	return WG.InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
+	return InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
+end
+
+------------------------------------------------------------
+-- Initialize/shutdown
+------------------------------------------------------------
+
+local function GetUnlockedBuildOptions(fullOptions)
+	local teamID = Spring.GetMyTeamID()
+	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
+	if not unlockedCount then
+		return fullOptions
+	end
+	local unlockedMap = {}
+	for i = 1, unlockedCount do
+		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
+		if unitDefID then
+			unlockedMap[unitDefID] = true
+		end
+	end
+	local newOptions = {}
+	for i = 1, #fullOptions do
+		if unlockedMap[fullOptions[i]] then
+			newOptions[#newOptions + 1] = fullOptions[i]
+		end
+	end
+	return newOptions
+end
+
+function widget:Initialize()
+	WG.InitialQueueHandleCommand = InitialQueueHandleCommand
+	WG.InitialQueueGetTail = InitialQueueGetTail
+
+	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
+		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
+		widgetHandler:RemoveWidget(self)
+		return
+	end
+	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
+		widgetHandler:RemoveWidget(self)
+		return
+	end
+	for uDefID, uDef in pairs(UnitDefs) do
+		if uDef.customParams.ismex then
+			isMex[uDefID] = true
+		end
+
+		if uDef.maxWeaponRange > 16 then
+			weaponRange[uDefID] = uDef.maxWeaponRange
+		end
+	end
+	if UnitDefNames["staticmex"] then
+		isMex[UnitDefNames["staticmex"].id] = true;
+	end
+	WG.InitialQueue = true
+	
+	buildOptions = GetUnlockedBuildOptions(buildOptions)
+end
+
+function widget:Shutdown()
+	WG.InitialQueue = nil
 end
 
 ------------------------------------------------------------
