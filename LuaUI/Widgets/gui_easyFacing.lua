@@ -21,6 +21,7 @@ local updateInt = 1 --seconds for the ::update loop
 local sens = 50 --rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
 local drawForAll = false --draw facing direction also for other buildings than labs
 local drawForTurret = false --draw facing direction for all unit that can attack
+local drawForStarlight = true --draw facing direction for Starlight
 local timesens = 0.06 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
 
 local USE_META = false -- Meta (space) functionality is disabled
@@ -86,23 +87,23 @@ local GL_TRIANGLES			= GL.TRIANGLES
 function widget:Update()
 	local timef = spGetGameSeconds()
 	local time = floor(timef)
-	
+
 	-- update timers once every <updateInt> seconds
 	if (time % updateInt == 0 and time ~= lastTimeUpdate) then
 		lastTimeUpdate = time
 		--do update stuff:
-		
+
 		if ( CheckSpecState() == false ) then
 			return false
 		end
 	end
-	
+
 	manipulateFacing()
 end
 
 function widget:DrawWorld()
 	drawOrientation()
-	
+
 	ResetGl()
 end
 
@@ -146,25 +147,25 @@ end
 
 function getFacingByMouseDelta( mouseDeltaX,mouseDeltaY )
 	local camVecs = spGetCameraVectors()	--would be cool to update this only on a callin like "onCameraMoved()"
-	
+
 	local mouseMovVec = { mouseDeltaX, mouseDeltaY }
 	local mMovVecLen = getVector2dLen( mouseMovVec )
-	
+
 	if ( mMovVecLen < sens ) then
 		return nil
 	end
-	
+
 	local mouseDegree = getMouseFacingDegree( mouseMovVec )
-	
+
 	--calculate the camera angle
 	local camRight2d = { camVecs.right[1], -camVecs.right[3] }
 	local camDegree = getMouseFacingDegree( camRight2d ) - 90
 	camDegree = normalizeDegreeRange( camDegree )
-	
+
 	--take the camera angle into account here
 	mouseDegree = mouseDegree + camDegree
 	mouseDegree = normalizeDegreeRange( mouseDegree )
-	
+
 	local newFacing = nil
 	if ( ( mouseDegree >= 280.0 ) or ( mouseDegree < 45.0 ) ) then
 		newFacing = 2
@@ -177,7 +178,7 @@ function getFacingByMouseDelta( mouseDeltaX,mouseDeltaY )
 	else
 		newFacing = 0 --should not happen
 	end
-	
+
 	return newFacing
 end
 
@@ -185,7 +186,7 @@ function manipulateFacing()
 	local mx,my,lmb,mmb,rmb = spGetMouseState()
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	meta = meta and USE_META
-	
+
 	if ( lmb and mouseLbLast == false) or ( meta and not inDrag and not lmb ) then
 		--in
 		inDrag = true
@@ -197,7 +198,7 @@ function manipulateFacing()
 		mouseXStartDrag = mx
 		mouseYStartDrag = my
 		printDebug("IN")
-		
+
 		if ( meta and not lmb ) then
 			metaStart = true
 		else
@@ -209,44 +210,44 @@ function manipulateFacing()
 		inDrag = false
 	end
 	mouseLbLast = lmb
-		
+
 	--check if valid command
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
 	if (not cmd_id) then return end
 
-	
+
 	--check if build command
 	local cmdDesc = spGetActiveCmdDesc( idx )
 	if ( cmdDesc["type"] ~= 20 ) then
 		--quit here if not a build command
 		return
 	end
-	
+
 	if ( inDrag ) then
 		if (shift == true and meta == false) then
 			mouseXStartRotate = mx
 			mouseYStartRotate = my
 		end
-		
+
 		local curDeltaX = mx - mouseXStartRotate or mx
 		mouseDeltaX = mouseDeltaX + curDeltaX
 		local curDeltaY = my - mouseYStartRotate or my
 		mouseDeltaY = mouseDeltaY + curDeltaY
-		
+
 		local newFacing = getFacingByMouseDelta( mouseDeltaX, mouseDeltaY )
 		if ( newFacing ~= nil) then
 			mouseDeltaX = 0
 			mouseDeltaY = 0 --reset cumulative delta
 			mouseXStartRotate = mx
 			mouseYStartRotate = my -- reset rotate center
-			
+
 			local transTime = spDiffTimers(spGetTimer(), mouseTimeStartRotate)
 			mouseTimeStartRotate = spGetTimer()
 			if (transTime < timesens) and ( newFacing ~= spGetBuildFacing()) then
 				spSetBuildFacing( newFacing )
 			end
 		end
-		
+
 		--[[ note: disable cursor lock so that it won't conflict with other widget (such as CommandInsert() widget when meta is pressed).
 		if mouseXStartRotate~=mx or mouseYStartRotate~=my then
 			spWarpMouse( mouseXStartRotate, mouseYStartRotate ) --set old mouse coords to prevent mouse movement
@@ -258,22 +259,23 @@ end
 function drawOrientation()
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
 	local cmdDesc = spGetActiveCmdDesc( idx )
-	
+
 	if ( cmdDesc == nil or cmdDesc["type"] ~= 20 ) then
 		--quit here if not a build command
 		return
 	end
-	
+
 	local unitDefID = -cmd_id
 	local alt,ctrl,meta,shift = spGetModKeyState()
-	
+
 	local ud = udefTab[unitDefID]
-	if not (drawForAll or ud["isFactory"] or (drawForTurret and ud.canAttack)) then
+
+	if not (drawForAll or ud["isFactory"] or (drawForTurret and ud.canAttack) or (drawForStarlight and ud.name == "mahlazer")) then
 		return
 	end
-	
+
 	local mx, my,lmb = spGetMouseState()
-	
+
 	if ( shift and inDrag and lmb) then --shift+drag+click (queue a line)
 		mx = mouseXStartDrag --center arrow on first queue
 		my = mouseYStartDrag
@@ -281,14 +283,14 @@ function drawOrientation()
 	end
 
 	local _, coords = spTraceScreenRay(mx, my, true, true)
-	
+
 	if not coords then return end
-	
+
 	local centerX = coords[1]
 	local centerY = coords[2]
 	local centerZ = coords[3]
 	local facing = spGetBuildFacing()
-	
+
 	local footX = ud.xsize/2
 	local footZ = ud.zsize/2
 	if (facing == 1 or facing == 3) then
@@ -298,10 +300,10 @@ function drawOrientation()
 		centerX = math.floor((centerX + (1 - footX%2)*8)/16)*16 + (footX%2)*8
 		centerZ = math.floor((centerZ + (1 - footZ%2)*8)/16)*16 + (footZ%2)*8
 	end
-	
+
 	glLineWidth(1)
 	glColor( 0.0, 1.0, 0.0, 0.5 )
-	
+
 	local function drawFunc()
 		glVertex( 0, 0, -8)
 		glVertex( 0, 0, 8)
@@ -310,11 +312,11 @@ function drawOrientation()
 		glVertex( 0, 0,  8)
 		glVertex( 48, 0, 3)
 		glVertex( 48, 0, -3 )
-		
+
 		glVertex( 50, 0,  0)
 		glVertex( 48, 0, 3)
 		glVertex( 48, 0, -3 )
-		
+
 		glVertex( 50, 0, 0)
 		glVertex( 30, 0, -30 )
 		glVertex( 80, 0, 0 )
@@ -323,7 +325,7 @@ function drawOrientation()
 		glVertex( 80, 0, 0 )
 		glVertex( 30, 0, 30 )
 	end
-  
+
 	--local height = spGetGroundHeight( centerX, centerZ )
 	local transSpace = ud["zsize"] * 4   --should be ysize but its not there?!?
 
@@ -349,7 +351,7 @@ function drawOrientation()
 	glScale( (transSpace or 70)/70, 1.0, (transSpace or 70)/70)
 	glBeginEnd( GL_TRIANGLES, drawFunc )
 	glScale( 1.0, 1.0, 1.0 )
-	
+
 	gl.DepthTest(true)
 	glPopMatrix()
 
@@ -367,13 +369,13 @@ end
 function CheckSpecState()
 	local playerID = spGetMyPlayerID()
 	local _, _, spec = spGetPlayerInfo(playerID, false)
-		
+
 	if ( spec == true ) then
 		spEcho("<Easy Facing> Spectator mode. Widget removed.")
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	
+
 	return true
 end
 
@@ -392,4 +394,4 @@ function printDebug( value )
 		end
 	end
 end
-	
+
