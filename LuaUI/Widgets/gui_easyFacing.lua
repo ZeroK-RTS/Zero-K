@@ -36,9 +36,9 @@ local mouseXStartDrag = 0
 local mouseYStartDrag = 0
 local mouseLbLast = false
 -------------------------------------------------------------------------------
-local udefTab				= UnitDefs
+local udefTab               = UnitDefs
 
-local spGetActiveCommand 	= Spring.GetActiveCommand
+local spGetActiveCommand    = Spring.GetActiveCommand
 local spGetKeyState         = Spring.GetKeyState
 local spGetModKeyState      = Spring.GetModKeyState
 local spGetSelectedUnits    = Spring.GetSelectedUnits
@@ -53,16 +53,16 @@ local spGetMyPlayerID       = Spring.GetMyPlayerID
 local spGetPlayerInfo       = Spring.GetPlayerInfo
 local spGetCameraVectors    = Spring.GetCameraVectors
 local spEcho                = Spring.Echo
-local spWarpMouse			= Spring.WarpMouse
-local spGetBuildFacing		= Spring.GetBuildFacing
-local spSetBuildFacing 		= Spring.SetBuildFacing
-local spPos2BuildPos 		= Spring.Pos2BuildPos
-local spGetGroundHeight 	= Spring.GetGroundHeight
-local spDiffTimers			= Spring.DiffTimers
-local spGetTimer			= Spring.GetTimer
+local spWarpMouse           = Spring.WarpMouse
+local spGetBuildFacing      = Spring.GetBuildFacing
+local spSetBuildFacing      = Spring.SetBuildFacing
+local spPos2BuildPos        = Spring.Pos2BuildPos
+local spGetGroundHeight     = Spring.GetGroundHeight
+local spDiffTimers          = Spring.DiffTimers
+local spGetTimer            = Spring.GetTimer
 
 local floor                 = math.floor
-local abs					= math.abs
+local abs                   = math.abs
 local atan2                 = math.atan2
 local pi                    = math.pi
 local sqrt                  = math.sqrt
@@ -77,11 +77,11 @@ local glPushMatrix          = gl.PushMatrix
 local glTranslate           = gl.Translate
 local glText                = gl.Text
 local glVertex              = gl.Vertex
-local glRotate				= gl.Rotate
-local glBeginEnd			= gl.BeginEnd
-local glScale				= gl.Scale
+local glRotate              = gl.Rotate
+local glBeginEnd            = gl.BeginEnd
+local glScale               = gl.Scale
 
-local GL_TRIANGLES			= GL.TRIANGLES
+local GL_TRIANGLES          = GL.TRIANGLES
 ----------------------------------------------------------------------------------
 function widget:Update()
 	local timef = spGetGameSeconds()
@@ -268,7 +268,7 @@ function drawOrientation()
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	
 	local ud = udefTab[unitDefID]
-	if not (drawForAll or ud["isFactory"] or (drawForTurret and ud.canAttack)) then
+	if not (drawForAll or ud["isFactory"] or (drawForTurret and ud.canAttack) or ud.customParams.draw_blueprint_facing) then
 		return
 	end
 	
