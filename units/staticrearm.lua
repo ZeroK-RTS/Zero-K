@@ -7,7 +7,9 @@ return { staticrearm = {
   brakeRate           = 0,
   buildCostMetal      = 350,
   buildDistance       = 6,
-  builder             = true,
+  builder             = true, --[[ This makes the airpad a factory from the engine's technical PoV.
+                                   The purpose is to let airpads have a rally queue that units leaving
+                                   the pad can inherit, without the airpad itself trying to act on it. ]]
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 12,
   buildingGroundDecalSizeY      = 12,
