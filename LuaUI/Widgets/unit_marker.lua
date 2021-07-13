@@ -139,6 +139,12 @@ function widget:UnitEnteredLos (unitID, teamID)
 
 			markerText = markerText .. " (" .. owner_name .. ")"
 		end
+
+		local _, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
+		if buildProgress < 1 then
+			markerText = markerText .. " (" .. math.floor(100 * buildProgress) .. "%)"
+		end
+
 		Spring.MarkerAddPoint (x, y, z, markerText, true)
 	end
 end
