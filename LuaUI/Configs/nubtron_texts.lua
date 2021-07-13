@@ -79,7 +79,7 @@ return {
 <(Click next to continue)>]],
 			epilogue4 = [[Ronin and Reaver can be mixed to create a strong early army. Reaver has low range but annihilates raiders, while Ronin can harass enemies at range.
 <(Click next to continue)>]],
-			epilogue5 = [[Knight and Sling are great at busting entrenched positions. Knight has the health to assault heavy turrets, while Sling can wear down defenses from far away.
+			epilogue5 = [[Knight and Sling are great at busting entrenched positions. Knight has the health to assault heavy turrets, while Sling can wear down defences from far away.
 <(Click next to continue)>]],
 			epilogue6 = [[To learn more about a unit <hold space and click> on it, its wreck, or its build button, to bring up its description. Experiment with other units and factories.
 <(Click next to continue)>]],

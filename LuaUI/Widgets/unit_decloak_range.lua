@@ -26,7 +26,7 @@ local cloakedColor = { 0.4, 0.4, 0.9, drawAlpha} -- drawAlpha on purpose!
 
 local decloakDist = {}
 
-options_path = 'Settings/Interface/Defense and Cloak Ranges'
+options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options_order = {
 	"label",
 	"drawranges",

@@ -262,7 +262,7 @@ local structureConfig = {
 
 	pw_grid = function(unitDef)
 		unitDef.maxdamage = 20000
-		unitDef.name = "Planetary Defense Grid"
+		unitDef.name = "Planetary Defence Grid"
 		unitDef.description = "Defends against everything"
 		unitDef.objectname = "pw_wormhole2.dae"
 		unitDef.icontype = [[pw_defense2]]
