@@ -35,6 +35,7 @@ return { factoryplane = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     pad_count = 1,
     landflystate   = [[0]],
     sortName = [[4]],

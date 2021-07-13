@@ -37,6 +37,7 @@ return { factoryhover = {
   corpse           = [[DEAD]],
 
   customParams     = {
+    ploppable = 1,
     sortName            = [[8]],
     modelradius         = [[60]],
     default_spacing     = 8,

@@ -33,6 +33,7 @@ return { factoryshield = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     sortName            = [[1]],
     midposoffset        = [[0 0 -24]],
     solid_factory       = [[6]],

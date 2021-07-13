@@ -39,6 +39,7 @@ return { factorygunship = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     landflystate   = [[0]],
     sortName = [[3]],
     modelradius    = [[43]],

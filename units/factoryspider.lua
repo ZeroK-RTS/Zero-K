@@ -37,6 +37,7 @@ return { factoryspider = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName       = [[5]],

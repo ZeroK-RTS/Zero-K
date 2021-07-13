@@ -33,6 +33,7 @@ return { factoryship = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    ploppable = 1,
     sortName       = [[7]],
     unstick_help   = 1,
     aimposoffset   = [[60 0 -15]],

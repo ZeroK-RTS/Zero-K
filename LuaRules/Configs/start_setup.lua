@@ -1,29 +1,12 @@
 aiCommanders = {}
+ploppableDefs = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-	if unitDef.customParams.ai_start_unit then
+	local cp = unitDef.customParams
+	if cp.ai_start_unit then
 		aiCommanders[unitDefID] = true
 	end
-end
-
-ploppables = {
-  "factoryhover",
-  "factoryveh",
-  "factorytank",
-  "factoryshield",
-  "factorycloak",
-  "factoryamph",
-  "factoryjump",
-  "factoryspider",
-  "factoryship",
-  "factoryplane",
-  "factorygunship",
-}
-
-ploppableDefs = {}
-for i = 1, #ploppables do
-	local ud = UnitDefNames[ploppables[i]]
-	if ud and ud.id then
-		ploppableDefs[ud.id ] = true
+	if cp.ploppable then
+		ploppableDefs[unitDefID] = true
 	end
 end
 

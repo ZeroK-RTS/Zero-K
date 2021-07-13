@@ -37,6 +37,7 @@ return { factorytank = {
   selectionVolumeType           = [[box]],
 
   customParams                  = {
+    ploppable = 1,
     sortName = [[6]],
     solid_factory = [[4]],
     default_spacing = 8,

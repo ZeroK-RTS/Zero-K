@@ -31,6 +31,7 @@ return { factorycloak = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     sortName            = [[1]],
     default_spacing     = 8,
     midposoffset        = [[0 0 -24]],

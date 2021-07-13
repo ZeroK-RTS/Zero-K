@@ -38,6 +38,7 @@ return { factoryjump = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    ploppable = 1,
     aimposoffset   = [[0 0 -28]],
     midposoffset   = [[0 0 -10]],
     canjump  = [[1]],
