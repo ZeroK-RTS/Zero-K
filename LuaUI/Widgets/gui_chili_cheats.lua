@@ -245,8 +245,8 @@ local function IsCheatingGameSetup()
 					return false
 				end
 			else
-				local _, aiName = Spring.GetAIInfo(teamID)
-				if not (string.find(aiName, 'Null AI') or string.find(aiName, 'Inactive AI')) then
+				local _, aiName, _, aiLibrary = Spring.GetAIInfo(teamID)
+				if not (string.find(aiLibrary, 'Null AI') or string.find(aiName, 'Inactive AI')) then
 					return false
 				end
 			end
