@@ -18,7 +18,7 @@ return { hoverdepthcharge = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    bait_level_default = 0,
+    bait_level_default = 1,
     modelradius    = [[25]],
   },
 
