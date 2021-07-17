@@ -10,9 +10,9 @@ return { staticmex = {
   buildingMask           = 0,
   buildPic               = [[staticmex.png]],
   category               = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 4 0]],
-  collisionVolumeScales  = [[42 50 42]],
-  collisionVolumeType    = [[clyY]],
+  collisionVolumeOffsets = [[0 -8 0]],
+  collisionVolumeScales  = [[40 58 40]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -21,9 +21,9 @@ return { staticmex = {
     ismex              = 1,
     aimposoffset       = [[0 11 0]],
     midposoffset       = [[0 0 0]],
-    modelradius        = [[21]],
+    modelradius        = [[15]],
     removewait         = 1,
-    removestop         = 1,
+    removestop     = 1,
     selectionscalemult = 1.4,
   },
 
