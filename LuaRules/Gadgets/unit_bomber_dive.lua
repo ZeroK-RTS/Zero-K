@@ -280,8 +280,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 						bombers[proOwnerID].underShield = gameFrame + 45
 						if targetID then
 							local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
-							local distance = GetCollisionDistance(proOwnerID, targetID)
-							temporaryDive(proOwnerID, 45, height, distance, targetID)
+							temporaryDive(proOwnerID, 45, height, nil, targetID)
 						else
 							temporaryDive(proOwnerID, 45, 40)
 						end
