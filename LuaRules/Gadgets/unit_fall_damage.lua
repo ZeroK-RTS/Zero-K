@@ -290,7 +290,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		-- normal is multiplied by elasticity, tangent by friction
 		-- unit takes damage based on velocity at normal to terrain + TANGENT_DAMAGE of velocity of tangent
 		local att = attributes[unitDefID]
-		local vx,vy,vz, speed = Spring.GetUnitVelocity(unitID)
+		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
@@ -331,7 +331,7 @@ function gadget:GameFrame(frame)
 			local unitID = unitWantedVelocity[i][1]
 			if not alreadySet[unitID] then
 				alreadySet[unitID] = true
-				local vx, vy, vz, speed = Spring.GetUnitVelocity(unitID)
+				local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 				if vx then
 					if unitWantedVelocity[i][4] then
 						-- Set mode

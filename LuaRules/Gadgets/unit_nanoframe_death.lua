@@ -1,6 +1,3 @@
--- $Id: unit_terraform.lua 3299 2008-11-25 07:25:57Z google frog $
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:GetInfo()
 	return {
@@ -25,23 +22,13 @@ end
 --------------------------------------------------------------------------------
 
 -- Speedups
-
-local spSetUnitHealth = Spring.SetUnitHealth
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitPosition	= Spring.GetUnitPosition
 local spGetUnitBuildFacing	= Spring.GetUnitBuildFacing
-local spCreateUnit = Spring.CreateUnit
-local spDestroyUnit = Spring.DestroyUnit
-local spGetUnitSelfDTime = Spring.GetUnitSelfDTime
-
-
-local spSetFeatureResurrect = Spring.SetFeatureResurrect
 local spSetFeatureHealth = Spring.SetFeatureHealth
 local spSetFeatureReclaim = Spring.SetFeatureReclaim
 local spGetGroundHeight = Spring.GetGroundHeight
 local spCreateFeature = Spring.CreateFeature
-
-local spValidUnitID = Spring.ValidUnitID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -88,7 +75,7 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 				if Spring.SetFeatureResources then -- 103.0 non-dev version compat
 					Spring.SetFeatureResources(featureID, currentMetal, 0, currentMetal, progress)
 				else
-					Spring.SetFeatureReclaim(featureID, progress)
+					spSetFeatureReclaim(featureID, progress)
 				end
 
 				spSetFeatureHealth(featureID, progress * FeatureDefs[wreck].maxHealth)

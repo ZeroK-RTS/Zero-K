@@ -620,7 +620,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		return
 	end
 	local command, targetID = ProccessCommand(strLower(message))
-	local name, active, spectator, teamID, _, _, _, _, _, cp = spGetPlayerInfo(playerID, false)
+	local name, active, _, teamID, _, _, _, _, _, cp = spGetPlayerInfo(playerID, false)
 	
 	if command == nil and (debugMode or firstError) then
 		spEcho("LUA_ERRRUN", "[Commshare] player " .. playerID .. "(" .. name .. ") sent an invalid command")

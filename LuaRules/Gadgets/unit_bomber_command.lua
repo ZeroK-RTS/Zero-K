@@ -807,8 +807,6 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 local spGetLocalTeamID = Spring.GetLocalTeamID
-local spGetSpectatingState = Spring.GetSpectatingState
-local spValidUnitID = Spring.ValidUnitID
 local spGetSelectedUnits = Spring.GetSelectedUnits
 
 function gadget:DefaultCommand(type, targetID)
@@ -837,6 +835,8 @@ function gadget:DefaultCommand(type, targetID)
 end
 
 --[[ widget
+local spValidUnitID = Spring.ValidUnitID
+local spGetSpectatingState = Spring.GetSpectatingState
 local noAmmoTexture = 'LuaUI/Images/noammo.png'
 local function DrawUnitFunc(yshift)
 	gl.Translate(0,yshift,0)

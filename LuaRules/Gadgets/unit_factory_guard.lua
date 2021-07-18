@@ -35,9 +35,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Automatically generated local definitions
 
 local CMD_GUARD            = CMD.GUARD
-local spGetMyTeamID        = Spring.GetMyTeamID
 local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
-local spGetUnitGroup       = Spring.GetUnitGroup
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetUnitRadius      = Spring.GetUnitRadius
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit

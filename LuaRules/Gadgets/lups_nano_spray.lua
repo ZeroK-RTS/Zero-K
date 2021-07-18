@@ -16,7 +16,6 @@ end
 
 
 local spGetFactoryCommands = Spring.GetFactoryCommands
-local spGetCommandQueue    = Spring.GetCommandQueue
 
 local function GetCmdTag(unitID)
 	local cmdTag = 0
@@ -317,7 +316,7 @@ function gadget:GameFrame(frame)
 					local allyID = Spring.GetUnitAllyTeam(unitID)
 					local unitDefID = Spring.GetUnitDefID(unitID)
 					local faction = GetFaction(unitDefID)
-					local teamColor = {Spring.GetTeamColor(teamID)}
+					local teamColor = {spGetTeamColor(teamID)}
 					local nanoPieces = Spring.GetUnitNanoPieces(unitID) or {}
 
 					strength = strength * allyTeamStrengthMult[allyID]

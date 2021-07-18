@@ -61,7 +61,6 @@ local spCreateUnit          = Spring.CreateUnit
 local spSetUnitHealth       = Spring.SetUnitHealth
 local spSetUnitMaxHealth    = Spring.SetUnitMaxHealth
 local spSetUnitVelocity     = Spring.SetUnitVelocity
-local spSetUnitRotation     = Spring.SetUnitRotation
 local spSetUnitExperience   = Spring.SetUnitExperience
 local spSetUnitShieldState  = Spring.SetUnitShieldState
 local spSetUnitWeaponState  = Spring.SetUnitWeaponState
@@ -700,9 +699,7 @@ local spGetFeatureHealth	= Spring.GetFeatureHealth
 local spGetFeatureDirection	= Spring.GetFeatureDirection
 local spGetFeaturePosition	= Spring.GetFeaturePosition
 local spGetFeatureHeading	= Spring.GetFeatureHeading
-local spGetFeatureVelocity	= Spring.GetFeatureVelocity
 local spGetFeatureResources	= Spring.GetFeatureResources
-local spGetFeatureNoSelect	= Spring.GetFeatureNoSelect
 
 local spGetProjectileDefID         = Spring.GetProjectileDefID
 local spGetProjectileTeamID        = Spring.GetProjectileTeamID

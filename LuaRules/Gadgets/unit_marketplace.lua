@@ -22,34 +22,12 @@ local TESTMODE = false
 local echo 				= Spring.Echo
 local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spGetTeamInfo		= Spring.GetTeamInfo
-local spGetTeamList		= Spring.GetTeamList
-local spAreTeamsAllied	= Spring.AreTeamsAllied
-local spGetAllUnits     = Spring.GetAllUnits
-local spGetUnitDefID    = Spring.GetUnitDefID
 
 local market = {}
 
 if not GG.shareunits then
 	GG.shareunits = {}
 end
-
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local spGetUnitIsActive     = Spring.GetUnitIsActive
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetTeamUnitCount	= Spring.GetTeamUnitCount
-local spInsertUnitCmdDesc	= Spring.InsertUnitCmdDesc
-local spGetAllyTeamList		= Spring.GetAllyTeamList
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 
 local function CheckOffer(data)
 	local saleprice = data.sell

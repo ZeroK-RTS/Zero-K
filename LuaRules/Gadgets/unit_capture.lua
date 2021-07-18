@@ -632,7 +632,6 @@ else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
@@ -700,14 +699,13 @@ local function DrawWire(units, spec)
 			local los1 = spGetUnitLosState(controller, myTeam, false)
 			local los2 = spGetUnitLosState(controliee, myTeam, false)
 			if teamID and (spec or (los1 and los1.los) or (los2 and los2.los)) then
-				-- (spIsUnitInView(controliee) or spIsUnitInView(controller)) -- Doesn't quite work because capture line may be long.
 				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
 				
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controller, true)
+				local _,_,_,xxx,yyy,zzz = spGetUnitPosition(controller, true)
 				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz, 50)
 				point[1] = {xxx, yyy, zzz}
 				point[2] = {topX, topY, topZ}
-				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controliee, true)
+				_,_,_,xxx,yyy,zzz = spGetUnitPosition(controliee, true)
 				topX, topY, topZ = GetUnitTop(controliee, xxx, yyy, zzz)
 				point[3] = {topX,topY,topZ}
 				point[4] = {xxx,yyy,zzz}
@@ -739,7 +737,7 @@ end
 
 local lastFrame = 0
 function gadget:DrawWorld()
-	if Spring.GetGameFrame() ~= lastFrame then
+	if spGetGameFrame() ~= lastFrame then
 		UpdateList()
 	end
 	

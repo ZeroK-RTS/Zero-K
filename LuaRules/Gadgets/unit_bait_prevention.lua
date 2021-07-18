@@ -22,12 +22,10 @@ end
 --------------------------------------------------------------------------------
 
 local spValidUnitID         = Spring.ValidUnitID
-local spGetGameFrame        = Spring.GetGameFrame
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitLosState     = Spring.GetUnitLosState
 
 local debugBait = false
 
