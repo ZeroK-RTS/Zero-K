@@ -280,6 +280,12 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 						bombers[proOwnerID].underShield = gameFrame + 45
 						if targetID then
 							local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
+							--[[ Distance to target is nil to dive as soon as possible,
+							     as suggested by the comments inside `temporaryDive`.
+							     Without it, the first dive attempt can be ignored for
+							     being too far away and yet the second one will be too
+							     close already (because the fake weapon shoots comparatively
+							     rarely for how fast bombers are). ]]
 							temporaryDive(proOwnerID, 45, height, nil, targetID)
 						else
 							temporaryDive(proOwnerID, 45, 40)
