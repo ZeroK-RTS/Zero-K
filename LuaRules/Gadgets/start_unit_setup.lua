@@ -18,7 +18,6 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetPlayerInfo       = Spring.GetPlayerInfo
-local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetPlayerList       = Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
@@ -697,13 +696,6 @@ end
 -- unsynced code
 --------------------------------------------------------------------
 else
-
-local teamID 			= Spring.GetLocalTeamID()
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spValidUnitID 	= Spring.ValidUnitID
-local spAreTeamsAllied 	= Spring.AreTeamsAllied
-local spGetUnitTeam 	= Spring.GetUnitTeam
-
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction('CommSelection',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"

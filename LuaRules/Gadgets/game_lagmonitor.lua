@@ -31,23 +31,16 @@ local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
 
-local spAddTeamResource       = Spring.AddTeamResource
 local spEcho                  = Spring.Echo
 local spGetGameSeconds        = Spring.GetGameSeconds
 local spGetPlayerInfo         = Spring.GetPlayerInfo
 local spGetTeamInfo           = Spring.GetTeamInfo
 local spGetTeamList           = Spring.GetTeamList
-local spGetTeamResources      = Spring.GetTeamResources
 local spGetTeamUnits          = Spring.GetTeamUnits
 local spGetUnitAllyTeam       = Spring.GetUnitAllyTeam
 local spGetUnitDefID          = Spring.GetUnitDefID
-local spGetUnitTeam           = Spring.GetUnitTeam
 local spGetPlayerList         = Spring.GetPlayerList
 local spTransferUnit          = Spring.TransferUnit
-local spUseTeamResource       = Spring.UseTeamResource
-local spGetUnitIsBuilding     = Spring.GetUnitIsBuilding
-local spGetUnitHealth         = Spring.GetUnitHealth
-local spSetUnitHealth         = Spring.SetUnitHealth
 local spSetPlayerRulesParam   = Spring.SetPlayerRulesParam
 local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
@@ -372,7 +365,7 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 end
 
 local function UpdateAllyTeamActivity(allyTeamID)
-	local teamList = Spring.GetTeamList(allyTeamID)
+	local teamList = spGetTeamList(allyTeamID)
 	
 	local totalResourceShares = 0
 	local giveAwayTeams = {}
@@ -460,7 +453,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 end
 
 local function InitializeAiTeamRulesParams()
-	local teamList = Spring.GetTeamList()
+	local teamList = spGetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local _, leaderID, _, isAiTeam, _, _, customKeys = spGetTeamInfo(teamID)
@@ -550,7 +543,7 @@ function externalFunctions.GetResourceShares()
 end
 
 function gadget:Initialize()
-	local teamList = Spring.GetTeamList()
+	local teamList = spGetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local _, playerID, _, isAI, _, allyTeamID = Spring.GetTeamInfo(teamID, false)

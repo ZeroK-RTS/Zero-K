@@ -35,11 +35,8 @@ local spGetAllUnits       = Spring.GetAllUnits
 local spGetAllyTeamList   = Spring.GetAllyTeamList
 local spGetPlayerInfo     = Spring.GetPlayerInfo
 local spGetPlayerList     = Spring.GetPlayerList
-local spAreTeamsAllied    = Spring.AreTeamsAllied
 local spGetUnitTeam       = Spring.GetUnitTeam
 local spGetUnitDefID      = Spring.GetUnitDefID
-local spGetUnitIsStunned  = Spring.GetUnitIsStunned
-local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
 local spTransferUnit      = Spring.TransferUnit
 local spGetGameRulesParam = Spring.GetGameRulesParam
@@ -758,7 +755,7 @@ function gadget:GameFrame(n)
 	if toDestroy[n] then
 		for unitID in pairs(toDestroy[n]) do
 			if Spring.ValidUnitID(unitID) then
-				local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+				local allyTeamID = spGetUnitAllyTeam(unitID)
 				if destroyedAlliances[allyTeamID] then
 					spDestroyUnit(unitID, true)
 				end

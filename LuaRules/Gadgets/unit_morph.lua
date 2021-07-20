@@ -1260,15 +1260,6 @@ function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
 
-local function split(msg,sep)
-	local s=sep or '|'
-	local t={}
-	for e in string.gmatch(msg..s,'([^%'..s..']+)%'..s) do
-		t[#t+1] = e
-	end
-	return t
-end
-
 function gadget:Save(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")

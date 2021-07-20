@@ -139,7 +139,6 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
@@ -521,7 +520,6 @@ function gadget:GameFrame(n)
 					local mRatio = max(0,nextMetalLevel)/metalDrain
 					local eRatio = max(0,nextEnergyLevel)/energyDrain
 				
-					local spare
 					if mRatio < eRatio then
 						-- mRatio is lower so we are stalling metal harder.
 						-- Set construction scale limited by metal.

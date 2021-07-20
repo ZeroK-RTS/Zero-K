@@ -12,8 +12,6 @@ end
 
 include("LuaRules/Configs/constants.lua")
 
-local spGetAllyTeamList = Spring.GetAllyTeamList
-local spIsGameOver      = Spring.IsGameOver
 local spGetTeamInfo     = Spring.GetTeamInfo
 local gaiaTeamID        = Spring.GetGaiaTeamID()
 
@@ -29,8 +27,6 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local spAreTeamsAllied      = Spring.AreTeamsAllied
-local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetTeamStatsHistory = Spring.GetTeamStatsHistory
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitTeam         = Spring.GetUnitTeam
@@ -624,8 +620,6 @@ end
 else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-local spSendCommands  = Spring.SendCommands
 
 local teamNames     = {}
 local awardList
