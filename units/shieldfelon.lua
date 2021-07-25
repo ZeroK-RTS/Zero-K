@@ -18,6 +18,7 @@ return { shieldfelon = {
     shield_emit_height = 25,
     shield_color_mult = 1.1,
     dontfireatradarcommand = '1',
+    aim_lookahead     = 30,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -28,7 +29,7 @@ return { shieldfelon = {
   idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
-  maxDamage           = 1400,
+  maxDamage           = 1600,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,

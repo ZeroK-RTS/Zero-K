@@ -83,8 +83,8 @@ return { shieldskirm = {
       },
       
       damage                  = {
-        default = 340,
-        planes  = 340,
+        default = 350,
+        planes  = 350,
       },
 
       fireStarter             = 70,
@@ -102,7 +102,7 @@ return { shieldskirm = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
-      startVelocity           = 185,
+      startVelocity           = 192,
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,

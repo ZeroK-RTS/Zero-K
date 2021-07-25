@@ -39,7 +39,7 @@ local gun_1 = 0
 local DRAIN = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.shield_drain)
 local SHIELD_RADIUS = 100
 local SPEED = UnitDef.speed / 30
-local AIM_DELAY = 133
+local AIM_DELAY = 0
 local RESTORE_DELAY = 4000
 
 --signals

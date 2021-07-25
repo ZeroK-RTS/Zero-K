@@ -90,8 +90,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 26,
-        planes  = 26,
+        default = 27,
+        planes  = 27,
       },
 
       customParams           = {
