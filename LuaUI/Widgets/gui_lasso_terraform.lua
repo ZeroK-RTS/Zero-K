@@ -136,10 +136,10 @@ options = {
 local hotkeyDefaults = {
 	levelPresets = {0, -8, -20, -24},
 	levelTypePreset = {0, 0, 0, 0},
-	raisePresets = {12, 24, 44, 240, -120},
-	raiseTypePreset = {1, 1, 1},
+	raisePresets = {12, 24, 46, 240, -120, 96},
+	raiseTypePreset = {1, 1, 1, 0, 0, 1},
 	levelCursorHotkey = {"alt+g"},
-	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j"},
+	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j", "alt+m"},
 }
 
 ---------------------------------
