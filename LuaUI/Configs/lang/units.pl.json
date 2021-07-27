@@ -1062,7 +1062,7 @@
 	"amphriot" : {
 		"name" : "Scallop",
 		"description" : "Amfibijny bot wsparcia",
-		"helptext" : "Wszechstronna amfibia uzbrojona w torpedy do użytku pod wodą i shotgun do niszczenia celów na lądzie."
+		"helptext" : "Amfibia uzbrojona w ładunki głębinowe do użytku przeciw celom podwodnym i shotgun do niszczenia celów na lądzie."
 	},
 	"planecon" : {
 		"name" : "Crane",
