@@ -85,13 +85,13 @@ return { jumpskirm = {
       coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-      
+
       customparams = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 4,
         timeslow_overslow_frames = 2*30,
-        
+
         light_color = [[1.88 0.63 2.5]],
         light_radius = 320,
       },
@@ -99,8 +99,8 @@ return { jumpskirm = {
       damage                  = {
           default = 460.1,
       },
-      
-      explosionGenerator      = [[custom:flash2purple]],
+
+      explosionGenerator      = [[custom:heavy_disrupter_beam_hit]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
