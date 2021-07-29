@@ -308,6 +308,7 @@ local function SnapSatellite()
 	while true do
 		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
 		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+		Spring.MoveCtrl.SetVelocity(satUnitID,0,0,0)
 		Sleep(30)
 	end
 end
