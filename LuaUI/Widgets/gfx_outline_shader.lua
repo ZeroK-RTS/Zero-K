@@ -299,6 +299,8 @@ function widget:Initialize()
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 	if not canContinue then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
+		widgetHandler:RemoveWidget()
+		return
 	end
 
 	firstTime = true
