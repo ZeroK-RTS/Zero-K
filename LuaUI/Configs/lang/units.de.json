@@ -516,7 +516,7 @@
 	},
 	"amphriot" : {
 		"name" : "Scallop",
-		"description" : "Amphibious Riot Bot",
+		"description" : "Amphibious Riot Bot (Anti-Sub)",
 		"helptext" : "A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land."
 	},
 	"amphaa" : {
