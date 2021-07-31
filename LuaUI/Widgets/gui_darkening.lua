@@ -85,7 +85,6 @@ function widget:Initialize()
   end
   UpdateCallins();
 
-  local help = " [0..1]:  sets map darkening";
   widgetHandler:AddAction("darkening", SetDarkening, nil, "t");
   widgetHandler:AddAction("inc_dark", IncDarkening, nil, "t");
   widgetHandler:AddAction("dec_dark", DecDarkening, nil, "t");

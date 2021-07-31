@@ -12,7 +12,6 @@ end
 
 local gl     = gl
 local Spring = Spring
-local table  = table
 
 local stockpilerDefNames = {
 	"staticnuke",

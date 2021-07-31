@@ -39,7 +39,7 @@ local function CreateWindow()
 		minimizable = false,
 	}
 
-	local background = Chili.Panel:New{
+	Chili.Panel:New{
 		classname = "panel_0021",
 		x = 0,
 		y = 0,

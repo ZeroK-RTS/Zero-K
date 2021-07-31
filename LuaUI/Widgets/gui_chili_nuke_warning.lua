@@ -66,7 +66,7 @@ end
 local function CreateWindow()
 	local data = {}
 	
-	local screenWidth,screenHeight = Spring.GetViewGeometry()
+	local screenWidth = Spring.GetViewGeometry()
 	local screenHorizCentre = screenWidth / 2
 	local windowWidth = 500
 	local resourcePanelHeight = 100

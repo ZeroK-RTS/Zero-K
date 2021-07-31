@@ -77,8 +77,6 @@ local spGetTeamColor         = Spring.GetTeamColor
 local spGetTeamList          = Spring.GetTeamList
 local spGetTeamUnits         = Spring.GetTeamUnits
 local spIsUnitVisible        = Spring.IsUnitVisible
-local spIsUnitIconic         = Spring.IsUnitIconic
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

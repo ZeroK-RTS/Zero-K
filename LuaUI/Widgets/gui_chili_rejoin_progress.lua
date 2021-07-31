@@ -130,7 +130,7 @@ end
 
 function widget:Initialize()
 
-	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	local screenWidth = Spring.GetViewGeometry()
 	local y = screenWidth*2/11 + 32
 
 	screen0 = WG.Chili.Screen0
