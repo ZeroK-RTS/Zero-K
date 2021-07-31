@@ -43,8 +43,6 @@ local increaseSizeCmdDesc = {
 
 local LOS_ACCESS = { inlos = true }
 
-local unitData = {}
-
 -------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -61,19 +59,21 @@ function gadget:Initialize()
 	end
 end
 
---local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
---function gadget:UnitCreated(unitID, unitDefID, team)
-	--if UnitDefs[unitDefID].commander then
-		--spInsertUnitCmdDesc(unitID, decreaseSizeCmdDesc)
-		--spInsertUnitCmdDesc(unitID, increaseSizeCmdDesc)
-	--end
---end
+--[[
+local unitData = {}
+
+local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
+function gadget:UnitCreated(unitID, unitDefID, team)
+	if UnitDefs[unitDefID].commander then
+		spInsertUnitCmdDesc(unitID, decreaseSizeCmdDesc)
+		spInsertUnitCmdDesc(unitID, increaseSizeCmdDesc)
+	end
+end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitData[unitID] = nil
 end
 
---[[
 function gadget:AllowCommand_GetWantedCommand()
 	return {
 		[CMD_DECREASE_SIZE] = true,

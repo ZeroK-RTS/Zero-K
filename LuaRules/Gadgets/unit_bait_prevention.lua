@@ -35,12 +35,7 @@ local debugBait = false
 local baitPreventionDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs, targetCostDefs, baitLevelCosts = include("LuaRules/Configs/bait_prevention_defs.lua")
 
 local unitBaitLevel = {}
-local unitDefCost = {}
 
-for i = 1, #UnitDefs do
-	local ud = UnitDefs[i]
-	unitDefCost[i] = ud.cost
-end
 include("LuaRules/Configs/customcmds.h.lua")
 
 local preventChaffShootingCmdDesc = {

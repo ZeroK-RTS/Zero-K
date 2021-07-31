@@ -21,7 +21,6 @@ if (gadgetHandler:IsSyncedCode()) then -- synced
 local getMovetype = Spring.Utilities.getMovetype
 
 local throwWeaponID = {}
-local throwWeaponName = {}
 local throwShooterID = {
 	-- [UnitDefNames["gorg"].id] = true
 }
@@ -31,7 +30,6 @@ for i=1,#WeaponDefs do
 	
 	if wd.customParams and wd.customParams.massliftthrow then
 		throwWeaponID[wd.id] = true
-		throwWeaponName[wd.name] = wd.id
 		Script.SetWatchExplosion(wd.id, true)
 	end
 end
