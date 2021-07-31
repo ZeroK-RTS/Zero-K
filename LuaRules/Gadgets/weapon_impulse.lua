@@ -127,9 +127,11 @@ local function DetatchFromGround(unitID, threshold, height, doImpulse)
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, doImpulse, 0)
 		end
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
-		Spring.MoveCtrl.Disable(unitID)
+		if not Spring.MoveCtrl.IsEnabled(unitID) then
+			Spring.MoveCtrl.Enable(unitID)
+			Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
+			Spring.MoveCtrl.Disable(unitID)
+		end
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, -doImpulse, 0)
 		end
