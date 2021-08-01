@@ -388,26 +388,47 @@ function widget:Shutdown()
 
 	if screenQuadList then
 		gl.DeleteList(screenQuadList)
+		screenQuadList = nil
 	end
 
 	if screenWideList then
 		gl.DeleteList(screenWideList)
+		screenWideList = nil
 	end
 
-	gl.DeleteTexture(shapeTex)
-
-	for i = 1, 2 do
-		gl.DeleteTexture(blurTexes[i])
+	if shapeTex then
+		gl.DeleteTexture(shapeTex)
+		shapeTex = nil
 	end
 
-	gl.DeleteFBO(shapeFBO)
 	for i = 1, 2 do
-		gl.DeleteFBO(blurFBOs[i])
+		if blurTexes[i] then
+			gl.DeleteTexture(blurTexes[i])
+			blurTexes[i] = nil
+		end
+	end
+
+	if shapeFBO then
+		gl.DeleteFBO(shapeFBO)
+		shapeFBO = nil
+	end
+
+	for i = 1, 2 do
+		if blurFBOs[i] then
+			gl.DeleteFBO(blurFBOs[i])
+			blurFBOs[i] = nil
+		end
 	end
 
 	ResetCache()
-	shapeShader:Finalize()
-	applicationShader:Finalize()
+	if shapeShader then
+		shapeShader:Finalize()
+		shapeShader = nil
+	end
+	if applicationShader then
+		applicationShader:Finalize()
+		applicationShader = nil
+	end
 end
 
 local function DoDrawOutline(isScreenSpace)
