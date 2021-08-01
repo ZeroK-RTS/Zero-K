@@ -76,7 +76,7 @@
 	},
 	"hoverraid" : {
 		"name" : "Dagger",
-		"description" : "Fast Attack Hovercraft",
+		"description" : "Fast Attack Hovercraft (Anti-Sub)",
 		"helptext" : "The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets."
 	},
 	"hoverheavyraid" : {
@@ -101,7 +101,7 @@
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
-		"description" : "Torpedo Launcher",
+		"description" : "Torpedo Launcher (Anti-Sub)",
 		"helptext" : "This Torpedo Launcher provides defense against both surface and submerged vessels."
 	},
 	"tankheavyassault" : {
@@ -151,7 +151,7 @@
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
-		"description" : "Gauss Turret, 10 health/s when closed",
+		"description" : "Popup gauss turret, regenerates when closed (Anti-Sub)",
 		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
@@ -326,7 +326,7 @@
 	},
 	"bomberprec" : {
 		"name" : "Raven",
-		"description" : "Precision Bomber",
+		"description" : "Precision Bomber (Anti-Sub)",
 		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Minotaur, but you should look elsewhere for something to use against smaller mobiles."
 	},
 	"chicken_shield" : {
@@ -516,7 +516,7 @@
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
-		"description" : "Cloaked Anti-Heavy/Anti-Strider Walker",
+		"description" : "Cloaked Anti-Strider Walker (Undersea Fire)",
 		"helptext" : "The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units."
 	},
 	"staticmex" : {
@@ -556,7 +556,7 @@
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
-		"description" : "Anti-Sub Hovercraft",
+		"description" : "Riot Hovercraft (Anti-Sub)",
 		"helptext" : "The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land."
 	},
 	"gunshipkrow" : {
@@ -656,7 +656,7 @@
 	},
 	"striderdetriment" : {
 		"name" : "Detriment",
-		"description" : "Ultimate Assault Strider",
+		"description" : "Ultimate Assault Strider (Undersea Fire)",
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
 	},
 	"energygeo" : {
@@ -926,22 +926,22 @@
 	},
 	"shipscout" : {
 		"name" : "Cutter",
-		"description" : "Picket Ship (Disarming Scout)",
+		"description" : "Scout Ship (Disarming)",
 		"helptext" : "Cheap, fast, and fragile, this Picket Ship is a good scout and spotter for more expensive ships. In numbers, their disarming missiles are effective against larger targets."
 	},
 	"shiptorpraider" : {
 		"name" : "Hunter",
-		"description" : "Torpedo-Boat (Raider)",
+		"description" : "Torpedo Raider Ship (Anti-Sub)",
 		"helptext" : "The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels."
 	},
 	"shipskirm" : {
 		"name" : "Mistral",
-		"description" : "Rocket Boat (Skirmisher)",
+		"description" : "Skirmisher Ship",
 		"helptext" : "This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
 	},
 	"subraider" : {
 		"name" : "Seawolf",
-		"description" : "Attack Submarine (Stealth Raider)",
+		"description" : "Raider Attack Submarine (Undersea Fire)",
 		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers."
 	},
 	"subtacmissile" : {
@@ -951,17 +951,17 @@
 	},
 	"shipriot" : {
 		"name" : "Corsair",
-		"description" : "Corvette (Raider/Riot)",
+		"description" : "Raider/Riot Corvette",
 		"helptext" : "This Corvette comes equipped with two shotguns which are effective against anything which gets close. It has no weapons effective against underwater targets."
 	},
 	"shipassault" : {
 		"name" : "Siren",
-		"description" : "Destroyer (Riot/Assault)",
+		"description" : "Riot/Assault Destroyer (Anti-Sub)",
 		"helptext" : "This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets."
 	},
 	"shiparty" : {
 		"name" : "Envoy",
-		"description" : "Cruiser (Artillery)",
+		"description" : "Artillery Cruiser",
 		"helptext" : "This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships."
 	},
 	"shipaa" : {
@@ -1076,7 +1076,7 @@
 	},
 	"amphimpulse" : {
 		"name" : "Archer",
-		"description" : "Amphibious Raider/Riot Bot",
+		"description" : "Amphibious Raider/Riot Bot (Anti-Sub)",
 		"helptext" : "The Archer uses a powerful sonic cannon to hit units above or below the water. It does not work while wet, so Archers must float to fire."
 	},
 	"fakeunit" : {
@@ -1121,7 +1121,7 @@
 	},
 	"amphriot" : {
 		"name" : "Scallop",
-		"description" : "Amphibious Riot Bot (Anti-Sub)",
+		"description" : "Amphibious Riot Bot (Undersea Fire)",
 		"helptext" : "A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land."
 	},
 	"planecon" : {
@@ -1141,7 +1141,7 @@
 	},
 	"amphraid" : {
 		"name" : "Duck",
-		"description" : "Amphibious Raider Bot (Anti-Sub)",
+		"description" : "Amphibious Raider (Anti-Sub, Undersea Fire)",
 		"helptext" : "The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon."
 	},
 	"planefighter" : {
