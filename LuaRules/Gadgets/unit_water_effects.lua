@@ -74,7 +74,7 @@ local function updateWeaponFromTank(unitID)
 
 end
 
-function shotWaterWeapon(unitID)
+function GG.shotWaterWeapon(unitID)
 	
 	local data = unit[unitID]
 	local effect = unitDefData[data.unitDefID]
@@ -102,8 +102,6 @@ function shotWaterWeapon(unitID)
 	
 	Spring.SetUnitRulesParam(unitID,"watertank",data.storage, LOS_ACCESS)
 end
-
-GG.shotWaterWeapon = shotWaterWeapon
 
 function gadget:GameFrame(n)
 	

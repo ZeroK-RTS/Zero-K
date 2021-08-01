@@ -43,6 +43,7 @@ local DEBRIS_SPRING_DAMAGE_MULTIPLIER = 10 --tweaked arbitrarily
 local gameframe = Spring.GetGameFrame()
 local attributes = {}
 local unitWantedVelocity
+local unitAlreadyProcessed
 
 for unitDefID=1,#UnitDefs do
 	local ud = UnitDefs[unitDefID]

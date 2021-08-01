@@ -122,6 +122,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetIdentified = (targetVisiblityState == 15) or (math.floor(targetVisiblityState / 4) % 4 == 3)
+	local shotsRequired
 	if targetIdentified then
 		local targetDefID = Spring.GetUnitDefID(targetID)
 		shotsRequired = shotRequirement[targetDefID] or 2
