@@ -75,7 +75,7 @@ return { cloakcon = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[spherejeth_dead.s3o]],
+      object           = [[cloakcon_dead.s3o]],
     },
 
     HEAP  = {
