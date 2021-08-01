@@ -1,6 +1,6 @@
 -- Stronghold beta boxes by Shaman --
 
-local team1box = {
+local boxSE = {
 	{6287, 8064},
 	{6223, 8064},
 	{6212, 8027},
@@ -104,7 +104,7 @@ local team1box = {
 	{6303, 8057},
 }
 
-local team5box = {
+local boxE = {
 	{6396, 5345},
 	{6459, 5352},
 	{6542, 5359},
@@ -196,7 +196,7 @@ local team5box = {
 	{6456, 5244},
 }
 
-local team3box = {
+local boxNE = {
 	{7624, 2295},
 	{7715, 2292},
 	{7759, 2229},
@@ -314,7 +314,7 @@ local team3box = {
 	{7616, 2275},
 }
 
-local team2box = {
+local boxNW = {
 	{121, 2336},
 	{190, 2323},
 	{226, 2242},
@@ -487,7 +487,7 @@ local team2box = {
 	{142, 2306},
 }
 
-local team6box = {
+local boxW = {
 	{126, 3891},
 	{196, 3878},
 	{243, 3885},
@@ -581,7 +581,7 @@ local team6box = {
 	{144, 3874},
 }
 
-local team4box = {
+local boxSW = {
 	{769, 7723},
 	{796, 7759},
 	{800, 7773},
@@ -818,7 +818,7 @@ local team4box = {
 	{783, 7709},
 }
 
-local team7box = {
+local boxN = {
 	{4603, 2261},
 	{4593, 2145},
 	{4566, 2084},
@@ -929,7 +929,7 @@ local team7box = {
 	{4668, 2286},
 }
 
-local team8box = {
+local boxS = {
 	{3437, 8030},
 	{3449, 8036},
 	{3483, 8020},
@@ -1069,42 +1069,42 @@ shorts[6] = "S"
 shorts[7] = "N"
 
 
-local team1boxstart = {
+local startSE = {
 	{6995, 7529},
 	{7650, 6462},
 }
 
-local team2boxstart = {
+local startNW = {
 	{1104, 691},
 	{508, 1853},
 }
 
-local team3boxstart = {
+local startNE = {
 	{6436, 503},
 	{7492, 1267},
 }
 
-local team4boxstart = {
+local startSW = {
 	{1695, 7678},
 	{656, 6943},
 }
 
-local team5boxstart = {
+local startE = {
 	{6643, 4557},
 	{7588, 4932},
 }
 
-local team6boxstart = {
+local startW = {
 	{1524, 3622},
 	{691, 3292},
 }
 
-local team7boxstart = {
+local startN = {
 	{4452, 1623},
 	{4912, 783},
 }
 
-local  team8boxstart = {
+local startS = {
 	{3560, 6720},
 	{3138, 7367},
 }
@@ -1116,10 +1116,10 @@ end
 
 
 -- give everyone a startbox and startpoints. --
-boxes[0].startpoints = team1boxstart
-boxes[1].startpoints = team2boxstart
-boxes[0].boxes[1] = team1box
-boxes[1].boxes[1] = team2box
+boxes[0].startpoints = startSE
+boxes[1].startpoints = startNW
+boxes[0].boxes[1] = boxSE
+boxes[1].boxes[1] = boxNW
 
 local function MergeStarts(t1, t2)
 	local ret = t1
@@ -1141,58 +1141,58 @@ if not isFFA then -- give extra boxes in big teams/coop
 	if not isSmallTeams then
 		local team1, team2
 		if r <= 3 then -- SvS
-			team1 = MergeStarts(team1boxstart, team5boxstart)
-			team1 = MergeStarts(team1, team3boxstart)
-			team2 = MergeStarts(team2boxstart, team6boxstart)
-			team2 = MergeStarts(team2, team4boxstart)
-			boxes[0].boxes[2] = team5box
-			boxes[0].boxes[3] = team3box
-			boxes[1].boxes[2] = team6box
-			boxes[1].boxes[3] = team4box
+			team1 = MergeStarts(startSE, startE)
+			team1 = MergeStarts(team1, startNE)
+			team2 = MergeStarts(startNW, startW)
+			team2 = MergeStarts(team2, startSW)
+			boxes[0].boxes[2] = boxE
+			boxes[0].boxes[3] = boxNE
+			boxes[1].boxes[2] = boxW
+			boxes[1].boxes[3] = boxSW
 			boxes[0].nameLong = names[4]
 			boxes[1].nameLong = names[5]
 			boxes[0].nameShort = shorts[4]
 			boxes[1].nameShort = shorts[5]
 		elseif r <= 6 then -- TvB
-			team1 = MergeStarts(team1boxstart, team8boxstart)
-			team1 = MergeStarts(team1, team4boxstart)
-			team2 = MergeStarts(team2boxstart, team7boxstart)
-			team2 = MergeStarts(team2, team6boxstart)
-			boxes[0].boxes[2] = team8box
-			boxes[0].boxes[3] = team4box
-			boxes[1].boxes[2] = team7box
-			boxes[1].boxes[3] = team6box
+			team1 = MergeStarts(startSE, startS)
+			team1 = MergeStarts(team1, startSW)
+			team2 = MergeStarts(startNW, startN)
+			team2 = MergeStarts(team2, startW)
+			boxes[0].boxes[2] = boxS
+			boxes[0].boxes[3] = boxSW
+			boxes[1].boxes[2] = boxN
+			boxes[1].boxes[3] = boxW
 			boxes[0].nameLong = names[7]
 			boxes[0].nameShort = shorts[7]
 			boxes[1].nameLong = names[6]
 			boxes[1].nameShort = shorts[6]
 		else -- SW vs NE
-			team1 = MergeStarts(team1boxstart, team5boxstart)
-			team1 = MergeStarts(team1, team7boxstart)
-			team2 = MergeStarts(team2boxstart, team8boxstart)
-			team2 = MergeStarts(team2, team6boxstart)
-			boxes[0].boxes[2] = team5box
-			boxes[0].boxes[3] = team7box
-			boxes[1].boxes[2] = team8box
-			boxes[1].boxes[3] = team6box
+			team1 = MergeStarts(startSE, startE)
+			team1 = MergeStarts(team1, startN)
+			team2 = MergeStarts(startNW, startS)
+			team2 = MergeStarts(team2, startW)
+			boxes[0].boxes[2] = boxE
+			boxes[0].boxes[3] = boxN
+			boxes[1].boxes[2] = boxS
+			boxes[1].boxes[3] = boxW
 		end
 		boxes[0].startpoints = team1
 		boxes[1].startpoints = team2
 	elseif isSmallTeams then
 		if r >= 5 then
-			local team1 = MergeStarts(team1boxstart, team5boxstart)
-			local team2 = MergeStarts(team2boxstart, team6boxstart)
+			local team1 = MergeStarts(startSE, startE)
+			local team2 = MergeStarts(startNW, startW)
 			boxes[0].startpoints = team1
 			boxes[1].startpoints = team2
-			boxes[0].boxes[2] = team5box
-			boxes[1].boxes[2] = team6box
+			boxes[0].boxes[2] = boxE
+			boxes[1].boxes[2] = boxW
 		else
-			local team1 = MergeStarts(team1boxstart, team8boxstart)
-			local team2 = MergeStarts(team2boxstart, team7boxstart)
+			local team1 = MergeStarts(startSE, startS)
+			local team2 = MergeStarts(startNW, startN)
 			boxes[0].startpoints = team1
 			boxes[1].startpoints = team2
-			boxes[0].boxes[2] = team8box
-			boxes[1].boxes[2] = team7box
+			boxes[0].boxes[2] = boxS
+			boxes[1].boxes[2] = boxN
 		end
 	end
 else -- 8 way FFA.
@@ -1205,31 +1205,31 @@ else -- 8 way FFA.
 			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
 			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
 		end
-		boxes[4].boxes[1] = team5box
-		boxes[5].boxes[1] = team6box
-		boxes[6].boxes[1] = team7box
-		boxes[7].boxes[1] = team8box
-		boxes[4].startpoints = team5boxstart
-		boxes[5].startpoints = team6boxstart
-		boxes[6].startpoints = team7boxstart
-		boxes[7].startpoints = team8boxstart
+		boxes[4].boxes[1] = boxE
+		boxes[5].boxes[1] = boxW
+		boxes[6].boxes[1] = boxN
+		boxes[7].boxes[1] = boxS
+		boxes[4].startpoints = startE
+		boxes[5].startpoints = startW
+		boxes[6].startpoints = startN
+		boxes[7].startpoints = startS
 		return boxes, {8}
 	else
 		
 		if r > 5 then
-			boxes[2].boxes[1] = team3box
-			boxes[3].boxes[1] = team4box
-			boxes[2].startpoints = team3boxstart
-			boxes[3].startpoints = team4boxstart
+			boxes[2].boxes[1] = boxNE
+			boxes[3].boxes[1] = boxSW
+			boxes[2].startpoints = startNE
+			boxes[3].startpoints = startSW
 		else
-			boxes[0].boxes[1] = team5box
-			boxes[1].boxes[1] = team6box
-			boxes[2].boxes[1] = team7box
-			boxes[3].boxes[1] = team8box
-			boxes[0].startpoints = team5boxstart
-			boxes[1].startpoints = team6boxstart
-			boxes[2].startpoints = team7boxstart
-			boxes[3].startpoints = team8boxstart
+			boxes[0].boxes[1] = boxE
+			boxes[1].boxes[1] = boxW
+			boxes[2].boxes[1] = boxN
+			boxes[3].boxes[1] = boxS
+			boxes[0].startpoints = startE
+			boxes[1].startpoints = startW
+			boxes[2].startpoints = startN
+			boxes[3].startpoints = startS
 		end
 		return boxes, {4}
 	end
