@@ -74,12 +74,15 @@ return { tankheavyraid = {
     ARMLATNK_WEAPON = {
       name                    = [[Lightning Gun]],
       areaOfEffect            = 8,
+      beamTTL                 = 1,
+      burst                   = 10,
+      burstrate               = 0.033,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
         burst = Shared.BURST_RELIABLE,
-        extra_damage = 500,
+        extra_damage = 50,
         light_camera_height = 1600,
         light_color = [[0.85 0.85 1.2]],
         light_radius = 180,
@@ -88,11 +91,11 @@ return { tankheavyraid = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 180,
+        default        = 18,
       },
 
       duration                = 10,
-      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
+      explosionGenerator      = [[custom:none]],
       fireStarter             = 150,
       impactOnly              = true,
       impulseBoost            = 0,
