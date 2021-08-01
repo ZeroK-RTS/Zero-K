@@ -941,7 +941,7 @@
 	},
 	"subraider" : {
 		"name" : "Seawolf",
-		"description" : "Raider Attack Submarine (Undersea Fire)",
+		"description" : "Raider Submarine (Anti-Sub, Undersea Fire)",
 		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers."
 	},
 	"subtacmissile" : {
