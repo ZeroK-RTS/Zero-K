@@ -593,7 +593,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	end
 	
 	-- raw access to widgetHandler
-	if (widget.GetInfo and widget:GetInfo().handler) then
+	if (fromZip and widget.GetInfo and widget:GetInfo().handler) then
 		widget.widgetHandler = self
 	end
 	
