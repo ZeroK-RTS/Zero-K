@@ -75,8 +75,6 @@ return { staticheavyarty = {
       craterMult              = 0.5,
 
       customParams            = {
-        restrict_in_widgets = 1,
-
         gatherradius = [[128]],
         smoothradius = [[96]],
         smoothmult   = [[0.4]],

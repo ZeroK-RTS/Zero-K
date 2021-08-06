@@ -71,8 +71,6 @@ return { seismic = {
         smoothexponent = [[0.45]],
         movestructures = [[1]],
 
-        restrict_in_widgets = 1,
-
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
         
