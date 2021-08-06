@@ -559,6 +559,16 @@ end
 function widgetHandler:LoadWidget(filename, _VFSMODE)
 	_VFSMODE = _VFSMODE or VFSMODE
 	local basename = Basename(filename)
+
+	local fromZip
+	if _VFSMODE == VFS.ZIP then
+		fromZip = true
+	elseif _VFSMODE == VFS.RAW_FIRST then
+		fromZip = not VFS.FileExists(filename, VFS.RAW_ONLY)
+	else
+		fromZip = VFS.FileExists(filename, VFS.ZIP_ONLY)
+	end
+
 	local text = VFS.LoadFile(filename, _VFSMODE)
 	
 	if (text == nil) then
@@ -571,7 +581,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 		return nil
 	end
 	
-	local widget = widgetHandler:NewWidget()
+	local widget = widgetHandler:NewWidget(fromZip)
 	setfenv(chunk, widget)
 	local success, err = pcall(chunk)
 	if (not success) then
@@ -613,14 +623,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 		knownInfo.basename = widget.whInfo.basename
 		knownInfo.filename = widget.whInfo.filename
 		knownInfo.alwaysStart = widget.whInfo.alwaysStart
-		knownInfo.fromZip  = true
-		if (_VFSMODE ~= VFS.ZIP) then
-			if (_VFSMODE == VFS.RAW_FIRST) then
-				knownInfo.fromZip = not VFS.FileExists(filename, VFS.RAW_ONLY)
-			else
-				knownInfo.fromZip = VFS.FileExists(filename, VFS.ZIP_ONLY)
-			end
-		end
+		knownInfo.fromZip  = fromZip
 		self.knownWidgets[name] = knownInfo
 		self.knownCount = self.knownCount + 1
 		self.knownChanged = true
@@ -669,8 +672,17 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	return widget
 end
 
+local builtinWidgetsOnly = {}
+local restrictedFunctions = {
+	"GetVisibleProjectiles", -- too perf-hungry to be used for micro (unfair to potatoes), contribute a gadget instead
+}
+for i = 1, #restrictedFunctions do
+	local funcName = restrictedFunctions[i]
+	builtinWidgetsOnly[funcName] = Spring[funcName]
+	Spring[funcName] = nil
+end
 
-function widgetHandler:NewWidget()
+function widgetHandler:NewWidget(fromZip)
 	local widget = {}
 	
 	-- copy the system calls into the widget table
@@ -678,7 +690,11 @@ function widgetHandler:NewWidget()
 	for k, v in pairs(System) do
 		widget[k] = v
 	end
-	
+
+	if fromZip then
+		widget.SpringRestricted = builtinWidgetsOnly
+	end
+
 	widget.WG = self.WG    -- the shared table
 	widget.widget = widget -- easy self referencing
 	
