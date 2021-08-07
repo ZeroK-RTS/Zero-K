@@ -1048,27 +1048,6 @@ local boxS = {
 	{3441, 8023},
 }
 
-local names = {}
-names[0] = "Southeast"
-names[1] = "Northwest"
-names[2] = "Northeast"
-names[3] = "Southwest"
-names[4] = "East"
-names[5] = "West"
-names[6] = "South"
-names[7] = "North"
-
-local shorts = {}
-shorts[0] = "SE"
-shorts[1] = "NW"
-shorts[2] = "NE"
-shorts[3] = "SW"
-shorts[4] = "E"
-shorts[5] = "W"
-shorts[6] = "S"
-shorts[7] = "N"
-
-
 local startSE = {
 	{6995, 7529},
 	{7650, 6462},
@@ -1109,130 +1088,69 @@ local startS = {
 	{3138, 7367},
 }
 
-local boxes = {}
-for i = 0, 1 do -- buildboxes
-	boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-end
-
-
--- give everyone a startbox and startpoints. --
-boxes[0].startpoints = startSE
-boxes[1].startpoints = startNW
-boxes[0].boxes[1] = boxSE
-boxes[1].boxes[1] = boxNW
-
-local function MergeStarts(t1, t2)
-	local ret = t1
+local function MergeStarts(t1, t2, t3)
 	for i = 1, #t2 do
-		ret[#ret + 1] = t2[i]
+		t1[#t1 + 1] = t2[i]
 	end
-	return ret
+	for i = 1, t3 and #t3 or 0 do
+		t1[#t1 + 1] = t3[i]
+	end
+	return t1
 end
 
--- check for FFA
-local isFFA = Spring.Utilities.Gametype.isFFA()
-local isSmallTeams = Spring.Utilities.Gametype.isSmallTeams()
-local teamcount = Spring.Utilities.GetTeamCount()
-local r = math.random(1, 10)
-if not isFFA then -- give extra boxes in big teams/coop
-	local count1 = #Spring.GetTeamList(1)
-	local count2 = #Spring.GetTeamList(2)
-	local players = math.max(count1, count2)
-	if not isSmallTeams then
-		local team1, team2
-		if r <= 3 then -- SvS
-			team1 = MergeStarts(startSE, startE)
-			team1 = MergeStarts(team1, startNE)
-			team2 = MergeStarts(startNW, startW)
-			team2 = MergeStarts(team2, startSW)
-			boxes[0].boxes[2] = boxE
-			boxes[0].boxes[3] = boxNE
-			boxes[1].boxes[2] = boxW
-			boxes[1].boxes[3] = boxSW
-			boxes[0].nameLong = names[4]
-			boxes[1].nameLong = names[5]
-			boxes[0].nameShort = shorts[4]
-			boxes[1].nameShort = shorts[5]
-		elseif r <= 6 then -- TvB
-			team1 = MergeStarts(startSE, startS)
-			team1 = MergeStarts(team1, startSW)
-			team2 = MergeStarts(startNW, startN)
-			team2 = MergeStarts(team2, startW)
-			boxes[0].boxes[2] = boxS
-			boxes[0].boxes[3] = boxSW
-			boxes[1].boxes[2] = boxN
-			boxes[1].boxes[3] = boxW
-			boxes[0].nameLong = names[7]
-			boxes[0].nameShort = shorts[7]
-			boxes[1].nameLong = names[6]
-			boxes[1].nameShort = shorts[6]
-		else -- SW vs NE
-			team1 = MergeStarts(startSE, startE)
-			team1 = MergeStarts(team1, startN)
-			team2 = MergeStarts(startNW, startS)
-			team2 = MergeStarts(team2, startW)
-			boxes[0].boxes[2] = boxE
-			boxes[0].boxes[3] = boxN
-			boxes[1].boxes[2] = boxS
-			boxes[1].boxes[3] = boxW
-		end
-		boxes[0].startpoints = team1
-		boxes[1].startpoints = team2
-	elseif isSmallTeams then
-		if r >= 5 then
-			local team1 = MergeStarts(startSE, startE)
-			local team2 = MergeStarts(startNW, startW)
-			boxes[0].startpoints = team1
-			boxes[1].startpoints = team2
-			boxes[0].boxes[2] = boxE
-			boxes[1].boxes[2] = boxW
-		else
-			local team1 = MergeStarts(startSE, startS)
-			local team2 = MergeStarts(startNW, startN)
-			boxes[0].startpoints = team1
-			boxes[1].startpoints = team2
-			boxes[0].boxes[2] = boxS
-			boxes[1].boxes[2] = boxN
-		end
-	end
-else -- 8 way FFA.
-	for i = 2, 3 do
-		boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-		boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-	end
-	if teamcount > 4 then
-		for i = 4, 7 do
-			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-			boxes[i] = {startpoints = {}, nameLong = names[i], nameShort = shorts[i], boxes = {}}
-		end
-		boxes[4].boxes[1] = boxE
-		boxes[5].boxes[1] = boxW
-		boxes[6].boxes[1] = boxN
-		boxes[7].boxes[1] = boxS
-		boxes[4].startpoints = startE
-		boxes[5].startpoints = startW
-		boxes[6].startpoints = startN
-		boxes[7].startpoints = startS
-		return boxes, {8}
-	else
-		
-		if r > 5 then
-			boxes[2].boxes[1] = boxNE
-			boxes[3].boxes[1] = boxSW
-			boxes[2].startpoints = startNE
-			boxes[3].startpoints = startSW
-		else
-			boxes[0].boxes[1] = boxE
-			boxes[1].boxes[1] = boxW
-			boxes[2].boxes[1] = boxN
-			boxes[3].boxes[1] = boxS
-			boxes[0].startpoints = startE
-			boxes[1].startpoints = startW
-			boxes[2].startpoints = startN
-			boxes[3].startpoints = startS
-		end
-		return boxes, {4}
-	end
+local spUtilities = Spring.Utilities
+local sputGametype = spUtilities.Gametype
+local r = math.random()
+if sputGametype.isFFA() or sputGametype.is1v1() then
+	if spUtilities.GetTeamCount() > 4 then return {
+		-- 8-way FFA
+		[0] = { boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
+		[1] = { boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
+		[2] = { boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
+		[3] = { boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
+		[4] = { boxes = {boxN }, startpoints = startN,  nameLong = "North",      nameShort = "N"  },
+		[5] = { boxes = {boxS }, startpoints = startS,  nameLong = "South",      nameShort = "S"  },
+		[6] = { boxes = {boxW }, startpoints = startW,  nameLong = "West",       nameShort = "W"  },
+		[7] = { boxes = {boxE }, startpoints = startE,  nameLong = "East",       nameShort = "E"  },
+	} elseif r < 0.5 then return {
+		-- 1v1 or 4-way FFA, diagonals
+		[0] = { boxes = {boxSE}, startpoints = startSE, nameLong = "South-East", nameShort = "SE" },
+		[1] = { boxes = {boxNW}, startpoints = startNW, nameLong = "North-West", nameShort = "NW" },
+		[2] = { boxes = {boxNE}, startpoints = startNE, nameLong = "North-East", nameShort = "NE" },
+		[3] = { boxes = {boxSW}, startpoints = startSW, nameLong = "South-West", nameShort = "SW" },
+	} else return {
+		-- 1v1 or 4-way FFA, cardinals
+		[0] = { boxes = {boxN}, startpoints = startN, nameLong = "North", nameShort = "N" },
+		[1] = { boxes = {boxS}, startpoints = startS, nameLong = "South", nameShort = "S" },
+		[2] = { boxes = {boxW}, startpoints = startW, nameLong = "West",  nameShort = "W" },
+		[3] = { boxes = {boxE}, startpoints = startE, nameLong = "East",  nameShort = "E" },
+	} end
+elseif sputGametype.isSmallTeams() then
+	if r < 0.5 then return {
+		-- teams, 2-area, top vs bottom
+		[0] = { boxes = {boxSE, boxS}, startpoints = MergeStarts(startSE, startS), nameLong = "South-East", nameShort = "SE" },
+		[1] = { boxes = {boxNW, boxN}, startpoints = MergeStarts(startNW, startN), nameLong = "North-West", nameShort = "NW" },
+	} else return {
+		-- teams, 2-area, east vs west
+		[0] = { boxes = {boxSE, boxE}, startpoints = MergeStarts(startSE, startE), nameLong = "South-East", nameShort = "SE" },
+		[1] = { boxes = {boxNW, boxW}, startpoints = MergeStarts(startNW, startW), nameLong = "North-West", nameShort = "NW" },
+	} end
+else
+	if r < 0.25 then return {
+		-- teams, 3-area, top vs bottom
+		[0] = { boxes = {boxS, boxSW, boxSE}, startpoints = MergeStarts(startS, startSW, startSE), nameLong = "South", nameShort = "S" },
+		[1] = { boxes = {boxN, boxNE, boxNW}, startpoints = MergeStarts(startN, startNE, startNW), nameLong = "North", nameShort = "N" },
+	} elseif r < 0.50 then return {
+		-- teams, 3-area, east vs west
+		[0] = { boxes = {boxE, boxNE, boxSE}, startpoints = MergeStarts(startE, startNE, startSE), nameLong = "East", nameShort = "E" },
+		[1] = { boxes = {boxW, boxSW, boxNW}, startpoints = MergeStarts(startW, startSW, startNW), nameLong = "West", nameShort = "W" },
+	} elseif r < 0.75 then return {
+		-- teams, 3-area, corners SE vs NW
+		[0] = { boxes = {boxSE, boxE, boxS}, startpoints = MergeStarts(startSE, startE, startS), nameLong = "South-East", nameShort = "SE" },
+		[1] = { boxes = {boxNW, boxW, boxN}, startpoints = MergeStarts(startNW, startW, startN), nameLong = "North-West", nameShort = "NW" },
+	} else return {
+		-- teams, 3-area, corners SW vs NE
+		[0] = { boxes = {boxSW, boxW, boxS}, startpoints = MergeStarts(startSW, startW, startS), nameLong = "South-West", nameShort = "SW" },
+		[1] = { boxes = {boxNE, boxE, boxN}, startpoints = MergeStarts(startNE, startE, startN), nameLong = "North-East", nameShort = "NE" },
+	} end
 end
-
-return boxes, {2}
