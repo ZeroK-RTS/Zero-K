@@ -66,8 +66,6 @@ return { tacnuke = {
       customParams            = {
         burst = Shared.BURST_RELIABLE,
 
-        restrict_in_widgets = 1,
-
       lups_explodelife = 1.5,
         stats_hide_dps = 1, -- meaningless
         stats_hide_reload = 1,

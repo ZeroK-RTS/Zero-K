@@ -98,7 +98,6 @@ return { raveparty = {
       craterMult              = 3,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
       },
       damage                  = {
@@ -138,7 +137,7 @@ return { raveparty = {
         setunitsonfire = "1",
         burntime = 240,
         burnchance = 1,
-        restrict_in_widgets = 1,
+
         script_reload = [[6]],
 
         area_damage = 1,
@@ -182,7 +181,6 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
       },
 
@@ -226,7 +224,7 @@ return { raveparty = {
         smoothmult   = [[0.7]],
         smoothexponent = [[0.45]],
         movestructures = [[1]],
-        restrict_in_widgets = 1,
+
         script_reload = [[6]],
       },
       
@@ -263,7 +261,6 @@ return { raveparty = {
       craterMult              = 0.5,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
       },
 
@@ -308,7 +305,6 @@ return { raveparty = {
       customparams = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
-        restrict_in_widgets = 1,
         script_reload = [[6]],
       },
       

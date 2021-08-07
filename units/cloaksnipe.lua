@@ -87,7 +87,6 @@ return { cloaksnipe = {
       customParams              = {
         burst = Shared.BURST_RELIABLE,
         light_radius = 0,
-        restrict_in_widgets = 1,
       },
       
       damage                  = {

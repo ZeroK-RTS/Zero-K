@@ -27,14 +27,7 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 local spGetProjectileTeamID = Spring.GetProjectileTeamID
 local spGetMyTeamID = Spring.GetMyTeamID
 local spAreTeamsAllied = Spring.AreTeamsAllied
-local spGetProjectileDefID = Spring.GetProjectileDefID
 local spGetSpectatingState = Spring.GetSpectatingState
-local filteredWeaponDefID = {}
-for wdid, wd in pairs(WeaponDefs) do
-	if wd.customParams.restrict_in_widgets then
-		filteredWeaponDefID[wdid] = true
-	end
-end
 local function FilterOutRestrictedProjectiles(projectiles)
 	local isSpectator, hasFullView = spGetSpectatingState()
 	if isSpectator and hasFullView then
@@ -48,13 +41,10 @@ local function FilterOutRestrictedProjectiles(projectiles)
 		local ownerTeamID = spGetProjectileTeamID(p)
 		-- If the owner is allied with us, we shouldn't need to filter anything out
 		if not spAreTeamsAllied(ownerTeamID, myTeamID) then
-			local pID = spGetProjectileDefID(p)
-			if filteredWeaponDefID[pID] then
-				projectiles[i] = projectiles[n]
-				projectiles[n] = nil
-				n = n - 1
-				i = i - 1
-			end
+			projectiles[i] = projectiles[n]
+			projectiles[n] = nil
+			n = n - 1
+			i = i - 1
 		end
 		i = i + 1
 	end
