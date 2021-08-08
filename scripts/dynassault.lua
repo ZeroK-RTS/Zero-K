@@ -3,8 +3,6 @@ include "constants.lua"
 local dyncomm = include('dynamicCommander.lua')
 _G.dyncomm = dyncomm
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------

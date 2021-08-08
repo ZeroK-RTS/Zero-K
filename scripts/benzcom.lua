@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -276,14 +274,6 @@ end
 function script.QueryNanoPiece()
 	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
 	return lnanoflare
-end
-
-function script.Activate()
-	--spSetUnitShieldState(unitID, 2, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, 2, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

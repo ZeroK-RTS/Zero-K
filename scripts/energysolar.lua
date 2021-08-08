@@ -34,7 +34,7 @@ local function Open()
 	WaitForTurn(dish3, z_axis)
 	WaitForTurn(dish4, z_axis)
 	
-	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
+	spSetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	GG.UpdateUnitAttributes(unitID)
 end
 
@@ -42,7 +42,7 @@ local function Close()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
 	
-	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 0)
+	spSetUnitRulesParam(unitID, "selfIncomeChange", 0)
 	GG.UpdateUnitAttributes(unitID)
 	
 	Turn(dish1, x_axis, 0, math.rad(120))
@@ -67,7 +67,7 @@ function script.Deactivate()
 end
 
 function script.Create()
-	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
+	spSetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	for i = 1, #fakes do Hide (fakes[i]) end
 	Move (base, y_axis, -90000)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)

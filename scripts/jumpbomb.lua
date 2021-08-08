@@ -28,7 +28,7 @@ local function WalkThread ()
 	SetSignalMask (SIG_MOVE)
 	while true do
 
-		local slow_mult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+		local slow_mult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		local anim_speed = math.rad(150) * slow_mult
 
 		Turn (Left_Back_Leg, y_axis, pi6, anim_speed)

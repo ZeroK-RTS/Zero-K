@@ -10,7 +10,6 @@ local spGetUnitBasePosition = Spring.GetUnitBasePosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPosition = Spring.GetUnitPosition
 local spPlaySoundFile = Spring.PlaySoundFile
-local spGetUnitHealth = Spring.GetUnitHealth
 
 local waterFire = false
 
@@ -33,9 +32,6 @@ local function Bob(rot)
 end
 
 function script.Create()
-	--while select(5, spGetUnitHealth(unitID)) < 1 do
-	--	Sleep(400)
-	--end
 	local x,_,z = spGetUnitBasePosition(unitID)
 	local y = spGetGroundHeight(x,z)
 	if y > 0 then

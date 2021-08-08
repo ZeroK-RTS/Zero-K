@@ -32,7 +32,6 @@ local WHEEL_TURN_MULT = 3
 local MAX_PIVOT = math.rad(30)
 
 local spGetGroundHeight = Spring.GetGroundHeight
-local spGetPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 

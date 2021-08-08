@@ -26,7 +26,6 @@ local gunPieces = {
 local shot = 1
 
 local spGetGroundHeight = Spring.GetGroundHeight
-local spGetPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir

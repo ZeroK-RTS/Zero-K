@@ -3,8 +3,6 @@ include "constants.lua"
 local dyncomm = include('dynamicCommander.lua')
 _G.dyncomm = dyncomm
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 -- pieces
 local base = piece 'base'
 local shield = piece 'shield'
@@ -494,14 +492,6 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	end
 	return false
-end
-
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
 end
 
 function script.FireWeapon(num)
