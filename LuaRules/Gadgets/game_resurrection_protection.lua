@@ -5,7 +5,7 @@ end
 function gadget:GetInfo()
 	return {
 		name      = "Resurrection Protection",
-		desc      = "",
+		desc      = "Prevents constructors from engaging in Reclaim-Resurrection wars. Finally, we will know peace.",
 		author    = "Shaman",
 		date      = "11 Elokuu 2021",
 		license   = "CC-0",
@@ -18,8 +18,6 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local protectedFeatures = {}
 local features = IterableMap.New()
 local newtable = {timer = 10, cancer = true} -- needed otherwise kaurapuurolainen will devour us.
-
-local spGetTeamInfo = Spring.GetTeamInfo
 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part) -- part seems to be some sort of reclaim speed.
 	if part >= 0 then
