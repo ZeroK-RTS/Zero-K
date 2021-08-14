@@ -27,11 +27,13 @@ local defs = {
 	{
 		name = "tankriot",
 		lowerHeight = -60,
+		upperHeight = 200,
 		searchRange = 180,
 	},
 	{
 		name = "spidercrabe",
 		lowerHeight = -80,
+		upperHeight = 160,
 		searchRange = 250,
 	},
 }
@@ -52,8 +54,8 @@ for i = 1, #defs do
 	unitData.searchRange = weaponRange + 60
 	unitData.weaponRange = weaponRange
 	unitData.fireHeight = unitData.fireHeight or 5
-	unitData.lowerHeight = unitData.lowerHeight or -45
-	unitData.upperHeight = unitData.upperHeight or 45
+	unitData.lowerHeight = unitData.lowerHeight or -25
+	unitData.upperHeight = unitData.upperHeight or 35
 	
 	realDefs[ud.id] = unitData
 end

@@ -148,7 +148,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 					
 					local team = spGetUnitTeam(newTargetID)
 					if (not team) or team ~= gaiaTeamID then
-						spSetUnitTarget(attackerID,newTargetID)
+						spSetUnitTarget(attackerID, newTargetID)
 						if cID_1 and cID_1 == CMD_ATTACK then
 							local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
 							if cID_2 and cID_2 == CMD_SET_WANTED_MAX_SPEED then
