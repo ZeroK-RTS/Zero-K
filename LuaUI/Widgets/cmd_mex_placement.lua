@@ -492,6 +492,161 @@ local function MakeMexTerraform(units, pointX, pointZ, height, holeMode)
 	return {CMD_LEVEL, {pointX, pointY, pointZ, commandTag}}
 end
 
+local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
+	local xmin = cx-cr
+	local xmax = cx+cr
+	local zmin = cz-cr
+	local zmax = cz+cr
+
+	local commands = {}
+	local orderedCommands = {}
+	local dis = {}
+
+	local ux = 0
+	local uz = 0
+	local us = 0
+
+	local aveX = 0
+	local aveZ = 0
+
+	local units = spGetSelectedUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		if mexBuilder[unitID] then
+			local x,_,z = spGetUnitPosition(unitID)
+			ux = ux+x
+			uz = uz+z
+			us = us+1
+		end
+	end
+
+	if pregame then
+		if WG.InitialQueueGetTail and WG.InitialQueueGetTail() then
+			aveX, aveZ = WG.InitialQueueGetTail()
+		else
+			aveX = Game.mapSizeX / 2
+			aveZ = Game.mapSizeZ / 2
+		end
+	elseif (us == 0) then
+		return
+	else
+		aveX = ux/us
+		aveZ = uz/us
+	end
+	
+	local terraMode = (cmdID == CMD_AREA_TERRA_MEX)
+	local makeMexEnergy = (not terraMode) and (cmdOpts.alt or cmdOpts.ctrl)
+	local wallHeight = 40
+	local burryMode = false
+	local energyToMake = 2 -- Just Alt
+	if cmdOpts.ctrl then
+		if cmdOpts.alt then
+			energyToMake = 4
+		else
+			energyToMake = 1
+		end
+		wallHeight = 75
+	end
+	if terraMode and cmdOpts.alt then
+		burryMode = true
+		wallHeight = wallHeight + 15
+	end
+
+	for i = 1, #WG.metalSpots do
+		local mex = WG.metalSpots[i]
+		--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
+		if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or (terraMode and not burryMode) or IsSpotBuildable(i)) then -- circle area, slower
+			commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
+		end
+	end
+
+	local noCommands = #commands
+	while noCommands > 0 do
+		tasort(commands, function(a,b) return a.d < b.d end)
+		orderedCommands[#orderedCommands+1] = commands[1]
+		aveX = commands[1].x
+		aveZ = commands[1].z
+		taremove(commands, 1)
+		for k, com in pairs(commands) do
+			com.d = Distance(aveX,aveZ,com.x,com.z)
+		end
+		noCommands = noCommands-1
+	end
+
+	local shift = cmdOpts.shift
+
+	do --issue ordered order to unit(s)
+		local commandArrayToIssue={}
+		local unitArrayToReceive ={}
+		for i = 1, #units do --prepare unit list
+			local unitID = units[i]
+			if mexBuilder[unitID] then
+				unitArrayToReceive[#unitArrayToReceive+1] = unitID
+			end
+		end
+		
+		-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
+		-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
+		-- where hold even when it is not. I do not know why this issue is absent when no modkey are held.
+		if makeMexEnergy and not (cmdOpts.shift or cmdOpts.meta) then
+			commandArrayToIssue[#commandArrayToIssue+1] = {CMD.STOP, {} }
+		end
+		
+		--prepare command list
+		for i, command in ipairs(orderedCommands) do
+			local x = command.x
+			local z = command.z
+			local y = math.max(0, Spring.GetGroundHeight(x, z))
+
+			-- check if some other widget wants to handle the command before sending it to units.
+			if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, cmdOpts, true) then
+				if burryMode then
+					local params = MakeMexTerraform(units, x, z, -wallHeight, true)
+					if params then
+						commandArrayToIssue[#commandArrayToIssue + 1] = params
+					end
+				end
+				commandArrayToIssue[#commandArrayToIssue + 1] = {-mexDefID, {x,y,z,0}}
+				if terraMode and not burryMode then
+					local params = MakeMexTerraform(units, x, z, wallHeight)
+					if params then
+						commandArrayToIssue[#commandArrayToIssue + 1] = params
+					end
+				end
+			end
+
+			if makeMexEnergy then
+				for i = 1, energyToMake do
+					local addon = addons[myOctant][i]
+					local xx = x+addon[1]
+					local zz = z+addon[2]
+					local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
+					local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
+
+					-- check if some other widget wants to handle the command before sending it to units.
+					if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, cmdOpts, true) then
+						commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0} }
+					end
+				end
+			end
+		end
+
+		for i = 1, #commandArrayToIssue do
+			local command = commandArrayToIssue[i]
+			if pregame then
+				WG.InitialQueueHandleCommand(command[1], command[2], cmdOpts)
+				if i == 1 then
+					cmdOpts.shift = true
+				end
+			else
+				WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
+			end
+		end
+	end
+
+	return true
+end
+
 function widget:CommandNotify(cmdID, params, cmdOpts)
 	if not WG.metalSpots then
 		return false
@@ -499,164 +654,19 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 	
 	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and ((params[4] or 0) > 1 or not options.area_point_command.value) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
-
-		local xmin = cx-cr
-		local xmax = cx+cr
-		local zmin = cz-cr
-		local zmax = cz+cr
-
-		local commands = {}
-		local orderedCommands = {}
-		local dis = {}
-
-		local ux = 0
-		local uz = 0
-		local us = 0
-
-		local aveX = 0
-		local aveZ = 0
-
-		local units = spGetSelectedUnits()
-		for i = 1, #units do
-			local unitID = units[i]
-			if mexBuilder[unitID] then
-				local x,_,z = spGetUnitPosition(unitID)
-				ux = ux+x
-				uz = uz+z
-				us = us+1
-			end
-		end
-
-		if pregame then
-			if WG.InitialQueueGetTail and WG.InitialQueueGetTail() then
-				aveX, aveZ = WG.InitialQueueGetTail()
-			else
-				aveX = Game.mapSizeX / 2
-				aveZ = Game.mapSizeZ / 2
-			end
-		elseif (us == 0) then
-			return
-		else
-			aveX = ux/us
-			aveZ = uz/us
-		end
-		
-		local terraMode = (cmdID == CMD_AREA_TERRA_MEX)
-		local makeMexEnergy = (not terraMode) and (cmdOpts.alt or cmdOpts.ctrl)
-		local wallHeight = 40
-		local burryMode = false
-		local energyToMake = 2 -- Just Alt
-		if cmdOpts.ctrl then
-			if cmdOpts.alt then
-				energyToMake = 4
-			else
-				energyToMake = 1
-			end
-			wallHeight = 75
-		end
-		if terraMode and cmdOpts.alt then
-			burryMode = true
-			wallHeight = wallHeight + 15
-		end
-
-		for i = 1, #WG.metalSpots do
-			local mex = WG.metalSpots[i]
-			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (Distance(cx, cz, mex.x, mex.z) < cr*cr) and (makeMexEnergy or (terraMode and not burryMode) or IsSpotBuildable(i)) then -- circle area, slower
-				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
-			end
-		end
-
-		local noCommands = #commands
-		while noCommands > 0 do
-			tasort(commands, function(a,b) return a.d < b.d end)
-			orderedCommands[#orderedCommands+1] = commands[1]
-			aveX = commands[1].x
-			aveZ = commands[1].z
-			taremove(commands, 1)
-			for k, com in pairs(commands) do
-				com.d = Distance(aveX,aveZ,com.x,com.z)
-			end
-			noCommands = noCommands-1
-		end
-
-		local shift = cmdOpts.shift
-
-		do --issue ordered order to unit(s)
-			local commandArrayToIssue={}
-			local unitArrayToReceive ={}
-			for i = 1, #units do --prepare unit list
-				local unitID = units[i]
-				if mexBuilder[unitID] then
-					unitArrayToReceive[#unitArrayToReceive+1] = unitID
-				end
-			end
-			
-			-- If ctrl or alt is held and the first metal spot is blocked by a mex, then the mex command is blocked
-			-- and the remaining commands are issused with shift. This causes the area mex command to act as if shift
-			-- where hold even when it is not. I do not know why this issue is absent when no modkey are held.
-			if makeMexEnergy and not (cmdOpts.shift or cmdOpts.meta) then
-				commandArrayToIssue[#commandArrayToIssue+1] = {CMD.STOP, {} }
-			end
-			
-			--prepare command list
-			for i, command in ipairs(orderedCommands) do
-				local x = command.x
-				local z = command.z
-				local y = math.max(0, Spring.GetGroundHeight(x, z))
-
-				-- check if some other widget wants to handle the command before sending it to units.
-				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, cmdOpts, true) then
-					if burryMode then
-						local params = MakeMexTerraform(units, x, z, -wallHeight, true)
-						if params then
-							commandArrayToIssue[#commandArrayToIssue + 1] = params
-						end
-					end
-					commandArrayToIssue[#commandArrayToIssue + 1] = {-mexDefID, {x,y,z,0}}
-					if terraMode and not burryMode then
-						local params = MakeMexTerraform(units, x, z, wallHeight)
-						if params then
-							commandArrayToIssue[#commandArrayToIssue + 1] = params
-						end
-					end
-				end
-
-				if makeMexEnergy then
-					for i = 1, energyToMake do
-						local addon = addons[myOctant][i]
-						local xx = x+addon[1]
-						local zz = z+addon[2]
-						local yy = math.max(0, Spring.GetGroundHeight(xx, zz))
-						local buildDefID = (Spring.TestBuildOrder(solarDefID, xx, yy, zz, 0) == 0 and windDefID) or solarDefID
-
-						-- check if some other widget wants to handle the command before sending it to units.
-						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-buildDefID, {xx, yy, zz, 0}, cmdOpts, true) then
-							commandArrayToIssue[#commandArrayToIssue+1] = {-buildDefID, {xx,yy,zz,0} }
-						end
-					end
-				end
-			end
-
-			for i = 1, #commandArrayToIssue do
-				local command = commandArrayToIssue[i]
-				if pregame then
-					WG.InitialQueueHandleCommand(command[1], command[2], cmdOpts)
-					if i == 1 then
-						cmdOpts.shift = true
-					end
-				else
-					WG.CommandInsert(command[1], command[2], cmdOpts, i - 1, true)
-				end
-			end
-		end
-
-		return true
+		return HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	end
 
-	if (-mexDefID == cmdID or cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and params[3] then
+	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and params[3] then
+		-- Just area mex on the closest spot. Reuses all the code for key modifiers.
 		local bx, bz = params[1], params[3]
-		return PlaceSingleMex(bx, bz, params[4], cmdOpts)
+		local closestSpot = GetClosestMetalSpot(bx, bz)
+		if closestSpot then
+			local cx, cz = closestSpot.x, closestSpot.z
+			local cy = spGetGroundHeight(cx, cz)
+			return HandleAreaMex(cmdID, cx, cy, cz, 30, cmdOpts)
+		end
+		return false
 	end
 end
 
