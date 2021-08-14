@@ -74,6 +74,7 @@ local commandDisplayConfig = {
 	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
 
 	[CMD_AREA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
+	[CMD_AREA_TERRA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
 
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 

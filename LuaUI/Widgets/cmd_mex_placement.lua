@@ -125,7 +125,6 @@ local myPlayerID = Spring.GetMyPlayerID()
 local myOctant = 1
 local pregame = true
 
-local terraformModeEnabled = false
 local placedMexSinceShiftPressed = false
 
 ------------------------------------------------------------
@@ -178,20 +177,6 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = "Clicking area mex without dragging is like constructing a mex.",
-	},
-	terraform_mex = {
-		name = "Area Mex with Terraform",
-		type = 'button',
-		action='areamexterra',
-		hotkey = {key='Q', mod='alt+'},
-		OnChange = function(self)
-			local index = Spring.GetCmdDescIndex(CMD_AREA_MEX)
-			if index then
-				Spring.SetActiveCommand(index)
-				terraformModeEnabled = true
-			end
-		end,
-		path = "Hotkeys/Construction"
 	},
 }
 
@@ -512,7 +497,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		return false
 	end
 	
-	if (cmdID == CMD_AREA_MEX) and ((params[4] or 0) > 1 or not options.area_point_command.value) then
+	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and ((params[4] or 0) > 1 or not options.area_point_command.value) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
 
 		local xmin = cx-cr
@@ -556,7 +541,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 			aveZ = uz/us
 		end
 		
-		local terraMode = terraformModeEnabled
+		local terraMode = (cmdID == CMD_AREA_TERRA_MEX)
 		local makeMexEnergy = (not terraMode) and (cmdOpts.alt or cmdOpts.ctrl)
 		local wallHeight = 40
 		local burryMode = false
@@ -669,7 +654,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		return true
 	end
 
-	if (-mexDefID == cmdID or cmdID == CMD_AREA_MEX) and params[3] then
+	if (-mexDefID == cmdID or cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and params[3] then
 		local bx, bz = params[1], params[3]
 		return PlaceSingleMex(bx, bz, params[4], cmdOpts)
 	end
@@ -784,7 +769,6 @@ function widget:MouseRelease(x, y, button)
 	end
 	if button ~= 1 then
 		Spring.SetActiveCommand(-1)
-		terraformModeEnabled = false
 		return false
 	end
 	local mx, my = spGetMouseState()
@@ -794,7 +778,6 @@ function widget:MouseRelease(x, y, button)
 		placedMexSinceShiftPressed = true
 		if not retain then
 			Spring.SetActiveCommand(-1)
-			terraformModeEnabled = false
 		end
 	end
 	return true
@@ -942,13 +925,6 @@ function widget:Update(dt)
 		firstUpdate = false
 	end
 
-	if terraformModeEnabled then
-		local _, cmdID = Spring.GetActiveCommand()
-		if cmdID ~= CMD_AREA_MEX then
-			terraformModeEnabled = false
-		end
-	end
-
 	if CheckNeedsRecalculating() then
 		spotByID = {}
 		spotData = {}
@@ -1014,7 +990,6 @@ function widget:KeyRelease(key, modifier, isRepeat)
 		local _, cmdID = Spring.GetActiveCommand()
 		if cmdID == -mexDefID then
 			Spring.SetActiveCommand(-1)
-			terraformModeEnabled = false
 		end
 	end
 end
@@ -1199,7 +1174,7 @@ function widget:DrawWorldPreUnit()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
 
-	drawMexSpots = (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
+	drawMexSpots = (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID or peruse)
 
 	if WG.metalSpots and (drawMexSpots or WG.showeco_always_mexes) then
 		gl.DepthTest(true)
@@ -1229,7 +1204,7 @@ function widget:DrawWorld()
 	local pregame = (spGetGameFrame() < 1)
 
 	if WG.metalSpots and (pregame or WG.selectionEntirelyCons) and
-			(isMexCmd or (pregame or (WG.showeco or WG.showeco_always_mexes)) or CMD_AREA_MEX == cmdID) then
+			(isMexCmd or (pregame or (WG.showeco or WG.showeco_always_mexes)) or CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID) then
 		local mx, my, leftPressed = spGetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)
 
@@ -1241,7 +1216,7 @@ function widget:DrawWorld()
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
 		local wantShow = isMexCmd or distance <= 60
-		if (not wantShow) and (options.area_point_command.value and CMD_AREA_MEX == cmdID) then
+		if (not wantShow) and (options.area_point_command.value and (CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID)) then
 			if leftPressed then
 				local pressX, pressY = Spring.GetMouseStartPosition(1)
 				if pressX then

@@ -217,6 +217,7 @@ local overrides = {
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
 
 	[CMD_AREA_MEX] = {caption = '', texture = imageDir .. 'Bold/mex.png'},
+	[CMD_AREA_TERRA_MEX] = {caption = '', texture = imageDir .. 'Bold/mex.png'},
 
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 
@@ -310,6 +311,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	sethaven=1,
 	--build=1,
 	areamex=1,
+	areaterramex=1,
 	disembark=1,
 	mine=1,
 	build=1,

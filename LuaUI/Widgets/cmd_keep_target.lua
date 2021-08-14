@@ -74,6 +74,7 @@ local TargetKeepingCommand = {
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
 	[CMD_AREA_MEX] = true,
+	[CMD_AREA_TERRA_MEX] = true,
 	[CMD.LOAD_UNITS] = true,
 	[CMD.UNLOAD_UNITS] = true,
 	[CMD.LOAD_ONTO] = true,

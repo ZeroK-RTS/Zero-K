@@ -18,14 +18,25 @@ end
 include("LuaRules/Configs/customcmds.h.lua")
 
 local cmdMex = {
-	id	  = CMD_AREA_MEX,
-	type	= CMDTYPE.ICON_AREA,
+	id      = CMD_AREA_MEX,
+	type    = CMDTYPE.ICON_AREA,
 	tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
-	name	= 'Mex',
+	name    = 'Mex',
 	cursor  = 'Mex',
 	action  = 'areamex',
 	params  = {},
 }
+
+local cmdTerraMex = {
+	id      = CMD_AREA_TERRA_MEX,
+	type    = CMDTYPE.ICON_AREA,
+	tooltip = 'Area Terra Mex: Click and drag to queue terraformed metal extractors in an area.',
+	name    = 'Terra Mex',
+	cursor  = 'Terramex',
+	action  = 'areaterramex',
+	params  = {},
+}
+
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -134,6 +145,7 @@ function gadget:Initialize()
 	GG.GetClosestMetalSpot = GetClosestMetalSpot
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_AREA_MEX)
+	gadgetHandler:RegisterCMDID(CMD_AREA_TERRA_MEX)
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -163,6 +175,7 @@ local inlosTrueTable = {inlos = true}
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if canMex[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, cmdMex)
+		Spring.InsertUnitCmdDesc(unitID, cmdTerraMex)
 	end
 	
 	if unitDefID == mexDefID then
@@ -214,6 +227,7 @@ function gadget:Initialize()
 	--gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	--Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.
 	Spring.AssignMouseCursor("Mex", "cursormex", true, true)
+	Spring.AssignMouseCursor("Terramex", "cursorterramex", true, true)
 end
 
 end
