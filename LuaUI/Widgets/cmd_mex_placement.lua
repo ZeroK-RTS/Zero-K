@@ -138,7 +138,7 @@ local PRESS_DRAG_THRESHOLD_SQR = 25^2
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Map/Metal Spots'
-options_order = { 'drawicons', 'size', 'rounding', 'terraform_mex', 'area_point_command'}
+options_order = { 'drawicons', 'size', 'rounding', 'catlabel', 'area_point_command', 'catlabel_terra', 'wall_low', 'wall_high', 'burry_shallow', 'burry_deep'}
 options = {
 	drawicons = {
 		name = 'Show Income as Icon',
@@ -172,11 +172,62 @@ options = {
 		tooltip_format = "%.0f", -- show 1 instead of 1.0 (confusion)
 		OnChange = function() updateMexDrawList() end
 	},
+	catlabel = {
+		name = 'Area Mex',
+		type = 'label',
+		path = 'Settings/Interface/Building Placement',
+	},
 	area_point_command = {
 		name = 'Point click queues mex',
 		type = 'bool',
 		value = true,
-		desc = "Clicking area mex without dragging is like constructing a mex.",
+		desc = "Clicking on the map with Area Mex or Area Terra Mex snaps to the nearest spot, like placing a mex.",
+		path = 'Settings/Interface/Building Placement',
+	},
+	catlabel_terra = {
+		name = 'Area Terra Mex (Alt+W by default)',
+		type = 'label',
+		path = 'Settings/Interface/Building Placement',
+	},
+	wall_low = {
+		name = "Low Wall height",
+		desc = "How high should a default terraformed wall be?",
+		type = "number",
+		value = 40,
+		min = 2,
+		max = 120,
+		step = 1,
+		path = 'Settings/Interface/Building Placement',
+	},
+	wall_high = {
+		name = "High Wall height",
+		desc = "How high should a tall terraformed wall (hold Ctrl) be?",
+		type = "number",
+		value = 75,
+		min = 2,
+		max = 120,
+		step = 1,
+		path = 'Settings/Interface/Building Placement',
+	},
+	burry_shallow = {
+		name = "Shallow burry depth",
+		desc = "How deep should a burried mex (hold Alt) be?",
+		type = "number",
+		value = 55,
+		min = 2,
+		max = 120,
+		step = 1,
+		path = 'Settings/Interface/Building Placement',
+	},
+	burry_deep = {
+		name = "Deep burry depth",
+		desc = "How deep should a deeper burried mex (hold Alt+Ctrl) be?",
+		type = "number",
+		value = 90,
+		min = 2,
+		max = 120,
+		step = 1,
+		path = 'Settings/Interface/Building Placement',
 	},
 }
 
@@ -535,22 +586,24 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	end
 	
 	local terraMode = (cmdID == CMD_AREA_TERRA_MEX)
-	local makeMexEnergy = (not terraMode) and (cmdOpts.alt or cmdOpts.ctrl)
-	local wallHeight = 40
+	local energyToMake = 0
 	local burryMode = false
-	local energyToMake = 2 -- Just Alt
+	local wallHeight = options.wall_low.value
 	if cmdOpts.ctrl then
 		if cmdOpts.alt then
 			energyToMake = 4
+			burryMode = true
+			wallHeight = options.burry_deep.value
 		else
 			energyToMake = 1
+			wallHeight = options.wall_high.value
 		end
-		wallHeight = 75
-	end
-	if terraMode and cmdOpts.alt then
+	elseif cmdOpts.alt then
+		energyToMake = 2
 		burryMode = true
-		wallHeight = wallHeight + 15
+		wallHeight = options.burry_shallow.value
 	end
+	local makeMexEnergy = (not terraMode) and (energyToMake > 0)
 
 	for i = 1, #WG.metalSpots do
 		local mex = WG.metalSpots[i]
@@ -600,7 +653,7 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 
 			-- check if some other widget wants to handle the command before sending it to units.
 			if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, cmdOpts, true) then
-				if burryMode then
+				if terraMode and burryMode then
 					local params = MakeMexTerraform(units, x, z, -wallHeight, true)
 					if params then
 						commandArrayToIssue[#commandArrayToIssue + 1] = params
