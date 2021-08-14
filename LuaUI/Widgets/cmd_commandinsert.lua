@@ -40,6 +40,10 @@ local positionCommand = {
 	[CMD_LEVEL] = true,
 }
 
+local doNotHandleRaw = {
+	[-UnitDefNames["staticmex"].id] = true,
+}
+
 local EMPTY_TABLE = {}
 --[[
 -- use this for debugging:
@@ -227,6 +231,9 @@ function widget:Update()
 end
 
 function widget:CommandNotify(id, params, options)
+	if doNotHandleRaw[id] then
+		return false
+	end
 	return ProcessCommand(id, params, options, 0)
 end
 
