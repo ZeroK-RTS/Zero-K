@@ -710,7 +710,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		return HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	end
 
-	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX) and params[3] then
+	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX or cmdID == -mexDefID) and params[3] then
 		-- Just area mex on the closest spot. Reuses all the code for key modifiers.
 		local bx, bz = params[1], params[3]
 		local closestSpot = GetClosestMetalSpot(bx, bz)
