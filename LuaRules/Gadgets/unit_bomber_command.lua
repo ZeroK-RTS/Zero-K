@@ -487,6 +487,15 @@ local function CancelAirpadReservation(unitID)
 		GG.LandAborted(unitID)
 	end
 	
+	local queue = spGetCommandQueue(unitID, -1)
+	if queue then
+		local index = #queue + 1
+		for i = 1, #queue do
+			if queue[i].id == CMD_REARM or queue[i].id == CMD_FIND_PAD then -- already have set rearm point, we have nothing left to do here
+				spGiveOrderToUnit(unitID, CMD_REMOVE, index, 0)
+		end
+	end
+
  --value greater than 1 for icon state:
 	if spGetUnitRulesParam(unitID, "noammo") == 3 then -- repairing
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -519,7 +528,9 @@ local function CancelAirpadReservation(unitID)
 		-- totalReservedPad = totalReservedPad -1
 		reservations.units[unitID] = nil
 		reservations.count = math.max(reservations.count - 1, 0)
-		spSetUnitRulesParam(targetPad,"unreservedPad",math.max(0,airpadsData[targetPad].cap-reservations.count)) --hint widgets
+		if not excludedPads[targetPad] then -- Don't mark excluded pads as unreserved
+			spSetUnitRulesParam(targetPad,"unreservedPad",math.max(0,airpadsData[targetPad].cap-reservations.count)) --hint widgets
+		end
 	end
 end
 
@@ -550,6 +561,9 @@ local function ToggleExclusion(padID, teamID)
 		if not excludedPads[teamID][padID] then
 			excludedPads[teamID][padID] = true
 			Spring.SetUnitRulesParam(padID, "padExcluded" .. teamID, 1)
+			for bomberID in pairs(airpadsData[padID].reservations.units) do
+				CancelAirpadReservation(bomberID) -- send anyone who was going here elsewhere
+			end
 		else
 			--Already exists, remove
 			Spring.SetUnitRulesParam(padID, "padExcluded" .. teamID, 0)
@@ -764,6 +778,20 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if cmdID == CMD_EXCLUDE_PAD then
 		ToggleExclusion(cmdParams[1], unitTeam)
 		return false
+	end
+	if cmdID == CMD_RAW_MOVE then
+		local targetPad
+		if bomberToPad[unitID] then -- unit is going toward an airpad
+			targetPad = bomberToPad[unitID].padID
+		elseif bomberLanding[unitID] then -- unit is on the airpad
+			targetPad = bomberLanding[unitID].padID
+		end
+		if targetPad then
+			ToggleExclusion(targetPad, Spring.GetUnitTeam(unitID))
+
+			CancelAirpadReservation(unitID)
+			return true
+		end
 	end
 	local noAmmo = spGetUnitRulesParam(unitID, "noammo")
 	if not noAmmo or noAmmo == 0 then
