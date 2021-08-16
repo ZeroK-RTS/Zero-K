@@ -11,8 +11,7 @@
 --
 
 -- if you add a command, please order it by ID!
-local cmds = {
-	--RETREAT = 10000,
+return {
 	RETREAT_ZONE = 10001,
 	RESETFIRE = 10003,
 	RESETMOVE = 10004,
@@ -105,24 +104,3 @@ local cmds = {
 	BUMPY = 39740,
 	TERRAFORM_INTERNAL = 39801,
 }
--- not included here, just listed
---[[
-PURCHASE = 32601	-- planetwars, range up to 32601 + #purchases
-MORPH_STOP = 32210	-- range up to 32210 + #morphs
-MORPH = 31210		-- ditto
-]]--
-
--- deprecated
---[[
-PLANTBOMB =     	32523
-AUTOREPAIR =    	33250 	-- up to 33250 + 3
-AUTORECLAIM =   	33251
-AUTOASSIST  =   	33252
-AUTOATTACK  =   	33253
-PRIORITY=			34220
-CobButton =         	34520 	-- up to 32520 + different cob buttons
-SCRAMBLE =      	35128
-WRECK =         	36734
-RESTOREBOMB = 		39735
-]]--
-return cmds
