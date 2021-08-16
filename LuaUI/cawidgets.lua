@@ -31,6 +31,7 @@ WG = {}
 Spring.Utilities = {}
 
 vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/teamFunctions.lua"    , nil, vfsGame)
