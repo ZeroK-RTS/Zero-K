@@ -106,6 +106,10 @@ local staticO_big = {
 	raveparty = 1,
 }
 
+--[[ Note that units need to still be alive by the time
+     damage is dealt. This means that the death explosion
+     has to have an instant shockwave or the unit has to
+     be hidden (as happens with Limpet and Puppy). ]]
 local kamikaze = {
 	shieldbomb=1,
 	jumpbomb=1,
