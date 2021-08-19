@@ -38,7 +38,6 @@ local barrels = {[0] = lbarrel, [1] = rbarrel}
 -- constants
 --------------------------------------------------------------------------------
 local SIG_AIM = 2
-local SIG_AIM_2 = 4
 local SIG_MOVE = 16
 
 local RESTORE_DELAY = 6000

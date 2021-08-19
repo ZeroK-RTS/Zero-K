@@ -39,7 +39,6 @@ local ROCK_PIECE = base	-- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
 
-local SIG_MOVE = 1
 local SIG_AIM = 2
 local RESTORE_DELAY = 3000
 

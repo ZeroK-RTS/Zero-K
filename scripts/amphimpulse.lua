@@ -39,7 +39,6 @@ local FOREARM_BACK_SPEED = math.rad(45) * PACE
 
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32

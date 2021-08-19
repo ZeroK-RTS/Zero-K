@@ -11,9 +11,6 @@ piece('base', 'rockbase', 'body', 'turret', 'firepoint',
 	'lwheel1', 'lwheel2',
 	'gs1r', 'gs2r', 'gs1l', 'gs2l')
 
-local SIG_AIM = 1
-local SIG_MOVE = 2
-
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition

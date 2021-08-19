@@ -17,7 +17,6 @@ local RESTORE_DELAY = 4000
 
 -- Signal definitions
 local SIG_AIM = 2
-local SIG_MOVE = 4
 
 local curTerrainType = 4
 local wobble = false
