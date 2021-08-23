@@ -57,7 +57,7 @@ local GUN_STOWED_SPEED = math.rad(45)
 local GUN_READY_SPEED = math.rad(45)
 
 local VERT_AIM_SPEED = math.rad(210)
-local AIM_SPEED = math.rad(360) -- noscope
+local AIM_SPEED = math.rad(480) -- noscope
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local bAiming, bCanAim, gun_unpacked = false, true, false

@@ -62,7 +62,7 @@ return { cloaksnipe = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2640,
+  turnRate               = 2500,
   upright                = true,
 
   weapons                = {
@@ -85,6 +85,7 @@ return { cloaksnipe = {
       craterMult              = 0,
 
       customParams              = {
+        reaim_time = 1, -- Keep aiming at target to prevent sideways gun, which can lead to teamkill.
         burst = Shared.BURST_RELIABLE,
         light_radius = 0,
       },
