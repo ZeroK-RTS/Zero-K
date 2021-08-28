@@ -29,19 +29,24 @@ end
 --------------------------------------------------------------------------------
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spGetUnitTeam         = Spring.GetUnitTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitVelocity     = Spring.GetUnitVelocity
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitLosState     = Spring.GetUnitLosState
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
+local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 
 local getMovetype = Spring.Utilities.getMovetype
 
 local CMD_WAIT = CMD.WAIT
 local CMD_FIRE_STATE = CMD.FIRE_STATE
+
+local PREDICT_MULT = 1
 
 -- Constans
 local TARGET_NONE   = 0
@@ -61,6 +66,8 @@ local UNSEEN_TIMEOUT = 2
 local validUnits = {}
 local waitWaitUnits = {}
 local weaponCounts = {}
+local fireTowardsCheckRange = {}
+local unitRange = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -71,6 +78,10 @@ for i = 1, #UnitDefs do
 			waitWaitUnits[i] = true
 		end
 		validUnits[i] = true
+	end
+	if weaponCounts[i] > 0 and ud.maxWeaponRange > 0 then
+		fireTowardsCheckRange[i] = ud.maxWeaponRange + 150
+		unitRange[i] = ud.maxWeaponRange
 	end
 end
 
@@ -119,21 +130,110 @@ local unitCancelTargetCmdDesc = {
 --------------------------------------------------------------------------------
 -- Target Handling
 
-local function unitInRange(unitID, unitDefID, targetID)
-	return true
-	--local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
-	--local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
-	--local _, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
-	--local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty) + 50
-	--return dis and range and dis < range
+local function IsUnitInRange(unitID, unitDefID, targetID)
+	local dis = Spring.GetUnitSeparation(unitID, targetID, true, false) -- 2d range
+	local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
+	local _, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty)
+	return dis and range and dis < range + 10
 end
 
-local function locationInRange(unitID, unitDefID, x, y, z)
-	return true
-	--local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
-	--local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - y) + 50
-	--return range and ((ux - x)^2 + (uz - z)^2) < range^2
+local function GetTargetPosition(targetID)
+	local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(targetID, true, true)
+	return tx, ty, tz
 end
+
+--------------------------------------------------------------------------------
+-- Fire Towards
+
+local function AllowedToFireTowards(unitID, unitData)
+	if not unitRange[unitData.unitDefID] then
+		-- Factories can have this command.
+		return false
+	end
+	--local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+	--if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
+	--	-- Manual attack commands should disable this behaviour
+	--	return false
+	--end
+	if (Spring.Utilities.GetUnitFireState(unitID) == 0) then
+		-- Hold fire for permanent fire towards
+		return true
+	end
+	
+	local enemyID = spGetUnitNearestEnemy(unitID, fireTowardsCheckRange[unitData.unitDefID], true)
+	if enemyID and IsUnitInRange(unitID, unitData.unitDefID, enemyID) then
+		-- Do not fire if an enemy is in range.
+		return false
+	end
+	
+	return true
+end
+
+local function TryToShootAtRange(unitID, unitDefID, range, ux, uy, uz, rx, rz, dist)
+	local fx, fz = range * rx / dist, range * rz / dist
+	local fy = Spring.GetGroundHeight(ux + fx, uz + fz)
+	
+	range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - fy)
+	if range and fx*fx + fz*fz < range*range then
+		spSetUnitTarget(unitID, ux + fx, fy, uz + fz, false, true, -1)
+		return false
+	end
+	return range
+end
+
+local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
+	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+	local vx, vy, vz = spGetUnitVelocity(unitID)
+	
+	-- Predict own velocity for targeting.
+	ux, uy, uz = ux + vx * PREDICT_MULT, uy + vy * PREDICT_MULT, uz + vz * PREDICT_MULT
+	
+	-- Make target vector relative to unit position
+	local rx, ry, rz = tx - ux, ty - uy, tz - uz
+	
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitData.unitDefID, -ry)
+	if range and rx*rx + rz*rz < (range - 5)*(range - 5) then
+		spSetUnitTarget(unitID, tx, ty, tz, false, true, -1)
+		return
+	end
+	
+	local flatRange = unitRange[unitData.unitDefID]
+	range = range or flatRange
+	
+	local dist = math.sqrt(rx*rx + rz*rz)
+	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, range - 5, ux, uy, uz, rx, rz, dist)
+	if failRange and failRange < range then
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, failRange - 5, ux, uy, uz, rx, rz, dist)
+	end
+	if failRange and failRange < flatRange - 10 then
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, flatRange - 10, ux, uy, uz, rx, rz, dist)
+	end
+end
+
+local function CheckFireTowardsGroundTarget(unitID, unitData, tx, ty, tz)
+	if not AllowedToFireTowards(unitID, unitData) then
+		return false
+	end
+	FireTowardsPosition(unitID, unitData, tx, ty, tz)
+	return true
+end
+
+local function CheckFireTowardsUnitTarget(unitID, unitData, enemyID)
+	if not AllowedToFireTowards(unitID, unitData) then
+		return false
+	end
+	
+	local tx, ty, tz = CallAsTeam(unitData.teamID, GetTargetPosition, enemyID)
+	if not tx then
+		return false
+	end
+	FireTowardsPosition(unitID, unitData, tx, ty, tz)
+	return true
+end
+
+--------------------------------------------------------------------------------
+-- Target Handling
 
 local function clearTarget(unitID)
 	spSetUnitTarget(unitID, nil) -- The second argument is needed.
@@ -154,7 +254,7 @@ local function setTarget(data, sendToWidget)
 	end
 	if spValidUnitID(data.id) then
 		if not data.targetID then
-			if locationInRange(data.id, data.unitDefID, data.x, data.y, data.z) then
+			if not (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z)) then
 				spSetUnitTarget(data.id, data.x, data.y, data.z, false, true, -1)
 				GG.UnitSetGroundTarget(data.id)
 			end
@@ -163,14 +263,16 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_x",data.x)
 				spSetUnitRulesParam(data.id,"target_y",data.y)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
+				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (unitRange[data.unitDefID] or 1)) or 0)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam)) then
-			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.unitDefID, data.targetID) and (data.id ~= data.targetID) then
+			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id, "target_type", TARGET_UNIT)
 				spSetUnitRulesParam(data.id, "target_id", data.targetID)
+				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (unitRange[data.unitDefID] or 1)) or 0)
 			end
 		else
 			return false
@@ -275,7 +377,9 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 			targetID = data.targetID,
 			x = data.x, y = data.y, z = data.z,
 			allyTeam = spGetUnitAllyTeam(unitID),
+			teamID = spGetUnitTeam(unitID),
 			unitDefID = unitDefID,
+			fireTowards = unitRange[unitDefID] and data.fireTowards,
 			alwaysSeen = data.alwaysSeen,
 		})
 	end
@@ -325,6 +429,7 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 			id = unitID,
 			targetID = bestUnit,
 			allyTeam = spGetUnitAllyTeam(unitID),
+			teamID = spGetUnitTeam(unitID),
 			unitDefID = unitDefID,
 			alwaysSeen = tud and tud.isImmobile,
 		})
@@ -381,6 +486,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end),
 					z = cmdParams[3],
 					allyTeam = spGetUnitAllyTeam(unitID),
+					teamID = spGetUnitTeam(unitID),
+					fireTowards = cmdOptions.ctrl,
 					unitDefID = unitDefID,
 				})
 			
@@ -399,7 +506,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				)
 				
 				setTargetClosestFromList(unitID, unitDefID, team, units)
-				
 			elseif #cmdParams == 1 then
 				local targetUnitDef = spGetUnitDefID(cmdParams[1])
 				local tud = targetUnitDef and UnitDefs[targetUnitDef]
@@ -407,8 +513,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					id = unitID,
 					targetID = cmdParams[1],
 					allyTeam = spGetUnitAllyTeam(unitID),
+					teamID = spGetUnitTeam(unitID),
 					allyAllowed = allyTargetUnits[unitDefID],
 					unitDefID = unitDefID,
+					fireTowards = cmdOptions.ctrl,
 					alwaysSeen = tud and tud.isImmobile,
 				})
 			end
@@ -445,7 +553,11 @@ function GG.GetUnitTargetGround(unitID)
 end
 
 function GG.GetUnitHasSetTarget(unitID)
-	return (unitById[unitID] and unit.data[unitById[unitID]] and (not unit.data[unitById[unitID]].lingerOnly) and true) or false
+	if unitById[unitID] and unit.data[unitById[unitID]] then
+		local data = unit.data[unitById[unitID]]
+		return not (data.lingerOnly)
+	end
+	return false
 end
 
 function GG.SetUnitTarget(unitID, targetID)
@@ -461,6 +573,7 @@ function GG.SetUnitTarget(unitID, targetID)
 			id = unitID,
 			targetID = targetID,
 			allyTeam = spGetUnitAllyTeam(unitID),
+			teamID = spGetUnitTeam(unitID),
 			allyAllowed = allyTargetUnits[unitDefID],
 			unitDefID = unitDefID,
 			alwaysSeen = tud.isImmobile,

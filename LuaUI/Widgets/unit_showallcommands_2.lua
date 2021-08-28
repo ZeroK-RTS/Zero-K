@@ -44,7 +44,7 @@ local TARGET_GROUND = 1
 local TARGET_UNIT= 2
 
 local CMD_ATTACK = CMD.ATTACK
-local setTargetAlpha = math.min(0.5, (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7) - 0.05)
+local setTargetAlpha = math.min(0.5, (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7))
 
 local selectedUnitCount = 0
 local selectedUnits
@@ -216,8 +216,12 @@ local function getTargetPosition(unitID)
 		return nil
 	end
 	local target_type = spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
+	local fireTowards = spGetUnitRulesParam(unitID,"target_towards")
+	if fireTowards == 0 then
+		fireTowards = false
+	end
 	
-	local tx,ty,tz
+	local tx, ty, tz
 	
 	if target_type == TARGET_GROUND then
 		tx = spGetUnitRulesParam(unitID, "target_x")
@@ -238,7 +242,7 @@ local function getTargetPosition(unitID)
 	else
 		return nil
 	end
-	return tx,ty,tz
+	return tx, ty, tz, fireTowards
 end
 
 local function drawUnitCommands(unitID)
@@ -247,14 +251,42 @@ local function drawUnitCommands(unitID)
 	end
 	spDrawUnitCommands(unitID)
 	
-	local tx,ty,tz = getTargetPosition(unitID)
+	local tx,ty,tz,fireTowards = getTargetPosition(unitID)
 	if tx then
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
-		glBeginEnd(GL.LINES,
-			function()
-				glVertex(x,y,z);
-				glVertex(tx,ty,tz);
-			end)
+		if fireTowards then
+			local dist = math.sqrt((x - tx)^2 + (y - ty)^2 + (z - tz)^2)
+			if dist < fireTowards then
+				glColor(1, 0.8, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(x,y,z)
+						glVertex(tx, ty, tz)
+					end)
+			else
+				local mult = fireTowards / dist
+				local mx, my, mz = (tx - x)*mult + x, (ty - y)*mult + y, (tz - z)*mult + z
+				glColor(1, 0.8, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(x,y,z)
+						glVertex(mx, my, mz)
+					end)
+				glColor(1, 1, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(tx, ty, tz)
+						glVertex(mx, my, mz)
+					end)
+			end
+		else
+			glColor(1, 0.8, 0, setTargetAlpha)
+			glBeginEnd(GL.LINES,
+				function()
+					glVertex(x,y,z)
+					glVertex(tx,ty,tz)
+				end)
+		end
 	end
 end
 
@@ -306,7 +338,6 @@ function widget:DrawWorld()
 		gl.LineStipple("springdefault")
 		glDepthTest(false)
 		glLineWidth(1)
-		glColor(1, 0.8, 0, setTargetAlpha)
 		glCallList(drawList)
 		glColor(1, 1, 1, 1)
 		glLineStipple(false)
