@@ -657,7 +657,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	if doHug or skirmRange > predictedDist then
 		if behaviour.skirmOnlyNearEnemyRange then
 			local enemyRange = (GetEffectiveWeaponRange(enemyUnitDef, dy, behaviour.weaponNum) or 0) + behaviour.skirmOnlyNearEnemyRange
-			if enemyRange < predictedDist then
+			if enemyRange and enemyRange < predictedDist then
 				if doDebug then
 					Spring.Echo("return enemyRange < predictedDist", enemyRange, predictedDist)
 				end

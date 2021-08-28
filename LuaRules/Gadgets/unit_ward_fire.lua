@@ -175,19 +175,21 @@ local function DoUnitUpdate(unitID, unitData)
 	end
 	
 	local effectiveRange = (GetEffectiveWeaponRange(unitData.unitDefID, -dy, behaviour.weaponNum) or 0)
-	local wardFireRange = (effectiveRange - behaviour.wardFireLeeway)
+	if effectiveRange then
+		local wardFireRange = (effectiveRange - behaviour.wardFireLeeway)
 
-	if doDebug then
-		Spring.Echo("targetLeeway", effectiveRange + targetLeeway, effectiveRange, predictedDist)
-	end
-	
-	if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist then
-		local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
 		if doDebug then
-			Spring.MarkerAddPoint(tx, 0, tz, "F")
+			Spring.Echo("targetLeeway", effectiveRange + targetLeeway, effectiveRange, predictedDist)
 		end
-		local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
-		GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, UPDATE_RATE)
+		
+		if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist then
+			local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
+			if doDebug then
+				Spring.MarkerAddPoint(tx, 0, tz, "F")
+			end
+			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
+			GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, UPDATE_RATE)
+		end
 	end
 end
 

@@ -68,7 +68,11 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	local a = myGravity
 	-- 0 = yVel*t - a*t*t/2 --this is the basic equation of motion for vertical motion, we set distance to 0 or yDist (this have 2 meaning: either is launching from ground or is hitting ground) then we find solution for time (t) using a quadratic solver
 	-- 0 = (yVel)*t - (a/2)*t*t --^same equation as above rearranged to highlight time (t)
-	local discriminant =(yVel^2 - 4*(-a/2)*(yDist))^0.5
+	local discriminantSq = yVel^2 - 4*(-a/2)*(yDist)
+	if discriminantSq < 0 then
+		return false -- No solution
+	end
+	local discriminant = math.sqrt(discriminantSq)
 	local denominator = 2*(-a/2)
 	local t1 = (-yVel + discriminant)/denominator ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
 	local t2 = (-yVel - discriminant)/denominator
@@ -94,6 +98,9 @@ local function CalculateModdedMaxRange(heightDiff, weapon, doDebug)
 			weapon.gameMyGravity = (weapon.myGravity > 0 and weapon.myGravity*888.888888) or (Game.gravity) or 0
 			weapon.deltaV = weapon.projectilespeed*30
 			local maxFlatRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,0)
+			if not maxFlatRange then
+				return false
+			end
 			weapon.scaleDown = weapon.customMaxRange/maxFlatRange --Example: UpdateRange() in Spring\rts\Sim\Weapons\Cannon.cpp
 			weapon.heightBoostFactor = weapon.customHeightBoost
 			if weapon.heightBoostFactor < 0 and weapon.scaleDown > 0 then
@@ -101,6 +108,9 @@ local function CalculateModdedMaxRange(heightDiff, weapon, doDebug)
 			end
 		end
 		local moddedRange = CalculateBallisticConstant(weapon.deltaV,weapon.gameMyGravity,heightModded*weapon.heightBoostFactor)
+		if not moddedRange then
+			return false
+		end
 		effectiveRange = moddedRange*weapon.scaleDown --Example: GetRange2D() in Spring\rts\Sim\Weapons\Cannon.cpp
 	elseif weapon.modType == 1 then
 		--SPHERE
