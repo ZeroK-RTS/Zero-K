@@ -9,7 +9,7 @@ local imageDir = 'LuaUI/Images/commands/'
 local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
-	WARD_FIRE = "Ward Fire (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Turn invisible. Disrupted by damage, firing, abilities, and nearby enemies.",
 	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloak all friendly units in the area. Does not apply to structures or shield bearers.",
@@ -107,9 +107,9 @@ local commandDisplayConfig = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
 	},
-	[CMD_WARD_FIRE] = {
+	[CMD_FIRE_AT_SHIELD] = {
 		texture = {imageDir .. 'states/ward_off.png', imageDir .. 'states/ward_on.png'},
-		stateTooltip = {tooltips.WARD_FIRE:gsub("_STATE_", "Disabled"), tooltips.WARD_FIRE:gsub("_STATE_", "Enabled")},
+		stateTooltip = {tooltips.FIRE_AT_SHIELD:gsub("_STATE_", "Disabled"), tooltips.FIRE_AT_SHIELD:gsub("_STATE_", "Enabled")},
 	},
 	[CMD.REPEAT] = {
 		texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'},

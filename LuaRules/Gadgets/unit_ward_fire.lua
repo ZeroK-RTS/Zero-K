@@ -70,7 +70,7 @@ local CMD_REMOVE       = CMD.REMOVE
 include("LuaRules/Configs/customcmds.h.lua")
 
 local wardFireCmdDesc = {
-	id      = CMD_WARD_FIRE,
+	id      = CMD_FIRE_AT_SHIELD,
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Ward Fire',
 	action  = 'wardfire',
@@ -287,7 +287,7 @@ local function StateToggleCommand(unitID, cmdParams, cmdOptions)
 	local mexData = IterableMap.Get(mexUnits, unitID)
 	if unitData or mexData then
 		local state = cmdParams[1]
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_WARD_FIRE)
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_FIRE_AT_SHIELD)
 		
 		if (cmdDescID) then
 			wardFireCmdDesc.params[1] = state
@@ -303,7 +303,7 @@ local function StateToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_WARD_FIRE] = true}
+	return {[CMD_FIRE_AT_SHIELD] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -311,7 +311,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_WARD_FIRE) then
+	if (cmdID ~= CMD_FIRE_AT_SHIELD) then
 		return true  -- command was not used
 	end
 	StateToggleCommand(unitID, cmdParams, cmdOptions)
@@ -405,7 +405,7 @@ end
 
 function gadget:Initialize()
 	-- register command
-	gadgetHandler:RegisterCMDID(CMD_WARD_FIRE)
+	gadgetHandler:RegisterCMDID(CMD_FIRE_AT_SHIELD)
 	
 	gadgetHandler:AddChatAction("debugward", ToggleDebug, "")
 	

@@ -75,7 +75,7 @@ local cmdPosDef = {
 	[CMD_WANT_ONOFF]       = {pos = 1, priority = 13},
 	[CMD_PREVENT_BAIT]     = {pos = 1, priority = 13.1},
 	[CMD_PREVENT_OVERKILL] = {pos = 1, priority = 13.2},
-	[CMD_WARD_FIRE]        = {pos = 1, priority = 13.3},
+	[CMD_FIRE_AT_SHIELD]   = {pos = 1, priority = 13.3},
 	[CMD.TRAJECTORY]       = {pos = 1, priority = 14},
 	[CMD_UNIT_FLOAT_STATE] = {pos = 1, priority = 15},
 	[CMD_TOGGLE_DRONES]    = {pos = 1, priority = 16},

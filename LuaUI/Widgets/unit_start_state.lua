@@ -95,7 +95,7 @@ local tooltips = {
 		[3] = "Avoid shooting at units costing less than 240 (excluding Stardust) as well as, Raptor, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
 		[4] = "Avoid shooting at  units costing less than 420, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
 	},
-	ward_fire = {
+	fire_at_shield = {
 		[0] = "Disabled.",
 		[1] = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	},
@@ -922,15 +922,15 @@ local function addUnit(defName, path)
 	end
 
 	if wardFireUnits[defName] then
-		options[defName .. "_ward_fire"] = {
-			name = "  Shoot Shields (Ward Fire)",
+		options[defName .. "_fire_at_shield"] = {
+			name = "  Fire at Shields",
 			desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 			type = 'bool',
 			value = (wardFireUnits[defName] == 1),
 			path = path,
 			tooltipFunction = tooltipFunc.prevent_bait,
 		}
-		options_order[#options_order+1] = defName .. "_ward_fire"
+		options_order[#options_order+1] = defName .. "_fire_at_shield"
 	end
 
 	if baitPreventionDefault[unitDefID] then
@@ -1339,9 +1339,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			orderArray[#orderArray + 1] = {CMD_PREVENT_BAIT, {value}, CMD.OPT_SHIFT}
 		end
 		
-		value = GetStateValue(name, "ward_fire")
+		value = GetStateValue(name, "fire_at_shield")
 		if value then
-			orderArray[#orderArray + 1] = {CMD_WARD_FIRE, {(value and 1) or 0}, CMD.OPT_SHIFT}
+			orderArray[#orderArray + 1] = {CMD_FIRE_AT_SHIELD, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "disableattack")

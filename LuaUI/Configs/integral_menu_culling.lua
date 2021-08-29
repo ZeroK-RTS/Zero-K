@@ -61,7 +61,7 @@ local configList = {
 	{cmdID = CMD_PREVENT_OVERKILL      , state = true, default = false, name = "Overkill Prevention"},
 	{cmdID = CMD_SELECTION_RANK        , state = true, default = false, name = "Selection Rank"},
 	{cmdID = CMD_UNIT_AI               , state = true, default = false, name = "Unit AI"},
-	{cmdID = CMD_WARD_FIRE             , state = true, default = false, name = "Ward Fire"},
+	{cmdID = CMD_FIRE_AT_SHIELD        , state = true, default = false, name = "Fire at Shields"},
 }
 
 local defaultValues = {
@@ -105,7 +105,7 @@ local defaultValues = {
 	[CMD_PREVENT_OVERKILL] = true,
 	--[CMD_AIR_STRAFE] = true,
 	[CMD_SELECTION_RANK] = true,
-	[CMD_WARD_FIRE] = true,
+	[CMD_FIRE_AT_SHIELD] = true,
 }
 
 return configList, defaultValues

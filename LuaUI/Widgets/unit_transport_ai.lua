@@ -196,7 +196,7 @@ local ignoredCommand = {
 	[CMD_AIR_STRAFE] = true,
 	[CMD_PREVENT_OVERKILL] = true,
 	[CMD_PREVENT_BAIT] = true,
-	[CMD_WARD_FIRE] = true,
+	[CMD_FIRE_AT_SHIELD] = true,
 	[CMD_SELECTION_RANK] = true,
 }
 
