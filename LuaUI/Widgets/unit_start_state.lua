@@ -609,7 +609,7 @@ do
 			if unitDefName then
 				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
 			end
-			if behaviourData.wardFireTargets then
+			if behaviourData.hasWardFire then
 				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
 			end
 		end

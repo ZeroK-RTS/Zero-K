@@ -527,12 +527,18 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- bonusRangeUnits: a map indexed by unitDefID of extra skirm range against particular units.
 
 -- wardFireTargets (default false): List of targets, with leeway ranges, to wardfire against.
+-- wardFireEverything (default false): Instead of supplying a table above.
+-- wardFireRangeOverride (default false): Override the values of wardFireTargets.
+-- wardFireTravelVectorAvoid (default false): Do not ward fire if the dot product of the ffire direction and my velocity exceeds this value.
+-- wardFireVectorAvoidSpeed (default false): Only do the dot product if my speed is above this threshold.
+-- wardFireUnboundedRange (default false): Do not do any range checks for ward fire.
 -- wardFireLeeway (defaults to 10): Distance below max range to aim at when ward firing.
 -- wardFireEnableLeeway (defaults to 3): Do not ward fire if enemy is within range + wardFireEnableLeeway, to free up targeting for fast moving units.
 -- wardFireHeight (defaults to 0): Ground height at which to fire towards enemies that are hyperskirmed due to bonusRangeUnits.
 -- wardFirePredict (default to 0): Multiply target velocity to predict location for ward fire.
 -- wardFireShield (default to false): Set a shield threshold required to ward fire against shielded targets.
 -- wardFireDefault (default to false): Default value for ward fire.
+-- wardAlternateStateToggle (default to false): Enable to use a more visible state called "Fire towards enemies"
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -894,11 +900,17 @@ local behaviourConfig = {
 		fleeDistance = 120,
 		fleeLeeway = 150,
 		
-		wardFireTargets = personalShieldUnits,
+		wardFireTargets = allGround,
+		wardFireRangeOverride = 150,
+		wardFireTravelVectorAvoid = 0.5,
+		wardFireVectorAvoidSpeed = 0,
+		wardFireLeewayOverride = 80,
 		wardFireEnableLeeway = 10,
+		wardFireLeeway = 45,
 		wardFirePredict = 5,
-		wardFireShield = 50,
+		wardFireShield = false,
 		wardFireDefault = true,
+		wardAlternateStateToggle = true,
 	},
 	{
 		name = "tankheavyraid",
@@ -1610,6 +1622,16 @@ local behaviourConfig = {
 		skirmLeeway = 20,
 		skirmOrderDis = 200,
 		skirmOrderDisMin = 100, -- Make it turn around.
+		
+		wardFireEverything = true,
+		wardFireUnboundedRange = true,
+		wardFireLeewayOverride = 80,
+		wardFireEnableLeeway = 10,
+		wardFirePredict = 5,
+		wardFireLeeway = 15,
+		wardFireShield = false,
+		wardFireDefault = true,
+		wardAlternateStateToggle = true,
 	},
 	{
 		name = "vehheavyarty",
@@ -2078,7 +2100,8 @@ local function GetBehaviourTable(behaviourData, ud)
 		behaviourData.swarmLeeway             = (behaviourData.swarmLeeway or 50)
 	end
 	
-	if behaviourData.wardFireTargets then
+	if behaviourData.wardFireTargets or behaviourData.wardFireEverything then
+		behaviourData.hasWardFire             = true
 		behaviourData.wardFireLeeway          = behaviourData.wardFireLeeway or 10
 		behaviourData.wardFireEnableLeeway    = behaviourData.wardFireEnableLeeway or 3
 		behaviourData.wardFireHeight          = behaviourData.wardFireHeight or 0

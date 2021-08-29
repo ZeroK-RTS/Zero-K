@@ -119,14 +119,14 @@ local function DoUnitUpdate(unitID, unitData)
 	end
 	local behaviour = unitData.def
 	
-	local enemyID = spGetUnitNearestEnemy(unitID, behaviour.searchRange, true)
+	local enemyID = spGetUnitNearestEnemy(unitID, (behaviour.wardFireUnboundedRange and 1000000000) or behaviour.searchRange, true)
 	local enemyUnitDefID = enemyID and spGetUnitDefID(enemyID)
 	
 	if doDebug then
-		Spring.Echo("enemyID", enemyID, "enemyUnitDefID", enemyUnitDefID, "def", enemyUnitDefID and behaviour.wardFireTargets[enemyUnitDefID])
+		Spring.Echo("enemyID", enemyID, "enemyUnitDefID", enemyUnitDefID, "def", enemyUnitDefID and (behaviour.wardFireEverything or behaviour.wardFireTargets[enemyUnitDefID]))
 	end
 	
-	if not (enemyUnitDefID and behaviour.wardFireTargets[enemyUnitDefID]) then
+	if not (enemyUnitDefID and (behaviour.wardFireEverything or behaviour.wardFireTargets[enemyUnitDefID])) then
 		return
 	end
 	
@@ -139,7 +139,7 @@ local function DoUnitUpdate(unitID, unitData)
 	end
 	
 	--Spring.Utilities.UnitEcho(enemyID)
-	local targetLeeway = behaviour.wardFireTargets[enemyUnitDefID]
+	local targetLeeway = (not behaviour.wardFireUnboundedRange) and (behaviour.wardFireRangeOverride or behaviour.wardFireTargets[enemyUnitDefID])
 	
 	local vx, vy, vz, enemySpeed = spGetUnitVelocity(enemyID)
 	local ex, ey, ez, _, aimY = spGetUnitPosition(enemyID, false, true) -- enemy position
@@ -167,11 +167,24 @@ local function DoUnitUpdate(unitID, unitData)
 
 	-- Calculate predicted enemy distance
 	local predictedDist = eDist
+	if behaviour.wardFireTravelVectorAvoid and predProj > 0 then
+		local mvx, mvy, mvz, mySpeed = spGetUnitVelocity(unitID)
+		if (not behaviour.wardFireVectorAvoidSpeed) or mySpeed > behaviour.wardFireVectorAvoidSpeed then
+			local dot = (ex*mvx + ey*mvy + ez*mvz)/(mySpeed * eDist)
+			if doDebug then
+				Spring.Echo("dot", dot)
+			end
+			if dot > behaviour.wardFireTravelVectorAvoid then
+				return
+			end
+		end
+	end
+	
 	if predProj > 0 then
 		predictedDist = predictedDist*predProj
 	else
-		-- In this case the enemy is predicted to go past me
-		predictedDist = 0
+		-- In this case the enemy is predicted to go past me so should enter range
+		return
 	end
 	
 	local effectiveRange = (GetEffectiveWeaponRange(unitData.unitDefID, -dy, behaviour.weaponNum) or 0)
@@ -179,11 +192,12 @@ local function DoUnitUpdate(unitID, unitData)
 		local wardFireRange = (effectiveRange - behaviour.wardFireLeeway)
 
 		if doDebug then
-			Spring.Echo("targetLeeway", effectiveRange + targetLeeway, effectiveRange, predictedDist)
+			Spring.Echo("targetLeeway", effectiveRange + (targetLeeway or 0), effectiveRange, predictedDist)
 		end
 		
-		if effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist then
+		if (not targetLeeway) or (effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist) then
 			local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
+			
 			if doDebug then
 				Spring.MarkerAddPoint(tx, 0, tz, "F")
 			end
@@ -321,9 +335,9 @@ local function AddWardUnit(unitID, unitDefID)
 	if not (behaviour) then
 		return false
 	end
-	if not behaviour.wardFireTargets then
+	if not behaviour.hasWardFire then
 		behaviour = (behaviour.land or false)
-		if not (behaviour and behaviour.wardFireTargets) then
+		if not (behaviour and behaviour.hasWardFire) then
 			return false
 		end
 	end
@@ -373,7 +387,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	if unitAIBehaviour[unitDefID] and unitAIBehaviour[unitDefID].wardFireTargets then
+	if unitAIBehaviour[unitDefID] and unitAIBehaviour[unitDefID].hasWardFire then
 		IterableMap.Remove(wardUnits, unitID)
 	end
 	if mexShootBehaviour[unitDefID] then
