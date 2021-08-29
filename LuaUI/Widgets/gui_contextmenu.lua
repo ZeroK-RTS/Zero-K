@@ -1160,9 +1160,13 @@ local function printAbilities(ud, unitID)
 
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
-		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
+		cells[#cells+1] = (((ud.customParams.islightonlytransport) and "Light") or ((ud.customParams.islighttransport) and "Medium") or "Heavy")
 		cells[#cells+1] = 'Light Speed: '
 		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		if not ud.customParams.islightonlytransport then
+			cells[#cells+1] = 'Medium Speed: '
+			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_medium or "1")*100) + 0.5) .. "%"
+		end
 		if not ud.customParams.islighttransport then
 			cells[#cells+1] = 'Heavy Speed: '
 			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
@@ -1550,7 +1554,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or (ud.customParams.requiremediumtrans and "Medium") or "Light"), textColor = color.stats_fg, }
 	end
 
 	if isCommander then

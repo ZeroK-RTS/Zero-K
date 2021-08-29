@@ -29,6 +29,8 @@ return { gunshipheavytrans = {
     midposoffset   = [[0 0 0]],
     aimposoffset   = [[0 10 0]],
     modelradius    = [[15]],
+    transport_speed_light   = [[0.75]],
+    transport_speed_medium  = [[0.65]],
     transport_speed_heavy   = [[0.5]],
   },
 

@@ -12,7 +12,6 @@ Spring.Echo("Loading UnitDefs_posts")
 --
 
 VFS.Include("LuaRules/Configs/constants.lua")
-local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -941,8 +940,13 @@ end
 if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
-		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
-			ud.customparams.requireheavytrans = 1
+		local buildCost = ud.buildcostmetal and tonumber(ud.buildcostmetal)
+		if buildCost then
+			if buildCost > TRANSPORT_MEDIUM_COST_MAX then
+				ud.customparams.requireheavytrans = 1
+			elseif buildCost > TRANSPORT_LIGHT_COST_MAX then
+				ud.customparams.requiremediumtrans = 1
+			end
 		end
 	end
 else
