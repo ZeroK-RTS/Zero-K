@@ -21,6 +21,7 @@ return { amphriot = {
     amph_submerged_at = 40,
     sink_on_emp    = 1,
     floattoggle    = [[1]],
+    set_target_range_buffer = 35,
   },
 
   explodeAs              = [[BIG_UNITEX]],

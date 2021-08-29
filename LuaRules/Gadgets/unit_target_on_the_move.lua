@@ -46,8 +46,6 @@ local getMovetype = Spring.Utilities.getMovetype
 local CMD_WAIT = CMD.WAIT
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 
-local PREDICT_MULT = 1
-
 -- Constans
 local TARGET_NONE   = 0
 local TARGET_GROUND = 1
@@ -60,6 +58,9 @@ local TARGET_UNIT   = 2
 local USEEN_UPDATE_FREQUENCY = 45
 local UNSEEN_TIMEOUT = 2
 
+local FIRE_TOWARDS_BUFFER = 8
+local PREDICT_MULT = 1.7
+
 --------------------------------------------------------------------------------
 -- Globals
 
@@ -68,6 +69,8 @@ local waitWaitUnits = {}
 local weaponCounts = {}
 local fireTowardsCheckRange = {}
 local unitRange = {}
+local setTargetRangeBuffer = {}
+local setTargetSpeedMult = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -83,6 +86,14 @@ for i = 1, #UnitDefs do
 		fireTowardsCheckRange[i] = ud.maxWeaponRange + 150
 		unitRange[i] = ud.maxWeaponRange
 	end
+	if ud.customParams.set_target_range_buffer and tonumber(ud.customParams.set_target_range_buffer) then
+		setTargetRangeBuffer[i] = tonumber(ud.customParams.set_target_range_buffer)
+		if ud.customParams.set_target_speed_buffer and tonumber(ud.customParams.set_target_speed_buffer) then
+			setTargetSpeedMult[i] = tonumber(ud.customParams.set_target_speed_buffer)
+		end
+	end
+	--setTargetRangeBuffer[i] = 30
+	--setTargetSpeedMult[i] = 8
 end
 
 local unitById = {} -- unitById[unitID] = position of unitID in unit
@@ -143,27 +154,48 @@ local function GetTargetPosition(targetID)
 	return tx, ty, tz
 end
 
+local function IsTargetGroundAllowed(unitID, unitDefID, tx, ty, tz)
+	if not setTargetRangeBuffer[unitDefID] then
+		return true
+	end
+	local buffer = setTargetRangeBuffer[unitDefID]
+	local ux, uy, uz = spGetUnitPosition(unitID)
+	
+	if setTargetSpeedMult[unitDefID] then
+		local vx, vy, vz, mySpeed = spGetUnitVelocity(unitID)
+		buffer = buffer + mySpeed * setTargetSpeedMult[unitDefID]
+	end
+	
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty)
+	if not range then
+		return false
+	end
+
+	range = range - buffer
+	if range < 0 then
+		return false
+	end
+
+	return ((tx - ux)^2 + (tz - uz)^2 < range*range)
+end
+
 --------------------------------------------------------------------------------
 -- Fire Towards
 
 local function AllowedToFireTowards(unitID, unitData)
+	-- Factories can have this command.
 	if not unitRange[unitData.unitDefID] then
-		-- Factories can have this command.
 		return false
 	end
-	--local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-	--if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
-	--	-- Manual attack commands should disable this behaviour
-	--	return false
-	--end
+
+	-- Hold fire for dedicated fire towards
 	if (Spring.Utilities.GetUnitFireState(unitID) == 0) then
-		-- Hold fire for permanent fire towards
 		return true
 	end
-	
+
+	-- Do not fire if an enemy is in range.
 	local enemyID = spGetUnitNearestEnemy(unitID, fireTowardsCheckRange[unitData.unitDefID], true)
 	if enemyID and IsUnitInRange(unitID, unitData.unitDefID, enemyID) then
-		-- Do not fire if an enemy is in range.
 		return false
 	end
 	
@@ -184,30 +216,36 @@ end
 
 local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
 	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
-	local vx, vy, vz = spGetUnitVelocity(unitID)
+	local vx, vy, vz, mySpeed = spGetUnitVelocity(unitID)
+	local unitDefID = unitData.unitDefID
 	
 	-- Predict own velocity for targeting.
 	ux, uy, uz = ux + vx * PREDICT_MULT, uy + vy * PREDICT_MULT, uz + vz * PREDICT_MULT
 	
 	-- Make target vector relative to unit position
 	local rx, ry, rz = tx - ux, ty - uy, tz - uz
+	local buffer = setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
 	
-	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitData.unitDefID, -ry)
-	if range and rx*rx + rz*rz < (range - 5)*(range - 5) then
+	if setTargetSpeedMult[unitDefID] then
+		buffer = buffer + mySpeed * setTargetSpeedMult[unitDefID]
+	end
+	
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, -ry)
+	if range and rx*rx + rz*rz < (range - buffer)*(range - buffer) then
 		spSetUnitTarget(unitID, tx, ty, tz, false, true, -1)
 		return
 	end
 	
-	local flatRange = unitRange[unitData.unitDefID]
+	local flatRange = unitRange[unitDefID]
 	range = range or flatRange
 	
 	local dist = math.sqrt(rx*rx + rz*rz)
-	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, range - 5, ux, uy, uz, rx, rz, dist)
-	if failRange and failRange < range then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, failRange - 5, ux, uy, uz, rx, rz, dist)
+	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, range - buffer, ux, uy, uz, rx, rz, dist)
+	if failRange and failRange - buffer < range then
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, failRange - buffer, ux, uy, uz, rx, rz, dist)
 	end
-	if failRange and failRange < flatRange - 10 then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, flatRange - 10, ux, uy, uz, rx, rz, dist)
+	if failRange and flatRange - (buffer + 5) < failRange then
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, flatRange - (buffer + 5), ux, uy, uz, rx, rz, dist)
 	end
 end
 
@@ -255,8 +293,10 @@ local function setTarget(data, sendToWidget)
 	if spValidUnitID(data.id) then
 		if not data.targetID then
 			if not (data.fireTowards and CheckFireTowardsGroundTarget(data.id, data, data.x, data.y, data.z)) then
-				spSetUnitTarget(data.id, data.x, data.y, data.z, false, true, -1)
-				GG.UnitSetGroundTarget(data.id)
+				if IsTargetGroundAllowed(data.id, data.unitDefID, data.x, data.y, data.z) then
+					spSetUnitTarget(data.id, data.x, data.y, data.z, false, true, -1)
+					GG.UnitSetGroundTarget(data.id)
+				end
 			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id,"target_type",TARGET_GROUND)

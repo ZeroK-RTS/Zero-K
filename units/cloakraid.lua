@@ -19,6 +19,8 @@ return { cloakraid = {
     modelradius        = [[16]],
     cus_noflashlight   = 1,
     aim_lookahead      = 80,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

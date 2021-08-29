@@ -23,6 +23,7 @@ return { cloakriot = {
     cus_noflashlight  = 1,
     selection_scale   = 0.85,
     aim_lookahead     = 120,
+    set_target_range_buffer = 35,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

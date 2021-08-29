@@ -21,6 +21,7 @@ return { tankriot = {
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
     aim_lookahead     = 160,
+    set_target_range_buffer = 40,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -373,7 +373,8 @@ local function AddMexUnit(unitID, unitDefID, teamID, cmdAdded)
 	end
 	
 	if not cmdAdded then
-		local wardFireCmdDesc = cmdDescs[behaviour.wardFireCmdID]
+		local cmdID = behaviour.wardFireCmdID or CMD_FIRE_AT_SHIELD
+		local wardFireCmdDesc = cmdDescs[cmdID]
 		wardFireCmdDesc.params[1] = 1
 		spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
 	end

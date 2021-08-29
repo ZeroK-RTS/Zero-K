@@ -23,6 +23,8 @@ return { amphimpulse = {
     floattoggle       = [[1]],
     selection_scale   = 0.8,
     aim_lookahead     = 120,
+    set_target_range_buffer = 50,
+    set_target_speed_buffer = 10,
   },
 
   explodeAs              = [[BIG_UNITEX]],

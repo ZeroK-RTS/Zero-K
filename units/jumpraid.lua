@@ -25,6 +25,8 @@ return { jumpraid = {
     fireproof          = [[1]],
     stats_show_death_explosion = 1,
     aim_lookahead      = 80,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs             = [[PYRO_DEATH]],
