@@ -36,11 +36,12 @@ local configList = {
 	{cmdID = CMD_AP_FLY_STATE          , state = true, default = true, name = "Air Factory Idle State"},
 	{cmdID = CMD_CLOAK_SHIELD          , state = true, default = true, name = "Area Cloaker"},
 	{cmdID = CMD_PREVENT_BAIT          , state = true, default = true, name = "Avoid Bad Targets"},
-	{cmdID = CMD_DONT_FIRE_AT_RADAR    , state = true, default = true, name = "Fire At Radar State"},
 	{cmdID = CMD_FACTORY_GUARD         , state = true, default = true, name = "Auto Assist"},
 	{cmdID = CMD_WANT_CLOAK            , state = true, default = true, name = "Cloak"},
 	{cmdID = CMD_PRIORITY              , state = true, default = true, name = "Construction Priority"},
 	{cmdID = CMD_TOGGLE_DRONES         , state = true, default = true, name = "Drone Construction"},
+	{cmdID = CMD_DONT_FIRE_AT_RADAR    , state = true, default = true, name = "Fire At Radar State"},
+	{cmdID = CMD_FIRE_TOWARDS_ENEMY    , state = true, default = true, name = "Fire Towards Enemies"},
 	{cmdID = CMD_UNIT_FLOAT_STATE      , state = true, default = true, name = "Float State"},
 	{cmdID = CMD_AIR_STRAFE            , state = true, default = true, name = "Gunship Strafe"},
 	{cmdID = CMD.FIRE_STATE            , state = true, default = true, name = "Hold Fire (Fire State)"},
@@ -56,12 +57,12 @@ local configList = {
 	{cmdID = CMD_DISABLE_ATTACK        , state = true, default = false, name = "Allow Attack Commands"},
 	{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
 	{cmdID = CMD_AUTO_CALL_TRANSPORT   , state = true, default = false, name = "Call Transports"},
+	{cmdID = CMD_FIRE_AT_SHIELD        , state = true, default = false, name = "Fire at Shields"},
 	{cmdID = CMD_GLOBAL_BUILD          , state = true, default = false, name = "Global Build"},
 	{cmdID = CMD_UNIT_KILL_SUBORDINATES, state = true, default = false, name = "Kill Captured"},
 	{cmdID = CMD_PREVENT_OVERKILL      , state = true, default = false, name = "Overkill Prevention"},
 	{cmdID = CMD_SELECTION_RANK        , state = true, default = false, name = "Selection Rank"},
 	{cmdID = CMD_UNIT_AI               , state = true, default = false, name = "Unit AI"},
-	{cmdID = CMD_FIRE_AT_SHIELD        , state = true, default = false, name = "Fire at Shields"},
 }
 
 local defaultValues = {
@@ -106,6 +107,7 @@ local defaultValues = {
 	--[CMD_AIR_STRAFE] = true,
 	[CMD_SELECTION_RANK] = true,
 	[CMD_FIRE_AT_SHIELD] = true,
+	--[CMD_FIRE_TOWARDS_ENEMY] = true,
 }
 
 return configList, defaultValues

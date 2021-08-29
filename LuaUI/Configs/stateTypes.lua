@@ -28,6 +28,7 @@ local stateData = {
 	[CMD_PREVENT_OVERKILL] = 2,
 	[CMD_PREVENT_BAIT] = 5,
 	[CMD_FIRE_AT_SHIELD] = 2,
+	[CMD_FIRE_TOWARDS_ENEMY] = 2,
 	--[CMD_SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
 	[CMD_UNIT_AI] = 2,
 }

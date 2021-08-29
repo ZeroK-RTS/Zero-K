@@ -197,6 +197,7 @@ local ignoredCommand = {
 	[CMD_PREVENT_OVERKILL] = true,
 	[CMD_PREVENT_BAIT] = true,
 	[CMD_FIRE_AT_SHIELD] = true,
+	[CMD_FIRE_TOWARDS_ENEMY] = true,
 	[CMD_SELECTION_RANK] = true,
 }
 

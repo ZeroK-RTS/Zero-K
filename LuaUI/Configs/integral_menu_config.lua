@@ -10,6 +10,7 @@ local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
 	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot in the direction of enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Turn invisible. Disrupted by damage, firing, abilities, and nearby enemies.",
 	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloak all friendly units in the area. Does not apply to structures or shield bearers.",
@@ -106,6 +107,10 @@ local commandDisplayConfig = {
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+	},
+	[CMD_FIRE_TOWARDS_ENEMY] = {
+		texture = {imageDir .. 'states/shoot_towards_off.png', imageDir .. 'states/shoot_towards_on.png'},
+		stateTooltip = {tooltips.FIRE_TOWARDS_ENEMY:gsub("_STATE_", "Disabled"), tooltips.FIRE_TOWARDS_ENEMY:gsub("_STATE_", "Enabled")},
 	},
 	[CMD_FIRE_AT_SHIELD] = {
 		texture = {imageDir .. 'states/ward_off.png', imageDir .. 'states/ward_on.png'},

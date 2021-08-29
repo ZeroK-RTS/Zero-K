@@ -69,13 +69,23 @@ local CMD_REMOVE       = CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local wardFireCmdDesc = {
-	id      = CMD_FIRE_AT_SHIELD,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Ward Fire',
-	action  = 'wardfire',
-	tooltip = 'Toggles warding fire for the unit',
-	params  = {0, 'Ward Off', 'Ward On'}
+local cmdDescs = {
+	[CMD_FIRE_AT_SHIELD] = {
+		id      = CMD_FIRE_AT_SHIELD,
+		type    = CMDTYPE.ICON_MODE,
+		name    = 'Fire at Shield',
+		action  = 'fireatshields',
+		tooltip = 'Toggles firing at shields',
+		params  = {0, 'Off', 'On'}
+	},
+	[CMD_FIRE_TOWARDS_ENEMY] = {
+		id      = CMD_FIRE_TOWARDS_ENEMY,
+		type    = CMDTYPE.ICON_MODE,
+		name    = 'Fire Towards Enemies',
+		action  = 'firetowards',
+		tooltip = 'Toggles firing towards enemies out of range.',
+		params  = {0, 'Off', 'On'}
+	}
 }
 
 --------------------------------------------------------------------------------
@@ -282,16 +292,16 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function StateToggleCommand(unitID, cmdParams, cmdOptions)
+local function StateToggleCommand(unitID, cmdParams, cmdOptions, cmdID)
 	local unitData = IterableMap.Get(wardUnits, unitID)
 	local mexData = IterableMap.Get(mexUnits, unitID)
-	if unitData or mexData then
+	if (unitData or mexData) and unitData.def.wardFireCmdID == cmdID then
 		local state = cmdParams[1]
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_FIRE_AT_SHIELD)
+		local cmdDescID = spFindUnitCmdDesc(unitID, cmdID)
 		
 		if (cmdDescID) then
-			wardFireCmdDesc.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, { params = wardFireCmdDesc.params})
+			cmdDescs[cmdID].params[1] = state
+			spEditUnitCmdDesc(unitID, cmdDescID, { params = cmdDescs[cmdID].params})
 			if unitData then
 				unitData.active = (state == 1)
 			end
@@ -303,7 +313,7 @@ local function StateToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[CMD_FIRE_AT_SHIELD] = true}
+	return {[CMD_FIRE_AT_SHIELD] = true, [CMD_FIRE_TOWARDS_ENEMY] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -311,10 +321,10 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_FIRE_AT_SHIELD) then
+	if not (cmdID == CMD_FIRE_AT_SHIELD or cmdID == CMD_FIRE_TOWARDS_ENEMY) then
 		return true  -- command was not used
 	end
-	StateToggleCommand(unitID, cmdParams, cmdOptions)
+	StateToggleCommand(unitID, cmdParams, cmdOptions, cmdID)
 	return false  -- command was used
 end
 
@@ -343,6 +353,7 @@ local function AddWardUnit(unitID, unitDefID)
 	end
 
 	local default = behaviour.wardFireDefault
+	local wardFireCmdDesc = cmdDescs[behaviour.wardFireCmdID]
 	wardFireCmdDesc.params[1] = (default and 1) or 0
 	spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
 
@@ -362,6 +373,7 @@ local function AddMexUnit(unitID, unitDefID, teamID, cmdAdded)
 	end
 	
 	if not cmdAdded then
+		local wardFireCmdDesc = cmdDescs[behaviour.wardFireCmdID]
 		wardFireCmdDesc.params[1] = 1
 		spInsertUnitCmdDesc(unitID, wardFireCmdDesc)
 	end
@@ -406,6 +418,7 @@ end
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_FIRE_AT_SHIELD)
+	gadgetHandler:RegisterCMDID(CMD_FIRE_TOWARDS_ENEMY)
 	
 	gadgetHandler:AddChatAction("debugward", ToggleDebug, "")
 	

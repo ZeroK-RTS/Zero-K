@@ -99,6 +99,10 @@ local tooltips = {
 		[0] = "Disabled.",
 		[1] = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
 	},
+	fire_towards_enemy = {
+		[0] = "Disabled.",
+		[1] = "Shoot towards the closest enemy when nothing else is in range.",
+	},
 }
 
 for name, values in pairs(tooltips) do
@@ -922,15 +926,29 @@ local function addUnit(defName, path)
 	end
 
 	if wardFireUnits[defName] then
-		options[defName .. "_fire_at_shield"] = {
-			name = "  Fire at Shields",
-			desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
-			type = 'bool',
-			value = (wardFireUnits[defName] == 1),
-			path = path,
-			tooltipFunction = tooltipFunc.prevent_bait,
-		}
-		options_order[#options_order+1] = defName .. "_fire_at_shield"
+		local def = wardFireUnits[defName]
+		
+		if def.wardFireCmdID == CMD_FIRE_AT_SHIELD then
+			options[defName .. "_fire_at_shield"] = {
+				name = "  Fire at Shields",
+				desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+				type = 'bool',
+				value = (wardFireUnits[defName] == 1),
+				path = path,
+				tooltipFunction = tooltipFunc.prevent_bait,
+			}
+			options_order[#options_order+1] = defName .. "_fire_at_shield"
+		elseif def.wardFireCmdID == CMD_FIRE_TOWARDS_ENEMY then
+			options[defName .. "_fire_towards_enemy"] = {
+				name = "  Fire Towards Enemies",
+				desc = "Shoot towards the closest enemy when nothing else is in range.",
+				type = 'bool',
+				value = (wardFireUnits[defName] == 1),
+				path = path,
+				tooltipFunction = tooltipFunc.prevent_bait,
+			}
+			options_order[#options_order+1] = defName .. "fire_towards_enemy"
+		end
 	end
 
 	if baitPreventionDefault[unitDefID] then
@@ -1342,6 +1360,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		value = GetStateValue(name, "fire_at_shield")
 		if value then
 			orderArray[#orderArray + 1] = {CMD_FIRE_AT_SHIELD, {(value and 1) or 0}, CMD.OPT_SHIFT}
+		end
+		
+		value = GetStateValue(name, "fire_towards_enemy")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
 		value = GetStateValue(name, "disableattack")

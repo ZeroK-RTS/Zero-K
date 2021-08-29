@@ -1,3 +1,6 @@
+
+include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -538,7 +541,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- wardFirePredict (default to 0): Multiply target velocity to predict location for ward fire.
 -- wardFireShield (default to false): Set a shield threshold required to ward fire against shielded targets.
 -- wardFireDefault (default to false): Default value for ward fire.
--- wardAlternateStateToggle (default to false): Enable to use a more visible state called "Fire towards enemies"
+-- wardFireCmdID (default to CMD_FIRE_AT_SHIELD): Set a different cmdID for ward fire.
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -900,6 +903,7 @@ local behaviourConfig = {
 		fleeDistance = 120,
 		fleeLeeway = 150,
 		
+		wardFireCmdID = CMD_FIRE_TOWARDS_ENEMY,
 		wardFireTargets = allGround,
 		wardFireRangeOverride = 150,
 		wardFireTravelVectorAvoid = 0.5,
@@ -1623,6 +1627,7 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		skirmOrderDisMin = 100, -- Make it turn around.
 		
+		wardFireCmdID = CMD_FIRE_TOWARDS_ENEMY,
 		wardFireEverything = true,
 		wardFireUnboundedRange = true,
 		wardFireLeewayOverride = 80,
@@ -1630,7 +1635,7 @@ local behaviourConfig = {
 		wardFirePredict = 5,
 		wardFireLeeway = 15,
 		wardFireShield = false,
-		wardFireDefault = true,
+		wardFireDefault = false, -- Let people choose this.
 		wardAlternateStateToggle = true,
 	},
 	{
@@ -2105,6 +2110,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		behaviourData.wardFireLeeway          = behaviourData.wardFireLeeway or 10
 		behaviourData.wardFireEnableLeeway    = behaviourData.wardFireEnableLeeway or 3
 		behaviourData.wardFireHeight          = behaviourData.wardFireHeight or 0
+		behaviourData.wardFireCmdID           = behaviourData.wardFireCmdID or CMD_FIRE_AT_SHIELD
 	end
 	
 	if behaviourData.fightOnlyOverride then

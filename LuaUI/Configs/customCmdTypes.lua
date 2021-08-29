@@ -43,7 +43,8 @@ local custom_cmd_actions = {
 	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", states = {'Off', '30%', '50%', '80%'}},
 	preventoverkill = {cmdType = 2, cmdID = CMD_PREVENT_OVERKILL, name = "Prevent Overkill", states = {'Off', 'On'}},
 	preventbait     = {cmdType = 2, cmdID = CMD_PREVENT_BAIT, name = "Avoid Bad Targets", states = {'Disabled', '40', '100', '300', '600'}},
-	wardfire        = {cmdType = 2, cmdID = CMD_FIRE_AT_SHIELD, name = "Ward Fire", states = {'Off', 'On'}},
+	fireatshields   = {cmdType = 2, cmdID = CMD_FIRE_AT_SHIELD, name = "Fire at Shields", states = {'Off', 'On'}},
+	firetowards     = {cmdType = 2, cmdID = CMD_FIRE_TOWARDS_ENEMY, name = "Fire Towards Enemies", states = {'Off', 'On'}},
 	trajectory      = {cmdType = 2, cmdID = CMD.TRAJECTORY, name = "Trajectory", states = {'Low', 'High'}},
 
 	--CUSTOM COMMANDS
@@ -199,7 +200,7 @@ local usedActions = {
 	["selection_rank"] = true,
 	["pushpull"] = true,
 	["unit_kill_subordinates"] = true,
-	["wardfire"] = true,
+	["fireatshields"] = true,
 	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
