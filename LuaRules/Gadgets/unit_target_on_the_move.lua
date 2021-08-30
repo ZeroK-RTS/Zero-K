@@ -41,7 +41,8 @@ local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 
-local getMovetype = Spring.Utilities.getMovetype
+local GetUnitRange = Spring.Utilities.GetUnitRange
+local getMovetype  = Spring.Utilities.getMovetype
 
 local CMD_WAIT = CMD.WAIT
 local CMD_FIRE_STATE = CMD.FIRE_STATE
@@ -67,9 +68,9 @@ local PREDICT_MULT = 1.7
 local validUnits = {}
 local waitWaitUnits = {}
 local weaponCounts = {}
-local fireTowardsCheckRange = {}
-local unitRange = {}
+local fireTowardsCheckBuffer = {}
 local setTargetRangeBuffer = {}
+local fireTowardsRangeBuffer = {}
 local setTargetSpeedMult = {}
 
 for i = 1, #UnitDefs do
@@ -83,14 +84,16 @@ for i = 1, #UnitDefs do
 		validUnits[i] = true
 	end
 	if weaponCounts[i] > 0 and ud.maxWeaponRange > 0 then
-		fireTowardsCheckRange[i] = ud.maxWeaponRange + 150
-		unitRange[i] = ud.maxWeaponRange
+		fireTowardsCheckBuffer[i] = 150
 	end
 	if ud.customParams.set_target_range_buffer and tonumber(ud.customParams.set_target_range_buffer) then
 		setTargetRangeBuffer[i] = tonumber(ud.customParams.set_target_range_buffer)
 		if ud.customParams.set_target_speed_buffer and tonumber(ud.customParams.set_target_speed_buffer) then
 			setTargetSpeedMult[i] = tonumber(ud.customParams.set_target_speed_buffer)
 		end
+	end
+	if ud.customParams.fire_towards_range_buffer and tonumber(ud.customParams.fire_towards_range_buffer) then
+		fireTowardsRangeBuffer[i] = tonumber(ud.customParams.fire_towards_range_buffer)
 	end
 	--setTargetRangeBuffer[i] = 30
 	--setTargetSpeedMult[i] = 8
@@ -141,11 +144,11 @@ local unitCancelTargetCmdDesc = {
 --------------------------------------------------------------------------------
 -- Target Handling
 
-local function IsUnitInRange(unitID, unitDefID, targetID)
+local function IsUnitInRange(unitID, unitDefID, weaponID, targetID)
 	local dis = Spring.GetUnitSeparation(unitID, targetID, true, false) -- 2d range
 	local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
 	local _, _, _, tx, ty, tz = spGetUnitPosition(targetID, true)
-	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty)
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty, weaponID)
 	return dis and range and dis < range + 10
 end
 
@@ -159,14 +162,15 @@ local function IsTargetGroundAllowed(unitID, unitDefID, tx, ty, tz)
 		return true
 	end
 	local buffer = setTargetRangeBuffer[unitDefID]
-	local ux, uy, uz = spGetUnitPosition(unitID)
+	local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true)
 	
 	if setTargetSpeedMult[unitDefID] then
 		local vx, vy, vz, mySpeed = spGetUnitVelocity(unitID)
 		buffer = buffer + mySpeed * setTargetSpeedMult[unitDefID]
 	end
 	
-	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty)
+	local _, weaponID = GetUnitRange(unitID, unitDefID)
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - ty, weaponID)
 	if not range then
 		return false
 	end
@@ -184,7 +188,8 @@ end
 
 local function AllowedToFireTowards(unitID, unitData)
 	-- Factories can have this command.
-	if not unitRange[unitData.unitDefID] then
+	local unitDefID = unitData.unitDefID
+	if not fireTowardsCheckBuffer[unitDefID] then
 		return false
 	end
 
@@ -194,28 +199,31 @@ local function AllowedToFireTowards(unitID, unitData)
 	end
 
 	-- Do not fire if an enemy is in range.
-	local enemyID = spGetUnitNearestEnemy(unitID, fireTowardsCheckRange[unitData.unitDefID], true)
-	if enemyID and IsUnitInRange(unitID, unitData.unitDefID, enemyID) then
+	local weaponRange, weaponID = GetUnitRange(unitID, unitDefID)
+	local checkRange = weaponRange + fireTowardsCheckBuffer[unitDefID]
+	local enemyID = spGetUnitNearestEnemy(unitID, checkRange, true)
+	if enemyID and IsUnitInRange(unitID, unitData.unitDefID, weaponID, enemyID) then
 		return false
 	end
 	
 	return true
 end
 
-local function TryToShootAtRange(unitID, unitDefID, range, ux, uy, uz, rx, rz, dist)
+local function TryToShootAtRange(unitID, unitDefID, weaponID, range, ux, uy, uz, rx, rz, dist)
 	local fx, fz = range * rx / dist, range * rz / dist
 	local fy = Spring.GetGroundHeight(ux + fx, uz + fz)
 	
-	range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - fy)
+	range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - fy, weaponID)
 	if range and fx*fx + fz*fz < range*range then
 		spSetUnitTarget(unitID, ux + fx, fy, uz + fz, false, true, -1)
+		--Spring.MarkerAddPoint(ux + fx, fy, uz + fz, "")
 		return false
 	end
 	return range
 end
 
 local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
-	local ux, uy, uz = spGetUnitPosition(unitID) -- my position
+	local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true) -- my position
 	local vx, vy, vz, mySpeed = spGetUnitVelocity(unitID)
 	local unitDefID = unitData.unitDefID
 	
@@ -224,28 +232,28 @@ local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
 	
 	-- Make target vector relative to unit position
 	local rx, ry, rz = tx - ux, ty - uy, tz - uz
-	local buffer = setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
+	local buffer = fireTowardsRangeBuffer[unitDefID] or setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
 	
 	if setTargetSpeedMult[unitDefID] then
 		buffer = buffer + mySpeed * setTargetSpeedMult[unitDefID]
 	end
 	
-	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, -ry)
+	local flatRange, weaponID = GetUnitRange(unitID, unitDefID)
+	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, -ry, weaponID)
 	if range and rx*rx + rz*rz < (range - buffer)*(range - buffer) then
 		spSetUnitTarget(unitID, tx, ty, tz, false, true, -1)
 		return
 	end
 	
-	local flatRange = unitRange[unitDefID]
 	range = range or flatRange
 	
 	local dist = math.sqrt(rx*rx + rz*rz)
-	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, range - buffer, ux, uy, uz, rx, rz, dist)
+	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, range - buffer, ux, uy, uz, rx, rz, dist)
 	if failRange and failRange - buffer < range then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, failRange - buffer, ux, uy, uz, rx, rz, dist)
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, failRange - buffer, ux, uy, uz, rx, rz, dist)
 	end
 	if failRange and flatRange - (buffer + 5) < failRange then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, flatRange - (buffer + 5), ux, uy, uz, rx, rz, dist)
+		failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, flatRange - (buffer + 5), ux, uy, uz, rx, rz, dist)
 	end
 end
 
@@ -303,7 +311,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_x",data.x)
 				spSetUnitRulesParam(data.id,"target_y",data.y)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
-				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (unitRange[data.unitDefID] or 1)) or 0)
+				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
 		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam)) then
 			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
@@ -312,7 +320,7 @@ local function setTarget(data, sendToWidget)
 			if sendToWidget then
 				spSetUnitRulesParam(data.id, "target_type", TARGET_UNIT)
 				spSetUnitRulesParam(data.id, "target_id", data.targetID)
-				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (unitRange[data.unitDefID] or 1)) or 0)
+				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
 		else
 			return false
@@ -419,7 +427,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 			allyTeam = spGetUnitAllyTeam(unitID),
 			teamID = spGetUnitTeam(unitID),
 			unitDefID = unitDefID,
-			fireTowards = unitRange[unitDefID] and data.fireTowards,
+			fireTowards = fireTowardsCheckBuffer[unitDefID] and data.fireTowards,
 			alwaysSeen = data.alwaysSeen,
 		})
 	end
