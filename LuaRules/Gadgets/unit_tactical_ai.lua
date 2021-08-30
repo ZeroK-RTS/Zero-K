@@ -441,6 +441,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
 		
+		cx, cz = GG.ProjDodge.RaycastHitZones(unitID, cx, cz)
 		if move then
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
@@ -493,6 +494,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cy = ey
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
+		cx, cz = GG.ProjDodge.RaycastHitZones(unitID, cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
@@ -533,6 +535,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength)/pointDis
 			end
 		end
+		cx, cz = GG.ProjDodge.RaycastHitZones(unitID, cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
@@ -695,6 +698,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
+		cx, cz = GG.ProjDodge.RaycastHitZones(unitID, cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
@@ -767,6 +771,7 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 		local cx = ux+(ux-ex)*f
 		local cy = uy
 		local cz = uz+(uz-ez)*f
+		cx, cz = GG.ProjDodge.RaycastHitZones(unitID, cx, cz)
 
 		GG.recursion_GiveOrderToUnit = true
 
@@ -979,6 +984,27 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
 		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	end
+
+	local velocity = select(4, spGetUnitVelocity(unitID))
+	if haveFight or velocity == 0 then
+		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
+		if dodgeX ~= 0 or dodgeZ ~= 0 then
+			local ux, cy, uz = spGetUnitPosition(unitID)
+			local cx = ux + dodgeX
+			local cz = uz + dodgeZ
+			if move then
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			else
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			end
+
+			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+			unitData.idleX, unitData.idleZ = cx, cz
+			unitData.receivedOrder = true
+			return
+		end
+	end
 	
 	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
@@ -1030,9 +1056,10 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enemyUnitDef, typeKnown)
 		end
 	end
-	
+
 	if unitData.queueReturnX or ((not cmdID) and unitData.setReturn and unitData.idleX) then
 		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
+		local rx, rz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
 		unitData.queueReturnX = nil
 		unitData.queueReturnZ = nil
 		unitData.idleWantReturn = nil
@@ -1064,6 +1091,10 @@ local function UpdateUnits(frame, start, increment)
 		else
 	--]]
 	local slowUpdate = (frame%3 == 0)
+
+	if start == 1 then
+		GG.ProjTargets.Update()
+	end
 	
 	local index = start
 	local listData = unitList.data
