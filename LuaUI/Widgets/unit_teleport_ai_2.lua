@@ -1,10 +1,7 @@
-local version = "v0.845"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
-    desc      = version .. " Automatically scan any units around teleport beacon " ..
-				"(up to 600elmo, HLT range) and teleport them when it shorten travel time. "..
-				"This only apply to your unit & allied beacon.",
+    desc      = "Units automatically use nearby teleport beacons to shorten travel time.",
 	author    = "Msafwan",
     date      = "1 September 2013",
     license   = "GNU GPL, v2 or later",

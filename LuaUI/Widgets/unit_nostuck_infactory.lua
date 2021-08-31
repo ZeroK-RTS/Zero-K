@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "UnitNoStuckInFactory",
-    desc      = "Always move unit away from factory's build yard & Remove an accidental build-unit command given to unit in factory. This prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
+    desc      = "Prevents units getting stuck in factories by dropping invalid orders and issuing move commands instead",
     author    = "msafwan",
     date      = "2 January 2014",
     license   = "none",

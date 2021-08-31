@@ -1,19 +1,9 @@
-local versionName = "v2.879"
---------------------------------------------------------------------------------
---
---  file:    cmd_dynamic_Avoidance.lua
---  brief:   a collision avoidance system
---  using: "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas
---	code:  Msafwan
---
---  Licensed under the terms of the GNU GPL, v2 or later.
---
---------------------------------------------------------------------------------
+
 function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System",
-    desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
-    author    = "msafwan",
+    desc      = "Avoidance AI behaviour for constructors, cloakies, ground-combat units and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
+    author    = "msafwan (based on articles by Siome Goldenstein, Edward Large, Dimitris Metaxas)",
     date      = "March 8, 2014", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,

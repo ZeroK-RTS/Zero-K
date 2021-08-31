@@ -13,7 +13,7 @@
 function widget:GetInfo()
 	return {
 		name      = "LupsManager",
-		desc      = "",
+		desc      = "Implements some unit particle effects",
 		author    = "jK",
 		date      = "Feb, 2008",
 		license   = "GNU GPL, v2 or later",

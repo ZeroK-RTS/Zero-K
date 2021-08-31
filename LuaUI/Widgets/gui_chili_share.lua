@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name    = "Chili Share menu v1.24",
-		desc    = "Press H to bring up the chili share menu.",
+		desc    = "FPS style (whole screen, hold to show) player list with comsharing UI",
 		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
 		license = "PD",

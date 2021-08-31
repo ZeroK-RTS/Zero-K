@@ -4,7 +4,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Save Game Menu",
-		desc      = "bla",
+		desc      = "Implements autosaves and the save menu",
 		author    = "KingRaptor",
 		date      = "2016.11.24",
 		license   = "GNU GPL, v2 or later",

@@ -6,7 +6,7 @@ local rank = playerID and select(9, Spring.GetPlayerInfo(playerID, false))
 function widget:GetInfo()
 	return {
 		name = widgetName,
-		desc = "v0.4 Teach you to play the game, one tip at a time",
+		desc = "Teaches you to play the game, one tip at a time",
 		author = "KingRaptor; original by zwzsg",
 		date = "July 30th, 2009",
 		license = "Public Domain",

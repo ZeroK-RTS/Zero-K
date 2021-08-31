@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Economy Panel Default",
-    desc      = "",
+    desc      = "Implements the default resource bars",
     author    = "jK, Shadowfury333, GoogleFrog",
     date      = "2014",
     license   = "GNU GPL, v2 or later",

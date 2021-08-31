@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name    = "Teamhighlight option",
+	desc    = "Adds the 'Lagging players flash' option",
 	layer   = -10002,
 	enabled = true,
 } end

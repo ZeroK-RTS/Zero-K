@@ -1,11 +1,7 @@
-local version = "v1.121"
-
 function widget:GetInfo()
   return {
     name      = "Area Attack Tweak",
-    desc      = version .. " Tweak to area attack command:"..
-				"\n• automatically filter out ground target for AA units."..
-				"\n• CTRL+Attack split targets among units.",
+    desc      = "CTRL+Attack splits targets. AA automatically drops ground targets.",
     author    = "msafwan",
     date      = "May 22, 2012",
     license   = "GNU GPL, v2 or later",

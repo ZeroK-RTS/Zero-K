@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Combo Overhead/Free Camera (experimental)",
+    name      = "Combo Overhead/Free Camera (experimental)", -- FIXME: long-ass name overlaps Alt+F11 checkbox, but changing it would ruin settings
     desc      = "v0.138 Camera featuring 6 actions",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2014-Sept-25
