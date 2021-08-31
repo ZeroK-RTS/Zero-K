@@ -4,7 +4,7 @@ function gadget:GetInfo()
     desc = "calculates projectile dodge vector for units",
     author = "petturtle",
     date = "2021",
-    layer = -4,
+    layer = 0,
     enabled = true
   }
 end
@@ -17,9 +17,6 @@ if gadgetHandler:IsSyncedCode() then
 local Vector2 = include("LuaRules/Utilities/vector2.lua")
 local Kinematics = include("LuaRules/Utilities/kinematics.lua")
 local Config = include("LuaRules/Configs/proj_targets_config.lua")
-
-local ggProjTargetsQuery
-local ggProjTargetsGetData
 
 local spIsPosInLos = Spring.IsPosInLos
 local spGetUnitDefID = Spring.GetUnitDefID
@@ -48,7 +45,7 @@ local hitDataCache = {}
 
 local function GetHitData(projID, unitID)
   local unitDefID = spGetUnitDefID(unitID)
-  local pData = ggProjTargetsGetData(projID)
+  local pData = GG.ProjTargets.GetData(projID)
   if hitDataCache[projID][unitDefID] and pData.config.dynamic == false then
     return hitDataCache[projID][unitDefID]
   end
@@ -140,7 +137,7 @@ end
 
 local function GetTargetDataData(unitID, uPos)
   local tData, tDataCount = {}, 0
-  local targets = ggProjTargetsQuery(uPos[1], uPos[2], QUERY_RADIUS)
+  local targets = GG.ProjTargets.Query(uPos[1], uPos[2], QUERY_RADIUS)
   for i = 1, #targets do
     local data = FilterTarget(unitID, targets[i])
     if data then
@@ -207,7 +204,7 @@ external.RaycastHitZones = function(unitID, x, z)
   local unitToPoint = uPos:DirectionTo(point)
   local moveDistance = unitToPoint:Mag()
   local closestDist = moveDistance
-  local targets = ggProjTargetsQuery(uPos[1], uPos[2], QUERY_RADIUS)
+  local targets = GG.ProjTargets.Query(uPos[1], uPos[2], QUERY_RADIUS)
   for i = 1, #targets do
     closestDist = min(RaycastMovementToTarget(unitID, targets[i], unitToPoint, moveDistance), closestDist)
   end
@@ -228,8 +225,6 @@ function gadget:ProjectileDestroyed(projID)
 end
 
 function gadget:Initialize()
-  ggProjTargetsQuery = GG.ProjTargets.Query
-  ggProjTargetsGetData = GG.ProjTargets.GetData
   GG.ProjDodge = external
   _G.hitDataCache = hitDataCache
 end

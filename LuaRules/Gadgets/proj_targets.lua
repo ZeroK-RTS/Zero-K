@@ -4,7 +4,7 @@ function gadget:GetInfo()
     desc = "tracks projectiles targets",
     author = "petturtle",
     date = "2021",
-    layer = -5,
+    layer = 0,
     enabled = true
   }
 end
