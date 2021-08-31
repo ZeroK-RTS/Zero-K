@@ -13,6 +13,7 @@ local DEBUG = false
 
 if gadgetHandler:IsSyncedCode() then
 
+local spSetWatchWeapon = Script.SetWatchWeapon
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDirection = Spring.GetUnitDirection
@@ -184,6 +185,10 @@ end
 function gadget:Initialize()
   GG.ProjTargets = external
   _G.projectiles = projectiles
+
+  for projDefID, _ in pairs(Config) do
+    spSetWatchWeapon(projDefID, true)
+  end
 end
 
 

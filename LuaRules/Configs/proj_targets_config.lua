@@ -38,7 +38,6 @@ local TRACKED = {
 
 local config = {}
 local dynamic, data
-local spSetWatchWeapon = Script.SetWatchWeapon
 for projName, _ in pairs(TRACKED) do
   data = WeaponDefNames[projName]
   dynamic = data.wobble ~= 0 or data.dance ~= 0 or data.tracks
@@ -50,7 +49,6 @@ for projName, _ in pairs(TRACKED) do
     range = data.range,
     selfExplode = data.selfExplode,
   }
-  spSetWatchWeapon(data.id, true)
 end
 
 return config
