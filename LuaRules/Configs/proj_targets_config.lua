@@ -30,6 +30,10 @@ local TRACKED = {
     turretheavylaser_laser = true,
     staticarty_plasma = true,
     staticheavyarty_plasma = true,
+    tacnuke_weapon = true,
+    napalmmissile_weapon = true,
+    empmissile_emp_weapon = true,
+    seismic_seismic_weapon = true,
 }
 
 local config = {}
