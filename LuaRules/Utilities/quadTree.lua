@@ -37,7 +37,7 @@ end
 
 function QuadTree:insert(x, y, data)
 	if self.dataCount < self.capacity or self.depth >= self.maxDepth then
-		self.data[data] = true
+		self.data[data] = {x, y}
 		self.dataCount = self.dataCount + 1
 	elseif self.isSubdivided then
 		self:getPointSubNode(x, y):insert(x, y, data)
@@ -64,9 +64,11 @@ function QuadTree:remove(x, y, data)
 end
 
 function QuadTree:query(rect, found, count)
-	for data in pairs(self.data) do
-		count = count + 1
-		found[count] = data
+	for data, point in pairs(self.data) do
+		if rect:HasPoint(point[1], point[2]) then
+			count = count + 1
+			found[count] = data
+		end
 	end
 
 	if self.isSubdivided and self.rect:Intersects(rect) then

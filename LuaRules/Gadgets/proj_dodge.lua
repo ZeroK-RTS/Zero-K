@@ -42,8 +42,9 @@ local max = math.max
 local min = math.min
 local hitDataCache = {}
 
-local function GetHitData(projID, unitID, pData)
+local function GetHitData(projID, unitID)
 	local unitDefID = spGetUnitDefID(unitID)
+	local pData = GG.ProjTargets.GetData(projID)
 	if hitDataCache[projID][unitDefID] and pData.config.dynamic == false then
 		return hitDataCache[projID][unitDefID]
 	end
@@ -124,13 +125,8 @@ local function FilterTarget(unitID, projID)
 		return false
 	end
 
-	local pData = GG.ProjTargets.GetData(projID)
+	local hitData = GetHitData(projID, unitID)
 	local uPos = vector.New3(spGetUnitPosition(unitID))
-	if vector.DistanceTo(uPos, pData.pos) > QUERY_RADIUS then
-		return false
-	end
-
-	local hitData = GetHitData(projID, unitID, pData)
 	local near = GetNearestPointOnLine(uPos, hitData.max, hitData.min)
 	local distance = vector.DistanceTo(near, uPos)
 	if distance > hitData.aoe then
@@ -159,13 +155,8 @@ local function RaycastMovementToTarget(unitID, projID, dir, dirLength)
 		return dirLength
 	end
 
-	local pData = GG.ProjTargets.GetData(projID)
+	local hitData = GetHitData(projID, unitID)
 	local uPos = vector.New3(spGetUnitPosition(unitID))
-	if vector.DistanceTo(uPos, pData.pos) > QUERY_RADIUS then
-		return dirLength
-	end
-
-	local hitData = GetHitData(projID, unitID, pData)
 	local pVel = vector.New3(spGetProjectileVelocity(projID))
 	local intersection = vector.Intersection(uPos, dir, pPos, pVel)
 	if intersection == nil then
