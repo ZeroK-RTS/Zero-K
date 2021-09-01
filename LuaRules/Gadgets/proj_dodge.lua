@@ -19,6 +19,7 @@ local Config = include("LuaRules/Configs/proj_targets_config.lua")
 
 local vector = Spring.Utilities.Vector
 local spIsPosInLos = Spring.IsPosInLos
+local spGetGameFrame = Spring.GetGameFrame
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitRadius = Spring.GetUnitRadius
 local spGetUnitHeight = Spring.GetUnitHeight
@@ -31,6 +32,7 @@ local spGetProjectileVelocity = Spring.GetProjectileVelocity
 
 local QUERY_RADIUS = 600
 local SAFETY_DISTANCE = 30
+local HITCACHE_UPDATE_DELAY = 15
 local CANNON = "Cannon"
 local AircraftBomb = "AircraftBomb"
 local MISSILE = "MissileLauncher"
@@ -43,9 +45,11 @@ local min = math.min
 local hitDataCache = {}
 
 local function GetHitData(projID, unitID)
+	local currFrame = spGetGameFrame()
 	local unitDefID = spGetUnitDefID(unitID)
 	local pData = GG.ProjTargets.GetData(projID)
-	if hitDataCache[projID][unitDefID] and pData.config.dynamic == false then
+	local hitData = hitDataCache[projID][unitDefID]
+	if hitData and (pData.config.dynamic == false or hitData.updateFrame > currFrame) then
 		return hitDataCache[projID][unitDefID]
 	end
 
@@ -89,16 +93,16 @@ local function GetHitData(projID, unitID)
 
 	local dist = vector.DirectionTo(pData.pos, min)
 	local uRadius = spGetUnitRadius(unitID)
-	local hitData = {
+	hitData = {
 		max = pData.pos,
 		maxY = pData.y,
 		min = min,
 		minY = minY,
 		dist = dist,
 		distLength = vector.Mag(dist),
-		aoe = pData.config.aoe + uRadius + SAFETY_DISTANCE
+		aoe = pData.config.aoe + uRadius + SAFETY_DISTANCE,
+		updateFrame = currFrame + HITCACHE_UPDATE_DELAY,
 	}
-
 	hitDataCache[projID][unitDefID] = hitData
 	return hitData
 end
