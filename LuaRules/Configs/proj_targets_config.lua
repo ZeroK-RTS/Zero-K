@@ -40,7 +40,7 @@ local config = {}
 local dynamic, data
 for projName, _ in pairs(TRACKED) do
   data = WeaponDefNames[projName]
-  dynamic = data.wobble ~= 0 or data.dance ~= 0 or data.tracks
+  dynamic = data.wobble ~= 0 or data.dance ~= 0 or data.tracks or data.selfExplode
   config[data.id] = {
     aoe = data.damageAreaOfEffect,
     wType = data.type,
