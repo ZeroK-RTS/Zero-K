@@ -43,9 +43,8 @@ local min = math.min
 local hitDataCache = {}
 
 
-local function GetHitData(projID, unitID)
+local function GetHitData(projID, unitID, pData)
   local unitDefID = spGetUnitDefID(unitID)
-  local pData = GG.ProjTargets.GetData(projID)
   if hitDataCache[projID][unitDefID] and pData.config.dynamic == false then
     return hitDataCache[projID][unitDefID]
   end
@@ -125,8 +124,14 @@ local function FilterTarget(unitID, projID)
   if not spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
     return false
   end
-  local hitData = GetHitData(projID, unitID)
+
+  local pData = GG.ProjTargets.GetData(projID)
   local uPos = Vector2.New3(spGetUnitPosition(unitID))
+  if uPos:DistanceTo(pData.pos) > QUERY_RADIUS then
+    return false
+  end
+
+  local hitData = GetHitData(projID, unitID, pData)
   local near = GetNearestPointOnLine(uPos, hitData.max, hitData.min)
   local distance = near:DistanceTo(uPos)
   if distance > hitData.aoe then
@@ -155,8 +160,13 @@ local function RaycastMovementToTarget(unitID, projID, dir, dirLength)
     return dirLength
   end
 
-  local hitData = GetHitData(projID, unitID)
+  local pData = GG.ProjTargets.GetData(projID)
   local uPos = Vector2.New3(spGetUnitPosition(unitID))
+  if uPos:DistanceTo(pData.pos) > QUERY_RADIUS then
+    return dirLength
+  end
+
+  local hitData = GetHitData(projID, unitID, pData)
   local pVel = Vector2.New3(spGetProjectileVelocity(projID))
   local intersection = Vector2.Intersection(uPos, dir, pPos, pVel)
   if intersection == nil then
@@ -248,6 +258,7 @@ local glBeginEnd = gl.BeginEnd
 local glLineWidth = gl.LineWidth
 local glPopMatrix = gl.PopMatrix
 local glPushMatrix = gl.PushMatrix
+local GL_LINE_LOOP = GL.LINE_LOOP
 
 local function DrawHitZone(x1, y1, z1, x2, y2, z2, aoe)
   local dirX, dirZ = x1 - x2, z1 - z2
@@ -267,7 +278,7 @@ function gadget:DrawWorld()
   for _, unitDefs in pairs(SYNCED.hitDataCache) do
     for _, h in pairs(unitDefs) do
       glPushMatrix()
-      glBeginEnd(GL.LINE_LOOP, DrawHitZone, h.max[1], h.maxY, h.max[2], h.min[1], h.minY, h.min[2], h.aoe)
+      glBeginEnd(GL_LINE_LOOP, DrawHitZone, h.max[1], h.maxY, h.max[2], h.min[1], h.minY, h.min[2], h.aoe)
       glPopMatrix()
     end
   end
