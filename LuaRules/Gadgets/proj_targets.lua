@@ -14,6 +14,7 @@ local DEBUG = false
 if gadgetHandler:IsSyncedCode() then
 
 
+local vector = Spring.Utilities.Vector
 local spSetWatchWeapon = Script.SetWatchWeapon
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -26,7 +27,6 @@ local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 
 local QuadTree = include("LuaRules/Utilities/quadTree.lua")
-local Vector2 = include("LuaRules/Utilities/vector2.lua")
 local Kinematics = include("LuaRules/Utilities/kinematics.lua")
 local Config = include("LuaRules/Configs/proj_targets_config.lua")
 
@@ -45,24 +45,24 @@ local targetMap = QuadTree.New(0, 0, MAP_WIDTH, MAP_HEIGHT, 4, 4)
 local function GetProjectileRawTarget(projID)
 	local tType, tArgs = spGetProjectileTarget(projID)
 	if tType == TTYPE_U then
-		return Vector2.New3(spGetUnitPosition(tArgs))
+		return vector.New3(spGetUnitPosition(tArgs))
 	elseif tType == TTYPE_G then
-		return Vector2.New(tArgs[1], tArgs[3]), tArgs[2]
+		return {tArgs[1], tArgs[3]}, tArgs[2]
 	elseif tType == TTYPE_F then
-		return Vector2.New3(spGetFeaturePosition(projID))
+		return vector.New3(spGetFeaturePosition(projID))
 	else -- TTYPE_P
-		return Vector2.New3(spGetProjectilePosition(tArgs))
+		return vector.New3(spGetProjectilePosition(tArgs))
 	end
 end
 
 local function GetProjectileTargetIntersection(projID)
 	local tType, tArgs = spGetProjectileTarget(projID)
 	if tType == TTYPE_U then
-		local uPos = Vector2.New3(spGetUnitPosition(tArgs))
-		local uDir = Vector2.New3(spGetUnitDirection(tArgs))
-		local pPos = Vector2.New3(spGetProjectilePosition(projID))
-		local pVel = Vector2.New3(spGetProjectileVelocity(projID))
-		local inter = Vector2.Intersection(uPos, uDir, pPos, pVel)
+		local uPos = vector.New3(spGetUnitPosition(tArgs))
+		local uDir = vector.New3(spGetUnitDirection(tArgs))
+		local pPos = vector.New3(spGetProjectilePosition(projID))
+		local pVel = vector.New3(spGetProjectileVelocity(projID))
+		local inter = vector.Intersection(uPos, uDir, pPos, pVel)
 		if inter then
 			return inter, spGetGroundHeight(inter[1], inter[2])
 		end
@@ -72,36 +72,21 @@ local function GetProjectileTargetIntersection(projID)
 	end
 end
 
+local function GetProjectileKinematicTarget(projID)
+	local gravity = spGetProjectileGravity(projID)
+	local y = select(2, GetProjectileTargetIntersection(projID))
+	local pPos, py = vector.New3(spGetProjectilePosition(projID))
+	local pVel, vy = vector.New3(spGetProjectileVelocity(projID))
+	local timeTo = Kinematics.TimeToHeight(vy, gravity, py - y, -1)
+	return vector.Add(pPos, vector.Mult(timeTo, pVel)), y
+end
+
 local GetProjectileTarget = {
-	["Cannon"] = function (projID)
-		local gravity = spGetProjectileGravity(projID)
-		local y = select(2, GetProjectileTargetIntersection(projID))
-		local pPos, py = Vector2.New3(spGetProjectilePosition(projID))
-		local pVel, vy = Vector2.New3(spGetProjectileVelocity(projID))
-		local timeTo = Kinematics.TimeToHeight(vy, gravity, py - y, -1)
-		return pPos + pVel:Multi(timeTo), y
-	end,
-
-	["AircraftBomb"] = function (projID)
-		local gravity = spGetProjectileGravity(projID)
-		local y = select(2, GetProjectileTargetIntersection(projID))
-		local pPos, py = Vector2.New3(spGetProjectilePosition(projID))
-		local pVel, vy = Vector2.New3(spGetProjectileVelocity(projID))
-		local timeTo = Kinematics.TimeToHeight(vy, gravity, py - y, -1)
-		return pPos + pVel:Multi(timeTo), y
-	end,
-
-	["MissileLauncher"] = function (projID)
-		return GetProjectileTargetIntersection(projID)
-	end,
-
-	["StarburstLauncher"] = function (projID)
-		return GetProjectileRawTarget(projID)
-	end,
-
-	["BeamLaser"] = function (projID)
-		return GetProjectileRawTarget(projID)
-	end
+	["Cannon"] = GetProjectileKinematicTarget,
+	["AircraftBomb"] = GetProjectileKinematicTarget,
+	["MissileLauncher"] = GetProjectileTargetIntersection,
+	["StarburstLauncher"] = GetProjectileRawTarget,
+	["BeamLaser"] = GetProjectileRawTarget,
 }
 
 local function TrackProjectile(projID)
@@ -114,7 +99,7 @@ local function TrackProjectile(projID)
 	local target, targetY = GetProjectileTarget[config.wType](projID)
 
 	if target then
-		local pPos = Vector2.New3(spGetProjectilePosition(projID))
+		local pPos = vector.New3(spGetProjectilePosition(projID))
 		projectiles[projID] = {
 			pos = target, y = targetY, config = config, initPos = pPos
 		}
@@ -158,19 +143,19 @@ external.Update = function()
 		projID = dynamicProjs[i]
 		data = projectiles[projID]
 		if data then
-			local pPos, pPosY = Vector2.New3(spGetProjectilePosition(projID))
-			local pVel, pVelY = Vector2.New3(spGetProjectileVelocity(projID))
+			local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
+			local pVel, pVelY = vector.New3(spGetProjectileVelocity(projID))
 			local timeToGround = (pPosY - data.y) / -pVelY
 			if timeToGround > 0 then
 				targetMap:Remove(data.pos[1], data.pos[2], projID)
-				data.pos = pPos + pVel:Multi(timeToGround)
+				data.pos = vector.Add(pPos, vector.Mult(timeToGround, pVel))
 				-- account for selfExplode projectiles
 				if data.config.selfExplode then
 					local initPos = data.initPos
-					local pDir = initPos:DirectionTo(data.pos)
-					if pDir:Mag() > data.config.range then
-						pDir = pDir:Normalize()
-						data.pos = initPos + pDir:Multi(data.config.range + 50)
+					local pDir = vector.DirectionTo(initPos, data.pos)
+					if vector.Mag(pDir) > data.config.range then
+						pDir = vector.Norm(1, pDir)
+						data.pos = vector.Add(initPos, vector.Mult(data.config.range + 50, pDir))
 					end
 				end
 				targetMap:Insert(data.pos[1], data.pos[2], projID)

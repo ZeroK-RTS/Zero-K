@@ -14,10 +14,10 @@ local DEBUG = false
 if gadgetHandler:IsSyncedCode() then
 
 
-local Vector2 = include("LuaRules/Utilities/vector2.lua")
 local Kinematics = include("LuaRules/Utilities/kinematics.lua")
 local Config = include("LuaRules/Configs/proj_targets_config.lua")
 
+local vector = Spring.Utilities.Vector
 local spIsPosInLos = Spring.IsPosInLos
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitRadius = Spring.GetUnitRadius
@@ -42,7 +42,6 @@ local max = math.max
 local min = math.min
 local hitDataCache = {}
 
-
 local function GetHitData(projID, unitID, pData)
 	local unitDefID = spGetUnitDefID(unitID)
 	if hitDataCache[projID][unitDefID] and pData.config.dynamic == false then
@@ -50,8 +49,8 @@ local function GetHitData(projID, unitID, pData)
 	end
 
 	local uHeight = spGetUnitHeight(unitID)
-	local pPos, pPosY = Vector2.New3(spGetProjectilePosition(projID))
-	local pVel, pVelY = Vector2.New3(spGetProjectileVelocity(projID))
+	local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
+	local pVel, pVelY = vector.New3(spGetProjectileVelocity(projID))
 
 	local min, minY
 	if pData.config.wType == CANNON or pData.config.wType == AircraftBomb then
@@ -63,12 +62,12 @@ local function GetHitData(projID, unitID, pData)
 		if minETA ~= minETA or minETA <= 0 then
 			min, minY = pData.pos, pData.y
 		else
-			min, minY = pPos + pVel:Multi(minETA), pData.y + uHeight
+			min, minY = vector.Add(pPos, vector.Mult(minETA, pVel)), pData.y + uHeight
 		end
 	elseif pData.config.wType == MISSILE then
 		local minETA = (pPosY - uHeight) / pVelY
 		if pVelY < 0 and minETA > 0 then
-			min = pPos + pVel:Multi(minETA)
+			min = vector.Add(pPos, vector.Mult(minETA, pVel))
 			minY = pData.y + uHeight
 		elseif pData.config.dynamic then
 			min, minY = pPos, pPosY
@@ -80,14 +79,14 @@ local function GetHitData(projID, unitID, pData)
 	elseif pData.config.wType == BEAMLASER then
 		local minETA = (pPosY - uHeight) / pVelY
 		if minETA > 0 then
-			min = pPos + pVel:Multi(minETA)
+			min = vector.Add(pPos, vector.Mult(minETA, pVel))
 			minY = pData.y + uHeight
 		else
 			min, minY = pData.pos, pData.y
 		end
 	end
 
-	local dist = pData.pos:DirectionTo(min)
+	local dist = vector.DirectionTo(pData.pos, min)
 	local uRadius = spGetUnitRadius(unitID)
 	local hitData = {
 		max = pData.pos,
@@ -95,7 +94,7 @@ local function GetHitData(projID, unitID, pData)
 		min = min,
 		minY = minY,
 		dist = dist,
-		distLength = dist:Mag(),
+		distLength = vector.Mag(dist),
 		aoe = pData.config.aoe + uRadius + SAFETY_DISTANCE
 	}
 
@@ -104,36 +103,36 @@ local function GetHitData(projID, unitID, pData)
 end
 
 local function GetNearestPointOnLine(point, max, min)
-	local line = max:DirectionTo(min)
+	local line = vector.DirectionTo(max, min)
 	if line[1] ~= 0 or line[2] ~= 0 then
 		local t = ((point[1]-max[1])*line[1] + (point[2] - max[2])*line[2]) / (line[1]*line[1] + line[2]*line[2])
 		if t < 0 then
-			return max:Clone()
+			return vector.Clone(max)
 		elseif t > 1 then
-			return min:Clone()
+			return vector.Clone(min)
 		else
-			return max + line:Multi(t)
+			return vector.Add(max, vector.Mult(t, line))
 		end
 	end
-	return max:Clone()
+	return vector.Clone(max)
 end
 
 local function FilterTarget(unitID, projID)
 	local allyTeam = spGetUnitAllyTeam(unitID)
-	local pPos, pPosY = Vector2.New3(spGetProjectilePosition(projID))
-	if not spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
+	local pPosX, pPosY, pPosZ = spGetProjectilePosition(projID)
+	if not spIsPosInLos(pPosX, pPosY, pPosZ, allyTeam) then
 		return false
 	end
 
 	local pData = GG.ProjTargets.GetData(projID)
-	local uPos = Vector2.New3(spGetUnitPosition(unitID))
-	if uPos:DistanceTo(pData.pos) > QUERY_RADIUS then
+	local uPos = vector.New3(spGetUnitPosition(unitID))
+	if vector.DistanceTo(uPos, pData.pos) > QUERY_RADIUS then
 		return false
 	end
 
 	local hitData = GetHitData(projID, unitID, pData)
 	local near = GetNearestPointOnLine(uPos, hitData.max, hitData.min)
-	local distance = near:DistanceTo(uPos)
+	local distance = vector.DistanceTo(near, uPos)
 	if distance > hitData.aoe then
 		return false
 	end
@@ -155,35 +154,35 @@ end
 
 local function RaycastMovementToTarget(unitID, projID, dir, dirLength)
 	local allyTeam = spGetUnitAllyTeam(unitID)
-	local pPos, pPosY = Vector2.New3(spGetProjectilePosition(projID))
+	local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
 	if not spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
 		return dirLength
 	end
 
 	local pData = GG.ProjTargets.GetData(projID)
-	local uPos = Vector2.New3(spGetUnitPosition(unitID))
-	if uPos:DistanceTo(pData.pos) > QUERY_RADIUS then
+	local uPos = vector.New3(spGetUnitPosition(unitID))
+	if vector.DistanceTo(uPos, pData.pos) > QUERY_RADIUS then
 		return dirLength
 	end
 
 	local hitData = GetHitData(projID, unitID, pData)
-	local pVel = Vector2.New3(spGetProjectileVelocity(projID))
-	local intersection = Vector2.Intersection(uPos, dir, pPos, pVel)
+	local pVel = vector.New3(spGetProjectileVelocity(projID))
+	local intersection = vector.Intersection(uPos, dir, pPos, pVel)
 	if intersection == nil then
 		return dirLength
 	end
 
-	local unitToInter = uPos:DirectionTo(intersection)
+	local unitToInter = vector.DirectionTo(uPos, intersection)
 	-- movement direction not facing intersection point
-	if dir:Dot(unitToInter) < 0 then
+	if vector.Dot(dir, unitToInter) < 0 then
 		return dirLength
 	end
 
 	local cNear = GetNearestPointOnLine(intersection, hitData.max, hitData.min)
-	local cNearDistToUnit = cNear:DistanceTo(uPos)
+	local cNearDistToUnit = vector.DistanceTo(cNear, uPos)
 	local uNear = GetNearestPointOnLine(uPos, hitData.max, hitData.min)
-	local uNearToUPos = uNear:DirectionTo(uPos)
-	local angle = uNearToUPos:AngleTo(dir:Negative())
+	local uNearToUPos = vector.DirectionTo(uNear, uPos)
+	local angle = vector.AngleTo(uNearToUPos, vector.Negative(dir))
 	local aoeDist = hitData.aoe / cos(angle)
 	return max(min(cNearDistToUnit - aoeDist, dirLength), 0)
 end
@@ -191,34 +190,36 @@ end
 local external = {}
 
 external.GetDodgeVector = function(unitID)
-	local uPos = Vector2.New3(spGetUnitPosition(unitID))
+	local uPos = vector.New3(spGetUnitPosition(unitID))
 	local tData, tDataCount = GetTargetDataData(unitID, uPos)
-	local dodge, maxMagnitude = Vector2.Zero(), 0
+	local dodge, maxMagnitude = {0, 0}, 0
 	for i = 1, tDataCount do
 		local data = tData[i]
 		maxMagnitude = max(data[3].aoe - data[2], maxMagnitude)
-		if uPos:Equal(data[1][1], data[1][2]) then
-			local pVel = Vector2.New3(spGetProjectileVelocity(data[4]))
-			dodge = dodge + pVel:Normalize()
+		if uPos[1] == data[1][1] and uPos[2] == data[1][2] then
+			local pVel = vector.New3(spGetProjectileVelocity(data[4]))
+			dodge = vector.Add(dodge, vector.Norm(1, pVel))
 		else
-			local dirToUnit = data[1]:DirectionTo(uPos)
-			dodge = dodge + dirToUnit:Normalize()
+			local dirToUnit = vector.DirectionTo(data[1], uPos)
+			dodge = vector.Add(dodge, vector.Norm(1, dirToUnit))
 		end
 	end
-	return dodge:Normalize():Multi(maxMagnitude):Unpack()
+	dodge = vector.Norm(maxMagnitude, dodge)
+	return dodge[1], dodge[2]
 end
 
 external.RaycastHitZones = function(unitID, x, z)
-	local point = Vector2.New(x, z)
-	local uPos = Vector2.New3(spGetUnitPosition(unitID))
-	local unitToPoint = uPos:DirectionTo(point)
-	local moveDistance = unitToPoint:Mag()
+	local point = {x, z}
+	local uPos = vector.New3(spGetUnitPosition(unitID))
+	local unitToPoint = vector.DirectionTo(uPos, point)
+	local moveDistance = vector.Mag(unitToPoint)
 	local closestDist = moveDistance
 	local targets = GG.ProjTargets.Query(uPos[1], uPos[2], QUERY_RADIUS)
 	for i = 1, #targets do
 		closestDist = min(RaycastMovementToTarget(unitID, targets[i], unitToPoint, moveDistance), closestDist)
 	end
-	return (uPos + unitToPoint:Normalize():Multi(closestDist)):Unpack()
+	local newPoint = vector.Add(uPos, vector.Norm(closestDist, unitToPoint))
+	return newPoint[1], newPoint[2]
 end
 
 function gadget:ProjectileCreated(projID)
