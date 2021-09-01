@@ -13,6 +13,7 @@ local DEBUG = false
 
 if gadgetHandler:IsSyncedCode() then
 
+
 local spSetWatchWeapon = Script.SetWatchWeapon
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPosition = Spring.GetUnitPosition
