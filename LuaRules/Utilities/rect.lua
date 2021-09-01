@@ -1,19 +1,19 @@
 local Rect = {}
 Rect.__index = Rect
 
-function Rect.new(_x, _y, _width, _height)
+function Rect.New(x, y, width, height)
     local instance = {
-        x = _x,
-        y = _y,
-        width = _width,
-        height = _height
+        x = x,
+        y = y,
+        width = width,
+        height = height
     }
     setmetatable(instance, Rect)
     return instance
 end
 
 function Rect:HasPoint(x, y)
-    local x2, y2 = self:GetBottomRightPoint()
+    local x2, y2 = self.x + self.width, self.y + self.height
     return x >= self.x and x <= x2 and y >= self.y and y <= y2
 end
 
@@ -24,14 +24,6 @@ function Rect:Intersects(rect)
         rect.y - rect.height > self.y + self.height or
         rect.y + rect.height < self.y - self.height
     )
-end
-
-function Rect:GetBottomRightPoint()
-    return self.x + self.width, self.y + self.height
-end
-
-function Rect:Draw(gl)
-    gl.DrawGroundQuad(self.x, self.y, self.x + self.width, self.y + self.height)
 end
 
 return Rect

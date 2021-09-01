@@ -24,7 +24,7 @@ local spGetProjectileGravity = Spring.GetProjectileGravity
 local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 
-local QuadTree = include("LuaRules/Utilities/quad_tree.lua")
+local QuadTree = include("LuaRules/Utilities/quadTree.lua")
 local Vector2 = include("LuaRules/Utilities/vector2.lua")
 local Kinematics = include("LuaRules/Utilities/kinematics.lua")
 local Config = include("LuaRules/Configs/proj_targets_config.lua")
@@ -39,7 +39,7 @@ local TTYPE_P = string.byte('p') -- projectile
 local projectiles = {}
 local dynamicProjs = {}
 local dynamicProjCount = 0
-local targetMap = QuadTree.new(0, 0, MAP_WIDTH, MAP_HEIGHT)
+local targetMap = QuadTree.New(0, 0, MAP_WIDTH, MAP_HEIGHT, 4, 4)
 
 local function GetProjectileRawTarget(projID)
   local tType, tArgs = spGetProjectileTarget(projID)
@@ -136,7 +136,7 @@ end
 function gadget:ProjectileDestroyed(projID)
   if projectiles[projID] then
     local pos = projectiles[projID].pos
-    targetMap:Remove(pos[1], pos[2])
+    targetMap:Remove(pos[1], pos[2], projID)
     projectiles[projID] = nil
   end
 end
@@ -144,7 +144,7 @@ end
 local external = {}
 
 external.Query = function(x, z, radius)
-  return targetMap:QueryCircle(x, z, radius)
+  return targetMap:Query(x, z, radius)
 end
 
 external.GetData = function(projID)
@@ -161,7 +161,7 @@ external.Update = function()
       local pVel, pVelY = Vector2.New3(spGetProjectileVelocity(projID))
       local timeToGround = (pPosY - data.y) / -pVelY
       if timeToGround > 0 then
-        targetMap:Remove(data.pos[1], data.pos[2])
+        targetMap:Remove(data.pos[1], data.pos[2], projID)
         data.pos = pPos + pVel:Multi(timeToGround)
         -- account for selfExplode projectiles
         if data.config.selfExplode then
