@@ -2,6 +2,11 @@ local sqrt = math.sqrt
 local pi = math.pi
 local cos = math.cos
 local sin = math.sin
+local atan2 = math.atan2
+
+local function New3(x,y,z)
+	return {x, z}, y
+end
 
 local function DistSq(x1,z1,x2,z2)
 	return (x1 - x2)*(x1 - x2) + (z1 - z2)*(z1 - z2)
@@ -35,6 +40,14 @@ local function AbsVal(x, y, z)
 	end
 end
 
+local function Negative(v)
+	return {-v[1], -v[2]}
+end
+
+local function Mag(v)
+	return sqrt(v[1] * v[1] + v[2] * v[2])
+end
+
 local function Unit(v)
 	local mag = AbsVal(v)
 	if mag > 0 then
@@ -42,6 +55,10 @@ local function Unit(v)
 	else
 		return v
 	end
+end
+
+local function Clone(v)
+	return {v[1], v[2]}
 end
 
 local function Norm(b, v)
@@ -73,7 +90,7 @@ local function Angle(x, z)
 	return 0
 end
 
-function Dot(v1, v2)
+local function Dot(v1, v2)
 	if v1[3] then
 		return v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3]
 	else
@@ -81,7 +98,7 @@ function Dot(v1, v2)
 	end
 end
 
-function Cross(v1, v2)
+local function Cross(v1, v2)
 	return {v1[2]*v2[3] - v1[3]*v2[2], v1[3]*v2[1] - v1[1]*v2[3], v1[1]*v2[2] - v1[2]*v2[1]}
 end
 
@@ -95,6 +112,36 @@ end
 local function Normal(v1, v2)
 	local projection = Project(v1, v2)
 	return Subtract(v1, projection), projection
+end
+
+function AngleTo(v1, v2)
+	return atan2(v1[1]*v2[2] - v1[2]*v2[1], v1[1]*v2[1] + v1[2]*v2[2]);
+end
+
+local function DirectionTo(v1, v2)
+	return {v2[1] - v1[1], v2[2] - v1[2]}
+end
+  
+local function DistanceTo(v1, v2)
+	local x, y = v2[1] - v1[1], v2[2] - v1[2]
+	return sqrt(x*x + y*y)
+end
+
+local function SlopeIntercept(v1, v2)
+	local a = v2[2] - v1[2]
+	local b = v1[1] - v2[1]
+	local c = (a * v1[1]) + (b * v1[2])
+	return a, b, c
+end
+
+local function Intersection(v1, d1, v2, d2)
+	local a1, b1, c1 = SlopeIntercept(v1, Add(v1, d1))
+	local a2, b2, c2 = SlopeIntercept(v2, Add(v2, d2))
+	local delta = a1 * b2 - b1 * a2
+	if delta == 0 then
+	  return nil
+	end
+	return {((b2 * c1) - (b1 * c2)) / delta, ((a1 * c2) - (a2 * c1)) / delta}
 end
 
 -- Spring.GetHeadingFromVector is actually broken at angles close to pi/4 and reflections
@@ -196,17 +243,26 @@ local function AngleAverageShortest(angleA, angleB)
 end
 
 Spring.Utilities.Vector = {
+	New3 = New3,
 	DistSq = DistSq,
 	Dist3D = Dist3D,
 	Mult = Mult,
 	AbsVal = AbsVal,
+	Negative = Negative,
+	Mag = Mag,
 	Unit = Unit,
+	Clone = Clone,
 	Dot = Dot,
 	Cross = Cross,
 	Norm = Norm,
 	Angle = Angle,
 	Project = Project,
 	Normal = Normal,
+	AngleTo = AngleTo,
+	DirectionTo = DirectionTo,
+	DistanceTo = DistanceTo,
+	SlopeIntercept = SlopeIntercept,
+	Intersection = Intersection,
 	PolarToCart = PolarToCart,
 	Add = Add,
 	Subtract = Subtract,
