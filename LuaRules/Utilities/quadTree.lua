@@ -52,7 +52,8 @@ function QuadTree:remove(x, y, data)
         self.data[data] = nil
         self.dataCount = self.dataCount - 1
     elseif self.isSubdivided then
-        if self:getPointSubNode(x, y):remove(x, y, data) and self:areChildrenEmpty() then
+        self:getPointSubNode(x, y):remove(x, y, data)
+        if self:areChildrenEmpty() then
             self.topLeft = nil
             self.topRight = nil
             self.bottomLeft = nil
