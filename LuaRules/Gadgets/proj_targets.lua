@@ -185,6 +185,7 @@ end
 function gadget:Initialize()
   GG.ProjTargets = external
   _G.projectiles = projectiles
+  _G.targetMap = targetMap
 
   for projDefID, _ in pairs(Config) do
     spSetWatchWeapon(projDefID, true)
@@ -195,16 +196,60 @@ end
 elseif DEBUG then -- ----- Unsynced -----
 
 
+local glText = gl.Text
+local glColor = gl.Color
+local glVertex = gl.Vertex
+local glRotate = gl.Rotate
+local glBeginEnd = gl.BeginEnd
+local glPopMatrix = gl.PopMatrix
+local glTranslate = gl.Translate
+local glDepthTest = gl.DepthTest
+local glPushMatrix = gl.PushMatrix
+local glDrawGroundCircle = gl.DrawGroundCircle
+local spGetGroundHeight = Spring.GetGroundHeight
+
 local SYNCED = SYNCED
 
-function gadget:DrawWorld()
-  gl.DepthTest(true)
-  gl.Color({1,0,0,1})
-  for _, data in pairs(SYNCED.projectiles) do
-    gl.DrawGroundCircle(data.pos[1], data.y + 1, data.pos[2], data.config.aoe, 12)
+local function DrawRect(rect)
+  glVertex({rect.x, 0, rect.y})
+  glVertex({rect.x + rect.width, 0, rect.y})
+  glVertex({rect.x + rect.width, 0, rect.y + rect.height})
+  glVertex({rect.x, 0, rect.y + rect.height})
+end
+
+local function DrawTargetMap(targetMap)
+  if targetMap.isSubdivided then
+    DrawTargetMap(targetMap.topLeft)
+    DrawTargetMap(targetMap.topRight)
+    DrawTargetMap(targetMap.bottomLeft)
+    DrawTargetMap(targetMap.bottomRight)
   end
-  gl.Color({1,1,1,1})
-  gl.DepthTest(false)
+
+  local rect = targetMap.rect
+  glPushMatrix()
+  glBeginEnd(GL.LINE_LOOP, DrawRect, rect)
+  glPopMatrix()
+
+  local x = rect.x + rect.width * 0.5
+  local z = rect.y + rect.height * 0.5
+  if targetMap.dataCount ~= 0 then
+    glPushMatrix()
+    glTranslate(x, spGetGroundHeight(x, z) + 10, z)
+    glRotate(-90, 1, 0, 0)
+    glText(tostring(targetMap.dataCount), 0, 0, 128, "cv")
+    glPopMatrix()
+  end
+end
+
+function gadget:DrawWorld()
+  glDepthTest(true)
+  glColor({1,0,0,1})
+  for _, data in pairs(SYNCED.projectiles) do
+    glDrawGroundCircle(data.pos[1], data.y + 1, data.pos[2], data.config.aoe, 12)
+  end
+  glDepthTest(false)
+  DrawTargetMap(SYNCED.targetMap)
+  glColor({1,1,1,1})
 end
 
 
