@@ -985,23 +985,25 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	end
 
-	local velocity = select(4, spGetUnitVelocity(unitID))
-	if haveFight or velocity == 0 then
+	local idle = select(4, spGetUnitVelocity(unitID)) == 0
+	if haveFight or idle then
 		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
 		if dodgeX ~= 0 or dodgeZ ~= 0 then
-			local ux, cy, uz = spGetUnitPosition(unitID)
-			local cx = ux + dodgeX
-			local cz = uz + dodgeZ
-			if move then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
-			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			local ux, uy, uz = spGetUnitPosition(unitID)
+			local cx, cz = ux + dodgeX, uz + dodgeZ
+			if idle and not move and not haveFight then
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {1, CMD_RAW_DODGE_MOVE, CMD_OPT_INTERNAL, ux, uy, uz }, CMD.OPT_ALT )
 			else
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+				if move then
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+				else
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+				end
+				unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
+				unitData.receivedOrder = true
 			end
-
-			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
-			unitData.idleX, unitData.idleZ = cx, cz
-			unitData.receivedOrder = true
 			return
 		end
 	end
@@ -1059,7 +1061,6 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 
 	if unitData.queueReturnX or ((not cmdID) and unitData.setReturn and unitData.idleX) then
 		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
-		local rx, rz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
 		unitData.queueReturnX = nil
 		unitData.queueReturnZ = nil
 		unitData.idleWantReturn = nil
@@ -1073,7 +1074,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		else
 			-- If the command queue is empty (ie still idle) then return to position
 			local ry = math.max(0, Spring.GetGroundHeight(rx, rz) or 0)
-			GiveClampedOrderToUnit(unitID, unitData.wantFightReturn and CMD_FIGHT or CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
+			GiveClampedOrderToUnit(unitID, unitData.wantFightReturn and CMD_FIGHT or CMD_RAW_DODGE_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
 			unitData.setReturn = nil
 			unitData.forceReturn = nil
 			if unitData.wantFightReturn then
