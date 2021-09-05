@@ -4,8 +4,8 @@ function widget:GetInfo()
   return {
     name      = "Area Attack Tweak",
     desc      = version .. " Tweak to area attack command:"..
-				"\n• automatically filter out ground target for AA units."..
-				"\n• CTRL+Attack split targets among units.",
+				"\nï¿½ automatically filter out ground target for AA units."..
+				"\nï¿½ CTRL+Attack split targets among units.",
     author    = "msafwan",
     date      = "May 22, 2012",
     license   = "GNU GPL, v2 or later",
@@ -32,6 +32,7 @@ local defaultCommands = {
 	[CMD_FIND_PAD] = true,
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_DODGE_MOVE] = true,
 	[CMD_RAW_BUILD] = true,
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,

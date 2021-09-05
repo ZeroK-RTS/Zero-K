@@ -28,6 +28,7 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 local positionCommand = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_DODGE_MOVE] = true,
 	[CMD_RAW_BUILD] = true,
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,

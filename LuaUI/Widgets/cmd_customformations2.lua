@@ -100,6 +100,7 @@ local lineFadeRate = 2.0
 local formationCmds = {
 	[CMD.MOVE] = true,
 	[CMD_RAW_MOVE] = true,
+	[CMD_RAW_DODGE_MOVE] = true,
 	[CMD.FIGHT] = true,
 	[CMD.ATTACK] = true,
 	[CMD.MANUALFIRE] = true,
@@ -132,7 +133,7 @@ local overrideCmds = {
 local positionCmds  =  {
 	[CMD.MOVE] = true,        [CMD_RAW_MOVE] = true,    [CMD_RAW_BUILD] = true,  [CMD.ATTACK] = true,     [CMD.RECLAIM] = true,      [CMD.RESTORE] = true,
 	[CMD.PATROL] = true,      [CMD.CAPTURE] = true,     [CMD.FIGHT] = true,      [CMD.MANUALFIRE] = true, [CMD_JUMP] = true,         [CMD.RESURRECT] = true,
-	[CMD.UNLOAD_UNIT] = true, [CMD.UNLOAD_UNITS] = true,[CMD.LOAD_UNITS] = true, [CMD.GUARD] = true,      [CMD.AREA_ATTACK]  =  true,
+	[CMD.UNLOAD_UNIT] = true, [CMD.UNLOAD_UNITS] = true,[CMD.LOAD_UNITS] = true, [CMD.GUARD] = true,      [CMD.AREA_ATTACK]  =  true, [CMD_RAW_DODGE_MOVE] = true,
 }
 
 --------------------------------------------------------------------------------
@@ -294,6 +295,7 @@ local function GetUnitFinalPosition(uID)
 end
 local function SetColor(cmdID, alpha)
 	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE then glColor(0.5, 1.0, 0.5, alpha) -- Green
+	elseif cmdID == CMD_RAW_DODGE_MOVE		   then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
 	elseif cmdID == CMD_ATTACK                 then glColor(1.0, 0.2, 0.2, alpha) -- Red
 	elseif cmdID == CMD.MANUALFIRE             then glColor(1.0, 1.0, 1.0, alpha) -- White
 	elseif cmdID == CMD_UNLOADUNIT             then glColor(1.0, 1.0, 0.0, alpha) -- Yellow

@@ -1,0 +1,13 @@
+hotspot topleft
+frame  anims/cursordodgemove_0.png  0.2
+frame  anims/cursordodgemove_1.png  0.1
+frame  anims/cursordodgemove_2.png  0.1
+frame  anims/cursordodgemove_3.png  0.1
+frame  anims/cursordodgemove_4.png  0.1
+frame  anims/cursordodgemove_5.png  0.1
+frame  anims/cursordodgemove_6.png  0.1
+frame  anims/cursordodgemove_7.png  0.1
+frame  anims/cursordodgemove_8.png  0.1
+frame  anims/cursordodgemove_9.png  0.1
+frame  anims/cursordodgemove_10.png  0.1
+frame  anims/cursordodgemove_11.png  0.4

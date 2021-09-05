@@ -10,6 +10,7 @@ local configList = {
 	{cmdID = CMD_JUMP                  , default = true, name = "Jump"},
 	{cmdID = CMD.LOAD_UNITS            , default = true, name = "Load"},
 	{cmdID = CMD_RAW_MOVE              , default = true, name = "Move"},
+	{cmdID = CMD_RAW_DODGE_MOVE        , default = true, name = "Move"},
 	{cmdID = CMD.STOP                  , default = true, name = "Stop"},
 	{cmdID = CMD_STOP_PRODUCTION       , default = true, name = "Stop Production"},
 	{cmdID = CMD.PATROL                , default = true, name = "Patrol"},

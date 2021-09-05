@@ -32,6 +32,7 @@ local custom_cmd_actions = {
 	areaattack = {cmdType = 1, name = "Area Attack"},
 
 	rawmove = {cmdType = 1, name = "Move"},
+	rawdodgemove = {cmdType = 1, name = "Dodge Move"},
 
 	-- states
 	wantonoff =       {cmdType = 2, cmdID = CMD_WANT_ONOFF, name = "On/Off", states = {'Off', 'On'}},
@@ -135,6 +136,7 @@ local usedActions = {
 	["repeat"] = true,
 	["loadonto"] = true,
 	["rawmove"] = true,
+	["rawdodgemove"] = true,
 	["patrol"] = true,
 	["fight"] = true,
 	["guard"] = true,

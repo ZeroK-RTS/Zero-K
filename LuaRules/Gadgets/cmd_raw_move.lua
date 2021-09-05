@@ -146,6 +146,16 @@ local moveRawCmdDesc = {
 	tooltip = 'Move: Move to a position. Click and drag to line move.',
 }
 
+local moveDodgeRawCmdDesc = {
+	id      = CMD_RAW_DODGE_MOVE,
+	type    = CMDTYPE.ICON_MAP,
+	name    = 'Dodge Move',
+	cursor  = 'RawDodgeMove', -- add with LuaUI?
+	action  = 'rawdodgemove',
+	tooltip = 'Dodge Move: Move to a position and dodge. Click and drag to line move.',
+	hidden  = true,
+}
+
 local TEST_MOVE_SPACING = 16
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
@@ -157,6 +167,7 @@ local RAW_CHECK_SPACING = 500
 local MAX_COMM_STOP_RADIUS = 400^2
 local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do not activate common stop radius.
 
+local RAW_DODGE_UPDATE_RATE = 15
 local CONSTRUCTOR_UPDATE_RATE = 30
 local CONSTRUCTOR_TIMEOUT_RATE = 2
 
@@ -167,6 +178,9 @@ local STOPPING_HAX = not Spring.Utilities.IsCurrentVersionNewerThan(104, 271)
 -- Variables
 
 local rawMoveUnit = {}
+local rawDodgeMoveUnit = {}
+local rawDodgeMoveUnitByID = {}
+local rawDodgeMoveUnitCount = 0
 local commonStopRadius = {}
 local oldCommandStoppingRadius = {}
 local commandCount = {}
@@ -260,9 +274,49 @@ end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+-- Raw Dodge Move Handling
+
+local function AddProjectileDodge(unitID)
+	if unitID and rawDodgeMoveUnitByID[unitID] == nil then
+		rawDodgeMoveUnitCount = rawDodgeMoveUnitCount + 1
+		rawDodgeMoveUnit[rawDodgeMoveUnitCount] = unitID
+		rawDodgeMoveUnitByID[unitID] = rawDodgeMoveUnitCount
+	end
+end
+
+local function RemoveProjectileDodge(unitID)
+	if unitID and rawDodgeMoveUnitByID[unitID] then
+		local index = rawDodgeMoveUnitByID[unitID]
+		rawDodgeMoveUnit[index] = rawDodgeMoveUnit[rawDodgeMoveUnitCount]
+		rawDodgeMoveUnitByID[rawDodgeMoveUnit[rawDodgeMoveUnitCount]] = index
+		rawDodgeMoveUnitByID[unitID] = nil
+		rawDodgeMoveUnit[rawDodgeMoveUnitCount] = nil
+		rawDodgeMoveUnitCount = rawDodgeMoveUnitCount - 1
+	end
+end
+
+local function UpdateProjectileDodge(frame)
+	if frame % RAW_DODGE_UPDATE_RATE == 0 then
+		local unitID, dodgeX, dodgeZ
+		for i = rawDodgeMoveUnitCount, 1, -1 do
+			unitID = rawDodgeMoveUnit[i]
+			dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
+			if dodgeX ~= 0 or dodgeZ ~= 0 then
+				local ux, uy, uz = spGetUnitPosition(unitID)
+				local mx, mz = ux + dodgeX, uz + dodgeZ
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, mx, uy, mz}, CMD_OPT_ALT)
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 -- Raw Move Handling
 
 local function StopRawMoveUnit(unitID, stopNonRaw)
+	RemoveProjectileDodge(unitID)
+
 	if not rawMoveUnit[unitID] then
 		return
 	end
@@ -455,10 +509,13 @@ end
 -- Command Handling
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
-	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) then
+	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD_RAW_DODGE_MOVE) then
 		return false
 	end
 	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
+	if cmdUsed and not cmdRemove and cmdID == CMD_RAW_DODGE_MOVE then
+		AddProjectileDodge(unitID)
+	end
 	return cmdUsed, cmdRemove
 end
 
@@ -504,7 +561,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if cmdID == CMD_INSERT then
 			cmdID = cmdParams[2]
 		end
-		if cmdID == CMD_RAW_MOVE then
+		if cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_DODGE_MOVE then
 			return false
 		end
 	end
@@ -778,6 +835,7 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
+	gadgetHandler:RegisterCMDID(CMD_RAW_DODGE_MOVE)
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
@@ -791,6 +849,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if (canMoveDefs[unitDefID]) then
 		spInsertUnitCmdDesc(unitID, moveRawCmdDesc)
+		spInsertUnitCmdDesc(unitID, moveDodgeRawCmdDesc)
 	end
 	if constructorBuildDistDefs[unitDefID] and not constructorByID[unitID] then
 		AddConstructor(unitID, constructorBuildDistDefs[unitDefID])
@@ -800,6 +859,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitID then
 		rawMoveUnit[unitID] = nil
+		RemoveProjectileDodge(unitID)
 		if unitDefID and constructorBuildDistDefs[unitDefID] and constructorByID[unitID] then
 			RemoveConstructor(unitID)
 		end
@@ -817,6 +877,7 @@ function gadget:GameFrame(n)
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
 	UpdateEngineMoveCheck(n)
+	UpdateProjectileDodge(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}
@@ -861,6 +922,9 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.
 	Spring.AssignMouseCursor("RawMove", "cursormove", true, true)
+	gadgetHandler:RegisterCMDID(CMD_RAW_DODGE_MOVE)
+	Spring.SetCustomCommandDrawData(CMD_RAW_DODGE_MOVE, "RawDodgeMove", {1.0, 1.0, 0.5, 0.7})
+	Spring.AssignMouseCursor("RawDodgeMove", "cursordodgemove", true, true)
 end
 
 end

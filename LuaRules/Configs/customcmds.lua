@@ -46,6 +46,7 @@ return {
 	CLOAK_SHIELD = 31101,
 	RAW_MOVE = 31109, --cmd_raw_move.lua
 	RAW_BUILD = 31110, --cmd_raw_move.lua -- unregistered raw move
+	RAW_DODGE_MOVE = 31111, --cmd_raw_move.lua
 	EMBARK = 31200, --unit_transport_ai_button.lua
 	DISEMBARK = 31201, --unit_transport_ai_button.lua
 	TRANSPORTTO = 31202, --unit_transport_ai_button.lua

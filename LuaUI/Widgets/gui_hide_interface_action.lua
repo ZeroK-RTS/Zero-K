@@ -31,6 +31,7 @@ local cursorNames = {
 	'cursordefend',
 	'cursorpickup',
 	'cursormove',
+	'cursordodgemove',
 	'cursorpatrol',
 	'cursorreclamate',
 	'cursorrepair',
