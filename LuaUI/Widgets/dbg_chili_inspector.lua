@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "ChiliInspector",
-    desc      = "",
+    desc      = "Inspects Chili API (memory usage, object counts etc.)",
     author    = "",
     date      = "2013",
     license   = "GPLv2",

@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name = "In-game Guide",
+	desc = "A ghetto wiki that adds a bunch of entries to the Help options submenu",
 	enabled = true,
 } end
 

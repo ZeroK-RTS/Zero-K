@@ -1,9 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "CustomFormations2",
-		desc      = "Allows you to draw a formation line:"..
-		            "\n mouse drag draw various command on ground."..
-		            "\n ALT+Attack draw attack command on the ground.",
+		desc      = "Dragged commands follow the wobbly line instead of treating it as a line segment",
 		author    = "Niobium, modified by Skasi", -- Based on 'Custom Formations' by jK and gunblob
 		version   = "v3.4", -- With modified dot drawing from v4.3
 		date      = "Mar, 2010",

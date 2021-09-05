@@ -1,9 +1,7 @@
-local versionNum = '0.308'
-
 function widget:GetInfo()
 	return {
 		name		= "Newton Firezone",
-		desc 		= "v".. (versionNum) .."Adds the Firezone command for Newtons. Allies in an area are targeted.",
+		desc 		= "Adds the Firezone command for Newtons. Allies in an area are targeted.",
 		author		= "wolas, xponen, Google Frog", --xponen (add crash location estimator)
 		date		= "2013",
 		license		= "GNU GPL, v2 or later",

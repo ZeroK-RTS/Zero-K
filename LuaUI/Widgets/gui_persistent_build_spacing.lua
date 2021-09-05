@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Persistent Build Spacing",
-		desc      = "Recalls last build spacing set for each building and game [v2.0]\n fixed pre-game, added mouse wheel and previsualization options(Helwor)",
+		desc      = "Maintains build spacing between matches",
 		author    = "Niobium & DrHash-, Helwor",
 		date      = "Sep 6, 2011",
 		license   = "GNU GPL, v3 or later",

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Resource Bars Classic",
-    desc      = "",
+    desc      = "Classic CA style resource bars",
     author    = "jK",
     date      = "2010",
     license   = "GNU GPL, v2 or later",

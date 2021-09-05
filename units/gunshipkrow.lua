@@ -25,6 +25,7 @@ return { gunshipkrow = {
 
   customParams           = {
     modelradius    = [[10]],
+    fire_towards_range_buffer = 95,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],

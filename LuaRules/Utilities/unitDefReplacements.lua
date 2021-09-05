@@ -4,8 +4,12 @@
 
 local econMultEnabled = nil
 local buildTimes = {}
+local unitRanges = {}
 local planetwarsStructure = {}
 local buildPlate = {}
+local buildPowerCache = {}
+local rangeCache = {}
+local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
 }
@@ -17,6 +21,7 @@ for i = 1, #UnitDefs do
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
 		variableCostUnit[i] = true
+		dynComm[i] = true
 	end
 	if ud.customParams.planetwars_structure then
 		planetwarsStructure[i] = true
@@ -25,6 +30,25 @@ for i = 1, #UnitDefs do
 		buildPlate[i] = true
 	end
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local function GetCachedBaseBuildPower(unitDefID, ud)
+	if not buildPowerCache[unitDefID] then
+		ud = ud or UnitDefs[unitDefID]
+		buildPowerCache[unitDefID] = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
+	end
+	return buildPowerCache[unitDefID]
+end
+
+local function GetCachedBaseRange(unitDefID, ud)
+	if not rangeCache[unitDefID] then
+		ud = ud or UnitDefs[unitDefID]
+		rangeCache[unitDefID] = ud.maxWeaponRange
+	end
+	return rangeCache[unitDefID]
+end	
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -48,9 +72,7 @@ function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
 	if not unitDefID then
 		return false
 	end
-	local ud = UnitDefs[unitDefID]
-	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
-	return buildPower > 0
+	return GetCachedBaseBuildPower(unitDefID) > 0
 end
 
 function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
@@ -61,8 +83,7 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 	if econMultEnabled == nil then
 		econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
 	end
-	local ud = UnitDefs[unitDefID]
-	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
+	local buildPower = GetCachedBaseBuildPower(unitDefID)
 	local mult = 1
 	if unitID then
 		if econMultEnabled then
@@ -76,6 +97,18 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 end
 
 local spGetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
+
+function Spring.Utilities.GetUnitRange(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return false
+	end
+	if not dynComm[unitDefID] then
+		local range = GetCachedBaseRange(unitDefID)
+		return (range > 0) and range
+	end
+	return Spring.GetUnitRulesParam(unitID, "comm_max_range") or GetCachedBaseRange(unitDefID), Spring.GetUnitRulesParam(unitID, "primary_weapon_range")
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

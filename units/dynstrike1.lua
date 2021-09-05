@@ -36,6 +36,7 @@ return { dynstrike1 = {
     modelradius    = [[25]],
     dynamic_comm   = 1,
     shared_energy_gen = 1,
+    set_target_range_buffer = 50,
   },
 
   energyStorage          = 500,

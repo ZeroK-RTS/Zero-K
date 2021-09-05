@@ -1,6 +1,6 @@
 function widget:GetInfo() return {
 	name    = "Startbox Editor",
-	desc    = "cruder than yo momma",
+	desc    = "Map development tool for drawing startboxes. Consult the ZK mediawiki at Startbox_API for usage and tips",
 	author  = "git blame",
 	date    = "git log",
 	license = "PD",

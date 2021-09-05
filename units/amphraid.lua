@@ -119,6 +119,7 @@ return { amphraid = {
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.8,
+      canAttackGround         = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,

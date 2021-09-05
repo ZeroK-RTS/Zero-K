@@ -13,7 +13,7 @@
 function widget:GetInfo()
 	return {
 		name      = "HealthBars",
-		desc      = "Gives various informations about units in form of bars.",
+		desc      = "Gives various information about units in form of bars.",
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",

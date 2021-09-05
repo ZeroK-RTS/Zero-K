@@ -1,6 +1,7 @@
 function widget:GetInfo()
    return {
       name      = "Deferred shading test",
+      desc      = "Plasters some sort of internal shader garbage onto the screen.",
       layer     = 0,
       enabled   = false,
    }

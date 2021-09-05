@@ -286,6 +286,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 		end
 	end
 	Spring.SetUnitMaxRange(unitID, maxRange)
+	Spring.SetUnitRulesParam(unitID, "comm_max_range", maxRange, INLOS)
 	
 	Spring.SetUnitRulesParam(unitID, "sightRangeOverride", math.max(500, math.min(600, maxRange*1.1)), INLOS)
 	
