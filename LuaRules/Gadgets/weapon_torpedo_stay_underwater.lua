@@ -19,6 +19,8 @@ local projectileDefs = {
 	[WeaponDefNames["subraider_torpedo"].id] = true,
 	[WeaponDefNames["amphriot_torpedo"].id] = true,
 	[WeaponDefNames["amphraid_torpedo"].id] = true,
+	[WeaponDefNames["shiptorpraider_torpedo"].id] = true,
+	[WeaponDefNames["turrettorp_torpedo"].id] = true,
 }
 
 -------------------------------------------------------------

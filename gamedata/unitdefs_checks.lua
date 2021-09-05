@@ -20,6 +20,23 @@ local function round_to_frames(name, wd, key)
 	wd[key] = sanitized_value + 1E-5
 end
 
+local function print_bounce_warning(name, wd, key)
+	if (wd.numBounce or wd.bouncerebound or wd.bounceslip) and not (
+			name == "amphriot.torpedo" or name == "amphraid.torpedo" or
+			name == "shiptorpraider.torpedo" or name == "turrettorp.torpedo" or
+			name == "hoverdepthcharge.depthcharge" or name == "hoverdepthcharge.fake_depthcharge" or
+			wd.weapontype == "Cannon") then
+		Spring.Echo("===============================================================")
+		Spring.Echo("*************************** WARNING ***************************")
+		Spring.Echo("Ground bounce detected for", name, wd.weapontype)
+		Spring.Echo("There is a risk of it falling through the ground indefinitely.")
+		Spring.Echo("Ensure appropriate hax is in place.")
+		Spring.Echo("See LuaRules/Gadgets/weapon_torpedo_stay_underwater.lua.")
+		Spring.Echo("************************* END WARNING *************************")
+		Spring.Echo("===============================================================")
+	end
+end
+
 local function check_lasercannon_range(name, wd)
 	if wd.weapontype ~= "LaserCannon" then
 		return
@@ -54,6 +71,7 @@ local function processWeapons(unitDefName, unitDef)
 		local fullWeaponName = unitDefName .. "." .. weaponDefName
 		round_to_frames(fullWeaponName, weaponDef, "reloadtime")
 		round_to_frames(fullWeaponName, weaponDef, "burstrate")
+		print_bounce_warning(fullWeaponName, weaponDef, "burstrate")
 		check_lasercannon_range(fullWeaponName, weaponDef)
 	end
 end
