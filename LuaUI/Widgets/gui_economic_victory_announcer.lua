@@ -158,7 +158,8 @@ local function CheckAndReportWinner(requiredMultiplier)
 
 	local winner, assets = GetWinningAllyTeam(requiredMultiplier)
 	if winner then
-		SaySomething(GetAllyteamName(winner) .. " (team " .. winner .. ") wins!")
+		-- NB: playerlists, website etc index teams from 1
+		SaySomething(GetAllyteamName(winner) .. " (team " .. (winner + 1) .. ") wins!")
 		for allyTeamID, assets in pairs(assets) do
 			SaySomething(GetAllyteamName(allyTeamID) .. " has a total of " .. string.format("%i", assets) .. " metal.")
 		end
