@@ -56,10 +56,9 @@ end
 
 local function FindBase(unitID)
 	local pieces = Spring.GetUnitPieceList(unitID)
-	local pieceMap = Spring.GetUnitPieceMap(unitID)
-	for i = 1, #pieces do
-		if Spring.GetUnitPieceInfo(unitID, pieceMap[pieces[i]]).parent == NULL_PIECE then
-			return pieceMap[pieces[i]]
+	for pieceNum = 1, #pieces do
+		if Spring.GetUnitPieceInfo(unitID, pieceNum).parent == NULL_PIECE then
+			return pieceNum
 		end
 	end
 end
