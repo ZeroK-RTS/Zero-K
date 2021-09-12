@@ -950,7 +950,7 @@ local function addUnit(defName, path)
 				path = path,
 				tooltipFunction = tooltipFunc.prevent_bait,
 			}
-			options_order[#options_order+1] = defName .. "fire_towards_enemy"
+			options_order[#options_order+1] = defName .. "_fire_towards_enemy"
 		end
 	end
 
