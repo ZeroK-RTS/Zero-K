@@ -25,7 +25,7 @@ local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.I
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
 
-local unitsToFactory = {}	-- [unitDefName] = factoryDefName
+local unitsToFactory = {} -- [unitDefName] = factoryDefName
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -604,6 +604,7 @@ options = {
 
 local tacticalAIUnits = {}
 local wardFireUnits = {}
+local wardFireCmdID = {}
 do
 	local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
 	for unitDefID, behaviourData in pairs(tacticalAIDefs) do
@@ -615,6 +616,7 @@ do
 			end
 			if behaviourData.hasWardFire then
 				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
+				wardFireCmdID[unitDefName] = behaviourData.wardFireCmdID
 			end
 		end
 	end
@@ -927,8 +929,9 @@ local function addUnit(defName, path)
 
 	if wardFireUnits[defName] then
 		local def = wardFireUnits[defName]
+		local wardCmd = wardFireCmdID[defName]
 		
-		if def.wardFireCmdID == CMD_FIRE_AT_SHIELD then
+		if wardCmd == CMD_FIRE_AT_SHIELD then
 			options[defName .. "_fire_at_shield"] = {
 				name = "  Fire at Shields",
 				desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
@@ -938,7 +941,7 @@ local function addUnit(defName, path)
 				tooltipFunction = tooltipFunc.prevent_bait,
 			}
 			options_order[#options_order+1] = defName .. "_fire_at_shield"
-		elseif def.wardFireCmdID == CMD_FIRE_TOWARDS_ENEMY then
+		elseif wardCmd == CMD_FIRE_TOWARDS_ENEMY then
 			options[defName .. "_fire_towards_enemy"] = {
 				name = "  Fire Towards Enemies",
 				desc = "Shoot towards the closest enemy when nothing else is in range.",
