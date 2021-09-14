@@ -1371,18 +1371,6 @@ function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
 	end
 end
 
-function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
-	local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
-	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
-	if retinueData then
-		local range = 70 + #retinueData*20
-		for i = 1, #retinueData do
-			local unitData = retinueData[i]
-			PlaceRetinueUnit(unitData.retinueID, range, unitData.unitDefName, x, z, facing, teamID, unitData.experience)
-		end
-	end
-end
-
 function GalaxyCampaignHandler.HasFactoryPlop(teamID)
 	return teamCommParameters[teamID] and teamCommParameters[teamID].facplop
 end
