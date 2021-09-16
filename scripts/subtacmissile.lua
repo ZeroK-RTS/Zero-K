@@ -13,7 +13,7 @@ function script.QueryWeapon()
 end
 
 function script.AimFromWeapon()
-	return aimpoint
+	return missile
 end
 
 local respawning_rocket = false
@@ -52,12 +52,17 @@ function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
+local function RestoreMissile()
+	Sleep(100)
+	Turn (missile, x_axis, 0)
+end
+
 function script.FireWeapon()
 	respawning_rocket = true
 	Signal (SIG_AIM)
 
 	Hide (missile)
-	Turn (missile, x_axis, 0)
+	StartThread(RestoreMissile)
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	Turn (door1, z_axis, 0, math.rad(80)*slowMult)
