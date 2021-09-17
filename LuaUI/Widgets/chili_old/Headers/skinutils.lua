@@ -794,7 +794,7 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) and not obj.noFont then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
+    obj.font:Print(obj.caption, obj.x + tx + obj.textoffset, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
   end
 end
 

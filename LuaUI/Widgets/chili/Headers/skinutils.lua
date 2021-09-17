@@ -1042,7 +1042,7 @@ function DrawCheckbox(obj)
 	gl.Color(1, 1, 1, 1)
 	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
-		font:Print(obj.caption, tx, ty - font.size*0.35, nil, obj.valign)
+		font:Print(obj.caption, tx + obj.textoffset, ty - font.size*0.35, nil, obj.valign)
 	end
 end
 
