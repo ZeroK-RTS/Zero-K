@@ -1,54 +1,66 @@
 local TRACKED = {
-    cloakskirm_bot_rocket = true,
-    cloakarty_hammer_weapon = true,
-    hoverarty_ata = true,
-    striderarty_rocket = true,
-    shieldassault_thud_weapon = true,
-    shieldskirm_storm_rocket = true,
-    vehassault_plasma = true,
-    vehheavyarty_cortruck_rocket = true,
-    tankarty_core_artillery = true,
-    tankassault_cor_reap = true,
-    tankheavyassault_cor_gol = true,
-    tankheavyarty_plasma = true,
-    spiderassault_thud_weapon = true,
-    spiderskirm_adv_rocket = true,
-    spidercrabe_arm_crabe_gauss = true,
-    amphsupport_cannon = true,
-    amphfloater_cannon = true,
-    gunshipheavyskirm_emg = true,
-    gunshipassault_vtol_salvo = true,
-    bomberriot_napalm = true,
-    bomberheavy_arm_pidr = true,
-    bomberprec_bombsabot = true,
-    jumparty_napalm_sprayer = true,
-    shipskirm_rocket = true,
-    shiparty_plasma = true,
-    turretgauss_gauss = true,
-    turretheavy_plasma = true,
-    turretantiheavy_ata = true,
-    turretheavylaser_laser = true,
-    staticarty_plasma = true,
-    staticheavyarty_plasma = true,
-    tacnuke_weapon = true,
-    napalmmissile_weapon = true,
-    empmissile_emp_weapon = true,
-    seismic_seismic_weapon = true,
+	cloakskirm_bot_rocket = {},
+	cloakarty_hammer_weapon = {},
+	hoverarty_ata = {},
+	striderarty_rocket = {},
+	shieldassault_thud_weapon = {},
+	shieldskirm_storm_rocket = {},
+	vehassault_plasma = {},
+	vehheavyarty_cortruck_rocket = {},
+	tankarty_core_artillery = {},
+	tankassault_cor_reap = {},
+	tankheavyassault_cor_gol = {},
+	tankheavyarty_plasma = {},
+	spiderassault_thud_weapon = {},
+	spiderskirm_adv_rocket = {},
+	spidercrabe_arm_crabe_gauss = {},
+	amphsupport_cannon = {},
+	amphfloater_cannon = {},
+	gunshipheavyskirm_emg = {},
+	gunshipassault_vtol_salvo = {},
+	bomberriot_napalm = {},
+	bomberheavy_arm_pidr = {},
+	bomberprec_bombsabot = {},
+	jumpblackhole_black_hole = {
+		area_dmg = {
+			dps = 5600,
+			radius = 70,
+			duration = 13.3 * 30,
+		},
+	},
+	jumparty_napalm_sprayer = {
+		area_dmg = {
+			dps = 20,
+			radius = 64,
+			duration = 16 * 30,
+		},
+	},
+	shipskirm_rocket = {},
+	shiparty_plasma = {},
+	turretgauss_gauss = {},
+	turretheavy_plasma = {},
+	turretantiheavy_ata = {},
+	turretheavylaser_laser = {},
+	staticarty_plasma = {},
+	staticheavyarty_plasma = {},
+	tacnuke_weapon = {},
+	napalmmissile_weapon = {},
+	empmissile_emp_weapon = {},
+	seismic_seismic_weapon = {},
 }
 
 local config = {}
-local dynamic, data
-for projName, _ in pairs(TRACKED) do
-  data = WeaponDefNames[projName]
-  dynamic = data.wobble ~= 0 or data.dance ~= 0 or data.tracks or data.selfExplode
-  config[data.id] = {
-    aoe = data.damageAreaOfEffect,
-    wType = data.type,
-    trajectoryHeight = data.trajectoryHeight,
-    dynamic = dynamic,
-    range = data.range,
-    selfExplode = data.selfExplode,
-  }
+for projName, customData in pairs(TRACKED) do
+	local wDef = WeaponDefNames[projName]
+	local wData = {
+		wType = wDef.type,
+		tracks = wDef.tracks,
+		aoe = wDef.damageAreaOfEffect,
+		dynamic = wDef.wobble ~= 0 or wDef.dance ~= 0 or wDef.tracks,
+	}
+	for key, data in pairs(customData) do
+		wData[key] = data
+	end
+	config[wDef.id] = wData
 end
-
 return config

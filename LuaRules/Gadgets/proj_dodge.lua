@@ -1,21 +1,21 @@
 function gadget:GetInfo()
 	return {
-    name = "Projectile Dodge",
-    desc = "calculates projectile dodge vector for units",
-    author = "petturtle",
-    date = "2021",
-    layer = 0,
-    enabled = true
+		name = "Projectile Dodge",
+		desc = "calculates projectile dodge vector for units",
+		author = "petturtle",
+		date = "2021",
+		layer = 0,
+		enabled = true
 	}
 end
 
-local DEBUG = false
+local DEBUG = true
 
 if gadgetHandler:IsSyncedCode() then
 
 
-local Kinematics = include("LuaRules/Utilities/kinematics.lua")
 local Config = include("LuaRules/Configs/proj_targets_config.lua")
+local Prediction = include("LuaRules/Utilities/projPrediction.lua")
 
 local vector = Spring.Utilities.Vector
 local spIsPosInLos = Spring.IsPosInLos
@@ -33,11 +33,6 @@ local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local QUERY_RADIUS = 600
 local SAFETY_DISTANCE = 30
 local HITCACHE_UPDATE_DELAY = 15
-local CANNON = "Cannon"
-local AircraftBomb = "AircraftBomb"
-local MISSILE = "MissileLauncher"
-local StarburstLauncher = "StarburstLauncher"
-local BEAMLASER = "BeamLaser"
 
 local cos = math.cos
 local max = math.max
@@ -48,49 +43,14 @@ local function GetHitData(projID, unitID)
 	local currFrame = spGetGameFrame()
 	local unitDefID = spGetUnitDefID(unitID)
 	local pData = GG.ProjTargets.GetData(projID)
+	local config = Config[pData.defID]
 	local hitData = hitDataCache[projID][unitDefID]
-	if hitData and (pData.config.dynamic == false or hitData.updateFrame > currFrame) then
+	if hitData and (config.dynamic == false or hitData.updateFrame > currFrame) then
 		return hitDataCache[projID][unitDefID]
 	end
 
-	local uHeight = spGetUnitHeight(unitID)
-	local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
-	local pVel, pVelY = vector.New3(spGetProjectileVelocity(projID))
-
-	local min, minY
-	if pData.config.wType == CANNON or pData.config.wType == AircraftBomb then
-		local pGravity = spGetProjectileGravity(projID)
-		local heightDiff = pPosY - uHeight - pData.y
-		local multi = -1
-		if heightDiff < 0 then multi = 1 end
-			local minETA = Kinematics.TimeToHeight(pVelY, pGravity, heightDiff, multi)
-		if minETA ~= minETA or minETA <= 0 then
-			min, minY = pData.pos, pData.y
-		else
-			min, minY = vector.Add(pPos, vector.Mult(minETA, pVel)), pData.y + uHeight
-		end
-	elseif pData.config.wType == MISSILE then
-		local minETA = (pPosY - uHeight) / pVelY
-		if pVelY < 0 and minETA > 0 then
-			min = vector.Add(pPos, vector.Mult(minETA, pVel))
-			minY = pData.y + uHeight
-		elseif pData.config.dynamic then
-			min, minY = pPos, pPosY
-		else
-			min, minY = pData.pos, pData.y
-		end
-	elseif pData.config.wType == StarburstLauncher then
-		min, minY = pData.pos, pData.y
-	elseif pData.config.wType == BEAMLASER then
-		local minETA = (pPosY - uHeight) / pVelY
-		if minETA > 0 then
-			min = vector.Add(pPos, vector.Mult(minETA, pVel))
-			minY = pData.y + uHeight
-		else
-			min, minY = pData.pos, pData.y
-		end
-	end
-
+	local uHeight = spGetUnitHeight(unitID) + pData.y
+	local min, minY = Prediction.AtHeight[config.wType](projID, pData.pos, pData.y, uHeight, config.dynamic)
 	local dist = vector.DirectionTo(pData.pos, min)
 	local uRadius = spGetUnitRadius(unitID)
 	hitData = {
@@ -100,7 +60,7 @@ local function GetHitData(projID, unitID)
 		minY = minY,
 		dist = dist,
 		distLength = vector.Mag(dist),
-		aoe = pData.config.aoe + uRadius + SAFETY_DISTANCE,
+		aoe = config.aoe + uRadius + SAFETY_DISTANCE,
 		updateFrame = currFrame + HITCACHE_UPDATE_DELAY,
 	}
 	hitDataCache[projID][unitDefID] = hitData
@@ -268,19 +228,21 @@ local function DrawHitZone(x1, y1, z1, x2, y2, z2, aoe)
 end
 
 function gadget:DrawWorld()
-	glDepthTest(true)
-	glColor({0,1,0,0.25})
-	glLineWidth(2)
-	for _, unitDefs in pairs(SYNCED.hitDataCache) do
-		for _, h in pairs(unitDefs) do
-			glPushMatrix()
-			glBeginEnd(GL_LINE_LOOP, DrawHitZone, h.max[1], h.maxY, h.max[2], h.min[1], h.minY, h.min[2], h.aoe)
-			glPopMatrix()
+	if SYNCED.hitDataCache then
+		glDepthTest(true)
+		glColor({0,1,0,0.25})
+		glLineWidth(2)
+		for _, unitDefs in pairs(SYNCED.hitDataCache) do
+			for _, h in pairs(unitDefs) do
+				glPushMatrix()
+				glBeginEnd(GL_LINE_LOOP, DrawHitZone, h.max[1], h.maxY, h.max[2], h.min[1], h.minY, h.min[2], h.aoe)
+				glPopMatrix()
+			end
 		end
+		glLineWidth(1)
+		glColor({1,1,1,1})
+		glDepthTest(false)
 	end
-	glLineWidth(1)
-	glColor({1,1,1,1})
-	glDepthTest(false)
 end
 
 
