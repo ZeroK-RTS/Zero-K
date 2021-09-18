@@ -205,7 +205,6 @@ local function AllowedToFireTowards(unitID, unitData)
 	if enemyID and IsUnitInRange(unitID, unitData.unitDefID, weaponID, enemyID) then
 		return false
 	end
-	
 	return true
 end
 
@@ -215,24 +214,20 @@ local function TryToShootAtRange(unitID, unitDefID, weaponID, range, ux, uy, uz,
 	
 	range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, uy - fy, weaponID)
 	if range and fx*fx + fz*fz < range*range then
-		spSetUnitTarget(unitID, ux + fx, fy, uz + fz, false, true, -1)
-		--Spring.MarkerAddPoint(ux + fx, fy, uz + fz, "")
-		return false
+		return false, ux + fx, fy, uz + fz
 	end
 	return range
 end
 
-local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
+function GG.GetFireTowardsPos(unitID, unitDefID, tx, ty, tz, buffer)
 	local _, _, _, ux, uy, uz = spGetUnitPosition(unitID, true) -- my position
 	local vx, vy, vz, mySpeed = spGetUnitVelocity(unitID)
-	local unitDefID = unitData.unitDefID
 	
 	-- Predict own velocity for targeting.
 	ux, uy, uz = ux + vx * PREDICT_MULT, uy + vy * PREDICT_MULT, uz + vz * PREDICT_MULT
 	
 	-- Make target vector relative to unit position
 	local rx, ry, rz = tx - ux, ty - uy, tz - uz
-	local buffer = fireTowardsRangeBuffer[unitDefID] or setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
 	
 	if setTargetSpeedMult[unitDefID] then
 		buffer = buffer + mySpeed * setTargetSpeedMult[unitDefID]
@@ -241,19 +236,28 @@ local function FireTowardsPosition(unitID, unitData, tx, ty, tz)
 	local flatRange, weaponID = GetUnitRange(unitID, unitDefID)
 	local range = Spring.Utilities.GetUpperEffectiveWeaponRange(unitDefID, -ry, weaponID)
 	if range and rx*rx + rz*rz < (range - buffer)*(range - buffer) then
-		spSetUnitTarget(unitID, tx, ty, tz, false, true, -1)
-		return
+		return tx, ty, tz
 	end
 	
 	range = range or flatRange
 	
 	local dist = math.sqrt(rx*rx + rz*rz)
-	local failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, range - buffer, ux, uy, uz, rx, rz, dist)
+	local failRange, fx, fy, fz = TryToShootAtRange(unitID, unitDefID, weaponID, range - buffer, ux, uy, uz, rx, rz, dist)
 	if failRange and failRange - buffer < range then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, failRange - buffer, ux, uy, uz, rx, rz, dist)
+		failRange, fx, fy, fz = TryToShootAtRange(unitID, unitDefID, weaponID, failRange - buffer, ux, uy, uz, rx, rz, dist)
 	end
 	if failRange and flatRange - (buffer + 5) < failRange then
-		failRange = TryToShootAtRange(unitID, unitData.unitDefID, weaponID, flatRange - (buffer + 5), ux, uy, uz, rx, rz, dist)
+		failRange, fx, fy, fz = TryToShootAtRange(unitID, unitDefID, weaponID, flatRange - (buffer + 5), ux, uy, uz, rx, rz, dist)
+	end
+	return fx, fy, fz
+end
+
+local function FireTowardsPosition(unitID, unitDefID, tx, ty, tz)
+	local buffer = fireTowardsRangeBuffer[unitDefID] or setTargetRangeBuffer[unitDefID] or FIRE_TOWARDS_BUFFER
+	local fx, fy, fz = GG.GetFireTowardsPos(unitID, unitDefID, tx, ty, tz, buffer)
+	if fx then
+		spSetUnitTarget(unitID, fx, fy, fz, false, true, -1)
+		--Spring.MarkerAddPoint(ux + fx, fy, uz + fz, "")
 	end
 end
 
@@ -261,7 +265,7 @@ local function CheckFireTowardsGroundTarget(unitID, unitData, tx, ty, tz)
 	if not AllowedToFireTowards(unitID, unitData) then
 		return false
 	end
-	FireTowardsPosition(unitID, unitData, tx, ty, tz)
+	FireTowardsPosition(unitID, unitData.unitDefID, tx, ty, tz)
 	return true
 end
 
@@ -274,7 +278,7 @@ local function CheckFireTowardsUnitTarget(unitID, unitData, enemyID)
 	if not tx then
 		return false
 	end
-	FireTowardsPosition(unitID, unitData, tx, ty, tz)
+	FireTowardsPosition(unitID, unitData.unitDefID, tx, ty, tz)
 	return true
 end
 

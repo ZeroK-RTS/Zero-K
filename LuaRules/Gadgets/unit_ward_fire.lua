@@ -206,13 +206,17 @@ local function DoUnitUpdate(unitID, unitData)
 		end
 		
 		if (not targetLeeway) or (effectiveRange + targetLeeway > predictedDist and effectiveRange + behaviour.wardFireLeeway + behaviour.wardFireEnableLeeway < predictedDist) then
-			local tx, tz = ux + wardFireRange*dx/predictedDist, uz + wardFireRange*dz/predictedDist
+			local tx, tz = ux + dx, uz + dz
+			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
+			local fx, fy, fz = GG.GetFireTowardsPos(unitID, unitData.unitDefID, tx, ty, tz, behaviour.wardFireLeeway)
 			
 			if doDebug then
-				Spring.MarkerAddPoint(tx, 0, tz, "F")
+				Spring.MarkerAddPoint(tx, 0, tz, "T")
+				Spring.MarkerAddPoint(fx, 0, fz, "F")
 			end
-			local ty = math.max(0, Spring.GetGroundHeight(tx, tz)) + behaviour.wardFireHeight
-			GG.SetTemporaryPosTarget(unitID, tx, ty, tz, false, UPDATE_RATE)
+			if fx then
+				GG.SetTemporaryPosTarget(unitID, fx, fy, fz, false, UPDATE_RATE)
+			end
 		end
 	end
 end
