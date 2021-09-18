@@ -824,6 +824,48 @@ end
 --------------------------------------------------------------------------------
 ---- Unit AI Selection
 
+local function DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
+	if (haveFight or unitData.wasIdle) and not holdPos then
+		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
+		if dodgeX ~= 0 or dodgeZ ~= 0 then
+			local ux, uy, uz = spGetUnitPosition(unitID)
+			local cx, cz = ux + dodgeX, uz + dodgeZ
+			if move then
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			else
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+			end
+			unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
+			unitData.receivedOrder = true
+			unitData.idleDodge = unitData.wasIdle
+			unitData.idleWantReturn = false
+			return true
+		end
+	end
+
+	if unitData.idleDodge then
+		local canIdleReturn = true
+		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
+		if dodgeX ~= 0 or dodgeZ ~= 0 then
+			canIdleReturn = false
+		else
+			local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
+			local cx, cz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
+			canIdleReturn = cx == rx and cz == rz
+		end
+
+		-- return to idle pos if safe
+		if canIdleReturn then
+			unitData.idleDodge = false
+			unitData.idleWantReturn = true
+			ReturnUnitToIdlePos(unitID, unitData)
+		end
+	end
+
+	return false
+end
+
 local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		fx, fy, fz, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
 		move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
@@ -836,7 +878,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		behaviour = behaviour.fightOnlyOverride
 	end
 	
-	if isIdleAttack and enemy and (not unitData.idleAgression) and typeKnown
+	if isIdleAttack and enemy and (not unitData.idleAgression or unitData.idleDodge) and typeKnown
 			and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
 		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
 		if not orderSent then
@@ -985,29 +1027,8 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	end
 
-	local idle = select(4, spGetUnitVelocity(unitID)) == 0
-	if haveFight or idle then
-		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
-		if dodgeX ~= 0 or dodgeZ ~= 0 then
-			local ux, uy, uz = spGetUnitPosition(unitID)
-			local cx, cz = ux + dodgeX, uz + dodgeZ
-			if idle and not move and not haveFight then
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
-				spGiveOrderToUnit(unitID, CMD_INSERT, {1, CMD_RAW_DODGE_MOVE, CMD_OPT_INTERNAL, ux, uy, uz }, CMD.OPT_ALT )
-			else
-				if move then
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-				else
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
-				end
-				unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
-				unitData.receivedOrder = true
-			end
-			return
-		end
-	end
-	
+	local dodgeSentOrder = DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
+
 	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
@@ -1029,7 +1050,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, unitData.allyTeam)
 		end
 		
-		if not (exitEarly or behaviour.onlyIdleHandling) then
+		if not (exitEarly or behaviour.onlyIdleHandling or dodgeSentOrder) then
 			--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
 			aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 				fightX, fightY, fightZ, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
@@ -1093,10 +1114,6 @@ local function UpdateUnits(frame, start, increment)
 	--]]
 	local slowUpdate = (frame%3 == 0)
 
-	if start == 1 then
-		GG.ProjTargets.Update()
-	end
-	
 	local index = start
 	local listData = unitList.data
 	while index <= unitList.count do
@@ -1141,6 +1158,10 @@ local function AddIdleUnit(unitID, unitDefID)
 	if doDebug then
 		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
 		Spring.Echo("=== Unit Idle", unitID, " ===")
+	end
+
+	if unitData.idleDodge then
+		return
 	end
 	
 	if unitData.idleWantReturn and unitData.idleX then
@@ -1335,7 +1356,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		unitList.count = unitList.count + 1
 		unitList.data[unitList.count] = unitID
 	end
-	
+	local ux, _, uz = spGetUnitPosition(unitID)
 	unit[unitID] = {
 		cx = 0, cy = 0, cz = 0,
 		udID = unitDefID,
@@ -1344,6 +1365,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		active = false,
 		receivedOrder = false,
 		allyTeam = spGetUnitAllyTeam(unitID),
+		wasIdle = true,
+		idleX = ux,
+		idleZ = uz,
 	}
 	
 	if not behaviour.onlyIdleHandling then
