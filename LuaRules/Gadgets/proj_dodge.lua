@@ -31,6 +31,7 @@ local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 
 local QUERY_RADIUS = 600
+local MIN_DODGE_TIME = 30 * 6
 local SAFETY_DISTANCE = 30
 local HITCACHE_UPDATE_DELAY = 15
 
@@ -84,12 +85,18 @@ end
 
 local function FilterTarget(unitID, projID)
 	local allyTeam = spGetUnitAllyTeam(unitID)
-	local pPosX, pPosY, pPosZ = spGetProjectilePosition(projID)
-	if not spIsPosInLos(pPosX, pPosY, pPosZ, allyTeam) then
+	local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
+	if not spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
 		return false
 	end
 
 	local hitData = GetHitData(projID, unitID)
+	local distToTarget = vector.DistanceTo(pPos, hitData.min)
+	local pVel = vector.New3(spGetProjectileVelocity(projID))
+	if distToTarget / vector.Mag(pVel) > MIN_DODGE_TIME then
+		return false
+	end
+
 	local uPos = vector.New3(spGetUnitPosition(unitID))
 	local near = GetNearestPointOnLine(uPos, hitData.max, hitData.min)
 	local distance = vector.DistanceTo(near, uPos)
@@ -121,7 +128,12 @@ local function RaycastMovementToTarget(unitID, projID, dir, dirLength)
 
 	local hitData = GetHitData(projID, unitID)
 	local uPos = vector.New3(spGetUnitPosition(unitID))
+	local distToTarget = vector.DistanceTo(pPos, hitData.min)
 	local pVel = vector.New3(spGetProjectileVelocity(projID))
+	if distToTarget / vector.Mag(pVel) > MIN_DODGE_TIME then
+		return dirLength
+	end
+
 	local intersection = vector.Intersection(uPos, dir, pPos, pVel)
 	if intersection == nil then
 		return dirLength
