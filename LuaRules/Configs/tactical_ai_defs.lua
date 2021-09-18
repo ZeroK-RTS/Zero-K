@@ -913,7 +913,7 @@ local behaviourConfig = {
 		wardFireLeeway = 45,
 		wardFirePredict = 5,
 		wardFireShield = false,
-		wardFireDefault = true,
+		wardFireDefault = false,
 		wardAlternateStateToggle = true,
 	},
 	{
