@@ -104,7 +104,7 @@ return { shieldfelon = {
       cylinderTargeting       = 0,
 
       customParams            = {
-        shield_drain = 80,
+        shield_drain = 75,
         
         light_camera_height = 2500,
         light_color = [[0.66 0.32 0.90]],
@@ -112,7 +112,7 @@ return { shieldfelon = {
       },
 
       damage                  = {
-        default        = 110.1,
+        default        = 94.01,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -123,7 +123,7 @@ return { shieldfelon = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 435,
-      reloadtime              = 0.166,
+      reloadtime              = 0.133,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,
