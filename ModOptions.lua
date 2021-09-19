@@ -376,6 +376,14 @@ local options = {
     def = true,
   },
   {
+    key    = 'explodeondefeat',
+    name   = 'Enemies explode on victory',
+    desc   = 'Causes units and structures of defeated teams to explode when the game ends.',
+    type   = 'bool',
+    def    = true,
+    section= 'experimental',
+  },
+  {
     key    = 'commends',
     name   = 'Team Commander Ends',
     desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
