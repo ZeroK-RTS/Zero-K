@@ -36,7 +36,7 @@ return { wolverine_mine = {
   maxDamage              = 40,
   maxSlope               = 255,
   maxVelocity            = 0,
-  minCloakDistance       = 50,
+  minCloakDistance       = 80,
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[claw.s3o]],
@@ -46,7 +46,7 @@ return { wolverine_mine = {
   script                 = [[wolverine_mine.lua]],
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
-  sightDistance          = 64,
+  sightDistance          = 132,
   stealth                = true,
   turnRate               = 0,
   waterline              = 1,
@@ -57,8 +57,7 @@ return { wolverine_mine = {
 
     {
       def                = [[BOMBLET]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
   },
@@ -77,6 +76,10 @@ return { wolverine_mine = {
       customparams = {
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
+
+        light_camera_height = 1600,
+        light_color = [[0.45 0.26 0.068]],
+        light_radius = 180,
       },
       
       damage                  = {
@@ -87,7 +90,7 @@ return { wolverine_mine = {
       explosionGenerator      = [[custom:DEFAULT]],
       fireStarter             = 70,
       fixedlauncher           = 1,
-      flightTime              = 1,
+      flightTime              = 1.6,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -101,14 +104,14 @@ return { wolverine_mine = {
       soundStart              = [[weapon/missile/sabot_fire_short]],
       soundStartVolume        = 9,
       soundTrigger            = 1,
-      startVelocity           = 50,
+      startVelocity           = 70,
       texture2                = [[darksmoketrail]],
       tracks                  = true,
-      turnRate                = 36000,
+      turnRate                = 23400,
       turret                  = true,
-      weaponAcceleration      = 200,
+      weaponAcceleration      = 45,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 130,
     },
 
   },
