@@ -26,7 +26,7 @@ local deploySeconds = 0.8
 local function Open()
 	deployed = false
 	Move(turret, y_axis, -18)
-	Turn(barrel, x_axis, -0.5 * math.pi/2)
+	Turn(barrel, x_axis, 0.5 * math.pi/2)
 	
 	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 	while stunned_or_inbuild do
@@ -35,10 +35,8 @@ local function Open()
 	end
 	
 	Move(turret, y_axis, 0, 18 / deploySeconds)
-	Sleep(700 * deploySeconds)
-	
-	Turn(barrel, x_axis, 0, 1.2 * (math.pi/2) / deploySeconds)
-	Sleep(300 * deploySeconds)
+	Turn(barrel, x_axis, 0, 0.5 * (math.pi/2) / deploySeconds)
+	Sleep(1000 * deploySeconds)
 	
 	deployed = true
 end
