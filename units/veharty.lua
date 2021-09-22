@@ -56,7 +56,8 @@ return { veharty = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 640,
+  turnRate            = 640, --[[ NB: lowering this can make it drive into HLT via
+                               turn circle (due to low LoS margin over HLT range) ]]
   workerTime          = 0,
 
   weapons             = {
