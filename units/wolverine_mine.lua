@@ -19,7 +19,7 @@ return { wolverine_mine = {
 
   customParams           = {
     bait_level_default = 0,
-    bait_level_target      = 1, -- Just for safety.
+    bait_level_target  = 1, -- Just for safety.
     dontcount = [[1]],
     mobilebuilding = [[1]],
     idle_cloak = 1,
@@ -46,7 +46,7 @@ return { wolverine_mine = {
   script                 = [[wolverine_mine.lua]],
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
-  sightDistance          = 132,
+  sightDistance          = 120,
   stealth                = true,
   turnRate               = 0,
   waterline              = 1,
@@ -57,7 +57,8 @@ return { wolverine_mine = {
 
     {
       def                = [[BOMBLET]],
-      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
 
   },
@@ -90,7 +91,7 @@ return { wolverine_mine = {
       explosionGenerator      = [[custom:DEFAULT]],
       fireStarter             = 70,
       fixedlauncher           = 1,
-      flightTime              = 1.6,
+      flightTime              = 1.7,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -107,9 +108,9 @@ return { wolverine_mine = {
       startVelocity           = 70,
       texture2                = [[darksmoketrail]],
       tracks                  = true,
-      turnRate                = 23400,
+      turnRate                = 24000,
       turret                  = true,
-      weaponAcceleration      = 45,
+      weaponAcceleration      = 50,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 130,
     },

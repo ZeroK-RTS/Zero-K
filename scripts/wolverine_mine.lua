@@ -30,8 +30,14 @@ for i = 1, 5 do
 end
 
 local currentBomblet = 1
+local UNFURL_SPEED = 2.4
 
 local function Remove ()
+	for i = 1, 5 do
+		Hide(bomblets[i].bomb)
+	end
+	
+	--Sleep(500)
 	for i = 3, 3 do
 		for j = 1, 4 do
 			Explode(petals[i][j], SFX.FALL + SFX.SMOKE)
@@ -78,9 +84,9 @@ function script.Create()
 	for i = 1, #petals do
 		Move (petals[i][1], y_axis, 100)
 		Turn (petals[i][1], y_axis, i * 2 * math.pi / #petals)
-		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49))
-		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14))
-		Turn (petals[i][4], x_axis, math.rad(-30), math.rad(21))
+		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49 * UNFURL_SPEED))
+		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14 * UNFURL_SPEED))
+		Turn (petals[i][4], x_axis, math.rad(-30), math.rad(21 * UNFURL_SPEED))
 	end
 
 	for i = 1, #stalk do
