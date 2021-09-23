@@ -225,9 +225,14 @@ end
 local defaultMyGravity = 120 / (Game.gameSpeed^2)
 
 for _, weaponDef in pairs(WeaponDefs) do
+
+	--[[ There are other weapons that follow gravity,
+	     for example expired missiles and torpedoes
+	     who fall out of water, but these disobey the
+	     tag and always use map gravity anyway ]]
 	local supportsMyGravity =
 		(weaponDef.weapontype == "Cannon") or
-		(weaponDef.weapontype == "AircraftBomb") -- other ballistic weapontypes don't support "myGravity" tag
+		(weaponDef.weapontype == "AircraftBomb")
 
 	if supportsMyGravity and (not weaponDef.mygravity) then -- setting myGravity = 0.0 will use map gravity anyway
 		weaponDef.mygravity = defaultMyGravity
