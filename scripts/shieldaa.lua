@@ -149,7 +149,7 @@ local function RestoreAfterDelay()
 	Sleep(2000)
 	Turn(head, y_axis, 0, 3)
 	Turn(pod, x_axis, 0, 3)
-	Move(podpist, y_axis, 0, 3)
+	Move(podpist, y_axis, 0, 20)
 end
 
 ----[[
@@ -164,10 +164,10 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
+	pitch = math.max(pitch, math.rad(40)) -- results in a minimum pod angle of 40° above horizontal
 	Turn(head, y_axis, heading, 6)
 	Turn(pod, x_axis, -pitch, 6)
-	Move(podpist, y_axis, pitch*2.5, 3)
+	Move(podpist, y_axis, pitch*6, 12)
 	WaitForTurn(head, y_axis)
 	WaitForTurn(pod, x_axis)
 	StartThread(RestoreAfterDelay)

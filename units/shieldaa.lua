@@ -10,9 +10,9 @@ return { shieldaa = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[30 41 30]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 -4 0]],
+  collisionVolumeScales  = [[30 40 30]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
