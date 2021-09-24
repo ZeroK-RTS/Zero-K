@@ -104,4 +104,7 @@ return {
 	RESTORE = 39739,
 	BUMPY = 39740,
 	TERRAFORM_INTERNAL = 39801,
+	
+	-- build plate
+	PLATE = 39802,
 }
