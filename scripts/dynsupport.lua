@@ -57,7 +57,7 @@ local bMoving = false
 local bAiming = false
 local inBuildAnim = false
 
-local SPEEDUP_FACTOR = 1.1
+local SPEEDUP_FACTOR = 1.02
 local REF_TURN_SPEED = 185  -- deg/s
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
