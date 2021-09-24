@@ -11,8 +11,8 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 end
 
 -- starting resources
-START_METAL   = 250
-START_ENERGY  = 250
+START_METAL   = 400
+START_ENERGY  = 400
 
 INNATE_INC_METAL   = 2
 INNATE_INC_ENERGY  = 2
