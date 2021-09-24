@@ -108,6 +108,7 @@ return { hoveraa = {
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_fire8]],
       startvelocity           = 200,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 4000,
       tracks                  = true,
