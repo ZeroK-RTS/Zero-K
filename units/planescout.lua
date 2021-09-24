@@ -14,8 +14,8 @@ return { planescout = {
   category            = [[UNARMED FIXEDWING]],
   collide             = false,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 12 60]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[40 15 75]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
   cruiseAlt           = 250,
 
