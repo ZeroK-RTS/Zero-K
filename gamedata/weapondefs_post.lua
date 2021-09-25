@@ -12,6 +12,16 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+--[[ This lets mutators add a bit of weapondefs_post processing without
+     losing access to future gameside updates to weapondefs_post. ]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/weapondefs_mod.lua'
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS.GAME) then
+	VFS.Include(MODSIDE_POSTS_FILEPATH, nil, VFS.GAME)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 Spring.Echo("Loading WeaponDefs_posts")
 
 --------------------------------------------------------------------------------
