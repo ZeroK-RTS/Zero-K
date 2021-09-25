@@ -2,6 +2,9 @@ local VFS = VFS
 local vfsInclude = VFS.Include
 local vfsDirList = VFS.DirList
 
+local system = vfsInclude('gamedata/system.lua')
+local lowerkeys = system.lowerkeys
+
 vfsInclude("LuaRules/Utilities/tablefunctions.lua")
 local suCopyTable = Spring.Utilities.CopyTable
 
@@ -15,7 +18,7 @@ local files = vfsDirList("effects", "*.lua")
 suCopyTable(vfsDirList("gamedata/explosions", "*.lua", VFS.MAP), false, files)
 
 for i = 1, #files do
-	suCopyTable(vfsInclude(files[i]), false, explosionDefs)
+	suCopyTable(lowerkeys(vfsInclude(files[i])), false, explosionDefs)
 end
 
 --[[ This lets mutators add a bit of explosions_post processing without
