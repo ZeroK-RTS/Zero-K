@@ -422,13 +422,14 @@ for i = 1, 5 do
 	}
 end
 
-local factoryButtonLayoutOverride = {}
-	factoryButtonLayoutOverride[1] = {
+local factoryButtonLayoutOverride = {
+	{
 		[3] = {
 			buttonLayoutConfig = buttonLayoutConfig.command,
 			isStructure = false,
 		}
 	}
+}
 
 local commandPanels = {
 	{

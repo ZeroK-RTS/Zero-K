@@ -123,18 +123,6 @@ local cmdPlateDefID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- local function dump(o)
-   -- if type(o) == 'table' then
-      -- local s = '{ '
-      -- for k,v in pairs(o) do
-         -- if type(k) ~= 'number' then k = '"'..k..'"' end
-         -- s = s .. '['..k..'] = ' .. dump(v) .. ','
-      -- end
-      -- return s .. '} '
-   -- else
-      -- return tostring(o)
-   -- end
--- end
 
 local function DistSq(x1, z1, x2, z2)
 	return (x1 - x2)*(x1 - x2) + (z1 - z2)*(z1 - z2)
@@ -205,7 +193,7 @@ local function CheckTransformPlateIntoFactory(plateDefID)
 	if not unitID then
 		return
 	end
-	
+
 	closestFactoryData = factoryData
 	if distSq >= FACTORY_RANGE_SQ then
 		Spring.SetActiveCommand(buildAction[factoryDefID])
@@ -245,15 +233,22 @@ local function MakePlateFromCMD()
 	if not mx then
 		return
 	end
+
 	local unitID, distSq, factoryData = GetClosestFactory(mx, mz)
+	if not unitID then
+		return
+	end
+
 	local factoryDefID = spGetUnitDefID(unitID)
 	local plateDefID = parentOfPlate[factoryDefID]
+
 	mx, mz = SnapBuildToGrid(mx, mz, plateDefID) -- Make sure the plate is in range when it is placed
-	-- Plates could be disabled by modoptions or otherwise unavailible.
+	-- Plates could be disabled by modoptions or otherwise unavailable.
 	local cmdDescID = Spring.GetCmdDescIndex(-plateDefID)
 	if not cmdDescID then
 		return
 	end
+
 	closestFactoryData = factoryData
 	if distSq < FACTORY_RANGE_SQ then
 		Spring.SetActiveCommand(buildAction[plateDefID])
@@ -270,10 +265,8 @@ function widget:Update()
 		local unitDefID = -cmdID
 		-- check for cmd plate first, otherwise do previous behaviour
 		if CMD_PLATE == cmdID then
-			if not IterableMap.IsEmpty(factories) then
-				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
-				return
-			end
+			cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+			return
 		elseif cmdPlateDefID then
 			if unitDefID == cmdPlateDefID then
 				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
@@ -309,7 +302,7 @@ function widget:Update()
 		cmdPlateDefID = nil
 		buildFactoryDefID = nil
 		buildPlateDefID = nil
-		closestFactoryData = nil	
+		closestFactoryData = nil
 	end
 end
 
@@ -386,7 +379,7 @@ function widget:PlayerChanged(playerID)
 	if myAllyTeamID == Spring.GetMyAllyTeamID() then
 		return
 	end
-	myAllyTeamID = Spring.GetMyAllyTeamIDs()
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 	widget:Initialize()
 end
 
@@ -405,7 +398,15 @@ local function GetDrawDef(mx, mz, data)
 end
 
 local function DrawFactoryLine(x, y, z, drawDef)
-	local mx, mz = GetMousePos()
+	if cmdFactoryDefID then
+		local lineFactoryDefID = cmdFactoryDefID
+	elseif buildFactoryDefID then
+		local lineFactoryDefID = buildFactoryDefID
+	else
+		return
+	end
+
+	local mx, mz = GetMousePos(not floatOnWater[lineFactoryDefID])
 	if not mx then
 		return
 	end
