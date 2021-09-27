@@ -23,7 +23,7 @@ if gadgetHandler:IsSyncedCode() then
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spGetUnitDefID		= Spring.GetUnitDefID
-
+local defIDCache = {}
 
 local plateCmdDesc = {
 	id      = CMD_PLATE,
@@ -34,28 +34,45 @@ local plateCmdDesc = {
 	tooltip = 'Build a Plate of a nearby factory',
 }
 
+function addToSet(set, key)
+    set[key] = true
+end
+
+function setContains(set, key)
+    return set[key] ~= nil
+end
+
 local function CanBuildFactoryPlate(unitDefID)
-	local ud = UnitDefs[unitDefID]
-	local bo = ud.buildOptions
-		for i = 1, #bo do
-			local cp = UnitDefs[bo[i]].customParams
-			if cp.parent_of_plate then
-				return true
+	if not (setContains(defIDCache, unitDefID) or setContains(defIDCache, -unitDefID)) then
+		local ud = UnitDefs[unitDefID]
+		local bo = ud.buildOptions
+			for i = 1, #bo do
+				local cp = UnitDefs[bo[i]].customParams
+				if cp.parent_of_plate then
+					addToSet(defIDCache, unitDefID, true)
+					return true
+				end
 			end
+		addToSet(defIDCache, -unitDefID)
+		return false
+	else
+		if setContains(defIDCache, unitDefID) then
+			return true
+		else
+			return false
 		end
-	return false
+	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if spGetUnitIsDead(unitID) then
-		return
+		if spGetUnitIsDead(unitID) then
+			return
+		end
+
+		if CanBuildFactoryPlate(unitDefID) then
+			spInsertUnitCmdDesc(unitID, plateCmdDesc)
+		end
 	end
-	
-	-- add plate command to builders
-	if CanBuildFactoryPlate(unitDefID) then
-		spInsertUnitCmdDesc(unitID, plateCmdDesc)
-	end
-end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_PLATE)
