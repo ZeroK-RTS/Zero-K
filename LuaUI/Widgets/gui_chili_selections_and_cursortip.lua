@@ -331,7 +331,7 @@ options = {
 	tooltip_opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0.8, min = 0, max = 1, step = 0.01,
+		value = 0.92, min = 0, max = 1, step = 0.01,
 		update_on_the_fly = true,
 		OnChange = function(self)
 			if not tooltipWindow then
@@ -468,8 +468,11 @@ local function Format(amount, displaySign)
 	if type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else
 			if (amount < 20 and (amount * 10)%10 ~=0) then
-				if displaySign then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end
+				if displaySign then 
+					formatted = strFormat("%+.1f", amount)
+				else 
+					formatted = strFormat("%.1f", amount)
+				end
 			else
 				if displaySign then
 					formatted = strFormat("%+d", amount)
@@ -673,7 +676,11 @@ local function GetUnitShieldRegenString(unitID, ud)
 
 	-- FIXME: take energy stall into account
 	local wd = WeaponDefs[ud.shieldWeaponDef]
-	return " (+" .. math.ceil(mult * (wd.customParams.shield_rate or wd.shieldPowerRegen)) .. ")"
+	local regen = mult * (wd.customParams.shield_rate or wd.shieldPowerRegen)
+	if math.abs(math.ceil(regen) - regen) < 0.05 then
+		return " (+" .. math.ceil(regen - 0.2) .. ")"
+	end
+	return " (+" .. strFormat("%+.1f", regen) .. ")"
 end
 
 local function IsUnitInLos(unitID)

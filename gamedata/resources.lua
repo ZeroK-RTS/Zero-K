@@ -70,6 +70,7 @@ local resources = {
 			heatcloud='GPL/explo.png',
 			explo='GPL/fire.png',
 	  -- MANUAL
+	  flarescale01='flarescale01.tga',
 
       ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",
