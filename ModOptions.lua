@@ -694,6 +694,17 @@ local options = {
 		section = 'mapsettings',
 		def     = false, -- don't change, won't take effect as this is engine value
 	},
+	{
+		key     = 'mapgen_seed',
+		name    = 'Random Map Seed',
+		desc    = 'Random seed for random map generation. A random map must be selected from the map list.',
+		type    = 'number',
+		section = 'mapsettings',
+		def     = 0,
+		min     = 0,
+		max     = 10000000,
+		step    = 1,
+	},
 	--[[ Engine option, would need proper UI before enabling
 	{
 		key     = 'fixedallies',
