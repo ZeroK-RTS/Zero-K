@@ -32,7 +32,7 @@ return { veharty = {
   maneuverleashlength = [[650]],
   maxDamage           = 450,
   maxSlope            = 18,
-  maxVelocity         = 1.867,
+  maxVelocity         = 1.85,
   maxWaterDepth       = 22,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
@@ -56,8 +56,7 @@ return { veharty = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 640, --[[ NB: lowering this can make it drive into HLT via
-                               turn circle (due to low LoS margin over HLT range) ]]
+  turnRate            = 640, --NB: be wary about large turning circles wandering into HLT.
   workerTime          = 0,
 
   weapons             = {

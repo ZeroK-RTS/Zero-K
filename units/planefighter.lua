@@ -13,8 +13,8 @@ return { planefighter = {
   category               = [[FIXEDWING]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
-  collisionVolumeScales  = [[25 11 40]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[30 14 50]],
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 10]],
   selectionVolumeScales  = [[50 50 70]],
   selectionVolumeType    = [[cylZ]],
@@ -33,7 +33,7 @@ return { planefighter = {
     fighter_pullup_dist = 400,
 
     midposoffset   = [[0 3 0]],
-    modelradius    = [[5]],
+    modelradius    = [[10]],
     refuelturnradius = [[80]],
   },
 
@@ -166,7 +166,7 @@ return { planefighter = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       metalpershot            = 0,
-      model                   = [[wep_m_fury.s3o]],
+      model                   = [[wep_m_fury.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 530,
       reloadtime              = 5.2,
@@ -174,6 +174,7 @@ return { planefighter = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 200,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 22000,
       tracks                  = true,
