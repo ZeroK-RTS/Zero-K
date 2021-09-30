@@ -1,6 +1,6 @@
 return { chickenflyerqueen = {
   unitname            = [[chickenflyerqueen]],
-  name                = [[Chicken Flyer Queen]],
+  name                = [[Chicken Queen]],
   description         = [[Clucking Hell!]],
   acceleration        = 1.2,
   activateWhenBuilt   = true,

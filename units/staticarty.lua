@@ -1,7 +1,7 @@
 return { staticarty = {
   unitname                      = [[staticarty]],
   name                          = [[Cerberus]],
-  description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
+  description                   = [[Plasma Artillery Battery - Power by connecting to a 50 energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

@@ -1,7 +1,7 @@
 return { shipskirm = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
-  description            = [[Rocket Boat (Skirmisher)]],
+  description            = [[Skirmisher Ship]],
   acceleration           = 0.234,
   activateWhenBuilt      = true,
   brakeRate              = 1.38,

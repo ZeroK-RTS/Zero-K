@@ -1,7 +1,7 @@
 return { shipriot = {
   unitname               = [[shipriot]],
   name                   = [[Corsair]],
-  description            = [[Corvette (Raider/Riot)]],
+  description            = [[Raider/Riot Corvette]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 1.7,

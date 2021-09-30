@@ -1,7 +1,7 @@
 return { subraider = {
   unitname               = [[subraider]],
   name                   = [[Seawolf]],
-  description            = [[Attack Submarine (Stealth Raider)]],
+  description            = [[Raider Submarine (Anti-Sub, Undersea Fire)]],
   acceleration           = 0.36,
   activateWhenBuilt      = true,
   brakeRate              = 2.4,

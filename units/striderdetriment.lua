@@ -1,7 +1,7 @@
 return { striderdetriment = {
   unitname               = [[striderdetriment]],
   name                   = [[Detriment]],
-  description            = [[Ultimate Assault Strider]],
+  description            = [[Ultimate Assault Strider (Undersea Fire)]],
   acceleration           = 0.328,
   activateWhenBuilt      = true,
   autoheal               = 100,

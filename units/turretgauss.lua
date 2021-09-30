@@ -1,7 +1,7 @@
 return { turretgauss = {
   unitname                      = [[turretgauss]],
   name                          = [[Gauss]],
-  description                   = [[Gauss Turret, 20 health/s when closed]],
+  description                   = [[Popup gauss turret, regenerates when closed (Anti-Sub)]],
   acceleration                  = 0,
   buildCostMetal                = 400,
   builder                       = false,

@@ -1,7 +1,7 @@
 return { shipscout = {
   unitname               = [[shipscout]],
   name                   = [[Cutter]],
-  description            = [[Picket Ship (Disarming Scout)]],
+  description            = [[Scout Ship (Disarming)]],
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 0.57,

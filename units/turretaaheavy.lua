@@ -1,7 +1,7 @@
 return { turretaaheavy = {
   unitname                      = [[turretaaheavy]],
   name                          = [[Artemis]],
-  description                   = [[Very Long-Range Anti-Air Missile Tower, Drains 4 m/s 20 second stockpile.]],
+  description                   = [[Very Long-Range Anti-Air Missile Tower, Drains 4 m/s, 20 second stockpile]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

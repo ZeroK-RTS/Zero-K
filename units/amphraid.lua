@@ -1,7 +1,7 @@
 return { amphraid = {
   unitname               = [[amphraid]],
   name                   = [[Duck]],
-  description            = [[Amphibious Raider Bot (Anti-Sub)]],
+  description            = [[Amphibious Raider (Anti-Sub, Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
