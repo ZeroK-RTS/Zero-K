@@ -967,7 +967,7 @@ end
 
 local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
 for i = 1, #ai_start_units do
-	if UnitDefs[ai_start_units[i]] then
+	if UnitDefs[ai_start_units[i]] then -- valid entries can still be nil in wiki exporter script
 		UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
 	end
 end
