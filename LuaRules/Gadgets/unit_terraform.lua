@@ -207,7 +207,6 @@ local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit hav
 local terraUnitCost = UnitDefs[terraunitDefID].metalCost
 local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
-local shieldscoutDefID = UnitDefNames["shieldscout"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 local exceptionArray = {
@@ -3619,64 +3618,74 @@ local function deregisterStructure(unitID)
 	
 end
 
-local dirtbagPosX =
-	          { -8, 0, 8,
-	        -16,-8, 0, 8, 16,
-	    -24,-16,-8, 0, 8, 16, 24,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	    -24,-16,-8, 0, 8, 16, 24,
-	        -16,-8, 0, 8, 16,
-	            -8, 0, 8}
+local terraformOnUnitDestroyed = {
+	[UnitDefNames["shieldscout"].id] = {
+		posX =
+			           {-8, 0, 8,
+			        -16,-8, 0, 8, 16,
+			    -24,-16,-8, 0, 8, 16, 24,
+			-32,-24,-16,-8, 0, 8, 16, 24, 32,
+			-32,-24,-16,-8, 0, 8, 16, 24, 32,
+			-32,-24,-16,-8, 0, 8, 16, 24, 32,
+			    -24,-16,-8, 0, 8, 16, 24,
+			        -16,-8, 0, 8, 16,
+			            -8, 0, 8},
 
-local dirtbagPosZ =
-	           {-32,-32,-32,
-	        -24,-24,-24,-24,-24,
-	    -16,-16,-16,-16,-16,-16,-16,
-	 -8, -8, -8, -8, -8, -8, -8, -8, -8,
-	  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	  8,  8,  8,  8,  8,  8,  8,  8,  8,
-	      16, 16, 16, 16, 16, 16, 16,
-	          24, 24, 24, 24, 24,
-	              32, 32, 32}
+		posZ =
+			           {-32,-32,-32,
+			        -24,-24,-24,-24,-24,
+			    -16,-16,-16,-16,-16,-16,-16,
+			 -8, -8, -8, -8, -8, -8, -8, -8, -8,
+			  0,  0,  0,  0,  0,  0,  0,  0,  0,
+			  8,  8,  8,  8,  8,  8,  8,  8,  8,
+			     16, 16, 16, 16, 16, 16, 16,
+			         24, 24, 24, 24, 24,
+			             32, 32, 32},
 
-local dirtbagPosY =
-	            {3 , 4 , 3 ,
-	         3 , 5 , 9 , 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	          3, 5 , 9 , 5 , 3 ,
-	             3 , 4 , 3 }
+		posY =
+			           { 3 , 4 , 3 ,
+			         3 , 5 , 9 , 5 , 3 ,
+			     3 , 6 , 25, 27, 25, 6 , 3 ,
+			 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
+			 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
+			 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
+			     3 , 6 , 25, 27, 25, 6 , 3 ,
+			         3 , 5 , 9 , 5 , 3 ,
+			             3 , 4 , 3 },
+
+		impulseRadius = 40,
+		impulseY = 0.3,
+	}
+}
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 
-	if (unitDefID == shieldscoutDefID) then
-		local  _,_,_,_,build = spGetUnitHealth(unitID)
-		if build == 1 then
-			local ux, uy, uz  = spGetUnitPosition(unitID)
+	if (terraformOnUnitDestroyed[unitDefID]) then
+		local  _,_,_,_,buildProgress = spGetUnitHealth(unitID)
+		if buildProgress == 1 then
+			local config = terraformOnUnitDestroyed[unitDefID]
+			local posX, posY, posZ = config.posX, config.posY, config.posZ
+
+			local ux, uy, uz = spGetUnitPosition(unitID)
 			ux = floor((ux+8)/16)*16
 			uz = floor((uz+8)/16)*16
 			
 			spSetHeightMapFunc(
 				function()
-					for i = 1, #dirtbagPosX, 1 do
-						local x, z = dirtbagPosX[i] + ux, dirtbagPosZ[i] + uz
+					for i = 1, #posX, 1 do
+						local x, z = posX[i] + ux, posZ[i] + uz
 						if IsPositionTerraformable(x, z) then
-							spAddHeightMap(x, z, dirtbagPosY[i])
+							spAddHeightMap(x, z, posY[i])
 						end
 					end
 				end
 			)
 			
-			local units = Spring.GetUnitsInCylinder(ux,uz,40)
+			local units = Spring.GetUnitsInCylinder(ux, uz, config.impulseRadius)
 			for i = 1, #units do
 				local hitUnitID = units[i]
 				if hitUnitID ~= unitID then
-					GG.AddGadgetImpulseRaw(hitUnitID, 0, 0.3, 0, true, true)
+					GG.AddGadgetImpulseRaw(hitUnitID, 0, config.impulseY, 0, true, true)
 				end
 			end
 		end
