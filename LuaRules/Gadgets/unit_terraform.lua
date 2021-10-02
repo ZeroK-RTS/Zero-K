@@ -207,6 +207,8 @@ local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit hav
 local terraUnitCost = UnitDefs[terraunitDefID].metalCost
 local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
+local terraformOnUnitDestroyed = VFS.Include("LuaRules/Configs/unit_terraform_defs.lua", nil, VFS.GAME)
+
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 local exceptionArray = {
@@ -3617,46 +3619,6 @@ local function deregisterStructure(unitID)
 	structure[unitID] = nil
 	
 end
-
-local terraformOnUnitDestroyed = {
-	[UnitDefNames["shieldscout"].id] = {
-		posX =
-			           {-8, 0, 8,
-			        -16,-8, 0, 8, 16,
-			    -24,-16,-8, 0, 8, 16, 24,
-			-32,-24,-16,-8, 0, 8, 16, 24, 32,
-			-32,-24,-16,-8, 0, 8, 16, 24, 32,
-			-32,-24,-16,-8, 0, 8, 16, 24, 32,
-			    -24,-16,-8, 0, 8, 16, 24,
-			        -16,-8, 0, 8, 16,
-			            -8, 0, 8},
-
-		posZ =
-			           {-32,-32,-32,
-			        -24,-24,-24,-24,-24,
-			    -16,-16,-16,-16,-16,-16,-16,
-			 -8, -8, -8, -8, -8, -8, -8, -8, -8,
-			  0,  0,  0,  0,  0,  0,  0,  0,  0,
-			  8,  8,  8,  8,  8,  8,  8,  8,  8,
-			     16, 16, 16, 16, 16, 16, 16,
-			         24, 24, 24, 24, 24,
-			             32, 32, 32},
-
-		posY =
-			           { 3 , 4 , 3 ,
-			         3 , 5 , 9 , 5 , 3 ,
-			     3 , 6 , 25, 27, 25, 6 , 3 ,
-			 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-			 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
-			 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-			     3 , 6 , 25, 27, 25, 6 , 3 ,
-			         3 , 5 , 9 , 5 , 3 ,
-			             3 , 4 , 3 },
-
-		impulseRadius = 40,
-		impulseY = 0.3,
-	}
-}
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 
