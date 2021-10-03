@@ -89,6 +89,9 @@ local function CheckDeathTeam(teamID)
 		end
 	end
 
+	--[[ The threshold is not 100% because between hitting Ctrl+A
+	     and the self-D order reaching the server some more units
+	     could have been created (keypress delay, network lag). ]]
 	if selfDUnitCount > 0.8 * realUnitCount then
 		ghRemoveCallIn(gh, 'AllowCommand')
 		spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
