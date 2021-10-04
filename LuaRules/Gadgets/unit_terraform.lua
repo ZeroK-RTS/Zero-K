@@ -3621,11 +3621,10 @@ local function deregisterStructure(unitID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-
-	if (terraformOnUnitDestroyed[unitDefID]) then
+	local config = terraformOnUnitDestroyed[unitDefID]
+	if config then
 		local  _,_,_,_,buildProgress = spGetUnitHealth(unitID)
 		if buildProgress == 1 then
-			local config = terraformOnUnitDestroyed[unitDefID]
 			local posX, posY, posZ = config.posX, config.posY, config.posZ
 
 			local ux, uy, uz = spGetUnitPosition(unitID)
