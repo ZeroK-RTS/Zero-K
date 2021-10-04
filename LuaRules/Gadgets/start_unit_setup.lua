@@ -31,7 +31,6 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, spGetTeamInfo(gaiateam, false))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
