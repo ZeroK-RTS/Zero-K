@@ -88,10 +88,10 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local hasSonar = {
+local hasActiveSonar = {
 	[ UnitDefNames['staticsonar'].id ] = true,
 	[ UnitDefNames['planescout'].id ] = true,
-	[ UnitDefNames['shipcarrier'].id ] = true,
+	[ UnitDefNames['athena'].id ] = true,
 }
 
 local radarUnitDef = {}
@@ -107,7 +107,7 @@ for unitDefID, ud in pairs(UnitDefs) do
 	end
 end
 
-for unitDefID,_ in pairs(hasSonar) do
+for unitDefID,_ in pairs(hasActiveSonar) do
 	local ud = UnitDefs[unitDefID]
 	if ud.sonarRadius > 0 then
 		sonarUnitDef[unitDefID] = ud.sonarRadius
