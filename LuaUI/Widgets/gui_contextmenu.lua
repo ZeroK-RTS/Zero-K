@@ -667,7 +667,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if stun_time > 0 then
-			cells[#cells+1] = ' - Stun time:'
+			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'
 		end
 
