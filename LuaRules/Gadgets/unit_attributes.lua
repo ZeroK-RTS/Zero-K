@@ -88,12 +88,8 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local hasSensorOrJamm = {
-	[ UnitDefNames['staticheavyradar'].id ] = true,
-	[ UnitDefNames['cloakjammer'].id ] = true,
-	[ UnitDefNames['staticjammer'].id ] = true,
+local hasSonar = {
 	[ UnitDefNames['staticsonar'].id ] = true,
-	[ UnitDefNames['staticradar'].id ] = true,
 	[ UnitDefNames['planescout'].id ] = true,
 	[ UnitDefNames['shipcarrier'].id ] = true,
 }
@@ -102,18 +98,22 @@ local radarUnitDef = {}
 local sonarUnitDef = {}
 local jammerUnitDef = {}
 
-for unitDefID,_ in pairs(hasSensorOrJamm) do
-	local ud = UnitDefs[unitDefID]
+for unitDefID, ud in pairs(UnitDefs) do
 	if ud.radarRadius > 0 then
 		radarUnitDef[unitDefID] = ud.radarRadius
-	end
-	if ud.sonarRadius > 0 then
-		sonarUnitDef[unitDefID] = ud.sonarRadius
 	end
 	if ud.jammerRadius > 0 then
 		jammerUnitDef[unitDefID] = ud.jammerRadius
 	end
 end
+
+for unitDefID,_ in pairs(hasSonar) do
+	local ud = UnitDefs[unitDefID]
+	if ud.sonarRadius > 0 then
+		sonarUnitDef[unitDefID] = ud.sonarRadius
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
