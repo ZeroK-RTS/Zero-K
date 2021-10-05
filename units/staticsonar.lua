@@ -36,6 +36,7 @@ return { staticsonar = {
     removewait     = 1,
     removestop     = 1,
     priority_misc  = 2, -- High
+    sonar_can_be_disabled = 1,
   },
 
   featureDefs       = {
