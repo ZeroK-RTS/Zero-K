@@ -88,12 +88,6 @@ for i = 1, #UnitDefs do
 	end
 end
 
-local hasActiveSonar = {
-	[ UnitDefNames['staticsonar'].id ] = true,
-	[ UnitDefNames['planescout'].id ] = true,
-	[ UnitDefNames['athena'].id ] = true,
-}
-
 local radarUnitDef = {}
 local sonarUnitDef = {}
 local jammerUnitDef = {}
@@ -102,15 +96,11 @@ for unitDefID, ud in pairs(UnitDefs) do
 	if ud.radarRadius > 0 then
 		radarUnitDef[unitDefID] = ud.radarRadius
 	end
+	if ud.sonarRadius > 0 and ud.customParams.sonar_can_be_disabled then
+		sonarUnitDef[unitDefID] = ud.sonarRadius
+	end
 	if ud.jammerRadius > 0 then
 		jammerUnitDef[unitDefID] = ud.jammerRadius
-	end
-end
-
-for unitDefID,_ in pairs(hasActiveSonar) do
-	local ud = UnitDefs[unitDefID]
-	if ud.sonarRadius > 0 then
-		sonarUnitDef[unitDefID] = ud.sonarRadius
 	end
 end
 
