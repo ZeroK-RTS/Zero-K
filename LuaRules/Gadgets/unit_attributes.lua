@@ -45,6 +45,7 @@ local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
 local ALLY_ACCESS = {allied = true}
 local INLOS_ACCESS = {inlos = true}
 
+local tobool      = Spring.Utilities.tobool
 local getMovetype = Spring.Utilities.getMovetype
 
 local spSetUnitCOBValue = Spring.SetUnitCOBValue
@@ -96,7 +97,7 @@ for unitDefID, ud in pairs(UnitDefs) do
 	if ud.radarRadius > 0 then
 		radarUnitDef[unitDefID] = ud.radarRadius
 	end
-	if ud.sonarRadius > 0 and ud.customParams.sonar_can_be_disabled then
+	if ud.sonarRadius > 0 and tobool(ud.customParams.sonar_can_be_disabled) then
 		sonarUnitDef[unitDefID] = ud.sonarRadius
 	end
 	if ud.jammerRadius > 0 then
