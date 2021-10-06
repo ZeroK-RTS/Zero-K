@@ -30,18 +30,17 @@ local InsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local GiveOrderToUnit = Spring.GiveOrderToUnit
 local GetUnitDefID = Spring.GetUnitDefID
 
-local AIRPLANT = {
-	[UnitDefNames.factoryplane.id] = {land = true},
-	[UnitDefNames.factorygunship.id] = {land = false},
-	[UnitDefNames.plateplane.id] = {land = true},
-	[UnitDefNames.plategunship.id] = {land = false},
-}
+local AIRPLANT = {}
 
-if UnitDefNames["pw_bomberfac"] then
-	AIRPLANT[UnitDefNames["pw_bomberfac"].id] = {land = false}
-end
-if UnitDefNames["pw_dropfac"] then
-	AIRPLANT[UnitDefNames["pw_dropfac"].id] = {land = false}
+for unitDefID, ud in pairs(UnitDefs) do
+	if (ud.customParams.factory_land_state ~= nil) then
+		-- "factory_land_state" customParam defines that unit is air factory and should have CMD_AP_FLY_STATE command available.
+		-- The value 0 or 1 is the initial value of that state.
+
+		AIRPLANT[unitDefID] = {
+			land = Spring.Utilities.tobool(ud.customParams.factory_land_state),
+		}
+	end
 end
 
 local plantList = {}
