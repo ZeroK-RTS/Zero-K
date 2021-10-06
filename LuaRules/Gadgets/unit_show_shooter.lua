@@ -32,9 +32,7 @@ local MOBILE_SHOW_TIME = 4.5 -- 2.5 seconds
 local fakeWeapons = {} -- WeaponDefs which are for hax.
 local fakeWeaponByNum = {}
 local immobileUnits = {} -- Units which are static
-local noDecloakUnits = {
-	[UnitDefNames["cloaksnipe"].id] = true,
-}
+local noDecloakUnits = {}
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -54,6 +52,10 @@ for i = 1, #UnitDefs do
 				fakeWeaponByNum[i] = fakeWeaponByNum[i] or {}
 				fakeWeaponByNum[i][j] = true
 			end
+		end
+
+		if Spring.Utilities.tobool(ud.customParams.no_decloak_on_weapon_fire) then
+			noDecloakUnits[i] = true
 		end
 	end
 end
