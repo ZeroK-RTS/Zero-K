@@ -12,6 +12,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.FileExists = VFS.FileExists or function() return false end	-- unitdef exporter compatibility
+
 --[[ This lets mutators add a bit of weapondefs_post processing without
      losing access to future gameside updates to weapondefs_post. ]]
 local MODSIDE_POSTS_FILEPATH = 'gamedata/weapondefs_mod.lua'
@@ -231,6 +233,9 @@ end
 --
 -- Set myGravity for ballistic weapons because maps cannot be trusted. Standard is 120,
 -- gravity of 150 can cause high things (such as HLT) to be unhittable.
+
+Game = Game or {}	-- unitdef exporter compatibility
+Game.gameSpeed = Game.gameSpeed or 30
 
 local defaultMyGravity = 120 / (Game.gameSpeed^2)
 

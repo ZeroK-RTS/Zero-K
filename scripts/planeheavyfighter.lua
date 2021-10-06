@@ -17,7 +17,6 @@ local RESTORE_DELAY = 150
 local FIRE_SLOWDOWN = tonumber(UnitDef.customParams.combat_slowdown)
 
 --signals
-local SIG_Aim = 1
 local SIG_RESTORE = 2
 
 ----------------------------------------------------------

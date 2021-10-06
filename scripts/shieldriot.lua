@@ -22,7 +22,6 @@ local smokePiece = {torso}
 
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM = 2
 local SIG_ACTIVATE = 8
 
 --------------------------------------------------------------------------------

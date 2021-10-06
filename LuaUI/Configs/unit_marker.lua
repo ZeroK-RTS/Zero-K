@@ -40,6 +40,25 @@ local unitlistNames = {
 	turretheavy = {},
 	turretaaheavy = {},
 
+	jumpsumo = {},
+	spidercrabe = {},
+	tankheavyarty = {},
+	hoverarty = {},
+	amphassault = {},
+	tankheavyassault = {},
+
+	striderfunnelweb = {},
+	striderantiheavy = {},
+	striderdante = {},
+	striderbantha = {},
+	shipcarrier = {},
+	gunshipkrow = {},
+	striderarty = {},
+	shipheavyarty = {},
+	subtacmissile = {},
+	striderscorpion = {},
+	striderdetriment = {},
+
 	-- these announce their presence globally, but
 	-- are still worth marking in case they get scouted
 	-- as a nanoframe or when toggled off

@@ -1,7 +1,7 @@
 return { shipassault = {
   unitname               = [[shipassault]],
   name                   = [[Siren]],
-  description            = [[Destroyer (Riot/Assault)]],
+  description            = [[Riot/Assault Destroyer (Anti-Sub)]],
   acceleration           = 0.46,
   activateWhenBuilt      = true,
   brakeRate              = 0.6,

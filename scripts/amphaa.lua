@@ -35,7 +35,6 @@ local SLEEP_TIME = 0 -- 1000 * math.abs(THIGH_FRONT_ANGLE - THIGH_BACK_ANGLE) / 
 
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32

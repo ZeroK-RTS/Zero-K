@@ -22,8 +22,7 @@ local nanoPiece = flare
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM = 2
-local SIG_BUILD = 3
+local SIG_BUILD = 2
 local SIG_STOPBUILD = 4
 
 local PERIOD = 0.22

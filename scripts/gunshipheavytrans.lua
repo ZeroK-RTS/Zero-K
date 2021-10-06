@@ -76,7 +76,6 @@ local SIG_CLOSEDOORS = 2
 local SIG_AIM = 4
 local SIG_AIM2 = 8
 local SIG_AIM3 = 16
-local SIG_RESTORE = 32
 local SIG_TOL = 64
 
 local doorSpeed = 3

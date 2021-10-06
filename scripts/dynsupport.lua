@@ -42,8 +42,6 @@ local SIG_BUILD = 32
 local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
-local SIG_WALK = 1
---local SIG_AIM_3 = 8 --step on
 
 --------------------------------------------------------------------------------
 -- vars
@@ -403,7 +401,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	--Signal(SIG_WALK)
 	bMoving = false
 end
 

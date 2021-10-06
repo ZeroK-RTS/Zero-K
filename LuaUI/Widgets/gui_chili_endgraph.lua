@@ -39,7 +39,7 @@ local buttongroups = {
 	{"Units", {
 		{"unit_value"      , "Total Value", "Total value of units and structures."},
 		{"unit_value_army" , "Army Value", "Value of mobile units excluding constructors, commanders, Iris, Owl, Djinn, Charon and Hercules."},
-		{"unit_value_def"  , "Defense Value", "Value of armed structures (and shields) with range up to and including Cerberus and Artemis."},
+		{"unit_value_def"  , "Defence Value", "Value of armed structures (and shields) with range up to and including Cerberus and Artemis."},
 		{"unit_value_econ" , "Economy Value", "Value of economic structures, factories and constructors."},
 		{"unit_value_other", "Other Value", "Value of units and structures that do not fit any other category."},
 		{"unit_value_killed", "Value Killed", "Cumulative total of value of enemy units and structured destroyed by the team. Includes nanoframes."},

@@ -203,7 +203,7 @@ local global_command_button
 -- EPIC options
 
 local Chili
-options_path = 'Settings/Interface/Defense and Cloak Ranges'
+options_path = 'Settings/Interface/Defence and Cloak Ranges'
 
 local function OnOptChange(self)
 	local cb = checkboxes[self.key]
@@ -216,7 +216,7 @@ local function OnOptChange(self)
 end
 
 options = {
-	label = { type = 'label', name = 'Defense Ranges' },
+	label = { type = 'label', name = 'Defence Ranges' },
 	allyground = {
 		name = 'Show Ally Ground Defence',
 		type = 'bool',
@@ -641,7 +641,7 @@ local function SetupChiliStuff()
 				mainWindow:SetVisibility(not mainWindow.visible)
 			end
 		end
-		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/defense_ranges/defense_colors.png", "Defense Ranges", ToggleWindow)
+		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/defense_ranges/defense_colors.png", "Defence Ranges", ToggleWindow)
 	end
 end
 

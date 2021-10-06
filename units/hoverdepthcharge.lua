@@ -1,7 +1,7 @@
 return { hoverdepthcharge = {
   unitname            = [[hoverdepthcharge]],
   name                = [[Claymore]],
-  description         = [[Anti-Sub Hovercraft]],
+  description         = [[Riot Hovercraft (Anti-Sub)]],
   acceleration        = 0.12,
   activateWhenBuilt   = true,
   brakeRate           = 1.3,

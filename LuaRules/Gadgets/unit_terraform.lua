@@ -207,8 +207,7 @@ local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit hav
 local terraUnitCost = UnitDefs[terraunitDefID].metalCost
 local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
-local shieldscoutDefID = UnitDefNames["shieldscout"].id
---local novheavymineDefID = UnitDefNames["novheavymine"].id
+local terraformOnUnitDestroyed = VFS.Include("LuaRules/Configs/unit_terraform_defs.lua", nil, VFS.GAME)
 
 local exceptionArray = {
 	[UnitDefNames["shipcarrier"].id] = true,
@@ -3619,127 +3618,38 @@ local function deregisterStructure(unitID)
 	
 end
 
-local dirtbagPosX =
-	          { -8, 0, 8,
-	        -16,-8, 0, 8, 16,
-	    -24,-16,-8, 0, 8, 16, 24,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	    -24,-16,-8, 0, 8, 16, 24,
-	        -16,-8, 0, 8, 16,
-	            -8, 0, 8}
-
-local dirtbagPosZ =
-	           {-32,-32,-32,
-	        -24,-24,-24,-24,-24,
-	    -16,-16,-16,-16,-16,-16,-16,
-	 -8, -8, -8, -8, -8, -8, -8, -8, -8,
-	  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	  8,  8,  8,  8,  8,  8,  8,  8,  8,
-	      16, 16, 16, 16, 16, 16, 16,
-	          24, 24, 24, 24, 24,
-	              32, 32, 32}
-
-local dirtbagPosY =
-	            {3 , 4 , 3 ,
-	         3 , 5 , 9 , 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	          3, 5 , 9 , 5 , 3 ,
-	             3 , 4 , 3 }
-
 function gadget:UnitDestroyed(unitID, unitDefID)
+	local config = terraformOnUnitDestroyed[unitDefID]
+	if config then
+		local  _,_,_,_,buildProgress = spGetUnitHealth(unitID)
+		if buildProgress == 1 then
+			local posX, posY, posZ = config.posX, config.posY, config.posZ
 
-	if (unitDefID == shieldscoutDefID) then
-		local  _,_,_,_,build = spGetUnitHealth(unitID)
-		if build == 1 then
-			local ux, uy, uz  = spGetUnitPosition(unitID)
+			local ux, uy, uz = spGetUnitPosition(unitID)
 			ux = floor((ux+8)/16)*16
 			uz = floor((uz+8)/16)*16
 			
 			spSetHeightMapFunc(
 				function()
-					for i = 1, #dirtbagPosX, 1 do
-						local x, z = dirtbagPosX[i] + ux, dirtbagPosZ[i] + uz
+					for i = 1, #posX, 1 do
+						local x, z = posX[i] + ux, posZ[i] + uz
 						if IsPositionTerraformable(x, z) then
-							spAddHeightMap(x, z, dirtbagPosY[i])
+							spAddHeightMap(x, z, posY[i])
 						end
 					end
 				end
 			)
 			
-			local units = Spring.GetUnitsInCylinder(ux,uz,40)
+			local units = Spring.GetUnitsInCylinder(ux, uz, config.impulseRadius)
 			for i = 1, #units do
 				local hitUnitID = units[i]
 				if hitUnitID ~= unitID then
-					GG.AddGadgetImpulseRaw(hitUnitID, 0, 0.3, 0, true, true)
+					GG.AddGadgetImpulseRaw(hitUnitID, 0, config.impulseY, 0, true, true)
 				end
 			end
 		end
-		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end
-	--[[
-	if (unitDefID == novheavymineDefID) then
-		local  _,_,_,_,build = spGetUnitHealth(unitID)
-		
-		if build == 1 then
-			local ux, uy, uz = spGetUnitPosition(unitID)
-			ux = ceil(ux/8)*8-4
-			uz = ceil(uz/8)*8-4
-			
-			local heightChange = -30
-			local size = 48
-			local heightMap = {}
-			
-			for ix = ux-size-8, ux+size+8, 8 do
-				heightMap[ix] = {}
-				for iz = uz-size-8, uz+size+8, 8 do
-					heightMap[ix][iz] = spGetGroundHeight(ix, iz)
-				end
-			end
-			
-			local point = {}
-			local points = 0
-			
-			for ix = ux-size, ux+size, 8 do
-				for iz = uz-size, uz+size, 8 do
-					local newHeight = heightMap[ix][iz] + heightChange
-					
-					local maxDiff = heightMap[ix-8][iz]-newHeight
-					if heightMap[ix+8][iz]-newHeight > maxDiff then
-						maxDiff = heightMap[ix+8][iz]-newHeight
-					end
-					if heightMap[ix][iz-8]-newHeight > maxDiff then
-						maxDiff = heightMap[ix][iz-8]-newHeight
-					end
-					if heightMap[ix][iz+8]-newHeight > maxDiff then
-						maxDiff = heightMap[ix][iz+8]-newHeight
-					end
-					
-					if maxDiff < maxHeightDifference then
-						points = points + 1
-						point[points] = {x = ix, y = newHeight, z = iz}
-					elseif maxDiff < maxHeightDifference*2 then
-						points = points + 1
-						point[points] = {x = ix, y = newHeight+maxDiff-maxHeightDifference, z = iz}
-					end
-				end
-			end
 
-			local func = function()
-					for i = 1, points do
-						spSetHeightMap(point[i].x,point[i].z,point[i].y)
-					end
-				end
-			spSetHeightMapFunc(func)
-		end
-		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
-	end
-	--]]
 	if constructor[unitID] then
 		local index = constructor[unitID].index
 		if index ~= constructors then

@@ -1,7 +1,7 @@
 return { striderantiheavy = {
   unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
-  description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
+  description            = [[Cloaked Anti-Strider Walker (Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,

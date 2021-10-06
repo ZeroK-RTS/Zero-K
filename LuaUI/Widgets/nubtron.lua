@@ -437,7 +437,7 @@ local function addTabText(unitDefID)
 	elseif econ_commands[-unitDefID] then
 		return " under the <Econ> tab."
 	elseif defense_commands[-unitDefID] then
-		return " under the <Defense> tab."
+		return " under the <Defence> tab."
 	elseif special_commands[-unitDefID] then
 		return " under the <Special> tab."
 	end

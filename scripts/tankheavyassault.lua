@@ -10,7 +10,6 @@ local base, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2,
 -- Signal definitions
 local SIG_AIM1 = 1
 local SIG_AIM2 = 2
-local SIG_AIM3 = 4
 local SIG_MOVE = 8
 local SIG_ROCK_X = 16
 local SIG_ROCK_Z = 32

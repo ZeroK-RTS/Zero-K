@@ -1,7 +1,7 @@
 return { shiparty = {
   unitname               = [[shiparty]],
   name                   = [[Envoy]],
-  description            = [[Cruiser (Artillery)]],
+  description            = [[Artillery Cruiser]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 1.7,

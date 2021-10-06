@@ -3,7 +3,6 @@ include "pieceControl.lua"
 
 local hull, torp, turret, sonar, wake1, wake2 = piece ('Hull', 'Torp', 'Turret', 'Sonar', 'Wake1', 'Wake2')
 
-local SIG_Move = 1
 local SIG_Aim = 2
 
 local stuns = {false, false, false}
