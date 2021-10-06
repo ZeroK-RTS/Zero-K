@@ -57,9 +57,13 @@ local min = math.min
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local mobilePadDefs = {
-	[UnitDefNames["shipcarrier"].id] = true,
-}
+local mobilePadDefs = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.ispad and (not ud.isImmobile) then
+		mobilePadDefs[unitDefID] = true
+	end
+end
 
 local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
