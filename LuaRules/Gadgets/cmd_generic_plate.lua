@@ -43,20 +43,20 @@ function setContains(set, key)
 end
 
 local function CanBuildFactoryPlate(unitDefID)
-	if not (setContains(defIDCache, unitDefID) or setContains(defIDCache, -unitDefID)) then
+	if not (setContains(defIDCache, {unitDefID, true}) or setContains(defIDCache, {unitDefID, false})) then
 		local ud = UnitDefs[unitDefID]
 		local bo = ud.buildOptions
 			for i = 1, #bo do
 				local cp = UnitDefs[bo[i]].customParams
 				if cp.parent_of_plate then
-					addToSet(defIDCache, unitDefID, true)
+					addToSet(defIDCache, {unitDefID, true})
 					return true
 				end
 			end
-		addToSet(defIDCache, -unitDefID)
+		addToSet(defIDCache, {unitDefID, false})
 		return false
 	else
-		if setContains(defIDCache, unitDefID) then
+		if setContains(defIDCache, {unitDefID, true}) then
 			return true
 		else
 			return false
