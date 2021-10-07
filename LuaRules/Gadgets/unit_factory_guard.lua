@@ -51,8 +51,11 @@ local factoryDefs = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
 	if (ud.isFactory and ud.buildOptions) then
-		for _, buildOptionDefID in ipairs(ud.buildOptions) do
-			local bod = UnitDefs[buildOptionDefID]
+		local buildOptions = ud.buildOptions
+
+		for i = 1, #buildOptions do
+			local boDefID = buildOptions[i]
+			local bod = UnitDefs[boDefID]
 
 			if (bod and bod.isBuilder and bod.canAssist) then
 				factoryDefs[unitDefID] = true  -- only factories that can build builders are included

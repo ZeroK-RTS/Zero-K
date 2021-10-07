@@ -14,7 +14,7 @@ for unitDefID, config in pairs(airpadDefs) do
     local ud = UnitDefs[unitDefID]
 
     config.mobile = (not ud.isImmobile)
-    config.cap = config.cap or ud.customParams.pad_count
+    config.cap = ud.customParams.pad_count
 end
 
 return airpadDefs
