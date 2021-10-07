@@ -233,7 +233,7 @@ local function RefreshEmptyPad(airpadID,airpadDefID)
 	local ux,uy,uz = spGetUnitPosition(airpadID)
 	local front, top, right = spGetUnitVectors(airpadID)
 	airpadsData[airpadID].emptySpot = {}
-	for i=1, airpadDefs[airpadDefID].cap do
+	for i=1, #padPieceName do
 		local padName = padPieceName[i]
 		local pieceNum = piecesList[padName]
 		local x,y,z = spGetUnitPiecePosition(airpadID, pieceNum)
