@@ -50,7 +50,7 @@ local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local factoryDefs = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
-	if (ud.isFactory and ud.buildOptions) then
+	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
 		local buildOptions = ud.buildOptions
 
 		for i = 1, #buildOptions do
