@@ -1071,8 +1071,6 @@ function widget:MousePress(mx, my, button)
 		spSetActiveCommand(index)
 		currentlyActiveCommand = CMD_LEVEL
 		
-		local mx,my = spGetMouseState()
-		
 		setHeight = true
 		drawingRectangle = false
 		placingRectangle = false
