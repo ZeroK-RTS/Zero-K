@@ -25,7 +25,7 @@ local MAPSIDE_METALMAP = "mapconfig/map_metal_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
-local MINIMUN_MEX_INCOME = 0.2
+local MINIMUM_MEX_INCOME = 0.2
 
 local gridSize = 16 -- Resolution of metal map
 local buildGridSize = 8 -- Resolution of build positions
@@ -163,7 +163,7 @@ function gadget:Initialize()
 		local i = 1
 		while i <= #metalSpots do
 			local spot = metalSpots[i]
-			if spot.metal > MINIMUN_MEX_INCOME then
+			if spot.metal > MINIMUM_MEX_INCOME then
 				if metalValueOverride then
 					spot.metal = metalValueOverride
 				end
