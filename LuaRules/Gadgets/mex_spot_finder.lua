@@ -291,7 +291,6 @@ function GetSpots(gameConfig, mapConfig)
 	
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
-		loadConfig = true
 		spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride)
 		return spots, false
 	end
