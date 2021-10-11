@@ -178,6 +178,12 @@ end
 -- Extractor Processing
 ------------------------------------------------------------
 
+function IntegrateMetal(x, z, radius)
+	local centerX, centerZ = AdjustCoordinates(x, z)
+	local metal = IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	return metal, centerX, centerZ
+end
+
 function AdjustCoordinates(x, z)
 	local centerX, centerZ
 
@@ -196,22 +202,8 @@ function AdjustCoordinates(x, z)
 	return centerX, centerZ
 end
 
-function IntegrateMetal(x, z, radius)
-	local centerX, centerZ
-	
+function IntegrateMetalFromAdjusted(centerX, centerZ, radius)
 	radius = radius or MEX_RADIUS
-	
-	if (mexDefInfo.oddX) then
-		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		centerX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
-	
-	if (mexDefInfo.oddZ) then
-		centerZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
 	
 	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
 	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
@@ -236,7 +228,7 @@ function IntegrateMetal(x, z, radius)
 		end
 	end
 	
-	return result * mult, centerX, centerZ
+	return result * mult
 end
 
 ------------------------------------------------------------
@@ -254,7 +246,7 @@ local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
 			
 			spot.metal = spot.metal or softMetalOverride
 			if not spot.metal then
-				local metal, _, _ = IntegrateMetal(spot.x, spot.z)
+				local metal = IntegrateMetalFromAdjusted(spot.x, spot.z)
 				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			end
 			
