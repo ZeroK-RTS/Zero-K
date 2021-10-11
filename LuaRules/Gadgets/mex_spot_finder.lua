@@ -164,9 +164,6 @@ function gadget:Initialize()
 		while i <= #metalSpots do
 			local spot = metalSpots[i]
 			if spot.metal > MINIMUM_MEX_INCOME then
-				if metalValueOverride then
-					spot.metal = metalValueOverride
-				end
 				spot.metal = spot.metal*mult
 				i = i + 1
 			else
