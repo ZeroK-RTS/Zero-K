@@ -159,19 +159,6 @@ function gadget:Initialize()
 	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
 	
 	if metalSpots then
-		local mult = (modOptions and modOptions.metalmult) or 1
-		local i = 1
-		while i <= #metalSpots do
-			local spot = metalSpots[i]
-			if spot.metal > MINIMUM_MEX_INCOME then
-				spot.metal = spot.metal*mult
-				i = i + 1
-			else
-				metalSpots[i] = metalSpots[#metalSpots]
-				metalSpots[#metalSpots] = nil
-			end
-		end
-		
 		metalSpotsByPos = GetSpotsByPos(metalSpots)
 	end
 	
@@ -256,21 +243,35 @@ end
 -- Mex finding
 ------------------------------------------------------------
 local function SanitiseSpots(spots, metalValueOverride)
+	local mult = (modOptions and modOptions.metalmult) or 1
 	local i = 1
 	while i <= #spots do
 		local spot = spots[i]
+		local deleteSpot = false
 		if spot and spot.x and spot.z then
 			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
+			
 			spot.metal = spot.metal or metalValueOverride
 			if not spot.metal then
 				local metal, _, _ = IntegrateMetal(spot.x, spot.z)
 				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			end
-			i = i + 1
+			
+			if spot.metal > MINIMUM_MEX_INCOME then
+				spot.metal = spot.metal*mult
+			else
+				deleteSpot = true
+			end
 		else
+			deleteSpot = true
+		end
+
+		if deleteSpot then
 			spot[i] = spot[#spots]
 			spot[#spots] = nil
+		else
+			i = i + 1
 		end
 	end
 	
