@@ -188,8 +188,26 @@ function gadget:Initialize()
 end
 
 ------------------------------------------------------------
--- Extractor Income Processing
+-- Extractor Processing
 ------------------------------------------------------------
+
+function AdjustCoordinates(x, z)
+	local centerX, centerZ
+
+	if (mexDefInfo.oddX) then
+		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		centerX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	if (mexDefInfo.oddZ) then
+		centerZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	return centerX, centerZ
+end
 
 function IntegrateMetal(x, z, radius)
 	local centerX, centerZ
@@ -242,10 +260,13 @@ local function SanitiseSpots(spots, metalValueOverride)
 	while i <= #spots do
 		local spot = spots[i]
 		if spot and spot.x and spot.z then
-			local metal
-			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
+			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
-			spot.metal = spot.metal or metalValueOverride or (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			spot.metal = spot.metal or metalValueOverride
+			if not spot.metal then
+				local metal, _, _ = IntegrateMetal(spot.x, spot.z)
+				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			end
 			i = i + 1
 		else
 			spot[i] = spot[#spots]
