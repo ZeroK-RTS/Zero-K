@@ -308,6 +308,9 @@ function GetSpots(gameConfig, mapConfig)
 		if mapConfig.spots then
 			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
 			return spots, false
+		else
+			Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mapside mex config has no defined mexes. Aborting.")
+			Spring.SendCommands("quit","quitforce")
 		end
 	end
 	
