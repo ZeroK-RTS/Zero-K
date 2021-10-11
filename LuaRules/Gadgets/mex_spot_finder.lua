@@ -242,7 +242,7 @@ end
 ------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
-local function SanitiseSpots(spots, metalValueOverride)
+local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
 	local mult = (modOptions and modOptions.metalmult) or 1
 	local i = 1
 	while i <= #spots do
@@ -252,13 +252,16 @@ local function SanitiseSpots(spots, metalValueOverride)
 			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
 			
-			spot.metal = spot.metal or metalValueOverride
+			spot.metal = spot.metal or softMetalOverride
 			if not spot.metal then
 				local metal, _, _ = IntegrateMetal(spot.x, spot.z)
 				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			end
 			
 			if spot.metal > MINIMUM_MEX_INCOME then
+				if hardMetalOverride then
+					spot.metal = hardMetalOverride
+				end
 				spot.metal = spot.metal*mult
 			else
 				deleteSpot = true
@@ -303,7 +306,7 @@ function GetSpots(gameConfig, mapConfig)
 	if gameConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride)
+			spots = SanitiseSpots(gameConfig.spots, nil, gameConfig.metalValueOverride)
 			return spots, false
 		end
 	end
@@ -311,7 +314,7 @@ function GetSpots(gameConfig, mapConfig)
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		if mapConfig.spots then
-			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride)
+			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
 			return spots, false
 		end
 	end
