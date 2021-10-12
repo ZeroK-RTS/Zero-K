@@ -309,8 +309,7 @@ function GetSpots(gameConfig, mapConfig)
 			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
 			return spots, false
 		else
-			Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mapside mex config has no defined mexes. Aborting.")
-			Spring.SendCommands("quit","quitforce")
+			Spring.MarkerAddPoint(Game.mapSizeX / 2, 0, Game.mapSizeZ / 2, "Mapside mex config has no defined mex table")
 		end
 	end
 	
