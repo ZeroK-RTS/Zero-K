@@ -64,6 +64,7 @@ local commandDisplayConfig = {
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', tooltip = "Load: Pick up a unit. Click and drag to load unit in an area."},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', tooltip = "Unload: Set down a carried unit. Click and drag to unload in an area."},
 	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', tooltip = "Area Attack: Indiscriminately bomb the terrain in an area."},
+	[CMD_BUILD_PLATE] = {texture = imageDir .. 'Bold/buildplate.png', tooltip = "Build Plate: Place near a factory to build a construction plate."},
 
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
@@ -71,7 +72,6 @@ local commandDisplayConfig = {
 	[CMD_SMOOTH] = {texture = imageDir .. 'smooth.png'},
 	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
-	[CMD_BUILD_PLATE] = {texture = imageDir .. 'plate.png'},
 
 	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
 
