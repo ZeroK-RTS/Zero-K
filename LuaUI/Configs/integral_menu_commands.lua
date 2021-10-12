@@ -24,8 +24,6 @@ local cmdPosDef = {
 	[CMD_AREA_GUARD]    = {pos = 1, priority = 10},
 	[CMD.AREA_ATTACK]   = {pos = 1, priority = 11},
 	
-	--[CMD_PLATE]       = {pos = 7, priority = 12},
-	
 	[CMD_UPGRADE_UNIT]  = {pos = 7, priority = -8},
 	[CMD_UPGRADE_STOP]  = {pos = 7, priority = -7},
 	[CMD_MORPH]         = {pos = 7, priority = -6},
@@ -292,7 +290,7 @@ local factory_commands = {
 	factoryamph       = {order = 10, row = 2, col = 4},
 	factoryship       = {order = 11, row = 2, col = 5},
 	striderhub        = {order = 12, row = 2, col = 6},
-	[CMD_PLATE]       = {order = 13, row = 3, col = 1},
+	[CMD_BUILD_PLATE] = {order = 13, row = 3, col = 1},
 }
 
 local econ_commands = {

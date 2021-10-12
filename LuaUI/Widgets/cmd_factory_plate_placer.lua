@@ -4,7 +4,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Factory Plate Placer",
-		desc      = "Replaces factory placement with plates of the appropriate type, and integrates CMD PLATE behaviour",
+		desc      = "Replaces factory placement with plates of the appropriate type, and integrates CMD_BUILD_PLATE behaviour",
 		author    = "GoogleFrog/DavetheBrave",
 		date      = "23 September 2021",
 		license   = "GNU GPL, v2 or later",
@@ -114,6 +114,7 @@ local myAllyTeamID = Spring.GetMyAllyTeamID()
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local factories = IterableMap.New()
 
+local buildPlateCommand
 local buildFactoryDefID
 local buildPlateDefID
 local closestFactoryData
@@ -142,7 +143,7 @@ local function GetClosestFactory(x, z, unitDefID)
 					end
 				end
 		end
-	-- otherwise if using CMD_PLATE
+	-- otherwise if using CMD_BUILD_PLATE
 	else
 		for unitID, data in IterableMap.Iterator(factories) do
 			local dSq = DistSq(x, z, data.x, data.z)
@@ -254,17 +255,18 @@ local function MakePlateFromCMD()
 		Spring.SetActiveCommand(buildAction[plateDefID])
 		return factoryDefID, plateDefID
 	else
-		Spring.SetActiveCommand("plate")
+		Spring.SetActiveCommand("buildplate")
 		return
 	end
 end
 
 function widget:Update()
 	local _, cmdID = spGetActiveCommand()
+	buildPlateCommand = cmdID and ((CMD_BUILD_PLATE == cmdID) or (cmdPlateDefID))
 	if cmdID then
 		local unitDefID = -cmdID
 		-- check for cmd plate first, otherwise do previous behaviour
-		if CMD_PLATE == cmdID then
+		if CMD_BUILD_PLATE == cmdID then
 			cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
 			return
 		elseif cmdPlateDefID then
@@ -406,7 +408,7 @@ local function DrawFactoryLine(x, y, z, drawDef)
 		return
 	end
 
-	local mx, mz = GetMousePos(not floatOnWater[lineFactoryDefID])
+	local mx, mz = GetMousePos(not ((not buildPlateCommand) and floatOnWater[buildFactoryDefID]))
 	if not mx then
 		return
 	end
@@ -430,23 +432,29 @@ local function DrawFactoryLine(x, y, z, drawDef)
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
-	if not buildFactoryDefID then
+	if not (buildFactoryDefID or buildPlateCommand) then
 		return
 	end
-	local mx, mz = GetMousePos(not floatOnWater[buildFactoryDefID])
+	local mx, mz = GetMousePos(not ((not buildPlateCommand) and floatOnWater[buildFactoryDefID]))
 	if not mx then
 		return
 	end
-	mx, mz = SnapBuildToGrid(mx, mz, buildPlateDefID)
+	if not buildPlateCommand then
+		mx, mz = SnapBuildToGrid(mx, mz, buildPlateDefID)
+	end
+	
+	glTranslate(0,minimapY,0)
+	glScale(minimapX/mapX, -minimapY/mapZ, 1)
 	
 	local drawn = false
 	for unitID, data in IterableMap.Iterator(factories) do
-		if data.unitDefID == buildFactoryDefID then
+		if buildPlateCommand or data.unitDefID == buildFactoryDefID then
 			drawn = true
 			local drawDef = GetDrawDef(mx, mz, data)
-			
-			glTranslate(0,minimapY,0)
-			glScale(minimapX/mapX, -minimapY/mapZ, 1)
+			if buildPlateCommand and drawPlateDefID and data.unitDefID ~= drawFactoryDefID then
+				inRange = false
+				drawDef = outCircle
+			end
 			
 			glLineWidth(drawDef.miniWidth)
 			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
@@ -464,7 +472,6 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 end
 
 function widget:DrawWorld()
-
 	if cmdPlateDefID then
 		drawFactoryDefID = cmdFactoryDefID
 		drawPlateDefID = cmdPlateDefID
@@ -473,22 +480,28 @@ function widget:DrawWorld()
 		drawPlateDefID = buildPlateDefID
 	end
 	
-	if not drawFactoryDefID then
+	if not (drawFactoryDefID or buildPlateCommand) then
 		return
 	end
 	
-	local mx, mz = GetMousePos(not floatOnWater[drawFactoryDefID])
+	local mx, mz = GetMousePos(not ((not buildPlateCommand) and floatOnWater[buildFactoryDefID]))
 	if not mx then
 		return
 	end
-	mx, mz = SnapBuildToGrid(mx, mz, drawPlateDefID)
+	if not buildPlateCommand then
+		mx, mz = SnapBuildToGrid(mx, mz, drawPlateDefID)
+	end
 	
 	local drawn = false
 	local drawInRange = false
 	for unitID, data in IterableMap.Iterator(factories) do
-		if data.unitDefID == drawFactoryDefID then
+		if buildPlateCommand or data.unitDefID == drawFactoryDefID then
 			drawn = true
 			local drawDef, inRange = GetDrawDef(mx, mz, data)
+			if buildPlateCommand and drawPlateDefID and data.unitDefID ~= drawFactoryDefID then
+				inRange = false
+				drawDef = outCircle
+			end
 			drawInRange = drawInRange or inRange
 			
 			gl.DepthTest(false)

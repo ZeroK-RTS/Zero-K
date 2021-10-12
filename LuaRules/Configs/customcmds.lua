@@ -43,6 +43,7 @@ return {
 	STOP_PRODUCTION = 13954,
 	SELECTION_RANK = 13987,
 	SELECT_MISSILES = 14001,
+	BUILD_PLATE = 39802,
 
 	AREA_MEX = 30100,
 	AREA_TERRA_MEX = 30101,
@@ -108,9 +109,6 @@ return {
 	RESTORE = 39739,
 	BUMPY = 39740,
 	TERRAFORM_INTERNAL = 39801,
-
-	-- build plate
-	PLATE = 39802,
 
 	--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
 	     See the bigass chunk of text at the top of the file. ]]
