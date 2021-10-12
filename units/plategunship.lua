@@ -41,6 +41,7 @@ return { plategunship = {
   customParams                  = {
     aimposoffset       = [[0 10 0]],
     landflystate       = [[0]],
+    factory_land_state = 0,
     sortName           = [[3]],
     modelradius        = [[43]],
     nongroundfac       = [[1]],

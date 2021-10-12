@@ -39,6 +39,7 @@ return { plateplane = {
 
   customParams                  = {
     landflystate       = [[0]],
+    factory_land_state = 1,
     sortName           = [[4]],
     modelradius        = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
     midposoffset       = [[0 0 -16]],

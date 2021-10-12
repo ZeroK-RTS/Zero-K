@@ -89,6 +89,7 @@ local structureConfig = {
 		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
@@ -123,6 +124,7 @@ local structureConfig = {
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 

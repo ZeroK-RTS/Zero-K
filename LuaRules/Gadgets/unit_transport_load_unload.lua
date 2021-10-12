@@ -17,17 +17,19 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local airTransports = {
-	[UnitDefNames["gunshiptrans"].id] = true,
-	[UnitDefNames["gunshipheavytrans"].id] = true,
-}
 
+local airTransports = {}
 local lightTransport = {}
 local allowTransportCache = {}
-for unitDefID, _ in pairs(airTransports) do
-	if UnitDefs[unitDefID].customParams.islighttransport then
-		lightTransport[unitDefID] = true
-		allowTransportCache[unitDefID] = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if (ud.isTransport and ud.canFly) then
+		airTransports[unitDefID] = true
+
+		if ud.customParams.islighttransport then
+			lightTransport[unitDefID] = true
+			allowTransportCache[unitDefID] = {}
+		end
 	end
 end
 

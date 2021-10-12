@@ -24,6 +24,7 @@ return { cloaksnipe = {
     bait_level_default = 1,
     modelradius    = [[15]],
     dontfireatradarcommand = '0',
+    no_decloak_on_weapon_fire = 1,
   },
 
   decloakOnFire          = false,

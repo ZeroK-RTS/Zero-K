@@ -38,6 +38,7 @@ return { factoryplane = {
     ploppable = 1,
     pad_count = 1,
     landflystate   = [[0]],
+    factory_land_state = 1,
     sortName = [[4]],
     modelradius    = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
     aimposoffset   = [[0 23 -25]],
