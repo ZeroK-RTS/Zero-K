@@ -423,7 +423,7 @@ for i = 1, 5 do
 end
 
 local factoryButtonLayoutOverride = {
-	{
+	[4] = {
 		[3] = {
 			buttonLayoutConfig = buttonLayoutConfig.command,
 			isStructure = false,

@@ -290,7 +290,7 @@ local factory_commands = {
 	factoryamph       = {order = 10, row = 2, col = 4},
 	factoryship       = {order = 11, row = 2, col = 5},
 	striderhub        = {order = 12, row = 2, col = 6},
-	[CMD_BUILD_PLATE] = {order = 13, row = 3, col = 1},
+	[CMD_BUILD_PLATE] = {order = 13, row = 3, col = 4},
 }
 
 local econ_commands = {
