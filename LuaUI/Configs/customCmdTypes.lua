@@ -90,6 +90,9 @@ local custom_cmd_actions = {
 	restoreground = {cmdType = 1, name = "Terraform Restore"},
 	--terraform_internal = {cmdType = 1, name = "--terraform_internal"},
 
+	--build a "generic" plate from build factory menu
+	plate = {cmdType = 1, name = "plate"}, 
+	
 	resetfire = {cmdType = 3, name = "Reset Fire"},
 	resetmove = {cmdType = 3, name = "Reset Move"},
 
@@ -163,6 +166,7 @@ local usedActions = {
 	["raiseground"] = true,
 	["smoothground"] = true,
 	["restoreground"] = true,
+	["buildplate"] = true,
 	["jump"] = true,
 	["idlemode"] = true,
 	["areaattack"] = true,

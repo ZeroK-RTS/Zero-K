@@ -4,9 +4,9 @@
 function widget:GetInfo()
 	return {
 		name      = "Factory Plate Placer",
-		desc      = "Replaces factory placement with plates of the appropriate type.",
-		author    = "GoogleFrog",
-		date      = "20 July 2019",
+		desc      = "Replaces factory placement with plates of the appropriate type, and integrates CMD PLATE behaviour",
+		author    = "GoogleFrog/DavetheBrave",
+		date      = "23 September 2021",
 		license   = "GNU GPL, v2 or later",
 		layer     = -1,
 		enabled   = true,
@@ -19,11 +19,13 @@ end
 
 include("keysym.lua")
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
+include("LuaRules/Configs/customcmds.h.lua")
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay
 local spGetMouseState    = Spring.GetMouseState
 local spGetGroundHeight  = Spring.GetGroundHeight
+local spGetUnitDefID     = Spring.GetUnitDefID
 
 local floor = math.floor
 local mapX = Game.mapSizeX
@@ -112,10 +114,12 @@ local myAllyTeamID = Spring.GetMyAllyTeamID()
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local factories = IterableMap.New()
 
-local currentFactoryDefID
-local currentPlateDefID
+local buildFactoryDefID
+local buildPlateDefID
 local closestFactoryData
 local activeCmdOverride
+local cmdFactoryDefID
+local cmdPlateDefID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -126,8 +130,21 @@ end
 
 local function GetClosestFactory(x, z, unitDefID)
 	local nearID, nearDistSq, nearData
-	for unitID, data in IterableMap.Iterator(factories) do
-		if data.unitDefID == unitDefID then
+	-- if building a specific factory
+	if unitDefID then
+		for unitID, data in IterableMap.Iterator(factories) do
+			if data.unitDefID == unitDefID then
+				local dSq = DistSq(x, z, data.x, data.z)
+				if (not nearDistSq) or (dSq < nearDistSq) then
+					nearID = unitID
+					nearDistSq = dSq
+					nearData = data
+					end
+				end
+		end
+	-- otherwise if using CMD_PLATE
+	else
+		for unitID, data in IterableMap.Iterator(factories) do
 			local dSq = DistSq(x, z, data.x, data.z)
 			if (not nearDistSq) or (dSq < nearDistSq) then
 				nearID = unitID
@@ -176,7 +193,7 @@ local function CheckTransformPlateIntoFactory(plateDefID)
 	if not unitID then
 		return
 	end
-	
+
 	closestFactoryData = factoryData
 	if distSq >= FACTORY_RANGE_SQ then
 		Spring.SetActiveCommand(buildAction[factoryDefID])
@@ -204,43 +221,87 @@ local function CheckTransformFactoryIntoPlate(factoryDefID)
 	end
 	
 	closestFactoryData = factoryData
+	if distSq < FACTORY_RANGE_SQ and plateDefID then
+		Spring.SetActiveCommand(buildAction[plateDefID])
+		return true
+	end
+	return
+end
+
+local function MakePlateFromCMD()
+	local mx, mz = GetMousePos()
+	if not mx then
+		return
+	end
+
+	local unitID, distSq, factoryData = GetClosestFactory(mx, mz)
+	if not unitID then
+		return
+	end
+
+	local factoryDefID = spGetUnitDefID(unitID)
+	local plateDefID = parentOfPlate[factoryDefID]
+
+	mx, mz = SnapBuildToGrid(mx, mz, plateDefID) -- Make sure the plate is in range when it is placed
+	-- Plates could be disabled by modoptions or otherwise unavailable.
+	local cmdDescID = Spring.GetCmdDescIndex(-plateDefID)
+	if not cmdDescID then
+		return
+	end
+
+	closestFactoryData = factoryData
 	if distSq < FACTORY_RANGE_SQ then
 		Spring.SetActiveCommand(buildAction[plateDefID])
+		return factoryDefID, plateDefID
+	else
+		Spring.SetActiveCommand("plate")
+		return
 	end
-	return true
 end
 
 function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	if cmdID then
 		local unitDefID = -cmdID
-		if activeCmdOverride then
-			if (unitDefID == currentFactoryDefID or unitDefID == currentPlateDefID) then
+		-- check for cmd plate first, otherwise do previous behaviour
+		if CMD_PLATE == cmdID then
+			cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+			return
+		elseif cmdPlateDefID then
+			if unitDefID == cmdPlateDefID then
+				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+			end
+			return
+		else 
+			if activeCmdOverride then
+				if (unitDefID == buildFactoryDefID or unitDefID == buildPlateDefID) then
+					return
+				end
+				activeCmdOverride = nil
+			end
+			if parentOfPlate[unitDefID] then
+				buildFactoryDefID = unitDefID
+				buildPlateDefID = parentOfPlate[unitDefID]
+				if not CheckTransformFactoryIntoPlate(unitDefID) then
+					closestFactoryData = nil
+				end
 				return
 			end
-			activeCmdOverride = nil
-		end
-		if parentOfPlate[unitDefID] then
-			currentFactoryDefID = unitDefID
-			currentPlateDefID = parentOfPlate[unitDefID]
-			if not CheckTransformFactoryIntoPlate(unitDefID) then
-				closestFactoryData = false
+			if childOfFactory[unitDefID] then
+				buildFactoryDefID = childOfFactory[unitDefID]
+				buildPlateDefID = unitDefID
+				if not CheckTransformPlateIntoFactory(unitDefID) then
+					closestFactoryData = nil
+				end
+				return
 			end
-			return
-		end
-		if childOfFactory[unitDefID] then
-			currentFactoryDefID = childOfFactory[unitDefID]
-			currentPlateDefID = unitDefID
-			if not CheckTransformPlateIntoFactory(unitDefID) then
-				closestFactoryData = false
-			end
-			return
 		end
 	end
-	
-	if currentFactoryDefID then
-		currentFactoryDefID = nil
-		currentPlateDefID = nil
+	if buildFactoryDefID or cmdFactoryDefID then
+		cmdFactoryDefID = nil
+		cmdPlateDefID = nil
+		buildFactoryDefID = nil
+		buildPlateDefID = nil
 		closestFactoryData = nil
 	end
 end
@@ -252,7 +313,7 @@ function widget:KeyPress(key, mods, isRepeat, label, unicode)
 	if isRepeat then
 		return
 	end
-	if not (currentFactoryDefID and currentPlateDefID) then
+	if not (buildFactoryDefID and buildPlateDefID) then
 		return
 	end
 	if not (options.ctrl_toggle.value and (key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL)) then
@@ -262,10 +323,10 @@ function widget:KeyPress(key, mods, isRepeat, label, unicode)
 	activeCmdOverride = true
 	local _, cmdID = spGetActiveCommand()
 	local unitDefID = -cmdID
-	if unitDefID == currentFactoryDefID then
-		Spring.SetActiveCommand(buildAction[currentPlateDefID])
+	if unitDefID == buildFactoryDefID then
+		Spring.SetActiveCommand(buildAction[buildPlateDefID])
 	else
-		Spring.SetActiveCommand(buildAction[currentFactoryDefID])
+		Spring.SetActiveCommand(buildAction[buildFactoryDefID])
 	end
 	return true
 end
@@ -337,13 +398,21 @@ local function GetDrawDef(mx, mz, data)
 end
 
 local function DrawFactoryLine(x, y, z, drawDef)
-	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
+	if cmdFactoryDefID then
+		local lineFactoryDefID = cmdFactoryDefID
+	elseif buildFactoryDefID then
+		local lineFactoryDefID = buildFactoryDefID
+	else
+		return
+	end
+
+	local mx, mz = GetMousePos(not floatOnWater[lineFactoryDefID])
 	if not mx then
 		return
 	end
 	
 	local _, cmdID = spGetActiveCommand()
-	if not (cmdID and oddX[-cmdID]) then
+	if not (cmdID and (oddX[-cmdID])) then
 		return
 	end
 	
@@ -361,18 +430,18 @@ local function DrawFactoryLine(x, y, z, drawDef)
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
-	if not currentFactoryDefID then
+	if not buildFactoryDefID then
 		return
 	end
-	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
+	local mx, mz = GetMousePos(not floatOnWater[buildFactoryDefID])
 	if not mx then
 		return
 	end
-	mx, mz = SnapBuildToGrid(mx, mz, currentPlateDefID)
+	mx, mz = SnapBuildToGrid(mx, mz, buildPlateDefID)
 	
 	local drawn = false
 	for unitID, data in IterableMap.Iterator(factories) do
-		if data.unitDefID == currentFactoryDefID then
+		if data.unitDefID == buildFactoryDefID then
 			drawn = true
 			local drawDef = GetDrawDef(mx, mz, data)
 			
@@ -395,19 +464,29 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 end
 
 function widget:DrawWorld()
-	if not currentFactoryDefID then
+
+	if cmdPlateDefID then
+		drawFactoryDefID = cmdFactoryDefID
+		drawPlateDefID = cmdPlateDefID
+	else
+		drawFactoryDefID = buildFactoryDefID
+		drawPlateDefID = buildPlateDefID
+	end
+	
+	if not drawFactoryDefID then
 		return
 	end
-	local mx, mz = GetMousePos(not floatOnWater[currentFactoryDefID])
+	
+	local mx, mz = GetMousePos(not floatOnWater[drawFactoryDefID])
 	if not mx then
 		return
 	end
-	mx, mz = SnapBuildToGrid(mx, mz, currentPlateDefID)
+	mx, mz = SnapBuildToGrid(mx, mz, drawPlateDefID)
 	
 	local drawn = false
 	local drawInRange = false
 	for unitID, data in IterableMap.Iterator(factories) do
-		if data.unitDefID == currentFactoryDefID then
+		if data.unitDefID == drawFactoryDefID then
 			drawn = true
 			local drawDef, inRange = GetDrawDef(mx, mz, data)
 			drawInRange = drawInRange or inRange

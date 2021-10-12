@@ -71,6 +71,7 @@ local commandDisplayConfig = {
 	[CMD_SMOOTH] = {texture = imageDir .. 'smooth.png'},
 	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
+	[CMD_PLATE] = {texture = imageDir .. 'plate.png'},
 
 	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
 
@@ -421,12 +422,21 @@ for i = 1, 5 do
 	}
 end
 
+local factoryButtonLayoutOverride = {
+	{
+		[3] = {
+			buttonLayoutConfig = buttonLayoutConfig.command,
+			isStructure = false,
+		}
+	}
+}
+
 local commandPanels = {
 	{
 		humanName = "Orders",
 		name = "orders",
 		inclusionFunction = function(cmdID)
-			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
+			return cmdID >= 0 and not buildCmdFactory[cmdID] and not buildCmdSpecial[cmdID]-- Terraform and Plate
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -484,10 +494,12 @@ local commandPanels = {
 		end,
 		isBuild = true,
 		isStructure = true,
+		notBuildRow = 3,
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_factory",
 		buttonLayoutConfig = buttonLayoutConfig.build,
+		buttonLayoutOverride = factoryButtonLayoutOverride,
 	},
 	{
 		humanName = "Units",
