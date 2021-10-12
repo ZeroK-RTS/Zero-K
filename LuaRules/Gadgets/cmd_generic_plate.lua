@@ -23,7 +23,8 @@ if gadgetHandler:IsSyncedCode() then
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spGetUnitDefID		= Spring.GetUnitDefID
-local defIDCache = {}
+local plateBuilder = {}
+local plateParent = {}
 
 local plateCmdDesc = {
 	id      = CMD_PLATE,
@@ -31,37 +32,31 @@ local plateCmdDesc = {
 	name    = 'plate',
 	cursor  = 'Plate',
 	action  = 'plate',
-	tooltip = 'Build a Plate of a nearby factory',
+	tooltip = 'Build Plate: Move cursor near factory to build matching plate'
 }
 
-function addToSet(set, key)
-    set[key] = true
-end
-
-function setContains(set, key)
-    return set[key] ~= nil
-end
-
 local function CanBuildFactoryPlate(unitDefID)
-	if not (setContains(defIDCache, {unitDefID, true}) or setContains(defIDCache, {unitDefID, false})) then
+	if not plateBuilder[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		local bo = ud.buildOptions
-			for i = 1, #bo do
-				local cp = UnitDefs[bo[i]].customParams
+		plateBuilder[unitDefID] = 0
+		for i = 1, #bo do
+			local boDefID = bo[i]
+			if not plateParent[boDefID] then
+				local cp = UnitDefs[boDefID].customParams
 				if cp.parent_of_plate then
-					addToSet(defIDCache, {unitDefID, true})
-					return true
+					plateParent[boDefID] = 1
+					plateBuilder[unitDefID] = 1
+				else
+					plateParent[boDefID] = 0
 				end
 			end
-		addToSet(defIDCache, {unitDefID, false})
-		return false
-	else
-		if setContains(defIDCache, {unitDefID, true}) then
-			return true
-		else
-			return false
+			if plateParent[boDefID] == 1 then
+				plateBuilder[unitDefID] = 1
+			end
 		end
 	end
+	return (plateBuilder[unitDefID] == 1)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
