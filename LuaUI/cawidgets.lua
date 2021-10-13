@@ -183,6 +183,7 @@ local flexCallIns = {
 	'UnitFromFactory',
 	'UnitDestroyed',
 	'UnitDestroyedByTeam',
+	'RenderUnitDestroyed',
 	'UnitExperience',
 	'UnitTaken',
 	'UnitGiven',
@@ -2205,6 +2206,13 @@ function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID
 		w:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID, attackerDefID, attackerTeam)
 	end
 	return
+end
+
+
+function widgetHandler:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
+	for _, w in r_ipairs(self.RenderUnitDestroyedList) do
+		w:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
+	end
 end
 
 
