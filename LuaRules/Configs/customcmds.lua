@@ -6,14 +6,6 @@
      who might want to use your code (with your own file it will be
      obvious where the extra commands are coming from). ]]
 
---[[ WARNING!! Only BASE VANILLA ZK commands belong here!
-     If you are a modder adding custom commands, MAKE YOUR OWN FILE.
-     By overriding this file you're SETTING YOURSELF UP FOR FAILURE
-     when ZK adds something to this file (your override won't have
-     the new addition) and making things confusing for other modders
-     who might want to use your code (with your own file it will be
-     obvious where the extra commands are coming from). ]]
-
 -- if you add a command, please order it by ID!
 return {
 	RETREAT_ZONE = 10001,
