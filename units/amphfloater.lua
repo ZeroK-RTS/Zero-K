@@ -77,7 +77,7 @@ return { amphfloater = {
       name                    = [[Disruption Cannon]],
       accuracy                = 200,
       areaOfEffect            = 32,
-      cegTag                  = [[beamweapon_muzzle_purple]],
+      cegTag                  = [[disruptertrail]],
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -85,7 +85,7 @@ return { amphfloater = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 1.667,
-        
+
         light_camera_height = 2500,
         light_color = [[1.36 0.68 1.5]],
         light_radius = 180,
@@ -128,7 +128,7 @@ return { amphfloater = {
         timeslow_damagefactor = 1.7,
         bogus = 1,
       },
-  
+
       damage                  = {
         default = 150,
       },
