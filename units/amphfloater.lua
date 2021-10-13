@@ -45,6 +45,7 @@ return { amphfloater = {
   sfxtypes               = {
     explosiongenerators = {
         [[custom:bubbles_small]],
+        [[custom:disrupter_cannon_muzzle]],
     },
   },
 

@@ -1,9 +1,32 @@
 -- vulcanfx
 
 return {
-  ["disruptertrail"] = {
-    alwaysvisible         = false,
-    usedefaultexplosions = false,
+	["disrupter_cannon_muzzle"] = {
+		alwaysvisible         = false,
+		usedefaultexplosions = false,
+		shaft = {
+			air                = true,
+			class              = [[CBitmapMuzzleFlame]],
+			count              = 1,
+			ground             = true,
+			underwater         = 1,
+			water              = true,
+			properties = {
+				colormap           = [[0.9 0.7 0.9 0.01 0.5 0.1 0.8 0.01 0 0 0 0.01]],
+				dir                = [[dir]],
+				frontoffset        = 0,
+				fronttexture       = [[muzzlefront]],
+				length             = 24,
+				sidetexture        = [[muzzleside]],
+				size               = 16,
+				sizegrowth         = -0.5,
+				ttl                = 16,
+			},
+		},
+	},
+	["disruptertrail"] = {
+	alwaysvisible         = false,
+	usedefaultexplosions = false,
 	head = {
 	  air                = true,
 	  class              = [[heatcloud]],
@@ -42,7 +65,7 @@ return {
 		sizegrowth         = -0.3,
 		ttl                = 8,
 	  },
-    },
+	},
 	sparks = {
 	  class              = [[CSimpleParticleSystem]],
 	  count              = 1,
@@ -72,6 +95,6 @@ return {
 		  texture            = [[pinknovaexplo]],
 	  },
 	},
-  }
+	}
 }
 

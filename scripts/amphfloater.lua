@@ -122,11 +122,11 @@ end
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	
+
 	Turn(base, x_axis, 0, math.rad(20))
 	Turn(base, z_axis, 0, math.rad(20))
 	Move(base, y_axis, 0, 10)
-	
+
 	while true do
 		--left leg up, right leg back
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
@@ -135,7 +135,7 @@ local function Walk()
 		Turn(rshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		WaitForTurn(lthigh, x_axis)
 		Sleep(0)
-		
+
 		--right leg up, left leg back
 		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
@@ -156,26 +156,26 @@ end
 local function Unpack()
 	Signal(SIG_UNPACK)
 	SetSignalMask(SIG_UNPACK)
-	
+
 	Sleep(UNPACK_TIME)
 end
 
 local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	
+
 	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
 	Turn(rshin, x_axis, 0, math.rad(120)*PACE)
 	Turn(rfoot, x_axis, 0, math.rad(80)*PACE)
 	Turn(lthigh, x_axis, 0, math.rad(80)*PACE)
 	Turn(lshin, x_axis, 0, math.rad(80)*PACE)
 	Turn(lfoot, x_axis, 0, math.rad(80)*PACE)
-	
+
 	--Move(lthigh, y_axis, 4, 12)
 	--Move(rthigh, y_axis, 4, 12)
-	
+
 	GG.Floating_StopMoving(unitID)
-	
+
 	StartThread(Unpack)
 end
 
@@ -220,14 +220,14 @@ end
 function script.AimFromWeapon()
 	--Spring.Echo(Spring.GetUnitWeaponState(unitID, 1, "projectileSpeed"))
 	--Spring.Echo(PROJECTILE_SPEED)
-	
+
 	local height = select(2, Spring.GetUnitBasePosition(unitID))
 	if height < -130 then
 		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = 200})
 	else
 		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = PROJECTILE_SPEED})
 	end
-	
+
 	return barrel
 end
 
@@ -257,6 +257,10 @@ function script.BlockShot(num, targetID)
 		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 35 * distMult, false, false, true)
 	end
 	return false
+end
+
+function script.FireWeapon(num)
+	EmitSfx(firepoint, 1025)
 end
 
 function script.Killed(recentDamage, maxHealth)
