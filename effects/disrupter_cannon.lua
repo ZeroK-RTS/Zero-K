@@ -35,11 +35,11 @@ return {
 			unit = 1,
 			properties = {
 				alwaysvisible = false,
-				heat = [[100]],
+				heat = 100,
 				heatfalloff = 15,
 				maxheat = 100,
 				pos = [[0 0 0]],
-				size = [[10]],
+				size = 10,
 				sizegrowth = -2.5,
 				speed = [[0 0 0]],
 				texture = [[pinknovaexplo]],
