@@ -244,30 +244,8 @@ local function MakeString(group)
 	end
 end
 
-local function GetSpots(gameConfig, mapConfig)
+local function SearchForSpots(spotValueOverride)
 	local spots = {}
-	local spotValueOverride = false
-	
-	-- Check configs
-	if gameConfig then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
-		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride, true)
-			return spots, false
-		elseif gameConfig.metalValueOverride then
-			spotValueOverride = gameConfig.metalValueOverride
-		end
-	end
-	
-	if mapConfig then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
-		if mapConfig.spots then
-			spots = SanitiseSpots(mapConfig.spots, spotValueOverride or mapConfig.metalValueOverride, spotValueOverride or false)
-			return spots, false
-		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
-			spotValueOverride = mapConfig.metalValueOverride
-		end
-	end
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
 
@@ -414,7 +392,7 @@ local function GetSpots(gameConfig, mapConfig)
 		end
 	end
 	
-	return spots, true
+	return spots
 end
 
 local function DoMetalMult(spots)
@@ -424,6 +402,34 @@ local function DoMetalMult(spots)
 		spot.metal = spot.metal * metalMult
 	end
 	return spots
+end
+
+local function GetSpots(gameConfig, mapConfig)
+	local spotValueOverride = false
+	
+	-- Check configs
+	if gameConfig then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
+		if gameConfig.spots then
+			local spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride, true)
+			return DoMetalMult(spots), false
+		elseif gameConfig.metalValueOverride then
+			spotValueOverride = gameConfig.metalValueOverride
+		end
+	end
+	
+	if mapConfig then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
+		if mapConfig.spots then
+			local spots = SanitiseSpots(mapConfig.spots, spotValueOverride or mapConfig.metalValueOverride, spotValueOverride or false)
+			return DoMetalMult(spots), false
+		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
+			spotValueOverride = mapConfig.metalValueOverride
+		end
+	end
+	
+	local spots = SearchForSpots(spotValueOverride)
+	return DoMetalMult(spots), true
 end
 
 ------------------------------------------------------------
@@ -436,9 +442,6 @@ function gadget:Initialize()
 	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
 	
 	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
-	if metalSpots then
-		metalSpots = DoMetalMult(metalSpots)
-	end
 	local metalSpotsByPos = false
 	
 	if fromEngineMetalmap and #metalSpots < 6 then
