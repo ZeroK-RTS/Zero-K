@@ -234,43 +234,33 @@ end
 -- Mex finding
 ------------------------------------------------------------
 
-local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
+local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
 	local mult = (modOptions and modOptions.metalmult) or 1
+	local retSpots = {}
 	local i = 1
 	while i <= #spots do
 		local spot = spots[i]
-		local deleteSpot = false
 		if spot and spot.x and spot.z then
 			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
 			
-			spot.metal = spot.metal or softMetalOverride
+			if metalOverride and (overrideDefinedMexes or not spot.metal) then
+				spot.metal = metalOverride
+			end
+			
 			if not spot.metal then
 				local metal = IntegrateMetalFromAdjusted(spot.x, spot.z)
 				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			end
 			
 			if spot.metal > MINIMUM_MEX_INCOME then
-				if hardMetalOverride then
-					spot.metal = hardMetalOverride
-				end
 				spot.metal = spot.metal*mult
-			else
-				deleteSpot = true
+				retSpots[#retSpots + 1] = spot
 			end
-		else
-			deleteSpot = true
-		end
-
-		if deleteSpot then
-			spot[i] = spot[#spots]
-			spot[#spots] = nil
-		else
-			i = i + 1
 		end
 	end
 	
-	return spots
+	return retSpots
 end
 
 local function MakeString(group)
@@ -292,23 +282,26 @@ end
 
 function GetSpots(gameConfig, mapConfig)
 	local spots = {}
+	local spotValueOverride = false
 
 	-- Check configs
 	if gameConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots, nil, gameConfig.metalValueOverride)
+			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride, true)
 			return spots, false
+		elseif gameConfig.metalValueOverride then
+			spotValueOverride = gameConfig.metalValueOverride
 		end
 	end
 	
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		if mapConfig.spots then
-			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
+			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, false)
 			return spots, false
-		else
-			Spring.MarkerAddPoint(Game.mapSizeX / 2, 0, Game.mapSizeZ / 2, "No 'spots' sub-table found in 'mapconfig/map_metal_layout.lua'.")
+		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
+			spotValueOverride = mapConfig.metalValueOverride
 		end
 	end
 	
@@ -438,7 +431,6 @@ function GetSpots(gameConfig, mapConfig)
 					spot.x = mx
 					spot.y = spGetGroundOrigHeight(mx, mx)
 					spot.z = mz
-					spot.metal = metal
 					merged = true
 					break
 				end
@@ -450,9 +442,16 @@ function GetSpots(gameConfig, mapConfig)
 		end
 	end
 	
-	--for i = 1, #spots do
-	--	Spring.MarkerAddPoint(spots[i].x,spots[i].y,spots[i].z,"")
-	--end
+	-- Apply metal mult and override
+	local metalMult = (modOptions and modOptions.metalmult) or 1
+	for i = 1, #spots do
+		local spot = spots[i]
+		if spotValueOverride then
+			spot.metal = spotValueOverride * metalMult
+		else
+			spot.metal = spot.metal * metalMult
+		end
+	end
 	
 	return spots, true
 end
