@@ -464,8 +464,8 @@ function widget:GameFrame(n)
 							--save exit coordinate:--
 							teleportedUnit[unitID] = { x = dx*50+ex ,y = ey, z = dz*50+ez } --(a coordinate of a command that we going to give)
 							--end fix
-							--method A: give GUARD order--
-							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, CMD.OPT_ALT},{CMD.INSERT, {1, CMD_RAW_MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, CMD.OPT_ALT}})
+							--method A: give WAIT_AT_BEACON order--
+							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD_WAIT_AT_BEACON, CMD.OPT_SHIFT, pathToFollow}, CMD.OPT_ALT},{CMD.INSERT, {1, CMD_RAW_MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, CMD.OPT_ALT}})
 							local defID = unitInfo["defID"]
 							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
