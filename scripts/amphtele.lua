@@ -67,7 +67,7 @@ local function Create_Beacon_Thread(x,z)
 		end
 	end
 
-	GG.tele_createBeacon(unitID,x,z)
+	GG.tele_createBeacon(unitID,unitDefID,x,z)
 	
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)
