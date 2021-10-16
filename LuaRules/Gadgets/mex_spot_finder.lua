@@ -17,7 +17,6 @@ end
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 
-
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -49,16 +48,16 @@ local spGetGroundInfo       = Spring.GetGroundInfo
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local spSetGameRulesParam   = Spring.SetGameRulesParam
 
-local extractorRadius = Game.extractorRadius
+local extractorRadius    = Game.extractorRadius
 local extractorRadiusSqr = extractorRadius * extractorRadius
  
-local buildmapSizeX = Game.mapSizeX - buildGridSize
-local buildmapSizeZ = Game.mapSizeZ - buildGridSize
+local buildmapSizeX  = Game.mapSizeX - buildGridSize
+local buildmapSizeZ  = Game.mapSizeZ - buildGridSize
 local buildmapStartX = buildGridSize
 local buildmapStartZ = buildGridSize
 
-local metalmapSizeX = Game.mapSizeX - 1.5 * gridSize
-local metalmapSizeZ = Game.mapSizeZ - 1.5 * gridSize
+local metalmapSizeX  = Game.mapSizeX - 1.5 * gridSize
+local metalmapSizeZ  = Game.mapSizeZ - 1.5 * gridSize
 local metalmapStartX = 1.5 * gridSize
 local metalmapStartZ = 1.5 * gridSize
 
@@ -70,15 +69,14 @@ local mexUnitDef = UnitDefNames["staticmex"]
 
 local mexDefInfo = {
 	extraction = 0.001,
-	oddX = mexUnitDef.xsize % 4 == 2,
-	oddZ = mexUnitDef.zsize % 4 == 2,
+	oddX = (mexUnitDef.xsize % 4 == 2),
+	oddZ = (mexUnitDef.zsize % 4 == 2),
 }
 
 local modOptions
 if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
+	modOptions = Spring.GetModOptions()
 end
-
 
 ------------------------------------------------------------
 -- Speedup
@@ -99,6 +97,7 @@ end
 ------------------------------------------------------------
 -- Set Game Rules so widgets can read metal spots
 ------------------------------------------------------------
+
 local function SetMexGameRulesParams(metalSpots, needMexDrawing)
 	if not metalSpots then -- Mexes can be built anywhere
 		spSetGameRulesParam("mex_count", -1)
@@ -141,8 +140,65 @@ local function SetMexHelperAttributes(metalSpots, needMexDrawing)
 end
 
 ------------------------------------------------------------
+-- Extractor Processing
+------------------------------------------------------------
+
+local function AdjustCoordinates(x, z)
+	local centerX, centerZ
+	if (mexDefInfo.oddX) then
+		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		centerX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	if (mexDefInfo.oddZ) then
+		centerZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	return centerX, centerZ
+end
+
+local function IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	radius = radius or MEX_RADIUS
+	
+	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
+	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
+	local endX = floor((centerX + radius) / METAL_MAP_SQUARE_SIZE)
+	local endZ = floor((centerZ + radius) / METAL_MAP_SQUARE_SIZE)
+	startX, startZ = max(startX, 0), max(startZ, 0)
+	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
+	
+	local mult = mexDefInfo.extraction
+	local result = 0
+
+	for i = startX, endX do
+		for j = startZ, endZ do
+			local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+			local dx, dz = cx - centerX, cz - centerZ
+			local dist = sqrt(dx * dx + dz * dz)
+
+			if (dist < radius) then
+				local _, metal = spGetGroundInfo(cx, cz)
+				result = result + (metal or 0)
+			end
+		end
+	end
+	
+	return result * mult
+end
+
+local function IntegrateMetal(x, z, radius)
+	local centerX, centerZ = AdjustCoordinates(x, z)
+	local metal = IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	return metal, centerX, centerZ
+end
+
+------------------------------------------------------------
 -- Callins
 ------------------------------------------------------------
+
 function gadget:Initialize()
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
 	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
@@ -175,65 +231,9 @@ function gadget:Initialize()
 end
 
 ------------------------------------------------------------
--- Extractor Processing
-------------------------------------------------------------
-
-function IntegrateMetal(x, z, radius)
-	local centerX, centerZ = AdjustCoordinates(x, z)
-	local metal = IntegrateMetalFromAdjusted(centerX, centerZ, radius)
-	return metal, centerX, centerZ
-end
-
-function AdjustCoordinates(x, z)
-	local centerX, centerZ
-
-	if (mexDefInfo.oddX) then
-		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		centerX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
-	
-	if (mexDefInfo.oddZ) then
-		centerZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
-	
-	return centerX, centerZ
-end
-
-function IntegrateMetalFromAdjusted(centerX, centerZ, radius)
-	radius = radius or MEX_RADIUS
-	
-	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
-	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
-	local endX = floor((centerX + radius) / METAL_MAP_SQUARE_SIZE)
-	local endZ = floor((centerZ + radius) / METAL_MAP_SQUARE_SIZE)
-	startX, startZ = max(startX, 0), max(startZ, 0)
-	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
-	
-	local mult = mexDefInfo.extraction
-	local result = 0
-
-	for i = startX, endX do
-		for j = startZ, endZ do
-			local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
-			local dx, dz = cx - centerX, cz - centerZ
-			local dist = sqrt(dx * dx + dz * dz)
-
-			if (dist < radius) then
-				local _, metal = spGetGroundInfo(cx, cz)
-				result = result + (metal or 0)
-			end
-		end
-	end
-	
-	return result * mult
-end
-
-------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
+
 local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
 	local mult = (modOptions and modOptions.metalmult) or 1
 	local i = 1
@@ -273,7 +273,7 @@ local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
 	return spots
 end
 
-local function makeString(group)
+local function MakeString(group)
 	if group then
 		local ret = ""
 		for i, v in pairs(group.left) do
@@ -291,7 +291,6 @@ local function makeString(group)
 end
 
 function GetSpots(gameConfig, mapConfig)
-	
 	local spots = {}
 
 	-- Check configs
@@ -309,7 +308,7 @@ function GetSpots(gameConfig, mapConfig)
 			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
 			return spots, false
 		else
-			Spring.MarkerAddPoint(Game.mapSizeX / 2, 0, Game.mapSizeZ / 2, "Mapside mex config has no defined mex table")
+			Spring.MarkerAddPoint(Game.mapSizeX / 2, 0, Game.mapSizeZ / 2, "No 'spots' sub-table found in 'mapconfig/map_metal_layout.lua'.")
 		end
 	end
 	
@@ -330,7 +329,6 @@ function GetSpots(gameConfig, mapConfig)
 	
 	-- Strip processing function (To avoid some code duplication)
 	local function DoStrip(x1, x2, z, worth)
-		
 		local assignedTo
 		
 		for i = aboveIdx, workingIdx - 1 do
@@ -351,7 +349,7 @@ function GetSpots(gameConfig, mapConfig)
 						end
 						assignedTo.maxZ = z
 						assignedTo.worth = assignedTo.worth + matchGroup.worth
-						uniqueGroups[makeString(matchGroup)] = nil
+						uniqueGroups[MakeString(matchGroup)] = nil
 					end
 				else
 					assignedTo = matchGroup
@@ -380,7 +378,7 @@ function GetSpots(gameConfig, mapConfig)
 					worth = worth
 				}
 			stripGroup[nStrips] = newGroup
-			uniqueGroups[makeString(newGroup)] = newGroup
+			uniqueGroups[MakeString(newGroup)] = newGroup
 		end
 	end
 	
@@ -460,7 +458,6 @@ function GetSpots(gameConfig, mapConfig)
 end
 
 function GetValidStrips(spot)
-	
 	local sMinZ, sMaxZ = spot.minZ, spot.maxZ
 	local sLeft, sRight = spot.left, spot.right
 	
