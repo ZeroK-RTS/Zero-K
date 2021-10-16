@@ -6,6 +6,7 @@ return { tele_beacon = {
   brakeRate                     = 0,
   buildCostMetal                = 100,
   builder                       = false,
+  buildPic                      = [[tele_beacon.png]],
   category                      = [[SINK UNARMED]],
 
   customParams                  = {
