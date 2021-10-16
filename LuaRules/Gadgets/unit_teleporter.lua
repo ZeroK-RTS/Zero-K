@@ -25,8 +25,20 @@ local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 local canTeleport = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.isFactory or not (ud.isImmobile or ud.isStrafingAirUnit) then
+	if not (ud.isImmobile or ud.isStrafingAirUnit) then
 		canTeleport[i] = true
+	elseif ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local buildOptions = ud.buildOptions
+
+		for j = 1, #buildOptions do
+			local boDefID = buildOptions[j]
+			local bod = UnitDefs[boDefID]
+
+			if bod and not (bod.isImmobile or bod.isStrafingAirUnit) then
+				canTeleport[i] = true  -- only factories that can build teleportable units are included
+				break
+			end
+		end
 	end
 end
 
