@@ -46,7 +46,19 @@ local groupBeaconFinish={}
 --end spread job stuff
 local IgnoreUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes (an Optimization)
 local teleportedUnit = {}
-local beaconDefID = UnitDefNames["tele_beacon"].id
+
+local isBeaconDef = {}
+
+for _, ud in pairs(UnitDefs) do
+	if (ud.customParams.teleporter and ud.customParams.teleporter_beacon_unit) then
+		local beaconDef = UnitDefNames[ ud.customParams.teleporter_beacon_unit ]
+
+		if (beaconDef) then
+			isBeaconDef[beaconDef.id] = true
+		end
+	end
+end
+
 --Network lag hax stuff: (wait until unit receive command before processing 2nd time)
 local waitForNetworkDelay = {}
 local issuedOrderTo = {}
@@ -65,7 +77,7 @@ function widget:Initialize()
 		local unitID = units[i]
 		if Spring.IsUnitAllied(unitID) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			if beaconDefID == unitDefID then
+			if isBeaconDef[unitDefID] then
 				local x,y,z = spGetUnitPosition(unitID)
 				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 			end
@@ -79,7 +91,7 @@ function widget:Initialize()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if beaconDefID == unitDefID then
+	if isBeaconDef[unitDefID] then
 		local x,y,z = spGetUnitPosition(unitID)
 		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
