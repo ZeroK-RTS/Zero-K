@@ -201,7 +201,6 @@ end
 ------------------------------------------------------------
 
 local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
-	local mult = (modOptions and modOptions.metalmult) or 1
 	local retSpots = {}
 	for i = 1, #spots do
 		local spot = spots[i]
@@ -219,7 +218,7 @@ local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
 			end
 			
 			if spot.metal > MINIMUM_MEX_INCOME then
-				spot.metal = spot.metal*mult
+				spot.metal = spot.metal
 				retSpots[#retSpots + 1] = spot
 			end
 		end
@@ -408,17 +407,23 @@ local function GetSpots(gameConfig, mapConfig)
 	end
 	
 	-- Apply metal mult and override
-	local metalMult = (modOptions and modOptions.metalmult) or 1
-	for i = 1, #spots do
-		local spot = spots[i]
-		if spotValueOverride then
-			spot.metal = spotValueOverride * metalMult
-		else
-			spot.metal = spot.metal * metalMult
+	if spotValueOverride then
+		for i = 1, #spots do
+			local spot = spots[i]
+			spot.metal = spotValueOverride
 		end
 	end
 	
 	return spots, true
+end
+
+local function DoMetalMult(spots)
+	local metalMult = (modOptions and modOptions.metalmult) or 1
+	for i = 1, #spots do
+		local spot = spots[i]
+		spot.metal = spot.metal * metalMult
+	end
+	return spots
 end
 
 ------------------------------------------------------------
@@ -431,6 +436,9 @@ function gadget:Initialize()
 	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
 	
 	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
+	if metalSpots then
+		metalSpots = DoMetalMult(metalSpots)
+	end
 	local metalSpotsByPos = false
 	
 	if fromEngineMetalmap and #metalSpots < 6 then
