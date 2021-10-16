@@ -248,7 +248,7 @@ end
 local function GetSpots(gameConfig, mapConfig)
 	local spots = {}
 	local spotValueOverride = false
-
+	
 	-- Check configs
 	if gameConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
@@ -263,7 +263,7 @@ local function GetSpots(gameConfig, mapConfig)
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		if mapConfig.spots then
-			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, false)
+			spots = SanitiseSpots(mapConfig.spots, spotValueOverride or mapConfig.metalValueOverride, spotValueOverride or false)
 			return spots, false
 		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
 			spotValueOverride = mapConfig.metalValueOverride
