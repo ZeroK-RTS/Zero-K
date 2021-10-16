@@ -25,7 +25,7 @@ local MAPSIDE_METALMAP = "mapconfig/map_metal_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
-local MINIMUN_MEX_INCOME = 0.2
+local MINIMUM_MEX_INCOME = 0.2
 
 local gridSize = 16 -- Resolution of metal map
 local buildGridSize = 8 -- Resolution of build positions
@@ -159,22 +159,6 @@ function gadget:Initialize()
 	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
 	
 	if metalSpots then
-		local mult = (modOptions and modOptions.metalmult) or 1
-		local i = 1
-		while i <= #metalSpots do
-			local spot = metalSpots[i]
-			if spot.metal > MINIMUN_MEX_INCOME then
-				if metalValueOverride then
-					spot.metal = metalValueOverride
-				end
-				spot.metal = spot.metal*mult
-				i = i + 1
-			else
-				metalSpots[i] = metalSpots[#metalSpots]
-				metalSpots[#metalSpots] = nil
-			end
-		end
-		
 		metalSpotsByPos = GetSpotsByPos(metalSpots)
 	end
 	
@@ -191,14 +175,18 @@ function gadget:Initialize()
 end
 
 ------------------------------------------------------------
--- Extractor Income Processing
+-- Extractor Processing
 ------------------------------------------------------------
 
 function IntegrateMetal(x, z, radius)
+	local centerX, centerZ = AdjustCoordinates(x, z)
+	local metal = IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	return metal, centerX, centerZ
+end
+
+function AdjustCoordinates(x, z)
 	local centerX, centerZ
-	
-	radius = radius or MEX_RADIUS
-	
+
 	if (mexDefInfo.oddX) then
 		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
 	else
@@ -210,6 +198,12 @@ function IntegrateMetal(x, z, radius)
 	else
 		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
+	
+	return centerX, centerZ
+end
+
+function IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	radius = radius or MEX_RADIUS
 	
 	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
 	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
@@ -234,25 +228,45 @@ function IntegrateMetal(x, z, radius)
 		end
 	end
 	
-	return result * mult, centerX, centerZ
+	return result * mult
 end
 
 ------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
-local function SanitiseSpots(spots, metalValueOverride)
+local function SanitiseSpots(spots, softMetalOverride, hardMetalOverride)
+	local mult = (modOptions and modOptions.metalmult) or 1
 	local i = 1
 	while i <= #spots do
 		local spot = spots[i]
+		local deleteSpot = false
 		if spot and spot.x and spot.z then
-			local metal
-			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
+			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
-			spot.metal = spot.metal or metalValueOverride or (metal > 0 and metal) or DEFAULT_MEX_INCOME
-			i = i + 1
+			
+			spot.metal = spot.metal or softMetalOverride
+			if not spot.metal then
+				local metal = IntegrateMetalFromAdjusted(spot.x, spot.z)
+				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			end
+			
+			if spot.metal > MINIMUM_MEX_INCOME then
+				if hardMetalOverride then
+					spot.metal = hardMetalOverride
+				end
+				spot.metal = spot.metal*mult
+			else
+				deleteSpot = true
+			end
 		else
+			deleteSpot = true
+		end
+
+		if deleteSpot then
 			spot[i] = spot[#spots]
 			spot[#spots] = nil
+		else
+			i = i + 1
 		end
 	end
 	
@@ -284,16 +298,19 @@ function GetSpots(gameConfig, mapConfig)
 	if gameConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride)
+			spots = SanitiseSpots(gameConfig.spots, nil, gameConfig.metalValueOverride)
 			return spots, false
 		end
 	end
 	
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
-		loadConfig = true
-		spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride)
-		return spots, false
+		if mapConfig.spots then
+			spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride, nil)
+			return spots, false
+		else
+			Spring.MarkerAddPoint(Game.mapSizeX / 2, 0, Game.mapSizeZ / 2, "Mapside mex config has no defined mex table")
+		end
 	end
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
