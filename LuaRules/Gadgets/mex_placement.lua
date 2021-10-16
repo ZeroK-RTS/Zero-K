@@ -142,7 +142,7 @@ end
 function gadget:Initialize()
 	metalSpots = GG.metalSpots
 	metalSpotsByPos = GG.metalSpotsByPos
-	GG.GetClosestMetalSpot = GetClosestMetalSpot
+
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_AREA_MEX)
 	gadgetHandler:RegisterCMDID(CMD_AREA_TERRA_MEX)
@@ -154,6 +154,8 @@ function gadget:Initialize()
 	end
 
 	if metalSpots then
+		GG.GetClosestMetalSpot = GetClosestMetalSpot
+
 		local scalingFactor = 2 * Game.squareSize
 		for i = 1, #metalSpots do
 			local spot = metalSpots[i]
