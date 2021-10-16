@@ -195,40 +195,6 @@ local function IntegrateMetal(x, z, radius)
 	return metal, centerX, centerZ
 end
 
-------------------------------------------------------------
--- Callins
-------------------------------------------------------------
-
-function gadget:Initialize()
-	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
-	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
-	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
-	
-	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
-	local metalSpotsByPos = false
-	
-	if fromEngineMetalmap and #metalSpots < 6 then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
-		metalSpots = false
-	end
-	
-	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
-	
-	if metalSpots then
-		metalSpotsByPos = GetSpotsByPos(metalSpots)
-	end
-	
-	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
-	SetMexGameRulesParams(metalSpots)
-	SetMexHelperAttributes(metalSpots, needMexDrawing)
-
-	GG.metalSpots = metalSpots
-	GG.metalSpotsByPos = metalSpotsByPos
-	
-	GG.IntegrateMetal = IntegrateMetal
-	
-	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Metal Spots found and GGed")
-end
 
 ------------------------------------------------------------
 -- Mex finding
@@ -237,11 +203,10 @@ end
 local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
 	local mult = (modOptions and modOptions.metalmult) or 1
 	local retSpots = {}
-	local i = 1
-	while i <= #spots do
+	for i = 1, #spots do
 		local spot = spots[i]
 		if spot and spot.x and spot.z then
-			spot.x, spot.z = AdjustCoordinates(spot.x, spotz)
+			spot.x, spot.z = AdjustCoordinates(spot.x, spot.z)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
 			
 			if metalOverride and (overrideDefinedMexes or not spot.metal) then
@@ -280,7 +245,7 @@ local function MakeString(group)
 	end
 end
 
-function GetSpots(gameConfig, mapConfig)
+local function GetSpots(gameConfig, mapConfig)
 	local spots = {}
 	local spotValueOverride = false
 
@@ -456,29 +421,39 @@ function GetSpots(gameConfig, mapConfig)
 	return spots, true
 end
 
-function GetValidStrips(spot)
-	local sMinZ, sMaxZ = spot.minZ, spot.maxZ
-	local sLeft, sRight = spot.left, spot.right
+------------------------------------------------------------
+-- Callins
+------------------------------------------------------------
+
+function gadget:Initialize()
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
+	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
+	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
 	
-	local validLeft = {}
-	local validRight = {}
+	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
+	local metalSpotsByPos = false
 	
-	local maxZOffset = buildGridSize * ceil(extractorRadius / buildGridSize - 1)
-	for mz = max(sMaxZ - maxZOffset, buildmapStartZ), min(sMinZ + maxZOffset, buildmapSizeZ), buildGridSize do
-		local vLeft, vRight = buildmapStartX, buildmapSizeX
-		for sz = sMinZ, sMaxZ, gridSize do
-			local dz = sz - mz
-			local maxXOffset = buildGridSize * ceil(sqrt(extractorRadiusSqr - dz * dz) / buildGridSize - 1) -- Test for metal being included is dist < extractorRadius
-			local left, right = sRight[sz] - maxXOffset, sLeft[sz] + maxXOffset
-			if left  > vLeft  then vLeft  = left  end
-			if right < vRight then vRight = right end
-		end
-		validLeft[mz] = vLeft
-		validRight[mz] = vRight
+	if fromEngineMetalmap and #metalSpots < 6 then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
+		metalSpots = false
 	end
 	
-	spot.validLeft = validLeft
-	spot.validRight = validRight
+	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
+	
+	if metalSpots then
+		metalSpotsByPos = GetSpotsByPos(metalSpots)
+	end
+	
+	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
+	SetMexGameRulesParams(metalSpots)
+	SetMexHelperAttributes(metalSpots, needMexDrawing)
+
+	GG.metalSpots = metalSpots
+	GG.metalSpotsByPos = metalSpotsByPos
+	
+	GG.IntegrateMetal = IntegrateMetal
+	
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Metal Spots found and GGed")
 end
 
 --------------------------------------------------------------------------------
@@ -518,7 +493,6 @@ function GetMexSpotsFromGameRules()
 	end
 	
 	local metalSpots = {}
-	
 	for i = 1, mexCount do
 		metalSpots[i] = {
 			x = spGetGameRulesParam("mex_x" .. i),
