@@ -269,8 +269,8 @@ end
 function script.FireWeapon(num)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
-	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
+	EmitSfx(flareMap[shootCycle], 1025)
 end
 
 function script.Killed(recentDamage, maxHealth)
