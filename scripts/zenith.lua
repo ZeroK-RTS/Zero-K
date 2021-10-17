@@ -51,6 +51,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local sputIsBitSet = Spring.Utilities.IsBitSet
 local CMD_ATTACK = CMD.ATTACK
 local gaiaTeam = Spring.GetGaiaTeamID()
 
@@ -58,6 +59,7 @@ local launchInProgress = false
 local isBlocked = true
 local currentlyEnabled = false
 
+local CMD_OPT_CTRL = CMD.OPT_CTRL
 local INLOS_ACCESS = {inlos = true}
 
 local ux, uy, uz
@@ -214,8 +216,11 @@ local function SpawnProjectileThread()
 	end
 end
 
-local function LaunchAll(x, z)
+local function LaunchN(x, z, n)
 	-- Sanitize input
+	if not n or n > projectileCount then
+		n = projectileCount
+	end
 	x, z = Spring.Utilities.ClampPosition(x, z)
 	local y = math.max(0, Spring.GetGroundHeight(x,z))
 	
@@ -229,38 +234,40 @@ local function LaunchAll(x, z)
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
 	-- direction.
+	local remainingProjectiles = {}
+	local remainingProjectilesCount = 0
 	local aim = {}
 	local aimCount = 0
-	
-	for i = 1, projectileCount do
+
+	local i = oldestProjectile
+	for j = 1, projectileCount do
 		local proID = projectiles[i]
-		-- Check that the projectile ID is still valid
-		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
-			
-			--// Shoot gravity beams at the new aim projectiles. Did not look great.
-			--local px, py, pz = Spring.GetProjectilePosition(proID)
-			--local dist = math.sqrt((px - ux)^2 + (py - uy)^2 + (pz - uz)^2)
-			--local mult = 1000/dist
-			--Spring.SpawnProjectile(gravityWeaponDefID, {
-			--	pos = {ux, uy + 100, uz},
-			--	speed = {(px - ux)*mult, (py - uy)*mult, (pz - uz)*mult},
-			--	ttl = dist/1000,
-			--	owner = unitID,
-			--	maxRange = dist,
-			--})
-			
-			-- Projectile is valid, launch!
-			aimCount = aimCount + 1
-			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
+		local proDefID = Spring.GetProjectileDefID(proID)
+		if proDefID == floatWeaponDefID then
+			if n > 0 then
+				n = n - 1
+				aimCount = aimCount + 1
+				aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
+			else
+				remainingProjectilesCount = remainingProjectilesCount + 1
+				remainingProjectiles[remainingProjectilesCount] = proID
+			end
+		elseif proDefID == uncontrolWeaponDefID then
+			remainingProjectilesCount = remainingProjectilesCount + 1
+			remainingProjectiles[remainingProjectilesCount] = proID
+		end
+
+		i = i + 1
+		if i > projectileCount then
+			i = 1
 		end
 	end
-	
-	-- All projectiles were launched so there are none left.
-	projectiles = {}
-	projectileCount = 0
+
+	projectiles = remainingProjectiles
+	projectileCount = remainingProjectilesCount
 	oldestProjectile = 1
 	
-	tooltipProjectileCount = 0
+	tooltipProjectileCount = projectileCount
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 	
 	-- Raw projectile manipulation doesn't create an event (needed for stuff like Fire Once)
@@ -336,10 +343,17 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 
-	local cmdID, _, _, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
+	local cmdID, cmdOpt, _, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
+
+	--[[ Fire once: a smaller batch. Scales with the projectile count (instead of a flat number)
+	     to maintain some of the "firing spends way more ammo than it should" aspect of the unit,
+	     especially given that it doesn't trivialize the decision to send meteors into a corner
+	     to prevent the overflow falling on your head (losing a large chunk of ammo hurts). ]]
+	local howManyToLaunch = sputIsBitSet(cmdOpt, CMD_OPT_CTRL) and math.ceil(projectileCount / 3)
+
 	if cmdID == CMD_ATTACK then
 		if cmdParam3 then
-			StartThread(LaunchAll, cmdParam1, cmdParam3)
+			StartThread(LaunchN, cmdParam1, cmdParam3, howManyToLaunch)
 			return true
 		elseif not cmdParam2 then
 			targetID = cmdParam1
@@ -361,7 +375,7 @@ function script.BlockShot(num, targetID)
 				z = z + vz*travelTime
 			end
 			x, z = x + vx*50, z + vz*50
-			StartThread(LaunchAll, x, z)
+			StartThread(LaunchN, x, z, howManyToLaunch)
 		end
 	end
 	return true
