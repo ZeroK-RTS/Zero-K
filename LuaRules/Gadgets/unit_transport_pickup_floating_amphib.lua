@@ -80,9 +80,9 @@ local dropableUnits = {}
 --All floatable units will be dropped when regular unload fail (such as when unloading at sea), but some can't float but are amphibious,
 --This detects additional units that should be dropped.
 for unitDefID = 1, #UnitDefs do
-	local ud = UnitDefs[unitDefID]	
+	local ud = UnitDefs[unitDefID]
 
-	local floatsOnWaterSurface = floatingMoveClasses[ud.moveDef.smClass]
+	local floatsOnWaterSurface = ud.moveDef.smClass and floatingMoveClasses[ud.moveDef.smClass]
 	local canMoveInDeepWater   = (ud.moveDef.depth and ud.moveDef.depth >= DROPPABLE_UNIT_MAXDEPTH)  -- ud.maxWaterDepth seems to have no effect, only ud.moveDef.depth matters
 
 	if (not floatsOnWaterSurface) and canMoveInDeepWater then
