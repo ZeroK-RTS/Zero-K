@@ -50,6 +50,8 @@ local gravityDefs = {
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local CMD_ATTACK = CMD.ATTACK
 local gaiaTeam = Spring.GetGaiaTeamID()
 
 local launchInProgress = false
@@ -333,14 +335,14 @@ function script.BlockShot(num, targetID)
 	if IsDisabled() then
 		return true
 	end
-	
-	local cQueue = Spring.GetCommandQueue(unitID, 1)
-	if (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
-		if cQueue[1].params[3] then
-			StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
+
+	local cmdID, _, _, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
+	if cmdID == CMD_ATTACK then
+		if cmdParam3 then
+			StartThread(LaunchAll, cmdParam1, cmdParam3)
 			return true
-		elseif (#cQueue[1].params == 1) then
-			targetID = cQueue[1].params[1]
+		elseif not cmdParam2 then
+			targetID = cmdParam1
 		end
 	end
 	
