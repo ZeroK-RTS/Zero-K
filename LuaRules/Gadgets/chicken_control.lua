@@ -114,8 +114,6 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-  local allyTeam = spGetUnitAllyTeam(unitID)
-  --Spring.Echo("Unit spawned and ally team is "..allyTeam)
   local curLoop = 0
   local anyone_not_spec = false
   local condition = true
@@ -153,13 +151,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
       end
     end
   end
--- -- now thats legacy - commander is not given in the first place
---   elseif (allyTeam == ChickenAllyTeam) then
---     local ud = UnitDefs[unitDefID]
---     if (ud.customParams.commtype) then
---       spDestroyUnit(unitID, false, true) -- bye bye commander
---     end
---   end
 end
 
 end

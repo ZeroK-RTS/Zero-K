@@ -83,7 +83,6 @@ end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
 	if (not weapon2) and weapon1 then
-		local unitDefID = Spring.GetUnitDefID(unitID)
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
 		if wd and wd.customParams and wd.customParams.manualfire then
