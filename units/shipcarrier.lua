@@ -92,7 +92,8 @@ return { shipcarrier = {
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
         disarmTimer      = 10, -- seconds
-        
+        radar_homing_distance = 600,
+
         light_color = [[1 1 1]],
       },
       

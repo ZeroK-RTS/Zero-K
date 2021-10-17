@@ -22,15 +22,13 @@ local UNIT = string.byte('u')
 
 local projectiles = {}
 
-local projectileHomingDistance = {
-	[WeaponDefNames["shipcarrier_disarm_rocket"].id] = 600^2,
-	[WeaponDefNames["turretaaheavy_advsam"].id] = 1800^2,
-	[WeaponDefNames["amphraid_torpedo"].id] = 200^2,
-}
+local projectileHomingDistance = {}
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
-	if (not projectileHomingDistance[wdid]) and wd.tracks and
+	if (wd.customParams.radar_homing_distance) then
+		projectileHomingDistance[wdid] = tonumber(wd.customParams.radar_homing_distance)^2
+	elseif wd.tracks and
 			(wd.type == "TorpedoLauncher" or wd.type == "MissileLauncher" or wd.type == "StarburstLauncher") then
 		projectileHomingDistance[wdid] = (10 * wd.projectilespeed)^2
 	end

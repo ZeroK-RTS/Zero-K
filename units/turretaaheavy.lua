@@ -70,6 +70,7 @@ return { turretaaheavy = {
 
       customParams              = {
         isaa = [[1]],
+        radar_homing_distance = 1800,
 
         light_color = [[1.5 1.8 1.8]],
         light_radius = 600,
