@@ -83,7 +83,7 @@ for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 
 	local floatsOnWaterSurface = ud.moveDef.smClass and floatingMoveClasses[ud.moveDef.smClass]
-	local canMoveInDeepWater   = (ud.moveDef.depth and ud.moveDef.depth >= DROPPABLE_UNIT_MAXDEPTH)  -- ud.maxWaterDepth seems to have no effect, only ud.moveDef.depth matters
+	local canMoveInDeepWater   = (ud.moveDef.depth and ud.moveDef.depth >= DROPPABLE_UNIT_MAXDEPTH)  -- NB: ud.maxWaterDepth is for sea buildability, not pathing
 
 	if (not floatsOnWaterSurface) and canMoveInDeepWater then
 		dropableUnits[unitDefID] = true
