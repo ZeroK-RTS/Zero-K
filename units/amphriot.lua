@@ -90,7 +90,11 @@ return { amphriot = {
       craterBoost             = 0,
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
-   
+
+      customparams = {
+        stays_underwater = 1,
+      },
+
       damage                  = {
         default = 48.01,
       },

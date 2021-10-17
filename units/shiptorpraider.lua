@@ -76,11 +76,12 @@ return { shiptorpraider = {
       cegTag                  = [[torpedo_trail]],
 
       customParams = {
-          burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
+
+        stays_underwater = 1,
       },
 
       damage                  = {
-
         default = 220.1,
       },
 
