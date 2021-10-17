@@ -168,6 +168,8 @@ local DRAWING_TOOLTIP =
 	green.. 'Middle click'..white..': Place marker. \n' ..
 	green.. 'Double click'..white..': Place marker with label.'
 
+local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadFrame"
+local JUMP_RELOAD_PARAM = "jumpReload"
 
 local reloadBarColor = {013, 245, 243, 1}
 local fullHealthBarColor = {0, 255, 0, 1}
@@ -222,6 +224,8 @@ for i = 1, #UnitDefs do
 end
 
 local manualFireTimeDefs = {}
+local specialReloadDefs = {}
+local jumpReloadDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitWeapon = (ud and ud.weapons)
@@ -229,6 +233,12 @@ for unitDefID = 1, #UnitDefs do
 	--Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 	if (unitWeapon ~= nil) and WeaponDefs[unitWeapon.weaponDef].manualFire then
 		manualFireTimeDefs[unitDefID] = WeaponDefs[unitWeapon.weaponDef].reload
+	end
+	if ud.customParams.specialreloadtime then
+		specialReloadDefs[unitDefID] = tonumber(ud.customParams.specialreloadtime)
+	end
+	if ud.customParams.canjump then
+		jumpReloadDefs[unitDefID] = -1 --Signifies that reload time is not stored
 	end
 end
 
@@ -264,11 +274,13 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter', 'uniticon_size', 'manualWeaponReloadBar',
+	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
+	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
 
 local showManualFire = true
+local showJumpReload = true
 
 options = {
 	tooltip_delay = {
@@ -416,6 +428,17 @@ options = {
 		path = selPath,
 		OnChange = function(self)
 			showManualFire = self.value
+		end,
+	},
+	jumpReloadBar = {
+		name="Show Unit's Jump Status",
+		type='bool',
+		value= true,
+		noHotkey = true,
+		desc = "Show reload progress for jumpjets (only for ungrouped unit selection)",
+		path = selPath,
+		OnChange = function(self)
+			showJumpReload = self.value
 		end,
 	},
 	fancySkinning = {
@@ -608,9 +631,23 @@ local function GetWeaponReloadStatus(unitID, weapNum, reloadTime)
 		local currentFrame, _ = Spring.GetGameFrame()
 		local remainingTime = (weaponReloadFrame - currentFrame)/30
 		local reloadFraction = 1 - remainingTime/reloadTime
-		return reloadFraction, remainingTime
+		return reloadFraction
 	end
 	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
+end
+
+local function GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
+	local specialReloadState = spGetUnitRulesParam(unitID, rulesParam)
+	if specialReloadState then
+		if reloadTime > 0 then
+			local currentFrame, _ = Spring.GetGameFrame()
+			local remainingTime = (specialReloadState - currentFrame)
+			local reloadFraction = 1 - remainingTime/reloadTime
+			return reloadFraction
+		end
+		return specialReloadState
+	end
+	return false
 end
 
 local function GetUnitResources(unitID)
@@ -715,6 +752,9 @@ local function GetManualFireReload(unitID, unitDefID)
 	if manualFireTimeDefs[unitDefID] then
 		return manualFireTimeDefs[unitDefID], 3
 	end
+	if specialReloadDefs[unitDefID] then
+		return specialReloadDefs[unitDefID], false, SPECIAL_WEAPON_RELOAD_PARAM
+	end
 	if not (unitID and isCommander[unitDefID]) then
 		return false
 	end
@@ -740,6 +780,20 @@ local function GetManualFireReload(unitID, unitDefID)
 	end
 	
 	commanderManualFireReload[unitID] = {0}
+	return false
+end
+
+local function GetJumpReload(unitID, unitDefID)
+	if not (unitDefID and showJumpReload) then
+		return false
+	end
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return false
+	end
+	if jumpReloadDefs[unitDefID] then
+		return jumpReloadDefs[unitDefID]
+	end
 	return false
 end
 
@@ -1194,12 +1248,12 @@ local function GetCostInfoPanel(parentControl, yPos)
 	return Update
 end
 
-local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, reloadTime)
+local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum, rulesParam, reloadTime, onLeft)
 	if not reloadBar then
 		reloadBar = Chili.Progressbar:New {
-			x = "82%",
+			x = (onLeft and 5) or "82%",
 			y = 5,
-			right = 5,
+			right = ((not onLeft) and 5) or "82%",
 			bottom = 5,
 			minWidth = 4,
 			max = 1,
@@ -1212,7 +1266,12 @@ local function UpdateManualFireReload(reloadBar, parentImage, unitID, weaponNum,
 			parent = parentImage,
 		}
 	end
-	local reloadFraction, remainingTime = GetWeaponReloadStatus(unitID, weaponNum, reloadTime)
+	local reloadFraction
+	if weaponNum then
+		reloadFraction = GetWeaponReloadStatus(unitID, weaponNum, reloadTime)
+	elseif rulesParam then
+		reloadFraction = GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
+	end
 	
 	if reloadFraction and reloadFraction < 1 then
 		reloadBar:SetValue(reloadFraction)
@@ -1245,7 +1304,7 @@ local function GetUnitGroupIconButton(parentControl)
 		parent = parentControl,
 	}
 	
-	local reloadBar
+	local reloadBar, jumpBar
 	local healthBar = Chili.Progressbar:New {
 		x = 0,
 		y = "80%",
@@ -1291,17 +1350,26 @@ local function GetUnitGroupIconButton(parentControl)
 				healthBar.color = GetHealthColor(health/maxhealth)
 				healthBar:SetValue(health/maxhealth)
 			end
-			local reloadTime, weaponNum = GetManualFireReload(unitID, unitDefID)
+			local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
 			if reloadTime then
-				reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, reloadTime)
+				reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, rulesParam, reloadTime)
 			elseif reloadBar then
 				reloadBar:SetVisibility(false)
+			end
+			local jumpReloadTime = GetJumpReload(unitID, unitDefID)
+			if jumpReloadTime then
+				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+			elseif jumpBar then
+				jumpBar:SetVisibility(false)
 			end
 			return
 		end
 		
 		if reloadBar then
 			reloadBar:SetVisibility(false)
+		end
+		if jumpBar then
+			jumpBar:SetVisibility(false)
 		end
 		
 		local totalHealth, totalMax = 0, 0
@@ -1745,7 +1813,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = parentControl,
 	}
 	
-	local reloadBar
+	local reloadBar, jumpBar
 	local unitImage = Chili.Image:New{
 		name = "unitImage",
 		x = 0,
@@ -1828,11 +1896,17 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local externalFunctions = {}
 		
 	local function UpdateReloadTime(unitID, unitDefID)
-		local reloadTime, weaponNum = GetManualFireReload(unitID, unitDefID)
+		local reloadTime, weaponNum, rulesParam = GetManualFireReload(unitID, unitDefID)
 		if reloadTime then
-			reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, reloadTime)
+			reloadBar = UpdateManualFireReload(reloadBar, unitImage, unitID, weaponNum, rulesParam, reloadTime)
 		elseif reloadBar then
 			reloadBar:SetVisibility(false)
+		end
+		local jumpReloadTime = GetJumpReload(unitID, unitDefID)
+		if jumpReloadTime then
+			jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
+		elseif jumpBar then
+			jumpBar:SetVisibility(false)
 		end
 	end
 
@@ -2059,6 +2133,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			selectedUnitID = nil
 			if reloadBar then
 				reloadBar:SetVisibility(false)
+			end
+			if jumpBar then
+				jumpBar:SetVisibility(false)
 			end
 		end
 		

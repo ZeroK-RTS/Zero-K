@@ -21,7 +21,7 @@ return { planescout = {
 
   customParams        = {
     modelradius       = [[20]],
-    specialreloadtime = [[600]],
+    --specialreloadtime = [[600]],
     refuelturnradius  = [[120]],
     priority_misc     = 2, -- High
     sonar_can_be_disabled = 1,

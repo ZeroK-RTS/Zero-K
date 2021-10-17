@@ -16,6 +16,7 @@ local flare = {
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
+local MOVE_THRESHOLD = 8
 
 ----------------------------------------------------------
 
@@ -36,7 +37,8 @@ end
 ----------------------------------------------------------
 
 function SprintThread()
-	for i=1, SPEEDUP_DURATION do
+	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
+	for i = 1, SPEEDUP_DURATION do
 		EmitSfx(ljet, 1027)
 		EmitSfx(rjet, 1027)
 		Sleep(33)
@@ -50,6 +52,12 @@ function SprintThread()
 	
 	Turn(rwing, y_axis, 0, math.rad(100))
 	Turn(lwing, y_axis, 0, math.rad(100))
+	
+	-- Refund reload time if the unit didn't move.
+	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
+	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
+		Spring.SetUnitRulesParam(unitID, "specialReloadFrame", Spring.GetGameFrame(), {inlos = true})
+	end
 end
 
 function Sprint()
