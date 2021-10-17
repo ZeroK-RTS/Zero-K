@@ -21,7 +21,7 @@ return { hoverskirm = {
   customParams        = {
     bait_level_default = 1,
     modelradius    = [[25]],
-    turnatfullspeed = [[1]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -24,6 +24,7 @@ return { hoveraa = {
     bait_level_default = 0,
     modelradius    = [[25]],
     midposoffset   = [[0 8 0]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

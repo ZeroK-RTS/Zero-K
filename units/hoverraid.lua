@@ -21,6 +21,7 @@ return { hoverraid = {
     modelradius        = [[25]],
     aim_lookahead      = 120,
     bait_level_default = 0,
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],

@@ -525,15 +525,20 @@ end
 -- Set turnInPlace speed limits, reverse velocities (but not for ships)
 --
 for name, ud in pairs(UnitDefs) do
-	if ud.turnrate and (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
-		ud.turninplace = false
-		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
-	elseif ud.turninplace ~= true then
-		ud.turninplace = false	-- true
-		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
-		--ud.turninplaceanglelimit = 180
+	if ud.turnrate then
+		if ud.customparams.turnatfullspeed_hover then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 1)
+			ud.turninplaceanglelimit = 90
+		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)
+		elseif ud.turninplace ~= true then
+			ud.turninplace = false -- true
+			ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+			--ud.turninplaceanglelimit = 180
+		end
 	end
-
 
 	if ud.category and not (ud.category:find("SHIP", 1, true) or ud.category:find("SUB", 1, true)) then
 		if (ud.maxvelocity) and not ud.maxreversevelocity then

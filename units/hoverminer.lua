@@ -15,6 +15,7 @@ return { hoverminer = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

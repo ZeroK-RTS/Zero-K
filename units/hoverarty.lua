@@ -22,6 +22,7 @@ return { hoverarty = {
     modelradius    = [[32]],
     dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],

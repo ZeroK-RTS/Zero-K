@@ -20,6 +20,7 @@ return { hoverheavyraid = {
     modelradius       = [[25]],
     selection_scale   = 0.85,
     aim_lookahead     = 120,
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

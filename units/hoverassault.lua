@@ -21,6 +21,7 @@ return { hoverassault = {
     bait_level_default = 0,
     bait_level_target_armor = 1,
     modelradius       = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   damageModifier      = 0.25,

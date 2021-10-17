@@ -25,6 +25,7 @@ return { hovercon = {
   customParams        = {
     modelradius    = [[25]],
     selection_scale = 1.2,
+    turnatfullspeed_hover = [[1]],
   },
 
   energyUse           = 0,
@@ -56,7 +57,7 @@ return { hovercon = {
   sightDistance       = 300,
   sonarDistance       = 300,
   turninplace         = 0,
-  turnRate            = 920,
+  turnRate            = 1100,
   workerTime          = 5,
 
   featureDefs         = {
