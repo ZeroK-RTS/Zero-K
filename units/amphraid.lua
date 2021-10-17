@@ -127,6 +127,7 @@ return { amphraid = {
 
       customparams = {
         radar_homing_distance = 200,
+        stays_underwater = 1,
       },
 
       damage                  = {

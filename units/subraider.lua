@@ -83,6 +83,7 @@ return { subraider = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 2,
+        stays_underwater = 1,
       },
 
       damage                  = {

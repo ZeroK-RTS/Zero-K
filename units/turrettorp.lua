@@ -69,6 +69,10 @@ return { turrettorp = {
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
 
+      customparams = {
+        stays_underwater = 1,
+      },
+
       damage                  = {
         default = 190,
       },
