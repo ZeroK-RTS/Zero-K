@@ -97,8 +97,9 @@ function SprintThread()
 		Sleep(33)
 	end
 	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_RELOAD_FACTOR)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SPEEDUP_RELOAD_FACTOR)
+	GG.SetAllowUnitCoast(unitID, true)
 	GG.UpdateUnitAttributes(unitID)
 	
 	-- Refund reload time if the unit didn't move.
@@ -108,10 +109,13 @@ function SprintThread()
 		return
 	end
 	
-	Sleep(1000) -- Give the unit some time to coast, as attribute speed below zero sets high deccelleration.
+	Sleep(1300) -- Give the unit some time to coast, as attribute speed below zero sets high deccelleration.
 	while (Spring.MoveCtrl.GetTag(unitID) ~= nil) do
 		Sleep(33)
 	end
+	-- Disable coast once Mace slows down.
+	GG.SetAllowUnitCoast(unitID, false)
+	GG.UpdateUnitAttributes(unitID)
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_RELOAD_FACTOR)
 	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SPEEDUP_RELOAD_FACTOR)

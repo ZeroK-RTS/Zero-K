@@ -68,6 +68,8 @@ GG.att_weaponMods = GG.att_weaponMods or {}
 -- To tell other gadgets things without creating RulesParams
 GG.att_out_buildSpeed = {}
 
+local allowUnitCoast = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- UnitDefs caching
@@ -131,7 +133,6 @@ end
 -- Build Speed Handling
 
 local REPAIR_ENERGY_COST_FACTOR = Game.repairEnergyCostFactor
-
 
 local function UpdateBuildSpeed(unitID, unitDefID, speedFactor)
 	local buildSpeed = (buildSpeedDef[unitDefID] or 0)
@@ -254,7 +255,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	if not origUnitSpeed[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		local moveData = spGetUnitMoveTypeData(unitID)
-    
+
 		origUnitSpeed[unitDefID] = {
 			origSpeed = ud.speed,
 			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
@@ -270,7 +271,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	
 	local state = origUnitSpeed[unitDefID]
 	local decFactor = maxAccelerationFactor
-	local isSlowed = speedFactor < 1
+	local isSlowed = (speedFactor < 1) and not allowUnitCoast[unitID]
 	if isSlowed then
 		-- increase brake rate to cause units to slow down to their new max speed correctly.
 		decFactor = 1000
@@ -379,6 +380,7 @@ local function removeUnit(unitID)
 	currentMovement[unitID] = nil
 	currentTurn[unitID] = nil
 	currentAcc[unitID] = nil
+	allowUnitCoast[unitID] = nil
 	
 	GG.att_EconomyChange[unitID] = nil
 	GG.att_ReloadChange[unitID] = nil
@@ -544,8 +546,14 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 end
 
+-- Whatever sets this should call UpdateUnitAttributes frames afterwards too
+local function SetAllowUnitCoast(unitID, allowed)
+	allowUnitCoast[unitID] = allowed
+end
+
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
+	GG.SetAllowUnitCoast = SetAllowUnitCoast
 end
 
 function gadget:GameFrame(f)
