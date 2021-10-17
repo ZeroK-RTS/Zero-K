@@ -217,6 +217,10 @@ return { bomberprec = {
       craterBoost             = 1,
       craterMult              = 2,
 
+      customparams = {
+        stays_underwater = 1,
+      },
+
       damage                  = {
         default = 800,
       },
