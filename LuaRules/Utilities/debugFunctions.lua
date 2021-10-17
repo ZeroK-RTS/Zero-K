@@ -4,50 +4,17 @@ function Spring.Utilities.Traceback(condition)
 	end
 end
 
-local cmdNames = {
-	-- engine commands; note the gaps (for instance there is no 3)
-	[  0] = "STOP",
-	[  1] = "INSERT",
-	[  2] = "REMOVE",
-	[  5] = "WAIT",
-	[  6] = "TIMEWAIT",
-	[  7] = "DEATHWAIT",
-	[  8] = "SQUADWAIT",
-	[  9] = "GATHERWAIT",
-	[ 10] = "MOVE",
-	[ 15] = "PATROL",
-	[ 16] = "FIGHT",
-	[ 20] = "ATTACK",
-	[ 21] = "AREA_ATTACK",
-	[ 25] = "GUARD",
-	[ 30] = "AISELECT",
-	[ 35] = "GROUPSELECT",
-	[ 36] = "GROUPADD",
-	[ 37] = "GROUPCLEAR",
-	[ 40] = "REPAIR",
-	[ 45] = "FIRE_STATE",
-	[ 50] = "MOVE_STATE",
-	[ 55] = "SETBASE",
-	[ 60] = "INTERNAL",
-	[ 65] = "SELFD",
-	[ 75] = "LOAD_UNITS",
-	[ 76] = "LOAD_ONTO",
-	[ 80] = "UNLOAD_UNITS",
-	[ 81] = "UNLOAD_UNIT",
-	[ 85] = "ONOFF",
-	[ 90] = "RECLAIM",
-	[ 95] = "CLOAK",
-	[100] = "STOCKPILE",
-	[105] = "MANUALFIRE",
-	[110] = "RESTORE",
-	[115] = "REPEAT",
-	[120] = "TRAJECTORY",
-	[125] = "RESURRECT",
-	[130] = "CAPTURE",
-	[135] = "AUTOREPAIRLEVEL",
-	[145] = "IDLEMODE",
-	[150] = "FAILED",
-}
+local cmdNames = {} -- [cmdID] = "NAME"
+
+for key, value in pairs(CMD) do
+	if type(key) == "number" then -- also contains reverse mappings and stuff like OPT_CTRL, but those are strings
+		cmdNames[key] = value
+	end
+end
+cmdNames[ 20] = "ATTACK" -- more salient than LOOPBACKATTACK which it shares cmdID with
+cmdNames[105] = "MANUALFIRE" -- DGUN is a legacy alias, worse for being a weapon type
+cmdNames[150] = "FAILED" -- not listed; in theory can't reach Lua but better be safe
+
 for cmdName, cmdID in pairs(VFS.Include("LuaRules/Configs/customcmds.lua", nil, VFS.GAME)) do
 	cmdNames[cmdID] = cmdName
 end
