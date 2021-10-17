@@ -125,6 +125,10 @@ return { amphraid = {
       craterMult              = 2,
       cegTag                  = [[torpedo_trail]],
 
+      customparams = {
+        radar_homing_distance = 200,
+      },
+
       damage                  = {
         default = 130.01,
       },
