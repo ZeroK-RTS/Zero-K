@@ -45,7 +45,7 @@ return { amphfloater = {
   sfxtypes               = {
     explosiongenerators = {
         [[custom:bubbles_small]],
-        [[custom:disrupter_cannon_muzzle]],
+        [[custom:disruptor_cannon_muzzle]],
     },
   },
 
@@ -78,7 +78,7 @@ return { amphfloater = {
       name                    = [[Disruption Cannon]],
       accuracy                = 200,
       areaOfEffect            = 32,
-      cegTag                  = [[disruptertrail]],
+      cegTag                  = [[disruptortrail]],
       craterBoost             = 1,
       craterMult              = 2,
 

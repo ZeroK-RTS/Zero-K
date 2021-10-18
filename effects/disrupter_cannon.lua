@@ -1,5 +1,5 @@
 return {
-	["disrupter_cannon_muzzle"] = {
+	["disruptor_cannon_muzzle"] = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
 		shaft                = {
@@ -22,7 +22,7 @@ return {
 			},
 		},
 	},
-	["disruptertrail"]          = {
+	["disruptortrail"]          = {
 		alwaysvisible        = false,
 		usedefaultexplosions = false,
 		head                 = {

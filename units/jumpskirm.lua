@@ -100,7 +100,7 @@ return { jumpskirm = {
           default = 460.1,
       },
 
-      explosionGenerator      = [[custom:heavy_disrupter_beam_hit]],
+      explosionGenerator      = [[custom:heavy_disruptor_beam_hit]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,

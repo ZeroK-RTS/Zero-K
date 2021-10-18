@@ -1,5 +1,5 @@
 return {
-	["heavy_disrupter_beam_hit"] = {
+	["heavy_disruptor_beam_hit"] = {
 		usedefaultexplosions = false,
 		airflash = {
 			air                = true,
