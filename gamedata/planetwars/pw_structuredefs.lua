@@ -87,7 +87,6 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
 		unitDef.customparams.factory_land_state = 0
 
@@ -122,7 +121,6 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
 		unitDef.customparams.factory_land_state = 0
 
