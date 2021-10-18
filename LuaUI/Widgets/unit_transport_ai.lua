@@ -17,6 +17,7 @@ end
 
 local floatDefs = VFS.Include("LuaRules/Configs/float_defs.lua") --list of unit able to float for pickup at sea
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
@@ -119,7 +120,7 @@ local autoCallTransportDef = {}
 local transportDef = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or (ud.isFactory and not ud.customParams.nongroundfac) then
+	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or Spring.Utilities.isGroundFactory(ud) then
 		autoCallTransportDef[i] = true
 	end
 	if (ud.transportCapacity >= 1) and ud.canFly then

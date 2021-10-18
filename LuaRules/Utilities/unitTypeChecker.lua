@@ -1,3 +1,6 @@
+if Spring.Utilities.getMovetype then
+	return -- Prevents repeated including in widgets environment
+end
 
 local moveType = {}
 for i = 1, #UnitDefs do
@@ -36,5 +39,21 @@ function Spring.Utilities.getMovetypeByID(unitDefID)
 	if ud then
 		return Spring.Utilities.getMovetype(ud)
 	end
+	return false
+end
+
+function Spring.Utilities.isGroundFactory(ud)
+	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local buildOptions = ud.buildOptions
+
+		for i = 1, #buildOptions do
+			local boDefID = buildOptions[i]
+
+			if (Spring.Utilities.getMovetypeByID(boDefID) == 2) then
+				return true
+			end
+		end
+	end
+
 	return false
 end
