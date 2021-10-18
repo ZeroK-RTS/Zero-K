@@ -209,14 +209,10 @@ local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
 local terraformOnUnitDestroyed = VFS.Include("LuaRules/Configs/unit_terraform_defs.lua", nil, VFS.GAME)
 
-local exceptionArray = {
-	[UnitDefNames["shipcarrier"].id] = true,
-}
-
 local terraformUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud and ud.isBuilder and not ud.isFactory and not exceptionArray[i] then
+	if ud and ud.isBuilder and not ud.isFactory and (ud.terraformSpeed > 0) then
 		terraformUnitDefIDs[i] = true
 	end
 end
