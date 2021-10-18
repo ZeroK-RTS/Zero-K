@@ -43,7 +43,6 @@ return { factoryplane = {
     modelradius    = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
     aimposoffset   = [[0 23 -25]],
     midposoffset   = [[0 20 0]],
-    nongroundfac = [[1]],
     default_spacing = 8,
     factorytab       = 1,
     shared_energy_gen = 1,

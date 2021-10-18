@@ -44,7 +44,6 @@ return { plateplane = {
     modelradius        = [[51]], -- at 50 planefighter won't respond to Bugger Off calls
     midposoffset       = [[0 0 -16]],
     aimposoffset       = [[0 15 -20]],
-    nongroundfac       = [[1]],
     default_spacing    = 4,
     child_of_factory   = [[factoryplane]],
   },

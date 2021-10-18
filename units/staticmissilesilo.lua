@@ -23,10 +23,6 @@ return { staticmissilesilo = {
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 
-  customParams                  = {
-    nongroundfac = [[1]],
-  },
-
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
