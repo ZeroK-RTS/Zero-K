@@ -30,7 +30,7 @@ return { turretheavy = {
     modelradius    = [[20]],
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 3,
   footprintZ                    = 3,

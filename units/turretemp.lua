@@ -23,7 +23,7 @@ return { turretemp = {
     aim_lookahead  = 50,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,

@@ -26,7 +26,7 @@ return { energysolar = {
     default_spacing = 0,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   energyMake                    = 2,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 5,
@@ -34,7 +34,7 @@ return { energysolar = {
   iconType                      = [[energy_med]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  maxDamage                     = 500,
+  maxDamage                     = 600,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,

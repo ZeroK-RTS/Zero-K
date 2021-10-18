@@ -32,7 +32,7 @@ return { turretantiheavy = {
     dontfireatradarcommand = '0',
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,

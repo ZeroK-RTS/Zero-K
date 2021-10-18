@@ -26,7 +26,7 @@ return { amphcon = {
     amph_submerged_at = 40,
   },
 
-  damageModifier      = 0.25,
+  damageModifier      = 0.333,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,

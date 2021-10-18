@@ -21,7 +21,7 @@ return { turretaalaser = {
     bait_level_default = 0,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
