@@ -426,18 +426,14 @@ function gadget:Initialize()
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-
 	end
 
-	local boatFacs = {'factoryship', 'striderhub'}
-	for _, boatFac in pairs(boatFacs) do
-		local udBoatFac = UnitDefNames[boatFac]
-		if udBoatFac then
-			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
-					boats[boatDefID] = true
-				end
-			end
+	local shipSMClass = Game.speedModClasses.Ship
+	for i = 1, #UnitDefs do
+		local ud = UnitDefs[i]
+
+		if (ud.moveDef.smClass == shipSMClass) then
+			boats[i] = true
 		end
 	end
 
