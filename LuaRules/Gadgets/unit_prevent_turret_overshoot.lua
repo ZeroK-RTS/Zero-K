@@ -9,31 +9,43 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
-local fudgeNames = {
-	turretmissile  = 45, -- projectile speed is 25 elmo/frame
-	turretheavylaser = 15,
-	turretlaser = 15,
-}
-local sphericals = { -- spherical weapons; rest assumed cylindrical
-	"turretheavylaser",
-	"turretlaser",
-}
+local allowedRangeSqByWeapon = {}
+local isSphericalByWeapon = {}
 
+for weaponDefID = 1, #WeaponDefs do
+	local wd = WeaponDefs[weaponDefID]
+	local fudge = tonumber(wd.customParams.prevent_overshoot_fudge)
+
+	if (fudge and fudge ~= 0) then
+		local allowedRange = wd.range - fudge
+
+		allowedRangeSqByWeapon[weaponDefID] = allowedRange*allowedRange
+		isSphericalByWeapon[weaponDefID] = (wd.cylinderTargeting == 0)
+	end
+end
 
 local isSpherical = {}
-for i = 1, #sphericals do
-	isSpherical[UnitDefNames[sphericals[i]].id] = true
-end
-sphericals = nil
-
 local allowedRangeSq = {}
-for name, fudge in pairs(fudgeNames) do
-	local udid = UnitDefNames[name].id
-	local range = WeaponDefs[UnitDefs[udid].weapons[1].weaponDef].range
-	local allowedRange = range - fudge
-	allowedRangeSq[udid] = allowedRange*allowedRange
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	local weapons = ud.weapons
+
+	if (weapons) then
+        for i = 1, #weapons do
+			local weaponDefID = weapons[i].weaponDef
+
+			if (allowedRangeSqByWeapon[weaponDefID]) then
+				allowedRangeSq[unitDefID] = allowedRangeSqByWeapon[weaponDefID]
+				isSpherical[unitDefID] = isSphericalByWeapon[weaponDefID]
+				break
+			end
+        end
+    end
 end
-fudgeNames = nil
+
+allowedRangeSqByWeapon = nil
+isSphericalByWeapon = nil
 
 
 include "LuaRules/Configs/customcmds.h.lua"

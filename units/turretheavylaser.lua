@@ -77,6 +77,7 @@ return { turretheavylaser = {
       
       customParams            = {
         burst = Shared.BURST_UNRELIABLE,
+        prevent_overshoot_fudge = 15,
 
         light_color = [[1.25 1.25 3.75]],
         light_radius = 180,
