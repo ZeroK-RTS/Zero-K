@@ -82,7 +82,8 @@ return { turretmissile = {
         isaa = [[1]],
         script_reload = [[12.5]],
         script_burst = [[3]],
-        
+        prevent_overshoot_fudge = 45, -- projectile speed is 25 elmo/frame
+
         light_camera_height = 2000,
         light_radius = 200,
       },
