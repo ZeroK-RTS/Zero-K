@@ -18,6 +18,7 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 
 local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")
@@ -840,7 +841,7 @@ local function addUnit(defName, path)
 			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
-	elseif ud.isFactory and not ud.customParams.nongroundfac then
+	elseif Spring.Utilities.isGroundFactory(ud) then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Disabled, Enabled",
