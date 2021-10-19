@@ -34,7 +34,7 @@ Klangfabrik:
 Sonic blaster shot sound (http://www.freesound.org/people/klangfabrik/sounds/232936/, sonic_blaster.wav)
 AA laser sound (https://freesound.org/people/klangfabrik/sounds/232936/)
 
-Anarchid: 
+Anarchid:
 disruptor_explosion (adapted from disruptor laser sound)
 
 Unfa:
@@ -53,3 +53,9 @@ jump_land.wav
 Kingstad:
 badger_fire.wav
 badger_hit.wav
+
+LiamG_SFX:
+Halberd weapon fire sound (https://freesound.org/people/LiamG_SFX/sounds/334240/)
+
+LittleRobotSoundFactory:
+Halberd weapon impact sound (https://freesound.org/people/LittleRobotSoundFactory/sounds/270550/)
