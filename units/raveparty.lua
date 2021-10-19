@@ -122,7 +122,7 @@ return { raveparty = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
     },
-    
+
     ORANGE_ROASTER = {
       name                    = [[Orange Roaster]],
       accuracy                = 750,
@@ -132,7 +132,7 @@ return { raveparty = {
       avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
-      
+
       customParams              = {
         setunitsonfire = "1",
         burntime = 240,
@@ -169,7 +169,7 @@ return { raveparty = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
     },
-    
+
     YELLOW_SLAMMER = {
       name                    = [[Yellow Slammer]],
       accuracy                = 750,
@@ -227,7 +227,7 @@ return { raveparty = {
 
         script_reload = [[6]],
       },
-      
+
       damage                  = {
         default = 401.1,
         planes  = 400,
@@ -307,7 +307,7 @@ return { raveparty = {
         nofriendlyfire = "needs hax",
         script_reload = [[6]],
       },
-      
+
       damage                  = {
         default = 450.1,
       },
@@ -325,14 +325,14 @@ return { raveparty = {
       reloadtime              = 1,
       size                    = 15,
       sizeDecay               = 0.03,
-      soundHit                = [[weapon/aoe_aura2]],
+      soundHit                = [[weapon/disruptor_wave]],
       soundStart              = [[weapon/cannon/big_begrtha_gun_fire]],
       stages                  = 30,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,
     },
-    
+
   },
 
 

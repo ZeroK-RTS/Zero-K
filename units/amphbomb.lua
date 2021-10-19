@@ -64,7 +64,7 @@ return { amphbomb = {
   trackType              = [[ChickenTrackPointyShortLarge]],
   trackWidth             = 30,
   turnRate               = 3600,
-  
+
   featureDefs            = {
 
     DEAD      = {
@@ -97,18 +97,18 @@ return { amphbomb = {
           light_color = [[1.88 0.63 2.5]],
           light_radius = 320,
       },
-     
+
       damage = {
         default          = 150.1,
       },
-     
+
       edgeEffectiveness  = 0.4,
       explosionGenerator = "custom:riotballplus2_purple_limpet",
       explosionSpeed     = 10,
       impulseBoost       = 0,
       impulseFactor      = 0.3,
       name               = "Slowing Explosion",
-      soundHit           = [[weapon/aoe_aura2]],
+      soundHit           = [[weapon/disruptor_wave]],
       soundHitVolume     = 4,
     },
   }
