@@ -45,7 +45,7 @@ return { hoverassault = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
-      [[custom:beamerray]],
+      [[custom:plasma_cannon_muzzle_blue]],
     },
 
   },
@@ -71,7 +71,7 @@ return { hoverassault = {
     DEW = {
       name                    = [[Direct Energy Weapon]],
       areaOfEffect            = 48,
-      cegTag                  = [[beamweapon_muzzle_blue]],
+      cegTag                  = [[halberd_trail]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -81,7 +81,7 @@ return { hoverassault = {
         light_color = [[0.7 0.7 2.3]],
         light_radius = 160,
       },
-      
+
       damage                  = {
         default = 160.1,
       },
