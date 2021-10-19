@@ -18,9 +18,9 @@ return { vehassault = {
 
   customParams           = {
     bait_level_default = 0,
-    aimposoffset       = [[0 8 0]],
-    midposoffset       = [[0 3 0]],
-    modelradius        = [[21]],
+    aimposoffset   = [[0 8 0]],
+    midposoffset   = [[0 3 0]],
+    modelradius    = [[21]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -77,10 +77,9 @@ return { vehassault = {
       areaOfEffect            = 32,
       craterBoost             = 0,
       craterMult              = 0,
-      --cegTag                  = [[plasmatrail_yellow_small]],
 
-      customParams            = {
-        reaim_time          = 8, -- COB
+      customParams        = {
+        reaim_time = 8, -- COB
         light_camera_height = 1500,
       },
 
@@ -108,23 +107,23 @@ return { vehassault = {
 
   featureDefs            = {
 
-    DEAD = {
-      blocking               = true,
-      featureDead            = [[HEAP]],
-      footprintX             = 2,
-      footprintZ             = 2,
+    DEAD  = {
+      blocking         = true,
+      featureDead      = [[HEAP]],
+      footprintX       = 2,
+      footprintZ       = 2,
       collisionVolumeOffsets = [[0 -5 0]],
       collisionVolumeScales  = [[42 42 42]],
       collisionVolumeType    = [[ellipsoid]],
-      object                 = [[corraid_dead.s3o]],
+      object           = [[corraid_dead.s3o]],
     },
 
 
-    HEAP = {
-      blocking   = false,
-      footprintX = 2,
-      footprintZ = 2,
-      object     = [[debris2x2c.s3o]],
+    HEAP  = {
+      blocking         = false,
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2c.s3o]],
     },
 
   },
