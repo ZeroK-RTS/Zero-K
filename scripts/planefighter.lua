@@ -6,6 +6,8 @@ local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing,
 
 local smokePiece = {base, rwing, lwing}
 
+local IN_LOS = {inlos = true}
+
 --variables
 local shotCycle = 0
 local flare = {
@@ -16,6 +18,7 @@ local flare = {
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
+local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
 local MOVE_THRESHOLD = 8
 
 ----------------------------------------------------------
@@ -37,6 +40,7 @@ end
 ----------------------------------------------------------
 
 function SprintThread()
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
 	for i = 1, SPEEDUP_DURATION do
 		EmitSfx(ljet, 1027)
@@ -56,7 +60,24 @@ function SprintThread()
 	-- Refund reload time if the unit didn't move.
 	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
 	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
-		Spring.SetUnitRulesParam(unitID, "specialReloadFrame", Spring.GetGameFrame(), {inlos = true})
+		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 0, IN_LOS)
+		return
+	end
+	
+	local reloadRemaining = 1 -- Synced to specialReloadRemaining because nothing else changes it.
+	while reloadRemaining > 0 do
+		Sleep(33)
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		if not stunnedOrInbuild then
+			local reloadSpeedMult = (GG.att_ReloadChange[unitID] or 1)
+			if reloadSpeedMult > 0 then
+				reloadRemaining = reloadRemaining - SPEEDUP_RELOAD_PER_FRAME*reloadSpeedMult
+				if reloadRemaining < 0 then
+					reloadRemaining = 0
+				end
+				Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", reloadRemaining, IN_LOS)
+			end
+		end
 	end
 end
 

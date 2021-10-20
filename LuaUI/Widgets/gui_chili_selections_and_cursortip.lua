@@ -168,7 +168,7 @@ local DRAWING_TOOLTIP =
 	green.. 'Middle click'..white..': Place marker. \n' ..
 	green.. 'Double click'..white..': Place marker with label.'
 
-local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadFrame"
+local SPECIAL_WEAPON_RELOAD_PARAM = "specialReloadRemaining"
 local JUMP_RELOAD_PARAM = "jumpReload"
 
 local reloadBarColor = {013, 245, 243, 1}
@@ -640,10 +640,11 @@ local function GetRulesParamReloadStatus(unitID, rulesParam, reloadTime)
 	local specialReloadState = spGetUnitRulesParam(unitID, rulesParam)
 	if specialReloadState then
 		if reloadTime > 0 then
-			local currentFrame, _ = Spring.GetGameFrame()
-			local remainingTime = (specialReloadState - currentFrame)
-			local reloadFraction = 1 - remainingTime/reloadTime
-			return reloadFraction
+			--local currentFrame, _ = Spring.GetGameFrame()
+			--local remainingTime = (specialReloadState - currentFrame)
+			--local reloadFraction = 1 - remainingTime/reloadTime
+			--return reloadFraction
+			return 1 - specialReloadState
 		end
 		return specialReloadState
 	end

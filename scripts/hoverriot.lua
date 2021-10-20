@@ -6,6 +6,7 @@ local barrel = piece 'barrel'
 local rthrustpoint = piece 'rthrustpoint'
 local lthrustpoint = piece 'lthrustpoint'
 
+local IN_LOS = {inlos = true}
 local wakes = {}
 for i = 1, 8 do
 	wakes[i] = piece ('wake' .. i)
@@ -21,6 +22,7 @@ local RESTORE_DELAY = 3000
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local SPEEDUP_RELOAD_FACTOR = tonumber (UnitDef.customParams.boost_reload_speed_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
+local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
 local TURN_SPEED_FACTOR = 0.5 -- So it doesn't rotate right around in a silly looking way.
 local MOVE_THRESHOLD = 8
 
@@ -85,7 +87,8 @@ local function MoveScript()
 	end
 end
 
-function SprintThread()
+local function SprintThread()
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
 	for i = 1, SPEEDUP_DURATION do
 		EmitSfx(lthrustpoint, 1026)
@@ -105,26 +108,41 @@ function SprintThread()
 	-- Refund reload time if the unit didn't move.
 	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
 	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
-		Spring.SetUnitRulesParam(unitID, "specialReloadFrame", Spring.GetGameFrame(), {inlos = true})
+		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 0, IN_LOS)
 		return
 	end
 	
-	Sleep(1300) -- Give the unit some time to coast, as attribute speed below zero sets high deccelleration.
+	local coastFrames = 39 -- Give the unit some time to coast, as attribute speed below zero sets high deccelleration.
+	local reloadRemaining = 1 -- Synced to specialReloadRemaining because nothing else changes it.
+	
+	while reloadRemaining > 0 do
+		Sleep(33)
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		if not stunnedOrInbuild then
+			local reloadSpeedMult = (GG.att_ReloadChange[unitID] or 1)
+			if reloadSpeedMult > 0 then
+				reloadRemaining = reloadRemaining - SPEEDUP_RELOAD_PER_FRAME*reloadSpeedMult
+				if reloadRemaining < 0 then
+					reloadRemaining = 0
+				end
+				Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", reloadRemaining, IN_LOS)
+			end
+		end
+		
+		if coastFrames then
+			coastFrames = coastFrames - 1
+			if (Spring.MoveCtrl.GetTag(unitID) ~= nil) then
+				coastFrames = false
+				-- Disable coast once Mace slows down.
+				GG.SetAllowUnitCoast(unitID, false)
+				GG.UpdateUnitAttributes(unitID)
+			end
+		end
+	end
+	
 	while (Spring.MoveCtrl.GetTag(unitID) ~= nil) do
 		Sleep(33)
 	end
-	-- Disable coast once Mace slows down.
-	GG.SetAllowUnitCoast(unitID, false)
-	GG.UpdateUnitAttributes(unitID)
-	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_RELOAD_FACTOR)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SPEEDUP_RELOAD_FACTOR)
-	GG.UpdateUnitAttributes(unitID)
-	
-	while ((Spring.GetUnitRulesParam(unitID, "specialReloadFrame") > Spring.GetGameFrame()) or (Spring.MoveCtrl.GetTag(unitID) ~= nil)) do
-		Sleep(1000)
-	end
-	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)

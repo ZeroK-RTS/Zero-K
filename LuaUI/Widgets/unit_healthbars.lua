@@ -597,6 +597,7 @@ do
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
+				specialRate   = ud.customParams.specialreload_userate,
 				heat          = ud.customParams.heat_per_shot,
 			}
 		end
@@ -800,10 +801,19 @@ do
 		
 		--// SPECIAL WEAPON
 		if ci.specialReload then
-			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
-			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+			if ci.specialRate then
+				local specialReloadProp = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+				if (specialReloadProp > 0) and (specialReloadProp < 1) then
+					local special = 1 - specialReloadProp
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			
+			else
+				local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
+				if (specialReloadState and specialReloadState > gameFrame) then
+					local special = 1-(specialReloadState-gameFrame)/ci.specialReload -- don't divide by gamespeed, since specialReload is also in gameframes
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
 			end
 		end
 		

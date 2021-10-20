@@ -26,6 +26,7 @@ return { planefighter = {
     bait_level_default = 0,
 
     specialreloadtime = [[850]],
+    specialreload_userate = [[1]],
     boost_speed_mult = 5,
     boost_accel_mult = 6,
     boost_duration = 30, -- frames

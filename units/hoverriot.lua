@@ -21,6 +21,7 @@ return { hoverriot = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
     specialreloadtime = [[1050]],
+    specialreload_userate = [[1]],
     boost_speed_mult = 5,
     boost_reload_speed_mult = 0.9,
     boost_duration = 30, -- frames

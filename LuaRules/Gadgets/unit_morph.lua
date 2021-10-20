@@ -230,8 +230,8 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	-- Do not read full attributes-derived BP multiplier here because morph disables units, so
-	-- BP mult will be zero.
+	-- Do not read full attributes-derived BP multiplier here because morph
+	-- disables units, causing BP mult to be zero.
 	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1) * (GG.unit_handicap and GG.unit_handicap[unitID] or 1)
 end
 
