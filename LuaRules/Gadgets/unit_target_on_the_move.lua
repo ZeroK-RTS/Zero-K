@@ -43,6 +43,7 @@ local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 
 local GetUnitRange = Spring.Utilities.GetUnitRange
 local getMovetype  = Spring.Utilities.getMovetype
+local tobool       = Spring.Utilities.tobool
 
 local CMD_WAIT = CMD.WAIT
 local CMD_FIRE_STATE = CMD.FIRE_STATE
@@ -107,10 +108,15 @@ local drawPlayerAlways = {}
 --------------------------------------------------------------------------------
 -- Commands
 
-local allyTargetUnits = {
-	[UnitDefNames["jumpsumo"].id] = true,
-	[UnitDefNames["amphlaunch"].id] = true,
-}
+local allyTargetUnits = {}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+
+	if validUnits[unitDefID] and tobool(ud.customParams.can_target_allies) then
+		allyTargetUnits[unitDefID] = true
+	end
+end
 
 local unitSetTargetCmdDesc = {
 	id      = CMD_UNIT_SET_TARGET,
