@@ -18,6 +18,7 @@ return { jumpblackhole = {
 
   customParams          = {
     bait_level_default = 0,
+    can_target_allies  = 1,
     midposoffset   = [[0 10 0]],
   },
 

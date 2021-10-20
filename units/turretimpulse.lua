@@ -18,6 +18,7 @@ return { turretimpulse = {
 
   customParams                  = {
     bait_level_default = 0,
+    can_target_allies  = 1,
     modelradius    = [[25]],
     lookahead      = 120,
   },
