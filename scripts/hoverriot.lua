@@ -5,8 +5,8 @@ local barrel = piece 'barrel'
 local barrel = piece 'barrel'
 local rthrustpoint = piece 'rthrustpoint'
 local lthrustpoint = piece 'lthrustpoint'
-local tankl = piece 'tankl'
-local tankr = piece 'tankr'
+local ltank = piece 'ltank'
+local rtank = piece 'rtank'
 
 local IN_LOS = {inlos = true}
 local wakes = {}
@@ -27,6 +27,9 @@ local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
 local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
 local TURN_SPEED_FACTOR = 0.5 -- So it doesn't rotate right around in a silly looking way.
 local MOVE_THRESHOLD = 8
+
+local END_ANIM_PAD = 25 * SPEEDUP_RELOAD_PER_FRAME
+local TANK_TURN = math.rad(18)
 
 ----------------------------------------------------------
 
@@ -90,11 +93,23 @@ local function MoveScript()
 end
 
 local function SetSprintAnimation(prop)
-	Move(tankl, x_axis, -11.5*prop, 11.5)
-	Move(tankl, z_axis, 5*prop, 5)
+	local speed = 1
+	if prop < 1 then
+		speed = 0.4
+	end
+	Move(ltank, x_axis, -10*prop, 10*speed)
+	Move(ltank, z_axis, 5*prop, 5*speed)
 	
-	Move(tankr, x_axis, 11.5*prop, 11.5)
-	Move(tankr, z_axis, 5*prop, 5)
+	Move(rtank, x_axis, 10*prop, 10*speed)
+	Move(rtank, z_axis, 5*prop, 5*speed)
+	
+	if prop > 0 and prop < 1 then
+		Turn(ltank, y_axis, -TANK_TURN*(1 - prop), speed)
+		Turn(rtank, y_axis, TANK_TURN*(1 - prop), speed)
+	else
+		Turn(ltank, y_axis, 0, speed)
+		Turn(rtank, y_axis, 0, speed)
+	end
 end
 
 local function SprintThread()
@@ -138,7 +153,7 @@ local function SprintThread()
 				if reloadRemaining < 0 then
 					reloadRemaining = 0
 				end
-				SetSprintAnimation(reloadRemaining*0.97 + 0.03)
+				SetSprintAnimation(math.max(0, reloadRemaining - END_ANIM_PAD))
 				Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", reloadRemaining, IN_LOS)
 			end
 		end

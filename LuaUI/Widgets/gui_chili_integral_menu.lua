@@ -76,6 +76,11 @@ local DRAW_NAME_COMMANDS = {
 	[CMD.STOCKPILE] = true, -- draws stockpile progress (command handler sends correct string).
 }
 
+local DYNAMIC_COMMANDS = {
+	[CMD_ONECLICK_WEAPON] = true,
+	[CMD.MANUALFIRE] = true,
+}
+
 local REMOVE_TAG_FRAMES = 180 -- Game frames between reseting the tag removal table.
 
 -- Defined upon learning the appropriate colors
@@ -1431,6 +1436,13 @@ local function GetButton(parent, name, selectionIndex, x, y, xStr, yStr, width, 
 					end
 					SetImage(texture)
 				end
+			elseif newCmdID and DYNAMIC_COMMANDS[newCmdID] then
+				-- Reset potentially stale special weapon iamge and tooltip.
+				-- Action is the same so hotkey does not require a reset.
+				local displayConfig = GetDisplayConfig(cmdID)
+				button.tooltip = GetButtonTooltip(displayConfig, command, state)
+				local texture = (displayConfig and displayConfig.texture) or command.texture
+				SetImage(texture)
 			end
 			if not notGlobal then
 				buttonsByCommand[cmdID] = externalFunctionsAndData
