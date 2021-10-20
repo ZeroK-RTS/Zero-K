@@ -28,6 +28,8 @@ return { jumpscout = {
     grey_goo_drain = 5,
     grey_goo_cost = 45,
     grey_goo_range = 120,
+    jump_using_weapon = 1, -- Value is weapon number
+    jump_self_damage = 15,
     selection_scale = 1, -- Maybe change later
     select_show_eco = 1,
   },
