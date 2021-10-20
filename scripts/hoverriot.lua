@@ -5,6 +5,8 @@ local barrel = piece 'barrel'
 local barrel = piece 'barrel'
 local rthrustpoint = piece 'rthrustpoint'
 local lthrustpoint = piece 'lthrustpoint'
+local tankl = piece 'tankl'
+local tankr = piece 'tankr'
 
 local IN_LOS = {inlos = true}
 local wakes = {}
@@ -87,9 +89,19 @@ local function MoveScript()
 	end
 end
 
+local function SetSprintAnimation(prop)
+	Move(tankl, x_axis, -11.5*prop, 11.5)
+	Move(tankl, z_axis, 5*prop, 5)
+	
+	Move(tankr, x_axis, 11.5*prop, 11.5)
+	Move(tankr, z_axis, 5*prop, 5)
+end
+
 local function SprintThread()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
+	SetSprintAnimation(1)
+	
 	for i = 1, SPEEDUP_DURATION do
 		EmitSfx(lthrustpoint, 1026)
 		EmitSfx(rthrustpoint, 1026)
@@ -109,6 +121,7 @@ local function SprintThread()
 	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
 	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
 		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 0, IN_LOS)
+		SetSprintAnimation(0)
 		return
 	end
 	
@@ -125,6 +138,7 @@ local function SprintThread()
 				if reloadRemaining < 0 then
 					reloadRemaining = 0
 				end
+				SetSprintAnimation(reloadRemaining*0.97 + 0.03)
 				Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", reloadRemaining, IN_LOS)
 			end
 		end
@@ -139,6 +153,8 @@ local function SprintThread()
 			end
 		end
 	end
+
+	SetSprintAnimation(0)
 	
 	while (Spring.MoveCtrl.GetTag(unitID) ~= nil) do
 		Sleep(33)
