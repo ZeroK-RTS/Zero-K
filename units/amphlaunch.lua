@@ -22,6 +22,7 @@ return { amphlaunch = {
     amph_submerged_at  = 40,
     thrower_gather     = 160,
     attack_toggle      = [[1]],
+    can_target_allies  = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

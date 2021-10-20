@@ -20,6 +20,7 @@ return { jumpsumo = {
 
   customParams        = {
     bait_level_default = 0,
+    can_target_allies  = 1,
     canjump            = 1,
     jump_range         = 360,
     jump_height        = 110,
