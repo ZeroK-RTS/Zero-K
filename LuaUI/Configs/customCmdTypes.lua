@@ -205,6 +205,7 @@ local usedActions = {
 	["pushpull"] = true,
 	["unit_kill_subordinates"] = true,
 	["fireatshields"] = true,
+	["firetowards"] = true,
 	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
