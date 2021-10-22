@@ -19,7 +19,7 @@ return { chickenwurm = {
     fireproof         = 1,
   },
 
-  explodeAs           = [[jumpraid_PYRO_DEATH]],
+  explodeAs           = [[CHICKENWURM_DEATH]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[spidergeneric]],
@@ -37,7 +37,7 @@ return { chickenwurm = {
   power               = 350,
   reclaimable         = false,
   script              = [[chickenwurm.lua]],
-  selfDestructAs      = [[jumpraid_PYRO_DEATH]],
+  selfDestructAs      = [[CHICKENWURM_DEATH]],
 
   sfxtypes            = {
 
@@ -156,6 +156,34 @@ return { chickenwurm = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
       waterWeapon             = true,
+    },
+
+    DEATH = {
+      name                    = [[Napalm Blast]],
+      areaofeffect            = 256,
+      craterboost             = 1,
+      cratermult              = 3.5,
+
+      customparams            = {
+        setunitsonfire = "1",
+        burnchance     = "1",
+        burntime       = 60,
+
+        area_damage = 1,
+        area_damage_radius = 128,
+        area_damage_dps = 20,
+        area_damage_duration = 13.3,
+      },
+
+      damage                  = {
+        default = 50,
+      },
+
+      edgeeffectiveness       = 0.5,
+      explosionGenerator      = [[custom:napalm_pyro]],
+      impulseboost            = 0,
+      impulsefactor           = 0,
+      soundhit                = [[explosion/ex_med3]],
     },
   },
 
