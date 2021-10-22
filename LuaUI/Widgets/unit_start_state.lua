@@ -18,7 +18,6 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 
 local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")

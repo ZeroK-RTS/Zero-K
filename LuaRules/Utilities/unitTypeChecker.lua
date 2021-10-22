@@ -1,7 +1,3 @@
-if Spring.Utilities.getMovetype then
-	return -- Prevents repeated including in widgets environment
-end
-
 local moveType = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]

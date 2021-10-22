@@ -14,7 +14,6 @@ local detectionRange = 600
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
-VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
