@@ -435,6 +435,10 @@ function gadget:Initialize()
 		if (ud.moveDef.smClass == shipSMClass) then
 			boats[i] = true
 		end
+
+		if ud.customParams.dynamic_comm then
+			comms[i] = true
+		end
 	end
 
 	for i=1,#WeaponDefs do
@@ -443,12 +447,6 @@ function gadget:Initialize()
 			flamerWeaponDefs[i] = true
 		end
 	end
-
-	for i=1,#UnitDefs do
-		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
-	end
- end
-
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
