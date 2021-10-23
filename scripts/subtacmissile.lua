@@ -55,7 +55,14 @@ end
 function script.FireWeapon()
 	respawning_rocket = true
 	Signal (SIG_AIM)
+end
 
+function script.EndBurst()
+	--[[ NB: hiding the missile is done here rather than in FireWeapon
+	     partially because a modded unit can have a longer burst, but
+	     mostly because FireWeapon applies before the projectile is
+	     actually spawned so the Turn would ruin the spawnpoint, up to
+	     clipping it into other units or seaside cliffs. ]]
 	Hide (missile)
 	Turn (missile, x_axis, 0)
 
