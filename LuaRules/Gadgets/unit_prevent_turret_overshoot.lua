@@ -44,10 +44,6 @@ for unitDefID = 1, #UnitDefs do
     end
 end
 
-allowedRangeSqByWeapon = nil
-isSphericalByWeapon = nil
-
-
 include "LuaRules/Configs/customcmds.h.lua"
 
 local blockedCmds = {
@@ -109,7 +105,6 @@ for i = 1, #trackedWeaponDefNames do
 	local wd = WeaponDefNames[trackedWeaponDefNames[i]]
 	trackedWeaponDefIDs[wd.id] = wd.range * wd.range
 end
-trackedWeaponDefNames = nil
 
 local projectiles = {}
 local projectileByID = {}
