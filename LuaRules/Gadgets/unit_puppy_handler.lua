@@ -1,4 +1,19 @@
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--[[
+	The gadget allows a unit to "jump" using weapon projectile.
+	It hides the unit after shot, and respawns it at the target position on
+	Explosion event of any projectile from the given weapon.
+	Works with burst and noExplode weapons too, in such case the first Explosion
+	while the unit is still hidden respawns the unit.
+	It is currently limited to one weapon per unit.
+	To use:
+	1. Add "jump_using_weapon = <weapon_index>" to unit customParams.
+	2. Call GG.PuppyHandler_Shot(unitID) from unit script after the unit shoots
+	the given weapon.
+	Usually in script.Shot(num) function, or for script-emitted weapons, after
+	EmitSfx() call that fires the given weapon.
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
