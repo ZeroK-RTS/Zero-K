@@ -432,6 +432,10 @@ function gadget:Initialize()
 	for i = 1, #UnitDefs do
 		local ud = UnitDefs[i]
 
+		--[[ NB: ships that extend legs and walk onto land, like
+		     the SupCom Cybran Siren or RA3 Soviet Stingray, are
+		     technically hovercraft in Spring so would need some
+		     extra handling AFAIK. No such ship in vanilla ZK. ]]
 		if (ud.moveDef.smClass == shipSMClass) then
 			boats[i] = true
 		end
