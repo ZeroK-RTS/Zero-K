@@ -47,7 +47,7 @@ function script.Create()
 	local midpos = {midTable.midx, midTable.midy,      midTable.midz}
 	local aimpos = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	GG.SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

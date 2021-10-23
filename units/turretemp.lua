@@ -18,9 +18,10 @@ return { turretemp = {
   customParams                  = {
     bait_level_default = 1,
     bait_level_target_armor = 1,
-    aimposoffset   = [[0 10 0]],
+    aimposoffset   = [[0 12 0]],
     modelradius    = [[16]],
     aim_lookahead  = 50,
+    dynamic_colvol = [[1]],
   },
 
   damageModifier                = 0.333,

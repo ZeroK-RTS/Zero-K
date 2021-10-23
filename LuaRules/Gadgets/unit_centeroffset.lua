@@ -35,9 +35,17 @@ local FULL_GROW = 0.4
 local UPDATE_FREQUENCY = 25
 
 local growUnit = {}
+local completeGrowUnit = {}
 local offsets = {}
 local modelRadii = {}
 local noGrowUnitDefs = {}
+
+local postCompleteGrowDefs = {}
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.dynamic_colvol then
+		postCompleteGrowDefs[i] = true
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -53,7 +61,7 @@ local function UnpackInt3(str)
 	return ret
 end
 
-for i=1,#UnitDefs do
+for i = 1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local midPosOffset = ud.customParams.midposoffset
 	local aimPosOffset = ud.customParams.aimposoffset
@@ -94,33 +102,30 @@ end
 --------------------------------------------------------------------------------
 -- Unit Handling
 
-local function UpdateUnitGrow(unitID, growScale)
-	local unit = growUnit[unitID]
+local function UpdateUnitGrow(unitID, data, growScale)
 	growScale = 1 - growScale
 	
-	if unit.isSphere then
+	if data.isSphere then
 		spSetUnitCollisionVolumeData(unitID,
-			unit.scale[1], unit.scale[2], unit.scale[3],
-			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3],
-			unit.volumeType, unit.testType, unit.primaryAxis
+			data.scale[1], data.scale[2], data.scale[3],
+			data.offset[1], data.offset[2] - growScale*data.scaleOff, data.offset[3],
+			data.volumeType, data.testType, data.primaryAxis
 		)
 	else
 		spSetUnitCollisionVolumeData(unitID,
-			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3],
-			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3],
-			unit.volumeType, unit.testType, unit.primaryAxis)
+			data.scale[1], data.scale[2] - growScale*data.scaleOff, data.scale[3],
+			data.offset[1], data.offset[2] - growScale*data.scaleOff/2, data.offset[3],
+			data.volumeType, data.testType, data.primaryAxis)
 	end
 
 	spSetUnitMidAndAimPos(unitID,
-		unit.mid[1], unit.mid[2], unit.mid[3],
-		unit.aim[1], unit.aim[2] - growScale*unit.aimOff, unit.aim[3], true)
+		data.mid[1], data.mid[2], data.mid[3],
+		data.aim[1], data.aim[2] - growScale*data.aimOff, data.aim[3], true)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local ud = UnitDefs[unitDefID]
-	
 	local midTable = ud.model
-	
 	local mid, aim
 	
 	if offsets[unitDefID] and ud then
@@ -147,7 +152,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	local buildProgress = select(5, spGetUnitHealth(unitID))
-	if buildProgress > FULL_GROW then
+	if buildProgress > FULL_GROW and not postCompleteGrowDefs[unitDefID] then
 		return
 	end
 	
@@ -185,6 +190,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		testType = testType,
 		primaryAxis = primaryAxis,
 		prevGrowth = growScale,
+		dynamicColvol = postCompleteGrowDefs[unitDefID],
 	}
 	
 	local luaSelectionScale = ud.customParams.lua_selection_scale
@@ -195,7 +201,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			volumeType, testType, primaryAxis)
 	end
 	
-	UpdateUnitGrow(unitID, growScale)
+	UpdateUnitGrow(unitID, growUnit[unitID], growScale)
 end
 
 local function OverrideMidAndAimPos(unitID, mid, aim)
@@ -213,7 +219,16 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if growUnit[unitID] then
-		UpdateUnitGrow(unitID, 1)
+		UpdateUnitGrow(unitID, growUnit[unitID], 1)
+		if growUnit[unitID].dynamicColvol then
+			completeGrowUnit[unitID] = growUnit[unitID]
+		end
+		growUnit[unitID] = nil
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if completeGrowUnit[unitID] then
 		growUnit[unitID] = nil
 	end
 end
@@ -226,22 +241,41 @@ function gadget:GameFrame(f)
 				if buildProgress <= FULL_GROW then
 					local growScale = min(1, buildProgress/FULL_GROW)
 					if growScale ~= data.prevGrowth then
-						UpdateUnitGrow(unitID, growScale)
+						UpdateUnitGrow(unitID, growUnit[unitID], growScale)
 						data.prevGrowth = growScale
 					end
 				else
-					UpdateUnitGrow(unitID, 1)
+					UpdateUnitGrow(unitID, growUnit[unitID], 1)
+					if growUnit[unitID].dynamicColvol then
+						completeGrowUnit[unitID] = growUnit[unitID]
+					end
 					growUnit[unitID] = nil
 				end
 			else
+				if growUnit[unitID].dynamicColvol then
+					completeGrowUnit[unitID] = growUnit[unitID]
+				end
 				growUnit[unitID] = nil
 			end
 		end
 	end
 end
 
+local function OffsetColVol(unitID, offset)
+	if growUnit[unitID] then
+		growUnit[unitID].offset[2] = offset
+		UpdateUnitGrow(unitID, growUnit[unitID], 1)
+		return
+	end
+	if completeGrowUnit[unitID] then
+		completeGrowUnit[unitID].offset[2] = offset
+		UpdateUnitGrow(unitID, completeGrowUnit[unitID], 1)
+	end
+end
+
 function gadget:Initialize()
 	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
+	GG.OffsetColVol = OffsetColVol
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

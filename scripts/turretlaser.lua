@@ -48,7 +48,7 @@ function script.Create()
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
     
-	GG.SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
