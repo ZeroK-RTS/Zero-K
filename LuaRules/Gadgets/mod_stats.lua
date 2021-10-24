@@ -92,16 +92,18 @@ for unitDefID = 1, #UnitDefs do
 	end
 
 	-- Autogenerate weaponIDToUnitDefID table
-	local weapons = ud.weapons
-	if (weapons) then
-        for i = 1, #weapons do
-			local weaponDefID = weapons[i].weaponDef
-			addWeaponIDToUnitMapping(weaponDefID, unitDefStatsID)
-        end
-    end
+	if (not ud.customParams.dynamic_comm) then
+		local weapons = ud.weapons
+		if (weapons) then
+			for i = 1, #weapons do
+				local weaponDefID = weapons[i].weaponDef
+				addWeaponIDToUnitMapping(weaponDefID, unitDefStatsID)
+			end
+		end
 
-	addWeaponNameToUnitMapping(ud.deathExplosion, unitDefStatsID)
-	addWeaponNameToUnitMapping(ud.selfDExplosion, unitDefStatsID)
+		addWeaponNameToUnitMapping(ud.deathExplosion, unitDefStatsID)
+		addWeaponNameToUnitMapping(ud.selfDExplosion, unitDefStatsID)
+	end
 end
 
 --------------------------------------------------------------------------------
