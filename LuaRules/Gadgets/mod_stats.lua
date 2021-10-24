@@ -78,7 +78,7 @@ for unitDefID = 1, #UnitDefs do
 
 	-- Autogenerate drones table
 	if (ud.customParams.is_drone or ud.customParams.has_parent_unit) then
-		drones[ud.name] = true  -- using ud.name, not ud.customParams.statsname here, as drone is mapped to parent before mapping to statsname
+		drones[unitDefID] = true  -- using unitDefID, not unitDefStatsID here, as drone is mapped to parent before mapping to statsname
 	end
 
 	-- Autogenerate weaponIDToUnitDefID table
@@ -136,10 +136,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	
 	
 	-- treat as different unit as needed
-	if drones[UnitDefs[unitDefID].name] then
+	if drones[unitDefID] then
 		return
 	end
-	if drones[UnitDefs[attackerDefID].name] then
+	if drones[attackerDefID] then
 		local parentUnitDefID = attackerID and unitIDToParentDefID[attackerID]
 		attackerDefID = parentUnitDefID or attackerDefID
 	end
@@ -193,7 +193,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lastPara[unitID] = nil
 	unitIDToParentDefID[unitID] = nil
 
-	if (drones[UnitDefs[unitDefID].name]) then
+	if (drones[unitDefID]) then
 		checkParentCount = checkParentCount + 1
 		checkParentList[checkParentCount] = unitID
 	end
