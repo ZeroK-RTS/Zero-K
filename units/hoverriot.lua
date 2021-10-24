@@ -23,7 +23,7 @@ return { hoverriot = {
     specialreloadtime = [[1350]],
     specialreload_userate = [[1]],
     boost_speed_mult = 5,
-    boost_reload_speed_mult = 0.9,
+    boost_reload_speed_mult = 0.8,
     boost_duration = 30, -- frames
     turnatfullspeed_hover = [[1]],
   },
