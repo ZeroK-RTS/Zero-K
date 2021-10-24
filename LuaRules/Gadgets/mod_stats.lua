@@ -43,11 +43,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 --------------------------------------------------------------------------------
 
 -- drones are counted as parent for damage done, ignored for damage received
--- key = drone, value = true
-local drones = {
-	dronecarry = true,
-	wolverine_mine = true,
-}
+local drones = {}
 
 -- remembers parent unitDefID while parent unit is alive, because minelayer unit can get destroyed before mines do
 local unitIDToParentDefID = {}
@@ -80,6 +76,12 @@ end
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 
+	-- Autogenerate drones table
+	if (ud.customParams.is_drone or ud.customParams.has_parent_unit) then
+		drones[ud.name] = true  -- using ud.name, not ud.customParams.statsname here, as drone is mapped to parent before mapping to statsname
+	end
+
+	-- Autogenerate weaponIDToUnitDefID table
 	local unitDefStatsID = unitDefID
 	local unitDefAlias = ud.customParams.statsname
 	if unitDefAlias and UnitDefNames[unitDefAlias] then

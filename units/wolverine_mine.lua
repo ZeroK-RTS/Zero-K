@@ -23,6 +23,7 @@ return { wolverine_mine = {
     dontcount = [[1]],
     mobilebuilding = [[1]],
     idle_cloak = 1,
+    has_parent_unit = 1,
   },
 
   explodeAs              = [[NOWEAPON]],
