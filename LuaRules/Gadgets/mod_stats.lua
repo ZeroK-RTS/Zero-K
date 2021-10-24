@@ -51,6 +51,8 @@ local unitIDToParentDefID = {}
 local checkParentList = {}
 local checkParentCount = 0
 
+local unitDefIDToStatsID = {}
+
 -- fallback for when attacker is already dead at damage event - attackerDefID == nil
 local weaponIDToUnitDefID = {}
 -- temporary variable used to exclude weapons used by multiple unit types
@@ -81,13 +83,15 @@ for unitDefID = 1, #UnitDefs do
 		drones[unitDefID] = true  -- using unitDefID, not unitDefStatsID here, as drone is mapped to parent before mapping to statsname
 	end
 
-	-- Autogenerate weaponIDToUnitDefID table
+	-- Autogenerate unitDefIDToStatsID table
 	local unitDefStatsID = unitDefID
 	local unitDefAlias = ud.customParams.statsname
 	if unitDefAlias and UnitDefNames[unitDefAlias] then
 		unitDefStatsID = UnitDefNames[unitDefAlias].id
+		unitDefIDToStatsID[unitDefID] = unitDefStatsID
 	end
 
+	-- Autogenerate weaponIDToUnitDefID table
 	local weapons = ud.weapons
 	if (weapons) then
         for i = 1, #weapons do
@@ -143,14 +147,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		local parentUnitDefID = attackerID and unitIDToParentDefID[attackerID]
 		attackerDefID = parentUnitDefID or attackerDefID
 	end
-	local attackerAlias = UnitDefs[attackerDefID].customParams.statsname
-	if attackerAlias and UnitDefNames[attackerAlias] then
-		attackerDefID = UnitDefNames[attackerAlias].id
-	end
-	local defenderAlias = UnitDefs[unitDefID].customParams.statsname
-	if defenderAlias and UnitDefNames[defenderAlias] then
-		unitDefID = UnitDefNames[defenderAlias].id
-	end
+
+	attackerDefID = unitDefIDToStatsID[attackerDefID] or attackerDefID
+	unitDefID = unitDefIDToStatsID[unitDefID] or unitDefID
 	
 	
 	local hp, maxHp, paraDam, capture, build = spGetUnitHealth(unitID)
@@ -198,10 +197,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		checkParentList[checkParentCount] = unitID
 	end
 
-	local unitAlias = UnitDefs[unitDefID].customParams.statsname
-	if unitAlias and UnitDefNames[unitAlias] then
-		unitDefID = UnitDefNames[unitAlias].id
-	end
+	unitDefID = unitDefIDToStatsID[unitDefID] or unitDefID
 	
 	if (builderID == nil) then
 		local tab = unitCounts[unitDefID]
@@ -217,10 +213,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil
 
-	local unitAlias = UnitDefs[unitDefID].customParams.statsname
-	if unitAlias and UnitDefNames[unitAlias] then
-		unitDefID = UnitDefNames[unitAlias].id
-	end
+	unitDefID = unitDefIDToStatsID[unitDefID] or unitDefID
 	
 	local tab = unitCounts[unitDefID]
 	if (tab == nil) then
@@ -235,10 +228,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil
 	-- Not clearing unitIDToParentDefID here, because fired projectiles may still exist
 
-	local unitAlias = UnitDefs[unitDefID].customParams.statsname
-	if unitAlias and UnitDefNames[unitAlias] then
-		unitDefID = UnitDefNames[unitAlias].id
-	end
+	unitDefID = unitDefIDToStatsID[unitDefID] or unitDefID
 	
 	local tab = unitCounts[unitDefID]
 	if (tab == nil) then
