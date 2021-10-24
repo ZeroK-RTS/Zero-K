@@ -43,11 +43,17 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 --------------------------------------------------------------------------------
 
 -- drones are counted as parent for damage done, ignored for damage received
--- key = drone, value = parent
+-- key = drone, value = true
 local drones = {
-	dronecarry = "shipcarrier",
-	wolverine_mine = "veharty",
+	dronecarry = true,
+	wolverine_mine = true,
 }
+
+-- remembers parent unitDefID while parent unit is alive, because minelayer unit can get destroyed before mines do
+local unitIDToParentDefID = {}
+
+local checkParentList = {}
+local checkParentCount = 0
 
 -- fallback for when attacker is already dead at damage event - attackerDefID == nil
 local weaponIDToUnitDefID = {}
@@ -132,8 +138,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		return
 	end
 	if drones[UnitDefs[attackerDefID].name] then
-		local name = drones[UnitDefs[attackerDefID].name]
-		attackerDefID = (UnitDefNames[name] and UnitDefNames[name].id) or attackerDefID
+		local parentUnitDefID = attackerID and unitIDToParentDefID[attackerID]
+		attackerDefID = parentUnitDefID or attackerDefID
 	end
 	local attackerAlias = UnitDefs[attackerDefID].customParams.statsname
 	if attackerAlias and UnitDefNames[attackerAlias] then
@@ -183,6 +189,12 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lastPara[unitID] = nil
+	unitIDToParentDefID[unitID] = nil
+
+	if (drones[UnitDefs[unitDefID].name]) then
+		checkParentCount = checkParentCount + 1
+		checkParentList[checkParentCount] = unitID
+	end
 
 	local unitAlias = UnitDefs[unitDefID].customParams.statsname
 	if unitAlias and UnitDefNames[unitAlias] then
@@ -219,6 +231,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil
+	-- Not clearing unitIDToParentDefID here, because fired projectiles may still exist
 
 	local unitAlias = UnitDefs[unitDefID].customParams.statsname
 	if unitAlias and UnitDefNames[unitAlias] then
@@ -231,6 +244,23 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		unitCounts[unitDefID] = tab
 	end
 	tab[2] = tab[2] + 1
+end
+
+function gadget:GameFrame(frame)
+	if checkParentCount > 0 then
+		for i = 1, checkParentCount do
+			local unitID = checkParentList[i]
+			local parentUnitID = Spring.GetUnitRulesParam(unitID, "parent_unit_id")
+			if (parentUnitID) then -- can be null if minelayer unit dies before mine even spawns
+				local parentUnitDefID = Spring.GetUnitDefID(parentUnitID)
+				if (parentUnitDefID) then
+					unitIDToParentDefID[unitID] = parentUnitDefID -- remember parent unitDefID, because parent unit may die later
+				end
+			end
+		end
+
+		checkParentCount = 0
+	end
 end
 
 function SendData(statsData)
