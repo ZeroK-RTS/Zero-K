@@ -89,6 +89,7 @@ function script.FireWeapon(checkHeight)
 			Turn(preDrop, z_axis, -angle_z)
 			
 			EmitSfx(drop, GG.Script.FIRE_W2)
+			GG.PokeDecloakUnit(unitID, unitDefID)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
 				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
