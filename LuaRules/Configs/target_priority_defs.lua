@@ -1,5 +1,8 @@
--- Assuming max HP/Cost is 50.
--- Max useful HP/Cost is 11, Only Dirtbag and Claw are higher at 32.5 and 40 respectively.
+-- Assuming max HP/Cost is 50 (for setting crappy targets above this threshold).
+--   Max useful HP/Cost is 11 (open Razor).
+--   Some chaff (Gull and Viper drones; Djinn's Lamps) are 12-15.
+--   Dirtbag is the highest among regular units at 20.
+--   Planet Wars buildings reach up to 40 (basic Wormhole).
 
 local DISARM_BASE = 0.3
 local DISARM_ADD = 0.2
