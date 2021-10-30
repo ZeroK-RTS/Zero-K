@@ -14,6 +14,7 @@ local flare = {
 	[0] = flare1,
 	[1] = flare2,
 }
+local isMoving = false
 
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
@@ -119,10 +120,12 @@ function script.Create()
 end
 
 function script.StartMoving()
+	isMoving = true
 	activate()
 end
 
 function script.StopMoving()
+	isMoving = false
 	deactivate()
 end
 
@@ -139,7 +142,11 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1)
+	if not (GetUnitValue(COB.CRASHING) == 1) and isMoving then
+		x,y,z = Spring.GetUnitVelocity(unitID)
+		return (x ~=0 or z ~= 0)
+	end
+	return false
 end
 
 function script.FireWeapon(num)
