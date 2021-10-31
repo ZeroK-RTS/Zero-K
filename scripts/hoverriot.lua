@@ -93,7 +93,7 @@ local function MoveScript()
 end
 
 local function SetSprintAnimation(prop)
-	local speed = 1
+	local speed = 30/SPEEDUP_DURATION
 	if prop < 1 then
 		speed = 0.4
 	end

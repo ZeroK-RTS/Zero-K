@@ -45,7 +45,7 @@ local oneClickWepDefNames = {
 		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	hoverriot = {
-		{ functionToCall = "Sprint", reloadTime = 1050, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+		{ functionToCall = "Sprint", reloadTime = 1050, name = "Speed Boost", tooltip = "Speed boost (5x for 0.66 seconds)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--planescout = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
