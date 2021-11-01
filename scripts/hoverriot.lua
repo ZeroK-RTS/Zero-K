@@ -127,18 +127,22 @@ local function SprintThread()
 		Sleep(33)
 	end
 	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_RELOAD_FACTOR)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SPEEDUP_RELOAD_FACTOR)
-	GG.SetAllowUnitCoast(unitID, true)
-	GG.UpdateUnitAttributes(unitID)
 	
 	-- Refund reload time if the unit didn't move.
 	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
 	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
 		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 0, IN_LOS)
 		SetSprintAnimation(0)
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+		GG.UpdateUnitAttributes(unitID)
 		return
 	end
+	
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_RELOAD_FACTOR)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SPEEDUP_RELOAD_FACTOR)
+	GG.SetAllowUnitCoast(unitID, true)
+	GG.UpdateUnitAttributes(unitID)
 	
 	local coastFrames = 39 -- Give the unit some time to coast, as attribute speed below zero sets high deccelleration.
 	local reloadRemaining = 1 -- Synced to specialReloadRemaining because nothing else changes it.
