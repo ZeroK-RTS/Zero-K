@@ -275,6 +275,7 @@ end
 local function ReturnUnitToIdlePos(unitID, unitData, force)
 	unitData.queueReturnX = unitData.idleX
 	unitData.queueReturnZ = unitData.idleZ
+	unitData.returnCommandPos = true
 	unitData.setReturn = true
 	unitData.forceReturn = force
 end
@@ -822,7 +823,70 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
----- Unit AI Selection
+---- Idling and Dodging
+
+local function AddIdleUnit(unitID, unitDefID)
+	if not (unit[unitID] and spValidUnitID(unitID)) then
+		return
+	end
+	local unitData = unit[unitID]
+	unitData.wasIdle = true
+	
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if doDebug then
+		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
+		Spring.Echo("=== Unit Idle", unitID, " ===")
+	end
+
+	if unitData.idleWantReturn and unitData.idleX then
+		if unitData.wasDodge then
+			return
+		end
+		if doDebug then
+			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
+		end
+		ReturnUnitToIdlePos(unitID, unitData)
+		return
+	end
+	
+	local behaviour = GetUnitBehavior(unitID, unitData.udID)
+	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
+	
+	-- Only update idle pos with commands not issued as part of returning to idle pos
+	if not unitData.returnCommandPos then
+		local x, _, z = Spring.GetUnitPosition(unitID)
+		unitData.idleX = x
+		unitData.idleZ = z
+	end
+	unitData.wantFightReturn = nil
+	unitData.returnCommandPos = nil
+	unitData.idleWantReturn = nil
+
+	if doDebug or true then
+		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
+		Spring.MarkerAddPoint(unitData.idleX, 0, unitData.idleZ, "IG")
+	end
+	
+	if nearbyEnemy then
+		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
+		if enemyUnitDef and typeKnown then
+			local enemyRange = GetEnemyRealRange(enemyUnitDef)
+			if enemyRange and enemyRange > 0 then
+				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
+				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
+					nearbyEnemy = false -- Don't aggress against nearby enemy that cannot shoot.
+				end
+			end
+		end
+	end
+	
+	if doDebug then
+		Spring.Echo("After nearby check", nearbyEnemy)
+	end
+	
+	SetIdleAgression(unitID, unitData, nearbyEnemy)
+	--Spring.Utilities.UnitEcho(unitID, "I")
+end
 
 local function DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
 	if (haveFight or unitData.wasIdle) and not holdPos then
@@ -838,13 +902,12 @@ local function DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
 			end
 			unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
 			unitData.receivedOrder = true
-			unitData.idleDodge = unitData.wasIdle
-			unitData.idleWantReturn = false
+			unitData.wasDodge = true
 			return true
 		end
 	end
 
-	if unitData.idleDodge then
+	if unitData.wasDodge then
 		local canIdleReturn = true
 		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
 		if dodgeX ~= 0 or dodgeZ ~= 0 then
@@ -854,17 +917,20 @@ local function DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
 			local cx, cz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
 			canIdleReturn = cx == rx and cz == rz
 		end
-
+		
 		-- return to idle pos if safe
 		if canIdleReturn then
-			unitData.idleDodge = false
-			unitData.idleWantReturn = true
-			ReturnUnitToIdlePos(unitID, unitData)
+			unitData.wasDodge = false
+			AddIdleUnit(unitID, unitData)
 		end
 	end
 
 	return false
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---- Unit AI Selection
 
 local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 		fx, fy, fz, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
@@ -1020,14 +1086,14 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Echo("wasIdle", unitData.wasIdle, "isIdleAttack", isIdleAttack, "idleWantReturn", unitData.idleWantReturn)
 		Spring.Echo("queueReturnX queueReturnZ", unitData.queueReturnX, unitData.queueReturnZ, "setReturn", unitData.setReturn)
 	end
-	
-	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack)
+
+	local dodgeSentOrder = DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
+
+	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack or unitData.wasDodge)
 	if doDebug then
 		Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
 		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 	end
-
-	local dodgeSentOrder = DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
 
 	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
@@ -1147,65 +1213,6 @@ end
 --------------------------------------------------------------------------------
 -- Idle Handling
 
-local function AddIdleUnit(unitID, unitDefID)
-	if not (unit[unitID] and spValidUnitID(unitID)) then
-		return
-	end
-	local unitData = unit[unitID]
-	unitData.wasIdle = true
-	
-	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
-	if doDebug then
-		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
-		Spring.Echo("=== Unit Idle", unitID, " ===")
-	end
-
-	if unitData.idleDodge then
-		return
-	end
-	
-	if unitData.idleWantReturn and unitData.idleX then
-		if doDebug then
-			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
-		end
-		ReturnUnitToIdlePos(unitID, unitData)
-		return
-	end
-	
-	local behaviour = GetUnitBehavior(unitID, unitData.udID)
-	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
-	local x, _, z = Spring.GetUnitPosition(unitID)
-	
-	unitData.idleX = x
-	unitData.idleZ = z
-	unitData.wantFightReturn = nil
-	unitData.idleWantReturn = nil
-
-	if doDebug then
-		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
-	end
-	
-	if nearbyEnemy then
-		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
-		if enemyUnitDef and typeKnown then
-			local enemyRange = GetEnemyRealRange(enemyUnitDef)
-			if enemyRange and enemyRange > 0 then
-				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
-				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
-					nearbyEnemy = false -- Don't aggress against nearby enemy that cannot shoot.
-				end
-			end
-		end
-	end
-	
-	if doDebug then
-		Spring.Echo("After nearby check", nearbyEnemy)
-	end
-	
-	SetIdleAgression(unitID, unitData, nearbyEnemy)
-	--Spring.Utilities.UnitEcho(unitID, "I")
-end
-
 function gadget:UnitIdle(unitID, unitDefID)
 	AddIdleUnit(unitID, unitDefID)
 end
@@ -1226,6 +1233,8 @@ function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 		needNextUpdate[#needNextUpdate + 1] = unitID
 	end
 	unitData.wasIdle = false
+	unitData.wasDodge = false
+	unitData.returnCommandPos = false
 	unitData.idleWantReturn = false
 end
 
@@ -1356,7 +1365,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		unitList.count = unitList.count + 1
 		unitList.data[unitList.count] = unitID
 	end
-	local ux, _, uz = spGetUnitPosition(unitID)
 	unit[unitID] = {
 		cx = 0, cy = 0, cz = 0,
 		udID = unitDefID,
@@ -1365,10 +1373,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		active = false,
 		receivedOrder = false,
 		allyTeam = spGetUnitAllyTeam(unitID),
-		wasIdle = true,
-		idleX = ux,
-		idleZ = uz,
 	}
+	local _, _, inBuild = Spring.GetUnitIsStunned(unitID)
+	if not inBuild then
+		local ux, _, uz = spGetUnitPosition(unitID)
+		unit[unitID].wasIdle = true
+		unit[unitID].idleX = ux
+		unit[unitID].idleZ = uz
+	end
 	
 	if not behaviour.onlyIdleHandling then
 		if (behaviour.defaultAIState == 1) then
