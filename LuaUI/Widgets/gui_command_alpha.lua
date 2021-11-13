@@ -22,7 +22,7 @@ local terraformColor = {0.7, 0.75, 0, cmdAlpha}
 function widget:Initialize()
 	Spring.SetCustomCommandDrawData(CMD_ORBIT_DRAW, "Guard", {0.3, 0.3, 1.0, cmdAlpha})
 	Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, cmdAlpha}) -- "" mean there's no MOVE cursor if the command is drawn.
-	Spring.SetCustomCommandDrawData(CMD_RAW_DODGE_MOVE, "RawDodgeMove", {1.0, 1.0, 0.5, cmdAlpha})
+	Spring.SetCustomCommandDrawData(CMD_RAW_DODGE_MOVE, "RawDodgeMove", {0.7, 1.0, 0.3, cmdAlpha})
 	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, cmdAlpha})
 	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, cmdAlpha})
 	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, cmdAlpha})
