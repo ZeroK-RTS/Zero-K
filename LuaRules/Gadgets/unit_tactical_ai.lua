@@ -852,21 +852,21 @@ local function AddIdleUnit(unitID, unitDefID)
 	local behaviour = GetUnitBehavior(unitID, unitData.udID)
 	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
 	
+	if doDebug then
+		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
+		Spring.MarkerAddPoint(unitData.idleX, 0, unitData.idleZ, "IG")
+	end
 	-- Only update idle pos with commands not issued as part of returning to idle pos
 	if not unitData.returnCommandPos then
 		local x, _, z = Spring.GetUnitPosition(unitID)
 		unitData.idleX = x
 		unitData.idleZ = z
 	end
+	
 	unitData.wantFightReturn = nil
 	unitData.returnCommandPos = nil
 	unitData.idleWantReturn = nil
 
-	if doDebug or true then
-		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
-		Spring.MarkerAddPoint(unitData.idleX, 0, unitData.idleZ, "IG")
-	end
-	
 	if nearbyEnemy then
 		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
 		if enemyUnitDef and typeKnown then
@@ -888,38 +888,48 @@ local function AddIdleUnit(unitID, unitDefID)
 	--Spring.Utilities.UnitEcho(unitID, "I")
 end
 
+local function IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize)
+	if not (unitData.wasIdle and unitData.idleX) then
+		return true
+	end
+	
+	local dodgeDistSq = DistSq(unitData.idleX, unitData.idleZ, cx, cz)
+	if dodgeDistSq > ((dodgeSize + 16)*2)^2 then
+		return false
+	end
+	return true
+end
+
 local function DoProjDodgeAI(unitID, cmdTag, unitData, move, haveFight, holdPos)
 	if (haveFight or unitData.wasIdle) and not holdPos then
-		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
-		if dodgeX ~= 0 or dodgeZ ~= 0 then
+		local dodgeX, dodgeZ, dodgeSize = GG.ProjDodge.GetDodgeVector(unitID)
+		if dodgeX then
 			local ux, uy, uz = spGetUnitPosition(unitID)
 			local cx, cz = ux + dodgeX, uz + dodgeZ
-			if move then
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-			else
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+			if IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize) then
+				if move then
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+				else
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz }, CMD.OPT_ALT )
+				end
+				unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
+				unitData.receivedOrder = true
+				unitData.wasDodge = true
+				return true
 			end
-			unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
-			unitData.receivedOrder = true
-			unitData.wasDodge = true
-			return true
 		end
 	end
 
-	if unitData.wasDodge then
+	if unitData.wasDodge and unitData.wasIdle then
+		unitData.idleWantReturn = true
 		local canIdleReturn = true
-		local dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
-		if dodgeX ~= 0 or dodgeZ ~= 0 then
-			canIdleReturn = false
-		else
-			local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
-			local cx, cz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
-			canIdleReturn = cx == rx and cz == rz
-		end
-		
+		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
+		local cx, cz = GG.ProjDodge.RaycastHitZones(unitID, rx, rz)
+		--Spring.Echo(rx, rz)
+		--Spring.Echo(cx, cz)
 		-- return to idle pos if safe
-		if canIdleReturn then
+		if (not cx) or (cx == rx and cz == rz) or not IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, 20) then
 			unitData.wasDodge = false
 			AddIdleUnit(unitID, unitData)
 		end

@@ -159,9 +159,10 @@ local external = {}
 external.GetDodgeVector = function(unitID)
 	local uPos = vector.New3(spGetUnitPosition(unitID))
 	local tData, tDataCount = GetTargetDataData(unitID, uPos)
-	local dodge, maxMagnitude = {0, 0}, 0
+	local dodge, maxMagnitude, maxAoE = {0, 0}, 0, 0
 	for i = 1, tDataCount do
 		local data = tData[i]
+		maxAoE = max(data[3].aoe, maxAoE)
 		maxMagnitude = max(data[3].aoe - data[2], maxMagnitude)
 		if uPos[1] == data[1][1] and uPos[2] == data[1][2] then
 			local pVel = vector.New3(spGetProjectileVelocity(data[4]))
@@ -172,7 +173,10 @@ external.GetDodgeVector = function(unitID)
 		end
 	end
 	dodge = vector.Norm(maxMagnitude, dodge)
-	return dodge[1], dodge[2]
+	if dodge[1] == 0 and dodge[2] == 0 then
+		return false
+	end
+	return dodge[1], dodge[2], maxAoE
 end
 
 external.RaycastHitZones = function(unitID, x, z)

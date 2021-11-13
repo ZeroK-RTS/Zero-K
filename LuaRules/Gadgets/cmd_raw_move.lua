@@ -301,7 +301,7 @@ local function UpdateProjectileDodge(frame)
 		for i = rawDodgeMoveUnitCount, 1, -1 do
 			unitID = rawDodgeMoveUnit[i]
 			dodgeX, dodgeZ = GG.ProjDodge.GetDodgeVector(unitID)
-			if dodgeX ~= 0 or dodgeZ ~= 0 then
+			if dodgeX then
 				local ux, uy, uz = spGetUnitPosition(unitID)
 				local mx, mz = ux + dodgeX, uz + dodgeZ
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, mx, uy, mz}, CMD_OPT_ALT)

@@ -55,7 +55,7 @@ for projName, customData in pairs(TRACKED) do
 	local wData = {
 		wType = wDef.type,
 		tracks = wDef.tracks,
-		aoe = wDef.damageAreaOfEffect,
+		aoe = math.max(20, (wDef.impactOnly and 0) or wDef.damageAreaOfEffect),
 		dynamic = wDef.wobble ~= 0 or wDef.dance ~= 0 or wDef.tracks,
 	}
 	for key, data in pairs(customData) do
