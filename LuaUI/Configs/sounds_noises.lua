@@ -755,6 +755,16 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
+	vehheavyarty = {
+		ok = {
+			volume = 0.54,
+			[1] = "vehicle_move",
+		},
+		select = {
+			volume = 1,
+			[1] = "vehicle_select2",
+		},
+	},
 	
 	-- Tank
 	tankcon = {
@@ -799,16 +809,6 @@ local sounds = {
 		},
 	},
 	tankassault = {
-		ok = {
-			volume = 0.52,
-			[1] = "tank_move",
-		},
-		select = {
-			volume = 0.62,
-			[1] = "tank_select",
-		},
-	},
-	vehheavyarty = {
 		ok = {
 			volume = 0.52,
 			[1] = "tank_move",
