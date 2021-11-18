@@ -113,6 +113,12 @@ local function CheckDeathTeam(teamID)
 		end
 	end
 
+	--[[ Resign the team because using Ctrl+AD to quit is a habit
+	     that people have already developed (originating all the
+	     way back in OTA). Perhaps it would be good to just block
+	     the self-D command but not resign (forcing veterans to
+	     learn the new methods, which would ultimately allow us to
+	     remove the block as well). ]]
 	ghRemoveCallIn(gh, 'AllowCommand')
 	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
 	ghUpdateCallIn(gh, 'AllowCommand')
