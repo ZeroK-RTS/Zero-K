@@ -91,8 +91,13 @@ local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, 
 		speed = {vx, vy, vz},
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
-		team = meteorTeamID,
 		owner = meteorOwnerID,
+
+		--[[ usually Zenith's team, but for uncontrolled meteors
+		     like the ones from EMP or reaching the cap it's Gaia
+		     so that allied shields will block them (also prevents
+		     counting as a teamkill etc). ]]
+		team = meteorTeamID,
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
