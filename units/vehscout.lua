@@ -84,7 +84,7 @@ return { vehscout = {
       },
       
       damage                  = {
-        default = 35,
+        default = 32,
       },
   
       explosionGenerator      = [[custom:flash2purple]],

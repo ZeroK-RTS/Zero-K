@@ -20,11 +20,11 @@ return { hoverriot = {
   customParams        = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
-    specialreloadtime = [[1350]],
-    specialreload_userate = [[1]],
-    boost_speed_mult = 5,
-    boost_reload_speed_mult = 0.8,
-    boost_duration = 20, -- frames
+    --specialreloadtime = [[1350]],
+    --specialreload_userate = [[1]],
+    --boost_speed_mult = 5,
+    --boost_reload_speed_mult = 0.8,
+    --boost_duration = 20, -- frames
     turnatfullspeed_hover = [[1]],
   },
 

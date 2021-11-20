@@ -76,7 +76,7 @@ return { turretemp = {
       },
 
       damage                  = {
-        default = 1200,
+        default = 1100,
       },
 
       duration                = 8,
@@ -91,7 +91,7 @@ return { turretemp = {
       paralyzer               = true,
       paralyzeTime            = 2,
       range                   = 460,
-      reloadtime              = 2.7,
+      reloadtime              = 2.9,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

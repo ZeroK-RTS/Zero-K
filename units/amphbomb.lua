@@ -5,7 +5,7 @@ return { amphbomb = {
   acceleration           = 0.45,
   activateWhenBuilt      = true,
   brakeRate              = 1.2,
-  buildCostMetal         = 150,
+  buildCostMetal         = 160,
   buildPic               = [[AMPHBOMB.png]],
   canGuard               = true,
   canMove                = true,
@@ -38,7 +38,7 @@ return { amphbomb = {
   leaveTracks            = true,
   maxDamage              = 400,
   maxSlope               = 36,
-  maxVelocity            = 4.1,
+  maxVelocity            = 4,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[amphbomb.s3o]],
@@ -91,15 +91,15 @@ return { amphbomb = {
       customparams = {
           lups_explodespeed = 1.04,
           lups_explodelife = 0.88,
-          timeslow_damagefactor = 8,
-          timeslow_overslow_frames = 5*30, --5 seconds before slow decays
+          timeslow_damagefactor = 10,
+          timeslow_overslow_frames = 2*30, --2 seconds before slow decays
           nofriendlyfire = 1,
           light_color = [[1.88 0.63 2.5]],
           light_radius = 320,
       },
      
       damage = {
-        default          = 150.1,
+        default          = 120.1,
       },
      
       edgeEffectiveness  = 0.4,

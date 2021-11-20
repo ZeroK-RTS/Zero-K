@@ -306,6 +306,7 @@ return { raveparty = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
         script_reload = [[6]],
+        timeslow_overslow_frames = 2*30, --2 seconds before slow decays
       },
       
       damage                  = {

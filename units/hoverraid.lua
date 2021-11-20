@@ -27,7 +27,7 @@ return { hoverraid = {
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
-  iconType            = [[hoverraider]],
+  iconType            = [[hoverscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maxDamage           = 300,
@@ -88,7 +88,7 @@ return { hoverraid = {
       },
       
       damage                  = {
-        default = 100.01,
+        default = 110.01,
       },
       
       explosionGenerator      = [[custom:gauss_hit_l]],
