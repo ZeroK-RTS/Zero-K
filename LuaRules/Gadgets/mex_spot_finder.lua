@@ -428,7 +428,7 @@ local function GetSpots(gameConfig, mapConfig)
 		end
 	end
 	
-	local spots = SearchForSpots(spotValueOverride)
+	local spots = SanitiseSpots(SearchForSpots(spotValueOverride))
 	return DoMetalMult(spots), true
 end
 
