@@ -153,7 +153,7 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Set jump reload to flashes when issuing the jump command',
+		desc = 'Set jump reload to flash when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
