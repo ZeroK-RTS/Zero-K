@@ -13,7 +13,6 @@ local smokePiece = {basebottom, basemid, basetop}
 -- Local Constants
 
 local BASETOP_TURN_SPEED = math.rad(200)
-local BASEMID_TURN_SPEED = math.rad(230)
 local HOUSING_TURN_SPEED = math.rad(200)
 local SPINDLE_TURN_SPEED = math.rad(120 / 0.8)
 

@@ -103,8 +103,6 @@ local function Walk()
 		if not(isLasering or isDgunning) then
 			--left arm back, right arm front
 			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
---			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		end
 		WaitForTurn(rupleg, x_axis)
 		Sleep(0)
@@ -117,8 +115,6 @@ local function Walk()
 		if not(isLasering or isDgunning) then
 			--left arm front, right arm back
 			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
---			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 		WaitForTurn(lupleg, x_axis)
 		Sleep(0)

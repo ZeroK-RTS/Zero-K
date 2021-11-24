@@ -29,7 +29,6 @@ local WHEEL_SPIN_DECEL_L = math.rad(15)
 
 local DEPLOY_SPEED = math.rad(90)
 local TURRET_SPEED = math.rad(60)
-local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
 local PIVOT_MOD = 1.6 --appox. equal to MAX_PIVOT / turnrate

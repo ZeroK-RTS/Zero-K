@@ -16,7 +16,6 @@ local smokePiece = {body, turret}
 
 local wheels = {fwheel, rwheel1, rwheel2, rwheel3, rwheel4, lwheel1, lwheel2, lwheel3, lwheel4}
 
-local SIG_MOVE = 1
 local SIG_BUILD = 2
 
 local WHEEL_TURN_SPEED = math.rad(480)
