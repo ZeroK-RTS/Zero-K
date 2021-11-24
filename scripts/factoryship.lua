@@ -17,6 +17,7 @@ local smokePiece = {base}
 -- Signal definitions
 local SIG_BUILD = 2
 
+--[[
 local function PadAdjust()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
@@ -33,6 +34,7 @@ local function PadAdjust()
 		Sleep(500)
 	end
 end
+]]
 
 local function Unstick()
 	Signal(SIG_BUILD)

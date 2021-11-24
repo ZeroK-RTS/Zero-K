@@ -61,8 +61,8 @@ local function Bob()
 	end
 end
 
+--[[
 local function FloatBubbles()
-	--[[
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
@@ -80,8 +80,8 @@ local function FloatBubbles()
 		Sleep(33)
 		
 	end
-	]]
 end
+]]
 
 local function riseFloat_thread()
 	if floatState ~= 0 then
