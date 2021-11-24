@@ -103,7 +103,7 @@ local function GetBpHaverAndWait(unitID)
 	end
 	--local cQueue = Spring.GetFactoryCommands(unitID, 1)
 	-- Return false because factories lose wait when transfered, so should not be treated as having it set.
-	return true, false 
+	return true, false
 end
 
 --------------------------------------------------------------------------------

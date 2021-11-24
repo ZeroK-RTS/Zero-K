@@ -491,9 +491,9 @@ local function Format(amount, displaySign)
 	if type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else
 			if (amount < 20 and (amount * 10)%10 ~=0) then
-				if displaySign then 
+				if displaySign then
 					formatted = strFormat("%+.1f", amount)
-				else 
+				else
 					formatted = strFormat("%.1f", amount)
 				end
 			else

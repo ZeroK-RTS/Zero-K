@@ -91,7 +91,7 @@ local custom_cmd_actions = {
 	--terraform_internal = {cmdType = 1, name = "--terraform_internal"},
 
 	--build a "generic" plate from build factory menu
-	buildplate = {cmdType = 1, name = "Build Plate"}, 
+	buildplate = {cmdType = 1, name = "Build Plate"},
 	
 	resetfire = {cmdType = 3, name = "Reset Fire"},
 	resetmove = {cmdType = 3, name = "Reset Move"},

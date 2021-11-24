@@ -274,7 +274,7 @@ function widget:Update()
 				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
 			end
 			return
-		else 
+		else
 			if activeCmdOverride then
 				if (unitDefID == buildFactoryDefID or unitDefID == buildPlateDefID) then
 					return

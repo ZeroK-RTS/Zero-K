@@ -202,8 +202,8 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	
 	local function LeanControl(angle)
-		if angle < 0 then 
-			return -angle 
+		if angle < 0 then
+			return -angle
 		else
 			return 0
 		end
