@@ -3,6 +3,7 @@ return { striderbantha = {
   name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.314,
+  autoheal               = 20,
   brakeRate              = 1.327,
   buildCostMetal         = 10000,
   builder                = false,
