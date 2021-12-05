@@ -51,7 +51,7 @@ return { hoverheavyraid = {
   sightDistance       = 560,
   sonarDistance       = 560,
   turninplace         = 0,
-  turnRate            = 896,
+  turnRate            = 848,
 
   weapons             = {
 
@@ -84,7 +84,7 @@ return { hoverheavyraid = {
       },
       
       damage                  = {
-        default = 35,
+        default = 34,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
@@ -97,7 +97,7 @@ return { hoverheavyraid = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 232,
+      range                   = 225,
       reloadtime              = 0.3 + 1/30,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],

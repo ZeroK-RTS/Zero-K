@@ -528,7 +528,7 @@ for name, ud in pairs(UnitDefs) do
 	if ud.turnrate then
 		if ud.customparams.turnatfullspeed_hover then
 			ud.turninplace = false
-			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 1)
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 0.85)
 			ud.turninplaceanglelimit = 90
 		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
 			ud.turninplace = false
