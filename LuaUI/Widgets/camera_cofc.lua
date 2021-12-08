@@ -650,31 +650,31 @@ Complete Overhead/Free Camera has six actions:
 		path = cameraFollowPath,
 	},
 
-    thirdpersontrack = {
-		name = "Enter 3rd Person Trackmode",
-		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, or move mouse to edge of screen to jump to current unit selection (will exit mode if no selection).",
-		type = 'button',
-		hotkey = {key='k', mod='alt+'},
-		path = cameraFollowPath,
-		OnChange = function(self)
-			local selUnits = Spring.GetSelectedUnits()
-			if selUnits and selUnits[1] and thirdperson_trackunit ~= selUnits[1] then --check if 3rd Person into same unit or if there's any unit at all
-				Spring.SendCommands('viewfps')
-				Spring.SendCommands('track')
-				thirdperson_trackunit = selUnits[1]
-				local cs = Spring.GetCameraState()
-				cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
-				cs.py = cs.py + 25
+ --    thirdpersontrack = {
+	-- 	name = "Enter 3rd Person Trackmode",
+	-- 	desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, or move mouse to edge of screen to jump to current unit selection (will exit mode if no selection).",
+	-- 	type = 'button',
+	-- 	hotkey = {key='k', mod='alt+'},
+	-- 	path = cameraFollowPath,
+	-- 	OnChange = function(self)
+	-- 		local selUnits = Spring.GetSelectedUnits()
+	-- 		if selUnits and selUnits[1] and thirdperson_trackunit ~= selUnits[1] then --check if 3rd Person into same unit or if there's any unit at all
+	-- 			Spring.SendCommands('viewfps')
+	-- 			Spring.SendCommands('track')
+	-- 			thirdperson_trackunit = selUnits[1]
+	-- 			local cs = Spring.GetCameraState()
+	-- 			cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
+	-- 			cs.py = cs.py + Spring.GetUnitHeight(selUnits[1]) + 50
 
-				-- Spring.SetCameraState(cs,0)
-				OverrideSetCameraStateInterpolate(cs,0)
-			else
-				Spring.SendCommands('trackoff')
-				Spring.SendCommands('viewfree')
-				thirdperson_trackunit = false
-			end
-        end,
-	},
+	-- 			-- Spring.SetCameraState(cs,0)
+	-- 			OverrideSetCameraStateInterpolate(cs,0)
+	-- 		else
+	-- 			Spring.SendCommands('trackoff')
+	-- 			Spring.SendCommands('viewfree')
+	-- 			thirdperson_trackunit = false
+	-- 		end
+ --        end,
+	-- },
 
 
 	label_controlgroups = {name='Pan To Cluster', type='label', path = 'Settings/Interface/Control Groups'},
@@ -727,6 +727,7 @@ local spGetModKeyState		= Spring.GetModKeyState
 local spGetMouseState		= Spring.GetMouseState
 local spGetSelectedUnits	= Spring.GetSelectedUnits
 local spGetUnitPosition		= Spring.GetUnitPosition
+local spGetUnitHeight		= Spring.GetUnitHeight
 local spIsAboveMiniMap		= Spring.IsAboveMiniMap
 local spSendCommands		= Spring.SendCommands
 local spSetCameraState		= Spring.SetCameraState
@@ -1738,7 +1739,7 @@ OverviewAction = function()
 				thirdperson_trackunit = selUnits[1]
 				local cs = GetTargetCameraState()
 				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
-				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+				cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 				-- spSetCameraState(cs,0)
 				OverrideSetCameraStateInterpolate(cs,0)
 			end
@@ -1913,7 +1914,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	end
 	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
 	local x,y,z = spGetUnitPosition(thirdperson_trackunit)
-	y = y+25
+	y = y+spGetUnitHeight(thirdperson_trackunit)+50
 	for i=1, 3 do --create a (detection) sphere of increasing size to ~1600-elmo range in scroll direction
 		local sphereCenterOffset = detectionSphereRadiusAndPosition[i][2]
 		local sphereRadius = detectionSphereRadiusAndPosition[i][1]
@@ -1961,7 +1962,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	spSendCommands('track')
 	thirdperson_trackunit = foundUnit --remember current unitID
 	cs.px,cs.py,cs.pz=spGetUnitPosition(foundUnit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
-	cs.py = cs.py+25
+	cs.py = cs.py+spGetUnitHeight(foundUnit)+50
 	-- spSetCameraState(cs,0)
 	OverrideSetCameraStateInterpolate(cs,0)
 	thirdPerson_transit = spGetTimer() --block access to edge scroll until camera focus on unit
@@ -2335,7 +2336,7 @@ function widget:Update(dt)
 				local x,y,z = spGetUnitPosition(selUnits[1])
 				if x and y and z then --unit position can be NIL if spectating with limited LOS
 					cs.px,cs.py,cs.pz=x,y,z
-					cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+					cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 					-- spSetCameraState(cs,0)
 					Spring.Echo("track retarget")
 					OverrideSetCameraStateInterpolate(cs,0)
@@ -2804,7 +2805,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			thirdperson_trackunit = selUnits[1]
 			local cs = GetTargetCameraState()
 			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
-			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+			cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 			-- spSetCameraState(cs,0)
 			OverrideSetCameraStateInterpolate(cs,0)
 		else
