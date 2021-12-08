@@ -650,7 +650,9 @@ Complete Overhead/Free Camera has six actions:
 		path = cameraFollowPath,
 	},
 
- --    thirdpersontrack = {
+--Removed because it doesn't really fit for a gameplay camera, and requires a completely different input paradigm anyway
+--If this is desired it should be a separate widget that can be switched to and from freely, rather than adding more code to COFC.
+ --    thirdpersontrack = { 
 	-- 	name = "Enter 3rd Person Trackmode",
 	-- 	desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, or move mouse to edge of screen to jump to current unit selection (will exit mode if no selection).",
 	-- 	type = 'button',
@@ -1171,6 +1173,19 @@ local function VirtTraceRay(x,y, cs)
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
 end
+
+local function SetThirdPersonCameraState(cs, unit)
+	cs.px,cs.py,cs.pz=spGetUnitPosition(unit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
+	cs.py = cs.py+spGetUnitHeight(unit)+50 --move camera up incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+	return cs
+end
+
+local function SetThirdPersonCameraPosition(unit)
+	local x,y,z = spGetUnitPosition(thirdperson_trackunit)
+	y = y+spGetUnitHeight(thirdperson_trackunit)+50
+	return x,y,z
+end
+
 
 ApplyCenterBounds = function(cs, ignoreLockSpot)
 	local csnew = spGetCameraState()
@@ -1738,8 +1753,7 @@ OverviewAction = function()
 				spSendCommands('track') -- re-issue 3rd person for selected unit
 				thirdperson_trackunit = selUnits[1]
 				local cs = GetTargetCameraState()
-				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
-				cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+				SetThirdPersonCameraState(cs, selUnits[1])
 				-- spSetCameraState(cs,0)
 				OverrideSetCameraStateInterpolate(cs,0)
 			end
@@ -1913,8 +1927,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 		backwardOffset = true
 	end
 	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
-	local x,y,z = spGetUnitPosition(thirdperson_trackunit)
-	y = y+spGetUnitHeight(thirdperson_trackunit)+50
+	local x,y,z = SetThirdPersonCameraPosition(thirdperson_trackunit)
 	for i=1, 3 do --create a (detection) sphere of increasing size to ~1600-elmo range in scroll direction
 		local sphereCenterOffset = detectionSphereRadiusAndPosition[i][2]
 		local sphereRadius = detectionSphereRadiusAndPosition[i][1]
@@ -1961,8 +1974,6 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	spSendCommands('viewfps')
 	spSendCommands('track')
 	thirdperson_trackunit = foundUnit --remember current unitID
-	cs.px,cs.py,cs.pz=spGetUnitPosition(foundUnit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
-	cs.py = cs.py+spGetUnitHeight(foundUnit)+50
 	-- spSetCameraState(cs,0)
 	OverrideSetCameraStateInterpolate(cs,0)
 	thirdPerson_transit = spGetTimer() --block access to edge scroll until camera focus on unit
@@ -2335,8 +2346,7 @@ function widget:Update(dt)
 				thirdperson_trackunit = selUnits[1]
 				local x,y,z = spGetUnitPosition(selUnits[1])
 				if x and y and z then --unit position can be NIL if spectating with limited LOS
-					cs.px,cs.py,cs.pz=x,y,z
-					cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+					SetThirdPersonCameraState(cs, selUnits[1])
 					-- spSetCameraState(cs,0)
 					Spring.Echo("track retarget")
 					OverrideSetCameraStateInterpolate(cs,0)
@@ -2804,8 +2814,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			spSendCommands('track')
 			thirdperson_trackunit = selUnits[1]
 			local cs = GetTargetCameraState()
-			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
-			cs.py= cs.py+spGetUnitHeight(selUnits[1])+50 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+			SetThirdPersonCameraState(cs, selUnits[1])
 			-- spSetCameraState(cs,0)
 			OverrideSetCameraStateInterpolate(cs,0)
 		else
