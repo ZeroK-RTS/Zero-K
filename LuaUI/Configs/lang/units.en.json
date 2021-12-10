@@ -152,7 +152,7 @@
 	"turretgauss" : {
 		"name" : "Gauss",
 		"description" : "Popup gauss turret, regenerates when closed (Anti-Sub)",
-		"helptext" : "The Gauss is a compact, resilient turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage as well as a small amount of health regeneration. It can also attack underwater targets."
+		"helptext" : "The Gauss is a compact, resilient turret with a medium-range gauss cannon. When popped down, it receives a third of incoming damage as well as a small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
 		"name" : "Nebula",
@@ -192,7 +192,7 @@
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a quarter. The Crab's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -262,7 +262,7 @@
 	"hoverassault" : {
 		"name" : "Halberd",
 		"description" : "Blockade Runner Hover",
-		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 4x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
+		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 3x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
 	},
 	"shieldcon" : {
 		"name" : "Convict",
@@ -372,7 +372,7 @@
 	"energysolar" : {
 		"name" : "Solar Collector",
 		"description" : "Small Powerplant",
-		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
+		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a third and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
 		"name" : "Nimbus",
@@ -782,7 +782,7 @@
 	"turretemp" : {
 		"name" : "Faraday",
 		"description" : "EMP Turret",
-		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
+		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a third. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
 	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
@@ -882,7 +882,7 @@
 	"turretantiheavy" : {
 		"name" : "Lucifer",
 		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
-		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
+		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",
@@ -982,7 +982,7 @@
 	"turretheavy" : {
 		"name" : "Desolator",
 		"description" : "Medium Range Defense Fortress - Power by connecting to a 50 energy grid",
-		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
+		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a third, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
@@ -1052,7 +1052,7 @@
 	"turretaalaser" : {
 		"name" : "Razor",
 		"description" : "Hardened Anti-Air Laser",
-		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed make it very hard for the enemy to dislodge."
+		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 3x armour bonus when closed make it very hard for the enemy to dislodge."
 	},
 	"hovercon" : {
 		"name" : "Quill",
