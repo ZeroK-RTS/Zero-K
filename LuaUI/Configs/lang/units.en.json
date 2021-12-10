@@ -52,7 +52,7 @@
 	"tankassault" : {
 		"name" : "Minotaur",
 		"description" : "Assault Tank",
-		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability."
+		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of maneuverability."
 	},
 	"chicken_listener" : {
 		"name" : "Listener",
@@ -107,7 +107,7 @@
 	"tankheavyassault" : {
 		"name" : "Cyclops",
 		"description" : "Very Heavy Tank Buster",
-		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
+		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent them from escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
 	},
 	"damagesink" : {
 		"name" : "Damage Sink thing",
@@ -137,7 +137,7 @@
 	"staticjammer" : {
 		"name" : "Cornea",
 		"description" : "Area Cloaker/Jammer",
-		"helptext" : "Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. The Cornea is also equipped with a cloak shield to hide nearby units from enemy sight."
+		"helptext" : "Jammers such as this interfere with enemy radar waves, concealing your units' radar returns. The Cornea is also equipped with a cloak shield to hide nearby units from enemy sight."
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
@@ -152,7 +152,7 @@
 	"turretgauss" : {
 		"name" : "Gauss",
 		"description" : "Popup gauss turret, regenerates when closed (Anti-Sub)",
-		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
+		"helptext" : "The Gauss is a compact, resilient turret with a medium-range gauss cannon. When popped down, it receives a third of incoming damage as well as a small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
 		"name" : "Nebula",
@@ -192,7 +192,7 @@
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a quarter. The Crab's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -262,7 +262,7 @@
 	"hoverassault" : {
 		"name" : "Halberd",
 		"description" : "Blockade Runner Hover",
-		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 4x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
+		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 3x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
 	},
 	"shieldcon" : {
 		"name" : "Convict",
@@ -272,7 +272,7 @@
 	"energysingu" : {
 		"name" : "Singularity Reactor",
 		"description" : "Large Powerplant HAZARDOUS",
-		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
+		"helptext" : "The Singularity Reactor generates a massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
 	"bomberdisarm" : {
 		"name" : "Thunderbird",
@@ -372,7 +372,7 @@
 	"energysolar" : {
 		"name" : "Solar Collector",
 		"description" : "Small Powerplant",
-		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
+		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a third and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
 		"name" : "Nimbus",
@@ -497,7 +497,7 @@
 	"amphassault" : {
 		"name" : "Grizzly",
 		"description" : "Heavy Amphibious Assault Walker",
-		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot."
+		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to the surface in order to shoot."
 	},
 	"shieldaa" : {
 		"name" : "Vandal",
@@ -577,7 +577,7 @@
 	"gunshipbomb" : {
 		"name" : "Blastwing",
 		"description" : "Flying Bomb/Scout (Burrows)",
-		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
+		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more formidable punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"napalmmissile" : {
 		"name" : "Inferno",
@@ -637,7 +637,7 @@
 	"cloakraid" : {
 		"name" : "Glaive",
 		"description" : "Light Raider Bot",
-		"helptext" : "Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmanouver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat."
+		"helptext" : "Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmaneuver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat."
 	},
 	"gunshipaa" : {
 		"name" : "Trident",
@@ -692,7 +692,7 @@
 	"spideremp" : {
 		"name" : "Venom",
 		"description" : "Lightning Riot Spider",
-		"helptext" : "The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher."
+		"helptext" : "The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis, it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher."
 	},
 	"jumpassault" : {
 		"name" : "Jack",
@@ -762,7 +762,7 @@
 	"vehraid" : {
 		"name" : "Scorcher",
 		"description" : "Raider Rover",
-		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
+		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in maneuverability and cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
@@ -782,7 +782,7 @@
 	"turretemp" : {
 		"name" : "Faraday",
 		"description" : "EMP Turret",
-		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
+		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a third. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
 	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
@@ -817,7 +817,7 @@
 	"cloakaa" : {
 		"name" : "Gremlin",
 		"description" : "Cloaked Anti-Air Bot",
-		"helptext" : "Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against."
+		"helptext" : "Fast and fairly sturdy for its price, the Gremlin is a good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against."
 	},
 	"vehheavyarty" : {
 		"name" : "Impaler",
@@ -882,7 +882,7 @@
 	"turretantiheavy" : {
 		"name" : "Lucifer",
 		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
-		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
+		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",
@@ -982,7 +982,7 @@
 	"turretheavy" : {
 		"name" : "Desolator",
 		"description" : "Medium Range Defense Fortress - Power by connecting to a 50 energy grid",
-		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
+		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a third, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
@@ -1052,7 +1052,7 @@
 	"turretaalaser" : {
 		"name" : "Razor",
 		"description" : "Hardened Anti-Air Laser",
-		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed makes it very hard for the enemy to dislodge."
+		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 3x armour bonus when closed make it very hard for the enemy to dislodge."
 	},
 	"hovercon" : {
 		"name" : "Quill",
@@ -1127,12 +1127,12 @@
 	"planecon" : {
 		"name" : "Crane",
 		"description" : "Construction Aircraft",
-		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
+		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air player's territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetitive tasks."
 	},
 	"gunshipraid" : {
 		"name" : "Locust",
 		"description" : "Raider Gunship",
-		"helptext" : "The Locust is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defense."
+		"helptext" : "The Locust is a light gunship. Its high speed and decent damage make it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defense."
 	},
 	"shieldraid" : {
 		"name" : "Bandit",
