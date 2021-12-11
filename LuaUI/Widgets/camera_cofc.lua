@@ -112,6 +112,10 @@ options_order = {
 	'lblFollowUnit',
 	'trackmode',
 	'persistenttrackmode',
+	'ctrl_retains_track',
+	'alt_retains_track',
+	'track_while_rotate',
+	'track_rotate_disable_dist_change',
 	'thirdpersontrack',
 
 	'lblFollowCursorZoom',
@@ -649,6 +653,36 @@ Complete Overhead/Free Camera has six actions:
 		value = false,
 		path = cameraFollowPath,
 	},
+
+	ctrl_retains_track = {
+		name = "Ctrl retains track",
+		desc = "Trackmode will (probably) cancel when doing the type of camera rotation enabled by Ctrl.",
+		type = 'bool',
+		value = false,
+		path = cameraFollowPath,
+	},
+	alt_retains_track = {
+		name = "Alt retains track",
+		desc = "Trackmode will (probably) cancel when doing the type of camera rotation enabled by Alt.",
+		type = 'bool',
+		value = false,
+		path = cameraFollowPath,
+	},
+	track_while_rotate = {
+		name = "Track while rotating",
+		desc = "Trackmode works while rotating, but may cause a bug.",
+		type = 'bool',
+		value = false,
+		path = cameraFollowPath,
+	},
+	track_rotate_disable_dist_change = {
+		name = "Track rotate fix zoom",
+		desc = "Disable zoom changes while track rotating.",
+		type = 'bool',
+		value = false,
+		path = cameraFollowPath,
+	},
+	
 
     thirdpersontrack = {
 		name = "Enter 3rd Person Trackmode",
@@ -1864,8 +1898,13 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 					local px,py,pz = cs.px,cs.py,cs.pz
 					local dx,dy,dz = ux-px, uy-py, uz-pz
 					ls_onmap = true
-					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
 					ls_have = true
+					
+					if not options.track_rotate_disable_dist_change.value then
+						ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
+						ls_dist = max(ls_dist, options.followzoommindist.value)
+						ls_dist = min(ls_dist, maxDistY,options.followzoommaxdist.value)
+					end
 				end
 			end
         end
@@ -2124,10 +2163,10 @@ function widget:Update(dt)
 	if (trackcycle == 0 and
 	trackmode and
 	not overview_mode and
-	(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
+	(follow_timer <= 0 or options.track_while_rotate.value) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 	not thirdperson_trackunit and
 	not (rot.right or rot.left or rot.up or rot.down) and --cam rotation conflict with tracking, causing zoom-out bug. Rotation while tracking is handled in RotateCamera() but with less smoothing.
-	(not rotate)) --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
+	(not rotate or options.track_while_rotate.value)) --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
 	then
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
@@ -2420,21 +2459,24 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	end
 
 	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
-
+	
 	local a,ctrl,m,s = spGetModKeyState()
 	s = s and not options.disableshift.value
 	ctrl = ctrl and not options.disablectrl.value
 	a = a and not options.disablealt.value
+	retainTrack = ((ctrl and options.ctrl_retains_track.value) or (a and options.alt_retains_track.value))
 
-	spSendCommands('trackoff')
-    spSendCommands('viewfree')
-	if not (options.persistenttrackmode.value and (ctrl or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
-		if trackmode then
-			Spring.Echo("COFC: Unit tracking OFF")
+	if not retainTrack then
+		spSendCommands('trackoff')
+		spSendCommands('viewfree')
+		if not (options.persistenttrackmode.value and (ctrl or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
+			if trackmode  then
+				Spring.Echo("COFC: Unit tracking OFF")
+			end
+			trackmode = false
 		end
-		trackmode = false
+		thirdperson_trackunit = false
 	end
-	thirdperson_trackunit = false
 
 
 	-- Reset --
@@ -2453,8 +2495,10 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	msx = x
 	msy = y
 
-	spSendCommands({'trackoff'})
-
+	if not retainTrack then
+		spSendCommands({'trackoff'})
+	end
+	
 	rotate = false
 	-- Rotate --
 	if a or options.middleMouseButton.value == 'rotate' then
