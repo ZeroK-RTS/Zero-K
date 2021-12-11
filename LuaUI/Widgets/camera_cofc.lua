@@ -32,6 +32,7 @@ local init = true
 local trackmode = false --before options
 local thirdperson_trackunit = false
 local overrideTiltValue = false
+local rotateFollowing = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -120,6 +121,7 @@ options_order = {
 
 	'lblFollowCursorZoom',
 	'followautozoom',
+	'tpv_height_mult',
 	'followinscrollspeed',
 	'followoutscrollspeed',
 	'followzoominspeed',
@@ -570,6 +572,14 @@ Complete Overhead/Free Camera has six actions:
 		value = false,
 		path = cameraFollowPath,
 	},
+	tpv_height_mult = {
+		name = "Over-the-shoulder height mult",
+		desc = "Height multiplier for looking over the shoulter.",
+		type = 'number',
+		min = 1, max = 2, step = 0.05,
+		value = 1,
+		path = cameraFollowPath,
+	},
 	followinscrollspeed = {
 		name = "On Screen Tracking Speed",
 		desc = "Tracking speed while cursor is on-screen. \n\nRecommend: Lowest (prevent jerky movement)",
@@ -698,7 +708,7 @@ Complete Overhead/Free Camera has six actions:
 				thirdperson_trackunit = selUnits[1]
 				local cs = Spring.GetCameraState()
 				cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
-				cs.py = cs.py + 25
+				cs.py = cs.py + Spring.GetUnitHeight(selUnits[1])*options.tpv_height_mult.value
 
 				-- Spring.SetCameraState(cs,0)
 				OverrideSetCameraStateInterpolate(cs,0)
@@ -1433,6 +1443,36 @@ local function DriftToCenter(cs, gx, gy, gz, mx, my)
 	return gx, gz
 end
 
+local function AdjustCameraTarget(cs, gx,gy,gz, dist)
+	SetLockSpot2(cs) --get lockspot at mid screen if there's none present
+	if not ls_have then
+		return
+	end
+	if dist then -- if a distance is specified, loosen bounds at first. They will be checked at the end
+		ls_dist = dist
+		ls_x, ls_y, ls_z = gx, gy, gz
+	end
+	local cstemp = UpdateCam(cs)
+	if options.tiltedzoom.value then
+		if cstemp then
+			if dist then
+				lockPoint = {}
+				_, x, y, z = VirtTraceRay(cx, cy, cs)
+				cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true)
+				lockPoint.worldEnd = {x = ls_x, y = ls_y, z = ls_z}
+				lockPoint.worldBegin = {x = x, y = y, z = z}
+			else
+				cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp)
+			end
+			cstemp = UpdateCam(cs)
+			if cstemp then cs = cstemp end
+		end
+	else
+		if cstemp then cs = cstemp end
+	end
+	return cs
+end
+
 local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
@@ -1772,7 +1812,7 @@ OverviewAction = function()
 				thirdperson_trackunit = selUnits[1]
 				local cs = GetTargetCameraState()
 				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
-				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+				cs.py= cs.py+Spring.GetUnitHeight(selUnits[1])*options.tpv_height_mult.value
 				-- spSetCameraState(cs,0)
 				OverrideSetCameraStateInterpolate(cs,0)
 			end
@@ -1875,6 +1915,7 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 		if overrideTiltValue then
 			cs.rx = overrideTiltValue
 		end
+		
 
 		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
 		local max_rx = HALFPIMINUS
@@ -1899,9 +1940,11 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 					local dx,dy,dz = ux-px, uy-py, uz-pz
 					ls_onmap = true
 					ls_have = true
+					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
+					cs = AdjustCameraTarget(cs, ux,uy,uz, ls_dist)
+					rotateFollowing = true
 					
 					if not options.track_rotate_disable_dist_change.value then
-						ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
 						ls_dist = max(ls_dist, options.followzoommindist.value)
 						ls_dist = min(ls_dist, maxDistY,options.followzoommaxdist.value)
 					end
@@ -1952,7 +1995,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	end
 	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
 	local x,y,z = spGetUnitPosition(thirdperson_trackunit)
-	y = y+25
+	y = y+Spring.GetUnitHeight(thirdperson_trackunit)*options.tpv_height_mult.value
 	for i=1, 3 do --create a (detection) sphere of increasing size to ~1600-elmo range in scroll direction
 		local sphereCenterOffset = detectionSphereRadiusAndPosition[i][2]
 		local sphereRadius = detectionSphereRadiusAndPosition[i][1]
@@ -2000,7 +2043,7 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	spSendCommands('track')
 	thirdperson_trackunit = foundUnit --remember current unitID
 	cs.px,cs.py,cs.pz=spGetUnitPosition(foundUnit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
-	cs.py = cs.py+25
+	cs.py = cs.py+Spring.GetUnitHeight(thirdperson_trackunit)*options.tpv_height_mult.value
 	-- spSetCameraState(cs,0)
 	OverrideSetCameraStateInterpolate(cs,0)
 	thirdPerson_transit = spGetTimer() --block access to edge scroll until camera focus on unit
@@ -2177,7 +2220,10 @@ function widget:Update(dt)
 			--1) reset Spring.SetCameraTarget to: (x+vx,y+vy,z+vz, 0.0333)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
 			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
-			SetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
+			if not rotateFollowing then
+				SetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
+			end
+			rotateFollowing = false
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
 			Spring.Echo("COFC: Unit tracking OFF")
@@ -2374,7 +2420,7 @@ function widget:Update(dt)
 				local x,y,z = spGetUnitPosition(selUnits[1])
 				if x and y and z then --unit position can be NIL if spectating with limited LOS
 					cs.px,cs.py,cs.pz=x,y,z
-					cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+					cs.py= cs.py + Spring.GetUnitHeight(selUnits[1])*options.tpv_height_mult.value
 					-- spSetCameraState(cs,0)
 					Spring.Echo("track retarget")
 					OverrideSetCameraStateInterpolate(cs,0)
@@ -2402,6 +2448,7 @@ function widget:Update(dt)
 	end
 end
 
+local oldDx, oldDy = 0, 0
 function widget:MouseMove(x, y, dx, dy, button)
 	lastMouseX = nil
 	if rotate then
@@ -2413,8 +2460,10 @@ function widget:MouseMove(x, y, dx, dy, button)
 				rotate_transit = nil --cancel in-transit flag
 			end
 		end
-		if abs(dx) > 0 or abs(dy) > 0 then
-			RotateCamera(x, y, dx, dy, true, ls_have, false)
+		oldDx = oldDx*0.8 + dx*0.2
+		oldDy = oldDy*0.8 + dy*0.2
+		if abs(oldDx) > 1 or abs(oldDy) > 1 then
+			RotateCamera(x, y, oldDx, oldDy, true, ls_have, false)
 		end
 
 		-- spWarpMouse(msx, msy) -- doesn't work as desired in Spring 104.0.1-1544, as it seems to trigger widget:MouseMove, leading to jittery behaviour
@@ -2848,7 +2897,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			thirdperson_trackunit = selUnits[1]
 			local cs = GetTargetCameraState()
 			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
-			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+			cs.py= cs.py + Spring.GetUnitHeight(selUnits[1])*options.tpv_height_mult.value
 			-- spSetCameraState(cs,0)
 			OverrideSetCameraStateInterpolate(cs,0)
 		else
