@@ -1940,11 +1940,11 @@ local function RotateCamera(x, y, rdx, rdy, smooth, lock, tilt)
 					local dx,dy,dz = ux-px, uy-py, uz-pz
 					ls_onmap = true
 					ls_have = true
-					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
-					cs = AdjustCameraTarget(cs, ux,uy,uz, ls_dist)
+					cs = AdjustCameraTarget(cs, ux,uy,uz)
 					rotateFollowing = true
 					
 					if not options.track_rotate_disable_dist_change.value then
+						ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
 						ls_dist = max(ls_dist, options.followzoommindist.value)
 						ls_dist = min(ls_dist, maxDistY,options.followzoommaxdist.value)
 					end
