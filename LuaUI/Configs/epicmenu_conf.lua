@@ -587,7 +587,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		min = 1,
 		max = 10000,
 		springsetting = 'UnitLodDist',
-		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end
+		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end,
+		advanced = true,
 	} )
 	AddOption(pathUnitVisiblity,
 	{
@@ -598,6 +599,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		springsetting = 'UnitIconDist',
 		OnChange = function(self)
 			spSendCommands{"disticon " .. self.value}
+			WG.resetIconDist = self.value
 		end
 	} )
 	AddOption(pathUnitVisiblity,
@@ -656,6 +658,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	local pathIconZoomTransition = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
+		ShButton(pathIconZoomTransition, 'Toggle Smooth Icon Zoom', function() spSendCommands{"luaui togglewidget Icon Zoom Transition"} end, "Draw both icons and models at medium zoom distance.")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
 				spSendCommands{"luaui disablewidget Outline No Shader"}
