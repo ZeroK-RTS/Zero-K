@@ -80,6 +80,8 @@
 	"cheatsheet_lab_top" : "Cheat Sheet",
 	"cheatsheet_chb_godmode" : "Global spec control",
 	"cheatsheet_chb_godmode_desc" : "Allows spectators to control all teams",
+	"cheatsheet_chb_allowfps" : "Allow FPS without cheats",
+	"cheatsheet_chb_allowfps_desc" : "Allows first person mode even when cheats are disabled. Select a unit and press Alt+P to toggle FPS mode.",
 	"cheatsheet_chb_nocost" : "Quick build",
 	"cheatsheet_chb_nocost_desc" : "Construction becomes free and completes near instantly.",
 	"cheatsheet_chb_globallos" : "Global vision",

@@ -556,6 +556,14 @@ local options = {
     section= 'silly',
     def    = false,
   },
+  {
+    key    = 'allowfpsmode',
+    name   = 'Enable first person control',
+    desc   = "Allow players to take direct control of units without cheats enabled. Select a unit and press Alt+P to toggle.",
+    type   = 'bool',
+    section= 'silly',
+    def    = false,
+  },
 	{
 		key     = 'maxunits',
 		name    = 'Max units',

@@ -397,6 +397,31 @@ local function AddGodmodeToggle(parent, offset)
 	offset[1] = offset[1] + CHECKBOX_SIZE
 end
 
+local function AddAllowFpsToggle(parent, offset)
+	chbox.allowfps = WG.Chili.Checkbox:New{
+		x = CHECKBOX_SIZE + 2,
+		y = offset[1],
+		right = 0,
+		checked = not (Spring.GetGameRulesParam("fps_need_cheat") == 1),
+		parent = parent,
+		objectOverrideFont = WG.GetFont(),
+		OnChange = {function(self, value)
+			Spring.SendCommands("luarules allowfps " .. (value and 1 or 0))
+		end},
+	}
+
+	local pic = WG.Chili.Image:New{
+		x = 0,
+		y = offset[1],
+		width = CHECKBOX_SIZE,
+		height = CHECKBOX_SIZE,
+		parent = parent,
+		file = 'LuaUI/Images/commands/bold/attack.png', -- hand (not the recycle triangle)
+	}
+	chbox.allowfps.Toggle = ToggleIfCheatsEnabled
+	offset[1] = offset[1] + CHECKBOX_SIZE
+end
+
 local function AddNocostToggle(parent, offset)
 	chbox.nocost = WG.Chili.Checkbox:New{
 		x = CHECKBOX_SIZE + 2,
@@ -481,6 +506,7 @@ local function AddMiscControls(parent, offset)
 	AddNocostToggle   (parent, offset)
 	AddGloballosToggle(parent, offset)
 	AddGodmodeToggle  (parent, offset)
+	AddAllowFpsToggle (parent, offset)
 	AddButtons        (parent, offset)
 end
 
@@ -784,6 +810,17 @@ function widget:AddConsoleLine(msg)
 	if msg == "God-Mode is disabled!" then
 		chbox.godmode.state.checked = false
 		chbox.godmode:Invalidate()
+		return
+	end
+
+	if msg == "First person view enabled, select a unit and press Alt+P." then
+		chbox.allowfps.state.checked = true
+		chbox.allowfps:Invalidate()
+		return
+	end
+	if msg == "First person view disabled." then
+		chbox.allowfps.state.checked = false
+		chbox.allowfps:Invalidate()
 		return
 	end
 
