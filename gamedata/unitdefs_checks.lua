@@ -76,6 +76,17 @@ local function processWeapons(unitDefName, unitDef)
 	end
 end
 
+local function checkBuildingness(name, ud)
+	if not ud.maxvelocity or ud.maxvelocity == 0 then
+		if ud.brakerate     then Spring.Echo(name .. " is a building but has the `brakeRate` field set!") end
+		if ud.acceleration  then Spring.Echo(name .. " is a building but has the `acceleration` field set!") end
+		if ud.turnrate      then Spring.Echo(name .. " is a building but has the `turnRate` field set!") end
+	else
+		if ud.yardmap then Spring.Echo(name .. " is not a building (speed > 0) but has a yardmap!") end
+	end
+end
+
 for unitDefName, unitDef in pairs (UnitDefs) do
+	checkBuildingness(unitDefName, unitDef)
 	processWeapons(unitDefName, unitDef)
 end
