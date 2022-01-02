@@ -207,7 +207,7 @@
 	"shieldarty" : {
 		"name" : "Racketeer",
 		"description" : "Disarming Artillery",
-		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
+		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defences or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
@@ -1147,7 +1147,7 @@
 	"subtacmissile" : {
 		"name" : "Scylla",
 		"description" : "Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile",
-		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
+		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defence against direct attacks and should avoid contact with the enemy."
 	},
 	"amphassault" : {
 		"name" : "Grizzly",
