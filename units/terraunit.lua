@@ -27,7 +27,6 @@ return { terraunit = {
   footprintX             = 2,
   footprintZ             = 2,
   idleAutoHeal           = 0,
-  idleTime               = 1800,
   isFeature              = false,
   levelGround            = false,
   maxDamage              = 100000,

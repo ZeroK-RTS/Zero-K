@@ -15,7 +15,6 @@ return { empiricaldpsersmall = {
   footprintZ              = 2,
   iconType                = [[mahlazer]],
   idleAutoHeal            = 0,
-  idleTime                = 1800,
   maxDamage               = 16000,
   maxSlope                = 18,
   maxVelocity             = 0,
