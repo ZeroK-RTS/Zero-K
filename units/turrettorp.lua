@@ -24,9 +24,6 @@ return { turrettorp = {
   footprintX        = 3,
   footprintZ        = 3,
   iconType          = [[defensetorp]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-
   maxDamage         = 1020,
   maxSlope          = 18,
   maxVelocity       = 0,
