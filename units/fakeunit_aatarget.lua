@@ -2,9 +2,7 @@ return { fakeunit_aatarget = {
   unitname              = [[fakeunit_aatarget]],
   name                  = [[Fake AA target]],
   description           = [[Used by the jumpjet script.]],
-  acceleration          = 0,
   activateWhenBuilt     = false,
-  brakeRate             = 0,
   buildCostEnergy       = 0.45,
   buildCostMetal        = 0.45,
   builder               = false,
@@ -38,6 +36,5 @@ return { fakeunit_aatarget = {
   selfDestructAs        = [[TINY_BUILDINGEX]],
   selfDestructCountdown = 0,
   sightDistance         = 0.2,
-  turnRate              = 0,
   workerTime            = 0,
 } }

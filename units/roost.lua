@@ -2,9 +2,7 @@ return { roost = {
   unitname          = [[roost]],
   name              = [[Roost]],
   description       = [[Spawns Chicken]],
-  acceleration      = 0,
   activateWhenBuilt = true,
-  brakeRate         = 0,
   buildCostMetal    = 340,
   builder           = false,
   buildPic          = [[roost.png]],
@@ -39,7 +37,6 @@ return { roost = {
 
   },
   sightDistance     = 273,
-  turnRate          = 0,
   upright           = false,
   waterline         = 0,
   workerTime        = 0,

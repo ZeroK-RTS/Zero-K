@@ -2,8 +2,6 @@ return { turretaaflak = {
   unitname                      = [[turretaaflak]],
   name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -46,7 +44,6 @@ return { turretaaflak = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],

@@ -2,9 +2,7 @@ return { energysingu = {
   unitname                      = [[energysingu]],
   name                          = [[Singularity Reactor]],
   description                   = [[Large Powerplant (+225) - HAZARDOUS]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostMetal                = 4000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -44,7 +42,6 @@ return { energysingu = {
   script                        = [[energysingu.lua]],
   selfDestructAs                = [[SINGULARITY]],
   sightDistance                 = 273,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooooooooooooooooooooooooooooooooooooooooooooooooo]],
 

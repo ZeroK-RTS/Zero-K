@@ -2,10 +2,7 @@ return { turrettorp = {
   unitname          = [[turrettorp]],
   name              = [[Urchin]],
   description       = [[Torpedo Launcher (Anti-Sub)]],
-  acceleration      = 0,
   activateWhenBuilt = true,
-  brakeRate         = 0,
-
   buildCostMetal    = 120,
   builder           = false,
   buildPic          = [[turrettorp.png]],
@@ -35,7 +32,6 @@ return { turrettorp = {
 
   sightDistance     = 653, -- Range*1.1 + 48 for radar overshoot
   sonarDistance     = 653,
-  turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
   yardMap           = [[wwwwwwwww]],

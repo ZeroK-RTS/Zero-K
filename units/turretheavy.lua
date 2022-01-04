@@ -2,9 +2,7 @@ return { turretheavy = {
   unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
   description                   = [[Medium Range Defence Fortress - Power by connecting to a 50 energy grid]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostMetal                = 1600,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -55,7 +53,6 @@ return { turretheavy = {
 
   },
   sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],

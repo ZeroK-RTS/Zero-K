@@ -2,8 +2,6 @@ return { raveparty = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 36000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -50,7 +48,6 @@ return { raveparty = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooooo ooooooo ooooooo ooooooo ooooooo ooooooo ooooooo]],

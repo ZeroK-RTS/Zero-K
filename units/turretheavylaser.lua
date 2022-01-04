@@ -2,8 +2,6 @@ return { turretheavylaser = {
   unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -47,7 +45,6 @@ return { turretheavylaser = {
 
   },
   sightDistance                 = 730, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],

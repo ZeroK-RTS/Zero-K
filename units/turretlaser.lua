@@ -2,8 +2,6 @@ return { turretlaser = {
   unitname                      = [[turretlaser]],
   name                          = [[Lotus]],
   description                   = [[Light Laser Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 90,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -45,7 +43,6 @@ return { turretlaser = {
 
   },
   sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline                     = 5,
   workerTime                    = 0,

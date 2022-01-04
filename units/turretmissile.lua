@@ -2,8 +2,6 @@ return { turretmissile = {
   unitname                      = [[turretmissile]],
   name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 100,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -48,7 +46,6 @@ return { turretmissile = {
 
   },
   sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oo oo]],
