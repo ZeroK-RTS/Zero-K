@@ -1319,8 +1319,6 @@ function widgetHandler:Shutdown()
 		w:Shutdown()
 	end
 	Spring.Echo("End widgetHandler:Shutdown")
-  
-	return
 end
 
 function widgetHandler:Update()
@@ -1330,7 +1328,6 @@ function widgetHandler:Update()
 	for _, w in r_ipairs(self.UpdateList) do
 		w:Update(deltaTime)
 	end
-	return
 end
 
 
@@ -1557,7 +1554,6 @@ function widgetHandler:GroupChanged(groupID)
 	for _, w in r_ipairs(self.GroupChangedList) do
 		w:GroupChanged(groupID)
 	end
-	return
 end
 
 
@@ -1571,7 +1567,6 @@ function widgetHandler:CommandsChanged()
 		w:CommandsChanged()
 	end
 	self.inCommandsChanged = false
-	return
 end
 
 
@@ -1588,7 +1583,6 @@ function widgetHandler:ViewResize(viewGeometry)
 	for _, w in r_ipairs(self.ViewResizeList) do
 		w:ViewResize(vsx, vsy, viewGeometry)
 	end
-	return
 end
 
 function widgetHandler:DrawScreen()
@@ -1606,7 +1600,6 @@ function widgetHandler:DrawScreen()
 			w:TweakDrawScreen()
 		end
 	end
-	return
 end
 
 
@@ -1614,7 +1607,6 @@ function widgetHandler:DrawGenesis()
 	for _, w in r_ipairs(self.DrawGenesisList) do
 		w:DrawGenesis()
 	end
-	return
 end
 
 
@@ -1687,7 +1679,6 @@ function widgetHandler:DrawUnitsPostDeferred()
 	for _, w in r_ipairs(self.DrawUnitsPostDeferredList) do
 		w:DrawUnitsPostDeferred()
 	end
-	return
 end
 
 
@@ -1695,7 +1686,6 @@ function widgetHandler:DrawFeaturesPostDeferred()
 	for _, w in r_ipairs(self.DrawFeaturesPostDeferredList) do
 		w:DrawFeaturesPostDeferred()
 	end
-	return
 end
 
 
@@ -1703,21 +1693,18 @@ function widgetHandler:DrawScreenEffects(vsx, vsy)
 	for _, w in r_ipairs(self.DrawScreenEffectsList) do
 		w:DrawScreenEffects(vsx, vsy)
 	end
-	return
 end
 
 function widgetHandler:DrawScreenPost(vsx, vsy)
 	for _, w in r_ipairs(self.DrawScreenPostList) do
 		w:DrawScreenPost(vsx, vsy)
 	end
-	return
 end
 
 function widgetHandler:DrawInMiniMap(xSize, ySize)
 	for _, w in r_ipairs(self.DrawInMiniMapList) do
 		w:DrawInMiniMap(xSize, ySize)
 	end
-	return
 end
 
 
@@ -1992,7 +1979,6 @@ function widgetHandler:GamePreload()
 	for _, w in r_ipairs(self.GamePreloadList) do
 		w:GamePreload()
 	end
-	return
 end
 
 function widgetHandler:GameStart()
@@ -2017,14 +2003,12 @@ function widgetHandler:GameStart()
 		end
 	end
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats,plist".. plist)
-	return
 end
 
 function widgetHandler:GameOver(winners)
 	for _, w in r_ipairs(self.GameOverList) do
 		w:GameOver(winners)
 	end
-	return
 end
 
 
@@ -2032,7 +2016,6 @@ function widgetHandler:GamePaused(playerID, paused)
 	for _, w in r_ipairs(self.GamePausedList) do
 		w:GamePaused(playerID, paused)
 	end
-	return
 end
 
 
@@ -2040,7 +2023,6 @@ function widgetHandler:TeamDied(teamID)
 	for _, w in r_ipairs(self.TeamDiedList) do
 		w:TeamDied(teamID)
 	end
-	return
 end
 
 
@@ -2048,7 +2030,6 @@ function widgetHandler:TeamChanged(teamID)
 	for _, w in r_ipairs(self.TeamChangedList) do
 		w:TeamChanged(teamID)
 	end
-	return
 end
 
 
@@ -2058,7 +2039,6 @@ function widgetHandler:PlayerAdded(playerID, reason) --when player Join Lobby
 	for _, w in r_ipairs(self.PlayerAddedList) do
 		w:PlayerAdded(playerID, reason)
 	end
-	return
 end
 
 
@@ -2081,7 +2061,6 @@ function widgetHandler:PlayerChanged(playerID) --when player Change from Spectat
 	for _, w in r_ipairs(self.PlayerChangedList) do
 		w:PlayerChanged(playerID)
 	end
-	return
 end
 
 
@@ -2089,7 +2068,6 @@ function widgetHandler:PlayerRemoved(playerID, reason) --when player Left a Runn
 	for _, w in r_ipairs(self.PlayerRemovedList) do
 		w:PlayerRemoved(playerID, reason)
 	end
-	return
 end
 
 
@@ -2097,7 +2075,6 @@ function widgetHandler:GameFrame(frameNum)
 	for _, w in r_ipairs(self.GameFrameList) do
 		w:GameFrame(frameNum)
 	end
-	return
 end
 
 
@@ -2105,7 +2082,6 @@ function widgetHandler:ShockFront(power, dx, dy, dz)
 	for _, w in r_ipairs(self.ShockFrontList) do
 		w:ShockFront(power, dx, dy, dz)
 	end
-	return
 end
 
 function widgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
@@ -2124,7 +2100,6 @@ function widgetHandler:WorldTooltip(ttType, ...)
 			return tt
 		end
 	end
-	return
 end
 
 
@@ -2176,7 +2151,6 @@ function widgetHandler:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	for _, w in r_ipairs(self.UnitCreatedList) do
 		w:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
-	return
 end
 
 
@@ -2184,21 +2158,18 @@ function widgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitFinishedList) do
 		w:UnitFinished(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 function widgetHandler:UnitReverseBuilt(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitReverseBuiltList) do
 		w:UnitReverseBuilt(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 function widgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	for _, w in r_ipairs(self.UnitFromFactoryList) do
 		w:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	end
-	return
 end
 
 
@@ -2206,7 +2177,6 @@ function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID
 	for _, w in r_ipairs(self.UnitDestroyedList) do
 		w:UnitDestroyed(unitID, unitDefID, unitTeam, attackerUnitID, attackerDefID, attackerTeam)
 	end
-	return
 end
 
 
@@ -2221,7 +2191,6 @@ function widgetHandler:UnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamI
 	for _, w in r_ipairs(self.UnitDestroyedByTeamList) do
 		w:UnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamID)
 	end
-	return
 end
 
 
@@ -2229,7 +2198,6 @@ function widgetHandler:UnitExperience(unitID, unitDefID, unitTeam, experience, o
 	for _, w in r_ipairs(self.UnitExperienceList) do
 		w:UnitExperience(unitID, unitDefID, unitTeam, experience, oldExperience)
 	end
-	return
 end
 
 
@@ -2237,7 +2205,6 @@ function widgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	for _, w in r_ipairs(self.UnitTakenList) do
 		w:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	end
-	return
 end
 
 
@@ -2245,7 +2212,6 @@ function widgetHandler:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	for _, w in r_ipairs(self.UnitGivenList) do
 		w:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	end
-	return
 end
 
 
@@ -2253,7 +2219,6 @@ function widgetHandler:UnitIdle(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitIdleList) do
 		w:UnitIdle(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2263,14 +2228,12 @@ if Script.IsEngineMinVersion(104, 0, 1431) then
 		for _, w in r_ipairs(self.UnitCommandList) do
 			w:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams, cmdTag, playerID, fromSynced, fromLua)
 		end
-		return
 	end
 else
 	function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOpts, cmdTag) --cmdTag available in Spring 95
 		for _, w in r_ipairs(self.UnitCommandList) do
 			w:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOpts, cmdTag)
 		end
-		return
 	end
 end
 
@@ -2278,7 +2241,6 @@ function widgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams
 	for _, w in r_ipairs(self.UnitCmdDoneList) do
 		w:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
 	end
-	return
 end
 
 
@@ -2286,14 +2248,12 @@ function widgetHandler:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyze
 	for _, w in r_ipairs(self.UnitDamagedList) do
 		w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	end
-	return
 end
 
 function widgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
 	for _, w in r_ipairs(self.UnitStunnedList) do
 		w:UnitStunned(unitID, unitDefID, unitTeam, stunned)
 	end
-	return
 end
 
 
@@ -2301,7 +2261,6 @@ function widgetHandler:UnitEnteredRadar(unitID, unitTeam)
 	for _, w in r_ipairs(self.UnitEnteredRadarList) do
 		w:UnitEnteredRadar(unitID, unitTeam)
 	end
-	return
 end
 
 
@@ -2309,7 +2268,6 @@ function widgetHandler:UnitEnteredLos(unitID, unitTeam)
 	for _, w in r_ipairs(self.UnitEnteredLosList) do
 		w:UnitEnteredLos(unitID, unitTeam)
 	end
-	return
 end
 
 
@@ -2317,7 +2275,6 @@ function widgetHandler:UnitLeftRadar(unitID, unitTeam)
 	for _, w in r_ipairs(self.UnitLeftRadarList) do
 		w:UnitLeftRadar(unitID, unitTeam)
 	end
-	return
 end
 
 
@@ -2325,7 +2282,6 @@ function widgetHandler:UnitLeftLos(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitLeftLosList) do
 		w:UnitLeftLos(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2333,7 +2289,6 @@ function widgetHandler:UnitEnteredWater(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitEnteredWaterList) do
 		w:UnitEnteredWater(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2341,7 +2296,6 @@ function widgetHandler:UnitEnteredAir(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitEnteredAirList) do
 		w:UnitEnteredAir(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2349,7 +2303,6 @@ function widgetHandler:UnitLeftWater(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitLeftWaterList) do
 		w:UnitLeftWater(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2357,7 +2310,6 @@ function widgetHandler:UnitLeftAir(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitLeftAirList) do
 		w:UnitLeftAir(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2365,7 +2317,6 @@ function widgetHandler:UnitSeismicPing(x, y, z, strength)
 	for _, w in r_ipairs(self.UnitSeismicPingList) do
 		w:UnitSeismicPing(x, y, z, strength)
 	end
-	return
 end
 
 
@@ -2373,7 +2324,6 @@ function widgetHandler:UnitLoaded(unitID, unitDefID, unitTeam, transportID, tran
 	for _, w in r_ipairs(self.UnitLoadedList) do
 		w:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	end
-	return
 end
 
 
@@ -2381,7 +2331,6 @@ function widgetHandler:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, tr
 	for _, w in r_ipairs(self.UnitUnloadedList) do
 		w:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	end
-	return
 end
 
 
@@ -2389,7 +2338,6 @@ function widgetHandler:UnitCloaked(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitCloakedList) do
 		w:UnitCloaked(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2397,7 +2345,6 @@ function widgetHandler:UnitDecloaked(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitDecloakedList) do
 		w:UnitDecloaked(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2405,7 +2352,6 @@ function widgetHandler:UnitMoveFailed(unitID, unitDefID, unitTeam)
 	for _, w in r_ipairs(self.UnitMoveFailedList) do
 		w:UnitMoveFailed(unitID, unitDefID, unitTeam)
 	end
-	return
 end
 
 
@@ -2424,7 +2370,6 @@ function widgetHandler:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, 
 	for _, w in r_ipairs(self.StockpileChangedList) do
 		w:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
 	end
-	return
 end
 
 
@@ -2486,28 +2431,24 @@ function widgetHandler:GameProgress(frame)
 	for _, w in r_ipairs(self.GameProgressList) do
 		w:GameProgress(frame)
 	end
-	return
 end
 
 function widgetHandler:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
 	for _, w in r_ipairs(self.UnsyncedHeightMapUpdateList) do
 		w:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
 	end
-	return
 end
 
 function widgetHandler:Save(zip)
 	for _, w in r_ipairs(self.SaveList) do
 		w:Save(zip)
 	end
-	return
 end
 
 function widgetHandler:Load(zip)
 	for _, w in r_ipairs(self.LoadList) do
 		w:Load(zip)
 	end
-	return
 end
 
 --------------------------------------------------------------------------------
