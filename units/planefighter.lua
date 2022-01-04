@@ -36,6 +36,7 @@ return { planefighter = {
     midposoffset   = [[0 3 0]],
     modelradius    = [[10]],
     refuelturnradius = [[80]],
+    okp_damage = 130,
   },
 
   explodeAs              = [[GUNSHIPEX]],

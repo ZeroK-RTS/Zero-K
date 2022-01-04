@@ -12,6 +12,8 @@ for i = 1, 8 do
 	wakes[i] = piece ('wake' .. i)
 end
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local SIG_HIT = 2
 
 local function WobbleUnit()
@@ -178,7 +180,7 @@ function script.BlockShot(num, targetID)
 	if num == 1 then
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
-		return GG.Script.OverkillPreventionCheck(unitID, targetID, 440, 300, 45, 0.1, false, 30)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 300, 45, 0.1, false, 30)
 	end
 	if num == 2 then
 		if targetID then

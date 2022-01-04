@@ -18,6 +18,7 @@ local ground1 = piece 'ground1'
 
 local random = math.random
 local hpi = math.pi*0.5
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 local shotNum = 1
 local flares = {
@@ -148,7 +149,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 655.1, 440, 90, 0, true, 180, 0.5)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 440, 90, 0, true, 180, 0.5)
 end
 
 function script.Shot()

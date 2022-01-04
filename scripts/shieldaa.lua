@@ -60,6 +60,8 @@ local missilespeed = 850 --fixme
 local mfront = 10 --fixme
 local pause = 600
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 --effects
 local smokeblast = 1024
 
@@ -181,7 +183,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 70.1, 880, 30, 0.05, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 880, 30, 0.05, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

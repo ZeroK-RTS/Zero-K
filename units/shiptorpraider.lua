@@ -22,6 +22,7 @@ return { shiptorpraider = {
     turnatfullspeed    = [[1]],
     aim_lookahead      = 80,
     bait_level_default = 0,
+    okp_damage = 180,
   },
 
 

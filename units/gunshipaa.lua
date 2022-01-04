@@ -27,6 +27,7 @@ return { gunshipaa = {
     modelradius    = [[18]],
     midposoffset   = [[0 15 0]],
     selection_velocity_heading = 1,
+    okp_damage = 190.1,
   },
 
   explodeAs              = [[GUNSHIPEX]],

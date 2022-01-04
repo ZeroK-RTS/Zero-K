@@ -24,6 +24,7 @@ return { turretaaheavy = {
     stockpilecost  = [[80]],
     stockpiletime  = [[20]],
     priority_misc  = 1, -- Medium
+    okp_damage = 1600,
   },
 
   explodeAs                     = [[ESTOR_BUILDING]],

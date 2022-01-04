@@ -17,6 +17,7 @@ return { shieldaa = {
 
   customParams           = {
     bait_level_default = 0,
+    okp_damage = 70.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

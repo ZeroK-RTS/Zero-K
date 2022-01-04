@@ -23,6 +23,7 @@ return { amphaa = {
     sink_on_emp       = 1,
     floattoggle       = [[1]],
     selection_scale   = 0.85,
+    okp_damage = 140.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

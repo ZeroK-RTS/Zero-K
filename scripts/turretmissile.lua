@@ -39,6 +39,8 @@ local bay = {
 
 include "constants.lua"
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local scriptReload = include("scriptReload.lua")
 
 local missile, missilespeed, mfront
@@ -154,7 +156,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 103, 610, 30, 0.25)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 610, 30, 0.25)
 end
 
 function script.FireWeapon()

@@ -19,6 +19,7 @@ return { vehaa = {
   customParams           = {
     bait_level_default = 0,
     modelradius    = [[9]],
+    okp_damage = 280.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],

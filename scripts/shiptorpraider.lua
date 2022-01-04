@@ -10,6 +10,8 @@ local disarmed = false
 local moving = false
 local sfxNum = 2
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 function script.setSFXoccupy(num)
 	sfxNum = num
 end
@@ -100,7 +102,7 @@ function script.AimWeapon(id, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 180, 240, 28, 0.05, true, 100)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 240, 28, 0.05, true, 100)
 end
 
 local explodables = {sonar, turret}

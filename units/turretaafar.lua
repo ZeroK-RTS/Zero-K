@@ -21,6 +21,7 @@ return { turretaafar = {
     bait_level_default = 1,
     aimposoffset   = [[0 10 0]],
     modelradius    = [[19]],
+    okp_damage = 200.1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

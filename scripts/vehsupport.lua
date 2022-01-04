@@ -30,6 +30,8 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 -- Signal definitions
 local SIG_AIM = 1
 local SIG_DEPLOY = 2
@@ -329,7 +331,7 @@ function script.Shot()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 35, 600, 30, 0.05, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 600, 30, 0.05, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -20,6 +20,7 @@ return { turretmissile = {
   customParams                  = {
     aimposoffset   = [[0 20 0]],
     bait_level_default = 0,
+    okp_damage = 103,
   },
 
   explodeAs                     = [[BIG_UNITEX]],

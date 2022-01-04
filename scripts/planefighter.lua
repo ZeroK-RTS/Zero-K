@@ -22,6 +22,8 @@ local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
 local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
 local MOVE_THRESHOLD = 8
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 ----------------------------------------------------------
 
 local CMD_ONECLICK_WEAPON = Spring.Utilities.CMD.ONECLICK_WEAPON
@@ -165,7 +167,7 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	if num == 2 then
-		return GG.Script.OverkillPreventionCheck(unitID, targetID, 130, 530, 38, 0.1, false, 100)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 530, 38, 0.1, false, 100)
 	end
 	return false
 end
