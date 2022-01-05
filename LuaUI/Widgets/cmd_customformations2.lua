@@ -549,7 +549,6 @@ function widget:MousePress(mx, my, mButton)
 	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
-	local alt, ctrl, meta, shift = GetModKeys()
 	if activeCmdID then
 		if mButton==3 and (fightRMBLineFormationToo[activeCmdID] or cmdRMBWorksAsALTLMB[activeCmdID]) then
 			usingCmd = activeCmdID
