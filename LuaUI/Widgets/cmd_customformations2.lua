@@ -22,11 +22,8 @@ local overrideCmdSingleUnit = {
 	[CMD.GUARD] = true,
 }
 
-local fightRMBLineFormationToo = {}
-local cmdRMBWorksAsALTLMB = {}
-
 options_path = 'Settings/Interface/Command Visibility'--/Formations'
-options_order = { 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','fightRMBLineFormation','rmbWorksAsALTLMB' }
+options_order = { 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','RMBLineFormation' }
 options = {
 	drawmode_v2 = {
 		name = 'Draw mode',
@@ -73,41 +70,12 @@ options = {
 			end
 		end,
 	},
-	fightRMBLineFormation = {
-		name = "RMB can line formation fight",
-		desc = "When enabled, after selecting fight you can also issue the line formation command with dragging rmb, clicking rmb without moving still cancels",
+	RMBLineFormation = {
+		name = "RMB can issue line formation",
+		desc = "When enabled you can also issue the line formation command with dragging rmb, clicking rmb without moving still cancels.",
 		type = "bool",
 		value = false,
 		path = 'Settings/Interface/Commands',
-		OnChange = function (self)
-			if self.value then
-				fightRMBLineFormationToo = {
-					
-					[CMD.FIGHT] = true,
-				}
-			else
-				fightRMBLineFormationToo = {}
-			end
-		end,
-	},
-	rmbWorksAsALTLMB = {
-		name = "RMB drag acts as alt ATK/TGT",
-		desc = "When enabled, after selecting attack or target, line drag will issue a formation line fire command",
-		type = "bool",
-		value = false,
-		path = 'Settings/Interface/Commands',
-		OnChange = function (self)
-			if self.value then
-				cmdRMBWorksAsALTLMB = {
-					
-					[CMD.ATTACK] = true,
-					[CMD_UNIT_SET_TARGET_CIRCLE] = true,
-					
-				}
-			else
-				cmdRMBWorksAsALTLMB = {}
-			end
-		end,
 	},
 }
 
@@ -550,7 +518,7 @@ function widget:MousePress(mx, my, mButton)
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
 	if activeCmdID then
-		if mButton==3 and (fightRMBLineFormationToo[activeCmdID] or cmdRMBWorksAsALTLMB[activeCmdID]) then
+		if mButton==3 and options.RMBLineFormation.value then
 			usingCmd = activeCmdID
 			--If the option to use RMB for fight and attack as well is on we fake the rmb not being used. Is this too janky?
 			usingRMB = false
@@ -605,7 +573,7 @@ function widget:MousePress(mx, my, mButton)
 	-- Is this command eligible for a custom formation ?
 	local alt, ctrl, meta, shift = GetModKeys()
 	-- If its not ( command elegible for formation AND ((alt is being held or the command doesnt require alt) or (using rmb as alt command and rmb is pressed)))
-	if not (formationCmds[usingCmd] and (alt or not requiresAlt[usingCmd]) or (cmdRMBWorksAsALTLMB[usingCmd]) and mButton == 3) then
+	if not (formationCmds[usingCmd] and ((alt or not requiresAlt[usingCmd]) or (options.RMBLineFormation.value and mButton == 3))) then
 		return false
 	end
 	
@@ -706,7 +674,7 @@ function widget:MouseRelease(mx, my, mButton)
 	--copied from press to check activecmd
 	local _, activeCmdID = spGetActiveCommand()
 	-- If the right part involving rmb formations and mbutton 3, usingrmb will be false as it was passed like that on press
-	if (mButton == 1 or mButton == 3) and ((not usingRMB) == (mButton == 3) and (not ((fightRMBLineFormationToo[activeCmdID] or cmdRMBWorksAsALTLMB[activeCmdID])and mButton == 3))) then
+	if (mButton == 1 or mButton == 3) and ((not usingRMB) == (mButton == 3) and (not (options.RMBLineFormation.value and mButton == 3))) then
 		StopCommandAndRelinquishMouse()
 		return false
 	end
