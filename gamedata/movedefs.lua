@@ -158,7 +158,7 @@ local moveDefs = {
 		footprintz = 2,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 20,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 	HOVER3 = {
@@ -166,7 +166,7 @@ local moveDefs = {
 		footprintz = 3,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 20,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 	HOVER4 = {
@@ -174,7 +174,7 @@ local moveDefs = {
 		footprintz = 4,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 20,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 
