@@ -27,7 +27,7 @@ end
 local nukeDefs = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
-	if ud.customParams.isNuke then
+	if ud.customParams.is_nuke then
 		nukeDefs[unitDefID] = true
 	end
 end
