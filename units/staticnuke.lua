@@ -21,6 +21,7 @@ return { staticnuke = {
     stockpiletime  = [[180]],
     stockpilecost  = [[3240]],
     priority_misc  = 1, -- Medium
+    isNuke = true,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
