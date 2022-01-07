@@ -677,7 +677,10 @@ end
 
 local builtinWidgetsOnly = {}
 local restrictedFunctions = {
-	"GetVisibleProjectiles", -- too perf-hungry to be used for micro (unfair to potatoes), contribute a gadget instead
+	--[[ These are blocked for being unfair because of latency and performance.
+	     Feel free to make a gadget instead though. See https://zero-k.info/Forum/Thread/34108 ]]
+	"GetVisibleProjectiles",
+	"GetProjectilesInRectangle",
 }
 for i = 1, #restrictedFunctions do
 	local funcName = restrictedFunctions[i]
