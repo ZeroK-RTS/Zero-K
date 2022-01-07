@@ -114,8 +114,11 @@ function gadget:GameFrame(n)
 			if y and h and y > h and y <= 0  and not spGetUnitIsCloaked(unitID) then
 				local _, _, _, speed = spGetUnitVelocity(unitID)
 				if speed and speed > 0 then
-					-- 1 is the pieceID, most likely it's usually the base piece
-					-- but even if it isn't, it doesn't really matter
+					--[[ 1 is the pieceID, most likely it's usually the base piece
+					     but even if it isn't, it doesn't really matter (the effect
+					     doesn't have to be accurately in the middle).
+					     Also note that Spring.SpawnCEG cannot spawn wakes,
+					     which is why we're using unit script callouts. ]]
 					spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
 				end
 			end
