@@ -671,8 +671,6 @@ local function StopCommandAndRelinquishMouse()
 end
 
 function widget:MouseRelease(mx, my, mButton)
-	--copied from press to check activecmd
-	local _, activeCmdID = spGetActiveCommand()
 	-- If the right part involving rmb formations and mbutton 3, usingrmb will be false as it was passed like that on press
 	if (mButton == 1 or mButton == 3) and ((not usingRMB) == (mButton == 3) and (not (options.RMBLineFormation.value and mButton == 3))) then
 		StopCommandAndRelinquishMouse()
