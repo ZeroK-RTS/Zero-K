@@ -163,6 +163,7 @@ local overriddenTarget = nil -- The target (for params) we ignored
 
 local usingCmd = nil -- The command to execute across the line
 local usingRMB = false -- If the command is the default it uses right click, otherwise it is active and uses left click
+local usingContextCommand = false -- Whether the command is a right-click context command.
 local inMinimap = false -- Is the line being drawn in the minimap
 local endShift = false -- True to reset command when shift is released
 
@@ -521,15 +522,16 @@ function widget:MousePress(mx, my, mButton)
 		if mButton==3 and options.RMBLineFormation.value then
 			usingCmd = activeCmdID
 			--If the option to use RMB for fight and attack as well is on we fake the rmb not being used. Is this too janky?
-			usingRMB = false
+			usingContextCommand = false
 		else
 			if mButton ~= 1 then
 				return false
 			end
 			
 			usingCmd = activeCmdID
-			usingRMB = false
+			usingContextCommand = false
 		end
+		usingRMB = (mButton == 3)
 	else
 		if mButton ~= 3 then
 			return false
@@ -562,6 +564,7 @@ function widget:MousePress(mx, my, mButton)
 			usingCmd = defaultCmdID
 		end
 		
+		usingContextCommand = true
 		usingRMB = true
 	end
 	
@@ -661,7 +664,7 @@ local function StopCommandAndRelinquishMouse()
 	
 	-- Modkeys / command reset
 	local alt, ctrl, meta, shift = GetModKeys()
-	if not usingRMB then
+	if not usingContextCommand then
 		if shift then
 			endShift = true -- Reset on release of shift
 		else
@@ -671,8 +674,13 @@ local function StopCommandAndRelinquishMouse()
 end
 
 function widget:MouseRelease(mx, my, mButton)
-	-- If the right part involving rmb formations and mbutton 3, usingrmb will be false as it was passed like that on press
-	if (mButton == 1 or mButton == 3) and ((not usingRMB) == (mButton == 3) and (not (options.RMBLineFormation.value and mButton == 3))) then
+	-- Cancel command by pressing the other mouse button.
+	if (usingRMB) ~= (mButton == 3) then
+		StopCommandAndRelinquishMouse()
+		return false
+	end
+	-- Cancel RMB line formations for selected commands if no formation has been drawn.
+	if (not usingContextCommand) and usingRMB and options.RMBLineFormation.value and #fNodes <= 1 then
 		StopCommandAndRelinquishMouse()
 		return false
 	end
@@ -684,7 +692,7 @@ function widget:MouseRelease(mx, my, mButton)
 	
 	-- Modkeys / command reset
 	local alt, ctrl, meta, shift = GetModKeys()
-	if not usingRMB then
+	if not usingContextCommand then
 		if shift then
 			endShift = true -- Reset on release of shift
 		else
@@ -712,7 +720,7 @@ function widget:MouseRelease(mx, my, mButton)
 				usingFormation = false
 				
 				-- Process the original command instead
-				local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingRMB)
+				local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingContextCommand)
 				GiveNotifyingOrder(overriddenCmd, {overriddenTarget}, cmdOpts)
 			end
 		end
@@ -733,7 +741,7 @@ function widget:MouseRelease(mx, my, mButton)
 		end
 		
 		-- Get command options
-		local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingRMB)
+		local cmdOpts = GetCmdOpts(alt, ctrl, meta, shift, usingContextCommand)
 		
 		-- Single click ? (no line drawn)
 		--if (#fNodes == 1) then
