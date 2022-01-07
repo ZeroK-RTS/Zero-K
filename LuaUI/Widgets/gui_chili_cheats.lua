@@ -16,7 +16,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local setAiPosCommand = {
 	id      = CMD_CHEAT_GIVE,
 	type    = CMDTYPE.ICON_MAP,
-	tooltip = 'Set AI start position.',
+	tooltip = 'Spawn units.',
 	cursor  = 'Attack',
 	action  = 'cheatgive',
 	params  = {},
