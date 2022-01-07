@@ -16,18 +16,26 @@ end
 -- Config
 --------------------------------------------------------------------------------
 
-local nukeDefs = {
-	[UnitDefNames["staticnuke"].id] = true,
-}
+local nukeDefs = {}
 
-local intDefs = {
-	[UnitDefNames["staticantinuke"].id] = {
-		range = 2500,
-		static = true,
-		oddX = (5 % 2)*8,
-		oddZ = (8 % 2)*8,
-	},
-}
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.is_nuke then
+		nukeDefs[unitDefID] = true
+	end
+end
+
+local intDefs = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.nuke_coverage then
+		intDefs[unitDefID] = {
+			range = ud.customParams.nuke_coverage,
+			static = ud.isImmobile,
+			oddX = (ud.footprintX % 2) * 8,
+			oddX = (ud.footprintY % 2) * 8,
+		}
+	end
+end
 
 --------------------------------------------------------------------------------
 -- Globals
