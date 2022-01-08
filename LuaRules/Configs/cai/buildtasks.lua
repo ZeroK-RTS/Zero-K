@@ -505,9 +505,8 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 0.6,
 					count = 3,
-					[1] = {ID = UnitDefNames['amphimpulse'].id, chance = 0.65},
-					[2] = {ID = UnitDefNames['amphriot'].id, chance = 0.25},
-					[3] = {ID = UnitDefNames['amphbomb'].id, chance = 0.1},
+					[1] = {ID = UnitDefNames['amphimpulse'].id, chance = 0.7},
+					[2] = {ID = UnitDefNames['amphriot'].id, chance = 0.3},
 				},
 				
 				[8] = { -- aa
@@ -587,18 +586,18 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- bomber
-					importanceMult = 1,
-					count = 2,
-					[1] = {ID = UnitDefNames['gunshipassault'].id, chance = 0.96},
-					[2] = {ID = UnitDedNames['gunshipkrow'].id, chance = 0.04},
+					importanceMult = 0,
+					count = 0,
 				},
 				
 				[5] = { -- gunship
 					importanceMult = 1.4,
-					count = 3,
-					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 0.37},
-					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.42},
-					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.21},
+					count = 5,
+					[1] = {ID = UnitDefNames['gunshipskirm'].id, chance = 0.29},
+					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.34},
+					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.17},
+					[4] = {ID = UnitDefNames['gunshipassault'].id, chance = 0.17},
+					[5] = {ID = UnitDefNames['gunshipkrow'].id, chance = 0.03}
 				},
 			},
 		},
