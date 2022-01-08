@@ -12,6 +12,7 @@
 	"teleport" : "teleport",
 	"ability" : "ability",
 	"heat" : "heat",
+	"speed" : "speed",
 	"reload" : "reload",
 	"slow" : "slow",
 	"goo" : "goo",

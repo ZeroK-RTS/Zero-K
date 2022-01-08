@@ -86,6 +86,7 @@ local messages = {
 	teleport_pw = "teleport",
 	ability = "ability",
 	heat = "heat",
+	speed = "speed",
 	reload = "reload",
 	reammo = "reammo",
 	slow = "slow",
@@ -599,6 +600,7 @@ do
 				specialReload = ud.customParams.specialreloadtime,
 				specialRate   = ud.customParams.specialreload_userate,
 				heat          = ud.customParams.heat_per_shot,
+				speed         = ud.customParams.speed_bar,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -822,6 +824,14 @@ do
 			local heatState = GetUnitRulesParam(unitID, "heat_bar")
 			if (heatState and heatState > 0) then
 				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
+			end
+		end
+		
+		--// DRP Speed
+		if ci.speed and build == 1 then
+			local speedState = GetUnitRulesParam(unitID, "speed_bar")
+			if (speedState and speedState < 1) then
+				barDrawer.AddBar(addTitle and messages.speed, speedState, "reload2", (addPercent and floor(speedState*100) .. '%'))
 			end
 		end
 		

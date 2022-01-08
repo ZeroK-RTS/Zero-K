@@ -19,6 +19,7 @@ return { raveparty = {
     modelradius    = [[35]],
     bait_level_default = 0,
     draw_blueprint_facing = 1,
+    speed_bar = 1,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -94,6 +95,7 @@ return { raveparty = {
 
       customParams = {
         script_reload = [[6]],
+        reaim_time = 1,
       },
       damage                  = {
         default = 3002.1,
@@ -107,7 +109,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[1 0.1 0.1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                    = 15,
       sizeDecay               = 0.03,
       soundHit                = [[explosion/mini_nuke]],
@@ -134,6 +136,7 @@ return { raveparty = {
         burnchance = 1,
 
         script_reload = [[6]],
+        reaim_time = 1,
 
         area_damage = 1,
         area_damage_radius = 320,
@@ -154,7 +157,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.9 0.3 0]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
@@ -177,6 +180,7 @@ return { raveparty = {
 
       customParams = {
         script_reload = [[6]],
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -193,7 +197,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.7 0.7 0]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/cannon/earthshaker]],
@@ -221,6 +225,7 @@ return { raveparty = {
         movestructures = [[1]],
 
         script_reload = [[6]],
+        reaim_time = 1,
       },
       
       damage                  = {
@@ -235,7 +240,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.1 1 0.1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[explosion/ex_large4]],
@@ -257,6 +262,7 @@ return { raveparty = {
 
       customParams = {
         script_reload = [[6]],
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -276,7 +282,7 @@ return { raveparty = {
       paralyzeTime            = 25,
       range                   = 7500,
       rgbColor                = [[0.1 0.1 1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/more_lightning]],
@@ -301,6 +307,7 @@ return { raveparty = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
         script_reload = [[6]],
+        reaim_time = 1,
         timeslow_overslow_frames = 2*30, --2 seconds before slow decays
       },
       
@@ -318,7 +325,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.7 0 0.7]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                    = 15,
       sizeDecay               = 0.03,
       soundHit                = [[weapon/aoe_aura2]],
