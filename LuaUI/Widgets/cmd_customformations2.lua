@@ -131,7 +131,6 @@ local requiresAlt = {
 local overrideCmds = {
 	[CMD.GUARD] = CMD_RAW_MOVE,
 	[CMD_WAIT_AT_BEACON] = CMD_RAW_MOVE,
-	[CMD.ATTACK] = 20,
 }
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
@@ -576,7 +575,7 @@ function widget:MousePress(mx, my, mButton)
 	-- Is this command eligible for a custom formation ?
 	local alt, ctrl, meta, shift = GetModKeys()
 	-- If its not ( command elegible for formation AND ((alt is being held or the command doesnt require alt) or (using rmb as alt command and rmb is pressed)))
-	if not (formationCmds[usingCmd] and ((alt or not requiresAlt[usingCmd]) or (options.RMBLineFormation.value and mButton == 3))) then
+	if not (formationCmds[usingCmd] and ((alt or not requiresAlt[usingCmd]) or (options.RMBLineFormation.value and mButton == 3 and not usingContextCommand))) then
 		return false
 	end
 	
