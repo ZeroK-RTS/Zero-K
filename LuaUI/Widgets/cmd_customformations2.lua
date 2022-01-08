@@ -132,7 +132,6 @@ local overrideCmds = {
 	[CMD.GUARD] = CMD_RAW_MOVE,
 	[CMD_WAIT_AT_BEACON] = CMD_RAW_MOVE,
 	[CMD.ATTACK] = 20,
-	
 }
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
@@ -520,7 +519,6 @@ function widget:MousePress(mx, my, mButton)
 	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
-	
 	if activeCmdID then
 		if mButton==3 and options.RMBLineFormation.value then
 			usingCmd = activeCmdID
@@ -545,7 +543,6 @@ function widget:MousePress(mx, my, mButton)
 		end
 		
 		local overrideCmdID = overrideCmds[defaultCmdID]
-		
 		if overrideCmdID then
 			local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 			if targType == 'unit' then
@@ -569,10 +566,6 @@ function widget:MousePress(mx, my, mButton)
 		
 		usingContextCommand = true
 		usingRMB = true
-		Spring.Echo("usingContextCommand")
-		Spring.Echo(usingContextCommand)
-		Spring.Echo("usingRMB")
-		Spring.Echo(usingRMB)
 	end
 	
 	-- Without this, the unloads issued will use the area of the last area unload
