@@ -52,7 +52,13 @@ local readyNukeCount = 0
 local highProgress = -1
 local lastTime
 local nukeList = {}
-local curUnitList = { staticnuke = true }
+local curUnitList = {}
+
+for unitDefName, ud in pairs(UnitDefNames) do
+	if ud.customParams.is_nuke then
+		curUnitList[unitDefName] = true
+	end
+end
 
 
 local config = {}

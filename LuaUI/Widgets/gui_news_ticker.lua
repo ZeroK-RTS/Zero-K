@@ -314,7 +314,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 		if unitDef.canFly and not airSpotted then
 			AddEvent("Enemy aircraft spotted", nil, colorRed, "enemyAirSpotted", pos)
 			airSpotted = true
-		elseif unitDef.name == "staticnuke" and not nukeSpotted then
+		elseif unitDef.customParams.is_nuke and not nukeSpotted then
 			AddEvent("Enemy nuke silo spotted", nil, colorRed, "enemyNukeSpotted", pos)
 			nukeSpotted = true
 		end
