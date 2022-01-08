@@ -32,7 +32,7 @@ for unitDefID, ud in pairs(UnitDefs) do
 			range = ud.customParams.nuke_coverage,
 			static = ud.isImmobile,
 			oddX = (ud.footprintX % 2) * 8,
-			oddX = (ud.footprintY % 2) * 8,
+			oddY = (ud.footprintY % 2) * 8,
 		}
 	end
 end
