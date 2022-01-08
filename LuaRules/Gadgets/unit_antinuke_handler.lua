@@ -25,16 +25,13 @@ end
 --------------------------------------------------------------------------------
 
 local nukeDefs = {}
+local interceptorRanges = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
 	if ud.customParams.is_nuke then
 		nukeDefs[unitDefID] = true
 	end
-end
 
-local interceptorRanges = {}
-
-for unitDefID, ud in pairs(UnitDefs) do
 	if ud.customParams.nuke_coverage then
 		interceptorRanges[unitDefID] = (ud.customParams.nuke_coverage)^2
 	end

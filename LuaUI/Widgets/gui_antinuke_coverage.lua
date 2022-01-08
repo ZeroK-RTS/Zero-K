@@ -17,22 +17,19 @@ end
 --------------------------------------------------------------------------------
 
 local nukeDefs = {}
+local intDefs = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
 	if ud.customParams.is_nuke then
 		nukeDefs[unitDefID] = true
 	end
-end
 
-local intDefs = {}
-
-for unitDefID, ud in pairs(UnitDefs) do
 	if ud.customParams.nuke_coverage then
 		intDefs[unitDefID] = {
 			range = ud.customParams.nuke_coverage,
 			static = ud.isImmobile,
-			oddX = (ud.footprintX % 2) * 8,
-			oddY = (ud.footprintY % 2) * 8,
+			oddX = (ud.xsize % 4) * 4,
+			oddY = (ud.zsize % 4) * 4,
 		}
 	end
 end
