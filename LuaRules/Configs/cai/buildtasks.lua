@@ -504,7 +504,7 @@ factionBuildConfig = {
 				
 				[7] = { -- riot
 					importanceMult = 0.6,
-					count = 3,
+					count = 2,
 					[1] = {ID = UnitDefNames['amphimpulse'].id, chance = 0.7},
 					[2] = {ID = UnitDefNames['amphriot'].id, chance = 0.3},
 				},
