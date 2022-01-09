@@ -2,7 +2,7 @@ return { raveparty = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
-  buildCostMetal                = 36000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -20,6 +20,10 @@ return { raveparty = {
     bait_level_default = 0,
     draw_blueprint_facing = 1,
     speed_bar = 1,
+
+    keeptooltip    = [[any string I want]],
+    neededlink     = 400,
+    pylonrange     = 150,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -218,9 +222,9 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams            = {
-        gatherradius = [[384]],
-        smoothradius = [[192]],
-        smoothmult   = [[0.7]],
+        gatherradius = [[400]],
+        smoothradius = [[240]],
+        smoothmult   = [[0.8]],
         smoothexponent = [[0.45]],
         movestructures = [[1]],
 

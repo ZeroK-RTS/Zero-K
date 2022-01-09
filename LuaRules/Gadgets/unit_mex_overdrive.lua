@@ -438,6 +438,7 @@ local function AddPylon(unitID, unitDefID, range)
 	end
 	quadFields[allyTeamID]:Insert(unitID, pX, pZ, range)
 	local intersections = quadFields[allyTeamID]:GetIntersections(unitID)
+	local neededLink = pylonDefs[unitDefID].neededLink
 
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
@@ -449,10 +450,14 @@ local function AddPylon(unitID, unitDefID, range)
 		--nearEnergy = {},
 		x = pX,
 		z = pZ,
-		neededLink = pylonDefs[unitDefID].neededLink,
+		neededLink = neededLink,
 		active = true,
 		color = 0,
 	}
+	if neededLink then
+		-- Start spawned units with low power until the next grid update
+		spSetUnitRulesParam(unitID, "lowpower", 1, inlosTrueTable)
+	end
 
 	for i = 2, intersections[1] do
 		local pid = intersections[i]

@@ -72,7 +72,7 @@ local function IsDisabled()
 	if y < -95 then
 		return true
 	end
-	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1) or (spGetUnitRulesParam(unitID, "lowpower") == 1)
 end
 
 local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, x, y, z)
@@ -191,8 +191,6 @@ local function SpawnProjectileThread()
 	GG.zenith_spawnBlocked = GG.zenith_spawnBlocked or {}
 
 	while true do
-		local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
 		--	pos = {1000,1000,1000},
 		--	speed = {10, 0 ,10},
@@ -204,8 +202,10 @@ local function SpawnProjectileThread()
 		-- reloadMult should be 0 only when disabled.
 		while IsDisabled() do
 			UpdateEnabled(false)
-			Sleep(500)
+			Sleep(100)
 		end
+		local reloadMult = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
+
 		EmitSfx(flare, 2049)
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
 

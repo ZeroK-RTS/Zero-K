@@ -23,6 +23,10 @@ return { mahlazer = {
     select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
     bait_level_default = 0,
     draw_blueprint_facing = 1,
+
+    keeptooltip    = [[any string I want]],
+    neededlink     = 600,
+    pylonrange     = 200,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

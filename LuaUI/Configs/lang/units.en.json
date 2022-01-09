@@ -186,7 +186,7 @@
 	},
 	"mahlazer" : {
 		"name" : "Starlight",
-		"description" : "Planetary Energy Chisel",
+		"description" : "Planetary Energy Chisel - Power by connecting to a 600 energy grid",
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
 	},
 	"spidercrabe" : {
@@ -601,7 +601,7 @@
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
-		"description" : "Destructive Rainbow Projector",
+		"description" : "Destructive Rainbow Projector - Power by connecting to a 400 energy grid",
 		"helptext" : "The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!"
 	},
 	"turretlaser" : {
@@ -826,7 +826,7 @@
 	},
 	"zenith" : {
 		"name" : "Zenith",
-		"description" : "Meteor Controller",
+		"description" : "Meteor Controller - Power by connecting to a 400 energy grid",
 		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"vehaa" : {

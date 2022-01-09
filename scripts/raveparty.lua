@@ -55,23 +55,27 @@ local smokePiece = {spindle, turret}
 
 include "constants.lua"
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
 -- Signal definitions
 local SIG_AIM = 2
 
-local minSpinMult = 0.2
+local minSpinMult = 0.25
 local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
-local maxGainStoreTotal = 0.1
-local maxGainStoreFrames = 120
+local maxGainStoreTotal = 0.12
+local maxGainStoreFrames = 150
 local lastGainStoreTime = 0
 
-local spinMult = minSpinMult
+local spinMult = 0
 local gunNum = 1
+local reloadChange = 0
 
 local function UpdateSpin(gainSpin)
-	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
-	local reloadChange = (stunned_or_inbuild and 0) or (GG.att_ReloadChange[unitID] or 1)
+	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
+	reloadChange = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
 	if gainSpin then
 		local gameFrame = Spring.GetGameFrame()
 		local gainDiff = gameFrame - lastGainStoreTime
@@ -80,16 +84,25 @@ local function UpdateSpin(gainSpin)
 			gainDiff = maxGainStoreFrames
 		end
 		spinMult = spinMult + spinMult * reloadChange * maxGainStoreTotal * gainDiff / maxGainStoreFrames
-		--startTime = startTime or Spring.GetGameFrame()
-		--Spring.Echo("spinMult", spinMult, (Spring.GetGameFrame() - startTime)/30)
 		if spinMult > 1 then
 			spinMult = 1
 		end
+		--startTime = startTime or Spring.GetGameFrame()
+		--Spring.Echo("spinMult", spinMult, (Spring.GetGameFrame() - startTime)/30)
 	end
-	if reloadChange <= 0 then
-		reloadChange = 1
+	if spinMult > reloadChange then
+		spinMult = spinMult*0.97 - 0.0015
+		if spinMult < 0 then
+			spinMult = 0
+		end
 	end
-	Spin(spindle, x_axis, reloadChange*spinMult*maxSpin, spinScriptAccel)
+	if reloadChange > 0 and spinMult < minSpinMult then
+		spinMult = spinMult + 0.03
+		if spinMult > minSpinMult then
+			spinMult = minSpinMult
+		end
+	end
+	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
 	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult, LOS_ACCESS)
 end
 
@@ -121,12 +134,12 @@ function script.AimWeapon(num, heading, pitch)
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
 
-	while Spring.GetUnitRulesParam(unitID,"disarmed") == 1 do
+	while reloadChange <= 0 do
 		Sleep(10)
 	end
 
 	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
-	local headDiff = heading-curHead
+	local headDiff = heading - curHead
 	if math.abs(headDiff) > math.pi then
 		headDiff = headDiff - math.abs(headDiff)/headDiff*2*math.pi
 	end
@@ -138,8 +151,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	local spindlePitch = -pitch + (num - 1)* math.pi/3
 
-	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn(turret, y_axis, heading, headingSpeed*slowMult)
+	Turn(turret, y_axis, heading, headingSpeed*reloadChange)
 	WaitForTurn(turret, y_axis)
 	
 	local currentSpindle = select(1, Spring.UnitScript.GetPieceRotation(spindle))
@@ -147,7 +159,7 @@ function script.AimWeapon(num, heading, pitch)
 	if diff < math.pi/3 then
 		gunNum = num
 	end
-	return (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1) and diff < 0.15*spinMult
+	return reloadChange > 0 and diff < 0.15*spinMult
 end
 
 function script.AimFromWeapon(num)
