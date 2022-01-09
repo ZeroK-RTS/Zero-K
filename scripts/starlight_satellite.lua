@@ -137,6 +137,11 @@ function mahlazer_DisengageTheLaserBeam()
 	on = false
 end
 
+function mahlazer_StopAim()
+	GG.PieceControl.StopTurn(SatelliteMuzzle, x_axis)
+	GG.PieceControl.StopTurn(Satellite, x_axis)
+end
+
 function mahlazer_AimAt(pitch)
 	Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
 	Turn(Satellite, x_axis, pitch/2, math.rad(0.6))
