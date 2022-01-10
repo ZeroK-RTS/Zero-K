@@ -3455,7 +3455,7 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 						and IsPositionTerraformable(structData.minx, structData.minz, true) and IsPositionTerraformable(structData.maxx, structData.minz, true)
 						and IsPositionTerraformable(structData.minx, structData.maxz, true) and IsPositionTerraformable(structData.maxx, structData.maxz, true) then
 					local gh = spGetGroundHeight(i,j)
-					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent) + gh
+					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent or 1) + gh
 					structHeight[unitID] = structData.h
 					-- Causes structures to become non-blocking.
 					--local unitDefID = Spring.GetUnitDefID(unitID)

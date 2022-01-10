@@ -819,6 +819,17 @@ local function nocost(cmd,line,words,player)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
 	GG.Terraform.SetFreeTerraform(enabled)
 	Spring.Echo("Free terraform " .. ((enabled and "enabled") or "disabled") .. ".")
+	GG.Overdrive.SetNoGridRequirement(enabled)
+	Spring.Echo("No grid requirement " .. ((enabled and "enabled") or "disabled") .. ".")
+end
+
+local function power(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local enabled = not (tonumber(words[1]) == 0)
+	GG.Overdrive.SetNoGridRequirement(enabled)
+	Spring.Echo("No grid requirement " .. ((enabled and "enabled") or "disabled") .. ".")
 end
 
 local function EmpiricalDps(cmd,line,words,player)
@@ -895,6 +906,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "serial", serial, "Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self, "restart", restart, "Gives some commanders and clears everything else.")
 	gadgetHandler.actionHandler.AddChatAction(self, "nocost", nocost, "Makes everything gadget-implemented free.")
+	gadgetHandler.actionHandler.AddChatAction(self, "power", power, "Remove grid power limit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "printunits",  PrintUnits, "")
 
 	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)

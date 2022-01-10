@@ -61,7 +61,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 -- Signal definitions
 local SIG_AIM = 2
 
-local minSpinMult = 0.25
+local minSpinMult = 0.2
 local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 

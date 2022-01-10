@@ -35,6 +35,11 @@ function Spring.Utilities.CommandNameByID(cmdID) -- returns a human-parsable str
 end
 
 function Spring.Utilities.TraceFullEcho(...)
+	if not debug then
+		Spring.Echo("TraceFullEcho not available", ...)
+		-- debug is not in luarules
+		return
+	end
 	local myargs = {...}
 	infostr = ""
 	for i,v in ipairs(myargs) do

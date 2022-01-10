@@ -127,6 +127,7 @@ local paybackDefs = { -- cost is how much to pay back
 local spammedError = false
 local debugGridMode = false
 local debugAllyTeam = false
+local waiveGridLowPower = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -454,7 +455,7 @@ local function AddPylon(unitID, unitDefID, range)
 		active = true,
 		color = 0,
 	}
-	if neededLink then
+	if neededLink and not waiveGridLowPower then
 		-- Start spawned units with low power until the next grid update
 		spSetUnitRulesParam(unitID, "lowpower", 1, inlosTrueTable)
 	end
@@ -1096,7 +1097,7 @@ function gadget:GameFrame(n)
 				local pylonData = pylon[allyTeamID][unitID]
 				if pylonData then
 					if pylonData.neededLink then
-						if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
+						if (pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID]) and not waiveGridLowPower then
 							spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
 							GG.ScriptNotifyUnpowered(unitID, true)
 						else
@@ -1699,6 +1700,10 @@ end
 
 function externalFunctions.RemoveTeamIncomeRedirect(teamID)
 
+end
+
+function externalFunctions.SetNoGridRequirement(enabled)
+	waiveGridLowPower = enabled
 end
 
 -------------------------------------------------------------------------------------
