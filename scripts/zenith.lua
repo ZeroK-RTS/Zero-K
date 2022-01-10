@@ -124,7 +124,7 @@ local function LoseControlOfMeteors()
 			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 		end
 	end
-	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 end
 
 local function RegainControlOfMeteors()

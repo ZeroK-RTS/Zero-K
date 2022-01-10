@@ -33,3 +33,41 @@ function Spring.Utilities.CommandNameByID(cmdID) -- returns a human-parsable str
 
 	return ret .. " (" .. tostring(cmdID) .. ")"
 end
+
+function Spring.Utilities.TraceFullEcho(...)
+	local myargs = {...}
+	infostr = ""
+	for i,v in ipairs(myargs) do
+		infostr = infostr .. tostring(v) .. "\t"
+	end
+	if infostr ~= "" then
+		infostr = "Trace:[" .. infostr .. "]\n"
+	end
+	local functionstr = "" -- "Trace:["
+	for i = 2, 16 do
+		if debug.getinfo(i) then
+			local funcName = (debug and debug.getinfo(i) and debug.getinfo(i).name)
+			if funcName then
+				functionstr = functionstr .. tostring(i-1) .. ": " .. tostring(funcName) .. " "
+				local arguments = ""
+				local funcName = (debug and debug.getinfo(i) and debug.getinfo(i).name) or "??"
+				if funcName ~= "??" then
+					for j = 1, 10 do
+						local name, value = debug.getlocal(i, j)
+						if not name then
+							break
+						end
+						local sep = ((arguments == "") and "") or  "; "
+						arguments = arguments .. sep .. ((name and tostring(name)) or "name?") .. "=" .. tostring(value)
+					end
+				end
+				functionstr  = functionstr .. " Locals:(" .. arguments .. ")" .. "\n"
+			else
+				break
+			end
+		else
+			break
+		end
+	end
+	Spring.Echo(infostr .. functionstr)
+end
