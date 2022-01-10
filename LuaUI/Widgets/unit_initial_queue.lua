@@ -98,13 +98,6 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	end
 
 	if drawRanges then
-		--[[
-		if isMex[bDefID] then
-			gl.Color(1.0, 0.3, 0.3, 0.7)
-			gl.DrawGroundCircle(bx, by, bz, Game.extractorRadius, 40)
-		end
-		]]
-
 		local wRange = weaponRange[bDefID]
 		if wRange then
 			gl.Color(1.0, 0.3, 0.3, 0.7)
@@ -158,13 +151,6 @@ local function DoBuildingsClash(buildData1, buildData2)
 end
 local function SetSelDefID(defID)
 	selDefID = defID
-
-	-- if (isMex[selDefID] ~= nil) ~= (Spring.GetMapDrawMode() == "metal") then
-		-- Spring.SendCommands("ShowMetalMap")
-	-- end
-	-- if defID then
-		-- Spring.SetActiveCommand(defID)
-	-- end
 end
 
 local function GetSelDefID(defID)
@@ -756,9 +742,6 @@ function widget:Initialize()
 		if uDef.maxWeaponRange > 16 then
 			weaponRange[uDefID] = uDef.maxWeaponRange
 		end
-	end
-	if UnitDefNames["staticmex"] then
-		isMex[UnitDefNames["staticmex"].id] = true;
 	end
 	WG.InitialQueue = true
 	
