@@ -35,7 +35,7 @@ local spGetGameFrame = Spring.GetGameFrame
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Map/Reclaimables'
+options_path = 'Settings/Interface/Reclaim Highlight/Old'
 options_order = { 'showhighlight','pregamehighlight','intensity','minmetal'}
 options = {
 	showhighlight = {

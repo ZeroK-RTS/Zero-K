@@ -17,6 +17,8 @@ end
 
 local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
 
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+
 -----------------------------------------------------------------
 -- Configuration Constants
 -----------------------------------------------------------------
@@ -296,6 +298,13 @@ function widget:ViewResize()
 end
 
 function widget:Initialize()
+	if BAR_COMPAT then
+		Spring.Echo("Using fallback unit outlines due to 105+.")
+		Spring.SendCommands{"luaui enablewidget Outline No Shader"}
+		widgetHandler:RemoveWidget()
+		return
+	end
+	Spring.SendCommands{"luaui disablewidget Outline No Shader"}
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 	if not canContinue then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))

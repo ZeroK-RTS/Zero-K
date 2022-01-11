@@ -27,12 +27,13 @@ end
 local thickness = 1
 local thicknessMult = 1
 local forceLowQuality = false
-local scaleWithHeight
-local functionScaleWithHeight
+local scaleWithHeight = false
+local functionScaleWithHeight = true
 
 local PI = math.pi
 local SUBTLE_MIN = 500
 local SUBTLE_MAX = 3000
+local zoomScaleRange = 0.5
 
 local function OnchangeFunc()
 	thickness = options.thickness.value
@@ -67,6 +68,16 @@ options = {
 			if not scaleWithHeight then
 				thicknessMult = 1
 			end
+		end,
+	},
+	scaleRange = {
+		name = 'Zoom Scale Minimum',
+		desc = 'Minimum outline thickness muliplier when zoomed out.',
+		type = 'number',
+		min = 0, max = 1, step = 0.01,
+		value = zoomScaleRange,
+		OnChange = function (self)
+			zoomScaleRange = self.value
 		end,
 	},
 	functionScaleWithHeight = {
@@ -517,7 +528,7 @@ function widget:UnitDestroyed(unitID)
 	unbuiltUnits[unitID] = nil
 end
 
-function widget:Update(dt)
+local function GetNewThickness()
 	if functionScaleWithHeight then
 		local cs = Spring.GetCameraState()
 		local gy = Spring.GetGroundHeight(cs.px, cs.pz)
@@ -528,18 +539,16 @@ function widget:Update(dt)
 			cameraHeight = cs.py - gy
 		end
 		if cameraHeight < SUBTLE_MIN then
-			thicknessMult = 1
-			return
+			return 1
 		end
 		if cameraHeight > SUBTLE_MAX then
-			thicknessMult = 0.5
-			return
+			thicknessMult = zoomScaleRange
+			return zoomScaleRange
 		end
-		
-		thicknessMult = (((math.cos(PI*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)/2 + 0.5
-		--Spring.Echo("cameraHeight", cameraHeight, "thicknessMult", thicknessMult)
-		return
+		local zoomScale = (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^3)
+		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
 	end
+	
 	if not scaleWithHeight then
 		return
 	end
@@ -554,7 +563,14 @@ function widget:Update(dt)
 	if cameraHeight < 1 then
 		cameraHeight = 1
 	end
-	thicknessMult = 1000/cameraHeight
+	return 1000/cameraHeight
+end
+
+function widget:Update(dt)
+	local newThickness = GetNewThickness()
+	if newThickness then
+		thicknessMult = newThickness
+	end
 end
 
 --------------------------------------------------------------------------------
