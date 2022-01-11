@@ -8,7 +8,7 @@ local SOURCE_RANGE = 4200 -- size of the box which the emit point can be randoml
 local SOURCE_HEIGHT = 9001
 
 local HOVER_RANGE = 1600
-local HOVER_HEIGHT = 2500
+local HOVER_HEIGHT = 2650
 
 local SPREAD_PER_DIST = 0.03
 
