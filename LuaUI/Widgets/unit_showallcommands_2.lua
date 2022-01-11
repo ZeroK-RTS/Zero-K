@@ -249,7 +249,6 @@ local function drawUnitCommands(unitID)
 	if not unitID then
 		return
 	end
-	spDrawUnitCommands(unitID)
 	
 	local tx,ty,tz,fireTowards = getTargetPosition(unitID)
 	if tx then
@@ -298,13 +297,16 @@ local function updateDrawing()
 		for i = 1, count do
 			drawUnitCommands(units[i])
 		end
+		spDrawUnitCommands(units)
 	elseif drawSelected then
 		local sel = selectedUnits
 		local alreadyDrawn = {}
+		local toDraw = {}
 		for i = 1, selectedUnitCount do
 			if sel[i] then
 				drawUnitCommands(sel[i])
 				alreadyDrawn[sel[i]] = true
+				toDraw[#toDraw + 1] = sel[i]
 			end
 		end
 		if options.includeallies.value then
@@ -315,8 +317,12 @@ local function updateDrawing()
 				if unitID and WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
 					drawUnitCommands(unitID)
 					alreadyDrawn[unitID] = true
+					toDraw[#toDraw + 1] = unitID
 				end
 			end
+		end
+		if #toDraw > 0 then
+			spDrawUnitCommands(toDraw)
 		end
 	end
 end
