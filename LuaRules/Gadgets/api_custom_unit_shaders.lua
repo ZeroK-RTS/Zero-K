@@ -952,6 +952,7 @@ local function ReloadCUS(optName, _, _, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
+	Spring.Echo("Reloading CUS")
 	gadget:Shutdown()
 	gadget:Initialize()
 end
@@ -960,6 +961,7 @@ local function DisableCUS(optName, _, _, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
+	Spring.Echo("Removing CUS")
 	gadget:Shutdown()
 end
 
@@ -971,6 +973,10 @@ end
 -----------------------------------------------------------------
 
 function gadget:Initialize()
+	--if true then
+	--	gadgetHandler:RemoveGadget()
+	--	return
+	--end
 	--// GG assignment
 	GG.CUS = {}
 
