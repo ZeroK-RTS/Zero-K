@@ -281,10 +281,10 @@ return { zenith = {
       tracks                  = true,
       trajectoryHeight        = 0,
       turret                  = true,
-      turnRate                = 6000,
+      turnRate                = 8000,
       weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 350,
+      weaponVelocity          = 300,
       wobble                  = 28000,
     },
 
