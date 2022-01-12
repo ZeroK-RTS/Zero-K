@@ -6,10 +6,10 @@ local firept = piece "firept"
 
 local SOURCE_RANGE = 4200 -- size of the box which the emit point can be randomly placed in
 
---[[ Higher than hover height partially so that they don't spawn in front of people's eyes,
-     but also keep in mind that this has a mechanical effect on constant-fire accuracy
-     due to distance scaling and spending more time applying turnrate/wobble compared to
-     being fired from the lower height of the swarm. ]]
+--[[ Higher than hover height partially so that they don't spawn in front of people's eyes
+     but come "from space" (cool!!), though also keep in mind that this has a mechanical
+     effect on constant-fire accuracy due to distance scaling and spending more time applying
+     turnrate/wobble compared to being fired from the lower height of the swarm. ]]
 local SOURCE_HEIGHT = 9001
 
 local HOVER_RANGE = 1600
