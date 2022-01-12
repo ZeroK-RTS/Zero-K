@@ -293,18 +293,27 @@ end
 -----------------------------------------------------------------
 
 function widget:ViewResize()
+	if BAR_COMPAT then
+		return
+	end
 	widget:Shutdown()
 	widget:Initialize()
+end
+
+local firstUpdate = true
+function widget:Update(dt)
+	if BAR_COMPAT and firstUpdate then
+		Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+		firstUpdate = false
+	end
 end
 
 function widget:Initialize()
 	if BAR_COMPAT then
 		Spring.Echo("Using fallback unit outlines due to 105+.")
 		Spring.SendCommands{"luaui enablewidget Outline No Shader"}
-		widgetHandler:RemoveWidget()
 		return
 	end
-	Spring.SendCommands{"luaui disablewidget Outline No Shader"}
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 	if not canContinue then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
@@ -331,8 +340,6 @@ function widget:Initialize()
 		blurTexes[i] = gl.CreateTexture(vsx, vsy, commonTexOpts)
 	end
 
-
-
 	shapeFBO = gl.CreateFBO({
 		color0 = shapeTex,
 		drawbuffers = {GL_COLOR_ATTACHMENT0_EXT},
@@ -352,9 +359,7 @@ function widget:Initialize()
 		end
 	end
 
-
 	local identityShaderVert = VFS.LoadFile(shadersDir.."identity.vert.glsl")
-
 	local shapeShaderFrag = VFS.LoadFile(shadersDir.."outlineShape2.frag.glsl")
 
 	shapeShaderFrag = shapeShaderFrag:gsub("###USE_MATERIAL_INDICES###", tostring((USE_MATERIAL_INDICES and 1) or 0))
@@ -393,6 +398,9 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	if BAR_COMPAT then
+		return
+	end
 	firstTime = nil
 
 	if screenQuadList then
@@ -528,6 +536,9 @@ local function EnterLeaveScreenSpace(functionName, ...)
 end
 
 function widget:DrawWorld()
+	if BAR_COMPAT then
+		return
+	end
 	if UpdateThicknessWithZoomScale() then
 		gaussianBlurShader[blurShaderHalfKernal]:ActivateWith(SetThickness)
 	end

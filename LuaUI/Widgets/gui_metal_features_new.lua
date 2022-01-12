@@ -78,12 +78,20 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local firstUpdate = true
 local enableCondOld = false
 local minMetalShownOld = -1
 local highlight = false
 local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 function widget:Update()
+	if firstUpdate then
+		Spring.SendCommands{"luaui disablewidget MetalFeatures (old)"}
+		firstUpdate = false
+	end
+	if BAR_COMPAT then
+		return
+	end
 	if Spring.IsGUIHidden() then
 		if enableCondOld then
 			Spring.SendCommands("luarules metal_highlight 0")
@@ -140,10 +148,8 @@ function widget:Initialize()
 	if BAR_COMPAT then
 		Spring.Echo("Using fallback reclaim highlight) due to 105+.")
 		Spring.SendCommands{"luaui enablewidget MetalFeatures (old)"}
-		widgetHandler:RemoveWidget()
 		return
 	end
-	Spring.SendCommands{"luaui disablewidget MetalFeatures (old)"}
 	Spring.SendCommands("luarules metal_highlight 0")
 end
 
@@ -152,6 +158,9 @@ function widget:Shutdown()
 end
 
 function widget:SelectionChanged(units)
+	if BAR_COMPAT then
+		return
+	end
 	if (WG.selectionEntirelyCons) then
 		conSelected = true
 	else
