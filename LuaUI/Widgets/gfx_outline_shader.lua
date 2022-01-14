@@ -302,16 +302,19 @@ end
 
 local firstUpdate = true
 function widget:Update(dt)
-	if BAR_COMPAT and firstUpdate then
-		Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+	if firstUpdate then
 		firstUpdate = false
+		if BAR_COMPAT then
+			Spring.Echo("Using fallback unit outlines due to 105+.")
+			Spring.SendCommands{"luaui enablewidget Outline No Shader"}
+		else
+			Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+		end
 	end
 end
 
 function widget:Initialize()
 	if BAR_COMPAT then
-		Spring.Echo("Using fallback unit outlines due to 105+.")
-		Spring.SendCommands{"luaui enablewidget Outline No Shader"}
 		return
 	end
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
