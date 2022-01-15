@@ -360,39 +360,16 @@ local function AddFNode(pos)
 	return true
 end
 
-local function HasWaterWeapon(UnitDefID)
-	local haswaterweapon = false
-	local numweapons = #(UnitDefs[UnitDefID]["weapons"])
-	for j=1, numweapons do
-		local weapondefid = UnitDefs[UnitDefID]["weapons"][j]["weaponDef"]
-		local iswaterweapon = WeaponDefs[weapondefid]["waterWeapon"]
-		if iswaterweapon then haswaterweapon=true end
-	end
-	return haswaterweapon
-end
+local function GetInterpNodes(number)
+	local spacing = fDists[#fNodes] / (number - 1)
 
-local function GetInterpNodes(mUnits)
-		
-	local number = #mUnits
-	local spacing = fDists[#fNodes] / (#mUnits - 1)
-
-	local haswaterweapon = {}
-	for i=1, number do
-		local UnitDefID = spGetUnitDefID(mUnits[i])
-		haswaterweapon[i] = HasWaterWeapon(UnitDefID)
-	end
-	--result of this and code below is that the height of the aimpoint for a unit [i] will be:
-	--(a) on GetGroundHeight(units aimed position), if the unit has a waterweapon
-	--(b) on whichever is highest out of water surface (=0) and GetGroundHeight(units aimed position), if the unit does not have water weapon.
-	--in BA this must match the behaviour of prevent_range_hax or commands will get modified.
-	
 	local interpNodes = {}
-	
+
 	local sPos = fNodes[1]
 	local sX = sPos[1]
 	local sZ = sPos[3]
 	local sDist = 0
-	
+
 	local eIdx = 2
 	local ePos = fNodes[2]
 	local eX = ePos[1]
@@ -752,16 +729,51 @@ function widget:MouseRelease(mx, my, mButton)
 			-- Are any units able to execute it?
 			local mUnits = GetExecutingUnits(usingCmd)
 			if #mUnits > 0 then
-				
-				local interpNodes = GetInterpNodes(mUnits)
-				
-				local orders
-				if (#mUnits <= maxHungarianUnits) then
-					orders = GetOrdersHungarian(interpNodes, mUnits, #mUnits, shift and not meta)
-				else
-					orders = GetOrdersNoX(interpNodes, mUnits, #mUnits, shift and not meta)
+				local interpNodes = GetInterpNodes(#mUnits)
+				local unitTypes = {}
+				local nUnitTypes = 0
+
+				for u = 1, #mUnits do
+					local UnitDefID = spGetUnitDefID(mUnits[u])
+					if unitTypes[UnitDefID] == nil then
+						unitTypes[UnitDefID] = {
+							units = {},
+							nodes = {}
+						}
+				        end
+					table.insert(unitTypes[UnitDefID].units, mUnits[u])
 				end
-				
+
+				-- assign nodes to unitTypes
+				for _, node in ipairs(interpNodes) do
+					local UnitDefID = nil
+					local priority = 1
+					for unitTypeId, unitType in pairs(unitTypes) do
+						local x = (#(unitType.nodes) + 1) / (#(unitType.units) + 1)
+						if x < priority then
+							priority = x
+							UnitDefID = unitTypeId
+						end
+					end
+					table.insert(unitTypes[UnitDefID].nodes, node)
+				end
+
+				local orders = {}
+
+				for _ , unitType in pairs(unitTypes) do
+					local unitTypeOrders
+					if (#(unitType.units) == 1) then
+						unitTypeOrders = {{ unitType.units[1], unitType.nodes[1] }}
+					elseif (#(unitType.units) <= maxHungarianUnits) then
+						unitTypeOrders = GetOrdersHungarian(unitType.nodes, unitType.units, #(unitType.units), shift and not meta)
+					else
+						unitTypeOrders = GetOrdersNoX(unitType.nodes, unitType.units, #(unitType.units), shift and not meta)
+					end
+
+					table.foreach(unitTypeOrders, function(k, v) table.insert(orders, v) end)
+
+				end
+
 				if meta then
 					local altOpts = GetCmdOpts(true, false, false, false, false)
 					for i = 1, #orders do
