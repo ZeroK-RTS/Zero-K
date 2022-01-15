@@ -110,7 +110,7 @@ return { jumpraid = {
       },
     
       damage                  = {
-        default = 8.9,
+        default = 9.2,
       },
 
       duration                = 0.01,
