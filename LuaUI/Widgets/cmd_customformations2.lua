@@ -360,39 +360,16 @@ local function AddFNode(pos)
 	return true
 end
 
-local function HasWaterWeapon(UnitDefID)
-	local haswaterweapon = false
-	local numweapons = #(UnitDefs[UnitDefID]["weapons"])
-	for j=1, numweapons do
-		local weapondefid = UnitDefs[UnitDefID]["weapons"][j]["weaponDef"]
-		local iswaterweapon = WeaponDefs[weapondefid]["waterWeapon"]
-		if iswaterweapon then haswaterweapon=true end
-	end
-	return haswaterweapon
-end
+local function GetInterpNodes(number)
+	local spacing = fDists[#fNodes] / (number - 1)
 
-local function GetInterpNodes(mUnits)
-		
-	local number = #mUnits
-	local spacing = fDists[#fNodes] / (#mUnits - 1)
-
-	local haswaterweapon = {}
-	for i=1, number do
-		local UnitDefID = spGetUnitDefID(mUnits[i])
-		haswaterweapon[i] = HasWaterWeapon(UnitDefID)
-	end
-	--result of this and code below is that the height of the aimpoint for a unit [i] will be:
-	--(a) on GetGroundHeight(units aimed position), if the unit has a waterweapon
-	--(b) on whichever is highest out of water surface (=0) and GetGroundHeight(units aimed position), if the unit does not have water weapon.
-	--in BA this must match the behaviour of prevent_range_hax or commands will get modified.
-	
 	local interpNodes = {}
-	
+
 	local sPos = fNodes[1]
 	local sX = sPos[1]
 	local sZ = sPos[3]
 	local sDist = 0
-	
+
 	local eIdx = 2
 	local ePos = fNodes[2]
 	local eX = ePos[1]
@@ -752,27 +729,59 @@ function widget:MouseRelease(mx, my, mButton)
 			-- Are any units able to execute it?
 			local mUnits = GetExecutingUnits(usingCmd)
 			if #mUnits > 0 then
-				
-				local interpNodes = GetInterpNodes(mUnits)
-				
-				local orders
-				if (#mUnits <= maxHungarianUnits) then
-					orders = GetOrdersHungarian(interpNodes, mUnits, #mUnits, shift and not meta)
-				else
-					orders = GetOrdersNoX(interpNodes, mUnits, #mUnits, shift and not meta)
-				end
-				
-				if meta then
-					local altOpts = GetCmdOpts(true, false, false, false, false)
-					for i = 1, #orders do
-						local orderPair = orders[i]
-						local orderPos = orderPair[2]
-						GiveNotifyingOrderToUnit(orderPair[1], CMD_INSERT, {0, usingCmd, cmdOpts.coded, orderPos[1], orderPos[2], orderPos[3]}, altOpts)
+				local interpNodes = GetInterpNodes(#mUnits)
+				local unitTypeUnits = {}
+				local unitTypeNodes = {}
+				local unitTypeList = {}
+				local nUnitTypes = 0
+
+				for u = 1, #mUnits do
+					local unitDefID = spGetUnitDefID(mUnits[u])
+					if not unitTypeUnits[unitDefID] then
+						unitTypeUnits[unitDefID] = {}
+						unitTypeNodes[unitDefID] = {}
+						unitTypeList[#unitTypeList + 1] = unitDefID
 					end
-				else
-					for i = 1, #orders do
-						local orderPair = orders[i]
-						GiveNotifyingOrderToUnit(orderPair[1], usingCmd, orderPair[2], cmdOpts)
+					unitTypeUnits[unitDefID][#unitTypeUnits[unitDefID] + 1] = mUnits[u]
+				end
+
+				-- Assign nodes to unitTypes
+				for i = 1, #interpNodes do
+					local node = interpNodes[i]
+					local maxPrioUnitDefId = false
+					local priority = false
+					for j = 1, #unitTypeList do
+						local unitDefID = unitTypeList[j]
+						local typePriority = (#unitTypeUnits[unitDefID] + 1) / (#unitTypeNodes[unitDefID] + 1)
+						if (not priority) or typePriority > priority then
+							priority = typePriority
+							maxPrioUnitDefId = unitDefID
+						end
+					end
+					if priority then
+						unitTypeNodes[maxPrioUnitDefId][#unitTypeNodes[maxPrioUnitDefId] + 1] = node
+					end
+				end
+
+				-- Match units to nodes and issue orders
+				local altOpts = meta and GetCmdOpts(true, false, false, false, false)
+				for i = 1, #unitTypeList do
+					local unitDefID = unitTypeList[i]
+					local units = unitTypeUnits[unitDefID]
+					local nodes = unitTypeNodes[unitDefID]
+					local orders = MatchUnitsToNodes(nodes, units, shift and not meta)
+					
+					if meta then
+						for i = 1, #orders do
+							local orderPair = orders[i]
+							local orderPos = orderPair[2]
+							GiveNotifyingOrderToUnit(orderPair[1], CMD_INSERT, {0, usingCmd, cmdOpts.coded, orderPos[1], orderPos[2], orderPos[3]}, altOpts)
+						end
+					else
+						for i = 1, #orders do
+							local orderPair = orders[i]
+							GiveNotifyingOrderToUnit(orderPair[1], usingCmd, orderPair[2], cmdOpts)
+						end
 					end
 				end
 			end
@@ -1021,6 +1030,18 @@ end
 ---------------------------------------------------------------------------------------------------------
 -- Matching Algorithms
 ---------------------------------------------------------------------------------------------------------
+
+function MatchUnitsToNodes(nodes, units, shifted)
+	if (#units == 1) then
+		return {{units[1], nodes[1]}}
+	elseif (#units <= maxHungarianUnits) then
+		return GetOrdersHungarian(nodes, units, #units, shift and not meta)
+	else
+		return GetOrdersNoX(nodes, units, #units, shift and not meta)
+	end
+end
+
+
 function GetOrdersNoX(nodes, units, unitCount, shifted)
 	
 	-- Remember when  we start
@@ -1194,6 +1215,7 @@ function GetOrdersNoX(nodes, units, unitCount, shifted)
 	end
 	return orders
 end
+
 function GetOrdersHungarian(nodes, units, unitCount, shifted)
 	-------------------------------------------------------------------------------------
 	-------------------------------------------------------------------------------------
