@@ -730,61 +730,58 @@ function widget:MouseRelease(mx, my, mButton)
 			local mUnits = GetExecutingUnits(usingCmd)
 			if #mUnits > 0 then
 				local interpNodes = GetInterpNodes(#mUnits)
-				local unitTypes = {}
+				local unitTypeUnits = {}
+				local unitTypeNodes = {}
+				local unitTypeList = {}
 				local nUnitTypes = 0
 
 				for u = 1, #mUnits do
-					local UnitDefID = spGetUnitDefID(mUnits[u])
-					if unitTypes[UnitDefID] == nil then
-						unitTypes[UnitDefID] = {
-							units = {},
-							nodes = {}
-						}
+					local unitDefID = spGetUnitDefID(mUnits[u])
+					if not unitTypeUnits[unitDefID] then
+						unitTypeUnits[unitDefID] = {}
+						unitTypeNodes[unitDefID] = {}
+						unitTypeList[#unitTypeList + 1] = unitDefID
 					end
-					table.insert(unitTypes[UnitDefID].units, mUnits[u])
+					unitTypeUnits[unitDefID][#unitTypeUnits[unitDefID] + 1] = mUnits[u]
 				end
 
-				-- assign nodes to unitTypes
-				for _, node in ipairs(interpNodes) do
-					local UnitDefID = nil
-					local priority = 1
-					for unitTypeId, unitType in pairs(unitTypes) do
-						local x = (#(unitType.nodes) + 1) / (#(unitType.units) + 1)
-						if x < priority then
-							priority = x
-							UnitDefID = unitTypeId
+				-- Assign nodes to unitTypes
+				for i = 1, #interpNodes do
+					local node = interpNodes[i]
+					local maxPrioUnitDefId = false
+					local priority = false
+					for j = 1, #unitTypeList do
+						local unitDefID = unitTypeList[j]
+						local typePriority = (#unitTypeUnits[unitDefID] + 1) / (#unitTypeNodes[unitDefID] + 1)
+						if (not priority) or typePriority > priority then
+							priority = typePriority
+							maxPrioUnitDefId = unitDefID
 						end
 					end
-					table.insert(unitTypes[UnitDefID].nodes, node)
+					if priority then
+						unitTypeNodes[maxPrioUnitDefId][#unitTypeNodes[maxPrioUnitDefId] + 1] = node
+					end
 				end
 
-				local orders = {}
-
-				for _ , unitType in pairs(unitTypes) do
-					local unitTypeOrders
-					if (#(unitType.units) == 1) then
-						unitTypeOrders = {{ unitType.units[1], unitType.nodes[1] }}
-					elseif (#(unitType.units) <= maxHungarianUnits) then
-						unitTypeOrders = GetOrdersHungarian(unitType.nodes, unitType.units, #(unitType.units), shift and not meta)
+				-- Match units to nodes and issue orders
+				local altOpts = meta and GetCmdOpts(true, false, false, false, false)
+				for i = 1, #unitTypeList do
+					local unitDefID = unitTypeList[i]
+					local units = unitTypeUnits[unitDefID]
+					local nodes = unitTypeNodes[unitDefID]
+					local orders = MatchUnitsToNodes(nodes, units, shift and not meta)
+					
+					if meta then
+						for i = 1, #orders do
+							local orderPair = orders[i]
+							local orderPos = orderPair[2]
+							GiveNotifyingOrderToUnit(orderPair[1], CMD_INSERT, {0, usingCmd, cmdOpts.coded, orderPos[1], orderPos[2], orderPos[3]}, altOpts)
+						end
 					else
-						unitTypeOrders = GetOrdersNoX(unitType.nodes, unitType.units, #(unitType.units), shift and not meta)
-					end
-
-					table.foreach(unitTypeOrders, function(k, v) table.insert(orders, v) end)
-
-				end
-
-				if meta then
-					local altOpts = GetCmdOpts(true, false, false, false, false)
-					for i = 1, #orders do
-						local orderPair = orders[i]
-						local orderPos = orderPair[2]
-						GiveNotifyingOrderToUnit(orderPair[1], CMD_INSERT, {0, usingCmd, cmdOpts.coded, orderPos[1], orderPos[2], orderPos[3]}, altOpts)
-					end
-				else
-					for i = 1, #orders do
-						local orderPair = orders[i]
-						GiveNotifyingOrderToUnit(orderPair[1], usingCmd, orderPair[2], cmdOpts)
+						for i = 1, #orders do
+							local orderPair = orders[i]
+							GiveNotifyingOrderToUnit(orderPair[1], usingCmd, orderPair[2], cmdOpts)
+						end
 					end
 				end
 			end
@@ -1033,6 +1030,18 @@ end
 ---------------------------------------------------------------------------------------------------------
 -- Matching Algorithms
 ---------------------------------------------------------------------------------------------------------
+
+function MatchUnitsToNodes(nodes, units, shifted)
+	if (#units == 1) then
+		return {{units[1], nodes[1]}}
+	elseif (#units <= maxHungarianUnits) then
+		return GetOrdersHungarian(nodes, units, #units, shift and not meta)
+	else
+		return GetOrdersNoX(nodes, units, #units, shift and not meta)
+	end
+end
+
+
 function GetOrdersNoX(nodes, units, unitCount, shifted)
 	
 	-- Remember when  we start
@@ -1206,6 +1215,7 @@ function GetOrdersNoX(nodes, units, unitCount, shifted)
 	end
 	return orders
 end
+
 function GetOrdersHungarian(nodes, units, unitCount, shifted)
 	-------------------------------------------------------------------------------------
 	-------------------------------------------------------------------------------------
