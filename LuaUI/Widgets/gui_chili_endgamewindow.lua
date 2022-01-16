@@ -178,6 +178,9 @@ end
 --APM Window
 
 local function AddPlayerStatsToPanel(stats)
+	if not stats then
+		return
+	end
 	local teamID = stats.teamID
 	if not teamNames[teamID] then
 		return
@@ -418,7 +421,7 @@ local function SetupControls()
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
-		itemMargin = {1, 1, 1, 1},
+		itemMargin = {1, 2, 1, 1},
 		tooltip = "",
 
 		resizeItems = false,
