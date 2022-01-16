@@ -29,7 +29,7 @@ return { amphriot = {
   footprintZ             = 2,
   iconType               = [[amphtorpriot]],
   leaveTracks            = true,
-  maxDamage              = 1100,
+  maxDamage              = 2070,
   maxSlope               = 36,
   maxVelocity            = 1.6,
   movementClass          = [[AKBOT2]],
@@ -94,7 +94,7 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 48.01,
+        default = 22.01,
       },
 
       edgeEffectiveness       = 0.6,
@@ -126,7 +126,7 @@ return { amphriot = {
 
     FLECHETTE = {
       name                    = [[Flechette]],
-      areaOfEffect            = 32,
+      areaOfEffect            = 16,
       burst                   = 3,
       burstRate               = 0.033,
       coreThickness           = 0.5,
@@ -140,7 +140,7 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 23,
+        default = 8,
       },
 
       duration                = 0.02,
@@ -151,19 +151,19 @@ return { amphriot = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles             = 3,
-      range                   = 264,
+      range                   = 340,
       reloadtime              = 0.8,
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],
       soundStart              = [[weapon/shotgun_firev4]],
       soundStartVolume        = 0.5,
       soundTrigger            = true,
-      sprayangle              = 1500,
+      sprayangle              = 900,
       thickness               = 2,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 880,
+      weaponVelocity          = 560,
     }
   },
 
