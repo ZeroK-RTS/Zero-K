@@ -77,6 +77,9 @@ local function ProcessPlayerInactiveTime(msg)
 end
 
 local function ProcessPlayerStats(msg, playerID)
+	if not timedPlayerList[playerID] then
+		return
+	end
 	local teamID = select(4,spGetPlayerInfo(playerID, false))
 	local MP = tonumber(VFS.UnpackU16(msg:sub(7)))
 	local MC = tonumber(VFS.UnpackU16(msg:sub(9)))
@@ -117,7 +120,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		else
 			storedPlayerStats[playerID] = msg
 		end
-	elseif (msg:sub(1,12)=="inactiveTime") then
+	elseif (msg:sub(1,12)=="inactiveTime") and timedPlayerList[timedPlayerID] then
 		--Ensure that the maximum amount of inactive time is getting sent for each player
 		--Because local player won't have information on their own inactive time, and some others may not have
 		--complete information if they have left and come back
@@ -133,20 +136,20 @@ function widget:Shutdown()
 end
 
 function widget:PlayerChanged(playerID)
-	if playerID == myPlayerID and gameOn then
+	if playerID == myPlayerID and gameOn and timedPlayerList[playerID] then
 		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 		SendMyPlayerStats()
 	end
 end
 
 function widget:PlayerRemoved(playerID)
-	if playerID ~= myPlayerID and gameOn then
+	if playerID ~= myPlayerID and gameOn and timedPlayerList[playerID] then
 		timedPlayerList[playerID].inactiveStartTime = timedPlayerList[playerID].inactiveStartTime or spGetGameSeconds()
 	end
 end
 
 function widget:PlayerAdded(playerID)
-	if (playerID ~= myPlayerID) and gameOn then
+	if (playerID ~= myPlayerID) and gameOn and timedPlayerList[playerID] then
 		local timeStamp = spGetGameSeconds()
 		if timedPlayerList[playerID].inactiveStartTime then
 			timedPlayerList[playerID].inactiveTime = (spGetGameSeconds()-(timedPlayerList[playerID].inactiveStartTime))

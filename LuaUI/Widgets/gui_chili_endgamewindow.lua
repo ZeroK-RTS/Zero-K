@@ -179,6 +179,9 @@ end
 
 local function AddPlayerStatsToPanel(stats)
 	local teamID = stats.teamID
+	if not teamNames[teamID] then
+		return
+	end
 	Label:New{
 		parent=apmSubPanel,
 		width=200,
