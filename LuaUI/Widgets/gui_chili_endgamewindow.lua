@@ -421,7 +421,8 @@ local function SetupControls()
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
-		itemMargin = {1, 2, 1, 1},
+		itemMargin = {0, 0, 0, 0},
+		itemPadding = {1, 1, 1, 1},
 		tooltip = "",
 
 		resizeItems = false,
