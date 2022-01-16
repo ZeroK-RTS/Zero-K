@@ -5,7 +5,7 @@ return { amphriot = {
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
-  buildCostMetal         = 260,
+  buildCostMetal         = 240,
   buildPic               = [[amphriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -29,7 +29,7 @@ return { amphriot = {
   footprintZ             = 2,
   iconType               = [[amphtorpriot]],
   leaveTracks            = true,
-  maxDamage              = 2070,
+  maxDamage              = 1300,
   maxSlope               = 36,
   maxVelocity            = 1.6,
   movementClass          = [[AKBOT2]],
@@ -94,7 +94,7 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 22.01,
+        default = 48.01,
       },
 
       edgeEffectiveness       = 0.6,
@@ -126,8 +126,10 @@ return { amphriot = {
 
     FLECHETTE = {
       name                    = [[Flechette]],
-      areaOfEffect            = 16,
-      burst                   = 3,
+      areaOfEffect            = 32,
+      bounceRebound           = 1,
+      bounceSlip              = 1,
+      burst                   = 4,
       burstRate               = 0.033,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -140,30 +142,32 @@ return { amphriot = {
       },
 
       damage                  = {
-        default = 8,
+        default = 38,
       },
 
       duration                = 0.02,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
       fireStarter             = 50,
+      groundBounce            = true,
       heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      projectiles             = 3,
-      range                   = 340,
-      reloadtime              = 0.8,
+      numBounce               = 1,
+      projectiles             = 4,
+      range                   = 300,
+      reloadtime              = 2.3,
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],
       soundStart              = [[weapon/shotgun_firev4]],
       soundStartVolume        = 0.5,
       soundTrigger            = true,
-      sprayangle              = 900,
+      sprayangle              = 2800,
       thickness               = 2,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 560,
+      weaponVelocity          = 880,
     }
   },
 
