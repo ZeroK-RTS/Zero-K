@@ -22,9 +22,26 @@ local overrideCmdSingleUnit = {
 	[CMD.GUARD] = true,
 }
 
-options_path = 'Settings/Interface/Command Visibility'--/Formations'
-options_order = { 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','RMBLineFormation' }
+options_path = 'Settings/Interface/Line Formations'
+options_order = { 'spreadtypes', 'ignorespreadsize', 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','RMBLineFormation' }
 options = {
+	spreadtypes = {
+		name = "Evenly spread unit types along lines",
+		type = 'radioButton',
+		value = 'move',
+		items={
+			{key='never', name='Disabled', desc='Units spread themselves along the line minimising order distance without any regard for unit type clumping.'},
+			{key='move', name='For movement orders', desc='As below, excluding commands that do not cause units to walk to the line (such as Force Fire).'},
+			{key='all', name='For all orders', desc='Units of the same type recieve orders spread evenly along the line. Order distance is still minimised within each type.'},
+		},
+	},
+	ignorespreadsize = {
+		name = 'Merge spread group size',
+		desc = "Groups of unit types of this size and smaller are merged into the largest group when spreading unit types evenly along the line.",
+		type = 'number',
+		value = 1,
+		min = 0, max = 50, step=1,
+	},
 	drawmode_v2 = {
 		name = 'Draw mode',
 		-- desc is not supported here :(
@@ -114,6 +131,17 @@ local formationCmds = {
 	[CMD_PLACE_BEACON] = true, -- teleport beacon
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
+}
+
+-- Commands that tell units to move to a point
+local movementCmds = {
+	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
+	[CMD.FIGHT] = true,
+	[CMD.PATROL] = true,
+	[CMD.UNLOAD_UNIT] = true,
+	[CMD_JUMP] = true, -- jump
+	[CMD_PLACE_BEACON] = true, -- teleport beacon
 }
 
 -- What commands require alt to be held (Must also appear in formationCmds)
@@ -298,6 +326,7 @@ local function GetUnitFinalPosition(uID)
 	
 	return ux, uy, uz
 end
+
 local function SetColor(cmdID, alpha)
 	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE then glColor(0.5, 1.0, 0.5, alpha) -- Green
 	elseif cmdID == CMD_ATTACK                 then glColor(1.0, 0.2, 0.2, alpha) -- Red
@@ -309,6 +338,7 @@ local function SetColor(cmdID, alpha)
 	else                                            glColor(0.5, 0.5, 1.0, alpha) -- Blue
 	end
 end
+
 local function CanUnitExecute(uID, cmdID)
 	
 	if cmdID == CMD_UNLOADUNIT then
@@ -318,6 +348,7 @@ local function CanUnitExecute(uID, cmdID)
 	
 	return (spFindUnitCmdDesc(uID, cmdID) ~= nil)
 end
+
 local function GetExecutingUnits(cmdID)
 	local units = {}
 	local selUnits = spGetSelectedUnits()
@@ -475,6 +506,65 @@ local function SendSetWantedMaxSpeed(alt, ctrl, meta, shift)
 		local speedOpts = GetCmdOpts(alt, ctrl, meta, shift, true)
 		GiveNotifyingOrder(CMD_SET_WANTED_MAX_SPEED, {wantedSpeed / 30}, speedOpts)
 	end
+end
+
+local function GetFormationGroups(cmdID, units)
+	if options.spreadtypes.value == "none" or (options.spreadtypes.value == "move" and not movementCmds[cmdID]) then
+		return {units}
+	end
+	
+	local unitDefIDToGroup = {}
+	local groups = {}
+
+	for i = 1, #units do
+		local unitDefID = spGetUnitDefID(units[i])
+		if not unitDefIDToGroup[unitDefID] then
+			groups[#groups + 1] = {}
+			unitDefIDToGroup[unitDefID] = #groups
+		end
+		local myGroup = groups[unitDefIDToGroup[unitDefID]]
+		myGroup[#myGroup + 1] = units[i]
+	end
+	
+	local mergeGroupSize = options.ignorespreadsize.value
+	if mergeGroupSize <= 0 then
+		return groups
+	end
+	
+	local largestGroupSize = false
+	local largestGroupId = false
+	local needMerge = false
+	for i = 1, #groups do
+		local size = #groups[i]
+		if (not largestGroupSize) or (largestGroupSize < size) then
+			largestGroupSize = size
+			largestGroupId = i
+		end
+		needMerge = needMerge or (size <= mergeGroupSize)
+	end
+	
+	if largestGroupSize <= mergeGroupSize then
+		return {units}
+	end
+	if not needMerge then
+		return groups
+	end
+	
+	local newGroups = {}
+	local largestGroup = groups[largestGroupId]
+	newGroups[1] = largestGroup
+	for i = 1, #groups do
+		local size = #groups[i]
+		if size <= mergeGroupSize then
+			for j = 1, size do
+				largestGroup[#largestGroup + 1] = groups[i][j]
+			end
+		elseif i ~= largestGroupId then
+			newGroups[#newGroups + 1] = groups[i]
+		end
+	end
+	
+	return newGroups
 end
 
 --------------------------------------------------------------------------------
@@ -730,46 +820,37 @@ function widget:MouseRelease(mx, my, mButton)
 			local mUnits = GetExecutingUnits(usingCmd)
 			if #mUnits > 0 then
 				local interpNodes = GetInterpNodes(#mUnits)
-				local unitTypeUnits = {}
-				local unitTypeNodes = {}
-				local unitTypeList = {}
-				local nUnitTypes = 0
+				local groups = GetFormationGroups(usingCmd, mUnits)
 
-				for u = 1, #mUnits do
-					local unitDefID = spGetUnitDefID(mUnits[u])
-					if not unitTypeUnits[unitDefID] then
-						unitTypeUnits[unitDefID] = {}
-						unitTypeNodes[unitDefID] = {}
-						unitTypeList[#unitTypeList + 1] = unitDefID
-					end
-					unitTypeUnits[unitDefID][#unitTypeUnits[unitDefID] + 1] = mUnits[u]
+				-- Assign nodes to groups
+				local groupNodes = {}
+				for i = 1, #groups do
+					groupNodes[i] = {}
 				end
-
-				-- Assign nodes to unitTypes
+				
 				for i = 1, #interpNodes do
 					local node = interpNodes[i]
-					local maxPrioUnitDefId = false
-					local priority = false
-					for j = 1, #unitTypeList do
-						local unitDefID = unitTypeList[j]
-						local typePriority = (#unitTypeUnits[unitDefID] + 1) / (#unitTypeNodes[unitDefID] + 1)
-						if (not priority) or typePriority > priority then
-							priority = typePriority
-							maxPrioUnitDefId = unitDefID
+					local minPosId = false
+					local minPos = false
+					for j = 1, #groups do
+						if #groupNodes[j] < #groups[j] then
+							local halfGap = #groups[j] > 0 and 0.5/#groups[j] or 0
+							local nextPos = #groupNodes[j]*(1 + halfGap) / (#groups[j] + 1) + halfGap
+							if (not minPos) or nextPos < minPos then
+								minPos = nextPos
+								minPosId = j
+							end
 						end
 					end
-					if priority then
-						unitTypeNodes[maxPrioUnitDefId][#unitTypeNodes[maxPrioUnitDefId] + 1] = node
+					if minPos then
+						groupNodes[minPosId][#groupNodes[minPosId] + 1] = node
 					end
 				end
 
 				-- Match units to nodes and issue orders
 				local altOpts = meta and GetCmdOpts(true, false, false, false, false)
-				for i = 1, #unitTypeList do
-					local unitDefID = unitTypeList[i]
-					local units = unitTypeUnits[unitDefID]
-					local nodes = unitTypeNodes[unitDefID]
-					local orders = MatchUnitsToNodes(nodes, units, shift and not meta)
+				for i = 1, #groups do
+					local orders = MatchUnitsToNodes(groupNodes[i], groups[i], shift and not meta)
 					
 					if meta then
 						for i = 1, #orders do

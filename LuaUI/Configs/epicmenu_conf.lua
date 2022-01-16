@@ -189,6 +189,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Build ETA']                = imgPath..'epicmenu/stop_watch_icon.png',
 	['Settings/Interface/Defence and Cloak Ranges'] = imgPath..'epicmenu/target.png',
 	['Settings/Interface/Command Visibility']       = imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
