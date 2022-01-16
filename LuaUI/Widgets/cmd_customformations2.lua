@@ -740,7 +740,7 @@ function widget:MouseRelease(mx, my, mButton)
 							units = {},
 							nodes = {}
 						}
-				        end
+					end
 					table.insert(unitTypes[UnitDefID].units, mUnits[u])
 				end
 
