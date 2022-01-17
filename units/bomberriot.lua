@@ -20,7 +20,7 @@ return { bomberriot = {
   selectionVolumeScales  = [[80 20 80]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 180,
+  cruiseAlt           = 160,
 
   customParams        = {
     modelradius    = [[10]],
@@ -108,7 +108,7 @@ return { bomberriot = {
       reloadtime              = 1,
       soundHit                = [[weapon/burn_mixed]],
       soundStart              = [[weapon/bomb_drop_short]],
-      sprayangle              = 64000,
+      sprayangle              = 128000,
       weaponType              = [[AircraftBomb]],
     },
 
