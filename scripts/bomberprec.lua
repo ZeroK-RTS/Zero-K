@@ -31,6 +31,7 @@ local spGetGroundHeight     = Spring.GetGroundHeight
 
 local EstimateCurrentMaxSpeed = Spring.Utilities.EstimateCurrentMaxSpeed
 
+local SIG_TAKEOFF = 1
 local predictMult = 3
 
 local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
