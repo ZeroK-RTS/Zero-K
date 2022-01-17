@@ -108,7 +108,7 @@ return { bomberriot = {
       reloadtime              = 1,
       soundHit                = [[weapon/burn_mixed]],
       soundStart              = [[weapon/bomb_drop_short]],
-      sprayangle              = 128000,
+      sprayangle              = 42000, -- Maximum is 45000. Note that this has little effect due to near-zero launch speed.
       weaponType              = [[AircraftBomb]],
     },
 
