@@ -89,6 +89,7 @@ return { bomberriot = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
         setunitsonfire = "1",
         burntime = 300,
+        gui_sprayangle = 0.32,
       },
       
       damage                  = {
@@ -108,7 +109,7 @@ return { bomberriot = {
       reloadtime              = 1,
       soundHit                = [[weapon/burn_mixed]],
       soundStart              = [[weapon/bomb_drop_short]],
-      sprayangle              = 42000, -- Maximum is 45000. Note that this has little effect due to near-zero launch speed.
+      sprayangle              = 22000, -- Maximum is 22500. Note that this has little effect due to near-zero launch speed.
       weaponType              = [[AircraftBomb]],
     },
 

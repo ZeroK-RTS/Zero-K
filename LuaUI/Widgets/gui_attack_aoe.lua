@@ -199,7 +199,8 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local retData
 
 	local weaponType = weaponDef.type
-	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
+	local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
+	local scatter = weaponDef.accuracy + spray
 	local aoe = weaponDef.damageAreaOfEffect
 	local cost = unitDef.metalCost
 	local waterWeapon = weaponDef.waterWeapon
@@ -312,7 +313,8 @@ local function SetupUnit(unitDef, unitID)
 				elseif (not weaponDef.isShield
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
 						and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
-					maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
+					local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
+					maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + spray))
 					maxWeaponDef = weaponDef
 				end
 			end
