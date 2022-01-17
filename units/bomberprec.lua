@@ -20,7 +20,7 @@ return { bomberprec = {
   selectionVolumeScales  = [[95 25 60]],
   selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 220,
+  cruiseAlt           = 180,
 
   customParams        = {
     modelradius    = [[15]],
@@ -67,19 +67,16 @@ return { bomberprec = {
       def                = [[BOGUS_BOMB]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-
-
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 150,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-    
-    {
-      def                = [[SHIELD_CHECK]],
-      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },
+    --{
+    --  def                = [[SHIELD_CHECK]],
+    --  onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    --},
 
   },
 
@@ -141,7 +138,7 @@ return { bomberprec = {
 
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
-      flightTime              = 3,
+      flightTime              = 2.4,
       heightmod               = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -154,15 +151,15 @@ return { bomberprec = {
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/bomb_drop]],
-      startVelocity           = 200,
+      startVelocity           = 110,
       tolerance               = 8000,
-      tracks                  = false,
-      turnRate                = 2500,
+      tracks                  = true,
+      turnRate                = 18000,
       turret                  = true,
       waterweapon             = true,
-      weaponAcceleration      = 50,
+      weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 110,
     },
     
     SHIELD_CHECK = {
