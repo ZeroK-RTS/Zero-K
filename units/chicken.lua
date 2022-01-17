@@ -13,7 +13,7 @@ return { chicken = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND SINK]],
+  category            = [[LAND SINK SMALL]],
 
   customParams        = {
   },

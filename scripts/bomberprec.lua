@@ -29,6 +29,8 @@ local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local spSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData
 local spGetGroundHeight     = Spring.GetGroundHeight
 
+local EstimateCurrentMaxSpeed = Spring.Utilities.EstimateCurrentMaxSpeed
+
 local predictMult = 3
 
 local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
@@ -82,12 +84,12 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	if num ~= 2 then
-		return false
-	end
 	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
 	if not (targetID and ableToFire) then
 		return not ableToFire
+	end
+	if num == 1 then
+		return false
 	end
 	local x,y,z = spGetUnitPosition(unitID)
 	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
@@ -100,7 +102,7 @@ function script.BlockShot(num, targetID)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
 	local isMobile = not GG.IsUnitIdentifiedStructure(true, targetID)
-	local damage = (isMobile and 500.05) or GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
+	local damage = GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
@@ -114,43 +116,52 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	
-	if dy > 0 then
-		return true
+	local mx, mz = dx, dz
+	if isMobile then
+		mx = math.min(math.max(-45, mx), 45)
+		mz = math.min(math.max(-30, mz), 30)
+	else
+		mx = math.min(math.max(-30, mx), 30)
+		mz = math.min(math.max(-15, mz), 15)
 	end
+	dx, dz = dx - mx, dz - mz
+	local hDist = math.sqrt(dx*dx + dz*dz)
 	
-	if (dz > 30 or dz < -30 or dx > 80 or dx < -80) then
+	if dy > 0 or hDist*0.8 > -dy then
 		return true
 	end
 	
 	if isMobile then
-		dx = math.min(math.max(-50, dx), 50)
-		dz = math.min(math.max(-20, dz), 20)
-		dy = math.max(dy, -20)
-	else
-		dx = math.min(math.max(-30, dx), 30)
-		dz = math.min(math.max(-10, dz), 10)
-		dy = math.max(dy, -5)
+		local speed = EstimateCurrentMaxSpeed(targetID)
+		if speed >= 3 then
+			damage = 450
+		end
+		-- Cap out at speed 2.7 on normal terrain
+		if hDist > math.max(5, -dy - speed*90) then
+			return true
+		end
 	end
 	
-	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
-	Move(drop, x_axis, dx)
-	Move(drop, z_axis, dz)
-	Move(drop, y_axis, dy)
+	--if (dz > 30 or dz < -30 or dx > 80 or dx < -80) then
+		--return true
+	--end
+	
 	
 	if GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 60, false, false, false) then
 		return true
 	end
+	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
+	Move(drop, x_axis, mx)
+	Move(drop, z_axis, mz)
 	return false
 end
 
 
 function script.FireWeapon(num)
 	if num == 2 then
-		SetUnarmedAI()
 		Sleep(33) -- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)
 		Move(drop, z_axis, 0)
-		Move(drop, y_axis, 0)
 		Reload()
 	end
 end
