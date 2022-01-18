@@ -54,7 +54,7 @@ function gadget:GameFrame(n)
 		thereAreProjectiles = false
 		for proID, data in pairs(projectiles) do
 			thereAreProjectiles = true
-			local vx, vy, vz, speed = Spring.GetProjectileVelocity (proID)
+			local vx, vy, vz, speed = Spring.GetProjectileVelocity(proID)
 			local mult = math.max(0.1, 1 - (speed - data.anchor)/speed)
 			vx, vy, vz = vx*mult, (vy - data.pull)*mult, vz*mult
 			Spring.SetProjectileVelocity (proID, vx, vy, vz)

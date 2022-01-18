@@ -77,7 +77,7 @@ local setTargetSpeedMult = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	weaponCounts[i] = (ud.weapons and #ud.weapons)
-	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and
+	if ((not (ud.canFly and ((ud.isBomber or ud.isBomberAirUnit) and not ud.customParams.can_set_target))) and
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		if getMovetype(ud) == 0 then
 			waitWaitUnits[i] = true

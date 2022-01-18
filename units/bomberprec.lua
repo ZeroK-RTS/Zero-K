@@ -23,10 +23,11 @@ return { bomberprec = {
   cruiseAlt           = 180,
 
   customParams        = {
-    modelradius    = [[15]],
+    modelradius      = [[15]],
     refuelturnradius = [[120]],
     reammoseconds    = [[8]],
-    requireammo    = [[1]],
+    requireammo      = [[1]],
+    can_set_target   = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
