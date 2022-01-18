@@ -154,8 +154,9 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:PlayerRemoved(playerID)
+	--this is useless for now
 	if playerID ~= myPlayerID and gameOn and timedPlayerList[playerID] then
-		timedPlayerList[playerID].inactiveStart = true
+		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 	end
 end
 
