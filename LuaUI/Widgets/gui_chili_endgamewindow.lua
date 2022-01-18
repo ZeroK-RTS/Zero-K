@@ -66,6 +66,7 @@ local endgame_fontcolor
 local gameEnded
 local showEndgameWindowTimer
 local myPlayerID = Spring.GetMyPlayerID()
+local updateFlag = true
 
 -- Constants and parameters
 local endgameWindowDelay = 2
@@ -626,32 +627,36 @@ function widget:GameOver(winners)
 end
 
 function widget:Update(dt)
-	showEndgameWindowTimer = showEndgameWindowTimer - dt
-	if showEndgameWindowTimer > 0 then
-		return
+	if updateFlag then
+		showEndgameWindowTimer = showEndgameWindowTimer - dt
+		if showEndgameWindowTimer > 0 then
+			return
+		end
+		local screenWidth, screenHeight = Spring.GetViewGeometry()
+		window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
+		statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
+		statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
+		awardButton:Show()
+		statsButton:Show()
+		apmButton:Show()
+		exitButton:Show()
+
+		window_endgame.tooltip = ""
+		window_endgame.caption = endgame_caption
+		window_endgame.font.color = endgame_fontcolor
+
+		if WG.awardList then
+			ShowAwards()
+		else
+			ShowStats()
+		end
+		ToggleStatsGraph(true)
+
+		updateFlag = false
 	end
-	local screenWidth, screenHeight = Spring.GetViewGeometry()
-	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
-	statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
-	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
-	awardButton:Show()
-	statsButton:Show()
-	apmButton:Show()
-	exitButton:Show()
-
-	window_endgame.tooltip = ""
-	window_endgame.caption = endgame_caption
-	window_endgame.font.color = endgame_fontcolor
-
-	if WG.awardList then
-		ShowAwards()
-	else
-		ShowStats()
+	if gameEnded then
+		PopulateAPMPanel()
 	end
-	ToggleStatsGraph(true)
-
-	PopulateAPMPanel()
-	widgetHandler:RemoveCallIn("Update")
 end
 
 function widget:GameFrame(f)
