@@ -178,7 +178,7 @@ end
 --------------------------------------------------------------------------------
 --APM Window
 
-local function AddPlayerStatsToPanel(stats)
+function AddPlayerStatsToPanel(stats)
 	if not stats then
 		return
 	end
@@ -234,8 +234,7 @@ local function AddPlayerStatsToPanel(stats)
 	Line:New{height = 1, width='100%', parent=apmSubPanel}
 end
 
-local function PopulateAPMPanel()
-	if not WG.apmStats then return end
+local function SetupAPMPanel()
 	apmSubPanel:ClearChildren()
 	Label:New{
 		parent=apmSubPanel,
@@ -285,13 +284,11 @@ local function PopulateAPMPanel()
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
 		}
-	Line:New{ width='100%', parent=apmSubPanel } --spacer to force a "line break"
-	AddPlayerStatsToPanel(WG.apmStats[myPlayerID])
-	for playerID, pStats in pairs(WG.apmStats) do
-		if playerID ~= myPlayerID then
-			AddPlayerStatsToPanel(pStats)
-		end
+	Line:New{ width='100%', parent=apmSubPanel} --spacer to force a "line break"
+	if not WG.myAPMStats then
+		return
 	end
+	AddPlayerStatsToPanel(WG.myAPMStats)
 end
 
 --------------------------------------------------------------------------------
@@ -596,6 +593,10 @@ function widget:Initialize()
 	if statsSubPanel then
 		statsPanel:AddChild(statsSubPanel)
 	end
+	
+	--apm stats setup
+	WG.AddPlayerStatsToPanel = AddPlayerStatsToPanel
+
 	awardButton:Hide()
 	apmButton:Hide()
 	statsButton:Hide()
@@ -622,41 +623,36 @@ function widget:Initialize()
 end
 
 function widget:GameOver(winners)
+	SetupAPMPanel()
 	SetEndgameCaption(winners)
 	StartEndgameTimer(endgameWindowDelay)
 end
 
 function widget:Update(dt)
-	if updateFlag then
-		showEndgameWindowTimer = showEndgameWindowTimer - dt
-		if showEndgameWindowTimer > 0 then
-			return
-		end
-		local screenWidth, screenHeight = Spring.GetViewGeometry()
-		window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
-		statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
-		statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
-		awardButton:Show()
-		statsButton:Show()
-		apmButton:Show()
-		exitButton:Show()
-
-		window_endgame.tooltip = ""
-		window_endgame.caption = endgame_caption
-		window_endgame.font.color = endgame_fontcolor
-
-		if WG.awardList then
-			ShowAwards()
-		else
-			ShowStats()
-		end
-		ToggleStatsGraph(true)
-
-		updateFlag = false
+	showEndgameWindowTimer = showEndgameWindowTimer - dt
+	if showEndgameWindowTimer > 0 then
+		return
 	end
-	if gameEnded then
-		PopulateAPMPanel()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
+	statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
+	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
+	awardButton:Show()
+	statsButton:Show()
+	apmButton:Show()
+	exitButton:Show()
+
+	window_endgame.tooltip = ""
+	window_endgame.caption = endgame_caption
+	window_endgame.font.color = endgame_fontcolor
+
+	if WG.awardList then
+		ShowAwards()
+	else
+		ShowStats()
 	end
+	ToggleStatsGraph(true)
+	widgetHandler:RemoveCallIn("Update")
 end
 
 function widget:GameFrame(f)
