@@ -29,7 +29,6 @@ function script.Create()
 end
 
 function script.Activate()
-	
 	Turn(Lwing, z_axis, math.rad(90), 2)
 	Turn(Rwing, z_axis, math.rad(-90), 2)
 	Turn(LwingTip, z_axis, math.rad(-165), 2) --160
@@ -43,7 +42,6 @@ function script.Deactivate()
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
-
 
 function script.FireWeapon(checkHeight)
 	if doingRun then
