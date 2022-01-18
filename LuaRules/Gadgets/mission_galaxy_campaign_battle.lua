@@ -1332,7 +1332,8 @@ local function DoInitialTerraform(noBuildings)
 				terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction, terraform.enableDecay)
 		end
 	end
-	GG.Terraform.ForceTerraformCompletion(true)
+	local fixSaves = Spring.GetModOptions().init_terra_save_fix
+	GG.Terraform.ForceTerraformCompletion(true, fixSaves == 1 or fixSaves == "1")
 end
 
 --------------------------------------------------------------------------------
