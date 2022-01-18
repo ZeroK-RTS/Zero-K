@@ -178,62 +178,6 @@ end
 --------------------------------------------------------------------------------
 --APM Window
 
-function AddPlayerStatsToPanel(stats)
-	if not stats then
-		return
-	end
-	local teamID = stats.teamID
-	if not teamNames[teamID] then
-		return
-	end
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. teamNames[teamID],
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MPS,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MCM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.KPM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.APM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Line:New{height = 1, width='100%', parent=apmSubPanel}
-end
-
 local function SetupAPMPanel()
 	apmSubPanel:ClearChildren()
 	Label:New{
@@ -285,10 +229,66 @@ local function SetupAPMPanel()
 		objectOverrideFont = WG.GetFont(),
 		}
 	Line:New{ width='100%', parent=apmSubPanel} --spacer to force a "line break"
-	if not WG.myAPMStats then
+end
+
+function AddPlayerStatsToPanel(stats, doClear)
+	if not stats then
 		return
 	end
-	AddPlayerStatsToPanel(WG.myAPMStats)
+	local teamID = stats.teamID
+	if not teamNames[teamID] then
+		return
+	end
+	if doClear then
+		apmSubPanel:ClearChildren()
+		SetupAPMPanel()
+	end
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. teamNames[teamID],
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.MPS,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.MCM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.KPM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.APM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Line:New{height = 1, width='100%', parent=apmSubPanel}
 end
 
 --------------------------------------------------------------------------------
