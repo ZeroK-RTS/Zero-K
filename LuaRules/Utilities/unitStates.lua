@@ -71,8 +71,8 @@ function Spring.Utilities.EstimateCurrentMaxSpeed(unitID, unitDefID)
 		local speed = ud.speed/30
 		if ud.customParams and ud.customParams.jump_speed then
 			local jumpSpeed = tonumber(ud.customParams.jump_speed)
-			if jumpSpeed and jumpSpeed/2 > speed then
-				speed = jumpSpeed/2
+			if jumpSpeed and jumpSpeed > speed then
+				speed = jumpSpeed
 			end
 		end
 		speedCache[unitDefID] = speed

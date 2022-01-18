@@ -164,9 +164,9 @@ function script.BlockShot(num, targetID)
 		if speed >= 3 then
 			damage = 450
 		end
-		--Spring.Echo(hDist, math.max(5, -dy - speed*100))
+		--Spring.Echo(hDist, speed, math.max(3, -dy - speed*90 - 35))
 		-- Cap out at speed 2.7 on normal terrain
-		if hDist > math.max(3, -dy - speed*100) then
+		if hDist > math.max(3, -dy - speed*90 - 35) then
 			return true
 		end
 	end
