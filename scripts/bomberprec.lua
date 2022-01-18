@@ -32,6 +32,7 @@ local spGetGroundHeight     = Spring.GetGroundHeight
 local EstimateCurrentMaxSpeed = Spring.Utilities.EstimateCurrentMaxSpeed
 
 local SIG_TAKEOFF = 1
+local SIG_NOT_BLOCKED = 2
 local predictMult = 3
 
 local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
@@ -84,31 +85,57 @@ function script.AimWeapon(num, heading, pitch)
 	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
+local function ResetTurnRadius()
+	Signal(SIG_NOT_BLOCKED)
+	SetSignalMask(SIG_NOT_BLOCKED)
+	Sleep(500)
+	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 300})
+end
+
+local function GetAimLocation(targetID)
+	if not targetID then
+		local targetType, isUser, pos = Spring.GetUnitWeaponTarget(unitID, 2)
+		if targetType == 2 and pos then
+			return pos[1], pos[2], pos[3]
+		end
+		return false
+	end
+	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
+	local vx,vy,vz = spGetUnitVelocity(targetID)
+	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
+	return tx + vx, ty + vy, tz + vz
+end
+
 function script.BlockShot(num, targetID)
+	if num == 1 then
+		return true
+	end
 	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
-	if not (targetID and ableToFire) then
+	if not ableToFire then
 		return not ableToFire
 	end
-	if num == 1 then
+	SetUnarmedAI() -- Unarmed before firing because low turn radius fixes the turn aside bug. Try to hit a Flea retreating up a slope without this.
+	StartThread(ResetTurnRadius)
+	
+	local tx, ty, tz = GetAimLocation(targetID)
+	--Spring.MarkerAddPoint(tx, ty, tz,"")
+	if not tx then
 		return false
 	end
 	local x,y,z = spGetUnitPosition(unitID)
-	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
-	local vx,vy,vz = spGetUnitVelocity(targetID)
+	local dx, dy, dz = tx - x, ty - y, tz - z
 	local heading = spGetUnitHeading(unitID)*GG.Script.headingToRad
-	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
-	local dx, dy, dz = tx + vx - x, ty + vy - y, tz + vz - z
 	local cosHeading = math.cos(heading)
 	local sinHeading = math.sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
-	local isMobile = not GG.IsUnitIdentifiedStructure(true, targetID)
-	local damage = GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
+	local isMobile = targetID and not GG.IsUnitIdentifiedStructure(true, targetID)
+	local damage = targetID and GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 60, false, false, false) then
+	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 60, false, false, false) then
 		-- Remove attack command on blocked target, it's already dead so move on.
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
@@ -128,7 +155,7 @@ function script.BlockShot(num, targetID)
 	dx, dz = dx - mx, dz - mz
 	local hDist = math.sqrt(dx*dx + dz*dz)
 	
-	if dy > 0 or hDist*0.8 > -dy then
+	if dy > 0 or hDist*1.15 > -dy then
 		return true
 	end
 	
@@ -137,8 +164,9 @@ function script.BlockShot(num, targetID)
 		if speed >= 3 then
 			damage = 450
 		end
+		--Spring.Echo(hDist, math.max(5, -dy - speed*100))
 		-- Cap out at speed 2.7 on normal terrain
-		if hDist > math.max(5, -dy - speed*90) then
+		if hDist > math.max(3, -dy - speed*100) then
 			return true
 		end
 	end
@@ -148,7 +176,7 @@ function script.BlockShot(num, targetID)
 	--end
 	
 	
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 60, false, false, false) then
+	if targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 60, false, false, false) then
 		return true
 	end
 	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
@@ -156,7 +184,6 @@ function script.BlockShot(num, targetID)
 	Move(drop, z_axis, mz)
 	return false
 end
-
 
 function script.FireWeapon(num)
 	if num == 2 then
