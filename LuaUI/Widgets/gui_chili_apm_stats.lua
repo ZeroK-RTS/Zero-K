@@ -50,11 +50,10 @@ local function SendMyPlayerStats()
 	local MP, MC, KP, NC, NUC = spGetPlayerStatistics(myPlayerID, true)
 	local playerStats = {
 		teamID = myTeamID,
-		MP = MP,
-		MC = MC,
-		KP = KP,
-		NC = NC,
-		NUC = NUC
+		MPS = round(MP/activeTime),
+		MCM = round(MC*60/activeTime),
+		KPM = round(KP*60/activeTime),
+		APM = round(NC*60/activeTime),
 	}
 	WG.apmStats[myPlayerID] = playerStats
 	MP = VFS.PackU16(MP)
@@ -111,7 +110,7 @@ function widget:Initialize()
 end
 
 function widget:RecvLuaMsg(msg, playerID)
-	if playerID == myPLayerID then
+	if playerID == myPlayerID then
 		return true
 	end
 	if (msg:sub(1,6)=="pStats") then
