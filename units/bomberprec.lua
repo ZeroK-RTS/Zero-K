@@ -137,7 +137,7 @@ return { bomberprec = {
 
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
-      flightTime              = 3,
+      flightTime              = 6,
       heightmod               = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

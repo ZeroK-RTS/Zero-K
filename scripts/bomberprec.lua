@@ -36,6 +36,7 @@ local SIG_NOT_BLOCKED = 2
 local predictMult = 3
 
 local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
+local takeoffHeightInElmos = takeoffHeight*1.5
 local smokePiece = {fuselage, thrustr, thrustl}
 
 function script.StartMoving()
@@ -166,7 +167,14 @@ function script.BlockShot(num, targetID)
 		end
 		--Spring.Echo(hDist, speed, math.max(3, -dy - speed*90 - 35))
 		-- Cap out at speed 2.7 on normal terrain
-		if hDist > math.max(3, -dy - speed*90 - 35) then
+		local diffFactor = -dy
+		if diffFactor > takeoffHeightInElmos then
+			-- Reduce apparently height difference for cone in cases where Raven is higher than usual.
+			-- This can happen when the Raven crests a cliff, or against underwater targets.
+			diffFactor = takeoffHeightInElmos*(diffFactor + takeoffHeightInElmos) / (2*diffFactor)
+		end
+		--Spring.Echo("diffFactor", diffFactor, -dy, takeoffHeightInElmos)
+		if hDist > math.max(3, diffFactor - speed*90 - 35) then
 			return true
 		end
 	end
