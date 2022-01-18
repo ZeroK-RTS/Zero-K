@@ -55,7 +55,7 @@ return { gunshipcon = {
   showNanoSpray       = false,
   sightDistance       = 375,
   turnRate            = 500,
-  workerTime          = 7.5,
+  workerTime          = 10,
 
   featureDefs         = {
 

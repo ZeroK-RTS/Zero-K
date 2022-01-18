@@ -85,15 +85,15 @@ return { gunshipbomb = {
 
         area_damage = 1,
         area_damage_radius = 128,
-        area_damage_dps = 18,
-        area_damage_duration = 20,
+        area_damage_dps = 25,
+        area_damage_duration = 25,
 
         --lups_heat_fx = [[firewalker]],
       },
 
       damage = {
-        default = 80,
-        planes  = 80,
+        default = 40,
+        planes  = 40,
       },
 
       edgeeffectiveness  = 0.7,

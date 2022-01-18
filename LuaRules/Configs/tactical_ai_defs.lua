@@ -520,7 +520,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
 -- skirmKeepOrder (defaults to false): If true the unit does not clear its move order when too far away from the unit it is skirming.
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
--- velPredChaseFactor (from 0 to 1, default false): values closer to 0 reduce the degree to which units use velocityPrediction to chase units running away.
+-- velPredChaseFactor (from 0 to inf, default false): values closer to 0 reduce the degree to which units use velocityPrediction to chase units running away. Above 1 increases prediction when chasing.
 -- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
 -- reloadSkirmLeeway (defaults to false): Increase skirm range by reloadSkirmLeeway*remainingReloadFrames when reloading.
 -- skirmBlockedApproachOnFight (defaults to false): Applies skirmBlockedApproachFrames to all commands.
@@ -1475,14 +1475,18 @@ local behaviourConfig = {
 	},
 	{
 		name = "gunshipskirm",
-		skirms = medRangeSkirmieeArray,
+		skirms = longRangeSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
 		skirmOrderDis = 120,
 		selfVelocityPrediction = true,
-		velocityPrediction = 30,
+		skirmLeeway = -15,
+		jinkPeriod = 2.45,
+		reloadSkirmLeeway = 1,
+		velocityPrediction = 45,
+		velPredChaseFactor = 1.5,
 		
 		wardFireTargets = personalShieldUnits,
 		wardFireLeeway = 10,
