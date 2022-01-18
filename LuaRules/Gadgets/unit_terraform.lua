@@ -222,6 +222,7 @@ local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because 
 local workaround_recursion_in_cmd_fallback = {}
 local workaround_recursion_in_cmd_fallback_needed = false
 
+local wantForceCompleteFrameZero = false
 local freeTerraform = false
 local debugMode = false
 local debugModeUnitID
@@ -3201,7 +3202,10 @@ local function DoTerraformUpdate(n, forceCompletion)
 end
 
 function gadget:GameFrame(n)
-
+	if n == 0 and wantForceCompleteFrameZero then
+		DoTerraformUpdate(n, true)
+	end
+	
 	if workaround_recursion_in_cmd_fallback_needed then
 		for unitID, terraID in pairs(workaround_recursion_in_cmd_fallback) do
 			REPAIR_ORDER_PARAMS[4] = terraID
@@ -3824,10 +3828,14 @@ end
 
 local TerraformFunctions = {}
 
-function TerraformFunctions.ForceTerraformCompletion(pregame)
+function TerraformFunctions.ForceTerraformCompletion(pregame, needSaveHax)
+	if pregame and needSaveHax then
+		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.
+		wantForceCompleteFrameZero = true
+		return
+	end
 	DoTerraformUpdate(Spring.GetGameFrame(), true)
 	if pregame then
-		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.
 		GG.TerrainTexture.UpdateAll()
 	end
 end
