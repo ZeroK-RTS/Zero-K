@@ -184,7 +184,7 @@ function widget:GameOver()
 		--If a player has some DC time, and also resigned early, the cumulative total needs to be considered
 		data.inactiveTimeDC = data.inactiveTimeDC or 0
 		data.inactiveTimeRes = data.inactiveTimeRes or 0
-		data.inactiveTime = inactiveTimeDC + inactivetimeRes
+		data.inactiveTime = data.inactiveTimeDC + data.inactivetimeRes
 		SendPlayerInactiveTime(playerID)
 	end
 	SendMyPlayerStats()
