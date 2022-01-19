@@ -13,15 +13,17 @@ function widget:GetInfo()
 	}
 end
 
-local spGetTeamInfo = Spring.GetTeamInfo
-local spGetTeamList = Spring.GetTeamList
-local spGetGameSeconds = Spring.GetGameSeconds
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetTeamList         = Spring.GetTeamList
+local spGetGameSeconds      = Spring.GetGameSeconds
 local spGetPlayerStatistics = Spring.GetPlayerStatistics
-local spGetPlayerInfo = Spring.GetPlayerInfo
-local myPlayerID = Spring.GetMyPlayerID()
+local spGetPlayerInfo       = Spring.GetPlayerInfo
+
 local timedPlayerList = {}
 local storedPlayerStats = {}
 local statsFinal = {}
+
+local myPlayerID = Spring.GetMyPlayerID()
 local myTeamID
 local wantStats = false
 local SendLuaUIMsg = Spring.SendLuaUIMsg
@@ -35,7 +37,7 @@ local function GameRunning()
 end
 
 local function round(number)
-	return floor(number+0.5)
+	return floor(number + 0.5)
 end
 
 local function SetTimedPlayerList()
@@ -98,14 +100,16 @@ local function ProcessPlayerStats(msg, playerID)
 	local NUC = tonumber(VFS.UnpackU16(msg:sub(15)))
 	timedPlayerList[playerID].inactiveTime = timedPlayerList[playerID].inactiveTime or 0
 	local activeTime = spGetGameSeconds() - timedPlayerList[playerID].inactiveTime
-	local playerStats = {
-		teamID = teamID,
-		MPS = round(MP/activeTime),
-		MCM = round(MC*60/activeTime),
-		KPM = round(KP*60/activeTime),
-		APM = round(NC*60/activeTime),
-	}
-	WG.AddPlayerStatsToPanel(playerStats)
+	if activeTime > 0 then
+		local playerStats = {
+			teamID = teamID,
+			MPS = round(MP/activeTime),
+			MCM = round(MC*60/activeTime),
+			KPM = round(KP*60/activeTime),
+			APM = round(NC*60/activeTime),
+		}
+		WG.AddPlayerStatsToPanel(playerStats)
+	end
 end
 
 function widget:Initialize()
@@ -174,10 +178,11 @@ function widget:PlayerAdded(playerID)
 		end
 	end
 end
+
 function widget:GameOver()
 	for playerID, data in pairs(timedPlayerList) do
 		if data.inactiveStartTime then
-			data.inactiveTimeRes = spGetGameSeconds()-timedPlayerList[playerID].inactiveStartTime
+			data.inactiveTimeRes = spGetGameSeconds() - timedPlayerList[playerID].inactiveStartTime
 		end
 		--If a player has some DC time, and also resigned early, the cumulative total needs to be considered
 		data.inactiveTimeDC = data.inactiveTimeDC or 0

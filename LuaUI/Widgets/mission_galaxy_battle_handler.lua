@@ -212,7 +212,6 @@ end
 -- Briefing Window
 
 local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
-	
 	local offset = 0
 	
 	local holder = Chili.Control:New{
