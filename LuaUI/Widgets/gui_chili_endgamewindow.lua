@@ -66,6 +66,7 @@ local endgame_fontcolor
 local gameEnded
 local showEndgameWindowTimer
 local myPlayerID = Spring.GetMyPlayerID()
+local updateFlag = true
 
 -- Constants and parameters
 local endgameWindowDelay = 2
@@ -177,64 +178,7 @@ end
 --------------------------------------------------------------------------------
 --APM Window
 
-local function AddPlayerStatsToPanel(stats)
-	if not stats then
-		return
-	end
-	local teamID = stats.teamID
-	if not teamNames[teamID] then
-		return
-	end
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. teamNames[teamID],
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MPS,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MCM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.KPM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.APM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Line:New{height = 1, width='100%', parent=apmSubPanel}
-end
-
-local function PopulateAPMPanel()
-	if not WG.apmStats then return end
+local function SetupAPMPanel()
 	apmSubPanel:ClearChildren()
 	Label:New{
 		parent=apmSubPanel,
@@ -284,13 +228,67 @@ local function PopulateAPMPanel()
 		autosize=false,
 		objectOverrideFont = WG.GetFont(),
 		}
-	Line:New{ width='100%', parent=apmSubPanel } --spacer to force a "line break"
-	AddPlayerStatsToPanel(WG.apmStats[myPlayerID])
-	for playerID, pStats in pairs(WG.apmStats) do
-		if playerID ~= myPlayerID then
-			AddPlayerStatsToPanel(pStats)
-		end
+	Line:New{ width='100%', parent=apmSubPanel} --spacer to force a "line break"
+end
+
+function AddPlayerStatsToPanel(stats, doClear)
+	if not stats then
+		return
 	end
+	local teamID = stats.teamID
+	if not teamNames[teamID] then
+		return
+	end
+	if doClear then
+		apmSubPanel:ClearChildren()
+		SetupAPMPanel()
+	end
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. teamNames[teamID],
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.MPS,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.MCM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.KPM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Label:New{
+		parent=apmSubPanel,
+		width=200,
+		height=awardPanelHeight,
+		caption = teamColors[teamID] .. stats.APM,
+		valign='center',
+		autosize=false,
+		objectOverrideFont = WG.GetFont(),
+	}
+	Line:New{height = 1, width='100%', parent=apmSubPanel}
 end
 
 --------------------------------------------------------------------------------
@@ -595,6 +593,10 @@ function widget:Initialize()
 	if statsSubPanel then
 		statsPanel:AddChild(statsSubPanel)
 	end
+	
+	--apm stats setup
+	WG.AddPlayerStatsToPanel = AddPlayerStatsToPanel
+
 	awardButton:Hide()
 	apmButton:Hide()
 	statsButton:Hide()
@@ -621,6 +623,7 @@ function widget:Initialize()
 end
 
 function widget:GameOver(winners)
+	SetupAPMPanel()
 	SetEndgameCaption(winners)
 	StartEndgameTimer(endgameWindowDelay)
 end
@@ -649,8 +652,6 @@ function widget:Update(dt)
 		ShowStats()
 	end
 	ToggleStatsGraph(true)
-
-	PopulateAPMPanel()
 	widgetHandler:RemoveCallIn("Update")
 end
 

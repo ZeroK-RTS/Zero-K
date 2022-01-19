@@ -21,8 +21,10 @@ local spGetPlayerInfo = Spring.GetPlayerInfo
 local myPlayerID = Spring.GetMyPlayerID()
 local timedPlayerList = {}
 local storedPlayerStats = {}
+local statsFinal = {}
 local myTeamID
 local gameOn = false
+local wantStats = false
 local SendLuaUIMsg = Spring.SendLuaUIMsg
 
 local floor = math.floor
@@ -47,16 +49,21 @@ local function SetTimedPlayerList()
 end
 
 local function SendMyPlayerStats()
+	if not wantStats then
+		return
+	end
 	local MP, MC, KP, NC, NUC = spGetPlayerStatistics(myPlayerID, true)
+	timedPlayerList[myPlayerID].inactiveTime = timedPlayerList[myPlayerID].inactiveTime or 0
+	local activeTime = spGetGameSeconds()-timedPlayerList[myPlayerID].inactiveTime
 	local playerStats = {
 		teamID = myTeamID,
-		MP = MP,
-		MC = MC,
-		KP = KP,
-		NC = NC,
-		NUC = NUC
+		MPS = round(MP/activeTime),
+		MCM = round(MC*60/activeTime),
+		KPM = round(KP*60/activeTime),
+		APM = round(NC*60/activeTime),
 	}
-	WG.apmStats[myPlayerID] = playerStats
+	--If sending own stats, we need to clear previous set incase we have left the game and come back
+	WG.AddPlayerStatsToPanel(playerStats, true)
 	MP = VFS.PackU16(MP)
 	MC = VFS.PackU16(MC)
 	KP = VFS.PackU16(KP)
@@ -88,7 +95,6 @@ local function ProcessPlayerStats(msg, playerID)
 	local NUC = tonumber(VFS.UnpackU16(msg:sub(15)))
 	timedPlayerList[playerID].inactiveTime = timedPlayerList[playerID].inactiveTime or 0
 	local activeTime = spGetGameSeconds() - timedPlayerList[playerID].inactiveTime
-	local MPS = round(MP/activeTime)
 	local playerStats = {
 		teamID = teamID,
 		MPS = round(MP/activeTime),
@@ -96,22 +102,24 @@ local function ProcessPlayerStats(msg, playerID)
 		KPM = round(KP*60/activeTime),
 		APM = round(NC*60/activeTime),
 	}
-	WG.apmStats[playerID] = playerStats
+	WG.AddPlayerStatsToPanel(playerStats)
 end
 
 
 
 function widget:Initialize()
 	local _, _, isSpec, teamID = spGetPlayerInfo(myPlayerID, false)
+	--This will also get called if coming back into game as a spectator -- in that case we don't want to start logging stats again
+	--so wantStats will be false
 	if not isSpec then
 		myTeamID = teamID
+		wantStats = true
 	end
 	SetTimedPlayerList()
-	WG.apmStats = WG.apmStats or {}
 end
 
 function widget:RecvLuaMsg(msg, playerID)
-	if playerID == myPLayerID then
+	if playerID == myPlayerID then
 		return true
 	end
 	if (msg:sub(1,6)=="pStats") then
@@ -132,10 +140,13 @@ function widget:RecvLuaMsg(msg, playerID)
 end
 
 function widget:Shutdown()
+	--ensure that stats are getting sent even if player has left
 	SendMyPlayerStats()
 end
 
 function widget:PlayerChanged(playerID)
+	--ensure that stats are getting sent if a player is resigning early
+	--log time after resign as inactive time
 	if playerID == myPlayerID and gameOn and timedPlayerList[playerID] then
 		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 		SendMyPlayerStats()
@@ -143,17 +154,19 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:PlayerRemoved(playerID)
+	--this is useless for now
 	if playerID ~= myPlayerID and gameOn and timedPlayerList[playerID] then
-		timedPlayerList[playerID].inactiveStartTime = timedPlayerList[playerID].inactiveStartTime or spGetGameSeconds()
+		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 	end
 end
 
 function widget:PlayerAdded(playerID)
+	--When a player gets added, Spring.GetPlayerStatistics starts anew
+	--So any time before this should be considered inactive time
 	if (playerID ~= myPlayerID) and gameOn and timedPlayerList[playerID] then
-		local timeStamp = spGetGameSeconds()
 		if timedPlayerList[playerID].inactiveStartTime then
-			timedPlayerList[playerID].inactiveTime = (spGetGameSeconds()-(timedPlayerList[playerID].inactiveStartTime))
-			timedPlayerList[playerID].inactiveStartTime = nil
+			timedPlayerList[playerID].inactiveTimeDC = spGetGameSeconds()
+			timedPlayerList[playerID].inactiveStartTime = false
 		end
 	end
 end
@@ -166,8 +179,12 @@ function widget:GameOver()
 	gameOn = false
 	for playerID, data in pairs(timedPlayerList) do
 		if data.inactiveStartTime then
-			data.inactiveTime = spGetGameSeconds()-timedPlayerList[playerID].inactiveStartTime
+			data.inactiveTimeRes = spGetGameSeconds()-timedPlayerList[playerID].inactiveStartTime
 		end
+		--If a player has some DC time, and also resigned early, the cumulative total needs to be considered
+		data.inactiveTimeDC = data.inactiveTimeDC or 0
+		data.inactiveTimeRes = data.inactiveTimeRes or 0
+		data.inactiveTime = inactiveTimeDC + inactivetimeRes
 		SendPlayerInactiveTime(playerID)
 	end
 	SendMyPlayerStats()
