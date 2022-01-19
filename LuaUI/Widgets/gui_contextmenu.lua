@@ -1538,7 +1538,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	if ud.wantedHeight > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight*1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then
