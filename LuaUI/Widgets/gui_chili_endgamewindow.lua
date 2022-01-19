@@ -17,12 +17,12 @@ end
 --------------------------------------------------------------------------------
 
 -- Spring aliases
-local spSendCommands	= Spring.SendCommands
-local echo 		= Spring.Echo
-local GetGameSeconds	= Spring.GetGameSeconds
-local spGetTeamInfo = Spring.GetTeamInfo
+local spSendCommands   = Spring.SendCommands
+local echo             = Spring.Echo
+local GetGameSeconds   = Spring.GetGameSeconds
+local spGetTeamInfo    = Spring.GetTeamInfo
 local spGetGameseconds = Spring.GetGameSeconds
-local spGetPlayerInfo = Spring.GetPlayerInfo
+local spGetPlayerInfo  = Spring.GetPlayerInfo
 local floor = math.floor
 
 -- Chili classes
@@ -71,6 +71,7 @@ local updateFlag = true
 -- Constants and parameters
 local endgameWindowDelay = 2
 local awardPanelHeight = 50
+local apmPanelHeight = 30
 local B_HEIGHT = 40
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
@@ -81,6 +82,8 @@ local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
 
 local teamNames = {}
 local teamColors = {}
+local teamApmStatsLabels = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --options
@@ -179,7 +182,6 @@ end
 --APM Window
 
 local function SetupAPMPanel()
-	apmSubPanel:ClearChildren()
 	Label:New{
 		parent=apmSubPanel,
 		width=200,
@@ -231,64 +233,70 @@ local function SetupAPMPanel()
 	Line:New{ width='100%', parent=apmSubPanel} --spacer to force a "line break"
 end
 
-function AddPlayerStatsToPanel(stats, doClear)
-	if not stats then
+function AddPlayerStatsToPanel(stats)
+	if not (stats and apmSubPanel) then
 		return
 	end
 	local teamID = stats.teamID
 	if not teamNames[teamID] then
 		return
 	end
-	if doClear then
-		apmSubPanel:ClearChildren()
-		SetupAPMPanel()
+	if not teamApmStatsLabels[teamID] then
+		local data = {}
+		Label:New{
+			parent=apmSubPanel,
+			width=200,
+			height=apmPanelHeight,
+			caption = teamColors[teamID] .. teamNames[teamID],
+			valign='center',
+			autosize=false,
+			objectOverrideFont = WG.GetFont(),
+		}
+		data.mps = Label:New{
+			parent=apmSubPanel,
+			width=200,
+			height=apmPanelHeight,
+			caption = teamColors[teamID] .. stats.MPS,
+			valign='center',
+			autosize=false,
+			objectOverrideFont = WG.GetFont(),
+		}
+		data.mcm = Label:New{
+			parent=apmSubPanel,
+			width=200,
+			height=apmPanelHeight,
+			caption = teamColors[teamID] .. stats.MCM,
+			valign='center',
+			autosize=false,
+			objectOverrideFont = WG.GetFont(),
+		}
+		data.kpm = Label:New{
+			parent=apmSubPanel,
+			width=200,
+			height=apmPanelHeight,
+			caption = teamColors[teamID] .. stats.KPM,
+			valign='center',
+			autosize=false,
+			objectOverrideFont = WG.GetFont(),
+		}
+		data.apm = Label:New{
+			parent=apmSubPanel,
+			width=200,
+			height=apmPanelHeight,
+			caption = teamColors[teamID] .. stats.APM,
+			valign='center',
+			autosize=false,
+			objectOverrideFont = WG.GetFont(),
+		}
+		Line:New{height = 1, width='100%', parent=apmSubPanel}
+		teamApmStatsLabels[teamID] = data
 	end
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. teamNames[teamID],
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MPS,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.MCM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.KPM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Label:New{
-		parent=apmSubPanel,
-		width=200,
-		height=awardPanelHeight,
-		caption = teamColors[teamID] .. stats.APM,
-		valign='center',
-		autosize=false,
-		objectOverrideFont = WG.GetFont(),
-	}
-	Line:New{height = 1, width='100%', parent=apmSubPanel}
+	
+	local teamData = teamApmStatsLabels[teamID]
+	teamData.mps:SetCaption(teamColors[teamID] .. stats.MPS)
+	teamData.mcm:SetCaption(teamColors[teamID] .. stats.MCM)
+	teamData.kpm:SetCaption(teamColors[teamID] .. stats.KPM)
+	teamData.apm:SetCaption(teamColors[teamID] .. stats.APM)
 end
 
 --------------------------------------------------------------------------------
@@ -436,13 +444,16 @@ local function SetupControls()
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
-		itemMargin = {1, 1, 1, 1},
+		itemMargin = {0, 0, 0, 0},
+		itemPadding = {1, 1, 1, 1},
 		tooltip = "",
 
 		resizeItems = false,
 		centerItems = false,
 		orientation = 'horizontal';
 	}
+	SetupAPMPanel()
+
 	awardButton = Button:New{
 		parent = window_endgame;
 		caption="Awards",
@@ -623,7 +634,6 @@ function widget:Initialize()
 end
 
 function widget:GameOver(winners)
-	SetupAPMPanel()
 	SetEndgameCaption(winners)
 	StartEndgameTimer(endgameWindowDelay)
 end

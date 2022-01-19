@@ -23,13 +23,16 @@ local timedPlayerList = {}
 local storedPlayerStats = {}
 local statsFinal = {}
 local myTeamID
-local gameOn = false
 local wantStats = false
 local SendLuaUIMsg = Spring.SendLuaUIMsg
 
 local floor = math.floor
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
+
+local function GameRunning()
+	return (Spring.GetGameFrame() > 0 and not Spring.IsGameOver())
+end
 
 local function round(number)
 	return floor(number+0.5)
@@ -63,7 +66,7 @@ local function SendMyPlayerStats()
 		APM = round(NC*60/activeTime),
 	}
 	--If sending own stats, we need to clear previous set incase we have left the game and come back
-	WG.AddPlayerStatsToPanel(playerStats, true)
+	WG.AddPlayerStatsToPanel(playerStats)
 	MP = VFS.PackU16(MP)
 	MC = VFS.PackU16(MC)
 	KP = VFS.PackU16(KP)
@@ -105,8 +108,6 @@ local function ProcessPlayerStats(msg, playerID)
 	WG.AddPlayerStatsToPanel(playerStats)
 end
 
-
-
 function widget:Initialize()
 	local _, _, isSpec, teamID = spGetPlayerInfo(myPlayerID, false)
 	--This will also get called if coming back into game as a spectator -- in that case we don't want to start logging stats again
@@ -123,7 +124,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		return true
 	end
 	if (msg:sub(1,6)=="pStats") then
-		if not gameOn then
+		if not GameRunning() then
 			ProcessPlayerStats(msg, playerID)
 		else
 			storedPlayerStats[playerID] = msg
@@ -140,14 +141,17 @@ function widget:RecvLuaMsg(msg, playerID)
 end
 
 function widget:Shutdown()
-	--ensure that stats are getting sent even if player has left
+	--ensure that stats are getting sent if the player leaves before the game ends.
+	if Spring.IsGameOver() then
+		return
+	end
 	SendMyPlayerStats()
 end
 
 function widget:PlayerChanged(playerID)
 	--ensure that stats are getting sent if a player is resigning early
 	--log time after resign as inactive time
-	if playerID == myPlayerID and gameOn and timedPlayerList[playerID] then
+	if playerID == myPlayerID and GameRunning() and timedPlayerList[playerID] then
 		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 		SendMyPlayerStats()
 	end
@@ -155,7 +159,7 @@ end
 
 function widget:PlayerRemoved(playerID)
 	--this is useless for now
-	if playerID ~= myPlayerID and gameOn and timedPlayerList[playerID] then
+	if playerID ~= myPlayerID and GameRunning() and timedPlayerList[playerID] then
 		timedPlayerList[playerID].inactiveStartTime = spGetGameSeconds()
 	end
 end
@@ -163,20 +167,14 @@ end
 function widget:PlayerAdded(playerID)
 	--When a player gets added, Spring.GetPlayerStatistics starts anew
 	--So any time before this should be considered inactive time
-	if (playerID ~= myPlayerID) and gameOn and timedPlayerList[playerID] then
+	if (playerID ~= myPlayerID) and GameRunning() and timedPlayerList[playerID] then
 		if timedPlayerList[playerID].inactiveStartTime then
 			timedPlayerList[playerID].inactiveTimeDC = spGetGameSeconds()
 			timedPlayerList[playerID].inactiveStartTime = false
 		end
 	end
 end
-
-function widget:GameStart()
-	gameOn = true
-end
-
 function widget:GameOver()
-	gameOn = false
 	for playerID, data in pairs(timedPlayerList) do
 		if data.inactiveStartTime then
 			data.inactiveTimeRes = spGetGameSeconds()-timedPlayerList[playerID].inactiveStartTime
