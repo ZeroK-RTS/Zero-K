@@ -194,6 +194,11 @@ local function GetExtraStartUnits(teamID, customKeys)
 	return startUnits
 end
 
+local function SetGameRulesParamHax(key, value)
+	--Spring.SetGameRulesParam(key, value)
+	Spring.SetTeamRulesParam(0, key, value, publicTrueTable)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Victory and Defeat functions
@@ -281,7 +286,7 @@ local function VictoryAtLocationUpdate()
 			if DoVictoryAtLocationCheck(unitID, data[i]) then
 				if data[i].objectiveID then
 					local objParameter = "objectiveSuccess_" .. data[i].objectiveID
-					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
+					SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 				end
 				GG.CauseVictory(data[i].allyTeamID)
 				return
@@ -322,7 +327,7 @@ end
 
 local function CompleteBonusObjective(bonusObjectiveID, success)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	Spring.SetGameRulesParam("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
+	SetGameRulesParamHax("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
 	
 	objectiveData.success = success
 	objectiveData.terminated = true
@@ -1159,7 +1164,7 @@ local function InitializeUnlocks()
 	if doNotDisableAnyUnits then
 		GG.terraformRequiresUnlock = false
 	else
-		Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+		SetGameRulesParamHax("terraformRequiresUnlock", 1)
 	end
 	
 	local teamList = Spring.GetTeamList()
@@ -1397,10 +1402,10 @@ local function MissionGameOver(missionWon)
 	gameIsOver = true
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
-	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
+	SetGameRulesParamHax("MissionGameOver", (missionWon and 1) or 0)
 	local frame = Spring.GetGameFrame()
 	Spring.Echo("set MissionGameOver_frames", frame)
-	Spring.SetGameRulesParam("MissionGameOver_frames", frame)
+	SetGameRulesParamHax("MissionGameOver_frames", frame)
 end
 
 --------------------------------------------------------------------------------
@@ -1508,7 +1513,7 @@ function gadget:GameFrame(n)
 					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
 					if defeatConfig.timeLossObjectiveID then
 						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
-						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
+						SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
