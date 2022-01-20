@@ -131,7 +131,7 @@ function script.BlockShot(num, targetID)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
 	local isMobile = targetID and not GG.IsUnitIdentifiedStructure(true, targetID)
-	local damage = targetID and GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
+	local damage = targetID and GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1) or 800.1
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
