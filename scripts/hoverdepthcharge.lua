@@ -165,7 +165,7 @@ local function FakeWeaponShoot(targetID)
 		local h = Spring.GetGroundHeight(x, z)
 		-- Underestimate damage and flight time. The aim here really is just to avoid every Claymore unloading on a single
 		-- target at the same time. They are a bit too random for anything more precise.
-		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, 440, 22) then
+		if h > -5 and not GG.OverkillPrevention_CheckBlock(unitID, targetID, OKP_DAMAGE, 22) then
 			local gameFrame = spGetGameFrame()
 			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
