@@ -56,7 +56,7 @@ local configList = {
 
 	{label = "Advanced States (hidden by default)"},
 	{cmdID = CMD_DISABLE_ATTACK        , state = true, default = false, name = "Allow Attack Commands"},
-	{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
+	--{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
 	{cmdID = CMD_AUTO_CALL_TRANSPORT   , state = true, default = false, name = "Call Transports"},
 	{cmdID = CMD_FIRE_AT_SHIELD        , state = true, default = false, name = "Fire at Shields"},
 	{cmdID = CMD_GLOBAL_BUILD          , state = true, default = false, name = "Global Build"},
@@ -99,7 +99,7 @@ local defaultValues = {
 	[CMD_GLOBAL_BUILD] = true,
 	--[CMD.MOVE_STATE] = true,
 	--[CMD.FIRE_STATE] = true,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+	--[CMD_UNIT_BOMBER_DIVE_STATE] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
 	--[CMD_GOO_GATHER] = true,
 	[CMD_DISABLE_ATTACK] = true,
