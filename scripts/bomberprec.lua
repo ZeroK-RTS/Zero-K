@@ -135,7 +135,7 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 60, false, false, false) then
+	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 40, false, false, false) then
 		-- Remove attack command on blocked target, it's already dead so move on.
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
@@ -183,7 +183,7 @@ function script.BlockShot(num, targetID)
 	--end
 	
 	
-	if targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 60, false, false, false) then
+	if targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 40, false, false, false) then
 		return true
 	end
 	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
