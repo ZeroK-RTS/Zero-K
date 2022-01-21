@@ -23,8 +23,9 @@ if gadgetHandler:IsSyncedCode() then
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spGetUnitDefID        = Spring.GetUnitDefID
-local plateBuilder = {}
+
 local plateParent = {}
+local canBuildPlateCache = {}
 
 local plateCmdDesc = {
 	id      = CMD_BUILD_PLATE,
@@ -35,18 +36,16 @@ local plateCmdDesc = {
 	tooltip = 'Build Plate: Move cursor near factory to build matching plate'
 }
 
-local function PlaceBuilderInList(defList)
-	for i = 1, #defList do
-		local unitDefID = defList[i]
-		if not plateParent[unitDefID] then
-			local cp = UnitDefs[unitDefID].customParams
-			if cp.parent_of_plate then
-				plateBuilder[unitDefID] = 1
-			else
-				plateParent[unitDefID] = 0
-			end
+local function CanBuildPlate(unitDefID)
+	local ud = UnitDefs[unitDefID]
+	local buildOptions = ud.buildOptions
+	for i = 1, #buildOptions do
+		local buildDefID = buildOptions[i]
+		if not plateParent[buildDefID] then
+			local cp = UnitDefs[buildDefID].customParams
+			plateParent[buildDefID] = (cp.parent_of_plate and 1) or 0
 		end
-		if plateBuilder[unitDefID] == 1 then
+		if plateParent[buildDefID] == 1 then
 			return true
 		end
 	end
@@ -54,12 +53,10 @@ local function PlaceBuilderInList(defList)
 end
 
 local function CanBuildFactoryPlate(unitDefID)
-	if not plateBuilder[unitDefID] then
-		local ud = UnitDefs[unitDefID]
-		local buildOptions = ud.buildOptions
-		plateBuilder[unitDefID] = (PlaceBuilderInList(buildOptions) and 1) or 0
+	if not canBuildPlateCache[unitDefID] then
+		canBuildPlateCache[unitDefID] = (CanBuildPlate(unitDefID) and 1) or 0
 	end
-	return (plateBuilder[unitDefID] == 1)
+	return (canBuildPlateCache[unitDefID] == 1)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
