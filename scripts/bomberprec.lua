@@ -24,7 +24,6 @@ local xp,zp = piece("x","z")
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetUnitHeading      = Spring.GetUnitHeading
 local spGetUnitVelocity     = Spring.GetUnitVelocity
-local spMoveCtrlGetTag      = Spring.MoveCtrl.GetTag
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local spSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData
 local spGetGroundHeight     = Spring.GetGroundHeight
@@ -90,7 +89,7 @@ local function ResetTurnRadius()
 	Signal(SIG_NOT_BLOCKED)
 	SetSignalMask(SIG_NOT_BLOCKED)
 	Sleep(500)
-	Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 300})
+	SetUnarmedAI(300)
 end
 
 local function GetAimLocation(targetID)
@@ -198,6 +197,8 @@ function script.FireWeapon(num)
 		Sleep(33) -- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)
 		Move(drop, z_axis, 0)
+		Signal(SIG_NOT_BLOCKED)
+		SetUnarmedAI()
 		Reload()
 	end
 end

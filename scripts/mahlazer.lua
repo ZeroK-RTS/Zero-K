@@ -119,6 +119,9 @@ end
 
 local HEADING_TO_RAD = 1/32768*math.pi
 local function GetDir(checkUnitID)
+	if not satUnitID then
+		return
+	end
 	local heading = Spring.GetUnitHeading(satUnitID)
 	if heading then
 		return math.pi/2 - heading*HEADING_TO_RAD
@@ -129,7 +132,9 @@ function StopAim()
 	CallSatelliteScript('mahlazer_StopAim')
 	GG.PieceControl.StopTurn(SatelliteMuzzle, x_axis)
 	Signal(SIG_AIM)
-	wantedDirection = GetDir(satUnitID)
+	if satUnitID then
+		wantedDirection = GetDir(satUnitID)
+	end
 end
 
 local isFiring = false
