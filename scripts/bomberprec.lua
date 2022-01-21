@@ -136,10 +136,14 @@ function script.BlockShot(num, targetID)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
 	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 40, false, false, false) then
-		-- Remove attack command on blocked target, it's already dead so move on.
-		local cQueue = Spring.GetCommandQueue(unitID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
+		-- Remove attack command on blocked target, if it is followed by another attack command. This is commands queued in an area.
+		local cmdID, _, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
+		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
+			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
+				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+			end
 		end
 		return true
 	end
@@ -159,10 +163,11 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	
+	local isTooFast = false -- Do not OKP for too fast targets as we don't expect to hit.
 	if isMobile then
 		local speed = EstimateCurrentMaxSpeed(targetID)
 		if speed >= 3 then
-			damage = 450
+			isTooFast = true
 		end
 		--Spring.Echo(hDist, speed, math.max(3, -dy - speed*90 - 35))
 		-- Cap out at speed 2.7 on normal terrain
@@ -182,8 +187,7 @@ function script.BlockShot(num, targetID)
 		--return true
 	--end
 	
-	
-	if targetID and GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, 40, false, false, false) then
+	if targetID and (not isTooFast) and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, 35, 0.025) then
 		return true
 	end
 	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)

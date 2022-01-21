@@ -298,7 +298,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	end
 
-	lastShot[unitID] = targetID
+	if not noFire then
+		lastShot[unitID] = targetID
+	end
 	return false
 end
 
