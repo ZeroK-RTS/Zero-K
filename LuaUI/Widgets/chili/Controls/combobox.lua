@@ -76,8 +76,10 @@ function ComboBox:_CloseWindow()
 	self.labels = nil
 	if self._dropDownWindow then
 		self:CallListeners(self.OnClose)
-		self._dropDownWindow:Dispose()
-		self._dropDownWindow = nil
+		if self._dropDownWindow then
+			self._dropDownWindow:Dispose()
+			self._dropDownWindow = nil
+		end
 	end
 	if (self.state.pressed) then
 		self.state.pressed = false
