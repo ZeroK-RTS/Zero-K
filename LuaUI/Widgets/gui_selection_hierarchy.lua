@@ -50,6 +50,8 @@ local ctrlFlattenRank = 1
 local doubleClickFlattenRank = 1
 local retreatOverride = true
 local retreatingRank = 0
+local globalBuildRankOverride = true
+local globalBuildRank = 0
 local useSelectionFiltering = true
 local selectionFilteringOnlyAlt = false
 local retreatDeselects = false
@@ -70,7 +72,19 @@ end
 
 options_path = 'Settings/Interface/Selection'
 local retreatPath = 'Settings/Interface/Retreat Zones'
-options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'doubleClickFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
+local globalBuildPath = 'Settings/Unit Behaviour/Worker AI'
+options_order = {
+	'useSelectionFilteringOption',
+	'selectionFilteringOnlyAltOption',
+	'ctrlFlattenRankOption',
+	'doubleClickFlattenRankOption',
+	'retreatOverrideOption',
+	'retreatingRankOption',
+	'globalBuildOverrideOption',
+	'globalBuildRankOption',
+	'retreatDeselects'
+}
+
 options = {
 	useSelectionFilteringOption = {
 		name = "Use selection filtering",
@@ -138,6 +152,30 @@ options = {
 		path = retreatPath,
 		OnChange = function (self)
 			retreatingRank = self.value
+		end
+	},
+	globalBuildOverrideOption = {
+		name = "Global build overrides selection rank",
+		desc = "Units controlled by global build command will be treated as a different selection rank.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		path = globalBuildPath,
+		OnChange = function (self)
+			globalBuildRankOverride = self.value
+		end
+	},
+	globalBuildRankOption = {
+		name = 'Global build selection override:',
+		desc = "Units controlled by global build command are treated as this selection rank, if override is enabled.",
+		type = 'number',
+		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+		path = globalBuildPath,
+		OnChange = function (self)
+			globalBuildRank = self.value
 		end
 	},
 	retreatDeselects = {
@@ -264,6 +302,11 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
 			rank = retreatingRank
 		end
+
+		if globalBuildRankOverride and WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsControllingUnit(unitID) and (rank > globalBuildRank) then
+			rank = globalBuildRank
+		end
+
 		if rank then
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
