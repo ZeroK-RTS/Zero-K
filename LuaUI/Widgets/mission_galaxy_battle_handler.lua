@@ -519,7 +519,6 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 	end
 	
 	local function UpdateSuccess(index)
-		Spring.Echo("newSuccess", gameRulesParam .. index, GetGameRulesHax(gameRulesParam .. index))
 		if objectives[index].terminated then
 			return
 		end
