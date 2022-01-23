@@ -275,7 +275,7 @@ local function GetOptions()
 		end
 	end
 	
-	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue)
+	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue, 10, 0, 50)
 
 	options["sunDir"] = {
 		name = "Sun Direction",
