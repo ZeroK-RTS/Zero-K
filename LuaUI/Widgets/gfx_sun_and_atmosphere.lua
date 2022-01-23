@@ -385,8 +385,10 @@ local updates = 0
 function widget:Update()
 	initialized = true
 	updates = updates + 1
-	if updates > 4 then
+	if updates == 4 or updates == 28 then
 		LoadSunAndFogSettings()
-		widgetHandler:RemoveCallIn("Update")
+		if updates == 28 then
+			widgetHandler:RemoveCallIn("Update")
+		end
 	end
 end
