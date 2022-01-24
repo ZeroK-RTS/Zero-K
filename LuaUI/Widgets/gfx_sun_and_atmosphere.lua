@@ -139,7 +139,9 @@ local function LoadSunAndFogSettings()
 		sunSettingsChanged = true
 		
 		for name, value in pairs(sun) do
-			options[name].value = value
+			if options[name] then
+				options[name].value = value
+			end
 		end
 	end
 	
@@ -157,7 +159,9 @@ local function LoadSunAndFogSettings()
 		fogSettingsChanged = true
 		
 		for name, value in pairs(fog) do
-			options[name].value = value
+			if options[name] then
+				options[name].value = value
+			end
 		end
 	end
 
