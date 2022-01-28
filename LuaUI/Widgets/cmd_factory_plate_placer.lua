@@ -260,9 +260,21 @@ local function MakePlateFromCMD()
 	end
 end
 
+local function ResetInterface()
+	cmdFactoryDefID = nil
+	buildFactoryDefID = nil
+	buildPlateDefID = nil
+	closestFactoryData = nil
+end
+
 function widget:Update()
 	local _, cmdID = spGetActiveCommand()
 	buildPlateCommand = cmdID and ((CMD_BUILD_PLATE == cmdID) or (cmdPlateDefID))
+	
+	if (buildFactoryDefID or cmdFactoryDefID or closestFactoryData) and CMD_BUILD_PLATE ~= cmdID then
+		ResetInterface()
+	end
+	
 	if cmdID then
 		local unitDefID = -cmdID
 		-- check for cmd plate first, otherwise do previous behaviour
@@ -272,6 +284,9 @@ function widget:Update()
 		elseif cmdPlateDefID then
 			if unitDefID == cmdPlateDefID then
 				cmdFactoryDefID, cmdPlateDefID = MakePlateFromCMD()
+			else
+				cmdPlateDefID = nil
+				ResetInterface()
 			end
 			return
 		else
@@ -284,27 +299,16 @@ function widget:Update()
 			if parentOfPlate[unitDefID] then
 				buildFactoryDefID = unitDefID
 				buildPlateDefID = parentOfPlate[unitDefID]
-				if not CheckTransformFactoryIntoPlate(unitDefID) then
-					closestFactoryData = nil
-				end
+				CheckTransformFactoryIntoPlate(unitDefID)
 				return
 			end
 			if childOfFactory[unitDefID] then
 				buildFactoryDefID = childOfFactory[unitDefID]
 				buildPlateDefID = unitDefID
-				if not CheckTransformPlateIntoFactory(unitDefID) then
-					closestFactoryData = nil
-				end
+				CheckTransformPlateIntoFactory(unitDefID)
 				return
 			end
 		end
-	end
-	if buildFactoryDefID or cmdFactoryDefID then
-		cmdFactoryDefID = nil
-		cmdPlateDefID = nil
-		buildFactoryDefID = nil
-		buildPlateDefID = nil
-		closestFactoryData = nil
 	end
 end
 
@@ -399,27 +403,20 @@ local function GetDrawDef(mx, mz, data)
 	return outCircle, false
 end
 
-local function DrawFactoryLine(x, y, z, drawDef)
-	if cmdFactoryDefID then
-		local lineFactoryDefID = cmdFactoryDefID
-	elseif buildFactoryDefID then
-		local lineFactoryDefID = buildFactoryDefID
-	else
-		return
-	end
-
-	local mx, mz = GetMousePos(not ((not buildPlateCommand) and floatOnWater[buildFactoryDefID]))
+local function DrawFactoryLine(x, y, z, unitDefID, drawDef)
+	local mx, mz = GetMousePos(not floatOnWater[unitDefID])
 	if not mx then
 		return
 	end
 	
 	local _, cmdID = spGetActiveCommand()
-	if not (cmdID and (oddX[-cmdID])) then
-		return
+	if cmdID and cmdID < 0 then
+		if not (cmdID and (oddX[-cmdID])) then
+			return
+		end
+		
+		mx, mz = SnapBuildToGrid(mx, mz, -cmdID)
 	end
-	
-	mx, mz = SnapBuildToGrid(mx, mz, -cmdID)
-
 	local my = spGetGroundHeight(mx, mz)
 
 	glLineWidth(drawDef.width)
@@ -480,7 +477,7 @@ function widget:DrawWorld()
 		drawPlateDefID = buildPlateDefID
 	end
 	
-	if not (drawFactoryDefID or buildPlateCommand) then
+	if not (drawFactoryDefID or buildPlateCommand or closestFactoryData) then
 		return
 	end
 	
@@ -488,38 +485,41 @@ function widget:DrawWorld()
 	if not mx then
 		return
 	end
-	if not buildPlateCommand then
-		mx, mz = SnapBuildToGrid(mx, mz, drawPlateDefID)
-	end
 	
-	local drawn = false
 	local drawInRange = false
-	for unitID, data in IterableMap.Iterator(factories) do
-		if buildPlateCommand or data.unitDefID == drawFactoryDefID then
-			drawn = true
-			local drawDef, inRange = GetDrawDef(mx, mz, data)
-			if buildPlateCommand and drawPlateDefID and data.unitDefID ~= drawFactoryDefID then
-				inRange = false
-				drawDef = outCircle
+	if drawFactoryDefID or buildPlateCommand then
+		if not buildPlateCommand then
+			mx, mz = SnapBuildToGrid(mx, mz, drawPlateDefID)
+		end
+		
+		local drawn = false
+		for unitID, data in IterableMap.Iterator(factories) do
+			if buildPlateCommand or data.unitDefID == drawFactoryDefID then
+				drawn = true
+				local drawDef, inRange = GetDrawDef(mx, mz, data)
+				if buildPlateCommand and drawPlateDefID and data.unitDefID ~= drawFactoryDefID then
+					inRange = false
+					drawDef = outCircle
+				end
+				drawInRange = drawInRange or inRange
+				
+				gl.DepthTest(false)
+				glLineWidth(drawDef.width)
+				glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
+				
+				glDrawGroundCircle(data.x, data.y, data.z, drawDef.range, drawDef.circleDivs)
 			end
-			drawInRange = drawInRange or inRange
-			
-			gl.DepthTest(false)
-			glLineWidth(drawDef.width)
-			glColor(drawDef.color[1], drawDef.color[2], drawDef.color[3], drawDef.color[4])
-			
-			glDrawGroundCircle(data.x, data.y, data.z, drawDef.range, drawDef.circleDivs)
+		end
+		
+		if drawn then
+			glLineStipple(false)
+			glLineWidth(1)
+			glColor(1, 1, 1, 1)
 		end
 	end
 	
-	if drawn then
-		glLineStipple(false)
-		glLineWidth(1)
-		glColor(1, 1, 1, 1)
-	end
-	
 	if closestFactoryData then
-		DrawFactoryLine(closestFactoryData.x, closestFactoryData.y, closestFactoryData.z, drawInRange and inCircle or outCircle)
+		DrawFactoryLine(closestFactoryData.x, closestFactoryData.y, closestFactoryData.z, drawFactoryDefID, drawInRange and inCircle or outCircle)
 	end
 end
 
