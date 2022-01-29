@@ -14,7 +14,13 @@ function gadget:GetInfo()
 	}
 end
 
-if gadgetHandler:IsSyncedCode() then return end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then
+	return
+end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 local alphaMult = 0.35
 local alphaThresholdOpaque = 0.5
@@ -51,31 +57,32 @@ local processedUnits = {}
 local textureOverrides = {}
 
 local unitDrawBins = {
-	[0    ] = {},	-- deferred opaque
-	[1    ] = {},	-- forward  opaque
-	[1 + 4] = {},	-- forward  opaque + reflection
-	[1 + 8] = {},	-- forward  opaque + refraction
-	[2    ] = {},	-- alpha
-	[2 + 4] = {},	-- alpha + reflection
-	[2 + 8] = {},	-- alpha + refraction
-	[16   ] = {},	-- shadow
+	[0    ] = {}, -- deferred opaque
+	[1    ] = {}, -- forward  opaque
+	[1 + 4] = {}, -- forward  opaque + reflection
+	[1 + 8] = {}, -- forward  opaque + refraction
+	[2    ] = {}, -- alpha
+	[2 + 4] = {}, -- alpha + reflection
+	[2 + 8] = {}, -- alpha + refraction
+	[16   ] = {}, -- shadow
 }
 
-
+local unitIDs = {}
 local idToDefId = {}
-
 local processedCounter = 0
-
 local shaders = {}
 
 local vao = nil
-
 local vbo = nil
 local ebo = nil
 local ibo = nil
 
+local MAX_DRAWN_UNITS = 8192
+local skinDefs = include("LuaRules/Configs/dynamic_comm_skins.lua")
 
------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Utilities
 
 local function Bit(p)
 	return 2 ^ (p - 1)  -- 1-based indexing
@@ -99,12 +106,13 @@ local function ClearBit(x, p)
 	return HasBit(x, p) and x - p or x
 end
 
------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Shader
 
 local function GetShader(drawPass, unitDef)
 	return shaders[drawPass]
 end
-
 
 local function SetFixedStatePre(drawPass, shaderID)
 	if HasBit(drawPass, 4) then
@@ -181,7 +189,9 @@ local function GetTexturesKey(textures)
 	return cs
 end
 
------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Unit tracking
 
 local function AssignUnitToBin(unitID, unitDefID, flag, shader, textures, texKey)
 	shader = shader or GetShader(flag, unitDefID)
@@ -208,7 +218,6 @@ local function AssignUnitToBin(unitID, unitDefID, flag, shader, textures, texKey
 
 	unitDrawBinsFlagShaderTexKeyObjs[unitID] = true
 end
-
 
 local function AddUnit(unitID, drawFlag)
 	if (drawFlag >= 128) then --icon
@@ -321,8 +330,16 @@ local function RemoveUnit(unitID)
 	Spring.SetUnitEngineDrawMask(unitID, 255)
 end
 
-local function ProcessUnit(unitID, drawFlag)
-	local drawFlag = drawFlag
+local function ProcessUnit(unitID, drawFlag, skinName)
+	local data = skinDefs[skinName]
+	local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
+	local tex1 = data.altskin
+	local tex2 = data.altskin2
+	if not tex2 then
+		tex2 = "%%" .. udefParent.id .. ":1"
+	end
+
+	textureOverrides[unitID] = {tex1, tex2}
 	if overriddenUnits[unitID] == nil then --object was not seen
 		AddUnit(unitID, drawFlag)
 	elseif overriddenUnits[unitID] ~= drawFlag then --flags have changed
@@ -352,7 +369,6 @@ local function ProcessUnits(units, drawFlags)
 	end
 end
 
-local unitIDs = {}
 local function ExecuteDrawPass(drawPass)
 	for shaderId, data in pairs(unitDrawBins[drawPass]) do
 		for _, texAndObj in pairs(data) do
@@ -386,7 +402,10 @@ local function ExecuteDrawPass(drawPass)
 	end
 end
 
-local MAX_DRAWN_UNITS = 8192
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Callins
+
 function gadget:Initialize()
 	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
 	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl")
@@ -526,25 +545,21 @@ function gadget:DrawAlphaUnitsLua(drawReflection, drawRefraction)
 	ExecuteDrawPass(drawPass)
 end
 
-local skinDefs = include("LuaRules/Configs/dynamic_comm_skins.lua")
 
 function gadget:UnitCreated(unitId, unitDefID)
-	local skinName = Spring.GetUnitRulesParam(unitId, 'comm_texture');
-	if not skinName then return end
-
-	local data = skinDefs[skinName];
-	local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
-	local tex1 = data.altskin
-	local tex2 = data.altskin2
-	if not tex2 then
-		tex2 = "%%" .. udefParent.id .. ":1"
+	local skinName = Spring.GetUnitRulesParam(unitId, 'comm_texture')
+	if not skinName then
+		return
 	end
 
-	textureOverrides[unitId] = {tex1,tex2}
-	ProcessUnit(unitId, overrideDrawFlag);
+	ProcessUnit(unitId, overrideDrawFlag, skinName)
 end
 
-function gadget:UnitDestroyed(unitId)
-	textureOverrides[unitId] = nil
+function gadget:RenderUnitDestroyed(unitId)
+	local skinName = Spring.GetUnitRulesParam(unitId, 'comm_texture')
+	if not skinName then
+		return
+	end
+	
 	RemoveUnit(unitId)
 end
