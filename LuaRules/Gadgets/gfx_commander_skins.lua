@@ -123,32 +123,34 @@ local function SetFixedStatePost(drawPass, shaderID)
 end
 
 --[[
-drawMode:
+cameraMode:
 		case  1: // water reflection
 		case  2: // water refraction
 		default: // player, (-1) static model, (0) normal rendering
 ]]--
 local function SetShaderUniforms(drawPass, shaderID)
 	if drawPass <= 2 then
-		gl.UniformInt(gl.GetUniformLocation(shaderID, "drawMode"), 0)
-		gl.Uniform(gl.GetUniformLocation(shaderID, "clipPlane2"), 0.0, 0.0, 0.0, 1.0)
+		gl.UniformInt("cameraMode", 0)
+		gl.Uniform("clipPlane2", 0.0, 0.0, 0.0, 1.0)
 	elseif drawPass == 16 then
-		--gl.Uniform(gl.GetUniformLocation(shaderID, "alphaCtrl"), alphaThresholdOpaque, 1.0, 0.0, 0.0)
+		--gl.Uniform("alphaCtrl", alphaThresholdOpaque, 1.0, 0.0, 0.0)
 		-- set properly by default
 	end
 
 	if HasBit(drawPass, 1) then
-		gl.Uniform(gl.GetUniformLocation(shaderID, "alphaCtrl"), alphaThresholdOpaque, 1.0, 0.0, 0.0)
-		gl.Uniform(gl.GetUniformLocation(shaderID, "colorMult"), 1.0, 1.0, 1.0, 1.0)
+		gl.Uniform("alphaCtrl", alphaThresholdOpaque, 1.0, 0.0, 0.0)
+		gl.Uniform("colorMult", 1.0, 1.0, 1.0, 1.0)
 	elseif HasBit(drawPass, 2) then
-		gl.Uniform(gl.GetUniformLocation(shaderID, "alphaCtrl"), alphaThresholdAlpha , 1.0, 0.0, 0.0)
-		gl.Uniform(gl.GetUniformLocation(shaderID, "colorMult"), 1.0, 1.0, 1.0, alphaMult)
-	elseif HasBit(drawPass, 4) then
-		gl.UniformInt(gl.GetUniformLocation(shaderID, "drawMode"), 1)
-		gl.Uniform(gl.GetUniformLocation(shaderID, "clipPlane2"), 0.0, 1.0, 0.0, 0.0)
+		gl.Uniform("alphaCtrl", alphaThresholdAlpha , 1.0, 0.0, 0.0)
+		gl.Uniform("colorMult", 1.0, 1.0, 1.0, alphaMult)
+	end
+
+	if HasBit(drawPass, 4) then
+		gl.UniformInt("cameraMode", 1)
+		gl.Uniform("clipPlane2", 0.0, 1.0, 0.0, 0.0)
 	elseif HasBit(drawPass, 8) then
-		gl.UniformInt(gl.GetUniformLocation(shaderID, "drawMode"), 2)
-		gl.Uniform(gl.GetUniformLocation(shaderID, "clipPlane2"), 0.0, -1.0, 0.0, 0.0)
+		gl.UniformInt("cameraMode", 2)
+		gl.Uniform("clipPlane2", 0.0, -1.0, 0.0, 0.0)
 	end
 end
 
@@ -386,12 +388,29 @@ end
 
 local MAX_DRAWN_UNITS = 8192
 function gadget:Initialize()
-	local fwdShader = gl.CreateShader({
-		vertex   = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl"),
-		fragment = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl"),
-		definitions = table.concat({
+	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
+	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl")
 
+	vsSrc = string.gsub(vsSrc, "#version 430 core", "")
+	fsSrc = string.gsub(fsSrc, "#version 430 core", "")
+
+	local fwdShader = gl.CreateShader({
+		vertex   = vsSrc,
+		fragment = fsSrc,
+		definitions = table.concat({
+			"#version 430 core",
+			"#define USE_SHADOWS 1",
+			"#define DEFERRED_MODE 0",
+			"#define GBUFFER_NORMTEX_IDX 0",
+			"#define GBUFFER_DIFFTEX_IDX 1",
+			"#define GBUFFER_SPECTEX_IDX 2",
+			"#define GBUFFER_EMITTEX_IDX 3",
+			"#define GBUFFER_MISCTEX_IDX 4",
+			"#define GBUFFER_ZVALTEX_IDX 5",
 		}, "\n") .. "\n",
+		uniformInt = {
+			matrixMode = 0,
+		}
 	})
 	Spring.Echo(gl.GetShaderLog())
 	if fwdShader == nil then
@@ -399,11 +418,22 @@ function gadget:Initialize()
 	end
 
 	local dfrShader = gl.CreateShader({
-		vertex   = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl"),
-		fragment = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl"),
+		vertex   = vsSrc,
+		fragment = fsSrc,
 		definitions = table.concat({
-
+			"#version 430 core",
+			"#define USE_SHADOWS 1",
+			"#define DEFERRED_MODE 1",
+			"#define GBUFFER_NORMTEX_IDX 0",
+			"#define GBUFFER_DIFFTEX_IDX 1",
+			"#define GBUFFER_SPECTEX_IDX 2",
+			"#define GBUFFER_EMITTEX_IDX 3",
+			"#define GBUFFER_MISCTEX_IDX 4",
+			"#define GBUFFER_ZVALTEX_IDX 5",
 		}, "\n") .. "\n",
+		uniformInt = {
+			matrixMode = 0,
+		}
 	})
 
 	Spring.Echo(gl.GetShaderLog())
