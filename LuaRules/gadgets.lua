@@ -1887,42 +1887,42 @@ function gadgetHandler:DrawInMiniMap(mmsx, mmsy)
 end
 
 function gadgetHandler:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
-	for _, g in ipairs(self.DrawOpaqueUnitsLuaList) do
+	for _, g in r_ipairs(self.DrawOpaqueUnitsLuaList) do
 		g:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
 	end
 	return
 end
 
 function gadgetHandler:DrawOpaqueFeaturesLua(deferredPass, drawReflection, drawRefraction)
-	for _, g in ipairs(self.DrawOpaqueFeaturesLuaList) do
+	for _, g in r_ipairs(self.DrawOpaqueFeaturesLuaList) do
 		g:DrawOpaqueFeaturesLua(deferredPass, drawReflection, drawRefraction)
 	end
 	return
 end
 
 function gadgetHandler:DrawAlphaUnitsLua(drawReflection, drawRefraction)
-	for _, g in ipairs(self.DrawAlphaUnitsLuaList) do
+	for _, g in r_ipairs(self.DrawAlphaUnitsLuaList) do
 		g:DrawAlphaUnitsLua(drawReflection, drawRefraction)
 	end
 	return
 end
 
 function gadgetHandler:DrawAlphaFeaturesLua(drawReflection, drawRefraction)
-	for _, g in ipairs(self.DrawAlphaFeaturesLuaList) do
+	for _, g in r_ipairs(self.DrawAlphaFeaturesLuaList) do
 		g:DrawAlphaFeaturesLua(drawReflection, drawRefraction)
 	end
 	return
 end
 
 function gadgetHandler:DrawShadowUnitsLua()
-	for _, g in ipairs(self.DrawShadowUnitsLuaList) do
+	for _, g in r_ipairs(self.DrawShadowUnitsLuaList) do
 		g:DrawShadowUnitsLua()
 	end
 	return
 end
 
 function gadgetHandler:DrawShadowFeaturesLua()
-	for _, g in ipairs(self.DrawShadowFeaturesLuaList) do
+	for _, g in r_ipairs(self.DrawShadowFeaturesLuaList) do
 		g:DrawShadowFeaturesLua()
 	end
 	return
