@@ -242,6 +242,21 @@ local function MakePlateFromCMD()
 
 	local factoryDefID = spGetUnitDefID(unitID)
 	local plateDefID = parentOfPlate[factoryDefID]
+	if not floatOnWater[plateDefID] and Spring.GetGroundHeight(mx, mz) < 0 then
+		mx, mz = GetMousePos(true)
+		if not mx then
+			return
+		end
+		unitID, distSq, factoryData = GetClosestFactory(mx, mz)
+		if not unitID then
+			return
+		end
+		factoryDefID = spGetUnitDefID(unitID)
+		plateDefID = parentOfPlate[factoryDefID]
+		if floatOnWater[plateDefID] then
+			return
+		end
+	end
 
 	mx, mz = SnapBuildToGrid(mx, mz, plateDefID) -- Make sure the plate is in range when it is placed
 	-- Plates could be disabled by modoptions or otherwise unavailable.
