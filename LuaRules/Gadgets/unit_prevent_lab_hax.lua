@@ -32,6 +32,7 @@ local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
 local spGetFeaturePosition     = Spring.GetFeaturePosition
 local spSetFeaturePosition     = Spring.SetFeaturePosition
 local spSetFeatureVelocity     = Spring.SetFeatureVelocity
+local spGetUnitTransporter     = Spring.GetUnitTransporter
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 
 local abs = math.abs
@@ -77,10 +78,8 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 					local unitID = units[j]
 					local unitDefID = spGetUnitDefID(unitID)
 					local ud = UnitDefs[unitDefID]
-					local movetype = Spring.Utilities.getMovetype(ud)
-					local ally = spGetUnitAllyTeam(unitID)
-					local team = spGetUnitTeam(unitID)
-					if (not ud.canFly) and (spMoveCtrlGetTag(unitID) == nil) then
+					if (not ud.canFly) and (spMoveCtrlGetTag(unitID) == nil) and not spGetUnitTransporter(unitID) then
+						local ally = spGetUnitAllyTeam(unitID)
 						if (ally ~= data.ally) or (data.unstickHelp and not ud.isImmobile) then --teleport unit away
 							local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
 							local vx, vy, vz = spGetUnitVelocity(unitID)
