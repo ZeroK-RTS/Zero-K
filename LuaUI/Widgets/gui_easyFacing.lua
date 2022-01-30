@@ -255,6 +255,28 @@ function manipulateFacing()
 	end
 end
 
+local function drawFunc()
+	glVertex( 0, 0, -8)
+	glVertex( 0, 0, 8)
+	glVertex( 48, 0, -3)
+
+	glVertex( 0, 0,  8)
+	glVertex( 48, 0, 3)
+	glVertex( 48, 0, -3 )
+	
+	glVertex( 50, 0,  0)
+	glVertex( 48, 0, 3)
+	glVertex( 48, 0, -3 )
+	
+	glVertex( 50, 0, 0)
+	glVertex( 30, 0, -30 )
+	glVertex( 80, 0, 0 )
+
+	glVertex( 50, 0, 0)
+	glVertex( 80, 0, 0 )
+	glVertex( 30, 0, 30 )
+end
+
 function drawOrientation()
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
 	local cmdDesc = spGetActiveCmdDesc( idx )
@@ -280,9 +302,11 @@ function drawOrientation()
 		printDebug("UDEFID: " .. mx )
 	end
 
-	local _, coords = spTraceScreenRay(mx, my, true, true)
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, not ud.floatOnWater)
 	
-	if not coords then return end
+	if not coords then
+		return
+	end
 	
 	local centerX = coords[1]
 	local centerY = coords[2]
@@ -301,28 +325,6 @@ function drawOrientation()
 	
 	glLineWidth(1)
 	glColor( 0.0, 1.0, 0.0, 0.5 )
-	
-	local function drawFunc()
-		glVertex( 0, 0, -8)
-		glVertex( 0, 0, 8)
-		glVertex( 48, 0, -3)
-
-		glVertex( 0, 0,  8)
-		glVertex( 48, 0, 3)
-		glVertex( 48, 0, -3 )
-		
-		glVertex( 50, 0,  0)
-		glVertex( 48, 0, 3)
-		glVertex( 48, 0, -3 )
-		
-		glVertex( 50, 0, 0)
-		glVertex( 30, 0, -30 )
-		glVertex( 80, 0, 0 )
-
-		glVertex( 50, 0, 0)
-		glVertex( 80, 0, 0 )
-		glVertex( 30, 0, 30 )
-	end
   
 	--local height = spGetGroundHeight( centerX, centerZ )
 	local transSpace = ud["zsize"] * 4   --should be ysize but its not there?!?
