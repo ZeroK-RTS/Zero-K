@@ -26,8 +26,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-if (not gl.CreateShader) then
-	Spring.Log("Commander Skins", LOG.WARNING, "Shaders not supported, disabling.")
+if not (gl.CreateShader and Platform.glHaveGL4) then
+	Spring.Log("Commander Skins", LOG.WARNING, "Shaders not supported, disabling.", gl.CreateShader, Platform.glHaveGL4)
 	return false
 end
 
