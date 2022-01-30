@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date      = "May 2020",
 		license   = "GPL V2",
 		layer     = 0,
-		enabled   = false and Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+		enabled   = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 	}
 end
 
@@ -19,6 +19,18 @@ end
 if gadgetHandler:IsSyncedCode() then
 	return
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Unsynced
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+if (not gl.CreateShader) then
+	Spring.Log("Commander Skins", LOG.WARNING, "Shaders not supported, disabling.")
+	return false
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
