@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		name    = "Structure death flatten fix",
 		desc    = "Remove engine structure terraform to fix post-nuke 'foundation' remains.",
 		author  = "GoogleFrog",
-		date    = "1 Jan 2022",
+		date    = "31 Jan 2022",
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
 		enabled = true
