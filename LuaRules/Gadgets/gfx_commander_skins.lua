@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date      = "May 2020",
 		license   = "GPL V2",
 		layer     = 0,
-		enabled   = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+		enabled   = false and Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 	}
 end
 
