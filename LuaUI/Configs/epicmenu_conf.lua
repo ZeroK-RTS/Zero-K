@@ -413,6 +413,8 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 	{
 		name = 'Hardware Cursor',
 		type = 'bool',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		--advanced = true, -- The temp toggle is somewhat useful.
 		springsetting = 'HardwareCursor',
 		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
@@ -494,7 +496,7 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"water " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 
@@ -507,13 +509,14 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"Shadows " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 	AddOption(pathGraphicsMap,
 	{
 		name = 'Shadow detail level',
-		desc = 'How detailed shadows are.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096, 8192, 16384},
 		springsetting = 'ShadowMapSize',
@@ -565,7 +568,8 @@ local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	AddOption(pathGraphicsExtras,
 	{
 		name = 'Particle density',
-		desc = 'How many visual effects can exist at the same time.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		min = 250,
 		max = 20000,
