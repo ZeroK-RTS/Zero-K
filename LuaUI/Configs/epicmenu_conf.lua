@@ -415,7 +415,7 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 		type = 'bool',
 		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
 		--advanced = true, -- The temp toggle is somewhat useful.
-		springsetting = 'HardwareCursor',\
+		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
 	
