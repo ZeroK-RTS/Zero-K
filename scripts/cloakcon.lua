@@ -33,7 +33,8 @@ local runspeed = 1.37 * (UnitDefs[unitDefID].speed / 57)
 --------------------------------------------------------------------------------
 
 local function GetSpeedMod()
-	return (GG.att_MoveChange[unitID] or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function IsBuilding()

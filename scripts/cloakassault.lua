@@ -39,7 +39,8 @@ local stride_top = -0.5
 local stride_bottom = -2.75
 
 local function GetSpeedMod()
-	return (GG.att_MoveChange[unitID] or 1)
+	-- disallow zero (instant turn instead)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function walk()
