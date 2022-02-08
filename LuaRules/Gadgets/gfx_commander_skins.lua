@@ -382,6 +382,7 @@ local function ProcessUnits(units, drawFlags)
 end
 
 local function ExecuteDrawPass(drawPass)
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
 	for shaderId, data in pairs(unitDrawBins[drawPass]) do
 		for _, texAndObj in pairs(data) do
 			for bp, tex in pairs(texAndObj.textures) do
@@ -390,7 +391,9 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				unitIDs[#unitIDs + 1] = unitID
+				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+					unitIDs[#unitIDs + 1] = unitID
+				end
 			end
 
 			SetFixedStatePre(drawPass, shaderId)
