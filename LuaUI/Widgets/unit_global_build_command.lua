@@ -107,8 +107,8 @@ options_order = {
 	'intelliCost',
 	'alwaysShow',
 	'drawIcons',
-	'selectionOverrideRankOption',
 	'isSelectionOverrideSetOption',
+	'selectionOverrideRankOption',
 }
 
 options = {
@@ -182,18 +182,18 @@ options = {
 		value = true,
 	},
 
-	selectionOverrideRankOption = {
+	isSelectionOverrideSetOption = {
 		name = "Global build overrides selection rank",
 		desc = "Units controlled by global build command will be treated as a different selection rank.",
 		type = "bool",
 		value = true,
 		noHotkey = true,
 		OnChange = function (self)
-			 WG.GlobalBuildCommand.SelectionOverrideRank = self.value
+			 WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
 		end
 	},
 
-	isSelectionOverrideSetOption = {
+	selectionOverrideRankOption = {
 		name = 'Global build selection override:',
 		desc = "Units controlled by global build command are treated as this selection rank, if override is enabled.",
 		type = 'number',
@@ -202,7 +202,7 @@ options = {
 		tooltip_format = "%.0f",
 		noHotkey = true,
 		OnChange = function (self)
-			 WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
+			 WG.GlobalBuildCommand.SelectionOverrideRank = self.value
 		end
 	},
 
@@ -410,8 +410,8 @@ function widget:Initialize()
 		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
 		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
 		IsControllingUnit = function(id) return allBuilders[id] and allBuilders[id].include end,
-		IsSelectionOverrideSet = 0,
-		SelectionOverrideRank = true,
+		IsSelectionOverrideSet = true,
+		SelectionOverrideRank = 0,
 	}
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then
