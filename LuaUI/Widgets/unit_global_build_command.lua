@@ -107,6 +107,8 @@ options_order = {
 	'intelliCost',
 	'alwaysShow',
 	'drawIcons',
+	'selectionOverrideRankOption',
+	'isSelectionOverrideSetOption',
 }
 
 options = {
@@ -179,6 +181,31 @@ options = {
 		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
 		value = true,
 	},
+
+	selectionOverrideRankOption = {
+		name = "Global build overrides selection rank",
+		desc = "Units controlled by global build command will be treated as a different selection rank.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			 WG.GlobalBuildCommand.SelectionOverrideRank = self.value
+		end
+	},
+
+	isSelectionOverrideSetOption = {
+		name = 'Global build selection override:',
+		desc = "Units controlled by global build command are treated as this selection rank, if override is enabled.",
+		type = 'number',
+		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+		OnChange = function (self)
+			 WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
+		end
+	},
+
 }
 
 -- "Localized" API calls, because they run ~33% faster in lua.
@@ -382,7 +409,9 @@ function widget:Initialize()
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
 		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
-		IsControllingUnit = function(id) return allBuilders[id] and allBuilders[id].include end
+		IsControllingUnit = function(id) return allBuilders[id] and allBuilders[id].include end,
+		IsSelectionOverrideSet = 0,
+		SelectionOverrideRank = true,
 	}
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then
