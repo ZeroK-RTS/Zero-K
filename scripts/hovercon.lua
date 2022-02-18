@@ -8,6 +8,7 @@ local neck = piece "neck"
 local gun = piece "gun"
 local ground1 = piece "ground1"
 local wakes = {}
+
 for i = 1, 8 do
 	wakes[i] = piece ("wake"..i)
 end
@@ -16,6 +17,43 @@ local curTerrainType = 0
 local wobble_dir = true
 
 local SIG_BUILD = 1
+
+local function SetupHeat()
+	local ud = UnitDefs[unitDefID]
+	local cp = ud.customParams
+	return tonumber(cp.heat_per_shot), (tonumber(cp.heat_decay) or 0)/30, tonumber(cp.heat_max_slow), tonumber(cp.heat_initial) or 0
+end
+local heatPerShot, heatDecay, heatMaxSlow, currentHeat = SetupHeat()
+
+local function UpdateReloadTime()
+	local reloadMult = 1 - currentHeat * heatMaxSlow
+	Spring.SetUnitRulesParam(unitID, "selfBuildChange", reloadMult, LOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "heat_bar", currentHeat, LOS_ACCESS)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function HeatUpdateThread()
+	while true do
+		UpdateReloadTime()
+		Sleep(33)
+		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
+		if not stunned_or_inbuild then
+			local decayMult = (GG.att_EconomyChange[unitID] or 1)
+			local bp = Spring.GetUnitCurrentBuildPower(unitID)
+
+			if decayMult > 0 then
+				currentHeat = currentHeat - heatDecay*decayMult + bp * heatPerShot
+				if currentHeat < 0 then
+					currentHeat = 0
+				end
+				if currentHeat > 1 then
+					currentHeat = 1
+				end
+				UpdateReloadTime()
+			end
+		end
+	end
+end
 
 local function HoveringAnimations () -- wobbling, waves and dust clouds
 	local i = 1
@@ -51,6 +89,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(HoveringAnimations)
 	Spring.SetUnitNanoPieces(unitID, {beam})
+	StartThread(HeatUpdateThread)
 end
 
 local function BuildAnim (heading)

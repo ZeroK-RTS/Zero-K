@@ -26,6 +26,10 @@ return { hovercon = {
     modelradius    = [[25]],
     selection_scale = 1.2,
     turnatfullspeed_hover = [[1]],
+    heat_per_shot  = 0.02, -- Heat is always a number between 0 and 1
+    heat_decay     = 1/6, -- Per second
+    heat_max_slow  = 0.5,
+    heat_initial   = 1,
   },
 
   energyUse           = 0,
@@ -34,7 +38,7 @@ return { hovercon = {
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[builder]],
-  maxDamage           = 960,
+  maxDamage           = 940,
   maxSlope            = 36,
   maxVelocity         = 2.9,
   movementClass       = [[HOVER2]],
@@ -56,7 +60,7 @@ return { hovercon = {
   sonarDistance       = 300,
   turninplace         = 0,
   turnRate            = 1100,
-  workerTime          = 5,
+  workerTime          = 10,
 
   featureDefs         = {
 

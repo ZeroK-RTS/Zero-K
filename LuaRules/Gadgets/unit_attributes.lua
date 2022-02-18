@@ -406,12 +406,12 @@ function UpdateUnitAttributes(unitID, frame)
 	-- Increased reload from CAPTURE --
 	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
 	
-	local disarmed = spGetUnitRulesParam(unitID,"disarmed") or 0
-	local completeDisable = (spGetUnitRulesParam(unitID,"morphDisable") or 0)
-	if spGetUnitRulesParam(unitID,"planetwarsDisable") == 1 then
+	local disarmed = spGetUnitRulesParam(unitID, "disarmed") or 0
+	local completeDisable = (spGetUnitRulesParam(unitID, "morphDisable") or 0)
+	if spGetUnitRulesParam(unitID, "planetwarsDisable") == 1 then
 		completeDisable = 1
 	end
-	local crashing = spGetUnitRulesParam(unitID,"crashing") or 0
+	local crashing = spGetUnitRulesParam(unitID, "crashing") or 0
 	
 	-- Unit speed change (like sprint) --
 	local upgradesSpeedMult   = spGetUnitRulesParam(unitID, "upgradesSpeedMult")
@@ -419,13 +419,14 @@ function UpdateUnitAttributes(unitID, frame)
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
 	local selfIncomeChange = (spGetUnitRulesParam(unitID, "selfIncomeChange") or 1) * (GG.unit_handicap[unitID] or 1)
 	local selfMaxAccelerationChange = spGetUnitRulesParam(unitID, "selfMaxAccelerationChange") --only exist in airplane??
+	local selfBuildChange = spGetUnitRulesParam(unitID, "selfBuildChange")
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
 	if slowState and slowState > 0.5 then
 		slowState = 0.5 -- Maximum slow
 	end
-	local zombieSpeedMult = spGetUnitRulesParam(unitID,"zombieSpeedMult")
+	local zombieSpeedMult = spGetUnitRulesParam(unitID, "zombieSpeedMult")
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
 	-- Disable
@@ -450,7 +451,7 @@ function UpdateUnitAttributes(unitID, frame)
 		local baseSpeedMult   = (1 - (slowState or 0))*(zombieSpeedMult or 1)
 		
 		local econMult   = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)
-		local buildMult  = (baseSpeedMult)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
+		local buildMult  = (baseSpeedMult)*(selfBuildChange or 1)*(1 - disarmed)*(1 - completeDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
 		local moveMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(1 - completeDisable)*(upgradesSpeedMult or 1)
 		local turnMult   = (baseSpeedMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - completeDisable)
 		local reloadMult = (baseSpeedMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - completeDisable)
