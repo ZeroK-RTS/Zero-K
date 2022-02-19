@@ -210,6 +210,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "disableresurrect",
+    name        = "Disable resurrect",
+    desc        = "Removes resurrect abilities from the game",
+    type        = "bool",
+    section     = "experimental",
+    def         = false,
+  },
+  {
     key    = "shuffle",
     name   = "Start Boxes",
     desc   = "Start box settings.",

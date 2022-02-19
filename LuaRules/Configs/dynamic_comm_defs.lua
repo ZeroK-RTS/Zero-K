@@ -29,6 +29,7 @@ if (Spring.GetModOptions) then
 end
 
 local moduleImagePath = "unitpics/"
+local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or (Spring.GetModOptions().disableresurrect == "1")
 
 ------------------------------------------------------------------------
 -- Module Definitions
@@ -654,7 +655,7 @@ local moduleDefs = {
 		image = moduleImagePath .. "module_resurrect.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
-		requireChassis = {"support", "knight"},
+		requireChassis = disableResurrect and {} or {"support", "knight"},
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)

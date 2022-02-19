@@ -475,6 +475,20 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Resurrect
+--
+
+if (modOptions and (modOptions.disableresurrect == 1 or modOptions.disableresurrect == "1")) then
+	for name, unitDef in pairs(UnitDefs) do
+		if (unitDef.canresurrect) then
+			unitDef.canresurrect = false
+		end
+	end
+
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- unitspeedmult
 --
 
