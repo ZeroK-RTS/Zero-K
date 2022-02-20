@@ -15,6 +15,8 @@ local smokePiece = {base, turret}
 
 local RESTORE_DELAY = 4000
 
+local lastPitch = 0
+
 -- Signal definitions
 local SIG_AIM = 2
 
@@ -60,6 +62,14 @@ local function HoverFX()
 	end
 end
 
+local function HeadsUp(duration)
+	Turn(turret, x_axis, math.rad(28), math.rad(90))
+	Turn(barrel1, x_axis, -(lastPitch+math.rad(28)), math.rad(90))
+	Sleep(duration)
+	Turn(turret, x_axis, 0, math.rad(90))
+	Turn(barrel1, x_axis, -lastPitch, math.rad(90))
+end
+
 function script.setSFXoccupy(num)
 	curTerrainType = num
 end
@@ -85,6 +95,8 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+
+	lastPitch = pitch
 
 	while firing do
 		Sleep(100)
@@ -117,6 +129,7 @@ end
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
 function script.FireWeapon()
 	firing = true
+	StartThread(HeadsUp, beam_duration)
 	Sleep (beam_duration)
 	firing = false
 end
