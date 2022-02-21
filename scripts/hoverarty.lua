@@ -17,6 +17,7 @@ local RESTORE_DELAY = 4000
 
 -- Signal definitions
 local SIG_AIM = 2
+local SIG_WOBBLE = 4
 
 local curTerrainType = 4
 local wobble = false
@@ -34,16 +35,18 @@ local function Tilt()
 end
 
 local function WobbleUnit()
-	StartThread(Tilt)
+	Signal(SIG_WOBBLE)
+	SetSignalMask(SIG_WOBBLE)
 	while true do
+		local rand = 2.5 + math.random()
 		if wobble == true then
-			Move(base, y_axis, 2, 3)
+			Move(base, y_axis, 2, rand)
 		end
 		if wobble == false then
-			Move(base, y_axis, -2, 3)
+			Move(base, y_axis, -2, rand)
 		end
 		wobble = not wobble
-		Sleep(1500)
+		Sleep(( 4000 / rand ) + ( 1000 / 6 ))
 	end
 end
 
@@ -68,6 +71,7 @@ function script.Create()
 	Hide(flare)
 
 	StartThread(WobbleUnit)
+	StartThread(Tilt)
 	
 	for i = 1, 4 do
 		Hide(wheels[i])
