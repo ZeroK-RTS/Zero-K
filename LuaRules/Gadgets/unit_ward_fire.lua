@@ -299,7 +299,8 @@ end
 local function StateToggleCommand(unitID, cmdParams, cmdOptions, cmdID)
 	local unitData = IterableMap.Get(wardUnits, unitID)
 	local mexData = IterableMap.Get(mexUnits, unitID)
-	if (unitData or mexData) and unitData.def.wardFireCmdID == cmdID then
+	local def = (unitData and unitData.def) or (mexData and mexData.def)
+	if def and (def.wardFireCmdID or CMD_FIRE_AT_SHIELD) == cmdID then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, cmdID)
 		
