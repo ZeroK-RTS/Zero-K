@@ -34,6 +34,7 @@ return {
 	GBCANCEL = 13926, -- global build command area cancel cmd
 	STOP_PRODUCTION = 13954,
 	SELECTION_RANK = 13987,
+	FORMATION_RANK = 13988,
 	SELECT_MISSILES = 14001,
 	BUILD_PLATE = 14002,
 
