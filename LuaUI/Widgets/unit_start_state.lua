@@ -610,7 +610,7 @@ options = {
 
 	commander_formation_rank = {
 		name = "  Formation Rank",
-		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
+		desc = "Formation Rank: units of lower rank line up in front of units of higher rank when given line movement orders.",
 		type = 'number',
 		value = 2,
 		min = 0,
