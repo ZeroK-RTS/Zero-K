@@ -200,16 +200,8 @@ function script.AimWeapon(num, heading, pitch)
 		
 		isClosed = false
 	end
-	
-	local function LeanControl(angle)
-		if angle < 0 then
-			return -angle
-		else
-			return 0
-		end
-	end
-	
-	local lean = LeanControl(pitch + math.rad(30))--min pitch plus pi/6 is -60 degrees or approximately 1 in radians
+
+	local lean = math.max(-pitch - math.rad(30), 0) --min pitch plus pi/6 is -60 degrees or approximately 1 in radians
 	local wh = math.rad(-30) + (lean * math.rad(90));
 	local ar = math.rad(30) + (lean * math.rad(5));
 	local ha = math.rad(30) - (lean * math.rad(25));
