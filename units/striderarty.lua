@@ -9,6 +9,7 @@ return { striderarty = {
   buildPic               = [[striderarty.png]],
   canGuard               = true,
   canMove                = true,
+  canManualFire          = true,
   canPatrol              = true,
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
@@ -17,7 +18,8 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    bait_level_default = 2,
+    bait_level_default   = 2,
+    can_disable_attack   = true
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -47,13 +49,16 @@ return { striderarty = {
   workerTime             = 0,
 
   weapons                = {
-
     {
       def                = [[ROCKET]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
-
+    {
+      def                = [[BOGUS_ROCKET]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
+    },
   },
 
 
@@ -111,6 +116,59 @@ return { striderarty = {
       wobble                  = 7000,
     },
 
+    BOGUS_ROCKET = {
+      name                    = [[Long-Range Rocket Battery]],
+      areaOfEffect            = 128,
+      avoidFeature            = false,
+      avoidGround             = false,
+      burst                   = 20,
+      burstrate               = 0.1,
+      cegTag                  = [[RAVENTRAIL_Light]],
+      craterBoost             = 1,
+      craterMult              = 2,
+      commandfire             = true,
+
+      customParams              = {
+        force_ignore_ground = [[1]],
+        light_camera_height = 2500,
+        light_color = [[0.35 0.17 0.04]],
+        light_radius = 400,
+        bogus = 1,
+      },
+
+      damage                  = {
+        default = 220.5,
+        planes  = 220.5,
+      },
+
+      dance                   = 20,
+      edgeEffectiveness       = 0.5,
+      explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
+      fireStarter             = 100,
+      flightTime              = 8,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[hobbes_nohax.s3o]],
+      noSelfDamage            = true,
+      projectiles             = 2,
+      range                   = 1450,
+      reloadtime              = 30,
+      smokeTrail              = false,
+      soundHit                = [[weapon/missile/rapid_rocket_hit]],
+      soundHitVolume          = 5,
+      soundStart              = [[weapon/missile/rapid_rocket_fire]],
+      soundStartVolume        = 5,
+      startVelocity           = 100,
+      tolerance               = 512,
+      trajectoryHeight        = 1,
+      turnRate                = 2500,
+      turret                  = true,
+      weaponAcceleration      = 100,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 250,
+      wobble                  = 7000,
+    },
   },
 
 

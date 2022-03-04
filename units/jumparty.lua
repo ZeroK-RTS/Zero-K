@@ -8,6 +8,7 @@ return { jumparty = {
   builder                = false,
   buildPic               = [[jumparty.png]],
   canGuard               = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
@@ -18,7 +19,8 @@ return { jumparty = {
 
   customParams           = {
     bait_level_default = 1,
-    selection_scale   = 0.92,
+    selection_scale    = 0.92,
+    can_disable_attack = true
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -57,12 +59,14 @@ return { jumparty = {
   workerTime             = 0,
 
   weapons                = {
-
     {
       def                = [[NAPALM_SPRAYER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
-
+    {
+      def                = [[BOGUS_NAPALM_SPRAYER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+    },
   },
 
 
@@ -92,6 +96,58 @@ return { jumparty = {
         light_radius = 460,
       },
       
+      damage                  = {
+        default = 80,
+        planes  = 80,
+      },
+
+      explosionGenerator      = [[custom:napalm_firewalker_small]],
+      firestarter             = 180,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 0.1,
+      projectiles             = 10,
+      range                   = 900,
+      reloadtime              = 12,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 5,
+      soundHit                = [[weapon/cannon/wolverine_hit]],
+      soundStart              = [[weapon/cannon/wolverine_fire]],
+      soundStartVolume        = 3.2,
+      sprayangle              = 2500,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 320,
+    },
+
+    BOGUS_NAPALM_SPRAYER = {
+      name                    = [[Bogus Napalm Mortar]],
+      accuracy                = 400,
+      areaOfEffect            = 128,
+      avoidFeature            = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+      cegTag                  = [[flamer]],
+      commandfire             = true,
+
+      customParams              = {
+        setunitsonfire = "1",
+        burntime = 60,
+        force_ignore_ground = [[1]],
+
+        area_damage = 1,
+        area_damage_radius = 64,
+        area_damage_dps = 20,
+        area_damage_duration = 16,
+
+        --lups_heat_fx = [[firewalker]],
+        light_camera_height = 2500,
+        light_color = [[0.25 0.13 0.05]],
+        light_radius = 460,
+        bogus = 1,
+      },
+
       damage                  = {
         default = 80,
         planes  = 80,

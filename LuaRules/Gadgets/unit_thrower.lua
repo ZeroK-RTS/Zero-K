@@ -104,21 +104,8 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 
 include("LuaRules/Configs/customcmds.h.lua")
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
-
-local unitBlockAttackCmd = {
-	id      = CMD_DISABLE_ATTACK,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Disable Attack',
-	action  = 'disableattack',
-	tooltip = 'Allow attack commands',
-	params  = {0, 'Allowed','Blocked'}
-}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -258,23 +245,8 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function BlockAttackToggle(unitID, cmdParams)
-	local data = IterableMap.Get(throwUnits, unitID)
-	if data then
-		local state = cmdParams[1]
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_DISABLE_ATTACK)
-		
-		if (cmdDescID) then
-			unitBlockAttackCmd.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitBlockAttackCmd.params})
-		end
-		data.blockAttack = (state == 1)
-	end
-end
-
 function gadget:AllowCommand_GetWantedCommand()
 	return {
-		[CMD_DISABLE_ATTACK] = true,
 		[CMD_ATTACK] = true,
 		[CMD_INSERT] = true,
 		[CMD_UNIT_SET_TARGET] = true,
@@ -303,11 +275,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true  -- command was not used
 	end
 	
-	if (cmdID ~= CMD_DISABLE_ATTACK) then
-		return true  -- command was not used
-	end
-	BlockAttackToggle(unitID, cmdParams)
-	return false  -- command was used
+	return true  -- command was not used
 end
 
 ----------------------------------------------------------------------------------------------
@@ -323,9 +291,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 				weaponNum = 1,
 			}
 		)
-		
-		spInsertUnitCmdDesc(unitID, unitBlockAttackCmd)
-		BlockAttackToggle(unitID, {0})
 	end
 end
 
@@ -338,16 +303,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-local externalFunc = {}
-function externalFunc.BlockAttack(unitID)
-	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
-	return unitData and unitData.blockAttack
-end
-
 function gadget:Initialize()
-	-- register command
-	gadgetHandler:RegisterCMDID(CMD_DISABLE_ATTACK)
-	
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
@@ -355,8 +311,6 @@ function gadget:Initialize()
 	for id, _ in pairs(throwWeaponDef) do
 		Script.SetWatchProjectile(id, true)
 	end
-	
-	GG.Thrower = externalFunc
 end
 
 local function UpdateTrajectory(unitID, data)

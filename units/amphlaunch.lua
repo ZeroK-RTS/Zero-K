@@ -23,6 +23,7 @@ return { amphlaunch = {
     thrower_gather     = 160,
     attack_toggle      = [[1]],
     can_target_allies  = 1,
+    can_disable_attack = true
   },
 
   explodeAs              = [[BIG_UNITEX]],
