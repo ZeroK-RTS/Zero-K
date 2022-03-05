@@ -107,6 +107,8 @@ options_order = {
 	'intelliCost',
 	'alwaysShow',
 	'drawIcons',
+	'isSelectionOverrideSetOption',
+	'selectionOverrideRankOption',
 }
 
 options = {
@@ -179,6 +181,31 @@ options = {
 		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
 		value = true,
 	},
+
+	isSelectionOverrideSetOption = {
+		name = "Global build overrides selection rank",
+		desc = "Units controlled by global build command will be treated as a different selection rank.",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			 WG.GlobalBuildCommand.IsSelectionOverrideSet = self.value
+		end
+	},
+
+	selectionOverrideRankOption = {
+		name = 'Global build selection override:',
+		desc = "Units controlled by global build command are treated as this selection rank, if override is enabled.",
+		type = 'number',
+		value = 0, -- This should be 0 because otherwise Ctrl selection keys work on the unit.
+		min = 0, max = 3, step = 1,
+		tooltip_format = "%.0f",
+		noHotkey = true,
+		OnChange = function (self)
+			 WG.GlobalBuildCommand.SelectionOverrideRank = self.value
+		end
+	},
+
 }
 
 -- "Localized" API calls, because they run ~33% faster in lua.
@@ -381,7 +408,10 @@ function widget:Initialize()
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
-		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+		IsControllingUnit = function(id) return allBuilders[id] and allBuilders[id].include end,
+		IsSelectionOverrideSet = true,
+		SelectionOverrideRank = 0,
 	}
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then
@@ -1163,7 +1193,7 @@ end
 --  Thanks to Niobium for pointing out CommandNotify().
 function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	if id == CMD_GLOBAL_BUILD then
-		ApplyStateToggle()
+		SetGlobalBuildState(params[1])
 		return true
 	end
 	
@@ -1328,11 +1358,11 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	return false
 end
 
-function ApplyStateToggle()
+function SetGlobalBuildState(state)
 	local selectedUnits = spGetSelectedUnits()
 	for _,unitID in pairs(selectedUnits) do
 		if allBuilders[unitID] then
-			allBuilders[unitID].include = not allBuilders[unitID].include
+			allBuilders[unitID].include = state == 1
 			if allBuilders[unitID].include then
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not includedBuilders[unitID] and not nanoframe then
