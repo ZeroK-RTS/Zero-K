@@ -14,9 +14,12 @@ local flare = piece 'firepoint1'
 local smokePiece = {base, turret}
 
 local RESTORE_DELAY = 4000
+local WOBBLE_HEIGHT = 2
+local WOBBLE_SPEED = 2.5
 
 -- Signal definitions
 local SIG_AIM = 2
+local SIG_WOBBLE = 4
 
 local curTerrainType = 4
 local wobble = false
@@ -34,16 +37,18 @@ local function Tilt()
 end
 
 local function WobbleUnit()
-	StartThread(Tilt)
+	Signal(SIG_WOBBLE)
+	SetSignalMask(SIG_WOBBLE)
 	while true do
+		local rand = WOBBLE_SPEED + math.random()
 		if wobble == true then
-			Move(base, y_axis, 2, 3)
+			Move(base, y_axis, WOBBLE_HEIGHT, rand)
 		end
 		if wobble == false then
-			Move(base, y_axis, -2, 3)
+			Move(base, y_axis, -WOBBLE_HEIGHT, rand)
 		end
 		wobble = not wobble
-		Sleep(1500)
+		Sleep(( 2000 * WOBBLE_HEIGHT / rand ) + ( 1000 / 6 ))
 	end
 end
 
@@ -68,6 +73,7 @@ function script.Create()
 	Hide(flare)
 
 	StartThread(WobbleUnit)
+	StartThread(Tilt)
 	
 	for i = 1, 4 do
 		Hide(wheels[i])
@@ -117,7 +123,11 @@ end
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
 function script.FireWeapon()
 	firing = true
+	Signal(SIG_WOBBLE)
+	Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED)
 	Sleep (beam_duration)
+	wobble = false
+	StartThread(WobbleUnit)
 	firing = false
 end
 
