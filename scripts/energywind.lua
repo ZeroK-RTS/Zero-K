@@ -11,21 +11,27 @@ local UPDATE_PERIOD = 1000
 local BUILD_PERIOD = 500
 
 local turnSpeed = math.rad(20)
+local waterSpin = math.rad(30)
+local waterMaxSpin = math.rad(2)
 
 local isWind, baseWind, rangeWind
 
 local function BobTidal()
-	baseDirection = baseDirection + math.random(0,math.rad(2))
+	local spinSpeed	= 0 -- radian speed
 	while true do
-		Turn(cradle, y_axis, baseDirection, math.rad(1))
+		
+		spinSpeed = math.max(-waterMaxSpin),math.min(waterMaxSpin, 0.99*spinSpeed + (math.random() - 0.5) / 100))
+		Spin(cradle, y_axis, spinSpeed)
+		Spin(fan, z_axis, waterSpin + spinSpeed)
 		
 		Move(cradle, x_axis, math.random(-2,2), 0.2)
-		Move(cradle, y_axis, math.random(-0.5,0.5) - 51, 0.05)
+		Move(cradle, y_axis, math.random(-1,1) * 0.5 - 51, 0.05)
 		Move(cradle, z_axis, math.random(-2,2), 0.2)
 		Sleep(1000)
 		
 		if GG.Wind_SpinDisabled then
 			StopSpin(fan, z_axis)
+			StopSpin(cradle, y_axis)
 			return
 		end
 	end
@@ -64,7 +70,7 @@ function InitializeWind()
 		Hide(base)
 		Hide(flaot)
 		Move(cradle, y_axis, -51)
-		Turn(fan, x_axis, math.rad(90))
+		Turn(fan, x_axis, hpi)
 		Move(fan, z_axis, 9)
 		Move(fan, y_axis, -5)
 		--[[ diagonal down, needs teamcolour
@@ -77,13 +83,13 @@ function InitializeWind()
 		Move(fan, z_axis, 14)
 		Move(fan, y_axis, 18)
 		--]]
-		Spin(fan, z_axis, math.rad(30))
+		Spin(fan, z_axis, waterSpin)
 	end
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	baseDirection = math.random(0,GG.Script.tau)
+	baseDirection = math.random() * GG.Script.tau
 	Turn(base, y_axis, baseDirection)
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
 	InitializeWind()
