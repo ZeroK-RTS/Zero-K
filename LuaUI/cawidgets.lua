@@ -298,6 +298,12 @@ local callInLists = {
 	'TweakGetTooltip',
 	'GameProgress',
 	'UnsyncedHeightMapUpdate',
+	'VisibleUnitAdded',
+	'VisibleUnitRemoved',
+	'VisibleUnitsChanged',
+	'AlliedUnitAdded',
+	'AlliedUnitRemoved',
+	'AlliedUnitsChanged',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -2421,6 +2427,49 @@ end
 function widgetHandler:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
 	for _, w in r_ipairs(self.StockpileChangedList) do
 		w:StockpileChanged(unitID, unitDefID, unitTeam, weaponNum, oldCount, newCount)
+	end
+end
+
+
+function widgetHandler:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+Spring.Echo("VisibleUnitAdded")
+	for _, w in ipairs(self.VisibleUnitAddedList) do
+		w:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+	end
+end
+
+
+function widgetHandler:VisibleUnitRemoved(unitID)
+	for _, w in ipairs(self.VisibleUnitRemovedList) do
+		w:VisibleUnitRemoved(unitID)
+	end
+end
+
+
+function widgetHandler:VisibleUnitsChanged(visibleUnits, numVisibleUnits)
+	for _, w in ipairs(self.VisibleUnitsChangedList) do
+		w:VisibleUnitsChanged(visibleUnits, numVisibleUnits)
+	end
+end
+
+
+function widgetHandler:AlliedUnitAdded(unitID, unitDefID, unitTeam)
+	for _, w in ipairs(self.AlliedUnitAddedList) do
+		w:AlliedUnitAdded(unitID, unitDefID, unitTeam)
+	end
+end
+
+
+function widgetHandler:AlliedUnitRemoved(unitID)
+	for _, w in ipairs(self.AlliedUnitRemovedList) do
+		w:AlliedUnitRemoved(unitID)
+	end
+end
+
+
+function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
+	for _, w in ipairs(self.AlliedUnitsChangedList) do
+		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
 	end
 end
 
