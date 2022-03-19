@@ -25,6 +25,18 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	unitConf[unitDefID] = {scale=scale, iconSize=scale, height=unitDef.height}
 end
 
+-----------------------------------------------------------------
+-- Configuration Constants
+-----------------------------------------------------------------
+
+local STRENGTH_MULT_MIN = 0.1
+local STRENGTH_MULT_MAX = 12
+local DEFAULT_STRENGTH_MULT = 0.5
+local STRENGTH_MAGIC_NUMBER = 5.5
+
+local SUBTLE_MIN = 400
+local SUBTLE_MAX = 4000
+
 local shaderConfig = {
 	TRANSPARENCY = 1, -- transparency of the stuff drawn
 	HEIGHTOFFSET = 4, -- Additional height added to everything
@@ -49,7 +61,111 @@ local shaderConfig = {
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
 }
 
----- GL4 Backend Stuff----
+-----------------------------------------------------------------
+-- Configuration
+-----------------------------------------------------------------
+
+local configStrengthMult = DEFAULT_STRENGTH_MULT
+local scaleWithHeight = true
+local functionScaleWithHeight = true
+local zoomScaleRange = 0.1
+
+options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options = {
+	thickness = {
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 0.2, max = 2, step = 0.01,
+		value = DEFAULT_STRENGTH_MULT,
+		OnChange = function (self)
+			configStrengthMult = self.value
+		end,
+	},
+	scaleRange = {
+		name = 'Zoom Scale Minimum',
+		desc = 'Minimum outline thickness muliplier when zoomed out.',
+		type = 'number',
+		min = 0, max = 1, step = 0.01,
+		value = zoomScaleRange,
+		OnChange = function (self)
+			zoomScaleRange = self.value
+		end,
+	},
+	scaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			scaleWithHeight = self.value
+			if not scaleWithHeight then
+				configStrengthMult = 1
+			end
+		end,
+	},
+	functionScaleWithHeight = {
+		name = 'Subtle Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out, in a subtle way.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			functionScaleWithHeight = self.value
+			if not functionScaleWithHeight then
+				configStrengthMult = 1
+			end
+		end,
+	},
+}
+
+-----------------------------------------------------------------
+-- Zoom Scale Functions
+-----------------------------------------------------------------
+
+local function GetZoomScale()
+	if not (scaleWithHeight or functionScaleWithHeight) then
+		return 1
+	end
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	cameraHeight = math.max(1.0, cameraHeight)
+	--Spring.Echo("cameraHeight", cameraHeight, zoomScaleRange)
+
+	if functionScaleWithHeight then
+		if cameraHeight < SUBTLE_MIN then
+			return 1
+		end
+		if cameraHeight > SUBTLE_MAX then
+			return zoomScaleRange
+		end
+		
+		local zoomScale = (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)
+		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
+	end
+
+	local scaleFactor = 250.0 / cameraHeight
+	scaleFactor = math.min(math.max(zoomScaleRange, scaleFactor), 1.0)
+	--Spring.Echo("cameraHeight", cameraHeight, "scaleFactor", scaleFactor)
+	return scaleFactor
+end
+
+local function GetThicknessWithZoomScale()
+	local strengthMult = configStrengthMult*GetZoomScale()*STRENGTH_MAGIC_NUMBER
+	strengthMult = math.max(STRENGTH_MULT_MIN, math.min(STRENGTH_MULT_MAX, strengthMult))
+	return strengthMult
+end
+
+-----------------------------------------------------------------
+-- GL4 Backend Stuff
+-----------------------------------------------------------------
 local DrawPrimitiveAtUnitVBO = nil
 local DrawPrimitiveAtUnitShader = nil
 
@@ -475,7 +591,7 @@ function widget:DrawWorld()
 		resurrectionHalosShader:Activate()
 			resurrectionHalosShader:SetUniform("iconDistance", 99999) -- pass
 			resurrectionHalosShader:SetUniform("addRadius", 0)
-			resurrectionHalosShader:SetUniform("outlineWidth", (Spring.GetGameFrame()%60)/3)
+			resurrectionHalosShader:SetUniform("outlineWidth", GetThicknessWithZoomScale())
 		
 		if useStencil then -- https://learnopengl.com/Advanced-OpenGL/Stencil-testing
 			gl.DepthMask(false)
