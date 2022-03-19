@@ -1,13 +1,13 @@
 function widget:GetInfo()
-   return {
-      name      = "Unit Outlines GL4",
-      desc      = "An interesting way of doing unit outlines",
-      author    = "Beherith",
-      date      = "2022.03.05",
-      license   = "Lua: GNU GPL, v2 or later, GLSL code: (c) Beherith, mysterme@gmail.com ",
-      layer     = -50,
-      enabled   = false
-   }
+	return {
+		name      = "Unit Outlines GL4",
+		desc      = "An interesting way of doing unit outlines",
+		author    = "Beherith",
+		date      = "2022.03.05",
+		license   = "Lua: GNU GPL, v2 or later, GLSL code: (c) Beherith, mysterme@gmail.com ",
+		layer     = -50,
+		enabled   = false
+	}
 end
 
 local myvisibleUnits = {} -- table of unitID : unitDefID
@@ -15,7 +15,7 @@ local myvisibleUnits = {} -- table of unitID : unitDefID
 local resurrectionHalosVBO = nil
 local resurrectionHalosShader = nil
 local luaShaderDir = "LuaUI/Widgets/Include/"
-local texture = 'LuaUI/Images/halo.dds'
+--local texture = 'LuaUI/Images/halo.dds'
 
 local unitConf = {}
 
@@ -419,14 +419,7 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 	return  DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
 end
 
-local function initGL4()
-	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
-end
-
-
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
-	--if unitConf[unitDefID] == nil or Spring.GetUnitRulesParam(unitID, "resurrected") == nil then return end
-	
 	local gf = Spring.GetGameFrame()
 	myvisibleUnits[unitID] = unitDefID
 	pushElementInstance(
@@ -454,19 +447,11 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 end
 
 function widget:VisibleUnitRemoved(unitID)
-	--Spring.Echo("widget:VisibleUnitRemoved",unitID)
 	if resurrectionHalosVBO.instanceIDtoIndex[unitID] then 
 		popElementInstance(resurrectionHalosVBO, unitID)
 		myvisibleUnits[unitID] = nil
 	end
 end
-
-function widget:RecvLuaMsg(msg, playerID)
-	if msg:sub(1,18) == 'LobbyOverlayActive' then
-		chobbyInterface = (msg:sub(1,19) == 'LobbyOverlayActive1')
-	end
-end
-
 
 local GL_ALWAYS             = GL.ALWAYS
 local GL_EQUAL              = GL.EQUAL
@@ -479,13 +464,12 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if chobbyInterface then return end
 	if Spring.IsGUIHidden() then
 		return
 	end
 
 	if resurrectionHalosVBO.usedElements > 0 then
-		gl.Texture(0, texture)
+		--gl.Texture(0, texture)
 		gl.Texture(1, "$map_gbuffer_zvaltex")-- Texture file
 		gl.Texture(2, "$model_gbuffer_zvaltex")-- Texture file
 		resurrectionHalosShader:Activate()
@@ -493,7 +477,7 @@ function widget:DrawWorld()
 			resurrectionHalosShader:SetUniform("addRadius", 0)
 			resurrectionHalosShader:SetUniform("outlineWidth", (Spring.GetGameFrame()%60)/3)
 		
-		if useStencil then --	https://learnopengl.com/Advanced-OpenGL/Stencil-testing
+		if useStencil then -- https://learnopengl.com/Advanced-OpenGL/Stencil-testing
 			gl.DepthMask(false)
 			
 			-- FIRST PASS:
@@ -528,6 +512,10 @@ function widget:DrawWorld()
 		gl.Texture(1, false)-- Texture file
 		gl.Texture(2, false)-- Texture file
 	end
+end
+
+local function initGL4()
+	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
 end
 
 function widget:Initialize()
