@@ -34,7 +34,7 @@ local STRENGTH_MULT_MAX = 12
 local DEFAULT_STRENGTH_MULT = 0.6
 local STRENGTH_MAGIC_NUMBER = 6
 
-local SUBTLE_MIN = 400
+local SUBTLE_MIN = 150
 local SUBTLE_MAX = 4000
 
 local shaderConfig = {
