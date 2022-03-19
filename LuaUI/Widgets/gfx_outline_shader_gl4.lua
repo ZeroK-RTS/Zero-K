@@ -1,12 +1,12 @@
 function widget:GetInfo()
 	return {
-		name      = "Unit Outlines GL4",
+		name      = "Outline Shader GL4",
 		desc      = "An interesting way of doing unit outlines",
 		author    = "Beherith",
 		date      = "2022.03.05",
 		license   = "Lua: GNU GPL, v2 or later, GLSL code: (c) Beherith, mysterme@gmail.com ",
 		layer     = -50,
-		enabled   = false
+		enabled   = true
 	}
 end
 
@@ -31,8 +31,8 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 0.5
-local STRENGTH_MAGIC_NUMBER = 5.5
+local DEFAULT_STRENGTH_MULT = 0.6
+local STRENGTH_MAGIC_NUMBER = 6
 
 local SUBTLE_MIN = 400
 local SUBTLE_MAX = 4000
@@ -68,7 +68,7 @@ local shaderConfig = {
 local configStrengthMult = DEFAULT_STRENGTH_MULT
 local scaleWithHeight = true
 local functionScaleWithHeight = true
-local zoomScaleRange = 0.1
+local zoomScaleRange = 0.4
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
 options = {
