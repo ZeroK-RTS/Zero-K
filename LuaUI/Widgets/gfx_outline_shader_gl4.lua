@@ -31,7 +31,7 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 0.6
+local DEFAULT_STRENGTH_MULT = 0.5
 local STRENGTH_MAGIC_NUMBER = 6
 
 local SUBTLE_MIN = 150
@@ -100,9 +100,6 @@ options = {
 		noHotkey = true,
 		OnChange = function (self)
 			scaleWithHeight = self.value
-			if not scaleWithHeight then
-				configStrengthMult = 1
-			end
 		end,
 	},
 	functionScaleWithHeight = {
@@ -113,9 +110,6 @@ options = {
 		noHotkey = true,
 		OnChange = function (self)
 			functionScaleWithHeight = self.value
-			if not functionScaleWithHeight then
-				configStrengthMult = 1
-			end
 		end,
 	},
 }
