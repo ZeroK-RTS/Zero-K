@@ -158,11 +158,8 @@ end
 
 
 -- Jumping
-local turnSpeed
-
 function beginJump()
 	Signal(SIG_WALK)
-	--Turn(base, y_axis, 0, turnSpeed)
 	
 	Turn(rshoulder, x_axis, math.rad(25), math.rad(30))
 	Turn(rlarm, x_axis, math.rad(-25), math.rad(30))

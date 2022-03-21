@@ -16,10 +16,6 @@ local smokePiece = {pelvis, torso}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-
-local restore_delay = 3000
-local base_speed = 100
-
 local SIG_WALK = 1
 local SIG_AIM1 = 2
 local SIG_AIM2 = 4

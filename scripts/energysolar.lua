@@ -1,5 +1,3 @@
-local GetUnitStates = Spring.GetUnitStates
-
 local base = piece 'base'
 local dish1 = piece 'dish1'
 local dish2 = piece 'dish2'

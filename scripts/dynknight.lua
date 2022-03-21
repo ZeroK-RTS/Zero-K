@@ -102,7 +102,6 @@ end
 --------------------------------------------------------------------------------
 local armsFree = true
 local restoreHeading = 0
-local gun_num = 0
 
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons

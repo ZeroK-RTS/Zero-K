@@ -14,7 +14,6 @@ local smokePiece = {base}
 include "constants.lua"
 
 local gun_1 = false
-local firestate = Spring.GetUnitStates(unitID).firestate
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local function TiltWings()

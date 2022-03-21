@@ -40,8 +40,6 @@ local turretData = {
 	}
 }
 
-local gun_1, gun_2
-
 -- Signal definitions
 local SIG_MOVE = 8
 
