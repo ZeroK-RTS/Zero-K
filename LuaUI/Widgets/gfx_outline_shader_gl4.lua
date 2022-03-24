@@ -219,6 +219,7 @@ out DataVS {
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
+	float v_cameraDistance;
 	#if (FULL_ROTATION == 1)
 		mat3 v_fullrotation;
 	#endif
@@ -256,8 +257,8 @@ void main()
 	// TODO: take into account size of primitive before clipping
 
 	// this sets the num prims to 0 for units further from cam than iconDistance
-	float cameraDistance = length((cameraViewInv[3]).xyz - v_centerpos.xyz);
-	if (cameraDistance > iconDistance) v_numvertices = 0;
+	v_cameraDistance = length((cameraViewInv[3]).xyz - v_centerpos.xyz);
+	if (v_cameraDistance > iconDistance) v_numvertices = 0;
 
 	if (dot(v_centerpos.xyz, v_centerpos.xyz) < 1.0) v_numvertices = 0; // if the center pos is at (0,0,0) then we probably dont have the matrix yet for this unit, because it entered LOS but has not been drawn yet.
 
@@ -293,6 +294,7 @@ in DataVS {
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
+	float v_cameraDistance;
 	#if (FULL_ROTATION == 1)
 		mat3 v_fullrotation;
 	#endif
@@ -301,6 +303,7 @@ in DataVS {
 out DataGS {
 	vec4 g_color;
 	vec4 g_uv;
+	float g_cameraDistance;
 };
 
 mat3 rotY;
@@ -328,6 +331,7 @@ void offsetVertex4( float x, float y, float z, float u, float v){
 void main(){
 	uint numVertices = dataIn[0].v_numvertices;
 	centerpos = dataIn[0].v_centerpos;
+	g_cameraDistance = dataIn[0].v_cameraDistance;;
 	#if (BILLBOARD == 1 )
 		rotY = mat3(cameraViewInv[0].xyz,cameraViewInv[2].xyz, cameraViewInv[1].xyz); // swizzle cause we use xz
 	#else
@@ -412,6 +416,7 @@ uniform float outlineWidth;
 in DataGS {
 	vec4 g_color;
 	vec4 g_uv;
+	flaot g_cameraDistance; 
 };
 
 uniform sampler2D DrawPrimitiveAtUnitTexture;
@@ -450,11 +455,12 @@ void main(void)
 	
 	if (stencilPass > 0.5){
 		float nearest = (outlineWidth*20 + 1) *  (outlineWidth*20 + 1) ;
+		vec2 viewGeometryInv = 1.0 / viewGeometry.xy;
 		for (int x = -1 * resolution; x <= resolution; x++){
 			for (int y = -1* resolution; y <= resolution; y++){
 			
 				vec2 pixeloffset = vec2(float(x), float(y));
-				vec2 screendelta = pixeloffset / viewGeometry.xy;
+				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
 				
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
