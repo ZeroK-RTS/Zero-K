@@ -20,7 +20,7 @@ local function BobTidal()
 	local spinSpeed	= 0 -- radian speed
 	while true do
 		
-		spinSpeed = math.max(-waterMaxSpin),math.min(waterMaxSpin, 0.99*spinSpeed + (math.random() - 0.5) / 100))
+		spinSpeed = math.max(-waterMaxSpin, math.min(waterMaxSpin, 0.99*spinSpeed + (math.random() - 0.5) / 100)))
 		Spin(cradle, y_axis, spinSpeed)
 		Spin(fan, z_axis, waterSpin + spinSpeed)
 		
