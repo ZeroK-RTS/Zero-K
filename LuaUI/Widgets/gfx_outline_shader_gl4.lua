@@ -54,11 +54,12 @@ local shaderConfig = {
 	POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 256.0 / (gl_Position.w);",	--"g_uv.zw = dataIn[0].v_parameters.xy;", -- noop
 	POST_SHADING = "fragColor.rgba = texcolor;",
 	MAXVERTICES = 4, -- The max number of vertices we can emit, make sure this is consistent with what you are trying to draw (tris 3, quads 4, corneredrect 8, circle 64
-	USE_CIRCLES = 1, -- set to nil if you dont want circles
-	USE_CORNERRECT = 1, -- set to nil if you dont want cornerrect
-	USE_TRIANGLES = 1,
+	--USE_CIRCLES = 1, -- set to nil if you dont want circles
+	--USE_CORNERRECT = 1, -- set to nil if you dont want cornerrect
+	--USE_TRIANGLES = 1,
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
+	--DEBUGEDGES = 0, -- set to non-nil to debug the size of the rectangles
 }
 
 -----------------------------------------------------------------
@@ -448,7 +449,7 @@ void main(void)
 	//if ((modeldepth < 1.0) && (mapdepth > modeldepth)) discard; // model occluded behind map
 	
 	if (stencilPass > 0.5){
-		float nearest = outlineWidth*20 + 1 ;
+		float nearest = (outlineWidth*20 + 1) *  (outlineWidth*20 + 1) ;
 		for (int x = -1 * resolution; x <= resolution; x++){
 			for (int y = -1* resolution; y <= resolution; y++){
 			
@@ -459,17 +460,20 @@ void main(void)
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd > 0 ) nearest = min(nearest, length(pixeloffset));
+				if (dd > 0 ) nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
 
 			}
 		}
-		// For debuging draw size
-		//if (min(g_uv.x, g_uv.y) > 0.03){ // we are NOT the edges
-			fragColor.rgba = vec4(vec3(0.0), 1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 3)));
-		//}else{
-		//	fragColor.rgba = vec4(vec3(fract(nearest/16)), 1.0);
-		//	fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
-		//}
+		nearest = sqrt(nearest);
+
+		fragColor.rgba = vec4(vec3(0.0), 1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 3)));
+		#ifdef DEBUGEDGES
+			// For debuging draw size
+			if (min(g_uv.x, g_uv.y) < 0.03){ // we are on the edges
+				fragColor.rgba = vec4(vec3(fract(nearest/16)), 1.0);
+				fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
+			}
+		#endif
 	}else{
 		fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
 	}
