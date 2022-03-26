@@ -39,7 +39,7 @@ local SUBTLE_MAX = 4000
 
 local shaderConfig = {
 	TRANSPARENCY = 1, -- transparency of the stuff drawn
-	HEIGHTOFFSET = 4, -- Additional height added to everything
+	HEIGHTOFFSET = 0, -- Additional height added to everything
 	ANIMATION = 0, -- set to 0 if you dont want animation
 	INITIALSIZE = 1, -- What size the stuff starts off at when spawned
 	GROWTHRATE = 4, -- How fast it grows to full size
@@ -59,7 +59,7 @@ local shaderConfig = {
 	--USE_TRIANGLES = 1,
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
-	--DEBUGEDGES = 0, -- set to non-nil to debug the size of the rectangles
+	DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
 }
 
 -----------------------------------------------------------------
@@ -475,9 +475,9 @@ void main(void)
 		fragColor.rgba = vec4(vec3(0.0), 1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 3)));
 		#ifdef DEBUGEDGES
 			// For debuging draw size
-			if (min(g_uv.x, g_uv.y) < 0.03){ // we are on the edges
+			if (min(g_uv.x, g_uv.y) < 0.05 || max(g_uv.x, g_uv.y) > 0.95){ // we are on the edges
 				fragColor.rgba = vec4(vec3(fract(nearest/16)), 1.0);
-				fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
+				fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.7);
 			}
 		#endif
 	}else{
