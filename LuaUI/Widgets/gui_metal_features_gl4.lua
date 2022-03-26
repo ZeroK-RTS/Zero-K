@@ -35,6 +35,7 @@ local spGetGameFrame = Spring.GetGameFrame
 local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 local FEATURE_RADIUS = 120
+local ALL_FEATURES = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -92,12 +93,31 @@ local highlight = false
 local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 
+local function AddFeature(featureID)
+	local metal = Spring.GetFeatureResources(featureID)
+	if not (metal and metal > 1) then
+		return
+	end
+	local x100  = 100  / (100  + metal)
+	local x1000 = 1000 / (1000 + metal)
+	local r = 1 - x1000
+	local g = x1000 - x100
+	local b = x100
+	
+	handledFeatureCheck[#handledFeatureCheck + 1] = 1
+	handledFeatureList[#handledFeatureList + 1] = featureID
+	handledFeatureMap[featureID] = #handledFeatureList
+	handledFeatureApiIDs[#handledFeatureApiIDs + 1] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
+end
+
+--local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)
+
 local function UpdateFeatureVisibility()
 	-- This whole function is rediculous, but there are no events to handle what is required.
 	if not handledFeatureMap then
 		return
 	end
-	local visibleFeatures = Spring.GetVisibleFeatures(-1, FEATURE_RADIUS, false)
+	local visibleFeatures = (ALL_FEATURES and Spring.GetAllFeatures()) or Spring.GetVisibleFeatures(-1, FEATURE_RADIUS, false, false)
 	local newCheck = 3 - (handledFeatureCheck[1] or 1)
 	
 	-- Add new features and mark existing ones as seen.
@@ -106,10 +126,7 @@ local function UpdateFeatureVisibility()
 		if handledFeatureMap[featureID] then
 			handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 		else
-			handledFeatureCheck[#handledFeatureCheck + 1] = newCheck
-			handledFeatureList[#handledFeatureList + 1] = visibleFeatures[i]
-			handledFeatureMap[featureID] = #handledFeatureList
-			handledFeatureApiIDs[#handledFeatureApiIDs + 1] = WG.HighlightUnitGL4(featureID, 'featureID', 0.2, 1, 0.7, 0.2, 1, 1.4, 0.8, 0, 0, 0)
+			AddFeature(featureID)
 		end
 	end
 	
@@ -198,16 +215,14 @@ function widget:Update()
 	if enableCondNew ~= enableCondOld then
 		enableCondOld = enableCondNew
 		if enableCondNew then
-			local visibleFeatures = Spring.GetVisibleFeatures(-1, FEATURE_RADIUS, false)
+			local visibleFeatures = (ALL_FEATURES and Spring.GetAllFeatures()) or Spring.GetVisibleFeatures(-1, FEATURE_RADIUS, false, false)
 			handledFeatureList = {}
 			handledFeatureMap = {}
 			handledFeatureCheck = {}
 			handledFeatureApiIDs = {}
 			for i = 1, #visibleFeatures do
-				handledFeatureCheck[#handledFeatureCheck + 1] = 1
-				handledFeatureList[#handledFeatureList + 1] = visibleFeatures[i]
-				handledFeatureMap[visibleFeatures[i]] = #handledFeatureList
-				handledFeatureApiIDs[#handledFeatureApiIDs + 1] = WG.HighlightUnitGL4(visibleFeatures[i], 'featureID', 0.2, 1, 0.7, 0.2, 1, 1.4, 0.8, 0, 0, 0)
+				--Spring.Utilities.FeatureEcho(visibleFeatures[i], i)
+				AddFeature(visibleFeatures[i])
 			end
 		else
 			for i = 1, #handledFeatureApiIDs do

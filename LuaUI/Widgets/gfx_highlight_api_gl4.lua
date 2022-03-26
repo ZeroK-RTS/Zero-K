@@ -6,7 +6,7 @@ function widget:GetInfo()
     author    = "Beherith,ivand",
     date      = "2022.01.04",
     license   = "GPL",
-    layer     = -30,
+    layer     = -60,
     enabled   = true,
   }
 end
@@ -148,7 +148,6 @@ local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha,
 	-- rotationY: apply a rot offset, usually all 0
 	-- returns: a unique handler ID number that you should store and call StopHighlightUnitGL4(uniqueID) with to stop drawing it
 	-- note that widgets are responsible for stopping the drawing of every unit that they submit!
-	Spring.Echo("HighlightUnitGL4", r, g, b)
 	uniqueID = uniqueID + 1
 	local staticmodel = (objecttype == "unitDefID" or objecttype == "featureDefID") and 1 or 0
 	-- Spring.Echo("HighlightUnitGL4", objecttype, objectID, staticmodel,"to uniqueID", uniqueID, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)

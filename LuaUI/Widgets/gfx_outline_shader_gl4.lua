@@ -749,6 +749,8 @@ function widget:DrawWorld()
 		gl.Texture(0, false)
 		gl.Texture(1, false)-- Texture file
 		gl.Texture(2, false)-- Texture file
+		
+		gl.StencilTest(false)
 	end
 end
 
