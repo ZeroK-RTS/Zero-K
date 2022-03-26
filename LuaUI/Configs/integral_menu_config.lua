@@ -36,6 +36,7 @@ local tooltips = {
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
+	FORMATION_RANK = "Formation Rank (_STATE_)\n  set rank in formation.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }
 
@@ -285,6 +286,15 @@ local commandDisplayConfig = {
 			tooltips.SELECTION_RANK:gsub("_STATE_", "1"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "2"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "3")
+		}
+	},
+	[CMD_FORMATION_RANK] = {
+		texture = {imageDir .. 'states/formation_rank_0.png', imageDir .. 'states/formation_rank_1.png', imageDir .. 'states/formation_rank_2.png', imageDir .. 'states/formation_rank_3.png'},
+		stateTooltip = {
+			tooltips.FORMATION_RANK:gsub("_STATE_", "0"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "1"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "2"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "3")
 		}
 	},
 	[CMD_TOGGLE_DRONES] = {

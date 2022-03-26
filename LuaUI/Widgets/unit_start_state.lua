@@ -88,6 +88,12 @@ local tooltips = {
 		[2] = "2",
 		[3] = "3",
 	},
+	formationrank = {
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+	},
 	prevent_bait = {
 		[0] = "Disable target avoidance.",
 		[1] = "Avoid shooting at light drones, Wind, Solar, Claw, Dirtbag, low value nanoframes and armoured targets (excluding Crab)." .. preventBaitTip,
@@ -154,6 +160,7 @@ options_order = {
 	'commander_retreat',
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
+	'commander_formation_rank',
 }
 
 options = {
@@ -588,7 +595,7 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.auto_call_transport,
 	},
-	
+
 	commander_selection_rank = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
@@ -599,6 +606,18 @@ options = {
 		step = 1,
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.selectionrank,
+	},
+
+	commander_formation_rank = {
+		name = "  Formation Rank",
+		desc = "Formation Rank: units of lower rank line up in front of units of higher rank when given line movement orders.",
+		type = 'number',
+		value = 2,
+		min = 0,
+		max = 3,
+		step = 1,
+		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.formationrank,
 	},
 }
 
@@ -869,7 +888,7 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
-	
+
 	options[defName .. "_selection_rank"] = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
@@ -882,6 +901,21 @@ local function addUnit(defName, path)
 		tooltipFunction = tooltipFunc.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
+	
+	if ud.canMove and not ud.isFactory and not (ud.springCategories.fixedwing) then
+		options[defName .. "_formation_rank"] = {
+			name = "  Formation Rank",
+			desc = "Formation Rank: set rank in formation",
+			type = 'number',
+			value = 2,
+			min = 0,
+			max = 3,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.formationrank,
+		}
+		options_order[#options_order+1] = defName .. "_formation_rank"
+	end
 	
 	if tacticalAIUnits[defName] then
 		options[defName .. "_tactical_ai_2"] = {
@@ -1102,13 +1136,22 @@ end
 local function ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	local name = ud.name
+	
 	if options[name .. "_selection_rank"] and WG.SetSelectionRank then
 		WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
 	end
-	
 	if ud.customParams.commtype or ud.customParams.level then
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+	end
+	
+	if options[name .. "_formation_rank"] and WG.SetFormationRank then
+		WG.SetFormationRank(unitID, options[name .. "_formation_rank"].value)
+	end
+	if ud.customParams.commtype or ud.customParams.level then
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 end
@@ -1209,6 +1252,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 
@@ -1374,7 +1420,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if value then -- false is the default
 			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
 		end
-		
+
+		value = GetStateValue(name, "formation_rank")
+		if value and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, value)
+		end
+	
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")
