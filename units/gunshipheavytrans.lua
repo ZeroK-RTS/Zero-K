@@ -32,6 +32,10 @@ return { gunshipheavytrans = {
     transport_speed_light   = [[0.75]],
     transport_speed_medium  = [[0.65]],
     transport_speed_heavy   = [[0.5]],
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 17.5,
   },
 
   explodeAs              = [[GUNSHIPEX]],

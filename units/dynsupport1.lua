@@ -37,6 +37,10 @@ return { dynsupport1 = {
     dynamic_comm   = 1,
     shared_energy_gen = 1,
     set_target_range_buffer = 50,
+
+    outline_x = 140,
+    outline_y = 140,
+    outline_yoff = 28,
   },
 
   energyStorage       = 500,

@@ -19,10 +19,21 @@ local luaShaderDir = "LuaUI/Widgets/Include/"
 
 local unitConf = {}
 
-for unitDefID, unitDef in pairs(UnitDefs) do
-	local xsize, zsize = unitDef.xsize, unitDef.zsize
-	local scale = math.max(xsize,zsize)
-	unitConf[unitDefID] = {scale=scale, iconSize=scale, height=unitDef.height}
+for unitDefID, ud in pairs(UnitDefs) do
+	local xsize, zsize = ud.xsize, ud.zsize
+	local scale = math.max(xsize,zsize) * 16
+	unitConf[unitDefID] = {
+		drawRectX = (ud.customParams.outline_x and tonumber(ud.customParams.outline_x)) or scale,
+		drawRectY = (ud.customParams.outline_y and tonumber(ud.customParams.outline_y)) or scale,
+		height = (ud.customParams.outline_yoff and tonumber(ud.customParams.outline_yoff)) or (ud.height * 0.5)
+	}
+	if ud.customParams.outline_sea_x then
+		unitConf[unitDefID].seaConfig = {
+			drawRectX = (ud.customParams.outline_sea_x and tonumber(ud.customParams.outline_sea_x)) or unitConf[unitDefID].drawRectX,
+			drawRectY = (ud.customParams.outline_sea_y and tonumber(ud.customParams.outline_sea_y)) or unitConf[unitDefID].drawRectY,
+			height = (ud.customParams.outline_sea_yoff and tonumber(ud.customParams.outline_sea_yoff)) or unitConf[unitDefID].height
+		}
+	end
 end
 
 -----------------------------------------------------------------
@@ -59,7 +70,7 @@ local shaderConfig = {
 	--USE_TRIANGLES = 1,
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
-	DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
+	--DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
 }
 
 -----------------------------------------------------------------
@@ -70,8 +81,20 @@ local configStrengthMult = DEFAULT_STRENGTH_MULT
 local scaleWithHeight = true
 local functionScaleWithHeight = true
 local zoomScaleRange = 0.4
+local overrideDrawBoxes = false
+
+local function PrintDrawBox()
+	Spring.Echo("=== New Draw Box ===")
+	Spring.Echo("outline_x = " .. options.overrideDrawBox_x.value .. ",")
+	Spring.Echo("outline_y = " .. options.overrideDrawBox_y.value .. ",")
+	Spring.Echo("outline_yoff = " .. options.overrideDrawBox_yoff.value .. ",")
+	Spring.SetClipboard("\n\n    outline_x = " .. options.overrideDrawBox_x.value .. [[,
+    outline_y = ]] .. options.overrideDrawBox_y.value .. [[,
+    outline_yoff = ]] .. options.overrideDrawBox_yoff.value .. [[,]])
+end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
 options = {
 	thickness = {
 		name = 'Outline Thickness',
@@ -111,6 +134,57 @@ options = {
 		noHotkey = true,
 		OnChange = function (self)
 			functionScaleWithHeight = self.value
+		end,
+	},
+	
+	-- Debug
+	overrideDrawBox = {
+		name = 'Override draw box',
+		desc = 'Debug enabling below.',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		OnChange = function (self)
+			overrideDrawBoxes = self.value
+			local selUnits = Spring.GetSelectedUnits()
+			if selUnits and selUnits[1] and Spring.GetUnitDefID(selUnits[1]) then
+				local unitDefID = Spring.GetUnitDefID(selUnits[1])
+				options.overrideDrawBox_x.value = unitConf[unitDefID].drawRectX
+				options.overrideDrawBox_y.value = unitConf[unitDefID].drawRectY
+				options.overrideDrawBox_yoff.value = unitConf[unitDefID].height
+				PrintDrawBox()
+			end
+			WG.unittrackerapi.initializeAllUnits()
+		end,
+	},
+	overrideDrawBox_x = {
+		name = 'Override X',
+		type = 'number',
+		min = 0, max = 300, step = 5,
+		value = 100,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
+		end,
+	},
+	overrideDrawBox_y = {
+		name = 'Override Y',
+		type = 'number',
+		min = 0, max = 300, step = 5,
+		value = 100,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
+		end,
+	},
+	overrideDrawBox_yoff = {
+		name = 'Override Y Offset',
+		type = 'number',
+		min = -200, max = 200, step = 5,
+		value = 0,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
 		end,
 	},
 }
@@ -572,10 +646,21 @@ end
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	local gf = Spring.GetGameFrame()
 	myvisibleUnits[unitID] = unitDefID
+	local unitData = unitConf[unitDefID]
+	if unitData.seaConfig then
+		local x, z = Spring.GetUnitPosition(unitID)
+		if Spring.GetGroundHeight(x, z) < 0 then
+			unitData = unitData.seaConfig
+		end
+	end
+	
 	pushElementInstance(
 		resurrectionHalosVBO, -- push into this Instance VBO Table
 		{
-			unitConf[unitDefID].scale * 16, unitConf[unitDefID].scale * 16, 8, unitConf[unitDefID].height*0.5 ,  -- lengthwidthcornerheight
+			(overrideDrawBoxes and options.overrideDrawBox_y.value) or unitData.drawRectY,
+			(overrideDrawBoxes and options.overrideDrawBox_x.value) or unitData.drawRectX,
+			8,
+			(overrideDrawBoxes and options.overrideDrawBox_yoff.value) or unitData.height,  -- lengthwidthcornerheight
 			0, -- teamID
 			4, -- how many trianges should we make (2 = cornerrect)
 			gf, 0, 0, 0, -- the gameFrame (for animations), and any other parameters one might want to add

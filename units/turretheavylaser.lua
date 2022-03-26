@@ -18,6 +18,10 @@ return { turretheavylaser = {
   customParams                  = {
     bait_level_default = 0,
     aimposoffset   = [[0 15 0]],
+
+    outline_x = 115,
+    outline_y = 150,
+    outline_yoff = 50,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],

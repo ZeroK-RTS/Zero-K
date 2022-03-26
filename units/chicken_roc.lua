@@ -22,6 +22,9 @@ return { chicken_roc = {
   cruiseAlt           = 150,
 
   customParams        = {
+    outline_x = 180,
+    outline_y = 180,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],

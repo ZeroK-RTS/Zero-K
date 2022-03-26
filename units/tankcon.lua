@@ -26,6 +26,10 @@ return { tankcon = {
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
     selection_scale = 1.2,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   energyUse              = 0,

@@ -23,6 +23,10 @@ return { subraider = {
     midposoffset   = [[0 -5 0]],
     turnatfullspeed = [[1]],
     okp_damage = 210,
+
+    outline_x = 128,
+    outline_y = 128,
+    outline_yoff = 16,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

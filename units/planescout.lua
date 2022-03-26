@@ -25,6 +25,10 @@ return { planescout = {
     refuelturnradius  = [[120]],
     priority_misc     = 2, -- High
     sonar_can_be_disabled = 1,
+
+    outline_x = 120,
+    outline_y = 120,
+    outline_yoff = 20,
   },
 
   energyUse           = 1.5,

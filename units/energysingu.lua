@@ -24,6 +24,10 @@ return { energysingu = {
     removewait     = 1,
     removestop     = 1,
     selectionscalemult = 1.15,
+
+    outline_x = 200,
+    outline_y = 200,
+    outline_yoff = 55,
   },
 
   energyMake                    = 225,

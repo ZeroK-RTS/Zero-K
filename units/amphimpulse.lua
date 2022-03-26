@@ -25,6 +25,10 @@ return { amphimpulse = {
     aim_lookahead     = 120,
     set_target_range_buffer = 50,
     set_target_speed_buffer = 10,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],

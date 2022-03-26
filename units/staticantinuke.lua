@@ -25,6 +25,10 @@ return { staticantinuke = {
     nuke_coverage  = 2500,
     modelradius      = [[50]],
     selectionscalemult = 1,
+
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 25,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

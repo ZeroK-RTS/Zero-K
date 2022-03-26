@@ -19,6 +19,10 @@ return { jumparty = {
   customParams           = {
     bait_level_default = 1,
     selection_scale   = 0.92,
+
+    outline_x = 125,
+    outline_y = 125,
+    outline_yoff = 21,
   },
 
   explodeAs              = [[BIG_UNITEX]],

@@ -28,6 +28,10 @@ return { bomberprec = {
     reammoseconds    = [[8]],
     requireammo      = [[1]],
     can_set_target   = [[1]],
+
+    outline_x = 130,
+    outline_y = 130,
+    outline_yoff = 10,
   },
 
   explodeAs           = [[GUNSHIPEX]],

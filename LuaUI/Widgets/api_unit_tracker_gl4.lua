@@ -556,8 +556,8 @@ function widget:Initialize()
 	WG['unittrackerapi'] = {}
 	WG['unittrackerapi'].visibleUnits = visibleUnits
 	WG['unittrackerapi'].alliedUnits = alliedUnits
+	WG['unittrackerapi'].initializeAllUnits = initializeAllUnits
 	initializeAllUnits()
-	
 end
 
 function widget:Shutdown()

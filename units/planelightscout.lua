@@ -24,6 +24,10 @@ return { planelightscout = {
 
     modelradius    = [[8]],
     refuelturnradius = [[130]],
+
+    outline_x = 75,
+    outline_y = 75,
+    outline_yoff = 10,
   },
 
   explodeAs           = [[GUNSHIPEX]],

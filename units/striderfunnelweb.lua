@@ -32,6 +32,10 @@ return { striderfunnelweb = {
     unarmed       = true,
     shield_power_gfx_override = 10000,
     selection_rank = 3,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 25,
   },
 
   explodeAs              = [[ESTOR_BUILDING]],

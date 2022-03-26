@@ -15,6 +15,9 @@ return { chicken_leaper = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],

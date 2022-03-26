@@ -16,6 +16,9 @@ return { chicken = {
   category            = [[LAND SINK SMALL]],
 
   customParams        = {
+    outline_x = 70,
+    outline_y = 70,
+    outline_yoff = 15,
   },
 
   explodeAs           = [[NOWEAPON]],

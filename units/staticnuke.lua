@@ -20,6 +20,10 @@ return { staticnuke = {
     stockpilecost  = [[3240]],
     priority_misc  = 1, -- Medium
     is_nuke = true,
+
+    outline_x = 195,
+    outline_y = 195,
+    outline_yoff = 15,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
