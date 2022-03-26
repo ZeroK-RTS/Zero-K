@@ -213,7 +213,6 @@ function widget:Update()
 		end
 	end
 	
-	Spring.Echo("enableCondNew", enableCondNew)
 	if enableCondNew ~= enableCondOld then
 		enableCondOld = enableCondNew
 		if enableCondNew then
