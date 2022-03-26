@@ -84,13 +84,15 @@ local zoomScaleRange = 0.4
 local overrideDrawBoxes = false
 
 local function PrintDrawBox()
-	Spring.Echo("=== New Draw Box ===")
-	Spring.Echo("outline_x = " .. options.overrideDrawBox_x.value .. ",")
-	Spring.Echo("outline_y = " .. options.overrideDrawBox_y.value .. ",")
-	Spring.Echo("outline_yoff = " .. options.overrideDrawBox_yoff.value .. ",")
-	Spring.SetClipboard("\n\n    outline_x = " .. options.overrideDrawBox_x.value .. [[,
+	if overrideDrawBoxes then
+		Spring.Echo("=== New Draw Box ===")
+		Spring.Echo("outline_x = " .. options.overrideDrawBox_x.value .. ",")
+		Spring.Echo("outline_y = " .. options.overrideDrawBox_y.value .. ",")
+		Spring.Echo("outline_yoff = " .. options.overrideDrawBox_yoff.value .. ",")
+		Spring.SetClipboard("\n\n    outline_x = " .. options.overrideDrawBox_x.value .. [[,
     outline_y = ]] .. options.overrideDrawBox_y.value .. [[,
     outline_yoff = ]] .. options.overrideDrawBox_yoff.value .. [[,]])
+	end
 end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
@@ -716,6 +718,7 @@ function widget:DrawWorld()
 			gl.DepthMask(false)
 			
 			-- FIRST PASS:
+			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.ColorMask(false, false, false, false) -- disable writing to all but stencil
 			gl.StencilTest(true) -- enable stencil test
 			gl.DepthTest(false) -- dont do depth testing either
