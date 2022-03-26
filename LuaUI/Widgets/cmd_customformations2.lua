@@ -35,7 +35,7 @@ local overrideCmdSingleUnit = {
 }
 
 options_path = 'Settings/Interface/Line Formations'
-options_order = { 'spreadtypes', 'ignorespreadsize', 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','RMBLineFormation' }
+options_order = { 'spreadtypes', 'ignorespreadsize', 'rank_gap', 'drawmode_v2', 'linewidth', 'dotsize', 'overrideGuard','RMBLineFormation' }
 options = {
 	spreadtypes = {
 		name = "Evenly spread unit types along lines",
@@ -53,6 +53,13 @@ options = {
 		type = 'number',
 		value = 1,
 		min = 0, max = 50, step=1,
+	},
+	rank_gap = {
+		name = 'Formation rank spacing',
+		desc = "The gap between front and back formations. All units start at the same formation rank by default. Enable Formation Rank in Settings/Interface/Commands or edit Formation Rank in Settings/Unit Behaviour/Default States.",
+		type = 'number',
+		value = 100,
+		min = 20, max = 250, step=5,
 	},
 	drawmode_v2 = {
 		name = 'Draw mode',
@@ -382,7 +389,8 @@ local function GetFormationRanks(mUnits, cmdID)
 
 	for i = 1, #mUnits do
 		local unit = mUnits[i]
-		local unitRank = formationRank[unit] or defaultRank[Spring.GetUnitDefID(unit)] or 2
+		local unitDefID = Spring.GetUnitDefID(unit)
+		local unitRank = formationRank[unit] or (unitDefID and defaultRank[unitDefID]) or 2
 		if not ranks[unitRank] then
 			ranks[unitRank] = {}
 		end
@@ -443,15 +451,17 @@ local function GetInterpNodes(number, offset)
 	local eZ = ePos[3]
 	local eDist = fDists[2]
 
-	local nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
-	sX = sX + math.sin(nA) * offset
-	sZ = sZ + math.cos(nA) * offset
+	local nA = 0
+	if offset ~= 0 then
+		nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
+		sX = sX + math.sin(nA) * offset
+		sZ = sZ + math.cos(nA) * offset
+	end
 	local sY = math.max(0, spGetGroundHeight(sX,sZ))
 
 	interpNodes[1] = {sX, sY, sZ}
 
 	for n = 1, number - 2 do
-
 		local reqDist = n * spacing
 		while (reqDist > eDist) do
 
@@ -464,12 +474,18 @@ local function GetInterpNodes(number, offset)
 			eX = ePos[1]
 			eZ = ePos[3]
 			eDist = fDists[eIdx]
-			nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
+			if offset ~= 0 then
+				nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
+			end
 		end
 
 		local nFrac = (reqDist - sDist) / (eDist - sDist)
-		local nX = sX * (1 - nFrac) + eX * nFrac + math.sin(nA) * offset
-		local nZ = sZ * (1 - nFrac) + eZ * nFrac + math.cos(nA) * offset
+		local nX = sX * (1 - nFrac) + eX * nFrac
+		local nZ = sZ * (1 - nFrac) + eZ * nFrac
+		if offset ~= 0 then
+			nX = nX + math.sin(nA) * offset
+			nZ = nZ + math.cos(nA) * offset
+		end
 		local nY = math.max(0, spGetGroundHeight(nX, nZ))
 		interpNodes[n + 1] = {nX, nY, nZ}
 	end
@@ -477,9 +493,11 @@ local function GetInterpNodes(number, offset)
 	ePos = fNodes[#fNodes]
 	eX = ePos[1]
 	eZ = ePos[3]
-	nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
-	eX = eX + math.sin(nA) * offset
-	eZ = eZ + math.cos(nA) * offset
+	if offset ~= 0 then
+		nA = math.atan2(sX - eX, sZ - eZ) + math.pi / 2
+		eX = eX + math.sin(nA) * offset
+		eZ = eZ + math.cos(nA) * offset
+	end
 	local eY = math.max(0, spGetGroundHeight(eX, eZ))
 	interpNodes[number] = {eX, eY, eZ}
 
@@ -489,14 +507,14 @@ local function GetInterpNodes(number, offset)
 end
 
 local function GetFormationNodes(ranks)
-	local minRank = nil
+	local maxRank = nil
 	local nodes = {}
 
-	for rank = 0, 3 do
+	for rank = 3, 0, -1 do
 		local units = ranks[rank]
 		if units then
-			minRank = minRank or rank
-			nodes[rank] = GetInterpNodes(#units, 100 * (rank - minRank))
+			maxRank = maxRank or rank
+			nodes[rank] = GetInterpNodes(#units, options.rank_gap.value * (maxRank - rank))
 		end
 	end
 
