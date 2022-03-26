@@ -2432,7 +2432,6 @@ end
 
 
 function widgetHandler:VisibleUnitAdded(unitID, unitDefID, unitTeam)
-Spring.Echo("VisibleUnitAdded")
 	for _, w in ipairs(self.VisibleUnitAddedList) do
 		w:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	end

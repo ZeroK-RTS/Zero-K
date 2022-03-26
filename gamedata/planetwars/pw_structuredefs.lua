@@ -177,9 +177,9 @@ local structureConfig = {
 
 		unitDef.customparams.soundselect = "building_select2"
 
-		unitDef.customparams.outline_x = 220,
-		unitDef.customparams.outline_y = 220,
-		unitDef.customparams.outline_yoff = 75,
+		unitDef.customparams.outline_x = 220
+		unitDef.customparams.outline_y = 220
+		unitDef.customparams.outline_yoff = 75
 
 		unitDef.featuredefs.dead.object = "pw_mine_dead.dae"
 		unitDef.featuredefs.heap.object = "debris4x4b.s3o"
@@ -251,9 +251,9 @@ local structureConfig = {
 
 		unitDef.customparams.soundselect = "radar_select"
 
-		unitDef.customparams.outline_x = 260,
-		unitDef.customparams.outline_y = 260,
-		unitDef.customparams.outline_yoff = 95,
+		unitDef.customparams.outline_x = 260
+		unitDef.customparams.outline_y = 260
+		unitDef.customparams.outline_yoff = 95
 
 		unitDef.sightdistance = 800
 		unitDef.radardistance = 2100
