@@ -1136,13 +1136,22 @@ end
 local function ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	local name = ud.name
+	
 	if options[name .. "_selection_rank"] and WG.SetSelectionRank then
 		WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
 	end
-	
 	if ud.customParams.commtype or ud.customParams.level then
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+	end
+	
+	if options[name .. "_formation_rank"] and WG.SetFormationRank then
+		WG.SetFormationRank(unitID, options[name .. "_formation_rank"].value)
+	end
+	if ud.customParams.commtype or ud.customParams.level then
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 end
@@ -1243,6 +1252,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 
