@@ -31,10 +31,10 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 0.5
-local STRENGTH_MAGIC_NUMBER = 6
+local DEFAULT_STRENGTH_MULT = 1
+local STRENGTH_MAGIC_NUMBER = 2.4
 
-local SUBTLE_MIN = 150
+local SUBTLE_MIN = 50
 local SUBTLE_MAX = 4000
 
 local shaderConfig = {
@@ -77,7 +77,7 @@ options = {
 		name = 'Outline Thickness',
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
-		min = 0.2, max = 2, step = 0.01,
+		min = 0.2, max = 5, step = 0.05,
 		value = DEFAULT_STRENGTH_MULT,
 		OnChange = function (self)
 			configStrengthMult = self.value
@@ -142,7 +142,8 @@ local function GetZoomScale()
 			return zoomScaleRange
 		end
 		
-		local zoomScale = (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)
+		local zoomScale = (math.cos(math.pi*((cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN))^0.75) + 1)/2
+		--Spring.Echo("zoomScale", zoomScale)
 		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
 	end
 
@@ -450,29 +451,58 @@ void main(void)
 	
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
-	if (deltadepth > 0.0) discard; // we hit a model, bail!
+	//if (deltadepth > 0.0) discard; // we hit a model, bail!
 	//if ((modeldepth < 1.0) && (mapdepth > modeldepth)) discard; // model occluded behind map
 	
 	if (stencilPass > 0.5){
-		float nearest = (outlineWidth*20 + 1) *  (outlineWidth*20 + 1) ;
+		float nearest = (outlineWidth*20 + 1) * (outlineWidth*20 + 1) ;
 		vec2 viewGeometryInv = 1.0 / viewGeometry.xy;
-		for (int x = -1 * resolution; x <= resolution; x++){
-			for (int y = -1* resolution; y <= resolution; y++){
-			
-				vec2 pixeloffset = vec2(float(x), float(y));
+		
+		if (deltadepth > 0.0) {
+			for (int x = -1; x <= 1; x++){
+				vec2 pixeloffset = vec2(float(x), float(0));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
-				
 				
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd > 0 ) nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
-
+				if (dd == 0 ) {
+					nearest = min(nearest, abs(x)); 
+				}
 			}
-		}
-		nearest = sqrt(nearest);
+			for (int y = -1; y <= 1; y++){
+				vec2 pixeloffset = vec2(float(0), float(y));
+				vec2 screendelta = pixeloffset * viewGeometryInv;
+				
+				float mapd = texture(mapDepths, screenUV+ screendelta).x;
+				float modd = texture(modelDepths, screenUV + screendelta).x;
+				float dd = max(mapd - modd, 0.0);
+				if (dd == 0 ) {
+					nearest = min(nearest, abs(y)); 
+				}
+			}
+			nearest = sqrt(nearest);
+			
+			fragColor.rgba = vec4(vec3(0.0), (1.0 - nearest * 1.5 / outlineWidth));
+		} else {
+			for (int x = -1 * resolution; x <= resolution; x++){
+				for (int y = -1* resolution; y <= resolution; y++){
+					vec2 pixeloffset = vec2(float(x), float(y));
+					vec2 screendelta = pixeloffset * viewGeometryInv;
+					
+					
+					float mapd = texture(mapDepths, screenUV+ screendelta).x;
+					float modd = texture(modelDepths, screenUV + screendelta).x;
+					float dd = max(mapd - modd, 0.0);
+					if (dd > 0 ) {
+						nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
+					}
+				}
+			}
+			nearest = sqrt(nearest);
 
-		fragColor.rgba = vec4(vec3(0.0), 1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 3)));
+			fragColor.rgba = vec4(vec3(0.0), (1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 2))));
+		}
 		#ifdef DEBUGEDGES
 			// For debuging draw size
 			if (min(g_uv.x, g_uv.y) < 0.05 || max(g_uv.x, g_uv.y) > 0.95){ // we are on the edges
