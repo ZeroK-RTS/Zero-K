@@ -45,6 +45,10 @@ return { factoryship = {
     shared_energy_gen = 1,
     cus_noflashlight = 1,
     parent_of_plate   = [[plateship]],
+
+    outline_x = 340,
+    outline_y = 340,
+    outline_yoff = 25,
   },
 
   energyUse              = 0,

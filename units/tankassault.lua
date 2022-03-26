@@ -22,6 +22,10 @@ return { tankassault = {
     midposoffset      = [[0 0 0]],
     modelradius       = [[25]],
     selection_scale   = 0.92,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
