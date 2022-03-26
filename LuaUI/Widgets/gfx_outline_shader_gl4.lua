@@ -331,7 +331,7 @@ void offsetVertex4( float x, float y, float z, float u, float v){
 void main(){
 	uint numVertices = dataIn[0].v_numvertices;
 	centerpos = dataIn[0].v_centerpos;
-	g_cameraDistance = dataIn[0].v_cameraDistance;;
+	g_cameraDistance = dataIn[0].v_cameraDistance;
 	#if (BILLBOARD == 1 )
 		rotY = mat3(cameraViewInv[0].xyz,cameraViewInv[2].xyz, cameraViewInv[1].xyz); // swizzle cause we use xz
 	#else
@@ -416,7 +416,7 @@ uniform float outlineWidth;
 in DataGS {
 	vec4 g_color;
 	vec4 g_uv;
-	flaot g_cameraDistance; 
+	float g_cameraDistance; 
 };
 
 uniform sampler2D DrawPrimitiveAtUnitTexture;
