@@ -95,9 +95,6 @@ local currCmd = spGetActiveCommand() --remember current command
 
 local function AddFeature(featureID)
 	local metal = Spring.GetFeatureResources(featureID)
-	if not (metal and metal > 1) then
-		return
-	end
 	local x100  = 100  / (100  + metal)
 	local x1000 = 1000 / (1000 + metal)
 	local r = 1 - x1000
@@ -107,7 +104,11 @@ local function AddFeature(featureID)
 	handledFeatureCheck[#handledFeatureCheck + 1] = 1
 	handledFeatureList[#handledFeatureList + 1] = featureID
 	handledFeatureMap[featureID] = #handledFeatureList
-	handledFeatureApiIDs[#handledFeatureApiIDs + 1] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
+	
+	if not (metal and metal > 1) then
+		return
+	end
+	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
 end
 
 --local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)
@@ -135,17 +136,18 @@ local function UpdateFeatureVisibility()
 	while i <= #handledFeatureCheck do
 		if handledFeatureCheck[i] ~= newCheck then
 			local featureID = handledFeatureList[i]
-			WG.StopHighlightUnitGL4(handledFeatureApiIDs[i])
+			if handledFeatureApiIDs[featureID] then
+				WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+			end
 			
 			handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
 			handledFeatureList[i] = handledFeatureList[#handledFeatureList]
 			handledFeatureMap[handledFeatureList[i]] = i
-			handledFeatureApiIDs[i] = handledFeatureApiIDs[#handledFeatureApiIDs]
 			
 			handledFeatureCheck[#handledFeatureCheck] = nil
 			handledFeatureList[#handledFeatureList] = nil
 			handledFeatureMap[featureID] = nil
-			handledFeatureApiIDs[#handledFeatureApiIDs] = nil
+			handledFeatureApiIDs[featureID] = nil
 		else
 			i = i + 1
 		end
@@ -225,8 +227,8 @@ function widget:Update()
 				AddFeature(visibleFeatures[i])
 			end
 		else
-			for i = 1, #handledFeatureApiIDs do
-				WG.StopHighlightUnitGL4(handledFeatureApiIDs[i])
+			for i = 1, #handledFeatureList do
+				WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
 			end
 			handledFeatureList = false
 			handledFeatureMap = false
