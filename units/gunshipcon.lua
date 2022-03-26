@@ -1,7 +1,7 @@
 return { gunshipcon = {
   unitname            = [[gunshipcon]],
   name                = [[Wasp]],
-  description         = [[Heavy Construction Aircraft]],
+  description         = [[Heavy Gunship Constructor]],
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
@@ -45,8 +45,6 @@ return { gunshipcon = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[builderair]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1500,
   maxVelocity         = 2.4,
   noAutoFire          = false,
@@ -57,7 +55,7 @@ return { gunshipcon = {
   showNanoSpray       = false,
   sightDistance       = 375,
   turnRate            = 500,
-  workerTime          = 7.5,
+  workerTime          = 10,
 
   featureDefs         = {
 

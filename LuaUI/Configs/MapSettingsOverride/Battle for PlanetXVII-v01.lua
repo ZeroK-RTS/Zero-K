@@ -1,4 +1,15 @@
 return {
+	["water"]= false,
+	["sun"]= {
+		["groundDiffuseColor"]= {0.65338647, 0.65438247, 0.65438247, 0.85321099},
+		["groundAmbientColor"]= {0.70176989, 0.7061947, 0.71238941, 1},
+		["unitAmbientColor"]= {0.59565216, 0.5782609, 0.47391304, 1},
+		["groundSpecularColor"]= {0.06190476, 0.05714286, 0.04285714, 1},
+		["specularExponent"]= 32,
+		["unitDiffuseColor"]= {0.92660552, 0.93043476, 0.89130437, 1},
+		["unitSpecularColor"]= {0.33809525, 0.32857144, 0.41904762, 1},
+	},
+	["direction"]= false,
 	["fog"]= {
 		["sunColor"]= {0.71739131, 0.70434785, 0.70434785, 0.84347826},
 		["fogStart"]= -4.2199998,
@@ -7,16 +18,4 @@ return {
 		["skyColor"]= {0.6652174, 0.63913041, 0.64347827, 0.9173913},
 		["fogEnd"]= -5,
 	},
-	["sun"]= {
-		["groundDiffuseColor"]= {0.65338647, 0.65438247, 0.65438247, 0.85321099},
-		["groundAmbientColor"]= {0.70176989, 0.7061947, 0.71238941, 1},
-		["unitAmbientColor"]= {0.59565216, 0.5782609, 0.47391304, 1},
-		["groundSpecularColor"]= {0.05929204, 0.05663717, 0.03982301, 1},
-		["specularExponent"]= -1.5699999,
-		["unitDiffuseColor"]= {0.92660552, 0.93043476, 0.89130437, 1},
-		["unitSpecularColor"]= {1, 1, 1, 1},
-	},
-	["minimap"] = {
-		["groundAmbientColor"]= {0.8, 0.8, 0.8, 1},
-	}
 }

@@ -10,7 +10,7 @@ return { jumpraid = {
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
-  category              = [[LAND FIREPROOF]],
+  category              = [[LAND FIREPROOF TOOFAST]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[30 30 30]],
   selectionVolumeType    = [[ellipsoid]],
@@ -33,8 +33,6 @@ return { jumpraid = {
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetraider]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
   leaveTracks           = true,
   maxDamage             = 670,
   maxSlope              = 36,
@@ -112,7 +110,7 @@ return { jumpraid = {
       },
     
       damage                  = {
-        default = 8.9,
+        default = 9.2,
       },
 
       duration                = 0.01,

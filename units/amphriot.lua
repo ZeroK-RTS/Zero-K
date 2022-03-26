@@ -1,7 +1,7 @@
 return { amphriot = {
   unitname               = [[amphriot]],
   name                   = [[Scallop]],
-  description            = [[Amphibious Riot Bot (Anti-Sub)]],
+  description            = [[Amphibious Riot Bot (Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
@@ -28,8 +28,6 @@ return { amphriot = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[amphtorpriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
@@ -90,7 +88,11 @@ return { amphriot = {
       craterBoost             = 0,
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
-   
+
+      customparams = {
+        stays_underwater = 1,
+      },
+
       damage                  = {
         default = 48.01,
       },

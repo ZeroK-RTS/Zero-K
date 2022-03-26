@@ -60,6 +60,8 @@ local flare2 = piece 'flare_l'
 --------------------------------------------------------------------------------
 local smokePiece = {rotating_bas, mc_rocket_ho}
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local TURN_SPEED = 145
 local TILT_SPEED = 200
 local RELOAD_SPEED = 20
@@ -407,7 +409,7 @@ function script.AimFromWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 200.1, 1800, 70, 0.1, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 1800, 70, 0.1, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -3,6 +3,8 @@
 -- unused piece: 'wake'
 local base, firepoint = piece ("base", "firepoint")
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 function script.QueryWeapon(num)
 	return firepoint
 end
@@ -19,7 +21,7 @@ function script.Create()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 210, 220, 12, 0.05, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 220, 12, 0.05, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

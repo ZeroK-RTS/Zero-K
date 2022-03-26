@@ -1,7 +1,7 @@
 return { shiparty = {
   unitname               = [[shiparty]],
   name                   = [[Envoy]],
-  description            = [[Cruiser (Artillery)]],
+  description            = [[Artillery Cruiser]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 1.7,
@@ -27,8 +27,6 @@ return { shiparty = {
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[shiparty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   losEmitHeight          = 25,
   maxDamage              = 2000,
   maxVelocity            = 1.7,

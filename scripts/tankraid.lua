@@ -225,7 +225,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local hitTime = (Spring.GetUnitSeparation(unitID, targetID) or 0)*0.1
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 58, hitTime)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 35, hitTime) -- Often grazes with AoE
 	end
 	return false
 end

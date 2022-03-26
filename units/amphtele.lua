@@ -23,14 +23,13 @@ return { amphtele = {
     teleporter = 1,
     teleporter_throughput = 150, -- mass per second
     teleporter_beacon_spawn_time = 8,
+    teleporter_beacon_unit = [[tele_beacon]],
   },
 
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[amphtransport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 2500,
   maxSlope               = 36,

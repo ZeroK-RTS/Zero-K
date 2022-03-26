@@ -426,18 +426,22 @@ function gadget:Initialize()
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-
 	end
 
-	local boatFacs = {'factoryship', 'striderhub'}
-	for _, boatFac in pairs(boatFacs) do
-		local udBoatFac = UnitDefNames[boatFac]
-		if udBoatFac then
-			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
-					boats[boatDefID] = true
-				end
-			end
+	local shipSMClass = Game.speedModClasses.Ship
+	for i = 1, #UnitDefs do
+		local ud = UnitDefs[i]
+
+		--[[ NB: ships that extend legs and walk onto land, like
+		     the SupCom Cybran Siren or RA3 Soviet Stingray, are
+		     technically hovercraft in Spring so would need some
+		     extra handling AFAIK. No such ship in vanilla ZK. ]]
+		if (ud.moveDef.smClass == shipSMClass) then
+			boats[i] = true
+		end
+
+		if ud.customParams.dynamic_comm then
+			comms[i] = true
 		end
 	end
 
@@ -447,12 +451,6 @@ function gadget:Initialize()
 			flamerWeaponDefs[i] = true
 		end
 	end
-
-	for i=1,#UnitDefs do
-		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
-	end
- end
-
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)

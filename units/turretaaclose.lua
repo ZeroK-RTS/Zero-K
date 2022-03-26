@@ -18,6 +18,7 @@ return { turretaaclose = {
   customParams                  = {
     bait_level_default = 1,
     aim_lookahead      = 120,
+    okp_damage = 500.1,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -92,7 +93,7 @@ return { turretaaclose = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       leadLimit               = 0,
-      model                   = [[wep_m_phoenix.s3o]],
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 490,
       reloadtime              = 0.2,
@@ -100,6 +101,7 @@ return { turretaaclose = {
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/missile_fire3]],
       startVelocity           = 620,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tracks                  = true,
       turnRate                = 130000,

@@ -475,6 +475,20 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Resurrect
+--
+
+if (modOptions and (modOptions.disableresurrect == 1 or modOptions.disableresurrect == "1")) then
+	for name, unitDef in pairs(UnitDefs) do
+		if (unitDef.canresurrect) then
+			unitDef.canresurrect = false
+		end
+	end
+
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- unitspeedmult
 --
 
@@ -525,15 +539,20 @@ end
 -- Set turnInPlace speed limits, reverse velocities (but not for ships)
 --
 for name, ud in pairs(UnitDefs) do
-	if ud.turnrate and (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
-		ud.turninplace = false
-		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
-	elseif ud.turninplace ~= true then
-		ud.turninplace = false	-- true
-		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
-		--ud.turninplaceanglelimit = 180
+	if ud.turnrate then
+		if ud.customparams.turnatfullspeed_hover then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 0.8)
+			ud.turninplaceanglelimit = 90
+		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)
+		elseif ud.turninplace ~= true then
+			ud.turninplace = false -- true
+			ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+			--ud.turninplaceanglelimit = 180
+		end
 	end
-
 
 	if ud.category and not (ud.category:find("SHIP", 1, true) or ud.category:find("SUB", 1, true)) then
 		if (ud.maxvelocity) and not ud.maxreversevelocity then
@@ -967,5 +986,7 @@ end
 
 local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
 for i = 1, #ai_start_units do
-	UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	if UnitDefs[ai_start_units[i]] then -- valid entries can still be nil in wiki exporter script
+		UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	end
 end

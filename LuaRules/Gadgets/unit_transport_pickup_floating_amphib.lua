@@ -68,28 +68,25 @@ local sinkCommand = {
 	[CMD_WAIT_AT_BEACON] = true,
 }
 
-local dropableUnits = {
-	--all floatable unit will be dropped when regular unload fail (such as when unloading at sea), but some can't float but is amphibious,
-	--this list additional units that should be dropped.
-	[UnitDefNames["amphcon"].id] = true, --clam
-	[UnitDefNames["amphraid"].id] = true, --duck
-	[UnitDefNames["striderantiheavy"].id] = true, --ultimatum
-	[UnitDefNames["shieldshield"].id] = true, --aspis
-	[UnitDefNames["cloakjammer"].id] = true, --eraser
-	[UnitDefNames["striderdetriment"].id] = true, --striderdetriment
+local DROPPABLE_UNIT_MAXDEPTH = 100  -- Arbitrary value (there are no units with maxDepth between 22 and 5000, so any value from range 23-4999 will work here)
+
+local floatingMoveClasses = {
+	[Game.speedModClasses.Hover] = true,
+	[Game.speedModClasses.Ship] = true,
 }
 
-if UnitDefNames["factoryamph"] then
-	local buildOptions = UnitDefNames["factoryamph"].buildOptions
-	for i=1, #buildOptions do
-		local unitDefID = buildOptions[i]
-		dropableUnits[unitDefID] = true
-	end
-end
+local dropableUnits = {}
 
-for i=1, #UnitDefs do
-	if (UnitDefs[i].customParams.level) then
-		dropableUnits[i] = true
+--All floatable units will be dropped when regular unload fail (such as when unloading at sea), but some can't float but are amphibious,
+--This detects additional units that should be dropped.
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+
+	local floatsOnWaterSurface = ud.moveDef.smClass and floatingMoveClasses[ud.moveDef.smClass]
+	local canMoveInDeepWater   = (ud.moveDef.depth and ud.moveDef.depth >= DROPPABLE_UNIT_MAXDEPTH)  -- NB: ud.maxWaterDepth is for sea buildability, not pathing
+
+	if (not floatsOnWaterSurface) and canMoveInDeepWater then
+		dropableUnits[unitDefID] = true
 	end
 end
 

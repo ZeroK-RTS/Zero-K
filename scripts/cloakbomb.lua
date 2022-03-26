@@ -20,10 +20,6 @@ local digger = piece 'digger'
 include "constants.lua"
 include 'reliableStartMoving.lua'
 
---cob values
-local cloaked = COB.CLOAKED
-local stealth = COB.STEALTH
-
 local smokePiece = {base}
 local movingData = {}
 
@@ -46,7 +42,6 @@ local function Burrow()
 	
 	if(burrowed == true) then
 		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue(stealth, 1)
 	end
 end
 
@@ -198,7 +193,6 @@ local function UnBurrow()
 	Signal(SIG_BURROW)
 	burrowed = false
 	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue(stealth, 0)
 	Move(base, y_axis, 0.000000, 2.000000)
 	Turn(base, x_axis, 0, math.rad(60.000000))
 	

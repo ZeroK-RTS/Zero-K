@@ -1,7 +1,7 @@
 return { shipassault = {
   unitname               = [[shipassault]],
   name                   = [[Siren]],
-  description            = [[Destroyer (Riot/Assault)]],
+  description            = [[Riot/Assault Destroyer (Anti-Sub)]],
   acceleration           = 0.46,
   activateWhenBuilt      = true,
   brakeRate              = 0.6,
@@ -29,8 +29,6 @@ return { shipassault = {
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[shipassault]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   losEmitHeight          = 25,
   maxDamage              = 5200,
   maxVelocity            = 2.0,

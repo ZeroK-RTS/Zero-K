@@ -388,7 +388,7 @@ local function UpdateJink(behaviour, unitData)
 	end
 	unitData.jinkAccumulator = (unitData.jinkAccumulator or 0) + 1
 	if unitData.jinkAccumulator >= behaviour.jinkPeriod then
-		unitData.jinkAccumulator = 0
+		unitData.jinkAccumulator = unitData.jinkAccumulator - behaviour.jinkPeriod
 		unitData.jinkDir = unitData.jinkDir*-1
 	end
 end

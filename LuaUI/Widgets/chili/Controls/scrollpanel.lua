@@ -255,9 +255,7 @@ function ScrollPanel:IsRectInView(x, y, w, h)
 	local cx = x - self.scrollPosX
 	local cy = y - self.scrollPosY
 
-	local rect1 = {cx, cy, w, h}
-	local rect2 = {0, 0, self.clientArea[3], self.clientArea[4]}
-	local inview = AreRectsOverlapping(rect1, rect2)
+	local inview = AreRectsOverlapping(cx, cy, w, h, 0, 0, self.clientArea[3], self.clientArea[4])
 
 	if not(inview) then
 		return false

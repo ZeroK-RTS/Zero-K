@@ -4,6 +4,7 @@ local configList = {
 	{label = "Basic Commands"},
 	{cmdID = CMD_AREA_MEX              , default = true, name = "Area Mex"},
 	{cmdID = CMD.FIGHT                 , default = true, name = "Attack Move"},
+	{cmdID = CMD_BUILD_PLATE           , default = true, name = "Build Plate"},
 	{cmdID = CMD_EMBARK                , default = true, name = "Embark"},
 	{cmdID = CMD.MANUALFIRE            , default = true, name = "Fire Special Weapon"},
 	{cmdID = CMD.ATTACK                , default = true, name = "Force Fire"},
@@ -56,13 +57,14 @@ local configList = {
 
 	{label = "Advanced States (hidden by default)"},
 	{cmdID = CMD_DISABLE_ATTACK        , state = true, default = false, name = "Allow Attack Commands"},
-	{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
+	--{cmdID = CMD_UNIT_BOMBER_DIVE_STATE, state = true, default = false, name = "Bomber Dive State"},
 	{cmdID = CMD_AUTO_CALL_TRANSPORT   , state = true, default = false, name = "Call Transports"},
 	{cmdID = CMD_FIRE_AT_SHIELD        , state = true, default = false, name = "Fire at Shields"},
 	{cmdID = CMD_GLOBAL_BUILD          , state = true, default = false, name = "Global Build"},
 	{cmdID = CMD_UNIT_KILL_SUBORDINATES, state = true, default = false, name = "Kill Captured"},
 	{cmdID = CMD_PREVENT_OVERKILL      , state = true, default = false, name = "Overkill Prevention"},
 	{cmdID = CMD_SELECTION_RANK        , state = true, default = false, name = "Selection Rank"},
+	{cmdID = CMD_FORMATION_RANK        , state = true, default = false, name = "Formation Rank"},
 	{cmdID = CMD_UNIT_AI               , state = true, default = false, name = "Unit AI"},
 }
 
@@ -99,7 +101,7 @@ local defaultValues = {
 	[CMD_GLOBAL_BUILD] = true,
 	--[CMD.MOVE_STATE] = true,
 	--[CMD.FIRE_STATE] = true,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+	--[CMD_UNIT_BOMBER_DIVE_STATE] = true,
 	[CMD_UNIT_KILL_SUBORDINATES] = true,
 	--[CMD_GOO_GATHER] = true,
 	[CMD_DISABLE_ATTACK] = true,
@@ -107,6 +109,7 @@ local defaultValues = {
 	[CMD_PREVENT_OVERKILL] = true,
 	--[CMD_AIR_STRAFE] = true,
 	[CMD_SELECTION_RANK] = true,
+	[CMD_FORMATION_RANK] = true,
 	[CMD_FIRE_AT_SHIELD] = true,
 	--[CMD_FIRE_TOWARDS_ENEMY] = true,
 }

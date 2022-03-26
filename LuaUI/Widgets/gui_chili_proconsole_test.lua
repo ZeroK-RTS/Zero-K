@@ -186,6 +186,7 @@ options_order = {
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
+	'hideChat',
 	'toggleBacklog',
 	'text_height_chat',
 	'text_height_console',
@@ -214,6 +215,55 @@ options_order = {
 
 local function onOptionsChanged()
 	RemakeConsole()
+end
+
+local showingBackchat = false
+local showingNothing = false
+local wantHidden = false
+
+local function SwapBacklog()
+	if showingBackchat then
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		end
+		if wantHidden then
+			showingBackchat = false
+			showingNothing = true
+			return
+		else
+			window_chat:AddChild(scrollpanel_chat)
+			backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
+			backlogButtonImage:Invalidate()
+		end
+	else
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		window_chat:AddChild(scrollpanel_backchat)
+		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
+		backlogButtonImage:Invalidate()
+	end
+	showingBackchat = not showingBackchat
+	showingNothing = false
+end
+
+local function SetHidden(hidden)
+	if hidden == wantHidden then
+		return
+	end
+	wantHidden = hidden
+	
+	if wantHidden then
+		if showingBackchat then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		else
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		showingNothing = true
+	else
+		showingBackchat = true
+		SwapBacklog()
+	end
 end
 
 options = {
@@ -652,6 +702,15 @@ options = {
 				window_chat:RemoveChild(inputspace)
 			end
 			scrollpanel_console:Invalidate()
+		end,
+	},
+	hideChat = {
+		name = "Hide when not chatting",
+		desc = "Hide the chat completely when not entering chat.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetHidden(self.value)
 		end,
 	},
 	backchatOpacity = {
@@ -1253,42 +1312,6 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 			ParentFunc
 		},
 	}
-end
-
-local showingBackchat = false
-local showingNothing = false
-
-local function SetHidden(hidden)
-	if hidden == showingNothing then
-		return
-	end
-	showingNothing = hidden
-	
-	if showingBackchat then
-		window_chat:RemoveChild(scrollpanel_backchat)
-	else
-		window_chat:RemoveChild(scrollpanel_chat)
-	end
-end
-
-local function SwapBacklog()
-	if showingBackchat then
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_backchat)
-		end
-		window_chat:AddChild(scrollpanel_chat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
-		backlogButtonImage:Invalidate()
-	else
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_chat)
-		end
-		window_chat:AddChild(scrollpanel_backchat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
-		backlogButtonImage:Invalidate()
-	end
-	showingBackchat = not showingBackchat
-	showingNothing = false
 end
 
 local function SetBacklogShow(newShow)

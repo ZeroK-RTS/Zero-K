@@ -44,9 +44,6 @@ local spKillTeam          = Spring.KillTeam
 local spGameOver          = Spring.GameOver
 local spEcho              = Spring.Echo
 
-local SPARE_PLANETWARS_UNITS = false
-local SPARE_REGULAR_UNITS = false
-
 local DEBUG_MSG = false
 
 --------------------------------------------------------------------------------
@@ -71,6 +68,9 @@ local noElo = tobool(modOptions.noelo)
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid and true
 local planetIndex = Spring.GetModOptions().singleplayercampaignbattleid
 planetIndex = planetIndex and tonumber(planetIndex)
+
+local SPARE_PLANETWARS_UNITS = false
+local SPARE_REGULAR_UNITS = (modOptions.explodeondefeat == "0" or modOptions.explodeondefeat == 0)
 
 local revealed = false
 local gameIsOver = false

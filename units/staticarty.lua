@@ -1,10 +1,8 @@
 return { staticarty = {
   unitname                      = [[staticarty]],
   name                          = [[Cerberus]],
-  description                   = [[Plasma Artillery Battery - Requires connection to a 50 energy grid]],
-  acceleration                  = 0,
+  description                   = [[Plasma Artillery Battery - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostMetal                = 2500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -29,8 +27,6 @@ return { staticarty = {
   footprintZ                    = 5,
   highTrajectory                = 2,
   iconType                      = [[staticarty]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 3750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -50,7 +46,6 @@ return { staticarty = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooo ooooo ooooo ooooo ooooo]],

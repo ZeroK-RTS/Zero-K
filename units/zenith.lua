@@ -2,9 +2,8 @@ return { zenith = {
   unitname                      = [[zenith]],
   name                          = [[Zenith]],
   description                   = [[Meteor Controller]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  buildCostMetal                = 40000,
+  buildCostMetal                = 36000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
@@ -23,6 +22,9 @@ return { zenith = {
     --pylonrange  = 150,
     modelradius    = [[45]],
     bait_level_default = 0,
+
+    neededlink     = 400,
+    pylonrange     = 150,
   },
   
   energyUse                     = 0,
@@ -31,8 +33,6 @@ return { zenith = {
   footprintX                    = 8,
   footprintZ                    = 8,
   iconType                      = [[mahlazer]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 12000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -43,7 +43,6 @@ return { zenith = {
   script                        = [[zenith.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
@@ -111,7 +110,7 @@ return { zenith = {
       name                    = [[Meteor]],
       accuracy                = 700,
       alwaysVisible           = 1,
-      areaOfEffect            = 240,
+      areaOfEffect            = 256,
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidGround             = false,
@@ -126,6 +125,12 @@ return { zenith = {
 
         spawns_name = "asteroid_dead",
         spawns_feature = 1,
+
+        gatherradius     = [[280]],
+        smoothradius     = [[140]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[1]],
+        quickgather      = [[1]],
       },
 
       damage                  = {
@@ -141,8 +146,8 @@ return { zenith = {
       interceptedByShieldType = 2,
       noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
-      range                   = 9000,
-      reloadtime              = 1,
+      range                   = 8400,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -165,7 +170,7 @@ return { zenith = {
       name                    = [[Meteor]],
       accuracy                = 700,
       alwaysVisible           = 1,
-      areaOfEffect            = 240,
+      areaOfEffect            = 256,
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidGround             = false,
@@ -179,6 +184,12 @@ return { zenith = {
 
         spawns_name = "asteroid_dead",
         spawns_feature = 1,
+
+        gatherradius     = [[280]],
+        smoothradius     = [[140]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[1]],
+        quickgather      = [[1]],
       },
 
       damage                  = {
@@ -194,8 +205,8 @@ return { zenith = {
       interceptedByShieldType = 2,
       noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
-      range                   = 9000,
-      reloadtime              = 1,
+      range                   = 8400,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -219,7 +230,7 @@ return { zenith = {
       name                    = [[Meteor]],
       accuracy                = 700,
       alwaysVisible           = 1,
-      areaOfEffect            = 240,
+      areaOfEffect            = 256,
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidGround             = false,
@@ -234,6 +245,12 @@ return { zenith = {
 
         spawns_name = "asteroid_dead",
         spawns_feature = 1,
+
+        gatherradius     = [[280]],
+        smoothradius     = [[140]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[1]],
+        quickgather      = [[1]],
       },
 
       damage                  = {
@@ -249,8 +266,8 @@ return { zenith = {
       interceptedByShieldType = 2,
       noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
-      range                   = 9000,
-      reloadtime              = 1,
+      range                   = 8400,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,
@@ -264,18 +281,18 @@ return { zenith = {
       tracks                  = true,
       trajectoryHeight        = 0,
       turret                  = true,
-      turnRate                = 6000,
+      turnRate                = 8000,
       weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
-      wobble                  = 30000,
+      weaponVelocity          = 300,
+      wobble                  = 28000,
     },
 
     METEOR_UNCONTROLLED      = {
       name                    = [[Meteor]],
       accuracy                = 700,
       alwaysVisible           = 1,
-      areaOfEffect            = 240,
+      areaOfEffect            = 256,
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidGround             = false,
@@ -291,6 +308,12 @@ return { zenith = {
 
         spawns_name = "asteroid_dead",
         spawns_feature = 1,
+
+        gatherradius     = [[280]],
+        smoothradius     = [[140]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[1]],
+        quickgather      = [[1]],
       },
 
       damage                  = {
@@ -306,8 +329,8 @@ return { zenith = {
       interceptedByShieldType = 2,
       noSelfDamage            = false,
       model                   = [[asteroid.s3o]],
-      range                   = 9000,
-      reloadtime              = 1,
+      range                   = 8400,
+      reloadtime              = 1.2,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       startVelocity           = 1500,

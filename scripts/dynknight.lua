@@ -124,7 +124,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedMult = (GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
 		
 		--left leg up, right leg back
 		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)

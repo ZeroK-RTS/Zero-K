@@ -51,6 +51,7 @@ local buildoptions = {
 		{ "platetank",  notSea=true },
 		
 		{ "striderhub" },
+		{CMD_BUILD_PLATE, tech=3 },
 	},
 
 	{-- economy
@@ -215,6 +216,7 @@ local overrides = {
 	[CMD_SMOOTH] = {texture = imageDir .. 'smooth.png'},
 	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
+	[CMD_BUILD_PLATE] = {texture = imageDir .. 'Bold/buildplate.png'},
 
 	[CMD_AREA_MEX] = {caption = '', texture = imageDir .. 'Bold/mex.png'},
 	[CMD_AREA_TERRA_MEX] = {caption = '', texture = imageDir .. 'Bold/mex.png'},
@@ -271,6 +273,7 @@ local overrides = {
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, caption=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, caption=''},
 	[CMD_SELECTION_RANK] = { texture = {imageDir .. 'states/selection_rank_0.png', imageDir .. 'states/selection_rank_1.png', imageDir .. 'states/selection_rank_2.png', imageDir .. 'states/selection_rank_3.png'}, text=''},
+	[CMD_FORMATION_RANK] = { texture = {imageDir .. 'states/formation_rank_0.png', imageDir .. 'states/formation_rank_1.png', imageDir .. 'states/formation_rank_2.png', imageDir .. 'states/formation_rank_3.png'}, text=''},
 	}
 
 -- noone really knows what this table does but it's needed for epic menu to get the hotkey
@@ -325,6 +328,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	radialmenu=1,
 	placebeacon=1,
 	evacuate=1,
+	buildplate=1,
 
 	-- terraform
 	rampground=1,
@@ -358,6 +362,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	airstrafe=2,
 	divestate=2,
 	selection_rank = 2,
+	formation_rank = 2,
 }
 
 

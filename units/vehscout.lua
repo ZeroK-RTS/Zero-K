@@ -10,7 +10,7 @@ return { vehscout = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 2]],
   collisionVolumeScales  = [[14 14 40]],
   collisionVolumeType    = [[cylZ]],
@@ -28,8 +28,6 @@ return { vehscout = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[vehiclescout]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 120,
   maxSlope               = 18,
@@ -45,7 +43,7 @@ return { vehscout = {
   sightDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 1,
-  trackStretch           = 0.1,
+  trackStretch           = 1,
   trackType              = [[Motorbike]],
   trackWidth             = 24,
   turninplace            = 0,
@@ -84,7 +82,7 @@ return { vehscout = {
       },
       
       damage                  = {
-        default = 35,
+        default = 32,
       },
   
       explosionGenerator      = [[custom:flash2purple]],

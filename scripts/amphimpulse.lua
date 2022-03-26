@@ -15,7 +15,6 @@ local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(10)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
-local CALF_RETRACT_ANGLE = math.rad(0)
 local CALF_RETRACT_SPEED = math.rad(90) * PACE
 local CALF_STRAIGHTEN_ANGLE = math.rad(70)
 local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
@@ -28,29 +27,12 @@ local BODY_TILT_SPEED = math.rad(10)
 local BODY_RISE_HEIGHT = 4
 local BODY_RISE_SPEED = 6*PACE
 
-local ARM_FRONT_ANGLE = -math.rad(20)
-local ARM_FRONT_SPEED = math.rad(22.5) * PACE
-local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(22.5) * PACE
-local FOREARM_FRONT_ANGLE = -math.rad(40)
-local FOREARM_FRONT_SPEED = math.rad(45) * PACE
-local FOREARM_BACK_ANGLE = math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(45) * PACE
-
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 local UNDERWATER_DEPTH = -32
-
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
--- Weapon config
-
-local SOUND_PERIOD = 2
-local soundIndex = SOUND_PERIOD
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------

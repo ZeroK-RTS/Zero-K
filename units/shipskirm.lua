@@ -1,7 +1,7 @@
 return { shipskirm = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
-  description            = [[Rocket Boat (Skirmisher)]],
+  description            = [[Skirmisher Ship]],
   acceleration           = 0.234,
   activateWhenBuilt      = true,
   brakeRate              = 1.38,
@@ -29,8 +29,6 @@ return { shipskirm = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[shipskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   losEmitHeight          = 30,
   maxDamage              = 650,
   maxVelocity            = 2.1,

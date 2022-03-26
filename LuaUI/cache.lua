@@ -24,39 +24,6 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --	MarkerAddLine(a,b,c,d,e,f,true)
 --end
 
-local spGetProjectileTeamID = Spring.GetProjectileTeamID
-local spGetMyTeamID = Spring.GetMyTeamID
-local spAreTeamsAllied = Spring.AreTeamsAllied
-local spGetSpectatingState = Spring.GetSpectatingState
-local function FilterOutRestrictedProjectiles(projectiles)
-	local isSpectator, hasFullView = spGetSpectatingState()
-	if isSpectator and hasFullView then
-		return projectiles
-	end
-	local i = 1
-	local n = #projectiles
-	local myTeamID = spGetMyTeamID()
-	while i <= n do
-		local p = projectiles[i]
-		local ownerTeamID = spGetProjectileTeamID(p)
-		-- If the owner is allied with us, we shouldn't need to filter anything out
-		if not spAreTeamsAllied(ownerTeamID, myTeamID) then
-			projectiles[i] = projectiles[n]
-			projectiles[n] = nil
-			n = n - 1
-			i = i - 1
-		end
-		i = i + 1
-	end
-	return projectiles
-end
-
-local GetProjectilesInRectangle = Spring.GetProjectilesInRectangle
-function Spring.GetProjectilesInRectangle(x1, z1, x2, z2)
-	local projectiles = GetProjectilesInRectangle(x1, z1, x2, z2)
-	return FilterOutRestrictedProjectiles(projectiles)
-end
-
 -- Cutscenes apply F5
 local IsGUIHidden = Spring.IsGUIHidden
 function Spring.IsGUIHidden()

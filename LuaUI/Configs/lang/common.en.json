@@ -44,6 +44,7 @@
 	"button" : "Button",
 	"shift" : "Shift",
 	"health" : "Health",
+	"shields" : "Shields",
 	"value" : "Value",
 	"special" : "Special",
 	"ready" : "Ready",

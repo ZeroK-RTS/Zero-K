@@ -39,88 +39,70 @@ local SIG_AIM = 4
 local RESTORE_DELAY_TUBE = 1000
 local RESTORE_DELAY_HEAD = 1500
 
+local SPEED_MULT = 2.5
+
+local function HalfWalk(p_thigh, p_leg, p_foot, p_toe, pf_toe, pb_toe, s_thigh, s_leg, s_foot, s_toe, sf_toe, sb_toe, first)
+	local speedMod = math.max(0.25, GG.att_MoveChange[unitID] or 1) * SPEED_MULT
+	
+	--part one
+	Turn(head, z_axis, math.rad(-6), math.rad(3))
+	Turn(head, x_axis, math.rad(4), math.rad(5))
+	--right backward
+	Turn(p_thigh, x_axis, math.rad(50), math.rad(50) * speedMod)
+	Turn(p_leg, x_axis, math.rad(55), math.rad(15) * speedMod)
+	Turn(p_foot, x_axis, math.rad(-40), math.rad(35) * speedMod)
+	Turn(pf_toe, x_axis, math.rad(-40), math.rad(180) * speedMod)
+	Turn(pb_toe, x_axis, math.rad(-50), math.rad(180) * speedMod)
+	Turn(p_toe, z_axis, math.rad(-(20)), math.rad(140) * speedMod)
+	--left forward
+	Turn(s_thigh, x_axis, math.rad(-80), math.rad(115) * speedMod)
+	Turn(s_leg, x_axis, math.rad(120), math.rad(130) * speedMod)
+	Turn(s_foot, x_axis, math.rad(-10), math.rad(30) * speedMod)
+	Turn(sf_toe, x_axis, 0, math.rad(180) * speedMod)
+	Turn(sb_toe, x_axis, 0, math.rad(180) * speedMod)
+	Turn(s_toe, z_axis, 0, math.rad(140) * speedMod)
+	
+	if first then
+		Move(base, y_axis, 9.5, 20 * speedMod)
+	else
+		Move(base, y_axis, 9.5, 5 * speedMod)
+	end
+	Turn(s_leg, x_axis, math.rad(45), math.rad(110) * speedMod)
+	Sleep(500 / speedMod)
+	Turn(s_leg, x_axis, math.rad(120), math.rad(150) * speedMod)
+	Move(base, y_axis, 8, 3.5 * speedMod)
+	Sleep(500 / speedMod)
+	
+	--part two
+	Turn(head, z_axis, math.rad(-(-3)), math.rad(3))
+	Turn(head, x_axis, math.rad(-7), math.rad(5))
+	--right back to front
+	Turn(p_thigh, x_axis, math.rad(35), math.rad(15) * speedMod)
+	Turn(p_leg, x_axis, math.rad(-10), math.rad(65) * speedMod)
+	Turn(p_foot, x_axis, math.rad(-10), math.rad(30) * speedMod)
+	Turn(pf_toe, x_axis, math.rad(40), math.rad(180) * speedMod)
+	Turn(pb_toe, x_axis, math.rad(-30), math.rad(180) * speedMod)
+	Turn(p_toe, z_axis, math.rad(-(25)), math.rad(140) * speedMod)
+	--left front to back
+	Turn(s_thigh, x_axis, math.rad(0), math.rad(80) * speedMod)
+	Turn(s_leg, x_axis, math.rad(70), math.rad(100) * speedMod)
+	Turn(s_foot, x_axis, math.rad(-15), math.rad(5) * speedMod)
+	
+	Move(base, y_axis, 7, speedMod)
+	Sleep(500 / speedMod)
+	Turn(s_leg, x_axis, math.rad(40), math.rad(60) * speedMod)
+	Sleep(500 / speedMod)
+end
+
 local function walk()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 
-	Move(base, y_axis, 10, 30)
-	
+	local first = true
 	while true do
-		--part one
-		Move(base, y_axis, 3, 1)
-		Turn(head, z_axis, math.rad(-(6)), math.rad(3))
-		Turn(head, x_axis, math.rad(4), math.rad(5))
-		--right backward
-		Turn(r_thigh, x_axis, math.rad(10), math.rad(140))
-		WaitForTurn(r_thigh, x_axis)
-		Turn(r_thigh, x_axis, math.rad(45), math.rad(100))
-		Turn(r_leg, x_axis, math.rad(80), math.rad(140))
-		Turn(r_foot, x_axis, math.rad(-40), math.rad(140))
-		Turn(rf_toe, x_axis, math.rad(-40), math.rad(180))
-		Turn(rb_toe, x_axis, math.rad(-50), math.rad(180))
-		Turn(r_toe, z_axis, math.rad(-(20)), math.rad(140))
-		--left forward
-		Turn(l_thigh, x_axis, math.rad(-80), math.rad(220))
-		Turn(l_leg, x_axis, math.rad(120), math.rad(220))
-		Turn(l_foot, x_axis, math.rad(-10), math.rad(190))
-		Turn(lf_toe, x_axis, 0, math.rad(180))
-		Turn(lb_toe, x_axis, 0, math.rad(180))
-		Turn(l_toe, z_axis, math.rad(-(0)), math.rad(140))
-		WaitForTurn(l_thigh, x_axis)
-		
-		--part two
-		Move(base, y_axis, 0, 1.6)
-		Turn(head, z_axis, math.rad(-(-3)), math.rad(3))
-		Turn(head, x_axis, math.rad(-7), math.rad(5))
-		--right back to front
-		Turn(r_leg, x_axis, math.rad(-10), math.rad(150))
-		Turn(r_foot, x_axis, math.rad(-10), math.rad(150))
-		Turn(rf_toe, x_axis, math.rad(40), math.rad(180))
-		Turn(rb_toe, x_axis, math.rad(-30), math.rad(180))
-		Turn(r_toe, z_axis, math.rad(-(25)), math.rad(140))
-		--left front to back
-		Turn(l_thigh, x_axis, math.rad(-10), math.rad(140))
-		Turn(l_leg, x_axis, math.rad(30), math.rad(160))
-		Turn(l_foot, x_axis, math.rad(-15), math.rad(60))
-		Sleep(100)
-		
-		--part three
-		Move(base, y_axis, 3, 1)
-		Turn(head, z_axis, math.rad(-(5)), math.rad(3))
-		Turn(head, x_axis, math.rad(3), math.rad(5))
-		--left backward
-		Turn(l_thigh, x_axis, math.rad(10), math.rad(140))
-		WaitForTurn(l_thigh, x_axis)
-		Turn(l_thigh, x_axis, math.rad(45), math.rad(100))
-		Turn(l_leg, x_axis, math.rad(80), math.rad(140))
-		Turn(l_foot, x_axis, math.rad(-40), math.rad(140))
-		Turn(lf_toe, x_axis, math.rad(-40), math.rad(180))
-		Turn(lb_toe, x_axis, math.rad(-50), math.rad(180))
-		Turn(l_toe, z_axis, math.rad(-(20)), math.rad(140))
-		--right forward
-		Turn(r_thigh, x_axis, math.rad(-80), math.rad(220))
-		Turn(r_leg, x_axis, math.rad(120), math.rad(220))
-		Turn(r_foot, x_axis, math.rad(-10), math.rad(190))
-		Turn(rf_toe, x_axis, 0, math.rad(180))
-		Turn(rb_toe, x_axis, 0, math.rad(180))
-		Turn(r_toe, z_axis, math.rad(-(0)), math.rad(140))
-		WaitForTurn(r_thigh, x_axis)
-		
-		--part four
-		Move(base, y_axis, 0, 1.6)
-		Turn(head, z_axis, math.rad(-(-5)), math.rad(8))
-		Turn(head, x_axis, math.rad(-3), math.rad(10))
-		--left back to front
-		Turn(l_leg, x_axis, math.rad(-10), math.rad(150))
-		Turn(l_foot, x_axis, math.rad(-10), math.rad(150))
-		Turn(lf_toe, x_axis, math.rad(40), math.rad(180))
-		Turn(lb_toe, x_axis, math.rad(-30), math.rad(180))
-		Turn(l_toe, z_axis, math.rad(-(25)), math.rad(140))
-		-- right front to back
-		Turn(r_thigh, x_axis, math.rad(-10), math.rad(140))
-		Turn(r_leg, x_axis, math.rad(30), math.rad(160))
-		Turn(r_foot, x_axis, math.rad(-15), math.rad(60))
-		Sleep(100)
+		HalfWalk(r_thigh, r_leg, r_foot, r_toe, rf_toe, rb_toe, l_thigh, l_leg, l_foot, l_toe, lf_toe, lb_toe, first)
+		HalfWalk(l_thigh, l_leg, l_foot, l_toe, lf_toe, lb_toe, r_thigh, r_leg, r_foot, r_toe, rf_toe, rb_toe)
+		first = false
 	end
 end
 
@@ -144,7 +126,7 @@ local function stopWalk()
 	Turn(lf_toe, x_axis, 0, math.rad(200))
 	Turn(lb_toe, x_axis, 0, math.rad(200))
 	
-	Move(base, y_axis, 6, 8)
+	Move(base, y_axis, 6, 16)
 	Turn(head, z_axis, math.rad(-(0)), math.rad(200))
 	Turn(head, x_axis, 0, math.rad(200))
 

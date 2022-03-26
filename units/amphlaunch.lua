@@ -22,6 +22,7 @@ return { amphlaunch = {
     amph_submerged_at  = 40,
     thrower_gather     = 160,
     attack_toggle      = [[1]],
+    can_target_allies  = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -30,8 +31,6 @@ return { amphlaunch = {
   footprintZ             = 2,
   highTrajectory         = 1,
   iconType               = [[ampharty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 960,
   maxSlope               = 36,

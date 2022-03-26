@@ -25,8 +25,6 @@ return { shieldfelon = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[walkersupport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 1600,
@@ -84,8 +82,8 @@ return { shieldfelon = {
       shieldBadColor          = [[1 0.1 0.1 1]],
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 1600,
-      shieldPowerRegen        = 16,
+      shieldPower             = 1800,
+      shieldPowerRegen        = 21,
       shieldPowerRegenEnergy  = 0,
       shieldRadius            = 120,
       shieldRepulser          = false,
@@ -104,7 +102,7 @@ return { shieldfelon = {
       cylinderTargeting       = 0,
 
       customParams            = {
-        shield_drain = 80,
+        shield_drain = 75,
         
         light_camera_height = 2500,
         light_color = [[0.66 0.32 0.90]],
@@ -112,7 +110,7 @@ return { shieldfelon = {
       },
 
       damage                  = {
-        default        = 110.1,
+        default        = 94.01,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -123,7 +121,7 @@ return { shieldfelon = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 435,
-      reloadtime              = 0.166,
+      reloadtime              = 0.133,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,

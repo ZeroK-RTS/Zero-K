@@ -18,14 +18,13 @@ return { hoverskirm2 = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.5,

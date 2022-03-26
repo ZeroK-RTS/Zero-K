@@ -42,8 +42,6 @@ local SIG_BUILD = 32
 local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
-local SIG_WALK = 1
---local SIG_AIM_3 = 8 --step on
 
 --------------------------------------------------------------------------------
 -- vars
@@ -57,7 +55,7 @@ local bMoving = false
 local bAiming = false
 local inBuildAnim = false
 
-local SPEEDUP_FACTOR = 1.1
+local SPEEDUP_FACTOR = 1.02
 local REF_TURN_SPEED = 185  -- deg/s
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
@@ -403,7 +401,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	--Signal(SIG_WALK)
 	bMoving = false
 end
 

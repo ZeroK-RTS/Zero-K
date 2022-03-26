@@ -60,7 +60,7 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 	
-	AKBOT2 = {		--amphib
+	AKBOT2 = { --amphib
 		footprintx = 2,
 		footprintz = 2,
 		maxwaterdepth = 5000,
@@ -69,7 +69,7 @@ local moveDefs = {
 		crushstrength = 50,
 	},
 	
-	AKBOT3 = {		--amphib
+	AKBOT3 = { --amphib
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 5000,
@@ -78,7 +78,7 @@ local moveDefs = {
 		crushstrength = 150,
 	},
 	
-	AKBOT4 = {		--amphib
+	AKBOT4 = { --amphib
 		footprintx = 4,
 		footprintz = 4,
 		maxwaterdepth = 5000,
@@ -87,7 +87,7 @@ local moveDefs = {
 		crushstrength = 500,
 	},
 	
-	TKBOT2 = {		--allterrain
+	TKBOT2 = { --allterrain
 		footprintx = 2,
 		footprintz = 2,
 		maxwaterdepth = 16,
@@ -96,7 +96,7 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 
-	TKBOT3 = {		--allterrain
+	TKBOT3 = { --allterrain
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
@@ -105,7 +105,7 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 	
-	TKBOT4 = {		--allterrain
+	TKBOT4 = { --allterrain
 		footprintx = 4,
 		footprintz = 4,
 		maxwaterdepth = 22,
@@ -114,7 +114,7 @@ local moveDefs = {
 		depthmodparams = common_depthmodparams,
 	},
 
-	ATKBOT3 = {		--amphib + allterrain
+	ATKBOT3 = { --amphib + allterrain
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 5000,
@@ -158,7 +158,7 @@ local moveDefs = {
 		footprintz = 2,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 40,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 	HOVER3 = {
@@ -166,7 +166,7 @@ local moveDefs = {
 		footprintz = 3,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 40,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 	HOVER4 = {
@@ -174,7 +174,7 @@ local moveDefs = {
 		footprintz = 4,
 		maxslope = 18,
 		maxwaterdepth = 5000,
-		slopemod = 40,
+		slopemod = 30,
 		crushstrength = 50,
 	},
 
@@ -186,7 +186,7 @@ local moveDefs = {
 		crushstrength = 150,
 	},
 
-	BHOVER3 = {		--hover with bot slope
+	BHOVER3 = { --hover with bot slope
 		footprintx = 3,
 		footprintz = 3,
 		maxslope = 36,

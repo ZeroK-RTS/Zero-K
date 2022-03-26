@@ -25,8 +25,34 @@ local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 local canTeleport = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.isFactory or not (ud.isImmobile or ud.isStrafingAirUnit) then
+	if not (ud.isImmobile or ud.isStrafingAirUnit) then
 		canTeleport[i] = true
+	elseif ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local buildOptions = ud.buildOptions
+
+		for j = 1, #buildOptions do
+			local boDefID = buildOptions[j]
+			local bod = UnitDefs[boDefID]
+
+			if bod and not (bod.isImmobile or bod.isStrafingAirUnit) then
+				canTeleport[i] = true  -- only factories that can build teleportable units are included
+				break
+			end
+		end
+	end
+end
+
+local beaconDefsByTeleporterDef = {}
+local isBeaconDef = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if (ud.customParams.teleporter and ud.customParams.teleporter_beacon_unit) then
+		local beaconDef = UnitDefNames[ ud.customParams.teleporter_beacon_unit ]
+
+		if (beaconDef) then
+			beaconDefsByTeleporterDef[unitDefID] = beaconDef.id
+			isBeaconDef[beaconDef.id] = true
+		end
 	end
 end
 
@@ -63,8 +89,6 @@ local spTestMoveOrder = Spring.TestMoveOrder
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-local beaconDef = UnitDefNames["tele_beacon"].id
 
 local offset = {
 	[0] = {x = 1, z = 0},
@@ -166,7 +190,8 @@ function tele_undeployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 end
 
-function tele_createBeacon(unitID, x, z, beaconID)
+function tele_createBeacon(unitID, unitDefID, x, z, beaconID)
+	local beaconDef = beaconDefsByTeleporterDef[unitDefID]
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
 	changeSpeed(unitID, nil, 1)
@@ -332,6 +357,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 			end
 			
 			if (inLos) then --if LOS: check for obstacle
+				local beaconDef = beaconDefsByTeleporterDef[unitDefID]
 				local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0, cz, 1)
 				if not (place == 2 and feature == nil) then
 					return true, true -- command was used and remove it
@@ -694,7 +720,6 @@ local spGetLocalTeamID   = Spring.GetLocalTeamID
 local myTeam = spGetMyTeamID()
 local myAllyTeam = spGetMyAllyTeamID()
 
-local beaconDef = UnitDefNames["tele_beacon"].id
 local beacons = {}
 local beaconCount = 0
 
@@ -709,7 +734,7 @@ function gadget:Initialize()
 end
 
 function gadget:DefaultCommand(type, targetID)
-	if (type == 'unit') and beaconDef == spGetUnitDefID(targetID) then
+	if (type == 'unit') and isBeaconDef[ spGetUnitDefID(targetID) ] then
 		local targetTeam = spGetUnitTeam(targetID)
 		local selfTeam = spGetLocalTeamID()
 		if not (spAreTeamsAllied(targetTeam, selfTeam)) then
@@ -795,14 +820,14 @@ local function DrawFunc(u1, u2)
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	if (unitDefID == beaconDef) then
+	if (isBeaconDef[unitDefID]) then
 		beacons[beaconCount + 1] = unitID
 		beaconCount = beaconCount + 1
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	if (unitDefID == beaconDef) then
+	if (isBeaconDef[unitDefID]) then
 		for i=1, #beacons do
 			if beacons[i] == unitID then
 				beacons[i] = beacons[beaconCount]

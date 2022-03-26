@@ -1,7 +1,7 @@
 return { hoverdepthcharge = {
   unitname            = [[hoverdepthcharge]],
   name                = [[Claymore]],
-  description         = [[Anti-Sub Hovercraft]],
+  description         = [[Riot Hovercraft (Anti-Sub)]],
   acceleration        = 0.12,
   activateWhenBuilt   = true,
   brakeRate           = 1.3,
@@ -20,14 +20,14 @@ return { hoverdepthcharge = {
   customParams        = {
     bait_level_default = 1,
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
+    okp_damage = 440,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverspecial]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.35,

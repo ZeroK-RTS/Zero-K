@@ -1,4 +1,19 @@
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--[[
+	The gadget allows a unit to "jump" using weapon projectile.
+	It hides the unit after shot, and respawns it at the target position on
+	Explosion event of any projectile from the given weapon.
+	Works with burst and noExplode weapons too, in such case the first Explosion
+	while the unit is still hidden respawns the unit.
+	It is currently limited to one weapon per unit.
+	To use:
+	1. Add "jump_using_weapon = <weapon_index>" to unit customParams.
+	2. Call GG.PuppyHandler_Shot(unitID) from unit script after the unit shoots
+	the given weapon.
+	Usually in script.Shot(num) function, or for script-emitted weapons, after
+	EmitSfx() call that fires the given weapon.
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -50,11 +65,31 @@ local CMD_WAIT = CMD.WAIT
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local wantedList = {}
+local wantedWeaponsSet = {}
+local wantedWeaponsList = {}
 
-local puppyDefID
-local puppyWeaponID
-local puppyLosRadius
+local puppyDefs = {}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+
+	if (ud.customParams.jump_using_weapon) then
+		local weaponNumber = tonumber(ud.customParams.jump_using_weapon)
+		local weaponDefID = ud.weapons[weaponNumber].weaponDef
+
+		puppyDefs[unitDefID] = {
+			weaponDefID = weaponDefID,
+			selfDamage = tonumber(ud.customParams.jump_self_damage),
+			losRadius = ud.losRadius,
+		}
+
+		wantedWeaponsSet[weaponDefID] = true
+	end
+end
+
+for weaponDefID, _ in pairs(wantedWeaponsSet) do
+	wantedWeaponsList[#wantedWeaponsList + 1] = weaponDefID
+end
 
 local cannotBeDamage = {}
 local stuckPuppyWorkaround = {}
@@ -102,17 +137,22 @@ local function RestorePuppy(unitID, x, y, z)
 	end
 	--Spring.Echo("RestorePuppy DONE")
 	hiddenPuppy[unitID] = nil
+
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitConfig = puppyDefs[unitDefID]
 	spSetUnitPosition(unitID, x, z) -- fixes rectangle selection
 	spMoveCtrlSetPosition(unitID, x, y, z)
 	spSetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
 	spMoveCtrlDisable(unitID)
 	spSetUnitBlocking(unitID, true, true)	-- restores normal state once they land
-	-- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
+	-- Spring.SetUnitSensorRadius(unitID, "los", unitConfig.losRadius)
 	-- Spring.SetUnitStealth(unitID, false)
 	spSetUnitNoDraw(unitID, false)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, 0, 0, 0, 1, 0)
 	cannotBeDamage[unitID] = false
-	spAddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["jumpscout_missile"].id) -- prevent puppy fountain
+	if (unitConfig.selfDamage) then
+		spAddUnitDamage(unitID, unitConfig.selfDamage, 0, -1, unitConfig.weaponDefID) -- prevent puppy fountain
+	end
 	-- Spring.SetUnitNoSelect(unitID, false)
 	spSetUnitNoMinimap(unitID, false)
 	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
@@ -131,42 +171,39 @@ function GG.PuppyHandler_Shot(unitID)
 end
 
 function gadget:Initialize()
-	local puppyDef =  UnitDefNames.jumpscout
-	puppyDefID = puppyDef.id
-	puppyWeaponID = puppyDef.weapons[1].weaponDef
-	puppyLosRadius = puppyDef.losRadius
-	wantedList = {puppyWeaponID}
-	Script.SetWatchExplosion(puppyWeaponID, true)
+	for i = 1, #wantedWeaponsList do
+		Script.SetWatchExplosion(wantedWeaponsList[i], true)
+	end
 end
 
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
-	local attackerTeam, attackerDefID, defenderTeam, defenderDefID
+	local attackerTeam, attackerDefID, weaponDefID, defenderTeam, defenderDefID
 	if spValidUnitID(proOwnerID) then
 		attackerDefID = spGetUnitDefID(proOwnerID)
-		if attackerDefID ~= puppyDefID then return false end	-- nothing to do with us, exit
+		if (not puppyDefs[attackerDefID]) then return false end	-- nothing to do with us, exit
 		attackerTeam = spGetUnitTeam(proOwnerID)
+		weaponDefID = puppyDefs[attackerDefID].weaponDefID
 	end
 	if spValidUnitID(shieldCarrierUnitID) then
 		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
 		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
 	end
-	-- we don't actually have the weaponID, but can assume it is puppyWeaponID
-	gadget:UnitPreDamaged(shieldCarrierUnitID, defenderDefID, defenderTeam, 0, false, puppyWeaponID, proOwnerID, attackerDefID, attackerTeam, proID)
+	gadget:UnitPreDamaged(shieldCarrierUnitID, defenderDefID, defenderTeam, 0, false, weaponDefID, proOwnerID, attackerDefID, attackerTeam, proID)
 	return false
 end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
-	return {puppyWeaponID}
+	return wantedWeaponsList
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
-	if weaponDefID == puppyWeaponID and attackerID and spValidUnitID(attackerID) then
+	if wantedWeaponsSet[weaponDefID] and attackerID and spValidUnitID(attackerID) then
 		if attackerTeam and unitTeam then
 			-- attacker and attacked units are known (both units are alive)
 			if spAreTeamsAllied(unitTeam, attackerTeam) then
 				-- attacked unit is an ally
-				if unitDefID == puppyDefID then
+				if puppyDefs[unitDefID] then
 					-- attacked unit is an allied puppy, cancel damage
 					--Spring.Echo("UnitPreDamaged " .. attackerID)
 					return 0
@@ -210,11 +247,11 @@ function gadget:GameFrame(frame)
 end
 
 function gadget:Explosion_GetWantedWeaponDef()
-	return wantedList
+	return wantedWeaponsList
 end
 
-function gadget:Explosion(weaponID, px, py, pz, ownerID)
-	if weaponID == puppyWeaponID and ownerID and spValidUnitID(ownerID) then
+function gadget:Explosion(weaponDefID, px, py, pz, ownerID)
+	if wantedWeaponsSet[weaponDefID] and ownerID and spValidUnitID(ownerID) then
 		-- the puppy landed
 		RestorePuppy(ownerID, px, py, pz)
 	end

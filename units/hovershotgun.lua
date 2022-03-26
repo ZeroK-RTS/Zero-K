@@ -16,14 +16,13 @@ return { hovershotgun = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
  },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,

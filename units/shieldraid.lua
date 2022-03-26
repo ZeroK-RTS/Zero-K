@@ -9,7 +9,7 @@ return { shieldraid = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[24 29 24]],
   collisionVolumeType    = [[cylY]],
@@ -26,8 +26,6 @@ return { shieldraid = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 340,
   maxSlope               = 36,
@@ -81,7 +79,7 @@ return { shieldraid = {
       },
       
       damage                  = {
-        default = 8.6,
+        default = 8.48,
       },
 
       duration                = 0.02,

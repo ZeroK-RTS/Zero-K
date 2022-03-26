@@ -11,7 +11,7 @@ return { hoverassault = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[HOVER]],
+  category            = [[HOVER TOOFAST]],
   collisionVolumeOffsets = [[0 -8 0]],
   collisionVolumeScales  = [[30 34 36]],
   collisionVolumeType    = [[box]],
@@ -21,16 +21,15 @@ return { hoverassault = {
     bait_level_default = 0,
     bait_level_target_armor = 1,
     modelradius       = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
-  damageModifier      = 0.25,
+  damageModifier      = 0.333,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maxDamage           = 1250,
+  maxDamage           = 1450,
   maxSlope            = 36,
   maxVelocity         = 3.2,
   movementClass       = [[HOVER3]],
@@ -44,7 +43,7 @@ return { hoverassault = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
-      [[custom:beamerray]],
+      [[custom:plasma_cannon_muzzle_blue]],
     },
 
   },
@@ -70,7 +69,7 @@ return { hoverassault = {
     DEW = {
       name                    = [[Direct Energy Weapon]],
       areaOfEffect            = 48,
-      cegTag                  = [[beamweapon_muzzle_blue]],
+      cegTag                  = [[halberd_trail]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -80,7 +79,7 @@ return { hoverassault = {
         light_color = [[0.7 0.7 2.3]],
         light_radius = 160,
       },
-      
+
       damage                  = {
         default = 160.1,
       },

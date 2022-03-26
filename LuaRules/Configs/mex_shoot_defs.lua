@@ -1,8 +1,8 @@
 local defs = {
-	{
-		name = "cloakriot",
-		fireHeight = 0,
-	},
+	--{
+	--	name = "cloakriot",
+	--	fireHeight = 0,
+	--},
 	{
 		name = "vehriot",
 		searchRange = 180,

@@ -18,12 +18,13 @@ return { turretemp = {
   customParams                  = {
     bait_level_default = 1,
     bait_level_target_armor = 1,
-    aimposoffset   = [[0 10 0]],
+    aimposoffset   = [[0 12 0]],
     modelradius    = [[16]],
     aim_lookahead  = 50,
+    dynamic_colvol = [[1]],
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
@@ -75,7 +76,7 @@ return { turretemp = {
       },
 
       damage                  = {
-        default = 1200,
+        default = 1100,
       },
 
       duration                = 8,
@@ -90,7 +91,7 @@ return { turretemp = {
       paralyzer               = true,
       paralyzeTime            = 2,
       range                   = 460,
-      reloadtime              = 2.7,
+      reloadtime              = 2.9,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

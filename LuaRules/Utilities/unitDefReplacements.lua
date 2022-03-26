@@ -48,7 +48,7 @@ local function GetCachedBaseRange(unitDefID, ud)
 		rangeCache[unitDefID] = ud.maxWeaponRange
 	end
 	return rangeCache[unitDefID]
-end	
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

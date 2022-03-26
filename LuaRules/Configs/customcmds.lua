@@ -1,14 +1,10 @@
---------------------------------------------------------------------------------
---
---  Proposed Command ID Ranges:
---
---    all negative:  Engine (build commands)
---       0 -   999:  Engine
---    1000 -  9999:  Group AI
---   10000 - 19999:  LuaUI
---   20000 - 29999:  LuaCob
---   30000 - 39999:  LuaRules
---
+--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
+     If you are a modder adding custom commands, MAKE YOUR OWN FILE.
+     By overriding this file you're SETTING YOURSELF UP FOR FAILURE
+     when ZK adds something to this file (your override won't have
+     the new addition) and making things confusing for other modders
+     who might want to use your code (with your own file it will be
+     obvious where the extra commands are coming from). ]]
 
 -- if you add a command, please order it by ID!
 return {
@@ -38,7 +34,9 @@ return {
 	GBCANCEL = 13926, -- global build command area cancel cmd
 	STOP_PRODUCTION = 13954,
 	SELECTION_RANK = 13987,
+	FORMATION_RANK = 13988,
 	SELECT_MISSILES = 14001,
+	BUILD_PLATE = 14002,
 
 	AREA_MEX = 30100,
 	AREA_TERRA_MEX = 30101,
@@ -105,4 +103,7 @@ return {
 	RESTORE = 39739,
 	BUMPY = 39740,
 	TERRAFORM_INTERNAL = 39801,
+
+	--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
+	     See the bigass chunk of text at the top of the file. ]]
 }

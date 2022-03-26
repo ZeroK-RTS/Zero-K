@@ -11,9 +11,6 @@ piece('base', 'rockbase', 'body', 'turret', 'firepoint',
 	'lwheel1', 'lwheel2',
 	'gs1r', 'gs2r', 'gs1l', 'gs2l')
 
-local SIG_AIM = 1
-local SIG_MOVE = 2
-
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -34,6 +31,8 @@ local turnTilt = 0
 local lastSteer = 0
 local steerRate = 0
 local steer = 0
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 local SETTLE_PERIODS = 15
 local settleTimer = 0
@@ -197,7 +196,7 @@ function script.QueryWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, 280.1, 730, 30, 0.05, true)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 730, 30, 0.05, true)
 end
 
 function script.AimWeapon()

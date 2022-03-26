@@ -15,13 +15,17 @@ function gadget:GetInfo()
   }
 end
 
-local projectileDefs = {
-	[WeaponDefNames["subraider_torpedo"].id] = true,
-	[WeaponDefNames["amphriot_torpedo"].id] = true,
-	[WeaponDefNames["amphraid_torpedo"].id] = true,
-	[WeaponDefNames["shiptorpraider_torpedo"].id] = true,
-	[WeaponDefNames["turrettorp_torpedo"].id] = true,
-}
+local tobool = Spring.Utilities.tobool
+
+local projectileDefs = {}
+
+for i = 1, #WeaponDefs do
+	local wd = WeaponDefs[i]
+
+	if tobool(wd.customParams.stays_underwater) then
+		projectileDefs[i] = true
+	end
+end
 
 -------------------------------------------------------------
 -------------------------------------------------------------

@@ -20,7 +20,7 @@ upgrades = {
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
-		description = "Basic self-defense weapon",
+		description = "Basic self-defence weapon",
 	},
 
 	commweapon_assaultcannon = {
@@ -676,7 +676,7 @@ upgrades = {
 	},
 	-- modules that use a weapon slot
 	module_guardian_armor = {
-		name = "Guardian Defense System",
+		name = "Guardian Defence System",
 		description = "Adds 100% HP (including other modules); self-repairs 20 HP/s",
 		func = function(unitDef, attributeMods)
 				attributeMods.health = attributeMods.health + 1

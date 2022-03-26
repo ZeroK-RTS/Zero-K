@@ -69,7 +69,15 @@ local resources = {
 			explofade='explofade.tga',
 			heatcloud='GPL/explo.png',
 			explo='GPL/fire.png',
+
+			bar_dirt       = 'CC/bar_icexuick/dirt.png',
+			bar_explowater = 'CC/bar_icexuick/explowater.tga',
+			bar_gunshotxl  = 'CC/bar_icexuick/gunshotxl.tga',
+			bar_waterrush  = 'CC/bar_icexuick/waterrush.tga',
+			bar_wave       = 'CC/bar_icexuick/wave.tga',
+
 	  -- MANUAL
+	  flarescale01='flarescale01.tga',
 
       ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",

@@ -95,7 +95,7 @@ local menu_armcom = {
   {
     angle = 180,
     unit = "turretlaser",
-    label = "Defense",
+    label = "Defence",
     items = {
       {
         angle = 45,

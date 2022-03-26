@@ -20,8 +20,6 @@ return { starlight_satellite = {
   footprintZ             = 0,
   hoverAttack            = true,
   iconType               = [[satellite]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1500,
   maxVelocity            = 0.001,
   movementClass          = [[KBOT2]],
@@ -32,6 +30,7 @@ return { starlight_satellite = {
   
   customParams           = {
     dontcount = [[1]],
+    has_parent_unit = 1,
   },
 
   sfxtypes               = {

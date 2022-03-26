@@ -1,4 +1,5 @@
 include "constants.lua"
+include "aimPosTerraform.lua"
 
 --pieces
 local concrete, belt = piece('Concrete','Belt');
@@ -71,6 +72,7 @@ local function Close()
 	--end of animation
 	
 	Spring.SetUnitArmored(unitID, true);
+	GG.Script_OffsetAimAndColVol(unitID, 22, -15)
 	while true do
 		local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		if not stunned_or_inbuild then
@@ -98,15 +100,22 @@ local function RestoreAfterDelay()
 	
 	StartThread(Close);
 end
-	
+
 -- event handlers
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(RestoreAfterDelay);
 	
-	--hacks to move invisible pieces
+	local ud = UnitDefs[unitDefID]
+	local midTable = ud.model
+	
+	local mid = {midTable.midx, midTable.midy + 15, midTable.midz}
+	local aim = {midTable.midx, midTable.midy, midTable.midz}
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 36, midTable.midy + 52, 15, 48)
+	
+	-- Set aim position
 	Move(aimProxy, y_axis, -13)
---	Move(muzzleProxy, y_axis, 6)
+	Move(aimProxy, z_axis, 8)
 	Turn(muzzle, y_axis, math.rad(-90))
 	
 	Hide(legs);
@@ -175,6 +184,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(belt, z_axis, heading, math.rad(200))
 	if isClosed then
 		Spring.SetUnitArmored(unitID, false);
+		GG.Script_OffsetAimAndColVol(unitID, false, 15)
 		
 		--Opening animation
 		Turn(lidLeft, y_axis, math.rad(0), unpackSpeed);
@@ -190,16 +200,8 @@ function script.AimWeapon(num, heading, pitch)
 		
 		isClosed = false
 	end
-	
-	local function LeanControl(angle)
-		if angle < 0 then 
-			return -angle 
-		else
-			return 0
-		end
-	end
-	
-	local lean = LeanControl(pitch + math.rad(30))--min pitch plus pi/6 is -60 degrees or approximately 1 in radians
+
+	local lean = math.max(-pitch - math.rad(30), 0) --min pitch plus pi/6 is -60 degrees or approximately 1 in radians
 	local wh = math.rad(-30) + (lean * math.rad(90));
 	local ar = math.rad(30) + (lean * math.rad(5));
 	local ha = math.rad(30) - (lean * math.rad(25));

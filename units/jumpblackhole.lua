@@ -18,6 +18,7 @@ return { jumpblackhole = {
 
   customParams          = {
     bait_level_default = 0,
+    can_target_allies  = 1,
     midposoffset   = [[0 10 0]],
   },
 
@@ -25,8 +26,6 @@ return { jumpblackhole = {
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[kbotwideriot]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
   leaveTracks           = true,
   losEmitHeight         = 40,
   maxDamage             = 900,

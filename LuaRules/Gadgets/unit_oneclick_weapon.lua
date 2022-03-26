@@ -4,25 +4,25 @@
 --	and sets reload time for one of the unit's weapons
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
-  return {
-    name      = "One Click Weapon",
-    desc      = "Handles one-click weapon attacks like hoof stomp",
-    author    = "KingRaptor",
-    date      = "20 Aug 2011",
-    license   = "GNU LGPL, v2.1 or later",
-    layer     = 0,
-    enabled   = true --  loaded by default?
-  }
+	return {
+		name      = "One Click Weapon",
+		desc      = "Handles one-click weapon attacks like hoof stomp",
+		author    = "KingRaptor",
+		date      = "20 Aug 2011",
+		license   = "GNU LGPL, v2.1 or later",
+		layer     = 0,
+		enabled   = true --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
 -- speedups
 --------------------------------------------------------------------------------
-local spGetUnitDefID	= Spring.GetUnitDefID
-local spGetUnitHealth	= Spring.GetUnitHealth
-local spGetUnitTeam		= Spring.GetUnitTeam
-local spGetUnitIsDead	= Spring.GetUnitIsDead
-local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spGetUnitTeam       = Spring.GetUnitTeam
+local spGetUnitIsDead     = Spring.GetUnitIsDead
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -32,13 +32,13 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 
 local oneClickWepCMD = {
-    id      = CMD_ONECLICK_WEAPON,
-    name    = "One-Click Weapon",
-    action  = "oneclickwep",
-    cursor  = 'oneclickwep',
-    texture = "LuaUI/Images/Commands/Bold/action.png",
-    type    = CMDTYPE.ICON,
-    tooltip = "Activate the unit's special weapon",
+	id      = CMD_ONECLICK_WEAPON,
+	name    = "One-Click Weapon",
+	action  = "oneclickwep",
+	cursor  = 'oneclickwep',
+	texture = "LuaUI/Images/Commands/Bold/action.png",
+	type    = CMDTYPE.ICON,
+	tooltip = "Activate the unit's special weapon",
 }
 
 local INITIAL_CMD_DESC_ID = 500
@@ -104,9 +104,21 @@ local function doTheCommand(unitID, unitDefID, num)
 		return true
 	end
 
+	if data.useSpecialReloadRemaining then
+		if (Spring.GetUnitRulesParam(unitID, "specialReloadRemaining") or 0) > 0 then
+			return true
+		end
+		
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		local func = env[data.functionToCall]
+		Spring.UnitScript.CallAsUnit(unitID, func)
+		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 1, LOS_ACCESS)
+		return true
+	end
+
+	local frame = Spring.GetGameFrame()
 	local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
 		(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
-	local frame = Spring.GetGameFrame()
 	if (currentReload and currentReload > frame) or (not data.partBuilt and select(5, spGetUnitHealth(unitID)) < 1) or spGetUnitIsDead(unitID) then
 		return true
 	end
@@ -114,16 +126,15 @@ local function doTheCommand(unitID, unitDefID, num)
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	local func = env[data.functionToCall]
 	Spring.UnitScript.CallAsUnit(unitID, func)
-
-	local baseSpeedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+	local totalReloadSpeedChange = (spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1)
 
 	-- reload
 	if (data.reloadTime and data.weaponToReload) then
-		local reloadFrameVal = frame + data.reloadTime/baseSpeedMult
+		local reloadFrameVal = frame + data.reloadTime/totalReloadSpeedChange
 		Spring.SetUnitWeaponState(unitID, data.weaponToReload, "reloadState", reloadFrameVal)
 	end
 	if (data.reloadTime and data.useSpecialReloadFrame) then
-		local reloadFrameVal = frame + data.reloadTime
+		local reloadFrameVal = frame + data.reloadTime/totalReloadSpeedChange
 		Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, LOS_ACCESS)
 		Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, LOS_ACCESS)
 	end
@@ -156,24 +167,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false
 	end
 	return true
-end
-
-function gadget:Load(zip)
-	if not GG.SaveLoad then
-		return
-	end
-	
-	local offset = GG.SaveLoad.GetSavedGameFrame()
-	local units = Spring.GetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		local specialReload = Spring.GetUnitRulesParam(unitID, "specialReloadFrame")
-		if specialReload then
-			local specialReloadStart = Spring.GetUnitRulesParam(unitID, "specialReloadStart") or specialReload
-			Spring.SetUnitRulesParam(unitID, "specialReloadStart", specialReloadStart - offset, LOS_ACCESS)
-			Spring.SetUnitRulesParam(unitID, "specialReloadFrame", specialReload - offset, LOS_ACCESS)
-		end
-	end
 end
 
 else

@@ -1,7 +1,7 @@
 return { amphraid = {
   unitname               = [[amphraid]],
   name                   = [[Duck]],
-  description            = [[Amphibious Raider Bot (Anti-Sub)]],
+  description            = [[Amphibious Raider (Anti-Sub, Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   brakeRate              = 2.25,
@@ -10,7 +10,7 @@ return { amphraid = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND SINK]],
+  category               = [[LAND SINK TOOFAST SMALL]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[28 28 28]],
   selectionVolumeType    = [[ellipsoid]],
@@ -27,8 +27,6 @@ return { amphraid = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[amphtorpraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 360,
   maxSlope               = 36,
@@ -124,6 +122,11 @@ return { amphraid = {
       craterBoost             = 1,
       craterMult              = 2,
       cegTag                  = [[torpedo_trail]],
+
+      customparams = {
+        radar_homing_distance = 200,
+        stays_underwater = 1,
+      },
 
       damage                  = {
         default = 130.01,

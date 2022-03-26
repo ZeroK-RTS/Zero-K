@@ -1,7 +1,7 @@
 return { turretantiheavy = {
   unitname                      = [[turretantiheavy]],
   name                          = [[Lucifer]],
-  description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
+  description                   = [[Tachyon Projector - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
   buildCostMetal                = 2200,
   builder                       = false,
@@ -32,13 +32,11 @@ return { turretantiheavy = {
     dontfireatradarcommand = '0',
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[fixedtachyon]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   losEmitHeight                 = 65,
   maxDamage                     = 6000,
   maxSlope                      = 18,

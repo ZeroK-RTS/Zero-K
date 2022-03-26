@@ -58,6 +58,7 @@ return { athena = {
     isfakefactory = 1,
     notreallyafactory = 1,
     select_show_eco = 1,
+    sonar_can_be_disabled = 1,
   },
 
   energyUse           = 0,

@@ -1,10 +1,8 @@
 return { turretheavy = {
   unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
-  description                   = [[Medium Range Defense Fortress - Power by connecting to a 50 energy grid]],
-  acceleration                  = 0,
+  description                   = [[Medium Range Defence Fortress - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostMetal                = 1600,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -30,13 +28,11 @@ return { turretheavy = {
     modelradius    = [[20]],
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[staticassaultriot]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 70,
   maxDamage                     = 10000,
@@ -57,7 +53,6 @@ return { turretheavy = {
 
   },
   sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],

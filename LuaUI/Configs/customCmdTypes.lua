@@ -91,6 +91,9 @@ local custom_cmd_actions = {
 	restoreground = {cmdType = 1, name = "Terraform Restore"},
 	--terraform_internal = {cmdType = 1, name = "--terraform_internal"},
 
+	--build a "generic" plate from build factory menu
+	buildplate = {cmdType = 1, name = "Build Plate"},
+	
 	resetfire = {cmdType = 3, name = "Reset Fire"},
 	resetmove = {cmdType = 3, name = "Reset Move"},
 
@@ -108,6 +111,7 @@ local custom_cmd_actions = {
 	antinukezone =      {cmdType = 2, name = "Ceasefire Antinuke Zone", states = {'Off', 'On'}},
 	unitai =            {cmdType = 2, cmdID = CMD_UNIT_AI, name = "Unit AI", states = {'Off', 'On'}},
 	selection_rank =    {cmdType = 2, name = "Selection Rank", states = {'0', '1', '2', '3'}},
+	formation_rank =    {cmdType = 2, name = "Formation Rank", states = {'0', '1', '2', '3'}},
 	autocalltransport = {cmdType = 2, name = "Auto Call Transport", states = {'Off', 'On'}},
 	unit_kill_subordinates = {cmdType = 2, cmdID = CMD_UNIT_KILL_SUBORDINATES, name = "Dominatrix Kill", states = {'Off', 'On'}},
 	goostate =     {cmdType = 2, cmdID = CMD_GOO_GATHER, name = "Goo State", states = {'Off', 'When uncloaked', 'On'}},
@@ -165,6 +169,7 @@ local usedActions = {
 	["raiseground"] = true,
 	["smoothground"] = true,
 	["restoreground"] = true,
+	["buildplate"] = true,
 	["jump"] = true,
 	["idlemode"] = true,
 	["areaattack"] = true,
@@ -172,7 +177,7 @@ local usedActions = {
 	["find_pad"] = true,
 	["recalldrones"] = true,
 	["toggledrones"] = true,
-	["divestate"] = true,
+	--["divestate"] = true,
 	["wantcloak"] = true,
 	["oneclickwep"] = true,
 	["floatstate"] = true,
@@ -200,9 +205,11 @@ local usedActions = {
 	["setfirezone"] = true,
 	["cancelfirezone"] = true,
 	["selection_rank"] = true,
+	["formation_rank"] = true,
 	["pushpull"] = true,
 	["unit_kill_subordinates"] = true,
 	["fireatshields"] = true,
+	["firetowards"] = true,
 	["goostate"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI

@@ -187,8 +187,9 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Common Team Colors']       = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Build ETA']                = imgPath..'epicmenu/stop_watch_icon.png',
-	['Settings/Interface/Defense and Cloak Ranges'] = imgPath..'epicmenu/target.png',
+	['Settings/Interface/Defence and Cloak Ranges'] = imgPath..'epicmenu/target.png',
 	['Settings/Interface/Command Visibility']       = imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
@@ -412,8 +413,9 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 	{
 		name = 'Hardware Cursor',
 		type = 'bool',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		--advanced = true, -- The temp toggle is somewhat useful.
 		springsetting = 'HardwareCursor',
-		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
 	
@@ -493,7 +495,7 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"water " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 
@@ -506,13 +508,14 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"Shadows " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 	AddOption(pathGraphicsMap,
 	{
 		name = 'Shadow detail level',
-		desc = 'How detailed shadows are.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096, 8192, 16384},
 		springsetting = 'ShadowMapSize',
@@ -564,7 +567,8 @@ local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	AddOption(pathGraphicsExtras,
 	{
 		name = 'Particle density',
-		desc = 'How many visual effects can exist at the same time.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		min = 250,
 		max = 20000,
@@ -587,7 +591,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		min = 1,
 		max = 10000,
 		springsetting = 'UnitLodDist',
-		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end
+		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end,
+		advanced = true,
 	} )
 	AddOption(pathUnitVisiblity,
 	{
@@ -598,6 +603,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		springsetting = 'UnitIconDist',
 		OnChange = function(self)
 			spSendCommands{"disticon " .. self.value}
+			WG.resetIconDist = self.value
 		end
 	} )
 	AddOption(pathUnitVisiblity,
@@ -656,10 +662,12 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	local pathIconZoomTransition = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
+		ShButton(pathIconZoomTransition, 'Toggle Smooth Icon Zoom', function() spSendCommands{"luaui togglewidget Icon Zoom Transition"} end, "Draw both icons and models at medium zoom distance.")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
 				spSendCommands{"luaui disablewidget Outline No Shader"}
-				spSendCommands{"luaui togglewidget Outline Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader GL4"}
 			end, "Highlights edges of units")
 
 

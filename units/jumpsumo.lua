@@ -20,6 +20,7 @@ return { jumpsumo = {
 
   customParams        = {
     bait_level_default = 0,
+    can_target_allies  = 1,
     canjump            = 1,
     jump_range         = 360,
     jump_height        = 110,
@@ -38,8 +39,6 @@ return { jumpsumo = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[t3jumpjetriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 60,
   maxDamage           = 13500,

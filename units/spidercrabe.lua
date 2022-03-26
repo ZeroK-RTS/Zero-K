@@ -23,15 +23,13 @@ return { spidercrabe = {
     unstick_leeway    = 60, -- Don't lose move orders for longer while preparing to move.
   },
 
-  damageModifier         = 0.25,
+  damageModifier         = 0.333,
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[spidersupport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 4000,
+  maxDamage              = 4200,
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 22,

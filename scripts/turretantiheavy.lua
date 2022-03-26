@@ -14,7 +14,7 @@ local smokePiece = {base, turret}
 
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 -- Signal definitions
 local SIG_AIM = 2

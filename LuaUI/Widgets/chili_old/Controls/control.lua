@@ -906,9 +906,7 @@ function Control:IsRectInView(x,y,w,h)
 		return false
 	end
 
-	local rect1 = {x,y,w,h}
-	local rect2 = {0,0,self.clientArea[3],self.clientArea[4]}
-	local inview = AreRectsOverlapping(rect1,rect2)
+	local inview = AreRectsOverlapping(x, y, w, h, 0, 0, self.clientArea[3], self.clientArea[4])
 
 	if not(inview) then
 		return false

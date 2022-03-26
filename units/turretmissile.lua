@@ -2,8 +2,6 @@ return { turretmissile = {
   unitname                      = [[turretmissile]],
   name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 100,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -20,6 +18,7 @@ return { turretmissile = {
   customParams                  = {
     aimposoffset   = [[0 20 0]],
     bait_level_default = 0,
+    okp_damage = 103,
   },
 
   explodeAs                     = [[BIG_UNITEX]],
@@ -27,8 +26,6 @@ return { turretmissile = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[defenseskirm]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 40,
   maxDamage                     = 300,
@@ -49,7 +46,6 @@ return { turretmissile = {
 
   },
   sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oo oo]],
@@ -82,7 +78,8 @@ return { turretmissile = {
         isaa = [[1]],
         script_reload = [[12.5]],
         script_burst = [[3]],
-        
+        prevent_overshoot_fudge = 45, -- projectile speed is 25 elmo/frame
+
         light_camera_height = 2000,
         light_radius = 200,
       },
@@ -99,7 +96,7 @@ return { turretmissile = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       metalpershot            = 0,
-      model                   = [[hobbes.s3o]],
+      model                   = [[hobbes.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 610,
       reloadtime              = 1.2,
@@ -107,6 +104,7 @@ return { turretmissile = {
       soundHit                = [[explosion/ex_small13]],
       soundStart              = [[weapon/missile/missile_fire11]],
       startVelocity           = 500,
+      texture1                = [[flarescale01]],
       texture2                = [[lightsmoketrail]],
       tolerance               = 10000,
       tracks                  = true,

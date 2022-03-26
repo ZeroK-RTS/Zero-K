@@ -21,17 +21,16 @@ return { hoverskirm = {
   customParams        = {
     bait_level_default = 1,
     modelradius    = [[25]],
-    turnatfullspeed = [[1]],
+    turnatfullspeed_hover = [[1]],
+    okp_damage = 615,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 680,
+  maxDamage           = 650,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
@@ -88,7 +87,7 @@ return { hoverskirm = {
       },
       
       damage                  = {
-        default = 330,
+        default = 310,
       },
 
       fireStarter             = 70,

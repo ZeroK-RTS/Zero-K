@@ -35,12 +35,13 @@ local SLEEP_TIME = 0 -- 1000 * math.abs(THIGH_FRONT_ANGLE - THIGH_BACK_ANGLE) / 
 
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 
 local gameSpeed = Game.gameSpeed
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -374,7 +375,7 @@ end
 
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
-		return GG.Script.OverkillPreventionCheck(unitID, targetID, 140.1, 820, 28, 0.1, true)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 820, 28, 0.1, true)
 	end
 	return true
 end

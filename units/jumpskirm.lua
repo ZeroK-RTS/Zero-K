@@ -31,8 +31,6 @@ return { jumpskirm = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[fatbotsupport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 480,
   maxSlope            = 36,
@@ -100,7 +98,7 @@ return { jumpskirm = {
           default = 460.1,
       },
 
-      explosionGenerator      = [[custom:heavy_disrupter_beam_hit]],
+      explosionGenerator      = [[custom:heavy_disruptor_beam_hit]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,

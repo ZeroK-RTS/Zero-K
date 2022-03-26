@@ -52,7 +52,7 @@
 	"tankassault" : {
 		"name" : "Minotaur",
 		"description" : "Assault Tank",
-		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability."
+		"helptext" : "A heavy duty battle tank. The Minotaur excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of maneuverability."
 	},
 	"chicken_listener" : {
 		"name" : "Listener",
@@ -62,7 +62,7 @@
 	"cloakbomb" : {
 		"name" : "Imp",
 		"description" : "All Terrain EMP Bomb (Burrows)",
-		"helptext" : "The Imp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Reavers or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
+		"helptext" : "The Imp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Reavers or Glaives can then eliminate the helpless enemies without risk. Counter with defences or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
 	},
 	"shieldriot" : {
 		"name" : "Outlaw",
@@ -87,7 +87,7 @@
 	"chicken_digger" : {
 		"name" : "Digger",
 		"description" : "Burrowing Scout/Raider",
-		"helptext" : "The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can undetectably travel underground and appear anyplace it can cause mayhem. Protect your valuables directly, as Diggers can bypass your main defense lines."
+		"helptext" : "The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can undetectably travel underground and appear anyplace it can cause mayhem. Protect your valuables directly, as Diggers can bypass your main defence lines."
 	},
 	"chicken_leaper" : {
 		"name" : "Leaper",
@@ -97,17 +97,17 @@
 	"chickenr" : {
 		"name" : "Lobber",
 		"description" : "Artillery",
-		"helptext" : "A form of organic artillery, the Lobber hurls balls of venom at a high trajectory over long distances. It proves a problem for those who rely excessively on static defenses, but is practically helpless when attacked directly."
+		"helptext" : "A form of organic artillery, the Lobber hurls balls of venom at a high trajectory over long distances. It proves a problem for those who rely excessively on static defences, but is practically helpless when attacked directly."
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
 		"description" : "Torpedo Launcher (Anti-Sub)",
-		"helptext" : "This Torpedo Launcher provides defense against both surface and submerged vessels."
+		"helptext" : "This Torpedo Launcher provides defence against both surface and submerged vessels."
 	},
 	"tankheavyassault" : {
 		"name" : "Cyclops",
 		"description" : "Very Heavy Tank Buster",
-		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
+		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent them from escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
 	},
 	"damagesink" : {
 		"name" : "Damage Sink thing",
@@ -137,7 +137,7 @@
 	"staticjammer" : {
 		"name" : "Cornea",
 		"description" : "Area Cloaker/Jammer",
-		"helptext" : "Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. The Cornea is also equipped with a cloak shield to hide nearby units from enemy sight."
+		"helptext" : "Jammers such as this interfere with enemy radar waves, concealing your units' radar returns. The Cornea is also equipped with a cloak shield to hide nearby units from enemy sight."
 	},
 	"amphbomb" : {
 		"name" : "Limpet",
@@ -152,7 +152,7 @@
 	"turretgauss" : {
 		"name" : "Gauss",
 		"description" : "Popup gauss turret, regenerates when closed (Anti-Sub)",
-		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
+		"helptext" : "The Gauss is a compact, resilient turret with a medium-range gauss cannon. When popped down, it receives a third of incoming damage as well as a small amount of health regeneration. It can also attack underwater targets."
 	},
 	"nebula" : {
 		"name" : "Nebula",
@@ -167,12 +167,12 @@
 	"cloakarty" : {
 		"name" : "Sling",
 		"description" : "Light Artillery Bot",
-		"helptext" : "The Sling has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
+		"helptext" : "The Sling has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defences up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range."
 	},
 	"chickend" : {
 		"name" : "Chicken Tube",
-		"description" : "Defense and energy source",
-		"helptext" : "The Tube is the chickens' only defense structure, firing deadly spores at air and ground targets alike."
+		"description" : "Defence and energy source",
+		"helptext" : "The Tube is the chickens' only defence structure, firing deadly spores at air and ground targets alike."
 	},
 	"rocksink" : {
 		"name" : "Rocking Damage Sink thing",
@@ -186,13 +186,13 @@
 	},
 	"mahlazer" : {
 		"name" : "Starlight",
-		"description" : "Planetary Energy Chisel",
+		"description" : "Planetary Energy Chisel - Power by connecting to a 600 energy grid",
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
 	},
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary",
-		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crab curls up into armored form reducing incoming damage to a quarter. The Crab's main weakness is its lack of mobility."
+		"helptext" : "The Crab's huge shells obliterate large swarms of cheap units, and can also outrange basic defences. When it stops walking, Crab curls up into armored form reducing incoming damage to a third. The Crab's main weakness is its lack of mobility."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -262,7 +262,7 @@
 	"hoverassault" : {
 		"name" : "Halberd",
 		"description" : "Blockade Runner Hover",
-		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 4x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
+		"helptext" : "The Halberd buttons down into its armored hull when not firing, offering 3x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets."
 	},
 	"shieldcon" : {
 		"name" : "Convict",
@@ -272,7 +272,7 @@
 	"energysingu" : {
 		"name" : "Singularity Reactor",
 		"description" : "Large Powerplant HAZARDOUS",
-		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
+		"helptext" : "The Singularity Reactor generates a massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
 	"bomberdisarm" : {
 		"name" : "Thunderbird",
@@ -287,7 +287,7 @@
 	"shieldskirm" : {
 		"name" : "Rogue",
 		"description" : "Skirmisher Bot (Indirect Fire)",
-		"helptext" : "The Rogue's arcing rockets have a low rate of fire, but do a lot of damage, making it very good at dodging in and out of range of enemy units or defense, or in a powerful initial salvo. Counter them by attacking them with fast units, or crawling bombs when massed."
+		"helptext" : "The Rogue's arcing rockets have a low rate of fire, but do a lot of damage, making it very good at dodging in and out of range of enemy units or defence, or in a powerful initial salvo. Counter them by attacking them with fast units, or crawling bombs when massed."
 	},
 	"dronelight" : {
 		"name" : "Firefly",
@@ -307,7 +307,7 @@
 	"staticcon" : {
 		"name" : "Caretaker",
 		"description" : "Construction Assistant",
-		"helptext" : "The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however."
+		"helptext" : "The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defences. It cannot start any construction projects itself, however."
 	},
 	"terraunit" : {
 		"name" : "Terraform",
@@ -322,7 +322,7 @@
 	"energypylon" : {
 		"name" : "Energy Pylon",
 		"description" : "Extends overdrive grid",
-		"helptext" : "Energy Transmission Pylons help extend energy grids and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid. Note that over short distances or in low-energy situations using energy producers like solar collectors to connect grids can be a more cost efficient alternative."
+		"helptext" : "Energy Transmission Pylons help extend energy grids and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defences that rely on the energy grid. Note that over short distances or in low-energy situations using energy producers like solar collectors to connect grids can be a more cost efficient alternative."
 	},
 	"bomberprec" : {
 		"name" : "Raven",
@@ -352,7 +352,7 @@
 	"chickenwurm" : {
 		"name" : "Wurm",
 		"description" : "Burrowing Flamer (Assault/Riot)",
-		"helptext" : "The Wurm \"burrows\" under the surface of the ground, revealing itself to hurl a ball of fire that immolates a large swathe of terrain. It can climb cliffs and surprise defense turrets, but is weak to assaults."
+		"helptext" : "The Wurm \"burrows\" under the surface of the ground, revealing itself to hurl a ball of fire that immolates a large swathe of terrain. It can climb cliffs and surprise defence turrets, but is weak to assaults."
 	},
 	"dronefighter" : {
 		"name" : "Spicula",
@@ -372,7 +372,7 @@
 	"energysolar" : {
 		"name" : "Solar Collector",
 		"description" : "Small Powerplant",
-		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
+		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a third and offers excellent protection against raiders."
 	},
 	"gunshipheavyskirm" : {
 		"name" : "Nimbus",
@@ -497,12 +497,12 @@
 	"amphassault" : {
 		"name" : "Grizzly",
 		"description" : "Heavy Amphibious Assault Walker",
-		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot."
+		"helptext" : "The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to the surface in order to shoot."
 	},
 	"shieldaa" : {
 		"name" : "Vandal",
 		"description" : "Anti-Air Bot",
-		"helptext" : "The Vandal is a cheap, hardy and reliable dedicated anti-air bot. Defenseless vs. land forces."
+		"helptext" : "The Vandal is a cheap, hardy and reliable dedicated anti-air bot. Defenceless vs. land forces."
 	},
 	"hoverriot" : {
 		"name" : "Mace",
@@ -512,12 +512,12 @@
 	"veharty" : {
 		"name" : "Badger",
 		"description" : "Artillery Minelayer Rover",
-		"helptext" : "The Badger lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Badger outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
+		"helptext" : "The Badger lays mines which are fairly effective but have a limited lifespan from a distance (rather haphazardly). The Badger outranges most defences comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines."
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
 		"description" : "Cloaked Anti-Strider Walker (Undersea Fire)",
-		"helptext" : "The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units."
+		"helptext" : "The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defence against it is achieved by screening your heavyweights with lighter units."
 	},
 	"staticmex" : {
 		"name" : "Metal Extractor",
@@ -552,7 +552,7 @@
 	"spidercon" : {
 		"name" : "Weaver",
 		"description" : "Construction Spider",
-		"helptext" : "The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar."
+		"helptext" : "The Weaver is a constructor that can climb over any obstacle and build defences on high ground. It is also equipped with a short range radar."
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
@@ -562,7 +562,7 @@
 	"gunshipkrow" : {
 		"name" : "Krow",
 		"description" : "Flying Fortress",
-		"helptext" : "The Krow may be expensive and ponderous, but its incredible armor allows it to fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can unleash a deluge of carpet bombs to devastate anything underneath it."
+		"helptext" : "The Krow may be expensive and ponderous, but its incredible armor allows it to fly into all but the thickest anti-air defences and engage enemies with its three laser cannons. Best of all, it can unleash a deluge of carpet bombs to devastate anything underneath it."
 	},
 	"neebcomm" : {
 		"name" : "Neeb Comm",
@@ -577,7 +577,7 @@
 	"gunshipbomb" : {
 		"name" : "Blastwing",
 		"description" : "Flying Bomb/Scout (Burrows)",
-		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
+		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more formidable punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your Blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"napalmmissile" : {
 		"name" : "Inferno",
@@ -601,7 +601,7 @@
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
-		"description" : "Destructive Rainbow Projector",
+		"description" : "Destructive Rainbow Projector - Power by connecting to a 400 energy grid",
 		"helptext" : "The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!"
 	},
 	"turretlaser" : {
@@ -622,7 +622,7 @@
 	"shieldarty" : {
 		"name" : "Racketeer",
 		"description" : "Disarming Artillery",
-		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
+		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defences or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
 	},
 	"roost" : {
 		"name" : "Roost",
@@ -637,7 +637,7 @@
 	"cloakraid" : {
 		"name" : "Glaive",
 		"description" : "Light Raider Bot",
-		"helptext" : "Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmanouver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat."
+		"helptext" : "Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmaneuver riot units and defences, where it is not as strong. Damaged Glaives regenerate when out of combat."
 	},
 	"gunshipaa" : {
 		"name" : "Trident",
@@ -692,7 +692,7 @@
 	"spideremp" : {
 		"name" : "Venom",
 		"description" : "Lightning Riot Spider",
-		"helptext" : "The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher."
+		"helptext" : "The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis, it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher."
 	},
 	"jumpassault" : {
 		"name" : "Jack",
@@ -737,7 +737,7 @@
 	"staticarty" : {
 		"name" : "Cerberus",
 		"description" : "Plasma Artillery Battery - Power by connecting to a 50 energy grid",
-		"helptext" : "The Cerberus offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly."
+		"helptext" : "The Cerberus offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defence turret, and will go down if attacked directly."
 	},
 	"wolverine_mine" : {
 		"name" : "Claw",
@@ -762,7 +762,7 @@
 	"vehraid" : {
 		"name" : "Scorcher",
 		"description" : "Raider Rover",
-		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defenses. The Scorcher's heatray deals more damage up close."
+		"helptext" : "Capable of taking damage and dishing it out, the Scorcher is a versatile unit that remains very useful for more than just raiding, though it pays the price in maneuverability and cost. Though able to hold its own in combat, it is no match for anti-swarm and riot units or defences. The Scorcher's heatray deals more damage up close."
 	},
 	"striderfunnelweb" : {
 		"name" : "Funnelweb",
@@ -772,7 +772,7 @@
 	"cloakriot" : {
 		"name" : "Reaver",
 		"description" : "Riot Bot",
-		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate missing health when out of combat."
+		"helptext" : "The Reaver's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defence, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Reavers quickly regenerate missing health when out of combat."
 	},
 	"chickenspire" : {
 		"name" : "Chicken Spire",
@@ -782,7 +782,7 @@
 	"turretemp" : {
 		"name" : "Faraday",
 		"description" : "EMP Turret",
-		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
+		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a third. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
 	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
@@ -817,7 +817,7 @@
 	"cloakaa" : {
 		"name" : "Gremlin",
 		"description" : "Cloaked Anti-Air Bot",
-		"helptext" : "Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against."
+		"helptext" : "Fast and fairly sturdy for its price, the Gremlin is a good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenceless against."
 	},
 	"vehheavyarty" : {
 		"name" : "Impaler",
@@ -826,7 +826,7 @@
 	},
 	"zenith" : {
 		"name" : "Zenith",
-		"description" : "Meteor Controller",
+		"description" : "Meteor Controller - Power by connecting to a 400 energy grid",
 		"helptext" : "The Zenith collects meteorites from the sky (up to 300), which it can send anywhere to break things or provide a small reclaimable source of metal."
 	},
 	"vehaa" : {
@@ -882,7 +882,7 @@
 	"turretantiheavy" : {
 		"name" : "Lucifer",
 		"description" : "Tachyon Projector - Power by connecting to a 50 energy grid",
-		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
+		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",
@@ -902,7 +902,7 @@
 	"cloakheavyraid" : {
 		"name" : "Scythe",
 		"description" : "Cloaked Raider Bot",
-		"helptext" : "The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat."
+		"helptext" : "The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defences to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat."
 	},
 	"jumpblackhole" : {
 		"name" : "Placeholder",
@@ -947,7 +947,7 @@
 	"subtacmissile" : {
 		"name" : "Scylla",
 		"description" : "Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile",
-		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
+		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defence against direct attacks and should avoid contact with the enemy."
 	},
 	"shipriot" : {
 		"name" : "Corsair",
@@ -981,8 +981,8 @@
 	},
 	"turretheavy" : {
 		"name" : "Desolator",
-		"description" : "Medium Range Defense Fortress - Power by connecting to a 50 energy grid",
-		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
+		"description" : "Medium Range Defence Fortress - Power by connecting to a 50 energy grid",
+		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defence point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a third, although it cannot fire its weapons while doing so."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
@@ -1022,7 +1022,7 @@
 	"striderbantha" : {
 		"name" : "Paladin",
 		"description" : "Ranged Support Strider",
-		"helptext" : "The Paladin is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."
+		"helptext" : "The Paladin is an even heavier solution to a particularly uncrackable defence line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenceless against air and cannot be used effectively on its own."
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
@@ -1052,7 +1052,7 @@
 	"turretaalaser" : {
 		"name" : "Razor",
 		"description" : "Hardened Anti-Air Laser",
-		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed makes it very hard for the enemy to dislodge."
+		"helptext" : "The Razor is a hardy anti-air turret. Its high hit points and 3x armour bonus when closed make it very hard for the enemy to dislodge."
 	},
 	"hovercon" : {
 		"name" : "Quill",
@@ -1127,12 +1127,12 @@
 	"planecon" : {
 		"name" : "Crane",
 		"description" : "Construction Aircraft",
-		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air players territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetetitive tasks."
+		"helptext" : "The Crane flies quickly over any terrain, but is fragile to any AA. Though it has relatively poor nano power compared to other constructors, it is able to build in many hard to reach places and expand an air player's territory in a nonlinear fashion. Due to its mobility, it is ideal for reclaiming wrecks and other repetitive tasks."
 	},
 	"gunshipraid" : {
 		"name" : "Locust",
 		"description" : "Raider Gunship",
-		"helptext" : "The Locust is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defense."
+		"helptext" : "The Locust is a light gunship. Its high speed and decent damage make it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Locust should avoid riots and static defence."
 	},
 	"shieldraid" : {
 		"name" : "Bandit",

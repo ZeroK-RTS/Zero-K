@@ -2,7 +2,6 @@ local raider = {
 	"cloakraid",
 	"cloakheavyraid",
 	"shieldraid",
-	"armflash",
 	"vehscout",
 	"vehraid",
 	"amphraid",
@@ -11,7 +10,6 @@ local raider = {
 	"tankheavyraid",
 	"tankraid",
 	
-	"armsh",
 	"hoverraid",
 	"hoverheavyraid",
 	
@@ -28,17 +26,14 @@ local assault = {
 	"spiderassault",
 	"jumpassault",
 	--"jumpsumo",
-	"armbull",
 	"tankassault",
 	"tankheavyassault",
 	"amphassault",
 	
-	"armanac",
 	"hoverassault",
 	
 	--"striderbantha",
 	--"striderdetriment",
-	--"corkrog",
 	
 	--"chickena",
 	--"chickenc",
@@ -48,15 +43,11 @@ local assault = {
 local skirm = {
 	"cloakskirm",
 	"shieldskirm",
-	"armjanus",
-	"armstump",
 	"amphfloater",
 	
 	"spiderskirm",
 	"cloaksnipe",
-	"cormort",
 	"jumpskirm",
-	"cormortgold",
 	"hoverarty",
 	
 	"hoverskirm",
@@ -80,12 +71,10 @@ local riot = {
 	"amphriot",
 	
 	"spideremp",
-	"tawf003",
 	"tankriot",
 
 	"hoverriot",
 	
-	"armraz",
 	"striderdante",
 	
 	"chickenwurm",
@@ -93,9 +82,7 @@ local riot = {
 
 local arty = {
 	"cloakarty",
-	"punisher",
 	"jumparty",
-	"tawf013",
 	"veharty",
 	
 	"vehheavyarty",
@@ -103,10 +90,7 @@ local arty = {
 	"tankarty",
 	"tankheavyarty",
 	
-	"armshock",
 	"striderarty",
-	
-	"hoverartillery",
 	
 	"chickenr",
 	"chickenblobber",
@@ -121,15 +105,15 @@ local prioritySos = {
 	"energyfusion",
 	"energysingu",
 	"factoryshield",
-    "factorycloak",
-    "factoryveh",
-    "factoryplane",
-    "factorygunship",
-    "factoryhover",
-    "factoryspider",
-    "factoryjump",
-    "factorytank",
-    "factoryship",
+	"factorycloak",
+	"factoryveh",
+	"factoryplane",
+	"factorygunship",
+	"factoryhover",
+	"factoryspider",
+	"factoryjump",
+	"factorytank",
+	"factoryship",
 	"dyntrainer_recon_base",
 	"dyntrainer_support_base",
 	"dyntrainer_assault_base",

@@ -97,7 +97,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	local ud = UnitDefs[unitDefID]
 	if cmdID == CMD_TURN then
 		if turning[unitID] == nil then
 			local tx, _, tz = cmdParams[1], cmdParams[2], cmdParams[3]

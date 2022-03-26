@@ -14,16 +14,17 @@ return { planescout = {
   category            = [[UNARMED FIXEDWING]],
   collide             = false,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 12 60]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[40 15 75]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
   cruiseAlt           = 250,
 
   customParams        = {
     modelradius       = [[20]],
-    specialreloadtime = [[600]],
+    --specialreloadtime = [[600]],
     refuelturnradius  = [[120]],
     priority_misc     = 2, -- High
+    sonar_can_be_disabled = 1,
   },
 
   energyUse           = 1.5,
@@ -32,8 +33,6 @@ return { planescout = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[radarplane]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxAcc              = 0.5,
   maxDamage           = 950,
   maxAileron          = 0.018,

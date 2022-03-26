@@ -10,7 +10,7 @@ local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
 	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
-	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot in the direction of enemies when there are no other targets.",
+	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot towards enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Turn invisible. Disrupted by damage, firing, abilities, and nearby enemies.",
 	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloak all friendly units in the area. Does not apply to structures or shield bearers.",
@@ -36,6 +36,7 @@ local tooltips = {
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
+	FORMATION_RANK = "Formation Rank (_STATE_)\n  set rank in formation.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }
 
@@ -64,6 +65,7 @@ local commandDisplayConfig = {
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', tooltip = "Load: Pick up a unit. Click and drag to load unit in an area."},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', tooltip = "Unload: Set down a carried unit. Click and drag to unload in an area."},
 	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', tooltip = "Area Attack: Indiscriminately bomb the terrain in an area."},
+	[CMD_BUILD_PLATE] = {texture = imageDir .. 'Bold/buildplate.png', tooltip = "Build Plate: Place near a factory for an extra production queue."},
 
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
@@ -286,6 +288,15 @@ local commandDisplayConfig = {
 			tooltips.SELECTION_RANK:gsub("_STATE_", "3")
 		}
 	},
+	[CMD_FORMATION_RANK] = {
+		texture = {imageDir .. 'states/formation_rank_0.png', imageDir .. 'states/formation_rank_1.png', imageDir .. 'states/formation_rank_2.png', imageDir .. 'states/formation_rank_3.png'},
+		stateTooltip = {
+			tooltips.FORMATION_RANK:gsub("_STATE_", "0"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "1"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "2"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "3")
+		}
+	},
 	[CMD_TOGGLE_DRONES] = {
 		texture = {imageDir .. 'states/drones_off.png', imageDir .. 'states/drones_on.png'},
 		stateTooltip = {
@@ -421,12 +432,21 @@ for i = 1, 5 do
 	}
 end
 
+local factoryButtonLayoutOverride = {
+	[4] = {
+		[3] = {
+			buttonLayoutConfig = buttonLayoutConfig.command,
+			isStructure = false,
+		}
+	}
+}
+
 local commandPanels = {
 	{
 		humanName = "Orders",
 		name = "orders",
 		inclusionFunction = function(cmdID)
-			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
+			return cmdID >= 0 and not buildCmdFactory[cmdID] and not buildCmdSpecial[cmdID]-- Terraform and Plate
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -484,10 +504,12 @@ local commandPanels = {
 		end,
 		isBuild = true,
 		isStructure = true,
+		notBuildRow = 3,
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_factory",
 		buttonLayoutConfig = buttonLayoutConfig.build,
+		buttonLayoutOverride = factoryButtonLayoutOverride,
 	},
 	{
 		humanName = "Units",

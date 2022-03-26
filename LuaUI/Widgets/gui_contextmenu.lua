@@ -667,7 +667,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if stun_time > 0 then
-			cells[#cells+1] = ' - Stun time:'
+			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'
 		end
 
@@ -937,11 +937,11 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if ud.cloakCost > 0 and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
+	if ud.canCloak and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
 		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
-		if not ud.isImmobile then
+		if not ud.isImmobile and ud.cloakCost ~= ud.cloakCostMoving then
 			cells[#cells+1] = ' - Upkeep mobile: '
 			cells[#cells+1] = numformat(ud.cloakCostMoving) .. " E/s"
 			cells[#cells+1] = ' - Upkeep idle: '
@@ -1102,7 +1102,11 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = 'Speed boost'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Speed: '
-		cells[#cells+1] = 'x' .. cp.boost_speed_mult
+		cells[#cells+1] = math.floor((tonumber(cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
+		if cp.boost_reload_speed_mult then
+			cells[#cells+1] = ' - Cooldown speed: '
+			cells[#cells+1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1")*100) + 0.5) .. "%"
+		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30, 1) .. 's'
 		cells[#cells+1] = ' - Reload: '
@@ -1534,7 +1538,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	if ud.wantedHeight > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight*1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then

@@ -1,7 +1,7 @@
 return { shipriot = {
   unitname               = [[shipriot]],
   name                   = [[Corsair]],
-  description            = [[Corvette (Raider/Riot)]],
+  description            = [[Raider/Riot Corvette]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 1.7,
@@ -27,8 +27,6 @@ return { shipriot = {
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[shipriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1350,
   maxVelocity            = 2.7,
   minWaterDepth          = 10,

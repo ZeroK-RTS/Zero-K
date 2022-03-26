@@ -24,19 +24,27 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Unit Behaviour'
+options_order = {'keepTarget', 'keepTargetBombers', 'removeTarget'}
 options = {
 	keepTarget = {
-		name = "Keep overridden attack target",
+		name = "Prioritise overridden attack target",
 		type = "bool",
 		value = true,
-		desc = "Units with an attack command will proritize their target until a canceling command is given.",
+		desc = "Cancelling an attack command by issuing a movement command continues prioritising the target of the previous attack command.",
+		noHotkey = true,
+	},
+	keepTargetBombers = {
+		name = "Prioritise overridden attack for bombers",
+		type = "bool",
+		value = false,
+		desc = "Also enables the behaviour of 'Prioritise overridden attack target' for bombers.",
 		noHotkey = true,
 	},
 	removeTarget = {
 		name = "Stop clears target",
 		type = "bool",
 		value = true,
-		desc = "Issuing the commands Stop, Fight, Guard, Patrol and Attack cancel priority target orders.",
+		desc = "Target prioritisation is reset by Stop, Fight, Guard, Patrol and Attack commands.",
 		noHotkey = true,
 	},
 }
@@ -45,9 +53,11 @@ options = {
 --------------------------------------------------------------------------------
 
 local keepTargetDefs = {}
+local isFactory = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	keepTargetDefs[i] = not (ud.isBomber or ud.isFactory or ud.customParams.reallyabomber or ud.customParams.no_auto_keep_target)
+	keepTargetDefs[i] = not (ud.isBomberAirUnit or ud.isFactory or ud.customParams.reallyabomber)
+	isFactory[i] = ud.isFactory
 end
 
 --------------------------------------------------------------------------------
@@ -56,6 +66,9 @@ end
 local function isValidUnit(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID and Spring.ValidUnitID(unitID) then
+		if options.keepTargetBombers.value then
+			return not isFactory[unitDefID]
+		end
 		return keepTargetDefs[unitDefID]
 	end
 	return false

@@ -20,14 +20,18 @@ return { hoverriot = {
   customParams        = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
+    --specialreloadtime = [[1350]],
+    --specialreload_userate = [[1]],
+    --boost_speed_mult = 5,
+    --boost_reload_speed_mult = 0.8,
+    --boost_duration = 20, -- frames
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[hoverriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1400,
   maxSlope            = 36,
   maxVelocity         = 2.05,
@@ -43,6 +47,7 @@ return { hoverriot = {
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
       [[custom:RAIDMUZZLE]],
+      [[custom:FLAMER]],
     },
 
   },

@@ -26,6 +26,7 @@ return { shipcarrier = {
     priority_misc = 2, -- High
     extradrawrange = 3000,
     ispad         = 1,
+    pad_count     = 2,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -33,8 +34,6 @@ return { shipcarrier = {
   footprintX             = 5,
   footprintZ             = 5,
   iconType               = [[shipcarrier]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 7500,
   maxVelocity            = 2.75,
   minWaterDepth          = 10,
@@ -91,7 +90,8 @@ return { shipcarrier = {
         disarmDamageMult = 1.0,
         disarmDamageOnly = 1,
         disarmTimer      = 10, -- seconds
-        
+        radar_homing_distance = 600,
+
         light_color = [[1 1 1]],
       },
       

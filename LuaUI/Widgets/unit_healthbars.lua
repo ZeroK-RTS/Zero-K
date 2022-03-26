@@ -72,7 +72,7 @@ end
 --------------------------------------------------------------------------------
 
 local messages = {
-	shield = "shield",
+	shield_bar = "shield",
 	health_bar = "health",
 	building = "building",
 	morph = "morph",
@@ -86,6 +86,7 @@ local messages = {
 	teleport_pw = "teleport",
 	ability = "ability",
 	heat = "heat",
+	speed = "speed",
 	reload = "reload",
 	reammo = "reammo",
 	slow = "slow",
@@ -153,7 +154,7 @@ options = {
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Set jump reload to flashes when issuing the jump command',
+		desc = 'Set jump reload to flash when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -597,7 +598,9 @@ do
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
+				specialRate   = ud.customParams.specialreload_userate,
 				heat          = ud.customParams.heat_per_shot,
+				speed         = ud.customParams.speed_bar,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -800,10 +803,19 @@ do
 		
 		--// SPECIAL WEAPON
 		if ci.specialReload then
-			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
-			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+			if ci.specialRate then
+				local specialReloadProp = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+				if (specialReloadProp > 0) and (specialReloadProp < 1) then
+					local special = 1 - specialReloadProp
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			
+			else
+				local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
+				if (specialReloadState and specialReloadState > gameFrame) then
+					local special = 1-(specialReloadState-gameFrame)/ci.specialReload -- don't divide by gamespeed, since specialReload is also in gameframes
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
 			end
 		end
 		
@@ -812,6 +824,14 @@ do
 			local heatState = GetUnitRulesParam(unitID, "heat_bar")
 			if (heatState and heatState > 0) then
 				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
+			end
+		end
+		
+		--// DRP Speed
+		if ci.speed and build == 1 then
+			local speedState = GetUnitRulesParam(unitID, "speed_bar")
+			if (speedState and speedState < 1) then
+				barDrawer.AddBar(addTitle and messages.speed, speedState, "reload2", (addPercent and floor(speedState*100) .. '%'))
 			end
 		end
 		

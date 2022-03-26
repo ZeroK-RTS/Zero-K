@@ -32,6 +32,8 @@ local spGetActiveCommand = Spring.GetActiveCommand
 local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 local spGetGameFrame = Spring.GetGameFrame
 
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -76,12 +78,25 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local firstUpdate = true
 local enableCondOld = false
 local minMetalShownOld = -1
 local highlight = false
 local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 function widget:Update()
+	if firstUpdate then
+		firstUpdate = false
+		if BAR_COMPAT then
+			Spring.Echo("Using fallback reclaim highlight) due to 105+.")
+			Spring.SendCommands{"luaui enablewidget MetalFeatures (old)"}
+		else
+			Spring.SendCommands{"luaui disablewidget MetalFeatures (old)"}
+		end
+	end
+	if BAR_COMPAT then
+		return
+	end
 	if Spring.IsGUIHidden() then
 		if enableCondOld then
 			Spring.SendCommands("luarules metal_highlight 0")
@@ -143,6 +158,9 @@ function widget:Shutdown()
 end
 
 function widget:SelectionChanged(units)
+	if BAR_COMPAT then
+		return
+	end
 	if (WG.selectionEntirelyCons) then
 		conSelected = true
 	else

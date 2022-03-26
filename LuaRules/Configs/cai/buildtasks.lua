@@ -580,6 +580,7 @@ factionBuildConfig = {
 				[4] = { -- bomber
 					importanceMult = 0,
 					count = 0,
+					-- PUT NOTHING HERE! Breaks the AI.
 				},
 				
 				[5] = { -- gunship

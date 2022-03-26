@@ -157,12 +157,12 @@ end
 
 --//=============================================================================
 
-function AreRectsOverlapping(rect1,rect2)
+function AreRectsOverlapping(x1, y1, w1, h1, x2, y2, w2, h2)
 	return
-		(rect1[1] <= rect2[1] + rect2[3]) and
-		(rect1[1] + rect1[3] >= rect2[1]) and
-		(rect1[2] <= rect2[2] + rect2[4]) and
-		(rect1[2] + rect1[4] >= rect2[2])
+		(x1 <= x2 + w2) and
+		(x1 + w1 >= x2) and
+		(y1 <= y2 + h2) and
+		(y1 + h1 >= y2)
 end
 
 --//=============================================================================

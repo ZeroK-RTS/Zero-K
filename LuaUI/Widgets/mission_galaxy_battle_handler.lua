@@ -207,12 +207,16 @@ local function GetUnitTooltip(udef)
 	return spGetHumanName(udef) .. " - " .. spGetDescription(udef) .. "\n\255\1\255\1" .. WG.Translate("interface", "space_click_show_stats")
 end
 
+local function GetGameRulesHax(key)
+	--return Spring.GetGameRulesParam(key)
+	return Spring.GetTeamRulesParam(0, key)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Briefing Window
 
 local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
-	
 	local offset = 0
 	
 	local holder = Chili.Control:New{
@@ -518,7 +522,7 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 		if objectives[index].terminated then
 			return
 		end
-		local newSuccess = Spring.GetGameRulesParam(gameRulesParam .. index)
+		local newSuccess = GetGameRulesHax(gameRulesParam .. index)
 		if not newSuccess then
 			return
 		end
@@ -738,7 +742,7 @@ end
 -- Victory/Defeat
 
 local function GetTimeString()
-	local frames = Spring.GetGameRulesParam("MissionGameOver_frames") or select(1, Spring.GetGameFrame()) or 0
+	local frames = GetGameRulesHax("MissionGameOver_frames") or select(1, Spring.GetGameFrame()) or 0
 	return frames
 end
 
@@ -1031,7 +1035,7 @@ function widget:Initialize()
 	myFont = glLoadFont(fontPath, fontSizeHeadline, nil, nil) -- FIXME: nils for #2564
 	UpdateWindowCoords()
 	
-	local initMissionGameOver = Spring.GetGameRulesParam("MissionGameOver")
+	local initMissionGameOver = GetGameRulesHax("MissionGameOver")
 	if initMissionGameOver then
 		MissionGameOver(initMissionGameOver == 1)
 	end

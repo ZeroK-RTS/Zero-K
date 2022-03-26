@@ -24,7 +24,6 @@ local RESTORE_DELAY = 3000
 local SIG_AIM = 1
 local SIG_MOVE = 2 --Signal to prevent multiple track motion
 local SIG_TILT = 4
-local SIG_RAISE = 8
 local SIG_PUSH = 16
 local SIG_STOW = 32
 

@@ -26,7 +26,7 @@ function gadget:Initialize()
 			local teamID = teamList[i]
 			local _, leaderID = Spring.GetTeamInfo(teamID, false)
 			if leaderID >= 0 then
-				leaderID = Spring.SetTeamRulesParam(teamID, "initLeaderID", leaderID, PUBLIC_VISIBLE)
+				Spring.SetTeamRulesParam(teamID, "initLeaderID", leaderID, PUBLIC_VISIBLE)
 			end
 		end
 	end

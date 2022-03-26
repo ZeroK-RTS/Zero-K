@@ -95,13 +95,13 @@ function SetInitialBomberSettings()
 	end
 end
 
-function SetUnarmedAI()
+function SetUnarmedAI(turnRadiusOverride)
 	-- Make bombers think they have much smaller turn radius to make them more responsive.
 	-- This is not applied to armed AI because it can cause infinite circling while trying
 	-- to line up a bombing run.
 	local aircraftState = (spGetUnitMoveTypeData(unitID) or {}).aircraftState
-	if aircraftState then
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = 10})
+	if aircraftState and not Spring.MoveCtrl.GetTag(unitID) then
+		Spring.MoveCtrl.SetAirMoveTypeData(unitID, {turnRadius = (turnRadiusOverride or 10)})
 	end
 end
 

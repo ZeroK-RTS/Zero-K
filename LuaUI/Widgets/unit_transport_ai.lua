@@ -119,7 +119,7 @@ local autoCallTransportDef = {}
 local transportDef = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or (ud.isFactory and not ud.customParams.nongroundfac) then
+	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or Spring.Utilities.isGroundFactory(ud) then
 		autoCallTransportDef[i] = true
 	end
 	if (ud.transportCapacity >= 1) and ud.canFly then

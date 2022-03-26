@@ -77,8 +77,8 @@ local function SetUnitWantedSpeed(unitID, unitDefID, wantedSpeed, forceUpdate)
 	end
 end
 
-function GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
-	SetUnitWantedSpeed(unitID, unitDefID, units and units[unitID] and units[unitID].lastWantedSpeed, true)
+function GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID, clearWanted)
+	SetUnitWantedSpeed(unitID, unitDefID, (not clearWanted) and units and units[unitID] and units[unitID].lastWantedSpeed, true)
 end
 
 local function MaintainWantedSpeed(unitID)

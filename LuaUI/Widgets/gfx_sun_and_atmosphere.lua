@@ -139,7 +139,9 @@ local function LoadSunAndFogSettings()
 		sunSettingsChanged = true
 		
 		for name, value in pairs(sun) do
-			options[name].value = value
+			if options[name] then
+				options[name].value = value
+			end
 		end
 	end
 	
@@ -157,7 +159,9 @@ local function LoadSunAndFogSettings()
 		fogSettingsChanged = true
 		
 		for name, value in pairs(fog) do
-			options[name].value = value
+			if options[name] then
+				options[name].value = value
+			end
 		end
 	end
 
@@ -275,7 +279,7 @@ local function GetOptions()
 		end
 	end
 	
-	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue)
+	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue, 30, 0, 50)
 
 	options["sunDir"] = {
 		name = "Sun Direction",
@@ -385,8 +389,10 @@ local updates = 0
 function widget:Update()
 	initialized = true
 	updates = updates + 1
-	if updates > 4 then
+	if updates == 4 or updates == 28 then
 		LoadSunAndFogSettings()
-		widgetHandler:RemoveCallIn("Update")
+		if updates == 28 then
+			widgetHandler:RemoveCallIn("Update")
+		end
 	end
 end

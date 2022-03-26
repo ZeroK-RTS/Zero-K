@@ -298,10 +298,15 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 
 	-- Approximate flight time for direct flight
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
-	
-	if flyTime < 5 then
+	if flyTime < 1 then
 		return
 	end
+	
+	-- Better fly time not required so far.
+	--flyTime = dist3D(tx + flyTime*vx, ty + flyTime*vy, tz + flyTime*vz, px, py, pz)/speed
+	--if flyTime < 2 then
+	--	return
+	--end
 	
 	-- Reduce additional lead amount by the leadLimit of the weapon
 	if projectileLeadLimit[weaponID] then

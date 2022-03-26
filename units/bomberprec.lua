@@ -1,7 +1,7 @@
 return { bomberprec = {
   unitname            = [[bomberprec]],
   name                = [[Raven]],
-  description         = [[Precision Bomber]],
+  description         = [[Precision Bomber (Anti-Sub)]],
   brakerate           = 0.4,
   buildCostMetal      = 300,
   builder             = false,
@@ -14,19 +14,20 @@ return { bomberprec = {
   category            = [[FIXEDWING]],
   collide             = false,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[80 10 30]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[100 18 50]],
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[95 25 60]],
   selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 220,
+  cruiseAlt           = 180,
 
   customParams        = {
-    modelradius    = [[15]],
+    modelradius      = [[15]],
     refuelturnradius = [[120]],
     reammoseconds    = [[8]],
-    requireammo    = [[1]],
+    requireammo      = [[1]],
+    can_set_target   = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -34,8 +35,6 @@ return { bomberprec = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[bomberassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maneuverleashlength = [[1380]],
   maxAcc              = 0.5,
   maxBank             = 0.6,
@@ -46,7 +45,7 @@ return { bomberprec = {
   maxPitch            = 0.4,
   maxVelocity         = 7.8,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP TOOFAST]],
   objectName          = [[corshad.s3o]],
   script              = [[bomberprec.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
@@ -69,19 +68,16 @@ return { bomberprec = {
       def                = [[BOGUS_BOMB]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-
-
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 150,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
-    
-    {
-      def                = [[SHIELD_CHECK]],
-      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },
+    --{
+    --  def                = [[SHIELD_CHECK]],
+    --  onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    --},
 
   },
 
@@ -95,7 +91,6 @@ return { bomberprec = {
       craterMult              = 0,
 
       customParams            = {
-        reaim_time = 15, -- Fast update not required (maybe dangerous)
         bogus = 1,
       },
 
@@ -109,8 +104,8 @@ return { bomberprec = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       model                   = [[]],
-      myGravity               = 1000,
-      range                   = 10,
+      myGravity               = 0.8,
+      range                   = 140,
       reloadtime              = 10,
       weaponType              = [[AircraftBomb]],
     },
@@ -143,28 +138,28 @@ return { bomberprec = {
 
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
-      flightTime              = 3,
+      flightTime              = 6,
       heightmod               = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       leadlimit               = 0,
       model                   = [[wep_b_paveway.s3o]],
-      leadLimit               = 20,
+      leadLimit               = 10,
       range                   = 180,
-      reloadtime              = 5,
+      reloadtime              = 8,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/bomb_drop]],
-      startVelocity           = 200,
+      startVelocity           = 135,
       tolerance               = 8000,
-      tracks                  = false,
-      turnRate                = 2500,
+      tracks                  = true,
+      turnRate                = 20000,
       turret                  = true,
       waterweapon             = true,
-      weaponAcceleration      = 50,
+      weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 135,
     },
     
     SHIELD_CHECK = {
@@ -216,6 +211,10 @@ return { bomberprec = {
       areaOfEffect            = 32,
       craterBoost             = 1,
       craterMult              = 2,
+
+      customparams = {
+        stays_underwater = 1,
+      },
 
       damage                  = {
         default = 800,

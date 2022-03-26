@@ -14,13 +14,15 @@ local flare = piece 'firepoint1'
 local smokePiece = {base, turret}
 
 local RESTORE_DELAY = 4000
+local WOBBLE_HEIGHT = 2
+local WOBBLE_SPEED = 2.5
 
 -- Signal definitions
 local SIG_AIM = 2
-local SIG_MOVE = 4
+local SIG_WOBBLE = 4
 
 local curTerrainType = 4
-local wobble = false
+local wobbleRising = false
 local firing = false
 
 local function Tilt()
@@ -35,16 +37,17 @@ local function Tilt()
 end
 
 local function WobbleUnit()
-	StartThread(Tilt)
+	Signal(SIG_WOBBLE)
+	SetSignalMask(SIG_WOBBLE)
 	while true do
-		if wobble == true then
-			Move(base, y_axis, 2, 3)
+		local rand = WOBBLE_SPEED + math.random()
+		if wobbleRising then
+			Move(base, y_axis, -WOBBLE_HEIGHT, rand)
+		else
+			Move(base, y_axis, WOBBLE_HEIGHT, rand)
 		end
-		if wobble == false then
-			Move(base, y_axis, -2, 3)
-		end
-		wobble = not wobble
-		Sleep(1500)
+		wobbleRising = not wobbleRising
+		Sleep(( 2000 * WOBBLE_HEIGHT / rand ) + ( 1000 / 6 ))
 	end
 end
 
@@ -69,6 +72,7 @@ function script.Create()
 	Hide(flare)
 
 	StartThread(WobbleUnit)
+	StartThread(Tilt)
 	
 	for i = 1, 4 do
 		Hide(wheels[i])
@@ -104,7 +108,7 @@ end
 function script.BlockShot(num, targetID)
 	-- Partial OKP damage because long beam means the unit can dodge and just get grazed
 	-- Underestimate beam time so that fully-hit targets always have more pending damage in reality than in theory.
-	return targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 20))
+	return (targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 20))) or false
 end
 
 function script.AimFromWeapon(num)
@@ -118,7 +122,26 @@ end
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
 function script.FireWeapon()
 	firing = true
-	Sleep (beam_duration)
+	Signal(SIG_WOBBLE)
+	if not wobbleRising then
+		Move(base, y_axis, -WOBBLE_HEIGHT, WOBBLE_SPEED*0.25)
+		Sleep(100)
+		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.35)
+		Sleep(100)
+		Move(base, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
+		Sleep(100)
+		Sleep(beam_duration - 300)
+		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.4)
+	else
+		Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED*0.8)
+		Sleep(100)
+		Move(base, y_axis, WOBBLE_HEIGHT + 1, WOBBLE_SPEED*0.66)
+		Sleep(beam_duration - 100)
+	end
+	Move(base, y_axis, WOBBLE_HEIGHT, WOBBLE_SPEED)
+	WaitForMove(base, y_axis)
+	wobbleRising = true
+	StartThread(WobbleUnit)
 	firing = false
 end
 

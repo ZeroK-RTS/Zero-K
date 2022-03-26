@@ -52,7 +52,6 @@ local SIG_Restore = 1
 local SIG_Walk = 2
 local SIG_Aim = 4
 local SIG_Aim2 = 8
-local SIG_Aim3 = 16
 local SIG_Idle = 32
 local armGunIsR = false
 local missilegun = 1

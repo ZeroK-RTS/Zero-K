@@ -128,6 +128,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 
 	local index = nanoframesByID[unitID]
+	if not index then
+		return
+	end
 	local lastUnitID = nanoframes[nanoframeCount]
 	local cost = nanoframeCosts[index]
 

@@ -9,12 +9,12 @@ end
 function gadget:GetInfo()
 	return {
 		name      = "Wade Effects",
-		desc      = "Spawn wakes when non-ship ground units move while partially, but not completely submerged",
-		author    = "Anarchid",
+		desc      = "Spawn wakes when wading; splash when yitten into the sea",
+		author    = "Anarchid, Sprung",
 		date      = "March 2016",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true  --  loaded by default?
+		enabled   = true
 	}
 end
 
@@ -26,10 +26,12 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
+local spGetGroundHeight      = Spring.GetGroundHeight
 local spGetUnitIsCloaked     = Spring.GetUnitIsCloaked
 local spGetUnitPosition      = Spring.GetUnitPosition
 local spGetUnitVelocity      = Spring.GetUnitVelocity
 local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
+local spSpawnCEG             = Spring.SpawnCEG
 
 local spusCallAsUnit = Spring.UnitScript.CallAsUnit
 local spusEmitSfx    = Spring.UnitScript.EmitSfx
@@ -114,8 +116,11 @@ function gadget:GameFrame(n)
 			if y and h and y > h and y <= 0  and not spGetUnitIsCloaked(unitID) then
 				local _, _, _, speed = spGetUnitVelocity(unitID)
 				if speed and speed > 0 then
-					-- 1 is the pieceID, most likely it's usually the base piece
-					-- but even if it isn't, it doesn't really matter
+					--[[ 1 is the pieceID, most likely it's usually the base piece
+					     but even if it isn't, it doesn't really matter (the effect
+					     doesn't have to be accurately in the middle).
+					     Also note that Spring.SpawnCEG cannot spawn wakes,
+					     which is why we're using unit script callouts. ]]
 					spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
 				end
 			end
@@ -123,6 +128,50 @@ function gadget:GameFrame(n)
 		current_fold = (current_fold % n_folds) + 1
 	end
 end
+
+function gadget:UnitEnteredWater(unitID, unitDefID)
+	if not unit[unitID] then
+		--[[ Maybe hovers and ships should be eligible for splashes too,
+		     like when skipping stones? If making the check more lenient,
+		     remember not to include air units (they can land on surface
+		     of the sea and do so at fairly high speeds). ]]
+		return
+	end
+
+	local x, y, z = spGetUnitPosition(unitID)
+	local h = spGetGroundHeight(x, z)
+	if h + 1 > y then
+		--[[ The unit is already on the seafloor, so either:
+
+		 * the unit did not enter water through the surface,
+		   for example it was just rezzed/built/djinn'd/puppywarped,
+		   or maybe it was the seafloor itself that got terraformed.
+
+		 * the unit is entering the water normally,
+		   walking along the floor all along. This could
+		   make a reduced splash but this is what wakes
+		   already achieve so let's not overcomplicate.
+
+		 * water is just extremely shallow here, not deep
+		   enough to produce a proper splash. ]]
+		return
+	end
+
+	--[[ Placeholder black holes can in theory make a unit
+	     oscillate back and forth on the sea surface. This
+	     could be detected here to prevent splash spammaeg,
+	     but I have been unable to reproduce it on purpose
+	     and it should be extremely rare in practice. ]]
+
+	--[[ Align to water surface (y = 0).
+	     Note that spusEmitSfx cannot spawn arbitrary CEGs. ]]
+	spSpawnCEG("watersplash_bar_large", x, 0, z)
+end
+
+--[[ Leaving the water forcefully is fairly rare. The three
+     most common cases would be Recon Comm jumping out, Lobster
+     hurling stuff, and the more buoyant amphs floating up. ]]
+gadget.UnitLeftWater = gadget.UnitEnteredWater
 
 function gadget:Initialize()
 	local spGetUnitDefID = Spring.GetUnitDefID

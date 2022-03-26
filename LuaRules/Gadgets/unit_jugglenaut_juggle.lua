@@ -214,7 +214,6 @@ else	--unsynced
 -------------------------------------------------------------------------------------
 
 local Lups
-local SYNCED = SYNCED
 
 local particleIDs = {}
 

@@ -20,10 +20,9 @@ local function round_to_frames(name, wd, key)
 	wd[key] = sanitized_value + 1E-5
 end
 
-local function print_bounce_warning(name, wd, key)
-	if (wd.numBounce or wd.bouncerebound or wd.bounceslip) and not (
-			name == "amphriot.torpedo" or name == "amphraid.torpedo" or
-			name == "shiptorpraider.torpedo" or name == "turrettorp.torpedo" or
+local function print_bounce_warning(name, wd)
+	if (wd.numbounce or wd.bouncerebound or wd.bounceslip) and not (
+			(wd.customparams and wd.customparams.stays_underwater == 1) or
 			name == "hoverdepthcharge.depthcharge" or name == "hoverdepthcharge.fake_depthcharge" or
 			wd.weapontype == "Cannon") then
 		Spring.Echo("===============================================================")
@@ -31,6 +30,7 @@ local function print_bounce_warning(name, wd, key)
 		Spring.Echo("Ground bounce detected for", name, wd.weapontype)
 		Spring.Echo("There is a risk of it falling through the ground indefinitely.")
 		Spring.Echo("Ensure appropriate hax is in place.")
+		Spring.Echo("For torpedoes use \"stays_underwater\" customParam.")
 		Spring.Echo("See LuaRules/Gadgets/weapon_torpedo_stay_underwater.lua.")
 		Spring.Echo("************************* END WARNING *************************")
 		Spring.Echo("===============================================================")
@@ -71,11 +71,22 @@ local function processWeapons(unitDefName, unitDef)
 		local fullWeaponName = unitDefName .. "." .. weaponDefName
 		round_to_frames(fullWeaponName, weaponDef, "reloadtime")
 		round_to_frames(fullWeaponName, weaponDef, "burstrate")
-		print_bounce_warning(fullWeaponName, weaponDef, "burstrate")
+		print_bounce_warning(fullWeaponName, weaponDef)
 		check_lasercannon_range(fullWeaponName, weaponDef)
 	end
 end
 
+local function checkBuildingness(name, ud)
+	if not ud.maxvelocity or ud.maxvelocity == 0 then
+		if ud.brakerate     then Spring.Echo(name .. " is a building but has the `brakeRate` field set!") end
+		if ud.acceleration  then Spring.Echo(name .. " is a building but has the `acceleration` field set!") end
+		if ud.turnrate      then Spring.Echo(name .. " is a building but has the `turnRate` field set!") end
+	else
+		if ud.yardmap then Spring.Echo(name .. " is not a building (speed > 0) but has a yardmap!") end
+	end
+end
+
 for unitDefName, unitDef in pairs (UnitDefs) do
+	checkBuildingness(unitDefName, unitDef)
 	processWeapons(unitDefName, unitDef)
 end

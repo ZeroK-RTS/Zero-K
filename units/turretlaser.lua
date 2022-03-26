@@ -2,8 +2,6 @@ return { turretlaser = {
   unitname                      = [[turretlaser]],
   name                          = [[Lotus]],
   description                   = [[Light Laser Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 90,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -26,8 +24,6 @@ return { turretlaser = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[defenseraider]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 60,
   maxDamage                     = 785,
@@ -47,7 +43,6 @@ return { turretlaser = {
 
   },
   sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline                     = 5,
   workerTime                    = 0,
@@ -77,7 +72,8 @@ return { turretlaser = {
       customparams = {
         stats_hide_damage = 1, -- continuous laser
         stats_hide_reload = 1,
-        
+        prevent_overshoot_fudge = 15,
+
         light_color = [[0.4 1.1 1.1]],
         light_radius = 120,
       },

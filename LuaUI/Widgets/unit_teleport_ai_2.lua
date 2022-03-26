@@ -14,7 +14,6 @@ local detectionRange = 600
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
-VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
@@ -46,7 +45,19 @@ local groupBeaconFinish={}
 --end spread job stuff
 local IgnoreUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes (an Optimization)
 local teleportedUnit = {}
-local beaconDefID = UnitDefNames["tele_beacon"].id
+
+local isBeaconDef = {}
+
+for _, ud in pairs(UnitDefs) do
+	if (ud.customParams.teleporter and ud.customParams.teleporter_beacon_unit) then
+		local beaconDef = UnitDefNames[ ud.customParams.teleporter_beacon_unit ]
+
+		if (beaconDef) then
+			isBeaconDef[beaconDef.id] = true
+		end
+	end
+end
+
 --Network lag hax stuff: (wait until unit receive command before processing 2nd time)
 local waitForNetworkDelay = {}
 local issuedOrderTo = {}
@@ -65,7 +76,7 @@ function widget:Initialize()
 		local unitID = units[i]
 		if Spring.IsUnitAllied(unitID) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			if beaconDefID == unitDefID then
+			if isBeaconDef[unitDefID] then
 				local x,y,z = spGetUnitPosition(unitID)
 				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 			end
@@ -79,7 +90,7 @@ function widget:Initialize()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if beaconDefID == unitDefID then
+	if isBeaconDef[unitDefID] then
 		local x,y,z = spGetUnitPosition(unitID)
 		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
@@ -464,8 +475,8 @@ function widget:GameFrame(n)
 							--save exit coordinate:--
 							teleportedUnit[unitID] = { x = dx*50+ex ,y = ey, z = dz*50+ez } --(a coordinate of a command that we going to give)
 							--end fix
-							--method A: give GUARD order--
-							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, CMD.OPT_ALT},{CMD.INSERT, {1, CMD_RAW_MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, CMD.OPT_ALT}})
+							--method A: give WAIT_AT_BEACON order--
+							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD_WAIT_AT_BEACON, CMD.OPT_SHIFT, pathToFollow}, CMD.OPT_ALT},{CMD.INSERT, {1, CMD_RAW_MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, CMD.OPT_ALT}})
 							local defID = unitInfo["defID"]
 							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime

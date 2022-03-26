@@ -300,7 +300,7 @@ local DEF_TARGET_TOO_FAR_PRIORITY = 100000 --usually numbers are around several 
 --end
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-	if not defPriority then
+	if not (defPriority and attackerWeaponDefID) then
 		-- This callin is effectively script.BlockShot but for CommandAI.
 		-- The engine will discard target priority information.
 		return true
@@ -340,6 +340,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	local enemyUnitDefID = remUnitDefID[targetID]
+	if not enemyUnitDefID then
+		return true
+	end
 	
 	--// Get Velocity target penalty
 	local velocityAdd = 0

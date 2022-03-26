@@ -23,18 +23,12 @@ return { staticmissilesilo = {
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 
-  customParams                  = {
-    nongroundfac = [[1]],
-  },
-
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 6,
   footprintZ                    = 6,
   iconType                      = [[cruisemissile]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,

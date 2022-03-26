@@ -17,7 +17,6 @@ end
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 
-
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -25,7 +24,7 @@ local MAPSIDE_METALMAP = "mapconfig/map_metal_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
-local MINIMUN_MEX_INCOME = 0.2
+local MINIMUM_MEX_INCOME = 0.2
 
 local gridSize = 16 -- Resolution of metal map
 local buildGridSize = 8 -- Resolution of build positions
@@ -49,16 +48,16 @@ local spGetGroundInfo       = Spring.GetGroundInfo
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local spSetGameRulesParam   = Spring.SetGameRulesParam
 
-local extractorRadius = Game.extractorRadius
+local extractorRadius    = Game.extractorRadius
 local extractorRadiusSqr = extractorRadius * extractorRadius
  
-local buildmapSizeX = Game.mapSizeX - buildGridSize
-local buildmapSizeZ = Game.mapSizeZ - buildGridSize
+local buildmapSizeX  = Game.mapSizeX - buildGridSize
+local buildmapSizeZ  = Game.mapSizeZ - buildGridSize
 local buildmapStartX = buildGridSize
 local buildmapStartZ = buildGridSize
 
-local metalmapSizeX = Game.mapSizeX - 1.5 * gridSize
-local metalmapSizeZ = Game.mapSizeZ - 1.5 * gridSize
+local metalmapSizeX  = Game.mapSizeX - 1.5 * gridSize
+local metalmapSizeZ  = Game.mapSizeZ - 1.5 * gridSize
 local metalmapStartX = 1.5 * gridSize
 local metalmapStartZ = 1.5 * gridSize
 
@@ -70,15 +69,14 @@ local mexUnitDef = UnitDefNames["staticmex"]
 
 local mexDefInfo = {
 	extraction = 0.001,
-	oddX = mexUnitDef.xsize % 4 == 2,
-	oddZ = mexUnitDef.zsize % 4 == 2,
+	oddX = (mexUnitDef.xsize % 4 == 2),
+	oddZ = (mexUnitDef.zsize % 4 == 2),
 }
 
 local modOptions
 if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
+	modOptions = Spring.GetModOptions()
 end
-
 
 ------------------------------------------------------------
 -- Speedup
@@ -99,6 +97,7 @@ end
 ------------------------------------------------------------
 -- Set Game Rules so widgets can read metal spots
 ------------------------------------------------------------
+
 local function SetMexGameRulesParams(metalSpots, needMexDrawing)
 	if not metalSpots then -- Mexes can be built anywhere
 		spSetGameRulesParam("mex_count", -1)
@@ -141,64 +140,11 @@ local function SetMexHelperAttributes(metalSpots, needMexDrawing)
 end
 
 ------------------------------------------------------------
--- Callins
-------------------------------------------------------------
-function gadget:Initialize()
-	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
-	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
-	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
-	
-	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
-	local metalSpotsByPos = false
-	
-	if fromEngineMetalmap and #metalSpots < 6 then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
-		metalSpots = false
-	end
-	
-	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
-	
-	if metalSpots then
-		local mult = (modOptions and modOptions.metalmult) or 1
-		local i = 1
-		while i <= #metalSpots do
-			local spot = metalSpots[i]
-			if spot.metal > MINIMUN_MEX_INCOME then
-				if metalValueOverride then
-					spot.metal = metalValueOverride
-				end
-				spot.metal = spot.metal*mult
-				i = i + 1
-			else
-				metalSpots[i] = metalSpots[#metalSpots]
-				metalSpots[#metalSpots] = nil
-			end
-		end
-		
-		metalSpotsByPos = GetSpotsByPos(metalSpots)
-	end
-	
-	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
-	SetMexGameRulesParams(metalSpots)
-	SetMexHelperAttributes(metalSpots, needMexDrawing)
-
-	GG.metalSpots = metalSpots
-	GG.metalSpotsByPos = metalSpotsByPos
-	
-	GG.IntegrateMetal = IntegrateMetal
-	
-	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Metal Spots found and GGed")
-end
-
-------------------------------------------------------------
--- Extractor Income Processing
+-- Extractor Processing
 ------------------------------------------------------------
 
-function IntegrateMetal(x, z, radius)
+local function AdjustCoordinates(x, z)
 	local centerX, centerZ
-	
-	radius = radius or MEX_RADIUS
-	
 	if (mexDefInfo.oddX) then
 		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
 	else
@@ -210,6 +156,12 @@ function IntegrateMetal(x, z, radius)
 	else
 		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
+	
+	return centerX, centerZ
+end
+
+local function IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	radius = radius or MEX_RADIUS
 	
 	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
 	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
@@ -234,32 +186,48 @@ function IntegrateMetal(x, z, radius)
 		end
 	end
 	
-	return result * mult, centerX, centerZ
+	return result * mult
 end
+
+local function IntegrateMetal(x, z, radius)
+	local centerX, centerZ = AdjustCoordinates(x, z)
+	local metal = IntegrateMetalFromAdjusted(centerX, centerZ, radius)
+	return metal, centerX, centerZ
+end
+
 
 ------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
-local function SanitiseSpots(spots, metalValueOverride)
-	local i = 1
-	while i <= #spots do
+
+local function SanitiseSpots(spots, metalOverride, overrideDefinedMexes)
+	local retSpots = {}
+	for i = 1, #spots do
 		local spot = spots[i]
 		if spot and spot.x and spot.z then
-			local metal
-			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
+			spot.x, spot.z = AdjustCoordinates(spot.x, spot.z)
 			spot.y = spGetGroundOrigHeight(spot.x, spot.z)
-			spot.metal = spot.metal or metalValueOverride or (metal > 0 and metal) or DEFAULT_MEX_INCOME
-			i = i + 1
-		else
-			spot[i] = spot[#spots]
-			spot[#spots] = nil
+			
+			if metalOverride and (overrideDefinedMexes or not spot.metal) then
+				spot.metal = metalOverride
+			end
+			
+			if not spot.metal then
+				local metal = IntegrateMetalFromAdjusted(spot.x, spot.z)
+				spot.metal = (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			end
+			
+			if spot.metal > MINIMUM_MEX_INCOME then
+				spot.metal = spot.metal
+				retSpots[#retSpots + 1] = spot
+			end
 		end
 	end
 	
-	return spots
+	return retSpots
 end
 
-local function makeString(group)
+local function MakeString(group)
 	if group then
 		local ret = ""
 		for i, v in pairs(group.left) do
@@ -276,25 +244,8 @@ local function makeString(group)
 	end
 end
 
-function GetSpots(gameConfig, mapConfig)
-	
+local function SearchForSpots(spotValueOverride)
 	local spots = {}
-
-	-- Check configs
-	if gameConfig then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
-		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride)
-			return spots, false
-		end
-	end
-	
-	if mapConfig then
-		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
-		loadConfig = true
-		spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride)
-		return spots, false
-	end
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
 
@@ -313,7 +264,6 @@ function GetSpots(gameConfig, mapConfig)
 	
 	-- Strip processing function (To avoid some code duplication)
 	local function DoStrip(x1, x2, z, worth)
-		
 		local assignedTo
 		
 		for i = aboveIdx, workingIdx - 1 do
@@ -334,7 +284,7 @@ function GetSpots(gameConfig, mapConfig)
 						end
 						assignedTo.maxZ = z
 						assignedTo.worth = assignedTo.worth + matchGroup.worth
-						uniqueGroups[makeString(matchGroup)] = nil
+						uniqueGroups[MakeString(matchGroup)] = nil
 					end
 				else
 					assignedTo = matchGroup
@@ -363,7 +313,7 @@ function GetSpots(gameConfig, mapConfig)
 					worth = worth
 				}
 			stripGroup[nStrips] = newGroup
-			uniqueGroups[makeString(newGroup)] = newGroup
+			uniqueGroups[MakeString(newGroup)] = newGroup
 		end
 	end
 	
@@ -423,7 +373,6 @@ function GetSpots(gameConfig, mapConfig)
 					spot.x = mx
 					spot.y = spGetGroundOrigHeight(mx, mx)
 					spot.z = mz
-					spot.metal = metal
 					merged = true
 					break
 				end
@@ -435,37 +384,87 @@ function GetSpots(gameConfig, mapConfig)
 		end
 	end
 	
-	--for i = 1, #spots do
-	--	Spring.MarkerAddPoint(spots[i].x,spots[i].y,spots[i].z,"")
-	--end
-	
-	return spots, true
-end
-
-function GetValidStrips(spot)
-	
-	local sMinZ, sMaxZ = spot.minZ, spot.maxZ
-	local sLeft, sRight = spot.left, spot.right
-	
-	local validLeft = {}
-	local validRight = {}
-	
-	local maxZOffset = buildGridSize * ceil(extractorRadius / buildGridSize - 1)
-	for mz = max(sMaxZ - maxZOffset, buildmapStartZ), min(sMinZ + maxZOffset, buildmapSizeZ), buildGridSize do
-		local vLeft, vRight = buildmapStartX, buildmapSizeX
-		for sz = sMinZ, sMaxZ, gridSize do
-			local dz = sz - mz
-			local maxXOffset = buildGridSize * ceil(sqrt(extractorRadiusSqr - dz * dz) / buildGridSize - 1) -- Test for metal being included is dist < extractorRadius
-			local left, right = sRight[sz] - maxXOffset, sLeft[sz] + maxXOffset
-			if left  > vLeft  then vLeft  = left  end
-			if right < vRight then vRight = right end
+	-- Apply metal mult and override
+	if spotValueOverride then
+		for i = 1, #spots do
+			local spot = spots[i]
+			spot.metal = spotValueOverride
 		end
-		validLeft[mz] = vLeft
-		validRight[mz] = vRight
 	end
 	
-	spot.validLeft = validLeft
-	spot.validRight = validRight
+	return spots
+end
+
+local function DoMetalMult(spots)
+	local metalMult = (modOptions and modOptions.metalmult) or 1
+	for i = 1, #spots do
+		local spot = spots[i]
+		spot.metal = spot.metal * metalMult
+	end
+	return spots
+end
+
+local function GetSpots(gameConfig, mapConfig)
+	local spotValueOverride = false
+	
+	-- Check configs
+	if gameConfig then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
+		if gameConfig.spots then
+			local spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride, true)
+			return DoMetalMult(spots), false
+		elseif gameConfig.metalValueOverride then
+			spotValueOverride = gameConfig.metalValueOverride
+		end
+	end
+	
+	if mapConfig then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
+		if mapConfig.spots then
+			local spots = SanitiseSpots(mapConfig.spots, spotValueOverride or mapConfig.metalValueOverride, spotValueOverride or false)
+			return DoMetalMult(spots), false
+		elseif mapConfig.metalValueOverride and not gameConfig.metalValueOverride then
+			spotValueOverride = mapConfig.metalValueOverride
+		end
+	end
+	
+	local spots = SanitiseSpots(SearchForSpots(spotValueOverride))
+	return DoMetalMult(spots), true
+end
+
+------------------------------------------------------------
+-- Callins
+------------------------------------------------------------
+
+function gadget:Initialize()
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
+	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
+	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
+	
+	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
+	local metalSpotsByPos = false
+	
+	if fromEngineMetalmap and #metalSpots < 6 then
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
+		metalSpots = false
+	end
+	
+	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
+	
+	if metalSpots then
+		metalSpotsByPos = GetSpotsByPos(metalSpots)
+	end
+	
+	local needMexDrawing = (gameConfig and gameConfig.needMexDrawing) or (mapConfig and mapConfig.needMexDrawing)
+	SetMexGameRulesParams(metalSpots)
+	SetMexHelperAttributes(metalSpots, needMexDrawing)
+
+	GG.metalSpots = metalSpots
+	GG.metalSpotsByPos = metalSpotsByPos
+	
+	GG.IntegrateMetal = IntegrateMetal
+	
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Metal Spots found and GGed")
 end
 
 --------------------------------------------------------------------------------
@@ -505,7 +504,6 @@ function GetMexSpotsFromGameRules()
 	end
 	
 	local metalSpots = {}
-	
 	for i = 1, mexCount do
 		metalSpots[i] = {
 			x = spGetGameRulesParam("mex_x" .. i),

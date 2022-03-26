@@ -25,7 +25,7 @@ local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.I
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
 
-local unitsToFactory = {}	-- [unitDefName] = factoryDefName
+local unitsToFactory = {} -- [unitDefName] = factoryDefName
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -83,6 +83,12 @@ local tooltips = {
 		[2] = "Always Gather",
 	},
 	selectionrank = {
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+	},
+	formationrank = {
 		[0] = "0",
 		[1] = "1",
 		[2] = "2",
@@ -154,6 +160,7 @@ options_order = {
 	'commander_retreat',
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
+	'commander_formation_rank',
 }
 
 options = {
@@ -588,7 +595,7 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.auto_call_transport,
 	},
-	
+
 	commander_selection_rank = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
@@ -600,10 +607,23 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.selectionrank,
 	},
+
+	commander_formation_rank = {
+		name = "  Formation Rank",
+		desc = "Formation Rank: units of lower rank line up in front of units of higher rank when given line movement orders.",
+		type = 'number',
+		value = 2,
+		min = 0,
+		max = 3,
+		step = 1,
+		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.formationrank,
+	},
 }
 
 local tacticalAIUnits = {}
 local wardFireUnits = {}
+local wardFireCmdID = {}
 do
 	local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
 	for unitDefID, behaviourData in pairs(tacticalAIDefs) do
@@ -615,6 +635,7 @@ do
 			end
 			if behaviourData.hasWardFire then
 				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
+				wardFireCmdID[unitDefName] = behaviourData.wardFireCmdID
 			end
 		end
 	end
@@ -838,7 +859,7 @@ local function addUnit(defName, path)
 			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
-	elseif ud.isFactory and not ud.customParams.nongroundfac then
+	elseif Spring.Utilities.isGroundFactory(ud) then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Disabled, Enabled",
@@ -867,7 +888,7 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
-	
+
 	options[defName .. "_selection_rank"] = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
@@ -880,6 +901,21 @@ local function addUnit(defName, path)
 		tooltipFunction = tooltipFunc.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
+	
+	if ud.canMove and not ud.isFactory and not (ud.springCategories.fixedwing) then
+		options[defName .. "_formation_rank"] = {
+			name = "  Formation Rank",
+			desc = "Formation Rank: set rank in formation",
+			type = 'number',
+			value = 2,
+			min = 0,
+			max = 3,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.formationrank,
+		}
+		options_order[#options_order+1] = defName .. "_formation_rank"
+	end
 	
 	if tacticalAIUnits[defName] then
 		options[defName .. "_tactical_ai_2"] = {
@@ -927,8 +963,9 @@ local function addUnit(defName, path)
 
 	if wardFireUnits[defName] then
 		local def = wardFireUnits[defName]
+		local wardCmd = wardFireCmdID[defName]
 		
-		if def.wardFireCmdID == CMD_FIRE_AT_SHIELD then
+		if wardCmd == CMD_FIRE_AT_SHIELD then
 			options[defName .. "_fire_at_shield"] = {
 				name = "  Fire at Shields",
 				desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
@@ -938,7 +975,7 @@ local function addUnit(defName, path)
 				tooltipFunction = tooltipFunc.prevent_bait,
 			}
 			options_order[#options_order+1] = defName .. "_fire_at_shield"
-		elseif def.wardFireCmdID == CMD_FIRE_TOWARDS_ENEMY then
+		elseif wardCmd == CMD_FIRE_TOWARDS_ENEMY then
 			options[defName .. "_fire_towards_enemy"] = {
 				name = "  Fire Towards Enemies",
 				desc = "Shoot towards the closest enemy when nothing else is in range.",
@@ -947,7 +984,7 @@ local function addUnit(defName, path)
 				path = path,
 				tooltipFunction = tooltipFunc.prevent_bait,
 			}
-			options_order[#options_order+1] = defName .. "fire_towards_enemy"
+			options_order[#options_order+1] = defName .. "_fire_towards_enemy"
 		end
 	end
 
@@ -1099,13 +1136,22 @@ end
 local function ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	local name = ud.name
+	
 	if options[name .. "_selection_rank"] and WG.SetSelectionRank then
 		WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
 	end
-	
 	if ud.customParams.commtype or ud.customParams.level then
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+	end
+	
+	if options[name .. "_formation_rank"] and WG.SetFormationRank then
+		WG.SetFormationRank(unitID, options[name .. "_formation_rank"].value)
+	end
+	if ud.customParams.commtype or ud.customParams.level then
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 end
@@ -1206,6 +1252,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 
@@ -1371,7 +1420,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if value then -- false is the default
 			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
 		end
-		
+
+		value = GetStateValue(name, "formation_rank")
+		if value and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, value)
+		end
+	
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")

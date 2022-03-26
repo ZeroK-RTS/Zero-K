@@ -24,14 +24,18 @@ end
 -- Config
 --------------------------------------------------------------------------------
 
-local nukeDefs = {
-	[UnitDefNames["staticnuke"].id] = true,
-}
+local nukeDefs = {}
+local interceptorRanges = {}
 
-local interceptorRanges = {
-	[UnitDefNames["staticantinuke"].id] = 2500^2,
-	--[UnitDefNames["reef"].id] = 1200^2,
-}
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.is_nuke then
+		nukeDefs[unitDefID] = true
+	end
+
+	if ud.customParams.nuke_coverage then
+		interceptorRanges[unitDefID] = (ud.customParams.nuke_coverage)^2
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -32,8 +32,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	return
 end
 
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unsynced
@@ -54,6 +52,8 @@ local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
 local DEFAULT_VERSION = "#version 150 compatibility"
 
 local USE_OBJECT_DAMAGE = false
+
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 -----------------------------------------------------------------
 -- Includes and classes loading
@@ -952,6 +952,7 @@ local function ReloadCUS(optName, _, _, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
+	Spring.Echo("Reloading CUS")
 	gadget:Shutdown()
 	gadget:Initialize()
 end
@@ -960,6 +961,7 @@ local function DisableCUS(optName, _, _, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
+	Spring.Echo("Removing CUS")
 	gadget:Shutdown()
 end
 
@@ -971,6 +973,11 @@ end
 -----------------------------------------------------------------
 
 function gadget:Initialize()
+	if BAR_COMPAT then
+		Spring.Echo("Removing CUS due to 105+")
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	--// GG assignment
 	GG.CUS = {}
 

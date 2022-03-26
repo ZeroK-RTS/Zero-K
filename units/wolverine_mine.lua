@@ -2,9 +2,7 @@ return { wolverine_mine = {
   unitname               = [[wolverine_mine]],
   name                   = [[Claw]],
   description            = [[Badger Mine]],
-  acceleration           = 0,
   activateWhenBuilt      = false,
-  brakeRate              = 0,
   buildCostMetal         = 5,
   builder                = false,
   buildPic               = [[wolverine_mine.png]],
@@ -19,10 +17,11 @@ return { wolverine_mine = {
 
   customParams           = {
     bait_level_default = 0,
-    bait_level_target      = 1, -- Just for safety.
+    bait_level_target  = 1, -- Just for safety.
     dontcount = [[1]],
     mobilebuilding = [[1]],
     idle_cloak = 1,
+    has_parent_unit = 1,
   },
 
   explodeAs              = [[NOWEAPON]],
@@ -36,7 +35,7 @@ return { wolverine_mine = {
   maxDamage              = 40,
   maxSlope               = 255,
   maxVelocity            = 0,
-  minCloakDistance       = 50,
+  minCloakDistance       = 80,
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[claw.s3o]],
@@ -46,9 +45,8 @@ return { wolverine_mine = {
   script                 = [[wolverine_mine.lua]],
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
-  sightDistance          = 64,
+  sightDistance          = 120,
   stealth                = true,
-  turnRate               = 0,
   waterline              = 1,
   workerTime             = 0,
   yardMap                = [[y]],
@@ -77,6 +75,10 @@ return { wolverine_mine = {
       customparams = {
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
+
+        light_camera_height = 1600,
+        light_color = [[0.45 0.26 0.068]],
+        light_radius = 180,
       },
       
       damage                  = {
@@ -87,7 +89,7 @@ return { wolverine_mine = {
       explosionGenerator      = [[custom:DEFAULT]],
       fireStarter             = 70,
       fixedlauncher           = 1,
-      flightTime              = 1,
+      flightTime              = 1.7,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -101,14 +103,14 @@ return { wolverine_mine = {
       soundStart              = [[weapon/missile/sabot_fire_short]],
       soundStartVolume        = 9,
       soundTrigger            = 1,
-      startVelocity           = 50,
+      startVelocity           = 70,
       texture2                = [[darksmoketrail]],
       tracks                  = true,
-      turnRate                = 36000,
+      turnRate                = 24000,
       turret                  = true,
-      weaponAcceleration      = 200,
+      weaponAcceleration      = 50,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 130,
     },
 
   },
