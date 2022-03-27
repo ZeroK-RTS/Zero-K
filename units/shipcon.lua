@@ -27,6 +27,10 @@ return { shipcon = {
     modelradius    = [[40]],
     turnatfullspeed = [[1]],
     selection_scale = 1.2,
+
+    outline_x = 128,
+    outline_y = 128,
+    outline_yoff = 16,
   },
 
   energyUse              = 0,

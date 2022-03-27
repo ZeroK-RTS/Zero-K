@@ -65,6 +65,7 @@ local jumper = { -- uses jump for offense. IE do not put commander or AA here.
 local riot = {
 	"cloakriot",
 	"shieldriot",
+	"shieldfelon",
 	"vehriot",
 	"spiderriot",
 	"amphimpulse",
@@ -72,7 +73,7 @@ local riot = {
 	
 	"spideremp",
 	"tankriot",
-
+	"hoverdepthcharge",
 	"hoverriot",
 	
 	"striderdante",
@@ -83,7 +84,9 @@ local riot = {
 local arty = {
 	"cloakarty",
 	"jumparty",
+	"shieldarty",
 	"veharty",
+	"amphsupport",
 	
 	"vehheavyarty",
 	--"hoverarty",
@@ -106,6 +109,7 @@ local prioritySos = {
 	"energysingu",
 	"factoryshield",
 	"factorycloak",
+	"factoryamph",
 	"factoryveh",
 	"factoryplane",
 	"factorygunship",
@@ -114,6 +118,7 @@ local prioritySos = {
 	"factoryjump",
 	"factorytank",
 	"factoryship",
+	"striderhub",
 	"dyntrainer_recon_base",
 	"dyntrainer_support_base",
 	"dyntrainer_assault_base",

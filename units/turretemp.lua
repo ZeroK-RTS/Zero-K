@@ -22,6 +22,10 @@ return { turretemp = {
     modelradius    = [[16]],
     aim_lookahead  = 50,
     dynamic_colvol = [[1]],
+
+    outline_x = 64,
+    outline_y = 95,
+    outline_yoff = 32,
   },
 
   damageModifier                = 0.333,

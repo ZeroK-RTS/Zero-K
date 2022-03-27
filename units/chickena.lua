@@ -16,6 +16,9 @@ return { chickena = {
   category            = [[LAND SINK]],
 
   customParams        = {
+    outline_x = 235,
+    outline_y = 235,
+    outline_yoff = 25,
   },
 
   explodeAs           = [[NOWEAPON]],

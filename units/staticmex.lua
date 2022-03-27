@@ -23,6 +23,13 @@ return { staticmex = {
     removewait         = 1,
     removestop     = 1,
     selectionscalemult = 1.4,
+
+    outline_x = 75,
+    outline_y = 75,
+    outline_yoff = 10,
+    outline_sea_x = 200,
+    outline_sea_y = 260,
+    outline_sea_yoff = -70,
   },
 
   energyUse              = 0,

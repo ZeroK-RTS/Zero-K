@@ -14,13 +14,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "MetalFeatures (new)",
+    name      = "MetalFeatures GL3 (old)",
     desc      = "Highlights features with reclaimable metal. Slow due to DrawFeature() overhead",
     author    = "ivand",
     date      = "2019",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true,  --  loaded by default?
+    enabled   = false,  --  loaded by default?
   }
 end
 
@@ -85,15 +85,6 @@ local highlight = false
 local conSelected = false
 local currCmd = spGetActiveCommand() --remember current command
 function widget:Update()
-	if firstUpdate then
-		firstUpdate = false
-		if BAR_COMPAT then
-			Spring.Echo("Using fallback reclaim highlight) due to 105+.")
-			Spring.SendCommands{"luaui enablewidget MetalFeatures (old)"}
-		else
-			Spring.SendCommands{"luaui disablewidget MetalFeatures (old)"}
-		end
-	end
 	if BAR_COMPAT then
 		return
 	end

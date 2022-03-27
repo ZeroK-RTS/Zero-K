@@ -22,6 +22,10 @@ return { tankriot = {
     selection_scale   = 0.92,
     aim_lookahead     = 160,
     set_target_range_buffer = 40,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],

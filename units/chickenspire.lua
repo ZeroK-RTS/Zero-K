@@ -18,6 +18,9 @@ return { chickenspire = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
+    outline_x = 155,
+    outline_y = 200,
+    outline_yoff = 75,
   },
 
   energyMake                    = 0,

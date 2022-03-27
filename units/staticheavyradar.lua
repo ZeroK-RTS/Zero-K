@@ -21,6 +21,10 @@ return { staticheavyradar = {
     removewait     = 1,
     removestop     = 1,
     priority_misc  = 2, -- High
+
+    outline_x = 110,
+    outline_y = 120,
+    outline_yoff = 32.5,
   },
 
   energyUse                     = 3,

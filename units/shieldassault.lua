@@ -21,6 +21,10 @@ return { shieldassault = {
     shield_emit_height = 17,
     cus_noflashlight   = 1,
     selection_scale    = 0.82,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 15.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],

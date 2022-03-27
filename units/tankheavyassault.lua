@@ -16,6 +16,10 @@ return { tankheavyassault = {
   customParams        = {
     bait_level_default = 0,
     decloak_footprint     = 5,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNIT]],

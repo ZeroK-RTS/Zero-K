@@ -20,6 +20,10 @@ return { vehaa = {
     bait_level_default = 0,
     modelradius    = [[9]],
     okp_damage = 280.1,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],

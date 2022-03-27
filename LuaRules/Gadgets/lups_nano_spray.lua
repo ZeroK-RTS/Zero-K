@@ -1,6 +1,6 @@
--- $Id: lups_nano_spray.lua 3171 2008-11-06 09:06:29Z det $
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
+	return
+end
 
 function gadget:GetInfo()
   return {
@@ -34,37 +34,6 @@ local function GetCmdTag(unitID)
 	end
 	return cmdTag
 end
-	
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-  --// bw-compability
-  local alreadyWarned = 0
-  local function WarnDeprecated()
-	if (alreadyWarned<10) then
-		alreadyWarned = alreadyWarned + 1
-		Spring.Log("LUPS", LOG.WARNING, "LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
-	end
-  end
-
-  function gadget:Initialize()
-	GG.LUPS = GG.LUPS or {}
-	GG.LUPS.QueryNanoPiece = WarnDeprecated
-	gadgetHandler:RegisterGlobal("QueryNanoPiece", WarnDeprecated)
-  end
-
-  function gadget:Shutdown()
-	gadgetHandler:DeregisterGlobal("QueryNanoPiece")
-  end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-else
-------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 
 local Lups  --// Lua Particle System
 local initialized = false --// if LUPS isn't started yet, we try it once a gameframe later
@@ -452,8 +421,4 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitFinished(unitID, unitDefID)
 	end
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 end

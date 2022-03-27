@@ -24,6 +24,10 @@ return { shipaa = {
     bait_level_default = 0,
     modelradius    = [[45]],
     turnatfullspeed = [[1]],
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 25,
   },
 
   explodeAs              = [[BIG_UNITEX]],

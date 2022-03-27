@@ -667,7 +667,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
 				spSendCommands{"luaui disablewidget Outline No Shader"}
-				spSendCommands{"luaui togglewidget Outline Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader GL4"}
 			end, "Highlights edges of units")
 
 

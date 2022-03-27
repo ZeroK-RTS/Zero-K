@@ -20,6 +20,10 @@ return { vehriot = {
     selection_scale   = 0.85,
     aim_lookahead     = 100,
     set_target_range_buffer = 50,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],

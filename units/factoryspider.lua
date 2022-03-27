@@ -48,6 +48,10 @@ return { factoryspider = {
     shared_energy_gen = 1,
     cus_noflashlight = 1,
     parent_of_plate   = [[platespider]],
+
+    outline_x = 250,
+    outline_y = 250,
+    outline_yoff = 5,
   },
 
   energyUse                     = 0,

@@ -16,6 +16,9 @@ return { chickens = {
   category            = [[SWIM]],
 
   customParams        = {
+    outline_x = 115,
+    outline_y = 115,
+    outline_yoff = 20,
   },
 
   explodeAs           = [[NOWEAPON]],

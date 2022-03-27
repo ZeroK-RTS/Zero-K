@@ -46,6 +46,10 @@ return { platecloak = {
     unstick_help       = [[1]],
     selectionscalemult = 1,
     child_of_factory   = [[factorycloak]],
+
+    outline_x = 165,
+    outline_y = 165,
+    outline_yoff = 27.5,
   },
 
   energyUse                     = 0,

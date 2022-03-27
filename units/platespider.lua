@@ -45,6 +45,10 @@ return { platespider = {
     selectionscalemult = 1,
     cus_noflashlight   = 1,
     child_of_factory   = [[factoryspider]],
+
+    outline_x = 165,
+    outline_y = 165,
+    outline_yoff = 27.5,
   },
 
   energyUse                     = 0,

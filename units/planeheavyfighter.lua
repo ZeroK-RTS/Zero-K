@@ -33,6 +33,10 @@ return { planeheavyfighter = {
 
     combat_slowdown = 0.35,
     selection_scale = 1.4,
+
+    outline_x = 120,
+    outline_y = 120,
+    outline_yoff = 20,
   },
 
   explodeAs              = [[GUNSHIPEX]],

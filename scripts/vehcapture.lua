@@ -39,6 +39,7 @@ local MIN_DIFF = math.rad(0.01)
 
 local smokePiece = {base, turret}
 
+--[[
 local function ImpactTilt(x,z)
 	Turn(base, z_axis, math.rad(-z), math.rad(105))
 	Turn(base, x_axis, math.rad(x), math.rad(105))
@@ -48,7 +49,6 @@ local function ImpactTilt(x,z)
 	Turn(base, x_axis, 0, math.rad(300))
 end
 
---[[
 function script.HitByWeapon(x, z)
 	StartThread(ImpactTilt, x, z)
 end

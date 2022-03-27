@@ -9,7 +9,6 @@ local build = piece("build")
 
 --local vars
 local nanoPieces = {nano1, nano2, nano3, nano4}
-local nanoIdx = 1
 local smokePiece = {base}
 
 --opening animation
@@ -33,20 +32,6 @@ end
 
 function script.QueryBuildInfo()
 	return build
-end
-
-function script.QueryNanoPiece()
-	nanoIdx = nanoIdx + 1
-	if (nanoIdx > #nanoPieces) then
-		nanoIdx = 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
-	return nano
 end
 
 function script.QueryLandingPads()

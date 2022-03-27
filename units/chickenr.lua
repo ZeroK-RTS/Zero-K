@@ -16,6 +16,9 @@ return { chickenr = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 85,
+    outline_y = 85,
+    outline_yoff = 20,
   },
 
   explodeAs           = [[NOWEAPON]],

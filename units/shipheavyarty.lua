@@ -21,6 +21,10 @@ return { shipheavyarty = {
   customParams           = {
     bait_level_default = 1,
     modelradius    = [[80]],
+
+    outline_x = 340,
+    outline_y = 340,
+    outline_yoff = 30,
   },
 
   explodeAs              = [[BIG_UNITEX]],

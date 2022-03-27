@@ -44,6 +44,10 @@ return { plateplane = {
     aimposoffset       = [[0 15 -20]],
     default_spacing    = 4,
     child_of_factory   = [[factoryplane]],
+
+    outline_x = 165,
+    outline_y = 165,
+    outline_yoff = 27.5,
   },
 
   energyUse                     = 0,

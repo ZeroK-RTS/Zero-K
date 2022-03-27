@@ -21,6 +21,10 @@ return { jumpaa = {
     jump_reload        = 10,
     jump_from_midair   = 0,
     modelradius    = [[15]],
+
+    outline_x = 80,
+    outline_y = 90,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[BIG_UNITEX]],
