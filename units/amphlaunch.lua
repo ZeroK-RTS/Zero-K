@@ -65,11 +65,6 @@ return { amphlaunch = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-    {
-      def                = [[BOGUS_TELEPORTER_GUN]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
   },
 
   weaponDefs             = {
@@ -111,47 +106,6 @@ return { amphlaunch = {
       weaponVelocity          = 350,
       waterweapon             = true,
     },
-
-    BOGUS_TELEPORTER_GUN = {
-      name                    = [[Bogus Unit Launcher]],
-      accuracy                = 0,
-      areaOfEffect            = 224, -- UI
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      avoidGround             = false,
-      burnblow                = true,
-      commandfire             = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customParams            = {
-        lups_noshockwave = [[1]],
-        thower_weapon    = 1,
-        bogus = 1,
-      },
-      
-      damage                  = {
-        default = 0,
-      },
-
-      explosionSpeed          = 50,
-      intensity               = 0.9,
-      interceptedByShieldType = 1,
-      leadLimit               = 0,
-      myGravity               = 0.05,
-      projectiles             = 1,
-      range                   = 620,
-      reloadtime              = 12,
-      rgbColor                = [[0.05 0.45 0.95]],
-      size                    = 0.005,
-      soundStart              = [[Launcher]],
-      soundStartVolume        = 6000,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 350,
-      waterweapon             = true,
-    },
-
   },
 
   featureDefs            = {
