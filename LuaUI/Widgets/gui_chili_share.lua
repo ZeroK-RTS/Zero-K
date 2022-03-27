@@ -1,6 +1,6 @@
 function widget:GetInfo()
 	return {
-		name    = "Chili Share menu v1.24",
+		name    = "Chili Share menu v1.25",
 		desc    = "FPS style (whole screen, hold to show) player list with comsharing UI",
 		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
@@ -37,6 +37,7 @@ local mySubjectID = -1
 local fontSize = 18
 local badgeWidth = 59*0.6
 local badgeHeight = 24*0.6
+local extraPlayerWidthIfShowingWHR = 50
 local color2incolor = nil
 local teamZeroPlayers = {}
 local playerInfo = {}
@@ -54,8 +55,10 @@ local images = {
 	giftenergy = 'LuaUI/Images/energy.png',
 }
 local defaultamount = 100
+local zeroIfNumWrhDisabled = 0
 
 local UpdateListFunction
+local SetWantRebuild_
 local wantRebuild = false
 
 local KICK_USER = "StartKickPoll_"
@@ -69,15 +72,16 @@ local pingCpuColors = {
 	'\255\255\255\255',
 }
 
+-- RGBA. Used as font color of players' WHR.
 local rankColors = {
-	["7"] = {1,0,1,1},
-	["6"] = {0,.6,1,1},
-	["5"] = {.7,.8,1,1},
-	["4"] = {1,1,0,1},
-	["3"] = {1,.65,0,1},
-	["2"] = {.8,.4,.1,1},
-	["1"] = {1,0,0,1},
-	["0"] = {.5,.5,.5,1},
+	["7"] = {1  , 0   , 1  ,  1},
+	["6"] = {0  , 0.6 , 1  ,  1},
+	["5"] = {0.7, 0.8 , 1  ,  1},
+	["4"] = {1  , 1   , 0  ,  1},
+	["3"] = {1  , 0.65, 0  ,  1},
+	["2"] = {0.8, 0.4 , 0.1,  1},
+	["1"] = {1  ,   0 ,   0,  1},
+	["0"] = {0.5, 0.5 , 0.5,  1},
 }
 
 local function PingTimeOut(pingTime)
@@ -110,6 +114,17 @@ options = {
 		desc = "Fixes old hotkey issues once and then disables.",
 		advanced = true,
 		noHotkey = true,
+	},
+	enableNumWHR = {
+		name  = "Show current WHR (Elo) next to player name",
+		type  = "bool",
+		value = false,
+		desc = "Shows the WHR current rating of each player after their name. Uses the rating category of the current game mode (Casual or MM).",
+		noHotkey = true,
+		OnChange = function(self)
+			zeroIfNumWrhDisabled = self.value and 1 or 0
+			SetWantRebuild_()
+		end,
 	},
 	sharemenu = {
 		name = 'Show Player List',
@@ -688,7 +703,7 @@ local function InitName(subject, playerPanel)
 	
 	givemebuttons[subject.id]["text"] = chili.TextBox:New{
 		parent=playerPanel,
-		width=196,
+		width=146 + zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR,
 		height = sizefont+1,
 		objectOverrideFont = WG.GetFont(sizefont + 1),
 		x=69 + 2*buttonsize,
@@ -1191,12 +1206,12 @@ local function InitName(subject, playerPanel)
 		end
 	end
 
-	if rating then
+	if options.enableNumWHR.value and rating then
 		
 		chili.TextBox:New{
 			parent=playerPanel,
-			width=100,
-			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width - 30,
+			width=30,
+			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width - 31,
 			y= givemebuttons[subject.id]["text"].y + 1 ,
 			tooltip = "WHR Current Rating",
 			--text = rating
@@ -1219,7 +1234,7 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
-	windowWidth = 886
+	windowWidth = 786 + 2 * zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR
 	windowHeight = 666
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
@@ -1227,7 +1242,7 @@ local function Buildme()
 	local allypanels = {}
 	local allpanels = {}
 	local playerHeight =  64
-	local playerWidth =  389
+	local playerWidth =  339 + zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
@@ -1382,6 +1397,7 @@ local function SetWantRebuild()
 		wantRebuild = true
 	end
 end
+SetWantRebuild_ = SetWantRebuild
 
 local function UpdateInviteTable()
 	local myPlayerID = Spring.GetMyPlayerID()
@@ -1619,4 +1635,5 @@ function widget:Initialize()
 		WG.crude.SetHotkey("sharedialog","")
 		options.fixHotkeys.value = false
 	end
+	zeroIfNumWrhDisabled = options.enableNumWHR.value and 1 or 0
 end
