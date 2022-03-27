@@ -15,6 +15,7 @@ CallInsList = {
 	"Shutdown",
 	"LayoutButtons",
 	"ConfigureLayout",
+	"GetSelectedUnits",
 	"CommandNotify",
 	"UnitCommandNotify",
 

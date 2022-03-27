@@ -268,6 +268,7 @@ local callInLists = {
 	'Shutdown',
 	'Update',
 	'TextCommand',
+	'GetSelectedUnits',
 	'CommandNotify',
 	'UnitCommandNotify',
 	'AddConsoleLine',
@@ -1386,6 +1387,20 @@ function widgetHandler:ConfigureLayout(command)
 		end
 	end
 	return false
+end
+
+function widgetHandler:GetSelectedUnits(id, params, options)
+	local selected = Spring.GetSelectedUnits()
+
+	for _, w in r_ipairs(self.CommandNotifyList) do
+		if w.GetSelectedUnits then
+		local modified = w:GetSelectedUnits(selected, id, params, options)
+			if modified then
+				selected = modified
+			end
+		end
+	end
+	return selected
 end
 
 function widgetHandler:CommandNotify(id, params, options)
