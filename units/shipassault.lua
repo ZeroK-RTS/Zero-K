@@ -22,6 +22,10 @@ return { shipassault = {
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
     extradrawrange = 800,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 25,
   },
 
   explodeAs              = [[BIG_UNITEX]],

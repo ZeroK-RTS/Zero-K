@@ -17,7 +17,6 @@ local flare = {
 local isMoving = false
 
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
-local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
 local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
 local MOVE_THRESHOLD = 8

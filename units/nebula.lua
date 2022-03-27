@@ -28,6 +28,10 @@ return { nebula = {
     cantuseairpads = 1,
     modelradius    = [[40]],
     shield_emit_height = 20,
+
+    outline_x = 420,
+    outline_y = 420,
+    outline_yoff = 40,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],

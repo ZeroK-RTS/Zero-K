@@ -478,14 +478,6 @@ function script.StopMoving()
 
 end
 
---------------------------
--- NANO
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanoPiece)
-	return nanoPiece
-end
-
 function script.StartBuilding(heading, pitch)
 	if GetUnitValue(COB.INBUILDSTANCE) == 0 then
 		Signal(SIG_STOPBUILD)

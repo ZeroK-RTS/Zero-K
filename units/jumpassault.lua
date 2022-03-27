@@ -19,6 +19,10 @@ return { jumpassault = {
     jump_speed         = 4,
     jump_reload        = 10,
     jump_from_midair   = 1,
+
+    outline_x = 125,
+    outline_y = 125,
+    outline_yoff = 21,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -518,11 +518,6 @@ function script.StartBuilding(heading, pitch)
 	restoreHeading, restorePitch = heading, pitch
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true

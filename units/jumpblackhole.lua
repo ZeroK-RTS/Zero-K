@@ -20,6 +20,10 @@ return { jumpblackhole = {
     bait_level_default = 0,
     can_target_allies  = 1,
     midposoffset   = [[0 10 0]],
+
+    outline_x = 80,
+    outline_y = 90,
+    outline_yoff = 30,
   },
 
   explodeAs             = [[BIG_UNITEX]],

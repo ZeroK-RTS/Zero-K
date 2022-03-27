@@ -1,13 +1,12 @@
-local wiName = "Outline Shader"
 function widget:GetInfo()
 	return {
-		name      = wiName,
+		name      = "Outline Shader GL3",
 		desc      = "Displays small outline around units based on deferred g-buffer",
 		author    = "ivand",
 		date      = "2019",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true  --  loaded by default?
+		enabled   = false  --  loaded by default?
 	}
 end
 

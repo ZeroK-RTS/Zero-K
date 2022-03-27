@@ -70,7 +70,16 @@ end
 
 options_path = 'Settings/Interface/Selection'
 local retreatPath = 'Settings/Interface/Retreat Zones'
-options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'doubleClickFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
+options_order = {
+	'useSelectionFilteringOption',
+	'selectionFilteringOnlyAltOption',
+	'ctrlFlattenRankOption',
+	'doubleClickFlattenRankOption',
+	'retreatOverrideOption',
+	'retreatingRankOption',
+	'retreatDeselects'
+}
+
 options = {
 	useSelectionFilteringOption = {
 		name = "Use selection filtering",
@@ -264,6 +273,11 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
 			rank = retreatingRank
 		end
+
+		if WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsSelectionOverrideSet and WG.GlobalBuildCommand.IsControllingUnit(unitID) and (rank > WG.GlobalBuildCommand.SelectionOverrideRank) then
+			rank = WG.GlobalBuildCommand.SelectionOverrideRank
+		end
+
 		if rank then
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank

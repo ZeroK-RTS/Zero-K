@@ -16,6 +16,9 @@ return { chicken_sporeshooter = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 130,
+    outline_y = 130,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[NOWEAPON]],

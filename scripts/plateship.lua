@@ -25,11 +25,6 @@ function script.Create()
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
 end
 
-function script.QueryNanoPiece ()
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanos)
-	return nanos
-end
-
 function script.Activate ()
 	StartThread (Open)
 end

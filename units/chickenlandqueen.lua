@@ -24,6 +24,10 @@ return { chickenlandqueen = {
 
   customParams           = {
     selection_scale       = 2,
+
+    outline_x = 400,
+    outline_y = 400,
+    outline_yoff = 90,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

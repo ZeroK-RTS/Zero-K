@@ -49,7 +49,8 @@ local SIG_Walk = 1
 local SIG_Aim = 2
 
 local function GetSpeedMod()
-	return (GG.att_MoveChange[unitID] or 1)
+	-- disallow zero (instant turn instead)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 function script.Create()

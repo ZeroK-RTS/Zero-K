@@ -31,6 +31,10 @@ return { staticjammer = {
     priority_misc  = 1,
     addfight       = 1,
     addpatrol      = 1,
+
+    outline_x = 90,
+    outline_y = 130,
+    outline_yoff = 20,
   },
 
   energyUse                     = 1.5,

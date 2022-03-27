@@ -26,6 +26,10 @@ return { hoverriot = {
     --boost_reload_speed_mult = 0.8,
     --boost_duration = 20, -- frames
     turnatfullspeed_hover = [[1]],
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13,
   },
 
   explodeAs           = [[BIG_UNITEX]],

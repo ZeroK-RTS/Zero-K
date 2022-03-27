@@ -24,10 +24,8 @@ local SIG_OPEN = 4
 local RESTORE_DELAY = 1000
 
 local WHEEL_SPIN_SPEED_L = math.rad(360)
-local WHEEL_SPIN_ACCEL_L = math.rad(10)
 local WHEEL_SPIN_DECEL_L = math.rad(30)
 local WHEEL_SPIN_SPEED_S = math.rad(900)
-local WHEEL_SPIN_ACCEL_S = math.rad(25)
 local WHEEL_SPIN_DECEL_S = math.rad(75)
 
 local BAY_SPEED = 20

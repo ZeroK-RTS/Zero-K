@@ -21,6 +21,10 @@ return { vehassault = {
     aimposoffset   = [[0 8 0]],
     midposoffset   = [[0 3 0]],
     modelradius    = [[21]],
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],

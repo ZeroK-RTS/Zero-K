@@ -27,7 +27,8 @@ local runspeed = 25 * (UnitDefs[unitDefID].speed / 69)
 local aimBlocked = false
 
 local function GetSpeedMod()
-	return (GG.att_MoveChange[unitID] or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function SetSelfSpeedMod(speedmod)
@@ -112,6 +113,7 @@ local function RestoreAfterDelay()
 	Turn (gun, x_axis, math.rad(20), math.rad(40))
 end
 
+--[[
 local function ReloadPenaltyAndAnimation()
 	aimBlocked = true
 	SetSelfSpeedMod(RELOAD_PENALTY)
@@ -136,6 +138,7 @@ local function ReloadPenaltyAndAnimation()
 		Sleep(340)
 	end
 end
+]]
 
 function OnLoadGame()
 	SetSelfSpeedMod(1)

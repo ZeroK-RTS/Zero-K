@@ -136,11 +136,6 @@ function script.StopBuilding()
 	Move(pelvis, y_axis, 0, 6 * PACE)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),emit)
-	return emit
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then

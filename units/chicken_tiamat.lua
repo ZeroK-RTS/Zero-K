@@ -20,6 +20,10 @@ return { chicken_tiamat = {
     fireproof          = 1,
     shield_emit_height = 32,
     shield_emit_offset = -4,
+
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],

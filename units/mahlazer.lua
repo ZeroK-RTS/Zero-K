@@ -27,6 +27,10 @@ return { mahlazer = {
     keeptooltip    = [[any string I want]],
     neededlink     = 600,
     pylonrange     = 200,
+
+    outline_x = 235,
+    outline_y = 235,
+    outline_yoff = 42.5,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

@@ -26,6 +26,10 @@ return { energywind = {
     default_spacing = 2,
 
     tidal_health = 400,
+
+    outline_x = 140,
+    outline_y = 115,
+    outline_yoff = 30,
   },
 
   energyMake                    = 1.2, --[[ as tidal; NOT added to wind (which is fully gadgeted

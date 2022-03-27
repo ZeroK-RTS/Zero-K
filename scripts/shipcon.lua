@@ -72,11 +72,6 @@ function script.StopBuilding()
 	Turn (turret, y_axis, 0, math.rad(45))
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID, unitDefID, Spring.GetUnitTeam(unitID), beam)
-	return beam
-end
-
 local explodables = {turret, arm1, arm2, armpiece, claw1, claw2}
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

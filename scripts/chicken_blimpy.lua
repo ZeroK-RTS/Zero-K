@@ -11,7 +11,6 @@ local lsack = piece 'lsack'
 local dodobomb = piece 'dodobomb'
 
 -- Signal definitions
---local SIG_AIM = 2
 local SIG_MOVE = 4
 local SIG_RESTORE = 8
 

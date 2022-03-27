@@ -22,6 +22,10 @@ return { energysolar = {
     removewait      = 1,
     removestop      = 1,
     default_spacing = 0,
+
+    outline_x = 150,
+    outline_y = 110,
+    outline_yoff = 20,
   },
 
   damageModifier                = 0.333,

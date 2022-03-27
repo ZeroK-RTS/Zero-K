@@ -79,7 +79,7 @@ return { shieldraid = {
       },
       
       damage                  = {
-        default = 8.6,
+        default = 8.48,
       },
 
       duration                = 0.02,

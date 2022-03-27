@@ -65,7 +65,8 @@ local maintainHeading = false
 local torsoHeading = 0
 
 local function GetSpeedMod()
-	return (GG.att_MoveChange[unitID] or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function Walk()

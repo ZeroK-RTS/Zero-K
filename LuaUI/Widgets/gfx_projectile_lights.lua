@@ -18,6 +18,8 @@ end
 --------------------------------------------------------------------------------
 
 local spGetVisibleProjectiles     = SpringRestricted.GetVisibleProjectiles
+SpringRestricted = nil
+
 local spGetProjectilePosition     = Spring.GetProjectilePosition
 local spGetProjectileType         = Spring.GetProjectileType
 local spGetProjectileDefID        = Spring.GetProjectileDefID

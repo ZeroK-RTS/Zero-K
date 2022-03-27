@@ -94,7 +94,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedMult = GG.att_MoveChange[unitID] or 1
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 		--left leg up, right leg back
 		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
 		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
@@ -103,8 +103,6 @@ local function Walk()
 		if not(isLasering or isDgunning) then
 			--left arm back, right arm front
 			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
---			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		end
 		WaitForTurn(rupleg, x_axis)
 		Sleep(0)
@@ -117,8 +115,6 @@ local function Walk()
 		if not(isLasering or isDgunning) then
 			--left arm front, right arm back
 			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
---			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 		WaitForTurn(lupleg, x_axis)
 		Sleep(0)
@@ -269,11 +265,6 @@ function script.StartBuilding(heading, pitch)
 	Turn(larm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
-	return lnanoflare
 end
 
 function script.Killed(recentDamage, maxHealth)

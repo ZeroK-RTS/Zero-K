@@ -16,7 +16,6 @@ local smokePiece = {body, turret}
 
 local wheels = {fwheel, rwheel1, rwheel2, rwheel3, rwheel4, lwheel1, lwheel2, lwheel3, lwheel4}
 
-local SIG_MOVE = 1
 local SIG_BUILD = 2
 
 local WHEEL_TURN_SPEED = math.rad(480)
@@ -119,11 +118,6 @@ function script.StartBuilding(heading, pitch)
 		end
 		Sleep (250)
 	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), firepoint)
-	return firepoint
 end
 
 local explodables = {nano, rear, cradle, panel_t, panel_b, panel_l, panel_r, turret, fwheel, rwheel1}

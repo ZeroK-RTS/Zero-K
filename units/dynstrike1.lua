@@ -38,6 +38,10 @@ return { dynstrike1 = {
     dynamic_comm   = 1,
     shared_energy_gen = 1,
     set_target_range_buffer = 50,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 31.25,
   },
 
   energyStorage          = 500,

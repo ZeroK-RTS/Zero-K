@@ -17,6 +17,10 @@ return { chickenwurm = {
 
   customParams        = {
     fireproof         = 1,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 8,
   },
 
   explodeAs           = [[CHICKENWURM_DEATH]],

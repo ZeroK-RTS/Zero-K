@@ -18,6 +18,10 @@ return { chicken_shield = {
   customParams        = {
     shield_emit_height = 26,
     shield_emit_offset = 0,
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],

@@ -34,6 +34,10 @@ return { planecon = {
     airstrafecontrol = [[0]],
     modelradius    = [[10]],
     midposoffset   = [[0 4 0]],
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 7.5,
   },
 
   energyUse           = 0,

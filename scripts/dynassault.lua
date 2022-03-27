@@ -112,7 +112,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
@@ -313,11 +313,6 @@ function script.StartBuilding(heading, pitch)
 	Turn(larm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
-	return lnanoflare
 end
 
 function script.Killed(recentDamage, maxHealth)

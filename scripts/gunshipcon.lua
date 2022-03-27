@@ -186,11 +186,6 @@ function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),Nano)
-	return Nano
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then

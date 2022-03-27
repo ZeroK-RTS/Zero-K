@@ -36,6 +36,10 @@ return { gunshipcon = {
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 35 0]],
     custom_height  = [[55]],
+
+    outline_x = 105,
+    outline_y = 105,
+    outline_yoff = 25,
   },
 
   energyUse           = 0,

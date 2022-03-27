@@ -49,6 +49,10 @@ return { factoryjump = {
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[platejump]],
+
+    outline_x = 250,
+    outline_y = 250,
+    outline_yoff = 5,
   },
 
   energyUse                     = 0,

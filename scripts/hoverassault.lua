@@ -46,7 +46,6 @@ local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
 
 local RESTORE_DELAY = 1100
-local ROCK_DAMGE_MULT = 0.003
 local ROCK_FIRE_FORCE = 0.03
 
 local ROCK_SPEED = 12		--Number of half-cycles per second around x-axis.
@@ -109,6 +108,7 @@ local function WobbleUnit()
 end
 
 --[[
+local ROCK_DAMGE_MULT = 0.003
 function script.HitByWeapon(x, z, weaponID, damage)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], false, x*ROCK_DAMGE_MULT*damage)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], false, -z*ROCK_DAMGE_MULT*damage)

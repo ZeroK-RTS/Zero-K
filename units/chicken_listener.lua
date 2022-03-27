@@ -16,6 +16,9 @@ return { chicken_listener = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+    outline_x = 85,
+    outline_y = 85,
+    outline_yoff = 9,
   },
 
   explodeAs           = [[SMALL_UNITEX]],

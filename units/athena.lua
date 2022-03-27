@@ -59,6 +59,10 @@ return { athena = {
     notreallyafactory = 1,
     select_show_eco = 1,
     sonar_can_be_disabled = 1,
+
+    outline_x = 90,
+    outline_y = 90,
+    outline_yoff = 12,
   },
 
   energyUse           = 0,

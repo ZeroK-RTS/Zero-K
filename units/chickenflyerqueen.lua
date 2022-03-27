@@ -23,6 +23,10 @@ return { chickenflyerqueen = {
 
   customParams        = {
     statsname = "chickenlandqueen",
+
+    outline_x = 400,
+    outline_y = 400,
+    outline_yoff = 90,
   },
 
   explodeAs           = [[NOWEAPON]],

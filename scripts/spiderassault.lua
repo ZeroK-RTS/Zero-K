@@ -22,16 +22,12 @@ local laftleg1 = piece 'laftleg1'
 local raftleg = piece 'raftleg'
 local raftleg1 = piece 'raftleg1'
 
-local PACE = 1.4
-
 local SIG_Walk = 1
 local SIG_Aim = 2
 
 --constants
-local PI = math.pi
 local sa = math.rad(-10)
 local ma = math.rad(40)
-local la = math.rad(100)
 local pause = 440
 
 local forward = 2.2
