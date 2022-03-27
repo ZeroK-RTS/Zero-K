@@ -28,10 +28,6 @@ function script.QueryLandingPads()
 	return {land1, land2, land3, land4}
 end
 
-function script.QueryNanoPiece()
-	return radar
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then

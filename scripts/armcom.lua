@@ -270,11 +270,6 @@ function script.StartBuilding(heading, pitch)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then

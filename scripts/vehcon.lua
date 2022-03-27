@@ -120,11 +120,6 @@ function script.StartBuilding(heading, pitch)
 	end
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), firepoint)
-	return firepoint
-end
-
 local explodables = {nano, rear, cradle, panel_t, panel_b, panel_l, panel_r, turret, fwheel, rwheel1}
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

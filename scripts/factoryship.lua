@@ -10,7 +10,6 @@ local pad = piece 'pad'
 local pontoon = piece 'pontoon'
 
 local emitPieces = {piece('emit04', 'emit08', 'emit012')}
-local nanoNum = 1
 
 local smokePiece = {base}
 
@@ -74,15 +73,6 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, emitPieces)
-end
-
-function script.QueryNanoPiece()
-	nanoNum = nanoNum + 1
-	if nanoNum > 3 then nanoNum = 1 end
-
-	local piece = emitPieces[nanoNum]
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),piece)
-	return piece
 end
 
 function script.QueryBuildInfo()

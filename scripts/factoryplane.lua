@@ -30,7 +30,6 @@ local land = piece "land"
 
 --local vars
 local nanoPieces = {emit1,emit2}
-local nanoIdx = 1
 local smokePiece = { piece "bay", piece "pad1", piece "fuelpad" }
 
 --opening animation
@@ -143,21 +142,6 @@ end
 
 function script.QueryBuildInfo()
 	return build
-end
-
-function script.QueryNanoPiece()
-	if (nanoIdx == 2) then
-		nanoIdx = 1
-	else
-		nanoIdx = nanoIdx + 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
-	return nano
 end
 
 function script.QueryLandingPads()

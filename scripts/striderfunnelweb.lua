@@ -108,11 +108,6 @@ function script.StopMoving ()
 	StartThread (RestoreLegs)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
-	return gaster
-end
-
 function script.QueryWeapon(num)
 	return aimpoint
 end

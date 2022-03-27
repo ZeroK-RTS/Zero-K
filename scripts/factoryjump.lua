@@ -10,7 +10,6 @@ local head1, head2, nano1, nano2, nano3, nano4 = piece('head1', 'head2', 'nano1'
 
 --local vars
 local nanoPieces = {nano1, nano2, nano3, nano4}
-local nanoIdx = 1
 local smokePiece = {base, head1, head2}
 
 local SIG_Open = 1
@@ -57,21 +56,6 @@ function script.Create()
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-end
-
-function script.QueryNanoPiece()
-	if (nanoIdx == 4) then
-		nanoIdx = 1
-	else
-		nanoIdx = nanoIdx + 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
-	return nano
 end
 
 function script.Activate ()

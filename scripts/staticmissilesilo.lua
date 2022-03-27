@@ -63,10 +63,6 @@ function script.Deactivate()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 end
 
-function script.QueryNanoPiece()
-	return trolleyb
-end
-
 function script.QueryBuildInfo()
 	return pads[padnum]
 end
