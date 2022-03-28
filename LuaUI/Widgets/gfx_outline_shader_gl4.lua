@@ -499,6 +499,7 @@ in DataGS {
 uniform sampler2D DrawPrimitiveAtUnitTexture;
 uniform sampler2D mapDepths;
 uniform sampler2D modelDepths;
+uniform sampler2D modelMisc;
 
 uniform float stencilPass = 0.0; // 1 if we are stenciling
 out vec4 fragColor;
@@ -566,12 +567,14 @@ void main(void)
 					vec2 pixeloffset = vec2(float(x), float(y));
 					vec2 screendelta = pixeloffset * viewGeometryInv;
 					
-					
+					float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 					float mapd = texture(mapDepths, screenUV+ screendelta).x;
 					float modd = texture(modelDepths, screenUV + screendelta).x;
 					float dd = max(mapd - modd, 0.0);
-					if (dd > 0 ) {
-						nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
+					if (misctexvalue > 0.5 && dd >0  ){
+						if (dd > 0 ) {
+							nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
+						}
 					}
 				}
 			}
@@ -587,8 +590,9 @@ void main(void)
 			}
 		#endif
 	}else{
-		fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
+		//fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
 	}
+	//fragColor.rgba = vec4(texture(modelMisc, screenUV).rgb, 1.0);
 	
 }
 ]]
@@ -612,6 +616,7 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 				DrawPrimitiveAtUnitTexture = 0;
 				mapDepths = 1,
 				modelDepths = 2,
+				modelMisc = 3, 
 			},
 			uniformFloat = {
 				addRadius = 1,
@@ -709,6 +714,7 @@ function widget:DrawWorld()
 		--gl.Texture(0, texture)
 		gl.Texture(1, "$map_gbuffer_zvaltex")-- Texture file
 		gl.Texture(2, "$model_gbuffer_zvaltex")-- Texture file
+		gl.Texture(3, "$model_gbuffer_misctex")-- Texture file
 		resurrectionHalosShader:Activate()
 			resurrectionHalosShader:SetUniform("iconDistance", 99999) -- pass
 			resurrectionHalosShader:SetUniform("addRadius", 0)
@@ -749,6 +755,7 @@ function widget:DrawWorld()
 		gl.Texture(0, false)
 		gl.Texture(1, false)-- Texture file
 		gl.Texture(2, false)-- Texture file
+		gl.Texture(3, false)-- Texture file
 		
 		gl.StencilTest(false)
 	end
