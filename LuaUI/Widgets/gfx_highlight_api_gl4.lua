@@ -40,7 +40,7 @@ layout (location = 6) in vec4 worldposrot;
 layout (location = 7) in vec4 parameters; // x =isstatic, y = edgealpha, z = edgeexponent, w = animamount
 layout (location = 8) in vec4 hcolor; // rgb color, plainalpha
 layout (location = 9) in uvec4 instData;
-uniform float iconDistance;
+
 //__ENGINEUNIFORMBUFFERDEFS__
 //__DEFINES__
 #line 15000
@@ -87,9 +87,6 @@ void main() {
 	v_toeye = cameraViewInv[3].xyz - worldModelPos.xyz ;
 	v_hcolor = hcolor;
 	vec3 modelBaseToCamera = cameraViewInv[3].xyz - (pieceMatrix[3].xyz + worldposrot.xyz);
-	if ( dot (modelBaseToCamera, modelBaseToCamera) >  (iconDistance * iconDistance)) {
-		v_hcolor.a = 0.0;
-	}
 	v_parameters = parameters;
 	if ((uni[instData.y].composite & 0x00000001u) == 0u ) { // alpha 0 drawing of icons stuff
 		v_hcolor.a = 0.0;
@@ -220,7 +217,6 @@ function widget:Initialize()
 			--tex1 = 0,
 		},
 		uniformFloat = {
-			iconDistance = 1,
 		  },
 	}, "highlightUnitShader API")
 
@@ -257,7 +253,6 @@ function widget:DrawWorld()
 		gl.Blending(GL.SRC_ALPHA, GL.ONE)
 		gl.PolygonOffset( -0.1 ,-0.1) -- too much here bleeds
 		highlightunitShader:Activate()
-		highlightunitShader:SetUniform("iconDistance",27 * Spring.GetConfigInt("UnitIconDist", 200))
 		highlightUnitVBOTable.VAO:Submit()
 		highlightunitShader:Deactivate()
 		gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
