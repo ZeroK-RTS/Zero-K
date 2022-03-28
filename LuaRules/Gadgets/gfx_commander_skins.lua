@@ -423,7 +423,7 @@ end
 
 function gadget:Initialize()
 	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
-	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl")
+	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
 
 	vsSrc = string.gsub(vsSrc, "#version 430 core", "")
 	fsSrc = string.gsub(fsSrc, "#version 430 core", "")

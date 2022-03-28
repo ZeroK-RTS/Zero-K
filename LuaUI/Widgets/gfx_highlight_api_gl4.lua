@@ -30,13 +30,14 @@ local vsSrc =
 #extension GL_ARB_shader_storage_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 #line 10000
-layout (location = 0) in vec3 pos;
+layout (location = 0) in vec3 pos; // 0-4 is per vertex
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 T;
 layout (location = 3) in vec3 B;
 layout (location = 4) in vec4 uv;
 layout (location = 5) in uint pieceIndex;
-layout (location = 6) in vec4 worldposrot;
+
+layout (location = 6) in vec4 worldposrot; // this per instance parameters
 layout (location = 7) in vec4 parameters; // x =isstatic, y = edgealpha, z = edgeexponent, w = animamount
 layout (location = 8) in vec4 hcolor; // rgb color, plainalpha
 layout (location = 9) in uvec4 instData;
@@ -84,9 +85,11 @@ void main() {
 	uint teamIndex = (instData.z & 0x000000FFu); //leftmost ubyte is teamIndex
 	uint drawFlags = (instData.z & 0x0000FF00u) >> 8 ; // hopefully this works
 	vec4 viewpos = cameraView * worldModelPos;
-	v_toeye = cameraViewInv[3].xyz - worldModelPos.xyz ;
+	vec3 camPos = cameraViewInv[3].xyz ;
+	v_toeye = camPos - worldModelPos.xyz ;
 	v_hcolor = hcolor;
 	vec3 modelBaseToCamera = cameraViewInv[3].xyz - (pieceMatrix[3].xyz + worldposrot.xyz);
+
 	v_parameters = parameters;
 	if ((uni[instData.y].composite & 0x00000001u) == 0u ) { // alpha 0 drawing of icons stuff
 		v_hcolor.a = 0.0;
@@ -251,7 +254,7 @@ function widget:DrawWorld()
 		gl.DepthMask(true)
 		gl.DepthTest(true)
 		gl.Blending(GL.SRC_ALPHA, GL.ONE)
-		gl.PolygonOffset( -0.1 ,-0.1) -- too much here bleeds
+		gl.PolygonOffset( 0.0 , -1.0) -- too much here bleeds
 		highlightunitShader:Activate()
 		highlightUnitVBOTable.VAO:Submit()
 		highlightunitShader:Deactivate()
