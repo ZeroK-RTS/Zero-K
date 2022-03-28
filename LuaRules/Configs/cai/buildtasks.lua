@@ -175,15 +175,15 @@ factionBuildConfig = {
 				
 				[2] = { -- scout
 					importanceMult = 1.1,
-					count = 2,
-					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 0.8},
-					[2] = {ID = UnitDefNames['spideremp'].id, chance = 0.2},
+					count = 1,
+					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
-					count = 1,
-					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 1},
+					count = 2,
+					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 0.8},
+					[2] = {ID = UnitDefNames['spideremp'].id, chance = 0.2},
 				},
 				
 				[4] = { -- arty
