@@ -526,6 +526,7 @@ void main(void)
 	
 	float fulldepth = min(mapdepth, modeldepth); 
 	
+	float my_misctexvalue = texture(modelMisc, screenUV).r;
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
 	//if (deltadepth > 0.0) discard; // we hit a model, bail!
@@ -535,15 +536,16 @@ void main(void)
 		float nearest = (outlineWidth*20 + 1) * (outlineWidth*20 + 1) ;
 		vec2 viewGeometryInv = 1.0 / viewGeometry.xy;
 		
-		if (deltadepth > 0.0) {
+		if (deltadepth > 0.0 && my_misctexvalue > 0.5) {
 			for (int x = -1; x <= 1; x++){
 				vec2 pixeloffset = vec2(float(x), float(0));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd == 0 ) {
+				if (misctexvalue > 0.5 && dd == 0) {
 					nearest = min(nearest, abs(x)); 
 				}
 			}
@@ -551,10 +553,11 @@ void main(void)
 				vec2 pixeloffset = vec2(float(0), float(y));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd == 0 ) {
+				if (misctexvalue > 0.5 && dd == 0) {
 					nearest = min(nearest, abs(y)); 
 				}
 			}
@@ -571,10 +574,8 @@ void main(void)
 					float mapd = texture(mapDepths, screenUV+ screendelta).x;
 					float modd = texture(modelDepths, screenUV + screendelta).x;
 					float dd = max(mapd - modd, 0.0);
-					if (misctexvalue > 0.5 && dd >0  ){
-						if (dd > 0 ) {
-							nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
-						}
+					if (misctexvalue > 0.5 && dd > 0){
+						nearest = min(nearest, dot(pixeloffset, pixeloffset));
 					}
 				}
 			}
