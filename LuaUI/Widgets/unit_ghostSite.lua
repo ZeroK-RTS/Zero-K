@@ -47,6 +47,20 @@ function InitShader()
 end
 
 local function DrawGhostFeatures()
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	if cameraHeight < 1 then
+		cameraHeight = 1
+	end
+	if cameraHeight > Spring.GetConfigInt("FeatureDrawDistance") then
+		return
+	end
 	gl.Color(1.0, 1.0, 1.0, 0.35)
   
 	--gl.Texture(0,"$units1") --.3do texture atlas for .3do model
