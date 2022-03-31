@@ -82,10 +82,6 @@ function ConfigureLayout(command)
 	return widgetHandler:ConfigureLayout(command)
 end
 
-function GetSelectedUnits(cmdID, cmdParams, cmdOpts)
-	return widgetHandler:GetSelectedUnits(cmdID, cmdParams, cmdOpts)
-end
-
 function CommandNotify(id, params, options)
 	return widgetHandler:CommandNotify(id, params, options)
 end
