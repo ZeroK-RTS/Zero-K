@@ -113,6 +113,13 @@ local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
+
+--[[ Uses the regular 50% payback. This is because at 100% people would leave
+     empty nanoframes for their allies to finish (actual experience from past).
+     In general, the "correct" value is such that the people who are aware of
+     the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
+     Ideally the refund would just be for whomever actually put in resources,
+     but that would involve the build step callin which is quite expensive. ]]
 local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
 
 local paybackDefs = { -- cost is how much to pay back
