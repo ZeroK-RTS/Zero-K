@@ -1,7 +1,7 @@
 return {
-	radius = 20,
-	midpoint = {0,30,0},
+	radius = 22,
 	height = 110,
+	midpos = {0,28,0},
 	tex1 = "hlt1.dds",
 	tex2 = "hlt2.dds",
 	invertteamcolor = false

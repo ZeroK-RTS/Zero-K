@@ -3,78 +3,13 @@
   <asset>
     <contributor>
       <author>Blender User</author>
-      <authoring_tool>Blender 2.90.1 commit date:2020-09-23, commit time:06:43, hash:3e85bb34d0d7</authoring_tool>
+      <authoring_tool>Blender 3.1.2 commit date:2022-03-31, commit time:17:40, hash:cc66d1020c3b</authoring_tool>
     </contributor>
-    <created>2020-10-24T12:17:53</created>
-    <modified>2020-10-24T12:17:53</modified>
+    <created>2022-04-06T13:24:29</created>
+    <modified>2022-04-06T13:24:29</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
-  <library_cameras>
-    <camera id="Camera-camera" name="Camera">
-      <optics>
-        <technique_common>
-          <perspective>
-            <xfov sid="xfov">39.59775</xfov>
-            <aspect_ratio>1.777778</aspect_ratio>
-            <znear sid="znear">0.1</znear>
-            <zfar sid="zfar">100</zfar>
-          </perspective>
-        </technique_common>
-      </optics>
-      <extra>
-        <technique profile="blender">
-          <shiftx sid="shiftx" type="float">0</shiftx>
-          <shifty sid="shifty" type="float">0</shifty>
-          <dof_distance sid="dof_distance" type="float">0</dof_distance>
-        </technique>
-      </extra>
-    </camera>
-  </library_cameras>
-  <library_lights>
-    <light id="Light-light" name="Light">
-      <technique_common>
-        <point>
-          <color sid="color">1000 1000 1000</color>
-          <constant_attenuation>1</constant_attenuation>
-          <linear_attenuation>0</linear_attenuation>
-          <quadratic_attenuation>0.00111109</quadratic_attenuation>
-        </point>
-      </technique_common>
-      <extra>
-        <technique profile="blender">
-          <type sid="type" type="int">0</type>
-          <flag sid="flag" type="int">0</flag>
-          <mode sid="mode" type="int">1</mode>
-          <gamma sid="blender_gamma" type="float">1</gamma>
-          <red sid="red" type="float">1</red>
-          <green sid="green" type="float">1</green>
-          <blue sid="blue" type="float">1</blue>
-          <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
-          <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
-          <shadow_b sid="blender_shadow_b" type="float">0</shadow_b>
-          <energy sid="blender_energy" type="float">1000</energy>
-          <dist sid="blender_dist" type="float">29.99998</dist>
-          <spotsize sid="spotsize" type="float">75</spotsize>
-          <spotblend sid="spotblend" type="float">0.15</spotblend>
-          <att1 sid="att1" type="float">0</att1>
-          <att2 sid="att2" type="float">1</att2>
-          <falloff_type sid="falloff_type" type="int">2</falloff_type>
-          <clipsta sid="clipsta" type="float">1.000799</clipsta>
-          <clipend sid="clipend" type="float">30.002</clipend>
-          <bias sid="bias" type="float">1</bias>
-          <soft sid="soft" type="float">3</soft>
-          <bufsize sid="bufsize" type="int">2880</bufsize>
-          <samp sid="samp" type="int">3</samp>
-          <buffers sid="buffers" type="int">1</buffers>
-          <area_shape sid="area_shape" type="int">1</area_shape>
-          <area_size sid="area_size" type="float">0.1</area_size>
-          <area_sizey sid="area_sizey" type="float">0.1</area_sizey>
-          <area_sizez sid="area_sizez" type="float">1</area_sizez>
-        </technique>
-      </extra>
-    </light>
-  </library_lights>
   <library_effects>
     <effect id="hlt_s3o_mat-effect">
       <profile_COMMON>
@@ -198,9 +133,9 @@
           </technique_common>
         </source>
         <source id="holder-mesh-normals">
-          <float_array id="holder-mesh-normals-array" count="84">-0.3328183 -0.6815375 -0.6517197 -0.4388072 -0.8985812 0 0.3328183 -0.6815375 -0.6517197 0.4388072 -0.8985812 0 0.3190144 -0.6532273 -0.6866761 -0.3328183 -0.6815375 0.6517197 0.3328183 -0.6815375 0.6517197 -0.3190144 -0.6532273 0.6866761 -0.01745659 -0.03573721 0.9992088 0.01745659 -0.03573721 0.9992088 0.3190144 -0.6532273 0.6866761 0.01745659 0.03573721 0.9992088 0.3190144 0.6532273 0.6866761 -0.3190144 0.6532273 0.6866761 -0.01745659 0.03573721 0.9992088 0.3328183 0.6815375 0.6517197 0.4388072 0.8985812 0 -0.4388072 0.8985812 0 -0.3328183 0.6815375 0.6517197 0.3328183 0.6815375 -0.6517197 0.3190144 0.6532273 -0.6866761 -0.3328183 0.6815375 -0.6517197 0.01745659 0.03573721 -0.9992088 -0.01745659 -0.03573721 -0.9992088 -0.3190144 0.6532273 -0.6866761 -0.01745659 0.03573721 -0.9992088 -0.3190144 -0.6532273 -0.6866761 0.01745659 -0.03573721 -0.9992088</float_array>
+          <float_array id="holder-mesh-normals-array" count="96">-0.3328324 -0.6815347 -0.6517155 -0.4388247 -0.8985727 -5.76501e-7 -0.4388246 -0.8985728 -5.61674e-7 0.3328324 -0.6815347 -0.6517155 0.4388247 -0.8985727 -5.08103e-7 0.3190119 -0.6532353 -0.6866695 -0.3328322 -0.6815342 0.6517162 0.3328322 -0.6815342 0.6517162 0.4388246 -0.8985728 -5.82477e-7 -0.3190122 -0.6532354 0.6866693 -0.01746779 -0.03576695 0.9992076 0.01746779 -0.03576695 0.9992076 0.3190122 -0.6532355 0.6866693 0.0174663 0.0357657 0.9992076 0.3190101 0.6532334 0.6866722 -0.3190101 0.6532334 0.6866722 -0.0174663 0.0357657 0.9992076 0.332832 0.681534 0.6517164 0.4388241 0.898573 -6.83985e-7 -0.4388241 0.898573 -6.64443e-7 -0.332832 0.681534 0.6517164 0.3328318 0.6815338 -0.6517168 0.3190109 0.6532339 -0.6866714 -0.3328318 0.6815338 -0.6517168 -0.4388248 0.8985726 -5.82477e-7 0.01746648 0.0357657 -0.9992076 -0.01746743 -0.03576719 -0.9992076 -0.3190109 0.6532338 -0.6866714 -0.01746648 0.03576576 -0.9992076 -0.3190119 -0.6532353 -0.6866695 0.01746743 -0.03576719 -0.9992075 0.4388248 0.8985726 -5.40871e-7</float_array>
           <technique_common>
-            <accessor source="#holder-mesh-normals-array" count="28" stride="3">
+            <accessor source="#holder-mesh-normals-array" count="32" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -223,7 +158,7 @@
           <input semantic="VERTEX" source="#holder-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#holder-mesh-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#holder-mesh-map-0" offset="2" set="0"/>
-          <p>0 0 0 2 1 1 3 1 2 4 2 3 6 3 4 7 4 5 2 1 6 9 5 7 3 1 8 10 6 9 6 3 10 5 3 11 8 7 12 13 8 13 9 5 14 14 9 15 11 10 16 10 6 17 12 11 18 17 12 19 13 8 20 18 13 21 15 14 22 14 9 23 16 15 24 21 16 25 17 12 26 22 17 27 19 18 28 18 13 29 21 16 30 24 19 31 25 20 32 22 17 33 27 21 34 23 17 35 25 20 36 28 22 37 29 23 38 26 24 39 31 25 40 27 21 41 1 26 42 29 23 43 28 22 44 7 4 45 30 27 46 4 2 47 0 0 48 1 26 49 2 1 50 4 2 51 5 3 52 6 3 53 2 1 54 8 7 55 9 5 56 10 6 57 11 10 58 6 3 59 8 7 60 12 11 61 13 8 62 14 9 63 15 14 64 11 10 65 12 11 66 16 15 67 17 12 68 18 13 69 19 18 70 15 14 71 16 15 72 20 16 73 21 16 74 22 17 75 23 17 76 19 18 77 21 16 78 20 16 79 24 19 80 22 17 81 26 24 82 27 21 83 25 20 84 24 19 85 28 22 86 26 24 87 30 27 88 31 25 89 1 26 90 0 0 91 29 23 92 7 4 93 31 25 94 30 27 95</p>
+          <p>0 0 0 2 1 1 3 2 2 4 3 3 6 4 4 7 5 5 2 1 6 9 6 7 3 2 8 10 7 9 6 4 10 5 8 11 8 9 12 13 10 13 9 6 14 14 11 15 11 12 16 10 7 17 12 13 18 17 14 19 13 10 20 18 15 21 15 16 22 14 11 23 16 17 24 21 18 25 17 14 26 22 19 27 19 20 28 18 15 29 21 18 30 24 21 31 25 22 32 22 19 33 27 23 34 23 24 35 25 22 36 28 25 37 29 26 38 26 27 39 31 28 40 27 23 41 1 29 42 29 26 43 28 25 44 7 5 45 30 30 46 4 3 47 0 0 48 1 29 49 2 1 50 4 3 51 5 8 52 6 4 53 2 1 54 8 9 55 9 6 56 10 7 57 11 12 58 6 4 59 8 9 60 12 13 61 13 10 62 14 11 63 15 16 64 11 12 65 12 13 66 16 17 67 17 14 68 18 15 69 19 20 70 15 16 71 16 17 72 20 31 73 21 18 74 22 19 75 23 24 76 19 20 77 21 18 78 20 31 79 24 21 80 22 19 81 26 27 82 27 23 83 25 22 84 24 21 85 28 25 86 26 27 87 30 30 88 31 28 89 1 29 90 0 0 91 29 26 92 7 5 93 31 28 94 30 30 95</p>
         </triangles>
       </mesh>
     </geometry>
@@ -398,9 +333,6 @@
   </library_geometries>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
-      <node id="Radial_Empty_002" name="Radial Empty.002" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-      </node>
       <node id="basebottom" name="basebottom" type="NODE">
         <matrix sid="transform">1 0 0 0 0 7.54979e-8 -1 0 0 1 7.54979e-8 0 0 0 0 1</matrix>
         <instance_geometry url="#basebottom-mesh" name="basebottom">
@@ -467,9 +399,6 @@
                       </technique_common>
                     </bind_material>
                   </instance_geometry>
-                  <node id="Radial_Empty_001" name="Radial Empty.001" type="NODE">
-                    <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-                  </node>
                 </node>
                 <node id="spindle" name="spindle" type="NODE">
                   <matrix sid="transform">1 0 0 -1.04179e-6 0 1 0 0.1043547 0 0 1 1.836142 0 0 0 1</matrix>
@@ -503,19 +432,11 @@
           </node>
         </node>
       </node>
-      <node id="Camera" name="Camera" type="NODE">
-        <matrix sid="transform">0.6844012 -0.288599 0.6695563 8.085511 0.7291056 0.270902 -0.6285039 -7.663592 1.40626e-6 0.9183261 0.3958248 5.364779 0 0 0 1</matrix>
-        <instance_camera url="#Camera-camera"/>
+      <node id="turretheavylaser_dae_SpringHeight" name="turretheavylaser.dae.SpringHeight" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 20 0 0 0 1</matrix>
       </node>
-      <node id="Light" name="Light" type="NODE">
-        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
-        <instance_light url="#Light-light"/>
-      </node>
-      <node id="hlt_s3o_SpringHeight" name="hlt.s3o.SpringHeight" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 30 0 0 0 1</matrix>
-      </node>
-      <node id="hlt_s3o_SpringRadius" name="hlt.s3o.SpringRadius" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 30 0 0 0 1</matrix>
+      <node id="turretheavylaser_dae_SpringRadius" name="turretheavylaser.dae.SpringRadius" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 20 0 0 0 1</matrix>
       </node>
     </visual_scene>
   </library_visual_scenes>
