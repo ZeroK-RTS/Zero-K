@@ -20,14 +20,11 @@ return { grebe = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 900,
   maxSlope               = 36,
   maxVelocity            = 2.4,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[amphraider.s3o]],
@@ -46,7 +43,7 @@ return { grebe = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1200,
+  turnRate               = 1440,
   upright                = true,
 
   weapons                = {
@@ -69,7 +66,6 @@ return { grebe = {
       damage                  = {
         default = 240,
         planes  = 240,
-        subs    = 12,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_96]],

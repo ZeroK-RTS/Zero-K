@@ -1,3 +1,5 @@
+-- used by Gesture, Keyboard, and Radial build menu widgets
+
 local menu_armcom = include("Configs/marking_menu_menu_armcom.lua")
 local menu_athena = include("Configs/marking_menu_menu_athena.lua")
 local menu_striderhub = include("Configs/marking_menu_menu_striderhub.lua")

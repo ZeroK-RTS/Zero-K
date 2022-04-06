@@ -43,20 +43,23 @@ local projectileDefs = {
 		leadMult = 0.4,
 	},
 	[WeaponDefNames["hoverdepthcharge_depthcharge"].id] = {
-		speed = 3,
+		speed = 3.53,
 		track = true,
 		alwaysBurnblow = true,
 		rangeSqr = 121,
 		underwaterTrack = true,
-		leadMult = 0.5,
+		leadMult = 0.6,
 	},
 	[WeaponDefNames["hoverdepthcharge_fake_depthcharge"].id] = {
-		speed = 6,
+		speed = 8, -- For prediction.
 		alwaysBurnblow = true,
-		moveCtrlSpeed = 6,
+		moveCtrlSpeed = 5.3,
+		moveCtrlAccel = 0.02,
+		moveCtrlAccelAccel = 0.01,
+		moveCtrlMaxSpeed = 30,
 		groundFloat = 5,
 		rangeSqr = 121,
-		leadMult = 0.5,
+		leadMult = 0.75,
 		useOwnerWeapon = 2,
 	},
 }
@@ -135,12 +138,27 @@ function gadget:GameFrame(n)
 				local dx, dz = data[1] - px, data[3] - pz
 				if px and dx ~= 0 and dz ~= 0 then
 					local horDist = Dist2D(dx, dz)
-					dx, dz = def.speed*dx/horDist, def.speed*dz/horDist
+					local speed = def.moveCtrlSpeed
+					if def.moveCtrlAccel then
+						local accel = def.moveCtrlAccel
+						if def.moveCtrlAccelAccel then
+							data.accel = (data.accel or accel) + def.moveCtrlAccelAccel
+							accel = data.accel
+						end
+						data.speed = (data.speed or speed) + accel
+						speed = data.speed
+						if def.moveCtrlMaxSpeed and speed > def.moveCtrlMaxSpeed then
+							speed = def.moveCtrlMaxSpeed
+						end
+					end
+					--Spring.Echo("data.speed", data.speed, Spring.GetGameFrame())
+					
+					dx, dz = speed*dx/horDist, speed*dz/horDist
 					
 					local height = Spring.GetGroundHeight(px + dx, pz + dz) + def.groundFloat
 					local dy = height - py
 					local dist = Dist3D(dx, dy, dz)
-					dx, dz = def.speed*dx/dist, def.speed*dz/dist
+					dx, dz = speed*dx/dist, speed*dz/dist
 					
 					height = Spring.GetGroundHeight(px + dx, pz + dz) + def.groundFloat
 					Spring.SetProjectilePosition(proID, px + dx, height, pz + dz)
@@ -280,10 +298,15 @@ local function ApplyProjectileLead(proID, speed, weaponID)
 
 	-- Approximate flight time for direct flight
 	local flyTime = dist3D(tx, ty, tz, px, py, pz)/speed
-	
-	if flyTime < 5 then
+	if flyTime < 1 then
 		return
 	end
+	
+	-- Better fly time not required so far.
+	--flyTime = dist3D(tx + flyTime*vx, ty + flyTime*vy, tz + flyTime*vz, px, py, pz)/speed
+	--if flyTime < 2 then
+	--	return
+	--end
 	
 	-- Reduce additional lead amount by the leadLimit of the weapon
 	if projectileLeadLimit[weaponID] then

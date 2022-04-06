@@ -17,24 +17,27 @@ return { amphaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     amph_regen        = 20,
     amph_submerged_at = 40,
     sink_on_emp       = 1,
     floattoggle       = [[1]],
     selection_scale   = 0.85,
+    okp_damage = 140.1,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[amphaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -46,6 +49,7 @@ return { amphaa = {
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
       [[custom:STORMBACK]],
+      [[custom:bubbles_small]],
     },
   },
 
@@ -56,7 +60,7 @@ return { amphaa = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 30,
-  turnRate               = 1000,
+  turnRate               = 1200,
   upright                = true,
 
   weapons                = {
@@ -93,7 +97,6 @@ return { amphaa = {
       damage                  = {
         default = 15.01,
         planes  = 150.1,
-        subs    = 8,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -103,7 +106,7 @@ return { amphaa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_phoenix.s3o]],
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 820,
       reloadtime              = 0.3,
@@ -111,6 +114,7 @@ return { amphaa = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 650,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,

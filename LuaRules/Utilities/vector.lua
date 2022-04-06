@@ -175,6 +175,26 @@ local function DistanceToLineSq(point, line)
 	return AbsValSq(normal)
 end
 
+local function AngleSubtractShortest(angleA, angleB)
+	local dist = angleA - angleB
+	if dist > 0 then
+		if dist < pi then
+			return dist
+		end
+		return dist - 2*pi
+	else
+		if dist > -pi then
+			return dist
+		end
+		return dist + 2*pi
+	end
+end
+
+local function AngleAverageShortest(angleA, angleB)
+	local diff = AngleSubtractShortest(angleA, angleB)
+	return angleA - diff/2
+end
+
 Spring.Utilities.Vector = {
 	DistSq = DistSq,
 	Dist3D = Dist3D,
@@ -198,4 +218,6 @@ Spring.Utilities.Vector = {
 	DistanceToBoundedLineSq = DistanceToBoundedLineSq,
 	DistanceToBoundedLine = DistanceToBoundedLine,
 	DistanceToLineSq = DistanceToLineSq,
+	AngleSubtractShortest = AngleSubtractShortest,
+	AngleAverageShortest = AngleAverageShortest,
 }

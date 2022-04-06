@@ -5,25 +5,8 @@ local enginer = piece "enginer"
 local wingl = piece "wingl"
 local wingr = piece "wingr"
 
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0) then
-		submerged = false
-	else
-		submerged = true
-	end
-end
-
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damages = WeaponDefs[weaponDefID].damages
-		return damage * (damages[elseArmorClass] / damages[subArmorClass])
-	end
-	return damage
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
 end
 
 local explodables = {tail, enginel, enginer, wingl, wingr}

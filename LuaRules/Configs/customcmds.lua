@@ -1,18 +1,13 @@
---------------------------------------------------------------------------------
---
---  Proposed Command ID Ranges:
---
---    all negative:  Engine (build commands)
---       0 -   999:  Engine
---    1000 -  9999:  Group AI
---   10000 - 19999:  LuaUI
---   20000 - 29999:  LuaCob
---   30000 - 39999:  LuaRules
---
+--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
+     If you are a modder adding custom commands, MAKE YOUR OWN FILE.
+     By overriding this file you're SETTING YOURSELF UP FOR FAILURE
+     when ZK adds something to this file (your override won't have
+     the new addition) and making things confusing for other modders
+     who might want to use your code (with your own file it will be
+     obvious where the extra commands are coming from). ]]
 
 -- if you add a command, please order it by ID!
-local cmds = {
-	--RETREAT = 10000,
+return {
 	RETREAT_ZONE = 10001,
 	RESETFIRE = 10003,
 	RESETMOVE = 10004,
@@ -39,9 +34,12 @@ local cmds = {
 	GBCANCEL = 13926, -- global build command area cancel cmd
 	STOP_PRODUCTION = 13954,
 	SELECTION_RANK = 13987,
+	FORMATION_RANK = 13988,
 	SELECT_MISSILES = 14001,
+	BUILD_PLATE = 14002,
 
 	AREA_MEX = 30100,
+	AREA_TERRA_MEX = 30101,
 	STEALTH = 31100,
 	CLOAK_SHIELD = 31101,
 	RAW_MOVE = 31109, --cmd_raw_move.lua
@@ -60,6 +58,7 @@ local cmds = {
 	REARM = 33410, -- bomber control
 	FIND_PAD = 33411, -- bomber control
 	UNIT_FLOAT_STATE = 33412,
+	EXCLUDE_PAD = 33413,
 	PRIORITY = 34220,
 	MISC_PRIORITY = 34221,
 	RETREAT = 34223,
@@ -82,9 +81,12 @@ local cmds = {
 	UNIT_KILL_SUBORDINATES = 35821, -- unit_capture
 	DISABLE_ATTACK = 35822, -- unit_launcher
 	UNIT_AI = 36214,
+	FIRE_AT_SHIELD = 36215,
+	FIRE_TOWARDS_ENEMY = 36216,
 	WANT_CLOAK = 37382,
 	PREVENT_OVERKILL = 38291,
 	TRANSFER_UNIT = 38292,
+	PREVENT_BAIT = 38293,
 	DONT_FIRE_AT_RADAR = 38372, -- fire at radar toggle gadget
 	JUMP = 38521,
 	TIMEWARP = 38522,
@@ -100,25 +102,7 @@ local cmds = {
 	RESTORE = 39739,
 	BUMPY = 39740,
 	TERRAFORM_INTERNAL = 39801,
-}
--- not included here, just listed
---[[
-PURCHASE = 32601	-- planetwars, range up to 32601 + #purchases
-MORPH_STOP = 32210	-- range up to 32210 + #morphs
-MORPH = 31210		-- ditto
-]]--
 
--- deprecated
---[[
-PLANTBOMB =     	32523
-AUTOREPAIR =    	33250 	-- up to 33250 + 3
-AUTORECLAIM =   	33251
-AUTOASSIST  =   	33252
-AUTOATTACK  =   	33253
-PRIORITY=			34220
-CobButton =         	34520 	-- up to 32520 + different cob buttons
-SCRAMBLE =      	35128
-WRECK =         	36734
-RESTOREBOMB = 		39735
-]]--
-return cmds
+	--[[ WARNING!! Only BASE VANILLA ZK commands belong here!
+	     See the bigass chunk of text at the top of the file. ]]
+}

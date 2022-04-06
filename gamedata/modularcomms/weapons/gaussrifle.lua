@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 140,
-		subs    = 7,
 	},
 
 	explosionGenerator      = [[custom:gauss_hit_m]],

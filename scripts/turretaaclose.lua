@@ -2,6 +2,8 @@ include "constants.lua"
 
 local scriptReload = include("scriptReload.lua")
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 -- Pieces
 local base = piece 'base'
 local body = piece 'body'
@@ -110,8 +112,7 @@ end
 
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
-		local distMult = (Spring.ValidUnitID(targetID) and Spring.GetUnitSeparation(unitID, targetID) or 0)/430
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 500.1, 25 * distMult)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 430, 26, 0.1, true)
 	end
 	return true
 end

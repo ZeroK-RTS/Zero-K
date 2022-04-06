@@ -3,7 +3,9 @@ include "constants.lua"
 local base = piece 'base'
 local launched = false
 
-function script.AimWeapon1(heading, pitch) return true end
+function script.AimWeapon(heading, pitch)
+	return true
+end
 
 local function RemoveMissile()
 	GG.MissileSilo.DestroyMissile(unitID, unitDefID)

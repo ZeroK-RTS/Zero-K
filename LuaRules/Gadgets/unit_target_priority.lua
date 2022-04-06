@@ -89,7 +89,7 @@ local function GetUnitSpeed(unitID)
 	return remSpeed[unitID]
 end
 
-local function GetUnitVisibility(unitID, allyTeam)
+local function cache_GetUnitVisibility(unitID, allyTeam)
 	if not (remVisible[allyTeam] and remVisible[allyTeam][unitID]) then
 		if not remVisible[allyTeam] then
 			remVisible[allyTeam] = {}
@@ -122,7 +122,15 @@ local function GetUnitTransportieeDefID(unitID)
 	return remTransportiee[unitID]
 end
 
-local function GetUnitStunnedOrInBuild(unitID)
+local function cache_GetUnitStunnedOrInBuild(unitID, justWantBuild)
+	if justWantBuild then
+		if not remBuildProgress[unitID] then
+			local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+			remBuildProgress[unitID] = buildProgress
+		end
+		return remBuildProgress[unitID]
+	end
+	
 	if not remStunned[unitID] then
 		local bla, stunned, nanoframe = spGetUnitIsStunned(unitID)
 		
@@ -174,7 +182,7 @@ end
 local function GetCaptureWeaponPriorityModifier(unitID)
 	if not remCapturePriorityModifer[unitID] then
 		
-		local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
+		local stunned, buildProgress = cache_GetUnitStunnedOrInBuild(unitID)
 		
 		local priority = stunned*2 + (30 * (1 - buildProgress))
 		if buildProgress < 1 then
@@ -211,7 +219,7 @@ end
 local function GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	if not remNormalPriorityModifier[unitID] then
 		
-		local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
+		local stunned, buildProgress = cache_GetUnitStunnedOrInBuild(unitID)
 		
 		local priority = stunned*2 + (15 * (1 - buildProgress))
 		if buildProgress < 1 then
@@ -267,7 +275,7 @@ local function GetGravityWeaponPriorityModifier(unitID, attackerWeaponDefID)
 end
 
 local function GetDisarmWeaponPriorityModifier(unitID, attackerWeaponDefID)
-	local stunned, buildProgress = GetUnitStunnedOrInBuild(unitID)
+	local stunned, buildProgress = cache_GetUnitStunnedOrInBuild(unitID)
 	local priority = (disarmPenaltyDefs[attackerWeaponDefID] or 10) + GetNormalWeaponPriorityModifier(unitID, attackerWeaponDefID)
 	local fewAttackers = false
 	if buildProgress == 1 and (remStunAttackers[unitID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
@@ -292,7 +300,7 @@ local DEF_TARGET_TOO_FAR_PRIORITY = 100000 --usually numbers are around several 
 --end
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-	if not defPriority then
+	if not (defPriority and attackerWeaponDefID) then
 		-- This callin is effectively script.BlockShot but for CommandAI.
 		-- The engine will discard target priority information.
 		return true
@@ -315,7 +323,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if GG.GetUnitTarget(unitID) == targetID then
 		if disarmWeaponTimeDefs[attackerWeaponDefID] then
 			if (remStunAttackers[targetID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
-				local stunned, buildProgress = GetUnitStunnedOrInBuild(targetID)
+				local stunned, buildProgress = cache_GetUnitStunnedOrInBuild(targetID)
 				if stunned ~= 0 then
 					remStunAttackers[targetID] = (remStunAttackers[targetID] or 0) + 1
 				end
@@ -332,6 +340,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	local enemyUnitDefID = remUnitDefID[targetID]
+	if not enemyUnitDefID then
+		return true
+	end
 	
 	--// Get Velocity target penalty
 	local velocityAdd = 0
@@ -345,7 +356,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	--// Radar dot handling. Radar dots are not handled by subsequent areas because a unit which is
 	-- identified but not visible cannot have priority based on health or other status effects.
-	local visiblity = GetUnitVisibility(targetID, allyTeam)
+	local visiblity = cache_GetUnitVisibility(targetID, allyTeam)
 
 	if visiblity ~= 2 then
 		local wobbleAdd = (radarDotPenalty[attackerWeaponDefID] or 0)
@@ -437,6 +448,9 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 function gadget:Initialize()
+	GG.cache_GetUnitStunnedOrInBuild = cache_GetUnitStunnedOrInBuild
+	GG.cache_GetUnitVisibility = cache_GetUnitVisibility
+
 	for _, unitID in ipairs(spGetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)

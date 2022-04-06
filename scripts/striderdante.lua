@@ -73,6 +73,7 @@ local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].wea
 local dead = false
 local armsFree = true
 local dgunning = false
+local rightArmPitch = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -94,6 +95,7 @@ local function RestorePose()
 	Turn(pelvis, z_axis, 0, math.rad(100))
 
 	Move(pelvis, y_axis, 0, 25)
+	rightArmPitch = 0
 end
 
 local function IdleAnim()
@@ -236,11 +238,12 @@ local function Walk()
 		Turn(rarm, y_axis, 0, math.rad(120))
 		Turn(luparm, x_axis, 0, math.rad(240))
 		Turn(ruparm, x_axis, 0, math.rad(240))
+		rightArmPitch = 0
 	end
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
@@ -310,10 +313,16 @@ end
 -- Weaponry
 
 function script.AimFromWeapon(num)
+	if num > 4 then
+		return torso
+	end
 	return weaponPieces[num].aimFrom
 end
 
 function script.QueryWeapon(num)
+	if num > 4 then
+		return torso
+	end
 	local pieces = weaponPieces[num].query
 	return pieces[weaponPieces[num].index]
 end
@@ -332,6 +341,8 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis) --need to make surenot
+		
+		rightArmPitch = -pitch
 		return true
 	elseif num == 2 then
 		if dgunning then return false end
@@ -364,13 +375,15 @@ function script.AimWeapon(num, heading, pitch)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
 		dgunning = false
+		
+		rightArmPitch = -pitch
 		return true
 	elseif num == 4 then
 		if dgunning then return false end
 		Signal(SIG_AIM_4)
 		SetSignalMask(SIG_AIM_4)
 	
-		Turn(flagellum, x_axis, -pitch, math.rad(90))
+		Turn(flagellum, x_axis, -pitch - rightArmPitch + 0.45, math.rad(90))
 		Turn(torso, y_axis, heading, math.rad(250))
 		WaitForTurn(ruparm, x_axis)
 		WaitForTurn(flagellum, x_axis)
@@ -378,6 +391,7 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	end
+	return true
 end
 
 function script.Shot(num)

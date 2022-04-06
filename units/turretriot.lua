@@ -17,9 +17,14 @@ return { turretriot = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_target = 4,
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
-    aim_lookahead  = 100,
+    aim_lookahead  = 50,
+    heat_per_shot  = 0.038, -- Heat is always a number between 0 and 1
+    heat_decay     = 1/6, -- Per second
+    heat_max_slow  = 0.5,
+    heat_initial   = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -30,7 +35,6 @@ return { turretriot = {
   levelGround                   = false,
   maxDamage                     = 1500,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
   script                        = "turretriot.lua",
@@ -81,7 +85,6 @@ return { turretriot = {
 
       damage                  = {
         default = 45,
-        subs    = 2.25,
       },
 
       edgeEffectiveness       = 0.5,

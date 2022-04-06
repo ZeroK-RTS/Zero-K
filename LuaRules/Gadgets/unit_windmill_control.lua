@@ -28,14 +28,16 @@ local windDefs = {
 	[ UnitDefNames['energywind'].id ] = true,
 }
 
-local WIND_HEALTH = UnitDefNames['energywind'].health
+local turbineUnitDef = UnitDefNames['energywind']
+local WIND_HEALTH = turbineUnitDef.health
+local TIDAL_HEALTH = turbineUnitDef.customParams.tidal_health
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local windmills = IterableMap.New()
 
 local TIDAL_HEIGHT = -10
 
-local windMin, windMax, tidalStrength, windRange
+local windMin, windMax, windRange
 
 local strength, next_strength, strength_step, step_count = 0,0,0,0
 
@@ -109,22 +111,27 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function UpdateWindStrengthAndDir()
+	if step_count > 0 then
+		strength = strength + strength_step
+		step_count = step_count - 1
+	end
+	local _, _, _, windStrength, x, _, z = spGetWind()
+	local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
+	
+	GG.WindHeading = windHeading
+	GG.WindStrength = (strength - windMin)/windRange
+	Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
+	Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
+	
+	return strength
+end
+
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
-		if (not IterableMap.IsEmpty(windmills)) then
-			if step_count > 0 then
-				strength = strength + strength_step
-				step_count = step_count - 1
-			end
-			local _, _, _, windStrength, x, _, z = spGetWind()
-			local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
-			
-			GG.WindHeading = windHeading
-			GG.WindStrength = (strength - windMin)/windRange
-			Spring.SetGameRulesParam("WindHeading", GG.WindHeading)
-			Spring.SetGameRulesParam("WindStrength", GG.WindStrength)
-			
+		local curr_strength = UpdateWindStrengthAndDir()
 		
+		if (not IterableMap.IsEmpty(windmills)) then
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
@@ -132,7 +139,7 @@ function gadget:GameFrame(n)
 			for i = 1, indexMax do
 				local unitID = keyByIndex[i]
 				local entry = dataByKey[unitID]
-				local windEnergy = (windMax - strength)*entry.myMin + strength
+				local windEnergy = (windMax - curr_strength)*entry.myMin + curr_strength
 				local paralyzed = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry.teamID
@@ -150,7 +157,7 @@ function gadget:GameFrame(n)
 		end
 		if (((n+16) % (32*30)) < 0.1) then
 			next_strength = (rand() * windRange) + windMin
-			strength_step = (next_strength - strength) * 0.1
+			strength_step = (next_strength - curr_strength) * 0.1
 			step_count = 10
 		end
 	end
@@ -170,12 +177,11 @@ local function SetupUnit(unitID)
 	local x, y, z = spGetUnitPosition(unitID)
 	
 	if Spring.GetGroundHeight(x, z) <= TIDAL_HEIGHT then
-		spSetUnitRulesParam(unitID, "wanted_energyIncome", tidalStrength, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
-		Spring.SetUnitMaxHealth(unitID, 400)
+		Spring.SetUnitMaxHealth(unitID, TIDAL_HEALTH)
 		local health = Spring.GetUnitHealth(unitID)
 		if health == WIND_HEALTH then
-			Spring.SetUnitHealth(unitID, 400)
+			Spring.SetUnitHealth(unitID, TIDAL_HEALTH)
 		end
 		Spring.SetUnitCollisionVolumeData(unitID, 24, 20, 24, 0, -5, 0, 0, 1, 0)
 		Spring.SetUnitMidAndAimPos(unitID, 0, 0, 0, 0, 2, 0, true)
@@ -212,12 +218,10 @@ function gadget:Initialize()
 
 	windMin = 0 * energyMult
 	windMax = 2.5 * energyMult
-	tidalStrength = 1.2 * energyMult
 	windRange = windMax - windMin
 
 	Spring.SetGameRulesParam("WindMin",windMin)
 	Spring.SetGameRulesParam("WindMax",windMax)
-	Spring.SetGameRulesParam("tidalStrength",tidalStrength)
 	Spring.SetGameRulesParam("WindHeading", 0)
 	Spring.SetGameRulesParam("WindStrength", 0)
 	Spring.SetGameRulesParam("tidalHeight", TIDAL_HEIGHT)
@@ -228,7 +232,7 @@ function gadget:Initialize()
 	end
 	
 	local nominalGroundMin, nominalGroundMax = Spring.GetGroundExtremes()
-	local waterlevel = Spring.GetGameRulesParam("waterlevel")
+	local waterlevel = Spring.GetGameRulesParam("waterlevel") or 0
 	local groundMin, groundMax = math.max(nominalGroundMin - waterlevel,0), math.max(nominalGroundMax - waterlevel, 1)
 	local mexHeight = math.max(0, Spring.GetGameRulesParam("mex_min_height") or groundMin)
 
@@ -254,6 +258,8 @@ function gadget:Initialize()
 	end
 	
 	gadgetHandler:AddChatAction("windanim", ToggleWindAnimation, "Toggles windmill animations.")
+	
+	UpdateWindStrengthAndDir()
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)

@@ -1,13 +1,10 @@
 -- $Id: gui_commandinsert.lua 3171 2008-11-06 09:06:29Z det $
 -------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-local version= "1.003"
+
 function widget:GetInfo()
 	return {
 		name = "CommandInsert",
-		desc = "[v" .. version .. "] Allow you to add command into existing queue. Based on FrontInsert by jK" ..
-		  "\n• SPACEBAR + SHIFT insert command to arbitrary places in queue." ..
-		  "\n• SPACEBAR insert command in front of queue.",
+		desc = "Implements mid-queue command insertion via SPACE",
 		author = "dizekat, GoogleFrog (structure block order)",
 		date = "Jan,2008", --16 October 2013
 		license = "GNU GPL, v2 or later",
@@ -38,6 +35,10 @@ local positionCommand = {
 	[CMD.ATTACK] = true,
 	[CMD_JUMP] = true,
 	[CMD_LEVEL] = true,
+}
+
+local doNotHandleRaw = {
+	[-UnitDefNames["staticmex"].id] = true,
 }
 
 local EMPTY_TABLE = {}
@@ -166,7 +167,7 @@ local function ProcessCommand(id, params, options, sequence_order)
 			coded = coded - CMD.OPT_META
 		end
 
-		if not shift then
+		if not (shift or id == CMD_AREA_MEX or id == CMD_AREA_TERRA_MEX) then
 			Spring.GiveOrder(CMD.INSERT, {sequence_order, id, coded, unpack(params)}, CMD.OPT_ALT)
 			return true
 		end
@@ -227,6 +228,9 @@ function widget:Update()
 end
 
 function widget:CommandNotify(id, params, options)
+	if doNotHandleRaw[id] then
+		return false
+	end
 	return ProcessCommand(id, params, options, 0)
 end
 

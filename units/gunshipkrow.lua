@@ -25,6 +25,7 @@ return { gunshipkrow = {
 
   customParams           = {
     modelradius    = [[10]],
+    fire_towards_range_buffer = 95,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -33,12 +34,9 @@ return { gunshipkrow = {
   footprintZ             = 5,
   hoverAttack            = true,
   iconType               = [[supergunship]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maneuverleashlength    = [[500]],
   maxDamage              = 16000,
   maxVelocity            = 3.3,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[krow.s3o]],
@@ -113,7 +111,6 @@ return { gunshipkrow = {
 
       damage                  = {
         default = 37.8,
-        subs    = 1.8,
       },
 
       duration                = 0.02,
@@ -123,7 +120,7 @@ return { gunshipkrow = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      range                   = 450,
+      range                   = 383,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -150,7 +147,6 @@ return { gunshipkrow = {
       damage                  = {
         default = 250,
         planes  = 250,
-        subs    = 12.5,
       },
       
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],

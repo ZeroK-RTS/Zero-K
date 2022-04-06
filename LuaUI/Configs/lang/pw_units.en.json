@@ -35,7 +35,7 @@
 		"helptext" : "A gas-fired power generator."
 	},
 	"pw_grid" : {
-		"name" : "Planetary Defense Grid",
+		"name" : "Planetary Defence Grid",
 		"description" : "Defends against everything",
 		"helptext" : "This structure reduces Influence gains as well as intercepting incoming bombers."
 	},

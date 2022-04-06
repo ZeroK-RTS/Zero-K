@@ -207,7 +207,7 @@
 	"shieldarty" : {
 		"name" : "Racketeer",
 		"description" : "Disarming Artillery",
-		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
+		"helptext" : "The Racketeer launches long range missiles that can disarm key enemy defences or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless."
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
@@ -566,7 +566,7 @@
 	},
 	"energygeo" : {
 		"name" : "Geothermal Generator",
-		"description" : "Geothermisches Kraftwerk (+25)",
+		"description" : "Geothermisches Kraftwerk",
 		"helptext" : "Geothermische Anlagen sind hocheffiziente Energiequellen, die nur auf Thermalquellen auf der Karte gebaut werden können. Sie explodieren heftig, wenn sie zerstört werden. Von daher vermeide es, sie in unmittelbarer Nähe zu deiner Basis zu bauen."
 	},
 	"striderdetriment" : {
@@ -596,7 +596,7 @@
 	},
 	"energysolar" : {
 		"name" : "Solar Collector",
-		"description" : "Kleines Solarkraftwerk (+2)",
+		"description" : "Kleines Solarkraftwerk",
 		"helptext" : "Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form fur 8 Sekunden zurück, die als exzellenter Schutz gegen Raider fungiert."
 	},
 	"empiricaldpser" : {
@@ -811,7 +811,7 @@
 	},
 	"energyfusion" : {
 		"name" : "Fusion Reactor",
-		"description" : "Fusionskraftwerk (+35)",
+		"description" : "Fusionskraftwerk",
 		"helptext" : "Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt."
 	},
 	"shipcon" : {
@@ -992,7 +992,7 @@
 	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Leichte, paralysierende Drohne",
-		"helptext" : "Gnats sind kleine Einheiten, die Feinde paralysieren können. Sie erweisen sich als Verteidigungseinheiten als sehr nützlich und unter der Kombination mit Banshees oder anderen Einheiten können die Feinde so lange bewegungsunfähig gemacht werden, bis deine Einheiten diese vernichtet haben. In der Offensive können sie sogar schwerere Einheiten paralysieren, doch sterben sie relativ schnell gegen Verteidiger."
+		"helptext" : "Gnats sind kleine Einheiten, die Feinde paralysieren können. Sie erweisen sich als Verteidigungseinheiten als sehr nützlich und unter der Kombination mit Locusts oder anderen Einheiten können die Feinde so lange bewegungsunfähig gemacht werden, bis deine Einheiten diese vernichtet haben. In der Offensive können sie sogar schwerere Einheiten paralysieren, doch sterben sie relativ schnell gegen Verteidiger."
 	},
 	"chicken_spidermonkey" : {
 		"name" : "Spidermonkey",
@@ -1111,7 +1111,7 @@
 	},
 	"energyheavygeo" : {
 		"name" : "Advanced Geothermal",
-		"description" : "Großes geothermisches Kraftwerk (+100) - GEFÄHRLICH",
+		"description" : "Großes geothermisches Kraftwerk GEFÄHRLICH",
 		"helptext" : "Das verbesserte geothermische Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar."
 	},
 	"fakeunit_aatarget" : {
@@ -1136,7 +1136,7 @@
 	},
 	"energysingu" : {
 		"name" : "Singularity Reactor",
-		"description" : "Großes Kraftwerk (+225) - GEFÄHRLICH",
+		"description" : "Großes Kraftwerk GEFÄHRLICH",
 		"helptext" : "Dieser Reaktor erzeugt eine riesige Menge an Energie, wozu er ein kontrolliertes Schwarzes Loch nutzt - was genauso sicher ist, wie es sich anhört. Wird der Reaktor zerstört, wird eine riesige Menge an Energie frei, die sich in einer Explosion ungeheuren Ausmaßes, vergleichbar mit einer Atomexplosion, äußert. Ein ganzer Kontinent, auf dem der Reaktor gebaut wird, sollte von nun an als unsicherer Boden betrachtet werden."
 	},
 	"turretaafar" : {
@@ -1147,7 +1147,7 @@
 	"subtacmissile" : {
 		"name" : "Scylla",
 		"description" : "Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile",
-		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
+		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defence against direct attacks and should avoid contact with the enemy."
 	},
 	"amphassault" : {
 		"name" : "Grizzly",

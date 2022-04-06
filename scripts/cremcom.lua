@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -112,7 +110,6 @@ for index, weapon in pairs(wepTable) do
 		starBLaunchers[index] = true
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -197,9 +194,6 @@ function jumping()
 	end
 end
 
-function halfJump()
-end
-
 function endJump()
 	script.StopMoving()
 	EmitSfx(base, 1029)
@@ -265,14 +259,6 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
-end
-
 function script.Shot(num)
 	if num == 5 then
 		EmitSfx(flareL, 1025)
@@ -299,11 +285,6 @@ function script.StartBuilding(heading, pitch)
 	restoreHeading = heading
 	Turn(torso, y_axis, heading, ARM_SPEED_PITCH)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),snout)
-	return snout
 end
 
 function script.Killed(recentDamage, maxHealth)

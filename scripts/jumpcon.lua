@@ -478,14 +478,6 @@ function script.StopMoving()
 
 end
 
---------------------------
--- NANO
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanoPiece)
-	return nanoPiece
-end
-
 function script.StartBuilding(heading, pitch)
 	if GetUnitValue(COB.INBUILDSTANCE) == 0 then
 		Signal(SIG_STOPBUILD)
@@ -558,9 +550,6 @@ end
 --------------------------
 -- JUMP
 
-function preJump(turn,distance)
-end
-
 function beginJump()
 	script.StopMoving()
 	EmitSfx(jump, GG.Script.UNIT_SFX2)
@@ -569,9 +558,6 @@ end
 function jumping()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	EmitSfx(thrust, GG.Script.UNIT_SFX1)
-end
-
-function halfJump()
 end
 
 function endJump()

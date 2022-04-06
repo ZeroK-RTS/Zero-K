@@ -32,8 +32,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	return
 end
 
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unsynced
@@ -46,12 +44,16 @@ if (not gl.CreateShader) then
 end
 
 -----------------------------------------------------------------
--- File path Constants
+-- Constants
 -----------------------------------------------------------------
 
 local MATERIALS_DIR = "ModelMaterials/"
 local LUASHADER_DIR = "LuaRules/Gadgets/Include/"
 local DEFAULT_VERSION = "#version 150 compatibility"
+
+local USE_OBJECT_DAMAGE = false
+
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 -----------------------------------------------------------------
 -- Includes and classes loading
@@ -68,17 +70,16 @@ local LuaShader = VFS.Include(LUASHADER_DIR .. "LuaShader.lua")
 local advShading
 local shadows
 
-local bug3734wa = false
-
-local sunChanged = false
-local optionsChanged = true --just in case
+local sunChanged = false --always on on load/reload
+local optionsChanged = false --just in case
 
 local registeredOptions = {}
 
 local idToDefID = {}
 
 --- Main data structures:
--- rendering.drawList[objectID] = matSrc
+-- rendering.objectList[objectID] = matSrc -- All units
+-- rendering.drawList[objectID] = matSrc -- Lua Draw
 -- rendering.materialInfos[objectDefID] = {matName, name = param, name1 = param1}
 -- rendering.bufMaterials[objectDefID] = rendering.spGetMaterial("opaque") / luaMat
 -- rendering.bufShadowMaterials[objectDefID] = rendering.spGetMaterial("shadow") / luaMat
@@ -87,12 +88,16 @@ local idToDefID = {}
 ---
 
 local unitRendering = {
+	objectList          = {},
 	drawList            = {},
 	materialInfos       = {},
 	bufMaterials        = {},
 	bufShadowMaterials  = {},
 	materialDefs        = {},
 	loadedTextures      = {},
+
+	shadowsPreDLs       = {},
+	shadowsPostDL       = nil,
 
 	spGetAllObjects      = Spring.GetAllUnits,
 	spGetObjectPieceList = Spring.GetUnitPieceList,
@@ -108,15 +113,20 @@ local unitRendering = {
 	DrawObject           = "DrawUnit", --avoid, will kill CPU-side of performance!
 	ObjectCreated        = "UnitCreated",
 	ObjectDestroyed      = "UnitDestroyed",
+	ObjectDamaged        = "UnitDamaged",
 }
 
 local featureRendering = {
+	objectList          = {},
 	drawList            = {},
 	materialInfos       = {},
 	bufMaterials        = {},
 	bufShadowMaterials  = {},
 	materialDefs        = {},
 	loadedTextures      = {},
+
+	shadowsPreDLs       = {},
+	shadowsPostDL       = nil,
 
 	spGetAllObjects      = Spring.GetAllFeatures,
 	spGetObjectPieceList = Spring.GetFeaturePieceList,
@@ -132,6 +142,7 @@ local featureRendering = {
 	DrawObject           = "DrawFeature", --avoid, will kill CPU-side of performance!
 	ObjectCreated        = "FeatureCreated",
 	ObjectDestroyed      = "FeatureDestroyed",
+	ObjectDamaged        = "FeatureDamaged",
 }
 
 local allRendering = {
@@ -143,7 +154,9 @@ local allRendering = {
 -- Local Functions
 -----------------------------------------------------------------
 
-local function _CompileShader(shader, definitions, addName)
+
+
+local function _CompileShader(shader, definitions, plugIns, addName)
 	definitions = definitions or {}
 
 	local hasVersion = false
@@ -156,6 +169,25 @@ local function _CompileShader(shader, definitions, addName)
 	end
 
 	shader.definitions = table.concat(definitions, "\n") .. "\n"
+
+	--// insert small pieces of code named `plugins`
+	--// this way we can use a basic shader and add some simple vertex animations etc.
+	do
+		local function InsertPlugin(str)
+			return (plugIns and plugIns[str]) or ""
+		end
+
+		if shader.vertex then
+			shader.vertex   = shader.vertex:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
+		end
+		if shader.fragment then
+			shader.fragment = shader.fragment:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
+		end
+		if shader.geometry then
+			shader.geometry = shader.geometry:gsub("%%%%([%a_]+)%%%%", InsertPlugin)
+		end
+	end
+
 	local luaShader = LuaShader(shader, "Custom Unit Shaders. " .. addName)
 	local compilationResult = luaShader:Initialize()
 
@@ -191,10 +223,14 @@ end
 
 local function _CompileMaterialShaders(rendering)
 	for matName, matSrc in pairs(rendering.materialDefs) do
+		matSrc.hasStandardShader = false
+		matSrc.hasDeferredShader = false
+		matSrc.hasShadowShader = false
 		if matSrc.shaderSource then
 			local luaShader = _CompileShader(
 				matSrc.shaderSource,
 				matSrc.shaderDefinitions,
+				matSrc.shaderPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Standard")
 			)
 
@@ -207,23 +243,21 @@ local function _CompileMaterialShaders(rendering)
 					end
 				end
 				matSrc.standardShaderObj = luaShader
+				matSrc.hasStandardShader = true
 				matSrc.standardShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
 					matSrc.standardUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
-
-				if matSrc.Initialize then
-					matSrc.Initialize(matName, matSrc)
-				end
 			end
 		end
 
-		if (matSrc.deferredSource) then
+		if matSrc.deferredSource then
 			local luaShader = _CompileShader(
 				matSrc.deferredSource,
 				matSrc.deferredDefinitions,
+				matSrc.shaderPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Deferred")
 			)
 
@@ -236,23 +270,24 @@ local function _CompileMaterialShaders(rendering)
 					end
 				end
 				matSrc.deferredShaderObj = luaShader
+				matSrc.hasDeferredShader = true
 				matSrc.deferredShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
 					matSrc.deferredUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
-
-				if matSrc.Initialize then
-					matSrc.Initialize(matName, matSrc)
-				end
 			end
 		end
 
-		if (matSrc.shadowSource) then
+		if matSrc.shadowSource then
+			-- work around AMD bug
+			matSrc.shadowSource.fragment = nil
+
 			local luaShader = _CompileShader(
 				matSrc.shadowSource,
 				matSrc.shadowDefinitions,
+				matSrc.shaderPlugins,
 				string.format("MatName: \"%s\"(%s)", matName, "Shadow")
 			)
 			if luaShader then
@@ -264,17 +299,18 @@ local function _CompileMaterialShaders(rendering)
 					end
 				end
 				matSrc.shadowShaderObj = luaShader
+				matSrc.hasShadowShader = true
 				matSrc.shadowShader = luaShader:GetHandle()
 				luaShader:SetUnknownUniformIgnore(true)
 				luaShader:ActivateWith( function()
 					matSrc.shadowUniforms = _FillUniformLocs(luaShader)
 				end)
 				luaShader:SetActiveStateIgnore(true)
-
-				if matSrc.Initialize then
-					matSrc.Initialize(matName, matSrc)
-				end
 			end
+		end
+
+		if matSrc.Initialize then
+			matSrc.Initialize(matName, matSrc)
 		end
 
 	end
@@ -312,9 +348,9 @@ local validTexturePrefixes = {
 	["$"] = true
 }
 local function GetObjectMaterial(rendering, objectDefID)
-	local cachedMat = rendering.bufMaterials[objectDefID]
-	if cachedMat then
-		return cachedMat
+	local mat = rendering.bufMaterials[objectDefID]
+	if mat then
+		return mat
 	end
 
 
@@ -374,9 +410,9 @@ local function GetObjectMaterial(rendering, objectDefID)
 end
 
 local function GetObjectShadowMaterial(rendering, objectDefID)
-	local cachedMat = rendering.bufShadowMaterials[objectDefID]
-	if cachedMat then
-		return cachedMat
+	local mat = rendering.bufShadowMaterials[objectDefID]
+	if mat then
+		return mat
 	end
 
 
@@ -416,6 +452,28 @@ local function GetObjectShadowMaterial(rendering, objectDefID)
 	end)
 	gl.DeleteList(texdl)
 
+	-- needs TEX2 to perform alpha tests
+	-- cannot do it in shader because of some weird bug with AMD
+	-- not accepting any frag shaders for shadow pass
+	local shadowAlphaTexNum = mat.shadowAlphaTexNum or 1
+	local shadowAlphaTex = texUnits[shadowAlphaTexNum].tex
+
+	if not rendering.shadowsPostDL then
+		rendering.shadowsPostDL = gl.CreateList(function()
+			gl.Texture(0, false)
+		end)
+	end
+
+	if shadowAlphaTex then
+		if not rendering.shadowsPreDLs[shadowAlphaTex] then
+			rendering.shadowsPreDLs[shadowAlphaTex] = gl.CreateList(function()
+				gl.Texture(0, shadowAlphaTex)
+			end)
+		end
+	end
+
+	local shadowsPreDL = rendering.shadowsPreDLs[shadowAlphaTex]
+
 	--No deferred statements are required
 	local luaShadowMat = rendering.spGetMaterial("shadow", {
 		standardshader = mat.shadowShader,
@@ -424,7 +482,9 @@ local function GetObjectShadowMaterial(rendering, objectDefID)
 
 		usecamera   = true,
 		culling     = mat.shadowCulling,
-		texunits    = texUnits,
+		--texunits    = {[shadowAlphaTexNum] = {tex = texUnits[shadowAlphaTexNum].tex, enable = false}},
+		prelist     = shadowsPreDL,
+		postlist    = rendering.shadowsPostDL,
 	})
 
 	rendering.bufShadowMaterials[objectDefID] = luaShadowMat
@@ -534,6 +594,7 @@ local function BindMaterials()
 end
 
 local function ToggleAdvShading()
+
 	unitRendering.drawList = {}
 	featureRendering.drawList = {}
 
@@ -558,10 +619,12 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 		local mat = rendering.materialDefs[objectMat[1]]
 
 		if mat.standardShader then
+			rendering.objectList[objectID] = mat
+
 			rendering.spActivateMaterial(objectID, 3)
 
 			rendering.spSetMaterial(objectID, 3, "opaque", GetObjectMaterial(rendering, objectDefID))
-			if mat.shadowShader and (not bug3734wa) then
+			if mat.shadowShader then
 				rendering.spSetMaterial(objectID, 3, "shadow", GetObjectShadowMaterial(rendering, objectDefID))
 			end
 
@@ -569,26 +632,62 @@ local function ObjectFinished(rendering, objectID, objectDefID)
 				rendering.spSetPieceList(objectID, 3, pieceID)
 			end
 
-			local DrawObject = mat[rendering.DrawObject]
-			local ObjectCreated = mat[rendering.ObjectCreated]
+			local _DrawObject = mat[rendering.DrawObject]
+			local _ObjectCreated = mat[rendering.ObjectCreated]
 
-			if DrawObject then
+			if _DrawObject then
 				rendering.spSetObjectLuaDraw(objectID, true)
 				rendering.drawList[objectID] = mat
 			end
 
-			if ObjectCreated then
-				ObjectCreated(objectID, mat, 3)
+			if _ObjectCreated then
+				_ObjectCreated(objectID, objectDefID, mat)
 			end
 		end
 	end
 end
 
 
+local function ObjectDestroyed(rendering, objectID, objectDefID)
+	local mat = rendering.objectList[objectID]
+	if mat then
+		local _ObjectDestroyed = mat[rendering.ObjectDestroyed]
+		if _ObjectDestroyed then
+			_ObjectDestroyed(objectID, objectDefID, mat)
+		end
+		rendering.objectList[objectID] = nil
+		rendering.drawList[objectID] = nil
+	end
+	rendering.spDeactivateMaterial(objectID, 3)
+end
+
+local function ObjectDamaged(rendering, objectID, objectDefID)
+	local mat = rendering.objectList[objectID]
+	if mat then
+		local _ObjectDamaged = mat[rendering.ObjectDamaged]
+		if _ObjectDamaged then
+			_ObjectDamaged(objectID, objectDefID, mat)
+		end
+	end
+end
+
+local function DrawObject(rendering, objectID, objectDefID, drawMode)
+	local mat = rendering.drawList[objectID]
+	if not mat then
+		return
+	end
+
+	local _DrawObject = mat[rendering.DrawObject]
+	if _DrawObject then
+		return _DrawObject(objectID, objectDefID, mat, drawMode)
+	end
+end
+
+
 local function _CleanupEverything(rendering)
 	for objectID, mat in pairs(rendering.drawList) do
-		local DrawObject = mat[rendering.DrawObject]
-		if DrawObject then
+		local _DrawObject = mat[rendering.DrawObject]
+		if _DrawObject then
 			rendering.spSetObjectLuaDraw(objectID, false)
 		end
 	end
@@ -605,8 +704,26 @@ local function _CleanupEverything(rendering)
 	end
 
 	for tex, _ in pairs(rendering.loadedTextures) do
-		gl.DeleteTexture(tex)
+		local prefix = tex:sub(1, 1)
+		if not validTexturePrefixes[prefix] then
+			gl.DeleteTexture(tex)
+		end
 	end
+
+	for _, dl in pairs(rendering.shadowsPreDLs) do
+		gl.DeleteList(dl)
+	end
+
+	if rendering.shadowsPostDL then
+		gl.DeleteList(rendering.shadowsPostDL)
+	end
+
+-- crashes system
+--[[
+	for objectID, mat in pairs(rendering.objectList) do
+		ObjectDestroyed(rendering, objectID, nil)
+	end
+]]--
 
 	for _, oid in ipairs(rendering.spGetAllObjects()) do
 		rendering.spSetLODCount(oid, 0)
@@ -616,40 +733,23 @@ local function _CleanupEverything(rendering)
 		gadgetHandler:RemoveChatAction(optName)
 	end
 
+	rendering.objectList          = {}
 	rendering.drawList            = {}
 	rendering.materialInfos       = {}
 	rendering.bufMaterials        = {}
 	rendering.bufShadowMaterials  = {}
 	rendering.materialDefs        = {}
 	rendering.loadedTextures      = {}
+	rendering.shadowsPreDLs       = {}
+	rendering.shadowsPostDL       = nil
 
-	gadgetHandler:RemoveChatAction("cusreload")
-	gadgetHandler:RemoveChatAction("reloadcus")
-end
+	gadgetHandler:RemoveChatAction("updatesun")
+	--gadgetHandler:RemoveChatAction("cusreload")
+	--gadgetHandler:RemoveChatAction("reloadcus")
+	gadgetHandler:RemoveChatAction("disablecus")
+	gadgetHandler:RemoveChatAction("cusdisable")
 
-local function ObjectDestroyed(rendering, objectID, objectDefID)
-	local mat = rendering.drawList[objectID]
-	if mat then
-		local _ObjectDestroyed = mat[rendering.ObjectDestroyed]
-		if _ObjectDestroyed then
-			_ObjectDestroyed(objectID)
-		end
-		rendering.drawList[objectID] = nil
-	end
-	rendering.spDeactivateMaterial(objectID, 3)
-end
-
-local function DrawObject(rendering, objectID, objectDefID, drawMode)
-	local mat = rendering.drawList[objectID]
-	if not mat then
-		return
-	end
-
-	local _DrawObject = mat[rendering.DrawObject]
-	if _DrawObject then
-		local luaShaderObj = ((drawMode == 1) and mat.standardShaderObj) or ((drawMode == 5) and mat.deferredShaderObj)
-		return _DrawObject(objectID, objectDefID, mat, drawMode, luaShaderObj)
-	end
+	collectgarbage()
 end
 
 
@@ -705,17 +805,24 @@ end
 -----------------------------------------------------------------
 
 -- To be called once per CHECK_FREQ
-local function GameFrameSlow(gf)
+local function _GameFrameSlow(gf)
 	for _, rendering in ipairs(allRendering) do
 		for _, mat in pairs(rendering.materialDefs) do
 			local gameFrameSlowFunc = mat.GameFrameSlow
 			if gameFrameSlowFunc then
-				if mat.standardShaderObj then
-					gameFrameSlowFunc(gf, mat, false)
-				end
-				if mat.deferredShaderObj then
-					gameFrameSlowFunc(gf, mat, true)
-				end
+				gameFrameSlowFunc(gf, mat)
+			end
+		end
+	end
+end
+
+-- To be called every synced gameframe
+local function _GameFrame(gf)
+	for _, rendering in ipairs(allRendering) do
+		for _, mat in pairs(rendering.materialDefs) do
+			local gameFrameFunc = mat.GameFrame
+			if gameFrameFunc then
+				gameFrameFunc(gf, mat)
 			end
 		end
 	end
@@ -738,7 +845,34 @@ function gadget:GameFrame(gf)
 			_ProcessOptions("shadowmapping", nil, shadows, Spring.GetMyPlayerID())
 		end
 	elseif gfMod == 15 then --TODO change 15 to something less busy
-		GameFrameSlow(gf)
+		_GameFrameSlow(gf)
+	end
+	_GameFrame(gf)
+end
+
+local slowTime = Spring.GetTimer()
+local fastTime = Spring.GetTimer()
+function gadget:Update()
+	local _, _, paused = Spring.GetGameSpeed()
+	local frame = Spring.GetGameFrame()
+	paused = paused or frame < 1
+	if not paused then
+		slowTime = false
+		fastTime = false
+		return
+	end
+
+	local currentTime = Spring.GetTimer()
+	slowTime = slowTime or currentTime
+	fastTime = fastTime or currentTime
+
+	if Spring.DiffTimers(currentTime, fastTime) > 0.0333 then
+		_GameFrame(frame)
+		fastTime = currentTime
+	end
+	if Spring.DiffTimers(currentTime, slowTime) > 1 then
+		_GameFrameSlow(frame)
+		slowTime = currentTime
 	end
 end
 
@@ -753,6 +887,14 @@ end
 function gadget:FeatureCreated(featureID)
 	idToDefID[-featureID] = Spring.GetFeatureDefID(featureID)
 	ObjectFinished(featureRendering, featureID, idToDefID[-featureID])
+end
+
+function gadget:UnitDamaged(unitID, unitDefID)
+	ObjectDamaged(unitRendering, unitID, unitDefID)
+end
+
+function gadget:FeatureDamaged(featureID, featureDefID)
+	ObjectDamaged(featureRendering, featureID, featureDefID)
 end
 
 function gadget:RenderUnitDestroyed(unitID, unitDefID)
@@ -810,14 +952,32 @@ local function ReloadCUS(optName, _, _, playerID)
 	if (playerID ~= Spring.GetMyPlayerID()) then
 		return
 	end
+	Spring.Echo("Reloading CUS")
 	gadget:Shutdown()
 	gadget:Initialize()
+end
+
+local function DisableCUS(optName, _, _, playerID)
+	if (playerID ~= Spring.GetMyPlayerID()) then
+		return
+	end
+	Spring.Echo("Removing CUS")
+	gadget:Shutdown()
+end
+
+local function UpdateSun(optName, _, _, playerID)
+	sunChanged = true
 end
 
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 
 function gadget:Initialize()
+	if BAR_COMPAT then
+		Spring.Echo("Removing CUS due to 105+")
+		gadgetHandler:RemoveGadget()
+		return
+	end
 	--// GG assignment
 	GG.CUS = {}
 
@@ -831,7 +991,8 @@ function gadget:Initialize()
 
 	shadows = Spring.HaveShadows()
 
-	bug3734wa = Spring.GetConfigInt("bug3734wa", 0) > 0
+	sunChanged = true --always on on load/reload
+	optionsChanged = true --just in case
 
 	local normalmapping = Spring.GetConfigInt("NormalMapping", 1) > 0
 	local treewind = Spring.GetConfigInt("TreeWind", 1) > 0
@@ -840,30 +1001,38 @@ function gadget:Initialize()
 		shadowmapping     = shadows,
 		normalmapping     = normalmapping,
 		treewind          = treewind,
-		--metal_highlight   = false,
 	}
 
 	for _, rendering in ipairs(allRendering) do
 		for matName, matTable in pairs(rendering.materialDefs) do
 
-			local allOptions = matTable.GetAllOptions()
-			for opt, _ in pairs(allOptions) do
-				if not registeredOptions[opt] then
-					registeredOptions[opt] = true
-					gadgetHandler:AddChatAction(opt, _ProcessOptions)
+			if matTable.GetAllOptions then
+				local allOptions = matTable.GetAllOptions()
+				for opt, _ in pairs(allOptions) do
+					if not registeredOptions[opt] then
+						registeredOptions[opt] = true
+						gadgetHandler:AddChatAction(opt, _ProcessOptions)
+					end
+				end
+
+				for optName, optValue in pairs(commonOptions) do
+					_ProcessOptions(optName, nil, optValue, Spring.GetMyPlayerID())
 				end
 			end
-
-			for optName, optValue in pairs(commonOptions) do
-				_ProcessOptions(optName, nil, optValue, Spring.GetMyPlayerID())
-			end
-
 		end
 	end
 
 	BindMaterials()
+	gadgetHandler:AddChatAction("updatesun", UpdateSun)
 	gadgetHandler:AddChatAction("cusreload", ReloadCUS)
 	gadgetHandler:AddChatAction("reloadcus", ReloadCUS)
+	gadgetHandler:AddChatAction("disablecus", DisableCUS)
+	gadgetHandler:AddChatAction("cusdisable", DisableCUS)
+
+	if not USE_OBJECT_DAMAGE then
+		gadgetHandler:RemoveCallIn("UnitDamaged")
+		--gadgetHandler:RemoveCallIn("FeatureDamaged")
+	end
 end
 
 function gadget:Shutdown()

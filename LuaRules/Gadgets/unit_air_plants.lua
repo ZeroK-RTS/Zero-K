@@ -30,18 +30,17 @@ local InsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local GiveOrderToUnit = Spring.GiveOrderToUnit
 local GetUnitDefID = Spring.GetUnitDefID
 
-local AIRPLANT = {
-	[UnitDefNames.factoryplane.id] = {land = true},
-	[UnitDefNames.factorygunship.id] = {land = false},
-	[UnitDefNames.plateplane.id] = {land = true},
-	[UnitDefNames.plategunship.id] = {land = false},
-}
+local AIRPLANT = {}
 
-if UnitDefNames["pw_bomberfac"] then
-	AIRPLANT[UnitDefNames["pw_bomberfac"].id] = {land = false}
-end
-if UnitDefNames["pw_dropfac"] then
-	AIRPLANT[UnitDefNames["pw_dropfac"].id] = {land = false}
+for unitDefID, ud in pairs(UnitDefs) do
+	if (ud.customParams.factory_land_state ~= nil) then
+		-- "factory_land_state" customParam defines that unit is air factory and should have CMD_AP_FLY_STATE command available.
+		-- The value 0 or 1 is the initial value of that state.
+
+		AIRPLANT[unitDefID] = {
+			land = Spring.Utilities.tobool(ud.customParams.factory_land_state),
+		}
+	end
 end
 
 local plantList = {}
@@ -55,20 +54,10 @@ local landCmd = {
 	params  = { '1', ' Fly ', 'Land'}
 }
 
-local repairCmd = {
-	id      = CMD_AP_AUTOREPAIRLEVEL,
-	name    = "apAirRepair",
-	action  = "apAirRepair",
-	type    = CMDTYPE.ICON_MODE,
-	tooltip = "Plant Repair Level: settings for Aircraft leaving the plant",
-	params  = { '0', 'LandAt 0', 'LandAt 30', 'LandAt 50', 'LandAt 80'}
-}
-
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if AIRPLANT[unitDefID] then
 		landCmd.params[1] = (AIRPLANT[unitDefID].land and '1') or '0'
 		InsertUnitCmdDesc(unitID, 500, landCmd)
-		--InsertUnitCmdDesc(unitID, 500, repairCmd)
 		plantList[unitID] = {flyState=(AIRPLANT[unitDefID].land and 1) or 0, repairAt=0}
 		Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
 	elseif plantList[builderID] then
@@ -101,15 +90,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
 			end
 			return false
-			--[[
-		elseif (cmdID == CMD_AP_AUTOREPAIRLEVEL) then
-			local cmdDescID = FindUnitCmdDesc(unitID, CMD_AP_AUTOREPAIRLEVEL)
-			repairCmd.params[1] = cmdParams[1]
-			EditUnitCmdDesc(unitID, cmdDescID, repairCmd)
-			plantList[unitID].repairAt = cmdParams[1]
-			repairCmd.params[1] = 1
-			return false
-			--]]
 		end
 	end
 	return true

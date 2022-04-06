@@ -2,8 +2,8 @@ return { vehriot = {
   unitname            = [[vehriot]],
   name                = [[Ripper]],
   description         = [[Riot Rover]],
-  acceleration        = 0.159,
-  brakeRate           = 1.24,
+  acceleration        = 0.191,
+  brakeRate           = 1.488,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[vehriot.png]],
@@ -19,20 +19,22 @@ return { vehriot = {
   customParams        = {
     selection_scale   = 0.85,
     aim_lookahead     = 100,
+    set_target_range_buffer = 50,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehicleriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 1020,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -56,7 +58,7 @@ return { vehriot = {
   trackType           = [[StdTank]],
   trackWidth          = 28,
   turninplace         = 0,
-  turnRate            = 390,
+  turnRate            = 624,
   workerTime          = 0,
 
   weapons             = {
@@ -93,7 +95,6 @@ return { vehriot = {
       damage                  = {
         default = 260.2,
         planes  = 260.2,
-        subs    = 13.5,
       },
 
       edgeEffectiveness       = 0.75,

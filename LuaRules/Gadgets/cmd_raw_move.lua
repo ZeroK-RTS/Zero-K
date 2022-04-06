@@ -102,6 +102,9 @@ for i = 1, #UnitDefs do
 			-- Lower stopping distance for more precise placement on terrain
 			loneStopDist = 4
 		end
+		if ud.customParams.unstick_leeway then
+			startMovingTime[i] = tonumber(ud.customParams.unstick_leeway)
+		end
 		if ud.canFly then
 			canFlyDefs[i] = true
 			stopDist = ud.speed
@@ -168,7 +171,9 @@ local commonStopRadius = {}
 local oldCommandStoppingRadius = {}
 local commandCount = {}
 local oldCommandCount = {}
-local fromFactory = {}
+local fromFactoryReplaceSkip = {}
+local engineMoveAppeared = {}
+local fromFactoryID = {}
 
 local constructors = {}
 local constructorBuildDist = {}
@@ -178,6 +183,7 @@ local constructorsPerFrame = 0
 local constructorIndex = 1
 local alreadyResetConstructors = false
 
+local checkEngineMove
 local moveCommandReplacementUnits
 local fastConstructorUpdate
 
@@ -476,6 +482,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if cmdID == CMD_MOVE and not canFlyDefs[unitDefID] then
 		moveCommandReplacementUnits = moveCommandReplacementUnits or {}
 		moveCommandReplacementUnits[#moveCommandReplacementUnits + 1] = unitID
+		engineMoveAppeared[unitID] = Spring.GetGameFrame()
 	end
 
 	if constructorBuildDistDefs[unitDefID] and not rawBuildUpdateIgnore[cmdID] then
@@ -666,8 +673,8 @@ end
 local function ReplaceMoveCommand(unitID)
 	local cmdID, _, cmdTag, cmdParam_1, cmdParam_2, cmdParam_3 = spGetUnitCurrentCommand(unitID)
 	if cmdID == CMD_MOVE and cmdParam_3 then
-		if fromFactory[unitID] then
-			fromFactory[unitID] = nil
+		if fromFactoryReplaceSkip[unitID] then
+			fromFactoryReplaceSkip[unitID] = nil
 		else
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, cmdParam_1, cmdParam_2, cmdParam_3}, CMD_OPT_ALT)
 		end
@@ -689,6 +696,54 @@ local function UpdateMoveReplacement()
 		end
 	end
 	moveCommandReplacementUnits = nil
+end
+
+local function DoFactoryWaypointManually(unitID)
+	local cQueue = spGetCommandQueue(unitID, -1)
+	local foundRightOpts = false
+	for i = 1, #cQueue do
+		if cQueue[i].id ~= CMD_MOVE then
+			return
+		end
+		if cQueue[i].options.coded == 8 then
+			foundRightOpts = true
+		end
+	end
+	if not foundRightOpts then
+		return
+	end
+	local facID = fromFactoryID[unitID]
+	if not Spring.ValidUnitID(facID) then
+		return
+	end
+	local factoryQueue = spGetCommandQueue(facID, -1)
+	local orderArray = {}
+	for i = 1, #factoryQueue do
+		orderArray[i] = {
+			factoryQueue[i].id,
+			factoryQueue[i].params,
+			factoryQueue[i].options.coded
+		}
+	end
+	Spring.GiveOrderArrayToUnitArray({unitID}, orderArray)
+end
+
+local function UpdateEngineMoveCheck(frame)
+	-- Maybe this could be done one frame earlier, but I've already written it this
+	-- way and I don't want to unrewrite it if gadget:UnitFromFactory has recursion.
+	-- See https://github.com/ZeroK-RTS/Zero-K/issues/4317 for a test case.
+	if not checkEngineMove then
+		return
+	end
+
+	for i = 1, #checkEngineMove do
+		local unitID = checkEngineMove[i]
+		if engineMoveAppeared[unitID] ~= frame - 1 then
+			DoFactoryWaypointManually(unitID)
+		end
+		fromFactoryID[unitID] = nil
+	end
+	checkEngineMove = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -715,7 +770,10 @@ local function RawMove_IsPathFree(unitDefID, sX, sZ, gX, gZ)
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-	fromFactory[unitID] = true
+	fromFactoryReplaceSkip[unitID] = true
+	fromFactoryID[unitID] = facID
+	checkEngineMove = checkEngineMove or {}
+	checkEngineMove[#checkEngineMove + 1] = unitID
 end
 
 function gadget:Initialize()
@@ -758,6 +816,7 @@ function gadget:GameFrame(n)
 	end
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
+	UpdateEngineMoveCheck(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}

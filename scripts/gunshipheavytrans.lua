@@ -76,7 +76,6 @@ local SIG_CLOSEDOORS = 2
 local SIG_AIM = 4
 local SIG_AIM2 = 8
 local SIG_AIM3 = 16
-local SIG_RESTORE = 32
 local SIG_TOL = 64
 
 local doorSpeed = 3
@@ -391,7 +390,7 @@ function script.BeginTransport(passengerID)
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
-	if not GG.TransportAllowed(passengerID) then
+	if not GG.TransportAllowed(unitID, passengerID) then
 		Sleep(10)
 		unitLoaded = passengerID
 		ForceDropUnit()

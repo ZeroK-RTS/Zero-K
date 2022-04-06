@@ -9,6 +9,8 @@ local imageDir = 'LuaUI/Images/commands/'
 local tooltips = {
 	WANT_ONOFF = "Activation (_STATE_)\n  Toggles unit abilities such as radar, shield charge, and radar jamming.",
 	UNIT_AI = "Unit AI (_STATE_)\n  Move intelligently in combat.",
+	FIRE_AT_SHIELD = "Fire at Shields (_STATE_)\n  Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+	FIRE_TOWARDS_ENEMY = "Fire Towards Enemies (_STATE_)\n  Shoot towards enemies when there are no other targets.",
 	REPEAT = "Repeat (_STATE_)\n  Loop factory construction, or the command queue for units.",
 	WANT_CLOAK = "Cloak (_STATE_)\n  Turn invisible. Disrupted by damage, firing, abilities, and nearby enemies.",
 	CLOAK_SHIELD = "Area Cloaker (_STATE_)\n  Cloak all friendly units in the area. Does not apply to structures or shield bearers.",
@@ -28,11 +30,13 @@ local tooltips = {
 	DISABLE_ATTACK = "Allow Attack Commands (_STATE_)\n  Set whether the unit responds to attack commands.",
 	PUSH_PULL = "Impulse Mode (_STATE_)\n  Set whether gravity guns push or pull.",
 	DONT_FIRE_AT_RADAR = "Fire At Radar State (_STATE_)\n  Set whether precise units with high reload time fire at radar dots.",
+	PREVENT_BAIT = "Avoid Bad Targets (_STATE_)\n  _DESC_",
 	PREVENT_OVERKILL = "Overkill Prevention (_STATE_)\n  Prevents units from shooting at already doomed enemies.",
 	TRAJECTORY = "Trajectory (_STATE_)\n  Set whether units fire at a high or low arc.",
 	AIR_STRAFE = "Gunship Strafe (_STATE_)\n  Set whether gunships strafe when fighting.",
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
+	FORMATION_RANK = "Formation Rank (_STATE_)\n  set rank in formation.",
 	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
 }
 
@@ -61,6 +65,7 @@ local commandDisplayConfig = {
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', tooltip = "Load: Pick up a unit. Click and drag to load unit in an area."},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', tooltip = "Unload: Set down a carried unit. Click and drag to unload in an area."},
 	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', tooltip = "Area Attack: Indiscriminately bomb the terrain in an area."},
+	[CMD_BUILD_PLATE] = {texture = imageDir .. 'Bold/buildplate.png', tooltip = "Build Plate: Place near a factory for an extra production queue."},
 
 	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
 	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
@@ -72,10 +77,13 @@ local commandDisplayConfig = {
 	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
 
 	[CMD_AREA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
+	[CMD_AREA_TERRA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
 
 	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},
 
 	[CMD_FIND_PAD] = {texture = imageDir .. 'Bold/rearm.png', tooltip = "Resupply: Return to nearest Airpad for repairs and, for bombers, ammo."},
+
+	[CMD_EXCLUDE_PAD] = {texture = imageDir .. 'Bold/excludeairpad.png', tooltip = "Exclude Airpad: Toggle whether any of your aircraft use the targeted airpad."},
 
 	[CMD_EMBARK] = {texture = imageDir .. 'Bold/embark.png'},
 	[CMD_DISEMBARK] = {texture = imageDir .. 'Bold/disembark.png'},
@@ -101,6 +109,14 @@ local commandDisplayConfig = {
 	[CMD_UNIT_AI] = {
 		texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'},
 		stateTooltip = {tooltips.UNIT_AI:gsub("_STATE_", "Disabled"), tooltips.UNIT_AI:gsub("_STATE_", "Enabled")},
+	},
+	[CMD_FIRE_TOWARDS_ENEMY] = {
+		texture = {imageDir .. 'states/shoot_towards_off.png', imageDir .. 'states/shoot_towards_on.png'},
+		stateTooltip = {tooltips.FIRE_TOWARDS_ENEMY:gsub("_STATE_", "Disabled"), tooltips.FIRE_TOWARDS_ENEMY:gsub("_STATE_", "Enabled")},
+	},
+	[CMD_FIRE_AT_SHIELD] = {
+		texture = {imageDir .. 'states/ward_off.png', imageDir .. 'states/ward_on.png'},
+		stateTooltip = {tooltips.FIRE_AT_SHIELD:gsub("_STATE_", "Disabled"), tooltips.FIRE_AT_SHIELD:gsub("_STATE_", "Enabled")},
 	},
 	[CMD.REPEAT] = {
 		texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'},
@@ -175,6 +191,22 @@ local commandDisplayConfig = {
 				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Return Fire"),
 				tooltipsAlternate.FIRE_STATE:gsub("_STATE_", "Fire At Will")
 			},
+		}
+	},
+	[CMD_PREVENT_BAIT] = {
+		texture = {
+			imageDir .. 'states/bait_off_alternate.png',
+			imageDir .. 'states/bait_1.png',
+			imageDir .. 'states/bait_2.png',
+			imageDir .. 'states/bait_3.png',
+			imageDir .. 'states/bait_4.png',
+		},
+		stateTooltip = {
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Disabled"):gsub("_DESC_", "Enable this to ignore bad targets when not on Force Fire or Attack Move."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Free"):gsub("_DESC_", "Avoid light drones, Wind, Solar, Claw, Dirtbag and armoured targets."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Light"):gsub("_DESC_", "Avoid cost under 90, Razor, Sparrow, unknown radar and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Medium"):gsub("_DESC_", "Avoid cost under 240, minus Stardust, Raptor, unknown radar and armour."),
+			tooltips.PREVENT_BAIT:gsub("_STATE_", "Heavy"):gsub("_DESC_", "Avoid cost under 420, unknown radar dots and armour."),
 		}
 	},
 	[CMD_RETREAT] = {
@@ -254,6 +286,15 @@ local commandDisplayConfig = {
 			tooltips.SELECTION_RANK:gsub("_STATE_", "1"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "2"),
 			tooltips.SELECTION_RANK:gsub("_STATE_", "3")
+		}
+	},
+	[CMD_FORMATION_RANK] = {
+		texture = {imageDir .. 'states/formation_rank_0.png', imageDir .. 'states/formation_rank_1.png', imageDir .. 'states/formation_rank_2.png', imageDir .. 'states/formation_rank_3.png'},
+		stateTooltip = {
+			tooltips.FORMATION_RANK:gsub("_STATE_", "0"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "1"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "2"),
+			tooltips.FORMATION_RANK:gsub("_STATE_", "3")
 		}
 	},
 	[CMD_TOGGLE_DRONES] = {
@@ -391,12 +432,21 @@ for i = 1, 5 do
 	}
 end
 
+local factoryButtonLayoutOverride = {
+	[4] = {
+		[3] = {
+			buttonLayoutConfig = buttonLayoutConfig.command,
+			isStructure = false,
+		}
+	}
+}
+
 local commandPanels = {
 	{
 		humanName = "Orders",
 		name = "orders",
 		inclusionFunction = function(cmdID)
-			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
+			return cmdID >= 0 and not buildCmdFactory[cmdID] and not buildCmdSpecial[cmdID]-- Terraform and Plate
 		end,
 		loiterable = true,
 		buttonLayoutConfig = buttonLayoutConfig.command,
@@ -454,10 +504,12 @@ local commandPanels = {
 		end,
 		isBuild = true,
 		isStructure = true,
+		notBuildRow = 3,
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_factory",
 		buttonLayoutConfig = buttonLayoutConfig.build,
+		buttonLayoutOverride = factoryButtonLayoutOverride,
 	},
 	{
 		humanName = "Units",

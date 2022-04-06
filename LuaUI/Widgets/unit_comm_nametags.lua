@@ -108,7 +108,8 @@ local comms = {}
 local function GetCommAttributes(unitID, unitDefID)
   local team = GetUnitTeam(unitID)
   local _, player = GetTeamInfo(team, false)
-  local name = GetPlayerInfo(player, false) or 'name unknown'
+  local _, aiName = Spring.GetAIInfo(team)
+  local name = aiName or GetPlayerInfo(player, false) or 'name unknown'
   local r, g, b, a = GetTeamColor(team)
   local height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + heightOffset
   local pm = spGetUnitPieceMap(unitID)

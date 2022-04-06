@@ -5,13 +5,6 @@ Spring.Echo("Loading ArmorDefs_posts")
 --------------------------------------------------------------------------------
 
 local armorDefs = {
-  
-  SUBS = {
-    "subraider",
-    "subscout",
-    "subtacmissile",
-  },
-
   CHICKEN = {
     "nest",
 	"chicken_drone",

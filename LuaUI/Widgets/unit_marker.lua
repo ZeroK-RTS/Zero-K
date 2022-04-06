@@ -9,9 +9,22 @@ function widget:GetInfo() return {
 } end
 
 local knownUnits = {}
-local unitList = {}
+local unitList
+local activeDefID = {}
 
 local markingActive = false
+
+local sp = Spring
+local spGetAIInfo          = sp.GetAIInfo
+local spGetPlayerInfo      = sp.GetPlayerInfo
+local spGetSpectatingState = sp.GetSpectatingState
+local spGetTeamInfo        = sp.GetTeamInfo
+local spGetUnitDefID       = sp.GetUnitDefID
+local spGetUnitHealth      = sp.GetUnitHealth
+local spGetUnitPosition    = sp.GetUnitPosition
+local spIsUnitAllied       = sp.IsUnitAllied
+local spMarkerAddPoint     = sp.MarkerAddPoint
+local sputGetHumanName     = sp.Utilities.GetHumanName
 
 if VFS.FileExists("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW) then
 	unitList = VFS.Include("LuaUI/Configs/unit_marker_local.lua", nil, VFS.RAW)
@@ -37,14 +50,14 @@ options = {
 					options[opt].value = true
 				end
 			end
-			for unitDefID,_ in pairs(unitList) do
-				unitList[unitDefID].active = true
+			for unitDefID in pairs(unitList) do
+				activeDefID[unitDefID] = true
 			end
 			if not markingActive then
 				widgetHandler:UpdateCallIn('UnitEnteredLos')
 				markingActive = true
 			end
-        end,
+		end,
 		noHotkey = true,
 	},
 	disableAll = {
@@ -63,84 +76,92 @@ options = {
 				end
 			end
 			for unitDefID,_ in pairs(unitList) do
-				unitList[unitDefID].active = false
+				activeDefID[unitDefID] = false
 			end
 			if markingActive then
 				widgetHandler:RemoveCallIn('UnitEnteredLos')
 				markingActive = false
 			end
-        end,
+		end,
 		noHotkey = true,
 	},
-	
 	unitslabel = {name = "unitslabel", type = 'label', value = "Individual Toggles", path = options_path},
 }
 
-for unitDefID,_ in pairs(unitList) do
-	local ud = (not unitDefID) or UnitDefs[unitDefID]
-	if ud then
-		options[ud.name .. "_mark"] = {
-			name = "  " .. Spring.Utilities.GetHumanName(ud) or "",
-			type = 'bool',
-			value = false,
-			OnChange = function (self)
-				unitList[unitDefID].active = self.value
-				if self.value and not markingActive then
-					widgetHandler:UpdateCallIn('UnitEnteredLos')
-					markingActive = true
-				end
-			end,
-			noHotkey = true,
-		}
-		options_order[#options_order+1] = ud.name .. "_mark"
-	end
+for unitDefID in pairs(unitList) do
+	local ud = UnitDefs[unitDefID]
+	options[ud.name .. "_mark"] = {
+		name = "  " .. sputGetHumanName(ud) or "",
+		type = 'bool',
+		value = false,
+		OnChange = function (self)
+			activeDefID[unitDefID] = self.value
+			if self.value and not markingActive then
+				widgetHandler:UpdateCallIn('UnitEnteredLos')
+				markingActive = true
+			end
+		end,
+		noHotkey = true,
+	}
+	options_order[#options_order+1] = ud.name .. "_mark"
 end
 
-function widget:Initialize()
+local function refreshCallin()
 	if not markingActive then
 		widgetHandler:RemoveCallIn("UnitEnteredLos")
 	end
-	if Spring.GetSpectatingState() then
+	if spGetSpectatingState() then
 		widgetHandler:RemoveCallIn("UnitEnteredLos")
 	elseif markingActive then
 		widgetHandler:UpdateCallIn('UnitEnteredLos')
 	end
 end
 
-function widget:PlayerChanged ()
-	widget:Initialize ()
-end
-
-function widget:TeamDied ()
-	widget:Initialize ()
-end
+widget.PlayerChanged = refreshCallin
+widget.Initialize = refreshCallin
+widget.TeamDied = refreshCallin
 
 function widget:UnitEnteredLos (unitID, teamID)
-	if Spring.IsUnitAllied(unitID) or Spring.GetSpectatingState() then return end
-
-	local unitDefID = Spring.GetUnitDefID (unitID)
-	if not unitDefID then return end -- safety just in case
-
-	if unitList[unitDefID] and unitList[unitDefID].active and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
-		local x, y, z = Spring.GetUnitPosition(unitID)
-		local markerText = unitList[unitDefID].markerText or Spring.Utilities.GetHumanName(UnitDefs[unitDefID])
-		if not unitList[unitDefID].mark_each_appearance then
-			knownUnits[unitID] = unitDefID
-		end
-		if unitList[unitDefID].show_owner then
-			local _,playerID,_,isAI = Spring.GetTeamInfo(teamID, false)
-			local owner_name
-			if isAI then
-				local _,botName,_,botType = Spring.GetAIInfo(teamID)
-				owner_name = (botType or "AI") .." - " .. (botName or "unnamed")
-			else
-				owner_name = Spring.GetPlayerInfo(playerID, false) or "nobody"
-			end
-
-			markerText = markerText .. " (" .. owner_name .. ")"
-		end
-		Spring.MarkerAddPoint (x, y, z, markerText, true)
+	if spIsUnitAllied(unitID) or spGetSpectatingState() then
+		return
 	end
+
+	local unitDefID = spGetUnitDefID (unitID)
+	if not unitDefID or not activeDefID[unitDefID] then
+		return
+	end
+
+	local data = unitList[unitDefID]
+	if not data or knownUnits[unitID] == unitDefID then
+		return
+	end
+
+	local markerText = data.markerText or sputGetHumanName(UnitDefs[unitDefID])
+
+	if not data.mark_each_appearance then
+		knownUnits[unitID] = unitDefID
+	end
+
+	if data.show_owner then
+		local _,playerID,_,isAI = spGetTeamInfo(teamID, false)
+		local owner_name
+		if isAI then
+			local _,botName,_,botType = spGetAIInfo(teamID)
+			owner_name = (botType or "AI") .." - " .. (botName or "unnamed")
+		else
+			owner_name = spGetPlayerInfo(playerID, false) or "nobody"
+		end
+
+		markerText = markerText .. " (" .. owner_name .. ")"
+	end
+
+	local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+	if buildProgress < 1 then
+		markerText = markerText .. " (" .. math.floor(100 * buildProgress) .. "%)"
+	end
+
+	local x, y, z = spGetUnitPosition(unitID)
+	spMarkerAddPoint (x, y, z, markerText, true)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)

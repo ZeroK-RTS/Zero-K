@@ -1,12 +1,12 @@
 return { striderantiheavy = {
   unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
-  description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
+  description            = [[Cloaked Anti-Strider Walker (Undersea Fire)]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
   autoHeal               = 5,
   brakeRate              = 2.25,
-  buildCostMetal         = 2000,
+  buildCostMetal         = 2500,
   buildPic               = [[striderantiheavy.png]],
   canGuard               = true,
   canMove                = true,
@@ -20,6 +20,7 @@ return { striderantiheavy = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[21]],
   },
 
@@ -28,15 +29,13 @@ return { striderantiheavy = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[corcommander]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
   maxDamage              = 2000,
   maxSlope               = 36,
   maxVelocity            = 1.55,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 100,
+  minCloakDistance       = 120,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[noruas]],
@@ -59,7 +58,7 @@ return { striderantiheavy = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
 
   weapons                = {
@@ -99,7 +98,7 @@ return { striderantiheavy = {
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 250,
-      reloadtime              = 1.5,
+      reloadtime              = 2,
       size                    = 6,
       soundHit                = [[explosion/ex_med6]],
       soundStart              = [[weapon/laser/heavy_laser4]],

@@ -49,6 +49,7 @@ Object = {
 	OnMouseOut      = {},
 	OnKeyPress      = {},
 	OnTextInput     = {},
+	OnTextModified  = {},
 	OnTextEditing   = {},
 	OnFocusUpdate   = {},
 	OnHide          = {},
@@ -1061,6 +1062,15 @@ end
 
 function Object:TextInput(...)
 	if (self:CallListeners(self.OnTextInput, ...)) then
+		return self
+	end
+
+	return false
+end
+
+
+function Object:TextModified(...)
+	if (self:CallListeners(self.OnTextModified, ...)) then
 		return self
 	end
 

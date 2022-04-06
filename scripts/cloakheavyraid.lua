@@ -49,7 +49,8 @@ local SIG_Walk = 1
 local SIG_Aim = 2
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 function script.Create()
@@ -197,11 +198,15 @@ local function RestoreAfterDelay()
 	aiming = false
 end
 
-function script.QueryWeapon1() return head end
+function script.QueryWeapon()
+	return head
+end
 
-function script.AimFromWeapon1() return head end
+function script.AimFromWeapon()
+	return head
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	aiming = true
@@ -216,7 +221,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	Turn(lforearm, x_axis, 0.4, 5)
 	Turn(lshoulder, z_axis, - 0, 12)
 	Turn(lshoulder, x_axis, - 0.7, 12)

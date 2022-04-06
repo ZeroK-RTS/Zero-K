@@ -16,24 +16,26 @@ return { cloakarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius       = [[14]],
     selection_scale   = 0.85,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 15.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[kbotarty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 350,
   maxSlope               = 36,
-  maxVelocity            = 1.6,
+  maxVelocity            = 1.5,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
-  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SMALL]],
   objectName             = [[cloakarty.s3o]],
   script                 = [[cloakarty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
@@ -54,7 +56,7 @@ return { cloakarty = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1500,
+  turnRate               = 1800,
   upright                = true,
 
   weapons                = {
@@ -83,9 +85,8 @@ return { cloakarty = {
       },
 
       damage                  = {
-        default = 150.1,
-        planes  = 150.1,
-        subs    = 7.5,
+        default = 140.1,
+        planes  = 140.1,
       },
 
       edgeEffectiveness       = 0.1,

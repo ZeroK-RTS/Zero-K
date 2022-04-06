@@ -10,16 +10,14 @@ local head1, head2, nano1, nano2, nano3, nano4 = piece('head1', 'head2', 'nano1'
 
 --local vars
 local nanoPieces = {nano1, nano2, nano3, nano4}
-local nanoIdx = 1
 local smokePiece = {base, head1, head2}
 
 local SIG_Open = 1
-local SIG_Close = 2
 
 --opening animation of the factory
 local function Open()
-	Signal(SIG_Close)
-	--SetSignalMask(SIG_Open)
+	Signal(SIG_Open)
+	SetSignalMask(SIG_Open)
 
 	Move(center1, z_axis, 0, 10)
 	Move(center2, z_axis, 0, 10)
@@ -32,12 +30,13 @@ local function Open()
 --	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 --closing animation of the factory
 local function Close()
 	Signal(SIG_Open) --kill the opening animation if it is in process
-	SetSignalMask(SIG_Close) --set the signal to kill the closing animation
+	SetSignalMask(SIG_Open) --set the signal to kill the closing animation
 
 --	SetUnitValue(COB.YARD_OPEN, 0)
 	SetUnitValue(COB.BUGGER_OFF, 0)
@@ -57,21 +56,6 @@ function script.Create()
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-end
-
-function script.QueryNanoPiece()
-	if (nanoIdx == 4) then
-		nanoIdx = 1
-	else
-		nanoIdx = nanoIdx + 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
-	return nano
 end
 
 function script.Activate ()

@@ -169,7 +169,6 @@ end
 function gadget:GameFrame(n)
 	gameFrame = n
 	if (n%CHECK_INTERVAL<1)and(next(unitsOnFire)) then
-		local burningUnits = {}
 		local cnt = 1
 		inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
@@ -180,8 +179,6 @@ function gadget:GameFrame(n)
 			else
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
 				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponID )
-				--Spring.Echo(t.attackerDefID)
-				burningUnits[cnt] = unitID
 				cnt=cnt+1
 			end
 		end

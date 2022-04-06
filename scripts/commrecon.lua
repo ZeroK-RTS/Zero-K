@@ -1,8 +1,6 @@
 include "constants.lua"
 include "JumpRetreat.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -392,14 +390,6 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
-end
-
 function script.QueryWeapon(num)
 	if num == 3 then
 		return grenade
@@ -433,9 +423,6 @@ local function JumpExhaust()
 	end
 end
 
-function preJump(turn, distance)
-end
-
 function beginJump()
 	inJumpMode = true
 	--[[
@@ -447,9 +434,6 @@ function jumping()
 	GG.PokeDecloakUnit(unitID, unitDefID)
 	EmitSfx(jx1, 1028)
 	EmitSfx(jx2, 1028)
-end
-
-function halfJump()
 end
 
 function endJump()
@@ -471,11 +455,6 @@ function script.StartBuilding(heading, pitch)
 	BuildPose(heading, pitch)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	restoreHeading, restorePitch = heading, pitch
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
 end
 
 function script.Killed(recentDamage, maxHealth)

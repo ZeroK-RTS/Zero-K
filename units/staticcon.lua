@@ -2,8 +2,6 @@ return { staticcon = {
   unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
   description                   = [[Construction Assistant]],
-  acceleration                  = 0,
-  brakeRate                     = 1.5,
   buildCostMetal                = 180,
   buildDistance                 = 500,
   builder                       = true,
@@ -28,6 +26,11 @@ return { staticcon = {
     modelradius      = [[24]],
     default_spacing  = 1,
     like_structure   = 1,
+    select_show_eco  = 1,
+
+    outline_x = 80,
+    outline_y = 85,
+    outline_yoff = 13.5,
   },
 
   explodeAs                     = [[NANOBOOM2]],
@@ -35,20 +38,16 @@ return { staticcon = {
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[staticbuilder]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   maxDamage                     = 500,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[staticcon.lua]],
   selfDestructAs                = [[NANOBOOM2]],
   showNanoSpray                 = false,
   sightDistance                 = 380,
-  turnRate                      = 1,
   upright                       = true,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
@@ -56,11 +55,11 @@ return { staticcon = {
   featureDefs                   = {
 
     DEAD = {
-      blocking         = false,
+      blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[debris4x4a.s3o]],
+      object           = [[armsenan_dead.dae]],
     },
 
     HEAP = {

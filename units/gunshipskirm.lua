@@ -3,7 +3,7 @@ return { gunshipskirm = {
   name                   = [[Harpy]],
   description            = [[Multi-Role Support Gunship]],
   acceleration           = 0.152,
-  brakeRate              = 0.1216,
+  brakeRate              = 0.145,
   buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[gunshipskirm.png]],
@@ -19,6 +19,7 @@ return { gunshipskirm = {
   cruiseAlt              = 140,
 
   customParams           = {
+    bait_level_default = 0,
     airstrafecontrol = [[1]],
     modelradius    = [[16]],
   },
@@ -29,11 +30,8 @@ return { gunshipskirm = {
   footprintZ             = 3,
   hoverAttack            = true,
   iconType               = [[gunshipskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  maxDamage              = 1100,
+  maxDamage              = 1200,
   maxVelocity            = 3.8,
-  minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
   script                 = [[gunshipskirm.lua]],
@@ -82,8 +80,7 @@ return { gunshipskirm = {
       },
 
       damage                  = {
-        default = 200.1,
-        subs    = 10,
+        default = 220.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],

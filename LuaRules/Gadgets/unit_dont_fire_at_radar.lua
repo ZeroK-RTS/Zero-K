@@ -24,23 +24,20 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitLosState     = Spring.GetUnitLosState
-local spGetCommandQueue     = Spring.GetCommandQueue
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitPosition     = Spring.GetUnitPosition
 
 local floor = math.floor
 
-local CMD_ATTACK		= CMD.ATTACK
-local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
-local CMD_FIRE_STATE 	= CMD.FIRE_STATE
-local CMD_INSERT 		= CMD.INSERT
-local CMD_REMOVE 		= CMD.REMOVE
+local CMD_ATTACK        = CMD.ATTACK
+local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL
+local CMD_FIRE_STATE    = CMD.FIRE_STATE
+local CMD_INSERT        = CMD.INSERT
+local CMD_REMOVE        = CMD.REMOVE
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

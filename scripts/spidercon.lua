@@ -22,8 +22,7 @@ local nanoPiece = flare
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM = 2
-local SIG_BUILD = 3
+local SIG_BUILD = 2
 local SIG_STOPBUILD = 4
 
 local PERIOD = 0.22
@@ -124,11 +123,6 @@ function script.StopBuilding()
 		Turn(cover_r,z_axis,0, math.rad(250))
 		Turn(cover_l,z_axis,0, math.rad(250))
 	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),flare)
-	return flare
 end
 
 function script.Killed(recentDamage, maxHealth)

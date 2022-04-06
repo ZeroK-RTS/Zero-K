@@ -30,15 +30,9 @@ local UNSTICK_CONSTANT = 4
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetCommandQueue = Spring.GetCommandQueue
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local getMovetype = Spring.Utilities.getMovetype
 local abs = math.abs
@@ -133,9 +127,11 @@ local function DetatchFromGround(unitID, threshold, height, doImpulse)
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, doImpulse, 0)
 		end
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
-		Spring.MoveCtrl.Disable(unitID)
+		if not Spring.MoveCtrl.IsEnabled(unitID) then
+			Spring.MoveCtrl.Enable(unitID)
+			Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
+			Spring.MoveCtrl.Disable(unitID)
+		end
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, -doImpulse, 0)
 		end
@@ -349,10 +345,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Main Impulse Handling
-
-local function distance(x1,y1,z1,x2,y2,z2)
-	return math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2)
-end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}

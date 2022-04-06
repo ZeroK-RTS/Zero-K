@@ -85,6 +85,7 @@ local color2incolor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local WINDOW_WIDTH  = 450
 local B_HEIGHT 		= 30
 local icon_size 	= 18
 
@@ -168,16 +169,47 @@ end
 local function MakeStatsWindow()
 end
 
-options_order = {'shortNotation', 'text_hotkey'}
+options_order = {'shortNotation', 'window_height', 'window_to_cursor', 'window_pos_x', 'window_pos_y', 'text_hotkey'}
 options_path = 'Help/Unit List'
 options = {
-		
 	shortNotation = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
 		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_height = {
+		name = "Window Height",
+		type = 'number',
+		value = 450,
+		min = 450,
+		max = 1000,
+		desc = 'Set default window height.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_to_cursor = {
+		name = "Create window under cursor",
+		type = 'bool',
+		value = true,
+		desc = 'Creates the window under the mouse cursor, otherwise uses the values below for position.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_x = {
+		name = "Window Default X",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	window_pos_y = {
+		name = "Window Default Y",
+		type = 'number',
+		value = 150,
+		min = 0,
+		max = 2000,
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
 	
@@ -635,7 +667,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if stun_time > 0 then
-			cells[#cells+1] = ' - Stun time:'
+			cells[#cells+1] = ' - Max stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'
 		end
 
@@ -816,7 +848,7 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.noExplode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
-			if not cp.single_hit then
+			if not (cp.single_hit or cp.single_hit_multi) then
 				cells[#cells+1] = ' - Damage increase vs large units'
 				cells[#cells+1] = ''
 			end
@@ -905,11 +937,11 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if ud.cloakCost > 0 and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
+	if ud.canCloak and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
 		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
-		if not ud.isImmobile then
+		if not ud.isImmobile and ud.cloakCost ~= ud.cloakCostMoving then
 			cells[#cells+1] = ' - Upkeep mobile: '
 			cells[#cells+1] = numformat(ud.cloakCostMoving) .. " E/s"
 			cells[#cells+1] = ' - Upkeep idle: '
@@ -1070,7 +1102,11 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = 'Speed boost'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Speed: '
-		cells[#cells+1] = 'x' .. cp.boost_speed_mult
+		cells[#cells+1] = math.floor((tonumber(cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
+		if cp.boost_reload_speed_mult then
+			cells[#cells+1] = ' - Cooldown speed: '
+			cells[#cells+1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1")*100) + 0.5) .. "%"
+		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30, 1) .. 's'
 		cells[#cells+1] = ' - Reload: '
@@ -1128,9 +1164,13 @@ local function printAbilities(ud, unitID)
 
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		cells[#cells+1] = 'Transport: '
-		cells[#cells+1] = ((ud.customParams.islighttransport) and "Light" or "Heavy")
+		cells[#cells+1] = (((ud.customParams.islightonlytransport) and "Light") or ((ud.customParams.islighttransport) and "Medium") or "Heavy")
 		cells[#cells+1] = 'Light Speed: '
 		cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_light or "1")*100) + 0.5) .. "%"
+		if not ud.customParams.islightonlytransport then
+			cells[#cells+1] = 'Medium Speed: '
+			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_medium or "1")*100) + 0.5) .. "%"
+		end
 		if not ud.customParams.islighttransport then
 			cells[#cells+1] = 'Heavy Speed: '
 			cells[#cells+1] = math.floor((tonumber(ud.customParams.transport_speed_heavy or "1")*100) + 0.5) .. "%"
@@ -1267,6 +1307,59 @@ local function printWeapons(unitDef, unitID)
 	return cells
 end
 
+local function slopeDegrees(slope)
+	return math.floor(math.deg(math.acos(1 - slope)) + 0.5)
+end
+
+local slopeTolerances = {
+	VEHICLE = 27,
+	BOT = 54,
+	SPIDER = 90,
+}
+
+-- returns the string, plus optionally the slope if it makes sense to show
+local function GetMoveType(ud)
+	if ud.isImmobile then
+		return "Immobile"
+	elseif ud.isStrafingAirUnit then
+		return "Plane"
+	elseif ud.isHoveringAirUnit then
+		return "Gunship"
+	end
+
+	local md = ud.moveDef
+	local smClass = Game.speedModClasses
+
+	if md.smClass == smClass.Ship then
+		-- caveman style workaround for the lack of `md.subMarine`
+		if ud.name == "subraider" or ud.name == "subtacmissile" or ud.name == "subscout" then
+			return "Submarine"
+		else
+			return "Ship"
+		end
+	end
+
+	local slope = slopeDegrees(md.maxSlope)
+	if md.smClass == smClass.Hover then
+		if slope == slopeTolerances.BOT then
+			-- chickens can walk on water!
+			return "Waterwalker", slope
+		else
+			return "Hovercraft", slope
+		end
+	elseif md.depth > 1337 then
+		return "Amphibious", slope
+	elseif slope == slopeTolerances.SPIDER then
+		return "All-terrain", slope
+	elseif md.smClass == smClass.KBot then
+		-- "bot" would sound weird for a chicken, but
+		-- all seem to be either amphs or waterwalkers
+		return "Bot", slope
+	else
+		return "Vehicle", slope
+	end
+end
+
 local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName]
 end
@@ -1391,6 +1484,14 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	if not ud.isImmobile then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
+
+		local mt, slope = GetMoveType(ud)
+		statschildren[#statschildren+1] = Label:New{ caption = 'Movement: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = mt, textColor = color.stats_fg, }
+		if slope then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Climbs: ', textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = slope .. " deg", textColor = color.stats_fg, }
+		end
 	end
 
 	--[[ Enable through some option perhaps
@@ -1437,7 +1538,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	if ud.wantedHeight > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight*1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then
@@ -1445,10 +1546,19 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.pylonrange) .. " elmo", textColor = color.stats_fg, }
 	end
 
+	if ud.customParams.heat_per_shot then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Per Shot: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_per_shot*100) .. "%", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Decay: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_decay*100) .. "%/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Heat Max Slow: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.heat_max_slow*100) .. "%", textColor = color.stats_fg, }
+	end
+
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((ud.customParams.requireheavytrans and "Heavy") or (ud.customParams.requiremediumtrans and "Medium") or "Light"), textColor = color.stats_fg, }
 	end
 
 	if isCommander then
@@ -1631,10 +1741,9 @@ local function tooltipBreakdown(tooltip)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
-		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \\-]', '')
-		local udef = GetUnitDefByHumanName(unitHumanName)
+		local unitDefID = tooltip:match('(%d+)')
+		local udef = UnitDefs[tonumber(unitDefID)]
 		return udef or false
-			
 	elseif tooltip:find('Selected', 1, true) == 1 then
 		local start,fin = tooltip:find([[ - ]], 1, true)
 		if start and fin then
@@ -1678,11 +1787,13 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		y = scrH / 3
 	end
 	
-	local window_width = 450
-	local window_height = 450
+	
+	if not options.window_to_cursor.value then
+		x = options.window_pos_x.value
+		y = options.window_pos_y.value
+	end
 
 	local num = #statswindows+1
-	
 	local children = {
 		ScrollPanel:New{
 			--horizontalScrollbar = false,
@@ -1710,8 +1821,8 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	statswindows[num] = Window:New{
 		x = x,
 		y = y,
-		width  = window_width,
-		height = window_height,
+		width  = WINDOW_WIDTH,
+		height = options.window_height.value,
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg,
@@ -2030,6 +2141,7 @@ function widget:Initialize()
 
 	widget:ViewResize(Spring.GetViewGeometry())
 	
+	WG.MakeStatsWindow = MakeStatsWindow
 end
 
 function widget:Shutdown()

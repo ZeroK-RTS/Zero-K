@@ -21,8 +21,14 @@ return { cloaksnipe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     modelradius    = [[15]],
     dontfireatradarcommand = '0',
+    no_decloak_on_weapon_fire = 1,
+
+    outline_x = 120,
+    outline_y = 120,
+    outline_yoff = 32.5,
   },
 
   decloakOnFire          = false,
@@ -30,8 +36,6 @@ return { cloaksnipe = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[sniper]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight          = 40,
   initCloaked            = true,
@@ -61,7 +65,7 @@ return { cloaksnipe = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2200,
+  turnRate               = 2500,
   upright                = true,
 
   weapons                = {
@@ -84,15 +88,14 @@ return { cloaksnipe = {
       craterMult              = 0,
 
       customParams              = {
+        reaim_time = 1, -- Keep aiming at target to prevent sideways gun, which can lead to teamkill.
         burst = Shared.BURST_RELIABLE,
         light_radius = 0,
-        restrict_in_widgets = 1,
       },
       
       damage                  = {
         default = 1500.1,
         planes  = 1500.1,
-        subs    = 75,
       },
 
       explosionGenerator      = [[custom:spectre_hit]],

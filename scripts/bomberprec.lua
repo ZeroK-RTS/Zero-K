@@ -1,3 +1,8 @@
+include "bombers.lua"
+include "fakeUpright.lua"
+include "constants.lua"
+include "fixedwingTakeOff.lua"
+
 local base = piece 'base'
 local fuselage = piece 'fuselage'
 local wingl1 = piece 'wingl1'
@@ -19,217 +24,19 @@ local xp,zp = piece("x","z")
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetUnitHeading      = Spring.GetUnitHeading
 local spGetUnitVelocity     = Spring.GetUnitVelocity
-local spMoveCtrlGetTag      = Spring.MoveCtrl.GetTag
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local spSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData
 local spGetGroundHeight     = Spring.GetGroundHeight
 
-local min, max = math.min, math.max
-
-local smokePiece = {fuselage, thrustr, thrustl}
-
-local bombs = 1
-
-include "bombers.lua"
-include "fakeUpright.lua"
-include "constants.lua"
-include "fixedwingTakeOff.lua"
-
-local ud = UnitDefs[unitDefID]
-
-local highBehaviour = {
-	wantedHeight = UnitDefNames["bomberprec"].wantedHeight*1.5,
-	maxPitch = ud.maxPitch,
-	maxBank = ud.maxBank,
-	turnRadius = ud.turnRadius,
-	maxAileron = ud.maxAileron,
-	maxElevator = ud.maxElevator,
-	maxRudder = ud.maxRudder,
-}
-
-local lowBehaviour = {
-	maxPitch = 0.72,
-	maxBank = 0.5,
-	turnRadius = 80,
-	maxAileron = 0.004,
-	maxElevator = 0.018,
-	maxRudder = 0.02,
-}
-
-local currentBehaviour = {
-	wantedHeight = highBehaviour.wantedHeight,
-	maxPitch = highBehaviour.maxPitch,
-	maxBank = highBehaviour.maxBank,
-	turnRadius = highBehaviour.turnRadius,
-	maxAileron = highBehaviour.maxAileron,
-	maxElevator = highBehaviour.maxElevator,
-	maxRudder = highBehaviour.maxRudder,
-}
-
-local pitchOverride = false
+local EstimateCurrentMaxSpeed = Spring.Utilities.EstimateCurrentMaxSpeed
 
 local SIG_TAKEOFF = 1
-local SIG_CHANGE_FLY_HEIGHT = 2
-local SIG_SPEED_CONTROL = 4
+local SIG_NOT_BLOCKED = 2
+local predictMult = 3
 
 local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
-local fullHeight = UnitDefNames["bomberprec"].wantedHeight/1.5
-
-local minSpeedMult = 0.75
-
-local function SetMoveTypeDataWithOverrides(behaviour)
-	if behaviour then
-		currentBehaviour.wantedHeight = behaviour.wantedHeight or currentBehaviour.wantedHeight
-		currentBehaviour.maxPitch     = behaviour.maxPitch     or currentBehaviour.maxPitch
-		currentBehaviour.maxBank      = behaviour.maxBank      or currentBehaviour.maxBank
-		currentBehaviour.turnRadius   = behaviour.turnRadius   or currentBehaviour.turnRadius
-		currentBehaviour.maxAileron   = behaviour.maxAileron   or currentBehaviour.maxAileron
-		currentBehaviour.maxElevator  = behaviour.maxElevator  or currentBehaviour.maxElevator
-		currentBehaviour.maxRudder    = behaviour.maxRudder    or currentBehaviour.maxRudder
-	end
-	
-	local origPitch = currentBehaviour.maxPitch
-	if pitchOverride and (pitchOverride > currentBehaviour.maxPitch) then
-		currentBehaviour.maxPitch = pitchOverride
-	end
-	
-	if not Spring.MoveCtrl.GetTag(unitID) then
-		spSetAirMoveTypeData(unitID, currentBehaviour)
-	end
-	currentBehaviour.maxPitch = origPitch
-end
-
-local PREDICT_FRAMES = 10
-local function TargetHeightUpdateThread(targetID, behaviour)
-	-- Inherits signals from BehaviourChangeThread
-	local flatDiveHeight = behaviour.wantedHeight
-	
-	while Spring.ValidUnitID(targetID) do
-		local tx,_,tz = spGetUnitPosition(targetID)
-		local tHeight = max(Spring.GetGroundHeight(tx, tz), 0)
-		
-		local ux,_,uz = spGetUnitPosition(unitID)
-		local vx,vy,vz = spGetUnitVelocity(unitID)
-		vx, vz = vx*PREDICT_FRAMES, vz*PREDICT_FRAMES
-		local predictX, predictZ = ux + vx, uz + vz
-		if math.abs(ux - tx) < vx then
-			predictX = tx
-		end
-		if math.abs(uz - tz) < vz then
-			predictZ = tz
-		end
-		local uHeight = max(spGetGroundHeight(predictX, predictZ), 0)
-		
-		behaviour.wantedHeight = flatDiveHeight + max((tHeight - uHeight)*0.4, 0)
-		if not Spring.MoveCtrl.GetTag(unitID) then
-			SetMoveTypeDataWithOverrides(behaviour)
-		end
-		Sleep(200)
-	end
-end
-
-local pitchUpdateReset = false
-local function PitchOverrideResetThread()
-	pitchUpdateReset = 1
-	while pitchUpdateReset > 0 do
-		pitchUpdateReset = pitchUpdateReset - 1
-		Sleep(300)
-	end
-	
-	if pitchOverride then
-		pitchOverride = false
-		SetMoveTypeDataWithOverrides()
-	end
-	pitchUpdateReset = false
-end
-
-local function PitchUpdate(targetID, targetHeight)
-	if not pitchUpdateReset then
-		StartThread(PitchOverrideResetThread)
-	end
-	
-	if targetID and Spring.ValidUnitID(targetID) then
-		local tx,ty,tz = spGetUnitPosition(targetID)
-		targetHeight = ty
-	end
-	
-	if not targetHeight then
-		return
-	end
-	
-	local ux,uy,uz = spGetUnitPosition(unitID)
-	if uy < targetHeight then
-		local newPitch = 0.9
-		if targetHeight - uy < 100 then
-			newPitch = 0.5 + 0.4*(targetHeight - uy)/100
-		end
-		if pitchOverride ~= newPitch then
-			pitchOverride = newPitch
-			SetMoveTypeDataWithOverrides()
-		end
-	elseif pitchOverride then
-		pitchOverride = false
-		SetMoveTypeDataWithOverrides()
-	end
-	
-	pitchUpdateReset = 1
-end
-
-local function BehaviourChangeThread(behaviour, targetID)
-	Signal(SIG_CHANGE_FLY_HEIGHT)
-	SetSignalMask(SIG_CHANGE_FLY_HEIGHT)
-	
-	takeoffHeight = behaviour.wantedHeight/1.5
-	
-	local state = spGetUnitMoveTypeData(unitID).aircraftState
-	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
-	if not flying then
-		StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	end
-	
-	while not flying do
-		Sleep(600)
-		state = spGetUnitMoveTypeData(unitID).aircraftState
-		flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
-	end
-	
-	SetMoveTypeDataWithOverrides(behaviour)
-	if targetID then
-		TargetHeightUpdateThread(targetID, behaviour)
-	end
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	--GG.UpdateUnitAttributes(unitID)
-	--GG.UpdateUnitAttributes(unitID)
-end
-
-local function SpeedControl()
-	Signal(SIG_SPEED_CONTROL)
-	SetSignalMask(SIG_SPEED_CONTROL)
-	while true do
-		local x,y,z = spGetUnitPosition(unitID)
-		local terrain = max(spGetGroundHeight(x,z), 0) -- not amphibious, treat water as ground
-		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain - 50)/(fullHeight - 60)))
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
-		GG.UpdateUnitAttributes(unitID)
-		GG.UpdateUnitAttributes(unitID)
-		Sleep(50 + 2*max(0, y - terrain - 80))
-	end
-end
-
-function BomberDive_HighPitchUpdate(targetID, attackGroundHeight)
-	PitchUpdate(targetID, attackGroundHeight)
-end
-
-function BomberDive_FlyHigh()
-	StartThread(BehaviourChangeThread, highBehaviour)
-end
-
-function BomberDive_FlyLow(height, targetID)
-	height = math.min(height, highBehaviour.wantedHeight)
-	StartThread(SpeedControl)
-	lowBehaviour.wantedHeight = height
-	StartThread(BehaviourChangeThread, lowBehaviour, targetID)
-end
+local takeoffHeightInElmos = takeoffHeight*1.5
+local smokePiece = {fuselage, thrustr, thrustl}
 
 function script.StartMoving()
 	--Turn(fins, z_axis, math.rad(-(-30)), math.rad(50))
@@ -237,7 +44,6 @@ function script.StartMoving()
 	Move(wingr2, x_axis, 0, 50)
 	Move(wingl1, x_axis, 0, 50)
 	Move(wingl2, x_axis, 0, 50)
-	StartThread(SpeedControl)
 end
 
 function script.StopMoving()
@@ -261,7 +67,6 @@ local function Lights()
 end
 
 function script.Create()
-	SetInitialBomberSettings()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	GG.FakeUpright.FakeUprightInit(xp, zp, drop)
@@ -280,92 +85,125 @@ function script.AimWeapon(num, heading, pitch)
 	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
-local predictMult = 3
+local function ResetTurnRadius()
+	Signal(SIG_NOT_BLOCKED)
+	SetSignalMask(SIG_NOT_BLOCKED)
+	Sleep(500)
+	SetUnarmedAI(300)
+end
 
-function script.BlockShot(num, targetID)
-	if num ~= 2 then
+local function GetAimLocation(targetID)
+	if not targetID then
+		local targetType, isUser, pos = Spring.GetUnitWeaponTarget(unitID, 2)
+		if targetType == 2 and pos then
+			return pos[1], pos[2], pos[3]
+		end
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
-	if not (targetID and ableToFire) then
-		return not ableToFire
-	end
-	local x,y,z = spGetUnitPosition(unitID)
 	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
 	local vx,vy,vz = spGetUnitVelocity(targetID)
-	local heading = spGetUnitHeading(unitID)*GG.Script.headingToRad
 	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
-	local dx, dy, dz = tx + vx - x, ty + vy - y, tz + vz - z
+	return tx + vx, ty + vy, tz + vz
+end
+
+function script.BlockShot(num, targetID)
+	if num == 1 then
+		return true
+	end
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or RearmBlockShot())
+	if not ableToFire then
+		return not ableToFire
+	end
+	SetUnarmedAI() -- Unarmed before firing because low turn radius fixes the turn aside bug. Try to hit a Flea retreating up a slope without this.
+	StartThread(ResetTurnRadius)
+	
+	local tx, ty, tz = GetAimLocation(targetID)
+	--Spring.MarkerAddPoint(tx, ty, tz,"")
+	if not tx then
+		return false
+	end
+	local x,y,z = spGetUnitPosition(unitID)
+	local dx, dy, dz = tx - x, ty - y, tz - z
+	local heading = spGetUnitHeading(unitID)*GG.Script.headingToRad
 	local cosHeading = math.cos(heading)
 	local sinHeading = math.sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
 	
-	local isMobile = not GG.IsUnitIdentifiedStructure(true, targetID)
-	local damage = (isMobile and 400.05) or 800.1
+	local isMobile = targetID and not GG.IsUnitIdentifiedStructure(true, targetID)
+	local damage = targetID and GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 770.1)
 	
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 60, false, false, false) then
-		-- Remove attack command on blocked target, it's already dead so move on.
-		local cQueue = Spring.GetCommandQueue(unitID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
+	if targetID and GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, 40, false, false, false) then
+		-- Remove attack command on blocked target, if it is followed by another attack command. This is commands queued in an area.
+		local cmdID, _, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
+		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
+			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
+				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+			end
 		end
 		return true
 	end
 	
-	if dy > 0 then
-		return true
-	end
-	
-	if isMobile and (dz > 30 or dz < -30 or dx > 80 or dx < -80) then
-		return true
-	end
-	
+	local mx, mz = dx, dz
 	if isMobile then
-		dx = math.min(math.max(-50, dx), 50)
-		dz = math.min(math.max(-20, dz), 20)
-		dy = math.max(dy, -20)
+		mx = math.min(math.max(-45, mx), 45)
+		mz = math.min(math.max(-30, mz), 30)
 	else
-		dx = math.min(math.max(-30, dx), 30)
-		dz = math.min(math.max(-10, dz), 10)
-		dy = math.max(dy, -5)
+		mx = math.min(math.max(-30, mx), 30)
+		mz = math.min(math.max(-15, mz), 15)
 	end
+	dx, dz = dx - mx, dz - mz
+	local hDist = math.sqrt(dx*dx + dz*dz)
 	
-	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
-	Move(drop, x_axis, dx)
-	Move(drop, z_axis, dz)
-	Move(drop, y_axis, dy)
-	local distance = math.max((Spring.GetUnitSeparation(unitID, targetID) or 1) - 25, 1)
-	local unitHeight = (GG.GetUnitHeight and GG.GetUnitHeight(targetID)) or 0
-	distance = math.max(0, distance - unitHeight/2)
-	local projectileTime = 35*math.min(1, distance/340)
-	
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, projectileTime, false, false, false) then
+	if dy > 0 or hDist*1.15 > -dy then
 		return true
 	end
-	return false
-end
-
-local function SpamFireCheck()
-	for i = 1, 10 do
-		GG.Bomber_Dive_fake_fired(unitID)
-		Sleep(100)
+	
+	local isTooFast = false -- Do not OKP for too fast targets as we don't expect to hit.
+	if isMobile then
+		local speed = EstimateCurrentMaxSpeed(targetID)
+		if speed >= 3 then
+			isTooFast = true
+		end
+		--Spring.Echo(hDist, speed, math.max(3, -dy - speed*90 - 35))
+		-- Cap out at speed 2.7 on normal terrain
+		local diffFactor = -dy
+		if diffFactor > takeoffHeightInElmos then
+			-- Reduce apparently height difference for cone in cases where Raven is higher than usual.
+			-- This can happen when the Raven crests a cliff, or against underwater targets.
+			diffFactor = takeoffHeightInElmos*(diffFactor + takeoffHeightInElmos) / (2*diffFactor)
+		end
+		--Spring.Echo("diffFactor", diffFactor, -dy, takeoffHeightInElmos)
+		if hDist > math.max(3, diffFactor - speed*90 - 35) then
+			return true
+		end
 	end
+	
+	--if (dz > 30 or dz < -30 or dx > 80 or dx < -80) then
+		--return true
+	--end
+	
+	if targetID and (not isTooFast) and GG.Script.OverkillPreventionCheck(unitID, targetID, damage, 270, 35, 0.025) then
+		return true
+	end
+	GG.FakeUpright.FakeUprightTurn(unitID, xp, zp, base, predrop)
+	Move(drop, x_axis, mx)
+	Move(drop, z_axis, mz)
+	return false
 end
 
 function script.FireWeapon(num)
 	if num == 2 then
-		SetUnarmedAI()
-		GG.Bomber_Dive_fired(unitID)
 		Sleep(33) -- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)
 		Move(drop, z_axis, 0)
-		Move(drop, y_axis, 0)
+		Signal(SIG_NOT_BLOCKED)
+		SetUnarmedAI()
 		Reload()
-	elseif num == 3 then
-		StartThread(SpamFireCheck)
 	end
 end
 

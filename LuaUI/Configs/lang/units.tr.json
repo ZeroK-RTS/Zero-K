@@ -41,7 +41,7 @@
     },
     "energyfusion": {
         "name": "Füzyon Reaktörü",
-        "description": "Orta Enerji Santrali(+35)",
+        "description": "Orta Enerji Santrali",
         "helptext": "Füzyon reaktörleri makul bir fiyata iyi miktarda sabit enerji çıkışı sağlar. Onlar çekici hedefler ve çok iyi zırhlı değiller, bu yüzden iyi korunmalarını sağla. Öldürüldüğünde, füzyon reaktörleri yakındaki birimlere ağır hasar verir."
     },
     "chickenlandqueen": {
@@ -266,7 +266,7 @@
     },
     "energysingu": {
         "name": "Boyutsal Reaktör",
-        "description": "Büyük Güç Santrali (+225) - TEHLİKELİ",
+        "description": "Büyük Güç Santrali TEHLİKELİ",
         "helptext": "Boyutsal Reaktör, kontrollü bir kara delik kullanarak, kulağa geldiği kadar güvenli olan büyük miktarda enerji üretir. Reaktör tahrip edildiğinde, kara delik şiddetli bir şekilde çarparak birimleri içeri sürükler. Bunun inşa edildiği kıtanın tamamı güvenli olmayan zemin olarak değerlendirilmelidir."
     },
     "bomberdisarm": {
@@ -296,7 +296,7 @@
     },
     "energyheavygeo": {
         "name": "Gelişmiş Jeotermal",
-        "description": "Büyük Güç Santrali (+100) - TEHLİKELİ",
+        "description": "Büyük Güç Santrali TEHLİKELİ",
         "helptext": "Gelişmiş Jeotermal Santrali büyük miktarda enerji üretir. Bununla birlikte, onu yok etmek yıkıcı bir patlamaya neden olacağı için korunmayı gerektirir."
     },
     "staticcon": {
@@ -366,7 +366,7 @@
     },
     "energysolar": {
         "name": "Solar Santral",
-        "description": "Küçük Santral (+2)",
+        "description": "Küçük Santral",
         "helptext": "Güneş Santralleri enerji yapılarının maliyet açısından en az verimli olduğu, ancak aynı zamanda en güvenilir ve sağlam. Saldırıya uğradığında, santraller 8 saniye boyunca zırhlı bir şekilde kıvrılır ve bu da gelen hasarı çeyreğe kadar azaltır ve akıncılara karşı mükemmel koruma sağlar."
     },
     "gunshipheavyskirm": {
@@ -601,7 +601,7 @@
     },
     "energygeo": {
         "name": "Jeotermal Jeneratör",
-        "description": "Orta Santral (+25)",
+        "description": "Orta Santral",
         "helptext": "Jeotermal santralleri yalnızca haritada bulunan jeojik alanlar üzerine kurulabilen yüksek verimli enerji kaynaklarıdır. Yok edildiklerinde şiddetli bir şekilde patlarlar, bu nedenle doğrudan bitişik herhangi bir şey koymaktan kaçının."
     },
     "jumpcon": {

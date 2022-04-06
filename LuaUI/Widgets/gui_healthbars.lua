@@ -617,8 +617,9 @@ function init()
 		ud.primaryWeapon = 0
 		ud.shieldPower   = 0
 
-		for i = 1, #ud.weapons do
-			local WeaponDefID = ud.weapons[i].weaponDef
+		local weapons = ud.weapons
+		for i = 1, #weapons do
+			local WeaponDefID = weapons[i].weaponDef
 			local WeaponDef   = WeaponDefs[ WeaponDefID ]
 			if (WeaponDef.reload > ud.reloadTime) then
 				ud.reloadTime    = WeaponDef.reload

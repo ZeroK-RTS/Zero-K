@@ -86,7 +86,6 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local clickTargetID = false
 local clickCommandID = false
-local clickActiveCmdID = false
 local clickRight = false
 local totalDist = 0
 
@@ -96,20 +95,20 @@ local totalDist = 0
 local function Reset()
 	clickTargetID = false
 	clickCommandID = false
-	clickActiveCmdID = false
 	clickRight = false
 	totalDist = 0
 end
 
 local function GetActionCommand(right)
 	local _, activeCmdID = Spring.GetActiveCommand()
-	if activeCmdID and not right then
+	if activeCmdID and (not right) then
+		-- Left click means the active command should be issued.
 		return activeCmdID
-	else
-		if right then
-			local _, defaultCmdID = Spring.GetDefaultCommand()
-			return defaultCmdID
-		end
+	elseif (not activeCmdID) and right then
+		-- Right click means the default command should be issued, unless
+		-- there is an active command, in which case it is cancelled.
+		local _, defaultCmdID = Spring.GetDefaultCommand()
+		return defaultCmdID
 	end
 	return false
 end
@@ -182,7 +181,6 @@ local function MousePress(x, y, right)
 	
 	clickTargetID = targetID
 	clickCommandID = cmdID
-	clickActiveCmdID = select(2, Spring.GetActiveCommand())
 	clickRight = right
 end
 

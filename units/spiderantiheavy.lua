@@ -11,14 +11,15 @@ return { spiderantiheavy = {
   canMove               = true,
   canPatrol             = true,
   category              = [[LAND]],
-  cloakCost             = 4,
-  cloakCostMoving       = 12,
+  cloakCost              = 5,
+  cloakCostMoving        = 15,
   selectionVolumeOffsets = [[0 0 0]],
   selectionVolumeScales  = [[30 30 30]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
+    bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,
   },
@@ -28,8 +29,6 @@ return { spiderantiheavy = {
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[spiderspecialscout]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
   leaveTracks           = true,
   initCloaked           = true,
   maxDamage             = 270,
@@ -49,7 +48,7 @@ return { spiderantiheavy = {
   trackStretch          = 1,
   trackType             = [[ChickenTrackPointyShort]],
   trackWidth            = 45,
-  turnRate              = 1800,
+  turnRate              = 2160,
 
   weapons               = {
 

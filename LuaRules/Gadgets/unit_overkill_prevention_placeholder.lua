@@ -63,13 +63,7 @@ for i = 1, #UnitDefs do
 	shotRequirement[i] = shots
 end
 
-local HandledUnitDefIDs = {
-	[UnitDefNames["jumpblackhole"].id] = true,
-}
-
-local HandledWeaponDefIDs = {
-	[WeaponDefNames["jumpblackhole_black_hole"].id] = true,
-}
+local _, handledUnitDefIDs, handledWeaponDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local canHandleUnit = {}
 local units = {}
@@ -94,7 +88,7 @@ local function SumOverlappingAreas(_, data, _, tx, ty, tz, allyTeamID, areaLimit
 			return true -- Remove
 		end
 		if data.posUpdateFrame and data.posUpdateFrame > gameFrame then
-			if data.targetID and Spring.ValidUnitID(data.targetID) then
+			if data.targetID and spValidUnitID(data.targetID) then
 				local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(data.targetID, true, true)
 				data.x = x
 				data.y = y
@@ -127,7 +121,8 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	local _,_,_,_,_,_, x, y, z = Spring.GetUnitPosition(targetID, true, true)
 	
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
-	local targetIdentified = (targetVisiblityState > 2)
+	local targetIdentified = (targetVisiblityState == 15) or (math.floor(targetVisiblityState / 4) % 4 == 3)
+	local shotsRequired
 	if targetIdentified then
 		local targetDefID = Spring.GetUnitDefID(targetID)
 		shotsRequired = shotRequirement[targetDefID] or 2
@@ -169,7 +164,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
-	if not HandledWeaponDefIDs[weaponDefID] then
+	if not handledWeaponDefIDs[weaponDefID] then
 		return
 	end
 	
@@ -301,7 +296,7 @@ end
 -- Unit Handling
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if HandledUnitDefIDs[unitDefID] then
+	if handledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
 		PreventOverkillToggleCommand(unitID, {1})
@@ -325,7 +320,7 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
-	for w,_ in pairs(HandledWeaponDefIDs) do
+	for w,_ in pairs(handledWeaponDefIDs) do
 		Script.SetWatchProjectile(w, true)
 	end
 end

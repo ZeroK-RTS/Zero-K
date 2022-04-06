@@ -29,7 +29,13 @@ return { gunshipheavytrans = {
     midposoffset   = [[0 0 0]],
     aimposoffset   = [[0 10 0]],
     modelradius    = [[15]],
+    transport_speed_light   = [[0.75]],
+    transport_speed_medium  = [[0.65]],
     transport_speed_heavy   = [[0.5]],
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 17.5,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -38,12 +44,9 @@ return { gunshipheavytrans = {
   footprintZ             = 4,
   hoverAttack            = true,
   iconType               = [[heavygunshiptransport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maneuverleashlength    = [[1280]],
   maxDamage              = 1800,
   maxVelocity            = 9,
-  minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
   script                 = [[gunshipheavytrans.lua]],
@@ -117,7 +120,6 @@ return { gunshipheavytrans = {
       
       damage                  = {
         default = 10,
-        subs    = 0.5,
       },
 
       duration                = 0.02,
@@ -129,7 +131,7 @@ return { gunshipheavytrans = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 325,
+      range                   = 320,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -161,7 +163,6 @@ return { gunshipheavytrans = {
       damage                  = {
         default = 2,
         planes  = 20,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

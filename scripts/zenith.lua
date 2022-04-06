@@ -4,13 +4,18 @@ local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"
 
-local SOURCE_RANGE = 4000	-- size of the box which the emit point can be randomly placed in
+local SOURCE_RANGE = 4200 -- size of the box which the emit point can be randomly placed in
+
+--[[ Higher than hover height partially so that they don't spawn in front of people's eyes
+     but come "from space" (cool!!), though also keep in mind that this has a mechanical
+     effect on constant-fire accuracy due to distance scaling and spending more time applying
+     turnrate/wobble compared to being fired from the lower height of the swarm. ]]
 local SOURCE_HEIGHT = 9001
 
 local HOVER_RANGE = 1600
-local HOVER_HEIGHT = 2600
+local HOVER_HEIGHT = 2650
 
-local AIM_RADIUS = 160
+local SPREAD_PER_DIST = 0.03
 
 -- 6 minutes to reach capacity.
 local SPAWN_PERIOD = 1200 -- in milliseconds
@@ -50,6 +55,8 @@ local gravityDefs = {
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+local CMD_ATTACK = CMD.ATTACK
 local gaiaTeam = Spring.GetGaiaTeamID()
 
 local launchInProgress = false
@@ -70,7 +77,7 @@ local function IsDisabled()
 	if y < -95 then
 		return true
 	end
-	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1) or (spGetUnitRulesParam(unitID, "lowpower") == 1)
 end
 
 local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, x, y, z)
@@ -89,14 +96,19 @@ local function TransformMeteor(weaponDefID, proID, meteorTeamID, meteorOwnerID, 
 		speed = {vx, vy, vz},
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
-		team = meteorTeamID,
 		owner = meteorOwnerID,
+
+		--[[ usually Zenith's team, but for uncontrolled meteors
+		     like the ones from EMP or reaching the cap it's Gaia
+		     so that allied shields will block them (also prevents
+		     counting as a teamkill etc). ]]
+		team = meteorTeamID,
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
 	end
 	
-	return newProID
+	return newProID, px, py, pz
 end
 
 local function DropSingleMeteor(index)
@@ -117,7 +129,7 @@ local function LoseControlOfMeteors()
 			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID, gaiaTeam, nil)
 		end
 	end
-	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 end
 
 local function RegainControlOfMeteors()
@@ -143,9 +155,8 @@ local function SpawnMeteor()
 	local proID = Spring.SpawnProjectile(floatWeaponDefID, {
 		pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]},
 		tracking = true,
-		speed = {0, -1, 0},
+		speed = {0, -5, 0},
 		ttl = 18000, -- 18000 = 10 minutes
-		gravity = meteorGravity,
 		team = gaiaTeam,
 	})
 	Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
@@ -181,33 +192,32 @@ local function UpdateEnabled(newEnabled)
 end
 
 local function SpawnProjectileThread()
-	local reloadMult = 1
 	GG.zenith_spawnBlocked = GG.zenith_spawnBlocked or {}
-	
+
 	while true do
-		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-		
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
 		--	pos = {1000,1000,1000},
 		--	speed = {10, 0 ,10},
 		--	ttl = 100,
 		--	maxRange = 1000,
 		--})
-		
+
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
 		while IsDisabled() do
 			UpdateEnabled(false)
-			Sleep(500)
+			Sleep(100)
 		end
+		local reloadMult = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
+
 		EmitSfx(flare, 2049)
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
-		
+
 		UpdateEnabled(not isBlocked)
 		if currentlyEnabled then
 			SpawnMeteor()
 		end
-		
+
 		isBlocked = GG.zenith_spawnBlocked[unitID]
 		GG.zenith_spawnBlocked[unitID] = false
 	end
@@ -229,6 +239,7 @@ local function LaunchAll(x, z)
 	-- so are able to rotate the wobbly float projectiles in the right
 	-- direction.
 	local aim = {}
+	local aimDist = {}
 	local aimCount = 0
 	
 	for i = 1, projectileCount do
@@ -249,8 +260,12 @@ local function LaunchAll(x, z)
 			--})
 			
 			-- Projectile is valid, launch!
+			local id, px, py, pz = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
+			local dist = Vector.Dist3D(x, y, z, px, py, pz)
+			
 			aimCount = aimCount + 1
-			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, zenithTeamID, unitID, x, y, z)
+			aim[aimCount] = id
+			aimDist[aimCount] = dist
 		end
 	end
 	
@@ -277,9 +292,9 @@ local function LaunchAll(x, z)
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then
 			-- Projectile is valid, launch!
-			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
-			
+			local aimOff = Vector.PolarToCart(aimDist[i]*SPREAD_PER_DIST*math.random(), 2*math.pi*math.random())
 			TransformMeteor(fireWeaponDefID, proID, zenithTeamID, unitID, x + aimOff[1], y, z + aimOff[2])
+			--Spring.MarkerAddPoint(x + aimOff[1], y, z + aimOff[2], math.floor(aimDist[i]*SPREAD_PER_DIST))
 		end
 	end
 	
@@ -334,14 +349,14 @@ function script.BlockShot(num, targetID)
 	if IsDisabled() then
 		return true
 	end
-	
-	local cQueue = Spring.GetCommandQueue(unitID, 1)
-	if (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
-		if cQueue[1].params[3] then
-			StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
+
+	local cmdID, _, _, cmdParam1, cmdParam2, cmdParam3 = spGetUnitCurrentCommand(unitID)
+	if cmdID == CMD_ATTACK then
+		if cmdParam3 then
+			StartThread(LaunchAll, cmdParam1, cmdParam3)
 			return true
-		elseif (#cQueue[1].params == 1) then
-			targetID = cQueue[1].params[1]
+		elseif not cmdParam2 then
+			targetID = cmdParam1
 		end
 	end
 	

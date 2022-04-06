@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -84,7 +82,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -257,19 +254,6 @@ function script.StartBuilding(heading, pitch)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	restoreHeading, restorePitch = heading, pitch
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),rbigflash)
-	return rbigflash
-end
-
-function script.Activate()
-	--spSetUnitShieldState(unitID, 2, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, 2, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

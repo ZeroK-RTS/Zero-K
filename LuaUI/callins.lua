@@ -83,6 +83,12 @@ CallInsList = {
 	"DrawScreenPost",
 	"DrawScreen",
 	"DrawInMiniMap",
+	'DrawOpaqueUnitsLua',
+	'DrawOpaqueFeaturesLua',
+	'DrawAlphaUnitsLua',
+	'DrawAlphaFeaturesLua',
+	'DrawShadowUnitsLua',
+	'DrawShadowFeaturesLua',
 
 	"Explosion",
 	"ShockFront",
@@ -108,7 +114,7 @@ CallInsList = {
 	"DownloadFinished",
 	"DownloadFailed",
 	"DownloadProgress",
-	
+
 	"Save",
 	"Load",
 }

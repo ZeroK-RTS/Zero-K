@@ -194,6 +194,11 @@ local function GetExtraStartUnits(teamID, customKeys)
 	return startUnits
 end
 
+local function SetGameRulesParamHax(key, value)
+	--Spring.SetGameRulesParam(key, value)
+	Spring.SetTeamRulesParam(0, key, value, publicTrueTable)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Victory and Defeat functions
@@ -281,7 +286,7 @@ local function VictoryAtLocationUpdate()
 			if DoVictoryAtLocationCheck(unitID, data[i]) then
 				if data[i].objectiveID then
 					local objParameter = "objectiveSuccess_" .. data[i].objectiveID
-					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
+					SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 				end
 				GG.CauseVictory(data[i].allyTeamID)
 				return
@@ -322,7 +327,7 @@ end
 
 local function CompleteBonusObjective(bonusObjectiveID, success)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	Spring.SetGameRulesParam("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
+	SetGameRulesParamHax("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
 	
 	objectiveData.success = success
 	objectiveData.terminated = true
@@ -1159,7 +1164,7 @@ local function InitializeUnlocks()
 	if doNotDisableAnyUnits then
 		GG.terraformRequiresUnlock = false
 	else
-		Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+		SetGameRulesParamHax("terraformRequiresUnlock", 1)
 	end
 	
 	local teamList = Spring.GetTeamList()
@@ -1316,20 +1321,24 @@ local function DoInitialTerraform(noBuildings)
 				{x = pos[1], z = pos[4] - 8},
 				{x = pos[1], z = pos[2]},
 			}
-			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 2 then
 			-- Line
 			local points = {
 				{x = pos[1], z = pos[2]},
 				{x = pos[3], z = pos[4]},
 			}
-			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 3 then
 			-- Ramp
-			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction)
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction, terraform.enableDecay)
 		end
 	end
-	GG.Terraform.ForceTerraformCompletion(true)
+	local fixSaves = Spring.GetModOptions().init_terra_save_fix
+	GG.Terraform.ForceTerraformCompletion(true, fixSaves == 1 or fixSaves == "1")
 end
 
 --------------------------------------------------------------------------------
@@ -1354,18 +1363,6 @@ end
 
 function GalaxyCampaignHandler.GetDefeatConfig(allyTeamID)
 	return defeatConditionConfig[allyTeamID]
-end
-
-function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
-	local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
-	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
-	if retinueData then
-		local range = 70 + #retinueData*20
-		for i = 1, #retinueData do
-			local unitData = retinueData[i]
-			PlaceRetinueUnit(unitData.retinueID, range, unitData.unitDefName, x, z, facing, teamID, unitData.experience)
-		end
-	end
 end
 
 function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
@@ -1405,10 +1402,10 @@ local function MissionGameOver(missionWon)
 	gameIsOver = true
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
-	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
+	SetGameRulesParamHax("MissionGameOver", (missionWon and 1) or 0)
 	local frame = Spring.GetGameFrame()
 	Spring.Echo("set MissionGameOver_frames", frame)
-	Spring.SetGameRulesParam("MissionGameOver_frames", frame)
+	SetGameRulesParamHax("MissionGameOver_frames", frame)
 end
 
 --------------------------------------------------------------------------------
@@ -1516,7 +1513,7 @@ function gadget:GameFrame(n)
 					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
 					if defeatConfig.timeLossObjectiveID then
 						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
-						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
+						SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end

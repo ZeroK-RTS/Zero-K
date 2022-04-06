@@ -29,6 +29,10 @@ return {
 			},
 		},
 	},
+--[[ The map is not actually 4-way symmetrical.
+     The other corners could probably be reused
+     at some point but for now they're excluded.
+
 	[2] = {
 		nameLong = "Northeast",
 		nameShort = "NE",
@@ -59,4 +63,5 @@ return {
 			},
 		},
 	},
+]]
 }

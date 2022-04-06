@@ -813,8 +813,23 @@ local function nocost(cmd,line,words,player)
 		return
 	end
 	local enabled = not (tonumber(words[1]) == 0)
+	GG.SetFreeStockpile(enabled)
+	Spring.Echo("Free stockpile " .. ((enabled and "enabled") or "disabled") .. ".")
 	GG.SetFreeMorph(enabled)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
+	GG.Terraform.SetFreeTerraform(enabled)
+	Spring.Echo("Free terraform " .. ((enabled and "enabled") or "disabled") .. ".")
+	GG.Overdrive.SetNoGridRequirement(enabled)
+	Spring.Echo("No grid requirement " .. ((enabled and "enabled") or "disabled") .. ".")
+end
+
+local function power(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local enabled = not (tonumber(words[1]) == 0)
+	GG.Overdrive.SetNoGridRequirement(enabled)
+	Spring.Echo("No grid requirement " .. ((enabled and "enabled") or "disabled") .. ".")
 end
 
 local function EmpiricalDps(cmd,line,words,player)
@@ -828,6 +843,16 @@ local function EmpiricalDps(cmd,line,words,player)
 		gadgetHandler:GotChatMsg("disablegadget Empirical DPS", 0)
 	end
 	Spring.SetGameRulesParam("enable_EmpiricalDPS", enabled and 1 or 0)
+end
+
+local function PrintUnits(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local unitList = Spring.GetAllUnits()
+	for i = 1, #unitList do
+		Spring.Utilities.UnitEcho(unitList[i])
+	end
 end
 
 function gadget:GameFrame(n)
@@ -861,27 +886,28 @@ function gadget:Initialize()
 	if Spring.GetGameRulesParam("enable_EmpiricalDPS") == 1 then
 		gadgetHandler:GotChatMsg("enablegadget Empirical DPS", 0)
 	end
-
-	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
-	gadgetHandler.actionHandler.AddChatAction(self,"emd",EmpiricalDps,"Toggle empirical DPS.")
-	gadgetHandler.actionHandler.AddChatAction(self,"ecrush",EchoCrush,"Echos all crushabilities.")
-	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
-	gadgetHandler.actionHandler.AddChatAction(self,"moveunit", MoveUnit, "Moves a unit.")
-	gadgetHandler.actionHandler.AddChatAction(self,"destroyunit", DestroyUnit, "Destroys a unit.")
-	gadgetHandler.actionHandler.AddChatAction(self,"rotateunit", RotateUnit, "Rotates a unit.")
-	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
-	gadgetHandler.actionHandler.AddChatAction(self,"givesort",givesort,"Gives mobiles sorted by cost.")
-	gadgetHandler.actionHandler.AddChatAction(self,"pw",PlanetwarsGive,"Spawns all planetwars structures.")
-	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
-	gadgetHandler.actionHandler.AddChatAction(self,"nf",nanoFrame,"Sets nanoframe values.")
-	gadgetHandler.actionHandler.AddChatAction(self,"rez",rezAll,"Resurrects wrecks for former owners.")
-	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
-	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
-	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")
-	gadgetHandler.actionHandler.AddChatAction(self,"uclear",uclear,"Clears all units.")
-	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
-	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
-	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
+	gadgetHandler.actionHandler.AddChatAction(self, "bisect", bisect, "Bisect gadget disables.")
+	gadgetHandler.actionHandler.AddChatAction(self, "emd", EmpiricalDps, "Toggle empirical DPS.")
+	gadgetHandler.actionHandler.AddChatAction(self, "ecrush", EchoCrush, "Echos all crushabilities.")
+	gadgetHandler.actionHandler.AddChatAction(self, "circle", circleGive, "Gives a bunch of units in a circle.")
+	gadgetHandler.actionHandler.AddChatAction(self, "moveunit",  MoveUnit,  "Moves a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "destroyunit",  DestroyUnit,  "Destroys a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "rotateunit",  RotateUnit,  "Rotates a unit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "give", give, "Like give all but without all the crap.")
+	gadgetHandler.actionHandler.AddChatAction(self, "givesort", givesort, "Gives mobiles sorted by cost.")
+	gadgetHandler.actionHandler.AddChatAction(self, "pw", PlanetwarsGive, "Spawns all planetwars structures.")
+	gadgetHandler.actionHandler.AddChatAction(self, "gk", gentleKill, "Gently kills everything.")
+	gadgetHandler.actionHandler.AddChatAction(self, "nf", nanoFrame, "Sets nanoframe values.")
+	gadgetHandler.actionHandler.AddChatAction(self, "rez", rezAll, "Resurrects wrecks for former owners.")
+	gadgetHandler.actionHandler.AddChatAction(self, "damage", damage, "Damages everything.")
+	gadgetHandler.actionHandler.AddChatAction(self, "color", ColorTest, "Spawns units for color test.")
+	gadgetHandler.actionHandler.AddChatAction(self, "clear", clear, "Clears all units and wreckage.")
+	gadgetHandler.actionHandler.AddChatAction(self, "uclear", uclear, "Clears all units.")
+	gadgetHandler.actionHandler.AddChatAction(self, "serial", serial, "Gives all units in succession.")
+	gadgetHandler.actionHandler.AddChatAction(self, "restart", restart, "Gives some commanders and clears everything else.")
+	gadgetHandler.actionHandler.AddChatAction(self, "nocost", nocost, "Makes everything gadget-implemented free.")
+	gadgetHandler.actionHandler.AddChatAction(self, "power", power, "Remove grid power limit.")
+	gadgetHandler.actionHandler.AddChatAction(self, "printunits",  PrintUnits, "")
 
 	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end

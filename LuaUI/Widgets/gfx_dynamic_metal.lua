@@ -62,6 +62,7 @@ end
 function widget:GameFrame(n)
 	if n%15 == 0 then
 		-- Update display to take terraform into account
+		gl.DeleteList(displayList)
 		displayList = gl.CreateList(drawPatches)
 	end
 end

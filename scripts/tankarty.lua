@@ -24,7 +24,6 @@ local RESTORE_DELAY = 3000
 local SIG_AIM = 1
 local SIG_MOVE = 2 --Signal to prevent multiple track motion
 local SIG_TILT = 4
-local SIG_RAISE = 8
 local SIG_PUSH = 16
 local SIG_STOW = 32
 
@@ -96,9 +95,12 @@ local function SetAbleToMove(newMove)
 	end
 	ableToMove = newMove
 	
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.25)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.25)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", (ableToMove and 1) or 0.05)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (ableToMove and 1) or 0.05)
 	GG.UpdateUnitAttributes(unitID)
+	if newMove then
+		GG.WaitWaitMoveUnit(unitID)
+	end
 end
 
 for i = 1, 4 do
@@ -127,9 +129,14 @@ function script.StartMoving()
 	StartThread(StowGun)
 end
 
-function script.StopMoving()
+local function DelayStopMove()
+	SetSignalMask(SIG_MOVE)
+	Sleep(500)
 	moving = false
+end
+function script.StopMoving()
 	Signal(SIG_STOW)
+	StartThread(DelayStopMove)
 	TrackControlStopMoving()
 end
 

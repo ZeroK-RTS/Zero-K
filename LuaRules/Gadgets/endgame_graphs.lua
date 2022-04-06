@@ -61,7 +61,7 @@ end
 
 local dontCountUnits = {}
 for unitDefID = 1, #UnitDefs do
-	if UnitDefs[unitDefID].customParams.dontcount then
+	if UnitDefs[unitDefID].customParams.dontcount or UnitDefs[unitDefID].customParams.is_drone then
 		dontCountUnits[unitDefID] = true
 	end
 end
@@ -80,7 +80,9 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if paralyzer then return end
+	if damage <= 0 or paralyzer then
+		return
+	end
 
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
@@ -126,6 +128,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 
 	local index = nanoframesByID[unitID]
+	if not index then
+		return
+	end
 	local lastUnitID = nanoframes[nanoframeCount]
 	local cost = nanoframeCosts[index]
 
@@ -438,7 +443,7 @@ function gadget:Initialize()
 		spSetTeamRulesParam(teamID, "stats_history_nano_total_0"       , 0, ALLIED_VISIBLE)
 
 		mTotalOverdrive     [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_overdrive_current") or 0
-		reclaimListByTeam   [teamID] = -spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0
+		reclaimListByTeam   [teamID] = -1*(spGetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0)
 		metalExcessByTeam   [teamID] = spGetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0
 		damageDealtByTeamHax[teamID] =  GetHiddenTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0
 		damageDealtByTeamNonhax[teamID] =  spGetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0

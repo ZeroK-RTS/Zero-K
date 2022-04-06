@@ -57,6 +57,7 @@ local legBackwardAngleMinor = math.rad(10)
 --------------------------------------------------------------------------------
 local armored = false
 local nocurl = true
+local movingData = {}
 
 local gun_0 = 0
 
@@ -112,7 +113,6 @@ local function Curl()
 	end
 	--Spring.Echo("Initiating curl")
 	
-	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
 	Sleep(200)
@@ -123,7 +123,7 @@ local function Curl()
 	
 	Sleep(100)
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.1)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
 	GG.UpdateUnitAttributes(unitID)
 
 	Move(canon, y_axis, 5, 1.5)
@@ -200,6 +200,7 @@ local function Uncurl()
 	Move(base, z_axis, 0, 2.5)
 
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
+	armored = false
 	Spring.SetUnitArmored(unitID,false)
 	
 	WaitForTurn(leg1, x_axis)
@@ -233,18 +234,22 @@ end
 local function Motion()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	armored = false
-	Sleep(30)
+	Sleep(100)
 	Uncurl()
 	Walk()
 end
 
 function script.StartMoving()
+	movingData.moving = true
 	--Spring.Utilities.UnitEcho(unitID, "A " .. ((armored and "T") or "F"))
 	StartThread(Motion)
+	movingData.thresholdSpeed = 0.02
 end
 
 function script.StopMoving()
+	Signal(SIG_MOVE)
+	movingData.thresholdSpeed = 0.3
+	movingData.moving = false
 	--Spring.Utilities.UnitEcho(unitID, "P " .. ((armored and "T") or "F"))
 	StartThread(Curl)
 end
@@ -259,7 +264,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.1)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, 0.3, false, movingData, 4, true)
 	
 	--StartThread(MotionControl)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
@@ -280,7 +285,21 @@ local function RockSelf(anglex, anglez)
 	Turn(base, z_axis, 0, math.rad(20))
 	Turn(base, x_axis, 0, math.rad(20))
 end
-	
+
+local spGetUnitSeparation = Spring.GetUnitSeparation
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		-- TTL at max range determined to be 60f empirically
+		-- at projectile speed 290 elmo/s and 600 range, but
+		-- add a few extra frames because that was on flat
+		-- terrain and spiders like uneven terrain where the
+		-- TTL can be a bit larger due to vertical difference
+		local framesETA = 65 * (spGetUnitSeparation(unitID, targetID) or 0) / 600
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, framesETA, false, false, true)
+	end
+	return false
+end
+
 function script.RockUnit(anglex, anglez)
 	StartThread(RockSelf, math.rad(anglex), math.rad(anglez))
 end

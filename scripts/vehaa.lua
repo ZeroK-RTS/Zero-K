@@ -11,11 +11,7 @@ piece('base', 'rockbase', 'body', 'turret', 'firepoint',
 	'lwheel1', 'lwheel2',
 	'gs1r', 'gs2r', 'gs1l', 'gs2l')
 
-local SIG_AIM = 1
-local SIG_MOVE = 2
-
 local spGetGroundHeight = Spring.GetGroundHeight
-local spGetPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
@@ -35,6 +31,8 @@ local turnTilt = 0
 local lastSteer = 0
 local steerRate = 0
 local steer = 0
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 local SETTLE_PERIODS = 15
 local settleTimer = 0
@@ -111,19 +109,15 @@ local function UpdateAnimControl()
 end
 
 function Suspension()
-	local x, y, z, height
-	local s1r, s2r = 0, 0
-	local s1l, s2l = 0, 0
-	local xtilt, xtiltv, xtilta = 0, 0, 0
-	local ztilt, ztiltv, ztilta = 0, 0, 0
-	local ya, yv, yp = 0, 0, 0
-	local speed = 0
+	-- local xtilt, xtiltv = 0, 0
+	local ztilt, ztiltv = 0, 0
+	local yp, yv = 0, 0
 	lastHeading = GetUnitValue(COB.HEADING)*GG.Script.headingToRad
-	
+
 	while true do
-		speed = select(4,spGetUnitVelocity(unitID))
+		local _, _, _, speed = spGetUnitVelocity(unitID)
 		wheelTurnSpeed = speed*WHEEL_TURN_MULT
-	
+
 		if moving then
 			if speed <= 0.05 then
 				StopMoving()
@@ -133,7 +127,7 @@ function Suspension()
 				StartMoving()
 			end
 		end
-		
+
 		if speed > 0.05 then
 			settleTimer = 0
 		elseif settleTimer < SETTLE_PERIODS then
@@ -142,24 +136,24 @@ function Suspension()
 
 		UpdateAnimControl()
 		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
-			x,y,z = spGetUnitPosition(unitID)
-			height = spGetGroundHeight(x,z)
+			local x,y,z = spGetUnitPosition(unitID)
+			local height = spGetGroundHeight(x,z)
 			
 			if y - height < 1 then -- If I am on the ground
-				s1r = GetWheelHeight(gs1r)
-				s2r = GetWheelHeight(gs2r)
-				s1l = GetWheelHeight(gs1l)
-				s2l = GetWheelHeight(gs2l)
-				
-				--xtilta = (s3r + s3l - s1l - s1r)/6000
+				local s1r = GetWheelHeight(gs1r)
+				local s2r = GetWheelHeight(gs2r)
+				local s1l = GetWheelHeight(gs1l)
+				local s2l = GetWheelHeight(gs2l)
+
+				--local xtilta = (s3r + s3l - s1l - s1r)/6000
 				--xtiltv = xtiltv*0.99 + xtilta
 				--xtilt = xtilt*0.98 + xtiltv
 
-				ztilta = (s1r + s2r - s1l - s2l)/10000 + turnTilt
+				local ztilta = (s1r + s2r - s1l - s2l)/10000 + turnTilt
 				ztiltv = ztiltv*0.99 + ztilta
 				ztilt = ztilt*0.98 + ztiltv
 
-				ya = (s1r + s2r + s1l + s2l)/1000
+				local ya = (s1r + s2r + s1l + s2l)/1000
 				yv = yv*0.99 + ya
 				yp = yp*0.98 + yv
 
@@ -172,7 +166,7 @@ function Suspension()
 
 				Move(rwheel1, y_axis, s1r, 20)
 				Move(rwheel2, y_axis, s2r, 20)
-											
+
 				Move(lwheel1, y_axis, s1l, 20)
 				Move(lwheel2, y_axis, s2l, 20)
 
@@ -202,11 +196,7 @@ function script.QueryWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/730
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 290.1, 40 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 730, 30, 0.05, true)
 end
 
 function script.AimWeapon()

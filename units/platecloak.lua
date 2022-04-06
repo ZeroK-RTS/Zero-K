@@ -46,6 +46,10 @@ return { platecloak = {
     unstick_help       = [[1]],
     selectionscalemult = 1,
     child_of_factory   = [[factorycloak]],
+
+    outline_x = 165,
+    outline_y = 165,
+    outline_yoff = 27.5,
   },
 
   energyUse                     = 0,
@@ -53,12 +57,9 @@ return { platecloak = {
   footprintX                    = 5,
   footprintZ                    = 6,
   iconType                      = [[padbot]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   moveState                     = 1,
   noAutoFire                    = false,
   objectName                    = [[plate_cloak.s3o]],

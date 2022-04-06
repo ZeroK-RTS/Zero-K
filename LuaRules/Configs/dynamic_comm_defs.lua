@@ -29,6 +29,7 @@ if (Spring.GetModOptions) then
 end
 
 local moduleImagePath = "unitpics/"
+local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or (Spring.GetModOptions().disableresurrect == "1")
 
 ------------------------------------------------------------------------
 -- Module Definitions
@@ -654,7 +655,7 @@ local moduleDefs = {
 		image = moduleImagePath .. "module_resurrect.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
-		requireChassis = {"support", "knight"},
+		requireChassis = disableResurrect and {} or {"support", "knight"},
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -683,7 +684,7 @@ local moduleDefs = {
 		description = "Companion Drone - Commander spawns protective drones. Limit: 8",
 		image = moduleImagePath .. "module_companion_drone.png",
 		limit = 8,
-		cost = 300 * COST_MULT,
+		cost = 200 * COST_MULT,
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -696,7 +697,7 @@ local moduleDefs = {
 		description = "Battle Drone - Commander spawns heavy drones. Limit: 8, Requires Companion Drone",
 		image = moduleImagePath .. "module_battle_drone.png",
 		limit = 8,
-		cost = 500 * COST_MULT,
+		cost = 350 * COST_MULT,
 		requireChassis = {"assault", "support", "knight"},
 		requireOneOf = {"module_companion_drone"},
 		requireLevel = 3,
@@ -1368,7 +1369,6 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 					sharedData.drones = (sharedData.drones or 0) + 2
-					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault3_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1393,7 +1393,7 @@ local chassisDefs = {
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
-					sharedData.drones = (sharedData.drones or 0) + 3
+					sharedData.drones = (sharedData.drones or 0) + 2
 					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -1420,7 +1420,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 					sharedData.drones = (sharedData.drones or 0) + 3
-					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 2
+					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault5_" .. GetAssaultCloneModulesString(modulesByDefID)].id

@@ -230,7 +230,9 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+	-- Do not read full attributes-derived BP multiplier here because morph
+	-- disables units, causing BP mult to be zero.
+	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1) * (GG.unit_handicap and GG.unit_handicap[unitID] or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
@@ -597,6 +599,10 @@ local function UpdateMorph(unitID, morphData)
 	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1 and not transportID) then
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
+	end
+	if not morphData.combatMorph then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
 	end
 	return true
 end
@@ -1242,6 +1248,7 @@ local function DrawWorldFunc()
 	)
 	glDepthTest(false)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	glCulling(false)
 	phase = phase + .06
 end
 
@@ -1252,51 +1259,6 @@ end
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
 end
-
-local function split(msg,sep)
-	local s=sep or '|'
-	local t={}
-	for e in string.gmatch(msg..s,'([^%'..s..']+)%'..s) do
-		t[#t+1] = e
-	end
-	return t
-end
-
--- Exemple of AI messages:
--- "aiShortName|morph|762" -- morph the unit of unitId 762
--- "aiShortName|morph|861|12" -- morph the unit of unitId 861 into an unit of unitDefId 12
---
--- Does not work because apparently Spring.GiveOrderToUnit from unsynced gadgets are ignored.
---
-function gadget:AICallIn(data)
-	if type(data) == "string" then
-		local message = split(data)
-		if message[1] == "Shard" or true then-- Because other AI shall be allowed to send such morph command without having to pretend to be Shard
-			if message[2] == "morph" and message[3] then
-				local unitID = tonumber(message[3])
-				if unitID and Spring.ValidUnitID(unitID) then
-					if message[4] then
-						local destDefId=tonumber(message[4])
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
-					else
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
-					end
-				else
-					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
-				end
-			end
-		end
-	end
-end
-
--- Just something to test the above AICallIn
---function gadget:KeyPress(key)
---	if key == 32 then--space key
---	gadget:AICallIn("asn|morph|762")
---	end
---end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then

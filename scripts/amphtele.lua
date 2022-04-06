@@ -52,8 +52,7 @@ local function Create_Beacon_Thread(x,z)
 		Turn(body, y_axis, math.rad(i*4), math.rad(50*speedMult))
 		Sleep(100/speedMult)
 		if i == 1 then
-			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
-			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+			GG.WaitWaitMoveUnit(unitID)
 		end
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
@@ -68,7 +67,7 @@ local function Create_Beacon_Thread(x,z)
 		end
 	end
 
-	GG.tele_createBeacon(unitID,x,z)
+	GG.tele_createBeacon(unitID,unitDefID,x,z)
 	
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)

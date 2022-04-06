@@ -1,6 +1,7 @@
 local base = piece 'base'
 local body = piece 'body'
 local jet = piece 'jet'
+local drop = piece 'drop'
 local wingtipl = piece 'wingtipl'
 local wingtipr = piece 'wingtipr'
 
@@ -40,7 +41,11 @@ function script.AimWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return base
+	return drop
+end
+
+function script.Shot(num)
+	Move(drop, x_axis, math.random()*50 - 25)
 end
 
 function script.BlockShot(num)
@@ -48,8 +53,10 @@ function script.BlockShot(num)
 end
 
 function script.FireWeapon(num)
+	Move(drop, x_axis, math.random()*50 - 25)
 	SetUnarmedAI()
 	Sleep(400)
+	Move(drop, x_axis, 0)
 	Reload()
 end
 

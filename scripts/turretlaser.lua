@@ -20,6 +20,26 @@ end
 
 local stuns = {false, false, false}
 local disarmed = false
+local deployed = true
+local deploySeconds = 0.8
+
+local function Open()
+	deployed = false
+	Move(turret, y_axis, -18)
+	Turn(barrel, x_axis, 0.5 * math.pi/2)
+	
+	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
+	while stunned_or_inbuild do
+		Sleep(100)
+		stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
+	end
+	
+	Move(turret, y_axis, 0, 18 / deploySeconds)
+	Turn(barrel, x_axis, 0, 0.5 * (math.pi/2) / deploySeconds)
+	Sleep(1000 * deploySeconds)
+	
+	deployed = true
+end
 
 function script.Create()
 	local ud = UnitDefs[unitDefID]
@@ -28,12 +48,16 @@ function script.Create()
 	local mid = {midTable.midx, midTable.midy, midTable.midz}
 	local aim = {midTable.midx, midTable.midy + 22, midTable.midz}
     
-	GG.SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 22, midTable.midy + 40, 15, 40)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
+	local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
+	if stunned_or_inbuild then
+		StartThread(Open)
+	end
 end
 
-local function StunThread ()
+local function StunThread()
 	Signal (SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	disarmed = true
@@ -42,17 +66,17 @@ local function StunThread ()
 	GG.PieceControl.StopTurn (barrel, x_axis)
 end
 
-local function UnstunThread ()
+local function UnstunThread()
 	disarmed = false
 	SetSignalMask(SIG_AIM)
 	RestoreAfterDelay()
 end
 
-function Stunned (stun_type)
+function Stunned(stun_type)
 	stuns[stun_type] = true
 	StartThread (StunThread)
 end
-function Unstunned (stun_type)
+function Unstunned(stun_type)
 	stuns[stun_type] = false
 	if not stuns[1] and not stuns[2] and not stuns[3] then
 		StartThread (UnstunThread)
@@ -63,7 +87,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 
-	while disarmed do
+	while disarmed or not deployed do
 		Sleep(34)
 	end
 

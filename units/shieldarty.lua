@@ -4,7 +4,7 @@ return { shieldarty = {
   description            = [[Disarming Artillery]],
   acceleration           = 0.75,
   brakeRate              = 4.5,
-  buildCostMetal         = 350,
+  buildCostMetal         = 340,
   buildPic               = [[SHIELDARTY.png]],
   canGuard               = true,
   canMove                = true,
@@ -13,20 +13,18 @@ return { shieldarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerlrarty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 780,
   maxSlope               = 36,
-  maxVelocity            = 1.7,
+  maxVelocity            = 1.75,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],
@@ -48,7 +46,7 @@ return { shieldarty = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 1800,
+  turnRate               = 2160,
   upright                = true,
 
   weapons                = {

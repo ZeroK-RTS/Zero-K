@@ -6,7 +6,7 @@ local rank = playerID and select(9, Spring.GetPlayerInfo(playerID, false))
 function widget:GetInfo()
 	return {
 		name = widgetName,
-		desc = "v0.4 Teach you to play the game, one tip at a time",
+		desc = "Teaches you to play the game, one tip at a time",
 		author = "KingRaptor; original by zwzsg",
 		date = "July 30th, 2009",
 		license = "Public Domain",
@@ -262,21 +262,21 @@ local function GetTipsList()
 		end
 		if CountMy(raider) >= 1 then
 			local raiderStr1 = "Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like."
-			local raiderStr2 = "Raiders should avoid charging enemy defenses or riot units head-on."
+			local raiderStr2 = "Raiders should avoid charging enemy defences or riot units head-on."
 			AddTipOnce(raiderStr1, 1, 3)
 			AddTipOnce(raiderStr2,1, 2, nil, raiderStr1)
 		end
 		if CountMy(assault) >= 1 then
-			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defensive lines.", 1, 3)
+			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defencive lines.", 1, 3)
 		end
 		if CountMy(skirm) >= 1 then
-			AddTipOnce("Skirmishers are medium-ranged units, ideal for picking off riot units and some defenses from afar. They are vulnerable to raider charges.", 1, 3)
+			AddTipOnce("Skirmishers are medium-ranged units, ideal for picking off riot units and some defences from afar. They are vulnerable to raider charges.", 1, 3)
 		end
 		if CountMy(riot) >= 1 then
-			AddTipOnce("Riot units are slow, short-ranged, and extremely deadly. Use them to counter raiders, but do not attack defenses head-on with them.", 1, 3)
+			AddTipOnce("Riot units are slow, short-ranged, and extremely deadly. Use them to counter raiders, but do not attack defences head-on with them.", 1, 3)
 		end
 		if CountMy(arty) >= 1 then
-			AddTipOnce("Artillery excels at shelling enemy defenses from a safe distance. It is usually (though not always) relatively ineffective against mobile units.", 1, 3)
+			AddTipOnce("Artillery excels at shelling enemy defences from a safe distance. It is usually (though not always) relatively ineffective against mobile units.", 1, 3)
 		end
 		if CountMy(bomber) >= 1 then
 			AddTipOnce("Bombers require air repair pads to reload after each run. The Aircraft Plant comes with one free pad, but you should build more to avoid long waiting lines.", 2, 5)
@@ -402,7 +402,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 		if unitDef.canFly and not airSpotted then
 			SetTip(stringAirSpotted)
 			airSpotted = true
-		elseif unitDef.name == "staticnuke" and not nukeSpotted then
+		elseif unitDef.customParams.is_nuke and not nukeSpotted then
 			SetTip(stringNukeSpotted)
 			nukeSpotted = true
 		end

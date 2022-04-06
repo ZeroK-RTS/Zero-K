@@ -16,6 +16,9 @@ end
 -- august 2013: send queue length to cmd_idle_players (BrainDamage)
 
 --TODO: find way to detect GameStart countdown, so that we can remove button before GameStart (not after gamestart) since it will cause duplicate button error.
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -95,13 +98,6 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	end
 
 	if drawRanges then
-		--[[
-		if isMex[bDefID] then
-			gl.Color(1.0, 0.3, 0.3, 0.7)
-			gl.DrawGroundCircle(bx, by, bz, Game.extractorRadius, 40)
-		end
-		]]
-
 		local wRange = weaponRange[bDefID]
 		if wRange then
 			gl.Color(1.0, 0.3, 0.3, 0.7)
@@ -155,13 +151,6 @@ local function DoBuildingsClash(buildData1, buildData2)
 end
 local function SetSelDefID(defID)
 	selDefID = defID
-
-	-- if (isMex[selDefID] ~= nil) ~= (Spring.GetMapDrawMode() == "metal") then
-		-- Spring.SendCommands("ShowMetalMap")
-	-- end
-	-- if defID then
-		-- Spring.SetActiveCommand(defID)
-	-- end
 end
 
 local function GetSelDefID(defID)
@@ -213,62 +202,6 @@ end
 
 local function GetBuildOptions()
 	return buildOptions
-end
-------------------------------------------------------------
--- Initialize/shutdown
-------------------------------------------------------------
-
-local function GetUnlockedBuildOptions(fullOptions)
-	local teamID = Spring.GetMyTeamID()
-	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
-	if not unlockedCount then
-		return fullOptions
-	end
-	local unlockedMap = {}
-	for i = 1, unlockedCount do
-		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
-		if unitDefID then
-			unlockedMap[unitDefID] = true
-		end
-	end
-	local newOptions = {}
-	for i = 1, #fullOptions do
-		if unlockedMap[fullOptions[i]] then
-			newOptions[#newOptions + 1] = fullOptions[i]
-		end
-	end
-	return newOptions
-end
-
-function widget:Initialize()
-	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
-		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-	for uDefID, uDef in pairs(UnitDefs) do
-		if uDef.customParams.ismex then
-			isMex[uDefID] = true
-		end
-
-		if uDef.maxWeaponRange > 16 then
-			weaponRange[uDefID] = uDef.maxWeaponRange
-		end
-	end
-	if UnitDefNames["staticmex"] then
-		isMex[UnitDefNames["staticmex"].id] = true;
-	end
-	WG.InitialQueue = true
-	
-	buildOptions = GetUnlockedBuildOptions(buildOptions)
-end
-
-function widget:Shutdown()
-	WG.InitialQueue = nil
 end
 
 ------------------------------------------------------------
@@ -481,7 +414,6 @@ end
 ------------------------------------------------------------
 
 function widget:GameFrame(n)
-
 	if not gameStarted then
 		gameStarted = true
 	end
@@ -637,6 +569,15 @@ function widget:CommandsChanged()
 		action  = "stop",
 		params  = {},
 	})
+	table.insert(widgetHandler.customCommands, {
+		id      = CMD_AREA_MEX,
+		type    = CMDTYPE.ICON_AREA,
+		tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
+		name    = 'Mex',
+		cursor  = 'Mex',
+		action  = 'areamex',
+		params  = {},
+})
 end
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
@@ -664,8 +605,7 @@ local function CancelQueue()
 	buildTime = bCost / sDef.buildSpeed
 end
 
-
-function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+local function InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
 	local areSpec = Spring.GetSpectatingState()
 	if areSpec then
 		return false
@@ -701,7 +641,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		
-		if cmdOptions.meta then	-- space insert at front
+		if cmdOptions.meta then -- space insert at front
 			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
 				table.insert(buildQueue, 1, buildData)
@@ -712,7 +652,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 					msg = "IQ|2|".. (MAX_QUEUE + 1)
 				end
 			end
-		elseif cmdOptions.shift then	-- shift-queue
+		elseif cmdOptions.shift then -- shift-queue
 			local anyClashes = CheckClash(buildData)
 			if not anyClashes then
 				if #buildQueue < MAX_QUEUE then	-- disallow if already reached max queue
@@ -741,6 +681,75 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		return true
 	end
 	return false
+end
+
+local function InitialQueueGetTail()
+	if not (buildQueue and buildQueue[1]) then
+		return false
+	end
+	local lastQueue = buildQueue[#buildQueue]
+	return lastQueue[2], lastQueue[4]
+end
+
+function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	return InitialQueueHandleCommand(cmdID, cmdParams, cmdOptions)
+end
+
+------------------------------------------------------------
+-- Initialize/shutdown
+------------------------------------------------------------
+
+local function GetUnlockedBuildOptions(fullOptions)
+	local teamID = Spring.GetMyTeamID()
+	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
+	if not unlockedCount then
+		return fullOptions
+	end
+	local unlockedMap = {}
+	for i = 1, unlockedCount do
+		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
+		if unitDefID then
+			unlockedMap[unitDefID] = true
+		end
+	end
+	local newOptions = {}
+	for i = 1, #fullOptions do
+		if unlockedMap[fullOptions[i]] then
+			newOptions[#newOptions + 1] = fullOptions[i]
+		end
+	end
+	return newOptions
+end
+
+function widget:Initialize()
+	WG.InitialQueueHandleCommand = InitialQueueHandleCommand
+	WG.InitialQueueGetTail = InitialQueueGetTail
+
+	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
+		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
+		widgetHandler:RemoveWidget(self)
+		return
+	end
+	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
+		widgetHandler:RemoveWidget(self)
+		return
+	end
+	for uDefID, uDef in pairs(UnitDefs) do
+		if uDef.customParams.ismex then
+			isMex[uDefID] = true
+		end
+
+		if uDef.maxWeaponRange > 16 then
+			weaponRange[uDefID] = uDef.maxWeaponRange
+		end
+	end
+	WG.InitialQueue = true
+	
+	buildOptions = GetUnlockedBuildOptions(buildOptions)
+end
+
+function widget:Shutdown()
+	WG.InitialQueue = nil
 end
 
 ------------------------------------------------------------

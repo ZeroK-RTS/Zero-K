@@ -1,7 +1,7 @@
 return { turretantiheavy = {
   unitname                      = [[turretantiheavy]],
   name                          = [[Lucifer]],
-  description                   = [[Tachyon Projector - Requires connection to a 50 energy grid]],
+  description                   = [[Tachyon Projector - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
   buildCostMetal                = 2200,
   builder                       = false,
@@ -17,6 +17,8 @@ return { turretantiheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
+    bait_level_target_armor = 1,
 
     keeptooltip    = [[any string I want]],
 
@@ -30,18 +32,15 @@ return { turretantiheavy = {
     dontfireatradarcommand = '0',
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[fixedtachyon]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   losEmitHeight                 = 65,
   maxDamage                     = 6000,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
@@ -83,7 +82,6 @@ return { turretantiheavy = {
       damage                  = {
         default = 4000.1,
         planes  = 4000.1,
-        subs    = 200.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

@@ -13,7 +13,6 @@ local smokePiece = {basebottom, basemid, basetop}
 -- Local Constants
 
 local BASETOP_TURN_SPEED = math.rad(200)
-local BASEMID_TURN_SPEED = math.rad(230)
 local HOUSING_TURN_SPEED = math.rad(200)
 local SPINDLE_TURN_SPEED = math.rad(120 / 0.8)
 
@@ -47,7 +46,7 @@ function script.Create()
 	local midpos = {midTable.midx, midTable.midy,      midTable.midz}
 	local aimpos = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	GG.SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end

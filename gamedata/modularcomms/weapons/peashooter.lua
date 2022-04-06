@@ -18,7 +18,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 12,
-		subs    = 0.6,
 	},
 
 	duration                = 0.02,
@@ -30,7 +29,7 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 300,
+	range                   = 293,
 	reloadtime              = 0.1,
 	rgbColor                = [[1 0 0]],
 	soundHit                = [[weapon/laser/lasercannon_hit]],

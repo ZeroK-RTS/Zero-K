@@ -2,18 +2,26 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local econMultEnabled = nil
 local buildTimes = {}
+local unitRanges = {}
 local planetwarsStructure = {}
 local buildPlate = {}
+local buildPowerCache = {}
+local rangeCache = {}
+local dynComm = {}
 local variableCostUnit = {
 	[UnitDefNames["terraunit"].id] = true
 }
+
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	buildTimes[i] = ud.buildTime
 	if ud.customParams.level or ud.customParams.dynamic_comm then
 		variableCostUnit[i] = true
+		dynComm[i] = true
 	end
 	if ud.customParams.planetwars_structure then
 		planetwarsStructure[i] = true
@@ -25,6 +33,86 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local function GetCachedBaseBuildPower(unitDefID, ud)
+	if not buildPowerCache[unitDefID] then
+		ud = ud or UnitDefs[unitDefID]
+		buildPowerCache[unitDefID] = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
+	end
+	return buildPowerCache[unitDefID]
+end
+
+local function GetCachedBaseRange(unitDefID, ud)
+	if not rangeCache[unitDefID] then
+		ud = ud or UnitDefs[unitDefID]
+		rangeCache[unitDefID] = ud.maxWeaponRange
+	end
+	return rangeCache[unitDefID]
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function Spring.Utilities.GetUnitCost(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if unitID and variableCostUnit[unitDefID] then
+		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
+		if realCost then
+			return realCost
+		end
+	end
+	if unitDefID and buildTimes[unitDefID] then
+		return buildTimes[unitDefID]
+	end
+	return 50
+end
+
+function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return false
+	end
+	return GetCachedBaseBuildPower(unitDefID) > 0
+end
+
+function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return 0
+	end
+	if econMultEnabled == nil then
+		econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
+	end
+	local buildPower = GetCachedBaseBuildPower(unitDefID)
+	local mult = 1
+	if unitID then
+		if econMultEnabled then
+			mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
+		end
+		buildPower = buildPower * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+	elseif econMultEnabled and Spring.GetMyAllyTeamID then
+		mult = mult * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetMyAllyTeamID() or "")) or 1)
+	end
+	return mult * buildPower, buildPower
+end
+
+local spGetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
+
+function Spring.Utilities.GetUnitRange(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return false
+	end
+	if not dynComm[unitDefID] then
+		local range = GetCachedBaseRange(unitDefID)
+		return (range > 0) and range
+	end
+	return Spring.GetUnitRulesParam(unitID, "comm_max_range") or GetCachedBaseRange(unitDefID), Spring.GetUnitRulesParam(unitID, "primary_weapon_range")
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 local function GetGridTooltip(unitID)
 	local gridCurrent = Spring.GetUnitRulesParam(unitID, "OD_gridCurrent")
 	if not gridCurrent then return end
@@ -32,7 +120,18 @@ local function GetGridTooltip(unitID)
 	local windStr = ""
 	local minWind = Spring.GetUnitRulesParam(unitID, "minWind")
 	if minWind then
-		windStr = "\n" ..  WG.Translate("interface", "wind_range") .. " " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+		if econMultEnabled == nil then
+			econMultEnabled = (Spring.GetGameRulesParam("econ_mult_enabled") and true) or false
+		end
+		local maxWind = (Spring.GetGameRulesParam("WindMax") or 2.5)
+		if econMultEnabled then
+			local mult = (Spring.GetGameRulesParam("econ_mult_" .. (spGetUnitAllyTeam(unitID) or "")) or 1)
+			minWind = minWind * mult
+			maxWind = maxWind * mult
+		end
+		minWind = math.round(minWind, 1)
+		maxWind = math.round(maxWind, 1)
+		windStr = "\n" ..  WG.Translate("interface", "wind_range") .. " " .. minWind .. " - " .. maxWind
 	end
 
 	if gridCurrent < 0 then
@@ -95,7 +194,8 @@ local function GetPlanetwarsTooltip(unitID, ud)
 end
 
 local function GetPlateTooltip(unitID, ud)
-	if not buildPlate[ud.id] then
+	local unitDefID = ud.id
+	if not buildPlate[unitDefID] then
 		return false
 	end
 	local disabled = (Spring.GetUnitRulesParam(unitID, "nofactory") == 1)
@@ -104,10 +204,10 @@ local function GetPlateTooltip(unitID, ud)
 	end
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
-	local buildSpeedRaw = ud.buildSpeed
+	local buildSpeedRaw = spGetUnitBuildSpeed(unitID, unitDefID)
 	if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
 		local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = buildSpeed}) or desc
+		desc = WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc .. " Disabled - Too far from operational factory"
 end
@@ -150,17 +250,17 @@ function Spring.Utilities.GetDescription(ud, unitID)
 
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
-	if Spring.ValidUnitID(unitID) then
+	local isValidUnit = Spring.ValidUnitID(unitID)
+	if isValidUnit then
 		local customTooltip = GetCustomTooltip(unitID, ud)
 		if customTooltip then
 			return customTooltip
 		end
-
-		local buildSpeedRaw = ud.buildSpeed
-		if buildSpeedRaw > 0 and not ud.customParams.nobuildpower then
-			local buildSpeed = buildSpeedRaw * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-			desc = WG.Translate("interface", "builds_at", {desc = desc, bp = buildSpeed}) or desc
-		end
+	end
+	
+	local buildSpeed = spGetUnitBuildSpeed(unitID, ud.id)
+	if buildSpeed > 0 then
+		return WG.Translate("interface", "builds_at", {desc = desc, bp = math.round(buildSpeed, 1)}) or desc
 	end
 	return desc
 end
@@ -177,46 +277,6 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-function Spring.Utilities.GetUnitCost(unitID, unitDefID)
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	if unitID and variableCostUnit[unitDefID] then
-		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
-		if realCost then
-			return realCost
-		end
-	end
-	if unitDefID and buildTimes[unitDefID] then
-		return buildTimes[unitDefID]
-	end
-	return 50
-end
-
-function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	if not unitDefID then
-		return false
-	end
-	local ud = UnitDefs[unitDefID]
-	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
-	return buildPower > 0
-end
-
-function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	if not unitDefID then
-		return 0
-	end
-	local ud = UnitDefs[unitDefID]
-	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
-	if unitID then
-		local mult = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-		if mult then
-			return mult * buildPower
-		end
-	end
-	return buildPower
-end
 
 function Spring.Utilities.UnitEcho(unitID, st)
 	st = st or unitID

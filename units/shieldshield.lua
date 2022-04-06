@@ -24,20 +24,21 @@ return { shieldshield = {
     
     priority_misc = 1, -- Medium
     unarmed       = true,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkershield]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 700,
   maxSlope               = 36,
   maxVelocity            = 2.05,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   moveState              = 0,
   objectName             = [[m-8.s3o]],
@@ -51,7 +52,7 @@ return { shieldshield = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 30,
-  turnRate               = 2100,
+  turnRate               = 2520,
   upright                = false,
 
   weapons                = {

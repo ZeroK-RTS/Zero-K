@@ -2,9 +2,7 @@ return { raveparty = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
-  buildCostMetal                = 36000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -19,6 +17,13 @@ return { raveparty = {
 
   customParams                  = {
     modelradius    = [[35]],
+    bait_level_default = 0,
+    draw_blueprint_facing = 1,
+    speed_bar = 1,
+
+    keeptooltip    = [[any string I want]],
+    neededlink     = 400,
+    pylonrange     = 150,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -26,15 +31,12 @@ return { raveparty = {
   footprintZ                    = 7,
   highTrajectory                = 2,
   iconType                      = [[mahlazer]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 100,
   maxDamage                     = 16000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[raveparty.s3o]],
   --onoffable                        = true,
@@ -51,7 +53,6 @@ return { raveparty = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooooo ooooooo ooooooo ooooooo ooooooo ooooooo ooooooo]],
@@ -97,8 +98,8 @@ return { raveparty = {
       craterMult              = 3,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
+        reaim_time = 1,
       },
       damage                  = {
         default = 3002.1,
@@ -112,7 +113,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[1 0.1 0.1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                    = 15,
       sizeDecay               = 0.03,
       soundHit                = [[explosion/mini_nuke]],
@@ -137,8 +138,9 @@ return { raveparty = {
         setunitsonfire = "1",
         burntime = 240,
         burnchance = 1,
-        restrict_in_widgets = 1,
+
         script_reload = [[6]],
+        reaim_time = 1,
 
         area_damage = 1,
         area_damage_radius = 320,
@@ -149,7 +151,6 @@ return { raveparty = {
       damage                  = {
         default = 300.9,
         planes  = 300,
-        subs    = 15,
       },
 
       edgeeffectiveness       = 0.25,
@@ -160,7 +161,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.9 0.3 0]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
@@ -182,14 +183,13 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
+        reaim_time = 1,
       },
 
       damage                  = {
         default = 801.1,
         planes  = 800,
-        subs    = 800,
       },
 
       edgeeffectiveness       = 0.5,
@@ -201,7 +201,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.7 0.7 0]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/cannon/earthshaker]],
@@ -222,19 +222,19 @@ return { raveparty = {
       craterMult              = 1,
 
       customParams            = {
-        gatherradius = [[384]],
-        smoothradius = [[192]],
-        smoothmult   = [[0.7]],
+        gatherradius = [[400]],
+        smoothradius = [[240]],
+        smoothmult   = [[0.8]],
         smoothexponent = [[0.45]],
         movestructures = [[1]],
-        restrict_in_widgets = 1,
+
         script_reload = [[6]],
+        reaim_time = 1,
       },
       
       damage                  = {
         default = 401.1,
         planes  = 400,
-        subs    = 20,
       },
 
       explosionGenerator      = [[custom:blobber_goo]],
@@ -244,7 +244,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.1 1 0.1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[explosion/ex_large4]],
@@ -265,8 +265,8 @@ return { raveparty = {
       craterMult              = 0.5,
 
       customParams = {
-        restrict_in_widgets = 1,
         script_reload = [[6]],
+        reaim_time = 1,
       },
 
       damage                  = {
@@ -286,7 +286,7 @@ return { raveparty = {
       paralyzeTime            = 25,
       range                   = 7500,
       rgbColor                = [[0.1 0.1 1]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                      = 15,
       sizeDecay                  = 0.03,
       soundHit                = [[weapon/more_lightning]],
@@ -310,13 +310,13 @@ return { raveparty = {
       customparams = {
         timeslow_damagefactor = 10,
         nofriendlyfire = "needs hax",
-        restrict_in_widgets = 1,
         script_reload = [[6]],
+        reaim_time = 1,
+        timeslow_overslow_frames = 2*30, --2 seconds before slow decays
       },
       
       damage                  = {
         default = 450.1,
-        subs    = 22.5,
       },
 
       edgeeffectiveness       = 0.8,
@@ -329,7 +329,7 @@ return { raveparty = {
       myGravity               = 0.18,
       range                   = 7500,
       rgbColor                = [[0.7 0 0.7]],
-      reloadtime              = 1,
+      reloadtime              = 5,
       size                    = 15,
       sizeDecay               = 0.03,
       soundHit                = [[weapon/aoe_aura2]],

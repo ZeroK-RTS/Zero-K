@@ -14,26 +14,28 @@ return { jumpaa = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 0,
     modelradius    = [[15]],
+
+    outline_x = 80,
+    outline_y = 90,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[jumpjetaa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 2100,
   maxSlope            = 36,
   maxVelocity         = 2.017,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
@@ -46,7 +48,7 @@ return { jumpaa = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 28,
-  turnRate            = 1400,
+  turnRate            = 1680,
   upright             = true,
 
   weapons             = {
@@ -89,7 +91,6 @@ return { jumpaa = {
       damage                  = {
         default = 0.78,
         planes  = 7.8,
-        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:ARCHPLOSION]],
@@ -134,7 +135,6 @@ return { jumpaa = {
       damage                  = {
         default = 1.636,
         planes  = 16.36,
-        subs    = 0.94,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

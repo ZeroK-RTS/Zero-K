@@ -185,7 +185,9 @@ local function DrawWire(emitUnitID, recUnitID)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
+	if Spring.IsGUIHidden() then
+		return
+	end
 	gl.DepthTest(false)
 	for unitID, info in pairs(terraUnits) do
 		if info and info.terraformType > 0 and Spring.IsUnitVisible(unitID, 550, true) then

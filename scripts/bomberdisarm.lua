@@ -9,7 +9,6 @@ local smokePiece = {base, jet1, jet2}
 local doingRun = false
 local preDropMoved = false
 local sound_index = 0
-local BOMB_DELAY = 1
 
 local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberdisarm"].wantedHeight
@@ -29,7 +28,6 @@ function script.Create()
 end
 
 function script.Activate()
-	
 	Turn(Lwing, z_axis, math.rad(90), 2)
 	Turn(Rwing, z_axis, math.rad(-90), 2)
 	Turn(LwingTip, z_axis, math.rad(-165), 2) --160
@@ -43,7 +41,6 @@ function script.Deactivate()
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
-
 
 function script.FireWeapon(checkHeight)
 	if doingRun then
@@ -89,6 +86,7 @@ function script.FireWeapon(checkHeight)
 			Turn(preDrop, z_axis, -angle_z)
 			
 			EmitSfx(drop, GG.Script.FIRE_W2)
+			GG.PokeDecloakUnit(unitID, unitDefID)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
 				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)

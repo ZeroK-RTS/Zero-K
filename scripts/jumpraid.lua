@@ -160,14 +160,8 @@ function jumping(jumpPercent)
 	end
 end
 
-function preJump(turn,distance)
-end
-
 function beginJump()
 	StartThread(BeginJumpThread)
-end
-
-function halfJump()
 end
 
 function endJump()

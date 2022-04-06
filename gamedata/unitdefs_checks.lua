@@ -20,6 +20,47 @@ local function round_to_frames(name, wd, key)
 	wd[key] = sanitized_value + 1E-5
 end
 
+local function print_bounce_warning(name, wd)
+	if (wd.numbounce or wd.bouncerebound or wd.bounceslip) and not (
+			(wd.customparams and wd.customparams.stays_underwater == 1) or
+			name == "hoverdepthcharge.depthcharge" or name == "hoverdepthcharge.fake_depthcharge" or
+			wd.weapontype == "Cannon") then
+		Spring.Echo("===============================================================")
+		Spring.Echo("*************************** WARNING ***************************")
+		Spring.Echo("Ground bounce detected for", name, wd.weapontype)
+		Spring.Echo("There is a risk of it falling through the ground indefinitely.")
+		Spring.Echo("Ensure appropriate hax is in place.")
+		Spring.Echo("For torpedoes use \"stays_underwater\" customParam.")
+		Spring.Echo("See LuaRules/Gadgets/weapon_torpedo_stay_underwater.lua.")
+		Spring.Echo("************************* END WARNING *************************")
+		Spring.Echo("===============================================================")
+	end
+end
+
+local function check_lasercannon_range(name, wd)
+	if wd.weapontype ~= "LaserCannon" then
+		return
+	end
+
+	local original_range = wd.range
+	local v = wd.weaponvelocity / Game.gameSpeed
+
+	local frames = math.max(1, math.floor((original_range + 0.5) / v))
+	local sanitized_range = frames * v
+	local next_range = (frames + 1) * v
+	local velocty_for_current_range = (original_range / frames) * Game.gameSpeed
+	if math.abs(original_range - sanitized_range) > 1 then
+		-- Warning instead of Error for now, to let mods adjust
+		-- stabled in 2021-06, change to `error()` later
+		Spring.Echo(name..".range is set to " .. original_range .. " but would actually be " .. sanitized_range .. " ingame! Please either:\n" ..
+			" - set range to " .. math.floor(sanitized_range + 0.5) .. " (no logic change)\n" ..
+			" - set range to " .. math.floor(next_range + 0.5) .. " (next available breakpoint)\n" ..
+			" - set weaponVelocity to " .. velocty_for_current_range .. " (to keep current range)")
+	end
+
+	wd.range = sanitized_range + 1E-5
+end
+
 local function processWeapons(unitDefName, unitDef)
 	local weaponDefs = unitDef.weapondefs
 	if not weaponDefs then
@@ -30,9 +71,22 @@ local function processWeapons(unitDefName, unitDef)
 		local fullWeaponName = unitDefName .. "." .. weaponDefName
 		round_to_frames(fullWeaponName, weaponDef, "reloadtime")
 		round_to_frames(fullWeaponName, weaponDef, "burstrate")
+		print_bounce_warning(fullWeaponName, weaponDef)
+		check_lasercannon_range(fullWeaponName, weaponDef)
+	end
+end
+
+local function checkBuildingness(name, ud)
+	if not ud.maxvelocity or ud.maxvelocity == 0 then
+		if ud.brakerate     then Spring.Echo(name .. " is a building but has the `brakeRate` field set!") end
+		if ud.acceleration  then Spring.Echo(name .. " is a building but has the `acceleration` field set!") end
+		if ud.turnrate      then Spring.Echo(name .. " is a building but has the `turnRate` field set!") end
+	else
+		if ud.yardmap then Spring.Echo(name .. " is not a building (speed > 0) but has a yardmap!") end
 	end
 end
 
 for unitDefName, unitDef in pairs (UnitDefs) do
+	checkBuildingness(unitDefName, unitDef)
 	processWeapons(unitDefName, unitDef)
 end

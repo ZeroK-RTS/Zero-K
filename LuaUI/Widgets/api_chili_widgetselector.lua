@@ -204,18 +204,15 @@ MakeWidgetList = function()
 		if not data.alwaysStart then
 			data.basename = data.basename or ''
 			data.desc = data.desc or '' --become NIL if zipfile/archive corrupted
-			data.author = data.author or ''
 			local _, _, category = string.find(data.basename, "([^_]*)")
 
 			local lowercase_name = name:lower()
 			local lowercase_category = category:lower()
 			local lowercase_desc = data.desc:lower()
-			local lowercase_author = data.author:lower()
 			
 			if filterUserInsertedTerm == "" or
 			lowercase_name:find(filterUserInsertedTerm) or
 			lowercase_desc:find(filterUserInsertedTerm) or
-			lowercase_author:find(filterUserInsertedTerm) or
 			lowercase_category:find(filterUserInsertedTerm)
 			then
 			
@@ -233,7 +230,6 @@ MakeWidgetList = function()
 					name         = name,
 					active       = data.active,
 					desc         = data.desc,
-					author       = data.author,
 				}
 				listIsEmpty = false
 			end
@@ -268,7 +264,7 @@ MakeWidgetList = function()
 			widget_checks[wdata.name] = Checkbox:New{
 					caption = wdata.name,
 					checked = enabled,
-					tooltip = '(By ' .. tostring(wdata.author) .. ")\n" .. tostring(wdata.desc),
+					tooltip = tostring(wdata.desc),
 					OnChange = {
 						function(self)
 							widgetHandler:ToggleWidget(wdata.name)

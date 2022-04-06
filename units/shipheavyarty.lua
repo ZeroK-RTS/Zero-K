@@ -2,9 +2,9 @@ return { shipheavyarty = {
   unitname               = [[shipheavyarty]],
   name                   = [[Shogun]],
   description            = [[Battleship (Heavy Artillery)]],
-  acceleration           = 0.195,
+  acceleration           = 0.234,
   activateWhenBuilt   = true,
-  brakeRate              = 0.475,
+  brakeRate              = 0.57,
   buildCostMetal         = 5000,
   builder                = false,
   buildPic               = [[shipheavyarty.png]],
@@ -19,7 +19,12 @@ return { shipheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     modelradius    = [[80]],
+
+    outline_x = 340,
+    outline_y = 340,
+    outline_yoff = 30,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,11 +33,8 @@ return { shipheavyarty = {
   footprintZ             = 5,
   highTrajectory         = 2,
   iconType               = [[shipheavyarty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 8000,
   maxVelocity            = 1.9,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],
   moveState              = 0,
@@ -54,7 +56,7 @@ return { shipheavyarty = {
   sightDistance          = 660,
   sonarDistance          = 660,
   turninplace            = 0,
-  turnRate               = 216,
+  turnRate               = 345,
   waterLine              = 4,
   workerTime             = 0,
 
@@ -104,10 +106,9 @@ return { shipheavyarty = {
       damage                  = {
         default = 501.1,
         planes  = 501.1,
-        subs    = 25,
       },
 
-      explosionGenerator      = [[custom:PLASMA_HIT_96]],
+      explosionGenerator      = [[custom:165rlexplode]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

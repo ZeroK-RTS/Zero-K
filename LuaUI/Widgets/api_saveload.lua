@@ -45,8 +45,10 @@ local savedata = {
 	projectile = {},
 	widgets = {}
 }
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
+
 local function ReadFile(zip, name, file)
 	name = name or ''
 	if (not file) then return end

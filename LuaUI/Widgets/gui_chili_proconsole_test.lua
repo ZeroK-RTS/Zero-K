@@ -186,6 +186,7 @@ options_order = {
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
+	'hideChat',
 	'toggleBacklog',
 	'text_height_chat',
 	'text_height_console',
@@ -214,6 +215,55 @@ options_order = {
 
 local function onOptionsChanged()
 	RemakeConsole()
+end
+
+local showingBackchat = false
+local showingNothing = false
+local wantHidden = false
+
+local function SwapBacklog()
+	if showingBackchat then
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		end
+		if wantHidden then
+			showingBackchat = false
+			showingNothing = true
+			return
+		else
+			window_chat:AddChild(scrollpanel_chat)
+			backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
+			backlogButtonImage:Invalidate()
+		end
+	else
+		if not showingNothing then
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		window_chat:AddChild(scrollpanel_backchat)
+		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
+		backlogButtonImage:Invalidate()
+	end
+	showingBackchat = not showingBackchat
+	showingNothing = false
+end
+
+local function SetHidden(hidden)
+	if hidden == wantHidden then
+		return
+	end
+	wantHidden = hidden
+	
+	if wantHidden then
+		if showingBackchat then
+			window_chat:RemoveChild(scrollpanel_backchat)
+		else
+			window_chat:RemoveChild(scrollpanel_chat)
+		end
+		showingNothing = true
+	else
+		showingBackchat = true
+		SwapBacklog()
+	end
 end
 
 options = {
@@ -561,6 +611,7 @@ options = {
 					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -578,6 +629,7 @@ options = {
 					bottom = 0,
 					right = 0,
 					height = inputsize,
+					noFont = true,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
@@ -650,6 +702,15 @@ options = {
 				window_chat:RemoveChild(inputspace)
 			end
 			scrollpanel_console:Invalidate()
+		end,
+	},
+	hideChat = {
+		name = "Hide when not chatting",
+		desc = "Hide the chat completely when not entering chat.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetHidden(self.value)
 		end,
 	},
 	backchatOpacity = {
@@ -852,6 +913,9 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'GodModeAction') or
+	string.find(msg.argument,'GlobalLosActionExecutor') or
+	string.find(msg.argument,'Everything%-for%-free') or
 	string.find(msg.argument,'resigned') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player'))
 	--string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
@@ -920,7 +984,6 @@ local function AddMessage(msg, target, remake)
 	local textbox = WG.Chili.TextBox:New{
 		width = '100%',
 		align = "left",
-		fontsize = size,
 		valign = "ascender",
 		lineSpacing = 0,
 		padding = { 0, 0, 0, 0 },
@@ -930,14 +993,11 @@ local function AddMessage(msg, target, remake)
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-
-		font = {
+		objectOverrideFont = WG.GetSpecialFont(size, "proconsole", {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
-			
-			--color         = {0,0,0,0},
-		}
+		})
 	}
 	
 	if options.clickable_points.value then
@@ -963,7 +1023,7 @@ local function AddMessage(msg, target, remake)
 				caption = '',
 				children = {
 					WG.Chili.Button:New{
-						caption='',
+						noFont = true,
 						x=0;y=0;
 						width = 30,
 						height = 20,
@@ -1221,6 +1281,7 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 		parent = (enabled and screen0) or nil,
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
+		noFont = true,
 		dockable = true,
 		name = name,
 		x = x,
@@ -1251,42 +1312,6 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 			ParentFunc
 		},
 	}
-end
-
-local showingBackchat = false
-local showingNothing = false
-
-local function SetHidden(hidden)
-	if hidden == showingNothing then
-		return
-	end
-	showingNothing = hidden
-	
-	if showingBackchat then
-		window_chat:RemoveChild(scrollpanel_backchat)
-	else
-		window_chat:RemoveChild(scrollpanel_chat)
-	end
-end
-
-local function SwapBacklog()
-	if showingBackchat then
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_backchat)
-		end
-		window_chat:AddChild(scrollpanel_chat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
-		backlogButtonImage:Invalidate()
-	else
-		if not showingNothing then
-			window_chat:RemoveChild(scrollpanel_chat)
-		end
-		window_chat:AddChild(scrollpanel_backchat)
-		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
-		backlogButtonImage:Invalidate()
-	end
-	showingBackchat = not showingBackchat
-	showingNothing = false
 end
 
 local function SetBacklogShow(newShow)
@@ -1597,6 +1622,7 @@ function widget:Initialize()
 		x = (options.backlogArrowOnRight.value and 0) or inputsize,
 		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
+		noFont = true,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
@@ -1618,7 +1644,7 @@ function widget:Initialize()
 		height = inputsize - 3,
 		classname = "overlay_button_tiny",
 		padding = {1,1,1,1},
-		caption = '',
+		noFont = true,
 		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},
 		children={ backlogButtonImage },
@@ -1630,6 +1656,7 @@ function widget:Initialize()
 		x = 0,
 		y = 0,
 		width = '100%',
+		noFont = true,
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
@@ -1656,6 +1683,7 @@ function widget:Initialize()
 		padding = { 3,3,3,3 },
 		x = 0,
 		y = 0,
+		noFont = true,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
@@ -1675,6 +1703,7 @@ function widget:Initialize()
 		y = 5,
 		right = 5,
 		bottom = 5,
+		noFont = true,
 		verticalSmartScroll = true,
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},

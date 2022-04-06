@@ -4,6 +4,7 @@ return { commstrike1 = {
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,
   activateWhenBuilt      = true,
+  autoheal               = 5,
   brakeRate              = 2.25,
   buildCostMetal         = 1200,
   buildDistance          = 128,
@@ -27,6 +28,8 @@ return { commstrike1 = {
     statsname = [[dynstrike1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[1]],
     --decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
@@ -38,8 +41,6 @@ return { commstrike1 = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[commander1]],
-  idleAutoHeal           = 5,
-  idleTime               = 0,
   leaveTracks            = true,
   losEmitHeight          = 40,
   maxDamage              = 2500,
@@ -47,7 +48,6 @@ return { commstrike1 = {
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
   metalStorage           = 500,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[strikecom.dae]],
@@ -71,7 +71,7 @@ return { commstrike1 = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
   workerTime             = 10,
   
@@ -102,7 +102,6 @@ return { commstrike1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -144,7 +143,6 @@ return { commstrike1 = {
 
       damage                  = {
         default = 15.06,
-        subs    = 0.8,
       },
 
       duration                = 0.1,

@@ -3,8 +3,6 @@ include "constants.lua"
 local dyncomm = include('dynamicCommander.lua')
 _G.dyncomm = dyncomm
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 -- pieces
 local base = piece 'base'
 local shield = piece 'shield'
@@ -44,8 +42,6 @@ local SIG_BUILD = 32
 local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
-local SIG_WALK = 1
---local SIG_AIM_3 = 8 --step on
 
 --------------------------------------------------------------------------------
 -- vars
@@ -59,7 +55,7 @@ local bMoving = false
 local bAiming = false
 local inBuildAnim = false
 
-local SPEEDUP_FACTOR = 1.1
+local SPEEDUP_FACTOR = 1.02
 local REF_TURN_SPEED = 185  -- deg/s
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
@@ -405,7 +401,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	--Signal(SIG_WALK)
 	bMoving = false
 end
 
@@ -496,25 +491,12 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
-end
-
 function script.FireWeapon(num)
 	dyncomm.EmitWeaponFireSfx(flare, num)
 end
 
 function script.Shot(num)
 	dyncomm.EmitWeaponShotSfx(flare, num)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
 end
 
 function script.StopBuilding()

@@ -113,11 +113,15 @@ local function RestoreAfterDelay()
 	Turn(turret, x_axis, 0, math.rad(30))
 end
 
-function script.QueryWeapon1() return points[missile].missile end
+function script.QueryWeapon()
+	return points[missile].missile
+end
 
-function script.AimFromWeapon1() return pelvis end
+function script.AimFromWeapon()
+	return pelvis
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	Turn(body, y_axis, heading, 5)
@@ -128,7 +132,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	missile = missile + 1
 	if missile > 2 then missile = 1 end
 	EmitSfx(points[missile].missile, 1024)

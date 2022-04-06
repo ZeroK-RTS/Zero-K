@@ -100,7 +100,7 @@ end
 local function ChangeDroneRulesParam(unitID, diff)
 	local count = Spring.GetUnitRulesParam(unitID, "dronesControlled") or 0
 	count = count + diff
-	Spring.SetUnitRulesParam(unitID, "dronesControlled", count, INLOS_ACCESS)
+	spSetUnitRulesParam(unitID, "dronesControlled", count, INLOS_ACCESS)
 end
 
 local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
@@ -126,10 +126,11 @@ local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
 		toReturn.droneSets[i].buildCount = 0
+		toReturn.droneSets[i].queueCount = 0
 	end
 	if maxDronesTotal > 0 then
-		Spring.SetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
-		Spring.SetUnitRulesParam(unitID, "dronesControlledMax", maxDronesTotal, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "dronesControlled", 0, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "dronesControlledMax", maxDronesTotal, INLOS_ACCESS)
 	end
 	return toReturn
 end
@@ -195,8 +196,8 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
-		Spring.SetUnitRulesParam(droneID, "parent_unit_id", unitID)
-		Spring.SetUnitRulesParam(droneID, "drone_set_index", setNum)
+		spSetUnitRulesParam(droneID, "parent_unit_id", unitID)
+		spSetUnitRulesParam(droneID, "drone_set_index", setNum)
 		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.droneCount = droneSet.droneCount + 1
 		ChangeDroneRulesParam(unitID, 1)
@@ -369,8 +370,14 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	end
 	
 	local AddNextDroneFromQueue = function(inputID)
-		if #carrierList[inputID].droneInQueue > 0 then
-			if AddUnitToEmptyPad(inputID, carrierList[inputID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
+		local carrier = carrierList[inputID]
+		local droneQueue = carrier.droneInQueue
+		if #droneQueue > 0 then
+			local droneSetID = droneQueue[1]
+			if AddUnitToEmptyPad(inputID, droneSetID) then --pad cleared, immediately add any unit from queue
+				local set = carrier.droneSets[droneSetID]
+				set.buildCount = set.buildCount + 1
+				set.queueCount = set.queueCount - 1
 				table.remove(carrierList[inputID].droneInQueue, 1)
 			end
 		end
@@ -811,17 +818,19 @@ function gadget:GameFrame(f)
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
+					elseif (set.droneCount + set.queueCount < set.maxDrones) and set.buildCount < set.config.maxBuild then
 						if generateDrones[carrierID] then
 							for n = 1, set.config.spawnSize do
-								if (set.droneCount >= set.maxDrones) then
+								if set.droneCount + set.queueCount >= set.maxDrones
+								or set.buildCount >= set.config.maxBuild then
 									break
 								end
-								
-								carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue + 1 ] = i
+
 								if AddUnitToEmptyPad(carrierID, i ) then
-									set.buildCount = set.buildCount + 1;
-									table.remove(carrierList[carrierID].droneInQueue, 1)
+									set.buildCount = set.buildCount + 1
+								else
+									set.queueCount = set.queueCount + 1
+									carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue + 1 ] = i
 								end
 							end
 							set.reload = set.config.reloadTime -- apply reloadtime when queuing construction (not when it actually happens) - helps keep a constant creation rate over time

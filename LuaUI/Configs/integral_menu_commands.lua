@@ -5,7 +5,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Order and State Panel Positions
 
 -- Commands are placed in their position, with conflicts resolved by pushng those
--- with less priority (higher number = less priority) along the positions if 
+-- with less priority (higher number = less priority) along the positions if
 -- two or more commands want the same position.
 -- The command panel is propagated left to right, top to bottom.
 -- The state panel is propagate top to bottom, right to left.
@@ -51,32 +51,38 @@ local cmdPosDef = {
 	[CMD.UNLOAD_UNITS]  = {pos = 7, priority = 8},
 	[CMD_RECALL_DRONES] = {pos = 7, priority = 10},
 	
+	[CMD_AREA_TERRA_MEX]= {pos = 13, priority = 1},
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 2},
-	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 2},
+	[CMD_UNIT_CANCEL_TARGET]     = {pos = 13, priority = 3},
 	[CMD_EMBARK]        = {pos = 13, priority = 5},
 	[CMD_DISEMBARK]     = {pos = 13, priority = 6},
+	[CMD_EXCLUDE_PAD]   = {pos = 13, priority = 7},
 
 	-- States
-	[CMD.REPEAT]           = {pos = 1, priority = 1},
-	[CMD_RETREAT]          = {pos = 1, priority = 2},
+	[CMD.REPEAT]              = {pos = 1, priority = 1},
+	[CMD_RETREAT]             = {pos = 1, priority = 2},
 	
-	[CMD.MOVE_STATE]       = {pos = 6, posSimple = 5, priority = 1},
-	[CMD.FIRE_STATE]       = {pos = 6, posSimple = 5, priority = 2},
-	[CMD_FACTORY_GUARD]    = {pos = 6, posSimple = 5, priority = 3},
+	[CMD.MOVE_STATE]          = {pos = 6, posSimple = 5, priority = 1},
+	[CMD.FIRE_STATE]          = {pos = 6, posSimple = 5, priority = 2},
+	[CMD_FACTORY_GUARD]       = {pos = 6, posSimple = 5, priority = 3},
 	
-	[CMD_SELECTION_RANK]   = {pos = 6, posSimple = 1, priority = 1.5},
+	[CMD_SELECTION_RANK]      = {pos = 6, posSimple = 1, priority = 1.5},
 	
-	[CMD_PRIORITY]         = {pos = 1, priority = 10},
-	[CMD_MISC_PRIORITY]    = {pos = 1, priority = 11},
-	[CMD_CLOAK_SHIELD]     = {pos = 1, priority = 11.5},
-	[CMD_WANT_CLOAK]       = {pos = 1, priority = 11.6},
-	[CMD_WANT_ONOFF]       = {pos = 1, priority = 13},
-	[CMD.TRAJECTORY]       = {pos = 1, priority = 14},
-	[CMD_UNIT_FLOAT_STATE] = {pos = 1, priority = 15},
-	[CMD_TOGGLE_DRONES]    = {pos = 1, priority = 16},
-	[CMD_PUSH_PULL]        = {pos = 1, priority = 17},
-	[CMD.IDLEMODE]         = {pos = 1, priority = 18},
-	[CMD_AP_FLY_STATE]     = {pos = 1, priority = 19},
+	[CMD_PRIORITY]            = {pos = 1, priority = 10},
+	[CMD_MISC_PRIORITY]       = {pos = 1, priority = 11},
+	[CMD_CLOAK_SHIELD]        = {pos = 1, priority = 11.5},
+	[CMD_WANT_CLOAK]          = {pos = 1, priority = 11.6},
+	[CMD_WANT_ONOFF]          = {pos = 1, priority = 13},
+	[CMD_PREVENT_BAIT]        = {pos = 1, priority = 13.1},
+	[CMD_PREVENT_OVERKILL]    = {pos = 1, priority = 13.2},
+	[CMD_FIRE_TOWARDS_ENEMY]  = {pos = 1, priority = 13.25},
+	[CMD_FIRE_AT_SHIELD]      = {pos = 1, priority = 13.3},
+	[CMD.TRAJECTORY]          = {pos = 1, priority = 14},
+	[CMD_UNIT_FLOAT_STATE]    = {pos = 1, priority = 15},
+	[CMD_TOGGLE_DRONES]       = {pos = 1, priority = 16},
+	[CMD_PUSH_PULL]           = {pos = 1, priority = 17},
+	[CMD.IDLEMODE]            = {pos = 1, priority = 18},
+	[CMD_AP_FLY_STATE]        = {pos = 1, priority = 19},
 	[CMD_AUTO_CALL_TRANSPORT] = {pos = 1, priority = 21},
 }
 
@@ -221,7 +227,7 @@ local factoryUnitPosDef = {
 		amphimpulse       = unitTypes.WEIRD_RAIDER,
 		amphriot          = unitTypes.RIOT,
 		amphfloater       = unitTypes.SKIRMISHER,
-		-- No Amph Artillery
+		amphsupport       = unitTypes.ASSAULT,
 		amphaa            = unitTypes.ANTI_AIR,
 		amphassault       = unitTypes.HEAVY_SOMETHING,
 		amphlaunch        = unitTypes.ARTILLERY,
@@ -284,6 +290,7 @@ local factory_commands = {
 	factoryamph       = {order = 10, row = 2, col = 4},
 	factoryship       = {order = 11, row = 2, col = 5},
 	striderhub        = {order = 12, row = 2, col = 6},
+	[CMD_BUILD_PLATE] = {order = 13, row = 3, col = 4},
 }
 
 local econ_commands = {

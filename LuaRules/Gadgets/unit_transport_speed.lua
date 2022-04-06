@@ -23,16 +23,20 @@ end
 
 local mass = {}
 local requireHeavy = {}
+local requireMedium = {}
 local lightSpeed = {}
+local mediumSpeed = {}
 local heavySpeed = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	mass[i] = ud.mass
 	requireHeavy[i] = (ud.customParams.requireheavytrans and true) or false
+	requireMedium[i] = (ud.customParams.requiremediumtrans and true) or false
 	
 	if ud.transportCapacity and (ud.transportCapacity > 0) then
 		lightSpeed[i] = tonumber(ud.customParams.transport_speed_light or "1")
+		mediumSpeed[i] = tonumber(ud.customParams.transport_speed_medium or "1")
 		heavySpeed[i] = tonumber(ud.customParams.transport_speed_heavy or "1")
 	end
 end
@@ -45,6 +49,9 @@ local function GetSpeedFactor(tudid, unitDefID, effectiveMass)
 	--return math.min(1, 2 * mass[tudid]/(effectiveMass))
 	if requireHeavy[unitDefID] then
 		return heavySpeed[tudid] or 1
+	end
+	if requireMedium[unitDefID] then
+		return mediumSpeed[tudid] or 1
 	end
 	return lightSpeed[tudid] or 1
 end

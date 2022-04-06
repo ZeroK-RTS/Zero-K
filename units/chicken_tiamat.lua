@@ -20,6 +20,10 @@ return { chicken_tiamat = {
     fireproof          = 1,
     shield_emit_height = 32,
     shield_emit_offset = -4,
+
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -33,7 +37,6 @@ return { chicken_tiamat = {
   maxSlope            = 37,
   maxVelocity         = 2.3,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
@@ -60,7 +63,7 @@ return { chicken_tiamat = {
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
   turninplace         = 0,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 
@@ -127,7 +130,6 @@ return { chicken_tiamat = {
     
       damage                  = {
         default = 12,
-        subs    = 0.01,
       },
 
       duration          = 0.01,
@@ -141,7 +143,7 @@ return { chicken_tiamat = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 290,
+      range                   = 267,
       reloadtime              = 0.133,
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],
@@ -233,7 +235,6 @@ return { chicken_tiamat = {
       damage                  = {
         default = 100,
         planes  = 100,
-        subs    = 100,
       },
 
       dance                   = 60,

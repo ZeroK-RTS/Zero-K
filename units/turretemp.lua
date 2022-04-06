@@ -2,7 +2,7 @@ return { turretemp = {
   unitname                      = [[turretemp]],
   name                          = [[Faraday]],
   description                   = [[EMP Turret]],
-  buildCostMetal                = 250,
+  buildCostMetal                = 260,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
@@ -16,12 +16,19 @@ return { turretemp = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    aimposoffset   = [[0 10 0]],
+    bait_level_default = 1,
+    bait_level_target_armor = 1,
+    aimposoffset   = [[0 12 0]],
     modelradius    = [[16]],
     aim_lookahead  = 50,
+    dynamic_colvol = [[1]],
+
+    outline_x = 64,
+    outline_y = 95,
+    outline_yoff = 32,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
@@ -30,7 +37,6 @@ return { turretemp = {
   maxDamage                     = 1600,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armartic]],
   script                        = [[turretemp.lua]],
@@ -74,7 +80,7 @@ return { turretemp = {
       },
 
       damage                  = {
-        default = 1200,
+        default = 1100,
       },
 
       duration                = 8,
@@ -89,7 +95,7 @@ return { turretemp = {
       paralyzer               = true,
       paralyzeTime            = 2,
       range                   = 460,
-      reloadtime              = 2.7,
+      reloadtime              = 2.9,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

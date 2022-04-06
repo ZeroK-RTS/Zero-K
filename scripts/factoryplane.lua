@@ -30,13 +30,12 @@ local land = piece "land"
 
 --local vars
 local nanoPieces = {emit1,emit2}
-local nanoIdx = 1
 local smokePiece = { piece "bay", piece "pad1", piece "fuelpad" }
 
 --opening animation
 local function Open()
-	Signal(2) --kill the closing animation if it is in process
-	--SetSignalMask(1) --set the signal to kill the opening animation
+	Signal(1) --kill the closing animation if it is in process
+	SetSignalMask(1) --set the signal to kill the opening animation
 
 	Move(bay, 1, -18, 15)
 
@@ -70,12 +69,13 @@ local function Open()
 --	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 --closing animation of the factory
 local function Close()
 	Signal(1) --kill the opening animation if it is in process
-	SetSignalMask(2) --set the signal to kill the closing animation
+	SetSignalMask(1) --set the signal to kill the closing animation
 
 --	SetUnitValue(COB.YARD_OPEN, 0)
 	SetUnitValue(COB.BUGGER_OFF, 0)
@@ -142,21 +142,6 @@ end
 
 function script.QueryBuildInfo()
 	return build
-end
-
-function script.QueryNanoPiece()
-	if (nanoIdx == 2) then
-		nanoIdx = 1
-	else
-		nanoIdx = nanoIdx + 1
-	end
-
-	local nano = nanoPieces[nanoIdx]
-
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),nano)
-
-	return nano
 end
 
 function script.QueryLandingPads()

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Widget Profiler",
-    desc      = "",
+    desc      = "Profiles widgets' performance cost; obsolete",
     author    = "jK",
     version   = "2.0",
     date      = "2007,2008,2009",

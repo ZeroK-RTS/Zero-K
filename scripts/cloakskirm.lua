@@ -27,7 +27,8 @@ local runspeed = 25 * (UnitDefs[unitDefID].speed / 69)
 local aimBlocked = false
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function SetSelfSpeedMod(speedmod)
@@ -112,6 +113,7 @@ local function RestoreAfterDelay()
 	Turn (gun, x_axis, math.rad(20), math.rad(40))
 end
 
+--[[
 local function ReloadPenaltyAndAnimation()
 	aimBlocked = true
 	SetSelfSpeedMod(RELOAD_PENALTY)
@@ -136,6 +138,7 @@ local function ReloadPenaltyAndAnimation()
 		Sleep(340)
 	end
 end
+]]
 
 function OnLoadGame()
 	SetSelfSpeedMod(1)
@@ -159,8 +162,8 @@ function script.AimWeapon(num, heading, pitch)
 
 	Turn (hips, x_axis, 0)
 	Turn (chest, x_axis, 0)
-	Turn (gun, x_axis, -pitch, math.rad(100))
-	Turn (turner, y_axis, heading + math.rad(5), math.rad(200))
+	Turn (gun, x_axis, -pitch, math.rad(130))
+	Turn (turner, y_axis, heading + math.rad(5), math.rad(260))
 
 	WaitForTurn (turner, y_axis)
 	WaitForTurn (gun, x_axis)
@@ -172,7 +175,7 @@ end
 
 function script.FireWeapon(num)
 	EmitSfx (exhaust, 1024)
-	StartThread(ReloadPenaltyAndAnimation)
+	--StartThread(ReloadPenaltyAndAnimation)
 end
 
 function script.BlockShot(num, targetID)

@@ -111,6 +111,7 @@ local longRange = false
 local torpRange = WeaponDefNames["amphriot_torpedo"].range
 local shotRange = WeaponDefNames["amphriot_flechette"].range
 
+--[[
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
@@ -128,7 +129,7 @@ local function WeaponRangeUpdate()
 		Sleep(200)
 	end
 end
-
+]]
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim functions
@@ -158,7 +159,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lfleg, x_axis, 0, math.rad(800))
 	Turn(lffoot, x_axis, 0, math.rad(800))
@@ -207,7 +208,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(lfleg,x_axis, math.rad(55-15), math.rad(60))
 	Turn(rfleg,x_axis, math.rad(55+15), math.rad(60))
@@ -260,7 +261,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	Signal(SIG_BOB)
 
 	Turn(lfleg, x_axis, 0, math.rad(80))
@@ -277,13 +278,13 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random()))
 
 	while true do
-		EmitSfx(lfleg, SFX.BUBBLE)
+		EmitSfx(lfleg, 1026)
 		Sleep(66)
-		EmitSfx(rfleg, SFX.BUBBLE)
+		EmitSfx(rfleg, 1026)
 		Sleep(66)
-		EmitSfx(lbleg, SFX.BUBBLE)
+		EmitSfx(lbleg, 1026)
 		Sleep(66)
-		EmitSfx(rbleg, SFX.BUBBLE)
+		EmitSfx(rbleg, 1026)
 		Sleep(66)
 	end
 

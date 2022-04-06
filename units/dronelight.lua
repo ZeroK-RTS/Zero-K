@@ -14,9 +14,9 @@ return { dronelight = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = false,
-  category            = [[GUNSHIP]],
+  category            = [[GUNSHIP DRONE]],
   collide             = false,
-  cruiseAlt           = 100,
+  cruiseAlt           = 85,
   explodeAs           = [[TINY_BUILDINGEX]],
   floater             = true,
   footprintX          = 2,
@@ -27,17 +27,17 @@ return { dronelight = {
   idleTime            = 300,
   maxDamage           = 180,
   maxVelocity         = 7,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[attackdrone.s3o]],
   reclaimable         = false,
+  repairable          = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   refuelTime          = 10,
   script              = [[dronelight.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-
+    bait_level_target      = 1,
     is_drone = 1,
   },
   
@@ -85,7 +85,6 @@ return { dronelight = {
 
       damage                  = {
         default = 32,
-        subs    = 1.6,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -95,7 +94,7 @@ return { dronelight = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      range                   = 250,
+      range                   = 150,
       reloadtime              = 0.8,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/mini_laser]],

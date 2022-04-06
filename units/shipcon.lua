@@ -2,9 +2,9 @@ return { shipcon = {
   unitname               = [[shipcon]],
   name                   = [[Mariner]],
   description            = [[Construction Ship]],
-  acceleration           = 0.256,
+  acceleration           = 0.307,
   activateWhenBuilt      = true,
-  brakeRate              = 0.61,
+  brakeRate              = 0.732,
   buildCostMetal         = 200,
   buildDistance          = 330,
   builder                = true,
@@ -27,6 +27,10 @@ return { shipcon = {
     modelradius    = [[40]],
     turnatfullspeed = [[1]],
     selection_scale = 1.2,
+
+    outline_x = 128,
+    outline_y = 128,
+    outline_yoff = 16,
   },
 
   energyUse              = 0,
@@ -35,11 +39,8 @@ return { shipcon = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[builder]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1400,
   maxVelocity            = 2.5,
-  minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,
@@ -51,7 +52,7 @@ return { shipcon = {
   sightDistance          = 375,
   sonarDistance          = 375,
   turninplace            = 0,
-  turnRate               = 508,
+  turnRate               = 813,
   workerTime             = 7.5,
 
   featureDefs            = {

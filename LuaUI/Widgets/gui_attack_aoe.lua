@@ -23,6 +23,8 @@ local aoeColor             = {1, 0, 0, 1}
 local aoeLineWidthMult     = 64
 local scatterColor         = {1, 1, 0, 1}
 local scatterLineWidthMult = 1024
+local depthColor           = {1, 0, 0, 0.5}
+local depthLineWidth       = 1
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
@@ -48,6 +50,8 @@ local secondPart = 0
 local mouseDistance = 1000
 local extraDrawRange
 local sumoSelected = false
+local detrimentSelected = false
+local detrimentUnitID = nil
 
 --------------------------------------------------------------------------------
 --speedups
@@ -73,6 +77,7 @@ local glColor                = gl.Color
 local glDeleteList           = gl.DeleteList
 local glDepthTest            = gl.DepthTest
 local glDrawGroundCircle     = gl.DrawGroundCircle
+local glLineStipple          = gl.LineStipple
 local glLineWidth            = gl.LineWidth
 local glPointSize            = gl.PointSize
 local glPopMatrix            = gl.PopMatrix
@@ -98,6 +103,10 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local sumoDefID = UnitDefNames.jumpsumo.id
 local sumoAoE = WeaponDefNames.jumpsumo_landing.damageAreaOfEffect
 local sumoEE = WeaponDefNames.jumpsumo_landing.edgeEffectiveness
+
+local detrimentDefID = UnitDefNames.striderdetriment.id
+local detrimentLandingAoE = WeaponDefNames.striderdetriment_landing.damageAreaOfEffect
+local detrimentLandingEE = WeaponDefNames.striderdetriment_landing.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions
@@ -125,16 +134,16 @@ end
 
 local function GetMouseTargetPosition()
 	local mx, my = GetMouseState()
-	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true)
+	local mouseTargetType, mouseTarget = TraceScreenRay(mx, my, false, true, false, true)
 
 	if (mouseTargetType == "ground") then
-		return mouseTarget[1], mouseTarget[2], mouseTarget[3]
+		return mouseTarget[1], mouseTarget[2], mouseTarget[3], true
 	elseif (mouseTargetType == "unit") then
 		return GetUnitPosition(mouseTarget)
 	elseif (mouseTargetType == "feature") then
-		local _, coords = TraceScreenRay(mx, my, true, true)
+		local _, coords = TraceScreenRay(mx, my, true, true, false, true)
 		if coords and coords[3] then
-			return coords[1], coords[2], coords[3]
+			return coords[1], coords[2], coords[3], true
 		else
 			return GetFeaturePosition(mouseTarget)
 		end
@@ -190,7 +199,8 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local retData
 
 	local weaponType = weaponDef.type
-	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
+	local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
+	local scatter = weaponDef.accuracy + spray
 	local aoe = weaponDef.damageAreaOfEffect
 	local cost = unitDef.metalCost
 	local waterWeapon = weaponDef.waterWeapon
@@ -303,7 +313,8 @@ local function SetupUnit(unitDef, unitID)
 				elseif (not weaponDef.isShield
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
 						and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
-					maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
+					local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
+					maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + spray))
 					maxWeaponDef = weaponDef
 				end
 			end
@@ -343,14 +354,22 @@ local function UpdateSelection()
 	dgunUnitID = nil
 	aoeUnitID = nil
 	sumoSelected = false
+	detrimentSelected = false
+	detrimentUnitID = nil
 
 	for unitDefID, unitIDs in pairs(sel) do
 		if unitDefID ~= "n" then
+			local unitID = unitIDs[1]
+		
 			if unitDefID == sumoDefID then
 				sumoSelected = true
 			end
-
-			local unitID = unitIDs[1]
+			
+			if unitDefID == detrimentDefID then
+				detrimentSelected = true
+				detrimentUnitID = unitID
+			end
+			
 			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
 			
 			if dynamicComm and not unitHasBeenSetup[unitID] then
@@ -685,6 +704,20 @@ local function DrawOrbitalScatter(scatter, tx, ty, tz)
 	glColor(1,1,1,1)
 	glLineWidth(1)
 end
+
+--------------------------------------------------------------------------------
+--underwater
+--------------------------------------------------------------------------------
+local function DrawWaterDepth(tx, ty, tz)
+	glColor(depthColor)
+	glLineWidth(depthLineWidth)
+	glLineStipple(1, 255)
+	glBeginEnd(GL_LINES, VertexList, {{tx,0,tz},{tx,ty,tz}})
+	glLineStipple(false)
+	glColor(1,1,1,1)
+	glLineWidth(1)
+end
+
 --------------------------------------------------------------------------------
 --callins
 --------------------------------------------------------------------------------
@@ -703,7 +736,7 @@ end
 function widget:DrawWorld()
 	mouseDistance = GetMouseDistance() or 1000
 
-	local tx, ty, tz = GetMouseTargetPosition()
+	local tx, ty, tz, targetIsGround = GetMouseTargetPosition()
 	if (not tx) then
 		return
 	end
@@ -733,6 +766,10 @@ function widget:DrawWorld()
 	elseif (cmd == CMD_JUMP and sumoSelected) then
 		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
 		return
+	elseif (cmd == CMD_JUMP and detrimentSelected) then
+		local _,_,_,fx, fy, fz = GetUnitPosition(detrimentUnitID, true)
+		DrawAoE(tx, ty, tz, detrimentLandingAoE, detrimentLandingEE)
+		return
 	else
 		return
 	end
@@ -746,6 +783,9 @@ function widget:DrawWorld()
 		fy = fy + GetUnitRadius(unitID)
 	end
 
+	if ty < 0 and targetIsGround then
+		DrawWaterDepth(tx, ty, tz)
+	end
 	if (not info.waterWeapon) then
 		ty = max(0, ty)
 	end

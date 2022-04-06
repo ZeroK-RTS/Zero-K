@@ -24,6 +24,7 @@ local function Open ()
 	SetUnitValue (COB.YARD_OPEN, 1)
 	SetUnitValue (COB.INBUILDSTANCE, 1)
 	SetUnitValue (COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
@@ -45,17 +46,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
-end
-
--- doesn't actually get called as far as I can tell
--- but other cons have this so maybe there's some legacy use (icongenerator or whatever)
--- consider finding out and cleaning up across all con scripts at some point
-local lastNanopiece = 1
-function script.QueryNanoPiece ()
-	lastNanopiece = (lastNanopiece + 1) % 6
-	local nanoemit = nanoPieces[lastNanopiece + 1]
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanoemit)
-	return nanoemit
 end
 
 function script.Activate ()

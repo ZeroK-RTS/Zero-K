@@ -19,23 +19,20 @@ function gadget:GetInfo()
 end
 
 -- Speedups
-local spGetGroundHeight        = Spring.GetGroundHeight
 local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
 local spGetUnitAllyTeam        = Spring.GetUnitAllyTeam
 local spGetUnitsInRectangle    = Spring.GetUnitsInRectangle
 local spSetUnitPosition        = Spring.SetUnitPosition
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
-local spGetUnitDirection       = Spring.GetUnitDirection
 local spGetUnitVelocity        = Spring.GetUnitVelocity
 local spSetUnitVelocity        = Spring.SetUnitVelocity
-local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spGetUnitTeam            = Spring.GetUnitTeam
-local spGetUnitIsStunned       = Spring.GetUnitIsStunned
 local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
 local spGetFeaturePosition     = Spring.GetFeaturePosition
 local spSetFeaturePosition     = Spring.SetFeaturePosition
 local spSetFeatureVelocity     = Spring.SetFeatureVelocity
+local spGetUnitTransporter     = Spring.GetUnitTransporter
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 
 local abs = math.abs
@@ -81,16 +78,14 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 					local unitID = units[j]
 					local unitDefID = spGetUnitDefID(unitID)
 					local ud = UnitDefs[unitDefID]
-					local movetype = Spring.Utilities.getMovetype(ud)
-					local ally = spGetUnitAllyTeam(unitID)
-					local team = spGetUnitTeam(unitID)
-					if (not ud.canFly) and (spMoveCtrlGetTag(unitID) == nil) then
+					if (not ud.canFly) and (spMoveCtrlGetTag(unitID) == nil) and not spGetUnitTransporter(unitID) then
+						local ally = spGetUnitAllyTeam(unitID)
 						if (ally ~= data.ally) or (data.unstickHelp and not ud.isImmobile) then --teleport unit away
 							local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
 							local vx, vy, vz = spGetUnitVelocity(unitID)
 							
 							if aimY > -18 and aimY >= clearUnits[5] and aimY <= clearUnits[6] then
-								local isAlly = ally == data.ally
+								local isAlly = (ally == data.ally)
 								
 								local l = abs(ux - clearUnits[1])
 								local t = abs(uz - clearUnits[2])
@@ -282,10 +277,11 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 		
 		if unstickHelp then
 			local data = labList.data[labList.count]
-			data.minBuildX = (((face == 3) and minx) or (minx*0.5 + ux*0.5))
-			data.minBuildZ = (((face == 2) and minz) or (minz*0.5 + uz*0.5))
-			data.maxBuildX = (((face == 1) and maxx) or (maxx*0.5 + ux*0.5))
-			data.maxBuildZ = (((face == 0) and maxz) or (maxz*0.5 + uz*0.5))
+			local buffer = (ud.customParams.unstick_help_buffer and tonumber(ud.customParams.unstick_help_buffer)) or 0.5
+			data.minBuildX = (((face == 3) and minx) or (minx*(1 - buffer) + ux*buffer))
+			data.minBuildZ = (((face == 2) and minz) or (minz*(1 - buffer) + uz*buffer))
+			data.maxBuildX = (((face == 1) and maxx) or (maxx*(1 - buffer) + ux*buffer))
+			data.maxBuildZ = (((face == 0) and maxz) or (maxz*(1 - buffer) + uz*buffer))
 			
 			--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.maxBuildX,0,data.minBuildZ)
 			--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.minBuildX,0,data.maxBuildZ)

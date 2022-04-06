@@ -197,6 +197,9 @@ local levels = {}
 
 local move_digested = nil -- was move command digested (hold right click detection)
 
+-- "marking menu" is not the best name, but it's also used by
+-- other similar widgets and also people may have already
+-- overridden it locally, so don't rename it
 local menu_use = include("Configs/marking_menu_menus.lua", nil, VFS.RAW_FIRST)
 
 local function GetAngle(x1,y1,x2,y2)

@@ -31,8 +31,6 @@ return { bomberassault = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[bombernuke]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maneuverleashlength = [[1280]],
   maxAcc              = 0.5,
   maxDamage           = 4000,
@@ -40,7 +38,6 @@ return { bomberassault = {
   maxRudder           = 0.003,
   maxFuel             = 1000000,
   maxVelocity         = 6,
-  minCloakDistance    = 75,
   mygravity           = 1,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -77,7 +74,6 @@ return { bomberassault = {
       damage                  = {
         default = 2500,
         planes  = 2500,
-        subs    = 2500,
       },
 
       edgeEffectiveness       = 0.7,

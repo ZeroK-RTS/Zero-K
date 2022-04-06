@@ -17,6 +17,7 @@ local function Open ()
 	SetUnitValue (COB.YARD_OPEN, 1)
 	SetUnitValue (COB.INBUILDSTANCE, 1)
 	SetUnitValue (COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
@@ -36,11 +37,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
-end
-
-function script.QueryNanoPiece ()
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanoemit)
-	return nanoemit
 end
 
 function script.Activate ()

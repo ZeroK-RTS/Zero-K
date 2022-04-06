@@ -17,7 +17,7 @@ local glColor            = gl.Color
 local glLineWidth        = gl.LineWidth
 local glDrawGroundCircle = gl.DrawGroundCircle
 
-options_path = 'Settings/Interface/Defense and Cloak Ranges'
+options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options = {
 	showselectedunitrange = {
 		name = 'Show selected unit(s) range(s)',

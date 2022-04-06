@@ -2,9 +2,9 @@ return { tankcon = {
   unitname               = [[tankcon]],
   name                   = [[Welder]],
   description            = [[Armed Construction Tank]],
-  acceleration           = 0.33,
-  brakeRate              = 15.0,
-  buildCostMetal         = 200,
+  acceleration           = 0.4,
+  brakeRate              = 18.0,
+  buildCostMetal         = 185,
   buildDistance          = 180,
   builder                = true,
 
@@ -26,6 +26,10 @@ return { tankcon = {
     midposoffset   = [[0 -4 0]],
     modelradius    = [[30]],
     selection_scale = 1.2,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   energyUse              = 0,
@@ -33,14 +37,11 @@ return { tankcon = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[builder]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1800,
+  maxDamage              = 1700,
   maxSlope               = 18,
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,
@@ -65,7 +66,7 @@ return { tankcon = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 625,
+  turnRate               = 1000,
   workerTime             = 7.5,
 
   weapons                = {
@@ -94,9 +95,8 @@ return { tankcon = {
       },
 
       damage                  = {
-        default = 9,
-        planes  = 9,
-        subs    = 0.7,
+        default = 8.64,
+        planes  = 8.64,
       },
 
       duration                = 0.02,
@@ -108,7 +108,7 @@ return { tankcon = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 240,
+      range                   = 235,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],

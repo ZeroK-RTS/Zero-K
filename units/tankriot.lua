@@ -2,8 +2,8 @@ return { tankriot = {
   unitname            = [[tankriot]],
   name                = [[Ogre]],
   description         = [[Heavy Riot Support Tank]],
-  acceleration        = 0.109,
-  brakeRate           = 0.428,
+  acceleration        = 0.132,
+  brakeRate           = 0.516,
   buildCostMetal      = 500,
   builder             = false,
   buildPic            = [[tankriot.png]],
@@ -17,23 +17,26 @@ return { tankriot = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
     aim_lookahead     = 160,
+    set_target_range_buffer = 40,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[tankriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 1850,
+  maxDamage           = 1950,
   maxSlope            = 18,
   maxVelocity         = 2.3,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -47,7 +50,7 @@ return { tankriot = {
   trackType           = [[StdTank]],
   trackWidth          = 50,
   turninplace         = 0,
-  turnRate            = 355,
+  turnRate            = 568,
   workerTime          = 0,
 
   weapons             = {
@@ -87,7 +90,6 @@ return { tankriot = {
       
       damage                  = {
         default = 240.1,
-        subs    = 12,
       },
 
       edgeEffectiveness       = 0.4,
@@ -98,7 +100,7 @@ return { tankriot = {
       impulseFactor           = 0.6,
       interceptedByShieldType = 2,
       leadlimit               = 0,
-      model                   = [[corbanishrk.s3o]],
+      model                   = [[corbanishrk.s3o]], -- Model radius 100 for QuadField fix.
       noSelfDamage            = true,
       range                   = 320,
       reloadtime              = 0.3,
@@ -106,6 +108,7 @@ return { tankriot = {
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/missile/banisher_fire]],
       startVelocity           = 400,
+      texture1                = [[flarescale01]],
       tolerance               = 9000,
       tracks                  = true,
       trajectoryHeight        = 0.45,

@@ -19,7 +19,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 360,
-		subs    = 18,
 	},
 
 	fireStarter             = 180,

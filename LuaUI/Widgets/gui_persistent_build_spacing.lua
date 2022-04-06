@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Persistent Build Spacing",
-		desc      = "Recalls last build spacing set for each building and game [v2.0]\n fixed pre-game, added mouse wheel and previsualization options(Helwor)",
+		desc      = "Maintains build spacing between matches",
 		author    = "Niobium & DrHash-, Helwor",
 		date      = "Sep 6, 2011",
 		license   = "GNU GPL, v3 or later",
@@ -57,8 +57,8 @@ local dwOn, draw, drawValue, drawRects
 
 -- related to options
 local requestUpdate
-local wheelSpacing, reverseWheel = false, false
-local showSpacingRects, only2Rects, showRectsOnChange = true, false, true
+local wheelSpacing, reverseWheel = false, 1
+local showSpacingRects, only2Rects, showRectsOnChange = false, false, true
 local showSpacingValue, showValueOnChange = false, false
 local showRectsTime = 1
 local showValueTime = 1
@@ -124,7 +124,7 @@ options_order = {
 	'hotkey_inc', 'hotkey_dec', 'hotkey_facing_inc', 'hotkey_facing_dec',
 	'spacing_label',
 	'wheel_spacing', 'reverse_wheel',
-	'show_spacing_rects', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
+	'show_spacing_rects_2', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
 	'show_spacing_value', 'show_value_only_on_change', 'show_time_value',
 }
 -- hotkeys
@@ -177,11 +177,11 @@ options = {
 	-- wheel
 	wheel_spacing = {
 		origname        = 'Change with Shift + MouseWheel',
-		type            = 'bool',        
+		type            = 'bool',
 		desc            = 'Change the spacing with the Mousewheel and Shift down',
 		value           = false,
 		noHotkey        = true,
-		OnChange        = function(self) 
+		OnChange        = function(self)
 			wheelSpacing = self.value
 			requestUpdate = options_path
 		end,
@@ -199,11 +199,11 @@ options = {
 		parents         = {'wheel_spacing'}
 	},
 	-- rectangle showing options
-	show_spacing_rects = {
+	show_spacing_rects_2 = {
 		origname        = 'Visualise spacing',
 		type            = 'bool',
 		desc            = "Briefly show spaced rectangles in all directions around the cursor",
-		value           = true,
+		value           = false,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showSpacingRects = self.value
@@ -224,7 +224,7 @@ options = {
 			only2Rects = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects'}
+		parents         = {'show_spacing_rects_2'}
 	},
 	show_rects_only_on_change = {
 		origname        = ' ..only on spacing change, ',
@@ -236,7 +236,7 @@ options = {
 			showRectsOnChange = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects'}
+		parents         = {'show_spacing_rects_2'}
 	},
 	show_time_rects = {
 		name            = ' ..for 1 seconds.',
@@ -258,7 +258,7 @@ options = {
 			end
 			requestUpdate = options_path
 		end,
-		parents        = {'show_spacing_rects'}
+		parents        = {'show_spacing_rects_2'}
 	},
 	-- value showing options
 	show_spacing_value = {
@@ -459,6 +459,11 @@ function widget:Update(dt)
 		identified = true
 	end
 	
+	if not placement then --Can happen when rotation changes rapidly
+		draw = false
+		return
+	end
+
 	local pos = select(2, spTraceScreenRay(mx, my, true, false, false, placement.floatOnWater))
 	if not pos then
 		draw = false
@@ -530,7 +535,7 @@ function widget:DrawWorld()
 		glLineStipple(false)
 		glColor(1, 1, 1, 1)
 	end
-	if drawValue then
+	if drawValue and placement then
 		glPushMatrix()
 		glTranslate(x, y, z)
 		glBillboard()
@@ -566,6 +571,6 @@ end
 
 -- Init
 function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
-	UpdateKeys() 
+	UpdateKeys()
 	UpdateOptionsDisplay(options_path)
 end

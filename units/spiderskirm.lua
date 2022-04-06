@@ -15,20 +15,18 @@ return { spiderskirm = {
   customParams           = {
     midposoffset   = [[0 -5 0]],
     aim_lookahead  = 160,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 650,
   maxSlope               = 72,
   maxVelocity            = 1.5,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
@@ -40,7 +38,7 @@ return { spiderskirm = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 52,
-  turnRate               = 1400,
+  turnRate               = 1680,
 
   weapons                = {
 
@@ -72,7 +70,6 @@ return { spiderskirm = {
       damage                  = {
         default = 135,
         planes  = 135,
-        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

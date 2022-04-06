@@ -12,6 +12,18 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.FileExists = VFS.FileExists or function() return false end	-- unitdef exporter compatibility
+
+--[[ This lets mutators add a bit of weapondefs_post processing without
+     losing access to future gameside updates to weapondefs_post. ]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/weapondefs_mod.lua'
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS.GAME) then
+	VFS.Include(MODSIDE_POSTS_FILEPATH, nil, VFS.GAME)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 Spring.Echo("Loading WeaponDefs_posts")
 
 --------------------------------------------------------------------------------
@@ -219,12 +231,26 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Set myGravity for Cannons because maps cannot be trusted. Standard is 120,
+-- Set myGravity for ballistic weapons because maps cannot be trusted. Standard is 120,
 -- gravity of 150 can cause high things (such as HLT) to be unhittable.
 
- for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.weapontype == "Cannon" and not weaponDef.mygravity then
-		weaponDef.mygravity = 2/15 -- 120/(GAME_SPEED^2)
+Game = Game or {}	-- unitdef exporter compatibility
+Game.gameSpeed = Game.gameSpeed or 30
+
+local defaultMyGravity = 120 / (Game.gameSpeed^2)
+
+for _, weaponDef in pairs(WeaponDefs) do
+
+	--[[ There are other weapons that follow gravity,
+	     for example expired missiles and torpedoes
+	     who fall out of water, but these disobey the
+	     tag and always use map gravity anyway ]]
+	local supportsMyGravity =
+		(weaponDef.weapontype == "Cannon") or
+		(weaponDef.weapontype == "AircraftBomb")
+
+	if supportsMyGravity and (not weaponDef.mygravity) then -- setting myGravity = 0.0 will use map gravity anyway
+		weaponDef.mygravity = defaultMyGravity
 	end
 end
 --------------------------------------------------------------------------------
@@ -359,20 +385,6 @@ for _, weaponDef in pairs(WeaponDefs) do
 	end
 	if not weaponDef.predictboost then
 		weaponDef.predictboost = 1
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Remove submarine damage modifier
--- TODO: also remove from defs
-
-for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.damage then
-		if weaponDef.damage.subs and weaponDef.damage.default then
-			weaponDef.damage.subs = weaponDef.damage.default
-		end
 	end
 end
 

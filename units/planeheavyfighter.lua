@@ -13,8 +13,8 @@ return { planeheavyfighter = {
   category               = [[FIXEDWING]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
-  collisionVolumeScales  = [[30 12 50]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[38 15 64]],
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 10]],
   selectionVolumeScales  = [[60 60 80]],
   selectionVolumeType    = [[cylZ]],
@@ -23,6 +23,9 @@ return { planeheavyfighter = {
   cruiseAlt              = 220,
 
   customParams           = {
+    bait_level_default = 0,
+    bait_level_target      = 3,
+
     midposoffset   = [[0 3 0]],
     aimposoffset   = [[0 3 0]],
     modelradius    = [[10]],
@@ -30,6 +33,10 @@ return { planeheavyfighter = {
 
     combat_slowdown = 0.35,
     selection_scale = 1.4,
+
+    outline_x = 120,
+    outline_y = 120,
+    outline_yoff = 20,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -39,15 +46,12 @@ return { planeheavyfighter = {
   footprintZ             = 2,
   frontToSpeed           = 0.1,
   iconType               = [[stealthfighter]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxAcc                 = 0.605,
   maxAileron             = 0.02,
   maxDamage              = 1100,
   maxElevator            = 0.015,
   maxRudder              = 0.008,
   maxVelocity            = 7.6,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
@@ -94,7 +98,6 @@ return { planeheavyfighter = {
       damage                  = {
         default = 0.96,
         planes  = 9.6,
-        subs    = 0.96,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

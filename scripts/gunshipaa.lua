@@ -16,6 +16,8 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local smokePiece = { base}
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local root3on2 = math.sqrt(3)/2
 
 local gameSpeed = Game.gameSpeed
@@ -219,7 +221,7 @@ end
 
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 200.1, 35)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 750, 30, 0.05, true, 120)
 	end
 	return true
 end

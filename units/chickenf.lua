@@ -22,6 +22,9 @@ return { chickenf = {
   cruiseAlt           = 150,
 
   customParams        = {
+    outline_x = 180,
+    outline_y = 180,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -35,7 +38,6 @@ return { chickenf = {
   maxDamage           = 1200,
   maxSlope            = 18,
   maxVelocity         = 10,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],

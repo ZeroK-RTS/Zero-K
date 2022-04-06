@@ -35,8 +35,6 @@ return { gunshipbomb = {
   footprintZ             = 2,
   hoverAttack            = true,
   iconType               = [[gunshipspecial]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   kamikaze               = true,
   kamikazeDistance       = 60,
   kamikazeUseLOS         = true,
@@ -44,7 +42,6 @@ return { gunshipbomb = {
   maxDamage              = 100,
   maxSlope               = 36,
   maxVelocity            = 8.2,
-  minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
@@ -88,16 +85,15 @@ return { gunshipbomb = {
 
         area_damage = 1,
         area_damage_radius = 128,
-        area_damage_dps = 18,
-        area_damage_duration = 20,
+        area_damage_dps = 25,
+        area_damage_duration = 25,
 
         --lups_heat_fx = [[firewalker]],
       },
 
       damage = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
+        default = 40,
+        planes  = 40,
       },
 
       edgeeffectiveness  = 0.7,

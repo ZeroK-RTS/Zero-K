@@ -4,7 +4,7 @@ return { spiderriot = {
   description            = [[Riot Spider]],
   acceleration           = 0.66,
   brakeRate              = 3.96,
-  buildCostMetal         = 240,
+  buildCostMetal         = 230,
   buildPic               = [[spiderriot.png]],
   canGuard               = true,
   canMove                = true,
@@ -24,14 +24,11 @@ return { spiderriot = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 900,
   maxSlope               = 72,
-  maxVelocity            = 1.8,
+  maxVelocity            = 1.85,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spiderriot.s3o]],
@@ -43,7 +40,7 @@ return { spiderriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 1700,
+  turnRate               = 2040,
 
   weapons                = {
 
@@ -73,7 +70,6 @@ return { spiderriot = {
 
       damage                  = {
         default = 70.01,
-        subs    = 3,
       },
 
       explosionGenerator      = [[custom:flash1red]],

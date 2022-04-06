@@ -15,7 +15,7 @@ local nanoTurnSpeedVert = 0.3 * math.pi
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(GG.NanoAim.UpdateNanoDirection, unitID, nanoPieces, 1000, nanoTurnSpeedHori, nanoTurnSpeedVert)
+	StartThread(GG.NanoAim.UpdateNanoDirectionThread, unitID, nanoPieces, 1000, nanoTurnSpeedHori, nanoTurnSpeedVert)
 	Spring.SetUnitNanoPieces(unitID, {emitnano})
 end
 
@@ -27,14 +27,6 @@ end
 
 function script.StopBuilding()
 	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0);
-end
-
-
-function script.QueryNanoPiece()
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),emitnano)
-
-	return emitnano
 end
 
 function script.Killed(recentDamage, maxHealth)

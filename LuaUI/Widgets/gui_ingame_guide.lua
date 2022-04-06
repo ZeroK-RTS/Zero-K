@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name = "In-game Guide",
+	desc = "A ghetto wiki that adds a bunch of entries to the Help options submenu",
 	enabled = true,
 } end
 
@@ -43,7 +44,7 @@ options = {
 	},
 	ingameguide_roles_raider = {
 		name = "Raider",
-		value= "Fast, light units who deal high damage. Use to harass the enemy economy and to counter skirmishers. Counter with riot units and defenses.",
+		value= "Fast, light units who deal high damage. Use to harass the enemy economy and to counter skirmishers. Counter with riot units and defences.",
 		path = "Unit Roles"
 	},
 	ingameguide_roles_skirm = {

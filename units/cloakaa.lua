@@ -18,6 +18,7 @@ return { cloakaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[11]],
     cus_noflashlight = 1,
   },
@@ -26,8 +27,6 @@ return { cloakaa = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[kbotaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
   maxDamage              = 550,
@@ -57,7 +56,7 @@ return { cloakaa = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 16,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
 
   weapons                = {
@@ -93,7 +92,6 @@ return { cloakaa = {
       damage                  = {
         default = 1.94,
         planes  = 19.4,
-        subs    = 1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

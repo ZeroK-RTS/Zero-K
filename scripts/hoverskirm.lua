@@ -18,6 +18,7 @@ local ground1 = piece 'ground1'
 
 local random = math.random
 local hpi = math.pi*0.5
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 local shotNum = 1
 local flares = {
@@ -39,7 +40,6 @@ local ROCK_PIECE = base	-- should be negative to alternate rocking direction.
 local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
 
-local SIG_MOVE = 1
 local SIG_AIM = 2
 local RESTORE_DELAY = 3000
 
@@ -149,7 +149,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 660.1, 70, 0.3)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 440, 90, 0, true, 180, 0.5)
 end
 
 function script.Shot()

@@ -34,6 +34,10 @@ return { planecon = {
     airstrafecontrol = [[0]],
     modelradius    = [[10]],
     midposoffset   = [[0 4 0]],
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 7.5,
   },
 
   energyUse           = 0,
@@ -43,11 +47,8 @@ return { planecon = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[builderair]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 260,
   maxVelocity         = 6,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[crane.s3o]],

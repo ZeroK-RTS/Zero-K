@@ -2,9 +2,9 @@ return { hoverriot = {
   unitname            = [[hoverriot]],
   name                = [[Mace]],
   description         = [[Riot Hover]],
-  acceleration        = 0.14,
+  acceleration        = 0.168,
   activateWhenBuilt   = true,
-  brakeRate           = 0.36,
+  brakeRate           = 0.432,
   buildCostMetal      = 400,
   builder             = false,
   buildPic            = [[hoverriot.png]],
@@ -20,18 +20,25 @@ return { hoverriot = {
   customParams        = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
+    --specialreloadtime = [[1350]],
+    --specialreload_userate = [[1]],
+    --boost_speed_mult = 5,
+    --boost_reload_speed_mult = 0.8,
+    --boost_duration = 20, -- frames
+    turnatfullspeed_hover = [[1]],
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[hoverriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maxDamage           = 1300,
+  maxDamage           = 1400,
   maxSlope            = 36,
   maxVelocity         = 2.05,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -44,6 +51,7 @@ return { hoverriot = {
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
       [[custom:RAIDMUZZLE]],
+      [[custom:FLAMER]],
     },
 
   },
@@ -51,7 +59,7 @@ return { hoverriot = {
   sightDistance       = 407,
   sonarDistance       = 407,
   turninplace         = 0,
-  turnRate            = 375,
+  turnRate            = 600,
   workerTime          = 0,
 
   weapons             = {
@@ -83,8 +91,7 @@ return { hoverriot = {
       },
 
       damage                  = {
-        default = 29.68,
-        subs    = 1.75,
+        default = 32.65,
       },
 
       explosionGenerator      = [[custom:flash1green]],

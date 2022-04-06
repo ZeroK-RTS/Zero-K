@@ -35,12 +35,13 @@ local SLEEP_TIME = 0 -- 1000 * math.abs(THIGH_FRONT_ANGLE - THIGH_BACK_ANGLE) / 
 
 local SIG_WALK = 1
 local SIG_AIM1 = 2
-local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 
 local gameSpeed = Game.gameSpeed
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -64,12 +65,12 @@ local function Bob()
 	end
 end
 
+--[[
 local function FloatBubbles()
-	--[[
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	local isSubmerged = true
 	while true do
-		--EmitSfx(vent, SFX.BUBBLE)
+		--EmitSfx(vent, 1026)
 
 		if isSubmerged then -- water breaking anim - kind of overkill?
 			local x,y,z = Spring.GetUnitPosition(unitID)
@@ -83,8 +84,8 @@ local function FloatBubbles()
 		Sleep(33)
 
 	end
-	]]
 end
+]]
 
 local function riseFloat_thread()
 	if floatState ~= 0 then
@@ -93,7 +94,7 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 		--StartThread(FloatBubbles)
 
 	Turn(lthigh,x_axis, math.rad(30), math.rad(240))
@@ -142,7 +143,7 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lcalf,x_axis, math.rad(-55-20), math.rad(50))
 	Turn(lfoot,x_axis, math.rad(80+20), math.rad(50))
@@ -186,7 +187,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
 	Turn(rcalf, x_axis, 0, math.rad(120)*PACE)
@@ -202,7 +203,7 @@ local function sinkFloat_thread()
 	Move(base, y_axis, 0, math.rad(math.random(1,2)))
 
 	while true do --FIXME: not stopped when sinking ends!
-		EmitSfx(vent, SFX.BUBBLE)
+		EmitSfx(vent, 1026)
 		Sleep(66)
 	end
 
@@ -374,8 +375,7 @@ end
 
 function script.BlockShot(num, targetID)
 	if gun[shot].loaded then
-		local distMult = (Spring.ValidUnitID(targetID) and Spring.GetUnitSeparation(unitID, targetID) or 0)/820
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 35 * distMult)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 820, 28, 0.1, true)
 	end
 	return true
 end

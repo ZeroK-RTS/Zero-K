@@ -30,7 +30,7 @@ local forceHideModoptions = {
 
 -- gui elements
 local window2
-	
+
 function widget:Initialize()
 	-- ZK Mission Editor mission
 	if VFS.FileExists("mission.lua") then
@@ -53,7 +53,7 @@ function widget:Initialize()
 	forceHideWindow = false
 
 	local customizedModOptions = {}
-	for i=1, #options do
+	for i = 1, #options do
 		local optType = options[i].type
 		if optType == 'bool' or optType == 'number' or optType == 'string' or optType == 'list' then
 			local keyName = options[i].key
@@ -80,6 +80,14 @@ function widget:Initialize()
 				customizedModOptions[index+2] = {"value: "..value,{options[i].desc}}
 			end
 		end
+	end
+
+	local autoHandicapValue = Spring.GetGameRulesParam("econ_mult_auto_value")
+	--Spring.Echo("Widget_autoHandicapValue", autoHandicapValue)
+	if autoHandicapValue then
+		local index = #customizedModOptions
+		customizedModOptions[index+1] = "Handicap Value: " .. math.round(autoHandicapValue * 100) .. "%"
+		customizedModOptions[index+2] = {"value: " .. math.round(autoHandicapValue, 3), {"The income multipler for the lower rated player."}}
 	end
 
 	if forceHideWindow or (not displayWindow) then

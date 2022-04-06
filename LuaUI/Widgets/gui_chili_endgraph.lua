@@ -39,7 +39,7 @@ local buttongroups = {
 	{"Units", {
 		{"unit_value"      , "Total Value", "Total value of units and structures."},
 		{"unit_value_army" , "Army Value", "Value of mobile units excluding constructors, commanders, Iris, Owl, Djinn, Charon and Hercules."},
-		{"unit_value_def"  , "Defense Value", "Value of armed structures (and shields) with range up to and including Cerberus and Artemis."},
+		{"unit_value_def"  , "Defence Value", "Value of armed structures (and shields) with range up to and including Cerberus and Artemis."},
 		{"unit_value_econ" , "Economy Value", "Value of economic structures, factories and constructors."},
 		{"unit_value_other", "Other Value", "Value of units and structures that do not fit any other category."},
 		{"unit_value_killed", "Value Killed", "Cumulative total of value of enemy units and structured destroyed by the team. Includes nanoframes."},
@@ -78,17 +78,62 @@ local usingAllyteams = false
 local curGraph = {}
 
 -- Spring aliases
-local echo 		= Spring.Echo
+local echo = Spring.Echo
 
 -- CHILI CONTROLS
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
 local wasActive = {}
 local playerNames = {}
+local highlightedTeamId = false
+local highlightedAllyTeamId = false
+
+local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
 local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
+
+local TEAM_WRAP = 20
+
+local teamToPosition = {}
+do
+	local pos = 1
+	
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeam = false
+	if not spectating then
+		myAllyTeam = Spring.GetMyAllyTeamID()
+		teamToPosition[Spring.GetMyTeamID()] = pos
+		pos = pos + 1
+	end
+	
+	local function SetAllyTeamPositions(allyTeamID)
+		local teamList = Spring.GetTeamList(allyTeamID)
+		for i = 1, #teamList do
+			local teamID = teamList[i]
+			if teamID ~= gaiaTeamID and not teamToPosition[teamID] then
+				teamToPosition[teamID] = pos
+				pos = pos + 1
+			end
+		end
+	end
+	
+	if myAllyTeam then
+		SetAllyTeamPositions(myAllyTeam)
+	end
+	
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		if allyTeamList[i] ~= myAllyTeam then
+			SetAllyTeamPositions(allyTeamList[i])
+		end
+	end
+end
+
+local function TeamToPosition(teamID)
+	return teamToPosition[teamID] or 0
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -144,12 +189,40 @@ local function drawIntervals(graphMax)
 				x = 5,
 				bottom = ((i)/5*100 + 1) .. "%",
 				width = "100%",
-				caption = numFormat(graphMax*i/5)
+				caption = numFormat(graphMax*i/5),
+				objectOverrideFont = WG.GetFont(),
 			}
 		end
 	end
 end
 
+local getEngineArrays = function(name, caption) end
+
+local function SetHighlightedTeam(teamID)
+	if highlightedTeamId == teamID then
+		highlightedTeamId = false
+	else
+		highlightedTeamId = teamID
+	end
+	if curGraph.name then
+		graphPanel:ClearChildren()
+		lineLabels:ClearChildren()
+		getEngineArrays(curGraph.name,curGraph.caption)
+	end
+end
+
+local function SetHighlightedAllyTeam(allyTeamID)
+	if highlightedAllyTeamId == allyTeamID then
+		highlightedAllyTeamId = false
+	else
+		highlightedAllyTeamId = allyTeamID
+	end
+	if curGraph.name then
+		graphPanel:ClearChildren()
+		lineLabels:ClearChildren()
+		getEngineArrays(curGraph.name,curGraph.caption)
+	end
+end
 
 -- This is broken.
 --
@@ -205,7 +278,7 @@ end
 --draw graphs
 
 --Total package of graph: Draws graph and labels for each nonSpec player
-local function drawGraph(graphArray, graphMax, teamID, team_num)
+local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
 	if #graphArray == 0 then
 		return
 	end
@@ -216,6 +289,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		or teamID
 	)
 	local teamColor = {r,g,b,a}
+	local teamColorDark = {r*0.32,g*0.32,b*0.32,a}
 	local lineLabel = numFormat(graphArray[#graphArray])
 
 	local name = ""
@@ -247,24 +321,40 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 		bottom = (not labelOffBottom) and 1,
 		width = "100%",
 		caption = lineLabel,
-		font = {color = teamColor},
+		font = {color = (isHighlighted and teamColor) or teamColorDark},
 	}
 
 	--adds player to Legend
 	if team_num then
-		local label2 = Chili.Label:New{
+		local label2 = Chili.Button:New{
 			parent = graphPanel,
-			x = 55, y = (team_num)*20 + 5,
-			width = "100%",
+			x = 40 + 230*math.floor((team_num - 1)/TEAM_WRAP), y = ((team_num - 1)%TEAM_WRAP)*20 + 16,
+			width = 230,
 			height = 20,
+
+			borderColor     = {0, 0, 0, 0},
+			borderColor2    = {0, 0, 0, 0},
+			backgroundColor = {0, 0, 0, 0},
 			caption = name,
-			font = {color = teamColor}
+			align= "left",
+			alignPadding = 0.08,
+			font = {color = (isHighlighted and teamColor) or teamColorDark},
+			noClickThrough = true,
+			OnClick = {
+				function(...)
+					if usingAllyteams then
+						SetHighlightedAllyTeam(teamID)
+					else
+						SetHighlightedTeam(teamID)
+					end
+				 end
+			}
 		}
 	end
 
 	--creates graph element
 	local graph = Chili.Control:New{
-		parent	= graphPanel,
+		parent  = graphPanel,
 		x       = 0,
 		y       = 0,
 		height  = "100%",
@@ -277,18 +367,24 @@ local function drawGraph(graphArray, graphMax, teamID, team_num)
 			local w = obj.width
 			local h = obj.height
 
-			gl.Color(teamColor)
 			gl.PushMatrix()
 			gl.Translate(x, y, 0)
 			gl.Scale(w, h, 1)
-			gl.LineWidth(3)
+			gl.LineWidth((isHighlighted and 3) or 2)
+			if isHighlighted then
+				gl.Color(teamColor)
+			else
+				gl.Color(teamColorDark)
+			end
 			gl.BeginEnd(GL.LINE_STRIP, drawLine)
 			gl.PopMatrix()
 		end
 	}
+	
+	return graph
 end
 
-local function getEngineArrays(statistic, labelCaption)
+getEngineArrays = function(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
 	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
@@ -315,7 +411,7 @@ local function getEngineArrays(statistic, labelCaption)
 			caption = "No Data",
 			align = "center",
 			textColor = {1,1,0,1},
-			fontsize = 60,
+			objectOverrideFont = WG.GetFont(fontsize),
 		}
 		return
 	end
@@ -324,8 +420,8 @@ local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local graphMax = 0
 	local gaia = usingAllyteams
-		and select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
-		or Spring.GetGaiaTeamID()
+		and select(6, Spring.GetTeamInfo(gaiaTeamID, false))
+		or gaiaTeamID
 
 	for i = 1, #teams do
 		local teamID = teams[i]
@@ -363,12 +459,22 @@ local function getEngineArrays(statistic, labelCaption)
 		graphMax = 5
 	end
 	
+	local highlightID = (usingAllyteams and highlightedAllyTeamId)
+	if not usingAllyteams then
+		highlightID = highlightedTeamId
+	end
+	
 	local team_i = 1
-	for k, v in pairs(teamScores) do
-		if k ~= gaia then
-			drawGraph(v, graphMax*1.005, k, team_i)
+	for teamID, v in pairs(teamScores) do
+		if teamID ~= gaia and teamID ~= highlightID then
+			drawGraph(v, graphMax*1.005, teamID, TeamToPosition(teamID), not highlightID)
 		end
-		team_i = team_i + 1
+	end
+	if highlightID then
+		local graph = drawGraph(teamScores[highlightID], graphMax*1.005, highlightID, TeamToPosition(highlightID), true)
+		if graph then
+			graph:BringToFront()
+		end
 	end
 
 	-- Commented out for now because it's broken; see above
@@ -432,7 +538,7 @@ function makePanel()
 		height = 30,
 		align = "center",
 		autosize = true,
-		font = {size = 30,},
+		objectOverrideFont = WG.GetFont(30),
 	}
 	graphTime = Chili.Label:New {
 		parent = window0,
@@ -441,6 +547,7 @@ function makePanel()
 		width = 50,
 		height = 10,
 		caption = "",
+		objectOverrideFont = WG.GetFont(),
 	}
 
 	drawIntervals()
@@ -460,10 +567,7 @@ function makePanel()
 			x = 5,
 			y = 3,
 			caption = buttongroups[i][1],
-			font = {
-				size          = 16,
-				color         = {1,1,0,1},
-			},
+			objectOverrideFont = WG.GetSpecialFont(16, "yellow", {color = {1,1,0,1}}),
 
 		}
 		local groupstack = Chili.StackPanel:New {
@@ -482,6 +586,7 @@ function makePanel()
 				caption = buttongroups[i][2][j][2],
 				tooltip = buttongroups[i][2][j][3],
 				parent = groupstack,
+				objectOverrideFont = WG.GetFont(),
 				OnClick = {
 					function(obj)
 						if window0.buttonPressed then
@@ -503,7 +608,7 @@ function makePanel()
 
 	local allyToggle = Chili.Checkbox:New {
 		parent = window0,
-		caption = " ",
+		noFont = true,
 		right = 32, bottom = 2,
 		checked = false,
 		OnClick = {
@@ -524,6 +629,7 @@ function makePanel()
 		bottom = 5, right = 50,
 		width = 50, height = 10,
 		align = "right",
+		objectOverrideFont = WG.GetFont(),
 	}
 
 	return window0

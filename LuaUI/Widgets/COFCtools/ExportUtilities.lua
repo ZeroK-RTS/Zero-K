@@ -1,4 +1,12 @@
 
+function SetCameraState(cs, smoothness)
+	if WG.COFC_SetCameraState then
+		WG.COFC_SetCameraState(cs, smoothness or 0)
+	else
+		Spring.SetCameraState(cs, smoothness or 0)
+	end
+end
+
 function SetCameraTarget(x, y, z, smoothness, useSmoothMeshSetting, dist)
 	if WG.COFC_SetCameraTarget then
 		WG.COFC_SetCameraTarget(x, y, z, smoothness, useSmoothMeshSetting, dist)

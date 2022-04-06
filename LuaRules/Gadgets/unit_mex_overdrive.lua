@@ -113,6 +113,13 @@ local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
+
+--[[ Uses the regular 50% payback. This is because at 100% people would leave
+     empty nanoframes for their allies to finish (actual experience from past).
+     In general, the "correct" value is such that the people who are aware of
+     the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
+     Ideally the refund would just be for whomever actually put in resources,
+     but that would involve the build step callin which is quite expensive. ]]
 local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
 
 local paybackDefs = { -- cost is how much to pay back
@@ -127,6 +134,7 @@ local paybackDefs = { -- cost is how much to pay back
 local spammedError = false
 local debugGridMode = false
 local debugAllyTeam = false
+local waiveGridLowPower = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -162,12 +170,8 @@ do
 		quadFields[allyTeamID] = Spring.Utilities.QuadField(QUADFIELD_SQUARE_SIZE)
 
 		allyTeamInfo[allyTeamID] = {
-			--plant = {},
-			mexMetal = 0,
-			mexSquaredSum = 0,
-			mexCount = 0,
 			grids = 0,
-			grid = {}, -- pylon[unitID], plant[unitID], mexMetal, mexSquaredSum
+			grid = {}, -- pylon[unitID]
 			nilGrid = {},
 			team = {},
 			teams = 0,
@@ -360,9 +364,6 @@ local function AddPylonToGrid(unitID)
 			if ai.nilGrid[i] then
 				ai.grid[i] = {
 					pylon = {},
-					--plant = {},
-					mexMetal = 0,
-					mexSquaredSum = 0,
 				}
 				newGridID = i
 				ai.nilGrid[i] = false
@@ -375,9 +376,6 @@ local function AddPylonToGrid(unitID)
 			newGridID = ai.grids
 			ai.grid[ai.grids] = {
 				pylon = {},
-				--plant = {},
-				mexMetal = 0,
-				mexSquaredSum = 0,
 			}
 			mexes[allyTeamID][newGridID] = {}
 		end
@@ -399,11 +397,6 @@ local function AddPylonToGrid(unitID)
 				ai.grid[newGridID].pylon[pid] = true
 				spSetUnitRulesParam(pid,"gridNumber",newGridID,alliedTrueTable)
 			end
-			--[[for eid,_ in pairs(ai.grid[oldGridID].plant) do
-				ai.grid[newGridID].plant[eid] = true
-			end--]]
-			ai.grid[newGridID].mexMetal = ai.grid[newGridID].mexMetal + ai.grid[oldGridID].mexMetal
-			ai.grid[newGridID].mexSquaredSum = ai.grid[newGridID].mexSquaredSum + ai.grid[oldGridID].mexSquaredSum
 			ai.nilGrid[oldGridID] = true
 		end
 	end
@@ -414,24 +407,14 @@ local function AddPylonToGrid(unitID)
 
 	-- add econ to new grid
 	-- mexes
-	if pylon[allyTeamID][unitID].mex then
+	if pylon[allyTeamID][unitID].mex and mexes[allyTeamID][0][unitID] then
 		local mid = unitID
 		local orgMetal = mexes[allyTeamID][0][mid]
-		ai.mexMetal = ai.mexMetal + orgMetal
-		ai.mexSquaredSum = ai.mexSquaredSum + (orgMetal * orgMetal)
-
-		ai.grid[newGridID].mexMetal = ai.grid[newGridID].mexMetal + orgMetal
-		ai.grid[newGridID].mexSquaredSum = ai.grid[newGridID].mexSquaredSum + (orgMetal * orgMetal)
 
 		mexes[allyTeamID][newGridID][mid] = orgMetal
 		mexByID[mid].gridID = newGridID
 		mexes[allyTeamID][0][mid] = nil
 	end
-
-	-- energy
-	--[[for eid,_ in pairs(pylon[allyTeamID][unitID].nearEnergy) do
-		ai.grid[newGridID].plant[eid] = true
-	end--]]
 end
 
 local function QueueAddPylonToGrid(unitID)
@@ -463,6 +446,7 @@ local function AddPylon(unitID, unitDefID, range)
 	end
 	quadFields[allyTeamID]:Insert(unitID, pX, pZ, range)
 	local intersections = quadFields[allyTeamID]:GetIntersections(unitID)
+	local neededLink = pylonDefs[unitDefID].neededLink
 
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
@@ -474,10 +458,14 @@ local function AddPylon(unitID, unitDefID, range)
 		--nearEnergy = {},
 		x = pX,
 		z = pZ,
-		neededLink = pylonDefs[unitDefID].neededLink,
+		neededLink = neededLink,
 		active = true,
 		color = 0,
 	}
+	if neededLink and not waiveGridLowPower then
+		-- Start spawned units with low power until the next grid update
+		spSetUnitRulesParam(unitID, "lowpower", 1, inlosTrueTable)
+	end
 
 	for i = 2, intersections[1] do
 		local pid = intersections[i]
@@ -502,39 +490,6 @@ local function AddPylon(unitID, unitDefID, range)
 		Spring.Utilities.UnitEcho(unitID, list.count .. ", " .. unitID)
 	end
 
-	-- check for mexes
-	--[[
-	if unitOverdrive then
-		for mid, orgMetal in pairs(mexes[allyTeamID][0]) do
-			local mX,_,mZ = spGetUnitPosition(mid)
-			if (mid == unitID) then -- mex as pylon
-			--if (pX-mX)^2 + (pZ-mZ)^2 <= range^2 and not takenMexId[mid] then
-
-				--pylon[allyTeamID][unitID].mexes = pylon[allyTeamID][unitID].mexes + 1
-				pylon[allyTeamID][unitID].mex = true
-				--takenMexId[mid] = true
-
-				--if pylon[allyTeamID][unitID].mexes >= PYLON_MEX_LIMIT then
-				--	break
-				--end
-			end
-		end
-	end
-	--]]
-
-	-- check for energy
-	--[[
-	for eid, state in pairs(ai.plant) do
-		if (state == 0) then
-			local eX,_,eZ = spGetUnitPosition(eid)
-			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
-				ai.plant[eid] = 1
-				pylon[allyTeamID][unitID].nearEnergy[eid] = true
-			end
-		end
-	end
-	--]]
-
 	QueueAddPylonToGrid(unitID)
 end
 
@@ -554,10 +509,6 @@ local function DestroyGrid(allyTeamID,oldGridID)
 			mexes[allyTeamID][oldGridID][mid] = nil
 			mexes[allyTeamID][0][mid] = orgMetal
 			mexByID[mid].gridID = 0
-
-			ai.mexCount = ai.mexCount - 1
-			ai.mexMetal = ai.mexMetal - orgMetal
-			ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
 		end
 	end
 
@@ -571,24 +522,7 @@ local function ReactivatePylon(unitID)
 	if debugGridMode then
 		Spring.Echo("ReactivatePylon " .. unitID)
 	end
-
-	--local pX,_,pZ = spGetUnitPosition(unitID)
-
 	pylon[allyTeamID][unitID].active = true
-
-	-- check for energy
-	--[[
-	for eid, state in pairs(ai.plant) do
-		if state == 0 then
-			local eX,_,eZ = spGetUnitPosition(eid)
-			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
-				state = 1
-				pylon[allyTeamID][unitID].nearEnergy[eid] = true
-			end
-		end
-
-	end
-	--]]
 
 	QueueAddPylonToGrid(unitID)
 end
@@ -702,13 +636,6 @@ local function RemovePylon(unitID)
 
 		mexes[allyTeamID][mexGridID][mid] = orgMetal
 		mexByID[unitID].gridID = mexGridID
-		if mexGridID ~= 0 then
-			ai.mexCount = ai.mexCount + 1
-			ai.mexMetal = ai.mexMetal + orgMetal
-			ai.mexSquaredSum = ai.mexSquaredSum + (orgMetal * orgMetal)
-			ai.grid[mexGridID].mexMetal = ai.grid[mexGridID].mexMetal + orgMetal
-			ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (orgMetal * orgMetal)
-		end
 	end
 
 	if debugGridMode then
@@ -765,7 +692,6 @@ end
 -- Overdrive and resource handling
 
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
-
 	local summedMetalProduction = 0
 	local summedBaseMetal = 0
 	local summedOverdrive = 0
@@ -774,13 +700,30 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	local maxedBaseMetal = 0
 	local maxedOverdrive = 0
 
-
-	local allyMetal = allyTeamData.mexMetal
-	local allyMetalSquared = allyTeamData.mexSquaredSum
+	local allyMetalSquared = 0
 	local allyTeamMexes = mexes[allyTeamID]
 
-	local energyWasted = allyE
+	-- Calculate income squared sum each loop because mex income can change (eg handicap, slow damage)
+	local curMexIncomes = {}
+	local gridMexSquareSum = {}
+	for i = 1, allyTeamData.grids do -- loop through grids
+		gridMexSquareSum[i] = 0
+		for unitID, orgMetal in pairs(allyTeamMexes[i]) do -- loop mexes
+			local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+			if stunned_or_inbuld then
+				orgMetal = 0
+			end
+			local incomeFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+			if incomeFactor then
+				orgMetal = orgMetal * incomeFactor
+			end
+			curMexIncomes[unitID] = orgMetal
+			allyMetalSquared = allyMetalSquared + orgMetal * orgMetal
+			gridMexSquareSum[i] = gridMexSquareSum[i] + orgMetal * orgMetal
+		end
+	end
 
+	local energyWasted = allyE
 	local gridEnergySpent = {}
 	local gridMetalGain = {}
 
@@ -789,32 +732,25 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 
 	local reCalc = true
 	local maxedGrid = {}
-	while reCalc do	-- calculate overdrive for as long as a new grid is not maxed
+	while reCalc do -- calculate overdrive for as long as a new grid is not maxed
 		reCalc = false
 		for i = 1, allyTeamData.grids do -- loop through grids
 			if not (maxedGrid[i] or allyTeamData.nilGrid[i]) then -- do not check maxed grids
 				gridEnergySpent[i] = 0
 				gridMetalGain[i] = 0
-				for unitID, orgMetal in pairs(allyTeamMexes[i]) do -- loop mexes
-					local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
-					if stunned_or_inbuld then
-						orgMetal = 0
-					end
-					local incomeFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
-					if incomeFactor then
-						orgMetal = orgMetal*incomeFactor
-					end
+				for unitID, _ in pairs(allyTeamMexes[i]) do -- loop mexes
+					local myMetalIncome = curMexIncomes[unitID]
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
-						mexE = allyE*(orgMetal * orgMetal)/ allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
-						energyWasted = energyWasted-mexE --leftover E minus Mex usage
+						mexE = allyE * (myMetalIncome * myMetalIncome) / allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
+						energyWasted = energyWasted - mexE -- leftover E minus Mex usage
 						gridEnergySpent[i] = gridEnergySpent[i] + mexE
 						-- if a grid is being too overdriven it has become maxed.
 						-- the grid's mexSqauredSum is used for best distribution
 						if gridEnergySpent[i] > maxGridCapacity[i] then --final Mex to be looped since we are out of E to OD the rest of the Mex
 							gridMetalGain[i] = 0
 							local gridE = maxGridCapacity[i]
-							local gridMetalSquared = allyTeamData.grid[i].mexSquaredSum
+							local gridMetalSquared = gridMexSquareSum[i]
 							if gridMetalSquared <= 0 and not sentErrorWarning then
 								Spring.Echo("** Warning: gridMetalSquared <= 0 **")
 								Spring.Echo(gridMetalSquared)
@@ -831,33 +767,26 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							reCalc = true
 							allyE = allyE - gridE
 							energyWasted = allyE
-							for unitID, orgMetal in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
-								local this_stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
-								if this_stunned_or_inbuld then
-									orgMetal = 0
-								end
-								local thisIncomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor")
-								if thisIncomeFactor then
-									orgMetal = orgMetal*thisIncomeFactor
-								end
-								local thisMexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared
-								local metalMult = energyToExtraM(thisMexE)
-								local thisMexM = orgMetal + orgMetal * metalMult
+							for unitID_inner, _ in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
+								myMetalIncome = curMexIncomes[unitID_inner]
+								mexE = gridE*(myMetalIncome * myMetalIncome) / gridMetalSquared
+								local metalMult = energyToExtraM(mexE)
+								local thisMexM = myMetalIncome + myMetalIncome * metalMult
 
-								spSetUnitRulesParam(unitID, "overdrive", 1+thisMexE/5, inlosTrueTable)
-								spSetUnitRulesParam(unitID, "overdrive_energyDrain", thisMexE, inlosTrueTable)
-								spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, inlosTrueTable)
-								spSetUnitRulesParam(unitID, "overdrive_proportion", metalMult, inlosTrueTable)
+								spSetUnitRulesParam(unitID_inner, "overdrive", 1 + mexE / 5, inlosTrueTable)
+								spSetUnitRulesParam(unitID_inner, "overdrive_energyDrain", mexE, inlosTrueTable)
+								spSetUnitRulesParam(unitID_inner, "current_metalIncome", thisMexM, inlosTrueTable)
+								spSetUnitRulesParam(unitID_inner, "overdrive_proportion", metalMult, inlosTrueTable)
 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
-								maxedBaseMetal = maxedBaseMetal + orgMetal
-								maxedOverdrive = maxedOverdrive + orgMetal * metalMult
+								maxedBaseMetal = maxedBaseMetal + myMetalIncome
+								maxedOverdrive = maxedOverdrive + myMetalIncome * metalMult
 
-								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
-								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
+								allyMetalSquared = allyMetalSquared - myMetalIncome * myMetalIncome
+								gridMetalGain[i] = gridMetalGain[i] + myMetalIncome * metalMult
 
-								if mexByID[unitID].refundTeamID then
-									mexBaseMetal[unitID] = orgMetal
+								if mexByID[unitID_inner].refundTeamID then
+									mexBaseMetal[unitID_inner] = myMetalIncome
 								end
 							end
 							break --finish distributing energy to 1 grid, go to next grid
@@ -865,21 +794,21 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					end
 
 					local metalMult = energyToExtraM(mexE)
-					local thisMexM = orgMetal + orgMetal * metalMult
+					local thisMexM = myMetalIncome + myMetalIncome * metalMult
 
-					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, inlosTrueTable)
+					spSetUnitRulesParam(unitID, "overdrive", 1 + mexE / 5, inlosTrueTable)
 					spSetUnitRulesParam(unitID, "overdrive_energyDrain", mexE, inlosTrueTable)
 					spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, inlosTrueTable)
 					spSetUnitRulesParam(unitID, "overdrive_proportion", metalMult, inlosTrueTable)
 
 					summedMetalProduction = summedMetalProduction + thisMexM
-					summedBaseMetal = summedBaseMetal + orgMetal
-					summedOverdrive = summedOverdrive + orgMetal * metalMult
+					summedBaseMetal = summedBaseMetal + myMetalIncome
+					summedOverdrive = summedOverdrive + myMetalIncome * metalMult
 
-					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
+					gridMetalGain[i] = gridMetalGain[i] + myMetalIncome * metalMult
 
 					if mexByID[unitID].refundTeamID then
-						mexBaseMetal[unitID] = orgMetal
+						mexBaseMetal[unitID] = myMetalIncome
 					end
 				end
 
@@ -1175,7 +1104,7 @@ function gadget:GameFrame(n)
 				local pylonData = pylon[allyTeamID][unitID]
 				if pylonData then
 					if pylonData.neededLink then
-						if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
+						if (pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID]) and not waiveGridLowPower then
 							spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
 							GG.ScriptNotifyUnpowered(unitID, true)
 						else
@@ -1580,14 +1509,6 @@ local function AddMex(unitID, teamID, metalMake)
 		end
 		mexes[allyTeamID][mexGridID][unitID] = metalMake
 		mexByID[unitID].gridID = mexGridID
-		if mexGridID ~= 0 then
-			local ai = allyTeamInfo[allyTeamID]
-			ai.mexCount = ai.mexCount + 1
-			ai.mexMetal = ai.mexMetal + metalMake
-			ai.mexSquaredSum = ai.mexSquaredSum + (metalMake * metalMake)
-			ai.grid[mexGridID].mexMetal = ai.grid[mexGridID].mexMetal + metalMake
-			ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (metalMake * metalMake)
-		end
 	end
 end
 
@@ -1601,13 +1522,6 @@ local function RemoveMex(unitID)
 		local ai = allyTeamInfo[mex.allyTeamID]
 		local g = ai.grid[mex.gridID]
 
-		if mex.gridID ~= 0 then
-			g.mexMetal = g.mexMetal - orgMetal
-			g.mexSquaredSum = g.mexSquaredSum - (orgMetal * orgMetal)
-			ai.mexCount = ai.mexCount - 1
-			ai.mexMetal = ai.mexMetal - orgMetal
-			ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
-		end
 		local pylonData = pylon[mex.allyTeamID][unitID]
 		if pylonData then
 			pylonData.mex = nil --for some magical case where mex is to be removed but the pylon not?
@@ -1777,6 +1691,10 @@ function externalFunctions.AddInnateIncome(allyTeamID, metal, energy)
 	if not (allyTeamID and allyTeamInfo[allyTeamID]) then
 		return
 	end
+	if GG.allyTeamIncomeMult then
+		metal = metal * GG.allyTeamIncomeMult[allyTeamID]
+		energy = energy * GG.allyTeamIncomeMult[allyTeamID]
+	end
 	allyTeamInfo[allyTeamID].innateMetal = (allyTeamInfo[allyTeamID].innateMetal or 0) + metal
 	allyTeamInfo[allyTeamID].innateEnergy = (allyTeamInfo[allyTeamID].innateEnergy or 0) + energy
 	Spring.SetGameRulesParam("OD_allyteam_metal_innate_" .. allyTeamID, allyTeamInfo[allyTeamID].innateMetal)
@@ -1789,6 +1707,10 @@ end
 
 function externalFunctions.RemoveTeamIncomeRedirect(teamID)
 
+end
+
+function externalFunctions.SetNoGridRequirement(enabled)
+	waiveGridLowPower = enabled
 end
 
 -------------------------------------------------------------------------------------

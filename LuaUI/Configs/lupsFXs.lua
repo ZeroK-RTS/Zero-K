@@ -59,14 +59,6 @@ groundFlashShield = {
 	repeatEffect = true,
 }
 
-groundFlashCorestor = {
-	life       = 50,
-	size       = 80,
-	texture    = "bitmaps/GPL/Lups/gf_corestor.png",
-	colormap   = { {0.9, 0.9, 0.0, 0.15},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.15}, },
-	repeatEffect = true,
-	quality = 1, -- Low
-}
 groundFlashenergypylon = {
 	life       = 50,
 	size       = 80,
@@ -79,23 +71,6 @@ groundFlashenergypylon = {
 ----------------------------------------------------------------------------
 -- BURSTS ------------------------------------------------------------------
 ----------------------------------------------------------------------------
-corfusBursts = {
-	delay      = 30,
-	life       = math.huge,
-	pos        = {0,40,0},
-	rotSpeed   = 2,
-	rotSpread  = 1,
-	rotairdrag = 1,
-	arc        = 90,
-	arcSpread  = 0,
-	size       = 17,
-	sizeSpread = 5,
-	--colormap   = { {0.10, 0.8, 0.8, 0.4} },
-	colormap   = { {0.8, 0.4, 0.1, 0.4} },
-	directional= true,
-	repeatEffect = true,
-	count      = 17,
-}
 
 energysinguBursts = {
 	life       = math.huge,
@@ -275,76 +250,6 @@ energysinguCorona = {
 	count       = 1,
 	repeatEffect = true,
 }
-
-corfusCorona = {
-	delay       = 25,
-	pos         = {0,40.5,0},
-	life        = math.huge,
-	lifeSpread  = 0,
-	size        = 55,
-	sizeGrowth  = 0,
-	colormap    = { {0.3, 0.7, 1, 0.005}  },
-	texture     = 'bitmaps/GPL/groundflash.tga',
-	count       = 1,
-	repeatEffect = true,
-}
-
-corfusNova = {
-	layer       = 1,
-	pos         = {0,40.5,0},
-	life        = 26,
-	lifeSpread  = 0,
-	size        = 0,
-	sizeGrowth  = 3,
-	colormap    = { {1.0, 0.6, 0.1, 0.005}, {1.0, 0.6, 0.1, 0.005}, {1.0, 0.6, 0.1, 0.005}, {0, 0, 0, 0.005} },
-	texture     = 'bitmaps/GPL/smallflare.tga',
-	count       = 1,
-}
-
-
-corfusNova2 = {
-	layer       = 1,
-	delay       = 10,
-	pos         = {0,40.5,0},
-	life        = 35,
-	lifeSpread  = 0,
-	size        = 0,
-	sizeGrowth  = 2,
-	colormap    = { {0.5, 0.35, 0.15, 0.005}, {0.5, 0.35, 0.15, 0.005}, {0.5, 0.35, 0.15, 0.005}, {0, 0, 0, 0.005} },
-	texture     = 'bitmaps/GPL/groundflash.tga',
-	count       = 1,
-}
-
-
-corfusNova3 = {
-	layer       = -10,
-	delay       = 25,
-	pos         = {0,40.5,0},
-	life        = math.huge,
-	lifeSpread  = 0,
-	size        = 50,
-	sizeGrowth  = 0,
-	colormap    = { {1.0, 0.5, 0.1, 0.005} },
-	texture     = 'bitmaps/GPL/smallflare.tga',
-	count       = 1,
-	repeatEffect= true,
-}
-
-
-corfusNova4 = {
-	layer       = -5,
-	delay       = 25,
-	pos         = {0,40.5,0},
-	life        = math.huge,
-	lifeSpread  = 0,
-	size        = 50,
-	sizeGrowth  = 0,
-	colormap    = { {0.6, 0.15, 0.04, 0.005}, {0, 0, 0, 0.005} },
-	texture     = 'bitmaps/Saktoths/groundring.tga',
-	count       = 1,
-	repeatEffect= true,
-}
-
 
 radarBlink = {
 	piece       = "head_3",

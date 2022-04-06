@@ -87,11 +87,6 @@ function script.Create()
 	StartThread(padchange)
 end
 
-function script.QueryNanoPiece ()
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nano1)
-	return nano1
-end
-
 function script.Activate ()
 	StartThread (Open)
 end

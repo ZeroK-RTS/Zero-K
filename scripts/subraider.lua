@@ -3,41 +3,25 @@
 -- unused piece: 'wake'
 local base, firepoint = piece ("base", "firepoint")
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 function script.QueryWeapon(num)
 	return firepoint
 end
 function script.AimFromWeapon(num)
-	return base
+	return firepoint
 end
 
 function script.AimWeapon(num, heading, pitch)
 	return num == 2
 end
 
+function script.Create()
+	Move(firepoint, y_axis, 10)
+end
+
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 240, 25, 0.5) -- Leeway for amph regen
-end
-
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0) then
-		submerged = false
-	else
-		submerged = true
-	end
-end
-
-
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damages = WeaponDefs[weaponDefID].damages
-		return damage * (damages[elseArmorClass] / damages[subArmorClass])
-	end
-	return damage
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 220, 12, 0.05, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

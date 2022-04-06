@@ -16,7 +16,6 @@ local smokePiece = {base}
 local SIG_MOVE = 1
 
 function script.Create()
-	restore_delay = 3000
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(turret, x_axis, math.rad(-90), math.rad(10000))
 	Turn(doorl, z_axis, math.rad(-100), math.rad(240))

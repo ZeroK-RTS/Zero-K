@@ -16,24 +16,27 @@ return { spidercrabe = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -10 0]],
     modelradius    = [[30]],
+    unstick_leeway    = 60, -- Don't lose move orders for longer while preparing to move.
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 5,
   },
 
-  damageModifier         = 0.25,
+  damageModifier         = 0.333,
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[spidersupport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 4000,
+  maxDamage              = 4200,
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT4]],
   moveState              = 0,
   noChaseCategory        = [[FIXEDWING GUNSHIP]],
@@ -59,7 +62,7 @@ return { spidercrabe = {
   trackStretch           = 1,
   trackType              = [[crossFoot]],
   trackWidth             = 50,
-  turnRate               = 600,
+  turnRate               = 720,
 
   weapons                = {
 
@@ -80,13 +83,13 @@ return { spidercrabe = {
       craterMult              = 0.5,
 
       customParams            = {
+        force_ignore_ground = [[1]],
         light_color = [[1.5 1.13 0.6]],
         light_radius = 450,
       },
 
       damage                  = {
         default = 600.5,
-        subs    = 30,
       },
 
       edgeEffectiveness       = 0.3,

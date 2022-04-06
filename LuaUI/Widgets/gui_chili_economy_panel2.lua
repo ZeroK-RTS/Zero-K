@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Economy Panel Default",
-    desc      = "",
+    desc      = "Implements the default resource bars",
     author    = "jK, Shadowfury333, GoogleFrog",
     date      = "2014",
     license   = "GNU GPL, v2 or later",
@@ -95,7 +95,7 @@ local updateOpacity = false
 local reserveSentTimer = false
 local blinkMetal = 0
 local blinkEnergy = 0
-local BLINK_UPDATE_RATE = 0.1
+local BLINK_UPDATE_RATE = 0.06
 local blinkM_status = false
 local blinkE_status = false
 local excessE = false
@@ -134,8 +134,8 @@ local strings = {
 	advie_add_metal = "",
 	advice_add_energy = "",
 	advice_expand_both = "",
-	metal = "",	
-	metal_excess_warning = "",	
+	metal = "",
+	metal_excess_warning = "",
 	energy_stall_warning = "",
 }
 
@@ -184,22 +184,146 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function Format(input, override)
+	local leadingString = positiveColourStr .. "+"
+	if input < 0 then
+		leadingString = negativeColourStr .. "-"
+	end
+	leadingString = override or leadingString
+	input = math.abs(input)
+	
+	if input < 0.05 then
+		if override then
+			return override .. "0.0"
+		end
+		return WhiteStr .. "0"
+	elseif input < 100 then
+		return leadingString .. ("%.1f"):format(input) .. WhiteStr
+	elseif input < 10^3 - 0.5 then
+		return leadingString .. ("%.0f"):format(input) .. WhiteStr
+	elseif input < 10^4 then
+		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
+	elseif input < 10^5 then
+		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
+	else
+		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
+	end
+end
+
+local function FormatPercent(input, colorFunc)
+	local leadingString = ""
+	if colorFunc then
+		local color = colorFunc(input)
+		leadingString = string.char(255, color[1] * 255, color[2] * 255, color[3] * 255)
+	end
+	return leadingString .. ("%.0f"):format(100*input) .. "%" .. WhiteStr
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local extraPanels
+
+local function UpdateWindPanel()
+	if extraPanels.wind and extraPanels.wind.window then
+		local windStrength = Spring.GetGameRulesParam("WindStrength")
+		if windStrength then
+			extraPanels.wind.window.SetText(FormatPercent(windStrength,  extraPanels.wind.colorFunc))
+		end
+	end
+end
+
+extraPanels = {
+	efficiency = {
+		title = "Efficiency",
+		labelRight = "0%",
+		colorFunc = function (value)
+			if value <= 0 then
+				return {0.5, 0.8, 0.3}
+			end
+			value = 1/value
+			if value < 0.2 then
+				return {1, 0.3, 0.3}
+			end
+			if value < 1.2 then
+				local prop = (value - 0.2)
+				return {1 - 0.7*prop, 0.3 + 0.7*prop, 0.3}
+			end
+			if value < 2 then
+				return {0.3, 1, 0.3}
+			end
+			if value < 3.5 then
+				local prop = (value - 2)/1.5
+				return {0.3 + 0.2*prop, 1 - 0.2*prop, 0.3}
+			end
+			return {0.5, 0.8, 0.3}
+		end,
+	},
+	usage = {
+		title = "Usage",
+		labelRight = "0%",
+		colorFunc = function (value)
+			if value < 0.2 then
+				return {1, 0.3, 0.3}
+			end
+			if value < 1.2 then
+				local prop = (value - 0.2)
+				return {1 - 0.7*prop, 0.3 + 0.7*prop, 0.3}
+			end
+			if value < 2 then
+				return {0.3, 1, 0.3}
+			end
+			if value < 3.5 then
+				local prop = (value - 2)/1.5
+				return {0.3 + 0.2*prop, 1 - 0.2*prop, 0.3}
+			end
+			return {0.5, 0.8, 0.3}
+		end,
+	},
+	overdrive = {
+		title = "Overdrive",
+		labelCount = 3,
+	},
+	wind = {
+		title = "Wind",
+		onShow = UpdateWindPanel,
+		labelRight = "0%",
+		colorFunc = function (value)
+			return {1 - 0.7*value, 0.3 + 0.7*value, 0.7}
+		end,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 options_path = 'Settings/HUD Panels/Economy Panel'
+
+local function UpdateExtraPanelHide(wantHide)
+	for key, data in pairs(extraPanels) do
+		if data.window then
+			data.window.SetTempHide(wantHide)
+		end
+	end
+end
 
 local function option_recreateWindow()
 	local x,y,w,h = DestroyWindow()
 	if options.ecoPanelHideSpec.value then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if spectating then
+			UpdateExtraPanelHide(true)
 			return false
 		end
 	end
 	
 	if externalForceHide then
+		UpdateExtraPanelHide(true)
 		return false
 	end
 	
 	CreateWindow(x,y,w,h)
+	UpdateExtraPanelHide(false)
 	return true
 end
 
@@ -232,27 +356,55 @@ local function option_colourBlindUpdate()
 	col_highlight = {1, 0.5, 0.5, 1}
 end
 
+local function option_toggleExtra(self, value)
+	-- Global func
+	DoExtraToggle(self.extraKey, self.value)
+end
+
 options_order = {
-	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
-	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve', 'flowAsArrows',
+	'lbl_metal', 'metalFlash', 'metalWarning',
+	'lbl_energy', 'energyFlash', 'energyWarning', 'eExcessFlash',
+	'lbl_reserve', 'enableReserveBar', 'defaultEnergyReserve','defaultMetalReserve',
+	'lbl_extra', 'panel_efficiency', 'panel_usage', 'panel_overdrive', 'panel_wind',
+	'lbl_visual', 'ecoPanelHideSpec',
+	'flowAsArrows', 'opacity',
 	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
- 
+
 options = {
-	ecoPanelHideSpec = {
-		name  = 'Hide if spectating',
-		type  = 'bool',
-		value = false,
-		noHotkey = true,
-		desc = "Should the panel hide when spectating?",
-		OnChange = option_recreateWindow
+	lbl_metal = {name='Metal Warnings', type='label'},
+	metalFlash = {
+		name  = "Metal Excess Flash",
+		type  = "number",
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Metal storage will flash when metal storage exceeds this value."
+	},
+	metalWarning = {
+		name  = "Metal Excess Warning",
+		type  = "number",
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when metal storage exceeds this value."
+	},
+	lbl_energy = {name='Energy Warnings', type='label'},
+	energyFlash = {
+		name  = "Energy Stall Flash",
+		type  = "number",
+		value = 0.1, min=0,max=1,step=0.02,
+		desc = "Energy storage will flash when it drops below this fraction of your total storage."
+	},
+	energyWarning = {
+		name  = "Energy Stall Warning",
+		type  = "number",
+		value = 0.1, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when energy storage drops below this value."
 	},
 	eExcessFlash = {
 		name  = 'Flash On Energy Excess',
 		type  = 'bool',
 		value = false,
 		noHotkey = true,
-		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
+		desc = "When enabled, energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
+	lbl_reserve = {name='Reserve', type='label'},
 	enableReserveBar = {
 		name  = 'Enable Reserve',
 		type  = 'bool',
@@ -270,23 +422,47 @@ options = {
 		type  = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 	},
-	energyFlash = {
-		name  = "Energy Stall Flash",
-		type  = "number",
-		value = 0.1, min=0,max=1,step=0.02,
-		desc = "Energy storage will flash when it drops below this fraction of your total storage."
+	lbl_extra = {name='Extras', type='label'},
+	panel_efficiency = {
+		name  = 'Show Efficiency',
+		type  = 'bool',
+		value = false,
+		desc = "Show the minimum of Metal Income/Metal Pull and Energy Income/Energy Pull as a percentage. Use Ctrl+F11 to reposition as Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'efficiency',
 	},
-	energyWarning = {
-		name  = "Energy Stall Warning",
-		type  = "number",
-		value = 0.1, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when energy storage drops below this value."
+	panel_usage = {
+		name  = 'Show Usage',
+		type  = 'bool',
+		value = false,
+		desc = "Show the Metal Pull/Metal Income as a percentage. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'usage',
 	},
-	metalWarning = {
-		name  = "Metal Excess Warning",
-		type  = "number",
-		value = 0.9, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when metal storage exceeds this value."
+	panel_overdrive = {
+		name  = 'Show Overdrive',
+		type  = 'bool',
+		value = false,
+		desc = "Show overdrive energy:metal ratio, metal income, and energy cost. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'overdrive',
+	},
+	panel_wind = {
+		name  = 'Show Wind',
+		type  = 'bool',
+		value = false,
+		desc = "Show wind strength as a percentage. Use Ctrl+F11 to reposition and Escape to cancel.",
+		OnChange = option_toggleExtra,
+		extraKey = 'wind',
+	},
+	lbl_visual = {name='Visuals', type='label'},
+	ecoPanelHideSpec = {
+		name  = 'Hide if spectating',
+		type  = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = "Should the panel hide when spectating?",
+		OnChange = option_recreateWindow
 	},
 	flowAsArrows = {
 		name  = "Flow as arrows",
@@ -296,7 +472,7 @@ options = {
 		noHotkey = true,
 		OnChange = function(self)
 			if bar_metal then
-				bar_metal.font.size = self.value and 20 or 16
+				bar_metal.font = WG.GetFont((self.value and 20) or 16)
 				bar_metal.fontOffset = self.value and -2 or 1
 				if bar_metal.net then
 					bar_metal:SetCaption(GetFlowStr(bar_metal.net, self.value, positiveColourStr, negativeColourStr))
@@ -304,7 +480,7 @@ options = {
 				bar_metal:Invalidate()
 			end
 			if bar_overlay_energy then
-				bar_overlay_energy.font.size = self.value and 20 or 16
+				bar_overlay_energy.font = WG.GetFont((self.value and 20) or 16)
 				bar_overlay_energy.fontOffset = self.value and -2 or 1
 				if bar_overlay_energy.net then
 					bar_overlay_energy:SetCaption(GetFlowStr(bar_overlay_energy.net, self.value, positiveColourStr, negativeColourStr))
@@ -495,17 +671,17 @@ local BlinkStatusFunc = {
 	[1] = function (index)
 		index = index%12
 		if index < 6 then
-			return index*0.8/5
+			return 0.05 + index*0.9/5
 		else
-			return (11 - index)*0.8/5
+			return 0.05 + (11 - index)*0.9/5
 		end
 	end,
 	[2] = function (index)
 		index = index%8
 		if index < 4 then
-			return 0.25 + index*0.75/3
+			return 0.2 + index*0.8/3
 		else
-			return 0.25 + (7 - index)*0.75/3
+			return 0.2 + (7 - index)*0.8/3
 		end
 	end,
 }
@@ -521,7 +697,7 @@ local function UpdateBlink(dt)
 	blinkIndex = (blinkIndex + 1)%24
 	
 	if blinkM_status then
-		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_highlight, BlinkStatusFunc[blinkM_status](blinkIndex)))
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.6}, col_highlight, BlinkStatusFunc[blinkM_status](blinkIndex)))
 	end
 	
 	if blinkE_status then
@@ -571,32 +747,6 @@ local function NoStorageEnergyStall(mInco, mPull, eInco, ePull)
 	end
 	-- The following fails with some priority arrangements.
 	return eInco/ePull > mInco/mPull
-end
-
-local function Format(input, override)
-	local leadingString = positiveColourStr .. "+"
-	if input < 0 then
-		leadingString = negativeColourStr .. "-"
-	end
-	leadingString = override or leadingString
-	input = math.abs(input)
-	
-	if input < 0.05 then
-		if override then
-			return override .. "0.0"
-		end
-		return WhiteStr .. "0"
-	elseif input < 100 then
-		return leadingString .. ("%.1f"):format(input) .. WhiteStr
-	elseif input < 10^3 - 0.5 then
-		return leadingString .. ("%.0f"):format(input) .. WhiteStr
-	elseif input < 10^4 then
-		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
-	elseif input < 10^5 then
-		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
-	else
-		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
-	end
 end
 
 local  metalWarnOpt = options.metalWarning
@@ -698,11 +848,17 @@ function widget:GameFrame(n)
 	if teamTotalMetalStored > teamTotalMetalCapacity then
 		teamTotalMetalStored = teamTotalMetalCapacity
 	end
+
+	--// Storage, income and pull numbers
+	local realEnergyPull = ePull
+	local netMetal = mInco - mPull + mReci
+	local netEnergy = eInco - realEnergyPull
 	
 	-- Metal Blink
-	if flashModeEnabled and (mCurr >= mStor or teamMetalWaste > 0) then
+	local metalFlashOptValue = options.metalFlash.value
+	if flashModeEnabled and ((netMetal > 0 and mCurr >= mStor) or teamMetalWaste > 0) and metalFlashOptValue < 1 then
 		blinkM_status = 2
-	elseif flashModeEnabled and mCurr >= mStor * 0.9 then
+	elseif flashModeEnabled and (netMetal > 0 and mCurr >= mStor * metalFlashOptValue and metalFlashOptValue < 1) then
 		-- Blink less fast
 		blinkM_status = 1
 	elseif blinkM_status then
@@ -720,12 +876,6 @@ function widget:GameFrame(n)
 	
 	local ODEFlashThreshold = 0.1
 
-	--// Storage, income and pull numbers
-	local realEnergyPull = ePull
-
-	local netMetal = mInco - mPull + mReci
-	local netEnergy = eInco - realEnergyPull
-	
 	-- Energy Blink
 	local wastingE = false
 	if options.eExcessFlash.value then
@@ -749,7 +899,7 @@ function widget:GameFrame(n)
 	-- Warnings
 	local  metalWarnLevel =  metalWarnOpt.value
 	local energyWarnLevel = energyWarnOpt.value
-	local  metalWarning = (mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
+	local  metalWarning = (netMetal > 0 and mStor > 1 and mCurr > mStor *  metalWarnLevel) or (mStor <= 1 and netMetal > 0  and  metalWarnLevel < 1)
 	local energyWarning = (eStor > 1 and eCurr < eStor * energyWarnLevel) or (eStor <= 1 and eInco < mInco and energyWarnLevel > 0 and not metalWarning)
 	metalWarningPanel.ShowWarning(flashModeEnabled and (metalWarning and not energyWarning))
 	energyWarningPanel.ShowWarning(flashModeEnabled and energyWarning)
@@ -871,25 +1021,26 @@ function widget:GameFrame(n)
 	"\n      " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
 	"\n      " .. strings["resbar_other"] .. ": " .. energyOther ..
 	"\n   " .. strings["resbar_storage"] ..
-    "\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n      " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\n" .. strings["team_energy_economy"] ..
 	"\n   " .. strings["resbar_income"] ..
-	"\n      " .. strings["resbar_inc"] .. ": " .. team_energyIncome ..       
+	"\n      " .. strings["resbar_inc"] .. ": " .. team_energyIncome ..
 	"\n      " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n      " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
 	"\n      " .. strings["resbar_cons"] .. ": " .. team_energyMisc ..
 	"\n   " .. strings["resbar_expenses"] ..
 	"\n      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
 	"\n      " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
- 	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n      " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n      " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
 	"\n      " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
 	"\n      " .. strings["resbar_overdrive_efficiency"] .. ": " .. odEffStr .. " E/M" ..
-	"\n      " .. strings["resbar_economy_advice"] .. ": " .. advice ..
 	"\n   " .. strings["resbar_storage"] ..
-	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+	"\n      " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity) ..
+	"\n " ..
+	"\n" .. strings["resbar_economy_advice"] .. ": " .. advice
 
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
@@ -901,6 +1052,26 @@ function widget:GameFrame(n)
 	--// Net income indicator on resource bars.
 	bar_metal:SetCaption(GetFlowStr(netMetal, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
 	bar_overlay_energy:SetCaption(GetFlowStr(netEnergy, options.flowAsArrows.value, positiveColourStr, negativeColourStr))
+
+	if extraPanels.overdrive.window then
+		extraPanels.overdrive.window.SetText(odEffStr, 1)
+		extraPanels.overdrive.window.SetText(team_metalOverdrive, 2)
+		extraPanels.overdrive.window.SetText(team_energyOverdrive, 3)
+	end
+	if extraPanels.usage.window then
+		if mInco+mReci > 0 then
+			extraPanels.usage.window.SetText(FormatPercent(mPull/(mInco + mReci), extraPanels.usage.colorFunc))
+		else
+			extraPanels.usage.window.SetText(FormatPercent(0, extraPanels.usage.colorFunc))
+		end
+	end
+	if extraPanels.efficiency.window then
+		local energyEff = (realEnergyPull > 0 and eInco/realEnergyPull) or 0
+		local metalEff = (mPull > 0 and (mInco+mReci)/mPull) or 0
+		local efficiency = math.min(energyEff, metalEff)
+		extraPanels.efficiency.window.SetText(FormatPercent(efficiency, extraPanels.efficiency.colorFunc))
+	end
+	UpdateWindPanel()
 
 	-- save so that we can switch representation without recalculating
 	bar_metal.net = netMetal
@@ -942,7 +1113,9 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.warningFontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 		parent = holder,
 	}
 	
@@ -995,7 +1168,9 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 		valign = "center",
 		align  = "center",
 		autosize = false,
-		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.warningFontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 		parent = holder,
 	}
 	
@@ -1064,6 +1239,127 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Extra Panels
+
+local function GetExtraPanel(name, extraData)
+	local show = true
+	extraData.labelCount = extraData.labelCount or 1
+	extraData.minWidth = extraData.minWidth or 100
+	
+	local extraWindow = Chili.Window:New{
+		backgroundColor = {0, 0, 0, 0},
+		color = {0, 0, 0, 0},
+		parent = Chili.Screen0,
+		dockable = true,
+		name = name .. "_extraWindow",
+		padding = {0,0,0,0},
+		x = 150,
+		y = 150,
+		clientWidth  = extraData.minWidth,
+		clientHeight = 37 + 35*extraData.labelCount,
+		minWidth  = extraData.minWidth,
+		minHeight = 72,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+		dockableSavePositionOnly = true,
+	}
+	local holderPanel = Chili.Panel:New{
+		classname = "main_window_small_tall",
+		backgroundColor = {0, 0, 0, 0},
+		parent = extraWindow,
+		padding = {0,0,0,0},
+		y      = 0,
+		x      = 0,
+		right  = 0,
+		bottom = 0,
+		dockable = false;
+		draggable = false,
+		resizable = false,
+	}
+	
+	local title = Chili.Label:New{
+		x      = "5%",
+		y      = 10,
+		width  = "90%",
+		height = 20,
+		caption = extraData.title,
+		valign = "center",
+		align  = "center",
+		autosize = false,
+		parent = holderPanel
+	}
+	
+	local labels = {}
+	for i = 1, extraData.labelCount do
+		labels[i] = Chili.Label:New{
+			x      = "10%",
+			y      = i*35 - 5,
+			right  = extraData.labelRight or "10%",
+			height = 30,
+			caption = "0.0",
+			valign = "center",
+			align  = "center",
+			autosize = false,
+			parent = holderPanel,
+			objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+				outline = true, outlineWidth = 2, outlineWeight = 2,
+			}),
+		}
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.SetText(newText, labelIndex)
+		if show then
+			labelIndex = labelIndex or 1
+			labels[labelIndex]:SetCaption(newText)
+		end
+	end
+	
+	function externalFunctions.Show(newShow)
+		if show == newShow then
+			return
+		end
+		show = newShow
+		holderPanel:SetVisibility(show)
+		if show and extraData.onShow then
+			extraData.onShow()
+		end
+	end
+	
+	function externalFunctions.SetTempHide(shouldHide)
+		if shouldHide then
+			holderPanel:SetVisibility(false)
+			return
+		end
+		holderPanel:SetVisibility(show)
+	end
+	
+	return externalFunctions
+end
+
+function DoExtraToggle(name, value)
+	if not extraPanels[name] then
+		return
+	end
+	Spring.Echo("extraPanels", name, value)
+	local extraData = extraPanels[name]
+	if value and not extraData.window then
+		extraData.window = GetExtraPanel(name, extraData)
+		if extraData.onShow then
+			extraData.onShow()
+		end
+	end
+	if extraData.window then
+		extraData.window.Show(value)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local externalFunctions = {}
 
@@ -1077,9 +1373,11 @@ function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 	else
 		window:SetVisibility(newVisibility)
 	end
+	UpdateExtraPanelHide(not newVisibility)
 end
 
 function externalFunctions.SetFlashEnabled(newEnabled)
+	-- Probably used in tutorial missions
 	flashModeEnabled = newEnabled
 end
 
@@ -1153,6 +1451,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// WINDOW
 	window = Chili.Window:New{
 		backgroundColor = {0, 0, 0, 0},
+		noFont = true,
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
@@ -1162,7 +1461,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
 		clientWidth  = oldW or economyPanelWidth,
-		clientHeight = oldH or 110,
+		clientHeight = oldH or 116,
 		minHeight = 100,
 		draggable = false,
 		resizable = false,
@@ -1266,7 +1565,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
+			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
+		}),
 	}
 	
 	lbl_income_metal = Chili.Label:New{
@@ -1279,7 +1580,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	lbl_expense_metal = Chili.Label:New{
@@ -1292,7 +1595,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	local metalBarHolder = Chili.Control:New{
@@ -1415,7 +1720,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_grey", {
+			outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2.
+		}),
 	}
 	
 	lbl_income_energy = Chili.Label:New{
@@ -1428,7 +1735,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	lbl_expense_energy = Chili.Label:New{
@@ -1441,7 +1750,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		objectOverrideFont = WG.GetSpecialFont(options.fontSize.value, "res_outline", {
+			outline = true, outlineWidth = 2, outlineWeight = 2,
+		}),
 	}
 	
 	local energyBarHolder = Chili.Control:New{
@@ -1547,6 +1858,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 
 	-- set translatable strings
 	languageChanged ()
+
+	-- Initial Wind
+	UpdateWindPanel()
 
 	-- update the flow string font settings
 	local opt_flowstr = options.flowAsArrows

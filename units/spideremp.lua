@@ -4,7 +4,7 @@ return { spideremp = {
   description            = [[Lightning Riot Spider]],
   acceleration           = 0.78,
   brakeRate              = 4.68,
-  buildCostMetal         = 200,
+  buildCostMetal         = 190,
   buildPic               = [[spideremp.png]],
   canGuard               = true,
   canMove                = true,
@@ -20,20 +20,19 @@ return { spideremp = {
     midposoffset   = [[0 -6 0]],
     modelradius    = [[19]],
     aim_lookahead  = 100,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderriotspecial]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 750,
+  maxDamage              = 740,
   maxSlope               = 72,
   maxVelocity            = 2.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[venom.s3o]],
@@ -55,7 +54,7 @@ return { spideremp = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1600,
+  turnRate               = 1920,
 
   weapons                = {
 
@@ -76,14 +75,15 @@ return { spideremp = {
       craterMult              = 0,
       
       customParams            = {
-        extra_damage = 450,
+        extra_damage = 400,
+        force_ignore_ground = [[1]],
         
         light_color = [[0.75 0.75 0.56]],
         light_radius = 190,
       },
 
       damage                  = {
-        default        = 40.01,
+        default        = 65.01,
       },
 
       duration                = 8,
@@ -95,9 +95,9 @@ return { spideremp = {
       intensity               = 12,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      paralyzeTime            = 3,
+      paralyzeTime            = 1,
       range                   = 240,
-      reloadtime              = 1.5,
+      reloadtime              = 34/30,
       rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,

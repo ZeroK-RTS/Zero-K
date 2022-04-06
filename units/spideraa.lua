@@ -13,21 +13,20 @@ return { spideraa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     cus_noflashlight = 1,
+    okp_damage = 250.1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spideraa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1200,
   maxSlope               = 72,
   maxVelocity            = 2.3,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
@@ -40,7 +39,7 @@ return { spideraa = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 1700,
+  turnRate               = 2040,
 
   weapons                = {
 
@@ -73,7 +72,6 @@ return { spideraa = {
       damage                  = {
         default = 20,
         planes  = 260,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -83,7 +81,7 @@ return { spideraa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_phoenix.s3o]],
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 1000,
       reloadtime              = 1.9,
@@ -91,10 +89,11 @@ return { spideraa = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 400,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
-      turnRate                = 70000,
+      turnRate                = 82000,
       turret                  = true,
       weaponAcceleration      = 200,
       weaponType              = [[MissileLauncher]],

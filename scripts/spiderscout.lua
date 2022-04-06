@@ -25,6 +25,7 @@ local RESTORE_DELAY = 600
 local burrowed = false
 local aiming = false
 local dirtfling = 1024+2
+local movingData = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -317,6 +318,7 @@ local function UnBurrow()
 end
 
 function script.StartMoving()
+	movingData.moving = true
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -326,12 +328,13 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	movingData.moving = false
 	StartThread(Burrow)
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, {body})
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end

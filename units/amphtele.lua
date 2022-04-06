@@ -11,9 +11,9 @@ return { amphtele = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
-  --collisionVolumeOffsets = [[0 1 0]],
-  --collisionVolumeScales  = [[36 49 35]],
-  --collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[36 49 36]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -23,19 +23,17 @@ return { amphtele = {
     teleporter = 1,
     teleporter_throughput = 150, -- mass per second
     teleporter_beacon_spawn_time = 8,
+    teleporter_beacon_unit = [[tele_beacon]],
   },
 
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[amphtransport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 2.5,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   objectName             = [[amphteleport.s3o]],
   script                 = [[amphtele.lua]],
@@ -48,7 +46,7 @@ return { amphtele = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 24,
-  turnRate               = 700,
+  turnRate               = 840,
 
   featureDefs            = {
 

@@ -9,7 +9,7 @@ return { cloakraid = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[18 28 18]],
   collisionVolumeType    = [[cylY]],
@@ -19,6 +19,8 @@ return { cloakraid = {
     modelradius        = [[16]],
     cus_noflashlight   = 1,
     aim_lookahead      = 80,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -32,7 +34,6 @@ return { cloakraid = {
   maxSlope               = 36,
   maxVelocity            = 3.85,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
@@ -55,7 +56,7 @@ return { cloakraid = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 14,
-  turnRate               = 2500,
+  turnRate               = 3000,
   upright                = true,
 
   weapons                = {
@@ -87,8 +88,7 @@ return { cloakraid = {
       },
 
       damage                  = {
-        default = 10.2,
-        subs    = 0.51,
+        default = 10.5,
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],

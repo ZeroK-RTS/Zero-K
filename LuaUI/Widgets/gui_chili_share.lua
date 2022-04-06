@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name    = "Chili Share menu v1.24",
-		desc    = "Press H to bring up the chili share menu.",
+		desc    = "FPS style (whole screen, hold to show) player list with comsharing UI",
 		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
 		license = "PD",
@@ -47,6 +47,7 @@ local images = {
 	pending = 'LuaUI/Images/epicmenu/questionmark.png',
 	leave = 'LuaUI/Images/epicmenu/exit.png',
 	kick = 'LuaUI/Images/advplayerslist/cross.png', -- REPLACE ME
+	report = 'LuaUI/Images/Crystal_Clear_app_error.png', -- REPLACE ME
 	merge = 'LuaUI/Images/Commshare_Merge.png',
 	give = 'LuaUI/Images/gift2.png',
 	giftmetal = 'LuaUI/Images/ibeam.png',
@@ -56,6 +57,8 @@ local defaultamount = 100
 
 local UpdateListFunction
 local wantRebuild = false
+
+local KICK_USER = "StartKickPoll_"
 
 local pingCpuColors = {
 	'\255\0\255\0',
@@ -566,6 +569,47 @@ local function BattleKickPlayer(subject)
 	Spring.SendCommands("say !poll kick " .. subject.name)
 end
 
+local function HandleKickMessage(msg)
+	if string.find(msg, KICK_USER) ~= 1 then
+		return
+	end
+	local data = msg:split("_")
+	if not (data and data[2]) then
+		return
+	end
+	
+	Spring.SendCommands("say !poll kick " .. data[2])
+	return true
+end
+
+local function ReportPlayer(subject)
+	local extraText = ""
+	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
+	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
+
+	local utils = Spring.Utilities
+	local gametype = utils.Gametype
+	if gametype.isCompStomp() then
+		local humans = #(Spring.GetTeamList(0) or {})
+		extraText = extraText .. humans .. " vs " .. (gametype.isChickens() and "Chickens" or "Bots")
+	elseif gametype.isTeamFFA() then
+		local playerCount = #Spring.GetTeamList() - 1 -- ignore gaia
+		extraText = extraText .. playerCount .. "-man, " .. utils.GetTeamCount() .. "-way Team FFA"
+	elseif gametype.isFFA() then
+		extraText = extraText .. utils.GetTeamCount() .. "-way FFA"
+	else
+		local teamCountFirst = #(Spring.GetTeamList(0) or {}) -- fixme: technically the teams dont need to be 0 and 1
+		local teamCountSecond = #(Spring.GetTeamList(1) or {})
+		extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond
+	end
+	extraText = extraText .. " on " .. Game.mapName
+
+	local seconds = math.floor(Spring.GetGameFrame()/30)
+	local minutes = math.floor(seconds/60)
+	extraText = extraText .. " at " .. string.format("%d:%02d", minutes, seconds - 60*minutes)
+	Spring.SendLuaMenuMsg("reportUser_" .. subject.name .. "_" .. extraText)
+end
+
 local function GiveUnit(target)
 	local num = Spring.GetSelectedUnitsCount()
 	if num == 0 then
@@ -635,17 +679,15 @@ local function InitName(subject, playerPanel)
 		parent=playerPanel,
 		width=146,
 		height = sizefont+1,
-		fontsize=sizefont + 1,
+		objectOverrideFont = WG.GetFont(sizefont + 1),
 		x=69 + 2*buttonsize,
 		text=subject.name ,
 		y=13
 	}
-	givemebuttons[subject.id]["text"].font.shadow = false
 	givemebuttons[subject.id]["text"]:Invalidate()
 	while (givemebuttons[subject.id]["text"].font:GetTextWidth(subject.name) > givemebuttons[subject.id]["text"].width - buttonsize) do
-		givemebuttons[subject.id]["text"].font.size = givemebuttons[subject.id]["text"].font.size - 1
+		givemebuttons[subject.id]["text"].font = WG.GetFont(givemebuttons[subject.id]["text"].font.size - 1)
 		givemebuttons[subject.id]["text"]:Invalidate()
-		
 	end
 	
 	local bottomRowStartX = 67
@@ -666,7 +708,7 @@ local function InitName(subject, playerPanel)
 			width='100%',
 			height='100%'}},
 			tooltip="Give selected units.",
-			caption=" "
+			noFont = true,
 		}
 		givemebuttons[subject.id]["metal"] = chili.Button:New{
 			parent = playerPanel,
@@ -688,7 +730,7 @@ local function InitName(subject, playerPanel)
 					height='100%'
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 		givemebuttons[subject.id]["energy"] = chili.Button:New{
 			parent = playerPanel,
@@ -710,7 +752,7 @@ local function InitName(subject, playerPanel)
 					height='100%'
 				}
 			},
-			caption=" "
+			noFont = true,
 		}
 	end
 	givemebuttons[subject.id]["ping"] = chili.TextBox:New{
@@ -720,7 +762,7 @@ local function InitName(subject, playerPanel)
 		x=12,
 		y=3,
 		textColor={1,1,1,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= "100ms"
@@ -731,7 +773,7 @@ local function InitName(subject, playerPanel)
 		x=19,
 		y=5,
 		textColor={1,0.4,0.4,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= ""
@@ -742,7 +784,7 @@ local function InitName(subject, playerPanel)
 		x=19,
 		y=5,
 		textColor={0.52,0.52,1,1},
-		fontsize=smallFontSize,
+		objectOverrideFont = WG.GetFont(smallFontSize),
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		text= ""
@@ -781,7 +823,8 @@ local function InitName(subject, playerPanel)
 		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
-		tooltip = "Your ally's metal."
+		tooltip = "Your ally's metal.",
+		noFont = true,
 	}
 	givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
 		parent = playerPanel,
@@ -793,14 +836,15 @@ local function InitName(subject, playerPanel)
 		x=givemebuttons[subject.id]["metalbar"].x,
 		y=givemebuttons[subject.id]["metalbar"].y + 12,
 		color={.93,.93,0,1},
-		tooltip = "Your ally's energy."
+		tooltip = "Your ally's energy.",
+		noFont = true,
 	}
 	
 	givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
 		parent=playerPanel,
 		height='50%',
 		width=100,
-		fontsize=smallerFontSize,
+		objectOverrideFont = WG.GetFont(smallerFontSize),
 		x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
 		y=givemebuttons[subject.id]["metalbar"].y + 1,
 		tooltip = "Your ally's metal income."
@@ -809,7 +853,7 @@ local function InitName(subject, playerPanel)
 		parent=playerPanel,
 		height='50%',
 		width=100,
-		fontsize=smallerFontSize,
+		objectOverrideFont = WG.GetFont(smallerFontSize),
 		x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
 		y=givemebuttons[subject.id]["energybar"].y + 1,
 		tooltip = "Your ally's energy income."
@@ -882,7 +926,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["commshare"] = chili.Button:New{
 				parent = playerPanel,
@@ -900,7 +944,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["kick"] = chili.Button:New{
 				parent = playerPanel,
@@ -918,7 +962,7 @@ local function InitName(subject, playerPanel)
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
 			givemebuttons[subject.id]["battlekick"] = chili.Button:New{
 				parent = playerPanel,
@@ -926,18 +970,36 @@ local function InitName(subject, playerPanel)
 				width = buttonsize,
 				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
 				y= givemebuttons[subject.id]["text"].y - 6,
-				OnClick = {function () BattleKickPlayer(subject) end},
-				padding={1,1,1,1},
-				tooltip = "Kick this player from the battle.",
+				OnClick = {function () ReportPlayer(subject) end},
+				padding={2,2,2,2},
+				tooltip = "Report this player to moderators.",
 				children={
 					chili.Image:New{
-						file=images.kick,
+						file=images.report,
 						width='100%',
 						height='100%'
 					}
 				},
-				caption=" "
+				noFont = true,
 			}
+			--givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			--	parent = playerPanel,
+			--	height = buttonsize,
+			--	width = buttonsize,
+			--	x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			--	y= givemebuttons[subject.id]["text"].y - 6,
+			--	OnClick = {function () BattleKickPlayer(subject) end},
+			--	padding={1,1,1,1},
+			--	tooltip = "Kick this player from the battle.",
+			--	children={
+			--		chili.Image:New{
+			--			file=images.kick,
+			--			width='100%',
+			--			height='100%'
+			--		}
+			--	},
+			--	noFont = true,
+			--}
 		end
 	else
 		givemebuttons[subject.id]["leave"] = chili.Button:New{
@@ -958,7 +1020,25 @@ local function InitName(subject, playerPanel)
 					y=0
 				}
 			},
-			caption=" "
+			noFont = true,
+		}
+		givemebuttons[subject.id]["battlekick"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			y= givemebuttons[subject.id]["text"].y - 6,
+			OnClick = {function () ReportPlayer(subject) end},
+			padding={2,2,2,2},
+			tooltip = "Report this player to moderators.",
+			children={
+				chili.Image:New{
+					file=images.report,
+					width='100%',
+					height='100%'
+				}
+			},
+			noFont = true,
 		}
 	end
 	local country, icon, badges, clan, avatar, faction, admin
@@ -1027,28 +1107,28 @@ local function InitName(subject, playerPanel)
 		}
 	end
 	if (adminImg) then
-		if givemebuttons[subject.id]["battlekick"] then
-			givemebuttons[subject.id]["battlekick"]:Dispose()
-		end
-		givemebuttons[subject.id]["admin"] = chili.Button:New{
-			parent = playerPanel,
-			height = buttonsize,
-			width = buttonsize,
-			x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
-			y= givemebuttons[subject.id]["text"].y - 4,
-			padding={1,1,1,1},
-			tooltip = "Zero-K Administrator",
-			children={
-				chili.Image:New{
-					file=adminImg,
-					width=16,
-					height=16,
-					x = 2,
-					y = 2
-				}
-			},
-			caption=" "
-		}
+		--if givemebuttons[subject.id]["battlekick"] then
+		--	givemebuttons[subject.id]["battlekick"]:Dispose()
+		--end
+		--givemebuttons[subject.id]["admin"] = chili.Button:New{
+		--	parent = playerPanel,
+		--	height = buttonsize,
+		--	width = buttonsize,
+		--	x= bottomRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
+		--	y= givemebuttons[subject.id]["text"].y - 4,
+		--	padding={1,1,1,1},
+		--	tooltip = "Zero-K Administrator",
+		--	children={
+		--		chili.Image:New{
+		--			file=adminImg,
+		--			width=16,
+		--			height=16,
+		--			x = 2,
+		--			y = 2
+		--		}
+		--	},
+		--	caption=" "
+		--}
 	end
 	--if (countryImg) then
 	--	chili.Image:New{parent=playerPanel,
@@ -1173,7 +1253,10 @@ local function Buildme()
 				width=panelWidth,
 				height = titleSize,
 				x = panelX,
-				y = localHeightOffset + 10,caption=name,fontsize=titleSize - 4,textColor=color,
+				y = localHeightOffset + 10,
+				caption=name,
+				objectOverrideFont = WG.GetFont(titleSize - 4),
+				textColor=color,
 				align='center'
 			}
 			allypanels[#allypanels + 1] = label
@@ -1239,7 +1322,7 @@ local function Buildme()
 		x='43%',
 		y=10,
 		text="P L A Y E R S",
-		fontsize=17,
+		objectOverrideFont = WG.GetFont(17),
 		textColor={1.0,1.0,1.0,1.0}
 	}
 	chili.ScrollPanel:New{
@@ -1486,6 +1569,10 @@ function widget:Update(dt)
 		end
 		UpdatePlayers()
 	end
+end
+
+function widget:RecvLuaMsg(msg)
+	HandleKickMessage(msg)
 end
 
 function widget:Initialize()

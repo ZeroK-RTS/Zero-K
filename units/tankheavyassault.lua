@@ -2,8 +2,8 @@ return { tankheavyassault = {
   unitname            = [[tankheavyassault]],
   name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
-  acceleration        = 0.141,
-  brakeRate           = 0.52,
+  acceleration        = 0.17,
+  brakeRate           = 0.624,
   buildCostMetal      = 2200,
   builder             = false,
   buildPic            = [[tankheavyassault.png]],
@@ -14,20 +14,23 @@ return { tankheavyassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
+    decloak_footprint     = 5,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNIT]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[tankskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 12000,
   maxSlope            = 18,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -49,7 +52,7 @@ return { tankheavyassault = {
   trackType           = [[StdTank]],
   trackWidth          = 50,
   turninplace         = 0,
-  turnRate            = 312,
+  turnRate            = 500,
   workerTime          = 0,
 
   weapons             = {
@@ -88,7 +91,6 @@ return { tankheavyassault = {
       
       damage                  = {
         default = 1000.1,
-        subs    = 50,
       },
 
       explosionGenerator      = [[custom:TESS]],

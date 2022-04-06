@@ -12,6 +12,9 @@ local oneClickWepDefNames = {
 	--hoverdepthcharge = {
 	--	{ functionToCall = "ShootDepthcharge", reloadTime = 256, name = "Drop Depthcharge", tooltip = "Drop Depthcharge: Drops a on the sea surface or ground.", weaponToReload = 1, texture = "LuaUI/Images/Commands/Bold/dgun.png",},
 	--},
+	subscout = {
+		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
 	cloakbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate: Kill selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
@@ -39,8 +42,11 @@ local oneClickWepDefNames = {
 	},
 	--]]
 	planefighter = {
-		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
+--	hoverriot = {
+--		{ functionToCall = "Sprint", reloadTime = 1050, name = "Speed Boost", tooltip = "Speed boost (5x for 0.66 seconds)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+--	},
 	--planescout = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
 	--},

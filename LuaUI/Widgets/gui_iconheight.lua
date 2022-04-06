@@ -87,7 +87,6 @@ local tolerance = 25
 local waiting_on_double
 local current_mode
 local target_mode
-local showing_icons
 
 -- Variables
 local kp_timer

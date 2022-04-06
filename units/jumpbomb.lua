@@ -39,8 +39,6 @@ return { jumpbomb = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[jumpjetbomb]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   initCloaked            = true,
   kamikaze               = true,
@@ -65,7 +63,7 @@ return { jumpbomb = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 34,
-  turnRate               = 2000,
+  turnRate               = 2400,
   workerTime             = 0,
   
   featureDefs            = {

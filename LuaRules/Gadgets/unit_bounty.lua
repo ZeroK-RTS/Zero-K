@@ -1,5 +1,6 @@
-if not Script.GetSynced() then
-	return
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return false
 end
 
 function gadget:GetInfo()
@@ -22,22 +23,10 @@ local BOUNTYTIME = 60*5
 local echo 				= Spring.Echo
 local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spGetTeamInfo		= Spring.GetTeamInfo
-local spGetTeamList		= Spring.GetTeamList
-local spAreTeamsAllied	= Spring.AreTeamsAllied
-local spGetAllUnits     = Spring.GetAllUnits
-local spGetUnitDefID    = Spring.GetUnitDefID
 
 local bounty = {}
 
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local spGetUnitIsActive     = Spring.GetUnitIsActive
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetTeamUnitCount	= Spring.GetTeamUnitCount
-local spInsertUnitCmdDesc	= Spring.InsertUnitCmdDesc
-local spGetAllyTeamList		= Spring.GetAllyTeamList
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -96,7 +85,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		end
 		
 		--local unitTeamID = Spring.GetUnitTeam(unitID)
-		local unitAlliance = Spring.GetUnitAllyTeam(unitID)
+		local unitAlliance = spGetUnitAllyTeam(unitID)
 		
 		if unitAlliance == allianceID then
 			echo ('<Bounty> You cannot place a bounty on an allied unit, Player ' .. playerID .. ' on team ' .. teamID)

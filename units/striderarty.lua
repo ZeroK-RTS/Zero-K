@@ -17,20 +17,18 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 2,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[t3arty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 3140,
   maxSlope               = 36,
   maxVelocity            = 1.2,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
   moveState              = 0,
   noAutoFire             = false,
@@ -44,7 +42,7 @@ return { striderarty = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 36,
-  turnRate               = 990,
+  turnRate               = 1188,
   upright                = true,
   workerTime             = 0,
 
@@ -73,6 +71,7 @@ return { striderarty = {
       craterMult              = 2,
       
       customParams              = {
+        force_ignore_ground = [[1]],
         light_camera_height = 2500,
         light_color = [[0.35 0.17 0.04]],
         light_radius = 400,
@@ -81,7 +80,6 @@ return { striderarty = {
       damage                  = {
         default = 220.5,
         planes  = 220.5,
-        subs    = 11,
       },
 
       dance                   = 20,
@@ -92,7 +90,7 @@ return { striderarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[hobbes.s3o]],
+      model                   = [[hobbes_nohax.s3o]],
       noSelfDamage            = true,
       projectiles             = 2,
       range                   = 1450,

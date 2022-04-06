@@ -24,8 +24,6 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetUnitTeam       = Spring.GetUnitTeam
-local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local decreaseSizeCmdDesc = {
 	id      = CMD_DECREASE_SIZE,
@@ -45,8 +43,6 @@ local increaseSizeCmdDesc = {
 
 local LOS_ACCESS = { inlos = true }
 
-local unitData = {}
-
 -------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -63,18 +59,21 @@ function gadget:Initialize()
 	end
 end
 
+--[[
+local unitData = {}
+
+local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 function gadget:UnitCreated(unitID, unitDefID, team)
-	--if UnitDefs[unitDefID].commander then
-		--spInsertUnitCmdDesc(unitID, decreaseSizeCmdDesc)
-		--spInsertUnitCmdDesc(unitID, increaseSizeCmdDesc)
-	--end
+	if UnitDefs[unitDefID].commander then
+		spInsertUnitCmdDesc(unitID, decreaseSizeCmdDesc)
+		spInsertUnitCmdDesc(unitID, increaseSizeCmdDesc)
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitData[unitID] = nil
 end
 
---[[
 function gadget:AllowCommand_GetWantedCommand()
 	return {
 		[CMD_DECREASE_SIZE] = true,
@@ -86,6 +85,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag)
 	if (cmdID == CMD_DECREASE_SIZE or cmdID == CMD_INCREASE_SIZE) then
 		if (not unitData[unitID]) then

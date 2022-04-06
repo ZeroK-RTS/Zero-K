@@ -1,10 +1,8 @@
 return { turretheavy = {
   unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
-  description                   = [[Medium Range Defense Fortress - Power by connecting to a 50 energy grid]],
-  acceleration                  = 0,
+  description                   = [[Medium Range Defence Fortress - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostMetal                = 1600,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -19,6 +17,8 @@ return { turretheavy = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 1,
+    bait_level_target_armor = 1,
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
@@ -26,22 +26,23 @@ return { turretheavy = {
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 0 0]],
     modelradius    = [[20]],
+
+    outline_x = 130,
+    outline_y = 150,
+    outline_yoff = 47.5,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[staticassaultriot]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 70,
   maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[DDM.s3o]],
   onoffable                     = true,
@@ -56,7 +57,6 @@ return { turretheavy = {
 
   },
   sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],
@@ -102,12 +102,12 @@ return { turretheavy = {
       damage                  = {
         default = 51.1,
         planes  = 51.1,
-        subs    = 2.625,
       },
 
       duration                = 0.3,
       dynDamageExp            = 1,
       dynDamageInverted       = false,
+      dynDamageRange          = 430,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 0.9,
       fireStarter             = 90,
@@ -119,7 +119,7 @@ return { turretheavy = {
       lodDistance             = 10000,
       proximityPriority       = 6,
       projectiles             = 2,
-      range                   = 430,
+      range                   = 417,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.1 0]],
       rgbColor2               = [[1 1 0.25]],
@@ -147,7 +147,6 @@ return { turretheavy = {
 
       damage                  = {
         default = 1201,
-        subs    = 60,
       },
 
       edgeEffectiveness       = 0.7,

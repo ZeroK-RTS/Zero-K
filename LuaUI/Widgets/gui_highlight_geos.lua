@@ -127,9 +127,7 @@ function widget:DefaultCommand(type, id)
 end
 
 function widget:DrawInMiniMap()
-
 	if drawGeos then
-	
 		gl.PushMatrix()
 		gl.LoadIdentity()
 		gl.Translate(0,1,0)

@@ -10,15 +10,21 @@ local base, pad = piece ('base', 'pad')
 local smokePieces = nanoPieces
 
 local function Open ()
-	-- no waits -> no signal
+	Signal(1)
+	SetSignalMask(1)
+	
 	Spin (pad, y_axis, math.rad(30))
 
 	SetUnitValue (COB.YARD_OPEN, 1)
 	SetUnitValue (COB.INBUILDSTANCE, 1)
 	SetUnitValue (COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
+	Signal(1)
+	SetSignalMask(1)
+
 	SetUnitValue (COB.YARD_OPEN, 0)
 	SetUnitValue (COB.BUGGER_OFF, 0)
 	SetUnitValue (COB.INBUILDSTANCE, 0)
@@ -29,15 +35,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePieces)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
-end
-
-local lastNanopiece = 1
-function script.QueryNanoPiece ()
-	Spring.Echo("called at all? noice")
-	lastNanopiece = 3 - lastNanopiece
-	local nanoemit = nanoPieces[lastNanopiece]
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanoemit)
-	return nanoemit
 end
 
 function script.Activate ()

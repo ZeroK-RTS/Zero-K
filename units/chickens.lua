@@ -2,9 +2,9 @@ return { chickens = {
   unitname            = [[chickens]],
   name                = [[Spiker]],
   description         = [[Skirmisher]],
-  acceleration        = 1.08,
+  acceleration        = 1.3,
   activateWhenBuilt   = true,
-  brakeRate           = 1.23,
+  brakeRate           = 1.5,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -16,6 +16,9 @@ return { chickens = {
   category            = [[SWIM]],
 
   customParams        = {
+    outline_x = 115,
+    outline_y = 115,
+    outline_yoff = 20,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -28,7 +31,6 @@ return { chickens = {
   maxDamage           = 600,
   maxSlope            = 36,
   maxVelocity         = 2,
-  minCloakDistance    = 75,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
@@ -53,7 +55,7 @@ return { chickens = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 30,
-  turnRate            = 806,
+  turnRate            = 1289,
   upright             = false,
   waterline           = 22,
   workerTime          = 0,
@@ -92,7 +94,6 @@ return { chickens = {
       damage                  = {
         default = 180,
         planes  = 180,
-        subs    = 180,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],

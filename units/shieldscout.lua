@@ -19,6 +19,7 @@ return { shieldscout = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_target      = 1,
     canjump            = 1,
     jump_range         = 400,
     jump_speed         = 6,
@@ -31,14 +32,11 @@ return { shieldscout = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[clogger]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 36,
-  maxVelocity            = 2.6,
+  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0, -- Used to make blockages.
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -46,13 +44,13 @@ return { shieldscout = {
   script                 = [[shieldscout.lua]],
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
-  sightDistance          = 560,
+  sightDistance          = 600,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2000,
+  turnRate               = 2400,
   upright                = true,
   
   weapons             = {
@@ -86,9 +84,8 @@ return { shieldscout = {
       },
 
       damage                  = {
-        default = 45,
-        planes  = 45,
-        subs    = 4.5,
+        default = 55,
+        planes  = 55,
       },
 
       explosionGenerator      = [[custom:none]],
@@ -98,9 +95,10 @@ return { shieldscout = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       lodDistance             = 10000,
+      minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 50,
-      reloadtime              = 2,
+      reloadtime              = 1.9,
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[explosion/ex_small4_2]],
       soundStartVolume        = 25,

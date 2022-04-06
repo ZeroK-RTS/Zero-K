@@ -16,23 +16,29 @@ end
 -- Config
 --------------------------------------------------------------------------------
 
-local nukeDefs = {
-	[UnitDefNames["staticnuke"].id] = true,
-}
+local nukeDefs = {}
+local intDefs = {}
 
-local intDefs = {
-	[UnitDefNames["staticantinuke"].id] = {
-		range = 2500,
-		rangeSq = 2500^2,
-		static = true,
-		oddX = (5 % 2)*8,
-		oddZ = (8 % 2)*8,
-	},
-}
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.is_nuke then
+		nukeDefs[unitDefID] = true
+	end
+
+	if ud.customParams.nuke_coverage then
+		intDefs[unitDefID] = {
+			range = ud.customParams.nuke_coverage,
+			static = ud.isImmobile,
+			oddX = (ud.xsize % 4) * 4,
+			oddY = (ud.zsize % 4) * 4,
+		}
+	end
+end
 
 --------------------------------------------------------------------------------
 -- Globals
 --------------------------------------------------------------------------------
+
+local GetNukeIntercepted = VFS.Include("LuaRules/Gadgets/Include/GetNukeIntercepted.lua", nil, VFS.GAME)
 
 local enemyInt = {}
 local enemyNuke = {}
@@ -45,6 +51,7 @@ local specUnit = {}
 local spectating = Spring.GetSpectatingState()
 local myTeamID = Spring.GetMyTeamID()
 local myAllyTeamID = Spring.GetMyAllyTeamID()
+local rangeFudgeMargin = 0
 
 --------------------------------------------------------------------------------
 -- Unit handling
@@ -68,7 +75,6 @@ local function AddUnit(unitID, unitDefID, intMap, nukeMap)
 		
 		intMap[unitID] = {
 			range = def.range,
-			rangeSq = def.rangeSq,
 			static = def.static,
 			incomplete = inBuild,
 		}
@@ -243,6 +249,9 @@ local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetMouseState       = Spring.GetMouseState
 local spGetActiveCommand 	= Spring.GetActiveCommand
 local spGetGroundHeight		= Spring.GetGroundHeight
+local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetFeaturePosition  = Spring.GetFeaturePosition
+local spGetFeatureDefID     = Spring.GetFeatureDefID
 
 local nukeSelected
 local antinukeSelected
@@ -262,7 +271,7 @@ function widget:SelectionChanged(newSelection)
 				if spectating then
 					SortUnitsIntoAllyEnemy(Spring.GetUnitTeam(unitID), Spring.GetUnitAllyTeam(unitID))
 				end
-				local x,y,z = Spring.GetUnitPosition(unitID)
+				local x,y,z = Spring.GetUnitWeaponVectors(unitID, 1)
 				nukeSelected = {x,y,z}
 				return
 			elseif intDefs[unitDefID] then
@@ -319,19 +328,33 @@ local function DrawAntinukeOnMouse(cmdID)
 	--return false
 end
 
+local function GetMouseTargetPosition()
+	local mx, my = spGetMouseState()
+	local targetType, target = spTraceScreenRay(mx, my, false, true, false, true)
+	rangeFudgeMargin = 0
+	if targetType == "ground" then
+		-- Even though nuke is not water-capable, this traces the ray through water to the sea-floor.
+		-- That's what the attack-ground order will do if you click on water, so we have to match it.
+		return {target[1], target[2], target[3]}
+	elseif targetType == "unit" then
+		-- Target coordinate is the center of target unit.
+		return {spGetUnitPosition(target)}
+	elseif targetType == "feature" then
+		-- Target is the exact point where the mouse-ray hits the feature's colvol.
+		-- FIXME But TraceScreenRay doesn't tell us that point, so we have to approximate.
+		rangeFudgeMargin = FeatureDefs[spGetFeatureDefID(target)].radius
+		return {spGetFeaturePosition(target)}
+	else
+		return nil
+	end
+end
+
 local function DrawNukeOnMouse(cmdID)
 	if cmdID ~= CMD.ATTACK then
 		return false
 	end
 	
-	local mx, my = spGetMouseState()
-	local _, mouse = spTraceScreenRay(mx, my, true, true)
-	if not mouse then
-		return false
-	end
-	
-	mouse = {mouse[1], mouse[2], mouse[3]}
-	
+	local mouse = GetMouseTargetPosition()
 	if not mouse then
 		return false
 	end
@@ -359,72 +382,6 @@ function widget:Update()
 	if not (nukeSelected and not drawAnti and DrawNukeOnMouse(cmdID)) then
 		drawNuke = false
 	end
-end
-
---------------------------------------------------------------------------------
--- Interception checks
---------------------------------------------------------------------------------
-
-local function InCircle(x,y,radiusSq)
-	return x*x + y*y <= radiusSq
-end
-
-local function GetNukeIntercepted(ux, uz, px, pz, tx, tz, radiusSq)
-	-- Unit position, Launcher position, Target position
-
-	-- Translate projectile position to the origin.
-	ux, uz, tx, tz, px, pz = ux - px, uz - pz, tx - px, tz - pz, 0, 0
-	
-	-- Get direction from projectile to target
-	local tDir
-	if tx == 0 then
-		if tz == 0 then
-			return InCircle(ux, uy, radiusSq)
-		elseif tz > 0 then
-			tDir = math.pi/4
-		else
-			tDir = math.pi*3/4
-		end
-	elseif tx > 0 then
-		tDir = math.atan(tz/tx)
-	else
-		tDir = math.atan(tz/tx) + math.pi
-	end
-	
-	-- Rotate space such that direction from projectile to target is 0
-	-- The nuke projectile will travel along the positive x-axis
-	local cosDir = math.cos(-tDir)
-	local sinDir = math.sin(-tDir)
-	ux, uz = ux*cosDir - uz*sinDir, uz*cosDir + ux*sinDir
-	tx, tz = tx*cosDir - tz*sinDir, tz*cosDir + tx*sinDir
-	
-	-- Find intersection of antinuke range with x-axis
-	-- Quadratic formula, a = 1
-	local b = -2*ux
-	local c = ux^2 + uz^2 - radiusSq
-	local determinate = b^2 - 4*c
-	if determinate < 0 then
-		-- No real solutions so the circle does not intersect x-axis.
-		-- This means that antinuke projectile does not cross intercept
-		-- range.
-		return false
-	end
-	
-	determinate = math.sqrt(determinate)
-	local leftInt = (-b - determinate)/2
-	local rightInt = (-b + determinate)/2
-	
-	--Spring.Echo(tDir*180/math.pi)
-	--Spring.Echo("Unit X: " .. ux .. ", Unit Z: " .. uz)
-	--Spring.Echo("Tar X: " .. tx .. ", Tar Z: " .. tz)
-	--Spring.Echo("Left: " .. leftInt .. ", Right: " .. rightInt)
-	
-	-- IF the nuke does not fall short of coverage AND
-	-- the projectile is still within coverage
-	if leftInt < tx and rightInt > 0 then
-		return true
-	end
-	return false
 end
 
 --------------------------------------------------------------------------------
@@ -471,7 +428,7 @@ local function DrawEnemyInterceptors(inMinimap)
 		end
 		
 		if ux then
-			local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mx, mz, def.rangeSq)
+			local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mx, mz, (def.range + rangeFudgeMargin)^2)
 			if thisIntercepted then
 				if def.incomplete then
 					intercepted = math.max(intercepted, 1)

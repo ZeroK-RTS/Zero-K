@@ -50,11 +50,6 @@ function script.Create()
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
 end
 
-function script.QueryNanoPiece ()
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nano)
-	return nano
-end
-
 function script.Activate ()
 	StartThread (Open) -- animation needs its own thread because Sleep and WaitForTurn will not work otherwise
 end

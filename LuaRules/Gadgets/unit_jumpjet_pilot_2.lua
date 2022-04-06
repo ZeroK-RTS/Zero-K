@@ -22,7 +22,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
-local spRequestPath = Spring.RequestPath
 
 local leaperDefID = UnitDefNames.chicken_leaper.id
 local gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)

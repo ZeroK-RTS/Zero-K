@@ -58,10 +58,10 @@ for i = 1, #WeaponDefs do
 	end
 end
 
-local DEFAULT_DECLOAK_TIME = 150
+local DEFAULT_DECLOAK_TIME = 180
 local PERSONAL_DECLOAK_TIME = 90
 
-local DEFAULT_PROXIMITY_DECLOAK_TIME = 75
+local DEFAULT_PROXIMITY_DECLOAK_TIME = 90
 local PERSONAL_PROXIMITY_DECLOAK_TIME = 45
 
 local UPDATE_FREQUENCY = 10
@@ -223,7 +223,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		local transID = Spring.GetUnitTransporter(unitID)
 		if transID then
 			-- For some reason enemyID indicates that the unit is being transported.
-			return Spring.GetUnitIsCloaked(transID)
+			return spGetUnitIsCloaked(transID)
 		end
 		recloakFrame[unitID] = currentFrame + GetProximityDecloakTime(unitID)
 		return false

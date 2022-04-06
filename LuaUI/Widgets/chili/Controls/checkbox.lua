@@ -18,6 +18,7 @@ Checkbox = Control:Inherit{
 	checked   = true,
 	caption   = "text",
 	textalign = "left",
+	textoffset = 0,
 	valign    = "linecenter",
 	boxalign  = "right",
 	boxsize   = 10,

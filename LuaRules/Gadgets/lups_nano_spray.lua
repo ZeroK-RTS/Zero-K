@@ -1,6 +1,6 @@
--- $Id: lups_nano_spray.lua 3171 2008-11-06 09:06:29Z det $
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
+	return
+end
 
 function gadget:GetInfo()
   return {
@@ -16,7 +16,6 @@ end
 
 
 local spGetFactoryCommands = Spring.GetFactoryCommands
-local spGetCommandQueue    = Spring.GetCommandQueue
 
 local function GetCmdTag(unitID)
 	local cmdTag = 0
@@ -35,37 +34,6 @@ local function GetCmdTag(unitID)
 	end
 	return cmdTag
 end
-	
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-  --// bw-compability
-  local alreadyWarned = 0
-  local function WarnDeprecated()
-	if (alreadyWarned<10) then
-		alreadyWarned = alreadyWarned + 1
-		Spring.Log("LUPS", LOG.WARNING, "LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
-	end
-  end
-
-  function gadget:Initialize()
-	GG.LUPS = GG.LUPS or {}
-	GG.LUPS.QueryNanoPiece = WarnDeprecated
-	gadgetHandler:RegisterGlobal("QueryNanoPiece", WarnDeprecated)
-  end
-
-  function gadget:Shutdown()
-	gadgetHandler:DeregisterGlobal("QueryNanoPiece")
-  end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-else
-------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 
 local Lups  --// Lua Particle System
 local initialized = false --// if LUPS isn't started yet, we try it once a gameframe later
@@ -85,6 +53,8 @@ local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 
 local type  = type
 local pairs = pairs
+
+local allyTeamStrengthMult = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -315,8 +285,10 @@ function gadget:GameFrame(frame)
 					local allyID = Spring.GetUnitAllyTeam(unitID)
 					local unitDefID = Spring.GetUnitDefID(unitID)
 					local faction = GetFaction(unitDefID)
-					local teamColor = {Spring.GetTeamColor(teamID)}
+					local teamColor = {spGetTeamColor(teamID)}
 					local nanoPieces = Spring.GetUnitNanoPieces(unitID) or {}
+
+					strength = strength * allyTeamStrengthMult[allyID]
 
 					for j = 1,#nanoPieces do
 						local nanoPieceID = nanoPieces[j]
@@ -381,7 +353,7 @@ function gadget:Update()
   end
 
   --// enable freaky arm nano fx when quality>3
-  if ((Lups.Config["quality"] or 3) >= 3) then
+  if ((Lups.Config.quality or 3) >= 3) and not (Lups.Config.disablefx and Lups.Config.disablefx.NanoParticles) then
     factionsNanoFx.default = factionsNanoFx["default_high_quality"]
   end
 
@@ -439,12 +411,14 @@ function gadget:UnitDestroyed(uid, udid)
 end
 
 function gadget:Initialize()
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		allyTeamStrengthMult[allyTeamID] = 1 / (Spring.GetGameRulesParam("econ_mult_" .. allyTeamID) or 1)
+	end
+	
 	for _,unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitFinished(unitID, unitDefID)
 	end
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 end

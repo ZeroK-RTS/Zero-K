@@ -41,7 +41,7 @@
 	},
 	"energyfusion" : {
 		"name" : "Reaktor fuzyjny",
-		"description" : "Średnia elektrownia (+35)",
+		"description" : "Średnia elektrownia",
 		"helptext" : "Reaktory fuzyjne zapewniają stały przypływ dużej ilości energii za niewygórowaną cenę. Są jednak dobrym celem dla wroga i nie są zbyt wytrzymałe, toteż warto zapewnić im ochronę. Wybuch reaktora zadaje wysokie obrażenia okolicznym jednostkom."
 	},
 	"chickenlandqueen" : {
@@ -266,7 +266,7 @@
 	},
 	"energysingu" : {
 		"name" : "Reaktor grawitacyjny",
-		"description" : "Duża elektrownia (+225) - NIEBEZPIECZNE",
+		"description" : "Duża elektrownia NIEBEZPIECZNE",
 		"helptext" : "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
 	},
 	"bomberdisarm" : {
@@ -296,7 +296,7 @@
 	},
 	"energyheavygeo" : {
 		"name" : "Ulepszona Geotermia",
-		"description" : "Duża elektrownia (+100) - NIEBEZPIECZNE",
+		"description" : "Duża elektrownia NIEBEZPIECZNE",
 		"helptext" : "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."
 	},
 	"staticcon" : {
@@ -366,7 +366,7 @@
 	},
 	"energysolar" : {
 		"name" : "Panel słoneczny",
-		"description" : "Mała elektrownia (+2)",
+		"description" : "Mała elektrownia",
 		"helptext" : "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
 	},
 	"gunshipheavyskirm" : {
@@ -601,7 +601,7 @@
 	},
 	"energygeo" : {
 		"name" : "Geotermia",
-		"description" : "Średnia elektrownia (+25)",
+		"description" : "Średnia elektrownia",
 		"helptext" : "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."
 	},
 	"jumpcon" : {
@@ -1061,8 +1061,8 @@
 	},
 	"amphriot" : {
 		"name" : "Scallop",
-		"description" : "Amfibijny bot wsparcia",
-		"helptext" : "Wszechstronna amfibia uzbrojona w torpedy do użytku pod wodą i shotgun do niszczenia celów na lądzie."
+		"description" : "Amfibijny bot wsparcia (przeciwpodwodny)",
+		"helptext" : "Amfibia uzbrojona w ładunki głębinowe do użytku przeciw celom podwodnym i shotgun do niszczenia celów na lądzie."
 	},
 	"planecon" : {
 		"name" : "Crane",

@@ -119,7 +119,7 @@ local autoCallTransportDef = {}
 local transportDef = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or (ud.isFactory and not ud.customParams.nongroundfac) then
+	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or Spring.Utilities.isGroundFactory(ud) then
 		autoCallTransportDef[i] = true
 	end
 	if (ud.transportCapacity >= 1) and ud.canFly then
@@ -195,6 +195,9 @@ local ignoredCommand = {
 	[CMD_DONT_FIRE_AT_RADAR] = true,
 	[CMD_AIR_STRAFE] = true,
 	[CMD_PREVENT_OVERKILL] = true,
+	[CMD_PREVENT_BAIT] = true,
+	[CMD_FIRE_AT_SHIELD] = true,
+	[CMD_FIRE_TOWARDS_ENEMY] = true,
 	[CMD_SELECTION_RANK] = true,
 }
 

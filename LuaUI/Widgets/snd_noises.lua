@@ -182,14 +182,18 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 
 	if not isBuild then
 		if sounds.ok then
-			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, sounds.ok.volume)
+			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
 	elseif sounds.build then
-		CoolNoisePlay(sounds.build[1], options.commandSoundCooldown.value)
+		CoolNoisePlay(sounds.build[1], options.commandSoundCooldown.value, options.ordernoisevolume.value)
 	end
 end
 
-local function PlayResponse(unitID, cmdID, cooldown)
+local function PlayResponse(unitID, cmdID)
+	unitID = unitID or GetSelectedUnits()[1]
+	if not unitID then
+		return false
+	end
 	local unitDefID = GetUnitDefID(unitID)
 	if not unitDefID then
 		return false

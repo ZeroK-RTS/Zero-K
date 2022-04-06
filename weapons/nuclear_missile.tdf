@@ -14,7 +14,6 @@
   impulsefactor=0.2;
   interceptedbyshieldtype=2;
   metalpershot=1000;
-  model=crblmsslr.s3o;
   range=72000;
   reloadtime=120;
   smoketrail=1;

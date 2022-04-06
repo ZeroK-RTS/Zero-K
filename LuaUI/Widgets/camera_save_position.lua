@@ -132,7 +132,7 @@ for i = 1, 10 do
 		OnChange = function()
 			if options.savezoom.value then
 				if savedCameraStates[i] then
-					Spring.SetCameraState(savedCameraStates[i], recallTime)
+					SetCameraState(savedCameraStates[i], recallTime)
 				end
 			else
 				local data = savedCameraPositions[i]

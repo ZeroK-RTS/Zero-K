@@ -314,9 +314,6 @@ function beginJump()
 
 end
 
-function jumping()
-end
-
 function halfJump()
 	Turn(lf_thigh, x_axis, 0, 2)
 	Turn(rf_thigh, x_axis, 0, 2)
@@ -355,6 +352,7 @@ end
 -- Other stuff
 
 function script.Create()
+	Move(emit, y_axis, 5)
 	Turn(l_turn, z_axis, math.rad(-45))
 	Turn(r_turn, z_axis, math.rad(45))
 	Turn(lf_ball, y_axis, math.rad(45))

@@ -9,7 +9,7 @@ return { spiderscout = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND TOOFAST]],
+  category            = [[LAND SMALL TOOFAST]],
   cloakCost           = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
@@ -30,14 +30,12 @@ return { spiderscout = {
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[spiderscout]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 40,
   maxSlope            = 72,
   maxVelocity         = 4.8,
   maxWaterDepth       = 15,
-  minCloakDistance    = 200,
+  minCloakDistance    = 130,
   movementClass       = [[TKBOT2]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -60,7 +58,7 @@ return { spiderscout = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 18,
-  turnRate            = 2100,
+  turnRate            = 2520,
 
   weapons             = {
 
@@ -89,9 +87,8 @@ return { spiderscout = {
       },
 
       damage                  = {
-        default = 9.8,
-        planes  = 9.8,
-        subs    = 0.5,
+        default = 10.5,
+        planes  = 10.5
       },
 
       explosionGenerator      = [[custom:beamweapon_hit_yellow_tiny]],
@@ -101,6 +98,7 @@ return { spiderscout = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       laserFlareSize          = 3.22,
+      leadLimit               = 0,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 150,

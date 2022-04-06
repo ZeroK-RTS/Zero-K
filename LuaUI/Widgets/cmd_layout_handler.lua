@@ -20,6 +20,7 @@ local emptyTable = {}
 --------------------------------------------------------------------------------
 -- Add commands to epic menu
 
+local spSendCommands = Spring.SendCommands
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local function CapCase(str)
@@ -45,12 +46,29 @@ local function AddHotkeyOptions()
 		
 		local cmdnamel = cmdname:lower()
 		local cmdname_disp = cmdData.name or CapCase(cmdname)
-		options[cmdname_disp] = {
-			name = cmdname_disp,
-			type = 'button',
-			action = cmdnamel,
-			path = 'Hotkeys/Commands' .. ((number == 2 and "/State") or (number == 3 and "/Instant") or "/Targeted"),
-		}
+		local path = 'Hotkeys/Commands' .. ((number == 2 and "/State") or (number == 3 and "/Instant") or "/Targeted")
+		if cmdData.setValue and cmdData.cmdID then
+			options[cmdname_disp] = {
+				name = cmdname_disp,
+				type = 'button',
+				OnChange = function (self)
+					if WG.SetStateToggle then
+						WG.SetStateToggle(cmdData.cmdID, cmdData.setValue)
+						if WG.noises then
+							WG.noises.PlayResponse(false, cmdData.cmdID)
+						end
+					end
+				end,
+				path = path
+			}
+		else
+			options[cmdname_disp] = {
+				name = cmdname_disp,
+				type = 'button',
+				action = cmdnamel,
+				path = path
+			}
+		end
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdname_disp
 			--options[cmdnamel].isUnitStateCommand = true

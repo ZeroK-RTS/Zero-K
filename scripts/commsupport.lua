@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 -- pieces
 local base = piece 'base'
 local pelvis = piece 'pelvis'
@@ -39,8 +37,6 @@ local nanoPieces = {nanospray}
 local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
-local SIG_WALK = 1
---local SIG_AIM_3 = 8 --step on
 
 --------------------------------------------------------------------------------
 -- vars
@@ -317,7 +313,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	--Signal(SIG_WALK)
 	bMoving = false
 end
 
@@ -400,14 +395,6 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
-end
-
 function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(flare, 1024)
@@ -435,11 +422,6 @@ function script.Shot(num)
 	elseif num == 3 then
 		EmitSfx(flare, 1027)
 	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
 end
 
 function script.StopBuilding()

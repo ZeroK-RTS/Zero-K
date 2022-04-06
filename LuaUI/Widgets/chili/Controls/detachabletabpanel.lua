@@ -77,6 +77,7 @@ function DetachableTabPanel:AddTab(tab, neverSwitchTab)
 		caption = tab.caption or tab.name,
 		tooltip = tab.tooltip,
 		font = tab.font,
+		objectOverrideFont = tab.objectOverrideFont,
 		defaultWidth = tabbar.minItemWidth,
 		defaultHeight = tabbar.minItemHeight
 	}) --FIXME: implement an "Add Tab in TabBar too"

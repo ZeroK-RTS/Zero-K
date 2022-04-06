@@ -9,7 +9,7 @@ return { shieldraid = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[24 29 24]],
   collisionVolumeType    = [[cylY]],
@@ -18,20 +18,19 @@ return { shieldraid = {
   customParams           = {
     modelradius        = [[12]],
     aim_lookahead      = 80,
+    set_target_range_buffer = 30,
+    set_target_speed_buffer = 8,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 330,
+  maxDamage              = 340,
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],
@@ -52,7 +51,7 @@ return { shieldraid = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2500,
+  turnRate               = 3000,
   upright                = true,
 
   weapons                = {
@@ -80,8 +79,7 @@ return { shieldraid = {
       },
       
       damage                  = {
-        default = 8.15,
-        subs    = 0.4,
+        default = 8.48,
       },
 
       duration                = 0.02,
@@ -94,7 +92,7 @@ return { shieldraid = {
       interceptedByShieldType = 1,
       leadLimit               = 0,
       noSelfDamage            = true,
-      range                   = 245,
+      range                   = 235,
       reloadtime              = 0.1,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],

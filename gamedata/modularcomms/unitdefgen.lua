@@ -53,7 +53,6 @@ local function DecodeBase64CommData(toDecode, useLegacyTranslator)
 	local err, success
 	
 	if not (toDecode and type(toDecode) == 'string') then
-		err = "Attempt to decode empty or invalid comm data"
 		return {}
 	end
 	

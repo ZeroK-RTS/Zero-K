@@ -139,7 +139,6 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
@@ -205,11 +204,11 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID,
                                 cmdID, cmdParams, cmdOptions)
-  if (cmdID ~= CMD_PRIORITY) then
-    return false  -- command was not used
-  end
-  PriorityCommand(unitID, cmdParams, cmdOptions)
-  return true, true  -- command was used, remove it
+	if (cmdID ~= CMD_PRIORITY) then
+		return false  -- command was not used
+	end
+	PriorityCommand(unitID, cmdParams, cmdOptions)
+	return true, true  -- command was used, remove it
 end
 
 -- Misc Priority tasks can get their reduced build rate directly.
@@ -386,7 +385,7 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if UnitOnlyEnergy[unitID] then
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
 						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
@@ -399,7 +398,7 @@ function gadget:GameFrame(n)
 							end
 						end
 					else
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or buildSpeedUnitDef[unitDefID] or 0
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
 						spending[pri] = spending[pri] + buildSpeed
 						
 						if debugMode and debugOnUnits then
@@ -521,7 +520,6 @@ function gadget:GameFrame(n)
 					local mRatio = max(0,nextMetalLevel)/metalDrain
 					local eRatio = max(0,nextEnergyLevel)/energyDrain
 				
-					local spare
 					if mRatio < eRatio then
 						-- mRatio is lower so we are stalling metal harder.
 						-- Set construction scale limited by metal.

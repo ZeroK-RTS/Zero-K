@@ -11,7 +11,7 @@ return { staticjammer = {
   buildingGroundDecalType       = [[staticjammer_aoplane.dds]],
   buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
-  canMove                       = true,
+  canMove                       = true, -- for queuing orders during morph to mobile
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
@@ -27,11 +27,14 @@ return { staticjammer = {
     area_cloak = 1,
     area_cloak_upkeep = 12,
     area_cloak_radius = 550,
-    area_cloak_decloak_distance = 75,
 
     priority_misc  = 1,
     addfight       = 1,
     addpatrol      = 1,
+
+    outline_x = 90,
+    outline_y = 130,
+    outline_yoff = 20,
   },
 
   energyUse                     = 1.5,
@@ -40,8 +43,6 @@ return { staticjammer = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[staticjammer]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   initCloaked                   = true,
   levelGround                   = false,
   maxDamage                     = 700,

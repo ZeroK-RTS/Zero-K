@@ -16,17 +16,18 @@ return { napalmmissile = {
 
   customParams                  = {
     mobilebuilding = [[1]],
+
+    outline_x = 55,
+    outline_y = 80,
+    outline_yoff = 55,
   },
 
   explodeAs                     = [[WEAPON]],
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[cruisemissilesmall]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   objectName                    = [[wep_napalm.s3o]],
   script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[WEAPON]],
@@ -69,8 +70,6 @@ return { napalmmissile = {
         setunitsonfire = "1",
         burntime = 90,
 
-        restrict_in_widgets = 1,
-
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
 
@@ -85,7 +84,6 @@ return { napalmmissile = {
 
       damage                  = {
         default = 151,
-        subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.4,
@@ -101,7 +99,7 @@ return { napalmmissile = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 180,

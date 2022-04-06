@@ -14,7 +14,7 @@ local smokePiece = {base, turret}
 
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -132,7 +132,9 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
+	-- partial OKP damage because long beam means the unit can dodge and just get grazed
+	-- Underestimate beam time so that fully-hit targets always have more pending damage in reality than in theory.
+	return targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 20))
 end
 
 --[[

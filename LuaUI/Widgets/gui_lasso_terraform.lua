@@ -133,10 +133,14 @@ options = {
 ---------------------------------
 -- Terraform hotkey presets
 
-local levelPresets = {0, -8, -20, -24}
-local levelTypePreset = {0, 0, 0, 0}
-local raisePresets = {12, -12, 24, -30}
-local raiseTypePreset = {1, 2, 1, 2}
+local hotkeyDefaults = {
+	levelPresets = {0, -8, -20, -24},
+	levelTypePreset = {0, 0, 0, 0},
+	raisePresets = {12, 24, 46, 240, -120, 96},
+	raiseTypePreset = {1, 1, 1, 0, 0, 1},
+	levelCursorHotkey = {"alt+g"},
+	raiseHotkey = {"alt+v", "alt+b", "alt+n", "alt+h", "alt+j", "alt+m"},
+}
 
 ---------------------------------
 -- Config
@@ -161,8 +165,8 @@ local maxWallPoints = 700 -- max points that makeup a wall
 -- bounding ramp dimensions, reduces slowdown MUST AGREE WITH GADGET VALUES
 local maxRampLength = 3000
 local maxRampWidth = 800
-local minRampLength = 40
-local minRampWidth = 24
+local minRampLength = 64
+local minRampWidth = 48
 
 local startRampWidth = 60
 
@@ -176,7 +180,9 @@ local posVolume   = {0, 1, 0, 0.1} -- posisive volume
 local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground height
 
 -- colour of lasso during drawing
-local lassoColor = {0.2, 1.0, 0.2, 1.0}
+local lassoColorGood = {0.2, 1.0, 0.2, 1.0}
+local lassoColorBad  = {1.0, 0.2, 0.2, 1.0}
+local lassoColorCurrent = lassoColorGood
 
 -- colour of ramp
 local vehPathingColor = {0.2, 1.0, 0.2, 1.0}
@@ -208,6 +214,8 @@ local commandMap = {
 	CMD_RAMP,
 	CMD_RESTORE
 }
+
+local terraTag=-1
 
 local volumeSelection = 0
 
@@ -264,6 +272,7 @@ for i = 1, 3 do
 		name = 'Level to Cursor Hotkey ' .. i,
 		desc = 'Set this hotkey to Level to the height of the terrain at the start of the lasson drawing.',
 		path = HOTKEY_PATH .. "/Level",
+		hotkey = hotkeyDefaults.levelCursorHotkey[i],
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_LEVEL)
 			if cmdDesc then
@@ -282,7 +291,7 @@ for i = 1, 10 do
 		name = 'Level Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Level",
-		value = levelTypePreset[i] or 0,
+		value = hotkeyDefaults.levelTypePreset[i] or 0,
 		items = {
 			{key = 0, name = 'Add and Subtract', desc = 'Terraform the entire area to the selected height.'},
 			{key = 1, name = 'Only Add', desc = 'Raise lower parts of the terrain up to the selected height.'},
@@ -296,8 +305,8 @@ for i = 1, 10 do
 		name = "Level height " .. i,
 		type = "number",
 		path = HOTKEY_PATH .. "/Level",
-		value = levelPresets[i] or 0,
-		min = -300, max = 300, step = 2,
+		value = hotkeyDefaults.levelPresets[i] or 0,
+		min = -400, max = 400, step = 2,
 	}
 	options_order[#options_order + 1] = "level_value_" .. i
 	
@@ -321,7 +330,7 @@ for i = 1, 10 do
 		name = 'Raise Hotkey ' .. i,
 		type = 'radioButton',
 		path = HOTKEY_PATH .. "/Raise",
-		value = raiseTypePreset[i] or 0,
+		value = hotkeyDefaults.raiseTypePreset[i] or 0,
 		items = {
 			{key = 0, name = 'Full', desc = 'Raise or lower the entire area.'},
 			{key = 1, name = 'Cull Cliffs', desc = 'Avoid raising sections of the terrain over the edge of cliffs.'},
@@ -335,8 +344,8 @@ for i = 1, 10 do
 		name = "Raise amount " .. i,
 		type = "number",
 		path = HOTKEY_PATH .. "/Raise",
-		value = raisePresets[i] or 0,
-		min = -300, max = 300, step = 2,
+		value = hotkeyDefaults.raisePresets[i] or 0,
+		min = -400, max = 400, step = 2,
 	}
 	options_order[#options_order + 1] = "raise_value_" .. i
 	
@@ -345,6 +354,7 @@ for i = 1, 10 do
 		name = 'Raise Hotkey ' .. i,
 		desc = 'Set this hotkey to issue a Raise command with these parameters.',
 		path = HOTKEY_PATH .. "/Raise",
+		hotkey = hotkeyDefaults.raiseHotkey[i],
 		OnChange = function ()
 			local cmdDesc = Spring.GetCmdDescIndex(CMD_RAISE)
 			if cmdDesc then
@@ -417,12 +427,6 @@ local function completelyStopCommand()
 	simpleDrawingRamp = false
 	points = 0
 	terraform_type = 0
-end
-
-local terraTag=-1
-function WG.Terraform_GetNextTag()
-	terraTag = terraTag + 1
-	return terraTag
 end
 
 local function SendCommand()
@@ -1067,8 +1071,6 @@ function widget:MousePress(mx, my, button)
 		spSetActiveCommand(index)
 		currentlyActiveCommand = CMD_LEVEL
 		
-		local mx,my = spGetMouseState()
-		
 		setHeight = true
 		drawingRectangle = false
 		placingRectangle = false
@@ -1115,7 +1117,7 @@ function widget:MousePress(mx, my, button)
 	end
 	
 	local toolTip = Spring.GetCurrentTooltip()
-	if not (toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
+	if not (toolTip == "" or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
 		return false
 	end
 	
@@ -1288,6 +1290,13 @@ function widget:MouseMove(mx, my, dx, dy, button)
 					end
 					point[2].z = z
 					point[3].z = point[1].z+16
+				end
+
+				if abs(point[2].x - point[3].x) > maxAreaSize
+				or abs(point[2].z - point[3].z) > maxAreaSize then
+					lassoColorCurrent = lassoColorBad
+				else
+					lassoColorCurrent = lassoColorGood
 				end
 			end
 		end
@@ -1525,7 +1534,6 @@ function widget:Update(dt)
 			widget:MousePress(mx, my, 1)
 		end
 	end
-
 end
 
 function widget:MouseRelease(mx, my, button)
@@ -1998,6 +2006,15 @@ local function Terraform_SetPlacingRectangleCheck()
 	return options.structure_altSelect.value
 end
 
+function WG.Terraform_GetNextTag()
+	terraTag = terraTag + 1
+	return terraTag
+end
+
+function WG.Terraform_GetIsPlacingStructure()
+	return (placingRectangle or buildToGive) and true
+end
+
 function widget:Initialize()
 	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
 	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
@@ -2045,7 +2062,6 @@ local function DrawRampStart(dis)
 end
 
 local function DrawRampMiddleEnd(dis)
-	
 	local perpendicular = {x = terraformHeight*(point[1].z-point[2].z)/dis, z = -terraformHeight*(point[1].x-point[2].x)/dis}
 	
 	glVertex(point[2].x-perpendicular.x,point[2].y,point[2].z-perpendicular.z)
@@ -2102,10 +2118,10 @@ function widget:DrawWorld()
 			
 			--glDepthTest(false)
 		elseif drawingLasso then
-			glColor(lassoColor)
+			glColor(lassoColorGood)
 			glBeginEnd(GL_LINE_STRIP, DrawLine)
 		elseif drawingRectangle or (placingRectangle and placingRectangle.legalPos) then
-			glColor(lassoColor)
+			glColor(lassoColorCurrent)
 			glBeginEnd(GL_LINE_STRIP, DrawRectangleLine)
 			local a,c,m,s = spGetModKeyState()
 			if c then
@@ -2163,9 +2179,11 @@ function widget:DrawScreen()
 		end
 	end
 end
+
 --------------------------------------------------------------------------------
 -- Drawing
 --------------------------------------------------------------------------------
+
 function widget:Shutdown()
 	if (volumeDraw) then
 		gl.DeleteList(volumeDraw); volumeDraw=nil

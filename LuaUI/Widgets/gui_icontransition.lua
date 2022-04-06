@@ -97,7 +97,7 @@ renderAtPos = {
 -- Options
 --
 
-options_path = 'Settings/Graphics/Unit Visibility/Icon Transition'
+options_path = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
 
 options_order = {
 	'lblIconTransition',
@@ -111,14 +111,14 @@ options_order = {
 }
 
 options = {
-	lblIconTransition = {name = 'Icon Transition Widget', type = 'label'},
+	lblIconTransition = {name = 'Icon Transition Parameters', type = 'label'},
 	icontransitiontop = {
 		name = 'Icon Transition Top',
 		desc = 'If the camera is above this height, units will be icons only.\n\nOnly applies when the icon display mode is set to Dynamic.\n\nThis setting overrides Icon Distance.',
 		type = 'number',
 		min = 0, max = 10000,
 		step = 50,
-		value = 5500,
+		value = 4500,
 	},
 	icontransitionbottom = {
 		name = 'Icon Transition Bottom',
@@ -126,7 +126,7 @@ options = {
 		type = 'number',
 		min = 0, max = 10000,
 		step = 50,
-		value = 2400,
+		value = 350,
 	},
 	icontransitionmaxsize = {
 		name = 'Icon Transition Max Size',
@@ -134,7 +134,7 @@ options = {
 		type = 'number',
 		min = 1, max = 250,
 		step = 1,
-		value = 62,
+		value = 58,
 	},
 	icontransitionminsize = {
 		name = 'Icon Transition Min Size',
@@ -142,7 +142,7 @@ options = {
 		type = 'number',
 		min = 1, max = 250,
 		step = 1,
-		value = 11,
+		value = 6,
 	},
 	icontransitionmaxopacity = {
 		name = 'Icon Transition Max Opacity',
@@ -375,6 +375,12 @@ function widget:Initialize()
 	for _,unitID in pairs (allUnits) do
 		local unitDefID = spGetUnitDefID(unitID)
 		addUnitIcon(unitID, unitDefID)
+	end
+end
+
+function widget:Shutdown()
+	if WG.resetIconDist then
+		spSendCommands{"disticon " .. WG.resetIconDist}
 	end
 end
 

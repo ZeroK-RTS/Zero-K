@@ -16,8 +16,10 @@ local spGetMyTeamID        	= Spring.GetMyTeamID
 local spGetSpectatingState 	= Spring.GetSpectatingState
 local spGetUnitLosState    	= Spring.GetUnitLosState
 
-local scriptUnitDestroyed		= Script.LuaUI.UnitDestroyed
-local scriptUnitDestroyedByTeam	= Script.LuaUI.UnitDestroyedByTeam
+--[[ NB: these are C proxies, not the actual Lua functions currently linked LuaUI-side,
+     so it is safe to cache them here even if the underlying func changes afterwards ]]
+local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
+local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
 
 function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
 	local myAllyTeamID = spGetMyAllyTeamID()

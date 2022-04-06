@@ -2,11 +2,11 @@ return { hovercon = {
   unitname            = [[hovercon]],
   name                = [[Quill]],
   description         = [[Construction Hovercraft]],
-  acceleration        = 0.33,
+  acceleration        = 0.4,
   activateWhenBuilt   = true,
-  brakeRate           = 15.0,
-  buildCostMetal      = 130,
-  buildDistance       = 160,
+  brakeRate           = 18.0,
+  buildCostMetal      = 125,
+  buildDistance       = 170,
   builder             = true,
 
   buildoptions        = {
@@ -25,6 +25,7 @@ return { hovercon = {
   customParams        = {
     modelradius    = [[25]],
     selection_scale = 1.2,
+    turnatfullspeed_hover = [[1]],
   },
 
   energyUse           = 0,
@@ -33,12 +34,9 @@ return { hovercon = {
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[builder]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 960,
   maxSlope            = 36,
-  maxVelocity         = 2.8,
-  minCloakDistance    = 75,
+  maxVelocity         = 2.9,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corch.s3o]],
@@ -57,7 +55,7 @@ return { hovercon = {
   sightDistance       = 300,
   sonarDistance       = 300,
   turninplace         = 0,
-  turnRate            = 550,
+  turnRate            = 1100,
   workerTime          = 5,
 
   featureDefs         = {

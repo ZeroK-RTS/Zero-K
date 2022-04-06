@@ -82,6 +82,28 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Stop command aim interrupt
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD.STOP] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return {[starlightDefID] = true}
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if unitDefID == starlightDefID and cmdID == CMD.STOP then
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		if env.StopAim then
+			Spring.UnitScript.CallAsUnit(unitID, env.StopAim)
+		end
+	end
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Initialization
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
@@ -96,12 +118,7 @@ function gadget:Initialize()
 		gadgetHandler:RemoveCallIn("GameFrame")
 	end
 	
-	--for _, unitID in pairs(Spring.GetAllUnits()) do
-	--	gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
-	--end
-	
 	GG.Starlight_DamageFrame = {}
-	local ud = UnitDefs[starlightDefID]
 	
 	for weaponDefID, _ in pairs(starlightWeapons) do
 		Script.SetWatchExplosion(weaponDefID, true)

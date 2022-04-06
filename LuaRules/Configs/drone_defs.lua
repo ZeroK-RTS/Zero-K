@@ -32,7 +32,7 @@ local carrierDefNames = {
 			range = 1000,
 			maxChaseRange = 1500,
 			buildTime = 3,
-			maxBuild = 1,
+			maxBuild = 4,
 			offsets = {0, 8, 15, colvolMidX = 0, colvolMidY = 30, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0} --shift colvol to avoid collision.
 		},
 	},

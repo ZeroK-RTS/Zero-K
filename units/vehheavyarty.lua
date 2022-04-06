@@ -2,8 +2,8 @@ return { vehheavyarty = {
   unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Rover]],
-  acceleration        = 0.21,
-  brakeRate           = 0.8,
+  acceleration        = 0.252,
+  brakeRate           = 0.96,
   buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[vehheavyarty.png]],
@@ -15,7 +15,7 @@ return { vehheavyarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
-
+    bait_level_default = 2,
     dontfireatradarcommand = '0',
   },
 
@@ -23,13 +23,10 @@ return { vehheavyarty = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehiclelrarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 1100,
   maxSlope            = 18,
   maxVelocity         = 2.0,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName          = [[core_diplomat.s3o]],
@@ -51,7 +48,7 @@ return { vehheavyarty = {
   trackType           = [[StdTank]],
   trackWidth          = 44,
   turninplace         = 0,
-  turnRate            = 460,
+  turnRate            = 736,
 
   weapons             = {
 
@@ -82,7 +79,6 @@ return { vehheavyarty = {
 
       damage         = {
         default = 800.1,
-        subs    = 4,
       },
 
       texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags

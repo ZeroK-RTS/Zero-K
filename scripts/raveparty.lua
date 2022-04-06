@@ -19,9 +19,6 @@ local hpi = math.pi*0.5
 local headingSpeed = math.rad(4)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
-local spindleOffset = 0
-local spindlePitch = 0
-
 guns[5].y = 11
 guns[5].z = 7
 
@@ -58,27 +55,72 @@ local smokePiece = {spindle, turret}
 
 include "constants.lua"
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
 -- Signal definitions
 local SIG_AIM = 2
 
-local gunNum = 1
-local weaponNum = 1
-local randomize = false
+local minSpinMult = 0.2
+local spinScriptAccel = 0.05
+local maxSpin = math.pi/3
 
-function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Turn(spindle, x_axis, spindleOffset + spindlePitch)
-	for i = 1, 6 do
-		Turn(guns[i].flare, x_axis, (math.rad(-60)* i + 1))
+local maxGainStoreTotal = 0.12
+local maxGainStoreFrames = 150
+local lastGainStoreTime = 0
+
+local spinMult = 0
+local gunNum = 1
+local reloadChange = 0
+
+local function UpdateSpin(gainSpin)
+	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
+	reloadChange = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
+	if gainSpin then
+		local gameFrame = Spring.GetGameFrame()
+		local gainDiff = gameFrame - lastGainStoreTime
+		lastGainStoreTime = gameFrame
+		if gainDiff > maxGainStoreFrames then
+			gainDiff = maxGainStoreFrames
+		end
+		spinMult = spinMult + spinMult * reloadChange * maxGainStoreTotal * gainDiff / maxGainStoreFrames
+		if spinMult > 1 then
+			spinMult = 1
+		end
+		--startTime = startTime or Spring.GetGameFrame()
+		--Spring.Echo("spinMult", spinMult, (Spring.GetGameFrame() - startTime)/30)
+	end
+	if spinMult > reloadChange then
+		spinMult = spinMult*0.97 - 0.0015
+		if spinMult < 0 then
+			spinMult = 0
+		end
+	end
+	if reloadChange > 0 and spinMult < minSpinMult then
+		spinMult = spinMult + 0.03
+		if spinMult > minSpinMult then
+			spinMult = minSpinMult
+		end
+	end
+	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
+	Spring.SetUnitRulesParam(unitID, "speed_bar", spinMult, LOS_ACCESS)
+end
+
+local function SpinThread()
+	while true do
+		UpdateSpin()
+		Sleep(1000)
 	end
 end
 
-function script.Activate()
-	randomize = true
-end
-
-function script.Deactivate()
-	randomize = false
+function script.Create()
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	for i = 1, 6 do
+		Turn(guns[i].flare, x_axis, (math.rad(-60)* i + 1))
+	end
+	
+	Spin(spindle, x_axis, spinMult*maxSpin, spinScriptAccel)
+	StartThread(SpinThread, unitID, smokePiece)
 end
 
 function script.HitByWeapon()
@@ -88,31 +130,16 @@ function script.HitByWeapon()
 	end
 end
 
-local sleeper = {}
-for i = 1, 6 do
-	sleeper[i] = false
-end
-
 function script.AimWeapon(num, heading, pitch)
-	if (sleeper[num]) then
-		return false
-	end
-
-	sleeper[num] = true
-	while weaponNum ~= num do
-		Sleep(10)
-	end
-	sleeper[num] = false
-
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
 
-	while Spring.GetUnitRulesParam(unitID,"disarmed") == 1 do
+	while reloadChange <= 0 do
 		Sleep(10)
 	end
 
 	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
-	local headDiff = heading-curHead
+	local headDiff = heading - curHead
 	if math.abs(headDiff) > math.pi then
 		headDiff = headDiff - math.abs(headDiff)/headDiff*2*math.pi
 	end
@@ -122,14 +149,17 @@ function script.AimWeapon(num, heading, pitch)
 		heading = (heading+math.pi)%GG.Script.tau
 		pitch = -pitch+math.pi
 	end
-	spindlePitch = -pitch
+	local spindlePitch = -pitch + (num - 1)* math.pi/3
 
-	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn(turret, y_axis, heading, headingSpeed*slowMult)
-	Turn(spindle, x_axis, spindlePitch+spindleOffset, pitchSpeed*slowMult)
+	Turn(turret, y_axis, heading, headingSpeed*reloadChange)
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(spindle, x_axis)
-	return (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1)
+	
+	local currentSpindle = select(1, Spring.UnitScript.GetPieceRotation(spindle))
+	local diff = math.abs(((currentSpindle - spindlePitch - math.pi)%GG.Script.tau) - math.pi)
+	if diff < math.pi/3 then
+		gunNum = num
+	end
+	return reloadChange > 0 and diff < 0.15*spinMult
 end
 
 function script.AimFromWeapon(num)
@@ -148,7 +178,6 @@ local function gunFire(num)
 	Move(guns[num].barrel, y_axis, 0, 0.2*guns[num].ys)
 end
 
-
 function script.Shot(num)
 	--EmitSfx(base, 1024) BASE IS NOT CENTRAL
 	EmitSfx(guns[gunNum].flare, 1025)
@@ -158,19 +187,10 @@ end
 
 function script.FireWeapon(num)
 	Sleep(33)
-	if randomize then
-		weaponNum = math.random(1,6)
-	else
-		weaponNum = weaponNum + 1
-		if weaponNum > 6 then
-			weaponNum = 1
-		end
+	
+	if spinMult < 1 then
+		UpdateSpin(true)
 	end
-	gunNum = gunNum + 1
-	if gunNum > 6 then
-		gunNum = 1
-	end
-	spindleOffset = math.rad(60)*(gunNum - 1)
 end
 
 function script.Killed(recentDamage, maxHealth)

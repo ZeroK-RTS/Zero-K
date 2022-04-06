@@ -10,7 +10,6 @@ local base, body, turret1, sleeve1, barrel1, firepoint1, turret2, sleeve2, gun2,
 -- Signal definitions
 local SIG_AIM1 = 1
 local SIG_AIM2 = 2
-local SIG_AIM3 = 4
 local SIG_MOVE = 8
 local SIG_ROCK_X = 16
 local SIG_ROCK_Z = 32
@@ -123,6 +122,17 @@ function script.StopMoving()
 end
 
 -- Weapons
+local spGetUnitSeparation = Spring.GetUnitSeparation
+function script.BlockShot(num, targetID)
+	if num == 1 and Spring.ValidUnitID(targetID) then
+		-- TTL at max range determined to be 50f empirically
+		-- at projectile speed 270 elmo/s and 450 range
+		local framesETA = 50 * (spGetUnitSeparation(unitID, targetID) or 0) / 450
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000.1, framesETA, false, false, true)
+	end
+	return false
+end
+
 function script.AimFromWeapon(num)
 	return aimPoints[num]
 end
@@ -169,7 +179,7 @@ function script.Shot(num)
 	StartThread(RestoreBarrel)
 end
 
-function script.Killed (recentDamage, maxHealth)
+function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.25) then
 		Explode(turret1, SFX.SMOKE)

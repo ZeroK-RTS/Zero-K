@@ -2,9 +2,7 @@ return { turretheavylaser = {
   unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
-  buildCostMetal                = 420,
+  buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
@@ -18,7 +16,12 @@ return { turretheavylaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_default = 0,
     aimposoffset   = [[0 15 0]],
+
+    outline_x = 115,
+    outline_y = 150,
+    outline_yoff = 50,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -26,14 +29,11 @@ return { turretheavylaser = {
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[defenseheavy]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 80,
-  maxDamage                     = 2475,
+  maxDamage                     = 2250,
   maxSlope                      = 36,
   maxVelocity                   = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[turretheavylaser.dae]],
@@ -49,7 +49,6 @@ return { turretheavylaser = {
 
   },
   sightDistance                 = 730, -- Range*1.1 + 48 for radar overshoot
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],
@@ -77,6 +76,7 @@ return { turretheavylaser = {
       
       customParams            = {
         burst = Shared.BURST_UNRELIABLE,
+        prevent_overshoot_fudge = 15,
 
         light_color = [[1.25 1.25 3.75]],
         light_radius = 180,
@@ -85,7 +85,6 @@ return { turretheavylaser = {
       damage                  = {
         default = 850.1,
         planes  = 850.1,
-        subs    = 45.1,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],

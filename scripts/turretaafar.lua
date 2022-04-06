@@ -60,6 +60,8 @@ local flare2 = piece 'flare_l'
 --------------------------------------------------------------------------------
 local smokePiece = {rotating_bas, mc_rocket_ho}
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local TURN_SPEED = 145
 local TILT_SPEED = 200
 local RELOAD_SPEED = 20
@@ -92,7 +94,7 @@ local function IdleAnim()
 	while true do
 		EmitSfx(zelena, 1025)
 		
-		heading = math.rad(math.random(-90, 90))
+		local heading = math.rad(math.random(-90, 90))
 		if(lastHeading > heading) then
 			rotateWise = 1
 		else
@@ -380,10 +382,8 @@ function script.Shot(num)
 end
 
 function Bum()
-	temp = flare
-	flare = flare2
-	flare2 = temp
-	
+	flare, flare2 = flare2, flare
+
 	if(gun) then
 		Hide(raketa026)
 				
@@ -409,11 +409,7 @@ function script.AimFromWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1800
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 1800, 70, 0.1, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

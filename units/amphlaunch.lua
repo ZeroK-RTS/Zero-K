@@ -22,6 +22,7 @@ return { amphlaunch = {
     amph_submerged_at  = 40,
     thrower_gather     = 160,
     attack_toggle      = [[1]],
+    can_target_allies  = 1,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -30,14 +31,11 @@ return { amphlaunch = {
   footprintZ             = 2,
   highTrajectory         = 1,
   iconType               = [[ampharty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 960,
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 5000,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE STUPIDTARGET]],
   objectName             = [[behecrash.s3o]],
@@ -57,7 +55,7 @@ return { amphlaunch = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 28,
-  turnRate               = 1800,
+  turnRate               = 2160,
   upright                = true,
 
   weapons                = {

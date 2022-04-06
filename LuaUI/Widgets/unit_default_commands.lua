@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name = "Misc default command replacements",
+	desc = "Implements some right-click behaviour options",
 	license = "Public Domain",
 	layer = 0,
 	enabled = Script.IsEngineMinVersion(104, 0, 53), -- 53 on maintenance branch, 211 on develob

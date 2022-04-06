@@ -11,7 +11,6 @@ local fakeWeapondef = {
 	avoidNeutral            = false,
 	damage                  = {
 		default = 11.34,
-		subs    = 0.567,
 	},
 	explosionGenerator      = [[custom:FLASHPLOSION]],
 	noSelfDamage            = true,
@@ -88,8 +87,8 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[gunshiptrans]], [[gunshipheavytrans]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
@@ -122,8 +121,8 @@ local structureConfig = {
 		unitDef.canattack = true
 		unitDef.workertime = 10
 		unitDef.buildoptions = { [[bomberprec]], [[bomberriot]], [[bomberdisarm]], [[bomberheavy]] }
-		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
+		unitDef.customparams.factory_land_state = 0
 
 		unitDef.yardmap = string.rep("o", unitDef.footprintx * unitDef.footprintz)
 
@@ -177,6 +176,10 @@ local structureConfig = {
 		unitDef.collisionvolumeoffsets = [[0 10 0]]
 
 		unitDef.customparams.soundselect = "building_select2"
+
+		unitDef.customparams.outline_x = 220
+		unitDef.customparams.outline_y = 220
+		unitDef.customparams.outline_yoff = 75
 
 		unitDef.featuredefs.dead.object = "pw_mine_dead.dae"
 		unitDef.featuredefs.heap.object = "debris4x4b.s3o"
@@ -248,6 +251,10 @@ local structureConfig = {
 
 		unitDef.customparams.soundselect = "radar_select"
 
+		unitDef.customparams.outline_x = 260
+		unitDef.customparams.outline_y = 260
+		unitDef.customparams.outline_yoff = 95
+
 		unitDef.sightdistance = 800
 		unitDef.radardistance = 2100
 		unitDef.radaremitheight = 150
@@ -263,7 +270,7 @@ local structureConfig = {
 
 	pw_grid = function(unitDef)
 		unitDef.maxdamage = 20000
-		unitDef.name = "Planetary Defense Grid"
+		unitDef.name = "Planetary Defence Grid"
 		unitDef.description = "Defends against everything"
 		unitDef.objectname = "pw_wormhole2.dae"
 		unitDef.icontype = [[pw_defense2]]

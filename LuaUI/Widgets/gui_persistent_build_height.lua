@@ -6,7 +6,7 @@ function widget:GetInfo()
 		version   = "v1",
 		date      = "7th June, 2016",
 		license   = "GNU GPL, v2 or later",
-		layer     = math.huge,
+		layer     = 998, -- Before mex placement
 		enabled   = true,
 		handler   = true,
 	}
@@ -87,7 +87,7 @@ options = {
 		path = hotkeyPath,
 	},
 	hotkey_raise = {
-		name = 'Raise Structure Teraform',
+		name = 'Raise Structure Terraform',
 		desc = 'Increase the height of structure terraform. Also possible with Alt + Scrollwheel.',
 		type = 'button',
 		hotkey = "C",
@@ -258,6 +258,9 @@ local function SendCommand()
 
 		WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
 		WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
+		if WG.OtherWidgetPlacedMex then
+			WG.OtherWidgetPlacedMex()
+		end
 	end
 end
 

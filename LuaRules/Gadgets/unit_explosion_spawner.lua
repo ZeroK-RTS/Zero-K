@@ -1,5 +1,6 @@
-if not Script.GetSynced() then
-	return
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return false
 end
 
 function gadget:GetInfo()
@@ -20,7 +21,6 @@ local spDestroyUnit           = Spring.DestroyUnit
 local spGetGameFrame          = Spring.GetGameFrame
 local spGetProjectileDefID    = Spring.GetProjectileDefID
 local spGetProjectileTeamID   = Spring.GetProjectileTeamID
-local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetUnitShieldState    = Spring.GetUnitShieldState
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 local spSetFeatureDirection   = Spring.SetFeatureDirection

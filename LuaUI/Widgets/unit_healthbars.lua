@@ -13,7 +13,7 @@
 function widget:GetInfo()
 	return {
 		name      = "HealthBars",
-		desc      = "Gives various informations about units in form of bars.",
+		desc      = "Gives various information about units in form of bars.",
 		author    = "jK",
 		date      = "2009", --2013 May 12
 		license   = "GNU GPL, v2 or later",
@@ -21,6 +21,8 @@ function widget:GetInfo()
 		enabled   = true  --  loaded by default?
 	}
 end
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -70,7 +72,7 @@ end
 --------------------------------------------------------------------------------
 
 local messages = {
-	shield = "shield",
+	shield_bar = "shield",
 	health_bar = "health",
 	building = "building",
 	morph = "morph",
@@ -83,6 +85,8 @@ local messages = {
 	teleport = "teleport",
 	teleport_pw = "teleport",
 	ability = "ability",
+	heat = "heat",
+	speed = "speed",
 	reload = "reload",
 	reammo = "reammo",
 	slow = "slow",
@@ -117,7 +121,7 @@ local function OptionsChanged()
 end
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages',
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'flashJump',
 	'barScale', 'debugMode', 'minReloadTime',
 	'unitMaxHeight', 'unitPercentHeight', 'unitTitleHeight',
 	'featureMaxHeight', 'featurePercentHeight', 'featureTitleHeight',
@@ -144,6 +148,13 @@ options = {
 		noHotkey = true,
 		desc = 'Shows percentages next to bars',
 		OnChange = OptionsChanged,
+	},
+	flashJump = {
+		name = 'Jump reload flash',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Set jump reload to flash when issuing the jump command',
 	},
 	barScale = {
 		name = 'Bar size scale',
@@ -285,7 +296,8 @@ local barColors = {
 	reload         = { 0.00, 0.60, 0.60, barAlpha },
 	reload2        = { 0.80, 0.60, 0.00, barAlpha },
 	reammo         = { 0.00, 0.60, 0.60, barAlpha },
-	jump           = { 0.00, 0.90, 0.00, barAlpha },
+	jump           = { 0.00, 0.80, 0.00, barAlpha },
+	jump_p         = { 0.80, 0.50, 0.00, barAlpha },
 	sheath         = { 0.00, 0.20, 1.00, barAlpha },
 	fuel           = { 0.70, 0.30, 0.00, barAlpha },
 	slow           = { 0.50, 0.10, 0.70, barAlpha },
@@ -304,6 +316,7 @@ local barColors = {
 --------------------------------------------------------------------------------
 
 local blink = false
+local blink_j = false
 local gameFrame = 0
 
 local empDecline = 1/40
@@ -585,6 +598,9 @@ do
 				maxWaterTank  = ud.customParams.maxwatertank,
 				freeStockpile = (ud.customParams.freestockpile and true) or nil,
 				specialReload = ud.customParams.specialreloadtime,
+				specialRate   = ud.customParams.specialreload_userate,
+				heat          = ud.customParams.heat_per_shot,
+				speed         = ud.customParams.speed_bar,
 			}
 		end
 		ci = customInfo[unitDefID]
@@ -787,10 +803,35 @@ do
 		
 		--// SPECIAL WEAPON
 		if ci.specialReload then
-			local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
-			if (specialReloadState and specialReloadState > gameFrame) then
-				local special = 1-(specialReloadState-gameFrame)/ci.specialReload	-- don't divide by gamespeed, since specialReload is also in gameframes
-				barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+			if ci.specialRate then
+				local specialReloadProp = GetUnitRulesParam(unitID, "specialReloadRemaining") or 0
+				if (specialReloadProp > 0) and (specialReloadProp < 1) then
+					local special = 1 - specialReloadProp
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			
+			else
+				local specialReloadState = GetUnitRulesParam(unitID, "specialReloadFrame")
+				if (specialReloadState and specialReloadState > gameFrame) then
+					local special = 1-(specialReloadState-gameFrame)/ci.specialReload -- don't divide by gamespeed, since specialReload is also in gameframes
+					barDrawer.AddBar(addTitle and messages.ability, special, "reload2", (addPercent and floor(special*100) .. '%'))
+				end
+			end
+		end
+		
+		--// HEAT
+		if ci.heat and build == 1 then
+			local heatState = GetUnitRulesParam(unitID, "heat_bar")
+			if (heatState and heatState > 0) then
+				barDrawer.AddBar(addTitle and messages.heat, heatState, "reload2", (addPercent and floor(heatState*100) .. '%'))
+			end
+		end
+		
+		--// DRP Speed
+		if ci.speed and build == 1 then
+			local speedState = GetUnitRulesParam(unitID, "speed_bar")
+			if (speedState and speedState < 1) then
+				barDrawer.AddBar(addTitle and messages.speed, speedState, "reload2", (addPercent and floor(speedState*100) .. '%'))
 			end
 		end
 		
@@ -862,7 +903,7 @@ do
 		if ci.canJump then
 			local jumpReload = GetUnitRulesParam(unitID, "jumpReload")
 			if (jumpReload and (jumpReload > 0) and (jumpReload < 1)) then
-				barDrawer.AddBar(addTitle and messages.jump, jumpReload, "jump", (addPercent and floor(jumpReload*100) .. '%'))
+				barDrawer.AddBar(addTitle and messages.jump, jumpReload, ((blink_j and "jump_p") or "jump"), (addPercent and floor(jumpReload*100) .. '%'))
 			end
 		end
 		
@@ -1091,16 +1132,21 @@ function widget:Initialize()
 
 	--// find real primary weapon and its reloadtime
 	for _, ud in pairs(UnitDefs) do
-		ud.reloadTime    = 0;
-		ud.primaryWeapon = 1;
-		ud.shieldPower   = 0;
+		ud.reloadTime    = 0
+		ud.primaryWeapon = 1
+		ud.shieldPower   = 0
+		local numOverride = ud.customParams.draw_reload_num and tonumber(ud.customParams.draw_reload_num)
 
-		for i = 1, #ud.weapons do
-			local WeaponDefID = ud.weapons[i].weaponDef;
+		local weapons = ud.weapons
+		for i = 1, #weapons do
+			local WeaponDefID = weapons[i].weaponDef;
 			local WeaponDef   = WeaponDefs[ WeaponDefID ];
-			if (WeaponDef.reload > ud.reloadTime) then
-				ud.reloadTime    = WeaponDef.reload;
-				ud.primaryWeapon = i;
+			if (WeaponDef.reload > ud.reloadTime) or numOverride == i then
+				ud.reloadTime    = WeaponDef.reload
+				ud.primaryWeapon = i
+				if numOverride == i then
+					break
+				end
 			end
 		end
 		local shieldDefID = ud.shieldWeaponDef
@@ -1253,10 +1299,12 @@ do
 		if not IsCameraBelowMaxHeight() then
 			return false
 		end
-
+		
+		local _, activeCmdID = Spring.GetActiveCommand()
 		-- Processing
 		sec = sec+dt
 		blink = (sec%1) < 0.5
+		blink_j = options.flashJump.value and (activeCmdID == CMD_JUMP) and ((sec%0.5) < 0.25)
 
 		gameFrame = GetGameFrame()
 		visibleUnits = GetVisibleUnits(-1, nil, false) --this don't need any delayed update or caching or optimization since its already done in "LUAUI/cache.lua"

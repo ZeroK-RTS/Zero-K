@@ -1,17 +1,17 @@
 return { shiptorpraider = {
   unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
-  description         = [[Torpedo-Boat (Raider)]],
-  acceleration        = 0.24,
+  description         = [[Torpedo Raider Ship (Anti-Sub)]],
+  acceleration        = 0.288,
   activateWhenBuilt   = true,
-  brakeRate           = 0.43,
+  brakeRate           = 0.516,
   buildCostMetal      = 100,
   builder             = false,
   buildPic            = [[shiptorpraider.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[SHIP]],
+  category               = [[SHIP SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[28 28 55]],
   collisionVolumeType    = [[cylZ]],
@@ -21,6 +21,8 @@ return { shiptorpraider = {
     modelradius        = [[14]],
     turnatfullspeed    = [[1]],
     aim_lookahead      = 80,
+    bait_level_default = 0,
+    okp_damage = 180,
   },
 
 
@@ -29,12 +31,9 @@ return { shiptorpraider = {
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[shiptorpraider]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maneuverleashlength = [[1280]],
-  maxDamage           = 310,
+  maxDamage           = 360,
   maxVelocity         = 4.2,
-  minCloakDistance    = 75,
   minWaterDepth       = 5,
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
@@ -44,7 +43,7 @@ return { shiptorpraider = {
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 560,
   sonarDistance       = 560,
-  turnRate            = 800,
+  turnRate            = 1280,
   waterline           = 0,
   workerTime          = 0,
 
@@ -76,13 +75,13 @@ return { shiptorpraider = {
       cegTag                  = [[torpedo_trail]],
 
       customParams = {
-          burst = Shared.BURST_RELIABLE,
+        burst = Shared.BURST_RELIABLE,
+
+        stays_underwater = 1,
       },
 
       damage                  = {
-
-        default = 200.1,
-        subs    = 200.1,
+        default = 220.1,
       },
 
       edgeEffectiveness       = 0.6,
@@ -99,9 +98,8 @@ return { shiptorpraider = {
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
-
-      range                   = 230,
-      reloadtime              = 2.5,
+      range                   = 240,
+      reloadtime              = 2.6,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.8,
       soundStart              = [[weapon/torp_land]],

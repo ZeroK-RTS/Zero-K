@@ -29,7 +29,8 @@ return { gunshiptrans = {
     midposoffset      = [[0 0 0]],
     modelradius       = [[15]],
     transport_speed_light   = [[0.7]],
-    islighttransport  = 1,
+    transport_speed_medium  = [[0.5]],
+    islighttransport  = 1, -- Actually maybe this needs to be kept as is, how does Circuit handle it?
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -38,11 +39,8 @@ return { gunshiptrans = {
   footprintZ          = 3,
   hoverAttack         = true,
   iconType            = [[gunshiptransport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 300,
   maxVelocity         = 11.5,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[smallTransport.s3o]],

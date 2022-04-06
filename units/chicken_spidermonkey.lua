@@ -16,6 +16,9 @@ return { chicken_spidermonkey = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -29,7 +32,6 @@ return { chicken_spidermonkey = {
   maxSlope            = 72,
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET MINE]],
@@ -54,7 +56,7 @@ return { chicken_spidermonkey = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 70,
-  turnRate            = 1200,
+  turnRate            = 1440,
   upright             = false,
   workerTime          = 0,
 
@@ -87,7 +89,6 @@ return { chicken_spidermonkey = {
 
       damage                  = {
         default = 30,
-        subs    = 0.75,
       },
 
       dance                   = 150,

@@ -260,6 +260,7 @@ local function ClusterBombThread()
 	while index <= SPECIAL_FIRE_COUNT do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
+			GG.PokeDecloakUnit(unitID, unitDefID)
 			EmitSfx(subemit[0], GG.Script.FIRE_W3)
 			index = index + 1
 		end

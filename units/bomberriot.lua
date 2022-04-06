@@ -14,17 +14,18 @@ return { bomberriot = {
   category            = [[FIXEDWING]],
   collide             = false,
   collisionVolumeOffsets = [[0 0 -5]],
-  collisionVolumeScales  = [[55 15 70]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[55 18 75]],
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[80 25 80]],
+  selectionVolumeScales  = [[80 20 80]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 180,
+  cruiseAlt           = 160,
 
   customParams        = {
     modelradius    = [[10]],
     refuelturnradius = [[120]],
+	reammoseconds = [[5]],
     requireammo    = [[1]],
   },
 
@@ -33,8 +34,6 @@ return { bomberriot = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[bomberraider]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxAcc              = 0.5,
   maxDamage           = 900,
   maxAileron          = 0.018,
@@ -42,7 +41,6 @@ return { bomberriot = {
   maxRudder           = 0.009,
   maxFuel             = 1000000,
   maxVelocity         = 8,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],
@@ -91,12 +89,12 @@ return { bomberriot = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
         setunitsonfire = "1",
         burntime = 300,
+        gui_sprayangle = 0.32,
       },
       
       damage                  = {
         default = 25,
         planes  = 25,
-        subs    = 2.5,
       },
 
       edgeEffectiveness       = 0.7,
@@ -111,7 +109,7 @@ return { bomberriot = {
       reloadtime              = 1,
       soundHit                = [[weapon/burn_mixed]],
       soundStart              = [[weapon/bomb_drop_short]],
-      sprayangle              = 64000,
+      sprayangle              = 22000, -- Maximum is 22500. Note that this has little effect due to near-zero launch speed.
       weaponType              = [[AircraftBomb]],
     },
 

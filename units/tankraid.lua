@@ -2,15 +2,15 @@ return { tankraid = {
   unitname            = [[tankraid]],
   name                = [[Kodachi]],
   description         = [[Raider Tank]],
-  acceleration        = 0.625,
-  brakeRate           = 1.375,
-  buildCostMetal      = 180,
+  acceleration        = 0.75,
+  brakeRate           = 1.65,
+  buildCostMetal      = 170,
   builder             = false,
   buildPic            = [[tankraid.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND]],
+  category            = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[34 26 34]],
   collisionVolumeType    = [[ellipsoid]],
@@ -21,12 +21,16 @@ return { tankraid = {
 
   customParams        = {
     fireproof      = [[1]],
-    specialreloadtime = [[850]],
+    --specialreloadtime = [[850]],
     modelradius       = [[20]],
     aimposoffset      = [[0 5 0]],
     selection_scale   = 0.85,
-    aim_lookahead     = 180,
+    aim_lookahead     = 140,
     percieved_range   = 270, -- How much range enemy units think Kodachi has
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -36,11 +40,10 @@ return { tankraid = {
   idleAutoHeal        = 5,
   idleTime            = 300,
   leaveTracks         = true,
-  maxDamage           = 670,
+  maxDamage           = 680,
   maxSlope            = 18,
-  maxVelocity         = 3.9,
+  maxVelocity         = 3.6,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -54,7 +57,7 @@ return { tankraid = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 720,
+  turnRate            = 1152,
   workerTime          = 0,
 
   weapons             = {
@@ -91,6 +94,7 @@ return { tankraid = {
         setunitsonfire = "1",
         burnchance     = "1",
         burntime       = 30,
+        force_ignore_ground = [[1]],
 
         area_damage = 1,
         area_damage_radius = 54,
@@ -105,7 +109,6 @@ return { tankraid = {
       damage                  = {
         default = 40,
         planes  = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda_small]],
@@ -118,7 +121,7 @@ return { tankraid = {
       model                   = [[wep_b_fabby.s3o]],
       myGravity               = 0.2,
       noSelfDamage            = true,
-      range                   = 215,
+      range                   = 210,
       reloadtime              = 0.5,
       soundHit                = [[FireHit]],
       soundHitVolume          = 5,

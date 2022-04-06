@@ -16,17 +16,18 @@ return { seismic = {
 
   customParams                  = {
     mobilebuilding = [[1]],
+
+    outline_x = 55,
+    outline_y = 80,
+    outline_yoff = 55,
   },
 
   explodeAs                     = [[SEISMIC_WEAPON]],
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[cruisemissilesmall]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   objectName                    = [[wep_seismic.s3o]],
   script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[SEISMIC_WEAPON]],
@@ -72,8 +73,6 @@ return { seismic = {
         smoothexponent = [[0.45]],
         movestructures = [[1]],
 
-        restrict_in_widgets = 1,
-
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
         
@@ -83,7 +82,6 @@ return { seismic = {
       
       damage                  = {
         default = 20,
-        subs    = 1,
       },
 
       edgeEffectiveness       = 0.4,
@@ -97,7 +95,7 @@ return { seismic = {
       reloadtime              = 10,
       smokeTrail              = false,
       soundHit                = [[explosion/ex_large4]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       turnrate                = 18000,
       waterWeapon             = true,

@@ -24,6 +24,8 @@ local smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local PERIOD = 0.17
 
 local sleepTime = PERIOD*1000
@@ -106,11 +108,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1000
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 260.1, 75 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 1000, 38, 0.05, true)
 end
 
 function script.QueryWeapon(num)

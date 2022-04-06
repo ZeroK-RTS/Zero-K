@@ -2,10 +2,10 @@ return { chicken_dragon = {
   unitname               = [[chicken_dragon]],
   name                   = [[White Dragon]],
   description            = [[Prime Assault Chicken]],
-  acceleration           = 5.0,
+  acceleration           = 6.0,
   activateWhenBuilt      = true,
   autoHeal               = 0,
-  brakeRate              = 30.0,
+  brakeRate              = 36.0,
   buildCostEnergy        = 0,
   buildCostMetal         = 0,
   builder                = false,
@@ -23,13 +23,16 @@ return { chicken_dragon = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
+    outline_x = 270,
+    outline_y = 270,
+    outline_yoff = 40,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
   footprintX             = 5,
   footprintZ             = 5,
   iconType               = [[chickenminiq]],
-  idleAutoHeal           = 5,
+  idleAutoHeal           = 20,
   idleTime               = 300,
   leaveTracks            = true,
   maxDamage              = 32000,
@@ -62,7 +65,7 @@ return { chicken_dragon = {
   trackType              = [[ChickenTrack]],
   trackWidth             = 100,
   turninplace            = 0,
-  turnRate               = 399,
+  turnRate               = 640,
   upright                = false,
   waterLine              = 42,
   workerTime             = 0,
@@ -160,7 +163,6 @@ return { chicken_dragon = {
       damage                  = {
         default = 1200,
         planes  = 1200,
-        subs    = 1200,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -192,7 +194,6 @@ return { chicken_dragon = {
         chicken    = 0.001,
 
         planes     = 10,
-        subs       = 5,
       },
 
       edgeEffectiveness       = 1,
@@ -229,7 +230,6 @@ return { chicken_dragon = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 6,
       },
 
       dance                   = 60,

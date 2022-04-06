@@ -2,9 +2,9 @@ return { subtacmissile = {
   unitname               = [[subtacmissile]],
   name                   = [[Scylla]],
   description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
-  acceleration           = 0.186,
+  acceleration           = 0.223,
   activateWhenBuilt      = true,
-  brakeRate              = 1.942,
+  brakeRate              = 2.33,
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[subtacmissile.png]],
@@ -18,11 +18,16 @@ return { subtacmissile = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[15]],
     stockpiletime  = [[30]],
     stockpilecost  = [[600]],
     priority_misc  = 1, -- Medium
     no_auto_keep_target = 1,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 12,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -30,11 +35,8 @@ return { subtacmissile = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[subtacmissile]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 3000,
   maxVelocity            = 2.79,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[UBOAT3]],
   moveState              = 0,
@@ -45,7 +47,7 @@ return { subtacmissile = {
   sightDistance          = 660,
   sonarDistance          = 660,
   turninplace            = 0,
-  turnRate               = 307,
+  turnRate               = 491,
   upright                = true,
   waterline              = 55,
   workerTime             = 0,
@@ -73,7 +75,6 @@ return { subtacmissile = {
 
       damage                  = {
         default = 3502.4,
-        subs    = 175,
       },
 
       edgeEffectiveness       = 0.4,

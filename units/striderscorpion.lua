@@ -23,15 +23,19 @@ return { striderscorpion = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    aimposoffset = [[0 10 0]],
+    bait_level_default = 0,
+    aimposoffset          = [[0 10 0]],
+    decloak_footprint     = 5,
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 20,
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[t3spidergeneric]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
   maxDamage              = 12000,
@@ -41,7 +45,7 @@ return { striderscorpion = {
   minCloakDistance       = 150,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName             = [[scorpion.s3o]],
   script                 = [[striderscorpion.lua]],
   selfDestructAs         = [[CRAWL_BLASTSML]],
@@ -62,7 +66,7 @@ return { striderscorpion = {
   trackStretch           = 1,
   trackType              = [[crossFoot]],
   trackWidth             = 76,
-  turnRate               = 400,
+  turnRate               = 480,
   workerTime             = 0,
 
   weapons                = {
@@ -120,7 +124,6 @@ return { striderscorpion = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.1,
@@ -259,7 +262,6 @@ return { striderscorpion = {
       
       damage                  = {
         default = 70.01,
-        subs    = 3,
       },
 
       explosionGenerator      = [[custom:flash1red]],

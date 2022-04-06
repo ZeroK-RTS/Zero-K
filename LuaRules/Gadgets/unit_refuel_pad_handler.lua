@@ -57,9 +57,13 @@ local min = math.min
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local mobilePadDefs = {
-	[UnitDefNames["shipcarrier"].id] = true,
-}
+local mobilePadDefs = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.ispad and (not ud.isImmobile) then
+		mobilePadDefs[unitDefID] = true
+	end
+end
 
 local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
@@ -238,10 +242,11 @@ local function SitOnPad(unitID)
 			
 			if (updateCost > 0) then
 				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
-				resTable.e = updateCost*updateRate
 			else
 				updateRate = 1
 			end
+			updateRate = updateRate*buildRate
+			resTable.e = updateCost*updateRate
 			
 			if reammoProgress then
 				if (updateRate > 0) and ((updateCost == 0) or spUseUnitResource(landData.padID, resTable)) then

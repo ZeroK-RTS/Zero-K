@@ -33,7 +33,7 @@ local ALLY_ACCESS = {allied = true}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local FACTORY_RANGE_SQ = FACTORY_PLATE_RANGE^2 -- see LuaRules/Configs/constants.lua
+local FACTORY_RANGE_SQ = VFS.Include("gamedata/unitdefs_pre.lua", nil, VFS.GAME).FACTORY_PLATE_RANGE^2
 
 local childOfFactory = {}
 local parentOfPlate = {}

@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Show All Commands v2",
-    desc      = "Provide ZK Epicmenu with Command visibility options. Go to \255\90\255\90Setting/ Interface/ Command Visibility\255\255\255\255 for options.", --"Acts like CTRL-A SHIFT all the time",
+    desc      = "Populates the 'Settings/Interface/Command Visibility' option set",
     author    = "Google Frog, msafwan",
     date      = "Mar 1, 2009, July 1 2013",
     license   = "GNU GPL, v2 or later",
@@ -44,7 +44,7 @@ local TARGET_GROUND = 1
 local TARGET_UNIT= 2
 
 local CMD_ATTACK = CMD.ATTACK
-local setTargetAlpha = math.min(0.5, (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7) - 0.05)
+local setTargetAlpha = math.min(0.5, (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7))
 
 local selectedUnitCount = 0
 local selectedUnits
@@ -66,7 +66,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local setTargetUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and
+	if ((not (ud.canFly and ((ud.isBomber or ud.isBomberAirUnit) and not ud.customParams.can_set_target))) and
 			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		setTargetUnitDefIDs[i] = true
 	end
@@ -216,8 +216,12 @@ local function getTargetPosition(unitID)
 		return nil
 	end
 	local target_type = spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
+	local fireTowards = spGetUnitRulesParam(unitID,"target_towards")
+	if fireTowards == 0 then
+		fireTowards = false
+	end
 	
-	local tx,ty,tz
+	local tx, ty, tz
 	
 	if target_type == TARGET_GROUND then
 		tx = spGetUnitRulesParam(unitID, "target_x")
@@ -238,23 +242,50 @@ local function getTargetPosition(unitID)
 	else
 		return nil
 	end
-	return tx,ty,tz
+	return tx, ty, tz, fireTowards
 end
 
 local function drawUnitCommands(unitID)
 	if not unitID then
 		return
 	end
-	spDrawUnitCommands(unitID)
 	
-	local tx,ty,tz = getTargetPosition(unitID)
+	local tx,ty,tz,fireTowards = getTargetPosition(unitID)
 	if tx then
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
-		glBeginEnd(GL.LINES,
-			function()
-				glVertex(x,y,z);
-				glVertex(tx,ty,tz);
-			end)
+		if fireTowards then
+			local dist = math.sqrt((x - tx)^2 + (y - ty)^2 + (z - tz)^2)
+			if dist < fireTowards then
+				glColor(1, 0.8, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(x,y,z)
+						glVertex(tx, ty, tz)
+					end)
+			else
+				local mult = fireTowards / dist
+				local mx, my, mz = (tx - x)*mult + x, (ty - y)*mult + y, (tz - z)*mult + z
+				glColor(1, 0.8, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(x,y,z)
+						glVertex(mx, my, mz)
+					end)
+				glColor(1, 1, 0, setTargetAlpha)
+				glBeginEnd(GL.LINES,
+					function()
+						glVertex(tx, ty, tz)
+						glVertex(mx, my, mz)
+					end)
+			end
+		else
+			glColor(1, 0.8, 0, setTargetAlpha)
+			glBeginEnd(GL.LINES,
+				function()
+					glVertex(x,y,z)
+					glVertex(tx,ty,tz)
+				end)
+		end
 	end
 end
 
@@ -266,13 +297,16 @@ local function updateDrawing()
 		for i = 1, count do
 			drawUnitCommands(units[i])
 		end
+		spDrawUnitCommands(units)
 	elseif drawSelected then
 		local sel = selectedUnits
 		local alreadyDrawn = {}
+		local toDraw = {}
 		for i = 1, selectedUnitCount do
 			if sel[i] then
 				drawUnitCommands(sel[i])
 				alreadyDrawn[sel[i]] = true
+				toDraw[#toDraw + 1] = sel[i]
 			end
 		end
 		if options.includeallies.value then
@@ -283,8 +317,12 @@ local function updateDrawing()
 				if unitID and WG.allySelUnits[unitID] and not alreadyDrawn[sel[i]] then
 					drawUnitCommands(unitID)
 					alreadyDrawn[unitID] = true
+					toDraw[#toDraw + 1] = unitID
 				end
 			end
+		end
+		if #toDraw > 0 then
+			spDrawUnitCommands(toDraw)
 		end
 	end
 end
@@ -306,7 +344,6 @@ function widget:DrawWorld()
 		gl.LineStipple("springdefault")
 		glDepthTest(false)
 		glLineWidth(1)
-		glColor(1, 0.8, 0, setTargetAlpha)
 		glCallList(drawList)
 		glColor(1, 1, 1, 1)
 		glLineStipple(false)

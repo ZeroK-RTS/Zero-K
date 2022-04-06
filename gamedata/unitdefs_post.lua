@@ -1,7 +1,7 @@
 
 local modOptions = {}
 if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
+	modOptions = Spring.GetModOptions()
 end
 
 Spring.Echo("Loading UnitDefs_posts")
@@ -12,7 +12,6 @@ Spring.Echo("Loading UnitDefs_posts")
 --
 
 VFS.Include("LuaRules/Configs/constants.lua")
-local TRANSPORT_LIGHT_COST_MAX = 1000
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -20,17 +19,17 @@ local TRANSPORT_LIGHT_COST_MAX = 1000
 --
 
 local function tobool(val)
-  local t = type(val)
-  if (t == 'nil') then
-    return false
-  elseif (t == 'boolean') then
-    return val
-  elseif (t == 'number') then
-    return (val ~= 0)
-  elseif (t == 'string') then
-    return ((val ~= '0') and (val ~= 'false'))
-  end
-  return false
+	local t = type(val)
+	if (t == 'nil') then
+		return false
+	elseif (t == 'boolean') then
+		return val
+	elseif (t == 'number') then
+		return (val ~= 0)
+	elseif (t == 'string') then
+		return ((val ~= '0') and (val ~= 'false'))
+	end
+	return false
 end
 
 local function lowerkeys(t)
@@ -63,9 +62,9 @@ MergeTable = Spring.Utilities.MergeTable
 -- ud.customparams IS NEVER NIL
 
 for _, ud in pairs(UnitDefs) do
-    if not ud.customparams then
-        ud.customparams = {}
-    end
+	if not ud.customparams then
+		ud.customparams = {}
+	end
  end
  
 --------------------------------------------------------------------------------
@@ -94,9 +93,9 @@ end
 
 do
 	local append = false
-	local name = "tweakunits"
-	while modOptions[name] and modOptions[name] ~= "" do
-		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[name])
+	local modoptName = "tweakunits"
+	while modOptions[modoptName] and modOptions[modoptName] ~= "" do
+		local tweaks = Spring.Utilities.CustomKeyToUsefulTable(modOptions[modoptName])
 		if type(tweaks) == "table" then
 			Spring.Echo("Loading tweakunits modoption", append or 0)
 			for name, ud in pairs(UnitDefs) do
@@ -107,7 +106,7 @@ do
 			end
 		end
 		append = (append or 0) + 1
-		name = "tweakunits" .. append
+		modoptName = "tweakunits" .. append
 	end
 end
 
@@ -117,11 +116,11 @@ end
 -- because the way lua access to unitdefs and weapondefs is setup is insane
 --
 
---for _, ud in pairs(UnitDefs) do
---    if ud.collisionVolumeOffsets then
---		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
---    end
---end
+--[[for _, ud in pairs(UnitDefs) do
+	if ud.collisionVolumeOffsets then
+		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
+	end
+end]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -142,7 +141,7 @@ local Utilities = VFS.Include('gamedata/utilities.lua')
 if Utilities.IsCurrentVersionNewerThan(104, 1400) and not Utilities.IsCurrentVersionNewerThan(104, 1470) then
 	UnitDefs.terraunit.collisionvolumeoffsets = [[0 -550 0]]
 	UnitDefs.terraunit.selectionvolumeoffsets = [[0 550 0]]
-	UnitDefs.terraunit.customparams.midposoffset   = [[0 -550 0]]
+	UnitDefs.terraunit.customparams.midposoffset = [[0 -550 0]]
 end
 
 --------------------------------------------------------------------------------
@@ -154,39 +153,39 @@ end
 -- FIXME: breaks with table keys
 -- but why would you be using those anyway?
 local function TableToString(tbl)
-    local str = "{"
-	for i,v in pairs(tbl) do
-	    if type(i) == "number" then
-		str = str .. "[" .. i .. "] = "
-	    else
-		str = str .. [[["]]..i..[["] = ]]
-	    end
-
-	    if type(v) == "table" then
-		str = str .. TableToString(v)
-	    elseif type(v) == "boolean" then
-		str = str .. tostring(v) .. ";"
-	    elseif type(v) == "string" then
-		str = str .. "[[" .. v .. "]];"
-	    else
-		str = str .. v .. ";"
-	    end
+	local str = "{"
+	for i, v in pairs(tbl) do
+		if type(i) == "number" then
+			str = str .. "[" .. i .. "] = "
+		else
+			str = str .. [[["]]..i..[["] = ]]
+		end
+		
+		if type(v) == "table" then
+			str = str .. TableToString(v)
+		elseif type(v) == "boolean" then
+			str = str .. tostring(v) .. ";"
+		elseif type(v) == "string" then
+			str = str .. "[[" .. v .. "]];"
+		else
+			str = str .. v .. ";"
+		end
 	end
-    str = str .. "};"
-    return str
+	str = str .. "};"
+	return str
 end
 
 for name, ud in pairs(UnitDefs) do
-    if (ud.customparams) then
-	for tag,v in pairs(ud.customparams) do
-	    if (type(v) == "table") then
-		local str = TableToString(v)
-		ud.customparams[tag] = str
-	    elseif (type(v) ~= "string") then
-		ud.customparams[tag] = tostring(v)
-	    end
+	if (ud.customparams) then
+		for tag, v in pairs(ud.customparams) do
+			if (type(v) == "table") then
+				local str = TableToString(v)
+				ud.customparams[tag] = str
+			elseif (type(v) ~= "string") then
+				ud.customparams[tag] = tostring(v)
+			end
+		end
 	end
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -228,7 +227,6 @@ for i = 1, #typeNames do
 end
 
 -- Set build options from pos_ customparam
-local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 for name, ud in pairs(UnitDefs) do
 	local cp = ud.customparams
 	for i = 1, #typeNamesLower do
@@ -247,9 +245,9 @@ end
 --
 
 --for name, ud in pairs(UnitDefs) do
---  if (tobool(ud.builder) and not tobool(ud.canfly)) then
---    ud.buildrange3d = true
---  end
+--	if (tobool(ud.builder) and not tobool(ud.canfly)) then
+--		ud.buildrange3d = true
+--	end
 --end
 
 
@@ -259,14 +257,21 @@ end
 --
 
 local sqrt = math.sqrt
-
+local cloakFootMult = 6 * sqrt(2)
 for name, ud in pairs(UnitDefs) do
-  if (not ud.mincloakdistance) then
-    local fx = ud.footprintx and tonumber(ud.footprintx) or 1
-    local fz = ud.footprintz and tonumber(ud.footprintz) or 1
-    local radius = 8 * sqrt((fx * fx) + (fz * fz))
-    ud.mincloakdistance = (radius + 48)
-  end
+	local fx = ud.customparams.decloak_footprint or (ud.footprintx and tonumber(ud.footprintx) or 1)
+	local fz = ud.customparams.decloak_footprint or (ud.footprintz and tonumber(ud.footprintz) or 1)
+	-- Note that the full power of this equation is never used in practise, since units have square
+	-- footprints and most structures don't cloak (the ones that do have square footprints).
+	local radius = cloakFootMult * sqrt((fx * fx) + (fz * fz)) + 56
+	-- 2x2 = 80
+	-- 3x3 = 92
+	-- 4x4 = 104
+	if (not ud.mincloakdistance) then
+		ud.mincloakdistance = radius
+	elseif radius < ud.mincloakdistance then
+		ud.customparams.cloaker_bestowed_radius = radius
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -311,6 +316,10 @@ for name, ud in pairs(UnitDefs) do
 			for _, wd in pairs(ud.weapondefs) do
 				if wd.weapontype == "Shield" then
 					hasShield = true
+					if ud.activatewhenbuilt == nil then
+						-- some aspects of shields require the unit to be enabled
+						ud.activatewhenbuilt = true
+					end
 					ud.customparams.shield_radius = wd.shieldradius
 					ud.customparams.shield_power = wd.shieldpower
 					ud.customparams.shield_recharge_delay = (wd.customparams or {}).shield_recharge_delay or wd.shieldrechargedelay
@@ -421,23 +430,24 @@ end
 --------------------------------------------------------------------------------
 -- Maneuverability multipliers, useful for testing.
 
-local TURNRATE_MULT = 1.2
-local TURNRATE_MULT_HIGH = 1.6
-local ACCEL_MULT = 1
-local ACCEL_MULT_HIGH = 1.2
+local TURNRATE_MULT_BOT = 1
+local TURNRATE_MULT_VEH = 1
+local ACCEL_MULT_BOT = 1
+local ACCEL_MULT_VEH = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
-			ud.turnrate = ud.turnrate * TURNRATE_MULT_HIGH
-			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
-			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
+			-- NB: also contains some water-walking chickens (as hover)
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_VEH
+			ud.acceleration = ud.acceleration * ACCEL_MULT_VEH
+			ud.brakerate = ud.brakerate * ACCEL_MULT_VEH
 		else
-			ud.turnrate = ud.turnrate * TURNRATE_MULT
-			ud.acceleration = ud.acceleration * ACCEL_MULT
-			ud.brakerate = ud.brakerate * ACCEL_MULT
+			ud.turnrate = ud.turnrate * TURNRATE_MULT_BOT
+			ud.acceleration = ud.acceleration * ACCEL_MULT_BOT
+			ud.brakerate = ud.brakerate * ACCEL_MULT_BOT
 		end
 	end
 end
@@ -449,12 +459,12 @@ end
 
 
 if (modOptions and modOptions.energymult) then
-  for name in pairs(UnitDefs) do
-    local em = UnitDefs[name].energymake
-    if (em) then
-      UnitDefs[name].energymake = em * modOptions.energymult
-    end
-  end
+	for name in pairs(UnitDefs) do
+		local em = UnitDefs[name].energymake
+		if (em) then
+			UnitDefs[name].energymake = em * modOptions.energymult
+		end
+	end
 end
 
 if (modOptions and modOptions.metalmult) then
@@ -465,35 +475,63 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Resurrect
+--
+
+if (modOptions and (modOptions.disableresurrect == 1 or modOptions.disableresurrect == "1")) then
+	for name, unitDef in pairs(UnitDefs) do
+		if (unitDef.canresurrect) then
+			unitDef.canresurrect = false
+		end
+	end
+
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- unitspeedmult
 --
 
 if (modOptions and modOptions.unitspeedmult and modOptions.unitspeedmult ~= 1) then
-  local unitspeedmult = modOptions.unitspeedmult
-  for unitDefID, unitDef in pairs(UnitDefs) do
-    if (unitDef.maxvelocity) then unitDef.maxvelocity = unitDef.maxvelocity * unitspeedmult end
-    if (unitDef.acceleration) then unitDef.acceleration = unitDef.acceleration * unitspeedmult end
-    if (unitDef.brakerate) then unitDef.brakerate = unitDef.brakerate * unitspeedmult end
-    if (unitDef.turnrate) then unitDef.turnrate = unitDef.turnrate * unitspeedmult end
-  end
+	local unitspeedmult = modOptions.unitspeedmult
+	for unitDefID, unitDef in pairs(UnitDefs) do
+		if (unitDef.maxvelocity) then
+			unitDef.maxvelocity = unitDef.maxvelocity * unitspeedmult
+		end
+		if (unitDef.acceleration) then
+			unitDef.acceleration = unitDef.acceleration * unitspeedmult
+		end
+		if (unitDef.brakerate) then
+			unitDef.brakerate = unitDef.brakerate * unitspeedmult
+		end
+		if (unitDef.turnrate) then
+			unitDef.turnrate = unitDef.turnrate * unitspeedmult
+		end
+	end
 end
 
 if (modOptions and modOptions.damagemult and modOptions.damagemult ~= 1) then
-  local damagemult = modOptions.damagemult
-  for _, unitDef in pairs(UnitDefs) do
-    if (unitDef.autoheal) then unitDef.autoheal = unitDef.autoheal * damagemult end
-    if (unitDef.idleautoheal) then unitDef.idleautoheal = unitDef.idleautoheal * damagemult end
-
-    if (unitDef.capturespeed)
-      then unitDef.capturespeed = unitDef.capturespeed * damagemult
-      elseif (unitDef.workertime) then unitDef.capturespeed = unitDef.workertime * damagemult
-    end
-
-    if (unitDef.repairspeed)
-      then unitDef.repairspeed = unitDef.repairspeed * damagemult
-      elseif (unitDef.workertime) then unitDef.repairspeed = unitDef.workertime * damagemult
-    end
-  end
+	local damagemult = modOptions.damagemult
+	for _, unitDef in pairs(UnitDefs) do
+		if (unitDef.autoheal) then
+			unitDef.autoheal = unitDef.autoheal * damagemult
+		end
+		if (unitDef.idleautoheal) then
+			unitDef.idleautoheal = unitDef.idleautoheal * damagemult
+		end
+		
+		if (unitDef.capturespeed) then
+			unitDef.capturespeed = unitDef.capturespeed * damagemult
+		elseif (unitDef.workertime) then
+			unitDef.capturespeed = unitDef.workertime * damagemult
+		end
+		
+		if (unitDef.repairspeed) then
+			unitDef.repairspeed = unitDef.repairspeed * damagemult
+		elseif (unitDef.workertime) then
+			unitDef.repairspeed = unitDef.workertime * damagemult
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -501,19 +539,24 @@ end
 -- Set turnInPlace speed limits, reverse velocities (but not for ships)
 --
 for name, ud in pairs(UnitDefs) do
-	if ud.turnrate and (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
-		ud.turninplace = false
-		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
-	elseif ud.turninplace ~= true then
-		ud.turninplace = false	-- true
-		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
-		--ud.turninplaceanglelimit = 180
+	if ud.turnrate then
+		if ud.customparams.turnatfullspeed_hover then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 0.8)
+			ud.turninplaceanglelimit = 90
+		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
+			ud.turninplace = false
+			ud.turninplacespeedlimit = (ud.maxvelocity or 0)
+		elseif ud.turninplace ~= true then
+			ud.turninplace = false -- true
+			ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+			--ud.turninplaceanglelimit = 180
+		end
 	end
 
-
-	if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
+	if ud.category and not (ud.category:find("SHIP", 1, true) or ud.category:find("SUB", 1, true)) then
 		if (ud.maxvelocity) and not ud.maxreversevelocity then
-			if not name:find("chicken",1,true) then
+			if not name:find("chicken", 1, true) then
 				ud.maxreversevelocity = ud.maxvelocity * 0.33
 			end
 		end
@@ -539,7 +582,7 @@ for name, unitDef in pairs(UnitDefs) do
 		unitDef.repairspeed = unitDef.repairspeed / REPAIR_ENERGY_COST_FACTOR
 	elseif (unitDef.workertime) then
 		unitDef.repairspeed = unitDef.workertime / REPAIR_ENERGY_COST_FACTOR
-    end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -550,7 +593,7 @@ end
 for name, unitDef in pairs(UnitDefs) do
 	if not unitDef.losEmitHeight then
 		unitDef.losEmitHeight = 30
-    end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -559,7 +602,7 @@ end
 --
 for name, ud in pairs(UnitDefs) do
 	if (ud.weapons and not ud.canfly) then
-		for wName,wDef in pairs(ud.weapons) do
+		for wName, wDef in pairs(ud.weapons) do
 			if wDef.badtargetcategory then
 				wDef.badtargetcategory = wDef.badtargetcategory .. " STUPIDTARGET"
 			else
@@ -581,13 +624,13 @@ end
 -- Avoid neutral	-- breaks explicit attack orders
 --
 
---for name, ud in pairs(UnitDefs) do
---  if (ud.weapondefs) then
---    for wName,wDef in pairs(ud.weapondefs) do
---      wDef.avoidneutral = true
---    end
---  end
---end
+--[[for name, ud in pairs(UnitDefs) do
+	if (ud.weapondefs) then
+		for wName,wDef in pairs(ud.weapondefs) do
+			wDef.avoidneutral = true
+		end
+	end
+end]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -645,32 +688,31 @@ end
 --
 
 if (modOptions and tobool(modOptions.xmas)) then
-  local gifts = {"present_bomb1.s3o","present_bomb2.s3o","present_bomb3.s3o"}
+	local gifts = {"present_bomb1.s3o", "present_bomb2.s3o","present_bomb3.s3o"}
+	
+	local function round(num)
+		return num - (num%1)
+	end
 
-  local function round(num)
-    return num-(num%1)
-  end
+	local function GetRandom(s, c)
+		local n = 0
+		for i = 1, s:len() do
+			n = n + s:byte(i)
+		end
+		n = (math.sin(n) + 1) * 0.5 * (c - 1) + 1
+		return round(n)
+	end
 
-  local function GetRandom(s,c)
-    local n = 0
-    for i=1,s:len() do
-      n = n + s:byte(i)
-    end
-    n = (math.sin(n)+1)*0.5*(c-1)+1
-    return round(n)
-  end
-
-  for name, ud in pairs(UnitDefs) do
-	if (type(ud.weapondefs) == "table") then
-      for wname,wd in pairs(ud.weapondefs) do
-        if (wd.weapontype == "AircraftBomb" or ( wd.name:lower() ):find("bomb")) and not wname:find("bogus") then
-		  --Spring.Echo(wname)
-          wd.model = gifts[ GetRandom(wname,#gifts) ]
-        end
-      end
-    end
-
-  end --for
+	for name, ud in pairs(UnitDefs) do
+		if (type(ud.weapondefs) == "table") then
+			for wname, wd in pairs(ud.weapondefs) do
+				if (wd.weapontype == "AircraftBomb" or ( wd.name:lower() ):find("bomb")) and not wname:find("bogus") then
+					--Spring.Echo(wname)
+					wd.model = gifts[ GetRandom(wname, #gifts) ]
+				end
+			end
+		end
+	end --for
 end
 
 
@@ -804,12 +846,12 @@ end
 --modOptions.hpmult = 1.5 -- TEST CHANGE
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
-    local hpMulti = modOptions.hpmult
-    for unitDefID, unitDef in pairs(UnitDefs) do
-        if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
-            unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1)
-        end
-    end
+	local hpMulti = modOptions.hpmult
+	for unitDefID, unitDef in pairs(UnitDefs) do
+		if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
+			unitDef.maxdamage = math.max(unitDef.maxdamage * hpMulti, 1)
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -818,10 +860,10 @@ end
 --
 
 for name, ud in pairs(UnitDefs) do
-  if tobool(ud.builder) then
-	ud.canrestore = false
-	--ud.shownanospray = true
-  end
+	if tobool(ud.builder) then
+		ud.canrestore = false
+		--ud.shownanospray = true
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -829,21 +871,21 @@ end
 -- Set chicken cost
 --
 
---for name, ud in pairs(UnitDefs) do
---  if (ud.unitname:sub(1,7) == "chicken") then
---	ud.buildcostmetal = ud.buildtime
---	ud.buildcostenergy = ud.buildtime
---  end
---end
+--[[for name, ud in pairs(UnitDefs) do
+	if (ud.unitname:sub(1,7) == "chicken") then
+		ud.buildcostmetal = ud.buildtime
+		ud.buildcostenergy = ud.buildtime
+	end
+end]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Category changes
 --
 for name, ud in pairs(UnitDefs) do
-  if ((ud.maxvelocity or 0) > 0) then
-	ud.category = ud.category .. " MOBILE"
-  end
+	if ((ud.maxvelocity or 0) > 0) then
+		ud.category = ud.category .. " MOBILE"
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -851,11 +893,11 @@ end
 -- Implement modelcenteroffset
 --
 for name, ud in pairs(UnitDefs) do
-    if ud.modelcenteroffset then
+	if ud.modelcenteroffset then
 		ud.customparams.aimposoffset = ud.modelcenteroffset
 		ud.customparams.midposoffset = ud.modelcenteroffset
 		ud.modelcenteroffset = "0 0 0"
-    end
+	end
 end
 
 -- Replace regeneration with Lua
@@ -917,8 +959,13 @@ end
 if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
-		if ud.buildcostmetal and tonumber(ud.buildcostmetal) > TRANSPORT_LIGHT_COST_MAX then
-			ud.customparams.requireheavytrans = 1
+		local buildCost = ud.buildcostmetal and tonumber(ud.buildcostmetal)
+		if buildCost then
+			if buildCost > TRANSPORT_MEDIUM_COST_MAX then
+				ud.customparams.requireheavytrans = 1
+			elseif buildCost > TRANSPORT_LIGHT_COST_MAX then
+				ud.customparams.requiremediumtrans = 1
+			end
 		end
 	end
 else
@@ -929,9 +976,9 @@ else
 	local valkMaxMass = valkDef.transportmass
 	local valkMaxSize = valkDef.transportsize
 	for name, ud in pairs (UnitDefs) do
-		if ud.mass > valkMaxMass
-		or ud.footprintx > valkMaxSize
-		or ud.footprintz > valkMaxSize then
+		if ud.mass > valkMaxMass or
+				ud.footprintx > valkMaxSize or
+				ud.footprintz > valkMaxSize then
 			ud.customparams.requireheavytrans = 1
 		end
 	end
@@ -939,5 +986,7 @@ end
 
 local ai_start_units = VFS.Include("LuaRules/Configs/ai_commanders.lua")
 for i = 1, #ai_start_units do
-	UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	if UnitDefs[ai_start_units[i]] then -- valid entries can still be nil in wiki exporter script
+		UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
+	end
 end

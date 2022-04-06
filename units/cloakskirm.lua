@@ -16,26 +16,25 @@ return { cloakskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead  = 60,
     modelradius    = [[18]],
     midposoffset   = [[0 6 0]],
     --reload_move_penalty = 0.8,
     cus_noflashlight = 1,
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[kbotskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 420,
   maxSlope               = 36,
   maxVelocity            = 2.3,
   maxWaterDepth          = 20,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SUB DRONE]],
   objectName             = [[sphererock.s3o]],
   script                 = "cloakskirm.lua",
   selfDestructAs         = [[BIG_UNITEX]],
@@ -54,7 +53,7 @@ return { cloakskirm = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 16,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
 
   weapons                = {
@@ -88,7 +87,6 @@ return { cloakskirm = {
 
       damage                  = {
         default = 180,
-        subs    = 9,
       },
 
       fireStarter             = 70,

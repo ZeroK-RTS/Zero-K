@@ -76,10 +76,15 @@ local transportToCmdDesc = {
   tooltip = 'Transport To location.',
 }
 
-local transDefs = {
-  [ UnitDefNames['gunshiptrans'].id ] = true,
-  [ UnitDefNames['gunshipheavytrans'].id ] = true,
-}
+local transDefs = {}
+
+for unitDefID = 1, #UnitDefs do
+  local ud = UnitDefs[unitDefID]
+
+  if (ud.isTransport) then
+    transDefs[unitDefID] = true
+  end
+end
 
 local hasTransports = {}
 

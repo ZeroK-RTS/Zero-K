@@ -29,7 +29,6 @@ local WHEEL_SPIN_DECEL_L = math.rad(15)
 
 local DEPLOY_SPEED = math.rad(90)
 local TURRET_SPEED = math.rad(60)
-local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
 local PIVOT_MOD = 1.6 --appox. equal to MAX_PIVOT / turnrate
@@ -40,6 +39,7 @@ local MIN_DIFF = math.rad(0.01)
 
 local smokePiece = {base, turret}
 
+--[[
 local function ImpactTilt(x,z)
 	Turn(base, z_axis, math.rad(-z), math.rad(105))
 	Turn(base, x_axis, math.rad(x), math.rad(105))
@@ -49,7 +49,6 @@ local function ImpactTilt(x,z)
 	Turn(base, x_axis, 0, math.rad(300))
 end
 
---[[
 function script.HitByWeapon(x, z)
 	StartThread(ImpactTilt, x, z)
 end

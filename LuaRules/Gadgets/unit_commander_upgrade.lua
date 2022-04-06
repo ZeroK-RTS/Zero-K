@@ -47,20 +47,10 @@ local commanderCloakShieldDef = {
 	growRate = 512,
 	shrinkRate = 2048,
 	selfCloak = true,
-	decloakDistance = 75,
 	isTransport = false,
-	
-	radiusException = {}
 }
 
 local COMMANDER_JAMMING_COST = 1.5
-
-for _, eud in pairs (UnitDefs) do
-	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
-		commanderCloakShieldDef.radiusException[eud.id] = true
-	end
-end
-
 local commAreaShield = WeaponDefNames["shieldshield_cor_shield_small"]
 
 local commAreaShieldDefID = {
@@ -93,7 +83,6 @@ end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
 	if (not weapon2) and weapon1 then
-		local unitDefID = Spring.GetUnitDefID(unitID)
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
 		if wd and wd.customParams and wd.customParams.manualfire then

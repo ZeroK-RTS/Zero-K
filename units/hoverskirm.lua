@@ -2,9 +2,9 @@ return { hoverskirm = {
   unitname            = [[hoverskirm]],
   name                = [[Scalpel]],
   description         = [[Skirmisher/Anti-Heavy Hovercraft]],
-  acceleration        = 0.2,
+  acceleration        = 0.24,
   activateWhenBuilt   = true,
-  brakeRate           = 2.05,
+  brakeRate           = 2.46,
   buildCostMetal      = 220,
   builder             = false,
   buildPic            = [[hoverskirm.png]],
@@ -19,25 +19,24 @@ return { hoverskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     modelradius    = [[25]],
-    turnatfullspeed = [[1]],
+    turnatfullspeed_hover = [[1]],
+    okp_damage = 615,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
-  maxDamage           = 680,
+  maxDamage           = 650,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM SATELLITE SUB MINE DRONE]],
   objectName          = [[nsaclash.s3o]],
   script              = [[hoverskirm.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
@@ -55,7 +54,7 @@ return { hoverskirm = {
   sightDistance       = 484,
   sonarDistance       = 484,
   turninplace         = 0,
-  turnRate            = 335,
+  turnRate            = 536,
   workerTime          = 0,
   
   weapons             = {
@@ -80,6 +79,7 @@ return { hoverskirm = {
       
       customParams        = {
         burst = Shared.BURST_RELIABLE,
+        force_ignore_ground = [[1]],
 
         light_camera_height = 3000,
         light_color = [[1 0.58 0.17]],
@@ -87,7 +87,7 @@ return { hoverskirm = {
       },
       
       damage                  = {
-        default = 330,
+        default = 310,
       },
 
       fireStarter             = 70,

@@ -18,7 +18,6 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetPlayerInfo       = Spring.GetPlayerInfo
-local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetPlayerList       = Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
@@ -32,12 +31,16 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, spGetTeamInfo(gaiateam, false))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
 local fixedStartPos = (modOptions.fixedstartpos == "1")
 local ordersToRemove
+
+local modStartMetal = START_METAL
+local modStartEnergy = START_ENERGY
+local modInnateMetal = INNATE_INC_METAL
+local modInnateEnergy = INNATE_INC_ENERGY
 
 local storageUnits = {
 	{
@@ -211,7 +214,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 	end
 
 	local startUnit
-	local commProfileID = nil
 
 	if isAI then -- AI that didn't pick comm type gets default comm
 		return UnitDefNames[Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_strike_base"].id
@@ -233,7 +235,6 @@ local function GetStartUnit(teamID, playerID, isAI)
 		local altComm = playerCommProfiles[commChoice[playerID]]
 		if altComm then
 			startUnit = playerCommProfiles[commChoice[playerID]].baseUnitDefID
-			commProfileID = commChoice[playerID]
 		end
 	end
 
@@ -393,11 +394,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (START_ENERGY + energy))
-		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (START_METAL + metal))
+		Spring.SetTeamResource(teamID, "energy", teamInfo.start_energy or (modStartEnergy + energy))
+		Spring.SetTeamResource(teamID, "metal", teamInfo.start_metal or (modStartMetal + metal))
 
 		if GG.Overdrive then
-			GG.Overdrive.AddInnateIncome(allyTeamID, INNATE_INC_METAL, INNATE_INC_ENERGY)
+			GG.Overdrive.AddInnateIncome(allyTeamID, modInnateMetal, modInnateEnergy)
 		end
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and
@@ -510,6 +511,25 @@ function gadget:GameStart()
 		return
 	end
 	gamestart = true
+	
+	-- check starting/innate resource modoptions
+	if (modOptions.startmetal and tonumber(modOptions.startmetal) and tonumber(modOptions.startmetal) >= 0) then
+		modStartMetal = modOptions.startmetal
+	end
+	if (modOptions.startenergy and tonumber(modOptions.startenergy) and tonumber(modOptions.startenergy) >= 0) then
+		modStartEnergy = modOptions.startenergy
+	end
+	if (modOptions.startresdelta and tonumber(modOptions.startresdelta) and tonumber(modOptions.startresdelta) > 0) then
+		local resdelta = math.random(0,modOptions.startresdelta)
+		modStartMetal = modStartMetal + resdelta
+		modStartEnergy = modStartEnergy + resdelta
+	end
+	if (modOptions.innatemetal and tonumber(modOptions.innatemetal) and tonumber(modOptions.innatemetal) >= 0) then
+		modInnateMetal = modOptions.innatemetal
+	end
+	if (modOptions.innateenergy and tonumber(modOptions.innateenergy) and tonumber(modOptions.innateenergy) >= 0) then
+		modInnateEnergy = modOptions.innateenergy
+	end
 
 	-- spawn units
 	for teamNum,team in ipairs(Spring.GetTeamList()) do
@@ -699,13 +719,6 @@ end
 -- unsynced code
 --------------------------------------------------------------------
 else
-
-local teamID 			= Spring.GetLocalTeamID()
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spValidUnitID 	= Spring.ValidUnitID
-local spAreTeamsAllied 	= Spring.AreTeamsAllied
-local spGetUnitTeam 	= Spring.GetUnitTeam
-
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction('CommSelection',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"

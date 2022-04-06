@@ -80,6 +80,14 @@ confdata.eopt = {}
 local function nullFunc()
 end
 
+local function SetWidgetEnableState(widget, state)
+	if state then
+		spSendCommands{"luaui enablewidget " .. widget}
+	else
+		spSendCommands{"luaui disablewidget " .. widget}
+	end
+end
+
 local function AddOption(path, option)
 	option.path = path or "Settings/Broken Paths"
 	if not option.key then
@@ -179,8 +187,9 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Common Team Colors']       = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Build ETA']                = imgPath..'epicmenu/stop_watch_icon.png',
-	['Settings/Interface/Defense and Cloak Ranges'] = imgPath..'epicmenu/target.png',
+	['Settings/Interface/Defence and Cloak Ranges'] = imgPath..'epicmenu/target.png',
 	['Settings/Interface/Command Visibility']       = imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
@@ -371,6 +380,7 @@ ShLabel('Hotkeys/Commands', 'Command Categories')
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
+	ShButton(HUDPath, 'Toggle Attrition Counter', function() spSendCommands{"luaui togglewidget Attrition Counter"} end, "Tracks killed and lost units (only in line of sight while playing)")
 
 local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	AddOption(HUDSkinPath,
@@ -403,8 +413,9 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 	{
 		name = 'Hardware Cursor',
 		type = 'bool',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		--advanced = true, -- The temp toggle is somewhat useful.
 		springsetting = 'HardwareCursor',
-		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
 	
@@ -484,7 +495,7 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"water " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 
@@ -497,13 +508,14 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"Shadows " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 	AddOption(pathGraphicsMap,
 	{
 		name = 'Shadow detail level',
-		desc = 'How detailed shadows are.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096, 8192, 16384},
 		springsetting = 'ShadowMapSize',
@@ -555,7 +567,8 @@ local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	AddOption(pathGraphicsExtras,
 	{
 		name = 'Particle density',
-		desc = 'How many visual effects can exist at the same time.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		min = 250,
 		max = 20000,
@@ -578,7 +591,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		min = 1,
 		max = 10000,
 		springsetting = 'UnitLodDist',
-		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end
+		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end,
+		advanced = true,
 	} )
 	AddOption(pathUnitVisiblity,
 	{
@@ -589,17 +603,58 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		springsetting = 'UnitIconDist',
 		OnChange = function(self)
 			spSendCommands{"disticon " .. self.value}
+			WG.resetIconDist = self.value
 		end
 	} )
 	AddOption(pathUnitVisiblity,
 	{
 		name = 'Shiny Units',
 		type = 'bool',
+		advanced = true,
 		springsetting = 'AdvUnitShading',
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
-	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
-	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+	ShLabel(pathUnitVisiblity, 'Unit Highlight Options')
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Halos',
+		desc = "Shows a thin halo of team colour around units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Halo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Baseplatter',
+		desc = "Highlight the base of units with a disk of their team colour.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Fancy Teamplatter", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Halo',
+		desc = "Add a large halo around selected and hovered units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Selection BlurryHalo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Shapes (default)',
+		desc = "Show appropriate shapes around the base of selected and hovered units. This is the default option.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			SetWidgetEnableState("UnitShapes", self.value)
+		end,
+	} )
 	
 	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
 	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
@@ -607,10 +662,12 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	local pathIconZoomTransition = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
+		ShButton(pathIconZoomTransition, 'Toggle Smooth Icon Zoom', function() spSendCommands{"luaui togglewidget Icon Zoom Transition"} end, "Draw both icons and models at medium zoom distance.")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
 				spSendCommands{"luaui disablewidget Outline No Shader"}
-				spSendCommands{"luaui togglewidget Outline Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader GL4"}
 			end, "Highlights edges of units")
 
 

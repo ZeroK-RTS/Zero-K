@@ -96,7 +96,7 @@ function StockpileChanged(newStock)
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {piece("smoke1", "smoke2", "smoke3")})
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)

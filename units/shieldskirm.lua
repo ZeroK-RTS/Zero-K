@@ -16,23 +16,22 @@ return { shieldskirm = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    aim_lookahead  = 80,
     aimposoffset   = [[0 5 0]],
     midposoffset   = [[0 5 0]],
     modelradius    = [[14]],
+    bait_level_default = 0,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerskirm]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 580,
+  maxDamage              = 540,
   maxSlope               = 36,
-  maxVelocity            = 1.95,
+  maxVelocity            = 1.9,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
@@ -54,7 +53,7 @@ return { shieldskirm = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2200,
+  turnRate               = 2376,
   upright                = true,
 
   weapons                = {
@@ -82,9 +81,8 @@ return { shieldskirm = {
       },
       
       damage                  = {
-        default = 350,
-        planes  = 350,
-        subs    = 17.5,
+        default = 345,
+        planes  = 345,
       },
 
       fireStarter             = 70,
@@ -102,13 +100,13 @@ return { shieldskirm = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
-      startVelocity           = 192,
+      startVelocity           = 190,
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
       turret                  = true,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 192,
+      weaponVelocity          = 190,
     },
 
   },

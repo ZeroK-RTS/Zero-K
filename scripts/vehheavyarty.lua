@@ -142,7 +142,7 @@ function script.BlockShot(num, targetID)
 	end
 	-- Seperation check is not required as the physics of the missile seems to result in a
 	-- time to impact of between 140 and 150 frames in almost all cases.
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, GG.OverkillPrevention_GetHealthThreshold(targetID, 800.1, 720.1), 150, false, false, true) then
 		return true
 	end
 	return false

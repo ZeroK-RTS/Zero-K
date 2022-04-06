@@ -2,8 +2,8 @@ return { tankaa = {
   unitname               = [[tankaa]],
   name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
-  acceleration           = 0.3,
-  brakeRate              = 1.5,
+  acceleration           = 0.36,
+  brakeRate              = 1.8,
   buildCostMetal         = 500,
   builder                = false,
   buildPic               = [[tankaa.png]],
@@ -17,6 +17,7 @@ return { tankaa = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[19]],
   },
 
@@ -24,20 +25,18 @@ return { tankaa = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[tankaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maneuverleashlength    = [[30]],
   maxDamage              = 1400,
   maxSlope               = 18,
   maxVelocity            = 3.2,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[corsent.s3o]],
+  script                 = [[tankaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   
   sfxtypes               = {
@@ -54,7 +53,7 @@ return { tankaa = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 653,
+  turnRate               = 1044,
   upright                = false,
   workerTime             = 0,
 
@@ -91,7 +90,6 @@ return { tankaa = {
       damage                  = {
         default = 9,
         planes  = 90,
-        subs    = 4.5,
       },
 
       edgeEffectiveness       = 0.85,

@@ -12,8 +12,6 @@ end
 
 include("LuaRules/Configs/constants.lua")
 
-local spGetAllyTeamList = Spring.GetAllyTeamList
-local spIsGameOver      = Spring.IsGameOver
 local spGetTeamInfo     = Spring.GetTeamInfo
 local gaiaTeamID        = Spring.GetGaiaTeamID()
 
@@ -29,8 +27,6 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local spAreTeamsAllied      = Spring.AreTeamsAllied
-local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetTeamStatsHistory = Spring.GetTeamStatsHistory
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitTeam         = Spring.GetUnitTeam
@@ -110,11 +106,18 @@ local staticO_big = {
 	raveparty = 1,
 }
 
+--[[ Note that units need to still be alive by the time
+     damage is dealt. This means that the death explosion
+     has to have an instant shockwave or the unit has to
+     be hidden (as happens with Limpet and Puppy). ]]
 local kamikaze = {
 	shieldbomb=1,
 	jumpbomb=1,
 	gunshipbomb=1,
 	jumpscout=1,
+	amphbomb=1,
+	subscout=1,
+	chicken_dodo=1,
 }
 
 local flamerWeaponDefs = {}
@@ -358,6 +361,8 @@ local function ProcessAwardData()
 					message = 'Stunned value: ' .. maxValWrite
 				elseif awardType == 'slow' then
 					message = 'Slowed value: ' .. maxValWrite
+				elseif awardType == 'disarm' then
+					message = 'Disarmed value: ' .. maxValWrite
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
@@ -421,18 +426,22 @@ function gadget:Initialize()
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-
 	end
 
-	local boatFacs = {'factoryship', 'striderhub'}
-	for _, boatFac in pairs(boatFacs) do
-		local udBoatFac = UnitDefNames[boatFac]
-		if udBoatFac then
-			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
-					boats[boatDefID] = true
-				end
-			end
+	local shipSMClass = Game.speedModClasses.Ship
+	for i = 1, #UnitDefs do
+		local ud = UnitDefs[i]
+
+		--[[ NB: ships that extend legs and walk onto land, like
+		     the SupCom Cybran Siren or RA3 Soviet Stingray, are
+		     technically hovercraft in Spring so would need some
+		     extra handling AFAIK. No such ship in vanilla ZK. ]]
+		if (ud.moveDef.smClass == shipSMClass) then
+			boats[i] = true
+		end
+
+		if ud.customParams.dynamic_comm then
+			comms[i] = true
 		end
 	end
 
@@ -442,12 +451,6 @@ function gadget:Initialize()
 			flamerWeaponDefs[i] = true
 		end
 	end
-
-	for i=1,#UnitDefs do
-		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
-	end
- end
-
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -526,6 +529,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
 		damage = damage + hp
+	end
+	if damage < 0 then
+		-- can happen with the EMP component of mixed weapons, when last-hitting
+		return
 	end
 	AddAwardPoints( 'ouch', unitTeam, damage )
 
@@ -615,8 +622,6 @@ end
 else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-local spSendCommands  = Spring.SendCommands
 
 local teamNames     = {}
 local awardList

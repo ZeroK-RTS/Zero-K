@@ -1,7 +1,6 @@
 -- TODO: CACHE INCLUDE FILE
 -- May not be worth it due to the rarity of comms, and the complexity of this file.
 local INLOS = {inlos = true}
-local spSetUnitShieldState = Spring.SetUnitShieldState
 
 local dgunTable
 local weapon1
@@ -287,6 +286,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, da
 		end
 	end
 	Spring.SetUnitMaxRange(unitID, maxRange)
+	Spring.SetUnitRulesParam(unitID, "comm_max_range", maxRange, INLOS)
 	
 	Spring.SetUnitRulesParam(unitID, "sightRangeOverride", math.max(500, math.min(600, maxRange*1.1)), INLOS)
 	
@@ -336,9 +336,11 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	local heading = math.random(65536)
 	local mag = 60 + math.random()*(30 + 5*math.min(totalCount, 15))
 	local horScale = mag*math.cos(pitch)
-	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
-	
-	local featureID = Spring.CreateFeature(featureDefID, x + vx, y, z + vz, heading, teamID)
+
+	local dx = vx + math.cos(dir)*horScale
+	local dz = vz + math.sin(dir)*horScale
+
+	local featureID = Spring.CreateFeature(featureDefID, x + dx, y, z + dz, heading, teamID)
 end
 
 local function SpawnModuleWrecks(wreckLevel)

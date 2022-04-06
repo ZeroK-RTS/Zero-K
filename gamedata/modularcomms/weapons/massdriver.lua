@@ -18,7 +18,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 270,
-		subs    = 13.5,
 	},
 
 	explosionGenerator      = [[custom:plasma_hit_32]],

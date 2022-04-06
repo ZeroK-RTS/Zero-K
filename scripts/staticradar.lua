@@ -50,7 +50,6 @@ local function TargetingLaser()
 		Sleep(20)
 	end
 end
-]]
 local index = 0
 local function ScannerLoop()
 	while true do
@@ -66,6 +65,7 @@ local function ScannerLoop()
 	Sleep(SCANNER_PERIOD)
 	end
 end
+]]
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)

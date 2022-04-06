@@ -30,7 +30,7 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local unit = {}
 local unitByID = {data = {}, count = 0}
 
-local unitDefData, waterCannonIterable, waterCannonIndexable = include("LuaRules/Configs/water_effect_defs.lua")
+local unitDefData = VFS.Include("LuaRules/Configs/water_effect_defs.lua")
 
 for id, data in pairs(UnitDefs) do
 	if data.customParams then
@@ -74,7 +74,7 @@ local function updateWeaponFromTank(unitID)
 
 end
 
-function shotWaterWeapon(unitID)
+function GG.shotWaterWeapon(unitID)
 	
 	local data = unit[unitID]
 	local effect = unitDefData[data.unitDefID]
@@ -102,8 +102,6 @@ function shotWaterWeapon(unitID)
 	
 	Spring.SetUnitRulesParam(unitID,"watertank",data.storage, LOS_ACCESS)
 end
-
-GG.shotWaterWeapon = shotWaterWeapon
 
 function gadget:GameFrame(n)
 	

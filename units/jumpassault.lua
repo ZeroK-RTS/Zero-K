@@ -19,20 +19,21 @@ return { jumpassault = {
     jump_speed         = 4,
     jump_reload        = 10,
     jump_from_midair   = 1,
+
+    outline_x = 125,
+    outline_y = 125,
+    outline_yoff = 21,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[jumpjetassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 6000,
   maxSlope            = 36,
   maxVelocity         = 1.81,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -54,7 +55,7 @@ return { jumpassault = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1200,
+  turnRate            = 1440,
   upright             = true,
   workerTime          = 0,
 
@@ -91,7 +92,6 @@ return { jumpassault = {
 
       damage                  = {
         default = 300.1,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
@@ -101,6 +101,7 @@ return { jumpassault = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       lodDistance             = 10000,
+      minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 125,
       reloadtime              = 1,

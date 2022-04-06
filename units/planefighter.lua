@@ -13,8 +13,8 @@ return { planefighter = {
   category               = [[FIXEDWING]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
-  collisionVolumeScales  = [[25 8 40]],
-  collisionVolumeType    = [[box]],
+  collisionVolumeScales  = [[30 14 50]],
+  collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 10]],
   selectionVolumeScales  = [[50 50 70]],
   selectionVolumeType    = [[cylZ]],
@@ -23,8 +23,10 @@ return { planefighter = {
   cruiseAlt              = 200,
 
   customParams           = {
+    bait_level_default = 0,
 
     specialreloadtime = [[850]],
+    specialreload_userate = [[1]],
     boost_speed_mult = 5,
     boost_accel_mult = 6,
     boost_duration = 30, -- frames
@@ -32,8 +34,13 @@ return { planefighter = {
     fighter_pullup_dist = 400,
 
     midposoffset   = [[0 3 0]],
-    modelradius    = [[5]],
+    modelradius    = [[10]],
     refuelturnradius = [[80]],
+    okp_damage = 130,
+
+    outline_x = 85,
+    outline_y = 85,
+    outline_yoff = 16,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -43,14 +50,11 @@ return { planefighter = {
   footprintZ             = 2,
   frontToSpeed           = 0,
   iconType               = [[fighter]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maneuverleashlength    = [[1280]],
   maxAcc                 = 0.5,
   maxDamage              = 300,
   maxRudder              = 0.007,
   maxVelocity            = 13,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
@@ -111,7 +115,6 @@ return { planefighter = {
 
       damage                  = {
         default = 7.1,
-        subs    = 0.36,
       },
 
       duration                = 0.012,
@@ -122,7 +125,7 @@ return { planefighter = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       lodDistance             = 10000,
-      range                   = 700,
+      range                   = 667,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -158,7 +161,6 @@ return { planefighter = {
       damage                  = {
         default = 13.5,
         planes  = 135,
-        subs    = 13.5,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],
@@ -168,7 +170,7 @@ return { planefighter = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       metalpershot            = 0,
-      model                   = [[wep_m_fury.s3o]],
+      model                   = [[wep_m_fury.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 530,
       reloadtime              = 5.2,
@@ -176,6 +178,7 @@ return { planefighter = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 200,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 22000,
       tracks                  = true,

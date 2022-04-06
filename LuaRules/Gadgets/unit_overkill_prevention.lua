@@ -57,69 +57,18 @@ local lastGain = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
--- Value is the default state of the command
-local HandledUnitDefIDs = {
-	[UnitDefNames["turretmissile"].id] = 1,
-	[UnitDefNames["turretaafar"].id] = 1,
-	[UnitDefNames["hoverskirm"].id] = 1,
-	[UnitDefNames["hoverdepthcharge"].id] = 1,
-	[UnitDefNames["turretaaclose"].id] = 1,
-	[UnitDefNames["turretaaheavy"].id] = 1,
-	[UnitDefNames["amphaa"].id] = 1,
-	[UnitDefNames["jumpscout"].id] = 1,
-	[UnitDefNames["planefighter"].id] = 1,
-	[UnitDefNames["hoveraa"].id] = 1,
-	[UnitDefNames["tankraid"].id] = 1,
-	[UnitDefNames["spideraa"].id] = 1,
-	[UnitDefNames["vehaa"].id] = 1,
-	[UnitDefNames["gunshipaa"].id] = 1,
-	[UnitDefNames["gunshipskirm"].id] = 1,
-	[UnitDefNames["gunshipassault"].id] = 1,
-	[UnitDefNames["cloaksnipe"].id] = 1,
-	[UnitDefNames["amphraid"].id] = 1,
-	[UnitDefNames["amphimpulse"].id] = 1,
-	[UnitDefNames["amphriot"].id] = 1,
-	[UnitDefNames["shieldaa"].id] = 1,
-	[UnitDefNames["vehsupport"].id] = 1,
-	[UnitDefNames["tankriot"].id] = 1, --HT's banisher
-	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
-	[UnitDefNames["bomberprec"].id] = 1,
-	[UnitDefNames["bomberstrike"].id] = 1,
-	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
-	[UnitDefNames["shiptorpraider"].id] = 1,
-	[UnitDefNames["shipskirm"].id] = 1,
-	[UnitDefNames["subraider"].id] = 1,
-	[UnitDefNames["turretheavylaser"].id] = 1,
-	[UnitDefNames["amphassault"].id] = 1,
-
-	-- Static only OKP below
-	[UnitDefNames["amphfloater"].id] = 1,
-	[UnitDefNames["vehheavyarty"].id] = 1,
-	[UnitDefNames["shieldskirm"].id] = 1,
-	[UnitDefNames["shieldassault"].id] = 1,
-	[UnitDefNames["spiderassault"].id] = 1,
-	[UnitDefNames["cloakskirm"].id] = 1,
-	[UnitDefNames["cloakarty"].id] = 1,
-	[UnitDefNames["tankarty"].id] = 1,
-	[UnitDefNames["striderdetriment"].id] = 1,
-	[UnitDefNames["shipassault"].id] = 1,
-	[UnitDefNames["shiparty"].id] = 1,
-	[UnitDefNames["spiderskirm"].id] = 1,
-
-	-- Needs LUS
-	--[UnitDefNames["tankassault"].id] = 1,
-	--[UnitDefNames["vehassault"].id] = 1,
-	--[UnitDefNames["tankheavyassault"].id] = 1,
-}
+local handledUnitDefIDs = include("LuaRules/Configs/overkill_prevention_defs.lua")
 
 local shieldPowerDef = {}
 local shieldRegenDef = {}
+local maxEffectiveHealth = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.customParams.shield_power then
 		shieldPowerDef[i] = ud.customParams.shield_power
 		shieldRegenDef[i] = ud.customParams.shield_rate/30
 	end
+	maxEffectiveHealth[i] = (ud.health / ud.armoredMultiple + (shieldPowerDef[i] or 0))
 end
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -160,11 +109,23 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	return false
 end
 
+function GG.OverkillPrevention_GetHealthThreshold(targetID, realDamage, fudgeDamage)
+	-- Don't do this on unidentified radar dots
+	local _, maxHealth = Spring.GetUnitHealth(targetID)
+	if not maxHealth then
+		return fudgeDamage
+	end
+	if maxHealth <= realDamage then
+		return realDamage
+	end
+	return fudgeDamage
+end
+
 local function IsUnitIdentifiedStructure(identified, unitID)
 	if not identified then
 		return false
 	end
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return false
 	end
@@ -211,9 +172,11 @@ end
 	noFire -- The unit is just testing whether it would be blocked. It is not neccessarily creating a projectile frrom this test.
 ]]--
 local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly, noFire)
+	-- Testing
+	--Spring.Utilities.UnitEcho(unitID, timeout + gameFrame)
 
 	-- Modify timeout based on unit speed and fastMult
-	local unitDefID = Spring.GetUnitDefID(targetID)
+	local unitDefID = spGetUnitDefID(targetID)
 	if fastMult and fastMult ~= 1 then
 		if fastUnitDefs[unitDefID] then
 			timeout = timeout * (fastMult or 1)
@@ -225,12 +188,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetInLoS = (targetVisiblityState == 15)
-	local targetIdentified = (targetVisiblityState > 2)
+	local targetIdentified = targetInLoS or (math.floor(targetVisiblityState / 4) % 4 == 3)
 
 	-- When true, the projectile damage will be added to the damage to be taken by the unit.
 	-- When false, it will only check whether the shot should be blocked.
 	local addToIncomingDamage = not noFire
-
 	if staticOnly and not noFire then
 		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
 	end
@@ -254,8 +216,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	else
 		timeout = timeout * (radarMult or 1)
-		local ud = UnitDefs[unitDefID]
-		adjHealth = (targetIdentified and (ud.health/ud.armoredMultiple + (shieldPowerDef[unitDefID] or 0))) or false
+		adjHealth = (targetIdentified and maxEffectiveHealth[unitDefID]) or false
 		disarmFrame = (targetIdentified and gameFrame) or false
 	end
 
@@ -273,11 +234,8 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				if frame < gameFrame then
 					incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 				else
-					local dataDisarmDamage = data.disarmDamage
-					local dataFullDamage = data.fullDamage
-
-					local disarmExtra = math.floor(dataDisarmDamage/adjHealth*DECAY_FRAMES)
-					adjHealth = adjHealth - dataFullDamage
+					local disarmExtra = math.floor(data.disarmDamage/adjHealth*DECAY_FRAMES)
+					adjHealth = adjHealth - data.fullDamage
 
 					disarmFrame = disarmFrame + disarmExtra
 					if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then
@@ -340,7 +298,9 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	end
 
-	lastShot[unitID] = targetID
+	if not noFire then
+		lastShot[unitID] = targetID
+	end
 	return false
 end
 
@@ -426,11 +386,16 @@ end
 --------------------------------------------------------------------------------
 -- Unit Handling
 
+-- Testing
+--function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,  weaponID, attackerID, attackerDefID, attackerTeam)
+--    Spring.Utilities.UnitEcho(unitID, Spring.GetGameFrame())
+--end
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if HandledUnitDefIDs[unitDefID] then
+	if handledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
-		PreventOverkillToggleCommand(unitID, {HandledUnitDefIDs[unitDefID]})
+		PreventOverkillToggleCommand(unitID, {handledUnitDefIDs[unitDefID]})
 	end
 end
 
@@ -454,7 +419,7 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end

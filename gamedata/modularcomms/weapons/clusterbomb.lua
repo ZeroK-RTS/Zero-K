@@ -20,13 +20,12 @@ local weaponDef = {
 
 		light_camera_height = 2500,
 		light_color = [[0.22 0.19 0.05]],
-		light_radios = 380,
+		light_radius = 380,
 		reaim_time = 1,
 	},
 
 	damage                  = {
 		default = 300,
-		subs    = 15,
 	},
 
 	explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],

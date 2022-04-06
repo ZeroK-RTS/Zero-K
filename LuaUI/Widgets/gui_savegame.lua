@@ -4,7 +4,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Save Game Menu",
-		desc      = "bla",
+		desc      = "Implements autosaves and the save menu",
 		author    = "KingRaptor",
 		date      = "2016.11.24",
 		license   = "GNU GPL, v2 or later",
@@ -19,7 +19,7 @@ local SAVEGAME_BUTTON_HEIGHT = 128
 local SAVE_DIR = "Saves"
 local SAVE_DIR_LENGTH = string.len(SAVE_DIR) + 2
 local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
-local MAX_SAVES = 999
+local MAX_SAVES = 99999
 
 local LOAD_GAME_STRING = "loadFilename "
 local SAVE_TYPE = (Spring.Utilities.IsCurrentVersionNewerThan(104, 1322) and "save ") or "luasave "
@@ -66,18 +66,6 @@ options =
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Makes a control grey for disabled, or whitish for enabled
-local function SetControlGreyout(control, state)
-	if state then
-		control.backgroundColor = {0.4, 0.4, 0.4, 1}
-		control.font.color = {0.4, 0.4, 0.4, 1}
-		control:Invalidate()
-	else
-		control.backgroundColor = {.8,.8,.8,1}
-		control.font.color = nil
-		control:Invalidate()
-	end
-end
 
 local function WriteDate(dateTable)
 	return string.format("%02d/%02d/%04d", dateTable.day, dateTable.month, dateTable.year)
@@ -192,14 +180,14 @@ end
 
 -- e.g. if save slots 1, 2, 5, and 7 are used, return 3
 -- only use for save name fallback
-local function FindFirstEmptySaveSlot()
+local function FindFirstEmptySaveSlot(name)
 	for i = 0, MAX_SAVES do
-		local num = string.format("%03d", i)
-		if not VFS.FileExists(SAVE_DIR .. "/save" .. num .. ".lua") then
-			return i
+		local num = string.format("%05d", i)
+		if not VFS.FileExists(SAVE_DIR .. "/" .. name.. num .. ".lua") then
+			return name .. string.format("%05d", i)
 		end
 	end
-	return MAX_SAVES
+	return name .. string.format("%05d", MAX_SAVES)
 end
 
 local function GetSaveDescText(saveFile)
@@ -220,11 +208,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 local function SaveGame(filename, description, requireOverwrite)
 	local success, err = pcall(
 		function()
 			Spring.CreateDir(SAVE_DIR)
-			filename = (filename and trim(filename)) or ("save" .. string.format("%03d", FindFirstEmptySaveSlot()))
+			filename = (filename and trim(filename)) or  FindFirstEmptySaveSlot("save")
 			path = SAVE_DIR .. "/" .. filename .. ".lua"
 			local saveData = {}
 			--saveData.filename = filename
@@ -256,7 +245,9 @@ local function SaveGame(filename, description, requireOverwrite)
 	)
 	if (not success) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error saving game: " .. err)
+		return false
 	end
+	return filename
 end
 
 local function LoadGameByFilename(filename)
@@ -561,6 +552,7 @@ end
 --------------------------------------------------------------------------------
 -- callins
 --------------------------------------------------------------------------------
+
 function widget:Initialize()
 	Chili = WG.Chili
 	Control = Chili.Control
@@ -577,6 +569,21 @@ end
 
 function widget:Shutdown()
 
+end
+
+function widget:RecvLuaMsg(msg, playerID)
+	if msg == "MatchmakerAutosaveRequired" then
+		local description = "Autosave"
+		if WG.campaign_planetInformation and WG.campaign_planetInformation.name then
+			description = description .. " on planet " .. WG.campaign_planetInformation.name .. "."
+		else
+			description = description .. " from a skirmish game."
+		end
+		local saveName = SaveGame(FindFirstEmptySaveSlot("SaveMM"), description)
+		if saveName then
+			Spring.SendLuaMenuMsg("autosaveComplete_" .. saveName)
+		end
+	end
 end
 
 function widget:GameFrame(n)

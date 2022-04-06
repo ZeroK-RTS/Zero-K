@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 local myteam = Spring.GetMyTeamID()
-local UPDATE_FRAME=5
+local UPDATE_FRAME=30
 local ConStack = {}
 local GetUnitPosition = Spring.GetUnitPosition
 local GiveOrderToUnit = Spring.GiveOrderToUnit
@@ -76,21 +76,19 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if UnitDefs[unitDefID].canReclaim and not UnitDefs[unitDefID].isFactory and (unitTeam==GetMyTeamID()) then
-			ConStack[unitID] = ConController:new(unitID);
+			ConStack[unitID%UPDATE_FRAME][unitID] = ConController:new(unitID);
 		end
 end
 
 function widget:UnitDestroyed(unitID)
-	if not (ConStack[unitID]==nil) then
-		ConStack[unitID]=ConStack[unitID]:unset();
+	if not (ConStack[unitID%UPDATE_FRAME][unitID]==nil) then
+		ConStack[unitID%UPDATE_FRAME][unitID]=ConStack[unitID%UPDATE_FRAME][unitID]:unset();
 	end
 end
 
 function widget:GameFrame(n)
-	if (n%UPDATE_FRAME==0 and n > 30) then
-		for _,Con in pairs(ConStack) do
-			Con:handle()
-		end
+	for _,Con in pairs(ConStack[n%UPDATE_FRAME]) do
+		Con:handle()
 	end
 end
 
@@ -128,11 +126,14 @@ function widget:Initialize()
 	DisableForCommshare()
 	local units = Spring.GetTeamUnits(Spring.GetMyTeamID())
 	-- Echo("IdleConAssist initializing")
+	for i=0, UPDATE_FRAME + 1 do
+		ConStack[i] = {}
+	end
 	for i=1, #units do
 		DefID = GetUnitDefID(units[i])
 		if (UnitDefs[DefID].canReclaim and not UnitDefs[DefID].isFactory)  then
-			if (ConStack[units[i]]==nil) then
-				ConStack[units[i]]=ConController:new(units[i])
+			if (ConStack[units[i]%UPDATE_FRAME][units[i]]==nil) then
+				ConStack[units[i]%UPDATE_FRAME][units[i]]=ConController:new(units[i])
 			end
 		end
 	end

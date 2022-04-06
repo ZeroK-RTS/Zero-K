@@ -31,12 +31,6 @@ local padnum = 1
 local missiles = {}
 
 --------------------------------------------------------------------------------
--- signals
---------------------------------------------------------------------------------
-local SIG_AIM = 2
-
-
---------------------------------------------------------------------------------
 -- main code
 --------------------------------------------------------------------------------
 function SetPadNum(num)
@@ -51,6 +45,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	Spring.SetUnitNanoPieces(unitID, {trolleyb})
 end
 
 function script.StartBuilding()
@@ -66,10 +61,6 @@ end
 
 function script.Deactivate()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-end
-
-function script.QueryNanoPiece()
-	return trolleyb
 end
 
 function script.QueryBuildInfo()

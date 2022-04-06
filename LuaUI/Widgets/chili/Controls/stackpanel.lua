@@ -12,6 +12,7 @@ StackPanel = LayoutPanel:Inherit{
 	resizeItems = true,
 	itemPadding = {0, 0, 0, 0},
 	itemMargin  = {5, 5, 5, 5},
+	noFont = true,
 }
 
 local this = StackPanel

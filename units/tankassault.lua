@@ -2,8 +2,8 @@ return { tankassault = {
   unitname            = [[tankassault]],
   name                = [[Minotaur]],
   description         = [[Assault Tank]],
-  acceleration        = 0.119,
-  brakeRate           = 0.479,
+  acceleration        = 0.144,
+  brakeRate           = 0.576,
   buildCostMetal      = 850,
   builder             = false,
   buildPic            = [[tankassault.png]],
@@ -17,29 +17,31 @@ return { tankassault = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     aimposoffset      = [[0 0 0]],
     midposoffset      = [[0 0 0]],
     modelradius       = [[25]],
     selection_scale   = 0.92,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 13.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[tankassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 6800,
   maxSlope            = 18,
   maxVelocity         = 2.45,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK4]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB DRONE]],
   objectName          = [[correap.s3o]],
-  script              = [[tankassault.cob]],
+  script              = [[tankassault.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -56,7 +58,7 @@ return { tankassault = {
   trackType           = [[StdTank]],
   trackWidth          = 42,
   turninplace         = 0,
-  turnRate            = 364,
+  turnRate            = 583,
   workerTime          = 0,
 
   weapons             = {
@@ -80,14 +82,8 @@ return { tankassault = {
       craterBoost             = 0,
       craterMult              = 0,
 
-      customParams        = {
-        reaim_time = 8, -- COB
-      },
-
       damage                  = {
-        default = 320,
-        planes  = 320,
-        subs    = 16,
+        default = 320.1,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],

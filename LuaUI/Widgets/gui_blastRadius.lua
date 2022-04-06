@@ -1,4 +1,3 @@
--- $Id$
 include("keysym.lua")
 local versionNumber = "1.1"
 
@@ -18,20 +17,16 @@ end
 local blastCircleDivs = 64
 local blastLineWidth = 2.0
 local blastAlphaValue = 0.5
---local blastImage = "LuaUI/Images/explosive.png"
-local updateInt = 1 --seconds for the ::update loop
 
 --------------------------------------------------------------------------------
 local blastColor = { 1.0, 0.0, 0.0 }
 local expBlastAlphaValue = 1.0
 local expBlastColor = { 1.0, 0.0, 0.0}
 
---local lastTimeUpdate = 0
 local lastColorChangeTime = 0.0
 local selfdCycleDir = false
 local selfdCycleTime = 0.3
 local expCycleTime = 0.5
-local mapSquareSize = 16
 
 -------------------------------------------------------------------------------
 
@@ -46,21 +41,16 @@ local spGetSelectedUnits    = Spring.GetSelectedUnits
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetActiveCommand 	= Spring.GetActiveCommand
 local spGetActiveCmdDesc 	= Spring.GetActiveCmdDesc
 local spGetMouseState       = Spring.GetMouseState
 local spTraceScreenRay      = Spring.TraceScreenRay
-local spGetMyPlayerID       = Spring.GetMyPlayerID
-local spGetPlayerInfo       = Spring.GetPlayerInfo
 local spEcho                = Spring.Echo
 local spGetBuildFacing	    = Spring.GetBuildFacing
 local spPos2BuildPos        = Spring.Pos2BuildPos
 
-local glBeginEnd            = gl.BeginEnd
 local glColor               = gl.Color
 local glLineStipple         = gl.LineStipple
 local glLineWidth           = gl.LineWidth
-local glDepthTest           = gl.DepthTest
 local glTexture             = gl.Texture
 local glDrawGroundCircle    = gl.DrawGroundCircle
 local glPopMatrix           = gl.PopMatrix
@@ -68,14 +58,10 @@ local glPushMatrix          = gl.PushMatrix
 local glTranslate           = gl.Translate
 local glBillboard           = gl.Billboard
 local glText                = gl.Text
-local glTexRect             = gl.TexRect
-local glTexCoord            = gl.TexCoord
-local glVertex              = gl.Vertex
 
 local max					= math.max
 local min					= math.min
 local sqrt					= math.sqrt
-local abs					= math.abs
 local lower                 = string.lower
 local floor                 = math.floor
 
@@ -88,20 +74,6 @@ local alwaysDisplay = {
 }
 
 -----------------------------------------------------------------------------------
-function widget:Update()
-	local timef = spGetGameSeconds()
-	local time = floor(timef)
-	
-	-- update timers once every <updateInt> seconds
-	--if (time % updateInt == 0 and time ~= lastTimeUpdate) then
-	--	lastTimeUpdate = time
-	--	--do update stuff:
-	--
-	--	if ( CheckSpecState() == false ) then
-	--		return false
-	--	end
-	--end
-end
 
 function widget:DrawWorld()
 	glLineStipple(true)
@@ -162,10 +134,8 @@ function DrawBuildMenuBlastRange()
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
 	
 	if (not cmd_id) then return end
-	--printDebug("Cmds: idx: " .. idx .. " cmd_id: " .. cmd_id .. " cmd_type: " .. cmd_type .. " cmd_name: " .. cmd_name )
 	
 	--check if META is pressed
-	--local keyPressed = spGetKeyState(KEYSYMS.X )
 	local alt,ctrl,meta,shift = spGetModKeyState()
 		
 	if ( not meta ) and not (alwaysDisplay[-cmd_id]) then --and keyPressed) then
@@ -200,40 +170,18 @@ function DrawBuildMenuBlastRange()
 	local centerZ = coords[3]
 		
 	centerX, _, centerZ = spPos2BuildPos( unitDefID, centerX, 0, centerZ, spGetBuildFacing() )
-	--this replaced the following
-	--subsample to map grid
---[[
-	if (udef.xsize % 4 ~= 2) then
-		centerX = floor(centerX / mapSquareSize + 0.5) * mapSquareSize
-	else
-		centerX = (floor(centerX / mapSquareSize) + 0.5) * mapSquareSize
-	end
-	
-	if (udef.zsize % 4 ~= 2) then
-		centerZ = floor(centerZ / mapSquareSize + 0.5) * mapSquareSize
-	else
-		centerZ = (floor(centerZ / mapSquareSize) + 0.5) * mapSquareSize
-	end
---]]
 	glLineWidth(blastLineWidth)
 	glColor( expBlastColor[1], expBlastColor[2], expBlastColor[3], blastAlphaValue )
 	
 	--draw static ground circle
 	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
 
-	--dynamic ground circle -- sucks
-	--glDrawGroundCircle(centerX, 0, centerZ, blastRadius * (( spGetGameSeconds() % 3 ) / 3.0 ), blastCircleDivs )
-	
 	local height = Spring.GetGroundHeight(centerX,centerZ)
-	local halfSquare = blastRadius*0.5
 	
 	--draw EXPLODE text and icon
 	glPushMatrix()
 	
 	glTranslate(centerX , height, centerZ)
-	--gl.Rotate(90,1,0,0)
-	--glTexRect(-halfSquare, halfSquare, halfSquare, -halfSquare)
-	--gl.Rotate(-90,1,0,0)
 	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 	glBillboard()
 	glText( defaultDamage, 0.0, 0.0, sqrt(blastRadius), "cn")
@@ -264,7 +212,6 @@ function DrawUnitBlastRadius( unitID )
 		deathblastDamage = weapTab[deathBlasId].customParams.shield_damage
 					
 		local height = Spring.GetGroundHeight(x,z)
-		local halfSquare = deathblastRadius*0.5
 					
 		glLineWidth(blastLineWidth)
 		glColor( blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
@@ -272,9 +219,6 @@ function DrawUnitBlastRadius( unitID )
 				
 		glPushMatrix()
 		glTranslate(x , height, z)
-		--gl.Rotate(90,1,0,0)
-		--glTexRect(-halfSquare, halfSquare, halfSquare, -halfSquare)
-		--gl.Rotate(-90,1,0,0)
 		glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 		glBillboard()
 		text = blastDamage --text = "SELF-D"
@@ -293,7 +237,6 @@ function DrawUnitBlastRadius( unitID )
 			glTranslate(x - ( deathblastRadius / 2 ), height , z  + ( deathblastRadius / 2) )
 			glBillboard()
 			glText( deathblastDamage , 0.0, 0.0, sqrt(deathblastRadius), "cn")
-			--glText("EXPLODE" , 0.0, 0.0, sqrt(deathblastRadius), "cn")
 			glPopMatrix()
 		end
 	end
@@ -303,14 +246,6 @@ function DrawBlastRadiusSelectedUnits()
 	glLineWidth(blastLineWidth)
   	  
 	local units = spGetSelectedUnits()
-        
-	local deathBlasId
-	local blastId
-	local blastRadius
-	local blastDamage
-	local deathblastRadius
-	local deathblastDamage
-	local text
 	for i,unitID in ipairs(units) do
 		DrawUnitBlastRadius( unitID )
 	end
@@ -322,38 +257,6 @@ end
 function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
-	glDepthTest(false)
 	glTexture(false)
 	glLineStipple(false)
-end
-
---[[
-function CheckSpecState()
-	local playerID = spGetMyPlayerID()
-	local _, _, spec = spGetPlayerInfo(playerID, false)
-		
-	if ( spec == true ) then
-		spEcho("<Blast Radius> Spectator mode. Widget removed.")
-		widgetHandler:RemoveWidget()
-		return false
-	end
-	
-	return true
-end
---]]
-
-function printDebug( value )
-	if ( debug ) then
-		if ( type( value ) == "boolean" ) then
-			if ( value == true ) then spEcho( "true" )
-				else spEcho("false") end
-		elseif ( type(value ) == "table" ) then
-			spEcho("Dumping table:")
-			for key,val in pairs(value) do
-				spEcho(key,val)
-			end
-		else
-			spEcho( value )
-		end
-	end
 end

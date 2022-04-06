@@ -52,12 +52,8 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spTestBuildOrder      = Spring.TestBuildOrder
 local spSetHeightMap        = Spring.SetHeightMap
 local spSetHeightMapFunc    = Spring.SetHeightMapFunc
-local spRevertHeightMap     = Spring.RevertHeightMap
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetActiveCommand    = Spring.GetActiveCommand
 local spCreateUnit          = Spring.CreateUnit
 local spDestroyUnit         = Spring.DestroyUnit
 local spGetAllyTeamList     = Spring.GetAllyTeamList
@@ -71,7 +67,6 @@ local spAddHeightMap        = Spring.AddHeightMap
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spSetUnitPosition     = Spring.SetUnitPosition
 local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
-local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
@@ -79,20 +74,10 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
-local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_ALT   = CMD.OPT_ALT
-local CMD_STOP      = CMD.STOP
 local CMD_REPAIR    = CMD.REPAIR
 local CMD_INSERT    = CMD.INSERT
 
-local checkCoord = {
-	{x = -8, z = 0},
-	{x = 8, z = 0},
-	{x = 0, z = -8},
-	{x = 0, z = 8},
-}
-
-local invRoot2 = 1/sqrt(2)
 local SQRT_2 = sqrt(2)
 local ALLIED_TABLE = {allied = true}
 
@@ -150,16 +135,14 @@ local perimeterEdgeCost = {
 --ramp dimensions
 local maxTotalRampLength = 3000
 local maxTotalRampWidth = 800
-local minTotalRampLength = 40
-local minTotalRampWidth = 24
+local minTotalRampLength = 64
+local minTotalRampWidth = 48
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
-local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
+local terraformDecayFrames = 2*60*30 -- how many frames a terrablock can survive for without a repair command
 local decayCheckFrequency = 90 -- frequency of terraform decay checks
 
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
-
-local terraUnitLimit = 250 -- limit on terraunits per player
 
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
@@ -184,8 +167,6 @@ pointExtraAreaCost = pointExtraAreaCost * costMult * inbuiltCostMult
 -- Arrays
 --------------------------------------------------------------------------------
 
-local drawPositions         = {count = 0, data = {}}
-local drawPosMap            = {}
 local steepnessMarkers      = {inner = {count = 0, data = {}, frame = 0}}
 
 local structure             = {}
@@ -226,17 +207,12 @@ local terraUnitHP = UnitDefs[terraunitDefID].health - 1000 -- Stop terraunit hav
 local terraUnitCost = UnitDefs[terraunitDefID].metalCost
 local terraBuildMult = terraUnitHP/UnitDefs[terraunitDefID].health
 
-local shieldscoutDefID = UnitDefNames["shieldscout"].id
---local novheavymineDefID = UnitDefNames["novheavymine"].id
-
-local exceptionArray = {
-	[UnitDefNames["shipcarrier"].id] = true,
-}
+local terraformOnUnitDestroyed = VFS.Include("LuaRules/Configs/unit_terraform_defs.lua", nil, VFS.GAME)
 
 local terraformUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud and ud.isBuilder and not ud.isFactory and not exceptionArray[i] then
+	if ud and ud.isBuilder and not ud.isFactory and (ud.terraformSpeed > 0) then
 		terraformUnitDefIDs[i] = true
 	end
 end
@@ -246,6 +222,8 @@ local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because 
 local workaround_recursion_in_cmd_fallback = {}
 local workaround_recursion_in_cmd_fallback_needed = false
 
+local wantForceCompleteFrameZero = false
+local freeTerraform = false
 local debugMode = false
 local debugModeUnitID
 
@@ -437,8 +415,8 @@ local function SetTooltip(unitID, spent, estimatedCost)
 	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, ALLIED_TABLE)
 end
 
-local function IsPositionTerraformable(x, z)
-	if HasStructure(x, z) then
+local function IsPositionTerraformable(x, z, ignoreStructure)
+	if (not ignoreStructure) and HasStructure(x, z) then
 		return false
 	end
 	if GG.map_AllowPositionTerraform then
@@ -677,7 +655,7 @@ local function GetUnitAveragePosition(unit, units)
 	return unitsX/units, unitsZ/units
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	--** Initial constructor processing **
 	local unitsX, unitsZ = GetUnitAveragePosition(unit, units)
 	if not unitsX then
@@ -819,8 +797,6 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	--]]
 
 	--** Split the ramp into segments and calculate the points within each one**
-	local otherTerraformUnitCount = terraformUnitCount
-
 	local segment = {}
 	local n = 1
 	
@@ -1011,6 +987,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
 			local pos = segment[i].position
 			local terraunitX, teamY, terraunitZ = GetTerraunitLeashedSpot(team, pos.x, pos.z, unitsX, unitsZ)
 			
@@ -1064,6 +1041,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 				
@@ -1102,7 +1080,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
 	--** Initial constructor processing **
@@ -1278,8 +1256,6 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
-	
-	local otherTerraformUnitCount = terraformUnitCount
 	
 	local frame = spGetGameFrame()
 
@@ -1481,6 +1457,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 				
@@ -1496,7 +1473,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 	AddFallbackCommand(team, commandTag, blocks, block, commandX, commandZ)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, noDecay)
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
 	--** Initial constructor processing **
@@ -1643,8 +1620,6 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	-- width and height are the witdh and height of segments. They must be squished to all be the same size
 	
 	local segment = {}
-	
-	local otherTerraformUnitCount = terraformUnitCount
 	
 	local wCount = ceil((border.right-border.left)/areaSegMaxSize) - 1
 	local hCount = ceil((border.bottom-border.top)/areaSegMaxSize) - 1
@@ -1969,6 +1944,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 					lastProgress = 0,
 					lastHealth = 0,
 					disableForceCompletion = disableForceCompletion,
+					noDecay = noDecay,
 				}
 				InitialiseNearbyEnemy(id)
 
@@ -2162,7 +2138,7 @@ function GG.Terraform_RaiseWater(raiseAmount)
 	end
 	--[[ move commands looks as though it will be messy
 	
-	local allUnits = spGetAllUnits()
+	local allUnits = Spring.GetAllUnits()
 	local allUnitsCount = #allUnits
 	for i = 1, allUnitsCount do
 		if spValidUnitID(allUnits[i]) then
@@ -2455,7 +2431,7 @@ local function updateTerraformCost(id)
 	terra.lastProgress = terra.progress
 	terra.lastHealth = terra.progress*terraUnitHP
 	
-	EchoDebug(id, "updateTerraformCost")
+	EchoDebug(id, "updateTerraformCost", "volume", volume, "terra.volCostSpent", terra.volCostSpent, "extra", volume*volumeCost)
 	spSetUnitHealth(id, {
 		health = terra.lastHealth,
 		build  = terra.lastProgress*terraBuildMult
@@ -2548,6 +2524,7 @@ local function finishInitialisingTerraformUnit(id)
 	--checkTerraformIntercepts(id) --Removed Intercept Check
 	
 	updateTerraformEdgePoints(id)
+	EchoDebug(id, "init update cost")
 	updateTerraformCost(id)
 	
 	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Base " .. terraformUnit[id].baseCost)
@@ -2621,19 +2598,31 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		end
 	end
 	
+	local x, z
 	for i = 1, terra.points do
-		local heightDiff = terra.point[i].prevHeight - spGetGroundHeight(terra.point[i].x, terra.point[i].z)
-		if heightDiff ~= 0 then
-			updateTerraformCost(id)
-			break
-			-- There must be a nicer way to update costs, below is an unstable attempt.
-			--local change = ((1-terra.progress)*terra.point[i].diffHeight + heightDiff)/((1-terra.progress)*terra.point[i].diffHeight)
-			--Spring.Echo(change)
-			--local costChange = (abs(change * terra.point[i].diffHeight) - abs(terra.point[i].diffHeight))*volumeCost
-			--terra.point[i].diffHeight = change * terra.point[i].diffHeight
-			--terra.point[i].orHeight = terra.point[i].aimHeight - terra.point[i].diffHeight
-			--terraformUnit[id].cost = terraformUnit[id].cost + costChange
-			--terraformUnit[id].totalCost = terraformUnit[id].totalCost + costChange
+		x, z = terra.point[i].x, terra.point[i].z
+		-- For some reason the heightDiff check always fails for points on the map edge, so just ignore them.
+		if x > 0 and x < mapWidth and z > 0 and z < mapHeight then
+			local heightDiff = terra.point[i].prevHeight - spGetGroundHeight(x, z)
+			if heightDiff ~= 0 then
+				EchoDebug(id, "heightDiff ~= 0 update cost", terra.point[i].x, terra.point[i].z, "prev", terra.point[i].prevHeight, "now", spGetGroundHeight(terra.point[i].x, terra.point[i].z))
+				--for j = 1, terra.points do
+				--	local heightDiff = terra.point[j].prevHeight - spGetGroundHeight(terra.point[j].x, terra.point[j].z)
+				--	if heightDiff ~= 0 then
+				--		Spring.MarkerAddPoint(terra.point[j].x, 0, terra.point[j].z)
+				--	end
+				--end
+				updateTerraformCost(id)
+				break
+				-- There must be a nicer way to update costs, below is an unstable attempt.
+				--local change = ((1-terra.progress)*terra.point[i].diffHeight + heightDiff)/((1-terra.progress)*terra.point[i].diffHeight)
+				--Spring.Echo(change)
+				--local costChange = (abs(change * terra.point[i].diffHeight) - abs(terra.point[i].diffHeight))*volumeCost
+				--terra.point[i].diffHeight = change * terra.point[i].diffHeight
+				--terra.point[i].orHeight = terra.point[i].aimHeight - terra.point[i].diffHeight
+				--terraformUnit[id].cost = terraformUnit[id].cost + costChange
+				--terraformUnit[id].totalCost = terraformUnit[id].totalCost + costChange
+			end
 		end
 	end
 	
@@ -2642,7 +2631,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		newProgress = 1
 	end
 	
-	local pyramindCost = 0
+	local pyramidVolumeChange = 0
 	local extraPoint = {}
 	local extraPoints = 0
 	local extraPointArea = {}
@@ -2671,13 +2660,12 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 			local makingPyramid = terra.point[i].aimHeight - terra.point[i].orHeight > 0
 			for j = 1, terra.point[i].edges do
 				local thisEdge = terra.point[i].edge[j]
-				local x = thisEdge.x
-				local z = thisEdge.z
+				x, z = thisEdge.x, thisEdge.z
 			
 				local groundHeight = spGetGroundHeight(x, z)
 				local edgeHeight = groundHeight
 				local overlap, overlapReplaces = false, false
-				local overlapCost = 0
+				local overlapHeightDiff = 0
 				if extraPointArea[x] and extraPointArea[x][z] then
 					overlap = extraPointArea[x][z]
 					if extraPoint[overlap].supportID then
@@ -2685,7 +2673,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					else
 						overlapReplaces = true
 					end
-					overlapCost = extraPoint[overlap].cost
+					overlapHeightDiff = abs(extraPoint[overlap].heightDiff)
 				end
 				
 				local maxDiff
@@ -2716,7 +2704,6 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						z = z,
 						orHeight = groundHeight,
 						heightDiff = newHeight - groundHeight - heightSign*maxDiff,
-						cost = heightSign*(newHeight - groundHeight) - maxDiff,
 						supportX = terra.point[i].x,
 						supportZ = terra.point[i].z,
 						supportH = newHeight,
@@ -2738,7 +2725,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						return -1
 					end
 					
-					pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
+					pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[index].heightDiff) - overlapHeightDiff
 					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
@@ -2771,11 +2758,10 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 								z = z,
 								orHeight = groundHeight,
 								heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
-								cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
 								pyramid = makingPyramid, -- pyramid = rising up, not pyramid = ditch
 							}
 							
-							pyramindCost = pyramindCost + extraPoint[extraPoints].cost
+							pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[extraPoints].heightDiff)
 							
 							if not extraPointArea[x] then
 								extraPointArea[x] = {}
@@ -2791,7 +2777,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	do
 	
 	local i = 1
-	local x, z, checkIndex
+	local checkIndex
 	local diffX, diffZ
 	while i <= extraPoints do
 		if extraPoint[i].supportID then
@@ -2820,7 +2806,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 					local groundHeight = spGetGroundHeight(x, z)
 					local edgeHeight = groundHeight
 					local overlap, overlapReplaces = false, false
-					local overlapCost = 0
+					local overlapHeightDiff = 0
 					if extraPointArea[x] and extraPointArea[x][z] then
 						overlap = extraPointArea[x][z]
 						if extraPoint[overlap].supportID then
@@ -2828,7 +2814,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 						else
 							overlapReplaces = true
 						end
-						overlapCost = extraPoint[overlap].cost
+						overlapHeightDiff = abs(extraPoint[overlap].heightDiff)
 					end
 					local maxHeightDifferenceLocal = GetHeightDiffLocal(abs(x - extraPoint[i].supportX), abs(z - extraPoint[i].supportZ), (not extraPoint[i].pyramid) and maxHeightDiffDownInner)
 
@@ -2852,7 +2838,6 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							z = z,
 							orHeight = groundHeight,
 							heightDiff = newHeight - groundHeight - heightSign*maxHeightDifferenceLocal,
-							cost = heightSign*(newHeight - groundHeight) - maxHeightDifferenceLocal,
 							supportX = extraPoint[i].supportX,
 							supportZ = extraPoint[i].supportZ,
 							supportH = extraPoint[i].supportH,
@@ -2874,7 +2859,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							return -1
 						end
 						
-						pyramindCost = pyramindCost + extraPoint[index].cost - overlapCost
+						pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[index].heightDiff) - overlapHeightDiff
 						
 						if not extraPointArea[x] then
 							extraPointArea[x] = {}
@@ -2899,18 +2884,17 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 							if (not (extraPointArea[x] and extraPointArea[x][z])) and
 									((extraPoint[i].pyramid and groundHeight < lookAheadHeight + borderHeightDiff) or ((not extraPoint[i].pyramid) and groundHeight > lookAheadHeight - borderHeightDiff)) and
 									IsPositionTerraformable(x, z) then
-							
+								
 								extraPoints = extraPoints + 1
 								extraPoint[extraPoints] = {
 									x = x,
 									z = z,
 									orHeight = groundHeight,
 									heightDiff = heightSign*borderHeightDiff + lookAheadHeight - groundHeight,
-									cost = abs(borderHeightDiff + lookAheadHeight - groundHeight),
 									pyramid = extraPoint[i].pyramid, -- pyramid = rising up, not pyramid = ditch
 								}
 								
-								pyramindCost = pyramindCost + extraPoint[extraPoints].cost
+								pyramidVolumeChange = pyramidVolumeChange + abs(extraPoint[extraPoints].heightDiff)
 								
 								if not extraPointArea[x] then
 									extraPointArea[x] = {}
@@ -2934,7 +2918,11 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 	
 	-- Update costs and determine progress.
 	terraformOperations = terraformOperations + extraPoints
-	pyramindCost = pyramindCost*volumeCost
+	local pyramindCost = pyramidVolumeChange*volumeCost
+	
+	if IsDebug(unitID) then
+		Spring.Echo("costDiff", costDiff)
+	end
 	
 	local edgeTerraMult = 1
 	if costDiff ~= 0 then
@@ -2953,7 +2941,7 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 				edgeSpending = pyramindCost
 			end
 			
-			EchoDebug(id, "costDiff", costDiff, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
+			EchoDebug(unitID, "volCostSpent", terra.volCostSpent, "cost", terra.cost, "totalCost", terra.totalCost, "pyramindCost", pyramindCost, "edgeSpending", edgeSpending)
 			
 			costDiff = costDiff - edgeSpending
 			edgeTerraMult = edgeSpending/pyramindCost
@@ -3018,10 +3006,9 @@ local function updateTerraform(health, id, arrayIndex, costDiff)
 		local drawEdge = {}
 		local count = 0
 		
-		local drawingList = {}
 		for i = 1, terra.points do
-			local x = terra.point[i].x
-			local z = terra.point[i].z
+			x = terra.point[i].x
+			z = terra.point[i].z
 			local freeLeft = not (terra.area[x-8] and terra.area[x-8][z]) and not (extraPointArea[x-8] and extraPointArea[x-8][z])
 			local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
 			local freeRight = not (terra.area[x+8] and terra.area[x+8][z]) and not (extraPointArea[x+8] and extraPointArea[x+8][z])
@@ -3143,17 +3130,14 @@ local function DoTerraformUpdate(n, forceCompletion)
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
 		if IsDebug(id) then
-			EchoDebug(id, "Check", Spring.GetUnitHealth(id))
+			-- EchoDebug(id, "Check", Spring.GetUnitHealth(id))
 		end
 		if (spValidUnitID(id)) then
 			local force = (forceCompletion and not terraformUnit[id].disableForceCompletion)
 			
 			local health = spGetUnitHealth(id)
-			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
-			EchoDebug(id, "Valid", diffProgress, terraformUnit[id].progress, health, (n - terraformUnit[id].lastUpdate >= updatePeriod))
-			
-			if diffProgress == 0 then
-				if (not forceCompletion) and (n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n) then
+			if health - terraformUnit[id].lastHealth == 0 then
+				if (not forceCompletion) and (n % decayCheckFrequency == 0 and (not terraformUnit[id].noDecay) and terraformUnit[id].decayTime < n) then
 					EchoUnit(id)
 					EchoDebug(id, "Decay", id)
 					deregisterTerraformUnit(id,i,3)
@@ -3191,6 +3175,7 @@ local function DoTerraformUpdate(n, forceCompletion)
 					EchoDebug(id, "updateVar", updateVar)
 					while updateVar == -1 and attempts < 10 do
 						if updateTerraformCost(id) then
+							EchoDebug(id, "updateVar == -1 update cost")
 							updateTerraformEdgePoints(id)
 							updateVar = updateTerraform(health,id,i,costDiff)
 							attempts = attempts + 1
@@ -3217,7 +3202,10 @@ local function DoTerraformUpdate(n, forceCompletion)
 end
 
 function gadget:GameFrame(n)
-
+	if n == 0 and wantForceCompleteFrameZero then
+		DoTerraformUpdate(n, true)
+	end
+	
 	if workaround_recursion_in_cmd_fallback_needed then
 		for unitID, terraID in pairs(workaround_recursion_in_cmd_fallback) do
 			REPAIR_ORDER_PARAMS[4] = terraID
@@ -3238,10 +3226,9 @@ function gadget:GameFrame(n)
 		nextUpdateCheck = n + updatePeriod
 	end
 	
-	DoTerraformUpdate(n)
+	DoTerraformUpdate(n, freeTerraform)
 	
 	--check constrcutors that are repairing terraform blocks
-	
 	if constructors ~= 0 then
 		if n % checkInterval == 0 then
 			-- only check 1 con per cycle
@@ -3250,39 +3237,53 @@ function gadget:GameFrame(n)
 				currentCon = 1
 			end
 			
-			local cQueue = spGetCommandQueue(constructorTable[currentCon], -1)
+			local unitID = constructorTable[currentCon]
+			local cQueue = spGetCommandQueue(unitID, -1)
 			if cQueue then
+				local teamID = spGetUnitTeam(unitID)
 				local ncq = #cQueue
 				for i = 1, ncq do
-					if cQueue[i].id == CMD_REPAIR then
-						if #cQueue[i].params == 1 then
+					local cmd = cQueue[i]
+					if fallbackableCommands[cmd.id] then
+						if fallbackCommands[teamID] and cmd.params and cmd.params[4] then
+							local terraCmd = fallbackCommands[teamID][cmd.params[4]]
+							if terraCmd and terraCmd.terraunitList then
+								local terraUnitList = terraCmd.terraunitList
+								for j = 1, #terraUnitList do
+									if terraformUnit[terraUnitList[j]] then
+										terraformUnit[terraUnitList[j]].decayTime = n + terraformDecayFrames
+									end
+								end
+							end
+						end
+					elseif cmd.id == CMD_REPAIR then
+						if #cmd.params == 1 then
 							-- target unit command
-							if terraformUnit[cQueue[i].params[1]] then
-								terraformUnit[cQueue[i].params[1]].decayTime = n + terraformDecayFrames
+							if terraformUnit[cmd.params[1]] then
+								terraformUnit[cmd.params[1]].decayTime = n + terraformDecayFrames
 							end
 							
 							-- bring terraunit towards con
-							if i == 1 and spValidUnitID(cQueue[i].params[1]) and terraformUnit[cQueue[i].params[1] ] then
-								local cx, _, cz = spGetUnitPosition(constructorTable[currentCon])
-								local team = spGetUnitTeam(constructorTable[currentCon])
-								if cx and team then
+							if i == 1 and spValidUnitID(cmd.params[1]) and terraformUnit[cmd.params[1] ] then
+								local cx, _, cz = spGetUnitPosition(unitID)
+								if cx and teamID then
 
-									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
-									local x, y, z = GetTerraunitLeashedSpot(team, tpos.x, tpos.z, cx, cz)
-									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
-									spSetUnitPosition(cQueue[i].params[1], x, y , z)
-									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
-									--Spring.MoveCtrl.SetPosition(cQueue[i].params[1], x, y , z)
-									--Spring.MoveCtrl.Disable(cQueue[i].params[1])
+									local tpos = terraformUnit[cmd.params[1] ].positionAnchor
+									local x, y, z = GetTerraunitLeashedSpot(teamID, tpos.x, tpos.z, cx, cz)
+									terraformUnit[cmd.params[1] ].position = {x = x, z = z}
+									spSetUnitPosition(cmd.params[1], x, y , z)
+									--Spring.MoveCtrl.Enable(cmd.params[1])
+									--Spring.MoveCtrl.SetPosition(cmd.params[1], x, y , z)
+									--Spring.MoveCtrl.Disable(cmd.params[1])
 								end
 							end
 							
-						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want
+						elseif #cmd.params == 4 then -- there is a command with 5 params that I do not want
 							-- area command
-							local radSQ = cQueue[i].params[4]^2
-							local cX, _, cZ = cQueue[i].params[1],cQueue[i].params[2],cQueue[i].params[3]
-							if constructor[constructorTable[currentCon]] and constructor[constructorTable[currentCon]].allyTeam then
-								local allyTeam = constructor[constructorTable[currentCon]].allyTeam
+							local radSQ = cmd.params[4]^2
+							local cX, _, cZ = cmd.params[1],cmd.params[2],cmd.params[3]
+							if constructor[unitID] and constructor[unitID].allyTeam then
+								local allyTeam = constructor[unitID].allyTeam
 								for j = 1, terraformUnitCount do
 									local terra = terraformUnit[terraformUnitTable[j]]
 									if terra.allyTeam == allyTeam then
@@ -3383,7 +3384,6 @@ local SeismicWeapon = {}
 local DEFAULT_SMOOTH = 0.5
 local HEIGHT_FUDGE_FACTOR = 10
 local HEIGHT_RAD_MULT = 0.8
-local MIN_SMOOTH_RAD = 20
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -3403,39 +3403,6 @@ for i=1,#WeaponDefs do
 	end
 end
 
-local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-	--local found = {count = 0, data = {}}
-	for i = 1, posCount do
-		if HasStructure(posX[i], posZ[i]) then
-			posY[i] = 0
-			--found.count = found.count + 1
-			--found.data[found.count] = {x = posX[i], z = posZ[i]}
-		end
-	end
-	
-	
-	--[[
-	if found.count == 0 then
-		return posY
-	end
-	
-	for i = 1, posCount do
-		local x = posX[i]
-		local z = posZ[i]
-		for j = 1, found.count do
-			local fx = found.data[j].x
-			local fz = found.data[j].z
-			local maxChange = sqrt((fx-x)^2 + (fz-z)^2)*maxHeightDifference/64
-			if abs(posY[i]) > maxChange then
-				posY[i] = abs(posY[i])/posY[i]*maxChange
-			end
-		end
-	end
-	--]]
-
-	return posY
-end
-
 function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
@@ -3453,7 +3420,7 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 	
 	for i = sx - smoothradius, sx + smoothradius,8 do
 		for j = sz - smoothradius, sz + smoothradius,8 do
-			if not HasStructure(i, j) then
+			if IsPositionTerraformable(i, j) then
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= smoothradiusSQ then
 					if smoothExponent then
@@ -3488,16 +3455,18 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 			if not structTested[unitID] then
 				local structData = structure[unitID]
 				local disSQ = (x - structData.x)^2 + (z - structData.z)^2
-				if disSQ <= smoothradiusSQ then
+				if disSQ <= smoothradiusSQ
+						and IsPositionTerraformable(structData.minx, structData.minz, true) and IsPositionTerraformable(structData.maxx, structData.minz, true)
+						and IsPositionTerraformable(structData.minx, structData.maxz, true) and IsPositionTerraformable(structData.maxx, structData.maxz, true) then
 					local gh = spGetGroundHeight(i,j)
-					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent) + gh
+					structData.h = (groundHeight - gh) * maxSmooth * movestructures * FalloffFunc(disSQ, smoothradiusSQ, smoothExponent or 1) + gh
 					structHeight[unitID] = structData.h
 					-- Causes structures to become non-blocking.
 					--local unitDefID = Spring.GetUnitDefID(unitID)
 					--if unitDefID then
-					--	local mvoeHeight = (UnitDefs[unitDefID].floatOnWater and math.max(structData.h, 0)) or structData.h
+					--	local moveHeight = (UnitDefs[unitDefID].floatOnWater and math.max(structData.h, 0)) or structData.h
 					--	Spring.MoveCtrl.Enable(unitID)
-					--	Spring.MoveCtrl.SetPosition(unitID, structData.x, mvoeHeight, structData.z)
+					--	Spring.MoveCtrl.SetPosition(unitID, structData.x, moveHeight, structData.z)
 					--	Spring.MoveCtrl.Disable(unitID)
 					--end
 				end
@@ -3513,12 +3482,6 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 			height = height/structCount
 			spSetHeightMap(i, j, height)
 		end
-	end
-end
-
-local function SmoothFromList(xt,zt,ht)
-	for i = 1, #xt, 1 do
-		spAddHeightMap(xt[i],zt[i],ht[i])
 	end
 end
 
@@ -3621,6 +3584,7 @@ local function deregisterStructure(unitID)
 						
 						if recalc then
 							updateTerraformEdgePoints(oid)
+							EchoDebug(id, "deregisterStructure update cost")
 							updateTerraformCost(oid)
 						end
 					end
@@ -3654,127 +3618,38 @@ local function deregisterStructure(unitID)
 	
 end
 
-local dirtbagPosX =
-	          { -8, 0, 8,
-	        -16,-8, 0, 8, 16,
-	    -24,-16,-8, 0, 8, 16, 24,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	-32,-24,-16,-8, 0, 8, 16, 24, 32,
-	    -24,-16,-8, 0, 8, 16, 24,
-	        -16,-8, 0, 8, 16,
-	            -8, 0, 8}
-
-local dirtbagPosZ =
-	           {-32,-32,-32,
-	        -24,-24,-24,-24,-24,
-	    -16,-16,-16,-16,-16,-16,-16,
-	 -8, -8, -8, -8, -8, -8, -8, -8, -8,
-	  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	  8,  8,  8,  8,  8,  8,  8,  8,  8,
-	      16, 16, 16, 16, 16, 16, 16,
-	          24, 24, 24, 24, 24,
-	              32, 32, 32}
-
-local dirtbagPosY =
-	            {3 , 4 , 3 ,
-	         3 , 5 , 9 , 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	 4 , 9 , 27, 31, 32, 31, 27, 9 , 4 ,
-	 3 , 5 , 25, 29, 31, 29, 25, 5 , 3 ,
-	     3 , 6 , 25, 27, 25, 6 , 3 ,
-	          3, 5 , 9 , 5 , 3 ,
-	             3 , 4 , 3 }
-
 function gadget:UnitDestroyed(unitID, unitDefID)
+	local config = terraformOnUnitDestroyed[unitDefID]
+	if config then
+		local  _,_,_,_,buildProgress = spGetUnitHealth(unitID)
+		if buildProgress == 1 then
+			local posX, posY, posZ = config.posX, config.posY, config.posZ
 
-	if (unitDefID == shieldscoutDefID) then
-		local  _,_,_,_,build = spGetUnitHealth(unitID)
-		if build == 1 then
-			local ux, uy, uz  = spGetUnitPosition(unitID)
+			local ux, uy, uz = spGetUnitPosition(unitID)
 			ux = floor((ux+8)/16)*16
 			uz = floor((uz+8)/16)*16
 			
 			spSetHeightMapFunc(
 				function()
-					for i = 1, #dirtbagPosX, 1 do
-						local x, z = dirtbagPosX[i] + ux, dirtbagPosZ[i] + uz
+					for i = 1, #posX, 1 do
+						local x, z = posX[i] + ux, posZ[i] + uz
 						if IsPositionTerraformable(x, z) then
-							spAddHeightMap(x, z, dirtbagPosY[i])
+							spAddHeightMap(x, z, posY[i])
 						end
 					end
 				end
 			)
 			
-			local units = Spring.GetUnitsInCylinder(ux,uz,40)
+			local units = Spring.GetUnitsInCylinder(ux, uz, config.impulseRadius)
 			for i = 1, #units do
 				local hitUnitID = units[i]
 				if hitUnitID ~= unitID then
-					GG.AddGadgetImpulseRaw(hitUnitID, 0, 0.3, 0, true, true)
+					GG.AddGadgetImpulseRaw(hitUnitID, 0, config.impulseY, 0, true, true)
 				end
 			end
 		end
-		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end
-	--[[
-	if (unitDefID == novheavymineDefID) then
-		local  _,_,_,_,build = spGetUnitHealth(unitID)
-		
-		if build == 1 then
-			local ux, uy, uz = spGetUnitPosition(unitID)
-			ux = ceil(ux/8)*8-4
-			uz = ceil(uz/8)*8-4
-			
-			local heightChange = -30
-			local size = 48
-			local heightMap = {}
-			
-			for ix = ux-size-8, ux+size+8, 8 do
-				heightMap[ix] = {}
-				for iz = uz-size-8, uz+size+8, 8 do
-					heightMap[ix][iz] = spGetGroundHeight(ix, iz)
-				end
-			end
-			
-			local point = {}
-			local points = 0
-			
-			for ix = ux-size, ux+size, 8 do
-				for iz = uz-size, uz+size, 8 do
-					local newHeight = heightMap[ix][iz] + heightChange
-					
-					local maxDiff = heightMap[ix-8][iz]-newHeight
-					if heightMap[ix+8][iz]-newHeight > maxDiff then
-						maxDiff = heightMap[ix+8][iz]-newHeight
-					end
-					if heightMap[ix][iz-8]-newHeight > maxDiff then
-						maxDiff = heightMap[ix][iz-8]-newHeight
-					end
-					if heightMap[ix][iz+8]-newHeight > maxDiff then
-						maxDiff = heightMap[ix][iz+8]-newHeight
-					end
-					
-					if maxDiff < maxHeightDifference then
-						points = points + 1
-						point[points] = {x = ix, y = newHeight, z = iz}
-					elseif maxDiff < maxHeightDifference*2 then
-						points = points + 1
-						point[points] = {x = ix, y = newHeight+maxDiff-maxHeightDifference, z = iz}
-					end
-				end
-			end
 
-			local func = function()
-					for i = 1, points do
-						spSetHeightMap(point[i].x,point[i].z,point[i].y)
-					end
-				end
-			spSetHeightMapFunc(func)
-		end
-		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
-	end
-	--]]
 	if constructor[unitID] then
 		local index = constructor[unitID].index
 		if index ~= constructors then
@@ -3843,6 +3718,19 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
 		end
 		
+		if structure[unitID].minx == 0 then
+			structure[unitID].minx = -8
+		end
+		if structure[unitID].minz == 0 then
+			structure[unitID].minz = -8
+		end
+		if structure[unitID].maxx == mapWidth then
+			structure[unitID].maxx = mapWidth + 8
+		end
+		if structure[unitID].maxz == mapHeight then
+			structure[unitID].maxz = mapHeight + 8
+		end
+		
 		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 			structure[unitID].area[i] = {}
 			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
@@ -3901,6 +3789,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 						end
 						
 						if recalc then
+							EchoDebug(id, "UnitCreated update cost")
 							updateTerraformCost(oid)
 							updateTerraformEdgePoints(oid)
 						end
@@ -3939,30 +3828,41 @@ end
 
 local TerraformFunctions = {}
 
-function TerraformFunctions.ForceTerraformCompletion(pregame)
+function TerraformFunctions.ForceTerraformCompletion(pregame, needSaveHax)
+	if pregame and needSaveHax then
+		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.
+		wantForceCompleteFrameZero = true
+		return
+	end
 	DoTerraformUpdate(Spring.GetGameFrame(), true)
 	if pregame then
-		-- gadget:UnsyncedHeightMapUpdate seems to not be called pregame.
 		GG.TerrainTexture.UpdateAll()
 	end
 end
 
-function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
-function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
-function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
-	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion)
+function TerraformFunctions.TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID,
+		volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, enableDecay)
+	TerraformRamp(startX, startY, startZ, endX, endY, endZ, width, unit, constructorCount,teamID, volumeSelection, shift, commandX, commandZ, commandTag, disableForceCompletion, not enableDecay)
 end
 
 function TerraformFunctions.SetStructureHeight(unitID, height)
 	if structure[unitID] then
 		structure[unitID].h = height
 	end
+end
+
+function TerraformFunctions.SetFreeTerraform(newFreeTerraform)
+	freeTerraform = newFreeTerraform
 end
 
 function gadget:Initialize()

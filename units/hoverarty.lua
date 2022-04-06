@@ -2,9 +2,9 @@ return { hoverarty = {
   unitname            = [[hoverarty]],
   name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
-  acceleration        = 0.08,
+  acceleration        = 0.096,
   activateWhenBuilt   = true,
-  brakeRate           = 1.48,
+  brakeRate           = 1.776,
   buildCostMetal      = 1000,
   builder             = false,
   buildPic            = [[hoverarty.png]],
@@ -18,24 +18,23 @@ return { hoverarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     modelradius    = [[32]],
     dontfireatradarcommand = '0',
     aimposoffset   = [[0 15 0]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[mobiletachyon]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 1000,
   maxSlope            = 18,
   maxVelocity         = 1.75,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER4]],
   moveState           = 0,
   noAutoFire          = false,
@@ -55,7 +54,7 @@ return { hoverarty = {
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
-  turnRate            = 290,
+  turnRate            = 464,
   workerTime          = 0,
 
   weapons             = {
@@ -88,7 +87,6 @@ return { hoverarty = {
       damage                  = {
         default = 3000.1,
         planes  = 3000.1,
-        subs    = 150.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

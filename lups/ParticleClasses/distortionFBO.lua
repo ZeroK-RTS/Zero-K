@@ -150,9 +150,11 @@ end
 function PostDistortion:EndDraw()
 	glCallList(enterIdentity);
 	if (pd.texRectangle) then glUniform(screenSizeLoc,vsx,vsy) end
-	glTexture(0,jitterTex);
-	glTexture(1,screenCopyTex);
-	glCallList(postDrawAndLeaveIdentity);
+	if jitterTex and screenCopyTex then
+		glTexture(0,jitterTex);
+		glTexture(1,screenCopyTex);
+		glCallList(postDrawAndLeaveIdentity);
+	end
 end
 
 -----------------------------------------------------------------------------------------------------------------

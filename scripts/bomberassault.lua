@@ -16,10 +16,6 @@ local wingRightRear = piece('wingRightRear');
 local wingTopFront = piece('wingTopFront');
 local wingTopRear = piece('wingTopRear');
 
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitHeading = Spring.GetUnitHeading
-local spGetUnitVelocity = Spring.GetUnitVelocity
-
 local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
 
 local bombs = 1

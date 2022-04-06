@@ -22,15 +22,6 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(10)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = -math.rad(20)
-local ARM_FRONT_SPEED = math.rad(22.5) * PACE
-local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(22.5) * PACE
-local FOREARM_FRONT_ANGLE = -math.rad(40)
-local FOREARM_FRONT_SPEED = math.rad(45) * PACE
-local FOREARM_BACK_ANGLE = math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(45) * PACE
-
 local SIG_WALK = 1
 local SIG_AIM = {2, 4}
 local SIG_RESTORE = 8

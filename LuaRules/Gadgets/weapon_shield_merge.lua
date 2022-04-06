@@ -213,10 +213,6 @@ end
 --------------------------------------------------------------------------------
 -- Hit and update handling
 
-local beamMultiHitException = {
-	[UnitDefNames["amphassault"].id] = true,
-	[UnitDefNames["striderdetriment"].id] = true,
-}
 local penetrationPower = {}
 
 function gadget:GameFrame(n)

@@ -57,7 +57,12 @@ local menu = nil
 local menu_selected = nil
 local level = 0
 local customKeyBind = false
+
+-- "marking menu" is not the best name, but it's also used by
+-- other similar widgets and also people may have already
+-- overridden it locally, so don't rename it
 local menu_use = include("Configs/marking_menu_menus.lua")
+
 local hotkey_mode = false
 local green = '\255\1\255\1'
 local white = '\255\255\255\255'

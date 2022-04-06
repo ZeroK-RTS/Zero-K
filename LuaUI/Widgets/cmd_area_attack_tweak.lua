@@ -1,11 +1,7 @@
-local version = "v1.121"
-
 function widget:GetInfo()
   return {
     name      = "Area Attack Tweak",
-    desc      = version .. " Tweak to area attack command:"..
-				"\n• automatically filter out ground target for AA units."..
-				"\n• CTRL+Attack split targets among units.",
+    desc      = "CTRL+Attack splits targets. AA automatically drops ground targets.",
     author    = "msafwan",
     date      = "May 22, 2012",
     license   = "GNU GPL, v2 or later",
@@ -18,6 +14,8 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local SPLIT_ATTACK_SINGLE = false
 
 local defaultCommands = {
 	[CMD.ATTACK] = true,
@@ -48,13 +46,13 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 		return false
 	end
 	local units
-	if handledCount > 0 then
+	if SPLIT_ATTACK_SINGLE and handledCount > 0 then
 		 --This remove all but 1st attack order from CTRL+Area_attack if user choose to append new order to unit (eg: SHIFT+move),
 		 --this is to be consistent with bomber_command (rearm-able bombers), which only shoot 1st target and move on to next order.
 		 
 		 --Known limitation: not able to remove order if user queued faster than network delay (it need to see unit's current command queue)
 		units = Spring.GetSelectedUnits()
-		local unitID,attackList
+		local unitID, attackList
 		for i=1,#units do
 			unitID = units[i]
 			attackList = GetAndRemoveHandledHistory(unitID)
@@ -91,22 +89,24 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 	return false
 end
 
-function widget:UnitGiven(unitID)
-	GetAndRemoveHandledHistory(unitID)
-end
-
-function widget:UnitDestroyed(unitID)
-	GetAndRemoveHandledHistory(unitID)
-end
---------------------------------------------------------------------------------
-function GetAndRemoveHandledHistory(unitID)
-	if unitsSplitAttackQueue[unitID] then
-		local attackList = unitsSplitAttackQueue[unitID]
-		unitsSplitAttackQueue[unitID] = nil
-		handledCount = handledCount - 1
-		return attackList
+if SPLIT_ATTACK_SINGLE then
+	function widget:UnitGiven(unitID)
+		GetAndRemoveHandledHistory(unitID)
 	end
-	return nil
+
+	function widget:UnitDestroyed(unitID)
+		GetAndRemoveHandledHistory(unitID)
+	end
+	--------------------------------------------------------------------------------
+	function GetAndRemoveHandledHistory(unitID)
+		if unitsSplitAttackQueue[unitID] then
+			local attackList = unitsSplitAttackQueue[unitID]
+			unitsSplitAttackQueue[unitID] = nil
+			handledCount = handledCount - 1
+			return attackList
+		end
+		return nil
+	end
 end
 
 function RevertAllButOneAttackQueue(unitID,attackList)
@@ -214,14 +214,16 @@ end
 
 function IssueSplitedCommand(selectedUnits,allTargets,cmdID,options)
 	if #allTargets>=1 then
-		local targetsUnordered = {}
-		if cmdID==CMD.ATTACK then --and not CMD_UNIT_SET_TARGET. Note: only CMD.ATTACK support split attack queue, and in such case we also need to remember the queue so we can revert later if user decided to do SHIFT+Move
-			for i=1,#allTargets do
-				targetsUnordered[allTargets[i] ] = true
-			end
-			for i=1, #selectedUnits do
-				unitsSplitAttackQueue[selectedUnits[i] ] = targetsUnordered --note: all units in this loop was refer to same table to avoid duplication
-				handledCount = handledCount + 1
+		if SPLIT_ATTACK_SINGLE then
+			local targetsUnordered = {}
+			if cmdID==CMD.ATTACK then --and not CMD_UNIT_SET_TARGET. Note: only CMD.ATTACK support split attack queue, and in such case we also need to remember the queue so we can revert later if user decided to do SHIFT+Move
+				for i=1,#allTargets do
+					targetsUnordered[allTargets[i] ] = true
+				end
+				for i=1, #selectedUnits do
+					unitsSplitAttackQueue[selectedUnits[i] ] = targetsUnordered --note: all units in this loop was refer to same table to avoid duplication
+					handledCount = handledCount + 1
+				end
 			end
 		end
 		for i=1, #selectedUnits do

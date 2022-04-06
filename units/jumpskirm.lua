@@ -22,25 +22,27 @@ return { jumpskirm = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     dontfireatradarcommand = '1',
     selection_scale   = 0.85,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 15.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[fatbotsupport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 480,
   maxSlope            = 36,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED DRONE]],
   objectName          = [[CORMORT.s3o]],
   script              = [[jumpskirm.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
@@ -59,7 +61,7 @@ return { jumpskirm = {
   trackStretch        = 0.8,
   trackType           = [[ComTrack]],
   trackWidth          = 14,
-  turnRate            = 2400,
+  turnRate            = 2880,
   upright             = true,
   workerTime          = 0,
 
@@ -85,13 +87,13 @@ return { jumpskirm = {
       coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-      
+
       customparams = {
         burst = Shared.BURST_RELIABLE,
 
         timeslow_damagefactor = 4,
         timeslow_overslow_frames = 2*30,
-        
+
         light_color = [[1.88 0.63 2.5]],
         light_radius = 320,
       },
@@ -99,8 +101,8 @@ return { jumpskirm = {
       damage                  = {
           default = 460.1,
       },
-      
-      explosionGenerator      = [[custom:flash2purple]],
+
+      explosionGenerator      = [[custom:heavy_disruptor_beam_hit]],
       fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,

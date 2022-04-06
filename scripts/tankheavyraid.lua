@@ -134,15 +134,15 @@ function script.StopMoving()
 end
 
 -- Weapons
-function script.AimFromWeapon1()
+function script.AimFromWeapon()
 	return turret
 end
 
-function script.QueryWeapon1()
+function script.QueryWeapon()
 	return sparkcenter2
 end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	
 	Signal(SIG_AIM1)
 	SetSignalMask(SIG_AIM1)

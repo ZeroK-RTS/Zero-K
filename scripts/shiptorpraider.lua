@@ -3,13 +3,14 @@ include "pieceControl.lua"
 
 local hull, torp, turret, sonar, wake1, wake2 = piece ('Hull', 'Torp', 'Turret', 'Sonar', 'Wake1', 'Wake2')
 
-local SIG_Move = 1
 local SIG_Aim = 2
 
 local stuns = {false, false, false}
 local disarmed = false
 local moving = false
 local sfxNum = 2
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 function script.setSFXoccupy(num)
 	sfxNum = num
@@ -101,10 +102,7 @@ function script.AimWeapon(id, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 190, 55, 0.25) then -- leaving at 190 for the case of amph regen
-		return true
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 240, 28, 0.05, true, 100)
 end
 
 local explodables = {sonar, turret}

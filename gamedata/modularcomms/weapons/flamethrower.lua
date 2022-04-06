@@ -30,7 +30,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 11,
-		subs    = 0.11,
 	},
 
 	explosionGenerator      = [[custom:SMOKE]],
@@ -42,7 +41,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noExplode               = true,
 	noSelfDamage            = true,
-	range                   = 270,
+	range                   = 267,
 	reloadtime              = 5/30,
 	rgbColor                = [[1 1 1]],
 	soundStart              = [[weapon/flamethrower]],

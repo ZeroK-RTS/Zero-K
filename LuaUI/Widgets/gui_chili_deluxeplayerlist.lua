@@ -183,7 +183,7 @@ options = {
 		name = "Show unit and income stats",
 		type = 'bool',
 		value = true,
-		desc = "Display resource statistics: metal in mobile units and static defenses; metal and energy income.",
+		desc = "Display resource statistics: metal in mobile units and static defences; metal and energy income.",
 		OnChange = function() SetupPanels() end,
 	},
 	colorResourceStats = {

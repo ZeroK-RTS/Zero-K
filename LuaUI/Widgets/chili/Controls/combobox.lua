@@ -76,8 +76,10 @@ function ComboBox:_CloseWindow()
 	self.labels = nil
 	if self._dropDownWindow then
 		self:CallListeners(self.OnClose)
-		self._dropDownWindow:Dispose()
-		self._dropDownWindow = nil
+		if self._dropDownWindow then
+			self._dropDownWindow:Dispose()
+			self._dropDownWindow = nil
+		end
 	end
 	if (self.state.pressed) then
 		self.state.pressed = false
@@ -103,7 +105,7 @@ function ComboBox:MouseDown(x, y)
 	self.state.pressed = true
 	if not self._dropDownWindow then
 		local sx, sy = self:LocalToScreen(0, 0)
-		
+
 		local selectByName = self.selectByName
 		local labels = {}
 
@@ -117,6 +119,7 @@ function ComboBox:MouseDown(x, y)
 					width = '100%',
 					height = self.itemHeight,
 					fontsize = self.itemFontSize,
+					objectOverrideFont = self.objectOverrideFont,
 					state = {focused = (i == self.selected), selected = (i == self.selected)},
 					OnMouseUp = {
 						function()

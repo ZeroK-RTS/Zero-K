@@ -28,7 +28,9 @@ function IterableMap.Add(self, key, data)
 		self.dataByKey[key] = data
 		return
 	end
-	data = data or true
+	if data == nil then
+		data = true
+	end
 	self.indexMax = self.indexMax + 1
 	self.keyByIndex[self.indexMax] = key
 	self.dataByKey[key] = data
@@ -131,6 +133,20 @@ function IterableMap.Apply(self, funcToApply, ...)
 			IterableMap.Remove(self, key)
 		else
 			i = i + 1
+		end
+	end
+end
+
+-- As above, but applies to every (mod)th element with an offset
+function IterableMap.ApplyFraction(self, mod, offset, funcToApply, ...)
+	local i = 1 + (offset or 0)
+	while i <= self.indexMax do
+		local key = self.keyByIndex[i]
+		if funcToApply(key, self.dataByKey[key], i, ...) then
+			-- Return true to remove element
+			IterableMap.Remove(self, key)
+		else
+			i = i + mod
 		end
 	end
 end

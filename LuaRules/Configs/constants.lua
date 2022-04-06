@@ -1,3 +1,4 @@
 HIDDEN_STORAGE = 10000 -- hidden storage: it will spend all energy above (storage - hidden_storage)
 TEAM_SLOWUPDATE_RATE = 30
-FACTORY_PLATE_RANGE = 420 -- Same as Caretaker, for no particula reason.
+TRANSPORT_LIGHT_COST_MAX = 500
+TRANSPORT_MEDIUM_COST_MAX = 1000

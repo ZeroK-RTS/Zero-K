@@ -60,6 +60,8 @@ local missilespeed = 850 --fixme
 local mfront = 10 --fixme
 local pause = 600
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 --effects
 local smokeblast = 1024
 
@@ -149,62 +151,40 @@ local function RestoreAfterDelay()
 	Sleep(2000)
 	Turn(head, y_axis, 0, 3)
 	Turn(pod, x_axis, 0, 3)
-	Move(podpist, y_axis, 0, 3)
+	Move(podpist, y_axis, 0, 20)
 end
 
 ----[[
-function script.QueryWeapon1() return points[missile].missile end
+function script.QueryWeapon()
+	return points[missile].missile
+end
 
-function script.AimFromWeapon1() return pod end
+function script.AimFromWeapon()
+	return pod
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
+	pitch = math.max(pitch, math.rad(40)) -- results in a minimum pod angle of 40° above horizontal
 	Turn(head, y_axis, heading, 6)
 	Turn(pod, x_axis, -pitch, 6)
-	Move(podpist, y_axis, pitch*2.5, 3)
+	Move(podpist, y_axis, pitch*6, 12)
 	WaitForTurn(head, y_axis)
 	WaitForTurn(pod, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	EmitSfx(points[missile].exhaust, smokeblast)
 	missile = missile + 1
 	if missile > 3 then missile = 1 end
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/880
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 71, 30 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 880, 30, 0.05, true)
 end
-
---]]
-
---[[ why are there two weapons???
-function script.QueryWeapon2() return pod end
-
-function script.AimFromWeapon2() return pod end
-
-function script.AimWeapon2(heading, pitch)
-	Signal(SIG_Aim)
-	SetSignalMask(SIG_Aim)
-	Turn(head, y_axis, heading, 5)
-	Turn(pod, x_axis, -pitch, 5)
-	--WaitForTurn(head, y_axis)
-	--WaitForTurn(pod, x_axis)
-	return true
-end
-
-function script.FireWeapon2()
-	--effects
-end
---]]
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

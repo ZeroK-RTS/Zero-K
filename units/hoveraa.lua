@@ -2,9 +2,9 @@ return { hoveraa = {
   unitname            = [[hoveraa]],
   name                = [[Flail]],
   description         = [[Anti-Air Hovercraft]],
-  acceleration        = 0.24,
+  acceleration        = 0.288,
   activateWhenBuilt   = true,
-  brakeRate           = 0.43,
+  brakeRate           = 0.516,
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoveraa.png]],
@@ -21,20 +21,19 @@ return { hoveraa = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 0,
     modelradius    = [[25]],
     midposoffset   = [[0 8 0]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoveraa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 950,
   maxSlope            = 36,
   maxVelocity         = 3.5,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   moveState           = 0,
   noAutoFire          = false,
@@ -55,7 +54,7 @@ return { hoveraa = {
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
-  turnRate            = 616,
+  turnRate            = 985,
   workerTime          = 0,
   weapons             = {
 
@@ -89,7 +88,6 @@ return { hoveraa = {
       damage                  = {
         default = 37.5,
         planes  = 375,
-        subs    = 20.625,
       },
 
       edgeEffectiveness       = 0.5,
@@ -109,6 +107,7 @@ return { hoveraa = {
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_fire8]],
       startvelocity           = 200,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 4000,
       tracks                  = true,

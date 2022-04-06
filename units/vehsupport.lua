@@ -2,9 +2,9 @@ return { vehsupport = {
   unitname               = [[vehsupport]],
   name                   = [[Fencer]],
   description            = [[Deployable Missile Rover (must stop to fire)]],
-  acceleration           = 0.15,
-  brakeRate              = 0.3,
-  buildCostMetal         = 140,
+  acceleration           = 0.18,
+  brakeRate              = 0.36,
+  buildCostMetal         = 145,
   builder                = false,
   buildPic               = [[vehsupport.png]],
   canGuard               = true,
@@ -23,20 +23,22 @@ return { vehsupport = {
     modelradius    = [[13]],
     aimposoffset   = [[0 10 0]],
     chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
+    okp_damage = 35,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[vehiclesupport]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 560,
+  maxDamage              = 530,
   maxSlope               = 18,
   maxVelocity            = 2.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   moveState              = 0,
   noAutoFire             = false,
@@ -61,7 +63,7 @@ return { vehsupport = {
   trackType              = [[StdTank]],
   trackWidth             = 34,
   turninplace            = 0,
-  turnRate               = 420,
+  turnRate               = 672,
   workerTime             = 0,
 
   weapons                = {
@@ -91,7 +93,6 @@ return { vehsupport = {
 
       damage                  = {
         default = 40.01,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

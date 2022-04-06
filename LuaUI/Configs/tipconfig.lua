@@ -34,7 +34,7 @@ generalTips = {
 unitTips = {
 	shieldscout = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
 	vehcapture = {"The \255\255\64\0Dominatrix\008 capture rover can capture enemy units (with a 10 second cooldown between captures), but control is lost if the capturing Dominatrix dies.", 3, 5},
-	spidercrabe = {"The \255\255\64\0Crab\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5},
+	spidercrabe = {"The \255\255\64\0Crab\008 outranges basic defences. It curls up into armored form when stationary, becoming a formidable defence turret.", 3, 5},
 	jumparty = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
 	jumpbomb = {"The \255\255\64\0Skuttle\008 has a very powerful explosion with a very small blast radius. Use it to jump on enemy heavy targets and kill them in one or two blows.", 3, 5},
 	

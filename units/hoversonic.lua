@@ -16,18 +16,16 @@ return { hoversonic = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -45,7 +43,7 @@ return { hoversonic = {
   },
   sightDistance       = 385,
   turninplace         = 0,
-  turnRate            = 616,
+  turnRate            = 985,
   workerTime          = 0,
 
   weapons             = {
@@ -73,14 +71,13 @@ return { hoversonic = {
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
             miscEffectFire   = [[custom:RIOT_SHELL_L]],
-            lups_explodelife = 100,
-            lups_explodespeed = 1,
+            lups_explodelife = 1.5,
+            lups_explodespeed = 0.44,
         },
 
         damage                  = {
             default = 175,
             planes  = 175,
-            subs    = 175,
         },
         
         cegTag                  = [[sonictrail]],
@@ -91,7 +88,7 @@ return { hoversonic = {
         impulseFactor           = 0.5,
         interceptedByShieldType = 1,
         noSelfDamage            = true,
-        range                   = 320,
+        range                   = 303,
         reloadtime              = 1.1,
         soundStart              = [[weapon/sonicgun2]],
         soundHit                = [[weapon/sonicgun_hit]],

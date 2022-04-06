@@ -115,14 +115,8 @@ function jumping(jumpPercent)
 	EmitSfx(r_pt, 1024)
 end
 
-function preJump(turn,distance)
-end
-
 function beginJump()
 	StartThread(BeginJumpThread)
-end
-
-function halfJump()
 end
 
 function endJump()

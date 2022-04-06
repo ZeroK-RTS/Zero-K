@@ -68,7 +68,7 @@ local function Bob()
 end
 
 local function SinkBubbles()
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
 	Turn(rfleg, x_axis, math.rad(0),math.rad(20))
 	Turn(rffoot, x_axis, math.rad(0),math.rad(20))
@@ -90,7 +90,7 @@ local function SinkBubbles()
 	
 	while true do
 		for i=1,#vents do
-			EmitSfx(vents[i], SFX.BUBBLE)
+			EmitSfx(vents[i], 1025)
 		end
 		Sleep(66)
 	end

@@ -1,10 +1,10 @@
 return { shipassault = {
   unitname               = [[shipassault]],
   name                   = [[Siren]],
-  description            = [[Destroyer (Riot/Assault)]],
-  acceleration           = 0.384,
+  description            = [[Riot/Assault Destroyer (Anti-Sub)]],
+  acceleration           = 0.46,
   activateWhenBuilt      = true,
-  brakeRate              = 0.5,
+  brakeRate              = 0.6,
   buildCostMetal         = 600,
   builder                = false,
   buildPic               = [[shipassault.png]],
@@ -18,9 +18,14 @@ return { shipassault = {
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[55]],
     turnatfullspeed = [[1]],
     extradrawrange = 800,
+
+    outline_x = 160,
+    outline_y = 160,
+    outline_yoff = 25,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -28,12 +33,9 @@ return { shipassault = {
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[shipassault]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 4000,
+  maxDamage              = 5200,
   maxVelocity            = 2.0,
-  minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
   noAutoFire             = false,
@@ -54,7 +56,7 @@ return { shipassault = {
   sightDistance          = 440,
   sonarDistance          = 440,
   turninplace            = 0,
-  turnRate               = 320,
+  turnRate               = 384,
   workerTime             = 0,
 
   weapons                = {
@@ -88,6 +90,7 @@ return { shipassault = {
         craterMult              = 0,
 
         customParams            = {
+            force_ignore_ground = [[1]],
             slot = [[5]],
             muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
             miscEffectFire   = [[custom:RIOT_SHELL_L]],
@@ -97,7 +100,7 @@ return { shipassault = {
         },
 
         damage                  = {
-            default = 260.01,
+            default = 280.01,
         },
         
         cegTag                  = [[sonictrail]],
@@ -110,8 +113,8 @@ return { shipassault = {
         interceptedByShieldType = 1,
         myGravity               = 0.01,
         noSelfDamage            = true,
-        range                   = 360,
-        reloadtime              = 3,
+        range                   = 270,
+        reloadtime              = 1.7,
         size                    = 64,
         sizeDecay               = 0.2,
         soundStart              = [[weapon/sonicgun2]],
@@ -137,7 +140,9 @@ return { shipassault = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-
+      customParams            = {
+        combatRange = 265,
+      },
       damage                  = {
         default = 400.01,
       },
