@@ -13,6 +13,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include(LUAUI_DIRNAME .. "Widgets/Include/Unit.lua")
 
 local formationRank = {}
 local defaultRank = {}
@@ -370,7 +371,7 @@ end
 
 local function GetExecutingUnits(cmdID)
 	local units = {}
-	local selUnits = spGetSelectedUnits()
+	local selUnits = GetSelectedUnits(cmdID)
 	for i = 1, #selUnits do
 		local uID = selUnits[i]
 		if CanUnitExecute(uID, cmdID) then

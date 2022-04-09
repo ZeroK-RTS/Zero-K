@@ -14,6 +14,7 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include(LUAUI_DIRNAME .. "Widgets/Include/Unit.lua")
 
 local SPLIT_ATTACK_SINGLE = false
 
@@ -42,16 +43,15 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 	if not defaultCommands[id] or options.internal then --only process user's command
 		return false
 	end
-	if Spring.GetSelectedUnitsCount() == 0 then --skip whole thing if no selection
+	local units = GetSelectedUnits(id, params, options)
+	if #units == 0 then --skip whole thing if no selection
 		return false
 	end
-	local units
 	if SPLIT_ATTACK_SINGLE and handledCount > 0 then
 		 --This remove all but 1st attack order from CTRL+Area_attack if user choose to append new order to unit (eg: SHIFT+move),
 		 --this is to be consistent with bomber_command (rearm-able bombers), which only shoot 1st target and move on to next order.
 		 
 		 --Known limitation: not able to remove order if user queued faster than network delay (it need to see unit's current command queue)
-		units = Spring.GetSelectedUnits()
 		local unitID, attackList
 		for i=1,#units do
 			unitID = units[i]
@@ -73,7 +73,6 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 		--The following code filter out ground unit from dedicated AA, and
 		--split target among selected unit if user press CTRL+Area_attack
 		local cx2, cy2, cz2 = params[4], params[5], params[6]
-		units = units or Spring.GetSelectedUnits()
 		local targetUnits
 		if cz2 then
 			targetUnits = Spring.GetUnitsInRectangle(math.min(cx,cx2), math.min(cz,cz2), math.max(cx,cx2), math.max(cz,cz2))
@@ -193,14 +192,10 @@ function ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,c
 		IssueSplitedCommand(normalUnits,allTargets,cmdID,options)
 		isHandled = true
 	else -- normal queue
-		if #antiAirUnits>1 then
-			--split between AA and ground,
-			IssueCommand(antiAirUnits,airTargets,cmdID,options)
-			IssueCommand(normalUnits,allTargets,cmdID,options)
-			isHandled = true
-		else
-			isHandled = false --nothing need to be done, let spring handle
-		end
+		--split between AA and ground,
+		IssueCommand(antiAirUnits,airTargets,cmdID,options)
+		IssueCommand(normalUnits,allTargets,cmdID,options)
+		isHandled = true
 	end
 	return isHandled
 end
