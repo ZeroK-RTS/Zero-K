@@ -16,6 +16,9 @@ local resurrectionHalosVBO = nil
 local resurrectionHalosShader = nil
 local luaShaderDir = "LuaUI/Widgets/Include/"
 --local texture = 'LuaUI/Images/halo.dds'
+local internalDisabled = false
+
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 local unitConf = {}
 
@@ -598,9 +601,15 @@ void main(void)
 }
 ]]
 
+local function hello()
+	Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+end
+
 local function goodbye(reason)
-  Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
-  widgetHandler:RemoveWidget()
+	Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
+	Spring.Echo("Using fallback unit outlines")
+	Spring.SendCommands{"luaui enablewidget Outline No Shader"}
+	internalDisabled = true -- Don't actually disable widget, because we want to check compat on each load.
 end
 
 local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
@@ -628,7 +637,10 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "Shader GL4"
 	  )
 	local shaderCompiled = DrawPrimitiveAtUnitShader:Initialize()
-	if not shaderCompiled then goodbye("Failed to compile ".. DPATname .." GL4 ") end
+	if not shaderCompiled then
+		goodbye("Failed to compile ".. DPATname .." GL4 ")
+		return
+	end
 
 	DrawPrimitiveAtUnitVBO = makeInstanceVBOTable(
 		{
@@ -643,15 +655,21 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "VBO", -- name
 		5  -- unitIDattribID (instData)
 	)
-	if DrawPrimitiveAtUnitVBO == nil then goodbye("Failed to create DrawPrimitiveAtUnitVBO") end
+	if DrawPrimitiveAtUnitVBO == nil then
+		goodbye("Failed to create DrawPrimitiveAtUnitVBO")
+		return
+	end
 
 	local DrawPrimitiveAtUnitVAO = gl.GetVAO()
 	DrawPrimitiveAtUnitVAO:AttachVertexBuffer(DrawPrimitiveAtUnitVBO.instanceVBO)
 	DrawPrimitiveAtUnitVBO.VAO = DrawPrimitiveAtUnitVAO
-	return  DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
+	return DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
 end
 
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+	if internalDisabled then
+		return
+	end
 	local gf = Spring.GetGameFrame()
 	myvisibleUnits[unitID] = unitDefID
 	local unitData = unitConf[unitDefID]
@@ -683,6 +701,9 @@ function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
+	if internalDisabled then
+		return
+	end
 	clearInstanceTable(resurrectionHalosVBO)
 	for unitID, unitDefID in pairs(extVisibleUnits) do 
 		widget:VisibleUnitAdded(unitID, unitDefID, Spring.GetUnitTeam(unitID))
@@ -690,6 +711,9 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 end
 
 function widget:VisibleUnitRemoved(unitID)
+	if internalDisabled then
+		return
+	end
 	if resurrectionHalosVBO.instanceIDtoIndex[unitID] then 
 		popElementInstance(resurrectionHalosVBO, unitID)
 		myvisibleUnits[unitID] = nil
@@ -707,7 +731,7 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then
+	if Spring.IsGUIHidden() or internalDisabled then
 		return
 	end
 
@@ -762,12 +786,12 @@ function widget:DrawWorld()
 	end
 end
 
-local function initGL4()
-	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
-end
-
 function widget:Initialize()
-	initGL4()
+	if not (LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive() and BAR_COMPAT) then
+		goodbye("Adv shading not enabled")
+		return
+	end
+	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
 	
 	if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then 
 		local visibleUnits =  WG['unittrackerapi'].visibleUnits
@@ -775,4 +799,5 @@ function widget:Initialize()
 			widget:VisibleUnitAdded(unitID, unitDefID)
 		end
 	end
+	hello()
 end
