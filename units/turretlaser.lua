@@ -18,6 +18,10 @@ return { turretlaser = {
   customParams                  = {
     aimposoffset   = [[0 22 0]],
     cus_noflashlight = 1,
+
+    outline_x = 70,
+    outline_y = 100,
+    outline_yoff = 32.5,
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],

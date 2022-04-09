@@ -27,6 +27,10 @@ return { tankraid = {
     selection_scale   = 0.85,
     aim_lookahead     = 140,
     percieved_range   = 270, -- How much range enemy units think Kodachi has
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -14,7 +14,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "MetalFeatures (old)",
+    name      = "MetalFeatures (very old)",
     desc      = "Highlights features with reclaimable metal",
     author    = "trepan",
     date      = "Aug 05, 2007", --Apr 23, 2019

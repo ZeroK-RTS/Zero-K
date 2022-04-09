@@ -31,6 +31,10 @@ return { starlight_satellite = {
   customParams           = {
     dontcount = [[1]],
     has_parent_unit = 1,
+
+    outline_x = 100,
+    outline_y = 100,
+    outline_yoff = 0,
   },
 
   sfxtypes               = {

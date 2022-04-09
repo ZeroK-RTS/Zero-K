@@ -16,13 +16,27 @@ local resurrectionHalosVBO = nil
 local resurrectionHalosShader = nil
 local luaShaderDir = "LuaUI/Widgets/Include/"
 --local texture = 'LuaUI/Images/halo.dds'
+local internalDisabled = false
+
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 local unitConf = {}
 
-for unitDefID, unitDef in pairs(UnitDefs) do
-	local xsize, zsize = unitDef.xsize, unitDef.zsize
-	local scale = math.max(xsize,zsize)
-	unitConf[unitDefID] = {scale=scale, iconSize=scale, height=unitDef.height}
+for unitDefID, ud in pairs(UnitDefs) do
+	local xsize, zsize = ud.xsize, ud.zsize
+	local scale = math.max(xsize,zsize) * 16
+	unitConf[unitDefID] = {
+		drawRectX = (ud.customParams.outline_x and tonumber(ud.customParams.outline_x)) or scale,
+		drawRectY = (ud.customParams.outline_y and tonumber(ud.customParams.outline_y)) or scale,
+		height = (ud.customParams.outline_yoff and tonumber(ud.customParams.outline_yoff)) or (ud.height * 0.5)
+	}
+	if ud.customParams.outline_sea_x then
+		unitConf[unitDefID].seaConfig = {
+			drawRectX = (ud.customParams.outline_sea_x and tonumber(ud.customParams.outline_sea_x)) or unitConf[unitDefID].drawRectX,
+			drawRectY = (ud.customParams.outline_sea_y and tonumber(ud.customParams.outline_sea_y)) or unitConf[unitDefID].drawRectY,
+			height = (ud.customParams.outline_sea_yoff and tonumber(ud.customParams.outline_sea_yoff)) or unitConf[unitDefID].height
+		}
+	end
 end
 
 -----------------------------------------------------------------
@@ -31,15 +45,15 @@ end
 
 local STRENGTH_MULT_MIN = 0.1
 local STRENGTH_MULT_MAX = 12
-local DEFAULT_STRENGTH_MULT = 0.5
-local STRENGTH_MAGIC_NUMBER = 6
+local DEFAULT_STRENGTH_MULT = 1
+local STRENGTH_MAGIC_NUMBER = 2.4
 
-local SUBTLE_MIN = 150
+local SUBTLE_MIN = 50
 local SUBTLE_MAX = 4000
 
 local shaderConfig = {
 	TRANSPARENCY = 1, -- transparency of the stuff drawn
-	HEIGHTOFFSET = 4, -- Additional height added to everything
+	HEIGHTOFFSET = 0, -- Additional height added to everything
 	ANIMATION = 0, -- set to 0 if you dont want animation
 	INITIALSIZE = 1, -- What size the stuff starts off at when spawned
 	GROWTHRATE = 4, -- How fast it grows to full size
@@ -54,11 +68,12 @@ local shaderConfig = {
 	POST_GEOMETRY = "gl_Position.z = (gl_Position.z) - 256.0 / (gl_Position.w);",	--"g_uv.zw = dataIn[0].v_parameters.xy;", -- noop
 	POST_SHADING = "fragColor.rgba = texcolor;",
 	MAXVERTICES = 4, -- The max number of vertices we can emit, make sure this is consistent with what you are trying to draw (tris 3, quads 4, corneredrect 8, circle 64
-	USE_CIRCLES = 1, -- set to nil if you dont want circles
-	USE_CORNERRECT = 1, -- set to nil if you dont want cornerrect
-	USE_TRIANGLES = 1,
+	--USE_CIRCLES = 1, -- set to nil if you dont want circles
+	--USE_CORNERRECT = 1, -- set to nil if you dont want cornerrect
+	--USE_TRIANGLES = 1,
 	FULL_ROTATION = 0, -- the primitive is fully rotated in the units plane
 	DISCARD = 0, -- Enable alpha threshold to discard fragments below 0.01
+	--DEBUGEDGES = 1, -- set to non-nil to debug the size of the rectangles
 }
 
 -----------------------------------------------------------------
@@ -69,14 +84,28 @@ local configStrengthMult = DEFAULT_STRENGTH_MULT
 local scaleWithHeight = true
 local functionScaleWithHeight = true
 local zoomScaleRange = 0.4
+local overrideDrawBoxes = false
+
+local function PrintDrawBox()
+	if overrideDrawBoxes then
+		Spring.Echo("=== New Draw Box ===")
+		Spring.Echo("outline_x = " .. options.overrideDrawBox_x.value .. ",")
+		Spring.Echo("outline_y = " .. options.overrideDrawBox_y.value .. ",")
+		Spring.Echo("outline_yoff = " .. options.overrideDrawBox_yoff.value .. ",")
+		Spring.SetClipboard("\n\n    outline_x = " .. options.overrideDrawBox_x.value .. [[,
+    outline_y = ]] .. options.overrideDrawBox_y.value .. [[,
+    outline_yoff = ]] .. options.overrideDrawBox_yoff.value .. [[,]])
+	end
+end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options_order = {'thickness', 'scaleRange', 'scaleWithHeight', 'functionScaleWithHeight', 'overrideDrawBox', 'overrideDrawBox_x', 'overrideDrawBox_y', 'overrideDrawBox_yoff'}
 options = {
 	thickness = {
 		name = 'Outline Thickness',
 		desc = 'How thick the outline appears around objects',
 		type = 'number',
-		min = 0.2, max = 2, step = 0.01,
+		min = 0.2, max = 5, step = 0.05,
 		value = DEFAULT_STRENGTH_MULT,
 		OnChange = function (self)
 			configStrengthMult = self.value
@@ -112,6 +141,57 @@ options = {
 			functionScaleWithHeight = self.value
 		end,
 	},
+	
+	-- Debug
+	overrideDrawBox = {
+		name = 'Override draw box',
+		desc = 'Debug enabling below.',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		OnChange = function (self)
+			overrideDrawBoxes = self.value
+			local selUnits = Spring.GetSelectedUnits()
+			if selUnits and selUnits[1] and Spring.GetUnitDefID(selUnits[1]) then
+				local unitDefID = Spring.GetUnitDefID(selUnits[1])
+				options.overrideDrawBox_x.value = unitConf[unitDefID].drawRectX
+				options.overrideDrawBox_y.value = unitConf[unitDefID].drawRectY
+				options.overrideDrawBox_yoff.value = unitConf[unitDefID].height
+				PrintDrawBox()
+			end
+			WG.unittrackerapi.initializeAllUnits()
+		end,
+	},
+	overrideDrawBox_x = {
+		name = 'Override X',
+		type = 'number',
+		min = 0, max = 300, step = 5,
+		value = 100,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
+		end,
+	},
+	overrideDrawBox_y = {
+		name = 'Override Y',
+		type = 'number',
+		min = 0, max = 300, step = 5,
+		value = 100,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
+		end,
+	},
+	overrideDrawBox_yoff = {
+		name = 'Override Y Offset',
+		type = 'number',
+		min = -200, max = 200, step = 5,
+		value = 0,
+		OnChange = function (self)
+			WG.unittrackerapi.initializeAllUnits()
+			PrintDrawBox()
+		end,
+	},
 }
 
 -----------------------------------------------------------------
@@ -141,7 +221,8 @@ local function GetZoomScale()
 			return zoomScaleRange
 		end
 		
-		local zoomScale = (((math.cos(math.pi*(cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN)) + 1)/2)^2)
+		local zoomScale = (math.cos(math.pi*((cameraHeight - SUBTLE_MIN)/(SUBTLE_MAX - SUBTLE_MIN))^0.75) + 1)/2
+		--Spring.Echo("zoomScale", zoomScale)
 		return zoomScale*(1 - zoomScaleRange) + zoomScaleRange
 	end
 
@@ -218,6 +299,7 @@ out DataVS {
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
+	float v_cameraDistance;
 	#if (FULL_ROTATION == 1)
 		mat3 v_fullrotation;
 	#endif
@@ -255,8 +337,8 @@ void main()
 	// TODO: take into account size of primitive before clipping
 
 	// this sets the num prims to 0 for units further from cam than iconDistance
-	float cameraDistance = length((cameraViewInv[3]).xyz - v_centerpos.xyz);
-	if (cameraDistance > iconDistance) v_numvertices = 0;
+	v_cameraDistance = length((cameraViewInv[3]).xyz - v_centerpos.xyz);
+	if (v_cameraDistance > iconDistance) v_numvertices = 0;
 
 	if (dot(v_centerpos.xyz, v_centerpos.xyz) < 1.0) v_numvertices = 0; // if the center pos is at (0,0,0) then we probably dont have the matrix yet for this unit, because it entered LOS but has not been drawn yet.
 
@@ -292,6 +374,7 @@ in DataVS {
 	vec4 v_centerpos;
 	vec4 v_uvoffsets;
 	vec4 v_parameters;
+	float v_cameraDistance;
 	#if (FULL_ROTATION == 1)
 		mat3 v_fullrotation;
 	#endif
@@ -300,6 +383,7 @@ in DataVS {
 out DataGS {
 	vec4 g_color;
 	vec4 g_uv;
+	float g_cameraDistance;
 };
 
 mat3 rotY;
@@ -327,6 +411,7 @@ void offsetVertex4( float x, float y, float z, float u, float v){
 void main(){
 	uint numVertices = dataIn[0].v_numvertices;
 	centerpos = dataIn[0].v_centerpos;
+	g_cameraDistance = dataIn[0].v_cameraDistance;
 	#if (BILLBOARD == 1 )
 		rotY = mat3(cameraViewInv[0].xyz,cameraViewInv[2].xyz, cameraViewInv[1].xyz); // swizzle cause we use xz
 	#else
@@ -411,11 +496,13 @@ uniform float outlineWidth;
 in DataGS {
 	vec4 g_color;
 	vec4 g_uv;
+	float g_cameraDistance; 
 };
 
 uniform sampler2D DrawPrimitiveAtUnitTexture;
 uniform sampler2D mapDepths;
 uniform sampler2D modelDepths;
+uniform sampler2D modelMisc;
 
 uniform float stencilPass = 0.0; // 1 if we are stenciling
 out vec4 fragColor;
@@ -442,44 +529,87 @@ void main(void)
 	
 	float fulldepth = min(mapdepth, modeldepth); 
 	
+	float my_misctexvalue = texture(modelMisc, screenUV).r;
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
-	if (deltadepth > 0.0) discard; // we hit a model, bail!
+	//if (deltadepth > 0.0) discard; // we hit a model, bail!
 	//if ((modeldepth < 1.0) && (mapdepth > modeldepth)) discard; // model occluded behind map
 	
 	if (stencilPass > 0.5){
-		float nearest = outlineWidth*20 + 1 ;
-		for (int x = -1 * resolution; x <= resolution; x++){
-			for (int y = -1* resolution; y <= resolution; y++){
-			
-				vec2 pixeloffset = vec2(float(x), float(y));
-				vec2 screendelta = pixeloffset / viewGeometry.xy;
+		float nearest = (outlineWidth*20 + 1) * (outlineWidth*20 + 1) ;
+		vec2 viewGeometryInv = 1.0 / viewGeometry.xy;
+		
+		if (deltadepth > 0.0 && my_misctexvalue > 0.5) {
+			for (int x = -1; x <= 1; x++){
+				vec2 pixeloffset = vec2(float(x), float(0));
+				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
-				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd > 0 ) nearest = min(nearest, length(pixeloffset));
-
+				if (misctexvalue > 0.5 && dd == 0) {
+					nearest = min(nearest, abs(x)); 
+				}
 			}
+			for (int y = -1; y <= 1; y++){
+				vec2 pixeloffset = vec2(float(0), float(y));
+				vec2 screendelta = pixeloffset * viewGeometryInv;
+				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+				float mapd = texture(mapDepths, screenUV+ screendelta).x;
+				float modd = texture(modelDepths, screenUV + screendelta).x;
+				float dd = max(mapd - modd, 0.0);
+				if (misctexvalue > 0.5 && dd == 0) {
+					nearest = min(nearest, abs(y)); 
+				}
+			}
+			nearest = sqrt(nearest);
+			
+			fragColor.rgba = vec4(vec3(0.0), (1.0 - nearest * 1.5 / outlineWidth));
+		} else {
+			for (int x = -1 * resolution; x <= resolution; x++){
+				for (int y = -1* resolution; y <= resolution; y++){
+					vec2 pixeloffset = vec2(float(x), float(y));
+					vec2 screendelta = pixeloffset * viewGeometryInv;
+					
+					float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
+					float mapd = texture(mapDepths, screenUV+ screendelta).x;
+					float modd = texture(modelDepths, screenUV + screendelta).x;
+					float dd = max(mapd - modd, 0.0);
+					if (misctexvalue > 0.5 && dd > 0){
+						nearest = min(nearest, dot(pixeloffset, pixeloffset));
+					}
+				}
+			}
+			nearest = sqrt(nearest);
+
+			fragColor.rgba = vec4(vec3(0.0), (1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 2))));
 		}
-		// For debuging draw size
-		//if (min(g_uv.x, g_uv.y) > 0.03){ // we are NOT the edges
-			fragColor.rgba = vec4(vec3(0.0), 1.0 - pow((nearest/(sqrtdist)), 1 + int(outlineWidth / 3)));
-		//}else{
-		//	fragColor.rgba = vec4(vec3(fract(nearest/16)), 1.0);
-		//	fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
-		//}
+		#ifdef DEBUGEDGES
+			// For debuging draw size
+			if (min(g_uv.x, g_uv.y) < 0.05 || max(g_uv.x, g_uv.y) > 0.95){ // we are on the edges
+				fragColor.rgba = vec4(vec3(fract(nearest/16)), 1.0);
+				fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.7);
+			}
+		#endif
 	}else{
-		fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
+		//fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
 	}
+	//fragColor.rgba = vec4(texture(modelMisc, screenUV).rgb, 1.0);
 	
 }
 ]]
 
+local function hello()
+	Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+end
+
 local function goodbye(reason)
-  Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
-  widgetHandler:RemoveWidget()
+	Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
+	Spring.Echo("Using fallback unit outlines")
+	Spring.SendCommands{"luaui enablewidget Outline No Shader"}
+	internalDisabled = true -- Don't actually disable widget, because we want to check compat on each load.
 end
 
 local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
@@ -496,6 +626,7 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 				DrawPrimitiveAtUnitTexture = 0;
 				mapDepths = 1,
 				modelDepths = 2,
+				modelMisc = 3, 
 			},
 			uniformFloat = {
 				addRadius = 1,
@@ -506,7 +637,10 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "Shader GL4"
 	  )
 	local shaderCompiled = DrawPrimitiveAtUnitShader:Initialize()
-	if not shaderCompiled then goodbye("Failed to compile ".. DPATname .." GL4 ") end
+	if not shaderCompiled then
+		goodbye("Failed to compile ".. DPATname .." GL4 ")
+		return
+	end
 
 	DrawPrimitiveAtUnitVBO = makeInstanceVBOTable(
 		{
@@ -521,21 +655,38 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "VBO", -- name
 		5  -- unitIDattribID (instData)
 	)
-	if DrawPrimitiveAtUnitVBO == nil then goodbye("Failed to create DrawPrimitiveAtUnitVBO") end
+	if DrawPrimitiveAtUnitVBO == nil then
+		goodbye("Failed to create DrawPrimitiveAtUnitVBO")
+		return
+	end
 
 	local DrawPrimitiveAtUnitVAO = gl.GetVAO()
 	DrawPrimitiveAtUnitVAO:AttachVertexBuffer(DrawPrimitiveAtUnitVBO.instanceVBO)
 	DrawPrimitiveAtUnitVBO.VAO = DrawPrimitiveAtUnitVAO
-	return  DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
+	return DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
 end
 
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+	if internalDisabled then
+		return
+	end
 	local gf = Spring.GetGameFrame()
 	myvisibleUnits[unitID] = unitDefID
+	local unitData = unitConf[unitDefID]
+	if unitData.seaConfig then
+		local x, z = Spring.GetUnitPosition(unitID)
+		if Spring.GetGroundHeight(x, z) < 0 then
+			unitData = unitData.seaConfig
+		end
+	end
+	
 	pushElementInstance(
 		resurrectionHalosVBO, -- push into this Instance VBO Table
 		{
-			unitConf[unitDefID].scale * 16, unitConf[unitDefID].scale * 16, 8, unitConf[unitDefID].height*0.5 ,  -- lengthwidthcornerheight
+			(overrideDrawBoxes and options.overrideDrawBox_y.value) or unitData.drawRectY,
+			(overrideDrawBoxes and options.overrideDrawBox_x.value) or unitData.drawRectX,
+			8,
+			(overrideDrawBoxes and options.overrideDrawBox_yoff.value) or unitData.height,  -- lengthwidthcornerheight
 			0, -- teamID
 			4, -- how many trianges should we make (2 = cornerrect)
 			gf, 0, 0, 0, -- the gameFrame (for animations), and any other parameters one might want to add
@@ -550,6 +701,9 @@ function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
+	if internalDisabled then
+		return
+	end
 	clearInstanceTable(resurrectionHalosVBO)
 	for unitID, unitDefID in pairs(extVisibleUnits) do 
 		widget:VisibleUnitAdded(unitID, unitDefID, Spring.GetUnitTeam(unitID))
@@ -557,6 +711,9 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 end
 
 function widget:VisibleUnitRemoved(unitID)
+	if internalDisabled then
+		return
+	end
 	if resurrectionHalosVBO.instanceIDtoIndex[unitID] then 
 		popElementInstance(resurrectionHalosVBO, unitID)
 		myvisibleUnits[unitID] = nil
@@ -574,7 +731,7 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then
+	if Spring.IsGUIHidden() or internalDisabled then
 		return
 	end
 
@@ -582,6 +739,7 @@ function widget:DrawWorld()
 		--gl.Texture(0, texture)
 		gl.Texture(1, "$map_gbuffer_zvaltex")-- Texture file
 		gl.Texture(2, "$model_gbuffer_zvaltex")-- Texture file
+		gl.Texture(3, "$model_gbuffer_misctex")-- Texture file
 		resurrectionHalosShader:Activate()
 			resurrectionHalosShader:SetUniform("iconDistance", 99999) -- pass
 			resurrectionHalosShader:SetUniform("addRadius", 0)
@@ -591,6 +749,7 @@ function widget:DrawWorld()
 			gl.DepthMask(false)
 			
 			-- FIRST PASS:
+			gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 			gl.ColorMask(false, false, false, false) -- disable writing to all but stencil
 			gl.StencilTest(true) -- enable stencil test
 			gl.DepthTest(false) -- dont do depth testing either
@@ -621,15 +780,18 @@ function widget:DrawWorld()
 		gl.Texture(0, false)
 		gl.Texture(1, false)-- Texture file
 		gl.Texture(2, false)-- Texture file
+		gl.Texture(3, false)-- Texture file
+		
+		gl.StencilTest(false)
 	end
 end
 
-local function initGL4()
-	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
-end
-
 function widget:Initialize()
-	initGL4()
+	if not (LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive() and BAR_COMPAT) then
+		goodbye("Adv shading not enabled")
+		return
+	end
+	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
 	
 	if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then 
 		local visibleUnits =  WG['unittrackerapi'].visibleUnits
@@ -637,4 +799,5 @@ function widget:Initialize()
 			widget:VisibleUnitAdded(unitID, unitDefID)
 		end
 	end
+	hello()
 end

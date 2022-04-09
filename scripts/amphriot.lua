@@ -111,6 +111,7 @@ local longRange = false
 local torpRange = WeaponDefNames["amphriot_torpedo"].range
 local shotRange = WeaponDefNames["amphriot_flechette"].range
 
+--[[
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
@@ -128,7 +129,7 @@ local function WeaponRangeUpdate()
 		Sleep(200)
 	end
 end
-
+]]
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim functions

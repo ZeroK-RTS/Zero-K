@@ -424,11 +424,6 @@ function script.Shot(num)
 	end
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
-end
-
 function script.StopBuilding()
 	inBuildAnim = false
 	SetUnitValue(COB.INBUILDSTANCE, 0)

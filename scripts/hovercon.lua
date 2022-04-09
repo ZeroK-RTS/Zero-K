@@ -75,11 +75,6 @@ function script.setSFXoccupy(num)
 	curTerrainType = num
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),beam)
-	return beam
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 

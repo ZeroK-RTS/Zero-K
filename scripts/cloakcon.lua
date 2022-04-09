@@ -186,11 +186,6 @@ function script.StopBuilding()
 	StartThread(Idle)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), claw1)
-	return claw1
-end
-
 function script.Create()
 	Spring.SetUnitNanoPieces(unitID, {claw1})
 	StartThread(GG.Script.SmokeUnit, unitID, {chest})

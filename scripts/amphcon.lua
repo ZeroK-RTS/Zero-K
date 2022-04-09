@@ -30,7 +30,6 @@ local moving = false
 local building = false
 local movingData = {}
 
-local nanoNum = 0
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local function Walk()
@@ -157,13 +156,6 @@ function script.StartBuilding(heading, pitch)
 	Turn(lnozzle, x_axis, - pitch, math.rad(180))
 	Turn(rnozzle, x_axis, - pitch, math.rad(180))
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	nanoNum = 1 - nanoNum
-	local nano = nanoPieces[nanoNum]
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nano)
-	return nano
 end
 
 function script.Killed(recentDamage, maxHealth)

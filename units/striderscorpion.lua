@@ -26,6 +26,10 @@ return { striderscorpion = {
     bait_level_default = 0,
     aimposoffset          = [[0 10 0]],
     decloak_footprint     = 5,
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 20,
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],

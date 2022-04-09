@@ -144,11 +144,6 @@ function script.Create()
 	StartThread(Open)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID, unitDefID, spGetUnitTeam(unitID), emit)
-	return emit
-end
-
 function script.Activate ()
 	StartThread(Open)
 end

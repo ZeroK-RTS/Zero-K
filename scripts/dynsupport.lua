@@ -499,11 +499,6 @@ function script.Shot(num)
 	dyncomm.EmitWeaponShotSfx(flare, num)
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
-end
-
 function script.StopBuilding()
 	Signal(SIG_BUILD)
 	inBuildAnim = false

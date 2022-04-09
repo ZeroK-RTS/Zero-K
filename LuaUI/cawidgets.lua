@@ -571,6 +571,24 @@ function widgetHandler:Initialize()
 	TimeLoad("SaveConfigData")
 end
 
+local springRestricted = {}
+local restrictedFunctions = {
+	--[[ These are blocked for being unfair because of latency and performance.
+	     Feel free to make a gadget instead though. See https://zero-k.info/Forum/Thread/34108 ]]
+	"GetVisibleProjectiles",
+	"GetProjectilesInRectangle",
+}
+local restrictedWhitelist = {
+	--[[ Other widgets have security holes and there is
+	     no reason for them to have access anyway. ]]
+	['LuaUI/Widgets/gfx_projectile_lights.lua'] = true,
+}
+
+for i = 1, #restrictedFunctions do
+	local funcName = restrictedFunctions[i]
+	springRestricted[funcName] = Spring[funcName]
+	Spring[funcName] = nil
+end
 
 function widgetHandler:LoadWidget(filename, _VFSMODE)
 	_VFSMODE = _VFSMODE or VFSMODE
@@ -597,7 +615,9 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 		return nil
 	end
 
-	local widget = widgetHandler:NewWidget(fromZip)
+	local exposeRestricted = fromZip and restrictedWhitelist[filename]
+	local widget = widgetHandler:NewWidget(exposeRestricted)
+
 	setfenv(chunk, widget)
 	local success, err = pcall(chunk)
 	if (not success) then
@@ -688,20 +708,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	return widget
 end
 
-local builtinWidgetsOnly = {}
-local restrictedFunctions = {
-	--[[ These are blocked for being unfair because of latency and performance.
-	     Feel free to make a gadget instead though. See https://zero-k.info/Forum/Thread/34108 ]]
-	"GetVisibleProjectiles",
-	"GetProjectilesInRectangle",
-}
-for i = 1, #restrictedFunctions do
-	local funcName = restrictedFunctions[i]
-	builtinWidgetsOnly[funcName] = Spring[funcName]
-	Spring[funcName] = nil
-end
-
-function widgetHandler:NewWidget(fromZip)
+function widgetHandler:NewWidget(exposeRestricted)
 	local widget = {}
 
 	-- copy the system calls into the widget table
@@ -710,8 +717,8 @@ function widgetHandler:NewWidget(fromZip)
 		widget[k] = v
 	end
 
-	if fromZip then
-		widget.SpringRestricted = builtinWidgetsOnly
+	if exposeRestricted then
+		widget.SpringRestricted = springRestricted
 	end
 
 	widget.WG = self.WG    -- the shared table
@@ -2432,7 +2439,6 @@ end
 
 
 function widgetHandler:VisibleUnitAdded(unitID, unitDefID, unitTeam)
-Spring.Echo("VisibleUnitAdded")
 	for _, w in ipairs(self.VisibleUnitAddedList) do
 		w:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 	end

@@ -11,7 +11,7 @@ function widget:GetInfo()
    }
 end
 
-local debuglevel = 1
+local debuglevel = 0
 -- debuglevel 0 is no debugging
 -- debuglevel 1 is show warnings for stuff periodicly and make self crash
 -- debuglevel 2 is verbose
@@ -556,8 +556,8 @@ function widget:Initialize()
 	WG['unittrackerapi'] = {}
 	WG['unittrackerapi'].visibleUnits = visibleUnits
 	WG['unittrackerapi'].alliedUnits = alliedUnits
+	WG['unittrackerapi'].initializeAllUnits = initializeAllUnits
 	initializeAllUnits()
-	
 end
 
 function widget:Shutdown()

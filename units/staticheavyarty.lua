@@ -20,6 +20,10 @@ return { staticheavyarty = {
     aimposoffset = [[0 50 -7]],
     modelradius    = [[35]],
     selectionscalemult = 1,
+
+    outline_x = 270,
+    outline_y = 270,
+    outline_yoff = 90,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

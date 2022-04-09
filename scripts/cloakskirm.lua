@@ -113,6 +113,7 @@ local function RestoreAfterDelay()
 	Turn (gun, x_axis, math.rad(20), math.rad(40))
 end
 
+--[[
 local function ReloadPenaltyAndAnimation()
 	aimBlocked = true
 	SetSelfSpeedMod(RELOAD_PENALTY)
@@ -137,6 +138,7 @@ local function ReloadPenaltyAndAnimation()
 		Sleep(340)
 	end
 end
+]]
 
 function OnLoadGame()
 	SetSelfSpeedMod(1)

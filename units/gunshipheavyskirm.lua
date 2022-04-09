@@ -25,6 +25,10 @@ return { gunshipheavyskirm = {
     airstrafecontrol = [[0]],
     modelradius      = [[10]],
     aim_lookahead    = 200,
+
+    outline_x = 110,
+    outline_y = 110,
+    outline_yoff = 10,
   },
 
   explodeAs           = [[GUNSHIPEX]],

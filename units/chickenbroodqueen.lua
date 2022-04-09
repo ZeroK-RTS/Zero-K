@@ -44,6 +44,9 @@ return { chickenbroodqueen = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 185,
+    outline_y = 185,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[SMALL_UNITEX]],

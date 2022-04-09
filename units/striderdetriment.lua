@@ -33,6 +33,10 @@ return { striderdetriment = {
     draw_reload_num       = 3,
     selection_scale       = 1.12,
     decloak_footprint     = 6,
+
+    outline_x = 230,
+    outline_y = 230,
+    outline_yoff = 70,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],

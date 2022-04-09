@@ -31,6 +31,8 @@ if not (gl.CreateShader and Platform.glHaveGL4) then
 	return false
 end
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -182,8 +184,8 @@ local function GetTextures(drawPass, unitID)
 		}
 	else
 		return {
-			[0] = ':l:'..textureOverrides[unitID][1],
-			[1] = ':l:'..textureOverrides[unitID][2],
+			[0] = textureOverrides[unitID][1],
+			[1] = textureOverrides[unitID][2],
 			[2] = "$shadow",
 			[3] = "$reflection",
 		}
@@ -316,6 +318,9 @@ local function UpdateUnit(unitID, drawFlag)
 end
 
 local function RemoveUnit(unitID)
+	if not textureOverrides[unitID] then
+		return
+	end
 	--remove the object from every bin and table
 
 	local unitDefID = idToDefId[unitID]
@@ -342,16 +347,22 @@ local function RemoveUnit(unitID)
 	Spring.SetUnitEngineDrawMask(unitID, 255)
 end
 
-local function ProcessUnit(unitID, drawFlag, skinName)
-	local data = skinDefs[skinName]
-	local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
-	local tex1 = data.altskin
-	local tex2 = data.altskin2
-	if not tex2 then
-		tex2 = "%%" .. udefParent.id .. ":1"
+local function ProcessUnit(unitID, unitDefID, drawFlag, skinName)
+	if skinName then
+		local data = skinDefs[skinName]
+		local udefParent = UnitDefNames["dyn" .. data.chassis .. "0"]
+		local tex1 = data.altskin
+		local tex2 = data.altskin2
+		if not tex2 then
+			tex2 = "%%" .. udefParent.id .. ":1"
+		end
+		textureOverrides[unitID] = {':l:'..tex1, ':l:'..tex2}
+	else
+		textureOverrides[unitID] = {
+			string.format("%%%s:%i", unitDefID, 0),
+			string.format("%%%s:%i", unitDefID, 1)
+		}
 	end
-
-	textureOverrides[unitID] = {tex1, tex2}
 	if overriddenUnits[unitID] == nil then --object was not seen
 		AddUnit(unitID, drawFlag)
 	elseif overriddenUnits[unitID] ~= drawFlag then --flags have changed
@@ -391,27 +402,28 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 and Spring.IsUnitInView(unitID) and not Spring.GetUnitIsCloaked(unitID) then
 					unitIDs[#unitIDs + 1] = unitID
 				end
 			end
+			
+			if #unitIDs > 0 then
+				SetFixedStatePre(drawPass, shaderId)
 
-			SetFixedStatePre(drawPass, shaderId)
+				ibo:InstanceDataFromUnitIDs(unitIDs, 6) --id = 6, name = "instData"
+				vao:ClearSubmission()
+				vao:AddUnitsToSubmission(unitIDs)
 
-			ibo:InstanceDataFromUnitIDs(unitIDs, 6) --id = 6, name = "instData"
-			vao:ClearSubmission()
-			vao:AddUnitsToSubmission(unitIDs)
+				gl.UseShader(shaderId)
+				SetShaderUniforms(drawPass, shaderId)
+				vao:Submit()
+				gl.UseShader(0)
 
-			gl.UseShader(shaderId)
-			SetShaderUniforms(drawPass, shaderId)
-			vao:Submit()
-			gl.UseShader(0)
+				SetFixedStatePost(drawPass, shaderId)
 
-			SetFixedStatePost(drawPass, shaderId)
-
-
-			for bp, tex in pairs(texAndObj.textures) do
-				gl.Texture(bp, false)
+				for bp, tex in pairs(texAndObj.textures) do
+					gl.Texture(bp, false)
+				end
 			end
 		end
 	end
@@ -423,7 +435,7 @@ end
 
 function gadget:Initialize()
 	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
-	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4.glsl")
+	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
 
 	vsSrc = string.gsub(vsSrc, "#version 430 core", "")
 	fsSrc = string.gsub(fsSrc, "#version 430 core", "")
@@ -507,7 +519,10 @@ function gadget:Initialize()
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		gadget:UnitCreated(unitID, unitDefID)
+		local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+		if not inbuild then
+			gadget:UnitFinished(unitID, unitDefID)
+		end
 	end
 end
 
@@ -560,21 +575,26 @@ function gadget:DrawAlphaUnitsLua(drawReflection, drawRefraction)
 	ExecuteDrawPass(drawPass)
 end
 
-
-function gadget:UnitCreated(unitId, unitDefID)
-	local skinName = Spring.GetUnitRulesParam(unitId, 'comm_texture')
-	if not skinName then
-		return
+local function CheckRemoval(unitID)
+	local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+		RemoveUnit(unitID)
 	end
-
-	ProcessUnit(unitId, overrideDrawFlag, skinName)
+	return inbuild
 end
 
-function gadget:RenderUnitDestroyed(unitId)
-	local skinName = Spring.GetUnitRulesParam(unitId, 'comm_texture')
-	if not skinName then
-		return
-	end
-	
-	RemoveUnit(unitId)
+local handledUnits = IterableMap.New()
+function gadget:GameFrame(n)
+	IterableMap.ApplyFraction(handledUnits, 10, n%10, CheckRemoval)
+end
+
+function gadget:UnitFinished(unitID, unitDefID)
+	local skinName = Spring.GetUnitRulesParam(unitID, 'comm_texture')
+	ProcessUnit(unitID, unitDefID, overrideDrawFlag, skinName)
+	IterableMap.Add(handledUnits, unitID)
+end
+
+function gadget:RenderUnitDestroyed(unitID)
+	RemoveUnit(unitID)
+	IterableMap.Remove(handledUnits, unitID)
 end

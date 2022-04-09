@@ -18,6 +18,10 @@ return { turretheavylaser = {
   customParams                  = {
     bait_level_default = 0,
     aimposoffset   = [[0 15 0]],
+
+    outline_x = 115,
+    outline_y = 150,
+    outline_yoff = 50,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -32,7 +36,7 @@ return { turretheavylaser = {
   maxVelocity                   = 0,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[hlt.s3o]],
+  objectName                    = [[turretheavylaser.dae]],
   script                        = [[turretheavylaser.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 

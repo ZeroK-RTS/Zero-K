@@ -27,6 +27,10 @@ return { staticcon = {
     default_spacing  = 1,
     like_structure   = 1,
     select_show_eco  = 1,
+
+    outline_x = 80,
+    outline_y = 85,
+    outline_yoff = 13.5,
   },
 
   explodeAs                     = [[NANOBOOM2]],

@@ -16,6 +16,9 @@ return { chicken_spidermonkey = {
   category            = [[LAND]],
 
   customParams        = {
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[NOWEAPON]],
