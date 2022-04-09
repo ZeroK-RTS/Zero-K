@@ -33,6 +33,7 @@ local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 local spGetGameFrame = Spring.GetGameFrame
 
 local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
+local internalEnabled = true
 
 local FEATURE_RADIUS = 120
 local ALL_FEATURES = false
@@ -154,17 +155,22 @@ local function UpdateFeatureVisibility()
 	end
 end
 
+local function SetInternalEnableState(state)
+	internalEnabled = state
+	if state then
+		Spring.SendCommands{"luaui disablewidget MetalFeatures (very old)"}
+	else
+		Spring.Echo("Reclaim highlight: old engine version.")
+		Spring.SendCommands{"luaui enablewidget MetalFeatures (very old)"}
+	end
+end
+
 function widget:Update()
 	if firstUpdate then
 		firstUpdate = false
-		if not BAR_COMPAT then
-			Spring.Echo("Using gl3 reclaim highlight) due to 104.")
-			Spring.SendCommands{"luaui enablewidget MetalFeatures GL3 (old)"}
-		else
-			Spring.SendCommands{"luaui disablewidget MetalFeatures GL3 (old)"}
-		end
+		SetInternalEnableState(BAR_COMPAT and WG.HighlightUnitGL4)
 	end
-	if not BAR_COMPAT then
+	if not internalEnabled then
 		return
 	end
 	if Spring.IsGUIHidden() then
@@ -227,7 +233,9 @@ function widget:Update()
 			end
 		else
 			for i = 1, #handledFeatureList do
-				WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
+				if handledFeatureApiIDs[handledFeatureList[i]] then
+					WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
+				end
 			end
 			handledFeatureList = false
 			handledFeatureMap = false
@@ -240,7 +248,7 @@ function widget:Update()
 end
 
 function widget:SelectionChanged(units)
-	if not BAR_COMPAT then
+	if not internalEnabled then
 		return
 	end
 	if (WG.selectionEntirelyCons) then

@@ -16,7 +16,13 @@ end
 --------------------------------------------------------------------------------
 
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local spGetAllUnits = Spring.GetAllUnits
+local spGetUnitHealth = Spring.GetUnitHealth
+
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+local trackedUnits = IterableMap.New()
+
+local CHECK_INTERVAL = 6
+local UNIT_TIMEOUT = 140
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -55,40 +61,45 @@ local flameFX = {
 
 local AddParticles
 
-local GetWind = Spring.GetWind
+local GetWind           = Spring.GetWind
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRadius   = Spring.GetUnitRadius
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
-	if not WG.Lups then
-		widgetHandler:RemoveCallIn("GameFrame")
-		return
+local function UpdateBurningUnit(unitID, timeoutFrame, index, flameFX, gameFrame, passsChance)
+	if not spGetUnitHealth(unitID) then
+		--  Dead or outside LOS, just wait until update time to remove
+		return (timeoutFrame > gameFrame)
 	end
-	AddParticles = WG.Lups.AddParticles
+	if not (spGetUnitRulesParam(unitID, "on_fire") == 1) then
+		return true -- Remove
+	end
+	
+	local x, y, z = spGetUnitPosition(unitID)
+	local r = spGetUnitRadius(unitID)
+	if (r and x) and math.random() < passsChance then
+		flameFX.pos[1] = x
+		flameFX.pos[2] = y
+		flameFX.pos[3] = z
+		flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
+		flameFX.size    = r * 0.35
+		AddParticles('SimpleParticles2', flameFX)
+	end
 end
 
-local CHECK_INTERVAL = 6
-
-local burningUnits = { count = 0 }
 function widget:GameFrame(n)
+	local unitOnFireUpdateUnitID = Spring.GetGameRulesParam("unitOnFireUpdateUnitID")
+	if unitOnFireUpdateUnitID then
+		IterableMap.Add(trackedUnits, unitOnFireUpdateUnitID, n + UNIT_TIMEOUT)
+	end
+
 	if n % CHECK_INTERVAL ~= 0 then
 		return
 	end
 
-	burningUnits.count = 0
-	local units = spGetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
-		if spGetUnitRulesParam(unitID, "on_fire") == 1 then
-			burningUnits.count = burningUnits.count + 1
-			burningUnits[burningUnits.count] = unitID
-		end
-	end
-
-	if burningUnits.count == 0 then
+	if IterableMap.IsEmpty(trackedUnits) then
 		return
 	end
 
@@ -96,19 +107,14 @@ function widget:GameFrame(n)
 	flameFX.force[1] = wx * 0.09
 	flameFX.force[2] = wy * 0.09 + 3
 	flameFX.force[3] = wz * 0.09
+	local count = IterableMap.GetIndexMax(trackedUnits)
+	IterableMap.Apply(trackedUnits, UpdateBurningUnit, flameFX, n, math.max(0, math.min(1, 1 - (count - 400)/400)))
+end
 
-	for i = 1, burningUnits.count do
-		local unitID = burningUnits[i]
-
-		local x, y, z = spGetUnitPosition(unitID)
-		local r = spGetUnitRadius(unitID)
-		if (r and x) and math.random(400) < (400 - burningUnits.count) then
-			flameFX.pos[1] = x
-			flameFX.pos[2] = y
-			flameFX.pos[3] = z
-			flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
-			flameFX.size    = r * 0.35
-			AddParticles('SimpleParticles2', flameFX)
-		end
+function widget:Initialize()
+	if not WG.Lups then
+		widgetHandler:RemoveCallIn("GameFrame")
+		return
 	end
+	AddParticles = WG.Lups.AddParticles
 end

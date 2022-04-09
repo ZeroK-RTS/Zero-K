@@ -36,7 +36,7 @@ return { turretheavylaser = {
   maxVelocity                   = 0,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[hlt.s3o]],
+  objectName                    = [[turretheavylaser.dae]],
   script                        = [[turretheavylaser.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
