@@ -402,7 +402,7 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 and Spring.IsUnitInView(unitID) then
+				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 and Spring.IsUnitInView(unitID) and not Spring.GetUnitIsCloaked(unitID) then
 					unitIDs[#unitIDs + 1] = unitID
 				end
 			end
