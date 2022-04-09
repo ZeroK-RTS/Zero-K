@@ -402,27 +402,28 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 and Spring.IsUnitInView(unitID) then
 					unitIDs[#unitIDs + 1] = unitID
 				end
 			end
+			
+			if #unitIDs > 0 then
+				SetFixedStatePre(drawPass, shaderId)
 
-			SetFixedStatePre(drawPass, shaderId)
+				ibo:InstanceDataFromUnitIDs(unitIDs, 6) --id = 6, name = "instData"
+				vao:ClearSubmission()
+				vao:AddUnitsToSubmission(unitIDs)
 
-			ibo:InstanceDataFromUnitIDs(unitIDs, 6) --id = 6, name = "instData"
-			vao:ClearSubmission()
-			vao:AddUnitsToSubmission(unitIDs)
+				gl.UseShader(shaderId)
+				SetShaderUniforms(drawPass, shaderId)
+				vao:Submit()
+				gl.UseShader(0)
 
-			gl.UseShader(shaderId)
-			SetShaderUniforms(drawPass, shaderId)
-			vao:Submit()
-			gl.UseShader(0)
+				SetFixedStatePost(drawPass, shaderId)
 
-			SetFixedStatePost(drawPass, shaderId)
-
-
-			for bp, tex in pairs(texAndObj.textures) do
-				gl.Texture(bp, false)
+				for bp, tex in pairs(texAndObj.textures) do
+					gl.Texture(bp, false)
+				end
 			end
 		end
 	end
