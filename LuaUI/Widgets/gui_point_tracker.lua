@@ -71,6 +71,23 @@ local mapY = Game.mapY * 512
 
 local vsx, vsy, sMidX, sMidY
 
+local verticlesCache_8 = {
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+}
+
+local verticlesCache_3 = {
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+	{v = {0, 0, 0}},
+}
+
 ----------------------------------------------------------------
 --local functions
 ----------------------------------------------------------------
@@ -116,7 +133,9 @@ function widget:Shutdown()
 end
 
 function widget:DrawScreen()
-	if (not on) then return end
+	if (not on) then
+		return
+	end
 	
 	glLineWidth(lineWidth)
 	
@@ -134,19 +153,27 @@ function widget:DrawScreen()
 			if (sx >= 0 and sy >= 0
 					and sx <= vsx and sy <= vsy) then
 				--in screen
-				local vertices = {
-					{v = {sx, sy - highlightLineMin, 0}},
-					{v = {sx, sy - highlightLineMax, 0}},
-					{v = {sx, sy + highlightLineMin, 0}},
-					{v = {sx, sy + highlightLineMax, 0}},
-					{v = {sx - highlightLineMin, sy, 0}},
-					{v = {sx - highlightLineMax, sy, 0}},
-					{v = {sx + highlightLineMin, sy, 0}},
-					{v = {sx + highlightLineMax, sy, 0}},
-				}
+				verticlesCache_8[1].v[1] = sx
+				verticlesCache_8[2].v[1] = sx
+				verticlesCache_8[3].v[1] = sx
+				verticlesCache_8[4].v[1] = sx
+				verticlesCache_8[5].v[1] = sx - highlightLineMin
+				verticlesCache_8[6].v[1] = sx - highlightLineMax
+				verticlesCache_8[7].v[1] = sx + highlightLineMin
+				verticlesCache_8[8].v[1] = sx + highlightLineMax
+				
+				verticlesCache_8[1].v[2] = sy - highlightLineMin
+				verticlesCache_8[2].v[2] = sy - highlightLineMax
+				verticlesCache_8[3].v[2] = sy + highlightLineMin
+				verticlesCache_8[4].v[2] = sy + highlightLineMax
+				verticlesCache_8[5].v[2] = sy
+				verticlesCache_8[6].v[2] = sy
+				verticlesCache_8[7].v[2] = sy
+				verticlesCache_8[8].v[2] = sy
+				
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 				glRect(sx - highlightSize, sy - highlightSize, sx + highlightSize, sy + highlightSize)
-				glShape(GL_LINES, vertices)
+				glShape(GL_LINES, verticlesCache_8)
 			else
 				--out of screen
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
@@ -157,24 +184,30 @@ function widget:DrawScreen()
 				end
 				local xRatio = sMidX / abs(sx - sMidX)
 				local yRatio = sMidY / abs(sy - sMidY)
-				local edgeDist, vertices, textX, textY, textOptions
+				local edgeDist, textX, textY, textOptions
 				if (xRatio < yRatio) then
 					edgeDist = (sy - sMidY) * xRatio + sMidY
 					if (sx > 0) then
-						vertices = {
-							{v = {vsx, edgeDist, 0}},
-							{v = {vsx - edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
-							{v = {vsx - edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
-						}
+						verticlesCache_3[1].v[1] = vsx
+						verticlesCache_3[2].v[1] = vsx - edgeMarkerSize
+						verticlesCache_3[3].v[1] = vsx - edgeMarkerSize
+						
+						verticlesCache_3[1].v[2] = edgeDist
+						verticlesCache_3[2].v[2] = edgeDist + edgeMarkerSize
+						verticlesCache_3[3].v[2] = edgeDist - edgeMarkerSize
+						
 						textX = vsx - edgeMarkerSize
 						textY = edgeDist - fontSize * 0.5
 						textOptions = "rn"
 					else
-						vertices = {
-							{v = {0, edgeDist, 0}},
-							{v = {edgeMarkerSize, edgeDist - edgeMarkerSize, 0}},
-							{v = {edgeMarkerSize, edgeDist + edgeMarkerSize, 0}},
-						}
+						verticlesCache_3[1].v[1] = 0
+						verticlesCache_3[2].v[1] = edgeMarkerSize
+						verticlesCache_3[3].v[1] = edgeMarkerSize
+						
+						verticlesCache_3[1].v[2] = edgeDist
+						verticlesCache_3[2].v[2] = edgeDist - edgeMarkerSize
+						verticlesCache_3[3].v[2] = edgeDist + edgeMarkerSize
+						
 						textX = edgeMarkerSize
 						textY = edgeDist - fontSize * 0.5
 						textOptions = "n"
@@ -182,26 +215,32 @@ function widget:DrawScreen()
 				else
 					edgeDist = (sx - sMidX) * yRatio + sMidX
 					if (sy > 0) then
-						vertices = {
-							{v = {edgeDist, vsy, 0}},
-							{v = {edgeDist - edgeMarkerSize, vsy - edgeMarkerSize, 0}},
-							{v = {edgeDist + edgeMarkerSize, vsy - edgeMarkerSize, 0}},
-						}
+						verticlesCache_3[1].v[1] = edgeDist
+						verticlesCache_3[2].v[1] = edgeDist - edgeMarkerSize
+						verticlesCache_3[3].v[1] = edgeDist + edgeMarkerSize
+						
+						verticlesCache_3[1].v[2] = vsy
+						verticlesCache_3[2].v[2] = vsy - edgeMarkerSize
+						verticlesCache_3[3].v[2] = vsy - edgeMarkerSize
+						
 						textX = edgeDist
 						textY = vsy - edgeMarkerSize - fontSize
 						textOptions = "cn"
 					else
-						vertices = {
-							{v = {edgeDist, 0, 0}},
-							{v = {edgeDist + edgeMarkerSize, edgeMarkerSize, 0}},
-							{v = {edgeDist - edgeMarkerSize, edgeMarkerSize, 0}},
-						}
+						verticlesCache_3[1].v[1] = edgeDist
+						verticlesCache_3[2].v[1] = edgeDist + edgeMarkerSize
+						verticlesCache_3[3].v[1] = edgeDist - edgeMarkerSize
+						
+						verticlesCache_3[1].v[2] = 0
+						verticlesCache_3[2].v[2] = edgeMarkerSize
+						verticlesCache_3[3].v[2] = edgeMarkerSize
+						
 						textX = edgeDist
 						textY = edgeMarkerSize
 						textOptions = "cn"
 					end
 				end
-				glShape(GL_TRIANGLES, vertices)
+				glShape(GL_TRIANGLES, verticlesCache_3)
 				glColor(1, 1, 1, alpha)
 				glText(curr[5], textX, textY, fontSize, textOptions)
 			end
@@ -217,8 +256,8 @@ end
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
-  sMidX = viewSizeX * 0.5
-  sMidY = viewSizeY * 0.5
+	sMidX = viewSizeX * 0.5
+	sMidY = viewSizeY * 0.5
 end
 
 function widget:MapDrawCmd(playerID, cmdType, px, py, pz, label)
@@ -260,12 +299,15 @@ function widget:Update(dt)
 end
 
 function widget:DrawInMiniMap(sx, sy)
-	if (not on) then return end
+	if (not on) then
+		return
+	end
 	glLineWidth(lineWidth)
 	
 	local ratioX = sx / mapX
 	local ratioY = sy / mapY
-	
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 	local i = 1
 	while i <= mapPointCount do
 		local curr = mapPoints[i]
@@ -278,19 +320,26 @@ function widget:DrawInMiniMap(sx, sy)
 			mapPointCount = mapPointCount - 1
 		else
 			glColor(curr[1][1], curr[1][2], curr[1][3], alpha)
-			local vertices = {
-				{v = {x, y - minimapHighlightLineMin, 0}},
-				{v = {x, y - minimapHighlightLineMax, 0}},
-				{v = {x, y + minimapHighlightLineMin, 0}},
-				{v = {x, y + minimapHighlightLineMax, 0}},
-				{v = {x - minimapHighlightLineMin, y, 0}},
-				{v = {x - minimapHighlightLineMax, y, 0}},
-				{v = {x + minimapHighlightLineMin, y, 0}},
-				{v = {x + minimapHighlightLineMax, y, 0}},
-			}
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+			verticlesCache_8[1].v[1] = x
+			verticlesCache_8[2].v[1] = x
+			verticlesCache_8[3].v[1] = x
+			verticlesCache_8[4].v[1] = x
+			verticlesCache_8[5].v[1] = x - minimapHighlightLineMin
+			verticlesCache_8[6].v[1] = x - minimapHighlightLineMax
+			verticlesCache_8[7].v[1] = x + minimapHighlightLineMin
+			verticlesCache_8[8].v[1] = x + minimapHighlightLineMax
+			
+			verticlesCache_8[1].v[2] = y - minimapHighlightLineMin
+			verticlesCache_8[2].v[2] = y - minimapHighlightLineMax
+			verticlesCache_8[3].v[2] = y + minimapHighlightLineMin
+			verticlesCache_8[4].v[2] = y + minimapHighlightLineMax
+			verticlesCache_8[5].v[2] = y
+			verticlesCache_8[6].v[2] = y
+			verticlesCache_8[7].v[2] = y
+			verticlesCache_8[8].v[2] = y
+			
 			glRect(x - minimapHighlightSize, y - minimapHighlightSize, x + minimapHighlightSize, y + minimapHighlightSize)
-			glShape(GL_LINES, vertices)
+			glShape(GL_LINES, verticlesCache_8)
 			
 			i = i + 1
 		end
