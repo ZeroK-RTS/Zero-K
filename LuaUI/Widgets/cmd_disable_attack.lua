@@ -41,7 +41,7 @@ local attackDisabledUnits = {}
 --------------------------------------------------------------------------------
 -- Command Handling
 
-function GetSelectedUnits(units, cmdID, cmdParams, cmdOpts)
+function FilterSelectedUnits(units, cmdID, cmdParams, cmdOpts)
 -- TODO: handle commands imbeded in CMD_INSERT though it dosen't seem to need it.
 	if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
     return units
@@ -126,7 +126,7 @@ function widget:Initialize()
 	end
 
 	WG.CmdDisableAttack = {
-		GetSelectedUnits = GetSelectedUnits,
+		FilterSelectedUnits = FilterSelectedUnits,
 		SetDisableAttack = SetDisableAttack
 	}
 end
