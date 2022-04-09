@@ -1417,8 +1417,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		value = GetStateValue(name, "disableattack")
-		if value then -- false is the default
-			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
+		if value and WG.CmdDisableAttack then -- false is the default
+			WG.CmdDisableAttack.SetDisableAttack(unitID, 1)
 		end
 
 		value = GetStateValue(name, "formation_rank")

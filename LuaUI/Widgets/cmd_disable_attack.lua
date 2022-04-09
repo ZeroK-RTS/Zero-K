@@ -27,20 +27,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
---include("LuaRules/Configs/customcmds.h.lua")
-
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
-
-local unitBlockAttackCmd = {
-	id      = CMD_DISABLE_ATTACK,
-	type    = CMDTYPE.ICON_MODE,
-	name    = 'Disable Attack',
-	action  = 'disableattack',
-	tooltip = 'Allow attack commands',
-	params  = {0, 'Allowed', 'Blocked'}
-}
+local CMD_MANUALFIRE = CMD.MANUALFIRE
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -51,10 +41,10 @@ local attackDisabledUnits = {}
 --------------------------------------------------------------------------------
 -- Command Handling
 
-function widget:GetSelectedUnits(units, cmdID, cmdParams, cmdOpts)
--- TODO: CMD_INSERT
-	if cmdID ~= CMD_ATTACK then
-    return
+function GetSelectedUnits(units, cmdID, cmdParams, cmdOpts)
+-- TODO: handle commands imbeded in CMD_INSERT though it dosen't seem to need it.
+	if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
+    return units
   end
 
 	local selected = {}
@@ -65,6 +55,12 @@ function widget:GetSelectedUnits(units, cmdID, cmdParams, cmdOpts)
 	end
 
 	return selected
+end
+
+function SetDisableAttack(unit, value)
+	if attackDisabledUnits[unit] then
+		attackDisabledUnits[unit] = value
+	end
 end
 
 function widget:CommandsChanged()
@@ -92,12 +88,22 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 
 	local units = Spring.GetSelectedUnits()
 	for i = 1, #units do
-		if attackDisabledUnits[units[i]] then
-			attackDisabledUnits[units[i]] = cmdParams[1]
-		end
+		SetDisableAttack(units[i], cmdParams[1])
 	end
 
-  return true
+	return true
+end
+
+function widget:UnitCommandNotify(unitID, id, params, options)
+	if id ~= CMD_MANUALFIRE then
+		return false
+	end
+
+	if attackDisabledUnits[unitID] then
+		Spring.GiveOrderToUnit(unitID, CMD_ATTACK, params, options)
+		return true
+	end
+	return false
 end
 
 ----------------------------------------------------------------------------------------------
@@ -118,4 +124,9 @@ function widget:Initialize()
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 	end
+
+	WG.CmdDisableAttack = {
+		GetSelectedUnits = GetSelectedUnits,
+		SetDisableAttack = SetDisableAttack
+	}
 end

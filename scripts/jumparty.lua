@@ -258,18 +258,6 @@ function script.QueryWeapon(num)
 	return flares[gun_1]
 end
 
-function script.BlockShot(num, targetID)
-	if num == 1 and GG.DisableAttack and GG.DisableAttack.IsAttackDisabled(unitID) then
-		return true
-	end
-
-	local reloadTime = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")*30 -- Takes slow into account
-	local otherNum = 3 - num
-	local gameFrame = Spring.GetGameFrame()
-	Spring.SetUnitWeaponState(unitID, otherNum, "reloadFrame", gameFrame + reloadTime)
-	return false
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
