@@ -37,7 +37,7 @@ local mySubjectID = -1
 local fontSize = 18
 local badgeWidth = 59*0.6
 local badgeHeight = 24*0.6
-local extraPlayerWidthIfShowingWHR = 50
+local whrWidth = 35 -- Including margins
 local color2incolor = nil
 local teamZeroPlayers = {}
 local playerInfo = {}
@@ -116,7 +116,7 @@ options = {
 		noHotkey = true,
 	},
 	enableNumWHR = {
-		name  = "Show current WHR (Elo) next to player name",
+		name  = "Show current WHR (Elo) rating of players",
 		type  = "bool",
 		value = false,
 		desc = "Shows the WHR current rating of each player after their name. Uses the rating category of the current game mode (Casual or MM).",
@@ -703,7 +703,7 @@ local function InitName(subject, playerPanel)
 	
 	givemebuttons[subject.id]["text"] = chili.TextBox:New{
 		parent=playerPanel,
-		width=146 + zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR,
+		width=146,
 		height = sizefont+1,
 		objectOverrideFont = WG.GetFont(sizefont + 1),
 		x=69 + 2*buttonsize,
@@ -719,6 +719,7 @@ local function InitName(subject, playerPanel)
 	local bottomRowStartX = 67
 	local bottomRowStartY = 37
 	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 6
+	local metalBarX = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + zeroIfNumWrhDisabled * whrWidth
 	local infoSize = 48
 	
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
@@ -833,7 +834,7 @@ local function InitName(subject, playerPanel)
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		width=60,
-		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 3,
+		x = metalBarX + buttonsize + 3,
 		y = givemebuttons[subject.id]["text"].y - 2,
 		height=buttonsize,
 		tooltip = "This player's network delay (ping)"
@@ -846,7 +847,7 @@ local function InitName(subject, playerPanel)
 		min=0,
 		max=1,
 		width = barWidth,
-		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
+		x = metalBarX,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
 		tooltip = "Your ally's metal.",
@@ -994,7 +995,7 @@ local function InitName(subject, playerPanel)
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+				x= metalBarX,
 				y= givemebuttons[subject.id]["text"].y - 6,
 				OnClick = {function () ReportPlayer(subject) end},
 				padding={2,2,2,2},
@@ -1012,7 +1013,7 @@ local function InitName(subject, playerPanel)
 			--	parent = playerPanel,
 			--	height = buttonsize,
 			--	width = buttonsize,
-			--	x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			--	x= metalBarX,
 			--	y= givemebuttons[subject.id]["text"].y - 6,
 			--	OnClick = {function () BattleKickPlayer(subject) end},
 			--	padding={1,1,1,1},
@@ -1052,7 +1053,7 @@ local function InitName(subject, playerPanel)
 			parent = playerPanel,
 			height = buttonsize,
 			width = buttonsize,
-			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			x= metalBarX,
 			y= givemebuttons[subject.id]["text"].y - 6,
 			OnClick = {function () ReportPlayer(subject) end},
 			padding={2,2,2,2},
@@ -1207,14 +1208,14 @@ local function InitName(subject, playerPanel)
 	end
 
 	if options.enableNumWHR.value and rating then
+		local whrMargin = 2
 		
 		chili.TextBox:New{
 			parent=playerPanel,
-			width=30,
-			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width - 31,
+			width=whrWidth - 2*whrMargin,
+			x= givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + whrMargin,
 			y= givemebuttons[subject.id]["text"].y + 1 ,
 			tooltip = "WHR Current Rating",
-			--text = rating
 			text = rating,
 			textColor = (icon and rankColors[icon:sub(3,3)]) or {1,1,1,1}
 		}
@@ -1234,7 +1235,7 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
-	windowWidth = 786 + 2 * zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR
+	windowWidth = 768 + 2 * zeroIfNumWrhDisabled * whrWidth
 	windowHeight = 666
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
@@ -1242,7 +1243,7 @@ local function Buildme()
 	local allypanels = {}
 	local allpanels = {}
 	local playerHeight =  64
-	local playerWidth =  339 + zeroIfNumWrhDisabled * extraPlayerWidthIfShowingWHR
+	local playerWidth =  339 + zeroIfNumWrhDisabled * whrWidth
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
