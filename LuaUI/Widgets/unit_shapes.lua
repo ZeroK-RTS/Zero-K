@@ -245,8 +245,7 @@ local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
 	local gameFrame = spGetGameFrame()
 	if forceUpdate or (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
-		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or
-		(#spGetSelectedUnits() > 0) then
+		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) then
 		
 		lastGameFrame = gameFrame
 		lastCamX, lastCamY, lastCamZ = camX, camY, camZ
