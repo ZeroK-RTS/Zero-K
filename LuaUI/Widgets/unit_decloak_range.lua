@@ -14,7 +14,6 @@ VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
 local Chili
 
-local spGetSelectedUnits   = Spring.GetSelectedUnits
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
@@ -25,6 +24,7 @@ local disabledColor = { 0.9,0.5,0.3, drawAlpha}
 local cloakedColor = { 0.4, 0.4, 0.9, drawAlpha} -- drawAlpha on purpose!
 
 local decloakDist = {}
+local currentSelection = false
 
 options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options_order = {
@@ -63,9 +63,11 @@ local function DrawMergedDecloakRanges(drawActive, drawDisabled)
 	-- From showeco action.
 	local drawGroundCircle = options.mergeCircles.value and gl.Utilities.DrawMergedGroundCircle or gl.Utilities.DrawGroundCircle
 
-	local selUnits = spGetSelectedUnits()
-	for i = 1, #selUnits do
-		local unitID = selUnits[i]
+	if not currentSelection then
+		return
+	end
+	for i = 1, #currentSelection do
+		local unitID = currentSelection[i]
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID then
 			if not decloakDist[unitDefID] then
@@ -97,6 +99,10 @@ local function DrawMergedDecloakRanges(drawActive, drawDisabled)
 	end
 	-- Keep clean for everyone after us
 	gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
+end
+
+function widget:SelectionChanged(selectedUnits)
+	currentSelection = selectedUnits
 end
 
 local function HighlightPylons()

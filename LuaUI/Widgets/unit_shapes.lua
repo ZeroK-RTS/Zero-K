@@ -114,6 +114,7 @@ local hoveredUnit         = {}
 
 local hasVisibleAllySelections = false
 local forceUpdate = false
+local selectioHasChanged = false
 
 -- Speedups to avoid tiny table spam
 local unitStartTimeMap  = {}
@@ -245,10 +246,11 @@ local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
 	local gameFrame = spGetGameFrame()
 	if forceUpdate or (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
-		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) then
+		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or selectioHasChanged then
 		
 		lastGameFrame = gameFrame
 		lastCamX, lastCamY, lastCamZ = camX, camY, camZ
+		selectioHasChanged = false
 		return true
 	end
 
@@ -257,6 +259,10 @@ local function HasVisibilityChanged()
 	-- 	return true
 	-- end
 	return false
+end
+
+function widget:SelectionChanged(selectedUnits)
+	selectioHasChanged = true
 end
 
 local function ShowAllySelection(unitID, myTeamID)
