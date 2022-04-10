@@ -16,6 +16,9 @@ local resurrectionHalosVBO = nil
 local resurrectionHalosShader = nil
 local luaShaderDir = "LuaUI/Widgets/Include/"
 --local texture = 'LuaUI/Images/halo.dds'
+local internalDisabled = false
+
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 
 local unitConf = {}
 
@@ -499,6 +502,7 @@ in DataGS {
 uniform sampler2D DrawPrimitiveAtUnitTexture;
 uniform sampler2D mapDepths;
 uniform sampler2D modelDepths;
+uniform sampler2D modelMisc;
 
 uniform float stencilPass = 0.0; // 1 if we are stenciling
 out vec4 fragColor;
@@ -525,6 +529,7 @@ void main(void)
 	
 	float fulldepth = min(mapdepth, modeldepth); 
 	
+	float my_misctexvalue = texture(modelMisc, screenUV).r;
 	float deltadepth = max(mapdepth - modeldepth, 0.0);
 	
 	//if (deltadepth > 0.0) discard; // we hit a model, bail!
@@ -534,15 +539,16 @@ void main(void)
 		float nearest = (outlineWidth*20 + 1) * (outlineWidth*20 + 1) ;
 		vec2 viewGeometryInv = 1.0 / viewGeometry.xy;
 		
-		if (deltadepth > 0.0) {
+		if (deltadepth > 0.0 && my_misctexvalue > 0.5) {
 			for (int x = -1; x <= 1; x++){
 				vec2 pixeloffset = vec2(float(x), float(0));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd == 0 ) {
+				if (misctexvalue > 0.5 && dd == 0) {
 					nearest = min(nearest, abs(x)); 
 				}
 			}
@@ -550,10 +556,11 @@ void main(void)
 				vec2 pixeloffset = vec2(float(0), float(y));
 				vec2 screendelta = pixeloffset * viewGeometryInv;
 				
+				float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 				float mapd = texture(mapDepths, screenUV+ screendelta).x;
 				float modd = texture(modelDepths, screenUV + screendelta).x;
 				float dd = max(mapd - modd, 0.0);
-				if (dd == 0 ) {
+				if (misctexvalue > 0.5 && dd == 0) {
 					nearest = min(nearest, abs(y)); 
 				}
 			}
@@ -566,12 +573,12 @@ void main(void)
 					vec2 pixeloffset = vec2(float(x), float(y));
 					vec2 screendelta = pixeloffset * viewGeometryInv;
 					
-					
+					float misctexvalue = texture(modelMisc, screenUV+ screendelta).r;
 					float mapd = texture(mapDepths, screenUV+ screendelta).x;
 					float modd = texture(modelDepths, screenUV + screendelta).x;
 					float dd = max(mapd - modd, 0.0);
-					if (dd > 0 ) {
-						nearest = min(nearest, dot(pixeloffset, pixeloffset)); 
+					if (misctexvalue > 0.5 && dd > 0){
+						nearest = min(nearest, dot(pixeloffset, pixeloffset));
 					}
 				}
 			}
@@ -587,15 +594,22 @@ void main(void)
 			}
 		#endif
 	}else{
-		fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
+		//fragColor.rgba = vec4(vec2(fract(gl_FragCoord.xy*0.1	)),0.0,  0.3);
 	}
+	//fragColor.rgba = vec4(texture(modelMisc, screenUV).rgb, 1.0);
 	
 }
 ]]
 
+local function hello()
+	Spring.SendCommands{"luaui disablewidget Outline No Shader"}
+end
+
 local function goodbye(reason)
-  Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
-  widgetHandler:RemoveWidget()
+	Spring.Echo("DrawPrimitiveAtUnits GL4 widget exiting with reason: "..reason)
+	Spring.Echo("Using fallback unit outlines")
+	Spring.SendCommands{"luaui enablewidget Outline No Shader"}
+	internalDisabled = true -- Don't actually disable widget, because we want to check compat on each load.
 end
 
 local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
@@ -612,6 +626,7 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 				DrawPrimitiveAtUnitTexture = 0;
 				mapDepths = 1,
 				modelDepths = 2,
+				modelMisc = 3, 
 			},
 			uniformFloat = {
 				addRadius = 1,
@@ -622,7 +637,10 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "Shader GL4"
 	  )
 	local shaderCompiled = DrawPrimitiveAtUnitShader:Initialize()
-	if not shaderCompiled then goodbye("Failed to compile ".. DPATname .." GL4 ") end
+	if not shaderCompiled then
+		goodbye("Failed to compile ".. DPATname .." GL4 ")
+		return
+	end
 
 	DrawPrimitiveAtUnitVBO = makeInstanceVBOTable(
 		{
@@ -637,15 +655,21 @@ local function InitDrawPrimitiveAtUnit(modifiedShaderConf, DPATname)
 		DPATname .. "VBO", -- name
 		5  -- unitIDattribID (instData)
 	)
-	if DrawPrimitiveAtUnitVBO == nil then goodbye("Failed to create DrawPrimitiveAtUnitVBO") end
+	if DrawPrimitiveAtUnitVBO == nil then
+		goodbye("Failed to create DrawPrimitiveAtUnitVBO")
+		return
+	end
 
 	local DrawPrimitiveAtUnitVAO = gl.GetVAO()
 	DrawPrimitiveAtUnitVAO:AttachVertexBuffer(DrawPrimitiveAtUnitVBO.instanceVBO)
 	DrawPrimitiveAtUnitVBO.VAO = DrawPrimitiveAtUnitVAO
-	return  DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
+	return DrawPrimitiveAtUnitVBO, DrawPrimitiveAtUnitShader
 end
 
 function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
+	if internalDisabled then
+		return
+	end
 	local gf = Spring.GetGameFrame()
 	myvisibleUnits[unitID] = unitDefID
 	local unitData = unitConf[unitDefID]
@@ -677,6 +701,9 @@ function widget:VisibleUnitAdded(unitID, unitDefID, unitTeam)
 end
 
 function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
+	if internalDisabled then
+		return
+	end
 	clearInstanceTable(resurrectionHalosVBO)
 	for unitID, unitDefID in pairs(extVisibleUnits) do 
 		widget:VisibleUnitAdded(unitID, unitDefID, Spring.GetUnitTeam(unitID))
@@ -684,6 +711,9 @@ function widget:VisibleUnitsChanged(extVisibleUnits, extNumVisibleUnits)
 end
 
 function widget:VisibleUnitRemoved(unitID)
+	if internalDisabled then
+		return
+	end
 	if resurrectionHalosVBO.instanceIDtoIndex[unitID] then 
 		popElementInstance(resurrectionHalosVBO, unitID)
 		myvisibleUnits[unitID] = nil
@@ -701,7 +731,7 @@ local useStencil = true
 local STENCILOPPASS = GL_DECR -- KEEP OR DECR
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then
+	if Spring.IsGUIHidden() or internalDisabled then
 		return
 	end
 
@@ -709,6 +739,7 @@ function widget:DrawWorld()
 		--gl.Texture(0, texture)
 		gl.Texture(1, "$map_gbuffer_zvaltex")-- Texture file
 		gl.Texture(2, "$model_gbuffer_zvaltex")-- Texture file
+		gl.Texture(3, "$model_gbuffer_misctex")-- Texture file
 		resurrectionHalosShader:Activate()
 			resurrectionHalosShader:SetUniform("iconDistance", 99999) -- pass
 			resurrectionHalosShader:SetUniform("addRadius", 0)
@@ -749,17 +780,18 @@ function widget:DrawWorld()
 		gl.Texture(0, false)
 		gl.Texture(1, false)-- Texture file
 		gl.Texture(2, false)-- Texture file
+		gl.Texture(3, false)-- Texture file
 		
 		gl.StencilTest(false)
 	end
 end
 
-local function initGL4()
-	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
-end
-
 function widget:Initialize()
-	initGL4()
+	if not (LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive() and BAR_COMPAT) then
+		goodbye("Adv shading not enabled")
+		return
+	end
+	resurrectionHalosVBO, resurrectionHalosShader = InitDrawPrimitiveAtUnit(shaderConfig, "ResurrectionHalos")
 	
 	if WG['unittrackerapi'] and WG['unittrackerapi'].visibleUnits then 
 		local visibleUnits =  WG['unittrackerapi'].visibleUnits
@@ -767,4 +799,5 @@ function widget:Initialize()
 			widget:VisibleUnitAdded(unitID, unitDefID)
 		end
 	end
+	hello()
 end

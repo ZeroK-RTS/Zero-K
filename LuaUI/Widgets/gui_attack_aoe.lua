@@ -35,6 +35,7 @@ local pointSizeMult        = 2048
 --------------------------------------------------------------------------------
 local aoeDefInfo = {}
 local dgunInfo = {}
+local extraDrawRangeDefInfo ={}
 
 local unitAoeDefs = {}
 local unitDgunDefs = {}
@@ -61,10 +62,12 @@ local GetCameraPosition      = Spring.GetCameraPosition
 local GetFeaturePosition     = Spring.GetFeaturePosition
 local GetGroundHeight        = Spring.GetGroundHeight
 local GetMouseState          = Spring.GetMouseState
-local GetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
 local GetUnitPosition        = Spring.GetUnitPosition
 local GetUnitRadius          = Spring.GetUnitRadius
 local TraceScreenRay         = Spring.TraceScreenRay
+
+local spGetUnitDefID         = Spring.GetUnitDefID
+
 local CMD_ATTACK             = CMD.ATTACK
 local CMD_MANUALFIRE         = CMD.MANUALFIRE
 local g                      = Game.gravity
@@ -331,7 +334,9 @@ local function SetupUnit(unitDef, unitID)
 		end
 	end
 	
-	return retAoeInfo, retDgunInfo
+	local extraDrawRangeInfo = unitDef and unitDef.customParams and unitDef.customParams.extradrawrange
+	
+	return retAoeInfo, retDgunInfo, extraDrawRangeInfo
 end
 
 local function SetupDisplayLists()
@@ -345,9 +350,7 @@ end
 --------------------------------------------------------------------------------
 --updates
 --------------------------------------------------------------------------------
-local function UpdateSelection()
-	local sel = GetSelectedUnitsSorted()
-
+local function UpdateSelection(sel)
 	local maxCost = 0
 	dgunUnitInfo = nil
 	aoeUnitInfo = nil
@@ -357,50 +360,51 @@ local function UpdateSelection()
 	detrimentSelected = false
 	detrimentUnitID = nil
 
-	for unitDefID, unitIDs in pairs(sel) do
-		if unitDefID ~= "n" then
-			local unitID = unitIDs[1]
+	local seenCount = {}
+	for i = 1, #sel do
+		local unitID = sel[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		seenCount[unitDefID] = (seenCount[unitDefID] or 0) + 1
+	
+		if unitDefID == sumoDefID then
+			sumoSelected = true
+		end
 		
-			if unitDefID == sumoDefID then
-				sumoSelected = true
-			end
-			
-			if unitDefID == detrimentDefID then
-				detrimentSelected = true
-				detrimentUnitID = unitID
-			end
-			
-			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
-			
-			if dynamicComm and not unitHasBeenSetup[unitID] then
-				unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
-				unitHasBeenSetup[unitID] = true
-			end
-			
-			if (dgunInfo[unitDefID]) then
-				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
-				dgunUnitID = unitID
-			end
+		if unitDefID == detrimentDefID then
+			detrimentSelected = true
+			detrimentUnitID = unitID
+		end
+		
+		local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
+		
+		if dynamicComm and not unitHasBeenSetup[unitID] then
+			unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
+			unitHasBeenSetup[unitID] = true
+		end
+		
+		if (dgunInfo[unitDefID]) then
+			dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+			dgunUnitID = unitID
+		end
 
-			if (aoeDefInfo[unitDefID]) then
-				local currCost = UnitDefs[unitDefID].metalCost * #unitIDs
-				if (currCost > maxCost) then
-					maxCost = currCost
-					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
-					aoeUnitID = unitID
-				end
+		if (aoeDefInfo[unitDefID]) then
+			local currCost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * seenCount[unitDefID]
+			if (currCost > maxCost) then
+				maxCost = currCost
+				aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+				aoeUnitID = unitID
 			end
+		end
 
-			local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
-			if extraDrawParam then
-				extraDrawRange = extraDrawParam
-			else
-				extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
-			end
-			
-			if extraDrawRange then
-				selUnitID = unitID
-			end
+		local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
+		if extraDrawParam then
+			extraDrawRange = extraDrawParam
+		else
+			extraDrawRange = extraDrawRangeDefInfo[unitDefID]
+		end
+		
+		if extraDrawRange then
+			selUnitID = unitID
 		end
 	end
 end
@@ -723,8 +727,9 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	for unitDefID, unitDef in pairs(UnitDefs) do
-		aoeDefInfo[unitDefID], dgunInfo[unitDefID] = SetupUnit(unitDef)
+	for unitDefID = 1, #UnitDefs do
+		local unitDef = UnitDefs[unitDefID]
+		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
 	end
 	SetupDisplayLists()
 end
@@ -836,7 +841,7 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:SelectionChanged(sel)
-	UpdateSelection()
+	UpdateSelection(sel)
 end
 
 function widget:Update(dt)

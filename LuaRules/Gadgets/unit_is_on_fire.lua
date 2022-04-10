@@ -49,6 +49,10 @@ local CHECK_INTERVAL = 6
 
 local LOS_ACCESS = {inlos = true}
 
+local RESEND_DELAY = 150
+local sendOnFireUnits = false
+local sentOnFireTime = {}
+
 --//VARS
 
 local gameFrame = 0
@@ -113,6 +117,23 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function SetFireGameRulesParamQueue(unitID)
+	local gameFrame = false
+	if unitsOnFire[unitID] then
+		gameFrame = Spring.GetGameFrame()
+		if (sentOnFireTime[unitID] or -2*RESEND_DELAY) + RESEND_DELAY >= gameFrame then
+			return
+		end
+	end
+	sendOnFireUnits = sendOnFireUnits or {}
+	sendOnFireUnits[#sendOnFireUnits + 1] = unitID
+	sentOnFireTime[unitID] = gameFrame or Spring.GetGameFrame()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:UnitEnteredWater(unitID, unitDefID, unitTeam)
 	inWater[unitID] = true
 end
@@ -147,6 +168,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
+	SetFireGameRulesParamQueue(unitID)
+
 	unitsOnFire[unitID] = {
 		endFrame    = gameFrame + burnLength,
 		damageLeft  = burnLength*fwd.burnDamage,
@@ -168,7 +191,7 @@ end
 
 function gadget:GameFrame(n)
 	gameFrame = n
-	if (n%CHECK_INTERVAL<1)and(next(unitsOnFire)) then
+	if (n%CHECK_INTERVAL < 1) and (next(unitsOnFire)) then
 		local cnt = 1
 		inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
@@ -183,6 +206,15 @@ function gadget:GameFrame(n)
 			end
 		end
 		inGameFrame = false
+	end
+	if sendOnFireUnits then
+		if #sendOnFireUnits == 0 then
+			Spring.SetGameRulesParam("unitOnFireUpdateUnitID", nil)
+			sendOnFireUnits = false
+		else
+			Spring.SetGameRulesParam("unitOnFireUpdateUnitID", sendOnFireUnits[#sendOnFireUnits])
+			sendOnFireUnits[#sendOnFireUnits] = nil
+		end
 	end
 end
 

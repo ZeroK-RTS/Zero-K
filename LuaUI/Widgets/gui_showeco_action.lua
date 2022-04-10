@@ -32,7 +32,6 @@ WG.ToggleShoweco = ToggleShoweco
 VFS.Include("LuaRules/Configs/constants.lua", nil, VFS.ZIP_FIRST)
 VFS.Include("LuaRules/Utilities/glVolumes.lua") --have to import this incase it fail to load before this widget
 
-local spGetSelectedUnits   = Spring.GetSelectedUnits
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetActiveCommand   = Spring.GetActiveCommand
@@ -56,6 +55,7 @@ local glCreateList    = gl.CreateList
 
 local pylons = {count = 0, data = {}}
 local pylonByID = {}
+local currentSelection = false
 
 local pylonDefs = {}
 local isBuilder = {}
@@ -256,10 +256,9 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			pylons.count = pylons.count - 1
 		end
 	end
-	if highlightQueue and not onlyActive then
-		local selUnits = spGetSelectedUnits()
-		for i=1,#selUnits do
-			local unitID = selUnits[i]
+	if highlightQueue and not onlyActive and currentSelection then
+		for i = 1, #currentSelection do
+			local unitID = currentSelection[i]
 			local unitDefID = spGetUnitDefID(unitID)
 			if unitDefID and isBuilder[unitDefID] then
 				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
@@ -319,6 +318,7 @@ end
 
 function widget:SelectionChanged(selectedUnits)
 	-- force regenerating the lists if we've selected a different unit
+	currentSelection = selectedUnits
 	lastDrawnFrame = 0
 end
 
@@ -335,14 +335,15 @@ function widget:DrawWorldPreUnit()
 	if (cmdID) then
 		if pylonDefs[-cmdID] then
 			if lastDrawnFrame ~= 0 then
-				local selUnits = spGetSelectedUnits()
 				local commandsCount = 0
-				for i=1,#selUnits do
-					local unitID = selUnits[i]
-					local unitDefID = spGetUnitDefID(unitID)
-					if unitDefID and isBuilder[unitDefID] then
-						commandsCount = Spring.GetCommandQueue(unitID, 0)
-						break
+				if currentSelection then
+					for i = 1,#currentSelection do
+						local unitID = currentSelection[i]
+						local unitDefID = spGetUnitDefID(unitID)
+						if unitDefID and isBuilder[unitDefID] then
+							commandsCount = Spring.GetCommandQueue(unitID, 0)
+							break
+						end
 					end
 				end
 				if commandsCount ~= lastCommandsCount then
@@ -360,10 +361,9 @@ function widget:DrawWorldPreUnit()
 		end
 	end
 
-	local selUnits = spGetSelectedUnits() -- or show it if its selected
-	if selUnits then
-		for i=1,#selUnits do
-			local ud = spGetUnitDefID(selUnits[i])
+	if currentSelection then
+		for i = 1, #currentSelection do
+			local ud = spGetUnitDefID(currentSelection[i])
 			if (pylonDefs[ud]) then
 				HighlightPylons()
 				glColor(1,1,1,1)

@@ -1,14 +1,14 @@
 function widget:GetInfo()
-   return {
-      name      = "UnitShapes",
-      desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
-      author    = "Lelousius and aegis, modded Licho, CarRepairer, jK, Shadowfury333",
-      date      = "30.07.2010",
-      license   = "GNU GPL, v2 or later",
-      layer     = 2,
-      enabled   = true,
-	  detailsDefault = 1
-   }
+	return {
+		name      = "UnitShapes",
+		desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
+		author    = "Lelousius and aegis, modded Licho, CarRepairer, jK, Shadowfury333",
+		date      = "30.07.2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = 2,
+		enabled   = true,
+		detailsDefault = 1
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -66,34 +66,33 @@ local shapes = {}
 
 local myTeamID = Spring.GetLocalTeamID()
 --local r,g,b = Spring.GetTeamColor(myTeamID)
-local r,g,b = 0.1, 1, 0.2
-local rgba = {r,g,b,1}
-local yellow = {1,1,0.1,1}
-local teal = {0.1,1,1,1}
-local red = {1,0.2,0.1,1}
+local r,g,b      = 0.1, 1, 0.2
+local rgba       = {r,g,b,1}
+local yellow     = {1,1,0.1,1}
+local teal       = {0.1,1,1,1}
+local red        = {1,0.2,0.1,1}
 local hoverColor = teal
 
 
-local circleDivs = 32 -- how precise circle? octagon by default
-local innersize = 0.9 -- circle scale compared to unit radius
-local selectinner = 1.5
-local outersize = 1.8 -- outer fade size compared to circle scale (1 = no outer fade)
-local scalefaktor = 2.8
+local circleDivs      = 32 -- how precise circle? octagon by default
+local innersize       = 0.9 -- circle scale compared to unit radius
+local selectinner     = 1.5
+local outersize       = 1.8 -- outer fade size compared to circle scale (1 = no outer fade)
+local scalefaktor     = 2.8
 local rectangleFactor = 2.7
-local CAlpha = 0.2
-
+local CAlpha          = 0.2
 
 local hoverScaleDuration = 0.05
-local hoverScaleStart = 0.95
-local hoverScaleEnd = 1.0
+local hoverScaleStart    = 0.95
+local hoverScaleEnd      = 1.0
 
-local hoverRestedTime = 0.05 --Time in ms below which the player is assumed to be rapidly hovering over different units
-local hoverBufferDisplayTime = 0.05 --Time in ms to keep showing hover when starting box selection
+local hoverRestedTime              = 0.05 --Time in ms below which the player is assumed to be rapidly hovering over different units
+local hoverBufferDisplayTime       = 0.05 --Time in ms to keep showing hover when starting box selection
 local hoverBufferScaleSuppressTime = 0.1 --Time in ms to stop box select from doing scale effect on a hovered unit
 
 local boxedScaleDuration = 0.05
-local boxedScaleStart = 0.9
-local boxedScaleEnd = 1.0
+local boxedScaleStart    = 0.9
+local boxedScaleEnd      = 1.0
 
 
 local colorout = {   1,   1,   1,   0 } -- outer color
@@ -104,17 +103,40 @@ local unitConf = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
-local lastBoxedUnits = {}
+local lastBoxedUnits    = {}
 local lastBoxedUnitsIDs = {}
 
 local selectedUnits = {}
 
-local visibleBoxed = {}
+local visibleBoxed        = {}
 local visibleAllySelUnits = {}
-local hoveredUnit = {}
+local hoveredUnit         = {}
 
 local hasVisibleAllySelections = false
 local forceUpdate = false
+local selectioHasChanged = false
+
+-- Speedups to avoid tiny table spam
+local unitStartTimeMap  = {}
+local unitDurationMap   = {}
+local unitStartScaleMap = {}
+local unitEndScaleMap   = {}
+local unitScaleMap      = {}
+local unitDefIDMap      = {}
+
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+
+local lastCamX, lastCamY, lastCamZ
+local lastGameFrame = 0
+
+local lastVisibleUnits, lastVisibleSelected, lastvisibleAllySelUnits
+-- local lastDrawtoolSetting = WG.drawtoolKeyPressed
+
+local hoverBuffer = 0
+local hoverTime = 0 --how long we've been hovering
+local cursorIsOn = "self"
+
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
@@ -182,32 +204,35 @@ options = {
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
-local lastCamX, lastCamY, lastCamZ
-local lastGameFrame = 0
-
-local lastVisibleUnits, lastVisibleSelected, lastvisibleAllySelUnits
--- local lastDrawtoolSetting = WG.drawtoolKeyPressed
-
-local hoverBuffer = 0
-local hoverTime = 0 --how long we've been hovering
-local cursorIsOn = "self"
-
 local function GetBoxedUnits() --Mostly a helper function for the animation system
 	local allBoxedUnits = GetUnitsInSelectionBox()
 	local boxedUnits = {}
 	local boxedUnitsIDs = {}
 	if allBoxedUnits then
-		for i=1, #allBoxedUnits do
-			if #hoveredUnit > 0 and hoveredUnit[1].unitID == allBoxedUnits[i] then --Transfer hovered unit here to avoid flickering
+		for i = 1, #allBoxedUnits do
+			local unitID = allBoxedUnits[i]
+			if #hoveredUnit > 0 and hoveredUnit[1] == allBoxedUnits[i] then --Transfer hovered unit here to avoid flickering
 				boxedUnits[#boxedUnits+1] = hoveredUnit[1]
 				hoveredUnit = {}
 				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits
 			elseif hoverBuffer > 0 or spIsUnitSelected(allBoxedUnits[i]) or not options.animateselectionbox.value then --don't scale if it just stopped being hovered over, reduces flicker effect
 				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits+1
-				boxedUnits[#boxedUnits+1] = {unitID = allBoxedUnits[i], scale = boxedScaleEnd}
+				boxedUnits[#boxedUnits+1] = unitID
+				unitStartTimeMap[unitID] = nil
+				unitDurationMap[unitID] = nil
+				unitStartScaleMap[unitID] = nil
+				unitEndScaleMap[unitID] = nil
+				unitScaleMap[unitID] = boxedScaleEnd
+				unitDefIDMap[unitID] = spGetUnitDefID(unitID)
 			elseif not lastBoxedUnitsIDs[allBoxedUnits[i]] then
 				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits+1
-				boxedUnits[#boxedUnits+1] = {unitID = allBoxedUnits[i], startTime = Spring.GetTimer(), duration = boxedScaleDuration, startScale = boxedScaleStart, endScale = boxedScaleEnd}
+				boxedUnits[#boxedUnits+1] = unitID
+				unitStartTimeMap[unitID] = Spring.GetTimer()
+				unitDurationMap[unitID] = boxedScaleDuration
+				unitStartScaleMap[unitID] = boxedScaleStart
+				unitEndScaleMap[unitID] = boxedScaleEnd
+				unitScaleMap[unitID] = nil
+				unitDefIDMap[unitID] = spGetUnitDefID(unitID)
 			else
 				boxedUnits[#boxedUnits+1] = lastBoxedUnits[lastBoxedUnitsIDs[allBoxedUnits[i]]]
 				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits
@@ -221,11 +246,11 @@ local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
 	local gameFrame = spGetGameFrame()
 	if forceUpdate or (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
-		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or
-		(#spGetSelectedUnits() > 0) then
+		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or selectioHasChanged then
 		
 		lastGameFrame = gameFrame
 		lastCamX, lastCamY, lastCamZ = camX, camY, camZ
+		selectioHasChanged = false
 		return true
 	end
 
@@ -234,6 +259,10 @@ local function HasVisibilityChanged()
 	-- 	return true
 	-- end
 	return false
+end
+
+function widget:SelectionChanged(selectedUnits)
+	selectioHasChanged = true
 end
 
 local function ShowAllySelection(unitID, myTeamID)
@@ -276,7 +305,7 @@ local function GetVisibleUnits()
 		for i = 1, #units do
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
-				visibleSelected[#visibleSelected+1] = {unitID = unitID}
+				visibleSelected[#visibleSelected + 1] = unitID
 			end
 			
 			if ShowAllySelection(unitID, myTeamID) then
@@ -289,7 +318,7 @@ local function GetVisibleUnits()
 					if not visibleAllySelUnits[teamIDIndex] then
 						visibleAllySelUnits[teamIDIndex] = {}
 					end
-					visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = {unitID = unitID, scale = 0.92}
+					visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = unitID
 					hasVisibleAllySelections = true
 				end
 			end
@@ -305,14 +334,24 @@ end
 
 local function GetHoveredUnit(dt) --Mostly a convenience function for the animation system
 	local unitID = GetUnitUnderCursor(false)
-	local hoveredUnit = hoveredUnit
+	local nweHoveredUnit = hoveredUnit
 	local cursorIsOn = cursorIsOn
 	if unitID and not spIsUnitSelected(unitID) then
-		if #hoveredUnit == 0 or unitID ~= hoveredUnit[#hoveredUnit].unitID then
+		if #nweHoveredUnit == 0 or unitID ~= nweHoveredUnit[#nweHoveredUnit] then
 			if hoverTime < hoverRestedTime or not options.animatehover.value then --Only animate hover effect if player is not rapidly changing hovered unit
-				hoveredUnit[1] = {unitID = unitID, scale = hoverScaleEnd}
+				nweHoveredUnit[1] = unitID
+				unitStartTimeMap[unitID] = nil
+				unitDurationMap[unitID] = nil
+				unitStartScaleMap[unitID] = nil
+				unitEndScaleMap[unitID] = nil
+				unitScaleMap[unitID] = hoverScaleEnd
 			else
-				hoveredUnit[1] = {unitID = unitID, startTime = Spring.GetTimer(), duration = hoverScaleDuration, startScale = hoverScaleStart, endScale = hoverScaleEnd}
+				nweHoveredUnit[1] = unitID
+				unitStartTimeMap[unitID] = Spring.GetTimer()
+				unitDurationMap[unitID] = hoverScaleDuration
+				unitStartScaleMap[unitID] = hoverScaleStart
+				unitEndScaleMap[unitID] = hoverScaleEnd
+				unitScaleMap[unitID] = nil
 			end
 
 			local teamID = Spring.GetUnitTeam(unitID)
@@ -336,14 +375,14 @@ local function GetHoveredUnit(dt) --Mostly a convenience function for the animat
 		hoverBuffer = math.max(hoverBuffer - dt, 0)
 
 		if hoverBuffer <= hoverBufferScaleSuppressTime then --stop showing hover shape here, but if box selected within a short time don't do scale effect
-			hoveredUnit = {}
+			nweHoveredUnit = {}
 		end
 
 		if hoverBuffer < hoverBufferScaleSuppressTime then
 			cursorIsOn = "self" --Don't change colour at the last second when over enemy
 		end
 	end
-	return hoveredUnit, cursorIsOn
+	return nweHoveredUnit, cursorIsOn
 end
 
 --------------------------------------------------------------------------------
@@ -575,16 +614,17 @@ local function UpdateUnitListScale(unitList)
 		return
 	end
 	local now = Spring.GetTimer()
-	for i=1, #unitList do
-		local startScale = unitList[i].startScale
-		local endScale = unitList[i].endScale
-		local scaleDuration = unitList[i].duration
+	for i = 1, #unitList do
+		local unitID = unitList[i]
+		local startScale = unitStartScaleMap[unitID]
+		local endScale = unitEndScaleMap[unitID]
+		local scaleDuration = unitDurationMap[unitID]
 		if scaleDuration and scaleDuration > 0 then
-			unitList[i].scale = startScale + math.min(Spring.DiffTimers(now, unitList[i].startTime) / scaleDuration, 1.0) * (endScale - startScale)
+			unitScaleMap[unitID] = startScale + math.min(Spring.DiffTimers(now, unitStartTimeMap[unitID]) / scaleDuration, 1.0) * (endScale - startScale)
 		elseif startScale then
-			unitList[i].scale = startScale
-		elseif not unitList[i].scale then --implicitly allows explicit scale to be set on unitList entry creation
-			unitList[i].scale = 1.0
+			unitScaleMap[unitID] = startScale
+		elseif not unitScaleMap[unitID] then --implicitly allows explicit scale to be set on unitList entry creation
+			unitScaleMap[unitID] = 1.0
 		end
 	end
 end
@@ -594,8 +634,8 @@ local function UpdateUnitListRotation(unitList)
 		return
 	end
 	for i = 1, #unitList do
-		local unitID = unitList[i].unitID
-		local udid = spGetUnitDefID(unitID)
+		local unitID = unitList[i]
+		local udid = unitDefIDMap[unitID] or spGetUnitDefID(unitID)
 		if udid and unitConf[udid].noRotate then
 			degrot[unitID] = 0
 		elseif udid and unitConf[udid].velocityHeading then
@@ -630,8 +670,8 @@ function widget:Update(dt)
 	if Spring.GetSpectatingState() and options.showallyplayercolours.value then
 		for i=1, #teams do
 			if visibleAllySelUnits[teams[i]+1] then
-				UpdateUnitListRotation(visibleAllySelUnits[teams[i]+1])
-				UpdateUnitListScale(visibleAllySelUnits[teams[i]+1])
+				UpdateUnitListRotation(visibleAllySelUnits[teams[i] + 1])
+				UpdateUnitListScale(visibleAllySelUnits[teams[i] + 1])
 			end
 		end
 	elseif hasVisibleAllySelections then
@@ -693,10 +733,10 @@ function DrawUnitShapes(unitList, color, underWorld)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
 	for i = 1, #unitList do
-		local unitID = unitList[i].unitID
-		local udid = spGetUnitDefID(unitID)
+		local unitID = unitList[i]
+		local udid = unitDefIDMap[unitID] or spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale or 1
+		local scale = unitScaleMap[unitID] or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
@@ -710,10 +750,10 @@ function DrawUnitShapes(unitList, color, underWorld)
 	gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
 	for i=1, #unitList do
-		local unitID = unitList[i].unitID
-		local udid = spGetUnitDefID(unitID)
+		local unitID = unitList[i]
+		local udid = unitDefIDMap[unitID] or spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitList[i].scale or 1
+		local scale = unitScaleMap[unitID] or 1
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
@@ -722,7 +762,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	-- gl.DepthTest(GL.LEQUAL)
 	-- gl.PolygonOffset(-1.0,-1.0)
 	for i=1, #unitList do --Correct underwater
-		local unitID = unitList[i].unitID
+		local unitID = unitList[i]
 		local _, y, _ = Spring.GetUnitViewPosition(unitID)
 		if y and (y < 0) then
 			gl.Unit(unitID, true)
@@ -748,8 +788,12 @@ function DrawUnitShapes(unitList, color, underWorld)
 end
 
 local function DrawCircles(underWorld)
-	if Spring.IsGUIHidden() then return end
-	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
+	if Spring.IsGUIHidden() then
+		return
+	end
+	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then
+		return
+	end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
@@ -765,7 +809,7 @@ local function DrawCircles(underWorld)
 					if fullselect then hoverColor = teal end
 					
 					local teams = Spring.GetTeamList()
-					for i=1, #teams do
+					for i = 1, #teams do
 						if visibleAllySelUnits[teams[i]+1] then
 							local r,g,b = Spring.GetTeamColor(teams[i])
 						  DrawUnitShapes(visibleAllySelUnits[teams[i]+1], {r,g,b,1}, underWorld)
