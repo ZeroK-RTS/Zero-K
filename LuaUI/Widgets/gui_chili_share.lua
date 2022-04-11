@@ -1,6 +1,6 @@
 function widget:GetInfo()
 	return {
-		name    = "Chili Share menu v1.25",
+		name    = "Chili Share menu v1.24",
 		desc    = "FPS style (whole screen, hold to show) player list with comsharing UI",
 		author  = "Commshare by Shaman, Playerlist by DeinFreund",
 		date    = "12-3-2016",
@@ -55,7 +55,6 @@ local images = {
 	giftenergy = 'LuaUI/Images/energy.png',
 }
 local defaultamount = 100
-local zeroIfNumWrhDisabled = 0
 
 local UpdateListFunction
 local SetWantRebuild_
@@ -80,7 +79,7 @@ local rankColors = {
 	["4"] = {1  , 1   , 0  ,  1},
 	["3"] = {1  , 0.65, 0  ,  1},
 	["2"] = {0.8, 0.4 , 0.1,  1},
-	["1"] = {1  ,   0 ,   0,  1},
+	["1"] = {1  , 0   , 0  ,  1},
 	["0"] = {0.5, 0.5 , 0.5,  1},
 }
 
@@ -122,7 +121,6 @@ options = {
 		desc = "Shows the WHR current rating of each player after their name. Uses the rating category of the current game mode (Casual or MM).",
 		noHotkey = true,
 		OnChange = function(self)
-			zeroIfNumWrhDisabled = self.value and 1 or 0
 			SetWantRebuild_()
 		end,
 	},
@@ -719,7 +717,7 @@ local function InitName(subject, playerPanel)
 	local bottomRowStartX = 67
 	local bottomRowStartY = 37
 	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 6
-	local metalBarX = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + zeroIfNumWrhDisabled * whrWidth
+	local metalBarX = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + (options.enableNumWHR.value and whrWidth or 0)
 	local infoSize = 48
 	
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
@@ -1068,12 +1066,12 @@ local function InitName(subject, playerPanel)
 			noFont = true,
 		}
 	end
-	local country, icon, rating, badges, clan, avatar, faction, admin
+	local country, icon, elo, badges, clan, avatar, faction, admin
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player, false))
 		icon = pdata.icon
-		rating = pdata.elo
+		elo = pdata.elo
 		badges = pdata.badges
 		clan = pdata.clan
 		avatar = pdata.avatar
@@ -1207,7 +1205,7 @@ local function InitName(subject, playerPanel)
 		end
 	end
 
-	if options.enableNumWHR.value and rating then
+	if options.enableNumWHR.value and elo then
 		local whrMargin = 2
 		
 		chili.TextBox:New{
@@ -1216,7 +1214,7 @@ local function InitName(subject, playerPanel)
 			x= givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + whrMargin,
 			y= givemebuttons[subject.id]["text"].y + 1 ,
 			tooltip = "WHR Current Rating",
-			text = rating,
+			text = elo,
 			textColor = (icon and rankColors[icon:sub(3,3)]) or {1,1,1,1}
 		}
 	end
@@ -1235,7 +1233,7 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
-	windowWidth = 768 + 2 * zeroIfNumWrhDisabled * whrWidth
+	windowWidth = 768 + (options.enableNumWHR.value and (2 * whrWidth) or 0)
 	windowHeight = 666
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
@@ -1243,7 +1241,7 @@ local function Buildme()
 	local allypanels = {}
 	local allpanels = {}
 	local playerHeight =  64
-	local playerWidth =  339 + zeroIfNumWrhDisabled * whrWidth
+	local playerWidth =  339 + (options.enableNumWHR.value and whrWidth or 0)
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
@@ -1636,5 +1634,4 @@ function widget:Initialize()
 		WG.crude.SetHotkey("sharedialog","")
 		options.fixHotkeys.value = false
 	end
-	zeroIfNumWrhDisabled = options.enableNumWHR.value and 1 or 0
 end
