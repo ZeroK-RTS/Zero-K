@@ -33,6 +33,9 @@ end
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
+local spGetUnitDrawFlag  = Spring.GetUnitDrawFlag
+local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -403,7 +406,7 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				if (fullView or Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1) and Spring.IsUnitInView(unitID) and not Spring.GetUnitIsCloaked(unitID) then
+				if ((spGetUnitDrawFlag(unitID, 1) % 2) == 1) and not spGetUnitIsCloaked(unitID) then
 					unitIDs[#unitIDs + 1] = unitID
 				end
 			end
