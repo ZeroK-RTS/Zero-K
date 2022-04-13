@@ -77,6 +77,8 @@ local lineOffset = nil
 local yCenter = nil
 local xCut = nil
 local mouseOverClose = false
+local mouseX = 0
+local mouseY = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -183,9 +185,9 @@ function widget:DrawScreen()
 		if now - disablePauseSlideTimestamp > slideTime then
 			drawPause(paused, now)
 		end
+	ResetGl()
 	end
 	
-	ResetGl()
 end
 
 function isOverWindow(x, y)
@@ -227,6 +229,7 @@ end
 
 function widget:IsAbove(x,y)
 	local _, _, paused = spGetGameSpeed()
+	mouseX, mouseY = spGetMouseState()
 	if ( paused and not options.autofade.value and not (options.hideimage.value or tempDisabled) and not clickTimestamp and isOverWindow( x, y ) ) then
 		return true
 	end
@@ -234,8 +237,7 @@ function widget:IsAbove(x,y)
 end
 
 function widget:Update()
-	local x,y = spGetMouseState()
-	if ( isOverWindow(x, y) ) then
+	if ( isOverWindow(mouseX, mouseY) ) then
 		mouseOverClose = true
 	else
 		mouseOverClose = false
