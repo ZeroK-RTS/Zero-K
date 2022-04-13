@@ -664,7 +664,7 @@ function widget:GameFrame(frame)
 	end
 	UpdateFeatures(frame)
 	--spEcho("featuresUpdated", featuresUpdated)
-	if featuresUpdated then
+	if featuresUpdated and drawEnabled then
 		ClusterizeFeatures()
 		ClustersToConvexHull()
 		--spEcho("LuaUI memsize before = ", collectgarbage("count"))
