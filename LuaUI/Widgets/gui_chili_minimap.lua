@@ -11,6 +11,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Configs/constants.lua")
 include("Widgets/COFCTools/ExportUtilities.lua")
 
 --// gl const
@@ -46,6 +47,9 @@ local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
+
+local vsx, vsy = gl.GetViewSizes
+local cs -- camera state
 
 local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
@@ -622,6 +626,11 @@ function setSensorState(newState)
 	end
 end
 
+function widget:ViewResize()
+	vsx,vsy = gl.GetViewSizes()
+	cs = Spring.GetCameraState()
+end
+
 local firstUpdate = true
 local updateRunOnceRan = false
 
@@ -639,10 +648,11 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
-	if not window then return end
+	if not window or (Spring.GetGameFrame()%TEAM_SLOWUPDATE_RATE ~= 0) then return end 
 
+	-- continue polling for camera at a reduced rate
 	if not options.hideOnOverview.value then
-		local cs = Spring.GetCameraState()
+		cs = Spring.GetCameraState()
 		if cs.name == "ov" and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
@@ -983,6 +993,7 @@ function widget:Initialize()
 	
 	Chili = WG.Chili
 
+	cs = Spring.GetCameraState()
 	MakeMinimapWindow()
 
 	if (gl.CreateFBO) then
@@ -992,7 +1003,7 @@ function widget:Initialize()
 
 		gl.DeleteTextureFBO(offscreentex or 0)
 
-		local vsx,vsy = gl.GetViewSizes()
+		vsx,vsy = gl.GetViewSizes()
 		if vsx > 0 and vsy > 0 then
 			offscreentex = gl.CreateTexture(vsx,vsy, {
 				border = false,
@@ -1093,7 +1104,6 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen()
-	local cs = Spring.GetCameraState()
 	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
@@ -1109,7 +1119,6 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
-	local vsx,vsy = Spring.GetViewSizes()
 	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy or last_window_x ~= window.x or last_window_y ~= window.y) then
 		lx = cx
 		ly = cy
