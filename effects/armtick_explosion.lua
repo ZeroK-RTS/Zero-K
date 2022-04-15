@@ -7,6 +7,8 @@ return {
     dirt = {
       count              = 4,
       ground             = true,
+      water              = true,
+      underwater         = true,
       properties = {
         alphafalloff       = 2,
         alwaysvisible      = true,
@@ -22,6 +24,7 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
@@ -40,6 +43,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
@@ -57,6 +61,8 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
+      water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.8,
         alwaysvisible      = true,
@@ -90,6 +96,7 @@ return {
       ground             = true,
       ttl                = 17,
       water              = true,
+      underwater         = true,
       color = {
         [1]  = 0,
         [2]  = 0.5,
@@ -101,6 +108,8 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
+      water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.8,
         alwaysvisible      = true,
@@ -130,6 +139,7 @@ return {
       count              = 2,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
