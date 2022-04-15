@@ -57,7 +57,7 @@ local images = {
 local defaultamount = 100
 
 local UpdateListFunction
-local SetWantRebuild_
+local SetWantRebuild
 local wantRebuild = false
 
 local KICK_USER = "StartKickPoll_"
@@ -115,13 +115,15 @@ options = {
 		noHotkey = true,
 	},
 	enableNumWHR = {
-		name  = "Show current WHR (Elo) rating of players",
+		name  = "Show player rating",
 		type  = "bool",
 		value = false,
 		desc = "Shows the WHR current rating of each player after their name. Uses the rating category of the current game mode (Casual or MM).",
 		noHotkey = true,
 		OnChange = function(self)
-			SetWantRebuild_()
+			if SetWantRebuild then
+				SetWantRebuild()
+			end
 		end,
 	},
 	sharemenu = {
@@ -1386,7 +1388,7 @@ local function Buildme()
 end
 UpdateListFunction = Buildme
 
-local function SetWantRebuild()
+function SetWantRebuild()
 	if (mySubjectID < 0 or not subjects[mySubjectID]) then
 		return
 	end
@@ -1396,7 +1398,6 @@ local function SetWantRebuild()
 		wantRebuild = true
 	end
 end
-SetWantRebuild_ = SetWantRebuild
 
 local function UpdateInviteTable()
 	local myPlayerID = Spring.GetMyPlayerID()
