@@ -37,6 +37,7 @@ local mySubjectID = -1
 local fontSize = 18
 local badgeWidth = 59*0.6
 local badgeHeight = 24*0.6
+local whrWidth = 35 -- Including margins
 local color2incolor = nil
 local teamZeroPlayers = {}
 local playerInfo = {}
@@ -56,6 +57,7 @@ local images = {
 local defaultamount = 100
 
 local UpdateListFunction
+local SetWantRebuild_
 local wantRebuild = false
 
 local KICK_USER = "StartKickPoll_"
@@ -67,6 +69,18 @@ local pingCpuColors = {
 	'\255\255\153\0',
 	'\255\255\0\0',
 	'\255\255\255\255',
+}
+
+-- RGBA. Used as font color of players' WHR.
+local rankColors = {
+	["7"] = {1  , 0   , 1  ,  1},
+	["6"] = {0  , 0.6 , 1  ,  1},
+	["5"] = {0.7, 0.8 , 1  ,  1},
+	["4"] = {1  , 1   , 0  ,  1},
+	["3"] = {1  , 0.65, 0  ,  1},
+	["2"] = {0.8, 0.4 , 0.1,  1},
+	["1"] = {1  , 0   , 0  ,  1},
+	["0"] = {0.5, 0.5 , 0.5,  1},
 }
 
 local function PingTimeOut(pingTime)
@@ -99,6 +113,16 @@ options = {
 		desc = "Fixes old hotkey issues once and then disables.",
 		advanced = true,
 		noHotkey = true,
+	},
+	enableNumWHR = {
+		name  = "Show current WHR (Elo) rating of players",
+		type  = "bool",
+		value = false,
+		desc = "Shows the WHR current rating of each player after their name. Uses the rating category of the current game mode (Casual or MM).",
+		noHotkey = true,
+		OnChange = function(self)
+			SetWantRebuild_()
+		end,
 	},
 	sharemenu = {
 		name = 'Show Player List',
@@ -693,6 +717,7 @@ local function InitName(subject, playerPanel)
 	local bottomRowStartX = 67
 	local bottomRowStartY = 37
 	local bottomInfoStartX = bottomRowStartX + 4*buttonsize + 6
+	local metalBarX = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + (options.enableNumWHR.value and whrWidth or 0)
 	local infoSize = 48
 	
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
@@ -807,7 +832,7 @@ local function InitName(subject, playerPanel)
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		width=60,
-		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + buttonsize + 3,
+		x = metalBarX + buttonsize + 3,
 		y = givemebuttons[subject.id]["text"].y - 2,
 		height=buttonsize,
 		tooltip = "This player's network delay (ping)"
@@ -820,7 +845,7 @@ local function InitName(subject, playerPanel)
 		min=0,
 		max=1,
 		width = barWidth,
-		x = givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width,
+		x = metalBarX,
 		y = bottomRowStartY - 1,
 		color={136/255,214/255,251/255,1},
 		tooltip = "Your ally's metal.",
@@ -968,7 +993,7 @@ local function InitName(subject, playerPanel)
 				parent = playerPanel,
 				height = buttonsize,
 				width = buttonsize,
-				x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+				x= metalBarX,
 				y= givemebuttons[subject.id]["text"].y - 6,
 				OnClick = {function () ReportPlayer(subject) end},
 				padding={2,2,2,2},
@@ -986,7 +1011,7 @@ local function InitName(subject, playerPanel)
 			--	parent = playerPanel,
 			--	height = buttonsize,
 			--	width = buttonsize,
-			--	x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			--	x= metalBarX,
 			--	y= givemebuttons[subject.id]["text"].y - 6,
 			--	OnClick = {function () BattleKickPlayer(subject) end},
 			--	padding={1,1,1,1},
@@ -1026,7 +1051,7 @@ local function InitName(subject, playerPanel)
 			parent = playerPanel,
 			height = buttonsize,
 			width = buttonsize,
-			x= givemebuttons[subject.id]["text"].x  + givemebuttons[subject.id]["text"].width,
+			x= metalBarX,
 			y= givemebuttons[subject.id]["text"].y - 6,
 			OnClick = {function () ReportPlayer(subject) end},
 			padding={2,2,2,2},
@@ -1041,11 +1066,12 @@ local function InitName(subject, playerPanel)
 			noFont = true,
 		}
 	end
-	local country, icon, badges, clan, avatar, faction, admin
+	local country, icon, elo, badges, clan, avatar, faction, admin
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player, false))
 		icon = pdata.icon
+		elo = pdata.elo
 		badges = pdata.badges
 		clan = pdata.clan
 		avatar = pdata.avatar
@@ -1106,6 +1132,7 @@ local function InitName(subject, playerPanel)
 			y = givemebuttons[subject.id]["text"].y - 1
 		}
 	end
+
 	if (adminImg) then
 		--if givemebuttons[subject.id]["battlekick"] then
 		--	givemebuttons[subject.id]["battlekick"]:Dispose()
@@ -1177,6 +1204,21 @@ local function InitName(subject, playerPanel)
 			end
 		end
 	end
+
+	if options.enableNumWHR.value and elo then
+		local whrMargin = 2
+		
+		chili.TextBox:New{
+			parent=playerPanel,
+			width=whrWidth - 2*whrMargin,
+			x= givemebuttons[subject.id]["text"].x + givemebuttons[subject.id]["text"].width + whrMargin,
+			y= givemebuttons[subject.id]["text"].y + 1 ,
+			tooltip = "WHR Current Rating",
+			text = elo,
+			textColor = (icon and rankColors[icon:sub(3,3)]) or {1,1,1,1}
+		}
+	end
+
 	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
 	local isSpec = select(3,Spring.GetPlayerInfo(subject.id, false))
 	--if not isSpec then
@@ -1191,7 +1233,7 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
-	windowWidth = 768
+	windowWidth = 768 + (options.enableNumWHR.value and (2 * whrWidth) or 0)
 	windowHeight = 666
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
@@ -1199,7 +1241,7 @@ local function Buildme()
 	local allypanels = {}
 	local allpanels = {}
 	local playerHeight =  64
-	local playerWidth =  339
+	local playerWidth =  339 + (options.enableNumWHR.value and whrWidth or 0)
 	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
@@ -1354,6 +1396,7 @@ local function SetWantRebuild()
 		wantRebuild = true
 	end
 end
+SetWantRebuild_ = SetWantRebuild
 
 local function UpdateInviteTable()
 	local myPlayerID = Spring.GetMyPlayerID()
