@@ -53,7 +53,7 @@ return { armcom1 = {
   metalStorage           = 500,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName             = [[ARMCOM]],
+  objectName             = [[armcom.s3o]],
   script                 = [[armcom.lua]],
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
