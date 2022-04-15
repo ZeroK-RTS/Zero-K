@@ -36,6 +36,12 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local spGetUnitDrawFlag  = Spring.GetUnitDrawFlag
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 
+local debugUnitDefIDs = {
+	[UnitDefNames["jumpraid"].id] = true,
+	[UnitDefNames["jumparty"].id] = true,
+	[UnitDefNames["jumpassault"].id] = true,
+}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -366,6 +372,11 @@ local function ProcessUnit(unitID, unitDefID, drawFlag, skinName)
 			string.format("%%%s:%i", unitDefID, 1)
 		}
 	end
+	
+	if unitDefID and debugUnitDefIDs[unitDefID] then
+		Spring.Echo("Adding unit", UnitDefs[unitDefID].name, textureOverrides[unitID][1], textureOverrides[unitID][2])
+	end
+	
 	if overriddenUnits[unitID] == nil then --object was not seen
 		AddUnit(unitID, drawFlag)
 	elseif overriddenUnits[unitID] ~= drawFlag then --flags have changed
