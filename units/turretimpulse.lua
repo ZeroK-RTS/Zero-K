@@ -161,7 +161,7 @@ return { turretimpulse = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[corgrav_dead]],
+      object           = [[corgrav_dead.s3o]],
     },
 
     HEAP  = {
