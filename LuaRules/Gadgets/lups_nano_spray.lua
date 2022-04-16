@@ -59,14 +59,6 @@ local allyTeamStrengthMult = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-if (not GetFeatureRadius) then
-  GetFeatureRadius = function(featureID)
-    local fDefID = spGetFeatureDefID(featureID)
-    return (FeatureDefs[fDefID].radius or 0)
-  end
-end
-
-
 local function SetTable(table,arg1,arg2,arg3,arg4)
   table[1] = arg1
   table[2] = arg2
