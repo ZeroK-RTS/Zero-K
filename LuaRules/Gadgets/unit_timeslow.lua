@@ -179,21 +179,25 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 
-local function addSlowDamage(unitID, damage)
+local function addSlowDamage(unitID, damage, overslow)
 
 	-- add stats that the unit requires for this gadget
-	if not slowedUnits[unitID] then
-		slowedUnits[unitID] = {
+	local su = slowedUnits[unitID]
+	if not su then
+		su = {
 			slowDamage = 0,
-			degradeTimer = DEGRADE_TIMER,
 		}
+		slowedUnits[unitID] = su
 	end
 
 	-- add slow damage
-	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + damage
-	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
-	
-	updateSlow( unitID, slowedUnits[unitID]) -- without this unit does not fire slower, only moves slower
+	su.slowDamage = su.slowDamage + damage
+	su.degradeTimer = DEGRADE_TIMER
+	if overslow then
+		su.extraSlowBound = math.max(overslow * DEGRADE_FACTOR, su.extraSlowBound or 0)
+	end
+
+	updateSlow(unitID, su) -- without this unit does not fire slower, only moves slower
 end
 
 local function getSlowDamage(unitID)
