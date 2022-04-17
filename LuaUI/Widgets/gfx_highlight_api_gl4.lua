@@ -187,6 +187,12 @@ if TESTMODE then
 end
 
 function widget:Initialize()
+	if not Platform.glHaveGL4 then
+		Spring.Echo("highlightUnitShader no GL4 support")
+		widgetHandler:RemoveWidget()
+		return
+	end
+
 	local vertVBO = gl.GetVBO(GL.ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	vertVBO:ModelsVBO()
