@@ -41,9 +41,19 @@ local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitTransporter = Spring.GetUnitTransporter
+local spGetUnitRadius = Spring.GetUnitRadius
+local spValidUnitID = Spring.ValidUnitID
 --local ech = Spring.Echo
 
 local floor = math.floor
+local min = math.min
+local max = math.max
+local abs = math.abs
+local sin = math.sin
+local cos = math.cos
+local atan2 = math.atan2
+local sqrt = math.sqrt
 
 local CMD_NEWTON_FIREZONE = 10283
 local CMD_STOP_NEWTON_FIREZONE = 10284
@@ -232,14 +242,14 @@ local function LimitRectangleSize(rect,units)  --limit rectangle size to Newton'
 			end
 		end
 	end
-	rect.x = math.min(maxX,rect.x)
-	rect.z = math.min(maxZ,rect.z)
-	rect.x2 = math.min(maxX + 252,rect.x2)
-	rect.z2 = math.min(maxZ + 252,rect.z2)
-	rect.x = math.max(minX - 252,rect.x)
-	rect.z = math.max(minZ - 252,rect.z)
-	rect.x2 = math.max(minX,rect.x2)
-	rect.z2 = math.max(minZ,rect.z2)
+	rect.x = min(maxX,rect.x)
+	rect.z = min(maxZ,rect.z)
+	rect.x2 = min(maxX + 252,rect.x2)
+	rect.z2 = min(maxZ + 252,rect.z2)
+	rect.x = max(minX - 252,rect.x)
+	rect.z = max(minZ - 252,rect.z)
+	rect.x2 = max(minX,rect.x2)
+	rect.z2 = max(minZ,rect.z2)
 	return rect
 end
 
@@ -571,9 +581,9 @@ end
 
 local function UpdateTransportedUnits()
 	for unitID,_ in pairs(transportedUnits) do
-		if Spring.ValidUnitID(unitID) then
-			local transport = Spring.GetUnitTransporter(unitID)
-			if transport and Spring.ValidUnitID(transport) then
+		if spValidUnitID(unitID) then
+			local transport = spGetUnitTransporter(unitID)
+			if transport and spValidUnitID(transport) then
 				EstimateCrashLocation(unitID, transport)
 			else
 				transportedUnits[unitID] = nil
@@ -716,7 +726,7 @@ function widget:GameFrame(n)
 		for victimID, _ in pairs (victimLandingLocation) do
 			local x,y,z = spGetUnitPosition(victimID)
 			if x then
-				local grndHeight = math.max(0, spGetGroundHeight(x,z)) + 30
+				local grndHeight = max(0, spGetGroundHeight(x,z)) + 30
 				if y <= grndHeight then
 					victimLandingLocation[victimID]=nil
 				end
@@ -790,7 +800,7 @@ end
 
 ------Crash location estimator---
 function EstimateCrashLocation(victimID, transportID)
-	if not Spring.ValidUnitID(victimID) then
+	if not spValidUnitID(victimID) then
 		return
 	end
 	local defID = spGetUnitDefID(victimID)
@@ -817,7 +827,7 @@ function EstimateCrashLocation(victimID, transportID)
 		end
 	end
 	local x,y,z = spGetUnitPosition(victimID)
-	local radius = Spring.GetUnitRadius(victimID)
+	local radius = spGetUnitRadius(victimID)
 	local mass = UnitDefs[defID].mass
 	local airDensity = 1.2/4 --see Spring/rts/Map/Mapinfo.cpp
 	local future_locationX, future_height,future_locationZ = SimulateWithDrag(xVel,yVel,zVel, x,y,z, gravity ,mass,radius, airDensity)
@@ -928,8 +938,8 @@ local function f_v(t,xold,vold,mass,area,gravity,airDensity) -- a function that 
   local tmp = {hrzn=0,vert=0};
   local rho=1
   local b=(1.0/2.0)*airDensity*area*rho;
-  local horizontalSign = -1*math.abs(vold.hrzn)/vold.hrzn
-  local verticalSign = -1*math.abs(vold.vert)/vold.vert
+  local horizontalSign = -1*abs(vold.hrzn)/vold.hrzn
+  local verticalSign = -1*abs(vold.vert)/vold.vert
   --MethodA: current spring implementation--
   tmp.hrzn = (b/mass)*(vold.hrzn^2)*horizontalSign;--horizontal is back-and-forth movement
   tmp.vert = -gravity+(b/mass)*(vold.vert^2)*verticalSign; --is vertical movement
@@ -979,10 +989,10 @@ end
 
 function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity)
 	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp
-	local horizontalVelocity = math.sqrt(velX^2+velZ^2)
-	local horizontalAngle = math.atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
-	local hrznAngleCos = math.cos(horizontalAngle)
-	local hrznAngleSin = math.sin(horizontalAngle)
+	local horizontalVelocity = sqrt(velX^2+velZ^2)
+	local horizontalAngle = atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
+	local hrznAngleCos = cos(horizontalAngle)
+	local hrznAngleSin = sin(horizontalAngle)
 
 	local area=(radius*radius)*math.pi;
 

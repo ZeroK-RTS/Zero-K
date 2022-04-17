@@ -17,6 +17,7 @@ local Chili
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spGetUnitIsCloaked   = Spring.GetUnitIsCloaked
 local glColor              = gl.Color
 
 local drawAlpha = 0.17
@@ -25,6 +26,7 @@ local cloakedColor = { 0.4, 0.4, 0.9, drawAlpha} -- drawAlpha on purpose!
 
 local decloakDist = {}
 local currentSelection = false
+local selectionCanCloak = false
 
 options_path = 'Settings/Interface/Defence and Cloak Ranges'
 options_order = {
@@ -103,6 +105,34 @@ end
 
 function widget:SelectionChanged(selectedUnits)
 	currentSelection = selectedUnits
+
+	for i = 1, #currentSelection do
+		local unitID = currentSelection[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		if unitDefID then
+			local cloaked = spGetUnitIsCloaked(unitID)
+			local wantCloak = (not cloaked) and ((spGetUnitRulesParam(unitID, "wantcloak") == 1) or (spGetUnitRulesParam(unitID, "areacloaked") == 1))
+			if (cloaked or wantCloak) then
+				selectionCanCloak = true
+				return
+			end
+		end
+	end
+	selectionCanCloak = false
+end
+
+function widget:UnitCloaked(curID, curUnitDefID, teamID)
+	local spec, fullview = Spring.GetSpectatingState()
+	if (not currentSelection) or (teamID ~= Spring.GetMyTeamID() and not (spec or fullview)) then
+		return
+	end
+	for i = 1, #currentSelection do
+		local unitID = currentSelection[i]
+		if unitID == curID then 
+			selectionCanCloak = true
+			return
+		end
+	end
 end
 
 local function HighlightPylons()
@@ -118,7 +148,8 @@ function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then
 		return
 	end
-
-	HighlightPylons()
-	glColor(1,1,1,1)
+	if selectionCanCloak then
+		HighlightPylons()
+		glColor(1,1,1,1)
+	end
 end
