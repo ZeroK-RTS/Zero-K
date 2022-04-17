@@ -110,6 +110,7 @@ local function AddFeature(featureID)
 		return
 	end
 	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
+	--Spring.Utilities.FeatureEcho(featureID, "________________ ADD")
 end
 
 --local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)
@@ -125,11 +126,10 @@ local function UpdateFeatureVisibility()
 	-- Add new features and mark existing ones as seen.
 	for i = 1, #visibleFeatures do
 		local featureID = visibleFeatures[i]
-		if handledFeatureMap[featureID] then
-			handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
-		else
+		if not handledFeatureMap[featureID] then
 			AddFeature(featureID)
 		end
+		handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 	end
 	
 	-- Remove features that don't appear in the list of visible features.
@@ -139,6 +139,7 @@ local function UpdateFeatureVisibility()
 			local featureID = handledFeatureList[i]
 			if handledFeatureApiIDs[featureID] then
 				WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+				--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
 			end
 			
 			handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
@@ -212,13 +213,6 @@ function widget:Update()
 		return
 	end
 
-	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
-		minMetalShownOld = minMetalShownNew
-		if Script.LuaRules.SetWreckMetalThreshold then
-			Script.LuaRules.SetWreckMetalThreshold(minMetalShownNew)
-		end
-	end
-	
 	if enableCondNew ~= enableCondOld then
 		enableCondOld = enableCondNew
 		if enableCondNew then
@@ -235,6 +229,7 @@ function widget:Update()
 			for i = 1, #handledFeatureList do
 				if handledFeatureApiIDs[handledFeatureList[i]] then
 					WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
+					--Spring.Utilities.FeatureEcho(featureID, "REMOVE __2")
 				end
 			end
 			handledFeatureList = false
