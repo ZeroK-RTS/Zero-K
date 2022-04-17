@@ -122,8 +122,7 @@ function widget:SelectionChanged(selectedUnits)
 end
 
 function widget:UnitCloaked(curID, curUnitDefID, teamID)
-	local spec, fullview = Spring.GetSpectatingState()
-	if (not currentSelection) or (teamID ~= Spring.GetMyTeamID() and not (spec or fullview)) then
+	if (not currentSelection) or ((teamID ~= Spring.GetMyTeamID()) and not Spring.GetSpectatingState()) then
 		return
 	end
 	for i = 1, #currentSelection do

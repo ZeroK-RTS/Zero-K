@@ -14,7 +14,7 @@ local last_frame = 0
 local disabled = false
 local enemyDots = {}
 local allyDots = {}
-local dot = {}
+local dot = { x, y, z, losState, r, g, b}
 local removals = {}
 
 local needsUpdate = false
