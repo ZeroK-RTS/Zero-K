@@ -75,7 +75,8 @@ void main() {
 	uint isDynamic = 1u; //default dynamic model
 	if (parameters.x > 0.5) isDynamic = 0u;  //if paramy == 1 then the unit is static
 	mat4 pieceMatrix = mat[baseIndex + pieceIndex + isDynamic];
-	vec4 localModelPos = pieceMatrix * vec4(pos, 1.0);
+	vec4 localModelPos = pieceMatrix * vec4(pos + 0.006 * normal, 1.0);
+	//vec4 localModelPos = pieceMatrix * vec4(pos + sin(timeInfo.x  * 0.05) * 10 * normal , 1.0); // Hunt for rogue geometry.
 	// Make the rotation matrix around Y and rotate the model
 	mat3 rotY = rotation3dY(worldposrot.w);
 	localModelPos.xyz = rotY * localModelPos.xyz;
