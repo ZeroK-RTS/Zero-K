@@ -261,7 +261,7 @@ function widget:DrawWorld()
 		gl.DepthMask(true)
 		gl.DepthTest(true)
 		gl.Blending(GL.SRC_ALPHA, GL.ONE)
-		gl.PolygonOffset( 0.0 , -1.0) -- too much here bleeds
+		gl.PolygonOffset( 0.0 , -2.0) -- too much here bleeds
 		highlightunitShader:Activate()
 		highlightUnitVBOTable.VAO:Submit()
 		highlightunitShader:Deactivate()

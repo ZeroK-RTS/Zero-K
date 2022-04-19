@@ -96,7 +96,7 @@ local currCmd = spGetActiveCommand() --remember current command
 
 local function AddFeature(featureID)
 	local metal = Spring.GetFeatureResources(featureID)
-	local x100  = 100  / (100  + metal)
+	local x100  = 80  / (80  + metal)
 	local x1000 = 1000 / (1000 + metal)
 	local r = 1 - x1000
 	local g = x1000 - x100
@@ -109,7 +109,7 @@ local function AddFeature(featureID)
 	if not (metal and metal > 1) then
 		return
 	end
-	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
+	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.45, 0.3, 0.5, 0.35, 0, 0, 0)
 	--Spring.Utilities.FeatureEcho(featureID, "________________ ADD")
 end
 
