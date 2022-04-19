@@ -37,7 +37,6 @@ local spGetUnitDrawFlag  = Spring.GetUnitDrawFlag
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 
 local debugUnitDefIDs = {
-	[UnitDefNames["jumpraid"].id] = true,
 	[UnitDefNames["jumparty"].id] = true,
 	[UnitDefNames["jumpassault"].id] = true,
 }
