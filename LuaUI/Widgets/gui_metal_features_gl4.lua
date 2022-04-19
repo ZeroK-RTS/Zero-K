@@ -34,6 +34,7 @@ local spGetGameFrame = Spring.GetGameFrame
 
 local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 local internalEnabled = true
+local hideWithUi = true
 
 local FEATURE_RADIUS = 120
 local ALL_FEATURES = false
@@ -42,7 +43,7 @@ local ALL_FEATURES = false
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Reclaim Highlight'
-options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
+options_order = { 'showhighlight', 'pregamehighlight', 'minmetal', 'disableWithUi'}
 options = {
 	showhighlight = {
 		name = 'Show Reclaim',
@@ -59,7 +60,6 @@ options = {
 		},
 		noHotkey = true,
 	},
-
 	pregamehighlight = {
 		name = "Show Reclaim Before Round Start",
 		desc = "Enabled: Show reclaimable metal features before game begins \n Disabled: No highlights before game begins",
@@ -67,7 +67,6 @@ options = {
 		value = true,
 		noHotkey = true,
 	},
-
 	minmetal = {
 		name = 'Minimum Reclaim To Highlight',
 		desc = "Metal below this amount will not be highlighted",
@@ -76,6 +75,16 @@ options = {
 		min = 1,
 		max = 200,
 		step = 1,
+	},
+	disableWithUi = {
+		name = 'Disable with hidden UI',
+		desc = 'Toggles outlines with Ctrl+F5.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			hideWithUi = self.value
+		end,
 	},
 }
 
@@ -174,13 +183,6 @@ function widget:Update()
 	if not internalEnabled then
 		return
 	end
-	if Spring.IsGUIHidden() then
-		if enableCondOld then
-			Spring.SendCommands("luarules metal_highlight 0")
-			enableCondOld = false
-		end
-		return
-	end
 
 	local activeCurrentCmd = spGetActiveCommand()
 	if currCmd ~= activeCurrentCmd then
@@ -208,8 +210,12 @@ function widget:Update()
 		or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
 		or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
 
+	if hideWithUi and Spring.IsGUIHidden() then
+		enableCondNew = false
+	end
+	
 	if Spring.GetConfigInt("ForceDisableShaders") == 1 then
-		enableCondOld = false
+		enableCondNew = false
 		return
 	end
 
