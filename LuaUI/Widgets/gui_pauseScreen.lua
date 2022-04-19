@@ -185,7 +185,7 @@ function widget:DrawScreen()
 		if now - disablePauseSlideTimestamp > slideTime then
 			drawPause(paused, now)
 		end
-	ResetGl()
+		ResetGl()
 	end
 	
 end
