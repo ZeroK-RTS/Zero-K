@@ -45,8 +45,18 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 --local EMPTY = {}
 
-local function DebugEcho(str)
-	spEcho("[unit_unstick_staticcon]: " .. str)
+local function DebugEcho(str, arg1, arg2, arg3, arg4)
+	if arg4 then
+		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2, arg3, arg4)
+	elseif arg3 then
+		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2, arg3)
+	elseif arg2 then
+		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2)
+	elseif arg1 then
+		spEcho("[unit_unstick_staticcon]: " .. str, arg1)
+	else
+		spEcho("[unit_unstick_staticcon]: " .. str)
+	end
 end
 
 local function GetDistance(unitID, targetID, isReclaim)
