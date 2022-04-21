@@ -127,9 +127,7 @@ end
 function gadget:GameFrame(f)
 	if f%delay == 0 then
 		for id, _ in pairs(IterableMap.Iterator(handled)) do
-			if spValidUnitID(id) then
-				HandleUnit(id)
-			end
+			HandleUnit(id)
 		end
 	end
 end
