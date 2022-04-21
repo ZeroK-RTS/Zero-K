@@ -100,7 +100,7 @@ OR (after finding a feature)
 [5] = radius
 ]]
 
-local function HandleUnit(unitID, f)
+local function HandleUnit(unitID)
 	if not spValidUnitID(unitID) then
 		return
 	end
