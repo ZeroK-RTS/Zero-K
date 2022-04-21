@@ -14,13 +14,17 @@ function gadget:GetInfo()
 	}
 end
 
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+local handled = IterableMap.New()
+
+
+-- Config --
 local delay = 15
 local debug = false
 
-local handled = {} -- [f] = {[1] = unitID}
 local buildRangesSq = {} -- [unitDefID] = buildDistance
 
-for i = 1, #UnitDefs do
+for i = 1, #UnitDefs do -- Find static constructors
 	local def = UnitDefs[i]
 	if def.isBuilder and def.customParams.like_structure then
 		buildRangesSq[i] = def.buildDistance^2
@@ -43,7 +47,6 @@ local spValidFeatureID = Spring.ValidFeatureID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFeaturePosition = Spring.GetFeaturePosition
---local EMPTY = {}
 
 local function DebugEcho(...)
 	spEcho("[unit_staticcon_unsticker]", unpack(arg))
@@ -101,11 +104,6 @@ local function HandleUnit(unitID, f)
 	if not spValidUnitID(unitID) then
 		return
 	end
-	local _, _, unbuilt = spGetUnitIsStunned(unitID)
-	if unbuilt then -- if caretaker is reversed built, UnitFinished should retrigger to readd it, though nobody really unbuilds caretakers.
-		if debug then DebugEcho(unitID .. ": Exited drop (Reverse Built)") end
-		return
-	end
 	local cmdID, _, cmdTag, cmdParam1, cmdParam2, cmdParam3, cmdParam4, cmdParam5 = spGetUnitCurrentCommand(unitID)
 	if cmdParam1 and spValidFeatureID(cmdParam1 - Game.maxUnits) then
 		cmdParam1 = cmdParam1 - Game.maxUnits
@@ -122,27 +120,35 @@ local function HandleUnit(unitID, f)
 			end
 		end
 	elseif debug then
-		DebugEcho("Invalid command handled for " .. unitID)
+		DebugEcho("No action needed for " .. unitID)
 	end
-	handled[f + delay] = handled[f + delay] or {} -- check back in 15 frames.
-	handled[f + delay][#handled[f + delay] + 1] = unitID
 end
 
 function gadget:GameFrame(f)
-	if handled[f] then
-		for i = 1, #handled[f] do
-			if debug then DebugEcho("Check " .. handled[f][i]) end
-			HandleUnit(handled[f][i], f)
+	if f%delay == 0 then
+		for id, _ in pairs(IterableMap.Iterator(handled)) do
+			if spValidUnitID(id) then
+				HandleUnit(id)
+			end
 		end
-		handled[f] = nil
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if buildRangesSq[unitDefID] then
 		if debug then DebugEcho(unitID .. ": Added to check loop.") end
-		local f = spGetGameFrame() + delay
-		handled[f] = handled[f] or {}
-		handled[f][#handled[f] + 1] = unitID
+		IterableMap.Add(handled, unitID, true)
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if buildRangesSq[unitDefID] then
+		IterableMap.Remove(handled, unitID)
+	end
+end
+
+function gadget:UnitReverseBuilt(unitID, unitDefID)
+	if buildRangesSq[unitDefID] then
+		IterableMap.Remove(handled, unitID)
 	end
 end
