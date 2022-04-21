@@ -45,18 +45,8 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 --local EMPTY = {}
 
-local function DebugEcho(str, arg1, arg2, arg3, arg4)
-	if arg4 then
-		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2, arg3, arg4)
-	elseif arg3 then
-		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2, arg3)
-	elseif arg2 then
-		spEcho("[unit_unstick_staticcon]: " .. str, arg1, arg2)
-	elseif arg1 then
-		spEcho("[unit_unstick_staticcon]: " .. str, arg1)
-	else
-		spEcho("[unit_unstick_staticcon]: " .. str)
-	end
+local function DebugEcho(...)
+	spEcho("[unit_staticcon_unsticker]", unpack(arg))
 end
 
 local function GetDistance(unitID, targetID, isReclaim)
@@ -75,7 +65,7 @@ local function GetDistance(unitID, targetID, isReclaim)
 		if debug then DebugEcho("Target doesn't exist?") end
 		return 9999
 	end
-	return ((x2 - x) * (x2 - x)) + ((z2 - z) * (z2 - z))
+	return (x2 - x)^2 + (z2 - z)^2
 end
 
 local function IsObjectCloseEnough(unitID, targetID, cmd) -- Note: build ranges are 2D usually.
@@ -120,7 +110,7 @@ local function HandleUnit(unitID, f)
 	if cmdParam1 and spValidFeatureID(cmdParam1 - Game.maxUnits) then
 		cmdParam1 = cmdParam1 - Game.maxUnits
 	end
-	if debug then DebugEcho(unitID .. ": " .. tostring(cmdID) .. ", " .. tostring(cmdParam1) .. ", " .. tostring(cmdParam2)) end
+	if debug then DebugEcho(unitID .. ": ", cmdID, cmdParam1, cmdParam2) end
 	if cmdID and cmdParam1 and (spValidFeatureID(cmdParam1) or spValidUnitID(cmdParam1)) then
 		if debug then DebugEcho(unitID .. ": Valid command, checking distance.") end
 		if not IsObjectCloseEnough(unitID, cmdParam1, cmdID) then
