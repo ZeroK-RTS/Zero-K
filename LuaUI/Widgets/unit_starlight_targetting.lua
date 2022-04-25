@@ -116,7 +116,7 @@ local StarlightController = {
 StarlightControllerMT = {__index = StarlightController}
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-		if (unitDefID == Starlight_ID)
+		if (unitDefID == StarlightUnitDefID)
 		and (unitTeam==GetMyTeamID()) then
 			Echo("Registered Starlight")
 			StarlightStack[unitID] = StarlightController:new(unitID);
