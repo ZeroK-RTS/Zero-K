@@ -38,12 +38,8 @@ for unitDefID, unitDef in pairs(UnitDefs) do
   end
 end
 
-function sq(x)
-	return x*x
-end
-
 function sqdist(p, q)
-	return sq(p[1]-q[1]) + sq(p[2]-q[2]) + sq(p[3]-q[3])
+	return (p[1]-q[1])^2 + (p[2]-q[2])^2 + (p[3]-q[3])^2
 end
 
 local StarlightControllerMT
