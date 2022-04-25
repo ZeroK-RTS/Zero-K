@@ -5,7 +5,7 @@ function widget:GetInfo()
       author       = "dyth68",
       date         = "2022",
       license      = "PD", -- should be compatible with Spring
-      layer        = 11,
+      layer        = 0,
 	  handler		= true, --for adding customCommand into UI
       enabled      = true
    }
