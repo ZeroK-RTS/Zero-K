@@ -28,7 +28,6 @@ local CMD_STOP = CMD.STOP
 local CMD_ATTACK = CMD.ATTACK
 local CMD_UNIT_SET_TARGET = Spring.Utilities.CMD.UNIT_SET_TARGET
 
-local Starlight_ID = UnitDefNames.mahlazer.id
 local StarlightUnitDefID = UnitDefNames["mahlazer"].id
 
 local immobiles = {}
