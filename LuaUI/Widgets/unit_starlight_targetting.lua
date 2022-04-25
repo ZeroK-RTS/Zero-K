@@ -1,7 +1,7 @@
 function widget:GetInfo()
    return {
       name         = "Starlight Targetting",
-      desc         = "Starlight targetting 0.01",
+      desc         = "Starlight targetting 0.1",
       author       = "dyth68",
       date         = "2022",
       license      = "PD", -- should be compatible with Spring
@@ -43,10 +43,7 @@ end
 
 local StarlightControllerMT
 local StarlightController = {
-	unitID,
-	pos,
-	targetPos,
-	currentTarget,
+	-- unitID, pos, targetPos, currentTarget,
 
 
 	new = function(index, unitID)
@@ -62,7 +59,7 @@ local StarlightController = {
 
 	unset = function(self)
 		--Echo("StarlightController removed:" .. self.unitID)
-		GiveOrderToUnit(self.unitID,CMD_STOP, {}, {""},1)
+		GiveOrderToUnit(self.unitID,CMD_STOP, {}, {""},0)
 		return nil
 	end,
 
@@ -98,7 +95,7 @@ local StarlightController = {
 						self.targetPos = {targetX, targetY, targetZ}
 						self.currentTarget = newTarget
 						--Echo("trying set target")
-						Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
+						--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
 						Spring.GiveOrderToUnit(self.unitID, CMD_ATTACK, newTarget, 0);
 						--Echo("Set")
 						return
@@ -148,7 +145,7 @@ end
 
 function widget:Initialize()
 	DisableForSpec()
-	Echo("starlight targetting loaded3")
+	Echo("starlight targetting loaded")
 	local units = GetTeamUnits(Spring.GetMyTeamID())
 	for i=1, #units do
 		local unitDefID = GetUnitDefID(units[i])
