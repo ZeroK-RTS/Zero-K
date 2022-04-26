@@ -83,7 +83,7 @@ function updateStarlight(unitID)
 					currStarlight.targetPos = {targetX, targetY, targetZ}
 					currStarlight.currentTarget = newTarget
 					--Echo("trying set target")
-					Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
+					--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
 					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0);
 					--Echo("Set")
 					return
