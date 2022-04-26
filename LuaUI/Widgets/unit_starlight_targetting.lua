@@ -41,96 +41,83 @@ function sqdist(p, q)
 	return (p[1]-q[1])^2 + (p[2]-q[2])^2 + (p[3]-q[3])^2
 end
 
-local StarlightControllerMT
-local StarlightController = {
-	-- unitID, pos, targetPos, currentTarget,
-
-
-	new = function(index, unitID)
-		--Echo("StarlightController added:" .. unitID)
-		local self = {}
-		setmetatable(self, StarlightControllerMT)
-		self.unitID = unitID
-		self.pos = {GetUnitPosition(self.unitID)}
-		self.targetPos = nil
-		self.currentTarget = nil
-		return self
-	end,
-
-	unset = function(self)
-		--Echo("StarlightController removed:" .. self.unitID)
-		GiveOrderToUnit(self.unitID,CMD_STOP, {}, {""},0)
-		return nil
-	end,
-
-	getTargetToClosest = function(self)
-		if self.targetPos ~= nil then
-			local nearUnits = Spring.GetUnitsInRectangle(self.targetPos[1]-2000, self.targetPos[3]-2000, self.targetPos[1]+2000, self.targetPos[3]+2000)
-			local shortestDist = 9999999
-			local bestSol = nil
-			for k, v in pairs(nearUnits) do
-				if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
-					local x,y,z = Spring.GetUnitPosition(v)
-					local dist = sqdist(self.targetPos, {x,y,z})
-					if dist < shortestDist then
-						shortestDist = dist
-						bestSol = v
-					end
+function getTargetToClosest(targetPos)
+	if targetPos ~= nil then
+		local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
+		local shortestDist = 9999999
+		local bestSol = nil
+		for k, v in pairs(nearUnits) do
+			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
+				local x,y,z = Spring.GetUnitPosition(v)
+				local dist = sqdist(targetPos, {x,y,z})
+				if dist < shortestDist then
+					shortestDist = dist
+					bestSol = v
 				end
 			end
-			return bestSol
 		end
-		return nil
-	end,
-
-	handle=function(self)
-		local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(self.unitID, 1)
-		if targetType == 1 then
-			local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
-			if self.currentTarget ~= unitIDorPos or targetZ == nil then
-				if not isUserTarget then
-					local newTarget = self:getTargetToClosest()
-					if newTarget ~= nil then
-						local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
-						self.targetPos = {targetX, targetY, targetZ}
-						self.currentTarget = newTarget
-						--Echo("trying set target")
-						--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
-						Spring.GiveOrderToUnit(self.unitID, CMD_ATTACK, newTarget, 0);
-						--Echo("Set")
-						return
-					end
-				end
-			end
-			if targetZ ~= nil then
-				self.targetPos = {targetX, targetY, targetZ}
-			end
-			self.currentTarget = unitIDorPos
-		end
+		return bestSol
 	end
-}
-StarlightControllerMT = {__index = StarlightController}
+	return nil
+end
+
+function newStarlight(unitID)
+	StarlightStack[unitID] = {
+		unitID = unitID,
+		pos= {GetUnitPosition(unitID)},
+		targetPos = nil,
+		currentTarget = nil
+	}
+end
+
+function updateStarlight(unitID)
+	local currStarlight = StarlightStack[unitID]
+	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
+	if targetType == 1 then
+		local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
+		if currStarlight.currentTarget ~= unitIDorPos or targetZ == nil then
+			if not isUserTarget then
+				local newTarget = getTargetToClosest(currStarlight.targetPos)
+				if newTarget ~= nil then
+					local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
+					currStarlight.targetPos = {targetX, targetY, targetZ}
+					currStarlight.currentTarget = newTarget
+					--Echo("trying set target")
+					Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
+					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0);
+					--Echo("Set")
+					return
+				end
+			end
+		end
+		if targetZ ~= nil then
+			currStarlight.targetPos = {targetX, targetY, targetZ}
+		end
+		currStarlight.currentTarget = unitIDorPos
+	end
+end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if (unitDefID == StarlightUnitDefID)
 		and (unitTeam==GetMyTeamID()) then
-			Echo("Registered Starlight")
-			StarlightStack[unitID] = StarlightController:new(unitID);
+			newStarlight(unitID)
 		end
 end
 
 function widget:UnitDestroyed(unitID) 
 	if not (StarlightStack[unitID]==nil) then
-		StarlightStack[unitID]=StarlightStack[unitID]:unset();
+		StarlightStack[unitID]=nil
+		GiveOrderToUnit(unitID,CMD_STOP, {}, {""},0)
 	end
 end
 
 function widget:GameFrame(n) 
-	if (n%UPDATE_FRAME==0) then
-		for _,Starlight in pairs(StarlightStack) do 
-			Starlight:handle()
+	-- Every frame updates are acceptable for units this big and rare
+	--if (n%UPDATE_FRAME==0) then
+		for unitId,Starlight in pairs(StarlightStack) do 
+			updateStarlight(unitId)
 		end
-	end
+	--end
 end
 
 --- COMMAND HANDLING
@@ -145,14 +132,14 @@ end
 
 function widget:Initialize()
 	DisableForSpec()
-	Echo("starlight targetting loaded")
+	Echo("Starlight targetting loaded")
 	local units = GetTeamUnits(Spring.GetMyTeamID())
 	for i=1, #units do
-		local unitDefID = GetUnitDefID(units[i])
+		local unitID = units[i]
+		local unitDefID = GetUnitDefID(unitID)
 		if (unitDefID == StarlightUnitDefID)  then
-			if  (StarlightStack[units[i]]==nil) then
-				Echo("Registered Starlight")
-				StarlightStack[units[i]]=StarlightController:new(units[i])
+			if  (StarlightStack[unitID]==nil) then
+				newStarlight(unitID)
 			end
 		end
 	end
