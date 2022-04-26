@@ -13,7 +13,7 @@ end
 
 
 local UPDATE_FRAME=2
-local StarlightStack = {}
+local SlowAimStack = {}
 local GetUnitPosition = Spring.GetUnitPosition
 local GiveOrderToUnit = Spring.GiveOrderToUnit
 local GetUnitsInCylinder = Spring.GetUnitsInCylinder
@@ -29,6 +29,8 @@ local CMD_ATTACK = CMD.ATTACK
 local CMD_UNIT_SET_TARGET = Spring.Utilities.CMD.UNIT_SET_TARGET
 
 local StarlightUnitDefID = UnitDefNames["mahlazer"].id
+local BerthaUnitDefID = UnitDefNames["staticheavyarty"].id
+local DRPUnitDefID = UnitDefNames["raveparty"].id
 
 local immobiles = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
@@ -41,13 +43,13 @@ function sqdist(p, q)
 	return (p[1]-q[1])^2 + (p[2]-q[2])^2 + (p[3]-q[3])^2
 end
 
-function getTargetToClosest(targetPos)
+function getTargetToClosest(targetPos, precise)
 	if targetPos ~= nil then
 		local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
 		local shortestDist = 9999999
 		local bestSol = nil
 		for k, v in pairs(nearUnits) do
-			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
+			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
 				local x,y,z = Spring.GetUnitPosition(v)
 				local dist = sqdist(targetPos, {x,y,z})
 				if dist < shortestDist then
@@ -61,27 +63,28 @@ function getTargetToClosest(targetPos)
 	return nil
 end
 
-function newStarlight(unitID)
-	StarlightStack[unitID] = {
+function newSlowAimer(unitID, prcs)
+	SlowAimStack[unitID] = {
 		unitID = unitID,
 		pos= {GetUnitPosition(unitID)},
 		targetPos = nil,
-		currentTarget = nil
+		currentTarget = nil,
+		precise = prcs
 	}
 end
 
-function updateStarlight(unitID)
-	local currStarlight = StarlightStack[unitID]
+function updateSlowAimer(unitID)
+	local currSlowAimer = SlowAimStack[unitID]
 	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
 	if targetType == 1 then
 		local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
-		if currStarlight.currentTarget ~= unitIDorPos or targetZ == nil then
+		if currSlowAimer.currentTarget ~= unitIDorPos or targetZ == nil then
 			if not isUserTarget then
-				local newTarget = getTargetToClosest(currStarlight.targetPos)
+				local newTarget = getTargetToClosest(currSlowAimer.targetPos, currSlowAimer.precise)
 				if newTarget ~= nil then
 					local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
-					currStarlight.targetPos = {targetX, targetY, targetZ}
-					currStarlight.currentTarget = newTarget
+					currSlowAimer.targetPos = {targetX, targetY, targetZ}
+					currSlowAimer.currentTarget = newTarget
 					--Echo("trying set target")
 					--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
 					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0);
@@ -91,22 +94,26 @@ function updateStarlight(unitID)
 			end
 		end
 		if targetZ ~= nil then
-			currStarlight.targetPos = {targetX, targetY, targetZ}
+			currSlowAimer.targetPos = {targetX, targetY, targetZ}
 		end
-		currStarlight.currentTarget = unitIDorPos
+		currSlowAimer.currentTarget = unitIDorPos
 	end
 end
 
+function isSlowAimer(unitDefID)
+	return (unitDefID == StarlightUnitDefID) or (unitDefID == BerthaUnitDefID) or (unitDefID == DRPUnitDefID)
+end
+
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-		if (unitDefID == StarlightUnitDefID)
+		if isSlowAimer(unitDefID)
 		and (unitTeam==GetMyTeamID()) then
-			newStarlight(unitID)
+			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 end
 
 function widget:UnitDestroyed(unitID) 
-	if not (StarlightStack[unitID]==nil) then
-		StarlightStack[unitID]=nil
+	if not (SlowAimStack[unitID]==nil) then
+		SlowAimStack[unitID]=nil
 		GiveOrderToUnit(unitID,CMD_STOP, {}, {""},0)
 	end
 end
@@ -114,8 +121,8 @@ end
 function widget:GameFrame(n) 
 	-- Every frame updates are acceptable for units this big and rare
 	--if (n%UPDATE_FRAME==0) then
-		for unitId,Starlight in pairs(StarlightStack) do 
-			updateStarlight(unitId)
+		for unitId,_ in pairs(SlowAimStack) do 
+			updateSlowAimer(unitId)
 		end
 	--end
 end
@@ -137,9 +144,9 @@ function widget:Initialize()
 	for i=1, #units do
 		local unitID = units[i]
 		local unitDefID = GetUnitDefID(unitID)
-		if (unitDefID == StarlightUnitDefID)  then
-			if  (StarlightStack[unitID]==nil) then
-				newStarlight(unitID)
+		if isSlowAimer(unitDefID) then
+			if  (SlowAimStack[unitID]==nil) then
+				newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 			end
 		end
 	end
