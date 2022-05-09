@@ -1,10 +1,10 @@
 function widget:GetInfo()
 	return {
 		name    = "Starlight Targetting",
-		desc    = "Starlight targetting 0.1",
+		desc    = "Slow-aiming superweapons prefer closer targets",
 		author  = "dyth68",
 		date    = "2022",
-		license = "PD", -- should be compatible with Spring
+		license = "PD",
 		layer   = 0,
 		handler = true, -- for adding customCommand into UI
 		enabled = true
@@ -50,6 +50,9 @@ local function getTargetToClosest(targetPos, precise)
 		return
 	end
 
+	--[[ Theoretically the distance should be calculated using conical/angular distance
+	     to the weapon's line of aim, but using just the closest unit achieves similar
+	     results and has a better implementation. ]]
 	local tx, tz = targetPos[1], targetPos[3]
 	local nearUnits = Spring.GetUnitsInRectangle(tx-SEARCH_DIST, tz-SEARCH_DIST, tx+SEARCH_DIST, tz+SEARCH_DIST)
 	local shortestDist = math.max
