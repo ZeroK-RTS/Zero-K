@@ -46,7 +46,7 @@ end
 function getTargetToClosest(targetPos, precise)
 	if targetPos ~= nil then
 		local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
-		local shortestDist = 9999999
+		local shortestDist = math.max
 		local bestSol = nil
 		for k, v in pairs(nearUnits) do
 			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
