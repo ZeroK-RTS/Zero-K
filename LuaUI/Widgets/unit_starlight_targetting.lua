@@ -55,7 +55,7 @@ local function getTargetToClosest(targetPos, precise)
 	local shortestDist = math.max
 	local bestSol
 	for k, v in pairs(nearUnits) do
-		if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
+		if not (Spring.IsUnitAllied(v)) and (not precise or Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
 			local x,y,z = Spring.GetUnitPosition(v)
 			local dist = sqdist(targetPos, x, y, z)
 			if dist < shortestDist then
