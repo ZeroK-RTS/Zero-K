@@ -82,10 +82,10 @@ local function updateSlowAimer(unitID)
 	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
 	if targetType == 1 then
 		local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
-		if currSlowAimer.currentTarget ~= unitIDorPos or targetZ == nil then
+		if currSlowAimer.currentTarget ~= unitIDorPos or not targetZ then
 			if not isUserTarget then
 				local newTarget = getTargetToClosest(currSlowAimer.targetPos, currSlowAimer.precise)
-				if newTarget ~= nil then
+				if newTarget then
 					local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
 					currSlowAimer.targetPos = {targetX, targetY, targetZ}
 					currSlowAimer.currentTarget = newTarget
@@ -97,7 +97,7 @@ local function updateSlowAimer(unitID)
 				end
 			end
 		end
-		if targetZ ~= nil then
+		if targetZ then
 			currSlowAimer.targetPos = {targetX, targetY, targetZ}
 		end
 		currSlowAimer.currentTarget = unitIDorPos
@@ -116,7 +116,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed(unitID) 
-	if not (SlowAimStack[unitID]==nil) then
+	if SlowAimStack[unitID] then
 		SlowAimStack[unitID]=nil
 		GiveOrderToUnit(unitID,CMD_STOP, {}, 0)
 	end
@@ -148,10 +148,8 @@ function widget:Initialize()
 	for i=1, #units do
 		local unitID = units[i]
 		local unitDefID = GetUnitDefID(unitID)
-		if isSlowAimer(unitDefID) then
-			if  (SlowAimStack[unitID]==nil) then
-				newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
-			end
+		if isSlowAimer(unitDefID) and not SlowAimStack[unitID] then
+			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 	end
 end
