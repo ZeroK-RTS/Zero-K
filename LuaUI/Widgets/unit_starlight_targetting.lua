@@ -41,11 +41,11 @@ for unitDefID, unitDef in pairs(UnitDefs) do
   end
 end
 
-function sqdist(p, x, y, z)
+local function sqdist(p, x, y, z)
 	return (p[1]-x)^2 + (p[2]-y)^2 + (p[3]-z)^2
 end
 
-function getTargetToClosest(targetPos, precise)
+local function getTargetToClosest(targetPos, precise)
 	if not targetPos then
 		return
 	end
@@ -67,7 +67,7 @@ function getTargetToClosest(targetPos, precise)
 	return bestSol
 end
 
-function newSlowAimer(unitID, prcs)
+local function newSlowAimer(unitID, prcs)
 	SlowAimStack[unitID] = {
 		unitID = unitID,
 		pos= {GetUnitPosition(unitID)},
@@ -77,7 +77,7 @@ function newSlowAimer(unitID, prcs)
 	}
 end
 
-function updateSlowAimer(unitID)
+local function updateSlowAimer(unitID)
 	local currSlowAimer = SlowAimStack[unitID]
 	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
 	if targetType == 1 then
@@ -104,7 +104,7 @@ function updateSlowAimer(unitID)
 	end
 end
 
-function isSlowAimer(unitDefID)
+local function isSlowAimer(unitDefID)
 	return (unitDefID == StarlightUnitDefID) or (unitDefID == BerthaUnitDefID) or (unitDefID == DRPUnitDefID)
 end
 
