@@ -118,7 +118,7 @@ end
 function widget:UnitDestroyed(unitID) 
 	if not (SlowAimStack[unitID]==nil) then
 		SlowAimStack[unitID]=nil
-		GiveOrderToUnit(unitID,CMD_STOP, {}, {""},0)
+		GiveOrderToUnit(unitID,CMD_STOP, {}, 0)
 	end
 end
 
