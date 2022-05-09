@@ -39,8 +39,8 @@ for unitDefID, unitDef in pairs(UnitDefs) do
   end
 end
 
-function sqdist(p, q)
-	return (p[1]-q[1])^2 + (p[2]-q[2])^2 + (p[3]-q[3])^2
+function sqdist(p, x, y, z)
+	return (p[1]-x)^2 + (p[2]-y)^2 + (p[3]-z)^2
 end
 
 function getTargetToClosest(targetPos, precise)
@@ -51,7 +51,7 @@ function getTargetToClosest(targetPos, precise)
 		for k, v in pairs(nearUnits) do
 			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
 				local x,y,z = Spring.GetUnitPosition(v)
-				local dist = sqdist(targetPos, {x,y,z})
+				local dist = sqdist(targetPos, x, y, z)
 				if dist < shortestDist then
 					shortestDist = dist
 					bestSol = v
