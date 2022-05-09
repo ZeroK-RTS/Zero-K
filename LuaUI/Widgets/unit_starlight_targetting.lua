@@ -44,23 +44,24 @@ function sqdist(p, x, y, z)
 end
 
 function getTargetToClosest(targetPos, precise)
-	if targetPos ~= nil then
-		local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
-		local shortestDist = math.max
-		local bestSol = nil
-		for k, v in pairs(nearUnits) do
-			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
-				local x,y,z = Spring.GetUnitPosition(v)
-				local dist = sqdist(targetPos, x, y, z)
-				if dist < shortestDist then
-					shortestDist = dist
-					bestSol = v
-				end
+	if not targetPos then
+		return
+	end
+
+	local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
+	local shortestDist = math.max
+	local bestSol
+	for k, v in pairs(nearUnits) do
+		if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
+			local x,y,z = Spring.GetUnitPosition(v)
+			local dist = sqdist(targetPos, x, y, z)
+			if dist < shortestDist then
+				shortestDist = dist
+				bestSol = v
 			end
 		end
-		return bestSol
 	end
-	return nil
+	return bestSol
 end
 
 function newSlowAimer(unitID, prcs)
