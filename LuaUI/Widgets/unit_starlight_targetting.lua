@@ -13,6 +13,8 @@ end
 
 
 local UPDATE_FRAME=2
+local SEARCH_DIST = 2000
+
 local SlowAimStack = {}
 local GetUnitPosition = Spring.GetUnitPosition
 local GiveOrderToUnit = Spring.GiveOrderToUnit
@@ -48,7 +50,8 @@ function getTargetToClosest(targetPos, precise)
 		return
 	end
 
-	local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
+	local tx, tz = targetPos[1], targetPos[3]
+	local nearUnits = Spring.GetUnitsInRectangle(tx-SEARCH_DIST, tz-SEARCH_DIST, tx+SEARCH_DIST, tz+SEARCH_DIST)
 	local shortestDist = math.max
 	local bestSol
 	for k, v in pairs(nearUnits) do
