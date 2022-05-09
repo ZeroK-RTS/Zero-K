@@ -1,18 +1,18 @@
 function widget:GetInfo()
-   return {
-      name         = "Starlight Targetting",
-      desc         = "Starlight targetting 0.1",
-      author       = "dyth68",
-      date         = "2022",
-      license      = "PD", -- should be compatible with Spring
-      layer        = 0,
-	  handler		= true, --for adding customCommand into UI
-      enabled      = true
-   }
+	return {
+		name    = "Starlight Targetting",
+		desc    = "Starlight targetting 0.1",
+		author  = "dyth68",
+		date    = "2022",
+		license = "PD", -- should be compatible with Spring
+		layer   = 0,
+		handler = true, -- for adding customCommand into UI
+		enabled = true
+	}
 end
 
 
-local UPDATE_FRAME=2
+local UPDATE_FRAME = 2
 local SEARCH_DIST = 2000
 
 local SlowAimStack = {}
@@ -36,9 +36,9 @@ local DRPUnitDefID = UnitDefNames["raveparty"].id
 
 local immobiles = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-  if unitDef.isImmobile then
-    immobiles[unitDefID] = true
-  end
+	if unitDef.isImmobile then
+		immobiles[unitDefID] = true
+	end
 end
 
 local function sqdist(p, x, y, z)
@@ -70,7 +70,7 @@ end
 local function newSlowAimer(unitID, prcs)
 	SlowAimStack[unitID] = {
 		unitID = unitID,
-		pos= {GetUnitPosition(unitID)},
+		pos = {GetUnitPosition(unitID)},
 		targetPos = nil,
 		currentTarget = nil,
 		precise = prcs
@@ -91,7 +91,7 @@ local function updateSlowAimer(unitID)
 					currSlowAimer.currentTarget = newTarget
 					--Echo("trying set target")
 					--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
-					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0);
+					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0)
 					--Echo("Set")
 					return
 				end
@@ -110,7 +110,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if isSlowAimer(unitDefID)
-		and (unitTeam==GetMyTeamID()) then
+		and unitTeam == GetMyTeamID() then
 			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 end
@@ -125,8 +125,8 @@ end
 function widget:GameFrame(n) 
 	-- Every frame updates are acceptable for units this big and rare
 	--if (n%UPDATE_FRAME==0) then
-		for unitId,_ in pairs(SlowAimStack) do 
-			updateSlowAimer(unitId)
+		for unitID in pairs(SlowAimStack) do 
+			updateSlowAimer(unitID)
 		end
 	--end
 end
