@@ -16,7 +16,6 @@ return { staticheavyarty = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    bait_level_default = 1,
     aimposoffset = [[0 50 -7]],
     modelradius    = [[35]],
     selectionscalemult = 1,
