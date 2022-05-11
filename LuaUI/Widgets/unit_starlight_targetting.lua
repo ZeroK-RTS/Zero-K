@@ -1,18 +1,20 @@
 function widget:GetInfo()
-   return {
-      name         = "Starlight Targetting",
-      desc         = "Starlight targetting 0.1",
-      author       = "dyth68",
-      date         = "2022",
-      license      = "PD", -- should be compatible with Spring
-      layer        = 0,
-	  handler		= true, --for adding customCommand into UI
-      enabled      = true
-   }
+	return {
+		name    = "Starlight Targetting",
+		desc    = "Slow-aiming superweapons prefer closer targets",
+		author  = "dyth68",
+		date    = "2022",
+		license = "PD",
+		layer   = 0,
+		handler = true, -- for adding customCommand into UI
+		enabled = true
+	}
 end
 
 
-local UPDATE_FRAME=2
+local UPDATE_FRAME = 2
+local SEARCH_DIST = 2000
+
 local SlowAimStack = {}
 local GetUnitPosition = Spring.GetUnitPosition
 local GiveOrderToUnit = Spring.GiveOrderToUnit
@@ -34,95 +36,100 @@ local DRPUnitDefID = UnitDefNames["raveparty"].id
 
 local immobiles = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
-  if unitDef.isImmobile then
-    immobiles[unitDefID] = true
-  end
+	if unitDef.isImmobile then
+		immobiles[unitDefID] = true
+	end
 end
 
-function sqdist(p, q)
-	return (p[1]-q[1])^2 + (p[2]-q[2])^2 + (p[3]-q[3])^2
+local function sqdist(p, x, y, z)
+	return (p[1]-x)^2 + (p[2]-y)^2 + (p[3]-z)^2
 end
 
-function getTargetToClosest(targetPos, precise)
-	if targetPos ~= nil then
-		local nearUnits = Spring.GetUnitsInRectangle(targetPos[1]-2000, targetPos[3]-2000, targetPos[1]+2000, targetPos[3]+2000)
-		local shortestDist = 9999999
-		local bestSol = nil
-		for k, v in pairs(nearUnits) do
-			if not (Spring.IsUnitAllied(v)) and (Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)] or not precise) then
-				local x,y,z = Spring.GetUnitPosition(v)
-				local dist = sqdist(targetPos, {x,y,z})
-				if dist < shortestDist then
-					shortestDist = dist
-					bestSol = v
-				end
+local function getTargetToClosest(targetPos, precise)
+	if not targetPos then
+		return
+	end
+
+	--[[ Theoretically the distance should be calculated using conical/angular distance
+	     to the weapon's line of aim, but using just the closest unit achieves similar
+	     results and has a better implementation. ]]
+	local tx, tz = targetPos[1], targetPos[3]
+	local nearUnits = Spring.GetUnitsInRectangle(tx-SEARCH_DIST, tz-SEARCH_DIST, tx+SEARCH_DIST, tz+SEARCH_DIST)
+	local shortestDist = math.max
+	local bestSol
+	for k, v in pairs(nearUnits) do
+		if not (Spring.IsUnitAllied(v)) and (not precise or Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
+			local x,y,z = Spring.GetUnitPosition(v)
+			local dist = sqdist(targetPos, x, y, z)
+			if dist < shortestDist then
+				shortestDist = dist
+				bestSol = v
 			end
 		end
-		return bestSol
 	end
-	return nil
+	return bestSol
 end
 
-function newSlowAimer(unitID, prcs)
+local function newSlowAimer(unitID, prcs)
 	SlowAimStack[unitID] = {
 		unitID = unitID,
-		pos= {GetUnitPosition(unitID)},
+		pos = {GetUnitPosition(unitID)},
 		targetPos = nil,
 		currentTarget = nil,
 		precise = prcs
 	}
 end
 
-function updateSlowAimer(unitID)
+local function updateSlowAimer(unitID)
 	local currSlowAimer = SlowAimStack[unitID]
 	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
 	if targetType == 1 then
 		local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
-		if currSlowAimer.currentTarget ~= unitIDorPos or targetZ == nil then
+		if currSlowAimer.currentTarget ~= unitIDorPos or not targetZ then
 			if not isUserTarget then
 				local newTarget = getTargetToClosest(currSlowAimer.targetPos, currSlowAimer.precise)
-				if newTarget ~= nil then
+				if newTarget then
 					local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
 					currSlowAimer.targetPos = {targetX, targetY, targetZ}
 					currSlowAimer.currentTarget = newTarget
 					--Echo("trying set target")
 					--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
-					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0);
+					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0)
 					--Echo("Set")
 					return
 				end
 			end
 		end
-		if targetZ ~= nil then
+		if targetZ then
 			currSlowAimer.targetPos = {targetX, targetY, targetZ}
 		end
 		currSlowAimer.currentTarget = unitIDorPos
 	end
 end
 
-function isSlowAimer(unitDefID)
+local function isSlowAimer(unitDefID)
 	return (unitDefID == StarlightUnitDefID) or (unitDefID == BerthaUnitDefID) or (unitDefID == DRPUnitDefID)
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if isSlowAimer(unitDefID)
-		and (unitTeam==GetMyTeamID()) then
+		and unitTeam == GetMyTeamID() then
 			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 end
 
 function widget:UnitDestroyed(unitID) 
-	if not (SlowAimStack[unitID]==nil) then
+	if SlowAimStack[unitID] then
 		SlowAimStack[unitID]=nil
-		GiveOrderToUnit(unitID,CMD_STOP, {}, {""},0)
+		GiveOrderToUnit(unitID,CMD_STOP, {}, 0)
 	end
 end
 
 function widget:GameFrame(n) 
 	-- Every frame updates are acceptable for units this big and rare
 	--if (n%UPDATE_FRAME==0) then
-		for unitId,_ in pairs(SlowAimStack) do 
-			updateSlowAimer(unitId)
+		for unitID in pairs(SlowAimStack) do 
+			updateSlowAimer(unitID)
 		end
 	--end
 end
@@ -144,10 +151,8 @@ function widget:Initialize()
 	for i=1, #units do
 		local unitID = units[i]
 		local unitDefID = GetUnitDefID(unitID)
-		if isSlowAimer(unitDefID) then
-			if  (SlowAimStack[unitID]==nil) then
-				newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
-			end
+		if isSlowAimer(unitDefID) and not SlowAimStack[unitID] then
+			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 	end
 end
