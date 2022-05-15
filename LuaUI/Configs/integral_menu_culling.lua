@@ -53,6 +53,8 @@ local configList = {
 	{cmdID = CMD.REPEAT                , state = true, default = true, name = "Repeat"},
 	{cmdID = CMD_RETREAT               , state = true, default = true, name = "Retreat"},
 	{cmdID = CMD.TRAJECTORY            , state = true, default = true, name = "Trajectory"},
+	{cmdID = CMD_IDLE_DODGE            , state = true, default = true, name = "Idle Dodge"},
+	{cmdID = CMD_MOVE_DODGE            , state = true, default = true, name = "Move Dodge"},
 
 	{label = "Advanced States (hidden by default)"},
 	{cmdID = CMD_DISABLE_ATTACK        , state = true, default = false, name = "Allow Attack Commands"},
@@ -111,6 +113,8 @@ local defaultValues = {
 	[CMD_FORMATION_RANK] = true,
 	[CMD_FIRE_AT_SHIELD] = true,
 	--[CMD_FIRE_TOWARDS_ENEMY] = true,
+	[CMD_IDLE_DODGE] = true,
+	[CMD_MOVE_DODGE] = true,
 }
 
 return configList, defaultValues

@@ -160,6 +160,8 @@ local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do
 local CONSTRUCTOR_UPDATE_RATE = 30
 local CONSTRUCTOR_TIMEOUT_RATE = 2
 
+local DODGE_UPDATE_RATE = 30
+
 local STOPPING_HAX = not Spring.Utilities.IsCurrentVersionNewerThan(104, 271)
 
 ----------------------------------------------------------------------------------------------
@@ -182,6 +184,10 @@ local constructorCount = 0
 local constructorsPerFrame = 0
 local constructorIndex = 1
 local alreadyResetConstructors = false
+
+local dodgeMoveUnit = {}
+local dodgeMoveUnitByID = {}
+local dodgeMoveUnitCount = 0
 
 local checkEngineMove
 local moveCommandReplacementUnits
@@ -260,9 +266,60 @@ end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+-- Dodge Move Handling
+
+local function RemoveProjectileDodge(unitID)
+	if unitID and dodgeMoveUnitByID[unitID] then
+		local index = dodgeMoveUnitByID[unitID]
+		dodgeMoveUnit[index] = dodgeMoveUnit[dodgeMoveUnitCount]
+		dodgeMoveUnitByID[dodgeMoveUnit[dodgeMoveUnitCount]] = index
+		dodgeMoveUnitByID[unitID] = nil
+		dodgeMoveUnit[dodgeMoveUnitCount] = nil
+		dodgeMoveUnitCount = dodgeMoveUnitCount - 1
+	end
+end
+
+local function UnitProjectileDodge(unitID)
+	if rawMoveUnit[unitID] then
+		local unitData = rawMoveUnit[unitID]
+		local dodgeX, dodgeZ, dodgeSize = GG.UnitDodge.Move(unitID, unitData.mx, unitData.mz)
+		if dodgeSize > 5 then
+			local cmdID, _, cmdTag, _, _, _, isDodge = spGetUnitCurrentCommand(unitID)
+			if (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and isDodge == -1 then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
+			end
+			local dodgeY = Spring.GetGroundHeight(dodgeX, dodgeZ)
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, 0, dodgeX, dodgeY, dodgeZ, -1}, CMD_OPT_ALT)
+		end
+	else
+		RemoveProjectileDodge(unitID)
+	end
+end
+
+local function AddProjectileDodge(unitID)
+	if unitID and dodgeMoveUnitByID[unitID] == nil then
+		dodgeMoveUnitCount = dodgeMoveUnitCount + 1
+		dodgeMoveUnit[dodgeMoveUnitCount] = unitID
+		dodgeMoveUnitByID[unitID] = dodgeMoveUnitCount
+		UnitProjectileDodge(unitID)
+	end
+end
+
+local function UpdateProjectileDodge(frame)
+	if frame % DODGE_UPDATE_RATE == 0 then
+		for i = dodgeMoveUnitCount, 1, -1 do
+			UnitProjectileDodge(dodgeMoveUnit[i])
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 -- Raw Move Handling
 
 local function StopRawMoveUnit(unitID, stopNonRaw)
+	RemoveProjectileDodge(unitID)
+
 	if not rawMoveUnit[unitID] then
 		return
 	end
@@ -296,6 +353,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 	end
 
 	local goalDistOverride = cmdParams[4]
+	if cmdParams[4] == -1 then
+		goalDistOverride = nil
+	end
+
 	local timerIncrement = cmdParams[5] or 1
 	if not rawMoveUnit[unitID] then
 		rawMoveUnit[unitID] = {}
@@ -459,6 +520,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
+	if cmdUsed and not cmdRemove and cmdParams[4] ~= -1 then
+		AddProjectileDodge(unitID)
+	end
 	return cmdUsed, cmdRemove
 end
 
@@ -800,6 +864,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitID then
 		rawMoveUnit[unitID] = nil
+		RemoveProjectileDodge(unitID)
 		if unitDefID and constructorBuildDistDefs[unitDefID] and constructorByID[unitID] then
 			RemoveConstructor(unitID)
 		end
@@ -817,6 +882,7 @@ function gadget:GameFrame(n)
 	UpdateConstructors(n)
 	UpdateMoveReplacement()
 	UpdateEngineMoveCheck(n)
+	UpdateProjectileDodge(n)
 	if n%247 == 4 then
 		oldCommandStoppingRadius = commonStopRadius
 		commonStopRadius = {}

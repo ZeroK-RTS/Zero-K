@@ -37,7 +37,9 @@ local tooltips = {
 	UNIT_FLOAT_STATE = "Float State (_STATE_)\n  Set when certain amphibious units float to the surface.",
 	SELECTION_RANK = "Selection Rank (_STATE_)\n  Priority for selection filtering.",
 	FORMATION_RANK = "Formation Rank (_STATE_)\n  set rank in formation.",
-	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation."
+	TOGGLE_DRONES = "Drone Construction (_STATE_)\n  Toggle drone creation.",
+	IDLE_DODGE = "Idle Dodge (_STATE_)\n",
+	MOVE_DODGE = "Move Dodge (_STATE_)\n",
 }
 
 local tooltipsAlternate = {
@@ -303,6 +305,22 @@ local commandDisplayConfig = {
 			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Disabled"),
 			tooltips.TOGGLE_DRONES:gsub("_STATE_", "Enabled"),
 		}
+	},
+	[CMD_IDLE_DODGE] = {
+		texture = {imageDir .. 'states/move_roam.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_hold.png'},
+		stateTooltip = {
+			tooltips.IDLE_DODGE:gsub("_STATE_", "Always"),
+			tooltips.IDLE_DODGE:gsub("_STATE_", "Not on Hold Pos"),
+			tooltips.IDLE_DODGE:gsub("_STATE_", "Never")
+		},
+	},
+	[CMD_MOVE_DODGE] = {
+		texture = {imageDir .. 'states/move_roam.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_hold.png'},
+		stateTooltip = {
+			tooltips.MOVE_DODGE:gsub("_STATE_", "Always"),
+			tooltips.MOVE_DODGE:gsub("_STATE_", "Not on Hold Pos"),
+			tooltips.MOVE_DODGE:gsub("_STATE_", "Never")
+		},
 	},
 }
 

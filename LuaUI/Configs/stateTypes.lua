@@ -31,6 +31,8 @@ local stateData = {
 	[CMD_FIRE_TOWARDS_ENEMY] = 2,
 	--[CMD_SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
 	[CMD_UNIT_AI] = 2,
+	[CMD_IDLE_DODGE] = 2,
+	[CMD_MOVE_DODGE] = 3,
 }
 
 local specialHandling = {
