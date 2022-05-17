@@ -443,7 +443,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
 		
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz)
+		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
 		cx, cz = ClampPosition(cx, cz)
 
 		if move then
@@ -498,7 +498,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cy = ey
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz)
+		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
 		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
@@ -540,7 +540,7 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength)/pointDis
 			end
 		end
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz)
+		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
 		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
@@ -704,7 +704,7 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz)
+		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
 		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
@@ -724,6 +724,33 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	end
 
 	return behaviour.skirmKeepOrder
+end
+
+local function DoMoveDodge(unitID, behaviour, fx, fz, unitData, move, isIdleAttack, cmdID, cmdTag)
+	if (((cmdID == CMD_FIGHT) or move) and fz) then
+		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, fx, fz, UPDATE_RATE)
+		if dodgeSize > 0 then
+			local cy = Spring.GetGroundHeight(cx, cz)
+			GG.recursion_GiveOrderToUnit = true
+			if cmdID then
+				if move then
+					cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+				else
+					cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+				end
+			elseif isIdleAttack then
+				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
+			else
+				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_FIGHT, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
+			end
+			GG.recursion_GiveOrderToUnit = false
+			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+			unitData.receivedOrder = true	
+			return true
+		end
+	end
+	return false
 end
 
 local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
@@ -778,7 +805,7 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 		local cx = ux+(ux-ex)*f
 		local cy = uy
 		local cz = uz+(uz-ez)*f
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz)
+		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
 		cx, cz = ClampPosition(cx, cz)
 
 		GG.recursion_GiveOrderToUnit = true
@@ -931,7 +958,7 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
 		behaviour = behaviour.fightOnlyOverride
 	end
-	
+
 	if isIdleAttack and enemy and (not unitData.idleAgression or unitData.idleDodge) and typeKnown
 			and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
 		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
@@ -958,6 +985,11 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	end
 	
 	if not enemy then
+		if DoMoveDodge(unitID, behaviour, fx, fz, unitData, move, isIdleAttack, cmdID, cmdTag) then
+			return true, true
+		else
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
 		return false
 	end
 	
@@ -1013,13 +1045,16 @@ local function IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize)
 	return true
 end
 
-local function DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight, holdPos)
-	if (unitData.wasIdle) and not holdPos then
-		local cx, cz, dodgeSize = GG.UnitDodge.Idle(unitID)
+local function DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight)
+	if (unitData.wasIdle) then
+
+		local cx, cz, dodgeSize = GG.UnitDodge.Idle(unitID, UPDATE_RATE)
 		if cx then
+			-- local ux, uy, uz = Spring.GetUnitPosition(unitID)
+			-- Spring.MarkerAddPoint(ux, uy, uz, "Dodge")
 			cx, cz = ClampPosition(cx, cz)
 			local ux, uy, uz = spGetUnitPosition(unitID)
-			--Spring.MarkerAddPoint(cx, 0, cz, "" .. dodgeSize)
+			-- Spring.MarkerAddPoint(cx, 0, cz, "" .. dodgeSize)
 			if IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize) then
 				if move then
 					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz, -1}, CMD.OPT_ALT )
@@ -1039,7 +1074,7 @@ local function DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight, holdPo
 		unitData.idleWantReturn = true
 		local canIdleReturn = true
 		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
-		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, rx, rz)
+		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, rx, rz, UPDATE_RATE)
 		-- return to idle pos if safe
 		if dodgeSize == 0 then
 			-- Spring.MarkerAddPoint(cx, 0, cz, "moving")
@@ -1125,13 +1160,6 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Echo("queueReturnX queueReturnZ", unitData.queueReturnX, unitData.queueReturnZ, "setReturn", unitData.setReturn)
 	end
 
-	local dodgeSentOrder = DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight, holdPos)
-	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack or unitData.wasDodge)
-	if doDebug then
-		Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
-		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
-	end
-	
 	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
@@ -1153,15 +1181,15 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			enemyUnitDef, typeKnown = GetUnitVisibleInformation(enemy, unitData.allyTeam)
 		end
 		
-		if not (exitEarly or behaviour.onlyIdleHandling or dodgeSentOrder) then
+		if not (exitEarly or behaviour.onlyIdleHandling) then
 			--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
-			aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+			aiTargetFound, aiSentOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 				fightX, fightY, fightZ, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
 				move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			
 			if autoAttackEnemyID and not aiTargetFound then
 				enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, unitData.allyTeam)
-				aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+				aiTargetFound, aiSentOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 					fightX, fightY, fightZ, unitData, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
 					move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			end
@@ -1180,6 +1208,15 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if enemy and enemy ~= -1 and unitData.idleWantReturn and not aiTargetFound then
 			DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enemyUnitDef, typeKnown)
+		end
+	end
+
+	if not aiSentOrder then
+		local dodgeSentOrder = DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight)
+		unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack or unitData.wasDodge)
+		if doDebug then
+			Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
+			Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
 		end
 	end
 	

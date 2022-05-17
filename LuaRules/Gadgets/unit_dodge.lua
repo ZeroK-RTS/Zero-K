@@ -21,8 +21,8 @@ local CACHE_TIME = 15
 local DODGE_HEIGHT = 50
 local QUERY_RADIUS = 300
 local SAFETY_RADIUS = 30
-local RAY_DISTANCE = 140
-local MAX_DISTANCE = 140
+local RAY_DISTANCE = 80
+local MAX_DISTANCE = 80000
 
 local abs = math.abs
 local max = math.max
@@ -40,7 +40,6 @@ local spGetGameFrame = Spring.GetGameFrame
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitRadius = Spring.GetUnitRadius
-local spGetUnitHeight = Spring.GetUnitHeight
 local spGetUnitIsDead = Spring.GetUnitIsDead
 local spGetUnitDirection = Spring.GetUnitDirection
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -114,25 +113,6 @@ local function GetHitData(obsticle)
     return hitData
 end
 
-local function QueryHitData(unitID)
-    local query = {}
-    local currFrame = spGetGameFrame()
-    local allyTeam = spGetUnitAllyTeam(unitID)
-    local uPosX, _, uPosZ = spGetUnitPosition(unitID)
-    local obsticles = GG.MapObsticles(uPosX, uPosZ, QUERY_RADIUS, {"projectiles"})
-    for i = 1, #obsticles do
-        local obsticle = obsticles[i]
-        local pPos, pPosY = vector.New3(spGetProjectilePosition(obsticle[3]))
-    	if spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
-            local hitData = GetHitData(obsticle)
-            if hitData.eta > currFrame then
-                query[#query+1] = GetHitData(obsticle)
-            end
-        end
-    end
-    return query
-end
-
 local function GetNearestPointToLine(point, a, b)
 	local line = vector.Subtract(b, a)
 	if line[1] ~= 0 or line[2] ~= 0 then
@@ -148,25 +128,55 @@ local function GetNearestPointToLine(point, a, b)
 	return vector.Clone(a)
 end
 
+local function QueryHitData(unitID, uRadius, updateRate)
+    local query = {}
+    local currFrame = spGetGameFrame()
+    local allyTeam = spGetUnitAllyTeam(unitID)
+    local uPosX, _, uPosZ = spGetUnitPosition(unitID)
+    local obsticles = GG.MapObsticles(uPosX, uPosZ, QUERY_RADIUS, {"projectiles"})
+    for i = 1, #obsticles do
+        local obsticle = obsticles[i]
+        local pPos, pPosY = vector.New3(spGetProjectilePosition(obsticle[3]))
+    	if spIsPosInLos(pPos[1], pPosY, pPos[2], allyTeam) then
+            local hitData = GetHitData(obsticle)
+            local hitTime = hitData.eta - currFrame
+            if hitTime > 0 then
+                local uPos = {uPosX, uPosZ}
+                local unitDefID = spGetUnitDefID(unitID)
+                local line = hitData.line
+                local near = GetNearestPointToLine(uPos, line[1], line[3])
+                local speed = UnitDefs[unitDefID].speed
+                local distance = vector.Distance(uPos, near) + hitData.radius + uRadius + SAFETY_RADIUS
+                local dodgeTime = distance / speed * updateRate
+                if dodgeTime > hitTime then
+                    hitData.near = near
+                    query[#query+1] = hitData
+                end
+            end
+        end
+    end
+    return query
+end
 
-local function BoidDodge(query, uPos, uRadius)
+local function BoidDodge(query, uPos, uDir, uRadius)
     local dodge, dodgeMag = {0, 0}, 0
     for i = 1, #query do
         local hitData = query[i]
         local line = hitData.line
-        local hitPoint = GetNearestPointToLine(uPos, line[1], line[3])
+        local hitPoint = hitData.near
         if uPos[1] == hitPoint[1] and uPos[2] == hitPoint[2] then
-            hitPoint[1] = hitPoint[1] + 1
-            hitPoint[2] = hitPoint[2] + 1
-        end
-        local dodgeRadius = vector.Distance(uPos, hitPoint)
-        if dodgeRadius < hitData.radius + uRadius + SAFETY_RADIUS then
-            local hitNormal = vector.Norm(1,  vector.Subtract(uPos, hitPoint))
-            dodge = vector.Add(dodge, hitNormal)
-            dodgeMag = max(dodgeMag, hitData.radius + uRadius + SAFETY_RADIUS + SAFETY_RADIUS - dodgeRadius)
+            local lineDir = vector.Subtract(line[3], line[1])
+            dodge = vector.Add(dodge, {-lineDir[2], lineDir[1]})
+            dodgeMag = max(dodgeMag, hitData.radius + uRadius + SAFETY_RADIUS + SAFETY_RADIUS)
+        else
+            local dodgeRadius = vector.Distance(uPos, hitPoint)
+            if dodgeRadius < hitData.radius + uRadius + SAFETY_RADIUS then
+                local hitNormal = vector.Norm(1,  vector.Subtract(uPos, hitPoint))
+                dodge = vector.Add(dodge, hitNormal)
+                dodgeMag = max(dodgeMag, hitData.radius + uRadius + SAFETY_RADIUS + SAFETY_RADIUS - dodgeRadius)
+            end
         end
     end
-    dodgeMag = min(dodgeMag, MAX_DISTANCE)
     dodge = vector.Norm(dodgeMag, dodge)
     return dodge, dodgeMag
 end
@@ -206,14 +216,19 @@ local function RayDodge(query, uPos, uDir, rDir, uRadius)
         end
         local dodgeRadius = uRadius + closestRadius + SAFETY_RADIUS + SAFETY_RADIUS
         local target = vector.Add(closestPoint, vector.Norm(dodgeRadius, closestDir))
-        local toTarget = vector.Norm(RAY_DISTANCE, vector.Subtract(target, uPos))
-        return uPos[1] + toTarget[1], uPos[2] + toTarget[2], RAY_DISTANCE
+        local origTarget = vector.Add(uPos, rDir)
+        if vector.Distance(uPos, target) < vector.Distance(uPos, origTarget) then
+            local toTarget = vector.Norm(RAY_DISTANCE, vector.Subtract(target, uPos))
+            return uPos[1] + toTarget[1], uPos[2] + toTarget[2], RAY_DISTANCE
+        end
     end
 
-    return uPos[1] + rDir[1], uPos[2] + rDir[2], 0
+    local length = sqrt(rDir[1]*rDir[1] + rDir[2]*rDir[2])
+    local move = vector.Norm(length, rDir)
+    return uPos[1] + move[1], uPos[2] + move[2], 0
 end
 
-local function IdleDodge(unitID)
+local function IdleDodge(unitID, updateRate)
     if not spValidUnitID(unitID) or spGetUnitIsDead(unitID) then
         return 0, 0, 0
     end
@@ -229,13 +244,17 @@ local function IdleDodge(unitID)
         return uPos[1], uPos[2], 0
     end
 
-    local query = QueryHitData(unitID)
+    
+
     local uRadius = spGetUnitRadius(unitID)
-    local dodge, dodgeMag = BoidDodge(query, uPos, uRadius)
+    local query = QueryHitData(unitID, uRadius, updateRate)
+    -- Spring.MarkerAddPoint(uPos[1], 0, uPos[2], "" .. #query)
+    local uDir = vector.New3(spGetUnitDirection(unitID))
+    local dodge, dodgeMag = BoidDodge(query, uPos, uDir, uRadius)
     return uPos[1] + dodge[1], uPos[2] + dodge[2], dodgeMag
 end
 
-local function MoveDodge(unitID, move_x, move_z)
+local function MoveDodge(unitID, move_x, move_z, updateRate)
     if not spValidUnitID(unitID) or spGetUnitIsDead(unitID) then
         return move_x, move_z, 0
     end
@@ -246,17 +265,17 @@ local function MoveDodge(unitID, move_x, move_z)
 
     local moveDodge = moveStates[unitID][1]
     local moveState = spGetUnitStates(unitID).movestate
-    if (moveDodge == 1 and moveState == 0) or moveDodge == 2 then
+    if not force and ((moveDodge == 1 and moveState == 0) or moveDodge == 2) then
         return move_x, move_z, 0
     end
 
-    local query = QueryHitData(unitID)
-    local uRadius = spGetUnitRadius(unitID)
     local uPos = vector.New3(spGetUnitPosition(unitID))
-    local dodge, dodgeMag = BoidDodge(query, uPos, uRadius)
+    local uRadius = spGetUnitRadius(unitID)
+    local query = QueryHitData(unitID, uRadius, updateRate)
+    local uDir = vector.New3(spGetUnitDirection(unitID))
+    local dodge, dodgeMag = BoidDodge(query, uPos, uDir, uRadius)
 
     if dodgeMag <= 0 and move_x then
-        local uDir = vector.New3(spGetUnitDirection(unitID))
         local rDir = vector.Subtract({move_x, move_z}, uPos)
         return RayDodge(query, uPos, uDir, rDir, uRadius)
     end
