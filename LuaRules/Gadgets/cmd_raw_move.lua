@@ -160,7 +160,7 @@ local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 120^2 -- Commands shorter than this do
 local CONSTRUCTOR_UPDATE_RATE = 30
 local CONSTRUCTOR_TIMEOUT_RATE = 2
 
-local DODGE_UPDATE_RATE = 30
+local DODGE_UPDATE_RATE = 20
 
 local STOPPING_HAX = not Spring.Utilities.IsCurrentVersionNewerThan(104, 271)
 
@@ -280,9 +280,9 @@ local function RemoveProjectileDodge(unitID)
 end
 
 local function UnitProjectileDodge(unitID)
-	if rawMoveUnit[unitID] then
+	if rawMoveUnit[unitID] and dodgeMoveUnitByID[unitID] then
 		local unitData = rawMoveUnit[unitID]
-		local dodgeX, dodgeZ, dodgeSize = GG.UnitDodge.Move(unitID, unitData.mx, unitData.mz)
+		local dodgeX, dodgeZ, dodgeSize = GG.UnitDodge.Move(unitID, unitData.mx, unitData.mz, DODGE_UPDATE_RATE)
 		if dodgeSize > 5 then
 			local cmdID, _, cmdTag, _, _, _, isDodge = spGetUnitCurrentCommand(unitID)
 			if (cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE) and isDodge == -1 then
@@ -301,7 +301,6 @@ local function AddProjectileDodge(unitID)
 		dodgeMoveUnitCount = dodgeMoveUnitCount + 1
 		dodgeMoveUnit[dodgeMoveUnitCount] = unitID
 		dodgeMoveUnitByID[unitID] = dodgeMoveUnitCount
-		UnitProjectileDodge(unitID)
 	end
 end
 
@@ -520,8 +519,11 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
-	if cmdUsed and not cmdRemove and cmdParams[4] ~= -1 then
+	if cmdUsed and not cmdRemove and cmdParams[4] ~= -2 then
 		AddProjectileDodge(unitID)
+		if not cmdParams[4] or cmdParams[4] >= 0 then
+			UnitProjectileDodge(unitID)
+		end
 	end
 	return cmdUsed, cmdRemove
 end
