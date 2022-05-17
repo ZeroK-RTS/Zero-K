@@ -12,6 +12,7 @@ local TRACKED_WEAPONS = {
 	gunshipassault_vtol_salvo = {},
 	gunshipheavyskirm_emg = {},
 	hoverarty_ata = {},
+	hoverskirm_missile = {},
 	jumparty_napalm_sprayer = {},
 	jumpblackhole_black_hole = {},
 	napalmmissile_weapon = {},
