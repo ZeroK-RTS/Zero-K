@@ -44,9 +44,9 @@ end
 local function GetLinear(projID, target, targetY, height, config)
 	local pPos, pPosY = vector.New3(spGetProjectilePosition(projID))
 	local pVel, pVelY = vector.New3(spGetProjectileVelocity(projID))
-	local eta = 40
-	local b = vector.Add(pPos, vector.Mult(eta, pVel))
-	return {pPos, pPosY, b, targetY}, eta
+	local lookAhead = 40
+	local b = vector.Add(pPos, vector.Mult(lookAhead, pVel))
+	return {pPos, pPosY, b, targetY}, 1
 end
 
 local function GetTarget(projID, target, targetY, height, config)
