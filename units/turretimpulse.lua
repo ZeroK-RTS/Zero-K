@@ -102,7 +102,7 @@ return { turretimpulse = {
       thickness               = 4,
       tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
+      weaponType              = [[LaserCannon]], -- not hitscan on purpose, to make it difficult to manipulate things perfectly
       weaponVelocity          = 2200,
     },
 
