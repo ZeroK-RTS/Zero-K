@@ -307,7 +307,7 @@ local commandDisplayConfig = {
 		}
 	},
 	[CMD_IDLE_DODGE] = {
-		texture = {imageDir .. 'states/move_roam.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_hold.png'},
+		texture = {imageDir .. 'states/idle_dodge_always.png', imageDir .. 'states/idle_dodge_hold.png', imageDir .. 'states/idle_dodge_never.png'},
 		stateTooltip = {
 			tooltips.IDLE_DODGE:gsub("_STATE_", "Always"),
 			tooltips.IDLE_DODGE:gsub("_STATE_", "Not on Hold Pos"),
@@ -315,7 +315,7 @@ local commandDisplayConfig = {
 		},
 	},
 	[CMD_MOVE_DODGE] = {
-		texture = {imageDir .. 'states/move_roam.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_hold.png'},
+		texture = {imageDir .. 'states/move_dodge_always.png', imageDir .. 'states/move_dodge_hold.png', imageDir .. 'states/move_dodge_never.png'},
 		stateTooltip = {
 			tooltips.MOVE_DODGE:gsub("_STATE_", "Always"),
 			tooltips.MOVE_DODGE:gsub("_STATE_", "Not on Hold Pos"),
