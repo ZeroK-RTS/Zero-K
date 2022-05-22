@@ -276,7 +276,6 @@ end
 local function ReturnUnitToIdlePos(unitID, unitData, force)
 	unitData.queueReturnX = unitData.idleX
 	unitData.queueReturnZ = unitData.idleZ
-	unitData.returnCommandPos = true
 	unitData.setReturn = true
 	unitData.forceReturn = force
 end
@@ -406,6 +405,13 @@ local function UpdateJinkRotation(behaviour, unitData)
 	end
 end
 
+local function InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
+	cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
+	cx, cz = ClampPosition(cx, cz)
+	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+	return cx, cy, cz
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 ---- Unit AI Execution
@@ -443,14 +449,11 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
 		
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
-		cx, cz = ClampPosition(cx, cz)
-
 		if move then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		--Spring.SetUnitMoveGoal(unitID, cx, cy, cz)
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -498,15 +501,13 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 			cy = ey
 			cz = ez+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength/pointDis
 		end
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
-		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData. cy, unitData.cz = cx, cy, cz
@@ -540,15 +541,13 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 				cz = uz-(-(uz-ez)*behaviour.jinkAwayParallelLength+(ux-ex)*unitData.jinkDir*behaviour.jinkTangentLength)/pointDis
 			end
 		end
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
-		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -704,15 +703,13 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
-		cx, cz = ClampPosition(cx, cz)
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -724,33 +721,6 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 	end
 
 	return behaviour.skirmKeepOrder
-end
-
-local function DoMoveDodge(unitID, behaviour, fx, fz, unitData, move, isIdleAttack, cmdID, cmdTag)
-	if (((cmdID == CMD_FIGHT) or move) and fz) then
-		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, fx, fz, UPDATE_RATE)
-		if dodgeSize > 0 then
-			local cy = Spring.GetGroundHeight(cx, cz)
-			GG.recursion_GiveOrderToUnit = true
-			if cmdID then
-				if move then
-					cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-				else
-					cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
-				end
-			elseif isIdleAttack then
-				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
-			else
-				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_FIGHT, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
-			end
-			GG.recursion_GiveOrderToUnit = false
-			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
-			unitData.receivedOrder = true	
-			return true
-		end
-	end
-	return false
 end
 
 local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
@@ -805,22 +775,20 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 		local cx = ux+(ux-ex)*f
 		local cy = uy
 		local cz = uz+(uz-ez)*f
-		cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
-		cx, cz = ClampPosition(cx, cz)
 
 		GG.recursion_GiveOrderToUnit = true
 
 		if cmdID then
 			if move then
-				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+				cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			else
-				cx, cy, cz = spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+				cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			end
 		elseif isIdleAttack then
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz }, CMD_OPT_RIGHT )
 		else
-			cx, cy, cz = spGiveOrderToUnit(unitID, CMD_FIGHT, {cx, cy, cz, -1}, CMD_OPT_RIGHT )
+			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx, cy, cz }, CMD_OPT_RIGHT )
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -857,6 +825,104 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+---- Unit AI Selection
+
+local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+		fx, fy, fz, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
+		move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
+	
+	if (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
+		return false -- Do not tactical AI enemy if it is fight-only.
+	end
+	
+	if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
+		behaviour = behaviour.fightOnlyOverride
+	end
+	
+	if isIdleAttack and enemy and (not unitData.idleAgression) and typeKnown
+			and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true, orderSent
+	end
+	
+	local didSwarm = false
+	if alwaysJink or (enemy and typeKnown and behaviour.swarms and behaviour.swarms[enemyUnitDef]) then
+		--Spring.Echo("unit checking swarm")
+		if DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, fx, fy, fz, frame) then
+			didSwarm = true
+		else
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+	end
+	
+	if didSwarm then
+		-- Units can immediately transition to skirm after swarming.
+		-- This can happen if a known auto-target becomes too far away.
+		return true, true
+	end
+	
+	if not enemy then
+		return false
+	end
+	
+	local typeSkirm = typeKnown and behaviour.skirms and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
+	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+		--Spring.Echo("unit checking skirm")
+		local orderSent = DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown,
+			move, isIdleAttack, cmdID, cmdTag, frame,
+			haveFight and holdPos,
+			particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])
+		)
+		if not orderSent then
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true, orderSent
+	end
+	
+	if behaviour.fleeEverything then
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true, orderSent
+	end
+	
+	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
+		return false -- if I have been given attack order manually do not flee
+	end
+	
+	if (typeKnown and ((behaviour.flees and behaviour.flees[enemyUnitDef]) or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef])))
+			or (not typeKnown and behaviour.fleeRadar) then
+		-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
+		-- if I do not have los and flee radar dot, flee
+		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
+		if not orderSent then
+			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
+		end
+		return true, orderSent
+	end
+	
+	return false
+end
+
+local function DoMoveDodge(unitID, fx, fz, unitData)
+	local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, fx, fz, UPDATE_RATE)
+	if dodgeSize > 1 then
+		cx, cz = ClampPosition(cx, cz)
+		local cy = Spring.GetGroundHeight(cx, cz)
+		spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT)
+		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+		unitData.receivedOrder = true
+		return true
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Idle Handling
 
 local function AddIdleUnit(unitID, unitDefID)
@@ -871,11 +937,11 @@ local function AddIdleUnit(unitID, unitDefID)
 		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
 		Spring.Echo("=== Unit Idle", unitID, " ===")
 	end
-	
+
 	if unitData.wasDodge then
 		return
 	end
-
+	
 	if unitData.idleWantReturn and unitData.idleX then
 		if doDebug then
 			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
@@ -922,162 +988,28 @@ function gadget:UnitIdle(unitID, unitDefID)
 	AddIdleUnit(unitID, unitDefID)
 end
 
-function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
-	if playerID == -1 or fromLua then
-		return
-	end
-	if cmdID and stateCommands[cmdID] then
-		return
-	end
-	local unitData = unit[unitID]
-	if not unitData then
-		return
-	end
-	if (cmdID == CMD_FIGHT or cmdID == CMD_ATTACK) and unitData.receivedOrder and not cmdOpts.shift then
-		needNextUpdate = needNextUpdate or {}
-		needNextUpdate[#needNextUpdate + 1] = unitID
-	end
-	unitData.wasIdle = false
-	unitData.wasDodge = false
-	unitData.returnCommandPos = false
-	unitData.idleWantReturn = false
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
----- Unit AI Selection
-
-local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
-		fx, fy, fz, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
-		move, haveFight, holdPos, isIdleAttack, particularEnemy, frame, alwaysJink)
-	
-	if (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
-		return false -- Do not tactical AI enemy if it is fight-only.
-	end
-	
-	if behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef] and behaviour.fightOnlyOverride then
-		behaviour = behaviour.fightOnlyOverride
-	end
-
-	if isIdleAttack and enemy and (not unitData.idleAgression or unitData.idleDodge) and typeKnown
-			and ((behaviour.idleFleeCombat and armedUnitDefIDs[enemyUnitDef]) or (behaviour.idleFlee and behaviour.idleFlee[enemyUnitDef])) then
-		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
-		if not orderSent then
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-		return true, orderSent
-	end
-	
-	local didSwarm = false
-	if alwaysJink or (enemy and typeKnown and behaviour.swarms and behaviour.swarms[enemyUnitDef]) then
-		--Spring.Echo("unit checking swarm")
-		if DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, fx, fy, fz, frame) then
-			didSwarm = true
-		else
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-	end
-	
-	if didSwarm then
-		-- Units can immediately transition to skirm after swarming.
-		-- This can happen if a known auto-target becomes too far away.
-		return true, true
-	end
-	
-	if not enemy then
-		if DoMoveDodge(unitID, behaviour, fx, fz, unitData, move, isIdleAttack, cmdID, cmdTag) then
-			return true, true
-		else
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-		return false
-	end
-	
-	local typeSkirm = typeKnown and behaviour.skirms and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
-	if (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
-		--Spring.Echo("unit checking skirm")
-		local orderSent = DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown,
-			move, isIdleAttack, cmdID, cmdTag, frame,
-			haveFight and holdPos,
-			particularEnemy and (behaviour.hugs and behaviour.hugs[enemyUnitDef])
-		)
-		if not orderSent then
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-		return true, orderSent
-	end
-	
-	if behaviour.fleeEverything then
-		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
-		if not orderSent then
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-		return true, orderSent
-	end
-	
-	if (cmdID == CMD_ATTACK and not Spring.Utilities.CheckBit(DEBUG_NAME, cmdOpts, CMD.OPT_INTERNAL)) then
-		return false -- if I have been given attack order manually do not flee
-	end
-	
-	if (typeKnown and ((behaviour.flees and behaviour.flees[enemyUnitDef]) or (behaviour.fleeCombat and armedUnitDefIDs[enemyUnitDef])))
-			or (not typeKnown and behaviour.fleeRadar) then
-		-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
-		-- if I do not have los and flee radar dot, flee
-		local orderSent = DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typeKnown, move, isIdleAttack, cmdID, cmdTag, frame)
-		if not orderSent then
-			ClearOrder(unitID, unitData, cmdID, cmdTag, cp_1, cp_2, cp_3)
-		end
-		return true, orderSent
-	end
-	
-	return false
-end
-
-local function IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize)
-	if not (unitData.wasIdle and unitData.idleX) then
-		return true
-	end
-
-	local dodgeDistSq = DistSq(unitData.idleX, unitData.idleZ, cx, cz)
-	if dodgeDistSq > ((dodgeSize + 16)*2)^2 then
-		return false
-	end
-	return true
-end
-
-local function DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight)
-	if (unitData.wasIdle) then
-
+local function DoIdleProjDodge(unitID, cmdTag, unitData, move)
 		local cx, cz, dodgeSize = GG.UnitDodge.Idle(unitID, UPDATE_RATE)
-		if cx then
-			-- local ux, uy, uz = Spring.GetUnitPosition(unitID)
-			-- Spring.MarkerAddPoint(ux, uy, uz, "Dodge")
+		if dodgeSize > 1 then
 			cx, cz = ClampPosition(cx, cz)
-			local ux, uy, uz = spGetUnitPosition(unitID)
-			-- Spring.MarkerAddPoint(cx, 0, cz, "" .. dodgeSize)
-			if IsSmallEnoughDodgeOrNotIdle(unitID, unitData, cx, cz, dodgeSize) then
-				if move then
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz, -1}, CMD.OPT_ALT )
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
-				else
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, uy, cz, -1}, CMD.OPT_ALT )
-				end
-				unitData.cx, unitData.cy, unitData.cz = cx, uy, cz
-				unitData.receivedOrder = true
-				unitData.wasDodge = true
-				return true
+			local cy = Spring.GetGroundHeight(cx, cz)
+			if move then
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			else
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
 			end
+			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+			unitData.receivedOrder = true
+			unitData.wasDodge = true
+			return true
 		end
-	end
 
-	if unitData.wasDodge and unitData.wasIdle then
+	if unitData.wasDodge then
 		unitData.idleWantReturn = true
-		local canIdleReturn = true
 		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
 		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, rx, rz, UPDATE_RATE)
-		-- return to idle pos if safe
-		if dodgeSize == 0 then
-			-- Spring.MarkerAddPoint(cx, 0, cz, "moving")
+		if dodgeSize < 1 then
 			unitData.wasDodge = false
 			AddIdleUnit(unitID, unitData)
 		end
@@ -1159,7 +1091,13 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		Spring.Echo("wasIdle", unitData.wasIdle, "isIdleAttack", isIdleAttack, "idleWantReturn", unitData.idleWantReturn)
 		Spring.Echo("queueReturnX queueReturnZ", unitData.queueReturnX, unitData.queueReturnZ, "setReturn", unitData.setReturn)
 	end
-
+	
+	unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack)
+	if doDebug then
+		Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
+		Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
+	end
+	
 	local aiTargetFound, aiSentOrder = false, false
 	if (enemy) then -- if I am fighting/patroling ground, idle, or targeting an enemy
 		local particularEnemy = ((enemy ~= -1) or autoAttackEnemyID) and true
@@ -1199,7 +1137,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			Spring.Echo("sentAiOrder", aiSentOrder, autoCmdTag, autoAttackEnemyID, enemy)
 		end
 		
-		if not aiSentOrder and autoCmdTag and (autoAttackEnemyID or -1) >= 0 and (enemy or -1) >= 0 and autoAttackEnemyID ~= enemy then
+		if autoCmdTag and (autoAttackEnemyID or -1) >= 0 and (enemy or -1) >= 0 and autoAttackEnemyID ~= enemy then
 			-- Removes a fight/autotarget-issued attack command if there is a closer enemy.
 			-- Prevents chasing past enemies that are good targets.
 			-- Only do this if no order was sent, so swarming may be less affected, which seems fine.
@@ -1212,11 +1150,10 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 	end
 
 	if not aiSentOrder then
-		local dodgeSentOrder = DoIdleProjDodge(unitID, cmdTag, unitData, move, haveFight)
-		unitData.idleWantReturn = unitData.wasIdle and ((unitData.idleWantReturn and (enemy == -1 or move) and not haveFight) or isIdleAttack or unitData.wasDodge)
-		if doDebug then
-			Spring.Echo("after", "idleWantReturn", unitData.idleWantReturn)
-			Spring.Utilities.UnitEcho(unitID, unitData.idleWantReturn and "W" or "O_O")
+		if fightZ then
+			DoMoveDodge(unitID, fightX, fightZ, unitData)
+		elseif unitData.wasIdle then
+			DoIdleProjDodge(unitID, cmdTag, unitData, move)
 		end
 	end
 	
@@ -1235,7 +1172,6 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		else
 			-- If the command queue is empty (ie still idle) then return to position
 			local ry = math.max(0, Spring.GetGroundHeight(rx, rz) or 0)
-			--Spring.MarkerAddPoint(rx, 0, rz, "returning")
 			GiveClampedOrderToUnit(unitID, unitData.wantFightReturn and CMD_FIGHT or CMD_RAW_MOVE, {rx, ry, rz}, CMD.OPT_ALT )
 			unitData.setReturn = nil
 			unitData.forceReturn = nil
@@ -1282,6 +1218,26 @@ end
 
 function gadget:GameFrame(n)
 	UpdateUnits(n, n%UPDATE_RATE + 1, UPDATE_RATE)
+end
+
+function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
+	if playerID == -1 or fromLua then
+		return
+	end
+	if cmdID and stateCommands[cmdID] then
+		return
+	end
+	local unitData = unit[unitID]
+	if not unitData then
+		return
+	end
+	if (cmdID == CMD_FIGHT or cmdID == CMD_ATTACK) and unitData.receivedOrder and not cmdOpts.shift then
+		needNextUpdate = needNextUpdate or {}
+		needNextUpdate[#needNextUpdate + 1] = unitID
+	end
+	unitData.wasIdle = false
+	unitData.wasDodge = false
+	unitData.idleWantReturn = false
 end
 
 --------------------------------------------------------------------------------
