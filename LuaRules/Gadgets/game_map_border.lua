@@ -187,6 +187,7 @@ end
 
 function gadget:Initialize()
 	if not LoadMapBorder() then
+		GG.map_AllowPositionTerraform = function() return true end
 		gadgetHandler:RemoveGadget()
 		return
 	end
