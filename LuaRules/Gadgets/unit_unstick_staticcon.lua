@@ -15,12 +15,11 @@ function gadget:GetInfo()
 end
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
-local handled = IterableMap.New()
-
+local handledUnits = IterableMap.New()
 
 -- Config --
-local delay = 15
-local debug = false
+local UPDATE_RATE = 45
+local debugMode = false
 
 local buildRangesSq = {} -- [unitDefID] = buildDistance
 
@@ -37,7 +36,6 @@ local CMD_REPAIR = CMD.REPAIR
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_RESURRECT = CMD.RESURRECT
 local CMD_REMOVE = CMD.REMOVE
-local spEcho = Spring.Echo
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spValidUnitID = Spring.ValidUnitID
 local spGetGameFrame = Spring.GetGameFrame
@@ -48,37 +46,39 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 
-local function DebugEcho(...)
-	spEcho("[unit_staticcon_unsticker]", unpack(arg))
-end
-
-local function GetDistance(unitID, targetID, isReclaim)
+local function GetDistanceSq(unitID, targetID, isReclaim)
 	local x, _, z = spGetUnitPosition(unitID)
 	local x2, z2
 	if isReclaim then
 		if spValidFeatureID(targetID) then
 			x2, _, z2 = spGetFeaturePosition(targetID)
-		elseif spValidUnitID(targetID) then -- live reclaim
+		elseif spValidUnitID(targetID) then 
+			-- live reclaim
 			x2, _, z2 = spGetUnitPosition(targetID)
 		end
 	else
 		x2, _, z2 = spGetUnitPosition(targetID)
 	end
 	if not x2 then
-		if debug then DebugEcho("Target doesn't exist?") end
-		return 9999
+		if debugMode then
+			Spring.Echo("Target doesn't exist?")
+		end
+		return false
 	end
 	return (x2 - x)^2 + (z2 - z)^2
 end
 
 local function IsObjectCloseEnough(unitID, targetID, cmd) -- Note: build ranges are 2D usually.
 	local isReclaim = (cmd == CMD_RECLAIM or cmd == CMD_RESURRECT)
-	local dist = GetDistance(unitID, targetID, isReclaim)
-	local buildRange = buildRangesSq[spGetUnitDefID(unitID)]
-	if debug then
-		DebugEcho(unitID, ": Distance: ", dist, " (Build Range: ", buildRange, ")")
+	local distSq = GetDistanceSq(unitID, targetID, isReclaim)
+	if not distSq then
+		return false
 	end
-	return dist <= buildRange
+	local buildRange = buildRangesSq[spGetUnitDefID(unitID)]
+	if debugMode then
+		Spring.Echo(unitID, ": Distance: ", math.sqrt(distSq), " (Build Range: ", buildRange, ")")
+	end
+	return distSq <= buildRange
 end
 
 --[[Some documentation with regards to this HandleUnit function:
@@ -108,45 +108,66 @@ local function HandleUnit(unitID)
 	if cmdParam1 and spValidFeatureID(cmdParam1 - Game.maxUnits) then
 		cmdParam1 = cmdParam1 - Game.maxUnits
 	end
-	if debug then DebugEcho(unitID .. ": ", cmdID, cmdParam1, cmdParam2) end
+	if debugMode then
+		Spring.Echo(unitID .. ": ", cmdID, cmdParam1, cmdParam2)
+	end
 	if cmdID and cmdParam1 and (spValidFeatureID(cmdParam1) or spValidUnitID(cmdParam1)) then
-		if debug then DebugEcho(unitID .. ": Valid command, checking distance.") end
+		if debugMode then
+			Spring.Echo(unitID .. ": Valid command, checking distance.")
+		end
 		if not IsObjectCloseEnough(unitID, cmdParam1, cmdID) then
-			if debug then DebugEcho(unitID .. ": Command dropped (Out of Range)") end
+			if debugMode then 
+				Spring.Echo(unitID .. ": Command dropped (Out of Range)")
+			end
 			spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
-			if cmdParam5 and cmdParam5 ~= buildRangesSq[spGetUnitDefID(unitID)] then -- this was an area command added by the user.
-				if debug then DebugEcho(unitID, cmdID, cmdParam1, cmdParam2) end
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, cmdID, CMD.OPT_SHIFT, cmdParam2, cmdParam3, cmdParam4, cmdParam5}, CMD.OPT_ALT) -- reissue the command (just in case)
+			if cmdParam5 and cmdParam5 ~= buildRangesSq[spGetUnitDefID(unitID)] then 
+				-- this was an area command added by the user.
+				if debugMode then 
+					Spring.Echo(unitID, cmdID, cmdParam1, cmdParam2)
+				end
+				-- reissue the command (just in case)
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, cmdID, CMD.OPT_SHIFT, cmdParam2, cmdParam3, cmdParam4, cmdParam5}, CMD.OPT_ALT)
 			end
 		end
-	elseif debug then
-		DebugEcho("No action needed for " .. unitID)
+	end
+
+	if debugMode and not (cmdID and cmdParam1 and (spValidFeatureID(cmdParam1) or spValidUnitID(cmdParam1))) then
+		Spring.Echo("No action needed for " .. unitID)
 	end
 end
 
-function gadget:GameFrame(f)
-	if f%delay == 0 then
-		for id, _ in pairs(IterableMap.Iterator(handled)) do
-			HandleUnit(id)
-		end
-	end
+function gadget:GameFrame(n)
+	IterableMap.ApplyFraction(handledUnits, UPDATE_RATE, n%UPDATE_RATE, HandleUnit)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if buildRangesSq[unitDefID] then
-		if debug then DebugEcho(unitID .. ": Added to check loop.") end
-		IterableMap.Add(handled, unitID, true)
+		if debugMode then 
+			Spring.Echo(unitID .. ": Added to check loop.")
+		end
+		IterableMap.Add(handledUnits, unitID)
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if buildRangesSq[unitDefID] then
-		IterableMap.Remove(handled, unitID)
+		IterableMap.Remove(handledUnits, unitID)
 	end
 end
 
 function gadget:UnitReverseBuilt(unitID, unitDefID)
 	if buildRangesSq[unitDefID] then
-		IterableMap.Remove(handled, unitID)
+		IterableMap.Remove(handledUnits, unitID)
+	end
+end
+
+function gadget:Initialize()
+	-- load active units
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+		if not inBuild then
+			gadget:UnitFinished(unitID, unitDefID)
+		end
 	end
 end
