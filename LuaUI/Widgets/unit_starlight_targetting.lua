@@ -16,19 +16,15 @@ local UPDATE_FRAME = 2
 local SEARCH_DIST = 2000
 
 local SlowAimStack = {}
-local GetUnitPosition = Spring.GetUnitPosition
-local GiveOrderToUnit = Spring.GiveOrderToUnit
-local GetUnitsInCylinder = Spring.GetUnitsInCylinder
-local GetUnitIsDead = Spring.GetUnitIsDead
-local GetMyTeamID = Spring.GetMyTeamID
-local GetUnitDefID = Spring.GetUnitDefID
-local GetTeamUnits = Spring.GetTeamUnits
-local GetUnitStates = Spring.GetUnitStates
-local Echo = Spring.Echo
-local GetSpecState = Spring.GetSpectatingState
-local CMD_STOP = CMD.STOP
-local CMD_ATTACK = CMD.ATTACK
-local CMD_UNIT_SET_TARGET = Spring.Utilities.CMD.UNIT_SET_TARGET
+local spGetUnitPosition    = Spring.GetUnitPosition
+local spGiveOrderToUnit    = Spring.GiveOrderToUnit
+local spGetMyTeamID        = Spring.GetMyTeamID
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetTeamUnits       = Spring.GetTeamUnits
+local spGetUnitStates      = Spring.GetUnitStates
+local spGetSpectatingState = Spring.GetSpectatingState
+local CMD_STOP             = CMD.STOP
+local CMD_ATTACK           = CMD.ATTACK
 
 local StarlightUnitDefID = UnitDefNames["mahlazer"].id
 local BerthaUnitDefID = UnitDefNames["staticheavyarty"].id
@@ -58,8 +54,8 @@ local function getTargetToClosest(targetPos, precise)
 	local shortestDist = math.max
 	local bestSol
 	for k, v in pairs(nearUnits) do
-		if not (Spring.IsUnitAllied(v)) and (not precise or Spring.IsUnitInLos(v) or immobiles[Spring.GetUnitDefID(v)]) then
-			local x,y,z = Spring.GetUnitPosition(v)
+		if not (Spring.IsUnitAllied(v)) and (not precise or Spring.IsUnitInLos(v) or immobiles[spGetUnitDefID(v)]) then
+			local x,y,z = spGetUnitPosition(v)
 			local dist = sqdist(targetPos, x, y, z)
 			if dist < shortestDist then
 				shortestDist = dist
@@ -73,7 +69,7 @@ end
 local function newSlowAimer(unitID, prcs)
 	SlowAimStack[unitID] = {
 		unitID = unitID,
-		pos = {GetUnitPosition(unitID)},
+		pos = {spGetUnitPosition(unitID)},
 		targetPos = nil,
 		currentTarget = nil,
 		precise = prcs
@@ -84,18 +80,18 @@ local function updateSlowAimer(unitID)
 	local currSlowAimer = SlowAimStack[unitID]
 	local targetType, isUserTarget, unitIDorPos = Spring.GetUnitWeaponTarget(unitID, 1)
 	if targetType == 1 then
-		local targetX, targetY, targetZ = Spring.GetUnitPosition(unitIDorPos)
+		local targetX, targetY, targetZ = spGetUnitPosition(unitIDorPos)
 		if currSlowAimer.currentTarget ~= unitIDorPos or not targetZ then
 			if not isUserTarget then
 				local newTarget = getTargetToClosest(currSlowAimer.targetPos, currSlowAimer.precise)
 				if newTarget then
-					local targetX, targetY, targetZ = Spring.GetUnitPosition(newTarget)
+					local targetX, targetY, targetZ = spGetUnitPosition(newTarget)
 					currSlowAimer.targetPos = {targetX, targetY, targetZ}
 					currSlowAimer.currentTarget = newTarget
-					--Echo("trying set target")
+					--Spring.Echo("trying set target")
 					--Spring.MarkerAddPoint(targetX, targetY, targetZ, newTarget)
-					Spring.GiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0)
-					--Echo("Set")
+					spGiveOrderToUnit(unitID, CMD_ATTACK, newTarget, 0)
+					--Spring.Echo("Set")
 					return
 				end
 			end
@@ -113,7 +109,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if isSlowAimer(unitDefID)
-		and unitTeam == GetMyTeamID() then
+		and unitTeam == spGetMyTeamID() then
 			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 end
@@ -121,7 +117,7 @@ end
 function widget:UnitDestroyed(unitID) 
 	if SlowAimStack[unitID] then
 		SlowAimStack[unitID]=nil
-		GiveOrderToUnit(unitID,CMD_STOP, {}, 0)
+		spGiveOrderToUnit(unitID,CMD_STOP, {}, 0)
 	end
 end
 
@@ -136,28 +132,26 @@ end
 
 --- COMMAND HANDLING
 
--- The rest of the code is there to disable the widget for spectators
-local function DisableForSpec()
-	if GetSpecState() then
-		widgetHandler:RemoveWidget(widget)
-	end
-end
-
-
 function widget:Initialize()
+	if spGetSpectatingState() then
+		widgetHandler:RemoveWidget(widget)
+		return
+	end
 	DisableForSpec()
-	Echo("Starlight targetting loaded")
-	local units = GetTeamUnits(Spring.GetMyTeamID())
-	for i=1, #units do
+	--Spring.Echo("Starlight targetting loaded")
+	local units = spGetTeamUnits(spGetMyTeamID())
+	for i = 1, #units do
 		local unitID = units[i]
-		local unitDefID = GetUnitDefID(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		if isSlowAimer(unitDefID) and not SlowAimStack[unitID] then
 			newSlowAimer(unitID, unitDefID == StarlightUnitDefID)
 		end
 	end
 end
 
-
-function widget:PlayerChanged (playerID)
-	DisableForSpec()
+function widget:PlayerChanged(playerID)
+	if spGetSpectatingState() then
+		widgetHandler:RemoveWidget(widget)
+		return
+	end
 end
