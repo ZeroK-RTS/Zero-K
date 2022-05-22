@@ -288,7 +288,7 @@ local external = {
     Move = MoveDodge,
 }
 
-local function CmdToggle(unitID, unitDefID, cmdID, cmdParams)
+local function CmdToggle(unitID, cmdID, cmdParams)
     local cmdDescID, cmdDesc
     if cmdID == CMD_IDLE_DODGE then
         cmdDesc = idleDodgeCmdDesc
@@ -308,10 +308,12 @@ local function CmdToggle(unitID, unitDefID, cmdID, cmdParams)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
+    if UnitDefs[unitDefID].isGroundUnit then
     spInsertUnitCmdDesc(unitID, idleDodgeCmdDesc)
     spInsertUnitCmdDesc(unitID, moveDodgeCmdDesc)
-    CmdToggle(unitID, unitDefID, CMD_IDLE_DODGE, {1})
-    CmdToggle(unitID, unitDefID, CMD_MOVE_DODGE, {1})
+        CmdToggle(unitID, CMD_IDLE_DODGE, {1})
+        CmdToggle(unitID, CMD_MOVE_DODGE, {1})
+    end
 end
 
 function gadget:UnitDestroyed(unitID)
@@ -323,7 +325,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_IDLE_DODGE and cmdID ~= CMD_MOVE_DODGE) then
 		return true
 	end
-    return CmdToggle(unitID, unitDefID, cmdID, cmdParams)
+    return CmdToggle(unitID, cmdID, cmdParams)
 end
 
 function gadget:ProjectileDestroyed(projID)
