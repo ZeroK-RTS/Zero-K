@@ -12,8 +12,8 @@ return { mahlazer = {
   buildPic                      = [[mahlazer.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[120 100 120]],
-  collisionVolumeType           = [[box]],
+  collisionVolumeScales         = [[150 200 150]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
