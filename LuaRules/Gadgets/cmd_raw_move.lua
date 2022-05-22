@@ -268,6 +268,14 @@ end
 ----------------------------------------------------------------------------------------------
 -- Dodge Move Handling
 
+local function AddProjectileDodge(unitID)
+	if unitID and dodgeMoveUnitByID[unitID] == nil then
+		dodgeMoveUnitCount = dodgeMoveUnitCount + 1
+		dodgeMoveUnit[dodgeMoveUnitCount] = unitID
+		dodgeMoveUnitByID[unitID] = dodgeMoveUnitCount
+	end
+end
+
 local function RemoveProjectileDodge(unitID)
 	if unitID and dodgeMoveUnitByID[unitID] then
 		local index = dodgeMoveUnitByID[unitID]
@@ -293,14 +301,6 @@ local function UnitProjectileDodge(unitID)
 		end
 	else
 		RemoveProjectileDodge(unitID)
-	end
-end
-
-local function AddProjectileDodge(unitID)
-	if unitID and dodgeMoveUnitByID[unitID] == nil then
-		dodgeMoveUnitCount = dodgeMoveUnitCount + 1
-		dodgeMoveUnit[dodgeMoveUnitCount] = unitID
-		dodgeMoveUnitByID[unitID] = dodgeMoveUnitCount
 	end
 end
 
@@ -521,9 +521,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
 	if cmdUsed and not cmdRemove and cmdParams[4] ~= -2 then
 		AddProjectileDodge(unitID)
-		if not cmdParams[4] or cmdParams[4] >= 0 then
-			UnitProjectileDodge(unitID)
-		end
 	end
 	return cmdUsed, cmdRemove
 end

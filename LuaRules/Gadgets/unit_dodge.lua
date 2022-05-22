@@ -22,18 +22,14 @@ local DODGE_HEIGHT = 50
 local QUERY_RADIUS = 300
 local SAFETY_RADIUS = 30
 local RAY_DISTANCE = 80
-local MAX_DISTANCE = 80000
+local MIN_DISTANCE = 80
 
 local abs = math.abs
 local max = math.max
-local min = math.min
-local cos = math.cos
 local sin = math.sin
-local acos = math.acos
 local sqrt = math.sqrt
 
 local vector = Spring.Utilities.Vector
-
 local spIsPosInLos = Spring.IsPosInLos
 local spValidUnitID = Spring.ValidUnitID
 local spGetGameFrame = Spring.GetGameFrame
@@ -47,20 +43,7 @@ local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-local spGetProjectileDefID = Spring.GetProjectileDefID
-local spGetProjectileGravity = Spring.GetProjectileGravity
 local spGetProjectilePosition = Spring.GetProjectilePosition
-local spGetProjectileVelocity = Spring.GetProjectileVelocity
-
-local markerX = 0
-local markerZ = 0
-
-local function PlaceMarker(x, z, msg)
-    Spring.MarkerErasePosition(markerX, 0, markerZ)
-    markerX = x
-    markerZ = z
-    Spring.MarkerAddPoint(markerX, 0, markerZ, msg)
-end
 
 local idleDodgeCmdDesc = {
 	id      = CMD_IDLE_DODGE,
@@ -176,6 +159,9 @@ local function BoidDodge(query, uPos, uDir, uRadius)
                 dodgeMag = max(dodgeMag, hitData.radius + uRadius + SAFETY_RADIUS + SAFETY_RADIUS - dodgeRadius)
             end
         end
+    end
+    if dodgeMag > 0 then
+        dodgeMag = max(dodgeMag, MIN_DISTANCE)
     end
     dodge = vector.Norm(dodgeMag, dodge)
     return dodge, dodgeMag
@@ -309,8 +295,8 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
     if UnitDefs[unitDefID].isGroundUnit then
-    spInsertUnitCmdDesc(unitID, idleDodgeCmdDesc)
-    spInsertUnitCmdDesc(unitID, moveDodgeCmdDesc)
+        spInsertUnitCmdDesc(unitID, idleDodgeCmdDesc)
+        spInsertUnitCmdDesc(unitID, moveDodgeCmdDesc)
         CmdToggle(unitID, CMD_IDLE_DODGE, {1})
         CmdToggle(unitID, CMD_MOVE_DODGE, {1})
     end
