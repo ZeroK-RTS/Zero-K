@@ -129,6 +129,9 @@ local function UpdateSlowAimer(unitID, slowAimData)
 				-- Issue attack command rather than set weapon target directly to communicate to player.
 				spGiveOrderToUnit(unitID, CMD_ATTACK, newTarget, CMD.OPT_INTERNAL)
 				if nextClosestTarget then
+					-- Queues two attack commands to avoid the jitter
+					-- that comes from waiting for a target to be acquired
+					-- so it shows up in GetUnitWeaponTarget.
 					spGiveOrderToUnit(unitID, CMD_ATTACK, nextClosestTarget, CMD.OPT_SHIFT + CMD.OPT_INTERNAL)
 					slowAimData.nextTarget = nextClosestTarget
 				end
