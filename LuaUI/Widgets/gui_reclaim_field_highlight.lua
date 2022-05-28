@@ -19,7 +19,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local flashStrength = 0.0
 local fontScaling = 25 / 40
-local fontSizeMin = 50
+local fontSizeMin = 70
 local fontSizeMax = 250
 
 local textParametersChanged = false
@@ -55,7 +55,7 @@ options = {
 		name = "Minimum font size",
 		type = 'number',
 		value = fontSizeMin,
-		min = 20, max = 100, step = 10,
+		min = 20, max = 150, step = 10,
 		desc = "The smallest font size to use for the smallest reclaim fields",
 		OnChange = function()
 			fontSizeMin = options.fontSizeMin.value
