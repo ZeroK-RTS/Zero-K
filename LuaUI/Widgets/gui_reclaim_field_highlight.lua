@@ -128,9 +128,13 @@ local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 
 local screenx, screeny
 
-local gaiaTeamId = spGetGaiaTeamID()
-local myAllyTeamID
 local Benchmark = false and VFS.Include("LuaRules/Gadgets/Include/Benchmark.lua")
+local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
+local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
+
+local gaiaTeamId = spGetGaiaTeamID()
+
+local myAllyTeamID
 local benchmark = Benchmark and Benchmark.new()
 
 local scanInterval = 1 * Game.gameSpeed
@@ -144,6 +148,26 @@ local minFeatureMetal = 8 --flea
 local drawEnabled = true
 
 local knownFeatures = {}
+
+--local reclaimColor = (1.0, 0.2, 1.0, 0.7);
+local reclaimColor = {1.0, 0.2, 1.0, 0.3}
+local reclaimEdgeColor = {1.0, 0.2, 1.0, 0.5}
+
+local E2M = 2 / 70 --solar ratio
+
+local drawFeatureConvexHullSolidList
+local drawFeatureConvexHullEdgeList
+local drawFeatureClusterTextList
+local checkFrequency = 30
+local cumDt = 0
+local minDim = 100
+
+local featureNeighborsMatrix = {}
+local featureConvexHulls = {}
+local featureClusters = {}
+
+local featuresUpdated = false
+local clusterMetalUpdated = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -182,7 +206,6 @@ end
 --------------------------------------------------------------------------------
 -- Feature Tracking
 
-local featureNeighborsMatrix = {}
 local function UpdateFeatureNeighborsMatrix(fID, added, posChanged, removed)
 	local fInfo = knownFeatures[fID]
 
@@ -211,13 +234,6 @@ local function UpdateFeatureNeighborsMatrix(fID, added, posChanged, removed)
 		UpdateFeatureNeighborsMatrix(fID, true, false, false) --add again
 	end
 end
-
-local featureClusters = {}
-
-local E2M = 2 / 70 --solar ratio
-
-local featuresUpdated = false
-local clusterMetalUpdated = false
 
 local function UpdateFeatures(gf)
 	if benchmark then
@@ -268,19 +284,19 @@ local function UpdateFeatures(gf)
 				knownFeatures[fID].drawAlt = ((fy > 0 and fy) or 0) + knownFeatures[fID].height + 10
 
 				UpdateFeatureNeighborsMatrix(fID, false, true, false)
-			featuresUpdated = true
+				featuresUpdated = true
 			end
 
 			if knownFeatures[fID].metal ~= metal then
-				--spEcho("knownFeatures[fID].metal ~= metal", metal)
+				--Spring.Echo("knownFeatures[fID].metal ~= metal", metal)
 				if knownFeatures[fID].clID then
-					--spEcho("knownFeatures[fID].clID")
+					--Spring.Echo("knownFeatures[fID].clID")
 					local thisCluster = featureClusters[ knownFeatures[fID].clID ]
 					thisCluster.metal = thisCluster.metal - knownFeatures[fID].metal
 					if metal >= minFeatureMetal then
 						thisCluster.metal = thisCluster.metal + metal
 						knownFeatures[fID].metal = metal
-						--spEcho("clusterMetalUpdated = true", thisCluster.metal)
+						--Spring.Echo("clusterMetalUpdated = true", thisCluster.metal)
 						clusterMetalUpdated = true
 					else
 						UpdateFeatureNeighborsMatrix(fID, false, false, true)
@@ -298,9 +314,8 @@ local function UpdateFeatures(gf)
 	end
 
 	for fID, fInfo in pairs(knownFeatures) do
-
 		if fInfo.isGaia and spValidFeatureID(fID) == false then
-			--spEcho("fInfo.isGaia and spValidFeatureID(fID) == false")
+			--Spring.Echo("fInfo.isGaia and spValidFeatureID(fID) == false")
 
 			UpdateFeatureNeighborsMatrix(fID, false, false, true)
 			fInfo = nil
@@ -311,7 +326,7 @@ local function UpdateFeatures(gf)
 		if fInfo and gf - fInfo.lastScanned >= scanForRemovalInterval then --long time unseen features, maybe they were relcaimed or destroyed?
 			local los = spIsPosInLos(fInfo.x, fInfo.y, fInfo.z, myAllyTeamID)
 			if los then --this place has no feature, it's been moved or reclaimed or destroyed
-				--spEcho("this place has no feature, it's been moved or reclaimed or destroyed")
+				--Spring.Echo("this place has no feature, it's been moved or reclaimed or destroyed")
 
 				UpdateFeatureNeighborsMatrix(fID, false, false, true)
 				fInfo = nil
@@ -331,17 +346,14 @@ local function UpdateFeatures(gf)
 	end
 end
 
-local Optics = VFS.Include("LuaRules/Gadgets/Include/Optics.lua")
-
 local function ClusterizeFeatures()
 	if benchmark then
 		benchmark:Enter("ClusterizeFeatures")
 	end
 	local pointsTable = {}
-
 	local unclusteredPoints  = {}
 
-	--spEcho("#knownFeatures", #knownFeatures)
+	--Spring.Echo("#knownFeatures", #knownFeatures)
 
 	for fID, fInfo in pairs(knownFeatures) do
 		pointsTable[#pointsTable + 1] = {
@@ -369,8 +381,7 @@ local function ClusterizeFeatures()
 		benchmark:Leave("opticsObject:Clusterize(minDistance)")
 	end
 
-	--spEcho("#featureClusters", #featureClusters)
-
+	--Spring.Echo("#featureClusters", #featureClusters)
 
 	for i = 1, #featureClusters do
 		local thisCluster = featureClusters[i]
@@ -420,17 +431,12 @@ local function ClusterizeFeatures()
 	end
 end
 
-local ConvexHull = VFS.Include("LuaRules/Gadgets/Include/ConvexHull.lua")
-
-local minDim = 100
-
-local featureConvexHulls = {}
 local function ClustersToConvexHull()
 	if benchmark then
 		benchmark:Enter("ClustersToConvexHull")
 	end
 	featureConvexHulls = {}
-	--spEcho("#featureClusters", #featureClusters)
+	--Spring.Echo("#featureClusters", #featureClusters)
 	for fc = 1, #featureClusters do
 		local clusterPoints = {}
 		if benchmark then
@@ -457,11 +463,11 @@ local function ClustersToConvexHull()
 		end
 		local convexHull
 		if #clusterPoints >= 3 then
-			--spEcho("#clusterPoints >= 3")
+			--Spring.Echo("#clusterPoints >= 3")
 			--convexHull = ConvexHull.JarvisMarch(clusterPoints, benchmark)
 			convexHull = ConvexHull.MonotoneChain(clusterPoints, benchmark) --twice faster
 		else
-			--spEcho("not #clusterPoints >= 3")
+			--Spring.Echo("not #clusterPoints >= 3")
 			local thisCluster = featureClusters[fc]
 
 			local xmin, xmax, zmin, zmax = thisCluster.xmin, thisCluster.xmax, thisCluster.zmin, thisCluster.zmax
@@ -527,22 +533,16 @@ local function ClustersToConvexHull()
 
 		featureConvexHulls[fc] = convexHull
 
---[[
-		for i = 1, #convexHull do
-			spMarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
-		end
-]]--
+
+		--for i = 1, #convexHull do
+		--	spMarkerAddPoint(convexHull[i].x, convexHull[i].y, convexHull[i].z, string.format("C%i(%i)", fc, i))
+		--end
+
 		if benchmark then
 			benchmark:Leave("ClustersToConvexHull")
 		end
 	end
 end
-
-
---local reclaimColor = (1.0, 0.2, 1.0, 0.7);
-local reclaimColor = {1.0, 0.2, 1.0, 0.3}
-local reclaimEdgeColor = {1.0, 0.2, 1.0, 0.5}
-
 
 local function ColorMul(scalar, actionColor)
 	return {scalar * actionColor[1], scalar * actionColor[2], scalar * actionColor[3], actionColor[4]}
@@ -552,6 +552,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
+Spring.Echo("Initialize")
 	UpdateTeamAndAllyTeamID()
 	screenx, screeny = widgetHandler:GetViewSizes()
 end
@@ -569,17 +570,13 @@ local function DrawHullVertices(hull)
 	end
 end
 
-local drawFeatureConvexHullSolidList
 local function DrawFeatureConvexHullSolid()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	for i = 1, #featureConvexHulls do
-
 		glBeginEnd(GL.TRIANGLE_FAN, DrawHullVertices, featureConvexHulls[i])
-
 	end
 end
 
-local drawFeatureConvexHullEdgeList
 local function DrawFeatureConvexHullEdge()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 	for i = 1, #featureConvexHulls do
@@ -588,7 +585,6 @@ local function DrawFeatureConvexHullEdge()
 	glPolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 end
 
-local drawFeatureClusterTextList
 local function DrawFeatureClusterText()
 	for i = 1, #featureConvexHulls do
 		glPushMatrix()
@@ -604,9 +600,8 @@ local function DrawFeatureClusterText()
 		fontSize = math.max(fontSize, fontSizeMin)
 		fontSize = math.min(fontSize, fontSizeMax)
 
-
 		local metal = featureClusters[i].metal
-		--spEcho(metal)
+		--Spring.Echo(metal)
 		local metalText
 		if metal < 1000 then
 			metalText = string.format("%.0f", metal) --exact number
@@ -626,14 +621,10 @@ local function DrawFeatureClusterText()
 		--glRect(-200, -200, 200, 200)
 		glText(metalText, 0, 0, fontSize, "cv")
 
-
 		glPopMatrix()
 	end
 end
 
-local checkFrequency = 30
-
-local cumDt = 0
 function widget:Update(dt)
 	cumDt = cumDt + dt
 	local cx, cy, cz = spGetCameraPosition()
@@ -650,8 +641,12 @@ function widget:Update(dt)
 
 	local frame = spGetGameFrame()
 	color = 0.5 + flashStrength * (frame % checkFrequency - checkFrequency)/(checkFrequency - 1)
-	if color < 0 then color = 0 end
-	if color > 1 then color = 1 end
+	if color < 0 then
+		color = 0
+	end
+	if color > 1 then
+		color = 1
+	end
 end
 
 function widget:GameFrame(frame)
@@ -663,21 +658,14 @@ function widget:GameFrame(frame)
 		benchmark:Enter("GameFrame UpdateFeatures")
 	end
 	UpdateFeatures(frame)
-	--spEcho("featuresUpdated", featuresUpdated)
-	if featuresUpdated and drawEnabled then
+	if featuresUpdated or (drawFeatureConvexHullSolidList == nil) then
 		ClusterizeFeatures()
 		ClustersToConvexHull()
-		--spEcho("LuaUI memsize before = ", collectgarbage("count"))
-		--collectgarbage("collect")
-		--spEcho("LuaUI memsize after = ", collectgarbage("count"))
-		--benchmark:PrintAllStat()
-	end
-
-	if featuresUpdated or drawFeatureConvexHullSolidList == nil then
+		
 		if benchmark then
 			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 		end
-		--spEcho("featuresUpdated")
+		--Spring.Echo("featuresUpdated")
 		if drawFeatureConvexHullSolidList then
 			glDeleteList(drawFeatureConvexHullSolidList)
 			drawFeatureConvexHullSolidList = nil
@@ -687,7 +675,6 @@ function widget:GameFrame(frame)
 			glDeleteList(drawFeatureConvexHullEdgeList)
 			drawFeatureConvexHullEdgeList = nil
 		end
-
 
 		drawFeatureConvexHullSolidList = glCreateList(DrawFeatureConvexHullSolid)
 		drawFeatureConvexHullEdgeList = glCreateList(DrawFeatureConvexHullEdge)
@@ -700,7 +687,7 @@ function widget:GameFrame(frame)
 		if benchmark then
 			benchmark:Enter("featuresUpdated or clusterMetalUpdated or drawFeatureClusterTextList == nil")
 		end
-		--spEcho("clusterMetalUpdated")
+		--Spring.Echo("clusterMetalUpdated")
 		if drawFeatureClusterTextList then
 			glDeleteList(drawFeatureClusterTextList)
 			drawFeatureClusterTextList = nil
@@ -743,14 +730,12 @@ function widget:DrawWorld()
 		glLineWidth(1.0)
 	end
 
-
 	if drawFeatureClusterTextList then
 		glCallList(drawFeatureClusterTextList)
 		--DrawFeatureClusterText()
 	end
 
 	glDepthTest(true)
-
 end
 
 function widget:Shutdown()
