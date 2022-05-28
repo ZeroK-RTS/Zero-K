@@ -19,7 +19,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local flashStrength = 0.0
 local fontScaling = 25 / 40
-local fontSizeMin = 40
+local fontSizeMin = 70
 local fontSizeMax = 250
 
 local textParametersChanged = false
@@ -146,6 +146,7 @@ local minPoints = 2
 local minFeatureMetal = 8 --flea
 
 local drawEnabled = true
+local BASE_FONT_SIZE = 192
 
 local knownFeatures = {}
 
@@ -168,6 +169,8 @@ local featureClusters = {}
 
 local featuresUpdated = false
 local clusterMetalUpdated = false
+
+local font = gl.LoadFont("FreeSansBold.otf", BASE_FONT_SIZE, 0, 0)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -610,6 +613,7 @@ local function DrawFeatureClusterText()
 		else
 			metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
 		end
+		gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
 
 		local x100  = 100  / (100  + metal)
 		local x1000 = 1000 / (1000 + metal)
@@ -617,9 +621,13 @@ local function DrawFeatureClusterText()
 		local g = x1000 - x100
 		local b = x100
 
-		glColor(r, g, b, 1.0)
 		--glRect(-200, -200, 200, 200)
-		glText(metalText, 0, 0, fontSize, "cv")
+		--glColor(r, g, b, 1.0)
+		--glText(metalText, 0, 0, fontSize, "cv")
+		font:Begin()
+			font:SetTextColor(r, g, b, 1.0)
+			font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
+		font:End()
 
 		glPopMatrix()
 	end
