@@ -71,7 +71,7 @@ function UnitCloaker:BeginDraw()
 	--gl.Texture(1,'bitmaps/clouddetail.bmp')
 	--gl.Texture(1,'bitmaps/GPL/Lups/perlin_noise.jpg')
 	gl.Texture(2,'bitmaps/GPL/Lups/mynoise2.png')
-	gl.Texture(3,'$specular')
+	--gl.Texture(3,'$specular')
 	gl.Texture(4,'$reflection')
 
 	gl.MatrixMode(GL.PROJECTION)
