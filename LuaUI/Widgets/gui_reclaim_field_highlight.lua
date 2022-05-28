@@ -19,7 +19,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local flashStrength = 0.0
 local fontScaling = 25 / 40
-local fontSizeMin = 70
+local fontSizeMin = 50
 local fontSizeMax = 250
 
 local textParametersChanged = false
