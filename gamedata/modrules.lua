@@ -129,6 +129,7 @@ local modrules  = {
 	pathFinderUpdateRate = 0.0000001,
 	pathFinderRawDistMult = 100000,
 	allowTake = false,
+	enableSmoothMesh = false,
   },
 }
 --------------------------------------------------------------------------------
