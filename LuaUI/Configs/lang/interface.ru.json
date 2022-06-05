@@ -80,6 +80,8 @@
 	"cheatsheet_lab_top" : "Панель читов",
 	"cheatsheet_chb_godmode" : "Глобальное управление зрителями",
 	"cheatsheet_chb_godmode_desc" : "Позволяет зрителям управлять всеми командами",
+	"cheatsheet_chb_allowfps" : "Позволяет включить FPS режим без читов",
+	"cheatsheet_chb_allowfps_desc" : "Позволяет переключиться в режим от первого лица без использования читов. Выберите юнит и нажмите Alt+P чтобы включить FPS режим.",
 	"cheatsheet_chb_nocost" : "Быстрое строительство",
 	"cheatsheet_chb_nocost_desc" : "Строительство становится бесплатным и завершается практически мгновенно.",
 	"cheatsheet_chb_globallos" : "Полный обзор",
