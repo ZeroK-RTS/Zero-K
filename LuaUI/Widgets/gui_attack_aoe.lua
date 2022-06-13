@@ -364,47 +364,49 @@ local function UpdateSelection(sel)
 	for i = 1, #sel do
 		local unitID = sel[i]
 		local unitDefID = spGetUnitDefID(unitID)
-		seenCount[unitDefID] = (seenCount[unitDefID] or 0) + 1
-	
-		if unitDefID == sumoDefID then
-			sumoSelected = true
-		end
+		if unitDefID then
+			seenCount[unitDefID] = (seenCount[unitDefID] or 0) + 1
 		
-		if unitDefID == detrimentDefID then
-			detrimentSelected = true
-			detrimentUnitID = unitID
-		end
-		
-		local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
-		
-		if dynamicComm and not unitHasBeenSetup[unitID] then
-			unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
-			unitHasBeenSetup[unitID] = true
-		end
-		
-		if (dgunInfo[unitDefID]) then
-			dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
-			dgunUnitID = unitID
-		end
-
-		if (aoeDefInfo[unitDefID]) then
-			local currCost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * seenCount[unitDefID]
-			if (currCost > maxCost) then
-				maxCost = currCost
-				aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
-				aoeUnitID = unitID
+			if unitDefID == sumoDefID then
+				sumoSelected = true
 			end
-		end
+			
+			if unitDefID == detrimentDefID then
+				detrimentSelected = true
+				detrimentUnitID = unitID
+			end
+			
+			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
+			
+			if dynamicComm and not unitHasBeenSetup[unitID] then
+				unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
+				unitHasBeenSetup[unitID] = true
+			end
+			
+			if (dgunInfo[unitDefID]) then
+				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				dgunUnitID = unitID
+			end
 
-		local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
-		if extraDrawParam then
-			extraDrawRange = extraDrawParam
-		else
-			extraDrawRange = extraDrawRangeDefInfo[unitDefID]
-		end
-		
-		if extraDrawRange then
-			selUnitID = unitID
+			if (aoeDefInfo[unitDefID]) then
+				local currCost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * seenCount[unitDefID]
+				if (currCost > maxCost) then
+					maxCost = currCost
+					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+					aoeUnitID = unitID
+				end
+			end
+
+			local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
+			if extraDrawParam then
+				extraDrawRange = extraDrawParam
+			else
+				extraDrawRange = extraDrawRangeDefInfo[unitDefID]
+			end
+			
+			if extraDrawRange then
+				selUnitID = unitID
+			end
 		end
 	end
 end

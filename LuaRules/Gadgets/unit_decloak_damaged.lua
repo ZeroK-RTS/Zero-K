@@ -58,7 +58,7 @@ for i = 1, #WeaponDefs do
 	end
 end
 
-local DEFAULT_DECLOAK_TIME = 180
+local DEFAULT_DECLOAK_TIME = 240
 local PERSONAL_DECLOAK_TIME = 90
 
 local DEFAULT_PROXIMITY_DECLOAK_TIME = 90

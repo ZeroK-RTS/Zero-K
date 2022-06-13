@@ -97,8 +97,8 @@ function script.AimWeapon(num, heading, pitch)
 
 	GG.DontFireRadar_CheckAim(unitID)
 	
-	Turn(turret, y_axis, heading, math.rad(70))
-	Turn(barrel1, x_axis, -pitch, math.rad(60))
+	Turn(turret, y_axis, heading, math.rad(60))
+	Turn(barrel1, x_axis, -pitch, math.rad(20))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel1, x_axis)
 	StartThread(RestoreAfterDelay)
