@@ -1101,16 +1101,18 @@ local function printAbilities(ud, unitID)
 	if cp.boost_speed_mult then
 		cells[#cells+1] = 'Speed boost'
 		cells[#cells+1] = ''
-		cells[#cells+1] = ' - Speed: '
+		cells[#cells+1] = ' - Boost speed: '
 		cells[#cells+1] = math.floor((tonumber(cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
 		if cp.boost_reload_speed_mult then
-			cells[#cells+1] = ' - Cooldown speed: '
+			cells[#cells+1] = ' - Recharge speed: '
 			cells[#cells+1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1")*100) + 0.5) .. "%"
 		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30, 1) .. 's'
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30, 1) .. 's'
+		cells[#cells+1] = ' - Distance: '
+		cells[#cells+1] = numformat(tonumber(cp.boost_distance), 1) .. ' elmos (approx.)'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

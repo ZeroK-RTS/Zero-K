@@ -20,11 +20,12 @@ return { hoverriot = {
   customParams        = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
-    --specialreloadtime = [[1350]],
-    --specialreload_userate = [[1]],
-    --boost_speed_mult = 5,
-    --boost_reload_speed_mult = 0.8,
-    --boost_duration = 20, -- frames
+    specialreloadtime = [[1200]],
+    specialreload_userate = [[1]],
+    boost_speed_mult = 4,
+    boost_reload_speed_mult = 0.9,
+    boost_duration = 30, -- frames
+    boost_distance = 260, -- empirical (distance over normal mace at boost end, plus 30*speed), for UI
     turnatfullspeed_hover = [[1]],
 
     outline_x = 110,
@@ -36,7 +37,7 @@ return { hoverriot = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[hoverriot]],
-  maxDamage           = 1400,
+  maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.05,
   movementClass       = [[HOVER4]],
@@ -56,8 +57,8 @@ return { hoverriot = {
 
   },
 
-  sightDistance       = 407,
-  sonarDistance       = 407,
+  sightDistance       = 416,
+  sonarDistance       = 416,
   turninplace         = 0,
   turnRate            = 600,
   workerTime          = 0,
@@ -104,7 +105,7 @@ return { hoverriot = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 345,
+      range                   = 333,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn10]],

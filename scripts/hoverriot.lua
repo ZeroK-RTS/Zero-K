@@ -25,7 +25,7 @@ local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local SPEEDUP_RELOAD_FACTOR = tonumber (UnitDef.customParams.boost_reload_speed_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
 local SPEEDUP_RELOAD_PER_FRAME = 1 / (tonumber(UnitDef.customParams.specialreloadtime) or 1)
-local TURN_SPEED_FACTOR = 0.5 -- So it doesn't rotate right around in a silly looking way.
+local TURN_SPEED_FACTOR = 0.7 -- So it doesn't rotate right around in a silly looking way.
 local MOVE_THRESHOLD = 8
 
 local END_ANIM_PAD = 25 * SPEEDUP_RELOAD_PER_FRAME
