@@ -7,6 +7,7 @@ local unitlistNames = {
 	cloaksnipe = MARK_EACH,
 	cloakheavyraid = MARK_EACH,
 	cloakjammer = MARK_EACH,
+	spiderantiheavy = MARK_EACH,
 
 	energyheavygeo = DEFAULT,
 	energyfusion = DEFAULT,
