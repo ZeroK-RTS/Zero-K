@@ -176,3 +176,11 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 		return r1, r2, r3, r4, r5, r6, r8, r7
 	end
 end
+
+if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
+	local spGetUnitExperience = Spring.GetUnitExperience
+	local spSetUnitExperience = Spring.SetUnitExperience
+	Spring.AddUnitExperience = function (unitID, deltaXP)
+		spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
+	end
+end
