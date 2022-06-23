@@ -19,7 +19,8 @@ end
 ---@return table<UnitDefId, boolean>
 local function CreateUnitDefIdSet(names)
 	local result = {}
-	for _, name in ipairs(names) do
+	for i = 1, #names do
+		local name = names[i]
 		result[UnitDefNames[name].id] = true
 	end
 	return result
