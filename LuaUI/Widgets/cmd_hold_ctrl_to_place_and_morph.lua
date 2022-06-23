@@ -1,8 +1,6 @@
-local widgetName = "Hold Ctrl during placement to morph";
-
 function widget:GetInfo()
 	return {
-		name      = widgetName,
+		name      = "Hold Ctrl during placement to morph",
 		version   = '1.0',
 		desc      = "Hold the Ctrl key while placing a Cornea, Aegis, Radar Tower or Geothermal Reactor to issue a morph order to the nanoframe when it's created (which will make it start morphing once finished).",
 		author    = "dunno",
