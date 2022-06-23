@@ -19,7 +19,7 @@ return { raveparty = {
     modelradius    = [[35]],
     bait_level_default = 0,
     draw_blueprint_facing = 1,
-    --want_proximity_targetting = 1, --hotfix 31/05/22
+    want_proximity_targetting = 1, --hotfix 31/05/22
     speed_bar = 1,
 
     keeptooltip    = [[any string I want]],

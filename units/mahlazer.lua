@@ -22,7 +22,7 @@ return { mahlazer = {
     midposoffset   = [[0 0 0]],
     select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
     bait_level_default = 0,
-	-- want_precise_proximity_targetting = 1, --hotfix 31/05/22
+	want_precise_proximity_targetting = 1, --hotfix 31/05/22
     draw_blueprint_facing = 1,
 
     keeptooltip    = [[any string I want]],
