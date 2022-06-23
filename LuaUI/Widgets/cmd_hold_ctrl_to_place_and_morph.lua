@@ -116,8 +116,5 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
-	if buildingsToMorphByBuilder[unitID] then
-		-- Spring.Echo('Clearing buildingsToMorph for builder '..unitID..' because it is idle.')
-		buildingsToMorphByBuilder[unitID] = nil
-	end
+	buildingsToMorphByBuilder[unitID] = nil
 end
