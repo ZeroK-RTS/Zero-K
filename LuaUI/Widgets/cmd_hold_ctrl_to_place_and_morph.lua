@@ -40,6 +40,7 @@ local buildingsToMorphByBuilder = {}
 function widget:Initialize()
 	myTeamID = Spring.GetMyTeamID()
 end
+widget.PlayerChanged = widget.Initialize
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOpts, cmdTag)
 	if cmdId > 0 
