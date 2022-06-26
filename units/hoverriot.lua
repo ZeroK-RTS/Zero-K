@@ -57,8 +57,8 @@ return { hoverriot = {
 
   },
 
-  sightDistance       = 407,
-  sonarDistance       = 407,
+  sightDistance       = 431,
+  sonarDistance       = 431,
   turninplace         = 0,
   turnRate            = 600,
   workerTime          = 0,

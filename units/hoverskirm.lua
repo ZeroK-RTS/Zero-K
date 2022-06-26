@@ -54,7 +54,7 @@ return { hoverskirm = {
   sightDistance       = 484,
   sonarDistance       = 484,
   turninplace         = 0,
-  turnRate            = 536,
+  turnRate            = 563,
   workerTime          = 0,
   
   weapons             = {
