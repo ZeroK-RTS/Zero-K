@@ -76,16 +76,18 @@ local function GetTargetToClosest(unitID, slowAimer)
 			if (losState % 2 == 1) or ((not precise) and losState % 4 == 2) or (immobileDefs[spGetUnitDefID(targetID)] and losState >= 8) then
 				if (not GG.baitPrevention_ChaffShootingBlock) or not GG.baitPrevention_ChaffShootingBlock(unitID, targetID) then
 					local x, y, z = CallAsTeam(aimerTeam, spGetUnitPosition, targetID)
-					local distSq = DistanceSq(tX, tY, tZ, x, y, z)
-					if (not shortestDistSq) or distSq < shortestDistSq then
-						nextBestSol = bestSol
-						nextShortestDistSq = shortestDistSq
-						
-						bestSol = targetID
-						shortestDistSq = distSq
-					elseif (not nextShortestDistSq) or distSq < nextShortestDistSq then
-						nextBestSol = targetID
-						nextShortestDistSq = distSq
+					if x and y and z then -- Fixes #4704, still don't know why it happens
+						local distSq = DistanceSq(tX, tY, tZ, x, y, z)
+						if (not shortestDistSq) or distSq < shortestDistSq then
+							nextBestSol = bestSol
+							nextShortestDistSq = shortestDistSq
+							
+							bestSol = targetID
+							shortestDistSq = distSq
+						elseif (not nextShortestDistSq) or distSq < nextShortestDistSq then
+							nextBestSol = targetID
+							nextShortestDistSq = distSq
+						end
 					end
 				end
 			end
