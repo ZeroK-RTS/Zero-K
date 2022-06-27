@@ -177,6 +177,18 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 	end
 end
 
+if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
+	Spring.ForceTesselationUpdate = function ()
+		--[[ This is just here so gadget code can avoid
+		     a nil check. The workaround was to apply
+		     ground detail changes to force an update,
+		     but that requires a timed delay (since else
+		     the change isn't noticed) which I am not
+		     going to reimplement here. ]]
+		return false
+	end
+end
+
 if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
 	local spGetUnitExperience = Spring.GetUnitExperience
 	local spSetUnitExperience = Spring.SetUnitExperience
