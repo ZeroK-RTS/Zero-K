@@ -248,8 +248,12 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	if highlightUnitVBOTable.VAO then highlightUnitVBOTable.VAO:Delete() end
-	if highlightunitShader then highlightunitShader:Finalize() end
+	if highlightUnitVBOTable and highlightUnitVBOTable.VAO then
+		highlightUnitVBOTable.VAO:Delete()
+	end
+	if highlightunitShader then
+		highlightunitShader:Finalize()
+	end
 
 	WG['HighlightUnitGL4'] = nil
 	WG['StopHighlightUnitGL4'] = nil
