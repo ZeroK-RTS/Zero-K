@@ -18,7 +18,7 @@ return { hoverdepthcharge = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    bait_level_default = 1,
+    bait_level_default = 0,
     modelradius    = [[25]],
     turnatfullspeed_hover = [[1]],
     okp_damage = 440,
@@ -94,7 +94,7 @@ return { hoverdepthcharge = {
         default = 520.1,
       },
 
-      edgeEffectiveness       = 0.4,
+      edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
       flightTime              = 2.3,
@@ -109,7 +109,7 @@ return { hoverdepthcharge = {
       noSelfDamage            = true,
       numbounce               = 3,
       range                   = 280,
-      reloadtime              = 3.2,
+      reloadtime              = 3.1,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
@@ -142,7 +142,7 @@ return { hoverdepthcharge = {
         default = 520.1,
       },
 
-      edgeEffectiveness       = 0.5,
+      edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
       flightTime              = 4,
@@ -156,7 +156,7 @@ return { hoverdepthcharge = {
       noSelfDamage            = true,
       numbounce               = 1,
       range                   = 280,
-      reloadtime              = 3.2,
+      reloadtime              = 3.1,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
