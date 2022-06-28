@@ -4,7 +4,7 @@ return { cloakaa = {
   description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 1.5,
   brakeRate              = 1.92,
-  buildCostMetal         = 150,
+  buildCostMetal         = 140,
   buildPic               = [[cloakaa.png]],
   canGuard               = true,
   canMove                = true,
@@ -90,8 +90,8 @@ return { cloakaa = {
       },
 
       damage                  = {
-        default = 1.94,
-        planes  = 19.4,
+        default = 2,
+        planes  = 20.001,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -101,7 +101,7 @@ return { cloakaa = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      range                   = 700,
+      range                   = 720,
       reloadtime              = 0.3,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
