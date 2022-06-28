@@ -50,6 +50,7 @@ local cmdPosDef = {
 	[CMD.LOAD_UNITS]    = {pos = 7, priority = 7},
 	[CMD.UNLOAD_UNITS]  = {pos = 7, priority = 8},
 	[CMD_RECALL_DRONES] = {pos = 7, priority = 10},
+	[CMD_GREYGOO]       = {pos = 7, priority = 11},
 	
 	[CMD_AREA_TERRA_MEX]= {pos = 13, priority = 1},
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {pos = 13, priority = 2},

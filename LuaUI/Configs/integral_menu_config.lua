@@ -75,7 +75,7 @@ local commandDisplayConfig = {
 	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
 
 	[CMD_AREA_GUARD] = { texture = imageDir .. 'Bold/guard.png', tooltip = "Guard: Protect the target and assist its production."},
-
+	
 	[CMD_AREA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
 	[CMD_AREA_TERRA_MEX] = {texture = imageDir .. 'Bold/mex.png'},
 
@@ -100,7 +100,7 @@ local commandDisplayConfig = {
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
-
+	[CMD_GREYGOO] = {texture = imageDir .. 'states/goo_on.png', tooltip = "Reclaim (Grey Goo): Consumes wreck(s) in an area (or a single wreck)."},
 	-- states
 	[CMD_WANT_ONOFF] = {
 		texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'},
