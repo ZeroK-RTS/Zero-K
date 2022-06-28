@@ -1,5 +1,5 @@
 local normal = 2.0
-local super = 7.0
+local super = 10.0
 
 return {
 	spots = {
