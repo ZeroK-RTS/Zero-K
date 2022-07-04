@@ -329,7 +329,7 @@ function comma_value(amount, displayPlusMinus)
 	local formatted
 
 	-- amount is a string when ToSI is used before calling this function
-	if type(amount) == "number" then
+	if amount and type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else
 			if (amount < 2 and (amount * 100)%100 ~=0) then
 				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
@@ -342,8 +342,10 @@ function comma_value(amount, displayPlusMinus)
 				else formatted = strFormat("%d", amount) end
 			end
 		end
-	else
+	elseif amount then
 		formatted = amount .. ""
+	else
+		formatted = "Missing Data"
 	end
 
 	return formatted
@@ -1111,8 +1113,10 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30, 1) .. 's'
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30, 1) .. 's'
-		cells[#cells+1] = ' - Distance: '
-		cells[#cells+1] = numformat(tonumber(cp.boost_distance), 1) .. ' elmos (approx.)'
+		if cp.boost_distance then
+			cells[#cells+1] = ' - Distance: '
+			cells[#cells+1] = numformat(tonumber(cp.boost_distance), 1) .. ' elmos (approx.)'
+		end
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
