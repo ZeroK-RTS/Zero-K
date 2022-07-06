@@ -29,7 +29,7 @@ return { gunshiptrans = {
     midposoffset      = [[0 0 0]],
     modelradius       = [[15]],
     transport_speed_light   = [[0.7]],
-    transport_speed_medium  = [[0.5]],
+    transport_speed_medium  = [[0.4]],
     islighttransport  = 1, -- Actually maybe this needs to be kept as is, how does Circuit handle it?
   },
 
