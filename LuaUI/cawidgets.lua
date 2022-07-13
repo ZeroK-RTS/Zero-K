@@ -878,12 +878,11 @@ local function SafeWrapFuncGL(func, funcName)
 	return function(w, ...)
 
 		glPushAttrib(GL.ALL_ATTRIB_BITS)
-		local r = { pcall(func, w, ...) }
+		local r1, r2, r3 = pcall(func, w, ...)
 		glPopAttrib()
 
-		if (r[1]) then
-			table.remove(r, 1)
-			return unpack(r)
+		if r1 then
+			return r2, r3
 		else
 			if (funcName ~= 'Shutdown') then
 				widgetHandler:RemoveWidget(w)
