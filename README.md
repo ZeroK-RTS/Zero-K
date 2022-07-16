@@ -1,16 +1,38 @@
-Zero-K
-======
- 
-Open source RTS game with physical projectiles, smart units and powerful UI, running on the Spring engine.
 
-This repository contains only game module files, without any associated infrastructure code, tools, or artwork sources.
-	
-Seek those in other repositories.
+# Zero-K   [![Badge License]][License]
 
-Usage
-=====
+*RTS game with physical projectiles, smart units* <br>
+*and a powerful UI, running on the **[Spring Engine]**.*
 
-These are the sources. To play the game, download the lobby from http://zero-k.info/Wiki/Download
+<br>
 
-To learn how to import the content directly to the engine and what is what, consult the engine wiki: https://springrts.com/wiki/Gamedev:Structure .
+## Repository
 
+This repository contains only the game module files, <br>
+without any associated infrastructure code, tools, or <br>
+artwork sources, seek those in the other repositories.
+
+<br>
+<br>
+
+## Usage
+
+To play the game, you need to **[Download]** the lobby.
+
+[*» Learn how to import the content directly into the engine.*][Importing]
+
+<br>
+
+
+<!----------------------------------------------------------------------------->
+
+[Spring Engine]: https://springrts.com/
+[Importing]: https://springrts.com/wiki/Gamedev:Structure
+[Download]: http://zero-k.info/Wiki/Download
+
+[License]: LICENSE
+
+
+<!---------------------------------[ Badges ]---------------------------------->
+
+[Badge License]: https://img.shields.io/badge/License-GPL_2-blue.svg?style=for-the-badge
