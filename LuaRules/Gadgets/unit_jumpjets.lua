@@ -553,7 +553,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false
 	end
 
-	if Spring.IsUnitStunned(unitID) then
+	if Spring.GetUnitIsStunned(unitID) then
 		-- these normally don't receive CommandFallback,
 		-- but can be reached via CMD.INSERT (engine bug?)
 		return true, false
