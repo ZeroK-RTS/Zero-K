@@ -427,7 +427,7 @@ function popElementInstance(iT, instanceID, noUpload)
 								s = s .. " " .. tostring(zombie)
 								Spring.Echo("ZOMBIE AT", zombie, Spring.GetUnitPosition(zombie))
 								--Spring.SendCommands({"pause 1"})
-								Spring.Debug.TraceFullEcho()
+								Spring.Utilities.TraceFullEcho()
 							end 
 							Spring.Echo(s)
 							iT.zombies = {}
