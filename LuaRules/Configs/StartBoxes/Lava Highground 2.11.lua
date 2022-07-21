@@ -211,74 +211,82 @@ if sputGametype.isFFA() then
 end
 
 
-boxes[0] = {startpoints = {}, boxes = {}, nameLong = "Magma Fanatics", nameShort = "Magma"}
-boxes[1] = {startpoints = {}, boxes = {}, nameLong = "Lava Lovers", nameShort = "Lava"}
+boxes[0] = {startpoints = {}, boxes = {}, nameLong = "", nameShort = ""}
+boxes[1] = {startpoints = {}, boxes = {}, nameLong = "", nameShort = ""}
 
 if (sputGametype.isBigTeams() or sputGametype.isCompStomp()) then -- pick two. team vs team.
 	local r = math.random(1, 6)
-	if r == 1 then
-		boxes[0].startpoints = {start1, start2}
-		boxes[0].boxes = {box1, box2}
-		boxes[1].startpoints = {start3, start4}
-		boxes[1].boxes = {box3, box4}
-	elseif r == 2 then
+	if math.random(1, 10) >= 6 then -- NvS
 		boxes[0].startpoints = {start1, start3}
 		boxes[0].boxes = {box1, box3}
+		boxes[0].nameLong = "North"
+		boxes[0].nameShort = "N"
 		boxes[1].startpoints = {start2, start4}
 		boxes[1].boxes = {box2, box4}
-	elseif r == 3 then
+		boxes[1].nameLong = "South"
+		boxes[1].nameShort = "S"
+	else -- WvE
 		boxes[0].startpoints = {start1, start4}
 		boxes[0].boxes = {box1, box4}
 		boxes[1].startpoints = {start2, start3}
 		boxes[1].boxes = {box2, box3}
-	elseif r == 4 then
-		boxes[0].startpoints = {start2, start3}
-		boxes[0].boxes = {box2, box3}
-		boxes[1].startpoints = {start1, start4}
-		boxes[1].boxes = {box1, box4}
-	elseif r == 5 then
-		boxes[0].startpoints = {start2, start4}
-		boxes[0].boxes = {box2, box4}
-		boxes[1].startpoints = {start1, start3}
-		boxes[1].boxes = {box1, box3}
-	else
-		boxes[0].startpoints = {start3, start4}
-		boxes[0].boxes = {box3, box4}
-		boxes[1].startpoints = {start1, start2}
-		boxes[1].boxes = {box1, box2}
 	end
 else -- pick 1
 	r = math.random(1, 6)
 	if r == 1 then -- NE vs SW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
+		boxes[0].nameLong = "Northeast"
+		boxes[0].nameShort = "NE"
 		boxes[1].startpoints = {start2}
 		boxes[1].boxes = {box2}
+		boxes[1].nameLong = "Southwest"
+		boxes[1].nameShort = "SW"
 	elseif r == 2 then -- SE vs SW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
+		boxes[0].nameLong = "Northeast"
+		boxes[0].nameShort = "NE"
 		boxes[1].startpoints = {start3}
 		boxes[1].boxes = {box3}
+		boxes[1].nameLong = "Southeast"
+		boxes[1].nameLong = "SE"
 	elseif r == 3 then -- NW vs NE
 		boxes[0].startpoints = {start4}
 		boxes[0].boxes = {box4}
+		boxes[0].nameLong = "Northwest"
+		boxes[0].nameShort = "NW"
 		boxes[1].startpoints = {start2}
 		boxes[1].boxes = {box2}
-	elseif r == 4 then -- NW vs SE -- fine.
+		boxes[1].nameLong = "Northeast"
+		boxes[1].nameLong = "NE"
+	elseif r == 4 then -- NW vs SE
 		boxes[0].startpoints = {start4}
 		boxes[0].boxes = {box4}
+		boxes[0].nameLong = "Northwest"
+		boxes[0].nameShort = "NW"
 		boxes[1].startpoints = {start3}
 		boxes[1].boxes = {box3}
-	elseif r == 5 then -- NvS -- fine
+		boxes[1].nameLong = "Southeast"
+		boxes[1].nameLong = "SE"
+	elseif r == 5 then -- NE vs NW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
+		boxes[0].nameLong = "Northeast"
+		boxes[0].nameShort = "NE"
 		boxes[1].startpoints = {start4}
 		boxes[1].boxes = {box4}
-	else -- NvS variant 2
+		boxes[1].nameLong = "Northwest"
+		boxes[1].nameShort = "NW"
+	else -- SE vs SW
 		boxes[0].startpoints = {start3}
 		boxes[0].boxes = {box3}
+		boxes[0].nameLong = "Southeast"
+		boxes[0].nameLong = "SE"
 		boxes[1].startpoints = {start2}
 		boxes[1].boxes = {box2}
+		boxes[1].nameLong = "Southwest"
+		boxes[1].nameShort = "SW"
 	end
 end
 
