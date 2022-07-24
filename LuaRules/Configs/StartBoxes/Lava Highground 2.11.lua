@@ -228,8 +228,12 @@ if (sputGametype.isBigTeams() or sputGametype.isCompStomp()) then -- pick two. t
 	else -- WvE
 		boxes[0].startpoints = {start1, start4}
 		boxes[0].boxes = {box1, box4}
+		boxes[0].nameLong = "West"
+		boxes[0].nameShort = "W"
 		boxes[1].startpoints = {start2, start3}
 		boxes[1].boxes = {box2, box3}
+		boxes[1].nameLong = "East"
+		boxes[1.nameShort = "E"
 	end
 else -- pick 1
 	r = math.random(1, 6)
