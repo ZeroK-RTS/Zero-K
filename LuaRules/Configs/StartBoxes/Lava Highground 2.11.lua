@@ -219,12 +219,12 @@ if (sputGametype.isBigTeams() or sputGametype.isCompStomp()) then -- pick two. t
 	if math.random(1, 10) >= 6 then -- NvS
 		boxes[0].startpoints = {start1, start3}
 		boxes[0].boxes = {box1, box3}
-		boxes[0].nameLong = "North"
-		boxes[0].nameShort = "N"
+		boxes[0].nameLong = "South"
+		boxes[0].nameShort = "S"
 		boxes[1].startpoints = {start2, start4}
 		boxes[1].boxes = {box2, box4}
-		boxes[1].nameLong = "South"
-		boxes[1].nameShort = "S"
+		boxes[1].nameLong = "North"
+		boxes[1].nameShort = "N"
 	else -- WvE
 		boxes[0].startpoints = {start1, start4}
 		boxes[0].boxes = {box1, box4}
