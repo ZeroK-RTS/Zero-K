@@ -20,6 +20,7 @@ return { tankheavyassault = {
     outline_x = 110,
     outline_y = 110,
     outline_yoff = 13.5,
+	inch_forwards_for_cannon_range = true,
   },
 
   explodeAs           = [[BIG_UNIT]],
