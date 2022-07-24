@@ -236,17 +236,17 @@ else -- pick 1
 	if r == 1 then -- NE vs SW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Northeast"
-		boxes[0].nameShort = "NE"
+		boxes[0].nameLong = "Southwest"
+		boxes[0].nameShort = "SW"
 		boxes[1].startpoints = {start2}
 		boxes[1].boxes = {box2}
-		boxes[1].nameLong = "Southwest"
-		boxes[1].nameShort = "SW"
+		boxes[1].nameLong = "Northeast"
+		boxes[1].nameShort = "NE"
 	elseif r == 2 then -- SE vs SW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Northeast"
-		boxes[0].nameShort = "NE"
+		boxes[0].nameLong = "Southwest"
+		boxes[0].nameShort = "SW"
 		boxes[1].startpoints = {start3}
 		boxes[1].boxes = {box3}
 		boxes[1].nameLong = "Southeast"
@@ -269,24 +269,24 @@ else -- pick 1
 		boxes[1].boxes = {box3}
 		boxes[1].nameLong = "Southeast"
 		boxes[1].nameLong = "SE"
-	elseif r == 5 then -- NE vs NW
+	elseif r == 5 then -- SW vs NW
 		boxes[0].startpoints = {start1}
 		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Northeast"
-		boxes[0].nameShort = "NE"
+		boxes[0].nameLong = "Southwest"
+		boxes[0].nameShort = "SW"
 		boxes[1].startpoints = {start4}
 		boxes[1].boxes = {box4}
 		boxes[1].nameLong = "Northwest"
 		boxes[1].nameShort = "NW"
-	else -- SE vs SW
+	else -- NE vs SE
 		boxes[0].startpoints = {start3}
 		boxes[0].boxes = {box3}
 		boxes[0].nameLong = "Southeast"
 		boxes[0].nameLong = "SE"
 		boxes[1].startpoints = {start2}
 		boxes[1].boxes = {box2}
-		boxes[1].nameLong = "Southwest"
-		boxes[1].nameShort = "SW"
+		boxes[1].nameLong = "Northeast"
+		boxes[1].nameShort = "NE"
 	end
 end
 
