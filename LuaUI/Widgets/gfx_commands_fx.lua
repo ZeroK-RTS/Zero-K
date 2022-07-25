@@ -108,7 +108,7 @@ local OPTIONS = {
 		},
 		map_erase = {
 			size			= 2,
-			duration		= 3,
+			duration		= 0.7,
 			baseColor		= {1.00 ,1.00 ,1.00 ,0.13},
 			ringColor		= {1.00 ,1.00 ,1.00 ,0.00}
 		},
