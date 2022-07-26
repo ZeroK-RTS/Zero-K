@@ -200,8 +200,8 @@ end
 
 
 local keyPressed = true
-function widget:KeyPress(key, mods, isRepeat, label, unicode)
-	keyPressed = screen0:KeyPress(key, mods, isRepeat, label, unicode)
+function widget:KeyPress(key, mods, isRepeat, label, unicode, scanCode)
+	keyPressed = screen0:KeyPress(key, mods, isRepeat, label, unicode, scanCode)
 	return keyPressed
 end
 
@@ -408,10 +408,10 @@ end
 
 
 local keyPressed = true
-function widget:KeyPress(key, mods, isRepeat, label, unicode)
+function widget:KeyPress(key, mods, isRepeat, label, unicode, scanCode)
 	if Spring.IsGUIHidden() then return false end
 
-	keyPressed = screen0:KeyPress(key, mods, isRepeat, label, unicode)
+	keyPressed = screen0:KeyPress(key, mods, isRepeat, label, unicode, scanCode)
 	return keyPressed
 end
 

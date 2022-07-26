@@ -1778,21 +1778,21 @@ end
 --  Keyboard call-ins
 --
 
-function widgetHandler:KeyPress(key, mods, isRepeat, label, unicode)
+function widgetHandler:KeyPress(key, mods, isRepeat, label, unicode, scanCode, actions)
 	if (self.tweakMode) then
 		local mo = self.mouseOwner
 		if (mo and mo.TweakKeyPress) then
-			mo:TweakKeyPress(key, mods, isRepeat, label, unicode)
+			mo:TweakKeyPress(key, mods, isRepeat, label, unicode, scanCode, actions)
 		end
 		return true
 	end
 
-	if (self.actionHandler:KeyAction(true, key, mods, isRepeat)) then
+	if (self.actionHandler:KeyAction(true, key, mods, isRepeat, scanCode, actions)) then
 		return true
 	end
 
 	for _, w in r_ipairs(self.KeyPressList) do
-		if (w:KeyPress(key, mods, isRepeat, label, unicode)) then
+		if (w:KeyPress(key, mods, isRepeat, label, unicode, scanCode, actions)) then
 			return true
 		end
 	end
@@ -1800,11 +1800,11 @@ function widgetHandler:KeyPress(key, mods, isRepeat, label, unicode)
 end
 
 
-function widgetHandler:KeyRelease(key, mods, label, unicode)
+function widgetHandler:KeyRelease(key, mods, label, unicode, scanCode, actions)
 	if (self.tweakMode) then
 		local mo = self.mouseOwner
 		if (mo and mo.TweakKeyRelease) then
-			mo:TweakKeyRelease(key, mods, label, unicode)
+			mo:TweakKeyRelease(key, mods, label, unicode, scanCode, actions)
 		elseif (key == KEYSYMS.ESCAPE) then
 			Spring.Echo("LuaUI TweakMode: OFF")
 			self.tweakMode = false
@@ -1812,12 +1812,12 @@ function widgetHandler:KeyRelease(key, mods, label, unicode)
 		return true
 	end
 
-	if (self.actionHandler:KeyAction(false, key, mods, false)) then
+	if (self.actionHandler:KeyAction(false, key, mods, false, scanCode, actions)) then
 		return true
 	end
 
 	for _, w in r_ipairs(self.KeyReleaseList) do
-		if (w:KeyRelease(key, mods, label, unicode)) then
+		if (w:KeyRelease(key, mods, label, unicode, scanCode, actions)) then
 			return true
 		end
 	end
