@@ -17,8 +17,8 @@ end
 local geoDef = FeatureDefNames["geovent"].id
 local geos = {}
 
-function gadget:GameStart()
-	if #geos > 0 then
+function gadget:GameStart() -- Note: Geos need to be movectrl'd after game starts 
+	if #geos > 0 then -- (I don't know why, but when testing in FeatureCreated, it would not apply the fix)
 		for i = 1, #geos do
 			local featureID = geos[i]
 			local x, _, z = Spring.GetFeaturePosition(featureID)
