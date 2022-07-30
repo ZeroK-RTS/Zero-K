@@ -198,15 +198,12 @@ local function GetTextures(drawPass, unitID)
 	end
 end
 
-local MAX_TEX_ID = 131072 --should be enough
 local function GetTexturesKey(textures)
-	local cs = 0
-	for bp, tex in pairs(textures) do
-		local texInfo = gl.TextureInfo(tex) or {}
-		cs = cs + (texInfo.id or 0) + bp * MAX_TEX_ID
+	if not (textures and textures[0]) then
+		return -1
 	end
-
-	return cs
+	local texInfo = gl.TextureInfo(textures[0]) or {}
+	return texInfo.id or -1
 end
 
 -------------------------------------------------------------------------------------
