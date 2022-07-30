@@ -975,6 +975,7 @@ local headingToDegree = (360 / 65535)
 local useLuaUI = false
 local oldFrame = 0		--//used to save bandwidth between unsynced->LuaUI
 local drawProgress = true --//a widget can do this job too (see healthbars)
+local morphUnitsSynced = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1076,7 +1077,7 @@ function gadget:Update()
 	local frame = GetGameFrame()
 	if frame > oldFrame then
 		oldFrame = frame
-		local morphUnitsSynced = SYNCED.morphUnits
+		morphUnitsSynced = SYNCED.morphUnits
 		if snext(morphUnitsSynced) then
 			local useLuaUI_ = Script.LuaUI('MorphUpdate')
 			if useLuaUI_ ~= useLuaUI then --//Update Callins on change
@@ -1214,9 +1215,7 @@ end
 
 local function DrawWorldFunc()
 
-	local morphUnits = SYNCED.morphUnits
-
-	if (not snext(morphUnits)) then
+	if (not snext(morphUnitsSynced)) then
 		return --//no morphs to draw
 	end
 
@@ -1235,7 +1234,7 @@ local function DrawWorldFunc()
 
 	CallAsTeam({['read'] = readTeam},
 		function()
-			for unitID, morphData in spairs(morphUnits) do
+			for unitID, morphData in spairs(morphUnitsSynced) do
 				if (unitID and morphData)and(IsUnitVisible(unitID)) then
 					if morphData.combatMorph then
 						DrawCombatMorphUnit(unitID, morphData,readTeam)
