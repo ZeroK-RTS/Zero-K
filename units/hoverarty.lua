@@ -21,7 +21,7 @@ return { hoverarty = {
     bait_level_default = 1,
     modelradius    = [[32]],
     dontfireatradarcommand = '0',
-    aimposoffset   = [[0 15 0]],
+    aimposoffset   = [[0 11 0]],
     turnatfullspeed_hover = [[1]],
   },
 
