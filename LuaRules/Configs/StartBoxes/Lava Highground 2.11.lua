@@ -1,9 +1,5 @@
-local start1 = {596, 3566}
-local start2 = {3432, 701}
-local start3 = {3571, 3567}
-local start4 = {332, 340}
-
-local box1 = {
+local startSW = { 596, 3566}
+local boxSW = {
 	{1471, 4095},
 	{1456, 4025},
 	{1434, 3992},
@@ -23,46 +19,46 @@ local box1 = {
 	{1157, 3446},
 	{1125, 3437},
 	{1052, 3381},
-	{963, 3296},
-	{890, 3203},
-	{821, 3118},
-	{698, 2988},
-	{661, 2954},
-	{557, 2964},
-	{497, 2944},
-	{473, 2930},
-	{472, 2913},
-	{485, 2889},
-	{583, 2862},
-	{605, 2859},
-	{617, 2850},
-	{616, 2818},
-	{611, 2781},
-	{619, 2769},
-	{620, 2746},
-	{608, 2740},
-	{586, 2729},
-	{561, 2714},
-	{526, 2696},
-	{486, 2662},
-	{441, 2619},
-	{396, 2571},
-	{358, 2512},
-	{278, 2503},
-	{258, 2499},
-	{174, 2464},
-	{118, 2492},
-	{70, 2496},
-	{51, 2524},
-	{54, 2548},
-	{45, 2560},
-	{2, 2566},
-	{2, 4091},
-	{1426, 4092},
+	{ 963, 3296},
+	{ 890, 3203},
+	{ 821, 3118},
+	{ 698, 2988},
+	{ 661, 2954},
+	{ 557, 2964},
+	{ 497, 2944},
+	{ 473, 2930},
+	{ 472, 2913},
+	{ 485, 2889},
+	{ 583, 2862},
+	{ 605, 2859},
+	{ 617, 2850},
+	{ 616, 2818},
+	{ 611, 2781},
+	{ 619, 2769},
+	{ 620, 2746},
+	{ 608, 2740},
+	{ 586, 2729},
+	{ 561, 2714},
+	{ 526, 2696},
+	{ 486, 2662},
+	{ 441, 2619},
+	{ 396, 2571},
+	{ 358, 2512},
+	{ 278, 2503},
+	{ 258, 2499},
+	{ 174, 2464},
+	{ 118, 2492},
+	{  70, 2496},
+	{  51, 2524},
+	{  54, 2548},
+	{  45, 2560},
+	{   1, 2566},
+	{   1, 4095},
 }
 
-local box2 = {
-	{4088, 1361},
+local startNE = {3432,  701}
+local boxNE = {
+	{4095, 1361},
 	{4002, 1364},
 	{3953, 1391},
 	{3864, 1394},
@@ -81,26 +77,26 @@ local box2 = {
 	{3448, 1072},
 	{3437, 1061},
 	{3453, 1019},
-	{3444, 979},
-	{3415, 934},
-	{3336, 943},
-	{3262, 952},
-	{3108, 810},
-	{2992, 725},
-	{2697, 685},
-	{2659, 640},
-	{2629, 539},
-	{2584, 382},
-	{2551, 267},
-	{2526, 42},
-	{2577, 49},
-	{2586, 2},
-	{4089, 4},
-	{4088, 1320},
+	{3444,  979},
+	{3415,  934},
+	{3336,  943},
+	{3262,  952},
+	{3108,  810},
+	{2992,  725},
+	{2697,  685},
+	{2659,  640},
+	{2629,  539},
+	{2584,  382},
+	{2551,  267},
+	{2526,   42},
+	{2577,   49},
+	{2586,    1},
+	{4095,    1},
 }
 
-local box3 = {
-	{2556, 4094},
+local startSE = {3571, 3567}
+local boxSE = {
+	{2556, 4095},
 	{2551, 4010},
 	{2540, 3968},
 	{2563, 3934},
@@ -148,150 +144,67 @@ local box3 = {
 	{3792, 2800},
 	{3892, 2808},
 	{3958, 2816},
-	{4085, 2853},
-	{4088, 3132},
-	{4092, 4093},
-	{2583, 4092},
+	{4095, 2853},
+	{4095, 4095},
 }
 
-local box4 = {
-	{2, 1466},
-	{47, 1475},
-	{131, 1485},
-	{185, 1483},
-	{266, 1460},
-	{335, 1455},
-	{411, 1467},
-	{414, 1489},
-	{449, 1487},
-	{516, 1443},
-	{526, 1418},
-	{545, 1400},
-	{591, 1385},
-	{630, 1363},
-	{672, 1357},
-	{681, 1347},
-	{692, 1323},
-	{731, 1285},
-	{786, 1260},
-	{832, 1156},
-	{832, 1143},
-	{948, 1038},
-	{1011, 954},
-	{1004, 913},
-	{1022, 863},
-	{1057, 796},
-	{1177, 741},
-	{1193, 704},
-	{1219, 656},
-	{1245, 587},
-	{1305, 489},
-	{1357, 450},
-	{1358, 387},
-	{1349, 327},
-	{1385, 284},
-	{1383, 239},
-	{1367, 195},
-	{1371, 110},
-	{1371, 2},
-	{2, 2},
-	{2, 1380},
-	{6, 1428},
+local startNW = { 332,  340}
+local boxNW = {
+	{   1, 1466},
+	{  47, 1475},
+	{ 131, 1485},
+	{ 185, 1483},
+	{ 266, 1460},
+	{ 335, 1455},
+	{ 411, 1467},
+	{ 414, 1489},
+	{ 449, 1487},
+	{ 516, 1443},
+	{ 526, 1418},
+	{ 545, 1400},
+	{ 591, 1385},
+	{ 630, 1363},
+	{ 672, 1357},
+	{ 681, 1347},
+	{ 692, 1323},
+	{ 731, 1285},
+	{ 786, 1260},
+	{ 832, 1156},
+	{ 832, 1143},
+	{ 948, 1038},
+	{1011,  954},
+	{1004,  913},
+	{1022,  863},
+	{1057,  796},
+	{1177,  741},
+	{1193,  704},
+	{1219,  656},
+	{1245,  587},
+	{1305,  489},
+	{1357,  450},
+	{1358,  387},
+	{1349,  327},
+	{1385,  284},
+	{1383,  239},
+	{1367,  195},
+	{1371,  110},
+	{1371,    1},
+	{   1,    1},
 }
 
 local sputGametype = Spring.Utilities.Gametype
 
-local boxes = {}
-if sputGametype.isFFA() then 
-	boxes[0] = {startpoints = {start1}, boxes = {box1}, nameLong = "Southwest", nameShort = "SW"}
-	boxes[1] = {startpoints = {start2}, boxes = {box2}, nameLong = "Northeast", nameShort = "NE"}
-	boxes[2] = {startpoints = {start3}, boxes = {box3}, nameLong = "Southeast", nameShort = "SE"}
-	boxes[3] = {startpoints = {start4}, boxes = {box4}, nameLong = "Northwest", nameShort = "NW"}
-	return boxes
+if sputGametype.isBigTeams() then
+	return
+		{ {startpoints = {startSW, startNW}, boxes = {boxSW, boxNW}, nameLong = "West", nameShort = "W"}
+		, {startpoints = {startNE, startSE}, boxes = {boxNE, boxSE}, nameLong = "East", nameShort = "E"}
+	}
+-- FIXME: elseif sputGametype.isChickens() then players in the middle surrounded by chickens
+else
+	return
+		{ {startpoints = {startSW}, boxes = {boxSW}, nameLong = "South-West", nameShort = "SW"}
+		, {startpoints = {startNE}, boxes = {boxNE}, nameLong = "North-East", nameShort = "NE"}
+		, {startpoints = {startSE}, boxes = {boxSE}, nameLong = "South-East", nameShort = "SE"}
+		, {startpoints = {startNW}, boxes = {boxNW}, nameLong = "North-West", nameShort = "NW"}
+	}
 end
-
-
-boxes[0] = {startpoints = {}, boxes = {}, nameLong = "", nameShort = ""}
-boxes[1] = {startpoints = {}, boxes = {}, nameLong = "", nameShort = ""}
-
-if (sputGametype.isBigTeams() or sputGametype.isCompStomp()) then -- pick two. team vs team.
-	local r = math.random(1, 6)
-	if math.random(1, 10) >= 6 then -- NvS
-		boxes[0].startpoints = {start1, start3}
-		boxes[0].boxes = {box1, box3}
-		boxes[0].nameLong = "South"
-		boxes[0].nameShort = "S"
-		boxes[1].startpoints = {start2, start4}
-		boxes[1].boxes = {box2, box4}
-		boxes[1].nameLong = "North"
-		boxes[1].nameShort = "N"
-	else -- WvE
-		boxes[0].startpoints = {start1, start4}
-		boxes[0].boxes = {box1, box4}
-		boxes[0].nameLong = "West"
-		boxes[0].nameShort = "W"
-		boxes[1].startpoints = {start2, start3}
-		boxes[1].boxes = {box2, box3}
-		boxes[1].nameLong = "East"
-		boxes[1.nameShort = "E"
-	end
-else -- pick 1
-	r = math.random(1, 6)
-	if r == 1 then -- NE vs SW
-		boxes[0].startpoints = {start1}
-		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Southwest"
-		boxes[0].nameShort = "SW"
-		boxes[1].startpoints = {start2}
-		boxes[1].boxes = {box2}
-		boxes[1].nameLong = "Northeast"
-		boxes[1].nameShort = "NE"
-	elseif r == 2 then -- SE vs SW
-		boxes[0].startpoints = {start1}
-		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Southwest"
-		boxes[0].nameShort = "SW"
-		boxes[1].startpoints = {start3}
-		boxes[1].boxes = {box3}
-		boxes[1].nameLong = "Southeast"
-		boxes[1].nameLong = "SE"
-	elseif r == 3 then -- NW vs NE
-		boxes[0].startpoints = {start4}
-		boxes[0].boxes = {box4}
-		boxes[0].nameLong = "Northwest"
-		boxes[0].nameShort = "NW"
-		boxes[1].startpoints = {start2}
-		boxes[1].boxes = {box2}
-		boxes[1].nameLong = "Northeast"
-		boxes[1].nameLong = "NE"
-	elseif r == 4 then -- NW vs SE
-		boxes[0].startpoints = {start4}
-		boxes[0].boxes = {box4}
-		boxes[0].nameLong = "Northwest"
-		boxes[0].nameShort = "NW"
-		boxes[1].startpoints = {start3}
-		boxes[1].boxes = {box3}
-		boxes[1].nameLong = "Southeast"
-		boxes[1].nameLong = "SE"
-	elseif r == 5 then -- SW vs NW
-		boxes[0].startpoints = {start1}
-		boxes[0].boxes = {box1}
-		boxes[0].nameLong = "Southwest"
-		boxes[0].nameShort = "SW"
-		boxes[1].startpoints = {start4}
-		boxes[1].boxes = {box4}
-		boxes[1].nameLong = "Northwest"
-		boxes[1].nameShort = "NW"
-	else -- NE vs SE
-		boxes[0].startpoints = {start3}
-		boxes[0].boxes = {box3}
-		boxes[0].nameLong = "Southeast"
-		boxes[0].nameLong = "SE"
-		boxes[1].startpoints = {start2}
-		boxes[1].boxes = {box2}
-		boxes[1].nameLong = "Northeast"
-		boxes[1].nameShort = "NE"
-	end
-end
-
-return boxes
