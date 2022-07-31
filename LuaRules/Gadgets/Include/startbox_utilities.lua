@@ -149,6 +149,24 @@ local function ParseBoxes ()
 		end
 	end
 
+	--[[ If the boxes start from 1, shift down (allyteams start from 0).
+	     At some point the internals could be rewritten so that configs
+	     starting from 0 would be shifted up instead (since this is how
+	     Lua generally works) but from the PoV of somebody writing map
+	     configs this is transparent so it's just a code neatness thing
+	     that can wait until later. Note that this deprecates 0-indexing,
+	     even though that is how ~all gameside configs still look (that
+	     would be another mechanical task to perform at some point). ]]
+	if startBoxConfig[1] and not startBoxConfig[0] then
+		Spring.Echo("1-indexed startbox detected, shifting")
+
+		local ret = {}
+		for boxID, box in pairs(startBoxConfig) do
+			ret[boxID - 1] = box
+		end
+		startBoxConfig = ret
+	end
+
 	return startBoxConfig
 end
 
