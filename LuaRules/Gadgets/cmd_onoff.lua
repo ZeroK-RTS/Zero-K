@@ -122,10 +122,13 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return onOffUnits
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if not onOffUnits[unitDefID] then
+		return false
+	end
 	if (cmdID == CMD_ONOFF) then
 		return (cmdParams[2] == CMD_WANT_ONOFF) -- we block any on/off that we didn't call ourselves
 	end
