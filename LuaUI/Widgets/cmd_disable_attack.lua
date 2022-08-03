@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author    = "Google Frog",
 		date      = "12 Janurary 2018",
 		license   = "GNU GPL, v2 or later",
-		layer     = -1,
+		layer     = -100,
     handler   = true,
 		enabled   = true  --  loaded by default?
 	}
@@ -40,23 +40,6 @@ local attackDisabledUnits = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling
-
-function FilterSelectedUnits(units, cmdID, cmdParams, cmdOpts)
--- TODO: handle commands imbeded in CMD_INSERT though it dosen't seem to need it.
-	if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
-    return units
-  end
-
-	local selected = {}
-	for i = 1, #units do
-		if attackDisabledUnits[units[i]] ~= 1 then
-			selected[#selected + 1] = units[i]
-		end
-	end
-
-	return selected
-end
-
 function SetDisableAttack(unit, value)
 	if attackDisabledUnits[unit] then
 		attackDisabledUnits[unit] = value
@@ -76,17 +59,32 @@ function widget:CommandsChanged()
 				tooltip = 'Allow attack commands',
 				params  = {attackDisabledUnits[units[i]], 'Allowed', 'Blocked'}
 			}
-      return
+			return
 		end
 	end
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID ~= CMD_DISABLE_ATTACK then
-		return false
+		-- TODO: handle commands imbeded in CMD_INSERT though it dosen't seem to need it.
+		if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
+			return
+		end
+
+		local units = WG.units or Spring.GetSelectedUnits()
+		local selected = {}
+		for i = 1, #units do
+			if attackDisabledUnits[units[i]] ~= 1 then
+				selected[#selected + 1] = units[i]
+			end
+		end
+
+		WG.units = selected
+		return
 	end
 
-	local units = Spring.GetSelectedUnits()
+	local units = WG.units or Spring.GetSelectedUnits()
+
 	for i = 1, #units do
 		SetDisableAttack(units[i], cmdParams[1])
 	end
