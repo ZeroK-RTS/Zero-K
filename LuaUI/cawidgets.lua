@@ -35,7 +35,7 @@ vfsInclude("LuaRules/Utilities/tablefunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/debugFunctions.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/versionCompare.lua"   , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitStates.lua"       , nil, vfsGame)
-vfsInclude("LuaRules/Utilities/teamFunctions.lua"    , nil, vfsGame)
+vfsInclude("LuaRules/Utilities/gametype.lua"         , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/vector.lua"           , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/unitTypeChecker.lua"  , nil, vfsGame)
 vfsInclude("LuaRules/Utilities/function_override.lua", nil, vfsGame)
@@ -878,12 +878,11 @@ local function SafeWrapFuncGL(func, funcName)
 	return function(w, ...)
 
 		glPushAttrib(GL.ALL_ATTRIB_BITS)
-		local r = { pcall(func, w, ...) }
+		local r1, r2, r3 = pcall(func, w, ...)
 		glPopAttrib()
 
-		if (r[1]) then
-			table.remove(r, 1)
-			return unpack(r)
+		if r1 then
+			return r2, r3
 		else
 			if (funcName ~= 'Shutdown') then
 				widgetHandler:RemoveWidget(w)

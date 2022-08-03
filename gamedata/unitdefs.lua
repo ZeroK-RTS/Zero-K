@@ -3,8 +3,13 @@ local VFS_Include = VFS.Include
 local VFS_GAME = VFS.GAME
 local VFS_MAP = VFS.MAP
 
-local system = VFS_Include('gamedata/system.lua')
-local lowerKeys = system.lowerkeys
+--[[ unitdefs_post is massively simplified by being able to assume
+     that all def keys are lowercase. However, being able to use
+     uppercase in the defs is also good for readability (also we
+     have to support modders with lax standards anyway). This is
+     why lowerkeys are applied to all defs; this has nothing to do
+     with the engine (all cases are accepted by Spring). ]]
+local lowerKeys = VFS_Include('gamedata/system.lua').lowerkeys
 
 VFS_Include("LuaRules/Utilities/tablefunctions.lua")
 local suCopyTable = Spring.Utilities.CopyTable

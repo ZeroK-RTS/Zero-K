@@ -21,7 +21,7 @@ return { hoverarty = {
     bait_level_default = 1,
     modelradius    = [[32]],
     dontfireatradarcommand = '0',
-    aimposoffset   = [[0 15 0]],
+    aimposoffset   = [[0 11 0]],
     turnatfullspeed_hover = [[1]],
   },
 
@@ -33,7 +33,7 @@ return { hoverarty = {
   losEmitHeight       = 40,
   maxDamage           = 1000,
   maxSlope            = 18,
-  maxVelocity         = 1.75,
+  maxVelocity         = 1.65,
   maxWaterDepth       = 22,
   movementClass       = [[HOVER4]],
   moveState           = 0,
@@ -54,7 +54,7 @@ return { hoverarty = {
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
-  turnRate            = 464,
+  turnRate            = 420,
   workerTime          = 0,
 
   weapons             = {
@@ -100,7 +100,7 @@ return { hoverarty = {
       leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 1000,
+      range                   = 980,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],

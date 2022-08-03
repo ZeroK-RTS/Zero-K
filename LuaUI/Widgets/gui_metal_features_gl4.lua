@@ -34,6 +34,7 @@ local spGetGameFrame = Spring.GetGameFrame
 
 local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
 local internalEnabled = true
+local hideWithUi = true
 
 local FEATURE_RADIUS = 120
 local ALL_FEATURES = false
@@ -42,7 +43,7 @@ local ALL_FEATURES = false
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Reclaim Highlight'
-options_order = { 'showhighlight', 'pregamehighlight', 'minmetal'}
+options_order = { 'showhighlight', 'pregamehighlight', 'minmetal', 'disableWithUi'}
 options = {
 	showhighlight = {
 		name = 'Show Reclaim',
@@ -59,7 +60,6 @@ options = {
 		},
 		noHotkey = true,
 	},
-
 	pregamehighlight = {
 		name = "Show Reclaim Before Round Start",
 		desc = "Enabled: Show reclaimable metal features before game begins \n Disabled: No highlights before game begins",
@@ -67,7 +67,6 @@ options = {
 		value = true,
 		noHotkey = true,
 	},
-
 	minmetal = {
 		name = 'Minimum Reclaim To Highlight',
 		desc = "Metal below this amount will not be highlighted",
@@ -76,6 +75,16 @@ options = {
 		min = 1,
 		max = 200,
 		step = 1,
+	},
+	disableWithUi = {
+		name = 'Disable with hidden UI',
+		desc = 'Toggles outlines with Ctrl+F5.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function (self)
+			hideWithUi = self.value
+		end,
 	},
 }
 
@@ -96,7 +105,7 @@ local currCmd = spGetActiveCommand() --remember current command
 
 local function AddFeature(featureID)
 	local metal = Spring.GetFeatureResources(featureID)
-	local x100  = 100  / (100  + metal)
+	local x100  = 80  / (80  + metal)
 	local x1000 = 1000 / (1000 + metal)
 	local r = 1 - x1000
 	local g = x1000 - x100
@@ -109,7 +118,8 @@ local function AddFeature(featureID)
 	if not (metal and metal > 1) then
 		return
 	end
-	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.5, 0.5, 1, 0.5, 0, 0, 0)
+	handledFeatureApiIDs[featureID] = WG.HighlightUnitGL4(featureID, 'featureID', r, g, b, 0.45, 0.3, 0.5, 0.35, 0, 0, 0)
+	--Spring.Utilities.FeatureEcho(featureID, "________________ ADD")
 end
 
 --local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)
@@ -125,11 +135,10 @@ local function UpdateFeatureVisibility()
 	-- Add new features and mark existing ones as seen.
 	for i = 1, #visibleFeatures do
 		local featureID = visibleFeatures[i]
-		if handledFeatureMap[featureID] then
-			handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
-		else
+		if not handledFeatureMap[featureID] then
 			AddFeature(featureID)
 		end
+		handledFeatureCheck[handledFeatureMap[featureID]] = newCheck
 	end
 	
 	-- Remove features that don't appear in the list of visible features.
@@ -139,6 +148,7 @@ local function UpdateFeatureVisibility()
 			local featureID = handledFeatureList[i]
 			if handledFeatureApiIDs[featureID] then
 				WG.StopHighlightUnitGL4(handledFeatureApiIDs[featureID])
+				--Spring.Utilities.FeatureEcho(featureID, "REMOVE 1")
 			end
 			
 			handledFeatureCheck[i] = handledFeatureCheck[#handledFeatureCheck]
@@ -173,13 +183,6 @@ function widget:Update()
 	if not internalEnabled then
 		return
 	end
-	if Spring.IsGUIHidden() then
-		if enableCondOld then
-			Spring.SendCommands("luarules metal_highlight 0")
-			enableCondOld = false
-		end
-		return
-	end
 
 	local activeCurrentCmd = spGetActiveCommand()
 	if currCmd ~= activeCurrentCmd then
@@ -207,18 +210,15 @@ function widget:Update()
 		or (options.showhighlight.value == 'conorecon' and (conSelected or WG.showeco))
 		or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco))
 
+	if hideWithUi and Spring.IsGUIHidden() then
+		enableCondNew = false
+	end
+	
 	if Spring.GetConfigInt("ForceDisableShaders") == 1 then
-		enableCondOld = false
+		enableCondNew = false
 		return
 	end
 
-	if enableCondNew and minMetalShownOld ~= minMetalShownNew then
-		minMetalShownOld = minMetalShownNew
-		if Script.LuaRules.SetWreckMetalThreshold then
-			Script.LuaRules.SetWreckMetalThreshold(minMetalShownNew)
-		end
-	end
-	
 	if enableCondNew ~= enableCondOld then
 		enableCondOld = enableCondNew
 		if enableCondNew then
@@ -235,6 +235,7 @@ function widget:Update()
 			for i = 1, #handledFeatureList do
 				if handledFeatureApiIDs[handledFeatureList[i]] then
 					WG.StopHighlightUnitGL4(handledFeatureApiIDs[handledFeatureList[i]])
+					--Spring.Utilities.FeatureEcho(featureID, "REMOVE __2")
 				end
 			end
 			handledFeatureList = false

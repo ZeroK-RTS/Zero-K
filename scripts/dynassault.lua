@@ -50,7 +50,7 @@ local RESTORE_DELAY = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isLasering, isDgunning, gunLockOut = false, false, false
+local isLasering, isDgunning = false, false
 local restoreHeading, restorePitch = 0, 0
 
 local starBLaunchers = {}

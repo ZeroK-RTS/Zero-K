@@ -33,6 +33,12 @@ end
 
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
+local spGetUnitDrawFlag  = Spring.GetUnitDrawFlag
+local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
+
+local debugUnitDefIDs = {
+}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -192,15 +198,12 @@ local function GetTextures(drawPass, unitID)
 	end
 end
 
-local MAX_TEX_ID = 131072 --should be enough
 local function GetTexturesKey(textures)
-	local cs = 0
-	for bp, tex in pairs(textures) do
-		local texInfo = gl.TextureInfo(tex) or {}
-		cs = cs + (texInfo.id or 0) + bp * MAX_TEX_ID
+	if not (textures and textures[0]) then
+		return -1
 	end
-
-	return cs
+	local texInfo = gl.TextureInfo(textures[0]) or {}
+	return texInfo.id or -1
 end
 
 -------------------------------------------------------------------------------------
@@ -363,6 +366,11 @@ local function ProcessUnit(unitID, unitDefID, drawFlag, skinName)
 			string.format("%%%s:%i", unitDefID, 1)
 		}
 	end
+	
+	if unitDefID and debugUnitDefIDs[unitDefID] then
+		Spring.Echo("Adding unit", UnitDefs[unitDefID].name, textureOverrides[unitID][1], textureOverrides[unitID][2])
+	end
+	
 	if overriddenUnits[unitID] == nil then --object was not seen
 		AddUnit(unitID, drawFlag)
 	elseif overriddenUnits[unitID] ~= drawFlag then --flags have changed
@@ -394,6 +402,7 @@ end
 
 local function ExecuteDrawPass(drawPass)
 	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local _, fullView = Spring.GetSpectatingState()
 	for shaderId, data in pairs(unitDrawBins[drawPass]) do
 		for _, texAndObj in pairs(data) do
 			for bp, tex in pairs(texAndObj.textures) do
@@ -402,7 +411,7 @@ local function ExecuteDrawPass(drawPass)
 
 			unitIDs = {}
 			for unitID, _ in pairs(texAndObj.objects) do
-				if Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 and Spring.IsUnitInView(unitID) and not Spring.GetUnitIsCloaked(unitID) then
+				if ((spGetUnitDrawFlag(unitID, 1) % 2) == 1) and not spGetUnitIsCloaked(unitID) then
 					unitIDs[#unitIDs + 1] = unitID
 				end
 			end

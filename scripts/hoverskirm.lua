@@ -16,7 +16,6 @@ for i = 1, 8 do
 end
 local ground1 = piece 'ground1'
 
-local random = math.random
 local hpi = math.pi*0.5
 local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 

@@ -75,7 +75,8 @@ void main() {
 	uint isDynamic = 1u; //default dynamic model
 	if (parameters.x > 0.5) isDynamic = 0u;  //if paramy == 1 then the unit is static
 	mat4 pieceMatrix = mat[baseIndex + pieceIndex + isDynamic];
-	vec4 localModelPos = pieceMatrix * vec4(pos, 1.0);
+	vec4 localModelPos = pieceMatrix * vec4(pos + 0.006 * normal, 1.0);
+	//vec4 localModelPos = pieceMatrix * vec4(pos + sin(timeInfo.x  * 0.05) * 10 * normal , 1.0); // Hunt for rogue geometry.
 	// Make the rotation matrix around Y and rotate the model
 	mat3 rotY = rotation3dY(worldposrot.w);
 	localModelPos.xyz = rotY * localModelPos.xyz;
@@ -186,6 +187,12 @@ if TESTMODE then
 end
 
 function widget:Initialize()
+	if not Platform.glHaveGL4 then
+		Spring.Echo("highlightUnitShader no GL4 support")
+		widgetHandler:RemoveWidget()
+		return
+	end
+
 	local vertVBO = gl.GetVBO(GL.ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	local indxVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false) -- GL.ARRAY_BUFFER, false
 	vertVBO:ModelsVBO()
@@ -241,8 +248,12 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	if highlightUnitVBOTable.VAO then highlightUnitVBOTable.VAO:Delete() end
-	if highlightunitShader then highlightunitShader:Finalize() end
+	if highlightUnitVBOTable and highlightUnitVBOTable.VAO then
+		highlightUnitVBOTable.VAO:Delete()
+	end
+	if highlightunitShader then
+		highlightunitShader:Finalize()
+	end
 
 	WG['HighlightUnitGL4'] = nil
 	WG['StopHighlightUnitGL4'] = nil
@@ -254,7 +265,7 @@ function widget:DrawWorld()
 		gl.DepthMask(true)
 		gl.DepthTest(true)
 		gl.Blending(GL.SRC_ALPHA, GL.ONE)
-		gl.PolygonOffset( 0.0 , -1.0) -- too much here bleeds
+		gl.PolygonOffset( 0.0 , -2.0) -- too much here bleeds
 		highlightunitShader:Activate()
 		highlightUnitVBOTable.VAO:Submit()
 		highlightunitShader:Deactivate()

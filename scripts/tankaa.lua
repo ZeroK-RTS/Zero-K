@@ -8,7 +8,6 @@ local flares = {piece("flare1", "flare2")}
 local a1, a2, neck = piece("a1", "a2", "neck")
 
 local currentGun = 1
-local isAiming = false
 
 local disarmed = false
 local stuns = {false, false, false}
@@ -25,7 +24,6 @@ local function RestoreAfterDelay()
 
 	WaitForTurn (turret, y_axis)
 	WaitForTurn (  guns, x_axis)
-	isAiming = false
 end
 
 local StopPieceTurn = GG.PieceControl.StopTurn
@@ -67,7 +65,6 @@ function script.AimWeapon(num, heading, pitch)
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
 
-	isAiming = true
 	while disarmed do
 		Sleep (33)
 	end

@@ -12,8 +12,8 @@ return { mahlazer = {
   buildPic                      = [[mahlazer.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[120 100 120]],
-  collisionVolumeType           = [[box]],
+  collisionVolumeScales         = [[150 200 150]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -22,6 +22,7 @@ return { mahlazer = {
     midposoffset   = [[0 0 0]],
     select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
     bait_level_default = 0,
+    want_precise_proximity_targetting = 1,
     draw_blueprint_facing = 1,
 
     keeptooltip    = [[any string I want]],

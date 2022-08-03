@@ -990,7 +990,7 @@ function widget:CommandsChanged()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local ud = UnitDefs[unitDefID]
 
-		if ud.canMove and not ud.isFactory and not (ud.springCategories.fixedwing) then
+		if ud and ud.canMove and not ud.isFactory and not (ud.springCategories.fixedwing) then
 			local rank = formationRank[unitID] or defaultRank[unitDefID] or 2
 			local customCommands = widgetHandler.customCommands
 			formationRankCmdDesc.params[1] = rank

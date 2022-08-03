@@ -48,11 +48,6 @@ local legBackwardTheta = -math.rad(45)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
---------------------------------------------------------------------------------
--- variables
---------------------------------------------------------------------------------
-local gun_1 = 1
-
 -- four-stroke hexapedal walkscript
 local function Walk()
 	Signal(SIG_WALK)

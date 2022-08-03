@@ -19,11 +19,6 @@ local turnAmount = math.rad(10)
 local turnSpeed = turnAmount*2000/(2*pause)
 
 -- variables
-local walking = false
-local forward = 8
-local backward = 5
-local up = 8
-
 local waveWeaponDef = WeaponDefNames["amphbomb_amphbomb_death"]
 local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
 

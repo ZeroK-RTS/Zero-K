@@ -20,11 +20,12 @@ return { hoverriot = {
   customParams        = {
     selection_scale    = 0.92,
     aim_lookahead      = 80,
-    --specialreloadtime = [[1350]],
+    --specialreloadtime = [[1200]],
     --specialreload_userate = [[1]],
-    --boost_speed_mult = 5,
-    --boost_reload_speed_mult = 0.8,
-    --boost_duration = 20, -- frames
+    --boost_speed_mult = 4,
+    --boost_reload_speed_mult = 0.9,
+    --boost_duration = 30, -- frames
+    --boost_distance = 260, -- empirical (distance over normal mace at boost end, plus 30*speed), for UI
     turnatfullspeed_hover = [[1]],
 
     outline_x = 110,
@@ -56,8 +57,8 @@ return { hoverriot = {
 
   },
 
-  sightDistance       = 407,
-  sonarDistance       = 407,
+  sightDistance       = 431,
+  sonarDistance       = 431,
   turninplace         = 0,
   turnRate            = 600,
   workerTime          = 0,

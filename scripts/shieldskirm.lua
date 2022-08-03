@@ -39,7 +39,7 @@ local SIG_AIM = 4
 local RESTORE_DELAY_TUBE = 1000
 local RESTORE_DELAY_HEAD = 1500
 
-local SPEED_MULT = 2.5
+local SPEED_MULT = 2.41
 
 local function HalfWalk(p_thigh, p_leg, p_foot, p_toe, pf_toe, pb_toe, s_thigh, s_leg, s_foot, s_toe, sf_toe, sb_toe, first)
 	local speedMod = math.max(0.25, GG.att_MoveChange[unitID] or 1) * SPEED_MULT

@@ -33,7 +33,7 @@ return { turretimpulse = {
   maxWaterDepth                 = 0,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[CORGRAV]],
+  objectName                    = [[corgrav.s3o]],
   onoffable                     = true,
   script                        = [[turretimpulse.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
@@ -102,7 +102,7 @@ return { turretimpulse = {
       thickness               = 4,
       tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
+      weaponType              = [[LaserCannon]], -- not hitscan on purpose, to make it difficult to manipulate things perfectly
       weaponVelocity          = 2200,
     },
 
@@ -161,7 +161,7 @@ return { turretimpulse = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[corgrav_dead]],
+      object           = [[corgrav_dead.s3o]],
     },
 
     HEAP  = {

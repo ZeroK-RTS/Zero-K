@@ -31,7 +31,7 @@ return { shieldriot = {
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
-  maxVelocity            = 1.9,
+  maxVelocity            = 2,
   maxWaterDepth          = 22,
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
@@ -92,8 +92,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 27,
-        planes  = 27,
+        default = 30,
+        planes  = 30,
       },
 
       customParams           = {
@@ -101,7 +101,7 @@ return { shieldriot = {
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
         nofriendlyfire = 1,
-        timeslow_damagefactor = 3,
+        timeslow_damagefactor = 2.5,
       },
 
       edgeeffectiveness       = 0.6,

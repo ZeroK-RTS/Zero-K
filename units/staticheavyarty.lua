@@ -17,6 +17,7 @@ return { staticheavyarty = {
 
   customParams                  = {
     bait_level_default = 1,
+    want_proximity_targetting = 1,
     aimposoffset = [[0 50 -7]],
     modelradius    = [[35]],
     selectionscalemult = 1,

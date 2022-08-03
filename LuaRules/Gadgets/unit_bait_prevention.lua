@@ -47,7 +47,7 @@ local preventChaffShootingCmdDesc = {
 	params  = {0, 0, 35, 100, 300, 600}
 }
 
-function ChaffShootingBlock(unitID, targetID, damage)
+function ChaffShootingBlock(unitID, targetID)
 	if debugBait then
 		Spring.Echo("==== BAIT CHECK ====", Spring.GetGameFrame(), unitID, targetID)
 		Spring.Utilities.UnitEcho(unitID)
@@ -197,7 +197,9 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_PREVENT_BAIT)
 	gadgetHandler:AddChatAction("debugbait", ToggleDebugBait, "")
 	gadgetHandler:AddChatAction("printbait", PrintBait, "")
-	
+
+	GG.baitPrevention_ChaffShootingBlock = ChaffShootingBlock
+
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

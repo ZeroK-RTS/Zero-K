@@ -31,7 +31,7 @@ return { gunshipraid = {
   footprintZ             = 2,
   hoverAttack            = true,
   iconType               = [[gunshipraider]],
-  idleAutoHeal           = 10,
+  idleAutoHeal           = 6,
   idleTime               = 150,
   maxDamage              = 800,
   maxVelocity            = 6.9,
@@ -87,7 +87,7 @@ return { gunshipraid = {
       },
 
       damage                  = {
-        default = 7.6,
+        default = 7.9,
       },
 
       explosionGenerator      = [[custom:flash1red]],

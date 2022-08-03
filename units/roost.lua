@@ -24,7 +24,7 @@ return { roost = {
   maxVelocity       = 0,
   metalMake         = 2.5,
   noAutoFire        = false,
-  objectName        = [[roost]],
+  objectName        = [[roost.s3o]],
   script            = [[roost.lua]],
   selfDestructAs    = [[NOWEAPON]],
 

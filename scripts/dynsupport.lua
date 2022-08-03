@@ -61,7 +61,6 @@ local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
 local walkAngleMult = 1.0
 local animationSpeedMult = 1.0
-local currentSpeed = 0
 local REF_SPEED = 1
 local sizeSpeedMult = 1.0
 

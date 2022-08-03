@@ -7,6 +7,7 @@ local unitlistNames = {
 	cloaksnipe = MARK_EACH,
 	cloakheavyraid = MARK_EACH,
 	cloakjammer = MARK_EACH,
+	spiderantiheavy = MARK_EACH,
 
 	energyheavygeo = DEFAULT,
 	energyfusion = DEFAULT,
@@ -51,8 +52,9 @@ local unitlistNames = {
 	amphassault = DEFAULT,
 	tankheavyassault = DEFAULT,
 
+	striderantiheavy = MARK_EACH, -- cloakers
+	striderscorpion = MARK_EACH,
 	striderfunnelweb = DEFAULT,
-	striderantiheavy = DEFAULT,
 	striderdante = DEFAULT,
 	striderbantha = DEFAULT,
 	shipcarrier = DEFAULT,
@@ -60,7 +62,6 @@ local unitlistNames = {
 	striderarty = DEFAULT,
 	shipheavyarty = DEFAULT,
 	subtacmissile = DEFAULT,
-	striderscorpion = DEFAULT,
 	striderdetriment = DEFAULT,
 
 	-- these announce their presence globally, but

@@ -19,11 +19,41 @@ end
 
 local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
+local ECHO_GAP = 300
+
+local veryLightCheckEnabled = false
 local lightCheckEnabled = false
 local heavyCheckEnabled = false
 local fullCheckEnabled = false
+local echoTime = 0
 local commandsfromPlayerID = {}
+local prevCommandsfromPlayerID = {}
 local playerName = {}
+
+local function EchoSummary()
+	commandsfromPlayerID = commandsfromPlayerID or {}
+	Spring.Echo("====== Command Summary", Spring.GetGameFrame(), "======")
+	for playerID, count in pairs(commandsfromPlayerID) do
+		local delta = count - (prevCommandsfromPlayerID[playerID] or 0)
+		prevCommandsfromPlayerID[playerID] = count
+		Spring.Echo("Delta", delta, "Sent", count, "P", playerName[playerID], "ID", playerID)
+	end
+end
+
+local function SendSummary(cmd, line, words, player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	EchoSummary()
+end
+local function VeryLightCheck(cmd, line, words, player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	veryLightCheckEnabled = not veryLightCheckEnabled
+	Spring.Echo("Very Light Command Checker " .. ((veryLightCheckEnabled and "Enabled.") or "Disabled."))
+end
 
 local function LightCheck(cmd, line, words, player)
 	if not spIsCheatingEnabled() then
@@ -94,19 +124,26 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 				end
 			end
 		end
-	elseif lightCheckEnabled then
+	elseif lightCheckEnabled or veryLightCheckEnabled then
 		if not playerName[playerID] then
 			playerName[playerID] = Spring.GetPlayerInfo(playerID) or ("playerID_" .. playerID)
 		end
 		commandsfromPlayerID[playerID] = (commandsfromPlayerID[playerID] or 0) + 1
-		Spring.Echo("U", unitID, "T", teamID, "C", cmdID, "A", cmdParams and #cmdParams, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
+		if lightCheckEnabled then
+			Spring.Echo("U", unitID, "T", teamID, "C", cmdID, "A", cmdParams and #cmdParams, "P", playerName[playerID], "ID", playerID, "S", fromSynced, "L", fromLua, "N", commandsfromPlayerID[playerID])
+		elseif Spring.GetGameFrame() > echoTime then
+			echoTime = Spring.GetGameFrame() + ECHO_GAP
+			EchoSummary()
+		end
 	end
 	return true
 end
 
 function gadget:Initialize()
+	gadgetHandler.actionHandler.AddChatAction(self, "cmdv", VeryLightCheck, "VeryLightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdl", LightCheck, "LightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdh", HeavyCheck, "LightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdp", PlayerDetailedCheck, "LightCheck")
 	gadgetHandler.actionHandler.AddChatAction(self, "cmdr", ResetCheck, "LightCheck")
+	gadgetHandler.actionHandler.AddChatAction(self, "cmds", SendSummary, "Summary")
 end

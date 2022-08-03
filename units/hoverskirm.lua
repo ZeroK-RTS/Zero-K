@@ -30,7 +30,7 @@ return { hoverskirm = {
   footprintZ          = 3,
   iconType            = [[hoverskirm]],
   leaveTracks         = true,
-  maxDamage           = 650,
+  maxDamage           = 660,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
@@ -54,7 +54,7 @@ return { hoverskirm = {
   sightDistance       = 484,
   sonarDistance       = 484,
   turninplace         = 0,
-  turnRate            = 536,
+  turnRate            = 563,
   workerTime          = 0,
   
   weapons             = {
@@ -87,7 +87,7 @@ return { hoverskirm = {
       },
       
       damage                  = {
-        default = 310,
+        default = 320,
       },
 
       fireStarter             = 70,

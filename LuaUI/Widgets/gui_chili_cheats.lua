@@ -210,8 +210,8 @@ end
 -- helpers
 
 local function SayAsHost(text)
-	if Spring.GetModOptions().zksearchtag then -- multiplayer
-		Spring.SendCommands("say !hostsay /" .. text)
+	if Spring.GetModOptions().cheatcommandprefix then -- multiplayer
+		Spring.SendCommands(Spring.GetModOptions().cheatcommandprefix .. text)
 	else
 		Spring.SendCommands(text)
 	end
@@ -431,9 +431,8 @@ local function AddNocostToggle(parent, offset)
 		parent = parent,
 		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
-			Spring.SendCommands(
-				"nocost "          .. (value and 1 or 0),
-				"luarules nocost " .. (value and 1 or 0))
+			SayAsHost("nocost "          .. (value and 1 or 0))
+			Spring.SendCommands("luarules nocost " .. (value and 1 or 0))
 		end},
 	}
 
@@ -458,7 +457,7 @@ local function AddGloballosToggle(parent, offset)
 		parent = parent,
 		objectOverrideFont = WG.GetFont(),
 		OnChange = {function(self, value)
-			Spring.SendCommands("globallos " .. Spring.GetLocalAllyTeamID())
+			SayAsHost("globallos " .. Spring.GetLocalAllyTeamID())
 		end},
 	}
 
@@ -835,21 +834,23 @@ function widget:AddConsoleLine(msg)
 		return
 	end
 
-	local a, b = msg:find("global LOS toggled for allyteam ")
-	if b then
-		local teamID = tonumber(msg:sub(b+1))
-		if teamID == Spring.GetLocalTeamID() then
-			chbox.globallos.state.checked = not chbox.globallos.state.checked
-			chbox.globallos:Invalidate()
-		end
-		return
-	end
-
-	if msg:find("global LOS toggled for all allyteams") then
-		chbox.globallos.state.checked = not chbox.globallos.state.checked
-		chbox.globallos:Invalidate()
-		return
-	end
+	-- Toggling based on messages is worse than doing nothing, because clicking the tickbox already toggles.
+	-- At least togging on the UI will make the state correct for the host.
+	--local a, b = msg:find("global LOS toggled for allyteam ")
+	--if b then
+	--	local teamID = tonumber(msg:sub(b+1))
+	--	if teamID == Spring.GetLocalAllyTeamID() then
+	--		chbox.globallos.state.checked = not chbox.globallos.state.checked
+	--		chbox.globallos:Invalidate()
+	--	end
+	--	return
+	--end
+	--
+	--if msg:find("global LOS toggled for all allyteams") then
+	--	chbox.globallos.state.checked = not chbox.globallos.state.checked
+	--	chbox.globallos:Invalidate()
+	--	return
+	--end
 end
 
 function widget:CommandsChanged()

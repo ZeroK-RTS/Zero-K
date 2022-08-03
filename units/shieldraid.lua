@@ -92,7 +92,7 @@ return { shieldraid = {
       interceptedByShieldType = 1,
       leadLimit               = 0,
       noSelfDamage            = true,
-      range                   = 235,
+      range                   = 232,
       reloadtime              = 0.1,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -102,7 +102,7 @@ return { shieldraid = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 880,
+      weaponVelocity          = 870,
     },
 
   },

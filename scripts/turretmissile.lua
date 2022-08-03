@@ -43,8 +43,6 @@ local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 local scriptReload = include("scriptReload.lua")
 
-local missile, missilespeed, mfront
-
 local SIG_AIM = 1
 local SIG_RESTORE = 2
 

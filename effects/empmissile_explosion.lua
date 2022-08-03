@@ -10,6 +10,7 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
@@ -28,6 +29,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
@@ -45,10 +47,12 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
+      water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.8,
         alwaysvisible      = true,
-        colormap           = [[1.0 1.0 1.0 0.04	0.2 0.5 0.9 0.01	0.1 0.5 0.7 0.01]],
+        colormap           = [[1.0 1.0 1.0 0.04    0.2 0.5 0.9 0.01    0.1 0.5 0.7 0.01]],
         directional        = true,
         emitrot            = 45,
         emitrotspread      = 32,
@@ -78,6 +82,7 @@ return {
       ground             = true,
       ttl                = 40,
       water              = true,
+      underwater         = true,
       color = {
         [1]  = 0,
         [2]  = 0.5,
@@ -89,6 +94,7 @@ return {
       count              = 8,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         agespeed           = 0.01,
         alwaysvisible      = true,
@@ -106,6 +112,7 @@ return {
       count              = 2,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alwaysvisible      = true,
         heat               = 10,
@@ -124,6 +131,7 @@ return {
       count              = 150,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[5 r200]],
         explosiongenerator = [[custom:YELLOW_LIGHTNING_STORMBOLT]],

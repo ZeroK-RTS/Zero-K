@@ -4,7 +4,7 @@ return { shieldskirm = {
   description            = [[Skirmisher Bot (Indirect Fire)]],
   acceleration           = 0.75,
   brakeRate              = 1.2,
-  buildCostMetal         = 120,
+  buildCostMetal         = 125,
   buildPic               = [[shieldskirm.png]],
   canGuard               = true,
   canMove                = true,
@@ -28,9 +28,9 @@ return { shieldskirm = {
   footprintZ             = 2,
   iconType               = [[walkerskirm]],
   leaveTracks            = true,
-  maxDamage              = 540,
+  maxDamage              = 520,
   maxSlope               = 36,
-  maxVelocity            = 1.9,
+  maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
@@ -53,7 +53,7 @@ return { shieldskirm = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2376,
+  turnRate               = 2257,
   upright                = true,
 
   weapons                = {
@@ -81,8 +81,8 @@ return { shieldskirm = {
       },
       
       damage                  = {
-        default = 345,
-        planes  = 345,
+        default = 330,
+        planes  = 330,
       },
 
       fireStarter             = 70,
@@ -100,13 +100,13 @@ return { shieldskirm = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/missile2_fire_bass]],
       soundStartVolume        = 7,
-      startVelocity           = 190,
+      startVelocity           = 185,
       tracks                  = false,
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
       turret                  = true,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 190,
+      weaponVelocity          = 185,
     },
 
   },
