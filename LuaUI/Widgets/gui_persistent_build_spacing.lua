@@ -1,7 +1,9 @@
 function widget:GetInfo()
 	return {
 		name      = "Persistent Build Spacing",
-		desc      = "Maintains build spacing between matches",
+		desc      = "-Maintains build spacing between matches"..
+			    "\n-Add Mousewheel+Shift to control it"..
+			    "\n-Add previsualization of future placements",
 		author    = "Helwor",
 		date      = "August 2020",
 		license   = "GNU GPL, v2 or later",
@@ -23,9 +25,11 @@ local spTraceScreenRay      = Spring.TraceScreenRay
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGameSeconds      = Spring.GetGameSeconds
 local spGetModKeyState      = Spring.GetModKeyState
+local spuGetMoveType        = Spring.Utilities.getMovetype
+local spTestBuildOrder      = Spring.TestBuildOrder
 local Echo                  = Spring.Echo
 
-local floor, round, huge = math.floor, math.round, math.huge
+local floor, round, huge, max = math.floor, math.round, math.huge, math.max
 
 local GL_LINE_STRIP = GL.LINE_STRIP
 local glLineWidth   = gl.LineWidth
@@ -39,8 +43,6 @@ local glTranslate   = gl.Translate
 local glBillboard   = gl.Billboard
 local glText        = gl.Text
 
-include("keysym.lua")
-local _, ToKeysyms  = include("Configs/integral_menu_special_keys.lua")
 
 ---- Shared variables
 local cmdID, lastCmdID
@@ -48,25 +50,38 @@ local buildStarted
 local buildSpacing = {}
 local identified = false
 local placement
-local preGame = spGetGameSeconds() < 0.1
+local placementCache = {}
+local placementCacheOff = {}
+local preGame
 local spacing, newspacing, facing
 local spacedRects = {}
-local waitTime = 0
 local x, y, z
 local dwOn, draw, drawValue, drawRects
-
+local drawTime = 0
+local colors = {  -- red, yellow, green
+	[0] = {  1 , 0.5, 0.5, 1 },
+	[1] = {  1 ,  1 , 0.5, 1 },
+	[2] = { 0.5,  1 , 0.5, 1 }
+}
 -- related to options
+local grdots = "\255\155\155\155" .. " .." .. "\255\255\255\255"
 local requestUpdate
-local wheelSpacing, reverseWheel = false, 1
-local showSpacingRects, only2Rects, showRectsOnChange = false, false, true
+local wheelSpacing, wheelValue = false, 1
+local showSpacingRects, only2Rects, followGround, stickToWrongGrid, showRectsOnChange
+	=      true,          true,        true,          false,             true
+local withBadColor = followGround
 local showSpacingValue, showValueOnChange = false, false
-local showRectsTime = 1
+
+local showRectsTime = 0.7
 local showValueTime = 1
 local spacingIncrease
 local spacingDecrease
 
 
-------- Options functions
+------- OPTIONS -------
+-- Identify the hotkeys
+include("keysym.lua")
+local _, ToKeysyms  = include("Configs/integral_menu_special_keys.lua")
 local function UpdateKeys()
 	local key = WG.crude.GetHotkeyRaw("buildspacing inc")
 	spacingIncrease = ToKeysyms(key and key[1])
@@ -74,9 +89,28 @@ local function UpdateKeys()
 	spacingDecrease = ToKeysyms(key and key[1])
 end
 
--- Menu detection, update and refresh
+------- Menu detection, update and refresh
+-- Fix of scrolling reset whenever an option is changed which was quite annoying
+-- (this could be easily fixed universally by modifying WG.crude.OpenPath)
+
+local function GetPanel(path) -- Find out the option panel if it's visible
+	for _,win in pairs(WG.Chili.Screen0.children) do
+		if  type(win)     == 'table'
+		and win.classname == "main_window_tall"
+		and win.caption   == path
+		then
+			for panel in pairs(win.children) do
+				if type(panel)=='table' and panel.name:match('scrollpanel') then
+					return panel
+				end
+			end
+		end
+	end
+end
 local function UpdateOptionsDisplay(options_path)
+	local oldPanel = GetPanel(options_path)
 	local greyed = "\255\155\155\155"
+	local whited = "\255\255\255\255"
 	for _, option in pairs(options) do
 		local value     = option.value
 		local origname  = option.origname
@@ -86,7 +120,7 @@ local function UpdateOptionsDisplay(options_path)
 			--if the option is a child -- CANDO: better with scanning child by parents instead of parents by child, keep in mind child can have multiple parents
 			-- greying out if its value is false/nil
 			if origname then
-				option.name = value and origname or greyed .. origname
+				option.name = value and origname or origname:gsub(whited,greyed)
 			end
 			-- masking itself if all its parents have false/nil value
 			local parentsVal
@@ -103,20 +137,14 @@ local function UpdateOptionsDisplay(options_path)
 			option.name = value and origname or origname .. "..."
 		end
 	end
-	-- refreshing menu if it's active
-	for _, v in pairs(WG.Chili.Screen0.children) do
-		if  type(v)     == 'table'
-		and v.classname == "main_window_tall"
-		and v.caption   == options_path
-		then
-			WG.crude.OpenPath(options_path)
-			break
-		end
+	-- if it's active, refresh the menu and get back where it was scrolled -- 
+	if oldPanel then
+		WG.crude.OpenPath(options_path)
+		GetPanel(options_path).scrollPosY = oldPanel.scrollPosY -- scrolling back
 	end
+	requestUpdate = false
 end
 
--------
--------- Options
 local hotkeys_path = 'Hotkeys/Construction'
 options_path = 'Settings/Interface/Building Placement'
 options_order = {
@@ -124,11 +152,12 @@ options_order = {
 	'hotkey_inc', 'hotkey_dec', 'hotkey_facing_inc', 'hotkey_facing_dec',
 	'spacing_label',
 	'wheel_spacing', 'reverse_wheel',
-	'show_spacing_rects_2', 'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects',
+	'show_spacing_rects', 'show_only_2_rects', 'show_rects_only_on_change', 'rects_follow_ground', 'stick_to_wrong_grid', 'rects_bad_color', 'show_time_rects',
 	'show_spacing_value', 'show_value_only_on_change', 'show_time_value',
+	
 }
--- hotkeys
 options = {
+	-- hotkeys
 	text_hotkey = {
 		name            = 'Structure Placement Modifiers',
 		type            = 'label',
@@ -169,7 +198,7 @@ options = {
 		bindWithAny     = true,
 		path            = hotkeys_path,
 	},
-	-- wheel and visualization implementation
+	----- wheel and visualization implementation
 	spacing_label = {
 		name            = 'Build Spacing',
 		type            = 'label',
@@ -178,94 +207,127 @@ options = {
 	wheel_spacing = {
 		origname        = 'Change with Shift + MouseWheel',
 		type            = 'bool',
-		desc            = 'Change the spacing with the Mousewheel and Shift down',
-		value           = false,
+		desc            = 'Change the spacing Shift down and the MouseWheel',
+		value           = wheelSpacing,
 		noHotkey        = true,
 		OnChange        = function(self)
 			wheelSpacing = self.value
+			widgetHandler[(wheelSpacing and 'Update' or 'Remove')..'CallIn'](widget,"MouseWheel")
 			requestUpdate = options_path
 		end,
 		children        = {'reverse_wheel'}
 	},
 	reverse_wheel = {
-		origname        = ' ..invert scroll.',
+		origname        = grdots..'reversed.',
 		type            = 'bool',
-		value           = false,
+		value           = wheelValue == -1,
 		noHotkey        = true,
 		OnChange        = function(self)
-			reverseWheel = self.value and -1 or 1
+			wheelValue = self.value and -1 or 1
 			requestUpdate = options_path
 		end,
 		parents         = {'wheel_spacing'}
 	},
 	-- rectangle showing options
-	show_spacing_rects_2 = {
+	show_spacing_rects = {
 		origname        = 'Visualise spacing',
 		type            = 'bool',
 		desc            = "Briefly show spaced rectangles in all directions around the cursor",
-		value           = false,
+		value           = showSpacingRects,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showSpacingRects = self.value
 			spacedRects = {}
 			requestUpdate = options_path
 		end,
-		children        = {'show_only_2_rects', 'show_rects_only_on_change', 'show_time_rects'}
+		children        = {'show_only_2_rects', 'rects_follow_ground', 'show_rects_only_on_change', 'show_time_rects'}
 	},
 	
 	show_only_2_rects = {
-		origname        = ' ..of only two rectangles, ',
+		origname        = grdots..'of only two rectangles, ',
 		type            = 'bool',
 		desc            = "If 8 rectangles bug you too much, only show 2 horizontal rectangles",
-		value           = false,
+		value           = only2Rects,
 		noHotkey        = true,
 		OnChange        = function(self)
 			spacedRects = {}
 			only2Rects = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects_2'}
+		parents         = {'show_spacing_rects'}
 	},
 	show_rects_only_on_change = {
-		origname        = ' ..only on spacing change, ',
+		origname        = grdots..'only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see those rectangles until you change the current spacing",
-		value           = true,
+		value           = showRectsOnChange,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showRectsOnChange = self.value
 			requestUpdate = options_path
 		end,
-		parents         = {'show_spacing_rects_2'}
+		parents         = {'show_spacing_rects'}
+	},
+	rects_follow_ground = {
+		origname        = grdots..'following the ground height,',
+		type            = 'bool',
+		desc            = "..unless, of course, if it should float !",
+		noHotkey        = true,
+		value           = followGround,
+		OnChange        = function(self)
+			followGround = self.value
+			requestUpdate=options_path
+		end,
+		parents         = {'show_spacing_rects'}
+	},
+	stick_to_wrong_grid = {
+		origname        = grdots..'according to the placement grid,',
+		type            = 'bool',
+		desc            = "In case of building moving units, the placement grid is misleading, uncheck this is you want to see the rectangles following where the placements will really occur.",
+		noHotkey        = true,
+		value           = stickToWrongGrid,
+		OnChange        = function(self)
+			stickToWrongGrid = self.value
+			requestUpdate=options_path
+		end,
+		parents         = {'show_spacing_rects'}
+	},
+	rects_bad_color = {
+		origname        = grdots..'with bad colors for bad placements,',
+		type            = 'bool',
+		desc            = "Reddish color if it cannot be placed",
+		noHotkey        = true,
+		value           = withBadColor,
+		OnChange        = function(self)
+			withBadColor = self.value
+			requestUpdate=options_path
+		end,
+		parents         = {'show_spacing_rects'}
 	},
 	show_time_rects = {
-		name            = ' ..for 1 seconds.',
+		name            = showRectsTime == huge and grdots..'forever' or grdots..'for '..showRectsTime..' seconds.',
 		type            = 'number',
 		min             = 0.1,
-		max             = 5,
+		max             = 10.1,
 		step            = 0.1,
-		value           = 1,
+		value           = math.min(showRectsTime, 10.1),
 		tooltipFunction = function(self)
-			return self.value < 5 and round(self.value, 1).." seconds" or "forever"
+			return self.value < 10.1 and round(self.value, 1).." seconds" or "forever"
 		end,
 		OnChange        = function(self)
-			showRectsTime = self.value < 5 and self.value or huge
+			showRectsTime = self.value < 10.1 and self.value or huge
 			local str = self.tooltipFunction(self) -- just using the return
-			if str == 'forever' then
-				self.name = " ..forever."
-			else
-				self.name = ' ..for '..str..'.'
-			end
+			self.name = str == 'forever' and grdots..'forever.' or grdots..'for '..str..'.'
 			requestUpdate = options_path
 		end,
-		parents        = {'show_spacing_rects_2'}
+		parents        = {'show_spacing_rects'}
 	},
 	-- value showing options
 	show_spacing_value = {
 		origname        = 'Show spacing value',
 		type            = 'bool',
 		desc            = "Briefly show separation value",
-		value           = false,
+		value           = showSpacingValue,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showSpacingValue = self.value
@@ -275,10 +337,10 @@ options = {
 	},
 	
 	show_value_only_on_change = {
-		origname        = ' ..only on spacing change, ',
+		origname        = grdots..'only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see the above helper until you change the current spacing",
-		value           = false,
+		value           = showValueOnChange,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showValueOnChange = self.value
@@ -288,34 +350,30 @@ options = {
 	},
 	
 	show_time_value = {
-		name            = ' ..for 1 seconds.',
+		name            = showValueTime == huge and grdots..'forever' or grdots..'for '..showValueTime..' seconds.',
 		type            = 'number',
 		min             = 0.1,
-		max             = 5,
+		max             = 10.1,
 		step            = 0.1,
-		value           = 1,
+		value           = math.min(showValueTime, 10.1),
 		tooltipFunction    = function(self)
-			return self.value < 5 and round(self.value, 1).." seconds" or "forever"
+			return self.value < 10.1 and round(self.value, 1).." seconds" or "forever"
 		end,
 		OnChange        = function(self)
-			showValueTime = self.value < 5 and self.value or huge
+			showValueTime = self.value < 10.1 and self.value or huge
 			local str = self.tooltipFunction(self) -- just using the return
-			if str == 'forever' then
-				self.name = " ..forever."
-			else self.name = ' ..for '..str..'.' end
+			self.name = str == 'forever' and grdots..'forever.' or grdots..'for '..str..'.'
 			requestUpdate = options_path
 		end,
 		parents         = {'show_spacing_value'},
 	},
 }
 
--- for drawing later...
-local placementCache = {}
-local placementCacheOff = {}
+------- DRAWING FUNCTIONS -------
 local function IdentifyPlacement(unitDefID, facing)
 	local offFacing = (facing == 1 or facing == 3)
 	local placeTable = (offFacing and placementCacheOff) or placementCache
-	if not placementCache[unitDefID] then
+	if not placeTable[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		local sx = ud.xsize*8
 		local sz = ud.zsize*8
@@ -323,40 +381,69 @@ local function IdentifyPlacement(unitDefID, facing)
 			sx, sz = sz, sx
 		end
 		local oddx, oddz = (sx/2)%16, (sz/2)%16
+		--[[
+			Note:
+			-floatOnWater is only correct for buildings (at the notable exception of turretgauss) and flying units
+			-canMove and isBuilding are unreliable:
+			   staticjammer, staticshield, staticradar, factories... have 'canMove'
+			   staticcon, striderhub doesn't have... 'isBuilding'
+			-isGroundUnit is reliable
+			-spuGetMoveType is better as it discern also between flying (1) and building (false)
+			-ud.maxWaterDepth is only correct for telling us if a non floating building can be a valid build undersea
+			-ud.moveDef.depth is always correct about units except for hover
+			-ud.moveDef.depthMod is 100% reliable for telling if non flying unit can be built under sea, on float or only on shallow water:
+			   no depthMod = flying or building,
+			   0 = walking unit undersea,
+			   0.1 = sub, ship or hover,
+			   0.02 = walking unit only on shallow water
+		--]]
+		local isUnit = spuGetMoveType(ud) -- 1 == flying, 2 == on ground/water false = building
+		local depthMod = isUnit and ud.moveDef.depthMod
+
+		local floatOnWater = ud.floatOnWater
+		local gridAboveWater = floatOnWater or isUnit -- that's what the engine relate to, with a position based on trace screen ray that has floatOnWater only, which offset the grid for units
+		local underSea = depthMod == 0 or not (isUnit or floatOnWater or ud.maxWaterDepth == 0)
+		local reallyFloat = isUnit == 2 and depthMod == 0.1 or floatOnWater and ud.name ~= 'turretgauss'
+		local cantPlaceOnWater = not (underSea or reallyFloat)
+
 		placeTable[unitDefID] = {
 			oddx = oddx,
 			oddz = oddz,
 			sx = sx,
 			sz = sz,
-			floatOnWater = ud.floatOnWater,
+			underSea = underSea,
+			reallyFloat = reallyFloat,
+			cantPlaceOnWater = cantPlaceOnWater,
+			gridAboveWater = gridAboveWater, -- following the wrong engine grid 
+			floatOnWater = floatOnWater,
 		}
 	end
 	return placeTable[unitDefID]
 end
 
-local function ToValidPlacement(x, z, oddx, oddz)
-	x = floor((x + 8 - oddx)/16)*16 + oddx
-	z = floor((z + 8 - oddz)/16)*16 + oddz
-	return x, z
+local function ToValidPlacement(x,z,oddx,oddz)
+	return  floor((x + 8 - oddx)/16)*16 + oddx,
+		floor((z + 8 - oddz)/16)*16 + oddz
 end
 
-local function MakeCorners(x, z, sx, sz)
-	local y = spGetGroundHeight(x, z)
-	local c1 = {x-sx, y, z-sz}
-	local c2 = {x-sx, y, z+sz}
-	local c3 = {x+sx, y, z+sz}
-	local c4 = {x+sx, y, z-sz}
-	return {c1, c2, c3, c4}
+local function MakeRect(x, y, z, sx, sz, color)
+	return {
+			{x-sx, y, z-sz},
+			{x-sx, y, z+sz},
+			{x+sx, y, z+sz},
+			{x+sx, y, z-sz}
+	}
 end
 
-local function DrawCorners(corners)
+local function DrawRect(corners)
+	glColor(corners.color)
 	for i = 1, 5 do
 		glVertex(unpack(corners[i] or corners[1]))
 	end
 end
 
---
--- Callins
+
+------- CALLINS -------
 function widget:KeyPress(key)
 	if not cmdID then
 		return
@@ -365,8 +452,7 @@ function widget:KeyPress(key)
 	if not change then
 		return
 	end
-	spacing = spacing + change
-	spacing = spacing > 0 and spacing or 0
+	spacing = max(spacing + change, 0)
 	newspacing = true
 	if preGame then
 		spSetBuildSpacing(spacing)-- action is recognized but still doesnt work, so we do change spacing directly
@@ -375,19 +461,25 @@ function widget:KeyPress(key)
 end
 
 function widget:MouseWheel(_, value)
-	if cmdID and wheelSpacing and select(4, spGetModKeyState()) then
-		spacing = spacing + reverseWheel*value
-		spacing = spacing > 0 and spacing or 0
-		spSetBuildSpacing(spacing)
-		newspacing = true
-		return true -- blocking the zoom
+	if not (cmdID and select(4,spGetModKeyState())) then
+		return
 	end
+	spacing = max(spacing + wheelValue*value,0)
+	spSetBuildSpacing(spacing)
+	newspacing = true
+	return true -- blocking the zoom
 end
+
+
+function widget:GameFrame(frame) -- more elegant way and less checking to set preGame
+	preGame=false
+	widgetHandler:RemoveCallIn('GameFrame',self)
+end
+
 
 function widget:Update(dt)
 	if requestUpdate then
 		UpdateOptionsDisplay(requestUpdate)
-		requestUpdate = false
 	end
 	
 	cmdID = select(2, spGetActiveCommand())
@@ -397,110 +489,127 @@ function widget:Update(dt)
 		buildStarted = nil
 		return
 	end
-	if buildStarted == nil then
-		buildStarted = 1
-		waitTime = 0
-	end
-	if preGame then
-		preGame = spGetGameSeconds() < 0.1
-	end
-	
 	if cmdID ~= lastCmdID then
 		spacing = buildSpacing[cmdID] or tonumber(UnitDefs[cmdID].customParams.default_spacing) or defaultSpacing
 		spSetBuildSpacing(spacing)
 		lastCmdID = cmdID
 		identified = false
-		waitTime = 0
+		buildStarted = nil
+	else
+		spacing = spGetBuildSpacing() -- changed mind, if another widget wants to change the spacing, we have to know it
+		buildSpacing[cmdID] = spacing
 	end
-	spacing = spGetBuildSpacing() -- changed mind, if another widget wants to change the spacing, we have to know it
-	buildSpacing[cmdID] = spacing
- 
-	--Spring.Echo("showSpacingRects", showSpacingRects, waitTime, showRectsTime, showRectsOnChange, buildStarted, newspacing)
 	local mx, my, leftClick, _, rightClick = spGetMouseState()
+
+	-- all pre-conditions variables set here
 	if leftClick or rightClick then
 		draw = false
-		waitTime = false
 		newspacing = false
-		return
-	end
-	
-	if newspacing then
 		buildStarted = false
-		waitTime = 0
+		drawTime=false
+		return
+	elseif newspacing then
+		buildStarted = false
+		drawTime = 0
+		newspacing = false
+	elseif buildStarted == nil then
+		buildStarted = true
+		drawTime = 0
+	elseif not drawTime then
+		return
+	else
+		drawTime = drawTime + dt
 	end
+	----
 
 	-- Drawing set up
 	draw, drawRects, drawValue = true, true, true
-	if not showSpacingRects or
-			(waitTime and waitTime > showRectsTime) or
-			showRectsOnChange and buildStarted then
+	if not showSpacingRects
+	   or drawTime > showRectsTime
+	   or showRectsOnChange and buildStarted
+	   then
 		drawRects = false
 	end
 
-	if not showSpacingValue or
-			(waitTime and waitTime > showValueTime) or
-			showValueOnChange and buildStarted then
+	if not showSpacingValue
+	   or drawTime > showValueTime
+	   or showValueOnChange and buildStarted
+	   then
 		drawValue = false
 	end
 	
-	if not drawValue and not drawRects then
+	if not (drawValue or drawRects) then
 		draw = false
 		return
 	end
 	
-	if waitTime then
-		waitTime = waitTime + dt
-	end
 	
 	local f = spGetBuildFacing()
-	if facing~= f or not identified then
+	if not identified or facing%2 ~= f%2 then
 		facing = f
 		placement = IdentifyPlacement(cmdID, facing)
 		identified = true
 	end
-	
+
 	if not placement then --Can happen when rotation changes rapidly
 		draw = false
 		return
 	end
 
-	local pos = select(2, spTraceScreenRay(mx, my, true, false, false, placement.floatOnWater))
+	local pos = select(2, spTraceScreenRay(mx, my, true, false, false, not placement.floatOnWater))
 	if not pos then
 		draw = false
 		return
 	end
 
 	local nx, nz = ToValidPlacement(pos[1], pos[3], placement.oddx, placement.oddz)
-	if x == nx and z == nz and not (newspacing or buildStarted == 1) then
-		-- only recalculate when needed
+	if x == nx and z == nz and drawTime~=0 then-- only recalculate when needed
 		return
 	end
-	if buildStarted == 1 then
-		buildStarted = true
-	end
-	x, z = nx, nz
+
 	
-	if drawValue then
-		y = spGetGroundHeight(x, z)
+	x, y, z = nx, pos[2], nz
+	local fix
+	-- we set a different y ref for rectangle draw, y for showValue will always stay above engine grid for the sake of visibility
+	local rY = y
+
+	if y<0 and placement.gridAboveWater then 
+		-- we're undersea, floatOnWater is false but grid is above water, therefore it's a non flying unit
+		-- the engine up the grid to floatline no matter what
+		-- when user will click, it will be placed actually undersea if the unit can sub
+		
+		-- if user wants to get the real placement and a fix is needed... fixing even impossible placement for the sake of coherence                                             
+		fix = not stickToWrongGrid and (placement.underSea or placement.cantPlaceOnWater)
+		y=0 -- the y is moving up following the engine placement grid
+		if not fix then
+			rY = y -- nothing to fix, rY stands corrected
+		end
 	end
+
 	if drawRects then
 		local count = 0
 		local sx, sz = placement.sx, placement.sz
 		local realspacing = spacing*16
 		for offx = -1, 1 do
 			for offz = -1, 1 do
-				if not(offx == 0 and offz == 0) then
-					-- skipping the middle one
-					if not only2Rects or offz == 0 then
-						count = count+1
-						spacedRects[count] = MakeCorners(
-							x + offx*(realspacing + sx), -- prepare corners directly here instead of recalculating them in DrawWorld
-							z + offz*(realspacing + sz),
-							sx/2, sz/2
-						)
+				if (not only2Rects or offz == 0) and (offx ~= 0 or offz ~= 0 or fix) then -- will add the center rect if we fix
+					count = count + 1
+					local ix,iz = x + offx*(realspacing + sx), z + offz*(realspacing + sz)
+					local iy = not followGround and rY or spGetGroundHeight(ix,iz)
+					-- we follow the grid if it's correct or user don't want to fix it
+					if iy < 0 and not fix and placement.gridAboveWater then 
+						iy = 0
 					end
+					-- prepare corners directly here instead of recalculating them in DrawWorld, prepare different colors if the user want to
+					spacedRects[count] = MakeRect(ix, iy, iz, sx/2, sz/2)
+					spacedRects[count].color = colors[withBadColor and spTestBuildOrder(cmdID, ix, 0, iz, facing) or 2]
+
 				end
 			end
+		end
+		if not fix then 
+			-- erasing an extra rect that might still be present from a previous 'fix'
+			spacedRects[only2Rects and 3 or 9] = nil
 		end
 	end
 	if not dwOn then
@@ -508,7 +617,7 @@ function widget:Update(dt)
 	end
 end
 
-------------- Drawing
+-- Drawing
 function widget:DrawWorld()
 	if not draw then
 		dwOn = false
@@ -517,33 +626,33 @@ function widget:DrawWorld()
 		return
 	end
 	dwOn = true
-	if drawRects and waitTime then
+	if drawRects then
 		local alpha
-		if waitTime < (showRectsTime-1) then
+		-- keep at 0.6 until the last second
+		if showRectsTime - drawTime > 1 then
 			alpha = 0.6
 		else
-			local ftime = waitTime-(showRectsTime-1) -- make the last second 0... to 1
-			alpha = 0.6/(ftime+1)^ftime -- fading out in that last second
+			local ftime = drawTime - (showRectsTime - 1) -- make the last second 0... to 1
+			alpha = 0.6 / (ftime + 1) ^ ftime -- fading out in that last second, augmenting the divisor exponentially as time run
 		end
 		glLineWidth(1.5)
-		glColor(0.5, 1, 0.5, alpha)
 		glLineStipple(true)
 		for _, rect in ipairs(spacedRects) do
-			glBeginEnd(GL_LINE_STRIP, DrawCorners, rect)
+			rect.color[4] = alpha
+			glBeginEnd(GL_LINE_STRIP, DrawRect, rect)
 		end
 		glLineWidth(1)
 		glLineStipple(false)
-		glColor(1, 1, 1, 1)
 	end
-	if drawValue and placement then
+	if drawValue then
 		glPushMatrix()
 		glTranslate(x, y, z)
 		glBillboard()
 		glColor(1, 1, 1, 0.4)
 		glText(spacing, placement.sx/2, placement.sz/2, 30, 'h')
 		glPopMatrix()
-		glColor(1, 1, 1, 1)
 	end
+	glColor(1, 1, 1, 1)
 end
 
 ------------
@@ -568,9 +677,12 @@ function widget:SetConfigData(data)
 		end
 	end
 end
-
 -- Init
 function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
+	preGame = Spring.GetGameFrame()<1
 	UpdateKeys()
 	UpdateOptionsDisplay(options_path)
+	if not wheelSpacing then -- now MouseWheel callin is updated/removed when option change
+		widgetHandler:RemoveCallIn('MouseWheel')
+	end
 end
