@@ -264,7 +264,10 @@ local function GetTeamNames (allyTeamID)
 	end
 
 	if humans == 0 then
-		return "AI", "AI"
+		--[[ AI is treated like a clan, so it generally takes
+		     priority unless there are multiple AI allyteams ]]
+		clanShortName = "AI"
+		clanLongName = "AI"
 	end
 
 	local boxCount = 0
@@ -283,6 +286,11 @@ local function GetTeamNames (allyTeamID)
 				return box.nameLong, box.nameShort, clanLongName, clanShortName
 			end
 		end
+	end
+
+	if humans == 0 then
+		local aiStr = "AI " .. allyTeamID
+		return aiStr, aiStr, clanLongName, clanShortName
 	end
 
 	return ("Team " .. leaderName), leaderName, clanLongName, clanShortName
