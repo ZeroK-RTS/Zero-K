@@ -1362,7 +1362,9 @@ local behaviourConfig = {
 	-- med range skirms
 	{
 		name = "cloakskirm",
-		skirms = Union(medRangeSkirmieeArray, NameToDefID({"turretriot"})),
+
+		-- LLT isn't outranged, but is on the list for the reload step-back
+		skirms = Union(medRangeSkirmieeArray, NameToDefID({"turretriot", "turretlaser"})),
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
