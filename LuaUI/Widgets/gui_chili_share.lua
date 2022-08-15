@@ -633,7 +633,7 @@ local function ReportPlayer(subject)
 	local seconds = math.floor(Spring.GetGameFrame()/30)
 	local minutes = math.floor(seconds/60)
 	extraText = extraText .. " at " .. string.format("%d:%02d", minutes, seconds - 60*minutes)
-	Spring.SendLuaMenuMsg("reportUser_" .. subject.name .. "_" .. extraText)
+	Spring.SendLuaMenuMsg("reportUser;" .. subject.name .. ";" .. extraText)
 end
 
 local function GiveUnit(target)
