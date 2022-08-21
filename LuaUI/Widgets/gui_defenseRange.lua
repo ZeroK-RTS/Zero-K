@@ -33,6 +33,7 @@ for unitName, conf in pairs({
 		class = ANTI,
 		color = { 1, 1, 1 },
 		colorInBuild = { 0, 0.6, 0.8 },
+		lineWidth = 5,
 	},
 	turretemp = {
 		color = {1, 0.56, 0},
