@@ -43,8 +43,6 @@ end
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
-	Spring.SetUnitCloak(unitID, 0)
-	Spring.SetUnitStealth(unitID, false)
 	--Spring.UnitScript.SetUnitValue(firestate, 2)
 	Turn(base, side, 0, 5)
 	Turn(l_wing, side,0, 5)
@@ -57,24 +55,38 @@ function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)
 end
 
+local function BurrowThread()
+	--[[ Ideally this would use events instead of polling,
+	     but gunships don't receive Skidding events so hurling
+	     it via gravguns would let it keep cloaked.
+
+	     Note that the animation is still tied to events because
+	     they produce better looks (transitions happen in flight). ]]
+	while true do
+		local _, _, _, v = Spring.GetUnitVelocity(unitID)
+		if v < 0.02 then
+			Spring.SetUnitCloak(unitID, 2)
+			Spring.SetUnitStealth(unitID, true)
+		else
+			Spring.SetUnitCloak(unitID, 0)
+			Spring.SetUnitStealth(unitID, false)
+		end
+
+		Sleep(200)
+	end
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(BurrowThread)
 	if not Spring.GetUnitIsStunned(unitID) then
-		Spring.SetUnitCloak(unitID, 2)
-		Spring.SetUnitStealth(unitID, true)
 		Burrow()
 	end
 end
 
-function script.Activate()
+function script.StartMoving()
 	StartThread(UnBurrow)
 end
-
-function script.Deactivate()
-	Spring.SetUnitCloak(unitID, 2)
-	Spring.SetUnitStealth(unitID, true)
-end
-
 function script.StopMoving()
 	StartThread(Burrow)
 end
