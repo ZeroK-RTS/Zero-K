@@ -77,6 +77,7 @@ return { cloakskirm = {
       craterMult              = 0,
 
       customParams        = {
+        reaim_time = 1, -- Keep aiming at target to prevent sideways gun, which can lead to teamkill.
         burst = Shared.BURST_RELIABLE,
 
         light_camera_height = 1600,
