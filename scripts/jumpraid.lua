@@ -319,6 +319,7 @@ local function RestoreAfterDelay()
 	Turn(low_head, y_axis, 0, math.rad(200))
 	Turn(low_head, x_axis, 0, math.rad(45))
 	Move(up_head, y_axis, 0, LINEAR_SPEED/3)
+	Move(low_head, y_axis, 0, LINEAR_SPEED/3)
 	firing = false
 end
 
@@ -330,7 +331,8 @@ function script.AimWeapon(num, heading, pitch)
 	--turn head, open mouth/limbs
 	Turn(low_head, y_axis, heading, math.rad(650)) -- left-right
 	Turn(low_head, x_axis, -pitch, math.rad(200)) --up-down
-	Move(up_head, y_axis, 1, LINEAR_SPEED/2)
+	Move(up_head, y_axis, 2.1895, LINEAR_SPEED/2)
+	Move(low_head, y_axis, -2, LINEAR_SPEED/2)
 	WaitForTurn(low_head, y_axis)
 	WaitForTurn(low_head, x_axis)
 	StartThread(RestoreAfterDelay)
