@@ -78,7 +78,6 @@ return { chicken_spidermonkey = {
       
       customParams            = {
         impulse = [[-100]],
-        timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
                 light_radius = 0,
