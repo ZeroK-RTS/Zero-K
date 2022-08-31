@@ -11,7 +11,6 @@ local weaponDef = {
 	customParams            = {
 		is_unit_weapon = 1,
 		slot = [[3]],
-		--timeslow_preset       = [[module_disruptorbomb]],
 		timeslow_damagefactor = [[10]],
 		timeslow_overslow_frames = 2*30, --2 seconds before slow decays
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],

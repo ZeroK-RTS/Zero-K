@@ -12,7 +12,6 @@ local weaponDef = {
 	customParams            = {
 		is_unit_weapon = 1,
 		slot = [[5]],
-		--timeslow_preset = [[commrecon_slowbeam]],
 		timeslow_onlyslow = [[1]],
 		timeslow_smartretarget = [[0.5]],
 

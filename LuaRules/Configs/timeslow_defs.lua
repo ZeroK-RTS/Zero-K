@@ -20,21 +20,6 @@ local weapons = {
 	vehdisable_disableray = { slowDamage = 30, scaleSlow = false },
 }
 
--- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms
--- as always, need better way to handle if upgrades are desired!
-local presets = {
-	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	
-	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	commrecon2_slowbomb = { slowDamage = 1250, scaleSlow = true },
-	
-	commrecon3_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	commrecon3_slowbomb = { slowDamage = 1500, scaleSlow = true },
-	
-	module_disruptorbeam = { slowDamage = 450, smartRetarget = 0.33, scaleSlow = true},
-	module_disruptorbomb = { slowDamage = 1250, scaleSlow = true },
-}
-
 ------------------------
 -- Send the Config
 
@@ -51,9 +36,7 @@ local weaponArray = {}
 for name, data in pairs(WeaponDefNames) do
 	local custom = {scaleSlow = true}
 	local cp = data.customParams
-	if cp.timeslow_preset then
-		weapons[name] = Spring.Utilities.CopyTable(presets[cp.timeslow_preset])
-	elseif cp.timeslow_damagefactor or cp.timeslow_damage or cp.timeslow_onlyslow then
+	if cp.timeslow_damagefactor or cp.timeslow_damage or cp.timeslow_onlyslow then
 		custom.slowDamage = cp.timeslow_damage or ((cp.timeslow_damagefactor or (cp.timeslow_onlyslow and 1)) * cp.raw_damage)
 		custom.overslow = cp.timeslow_overslow_frames
 		custom.onlySlow = (cp.timeslow_onlyslow) or false
