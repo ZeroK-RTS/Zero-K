@@ -300,11 +300,17 @@ end
 
 --Time("Reduce WeaponDefs access")
 
--- Generate full target table
+-- Cache for dynamic table generation
 local targetTable = {}
 
-local priority, damage
-for uid = 1, udCount do
+local function GetPriority(uid, wid)
+	if not targetTable[uid] then
+		targetTable[uid] = {}
+	end
+	if targetTable[uid][wid] then
+		return targetTable[uid][wid]
+	end
+	
 	local ud = UnitDefs[uid]
 	local unitHealth = ud.health
 	local inverseUnitCost = 1 / ud.buildTime
@@ -335,7 +341,15 @@ for uid = 1, udCount do
 			targetTable[uid][wid] = priority
 		end
 	end
+	return targetTable[uid][wid]
 end
+
+-- Fill the cache, but this costs 20MB so maybe better not.
+--for uid = 1, udCount do
+--	for wid = 1, wdCount do
+--		GetPriority(uid, wid)
+--	end
+--end
 
 --Time("Generate full target table")
 
@@ -374,4 +388,4 @@ end
 
 --Time("highAlphaWeaponDamages")
 
-return targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME
+return GetPriority, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME

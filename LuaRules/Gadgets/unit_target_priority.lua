@@ -33,7 +33,7 @@ local spGetGameFrame = Spring.GetGameFrame
 
 local floor = math.floor
 
-local targetTable, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
+local GetPriority, disarmWeaponTimeDefs, disarmPenaltyDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, radarDotPenalty, transportMult, highAlphaWeaponDamages, DISARM_BASE, DISARM_ADD, DISARM_ADD_TIME = include("LuaRules/Configs/target_priority_defs.lua")
 
 local DISARM_DECAY_FRAMES = 1200
 local DISARM_TOTAL = DISARM_BASE + DISARM_ADD
@@ -369,7 +369,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			return true, 25 + wobbleAdd + velocityAdd + lastShotBonus
 		elseif visiblity == 1 then
 			-- If the unit type is accessible then it can be included in the priority calculation.
-			return true, (targetTable[enemyUnitDefID][attackerWeaponDefID] or 5) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
+			return true, GetPriority(enemyUnitDefID, attackerWeaponDefID) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
 		end
 	end
 	
@@ -378,12 +378,12 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if transportMult[enemyUnitDefID] then
 		local transportiee = GetUnitTransportieeDefID(targetID)
 		if transportiee then
-			defPrio = targetTable[enemyUnitDefID][attackerWeaponDefID] or 5
+			defPrio = GetPriority(enemyUnitDefID, attackerWeaponDefID)
 		else
-			defPrio = (targetTable[transportiee][attackerWeaponDefID] or 5)*transportMult[enemyUnitDefID]
+			defPrio = GetPriority(transportiee, attackerWeaponDefID) * transportMult[enemyUnitDefID]
 		end
 	else
-		defPrio = targetTable[enemyUnitDefID][attackerWeaponDefID] or 5
+		defPrio = GetPriority(enemyUnitDefID, attackerWeaponDefID)
 	end
 
 	--// Get priority modifier based on broad weapon type and generic unit status
