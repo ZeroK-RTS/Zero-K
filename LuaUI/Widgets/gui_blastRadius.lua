@@ -130,9 +130,13 @@ function ChangeBlastColor()
 	lastColorChangeTime = time
 end
 
-local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text)
+local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, invert)
 	glLineWidth(blastLineWidth)
-	glColor( expBlastColor[1], expBlastColor[2], expBlastColor[3], blastAlphaValue )
+	local g = expBlastColor[2]
+	if invert then
+		g = 1 - g
+	end
+	glColor( expBlastColor[1], g, expBlastColor[3], blastAlphaValue )
 	
 	--draw static ground circle
 	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
@@ -201,12 +205,12 @@ function DrawBuildMenuBlastRange()
 		else
 			text = "Unmorphed: " .. damage
 		end
-		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text)
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, false)
 	end
 	if morphExplosionDef and morphExplosionDef.id ~= baseExplosionDef.id then
 		local blastRadius = morphExplosionDef.damageAreaOfEffect
 		local defaultDamage = morphExplosionDef.customParams.shield_damage	--get default damage
-		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Morphed: " .. defaultDamage)
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Morphed: " .. defaultDamage, true)
 	end
 end
 
