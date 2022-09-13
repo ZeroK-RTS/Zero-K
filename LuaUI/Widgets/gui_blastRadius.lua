@@ -1,10 +1,9 @@
 include("keysym.lua")
-local versionNumber = "1.1"
 
 function widget:GetInfo()
 	return {
 		name      = "Blast Radius",
-		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Displays blast radius of select units (META+X) and while placing buildings (META)",
+		desc      = "Displays death blast radius of selected units (hold Space+X) and while placing buildings (hold Space)",
 		author    = "very_bad_soldier",
 		date      = "April 7, 2009",
 		license   = "GNU GPL v2",
