@@ -20,12 +20,9 @@ local blastAlphaValue = 0.5
 
 --------------------------------------------------------------------------------
 local blastColor = { 1.0, 0.0, 0.0 }
-local expBlastAlphaValue = 1.0
-local expBlastColor = { 1.0, 0.0, 0.0}
 
 local lastColorChangeTime = 0.0
-local selfdCycleDir = false
-local selfdCycleTime = 0.3
+local expCycleDir = false
 local expCycleTime = 0.5
 
 -------------------------------------------------------------------------------
@@ -102,46 +99,31 @@ function ChangeBlastColor()
 	local time = spGetGameSeconds()
 	local timediff = ( time - lastColorChangeTime )
 		
-	local addValueSelf = timediff/ selfdCycleTime
 	local addValueExp = timediff/ expCycleTime
 
 	if ( blastColor[2] >= 1.0 ) then
-		selfdCycleDir = false
-	elseif ( blastColor[2] <= 0.0 ) then
-		selfdCycleDir = true
-	end
-	
-	if ( expBlastColor[2] >= 1.0 ) then
 		expCycleDir = false
-	elseif ( expBlastColor[2] <= 0.0 ) then
+	elseif ( blastColor[2] <= 0.0 ) then
 		expCycleDir = true
 	end
 
-	if ( selfdCycleDir == false ) then
-		blastColor[2] = blastColor[2] - addValueSelf
+	if ( expCycleDir == false) then
+		blastColor[2] = blastColor[2] - addValueExp
 		blastColor[2] = max( 0.0, blastColor[2] )
 	else
-		blastColor[2] = blastColor[2] + addValueSelf
+		blastColor[2] = blastColor[2] + addValueExp
 		blastColor[2] = min( 1.0, blastColor[2] )
-	end
-	
-	if ( expCycleDir == false) then
-		expBlastColor[2] = expBlastColor[2] - addValueExp
-		expBlastColor[2] = max( 0.0, expBlastColor[2] )
-	else
-		expBlastColor[2] = expBlastColor[2] + addValueExp
-		expBlastColor[2] = min( 1.0, expBlastColor[2] )
 	end
 					
 	lastColorChangeTime = time
 end
 
 local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, invert)
-	local g = expBlastColor[2]
+	local g = blastColor[2]
 	if invert then
 		g = 1 - g
 	end
-	glColor( expBlastColor[1], g, expBlastColor[3], blastAlphaValue )
+	glColor( blastColor[1], g, blastColor[3], blastAlphaValue)
 
 	--draw static ground circle
 	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
@@ -210,49 +192,25 @@ function DrawBuildMenuBlastRange()
 end
 
 function DrawUnitBlastRadius( unitID )
-	local unitDefID =  spGetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	local udef = udefTab[unitDefID]
-						
-	local x, y, z = spGetUnitPosition(unitID)
-					
-	if ( weapNamTab[lower(udef["deathExplosion"])] ~= nil and weapNamTab[lower(udef["selfDExplosion"])] ~= nil ) then
-		deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
-		blastId = weapNamTab[lower(udef["selfDExplosion"])].id
-
-		blastRadius = weapTab[blastId].damageAreaOfEffect
-		deathblastRadius = weapTab[deathBlasId].damageAreaOfEffect
-						
-		blastDamage = weapTab[blastId].customParams.shield_damage
-		deathblastDamage = weapTab[deathBlasId].customParams.shield_damage
-					
-		local height = Spring.GetGroundHeight(x,z)
-
-		glColor( blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
-		glDrawGroundCircle( x,y,z, blastRadius, blastCircleDivs )
-				
-		glPushMatrix()
-		glTranslate(x , height, z)
-		glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
-		glBillboard()
-		text = blastDamage --text = "SELF-D"
-		if ( deathblastRadius == blastRadius ) then
-			text = blastDamage .. " / " .. deathblastDamage --text = "SELF-D / EXPLODE"
-		end
-
-		glText( text, 0.0, 0.0, sqrt(blastRadius) , "cn")
-		glPopMatrix()
-
-		if ( deathblastRadius ~= blastRadius ) then
-			glColor( expBlastColor[1], expBlastColor[2], expBlastColor[3], expBlastAlphaValue)
-			glDrawGroundCircle( x,y,z, deathblastRadius, blastCircleDivs )
-
-			glPushMatrix()
-			glTranslate(x - ( deathblastRadius / 2 ), height , z  + ( deathblastRadius / 2) )
-			glBillboard()
-			glText( deathblastDamage , 0.0, 0.0, sqrt(deathblastRadius), "cn")
-			glPopMatrix()
-		end
+	local weaponDef = weapNamTab[lower(udef["selfDExplosion"])]
+	if not weaponDef then
+		return
 	end
+
+	local x, y, z = spGetUnitPosition(unitID)
+	local blastRadius = weaponDef.damageAreaOfEffect
+	local height = Spring.GetGroundHeight(x, z)
+
+	glColor(blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
+	glDrawGroundCircle(x, y, z, blastRadius, blastCircleDivs)
+
+	glPushMatrix()
+	glTranslate(x - blastRadius / 2, height, z + blastRadius / 2)
+	glBillboard()
+	glText("Damage: " .. weaponDef.customParams.shield_damage, 0.0, 0.0, sqrt(blastRadius) , "cn")
+	glPopMatrix()
 end
 
 function DrawBlastRadiusSelectedUnits()
