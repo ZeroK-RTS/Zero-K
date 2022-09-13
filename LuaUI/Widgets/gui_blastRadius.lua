@@ -78,6 +78,9 @@ local alwaysDisplay = {
 
 function widget:DrawWorld()
 	glLineStipple(true)
+	glLineWidth(blastLineWidth)
+
+	ChangeBlastColor()
 	DrawBuildMenuBlastRange()
 	
 	--hardcoded: meta + X
@@ -87,8 +90,11 @@ function widget:DrawWorld()
 	if (meta and keyPressed) then
 		DrawBlastRadiusSelectedUnits()
 	end
-	
-	ResetGl()
+
+	glColor(1, 1, 1, 1)
+	glLineWidth(1)
+	glTexture(false)
+	glLineStipple(false)
 end
 
 function ChangeBlastColor()
@@ -131,7 +137,6 @@ function ChangeBlastColor()
 end
 
 local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, invert)
-	glLineWidth(blastLineWidth)
 	local g = expBlastColor[2]
 	if invert then
 		g = 1 - g
@@ -147,13 +152,6 @@ local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, inv
 	glBillboard()
 	glText(text, 0.0, 0.0, sqrt(blastRadius), "cn")
 	glPopMatrix()
-
-	--tidy up
-	glLineWidth(1)
-	glColor(1, 1, 1, 1)
-
-	--cycle colors for next frame
-	ChangeBlastColor()
 end
 
 function DrawBuildMenuBlastRange()
@@ -228,8 +226,7 @@ function DrawUnitBlastRadius( unitID )
 		deathblastDamage = weapTab[deathBlasId].customParams.shield_damage
 					
 		local height = Spring.GetGroundHeight(x,z)
-					
-		glLineWidth(blastLineWidth)
+
 		glColor( blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
 		glDrawGroundCircle( x,y,z, blastRadius, blastCircleDivs )
 				
@@ -259,20 +256,8 @@ function DrawUnitBlastRadius( unitID )
 end
 
 function DrawBlastRadiusSelectedUnits()
-	glLineWidth(blastLineWidth)
-  	  
 	local units = spGetSelectedUnits()
 	for i,unitID in ipairs(units) do
 		DrawUnitBlastRadius( unitID )
 	end
-	  
-	ChangeBlastColor()
-end
-
---Commons
-function ResetGl()
-	glColor( { 1.0, 1.0, 1.0, 1.0 } )
-	glLineWidth( 1.0 )
-	glTexture(false)
-	glLineStipple(false)
 end
