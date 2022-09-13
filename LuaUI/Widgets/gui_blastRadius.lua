@@ -71,6 +71,7 @@ local alwaysDisplay = {
 	[UnitDefNames.energysingu.id] = true,
 	[UnitDefNames.staticcon.id] = true,
 	[UnitDefNames.staticnuke.id] = true,
+	[UnitDefNames.energygeo.id] = true,
 }
 
 -----------------------------------------------------------------------------------
@@ -129,6 +130,32 @@ function ChangeBlastColor()
 	lastColorChangeTime = time
 end
 
+local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, invert)
+	glLineWidth(blastLineWidth)
+	local g = expBlastColor[2]
+	if invert then
+		g = 1 - g
+	end
+	glColor( expBlastColor[1], g, expBlastColor[3], blastAlphaValue )
+
+	--draw static ground circle
+	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
+	glPushMatrix()
+
+	glTranslate(centerX , height, centerZ)
+	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
+	glBillboard()
+	glText(text, 0.0, 0.0, sqrt(blastRadius), "cn")
+	glPopMatrix()
+
+	--tidy up
+	glLineWidth(1)
+	glColor(1, 1, 1, 1)
+
+	--cycle colors for next frame
+	ChangeBlastColor()
+end
+
 function DrawBuildMenuBlastRange()
 	--check if valid command
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
@@ -153,14 +180,13 @@ function DrawBuildMenuBlastRange()
 	local unitDefID = -cmd_id
 		
 	local udef = udefTab[unitDefID]
-	if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
+	local morphdef = UnitDefs[unitDefID].customParams.morphto and UnitDefNames[UnitDefs[unitDefID].customParams.morphto]
+	local baseExplosionDef = weapNamTab[lower(udef["deathExplosion"])]
+	local morphExplosionDef = morphdef and weapNamTab[lower(morphdef["deathExplosion"])]
+	if not (baseExplosionDef or morphExplosionDef) then
 		return
 	end
 	
-	local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
-	local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
-	local defaultDamage = weapTab[deathBlasId].customParams.shield_damage	--get default damage
-		
 	local mx, my = spGetMouseState()
 	local _, coords = spTraceScreenRay(mx, my, true, true)
 	
@@ -170,29 +196,24 @@ function DrawBuildMenuBlastRange()
 	local centerZ = coords[3]
 		
 	centerX, _, centerZ = spPos2BuildPos( unitDefID, centerX, 0, centerZ, spGetBuildFacing() )
-	glLineWidth(blastLineWidth)
-	glColor( expBlastColor[1], expBlastColor[2], expBlastColor[3], blastAlphaValue )
-	
-	--draw static ground circle
-	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
-
 	local height = Spring.GetGroundHeight(centerX,centerZ)
 	
-	--draw EXPLODE text and icon
-	glPushMatrix()
-	
-	glTranslate(centerX , height, centerZ)
-	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
-	glBillboard()
-	glText( defaultDamage, 0.0, 0.0, sqrt(blastRadius), "cn")
-	glPopMatrix()
-	
-	--tidy up
-	glLineWidth(1)
-	glColor(1, 1, 1, 1)
-	
-	--cycle colors for next frame
-	ChangeBlastColor()
+	if baseExplosionDef then
+		local blastRadius = baseExplosionDef.damageAreaOfEffect
+		local damage = baseExplosionDef.customParams.shield_damage
+		local text = ""
+		if morphExplosionDef == nil or morphExplosionDef.id == baseExplosionDef.id then
+			text = "Damage: " .. damage
+		else
+			text = "Unmorphed: " .. damage
+		end
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, false)
+	end
+	if morphExplosionDef and morphExplosionDef.id ~= baseExplosionDef.id then
+		local blastRadius = morphExplosionDef.damageAreaOfEffect
+		local defaultDamage = morphExplosionDef.customParams.shield_damage	--get default damage
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Morphed: " .. defaultDamage, true)
+	end
 end
 
 function DrawUnitBlastRadius( unitID )
