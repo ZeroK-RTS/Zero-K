@@ -21,7 +21,6 @@ local blastAlphaValue = 0.5
 --------------------------------------------------------------------------------
 local blastColor = { 1.0, 0.0, 0.0 }
 
-local lastColorChangeTime = 0.0
 local expCycleDir = false
 local expCycleTime = 0.5
 
@@ -77,7 +76,6 @@ function widget:DrawWorld()
 	glLineStipple(true)
 	glLineWidth(blastLineWidth)
 
-	ChangeBlastColor()
 	DrawBuildMenuBlastRange()
 	
 	--hardcoded: meta + X
@@ -94,11 +92,8 @@ function widget:DrawWorld()
 	glLineStipple(false)
 end
 
-function ChangeBlastColor()
+function widget:Update(timediff)
 	--cycle red/yellow
-	local time = spGetGameSeconds()
-	local timediff = ( time - lastColorChangeTime )
-		
 	local addValueExp = timediff/ expCycleTime
 
 	if ( blastColor[2] >= 1.0 ) then
@@ -114,8 +109,6 @@ function ChangeBlastColor()
 		blastColor[2] = blastColor[2] + addValueExp
 		blastColor[2] = min( 1.0, blastColor[2] )
 	end
-					
-	lastColorChangeTime = time
 end
 
 local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, invert)
