@@ -1,5 +1,5 @@
 include("keysym.lua")
-local versionNumber = "1.2"
+local versionNumber = "1.1"
 
 function widget:GetInfo()
 	return {
@@ -137,25 +137,24 @@ local function DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, inv
 		g = 1 - g
 	end
 	glColor( expBlastColor[1], g, expBlastColor[3], blastAlphaValue )
-	
+
 	--draw static ground circle
 	glDrawGroundCircle(centerX, 0, centerZ, blastRadius, blastCircleDivs )
 	glPushMatrix()
-	
+
 	glTranslate(centerX , height, centerZ)
 	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 	glBillboard()
 	glText(text, 0.0, 0.0, sqrt(blastRadius), "cn")
 	glPopMatrix()
-	
+
 	--tidy up
 	glLineWidth(1)
 	glColor(1, 1, 1, 1)
-	
+
 	--cycle colors for next frame
 	ChangeBlastColor()
 end
-	
 
 function DrawBuildMenuBlastRange()
 	--check if valid command
@@ -182,7 +181,7 @@ function DrawBuildMenuBlastRange()
 		
 	local udef = udefTab[unitDefID]
 	local morphdef = UnitDefs[unitDefID].customParams.morphto and UnitDefNames[UnitDefs[unitDefID].customParams.morphto]
-	local baseExplosionDef = weapNamTab[lower(udef["deathExplosion"])] 
+	local baseExplosionDef = weapNamTab[lower(udef["deathExplosion"])]
 	local morphExplosionDef = morphdef and weapNamTab[lower(morphdef["deathExplosion"])]
 	if not (baseExplosionDef or morphExplosionDef) then
 		return
@@ -190,9 +189,12 @@ function DrawBuildMenuBlastRange()
 	
 	local mx, my = spGetMouseState()
 	local _, coords = spTraceScreenRay(mx, my, true, true)
+	
 	if not coords then return end
+		
 	local centerX = coords[1]
 	local centerZ = coords[3]
+		
 	centerX, _, centerZ = spPos2BuildPos( unitDefID, centerX, 0, centerZ, spGetBuildFacing() )
 	local height = Spring.GetGroundHeight(centerX,centerZ)
 	
@@ -217,20 +219,25 @@ end
 function DrawUnitBlastRadius( unitID )
 	local unitDefID =  spGetUnitDefID(unitID)
 	local udef = udefTab[unitDefID]
+						
 	local x, y, z = spGetUnitPosition(unitID)
+					
 	if ( weapNamTab[lower(udef["deathExplosion"])] ~= nil and weapNamTab[lower(udef["selfDExplosion"])] ~= nil ) then
 		deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
 		blastId = weapNamTab[lower(udef["selfDExplosion"])].id
-		
+
 		blastRadius = weapTab[blastId].damageAreaOfEffect
 		deathblastRadius = weapTab[deathBlasId].damageAreaOfEffect
-		
+						
 		blastDamage = weapTab[blastId].customParams.shield_damage
 		deathblastDamage = weapTab[deathBlasId].customParams.shield_damage
+					
 		local height = Spring.GetGroundHeight(x,z)
+					
 		glLineWidth(blastLineWidth)
 		glColor( blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
 		glDrawGroundCircle( x,y,z, blastRadius, blastCircleDivs )
+				
 		glPushMatrix()
 		glTranslate(x , height, z)
 		glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
@@ -263,6 +270,7 @@ function DrawBlastRadiusSelectedUnits()
 	for i,unitID in ipairs(units) do
 		DrawUnitBlastRadius( unitID )
 	end
+	  
 	ChangeBlastColor()
 end
 
