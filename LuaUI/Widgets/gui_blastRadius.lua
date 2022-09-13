@@ -201,18 +201,13 @@ function DrawBuildMenuBlastRange()
 	if baseExplosionDef then
 		local blastRadius = baseExplosionDef.damageAreaOfEffect
 		local damage = baseExplosionDef.customParams.shield_damage
-		local text = ""
-		if morphExplosionDef == nil or morphExplosionDef.id == baseExplosionDef.id then
-			text = "Damage: " .. damage
-		else
-			text = "Unmorphed: " .. damage
-		end
+		local text = "Damage: " .. damage
 		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, false)
 	end
 	if morphExplosionDef and morphExplosionDef.id ~= baseExplosionDef.id then
 		local blastRadius = morphExplosionDef.damageAreaOfEffect
 		local defaultDamage = morphExplosionDef.customParams.shield_damage	--get default damage
-		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Morphed: " .. defaultDamage, true)
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Damage (upgraded): " .. defaultDamage, true)
 	end
 end
 
