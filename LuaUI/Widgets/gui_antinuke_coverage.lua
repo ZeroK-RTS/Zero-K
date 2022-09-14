@@ -416,7 +416,7 @@ local function DrawEnemyInterceptors(inMinimap)
 	local mx, mz = drawNuke.mouse[1], drawNuke.mouse[3]
 
 	local intercepted = 0
-	glLineWidth(2)
+	glLineWidth(3)
 	
 	for unitID, def in pairs(enemyInt) do
 
@@ -457,7 +457,7 @@ local function DrawEnemyInterceptors(inMinimap)
 end
 
 local function DrawAllyInterceptors(inMinimap)
-	glLineWidth(2)
+	glLineWidth(3)
 	for unitID, def in pairs(allyInt) do
 		
 		if def.incomplete then
@@ -485,7 +485,6 @@ end
 
 
 local function Draw()
-	
 	if drawNuke then
 		local intercepted = DrawEnemyInterceptors()
 		local vertices = {drawNuke.pos, drawNuke.mouse}
@@ -498,7 +497,7 @@ local function Draw()
 			glColor(0,1,0,1)
 		end
 		
-		glLineWidth(2)
+		glLineWidth(3)
 		glBeginEnd(GL_LINES, VertexList, vertices)
 		
 		glLineWidth(1)
