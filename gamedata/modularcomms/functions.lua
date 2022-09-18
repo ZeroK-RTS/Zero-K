@@ -146,10 +146,9 @@ end
 
 function ModifyWeaponDamage(unitDef, factor, includeCustomParams)
 	if unitDef.customparams.dynamic_comm then
-		-- Change the name of the used weapon.
-		local damageMod = (unitDef.customparams.damagemod or 0)
+		-- Fix the format (FIXME: use v.name all along)
 		for i,v in pairs(unitDef.weapons) do
-			v.name = damageMod .. "_" .. v.def
+			v.name = v.def
 			v.def = nil
 		end
 	else
@@ -162,6 +161,10 @@ function ModifyWeaponDamage(unitDef, factor, includeCustomParams)
 			end
 			for armorname, dmg in pairs(v.damage) do
 				v.damage[armorname] = dmg + dmg * mod
+
+				if (v.customparams or {}).extra_damage then
+					v.customparams.extra_damage = v.customparams.extra_damage * (1 + mod)
+				end
 			end
 		end
 	end

@@ -8,7 +8,7 @@ local weaponDef = {
 
 	customParams            = {
 		is_unit_weapon = 1,
-		extra_damage_mult = 2.5,
+		extra_damage = 550,
 		slot = [[5]],
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
 

@@ -343,17 +343,6 @@ for name, data in pairs(commDefs) do
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
 	end
 	
-	-- calc lightning real damage based on para damage
-	-- TODO: use for slow-beams
-	if data.weapondefs then
-		for wName, weaponData in pairs(data.weapondefs) do
-			if (weaponData.customparams or {}).extra_damage_mult then
-				weaponData.customparams.extra_damage = weaponData.customparams.extra_damage_mult * weaponData.damage.default
-				weaponData.customparams.extra_damage_mult = nil
-			end
-		end
-	end
-	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs and not data.customparams.dynamic_comm then
 		local maxRange = 0

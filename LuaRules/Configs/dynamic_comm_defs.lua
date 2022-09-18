@@ -759,7 +759,6 @@ local moduleDefs = {
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			-- Damage boost is applied via clone swapping
 			sharedData.damageMult = (sharedData.damageMult or 1) + 0.1
 			sharedData.speedMod = (sharedData.speedMod or 0) - 1
 		end
