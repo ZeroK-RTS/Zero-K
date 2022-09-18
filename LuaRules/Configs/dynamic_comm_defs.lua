@@ -709,14 +709,14 @@ local moduleDefs = {
 	{
 		name = "module_autorepair",
 		humanName = "Autorepair",
-		description = "Autorepair - Commander self-repairs at +10 hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 8",
+		description = "Autorepair - Commander self-repairs at +" .. 10*HP_MULT .. " hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 8",
 		image = moduleImagePath .. "module_autorepair.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
+			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10*HP_MULT
 			sharedData.healthBonus = (sharedData.healthBonus or 0) - 100*HP_MULT
 		end
 	},
