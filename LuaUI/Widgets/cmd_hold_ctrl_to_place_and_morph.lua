@@ -29,6 +29,7 @@ end
 local abs = math.abs
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local CMD_MORPH = Spring.Utilities.CMD.MORPH
 
 local myTeamID
 
@@ -47,6 +48,8 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOp
 		or unitTeam ~= myTeamID 
 		or not morphableUnitDefIds[-cmdId] 
 		or not cmdOpts
+		or not cmdParams[1]
+		or not cmdParams[3]
 	then 
 		return 
 	end
@@ -59,16 +62,14 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOp
 			buildingsToMorph = {}
 			buildingsToMorphByBuilder[unitID] = buildingsToMorph
 		end
-		table.insert(buildingsToMorph, point)
-
-		-- Spring.Echo('Building at '..show(point).. ' marked as to be morphed when placed by builder '..unitID)
-
+		buildingsToMorph[#buildingsToMorph + 1] = point
 	elseif buildingsToMorph then
-		for i, point2 in pairs(buildingsToMorph) do
-			if (point2.x) then
-				if (point2.x == point.x) and (point2.z == point.z) then
-					buildingsToMorph[i] = nil
-				end
+		for i = 1, #buildingsToMorph do
+			local point2 = buildingsToMorph[i]
+			if point2.x == point.x and point2.z == point.z then
+				buildingsToMorph[i] = buildingsToMorph[#buildingsToMorph]
+				buildingsToMorph[#buildingsToMorph] = nil
+				break
 			end
 		end
 	end
@@ -92,19 +93,15 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local ux, uy, uz  = spGetUnitPosition(unitID)
 	-- Spring.Echo('UnitCreated(unitDef = '..UnitDefs[unitDefID].name..', builderID = '..(builderID or 'nil')..', x = '..ux..', z = '..uz..')')
 
-	for i, point2 in pairs(buildingsToMorph) do
-		if (point2.x) then
+	for i = 1, #buildingsToMorph do
+		-- Note: unit_building_starter.lua, which does something similar, uses a location tolerance of 16
+		-- here. But this appears to be unnecessary for the morphable buildings considered here(?)
+		-- (in fact, it workers with exact equality, but being defensive)
 
-			-- Note: unit_building_starter.lua, which does something similar, uses a location tolerance of 16
-			-- here. But this appears to be unnecessary for the morphable buildings considered here(?)
-			-- (in fact, it workers with exact equality, but being defensive)
-
-			if abs(point2.x - ux) < 1e-3 and abs(point2.z - uz) < 1e-3 then
-				local cmdId = Spring.Utilities.CMD.MORPH
-				-- Spring.Echo('MORPHING!!!!!!! '..cmdId)
-				spGiveOrderToUnit(unitID, cmdId, {}, 0)
-				return
-			end
+		local point2 = buildingsToMorph[i]
+		if abs(point2.x - ux) < 1e-3 and abs(point2.z - uz) < 1e-3 then
+			spGiveOrderToUnit(unitID, CMD_MORPH, {}, 0)
+			return
 		end
 	end
 
@@ -115,6 +112,5 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	buildingsToMorphByBuilder[unitID] = nil
 end
 
-function widget:UnitIdle(unitID, unitDefID, unitTeam)
-	buildingsToMorphByBuilder[unitID] = nil
-end
+widget.UnitIdle  = widget.UnitDestroyed
+widget.UnitTaken = widget.UnitDestroyed
