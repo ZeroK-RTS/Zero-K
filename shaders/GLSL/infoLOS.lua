@@ -13,32 +13,33 @@ return {
 		}
 	]],
 	fragment = [[#version 130
+
 	#ifdef HIGH_QUALITY
-	#extension GL_ARB_texture_query_lod : enable
+		#extension GL_ARB_texture_query_lod : enable
 	#endif
-		uniform float time;
-		uniform vec4 alwaysColor;
-		uniform vec4 losColor;
-		uniform vec4 radarColor;
-		uniform vec4 radarColor2;
-		uniform vec4 jamColor;
-		uniform sampler2D tex0;
-		uniform sampler2D tex1;
-		uniform sampler2D tex2;
-		varying vec2 texCoord;
+	
+	uniform float time;
+	uniform vec4 alwaysColor;
+	uniform vec4 losColor;
+	uniform vec4 radarColor;
+	uniform vec4 radarColor2;
+	uniform vec4 jamColor;
+	uniform sampler2D tex0;  // r = Ground LOS
+	uniform sampler2D tex1;  // r = Air LOS
+	uniform sampler2D tex2;  // r = Radar coverage, g = Jammer coverage
+	varying vec2 texCoord;
+	
 	#ifdef HIGH_QUALITY
 		//! source: http://www.ozone3d.net/blogs/lab/20110427/glsl-random-generator/
-		float rand(const in vec2 n)
-		{
+		float rand(const in vec2 n) {
 			return fract(sin(dot(n, vec2(12.9898, 78.233))) * 43758.5453);
 		}
-		vec4 getTexel(in sampler2D tex, in vec2 p)
-		{
+		vec4 getTexel(in sampler2D tex, in vec2 p) {
 			int lod = int(textureQueryLOD(tex, p).x);
 			vec2 texSize = vec2(textureSize(tex, lod));
 			vec2 off = vec2(time);
 			vec4 c = vec4(0.0);
-			for (int i = 0; i<4; i++) {
+			for (int i = 0; i < 4; i++) {
 				off = (vec2(rand(p.st + off.st), rand(p.ts - off.ts)) * 2.0 - 1.0) / texSize;
 				c += texture2D(tex, p + off);
 			}
@@ -48,31 +49,32 @@ return {
 	#else
 		#define getTexel texture2D
 	#endif
-		void main() {
-			vec2 radarJammer = getTexel(tex2, texCoord).rg;  // r = radar, g = jamming
-			float los = getTexel(tex0, texCoord).r;
-			float airlos = getTexel(tex1, texCoord).r;
-			// The radarColor2 fringing occurs as an edge case when it has color channels at 1.0
-			// The fract() returns 0.0 for that infill while maintaining the edge falloff
-			// Our goal is as follows:
-			//   - Ensure radarColor fringe is ALWAYS visible
-			//   - Ensure radarColor2 fringe is ALWAYS visible
-			//   - Ensure radarColor2 infill is ONLY visible in the absence of LOS
-			//   - Ensure jamColor is ALWAYS visible, especially as it almost always is LOS
-			// 2 & 3 combined present a bit of a challenge without branching.
-			vec3 radarFringe = radarColor.rgb * step(0.2, fract(1 - radarJammer.r));  // Radar edge/fringing
-			vec3 radarFill = fract(radarColor2.rgb * step(0.8, radarJammer.r) * radarJammer.r);
-			//gl_FragColor = fract(radarColor2 * step(0.8, radarJammer.r) * radarJammer.r  * (1.0-floor(los)));  // Radar area outside of LOS
-			gl_FragColor.rgb = radarFill * (1.0-floor(los)); // TODO: This may be wrong approach
-			gl_FragColor += alwaysColor + losColor * (los * 0.9 + airlos * 0.1);
-			gl_FragColor = min(gl_FragColor, alwaysColor + losColor);
-			gl_FragColor += jamColor * radarJammer.g;  // Jammer area - additive over LOS
-
-			gl_FragColor.rgb += radarFringe;
-
-			gl_FragColor.a = 0.05;
-		}
-	]],
+	
+	void main() {
+		float los = getTexel(tex0, texCoord).r;
+		float airLos = getTexel(tex1, texCoord).r;
+		vec2 radarJammer = getTexel(tex2, texCoord).rg;
+		float losMix = los*0.9 + airLos*0.1;
+		float radar = radarJammer.r;
+		float jammer = radarJammer.g;
+	
+		// The radarColor2 fringing occurs as an edge case when it has color channels at 1.0
+		// The fract() returns 0.0 for that infill while maintaining the edge falloff
+		// Our goal is as follows:
+		//   - Ensure radarColor fringe is ALWAYS visible
+		//   - Ensure radarColor2 fringe is ALWAYS visible
+		//   - Ensure radarColor2 infill is ONLY visible in the absence of LOS
+		//   - Do not draw radarColor2 infill for color channels set to 1.0
+		//   - Ensure jamColor is ALWAYS visible, especially as it almost always is LOS
+	
+		gl_FragColor.rgb = losColor.rgb * losMix;
+		gl_FragColor.rgb += jamColor.rgb * jammer;
+		gl_FragColor.rgb += fract(radarColor2.rgb) * step(1.0, radar) * (1.0 - los);  // Radar infill
+		gl_FragColor.rgb += radarColor2.rgb * fract(step(0.8, radar) * radar);  // Radar inner edge/fringing
+		gl_FragColor.rgb += radarColor.rgb * step(0.2, fract(1.0-radar));  // Radar outer edge/fringing
+		gl_FragColor.rgb += alwaysColor.rgb;
+		gl_FragColor.a = 0.05;
+	}]],
 	uniformFloat = {
 		alwaysColor = alwaysColor,
 		losColor    = losColor,
