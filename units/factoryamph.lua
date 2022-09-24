@@ -38,7 +38,7 @@ return { factoryamph = {
 
   customParams     = {
     ploppable = 1,
-    modelradius    = [[60]],
+    modelradius    = [[42]],
     aimposoffset   = [[0 0 -26]],
     midposoffset   = [[0 0 -10]],
     sortName = [[8]],

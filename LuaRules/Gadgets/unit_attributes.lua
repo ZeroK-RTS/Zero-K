@@ -75,16 +75,12 @@ local allowUnitCoast = {}
 -- UnitDefs caching
 
 local shieldWeaponDef = {}
-local isFirePlatform = {}
 local buildSpeedDef = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.shieldWeaponDef then
 		shieldWeaponDef[i] = true
-	end
-	if ud.isFirePlatform then
-		isFirePlatform[i] = true
 	end
 	if (ud.buildSpeed or 0) ~= 0 then
 		buildSpeedDef[i] = ud.buildSpeed
@@ -531,7 +527,6 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	if setNewState or radarOverride or sonarOverride or jammerOverride or sightOverride then
 		changedAtt = true
-		abilityDisabled = abilityDisabled and not isFirePlatform[unitDefID] -- Can't have surfboard losing sensors
 		UpdateSensorAndJamm(unitID, unitDefID, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 

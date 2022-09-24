@@ -2,9 +2,9 @@ function widget:GetInfo()
 	return {
 		name      = "Persistent Build Spacing",
 		desc      = "Maintains build spacing between matches",
-		author    = "Niobium & DrHash-, Helwor",
-		date      = "Sep 6, 2011",
-		license   = "GNU GPL, v3 or later",
+		author    = "Helwor",
+		date      = "August 2020",
+		license   = "GNU GPL, v2 or later",
 		layer     = 1,
 		enabled   = true,  --  loaded by default?
 	}

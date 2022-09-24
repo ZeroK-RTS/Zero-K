@@ -87,7 +87,7 @@ return { jumparty = {
 
         area_damage = 1,
         area_damage_radius = 64,
-        area_damage_dps = 20,
+        area_damage_dps = 19,
         area_damage_duration = 16,
 
         --lups_heat_fx = [[firewalker]],
@@ -97,8 +97,7 @@ return { jumparty = {
       },
       
       damage                  = {
-        default = 80,
-        planes  = 80,
+        default = 68,
       },
 
       explosionGenerator      = [[custom:napalm_firewalker_small]],

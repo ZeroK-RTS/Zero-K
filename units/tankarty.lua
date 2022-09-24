@@ -88,7 +88,7 @@ return { tankarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity               = 0.095,
+      myGravity               = 0.090,
       noSelfDamage            = true,
       range                   = 1120,
       reloadtime              = 7,
@@ -96,7 +96,7 @@ return { tankarty = {
       soundStart              = [[weapon/cannon/pillager_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 315,
+      weaponVelocity          = 320,
     },
 
   },

@@ -25,6 +25,7 @@ return { cloaksnipe = {
     modelradius    = [[15]],
     dontfireatradarcommand = '0',
     no_decloak_on_weapon_fire = 1,
+    reload_move_penalty = 0.66,
 
     outline_x = 120,
     outline_y = 120,

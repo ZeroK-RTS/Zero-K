@@ -285,7 +285,7 @@ local function drawGraph(graphArray, graphMax, teamID, team_num, isHighlighted)
 	
 	local r,g,b,a = Spring.GetTeamColor(
 		usingAllyteams
-		and ((teamID == Spring.GetMyAllyTeamID()) and Spring.GetMyTeamID() or Spring.GetTeamList(teamID)[1])
+		and ((not Spring.GetSpectatingState() and teamID == Spring.GetMyAllyTeamID()) and Spring.GetMyTeamID() or Spring.GetTeamList(teamID)[1])
 		or teamID
 	)
 	local teamColor = {r,g,b,a}

@@ -27,8 +27,8 @@ local SIG_TILT = 4
 local SIG_PUSH = 16
 local SIG_STOW = 32
 
-local TURRET_SPEED = math.rad(35)
-local TURRET_SPEED_2 = math.rad(70)
+local TURRET_SPEED = math.rad(40)
+local TURRET_SPEED_2 = math.rad(80)
 
 local BARREL_DISTANCE = -4
 local BREECH_DISTANCE = -2
@@ -186,6 +186,7 @@ function script.FireWeapon()
 	Move(breech, z_axis, BREECH_DISTANCE)
 	Move(barrel, z_axis, 0, BARREL_SPEED)
 	Move(breech, z_axis, 0, BREECH_SPEED)
+	--Spring.Echo("Fire", Spring.GetGameFrame())
 end
 
 function script.BlockShot(num, targetID)

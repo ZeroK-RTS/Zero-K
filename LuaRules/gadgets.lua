@@ -27,6 +27,7 @@ local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
 local SCRIPT_DIR = Script.GetName() .. '/'
 
 local ECHO_DESCRIPTIONS = false
+local SYNC_MEMORY_DEBUG = (gcinfo or false)
 
 local VFSMODE = VFS.ZIP_ONLY
 if (Spring.IsDevLuaEnabled()) then
@@ -351,6 +352,12 @@ end
 
 
 function gadgetHandler:LoadGadget(filename)
+  local kbytes = 0
+  if SYNC_MEMORY_DEBUG then-- only present in special debug builds, otherwise gcinfo is not preset in synced context!
+    collectgarbage("collect") -- call it twice, mark
+    collectgarbage("collect") -- sweep
+    kbytes = gcinfo() 
+  end
   local basename = Basename(filename)
   local text = VFS.LoadFile(filename, VFSMODE)
   if (text == nil) then
@@ -440,7 +447,12 @@ function gadgetHandler:LoadGadget(filename)
   if info and ECHO_DESCRIPTIONS then
     Spring.Echo(filename, info.name, info.desc)
   end
-
+  
+  if kbytes > 0 then 
+    collectgarbage("collect") -- mark
+    collectgarbage("collect") -- sweep
+    Spring.Echo("LoadGadget\t" .. filename .. "\t" .. (gcinfo() - kbytes) .. "\t" .. gcinfo() .. "\t" .. (IsSyncedCode() and 1 or 0))
+  end
   return gadget
 end
 

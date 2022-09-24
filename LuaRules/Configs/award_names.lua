@@ -16,7 +16,7 @@ return {
 	rezz    = 'Vile Necromancer',
 	vet     = 'Decorated Veteran',
 	ouch    = 'Big Purple Heart',
-	kam     = 'Kamikaze Award',
+	kam     = 'Blaze of Glory',
 	comm    = 'Master and Commander',
 	mex     = 'Mineral Prospector',
 	mexkill = 'Loot & Pillage',

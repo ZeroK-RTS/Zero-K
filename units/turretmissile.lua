@@ -32,7 +32,7 @@ return { turretmissile = {
   iconType                      = [[defenseskirm]],
   levelGround                   = false,
   losEmitHeight                 = 40,
-  maxDamage                     = 300,
+  maxDamage                     = 340,
   maxSlope                      = 36,
   maxVelocity                   = 0,
   noAutoFire                    = false,
@@ -89,7 +89,7 @@ return { turretmissile = {
       },
 
       damage                  = {
-        default = 104,
+        default = 104.001,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

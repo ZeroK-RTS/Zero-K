@@ -122,7 +122,7 @@ for i = 1, #UnitDefs do
 		if stopDist and not goalDist[i] then
 			goalDist[i] = loneStopDist
 		end
-		stoppingRadiusIncrease[i] = ud.xsize*250
+		stoppingRadiusIncrease[i] = ud.xsize*260*(1 + math.max(0, (ud.xsize - 4)*0.15))
 	end
 end
 

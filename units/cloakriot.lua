@@ -62,7 +62,7 @@ return { cloakriot = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 20,
-  turnRate               = 2160,
+  turnRate               = 2052,
   upright                = true,
 
   weapons                = {
@@ -109,7 +109,7 @@ return { cloakriot = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 275,
+      range                   = 270,
       reloadtime              = 0.466,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
@@ -118,7 +118,7 @@ return { cloakriot = {
       stages                  = 10,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
+      weaponVelocity          = 580,
     },
 
   },

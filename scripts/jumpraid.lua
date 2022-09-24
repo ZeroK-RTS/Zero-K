@@ -286,6 +286,7 @@ function script.StopMoving()
 end
 
 function script.Create()
+	Move(up_head, y_axis, -0.5) -- no mouth breathing
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
@@ -318,7 +319,7 @@ local function RestoreAfterDelay()
 	Sleep(2500)
 	Turn(low_head, y_axis, 0, math.rad(200))
 	Turn(low_head, x_axis, 0, math.rad(45))
-	Move(up_head, y_axis, 0, LINEAR_SPEED/3)
+	Move(up_head, y_axis, -0.5, LINEAR_SPEED/3)
 	firing = false
 end
 
@@ -328,9 +329,13 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	firing = true
 	--turn head, open mouth/limbs
-	Turn(low_head, y_axis, heading, math.rad(650)) -- left-right
-	Turn(low_head, x_axis, -pitch, math.rad(200)) --up-down
-	Move(up_head, y_axis, 1, LINEAR_SPEED/2)
+	Turn(low_head, y_axis, heading, math.rad(650))
+	Turn(low_head, x_axis, -pitch, math.rad(200))
+
+	-- NB: lower_head (ie. jaw) shouldn't move because
+	-- it is actually the parent piece for the upper head
+	Move(up_head, y_axis, 3, LINEAR_SPEED*2)
+
 	WaitForTurn(low_head, y_axis)
 	WaitForTurn(low_head, x_axis)
 	StartThread(RestoreAfterDelay)

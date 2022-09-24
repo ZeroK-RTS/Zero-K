@@ -14,17 +14,21 @@ local SIG_AIM = 2
 local SIG_MOVE = 1
 
 local RESTORE_DELAY = 5000
-local LOAD_DELAY = 4800
+local LOAD_DELAY = 1000
+local RELEASE_DELAY = 400 -- How long gantry waits after missile leaves
 local TRACK_PERIOD = 50
 
 local BAY_DISTANCE = -10
-local BAY_SPEED = 8
-local GANTRY_SPEED = math.rad(90)
-local CLAMP_SPEED = math.rad(180)
+local BAY_SPEED_LOADED = 7
+local BAY_SPEED_UNLOADED = 7
+local GANTRY_SPEED_LOADED = math.rad(90)
+local GANTRY_SPEED_UNLOADED = math.rad(40)
+local CLAMP_SPEED_LOADED = math.rad(360)
+local CLAMP_SPEED_UNLOADED = math.rad(90)
 
 local WHEEL_SPIN_SPEED = math.rad(720)
-local WHEEL_SPIN_ACCEL = math.rad(10)
-local WHEEL_SPIN_DECEL = math.rad(30)
+local WHEEL_SPIN_ACCEL = math.rad(100)
+local WHEEL_SPIN_DECEL = math.rad(200)
 
 local isLoaded, isReady, isMoving, doStrobe = true, false, false, false
 local tracks = 1
@@ -32,7 +36,11 @@ local tracks = 1
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function TrackControl()
+	SetSignalMask(SIG_MOVE)
 	while isMoving do
+		for i = 1, #wheels do
+			Spin(wheels[i], x_axis, WHEEL_SPIN_SPEED, WHEEL_SPIN_ACCEL)
+		end
 		tracks = tracks + 1
 		if tracks == 2 then
 			Hide(tracks1)
@@ -53,61 +61,73 @@ local function TrackControl()
 end
 
 local function Prepare()
-	Move(bay, x_axis, 0, BAY_SPEED)
+	Signal(SIG_OPEN)
+	SetSignalMask(SIG_OPEN)
+
+	Move(bay, x_axis, 0, BAY_SPEED_LOADED)
 	WaitForMove(bay, x_axis)
 	doStrobe = true
-	Turn(gantry, x_axis, math.rad(-90), GANTRY_SPEED)
+	Turn(gantry, x_axis, math.rad(-90), GANTRY_SPEED_LOADED)
 	WaitForTurn(gantry, x_axis)
-	Turn(clamp1, z_axis, math.rad(-(90)), CLAMP_SPEED)
-	Turn(clamp2, z_axis, math.rad(-(-90)), CLAMP_SPEED)
-	WaitForTurn(clamp1, y_axis)
-	WaitForTurn(clamp2, y_axis)
+	Turn(clamp1, z_axis, math.rad(-90), CLAMP_SPEED_LOADED)
+	Turn(clamp2, z_axis, math.rad( 90), CLAMP_SPEED_LOADED)
+	WaitForTurn(clamp1, z_axis)
+	WaitForTurn(clamp2, z_axis)
 	isReady = true
 end
 
 local function Reload()
+	Signal(SIG_OPEN)
+	SetSignalMask(SIG_OPEN)
+	if not isLoaded then   -- Just fired
+		Sleep(RELEASE_DELAY)
+	end
 	isReady = false
 	doStrobe = false
-	Turn(clamp1, z_axis, 0, CLAMP_SPEED)
-	Turn(clamp2, z_axis, 0, CLAMP_SPEED)
-	WaitForTurn(clamp1, z_axis)
-	WaitForTurn(clamp2, z_axis)
-	Turn(gantry, x_axis, 0, GANTRY_SPEED)
-	WaitForTurn(gantry, x_axis)
-	Move(bay, x_axis, -BAY_DISTANCE, BAY_SPEED)
+	if isLoaded then -- Slow retract if missile still there
+		Turn(clamp1, z_axis, 0, CLAMP_SPEED_LOADED)
+		Turn(clamp2, z_axis, 0, CLAMP_SPEED_LOADED)
+		Turn(gantry, x_axis, 0, GANTRY_SPEED_LOADED)
+		WaitForTurn(clamp1, z_axis)
+		WaitForTurn(clamp2, z_axis)
+		WaitForTurn(gantry, x_axis)
+		Move(bay, x_axis, -BAY_DISTANCE, BAY_SPEED_LOADED)
+	else
+		Turn(clamp1, z_axis, 0, CLAMP_SPEED_UNLOADED)
+		Turn(clamp2, z_axis, 0, CLAMP_SPEED_UNLOADED)
+		Turn(gantry, x_axis, 0, GANTRY_SPEED_UNLOADED)
+		WaitForTurn(clamp1, z_axis)
+		WaitForTurn(clamp2, z_axis)
+		WaitForTurn(gantry, x_axis)
+		Move(bay, x_axis, -BAY_DISTANCE, BAY_SPEED_UNLOADED)
+	end
 	WaitForMove(bay, x_axis)
-	
-	Sleep(LOAD_DELAY)
-	isLoaded = 1
+
+	if not isLoaded then -- Only wait if reload required
+		Sleep(LOAD_DELAY)
+	end
+	isLoaded = true
 	Show(missile)
 end
 
-local function Moving()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
-	
-	StartThread(TrackControl)
-	for i=1,#wheels do
-		Spin(wheels[i], x_axis, WHEEL_SPIN_SPEED, WHEEL_SPIN_ACCEL)
-	end
-end
-
-local function Stopping()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
-	for i=1,#wheels do
-		StopSpin(wheels[i], x_axis, WHEEL_SPIN_DECEL)
-	end
-end
-
 function script.StartMoving()
+	Signal(SIG_MOVE)
 	isMoving = true
-	StartThread(Moving)
+	StartThread(TrackControl)
+end
+
+local function DelayStopMove()
+	SetSignalMask(SIG_MOVE)
+	Sleep(500)
+	isMoving = false
 end
 
 function script.StopMoving()
-	isMoving = false
-	StartThread(Stopping)
+	Signal(SIG_MOVE)
+	StartThread(DelayStopMove)
+	for i = 1, #wheels do
+		StopSpin(wheels[i], x_axis, WHEEL_SPIN_DECEL)
+	end
 end
 
 local function RestoreAfterDelay()
@@ -118,8 +138,9 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+
 	GG.DontFireRadar_CheckAim(unitID)
-	
+
 	if isLoaded then
 		StartThread(Prepare)
 		if doStrobe then
@@ -149,7 +170,7 @@ function script.BlockShot(num, targetID)
 end
 
 function script.QueryWeapon(num)
-	return smoke
+	return missile
 end
 
 function script.Shot(num)

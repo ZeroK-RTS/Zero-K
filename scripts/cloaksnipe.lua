@@ -58,9 +58,13 @@ local GUN_READY_SPEED = math.rad(45)
 
 local VERT_AIM_SPEED = math.rad(210)
 local AIM_SPEED = math.rad(480) -- noscope
+
+local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty)
+local RELOAD_PENALTY_HALF = 0.5 + 0.5 * tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local bAiming, bCanAim, gun_unpacked = false, true, false
+local bAiming, canAim, gun_unpacked, aimBlocked = false, true, false, false
 local maintainHeading = false
 local torsoHeading = 0
 
@@ -75,37 +79,37 @@ local function Walk()
 
 	local side = 1
 	while true do
-		local speedmod = GetSpeedMod()
-		local truespeed = PACE * speedmod
+		local speedmod = math.sqrt(GetSpeedMod())
+		local speedMult = PACE * speedmod
+		local strideMult = speedmod
 
 		if not(bAiming) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
 
-		Turn(shin[side], x_axis, math.rad(85), truespeed*0.35)
-		Turn(ankle[side], x_axis, math.rad(0), truespeed*0.25)
-		Turn(foot[side], x_axis, math.rad(0), truespeed*0.25)
-		Turn(thigh[side], x_axis, math.rad(-36), truespeed*0.16)
-		Turn(thigh[3-side], x_axis, math.rad(36), truespeed*0.16)
-		Turn(shin[3-side], x_axis, math.rad(0), truespeed*0.16)
+		Turn(shin[side],    x_axis, strideMult * math.rad(85),  speedMult*0.35)
+		Turn(ankle[side],   x_axis, strideMult * math.rad(0),   speedMult*0.25)
+		Turn(foot[side],    x_axis, strideMult * math.rad(0),   speedMult*0.25)
+		Turn(thigh[side],   x_axis, strideMult * math.rad(-36), speedMult*0.16)
+		Turn(thigh[3-side], x_axis, strideMult * math.rad(36),  speedMult*0.16)
+		Turn(shin[3-side],  x_axis, strideMult * math.rad(0),   speedMult*0.16)
 
-		Move(hips, y_axis, 0, truespeed*1.0)
+		Move(hips, y_axis, 1.5, speedMult*2.0)
 		WaitForMove(hips, y_axis)
 
-		Turn(shin[side], x_axis, math.rad(0), truespeed*0.26)
-		Turn(ankle[side], x_axis, math.rad(10), truespeed*0.26)
-		Turn(foot[side], x_axis, math.rad(-20), truespeed*0.25)
-		Turn(foot[3-side], x_axis, math.rad(10), truespeed*0.25)
-		Move(hips, y_axis, -0.75, truespeed*0.2)
+		Turn(shin[side],   x_axis, strideMult * math.rad(0),   speedMult*0.26)
+		Turn(ankle[side],  x_axis, strideMult * math.rad(10),  speedMult*0.26)
+		Turn(foot[side],   x_axis, strideMult * math.rad(-20), speedMult*0.25)
+		Turn(foot[3-side], x_axis, strideMult * math.rad(5),   speedMult*0.15)
+		Move(hips, y_axis, strideMult * -0.5, speedMult*0.65)
 
 		WaitForMove(hips, y_axis)
 
-		Move(hips, y_axis, -3, truespeed*1.0)
-		Turn(shin[3-side], x_axis, math.rad(10), truespeed*0.15)
+		Move(hips, y_axis, strideMult * -3, speedMult*1.0)
+		Turn(shin[3-side], x_axis, math.rad(10), speedMult*0.15)
 
 		WaitForTurn(thigh[side], x_axis)
-
 		side = 3 - side
 	end
 end
@@ -118,25 +122,25 @@ local function IdleAnim()
 	end
 	Sleep(3000)
 	while true do
-		if not(bAiming) then
+		if not(bAiming or aimBlocked) then
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
 		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
-		if not(bAiming) then
+		if not(bAiming or aimBlocked) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
 		Turn(camera, y_axis, math.rad(30), math.rad(80))
 		Turn(forearmr, x_axis, math.rad(-30), math.rad(60))
 		Sleep(3500)
-		if not(bAiming) then
+		if not(bAiming or aimBlocked) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
 		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
-		if not(bAiming) then
+		if not(bAiming or aimBlocked) then
 			Turn(shoulderl, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 			Turn(shoulderr, x_axis, GUN_STOWED_ANGLE, GUN_STOWED_SPEED)
 		end
@@ -198,21 +202,6 @@ local function UnpackGunInstant()
 	gun_unpacked = true
 end
 
-function script.Create()
-	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	UnpackGunInstant()
-	StartThread(IdleAnim)
-	--StartThread(TorsoHeadingThread)
-end
-
-function script.AimFromWeapon(num)
-	return shoulderr
-end
-
-function script.QueryWeapon(num)
-	return gunemit
-end
 -----------------------------------------------------------------------
 --gun functions
 -----------------------------------------------------------------------
@@ -222,7 +211,7 @@ local function PackGun()
 	Signal(SIG_PACK)
 	SetSignalMask(SIG_PACK)
 
-	bCanAim = false
+	canAim = false
 	Move(barrel, y_axis, 0, 900)
 	Move(stock, y_axis, 0, 1400)
 
@@ -237,7 +226,7 @@ local function PackGun()
 	WaitForTurn(forearml, z_axis)
 	Turn(shoulderl, x_axis, 0, math.rad(250))
 	gun_unpacked = false
-	bCanAim = true
+	canAim = true
 end
 
 local function UnpackGun()
@@ -273,6 +262,125 @@ local function RestoreAfterDelay()
 	StartThread(IdleAnim)
 end
 
+-----------------------------------------------------------------------
+-- reload functions
+-----------------------------------------------------------------------
+
+local function SetSelfSpeedMod(speedmod)
+	if RELOAD_PENALTY == 1 then
+		return
+	end
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedmod)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function SetupReloadStance()
+	Turn(arml, y_axis, math.rad(-8), math.rad(45))
+	Turn(arml, x_axis, math.rad(28), math.rad(45))
+	Turn(arml, z_axis, math.rad(5), math.rad(45))
+	
+	Turn(forearml, z_axis, math.rad(-45), math.rad(45))
+	
+	Turn(armr, x_axis, math.rad(38), math.rad(45))
+	Turn(armr, y_axis, math.rad(8), math.rad(45))
+	
+	Turn(forearmr, z_axis, math.rad(45), math.rad(45))
+	
+	Turn(camera, y_axis, math.rad(-12), math.rad(80))
+	Turn(camera, x_axis, math.rad(35), math.rad(80))
+end
+
+local function LeaveReloadStance()
+	Turn(arml, y_axis, math.rad(0), math.rad(45))
+	Turn(arml, x_axis, math.rad(0), math.rad(45))
+	Turn(arml, z_axis, math.rad(0), math.rad(45))
+	
+	Turn(forearml, z_axis, math.rad(-90), math.rad(45))
+	
+	Turn(armr, x_axis, math.rad(0), math.rad(45))
+	Turn(armr, y_axis, math.rad(0), math.rad(45))
+	
+	Turn(forearmr, z_axis, math.rad(0), math.rad(45))
+	
+	Turn(camera, y_axis, math.rad(0), math.rad(80))
+	Turn(camera, x_axis, math.rad(0), math.rad(80))
+	
+	Move(stock, y_axis, 9, 9)
+	Turn(handl, z_axis, 0, math.rad(6))
+	Turn(handr, z_axis, 0, math.rad(6))
+	
+	-- Happens in fire weapon
+	Move(barrel, y_axis, -4.2, 4)
+end
+
+local function WiggleReload()
+	Move(stock, y_axis, 9 - 10 * math.random(), 20 * math.random())
+	Turn(forearml, z_axis, math.rad(-48 + 6 * math.random()), math.rad(8))
+	Turn(forearmr, z_axis, math.rad(45 - 3 * math.random()), math.rad(8))
+	Turn(camera, y_axis, math.rad(-15 + 20 * math.random()), math.rad(30))
+	Turn(handl, z_axis, math.rad(8 - 16 * math.random()), math.rad(10))
+	Turn(handr, z_axis, math.rad(10 - 10 * math.random()), math.rad(10))
+end
+
+local function ReloadPenaltyAndAnimation()
+	aimBlocked = true
+	SetSelfSpeedMod(RELOAD_PENALTY_HALF)
+	Signal(SIG_AIM)
+	Signal(SIG_RESTORE)
+
+	Sleep(1000)
+	SetSelfSpeedMod(RELOAD_PENALTY)
+	Turn(torsoTrue, y_axis, 0, math.rad(120))
+	Turn(torsoPivot, y_axis, 0, math.rad(120))
+	SetupReloadStance()
+	
+	-- 17 second reload so no point checking earlier (with room for animation reset).
+	Sleep(1000)
+	for i = 1, 25 do
+		WiggleReload()
+		Sleep(500)
+	end
+	
+	while true do
+		local state = Spring.GetUnitWeaponState(unitID, 1, "reloadState")
+		local gameFrame = Spring.GetGameFrame()
+		if state - 32 < gameFrame then
+			aimBlocked = false
+			Signal(SIG_AIM)
+
+			Sleep(500)
+			SetSelfSpeedMod(1)
+			return
+		elseif state - 64 < gameFrame then
+			SetSelfSpeedMod(RELOAD_PENALTY_HALF)
+			LeaveReloadStance()
+		else
+			WiggleReload()
+		end
+		Sleep(500)
+	end
+end
+
+-----------------------------------------------------------------------
+-- callins
+-----------------------------------------------------------------------
+
+function script.Create()
+	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
+	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	UnpackGunInstant()
+	StartThread(IdleAnim)
+	--StartThread(TorsoHeadingThread)
+end
+
+function script.AimFromWeapon(num)
+	return shoulderr
+end
+
+function script.QueryWeapon(num)
+	return gunemit
+end
+
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	Signal(SIG_AIM)
@@ -282,8 +390,8 @@ function script.AimWeapon(num, heading, pitch)
 	GG.DontFireRadar_CheckAim(unitID)
 
 	-- Announce that we would like to aim, and wait until we can
-	while not bCanAim do
-		Sleep(100)
+	while aimBlocked or not canAim do
+		Sleep(500)
 	end
 	bAiming = true
 	Turn(hips, x_axis, 0)
@@ -313,20 +421,18 @@ function script.BlockShot(num, targetID)
 end
 
 function script.FireWeapon(num)
---	bCanAim = false
 	Turn(forearmr, x_axis, math.rad(-20), math.rad(300))
---	Turn(torsoTrue, y_axis, math.rad(-20), math.rad(400))
---	Turn(camera, y_axis, math.rad(20), math.rad(400))
---	Turn(forearmr, y_axis, math.rad(10), math.rad(400))
+	Sleep(33)
+	Turn(torsoTrue, y_axis, math.rad(-20), math.rad(400))
+	Turn(camera, y_axis, math.rad(20), math.rad(400))
+	Turn(forearmr, y_axis, math.rad(10), math.rad(400))
 	Move(barrel, y_axis, 0)
+	StartThread(ReloadPenaltyAndAnimation)
 	WaitForTurn(forearmr, x_axis)
 	Turn(forearmr, x_axis, 0, math.rad(-90), math.rad(15))
---	Turn(torsoTrue, y_axis, 0, math.rad(100))
---	Turn(camera, y_axis, 0, math.rad(150))
---	Turn(forearmr, y_axis, 0, math.rad(200))
-	Sleep(15200)
-	Move(barrel, y_axis, -4.2, 4)
---	bCanAim = true
+	Turn(torsoTrue, y_axis, 0, math.rad(100))
+	Turn(camera, y_axis, 0, math.rad(150))
+	Turn(forearmr, y_axis, 0, math.rad(200))
 end
 
 function script.Killed(recentDamage, maxHealth)

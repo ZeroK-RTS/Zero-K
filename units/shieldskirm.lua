@@ -4,7 +4,7 @@ return { shieldskirm = {
   description            = [[Skirmisher Bot (Indirect Fire)]],
   acceleration           = 0.75,
   brakeRate              = 1.2,
-  buildCostMetal         = 125,
+  buildCostMetal         = 130,
   buildPic               = [[shieldskirm.png]],
   canGuard               = true,
   canMove                = true,
@@ -53,7 +53,7 @@ return { shieldskirm = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2257,
+  turnRate               = 2030,
   upright                = true,
 
   weapons                = {

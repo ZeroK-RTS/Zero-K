@@ -25,7 +25,7 @@ local progressByLastLine = {
 	["Loading Weapon Definitions"] = {10, 50},
 	["Loading LuaRules"] = {40, 80},
 	["Loading LuaUI"] = {70, 95},
-	["Loading Skirmish AIs"] = {100, 100},
+	["Loading Skirmish AIs"] = {90, 99},
 }
 for name,val in pairs(progressByLastLine) do
 	progressByLastLine[name] = {val[1]*0.01, val[2]*0.01}
@@ -34,7 +34,7 @@ end
 function addon.LoadProgress(message, replaceLastLine)
 	lastLoadMessage = message
 	if message:find("Path") then -- pathing has no rigid messages so cant use the table
-		lastProgress = {0.8, 1.0}
+		lastProgress = {0.3, 0.6}
 	end
 	lastProgress = progressByLastLine[message] or lastProgress
 end

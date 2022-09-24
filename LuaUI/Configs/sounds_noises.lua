@@ -755,6 +755,17 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
+	vehheavyarty = {
+		-- tank noises on purpose, it's comparatively heavy
+		ok = {
+			volume = 0.52,
+			[1] = "tank_move",
+		},
+		select = {
+			volume = 0.62,
+			[1] = "tank_select",
+		},
+	},
 	
 	-- Tank
 	tankcon = {
@@ -799,16 +810,6 @@ local sounds = {
 		},
 	},
 	tankassault = {
-		ok = {
-			volume = 0.52,
-			[1] = "tank_move",
-		},
-		select = {
-			volume = 0.62,
-			[1] = "tank_select",
-		},
-	},
-	vehheavyarty = {
 		ok = {
 			volume = 0.52,
 			[1] = "tank_move",

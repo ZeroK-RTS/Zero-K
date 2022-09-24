@@ -37,6 +37,7 @@ local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
 local isMission = Game.modDesc:find("Mission Mutator")
+local isServerHost = Spring.GetModOptions().sendspringiedata and not Spring.IsReplay()
 
 -- Config file data
 local keybind_dir, keybind_file, defaultkeybinds, defaultkeybind_date, confdata
@@ -423,7 +424,9 @@ WG.crude.SetMusicVolume = function (newVolume, viaTrackbar)
 	else
 		Spring.SetSoundStreamVolume(newVolume)
 	end
-	settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	if settings.config then
+		settings.config["epic_Settings/Audio_Music_Volume"] = newVolume
+	end
 	WG.music_volume = newVolume
 	if viaTrackbar then
 		if hackyOptionMemory['Music Volume'] then
@@ -2762,9 +2765,9 @@ local function MakeQuitButtons()
 		icon = imgPath..'epicmenu/undo.png',
 		OnChange = function()
 				-- Only allow restarting for local games or by the host of steam coop.
-				if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
+				if (not isServerHost) and Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 					local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
-					if myPing and myPing < 40 then
+					if myPing and myPing < 0.04 then
 						MakeExitConfirmWindow("Are you sure you want to restart?", function()
 							Spring.SendLuaMenuMsg("restartGame")
 						end, nil, false, true)
@@ -2774,9 +2777,12 @@ local function MakeQuitButtons()
 		key = 'Restart',
 		DisableFunc = function()
 			-- Only allow restarting for local games or by the host of steam coop.
+			if isServerHost then
+				return true
+			end
 			if Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName() then
 				local myPing = select(6, Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false))
-				return not (myPing and myPing < 40)
+				return not (myPing and myPing < 0.04)
 			end
 			return true
 		end,

@@ -69,7 +69,7 @@ return { spiderriot = {
       },
 
       damage                  = {
-        default = 70.01,
+        default = 80.01,
       },
 
       explosionGenerator      = [[custom:flash1red]],
