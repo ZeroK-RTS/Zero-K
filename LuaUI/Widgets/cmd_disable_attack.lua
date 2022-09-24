@@ -64,22 +64,25 @@ function widget:CommandsChanged()
 	end
 end
 
+function FilterSelectedUnits(cmdID)
+	if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
+		return Spring.GetSelectedUnits()
+	end
+	local units = Spring.GetSelectedUnits()
+	local selected = {}
+	for i = 1, #units do
+		if attackDisabledUnits[units[i]] ~= 1 then
+			selected[#selected + 1] = units[i]
+		end
+	end
+
+	return selected
+end
+
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID ~= CMD_DISABLE_ATTACK then
-		-- TODO: handle commands imbeded in CMD_INSERT though it dosen't seem to need it.
-		if cmdID ~= CMD_ATTACK and cmdID ~= CMD_UNIT_SET_TARGET and cmdID ~= CMD_UNIT_SET_TARGET_CIRCLE then
-			return
-		end
-
-		local units = WG.units or Spring.GetSelectedUnits()
-		local selected = {}
-		for i = 1, #units do
-			if attackDisabledUnits[units[i]] ~= 1 then
-				selected[#selected + 1] = units[i]
-			end
-		end
-
-		WG.units = selected
+		-- TODO: handle commands imbeded in CMD_INSERT.
+		WG.units = FilterSelectedUnits(cmdID)
 		return
 	end
 
