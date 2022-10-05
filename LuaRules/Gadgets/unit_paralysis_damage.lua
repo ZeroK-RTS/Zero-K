@@ -38,7 +38,10 @@ for wdid = 1, #WeaponDefs do
 		local rawDamage = tonumber(wd.customParams.raw_damage or 0)
 		if wd.customParams and wd.customParams.extra_damage and rawDamage > 0 then
 			normalDamageMult[wdid] = wd.customParams.extra_damage/rawDamage
-			paraTime[wdid] = wd.customParams.extra_paratime
+
+			-- engine rounds down, but paratime 0 means real damage
+			paraTime[wdid] = math.max(1, wd.customParams.extra_paratime)
+
 			wantedWeaponList[#wantedWeaponList + 1] = wdid
 		end
 	end
