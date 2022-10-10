@@ -50,6 +50,7 @@ return { chickens = {
   },
   sightDistance       = 550,
   sonarDistance       = 550,
+  script              = "chickens.lua",
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
