@@ -86,14 +86,14 @@ end
 
 function script.StopMoving()
 	Signal(SIG_MOVE)
-	Turn(lfoot, x_axis 0, math.rad(200))
-	Turn(rfoot, x_axis 0, math.rad(200))
-	Turn(rthigh, x_axis 0, math.rad(200))
-	Turn(lthigh, x_axis 0, math.rad(200))
-	Turn(lshin, x_axis 0, math.rad(200))
-	Turn(rshin, x_axis 0, math.rad(200))
-	Turn(lknee, x_axis 0, math.rad(200))
-	Turn(rknee, x_axis 0, math.rad(200))
+	Turn(lfoot, x_axis, 0, math.rad(200))
+	Turn(rfoot, x_axis, 0, math.rad(200))
+	Turn(rthigh, x_axis, 0, math.rad(200))
+	Turn(lthigh, x_axis, 0, math.rad(200))
+	Turn(lshin, x_axis, 0, math.rad(200))
+	Turn(rshin, x_axis, 0, math.rad(200))
+	Turn(lknee, x_axis, 0, math.rad(200))
+	Turn(rknee, x_axis, 0, math.rad(200))
 end
 
 function script.Shot(num)
@@ -102,7 +102,7 @@ function script.Shot(num)
 	Move(rsack, x_axis, -1, 1)
 	Move(lsack, x_axis, 1, 1)
 	Move(mblade, z_axis, -8, 100)
-	WaitForTurn(lsack, y-axis)
+	WaitForTurn(lsack, y_axis)
 	Turn(lsack, y_axis, 0, 0.3)
 	Turn(rsack, y_axis, 0, 0.3)
 	Move(rsack, x_axis, 0, 0.3)
@@ -143,4 +143,3 @@ end
 function script.Killed(recentDamage, maxHealth)
 	EmitSfx(body, 1025)
 end
-
