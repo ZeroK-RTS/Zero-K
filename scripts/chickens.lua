@@ -101,13 +101,13 @@ local function RecoilThread()
 	Turn(rsack, y_axis, math.rad(-40), math.rad(440)) -- ditto. 1 isn't fast enough!
 	Move(rsack, x_axis, -1, 1)
 	Move(lsack, x_axis, 1, 1)
-	Move(mblade, z_axis, -20, 100)
+	Move(mblade, z_axis, -24) -- hide the blade inside the body. it's at z = 20 to begin with, -22 is in the body.
 	WaitForTurn(lsack, y_axis)
 	Turn(lsack, y_axis, 0, 0.3)
 	Turn(rsack, y_axis, 0, 0.3)
 	Move(rsack, x_axis, 0, 0.3)
 	Move(lsack, x_axis, 0, 0.3)
-	Move(mblade, z_axis, 0, 5.5)
+	Move(mblade, z_axis, 0, 5.6)
 end
 
 function script.Shot(num)
