@@ -96,18 +96,22 @@ function script.StopMoving()
 	Turn(rknee, x_axis, 0, math.rad(200))
 end
 
-function script.Shot(num)
-	Turn(lsack, y_axis, math.rad(40), 1)
-	Turn(rsack, y_axis, math.rad(-40), 1)
+local function RecoilThread()
+	Turn(lsack, y_axis, math.rad(40), math.rad(440)) -- this had to be changed because it looked bad
+	Turn(rsack, y_axis, math.rad(-40), math.rad(440)) -- ditto. 1 isn't fast enough!
 	Move(rsack, x_axis, -1, 1)
 	Move(lsack, x_axis, 1, 1)
-	Move(mblade, z_axis, -8, 100)
+	Move(mblade, z_axis, -20, 100)
 	WaitForTurn(lsack, y_axis)
 	Turn(lsack, y_axis, 0, 0.3)
 	Turn(rsack, y_axis, 0, 0.3)
 	Move(rsack, x_axis, 0, 0.3)
 	Move(lsack, x_axis, 0, 0.3)
-	Move(mblade, z_axis, 0, 3)
+	Move(mblade, z_axis, 0, 5.5)
+end
+
+function script.Shot(num)
+	StartThread(RecoilThread) -- Needed because of WaitForTurn.
 end
 
 function script.QueryWeapon(num)
