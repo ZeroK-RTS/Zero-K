@@ -139,3 +139,8 @@ end
 function script.Create()
 	EmitSfx(body, 1026)
 end
+
+function script.Killed(recentDamage, maxHealth)
+	EmitSfx(body, 1025)
+end
+
