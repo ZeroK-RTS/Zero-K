@@ -360,7 +360,7 @@ function widget:DrawWorld()
 
 	for unitID, bi in pairs(stockpileEtaTable) do
 		local stocked, wanted = Spring.GetUnitStockpile(unitID)
-		if (stocked < wanted) then
+		if wanted > 0 then
 			DrawEtaText(unitID, bi.timeLeft, bi.yoffset, false)
 		end
 	end
