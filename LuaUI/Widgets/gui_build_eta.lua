@@ -314,6 +314,12 @@ function widget:Update()
 	end
 end
 
+function widget:PlayerChanged(playerID)
+	if playerID == Spring.GetMyPlayerID() and not previousFullview then
+		InitializeUnits()
+	end
+end
+
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsUnitIcon = Spring.IsUnitIcon
 local function DrawEtaText(unitID, timeLeft,yoffset, negative)
