@@ -321,7 +321,7 @@ local cameraPath = 'Settings/Camera'
 			{name = 'COFC (highly configurable)',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
 			{name = 'FPS (experimental)',key='FPS', hotkey=nil},
 			{name = 'Free (experimental)',key='Free', hotkey=nil},
-			{name = 'Total War (experimental)',key='Total War',  hotkey=nil},
+			{name = 'Spring (experimental)',key='Spring',  hotkey=nil},
 		},'Default',
 		function(self)
 			local key = self.value
@@ -333,8 +333,8 @@ local cameraPath = 'Settings/Camera'
 				spSendCommands{cofcDisable ,"viewfree"}
 			elseif key == 'Rotatable Overhead' then
 				spSendCommands{cofcDisable ,"viewrot"}
-			elseif key == 'Total War' then
-				spSendCommands{cofcDisable ,"viewtw"}
+			elseif key == 'Spring' then
+				spSendCommands{cofcDisable ,"viewspring"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
 			else
