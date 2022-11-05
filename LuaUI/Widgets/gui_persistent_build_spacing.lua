@@ -1,9 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Persistent Build Spacing",
-		desc      = "-Maintains build spacing between matches"..
-			    "\n-Add Mousewheel+Shift to control it"..
-			    "\n-Add previsualization of future placements",
+		desc      = "-Maintains build spacing between matches\n-Add Mousewheel+Shift to control it\n-Add previsualization of future placements",
 		author    = "Helwor",
 		date      = "August 2020",
 		license   = "GNU GPL, v2 or later",
@@ -27,7 +25,6 @@ local spGetGameSeconds      = Spring.GetGameSeconds
 local spGetModKeyState      = Spring.GetModKeyState
 local spuGetMoveType        = Spring.Utilities.getMovetype
 local spTestBuildOrder      = Spring.TestBuildOrder
-local Echo                  = Spring.Echo
 
 local floor, round, huge, max = math.floor, math.round, math.huge, math.max
 
@@ -65,7 +62,6 @@ local colors = {  -- red, yellow, green
 }
 -- related to options
 local grdots = "\255\155\155\155" .. " .." .. "\255\255\255\255"
-local requestUpdate
 local wheelSpacing, wheelValue = false, 1
 local showSpacingRects, only2Rects, followGround, stickToWrongGrid, showRectsOnChange
 	=      true,          true,        true,          false,             true
@@ -87,62 +83,6 @@ local function UpdateKeys()
 	spacingIncrease = ToKeysyms(key and key[1])
 	key = WG.crude.GetHotkeyRaw("buildspacing dec")
 	spacingDecrease = ToKeysyms(key and key[1])
-end
-
-------- Menu detection, update and refresh
--- Fix of scrolling reset whenever an option is changed which was quite annoying
--- (this could be easily fixed universally by modifying WG.crude.OpenPath)
-
-local function GetPanel(path) -- Find out the option panel if it's visible
-	for _,win in pairs(WG.Chili.Screen0.children) do
-		if  type(win)     == 'table'
-		and win.classname == "main_window_tall"
-		and win.caption   == path
-		then
-			for panel in pairs(win.children) do
-				if type(panel)=='table' and panel.name:match('scrollpanel') then
-					return panel
-				end
-			end
-		end
-	end
-end
-local function UpdateOptionsDisplay(options_path)
-	local oldPanel = GetPanel(options_path)
-	local greyed = "\255\155\155\155"
-	local whited = "\255\255\255\255"
-	for _, option in pairs(options) do
-		local value     = option.value
-		local origname  = option.origname
-		local parents   = option.parents
-		local children  = option.children
-		if parents then
-			--if the option is a child -- CANDO: better with scanning child by parents instead of parents by child, keep in mind child can have multiple parents
-			-- greying out if its value is false/nil
-			if origname then
-				option.name = value and origname or origname:gsub(whited,greyed)
-			end
-			-- masking itself if all its parents have false/nil value
-			local parentsVal
-			for _, parentname in pairs(parents) do
-				parentsVal = options[parentname].value
-				if parentsVal then
-					break
-				end
-			end
-			option.hidden = not parentsVal
-		end
-		if children and origname then
-			-- if its a parent
-			option.name = value and origname or origname .. "..."
-		end
-	end
-	-- if it's active, refresh the menu and get back where it was scrolled -- 
-	if oldPanel then
-		WG.crude.OpenPath(options_path)
-		GetPanel(options_path).scrollPosY = oldPanel.scrollPosY -- scrolling back
-	end
-	requestUpdate = false
 end
 
 local hotkeys_path = 'Hotkeys/Construction'
@@ -205,7 +145,7 @@ options = {
 	},
 	-- wheel
 	wheel_spacing = {
-		origname        = 'Change with Shift + MouseWheel',
+		name            = 'Change with Shift + MouseWheel',
 		type            = 'bool',
 		desc            = 'Change the spacing Shift down and the MouseWheel',
 		value           = wheelSpacing,
@@ -213,24 +153,22 @@ options = {
 		OnChange        = function(self)
 			wheelSpacing = self.value
 			widgetHandler[(wheelSpacing and 'Update' or 'Remove')..'CallIn'](widget,"MouseWheel")
-			requestUpdate = options_path
 		end,
 		children        = {'reverse_wheel'}
 	},
 	reverse_wheel = {
-		origname        = grdots..'reversed.',
+		name            = '..reversed.',
 		type            = 'bool',
 		value           = wheelValue == -1,
 		noHotkey        = true,
 		OnChange        = function(self)
 			wheelValue = self.value and -1 or 1
-			requestUpdate = options_path
 		end,
 		parents         = {'wheel_spacing'}
 	},
 	-- rectangle showing options
 	show_spacing_rects = {
-		origname        = 'Visualise spacing',
+		name            = 'Visualise spacing',
 		type            = 'bool',
 		desc            = "Briefly show spaced rectangles in all directions around the cursor",
 		value           = showSpacingRects,
@@ -238,13 +176,12 @@ options = {
 		OnChange        = function(self)
 			showSpacingRects = self.value
 			spacedRects = {}
-			requestUpdate = options_path
 		end,
 		children        = {'show_only_2_rects', 'rects_follow_ground', 'show_rects_only_on_change', 'show_time_rects'}
 	},
 	
 	show_only_2_rects = {
-		origname        = grdots..'of only two rectangles, ',
+		name            = '..of only two rectangles, ',
 		type            = 'bool',
 		desc            = "If 8 rectangles bug you too much, only show 2 horizontal rectangles",
 		value           = only2Rects,
@@ -252,60 +189,55 @@ options = {
 		OnChange        = function(self)
 			spacedRects = {}
 			only2Rects = self.value
-			requestUpdate = options_path
 		end,
 		parents         = {'show_spacing_rects'}
 	},
 	show_rects_only_on_change = {
-		origname        = grdots..'only on spacing change, ',
+		name            = '..only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see those rectangles until you change the current spacing",
 		value           = showRectsOnChange,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showRectsOnChange = self.value
-			requestUpdate = options_path
 		end,
 		parents         = {'show_spacing_rects'}
 	},
 	rects_follow_ground = {
-		origname        = grdots..'following the ground height,',
+		name            = '..following the ground height,',
 		type            = 'bool',
 		desc            = "..unless, of course, if it should float !",
 		noHotkey        = true,
 		value           = followGround,
 		OnChange        = function(self)
 			followGround = self.value
-			requestUpdate=options_path
 		end,
 		parents         = {'show_spacing_rects'}
 	},
 	stick_to_wrong_grid = {
-		origname        = grdots..'according to the placement grid,',
+		name            = '..according to the placement grid,',
 		type            = 'bool',
 		desc            = "In case of building moving units, the placement grid is misleading, uncheck this is you want to see the rectangles following where the placements will really occur.",
 		noHotkey        = true,
 		value           = stickToWrongGrid,
 		OnChange        = function(self)
 			stickToWrongGrid = self.value
-			requestUpdate=options_path
 		end,
 		parents         = {'show_spacing_rects'}
 	},
 	rects_bad_color = {
-		origname        = grdots..'with bad colors for bad placements,',
+		name            = '..with bad colors for bad placements,',
 		type            = 'bool',
 		desc            = "Reddish color if it cannot be placed",
 		noHotkey        = true,
 		value           = withBadColor,
 		OnChange        = function(self)
 			withBadColor = self.value
-			requestUpdate=options_path
 		end,
 		parents         = {'show_spacing_rects'}
 	},
 	show_time_rects = {
-		name            = showRectsTime == huge and grdots..'forever' or grdots..'for '..showRectsTime..' seconds.',
+		name            = '... for this many seconds.',
 		type            = 'number',
 		min             = 0.1,
 		max             = 10.1,
@@ -316,41 +248,36 @@ options = {
 		end,
 		OnChange        = function(self)
 			showRectsTime = self.value < 10.1 and self.value or huge
-			local str = self.tooltipFunction(self) -- just using the return
-			self.name = str == 'forever' and grdots..'forever.' or grdots..'for '..str..'.'
-			requestUpdate = options_path
 		end,
 		parents        = {'show_spacing_rects'}
 	},
 	-- value showing options
 	show_spacing_value = {
-		origname        = 'Show spacing value',
+		name            = 'Show spacing value',
 		type            = 'bool',
 		desc            = "Briefly show separation value",
 		value           = showSpacingValue,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showSpacingValue = self.value
-			requestUpdate = options_path
 		end,
 		children        = {'show_value_only_on_change', 'show_time_value'}
 	},
 	
 	show_value_only_on_change = {
-		origname        = grdots..'only on spacing change, ',
+		name            = '..only on spacing change, ',
 		type            = 'bool',
 		desc            = "If you don't want to see the above helper until you change the current spacing",
 		value           = showValueOnChange,
 		noHotkey        = true,
 		OnChange        = function(self)
 			showValueOnChange = self.value
-			requestUpdate = options_path
 		end,
 		parents         = {'show_spacing_value'}
 	},
 	
 	show_time_value = {
-		name            = showValueTime == huge and grdots..'forever' or grdots..'for '..showValueTime..' seconds.',
+		name            = '... for this many seconds.',
 		type            = 'number',
 		min             = 0.1,
 		max             = 10.1,
@@ -361,9 +288,6 @@ options = {
 		end,
 		OnChange        = function(self)
 			showValueTime = self.value < 10.1 and self.value or huge
-			local str = self.tooltipFunction(self) -- just using the return
-			self.name = str == 'forever' and grdots..'forever.' or grdots..'for '..str..'.'
-			requestUpdate = options_path
 		end,
 		parents         = {'show_spacing_value'},
 	},
@@ -478,10 +402,6 @@ end
 
 
 function widget:Update(dt)
-	if requestUpdate then
-		UpdateOptionsDisplay(requestUpdate)
-	end
-	
 	cmdID = select(2, spGetActiveCommand())
 	cmdID = cmdID and cmdID < 0 and -cmdID
 	if not cmdID then
@@ -681,7 +601,6 @@ end
 function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
 	preGame = Spring.GetGameFrame()<1
 	UpdateKeys()
-	UpdateOptionsDisplay(options_path)
 	if not wheelSpacing then -- now MouseWheel callin is updated/removed when option change
 		widgetHandler:RemoveCallIn('MouseWheel')
 	end
