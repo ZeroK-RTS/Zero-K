@@ -161,6 +161,8 @@ return {
 		{	"luaui tweakgui",	"C+f11",},
 		{	"movefast",	"None"},
 		{	"moveslow",	"None"},
+		{	"movereset",	"Any+alt"},
+		{	"movetilt",	"Any+ctrl"},
 		{	"epic_chili_widget_selector_widgetlist_2",	"alt+f11",},
 		{	"screenshot png",	"f12",},
 		{	"screenshot jpg", "ctrl+f12"},
