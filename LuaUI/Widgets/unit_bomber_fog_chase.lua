@@ -438,14 +438,15 @@ function widget:UnitEnteredRadar(unitID, unitTeam, allyTeam, unitDefID)
 end
 
 function widget:GameFrame(gameFrame)
-	if gameFrame % gameFramesInterval ~= gameFramesInterval - 1 then return end
-
-	if next(targets) == nil then return end
+	if gameFrame % gameFramesInterval ~= gameFramesInterval - 1 then
+		return
+	end
+	if next(targets) == nil then
+		return
+	end
 
 	for targetID, target in pairs(targets) do
-
 		if target.inLos then
-
 			local vx,vy,vz,v = spGetUnitVelocity(targetID)
 			local pos        = GetAimPosition(targetID)
 
@@ -464,9 +465,7 @@ function widget:GameFrame(gameFrame)
 			else
 				--Echo("target data missing")
 			end
-
 		elseif not target.inRadar then -- if its in Radar, continue with the regular Force Fire
-
 			if target.lastSeen then
 
 				local framesPassedSinceSeen = gameFrame - target.lastSeen
