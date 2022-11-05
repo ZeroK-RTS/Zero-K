@@ -111,7 +111,7 @@ local function HandleUnit(unitID)
 	if debugMode then
 		Spring.Echo(unitID .. ": ", cmdID, cmdParam1, cmdParam2)
 	end
-	if cmdID and cmdParam1 and (spValidFeatureID(cmdParam1) or spValidUnitID(cmdParam1)) then
+	if cmdID and (cmdID == CMD_RECLAIM or cmdID == CMD_RESURRECT) and cmdParam1 and (spValidFeatureID(cmdParam1) or spValidUnitID(cmdParam1)) then
 		if debugMode then
 			Spring.Echo(unitID .. ": Valid command, checking distance.")
 		end
