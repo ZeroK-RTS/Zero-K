@@ -50,6 +50,7 @@ return { chicken_dodo = {
     },
 
   },
+  script                = "chicken_dodo.lua",
   sightDistance         = 256,
   sonarDistance         = 256,
   trackOffset           = 1,
