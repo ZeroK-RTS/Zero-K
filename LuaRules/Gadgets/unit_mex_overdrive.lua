@@ -152,6 +152,7 @@ local generatorList = {} -- generator[allyTeamID][teamID] = {data  = {[1] = unit
 local resourceGeneratingUnit = {}
 
 local unitAlreadyFinished = {} -- To prevent payback being added twice, even across allyTeam transfers.
+local buildPropTracker = {} -- Track which teams have spent resources on this unit.
 
 local pylonGridQueue = false -- pylonGridQueue[unitID] = true
 
@@ -664,8 +665,31 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- PAYBACK
-
 -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
+
+local function GetUnitTeamBuildProp(unitID, teamID)
+	if not buildPropTracker[unitID] then
+		return {[teamID] = 1}
+	end
+	local total = 0
+	local teamList = {}
+	for propTeamID, amount in pairs(buildPropTracker[unitID]) do
+		if amount > 0 and Spring.AreTeamsAllied(teamID, propTeamID) then
+			total = total + amount
+			teamList[#teamList + 1] = propTeamID
+		end
+	end
+	if total <= 0 then
+		return {[teamID] = 1}
+	end
+	
+	local prop = {}
+	for i = 1, #teamList do
+		local propTeamID = teamList[i]
+		prop[propTeamID] = buildPropTracker[unitID][propTeamID] / total
+	end
+	return prop
+end
 
 local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 	if unitPaybackTeamIDs[unitID] then
@@ -683,7 +707,7 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 			cost = paybackCost * prop,
 			repaid = 0,
 		}
-		teamData.metalDueOD = teamData.metalDueOD + paybackCost
+		teamData.metalDueOD = teamData.metalDueOD + paybackCost * prop
 	end
 end
 
@@ -1741,6 +1765,15 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if not allowBuildStepDef[unitDefID] then
 		return true
 	end
+	if not builderID then
+		return true
+	end
+	local buildTeamID = Spring.GetUnitTeam(builderID)
+	if not buildTeamID then
+		return true
+	end
+	buildPropTracker[unitID] = buildPropTracker[unitID] or {}
+	buildPropTracker[unitID][buildTeamID] = (buildPropTracker[unitID][buildTeamID] or 0) + step
 	return true
 end
 
@@ -1802,7 +1835,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			return
 		end
 		unitAlreadyFinished[unitID] = true
-		AddEnergyToPayback(unitID, unitDefID, {[unitTeam] = 1})
+		AddEnergyToPayback(unitID, unitDefID, GetUnitTeamBuildProp(unitID, unitTeam))
 	end
 	if mexDefs[unitDefID] and enableMexPayback then
 		if unitAlreadyFinished[unitID] then
@@ -1810,7 +1843,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 		unitAlreadyFinished[unitID] = true
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMexPayback(unitID, unitDefID, {[unitTeam] = 1}, inc)
+		AddMexPayback(unitID, unitDefID, GetUnitTeamBuildProp(unitID, unitTeam), inc)
 	end
 end
 
@@ -1861,6 +1894,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID] and mexByID[unitID]) then
 		unitAlreadyFinished[unitID] = nil
+		buildPropTracker[unitID] = nil
 		RemoveMex(unitID)
 	end
 	if (pylonDefs[unitDefID]) then
@@ -1868,6 +1902,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 	if paybackDefs[unitDefID] and enableEnergyPayback then
 		unitAlreadyFinished[unitID] = nil
+		buildPropTracker[unitID] = nil
 		RemoveEnergyToPayback(unitID, unitDefID)
 	end
 	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
