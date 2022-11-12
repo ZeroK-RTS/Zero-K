@@ -16,7 +16,7 @@ function gadget:GetInfo()
 		author    = "Licho, Google Frog (pylon conversion), ashdnazg (quadField)",
 		date      = "16.5.2008 (OD date)",
 		license   = "GNU GPL, v2 or later",
-		layer     = -4,   -- OD grid circles must be drawn before lava drawing gadget some maps have (which has layer = -3)
+		layer     = -4,   -- OD grid circles must be drawn before lava drawing gadget some maps have (which has layer = -3). Must be after Priority
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -47,10 +47,30 @@ local spGetTeamInfo       = Spring.GetTeamInfo
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local FREE_STORAGE_LIMIT = 300
+local MIN_STORAGE = 0.5
+local PAYBACK_FACTOR = 0.5
+local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 20% over time
+local MEX_REFUND_MIN = 0.2
+
+--[[ Uses the regular 50% payback. This is because at 100% people would leave
+     empty nanoframes for their allies to finish (actual experience from past).
+     In general, the "correct" value is such that the people who are aware of
+     the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
+     Ideally the refund would just be for whomever actually put in resources,
+     but that would involve the build step callin which is quite expensive. ]]
+local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 local mexDefs = {}
 --local energyDefs = {}
 local pylonDefs = {}
 local generatorDefs = {}
+local paybackDefs = {} -- how much to pay back
+local allowBuildStepDef = {} -- cache basically?
+
 local isReturnOfInvestment = (Spring.GetModOptions().overdrivesharingscheme ~= "0")
 
 local enableEnergyPayback = isReturnOfInvestment
@@ -68,6 +88,7 @@ for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
 	if (udef.customParams.ismex) then
 		mexDefs[i] = true
+		allowBuildStepDef[i] = true
 	end
 	local pylonRange = tonumber(udef.customParams.pylonrange) or 0
 	if pylonRange > 0 then
@@ -86,6 +107,10 @@ for i = 1, #UnitDefs do
 			energyIncome = energyIncome,
 			sharedEnergyGenerator = udef.customParams.shared_energy_gen and true
 		}
+		if energyIncome > 0 or isWind then
+			paybackDefs[i] = (udef.customParams.overdrive_payback and tonumber(udef.customParams.overdrive_payback)) or (udef.metalCost * PAYBACK_FACTOR)
+			allowBuildStepDef[i] = true
+		end
 	end
 end
 
@@ -109,29 +134,6 @@ local function paybackFactorFunction(repayRatio)
 	end
 end
 
-local FREE_STORAGE_LIMIT = 300
-local MIN_STORAGE = 0.5
-local PAYBACK_FACTOR = 0.5
-local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 20% over time
-local MEX_REFUND_MIN = 0.2
-
---[[ Uses the regular 50% payback. This is because at 100% people would leave
-     empty nanoframes for their allies to finish (actual experience from past).
-     In general, the "correct" value is such that the people who are aware of
-     the mechanic don't feel the need to abuse it in a lobsterpot to get ahead.
-     Ideally the refund would just be for whomever actually put in resources,
-     but that would involve the build step callin which is quite expensive. ]]
-local MEX_REFUND_VALUE = PAYBACK_FACTOR * UnitDefNames.staticmex.metalCost
-
-local paybackDefs = { -- cost is how much to pay back
-	[UnitDefNames["energywind"].id] = {cost = UnitDefNames["energywind"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["energysolar"].id] = {cost = UnitDefNames["energysolar"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["energyfusion"].id] = {cost = UnitDefNames["energyfusion"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["energysingu"].id] = {cost = UnitDefNames["energysingu"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["energygeo"].id] = {cost = UnitDefNames["energygeo"].metalCost*PAYBACK_FACTOR},
-	[UnitDefNames["energyheavygeo"].id] = {cost = UnitDefNames["energyheavygeo"].metalCost*PAYBACK_FACTOR},
-}
-
 local spammedError = false
 local debugGridMode = false
 local debugAllyTeam = false
@@ -147,7 +149,9 @@ local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID,
 
 local generator = {} -- generator[allyTeamID][teamID][unitID] = {generatorListID, metalIncome, energyIncome}
 local generatorList = {} -- generator[allyTeamID][teamID] = {data  = {[1] = unitID, [2] = unitID, ...}, count = number}
-local resourceGenoratingUnit = {}
+local resourceGeneratingUnit = {}
+
+local unitAlreadyFinished = {} -- To prevent payback being added twice, even across allyTeam transfers.
 
 local pylonGridQueue = false -- pylonGridQueue[unitID] = true
 
@@ -214,7 +218,6 @@ local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summ
 		wasteEnergy = wasteEnergy,
 	}
 end
-
 
 GG.Overdrive_teamResources = {}
 local lastTeamResources = {} -- 1 second lag for resource updates
@@ -669,7 +672,7 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 		-- Only add units to payback once.
 		return
 	end
-	local def = paybackDefs[unitDefID]
+	local paybackCost = paybackDefs[unitDefID]
 	unitPaybackTeamIDs[unitID] = paybackTeams
 	
 	for teamID, prop in pairs(paybackTeams) do
@@ -677,10 +680,10 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 		teamData.count = teamData.count + 1
 		teamData.data[teamData.count] = {
 			unitID = unitID,
-			cost = def.cost * prop,
+			cost = paybackCost * prop,
 			repaid = 0,
 		}
-		teamData.metalDueOD = teamData.metalDueOD + def.cost
+		teamData.metalDueOD = teamData.metalDueOD + paybackCost
 	end
 end
 
@@ -717,11 +720,10 @@ local function AddMexPayback(unitID, unitDefID, refundTeams, metalMake)
 	if (metalMake or 0) <= 0 then
 		return
 	end
-	if (not mexByID[unitID]) or mexByID[unitID].refundAdded then
+	if (not mexByID[unitID]) then
 		return
 	end
 	-- share goes down to 0 linearly, so halved to average it over refund duration
-	mexByID[unitID].refundAdded = true
 	mexByID[unitID].refundTeams = refundTeams
 	mexByID[unitID].refundTotal = MEX_REFUND_VALUE
 	mexByID[unitID].refundSoFar = 0
@@ -734,7 +736,7 @@ end
 -------------------------------------------------------------------------------------
 -- Overdrive and resource handling
 
-local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
+local function OptimizeOverDrive(allyTeamID, allyTeamData, allyE, maxGridCapacity)
 	local summedMetalProduction = 0
 	local summedBaseMetal = 0
 	local summedOverdrive = 0
@@ -1565,7 +1567,6 @@ local function RemoveMex(unitID)
 			end
 		end
 	end
-
 end
 
 -------------------------------------------------------------------------------------
@@ -1607,14 +1608,14 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	list.data[list.count] = unitID
 
 	generator[allyTeamID][teamID][unitID].listID = list.count
-	resourceGenoratingUnit[unitID] = true
+	resourceGeneratingUnit[unitID] = true
 end
 
 local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
 	teamID = teamID or spGetUnitTeam(unitID)
 
-	resourceGenoratingUnit[unitID] = false
+	resourceGeneratingUnit[unitID] = false
 
 	--if not generator[allyTeamID][teamID][unitID] then
 		--return
@@ -1671,6 +1672,7 @@ local function OverdriveDebugEconomyToggle(cmd, line, words, player)
 		end
 	end
 end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- External functions
@@ -1733,6 +1735,17 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Payback share calculation
+
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
+	if not allowBuildStepDef[unitDefID] then
+		return true
+	end
+	return true
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 function gadget:Initialize()
 	GG.Overdrive = externalFunctions
@@ -1785,9 +1798,17 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if paybackDefs[unitDefID] and enableEnergyPayback then
+		if unitAlreadyFinished[unitID] then
+			return
+		end
+		unitAlreadyFinished[unitID] = true
 		AddEnergyToPayback(unitID, unitDefID, {[unitTeam] = 1})
 	end
 	if mexDefs[unitDefID] and enableMexPayback then
+		if unitAlreadyFinished[unitID] then
+			return
+		end
+		unitAlreadyFinished[unitID] = true
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
 		AddMexPayback(unitID, unitDefID, {[unitTeam] = 1}, inc)
 	end
@@ -1832,22 +1853,24 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		end
 	end
 
-	if generatorDefs[unitDefID] or resourceGenoratingUnit[unitID] then
+	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
 		RemoveResourceGenerator(unitID, unitDefID, oldTeamID, oldAllyTeamID)
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID] and mexByID[unitID]) then
+		unitAlreadyFinished[unitID] = nil
 		RemoveMex(unitID)
 	end
 	if (pylonDefs[unitDefID]) then
 		RemovePylon(unitID)
 	end
 	if paybackDefs[unitDefID] and enableEnergyPayback then
+		unitAlreadyFinished[unitID] = nil
 		RemoveEnergyToPayback(unitID, unitDefID)
 	end
-	if generatorDefs[unitDefID] or resourceGenoratingUnit[unitID] then
+	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
 		RemoveResourceGenerator(unitID, unitDefID, unitTeam)
 	end
 end
