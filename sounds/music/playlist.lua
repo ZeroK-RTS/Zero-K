@@ -18,7 +18,7 @@ local tracks = {
 -- can be removed if you want to specify directory yourself
 for type,list in pairs(tracks) do
     for i=1,#list do
-	list[i] = "sounds/music/"..type.."/"..list[i]..".ogg"
+	list[i] = "sounds/music/ost23_uf/"..type.."/"..list[i]..".ogg"
     end
 end
 
