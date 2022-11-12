@@ -331,7 +331,10 @@ local function GetPriority(uid, wid)
 			targetTable[uid][wid] = priority + 35
 		elseif unitIsClaw[uid] then
 			targetTable[uid][wid] = priority + 1000
-		elseif (weaponBadCats_fixedwing[wid] and unitIsFixedwing[uid]) or (weaponBadCats_gunship[wid] and unitIsGunship[uid]) or (weaponBadCats_ground[wid] and unitIsGround[uid]) then
+		elseif (
+				weaponBadCats_fixedwing[wid] and unitIsFixedwing[uid]) or 
+				(weaponBadCats_gunship[wid] and unitIsGunship[uid]) or 
+				(weaponBadCats_ground[wid] and unitIsGround[uid]) then
 			targetTable[uid][wid] = priority + 15
 		elseif (unitIsFighterOrDrone[uid]) then
 			targetTable[uid][wid] = priority + 10
@@ -340,6 +343,9 @@ local function GetPriority(uid, wid)
 		else
 			targetTable[uid][wid] = priority
 		end
+	end
+	if not targetTable[uid][wid] then
+		targetTable[uid][wid] = 5
 	end
 	return targetTable[uid][wid]
 end
