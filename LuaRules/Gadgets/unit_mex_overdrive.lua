@@ -112,7 +112,8 @@ end
 local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
-local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 0% over time
+local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 20% over time
+local MEX_REFUND_MIN = 0.2
 
 --[[ Uses the regular 50% payback. This is because at 100% people would leave
      empty nanoframes for their allies to finish (actual experience from past).
@@ -139,7 +140,7 @@ local waiveGridLowPower = false
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
-local mexByID = {} -- mexByID[unitID] = {gridID, allyTeamID, refundTeams, refundTime, refundTotal, refundSoFar}
+local mexByID = {} -- mexByID[unitID] = {gridID, allyTeamID, refundTeams, refundTotal, refundSoFar}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, attachedPylons = {[1] = size, [2] =  unitID, ...}}
 local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID, ...}, count = number}
@@ -695,6 +696,42 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Mex Payback
+
+local function UpdateAndGetCurrentMexRefundShare(unitID, baseMetal)
+	if baseMetal <= 0 then
+		return false
+	end
+	local mexData = mexByID[unitID]
+	local refund = baseMetal*(MEX_REFUND_MIN + (MEX_REFUND_SHARE - MEX_REFUND_MIN) * (1 - mexData.refundSoFar / mexData.refundTotal))
+	if mexData.refundSoFar + refund >= mexData.refundTotal then
+		local remainder = mexData.refundTotal - mexData.refundSoFar
+		mexByID[unitID].refundTeams = nil
+		return remainder
+	end
+	mexData.refundSoFar = mexData.refundSoFar + refund
+	return refund
+end
+
+local function AddMexPayback(unitID, unitDefID, refundTeams, metalMake)
+	if (metalMake or 0) <= 0 then
+		return
+	end
+	if (not mexByID[unitID]) or mexByID[unitID].refundAdded then
+		return
+	end
+	-- share goes down to 0 linearly, so halved to average it over refund duration
+	mexByID[unitID].refundAdded = true
+	mexByID[unitID].refundTeams = refundTeams
+	mexByID[unitID].refundTotal = MEX_REFUND_VALUE
+	mexByID[unitID].refundSoFar = 0
+	for teamID, prop in pairs(refundTeams) do
+		teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal * prop
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- Overdrive and resource handling
 
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
@@ -825,23 +862,15 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 		end
 	end
 
-	for unitID, value in pairs(mexBaseMetal) do
+	for unitID, baseMetal in pairs(mexBaseMetal) do
 		local toRefund = mexByID[unitID].refundTeams
-		local private_share = value*MEX_REFUND_SHARE*mexByID[unitID].refundTime/mexByID[unitID].refundTimeTotal
-		mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
-		mexByID[unitID].refundSoFar = mexByID[unitID].refundSoFar + private_share
+		local private_share = UpdateAndGetCurrentMexRefundShare(unitID, baseMetal) 
 		
-		for teamID, prop in pairs(toRefund) do
-			privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share * prop
-			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share * prop
-			Spring.Echo("teamPayback[teamID].metalDueBase", teamPayback[teamID].metalDueBase)
-			if mexByID[unitID].refundTime <= 0 then
-				teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - (mexByID[unitID].refundTotal - mexByID[unitID].refundSoFar) * prop
+		if private_share then
+			for teamID, prop in pairs(toRefund) do
+				privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share * prop
+				teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share * prop
 			end
-		end
-		if mexByID[unitID].refundTime <= 0 then
-			mexByID[unitID].refundTeams = nil
-			mexByID[unitID].refundTime = nil
 		end
 	end
 
@@ -1226,22 +1255,13 @@ function gadget:GameFrame(n)
 
 				if mexByID[unitID].refundTeams then
 					local toRefund = mexByID[unitID].refundTeams
-					local private_share = orgMetal*MEX_REFUND_SHARE*mexByID[unitID].refundTime/mexByID[unitID].refundTimeTotal
+					local private_share = UpdateAndGetCurrentMexRefundShare(unitID, orgMetal) 
 					
-					mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
-					mexByID[unitID].refundSoFar = mexByID[unitID].refundSoFar + private_share
-					
-					for teamID, prop in pairs(toRefund) do
-						privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share * prop
-						teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share * prop
-						if mexByID[unitID].refundTime <= 0 then
-							teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - (mexByID[unitID].refundTotal - mexByID[unitID].refundSoFar) * prop
+					if private_share then
+						for teamID, prop in pairs(toRefund) do
+							privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share * prop
+							teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share * prop
 						end
-					end
-					
-					if mexByID[unitID].refundTime <= 0 then
-						mexByID[unitID].refundTeams = nil
-						mexByID[unitID].refundTime = nil
 					end
 				end
 
@@ -1509,26 +1529,6 @@ local function AddMex(unitID, teamID, metalMake)
 	end
 end
 
-local function AddMexPayback(unitID, unitDefID, refundTeams, metalMake)
-	if (metalMake or 0) <= 0 then
-		return
-	end
-	if (not mexByID[unitID]) or mexByID[unitID].refundAdded then
-		return
-	end
-	-- share goes down to 0 linearly, so halved to average it over refund duration
-	local refundTime = MEX_REFUND_VALUE / ((MEX_REFUND_SHARE / 2) * metalMake)
-	mexByID[unitID].refundAdded = true
-	mexByID[unitID].refundTeams = refundTeams
-	mexByID[unitID].refundTime = refundTime
-	mexByID[unitID].refundTimeTotal = refundTime
-	mexByID[unitID].refundTotal = MEX_REFUND_VALUE
-	mexByID[unitID].refundSoFar = 0
-	for teamID, prop in pairs(refundTeams) do
-		teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal * prop
-	end
-end
-
 local function RemoveMex(unitID)
 	local gridID = 0
 	local mex = mexByID[unitID]
@@ -1552,7 +1552,6 @@ local function RemoveMex(unitID)
 			end
 		end
 		mexByID[unitID] = nil
-
 	else
 		local x,_,z = spGetUnitPosition(unitID)
 		Spring.MarkerAddPoint(x,0,z,"inconsistent mex entry 124125_1")
