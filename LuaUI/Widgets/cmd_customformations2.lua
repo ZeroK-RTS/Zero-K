@@ -370,7 +370,7 @@ end
 
 local function GetExecutingUnits(cmdID)
 	local units = {}
-	local selUnits = spGetSelectedUnits()
+	local selUnits = (WG.CmdDisableAttack and WG.CmdDisableAttack.FilterSelectedUnits(cmdID)) or spGetSelectedUnits()
 	for i = 1, #selUnits do
 		local uID = selUnits[i]
 		if CanUnitExecute(uID, cmdID) then

@@ -8,6 +8,7 @@ return { jumparty = {
   builder                = false,
   buildPic               = [[jumparty.png]],
   canGuard               = true,
+  canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
@@ -18,11 +19,12 @@ return { jumparty = {
 
   customParams           = {
     bait_level_default = 1,
-    selection_scale   = 0.92,
+    selection_scale    = 0.92,
+    can_disable_attack = true,
 
-    outline_x = 125,
-    outline_y = 125,
-    outline_yoff = 21,
+    outline_x          = 125,
+    outline_y          = 125,
+    outline_yoff       = 21,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -61,12 +63,10 @@ return { jumparty = {
   workerTime             = 0,
 
   weapons                = {
-
     {
       def                = [[NAPALM_SPRAYER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
-
   },
 
 
@@ -119,9 +119,7 @@ return { jumparty = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 320,
     },
-
   },
-
 
   featureDefs            = {
 

@@ -9,6 +9,7 @@ return { striderarty = {
   buildPic               = [[striderarty.png]],
   canGuard               = true,
   canMove                = true,
+  canManualFire          = true,
   canPatrol              = true,
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
@@ -17,7 +18,8 @@ return { striderarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    bait_level_default = 2,
+    bait_level_default   = 2,
+    can_disable_attack   = true
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -47,13 +49,11 @@ return { striderarty = {
   workerTime             = 0,
 
   weapons                = {
-
     {
       def                = [[ROCKET]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
-
   },
 
 
@@ -110,7 +110,6 @@ return { striderarty = {
       weaponVelocity          = 250,
       wobble                  = 7000,
     },
-
   },
 
 
