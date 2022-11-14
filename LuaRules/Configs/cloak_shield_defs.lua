@@ -31,8 +31,8 @@ for name, ud in pairs (UnitDefNames) do
 		cloakShieldDefs[name].init = (cp.area_cloak_init ~= "0")
 		cloakShieldDefs[name].draw = (cp.area_cloak_draw ~= "0")
 		cloakShieldDefs[name].selfCloak = (cp.area_cloak_self ~= "0")
-		if cp.area_move_mult then
-			cloakShieldDefs[name].moveSpeedMult = tonumber(cp.area_move_mult)
+		if cp.area_cloak_move_mult then
+			cloakShieldDefs[name].moveSpeedMult = tonumber(cp.area_cloak_move_mult)
 		end
 	end
 end
