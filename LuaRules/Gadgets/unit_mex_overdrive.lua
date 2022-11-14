@@ -49,8 +49,8 @@ local spGetTeamInfo       = Spring.GetTeamInfo
 
 local FREE_STORAGE_LIMIT = 300
 local MIN_STORAGE = 0.5
-local PAYBACK_FACTOR = 0.5
-local MEX_REFUND_SHARE = 0.5 -- refund starts at 50% of base income and linearly goes to 20% over time
+local PAYBACK_FACTOR = 0.6
+local MEX_REFUND_SHARE = 0.8 -- refund starts at 80% of base income and linearly goes to 20% as full payback approaches
 local MEX_REFUND_MIN = 0.2
 
 --[[ Uses the regular 50% payback. This is because at 100% people would leave
@@ -127,8 +127,8 @@ local function paybackFactorFunction(repayRatio)
 	-- Must map [0,1) to (0,1]
 	-- Must not have any sequences on the domain that converge to 0 in the codomain.
 	local repay =  0.35 - repayRatio*0.25
-	if repay > 0.33 then
-		return 0.33
+	if repay > 0.35 then
+		return 0.35
 	else
 		return repay
 	end
