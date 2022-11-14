@@ -30,11 +30,12 @@ return { cloakcon = {
 
     area_cloak = 1,
 	area_cloak_init = 0,
-    area_cloak_upkeep = 8,
+    area_cloak_upkeep = 10,
     area_cloak_radius = 184,
     area_cloak_self_decloak_distance = 184,
     area_cloak_grow_rate = 342,
     area_cloak_shrink_rate = 1400,
+    area_move_mult = 0.5,
 
     priority_misc = 2, -- High
   },

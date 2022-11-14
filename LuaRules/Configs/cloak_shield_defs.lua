@@ -21,16 +21,19 @@ for name, ud in pairs (UnitDefNames) do
 	if cp.area_cloak and (cp.area_cloak ~= "0") then
 		cloakShieldDefs[name] = {}
 
-		cloakShieldDefs[name].energy = tonumber (cp.area_cloak_upkeep)
-		cloakShieldDefs[name].maxrad = tonumber (cp.area_cloak_radius)
+		cloakShieldDefs[name].energy = tonumber(cp.area_cloak_upkeep)
+		cloakShieldDefs[name].maxrad = tonumber(cp.area_cloak_radius)
 
-		cloakShieldDefs[name].growRate = tonumber (cp.area_cloak_grow_rate)
-		cloakShieldDefs[name].shrinkRate = tonumber (cp.area_cloak_shrink_rate)
-		cloakShieldDefs[name].selfDecloakDistance = tonumber (cp.area_cloak_self_decloak_distance) or ud.decloakDistance
+		cloakShieldDefs[name].growRate = tonumber(cp.area_cloak_grow_rate)
+		cloakShieldDefs[name].shrinkRate = tonumber(cp.area_cloak_shrink_rate)
+		cloakShieldDefs[name].selfDecloakDistance = tonumber(cp.area_cloak_self_decloak_distance) or ud.decloakDistance
 
 		cloakShieldDefs[name].init = (cp.area_cloak_init ~= "0")
 		cloakShieldDefs[name].draw = (cp.area_cloak_draw ~= "0")
 		cloakShieldDefs[name].selfCloak = (cp.area_cloak_self ~= "0")
+		if cp.area_move_mult then
+			cloakShieldDefs[name].moveSpeedMult = tonumber(cp.area_move_mult)
+		end
 	end
 end
 
