@@ -323,7 +323,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 				spSetUnitRulesParam(data.id,"target_towards", (data.fireTowards and (GetUnitRange(data.id, data.unitDefID) or 1)) or 0)
 			end
-		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam)) then
+		elseif spValidUnitID(data.targetID) and (data.allyAllowed or IsValidTargetBasedOnAllyTeam(data.targetID, data.allyTeam))and (data.id ~= data.targetID) then
 			if (not Spring.GetUnitIsCloaked(data.targetID)) and not (data.fireTowards and CheckFireTowardsUnitTarget(data.id, data, data.targetID)) then
 				spSetUnitTarget(data.id, data.targetID, false, true)
 			end
@@ -416,7 +416,6 @@ function gadget:Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
-	
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)

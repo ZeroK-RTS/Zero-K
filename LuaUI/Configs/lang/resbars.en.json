@@ -29,7 +29,7 @@
 	"resbar_waste_total" : "Wasted Total",
 	"resbar_reclaim_total" : "Reclaimed Total",
 	"resbar_unit_value" : "Unit Value",
-	"resbar_nano_value" : "Ongoing Projects Value",
+	"resbar_nano_value" : "In Construction",
 	"resbar_metal_storage_tooltip" : "Your stored metal.",
 	"resbar_energy_storage_tooltip" : "Your stored energy.",
 	"resbar_metal_income_tooltip" : "Your metal income.\nGained from metal extractors, overdrive and reclaim.",

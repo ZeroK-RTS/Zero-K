@@ -29,7 +29,7 @@ return { cloakskirm = {
   footprintZ             = 2,
   iconType               = [[kbotskirm]],
   leaveTracks            = true,
-  maxDamage              = 420,
+  maxDamage              = 400,
   maxSlope               = 36,
   maxVelocity            = 2.3,
   maxWaterDepth          = 20,
@@ -53,7 +53,7 @@ return { cloakskirm = {
   trackStretch           = 0.8,
   trackType              = [[ComTrack]],
   trackWidth             = 16,
-  turnRate               = 2640,
+  turnRate               = 2244,
   upright                = true,
 
   weapons                = {

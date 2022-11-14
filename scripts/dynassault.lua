@@ -236,9 +236,14 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
-		Turn(rarm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
+		if pitch > math.rad(-45) then
+			Turn(rarm, x_axis, -pitch, ARM_SPEED_PITCH)
+			Turn(rhand, x_axis, math.rad(0), ARM_SPEED_PITCH)
+		else
+			Turn(rarm, x_axis, -math.rad(18), ARM_SPEED_PITCH)
+			Turn(rhand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
+		end
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(rhand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreLaser)
@@ -250,11 +255,18 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_DGUN)
 		SetSignalMask(SIG_DGUN)
 		isDgunning = true
-		Turn(larm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
+		if pitch > math.rad(-45) then
+			Turn(larm, x_axis, -pitch, ARM_SPEED_PITCH)
+			Turn(lnanohand, x_axis, math.rad(0), ARM_SPEED_PITCH)
+		else
+			Turn(larm, x_axis, -math.rad(18), ARM_SPEED_PITCH)
+			Turn(lnanohand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
+		end
+		--Turn(larm, x_axis, math.min(math.rad(-18), -pitch), ARM_SPEED_PITCH)
+		--Turn(lnanohand, x_axis, math.max(0, math.rad(18) -pitch), ARM_SPEED_PITCH)
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(lnanohand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(rarm, x_axis)
+		WaitForTurn(lnanohand, x_axis)
 		StartThread(RestoreDGun)
 		return true
 	elseif weaponNum == 3 then
