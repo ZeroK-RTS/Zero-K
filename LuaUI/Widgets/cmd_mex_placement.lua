@@ -1138,7 +1138,7 @@ DrawIncomeLabels = function()
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
-		local y = spotHeights[i]
+		local y = math.max(0, spotHeights[i])
 
 		glPushMatrix()
 		glTranslate(x,y+5,z)

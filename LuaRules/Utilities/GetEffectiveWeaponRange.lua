@@ -162,7 +162,7 @@ function Spring.Utilities.GetEffectiveWeaponRange(unitDefID, heightDiff, weaponN
 		weaponDefID = unitWeapon[unitDefID]
 	end
 	local effectiveMaxRange = 0
-	if weaponDefID then
+	if weaponDefID and weaponAttributes[weaponDefID] then
 		heightDiff = heightDiff or 0
 		effectiveMaxRange = CalculateModdedMaxRange(heightDiff, weaponAttributes[weaponDefID])
 	end
