@@ -29,12 +29,7 @@ local defs = {
 		lowerHeight = -60,
 		upperHeight = 200,
 		searchRange = 180,
-	},
-	{
-		name = "spidercrabe",
-		lowerHeight = -80,
-		upperHeight = 160,
-		searchRange = 250,
+		mexShootLeeway = 120,
 	},
 }
 
@@ -56,6 +51,7 @@ for i = 1, #defs do
 	unitData.fireHeight = unitData.fireHeight or 5
 	unitData.lowerHeight = unitData.lowerHeight or -25
 	unitData.upperHeight = unitData.upperHeight or 35
+	unitData.mexSearchRange = weaponRange - (unitData.mexShootLeeway or 0)
 	
 	realDefs[ud.id] = unitData
 end

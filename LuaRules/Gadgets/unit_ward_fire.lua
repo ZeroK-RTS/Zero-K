@@ -232,7 +232,7 @@ local function GetMexPos(unitID, behaviour, enemyID)
 	end
 	if GG.GetClosestMetalSpot then
 		local x, _, z = spGetUnitPosition(unitID)
-		local spot = GG.GetClosestMetalSpot(x, z, behaviour.weaponRange)
+		local spot = GG.GetClosestMetalSpot(x, z, behaviour.mexSearchRange)
 		if spot then
 			return spot.x, spot.z
 		end
