@@ -602,12 +602,12 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		dx, dy, dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
 	end
 	
-	local eDistSq = ex^2 + ey^2 + ez^2
+	local eDistSq = ex^2 + ez^2
 	local eDist = sqrt(eDistSq)
 	local bonusSkirmRange = enemyUnitDef and behaviour.bonusRangeUnits and behaviour.bonusRangeUnits[enemyUnitDef]
 	
 	-- Scalar projection of prediction vector onto enemy vector
-	local predProj = (ex*dx + ey*dy + ez*dz)/eDistSq
+	local predProj = (ex*dx + ez*dz)/eDistSq
 
 	-- Calculate predicted enemy distance
 	local predictedDist = eDist
