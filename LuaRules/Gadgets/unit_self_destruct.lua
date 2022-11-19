@@ -125,7 +125,7 @@ local function CheckDeathTeam(teamID)
 	if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
 		local _, leader = Spring.GetTeamInfo(teamID)
 		local playerName = (leader and Spring.GetPlayerInfo(leader)) or "Unknown"
-		Spring.Echo("Team attempted to self-destruct most of its stuff!")
+		Spring.Echo("Someone attempted to self-destruct most of their stuff!")
 		Spring.Echo("TeamID: ", teamID, "Player: ", playerName)
 		--GG.ResignTeam(teamID)
 	end

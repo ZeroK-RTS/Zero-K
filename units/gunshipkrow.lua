@@ -60,8 +60,8 @@ return { gunshipkrow = {
 
     {
       def                = [[KROWLASER]],
-      mainDir            = [[0.38 0.1 0.2]],
-      maxAngleDif        = 180,
+      mainDir            = [[0.4 0.1 0.2]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -69,8 +69,8 @@ return { gunshipkrow = {
 
     {
       def                = [[KROWLASER]],
-      mainDir            = [[-0.38 0.1 0.2]],
-      maxAngleDif        = 180,
+      mainDir            = [[-0.4 0.1 0.2]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -83,8 +83,8 @@ return { gunshipkrow = {
     
     {
       def                = [[KROWLASER]],
-      mainDir            = [[0 0.1 -0.38]],
-      maxAngleDif        = 180,
+      mainDir            = [[0 0.1 -0.4]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -110,7 +110,7 @@ return { gunshipkrow = {
       },
 
       damage                  = {
-        default = 37.8,
+        default = 45,
       },
 
       duration                = 0.02,
@@ -120,7 +120,7 @@ return { gunshipkrow = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      range                   = 383,
+      range                   = 395,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -162,7 +162,7 @@ return { gunshipkrow = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/cannon/mini_cannon]],
       soundStartVolume        = 2,
-      sprayangle              = 14400,
+      sprayangle              = 13500,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,

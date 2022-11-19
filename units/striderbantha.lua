@@ -35,7 +35,7 @@ return { striderbantha = {
   losEmitHeight          = 60,
   maxDamage              = 32000,
   maxSlope               = 36,
-  maxVelocity            = 1.55,
+  maxVelocity            = 1.45,
   maxWaterDepth          = 22,
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
@@ -59,7 +59,7 @@ return { striderbantha = {
   trackStretch           = 0.5,
   trackType              = [[ComTrack]],
   trackWidth             = 42,
-  turnRate               = 1268,
+  turnRate               = 1166,
   upright                = true,
   workerTime             = 0,
 

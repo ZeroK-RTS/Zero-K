@@ -97,7 +97,7 @@ return { tankassault = {
       soundStart              = [[weapon/cannon/cannon_fire5]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 255,
+      weaponVelocity          = 260,
     },
 
   },
