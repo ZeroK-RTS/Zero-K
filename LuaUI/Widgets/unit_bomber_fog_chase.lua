@@ -7,7 +7,7 @@ function widget:GetInfo()
 		date      = "2022",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true  --  loaded by default
+		enabled   = false  --  loaded by default
 	}
 end
 
@@ -118,8 +118,8 @@ local function GetHumanName(unitID)
 end
 
 local function GetAimPosition(unitID)
-	local _,_,_,x,y,z = spGetUnitPosition(unitID, false, true) -- last 2 args: bool return midPos , bool return aimPos
-	return {x=x, y=y, z=z}
+	local _,_,_, x, y, z = spGetUnitPosition(unitID, false, true) -- last 2 args: bool return midPos , bool return aimPos
+	return {x = x, y = y, z = z}
 end
 
 local function DiscardOrphanedTargets()
@@ -241,11 +241,14 @@ function bomberClass:HitTargetPosition(targetPos)
 	local vz = targets[self.target].vel.z
 
 	local a = self.weaponSpeed * self.weaponSpeed - targets[self.target].vel.speed * targets[self.target].vel.speed
-	if a < 0.01 then return end -- should not happen as weapon speed > target speed
+	if a < 0.01 then
+		-- should not happen as weapon speed > target speed
+		return
+	end
 	local b = px * vx + py * vy + pz * vz
 	local c = px * px + py * py + pz * pz
 	local d = b * b + a * c
-	if d>= 0 then
+	if d >= 0 then
 		local t = (b + sqrt(d)) / a
 		--local t2 = (b - sqrt(d)) / a
 		--if t2 > 0 then Echo("T2 POSITIVE: t=", t, "t2 = ", t2) end    -- should not happen
