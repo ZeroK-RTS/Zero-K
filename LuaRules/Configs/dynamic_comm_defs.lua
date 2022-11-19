@@ -80,7 +80,7 @@ local moduleDefs = {
 		description = "Beam Laser: An effective short-range cutting tool",
 		image = moduleImagePath .. "commweapon_beamlaser.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"knight"}, --[[ can fit on any chassis, but is already
 		                                  baseline for multiplayer comms, so we
 		                                  don't offer it for them ]]
@@ -103,7 +103,7 @@ local moduleDefs = {
 		description = "Flamethrower: Good for deep-frying swarmers and large targets alike",
 		image = moduleImagePath .. "commweapon_flamethrower.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"recon", "assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -124,7 +124,7 @@ local moduleDefs = {
 		description = "Heatray: Rapidly melts anything at short range; steadily loses all of its damage over distance",
 		image = moduleImagePath .. "commweapon_heatray.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -145,7 +145,7 @@ local moduleDefs = {
 		description = "Machine Gun: Close-in automatic weapon with AoE",
 		image = moduleImagePath .. "commweapon_heavymachinegun.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"recon", "assault", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -189,7 +189,7 @@ local moduleDefs = {
 		description = "Lightning Rifle: Paralyzes and damages annoying bugs",
 		image = moduleImagePath .. "commweapon_lightninggun.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"recon", "support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -211,7 +211,7 @@ local moduleDefs = {
 		description = "Light Particle Beam: Fast, light pulsed energy weapon",
 		image = moduleImagePath .. "commweapon_lparticlebeam.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"support", "recon", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -233,7 +233,7 @@ local moduleDefs = {
 		description = "Missile Launcher: Lightweight seeker missile with good range",
 		image = moduleImagePath .. "commweapon_missilelauncher.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -254,7 +254,7 @@ local moduleDefs = {
 		description = "Riot Cannon: The weapon of choice for crowd control",
 		image = moduleImagePath .. "commweapon_riotcannon.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -276,7 +276,7 @@ local moduleDefs = {
 		description = "Rocket Launcher: Medium-range, low-velocity hitter",
 		image = moduleImagePath .. "commweapon_rocketlauncher.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -298,7 +298,7 @@ local moduleDefs = {
 		description = "Shotgun: Can hammer a single large target or shred several small ones",
 		image = moduleImagePath .. "commweapon_shotgun.png",
 		limit = 2,
-		cost = 5 * COST_MULT,
+		cost = 25 * COST_MULT,
 		requireChassis = {"recon", "support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -886,15 +886,23 @@ local function GetKnightCloneModulesString(modulesByDefID)
 end
 
 local morphCosts = {
-	75,
+	50,
 	100,
 	650,
 	200,
-	300,
+	250,
+}
+
+local morphBuildPower = {
+	5,
+	5,
+	7.5,
+	7.5,
+	10
 }
 
 local function extraLevelCostFunction(level)
-	return (level - 2) * 100 * COST_MULT
+	return level * 50 * COST_MULT
 end
 
 local chassisDefs = {
@@ -907,7 +915,7 @@ local chassisDefs = {
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
-				morphBuildPower = 10,
+				morphBuildPower = 5,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -918,7 +926,7 @@ local chassisDefs = {
 				upgradeSlots = {},
 			},
 			[1] = {
-				morphBuildPower = 10,
+				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -938,7 +946,7 @@ local chassisDefs = {
 				},
 			},
 			[2] = {
-				morphBuildPower = 15,
+				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
@@ -958,7 +966,7 @@ local chassisDefs = {
 				},
 			},
 			[3] = {
-				morphBuildPower = 20,
+				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 16
@@ -982,7 +990,7 @@ local chassisDefs = {
 				},
 			},
 			[4] = {
-				morphBuildPower = 25,
+				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 25
@@ -1006,7 +1014,7 @@ local chassisDefs = {
 				},
 			},
 			[5] = {
-				morphBuildPower = 30,
+				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 35
@@ -1039,7 +1047,7 @@ local chassisDefs = {
 		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
-				morphBuildPower = 10,
+				morphBuildPower = 5,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1050,7 +1058,7 @@ local chassisDefs = {
 				upgradeSlots = {},
 			},
 			[1] = {
-				morphBuildPower = 10,
+				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1070,7 +1078,7 @@ local chassisDefs = {
 				},
 			},
 			[2] = {
-				morphBuildPower = 15,
+				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1090,7 +1098,7 @@ local chassisDefs = {
 				},
 			},
 			[3] = {
-				morphBuildPower = 20,
+				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1114,7 +1122,7 @@ local chassisDefs = {
 				},
 			},
 			[4] = {
-				morphBuildPower = 25,
+				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1138,7 +1146,7 @@ local chassisDefs = {
 				},
 			},
 			[5] = {
-				morphBuildPower = 30,
+				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1171,7 +1179,7 @@ local chassisDefs = {
 		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
-				morphBuildPower = 10,
+				morphBuildPower = 5,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1182,7 +1190,7 @@ local chassisDefs = {
 				upgradeSlots = {},
 			},
 			[1] = {
-				morphBuildPower = 10,
+				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
@@ -1203,7 +1211,7 @@ local chassisDefs = {
 				},
 			},
 			[2] = {
-				morphBuildPower = 15,
+				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
@@ -1224,7 +1232,7 @@ local chassisDefs = {
 				},
 			},
 			[3] = {
-				morphBuildPower = 20,
+				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
@@ -1249,7 +1257,7 @@ local chassisDefs = {
 				},
 			},
 			[4] = {
-				morphBuildPower = 25,
+				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 9
@@ -1274,7 +1282,7 @@ local chassisDefs = {
 				},
 			},
 			[5] = {
-				morphBuildPower = 30,
+				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 12
@@ -1309,7 +1317,7 @@ local chassisDefs = {
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
-				morphBuildPower = 10,
+				morphBuildPower = 5,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1321,7 +1329,7 @@ local chassisDefs = {
 				upgradeSlots = {},
 			},
 			[1] = {
-				morphBuildPower = 10,
+				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1342,7 +1350,7 @@ local chassisDefs = {
 				},
 			},
 			[2] = {
-				morphBuildPower = 15,
+				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1363,7 +1371,7 @@ local chassisDefs = {
 				},
 			},
 			[3] = {
-				morphBuildPower = 20,
+				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1388,12 +1396,11 @@ local chassisDefs = {
 				},
 			},
 			[4] = {
-				morphBuildPower = 25,
+				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 					sharedData.drones = (sharedData.drones or 0) + 2
-					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault4_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1414,12 +1421,11 @@ local chassisDefs = {
 				},
 			},
 			[5] = {
-				morphBuildPower = 30,
+				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 					sharedData.drones = (sharedData.drones or 0) + 3
-					sharedData.droneheavyslows = (sharedData.droneheavyslows or 0) + 1
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault5_" .. GetAssaultCloneModulesString(modulesByDefID)].id
@@ -1451,7 +1457,7 @@ local chassisDefs = {
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
-				morphBuildPower = 10,
+				morphBuildPower = 5,
 				morphBaseCost = 0,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1463,7 +1469,7 @@ local chassisDefs = {
 				upgradeSlots = {},
 			},
 			[1] = {
-				morphBuildPower = 10,
+				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1483,7 +1489,7 @@ local chassisDefs = {
 				},
 			},
 			[2] = {
-				morphBuildPower = 15,
+				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1503,7 +1509,7 @@ local chassisDefs = {
 				},
 			},
 			[3] = {
-				morphBuildPower = 20,
+				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1527,7 +1533,7 @@ local chassisDefs = {
 				},
 			},
 			[4] = {
-				morphBuildPower = 25,
+				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
@@ -1551,7 +1557,7 @@ local chassisDefs = {
 				},
 			},
 			[5] = {
-				morphBuildPower = 30,
+				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5

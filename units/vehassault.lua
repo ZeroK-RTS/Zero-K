@@ -32,7 +32,7 @@ return { vehassault = {
   footprintZ             = 3,
   iconType               = [[vehicleassault]],
   leaveTracks            = true,
-  maxDamage              = 1920,
+  maxDamage              = 2000,
   maxSlope               = 18,
   maxVelocity            = 2.95,
   maxWaterDepth          = 22,
@@ -101,7 +101,7 @@ return { vehassault = {
       soundStart              = [[weapon/cannon/medplasma_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 225,
+      weaponVelocity          = 238,
     },
 
   },
