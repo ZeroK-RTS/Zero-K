@@ -100,7 +100,7 @@ function beginJump(turn,lineDist,flightDist,duration)
 	
 	doingSomersault = math.random() < 0.15
 	
-	if doingSomersault then
+	if doingSomersault and not GG.lodLevelMedium then
 		StartThread(somersaultThread, duration*GG.Script.frameToMs)
 	end
 end
