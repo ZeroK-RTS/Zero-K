@@ -73,8 +73,8 @@ function widget:Update(s)
 		for i = 1, #allied_teams do
 			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue") or 0))
 			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue") or 0))
-			base_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalBase") or 0))
-			od_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalOverdrive") or 0))
+			base_income_labels[i]:SetCaption (string.format("+%.1f m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalBase") or 0))
+			od_income_labels[i]:SetCaption (string.format("+%.1f m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalOverdrive") or 0))
 		end
 	end
 end
@@ -123,7 +123,7 @@ function CreateWindow()
 		y = 5,
 		width = 10,
 		parent = window,
-		caption = "Player     Due:  OD       Base     Income:  OD      Base",
+		caption = "Player             Due:  OD     Base    Income: OD     Base",
 		fontsize = 13,
 		textColor = {1,1,1,1},
 	}
@@ -161,7 +161,7 @@ function CreateWindow()
 			textColor = {0.65, 0.65, 0.65, 1},
 		}
 		od_income_labels[i] = Chili.Label:New{
-			x = 250,
+			x = 225,
 			y = 16*i - 10,
 			width = 50,
 			parent = window,

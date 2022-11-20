@@ -177,22 +177,55 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 	end
 end
 
-if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
-	Spring.ForceTesselationUpdate = function ()
+local RET_FALSE = function() return false end
+
+if not Script.GetSynced() then
+
+	if not Spring.ForceTesselationUpdate then -- BAR 105-710
 		--[[ This is just here so gadget code can avoid
 		     a nil check. The workaround was to apply
 		     ground detail changes to force an update,
 		     but that requires a timed delay (since else
 		     the change isn't noticed) which I am not
 		     going to reimplement here. ]]
-		return false
+		Spring.ForceTesselationUpdate = RET_FALSE
+	end
+
+	if not Spring.GetMiniMapRotation then -- BAR 105-1242
+		Spring.GetMiniMapRotation = function()
+			return 0
+		end
+	end
+
+	if not Spring.GetCameraRotation then -- BAR 105-1242
+		local spGetCameraDirection = Spring.GetCameraDirection
+		local acos = math.acos
+		local atan2 = math.atan2
+		local sqrt = math.sqrt
+		Spring.GetCameraRotation = function()
+			local x, y, z = spGetCameraDirection()
+			local len = sqrt(x^2 + y^2 + z^2)
+			return acos(y / len), atan2(x / len, -z / len), 0
+		end
+	end
+
+	if not Spring.LoadModelTextures then -- BAR 105-1244
+		Spring.LoadModelTextures = RET_FALSE
+	end
+
+	if not Spring.SetWindowMinimized then -- BAR 105-1245
+		Spring.SetWindowMinimized = RET_FALSE
+		Spring.SetWindowMaximized = RET_FALSE
 	end
 end
 
-if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
-	local spGetUnitExperience = Spring.GetUnitExperience
-	local spSetUnitExperience = Spring.SetUnitExperience
-	Spring.AddUnitExperience = function (unitID, deltaXP)
-		spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
+if Script.GetSynced() then
+
+	if not Spring.AddUnitExperience then -- BAR 105-961
+		local spGetUnitExperience = Spring.GetUnitExperience
+		local spSetUnitExperience = Spring.SetUnitExperience
+		Spring.AddUnitExperience = function (unitID, deltaXP)
+			spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
+		end
 	end
 end

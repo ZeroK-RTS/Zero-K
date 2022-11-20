@@ -1,5 +1,6 @@
 local terraformOnUnitDestroyed = {
 	[UnitDefNames["shieldscout"].id] = {
+		shrakaPyramidDiff = 140,
 		posX =
 			           {-8, 0, 8,
 			        -16,-8, 0, 8, 16,

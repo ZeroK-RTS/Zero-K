@@ -321,7 +321,7 @@ local cameraPath = 'Settings/Camera'
 			{name = 'COFC (highly configurable)',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
 			{name = 'FPS (experimental)',key='FPS', hotkey=nil},
 			{name = 'Free (experimental)',key='Free', hotkey=nil},
-			{name = 'Total War (experimental)',key='Total War',  hotkey=nil},
+			{name = 'Spring (experimental)',key='Spring',  hotkey=nil},
 		},'Default',
 		function(self)
 			local key = self.value
@@ -333,8 +333,8 @@ local cameraPath = 'Settings/Camera'
 				spSendCommands{cofcDisable ,"viewfree"}
 			elseif key == 'Rotatable Overhead' then
 				spSendCommands{cofcDisable ,"viewrot"}
-			elseif key == 'Total War' then
-				spSendCommands{cofcDisable ,"viewtw"}
+			elseif key == 'Spring' then
+				spSendCommands{cofcDisable ,"viewspring"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
 			else
@@ -353,8 +353,12 @@ local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Track unit', 'track')
 	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
 	ShButton(camerHotkeys, 'Panning mode','mousestate', 'Note: must be bound to a key for use', true)
+	ShButton(camerHotkeys, 'Tilt Camera', 'movetilt', "Tilt the camera with mouse wheel while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Overview Zoom', 'movereset', "Mousewheel down with this key held to zoom all the way out. Mousewheel up to return to previous zoom level.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
+	-- Requires Spring Camera to be default.
+	--ShButton(camerHotkeys, 'Rotate Camera', 'moverotate', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	
 	ShLabel(camerHotkeys, 'Saving Position and Switching Camera')
 

@@ -935,6 +935,11 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = areaCloakUpkeep .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = areaCloakRadius .. " elmo"
+		if cp.area_cloak_move_mult then
+			cells[#cells+1] = ' - Move speed:'
+			cells[#cells+1] = numformat(tonumber(cp.area_cloak_move_mult)*100) .. "%"
+		
+		end
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

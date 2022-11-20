@@ -106,6 +106,7 @@ local function ValidateCloakShieldDefs(mds)
 			newData.selfCloak  = def.selfCloak or false
 			newData.decloakDistance  = def.decloakDistance or false
 			newData.selfDecloakDistance  = def.selfDecloakDistance or false
+			newData.moveSpeedMult  = def.moveSpeedMult or false
 			newData.isTransport = (ud.transportCapacity >= 1)
 			newDefs[ud.id] = newData
 		end
@@ -367,9 +368,18 @@ local function UpdateCloakees(data)
 	end
 end
 
+local function UpdateMoveSpeedMult(unitID, data, enabled)
+	if data.moveSpeedMult then
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", (enabled and data.moveSpeedMult) or 1)
+		GG.UpdateUnitAttributes(unitID)
+	end
+end
 
 local function GrowRadius(cloaker)
 	local r = cloaker.radius
+	if r <= 0 then
+		UpdateMoveSpeedMult(cloaker.id, cloaker.def, true)
+	end
 	local maxrad = cloaker.maxrad
 	if (r >= maxrad) then
 		r = maxrad
@@ -386,11 +396,11 @@ local function GrowRadius(cloaker)
 	end
 end
 
-
 local function ShrinkRadius(cloaker)
 	local r = cloaker.radius
 	if (r <= 0) then
 		cloaker.radius = 0
+		UpdateMoveSpeedMult(cloaker.id, cloaker.def, false)
 		return 0
 	end
 	r = (r * r) - cloaker.def.shrinkRate
@@ -402,9 +412,9 @@ local function ShrinkRadius(cloaker)
 	end
 	if ((r <= 0) and (not cloaker.want)) then
 		cloakers[cloaker.id] = nil
+		UpdateMoveSpeedMult(cloaker.id, cloaker.def, false)
 	end
 end
-
 
 local GetUnitIsStunned = Spring.GetUnitIsStunned
 
@@ -429,13 +439,13 @@ function gadget:GameFrame(frameNum)
 		elseif (not data.want) then
 			ShrinkRadius(data)
 		else
-		local newState = Spring.Utilities.GetUnitActiveState(unitID) and (GetUnitRulesParam(unitID, "forcedOff") ~= 1)
+			local newState = Spring.Utilities.GetUnitActiveState(unitID) and (GetUnitRulesParam(unitID, "forcedOff") ~= 1)
 			if (newState) then
 				GrowRadius(data)
 			else
 				ShrinkRadius(data)
 			end
-
+			
 			if (data.active ~= newState) then
 				data.active = newState
 				if (newState) then
@@ -541,8 +551,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
 end
 
 
-function gadget:CommandFallback(unitID, unitDefID, teamID,
-							                  cmdID, cmdParams, cmdOptions)
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID ~= CMD_CLOAK_SHIELD) then
 		return false  -- command was not used
 	end

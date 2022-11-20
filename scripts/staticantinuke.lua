@@ -62,6 +62,7 @@ function script.AimWeapon(weaponNum, heading, pitch)
 end
 
 function script.FireWeapon(weaponNum)
+	Spring.AddUnitExperience(unitID, 1) -- nuke missiles aren't worth exactly 1 anti, but for simplicity
 	Hide(missile)
 	Sleep(500)
 	if open then Close() end

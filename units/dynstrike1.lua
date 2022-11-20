@@ -14,6 +14,7 @@ return { dynstrike1 = {
   },
 
   buildPic               = [[commstrike.png]],
+  radarDistanceJam       = 175,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
