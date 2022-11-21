@@ -270,11 +270,11 @@ options = {
 		name = "Apply Changes",
 		type = 'button',
 		path = customGridPath,
-		noHotkey = true,
 	},
 	label_apply = {
-		type = 'label',
-		name = 'Click to apply changes. They are also applied the next time the game is launched.',
+		type = 'text',
+		name = 'Note: Click above to refresh',
+		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
 		path = customGridPath
 	},
 	label_tab = {
