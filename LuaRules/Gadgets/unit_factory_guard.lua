@@ -66,6 +66,7 @@ for unitDefID, ud in pairs(UnitDefs) do
 end
 
 local factories = {}
+local deferCheckUnits = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -151,9 +152,9 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		rx, rz =  0,  dist
 	end
 	
-	GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, 0)
-	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, CMD.OPT_SHIFT, true) then
-		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, CMD.OPT_SHIFT)
+	--GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, 0)
+	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, 0, true) then
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, 0)
 	end
 	spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, CMD.OPT_SHIFT)
 end
@@ -181,8 +182,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,
-                             cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_FACTORY_GUARD and factoryDefs[unitDefID] then
 		SetAssistState(unitID, cmdParams[1])
 		return false  -- command was used
@@ -201,14 +201,23 @@ function gadget:UnitCreated(unitID, unitDefID,  unitTeam)
 	end
 end
 
-function gadget:UnitFromFactory(unitID, unitDefID, unitTeam,
-                                factID, factDefID, userOrders)
-
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if (userOrders) then
 		return -- already has user assigned orders
 	end
 	if factories[factID] and factories[factID].assist then
 		GuardFactory(unitID, unitDefID, factID, factDefID)
+		deferCheckUnits = deferCheckUnits or {}
+		deferCheckUnits[unitID] = {unitDefID, factID, factDefID}
+	end
+end
+
+function gadget:GameFrame(n)
+	if deferCheckUnits then
+		for unitID, data in pairs(deferCheckUnits) do
+			GuardFactory(unitID, data[1], data[2], data[3])
+		end
+		deferCheckUnits = false
 	end
 end
 
