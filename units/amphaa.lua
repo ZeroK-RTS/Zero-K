@@ -75,6 +75,55 @@ return { amphaa = {
 
   weaponDefs             = {
 
+    ALPHABET_MISSILE = {
+      name                    = [[https://github.com/beyond-all-reason/spring/issues/509]],
+      areaOfEffect            = 48,
+      canAttackGround         = false,
+      cegTag                  = [[missiletrailblue]],
+      craterBoost             = 1,
+      craterMult              = 2,
+      cylinderTargeting       = 1,
+
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
+
+        isaa = [[1]],
+        script_reload = [[12]],
+        script_burst = [[4]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
+      },
+
+      damage                  = {
+        default = 15.01,
+        planes  = 150.1,
+      },
+
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+      flightTime              = 3,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
+      noSelfDamage            = true,
+      range                   = 820,
+      reloadtime              = 0.3,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startVelocity           = 650,
+      texture1                = [[flarescale01]],
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 9000,
+      tracks                  = true,
+      turnRate                = 63000,
+      turret                  = true,
+      weaponAcceleration      = 141,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 850,
+    },
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
