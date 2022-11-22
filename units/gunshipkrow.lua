@@ -46,7 +46,6 @@ return { gunshipkrow = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:BEAMWEAPON_MUZZLE_BIG_RED]],
       [[custom:DOT_Pillager_Explo]],
     },
 
@@ -95,43 +94,44 @@ return { gunshipkrow = {
   weaponDefs             = {
 
     KROWLASER  = {
-      name                    = [[Laserbeam]],
+      name                    = [[Auto Particle Beam]],
       areaOfEffect            = 8,
       avoidFeature            = false,
       canattackground         = true,
       collideFriendly         = false,
+      beamDecay               = 0.85,
+      beamTime                = 1/30,
+      beamttl                 = 45,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
-      customParams        = {
-        light_camera_height = 1800,
-        light_radius = 160,
+      customParams            = {
+        light_color = [[0.9 0.22 0.22]],
+        light_radius = 80,
       },
 
       damage                  = {
-        default = 45,
+        default = 67.5,
       },
 
-      duration                = 0.02,
-      explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
+      explosionGenerator      = [[custom:flash1red]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
-      impulseFactor           = 0.4,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
+      laserFlareSize          = 7,
+      minIntensity            = 1,
       range                   = 395,
-      reloadtime              = 0.2,
+      reloadtime              = 0.3,
       rgbColor                = [[1 0 0]],
-      soundHit                = [[weapon/laser/lasercannon_hit]],
-      soundStart              = [[weapon/laser/heavylaser_fire2]],
-      soundStartVolume        = 0.7,
-      soundTrigger            = true,
-      thickness               = 3.25,
+      soundStart              = [[weapon/laser/mini_laser]],
+      soundStartVolume        = 6,
+      thickness               = 5,
       tolerance               = 10000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2370,
+      weaponType              = [[BeamLaser]],
     },
 
     CLUSTERBOMB = {

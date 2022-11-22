@@ -111,7 +111,7 @@ local function DeathAnim()
 				EmitSfx(jets[i], 258)
 			end
 			if count % 18 == 0 then
-				EmitSfx(jets[index], 1025)
+				EmitSfx(jets[index], 1024)
 				index = index + 1
 				if index > #jets then
 					index = 1
@@ -318,13 +318,6 @@ function script.AimWeapon(num, heading, pitch)
 	StartThread(RestoreAfterDelay)
 	return true
 end
-
-function script.FireWeapon(num)
-	if num ~= 3 then
-		EmitSfx(gunpoints[num].fire, 1024)
-	end
-end
-
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
