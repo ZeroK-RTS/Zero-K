@@ -33,7 +33,7 @@ return { tankassault = {
   footprintZ          = 4,
   iconType            = [[tankassault]],
   leaveTracks         = true,
-  maxDamage           = 6800,
+  maxDamage           = 7200,
   maxSlope            = 18,
   maxVelocity         = 2.45,
   maxWaterDepth       = 22,
@@ -97,7 +97,7 @@ return { tankassault = {
       soundStart              = [[weapon/cannon/cannon_fire5]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 255,
+      weaponVelocity          = 260,
     },
 
   },

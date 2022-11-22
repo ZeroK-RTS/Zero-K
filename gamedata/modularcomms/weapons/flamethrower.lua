@@ -29,7 +29,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 11,
+		default = 12.5,
 	},
 
 	explosionGenerator      = [[custom:SMOKE]],
@@ -41,13 +41,13 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noExplode               = true,
 	noSelfDamage            = true,
-	range                   = 267,
+	range                   = 270,
 	reloadtime              = 5/30,
 	rgbColor                = [[1 1 1]],
 	soundStart              = [[weapon/flamethrower]],
 	soundTrigger            = true,
-    texture1				= [[flame]],
-    thickness				= 0,
+	texture1                = [[flame]],
+	thickness               = 0,
 	tolerance               = 5000,
 	turret                  = true,
 	weaponType              = [[LaserCannon]],

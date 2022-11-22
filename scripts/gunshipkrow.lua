@@ -61,7 +61,7 @@ local signals = {
 	[2] = 4,
 	[4] = 8,
 	tilt = 1,
-	particle = {	-- unused
+	particle = { -- unused
 		[1] = 16,
 		[2] = 32,
 		[4] = 64,
@@ -79,6 +79,7 @@ local isLanded = true
 local SPECIAL_FIRE_COUNT = 75
 
 local SLOWDOWN_FACTOR = 0.75
+local ACCEL_FACTOR = 1.25
 local UNIT_SPEED = UnitDefNames["gunshipkrow"].speed*SLOWDOWN_FACTOR/30
 
 local sound_index = 0
@@ -269,12 +270,17 @@ local function ClusterBombThread()
 	end
 	Sleep(330)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)
 	GG.UpdateUnitAttributes(unitID)
 end
 
 function ClusterBomb()
 	StartThread(ClusterBombThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SLOWDOWN_FACTOR)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/SLOWDOWN_FACTOR)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", ACCEL_FACTOR/SLOWDOWN_FACTOR)
+	
 	GG.UpdateUnitAttributes(unitID)
 	--local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	--local hSpeed = math.sqrt(vx^2 + vz^2)
@@ -285,6 +291,8 @@ end
 
 function OnLoadGame()
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)
 	GG.UpdateUnitAttributes(unitID)
 end
 

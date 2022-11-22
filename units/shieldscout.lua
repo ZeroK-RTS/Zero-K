@@ -33,7 +33,7 @@ return { shieldscout = {
   footprintZ             = 2,
   iconType               = [[clogger]],
   leaveTracks            = true,
-  maxDamage              = 580,
+  maxDamage              = 560,
   maxSlope               = 36,
   maxVelocity            = 2.8,
   maxWaterDepth          = 22,
@@ -84,8 +84,7 @@ return { shieldscout = {
       },
 
       damage                  = {
-        default = 55,
-        planes  = 55,
+        default = 48,
       },
 
       explosionGenerator      = [[custom:none]],

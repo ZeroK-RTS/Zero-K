@@ -361,6 +361,9 @@ medRangeSkirmieeArray         = Union(medRangeSkirmieeArray, lowMedRangeSkirmiee
 longRangeSkirmieeArray        = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
 artyRangeSkirmieeArray        = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
 
+-- Don't add this to the higher ranged units.
+local medRangeAndTurretSkirmieeArray = Union(medRangeSkirmieeArray, NameToDefID({"turretriot", "turretlaser"}))
+
 ---------------------------------------------------------------------------
 -- Personal shield draining
 ---------------------------------------------------------------------------
@@ -1364,7 +1367,7 @@ local behaviourConfig = {
 		name = "cloakskirm",
 
 		-- LLT isn't outranged, but is on the list for the reload step-back
-		skirms = Union(medRangeSkirmieeArray, NameToDefID({"turretriot", "turretlaser"})),
+		skirms = medRangeAndTurretSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
@@ -1388,7 +1391,7 @@ local behaviourConfig = {
 	},
 	{
 		name = "jumpskirm",
-		skirms = medRangeSkirmieeArray,
+		skirms = medRangeAndTurretSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
@@ -1397,8 +1400,10 @@ local behaviourConfig = {
 		minSwarmLeeway = 130,
 		skirmOrderDis = 150,
 		skirmLeeway = 5,
+		reloadSkirmLeeway = 1.5,
 		skirmBlockedApproachFrames = 60,
 		velPredChaseFactor = 0.5,
+		skirmBlockedApproachOnFight = true,
 
 		bonusRangeUnits = personalShieldUnits,
 		wardFireTargets = personalShieldUnits,
@@ -1439,7 +1444,7 @@ local behaviourConfig = {
 	},
 	{
 		name = "hoverskirm",
-		skirms = medRangeSkirmieeArray,
+		skirms = medRangeAndTurretSkirmieeArray,
 		swarms = medRangeSwarmieeArray,
 		--flees = {},
 		avoidHeightDiff = explodableFull,
@@ -1447,10 +1452,12 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30,
 		minSwarmLeeway = 130,
 		skirmLeeway = 30,
+		reloadSkirmLeeway = 1,
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
 		skirmBlockedApproachFrames = 60,
 		skirmBlockApproachHeadingBlock = 0,
+		skirmBlockedApproachOnFight = true,
 
 		wardFireTargets = personalShieldUnitsWithSafetyMargin,
 		wardFireLeeway = 10,
@@ -1557,14 +1564,14 @@ local behaviourConfig = {
 	},
 	{
 		name = "gunshipkrow",
-		skirms = medRangeSkirmieeArray,
-		swarms = medRangeSwarmieeArray,
-		--flees = {},
+		skirmEverything = true,
+		skirmRadar = true,
 		avoidHeightDiff = explodableFull,
 		fightOnlyUnits = medRangeExplodables,
-		maxSwarmLeeway = 10,
-		minSwarmLeeway = 130,
-		skirmLeeway = 20,
+		skirmOrderDis = 70,
+		skirmLeeway = 90,
+		velocityPrediction = 18,
+		velPredChaseFactor = 0,
 	},
 	{
 		name = "vehcapture",

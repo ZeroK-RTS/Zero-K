@@ -100,7 +100,7 @@ function beginJump(turn,lineDist,flightDist,duration)
 	
 	doingSomersault = math.random() < 0.15
 	
-	if doingSomersault then
+	if doingSomersault and not GG.lodLevelMedium then
 		StartThread(somersaultThread, duration*GG.Script.frameToMs)
 	end
 end
@@ -118,6 +118,53 @@ function endJump()
 	Move(pelvis, y_axis, -8, 80)
 	jumpLegLand(leftLeg)
 	jumpLegLand(rightLeg)
+end
+
+-----------------------------
+-- Walking low detail
+
+local function Step(front, back)
+	Turn(front.thigh, x_axis, math.rad(70), math.rad(230))
+	Turn(front.calf, x_axis, math.rad(20), math.rad(270))
+	--Turn(front.foot, x_axis, math.rad(-100), math.rad(420))
+	
+	Turn(back.thigh, x_axis, math.rad(-20), math.rad(420))
+	Turn(back.calf, x_axis, math.rad(50), math.rad(420))
+	--Turn(back.foot, x_axis, math.rad(30), math.rad(420))
+	
+	--Turn(pelvis, z_axis, math.rad(-(5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	--Move(pelvis, y_axis, 0.7, 8000)
+	
+	--WaitForTurn(front.thigh, x_axis)
+	Sleep(166)
+	
+	Turn(front.thigh, x_axis, math.rad(-10), math.rad(320))
+	Turn(front.calf, x_axis, math.rad(-60), math.rad(500))
+	--Turn(front.foot, x_axis, math.rad(70), math.rad(270))
+	
+	Turn(back.thigh, x_axis, math.rad(40), math.rad(270))
+	Turn(back.calf, x_axis, math.rad(-40), math.rad(270))
+	--Turn(back.foot, x_axis, 0, math.rad(270))
+	
+	--Move(pelvis, y_axis, 0, 8000)
+	Turn(box, x_axis, math.rad(10), math.rad(40))
+	
+	--WaitForTurn(front.calf, x_axis)
+	Sleep(166)
+	
+	Turn(box, x_axis, math.rad(-10), math.rad(40))
+end
+
+local function WalkLowDetail()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
+	while true do
+		Step(leftLeg, rightLeg)
+		Step(rightLeg, leftLeg)
+	end
 end
 
 -----------------------------
@@ -288,7 +335,11 @@ end
 function script.StartMoving()
 	if not walking then
 		walking = true
-		StartThread(Walk)
+		if GG.lodLevelMedium then
+			StartThread(WalkLowDetail)
+		else
+			StartThread(Walk)
+		end
 	end
 end
 

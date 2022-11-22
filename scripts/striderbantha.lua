@@ -47,6 +47,13 @@ local smokePiece = { torso, rarmgun, larm_rgunclaw }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Balance
+
+local ARM_AIM_SPEED = 2.7
+local HEAD_AIM_SPEED = 2.4
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
@@ -55,19 +62,19 @@ local SIG_Aim2 = 8
 local SIG_Idle = 32
 local armGunIsR = false
 local missilegun = 1
-local PACE = 1.25
+local PACE = 1.15
 
-local LEG_FRONT_ANGLES	= { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
-local LEG_FRONT_SPEEDS	= { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
+local LEG_FRONT_SPEEDS    = { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
 local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-6), shin=math.rad(6), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
 local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BACK_ANGLES	 = { thigh=math.rad(25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
-local LEG_BACK_SPEEDS	 = { thigh=math.rad(72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_BACK_ANGLES     = { thigh=math.rad(25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
+local LEG_BACK_SPEEDS     = { thigh=math.rad(72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BENT_ANGLES	 = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
-local LEG_BENT_SPEEDS	 = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_SPEEDS     = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
@@ -86,9 +93,6 @@ local ARM_SIDE_ANGLE = math.rad(5)
 
 local isFiring = false
 local isFiringBeam = false
-
-local CHARGE_TIME = 60	-- frames
-local FIRE_TIME = 120
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
@@ -188,9 +192,8 @@ local function Step(frontLeg, backLeg)
 end
 
 local function Passing(frontLeg, backLeg)
-
+	
 end
-
 
 local function Walk()
 	Signal(SIG_Walk)
@@ -205,7 +208,6 @@ local function Walk()
 		Step(leftLeg, rightLeg)
 		-- right leg
 		Step(rightLeg, leftLeg)
-
 	end
 end
 
@@ -341,8 +343,8 @@ function script.AimWeapon(num, heading, pitch)
 		while isFiringBeam do
 			Sleep(100)
 		end
-		Turn(head, y_axis, heading, 3)
-		Turn(headflare, x_axis, -pitch, 3)
+		Turn(head, y_axis, heading, HEAD_AIM_SPEED)
+		Turn(headflare, x_axis, -pitch, HEAD_AIM_SPEED)
 		WaitForTurn(head, y_axis)
 		WaitForTurn(headflare, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -352,9 +354,9 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_Aim2)
 		isFiring = true
 
-		Turn(torso, y_axis, heading, 3)
-		Turn(larm, x_axis, -pitch, 3)
-		Turn(rarm, x_axis, -pitch, 3)
+		Turn(torso, y_axis, heading, ARM_AIM_SPEED)
+		Turn(larm, x_axis, -pitch, ARM_AIM_SPEED)
+		Turn(rarm, x_axis, -pitch, ARM_AIM_SPEED)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 		StartThread(RestoreAfterDelay)

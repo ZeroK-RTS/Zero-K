@@ -162,7 +162,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
 		end
 
-		if (cp.timeslow_damagefactor) and (tobool(cp.timeslow_onlyslow)) then
+		if (tobool(cp.timeslow_onlyslow)) then
 			wd.damage.default = 0.001 -- Settings damage default to 0 removes cratering and impulse
 		end
 

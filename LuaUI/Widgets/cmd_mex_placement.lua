@@ -137,11 +137,6 @@ local TEXT_CORRECT_Y = 1.25
 local PRESS_DRAG_THRESHOLD_SQR = 25^2
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
-local function RefreshEverything()
-	updateMexDrawList()
-	updateIncomeDrawList()
-end
-
 options_path = 'Settings/Interface/Map/Metal Spots'
 options_order = { 'drawicons', 'size', 'rounding', 'catlabel', 'area_point_command', 'catlabel_terra', 'wall_low', 'wall_high', 'burry_shallow', 'burry_deep'}
 options = {
@@ -151,7 +146,7 @@ options = {
 		value = true,
 		noHotkey = true,
 		desc = "Enabled: income is shown pictorially.\nDisabled: income is shown as a number.",
-		OnChange = RefreshEverything
+		OnChange = function() updateMexDrawList() end
 	},
 	size = {
 		name = "Income Display Size",
@@ -163,7 +158,7 @@ options = {
 		step = 5,
 		update_on_the_fly = true,
 		advanced = true,
-		OnChange = RefreshEverything
+		OnChange = function() updateMexDrawList() end
 	},
 	rounding = {
 		name = "Display decimal digits",
@@ -175,7 +170,7 @@ options = {
 		update_on_the_fly = true,
 		advanced = true,
 		tooltip_format = "%.0f", -- show 1 instead of 1.0 (confusion)
-		OnChange = RefreshEverything
+		OnChange = function() updateMexDrawList() end
 	},
 	catlabel = {
 		name = 'Area Mex',
@@ -976,13 +971,14 @@ local function CheckNeedsRecalculating()
 end
 
 local firstUpdate = true
-local camDir = 0
+local cumDt = 0
+local camDir
+local debounceCamUpdate
 local incomeLabelList
 local DrawIncomeLabels
-local spGetCameraRotation = Spring.GetCameraRotation
-local deg = math.deg
 function widget:Update(dt)
 	widget:Initialize()
+	cumDt = cumDt + dt
 	
 	if firstUpdate then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
@@ -1005,12 +1001,24 @@ function widget:Update(dt)
 		end
 	end
 
-	if WG.metalSpots then
-		local _, rotY = spGetCameraRotation()
-		local newCamDir = deg(-rotY)
+	if debounceCamUpdate then
+		debounceCamUpdate = debounceCamUpdate - dt
+		if debounceCamUpdate < 0 then
+			debounceCamUpdate = nil
+		end
+	else
+		local cx, cy, cz = Spring.GetCameraDirection()
+		local newCamDir = ((math.atan2(cx, cz) / math.pi) + 1) * 180
 		if newCamDir ~= camDir then
 			camDir = newCamDir
-			updateIncomeDrawList()
+			if WG.metalSpots then
+				gl.DeleteList(incomeLabelList)
+				incomeLabelList = glCreateList(DrawIncomeLabels)
+			end
+			debounceCamUpdate = 0.1
+		else
+			-- this is really expensive, and *almost* never changes - cutscenes, cofc, or fps can change rotation. A slower initial recheck seems like an okay tradeoff.
+			debounceCamUpdate = 1
 		end
 	end
 
@@ -1130,7 +1138,7 @@ DrawIncomeLabels = function()
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
-		local y = spotHeights[i]
+		local y = math.max(0, spotHeights[i])
 
 		glPushMatrix()
 		glTranslate(x,y+5,z)
@@ -1159,6 +1167,7 @@ DrawIncomeLabels = function()
 	glTexture(false)
 
 	if not options.drawicons.value then
+		glColor(1,1,1,1)
 		for i = 1, #WG.metalSpots do
 			local spot = WG.metalSpots[i]
 			local x,z = spot.x, spot.z
@@ -1197,17 +1206,6 @@ function updateMexDrawList()
 	if not circleOnlyMexDrawList then
 		Spring.Echo("Warning: Failed to update mex draw list.")
 	end
-end
-
-function updateIncomeDrawList()
-	if not WG.metalSpots then
-		return
-	end
-
-	if incomeLabelList then
-		gl.DeleteList(incomeLabelList)
-	end
-	incomeLabelList = glCreateList(DrawIncomeLabels)
 end
 
 function widget:Shutdown()

@@ -815,6 +815,43 @@ local cegs = {
       },
     },
   },
+  ["beamweapon_muzzle_big_red"] = {
+    usedefaultexplosions = false,
+    glow = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 10,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.25,
+        alwaysvisible      = false,
+        color              = [[1,0,0]],
+        dir                = [[-4 r8, -4 r8, -4 r8]],
+        length             = 1.9,
+        lengthgrowth       = 1.015,
+        width              = 2.6,
+      },
+    },
+    white = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.25,
+        alwaysvisible      = false,
+        color              = [[1,1,1]],
+        dir                = [[-2 r4, -2 r4, -2 r4]],
+        length             = 2.2,
+        lengthgrowth       = 1.02,
+        width              = 2.1,
+      },
+    },
+  },
 
   ["beamweapon_muzzle_yellow"] = {
     usedefaultexplosions = false,

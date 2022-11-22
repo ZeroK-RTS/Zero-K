@@ -93,22 +93,22 @@ local function CheckDeathTeam(teamID)
 	--[[ The threshold is not 100% because between hitting Ctrl+A
 	     and the self-D order reaching the server some more units
 	     could have been created (keypress delay, network lag). ]]
-	if selfDUnitCount < 0.8 * realUnitCount then
+	if selfDUnitCount < 0.85 * realUnitCount then
 		return
 	end
 
 	--[[ Don't apply when self-destructing singular units, up
-	     to 1k cost. The intent is to allow self-ding things
+	     to 4k cost. The intent is to allow self-ding things
 	     like your fac in a high density teamgame (apparently
 	     a common case) and this value is supposed to let such
 	     units through, while still not being enough to let a
 	     commander self-d. ]]
-	if selfDUnitCount == 1 then
+	if selfDUnitCount < 10 then
 		local value = 0
 		for i = 1, selfDUnitCount do
 			value = value + sputGetUnitCost(selfDUnitIDs[i])
 		end
-		if value < 1000 then
+		if value < 4000 then
 			return
 		end
 	end
@@ -123,7 +123,11 @@ local function CheckDeathTeam(teamID)
 	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
 	ghUpdateCallIn(gh, 'AllowCommand')
 	if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
-		GG.ResignTeam(teamID)
+		local _, leader = Spring.GetTeamInfo(teamID)
+		local playerName = (leader and Spring.GetPlayerInfo(leader)) or "Unknown"
+		Spring.Echo("Someone attempted to self-destruct most of their stuff!")
+		Spring.Echo("TeamID: ", teamID, "Player: ", playerName)
+		--GG.ResignTeam(teamID)
 	end
 end
 

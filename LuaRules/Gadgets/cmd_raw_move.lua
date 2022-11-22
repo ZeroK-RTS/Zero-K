@@ -1,11 +1,11 @@
 function gadget:GetInfo()
 	return {
-		name 	= "Command Raw Move",
-		desc	= "Make unit move ahead at all cost!",
-		author	= "xponen, GoogleFrog",
-		date	= "June 12 2014",
-		license	= "GNU GPL, v2 or later",
-		layer	= 0,
+		name    = "Command Raw Move",
+		desc    = "Make unit move ahead at all cost!",
+		author  = "xponen, GoogleFrog",
+		date    = "June 12 2014",
+		license = "GNU GPL, v2 or later",
+		layer   = 0,
 		enabled = true,
 	}
 end

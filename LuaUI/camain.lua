@@ -94,12 +94,12 @@ function DrawScreen(vsx, vsy)
 	return widgetHandler:DrawScreen()
 end
 
-function KeyPress(key, mods, isRepeat)
-	return widgetHandler:KeyPress(key, mods, isRepeat)
+function KeyPress(key, mods, isRepeat, label, unicode, scanCode, actions)
+	return widgetHandler:KeyPress(key, mods, isRepeat, label, unicode, scanCode, actions)
 end
 
-function KeyRelease(key, mods)
-	return widgetHandler:KeyRelease(key, mods)
+function KeyRelease(key, mods, label, unicode, scanCode, actions)
+	return widgetHandler:KeyRelease(key, mods, label, unicode, scanCode, actions)
 end
 
 function TextInput(utf8, ...)

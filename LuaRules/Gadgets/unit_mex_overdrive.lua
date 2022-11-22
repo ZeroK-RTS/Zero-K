@@ -1449,6 +1449,9 @@ function gadget:GameFrame(n)
 					baseShare = ((share * summedBaseMetalAfterPrivate / resourceShares) + (privateBaseMetal[teamID] or 0)) or 0
 					miscShare = share * allyTeamMiscMetalIncome / resourceShares
 					energyMisc = share * allyTeamSharedEnergyIncome / resourceShares
+				else
+					odShare = (teamPaybackOD[teamID] or 0)
+					baseShare = (privateBaseMetal[teamID] or 0)
 				end
 
 				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
@@ -1463,7 +1466,7 @@ function gadget:GameFrame(n)
 				end
 				
 				local metalIncome = odShare + baseShare + miscShare
-				if share > 0 and mCurr + metalIncome < mStor then
+				if mCurr + metalIncome < mStor then
 					freeSpace[i] = mStor - (mCurr + metalIncome)
 				end
 				
@@ -1494,7 +1497,7 @@ function gadget:GameFrame(n)
 			
 			for i = 1, allyTeamData.teams do
 				local share = (splitByShare and teamResourceShare[teamID]) or 1
-				if share > 0 and freeSpace[i] then
+				if freeSpace[i] then
 					freeSpace[i] = min(freeSpace[i], totalToShare * share)
 					totalFreeSpace = totalFreeSpace + freeSpace[i]
 				end

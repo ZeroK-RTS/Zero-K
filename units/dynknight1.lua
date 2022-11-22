@@ -10,6 +10,8 @@ unitDef.customParams.commtype = "6"
 unitDef.customParams.statsname = "dynknight1"
 unitDef.customParams.shield_emit_height = "30"
 
+unitDef.reclaimable = false -- No reclaiming campaign commander.
+
 unitDef.sfxtypes = {
     explosiongenerators = {
         [[custom:BEAMWEAPON_MUZZLE_BLUE]],
