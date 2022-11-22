@@ -131,7 +131,7 @@ return { gunshipkrow = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2300,
+      weaponVelocity          = 2370,
     },
 
     CLUSTERBOMB = {
