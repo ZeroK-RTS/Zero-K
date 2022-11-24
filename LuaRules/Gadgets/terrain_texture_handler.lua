@@ -27,8 +27,8 @@ local spGetMapSquareTexture = Spring.GetMapSquareTexture
 local floor = math.floor
 
 local SAVE_FILE = "Gadgets/terrain_texture_handler.lua"
-local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 500)
-local USE_FORCE_UPDATE = false
+local BAR_COMPAT = Spring.Utilities.IsCurrentVersionNewerThan(105, 1300)
+local USE_FORCE_UPDATE = true
 
 if (gadgetHandler:IsSyncedCode()) then
 
@@ -476,7 +476,6 @@ function gadget:GameFrame(n)
 	
 	if BAR_COMPAT and USE_FORCE_UPDATE then
 		Spring.ForceTesselationUpdate(true, true)
-		Spring.Echo("ForceTesselationUpdate", math.random())
 	else
 		toSet = Spring.GetConfigInt("GroundDetail", 90) -- Default in epic menu
 		Spring.SendCommands{"GroundDetail " .. (toSet + 1)}
