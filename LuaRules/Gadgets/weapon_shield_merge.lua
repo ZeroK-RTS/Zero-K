@@ -46,6 +46,7 @@ for i = 1, #WeaponDefs do
 end
 
 local beamWeaponDef = {}
+local errorSent = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -246,6 +247,14 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 		damage = penetrationPower[proID]
 		penetrationPower[proID] = nil
 	end
+	if not damage then
+		if not errorSent then
+			Spring.Echo("LUA_ERRRUN", "Missing shield damage for projectile.", proID, Spring.GetProjectileDefID(proID))
+			Spring.Utilities.UnitEcho(unitID, "Error")
+			errorSent = true
+		end
+		return true -- No idea why this would happen, but it has.
+	end
 	
 	if charge and damage < charge then
 		Spring.SetUnitShieldState(unitID, -1, true, charge - damage + realDamage)
@@ -319,7 +328,6 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	end
 
 	local damage = shieldDamages[weaponDefID]
-	
 	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)
 	return projectilePasses
 end

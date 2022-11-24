@@ -492,7 +492,7 @@ end
 options_path = 'Settings/Unit Behaviour'
 options = {
 	patrol_idle_nanos = {
-		name = "Caretaker automation",
+		name = "Caretaker automation (v2)",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -505,7 +505,7 @@ options = {
 		end,
 	},
 	stop_disables = {
-		name = "Disable caretakers with stop",
+		name = "Disable caretakers with stop (v2)",
 		type = 'bool',
 		value = true,
 		noHotkey = true,

@@ -52,6 +52,7 @@ local configList = {
 	{cmdID = CMD_GOO_GATHER            , state = true, default = true, name = "Puppy Replication"},
 	{cmdID = CMD.REPEAT                , state = true, default = true, name = "Repeat"},
 	{cmdID = CMD_RETREAT               , state = true, default = true, name = "Retreat"},
+	{cmdID = CMD_SELECTION_RANK        , state = true, default = true, name = "Selection Rank"},
 	{cmdID = CMD.TRAJECTORY            , state = true, default = true, name = "Trajectory"},
 
 	{label = "Advanced States (hidden by default)"},
@@ -62,7 +63,6 @@ local configList = {
 	{cmdID = CMD_GLOBAL_BUILD          , state = true, default = false, name = "Global Build"},
 	{cmdID = CMD_UNIT_KILL_SUBORDINATES, state = true, default = false, name = "Kill Captured"},
 	{cmdID = CMD_PREVENT_OVERKILL      , state = true, default = false, name = "Overkill Prevention"},
-	{cmdID = CMD_SELECTION_RANK        , state = true, default = false, name = "Selection Rank"},
 	{cmdID = CMD_FORMATION_RANK        , state = true, default = false, name = "Formation Rank"},
 	{cmdID = CMD_UNIT_AI               , state = true, default = false, name = "Unit AI"},
 }
