@@ -895,10 +895,10 @@ local morphCosts = {
 
 local morphBuildPower = {
 	5,
-	5,
 	7.5,
-	7.5,
-	10
+	10,
+	12.5,
+	15
 }
 
 local function extraLevelCostFunction(level)

@@ -385,6 +385,7 @@ ShLabel('Hotkeys/Commands', 'Command Categories')
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
 	ShButton(HUDPath, 'Toggle Attrition Counter', function() spSendCommands{"luaui togglewidget Attrition Counter"} end, "Tracks killed and lost units (only in line of sight while playing)")
+	ShButton(HUDPath, 'Toggle RoI Tracker', function() spSendCommands{"luaui togglewidget RoI Tracker"} end, "Tracks ")
 
 local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	AddOption(HUDSkinPath,
