@@ -47,6 +47,7 @@ return { factorygunship = {
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[plategunship]],
+    buggeroff_offset    = 0,
 
     outline_x = 250,
     outline_y = 250,

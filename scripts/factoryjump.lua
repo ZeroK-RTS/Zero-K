@@ -28,7 +28,7 @@ local function Open()
 	--Sleep(500)
 	
 --	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
-	SetUnitValue(COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	GG.Script.UnstickFactory(unitID)
 end
@@ -39,7 +39,7 @@ local function Close()
 	SetSignalMask(SIG_Open) --set the signal to kill the closing animation
 
 --	SetUnitValue(COB.YARD_OPEN, 0)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 
 	Move(center1, z_axis, 20, 10)

@@ -51,7 +51,7 @@ function script.Activate()
 	end
 	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	StartThread(Unstick)
 end
 
@@ -65,7 +65,7 @@ function script.Deactivate()
 	]]--
 	Signal(SIG_BUILD)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	Move(pad, z_axis, 0)
 end
 

@@ -44,6 +44,7 @@ return { platehover = {
     unstick_help       = [[1]],
     selectionscalemult = 1,
     child_of_factory   = [[factoryhover]],
+    buggeroff_offset   = 40,
 
     outline_x = 165,
     outline_y = 165,

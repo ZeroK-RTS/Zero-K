@@ -192,8 +192,8 @@ end
 -- without any event to catch and prevent it
 function GG.Script.UnstickFactory(unitID)
 	while true do
-		SetUnitValue (COB.YARD_OPEN, 1)
-		SetUnitValue (COB.BUGGER_OFF, 1)
+		SetUnitValue(COB.YARD_OPEN, 1)
+		--SetUnitValue(COB.BUGGER_OFF, 1)
 		Sleep(1000 + math.random()*1000)
 	end
 end

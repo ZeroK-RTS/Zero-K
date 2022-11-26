@@ -16,17 +16,17 @@ local function Open ()
 	Turn (nanobase, x_axis, math.rad(10), math.rad(10))
 	WaitForTurn (nanobase, x_axis)
 
-	SetUnitValue (COB.YARD_OPEN, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
 	SetInBuildDistance(true)
-	SetUnitValue (COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 end
 
 local function Close()
 	Signal (1)
 	SetSignalMask (1)
 
-	SetUnitValue (COB.YARD_OPEN, 0)
-	SetUnitValue (COB.BUGGER_OFF, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetInBuildDistance(false)
 
 	Turn (arm_1, x_axis, 0, math.rad(34))

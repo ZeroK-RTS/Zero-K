@@ -88,7 +88,7 @@ local function Open()
 	
 	-- set values
 	SetUnitValue(COB.YARD_OPEN, 1)
-	SetUnitValue(COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	GG.Script.UnstickFactory(unitID)
 end
@@ -103,7 +103,7 @@ local function Close()
 
 	-- set values
 	SetUnitValue(COB.YARD_OPEN, 0)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	
 	while GetDisabled() do

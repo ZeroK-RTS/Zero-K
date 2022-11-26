@@ -13,13 +13,13 @@ local smokePiece = {base}
 
 --opening animation
 local function Open()
-	SetUnitValue(COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 
 --closing animation of the factory
 local function Close()
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 end
 

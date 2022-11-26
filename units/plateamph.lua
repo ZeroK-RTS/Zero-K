@@ -47,6 +47,7 @@ return { plateamph = {
     selectionscalemult = 1,
     child_of_factory   = [[factoryamph]],
     cus_noflashlight   = 1,
+    buggeroff_offset   = 45,
 
     outline_x = 165,
     outline_y = 165,

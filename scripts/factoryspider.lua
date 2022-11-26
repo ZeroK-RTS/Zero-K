@@ -14,9 +14,9 @@ local function Open ()
 	Turn (arm_3, x_axis, math.rad(-60), math.rad(60))
 	Turn (nanobase, x_axis, math.rad(10), math.rad(10))
 
-	SetUnitValue (COB.YARD_OPEN, 1)
-	SetUnitValue (COB.INBUILDSTANCE, 1)
-	SetUnitValue (COB.BUGGER_OFF, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	GG.Script.UnstickFactory(unitID)
 end
 
@@ -24,9 +24,9 @@ local function Close()
 	Signal (1)
 	SetSignalMask (1)
 
-	SetUnitValue (COB.YARD_OPEN, 0)
-	SetUnitValue (COB.BUGGER_OFF, 0)
-	SetUnitValue (COB.INBUILDSTANCE, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
+	SetUnitValue(COB.INBUILDSTANCE, 0)
 
 	Turn (arm_1, x_axis, 0, math.rad(34))
 	Turn (arm_2, x_axis, 0, math.rad(68))

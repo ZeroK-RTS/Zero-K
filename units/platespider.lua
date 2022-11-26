@@ -45,6 +45,7 @@ return { platespider = {
     selectionscalemult = 1,
     cus_noflashlight   = 1,
     child_of_factory   = [[factoryspider]],
+    buggeroff_offset   = 45,
 
     outline_x = 165,
     outline_y = 165,

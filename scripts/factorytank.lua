@@ -73,7 +73,7 @@ local function Open()
 		StopSpin(spinners[i], x_axis)
 	end
 	
-	SetUnitValue(COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	SetUnitValue(COB.YARD_OPEN, 1)
 	GG.Script.UnstickFactory(unitID)
@@ -87,7 +87,7 @@ local function Close()
 	SetSignalMask(SIG_ANIM)
 	open = false
 
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	SetUnitValue(COB.YARD_OPEN, 0)
 	

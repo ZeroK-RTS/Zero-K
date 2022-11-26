@@ -45,6 +45,8 @@ return { factoryship = {
     shared_energy_gen = 1,
     cus_noflashlight = 1,
     parent_of_plate   = [[plateship]],
+    buggeroff_offset    = 0,
+    buggeroff_radius    = 42,
 
     outline_x = 340,
     outline_y = 340,

@@ -45,6 +45,7 @@ return { plategunship = {
     default_spacing    = 4,
     selectionscalemult = 1,
     child_of_factory   = [[factorygunship]],
+    buggeroff_offset   = 0,
 
     outline_x = 165,
     outline_y = 165,

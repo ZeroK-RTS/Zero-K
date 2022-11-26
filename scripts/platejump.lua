@@ -23,7 +23,7 @@ local function Open()
 
 	Sleep(200)
 	
-	SetUnitValue(COB.BUGGER_OFF, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	SetInBuildDistance(true)
 end
 
@@ -33,7 +33,7 @@ local function Close()
 	SetSignalMask(SIG_Close) --set the signal to kill the closing animation
 
 --	SetUnitValue(COB.YARD_OPEN, 0)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	SetInBuildDistance(false)
 end
 

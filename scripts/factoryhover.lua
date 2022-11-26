@@ -21,9 +21,9 @@ local function Open ()
 	Move (nano, y_axis, 7.625, 17.5)
 	WaitForMove (nano, y_axis)
 
-	SetUnitValue (COB.YARD_OPEN, 1)
-	SetUnitValue (COB.INBUILDSTANCE, 1)
-	SetUnitValue (COB.BUGGER_OFF, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
 	GG.Script.UnstickFactory(unitID)
 end
 
@@ -31,9 +31,9 @@ local function Close()
 	Signal (1)
 	SetSignalMask (1)
 
-	SetUnitValue (COB.YARD_OPEN, 0)
-	SetUnitValue (COB.BUGGER_OFF, 0)
-	SetUnitValue (COB.INBUILDSTANCE, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
+	SetUnitValue(COB.INBUILDSTANCE, 0)
 
 	Move (nano, y_axis, 0, 17.5)
 	WaitForMove (nano, y_axis)
