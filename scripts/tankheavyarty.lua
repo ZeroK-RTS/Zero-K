@@ -99,11 +99,6 @@ local function TrackControl()
 	end
 end
 
-function script.Create()
-	Turn(shell, x_axis, math.rad(-90))
-	StartThread(GG.Script.SmokeUnit, unitID, {base, gun})
-end
-
 local function Open()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
@@ -171,6 +166,18 @@ local function DelayStopMove()
 	Sleep(500)
 	--Spring.Utilities.UnitEcho(unitID, "PPP")
 	isMoving = false
+	local oldX, oldY, oldZ = Spring.GetUnitPosition(unitID)
+	while not isMoving do
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		if math.abs(x - oldX) +  math.abs(y - oldY) +  math.abs(z - oldZ) > 24 then
+			StartThread(Close)
+			isMoving = true
+			Sleep(400)
+			isMoving = false
+			oldX, oldY, oldZ = Spring.GetUnitPosition(unitID)
+		end
+		Sleep(166)
+	end
 end
 
 function script.StopMoving()
@@ -182,6 +189,12 @@ function script.StopMoving()
 	StopSpin(wheels4, x_axis, WHEEL_SPIN_DECEL_S)
 	StopSpin(wheels5, x_axis, WHEEL_SPIN_DECEL_S)
 	StopSpin(wheels6, x_axis, WHEEL_SPIN_DECEL_L)
+end
+
+function script.Create()
+	Turn(shell, x_axis, math.rad(-90))
+	StartThread(GG.Script.SmokeUnit, unitID, {base, gun})
+	StartThread(DelayStopMove)
 end
 
 local function RestoreAfterDelay()
