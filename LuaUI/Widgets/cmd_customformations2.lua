@@ -14,6 +14,8 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+
 local formationRank = {}
 local defaultRank = {}
 
@@ -1190,8 +1192,14 @@ function widget:DrawInMiniMap()
 
 	glPushMatrix()
 		glLoadIdentity()
-		glTranslate(0, 1, 0)
-		glScale(1 / mapSizeX, -1 / mapSizeZ, 1)
+
+		if GetMiniMapFlipped() then
+			glTranslate(1, 0, 0)
+			glScale(-1 / mapSizeX, 1 / mapSizeZ, 1)
+		else
+			glTranslate(0, 1, 0)
+			glScale(1 / mapSizeX, -1 / mapSizeZ, 1)
+		end
 
 		DrawFormationLines(tVertsMinimap, 1)
 	glPopMatrix()

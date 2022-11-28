@@ -19,6 +19,7 @@ end
 
 include("keysym.lua")
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 include("LuaRules/Configs/customcmds.h.lua")
 
 local spGetActiveCommand = Spring.GetActiveCommand
@@ -455,8 +456,13 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 		mx, mz = SnapBuildToGrid(mx, mz, buildPlateDefID)
 	end
 	
-	glTranslate(0,minimapY,0)
-	glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	if GetMiniMapFlipped() then
+		glTranslate(minimapY, 0, 0)
+		glScale(-minimapX/mapX, minimapY/mapZ, 1)
+	else
+		glTranslate(0, minimapY, 0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	end
 	
 	local drawn = false
 	for unitID, data in IterableMap.Iterator(factories) do

@@ -16,6 +16,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 include("keysym.lua")
 
 ------------------------------------------------------------
@@ -1344,8 +1345,15 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	end
 	if drawMexSpots or WG.showeco_always_mexes then
 		glPushMatrix()
-		glTranslate(0,minimapY,0)
-		glScale(minimapX/mapX, -minimapY/mapZ, 1)
+
+		if GetMiniMapFlipped() then
+			glTranslate(minimapY, 0, 0)
+			glScale(-minimapX/mapX, minimapY/mapZ, 1)
+		else
+			glTranslate(0, minimapY, 0)
+			glScale(minimapX/mapX, -minimapY/mapZ, 1)
+		end
+
 		glLighting(false)
 
 		glCallList(minimapDrawList)

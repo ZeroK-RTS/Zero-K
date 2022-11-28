@@ -12,6 +12,7 @@ local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
 
 local GetRawBoxes, GetParsedBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 local startboxConfig = GetParsedBoxes()
 
 local rawBoxes = GetRawBoxes()
@@ -407,8 +408,14 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	local dotSize = math.max(minimapX, minimapY) * 0.3
 	gl.PushMatrix()
 	gl.LineWidth(3)
-	gl.Translate(0, minimapY, 0)
-	gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
+
+	if GetMiniMapFlipped() then
+		gl.Translate(minimapY, 0, 0)
+		gl.Scale(-minimapX/mapX, minimapY/mapZ, 1)
+	else
+		gl.Translate(0, minimapY, 0)
+		gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
+	end
 	
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)

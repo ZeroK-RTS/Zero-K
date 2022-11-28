@@ -24,6 +24,7 @@ function widget:GetInfo()
   }
 end
 
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -466,8 +467,14 @@ function widget:DrawInMiniMap(xSize, ySize)
   glPushMatrix()
 
   glLoadIdentity()
-  glTranslate(0, 1, 0)
-  glScale(1 / xMapSize, -1 / yMapSize,1)
+
+  if GetMiniMapFlipped() then
+    glTranslate(1, 0, 0)
+    glScale(-1 / xMapSize, 1 / yMapSize,1)
+  else
+    glTranslate(0, 1, 0)
+    glScale(1 / xMapSize, -1 / yMapSize,1)
+  end
   
   -- draw damages before events
   for _,damage in pairs(damageMap) do

@@ -84,6 +84,7 @@ local circleDivs = 64
 -- Speedup
 
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay
@@ -187,8 +188,13 @@ local function DrawActiveCommandRangesMinimap(minimapX, minimapY)
 	
 	local height = spGetGroundHeight(mouseX,mouseZ)
 	
-	glTranslate(0,minimapY,0)
-	glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	if GetMiniMapFlipped() then
+		glTranslate(minimapY, 0, 0)
+		glScale(-minimapX/mapX, minimapY/mapZ, 1)
+	else
+		glTranslate(0, minimapY, 0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	end
 	
 	for i = 1, (options.missile_silo_advanced.value and 5 or 2) do
 		local radius = drawRadius[i]

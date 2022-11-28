@@ -92,6 +92,8 @@ for name, color in pairs(colorPresets) do
 	end
 end
 
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+
 ----------------------------------------------------------------
 --speedups
 ----------------------------------------------------------------
@@ -546,6 +548,12 @@ function widget:DrawInMiniMap(sx, sy)
 		else
 			local x = point.x * ratioX
 			local y = sy - point.z * ratioY
+
+			if GetMiniMapFlipped() then
+				x = sx - x
+				y = sy - y
+			end
+
 			glColor(point.color[1], point.color[2], point.color[3], alpha * point.color[4])
 			local vertices = {
 					{v = {x, y - minimapHighlightLineMin, 0}},

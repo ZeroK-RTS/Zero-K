@@ -39,6 +39,7 @@ end
 --------------------------------------------------------------------------------
 
 local GetNukeIntercepted = VFS.Include("LuaRules/Gadgets/Include/GetNukeIntercepted.lua", nil, VFS.GAME)
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
 
 local enemyInt = {}
 local enemyNuke = {}
@@ -513,28 +514,28 @@ end
 
 
 local function DrawMinimap(minimapX, minimapY)
-	if drawNuke then
-		glPushMatrix()
-		glTranslate(0,minimapY,0)
+	if not (drawNuke or drawAnti) then return end
+
+	glPushMatrix()
+
+	if GetMiniMapFlipped() then
+		glTranslate(minimapY, 0, 0)
+		glScale(-minimapX/mapX, minimapY/mapZ, 1)
+	else
+		glTranslate(0, minimapY, 0)
 		glScale(minimapX/mapX, -minimapY/mapZ, 1)
-		
-		DrawEnemyInterceptors(true)
-		
-		glLineWidth(1)
-		glColor(1, 1, 1, 1)
-		
-		glPopMatrix()
-	elseif drawAnti then
-		glPushMatrix()
-		glTranslate(0,minimapY,0)
-		glScale(minimapX/mapX, -minimapY/mapZ, 1)
-		
-		DrawAllyInterceptors(true)
-		glLineWidth(1)
-		glColor(1, 1, 1, 1)
-		
-		glPopMatrix()
 	end
+
+	if drawNuke then
+		DrawEnemyInterceptors(true)
+	elseif drawAnti then
+		DrawAllyInterceptors(true)
+	end
+
+	glLineWidth(1)
+	glColor(1, 1, 1, 1)
+
+	glPopMatrix()
 end
 
 function widget:DrawInMiniMap(minimapX, minimapY)
