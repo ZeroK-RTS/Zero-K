@@ -259,6 +259,13 @@ function ForceDropUnit()
 	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
 end
 
+local function CrashWatcher()
+	while GetUnitValue(COB.CRASHING) ~= 1 do
+		Sleep(33)
+	end
+	ForceDropUnit()
+end
+
 --fetch unit id of passenger (from the load command)
 function getPassengerId()
 	local cmd=Spring.GetCommandQueue(unitID, 1)
@@ -458,6 +465,7 @@ function script.Create()
 	Turn(dust2, x_axis, math.rad(90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(PickupAndDropFixer)
+	StartThread(CrashWatcher)
 	--StartThread(DustLoop)	-- looks stupid
 	
 	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
