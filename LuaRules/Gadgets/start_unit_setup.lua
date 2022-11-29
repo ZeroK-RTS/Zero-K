@@ -31,6 +31,7 @@ local setAiStartPos = (modOptions.setaispawns == "1")
 local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1")
 
 local gaiateam = Spring.GetGaiaTeamID()
+local allyTeamAFKers = {}
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
@@ -236,7 +237,7 @@ local function GetFacingDirection(x, z, teamID)
 			or ((z>Game.mapSizeZ/2) and "north" or "south")
 end
 
-local function getMiddleOfStartBox(teamID)
+local function GetRecommendedStartPosition(teamID, n) -- allyteams can have multiple start positions, go and get the nth one.
 	local x = Game.mapSizeX / 2
 	local z = Game.mapSizeZ / 2
 
@@ -244,7 +245,8 @@ local function getMiddleOfStartBox(teamID)
 	if boxID then
 		local startposList = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
 		if startposList then
-			local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
+			local maxpoints = #startposList
+			local startpos = startposList[(n%maxpoints) + 1] -- recycle if you run out of points.
 			x = startpos[1]
 			z = startpos[2]
 		end
@@ -270,9 +272,11 @@ local function GetStartPos(teamID, teamInfo, isAI)
 		end
 		return x, y, z
 	end
-	
+	local allyTeamID = select(6, Spring.GetTeamInfo(teamID))
 	if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
-		local x, y, z = getMiddleOfStartBox(teamID)
+		local index = allyTeamAFKers[allyTeamID] or 0
+		allyTeamAFKers[allyTeamID] = index + 1
+		local x, y, z = GetRecommendedStartPosition(teamID, index)
 		return x, y, z
 	end
 	
@@ -281,7 +285,9 @@ local function GetStartPos(teamID, teamInfo, isAI)
 	-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
 	local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
 	if boxID and not GG.CheckStartbox(boxID, x, z) then
-		x,y,z = getMiddleOfStartBox(teamID)
+		local index = allyTeamAFKers[allyTeamID] or 0
+		allyTeamAFKers[allyTeamID] = index + 1
+		x,y,z = GetRecommendedStartPosition(teamID, index)
 	end
 	return x, y, z
 end
