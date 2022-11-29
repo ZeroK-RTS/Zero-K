@@ -25,6 +25,7 @@ local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitHealth		= Spring.GetUnitHealth
 
 local aircraftDefIDs = {}
+local emptyTable = {}
 
 function gadget:Initialize()
 	for i=1,#UnitDefs do
@@ -54,6 +55,13 @@ function gadget:GameFrame(n)
 	end
 end
 
+local spUnitScript = Spring.UnitScript -- CallAsUnit can't be localized directly because a later-layered gadget modifies it
+local function CallAsUnitIfExists(unitID, func, ...)
+	if func then
+		spUnitScript.CallAsUnit(unitID, func, ...)
+	end
+end
+
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if not aircraftDefIDs[unitDefID] then
 		return
@@ -73,6 +81,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local maxHealth = aircraftDefIDs[unitDefID]
 		local severity = rDam/maxHealth
 		if severity < 0.5 then
+			local env = Spring.UnitScript.GetScriptEnv(unitID) or emptyTable
+			CallAsUnitIfExists(unitID, env.OnStartingCrash) -- tell the LUS that we're crashing (mostly for transports)
 			Spring.SetUnitCrashing(unitID, true)
 			Spring.SetUnitNoSelect(unitID, true)
 			Spring.SetUnitSensorRadius(unitID, "los", 0)
