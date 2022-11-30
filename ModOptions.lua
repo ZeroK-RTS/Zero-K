@@ -416,6 +416,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'mtpath',
+    name   = 'Multithread Pathfinding',
+    desc   = 'Use multiple cores for pathfinding calculations.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = true,
+  },
+  {
     key    = 'terracostmult',
     name   = 'Terraform Cost Multiplier',
     desc   = 'Multiplies the cost of terraform.',
