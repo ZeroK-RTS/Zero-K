@@ -259,6 +259,10 @@ function ForceDropUnit()
 	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
 end
 
+function OnStartingCrash()
+	ForceDropUnit()
+end
+
 --fetch unit id of passenger (from the load command)
 function getPassengerId()
 	local cmd=Spring.GetCommandQueue(unitID, 1)
