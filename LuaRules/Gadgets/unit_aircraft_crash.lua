@@ -25,7 +25,6 @@ local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitHealth		= Spring.GetUnitHealth
 
 local aircraftDefIDs = {}
-local emptyTable = {}
 
 function gadget:Initialize()
 	for i=1,#UnitDefs do
