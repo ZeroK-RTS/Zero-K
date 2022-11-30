@@ -8,12 +8,12 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local pfForceSingleThreaded = false
+local forceSingleThreaded = false
 local modoptions = Spring.GetModOptions()
 if (modoptions and (modoptions.mtpath == 0 or modoptions.mtpath == "0")) then
-	multithreadPathing = true
+	forceSingleThreaded = true
 end
-Spring.Echo("pfForceSingleThreaded", pfForceSingleThreaded)
+Spring.Echo("forceSingleThreaded", forceSingleThreaded)
 
 local modrules  = {
   
@@ -26,6 +26,9 @@ local modrules  = {
     allowGroundUnitGravity = false,
     allowDirectionalPathing = true,
     maxCollisionPushMultiplier = 0.5,
+    
+    forceCollisionsSingleThreaded  = forceSingleThreaded,
+    forceCollisionAvoidanceSingleThreaded  = forceSingleThreaded,
   },
   
   construction = {
@@ -66,7 +69,7 @@ local modrules  = {
   
   paralyze = {
     paralyzeOnMaxHealth = true, -- defaults to true
-	unitParalysisDeclineScale = 40, -- Time in seconds to go from 100% to 0% emp
+    unitParalysisDeclineScale = 40, -- Time in seconds to go from 100% to 0% emp
   },
 
   sensors = {
@@ -75,8 +78,8 @@ local modrules  = {
     decloakRequiresLineOfSight = true, -- default false
     
     los = {
-	  -- Don't bother changing these values.
-	  -- In a test, both mip levels from 2 -> 4 changed the usage from around 1% to 0.6%.
+      -- Don't bother changing these values.
+      -- In a test, both mip levels from 2 -> 4 changed the usage from around 1% to 0.6%.
       losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
       airMipLevel = 2,  -- defaults to 2
@@ -89,7 +92,7 @@ local modrules  = {
     transportHover  = 1;   -- defaults to 0
     transportShip   = 1;  -- defaults to 0
     transportAir    = 0;  -- defaults to 0
-	targetableTransportedUnits = true;
+    targetableTransportedUnits = true;
   },
 
 
@@ -134,11 +137,11 @@ local modrules  = {
   
   system = {
     pathFinderSystem = 0, --(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
-	pathFinderUpdateRate = 0.0000001,
-	pathFinderRawDistMult = 100000,
-	pfForceSingleThreaded = pfForceSingleThreaded,
-	allowTake = false,
-	enableSmoothMesh = false,
+    pathFinderUpdateRate = 0.0000001,
+    pathFinderRawDistMult = 100000,
+    pfForceSingleThreaded = forceSingleThreaded,
+    allowTake = false,
+    enableSmoothMesh = false,
   },
 }
 --------------------------------------------------------------------------------
