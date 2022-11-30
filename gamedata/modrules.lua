@@ -25,7 +25,7 @@ local modrules  = {
     allowUnitCollisionOverlap = false, -- defaults to true -- this lets units clump close together when moving, after which they are pushed apart
     allowGroundUnitGravity = false,
     allowDirectionalPathing = true,
-    maxCollisionPushMultiplier = 0.5,
+    maxCollisionPushMultiplier = 0.8,
     
     forceCollisionsSingleThreaded  = forceSingleThreaded,
     forceCollisionAvoidanceSingleThreaded  = forceSingleThreaded,
