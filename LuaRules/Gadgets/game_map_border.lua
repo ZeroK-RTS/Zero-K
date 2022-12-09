@@ -42,6 +42,8 @@ local UP_IMPULSE = 0.25
 local SIDE_IMPULSE = 1.5
 local RAMP_DIST = 180
 local NEAR_DIST = 500
+local DEFAULT_EDGE_BORDER = 1000
+local DEFAULT_EDGE_NEAR = DEFAULT_EDGE_BORDER - NEAR_DIST
 
 local impulseMultipliers = {
 	[0] = 4, -- Fixedwing
@@ -49,11 +51,43 @@ local impulseMultipliers = {
 	[2] = 1.2, -- Ground/Sea
 }
 
+local defaultConfig = {
+	airBorderOnly = true,
+	forceMult = 0.15,
+	SpeedLimitFunc = function (distance)
+		return 3 + distance * 0.015
+	end,
+	IsInBounds = function (x, z)
+		return not ((x < -DEFAULT_EDGE_BORDER) or (z < -DEFAULT_EDGE_BORDER) or (x > MAP_WIDTH + DEFAULT_EDGE_BORDER) or (z > MAP_HEIGHT + DEFAULT_EDGE_BORDER))
+	end,
+	IsNearBorderOrOutOfBounds = function (x, z)
+		return (x < -DEFAULT_EDGE_NEAR) or (z < -DEFAULT_EDGE_NEAR) or (x > MAP_WIDTH + DEFAULT_EDGE_NEAR) or (z > MAP_HEIGHT + DEFAULT_EDGE_NEAR)
+	end,
+	GetClosestBorderPoint = function (x, z)
+		if z < 0 and z < x and z < (MAP_WIDTH - x) then
+			--Spring.Echo("Top Edge", math.random())
+			return x, -DEFAULT_EDGE_BORDER
+		elseif z > MAP_HEIGHT and (MAP_HEIGHT - z) < x and (MAP_HEIGHT - z) < (MAP_WIDTH - x) then
+			--Spring.Echo("Bottom Edge", math.random())
+			return x, MAP_HEIGHT + DEFAULT_EDGE_BORDER
+		elseif x < 0 then
+			--Spring.Echo("Left Edge", math.random())
+			return -DEFAULT_EDGE_BORDER, z
+		else
+			--Spring.Echo("Right Edge", math.random())
+			return MAP_WIDTH + DEFAULT_EDGE_BORDER, z
+		end
+	end,
+}
+
 -- Configurable with originX, originZ, radius in GG.map_CircularMapBorder as a table.
 local circularMapX = MAP_WIDTH/2
 local circularMapZ = MAP_HEIGHT/2
+local airBorderOnly = false
 local circularMapRadius = math.min(MAP_WIDTH/2, MAP_HEIGHT/2)
 local circularMapRadiusSq, circularMapNearRadiusSq = 0, 0 -- Set later
+local forceMult = 1
+local speedLimit = 20
 
 local mobileUnits = IterableMap.New()
 local outOfBoundsUnits = IterableMap.New()
@@ -82,21 +116,23 @@ end
 
 local function LoadMapBorder()
 	local gameConfig = VFS.FileExists(GAMESIDE_BORDER_FILE) and VFS.Include(GAMESIDE_BORDER_FILE) or false
-	local mapConfig = VFS.FileExists(MAPSIDE_BORDER_FILE) and VFS.Include(MAPSIDE_BORDER_FILE) or false
-	local config = gameConfig or mapConfig or false
-	if not config then
-		return false
-	end
+	local mapConfig  = VFS.FileExists(MAPSIDE_BORDER_FILE) and VFS.Include(MAPSIDE_BORDER_FILE) or false
+	local config     = gameConfig or mapConfig or defaultConfig
 	
-	IsInBounds = config.IsInBounds or IsInBounds
+	IsInBounds                = config.IsInBounds or IsInBounds
 	IsNearBorderOrOutOfBounds = config.IsNearBorderOrOutOfBounds or IsNearBorderOrOutOfBounds
-	GetClosestBorderPoint = config.GetClosestBorderPoint or GetClosestBorderPoint
+	GetClosestBorderPoint     = config.GetClosestBorderPoint or GetClosestBorderPoint
+	SpeedLimitFunc            = config.SpeedLimitFunc
 	
-	circularMapX = config.originX or circularMapX
-	circularMapZ = config.originZ or circularMapZ
-	circularMapRadius = config.radius or circularMapRadius
-	circularMapRadiusSq = circularMapRadius^2
+	circularMapX            = config.originX or circularMapX
+	circularMapZ            = config.originZ or circularMapZ
+	circularMapRadius       = config.radius or circularMapRadius
+	circularMapRadiusSq     = circularMapRadius^2
 	circularMapNearRadiusSq = (circularMapRadius > NEAR_DIST and (circularMapRadius - NEAR_DIST)^2) or 0
+	
+	airBorderOnly = config.airBorderOnly or airBorderOnly
+	forceMult     = config.forceMult or forceMult
+	speedLimit    = config.speedLimit or speedLimit
 	
 	return true
 end
@@ -145,6 +181,18 @@ local function HandleOutOFBoundsUnit(unitID, moveType)
 	local norm = math.sqrt(vx*vx + vz*vz)
 	vx, vz = vx / norm, vz / norm
 	
+	if speedLimit or SpeedLimitFunc then
+		local curVx, curVy, curVz, curSpeed = Spring.GetUnitVelocity(unitID)
+		local dot = curVx * vx + curVz * vz
+		--Spring.Echo("dot", dot)
+		if SpeedLimitFunc and (dot > SpeedLimitFunc(norm)) then
+			return
+		end
+		if speedLimit and (dot > speedLimit) then
+			return
+		end
+	end
+	
 	local mag = (impulseMultipliers[moveType] or 1)
 	if norm < RAMP_DIST then
 		if moveType == 2 then
@@ -171,6 +219,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local moveType = Spring.Utilities.getMovetypeByID(unitDefID)
 	if not moveType then
 		-- Don't handle static structures.
+		return
+	end
+	if airBorderOnly and moveType == 2 then
+		-- Don't handle land or sea
 		return
 	end
 	IterableMap.Add(mobileUnits, unitID, moveType)
