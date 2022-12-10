@@ -82,6 +82,7 @@ return { bomberdisarm = {
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds
+		script_reload    = 15, -- should probably equal reammoseconds above
       
         light_radius = 350,
         light_color = [[2 2 2]],

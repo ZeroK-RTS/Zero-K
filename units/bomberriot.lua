@@ -87,6 +87,7 @@ return { bomberriot = {
 
       customParams              = {
         reaim_time = 15, -- Fast update not required (maybe dangerous)
+		script_reload    = 5, -- should probably equal reammoseconds above
         setunitsonfire = "1",
         burntime = 300,
         gui_sprayangle = 0.32,
