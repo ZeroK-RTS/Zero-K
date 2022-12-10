@@ -463,6 +463,7 @@ function api.RemoveElement(tableName, instanceID)
 end
 
 function api.DrawElement(tableName, instanceID)
+	-- TODO: Make this draw instanceID, rather than everything up to instanceID
 	glTexture(0, atlasTexture)
 	chiliShader:Activate()
 	chiliShader:SetUniform("atlasSize", atlasX, atlasY)
@@ -473,8 +474,8 @@ function api.DrawElement(tableName, instanceID)
 	--for i, v in pairs(widgetInstanceVBO) do
 	--	Spring.Echo(i, v)
 	--end
+	
 	local index = widgetInstanceVBO.instanceIDtoIndex[instanceID]
-	Spring.Echo("index", index, widgetInstanceVBO.usedElements)
 	widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, index, 0)
 	
 	chiliShader:Deactivate()
