@@ -73,6 +73,7 @@ end
 
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
+local InstanceVboTable = VFS.Include(luaShaderDir.."InstanceVboTableWrapper.lua")
 local chiliShader = nil
 
 local autoupdate = false -- auto update shader, for debugging only!
@@ -339,7 +340,6 @@ end
 --- An instance VBO is just a set of instances
 --- An instance VBO Table is a lua table that wraps an instance VBO to allow for easy and fast addition and removal of elements
 
-VFS.Include(luaShaderDir.."instancevbotable.lua")
 local widgetInstanceVBOs = {} -- this will be a list of _named_ instance VBOs, so you can separate per-pass (or per widget or whatever)
 
 local chiliInstanceVBOLayout = { -- see how this matches per instance attributes in vertex shader
@@ -355,11 +355,11 @@ local chiliInstanceVBOLayout = { -- see how this matches per instance attributes
 
 local function CreateInstanceVBOTable(tableName)
 	local defaultMaxElements
-	local newInstanceVBO = makeInstanceVBOTable(chiliInstanceVBOLayout, defaultMaxElements, tableName .. "_ChiliVBO")
+	local newInstanceVBO = InstanceVboTable.makeInstanceVBOTable(chiliInstanceVBOLayout, defaultMaxElements, tableName .. "_ChiliVBO")
 	
 	newInstanceVBO.vertexVBO = rectVBO
 	newInstanceVBO.indexVBO  = rectIndexVBO
-	newInstanceVBO.VAO = makeVAOandAttach(
+	newInstanceVBO.VAO = InstanceVboTable.makeVAOandAttach(
 		newInstanceVBO.vertexVBO,
 		newInstanceVBO.instanceVBO,
 		newInstanceVBO.indexVBO
@@ -382,7 +382,7 @@ local function AddInstance(tableName, instanceID, screenpos, tiling, color1, col
 	animinfo = animinfo or defaultTiling
 	otherparams = animinfo or defaultTiling
 
-	return pushElementInstance(
+	return InstanceVboTable.pushElementInstance(
 		widgetInstanceVBOs[tableName], -- push into this Instance VBO Table
 			{
 				screenpos[1], screenpos[2], screenpos[3], screenpos[4],  -- screenpos; // screen pixel coords
@@ -450,14 +450,14 @@ function widget:Initialize()
 	MakeAtlas(imageDir, "tech")
 	chiliShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
 	initRectVBO()
-	CreateInstanceVBOTable("default") 
+	CreateInstanceVBOTable("default")
 	
 	if DEBUG_MODE then
 		math.randomseed(1)
-		local grid = 32
+		local grid = 2
 		local gs = 64
 		local vsx, vsy = Spring.GetViewGeometry()
-		for i= 0, grid * grid -1 do 
+		for i = 0, grid * grid -1 do 
 			local tex1 = RandTableChoice(atlassedImagesUVs)
 			local tex2 = RandTableChoice(atlassedImagesUVs)
 			local tiling = math.floor(math.random() * 8 + 4)
