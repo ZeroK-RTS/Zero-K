@@ -29,7 +29,7 @@ local imageDir = "luaui/widgets/chili/skins/evolved"
 
 local atlasTexture = nil
 local atlassedImagesUVs = {}
-local atlasSize = 4096
+local atlasSize = 2048
 local atlasX = 4000
 local atlasY = 4000
 
