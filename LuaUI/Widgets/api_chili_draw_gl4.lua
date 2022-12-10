@@ -16,28 +16,35 @@ end
 	-- background vertices
 	--
 
--- localized speedup stuff ---------------------------------
+-----------------------------------------------------------------
+------------------ localized speedup stuff ----------------------
+
 local glTexture = gl.Texture
 
---- ATLAS STUFF --------------------------------------------
+local DEBUG_MODE = true
+local imageDir = "luaui/widgets/chili/skins/evolved"
+
+-----------------------------------------------------------------
+------------------------ ATLAS STUFF ----------------------------
+
 local atlasTexture = nil
 local atlassedImagesUVs = {}
 local atlasSize = 4096
 local atlasX = 4000
 local atlasY = 4000
 
-local function addDirToAtlas(atlas, path, key, filelist)
+local function AddDirToAtlas(atlas, path, key, filelist)
 	if filelist == nil then filelist = {} end
-	local imgExts = {bmp = true,tga = true,jpg = true,png = true,dds = true, tif = true}
+	local imgExts = {bmp = true, tga = true, jpg = true, png = true, dds = true, tif = true}
 	local files = VFS.DirList(path)
 	--files = table.sort(files)
-	--Spring.Echo("Adding",#files, "images to atlas from", path, key)
+	--Spring.Echo("Adding", #files, "images to atlas from", path, key)
 	for i=1, #files do
 		Spring.Echo(files[i])
 		local lowerfile = string.lower(files[i])
-		if imgExts[string.sub(lowerfile,-3,-1)] and (key and string.find(lowerfile, key, nil, true)) then
+		if imgExts[string.sub(lowerfile, -3, -1)] and (key and string.find(lowerfile, key, nil, true)) then
 			Spring.Echo(lowerfile)
-			gl.AddAtlasTexture(atlas,lowerfile)
+			gl.AddAtlasTexture(atlas, lowerfile)
 			atlassedImagesUVs[lowerfile] = true
 			filelist[lowerfile] = true
 		end
@@ -45,24 +52,25 @@ local function addDirToAtlas(atlas, path, key, filelist)
 	return filelist
 end
 
-local function makeAtlas()
-	atlasTexture = gl.CreateTextureAtlas(atlasSize,atlasSize,1)
-	addDirToAtlas(atlasTexture, "luaui/images/chiliskin_gl4", "tech")
-	gl.FinalizeTextureAtlas(atlasTexture)	
-	local texInfo = gl.TextureInfo(atlasTexture ) 
-	--Spring.Debug.TableEcho(texInfo)	
+local function MakeAtlas(path, key)
+	atlasTexture = gl.CreateTextureAtlas(atlasSize, atlasSize, 1)
+	AddDirToAtlas(atlasTexture, path, key)
+	gl.FinalizeTextureAtlas(atlasTexture)
+	local texInfo = gl.TextureInfo(atlasTexture)
+	--Spring.Debug.TableEcho(texInfo)
 	atlasX = texInfo.xsize -- cool this works
 	atlasY = texInfo.ysize
-	for filepath,_ in pairs(atlassedImagesUVs) do
-		local p,q,s,t = gl.GetAtlasTexture(atlasTexture, filepath) -- this returns xXyY 
-		atlassedImagesUVs[filepath] = {p,q,s,t}
+	for filepath, _ in pairs(atlassedImagesUVs) do
+		local p, q, s, t = gl.GetAtlasTexture(atlasTexture, filepath) -- this returns xXyY 
+		atlassedImagesUVs[filepath] = {p, q, s, t}
 		Spring.Echo(string.format("%dx%d %s at xXyY %d %d %d %d", atlasX, atlasY, filepath,
 			p *atlasX, q * atlasX, s * atlasY, t * atlasY)) 
 	end
-
 end
 
-------------- SHADERS ----------------------------------------------
+-----------------------------------------------------------------
+-------------------------- SHADERS ------------------------------
+
 local luaShaderDir = "LuaUI/Widgets/Include/"
 local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
 local chiliShader = nil
@@ -87,7 +95,7 @@ local vsSrc =  [[
 #line 5000
 
 // per vertex attributes
-layout (location = 0) in vec4 xyuv; // each vertex of the rectVBO, range [0,1]
+layout (location = 0) in vec4 xyuv; // each vertex of the rectVBO, range [0, 1]
 layout (location = 1) in vec4 tilingvector; // TODO: binary vector of tiling factors?
 
 // per instance attributes, hmm, 32 floats per instance....
@@ -169,7 +177,7 @@ void main()
 	
 	// is the mouse, v_color1 will be increased if mouse is inside, even more if its clicked
 	bvec2 leftbottommouse = lessThan(screenpos.xy, mouseScreenPos.xy);
-	bvec2 righttopmouse =   lessThan(mouseScreenPos.xy,screenpos.zw);
+	bvec2 righttopmouse =   lessThan(mouseScreenPos.xy, screenpos.zw);
 	bool isinmouse = all(bvec4(righttopmouse, leftbottommouse));
 	if (isinmouse) {
 		v_otherparams.w += 0.5;
@@ -244,13 +252,13 @@ local shaderSourceCache = {
 		myFloat = 3000,
 		myZDepth = 0.7,
 		atlasSize = {atlasX, atlasY},
-		myFloat4 = {0,1,2,3},
+		myFloat4 = {0, 1, 2, 3},
 		},
 	shaderName = "Chili Gl4 Shader",
-	}
+}
 
-
--------------  Rectangle VBO  -------------------
+-----------------------------------------------------------------
+----------------------- Rectangle VBO ---------------------------
 -- A 4x4 rectangle VBO
 
 local rectVBO -- Contains the Vertex Array for the tiled 4x4 rectangle
@@ -297,11 +305,11 @@ local function initRectVBO()
 		1,0,1,0,    0,0,-1,0,
 		1,0,1,0,    0,0,0,0, --15
 	}
-	rectVBO = gl.GetVBO(GL.ARRAY_BUFFER,false)
+	rectVBO = gl.GetVBO(GL.ARRAY_BUFFER, false)
 	rectVBO:Define(16, { -- see how this matches per vertex attributes in vertex shader
 		{id = 0, name = "xyuv", size = 4},
 		{id = 1, name = "tilingvector", size = 4},
-		})
+	})
 	rectVBO:Upload(vertexData)
 	
 	local indexData = { -- This indexes vertexData
@@ -316,7 +324,7 @@ local function initRectVBO()
 		10,14,15, 10,15,11, -- BR
 	}
 
-	rectIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER,false)
+	rectIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER, false)
 	rectIndexVBO:Define(numIndices)
 	rectIndexVBO:Upload(indexData)
 	if rectVBO == nil or rectIndexVBO == nil then 
@@ -324,18 +332,15 @@ local function initRectVBO()
 	end
 end
 
----------------------- Instance VBOs --------------------------
+-----------------------------------------------------------------
+----------------------- Instance VBOs  --------------------------
+
 --- Each widget should (or could) have its own instance VBO, which will make layering easier, and one can transfer elements from one vbo to the other
 --- An instance VBO is just a set of instances
 --- An instance VBO Table is a lua table that wraps an instance VBO to allow for easy and fast addition and removal of elements
 
 VFS.Include(luaShaderDir.."instancevbotable.lua")
 local widgetInstanceVBOs = {} -- this will be a list of _named_ instance VBOs, so you can separate per-pass (or per widget or whatever)
-
-local function goodbye(reason)
-  Spring.Echo("Chili GL4 widget exiting with reason: "..reason)
-  widgetHandler:RemoveWidget()
-end
 
 local chiliInstanceVBOLayout = { -- see how this matches per instance attributes in vertex shader
 	{id = 2, name = 'screenpos', size = 4},
@@ -364,12 +369,11 @@ local function CreateInstanceVBOTable(tableName)
 	return newInstanceVBO
 end
 
-local defaultUV = {0,1,0,1} -- xXyY
-local defaultColor = {1,1,1,1}
-local defaultTiling = {0,0,0,0}
+local defaultUV = {0, 1, 0, 1} -- xXyY
+local defaultColor = {1, 1, 1, 1}
+local defaultTiling = {0, 0, 0, 0}
 
 local function AddInstance(tableName, instanceID, screenpos, tiling, color1, color2, tex1name, tex2name, animinfo, otherparams)
-
 	tiling = tiling or defaultTiling
 	color1 = color1 or defaultColor
 	color2 = color2 or defaultColor
@@ -388,24 +392,27 @@ local function AddInstance(tableName, instanceID, screenpos, tiling, color1, col
 				uv1[1], uv1[2], uv1[3], uv1[4], 
 				uv2[1], uv2[2], uv2[3], uv2[4], 
 				animinfo[1], animinfo[2], animinfo[3], animinfo[4],  -- unused so far
-				otherparams[1], otherparams[2], otherparams[3],otherparams[4], -- unused so far
+				otherparams[1], otherparams[2], otherparams[3], otherparams[4], -- unused so far
 			},
 		instanceID, -- this is the key inside the VBO Table, should be unique per unit
 		true, -- update existing element
-		false) -- noupload, dont use unless you know what you want to batch push/pop
+		false -- noupload, dont use unless you know what you want to batch push/pop
+	)
 end
 
 function widget:DrawScreen()
-	if chiliShader == nil then return end
+	if chiliShader == nil then
+		return
+	end
 	--gl.Culling(false)
 	--gl.DepthTest(GL_LEQUAL)
 	--gl.DepthTest(false)
 	--gl.DepthMask(false)
 	glTexture(0, atlasTexture)
 	chiliShader:Activate()
-	chiliShader:SetUniform("atlasSize",atlasX,atlasY)
+	chiliShader:SetUniform("atlasSize", atlasX, atlasY)
 	
-	chiliShader:SetUniform("myFloat",1.23456)
+	chiliShader:SetUniform("myFloat", 1.23456)
 	for name, widgetInstanceVBO in pairs(widgetInstanceVBOs) do 
 		if widgetInstanceVBO.usedElements > 0 then 
 			widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, widgetInstanceVBO.usedElements, 0)
@@ -423,38 +430,42 @@ local function RemoveElement(tableName, instanceID)
 	end
 end
 
-local function randtablechoice (t)
+local function RandTableChoice(t)
 	local i = 0
-	for _ in pairs(t) do i = i+1 end 
+	for _ in pairs(t) do
+		i = i+1
+	end 
 	local randi = math.floor(math.random()*i)
 	local j = 0
-	for k,v in pairs(t) do 
-		if j > randi then return k,v end
+	for k, v in pairs(t) do 
+		if j > randi then
+			return k, v
+		end
 		j = j+1
 	end
 	return next(t)
 end
 
 function widget:Initialize()
-	makeAtlas()
+	MakeAtlas(imageDir, "tech")
 	chiliShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
 	initRectVBO()
 	CreateInstanceVBOTable("default") 
 	
-	if true then -- debug mode
+	if DEBUG_MODE then
 		math.randomseed(1)
 		local grid = 32
 		local gs = 64
 		local vsx, vsy = Spring.GetViewGeometry()
 		for i= 0, grid * grid -1 do 
-			local tex1 = randtablechoice(atlassedImagesUVs)
-			local tex2 = randtablechoice(atlassedImagesUVs)
+			local tex1 = RandTableChoice(atlassedImagesUVs)
+			local tex2 = RandTableChoice(atlassedImagesUVs)
 			local tiling = math.floor(math.random() * 8 + 4)
 			local x = (i % grid)* gs + 16
 			local y = math.floor(i/grid) * gs + 16
 			local w = x + math.random() * gs + 16
 			local h = y + math.random() * gs + 16
-			AddInstance('default', nil, {x,y,w,h}, {tiling,tiling,tiling,tiling}, {math.random(), math.random(), math.random(), math.random()}, nil, tex1, tex2)
+			AddInstance('default', nil, {x, y, w, h}, {tiling, tiling, tiling, tiling}, {math.random(), math.random(), math.random(), math.random()}, nil, tex1, tex2)
 		end
 	end
 end
