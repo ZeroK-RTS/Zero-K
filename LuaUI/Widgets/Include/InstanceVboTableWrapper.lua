@@ -13,6 +13,7 @@ local exposedFuncs = {
 	getElementInstanceData  = getElementInstanceData  ,
 	uploadAllElements       = uploadAllElements       ,
 	uploadElementRange      = uploadElementRange      ,
+	compactInstanceVBO      = compactInstanceVBO      ,
 	drawInstanceVBO         = drawInstanceVBO         ,
 	countInvalidUnitIDs     = countInvalidUnitIDs     ,
 	makeCircleVBO           = makeCircleVBO           ,
@@ -24,6 +25,7 @@ local exposedFuncs = {
 	makeConeVBO             = makeConeVBO             ,
 	makeCylinderVBO         = makeCylinderVBO         ,
 	makeBoxVBO              = makeBoxVBO              ,
+	makeSphereVBO           = makeSphereVBO           ,
 }
 
 makeInstanceVBOTable    = nil
@@ -36,6 +38,7 @@ popElementInstance      = nil
 getElementInstanceData  = nil
 uploadAllElements       = nil
 uploadElementRange      = nil
+compactInstanceVBO      = nil
 drawInstanceVBO         = nil
 countInvalidUnitIDs     = nil
 makeCircleVBO           = nil
@@ -47,5 +50,6 @@ makeRectIndexVBO        = nil
 makeConeVBO             = nil
 makeCylinderVBO         = nil
 makeBoxVBO              = nil
+makeSphereVBO           = nil
 
 return exposedFuncs

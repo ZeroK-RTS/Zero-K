@@ -24,6 +24,8 @@ local glTexture = gl.Texture
 local DEBUG_MODE = true
 local imageDir = "luaui/widgets/chili/skins/evolved"
 
+local cacheTable = {}
+
 -----------------------------------------------------------------
 ------------------------ ATLAS STUFF ----------------------------
 
@@ -384,42 +386,20 @@ local function AddInstance(tableName, instanceID, screenpos, tiling, color1, col
 
 	return InstanceVboTable.pushElementInstance(
 		widgetInstanceVBOs[tableName], -- push into this Instance VBO Table
-			{
-				screenpos[1], screenpos[2], screenpos[3], screenpos[4],  -- screenpos; // screen pixel coords
-				tiling[1], tiling[2], tiling[3], tiling[4],  -- tiling; // skLeft, skbottom, skRight, sktop
-				color1[1], color1[2], color1[3], color1[4],  
-				color2[1], color2[2], color2[3],  color2[4],  
-				uv1[1], uv1[2], uv1[3], uv1[4], 
-				uv2[1], uv2[2], uv2[3], uv2[4], 
-				animinfo[1], animinfo[2], animinfo[3], animinfo[4],  -- unused so far
-				otherparams[1], otherparams[2], otherparams[3], otherparams[4], -- unused so far
-			},
+		{
+			screenpos[1], screenpos[2], screenpos[3], screenpos[4],  -- screenpos; // screen pixel coords
+			tiling[1], tiling[2], tiling[3], tiling[4],  -- tiling; // skLeft, skbottom, skRight, sktop
+			color1[1], color1[2], color1[3], color1[4],  
+			color2[1], color2[2], color2[3],  color2[4],  
+			uv1[1], uv1[2], uv1[3], uv1[4], 
+			uv2[1], uv2[2], uv2[3], uv2[4], 
+			animinfo[1], animinfo[2], animinfo[3], animinfo[4],  -- unused so far
+			otherparams[1], otherparams[2], otherparams[3], otherparams[4], -- unused so far
+		},
 		instanceID, -- this is the key inside the VBO Table, should be unique per unit
 		true, -- update existing element
 		false -- noupload, dont use unless you know what you want to batch push/pop
 	)
-end
-
-function widget:DrawScreen()
-	if chiliShader == nil then
-		return
-	end
-	--gl.Culling(false)
-	--gl.DepthTest(GL_LEQUAL)
-	--gl.DepthTest(false)
-	--gl.DepthMask(false)
-	glTexture(0, atlasTexture)
-	chiliShader:Activate()
-	chiliShader:SetUniform("atlasSize", atlasX, atlasY)
-	
-	chiliShader:SetUniform("myFloat", 1.23456)
-	for name, widgetInstanceVBO in pairs(widgetInstanceVBOs) do 
-		if widgetInstanceVBO.usedElements > 0 then 
-			widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, widgetInstanceVBO.usedElements, 0)
-		end
-	end
-	chiliShader:Deactivate()
-	glTexture(0, false)
 end
 
 local function RemoveElement(tableName, instanceID) 
@@ -446,6 +426,89 @@ local function RandTableChoice(t)
 	return next(t)
 end
 
+-----------------------------------------------------------------
+------------------------------ API ------------------------------
+
+local api = {}
+
+function api.AddElement(tableName, screenpos, tiling, color1, color2, tex1name, tex2name, animinfo, otherparams)
+	return AddInstance(tableName, nil, screenpos, tiling, color1, color2, tex1name, tex2name, animinfo, otherparams)
+end
+
+function api.UpdateElementPosition(tableName, instanceID, x, y, w, h)
+	local data = InstanceVboTable.getElementInstanceData(widgetInstanceVBOs[tableName], instanceID)
+	-- Perhaps use cacheTable at some point, but I don't trust this to not cause annoying bugs.
+	
+	x = x or data[1]
+	y = y or data[2]
+	w = w or (data[3] - data[1])
+	h = h or (data[4] - data[2])
+	
+	data[1] = x
+	data[2] = y
+	data[3] = x + w
+	data[4] = y + h
+	
+	InstanceVboTable.pushElementInstance(
+		widgetInstanceVBOs[tableName], -- push into this Instance VBO Table
+		data,
+		instanceID, -- this is the key inside the VBO Table, should be unique per unit
+		true, -- update existing element
+		false -- noupload, dont use unless you know what you want to batch push/pop
+	)
+end
+
+function api.RemoveElement(tableName, instanceID)
+	RemoveElement(tableName, instanceID) 
+end
+
+function api.DrawElement(tableName, instanceID)
+	glTexture(0, atlasTexture)
+	chiliShader:Activate()
+	chiliShader:SetUniform("atlasSize", atlasX, atlasY)
+	chiliShader:SetUniform("myFloat", 1.23456)
+	
+	local widgetInstanceVBO = widgetInstanceVBOs[tableName]
+	--Spring.Echo("widgetInstanceVBOwidgetInstanceVBOwidgetInstanceVBOwidgetInstanceVBOwidgetInstanceVBO")
+	--for i, v in pairs(widgetInstanceVBO) do
+	--	Spring.Echo(i, v)
+	--end
+	local index = widgetInstanceVBO.instanceIDtoIndex[instanceID]
+	Spring.Echo("index", index, widgetInstanceVBO.usedElements)
+	widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, index, 0)
+	
+	chiliShader:Deactivate()
+	glTexture(0, false)
+end
+
+function api.DrawAllElements(tableName)
+	glTexture(0, atlasTexture)
+	chiliShader:Activate()
+	chiliShader:SetUniform("atlasSize", atlasX, atlasY)
+	chiliShader:SetUniform("myFloat", 1.23456)
+
+	for name, widgetInstanceVBO in pairs(widgetInstanceVBOs) do 
+		if widgetInstanceVBO.usedElements > 0 then 
+			widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, widgetInstanceVBO.usedElements, 0)
+		end
+	end
+
+	chiliShader:Deactivate()
+	glTexture(0, false)
+end
+
+-----------------------------------------------------------------
+-------------------- Widget Interface ---------------------------
+
+function widget:DrawScreen()
+	if chiliShader == nil then
+		return
+	end
+	
+	api.UpdateElementPosition("default", 2, math.random()*400)
+	api.DrawElement("default", 2)
+end
+
 function widget:Initialize()
 	MakeAtlas(imageDir, "tech")
 	chiliShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
@@ -465,7 +528,7 @@ function widget:Initialize()
 			local y = math.floor(i/grid) * gs + 16
 			local w = x + math.random() * gs + 16
 			local h = y + math.random() * gs + 16
-			AddInstance('default', nil, {x, y, w, h}, {tiling, tiling, tiling, tiling}, {math.random(), math.random(), math.random(), math.random()}, nil, tex1, tex2)
+			api.AddElement('default', {x, y, w, h}, {tiling, tiling, tiling, tiling}, {math.random(), math.random(), math.random(), math.random()}, nil, tex1, tex2)
 		end
 	end
 end

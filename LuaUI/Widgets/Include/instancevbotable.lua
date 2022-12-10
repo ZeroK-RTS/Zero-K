@@ -36,10 +36,104 @@ function makeInstanceVBOTable(layout, maxElements, myName, unitIDattribID)
 		debugZombies 		= true,  -- this is new, and its for debugging non-existing stuff on unitdestroyed
 	}
 
+
 	if unitIDattribID ~= nil then
 		instanceTable.indextoUnitID = {}
 		instanceTable.unitIDattribID = unitIDattribID
 		instanceTable.popUnitIDFailuresInGameFrame = {}
+	end
+	
+	function instanceTable:clearInstanceTable() 
+		-- this wont resize it, but quickly sets it to empty
+		self.usedElements = 0
+		self.instanceIDtoIndex = {}
+		self.indextoInstanceID = {}
+		if self.indextoUnitID then self.indextoUnitID = {} end
+	end
+
+	function instanceTable:makeVAOandAttach(vertexVBO, instanceVBO, indexVBO) -- Attach a vertex buffer to an instance buffer, and optionally, an index buffer if one is supplied.
+		-- There is a special case for this, when we are using a vertexVBO as a quasi-instanceVBO, e.g. when we are using the geometry shader to draw a vertex as each instance. 
+		--iT.vertexVBO = vertexVBO
+		--iT.indexVBO = indexVBO
+		local newVAO = nil 
+		newVAO = gl.GetVAO()
+		if newVAO == nil then goodbye("Failed to create newVAO") end
+		self.VAO = newVAO
+		if vertexVBO == nil then -- the special case where are using 'vertices' as 'instances'
+			newVAO:AttachVertexBuffer(instanceVBO)
+		else
+			newVAO:AttachVertexBuffer(vertexVBO)
+			newVAO:AttachInstanceBuffer(instanceVBO)
+			self.vertexVBO = vertexVBO
+			self.instanceVBO = instanceVBO
+		end
+		if indexVBO then
+			newVAO:AttachIndexBuffer(indexVBO)     
+			self.indexVBO = indexVBO
+			function self:Draw()
+				self.VAO:DrawElements(GL.TRIANGLES, nil, 0, self.usedElements, 0)
+			end
+		else
+			function self:Draw()
+				self.VAO:DrawArrays(GL.TRIANGLES, nil, 0, self.usedElements, 0)
+			end
+		end
+		return newVAO
+	end
+	
+	function instanceTable:clearInstanceTable() 
+		-- this wont resize it, but quickly sets it to empty
+		self.usedElements = 0
+		self.instanceIDtoIndex = {}
+		self.indextoInstanceID = {}
+		if self.indextoUnitID then self.indextoUnitID = {} end
+	end
+	
+	function instanceTable:compact()
+		self.destroyedElements = 0
+		-- so this is for the edge case, where we have silently removed elements from instanceIDtoIndex
+		-- where we have holes everywhere, so we have to 'compact' the table, 
+		-- by copying back contiguously while preserving element order
+		local newInstanceIDtoIndex = {}
+		local newIndexToInstanceID = {}
+		local newInstanceData = {}
+		local newUsedElements = 0
+		for i = 1, self.usedElements do
+			local instanceID = self.indextoInstanceID[i]
+			local index = self.instanceIDtoIndex[self.indextoInstanceID[i]] 
+			if index then 
+				local instanceStep = self.instanceStep
+				local instanceData = self.instanceData
+				for j=1, instanceStep do 
+					newInstanceData[newUsedElements * instanceStep + j] = instanceData[(i-1)*instanceStep +j]
+				end
+				newUsedElements = newUsedElements + 1
+				newInstanceIDtoIndex[instanceID] = newUsedElements
+				newIndexToInstanceID[newUsedElements] = instanceID
+			else
+			    Spring.Echo("compacting index",i, 'instanceID', instanceID) 
+			end
+		end
+		Spring.Echo("Post compacting", self.usedElements, newUsedElements)
+		self.usedElements = newUsedElements
+		self.instanceIDtoIndex = newInstanceIDtoIndex
+		self.indextoInstanceID = newIndexToInstanceID
+		self.instanceData = newInstanceData
+		--iT.instanceVBO:Upload(iT.instanceData,nil,oldElementIndex-1,oldOffset +1,oldOffset + iTStep)
+		if self.usedElements > 0 then 
+			self.instanceVBO:Upload(self.instanceData)
+		end
+	end
+	
+
+	function instanceTable:draw(primitiveType)
+		if self.usedElements > 0 then 
+			if self.indexVBO then 
+				self.VAO:DrawElements(primitiveType or self.primitiveType, self.numVertices, 0, self.usedElements,0)
+			else
+				self.VAO:DrawArrays  (primitiveType or self.primitiveType, self.numVertices, 0, self.usedElements,0)
+			end
+		end
 	end
 	
 	newInstanceVBO:Upload(instanceData)
@@ -70,6 +164,9 @@ function makeVAOandAttach(vertexVBO, instanceVBO, indexVBO) -- Attach a vertex b
 	if indexVBO then
 		newVAO:AttachIndexBuffer(indexVBO)     
 	end
+	-- this allows us to set up our sane 
+
+
 	return newVAO
 end
 
@@ -99,8 +196,10 @@ local function dbgt(t, name)
 	local count = 0
 	local res = ''
 	for k,v in pairs(t) do
-		res = res .. tostring(k) .. ':' .. tostring(v) ..','
-		count = count + 1
+		if type(k) == 'number' and type(v) == 'number' then 
+			res = res .. tostring(k) .. ':' .. tostring(v) ..','
+			count = count + 1
+		end
 	end
 	Spring.Echo(tostring(gf).. " " ..name .. ' #' .. tostring(count) .. ' {'..res .. '}')
 	return res
@@ -276,6 +375,7 @@ function pushElementInstance(iT,thisInstance, instanceID, updateExisting, noUplo
 	-- returns: the index of the instanceID in the table on success, else nil
 	if #thisInstance ~= iT.instanceStep then
 		Spring.Echo("Trying to upload an oddly sized instance into",iT.myName, #thisInstance, "instead of ",iT.instanceStep)
+		Spring.Debug.TraceFullEcho(20,20,20, "pushElementInstance Failure:"..iT.myName )
 	end
 	local iTusedElements = iT.usedElements
 	local iTStep    = iT.instanceStep 
@@ -302,9 +402,9 @@ function pushElementInstance(iT,thisInstance, instanceID, updateExisting, noUplo
 			endOffset = (thisInstanceIndex - 1) * iTStep
 		end
 	end
-
+	local instanceData = iT.instanceData
 	for i =1, iTStep  do -- copy data, but fast
-		iT.instanceData[endOffset + i] =  thisInstance[i]
+		instanceData[endOffset + i] =  thisInstance[i]
 	end
 
 	if unitID ~= nil then 
@@ -333,7 +433,7 @@ function pushElementInstance(iT,thisInstance, instanceID, updateExisting, noUplo
 	end
 
 	if iT.debug then validateInstanceVBOTable(iT, 'push') end 
-	return thisInstanceIndex
+	return instanceID
 end
 
 function popElementInstance(iT, instanceID, noUpload) 
@@ -345,6 +445,7 @@ function popElementInstance(iT, instanceID, noUpload)
 
 	if iT.instanceIDtoIndex[instanceID] == nil then -- if key is instanceID yet does not exist, then warn and bail
 		Spring.Echo("Tried to remove element ",instanceID,'From instanceTable', iT.myName, 'but it does not exist in it')
+		Spring.Debug.TraceFullEcho(10,10,3, iT.myName)
 		return nil 
 	end
 	if iT.usedElements == 0 then -- Dont remove the last element
@@ -391,9 +492,9 @@ function popElementInstance(iT, instanceID, noUpload)
 		iT.indextoInstanceID[lastElementIndex] = nil --- somehow this got forgotten? TODO for VBOIDtable
 
 		local oldOffset = (oldElementIndex-1)*iTStep 
-		for i= 1, iTStep do 
-			local data =  iT.instanceData[endOffset + i]
-			iT.instanceData[oldOffset + i ] = data
+		local instanceData = iT.instanceData
+		for i = 1, iTStep do 
+			instanceData[oldOffset + i ] = instanceData[endOffset + i]
 		end
 		--size_t LuaVBOImpl::Upload(const sol::stack_table& luaTblData, const sol::optional<int> attribIdxOpt, const sol::optional<int> elemOffsetOpt, const sol::optional<int> luaStartIndexOpt, const sol::optional<int> luaFinishIndexOpt)
 		--Spring.Echo("Removing instanceID",instanceID,"from iT at position", oldElementIndex, "shuffling back at", iT.usedElements,"endoffset=",endOffset,'oldOffset=',oldOffset)
@@ -427,7 +528,7 @@ function popElementInstance(iT, instanceID, noUpload)
 								s = s .. " " .. tostring(zombie)
 								Spring.Echo("ZOMBIE AT", zombie, Spring.GetUnitPosition(zombie))
 								--Spring.SendCommands({"pause 1"})
-								Spring.Utilities.TraceFullEcho()
+								Spring.Debug.TraceFullEcho(nil,nil,nil, iT.myName)
 							end 
 							Spring.Echo(s)
 							iT.zombies = {}
@@ -478,16 +579,17 @@ function popElementInstance(iT, instanceID, noUpload)
 	return oldElementIndex
 end
 
-function getElementInstanceData(iT, instanceID)
+function getElementInstanceData(iT, instanceID, cacheTable)
 	-- iT: instanceTable created with makeInstanceTable
 	-- instanceID: an optional key given to the item, so it can be easily removed by reference, defaults to the index of the instance in the buffer (1 based)
 	local instanceIndex = iT.instanceIDtoIndex[instanceID] 
 	if instanceIndex == nil then return nil end
-	local iData = {}
+	local iData = cacheTable or {}
 	local iTStep = iT.instanceStep
 	instanceIndex = (instanceIndex-1) * iTStep
+	local instanceData = iT.instanceData
 	for i = 1, iTStep do
-		iData[i] = iT.instanceData[instanceIndex + i]
+		iData[i] = instanceData[instanceIndex + i]
 	end
 	return iData
 end
@@ -518,8 +620,9 @@ function uploadElementRange(iT, startElementIndex, endElementIndex)
 	if iT.indextoUnitID then
 		--we need to reslice the table
 		local unitIDRange = {}
+		local indextoUnitID = iT.indextoUnitID
 		for i = startElementIndex, endElementIndex do
-			unitIDRange[#unitIDRange + 1] = iT.indextoUnitID[i]
+			unitIDRange[#unitIDRange + 1] = indextoUnitID[i]
 		end
 		if iT.featureIDs then
 			iT.instanceVBO:InstanceDataFromFeatureIDs(unitIDRange, iT.unitIDattribID, startElementIndex - 1)
@@ -529,9 +632,51 @@ function uploadElementRange(iT, startElementIndex, endElementIndex)
 	end
 end
 
+-- This function allows for order-preserving compacting of a list of instances based on these funcs. 
+-- It is designed for Decals GL4, where draw order matters a lot!
+-- remove takes priority over keep
+function compactInstanceVBO(iT, removelist, keeplist)	
+	local usedElements = iT.usedElements
+	if usedElements == 0 then return 0 end
+	local instanceStep = iT.instanceStep
+	local instanceData = iT.instanceData
+	local instanceIDtoIndex = iT.instanceIDtoIndex
+	local indextoInstanceID = iT.indextoInstanceID
+	local newindextoInstanceID = {}
+	local newinstanceIDtoIndex = {}
+	local newUsedElements = 0
+	local numremoved = 0
+	local removemode = (removelist ~= nil) and (keeplist == nil)
+	for index, instanceID in ipairs(indextoInstanceID) do 
+		-- If its in keeplist, 
+		if (removemode and (removelist[instanceID]== nil) ) or ((removemode == false) and keeplist[instanceID]) then 
+			local instanceOffset = (index-1) * instanceStep
+			local newInstanceOffset = newUsedElements * instanceStep
+			for i = 1, instanceStep do 
+				instanceData[newInstanceOffset + i] = instanceData[instanceOffset + i]
+			end
+			newUsedElements = newUsedElements + 1
+			newindextoInstanceID[newUsedElements] = instanceID
+			newinstanceIDtoIndex[instanceID] = newUsedElements
+		else
+			numremoved = numremoved + 1
+		end
+	end
+	
+	iT.dirty = true -- we set the flag to notify that CPU and GPU contents dont match!
+	iT.usedElements = newUsedElements
+	iT.instanceIDtoIndex = newinstanceIDtoIndex
+	iT.indextoInstanceID = newindextoInstanceID
+	return numremoved
+end
+
 function drawInstanceVBO(iT)
 	if iT.usedElements > 0 then 
-		iT.VAO:DrawArrays(iT.primitiveType, iT.numVertices, 0, iT.usedElements,0)
+		if iT.indexVBO then 
+			iT.VAO:DrawElements(iT.primitiveType, iT.numVertices, 0, iT.usedElements,0)
+		else
+			iT.VAO:DrawArrays(iT.primitiveType, iT.numVertices, 0, iT.usedElements,0)
+		end
 	end
 end
 
@@ -618,33 +763,48 @@ function makePlaneVBO(xsize, ysize, xresolution, yresolution) -- makes a plane f
 	return planeVBO, #VBOData/2
 end
 
-function makePlaneIndexVBO(xresolution, yresolution)
+function makePlaneIndexVBO(xresolution, yresolution, cutcircle)
 	xresolution = math.floor(xresolution)
 	if not yresolution then yresolution = xresolution end
 	local planeIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER,false)
 	if planeIndexVBO == nil then return nil end
-	local numindices = yresolution*xresolution*6
-	planeIndexVBO:Define(
-		numindices
-	)
+
+	local function xyinrad(lx, ly)
+		local px = (lx / xresolution) * 2 - 1
+		local py = (ly / yresolution) * 2 - 1
+		return (px*px + py*py) <= 1 
+	end
+	
 	local IndexVBOData = {}
 	local qindex = 0
 	local colsize = yresolution + 1
 	for x = 0, xresolution-1  do -- this is +1
 		for y = 0, yresolution-1 do
-			IndexVBOData[#IndexVBOData + 1] = qindex
-			IndexVBOData[#IndexVBOData + 1] = qindex +1
-			IndexVBOData[#IndexVBOData + 1] = qindex + colsize
-			IndexVBOData[#IndexVBOData + 1] = qindex +1
-			IndexVBOData[#IndexVBOData + 1] = qindex + colsize + 1
-			IndexVBOData[#IndexVBOData + 1] = qindex + colsize
+			--this is only 20% optimization
+			if cutcircle == nil or (xyinrad(x,y) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then 
+				-- top left one
+				IndexVBOData[#IndexVBOData + 1] = qindex
+				IndexVBOData[#IndexVBOData + 1] = qindex +1
+				IndexVBOData[#IndexVBOData + 1] = qindex + colsize
+			end
+			
+			if cutcircle == nil or (xyinrad(x+1,y+1) or xyinrad(x + 1,y) or xyinrad(x,y + 1 )) then 
+				-- bottom right one?
+				IndexVBOData[#IndexVBOData + 1] = qindex +1
+				IndexVBOData[#IndexVBOData + 1] = qindex + colsize + 1
+				IndexVBOData[#IndexVBOData + 1] = qindex + colsize
+			end
 			qindex = qindex + 1
+			
 		end
 		qindex = qindex + 1
-	end	
+	end		
+	planeIndexVBO:Define(
+		#	IndexVBOData
+	)
 	planeIndexVBO:Upload(IndexVBOData)
 	--Spring.Echo("PlaneIndexVBO up:",#IndexVBOData, "Down", #planeIndexVBO:Download())
-	return planeIndexVBO,numindices
+	return planeIndexVBO, IndexVBOData
 end
 
 function makePointVBO(numPoints)
@@ -928,3 +1088,114 @@ function makeBoxVBO(minX, minY, minZ, maxX, maxY, maxZ) -- make a box
 	return boxVBO, #VBOData/4
 end
 
+
+
+
+function makeSphereVBO(sectorCount, stackCount, radius) -- http://www.songho.ca/opengl/gl_sphere.html
+
+	local sphereVBO = gl.GetVBO(GL.ARRAY_BUFFER,true)
+	if sphereVBO == nil then return nil end
+	local vertVBOLayout = {
+		{id = 0, name = "position", size = 4},
+		{id = 1, name = "normals", size = 3},
+		{id = 2, name = "uvs", size = 2},
+	} 
+	
+	local VBOData = {}
+	radius = radius or 1
+	local x, y, z, xy; --  vertex position
+	local nx, ny, nz
+	local lengthInv = 1.0 / radius;    -- vertex normal
+	local s, t;                                     -- vertex texCoord
+
+	local sectorStep = 2 * math.pi / sectorCount;
+	local stackStep = math.pi / stackCount;
+	local sectorAngle, stackAngle;
+
+	for i = 0, stackCount do 
+
+		stackAngle = math.pi / 2 - i * stackStep;        -- starting from pi/2 to -pi/2
+		xy = radius * math.cos(stackAngle);             -- r * cos(u)
+		z = radius * math.sin(stackAngle);              -- r * sin(u)
+
+		-- add (sectorCount+1) vertices per stack
+		-- the first and last vertices have same position and normal, but different tex coords
+		for j = 0, sectorCount do -- for (int j = 0; j <= sectorCount; ++j)
+
+			sectorAngle = j * sectorStep;           -- starting from 0 to 2pi
+
+			-- vertex position (x, y, z)
+			x = xy * math.cos(sectorAngle);             -- r * cos(u) * cos(v)
+			y = xy * math.sin(sectorAngle);             -- r * cos(u) * sin(v)
+			VBOData[#VBOData + 1] = x;
+			VBOData[#VBOData + 1] = y;
+			VBOData[#VBOData + 1] = z;
+			VBOData[#VBOData + 1] = 0;
+			--Spring.Echo(x,y,z)
+			-- normalized vertex normal (nx, ny, nz)
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+
+			
+			VBOData[#VBOData + 1] = nx;
+			VBOData[#VBOData + 1] = ny;
+			VBOData[#VBOData + 1] = nz;
+
+			-- vertex tex coord (s, t) range between [0, 1]
+			s = j / sectorCount;
+			t = i / stackCount;
+			
+			VBOData[#VBOData + 1] = s;
+			VBOData[#VBOData + 1] = t;
+		end
+	end
+	sphereVBO:Define(#VBOData/9, vertVBOLayout)
+	sphereVBO:Upload(VBOData)
+	local numVerts = #VBOData/9
+	
+	local sphereIndexVBO = gl.GetVBO(GL.ELEMENT_ARRAY_BUFFER,false)
+	VBOData = {}
+	
+	-- generate CCW index list of sphere triangles
+	-- k1--k1+1
+	-- |  / |
+	-- | /  |
+	-- k2--k2+1
+	local k1, k2
+	for i = 0, stackCount-1 do -- for(int i = 0; i < stackCount; ++i)
+	
+		k1 = i * (sectorCount + 1)     -- beginning of current stack
+		k2 = k1 + sectorCount + 1      -- beginning of next stack
+
+		for j = 0, sectorCount-1   do --for(int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+			--	Spring.Echo('indices', k1, k2)
+			-- 2 triangles per sector excluding first and last stacks
+			-- k1 => k2 => k1+1
+			if i ~= 0 then 
+			
+				VBOData[#VBOData + 1] = k1
+				VBOData[#VBOData + 1] = k2
+				VBOData[#VBOData + 1] = k1 + 1
+			end
+
+			-- k1+1 => k2 => k2+1
+			if i ~= (stackCount-1)	 then
+			
+				VBOData[#VBOData + 1] = k1 + 1
+				VBOData[#VBOData + 1] = k2
+				VBOData[#VBOData + 1] = k2 + 1
+
+			end
+			
+			k1 = k1 + 1
+			k2 = k2 + 1
+		end
+	end
+	
+	
+	sphereIndexVBO:Define(#VBOData)
+	sphereIndexVBO:Upload(VBOData)
+
+	return sphereVBO, numVerts, sphereIndexVBO, #VBOData
+end
