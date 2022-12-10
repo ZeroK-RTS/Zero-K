@@ -82,7 +82,7 @@ return { bomberheavy = {
 
       customParams            = {
         burst = Shared.BURST_UNRELIABLE,
-		script_reload    = 25, -- should probably equal reammoseconds above
+        script_reload    = 25, -- should probably equal reammoseconds above
 
         reaim_time = 15, -- Fast update not required (maybe dangerous)
         light_color = [[1.6 0.85 0.38]],
