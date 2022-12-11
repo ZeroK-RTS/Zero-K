@@ -21,6 +21,7 @@ end
 
 local glTexture = gl.Texture
 
+local HARD_DISABLE = true
 local DEBUG_MODE = true
 local imageDir = "luaui/widgets/chili/skins/evolved"
 
@@ -511,6 +512,10 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
+	if HARD_DISABLE then
+		widgetHandler:RemoveWidget()
+		return
+	end
 	MakeAtlas(imageDir, "tech")
 	chiliShader = LuaShader.CheckShaderUpdates(shaderSourceCache)
 	initRectVBO()
