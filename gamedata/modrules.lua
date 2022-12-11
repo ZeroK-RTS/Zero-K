@@ -140,6 +140,7 @@ local modrules  = {
     pathFinderUpdateRate = 0.0000001,
     pathFinderRawDistMult = 100000,
     pfForceSingleThreaded = forceSingleThreaded,
+    pfForceUpdateSingleThreaded = forceSingleThreaded,
     allowTake = false,
     enableSmoothMesh = false,
   },
