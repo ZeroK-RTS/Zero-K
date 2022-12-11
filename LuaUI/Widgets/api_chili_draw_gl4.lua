@@ -476,7 +476,7 @@ function api.DrawElement(tableName, instanceID)
 	--end
 	
 	local index = widgetInstanceVBO.instanceIDtoIndex[instanceID]
-	widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, index, 0)
+	widgetInstanceVBO.VAO:DrawElements(GL.TRIANGLES, nil, 0, index, 0, index - 1)
 	
 	chiliShader:Deactivate()
 	glTexture(0, false)
@@ -507,7 +507,7 @@ function widget:DrawScreen()
 	end
 	
 	api.UpdateElementPosition("default", 2, math.random()*400)
-	api.DrawElement("default", 2)
+	api.DrawElement("default", 3)
 end
 
 function widget:Initialize()
