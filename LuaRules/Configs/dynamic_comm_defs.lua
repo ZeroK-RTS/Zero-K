@@ -571,7 +571,7 @@ local moduleDefs = {
 		requireChassis = {"assault", "knight"},
 		requireOneOf = {
 			"commweapon_rocketlauncher", "commweapon_rocketlauncher_adv",
-			 "commweapon_riotcannon", "commweapon_riotcannon_adv",
+			"commweapon_riotcannon", "commweapon_riotcannon_adv",
 			"commweapon_hpartillery"},
 		requireLevel = 2,
 		slotType = "module",
@@ -882,7 +882,7 @@ for i = 1, #moduleDefs do
 	local def = moduleDefs[i]
 	if basicWeapons[def.name] then
 		local newDef = Spring.Utilities.CopyTable(def, true)
-		newDef.name = newDef.cost .. "_adv"
+		newDef.name = newDef.name .. "_adv"
 		newDef.slotType = "adv_weapon"
 		newDef.cost = 350 * COST_MULT
 		moduleDefs[#moduleDefs + 1] = newDef
