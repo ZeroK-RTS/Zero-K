@@ -35,6 +35,20 @@ local disableResurrect = (Spring.GetModOptions().disableresurrect == 1) or (Spri
 -- Module Definitions
 ------------------------------------------------------------------------
 
+-- For autogenerating expensive advanced versions
+local basicWeapons = {
+	["commweapon_beamlaser"] = true,
+	["commweapon_flamethrower"] = true,
+	["commweapon_heatray"] = true,
+	["commweapon_heavymachinegun"] = true,
+	["commweapon_lightninggun"] = true,
+	["commweapon_lparticlebeam"] = true,
+	["commweapon_missilelauncher"] = true,
+	["commweapon_riotcannon"] = true,
+	["commweapon_rocketlauncher"] = true,
+	["commweapon_shotgun"] = true,
+}
+
 local moduleDefNames = {}
 
 local moduleDefs = {
@@ -57,6 +71,7 @@ local moduleDefs = {
 		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
 		limit = false,
 		emptyModule = true,
+		requireChassis = {"knight"},
 		cost = 0,
 		requireLevel = 0,
 		slotType = "basic_weapon",
@@ -80,10 +95,7 @@ local moduleDefs = {
 		description = "Beam Laser: An effective short-range cutting tool",
 		image = moduleImagePath .. "commweapon_beamlaser.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
-		requireChassis = {"knight"}, --[[ can fit on any chassis, but is already
-		                                  baseline for multiplayer comms, so we
-		                                  don't offer it for them ]]
+		cost = 0,
 		requireLevel = 1,
 		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
@@ -103,7 +115,7 @@ local moduleDefs = {
 		description = "Flamethrower: Good for deep-frying swarmers and large targets alike",
 		image = moduleImagePath .. "commweapon_flamethrower.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"recon", "assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -124,7 +136,7 @@ local moduleDefs = {
 		description = "Heatray: Rapidly melts anything at short range; steadily loses all of its damage over distance",
 		image = moduleImagePath .. "commweapon_heatray.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -145,7 +157,7 @@ local moduleDefs = {
 		description = "Machine Gun: Close-in automatic weapon with AoE",
 		image = moduleImagePath .. "commweapon_heavymachinegun.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"recon", "assault", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -189,7 +201,7 @@ local moduleDefs = {
 		description = "Lightning Rifle: Paralyzes and damages annoying bugs",
 		image = moduleImagePath .. "commweapon_lightninggun.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"recon", "support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -211,7 +223,7 @@ local moduleDefs = {
 		description = "Light Particle Beam: Fast, light pulsed energy weapon",
 		image = moduleImagePath .. "commweapon_lparticlebeam.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"support", "recon", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -233,7 +245,7 @@ local moduleDefs = {
 		description = "Missile Launcher: Lightweight seeker missile with good range",
 		image = moduleImagePath .. "commweapon_missilelauncher.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -254,7 +266,7 @@ local moduleDefs = {
 		description = "Riot Cannon: The weapon of choice for crowd control",
 		image = moduleImagePath .. "commweapon_riotcannon.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -276,7 +288,7 @@ local moduleDefs = {
 		description = "Rocket Launcher: Medium-range, low-velocity hitter",
 		image = moduleImagePath .. "commweapon_rocketlauncher.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -298,7 +310,7 @@ local moduleDefs = {
 		description = "Shotgun: Can hammer a single large target or shred several small ones",
 		image = moduleImagePath .. "commweapon_shotgun.png",
 		limit = 2,
-		cost = 25 * COST_MULT,
+		cost = 0,
 		requireChassis = {"recon", "support", "strike", "knight"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -320,7 +332,7 @@ local moduleDefs = {
 		description = "Heavy Particle Beam - Replaces other weapons. Short range, high-power beam weapon with moderate reload time",
 		image = moduleImagePath .. "conversion_hparticlebeam.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"support", "knight"},
 		requireLevel = 1,
 		slotType = "adv_weapon",
@@ -340,7 +352,7 @@ local moduleDefs = {
 		description = "Shock Rifle - Replaces other weapons. Long range sniper rifle",
 		image = moduleImagePath .. "conversion_shockrifle.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"support", "knight"},
 		requireLevel = 1,
 		slotType = "adv_weapon",
@@ -359,7 +371,7 @@ local moduleDefs = {
 		description = "Cluster Bomb - Manually fired burst of bombs.",
 		image = moduleImagePath .. "commweapon_clusterbomb.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"recon", "assault", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -380,7 +392,7 @@ local moduleDefs = {
 		description = "Concussion Shell - Manually fired high impulse projectile.",
 		image = moduleImagePath .. "commweapon_concussion.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"recon", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -401,7 +413,7 @@ local moduleDefs = {
 		description = "Disintegrator - Manually fired weapon that destroys almost everything it touches.",
 		image = moduleImagePath .. "commweapon_disintegrator.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"assault", "strike", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -422,7 +434,7 @@ local moduleDefs = {
 		description = "Disruptor Bomb - Manually fired bomb that slows enemies in a large area.",
 		image = moduleImagePath .. "commweapon_disruptorbomb.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"recon", "support", "strike", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -443,7 +455,7 @@ local moduleDefs = {
 		description = "Multistunner - Manually fired sustained burst of lightning.",
 		image = moduleImagePath .. "commweapon_multistunner.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"support", "recon", "strike", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -465,7 +477,7 @@ local moduleDefs = {
 		description = "Hellfire Grenade - Manually fired bomb that inflames a large area.",
 		image = moduleImagePath .. "commweapon_napalmgrenade.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"assault", "recon", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -486,7 +498,7 @@ local moduleDefs = {
 		description = "S.L.A.M. Rocket - Manually fired miniature tactical nuke.",
 		image = moduleImagePath .. "commweapon_slamrocket.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 400 * COST_MULT,
 		requireChassis = {"assault", "knight"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -557,7 +569,10 @@ local moduleDefs = {
 		limit = 1,
 		cost = 350 * COST_MULT,
 		requireChassis = {"assault", "knight"},
-		requireOneOf = {"commweapon_rocketlauncher", "commweapon_hpartillery", "commweapon_riotcannon"},
+		requireOneOf = {
+			"commweapon_rocketlauncher", "commweapon_rocketlauncher_adv",
+			 "commweapon_riotcannon", "commweapon_riotcannon_adv",
+			"commweapon_hpartillery"},
 		requireLevel = 2,
 		slotType = "module",
 	},
@@ -569,7 +584,12 @@ local moduleDefs = {
 		limit = 1,
 		cost = 300 * COST_MULT,
 		requireChassis = {"strike", "recon", "support", "knight"},
-		requireOneOf = {"commweapon_heavymachinegun", "commweapon_shotgun", "commweapon_hparticlebeam", "commweapon_lparticlebeam"},
+		requireOneOf = {
+			"commweapon_heavymachinegun", "commweapon_heavymachinegun_adv",
+			"commweapon_shotgun", "commweapon_shotgun_adv",
+			"commweapon_lparticlebeam", "commweapon_lparticlebeam_adv",
+			"commweapon_hparticlebeam"
+		},
 		requireLevel = 2,
 		slotType = "module",
 	},
@@ -581,7 +601,10 @@ local moduleDefs = {
 		limit = 1,
 		cost = 300 * COST_MULT,
 		requireChassis = {"support", "strike", "recon", "knight"},
-		requireOneOf = {"commweapon_lightninggun", "commweapon_multistunner"},
+		requireOneOf = {
+			"commweapon_lightninggun", "commweapon_lightninggun_adv",
+			"commweapon_multistunner"
+		},
 		requireLevel = 2,
 		slotType = "module",
 	},
@@ -681,9 +704,9 @@ local moduleDefs = {
 	{
 		name = "module_companion_drone",
 		humanName = "Companion Drone",
-		description = "Companion Drone - Commander spawns protective drones. Limit: 8",
+		description = "Companion Drone - Commander spawns protective drones. Limit: 5",
 		image = moduleImagePath .. "module_companion_drone.png",
-		limit = 8,
+		limit = 5,
 		cost = 200 * COST_MULT,
 		requireLevel = 2,
 		slotType = "module",
@@ -694,9 +717,9 @@ local moduleDefs = {
 	{
 		name = "module_battle_drone",
 		humanName = "Battle Drone",
-		description = "Battle Drone - Commander spawns heavy drones. Limit: 8, Requires Companion Drone",
+		description = "Battle Drone - Commander spawns heavy drones. Limit: 5, Requires Companion Drone",
 		image = moduleImagePath .. "module_battle_drone.png",
-		limit = 8,
+		limit = 5,
 		cost = 350 * COST_MULT,
 		requireChassis = {"assault", "support", "knight"},
 		requireOneOf = {"module_companion_drone"},
@@ -709,9 +732,9 @@ local moduleDefs = {
 	{
 		name = "module_autorepair",
 		humanName = "Autorepair",
-		description = "Autorepair - Commander self-repairs at +" .. 10*HP_MULT .. " hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 8",
+		description = "Autorepair - Commander self-repairs at +" .. 10*HP_MULT .. " hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 5",
 		image = moduleImagePath .. "module_autorepair.png",
-		limit = 8,
+		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
@@ -721,13 +744,45 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "module_ablative_armor",
+		name = "module_ablative_armor_better",
 		humanName = "Ablative Armour Plates",
-		description = "Ablative Armour Plates - Provides " .. 600*HP_MULT .. " health. Limit: 8",
+		description = "Ablative Armour Plates - Provides " .. 700*HP_MULT .. " health. Limit: 5",
 		image = moduleImagePath .. "module_ablative_armor.png",
-		limit = 8,
+		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
+		requireChassis = {"assault"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 700*HP_MULT
+		end
+	},
+	{
+		name = "module_heavy_armor_better",
+		humanName = "High Density Plating",
+		description = "High Density Plating - Provides " .. 2000*HP_MULT .. " health but reduces speed by 2. " ..
+		"Limit: 5, Requires Ablative Armour Plates",
+		image = moduleImagePath .. "module_heavy_armor.png",
+		limit = 5,
+		cost = 400 * COST_MULT,
+		requireOneOf = {"module_ablative_armor"},
+		requireLevel = 2,
+		requireChassis = {"assault"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 2000*HP_MULT
+			sharedData.speedMod = (sharedData.speedMod or 0) - 2
+		end
+	},
+	{
+		name = "module_ablative_armor",
+		humanName = "Ablative Armour Plates",
+		description = "Ablative Armour Plates - Provides " .. 600*HP_MULT .. " health. Limit: 5",
+		image = moduleImagePath .. "module_ablative_armor.png",
+		limit = 5,
+		cost = 150 * COST_MULT,
+		requireLevel = 1,
+		requireChassis = {"strike", "recon", "support", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600*HP_MULT
@@ -736,40 +791,41 @@ local moduleDefs = {
 	{
 		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces speed by 3. " ..
-		"Limit: 8, Requires Ablative Armour Plates",
+		description = "High Density Plating - Provides " .. 1700*HP_MULT .. " health but reduces speed by 2. " ..
+		"Limit: 5, Requires Ablative Armour Plates",
 		image = moduleImagePath .. "module_heavy_armor.png",
-		limit = 8,
+		limit = 5,
 		cost = 400 * COST_MULT,
 		requireOneOf = {"module_ablative_armor"},
 		requireLevel = 2,
+		requireChassis = {"strike", "recon", "support", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600*HP_MULT
-			sharedData.speedMod = (sharedData.speedMod or 0) - 3
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 2000*HP_MULT
+			sharedData.speedMod = (sharedData.speedMod or 0) - 2
 		end
 	},
 	{
 		name = "module_dmg_booster",
 		humanName = "Damage Booster",
-		description = "Damage Booster - Increases damage by 10% but reduces speed by 1.  Limit: 8",
+		description = "Damage Booster - Increases damage by 15% but reduces speed by 1.  Limit: 5",
 		image = moduleImagePath .. "module_dmg_booster.png",
-		limit = 8,
+		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.damageMult = (sharedData.damageMult or 1) + 0.1
+			sharedData.damageMult = (sharedData.damageMult or 1) + 0.15
 			sharedData.speedMod = (sharedData.speedMod or 0) - 1
 		end
 	},
 	{
 		name = "module_high_power_servos",
 		humanName = "High Power Servos",
-		description = "High Power Servos - Increases speed by 3. Limit: 8",
+		description = "High Power Servos - Increases speed by 3. Limit: 5",
 		image = moduleImagePath .. "module_high_power_servos.png",
-		limit = 8,
-		cost = 150 * COST_MULT,
+		limit = 5,
+		cost = 200 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -779,10 +835,10 @@ local moduleDefs = {
 	{
 		name = "module_adv_targeting",
 		humanName = "Adv. Targeting System",
-		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 1. Limit: 8",
+		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 1. Limit: 5",
 		image = moduleImagePath .. "module_adv_targeting.png",
-		limit = 8,
-		cost = 150 * COST_MULT,
+		limit = 5,
+		cost = 200 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -793,14 +849,14 @@ local moduleDefs = {
 	{
 		name = "module_adv_nano",
 		humanName = "CarRepairer's Nanolathe",
-		description = "CarRepairer's Nanolathe - Increases build power by 4. Limit: 8",
+		description = "CarRepairer's Nanolathe - Increases build power by 5. Limit: 5",
 		image = moduleImagePath .. "module_adv_nano.png",
-		limit = 8,
-		cost = 150 * COST_MULT,
+		limit = 5,
+		cost = 200 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
+			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 5
 		end
 	},
 	
@@ -820,6 +876,18 @@ local moduleDefs = {
 		end
 	}
 }
+
+-- Add advanced versions of basic weapons
+for i = 1, #moduleDefs do
+	local def = moduleDefs[i]
+	if basicWeapons[def.name] then
+		local newDef = Spring.Utilities.CopyTable(def, true)
+		newDef.name = newDef.cost .. "_adv"
+		newDef.slotType = "adv_weapon"
+		newDef.cost = 350 * COST_MULT
+		moduleDefs[#moduleDefs + 1] = newDef
+	end
+end
 
 for name, data in pairs(skinDefs) do
 	moduleDefs[#moduleDefs + 1] = {
@@ -888,7 +956,7 @@ end
 local morphCosts = {
 	50,
 	100,
-	650,
+	150,
 	200,
 	250,
 }
@@ -912,7 +980,7 @@ local chassisDefs = {
 		baseUnitDef = UnitDefNames and UnitDefNames["dynstrike0"].id,
 		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
-		secondPeashooter = true,
+		secondPeashooter = false,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 5,
@@ -977,7 +1045,7 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotAllows = {"adv_weapon", "basic_weapon"},
+						slotAllows = "adv_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
@@ -1314,7 +1382,7 @@ local chassisDefs = {
 		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
 		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
-		secondPeashooter = true,
+		secondPeashooter = false,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 5,
@@ -1383,7 +1451,7 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotAllows = {"adv_weapon", "basic_weapon"},
+						slotAllows = "adv_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
@@ -1520,7 +1588,7 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotAllows = {"adv_weapon", "basic_weapon"},
+						slotAllows = "adv_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
@@ -1604,8 +1672,12 @@ end
 -- Set cost in module tooltip
 for i = 1, #moduleDefs do
 	local data = moduleDefs[i]
-	if data.cost > 0 then
-		data.description = data.description .. "\nCost: " .. data.cost
+	if not data.emptyModule then
+		if data.cost > 0 then
+			data.description = data.description .. "\nCost: " .. data.cost
+		else
+			data.description = data.description .. "\nCost: Free"
+		end
 	end
 end
 

@@ -25,7 +25,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 300,
+		default = 330,
 	},
 
 	explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
