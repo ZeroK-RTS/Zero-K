@@ -159,6 +159,9 @@ end
 
 local function CheckMobileUnit(unitID, moveType)
 	local x, _, z = spGetUnitPosition(unitID)
+	if not x then
+		return true
+	end
 	if (moveType == 2 and not IsInBounds(x, z)) or (moveType~= 2 and IsNearBorderOrOutOfBounds(x, z)) then
 		IterableMap.Add(outOfBoundsUnits, unitID, moveType)
 		return true -- remove from mobileUnits
@@ -167,6 +170,9 @@ end
 
 local function HandleOutOFBoundsUnit(unitID, moveType)
 	local ux, _, uz = spGetUnitPosition(unitID)
+	if not ux then
+		return true
+	end
 	if IsInBounds(ux, uz) then
 		if moveType ~= 2 and IsNearBorderOrOutOfBounds(ux, uz) then
 			return -- Keep track of aircraft near border.
