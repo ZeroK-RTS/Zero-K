@@ -1044,7 +1044,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1176,7 +1176,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1311,7 +1311,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1450,7 +1450,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1587,7 +1587,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
 						slotAllows = "adv_weapon",
 					},
 					{
