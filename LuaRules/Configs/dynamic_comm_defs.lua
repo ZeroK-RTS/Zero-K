@@ -21,11 +21,11 @@ local HP_MULT = 1
 
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
-    if modOptions then
-        if modOptions.hpmult and modOptions.hpmult ~= 1 then
-            HP_MULT = modOptions.hpmult
-        end
-    end
+	if modOptions then
+		if modOptions.hpmult and modOptions.hpmult ~= 1 then
+			HP_MULT = modOptions.hpmult
+		end
+	end
 end
 
 local moduleImagePath = "unitpics/"
@@ -1119,7 +1119,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.strike.commweapon_beamlaser,
+						defaultModule = moduleDefNames.strike.commweapon_beamlaser_adv,
 						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
@@ -1251,7 +1251,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.recon.commweapon_beamlaser,
+						defaultModule = moduleDefNames.recon.commweapon_disruptorbomb,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1386,7 +1386,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.support.commweapon_beamlaser,
+						defaultModule = moduleDefNames.support.commweapon_disruptorbomb,
 						slotAllows = "adv_weapon",
 					},
 					{
@@ -1525,7 +1525,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.assault.commweapon_beamlaser,
+						defaultModule = moduleDefNames.assault.commweapon_beamlaser_adv,
 						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
@@ -1662,7 +1662,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.knight.commweapon_beamlaser,
+						defaultModule = moduleDefNames.knight.commweapon_beamlaser_adv,
 						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
