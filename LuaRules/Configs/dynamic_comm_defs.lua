@@ -745,11 +745,27 @@ local moduleDefs = {
 	{
 		name = "module_autorepair",
 		humanName = "Autorepair",
+		description = "Autorepair - Commander self-repairs at +" .. 12*HP_MULT .. " hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 5",
+		image = moduleImagePath .. "module_autorepair.png",
+		limit = 5,
+		cost = 150 * COST_MULT,
+		requireLevel = 1,
+		requireChassis = {"strike", "knight"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12*HP_MULT
+			sharedData.healthBonus = (sharedData.healthBonus or 0) - 100*HP_MULT
+		end
+	},
+	{
+		name = "module_autorepair",
+		humanName = "Autorepair",
 		description = "Autorepair - Commander self-repairs at +" .. 10*HP_MULT .. " hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 5",
 		image = moduleImagePath .. "module_autorepair.png",
 		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
+		requireChassis = {"assault", "recon", "support"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10*HP_MULT
@@ -1071,7 +1087,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 8
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike1_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -1091,7 +1107,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike2_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -1111,7 +1127,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 15
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 16
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
@@ -1614,7 +1630,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[1],
 				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 8
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynknight1_" .. GetKnightCloneModulesString(modulesByDefID)].id
@@ -1634,7 +1650,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[2],
 				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynknight2_" .. GetKnightCloneModulesString(modulesByDefID)].id
@@ -1654,7 +1670,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 16
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynknight3_" .. GetKnightCloneModulesString(modulesByDefID)].id
@@ -1678,7 +1694,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynknight4_" .. GetKnightCloneModulesString(modulesByDefID)].id
@@ -1702,7 +1718,7 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 25
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynknight5_" .. GetKnightCloneModulesString(modulesByDefID)].id

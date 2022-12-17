@@ -5,6 +5,7 @@ unitDef.buildPic = [[cremcom.png]]
 unitDef.objectName = [[cremcom.s3o]]
 unitDef.script  = [[dynknight.lua]]
 unitDef.maxVelocity = 1.35
+unitDef.radarDistanceJam = 175
 
 unitDef.customParams.commtype = "6"
 unitDef.customParams.statsname = "dynknight1"
