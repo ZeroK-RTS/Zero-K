@@ -926,7 +926,6 @@ local moduleDefs = {
 		image = moduleImagePath .. "module_ablative_armor.png",
 		limit = 1,
 		cost = 0,
-		requireChassis = {},
 		requireLevel = 0,
 		slotType = "decoration",
 		applicationFunction = function (modules, sharedData)
