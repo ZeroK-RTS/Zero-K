@@ -652,7 +652,7 @@ local moduleDefs = {
 	{
 		name = "module_personal_cloak",
 		humanName = "Personal Cloak",
-		description = "Personal Cloak - A personal cloaking device. Reduces speed by 8.",
+		description = "Personal Cloak - A personal cloaking device. Reduces total speed by 12%.",
 		image = moduleImagePath .. "module_personal_cloak.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
@@ -662,7 +662,7 @@ local moduleDefs = {
 		applicationFunction = function (modules, sharedData)
 			sharedData.decloakDistance = math.max(sharedData.decloakDistance or 0, 150)
 			sharedData.personalCloak = true
-			sharedData.speedMod = (sharedData.speedMod or 0) - 8
+			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.12
 		end
 	},
 	{
