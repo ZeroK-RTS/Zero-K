@@ -5,7 +5,7 @@ local weaponDef = {
 	avoidFeature            = false,
 	avoidNeutral            = false,
 	areaOfEffect            = 160,
-	burst                   = 2,
+	burst                   = 3,
 	burstRate               = 0.033,
 	commandFire             = true,
 	craterBoost             = 1,
@@ -25,7 +25,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 330,
+		default = 300,
 	},
 
 	explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
@@ -34,7 +34,7 @@ local weaponDef = {
 	impulseFactor           = 0.2,
 	interceptedByShieldType = 2,
 	model                   = [[wep_b_canister.s3o]],
-	projectiles             = 4,
+	projectiles             = 3,
 	range                   = 360,
 	reloadtime              = 30,
 	smokeTrail              = true,
@@ -43,7 +43,7 @@ local weaponDef = {
 	soundStart              = [[weapon/cannon/cannon_fire3]],
 	soundStartVolume        = 2,
 	soundTrigger            = true,
-	sprayangle              = 2500,
+	sprayangle              = 3000,
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 400,

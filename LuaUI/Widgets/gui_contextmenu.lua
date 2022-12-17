@@ -325,16 +325,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function comma_value(amount, displayPlusMinus)
+function comma_value(amount, displayPlusMinus, forceDecimal)
 	local formatted
 
 	-- amount is a string when ToSI is used before calling this function
 	if amount and type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else
+		if (amount == 0) then formatted = "0" else
 			if (amount < 2 and (amount * 100)%100 ~=0) then
 				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
 				else formatted = strFormat("%.2f", amount) end
-			elseif (amount < 20 and (amount * 10)%10 ~=0) then
+			elseif (amount < 20 and (amount * 10)%10 ~=0) or forceDecimal then
 				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
 				else formatted = strFormat("%.1f", amount) end
 			else
@@ -351,10 +351,8 @@ function comma_value(amount, displayPlusMinus)
 	return formatted
 end
 
-
-
-local function numformat(num)
-	return options.shortNotation.value and ToSIPrec(num) or comma_value(num)
+local function numformat(num, forceDecimal)
+	return options.shortNotation.value and ToSIPrec(num) or comma_value(num, false, forceDecimal)
 end
 
 local function AdjustWindow(window)
@@ -1007,7 +1005,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ' - Range:'
 		cells[#cells+1] = cp.jump_range .. " elmo"
 		cells[#cells+1] = ' - Reload: '
-		cells[#cells+1] = cp.jump_reload .. 's'
+		cells[#cells+1] = (cp.jump_reload + ((unitID and Spring.GetUnitRulesParam(unitID, "upgradesJumpReloadMod")) or 0)) .. 's'
 		cells[#cells+1] = ' - Speed:'
 		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
 		cells[#cells+1] = ' - Midair jump:'
@@ -1427,7 +1425,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 
 	local cost = numformat(ud.metalCost)
 	local health = numformat(ud.health)
-	local speed = numformat(ud.speed)
+	local speed = numformat(ud.speed, true) -- Speeds often have 0.5s
 	local mass = numformat(ud.mass)
 	
 	-- stuff for modular commanders
@@ -1441,7 +1439,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	if isCommander then
 		cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or 1200
 		health = select(2, Spring.GetUnitHealth(unitID))
-		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
+		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1), true) -- Show a decimal place for comms due to fractional speed modules
 		mass = numformat(Spring.GetUnitRulesParam(unitID, "massOverride") or ud.mass)
 
 		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }

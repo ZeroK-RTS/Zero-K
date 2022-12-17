@@ -67,6 +67,7 @@ local moduleSlotTypeMap = {
 	module = "module",
 	basic_weapon = "module",
 	adv_weapon = "module",
+	dual_basic_weapon = "module",
 }
 
 local function SetUnitRulesModule(unitID, counts, moduleDefID)
@@ -111,9 +112,16 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
-	if data.speedMod then
-		local speedMult = (data.speedMod + ud.speed)/ud.speed
+	if data.speedMultPost or data.speedMod then
+		local speedMult = (data.speedMultPost or 1)*((data.speedMod or 0) + ud.speed)/ud.speed
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", speedMult, INLOS)
+	end
+	
+	if data.jumpReloadMod then
+		Spring.SetUnitRulesParam(unitID, "upgradesJumpReloadMod", data.jumpReloadMod, INLOS)
+		if GG.SetJumpReloadMod then
+			GG.SetJumpReloadMod(unitID, data.jumpReloadMod)
+		end
 	end
 	
 	if data.radarRange then
@@ -370,11 +378,13 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, targetLevel)
+	local chassisName = commProfileInfo.chassis
+	local chassisModuleDefs = moduleDefNames[chassisName] or {}
 	for i = 0, targetLevel do
 		local levelModules = commProfileInfo.modules[i]
 		if levelModules then
 			for j = 1, #levelModules do
-				local moduleID = moduleDefNames[levelModules[j]]
+				local moduleID = chassisModuleDefs[levelModules[j]]
 				if moduleID and moduleDefs[moduleID] then
 					moduleList[#moduleList + 1] = moduleID
 					moduleCost = moduleCost + moduleDefs[moduleID].cost
@@ -426,7 +436,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
-	local moduleList = {moduleDefNames.econ, moduleDefNames.module_radarnet}
+	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
+	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
 		moduleCost = moduleCost + moduleDefs[moduleList[i]].cost
@@ -435,8 +446,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	if commProfileInfo.decorations then
 		for i = 1, #commProfileInfo.decorations do
 			local decName = commProfileInfo.decorations[i]
-			if moduleDefNames[decName] then
-				moduleList[#moduleList + 1] = moduleDefNames[decName]
+			if chassisModuleDefs[decName] then
+				moduleList[#moduleList + 1] = chassisModuleDefs[decName]
 			end
 		end
 	end
@@ -490,14 +501,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if profileID then
 		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
+		local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
 		
 		-- Add decorations
 		local moduleList = {}
 		if commProfileInfo.decorations then
 			for i = 1, #commProfileInfo.decorations do
 				local decName = commProfileInfo.decorations[i]
-				if moduleDefNames[decName] then
-					moduleList[#moduleList + 1] = moduleDefNames[decName]
+				if chassisModuleDefs[decName] then
+					moduleList[#moduleList + 1] = chassisModuleDefs[decName]
 				end
 			end
 		end

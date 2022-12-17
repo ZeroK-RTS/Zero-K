@@ -69,6 +69,7 @@ local landBoxSize = 60
 local jumps = {}
 local jumping = {}
 local goalSet = {}
+local jumpReloadMod = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -222,7 +223,7 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local delay            = jumpDef.delay
 	local height           = jumpDef.height
 	local cannotJumpMidair = jumpDef.cannotJumpMidair
-	local reloadTime       = (jumpDef.reload or 0)*30
+	local reloadTime       = ((jumpDef.reload or 0) + (jumpReloadMod[unitID] or 0)) * 30
 	local teamID           = spGetUnitTeam(unitID)
 	
 	if (not mustJump) and ((cannotJumpMidair and abs(startHeight - start[2]) > 1) or (start[2] < -UnitDefs[unitDefID].maxWaterDepth)) then
@@ -486,6 +487,9 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	if jumping[oldUnitID] then
 		jumping[oldUnitID] = nil -- empty old unit's data
 	end
+	if jumpReloadMod[unitID] then
+		jumpReloadMod[unitID] = nil
+	end
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
@@ -637,6 +641,13 @@ function gadget:GameFrame(currFrame)
 			jumps[coords] = nil
 		end
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function GG.SetJumpReloadMod(unitID, value)
+	jumpReloadMod[unitID] = value
 end
 
 --------------------------------------------------------------------------------

@@ -76,8 +76,8 @@ if (vsx < 1024 or vsy < 768) then
 end
 
 local commTips = {
-	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA slow tanky chassis with a wide range of weapons and inbuilt battle drones. Can dual wield and gains extra health from armour modules.",
-	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Otherwise has poor survivability and lower build power.",
+	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA slow tanky chassis with a wide range of weapons and inbuilt battle drones. Can dual wield and gains 25% extra health from armour modules.",
+	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Gains bonus speed and jump cooldown from speed modules. Otherwise has poor survivability and lower build power.",
 	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with good speed and health. Can dual wield and gains extra health regeneration with levels.",
 	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to increase production. It has relatively poor speed and health.",
 	["LuaUI/Images/startup_info_selector/chassis_cremcom.png"] = "Select Campaign Chassis\nCan mount any module.",

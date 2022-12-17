@@ -50,6 +50,8 @@ local basicWeapons = {
 }
 
 local moduleDefNames = {}
+local moduleDefNamesAllList = {}
+local chassisList = {"recon", "strike", "assault", "support", "knight"}
 
 local moduleDefs = {
 	-- Empty Module Slots
@@ -86,6 +88,17 @@ local moduleDefs = {
 		cost = 0 * COST_MULT,
 		requireLevel = 0,
 		slotType = "adv_weapon",
+	},
+	{
+		name = "nulldualbasicweapon",
+		humanName = "No Weapon",
+		description = "No Weapon",
+		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
+		limit = false,
+		emptyModule = true,
+		cost = 0 * COST_MULT,
+		requireLevel = 0,
+		slotType = "dual_basic_weapon",
 	},
 	
 	-- Weapons
@@ -165,7 +178,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_heavymachinegun_disrupt") or "commweapon_heavymachinegun"
+			local weaponName = (modules[moduleDefNamesAllList.conversion_disruptor[1]] and "commweapon_heavymachinegun_disrupt") or "commweapon_heavymachinegun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -209,7 +222,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.weaponmod_stun_booster] and "commweapon_lightninggun_improved") or "commweapon_lightninggun"
+			local weaponName = (modules[moduleDefNamesAllList.weaponmod_stun_booster[1]] and "commweapon_lightninggun_improved") or "commweapon_lightninggun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -231,7 +244,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_disruptor") or "commweapon_lparticlebeam"
+			local weaponName = (modules[moduleDefNamesAllList.conversion_disruptor[1]] and "commweapon_disruptor") or "commweapon_lparticlebeam"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -274,7 +287,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.weaponmod_napalm_warhead] and "commweapon_riotcannon_napalm") or "commweapon_riotcannon"
+			local weaponName = (modules[moduleDefNamesAllList.weaponmod_napalm_warhead[1]] and "commweapon_riotcannon_napalm") or "commweapon_riotcannon"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -296,7 +309,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.weaponmod_napalm_warhead] and "commweapon_rocketlauncher_napalm") or "commweapon_rocketlauncher"
+			local weaponName = (modules[moduleDefNamesAllList.weaponmod_napalm_warhead[1]] and "commweapon_rocketlauncher_napalm") or "commweapon_rocketlauncher"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -318,7 +331,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_shotgun_disrupt") or "commweapon_shotgun"
+			local weaponName = (modules[moduleDefNamesAllList.conversion_disruptor[1]] and "commweapon_shotgun_disrupt") or "commweapon_shotgun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -340,7 +353,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_heavy_disruptor") or "commweapon_hparticlebeam"
+			local weaponName = (modules[moduleDefNamesAllList.conversion_disruptor[1]] and "commweapon_heavy_disruptor") or "commweapon_hparticlebeam"
 			sharedData.weapon1 = weaponName
 			sharedData.weapon2 = nil
 			sharedData.noMoreWeapons = true
@@ -463,7 +476,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.weaponmod_stun_booster] and "commweapon_multistunner_improved") or "commweapon_multistunner"
+			local weaponName = (modules[moduleDefNamesAllList.weaponmod_stun_booster[1]] and "commweapon_multistunner_improved") or "commweapon_multistunner"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -688,7 +701,7 @@ local moduleDefs = {
 	{
 		name = "module_jumpjet",
 		humanName = "Jumpjets",
-		description = "Jumpjets - Leap over obstacles and out of danger.",
+		description = "Jumpjets - Leap over obstacles and out of danger. Each High Powered Servos reduces jump reload by 1s.",
 		image = moduleImagePath .. "module_jumpjet.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
@@ -744,34 +757,34 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "module_ablative_armor_better",
+		name = "module_ablative_armor",
 		humanName = "Ablative Armour Plates",
-		description = "Ablative Armour Plates - Provides " .. 700*HP_MULT .. " health. Limit: 5",
+		description = "Ablative Armour Plates - Provides " .. 750*HP_MULT .. " health. Limit: 5",
 		image = moduleImagePath .. "module_ablative_armor.png",
 		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
-		requireChassis = {"assault"},
+		requireChassis = {"assault", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.healthBonus = (sharedData.healthBonus or 0) + 700*HP_MULT
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 750*HP_MULT
 		end
 	},
 	{
-		name = "module_heavy_armor_better",
+		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides " .. 2000*HP_MULT .. " health but reduces speed by 2. " ..
+		description = "High Density Plating - Provides " .. 2000*HP_MULT .. " health but reduces total speed by 2%. " ..
 		"Limit: 5, Requires Ablative Armour Plates",
 		image = moduleImagePath .. "module_heavy_armor.png",
 		limit = 5,
 		cost = 400 * COST_MULT,
-		requireOneOf = {"module_ablative_armor_better"},
+		requireOneOf = {"module_ablative_armor"},
 		requireLevel = 2,
-		requireChassis = {"assault"},
+		requireChassis = {"assault", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 2000*HP_MULT
-			sharedData.speedMod = (sharedData.speedMod or 0) - 2
+			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.02
 		end
 	},
 	{
@@ -782,7 +795,7 @@ local moduleDefs = {
 		limit = 5,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
-		requireChassis = {"strike", "recon", "support", "knight"},
+		requireChassis = {"strike", "recon", "support"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600*HP_MULT
@@ -791,7 +804,7 @@ local moduleDefs = {
 	{
 		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides " .. 1700*HP_MULT .. " health but reduces speed by 2. " ..
+		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces total speed by 2%. " ..
 		"Limit: 5, Requires Ablative Armour Plates",
 		image = moduleImagePath .. "module_heavy_armor.png",
 		limit = 5,
@@ -802,13 +815,13 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 2000*HP_MULT
-			sharedData.speedMod = (sharedData.speedMod or 0) - 2
+			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.02
 		end
 	},
 	{
 		name = "module_dmg_booster",
 		humanName = "Damage Booster",
-		description = "Damage Booster - Increases damage by 15% but reduces speed by 1.  Limit: 5",
+		description = "Damage Booster - Increases damage by 15% but reduces total speed by 2%.  Limit: 5",
 		image = moduleImagePath .. "module_dmg_booster.png",
 		limit = 5,
 		cost = 150 * COST_MULT,
@@ -816,26 +829,42 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.damageMult = (sharedData.damageMult or 1) + 0.15
-			sharedData.speedMod = (sharedData.speedMod or 0) - 1
+			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.02
 		end
 	},
 	{
 		name = "module_high_power_servos",
 		humanName = "High Power Servos",
-		description = "High Power Servos - Increases speed by 3. Limit: 5",
+		description = "High Power Servos - Increases speed by 4 and reduced jump cooldown by 1s. Limit: 5",
 		image = moduleImagePath .. "module_high_power_servos.png",
 		limit = 5,
 		cost = 200 * COST_MULT,
 		requireLevel = 1,
+		requireChassis = {"recon", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.speedMod = (sharedData.speedMod or 0) + 3
+			sharedData.speedMod = (sharedData.speedMod or 0) + 4
+			sharedData.jumpReloadMod = (sharedData.jumpReloadMod or 0) - 1
+		end
+	},
+	{
+		name = "module_high_power_servos",
+		humanName = "High Power Servos",
+		description = "High Power Servos - Increases speed by 3.5. Limit: 5",
+		image = moduleImagePath .. "module_high_power_servos.png",
+		limit = 5,
+		cost = 200 * COST_MULT,
+		requireLevel = 1,
+		requireChassis = {"strike", "assault", "support"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.speedMod = (sharedData.speedMod or 0) + 3.5
 		end
 	},
 	{
 		name = "module_adv_targeting",
 		humanName = "Adv. Targeting System",
-		description = "Advanced Targeting System - Increases range by 7.5% but reduces speed by 1. Limit: 5",
+		description = "Advanced Targeting System - Increases range by 7.5% but reduces total speed by 3%. Limit: 5",
 		image = moduleImagePath .. "module_adv_targeting.png",
 		limit = 5,
 		cost = 200 * COST_MULT,
@@ -843,7 +872,21 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.075
-			sharedData.speedMod = (sharedData.speedMod or 0) - 1
+			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.03
+		end
+	},
+	{
+		name = "module_adv_nano",
+		humanName = "CarRepairer's Nanolathe",
+		description = "CarRepairer's Nanolathe - Increases build power by 6. Limit: 5",
+		image = moduleImagePath .. "module_adv_nano.png",
+		limit = 5,
+		cost = 200 * COST_MULT,
+		requireLevel = 1,
+		requireChassis = {"support"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
 		end
 	},
 	{
@@ -854,9 +897,24 @@ local moduleDefs = {
 		limit = 5,
 		cost = 200 * COST_MULT,
 		requireLevel = 1,
+		requireChassis = {"strike", "assault", "knight"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 5
+		end
+	},
+	{
+		name = "module_adv_nano",
+		humanName = "CarRepairer's Nanolathe",
+		description = "CarRepairer's Nanolathe - Increases build power by 4. Limit: 5",
+		image = moduleImagePath .. "module_adv_nano.png",
+		limit = 5,
+		cost = 200 * COST_MULT,
+		requireLevel = 1,
+		requireChassis = {"recon"},
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
 		end
 	},
 	
@@ -877,13 +935,13 @@ local moduleDefs = {
 	}
 }
 
--- Add advanced versions of basic weapons
+-- Add second versions of basic weapons
 for i = 1, #moduleDefs do
 	local def = moduleDefs[i]
 	if basicWeapons[def.name] then
 		local newDef = Spring.Utilities.CopyTable(def, true)
 		newDef.name = newDef.name .. "_adv"
-		newDef.slotType = "adv_weapon"
+		newDef.slotType = "dual_basic_weapon"
 		newDef.cost = 350 * COST_MULT
 		moduleDefs[#moduleDefs + 1] = newDef
 	end
@@ -907,8 +965,25 @@ for name, data in pairs(skinDefs) do
 end
 
 for i = 1, #moduleDefs do
-	moduleDefNames[moduleDefs[i].name] = i
+	local data = moduleDefNamesAllList[moduleDefs[i].name] or {}
+	data[#data + 1] = i
+	moduleDefNamesAllList[moduleDefs[i].name] = data
 end
+
+for i = 1, #chassisList do
+	moduleDefNames[chassisList[i]] = {}
+end
+
+for i = 1, #moduleDefs do
+	local data = moduleDefs[i]
+	local allowedChassis = moduleDefs[i].requireChassis or chassisList
+	for j = 1, #allowedChassis do
+		moduleDefNames[allowedChassis[j]][data.name] = i
+	end
+end
+
+Spring.Utilities.TableEcho(moduleDefNamesAllList, "moduleDefNamesAllList")
+Spring.Utilities.TableEcho(moduleDefNames, "moduleDefNames")
 
 ------------------------------------------------------------------------
 -- Chassis Definitions
@@ -927,30 +1002,30 @@ end
 -- clone which was given those modules.
 
 local function GetReconCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0)
+	return (modulesByDefID[moduleDefNames.recon.commweapon_personal_shield] or 0)
 end
 
 local function GetSupportCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
-		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
-		(modulesByDefID[moduleDefNames.module_resurrect] or 0)
+	return (modulesByDefID[moduleDefNames.support.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.support.commweapon_areashield] or 0) ..
+		(modulesByDefID[moduleDefNames.support.module_resurrect] or 0)
 end
 
 local function GetAssaultCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
-		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
+	return (modulesByDefID[moduleDefNames.assault.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.assault.commweapon_areashield] or 0)
 end
 
 local function GetStrikeCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
-		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
+	return (modulesByDefID[moduleDefNames.strike.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.strike.commweapon_areashield] or 0)
 end
 
 local function GetKnightCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
-		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
-		(modulesByDefID[moduleDefNames.module_resurrect] or 0) ..
-		(modulesByDefID[moduleDefNames.module_jumpjet] or 0)
+	return (modulesByDefID[moduleDefNames.knight.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.knight.commweapon_areashield] or 0) ..
+		(modulesByDefID[moduleDefNames.knight.module_resurrect] or 0) ..
+		(modulesByDefID[moduleDefNames.knight.module_jumpjet] or 0)
 end
 
 local morphCosts = {
@@ -1004,11 +1079,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.strike.commweapon_beamlaser,
 						slotAllows = "basic_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1024,11 +1099,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1037,22 +1112,22 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[3],
 				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 16
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 15
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
-						slotAllows = "adv_weapon",
+						defaultModule = moduleDefNames.strike.commweapon_beamlaser,
+						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1061,22 +1136,22 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[4],
 				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 25
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike4_" .. GetStrikeCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1085,22 +1160,22 @@ local chassisDefs = {
 				morphBuildPower = morphBuildPower[5],
 				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
-					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 35
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 25
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynstrike5_" .. GetStrikeCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.strike.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1136,11 +1211,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.recon.commweapon_beamlaser,
 						slotAllows = "basic_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1156,11 +1231,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1176,15 +1251,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
+						defaultModule = moduleDefNames.recon.commweapon_beamlaser,
 						slotAllows = "adv_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1200,15 +1275,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1224,15 +1299,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.recon.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1269,11 +1344,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.support.commweapon_beamlaser,
 						slotAllows = "basic_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1290,11 +1365,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1311,15 +1386,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
+						defaultModule = moduleDefNames.support.commweapon_beamlaser,
 						slotAllows = "adv_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1336,15 +1411,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1361,15 +1436,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.support.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1408,11 +1483,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.assault.commweapon_beamlaser,
 						slotAllows = "basic_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1429,11 +1504,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1450,15 +1525,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
-						slotAllows = "adv_weapon",
+						defaultModule = moduleDefNames.assault.commweapon_beamlaser,
+						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1475,15 +1550,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1500,15 +1575,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.assault.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1547,11 +1622,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser,
+						defaultModule = moduleDefNames.knight.commweapon_beamlaser,
 						slotAllows = "basic_weapon",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1567,11 +1642,11 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1587,15 +1662,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.commweapon_beamlaser_adv,
-						slotAllows = "adv_weapon",
+						defaultModule = moduleDefNames.knight.commweapon_beamlaser,
+						slotAllows = {"dual_basic_weapon", "adv_weapon"},
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1611,15 +1686,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1635,15 +1710,15 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 					{
-						defaultModule = moduleDefNames.nullmodule,
+						defaultModule = moduleDefNames.knight.nullmodule,
 						slotAllows = "module",
 					},
 				},
@@ -1689,9 +1764,11 @@ for i = 1, #moduleDefs do
 	if data.requireOneOf then
 		local newRequire = {}
 		for j = 1, #data.requireOneOf do
-			local reqModuleID = moduleDefNames[data.requireOneOf[j]]
-			if reqModuleID then
-				newRequire[#newRequire + 1] = reqModuleID
+			local reqModuleIDs = moduleDefNamesAllList[data.requireOneOf[j]]
+			if reqModuleIDs then
+				for i = 1, #reqModuleIDs do
+					newRequire[#newRequire + 1] = reqModuleIDs[i]
+				end
 			end
 		end
 		data.requireOneOf = newRequire
@@ -1701,14 +1778,15 @@ for i = 1, #moduleDefs do
 	if data.prohibitingModules then
 		local newProhibit = {}
 		for j = 1, #data.prohibitingModules do
-			local reqModuleID = moduleDefNames[data.prohibitingModules[j]]
-			if reqModuleID then
-				newProhibit[#newProhibit + 1] = reqModuleID
+			local reqModuleIDs = moduleDefNamesAllList[data.prohibitingModules[j]]
+			if reqModuleIDs then
+				for i = 1, #reqModuleIDs do
+					newProhibit[#newProhibit + 1] = reqModuleIDs[i]
+				end
 			end
 		end
 		data.prohibitingModules = newProhibit
 	end
-	
 	
 	-- Required chassis is a map indexed by chassisDefID
 	if data.requireChassis then
