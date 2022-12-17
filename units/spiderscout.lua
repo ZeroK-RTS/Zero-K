@@ -87,8 +87,8 @@ return { spiderscout = {
       },
 
       damage                  = {
-        default = 10.5,
-        planes  = 10.5
+        default = 12,
+        planes  = 12
       },
 
       explosionGenerator      = [[custom:beamweapon_hit_yellow_tiny]],

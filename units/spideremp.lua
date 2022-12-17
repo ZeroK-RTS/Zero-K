@@ -18,6 +18,7 @@ return { spideremp = {
   customParams           = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
+    bait_level_default = 0,
     modelradius    = [[19]],
     aim_lookahead  = 100,
     set_target_range_buffer = 30,
