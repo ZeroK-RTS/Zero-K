@@ -963,6 +963,21 @@ for i = 1, #moduleDefs do
 	end
 end
 
+--[[ Stochastic check for module IDs,
+     not perfect but should do its job.
+     See the error message below. ]]
+if moduleDefs[ 1].name ~= "nullmodule"
+or moduleDefs[ 4].name ~= "nulldualbasicweapon"
+or moduleDefs[10].name ~= "commweapon_lparticlebeam"
+or moduleDefs[25].name ~= "commweapon_personal_shield"
+or moduleDefs[42].name ~= "module_ablative_armor"
+or moduleDefs[61].name ~= "commweapon_shotgun_adv" then
+	Spring.Echo("MODULE IDs NEED TO STAY CONSTANT BECAUSE AI HARDCODES THEM.\n"
+	         .. "SEE https://github.com/ZeroK-RTS/Zero-K/issues/4796 \n"
+	         .. "REMEMBER TO CHANGE CircuitAI CONFIG IF MODIFYING THE LIST!")
+	Script.Kill()
+end
+
 for name, data in pairs(skinDefs) do
 	moduleDefs[#moduleDefs + 1] = {
 		name = "skin_" .. name,
