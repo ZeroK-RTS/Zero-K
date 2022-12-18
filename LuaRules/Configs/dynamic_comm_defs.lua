@@ -18,6 +18,7 @@ end
 
 local COST_MULT = 1
 local HP_MULT = 1
+local ECHO_MODULES_FOR_CIRCUIT = false
 
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
@@ -997,9 +998,6 @@ for i = 1, #moduleDefs do
 	end
 end
 
-Spring.Utilities.TableEcho(moduleDefNamesAllList, "moduleDefNamesAllList")
-Spring.Utilities.TableEcho(moduleDefNames, "moduleDefNames")
-
 ------------------------------------------------------------------------
 -- Chassis Definitions
 ------------------------------------------------------------------------
@@ -1959,6 +1957,30 @@ local utilities = {
 	ModuleListToByDefID    = ModuleListToByDefID,
 	GetUnitDefShield       = GetUnitDefShield
 }
+
+------------------------------------------------------------------------
+-- Circuit need static module IDs
+------------------------------------------------------------------------
+
+if ECHO_MODULES_FOR_CIRCUIT then
+	local function SortFunc(a, b)
+		return a[2] < b[2]
+	end
+
+	for chassis, chassisModules in pairs(moduleDefNames) do
+		Spring.Echo("==============================================================")
+		Spring.Echo("Modules for", chassis)
+		local printList = {}
+		for name, chassisDefID in pairs(chassisModules) do
+			printList[#printList + 1] = {chassisDefID, name}
+		end
+		table.sort(printList, SortFunc)
+		for i = 1, #printList do
+			Spring.Echo(printList[i][1], printList[i][2])
+		end
+	end
+	Spring.Echo("==============================================================")
+end
 
 ------------------------------------------------------------------------
 -- Return Values
