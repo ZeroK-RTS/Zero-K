@@ -444,6 +444,7 @@ function script.AimWeapon(num, heading, pitch)
 		return false
 	end
 
+	bAiming = true
 	return AimRifle(heading, pitch, dyncomm.IsManualFire(num))
 end
 
