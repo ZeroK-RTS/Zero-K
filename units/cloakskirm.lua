@@ -19,7 +19,7 @@ return { cloakskirm = {
     aim_lookahead  = 60,
     modelradius    = [[18]],
     midposoffset   = [[0 6 0]],
-    --reload_move_penalty = 0.8,
+    reload_move_penalty = 0.8,
     cus_noflashlight = 1,
     bait_level_default = 0,
   },
