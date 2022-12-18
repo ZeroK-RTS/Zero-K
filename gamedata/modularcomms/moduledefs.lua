@@ -83,6 +83,10 @@ upgrades = {
 		name = "Shotgun",
 		description = "Can hammer a single large target or shred many small ones",
 	},
+	commweapon_shotcannon = {
+		name = "12 gauge shotgun",
+		description = "Shotgun but shoots GLOWING HOT BALLS OF STEEL instead of nerd-ass lasers",
+	},
 	commweapon_slowbeam = {
 		name = "Slowing Beam",
 		description = "Slows an enemy's movement and firing rate; non-lethal",
