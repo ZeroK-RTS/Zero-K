@@ -42,7 +42,7 @@ local UP_IMPULSE = 0.25
 local SIDE_IMPULSE = 1.5
 local RAMP_DIST = 180
 local NEAR_DIST = 500
-local DEFAULT_EDGE_BORDER = 1000
+local DEFAULT_EDGE_BORDER = 800
 local DEFAULT_EDGE_NEAR = DEFAULT_EDGE_BORDER - NEAR_DIST
 
 local impulseMultipliers = {
