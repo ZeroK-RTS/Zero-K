@@ -951,7 +951,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 		if savedSlotLoadout[profileID] and savedSlotLoadout[profileID][level] then
 			slotDefaults = savedSlotLoadout[profileID][level]
 		else
-			local chassisModuleDefs = moduleDefNames[chassis] or {}
+			local chassisModuleDefs = moduleDefNames[(chassisDefs[chassis] or {}).name] or {}
 			local commProfileInfo = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 			if commProfileInfo and commProfileInfo.modules and commProfileInfo.modules[level + 1] then
 				local defData = commProfileInfo.modules[level + 1]
