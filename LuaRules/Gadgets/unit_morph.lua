@@ -507,7 +507,7 @@ local function FinishMorph(unitID, morphData)
 	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara, capture = captureProgress })
 	
 	--//transfer experience
-	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(unitID, morphData.def.into))
+	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(newUnit, morphData.def.into))
 	Spring.SetUnitExperience(newUnit, newXp)
 	--// transfer shield power
 	if oldShieldState then
