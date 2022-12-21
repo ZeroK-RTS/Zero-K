@@ -28,6 +28,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terratex == "1"
+local ECHO_COST = false
 
 -- Speedups
 local cos                   = math.cos
@@ -2171,13 +2172,16 @@ end
 --------------------------------------------------------------------------------
 
 local function deregisterTerraformUnit(id,terraformIndex,origin)
-	
 	if not terraformUnit[id] then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Terraform:")
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Attempted to remove nil terraform ID")
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Error Tpye " .. origin)
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Tell Google Frog")
 		return
+	end
+	
+	if ECHO_COST then
+		Spring.Echo("TerraCost", terraformUnit[id].totalSpent)
 	end
 	
 	--Removed Intercept Check
@@ -2231,7 +2235,6 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		terraformOrder[t.order].index[t.orderIndex] = terraformIndex
 	end
 	terraformUnitCount = terraformUnitCount - 1
-
 end
 
 local function updateTerraformEdgePoints(id)
