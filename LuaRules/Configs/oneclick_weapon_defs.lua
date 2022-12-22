@@ -42,7 +42,10 @@ local oneClickWepDefNames = {
 	},
 	--]]
 	planefighter = {
-		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+		{ functionToCall = "Sprint", reloadTime = 840, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
+	},
+	planeheavyfighter = {
+		{ functionToCall = "RotationBoost", reloadTime = 1050, name = "Rotation Boost", tooltip = "Botation boost (5x for 1 second, blocks firing)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png", reloadFullyHandledInScript = true},
 	},
 	--hoverriot = {
 	--	{ functionToCall = "Sprint", reloadTime = 1050, name = "Speed Boost", tooltip = "Speed boost (4x for 1 second)", useSpecialReloadRemaining = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},

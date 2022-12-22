@@ -112,7 +112,9 @@ local function doTheCommand(unitID, unitDefID, num)
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		local func = env[data.functionToCall]
 		Spring.UnitScript.CallAsUnit(unitID, func)
-		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 1, LOS_ACCESS)
+		if not data.reloadFullyHandledInScript then
+			Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 1, LOS_ACCESS)
+		end
 		return true
 	end
 

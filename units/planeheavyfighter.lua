@@ -26,6 +26,11 @@ return { planeheavyfighter = {
     bait_level_default = 0,
     bait_level_target      = 3,
 
+    specialreloadtime = [[1050]],
+    specialreload_userate = [[1]],
+    boost_turn_mult = 5,
+    boost_duration = 30, -- frames
+
     midposoffset   = [[0 3 0]],
     aimposoffset   = [[0 3 0]],
     modelradius    = [[10]],
