@@ -613,6 +613,8 @@ local function ReportPlayer(subject)
 	local isSpec = select(3, Spring.GetPlayerInfo(subject.id, false))
 	extraText = extraText .. ((isSpec and "Spectator, ") or "Player, ")
 
+	--[[ Somewhat obsolete given the direct link to battle gives all that info,
+	     but let it hang around in case we discover cases where it doesn't ]]
 	local utils = Spring.Utilities
 	local gametype = utils.Gametype
 	if gametype.isCompStomp() then
@@ -629,6 +631,11 @@ local function ReportPlayer(subject)
 		extraText = extraText .. teamCountFirst .. "v" .. teamCountSecond
 	end
 	extraText = extraText .. " on " .. Game.mapName
+
+	local gameID = Spring.GetGameRulesParam("GameID")
+	if gameID then
+		extraText = extraText .. " https://zero-k.info/Battles/EngineDetail/" .. gameID
+	end
 
 	local seconds = math.floor(Spring.GetGameFrame()/30)
 	local minutes = math.floor(seconds/60)
