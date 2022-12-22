@@ -807,15 +807,13 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.smoothradius then
-			cells[#cells+1] = ' - Smoothes ground'
-			--cells[#cells+1] = cp.smoothradius .. " radius" -- overlaps
-			cells[#cells+1] = ''
+			cells[#cells+1] = ' - Smooth ground'
+			cells[#cells+1] = numformat((tonumber(cp.smoothmult or 0) or 0)*100) .. '%'
 		end
 
 		if cp.movestructures then
-			cells[#cells+1] = ' - Smoothes under structures'
-			--cells[#cells+1] = cp.smoothradius .. " radius" -- overlaps
-			cells[#cells+1] = ''
+			cells[#cells+1] = ' - Smooth structures'
+			cells[#cells+1] = numformat((tonumber(cp.movestructures or 0) or 0)*100) .. '%'
 		end
 
 		local highTraj = wd.highTrajectory

@@ -126,10 +126,10 @@ return { zenith = {
         spawns_name = "asteroid_dead",
         spawns_feature = 1,
 
-        gatherradius     = [[280]],
-        smoothradius     = [[140]],
+        gatherradius     = [[240]],
+        smoothradius     = [[120]],
         smoothmult       = [[0.5]],
-        movestructures   = [[1]],
+        movestructures   = [[0.5]],
         quickgather      = [[1]],
       },
 

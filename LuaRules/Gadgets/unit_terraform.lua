@@ -2181,7 +2181,9 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 	end
 	
 	if ECHO_COST then
-		Spring.Echo("TerraCost", terraformUnit[id].totalSpent)
+		local cost = math.floor(terraformUnit[id].totalSpent + 0.5)
+		Spring.Echo("TerraCost", cost)
+		Spring.Utilities.UnitEcho(id, cost)
 	end
 	
 	--Removed Intercept Check

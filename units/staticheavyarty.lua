@@ -78,9 +78,10 @@ return { staticheavyarty = {
       craterMult              = 0.5,
 
       customParams            = {
-        gatherradius = [[128]],
-        smoothradius = [[96]],
-        smoothmult   = [[0.4]],
+        gatherradius     = [[240]],
+        smoothradius     = [[120]],
+        smoothmult       = [[0.5]],
+        movestructures   = [[0.25]],
         
         light_color = [[2.4 1.5 0.6]],
       },
