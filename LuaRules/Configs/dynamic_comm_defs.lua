@@ -831,7 +831,7 @@ local moduleDefs = {
 		requireChassis = {"strike", "recon", "support"},
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.healthBonus = (sharedData.healthBonus or 0) + 2000*HP_MULT
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600*HP_MULT
 			sharedData.speedMultPost = (sharedData.speedMultPost or 1) - 0.02
 		end
 	},
