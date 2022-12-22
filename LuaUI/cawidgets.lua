@@ -235,6 +235,7 @@ local flexCallIns = {
 	'AddConsoleMessage',
 	'Save',
 	'Load',
+	'GameID',
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -2489,6 +2490,12 @@ end
 function widgetHandler:AlliedUnitsChanged(visibleUnits, numVisibleUnits)
 	for _, w in ipairs(self.AlliedUnitsChangedList) do
 		w:AlliedUnitsChanged(alliedUnits, numAlliedUnits)
+	end
+end
+
+function widgetHandler:GameID(gameID)
+	for _, w in ipairs(self.GameIDList) do
+		w:GameID(gameID)
 	end
 end
 
