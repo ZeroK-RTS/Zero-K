@@ -117,6 +117,49 @@ return { shipaa = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 1500,
     },
+
+    EMG           = {
+      name                    = [[Anti-Air Autocannon]],
+      alphaDecay              = 0.7,
+      burst                   = 11,
+      burstRate               = 0.033,
+      burnBlow                = false,
+      canattackground         = false,
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargeting       = 1,
+
+      customParams              = {
+        isaa = [[1]],
+
+        light_camera_height = 1600,
+        light_color = [[0.9 0.86 0.45]],
+        light_radius = 140,
+      },
+
+      damage                  = {
+        default = 1,
+        planes  = 25,
+      },
+
+      explosionGenerator      = [[custom:ARCHPLOSION]],
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 0.8,
+      interceptedByShieldType = 1,
+      proximityPriority       = 4,
+      range                   = 1040,
+      reloadtime              = 2.2,
+      rgbColor                = [[1 0.95 0.4]],
+      separation              = 1.5,
+      sprayangle              = 512,
+      soundStart              = [[weapon/emg]],
+      stages                  = 10,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 1750,
+    },
   },
 
 
