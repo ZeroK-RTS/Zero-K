@@ -69,10 +69,14 @@ local ActuatorTipCCW = {ActuatorTip_4,ActuatorTip_5,ActuatorTip_6,ActuatorTip_7}
 
 local smokePiece = {Basis,ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3,ActuatorBase_4,ActuatorBase_5,ActuatorBase_6,ActuatorBase_7}
 
+local YAW_AIM_RATE = math.rad(2.5)
+local PITCH_AIM_RATE = math.rad(0.75)
+
 local oldHeight = 0
 local shooting = 0
 local wantedDirection = 0
-local ROTATION_SPEED = math.rad(3.5)/30
+
+local ROTATION_PER_FRAME = YAW_AIM_RATE/30
 local TARGET_ALT = 143565270/2^16
 local Vector = Spring.Utilities.Vector
 local max = math.max
@@ -253,13 +257,13 @@ function SpiralDown()
 		local aimOff = closestMultiple - currentHeading
 
 		if aimOff < 0 then
-			aimOff = math.max(-ROTATION_SPEED, aimOff)
+			aimOff = math.max(-ROTATION_PER_FRAME, aimOff)
 		else
-			aimOff = math.min(ROTATION_SPEED, aimOff)
+			aimOff = math.min(ROTATION_PER_FRAME, aimOff)
 		end
 		
-		CallSatelliteScript('mahlazer_AimAt', 0, 1)
-		Turn(SatelliteMuzzle, x_axis, 0, math.rad(1.2))
+		CallSatelliteScript('mahlazer_AimAt', 0, PITCH_AIM_RATE)
+		Turn(SatelliteMuzzle, x_axis, 0, YAW_AIM_RATE)
 		
 		Spring.SetUnitRotation(satUnitID, 0, currentHeading + aimOff - math.pi/2 , 0)
 		
@@ -291,15 +295,15 @@ function TargetingLaserUpdate()
 						local aimOff = (otherCurrentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
 						
 						if aimOff < 0 then
-							if aimOff < -ROTATION_SPEED then
-								aimOff = -ROTATION_SPEED
+							if aimOff < -ROTATION_PER_FRAME then
+								aimOff = -ROTATION_PER_FRAME
 								aimingDone = false
 							else
 								aimingDone = true
 							end
 						else
-							if aimOff > ROTATION_SPEED then
-								aimOff = ROTATION_SPEED
+							if aimOff > ROTATION_PER_FRAME then
+								aimOff = ROTATION_PER_FRAME
 								aimingDone = false
 							else
 								aimingDone = true
@@ -447,8 +451,8 @@ function script.AimWeapon(num, heading, pitch)
 		pitchFudge = (math.pi/2 + pitch)*0.998 - math.pi/2
 		
 		local speedMult = (GG.att_ReloadChange[unitID] or 1)
-		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2, speedMult)
-		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, speedMult*math.rad(1.2))
+		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2, PITCH_AIM_RATE*speedMult)
+		Turn(SatelliteMuzzle, x_axis, math.pi/2 + pitch, PITCH_AIM_RATE*speedMult)
 		WaitForTurn(SatelliteMuzzle, x_axis)
 		return aimingDone and (spGetUnitRulesParam(unitID, "lowpower") == 0)
 	end
