@@ -154,7 +154,7 @@ local knownFeatures = {}
 local reclaimColor = {1.0, 0.2, 1.0, 0.3}
 local reclaimEdgeColor = {1.0, 0.2, 1.0, 0.5}
 
-local E2M = 2 / 70 --solar ratio
+local E2M = 0 -- doesn't convert too well, plus would be inconsistent since trees aren't counted
 
 local drawFeatureConvexHullSolidList
 local drawFeatureConvexHullEdgeList
