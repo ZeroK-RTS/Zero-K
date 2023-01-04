@@ -515,11 +515,15 @@ function widgetHandler:Initialize()
 	TimeLoad("Start loading widget files")
 	-- stuff the widgets into unsortedWidgets
 	local widgetFiles = VFS.DirList(WIDGET_DIRNAME, "*.lua", VFSMODE)
+	local wantYield = Spring.Yield and Spring.Yield()
 	for k, wf in ipairs(widgetFiles) do
 		local widget = self:LoadWidget(wf)
 		TimeLoad("LoadWidget " .. wf)
 		if (widget) then
 			table.insert(unsortedWidgets, widget)
+		end
+		if wantYield then
+			Spring.Yield()
 		end
 	end
 	TimeLoad("End loading widget files")

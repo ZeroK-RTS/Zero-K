@@ -310,11 +310,15 @@ function gadgetHandler:Initialize()
   end
 
   -- stuff the gadgets into unsortedGadgets
+  local wantYield = Spring.Yield and Spring.Yield()
   for k,gf in ipairs(gadgetFiles) do
 --    Spring.Echo('gf2 = ' .. gf) -- FIXME
     local gadget = self:LoadGadget(gf)
     if (gadget) then
       table.insert(unsortedGadgets, gadget)
+    end
+    if wantYield then
+      Spring.Yield()
     end
   end
 
