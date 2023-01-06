@@ -44,7 +44,7 @@ local preventChaffShootingCmdDesc = {
 	name    = "Prevent Bait.",
 	action  = 'preventbait',
 	tooltip = 'Enable to prevent units shooting at cheap targets.',
-	params  = {0, 0, 35, 100, 300, 600}
+	params  = {0, 0, 35, 90, 240, 420}
 }
 
 function ChaffShootingBlock(unitID, targetID)
