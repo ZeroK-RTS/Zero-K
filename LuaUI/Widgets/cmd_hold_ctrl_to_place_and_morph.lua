@@ -10,6 +10,31 @@ function widget:GetInfo()
 	}
 end
 
+options_path = 'Settings/Unit Behaviour'
+options = {
+	enable_automorph = {
+		name = 'Morph buildings when placed with Ctrl',
+		desc = "If queued holding Ctrl, morphable buildings will start morphing when finished. Single build only (doesn't work with Shift).",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			local callins =
+				{ "UnitCommand"
+				, "UnitCreated"
+				, "UnitDestroyed"
+				, "UnitIdle"
+				, "UnitTaken"
+				, "PlayerChanged"
+			}
+			local func = self.value and widgetHandler.UpdateCallIn or widgetHandler.RemoveCallIn
+			for i = 1, #callins do
+				func(widgetHandler, callins[i])
+			end
+		end,
+		noHotkey = true,
+	},
+}
+
 ---@param names UnitInternalName[]
 ---@return table<UnitDefId, boolean>
 local function CreateUnitDefIdSet(names)
