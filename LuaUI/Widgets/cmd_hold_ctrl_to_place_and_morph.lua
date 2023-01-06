@@ -52,12 +52,9 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOp
 	local buildingsToMorph = buildingsToMorphByBuilder[unitID]
 	local point = { x = cmdParams[1], z = cmdParams[3] }
 
-	--[[ FIXME 1: CTRL gains other meanings when SHIFT is held,
-	              this is rare given the current set of morphables
-	              but it would be good to solve for modder reasons.
-
-	     FIXME 2: SPACE is captured elsewhere and doesn't work. ]]
-	if cmdOpts.ctrl then
+	--[[ FIXME: SPACE is captured elsewhere and
+	     doesn't work for inserting a morphable. ]]
+	if cmdOpts.ctrl and not cmdOpts.shift then
 		if not buildingsToMorph then
 			buildingsToMorph = {}
 			buildingsToMorphByBuilder[unitID] = buildingsToMorph
