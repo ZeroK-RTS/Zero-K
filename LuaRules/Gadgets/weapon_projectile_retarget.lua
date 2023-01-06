@@ -266,7 +266,6 @@ local function AddProjectile(proID, def, proOwnerID)
 	
 	if def.moveCtrlSpeed and projectiles[proID] then
 		Spring.SetProjectileMoveControl(proID, true)
-		Spring.SetPieceProjectileParams(proID, 1000)
 	end
 end
 

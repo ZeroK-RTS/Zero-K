@@ -90,7 +90,6 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	
 	projectileMoveCtrl[proID] = true
 	Spring.SetProjectileMoveControl(proID, true)
-	Spring.SetPieceProjectileParams(proID, 1000)
 	
 	if not projectileTimes[releaseFrame] then
 		projectileTimes[releaseFrame] = proID

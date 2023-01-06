@@ -28,7 +28,6 @@ local spSetProjectileVelocity = Spring.SetProjectileVelocity
 local spSetProjectileGravity  = Spring.SetProjectileGravity
 local spSpawnProjectile = Spring.SpawnProjectile
 local spSetProjectileTarget = Spring.SetProjectileTarget
-local spSetPieceProjectileParams = Spring.SetPieceProjectileParams
 local spGetUnitTeam = Spring.GetUnitTeam
 
 function gadget:Initialize()
@@ -113,8 +112,7 @@ local function ConvertWeaponUnderwater()
 					team = ownerTeamID,
 				}
 				local a, b = spGetProjectileTarget(id)
-				
-				spSetPieceProjectileParams(id,0) --not sure what this do, it set piece explosion tag to 0 (disable)
+
 				px = math.modf(px+0.5) --round the number to nearest integer
 				pz = math.modf(pz+0.5)
 				noExplosionVFX[proj.weaponID] = noExplosionVFX[proj.weaponID] or {}
