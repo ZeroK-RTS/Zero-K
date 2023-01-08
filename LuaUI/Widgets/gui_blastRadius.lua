@@ -172,14 +172,21 @@ function DrawBuildMenuBlastRange()
 	
 	if baseExplosionDef then
 		local blastRadius = baseExplosionDef.damageAreaOfEffect
-		local damage = baseExplosionDef.customParams.shield_damage
-		local text = "Damage: " .. damage
+		local damage = baseExplosionDef.customParams.stats_damage
+		local text = "Damage: " .. floor(damage)
+		if baseExplosionDef.paralyzer then
+			text = text .. " (EMP)"
+		end
 		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, false)
 	end
 	if morphExplosionDef and morphExplosionDef.id ~= baseExplosionDef.id then
 		local blastRadius = morphExplosionDef.damageAreaOfEffect
-		local defaultDamage = morphExplosionDef.customParams.shield_damage	--get default damage
-		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, "Damage (upgraded): " .. defaultDamage, true)
+		local defaultDamage = morphExplosionDef.customParams.stats_damage
+		local text = "Damage (upgraded): " .. floor(defaultDamage)
+		if morphExplosionDef.paralyzer then
+			text = text .. " (EMP)"
+		end
+		DrawRadiusOnUnit(centerX, height, centerZ, blastRadius, text, true)
 	end
 end
 
@@ -194,6 +201,10 @@ function DrawUnitBlastRadius( unitID )
 	local x, y, z = spGetUnitPosition(unitID)
 	local blastRadius = weaponDef.damageAreaOfEffect
 	local height = Spring.GetGroundHeight(x, z)
+	local text = "Damage: " .. floor(weaponDef.customParams.stats_damage)
+	if weaponDef.paralyzer then
+		text = text .. " (EMP)"
+	end
 
 	glColor(blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
 	glDrawGroundCircle(x, y, z, blastRadius, blastCircleDivs)
@@ -201,7 +212,7 @@ function DrawUnitBlastRadius( unitID )
 	glPushMatrix()
 	glTranslate(x - blastRadius / 2, height, z + blastRadius / 2)
 	glBillboard()
-	glText("Damage: " .. weaponDef.customParams.shield_damage, 0.0, 0.0, sqrt(blastRadius) , "cn")
+	glText(text, 0.0, 0.0, sqrt(blastRadius) , "cn")
 	glPopMatrix()
 end
 
