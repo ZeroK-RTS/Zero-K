@@ -14,9 +14,9 @@ options_path = 'Settings/Unit Behaviour'
 options = {
 	enable_automorph = {
 		name = 'Morph buildings when placed with Ctrl',
-		desc = "If queued holding Ctrl, morphable buildings will start morphing when finished. Single build only (doesn't work with Shift).",
+		desc = "If queued holding Ctrl, morphable buildings will start morphing when finished.",
 		type = 'bool',
-		value = true,
+		value = false, -- not polished enough, see FIXMEs below
 		OnChange = function(self)
 			local callins =
 				{ "UnitCommand"
@@ -58,10 +58,14 @@ local morphableUnitDefIds = CreateUnitDefIdSet({'staticjammer', 'staticshield', 
 ---@type table<UnitId,{x:number,z:number}[]>
 local buildingsToMorphByBuilder = {}
 
-function widget:Initialize()
+function widget:PlayerChanged()
 	myTeamID = Spring.GetMyTeamID()
 end
-widget.PlayerChanged = widget.Initialize
+
+function widget:Initialize()
+	widget:PlayerChanged()
+	options.enable_automorph:OnChange()
+end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOpts, cmdTag)
 	if cmdId > 0
@@ -77,9 +81,16 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdParams, cmdOp
 	local buildingsToMorph = buildingsToMorphByBuilder[unitID]
 	local point = { x = cmdParams[1], z = cmdParams[3] }
 
-	--[[ FIXME: SPACE is captured elsewhere and
-	     doesn't work for inserting a morphable. ]]
-	if cmdOpts.ctrl and not cmdOpts.shift then
+	--[[ FIXME 1: SPACE is captured elsewhere and
+	     doesn't work for inserting a morphable.
+
+	     FIXME 2: CTRL conflicts with dragging a
+	     rectangle when SHIFT is also held. Ideally
+	     the feature would not enable itself if
+	     dragging a rectangle, but that is not as
+	     simple as disabling SHIFT (would also ruin
+	     queuing). ]]
+	if cmdOpts.ctrl then
 		if not buildingsToMorph then
 			buildingsToMorph = {}
 			buildingsToMorphByBuilder[unitID] = buildingsToMorph
