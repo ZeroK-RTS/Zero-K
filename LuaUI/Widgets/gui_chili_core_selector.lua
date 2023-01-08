@@ -230,7 +230,7 @@ options = {
 		end
 	},
 	monitoridlecomms = {
-		name = 'Track idle comms',
+		name = 'Track idle commanders',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
