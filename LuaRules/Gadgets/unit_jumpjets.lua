@@ -246,8 +246,9 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 	local flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
 	
 	local speed = defSpeed * lineDist/flightDist
-	local step = speed/lineDist
-	local duration = math.ceil(1/step)+1
+	local stepRaw = speed/lineDist
+	local duration = math.ceil(1/stepRaw)
+	local step = 1/duration
 
 	if not mustJump then
 		-- check if there is no wall in between
@@ -337,10 +338,12 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		
 		local lastX, lastY, lastZ = start[1], start[2], start[3]
 		local i = 0
-		while i <= 1 do
+		while i < 1 do
 			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
 				return
 			end
+
+			i = i + step
 
 			local x = start[1] + vector[1]*i
 			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
@@ -373,8 +376,9 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 				break
 			end
 			
-			Sleep()
-			i = i + step
+			if i < 1 then
+				Sleep()
+			end
 		end
 
 		CallAsUnitIfExists(unitID,env.endJump)
