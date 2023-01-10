@@ -483,15 +483,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 
--- Makes wrecks continue inertially instead of falling straight down
-function gadget:UnitDamaged(unitID)
-	local jump_dir = jumping[unitID]
-	if (Spring.GetUnitHealth(unitID) < 0) and jump_dir then
-		mcDisable(unitID)
-		jumping[unitID] = nil
-	end
-end
-
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	if jumping[oldUnitID] then
 		jumping[oldUnitID] = nil -- empty old unit's data
