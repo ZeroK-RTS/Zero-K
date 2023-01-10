@@ -416,6 +416,11 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
 		end
 
+		if reloadTime <= 1 then
+			spSetUnitRulesParam(unitID, "jumpReload", 1)
+			return
+		end
+
 		local reloadSpeed = 1/reloadTime
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 		
