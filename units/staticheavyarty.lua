@@ -16,6 +16,10 @@ return { staticheavyarty = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    neededlink     = 50,
+    pylonrange     = 50,
+    keeptooltip    = [[any string I want]],
+
     bait_level_default = 1,
     want_proximity_targetting = 1,
     aimposoffset = [[0 50 -7]],

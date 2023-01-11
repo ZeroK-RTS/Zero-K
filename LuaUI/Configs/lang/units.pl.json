@@ -666,7 +666,7 @@
 	},
 	"staticheavyarty" : {
 		"name" : "Big Bertha",
-		"description" : "Działo strategiczne",
+		"description" : "Działo strategiczne - wymaga sieci energetycznej 50 E",
 		"helptext" : "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
 	},
 	"cloaksnipe" : {
@@ -801,7 +801,7 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Buduje mechy",
+		"description" : "Buduje mechy - wymaga sieci energetycznej 50 E",
 		"helptext" : "Centrum konstrukcyjne mechów powołuje do życia ogromne roboty, ostateczną pięść pancerną natarcia powodującą zniszczenie i przerażenie w szeregach przeciwnika. W przeciwieństwie do zwykłej fabryki, centrum konstrukcyjne wymagane jest jedynie do zainicjowania budowy jednostki."
 	},
 	"amphcon" : {

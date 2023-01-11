@@ -726,7 +726,7 @@
 	},
 	"staticheavyarty" : {
 		"name" : "Big Bertha",
-		"description" : "Strategic Plasma Cannon",
+		"description" : "Strategic Plasma Cannon - Power by connecting to a 50 energy grid",
 		"helptext" : "The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however."
 	},
 	"cloaksnipe" : {
@@ -861,7 +861,7 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Constructs Striders",
+		"description" : "Constructs Striders - Power by connecting to a 50 energy grid",
 		"helptext" : "The Strider Hub deploys striders, the \"humongous mecha\" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it."
 	},
 	"amphcon" : {

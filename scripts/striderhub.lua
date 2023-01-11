@@ -6,6 +6,7 @@ local body = piece "body"
 local aim = piece "aim"
 local emitnano = piece "emitnano"
 
+local ALLY_ACCESS = {allied = true}
 --local vars
 local smokePiece = { piece "aim", piece "body" }
 local nanoPieces = { piece "aim" }
@@ -13,17 +14,45 @@ local nanoPieces = { piece "aim" }
 local nanoTurnSpeedHori = 0.5 * math.pi
 local nanoTurnSpeedVert = 0.3 * math.pi
 
+local powered = true
+
+function Stunned(stun_type)
+	if powered and stun_type == 4 then -- Power
+		powered = false
+		SetUnitValue(COB.INBUILDSTANCE, 0)
+		Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 0, ALLY_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
+	end
+end
+
+function Unstunned(stun_type)
+	if (not powered) and stun_type == 4 then -- Power
+		powered = true
+		SetUnitValue(COB.INBUILDSTANCE, 1)
+		Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1, ALLY_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
+	end
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(GG.NanoAim.UpdateNanoDirectionThread, unitID, nanoPieces, 1000, nanoTurnSpeedHori, nanoTurnSpeedVert)
 	Spring.SetUnitNanoPieces(unitID, {emitnano})
+	
+	local lowPower = (Spring.GetUnitRulesParam(unitID, "lowpower") == 1)
+	if lowPower then
+		Stunned(4)
+	else
+		Unstunned(4)
+	end
 end
 
 function script.StartBuilding()
 	GG.NanoAim.UpdateNanoDirection(unitID, nanoPieces, nanoTurnSpeedHori, nanoTurnSpeedVert)
-	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1);
+	if powered then
+		Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1);
+	end
 end
-
 
 function script.StopBuilding()
 	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0);

@@ -36,6 +36,10 @@ return { striderhub = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    neededlink     = 50,
+    pylonrange     = 50,
+    keeptooltip    = [[any string I want]],
+
     aimposoffset      = [[0 0 0]],
     midposoffset      = [[0 -10 0]],
     modelradius       = [[35]],

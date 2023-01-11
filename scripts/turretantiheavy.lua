@@ -121,7 +121,7 @@ function script.AimWeapon(weaponNum, heading, pitch)
 	Turn(gun, x_axis, 0 - pitch, math.rad(40))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
-	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0) --checks for sufficient energy in grid
 end
 
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000

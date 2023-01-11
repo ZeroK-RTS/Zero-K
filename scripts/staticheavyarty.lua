@@ -13,6 +13,7 @@ include "pieceControl.lua"
 include "QueryWeaponFixHax.lua"
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -21,7 +22,7 @@ local smokePiece = {base, turret, ground}
 
 local function DisableCheck()
 	while true do
-		if select(1, spGetUnitIsStunned(unitID)) then
+		if select(1, spGetUnitIsStunned(unitID)) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then
 			if GG.PieceControl.StopTurn(sleeve, x_axis) then
 				Signal(SIG_AIM)
 			end
@@ -45,12 +46,17 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	
+	while (spGetUnitRulesParam(unitID, "lowpower") == 1) do
+		Sleep (100)
+	end
+	
 	Turn(turret, y_axis, heading, math.rad(4))
 	Turn(sleeve, x_axis, -pitch, math.rad(2))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
 	StartThread(AimingDone)
-	return true
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0)
 end
 
 function script.FireWeapon(num)

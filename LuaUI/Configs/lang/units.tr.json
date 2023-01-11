@@ -666,7 +666,7 @@
     },
     "staticheavyarty": {
         "name": "Büyük Bertha",
-        "description": "Stratejik Plazma Topu",
+        "description": "Stratejik Plazma Topu - 50 enerjilik alana bağlanarak çalışır",
         "helptext": "Bertha, harita boyunca yüksek enerjili plazmidleri ateşleyen devasa bir top. Uygun şekilde kullanıldığında, düşman operasyonlarını üssünüzün güvenliğinden etkili bir şekilde bastırabilir. Bununla birlikte, yalnızca sizin için savaşlar kazanmasını beklemeyin."
     },
     "cloaksnipe": {
@@ -811,7 +811,7 @@
     },
     "striderhub": {
         "name": "Strider Merkezi",
-        "description": "Striderlar Üretir",
+        "description": "Striderlar Üretir - 50 enerjilik alana bağlanarak çalışır",
         "helptext": "Strider Merkezi, savaş alanında huşu ve korku uyandıran \"koskocaman makina\" olan striders'ı dağıtır. Normal bir fabrikadan farklı olarak, merkez projeyi bitirmek için değil, sadece bir projeyi başlatmak için gereklidir."
     },
     "amphcon": {
