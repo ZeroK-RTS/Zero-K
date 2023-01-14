@@ -29,7 +29,6 @@ local ghRemoveCallIn = gh.RemoveCallIn
 local ghUpdateCallIn = gh.UpdateCallIn
 
 local CMD_SELFD = CMD.SELFD
-local EMPTY_TABLE = {}
 
 local teamList = Spring.GetTeamList()
 local teamCount = #teamList
@@ -120,7 +119,7 @@ local function CheckDeathTeam(teamID)
 	     learn the new methods, which would ultimately allow us to
 	     remove the block as well). ]]
 	ghRemoveCallIn(gh, 'AllowCommand')
-	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
+	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, 0, 0)
 	ghUpdateCallIn(gh, 'AllowCommand')
 	if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
 		local _, leader = Spring.GetTeamInfo(teamID)

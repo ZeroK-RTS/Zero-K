@@ -113,7 +113,7 @@ local function HidePuppy(unitID)
 	spSetUnitCollisionVolumeData(unitID, 20, 20, 20, 0, -3000, 0, 0, 1, 0)
 	--Spring.SetUnitNoSelect(unitID, true)
 	spSetUnitNoMinimap(unitID, true)
-	--spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+	--spGiveOrderToUnit(unitID, CMD.STOP, 0, 0)
 
 	local frame = spGetGameFrame() + 450
 	cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
@@ -155,10 +155,10 @@ local function RestorePuppy(unitID, x, y, z)
 	end
 	-- Spring.SetUnitNoSelect(unitID, false)
 	spSetUnitNoMinimap(unitID, false)
-	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
-	spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+	spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
+	spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
 	GG.WaitWaitMoveUnit(unitID)
-	-- spGiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+	-- spGiveOrderToUnit(unitID, CMD.STOP, 0, 0)
 end
 
 function GG.PuppyHandler_IsHidden(unitID)

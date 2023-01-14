@@ -34,7 +34,7 @@ function MoveUnitOutOfFactory(unitID,factDefID)
 				--note to self: CMD.OPT_META is spacebar, CMD.OPT_INTERNAL is widget. If we use CMD.OPT_INTERNAL Spring might return unit to where it originally started but the benefit is it don't effected by Repeat state (reference: cmd_retreat.lua widget by CarRepairer).
 				if ( cmdID < 0 ) and (not cmdParam_1 ) then --if build-unit-command (which can be accidentally given when you use Chili Integral Menu)
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.REMOVE, {cmdTag}, 0}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
+							{CMD.REMOVE, cmdTag, 0}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
 							{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, CMD.OPT_ALT},
 							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, CMD.OPT_ALT}, --stop unit at end of move command (else it will return to original position).
 							})--insert move-stop command behind existing command

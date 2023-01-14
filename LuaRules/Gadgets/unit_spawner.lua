@@ -61,8 +61,7 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local emptyTable	= {}
-local roamParam		= {2}
+local CMD_MOVESTATE_ROAM = CMD.MOVESTATE_ROAM
 local maxTries		= 500
 local maxTriesSmall	= 100
 local lava = (Game.waterDamage > 0)
@@ -438,11 +437,11 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
 		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
-		--spGiveOrderToUnit(burrowID, CMD_ATTACK, {data.targetID}, 0)
+		--spGiveOrderToUnit(burrowID, CMD_ATTACK, data.targetID, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
 		targetData.targetID = nil
-		--spGiveOrderToUnit(burrowID, CMD_STOP, {}, 0)
+		--spGiveOrderToUnit(burrowID, CMD_STOP, 0, 0)
 		--echo("Target for burrow ID ".. burrowID .." lost, waiting")
 	end
 end
@@ -560,7 +559,7 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
 		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
 		local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, CMD_MOVESTATE_ROAM, 0)
 			if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0) end
 			data.chickenBirths[unitID] = now
 		end
@@ -768,7 +767,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 	for i=1, (number or 1) do
 		local unitID = spCreateUnit(unitName, x + random(-spawnSquare, spawnSquare), y, z + random(-spawnSquare, spawnSquare), "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, CMD_MOVESTATE_ROAM, 0)
 		end
 	end
 end

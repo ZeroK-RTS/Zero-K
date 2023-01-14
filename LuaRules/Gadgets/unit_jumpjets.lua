@@ -394,8 +394,8 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		mcDisable(unitID)
 
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
 		end
 		
 		if hitStructure then
@@ -628,7 +628,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		local cmdID_2 = Spring.GetUnitCurrentCommand(unitID, 2)
 		if cmdID_1 and cmdID_2 then
 			if cmdID_1 == CMD_MOVE and cmdID_2 == CMD_JUMP then
-				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag_1}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD_REMOVE, cmdTag_1, 0)
 			end
 		end
 	end

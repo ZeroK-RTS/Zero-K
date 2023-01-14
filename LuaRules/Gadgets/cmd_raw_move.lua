@@ -755,8 +755,8 @@ local function WaitWaitMoveUnit(unitID)
 	if unitData then
 		ResetUnitData(unitData)
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
 end
 
 local function AddRawMoveUnit(unitID)

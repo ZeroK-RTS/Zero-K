@@ -277,7 +277,7 @@ local function UpdateTeamActivity(teamID)
 			end
 			
 			if #waitUnits > 0 then
-				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, {}, {})
+				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, 0, 0)
 			end
 		end
 		
@@ -347,7 +347,7 @@ local function DoUnitGiveAway(allyTeamID, recieveTeamID, giveAwayTeams, doPlayer
 			end
 			
 			if #waitUnits > 0 then
-				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, {}, {})
+				spGiveOrderToUnitArray(waitUnits, CMD_WAIT, 0, 0)
 			end
 		end
 		

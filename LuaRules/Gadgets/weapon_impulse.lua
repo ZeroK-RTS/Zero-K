@@ -403,11 +403,11 @@ local function AddImpulses()
 
 					--if data.allied then
 						if Spring.GetUnitCurrentCommand(unitID) == CMD_GUARD then
-							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
+							spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 						end
 
 						if Spring.Utilities.GetUnitRepeat(unitID) then
-							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
+							spGiveOrderToUnit(unitID, CMD_REPEAT, 0, 0)
 						end
 					--end
 					--[[

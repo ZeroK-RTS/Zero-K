@@ -22,7 +22,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 
 local Spring = Spring
-local emptyTable = {}
 local LOS_ACCESS = {inlos = true}
 
 ----- Settings -----------------------------------------------------------------
@@ -191,8 +190,8 @@ function gadget:GameFrame(frame)
 			--Spring.AddUnitImpulse(unitID,0,4,0) --wiggle hax. this prevent 1 rare bug that could happen if MoveCtrl unit is launch upward and then aborted (unit will appear to stay in the air but actually is on ground). Note: Spring91 need +1/-1 for wiggle hax, but Spring 94 need +4/-4
 			--Spring.AddUnitImpulse(unitID,0,-4,0) --FIXME: when fixed, remove this +4/-4 hax.
 		end
-		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)	-- WAIT WAIT to make unit continue with any orders it has
-		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
+		Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)	-- WAIT WAIT to make unit continue with any orders it has
+		Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
 		--Spring.Echo(units[unitID][1]) --see if it match desired timeToGround
 		if GG.UpdateUnitAttributes then
 			Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 1, LOS_ACCESS)

@@ -287,7 +287,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				if cmdID == CMD.ATTACK and Spring.Utilities.CheckBit(gadget:GetInfo().name, cmdOpts, CMD.OPT_INTERNAL) and cp_1 and (not cp_2) and cp_1 == targetID then
 					--Spring.Echo("Removing auto-attack command")
 					GG.recursion_GiveOrderToUnit = true
-					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0 )
+					spGiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
 					GG.recursion_GiveOrderToUnit = false
 				end
 			else

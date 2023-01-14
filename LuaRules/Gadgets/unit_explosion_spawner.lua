@@ -34,7 +34,6 @@ local GAME_SPEED = Game.gameSpeed
 local TAU = 2 * math.pi
 local PRIVATE = { private = true }
 local CMD_WAIT = CMD.WAIT
-local EMPTY_TABLE = {}
 
 local noCreate = false
 
@@ -100,8 +99,8 @@ local function SpawnUnit(spawnData)
 		end
 
 		-- force a slowupdate to make the unit act immediately
-		spGiveOrderToUnit(unitID, CMD_WAIT, EMPTY_TABLE, 0)
-		spGiveOrderToUnit(unitID, CMD_WAIT, EMPTY_TABLE, 0)
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, 0)
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, 0)
 	end
 end
 

@@ -145,8 +145,8 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	if float[unitID] then
 		Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
 		Spring.MoveCtrl.Disable(unitID)
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
 		callScript(unitID, "script.StopMoving")
 		removeFloat(unitID)
 	end
@@ -218,8 +218,8 @@ function gadget:GameFrame(f)
 				if cmdID then
 					if (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) and cmdOpts == CMD.OPT_RIGHT then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 						Spring.GiveOrderArrayToUnitArray({unitID},{
-							{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
-							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
+							{CMD.REMOVE, cmdTag, 0},--clear Spring's command that desire unit to return to old position
+							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT}, CMD.OPT_ALT},
 						})
 					end
 				end
@@ -362,8 +362,8 @@ function gadget:GameFrame(f)
 					Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
 					Spring.SetUnitPosition(unitID, data.x, height, data.z)
 					Spring.MoveCtrl.Disable(unitID)
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+					Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
+					Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					

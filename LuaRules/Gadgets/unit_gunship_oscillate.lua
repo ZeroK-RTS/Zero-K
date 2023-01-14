@@ -44,8 +44,8 @@ local function IdlemodeIdlemode(unitID)
 		autoland = select(4, spGetUnitStates(unitID, false, false, true))
 	end
 	if not autoland then
-		Spring.GiveOrderToUnit(unitID, CMD_IDLEMODE, {1}, 0)
-		Spring.GiveOrderToUnit(unitID, CMD_IDLEMODE, {0}, 0)
+		Spring.GiveOrderToUnit(unitID, CMD_IDLEMODE, 1, 0)
+		Spring.GiveOrderToUnit(unitID, CMD_IDLEMODE, 0, 0)
 	end
 end
 

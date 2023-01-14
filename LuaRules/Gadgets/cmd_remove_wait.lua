@@ -78,7 +78,7 @@ function gadget:GameFrame()
 	end
 
 	for unitID, _ in pairs(antiRecursionWaitDo) do
-		Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+		Spring.GiveOrderToUnit(unitID, CMD.WAIT, 0, 0)
 	end
 	antiRecursionWaitDo = false
 end

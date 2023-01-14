@@ -117,7 +117,7 @@ end
 local function ClearUnitCommandQueue(unitID)
 	local cmds = spGetCommandQueue(unitID, -1)
 	for i=1,#cmds do
-		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmds[i].tag},0)
+		spGiveOrderToUnit(unitID, CMD.REMOVE, cmds[i].tag, 0)
 	end
 end
 

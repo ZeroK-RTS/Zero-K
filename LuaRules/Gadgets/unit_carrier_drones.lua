@@ -48,7 +48,6 @@ local spGetUnitSeparation = Spring.GetUnitSeparation
 local random              = math.random
 local CMD_ATTACK          = CMD.ATTACK
 
-local emptyTable = {}
 local INLOS_ACCESS = {inlos = true}
 
 -- thingsWhichAreDrones is an optimisation for AllowCommand, no longer used but it'll stay here for now
@@ -210,13 +209,13 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
 		local firestate = Spring.Utilities.GetUnitFireState(unitID)
-		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
-		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
-		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
+		GiveOrderToUnit(droneID, CMD.MOVE_STATE, 2, 0)
+		GiveOrderToUnit(droneID, CMD.FIRE_STATE, firestate, 0)
+		GiveOrderToUnit(droneID, CMD.IDLEMODE, 0, 0)
 		local rx, rz = RandomPointInUnitCircle()
 		-- Drones intentionall use CMD.MOVE instead of CMD_RAW_MOVE as they do not require any of the features
 		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + rx*IDLE_DISTANCE, y+DRONE_HEIGHT, z + rz*IDLE_DISTANCE}, 0, false, true)
-		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , CMD.OPT_SHIFT)
+		GiveOrderToUnit(droneID, CMD.GUARD, unitID, CMD.OPT_SHIFT)
 
 		SetUnitNoSelect(droneID, true)
 
@@ -516,7 +515,7 @@ local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 			local set = carrier.droneSets[i]
 			for droneID in pairs(set.drones) do
 				droneList[droneID].carrier = newUnitID
-				GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , CMD.OPT_SHIFT)
+				GiveOrderToUnit(droneID, CMD.GUARD, newUnitID, CMD.OPT_SHIFT)
 			end
 		end
 		carrierList[unitID] = nil
@@ -563,7 +562,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 	if not recallDrones and cmdID == CMD_ATTACK then
 		local ox, oy, oz = spGetUnitPosition(carrierID)
 		if cmdParam_1 and not cmdParam_2 then
-			target = {cmdParam_1}
+			target = cmdParam_1
 			px, py, pz = spGetUnitPosition(cmdParam_1)
 		else
 			px, py, pz = cmdParam_1, cmdParam_2, cmdParam_3
@@ -584,7 +583,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 			end
 			if targetType == 2 then --targeting units
 				local target_id = spGetUnitRulesParam(carrierID,"target_id")
-				target = {target_id}
+				target = target_id
 				px, py, pz = spGetUnitPosition(target_id)
 			end
 			if px then
@@ -609,10 +608,10 @@ local function UpdateCarrierTarget(carrierID, frame)
 			if attackOrder or setTargetOrder then
 				-- drones fire at will if carrier has an attack/target order
 				-- a drone bomber probably should not do this
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0)
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, 2, 0)
 			else
 				-- update firestate based on that of carrier
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { firestate }, 0)
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, firestate, 0)
 			end
 			
 			local separation = spGetUnitSeparation(droneID, carrierID, true)
@@ -621,7 +620,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 				px, py, pz = spGetUnitPosition(carrierID)
 				rx, rz = RandomPointInUnitCircle()
 				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0, false, true)
-				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , CMD.OPT_SHIFT)
+				GiveOrderToUnit(droneID, CMD.GUARD, carrierID, CMD.OPT_SHIFT)
 			elseif droneSendDistance and droneSendDistance < set.config.range then
 				-- attacking
 				if target then
@@ -645,7 +644,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 					px, py, pz = spGetUnitPosition(carrierID)
 					rx, rz = RandomPointInUnitCircle()
 					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0, false, true)
-					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , CMD.OPT_SHIFT)
+					GiveOrderToUnit(droneID, CMD.GUARD, carrierID, CMD.OPT_SHIFT)
 				end
 			end
 			
@@ -706,7 +705,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
 				local rx, rz = RandomPointInUnitCircle()
 				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0, false, true)
-				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , CMD.OPT_SHIFT)
+				GiveOrderToUnit(droneID, CMD.GUARD, unitID, CMD.OPT_SHIFT)
 				droneList[droneID] = temp
 			end
 		end
@@ -745,7 +744,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				for droneID in pairs(set.drones) do
 					droneList[droneID].carrier = newUnitID
 					droneList[droneID].set = newSetID
-					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , CMD.OPT_SHIFT)
+					GiveOrderToUnit(droneID, CMD.GUARD, newUnitID, CMD.OPT_SHIFT)
 				end
 			end
 		else --Carried died

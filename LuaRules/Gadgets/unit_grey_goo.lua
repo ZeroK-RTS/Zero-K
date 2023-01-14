@@ -273,9 +273,9 @@ function gadget:GameFrame(f)
 						firestate, movestate = spGetUnitStates(unitIndex[i], false)
 					end
 					
-					spGiveOrderToUnit(newId, CMD_FIRE_STATE, {firestate}, 0)
-					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {movestate}, 0)
-					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
+					spGiveOrderToUnit(newId, CMD_FIRE_STATE, firestate   , 0)
+					spGiveOrderToUnit(newId, CMD_MOVE_STATE, movestate   , 0)
+					spGiveOrderToUnit(newId, CMD_GUARD     , unitIndex[i], 0)
 
 					spSpawnCEG(CEG_SPAWN,
 						x, y, z,

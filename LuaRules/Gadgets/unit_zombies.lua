@@ -186,7 +186,7 @@ local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to
 	local orders = {}
 	--local x,y,z = spGetUnitPosition(unitID)
 	for i = 1, random(10, 30) do
-		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], {}, 0 }
+		orders[#orders + 1] = {-buildopts[random(1, #buildopts)], 0, 0 }
 	end
 	if (#orders > 0) then
 		if not spGetUnitIsDead(unitID) then
@@ -297,7 +297,7 @@ function gadget:GameFrame(f)
 				if (unitID) then
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
-					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, 0)
+					Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, 2, 0)
 					GG.PlayFogHiddenSound(REZ_SOUND, 12, x, y, z)
 					if partialReclaim ~= 1 then
 						local health = Spring.GetUnitHealth(unitID)
@@ -393,8 +393,8 @@ local function ReInit(reinit)
 	if not (defined) then
 		UnitFinished = function(unitID, unitDefID, teamID, builderID)
 			if (teamID == GaiaTeamID) and not (zombies[unitID]) then
-				spGiveOrderToUnit(unitID, CMD_REPEAT, {1}, 0)
-				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, {2}, 0)
+				spGiveOrderToUnit(unitID, CMD_REPEAT, 1, 0)
+				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
 				BringingDownTheHeavens(unitID)
 				zombies[unitID] = true
 				if ZOMBIES_PERMA_SLOW then

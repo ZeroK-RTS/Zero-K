@@ -50,9 +50,9 @@ local emptyTable = {} -- for speedups
 --
 -- Thus other gadgets can know which morphing commands are available
 -- Then they can simply issue:
---	Spring.GiveOrderToUnit(u,genericMorphCmdID,{}, 0)
--- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId}, 0)
--- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{}, 0)
+--	Spring.GiveOrderToUnit(u, genericMorphCmdID, 0, 0)
+-- or Spring.GiveOrderToUnit(u, genericMorphCmdID, targetUnitDefId, 0)
+-- or Spring.GiveOrderToUnit(u, specificMorphCmdID, 0, 0)
 --
 -- where:
 -- genericMorphCmdID is the same unique value, no matter what is the source unit or target unit
@@ -62,11 +62,11 @@ local emptyTable = {} -- for speedups
 --[[ Sample codes that could be used in other gadgets:
 
 	-- Morph unit u
-	Spring.GiveOrderToUnit(u,31210,{}, 0)
+	Spring.GiveOrderToUnit(u, 31210, 0, 0)
 
 	-- Morph unit u into a supertank:
 	local otherDefId=UnitDefNames["supertank"].id
-	Spring.GiveOrderToUnit(u,31210,{otherDefId}, 0)
+	Spring.GiveOrderToUnit(u, 31210, otherDefId, 0)
 
 	-- In place of writing 31210 you could use a morphCmdID that you'd read with:
 	local morphCmdID=(GG.MorphInfo or {})["CMD_MORPH_BASE_ID"]
@@ -220,7 +220,7 @@ local function ReAssignAssists(newUnit,oldUnit)
 				params[1] = newUnit
 				local opts = (cmd.options.meta and CMD.OPT_META or 0) + (cmd.options.ctrl and CMD.OPT_CTRL or 0) + (cmd.options.alt and CMD.OPT_ALT or 0)
 				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]}, 0)
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmd.tag, 0)
 			end
 		end
 	end
@@ -516,15 +516,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-		{CMD.FIRE_STATE,    { states.firestate             }, 0 },
-		{CMD.MOVE_STATE,    { states.movestate             }, 0 },
-		{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
-		{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
-		{CMD.ONOFF,         { 1                            }, 0 },
-		{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
-		{CMD_PRIORITY,      { states.buildPrio             }, 0 },
-		{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
-		{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
+		{CMD.FIRE_STATE,    states.firestate            , 0 },
+		{CMD.MOVE_STATE,    states.movestate            , 0 },
+		{CMD.REPEAT,        states["repeat"] and 1 or 0 , 0 },
+		{CMD_WANT_CLOAK,    wantCloakState or 0         , 0 },
+		{CMD.ONOFF,         1                           , 0 },
+		{CMD.TRAJECTORY,    states.trajectory and 1 or 0, 0 },
+		{CMD_PRIORITY,      states.buildPrio            , 0 },
+		{CMD_RETREAT,       states.retreat              , states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+		{CMD_MISC_PRIORITY, states.miscPrio             , 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -541,7 +541,7 @@ local function FinishMorph(unitID, morphData)
 			for j = 1, #units do
 				local areaUnitID = units[j]
 				if allyTeam == Spring.GetUnitAllyTeam(areaUnitID) and Spring.GetUnitDefID(areaUnitID) == -cmd.id then
-					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, coded)
+					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, areaUnitID, coded)
 					notFound = false
 					break
 				end

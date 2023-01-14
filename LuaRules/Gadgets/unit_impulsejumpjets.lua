@@ -70,8 +70,6 @@ local spGetUnitVelocity		= Spring.GetUnitVelocity
 
 local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
 
-local emptyTable = {}
-
 local coroutines = {}
 local lastJump = {}
 local lastJumpPosition = {}
@@ -136,7 +134,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 		end
 	end
 
-	spGiveOrderToUnit(unitID, CMD_STOP, emptyTable, 0)
+	spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
@@ -408,8 +406,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		SetLeaveTracks(unitID, true)
 		
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
 		end
 
 		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)

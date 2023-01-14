@@ -153,8 +153,8 @@ end
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if float[unitID] then
 		Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
-		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0) -->Error message: "UnitLoaded, [string "LuaRules/Gadgets/unit_impulsefloat_toggle.l..."]:144: GiveOrderToUnit() recursion is not permitted"
-		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0) -->Error message: "UnitLoaded, [string "LuaRules/Gadgets/unit_impulsefloat_toggle.l..."]:144: GiveOrderToUnit() recursion is not permitted"
+		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
 		callScript(unitID, "script.StopMoving")
 		removeFloat(unitID)
 	end
@@ -220,8 +220,8 @@ function gadget:GameFrame(f)
 				if cmdID and (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) and cmdOpts == CMD.OPT_RIGHT then
 					--Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-						{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
-						{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
+						{CMD.REMOVE, cmdTag, 0},--clear Spring's command that desire unit to return to old position
+						{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT}, CMD.OPT_ALT},
 					})
 				end
 			end

@@ -32,8 +32,6 @@ local stateToParam = {
   [0.8]   = 3,
 }
 
-local paramTable = { 0 }
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -52,8 +50,7 @@ function Spring.Utilities.GiveStateOrderToUnit (unitID, cmdID, param1, options)
     end
   end
 
-  paramTable[1] = param1
-  spGiveOrderToUnit(unitID, cmdID, paramTable, options)
+  spGiveOrderToUnit(unitID, cmdID, param1, options)
 end
 
 -------------------------------------------------------------------------------------
