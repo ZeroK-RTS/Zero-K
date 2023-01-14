@@ -23,6 +23,50 @@ if Script.IsEngineMinVersion(104, 0, 50) then
 	end
 end
 
+if not Script.IsEngineMinVersion(104, 0, 503) then
+	local tableCache = {123}
+	local function MakeWrappedSingleParamFunc(originalFunc)
+		return function (unitID, cmdID, cmdParam, cmdOpts)
+			-- unitID can actually be a table thereof, but we don't mind
+			if type (cmdParam) ~= "table" then
+				tableCache[1] = cmdParam
+				return originalFunc(unitID, cmdID, tableCache, cmdOpts)
+			else
+				return originalFunc(unitID, cmdID, cmdParam, cmdOpts)
+			end
+		end
+	end
+	local function MakeWrappedArrayParamFunc(originalFunc)
+		return function (units, orders)
+			for i = 1, #orders do
+				local order = orders[i]
+				local param = order[2]
+				if type(param) ~= "table" then
+					order[2] = {param}
+				end
+			end
+			return originalFunc(units, orders)
+		end
+	end
+
+	local originalGiveOrder = Spring.GiveOrder
+	Spring.GiveOrder = function(cmdID, cmdParam, cmdOpts)
+		if type (cmdParam) ~= "table" then
+			tableCache[1] = cmdParam
+			return originalGiveOrder(cmdID, tableCache, cmdOpts)
+		else
+			return originalGiveOrder(cmdID, cmdParam, cmdOpts)
+		end
+	end
+
+	Spring.GiveOrderToUnit      = MakeWrappedSingleParamFunc(Spring.GiveOrderToUnit     )
+	Spring.GiveOrderToUnitMap   = MakeWrappedSingleParamFunc(Spring.GiveOrderToUnitMap  )
+	Spring.GiveOrderToUnitArray = MakeWrappedSingleParamFunc(Spring.GiveOrderToUnitArray)
+
+	Spring.GiveOrderArrayToUnitMap   = MakeWrappedArrayParamFunc(Spring.GiveOrderArrayToUnitMap  )
+	Spring.GiveOrderArrayToUnitArray = MakeWrappedArrayParamFunc(Spring.GiveOrderArrayToUnitArray)
+end
+
 if Script.IsEngineMinVersion(104, 0, 536) then
 	local origGetPlayerInfo = Spring.GetPlayerInfo
 	Spring.GetPlayerInfo = function (playerID)
