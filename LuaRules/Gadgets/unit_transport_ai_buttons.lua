@@ -162,16 +162,6 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	gadget:UnitDestroyed(unitID, unitDefID, oldTeamID) --remove embark/disembark command
 end
 
-
-
-function gadget:UnitGiven(unitID) -- minor hack unrelated to transport ai - enable captured unit
-    GiveOrderToUnit(unitID, CMD_ONOFF, { 1 }, 0)
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 function gadget:Initialize()
   gadgetHandler:RegisterCMDID(CMD_EMBARK);
   gadgetHandler:RegisterCMDID(CMD_DISEMBARK);
