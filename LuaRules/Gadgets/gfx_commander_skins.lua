@@ -442,9 +442,16 @@ end
 -------------------------------------------------------------------------------------
 -- Callins
 
+local function GetModelFragShader()
+	if Spring.Utilities.IsCurrentVersionNewerThan(105, 1450) then
+		return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
+	end
+	return VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS_old1450.glsl")
+end
+
 function gadget:Initialize()
 	local vsSrc = VFS.LoadFile("shaders/GLSL/ModelVertProgGL4.glsl")
-	local fsSrc = VFS.LoadFile("shaders/GLSL/ModelFragProgGL4_CUS.glsl")
+	local fsSrc = GetModelFragShader()
 
 	vsSrc = string.gsub(vsSrc, "#version 430 core", "")
 	fsSrc = string.gsub(fsSrc, "#version 430 core", "")
