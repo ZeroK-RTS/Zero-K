@@ -467,9 +467,14 @@ function gadget:Initialize()
 			matrixMode = 0,
 		}
 	})
-	Spring.Echo(gl.GetShaderLog())
+	Spring.Echo("gfx_commander_skins fwd log", gl.GetShaderLog())
 	if fwdShader == nil then
-		gadgetHandler:Removegadget()
+		gadgetHandler:RemoveGadget()
+		return
+	end
+	for k = 1, #drawBinKeys do
+		local flag = drawBinKeys[k]
+		shaders[flag] = fwdShader
 	end
 
 	local dfrShader = gl.CreateShader({
@@ -490,21 +495,17 @@ function gadget:Initialize()
 			matrixMode = 0,
 		}
 	})
-
-	Spring.Echo(gl.GetShaderLog())
+	Spring.Echo("gfx_commander_skins dfr log", gl.GetShaderLog())
 	if dfrShader == nil then
-		gadgetHandler:Removegadget()
-	end
-
-	for k = 1, #drawBinKeys do
-		local flag = drawBinKeys[k]
-		shaders[flag] = fwdShader
+		gadgetHandler:RemoveGadget()
+		return
 	end
 	shaders[0 ] = dfrShader
 
 	vao = gl.GetVAO()
 	if vao == nil then
-		gadgetHandler:Removegadget()
+		gadgetHandler:RemoveGadget()
+		return
 	end
 
 	vbo = gl.GetVBO(GL.ARRAY_BUFFER, false)
@@ -512,7 +513,8 @@ function gadget:Initialize()
 	ibo = gl.GetVBO(GL.ARRAY_BUFFER, true)
 
 	if ((vbo == nil) or (ebo == nil) or (ibo == nil)) then
-		gadgetHandler:Removegadget()
+		gadgetHandler:RemoveGadget()
+		return
 	end
 
 	ibo:Define(MAX_DRAWN_UNITS, {
@@ -540,14 +542,34 @@ function gadget:Shutdown()
 		RemoveUnit(unitID)
 	end
 
-	vbo = nil
-	ebo = nil
-	ibo = nil
+	if vbo then
+		vbo:Delete()
+		vbo = nil
+	end
 
-	vao = nil
+	if ebo then
+		ebo:Delete()
+		ebo = nil
+	end
 
-	gl.DeleteShader(shaders[0])
-	gl.DeleteShader(shaders[1])
+	if ibo then
+		ibo:Delete()
+		ibo = nil
+	end
+
+	if vao then
+		vao:Delete()
+		vao = nil
+	end
+
+	local deletedShaders = {} -- some shaders are used under multiple flags, don't delete twice
+	for flag, shaderID in pairs(shaders) do
+		if not deletedShaders[shaderID] then
+			gl.DeleteShader(shaderID)
+			deletedShaders[shaderID] = true
+		end
+		shaders[shaderID] = nil
+	end
 end
 
 function gadget:DrawOpaqueUnitsLua(deferredPass, drawReflection, drawRefraction)
