@@ -1,0 +1,128 @@
+local RET_FALSE = function() return false end
+
+--[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
+     though this can only happen for random people's forks since regular BAR & Spring build
+     systems both hardcode the minor to 0. Assume we're on bleeding edge in that case. ]]
+if not Script.IsEngineMinVersion(1, 0, 0) then
+	Script.IsEngineMinVersion = function (major, minor, commit)
+		return true
+	end
+end
+
+if Script.IsEngineMinVersion(104, 0, 50) then
+	local origGetGroundInfo = Spring.GetGroundInfo
+	Spring.GetGroundInfo = function (x, z)
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9 = origGetGroundInfo(x, z)
+		return r2, r3, r4, r5, r6, r7, r8, r9, r1
+	end
+
+	local origGetTerrainTypeData = Spring.GetTerrainTypeData
+	Spring.GetTerrainTypeData = function (index)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTerrainTypeData(index)
+		return r2, r3, r4, r5, r6, r7, r8, r1
+	end
+end
+
+if Script.IsEngineMinVersion(104, 0, 536) then
+	local origGetPlayerInfo = Spring.GetPlayerInfo
+	Spring.GetPlayerInfo = function (playerID)
+		if not playerID then
+			return
+		end
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
+		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r10
+	end
+end
+
+if not Script.IsEngineMinVersion(104, 0, 1100) then
+	Script.SetWatchProjectile  = Script.SetWatchWeapon
+	Script.SetWatchExplosion   = Script.SetWatchWeapon
+	Script.SetWatchAllowTarget = Script.SetWatchWeapon
+end
+
+if not Script.IsEngineMinVersion(104, 0, 1143) then
+	local spGetCommandQueue = Spring.GetCommandQueue
+	local unpacc = unpack
+	Spring.GetUnitCurrentCommand = function (unitID, index)
+		index = index or 1
+
+		local queue = spGetCommandQueue(unitID, index)
+		if not queue then
+			return
+		end
+
+		local command = queue[index]
+		if not command then
+			return
+		end
+
+		return command.id, command.options.coded, command.tag, unpacc(command.params)
+	end
+end
+
+if Script.IsEngineMinVersion(104, 0, 1166) then
+	local origGetTeamInfo = Spring.GetTeamInfo
+	Spring.GetTeamInfo = function (p1, p2)
+		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)
+		return r1, r2, r3, r4, r5, r6, r8, r7
+	end
+end
+
+if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
+	--[[ This is just here so gadget code can avoid
+	     a nil check. The workaround was to apply
+	     ground detail changes to force an update,
+	     but that requires a timed delay (since else
+	     the change isn't noticed) which I am not
+	     going to reimplement here. ]]
+	Spring.ForceTesselationUpdate = RET_FALSE
+end
+
+if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
+	local spGetUnitExperience = Spring.GetUnitExperience
+	local spSetUnitExperience = Spring.SetUnitExperience
+	Spring.AddUnitExperience = function (unitID, deltaXP)
+		spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
+	end
+end
+
+if not Spring.GetCameraRotation and not Script.GetSynced() then -- BAR 105-1242
+	local spGetCameraDirection = Spring.GetCameraDirection
+	local acos = math.acos
+	local atan2 = math.atan2
+	local sqrt = math.sqrt
+	Spring.GetCameraRotation = function()
+		local x, y, z = spGetCameraDirection()
+		local len = sqrt(x^2 + y^2 + z^2)
+		return acos(y / len), atan2(x / len, -z / len), 0
+	end
+end
+
+if not Spring.GetMiniMapRotation and not Script.GetSynced() then -- BAR 105-1242
+	Spring.GetMiniMapRotation = function()
+		return 0
+	end
+end
+
+if not Spring.LoadModelTextures and not Script.GetSynced() then -- BAR 105-1244
+	Spring.LoadModelTextures = RET_FALSE
+end
+
+if not Spring.SetWindowMinimized and not Script.GetSynced() then -- BAR 105-1245
+	Spring.SetWindowMinimized = RET_FALSE
+	Spring.SetWindowMaximized = RET_FALSE
+end
+
+if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
+	local spSetGameRulesParam = Spring.SetGameRulesParam
+	Spring.SetPlayerRulesParam = function (playerID, key, value)
+		return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
+	end
+end
+
+if not Spring.GetPlayerRulesParam then -- future
+	local spGetGameRulesParam = Spring.GetGameRulesParam
+	Spring.GetPlayerRulesParam = function (playerID, key)
+		return spGetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
+	end
+end

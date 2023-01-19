@@ -18,6 +18,8 @@ local spSendCommands = Spring.SendCommands
 
 spSendCommands("ctrlpanel LuaUI/ctrlpanel.txt")
 
+vfsInclude('LuaRules/engine_compat.lua', nil, vfsGame)
+
 vfsInclude("LuaUI/utils.lua"    , nil, vfsGame)
 vfsInclude("LuaUI/setupdefs.lua", nil, vfsGame)
 vfsInclude("LuaUI/savetable.lua", nil, vfsGame)
