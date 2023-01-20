@@ -113,6 +113,15 @@ if not Spring.SetWindowMinimized and not Script.GetSynced() then -- BAR 105-1245
 	Spring.SetWindowMaximized = RET_FALSE
 end
 
+if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
+	local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
+	local staticTable = {123}
+	Spring.GiveOrderArrayToUnit = function (unitID, orderArray)
+		staticTable[1] = unitID
+		return spGiveOrderArrayToUnitArray(staticTable, orderArray)
+	end
+end
+
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
