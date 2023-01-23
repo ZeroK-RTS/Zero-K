@@ -78,6 +78,14 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 	end
 end
 
+Game.speedModClasses = Game.speedModClasses or -- 104-756
+	{ Tank  = 0
+	, KBot  = 1
+	, Hover = 2
+	, Boat  = 3
+	, Ship  = 3
+}
+
 if not Script.IsEngineMinVersion(104, 0, 1100) then
 	Script.SetWatchProjectile  = Script.SetWatchWeapon
 	Script.SetWatchExplosion   = Script.SetWatchWeapon
