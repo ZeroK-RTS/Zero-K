@@ -199,6 +199,8 @@ local ignoredCommand = {
 	[CMD_FIRE_AT_SHIELD] = true,
 	[CMD_FIRE_TOWARDS_ENEMY] = true,
 	[CMD_SELECTION_RANK] = true,
+	[CMD_IDLE_DODGE] = true,
+	[CMD_MOVE_DODGE] = true,
 }
 
 local function ProcessCommand(unitID, cmdID, params, noUsefuless, noPosition)

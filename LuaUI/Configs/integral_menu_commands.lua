@@ -84,6 +84,8 @@ local cmdPosDef = {
 	[CMD.IDLEMODE]            = {pos = 1, priority = 18},
 	[CMD_AP_FLY_STATE]        = {pos = 1, priority = 19},
 	[CMD_AUTO_CALL_TRANSPORT] = {pos = 1, priority = 21},
+	[CMD_IDLE_DODGE] 		  = {pos = 1, priority = 10.1},
+	[CMD_MOVE_DODGE]          = {pos = 1, priority = 10.2},
 }
 
 --------------------------------------------------------------------------------

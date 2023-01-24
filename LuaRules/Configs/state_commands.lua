@@ -39,6 +39,8 @@ local stateCommands = {
 	[CMD_TOGGLE_DRONES] = true,
 	[CMD_AUTO_CALL_TRANSPORT] = true,
 	[CMD_SELECTION_RANK] = true,
+	[CMD_IDLE_DODGE] = true,
+	[CMD_MOVE_DODGE] = true,
 }
 
 return stateCommands

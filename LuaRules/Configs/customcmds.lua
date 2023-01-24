@@ -93,6 +93,8 @@ return {
 	TURN = 38530,
 	WANTED_SPEED = 38825,
 	AIR_STRAFE = 39381,
+	IDLE_DODGE = 39382,
+	MOVE_DODGE = 39383,
 
 	-- terraform
 	RAMP = 39734,

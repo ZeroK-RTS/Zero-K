@@ -121,6 +121,8 @@ local custom_cmd_actions = {
 	divestate =     {cmdType = 2, cmdID = CMD_UNIT_BOMBER_DIVE_STATE, name = "Raven Dive", states = {'Never', 'Under Shields', 'For Mobiles', 'Always Low'}},
 	globalbuild =   {cmdType = 2, cmdID = CMD_GLOBAL_BUILD, name = "Constructor Global AI", states = {'Off', 'On'}},
 	toggledrones =  {cmdType = 2, cmdID = CMD_TOGGLE_DRONES, name = "Drone Construction.", states = {'Off', 'On'}},
+	idledodge     = {cmdType = 2, cmdID = CMD_IDLE_DODGE, name = "Idle Dodge", states = {'0', '1', '2'}},
+	movedodge     = {cmdType = 2, cmdID = CMD_MOVE_DODGE, name = "Move Dodge", states = {'0', '1', '2'}},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -209,6 +211,8 @@ local usedActions = {
 	["fireatshields"] = true,
 	["firetowards"] = true,
 	["goostate"] = true,
+	["idledodge"] = true,
+	["movedodge"] = true,
 
 	-- These actions are used, just not by selecting everything with default UI
 	["globalbuild"] = true,

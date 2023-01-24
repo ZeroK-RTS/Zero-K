@@ -43,6 +43,7 @@ local random                = math.random
 local sqrt                  = math.sqrt
 local min                   = math.min
 
+local ClampPosition = Spring.Utilities.ClampPosition
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
@@ -404,6 +405,13 @@ local function UpdateJinkRotation(behaviour, unitData)
 	end
 end
 
+local function InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
+	cx, cz = GG.UnitDodge.Move(unitID, cx, cz, UPDATE_RATE)
+	cx, cz = ClampPosition(cx, cz)
+	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+	return cx, cy, cz
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 ---- Unit AI Execution
@@ -442,10 +450,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		end
 		
 		if move then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		--Spring.SetUnitMoveGoal(unitID, cx, cy, cz)
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -496,10 +504,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData. cy, unitData.cz = cx, cy, cz
@@ -536,10 +544,10 @@ local function DoSwarmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -698,10 +706,10 @@ local function DoSkirmEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, ty
 		
 		GG.recursion_GiveOrderToUnit = true
 		if move then
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 		else
-			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+			cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 		end
 		GG.recursion_GiveOrderToUnit = false
 		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
@@ -772,10 +780,10 @@ local function DoFleeEnemy(unitID, behaviour, unitData, enemy, enemyUnitDef, typ
 
 		if cmdID then
 			if move then
-				cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+				cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
 			else
-				cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz }, CMD.OPT_ALT )
+				cx, cy, cz = InsertMoveDodgeOrderToUnit(unitID, cx, cy, cz)
 			end
 		elseif isIdleAttack then
 			cx, cy, cz = GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {cx, cy, cz }, CMD_OPT_RIGHT )
@@ -900,6 +908,116 @@ local function DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 	return false
 end
 
+local function DoMoveDodge(unitID, fx, fz, unitData)
+	local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, fx, fz, UPDATE_RATE)
+	if dodgeSize > 1 then
+		cx, cz = ClampPosition(cx, cz)
+		local cy = Spring.GetGroundHeight(cx, cz)
+		spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT)
+		unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+		unitData.receivedOrder = true
+		return true
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Idle Handling
+
+local function AddIdleUnit(unitID, unitDefID)
+	if not (unit[unitID] and spValidUnitID(unitID)) then
+		return
+	end
+	local unitData = unit[unitID]
+	unitData.wasIdle = true
+	
+	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
+	if doDebug then
+		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
+		Spring.Echo("=== Unit Idle", unitID, " ===")
+	end
+
+	if unitData.wasDodge then
+		return
+	end
+	
+	if unitData.idleWantReturn and unitData.idleX then
+		if doDebug then
+			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
+		end
+		ReturnUnitToIdlePos(unitID, unitData)
+		return
+	end
+	
+	local behaviour = GetUnitBehavior(unitID, unitData.udID)
+	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	
+	unitData.idleX = x
+	unitData.idleZ = z
+	unitData.wantFightReturn = nil
+	unitData.idleWantReturn = nil
+
+	if doDebug then
+		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
+	end
+	
+	if nearbyEnemy then
+		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
+		if enemyUnitDef and typeKnown then
+			local enemyRange = GetEnemyRealRange(enemyUnitDef)
+			if enemyRange and enemyRange > 0 then
+				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
+				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
+					nearbyEnemy = false -- Don't aggress against nearby enemy that cannot shoot.
+				end
+			end
+		end
+	end
+	
+	if doDebug then
+		Spring.Echo("After nearby check", nearbyEnemy)
+	end
+	
+	SetIdleAgression(unitID, unitData, nearbyEnemy)
+	--Spring.Utilities.UnitEcho(unitID, "I")
+end
+
+function gadget:UnitIdle(unitID, unitDefID)
+	AddIdleUnit(unitID, unitDefID)
+end
+
+local function DoIdleProjDodge(unitID, cmdTag, unitData, move)
+		local cx, cz, dodgeSize = GG.UnitDodge.Idle(unitID, UPDATE_RATE)
+		if dodgeSize > 1 then
+			cx, cz = ClampPosition(cx, cz)
+			local cy = Spring.GetGroundHeight(cx, cz)
+			if move then
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdTag}, 0 )
+			else
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx, cy, cz, -1}, CMD.OPT_ALT )
+			end
+			unitData.cx, unitData.cy, unitData.cz = cx, cy, cz
+			unitData.receivedOrder = true
+			unitData.wasDodge = true
+			return true
+		end
+
+	if unitData.wasDodge then
+		unitData.idleWantReturn = true
+		local rx, rz = unitData.queueReturnX or unitData.idleX, unitData.queueReturnZ or unitData.idleZ
+		local cx, cz, dodgeSize = GG.UnitDodge.Move(unitID, rx, rz, UPDATE_RATE)
+		if dodgeSize < 1 then
+			unitData.wasDodge = false
+			AddIdleUnit(unitID, unitData)
+		end
+	end
+
+	return false
+end
+
 local function DoUnitUpdate(unitID, frame, slowUpdate)
 	local unitData = unit[unitID]
 	
@@ -1003,13 +1121,13 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if not (exitEarly or behaviour.onlyIdleHandling) then
 			--Spring.Echo("cmdID", cmdID, cmdTag, move, math.random())
-			aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+			aiTargetFound, aiSentOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 				fightX, fightY, fightZ, unitData, behaviour, enemy, enemyUnitDef, typeKnown,
 				move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			
 			if autoAttackEnemyID and not aiTargetFound then
 				enemyUnitDef, typeKnown = GetUnitVisibleInformation(autoAttackEnemyID, unitData.allyTeam)
-				aiTargetFound, sentAiOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
+				aiTargetFound, aiSentOrder = DoTacticalAI(unitID, cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3,
 					fightX, fightY, fightZ, unitData, behaviour, autoAttackEnemyID, enemyUnitDef, typeKnown,
 					move, haveFight, holdPos, unitData.idleWantReturn, particularEnemy, frame, alwaysJink)
 			end
@@ -1019,7 +1137,7 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 			Spring.Echo("sentAiOrder", aiSentOrder, autoCmdTag, autoAttackEnemyID, enemy)
 		end
 		
-		if not aiSentOrder and autoCmdTag and (autoAttackEnemyID or -1) >= 0 and (enemy or -1) >= 0 and autoAttackEnemyID ~= enemy then
+		if autoCmdTag and (autoAttackEnemyID or -1) >= 0 and (enemy or -1) >= 0 and autoAttackEnemyID ~= enemy then
 			-- Removes a fight/autotarget-issued attack command if there is a closer enemy.
 			-- Prevents chasing past enemies that are good targets.
 			-- Only do this if no order was sent, so swarming may be less affected, which seems fine.
@@ -1028,6 +1146,14 @@ local function DoUnitUpdate(unitID, frame, slowUpdate)
 		
 		if enemy and enemy ~= -1 and unitData.idleWantReturn and not aiTargetFound then
 			DoAiLessIdleCheck(unitID, behaviour, unitData, frame, enemy, enemyUnitDef, typeKnown)
+		end
+	end
+
+	if not aiSentOrder then
+		if fightZ then
+			DoMoveDodge(unitID, fightX, fightZ, unitData)
+		elseif unitData.wasIdle then
+			DoIdleProjDodge(unitID, cmdTag, unitData, move)
 		end
 	end
 	
@@ -1094,69 +1220,6 @@ function gadget:GameFrame(n)
 	UpdateUnits(n, n%UPDATE_RATE + 1, UPDATE_RATE)
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Idle Handling
-
-local function AddIdleUnit(unitID, unitDefID)
-	if not (unit[unitID] and spValidUnitID(unitID)) then
-		return
-	end
-	local unitData = unit[unitID]
-	unitData.wasIdle = true
-	
-	local doDebug = (debugUnit and debugUnit[unitID]) or debugAll
-	if doDebug then
-		Spring.Utilities.UnitEcho(unitID, "Idle " .. unitID)
-		Spring.Echo("=== Unit Idle", unitID, " ===")
-	end
-	
-	if unitData.idleWantReturn and unitData.idleX then
-		if doDebug then
-			Spring.Echo("Return to idle position", unitData.idleX, unitData.idleZ)
-		end
-		ReturnUnitToIdlePos(unitID, unitData)
-		return
-	end
-	
-	local behaviour = GetUnitBehavior(unitID, unitData.udID)
-	local nearbyEnemy = spGetUnitNearestEnemy(unitID, behaviour.leashAgressRange, true) or false
-	local x, _, z = Spring.GetUnitPosition(unitID)
-	
-	unitData.idleX = x
-	unitData.idleZ = z
-	unitData.wantFightReturn = nil
-	unitData.idleWantReturn = nil
-
-	if doDebug then
-		Spring.Echo("New Idle", unitData.idleX, unitData.idleZ, nearbyEnemy)
-	end
-	
-	if nearbyEnemy then
-		local enemyUnitDef, typeKnown = GetUnitVisibleInformation(nearbyEnemy, unitData.allyTeam)
-		if enemyUnitDef and typeKnown then
-			local enemyRange = GetEnemyRealRange(enemyUnitDef)
-			if enemyRange and enemyRange > 0 then
-				local enemyDist = spGetUnitSeparation(nearbyEnemy, unitID, true)
-				if enemyRange + behaviour.leashEnemyRangeLeeway < enemyDist then
-					nearbyEnemy = false -- Don't aggress against nearby enemy that cannot shoot.
-				end
-			end
-		end
-	end
-	
-	if doDebug then
-		Spring.Echo("After nearby check", nearbyEnemy)
-	end
-	
-	SetIdleAgression(unitID, unitData, nearbyEnemy)
-	--Spring.Utilities.UnitEcho(unitID, "I")
-end
-
-function gadget:UnitIdle(unitID, unitDefID)
-	AddIdleUnit(unitID, unitDefID)
-end
-
 function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
 	if playerID == -1 or fromLua then
 		return
@@ -1173,6 +1236,7 @@ function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 		needNextUpdate[#needNextUpdate + 1] = unitID
 	end
 	unitData.wasIdle = false
+	unitData.wasDodge = false
 	unitData.idleWantReturn = false
 end
 
