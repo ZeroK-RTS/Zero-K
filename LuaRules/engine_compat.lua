@@ -1,4 +1,5 @@
 local RET_FALSE = function() return false end
+local RET_NONE  = function() end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
      though this can only happen for random people's forks since regular BAR & Spring build
@@ -135,6 +136,20 @@ if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
 	local spSetUnitExperience = Spring.SetUnitExperience
 	Spring.AddUnitExperience = function (unitID, deltaXP)
 		spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
+	end
+end
+
+if not Spring.SetFactoryBuggerOff and Script.GetSynced() then -- BAR 105-1029
+	Spring.SetFactoryBuggerOff = RET_FALSE
+end
+
+if not Spring.BuggerOff and Script.GetSynced() then -- BAR 105-1029
+	Spring.BuggerOff = RET_NONE
+end
+
+if not Spring.GetFactoryBuggerOff then -- BAR 105-1029
+	Spring.GetFactoryBuggerOff = function()
+		return false, 0, 1, 0, false, false, false
 	end
 end
 
