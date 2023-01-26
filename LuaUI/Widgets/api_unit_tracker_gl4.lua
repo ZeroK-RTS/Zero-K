@@ -535,6 +535,12 @@ end
 
 
 function widget:Initialize()
+	if not gl.GetVBO then
+		Spring.Echo("api_unit_tracker_gl4.lua: no VBO support, exiting")
+		widgetHandler:RemoveWidget(widget)
+		return
+	end
+
 	spec, fullview = Spring.GetSpectatingState()
 	myTeamID = Spring.GetMyTeamID()
 	myAllyTeamID = Spring.GetMyAllyTeamID()
@@ -568,8 +574,10 @@ function widget:Shutdown()
 	visibleUnits = {}
 	numVisibleUnits = 0 
 	
-	WG['unittrackerapi'].visibleUnits = visibleUnits
-	WG['unittrackerapi'].alliedUnits = alliedUnits
+	if WG['unittrackerapi'] then
+		WG['unittrackerapi'].visibleUnits = visibleUnits
+		WG['unittrackerapi'].alliedUnits = alliedUnits
+	end
 	visibleUnitsChanged()
 	alliedUnitsChanged()
 end
