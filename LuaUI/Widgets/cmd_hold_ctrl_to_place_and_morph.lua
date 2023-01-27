@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name      = "Hold Ctrl during placement to morph",
 		desc      = "Hold the Ctrl key while placing a Cornea, Aegis, Radar Tower or Geothermal Reactor to issue a morph order to the nanoframe when it's created (which will make it start morphing once finished).",
-		author    = "dunno",
+		author    = "dunno", -- the author is known, "dunno" is the nickname
 		date      = "2022-05-18",
 		license   = "MIT",
 		layer     = 0,
