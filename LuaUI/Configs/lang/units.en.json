@@ -1067,7 +1067,7 @@
 	"tankheavyraid" : {
 		"name" : "Blitz",
 		"description" : "Lightning Assault/Raider Tank",
-		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."
+		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base."
 	},
 	"staticheavyradar" : {
 		"name" : "Advanced Radar",

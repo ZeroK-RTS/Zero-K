@@ -1007,7 +1007,7 @@
 	"tankheavyraid" : {
 		"name" : "Blitz",
 		"description" : "Lekki czołg szturmowy",
-		"helptext" : "Blitz to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Blitz uwalnia falę EMP."
+		"helptext" : "Blitz to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych."
 	},
 	"staticheavyradar" : {
 		"name" : "Zaawansowany radar",

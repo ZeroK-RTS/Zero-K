@@ -1012,7 +1012,7 @@
     "tankheavyraid": {
         "name": "Baskıncı",
         "description": "Şimşek Taarruz/Akıncı Tank",
-        "helptext": "Baskıncı  yüksek teknolojili bir akıncı silahı olan yıldırım silahı, çoğunlukla felç edici hasarı verir. Bu şekilde, Baskıncı taretleri devre dışı bırakabilir, savunma hattını kullanarak vals yapabilir ve rakibin üssünün ekonomik kalbi seviyesini yükseltebilir. Öldürüldüğünde, çevredeki akıncıları sersemletebilecek bir EMD patlaması meydana getiriyor."
+        "helptext": "Baskıncı  yüksek teknolojili bir akıncı silahı olan yıldırım silahı, çoğunlukla felç edici hasarı verir. Bu şekilde, Baskıncı taretleri devre dışı bırakabilir, savunma hattını kullanarak vals yapabilir ve rakibin üssünün ekonomik kalbi seviyesini yükseltebilir."
     },
     "staticheavyradar": {
         "name": "Gelişmiş Radar",
