@@ -189,6 +189,8 @@ if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 	end
 end
 
+Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
+
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)

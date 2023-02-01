@@ -45,7 +45,7 @@ local sqrt = math.sqrt
 local strFind = string.find
 local strFormat = string.format
 
-local METAL_MAP_SQUARE_SIZE = 16
+local METAL_MAP_SQUARE_SIZE = Game.metalMapSquareSize
 local MEX_RADIUS = Game.extractorRadius
 local MAP_SIZE_X = Game.mapSizeX
 local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
