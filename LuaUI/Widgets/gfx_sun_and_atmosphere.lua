@@ -25,6 +25,14 @@ local MAP_FILE        = (Game.mapName or "") .. ".lua"
 local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
 local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
 
+local sunSettingsList = {}
+local sunSettingsGetSunMap = {}
+
+local defaultFog = {
+	["fogStart"] = 0.99,
+	["fogEnd"] = 1,
+}
+
 local initialized              = false
 local sunSettingsChanged       = false
 local directionSettingsChanged = false
@@ -68,8 +76,30 @@ local function SunDirectionFunc(newDir, newPitch)
 	Spring.SetSunDirection(sunX, sunY, sunZ)
 end
 
+local function GetSunDirection()
+	local sx, sy, sz = gl.GetSun("pos")
+	local dir = Spring.Utilities.Vector.Angle(sx, sz)
+	
+	-- Idk if GetSun is guranteed to return a unit
+	local norm = Spring.Utilities.Vector.Dist3D(sx, sy, sz, 0, 0, 0)
+	sx, sy, sz = sx/norm, sy/norm, sz/norm
+	local pitch = math.asin(sy) or 1
+	--Spring.Echo("SunVec", sx, sy, sz, pitch, dir)
+	return pitch, dir
+end
+
+local function FullSunUpdate()
+	local sunData = {}
+	for i = 1, #sunSettingsList do
+		local name = sunSettingsList[i]
+		sunData[name] = options[name].value
+	end
+	Spring.SetSunLighting(sunData)
+end
+
 local function UpdateSunValue(name, value)
-	Spring.SetSunLighting({[name] = value})
+	Spring.SetSunLighting({[name] = value}) -- For specularExponent, which isn't in sunSettingsList
+	FullSunUpdate()
 	sunSettingsChanged = true
 end
 
@@ -82,6 +112,21 @@ local function UpdateWaterValue(name, value)
 	Spring.SetWaterParams({[name] = value})
 	ResetWater()
 	waterSettingsChanged = true
+end
+
+local function GetSunMapSetting(thing, colType)
+	if colType == "shadowDensity" then
+		if thing == "unit" then
+			return gl.GetSun(colType, thing)
+		end
+		return gl.GetSun(colType)
+	end
+	if thing == "unit" then
+		local r, g, b = gl.GetSun(colType, thing)
+		return {r, g, b, 1}
+	end
+	local r, g, b = gl.GetSun(colType)
+	return {r, g, b, 1}
 end
 
 --------------------------------------------------------------------------------
@@ -129,11 +174,26 @@ local function SaveDefaultWaterFix()
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
 
-local function LoadSunAndFogSettings()
-	if not OVERRIDE_CONFIG then
-		return
+local function ReadSunFromMap(sunConf, dirConf)
+	for i = 1, #sunSettingsList do
+		local name = sunSettingsList[i]
+		if not sunConf[name] then
+			options[name].value = GetSunMapSetting(sunSettingsGetSunMap[name][1], sunSettingsGetSunMap[name][2])
+		end
 	end
-	local sun = OVERRIDE_CONFIG.sun
+	
+	local pitch, dir = GetSunDirection()
+	if not dirConf["sunPitch"] then
+		options["sunPitch"].value = pitch
+	end
+	if not dirConf["sunDir"] then
+		options["sunDir"].value = dir
+	end
+end
+
+local function LoadSunAndFogSettings()
+	local override = OVERRIDE_CONFIG or {}
+	local sun = override.sun
 	if sun then
 		Spring.SetSunLighting(sun)
 		sunSettingsChanged = true
@@ -145,15 +205,16 @@ local function LoadSunAndFogSettings()
 		end
 	end
 	
-	local direction = OVERRIDE_CONFIG.direction
+	local direction = override.direction
 	if direction then
 		SunDirectionFunc(direction.sunDir, direction.sunPitch)
 		
 		options["sunDir"].value = direction.sunDir
 		options["sunPitch"].value = direction.sunPitch
 	end
+	ReadSunFromMap(sun or {}, direction or {})
 	
-	local fog = OVERRIDE_CONFIG.fog
+	local fog = override.fog or defaultFog
 	if fog then
 		Spring.SetAtmosphere(fog)
 		fogSettingsChanged = true
@@ -165,14 +226,14 @@ local function LoadSunAndFogSettings()
 		end
 	end
 
-	local water = OVERRIDE_CONFIG.water
+	local water = override.water
 	if water then
 		Spring.SetWaterParams(water)
 		waterSettingsChanged = true
 		ResetWater()
 	end
 	
-	if OVERRIDE_CONFIG.fixDefaultWater then
+	if override.fixDefaultWater then
 		ApplyDefaultWaterFix()
 	end
 end
@@ -267,19 +328,32 @@ local function GetOptions()
 		}
 		options_order[#options_order + 1] = name
 	end
+	
+	local function AddSunNumberOption(name, humanName, readFromMap, minVal, maxVal)
+		local currentSetting = GetSunMapSetting(readFromMap[1], readFromMap[2])
+		sunSettingsList[#sunSettingsList + 1] = name
+		sunSettingsGetSunMap[name] = readFromMap
+		AddNumberOption(name, humanName, sunPath, UpdateSunValue, currentSetting, minVal, maxVal)
+	end
 
 ---------------------------------------
 -- Sun
 ---------------------------------------
 	local sunThings = {"ground", "unit"}
 	local sunColors = {"Ambient", "Diffuse", "Specular"}
+	local sunColorsLower = {"ambient", "diffuse", "specular"}
 	for _, thing in ipairs(sunThings) do
-		for _, color in ipairs(sunColors) do
-			AddColorOption(thing .. color .. "Color", thing .. " " .. color .. "Color", sunPath, UpdateSunValue)
+		for i, color in ipairs(sunColors) do
+			local name = thing .. color .. "Color"
+			local currentColor = GetSunMapSetting(thing, sunColorsLower[i])
+			sunSettingsList[#sunSettingsList + 1] = name
+			sunSettingsGetSunMap[name] = {thing, sunColorsLower[i]}
+			AddColorOption(name, thing .. " " .. color .. " Color", sunPath, UpdateSunValue, currentColor)
 		end
 	end
 	
-	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue, 30, 0, 50)
+	AddSunNumberOption("groundShadowDensity", "Shadow Density when cast on ground", {"ground", "shadowDensity"}, 0, 1)
+	AddSunNumberOption("modelShadowDensity", "Shadow Density when cast on units", {"unit", "shadowDensity"}, 0, 1)
 
 	options["sunDir"] = {
 		name = "Sun Direction",
@@ -289,6 +363,7 @@ local function GetOptions()
 		OnChange = function (self)
 			if initialized then
 				SunDirectionFunc(self.value, false)
+				FullSunUpdate()
 			end
 		end,
 		advanced = true,
@@ -298,13 +373,14 @@ local function GetOptions()
 	options_order[#options_order + 1] = "sunDir"
 	
 	options["sunPitch"] = {
-		name = "Sun pitch",
+		name = "Sun Pitch",
 		type = 'number',
 		value = sunPitch,
 		min = 0.05*math.pi, max = 0.5*math.pi, step = 0.01,
 		OnChange = function (self)
 			if initialized then
 				SunDirectionFunc(false, self.value)
+				FullSunUpdate()
 			end
 		end,
 		advanced = true,
@@ -313,6 +389,9 @@ local function GetOptions()
 	}
 	options_order[#options_order + 1] = "sunPitch"
 
+	-- I don't know how to read this from maps so it isn't in sunSettingsList.
+	AddNumberOption("specularExponent", "Specular Exponent", sunPath, UpdateSunValue, 30, 0, 50)
+	
 ---------------------------------------
 -- Fog
 ---------------------------------------
