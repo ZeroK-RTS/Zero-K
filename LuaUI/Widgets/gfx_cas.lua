@@ -13,13 +13,6 @@ if not gl.CreateShader or not gl.GetVAO then
 end
 
 -----------------------------------------------------------------
--- Constants
------------------------------------------------------------------
-
-local SHARPNESS = 1.0
-local version = 1.06
-
------------------------------------------------------------------
 -- Lua Shortcuts
 -----------------------------------------------------------------
 
@@ -46,8 +39,13 @@ local fullTexQuad
 -- Local Functions
 -----------------------------------------------------------------
 
-local isDisabled = false
+local isDisabled = true
 local function UpdateShader(sharpness)
+	if not casShader then
+		-- can happen due to epicmenu if CAS fails in Initialize
+		return
+	end
+
 	if sharpness > 0 then
 		if isDisabled then
 			isDisabled = false
@@ -71,6 +69,25 @@ local function UpdateShader(sharpness)
 		widgetHandler:RemoveCallIn("ViewResize")
 	end
 end
+
+options_path = 'Settings/Graphics/Effects'
+options = {
+	cas_sharpness = {
+		name = 'Sharpening',
+		type = 'number',
+		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. Also FIXME: is there a reference unit for the value? How much is 1 really?
+		min = 0.0,
+		max = 1.25, -- can go even higher but at about 1.5 it degenerates, don't let it get near
+		tooltipFunction = function(self)
+			return "Current: " .. math.ceil(100*self.value) .. "%\nUse 100% as a reasonable reference value. Higher may be excessive\n"
+		end,
+		step = 0.01,
+		OnChange = function(self) UpdateShader(self.value) end,
+		noHotkey = true,
+		update_on_the_fly = true,
+	},
+}
+
 
 -----------------------------------------------------------------
 -- Widget Functions
@@ -120,7 +137,7 @@ function widget:Initialize()
 		return
 	end
 
-	UpdateShader(SHARPNESS)
+	UpdateShader(options.cas_sharpness.value)
 end
 
 function widget:Shutdown()
@@ -155,17 +172,4 @@ function widget:DrawScreenEffects()
 	casShader:Deactivate()
 	glBlending(true)
 	glTexture(0, false)
-end
-
-function widget:GetConfigData()
-	return {
-		version = version,
-		SHARPNESS = SHARPNESS
-	}
-end
-
-function widget:SetConfigData(data)
-	if data.SHARPNESS ~= nil and data.version ~= nil and data.version == version then
-		SHARPNESS = data.SHARPNESS
-	end
 end
