@@ -106,14 +106,22 @@ end
 function widget:Shutdown()
 	if casShader then
 		casShader:Finalize()
+		casShader = nil
 	end
 
 	if fullTexQuad then
 		fullTexQuad:Delete()
+		fullTexQuad = nil
+	end
+
+	if screenCopyTex then
+		gl.DeleteTexture(screenCopyTex)
+		screenCopyTex = nil
 	end
 end
 
 function widget:ViewResize()
+	-- FIXME: could probably be optimized (reuse objects etc) but we're lazy
 	widget:Shutdown()
 	widget:Initialize()
 end
