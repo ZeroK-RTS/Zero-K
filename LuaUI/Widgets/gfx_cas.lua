@@ -28,24 +28,10 @@ local glTexture  = gl.Texture
 local glBlending = gl.Blending
 
 -----------------------------------------------------------------
--- File path Constants
------------------------------------------------------------------
-
-local shaderDir = "LuaUI/Widgets/Shaders/"
-local luaShaderDir = "LuaUI/Widgets/Include/"
-
------------------------------------------------------------------
--- Shader Sources
------------------------------------------------------------------
-
-local vsSrcPath = shaderDir .. "cas.vert.glsl"
-local fsSrcPath = shaderDir .. "cas.frag.glsl"
-
------------------------------------------------------------------
 -- Global Variables
 -----------------------------------------------------------------
 
-local LuaShader = VFS.Include(luaShaderDir.."LuaShader.lua")
+local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua")
 
 local vpx, vpy, vsx, vsy
 local screenCopyTex
@@ -76,8 +62,8 @@ function widget:Initialize()
 	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
 
 	casShader = LuaShader({
-		vertex = VFS.LoadFile(vsSrcPath),
-		fragment = VFS.LoadFile(fsSrcPath),
+		vertex   = VFS.LoadFile("LuaUI/Widgets/Shaders/cas.vert.glsl"),
+		fragment = VFS.LoadFile("LuaUI/Widgets/Shaders/cas.frag.glsl"),
 		uniformInt = {
 			screenCopyTex = 0,
 		},
