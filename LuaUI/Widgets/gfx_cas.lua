@@ -1,8 +1,9 @@
 function widget:GetInfo() return {
 	name      = "Contrast Adaptive Sharpen",
 	desc      = "Spring port of AMD FidelityFX' Contrast Adaptive Sharpen (CAS)",
-	author    = "martymcmodding, ivand",
-	layer     = 2000,
+	author    = "AMD Inc., SLSNe, martymcmodding, ivand", -- https://gist.github.com/martymcmodding/30304c4bffa6e2bd2eb59ff8bb09d135
+	license   = "MIT",
+	layer     = 2000, -- FIXME: why?
 	enabled   = true,
 } end
 
@@ -10,8 +11,6 @@ if not gl.CreateShader or not gl.GetVAO then
 	Spring.Echo("CAS: GLSL not supported.")
 	return
 end
-
--- Shameless port from https://gist.github.com/martymcmodding/30304c4bffa6e2bd2eb59ff8bb09d135
 
 -----------------------------------------------------------------
 -- Constants
