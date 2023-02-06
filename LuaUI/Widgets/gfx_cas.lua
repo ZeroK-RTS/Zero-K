@@ -26,6 +26,8 @@ local version = 1.06
 
 local glTexture  = gl.Texture
 local glBlending = gl.Blending
+local glCopyToTexture = gl.CopyToTexture
+local GL_TRIANGLES = GL.TRIANGLES
 
 -----------------------------------------------------------------
 -- Global Variables
@@ -39,7 +41,6 @@ local casShader
 
 local fullTexQuad
 
-local glCopyToTexture = gl.CopyToTexture
 
 
 -----------------------------------------------------------------
@@ -133,7 +134,7 @@ function widget:DrawScreenEffects()
 	glTexture(0, screenCopyTex)
 	glBlending(false)
 	casShader:Activate()
-	fullTexQuad:DrawArrays(GL.TRIANGLES, 3)
+	fullTexQuad:DrawArrays(GL_TRIANGLES, 3)
 	casShader:Deactivate()
 	glBlending(true)
 	glTexture(0, false)
