@@ -30,7 +30,7 @@ local STARTUP_FILENAME = LUAUI_DIRNAME .. 'camain.lua'
 --
 
 do
-  text = VFS.LoadFile(STARTUP_FILENAME, VFS.ZIP)
+  local text = VFS.LoadFile(STARTUP_FILENAME, VFS.ZIP)
   if (text == nil) then
     Script.Kill('Failed to load ' .. STARTUP_FILENAME)
   end
