@@ -102,6 +102,11 @@ function widget:Initialize()
 		wrap_s = GL.CLAMP,
 		wrap_t = GL.CLAMP,
 	})
+	if screenCopyTex == nil then
+		Spring.Echo("CAS: failed to gl.CreateTexture")
+		widgetHandler:RemoveWidget()
+		return
+	end
 
 	UpdateShader()
 
@@ -129,9 +134,6 @@ end
 
 function widget:DrawScreenEffects()
 	glCopyToTexture(screenCopyTex, 0, 0, vpx, vpy, vsx, vsy)
-
-	if screenCopyTex == nil then return end
-
 	glTexture(0, screenCopyTex)
 	glBlending(false)
 	casShader:Activate()
