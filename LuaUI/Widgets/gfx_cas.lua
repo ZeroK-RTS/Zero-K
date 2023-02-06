@@ -12,32 +12,10 @@ if not gl.CreateShader or not gl.GetVAO then
 	return
 end
 
------------------------------------------------------------------
--- Lua Shortcuts
------------------------------------------------------------------
-
-local glTexture  = gl.Texture
-local glBlending = gl.Blending
-local glCopyToTexture = gl.CopyToTexture
-local GL_TRIANGLES = GL.TRIANGLES
-
------------------------------------------------------------------
--- Global Variables
------------------------------------------------------------------
-
-local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua", nil, VFS.GAME)
-
 local vpx, vpy, vsx, vsy
 local screenCopyTex
 local casShader
-
 local fullTexQuad
-
-
-
------------------------------------------------------------------
--- Local Functions
------------------------------------------------------------------
 
 local isDisabled = true
 local function UpdateShader(sharpness)
@@ -88,10 +66,12 @@ options = {
 	},
 }
 
+local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua", nil, VFS.GAME)
 
------------------------------------------------------------------
--- Widget Functions
------------------------------------------------------------------
+local glTexture  = gl.Texture
+local glBlending = gl.Blending
+local glCopyToTexture = gl.CopyToTexture
+local GL_TRIANGLES = GL.TRIANGLES
 
 function widget:Initialize()
 	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
