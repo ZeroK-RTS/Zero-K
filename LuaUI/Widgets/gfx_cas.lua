@@ -6,8 +6,8 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-if not gl.CreateShader then
-	Spring.Echo(widget:GetInfo().name .. ": GLSL not supported.")
+if not gl.CreateShader or not gl.GetVAO then
+	Spring.Echo("CAS: GLSL not supported.")
 	return
 end
 
@@ -71,14 +71,15 @@ function widget:Initialize()
 
 	if not casShader then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, gl.GetShaderLog())
+		widgetHandler:RemoveWidget()
 		return
 	end
 
 	local shaderCompiled = casShader:Initialize()
 	if not shaderCompiled then
-			Spring.Echo("Failed to compile Contrast Adaptive Sharpen shader, removing widget")
-			widgetHandler:RemoveWidget()
-			return
+		Spring.Echo("Failed to compile Contrast Adaptive Sharpen shader, removing widget")
+		widgetHandler:RemoveWidget()
+		return
 	end
 
 	screenCopyTex = gl.CreateTexture(vsx, vsy, {
@@ -94,13 +95,14 @@ function widget:Initialize()
 		return
 	end
 
-	UpdateShader()
-
 	fullTexQuad = gl.GetVAO()
 	if fullTexQuad == nil then
-		widgetHandler:RemoveWidget() --no fallback for potatoes
+		Spring.Echo("CAS: failed to gl.getVAO")
+		widgetHandler:RemoveWidget()
 		return
 	end
+
+	UpdateShader()
 end
 
 function widget:Shutdown()
