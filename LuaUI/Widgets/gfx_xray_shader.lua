@@ -147,7 +147,7 @@ function widget:Initialize()
         color = gl_Color.rgb;
               
         gl_Position = gl_ProjectionMatrix * P;
-        position = gl_Position;
+        position = gl_Position.xyz;
       }
     ]],
  
