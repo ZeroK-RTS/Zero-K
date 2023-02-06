@@ -46,12 +46,30 @@ local fullTexQuad
 -- Local Functions
 -----------------------------------------------------------------
 
+local isDisabled = false
 local function UpdateShader(sharpness)
-	casShader:ActivateWith(function()
-		casShader:SetUniform("sharpness", sharpness)
-		casShader:SetUniform("viewPosX", vpx)
-		casShader:SetUniform("viewPosY", vpy)
-	end)
+	if sharpness > 0 then
+		if isDisabled then
+			isDisabled = false
+			widgetHandler:UpdateCallIn("DrawScreenEffects")
+			widgetHandler:UpdateCallIn("ViewResize")
+
+			local nsx, nsy, npx, npy = Spring.GetViewGeometry()
+			if nsx ~= vsx or nsy ~= vsy
+			or npx ~= vpx or npy ~= vpy then
+				widget:ViewResize()
+			end
+		end
+		casShader:ActivateWith(function()
+			casShader:SetUniform("sharpness", sharpness)
+			casShader:SetUniform("viewPosX", vpx)
+			casShader:SetUniform("viewPosY", vpy)
+		end)
+	else
+		isDisabled = true
+		widgetHandler:RemoveCallIn("DrawScreenEffects")
+		widgetHandler:RemoveCallIn("ViewResize")
+	end
 end
 
 -----------------------------------------------------------------
