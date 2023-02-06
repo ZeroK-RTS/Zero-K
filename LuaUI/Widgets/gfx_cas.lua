@@ -46,9 +46,9 @@ local fullTexQuad
 -- Local Functions
 -----------------------------------------------------------------
 
-local function UpdateShader()
+local function UpdateShader(sharpness)
 	casShader:ActivateWith(function()
-		casShader:SetUniform("sharpness", SHARPNESS)
+		casShader:SetUniform("sharpness", sharpness)
 		casShader:SetUniform("viewPosX", vpx)
 		casShader:SetUniform("viewPosY", vpy)
 	end)
@@ -102,7 +102,7 @@ function widget:Initialize()
 		return
 	end
 
-	UpdateShader()
+	UpdateShader(SHARPNESS)
 end
 
 function widget:Shutdown()
