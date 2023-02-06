@@ -25,7 +25,7 @@ local GL_TRIANGLES = GL.TRIANGLES
 -- Global Variables
 -----------------------------------------------------------------
 
-local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua")
+local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua", nil, VFS.GAME)
 
 local vpx, vpy, vsx, vsy
 local screenCopyTex
