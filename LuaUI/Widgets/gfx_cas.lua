@@ -19,22 +19,17 @@ local fullTexQuad
 
 local isDisabled = true
 local function UpdateShader(sharpness)
-	if not casShader then
-		-- can happen due to epicmenu if CAS fails in Initialize
-		return
-	end
-
 	if sharpness > 0 then
 		if isDisabled then
 			isDisabled = false
 			widgetHandler:UpdateCallIn("DrawScreenEffects")
 			widgetHandler:UpdateCallIn("ViewResize")
 
-			local nsx, nsy, npx, npy = Spring.GetViewGeometry()
-			if nsx ~= vsx or nsy ~= vsy
-			or npx ~= vpx or npy ~= vpy then
-				widget:ViewResize()
-			end
+			widget:Initialize()
+		end
+		if not casShader then
+			-- can happen on shader creation failure
+			return
 		end
 		casShader:ActivateWith(function()
 			casShader:SetUniform("sharpness", sharpness)
@@ -43,6 +38,7 @@ local function UpdateShader(sharpness)
 		end)
 	else
 		isDisabled = true
+		widget:Shutdown()
 		widgetHandler:RemoveCallIn("DrawScreenEffects")
 		widgetHandler:RemoveCallIn("ViewResize")
 	end
@@ -74,6 +70,14 @@ local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
 function widget:Initialize()
+	local sharpness = options.cas_sharpness.value
+	if sharpness == 0 then
+		-- lazy initialisation; zero is the default so this avoids creating those objects to lay unused
+		widgetHandler:RemoveCallIn("DrawScreenEffects")
+		widgetHandler:RemoveCallIn("ViewResize")
+		return
+	end
+
 	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
 
 	casShader = LuaShader({
@@ -117,7 +121,7 @@ function widget:Initialize()
 		return
 	end
 
-	UpdateShader(options.cas_sharpness.value)
+	UpdateShader(sharpness)
 end
 
 function widget:Shutdown()
