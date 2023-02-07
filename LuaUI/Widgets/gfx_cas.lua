@@ -3,7 +3,7 @@ function widget:GetInfo() return {
 	desc      = "Spring port of AMD FidelityFX' Contrast Adaptive Sharpen (CAS)",
 	author    = "AMD Inc., SLSNe, martymcmodding, ivand", -- https://gist.github.com/martymcmodding/30304c4bffa6e2bd2eb59ff8bb09d135
 	license   = "MIT",
-	layer     = 2000, -- FIXME: why?
+	layer     = 2000, -- probably to draw after most world stuff but not things like UI
 	enabled   = true,
 } end
 
@@ -53,7 +53,7 @@ options = {
 	cas_sharpness = {
 		name = 'Sharpening',
 		type = 'number',
-		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. Also FIXME: is there a reference unit for the value? How much is 1 really?
+		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
 		min = 0.0,
 		max = 1.25, -- can go even higher but at about 1.5 it degenerates, don't let it get near
 		tooltipFunction = function(self)
