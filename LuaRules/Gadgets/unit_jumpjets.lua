@@ -404,8 +404,10 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 
 		if reloadTime <= 1 then
 			spSetUnitRulesParam(unitID, "jumpReload", 1)
+			if unitID % 2 == 0 then
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
 			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+			end
 			return
 		end
 
@@ -490,6 +492,13 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not jumpDefs[unitDefID]) then
 		return
+	end
+
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	if unitID % 2 == 0 then
+		Spring.MarkerAddPoint(x,y,z, "DOES wait-wait")
+	else
+		Spring.MarkerAddPoint(x,y,z, "does NOT do wait-wait")
 	end
 	Spring.SetUnitRulesParam(unitID, "jumpReload", 1)
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
