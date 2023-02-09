@@ -393,11 +393,6 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 		Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
 		mcDisable(unitID)
 
-		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
-			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
-		end
-		
 		if hitStructure then
 			-- Add unstick impulse to make the jumper bound on the structure.
 			Spring.AddUnitImpulse(unitID, 3,0,3)
@@ -407,33 +402,50 @@ local function Jump(unitID, goal, origCmdParams, mustJump)
 			Spring.SetUnitPosition(unitID, hitStructure[1], hitStructure[2], hitStructure[3])
 		end
 
+		if reloadTime <= 1 then
+			spSetUnitRulesParam(unitID, "jumpReload", 1)
+			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+			spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+			return
+		end
+
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, CMD.OPT_SHIFT)
+
 		Sleep()
-		
+
+		if not Spring.ValidUnitID(unitID) then
+			return
+		end
+
 		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 		if morphedTo then
 			lastJumpPosition[morphedTo] = lastJumpPosition[unitID]
 			lastJumpPosition[unitID] = nil
 			unitID = morphedTo
-		end
-		
-		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+			if not Spring.ValidUnitID(unitID) then
+				return
+			end
 		end
 
-		if reloadTime <= 1 then
-			spSetUnitRulesParam(unitID, "jumpReload", 1)
+		if Spring.GetUnitIsDead(unitID) then
 			return
 		end
 
+		Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+
 		local reloadSpeed = 1/reloadTime
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
-		
+
 		while reloadAmount < 1 do
+			if not Spring.ValidUnitID(unitID) then
+				return
+			end
 			morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 			if morphedTo then
 				unitID = morphedTo
 			end
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then
+			if Spring.GetUnitIsDead(unitID) then
 				return
 			end
 
