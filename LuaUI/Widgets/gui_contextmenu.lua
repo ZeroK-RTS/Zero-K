@@ -299,16 +299,6 @@ addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should 
 addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
 addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
 
-
-local lobbyIDs = {} -- stores peoples names by lobbyID to match commanders to owners
-local players = Spring.GetPlayerList()
-for i = 1, #players do
-	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
-	if customkeys.lobbyid then
-		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i], false))
-	end
-end
-
 for i = 1, #UnitDefs do
 	if not alreadyAdded[i] then
 		local ud = UnitDefs[i]
@@ -1937,15 +1927,17 @@ local function PriceWindow(unitID, action)
 end
 
 local function MakeUnitContextMenu(unitID,x,y)
-	local udid 			= spGetUnitDefID(unitID)
-	local ud 			= UnitDefs[udid]
-	if not ud then return end
-	local alliance 		= spGetUnitAllyTeam(unitID)
-	local team			= spGetUnitTeam(unitID)
-	local _, player 	= spGetTeamInfo(team, false)
-	local playerName 	= spGetPlayerInfo(player, false) or 'noname'
-	local teamColor 	= {spGetTeamColor(team)}
-		
+	local udid = spGetUnitDefID(unitID)
+	local ud   = UnitDefs[udid]
+	if not ud then
+		return
+	end
+	local alliance   = spGetUnitAllyTeam(unitID)
+	local team       = spGetUnitTeam(unitID)
+	local _, player  = spGetTeamInfo(team, false)
+	local playerName = (WG.GetPlayerName and WG.GetPlayerName(player)) or spGetPlayerInfo(player, false) or 'noname'
+	local teamColor  = {spGetTeamColor(team)}
+	
 	local window_width = 200
 	--local buttonWidth = window_width - 0
 

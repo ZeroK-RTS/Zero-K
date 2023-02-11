@@ -176,7 +176,12 @@ end
 
 local function GetAvatarTooltip(unitID)
 	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
-	if not commOwner then return end
+	if not commOwner then
+		return
+	end
+	if (WG or GG).PlayerNameToAnonName and commOwner then
+		commOwner = (WG or GG).PlayerNameToAnonName(commOwner)
+	end
 	return commOwner or ""
 end
 

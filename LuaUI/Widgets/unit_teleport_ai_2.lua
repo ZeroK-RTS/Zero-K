@@ -64,12 +64,11 @@ local issuedOrderTo = {}
 --end network lag stuff
 
 function widget:Initialize()
-	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-		if spec then
+	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	myTeamID = teamID
+	myTeamID = Spring.GetMyTeamID()
 
 	local units = Spring.GetAllUnits()
 	for i=1,#units do  -- init existing transports

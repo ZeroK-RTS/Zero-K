@@ -463,10 +463,7 @@ function ResetGl()
 end
 
 function CheckSpecState()
-	local playerID = spGetMyPlayerID()
-	local _, _, spec = spGetPlayerInfo(playerID, false)
-		
-	if ( spec == true ) then
+	if Spring.GetSpectatingState() then
 		spEcho("<Nuke Icon> Spectator mode. Widget removed.")
 		widgetHandler:RemoveWidget()
 		return false

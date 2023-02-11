@@ -308,6 +308,7 @@ local function CfTooltip(allyTeam)
 	for _,teamID in ipairs(teamList) do
 		local _,playerID = Spring.GetTeamInfo(teamID, false)
 		local name = Spring.GetPlayerInfo(playerID, false) or '-'
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
 		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
@@ -335,6 +336,8 @@ local function MakeSpecTooltip()
 	local specsSorted = {}
 	for i = 1, #players do
 		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(players[i], false)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 		if spectator and active then
 			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = math.min(cpuUsage,1)}
 			--specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
@@ -361,6 +364,8 @@ local function UpdatePlayerInfo()
 		if not entities[i].isAI then
 			local playerID = entities[i].playerID
 			local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID, false)
+			pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+			name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 			--Spring.Echo("Player Update", playerID, name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, #(Spring.GetPlayerList(teamID, true)))
 			
 			local name_out = name or ''
@@ -488,6 +493,8 @@ local function AddEntity(entity, teamID, allyTeamID)
 	local playerID = entity.playerID or teams[teamID].leader
 	if playerID then
 		name,active,spectator,_,_,pingTime,cpuUsage,country,_, customKeys = Spring.GetPlayerInfo(playerID)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 	end
 	--Spring.Echo("Entity with team ID " .. teamID .. " is " .. (active and '' or "NOT ") .. "active")
 	if not active then deadTeam = true end
@@ -772,6 +779,8 @@ SetupPlayerNames = function()
 	for i = 1, #playerlist do
 		local playerID = playerlist[i]
 		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(playerID, false)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 		local isSpec = (teamID == 0 and spectator and Spring.GetPlayerRulesParam(playerID, "initiallyPlayingPlayer") ~= 1)
 		local entityID = #entities + 1
 		entities[entityID] = {name = name, isSpec = isSpec, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}

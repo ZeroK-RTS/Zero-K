@@ -106,18 +106,18 @@ local comms = {}
 
 --gets the name, color, and height of the commander
 local function GetCommAttributes(unitID, unitDefID)
-  local team = GetUnitTeam(unitID)
-  local _, player = GetTeamInfo(team, false)
-  local _, aiName = Spring.GetAIInfo(team)
-  local name = aiName or GetPlayerInfo(player, false) or 'name unknown'
-  local r, g, b, a = GetTeamColor(team)
-  local height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + heightOffset
-  local pm = spGetUnitPieceMap(unitID)
-  local pmt = pm["torso"]
-  if (pmt == nil) then
-    pmt = pm["chest"]
-  end
-  return {name, {r, g, b, a}, height, pmt }
+	local team = GetUnitTeam(unitID)
+	local _, player = GetTeamInfo(team, false)
+	local _, aiName = Spring.GetAIInfo(team)
+	local name = aiName or (WG.GetPlayerName and WG.GetPlayerName(player)) or GetPlayerInfo(player, false) or 'name unknown'
+	local r, g, b, a = GetTeamColor(team)
+	local height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + heightOffset
+	local pm = spGetUnitPieceMap(unitID)
+	local pmt = pm["torso"]
+	if (pmt == nil) then
+		pmt = pm["chest"]
+	end
+	return {name, {r, g, b, a}, height, pmt }
 end
 
 local function DrawCommName(unitID, attributes)

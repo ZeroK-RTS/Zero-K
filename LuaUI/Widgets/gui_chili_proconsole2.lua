@@ -762,8 +762,8 @@ local function formatMessage(msg)
 	--]]
 	msg.textFormatted = msg.text
 	if msg.playername then
+		local playerName = escape_lua_pattern(((WG.PlayerNameToAnonName and WG.PlayerNameToAnonName(msg.playername)) or msg.playername)
 		local out = msg.text
-		local playerName = escape_lua_pattern(msg.playername)
 		out = out:gsub( '^<' .. playerName ..'> ', '' )
 		out = out:gsub( '^%[' .. playerName ..'%] ', '' )
 		msg.textFormatted = out

@@ -371,9 +371,7 @@ function SetModulesPositionX()
 end
 
 function SetMaxPlayerNameWidth()
-
 	-- determines the maximal player name width (in order to set the width of the widget)
-
 	local t = Spring_GetPlayerList()
 	local maxWidth = GetTextWidth("- aband. units -")+4 -- minimal width = minimal standard text width
 	local name = ""
@@ -381,6 +379,7 @@ function SetMaxPlayerNameWidth()
 	UseFont(font)
 	for _,wplayer in ipairs(t) do
 		name = Spring_GetPlayerInfo(wplayer, false)
+		name = (WG.GetPlayerName and WG.GetPlayerName(wplayer)) or name
 		nextWidth = GetTextWidth(name)+4
 		if nextWidth > maxWidth then
 			maxWidth = nextWidth
@@ -443,6 +442,10 @@ end
 
 function CreatePlayer(playerID)
 	local tname, _, tspec, tteam, tallyteam, tping, tcpu, tcountry, trank = Spring_GetPlayerInfo(playerID, false)
+	tping = WG.PingToAnonPing and WG.PingToAnonPing(playerID, tping)
+	tname = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or tname
+	trank = (not (WG.IsPlayerAnon and WG.IsPlayerAnon(playerID))) and trank
+	
 	local _,_,_,_,tside,tallyteam = Spring_GetTeamInfo(tteam, false)
 	local tred, tgreen, tblue = Spring_GetTeamColor(tteam)
 	tpingLvl = GetPingLvl(tping)
@@ -1877,6 +1880,8 @@ function CheckPlayersChange()
 	local sorting = false
 	for p = 0,31 do
 		local name,active,spec,teamID,allyTeamID,pingTime,cpuUsage, country, rank = Spring_GetPlayerInfo(p, false)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(p, pingTime)
+		name = (WG.GetPlayerName and WG.GetPlayerName(p)) or name
 		if active == false then
 			if player[p].name ~= nil then                                             -- NON SPEC PLAYER LEAVING
 				if player[p].spec==false then
@@ -1922,7 +1927,7 @@ function CheckPlayersChange()
 			if player[p].spec == false then
 				player[p].needm   = GetNeed("metal",player[p].team)
 				player[p].neede   = GetNeed("energy",player[p].team)
-				player[p].rank = rank
+				player[p].rank    = (not (WG.IsPlayerAnon and WG.IsPlayerAnon(playerID))) and rank
 			else
 				player[p].needm   = false
 				player[p].neede   = false

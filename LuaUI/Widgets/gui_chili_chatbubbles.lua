@@ -140,9 +140,10 @@ local function MyPlayerNameToID(name)
 	local buf = playerNameToIDlist[name]
 	if (not buf) then
 		local players = Spring.GetPlayerList(true)
-		for i=1,#players do
+		for i = 1,#players do
 			local pid = players[i]
 			local pname = Spring.GetPlayerInfo(pid, false)
+			pname = (WG.GetPlayerName and WG.GetPlayerName(pid)) or pname
 			playerNameToIDlist[pname] = pid
 		end
 		return playerNameToIDlist[name]
@@ -270,9 +271,10 @@ function widget:AddChatMessage(msg)
 			playerName = msg.playername
 			active = true
 		else
-			playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(playerID)
+			playerName, active, isSpec, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys  = Spring.GetPlayerInfo(playerID)
+			playerName = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or playerName
 			teamcolor = {Spring.GetTeamColor(teamID)}
-			if (customKeys ~= nil) and (customKeys.avatar~=nil) then
+			if (not (WG.IsPlayerAnon and WG.IsPlayerAnon(playerID))) and (customKeys ~= nil) and (customKeys.avatar~=nil) then
 				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
 			end
 		end
@@ -422,7 +424,8 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		return
 	end
 
-	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(player, false)
+	local playerName, active, isSpec, teamID = Spring.GetPlayerInfo(player, false)
+	playerName = (WG.GetPlayerName and WG.GetPlayerName(player)) or playerName
 	local teamcolor = {Spring.GetTeamColor(teamID)}
 	if (not active or isSpec) then
 		teamcolor = {1,0,0,1}
@@ -547,6 +550,7 @@ function widget:TeamDied(teamID)
 	-- chicken team has no players (normally)
 	if player then
 		local playerName = Spring.GetPlayerInfo(player, false)
+		playerName = (WG.GetPlayerName and WG.GetPlayerName(player)) or playerName
 		widget:AddWarning(playerName .. ' died')
 	end
 end
@@ -577,7 +581,8 @@ end
 
 function widget:PlayerChanged(playerID)
 	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID, false)
-  local _,_,isDead = Spring.GetTeamInfo(teamID, false)
+	playerName = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or playerName
+	local _,_,isDead = Spring.GetTeamInfo(teamID, false)
 	if (isSpec) then
 		if not isDead then
 			widget:AddWarning(playerName .. ' resigned')
@@ -589,6 +594,7 @@ end
 
 function widget:PlayerRemoved(playerID, reason)
 	local playerName = Spring.GetPlayerInfo(playerID, false)
+	playerName = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or playerName
 	if reason == 0 then
 		widget:AddWarning(playerName .. ' timed out')
 	elseif reason == 1 then

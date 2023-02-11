@@ -287,9 +287,7 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 end
 
 function widget:Initialize()
-	local myPlayerID=Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)
-	if spec or Spring.GetModOptions().campaign_disable_share_marker then
+	if Spring.GetSpectatingState() or Spring.GetModOptions().campaign_disable_share_marker then
 		widgetHandler:RemoveWidget()
 		return false
 	end
@@ -316,7 +314,7 @@ function widget:Initialize()
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
-			local playerName = Spring.GetPlayerInfo(playerID, false)
+			local playerName = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or Spring.GetPlayerInfo(playerID, false)
 			gameID_to_playerName[teamID+1] = playerName or "Gaia"
 		end
 	end
@@ -343,8 +341,8 @@ function widget:Initialize()
 		  -- end)
 		-- end
 	  -- end)
-	  local myPlayerID = Spring.GetMyTeamID()
-	  local r, g, b = Spring.GetTeamColor(myPlayerID)
+	  local myTeamID = Spring.GetMyTeamID()
+	  local r, g, b = Spring.GetTeamColor(myTeamID)
 	  myColor = {r,g,b}
 	-----
 	gameID_to_playerName_gbl = gameID_to_playerName

@@ -1077,14 +1077,24 @@ local function InitName(subject, playerPanel)
 	end
 	local country, icon, elo, badges, clan, avatar, faction, admin
 	if (subject.player) then
-		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
-		country = select(8, Spring.GetPlayerInfo(subject.player, false))
-		icon = pdata.icon
-		elo = pdata.elo
-		badges = pdata.badges
-		clan = pdata.clan
-		avatar = pdata.avatar
-		faction = pdata.faction
+		if WG.IsPlayerAnon and WG.IsPlayerAnon(subject.player) then
+			country = '??'
+			icon = "0_0"
+			elo = 1500
+			badges = false
+			clan = false
+			avatar = false
+			faction = false
+		else
+			local pdata = select(10, Spring.GetPlayerInfo(subject.player))
+			country = select(8, Spring.GetPlayerInfo(subject.player, false))
+			icon = pdata.icon
+			elo = pdata.elo
+			badges = pdata.badges
+			clan = pdata.clan
+			avatar = pdata.avatar
+			faction = pdata.faction
+		end
 	end
 	if (playerInfo[subject.name]) then
 		--Spring.Echo("Using extra info for " .. subject.name)
@@ -1285,6 +1295,7 @@ local function Buildme()
 			if (allyTeamID >= 100) then
 				name = "Spectators"
 			end
+			name = WG.PlayerNameToAnonName and WG.PlayerNameToAnonName(name) or name
 			local height = #playerpanels[allyTeamID] * playerHeight + 20
 			local color = {0,1,0,1}
 			if (allyTeamID ~= Spring.GetMyAllyTeamID()) then
@@ -1460,8 +1471,8 @@ local function EloComparator(subject1, subject2)
 	if (not subject2.player and not subject1.player) then return subject1.id > subject2.id end
 	if (not subject2.player) then return true end
 	if (not subject1.player) then return false end
-	local elo1 = tonumber(select(10,Spring.GetPlayerInfo(subject1.player)).elo)
-	local elo2 = tonumber(select(10,Spring.GetPlayerInfo(subject2.player)).elo)
+	local elo1 = WG.GetPlayerElo and WG.GetPlayerElo(subject1.player) or tonumber(select(10, Spring.GetPlayerInfo(subject1.player)).elo)
+	local elo2 = WG.GetPlayerElo and WG.GetPlayerElo(subject2.player) or tonumber(select(10, Spring.GetPlayerInfo(subject2.player)).elo)
 	if (not elo2 and not elo1) then return subject1.id > subject2.id end
 	if (not elo2) then return true end
 	if (not elo1) then return false end
@@ -1479,8 +1490,11 @@ local function UpdateAllyTeam(allyTeam)
 			nonSpecs = true
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
-				local name,active,spec = Spring.GetPlayerInfo(playerID, false)
+				local name, active, spec = Spring.GetPlayerInfo(playerID, false)
 				if playerID ~= Spring.GetMyPlayerID() and (teamID ~= 0 or teamZeroPlayers[playerID]) or not spec then
+					if WG.GetPlayerName then
+						name = WG.GetPlayerName(playerID)
+					end
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 				nonSpecs = nonSpecs or active and not spec
@@ -1514,10 +1528,13 @@ local function UpdateSubjects()
 		end
 	end
 	for _, playerID in ipairs(Spring.GetPlayerList()) do
-		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
+		local name, active, spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
 		if spec and active then
 			if (playerID == Spring.GetMyPlayerID()) then
 				mySubjectID = #subjects + 1
+			end
+			if WG.GetPlayerName then
+				name = WG.GetPlayerName(playerID)
 			end
 			subjects[#subjects + 1] = {id = #subjects + 1, team = teamID, player = playerID, name = name, allyteam = 100, active = active, spec = spec, dead = dead}
 		end
@@ -1630,7 +1647,7 @@ function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	
 	for _, playerID in ipairs(Spring.GetPlayerList()) do
-		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID, false)
+		local _, _, spec, teamID = Spring.GetPlayerInfo(playerID, false)
 		if teamID == 0 and not spec then
 			teamZeroPlayers[playerID] = true
 		end

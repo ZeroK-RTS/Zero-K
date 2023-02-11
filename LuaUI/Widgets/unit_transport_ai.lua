@@ -49,7 +49,6 @@ local myTeamID
 local spGetUnitPosition       = Spring.GetUnitPosition
 local spGetUnitDefID          = Spring.GetUnitDefID
 local spEcho                  = Spring.Echo
-local spGetPlayerInfo         = Spring.GetPlayerInfo
 local spGetCommandQueue       = Spring.GetCommandQueue
 local spGetUnitSeparation     = Spring.GetUnitSeparation
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
@@ -642,8 +641,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 end
 
 function widget:Initialize()
-	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID(), false)
-	 if spec then
+	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget(widget)
 		return false
 	end
@@ -651,7 +649,7 @@ function widget:Initialize()
 	WG.SetAutoCallTransportState = SetAutoCallTransportState
 	WG.AddTransport = AddTransport
 
-	myTeamID = teamID
+	myTeamID = Spring.GetMyTeamID()
 	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
 
 	local units = spGetTeamUnits(teamID)

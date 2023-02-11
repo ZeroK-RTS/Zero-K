@@ -193,13 +193,12 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-	if spec then
+	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget()
 		return false
 	end
 	HotkeyChangeNotification()
-	myTeam = team
+	myTeam = Spring.GetMyTeamID()
 end
 
 function widget:DrawWorld()

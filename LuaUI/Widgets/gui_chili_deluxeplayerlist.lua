@@ -595,6 +595,7 @@ local function CfTooltip(allyTeam)
 	for _,teamID in ipairs(teamList) do
 		local _,playerID = Spring.GetTeamInfo(teamID, false)
 		local name = Spring.GetPlayerInfo(playerID, false) or '-'
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
 		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
@@ -624,8 +625,10 @@ local function MakeSpecTooltip()
 	local playerlist = Spring.GetPlayerList()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID, false)
-		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
+		local name, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank = Spring.GetPlayerInfo(playerID, false)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+		name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
+		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime, cpuUsage)
 		local cpuColChar = GetColorChar(cpuCol)
 		local pingColChar = GetColorChar(pingCol)
 		if active and not spectator then
@@ -773,13 +776,15 @@ end
 
 -- updates as needed: status, name, ping, cpu, resource stats, etc.
 local function UpdatePlayerInfo()
-	for i=1,#entities do
+	for i = 1, #entities do
 		local teamID
 		if entities[i].isAI then
 			teamID = entities[i].teamID
 		else
 			local playerID = entities[i].playerID
-			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID, false)
+			local name, active, spectator, localteamID, allyTeamID, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID, false)
+			pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+			name = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or name
 			teamID = localteamID
 			local teamcolor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1}
 			
@@ -823,7 +828,7 @@ local function UpdatePlayerInfo()
 				entities[i].winsLabel:SetCaption(FormatWins(name))
 			end
 
-			UpdatePingCpu(entities[i],pingTime,cpuUsage,pstatus)
+			UpdatePingCpu(entities[i],pingTime, cpuUsage, pstatus)
 		end	-- if not isAI
 
 		-- update the resource stats for all entities, including AIs
@@ -836,11 +841,12 @@ local function UpdatePlayerInfo()
 	if #specTeam.roster ~= 0 then
 		for i = 1,#specTeam.roster do
 			local playerID = specTeam.roster[i].playerID
-			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID, false)
+			local _, _, _, _, _, pingTime, cpuUsage = Spring.GetPlayerInfo(playerID, false)
+			pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
 			specTeam.roster[i].pingTime = pingTime
 			specTeam.roster[i].cpuUsage = cpuUsage
 			if list_size == 4 then
-				UpdatePingCpu(specTeam.roster[i],pingTime,cpuUsage)
+				UpdatePingCpu(specTeam.roster[i], pingTime, cpuUsage)
 			end
 		end
 	end
@@ -862,6 +868,9 @@ local function UpdatePlayerInfo()
 						AccumulatePlayerTeamStats(r,s)
 						local _,leader = Spring.GetTeamInfo(teamID, false)
 						local name = Spring.GetPlayerInfo(leader, false)
+						if WG.GetPlayerName then
+							leaderName = WG.GetPlayerName(leader)
+						end
 						if v.winsLabel and name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
 							v.winsLabel:SetCaption(FormatWins(name))
 						end
@@ -1082,6 +1091,9 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 
 				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1], false)
 				local leaderName = Spring.GetPlayerInfo(leader, false)
+				if WG.GetPlayerName then
+					leaderName = WG.GetPlayerName(leader)
+				end
 
 				if showWins and leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then
 					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=0,width=wins_width,caption = FormatWins(leaderName),textColor = allyTeamColor, align = "right"})
@@ -1166,7 +1178,7 @@ SetupPlayerNames = function()
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,_,customKeys = Spring.GetPlayerInfo(playerID)
 		local clan, faction, level, elo, rank
-		if customKeys then
+		if customKeys and not (WG.IsPlayerAnon and WG.IsPlayerAnon(playerID)) then
 			clan = customKeys.clan
 			faction = customKeys.faction
 			level = customKeys.level

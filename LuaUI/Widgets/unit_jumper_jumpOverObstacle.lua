@@ -52,12 +52,11 @@ for i = 1, #exclusions do
 end
 
 function widget:Initialize()
-	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-		if spec then
+	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	myTeamID = teamID
+	myTeamID = Spring.GetMyTeamID()
 end
 
 function widget:GameFrame(n)

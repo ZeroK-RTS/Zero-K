@@ -141,7 +141,9 @@ local function UpdateEntryData(entryData, controls, pingCpuOnly, forceUpdateCont
 	local isSpectator = false
 	
 	if entryData.playerID then
-		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank = Spring.GetPlayerInfo(entryData.playerID, false)
+		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country = Spring.GetPlayerInfo(entryData.playerID, false)
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(entryData.playerID, pingTime)
+		playerName = (WG.GetPlayerName and WG.GetPlayerName(entryData.playerID)) or playerName
 		newTeamID, newAllyTeamID = teamID, allyTeamID
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)
@@ -265,7 +267,9 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	
 	if playerID then
 		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
-		customKeys = customKeys or {}
+		pingTime = WG.PingToAnonPing and WG.PingToAnonPing(playerID, pingTime)
+		playerName = (WG.GetPlayerName and WG.GetPlayerName(playerID)) or playerName
+		customKeys = ((not (WG.IsPlayerAnon and WG.IsPlayerAnon(playerID))) and customKeys) or {}
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)
 		entryData.name = playerName

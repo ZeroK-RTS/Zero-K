@@ -876,14 +876,16 @@ end
 
 local function formatMessage(msg)
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
+	msg.playernamecolor = msg.playername
+	msg.playername = (WG.PlayerNameToAnonName and WG.PlayerNameToAnonName(msg.playername)) or msg.playername
 	
 	-- insert/sandwich colour string into text
 	local formatted, _ = format:gsub('([#%$]%w+)', function(parameter) -- FIXME pattern too broad for 1-char color specifiers
 			if parameter:sub(1,1) == '$' then
 				return msg[parameter:sub(2,parameter:len())]
 			elseif parameter == '#p' then
-				if msg.playername and incolors[msg.playername] then
-					return incolors[msg.playername]
+				if msg.playernamecolor and incolors[msg.playernamecolor] then
+					return incolors[msg.playernamecolor]
 				else
 					return incolors['#o'] -- player still at lobby, use grey text
 				end
@@ -895,8 +897,8 @@ local function formatMessage(msg)
 	--]]
 	msg.textFormatted = msg.text
 	if msg.playername then
-		local out = msg.text
 		local playerName = escape_lua_pattern(msg.playername)
+		local out = msg.text
 		out = out:gsub( '^<' .. playerName ..'> ', '' )
 		out = out:gsub( '^%[' .. playerName ..'%] ', '' )
 		msg.textFormatted = out
@@ -970,7 +972,6 @@ local function AddMessage(msg, target, remake)
 
 	if msg.dup > 1 and not remake then
 		--local last = stack.children[#(stack.children)]
-		
 		if lastMsg then
 			if lastMsg.SetText then
 				lastMsg:SetText(text)
@@ -1106,18 +1107,17 @@ local function AddMessage(msg, target, remake)
 	end
 
 	stack:UpdateClientArea()
-		
 end
 
 
 local function setupColors()
-	incolor_dup			= color2incolor(options.color_dup.value)
-	incolor_highlight	= color2incolor(options.color_highlight.value)
-	incolors['#h']		= incolor_highlight
-	incolors['#a'] 		= color2incolor(options.color_ally.value)
-	incolors['#e'] 		= color2incolor(options.color_chat.value)
-	incolors['#o'] 		= color2incolor(options.color_other.value)
-	incolors['#s'] 		= color2incolor(options.color_spec.value)
+	incolor_dup       = color2incolor(options.color_dup.value)
+	incolor_highlight = color2incolor(options.color_highlight.value)
+	incolors['#h']    = incolor_highlight
+	incolors['#a']    = color2incolor(options.color_ally.value)
+	incolors['#e']    = color2incolor(options.color_chat.value)
+	incolors['#o']    = color2incolor(options.color_other.value)
+	incolors['#s']    = color2incolor(options.color_spec.value)
 end
 
 local function setupPlayers(playerID)
@@ -1128,7 +1128,7 @@ local function setupPlayers(playerID)
 	else
 		local playerroster = Spring.GetPlayerList()
 		for i, id in ipairs(playerroster) do
-			local name,active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id, false)
+			local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id, false)
 			--lobby: grey chat, spec: white chat, player: color chat
 			incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
 		end
@@ -1220,6 +1220,7 @@ local function ShowInputSpace()
 		backlogButton:SetVisibility(true)
 	end
 end
+
 local function HideInputSpace()
 	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
@@ -1250,7 +1251,6 @@ local function MakeMessageStack(margin)
 end
 
 local function MakeMessageWindow(name, enabled, ParentFunc)
-
 	local x,y,bottom,width,height
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	if name == "ProChat" then
@@ -1659,7 +1659,7 @@ function widget:Initialize()
 		noFont = true,
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
--- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
+-- DISABLED FOR CLICKABLE TextBox disableChildrenHitTest = true,
 		backgroundColor = options.color_chat_background.value,
 		borderColor = options.color_chat_background.value,
 		ignoreMouseWheel = true,

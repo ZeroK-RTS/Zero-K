@@ -128,8 +128,7 @@ function widget:SetConfigData(data)
 end
 
 function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-	if spec then
+	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget()
 		return false
 	end

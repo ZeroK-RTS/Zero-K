@@ -159,7 +159,7 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 
 local visible = false
 local firstEnter = true --used to activate ally-chat at game start. To run once
-local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
+local noAlly = false --used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
 local wasSimpleColor = nil -- variable: indicate if simple color was toggled on or off. Used to trigger refresh.
 
@@ -489,7 +489,7 @@ function getMessageRuleOptionName(msgtype, suboption)
   return msgtype .. "_" .. suboption
 end
 
-for msgtype,rule in pairs(MESSAGE_RULES) do
+for msgtype, rule in pairs(MESSAGE_RULES) do
 	if rule.output and rule.name then -- if definition has multiple output formats, make associated config option
 		local option_name = getMessageRuleOptionName(msgtype, "output_format")
 		options_order[#options_order + 1] = option_name
@@ -512,21 +512,21 @@ for msgtype,rule in pairs(MESSAGE_RULES) do
 			end
 		end
 		options[option_name] = o
-    end
+	end
 end
 
 local function getOutputFormat(msgtype)
-  local rule = MESSAGE_RULES[msgtype]
-  if not rule then
-	Spring.Echo("UNKNOWN MESSAGE TYPE: " .. msgtype or "NiL")
-	return
-  elseif rule.output then -- rule has multiple user-selectable output formats
-    local option_name = getMessageRuleOptionName(msgtype, "output_format")
-    local value = options[option_name].value
-    return rule.output[value].format
-  else -- rule has only 1 format defined
-	return rule.format
-  end
+	local rule = MESSAGE_RULES[msgtype]
+	if not rule then
+		Spring.Echo("UNKNOWN MESSAGE TYPE: " .. msgtype or "NiL")
+		return
+	elseif rule.output then -- rule has multiple user-selectable output formats
+		local option_name = getMessageRuleOptionName(msgtype, "output_format")
+		local value = options[option_name].value
+		return rule.output[value].format
+	else -- rule has only 1 format defined
+		return rule.format
+	end
 end
 
 local function getSource(spec, allyTeamId)
@@ -687,7 +687,6 @@ local function displayMessage(msg, remake)
 		end
 
 		stack_console:UpdateClientArea()
-		
 	end
 
 	showConsole()

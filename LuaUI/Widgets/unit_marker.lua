@@ -160,6 +160,8 @@ function widget:UnitEnteredLos (unitID, teamID)
 		if isAI then
 			local _,botName,_,botType = spGetAIInfo(teamID)
 			owner_name = (botType or "AI") .." - " .. (botName or "unnamed")
+		elseif WG.GetPlayerName then
+			owner_name = WG.GetPlayerName(playerID) or "nobody"
 		else
 			owner_name = spGetPlayerInfo(playerID, false) or "nobody"
 		end
