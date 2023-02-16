@@ -23,6 +23,7 @@ return { bomberassault = {
 
   customParams        = {
     requireammo      = [[1]],
+    reammoseconds    = 20,
     modelradius      = [[10]],
   },
 
