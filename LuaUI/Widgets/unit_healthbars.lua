@@ -584,7 +584,7 @@ do
 				height        = Spring.Utilities.GetUnitHeight(ud) + 14,
 				canJump       = (ud.customParams.canjump and true) or false,
 				canGoo        = (ud.customParams.grey_goo and true) or false,
-				canReammo     = (ud.customParams.requireammo and true) or false,
+				canReammo     = (ud.customParams.reammoseconds and true) or false,
 				isPwStructure = (ud.customParams.planetwars_structure and true) or false,
 				canCapture    = (ud.customParams.post_capture_reload and true) or false,
 				maxShield     = ud.shieldPower - 10,

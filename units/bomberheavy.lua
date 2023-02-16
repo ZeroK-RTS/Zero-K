@@ -26,7 +26,6 @@ return { bomberheavy = {
 
   customParams        = {
     modelradius      = [[10]],
-    requireammo      = [[1]],
     reammoseconds    = [[25]],
     refuelturnradius = [[150]],
     reallyabomber    = [[1]],

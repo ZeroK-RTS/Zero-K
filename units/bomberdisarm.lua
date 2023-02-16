@@ -21,7 +21,6 @@ return { bomberdisarm = {
 
   customParams        = {
     modelradius    = [[10]],
-    requireammo    = [[1]],
     refuelturnradius = [[170]],
     reammoseconds    = [[15]],
   },

@@ -65,7 +65,6 @@ for unitDefID, ud in pairs(UnitDefs) do
 	end
 end
 
-local DEFAULT_REAMMO_TIME = 5
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
@@ -94,8 +93,8 @@ for i = 1, #UnitDefs do
 		turnRadius[i] = 20
 		rotateUnit[i] = false
 	end
-	if ud.customParams.requireammo then
-		reammoFrames[i] = (tonumber(ud.customParams.reammoseconds) or DEFAULT_REAMMO_TIME)*30
+	if ud.customParams.reammoseconds then
+		reammoFrames[i] = tonumber(ud.customParams.reammoseconds)*30
 		reammoDrain[i] = (tonumber(ud.customParams.reammodrain) or DEFAULT_REAMMO_DRAIN)/30
 	end
 	

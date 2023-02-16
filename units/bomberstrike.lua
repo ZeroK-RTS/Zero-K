@@ -23,7 +23,6 @@ return { bomberstrike = {
     reallyabomber    = [[1]],
     reammoseconds    = [[8]],
     refuelturnradius = [[150]],
-    requireammo      = [[1]],
     modelradius      = [[10]],
   },
 

@@ -25,8 +25,7 @@ return { bomberriot = {
   customParams        = {
     modelradius    = [[10]],
     refuelturnradius = [[120]],
-	reammoseconds = [[5]],
-    requireammo    = [[1]],
+    reammoseconds = 5,
   },
 
   explodeAs           = [[GUNSHIPEX]],

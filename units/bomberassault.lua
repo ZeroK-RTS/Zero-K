@@ -22,7 +22,6 @@ return { bomberassault = {
   cruiseAlt           = 250,
 
   customParams        = {
-    requireammo      = [[1]],
     reammoseconds    = 20,
     modelradius      = [[10]],
   },

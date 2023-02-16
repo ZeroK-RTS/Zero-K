@@ -90,7 +90,7 @@ for unitDefID = 1, #UnitDefs do
 	if ud.isFactory then
 		factoryUnitDef[unitDefID] = true
 	end
-	if ud.customParams.requireammo then
+	if ud.customParams.reammoseconds then
 		rearmUnitDef[unitDefID] = true
 	end
 	if not ud.isImmobile then
