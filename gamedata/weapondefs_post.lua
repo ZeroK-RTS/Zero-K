@@ -61,6 +61,10 @@ local function ProcessUnitDef(udName, ud)
       local fullName = udName .. '_' .. wdName
       WeaponDefs[fullName] = wd
       wd.filename = ud.filename
+      local wdcp = wd.customparams
+      if wdcp and wdcp.reammoseconds then
+        wdcp.reammoseconds = ud.customparams.reammoseconds
+      end
     end
   end
 

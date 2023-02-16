@@ -652,6 +652,12 @@ local function weapons2Table(cells, ws, unitID)
 		if cp.post_capture_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (tonumber(cp.post_capture_reload)/30) .. 's'
+		elseif cp.reammoseconds then
+			cells[#cells+1] = ' - Must rearm after shot'
+			cells[#cells+1] = ''
+			cells[#cells+1] = ' - Rearm time:'
+			cells[#cells+1] = cp.reammoseconds .. 's'
+			show_dps = false
 		elseif show_reload then
 			cells[#cells+1] = ' - Reloadtime:'
 			cells[#cells+1] = numformat (reloadtime) .. 's'
