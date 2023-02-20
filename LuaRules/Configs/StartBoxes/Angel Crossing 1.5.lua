@@ -429,6 +429,7 @@ do
 				table1[#table1 + 1] = table3[i]
 			end
 		end
+		return table1
 	end
 
 	if Spring.Utilities.Gametype.isCoop() or Spring.Utilities.Gametype.isBigTeams() then
