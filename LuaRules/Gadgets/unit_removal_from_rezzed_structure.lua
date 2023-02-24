@@ -63,7 +63,7 @@ local function CanUnitSwim(unitDef)
 end
 
 local function IsUnitShip(unitDef)
-    return unitDef.moveDef.type == "ship"
+    return unitDef.moveDef.smClass == Game.speedModClasses.Ship
 end
 
 
