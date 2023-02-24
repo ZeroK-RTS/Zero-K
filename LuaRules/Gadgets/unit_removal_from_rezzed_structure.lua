@@ -230,70 +230,66 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		return
 	end
 
-    local uDef = UnitDefs[unitDefID]
-            local ux1, uy1, uz1 = spGetUnitPosition(unitID)
-            --Debug("Created unit xsize = " .. uDef.xsize)
-            --Debug("Created unit zsize = " .. uDef.zsize)
-            local footprintXElmos = uDef.xsize * gameSquareSize
-            local footprintZElmos = uDef.zsize * gameSquareSize
-            --local createdUnitGroundY = spGetGroundHeight(ux1, uz1)
+	local uDef = UnitDefs[unitDefID]
 
+	local ux1, uy1, uz1 = spGetUnitPosition(unitID)
+	--Debug("Created unit xsize = " .. uDef.xsize)
+	--Debug("Created unit zsize = " .. uDef.zsize)
+	local footprintXElmos = uDef.xsize * gameSquareSize
+	local footprintZElmos = uDef.zsize * gameSquareSize
+	--local createdUnitGroundY = spGetGroundHeight(ux1, uz1)
 
-            local createdUnitMinX =  ux1 - footprintXElmos / 2
-            local createdUnitMinZ =  uz1 - footprintZElmos / 2
-            local createdUnitMaxX =  ux1 + footprintXElmos / 2
-            local createdUnitMaxZ =  uz1 + footprintZElmos / 2
+	local createdUnitMinX = ux1 - footprintXElmos / 2
+	local createdUnitMinZ = uz1 - footprintZElmos / 2
+	local createdUnitMaxX = ux1 + footprintXElmos / 2
+	local createdUnitMaxZ = uz1 + footprintZElmos / 2
+	--Debug("createdUnitMinX = " .. createdUnitMinX .. ", createdUnitMaxX = " .. createdUnitMaxX)
+	--Debug("createdUnitMinZ = " .. createdUnitMinZ .. ", createdUnitMaxZ = " .. createdUnitMaxZ)
 
-            --Debug("createdUnitMinX = " .. createdUnitMinX .. ", createdUnitMaxX = " .. createdUnitMaxX)
-            --Debug("createdUnitMinZ = " .. createdUnitMinZ .. ", createdUnitMaxZ = " .. createdUnitMaxZ)
+	local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance,
+		createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance,
+		createdUnitMaxZ + extraGatherDistance)
 
-            local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance,
-                createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance,
-                createdUnitMaxZ + extraGatherDistance)
+	--Debug("Y of the created unit: " .. uy1)
+	--Debug("Ground Y of the created unit: " .. createdUnitGroundY)
+	for i = 1, #units do
+		local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
+			createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
+		if units[i] ~= unitID and shouldUnitBeMoved then
 
+			local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
 
-            --Debug("Y of the created unit: " .. uy1)
-            --Debug("Ground Y of the created unit: " .. createdUnitGroundY)
-            for i = 1, #units do
-                local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
-                    createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
-                if units[i] ~= unitID and shouldUnitBeMoved then
+			local xDiff1 = rectUX - (createdUnitMinX - requiredGap)
+			local xDiff2 = rectUX - (createdUnitMaxX + requiredGap)
+			local zDiff1 = rectUZ - (createdUnitMinZ - requiredGap)
+			local zDiff2 = rectUZ - (createdUnitMaxZ + requiredGap)
 
-                    local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
+			local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
+				{isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
 
-                    local xDiff1 = rectUX - (createdUnitMinX - requiredGap)
-                    local xDiff2 = rectUX - (createdUnitMaxX + requiredGap)
-                    local zDiff1 = rectUZ - (createdUnitMinZ - requiredGap)
-                    local zDiff2 = rectUZ - (createdUnitMaxZ + requiredGap)
-                    
-                    
+			local comp = function(elem1, elem2)
+				return Abs(elem1.value) < Abs(elem2.value)
+			end
 
-                    local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
-                        {isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
+			SortTable(diffs, comp)
 
-                    local comp = function(elem1, elem2)
-                        return Abs(elem1.value) < Abs(elem2.value)
-                    end
+			local diffsCopy = {}
+			for j = 1, #diffs do
+				diffsCopy[j] = {}
+				diffsCopy[j].isX = diffs[j].isX
+				diffsCopy[j].value = diffs[j].value
+			end
 
-                    SortTable(diffs, comp)
-
-                    local diffsCopy = {}
-                    for j = 1, #diffs do
-                        diffsCopy[j] = {}
-                        diffsCopy[j].isX = diffs[j].isX
-                        diffsCopy[j].value = diffs[j].value
-                    end
-
-                    local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
-                    local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
-                    if targetX then
-                        spSetUnitPosition(units[i], targetX, targetZ)
-                        -- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
-                    --else
-                        --Debug("Failed to find an accessible spot")
-                    end
-                end
-            end
+			local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
+			local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
+			if targetX then
+			spSetUnitPosition(units[i], targetX, targetZ)
+				-- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
+			--else
+				--Debug("Failed to find an accessible spot")
+			end
+		end
+	end
 end
 
 -- The below code is for testing. It creates an athena and a cloakassault if they don't exist.
