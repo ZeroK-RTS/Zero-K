@@ -19,6 +19,7 @@ function gadget:GetInfo()
 end
 
 
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitRadius = Spring.GetUnitRadius
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
@@ -48,6 +49,11 @@ local extraGatherDistance = 125
 
 local function Debug(message)
     spEcho(gadgetName .. ": " .. message)
+end
+
+local pushesWhenRezzed = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	pushesWhenRezzed[unitDefID] = unitDef.isImmobile
 end
 
 local function IsGroundSlopeTraversable(unitDef, x, z)
@@ -218,10 +224,13 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
+	if not pushesWhenRezzed[unitDefID]
+	or not builderID
+	or spGetUnitCurrentCommand(builderID) ~= CMD_RESURRECT then
+		return
+	end
+
     local uDef = UnitDefs[unitDefID]
-    if builderID then
-        if Spring.GetUnitCurrentCommand(builderID) == CMD_RESURRECT and uDef.isImmobile and
-        uDef.name ~= "terraunit" then
             local ux1, uy1, uz1 = spGetUnitPosition(unitID)
             --Debug("Created unit xsize = " .. uDef.xsize)
             --Debug("Created unit zsize = " .. uDef.zsize)
@@ -285,8 +294,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                     end
                 end
             end
-        end
-    end
 end
 
 -- The below code is for testing. It creates an athena and a cloakassault if they don't exist.
