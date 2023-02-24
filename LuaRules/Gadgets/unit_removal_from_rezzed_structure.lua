@@ -12,8 +12,8 @@ function gadget:GetInfo()
         "by moving them aside",
         author    = "Alcur",
         date      = "21.10.2017",
-        license   = "GNU GPL, v2 or later", -- is that the correct license?
-        layer     = 0, -- what should the layer be?
+        license   = "GNU GPL, v2 or later",
+        layer     = 0,
         enabled   = true,
     }
 end
@@ -51,6 +51,7 @@ local function Debug(message)
     spEcho(gadgetName .. ": " .. message)
 end
 
+-- other traits not cached and read from UnitDefs directly on purpose, see below
 local pushesWhenRezzed = {}
 for unitDefID, unitDef in pairs(UnitDefs) do
 	pushesWhenRezzed[unitDefID] = unitDef.isImmobile
@@ -230,6 +231,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		return
 	end
 
+	--[[ Indexing UnitDefs looks bad, but reaching here will already be
+	     very rare and the gadget is very comprehensive in checking the
+	     conditions, so a ton of different fields are used: likely it's
+	     not too efficient to cache them all. ]]
 	local uDef = UnitDefs[unitDefID]
 
 	local ux1, uy1, uz1 = spGetUnitPosition(unitID)
