@@ -188,7 +188,7 @@ local function UpdateDrawEnabled()
 			or (options.showhighlight.value == 'conandecon' and (conSelected and WG.showeco)) then
 		return true
 	end
-	
+
 	local currentCmd = spGetActiveCommand()
 	if currentCmd then
 		local activeCmdDesc = spGetActiveCmdDesc(currentCmd)
@@ -342,7 +342,7 @@ local function UpdateFeatures(gf)
 			knownFeatures[fID].clID = nil
 		end
 	end
-	
+
 	if benchmark then
 		benchmark:Leave("UpdateFeatures 2loop")
 		benchmark:Leave("UpdateFeatures")
@@ -374,7 +374,7 @@ local function ClusterizeFeatures()
 		benchmark:Enter("opticsObject:Run()")
 	end
 	opticsObject:Run()
-	
+
 	if benchmark then
 		benchmark:Leave("opticsObject:Run()")
 		benchmark:Enter("opticsObject:Clusterize(minDistance)")
@@ -457,10 +457,10 @@ local function ClustersToConvexHull()
 		if benchmark then
 			benchmark:Leave("ClustersToConvexHull 1st Part")
 		end
-		
+
 		--- TODO perform pruning as described in the article below, if convex hull algo will start to choke out
 		-- http://mindthenerd.blogspot.ru/2012/05/fastest-convex-hull-algorithm-ever.html
-		
+
 		if benchmark then
 			benchmark:Enter("ClustersToConvexHull 2nd Part")
 		end
@@ -512,7 +512,7 @@ local function ClustersToConvexHull()
 			benchmark:Leave("ClustersToConvexHull 2nd Part")
 			benchmark:Enter("ClustersToConvexHull 3rd Part")
 		end
-		
+
 		local totalArea = 0
 		local pt1 = convexHull[1]
 		for i = 2, #convexHull - 1 do
@@ -530,7 +530,7 @@ local function ClustersToConvexHull()
 		if benchmark then
 			benchmark:Leave("ClustersToConvexHull 3rd Part")
 		end
-		
+
 		convexHull.area = totalArea
 		convexHull.center = {x = cx/#convexHull, z = cz/#convexHull, y = cy + 1}
 
@@ -589,14 +589,10 @@ local function DrawFeatureConvexHullEdge()
 end
 
 local function DrawFeatureClusterText()
+	glPushMatrix()
+	font:Begin()
 	for i = 1, #featureConvexHulls do
-		glPushMatrix()
-
 		local center = featureConvexHulls[i].center
-
-		glTranslate(center.x, center.y, center.z)
-		glRotate(-90, 1, 0, 0)
-
 		local fontSize = fontSizeMin * fontScaling
 		local area = featureConvexHulls[i].area
 		fontSize = math.sqrt(area) * fontSize / minDim
@@ -604,7 +600,6 @@ local function DrawFeatureClusterText()
 		fontSize = math.min(fontSize, fontSizeMax)
 
 		local metal = featureClusters[i].metal
-		--Spring.Echo(metal)
 		local metalText
 		if metal < 1000 then
 			metalText = string.format("%.0f", metal) --exact number
@@ -613,7 +608,6 @@ local function DrawFeatureClusterText()
 		else
 			metalText = string.format("%.0fK", math.floor(metal / 1000)) --40K
 		end
-		gl.Scale(fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE, fontSize / BASE_FONT_SIZE)
 
 		local x100  = 100  / (100  + metal)
 		local x1000 = 1000 / (1000 + metal)
@@ -621,16 +615,11 @@ local function DrawFeatureClusterText()
 		local g = x1000 - x100
 		local b = x100
 
-		--glRect(-200, -200, 200, 200)
-		--glColor(r, g, b, 1.0)
-		--glText(metalText, 0, 0, fontSize, "cv")
-		font:Begin()
-			font:SetTextColor(r, g, b, 1.0)
-			font:Print(metalText, 0, 0, BASE_FONT_SIZE, "cv")
-		font:End()
-
-		glPopMatrix()
+		font:SetTextColor(g, r, b, 1.0)
+		font:PrintWorld(metalText, center.x, center.y, center.z, fontSize, "ncv")
 	end
+	font:End()
+	glPopMatrix()
 end
 
 function widget:Update(dt)
@@ -669,7 +658,7 @@ function widget:GameFrame(frame)
 	if featuresUpdated or (drawFeatureConvexHullSolidList == nil) then
 		ClusterizeFeatures()
 		ClustersToConvexHull()
-		
+
 		if benchmark then
 			benchmark:Enter("featuresUpdated or drawFeatureConvexHullSolidList == nil")
 		end
