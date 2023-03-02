@@ -33,6 +33,8 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	factories[unitDefID] = ParsePotentialFactory(unitDef)
 end
 
+-- FIXME: could reapply the check if the building moves (triggered when affected by seismic explosions)
+
 function gadget:UnitCreated(unitID, unitDefID)
 	local buildOptions = factories[unitDefID]
 	if not buildOptions then
@@ -58,11 +60,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 		local smClass = buildeeMoveDef.smClass
 		cmdEditArray.disabled = false
 		if not smClass then
-			-- aircraft or immobile (like nano), not handled atm
+			-- aircraft or immobile (like nano), not handled atm. FIXME: could be handled
 		elseif smClass == smcShip then
 			if depth < buildeeMoveDef.depth then
 				cmdEditArray.disabled = true
 			end
+			-- FIXME: handle other reasons (steep slope? 0 speed typemap? water is acid?)
 		elseif smClass ~= smcHover then
 			if depth > buildeeMoveDef.depth then
 				cmdEditArray.disabled = true
