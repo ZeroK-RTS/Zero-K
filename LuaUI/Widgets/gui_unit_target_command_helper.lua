@@ -255,10 +255,6 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	if not Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
-		widgetHandler:RemoveWidget(widget)
-		return
-	end
 	screen0 = WG.Chili and WG.Chili.Screen0
 	SetCircleDragThreshold(options.circleDragThreshold.value)
 end
