@@ -40,7 +40,6 @@ return { chickenbroodqueen = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = true,
-  cantBeTransported   = true,
   category            = [[LAND]],
 
   customParams        = {

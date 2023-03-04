@@ -16,7 +16,6 @@ return { neebcomm = {
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = true,
-  cantBeTransported   = true,
   category            = [[LAND UNARMED]],
 
   customParams        = {

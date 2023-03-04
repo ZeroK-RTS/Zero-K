@@ -11,7 +11,6 @@ return { shipheavyarty = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  cantBeTransported      = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[45 45 260]],
