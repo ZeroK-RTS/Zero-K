@@ -27,6 +27,8 @@ return { turretheavy = {
     midposoffset   = [[0 0 0]],
     modelradius    = [[20]],
 
+    stats_show_death_explosion = 1,
+
     outline_x = 130,
     outline_y = 150,
     outline_yoff = 47.5,

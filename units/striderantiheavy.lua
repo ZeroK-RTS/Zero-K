@@ -22,6 +22,8 @@ return { striderantiheavy = {
   customParams           = {
     bait_level_default = 0,
     modelradius    = [[21]],
+
+    stats_show_death_explosion = 1,
   },
 
   energyUse              = 0,

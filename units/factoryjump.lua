@@ -50,6 +50,8 @@ return { factoryjump = {
     shared_energy_gen = 1,
     parent_of_plate   = [[platejump]],
 
+    stats_show_death_explosion = 1,
+
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,

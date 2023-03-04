@@ -51,6 +51,8 @@ return { factoryhover = {
     buggeroff_radius   = 40,
     buggeroff_offset   = 5,
 
+    stats_show_death_explosion = 1,
+
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,

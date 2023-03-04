@@ -29,6 +29,8 @@ return { turretantiheavy = {
     midposoffset   = [[0 0 0]],
     modelradius    = [[40]],
 
+    stats_show_death_explosion = 1,
+
     dontfireatradarcommand = '0',
   },
 

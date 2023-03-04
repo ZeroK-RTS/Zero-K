@@ -25,6 +25,8 @@ return { striderbantha = {
     midposoffset          = [[0 -8 0]],
     modelradius           = [[17]],
     decloak_footprint     = 5,
+
+    stats_show_death_explosion = 1,
   },
 
   explodeAs              = [[ATOMIC_BLAST]],

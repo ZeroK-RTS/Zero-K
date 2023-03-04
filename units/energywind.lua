@@ -25,6 +25,8 @@ return { energywind = {
     removestop     = 1,
     default_spacing = 2,
 
+    stats_show_death_explosion = 1,
+
     tidal_health = 400,
 
     outline_x = 140,

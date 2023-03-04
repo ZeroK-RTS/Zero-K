@@ -17,6 +17,7 @@ return { energyfusion = {
     pylonrange = 150,
     removewait = 1,
     removestop     = 1,
+    stats_show_death_explosion = 1,
   },
 
   energyMake                    = 35,

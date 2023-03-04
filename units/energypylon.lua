@@ -25,6 +25,7 @@ return { energypylon = {
     removestop     = 1,
     default_spacing = 41, -- Diagonal connection.
     selectionscalemult = 1.15,
+    stats_show_death_explosion = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

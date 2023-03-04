@@ -22,7 +22,9 @@ return { staticmissilesilo = {
   canPatrol                     = false,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
-
+  customparams = {
+    stats_show_death_explosion = 1,
+  },
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,

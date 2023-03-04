@@ -34,6 +34,8 @@ return { striderdetriment = {
     selection_scale       = 1.12,
     decloak_footprint     = 6,
 
+    stats_show_death_explosion = 1,
+
     outline_x = 230,
     outline_y = 230,
     outline_yoff = 70,

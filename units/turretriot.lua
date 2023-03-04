@@ -25,6 +25,7 @@ return { turretriot = {
     heat_decay     = 1/6, -- Per second
     heat_max_slow  = 0.5,
     heat_initial   = 1,
+    stats_show_death_explosion = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

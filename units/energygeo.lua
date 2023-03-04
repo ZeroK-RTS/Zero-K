@@ -24,7 +24,9 @@ return { energygeo = {
     modelradius    = [[42]],
     removewait     = 1,
     selectionscalemult = 1.15,
-    
+
+    stats_show_death_explosion = 1,
+
     morphto = [[energyheavygeo]],
     morphtime = [[90]],
     

@@ -25,6 +25,8 @@ return { energysingu = {
     removestop     = 1,
     selectionscalemult = 1.15,
 
+    stats_show_death_explosion = 1,
+
     outline_x = 200,
     outline_y = 200,
     outline_yoff = 55,

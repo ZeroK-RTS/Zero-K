@@ -48,6 +48,8 @@ return { factoryship = {
     buggeroff_offset    = 0,
     buggeroff_radius    = 42,
 
+    stats_show_death_explosion = 1,
+
     outline_x = 340,
     outline_y = 340,
     outline_yoff = 25,

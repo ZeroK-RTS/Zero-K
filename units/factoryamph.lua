@@ -51,6 +51,8 @@ return { factoryamph = {
     cus_noflashlight   = 1,
     parent_of_plate    = [[plateamph]],
 
+    stats_show_death_explosion = 1,
+
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,
