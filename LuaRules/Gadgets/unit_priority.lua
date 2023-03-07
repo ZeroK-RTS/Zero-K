@@ -785,3 +785,17 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		RemoveMiscPriorityUnit(unitID)
 	end
 end
+
+
+----- Exported functions
+function GG.SetPriorityState(unitID, state)
+	SetPriorityState(unitID, state, CMD_PRIORITY)
+end
+
+function GG.SetMetalReserved(teamID, value)
+	SetMetalReserved(teamID, value)
+end
+
+function GG.SetEnergyReserved(teamID, value)
+	SetEnergyReserved(teamID, value)
+end
