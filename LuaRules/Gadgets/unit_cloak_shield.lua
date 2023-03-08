@@ -316,9 +316,18 @@ local function UpdateCloakees(data)
 	local selfCloak = data.def.selfCloak
 	local selfDecloakDistance = data.def.selfDecloakDistance
 	local x, y, z = GetUnitPosition(unitID)
-	if (x == nil) then return end
+	if (x == nil) then
+		return
+	end
+	if Spring.GetUnitRulesParam(unitID, "cloaker_pos_x") then
+		x = Spring.GetUnitRulesParam(unitID, "cloaker_pos_x")
+		y = Spring.GetUnitRulesParam(unitID, "cloaker_pos_y")
+		z = Spring.GetUnitRulesParam(unitID, "cloaker_pos_z")
+	end
 	local closeUnits = GetUnitsInSphere(x, y, z, radius)
-	if (closeUnits == nil) then return end
+	if (closeUnits == nil) then
+		return
+	end
 	local allyTeam = GetUnitAllyTeam(unitID)
 	for _,cloakee in ipairs(closeUnits) do
 		local udid = GetUnitDefID(cloakee)
@@ -412,9 +421,9 @@ local function ShrinkRadius(cloaker)
 	end
 	if ((r <= 0) and (not cloaker.want)) then
 		cloakers[cloaker.id] = nil
-		UpdateMoveSpeedMult(cloaker.id, cloaker.def, false)
 	end
 end
+
 
 local GetUnitIsStunned = Spring.GetUnitIsStunned
 
@@ -714,7 +723,7 @@ end
 
 
 --------------------------------------------------------------------------------
-			
+
 local function SetupMaterial()
 	gl.Color(0.1, 0.2, 0.3, 0.3)
 	gl.Blending(GL.SRC_ALPHA, GL.ONE)
@@ -807,10 +816,18 @@ local function DrawShield(unitID, radius, degrees)
 	if (x == nil) then
 		return
 	end
+	local ux, uy, uz
+	if Spring.GetUnitRulesParam(unitID, "cloaker_pos_x") then
+		ux, uy, uz = x, y, z
+		x = Spring.GetUnitRulesParam(unitID, "cloaker_pos_x")
+		y = Spring.GetUnitRulesParam(unitID, "cloaker_pos_y")
+		z = Spring.GetUnitRulesParam(unitID, "cloaker_pos_z")
+	end
+	
 	if (not Spring.IsSphereInView(x, y, z, math.abs(radius))) then
 		return
 	end
-		
+	
 	glPushMatrix()
 
 	glTranslate(x, y, z)
@@ -820,6 +837,21 @@ local function DrawShield(unitID, radius, degrees)
 	glCallList(shieldList)
 
 	glPopMatrix()
+	
+	if ux then
+		gl.Material({
+			ambient  = { 0, 0, 0 },
+			diffuse  = { 0, 0, 0, 0.5 },
+			emission = { 0.15, 0.20, 0.25 },
+			specular = { 0.25, 0.75, 1.0 },
+			shininess = 4
+		})
+		gl.LineWidth(2.0)
+		gl.BeginEnd(GL.LINES, function()
+			gl.Vertex(ux, uy, uz)
+			gl.Vertex(x, y, z)
+		end)
+	end
 end
 
 local GetSpectatingState  = Spring.GetSpectatingState
@@ -875,6 +907,11 @@ function gadget:DrawInMiniMap()
 		if (IsUnitSelected(unitID)) then
 			local x, y, z = GetUnitViewPosition(unitID, true)
 			if (x ~= nil) then
+				if Spring.GetUnitRulesParam(unitID, "cloaker_pos_x") then
+					x = Spring.GetUnitRulesParam(unitID, "cloaker_pos_x")
+					y = Spring.GetUnitRulesParam(unitID, "cloaker_pos_y")
+					z = Spring.GetUnitRulesParam(unitID, "cloaker_pos_z")
+				end
 				if (fullView or (GetUnitAllyTeam(unitID) == readAllyTeam)) then
 					DrawGroundCircle(x, y, z, radius, 64)
 				end

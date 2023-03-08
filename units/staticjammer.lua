@@ -12,6 +12,8 @@ return { staticjammer = {
   buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
   canMove                       = true, -- for queuing orders during morph to mobile
+  canManualFire                 = true,
+  canAttack                     = false,
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
@@ -19,14 +21,14 @@ return { staticjammer = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    removewait     = 1,
 
     morphto = [[cloakjammer]],
     morphtime = 30,
 
     area_cloak = 1,
     area_cloak_upkeep = 12,
-    area_cloak_radius = 550,
+    area_cloak_radius = 350,
+    area_cloak_shift_range = 200,
 
     priority_misc  = 1,
     addfight       = 1,
@@ -57,6 +59,39 @@ return { staticjammer = {
   sightDistance                 = 250,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oo oo]],
+
+  weapons                = {
+
+    {
+      def                = [[BOGUS_CLOAK_TARGET]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+    },
+    
+  },
+
+  weaponDefs             = {
+
+    BOGUS_CLOAK_TARGET        = {
+      name                    = [[Bogus Cloak Target]],
+      areaOfEffect            = 700,
+      collideFriendly         = false,
+      commandfire             = true,
+
+      customParams        = {
+        gui_draw_range  = 200,
+      },
+      
+      damage                  = {
+        default = 0,
+      },
+
+      edgeEffectiveness       = 1,
+      range                   = 72000,
+      reloadtime              = 4/30,
+      weaponType              = [[StarburstLauncher]],
+    },
+
+  },
 
   featureDefs                   = {
 
