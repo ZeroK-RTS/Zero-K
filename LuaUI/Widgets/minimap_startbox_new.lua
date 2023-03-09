@@ -428,8 +428,7 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	gl.PushMatrix()
 	gl.LineWidth(3)
 
-	gl.Translate(0, minimapY, 0)
-	gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
+	gl.CallList(xformList)
 
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
