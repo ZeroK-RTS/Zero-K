@@ -16,7 +16,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local _, _, GetAllyTeamOctant = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 include("keysym.lua")
 
 ------------------------------------------------------------

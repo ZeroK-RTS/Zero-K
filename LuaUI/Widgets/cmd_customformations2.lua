@@ -14,7 +14,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 
 local formationRank = {}
 local defaultRank = {}

@@ -92,7 +92,7 @@ for name, color in pairs(colorPresets) do
 	end
 end
 
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 
 ----------------------------------------------------------------
 --speedups

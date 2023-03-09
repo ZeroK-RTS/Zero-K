@@ -84,7 +84,7 @@ local circleDivs = 64
 -- Speedup
 
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay

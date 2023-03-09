@@ -13,7 +13,7 @@ local mapZ = Game.mapSizeZ
 local flipped
 
 local GetRawBoxes, GetParsedBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 local startboxConfig = GetParsedBoxes()
 
 local rawBoxes = GetRawBoxes()

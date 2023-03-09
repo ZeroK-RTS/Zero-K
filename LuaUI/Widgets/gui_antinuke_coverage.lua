@@ -39,7 +39,7 @@ end
 --------------------------------------------------------------------------------
 
 local GetNukeIntercepted = VFS.Include("LuaRules/Gadgets/Include/GetNukeIntercepted.lua", nil, VFS.GAME)
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 
 local enemyInt = {}
 local enemyNuke = {}

@@ -19,7 +19,7 @@ end
 
 include("keysym.lua")
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
-local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 include("LuaRules/Configs/customcmds.h.lua")
 
 local spGetActiveCommand = Spring.GetActiveCommand
