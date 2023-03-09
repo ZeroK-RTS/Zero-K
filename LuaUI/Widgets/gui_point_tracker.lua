@@ -13,6 +13,8 @@ function widget:GetInfo()
   }
 end
 
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+
 ----------------------------------------------------------------
 --config
 ----------------------------------------------------------------
@@ -313,6 +315,12 @@ function widget:DrawInMiniMap(sx, sy)
 		local curr = mapPoints[i]
 		local x = curr[2] * ratioX
 		local y = sy - curr[4] * ratioY
+
+		if GetMiniMapFlipped() then
+			x = sx - x
+			y = sy - y
+		end
+
 		local alpha = maxAlpha * (curr[6] - timeNow) / ttl
 		if (alpha <= 0) then
 			mapPoints[i] = mapPoints[mapPointCount]

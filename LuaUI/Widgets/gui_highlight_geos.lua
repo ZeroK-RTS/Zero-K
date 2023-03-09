@@ -12,6 +12,8 @@ function widget:GetInfo()
 	}
 end
 
+local GetMiniMapFlipped = VFS.Include("LuaUI/Headers/minimap_utilities.lua").getMiniMapFlipped
+
 ----------------------------------------------------------------
 -- Globals
 ----------------------------------------------------------------
@@ -139,8 +141,13 @@ function widget:DrawInMiniMap()
 	if drawGeos then
 		gl.PushMatrix()
 		gl.LoadIdentity()
-		gl.Translate(0,1,0)
-		gl.Scale(mapXinv , -mapZinv, 1)
+		if GetMiniMapFlipped() then
+			gl.Translate(1, 0, 0)
+			gl.Scale(-mapXinv , mapZinv, 1)
+		else
+			gl.Translate(0, 1, 0)
+			gl.Scale(mapXinv , -mapZinv, 1)
+		end
 		gl.LineWidth(2)
 		gl.Lighting(false)
 		gl.Color(1,1,0,0.7)
