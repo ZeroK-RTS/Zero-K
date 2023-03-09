@@ -5,8 +5,10 @@ local smokePiece = {base}
 
 local cloakOffsetRange = tonumber(UnitDefs[unitDefID].customParams.area_cloak_shift_range)
 local currentX, currentY, currentZ = 0, 0, 0
-local moveSpeed = 2
+local moveSpeed = 3
+local UPDATE_RATE = 3
 local lastAim = false
+local currentlyFollowingCommandTag = false
 
 local SIG_MOVE = 1
 
@@ -57,7 +59,7 @@ local function FindPlacementPosition(tx, ty, tz)
 	return tx, ty, tz
 end
 
-local function MoveCloaker(tx, ty, tz)
+local function MoveCloaker(tx, ty, tz, toRemoveCmdTag)
 	SetSignalMask(SIG_MOVE)
 	Signal(SIG_MOVE)
 	
@@ -75,6 +77,17 @@ local function MoveCloaker(tx, ty, tz)
 			Spring.SetUnitRulesParam(unitID, "cloaker_pos_x", currentX)
 			Spring.SetUnitRulesParam(unitID, "cloaker_pos_y", currentY)
 			Spring.SetUnitRulesParam(unitID, "cloaker_pos_z", currentZ)
+			if (Spring.GetUnitStates(unitID) or {})["repeat"] then
+				local cmdID, _, cmdTag, cmdParam1, cmdParam2, cmdParam3 = Spring.GetUnitCurrentCommand(unitID)
+				if cmdTag == toRemoveCmdTag then
+					params = (cmdParam3 and {cmdParam1, cmdParam2, cmdParam3}) or {cmdParam1}
+					Spring.GiveOrderToUnit(unitID, CMD.MANUALFIRE, params, CMD.OPT_SHIFT)
+					Spring.GiveOrderToUnit(unitID, CMD.MANUALFIRE, params, CMD.OPT_SHIFT)
+				end
+			else
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, toRemoveCmdTag, 0)
+			end
+			currentlyFollowingCommandTag = false
 			return
 		end
 		Sleep(33)
@@ -83,30 +96,32 @@ end
 
 local function AimCloaker()
 	local frame = Spring.GetGameFrame()
-	if lastAim and lastAim + 5 > frame then
+	if lastAim and lastAim + UPDATE_RATE > frame then
 		return
 	end
 	lastAim = frame
 	
 	local cmdID, _, cmdTag, cmdParam1, cmdParam2, cmdParam3 = Spring.GetUnitCurrentCommand(unitID)
+	if cmdTag == currentlyFollowingCommandTag then
+		return
+	end
 	local tx, ty, tz
 	if cmdID == CMD.MANUALFIRE then
 		if cmdParam3 then
 			tx, ty, tz = cmdParam1, cmdParam2, cmdParam3
+			currentlyFollowingCommandTag = cmdTag
 		elseif not cmdParam2 then
 			targetID = cmdParam1
 			tx, ty, tz = Spring.GetUnitPosition(targetID)
+			currentlyFollowingCommandTag = false -- Units can move
 		end
 	end
 	if not tx then
 		return
 	end
-	if not (Spring.GetUnitStates(unitID) or {})["repeat"] then
-		Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
-	end
 	
 	tx, ty, tz = FindPlacementPosition(tx, ty, tz)
-	StartThread(MoveCloaker, tx, ty, tz)
+	StartThread(MoveCloaker, tx, ty, tz, cmdTag)
 end
 
 function script.QueryWeapon(num)

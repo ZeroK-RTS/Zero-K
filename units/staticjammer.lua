@@ -27,8 +27,9 @@ return { staticjammer = {
 
     area_cloak = 1,
     area_cloak_upkeep = 12,
-    area_cloak_radius = 350,
+    area_cloak_radius = 400,
     area_cloak_shift_range = 200,
+    removeattack = 1,
 
     priority_misc  = 1,
     addfight       = 1,
@@ -53,7 +54,7 @@ return { staticjammer = {
   noAutoFire                    = false,
   objectName                    = [[radarjammer.dae]],
   onoffable                     = true,
-  radarDistanceJam              = 550,
+  radarDistanceJam              = 600,
   script                        = [[staticjammer.lua]],
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 250,
@@ -73,7 +74,7 @@ return { staticjammer = {
 
     BOGUS_CLOAK_TARGET        = {
       name                    = [[Bogus Cloak Target]],
-      areaOfEffect            = 700,
+      areaOfEffect            = 800,
       collideFriendly         = false,
       commandfire             = true,
 
@@ -88,7 +89,12 @@ return { staticjammer = {
       edgeEffectiveness       = 1,
       range                   = 72000,
       reloadtime              = 4/30,
+      turnrate                = 1000000000,
+      turret                  = true,
+      weaponAcceleration      = 20000,
+      weaponTimer             = 0.5,
       weaponType              = [[StarburstLauncher]],
+      weaponVelocity          = 20000,
     },
 
   },

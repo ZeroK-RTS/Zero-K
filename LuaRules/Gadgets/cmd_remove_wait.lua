@@ -28,6 +28,7 @@ local waitRemoveDefs = {}
 local factoryDefs = {}
 local handleDefs = {}
 local stopRemoveDefs = {}
+local attackRemoveDefs = {}
 local antiRecursionWaitDo = false
 
 for unitDefID = 1, #UnitDefs do
@@ -38,6 +39,10 @@ for unitDefID = 1, #UnitDefs do
 	end
 	if ud.customParams and ud.customParams.removestop then
 		stopRemoveDefs[unitDefID] = true
+	end
+	if ud.customParams and ud.customParams.removeattack then
+		attackRemoveDefs[unitDefID] = true
+		handleDefs[unitDefID] = true
 	end
 	if ud.isFactory then
 		factoryDefs[unitDefID] = true
@@ -60,6 +65,9 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_WAIT and waitRemoveDefs[unitDefID]) then
+		return false
+	end
+	if (cmdID == CMD.ATTACK and attackRemoveDefs[unitDefID]) then
 		return false
 	end
 	if cmdID >= 0 and cmdID ~= CMD_WAIT and factoryDefs[unitDefID] and not (cmdOptions.shift or cmdOptions.alt) then
@@ -94,6 +102,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 	end
 	if stopRemoveDefs[unitDefID] then
 		local cmdDesc = spFindUnitCmdDesc(unitID, CMD.STOP)
+		if cmdDesc then
+			spRemoveUnitCmdDesc(unitID, cmdDesc)
+		end
+	end
+	if attackRemoveDefs[unitDefID] then
+		local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
 		if cmdDesc then
 			spRemoveUnitCmdDesc(unitID, cmdDesc)
 		end
