@@ -15,7 +15,7 @@ local offset				= 5
 local thickness				= 6
 local fadeStartHeight		= 800
 local fadeEndHeight			= 4800
-local dlistAmount			= 20		-- amount of dlists created, one for each opacity value
+local dlistAmount			= 20 -- one for each opacity value (isn't this too much for a simple infobox? idk, maybe a nothingburger)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ local font, mapInfoBoxHeight, chobbyInterface
 
 local success, mapinfo = pcall(VFS.Include,"mapinfo.lua") -- load mapinfo.lua confs
 
-function widget:ViewResize()
+function widget:ViewResize() -- FIXME: why would an in-world infobox care about resolution?
 	vsx,vsy = Spring.GetViewGeometry()
 
 	font = gl.LoadFont("FreeSansBold.otf", BASE_FONT_SIZE, 0, 0)
@@ -174,7 +174,7 @@ local function Init()
 end
 
 function widget:GameFrame(gf)
-	if gf == 1 then
+	if gf == 1 then -- FIXME: does frame == 1 mean it renders incorrectly before (generated terrain) and after (terraform)?
 		local prevMapInfoBoxHeight = mapInfoBoxHeight
 		mapInfoBoxHeight = spGetGroundHeight(0, Game.mapSizeZ)
 		if mapInfoBoxHeight ~= prevMapInfoBoxHeight then
@@ -199,7 +199,7 @@ function widget:Shutdown()
 end
 
 function widget:RecvLuaMsg(msg, playerID)
-	if msg:sub(1,18) == 'LobbyOverlayActive' then
+	if msg:sub(1,18) == 'LobbyOverlayActive' then -- FIXME: why does an in-world object care about the overlay?
 		chobbyInterface = (msg:sub(1,19) == 'LobbyOverlayActive1')
 	end
 end
