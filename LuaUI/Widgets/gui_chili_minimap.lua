@@ -163,6 +163,7 @@ options_order = {
 	'radar_view_presets_label1',
 	'radar_preset_only_los',
 	'radar_preset_double_outline',
+	'radar_preset_two_tone',
 	'radar_preset_blue_line',
 	'radar_preset_green',
 	'radar_preset_green_in_blue',
@@ -364,6 +365,20 @@ options = {
 		end,
 		path = radar_path,
 	},
+	radar_preset_two_tone = {
+		name = 'LOS Brighter',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness1.value = 0.2
+			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
+			options.radar_radar_color.value = { 0, 0.5, 0, 0}
+			options.radar_radar2_color.value = { 0.2, 0.2, 0.2, 0}
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+
 	radar_preset_blue_line = {
 		name = 'Blue Outline',
 		type = 'button',
