@@ -8,7 +8,9 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
-if (not gadgetHandler:IsSyncedCode()) then return end
+if (not gadgetHandler:IsSyncedCode()) then 
+	return 
+end
 
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spKillTeam = Spring.KillTeam
@@ -63,14 +65,26 @@ function gadget:GotChatMsg (msg, senderID)
 			end
 		end
 		if not allowed then return end
-
 		local target = string.sub(msg, 12)
 		local people = spGetPlayerList()
 		for i = 1, #people do
 			local personID = people[i]
-			local nick, _, _, teamID = spGetPlayerInfo(personID, false)
-			if (target == nick) then
-				ResignTeam (teamID)
+			local nick, _, isSpectator, teamID = spGetPlayerInfo(personID, false)
+			if target == nick and not isSpectator then
+				local commshareID = Spring.GetPlayerRulesParam(personID, "commshare_orig_teamid")
+				if commshareID then -- we're commshared.
+					--Spring.Echo("Unmerging squaddie")
+					GG.UnmergePlayerFromCommshare(personID)
+					ResignTeam(commshareID)
+				elseif #Spring.GetPlayerList(teamID) > 1 then -- check to make sure there aren't other people on the team.
+					GG.UnmergePlayerFromCommshare(personID) -- this can happen if we're the team leader.
+					ResignTeam(teamID)
+				else -- we're a nobody, just resign us.
+					ResignTeam (teamID)
+				end
+				return
+			elseif target == nick and isSpectator then
+				--Spring.Echo("Attempted to force resign a spectator!")
 				return
 			end
 		end
