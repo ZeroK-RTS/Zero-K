@@ -97,7 +97,6 @@ local timeframetimer_short = 0
 local loopTrack = ''
 local previousTrack = ''
 local previousTrackType = ''
-local numVisibleEnemy = 0
 local haltMusic = false
 local looping = false
 local musicMuted = false
@@ -250,15 +249,6 @@ function widget:Update(dt)
 	timeframetimer = timeframetimer + dt
 	if (timeframetimer > UPDATE_PERIOD) then -- every second
 		timeframetimer = 0
-		local PlayerTeam = Spring.GetMyTeamID()
-		numVisibleEnemy = 0
-		local doods = Spring.GetVisibleUnits(-1, nil, true)
-		for i=1,#doods do
-			if (Spring.IsUnitAllied(doods[i]) ~= true) then
-				numVisibleEnemy = numVisibleEnemy + 1
-			end
-		end
-		
 		local totalKilled = 0
 		for i = 1, 10, 1 do --calculate the first half of the table (1-15)
 			totalKilled = totalKilled + (dethklok[i] * 2)
@@ -338,11 +328,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 		if (teamID == PlayerTeam) then
 			damage = damage * 1.5
 		end
-		local multifactor = 1
-		if (numVisibleEnemy > 3) then
-			multifactor = math.log(numVisibleEnemy)
-		end
-		dethklok[1] = dethklok[1] + (damage * multifactor);
+		dethklok[1] = dethklok[1] + damage
 	end
 end
 
@@ -366,11 +352,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if (teamID == PlayerTeam) then
 		unitWorth = unitWorth * 1.5
 	end
-	local multifactor = 1
-	if (numVisibleEnemy > 3) then
-		multifactor = math.log(numVisibleEnemy)
-	end
-	dethklok[1] = dethklok[1] + (unitWorth*multifactor);
+	dethklok[1] = dethklok[1] + unitWorth
 end
 
 function widget:TeamDied(team)
