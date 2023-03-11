@@ -16,51 +16,7 @@ local vpx, vpy, vsx, vsy
 local screenCopyTex
 local casShader
 local fullTexQuad
-
 local isDisabled = true
-local function UpdateShader(sharpness)
-	if sharpness > 0 then
-		if isDisabled then
-			isDisabled = false
-			widgetHandler:UpdateCallIn("DrawScreenEffects")
-			widgetHandler:UpdateCallIn("ViewResize")
-
-			widget:Initialize()
-		end
-		if not casShader then
-			-- can happen on shader creation failure
-			return
-		end
-		casShader:ActivateWith(function()
-			casShader:SetUniform("sharpness", sharpness)
-			casShader:SetUniform("viewPosX", vpx)
-			casShader:SetUniform("viewPosY", vpy)
-		end)
-	else
-		isDisabled = true
-		widget:Shutdown()
-		widgetHandler:RemoveCallIn("DrawScreenEffects")
-		widgetHandler:RemoveCallIn("ViewResize")
-	end
-end
-
-options_path = 'Settings/Graphics/Effects'
-options = {
-	cas_sharpness = {
-		name = 'Sharpening',
-		type = 'number',
-		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
-		min = 0.0,
-		max = 1.25, -- can go even higher but at about 1.5 it degenerates, don't let it get near
-		tooltipFunction = function(self)
-			return "Current: " .. math.ceil(100*self.value) .. "%\nUse 100% as a reasonable reference value. Higher may be excessive\n"
-		end,
-		step = 0.01,
-		OnChange = function(self) UpdateShader(self.value) end,
-		noHotkey = true,
-		update_on_the_fly = true,
-	},
-}
 
 local LuaShader = VFS.Include("LuaUI/Widgets/Include/LuaShader.lua", nil, VFS.GAME)
 
@@ -69,7 +25,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-function widget:Initialize()
+local function MakeShader()
 	local sharpness = options.cas_sharpness.value
 	if sharpness == 0 then
 		-- lazy initialisation; zero is the default so this avoids creating those objects to lay unused
@@ -120,11 +76,9 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-
-	UpdateShader(sharpness)
 end
 
-function widget:Shutdown()
+local function DisableShader()
 	if casShader then
 		casShader:Finalize()
 		casShader = nil
@@ -141,10 +95,61 @@ function widget:Shutdown()
 	end
 end
 
+local function UpdateShader()
+	if options.cas_sharpness.value > 0 then
+		if isDisabled then
+			isDisabled = false
+			widgetHandler:UpdateCallIn("DrawScreenEffects")
+			widgetHandler:UpdateCallIn("ViewResize")
+		end
+		if not casShader then
+			MakeShader()
+		end
+		casShader:ActivateWith(function()
+			casShader:SetUniform("sharpness", options.cas_sharpness.value)
+			casShader:SetUniform("viewPosX", vpx)
+			casShader:SetUniform("viewPosY", vpy)
+		end)
+	else
+		isDisabled = true
+		widget:Shutdown()
+		widgetHandler:RemoveCallIn("DrawScreenEffects")
+		widgetHandler:RemoveCallIn("ViewResize")
+	end
+end
+
+options_path = 'Settings/Graphics/Effects'
+options = {
+	cas_sharpness = {
+		name = 'Sharpening',
+		type = 'number',
+		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
+		min = 0.0,
+		max = 1.25, -- can go even higher but at about 1.5 it degenerates, don't let it get near
+		tooltipFunction = function(self)
+			return "Current: " .. math.ceil(100*self.value) .. "%\nUse 100% as a reasonable reference value. Higher may be excessive\n"
+		end,
+		step = 0.01,
+		OnChange = function(self)
+			UpdateShader(self.value)
+		end,
+		noHotkey = true,
+		update_on_the_fly = true,
+	},
+}
+
+function widget:Initialize()
+	UpdateShader()
+end
+
+function widget:Shutdown()
+	DisableShader()
+end
+
 function widget:ViewResize()
 	-- FIXME: could probably be optimized (reuse objects etc) but we're lazy
-	widget:Shutdown()
-	widget:Initialize()
+	DisableShader()
+	UpdateShader()
 end
 
 function widget:DrawScreenEffects()
