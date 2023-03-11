@@ -318,16 +318,12 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	end
 	
 	if (damage < 1.5) then return end
-	local PlayerTeam = Spring.GetMyTeamID()
 	
 	if (UnitDefs[unitDefID] == nil) then return end
 		
 	if paralyzer then
 		return
 	else
-		if (teamID == PlayerTeam) then
-			damage = damage * 1.5
-		end
 		dethklok[1] = dethklok[1] + damage
 	end
 end
@@ -348,9 +344,6 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 	if (UnitDefs[unitDefID].metalCost > 8000) then
 		unitWorth = 700
-	end
-	if (teamID == PlayerTeam) then
-		unitWorth = unitWorth * 1.5
 	end
 	dethklok[1] = dethklok[1] + unitWorth
 end
