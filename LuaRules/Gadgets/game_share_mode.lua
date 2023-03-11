@@ -738,4 +738,5 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:AddChatAction("debugcommshare", ToggleDebug, "Toggles Commshare debugMode echos.")
+	GG.UnmergePlayerFromCommshare = UnmergePlayer
 end
