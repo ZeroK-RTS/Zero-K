@@ -58,7 +58,7 @@ function gadget:GotChatMsg (msg, senderID)
 			allowed = true
 		else
 			local playerkeys = select (10, spGetPlayerInfo(senderID))
-			if (playerkeys and playerkeys.admin and (playerkeys.admin == "1")) then
+			if playerkeys and ((playerkeys.admin and playerkeys.admin == "1") or (playerkeys.room_boss and playerkeys.room_boss == "1")) then
 				allowed = true
 			end
 		end
