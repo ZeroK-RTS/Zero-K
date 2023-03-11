@@ -264,4 +264,5 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(rcalf, SFX.FALL)
 	Explode(lfoot, SFX.FALL)
 	Explode(rfoot, SFX.FALL)
+	return 2
 end
