@@ -205,12 +205,16 @@ local function UnmergeUnits(orgTeamID, newOwner)
 end
 
 local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
+	local name, _, spec, teamID = spGetPlayerInfo(playerID, false)
+	if spec then
+		return
+	end
+
 	if config.permanentMerge then
 		spEcho("[Commshare] Unmerging is forbidden in this game mode!")
 		return
 	end
 
-	local name = spGetPlayerInfo(playerID, false)
 	spEcho("game_message: Unmerging player " .. name)
 	if spGetPlayerRulesParam(playerID, "commshare_orig_teamid") then
 		local orgTeamID = spGetPlayerRulesParam(playerID, "commshare_orig_teamid")
@@ -220,9 +224,8 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 		spSetPlayerRulesParam(playerID, "commshare_team_id", nil)
 		spSetPlayerRulesParam(playerID, "commshare_orig_teamid", nil)
 	elseif IsTeamLeader(playerID) then -- leader wants to unmerge
-		local myteamid = GetTeamID(playerID)
-		local playerlist = spGetPlayerList(myteamid)
-		local newleader = GetNewLeader(myteamid)
+		local playerlist = spGetPlayerList(teamID)
+		local newleader = GetNewLeader(teamID)
 		local leaderTeam = spGetPlayerRulesParam(newleader, "commshare_orig_teamid")
 		if not leaderTeam then
 			spEcho("[Commshare] Couldn't unmerge, maybe new leader playerID", newleader, "moved manually via /team or something")
