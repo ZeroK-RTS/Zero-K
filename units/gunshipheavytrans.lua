@@ -131,7 +131,7 @@ return { gunshipheavytrans = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 320,
+      range                   = 312,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -141,7 +141,7 @@ return { gunshipheavytrans = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2400,
+      weaponVelocity          = 1170,
     },
     
     AALASER  = {
