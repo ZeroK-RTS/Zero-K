@@ -220,6 +220,10 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 			local playerlist = spGetPlayerList(myteamid)
 			local newleader = GetNewLeader(myteamid)
 			local leaderTeam = spGetPlayerRulesParam(newleader, "commshare_orig_teamid")
+			if not leaderTeam then
+				spEcho("[Commshare] Couldn't unmerge, maybe new leader playerID", newleader, "moved manually via /team or something")
+				return
+			end
 			spSetTeamRulesParam(leaderTeam, "isCommsharing", nil) -- clean up the new leader.
 			spSetPlayerRulesParam(newleader, "commshare_team_id", nil)
 			spSetPlayerRulesParam(newleader, "commshare_orig_teamid", nil)
