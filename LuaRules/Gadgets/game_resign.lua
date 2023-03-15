@@ -53,24 +53,33 @@ function gadget:GotChatMsg (msg, senderID)
 	if Spring.GetGameFrame() <= 0 then
 		return
 	end
-	if (string.find(msg, "resignteam") == 1) then
+	if string.find(msg, "resignteam") ~= 1 then
+		return
+	end
 
 		local allowed = false
 		if (senderID == 255) then -- Springie
 			allowed = true
 		else
 			local playerkeys = select (10, spGetPlayerInfo(senderID))
-			if playerkeys and ((playerkeys.admin and playerkeys.admin == "1") or (playerkeys.room_boss and playerkeys.room_boss == "1")) then
+			if playerkeys and (playerkeys.admin == "1" or playerkeys.room_boss == "1") then
 				allowed = true
 			end
 		end
-		if not allowed then return end
+		if not allowed then
+			return
+		end
+
 		local target = string.sub(msg, 12)
 		local players = spGetPlayerList()
 		for i = 1, #players do
 			local playerID = players[i]
 			local nick, _, isSpectator, teamID = spGetPlayerInfo(playerID, false)
-			if target == nick and not isSpectator then
+			if target == nick then
+				if isSpectator then
+					return
+				end
+
 				local commshareID = Spring.GetPlayerRulesParam(playerID, "commshare_orig_teamid")
 				if commshareID then -- we're commshared.
 					--Spring.Echo("Unmerging squaddie")
@@ -83,10 +92,6 @@ function gadget:GotChatMsg (msg, senderID)
 					ResignTeam (teamID)
 				end
 				return
-			elseif target == nick and isSpectator then
-				--Spring.Echo("Attempted to force resign a spectator!")
-				return
 			end
 		end
-	end
 end
