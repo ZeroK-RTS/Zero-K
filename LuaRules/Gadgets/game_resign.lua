@@ -66,18 +66,18 @@ function gadget:GotChatMsg (msg, senderID)
 		end
 		if not allowed then return end
 		local target = string.sub(msg, 12)
-		local people = spGetPlayerList()
-		for i = 1, #people do
-			local personID = people[i]
-			local nick, _, isSpectator, teamID = spGetPlayerInfo(personID, false)
+		local players = spGetPlayerList()
+		for i = 1, #players do
+			local playerID = players[i]
+			local nick, _, isSpectator, teamID = spGetPlayerInfo(playerID, false)
 			if target == nick and not isSpectator then
-				local commshareID = Spring.GetPlayerRulesParam(personID, "commshare_orig_teamid")
+				local commshareID = Spring.GetPlayerRulesParam(playerID, "commshare_orig_teamid")
 				if commshareID then -- we're commshared.
 					--Spring.Echo("Unmerging squaddie")
-					GG.UnmergePlayerFromCommshare(personID)
+					GG.UnmergePlayerFromCommshare(playerID)
 					ResignTeam(commshareID)
-				elseif #Spring.GetPlayerList(teamID) > 1 then -- check to make sure there aren't other people on the team.
-					GG.UnmergePlayerFromCommshare(personID) -- this can happen if we're the team leader.
+				elseif #Spring.GetPlayerList(teamID) > 1 then -- check to make sure there aren't other players on the team.
+					GG.UnmergePlayerFromCommshare(playerID) -- this can happen if we're the team leader.
 					ResignTeam(teamID)
 				else -- we're a nobody, just resign us.
 					ResignTeam (teamID)
