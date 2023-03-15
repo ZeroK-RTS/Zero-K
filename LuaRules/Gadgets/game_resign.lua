@@ -81,16 +81,16 @@ function gadget:GotChatMsg (msg, senderID)
 			end
 
 			local commshareID = Spring.GetPlayerRulesParam(playerID, "commshare_orig_teamid")
-			if commshareID then -- we're commshared.
-				--Spring.Echo("Unmerging squaddie")
-				GG.UnmergePlayerFromCommshare(playerID)
-				ResignTeam(commshareID)
-			elseif #Spring.GetPlayerList(teamID) > 1 then -- check to make sure there aren't other players on the team.
-				GG.UnmergePlayerFromCommshare(playerID) -- this can happen if we're the team leader.
-				ResignTeam(teamID)
-			else -- we're a nobody, just resign us.
-				ResignTeam (teamID)
+			if commshareID or #Spring.GetPlayerList(teamID) > 1 then
+				teamID = GG.UnmergePlayerFromCommshare(playerID)
 			end
+
+			if #Spring.GetPlayerList(teamID) > 1 then
+				Spring.Echo("Force-resign: comshare unmerge failed, other players still on team", nick, "playerID", playerID, "teamID", teamID)
+				return
+			end
+
+			ResignTeam(teamID)
 			return
 		end
 	end
