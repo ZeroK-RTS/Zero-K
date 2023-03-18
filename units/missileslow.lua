@@ -1,6 +1,6 @@
 return { missileslow = {
   unitname                      = [[missileslow]],
-  name                          = [[Tortoise]],
+  name                          = [[Zeno]],
   description                   = [[Slow Homing Missile - High single-target slow damage with lingering damage over time]],
   buildCostMetal                = 500,
   builder                       = false,
