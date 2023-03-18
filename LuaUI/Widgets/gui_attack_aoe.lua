@@ -199,16 +199,15 @@ end
 --------------------------------------------------------------------------------
 
 local function getWeaponInfo(weaponDef, unitDef)
-
 	local retData
 
 	local weaponType = weaponDef.type
 	local spray = (weaponDef.customParams and weaponDef.customParams.gui_sprayangle) or weaponDef.sprayAngle
 	local scatter = weaponDef.accuracy + spray
-	local aoe = weaponDef.damageAreaOfEffect
+	local aoe = tonumber(weaponDef.customParams.gui_aoe) or weaponDef.damageAreaOfEffect
 	local cost = unitDef.metalCost
 	local waterWeapon = weaponDef.waterWeapon
-	local ee = weaponDef.edgeEffectiveness
+	local ee = tonumber(weaponDef.customParams.gui_ee) or weaponDef.edgeEffectiveness
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
@@ -256,7 +255,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 		retData = {type = "direct", scatter = scatter, range = weaponDef.range}
 	end
 
-	if not weaponDef.impactOnly then
+	if weaponDef.customParams.gui_aoe or not weaponDef.impactOnly then
 		retData.aoe = aoe
 	else
 		retData.aoe = 0
@@ -300,7 +299,7 @@ local function SetupUnit(unitDef, unitID)
 		if (weapon.weaponDef) and ((not unitID) or num == weapon1 or num == weapon2) then
 			local weaponDef = WeaponDefs[weapon.weaponDef]
 			if (weaponDef) then
-				local aoe = weaponDef.damageAreaOfEffect
+				local aoe = tonumber(weaponDef.customParams.gui_aoe) or weaponDef.damageAreaOfEffect
 				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
 					if retDgunInfo.range then

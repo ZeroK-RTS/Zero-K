@@ -503,8 +503,8 @@ local function weapons2Table(cells, ws, unitID)
 			stun_time = tonumber(cp.disarmtimer)
 		end
 
-		if cp.timeslow_damagefactor then
-			dams = val * cp.timeslow_damagefactor
+		if cp.timeslow_damagefactor or cp.timeslow_onlyslow then
+			dams = val * (cp.timeslow_damagefactor or 1)
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
 			end

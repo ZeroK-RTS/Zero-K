@@ -14,6 +14,7 @@ return { staticmissilesilo = {
     [[seismic]],
     [[empmissile]],
     [[napalmmissile]],
+    --[[missileslow]],
   },
 
   buildPic                      = [[staticmissilesilo.png]],

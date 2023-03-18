@@ -120,11 +120,11 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			wd.damage.shield = wd.damage.shield + tonumber(cp.extra_damage) * EMP_DAMAGE_MOD
 		end
 
-		if (cp.timeslow_damagefactor) then
+		if (cp.timeslow_damagefactor) or tobool(cp.timeslow_onlyslow) then
 			if (tobool(cp.timeslow_onlyslow)) then
 				wd.damage.shield = 0
 			end
-			wd.damage.shield = wd.damage.shield + (tonumber(wd.customparams.timeslow_damagefactor) * maxDamage * SLOW_DAMAGE_MOD)
+			wd.damage.shield = wd.damage.shield + (tonumber(wd.customparams.timeslow_damagefactor or "1") * maxDamage * SLOW_DAMAGE_MOD)
 		end
 
 		if (cp.disarmdamagemult) then
