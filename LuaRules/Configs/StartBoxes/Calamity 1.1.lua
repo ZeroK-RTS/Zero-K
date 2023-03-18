@@ -1,5 +1,5 @@
-local boxes = {
-	[0] = {
+return {
+	{
 		nameLong = "South",
 		nameShort = "S",
 		startpoints = {
@@ -395,7 +395,7 @@ local boxes = {
 			},
 		},
 	},
-	[1] = {
+	{
 		nameLong = "North",
 		nameShort = "N",
 		startpoints = {
@@ -769,5 +769,3 @@ local boxes = {
 		},
 	},
 }
-
-return boxes
