@@ -85,6 +85,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		expiry = frameNum + weaponInfo[weaponID].duration,
 		rangeFall = weaponInfo[weaponID].rangeFall,
 		timeLoss = timeLoss,
+		damageUpdateRate = weaponInfo[weaponID].damageUpdateRate,
 		id = weaponID,
 		pos = {x = px, y = py, z = pz},
 		owner = ownerID,
@@ -127,7 +128,7 @@ end
 local function HandleDamageArea(data, f)
 	local pos = data.pos
 	if data.radius then
-		if (f%DAMAGE_PERIOD == 0) then
+		if (not data.damageUpdateRate) or (f%data.damageUpdateRate == 0) then
 			local ulist = Spring.GetUnitsInSphere(pos.x, pos.y, pos.z, data.radius)
 			if (ulist) then
 				for j = 1, #ulist do
@@ -142,6 +143,8 @@ local function HandleDamageArea(data, f)
 						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
 						GG.SetUnitFallDamageImmunity(u, f + 10)
 						GG.DoAirDrag(u, damage)
+					elseif data.slow then
+						GG.addSlowDamage(u, damage)
 					else
 						Spring.AddUnitDamage(u, damage, 0, data.owner, data.id, 0, 0, 0)
 					end
@@ -164,12 +167,15 @@ local function HandleDamageArea(data, f)
 				return true -- remove
 			end
 		end
-		data.timeToNextSpawn = data.timeToNextSpawn - 1
+		data.timeToNextSpawn = data.timeToNextSpawn - DAMAGE_PERIOD
 	end
 end
 
 function gadget:GameFrame(f)
 	frameNum = f
+	if (f%DAMAGE_PERIOD ~= 0) then
+		return
+	end
 	local i = 1
 	while i <= explosionCount do
 		local data = explosionList[i]

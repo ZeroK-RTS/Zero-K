@@ -1,7 +1,7 @@
 return { missileslow = {
   unitname                      = [[missileslow]],
   name                          = [[Tortise]],
-  description                   = [[Slow Missile]],
+  description                   = [[Homing Slow Missile - High single-target damage followed by lingering slow]],
   buildCostMetal                = 500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -68,13 +68,18 @@ return { missileslow = {
         light_color = [[0.6 0.22 0.8]],
         light_radius = 550,
 
-        area_damage_weapon_name = [[missileslow_fallout]],
-        area_damage_repeat_period = 26,
-        area_damage_repeat_period_increase = 4,
-        area_damage_repeats = 6,
-        area_damage_weapon_instant_spawn = "1",
-        
-        gui_aoe = 320,
+        stats_hide_dps = 1, -- one use
+        stats_hide_reload = 1,
+        stats_aoe = 0,
+
+        area_damage = 1,
+        area_damage_radius = 384,
+        area_damage_dps = 200,
+        area_damage_duration = 30,
+        area_damage_update_mult = 5,
+        area_damage_is_slow = "1",
+
+        gui_aoe = 384,
         gui_ee = 0.4,
       },
 
@@ -98,36 +103,11 @@ return { missileslow = {
       soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       tracks                  = true,
-      turnrate                = 14000,
-      weaponAcceleration      = 80,
-      weaponTimer             = 4,
+      turnrate                = 12000,
+      weaponAcceleration      = 60,
+      weaponTimer             = 6,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 480,
-    },
-
-    fallout = {
-      name                    = [[Slow Fallout]],
-      areaOfEffect       = 640,
-      customparams = {
-        lups_explodespeed = 1.04,
-        lups_explodelife = 0.88,
-        timeslow_damagefactor = 10,
-        timeslow_onlyslow = 1,
-        nofriendlyfire = "needs hax",
-      },
-     
-      damage = {
-        default          = 350,
-      },
-     
-      edgeEffectiveness  = 0.4,
-      explosionGenerator = [[custom:purple_missile_riotball]],
-      explosionSpeed     = 10,
-      impulseBoost       = 0,
-      impulseFactor      = 0.3,
-      name               = "Slowing Explosion",
-      soundHit           = [[weapon/aoe_aura2]],
-      soundHitVolume     = 0.5,
     },
   },
 

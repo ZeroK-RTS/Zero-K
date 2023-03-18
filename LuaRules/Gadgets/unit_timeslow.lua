@@ -180,7 +180,6 @@ end
 
 
 local function addSlowDamage(unitID, damage, overslow)
-
 	-- add stats that the unit requires for this gadget
 	local su = slowedUnits[unitID]
 	if not su then

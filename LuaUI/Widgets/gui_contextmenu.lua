@@ -690,9 +690,9 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
-		if aoe > 15 and show_aoe then
+		if (aoe > 15 and show_aoe) or cp.stats_aoe then
 			cells[#cells+1] = ' - AoE radius:'
-			cells[#cells+1] = numformat(aoe) .. " elmo"
+			cells[#cells+1] = numformat(cp.stats_aoe or aoe) .. " elmo"
 		end
 
 		if show_projectile_speed then
@@ -776,6 +776,11 @@ local function weapons2Table(cells, ws, unitID)
 			if (cp.area_damage_is_impulse == "1") then
 				cells[#cells+1] = ' - Creates a gravity well:'
 				cells[#cells+1] = ''
+			elseif (cp.area_damage_is_slow == "1") then
+				cells[#cells+1] = ' - Lingering slow damage in an area:'
+				cells[#cells+1] = ''
+				cells[#cells+1] = '   * DPS:'
+				cells[#cells+1] = color2incolor(colorPurple) .. cp.area_damage_dps .. " (S)\008"
 			else
 				cells[#cells+1] = ' - Sets the ground on fire:'
 				cells[#cells+1] = ''

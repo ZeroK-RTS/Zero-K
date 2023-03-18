@@ -437,7 +437,7 @@ local function UpdateCloakees(data, frameNum)
 
 	if activeCloakee then
 		-- Spend energy on recloak
-		local recloakPower = data.recloakRate
+		local recloakPower = data.recloakRate * (GG.att_ReloadChange[unitID] or 1)
 		while activeCloakee do
 			local udid = GetUnitDefID(activeCloakee)
 			local costMult = GetUnitDefCloakTimeMult(udid)
