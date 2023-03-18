@@ -31,6 +31,7 @@ local missileDefIDs = {
 	[UnitDefNames.napalmmissile.id] = true,
 	[UnitDefNames.empmissile.id] = true,
 	[UnitDefNames.seismic.id] = true,
+	[UnitDefNames.missileslow.id] = true,
 }
 
 local silos = {} -- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
