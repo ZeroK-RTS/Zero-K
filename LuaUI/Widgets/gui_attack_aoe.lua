@@ -433,7 +433,7 @@ local function DrawAoE(tx, ty, tz, aoe, ee, alphaMult, offset, circleMode)
 		for i = 1, 3 do
 			local proportion = (i + 17) / 20
 			local radius = aoe * proportion
-			local alpha = aoeColor[4] * (i / 3) * (1 - GetSecondPart(offset or 0)) * (alphaMult or 0.7)
+			local alpha = aoeColor[4] * (i / 3) * (1 - GetSecondPart(offset or 0)) * (alphaMult or 0.55)
 			glColor(cloakerColor[1], cloakerColor[2], cloakerColor[3], alpha)
 			DrawCircle(tx, ty, tz, radius)
 		end

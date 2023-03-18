@@ -29,6 +29,7 @@ return { staticjammer = {
     area_cloak_upkeep = 12,
     area_cloak_radius = 400,
     area_cloak_shift_range = 200,
+    area_cloak_recloak_rate = 1200,
     removeattack = 1,
 
     priority_misc  = 1,

@@ -19,6 +19,7 @@ return { cloakjammer = {
     area_cloak = 1,
     area_cloak_upkeep = 15,
     area_cloak_radius = 360,
+    area_cloak_recloak_rate = 800,
     
     priority_misc = 1,
     cus_noflashlight = 1,

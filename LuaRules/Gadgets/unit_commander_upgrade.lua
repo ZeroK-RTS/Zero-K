@@ -42,7 +42,8 @@ local commanderCloakShieldDef = {
 	delay = 30,
 	energy = 15,
 	minrad = 64,
-	maxrad = 350,
+	maxrad = 320, -- Update a number in dynamic_comm_defs
+	recloakRate = 800, -- Update a number in dynamic_comm_defs
 	
 	growRate = 512,
 	shrinkRate = 2048,
@@ -151,6 +152,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak", 1, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_upkeep", data.cloakFieldUpkeep, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_area_recloak_rate", data.cloakFieldRecloakRate, INLOS)
 	end
 	
 	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed

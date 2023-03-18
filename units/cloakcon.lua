@@ -36,6 +36,7 @@ return { cloakcon = {
     area_cloak_grow_rate = 320,
     area_cloak_shrink_rate = 1400,
     area_cloak_move_mult = 0.666,
+    area_cloak_recloak_rate = 600,
 
     priority_misc = 2, -- High
   },

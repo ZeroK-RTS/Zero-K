@@ -27,6 +27,7 @@ for name, ud in pairs (UnitDefNames) do
 		cloakShieldDefs[name].growRate = tonumber(cp.area_cloak_grow_rate)
 		cloakShieldDefs[name].shrinkRate = tonumber(cp.area_cloak_shrink_rate)
 		cloakShieldDefs[name].selfDecloakDistance = tonumber(cp.area_cloak_self_decloak_distance) or ud.decloakDistance
+		cloakShieldDefs[name].recloakRate = tonumber(cp.area_cloak_recloak_rate)
 
 		cloakShieldDefs[name].init = (cp.area_cloak_init ~= "0")
 		cloakShieldDefs[name].draw = (cp.area_cloak_draw ~= "0")

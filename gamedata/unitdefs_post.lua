@@ -926,6 +926,7 @@ for name, ud in pairs(UnitDefs) do
 		if not cp.area_cloak_grow_rate then cp.area_cloak_grow_rate = tostring(area_cloak_defaults.grow_rate) end
 		if not cp.area_cloak_shrink_rate then cp.area_cloak_shrink_rate = tostring(area_cloak_defaults.shrink_rate) end
 		if not cp.area_cloak_decloak_distance then cp.area_cloak_decloak_distance = tostring(area_cloak_defaults.decloak_distance) end
+		if not cp.area_cloak_recloak_rate then cp.area_cloak_recloak_rate = tostring(area_cloak_defaults.recloak_rate) end
 
 		if not cp.area_cloak_init then cp.area_cloak_init = tostring(area_cloak_defaults.init) end
 		if not cp.area_cloak_draw then cp.area_cloak_draw = tostring(area_cloak_defaults.draw) end

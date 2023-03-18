@@ -931,12 +931,15 @@ local function printAbilities(ud, unitID)
 	if cp.area_cloak or (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) then
 		local areaCloakUpkeep = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_upkeep") or cp.area_cloak_upkeep)
 		local areaCloakRadius = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius")) or cp.area_cloak_radius)
+		local areaCloakRecloak = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_recloak_rate")) or cp.area_cloak_recloak_rate)
 		cells[#cells+1] = 'Area cloak'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Upkeep:'
 		cells[#cells+1] = areaCloakUpkeep .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = areaCloakRadius .. " elmo"
+		cells[#cells+1] = ' - Cloak rate:'
+		cells[#cells+1] = areaCloakRecloak .. " mass/s"
 		if cp.area_cloak_shift_range then
 			cells[#cells+1] = ' - Offset range:'
 			cells[#cells+1] = cp.area_cloak_shift_range

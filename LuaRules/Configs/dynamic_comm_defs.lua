@@ -682,6 +682,7 @@ local moduleDefs = {
 			sharedData.decloakDistance = 180
 			sharedData.cloakFieldRange = 320
 			sharedData.cloakFieldUpkeep = 15
+			sharedData.cloakFieldRecloakRate = 800 -- UI only, update in unit_commander_upgrade
 			sharedData.radarJammingRange = 320
 		end
 	},
