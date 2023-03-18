@@ -38,7 +38,6 @@ include("LuaRules/Configs/constants.lua")
 
 local SYNCSTR = "unit_cloak_shield"
 
-
 --------------------------------------------------------------------------------
 --  COMMON
 --------------------------------------------------------------------------------
@@ -60,7 +59,10 @@ local EditUnitCmdDesc    = Spring.EditUnitCmdDesc
 
 local SetUnitRulesParam  = Spring.SetUnitRulesParam
 local GetUnitRulesParam  = Spring.GetUnitRulesParam
-
+local GetUnitAllyTeam    = Spring.GetUnitAllyTeam
+local GetUnitPosition    = Spring.GetUnitPosition
+local GetUnitsInSphere   = Spring.GetUnitsInSphere
+local GetUnitIsStunned   = Spring.GetUnitIsStunned
 
 --------------------------------------------------------------------------------
 
@@ -71,6 +73,10 @@ local radiusOverrideDefs = {}
 local cloakShieldUnits = {} -- make it global in Initialize()
 local cloakers = {}
 local cloakees = {}
+local cloakProgress = {}
+local lastAreaCloakTime = {}
+
+local UPDATE_RATE = 6
 
 local cloakShieldCmdDesc = {
 	id      = CMD_CLOAK_SHIELD,
@@ -101,9 +107,10 @@ local function ValidateCloakShieldDefs(mds)
 			newData.energy = def.energy or 0
 			newData.minrad = def.minrad or 64
 			newData.maxrad = def.maxrad or 256
-			newData.growRate   = def.growRate   or 256
-			newData.shrinkRate = def.shrinkRate or 256
-			newData.selfCloak  = def.selfCloak or false
+			newData.growRate    = def.growRate   or 256
+			newData.shrinkRate  = def.shrinkRate or 256
+			newData.recloakRate = def.recloakRate or 750
+			newData.selfCloak   = def.selfCloak or false
 			newData.decloakDistance  = def.decloakDistance or false
 			newData.selfDecloakDistance  = def.selfDecloakDistance or false
 			newData.moveSpeedMult  = def.moveSpeedMult or false
@@ -187,7 +194,7 @@ local function AddCloakShieldUnit(unitID, cloakShieldDef)
 		energy  = cloakShieldDef.energy / TEAM_SLOWUPDATE_RATE,
 		isTransport = cloakShieldDef.isTransport,
 		unitRadius  = Spring.GetUnitRadius(unitID),
-		
+		recloakRate = cloakShieldDef.recloakRate * UPDATE_RATE / 30, -- Cloak def is in mass/second
 	}
 	cloakShieldUnits[unitID] = data
 
@@ -231,6 +238,27 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance, selfCloak)
 	SetUnitRulesParam(unitID, "areacloaked_radius", (level and newRadius) or 0, alliedTrueTable)
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local isTransportCache = {}
+local decloakTimeMultCache = {}
+
+local function IsTransport(udid)
+	if not isTransportCache[udid] then
+		isTransportCache[udid] = ((UnitDefs[udid].transportCapacity >= 1) and 1) or 0
+	end
+	return (isTransportCache[udid] == 1)
+end
+
+local function GetUnitDefCloakTimeMult(udid)
+	if not decloakTimeMultCache[udid] then
+		decloakTimeMultCache[udid] = 1/UnitDefs[udid].mass
+	end
+	return decloakTimeMultCache[udid]
+end
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:Initialize()
@@ -302,16 +330,11 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	end
 end
 
-
 --------------------------------------------------------------------------------
 
-local GetUnitAllyTeam  = Spring.GetUnitAllyTeam
-local GetUnitPosition  = Spring.GetUnitPosition
-local GetUnitsInSphere = Spring.GetUnitsInSphere
-
-local function UpdateCloakees(data)
-	local unitID = data.id
-	local radius = data.radius
+local function UpdateCloakees(data, frameNum)
+	local unitID    = data.id
+	local radius    = data.radius
 	local level     = data.def.level
 	local selfCloak = data.def.selfCloak
 	local selfDecloakDistance = data.def.selfDecloakDistance
@@ -328,31 +351,59 @@ local function UpdateCloakees(data)
 	if (closeUnits == nil) then
 		return
 	end
+
+	local closestDistSq = false
+	local activeCloakee = false
+	local recloakUnit = {}
+	local recloakDistSq = {}
+	
 	local allyTeam = GetUnitAllyTeam(unitID)
 	for _,cloakee in ipairs(closeUnits) do
 		local udid = GetUnitDefID(cloakee)
 		if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
-			if (cloakee ~= unitID) then
-				--other units
-				SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
-				cloakees[cloakee] = true
-			elseif (selfCloak) then
-				--self cloak
-				SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
-				cloakees[cloakee] = true
+			-- see if it's already cloaked, and skip if so
+			if GG.GetCloakedAllowed(cloakee) then
+				local personalCloak = GG.UnitHasPersonalCloak(cloakee)
+				if (not personalCloak) then
+					if (lastAreaCloakTime[cloakee] or 0) < frameNum - UPDATE_RATE then
+						cloakProgress[cloakee] = 0
+					end
+					lastAreaCloakTime[cloakee] = frameNum
+				end
+				if (not personalCloak) and (cloakProgress[cloakee] or 0) < 1 then
+					local ux,uy,uz = Spring.GetUnitPosition(cloakee)
+					local distSq = (ux-x)*(ux-x)+(uy-y)*(uy-y)+(uz-z)*(uz-z)
+					recloakUnit[#recloakUnit + 1] = cloakee
+					recloakDistSq[#recloakDistSq + 1] = distSq
+					if (not closestDistSq) or (distSq < closestDistSq) then
+						closestDistSq = distSq
+						activeCloakee = cloakee
+					end
+				else
+					-- "check cloakees" actually nulls the table, so need to constantly affirm that our already-cloaked units are cloaked
+					cloakees[cloakee] = true
+					if (cloakee ~= unitID) then
+						--other units
+						SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
+					elseif (selfCloak) then
+						--self cloak
+						SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
+					end
+				end
+			else
+				cloakProgress[cloakee] = 0
 			end
 		end
 		-- the GetUnitsInSphere() call uses unit midPos's, which can
 		-- differ from the unit's position while being transported.
 		-- here we do a direct check to see what units the cloakees are
 		-- transporting. this does not fix nested transports
-		if (UnitDefs[udid].transportCapacity >= 1) then
+		if IsTransport(udid) then
 			local transported = Spring.GetUnitIsTransporting(cloakee)
 			if transported ~= nil then
 				for _,cloakeeLvl2 in ipairs(transported) do
 					local udid2 = GetUnitDefID(cloakeeLvl2)
-					if ((not uncloakableDefs[udid2]) and
-							(GetUnitAllyTeam(cloakeeLvl2) == allyTeam)) then
+					if (GetUnitAllyTeam(cloakeeLvl2) == allyTeam) then
 						SetUnitCloakAndParam(cloakeeLvl2, 4, radiusOverrideDefs[udid2])
 						-- note: this gives perfect cloaking, but is the only level
 						-- to work under paralysis
@@ -368,10 +419,39 @@ local function UpdateCloakees(data)
 		if transported ~= nil then
 			for _,cloakee in ipairs(transported) do
 				local udid = GetUnitDefID(cloakee)
-				if ((not uncloakableDefs[udid]) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
+				if (GetUnitAllyTeam(cloakee) == allyTeam) then
 					SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
 					cloakees[cloakee] = true
 				end
+			end
+		end
+	end
+
+	if activeCloakee then
+		-- Spend energy on recloak
+		local recloakPower = data.recloakRate
+		while activeCloakee do
+			local udid = GetUnitDefID(activeCloakee)
+			local costMult = GetUnitDefCloakTimeMult(udid)
+			cloakProgress[activeCloakee] = (cloakProgress[activeCloakee] or 0) + recloakPower * costMult
+			if cloakProgress[activeCloakee] > 1 then
+				-- Spend overflow on next-closest unit
+				recloakPower = (cloakProgress[activeCloakee] - 1) / costMult
+				cloakProgress[activeCloakee] = 1
+				
+				local closestDistSq = false
+				activeCloakee = false
+				local candidateCount = #recloakUnit
+				for i = 1, candidateCount do
+					local cloakee = recloakUnit[i]
+					if (cloakProgress[cloakee] or 0) < 1 and ((not closestDistSq) or (recloakDistSq[i] < closestDistSq)) then
+						activeCloakee = cloakee
+						closestDistSq = recloakDistSq[i]
+					end
+				end
+			else
+				activeCloakee = false
+				recloakPower = 0
 			end
 		end
 	end
@@ -421,14 +501,12 @@ local function ShrinkRadius(cloaker)
 	end
 	if ((r <= 0) and (not cloaker.want)) then
 		cloakers[cloaker.id] = nil
+		UpdateMoveSpeedMult(cloaker.id, cloaker.def, false)
 	end
 end
 
-
-local GetUnitIsStunned = Spring.GetUnitIsStunned
-
 function gadget:GameFrame(frameNum)
-	local checkCloakees = ((frameNum % 6) < 1)
+	local checkCloakees = ((frameNum % UPDATE_RATE) < 1)
 	if (checkCloakees) then
 		for uid in pairs(cloakees) do
 			SetUnitCloakAndParam(uid, false)
@@ -467,7 +545,7 @@ function gadget:GameFrame(frameNum)
 		end
 
 		if (checkCloakees and (data.radius > 0)) then
-			UpdateCloakees(data)
+			UpdateCloakees(data, frameNum)
 		end
 	end
 end
@@ -497,7 +575,7 @@ function gadget:Load(zip)
 			if (data.draw) then
 				SendToUnsynced(SYNCSTR, data.id, radius)
 			end
-			UpdateCloakees(data)
+			UpdateCloakees(data, Spring.GetGameFrame())
 		end
 	end
 end
@@ -550,8 +628,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,
-							               cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID ~= CMD_CLOAK_SHIELD) then
 		return true  -- command was not used
 	end
@@ -922,13 +999,11 @@ function gadget:DrawInMiniMap()
 	gl.PopMatrix()
 end
 
-
 function gadget:UpdateFIXME() -- testing "cloak_shield" RulesParam
 	for _,unitID in ipairs(Spring.GetSelectedUnits()) do
 		print(unitID, Spring.GetUnitRulesParam(unitID, "cloak_shield"))
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

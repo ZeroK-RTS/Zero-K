@@ -123,20 +123,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetProximityDecloakTime(unitID, unitDefID)
+local function UnitHasPersonalCloak(unitID, unitDefID)
 	unitDefID = unitDefID or spGetUnitDefID(unitID)
 	if commDefID[unitDefID] and GG.Upgrades_UnitCanCloak(unitID) then
-		return PERSONAL_PROXIMITY_DECLOAK_TIME
+		return true
 	end
-	return (cloakUnitDefID[unitDefID] and PERSONAL_PROXIMITY_DECLOAK_TIME) or DEFAULT_PROXIMITY_DECLOAK_TIME
+	return (cloakUnitDefID[unitDefID] and true) or false
+end
+
+local function GetProximityDecloakTime(unitID, unitDefID)
+	return (UnitHasPersonalCloak(unitID, unitDefID) and PERSONAL_PROXIMITY_DECLOAK_TIME) or DEFAULT_PROXIMITY_DECLOAK_TIME
 end
 
 local function GetActionDecloakTime(unitID, unitDefID)
-	unitDefID = unitDefID or spGetUnitDefID(unitID)
-	if commDefID[unitDefID] and GG.Upgrades_UnitCanCloak(unitID) then
-		return PERSONAL_DECLOAK_TIME
-	end
-	return (cloakUnitDefID[unitDefID] and PERSONAL_DECLOAK_TIME) or DEFAULT_DECLOAK_TIME
+	return (UnitHasPersonalCloak(unitID, unitDefID) and PERSONAL_DECLOAK_TIME) or DEFAULT_DECLOAK_TIME
 end
 
 local function PokeDecloakUnit(unitID, unitDefID)
@@ -147,7 +147,16 @@ local function PokeDecloakUnit(unitID, unitDefID)
 	recloakUnit[unitID] = GetActionDecloakTime(unitID, unitDefID)
 end
 
-GG.PokeDecloakUnit = PokeDecloakUnit
+local function GetCloakedAllowed(unitID)
+	if not recloakFrame[unitID] then
+		return true
+	end
+	return recloakFrame[unitID] <= currentFrame
+end
+
+GG.UnitHasPersonalCloak = UnitHasPersonalCloak
+GG.PokeDecloakUnit      = PokeDecloakUnit
+GG.GetCloakedAllowed    = GetCloakedAllowed
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
@@ -307,7 +316,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_WANT_CLOAK then
-		if cloakUnitDefID[unitDefID] or GG.Upgrades_UnitCanCloak(unitID) then
+		if UnitHasPersonalCloak(unitID, unitDefID) then
 			SetWantedCloaked(unitID,cmdParams[1])
 		end
 		return false
@@ -322,7 +331,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
-	if cloakUnitDefID[unitDefID] or GG.Upgrades_UnitCanCloak(unitID) then
+	if UnitHasPersonalCloak(unitID, unitDefID) then
 		local cloakDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK)
 		if cloakDescID then
 			Spring.InsertUnitCmdDesc(unitID, unitWantCloakCommandDesc)
