@@ -80,6 +80,7 @@ return { staticjammer = {
 
       customParams        = {
         gui_draw_range  = 200,
+        attack_aoe_circle_mode = "cloaker"
       },
       
       damage                  = {
