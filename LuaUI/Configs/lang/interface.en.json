@@ -6,8 +6,8 @@
 		"other" : "You have %{count} idle constructors."
 	},
 	"quick_rallypoint_mode" : "Quick rallypoint mode",
-	"tacnuke_and_emp" : "Tacnuke and EMP",
-	"seismic" : "Seismic",
+	"tacnuke_and_emp" : "Tacnuke, EMP and Inferno",
+	"seismic" : "Seismic and Slow",
 	"emp_aoe" : "EMP AOE",
 	"emp_vertical" : "EMP vertical",
 	"tacnuke_vertical" : "Seismic and Tacnuke vertical",

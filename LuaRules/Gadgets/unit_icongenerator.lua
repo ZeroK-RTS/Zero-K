@@ -957,6 +957,7 @@ end
       --end;
 
       gl.SaveImage(0,0,iconX,iconY, outfile,{alpha=true});
+      Spring.Echo("saved to", outfile)
     end);
 
     if (not result and not cfg.empty) then

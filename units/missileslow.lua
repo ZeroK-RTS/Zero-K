@@ -1,14 +1,14 @@
 return { missileslow = {
   unitname                      = [[missileslow]],
-  name                          = [[Tortise]],
-  description                   = [[Homing Slow Missile - High single-target damage followed by lingering slow]],
+  name                          = [[Tortoise]],
+  description                   = [[Slow Homing Missile - High single-target slow damage with lingering damage over time]],
   buildCostMetal                = 500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 3,
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[napalmmissile_aoplane.dds]],
-  buildPic                      = [[napalmmissile.png]],
+  buildPic                      = [[missileslow.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 60 20]],
@@ -28,7 +28,7 @@ return { missileslow = {
   iconType                      = [[cruisemissilesmall]],
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  objectName                    = [[wep_napalm.s3o]],
+  objectName                    = [[wep_slow.s3o]],
   script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[WEAPON]],
 
@@ -48,8 +48,8 @@ return { missileslow = {
 
     {
       def                = [[WEAPON]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
+      badTargetCategory  = [[SWIM LAND SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
   },
@@ -58,7 +58,7 @@ return { missileslow = {
 
     WEAPON = {
       name                    = [[Slow Missile]],
-      cegTag                  = [[beamweapon_muzzle_purple]],
+      cegTag                  = [[purple_missile_trail]],
       avoidFriendly           = false,
       collideFriendly         = false,
 
@@ -74,7 +74,7 @@ return { missileslow = {
 
         area_damage = 1,
         area_damage_radius = 384,
-        area_damage_dps = 200,
+        area_damage_dps = 160,
         area_damage_duration = 30,
         area_damage_update_mult = 5,
         area_damage_is_slow = "1",
@@ -88,12 +88,13 @@ return { missileslow = {
       },
 
       explosionGenerator      = [[custom:purple_missile]],
-      flightTime              = 100,
+      flightTime              = 30,
       impulseBoost            = 0,
       impulseFactor           = 0,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      model                   = [[wep_napalm.s3o]],
+      model                   = [[wep_slow.s3o]],
+	  myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 6000,
       reloadtime              = 10,
@@ -104,7 +105,7 @@ return { missileslow = {
       tolerance               = 4000,
       tracks                  = true,
       turnrate                = 12000,
-      weaponAcceleration      = 60,
+      weaponAcceleration      = 70,
       weaponTimer             = 6,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 480,
