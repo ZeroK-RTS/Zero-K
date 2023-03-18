@@ -148,10 +148,13 @@ local function PokeDecloakUnit(unitID, unitDefID)
 end
 
 local function GetCloakedAllowed(unitID)
-	if not recloakFrame[unitID] then
+	if not recloakFrame[unitID] and not recloakUnit[unitID] then
 		return true
 	end
-	return recloakFrame[unitID] <= currentFrame
+	if (recloakFrame[unitID] or 0) > currentFrame then
+		return false
+	end
+	return (recloakUnit[unitID] or 0) <= 0
 end
 
 GG.UnitHasPersonalCloak = UnitHasPersonalCloak

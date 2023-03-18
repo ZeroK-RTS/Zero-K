@@ -242,6 +242,7 @@ end
 --------------------------------------------------------------------------------
 
 local isTransportCache = {}
+local canBurrowCache = {}
 local decloakTimeMultCache = {}
 
 local function IsTransport(udid)
@@ -251,9 +252,16 @@ local function IsTransport(udid)
 	return (isTransportCache[udid] == 1)
 end
 
+local function CanBurrow(udid)
+	if not canBurrowCache[udid] then
+		canBurrowCache[udid] = (UnitDefs[udid].customParams.idle_cloak and 1) or 0
+	end
+	return (canBurrowCache[udid] == 1)
+end
+
 local function GetUnitDefCloakTimeMult(udid)
 	if not decloakTimeMultCache[udid] then
-		decloakTimeMultCache[udid] = 1/UnitDefs[udid].mass
+		decloakTimeMultCache[udid] = 1/UnitDefs[udid].mass -- or build time?
 	end
 	return decloakTimeMultCache[udid]
 end
@@ -363,7 +371,7 @@ local function UpdateCloakees(data, frameNum)
 		if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
 			-- see if it's already cloaked, and skip if so
 			if GG.GetCloakedAllowed(cloakee) then
-				local personalCloak = GG.UnitHasPersonalCloak(cloakee)
+				local personalCloak = CanBurrow(udid) or GG.UnitHasPersonalCloak(cloakee, udid)
 				if (not personalCloak) then
 					if (lastAreaCloakTime[cloakee] or 0) < frameNum - UPDATE_RATE then
 						cloakProgress[cloakee] = 0
