@@ -21,6 +21,7 @@ if (gadgetHandler:IsSyncedCode()) then
 -- Config
 ------------------------------------------------------------
 local MAPSIDE_METALMAP = "mapconfig/map_metal_layout.lua"
+local ALT_MAPSIDE_METALMAP = "mapconfig/map_resource_spot_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
@@ -439,7 +440,9 @@ function gadget:Initialize()
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
 	local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
 	local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
-	
+	if not mapConfig then
+		mapConfig = VFS.FileExists(ALT_MAPSIDE_METALMAP) and VFS.Include(ALT_MAPSIDE_METALMAP) or false
+	end
 	local metalSpots, fromEngineMetalmap = GetSpots(gameConfig, mapConfig)
 	local metalSpotsByPos = false
 	
