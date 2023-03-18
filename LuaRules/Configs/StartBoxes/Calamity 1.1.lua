@@ -1,7 +1,7 @@
 local boxes = {
 	[0] = {
-		nameLong = "North",
-		nameShort = "N",
+		nameLong = "South",
+		nameShort = "S",
 		startpoints = {
 			{2002, 7069},
 			{3289, 6741},
@@ -396,8 +396,8 @@ local boxes = {
 		},
 	},
 	[1] = {
-		nameLong = "South",
-		nameShort = "S",
+		nameLong = "North",
+		nameShort = "N",
 		startpoints = {
 			{6183, 1076},
 			{4907, 1420},
