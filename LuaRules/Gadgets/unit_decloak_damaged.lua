@@ -161,8 +161,7 @@ GG.UnitHasPersonalCloak = UnitHasPersonalCloak
 GG.PokeDecloakUnit      = PokeDecloakUnit
 GG.GetCloakedAllowed    = GetCloakedAllowed
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
-                            weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if  (damage > 0 or spIsWeaponPureStatusEffect(weaponID)) and
 		not (attackerTeam and
 		weaponID and
@@ -260,7 +259,9 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 	end
 	
 	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) == 0)
-	if not areaCloaked then
+	if areaCloaked then
+		return GG.AreaCloakFinishedCharging(unitID)
+	else -- Not area cloaked
 		local speed = select(4, Spring.GetUnitVelocity(unitID))
 		local moving = speed and speed > CLOAK_MOVE_THRESHOLD
 		local cost = moving and ud.cloakCostMoving or ud.cloakCost

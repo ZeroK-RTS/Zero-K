@@ -72,7 +72,7 @@ local radiusOverrideDefs = {}
 
 local cloakShieldUnits = {} -- make it global in Initialize()
 local cloakers = {}
-local cloakees = {}
+local cloakees = {} -- 1 = under cloaker, 2 = finished spending recloak rate
 local cloakProgress = {}
 local lastAreaCloakTime = {}
 
@@ -387,19 +387,23 @@ local function UpdateCloakees(data, frameNum)
 						closestDistSq = distSq
 						activeCloakee = cloakee
 					end
+					-- cloakees[cloakee] = 1 means that the gadget that allows cloak won't actually let the unit cloak
+					-- This is so it counts as "attempting to cloak" for the purpose of drawing the cloak range ring,
+					-- and so it gets all the required engine and LUS decloak events (eg on firing)
+					cloakees[cloakee] = 1
 				else
 					-- "check cloakees" actually nulls the table, so need to constantly affirm that our already-cloaked units are cloaked
-					cloakees[cloakee] = true
-					if (cloakee ~= unitID) then
-						--other units
-						SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
-					elseif (selfCloak) then
-						--self cloak
-						SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
-					end
+					cloakees[cloakee] = 2
 				end
 			else
 				cloakProgress[cloakee] = 0
+			end
+			if (cloakee ~= unitID) then
+				--other units
+				SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
+			elseif (selfCloak) then
+				--self cloak
+				SetUnitCloakAndParam(cloakee, level, selfDecloakDistance, selfDecloakDistance and true)
 			end
 		end
 		-- the GetUnitsInSphere() call uses unit midPos's, which can
@@ -415,7 +419,7 @@ local function UpdateCloakees(data, frameNum)
 						SetUnitCloakAndParam(cloakeeLvl2, 4, radiusOverrideDefs[udid2])
 						-- note: this gives perfect cloaking, but is the only level
 						-- to work under paralysis
-						cloakees[cloakeeLvl2] = true
+						cloakees[cloakeeLvl2] = 2
 					end
 				end
 			end
@@ -429,7 +433,7 @@ local function UpdateCloakees(data, frameNum)
 				local udid = GetUnitDefID(cloakee)
 				if (GetUnitAllyTeam(cloakee) == allyTeam) then
 					SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
-					cloakees[cloakee] = true
+					cloakees[cloakee] = 2
 				end
 			end
 		end
@@ -463,6 +467,10 @@ local function UpdateCloakees(data, frameNum)
 			end
 		end
 	end
+end
+
+function GG.AreaCloakFinishedCharging(unitID)
+	return cloakees[unitID] >= 2
 end
 
 local function UpdateMoveSpeedMult(unitID, data, enabled)
