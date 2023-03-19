@@ -75,13 +75,15 @@ return { missileslow = {
 
         area_damage = 1,
         area_damage_radius = 384,
-        area_damage_dps = 160,
+        area_damage_dps = 190,
         area_damage_duration = 30,
         area_damage_update_mult = 5,
         area_damage_is_slow = "1",
+        area_damage_range_falloff = 0.9,
+        area_damage_time_falloff = 0.4,
 
         gui_aoe = 384,
-        gui_ee = 0.4,
+        gui_ee = 0.1,
       },
 
       damage                  = {
