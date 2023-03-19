@@ -26,7 +26,7 @@ local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
 local function MakeShader()
-	local sharpness = options.cas_sharpness.value
+	local sharpness = options.cas_sharpness2.value
 	if sharpness == 0 then
 		-- lazy initialisation; zero is the default so this avoids creating those objects to lay unused
 		widgetHandler:RemoveCallIn("DrawScreenEffects")
@@ -96,7 +96,7 @@ local function DisableShader()
 end
 
 local function UpdateShader()
-	if options.cas_sharpness.value > 0 then
+	if options.cas_sharpness2.value > 0 then
 		if isDisabled then
 			isDisabled = false
 			widgetHandler:UpdateCallIn("DrawScreenEffects")
@@ -106,7 +106,7 @@ local function UpdateShader()
 			MakeShader()
 		end
 		casShader:ActivateWith(function()
-			casShader:SetUniform("sharpness", options.cas_sharpness.value)
+			casShader:SetUniform("sharpness", options.cas_sharpness2.value)
 			casShader:SetUniform("viewPosX", vpx)
 			casShader:SetUniform("viewPosY", vpy)
 		end)
@@ -120,10 +120,10 @@ end
 
 options_path = 'Settings/Graphics/Effects'
 options = {
-	cas_sharpness = {
+	cas_sharpness2 = {
 		name = 'Sharpening',
 		type = 'number',
-		value = 0.0, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
+		value = 0.3, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
 		min = 0.0,
 		max = 1.25, -- can go even higher but at about 1.5 it degenerates, don't let it get near
 		tooltipFunction = function(self)
