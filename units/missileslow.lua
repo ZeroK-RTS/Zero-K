@@ -16,6 +16,7 @@ return { missileslow = {
 
   customParams                  = {
     mobilebuilding = [[1]],
+    midposoffset   = [[0 72 0]],
 
     outline_x = 55,
     outline_y = 80,
@@ -29,7 +30,7 @@ return { missileslow = {
   maxDamage                     = 1000,
   maxSlope                      = 18,
   objectName                    = [[slowmissile.dae]],
-  script                        = [[cruisemissile_dae.lua]],
+  script                        = [[cruisemissile.lua]],
   selfDestructAs                = [[WEAPON]],
 
   sfxtypes                      = {
