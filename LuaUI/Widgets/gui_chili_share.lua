@@ -379,6 +379,13 @@ end
 
 local oldSubjects = {}
 
+local function SafeSetButtonVisibility(button, visibility)
+	if not button then
+		return
+	end
+	button:SetVisibility(visibility)
+end
+
 local function UpdatePlayer(subject)
 	--Spring.Echo("playerupdate " .. subject.name)
 	if givemebuttons[subject.id] == nil or built == false then
@@ -404,114 +411,114 @@ local function UpdatePlayer(subject)
 	if subject.player and subject.player == myPlayerID then
 		if givemebuttons[subject.id]["leave"] then
 			if (teamLeader or sharemode == false or mySpec) then
-				givemebuttons[subject.id]["leave"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["leave"], false)
 			elseif not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-				givemebuttons[subject.id]["leave"]:SetVisibility(true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["leave"], true)
 			end
 		end
-		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
 	elseif subject.ai then
 		--Spring.Echo("dec3")
-		givemebuttons[subject.id]["metalbar"]:SetVisibility(true)
-		givemebuttons[subject.id]["energybar"]:SetVisibility(true)
-		givemebuttons[subject.id]["metalin"]:SetVisibility(true)
-		givemebuttons[subject.id]["energyin"]:SetVisibility(true)
-		givemebuttons[subject.id]["offHolder"]:SetVisibility(true)
-		givemebuttons[subject.id]["defHolder"]:SetVisibility(true)
-		givemebuttons[subject.id]["metal"]:SetVisibility(true)
-		givemebuttons[subject.id]["energy"]:SetVisibility(true)
-		givemebuttons[subject.id]["unit"]:SetVisibility(true)
-		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], false)
 		if subject.allyteam ~= myallyteamID or specFullView then -- hostile ai's stuff.
 			--Spring.Echo("dec4")
-			givemebuttons[subject.id]["metal"]:SetVisibility(false)
-			givemebuttons[subject.id]["energy"]:SetVisibility(false)
-			givemebuttons[subject.id]["unit"]:SetVisibility(false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
 			if (not specFullView ) then
 				--Spring.Echo("dec5")
-				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-				givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
-				givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
-				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
-				givemebuttons[subject.id]["metalin"]:SetVisibility(false)
-				givemebuttons[subject.id]["energyin"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
 			end
 		end
 	elseif subject.allyteam ~= myallyteamID or specFullView then -- hostile people's stuff.
 		--Spring.Echo("dec6")
-		givemebuttons[subject.id]["kick"]:SetVisibility(false)
-		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-		givemebuttons[subject.id]["accept"]:SetVisibility(false)
-		givemebuttons[subject.id]["metal"]:SetVisibility(false)
-		givemebuttons[subject.id]["energy"]:SetVisibility(false)
-		givemebuttons[subject.id]["unit"]:SetVisibility(false)
-		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["accept"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
 		if (not specFullView or subject.spec) then
 			--Spring.Echo("dec7")
-			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-			givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
-			givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
-			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
-			givemebuttons[subject.id]["metalin"]:SetVisibility(false)
-			givemebuttons[subject.id]["energyin"]:SetVisibility(false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
 		end
 	elseif mySpec then -- Spectator, but not fullview
-		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
-		givemebuttons[subject.id]["kick"]:SetVisibility(false)
-		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-		givemebuttons[subject.id]["metal"]:SetVisibility(false)
-		givemebuttons[subject.id]["energy"]:SetVisibility(false)
-		givemebuttons[subject.id]["unit"]:SetVisibility(false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
 	else -- other people's stuff.
-		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["pingCtrl"], true)
 		if teamID == myteamID then
 			if amiteamleader then
 				--Spring.Echo("dec8")
-				givemebuttons[subject.id]["kick"]:SetVisibility(true)
-				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["metal"]:SetVisibility(false)
-				givemebuttons[subject.id]["energy"]:SetVisibility(false)
-				givemebuttons[subject.id]["unit"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
 			else
 				--Spring.Echo("dec9")
-				givemebuttons[subject.id]["kick"]:SetVisibility(false)
-				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["metal"]:SetVisibility(false)
-				givemebuttons[subject.id]["energy"]:SetVisibility(false)
-				givemebuttons[subject.id]["unit"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
 			end
 			if sharemode == false then
 				--Spring.Echo("dec10")
-				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["kick"]:SetVisibility(false)
-				givemebuttons[subject.id]["metal"]:SetVisibility(true)
-				givemebuttons[subject.id]["energy"]:SetVisibility(true)
-				givemebuttons[subject.id]["unit"]:SetVisibility(true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
 			end
 		else
-			givemebuttons[subject.id]["kick"]:SetVisibility(false)
+			SafeSetButtonVisibility(givemebuttons[subject.id]["kick"], false)
 			if teamLeader == false then
 				--Spring.Echo("dec11")
-				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["metal"]:SetVisibility(false)
-				givemebuttons[subject.id]["energy"]:SetVisibility(false)
-				givemebuttons[subject.id]["unit"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], false)
 			else
 				--Spring.Echo("dec12")
-				givemebuttons[subject.id]["commshare"]:SetVisibility(true)
-				givemebuttons[subject.id]["metal"]:SetVisibility(true)
-				givemebuttons[subject.id]["energy"]:SetVisibility(true)
-				givemebuttons[subject.id]["unit"]:SetVisibility(true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["commshare"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["metal"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["energy"], true)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["unit"], true)
 			end
 		end
 	end
 	if (subject.spec) then
-		givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-		givemebuttons[subject.id]["offHolder"]:SetVisibility(false)
-		givemebuttons[subject.id]["defHolder"]:SetVisibility(false)
-		givemebuttons[subject.id]["energybar"]:SetVisibility(false)
-		givemebuttons[subject.id]["metalin"]:SetVisibility(false)
-		givemebuttons[subject.id]["energyin"]:SetVisibility(false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metalbar"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["offHolder"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["defHolder"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energybar"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["metalin"], false)
+		SafeSetButtonVisibility(givemebuttons[subject.id]["energyin"], false)
 	end
 	RenderName(subject)
 end
@@ -1420,17 +1427,17 @@ local function UpdateInviteTable()
 			--Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
 			if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
 				invites[playerID] = timeleft
-				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
+				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], true)
 			elseif invites[playerID] == timeleft then
 				invites[playerID] = nil -- dead invite
 				deadinvites[playerID] = timeleft
-				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], false)
 			elseif timeleft == 1 then
-				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], false)
 				invites[playerID] = nil
 			elseif invites[playerID] and timeleft > 1 then
 				invites[playerID] = timeleft
-					givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
+					SafeSetButtonVisibility(givemebuttons[givemesubjects[playerID].id]["accept"], true)
 					--Spring.Echo("showing")
 			end
 		-- else
@@ -1579,7 +1586,7 @@ function widget:Update(dt)
 		
 		for _, subject in ipairs(subjects) do
 			if (givemebuttons[subject.id] and givemebuttons[subject.id]["accept"]) then
-				givemebuttons[subject.id]["accept"]:SetVisibility(false)
+				SafeSetButtonVisibility(givemebuttons[subject.id]["accept"], false)
 			end
 		end
 		if invitecount and built then
