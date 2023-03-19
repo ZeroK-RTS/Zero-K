@@ -470,7 +470,7 @@ local function UpdateCloakees(data, frameNum)
 end
 
 function GG.AreaCloakFinishedCharging(unitID)
-	return cloakees[unitID] >= 2
+	return cloakees[unitID] and (cloakees[unitID] >= 2)
 end
 
 local function UpdateMoveSpeedMult(unitID, data, enabled)
