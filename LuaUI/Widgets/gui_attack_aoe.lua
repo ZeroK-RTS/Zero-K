@@ -310,6 +310,9 @@ local function SetupUnit(unitDef, unitID)
 						if weaponDef.customParams.gui_draw_range then
 							retDgunInfo.range = tonumber(weaponDef.customParams.gui_draw_range)
 						end
+						if weaponDef.customParams.gui_draw_leashed_to_range then
+							retDgunInfo.drawLeashedToRange = true
+						end
 						if rangeMult then
 							retDgunInfo.range = retDgunInfo.range * rangeMult
 						end
@@ -330,6 +333,9 @@ local function SetupUnit(unitDef, unitID)
 		retAoeInfo.circleMode = maxWeaponDef.customParams.attack_aoe_circle_mode
 		if maxWeaponDef.customParams.gui_draw_range then
 			retAoeInfo.range = tonumber(maxWeaponDef.customParams.gui_draw_range)
+		end
+		if maxWeaponDef.customParams.gui_draw_leashed_to_range then
+			retAoeInfo.drawLeashedToRange = true
 		end
 		if retAoeInfo.range and rangeMult then
 			retAoeInfo.range = retAoeInfo.range * rangeMult
@@ -352,6 +358,7 @@ end
 --------------------------------------------------------------------------------
 --updates
 --------------------------------------------------------------------------------
+
 local function UpdateSelection(sel)
 	local maxCost = 0
 	dgunUnitInfo = nil
@@ -627,6 +634,7 @@ end
 --------------------------------------------------------------------------------
 --wobble
 --------------------------------------------------------------------------------
+
 local function DrawWobbleScatter(scatter, fx, fy, fz, tx, ty, tz, rangeScatter, range)
 	local dx = tx - fx
 	local dy = ty - fy
@@ -650,6 +658,7 @@ end
 --------------------------------------------------------------------------------
 --direct
 --------------------------------------------------------------------------------
+
 local function DrawDirectScatter(scatter, fx, fy, fz, tx, ty, tz, range, unitRadius)
 	local dx = tx - fx
 	local dy = ty - fy
@@ -682,6 +691,7 @@ end
 --------------------------------------------------------------------------------
 --dropped
 --------------------------------------------------------------------------------
+
 local function DrawDroppedScatter(aoe, ee, scatter, v, fx, fy, fz, tx, ty, tz, salvoSize, salvoDelay)
 	local dx = tx - fx
 	local dz = tz - fz
@@ -715,6 +725,7 @@ end
 --------------------------------------------------------------------------------
 --orbital
 --------------------------------------------------------------------------------
+
 local function DrawOrbitalScatter(scatter, tx, ty, tz)
 	glColor(scatterColor)
 	glLineWidth(scatterLineWidthMult / mouseDistance)
@@ -726,6 +737,7 @@ end
 --------------------------------------------------------------------------------
 --underwater
 --------------------------------------------------------------------------------
+
 local function DrawWaterDepth(tx, ty, tz)
 	glColor(depthColor)
 	glLineWidth(depthLineWidth)
@@ -734,6 +746,21 @@ local function DrawWaterDepth(tx, ty, tz)
 	glLineStipple(false)
 	glColor(1,1,1,1)
 	glLineWidth(1)
+end
+
+local function LeashDrawRange(unitID, range, tx, ty, tz)
+	local ux, _, uz = GetUnitPosition(unitID)
+	if not ux then
+		return tx, ty, tz
+	end
+	vx, vz = (tx - ux), (tz - uz)
+	local dist = math.sqrt(vx*vx + vz*vz)
+	if dist < range then
+		return tx, ty, tz
+	end
+	tx, tz = ux + vx * range/dist, uz + vz * range/dist
+	ty = Spring.GetGroundHeight(tx, tz)
+	return tx, ty, tz
 end
 
 --------------------------------------------------------------------------------
@@ -791,6 +818,10 @@ function widget:DrawWorld()
 		return
 	else
 		return
+	end
+	
+	if info.drawLeashedToRange then
+		tx, ty, tz = LeashDrawRange(unitID, info.range, tx, ty, tz)
 	end
 
 	local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
