@@ -98,6 +98,8 @@ local lastGunAverageHeading = false
 local JUMP_TURN_SPEED = math.pi/80 -- matches jump_delay_turn_scale in unitdef
 
 local isFiring = false
+local resetRestore = false
+
 -- Effects
 local dirtfling = 1024
 local muzzle_flash = 1025
@@ -340,19 +342,30 @@ function endJump()
 	StartThread(EndJumpThread)
 end
 
+local function RestoreAfterDelay()
+	local counter = 2
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 2
+		end
+		if counter == 0 then
+			DoRestore()
+		end
+		Sleep(1000)
+	end
+end
+
 function script.Create()
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(shoulderflare, x_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 	Spring.SetUnitMaxRange(unitID, 510)
-end
-
-local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
-	Sleep(2000)
-	DoRestore()
 end
 
 function script.AimFromWeapon(num)
@@ -382,8 +395,7 @@ function script.AimWeapon(num, heading, pitch)
 	if weaponBlocked and (num == 1 or num == 2 or num == 3 or num == 5) then
 		return false
 	end
-
-	StartThread(RestoreAfterDelay)
+	resetRestore = true
 
 	if num == 1 then  -- Left gunpod
 		leftTorsoHeading = heading

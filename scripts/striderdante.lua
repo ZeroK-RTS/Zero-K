@@ -73,6 +73,7 @@ local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].wea
 local dead = false
 local armsFree = true
 local dgunning = false
+local resetRestore = false
 local rightArmPitch = 0
 
 --------------------------------------------------------------------------------
@@ -125,31 +126,41 @@ local function IdleAnim()
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
-	Sleep(8000)
-	--torso
-	if not dead then
-		Turn(torso, y_axis, 0, math.rad(100))
-		
-		Turn(ruparm, x_axis, 0, math.rad(250))
-		Turn(ruparm, y_axis, 0, math.rad(250))
-		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250))
-		Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
-		Turn(rarm, y_axis, 0, math.rad(250))
-		Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
-		Turn(flagellum, x_axis, 0, math.rad(90))
-	
-		Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
-		Turn(luparm, y_axis, 0, math.rad(250))
-		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))
-		Turn(larm, x_axis, 0, math.rad(250))	 --up 5
-		Turn(larm, y_axis, 0, math.rad(250))	 --up -3
-		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
-		RestorePose()
+	local counter = 8
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 8
+		end
+		if counter == 0 then
+			--torso
+			if not dead then
+				Turn(torso, y_axis, 0, math.rad(100))
+				
+				Turn(ruparm, x_axis, 0, math.rad(250))
+				Turn(ruparm, y_axis, 0, math.rad(250))
+				Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250))
+				Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
+				Turn(rarm, y_axis, 0, math.rad(250))
+				Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
+				Turn(flagellum, x_axis, 0, math.rad(90))
+			
+				Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
+				Turn(luparm, y_axis, 0, math.rad(250))
+				Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))
+				Turn(larm, x_axis, 0, math.rad(250))	 --up 5
+				Turn(larm, y_axis, 0, math.rad(250))	 --up -3
+				Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
+				RestorePose()
+			end
+			StartThread(IdleAnim)
+			armsFree = true
+		end
+		Sleep(1000)
 	end
-	StartThread(IdleAnim)
-	armsFree = true
 end
 
 --------------------------------------------------------------------------------
@@ -289,6 +300,7 @@ function script.Create()
 	Hide(jet2)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 end
 
 local function Stopping()
@@ -328,7 +340,6 @@ function script.QueryWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal(SIG_IDLE)
 	if num == 1 then
 		if dgunning then return false end
 		Signal(SIG_AIM)
@@ -350,10 +361,11 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_AIM_2)
 		Turn(torso, y_axis, heading, math.rad(200))
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	elseif num == 3 then
 		dgunning = true
+		resetRestore = true
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		Signal(SIG_AIM_3)
@@ -369,7 +381,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
@@ -388,7 +400,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(ruparm, x_axis)
 		WaitForTurn(flagellum, x_axis)
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	end
 	return true
