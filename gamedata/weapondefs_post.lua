@@ -428,3 +428,28 @@ do
 		end
 	end
 end
+
+
+--[[ Optimisation: if there are no firebases, we can set
+     that flag to collide. For most weapons, normally it
+     is the only thing they ghost through, and enabling
+     collisions with everything enables them to take the
+     fast collision code path that skips ghosting checks.
+
+     The version check is because the fast path used to
+     be broken and instead ghosted through everything. ]]
+if Script and Script.IsEngineMinVersion(105, 0, 1578) then
+	local anyFirePlatformExists = false
+	for name, ud in pairs(UnitDefs) do
+		if ud.isfireplatform then
+			anyFirePlatformExists = true
+			break
+		end
+	end
+
+	if not anyFirePlatformExists then
+		for name, weaponDef in pairs(WeaponDefs) do
+			weaponDef.collidefirebase = true
+		end
+	end
+end
