@@ -112,7 +112,7 @@ local function MakeRealTable(proxy, debugTag)
 	end
 	local proxyLocal = proxy
 	local ret = {}
-	for i,v in spairs(proxyLocal) do
+	for i,v in pairs(proxyLocal) do
 		if type(v) == "table" then
 			ret[i] = MakeRealTable(v)
 		else

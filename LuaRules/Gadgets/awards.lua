@@ -536,7 +536,7 @@ end
 local function ConvertToRegularTable(stable)
 	local ret = {}
 	local stableLocal = stable
-	for k,v in spairs(stableLocal) do
+	for k,v in pairs(stableLocal) do
 		if type(v) == 'table' then
 			v = ConvertToRegularTable(v)
 		end

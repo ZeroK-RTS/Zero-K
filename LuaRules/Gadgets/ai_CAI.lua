@@ -4233,10 +4233,10 @@ function gadget:DrawWorldPreUnit()
 	if Spring.IsCheatingEnabled() then
 		if SYNCED and SYNCED.debugData and SYNCED.debugData.drawScoutmap then
 			local scoutmaps = SYNCED.debugData.drawScoutmap
-			for allyTeam in spairs(scoutmaps) do
+			for allyTeam in pairs(scoutmaps) do
 				local scoutmap = SYNCED.allyTeamData[allyTeam].scoutingHeatmap
-				for x,xdata in spairs(scoutmap) do
-					for z,zdata in spairs(xdata) do
+				for x,xdata in pairs(scoutmap) do
+					for z,zdata in pairs(xdata) do
 						local px, pz = heatmapPosition[x][z].x, heatmapPosition[x][z].z
 						if not zdata.scouted then
 							gl.Color(0,0,0,0.5)
