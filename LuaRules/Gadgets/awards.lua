@@ -67,7 +67,7 @@ local awardAbsolutes = {
 	head        = 3,
 	dragon      = 3,
 	sweeper     = 20,
-	heart       = 1*10^9, --we should not exceed 2*10^9 because math.floor-ing the value will return integer -2147483648. Reference: https://code.google.com/p/zero-k/source/detail?r=9681
+	heart       = 1*10^9, -- avoid higher values, math.floor starts returning INT_MIN at some point
 	vet         = 3,
 }
 
