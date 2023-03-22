@@ -36,7 +36,7 @@ local function MakeShader()
 		return
 	end
 
-	vsx, vsy, vpx, vpy = Spring.GetViewGeometry()
+	vsx, vsy, vpx, vpy = Spring.Orig.GetViewGeometry()
 
 	casShader = LuaShader({
 		vertex   = VFS.LoadFile("LuaUI/Widgets/Shaders/cas.vert.glsl"),
