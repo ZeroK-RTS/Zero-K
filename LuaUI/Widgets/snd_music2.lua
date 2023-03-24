@@ -89,6 +89,7 @@ local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
 local LOOP_BUFFER = 0.015 -- if looping track is this close to the end, go ahead and loop
 local UPDATE_PERIOD = 1
+local MUSIC_VOLUME_DEFAULT = 0.5
 
 local musicType = 'peace'
 local dethklok = {} -- keeps track of the number of doods killed in each time frame
@@ -125,7 +126,7 @@ local function StartLoopingTrack(trackInit, trackLoop)
 	musicType = 'custom'
 	
 	loopTrack = trackLoop
-	Spring.PlaySoundStream(trackInit, WG.music_volume or 0.5)
+	Spring.PlaySoundStream(trackInit, WG.music_volume or MUSIC_VOLUME_DEFAULT)
 	looping = 0.5
 end
 
@@ -171,7 +172,7 @@ local function StartTrack(track)
 		until newTrack ~= previousTrack or tries >= 10
 	end
 	previousTrack = newTrack
-	Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5)
+	Spring.PlaySoundStream(newTrack,WG.music_volume or MUSIC_VOLUME_DEFAULT)
 	
 	WG.music_start_volume = WG.music_volume
 end
@@ -234,7 +235,7 @@ function widget:Update(dt)
 				looping = 1
 			elseif playedTime >= totalTime - LOOP_BUFFER then
 				Spring.StopSoundStream()
-				Spring.PlaySoundStream(loopTrack,WG.music_volume or 0.5)
+				Spring.PlaySoundStream(loopTrack,WG.music_volume or MUSIC_VOLUME_DEFAULT)
 			end
 		end
 		timeframetimer_short = 0
@@ -371,7 +372,7 @@ local function PlayGameOverMusic(gameWon)
 	end
 	looping = false
 	Spring.StopSoundStream()
-	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
+	Spring.PlaySoundStream(track,WG.music_volume or MUSIC_VOLUME_DEFAULT)
 	WG.music_start_volume = WG.music_volume
 end
 

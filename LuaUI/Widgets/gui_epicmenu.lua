@@ -204,12 +204,13 @@ local keybounditems = {}
 local keybind_date = 0
 
 local EPIC_SETTINGS_VERSION = 51
+local MUSIC_VOLUME_DEFAULT = 0.5
 
 local settings = {
 	versionmin = EPIC_SETTINGS_VERSION,
 	widgets = {},
 	show_crudemenu = true,
-	music_volume = 0.5,
+	music_volume = MUSIC_VOLUME_DEFAULT,
 	showAdvanced = false, -- Enable to show all settings.
 	simpleSettingsMode = true,
 }
@@ -2365,7 +2366,7 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT,
 					OnChange = {
 						function(self)
 							if WG.crude and WG.crude.SetMusicVolume then
@@ -2483,7 +2484,7 @@ local function GetMainPanel(parent, width, height)
 					max = 1,
 					step = 0.01,
 					trackColor = color.main_fg,
-					value = settings.config["epic_Settings/Audio_Music_Volume"] or 0.5,
+					value = settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT,
 					OnChange = {
 						function(self)
 							if WG.crude and WG.crude.SetMusicVolume then
@@ -3242,7 +3243,7 @@ function widget:SetConfigData(data)
 		settings.music_volume = nil
 	end
 
-	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or 0.5)
+	WG.crude.SetMusicVolume(settings.config["epic_Settings/Audio_Music_Volume"] or MUSIC_VOLUME_DEFAULT)
 	LoadKeybinds()
 end
 
