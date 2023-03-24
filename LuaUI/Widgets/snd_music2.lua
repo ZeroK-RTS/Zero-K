@@ -89,7 +89,7 @@ local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
 local LOOP_BUFFER = 0.015 -- if looping track is this close to the end, go ahead and loop
 local UPDATE_PERIOD = 1
-local MUSIC_VOLUME_DEFAULT = 0.5
+local MUSIC_VOLUME_DEFAULT = 0.25
 
 local musicType = 'peace'
 local dethklok = {} -- keeps track of the number of doods killed in each time frame

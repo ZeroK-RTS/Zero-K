@@ -204,7 +204,7 @@ local keybounditems = {}
 local keybind_date = 0
 
 local EPIC_SETTINGS_VERSION = 51
-local MUSIC_VOLUME_DEFAULT = 0.5
+local MUSIC_VOLUME_DEFAULT = 0.25
 
 local settings = {
 	versionmin = EPIC_SETTINGS_VERSION,
