@@ -89,6 +89,9 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		id = weaponID,
 		pos = {x = px, y = py, z = pz},
 		owner = ownerID,
+		cegName = weaponInfo[weaponID].cegName,
+		cegCount = weaponInfo[weaponID].cegCount,
+		cegSpacing = weaponInfo[weaponID].cegSpacing
 	}
 end
 
@@ -125,6 +128,41 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
 	return false
 end
 
+local function HandleEffects(data,f)
+	if(data.cegName) then
+		if (f % data.cegSpacing == 0) then
+			for i=0,data.cegCount do
+				local pos = data.pos;
+				local r = data.radius;
+				
+				-- pick a random position in a unit sphere
+				local u = math.random()^(1/3);
+				local x = math.random()-0.5;
+				local y = math.random()-0.5;
+				local z = math.random()-0.5;
+				local mag = math.sqrt(x*x + y*y + z*z);
+
+				x = u*x/mag; 
+				y = u*y/mag; 
+				z = u*z/mag;
+
+				x = pos.x + x*r;
+				y = pos.y + y*r;
+				z = pos.z + z*r;
+
+				-- sample DOT value at this point
+				-- maybe faster to use smth like mag*r to just get offset and calculate it locally
+				-- but DRY and future-proofness wins for now
+				local damage = GetDamageValueAtPoint(data,x,y,z);
+
+				-- pass damage and radius to the CEG
+				-- radius does nothing really, so whatever. damage is actually useful
+				Spring.SpawnCEG(data.cegName,x,y,z,0,0,0,data.radius,damage)
+			end
+		end
+	end
+end
+
 local function HandleDamageArea(data, f)
 	local pos = data.pos
 	if data.radius then
@@ -134,11 +172,7 @@ local function HandleDamageArea(data, f)
 				for j = 1, #ulist do
 					local u = ulist[j]
 					local ux, uy, uz = Spring.GetUnitPosition(u)
-					local damage = data.damage
-					local distance = math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)
-					if data.rangeFall ~= 0 and distance > data.plateauRadius then
-						damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
-					end
+					local damage = GetDamageValueAtPoint(data,ux,uy,uz)
 					if data.impulse then
 						GG.AddGadgetImpulse(u, pos.x - ux, pos.y - uy, pos.z - uz, damage, false, true, false, {0.22,0.7,1})
 						GG.SetUnitFallDamageImmunity(u, f + 10)
@@ -171,23 +205,37 @@ local function HandleDamageArea(data, f)
 	end
 end
 
+function GetDamageValueAtPoint(data,ux,uy,uz)
+	local damage = data.damage
+	local pos = data.pos
+	local distance = math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)
+	if data.rangeFall ~= 0 and distance > data.plateauRadius then
+		damage = damage - damage*data.rangeFall*(distance - data.plateauRadius)/(data.radius - data.plateauRadius)
+	end
+	return damage;
+end
+
 function gadget:GameFrame(f)
 	frameNum = f
-	if (f%DAMAGE_PERIOD ~= 0) then
-		return
-	end
-	local i = 1
+
+	local i = 1;
 	while i <= explosionCount do
-		local data = explosionList[i]
-		if HandleDamageArea(data, f) then
-			explosionList[i] = explosionList[explosionCount]
-			explosionList[explosionCount] = nil
-			explosionCount = explosionCount - 1
+		local data = explosionList[i];
+		HandleEffects(data,f);
+		if (f%DAMAGE_PERIOD == 0) then
+			if HandleDamageArea(data, f) then
+				explosionList[i] = explosionList[explosionCount]
+				explosionList[explosionCount] = nil
+				explosionCount = explosionCount - 1
+			else
+				i = i + 1
+			end
 		else
 			i = i + 1
 		end
 	end
 end
+
 
 function gadget:Initialize()
 	for w,_ in pairs(weaponInfo) do

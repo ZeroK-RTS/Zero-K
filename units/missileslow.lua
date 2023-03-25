@@ -81,7 +81,9 @@ return { missileslow = {
         area_damage_is_slow = "1",
         area_damage_range_falloff = 0.9,
         area_damage_time_falloff = 0.4,
-
+        area_effect_ceg_name = "zeno_fireball",
+        area_effect_ceg_count = 1,
+        area_effect_ceg_spacing = 1,
         gui_aoe = 320,
         gui_ee = 0.1,
       },

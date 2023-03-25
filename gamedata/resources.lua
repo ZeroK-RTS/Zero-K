@@ -165,6 +165,7 @@ local resources = {
 	  shield3wake= "pd/shield3wake.png",
       smallflare= "gpl/smallflare.tga",
       smoke= "pd/smokesmall.tga",
+      Smoke2="PD/Smoke2.tga",
       smokesmall= "pd/smokesmall.tga",
       smoketrailthinner= "pd/smoketrailthinner.tga",
 	  smoke1="pd/smoke1.tga",

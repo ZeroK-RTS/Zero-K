@@ -28,6 +28,9 @@ for id, data in pairs(WeaponDefs) do
 				heightMax = tonumber(cp.area_damage_height_max),
 				heightInt = tonumber(cp.area_damage_height_int),
 				heightReduce = tonumber(cp.area_damage_height_reduce),
+				cegName = cp.area_effect_ceg_name,
+				cegSpacing = tonumber(cp.area_effect_ceg_spacing),
+				cegCount = tonumber(cp.area_effect_ceg_count)
 			}
 			array[id].timeLoss = array[id].damage * array[id].timeFall * damageUpdateRate/array[id].duration
 			if damageUpdateRate ~= DAMAGE_PERIOD then
