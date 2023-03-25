@@ -30,7 +30,7 @@ local weaponDef = {
 	},
 
 	edgeEffectiveness       = 0.5,
-	explosionGenerator      = [[custom:nrlc_fireball]],
+	explosionGenerator      = [[custom:EMG_HIT_HE]],
 	firestarter             = 70,
 	impulseBoost            = 0,
 	impulseFactor           = 0.2,
