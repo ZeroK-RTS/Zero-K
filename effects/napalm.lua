@@ -506,7 +506,7 @@ local cegs = {
 
   -- Fireball particles of various lifetimes
   ["napalmfireball_200"] = {
-    flame = {
+    rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
