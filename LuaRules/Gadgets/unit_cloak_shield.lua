@@ -390,13 +390,16 @@ local function UpdateCloakees(data, frameNum)
 					-- cloakees[cloakee] = 1 means that the gadget that allows cloak won't actually let the unit cloak
 					-- This is so it counts as "attempting to cloak" for the purpose of drawing the cloak range ring,
 					-- and so it gets all the required engine and LUS decloak events (eg on firing)
-					cloakees[cloakee] = 1
+					cloakees[cloakee] = 0
 				else
 					-- "check cloakees" actually nulls the table, so need to constantly affirm that our already-cloaked units are cloaked
-					cloakees[cloakee] = 2
+					cloakees[cloakee] = 1
 				end
 			else
 				cloakProgress[cloakee] = 0
+				-- Set the cloakee to being handled, otherwise it won't be set to not cloak if it was not allowed to
+				-- cloak when it left the cloaker.
+				cloakees[cloakee] = 0
 			end
 			if (cloakee ~= unitID) then
 				--other units
@@ -419,7 +422,7 @@ local function UpdateCloakees(data, frameNum)
 						SetUnitCloakAndParam(cloakeeLvl2, 4, radiusOverrideDefs[udid2])
 						-- note: this gives perfect cloaking, but is the only level
 						-- to work under paralysis
-						cloakees[cloakeeLvl2] = 2
+						cloakees[cloakeeLvl2] = 1
 					end
 				end
 			end
@@ -433,7 +436,7 @@ local function UpdateCloakees(data, frameNum)
 				local udid = GetUnitDefID(cloakee)
 				if (GetUnitAllyTeam(cloakee) == allyTeam) then
 					SetUnitCloakAndParam(cloakee, level, radiusOverrideDefs[udid])
-					cloakees[cloakee] = 2
+					cloakees[cloakee] = 1
 				end
 			end
 		end
@@ -470,7 +473,7 @@ local function UpdateCloakees(data, frameNum)
 end
 
 function GG.AreaCloakFinishedCharging(unitID)
-	return cloakees[unitID] and (cloakees[unitID] >= 2)
+	return cloakees[unitID] and (cloakees[unitID] == 1)
 end
 
 local function UpdateMoveSpeedMult(unitID, data, enabled)
