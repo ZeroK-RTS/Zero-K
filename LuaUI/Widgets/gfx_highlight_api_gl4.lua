@@ -31,6 +31,8 @@ local vsSrc =
 #extension GL_ARB_shader_storage_buffer_object : require
 #extension GL_ARB_shading_language_420pack: require
 #line 10000
+//__DEFINES__
+
 layout (location = 0) in vec3 pos; // 0-4 is per vertex
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 T;
@@ -49,7 +51,6 @@ layout (location = 8) in vec4 hcolor; // rgb color, plainalpha
 layout (location = 9) in uvec4 instData;
 
 //__ENGINEUNIFORMBUFFERDEFS__
-//__DEFINES__
 #line 15000
 layout(std140, binding=0) readonly buffer MatrixBuffer {
 	mat4 mat[];
