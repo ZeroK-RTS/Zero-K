@@ -68,7 +68,13 @@ end
 function script.AimWeapon(num, heading, pitch)
 	return num == 2
 end
-	
+
+-- AimWeapon is ignored for AircraftBomb,
+-- and turning it to Cannon makes the projectile spawn on the ground immediately
+function script.BlockShot(num, heading, pitch)
+	return num ~= 2
+end
+
 function script.FireWeapon(num)
 	if num == 2 then
 		Hide(dodobomb)
