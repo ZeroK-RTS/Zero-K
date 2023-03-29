@@ -39,6 +39,7 @@ return { chicken_pigeon = {
   power               = 50,
   reclaimable         = false,
   selfDestructAs      = [[NOWEAPON]],
+  script              = "chicken_pigeon.lua",
 
   sfxtypes            = {
 
