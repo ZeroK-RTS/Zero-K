@@ -29,8 +29,6 @@ local missileDefIDs = {
 
 local silos = {} -- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
 local missileParents = {} -- [missileUnitID] = siloUnitID
-local missilesToDestroy
-local missilesToTransfer = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -84,22 +82,6 @@ function gadget:Shutdown()
 	GG.MissileSilo = nil
 end
 
-function gadget:GameFrame(n)
-	if missilesToDestroy then
-		for i = 1, #missilesToDestroy do
-			if missilesToDestroy[i] and Spring.ValidUnitID(missilesToDestroy[i]) then
-				Spring.DestroyUnit(missilesToDestroy[i], true)
-			end
-		end
-		missilesToDestroy = nil
-	end
-
-	for uid, team in pairs(missilesToTransfer) do
-		Spring.TransferUnit(uid, team, false)
-		missilesToTransfer[uid] = nil
-	end
-end
-
 -- check if the silo has a free pad we can use
 function gadget:AllowUnitCreation(udefID, builderID)
 	if (spGetUnitDefID(builderID) ~= siloDefID) then return true end
@@ -115,7 +97,7 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if unitDefID == siloDefID then
 		local missiles = GetSiloEntry(unitID)
 		for index, missileID in pairs(missiles) do
-			missilesToTransfer[missileID] = newTeam
+			Spring.TransferUnit(missileID, newTeam, true)
 		end
 	end
 end
@@ -124,9 +106,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	-- silo destroyed
 	if unitDefID == siloDefID then
 		local missiles = GetSiloEntry(unitID)
-		missilesToDestroy = missilesToDestroy or {}
 		for index, missileID in pairs(missiles) do
-			missilesToDestroy[#missilesToDestroy + 1] = missileID
+			Spring.DestroyUnit(missileID, true)
 		end
 	-- missile destroyed
 	elseif missileDefIDs[unitDefID] then
