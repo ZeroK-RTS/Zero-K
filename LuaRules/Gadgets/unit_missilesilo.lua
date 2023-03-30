@@ -16,10 +16,8 @@ end
 
 local spGetUnitDefID = Spring.GetUnitDefID
 
-local MISSILES_PER_SILO = 4
-
 local siloDefs = {
-	[UnitDefNames.staticmissilesilo.id] = true
+	[UnitDefNames.staticmissilesilo.id] = 4
 }
 local missileDefIDs = {
 	[UnitDefNames.tacnuke.id] = true,
@@ -29,7 +27,7 @@ local missileDefIDs = {
 	[UnitDefNames.missileslow.id] = true,
 }
 
-local silos = {} -- [siloUnitID] = {[1] = missileID1, [3] = missileID3, ...}
+local silos = {} -- [siloUnitID] = { capacity = n, slots = {[1] = missileID1, [3] = missileID3, ...}}
 local missileParents = {} -- [missileUnitID] = siloUnitID
 
 --------------------------------------------------------------------------------
@@ -39,15 +37,17 @@ local function GetSiloEntry(unitID)
 end
 
 local function GetFirstEmptyPad(unitID)
-	if not silos[unitID] then
-		return nil
+	local silo = silos[unitID]
+	if not silo then
+		return
 	end
-	for i = 1, MISSILES_PER_SILO do
-		if silos[unitID][i] == nil then
+
+	local slots = silo.slots
+	for i = 1, silo.capacity do
+		if not slots[i] then
 			return i
 		end
 	end
-	return nil
 end
 
 local function DestroyMissile(unitID, unitDefID)
@@ -75,7 +75,7 @@ function gadget:Initialize()
 		for i, v in pairs(unitList) do
 			local siloDef = siloDefs[spGetUnitDefID(v)]
 			if siloDef then
-				silos[v] = {}
+				silos[v] = {capacity = siloDef, slots = {}}
 			end
 		end
 	end
@@ -101,7 +101,7 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if siloDefs[unitDefID] then
-		local missiles = GetSiloEntry(unitID)
+		local missiles = GetSiloEntry(unitID).slots
 		for index, missileID in pairs(missiles) do
 			Spring.TransferUnit(missileID, newTeam, true)
 		end
@@ -111,7 +111,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID)
 	-- silo destroyed
 	if siloDefs[unitDefID] then
-		local missiles = GetSiloEntry(unitID)
+		local missiles = GetSiloEntry(unitID).slots
 		for index, missileID in pairs(missiles) do
 			Spring.DestroyUnit(missileID, true)
 		end
@@ -121,9 +121,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		if parent then
 			local siloEntry = GetSiloEntry(parent)
 			if siloEntry then
-				for i = 1, MISSILES_PER_SILO do
-					if siloEntry[i] == unitID then
-						siloEntry[i] = nil
+				local slots = siloEntry.slots
+				for i = 1, siloEntry.capacity do
+					if slots[i] == unitID then
+						slots[i] = nil
 						break
 					end
 				end
@@ -136,7 +137,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local siloDef = siloDefs[unitDefID]
 	if siloDef then
-		silos[unitID] = {}
+		silos[unitID] = {capacity = siloDef, slots = {}}
 	elseif silos[builderID] then
 		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
 		Spring.SetUnitRulesParam(unitID, "missile_parentSilo", builderID)
@@ -153,7 +154,7 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		local env = Spring.UnitScript.GetScriptEnv(facID)
 		if env then
 			local pad = Spring.UnitScript.CallAsUnit(facID, env.GetPadNum)
-			silos[facID][pad] = unitID
+			silos[facID].slots[pad] = unitID
 		end
 	end
 end
