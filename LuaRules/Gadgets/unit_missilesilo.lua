@@ -18,7 +18,9 @@ local spGetUnitDefID = Spring.GetUnitDefID
 
 local MISSILES_PER_SILO = 4
 
-local siloDefID = UnitDefNames.staticmissilesilo.id
+local siloDefs = {
+	[UnitDefNames.staticmissilesilo.id] = true
+}
 local missileDefIDs = {
 	[UnitDefNames.tacnuke.id] = true,
 	[UnitDefNames.napalmmissile.id] = true,
@@ -71,7 +73,8 @@ function gadget:Initialize()
 	if Spring.GetGameFrame() > 1 then
 		local unitList = Spring.GetAllUnits()
 		for i, v in pairs(unitList) do
-			if spGetUnitDefID(v) == siloDefID then
+			local siloDef = siloDefs[spGetUnitDefID(v)]
+			if siloDef then
 				silos[v] = {}
 			end
 		end
@@ -84,7 +87,10 @@ end
 
 -- check if the silo has a free pad we can use
 function gadget:AllowUnitCreation(udefID, builderID)
-	if (spGetUnitDefID(builderID) ~= siloDefID) then return true end
+	if not siloDefs[spGetUnitDefID(builderID)] then
+		return true
+	end
+
 	local firstPad = GetFirstEmptyPad(builderID)
 	if firstPad ~= nil then
 		SetSiloPadNum(builderID, firstPad)
@@ -94,7 +100,7 @@ function gadget:AllowUnitCreation(udefID, builderID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
-	if unitDefID == siloDefID then
+	if siloDefs[unitDefID] then
 		local missiles = GetSiloEntry(unitID)
 		for index, missileID in pairs(missiles) do
 			Spring.TransferUnit(missileID, newTeam, true)
@@ -104,7 +110,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	-- silo destroyed
-	if unitDefID == siloDefID then
+	if siloDefs[unitDefID] then
 		local missiles = GetSiloEntry(unitID)
 		for index, missileID in pairs(missiles) do
 			Spring.DestroyUnit(missileID, true)
@@ -128,7 +134,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if unitDefID == siloDefID then
+	local siloDef = siloDefs[unitDefID]
+	if siloDef then
 		silos[unitID] = {}
 	elseif silos[builderID] then
 		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
@@ -140,7 +147,7 @@ end
 --add newly finished missile to silo data
 --this doesn't check half-built missiles, but there's actually no need to
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-	if facDefID == siloDefID then
+	if siloDefs[facDefID] then
 		missileParents[unitID] = facID
 		-- get the pad the missile was built on from unit script, to make sure there's no discrepancy
 		local env = Spring.UnitScript.GetScriptEnv(facID)
