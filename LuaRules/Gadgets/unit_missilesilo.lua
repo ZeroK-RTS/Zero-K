@@ -1,5 +1,7 @@
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return false
+end
+
 function gadget:GetInfo()
 	return {
 		name      = "Missile Silo Controller",
@@ -12,15 +14,6 @@ function gadget:GetInfo()
 	}
 end
 
-local SAVE_FILE = "Gadgets/unit_missilesilo.lua"
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if gadgetHandler:IsSyncedCode() then
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 local spGetUnitDefID = Spring.GetUnitDefID
 
 local MISSILES_PER_SILO = 4
@@ -65,17 +58,6 @@ local function SetSiloPadNum(siloID, padNum)
 	local env = Spring.UnitScript.GetScriptEnv(siloID)
 	Spring.UnitScript.CallAsUnit(siloID, env.SetPadNum, padNum)
 end
-
--- this makes sure the object references are up to date
-local function UpdateSaveReferences()
-	_G.missileSiloSaveTable = {
-		silos = silos,
-		missileParents = missileParents,
-		missilesToDestroy = missilesToDestroy,
-		missilesToTransfer = missilesToTransfer
-	}
-end
-UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -164,16 +146,13 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-
-
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitDefID == siloDefID then
 		silos[unitID] = {}
 	elseif silos[builderID] then
 		Spring.SetUnitBlocking(unitID, false, false) -- non-blocking, non-collide (try to prevent pad detonations)
 		Spring.SetUnitRulesParam(unitID, "missile_parentSilo", builderID)
-		local spawnedFrame = (Spring.GetGameRulesParam("totalSaveGameFrame") or 0) + Spring.GetGameFrame()
-		Spring.SetUnitRulesParam(unitID, "missile_spawnedFrame", spawnedFrame)
+		Spring.SetUnitRulesParam(unitID, "missile_spawnedFrame", Spring.GetGameFrame())
 	end
 end
 
@@ -189,53 +168,4 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 			silos[facID][pad] = unitID
 		end
 	end
-end
-
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Missile Silo", SAVE_FILE) or {}
-	
-	missileParents = GG.SaveLoad.GetNewUnitIDKeys(loadData.missileParents or {})
-	missileParents = GG.SaveLoad.GetNewUnitIDValues(missileParents)
-	
-	missilesToDestroy = GG.SaveLoad.GetNewUnitIDValues(loadData.missilesToDestroy or {})
-	missilesToTransfer = GG.SaveLoad.GetNewUnitIDValues(loadData.missilesToTransfer or {})
-	
-	silos = GG.SaveLoad.GetNewUnitIDKeys(loadData.silos or {})
-	for siloID, missiles in pairs(silos) do
-		for i = 1, MISSILES_PER_SILO do
-			if missiles[i] ~= nil then
-				missiles[i] = GG.SaveLoad.GetNewUnitID(missiles[i])
-				Spring.SetUnitRulesParam(missiles[i], "missile_parentSilo", siloID)
-			end
-		end
-		SetSiloPadNum(siloID, GetFirstEmptyPad(siloID))
-	end
-	
-	UpdateSaveReferences()
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-else
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- UNSYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.missileSiloSaveTable, "Missile silo"))
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 end
