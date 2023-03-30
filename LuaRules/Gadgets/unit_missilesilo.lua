@@ -17,13 +17,6 @@ end
 local spGetUnitDefID = Spring.GetUnitDefID
 
 local siloDefs = {} -- [unitDefID] = default capacity
-local missileDefIDs = {
-	[UnitDefNames.tacnuke.id] = true,
-	[UnitDefNames.napalmmissile.id] = true,
-	[UnitDefNames.empmissile.id] = true,
-	[UnitDefNames.seismic.id] = true,
-	[UnitDefNames.missileslow.id] = true,
-}
 
 for unitDefID, unitDef in pairs(UnitDefs) do
 	local capacity = unitDef.customParams.missile_silo_capacity
@@ -120,18 +113,19 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		for index, missileID in pairs(missiles) do
 			Spring.DestroyUnit(missileID, true)
 		end
+		return
+	end
+
 	-- missile destroyed
-	elseif missileDefIDs[unitDefID] then
-		local parent = missileParents[unitID]
-		if parent then
-			local siloEntry = GetSiloEntry(parent)
-			if siloEntry then
-				local slots = siloEntry.slots
-				for i = 1, siloEntry.capacity do
-					if slots[i] == unitID then
-						slots[i] = nil
-						break
-					end
+	local parent = missileParents[unitID]
+	if parent then
+		local siloEntry = GetSiloEntry(parent)
+		if siloEntry then
+			local slots = siloEntry.slots
+			for i = 1, siloEntry.capacity do
+				if slots[i] == unitID then
+					slots[i] = nil
+					break
 				end
 			end
 		end
