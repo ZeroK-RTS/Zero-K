@@ -16,9 +16,7 @@ end
 
 local spGetUnitDefID = Spring.GetUnitDefID
 
-local siloDefs = {
-	[UnitDefNames.staticmissilesilo.id] = 4
-}
+local siloDefs = {} -- [unitDefID] = default capacity
 local missileDefIDs = {
 	[UnitDefNames.tacnuke.id] = true,
 	[UnitDefNames.napalmmissile.id] = true,
@@ -26,6 +24,13 @@ local missileDefIDs = {
 	[UnitDefNames.seismic.id] = true,
 	[UnitDefNames.missileslow.id] = true,
 }
+
+for unitDefID, unitDef in pairs(UnitDefs) do
+	local capacity = unitDef.customParams.missile_silo_capacity
+	if capacity then
+		siloDefs[unitDefID] = tonumber(capacity)
+	end
+end
 
 local silos = {} -- [siloUnitID] = { capacity = n, slots = {[1] = missileID1, [3] = missileID3, ...}}
 local missileParents = {} -- [missileUnitID] = siloUnitID
