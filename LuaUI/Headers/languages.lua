@@ -4,6 +4,7 @@ local langs = {
 	{ lang = 'pl', flag = 'pl', name = 'Polski' },
 	{ lang = 'de', flag = 'de', name = 'Deutsch' },
 	{ lang = 'tr', flag = 'tr', name = 'Türkçe' },
+	{ lang = 'zh', flag = 'cn', name = '中文' },
 }
 
 local flagByLang, langByFlag = {}, {}
