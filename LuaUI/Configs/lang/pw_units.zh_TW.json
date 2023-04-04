@@ -1,0 +1,117 @@
+{
+	"pw_artefact" : {
+		"name" : "古代文物",
+		"description" : "神秘遺跡",
+		"helptext" : "這個神秘的外星裝置擁有不可思議的力量。儘管我們的科學家仍然不理解，但它有可能被作為一種支配銀河系的超級武器加以利用。"
+	},
+	"pw_bomberfac" : {
+		"name" : "轟炸機工廠",
+		"description" : "生產轟炸機",
+		"helptext" : "生產用於攻擊敵方星球的太空轟炸機。在行星入侵期間，生產一般轟炸機。"
+	},
+	"pw_dropfac" : {
+		"name" : "船艦工廠",
+		"description" : "生產船艦",
+		"helptext" : "為入侵敵方星球所生產的太空船艦。在行星入侵期間，生產一般運輸船。"
+	},
+	"pw_estorage" : {
+		"name" : "能量儲存",
+		"description" : "儲存能量",
+		"helptext" : "一個大電容器。"
+	},
+	"pw_estorage2" : {
+		"name" : "雙重能量儲存",
+		"description" : "儲存能量",
+		"helptext" : "一個大雙重電容器。"
+	},
+	"pw_garrison" : {
+		"name" : "野戰營地",
+		"description" : "降低勢力值獲得",
+		"helptext" : "這建築有軍隊駐守將降低敵人從戰鬥中獲得的勢力值。"
+	},
+	"pw_gaspowerstation" : {
+		"name" : "燃氣發電站",
+		"description" : "生產能量",
+		"helptext" : "一個燃氣發電機。"
+	},
+	"pw_grid" : {
+		"name" : "星球防禦網",
+		"description" : "防禦一切",
+		"helptext" : "這建築降低勢力值獲得並攔截來襲的轟炸機。"
+	},
+	"pw_guerilla" : {
+		"name" : "遊擊隊跳躍門",
+		"description" : "遠程擴張勢力",
+		"helptext" : "一個能夠對任何星球擴張勢力的跳躍門。"
+	},
+	"pw_hq_attacker" : {
+		"name" : "攻擊者指揮中心",
+		"description" : "星球戰爭總部（改變勢力值獲得）",
+		"helptext" : "這建築是對星球戰略控制不可或缺的。如果進攻方在指揮中心被摧毀的情況下獲勝，他們只會獲得原本的 50%% 勢力值。"
+	},
+	"pw_hq_defender" : {
+		"name" : "防禦者指揮中心",
+		"description" : "星球戰爭總部（改變勢力值獲得）",
+		"helptext" : "這建築是對星球戰略控制不可或缺的。如果進攻方輸了，但摧毀了這個指揮中心，他們就會獲得少量的勢力值，獲勝時則獲得 20%%。"
+	},
+	"pw_inhibitor" : {
+		"name" : "蟲洞抑制器",
+		"description" : "阻止勢力擴張",
+		"helptext" : "抑制來自敵方星球的擴張勢力。"
+	},
+	"pw_interception" : {
+		"name" : "攔截網",
+		"description" : "攔截星球轟炸機",
+		"helptext" : "這建築會攔截來襲的轟炸機。"
+	},
+	"pw_mine" : {
+		"name" : "電力產生器",
+		"description" : "生產 50 能量／轉",
+		"helptext" : "一個小型高效的發電機。"
+	},
+	"pw_mine2" : {
+		"name" : "軌道太陽能陣列",
+		"description" : "生產 100 能量／轉",
+		"helptext" : "一個大型且輸出功率更高發電機。"
+	},
+	"pw_mine3" : {
+		"name" : "星球地熱電站",
+		"description" : "生產 250 能量／轉",
+		"helptext" : "這個巨大綜合體直接從星球的地函汲取能量。如果被摧毀，它將在核爆炸中升空。"
+	},
+	"pw_mstorage2" : {
+		"name" : "金屬儲存",
+		"description" : "儲存金屬",
+		"helptext" : "儲存大量金屬用於星球。"
+	},
+	"pw_warpgate" : {
+		"name" : "傳送門",
+		"description" : "生產傳送核心",
+		"helptext" : "這個設施生產令人垂涎的傳送核心，可以在眨眼間將飛船送至銀河系。"
+	},
+	"pw_warpjammer" : {
+		"name" : "傳送干擾機",
+		"description" : "防止傳送攻擊",
+		"helptext" : "傳送干擾機透過立場來保護所在區域防止配備傳送核心的船艦入侵。"
+	},
+	"pw_wormhole" : {
+		"name" : "蟲洞產生器",
+		"description" : "連結鄰近星球",
+		"helptext" : "允許船艦前往鄰近星球，並擴張勢力值至鄰近星球。"
+	},
+	"pw_wormhole2" : {
+		"name" : "加強版蟲洞",
+		"description" : "連結鄰近星球",
+		"helptext" : "這建築維護一個更強的蟲洞，增加鄰近星球的勢力值。"
+	},
+	"generic_tech" : {
+		"name" : "科技實驗室",
+		"description" : "解鎖科技",
+		"helptext" : "這建築為它所屬的陣營解鎖一個特定科技。"
+	},
+	"pw_techlab" : {
+		"name" : "科技實驗室",
+		"description" : "蘊含著強大的古代科技" ,
+		"helptext" : "這建築包含一些強大的技術。"
+	}
+}
