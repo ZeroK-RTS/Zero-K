@@ -1,0 +1,97 @@
+{
+	"comm_mission_tutorial1" : {
+		"name" : "Comandante di addestramento",
+		"description" : "Comandante d'assalto mobile",
+		"helptext" : "Una robusta unità di comando configurata per essere facile da utilizzare con velocità, armatura e rigenerazione decenti."
+	},
+	"comm_campaign_ada" : {
+		"name" : "Comandante di Ada",
+		"description" : "Comandante Relic",
+		"helptext" : "Un'unità speciale di comando speciale proveniente da prima della caduta che funziona bene nonostante la sua età. Pilotato dal capitano Ada Caedmon, già della 13a coorte ausiliaria imperiale."
+	},
+	"comm_campaign_promethean" : {
+		"name" : "Il Promethean",
+		"description" : "Fondatore di Machines Free",
+		"helptext" : "Fondatore delle Free Machines e creatore del virus Firebrand, un'IA calma e filosofica che combatte per la libertà del genere robotico. Uno spirito ardente."
+	},
+	"comm_campaign_freemachine" : {
+		"name" : "Libertas Machina",
+		"description" : "Luogotenente di Promethean",
+		"helptext" : "Il principale luogotenente di Promethean, un rivoluzionario impegnato nella causa della liberazione delle macchine. Ben carico e ben corazzato: da non prendere alla leggera."
+	},
+	"comm_campaign_odin" : {
+		"name" : "Odin",
+		"description" : "Leader del Valhalla",
+		"helptext" : "Il capo dei Valhallan, un guerriero costruito e allevato per la gloria della battaglia. Un nemico estremamente spietato."
+	},
+	"comm_campaign_biovizier" : {
+		"name" : "Il Blovizier",
+		"description" : "Custode dei geni della dinastia",
+		"helptext" : "Custode dei depositi genetici della Dinastia e maestro genetista. Freddo e calcolatore."
+	},
+	"comm_campaign_isonade" : {
+		"name" : "Lord Isonade",
+		"description" : "Lord Obediator",
+		"helptext" : "Uno dei nobili della Dinastia, un ambizioso signore della guerra che cerca di affermarsi come padrone della galassia. Una bestia orribilmente mutata."
+	},
+	"comm_campaign_legion" : {
+		"name" : "Legate Fides",
+		"description" : "Comandante dell'Avanguardia Imperiale",
+		"helptext" : "Comandante della Legione dell'Avanguardia Imperiale, esecutori della volontà dell'Imperatore. Un soldato leale e risoluto."
+	},
+	"comm_campaign_praetorian" : {
+		"name" : "Scipio Astra",
+		"description" : "Prefetto della Praetorian Guard",
+		"helptext" : "Prefetto della Praetorian Gard d'élite, i paladini dell'Impero. Un fanatico aderente al culto dell'Imperatore, che purga gli eretici con un'enorme potenza di fuoco."
+	},
+	"comm_campaign_athenion" : {
+		"name" : "Athenion",
+		"description" : "Comandante ribelle",
+		"helptext" : "Un capo ribelle imperiale."
+	},
+	"comm_campaign_hun" : {
+		"name" : "Comandante Hun",
+		"description" : "Comandante Barbaro",
+		"helptext" : "Un comandante barbaro."
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "Comandante Ostrogoth",
+		"description" : "Comandante Barbaro",
+		"helptext" : "Un comandante barbaro."
+	},
+	"comm_campaign_lombard" : {
+		"name" : "Comandante Lombard",
+		"description" : "Comandante Barbaro",
+		"helptext" : "Un comandante barbaro."
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "Comandante Bulgar",
+		"description" : "Comandante Barbaro",
+		"helptext" : "Un comandante barbaro."
+	},
+	"comm_campaign_suevi" : {
+		"name" : "Comandante Suevi",
+		"description" : "Comandante Barbaro",
+		"helptext" : "Un comandante barbaro."
+	},
+	"pw_campaign_bunker" : {
+		"name" : "Bunker di deposito",
+		"description" : "Immagazzina armi",
+		"helptext" : "I Bunker come questo furono usati per immagazzinare munizioni durante le Planetwars. Alcuni di questi potrebbero avere ancora attrezzature utilizzabili nascoste all'interno."
+	},
+	"pw_campaign_techlab" : {
+		"name" : "Laboratorio Tecnologico",
+		"description" : "Centro Ricerca e Sviluppo",
+		"helptext" : "Una delle strutture di ricerca e sviluppo costruite durante l'ultima guerra, molto ambita per la tecnologia contenuta al suo interno."
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "Tomba Imperiale",
+		"description" : "Qui giace l'Imperatore",
+		"helptext" : "Questo è il luogo di riposo del God-Emperor of Man."
+	},
+	"nebula_campaign_daneel" : {
+		"name" : "Daneel Olivaw",
+		"description" : "Nave madre atmosferica avanzata",
+		"helptext" : "Una versione avanzata della portaerei di classe Nebula. Manovrabile come un mattone e armato solo modestamente, il Daneel Olivaw è ancora una forza temibile grazie alla sua capacità di sopravvivere agli attacchi a lungo raggio grazie al suo scudo, oltre a distruggere i nemici minori con il suo complemento di droni da combattimento."
+	}
+}
