@@ -2,6 +2,7 @@ local langs = {
 	{ lang = 'en', flag = 'gb', name = 'English' },
 	{ lang = 'ru', flag = 'ru', name = 'Русский' },
 	{ lang = 'pl', flag = 'pl', name = 'Polski' },
+	{ lang = 'it', flag = 'it', name = 'Italiano' },
 	{ lang = 'de', flag = 'de', name = 'Deutsch' },
 	{ lang = 'tr', flag = 'tr', name = 'Türkçe' },
 	{ lang = 'zh', flag = 'cn', name = '中文' },
