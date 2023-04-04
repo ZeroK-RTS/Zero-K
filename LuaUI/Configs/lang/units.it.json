@@ -1,0 +1,1232 @@
+{
+	"starlight_satellite" : {
+		"name" : "Glint",
+		"description" : "Satellite Startlight",
+		"helptext" : "Satellite utilizzato da Starlight per mirare"
+	},
+	"gunshipcon" : {
+		"name" : "Wasp",
+		"description" : "Costruttore Gunship pesante",
+		"helptext" : "Un costruttore pesante che combina un'alta capacità di costruzione con la possibilità di volare"
+	},
+	"gunshipskirm" : {
+		"name" : "Harpy",
+		"description" : "Gunship multiruolo di supporto",
+		"helptext" : "L'Harpy è un velivolo leggero di combattimento. Nonostante non provochino gravi danni, i suoi missili sono precisi e provocano il rallentamento dell'obiettivo."
+	},
+	"factorycloak" : {
+		"name" : "Fabbrica di Cloakbot",
+		"description" : "Produce robot stealth.",
+		"helptext" : "La Fabbrica di Cloakbot produce unità agili, che non vengono rilevate dai radar e dotate di armi EMP / Elettromagnetiche per colpire i punti deboli del nemico. Unità chiave: Glaive, Ronin, Reaver, Knight, Sling"
+	},
+	"amphlaunch" : {
+		"name" : "Lobster",
+		"description" : "Lancia-unità anfibio",
+		"helptext" : "In mancanza di armamenti propri, i Lobster lanciano le altre unità. Nonostante fosse progettato per lo schieramento rapido in costa, i Lobster hanno una varietà di usi e possono persino lanciare le unità nemiche contro altre unità nemiche."
+	},
+	"tankarty" : {
+		"name" : "Emissary",
+		"description" : "Artiglieria Multiuso",
+		"helptext" : "Il pesante cannone a lunga gittata dell'Emissary lo rende l'unità preferita per i bombardamenti a distanza di unità o strutture nemiche. Però dovrebbe diffidare di tutto ciò che gli si avvicina."
+	},
+	"staticmissilesilo" : {
+		"name" : "Base Missilistica",
+		"description" : "Produce missili tattici",
+		"helptext" : "La Base Missilistica costruisce e contiene fino a quattro diversi missili da crociera, ciascuno con una testata unica. Offre un'eccellente capacità di attacco a distanza per scopi offensivi e difensivi."
+	},
+	"spiderscout" : {
+		"name" : "Flea",
+		"description" : "Spider ultraleggero per operazioni di ricerca (scova tane)",
+		"helptext" : "I Flea possono nascondersi in luoghi inaccessibili dove i suoi sofisticati sensori consentono di vedere più lontano di quanto possano essere visti. Possono essere utilizzati in piccoli gruppi per razziare o occupare efficacemente le risorse di metallo all'inizio della partita. Nelle mappe con alte scogliere possono attaccare da angolazioni inaspettate. Però fanno pochissimi danni e possono essere distrutti con il minimo sforzo dall'avversario."
+	},
+	"energyfusion" : {
+		"name" : "Reattore a Fusione Nucleare",
+		"description" : "Centrale Energetica di media capacità",
+		"helptext" : "I reattori a fusione nucleare forniscono una buona quantità di energia costante a un prezzo equo. Sono bersagli attraenti e non molto ben corazzati. Tienili ben protetti. Quando vengono distrutti, questi reattori causano gravi danni alle unità vicine."
+	},
+	"chickenlandqueen" : {
+		"name" : "Chicken Queen",
+		"description" : "E' l'inferno!",
+		"helptext" : "Una parola: SCAPPA! La Chicken Queen è la matriarca della colonia degli alieni. E' praticamente impossibile da fermare. Può sputare napalm infuocato, spruzzare spore per uccidere i velivoli e allontanare le unità di terra. Le sue mascelle possono fare a pezzi il più grande robot d'assalto in pochi secondi. Solo un'offensiva determinata e mirata può sperare di fermare questa bestia!"
+	},
+	"tankassault" : {
+		"name" : "Minotaur",
+		"description" : "Carrarmato d'assalto",
+		"helptext" : "Il Minotaur è un carrarmato pesante che eccelle nell'assorbire i danni nelle battaglie campali. Però, data la sua bassa cadenza di fuoco e la pesante armatura che lo rende poco manovrabile, è in difficoltà ad affrontare gli sciami di nemici."
+	},
+	"chicken_listener" : {
+		"name" : "Listener",
+		"description" : "Rilevatore sismico mobile scavante",
+		"helptext" : "Il Listener è una forma evoluta del Digger. Sebbene abbia perso tutte le capacità di combattimento, ha acquisito un senso dell'udito unico che gli consente di individuare la posizione delle forze di terra nemiche."
+	},
+	"cloakbomb" : {
+		"name" : "Imp",
+		"description" : "Bomba EMP / Elettromagnetica (cerca tane)",
+		"helptext" : "Le unità Imp fanno affidamento sulla loro velocità e sulle loro dimensioni ridotte per schivare le armi imprecise del nemico. Inoltre, si occultano quando sono inattivi. Possono paralizzare unità pesanti o gruppi di unità più leggere che non riescono distruggerli prima che siano nel loro raggio d'azione. Per difenderti da queste unità puoi utilizzare i Reavers, i Glaives o piccole difese o unità economiche per innescare precocemente la loro esplosione."
+	},
+	"shieldriot" : {
+		"name" : "Outlaw",
+		"description" : "Robot di rivolta",
+		"helptext" : "L'Outlaw emette un impulso di disturbo elettromagnetico in un ampio cerchio attorno ad esso che danneggia e rallenta solo le unità nemiche."
+	},
+	"chickenc" : {
+		"name" : "Basilisk",
+		"description" : "Creatura multiterreno",
+		"helptext" : "Il Basilisk si arrampica sui muri come un ragno e sorprende il nemico con il suo sputo altamente acido. Solo una mirata vigilanza impedisce a queste creature di vagare sulle colline e di distruggere la tua base. L'artiglieria è la migliore soluzione per tener lontane queste creature."
+	},
+	"hoverraid" : {
+		"name" : "Dagger",
+		"description" : "Hovercraft da attacco rapido (anti-sub)",
+		"helptext" : "Il Dagger è un'unità rapida che fornisce un metodo economico e usa e getta per ottenere informazioni sul terreno e sulle unità nemiche e per raggiungere obiettivi economici di opportunità. Il suo cannone Gauss leggero può colpire anche bersagli subacquei."
+	},
+	"hoverheavyraid" : {
+		"name" : "Bolas",
+		"description" : "Hovercraft distruttore",
+		"helptext" : "Il Bolas è un pesante hovercraft armato con un raggio disgregatore a fuoco rapido. Sebbene la sua produzione di danni sia abbastanza interessante, dà il meglio di sé se utilizzato assieme a Maces o Scalpels!"
+	},
+	"chicken_digger" : {
+		"name" : "Digger",
+		"description" : "Incursore scavante",
+		"helptext" : "I forti artigli del Digger possono scavare attraverso la roccia più dura. In questo modo può viaggiare in modo invisibile sottoterra e apparire ovunque possa causare caos. Proteggi efficacemente le tue strutture e le tue unità poiché i Digger possono aggirare le tue principali linee di difesa!"
+	},
+	"chicken_leaper" : {
+		"name" : "Leaper",
+		"description" : "Incursore saltellante",
+		"helptext" : "I Leaper sono le unità chickens più rapide in assoluto. Sono in grado di scavalcare gli ostacoli e di rallentare le unità nemiche."
+	},
+	"chickenr" : {
+		"name" : "Lobber",
+		"description" : "Artiglieria",
+		"helptext" : "Il Lobber è una forma di artiglieria organica che scaglia palle di veleno ad alta traiettoria su lunghe distanze. Si rivela un problema per coloro che si affidano eccessivamente alle difese statiche a corta gittata. Però è praticamente indifeso quando viene attaccato."
+	},
+	"turrettorp" : {
+		"name" : "Urchin",
+		"description" : "Lanciasiluri (anti-sub)",
+		"helptext" : "Questo lanciasiluri offre la difesa contro le unità di superficie e le unità sommergibili."
+	},
+	"tankheavyassault" : {
+		"name" : "Cyclops",
+		"description" : "Carrarmato distruttore pesante ",
+		"helptext" : "Il Cyclops è il carrarmato più pesante del lotto. Il suo cannone principale è un pesante disgregatore progettato per distruggere altri carri. E' in gradi di rallentare i nemici in modo che essi non sfuggano alla sua presa. Tuttavia il suo corto raggio d'azione lo rende la facile preda di schermagliatori avanzati o di attacchi aerei. La sua bassa velocità di fuoco lo rende vulnerabile anche agli attacchi di sciami di nemici. Il pesante cannone principale può abbattere struttura, muri e fortificazioni terraformate, facendo largo agli attacchi di altre unità."
+	},
+	"damagesink" : {
+		"name" : "Danni a piccole cose",
+		"description" : "Non importa se lo attacchi",
+		"helptext" : "\"Affondo, quindi sono!\""
+	},
+	"turretmissile" : {
+		"name" : "Picket",
+		"description" : "Lanciamissili leggero",
+		"helptext" : "Il Picket è una torre missilistica multiuso leggera. È utile per colpire le unità a distanza, fornire un certo grado di protezione antiaerea e danneggiare le difese nemiche leggere al di fuori del loro raggio d'azione. Tuttavia, si rompe quando ci si starnutisce contro."
+	},
+	"chicken_roc" : {
+		"name" : "Roc",
+		"description" : "Pesante creatura volante",
+		"helptext" : "Il Roc è una creatura larga, pensante e arrabbiata. E vola! Riesce ad attaccare sia bersagli volanti che unità di terra."
+	},
+	"turretaaheavy" : {
+		"name" : "Artemis",
+		"description" : "Lanciamissili antiaereo a lungo raggio. Utilizza 4 unità di metallo al secondo. Produce in 20 secondi.",
+		"helptext" : "L'Artemis è un'arma antiaerea di primo colpo a lunghissima gittata che invia un chiaro messaggio agli aerei nemici: non puoi avvicinarti, figliolo! Ogni colpo costa 80 unità di metallo ed impiega non meno di 20 secondi per accumularsi. Ma ne vale la pena, perché con una buona scorta di missili spazzerà via quasi tutti gli attacchi aerei!"
+	},
+	"chicken_drone" : {
+		"name" : "Drone",
+		"description" : "Si trasforma in strutture Chicken",
+		"helptext" : "Uno sfortunato organismo che non combatte e il cui unico scopo nella vita è di trasformarsi in una delle strutture dei Chicken."
+	},
+	"staticjammer" : {
+		"name" : "Cornea",
+		"description" : "Disturbatore radar",
+		"helptext" : "Un antiradar come questo interferisce con le onde radar nemiche, nascondendo i ritorni radar delle tue unità. La Cornea è inoltre dotata di uno scudo che nasconde le unità vicine alla vista del nemico."
+	},
+	"amphbomb" : {
+		"name" : "Limpet",
+		"description" : "Bomba rallentatrice anfibia",
+		"helptext" : "Il Limpet può schivare la maggior parte dei proiettili lenti grazie alla sua agilità e alle ridotte dimensioni, permettendogli di avvicinarsi alle unità nemiche per farle esplodere, rallentandole e danneggiandole."
+	},
+	"factoryveh" : {
+		"name" : "Fabbrica dei Rover",
+		"description" : "Produce veicoli leggeri con ruote",
+		"helptext" : "La Fabbrica di Rover è l'ideale per produrre unità veloci, aggressive e ideali per i blitzkrieg. Le unità più lente del lotto sono comunque dotate con un'abbondante potenza di foco. Unità chiave: Dart, Scorcher, Ravager, Ripper, Slasher"
+	},
+	"turretgauss" : {
+		"name" : "Gauss",
+		"description" : "Torretta gauss retrattile, si rigenera quando chiusa (anti-sub)",
+		"helptext" : "Il Gauss è una torretta compatta e resistente con un cannone gauss a medio raggio. Quando viene abbassata, diminuisce a un terzo i danni in arrivo ed è in grado di rigenerarsi lentamente. Può anche attaccare bersagli subacquei."
+	},
+	"nebula" : {
+		"name" : "Nebula",
+		"description" : "Nave Madre aerea",
+		"helptext" : "Manovrabile come un mattone e armata solo modestamente, la Nebula è ancora una forza temibile grazie alla sua capacità di sopravvivere agli attacchi a lungo raggio grazie al suo scudo. Con i suoi droni da combattimento è anche in grado di distruggere i nemici di piccola taglia."
+	},
+	"hoveraa" : {
+		"name" : "Flail",
+		"description" : "Hovercraft antiaereo",
+		"helptext" : "Il Flail lancia potenti missili a corto-medio raggio contro i bersagli aerei."
+	},
+	"cloakarty" : {
+		"name" : "Sling",
+		"description" : "Robot di artiglieria leggera",
+		"helptext" : "Lo Sling ha un cannone al plasma a lungo raggio che consente il fuoco indiretto oltre gli ostacoli e le difese statiche. Sebbene sia efficace contro le unità mobili, dovrebbe essere protetto per impedire alle unità veloci del nemico di avvicinarsi."
+	},
+	"chickend" : {
+		"name" : "Chicken Tube",
+		"description" : "Struttura di difesa ad energia",
+		"helptext" : "Il Chicken Tube è l'unica struttura di difesa dei Chicken. Spara spore mortali contro obiettivi aerei e di superficie."
+	},
+	"rocksink" : {
+		"name" : "Unità dondolante di poco conto",
+		"description" : "Dondola se gli spari",
+		"helptext" : "Sono una roccia e non c'è modo che mi rompaaaa! Sono una rocciaaaaa!"
+	},
+	"fakeunit_aatarget" : {
+		"name" : "Obiettivo AA fasullo",
+		"description" : "Utilizzato dal codice dei jumpjet.",
+		"helptext" : "Unità fasulla destinata a scopi tecnici."
+	},
+	"mahlazer" : {
+		"name" : "Starlight",
+		"description" : "Modellatore planetario ad energia - deve essere connesso alla rete e dotato di almeno 600 unità di energia",
+		"helptext" : "Questo strumento su larga scala viene utilizzato per modellare il terreno per progetti di terraformazione. Cia siamo accorti che è utile anche come pulitore di ostacoli, unità e basi nemiche fastidiose."
+	},
+	"spidercrabe" : {
+		"name" : "Crab",
+		"description" : "Spider pesante da sommossa/schermaglia - Si corazza quando è fermo",
+		"helptext" : "Gli enormi colpi del Crab annientano grandi sciami di unità economiche e possono anche superare le difese nemiche. Quando smette di camminare, il Crab si rannicchia in una forma corazzata riducendo i danni in arrivo a un terzo. Il principale punto debole del Crab è la sua mancanza di mobilità."
+	},
+	"subscout" : {
+		"name" : "Lancelet",
+		"description" : "Minisub suicida da ricognizione",
+		"helptext" : "Il Lancelet è fondamentalmente un grande siluro intelligente con funzionalità di ricognizione. Può rimanere nascosto in profondità per osservare i movimenti del nemico e far esplodere la sua carica esplosiva per affondare navi incaute."
+	},
+	"staticstorage" : {
+		"name" : "Deposito",
+		"description" : "Immagazzina metallo e energia (500 unità)",
+		"helptext" : "I depositi fungono da cuscinetto quando ci si aspetta un grande afflusso di metallo, come il recupero di un vasto campo di rottami. Tuttavia, è meglio affrontare i surplus di metallo aumentando le tue capacità costruttive."
+	},
+	"shieldscout" : {
+		"name" : "Dirtbag",
+		"description" : "Scatola di terra",
+		"helptext" : "Lo scopo dei Dirtbag è quello di bloccare i movimenti del nemico. Devono intralciare le altre unità. Sono così dediti a questo compito che rilasciano il loro carico utile di terra per formare piccoli tumuli fastidiosi. Mentre aspettano il loro destino, i Dirtbag si divertono a dare testate ed ad esplorare."
+	},
+	"amphaa" : {
+		"name" : "Angler",
+		"description" : "Robot antiaereo anfibio",
+		"helptext" : "Un Angler è un robot anfibio anti-aereo progettato per contrastare i temuti Raven. Due di loro insieme possono galleggiare in superficie e distruggere un singolo Raven."
+	},
+	"tankaa" : {
+		"name" : "Ettin",
+		"description" : "Flak Anti-Aereo",
+		"helptext" : "Il cannone antiaereo di Ettin fa un lavoro rapido contro le cannoniere nemiche ed è anche abbastanza efficace contro gli aerei."
+	},
+	"asteroid" : {
+		"name" : "Asteroid",
+		"description" : "Detrito Spaziale",
+		"helptext" : "Gli Asteroid possono essere manipolati e fatti sulla superficie tramite il Meteor Controller; servono principalmente come arma per schiacciare le unità su cui cadono, ma possono anche essere recuperate e reclamate come risorse."
+	},
+	"planeheavyfighter" : {
+		"name" : "Raptor",
+		"description" : "Caccia da combattimento",
+		"helptext" : "Il Raptor è specializzato nell'abbattere qualsiasi altra cosa che voli, tranne le zanzare. È abbastanza robusto da sopportare un fuoco nemico antiaereo limitato. Non ha capacità di attacco al suolo."
+	},
+	"hoverskirm2" : {
+		"name" : "Trisula",
+		"description" : "Hovercraft leggero d'assalto",
+		"helptext" : "Il Trisula è un combattente abbastanza veloce e robusto, armato con un'arma a raggio disperdente che può cancellare i piccoli bersagli. I bersagli grandi vengono solo scrostati."
+	},
+	"vehriot" : {
+		"name" : "Ripper",
+		"description" : "Rover da combattimento",
+		"helptext" : "Il cannone del Ripper è efficace nel distruggere sciami di piccole unità e nel fermare l'avanzata nemica. I proiettili viaggiano in linea retta e, quindi, è essenziale che i Ripper vengano disposti in linea di formazione. A causa della loro scarsa velocità e portata, subiscono spesso i danni dagli schermagliatori nemici. Il cannone del Ripper appiattisce il terreno accidentato per consentire il passaggio dei veicoli alleati."
+	},
+	"staticshield" : {
+		"name" : "Aegis",
+		"description" : "Scudo",
+		"helptext" : "L'Aegis protegge un'area modesta con il suo scudo a bolle. Blocca i proiettili in arrivo (ma non gli effetti delle esplosioni). Lo scudo necessita di energia per essere mantenuto. Non blocca armi molto potenti."
+	},
+	"turretaaclose" : {
+		"name" : "Hacksaw",
+		"description" : "Torretta antiaereo",
+		"helptext" : "I missili gemelli del Hacksaw puniscono brutalmente qualsiasi aereo che entri nel loro raggio d'azione, ma impiegano molto tempo per ricaricarsi, rendendoli tutt'altro che ideali contro bersagli numerosi o leggeri."
+	},
+	"chicken_rafflesia" : {
+		"name" : "Rafflesia",
+		"description" : "Scudo Chicken (struttura)",
+		"helptext" : "Lo scudo del Rafflesia protegge le unità e le strutture vicine."
+	},
+	"empiricaldpser" : {
+		"name" : "Verifica DPS empirica",
+		"description" : "Sparalo per la scienza.",
+		"helptext" : "!!PER-LA-SCIENZA!!"
+	},
+	"hoverassault" : {
+		"name" : "Halberd",
+		"description" : "Hovercraft corazzato",
+		"helptext" : "L'Halberd si ritrae nel suo scafo corazzato quando non spara, offrendo una resistenza ai danni 3 volte aumentata. La sua arma lenta e a corto raggio non è adatta per l'uso contro bersagli veloci."
+	},
+	"shieldcon" : {
+		"name" : "Convict",
+		"description" : "Costruttore con scudo",
+		"helptext" : "Il Convict è un robot da costruzione abbastanza standard con uno scudo leggero per difendersi e per supportare i robot alleati."
+	},
+	"energysingu" : {
+		"name" : "Reattore a Singolarità",
+		"description" : "Grande centrale energetica PERICOLOSO",
+		"helptext" : "Il Reattore a Singolarità genera un'enorme quantità di energia utilizzando un buco nero controllato che sembrerebbe sicuro. Quando il reattore viene distrutto, il buco nero implode violentemente trascinando le unità all'interno. Tutta la terra su cui è costruito dovrebbe essere considerata pericolosa per viverci."
+	},
+	"bomberdisarm" : {
+		"name" : "Thunderbird",
+		"description" : "Bombardiere disarmante",
+		"helptext" : "Bombardiere rapido armato con un generatore di fulmini che disarma le unità in un'ampia area sotto di esso."
+	},
+	"chicken_spidermonkey" : {
+		"name" : "Spidermonkey",
+		"description" : "Unità multiterreno di supporto",
+		"helptext" : "Lo Spidermonkey è un'unità di supporto molto insolita. Come suggerisce il nome, può arrampicarsi sui muri e tessere una tela che rallenta e strattona i nemici."
+	},
+	"shieldskirm" : {
+		"name" : "Rogue",
+		"description" : "Robot schermagliatore (tiro indiretto)",
+		"helptext" : "I razzi del Rogue hanno una bassa cadenza di fuoco ma infliggono molti danni. Questo rende l'unità ideale per entrare, sparare ed uscire dall'area di fuoco nemica. Contrastali attaccandoli con unità veloci o con bombe quando sono ammassati."
+	},
+	"dronelight" : {
+		"name" : "Firefly",
+		"description" : "Drone d'attacco",
+		"helptext" : "Il Firefly è un drone d'attacco con un debole laser a impulsi ed ad alta precisione. Può proteggere le unità madri da unità nemiche leggere. Tuttavia non condividono la caratteristica della furtività con l'unità madre e,  quindi, possono rivelare al nemico la posizione di un comandante occultato."
+	},
+	"chickenblobber" : {
+		"name" : "Blobber",
+		"description" : "Artiglieria pesante",
+		"helptext" : "Il fratello maggiore del Lobber, il Blobber scaglia una pioggia di melma acida ad ampia dispersione. Può colpire molto rapidamente anche una rete importante di scudi. Di contro rimane un'unità che soffre gli attacchi diretti."
+	},
+	"energyheavygeo" : {
+		"name" : "Centrale Geotermica Avanzata",
+		"description" : "Grande centrale energetica PERICOLOSO",
+		"helptext" : "La Centrale Geotermica Avanzata produce un'enorme quantità di energia. Richiede protezione, tuttavia, poiché la sua distruzione provoca un'esplosione devastante."
+	},
+	"staticcon" : {
+		"name" : "Caretaker",
+		"description" : "Assistente costruttore",
+		"helptext" : "Il Caretaker è l'ideale per aumentare la produzione delle fabbriche o per riparare automaticamente le difese vicine. Tuttavia non può avviare alcun progetto di costruzione da solo."
+	},
+	"terraunit" : {
+		"name" : "Terraformazione",
+		"description" : "Spesa: 0",
+		"helptext" : " Questa unità rappresenta un'area in fase di terraformazione."
+	},
+	"chickenf" : {
+		"name" : "Talon",
+		"description" : "Predatore volante",
+		"helptext" : "È un Chicken volante! Il Talon è un predatore letale che abbatte gli aerei nemici con le sue punte. Può impiegare le sue armi anche contro i bersagli a terra. Tuttavia non è immortale!"
+	},
+	"energypylon" : {
+		"name" : "Pilastro Energetico",
+		"description" : "Espande la rete energetica",
+		"helptext" : "I Pilastri Energetici trasmettono l'energia e aiutano ad estendere le reti energetiche. Queste reti collegano le fonti di energia agli Estrattori di Metallo e agli utilizzatori, comprese le strutture di difesa. L'energia collegata agli Estrattori di Metallo incrementa l'Overdrive, ovvero la capacità degli estrattori di produrre più metallo. Si noti che su brevi distanze o in situazioni di basso consumo energetico, l'utilizzo di centrali per espandere le reti energetiche può essere un'alternativa più efficiente rispetto ai Piloni Energetici."
+	},
+	"bomberprec" : {
+		"name" : "Raven",
+		"description" : "Bombardiere di precisione (anti-sub)",
+		"helptext" : "Il Raven sgancia una singola bomba ad alto danno e bassa area di impatto. Non c'è niente di meglio per eliminare i siti antinucleari o i Minotaur! Ma ti servirà qualcos'altro per eliminare unità più piccole e più veloci."
+	},
+	"chicken_shield" : {
+		"name" : "Blopper",
+		"description" : "Antiaereo con scudo",
+		"helptext" : "Protegge i Chicken vicini."
+	},
+	"chicken_dodo" : {
+		"name" : "Dodo",
+		"description" : "Bomba",
+		"helptext" : "Il corpo del Dodo contiene una miscela volatile di esplosivi organici. Alla minima provocazione esplode in modo spettacolare e con l'onda d'urto risultante lancia in aria le unità vicine. Fai attenzione perché i suoi arti e le sue punte volanti riescono a vare ulteriori danni."
+	},
+	"bomberheavy" : {
+		"name" : "Likho",
+		"description" : "Bombardiere a singolarità",
+		"helptext" : "Il Likho sgancia una singola e potente bomba che può far saltare le unità che colpisce. È abbastanza robusto da penetrare le linee antiaeree di moderata capacità e di scappare per ripararsi. Ma non usarlo in maniera incauta: è molto costoso!"
+	},
+	"tacnuke" : {
+		"name" : "Eos",
+		"description" : "Missile nucleare tattico",
+		"helptext" : "Un'arma precisa e a lungo raggio. Il raggio dell'esplosione di Eos, seppur piccolo, è decisamente letale."
+	},
+	"chickenwurm" : {
+		"name" : "Wurm",
+		"description" : "Lanciafiamme scavante (assalto)",
+		"helptext" : "Il Wurm \"scava\" sotto la superficie del terreno, uscendo per scagliare una palla di fuoco contro il nemico e che colpisce un'ampia fascia di terreno. Può scalare le montagne e sorprendere le tue torrette difensive. Di contro resiste poco agli assalti."
+	},
+	"dronefighter" : {
+		"name" : "Spicula",
+		"description" : "Drone da combattimento",
+		"helptext" : "Lo Spicula è un drone da battaglia veloce e multiruolo. Il suo cannone a raggi di particelle è efficace contro bersagli di superficie e di aria."
+	},
+	"bomberassault" : {
+		"name" : "Eclipse",
+		"description" : "Bombardiere d'assalto (Anti-strutture)",
+		"helptext" : "Le bombe dell'Eclipse può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Eclipse, a causa delle grandi dimensioni, sono un bersaglio facile!"
+	},
+	"cloakassault" : {
+		"name" : "Knight",
+		"description" : "Robot d'assalto a fulmini",
+		"helptext" : "I gruppi di Knight, lenti me costanti, possono eludere il fuoco nemico mentre si dirigono verso le fortificazioni avversarie. Così possono schierare i loro cannoni a fulmine di corto raggio che danneggia e stordisce i nemici trincerati. Affronta queste unità con tutto ciò che hai di affidabile e spera di non rimanere paralizzato dai loro raggi (nel qual caso considerati quasi morto)."
+	},
+	"energysolar" : {
+		"name" : "Collettore Solare",
+		"description" : "Stazione Energetica",
+		"helptext" : "I collettori solari sono le strutture energetiche meno efficienti. Di contro sono affidabili e robusti. Quando vengono attaccati, i pannelli si chiudono in una forma corazzata per 8 secondi, il che riduce i danni in arrivo a un terzo  offrendo un'eccellente protezione contro gli avversari."
+	},
+	"gunshipheavyskirm" : {
+		"name" : "Nimbus",
+		"description" : "Gunship di supporto",
+		"helptext" : "Il Nimbus è una cannoniera di supporto che vola fuori dalla portata della maggior parte delle unità di terra. È abbastanza resistente da sopravvivere a un limitato fuoco antiaereo. I suoi colpi gemellari distruggono le unità abbastanza stupide da non scappare alla vista di un Nimbus."
+	},
+	"factoryshield" : {
+		"name" : "Fabbrica di Shieldbot",
+		"description" : "Produce robot resistenti o con scudo",
+		"helptext" : "La fabbrica di Shieldbot è robusta ma flessibile. Le sue unità sono costruite per sopportare e per respingere i danni senza compromettere la mobilità. L'uso intelligente di unità combinate è sempre ben ricompensato. Unità chiave: Bandit, Thug, Outlaw, Rogue, Racketeer"
+	},
+	"platecloak" : {
+		"name" : "Piattaforma Cloakbot",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plateshield" : {
+		"name" : "Piattaforma Shieldbot",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"platespider" : {
+		"name" : "Piattaforma Spider",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"platejump" : {
+		"name" : "Piattaforma Jumpbot",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plateveh" : {
+		"name" : "Piattaforma Rover",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"platetank" : {
+		"name" : "Piattaforma Tank",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"platehover" : {
+		"name" : "Piattaforma Hovercraft",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plateamph" : {
+		"name" : "Piattaforma Amphbot",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plateship" : {
+		"name" : "Piattaforma Ship",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plateplane" : {
+		"name" : "Piattaforma Plane",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"plategunship" : {
+		"name" : "Piattaforma Gunship",
+		"description" : "Unità di produzione parallela",
+		"helptext" : "Le piattaforme di costruzione aumentano la capacità di produzione delle fabbriche vicine agendo con una lista di costruzione indipendente. Queste piattaforme sono il modo più economico per aumentare la produzione globale, evitando di costruire inefficienti ma versatili Caretaker. Attenzione: la piattaforma non funzionerà se mancherà la corrispondente fabbrica vicina.\n "
+	},
+	"chickena" : {
+		"name" : "Cockatrice",
+		"description" : "Unità d'assalto / anti-unità pesanti",
+		"helptext" : "La Cockatrice è davvero una bestia. Apparentemente insensibile al fuoco nemico, si avvicina casualmente al suo bersaglio e lo smembra con le sue mascelle incredibilmente potenti. Fortunatamente non è né veloce né particolarmente intelligente e può essere facilmente distrutta con schermagliatori o piccole unità.\n "
+	},
+	"hoverskirm" : {
+		"name" : "Scalpel",
+		"description" : "Hovercraft schermagliatore / anti-unità pesanti",
+		"helptext" : "Usa lo Scalpel per attacchi mordi-e-fuggi. Ha un lungo tempo di ricarica e pochi punti vita. Dovrebbe essere sempre tenuto a distanza dal nemico. I suoi proiettili indiretti contentono sparare oltre gli ostacoli e oltre le unità amiche."
+	},
+	"jumpbomb" : {
+		"name" : "Skuttle",
+		"description" : "Bomba saltante occultata anti-unità pesanti",
+		"helptext" : "Questa lenta e dispendiosa unità può occultarsi, saltare sui nemici ed esplodere mandando l'avversario all'infermo. Contrastala con gruppi di unitò economiche e dotate di abilità di ricognizione. Tieni conto della sua piccola area di esplosione quando la impieghi sul campo."
+	},
+	"jumpskirm" : {
+		"name" : "Moderator",
+		"description" : "Schermagliatore disgregatore",
+		"helptext" : "Il raggio disgregatore del Moderator riduce la velocità e la cadenza di fuoco del nemico fino al 50 %%, oltre a infliggere alcuni danni danni, rendendo questa unità efficace contro quasi tutti i bersagli.\n "
+	},
+	"chicken" : {
+		"name" : "Chicken",
+		"description" : "Sciami di unità",
+		"helptext" : "Questa unità di fanteria è aggressiva. Ciò che gli manca in forza individuale, viene compensato con il loro numero. Travolgono i nemici con sciami e sciami di unitò. Si consigliano buone unità di combattimento corpo a corpo per fermarle."
+	},
+	"chicken_sporeshooter" : {
+		"name" : "Sporeshooter",
+		"description" : "Artiglieria multi terreno (anti-aria / schermagliatore)",
+		"helptext" : "Lo Sporeshooter spara spore per far cadere aerei e per colpire bersagli terrestri a distanza. Può arrampicarsi sui muri e produrre attacchi a sorpresa."
+	},
+	"turretaafar" : {
+		"name" : "Chainsaw",
+		"description" : "Batteria missilistica anti-aereo a lungo raggio",
+		"helptext" : "La Chainsaw è una torretta antiaerea a lungo raggio, che infligge ingenti danni e in grado di far cadere i bombardieri molto rapidamente. Tuttavia non resiste molto ai danni ricevuti\n "
+	},
+	"staticnuke" : {
+		"name" : "Trinity",
+		"description" : "Laciatore nucleare tattico. Utilizza 18 unità di metallo al secondo. Produce in 3 minuti",
+		"helptext" : " Il Trinity lancia devastanti missili nucleari che possono cancellare intere basi amiche o nemiche. Tuttavia, i missili sono facilmente fermati dai sistemi anti-nucleari nemici che devono essere rimossi in anticipo dall'area che si vuole colpire."
+	},
+	"hovershotgun" : {
+		"name" : "Punisher",
+		"description" : "Hovercraf multicolpo",
+		"helptext" : "Il Punisher ha un cannone che spara una rosa di proiettili. Ottimo contro grandi bersagli o gruppi stretti di nemici."
+	},
+	"spiderantiheavy" : {
+		"name" : "Widow",
+		"description" : "Ricognitore occultabile anti-unità pesanti",
+		"helptext" : "Il Widow è utile in più modi. In primo luogo è un eccellente ricognitore molto difficile da rilevare. Può penetrare in profondità nelle linee nemiche. Ha anche la capacità di sparare un dardo paralizzante che congelerà qualsiasi bersaglio. E' ottimo contro nemici pesanti e le infrastrutture nemiche."
+	},
+	"energywind" : {
+		"name" : "Generatore eolico / da maree",
+		"description" : "Stazione Energetica",
+		"helptext" : "Questi generatori producono una quantità variabile di energia a seconda dell'altitudine e della velocità del vento. Sono estremamente fragili e, se troppo raggruppati, l'esplosione di uno genera l'esplosione di molti altri. Quando vengono posizionati in acqua diventano generatori di energia dalle maree, più robusti e costanti rispetto a quelli eolici."
+	},
+	"amphassault" : {
+		"name" : "Grizzly",
+		"description" : "Robot anfibio d'assalto pesante",
+		"helptext" : "Il Grizzly è una classica unità d'assalto: relativamente lenta, goffa e quasi inarrestabile, è dotata di un raggio laser ad alta potenza con portata e danno elevati. E' inefficace contro sciami di nemici e velivoli veloci. Quando in acqua, il Grizzly deve arrestarsi e galleggiare in superficie per poter sparare."
+	},
+	"shieldaa" : {
+		"name" : "Vandal",
+		"description" : "Robot anti-aereo",
+		"helptext" : "Il Vandal è un robot anti-aereo dedicato, economico, resistente ed affidabile. Bello, se non fosse che risulta indifeso contro le unità di terra."
+	},
+	"hoverriot" : {
+		"name" : "Mace",
+		"description" : "Hovercraft da battaglia",
+		"helptext" : "Il Mace è una torre laser mobile. La sua elevata potenza di fuoco è utile per uccidere le unità nemiche leggere. È preciso ed è buono contro le cannoniere e le unità veloci. Tuttavia la sua armatura sottile lo rende vulnerabile se preso di mira direttamente specialmente dagli schermagliatori."
+	},
+	"veharty" : {
+		"name" : "Badger",
+		"description" : "Artiglieria lanciamine",
+		"helptext" : "Il Badger lancia mine (piuttosto a casaccio) che, nonostante siano abbastanza efficaci, hanno una durata limitata. Supera comodamente la maggior parte delle difese, è leggermente corazzato ma non può fuggire facilmente, dal nemico. Proteggilo con le tue unità e con le sue mine."
+	},
+	"striderantiheavy" : {
+		"name" : "Ultimatum",
+		"description" : "Robot anti-unità pesanti con capacità di occultamento (e fuoco sottomarino)",
+		"helptext" : "L'Ultimatum racchiude è dotato di una pistola disintegratrice che può vaporizzare un carro pesante in un colpo solo. È meglio utilizzarlo per avvicinarsi di nascosto alle unità molto pensanti, distruggendo queste ultime in pochi colpi. Puoi difenderti contro gli Ultimatum schierando una difesa di mezzi mezzi molto pensanti mista a unità più leggere."
+	},
+	"staticmex" : {
+		"name" : "Estrattore di Metallo",
+		"description" : "Produce Metallo",
+		"helptext" : "L'estrattore di metallo è il sistema principale per ottenere il metallo. Gli estrattori di metallo utilizzeranno l'energia che hai in eccesso per estrarre più metallo. Questa funzione automatica si chiama Overdrive."
+	},
+	"vehsupport" : {
+		"name" : "Fencer",
+		"description" : "Veicolo lanciamissili (deve fermarsi per poter sparare)",
+		"helptext" : "Tieni il Fencer alla massima distanza dall'avversario per colpirlo. I missili del Fencer sono guidati e, quindi, sono ideali per distruggere i veicoli e le mine in movimento. È in grado di colpire gli aerei, ma è davvero utile solo contro i caccia poco protetti. Non può sparare sugli ostacoli e funziona male se i nemici, in particolare le unità d'assalto, riescono ad avvicinarsi. A differenza degli altri schermagliatori, il Fencer non può sparare mentre si muove."
+	},
+	"grebe" : {
+		"name" : "Grebe",
+		"description" : "Robot anfibio",
+		"helptext" : "Il Grebe è un'unità di base armata di granate, un'arma anti-unità pesanti a corto raggio. Nonostante sia anfibio, non può sparare mentre è sommerso."
+	},
+	"hoverarty" : {
+		"name" : "Lance",
+		"description" : "Hovercraft di artiglieria pesante",
+		"helptext" : "L'arma del Lance, soprannominata \"il bel laser blu della morte\", ha la potenza e la precisione per trafiggere la maggior parte delle unità con un solo colpo. Usalo contro unità ad alta corazza, ma tienilo dietro le linee del fronte: ha un'armatura leggera e non può scappare dal pericolo."
+	},
+	"shieldbomb" : {
+		"name" : "Snitch",
+		"description" : "Bomba strisciante (tane)",
+		"helptext" : "Questa unità suicida da rapido movimento è molto efficace contro le unità nemiche ammassate, in particolar modo i carrarmati d'assalto. È dotata di un dispositivo di occultamento che si attiva automaticamente quando l'unità è ferma, trasformandola di fatto in una mina. E' meglio non ammassare gli Snitch in quanto l'esposione di uno genera anche quella degli altri. Contrattacca questa unità con Pickets o con veicoli lanciamissili. Oppure con unità economiche che, avvicinandosi, riescono ad innescare la sua esplosione."
+	},
+	"cloakjammer" : {
+		"name" : "Iris",
+		"description" : "Robot da occultamento / Jammer",
+		"helptext" : "L'Iris ha un dispositivo di disturbo per nascondere i ritorni radar delle tue unità. Ha anche un piccolo mantello per nascondere le unità amiche vicine alla vista del nemico."
+	},
+	"spidercon" : {
+		"name" : "Weaver",
+		"description" : "Spider da costruzione",
+		"helptext" : "Il Weaver è un costuttore che può scalare ogni ostacolo e può costruire strutture e difese sugli altipiani. E' equipaggiato di un radar a corto raggio."
+	},
+	"hoverdepthcharge" : {
+		"name" : "Claymore",
+		"description" : "Hovercraft da battaglia (anti-sub)",
+		"helptext" : "Il Claymore, di istinto suicida, è armato con un pesante lanciatore di carica di profondità. Non si fa scrupoli a scaricare le cariche a terra."
+	},
+	"gunshipkrow" : {
+		"name" : "Krow",
+		"description" : "Fortezza volante",
+		"helptext" : "Il Krow può sembrare costoso e pesante, ma la sua incredibile armatura gli consente di volare contro tutte le difese antiaeree, tranne le più spesse, e ingaggiare i nemici con i suoi tre cannoni laser. Può scatenare un diluvio di bombe per devastare qualsiasi cosa sotto di essa.\n "
+	},
+	"neebcomm" : {
+		"name" : "Neeb Comm",
+		"description" : "Brutta bestia",
+		"helptext" : "Questa grassa creatura ti viene portata come ricompensa per i tuoi misfatti. Comportati meglio la prossima volta!"
+	},
+	"factoryplane" : {
+		"name" : "Fabbrica di Plane",
+		"description" : "Produce aerei",
+		"helptext" : "La fabbrica di aerei offre una varietà di velivoli ad ala fissa per soddisfare ogni tua esigenza. Scegli tra caccia multiruolo che possono fungere anche da attaccanti leggeri o intercettori specializzati, e tra bombardieri di precisione per abbattere obiettivi specifici e tra i bombardieri a saturazione per distruggere ammassi di unità. La fabbrica viene anche fornita di una piattaforma di riarmo di serie.\n "
+	},
+	"gunshipbomb" : {
+		"name" : "Blastwing",
+		"description" : "Bomba volante / esploratore (tane)",
+		"helptext" : "Il Blastwing fa pochi di danni ed è adatto per eliminare estrattori di metallo, pannelli solari, torrette leggere, parchi eolici e torrette da costruzione. Se utilizzato in massa potrebbe essere utile anche contro obiettivi più impegnativi. Fai attenzione alla velocità e alla direzione in cui sta viaggiando poiché gran parte del danno causato deriva dalle sue schegge che continueranno sulla traiettoria della bomba dopo la sua esplosione. In questo modo puoi danneggiare un nemico con le schegge anche se il tuo Blastwing dovesse essere distrutto poco prima. Non lasciarli troppo vicini gli uni con gli altri perchè l'esplosione di uno potrebbe provocare l'esplosione di altri. Hanno capacità di occultamento quando sono a terra."
+	},
+	"napalmmissile" : {
+		"name" : "Inferno",
+		"description" : "Missile al napalm",
+		"helptext" : "L'Inferno è un missile con un'ampia area di impatto. Il suo danno diretto è modesto, ma la sua nuvola di fuoco dura a lungo.\n "
+	},
+	"factoryamph" : {
+		"name" : "Fabbrica di Amphbot",
+		"description" : "Produce robot anfibi",
+		"helptext" : "L'impianto costruisce robot anfibi lenti e robusti, fornendo un approccio alternativo alla guerra terrestre/marittima. Le unità anfibie, in genere, si rigenerano mentre sono sommerse."
+	},
+	"factoryship" : {
+		"name" : "Fabbrica di Ship",
+		"description" : "Produce unità navali",
+		"helptext" : "Il cantiere navale è il luogo in cui vengono costruite navi e sottomarini. Altre unità capaci di affrontare i mari, come hovercraft e robot anfibi, hanno fabbriche dedicate."
+	},
+	"vehassault" : {
+		"name" : "Ravager",
+		"description" : "Rover d'assalto",
+		"helptext" : "Costoso e potente, il Ravager è in grado di resistere alla maggior parte dei nemici. Sebbene la sua manovrabilità sia pessima, raggiunge buone velocità massime sui rettilinei. Per questo motivo, è quasi immune dagli attacchi delle piccole unità mentre è in corsa. Quando combatti con i Ravager, dovresti cercare di evitare curve improvvise in modo tale ma mantenere la velocità massima. Potresti, al contrario, girare intorno al tuo bersaglio con un largo raggio che ti consenta, comunque, di colpire l'avversario. Rimane comunque vulnerabile alle bombe striscianti."
+	},
+	"raveparty" : {
+		"name" : "Disco Rave Party",
+		"description" : "Lanciatore distruttivo colorato - deve essere connesso alla rete e dotato di almeno 400 unità di energia",
+		"helptext" : "Il Disco Rave Party lancia sei diversi colpi festaioli e colorati al tuo nemico. Una sorpresa diversa ad ogni colpo! Divertimento per tutta la famiglia!"
+	},
+	"turretlaser" : {
+		"name" : "Lotus",
+		"description" : "LLT - Torretta Laser Leggera",
+		"helptext" : "Il Lotus è una torretta di base. Un'arma anti-terra versatile e solida, si comporta bene contro gli esploratori oltre ad essere in grado di affrontare uno o due combattenti. Viene distrutta relativamente facilmente dagli schermagliatori, dall'artiglieria o dalle unità d'assalto a meno che non siano protette."
+	},
+	"cloakskirm" : {
+		"name" : "Ronin",
+		"description" : "Robot Schermagliatore (fuoco diretto)",
+		"helptext" : "I razzi non guidati, a bassa velocità e a basso danno del Ronin vengono ricompensati dalla loro portata. Queste unitò sono più efficaci se poste in una formazione lineare. Contrastali attaccandoli con unità veloci che possono avvicinarsi rapidamente e schivare i loro missili."
+	},
+	"tankcon" : {
+		"name" : "Welder",
+		"description" : "Carro costruttore armato",
+		"helptext" : "Armato di una picccola torretta, il Welder può difendersi dai attacchi di nemici leggeri."
+	},
+	"shieldarty" : {
+		"name" : "Racketeer",
+		"description" : "Artiglieria da disarmo",
+		"helptext" : "Il Racketeer è un lanciamissili a lungo raggio che riesce a disarmare le unità o le difese nemiche. È necessario un solo racket per mantenere un bersaglio disarmato. Quindi ti conviene scegliere un bersaglio diverso per ogni lanciamissili. È eccellente per esaurire l'energia degli scudi nemici e per rendere innocue le grandi unità."
+	},
+	"roost" : {
+		"name" : "Roost",
+		"description" : "Genera Chicken",
+		"helptext" : "Sono i posatoi in cui vengono deposte le uova dei Chicken. Che poi si schiudono!"
+	},
+	"dynsupport1" : {
+		"name" : "Comandante Engineer",
+		"description" : "Comandante di supporto",
+		"helptext" : "Il telaio di questo comandante utilizza un set di armi non più ortodosso. Anche se privo di armatura e con bassa velocità, questo telaio è comunque preferito in quanto offre un buon bonus sulla capacità costruttiva dell'unità.\n "
+	},
+	"cloakraid" : {
+		"name" : "Glaive",
+		"description" : "Robot predatore leggero",
+		"helptext" : "Leggero ed economico, il Glaive non provoca grandi danni agli schermagliatori, all'artiglieria e alle strutture nemiche. Dovrebbe comunque superare, per astuzia, alcune unità di combattimento e alcune le difese. I Glaive danneggiati si rigenerano quando non stanno combattendo."
+	},
+	"gunshipaa" : {
+		"name" : "Trident",
+		"description" : "Gunship Anti-Aereo",
+		"helptext" : "Il Trident è un lento gunship che abbatte gli aerei nemici con i propri missili. È molto più lento degli altri gunship, quindi è facile abbatterlo con le unità di terra.\n "
+	},
+	"hoverminer" : {
+		"name" : "Dampener",
+		"description" : "Hovercraft minatore",
+		"helptext" : "Il Dampener deposita le mine a poca distanza da sé."
+	},
+	"gunshiptrans" : {
+		"name" : "Charon",
+		"description" : "Aereo da trasporto",
+		"helptext" : "Il Charon è l'aereo da trasporto di base. È l'ideale per trasportare le unità al fronte o per fare un balzo dietro le linee nemiche, ma non dovrebbe essere usato per sbarcare in aree protette dall'antiaerea nemica.\n "
+	},
+	"striderdetriment" : {
+		"name" : "Detriment",
+		"description" : "Robot d'assalto di ultima generazione (fuoco sottomarino)",
+		"helptext" : "Il Detriment è lo Strider più pesante sul campo. Può difendersi dagli attacchi aerei con i suoi razzi o usarli per colpire bersagli lontani, ma la vera potenza dell'unità risiede negli enormi cannoni gauss progettati per un solo scopo: uccidere le altre unità pesanti in modo rapido ed efficiente. Ricorda: il saggio comandante invia il suo Detriment con il supporto adeguato per far fronte alla controffensiva aerea e a quella di numerose unità leggere.\n "
+	},
+	"energygeo" : {
+		"name" : "Generatore Geotermico",
+		"description" : "Centrale Energetica di media capacità",
+		"helptext" : "Gli impianti geotermici sono efficientissime fonti di energia che possono essere costruite solo sui pennacchi geotermici. Esplodono abbastanza violentemente quando vengono distrutti. Evita di costruire nelle immediate vicinanze."
+	},
+	"jumpcon" : {
+		"name" : "Constable",
+		"description" : "Costruttore Jumpjet",
+		"helptext" : "Veloce e capace di saltare su brevi distanze o in altezza, il Constable è il costruttore ideale per una rapida espansione. Armato con un raggio leggero rallentante, può anche fornire supporto al combattimento.\n "
+	},
+	"chicken_blimpy" : {
+		"name" : "Blimpy",
+		"description" : "Bombardiere a Dodo",
+		"helptext" : "Il Blimpy lancia un Dodo come bomba su ignari bersagli."
+	},
+	"droneheavyslow" : {
+		"name" : "Viper",
+		"description" : "Drone avanzato da battaglia",
+		"helptext" : "Il Viper è un drone da battaglia avanzato simile al Firefly ma dotato di un raggio distruttore ad impulsi che rallenta maggiormente i suoi bersagli."
+	},
+	"athena" : {
+		"name" : "Athena",
+		"description" : "Aereo costruttore specializzato",
+		"helptext" : "L'Athena è l'apice della capacità di attacco invisibile. Dotato di un dispositivo di occultamento e di un disturbatore radar, può penetrare attraverso le linee nemiche per dispiegare squadre di unità ed infliggere scompiglio nella logistica nemica. L'Athena può anche resuscitare relitti sul campo di battaglia, aggiungendo nuove unità al tuo esercito.\n "
+	},
+	"staticsonar" : {
+		"name" : "Stazione sonar",
+		"description" : "Localizza unità marine",
+		"helptext" : "Il Sonar Station fornisce uno dei pochi mezzi per localizzare i bersagli subacquei."
+	},
+	"spideremp" : {
+		"name" : "Venom",
+		"description" : "Spider paralizzatore",
+		"helptext" : "Il Venom è un'unità multiterreno progettata per paralizzare i nemici affinché possano essere distrutti da altre unità. Si muove velocemente per la sua categoria e, oltre alla paralisi, infligge una piccola quantità di danni. Funziona bene in tandem con il Recluse per impedire ai nemici di avvicinarsi al fragile schermagliatore."
+	},
+	"jumpassault" : {
+		"name" : "Jack",
+		"description" : "Jumper d'assalto per corpo a corpo",
+		"helptext" : "Il Jack è un'unità d'assalto per il corpo a corpo dotata di jumpjet. Alcuni Jack possono facilmente danneggiare la maggior parte delle linee di fortificazione nemiche. La sua portata ridotta e la velocità molto bassa lo rendono molto vulnerabile agli schermagliatori."
+	},
+	"vehscout" : {
+		"name" : "Dart",
+		"description" : "Rover distruttore da ricognizione",
+		"helptext" : "Economico e veloce, il Dart è letale nei primi minuti di gioco perchè coglie il tuo avversario alla sprovvista. Usa torri missilistiche, laser leggeri o qualsiasi unità rapida per fermarli."
+	},
+	"factoryhover" : {
+		"name" : "Fabbrica di Hovercraft",
+		"description" : "Produce Hovercraft",
+		"helptext" : "Gli Hovercraft sono veloce e letale, offrendo la possibilità di attraversare il mare e le pianure e superare, così, il nemico. Unità chiave: Dagger, Halberd, Scalpel, Mace, Lance"
+	},
+	"gunshipassault" : {
+		"name" : "Revenant",
+		"description" : "Gunship d'assalto pesante",
+		"helptext" : "Il Revenant spara una raffica di razzi non guidati. Ha molta vita ma è costoso ed impreciso specialmente contro bersagli in movimento. È meglio per affrontare gruppi di strutture di base, unità a movimento lento o stazionarie. Il Revenant dovrebbe sfuggire alle raffiche  nemiche per ridurre al minimo i danni subiti."
+	},
+	"tankriot" : {
+		"name" : "Ogre",
+		"description" : "Carro pesante di supporto",
+		"helptext" : "Straordinariamente mobile per un'unità di questo tipo, l'Ogre racchiude due missili a frammentazione ed ad alta velocità che sono devastanti sia contro le unità leggere sia contro gli aerei, sebbene questi missili abbiano una portata limitata. L'Ogre non ha la portata e la velocità per reggere il confronto con la maggior parte degli schermagliatori. Il missile è abbastanza efficace nell'appiattire il terreno, quindi è particolarmente utile per abbattere muri che altre unità non possono raggiungere.\n "
+	},
+	"staticantinuke" : {
+		"name" : "Antinuke",
+		"description" : "Intercettore strategico di testate nucleari",
+		"helptext" : "L'Antinuke intercetta automaticamente le testate nucleari nemiche. Offre un ampio raggio di copertura."
+	},
+	"staticheavyarty" : {
+		"name" : "Big Bertha",
+		"description" : "Strategic Plasma Cannon - Power by connecting to a 50 energy grid",
+		"helptext" : "Il Bertha è un enorme cannone che spara plasmoidi ad alta energia su quasi tutta la mappa. Usato in modo appropriato può distruggere efficacemente le operazioni nemiche e rendere sicura la tua base. Tuttavia non aspettarti che vinca battaglie da solo per te."
+	},
+	"cloaksnipe" : {
+		"name" : "Phantom",
+		"description" : "Artiglieria anti-unità pesanti con capacità di occultamento",
+		"helptext" : "Il fucile a energia del Phantom infligge gravi danni a un singolo bersaglio. Può sparare mentre è occultato; tuttavia la sua traccia visibile tradisce la sua posizione. Richiede un bel po' di energia per mantenersi occultato specialmente quando è in movimento. Il modo migliore per localizzare un Phantom nemico è saturare l'area con molte unità economiche."
+	},
+	"staticarty" : {
+		"name" : "Cerberus",
+		"description" : "Artiglieria al Plasma - Richiede una griglia energetica (50)",
+		"helptext" : "Il Cerberus offre capacità di artiglieria/controartiglieria a lungo raggio, il che lo rende eccellente per liberare il terreno. Non è progettata come torretta di difesa e verrà distrutta se attaccata direttamente."
+	},
+	"wolverine_mine" : {
+		"name" : "Claw",
+		"description" : "Mina",
+		"helptext" : "Questa mina non esplode, ma rilascia una raffica di piccole bombe contro i nemici che vi passano vicino. Si disattiva dopo un minuto."
+	},
+	"staticradar" : {
+		"name" : "Torre Radar",
+		"description" : "Sistema di allerta precoce",
+		"helptext" : "La torre radar fornisce quasi gratuitamente un allarme tempestivo della presenza delle unità nemiche e dei loro movimenti su una distanza moderata. Ha un costo energetico costante e molto basso e si spegne automaticamente in assenza di energia. Le torri radar possono trasformarsi in Sparrow, aerei da ricognizione leggeri, per migliorare la loro capacità di raccogliere informazioni. La copertura radar è bloccata da terreni che ne fanno da ostacoli, come le montagne."
+	},
+	"turretriot" : {
+		"name" : "Stardust",
+		"description" : "Torretta anti-gruppi di unità",
+		"helptext" : "Lo Stardust sfoggia un potente cannone automatico. Ha una portata ridotta ed è più vulnerabile agli schermagliatori rispetto alle torrette laser leggere. In compenso la sua alta cadenza di fuoco e l'area di esplosione dei suoi colpi consentono di fermare i gruppi di unità leggere."
+	},
+	"spideranarchid" : {
+		"name" : "Anarchid",
+		"description" : "Spider con fuoco elettromagnetico",
+		"helptext" : "L'Anarchid è simile allo Starlight, solo che è uno Spider."
+	},
+	"vehraid" : {
+		"name" : "Scorcher",
+		"description" : "Rover da rapido da combattimento",
+		"helptext" : "Capace di subire ed infliggere danni, lo Scorcher è un'unità versatile e molto utile anche per qualcosa di più rispetto ai semplici raid, nonostante paghi in termidi di manovrabilità e di costi. Riesce a resistere al combattimento, ma non può competere con unità o con difese anti-gruppi o da battaglia. Il raggio di calore dello Scorcher infligge più danni se bersaglio è vicino."
+	},
+	"striderfunnelweb" : {
+		"name" : "Funnelweb",
+		"description" : "Strider di supporto con scudo",
+		"helptext" : "Il lento e multi-terreno Funnelweb è dotato di uno scudo estremamente potente ed ad ampia area di copertura. Ha un'elevata capacità costruttiva. Per il resto è disarmato."
+	},
+	"cloakriot" : {
+		"name" : "Reaver",
+		"description" : "Robot di rivolta",
+		"helptext" : "La devastante mitragliatrice ad energia pesante del Reaver è efficace contro la maggior parte delle unità nemiche, in particolar modo contro le unità piccole e veloci. Va in difficoltà contro la difesa statica, quindi non usarlo come unità d'assalto. Contrasta questa unità rimanendo fuori dalla sua portata sfruttando la sua lentezza a tuo favore. I Reavers rigenerano rapidamente la salute mancante quando non combattono."
+	},
+	"chickenspire" : {
+		"name" : "Chicken Spire",
+		"description" : "Artiglieria statica",
+		"helptext" : "Artiglieria statica a lungo raggio."
+	},
+	"turretemp" : {
+		"name" : "Faraday",
+		"description" : "Torretta elettromagnetica",
+		"helptext" : "Il Faraday è una potente torretta EMP. Provoca un alto danno e una buona area d'effetto. Amplifica notevolmente l'effetto di altre torri, ma, da sola, è praticamente inutile. Quando chiusa il danno ricevuto è ridotto a un terzo. Fai attenzione ai suoi raggi, poiché possono paralizzare anche le tue unità se sono troppo vicine al nemico."
+	},
+	"factoryspider" : {
+		"name" : "Fabbrica Spiders",
+		"description" : "Produce Spiders",
+		"helptext" : "Ottimizzata per terreni accidentati, le unità Spiders si basano principalmente sulla portata e sulla manovrabilità rispetto alla propria forza bruta. Unità chiave: Flea, Recluse, Hermit, Crab"
+	},
+	"chicken_dragon" : {
+		"name" : "White Dragon",
+		"description" : "Primo Chicken d'assalto",
+		"helptext" : "I White Dragons, guardiani anziani delle tane dei Chicken, sono esseri mostruosi e secondi solo alla regina stessa. Con potenti zampe, mascelle letali, sostanze corrosiva e una moltitudine di spore, sono davvero una minaccia da temere."
+	},
+	"chickens" : {
+		"name" : "Spiker",
+		"description" : "Schermagliatore",
+		"helptext" : "I proiettili affilati come rasoi dello Spiker possono perforare anche l'armatura più spessa. Sebbene non abbia molta salute, rimane una potente minaccia sia per le unità aeree che per quelle di terra. Contrastalo con tutto ciò che può farlo soccombere in modo affidabile."
+	},
+	"striderdante" : {
+		"name" : "Dante",
+		"description" : "Strider d'assalto",
+		"helptext" : "Il Dante è un'unità da combattimento pesante specializzata nell'avvicinarsi e nel fondere il suo bersaglio. Il suo lanciafiamme e i suoi doppi raggi di calore non sono straordinari, ma i suoi razzi incendiari possono essere lanciati in gruppi di venti e devastano un'ampia fascia di terreno."
+	},
+	"dynassault1" : {
+		"name" : "Comandante Guardian",
+		"description" : "Comandante pesante da combattimento",
+		"helptext" : "Il Guardian è dotato di una buona armatura e di una buona capacità di fuoco, a discapito di velocità e di equipaggiamento di supporto."
+	},
+	"chickenbroodqueen" : {
+		"name" : "Chichen Brood Queen",
+		"description" : "Si prende cura delle tane",
+		"helptext" : "Questa regina che depone le uova non è così temibile in combattimento come l'altra regina, ma a lungo termine può rappresentare una minaccia ancora più grande. Produce tutte le diverse unità di Chicken."
+	},
+	"cloakaa" : {
+		"name" : "Gremlin",
+		"description" : "Robot anti-aereo con capacità di occultamento",
+		"helptext" : "Veloce e abbastanza robusto per il suo prezzo, il Gremlin è un buon antiaereo mobile. Può occultarsi permettendogli di fornire una protezione antiaerea che il nemico non si aspetta o per sfuggire alle forze di terra contro cui è indifeso."
+	},
+	"vehheavyarty" : {
+		"name" : "Impaler",
+		"description" : "Rover di artigliera di precisione",
+		"helptext" : "L'Impaler spara verticalmente un missile cinetico, ad alto danno, ad alta precisione e a lungo raggio. Il suo missile può superare qualsiasi ostacolo. Tuttavia, il tempo di volo del missile è così alto che è praticamente inutile contro i bersagli in movimento. Usa questa unità contro le strutture!"
+	},
+	"zenith" : {
+		"name" : "Zenith",
+		"description" : "Cotrollore di meteore - deve essere connesso alla rete e dotato di 400 unità di energia",
+		"helptext" : "Lo Zenith controlla meteoriti dal cielo (fino a 300) che può inviare ovunque per distruggere edifici e unità o per fornire una piccola fonte recuperabile di metallo."
+	},
+	"vehaa" : {
+		"name" : "Crasher",
+		"description" : "Rover veloce anti-aereo",
+		"helptext" : "Il Crasher è la risposta rapida ai bombardieri nemici. Funziona bene anche contro i gunship."
+	},
+	"spiderskirm" : {
+		"name" : "Recluse",
+		"description" : "Spider schermagliatore (fuoco indiretto)",
+		"helptext" : "Un'unità di lancio di missili adatta a tutti i terreni. Scala i muri con questo ragno camminatore e cogli di sorpresa il tuo nemico! I razzi non guidati hanno una gittata abbastanza lunga a non sono efficienti per colpire un bersaglio che si muove rapidamente."
+	},
+	"fakeunit_los" : {
+		"name" : "LOS - linea di vista",
+		"description" : "Sa tutto e vede tutto",
+		"helptext" : "Kilrogg ne sarebbe orgoglioso!"
+	},
+	"tele_beacon" : {
+		"name" : "Lamp",
+		"description" : "Varco di entrata del teletrasporto, clicca con il tasto destro per attivare il teletrasporto",
+		"helptext" : "Questo è il varco di ingresso del Djinn. Fari clic con il pulsante destro del mouse per teletrasportare le unità al corrispondente Djinn."
+	},
+	"dynstrike1" : {
+		"name" : "Comandante Strike",
+		"description" : "Comandante d'assalto mobile",
+		"helptext" : "Il comandante Strike è una piattaforma di comando ben bilanciata che può montare la maggior parte dei moduli, con velocità, armatura e rigenerazione decenti."
+	},
+	"empmissile" : {
+		"name" : "Shockley",
+		"description" : "Missile elettromagnetico",
+		"helptext" : "Il Shockley provoca la disabilitazione fino a 45 secondo delle unità nella piccola area che colpisce."
+	},
+	"striderhub" : {
+		"name" : "Fabbrica di Strider",
+		"description" : "Constructs Striders - Power by connecting to a 50 energy grid",
+		"helptext" : "La Fabbrica di Strider Hub schiera gli strider, ovvero unità giganteschi o particolari che ispirano timore e paura agli avversari. A differenza di una normale fabbrica, l'hub serve solo per iniziare un progetto, non per finirlo."
+	},
+	"amphcon" : {
+		"name" : "Conch",
+		"description" : "Costruttore anfibio, corazzato quanto a riposo",
+		"helptext" : "Il Conch è un robusto costruttore che può perare sia in alto mare che sulla terraferma."
+	},
+	"spiderriot" : {
+		"name" : "Redback",
+		"description" : "Spider da rivolta",
+		"helptext" : "Uno spider dotato ti fuoco rapido che eccelle nell'eliminare le unità veloci."
+	},
+	"spiderassault" : {
+		"name" : "Hermit",
+		"description" : "Robot d'assalto multi-terreno",
+		"helptext" : "L'Hermit  può sopportare un danni incredibili ed è utile da sacrificare come scudo per i Recluse, più deboli ma più dannosi."
+	},
+	"turretantiheavy" : {
+		"name" : "Lucifer",
+		"description" : "Raggio Tachionico - deve essere connesso alla rete e dotato di 50 unità di energia",
+		"helptext" : "All'interno della sua corazza si trova il devastante Acceleratore Tachionico. Questa temibile arma è in grado di infliggere danni precisi a distanze estreme a condizione che tu la mantenga collegata a una fonte di alimentazione. Ricorda che il Lucifer è strettamente un'arma di supporto; lascialo incustodito e sarà distrutto dagli avversari veloci e numerosi. Quando viene attaccato dall'artiglieria a lungo raggio o dai bombardieri, il cannone principale può ritrarsi per ridurre a un terzo i danni in arrivo."
+	},
+	"jumparty" : {
+		"name" : "Firewalker",
+		"description" : "Robot d'artiglieria a saturazione",
+		"helptext" : "I mortai a medio raggio del Firewalker colpiscono una piccola area, negando l'uso di quel terreno per brevi periodi di tempo. Il robot è molto goffo e lento da manovrare."
+	},
+	"spideraa" : {
+		"name" : "Tarantula",
+		"description" : "Strider anti-aereo",
+		"helptext" : "Un'unità multi-terreno che, con le sue capacità antiaeree a medio raggio, supporta le altre unità contro i nemici volanti."
+	},
+	"chicken_pigeon" : {
+		"name" : "Pigeon",
+		"description" : "Ricognitore aereo",
+		"helptext" : "Un piccolo ricognitore volante armato di piccole spore."
+	},
+	"cloakheavyraid" : {
+		"name" : "Scythe",
+		"description" : "Robot da battaglia con capacità di occultamento",
+		"helptext" : "Lo Scythe non è particolarmente dura in un combattimento, ma il suo dispositivo di occultamento gli consente di oltrepassare le difese nemiche per danneggiare l'economia del nemico. I Scythe danneggiati possono rigenerarsi rapidamente quando non combattono."
+	},
+	"jumpblackhole" : {
+		"name" : "Placeholder",
+		"description" : "Lanciatori di buchi neri",
+		"helptext" : "Il Placeholder è un'unità di supporto. I suoi proiettili creano un vuoto che risucchia le unità vicine, raggruppandole e tenendole in posizione. Così potrai finirle con le altre tue unità."
+	},
+	"vehcon" : {
+		"name" : "Mason",
+		"description" : "Rover costruttore",
+		"helptext" : "Altamente mobile e in grado di resistere ai danni, il Mason ti permetterà di espanderti su una vasta area."
+	},
+	"amphtele" : {
+		"name" : "Djinn",
+		"description" : "Sistema di teletrasporto anfibio",
+		"helptext" : "Il Djinn eccelle nello spostare grandi eserciti di terra soprattutto attraverso gli specchi d'acqua. Una volta schierato, teletrasporta le unità utilizzando il varco di ingresso che dovrai aver pre-posizionato.  Il teletrasporto è a senso unico, quindi assicurati che la destinazione sia sicura.\n "
+	},
+	"shipcon" : {
+		"name" : "Mariner",
+		"description" : "Nave da costruzione",
+		"helptext" : "Sebbene costosa, questa nave da costruzione vanta una capacità di edificazione estremamente elevata, combinata ad un'armatura resistente e una buona velocità di movimento.\n "
+	},
+	"shipscout" : {
+		"name" : "Cutter",
+		"description" : "Nave Scout (disarmatore)",
+		"helptext" : "Economica, veloce e fragile, questa nave da carico è un buon esploratore per individuare navi nemiche pesanti. I loro missili disarmanti sono efficaci contro grandi bersagli."
+	},
+	"shiptorpraider" : {
+		"name" : "Hunter",
+		"description" : "Nave torpediniera (anti-sub)",
+		"helptext" : "L'Hunter è un'unità mobile e anti-sottomarino. È efficace contro unità subacquee e contro grandi navi."
+	},
+	"shipskirm" : {
+		"name" : "Mistral",
+		"description" : "Nave schermagliatrice",
+		"helptext" : "Questa navr spara gruppi di quattro razzi a medio raggio, utili per bombardare bersagli marittimi e costieri. Fai attenzione ai sottomarini e a qualsiasi cosa con una velocità sufficiente per avvicinarsi."
+	},
+	"subraider" : {
+		"name" : "Seawolf",
+		"description" : "Sottomarino da battaglia (anti-sub, fuoco sottomarino)",
+		"helptext" : "Furtivo, veloce e fragile, questo sottomarino può colpire rapidamente i bersagli non protetti. Il tipo di danno inferto gli consente di uccidere efficacemente le unità solitarie. Fai attenzione a qualsiasi cosa con armi anti-sottomarino, in particolare le torpediniere e le cacciatorpediniere."
+	},
+	"subtacmissile" : {
+		"name" : "Scylla",
+		"description" : "Lanciatore sub nucleare tattico. Utilizza 20 unità di metallo al secondo. Produce in 30 secondi",
+		"helptext" : "Questo lanciatore sottomarino tattico fornisce un'arma d'attacco di precisione sotto forma di missili nucleari. Non ha difesa contro gli attacchi diretti e dovrebbe evitare il contatto con il nemico."
+	},
+	"shipriot" : {
+		"name" : "Corsair",
+		"description" : "Corvetta da battaglia",
+		"helptext" : "Questa corvetta è dotata di due piccoli cannoni efficaci contro tutto ciò che si avvicina. Non ha armi efficaci contro i bersagli subacquei."
+	},
+	"shipassault" : {
+		"name" : "Siren",
+		"description" : "Cacciatorpediniere (anti-sub)",
+		"helptext" : "Questo cacciatorpediniere è una nave da combattimento multiuso che combina un potente cannone sonico a un missile a lancio verticale a medio raggio e a una robusta armatura. Usa il cannone contro gli avversari più piccoli sopra o sotto l'acqua. Usa il missile contro i bersagli statici."
+	},
+	"shiparty" : {
+		"name" : "Envoy",
+		"description" : "Incrociatore di artiglieria",
+		"helptext" : "Questo incrociatore è dotato di un potente cannone di artiglieria a lungo raggio utile per bombardare postazioni fisse e bersagli costieri. Fai attenzione agli aerei, ai sottomarini e alle navi da guerra."
+	},
+	"shipaa" : {
+		"name" : "Zephyr",
+		"description" : "Fregata anti-aereo",
+		"helptext" : "Con le sue potenti batterie laser antiaeree gemelle, questa fregata protegge la tua flotta dagli attacchi provenienti dal cielo. Come sempre, però, è inutile contro i bersagli che non sono in volo.\n "
+	},
+	"shipheavyarty" : {
+		"name" : "Shogun",
+		"description" : "Nave da guerra (artiglieria pesante)",
+		"helptext" : "Una singola carica dei suoi colpi sottometterà quasi tutti i bersagli di superficie. Gli effetti psicologici del lampo di volata e della nave che indietreggia nell'acqua durante il colpo sono abbastanza impressionanti. Per non parlare degli effetti di un colpo diretto! Attenzione: le corazzate non sono pensate per essere utilizzate da sole, non lasciarle prive di protezione antiaerea e anti-sottomarina.\n "
+	},
+	"factorygunship" : {
+		"name" : "Fabbrica di Gunship",
+		"description" : "Produce Gunship",
+		"helptext" : "La fabbrica di Gunship è progettata per fornire supporto aereo ravvicinato. Include una selezione di mezzi di trasporto per il trasporto di unità di terra e cannoniere da combattimento che possono svolgere una varietà di ruoli offensivi o difensivi."
+	},
+	"turretheavy" : {
+		"name" : "Desolator",
+		"description" : "Fortezza di difesa a medio raggio - deve essere connesso alla rete e dotato di 50 unità di energia",
+		"helptext" : "Armato con un pesante cannone al plasma e con un raggio di calore, il Desolator costituisce un punto di difesa focale contro gli assalti dei nemici. Può corazzarsi per sopravvivere all'attacco di artiglieria a lungo raggio o agli attacchi aerei. In questo modo riduce i danni subiti a un terzo. Però, se corazzato, non può sparare."
+	},
+	"turretimpulse" : {
+		"name" : "Newton",
+		"description" : "Torretta gravitazionale",
+		"helptext" : "Il Newton è armato con un proiettore di gravitoni sperimentale. Quest'arma non fa praticamente alcun danno diretto, ma può spingere le unità verso o lontano dal Newton. Puoi usarlo anche sulle tue unità, ma fai attenzione al fuoco amico."
+	},
+	"assaultcruiser" : {
+		"name" : "Vanquisher",
+		"description" : "Incrociatore pesante (assalto)",
+		"helptext" : "L'incrociatore Vanquisher vanta un'eccellente armatura e una potenza di fuoco ravvicinato letale. I suoi cannoni gauss penetrano nei bersagli in superficie come nel burro, mentre i suoi missili lo supportano contro i nemici sopra e sotto la superficie dell'acqua. Il suo corto raggio e la mancanza di potenza di fuoco antiaerea lo rendono vulnerabile agli attacchi degli aerei e a quelli dell'artiglieria.\n "
+	},
+	"shieldfelon" : {
+		"name" : "Felon",
+		"description" : "Robot schermagliatore con scudo",
+		"helptext" : "Il Felon trae energia dal suo scudo per aumentare i suoi precisi colpi. Collegalo ad altri scudi per aumentarne la cadenza di fuoco."
+	},
+	"seismic" : {
+		"name" : "Quake",
+		"description" : "Missile sismico",
+		"helptext" : "Il Quake crea una potente onda d'urto sismica che leviga un'ampia area di terreno, causando al contempo danni minimi alle unità."
+	},
+	"striderscorpion" : {
+		"name" : "Scorpion",
+		"description" : "Strider di penetrazione con capacità di occultamento",
+		"helptext" : "Lo Scorpion paralizza i nemici con il suo raggio e poi li distrugge con i suoi artigli a fascio di particelle. Il suo robusto carapace respinge la maggior parte del fuoco nemico. Si può occultare e risultare trasparente all'occhio del nemico."
+	},
+	"vehcapture" : {
+		"name" : "Dominatrix",
+		"description" : "Rover da cattura",
+		"helptext" : "Il Dominatrix cattura i nemici mettendoli contro i loro ex alleati. Più Dominatrix possono catturare più velocemente un singolo bersaglio ma solo un Dominatrix ne diventa l'effettivo controllore. Dopo aver preso il controllo di un'unità,  il Dominatrix non può sparare per 12 secondi. Se un Dominatrix viene distrutto, tutte le unità che controlla tornano sotto il controllo del tuo nemico."
+	},
+	"factorytank" : {
+		"name" : "Fabbrica di Tank",
+		"description" : "Produce veicoli cingolati pesanti",
+		"helptext" : "La fabbrica di carri armati offre la massima espressione della forza bruta: niente riesce a svolgere al meglio alcuni compiti come uno sparramento di artiglierira sostenuto da una spinta d'assalto decisiva. Unità chiave: Emissary, Minotaur, Ogre, Cyclops"
+	},
+	"striderbantha" : {
+		"name" : "Paladin",
+		"description" : "Strider di supporto a distanza",
+		"helptext" : "Il Paladin è una soluzione pesante per una linea di difesa particolarmente efficace, con un proiettore tachionico e missili elettromagnetici per obiettivi a distanza e cannoni fulminei per combattimenti generici: E' dotata anche di una buona dose di armatura. Attenzione però: è indifeso contro chi attacca dal cielo. Da solo non riesce ad essere usato efficacemente!"
+	},
+	"shipcarrier" : {
+		"name" : "Reef",
+		"description" : "Portaerei (bombardieri). Produce utilizzando 5 unità di metallo al secondo",
+		"helptext" : "E' La nave più versatile per l'alto mare. Questa unità svolge diverse funzioni. È dotato di un lanciamissili a disarmo a fuoco manuale per disabilitare, a distanza, le grandi navi nemiche. Funge, inoltre, da piattaforma di riparazione mobile per aerei amici. Infine fornisce droni di attacco per i tuoi combattimenti."
+	},
+	"turretaaflak" : {
+		"name" : "Thresher",
+		"description" : "Cannone Flak anti-aereo",
+		"helptext" : " Il Thresher è un cannone anti-aereo con una buona area di impatto e un'elevata capacità di provocare danni, che gli consente di ridurre rapidamente a pezzi i velivoli nemici."
+	},
+	"factoryjump" : {
+		"name" : "Fabbrica di Jumpbot",
+		"description" : "Produce robot dotati di Jumpjet",
+		"helptext" : "I Jumpbot offrono opzioni tattiche uniche per ridurre rapidamente la distanza in un combattimento ravvicinato o per superare colline e fiumi o per farsi strada attraverso le linee nemiche. Unità chiave: Pyro, Moderator, Jack, Firewalker, Jugglenaut"
+	},
+	"jumpsumo" : {
+		"name" : "Jugglenaut",
+		"description" : "Jumpbot pesante da battaglia",
+		"helptext" : "L'imponente armatura del Jugglenaut lo rende una macchina di morte quasi inarrestabile. Calpesta le unità nemiche per spezzare la loro formazione e può lanciare i sopravvissuti con i suoi raggi gravitazionali. Può danneggiare le strutture solo calpestandole."
+	},
+	"jumpscout" : {
+		"name" : "Puppy",
+		"description" : "Missile suicida",
+		"helptext" : "Questa unità suicida è rapida ed è ottima per razziare e colpire i bersagli leggermente corazzati. Quando si trova accanto ai detriti, estrae automaticamente il metallo da essi per replicarsi. Che stile!"
+	},
+	"turretaalaser" : {
+		"name" : "Razor",
+		"description" : "Anti-aereo laser corazzato",
+		"helptext" : " Il Razor è una robusta torretta antiaerea. I tanti punti vita e il bonus di resistenza 3x quando è chiuso rendono molto difficile, per il nemico, disfarsi di questa difesa."
+	},
+	"hovercon" : {
+		"name" : "Quill",
+		"description" : "Hovercraft costruttore",
+		"helptext" : "Il Quill consente un'espansione regolare sia sulla terraferma sia sul mare.\n "
+	},
+	"jumpaa" : {
+		"name" : "Toad",
+		"description" : "Jumper pesante anti-aereo",
+		"helptext" : "Il Toad racchiude due laser e un cannone automatico per distruggere rapidamente gli aerei nemici. Può anche saltare per accedere rapidamente a un'altura o per scappare."
+	},
+	"tankheavyraid" : {
+		"name" : "Blitz",
+		"description" : "Carro leggero d'assalto",
+		"helptext" : "The Blitz is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Blitz can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base."
+	},
+	"staticheavyradar" : {
+		"name" : "Radar Avanzato",
+		"description" : "Radar di lungo raggio",
+		"helptext" : "Il radar avanzato ha una copertura molto più ampia rispetto alla versione di base."
+	},
+	"amphimpulse" : {
+		"name" : "Archer",
+		"description" : "Raider anfibio (anti-sub)",
+		"helptext" : "L'Archer usa un potente cannone sonico per colpire le unità sopra o sotto l'acqua. Non funziona quando è sottacqua, quindi gli Archer devono galleggiare per poter sparare."
+	},
+	"fakeunit" : {
+		"name" : "Segnale radar ingannevole",
+		"description" : "Creato tramite dispositivi per interferenze.",
+		"helptext" : "Unità fasulla destinata a scopi tecnici."
+	},
+	"shieldshield" : {
+		"name" : "Aspis",
+		"description" : "Robot scudo",
+		"helptext" : "L'Aspis protegge le unità circostanti con il suo scudo in grado di distruggere i proiettili nemici. Si collegherà automaticamente ad altre unità dotate di scudo per condividerne la carica. Lo scudo non ferma le unità ed intercetta solo i proiettili sul suo perimetro. Quindi i nemici possono entrare all'interno e sparare alle unità protette. Ricaricare e mantenere gli scudi costa energia."
+	},
+	"jumpraid" : {
+		"name" : "Pyro",
+		"description" : "Jumperbot da combattimento",
+		"helptext" : "Il Pyro è un'unità economica, veloce e dotata di un lanciafiamme. Il lanciafiamme infligge danni maggiori alle unità di grandi dimensioni e può colpire più bersagli contemporaneamente. Quando viene distrutto il Pyro dà fuoco alle unità circostanti. Inoltre, i Pyro sono dotati anche di jetpack, che consentono loro di saltare oltre gli ostacoli o di cadere addosso ai nemici."
+	},
+	"tankheavyarty" : {
+		"name" : "Tremor",
+		"description" : "Carro d'artiglieria a saturazione",
+		"helptext" : "Il principio alla base del Tremor è semplice: inonda un'area con un numero sufficiente di colpi. Prima o poi colpirai qualcosa! Lento, goffo, vulnerabile ed estremamente spaventoso, il Tremore funziona meglio contro aree densamente popolate, dove è più probabile che i suoi colpi colpiscano qualcosa. Riesce a polverizzare gli scudi in pochi secondi. I suoi colpi levigano il terreno."
+	},
+	"tankraid" : {
+		"name" : "Kodachi",
+		"description" : "Carro raider",
+		"helptext" : "Il piccolo e agile telaio del Kodachi ha abbastanza armatura e velocità per avvicinarsi abbastanza all'obiettivo e sparare le bombe al napalm che incendieranno il terreno per qualche istante. Essendo l'unità più leggera prodotta dalla fabbrica, può assumere anche i ruoli di scouting e di screening. I Kodachi danneggiati si rigenerano se posti a riposo."
+	},
+	"cloakcon" : {
+		"name" : "Conjurer",
+		"description" : "Costruttore con abilità di occultamento",
+		"helptext" : "Il Conjurer racchiude un jammer a corto raggio e un dispositivo di occultamento in modo tale da essere utile per un'espansione furtiva delle tue strutture e per la manutenzione della base. Può anche abilitare un campo di occultamento a corto raggio che, a differenza delle citate abilità, necessita di energia per essere mantenuto."
+	},
+	"turretsunlance" : {
+		"name" : "Sunlance",
+		"description" : "Cannone Anti-Carro - Richiede 25 Energia",
+		"helptext" : "Il potente raggio disgregatore del Sunlance paralizza anche l'unità d'assalto più pesante. Fermerà qualsiasi assalto corazzato che si pone sul suo cammino!"
+	},
+	"shieldassault" : {
+		"name" : "Thug",
+		"description" : "Robot d'assalto con scudo",
+		"helptext" : "Nonostante debole, il Thug è per proteggere i Outlaws e i Rogues. Più Thug insieme riescono a collegare i loro scudi e a dare ottima assistenza. Può essere comunque distrutto da armi a ampio impatto o ad alta precisione."
+	},
+	"amphriot" : {
+		"name" : "Scallop",
+		"description" : "Robot anfibio da combattimento (fuoco sottomarino)",
+		"helptext" : "Tipica unità antisommossa, lo Scallop è armato con esplosivi ad impatto per uso subacqueo e con un quadrifucile per quando opera a terra."
+	},
+	"planecon" : {
+		"name" : "Crane",
+		"description" : "Aereo costruttore",
+		"helptext" : "Il Crane vola rapidamente su qualsiasi terreno. Però è fragile e qualsiasi contraerea potrebbe abbatterlo. Sebbene abbia una capacità costruttiva più bassa rispetto ad altri costruttori, è in grado di costruire in molti luoghi difficili da raggiungere e, in questo modo, contribuisce ad espandere il tuo territorio in modo non lineare. Grazie alla sua mobilità, è ideale per il recupero di relitti e per altri compiti ripetitivi."
+	},
+	"gunshipraid" : {
+		"name" : "Locust",
+		"description" : "Gunship raider",
+		"helptext" : "Il Locust è un gunshipa leggero. La sua alta velocità e la decente capacità di provocare danni lo rendono eccellente per eliminare rapidamente le strutture economiche nemiche o le unità imprecise ostili. Tuttavia, vola vicino al suolo e ha un breve raggio di fuoco, il che significa che può essere parimenti ingaggiato anche da altri raider. Il Locusta dovrebbe evitare unità da battaglia e difese statiche."
+	},
+	"shieldraid" : {
+		"name" : "Bandit",
+		"description" : "Raier medio",
+		"helptext" : "Il Bandit è un po' più pesante e importante del Glaive, ma non è ancora qualcosa che puoi scagliare tranquillamente contro forze trincerate. Piuttosto utilizzalo contro le torrette leggere e le unità antisommossa."
+	},
+	"amphraid" : {
+		"name" : "Duck",
+		"description" : "Raider anfibio (anti-sub, fuoco sottomarino)",
+		"helptext" : "Il Duck è il raider subacqueo di base. Armato di siluri a corto raggio, usa la sua (relativamente) alta velocità per ingaggiare i bersagli marini che non possono rispondere. Ma viene distrutto da unità più serie. A terra può lanciare i siluri a breve distanza come un'arma anti-unità pesanti a corto raggio.\n "
+	},
+	"planefighter" : {
+		"name" : "Swift",
+		"description" : "Caccia multiruolo",
+		"helptext" : "Lo Swift può colpire sia bersagli di terra sia di aria. È efficace contro le unità aeree con i suoi missili guidati e con i suoi laser, ma viene distrutto facilmente dai caccia nemici. In gruppo può distruggere le unità di terra e risulta adatto per effettuare incursioni. Sono dotati di jet postcombustori che possono essere utilizzati per dare allo Swift un'enorme accelerazione, consentendo loro di eseguire combattimenti incredibili e manovre evasive."
+	},
+	"dronecarry" : {
+		"name" : "Gull",
+		"description" : "Drone",
+		"helptext" : "Il Gull è un piccolo drone, aggressivo ed armato con una mitragliatrice a energia."
+	},
+	"turretheavylaser" : {
+		"name" : "Stinger",
+		"description" : "Torretta Laser ad alta energia",
+		"helptext" : "Lo Stinger è una torretta laser media. I suoi tre cannoni laser rotanti possono uccidere quasi tutte le piccole unità, ma la bassa cadenza di fuoco la rende vulnerabile ai gruppi nemici."
+	},
+	"hoversonic" : {
+		"name" : "Morningstar",
+		"description" : "Hovercraft antisub",
+		"helptext" : "Il Morningstar è armato con un cannone a impulsi sonici che riesce a colpire sia bersagli sotto l'acqua sia bersagli sopra l'acqua."
+	},
+	"chicken_tiamat" : {
+		"name" : "Tiamat",
+		"description" : "Unità pesante da assalto",
+		"helptext" : "E' il Chicken d'assalto definitivo. E' una mostruosità sputafuoco, dalla mascella di ferro e che vomita spore. Non conosce né paura né pietà. Ha uno scudo mucoso per proteggere se stesso e i chicken circostanti."
+	},
+	"bomberstrike" : {
+		"name" : "Kestrel",
+		"description" : "Bombardiere d'attacco tattico",
+		"helptext" : "Il Kestrel lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
+	},
+	"staticrearm" : {
+		"name" : "Airpad",
+		"description" : "Ripara e fornisce di armi gli aerei, ripara utilizzando 2.5 unità di energia al secondo per postazione",
+		"helptext" : "Ripara fino a quattro aerei contemporaneamente. Inoltre rifornisce i veicoli di carburante e i bombardieri di nuove bombe."
+	},
+	"dynrecon1" : {
+		"name" : "Comandante Recon",
+		"description" : "Comandante ad alta mobilità",
+		"helptext" : "Il Comandante Recon fa perno attorno alla mobilità e alla sua astuzia. Questa unità leggermente corazzata può montare molte armi e moduli speciali ed è pre-equipaggiata con jumpjet per saltare."
+	},
+	"gunshipemp" : {
+		"name" : "Gnat",
+		"description" : "Drone anti-unità pesanti a colpi elettromagnetici",
+		"helptext" : "Lo Gnat può essere usato per paralizzare le unità nemiche. È un'eccellente unità difensiva e, se combinata con i Locust o con altre unità, può fermare il nemico per darti il ​​tempo di distruggerlo. Come arma offensiva può paralizzare anche aree fortemente protette, ma viene distrutto facilmente dai Pickets.\n "
+	},
+	"bomberriot" : {
+		"name" : "Phoenix",
+		"description" : "Bombardiere napalm a saturazione",
+		"helptext" : "Le bombe al napalm del Phoenix decimano grandi gruppi di unità e strutture leggere."
+	},
+	"striderarty" : {
+		"name" : "Merlin",
+		"description" : "Strider di artiglieria a saturazione",
+		"helptext" : "Il Merlin è lanciarazzi multiplo. Può lanciare una raffica di razzi che garantisce la distruzione di quasi tutto all'interno dell'area bersaglio. Svolto il tuo compito può ritirarsi rapidamente dietro le linee amiche."
+	},
+	"gunshipheavytrans" : {
+		"name" : "Hercules",
+		"description" : "Gunship pesante e armato da trasporto",
+		"helptext" : "L'Hercules può trasportare qualsiasi unità mobile non volante all'interno della mappa, comprese le navi (tranne le unità Reef e Shogun). I suoi doppi cannoni laser e il sistema di espulsione automatizzata del carico lo rendono ideale per i trasporti nelle zone calde."
+	},
+	"planescout" : {
+		"name" : "Owl",
+		"description" : "Disturbatore aereo, aereo radar/sonar",
+		"helptext" : "L'Owl è un mezzo impareggiabile per l'esplorazione profonda e può localizzare i bersagli sottomarini con il proprio sonar. È inoltre dotato di disturbatore di segnali radar in modo tale da impedire, all'avversario, il rilevamento delle unità presenti nell'area sottostante."
+	},
+	"planelightscout" : {
+		"name" : "Sparrow",
+		"description" : "Ricognitore leggero",
+		"helptext" : "Lo Sparrow è un ricognitore leggero che può essere costruito convertendo una torre radar. E' l'unico aereo disponibile senza dover avere una fabbrica di aerei. Così diviene un'opzione di esplorazione accessibile e preziosa per coloro che non hanno accesso agli aerei. Di contro, nel proprio ruolo, è generalmente surclassata dal più veloce Swift e dal più grande Owl.\n "
+	},
+	"amphfloater" : {
+		"name" : "Buoy",
+		"description" : "Robot pesante anfibio schermagliatore",
+		"helptext" : "Il Buoy aggira la sua incapacità di sparare mentre è sommersa galleggiando sulla superficie del mare. Qui può sparare con un cannone a distanza decente e con danni da rallentamento. Non è in grado di muoversi mentre fluttua tra le onde."
+	},
+	"amphsupport" : {
+		"name" : "Bulkhead",
+		"description" : "Anfibio per fuoco di supporto (deve fermarsi per sparare)",
+		"helptext" : "Il Bulkhead ha un doppio cannone al plasma pesantemente corazzato e bilanciato su un paio di gambe robotizzate ed economiche. Sebbene ciò gli dia un'impressionante combinazione tra punti vita e capacità di fuoco, non è in grado di mirare o sparare senza prima doversi fermare per prepararsi. Questo inconveniente è meno evidente in acqua, dove può galleggiare per sparare e poi affondare per riposizionarsi."
+	},
+	"dynknight1" : {
+		"name" : "Comandante",
+		"description" : "Comandante d'assalto mobile",
+		"helptext" : "Il telaio del Comandante Knight è una piattaforma di comando ben bilanciata che può montare la maggior parte dei moduli, con velocità, armatura e rigenerazione decenti."
+	}
+}

@@ -1,0 +1,117 @@
+{
+	"pw_artefact" : {
+		"name" : "Antico manufatto",
+		"description" : "Reliquia misteriosa",
+		"helptext" : "Questo misterioso dispositivo alieno ospita poteri inimmaginabili. Anche se rimane poco compreso dai nostri scienziati, potrebbe essere potenzialmente sfruttato come una super arma per dominare la galassia."
+	},
+	"pw_bomberfac" : {
+		"name" : "Fabbrica di Bomber",
+		"description" : "Produce bombardieri",
+		"helptext" : "Produce bombardieri spaziali per assaltare i pianeti ostili. Durante le invasioni planetarie produce bombardieri regolari.\n "
+	},
+	"pw_dropfac" : {
+		"name" : "Fabbrida di Dropship",
+		"description" : "Produce navi da sbarco",
+		"helptext" : "Produce navicelle spaziali per l'invasione di pianeti ostili. Durante le invasioni planetarie, produce regolari aerei da trasporto."
+	},
+	"pw_estorage" : {
+		"name" : "Deposito di Energia",
+		"description" : "Immagazzina energia",
+		"helptext" : "Un grande banco di condensatori."
+	},
+	"pw_estorage2" : {
+		"name" : "Deposito doppio di Energia",
+		"description" : "Immagazzina energia",
+		"helptext" : "Un grande banco doppio di condensatori."
+	},
+	"pw_garrison" : {
+		"name" : "Guarnigione da campo",
+		"description" : "Riduce l'incremento di influenza",
+		"helptext" : "Questa struttura mantiene un esercito che riduce l'influenza nemica ottenuta dalle battaglie."
+	},
+	"pw_gaspowerstation" : {
+		"name" : "Centrale a gas",
+		"description" : "Produve energia",
+		"helptext" : "Una centrale di energia alimentata a gas."
+	},
+	"pw_grid" : {
+		"name" : "Griglia di difesa planetaria",
+		"description" : "Si difende da tutto",
+		"helptext" : "Questa struttura intercetta i bombardieri in arrivo e riduce gli incrementi di influenza."
+	},
+	"pw_guerilla" : {
+		"name" : "Jumpgate di guerra",
+		"description" : "Diffonde l'influenza a distanza",
+		"helptext" : "Un varco capace di inviare l'influenza su qualunque pianeta."
+	},
+	"pw_hq_attacker" : {
+		"name" : "Comandante d'attacco",
+		"description" : "Quartier Generale PlanetWars (varia gli incrementi di influenza)",
+		"helptext" : "Questo edificio è parte integrante del controllo strategico del pianeta. Se gli attaccanti vincono con un Command Center distrutto ottengono solo il 50%% dell'influenza che avrebbero altrimenti guadagnato."
+	},
+	"pw_hq_defender" : {
+		"name" : "Comandante di difesa",
+		"description" : "Quartier Generale PlanetWars (varia gli incrementi di influenza)",
+		"helptext" : "Questo edificio è parte integrante del controllo strategico del pianeta. Se gli attaccanti perdono distruggendo il Command Center ottengono una piccola quantità di influenza, 20 %%di quanto avrebbero ottenuto in caso di vittoria."
+	},
+	"pw_inhibitor" : {
+		"name" : "Inibitore Wormhole",
+		"description" : "Blocca la diffusione di influenza",
+		"helptext" : "Inibisce l'influenza diffusa da pianeti nemici."
+	},
+	"pw_interception" : {
+		"name" : "Rete di intercettazione",
+		"description" : "Intercetta i bombardieri planetari",
+		"helptext" : "Questa struttura intercetta i bombardieri in arrivo."
+	},
+	"pw_mine" : {
+		"name" : "Generatore di Energia",
+		"description" : "Produce 50 energia/turno",
+		"helptext" : "Un piccolo ed efficiente generatore di energia"
+	},
+	"pw_mine2" : {
+		"name" : "Sistema solare orbitante",
+		"description" : "Produce 100 energia/turno",
+		"helptext" : "Un generatore di energia più grande e con una maggiore potenza."
+	},
+	"pw_mine3" : {
+		"name" : "Impianto geotermico planetario",
+		"description" : "Produce 250 energia/turno",
+		"helptext" : "Questo enorme complesso trae energia direttamente dal mantello del pianeta. La sua distruzione provoca un'esplosione nucleare."
+	},
+	"pw_mstorage2" : {
+		"name" : "Deposito di Metallo",
+		"description" : "Immaganizza metallo",
+		"helptext" : "Immagazzina grandi quantità di metallo per gli usi planetari."
+	},
+	"pw_warpgate" : {
+		"name" : "Varco di curvatura",
+		"description" : "Produce nuclei a curvatura",
+		"helptext" : "Questa struttura produce sistemi a curvatura che possono inviare le navi attraverso la galassia in un batter d'occhio.\n "
+	},
+	"pw_warpjammer" : {
+		"name" : "Jammer per curvatura",
+		"description" : "Previene gli attacchi tramite i viaggi a curvatura",
+		"helptext" : "Questo Jammer protegge il pianeta con un campo magnetico che impedisce alle navi dotate di trasporto a curcavura di sbarcare."
+	},
+	"pw_wormhole" : {
+		"name" : "Wormhole Generator",
+		"description" : "Collega questo pianeta con i pianeti vicini",
+		"helptext" : "Consente alle navi di lasciare questo pianeta e di andare verso i suoi vicini collegati. Diffonde l'influenza verso i piante collegati."
+	},
+	"pw_wormhole2" : {
+		"name" : "Wormhole potenziato",
+		"description" : "Collega questo pianeta con i pianeti vicini",
+		"helptext" : "Questa struttura mantiene un wormhole migliore e più stabile al fine di migliorare la diffusione dell'influenza sui pianeti vicini."
+	},
+	"generic_tech" : {
+		"name" : "Laboratorio Tecnologico",
+		"description" : "Sbocca le tecnologie",
+		"helptext" : "Questa struttura permette di accedere a delle specifiche tecnologie da applicare alla propria fazione."
+	},
+	"pw_techlab" : {
+		"name" : "Laboratorio Tecnologico",
+		"description" : "Contiene potente ed antica tecnologia" ,
+		"helptext" : "Questa struttura contiene alcune tecnologie potenti."
+	}
+}
