@@ -30,7 +30,7 @@
 --
 
 local options = {
--- do deployment and tactics even work?
+  -- do deployment and tactics even work?
   {
     key    = 'a_important',
     name   = 'Important',
