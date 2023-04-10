@@ -5,7 +5,8 @@ local langs = {
 	{ lang = 'it', flag = 'it', name = 'Italiano' },
 	{ lang = 'de', flag = 'de', name = 'Deutsch' },
 	{ lang = 'tr', flag = 'tr', name = 'Türkçe' },
-	{ lang = 'zh', flag = 'cn', name = '中文' },
+	{ lang = 'zh', flag = 'cn', name = '簡體中文' },
+	{ lang = 'zh_TW', flag = 'tw', name = '繁體中文' },
 }
 
 local flagByLang, langByFlag = {}, {}
