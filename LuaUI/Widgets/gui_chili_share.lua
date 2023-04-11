@@ -691,10 +691,11 @@ local function GiveResource(target,kind)
 		name = name .. "'s squad"
 	end
 	local num = 0
+	local currentResourceValue = Spring.GetTeamResources(select(1,Spring.GetMyTeamID(),kind))
 	if mod == "all" then
-		num = Spring.GetTeamResources(select(1,Spring.GetMyTeamID(),kind))
+		num = currentResourceValue
 	elseif mod ~= nil then
-		num = mod
+		num = math.min(mod, currentResourceValue)
 	else
 		return
 	end
