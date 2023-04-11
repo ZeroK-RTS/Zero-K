@@ -237,9 +237,9 @@ local function SetupShaderTable()
   }
 end
 
-
+local offset = (Spring.GetGameRulesParam("waterlevel") or 0)
 local function GetGroundHeight(x, z)
-	return spGetGroundHeight(x,z)
+	return spGetGroundHeight(x,z) - offset
 end
 
 local function IsIsland()

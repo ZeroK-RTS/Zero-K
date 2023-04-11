@@ -2123,6 +2123,7 @@ end
 --------------------------------------------------------------------------------
 
 function GG.Terraform_RaiseWater(raiseAmount)
+	Spring.SetGameRulesParam("waterlevel", (Spring.GetGameRulesParam("waterlevel") or 0) + raiseAmount)
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]

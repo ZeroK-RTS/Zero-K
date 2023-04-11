@@ -26,7 +26,6 @@ local function ColorToVecStr(color)
 end
 
 local function ProcessLavalConf(lavaDef)
-	Spring.Echo("lavaDef", lavaDef)
 	if not lavaDef then
 		return false
 	end
@@ -44,12 +43,15 @@ local function ProcessLavalConf(lavaDef)
 	lavaDef.level = lavaDef.level or 1 -- pre-game lava level
 	lavaDef.grow = lavaDef.grow or 0.25 -- initial lavaGrow speed
 	lavaDef.damage = lavaDef.damage or 100 -- damage per second
+	lavaDef.terraformRequired = (lavaDef.terraformRequired ~= false) and (lavaDef.level ~= 1) -- Terraform so that the water is at the desired water level.
+	local realLevel = (lavaDef.terraformRequired and 1) or lavaDef.level
 	
 	lavaDef.uVscale = lavaDef.uVscale or 3.0 -- How many times to tile the lava texture across the entire map
 	lavaDef.colorCorrection = lavaDef.colorCorrection or {1.0, 1.0, 1.0} -- final colorcorrection on all lava + shore coloring
 	lavaDef.planeLightMult = lavaDef.planeLightMult or 4 -- Multiplier for the brightness of the lava plane.
+	lavaDef.outsideMapInLos = lavaDef.outsideMapInLos or false
 	
-	lavaDef.lOSdarkness = lavaDef.lOSdarkness or 0.75 -- how much to darken the out-of-los areas of the lava plane
+	lavaDef.lOSdarkness = lavaDef.lOSdarkness or 0.5 -- how much to darken the out-of-los areas of the lava plane
 	lavaDef.swirlFreq = lavaDef.swirlFreq or 0.025 -- How fast the main lava texture swirls around default 0.025
 	lavaDef.swirlAmp = lavaDef.swirlAmp or 0.003 -- How much the main lava texture is swirled around default 0.003
 	lavaDef.specularExp = lavaDef.specularExp or 64.0 -- the specular exponent of the lava plane
@@ -72,7 +74,7 @@ local function ProcessLavalConf(lavaDef)
 	lavaDef.tideamplitude = lavaDef.tideamplitude or 2 -- how much lava should rise up-down on static level
 	lavaDef.tideperiod = lavaDef.tideperiod or 200 -- how much time between live rise up-down
 	
-	lavaDef.tideRhym = lavaDef.tideRhym or {{target = 0, speed = 0.3, period = 5*6000}} -- overlapping set of tide rythms. Each entry is a list {level = X, speed = Y, remainTime = Z}
+	lavaDef.tideRhym = lavaDef.tideRhym or {{target = realLevel - 1, speed = 0.3, period = 5*6000}} -- overlapping set of tide rythms. Each entry is a list {level = X, speed = Y, remainTime = Z}
 	
 	-- End config, start post-processing
 	if lavaDef.barCompat then
@@ -85,7 +87,11 @@ local function ProcessLavalConf(lavaDef)
 		lavaDef.coastColor = ColorToVecStr(lavaDef.coastColor)
 		lavaDef.fogColor = ColorToVecStr(lavaDef.fogColor)
 	end
+	
 	lavaDef.burstFrequency = 1 / lavaDef.burstPeriod
+	for i = 1, #lavaDef.tideRhym do
+		lavaDef.tideRhym[i].target = lavaDef.tideRhym[i].target or (realLevel - 1)
+	end
 	return lavaDef
 end
 
@@ -288,7 +294,16 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget(self)
 		return
 	end
-	lavaLevel = lavaDef.level
+	currentFrame = Spring.GetGameFrame()
+	if lavaDef.terraformRequired then
+		if not Spring.GetGameRulesParam("lavaRaisedWater") then
+			GG.Terraform_RaiseWater(lavaDef.level - 1)
+			Spring.SetGameRulesParam("lavaRaisedWater", lavaDef.level - 1)
+		end
+		lavaLevel = 1
+	else
+		lavaLevel = lavaDef.level
+	end
 	lavaGrow = lavaDef.grow
 	_G.frame = 0
 	_G.lavaLevel = lavaLevel
@@ -318,7 +333,7 @@ local allowDeferredMapRendering =  (Spring.GetConfigInt("AllowDeferredMapRenderi
 
 local tideamplitude = lavaDef.tideamplitude
 local tideperiod = lavaDef.tideperiod
-local lavatidelevel = lavaDef.level
+local lavatidelevel = (lavaDef.terraformRequired and 1) or lavaDef.level 
 
 local heatdistortx = 0
 local heatdistortz = 0
@@ -348,6 +363,7 @@ local unifiedShaderConfig = {
 	PARALLAXOFFSET = lavaDef.parallaxOffset, -- center of the parallax plane, from 0.0 (up) to 1.0 (down)
 	GLOBALROTATEFREQUENCY = 0.0001, -- how fast the whole lava plane shifts around
 	GLOBALROTATEAMPLIDUE = 0.05, -- how big the radius of the circle we rotate around is
+	OUTSIDE_MAP_LOS_STATE = (lavaDef.outsideMapInLos and 1 or 0),
 
 	-- for foglight:
 	FOGHEIGHTABOVELAVA = lavaDef.fogHeight, -- how much higher above the lava the fog light plane is
@@ -502,8 +518,8 @@ void main() {
 	// Sample LOS texture for LOS, and scale it into a sane range
 	vec2 losUV = clamp(worldPos.xz, vec2(0.0), mapSize.xy ) / mapSize.zw;
 	float losTexSample = dot(vec3(0.33), texture(infoTex, losUV).rgb) ; // lostex is PO2
+	if (inboundsness < 0.0) losTexSample = OUTSIDE_MAP_LOS_STATE;
 	losTexSample = clamp(losTexSample * 4.0 - 1.0, LOSDARKNESS, 1.0);
-	if (inboundsness < 0.0) losTexSample = 1.0;
 
 	// We shift the distortion texture camera-upwards according to the uniforms that got passed in
 	vec2 camshift =  vec2(heatdistortx, heatdistortz) * 0.001;
@@ -534,7 +550,7 @@ void main() {
 	float lightamount = clamp(dot(sunDir.xyz, fragNormal), 0.2, 1.0) * max(0.5, shadow);
 	fragColor.rgb *= lightamount * BRIGHTNESS;
 
-	fragColor.rgb += COASTCOLOR * coastfactor;
+	fragColor.rgb += COASTCOLOR * coastfactor * losTexSample;
 
 	// Specular Color
 	vec3 reflvect = reflect(normalize(-1.0 * sunDir.xyz), normalize(fragNormal));
