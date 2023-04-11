@@ -96,6 +96,7 @@ local resources = {
       corelaser= "gpl/corelaser.png",
       darksmoketrail= "darksmoketrail.tga",
       debris2= "other/debris2.tga",
+      debris= "other/debris.tga",
       diamondstar= "other/diamondstar.tga",
       dirt= "cc/dirt.png",
       dirtplosion2= "pd/dirtplosion2.tga",

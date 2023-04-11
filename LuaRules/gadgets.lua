@@ -1493,7 +1493,7 @@ end
 
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
-								   projectileID, attackerID, attackerDefID, attackerTeam)
+                                   projectileID, attackerID, attackerDefID, attackerTeam)
 
 	if UnitPreDamaged_first then
 		for _,g in r_ipairs(self.UnitPreDamagedList) do
