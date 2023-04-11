@@ -28,7 +28,7 @@ end
 local function ProcessLavalConf(lavaDef)
 	Spring.Echo("lavaDef", lavaDef)
 	if not lavaDef then
-		lavaDef = {}
+		return false
 	end
 	lavaDef.diffuseEmitTex = lavaDef.diffuseEmitTex or "LuaRules/Images/lava/lavaDiffuse.dds"
 	lavaDef.normalHeightTex = lavaDef.normalHeightTex or "LuaUI/images/lava/lavaNormal.dds"
