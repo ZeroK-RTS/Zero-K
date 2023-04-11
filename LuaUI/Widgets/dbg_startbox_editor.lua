@@ -19,17 +19,44 @@ copy it from infolog to the config
 dont forget to change TEAM to an actual number
 ]]
 
+local MAP_WIDTH, MAP_HEIGHT = Game.mapSizeX, Game.mapSizeZ
+local LEEWAY = 64
+
 local polygon = { }
 local final_polygons = { }
 
 function widget:MousePress(mx, my, button)
 	widgetHandler:UpdateCallIn("MapDrawCmd")
-
+	
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true, true))
 	if not pos then
 		return true
 	end
-
+	
+	if pos[1] < LEEWAY then
+		pos[1] = 0
+	end
+	if pos[3] < LEEWAY then
+		pos[3] = 0
+	end
+	if pos[1] > MAP_WIDTH - LEEWAY then
+		pos[1] = MAP_WIDTH
+	end
+	if pos[3] > MAP_HEIGHT - LEEWAY then
+		pos[3] = MAP_HEIGHT
+	end
+	
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	if ctrl and #polygon > 0 then
+		eastWest = math.abs(polygon[#polygon][1] - pos[1])
+		northSouth = math.abs(polygon[#polygon][3] - pos[3])
+		if eastWest > northSouth then
+			pos[3] = polygon[#polygon][3]
+		else
+			pos[1] = polygon[#polygon][1]
+		end
+	end
+	
 	if (#polygon == 0) then
 		polygon[#polygon+1] = pos
 	else

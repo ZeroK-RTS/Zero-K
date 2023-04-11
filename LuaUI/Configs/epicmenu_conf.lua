@@ -446,7 +446,8 @@ local pathToolbox = 'Settings/Toolbox'
   - Press N finish the current polygon.
   - Press U to undo the last placed vertex
   - Press S to print the current boxes to infolog.txt.
-  - Press D to delete the most recently placed box.]])
+  - Press D to delete the most recently placed box.
+  - Hold Ctrl to snap to cardinal directions.]])
 
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
