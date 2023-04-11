@@ -1,6 +1,9 @@
 local funcs = {}
 
 function funcs.RotateMirrorBoxes(layout)
+	layout[1].boxes = {{}}
+	layout[1].startpoints = {}
+	
 	for i = 1, #layout[0].boxes[1] do
 		layout[1].boxes[1][i] = {
 			Game.mapSizeX - layout[0].boxes[1][i][1],
