@@ -44,7 +44,7 @@ local modrules  = {
     unitMethod    = 0;    -- defaults to 1
 
     unitEnergyCostFactor    = 0;  -- defaults to 0
-    unitEfficiency          = 0.5;  -- defaults to 1
+    unitEfficiency          = 0.8;  -- defaults to 1
     featureEnergyCostFactor = 0;  -- defaults to 0
 
     allowEnemies  = false;  -- defaults to true
