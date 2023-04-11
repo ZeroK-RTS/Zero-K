@@ -438,7 +438,14 @@ local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
 
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
-  
+
+local pathToolbox = 'Settings/Toolbox'
+	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and writing their coordinates to infolog.txt.
+  - Left click to place a vertex.
+  - Right click to finish the polygon (start zones can have multiple polygons).
+  - Press S print the current boxes to infolog.txt.
+  - Press D to delete the most recently placed box.]])
+
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
