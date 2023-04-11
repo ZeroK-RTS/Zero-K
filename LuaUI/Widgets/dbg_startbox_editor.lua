@@ -20,12 +20,15 @@ dont forget to change TEAM to an actual number
 ]]
 
 local MAP_WIDTH, MAP_HEIGHT = Game.mapSizeX, Game.mapSizeZ
-local LEEWAY = 64
+local LEEWAY = 20
 
 local polygon = { }
 local final_polygons = { }
 
 function widget:MousePress(mx, my, button)
+	if (button ~= 1 and button ~= 3) then
+		return
+	end
 	widgetHandler:UpdateCallIn("MapDrawCmd")
 	
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true, true))
