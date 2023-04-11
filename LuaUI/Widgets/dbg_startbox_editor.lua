@@ -122,12 +122,12 @@ function widget:KeyPress(key)
 		final_polygons[#final_polygons] = nil
 		return true
 	end
-	if (key == KEYSYMS.N) and polygon and #polygon > 3  then
+	if (key == KEYSYMS.N) and polygon and #polygon >= 3 then
 		final_polygons[#final_polygons+1] = polygon
 		polygon = {}
 		return true
 	end
-	if (key == KEYSYMS.U) and polygon and #polygon > 1 then
+	if (key == KEYSYMS.U) and polygon and #polygon > 0 then
 		polygon[#polygon] = nil
 		return true
 	end

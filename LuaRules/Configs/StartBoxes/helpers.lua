@@ -26,7 +26,7 @@ function funcs.NorthSouthBoxes(extent)
 			nameLong = "North",
 			nameShort = "N",
 			startpoints = {
-				{Game.mapSizeX*0.5, Game.mapSizeZ*percent},
+				{Game.mapSizeX*0.5, Game.mapSizeZ*percent*0.5},
 			},
 			boxes = {
 				{
@@ -55,7 +55,7 @@ function funcs.EastWestBoxes(extent)
 			nameLong = "West",
 			nameShort = "W",
 			startpoints = {
-				{Game.mapSizeX*percent, Game.mapSizeZ*0.5},
+				{Game.mapSizeX*percent*0.5, Game.mapSizeZ*0.5},
 			},
 			boxes = {
 				{
