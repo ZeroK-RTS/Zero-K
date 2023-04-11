@@ -150,6 +150,12 @@ local function GetGroundHeight(x, z)
 end
 
 local function IsIsland()
+	if WG.GetIslandOverride then
+		local override, value = WG.GetIslandOverride()
+		if override then
+			return value
+		end
+	end
 	local sampleDist = 512
 	for i=1,mapSizeX,sampleDist do
 		-- top edge

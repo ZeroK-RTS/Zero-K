@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Sun and Atmosphere Handler.",
+		name      = "Sun and Atmosphere Handler",
 		desc      = "Overrides sun and atmosphere for maps with poor settings",
 		author    = "GoogleFrog",
 		date      = "June 8, 2016",
@@ -22,8 +22,13 @@ local waterpath = 'Settings/Graphics/Sun, Fog & Water/Water'
 
 local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
+local MAPSIDE_FILE = "mapconfig/extraMapSettings.lua"
+
 local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
 local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
+if not OVERRIDE_CONFIG then
+	OVERRIDE_CONFIG = VFS.FileExists(MAPSIDE_FILE) and VFS.Include(MAPSIDE_FILE) or false
+end
 
 local sunSettingsList = {}
 local sunSettingsGetSunMap = {}
@@ -149,11 +154,14 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		sun       = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog       = fogSettingsChanged       and GetOptionsTable(fogPath),
-		water     = waterSettingsChanged     and GetOptionsTable(waterpath),
+		sun         = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction   = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog         = fogSettingsChanged       and GetOptionsTable(fogPath),
+		water       = waterSettingsChanged     and GetOptionsTable(waterpath),
 	}
+	if OVERRIDE_CONFIG.forceIsland ~= nil then
+		writeTable.forceIsland = OVERRIDE_CONFIG.forceIsland
+	end
 	
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
@@ -453,6 +461,13 @@ options, options_order = GetOptions()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function WG.GetIslandOverride()
+	if OVERRIDE_CONFIG and OVERRIDE_CONFIG.forceIsland ~= nil then
+		return true, OVERRIDE_CONFIG.forceIsland
+	end
+	return false
+end
 
 function widget:Initialize()
 	-- See Mantis https://springrts.com/mantis/view.php?id=5280

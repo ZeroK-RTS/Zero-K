@@ -442,8 +442,10 @@ local pathGesture = 'Settings/Interface/Gesture Menu'
 local pathToolbox = 'Settings/Toolbox'
 	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and writing their coordinates to infolog.txt.
   - Left click to place a vertex.
-  - Right click to finish the polygon (start zones can have multiple polygons).
-  - Press S print the current boxes to infolog.txt.
+  - Right click to place a vertex then finish the polygon (start zones can have multiple polygons).
+  - Press N finish the current polygon.
+  - Press U to undo the last placed vertex
+  - Press S to print the current boxes to infolog.txt.
   - Press D to delete the most recently placed box.]])
 
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.

@@ -74,22 +74,32 @@ include("keysym.lua")
 
 function widget:KeyPress(key)
 	if (key == KEYSYMS.S) then
-		local str = "\n\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
+		local str = "\t\n\t\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
 		for j = 1, #final_polygons do
-			str = str .. "\t\t{\n"
+			str = str .. "\t\t\t{\n"
 			local polygon = final_polygons[j]
 			for i = 1, #polygon do
 				local pos = polygon[i]
-				str = str .. "\t\t\t{" .. math.floor(pos[1]) .. ", " .. math.floor(pos[3]) .. "},\n"
+				str = str .. "\t\t\t\t{" .. math.floor(pos[1]) .. ", " .. math.floor(pos[3]) .. "},\n"
 			end
-			str = str .. "\t\t},\n"
+			str = str .. "\t\t\t},\n"
 		end
-		str = str .. "\t},\n"
+		str = str .. "\t\t},\n"
 		Spring.Echo(str)
-		final_polygons = {}
+		return true
 	end
 	if (key == KEYSYMS.D) and (#final_polygons > 0) then
 		final_polygons[#final_polygons] = nil
+		return true
+	end
+	if (key == KEYSYMS.N) and polygon and #polygon > 3  then
+		final_polygons[#final_polygons+1] = polygon
+		polygon = {}
+		return true
+	end
+	if (key == KEYSYMS.U) and polygon and #polygon > 1 then
+		polygon[#polygon] = nil
+		return true
 	end
 end
 
