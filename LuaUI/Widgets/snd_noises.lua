@@ -138,7 +138,7 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	cooldownTime = cooldownTime or 0
 	local t = osClock()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
-		playSound(category, volume or 1, 'userinterface') -- not using 'unitreply' because only 1 can play at a time, the next cutting off the first
+		playSound(category, (volume or 1) * (WG.unitReplyVolumeMult or 1), 'userinterface') -- not using 'unitreply' because only 1 can play at a time, the next cutting off the first
 		cooldown[category] = t
 	end
 end

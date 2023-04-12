@@ -714,8 +714,8 @@ local pathAudio = 'Settings/Audio'
 		everyMode = true,
 	})
 	AddOption(pathAudio,{
-		name = 'UI and Unit Reply Volume',
-		desc = 'Interface notifications such as chat and unit responses.',
+		name = 'UI Volume',
+		desc = 'Interface notifications such as chat. Also applies to unit replies.',
 		type = 'number',
 		min = 0,
 		max = 100,
@@ -724,18 +724,18 @@ local pathAudio = 'Settings/Audio'
 		simpleMode = true,
 		everyMode = true,
 	})
-	-- The noises widget says "not using 'unitreply' because only 1 can play at a time, the next cutting off the first"
-	--AddOption(pathAudio,{
-	--	name = 'Unit Reply Volume',
-	--	desc = 'Noises that units make when being selected or given orders.',
-	--	type = 'number',
-	--	min = 0,
-	--	max = 100,
-	--	springsetting = 'snd_volunitreply',
-	--	OnChange = function(self) spSendCommands{"set snd_volunitreply " .. self.value} end,
-	--	simpleMode = true,
-	--	everyMode = true,
-	--})
+	AddOption(pathAudio,{
+		name = 'Unit Reply Volume',
+		desc = 'Noises that units make when being selected or given orders.',
+		type = 'number',
+		key = "unit_reply_volume",
+		value = 50,
+		min = 0,
+		max = 100,
+		OnChange = function(self) WG.unitReplyVolumeMult =  self.value / 50 end,
+		simpleMode = true,
+		everyMode = true,
+	})
 	AddOption(pathAudio,{
 		name = 'Ambient Volume',
 		desc = 'Miscellaneous sounds such as the environment or a busy base.',
