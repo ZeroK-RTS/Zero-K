@@ -1,6 +1,6 @@
 -- needs select[1] and ok[1] (and build for cons)
 
-local VOLUME_MULT = 1.1
+local VOLUME_MULT = 1.05
 
 local volumeOverrides = {
 	builder_start = 1.1,
@@ -8,10 +8,10 @@ local volumeOverrides = {
 	light_bot_select = 0.58,
 	light_bot_move = 0.8,
 	bot_select = 0.2,
-	bot_move2 = 0.28,
+	bot_move2 = 0.26,
 	medium_bot_select = 0.52,
 	heavy_bot_move = 0.22,
-	amph_move = 0.4,
+	amph_move = 0.39,
 	amph_select = 0.3,
 	
 	crawlie_select = 0.19,
