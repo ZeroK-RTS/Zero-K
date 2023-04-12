@@ -1,6 +1,6 @@
 -- needs select[1] and ok[1] (and build for cons)
 
-local VOLUME_MULT = 1.6
+local VOLUME_MULT = 0.9
 
 local volumeOverrides = {
 	builder_start = 1.1,
@@ -8,13 +8,13 @@ local volumeOverrides = {
 	light_bot_select = 0.6,
 	light_bot_move = 0.8,
 	bot_select = 0.21,
-	bot_move2 = 0.3,
+	bot_move2 = 0.28,
 	medium_bot_select = 0.52,
-	heavy_bot_move = 0.23,
-	amph_move = 0.42,
-	amph_select = 0.33,
+	heavy_bot_move = 0.22,
+	amph_move = 0.4,
+	amph_select = 0.3,
 	
-	crawlie_select = 0.22,
+	crawlie_select = 0.21,
 	spider_move = 0.2,
 	spider_select2 = 0.28,
 	spider_select = 0.2,
@@ -26,13 +26,13 @@ local volumeOverrides = {
 	vehicle_select = 0.61,
 	
 	tank_move = 0.26,
-	tank_select = 0.39,
+	tank_select = 0.35,
 	light_tank_move2 = 0.37,
 	
 	hovercraft_move = 0.5,
 	hovercraft_select = 0.7,
 	
-	gunship_select = 0.32,
+	gunship_select = 0.3,
 	gunship_move = 0.35,
 	light_gunship_select = 0.28,
 	heavy_gunship_select = 0.2,
@@ -43,23 +43,23 @@ local volumeOverrides = {
 	bomber_move = 0.22,
 	bomber_select = 0.48,
 	
-	rumble2 = 1.2,
+	rumble2 = 1.35,
 	rumble1 = 1.4,
 	sub_select = 0.3,
 	
-	building_select2 = 0.55,
-	windmill = 0.52,
-	fusion_select = 0.52,
-	adv_fusion_select = 0.42,
-	geo_select = 0.52,
+	building_select2 = 0.52,
+	windmill = 0.38,
+	fusion_select = 0.5,
+	adv_fusion_select = 0.4,
+	geo_select = 0.45,
+	factory_select = 0.34,
 	
-	turret_move = 0.35,
-	light_turret_select = 0.3,
+	turret_move = 0.38,
+	light_turret_select = 0.29,
 	faraday_select = 0.3,
 	turret_select = 0.17,
 	turret_heavy_move2 = 0.17,
 	
-	factory_select = 0.4,
 	radar_select = 0.3,
 	cloaker_select = 0.32,
 	teleport_select = 0.28,
@@ -1632,7 +1632,7 @@ local function applyCustomParamSound(soundDef, soundName, customParams)
 
 	soundDef = soundDef or {}
 	soundDef[soundName] = {
-		volume = (volumeOverrides[sound] or tonumber(customParams["sound" .. soundName .. "_vol"] or 1)) * VOLUME_MULT,
+		volume = (volumeOverrides[sound] or tonumber(customParams["sound" .. soundName .. "_vol"] or 1)),
 		[1] = sound,
 	}
 	return soundDef
@@ -1653,8 +1653,13 @@ local function applyCommanderSound(soundDef, customParams)
 end
 
 local function OverrideVolume(def)
-	if def and def[1] and volumeOverrides[def[1]] then
-		def.volume = volumeOverrides[def[1]]
+	if not def then
+		return
+	end
+	if def[1] and volumeOverrides[def[1]] then
+		def.volume = volumeOverrides[def[1]] * VOLUME_MULT
+	else
+		def.volume = (def.volume or 1) * VOLUME_MULT
 	end
 end
 
