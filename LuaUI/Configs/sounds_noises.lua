@@ -1,6 +1,6 @@
 -- needs select[1] and ok[1] (and build for cons)
 
-local VOLUME_MULT = 1.05
+local VOLUME_MULT = 1.1
 
 local volumeOverrides = {
 	builder_start = 1.1,
@@ -8,9 +8,9 @@ local volumeOverrides = {
 	light_bot_select = 0.58,
 	light_bot_move = 0.8,
 	bot_select = 0.2,
-	bot_move2 = 0.26,
+	bot_move2 = 0.25,
 	medium_bot_select = 0.52,
-	heavy_bot_move = 0.22,
+	heavy_bot_move = 0.21,
 	amph_move = 0.39,
 	amph_select = 0.3,
 	
@@ -29,8 +29,8 @@ local volumeOverrides = {
 	tank_select = 0.35,
 	light_tank_move2 = 0.37,
 	
-	hovercraft_move = 0.5,
-	hovercraft_select = 0.7,
+	hovercraft_move = 0.55,
+	hovercraft_select = 0.76,
 	
 	gunship_select = 0.31,
 	gunship_move2 = 0.35,
