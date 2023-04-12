@@ -991,3 +991,16 @@ for i = 1, #ai_start_units do
 		UnitDefs[ai_start_units[i]].customparams.ai_start_unit = true
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Superweapon revealing
+--
+
+if (modOptions and tobool(modOptions.reveal_superweapons)) then
+	for name, ud in pairs(UnitDefs) do
+		if ud.customparams.superweapon then
+			ud.customparams.reveal_at_build = 0.05
+		end
+	end
+end

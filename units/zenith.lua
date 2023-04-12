@@ -22,6 +22,7 @@ return { zenith = {
     --pylonrange  = 150,
     modelradius    = [[45]],
     bait_level_default = 0,
+    superweapon = 1,
 
     neededlink     = 400,
     pylonrange     = 150,

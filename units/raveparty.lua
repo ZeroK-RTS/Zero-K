@@ -21,6 +21,7 @@ return { raveparty = {
     draw_blueprint_facing = 1,
     want_proximity_targetting = 1,
     speed_bar = 1,
+    superweapon = 1,
 
     keeptooltip    = [[any string I want]],
     neededlink     = 400,

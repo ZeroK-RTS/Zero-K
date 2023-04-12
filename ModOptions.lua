@@ -210,6 +210,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "reveal_superweapons",
+    name        = "Reveal superweapons",
+    desc        = "Reveals superweapons as soon as they exceed 5% completion.",
+    type        = "bool",
+    section     = "experimental",
+    def         = false,
+  },
+  {
     key         = "disableresurrect",
     name        = "Disable resurrect",
     desc        = "Removes resurrect abilities from the game",

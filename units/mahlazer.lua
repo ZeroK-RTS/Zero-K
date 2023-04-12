@@ -24,6 +24,7 @@ return { mahlazer = {
     bait_level_default = 0,
     want_precise_proximity_targetting = 1,
     draw_blueprint_facing = 1,
+    superweapon = 1,
 
     keeptooltip    = [[any string I want]],
     neededlink     = 600,
