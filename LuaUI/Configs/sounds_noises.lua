@@ -1,8 +1,10 @@
 -- needs select[1] and ok[1] (and build for cons)
 
 local volumeOverrides = {
-	heavy_bot_move = 0.36,
-	bot_select = 0.42,
+	heavy_bot_move = 0.32,
+	bot_select = 0.32,
+	bot_move2 = 0.55,
+	crawlie_select = 0.5,
 }
 
 local sounds = {
@@ -184,7 +186,7 @@ local sounds = {
 		build = { "builder_start" },
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "light_bot_select2",
@@ -193,7 +195,7 @@ local sounds = {
 	shieldscout = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -202,8 +204,8 @@ local sounds = {
 	},
 	shieldraid = {
 		ok = {
-			volume = 0.6,
-			[1] = "bot_move",
+			volume = 0.45,
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -213,7 +215,7 @@ local sounds = {
 	shieldskirm = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -223,7 +225,7 @@ local sounds = {
 	shieldassault = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -242,7 +244,7 @@ local sounds = {
 	shieldriot = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -252,7 +254,7 @@ local sounds = {
 	shieldaa = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -262,7 +264,7 @@ local sounds = {
 	shieldarty = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -285,7 +287,7 @@ local sounds = {
 		build = { "builder_start" },
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "light_bot_select2",
@@ -304,7 +306,7 @@ local sounds = {
 	jumpskirm = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -334,7 +336,7 @@ local sounds = {
 	jumpraid = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -344,7 +346,7 @@ local sounds = {
 	jumpblackhole = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -354,7 +356,7 @@ local sounds = {
 	jumpimpulse = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -364,7 +366,7 @@ local sounds = {
 	jumpassault = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -374,7 +376,7 @@ local sounds = {
 	jumpaa = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.5,
@@ -396,7 +398,7 @@ local sounds = {
 		build = { "builder_start" },
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "light_bot_select2",
@@ -430,7 +432,7 @@ local sounds = {
 	cloakskirm = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "medium_bot_select",
@@ -439,7 +441,7 @@ local sounds = {
 	cloakassault = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "medium_bot_select",
@@ -457,7 +459,7 @@ local sounds = {
 	cloakriot = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "medium_bot_select",
@@ -466,7 +468,7 @@ local sounds = {
 	cloakarty = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "medium_bot_select",
@@ -475,7 +477,7 @@ local sounds = {
 	cloakaa = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			[1] = "medium_bot_select",
@@ -1528,7 +1530,7 @@ local sounds = {
 	shieldshield = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.6,
@@ -1558,7 +1560,7 @@ local sounds = {
 	cloakjammer = {
 		ok = {
 			volume = 0.6,
-			[1] = "bot_move",
+			[1] = "bot_move2",
 		},
 		select = {
 			volume = 0.7,
