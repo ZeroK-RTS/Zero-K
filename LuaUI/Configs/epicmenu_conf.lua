@@ -732,7 +732,7 @@ local pathAudio = 'Settings/Audio'
 		value = 50,
 		min = 0,
 		max = 100,
-		OnChange = function(self) WG.unitReplyVolumeMult =  self.value / 50 end,
+		OnChange = function(self) WG.unitReplyVolumeMult =  self.value / 50 end, -- pay attention, the scaled value is 0-2!
 		simpleMode = true,
 		everyMode = true,
 	})
