@@ -447,10 +447,9 @@ if Script and Script.IsEngineMinVersion(105, 0, 1578) then
 		end
 	end
 
-	-- collidefirebase doesn't seem to exist.
-	--if not anyFirePlatformExists then
-	--	for name, weaponDef in pairs(WeaponDefs) do
-	--		weaponDef.collidefirebase = true
-	--	end
-	--end
+	if not anyFirePlatformExists then
+		for name, weaponDef in pairs(WeaponDefs) do
+			weaponDef.collidefirebase = true
+		end
+	end
 end
