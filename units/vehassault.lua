@@ -101,7 +101,7 @@ return { vehassault = {
       soundStart              = [[weapon/cannon/medplasma_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 238,
+      weaponVelocity          = 245,
     },
 
   },

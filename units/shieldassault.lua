@@ -129,7 +129,7 @@ return { shieldassault = {
       soundStart              = [[weapon/cannon/cannon_fire5]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 210,
     },
 
   },

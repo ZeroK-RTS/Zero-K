@@ -106,7 +106,7 @@ return { shieldskirm = {
       turnrate                = 1000,
       turret                  = true,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 185,
+      weaponVelocity          = 190,
     },
 
   },
