@@ -1,6 +1,6 @@
 -- needs select[1] and ok[1] (and build for cons)
 
-local VOLUME_MULT = 0.9
+local VOLUME_MULT = 1.1
 
 local volumeOverrides = {
 	builder_start = 1.1,
@@ -14,16 +14,16 @@ local volumeOverrides = {
 	amph_move = 0.4,
 	amph_select = 0.3,
 	
-	crawlie_select = 0.21,
-	spider_move = 0.2,
-	spider_select2 = 0.28,
-	spider_select = 0.2,
+	crawlie_select = 0.19,
+	spider_move = 0.18,
+	spider_select2 = 0.29,
+	spider_select = 0.18,
 	
 	spy_select = 0.43,
 	spy_move = 0.45,
 	
-	vehicle_move = 0.24,
-	vehicle_select = 0.61,
+	vehicle_move = 0.27,
+	vehicle_select = 0.65,
 	
 	tank_move = 0.26,
 	tank_select = 0.35,
@@ -32,8 +32,8 @@ local volumeOverrides = {
 	hovercraft_move = 0.5,
 	hovercraft_select = 0.7,
 	
-	gunship_select = 0.3,
-	gunship_move = 0.35,
+	gunship_select = 0.31,
+	gunship_move2 = 0.35,
 	light_gunship_select = 0.28,
 	heavy_gunship_select = 0.2,
 	heavy_gunship_move = 0.78,
@@ -48,8 +48,8 @@ local volumeOverrides = {
 	sub_select = 0.27,
 	
 	building_select1 = 0.8,
-	building_select2 = 0.46,
-	windmill = 0.42,
+	building_select2 = 0.52,
+	windmill = 0.48,
 	fusion_select = 0.37,
 	adv_fusion_select = 0.37,
 	geo_select = 0.43,
@@ -78,7 +78,7 @@ local sounds = {
 	athena = {
 		build = { "builder_start" },
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "light_gunship_select",
@@ -615,7 +615,7 @@ local sounds = {
 	},
 	nebula = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "heavy_gunship_select",
@@ -934,7 +934,7 @@ local sounds = {
 	planecon = {
 		build = { "builder_start" },
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "light_gunship_select",
@@ -943,7 +943,7 @@ local sounds = {
 	gunshipcon = {
 		build = { "builder_start" },
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "light_gunship_select",
@@ -951,7 +951,7 @@ local sounds = {
 	},
 	gunshipemp = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "light_gunship_select",
@@ -959,7 +959,7 @@ local sounds = {
 	},
 	gunshipbomb = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "light_gunship_select",
@@ -967,7 +967,7 @@ local sounds = {
 	},
 	gunshipraid = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "gunship_select",
@@ -975,7 +975,7 @@ local sounds = {
 	},
 	gunshipaa = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "gunship_select",
@@ -983,7 +983,7 @@ local sounds = {
 	},
 	gunshipskirm = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "gunship_select",
@@ -1007,7 +1007,7 @@ local sounds = {
 	},
 	gunshipkrow = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "heavy_gunship_select",
@@ -1015,7 +1015,7 @@ local sounds = {
 	},
 	gunshiptrans = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "gunship_select",
@@ -1023,7 +1023,7 @@ local sounds = {
 	},
 	gunshipheavytrans = {
 		ok = {
-			[1] = "gunship_move",
+			[1] = "gunship_move2",
 		},
 		select = {
 			[1] = "heavy_gunship_select",
