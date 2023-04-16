@@ -1,5 +1,6 @@
 local RET_FALSE = function() return false end
 local RET_NONE  = function() end
+local RET_TABLE = function() return {} end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
      though this can only happen for random people's forks since regular BAR & Spring build
@@ -190,6 +191,10 @@ if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
+
+if not Spring.GetFeaturesInScreenRectangle and not Script.GetSynced() then -- BAR 105-1649
+	Spring.GetFeaturesInScreenRectangle = RET_TABLE
+end
 
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam
