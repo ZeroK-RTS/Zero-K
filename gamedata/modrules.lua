@@ -42,6 +42,7 @@ local modrules  = {
     multiReclaim  = 1;    -- defaults to 0
     reclaimMethod = 0;    -- defaults to 1
     unitMethod    = 0;    -- defaults to 1
+    unitDrainHealth = false,
 
     unitEnergyCostFactor    = 0;  -- defaults to 0
     unitEfficiency          = 0.8;  -- defaults to 1
