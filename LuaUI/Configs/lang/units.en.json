@@ -147,7 +147,7 @@
 	"factoryveh" : {
 		"name" : "Rover Assembly",
 		"description" : "Produces Light Wheeled Vehicles",
-		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Slasher"
+		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Fencer"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -1202,7 +1202,7 @@
 	"gunshipheavytrans" : {
 		"name" : "Hercules",
 		"description" : "Armed Heavy Air Transport",
-		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships (except Reef and Shogun). Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
+		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot landing zones."
 	},
 	"planescout" : {
 		"name" : "Owl",
