@@ -715,12 +715,14 @@ local function MakeFlags()
 		local langData = languages[i]
 		flagChildren[#flagChildren + 1] = Image:New{
 			file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. langData.flag ..'.png',
+			lang = langData.lang,
+			OnClick = {SetLang }
 		}
 		flagChildren[#flagChildren + 1] = Button:New{
 			caption = langData.name,
 			objectOverrideFont = WG.GetFont(),
 			name = 'countryButton' .. langData.lang;
-			width = '50%',
+			width = '100%',
 			lang = langData.lang,
 			OnClick = {SetLang }
 		}
