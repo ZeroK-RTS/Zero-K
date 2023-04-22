@@ -147,7 +147,7 @@
 	"factoryveh" : {
 		"name" : "月球车总成",
 		"description" : "生产轻型轮式车辆",
-		"helptext" : "传统且最受欢迎的，月球车总成是理想的闪电战工厂，其快速，高度侵略性的单位。那些缺乏速度的单位用大量火力来弥补。关键单位：飞镖，灼烧者，掠夺者，开膛手，斜刀"
+		"helptext" : "传统且最受欢迎的，月球车总成是理想的闪电战工厂，其快速，高度侵略性的单位。那些缺乏速度的单位用大量火力来弥补。关键单位：飞镖，灼烧者，掠夺者，开膛手，剑客"
 	},
 	"turretgauss" : {
 		"name" : "高斯",
@@ -327,7 +327,7 @@
 	"bomberprec" : {
 		"name" : "乌鸦",
 		"description" : "精确轰炸机（反潜）",
-		"helptext" : "The Raven drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Minotaur, but you should look elsewhere for something to use against smaller mobiles."
+		"helptext" : "乌鸦投下一颗高伤害、小范围的炸弹。就成本来说，没什么能够与它相提并论，可以破坏反核或牛头人。但您应该要找其它单位来对付小型机动单位。"
 	},
 	"chicken_shield" : {
 		"name" : "布洛珀",
@@ -656,7 +656,7 @@
 	},
 	"striderdetriment" : {
 		"name" : "损害",
-		"description" : "Ultimate Assault Strider (Undersea Fire)",
+		"description" : "终极突击大型单位（水下射击）",
 		"helptext" : "损害是这个领域中最重的步兵。它可以抵御空中攻击，或者使用它的火箭击中遥远的目标，但真正的肉在于为一个目的而设计的巨大的高斯枪——快速而有效地杀死其他重型单元。记住，英明的指挥官以足够的护卫来对付轻型单位群和空中攻击。"
 	},
 	"energygeo" : {
@@ -882,7 +882,7 @@
 	"turretantiheavy" : {
 		"name" : "路西法",
 		"description" : "超光速投影仪-连接到50 能量网格的电源",
-		"helptext" : "Inside the heavily armored shell of the Lucifer lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Lucifer is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a third."
+		"helptext" : "在路西法重装甲内有个毁灭性的超光速粒子加速器。这可怕的武器能在极远射程造成高伤害，心须保持电源供应。请记住路西法严格来说是个支援武器；没有单位护卫它的话很快会被入侵者破坏。当从远距离被炮兵或轰炸机攻击时，主炮能缩回并减少受到伤害至三分之一。"
 	},
 	"jumparty" : {
 		"name" : "火箭筒",
@@ -931,17 +931,17 @@
 	},
 	"shiptorpraider" : {
 		"name" : "猎人",
-		"description" : "Torpedo Raider Ship (Anti-Sub)",
+		"description" : "鱼雷入侵者船（反潜）",
 		"helptext" : "鱼雷艇是一个机动突击队和反潜部队。它对水下航行器和大型船舶是有效的。"
 	},
 	"shipskirm" : {
 		"name" : "梦幻时光",
-		"description" : "Skirmisher Ship",
+		"description" : "散兵船",
 		"helptext" : "这艘火箭船发射了四枚中程火箭的齐射，用于轰炸海上和海岸目标。谨防潜艇和任何速度足够接近的潜艇。"
 	},
 	"subraider" : {
 		"name" : "海狼",
-		"description" : "Raider Submarine (Anti-Sub, Undersea Fire)",
+		"description" : "入侵者潜艇（反潜、水下射击）",
 		"helptext" : "隐身，快速，脆弱，这艘潜艇可以快速攻击未受保护的目标。缓慢的伤害使它能够有效地杀死单独的单位。小心任何反潜艇武器，特别是鱼雷艇和驱逐舰。"
 	},
 	"subtacmissile" : {
@@ -982,7 +982,7 @@
 	"turretheavy" : {
 		"name" : "黯灭",
 		"description" : "中程防御要塞 - 连接到50 能量网格的电源",
-		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Desolator forms a focal defence point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a third, although it cannot fire its weapons while doing so."
+		"helptext" : "配备重型等离子炮和热射线，黯灭会形成一个抵抗敌人的主要防御点。被远程炮轰或空袭时能躲进掩体，减少受到伤害至三分之一，尽管这时候无法开火。"
 	},
 	"turretimpulse" : {
 		"name" : "牛顿",
@@ -1102,12 +1102,12 @@
 	"tankraid" : {
 		"name" : "小太刀",
 		"description" : "入侵者坦克",
-		"helptext" : "The Kodachi's small yet agile chassis has enough armor and speed to get it close enough to fire its napalm bombs, which set the ground ablaze for a moment. As the lightest unit in the Tank Foundry, it also takes on the scouting and screening roles if need be. Damaged Kodachis regenerate out of combat."
+		"helptext" : "小太刀小巧而灵活的机体有足够的装甲和速度能近距离发射凝固汽油炸弹，让地面燃烧一段时间。作为战车工厂中最轻型的单位，有需要也能作为侦察和掩护。受伤的小太刀在脱离战斗后自动修复。"
 	},
 	"cloakcon" : {
 		"name" : "咒术师",
 		"description" : "隐形的工程机器人",
-		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance. It can also enable a short-range cloaking field, which unlike the aforementioned abilities costs energy to maintain."
+		"helptext" : "咒术师配备一个短程干扰器和一个隐形装置用于隐密扩张和基地维护。也能开启小范围隐形力场，与上述技能不同，力场需要消耗电源来维持。"
 	},
 	"turretsunlance" : {
 		"name" : "太阳长矛",
@@ -1141,7 +1141,7 @@
 	},
 	"amphraid" : {
 		"name" : "鸭",
-		"description" : "Amphibious Raider (Anti-Sub, Undersea Fire)",
+		"description" : "两栖入侵者（反潜、水下射击）",
 		"helptext" : "鸭子是基本的水下袭击者。 用短程鱼雷武装，它用相对较高的速度骚扰无法射击的海上目标，尽管它死于严重的反对。 在陆地上它可以发射短距离鱼雷作为体面的短程反重武器。"
 	},
 	"planefighter" : {
@@ -1202,7 +1202,7 @@
 	"gunshipheavytrans" : {
 		"name" : "大力神",
 		"description" : "武装重型航空运输",
-		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships (except Reef and Shogun). Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
+		"helptext" : "大力神可以在游戏中运输任何非飞行可移动单位，包含船舰。配备双雷射枪和自动货物弹射系统使它能运输到前线的理想选择。"
 	},
 	"planescout" : {
 		"name" : "猫头鹰",
@@ -1220,9 +1220,9 @@
 		"helptext" : "浮标围绕着它无法射击而漂浮在海面上。在这里，它可以发射一个有着缓慢伤害的远程炮火。浮动时无法移动。"
 	},
 	"amphsupport" : {
-		"name" : "Bulkhead",
-		"description" : "Deployable Amphibious Fire Support (must stop to fire)",
-		"helptext" : "The Bulkhead is a heavily armored dual plasma cannon balanced atop a cheap set of legs. While this gives it an impressive combination of health and range, it is unable to aim or fire its cannons without first stopping to brace itself. This drawback is less pronounced in the water, where it can float to fire then sink to reposition."
+		"name" : "舱壁",
+		"description" : "可部署的两栖火力支援（必须停止才能射击）",
+		"helptext" : "舱壁是个重型装甲双等离子炮，平衡在一组便宜的腿上。虽然有着优秀的生命值和射程，但必须先停下来支撑自己才能瞄准或开火。这个缺点在水中不太明显，它可以漂浮着开火后下沉重整位置。"
 	},
 	"dynknight1" : {
 		"name" : "指挥官",

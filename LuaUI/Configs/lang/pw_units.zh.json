@@ -1,0 +1,117 @@
+{
+	"pw_artefact" : {
+		"name" : "古代文物",
+		"description" : "神秘遗迹",
+		"helptext" : "这个神秘的外星人装置拥有不可思议的力量。尽管我们的科学家对它的理解仍然很差，但它有可能成为星系控制的超级武器。"
+	},
+	"pw_bomberfac" : {
+		"name" : "轰炸机工厂",
+		"description" : "生产轰炸机",
+		"helptext" : "生产用于攻击敌对星球的太空轰炸机。在行星入侵期间，生产常规轰炸机。"
+	},
+	"pw_dropfac" : {
+		"name" : "舰船工厂",
+		"description" : "生产舰船",
+		"helptext" : "为入侵敌对行星制造太空舰船。在行星入侵期间，生产常规运输机。"
+	},
+	"pw_estorage" : {
+		"name" : "储能",
+		"description" : "储存能量",
+		"helptext" : "一个大电容器组。"
+	},
+	"pw_estorage2" : {
+		"name" : "双重储能",
+		"description" : "储存能量",
+		"helptext" : "大型双电容器组。"
+	},
+	"pw_garrison" : {
+		"name" : "野战卫戍部队",
+		"description" : "降低影响增益",
+		"helptext" : "这种建筑维持着一支军队，减少了敌人从战斗中获得的影响。"
+	},
+	"pw_gaspowerstation" : {
+		"name" : "燃气发电站",
+		"description" : "产生能量",
+		"helptext" : "一个燃烧器发电机组。"
+	},
+	"pw_grid" : {
+		"name" : "行星防御网",
+		"description" : "防御一切",
+		"helptext" : "这种结构减少了影响增益和拦截来袭轰炸机。"
+	},
+	"pw_guerilla" : {
+		"name" : "游击队星门",
+		"description" : "远程传播影响",
+		"helptext" : "一种能够对任何行星产生影响的星门。"
+	},
+	"pw_hq_attacker" : {
+		"name" : "攻击指令",
+		"description" : "星球战争总部 (改变影响增益)",
+		"helptext" : "这座建筑是地球战略控制不可或缺的一部分。如果攻击者以一个被摧毁的指挥中心取胜，他们只会获得他们原本获得的50%%%的影响力。"
+	},
+	"pw_hq_defender" : {
+		"name" : "防御指令",
+		"description" : "星球战争总部 (改变影响增益)",
+		"helptext" : "这座建筑是地球战略控制不可或缺的一部分。如果攻击者输了但摧毁了这个指挥中心，他们会获得少量的影响，如果他们赢了，他们将获得20%%%的影响。"
+	},
+	"pw_inhibitor" : {
+		"name" : "虫洞抑制剂",
+		"description" : "阻止影响传播",
+		"helptext" : "抑制来自敌方行星的影响传播"
+	},
+	"pw_interception" : {
+		"name" : "拦截网",
+		"description" : "拦截行星轰炸机",
+		"helptext" : "这个结构拦截来袭的轰炸机。"
+	},
+	"pw_mine" : {
+		"name" : "发电机组",
+		"description" : "产生50能量/转",
+		"helptext" : "一个小型高效的发电机"
+	},
+	"pw_mine2" : {
+		"name" : "轨道太阳能阵列",
+		"description" : "产生100能量/转",
+		"helptext" : "一个更大的输出功率更大的发电机"
+	},
+	"pw_mine3" : {
+		"name" : "行星地热电站",
+		"description" : "产生250能量/转",
+		"helptext" : "这个巨大的复合体直接从地球的地幔中吸收能量。如果被摧毁，它会在核爆炸中上升。"
+	},
+	"pw_mstorage2" : {
+		"name" : "金属储存",
+		"description" : "储存金属",
+		"helptext" : "储存大量金属用于行星用途。"
+	},
+	"pw_warpgate" : {
+		"name" : "传送门",
+		"description" : "产生传送核心",
+		"helptext" : "这一设施产生了美妙的传送核心，可以在眨眼间将飞船送过银河系。"
+	},
+	"pw_warpjammer" : {
+		"name" : "传送干扰机",
+		"description" : "防止传送攻击",
+		"helptext" : "传动干扰机通过一个防止装备传送核心的舰船跳跃的磁场来保护所在区域。"
+	},
+	"pw_wormhole" : {
+		"name" : "虫洞发生器",
+		"description" : "链接相邻星球",
+		"helptext" : "允许船只离开这颗行星前往其相连的邻居，并将影响传播到相连的行星。"
+	},
+	"pw_wormhole2" : {
+		"name" : "改进型虫洞",
+		"description" : "链接相邻星球",
+		"helptext" : "这种建筑保持了一个更强的虫洞，以增加对邻近行星的影响。"
+	},
+	"generic_tech" : {
+		"name" : "科技实验室",
+		"description" : "解锁科技",
+		"helptext" : "这个建筑为它所属的派别解锁一个特定的技术"
+	},
+	"pw_techlab" : {
+		"name" : "科技实验室",
+		"description" : "蕴含着强大的古代科技" ,
+		"helptext" : "这个建筑包含一些强大的技术。"
+	}
+}

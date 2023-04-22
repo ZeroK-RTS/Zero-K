@@ -181,8 +181,8 @@
 	},
 	"fakeunit_aatarget" : {
 		"name" : "假的防空目標",
-		"description" : "Used by the jumpjet script.",
-		"helptext" : "Fake unit for technical purposes."
+		"description" : "由跳躍背包的程式使用",
+		"helptext" : "用於技術目的的假單位。"
 	},
 	"mahlazer" : {
 		"name" : "星光",
@@ -841,8 +841,8 @@
 	},
 	"fakeunit_los" : {
 		"name" : "視線提供者",
-		"description" : "Knows all and sees all",
-		"helptext" : "Kilrogg would be proud!"
+		"description" : "知曉一切，看透一切",
+		"helptext" : "基爾羅格會感到驕傲!"
 	},
 	"tele_beacon" : {
 		"name" : "傳送燈",
@@ -1081,8 +1081,8 @@
 	},
 	"fakeunit" : {
 		"name" : "假的雷達信號",
-		"description" : "Created by scrambling devices.",
-		"helptext" : "Fake unit for technical purposes."
+		"description" : "由加密設備產生",
+		"helptext" : "用於技術目的的假單位。"
 	},
 	"shieldshield" : {
 		"name" : "阿斯皮斯",
@@ -1202,7 +1202,7 @@
 	"gunshipheavytrans" : {
 		"name" : "大力士",
 		"description" : "武裝重型空中運輸機",
-		"helptext" : "大力士可以在遊戲中運輸任何非飛行可移動單位，包含船艦（除了暗礁和將軍）。配備雙雷射槍和自動貨物彈射系統使它能運輸到前線的理想選擇。"
+		"helptext" : "大力士可以在遊戲中運輸任何非飛行可移動單位，包含船艦。配備雙雷射槍和自動貨物彈射系統使它能運輸到前線的理想選擇。"
 	},
 	"planescout" : {
 		"name" : "貓頭鷹",

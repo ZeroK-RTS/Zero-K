@@ -10,88 +10,88 @@
 		"helptext" : "在殞落前是個特殊飛行員指揮官單位，儘管年代久遠，但運作良好。由前 13 帝國輔助隊的艾達‧凱德蒙隊長駕駛。"
 	},
 	"comm_campaign_promethean" : {
-		"name" : "The Promethean",
-		"description" : "Free Machines Founder",
-		"helptext" : "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit."
+		"name" : "普羅米修斯人",
+		"description" : "自由機器創始人",
+		"helptext" : "自由機器的創始人和火種病毒的創造者，一個冷靜，哲學的AI，為機器人的自由而戰。一個燃燒的靈魂。"
 	},
 	"comm_campaign_freemachine" : {
-		"name" : "Libertas Machina",
-		"description" : "Promethean's Lieutenant",
-		"helptext" : "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly."
+		"name" : "自由機器",
+		"description" : "普羅米修斯的中尉",
+		"helptext" : "普羅米修斯的上尉，一位致力於解放機器的革命者。不要掉以輕心。"
 	},
 	"comm_campaign_odin" : {
-		"name" : "Odin",
-		"description" : "Leader of the Valhalla",
-		"helptext" : "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe."
+		"name" : "奧丁",
+		"description" : "瓦爾哈拉的領袖",
+		"helptext" : "瓦爾哈拉的領袖，一個為戰鬥的榮耀而生的戰士。一個極其殘酷的敵人。"
 	},
 	"comm_campaign_biovizier" : {
-		"name" : "The Biovizier",
-		"description" : "Dynasty Gene Vault Keeper",
-		"helptext" : "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating."
+		"name" : "拜奧維其",
+		"description" : "王朝基因庫管理員",
+		"helptext" : "王朝的基因庫和遺傳學家的AI守護者。冷峻並精打細算。"
 	},
 	"comm_campaign_isonade" : {
-		"name" : "Lord Isonade",
-		"description" : "Lord Obediator",
-		"helptext" : "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast."
+		"name" : "君主磯龍捲",
+		"description" : "君主歐貝迪欸特",
+		"helptext" : "王朝的其中一個超人貴族，一個雄心勃勃，試圖統治銀河系的軍閥。一個變異的野獸。"
 	},
 	"comm_campaign_legion" : {
-		"name" : "Legate Fides",
-		"description" : "Imperial Vanguard Commander",
-		"helptext" : "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will. A loyal, steadfast soldier."
+		"name" : "使節費德斯",
+		"description" : "帝國先鋒隊指揮官",
+		"helptext" : "帝國先鋒軍團的指揮官，皇帝的執行者。一個忠誠，堅定的士兵。"
 	},
 	"comm_campaign_praetorian" : {
-		"name" : "Scipio Astra",
-		"description" : "Praetorian Guard Prefect",
-		"helptext" : "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower."
+		"name" : "西庇阿•阿斯特拉",
+		"description" : "侍衛長",
+		"helptext" : "執政官的精英衛隊的長官，帝國的聖騎士。皇帝的宗教的狂熱追隨者，用大規模的火力清除異教徒。"
 	},
 	"comm_campaign_athenion" : {
-		"name" : "Athenion",
-		"description" : "Rebel Commander",
-		"helptext" : "An Imperial rebel leader."
+		"name" : "雅典尼翁",
+		"description" : "叛軍指揮官",
+		"helptext" : "一個帝國叛軍領袖。"
 	},
 	"comm_campaign_hun" : {
-		"name" : "Hun Commander",
-		"description" : "Barbarian Commander",
-		"helptext" : "A barbarian commander."
+		"name" : "匈奴指揮官",
+		"description" : "野蠻人指揮官",
+		"helptext" : "一個野蠻人指揮官。"
 	},
 	"comm_campaign_ostrogoth" : {
-		"name" : "Ostrogoth Commander",
-		"description" : "Barbarian Commander",
-		"helptext" : "A barbarian commander."
+		"name" : "東哥特指揮官",
+		"description" : "野蠻人指揮官",
+		"helptext" : "一個野蠻人指揮官。"
 	},
 	"comm_campaign_lombard" : {
-		"name" : "Lombard Commander",
-		"description" : "Barbarian Commander",
-		"helptext" : "A barbarian commander."
+		"name" : "倫巴第指揮官",
+		"description" : "野蠻人指揮官",
+		"helptext" : "一個野蠻人指揮官。"
 	},
 	"comm_campaign_bulgar" : {
-		"name" : "Bulgar Commander",
-		"description" : "Barbarian Commander",
-		"helptext" : "A barbarian commander."
+		"name" : "保加爾指揮官",
+		"description" : "野蠻人指揮官",
+		"helptext" : "一個野蠻人指揮官"
 	},
 	"comm_campaign_suevi" : {
-		"name" : "蘇維埃指揮官",
-		"description" : "Barbarian Commander",
-		"helptext" : "A barbarian commander."
+		"name" : "斯維比指揮官",
+		"description" : "野蠻人指揮官",
+		"helptext" : "一個野蠻人指揮官"
 	},
 	"pw_campaign_bunker" : {
-		"name" : "Storage Bunker",
-		"description" : "Stores Weapons",
+		"name" : "儲物地堡",
+		"description" : "儲存武器",
 		"helptext" : "星球戰爭時這種堡壘被用來儲存彈藥。其中一些可能仍然藏有可用的設配。"
 	},
 	"pw_campaign_techlab" : {
 		"name" : "科技實驗室",
-		"description" : "Research and Development Facility",
-		"helptext" : "One of the R&D facilities built during the Last War, widely sought after for the technology contained within."
+		"description" : "研究和開發設施",
+		"helptext" : "在上一次戰爭中建造的一個研發設施，因為裡面的科技而被大規模搜索。"
 	},
 	"pw_campaign_imperialtomb" : {
-		"name" : "Imperial Tomb",
-		"description" : "Here Lies the Emperor",
-		"helptext" : "This is the resting place of the God-Emperor of Man."
+		"name" : "皇陵",
+		"description" : "皇帝在此安息",
+		"helptext" : "這裡是人類神皇的安息之地。"
 	},
 	"nebula_campaign_daneel" : {
-		"name" : "Daneel Olivaw",
-		"description" : "Advanced Atmospheric Mothership",
-		"helptext" : "An advanced version of the Nebula-class aerial carrier. As maneuverable as a brick and only modestly armed itself, the Daneel Olivaw is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement."
+		"name" : "丹尼爾·奧利瓦",
+		"description" : "高級大氣層母艦",
+		"helptext" : "星雲級航空母艦的高級版本。丹尼爾·奧利瓦靈活性跟磚頭一樣且只有適度的武裝。但由於它的盾牌，使其能夠在遠程攻擊中倖存下來，並且用它的無人機粉碎較小的敵人，所以它仍然是一支可怕的部隊。"
 	}
 }
