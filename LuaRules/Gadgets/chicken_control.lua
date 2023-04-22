@@ -54,7 +54,6 @@ local spGetTeamList	= Spring.GetTeamList
 local spGetTeamLuaAI	= Spring.GetTeamLuaAI
 local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spTransferUnit    = Spring.TransferUnit
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
   
 local function GetTeamIsChicken(teamID)
   local luaAI = spGetTeamLuaAI(teamID)

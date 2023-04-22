@@ -1935,7 +1935,6 @@ local function ModuleSetsAreIdentical(set1, set2)
 		return false
 	end
 
-	local validUnit = true
 	for i = 1, #set1 do
 		if set1[i] ~= set2[i] then
 			return false

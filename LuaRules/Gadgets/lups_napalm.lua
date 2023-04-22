@@ -58,7 +58,6 @@ else -- Unsynced
 	local napalmFX, heatFX = include("LuaRules/Configs/lups_napalm_fxs.lua")
 
 	local Lups
-	local LupsAddParticles
 	local SYNCED = SYNCED
 
 	local function SpawnNapalmFX(data)
@@ -75,7 +74,7 @@ else -- Unsynced
 	end
 
 	local function GameFrame()
-		if (not Lups) then Lups = GG['Lups']; LupsAddParticles = Lups.AddParticles end
+		if (not Lups) then Lups = GG['Lups'] end
 		local explosions = SYNCED.napalmExplosions
 		local napalmCount = SYNCED.napalmCount
 		for i=1,napalmCount do

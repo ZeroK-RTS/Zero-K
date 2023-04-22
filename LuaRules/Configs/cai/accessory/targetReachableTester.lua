@@ -1,5 +1,4 @@
 local spGetUnitPosition = Spring.GetUnitPosition
-local spRequestPath = Spring.RequestPath
 local spGetUnitDefID = Spring.GetUnitDefID
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
 

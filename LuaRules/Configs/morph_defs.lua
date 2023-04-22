@@ -164,7 +164,6 @@ for id, playerData in pairs(customComms) do
 			if targetDef and originDef then
 				--Spring.Echo("Configuring comm morph: "..(array[i]) , array[i+1])
 				local sourceName, targetName = originDef.name, targetDef.name
-				local morphCost
 				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true) or {}
 				
 				morphOption.into = array[i+1]

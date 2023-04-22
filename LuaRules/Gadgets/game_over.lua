@@ -389,7 +389,6 @@ local function CauseVictory(victoryAllyTeamID)
 		Spring.Echo("CauseVictory", victoryAllyTeamID)
 	end
 	local allylist = spGetAllyTeamList()
-	local count = 0
 	for _, allyTeamID in pairs(allylist) do
 		if allyTeamID ~= victoryAllyTeamID and allyTeamID ~= gaiaAllyTeamID then
 			DestroyAlliance(allyTeamID)
