@@ -1004,6 +1004,11 @@
 		"description" : "Seismic Missile",
 		"helptext" : "The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units."
 	},
+	"missileslow" : {
+		"name" : "Zeno",
+		"description" : "Slow Homing Missile - High single-target slow damage with lingering damage over time",
+		"helptext" : "The Zeno slows down a single target and leaves a slowing area behind it. It has far more range than other combat missiles and homes onto its target."
+	},
 	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Cloaked Infiltration Strider",

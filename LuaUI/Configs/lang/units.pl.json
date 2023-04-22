@@ -1004,6 +1004,11 @@
 		"description" : "Rakieta sejsmiczna",
 		"helptext" : "Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, lecz wyrównuje trafiony teren."
 	},
+	"missileslow" : {
+		"name" : "Zenon",
+		"description" : "Rakieta spowalniająca",
+		"helptext" : "Jednorazowa rakieta spowalniająca dalekiego zasięgu. Nie zadaje obrażeń, lecz silnie spowalnia pojedynczy cel i pozostawia obszarowe pole spowalniające."
+	},
 	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Ciężki niewidzialny pająk-mech",
