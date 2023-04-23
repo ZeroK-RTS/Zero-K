@@ -196,6 +196,19 @@ if not Spring.GetFeaturesInScreenRectangle and not Script.GetSynced() then -- BA
 	Spring.GetFeaturesInScreenRectangle = RET_TABLE
 end
 
+if Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1706) then
+	local inTransfer = false
+	local originalTransferUnit = Spring.TransferUnit
+	Spring.TransferUnit = function(unitID, teamID, captured)
+		if inTransfer then
+			return
+		end
+		inTransfer = true
+		originalTransferUnit(unitID, teamID, captured)
+		inTransfer = false
+	end
+end
+
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
