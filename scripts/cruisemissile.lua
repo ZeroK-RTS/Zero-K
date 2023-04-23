@@ -10,7 +10,7 @@ end
 
 local function RemoveMissile()
 	GG.MissileSilo.DestroyMissile(unitID, unitDefID)
-	Spring.SetUnitRulesParam(unitID, "do_not_save", 1)
+	Spring.SetUnitRulesParam(unitID, "missile_parentSilo", nil)
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
 	if unitDefName == "missileslow" then

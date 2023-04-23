@@ -100,9 +100,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	local ud = UnitDefs[unitDefID]
 	local face = (spGetUnitBuildFacing(unitID) or 1)
-	local noWreck = Spring.GetUnitRulesParam(unitID, "noWreck") == 1	-- set by api_saveload to clear stuff from factories
 	
-	if (progress > 0.8 and not noWreck) then
+	if progress > 0.8 then
 		local explodeAs = ud.deathExplosion
 		if explodeAs then
 			local wd = WeaponDefNames[explodeAs]
@@ -117,7 +116,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 	
-	if (progress > 0.05 and not noWreck) then
+	if progress > 0.05 then
 		ScrapUnit(unitID, unitDefID, unitTeam, progress, face)
 	end
 	

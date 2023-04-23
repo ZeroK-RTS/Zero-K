@@ -701,10 +701,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	if spGetGameRulesParam("loadPurge") == 1 then
-		return
-	end
-	
 	if (teamID ~= gaiaTeamID)
 	  and(not doesNotCountList[unitDefID])
 	  and finishedUnits[unitID]

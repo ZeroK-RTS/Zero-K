@@ -138,8 +138,7 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID])
-			or spGetGameRulesParam("loadPurge") == 1 then
+			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
 		return
 	end
 
@@ -173,8 +172,7 @@ local idleCheckUnits
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID])
-			or spGetGameRulesParam("loadPurge") == 1 then
+			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
 		return
 	end
 

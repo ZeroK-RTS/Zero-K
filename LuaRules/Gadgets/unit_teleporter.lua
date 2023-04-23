@@ -385,9 +385,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		or not beacon[beaconID]
 		or not Spring.AreTeamsAllied(teamID, Spring.GetUnitTeam(beaconID))
 		then
-			-- don't remove command if we're in game load
-			-- at this point the commands have been loaded but beacon table hasn't been regenerated
-			return true, Spring.GetGameRulesParam("loadPurge") == 1
+			return true, true
 		end
 
 		if not (beaconWaiter[unitID] and beaconWaiter[unitID].beaconID == beaconID) then

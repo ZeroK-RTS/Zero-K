@@ -15,11 +15,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-local SAVE_FILE = "Gadgets/unit_spawner.lua"
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 -- BEGIN SYNCED
 
@@ -1334,51 +1329,6 @@ function gadget:GameOver()
 	Spring.SendCommands("wbynum 255 SPRINGIE:score,ID: "..Spring.Utilities.Base64Encode(tostring(spGetGameFrame() + gameFrameOffset).."/"..tostring(math.floor(score))))
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
-		return
-	end
-	
-	gameFrameOffset = GG.SaveLoad.GetSavedGameFrame()
-	
-	local saveData = GG.SaveLoad.ReadFile(zip, "Chicken", SAVE_FILE) or {}
-	data.queenID = GG.SaveLoad.GetNewUnitID(saveData.queenID)
-	data.queenTime = (saveData.queenTime or baseQueenTime) - gameFrameOffset/30
-	data.miniQueenNum = saveData.miniQueenNum
-	--data.targetCache = saveData.targetCache	-- not needed
-	data.burrows = GG.SaveLoad.GetNewUnitIDKeys(saveData.burrows)
-	for burrowID, targetData in pairs(data.burrows) do
-		targetData.targetID = GG.SaveLoad.GetNewUnitID(targetData.targetID)
-	end
-	data.chickenBirths = GG.SaveLoad.GetNewUnitIDKeys(saveData.chickenBirths)
-	data.timeOfLastSpawn = saveData.timeOfLastSpawn - math.floor(gameFrameOffset/30)
-	data.waveSchedule = saveData.waveSchedule - gameFrameOffset
-	data.waveNumber = saveData.waveNumber
-	data.eggDecay = GG.SaveLoad.GetNewFeatureIDKeys(saveData.eggDecay)
-	data.targets = GG.SaveLoad.GetNewUnitIDKeys(saveData.targets)
-	data.totalTechAccel = saveData.totalTechAccel
-	data.defensePool = saveData.defensePool
-	data.defenseQuota = saveData.defenseQuota
-	
-	data.humanAggro = saveData.humanAggro
-	data.humanAggroDelta = saveData.humanAggroDelta
-	data.humanAggroPerWave = saveData.humanAggroPerWave
-	
-	data.endgame = saveData.endgame
-	data.victory = saveData.victory
-	data.endMiniQueenNum = saveData.endMiniQueenNum
-	
-	data.morphFrame = saveData.morphFrame - gameFrameOffset
-	data.morphed = saveData.morphed
-	data.specialPowerCooldown = saveData.specialPowerCooldown
-	
-	Spring.SetGameRulesParam("queenTime", data.queenTime)
-	_G.chickenEventArgs = {type="refresh"}
-	SendToUnsynced("ChickenEvent")
-	_G.chickenEventArgs = nil
-end
-
 function gadget:Initialize()
 	Spring.SetGameRulesParam("malus", malus)
 	Spring.SetGameRulesParam("lagging", 0)
@@ -1426,18 +1376,6 @@ function gadget:Initialize()
 	gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
 end
 
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
-		return
-	end
-	
-	local chickenTable = SYNCED.data
-	chickenTable = Spring.Utilities.MakeRealTable(chickenTable, "Chicken")
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, chickenTable)
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 end
 -- END UNSYNCED
 --------------------------------------------------------------------------------

@@ -26,7 +26,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local SAVE_FILE = "Gadgets/unit_morph.lua"
 local emptyTable = {} -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -879,43 +878,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	--[[
-	morphUnits[unitID] = {
-		def = morphDef,
-		progress = 0.0,
-		increment = morphDef.increment,
-		morphID = morphID,
-		teamID = teamID,
-		combatMorph = morphDef.combatMorph,
-		morphRate = 0.0,
-	}
-	]]
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Morph", SAVE_FILE) or emptyTable
-	for oldID, entry in pairs(loadData.morph or emptyTable) do
-		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		if newID then
-			morphUnits[newID] = entry
-			
-			local morphDef = entry.def
-			if morphDef.cmd then
-				local cmdDescID = Spring.FindUnitCmdDesc(newID, morphDef.cmd)
-				if (cmdDescID) then
-					Spring.EditUnitCmdDesc(newID, cmdDescID, {id = morphDef.stopCmd, name = RedStr .. "Stop"})
-				end
-			elseif morphDef.stopCmd == CMD_UPGRADE_STOP then
-				Spring.InsertUnitCmdDesc(newID, stopUpgradeCmdDesc)
-			end
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 --	END SYNCED
 --------------------------------------------------------------------------------
@@ -1255,19 +1217,6 @@ end
 
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
-end
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local morph = Spring.Utilities.MakeRealTable(SYNCED.morphUnits, "Morph")
-	--local morphToStart = Spring.Utilities.MakeRealTable(SYNCED.morphToStart, "Morph (to start)")
-	local save = {morph = morph}	-- {morph = morph, morphToStart = morphToStart}
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, save)
 end
 
 --------------------------------------------------------------------------------
