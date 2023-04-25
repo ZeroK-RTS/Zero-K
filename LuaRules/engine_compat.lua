@@ -209,6 +209,13 @@ if Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1706) then
 	end
 end
 
+if not Game.footprintScale then -- BAR 105-1725
+	Game.footprintScale = 2
+end
+if not Game.buildSquareSize then -- BAR 105-1725
+	Game.buildSquareSize = 16
+end
+
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
