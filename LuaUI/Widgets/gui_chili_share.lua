@@ -1083,10 +1083,9 @@ local function InitName(subject, playerPanel)
 			noFont = true,
 		}
 	end
-	local country, icon, elo, badges, clan, avatar, faction, admin
+	local icon, elo, badges, clan, avatar, faction, admin
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
-		country = select(8, Spring.GetPlayerInfo(subject.player, false))
 		icon = pdata.icon
 		elo = pdata.elo
 		badges = pdata.badges
@@ -1096,7 +1095,6 @@ local function InitName(subject, playerPanel)
 	end
 	if (playerInfo[subject.name]) then
 		--Spring.Echo("Using extra info for " .. subject.name)
-		country = playerInfo[subject.name].country
 		clan = playerInfo[subject.name].clan
 		icon = playerInfo[subject.name].icon
 		badges = playerInfo[subject.name].badges
@@ -1117,7 +1115,6 @@ local function InitName(subject, playerPanel)
 	end
 
 	--Spring.Echo("badges: " .. tostring(badges))
-	local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	local clanImg = nil
 	local avatarImg = nil
 	local adminImg = nil
@@ -1174,15 +1171,6 @@ local function InitName(subject, playerPanel)
 		--	caption=" "
 		--}
 	end
-	--if (countryImg) then
-	--	chili.Image:New{parent=playerPanel,
-	--		file=countryImg,
-	--		width=16,
-	--		height=11,
-	--		x = 64 + buttonsize*1 + 5,
-	--		y = givemebuttons[subject.id]["text"].y + 2
-	--	}
-	--end
 	if (clanImg) then
 		chili.Image:New{parent=playerPanel,
 			file=clanImg,
