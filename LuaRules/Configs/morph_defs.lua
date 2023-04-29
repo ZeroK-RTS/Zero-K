@@ -6,14 +6,6 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 local morphDefs = {}
 
-local baseComMorph = {
-	[0] = {time = 10, cost = 0},
-	[1] = {time = 25, cost = 250},
-	[2] = {time = 30, cost = 300},
-	[3] = {time = 40, cost = 400},
-	[4] = {time = 50, cost = 500},
-}
-
 --------------------------------------------------------------------------------
 -- customparams
 --------------------------------------------------------------------------------
@@ -56,6 +48,13 @@ end
 -- basic (non-modular) commander handling
 --------------------------------------------------------------------------------
 local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
+local baseComMorph = {
+	[0] = {time = 10, cost = 0},
+	[1] = {time = 25, cost = 250},
+	[2] = {time = 30, cost = 300},
+	[3] = {time = 40, cost = 400},
+	[4] = {time = 50, cost = 500},
+}
 
 for i = 1, #comms do
 	for j = 0,4 do
@@ -70,116 +69,6 @@ for i = 1, #comms do
 		}
 	end
 end
-
-
---------------------------------------------------------------------------------
--- modular commander handling
---------------------------------------------------------------------------------
-local comMorph = {	-- not needed
-	[1] = {time = 20,},
-	[2] = {time = 25,},
-	[3] = {time = 30,},
-	[4] = {time = 35,},
-	[5] = {time = 40,},
-}
-
-local customComms = {}
-
-local function InitUnsafe()
-	if not Spring.GetPlayerList then
-		return
-	end
-	for name, id in pairs(Spring.GetPlayerList()) do	-- pairs(playerIDsByName) do
-		-- copied from PlanetWars
-		local commData, success
-		local customKeys = select(10, Spring.GetPlayerInfo(id))
-		local commDataRaw = customKeys and customKeys.commanders
-		if not (commDataRaw and type(commDataRaw) == 'string') then
-			if commDataRaw then
-				err = "Comm data entry for player "..id.." is in invalid format"
-			end
-			commData = {}
-		else
-			commDataRaw = string.gsub(commDataRaw, '_', '=')
-			commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-			--Spring.Echo(commDataRaw)
-			local commDataFunc, err = loadstring("return "..commDataRaw)
-			if commDataFunc then
-				success, commData = pcall(commDataFunc)
-				if not success then
-					err = commData
-					commData = {}
-				end
-			end
-		end
-		if err then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Comm Morph warning: ' .. err)
-		end
-
-		for series, subdata in pairs(commData) do
-			customComms[id] = customComms[id] or {}
-			customComms[id][series] = subdata
-		end
-	end
-end
-
-local function CheckForExistingMorph(morphee, target)
-	local array = morphDefs[morphee]
-	if not array then
-		return false
-	end
-	if array.into then
-		return (array.into == target)
-	end
-	for index,morphOpts in pairs(array) do
-		if morphOpts.into and morphOpts.into == target then
-			return true
-		end
-	end
-	return false
-end
-
-InitUnsafe()
-for id, playerData in pairs(customComms) do
-	Spring.Echo("Setting morph for custom comms for player: "..id)
-	for chassisName, array in pairs(playerData) do
-		for i=1,#array do
-			--Spring.Echo(array[i], array[i+1])
-			local targetDef = array[i+1] and UnitDefNames[array[i+1]]
-			local originDef = UnitDefNames[array[i]] or UnitDefNames[array[i]]
-			if targetDef and originDef then
-				--Spring.Echo("Configuring comm morph: "..(array[i]) , array[i+1])
-				local sourceName, targetName = originDef.name, targetDef.name
-				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true) or {}
-				
-				morphOption.into = array[i+1]
-				-- set time
-				morphOption.time = math.floor( (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) ) or morphOption.time
-				--morphOption.time = math.floor((targetDef.metalCost - originDef.metalCost)/10) or morphOption.time
-				--morphOption.time = math.floor(15 + i*5) or morphOption.time
-				morphOption.combatMorph = true
-				-- copy, checking that this morph isn't already defined
-				morphDefs[sourceName] = morphDefs[sourceName]  or {}
-				if not CheckForExistingMorph(sourceName, targetName) then
-					morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
-				else
-					Spring.Echo("Duplicate morph, exiting")
-				end
-			end
-		end
-	end
-end
-
---check that the morphs were actually inserted
---[[
-for i,v in pairs(morphDefs) do
-	Spring.Echo(i)
-	if v.into then Spring.Echo("\t"..v.into)
-	else
-		for a,b in pairs(v) do Spring.Echo("\t"..b.into) end
-	end
-end
-]]--
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
