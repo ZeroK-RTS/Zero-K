@@ -24,7 +24,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-local defaultValue = 0
+local defaultValue = 0.8
 local isDisabled = (defaultValue ~= 0)
 
 local function MakeShader()
@@ -122,7 +122,7 @@ end
 
 options_path = 'Settings/Graphics/Effects'
 options = {
-	cas_sharpness4 = {
+	cas_sharpness5 = {
 		name = 'Sharpening',
 		type = 'number',
 		value = defaultValue, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
