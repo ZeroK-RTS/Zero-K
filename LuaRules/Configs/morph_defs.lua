@@ -4,21 +4,7 @@
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local morphDefs = {
-
-	chicken_drone = {
-		[1] = {
-			into = 'chickend',
-			energy = 15,
-			time = 20,
-		},
-		[2] = {
-			into = 'chickenspire',
-			energy = 600,
-			time = 90,
-		},
-	},
-}
+local morphDefs = {}
 
 local baseComMorph = {
 	[0] = {time = 10, cost = 0},

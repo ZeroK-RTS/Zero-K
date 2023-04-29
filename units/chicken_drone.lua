@@ -16,6 +16,13 @@ return { chicken_drone = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+	morphto_1 = "chickend",
+	morphtime_1 = 20,
+	morphcost_1 = 15,
+
+	morphto_2 = "chickenspire",
+	morphtime_2 = 90,
+	morphcost_2 = 600,
   },
 
   energyMake          = 0,
