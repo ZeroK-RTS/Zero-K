@@ -129,7 +129,6 @@ local PRIVATE = {private = true}
 --------------------------------------------------------------------------------
 
 local morphDefs	= {} --// make it global in Initialize()
-local extraUnitMorphDefs = {} -- stores mainly planetwars morphs
 local hostName = nil -- planetwars hostname
 local PWUnits = {} -- planetwars units
 local morphUnits = {} --// make it global in Initialize(); needs save/load
@@ -398,17 +397,12 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
-	--if (extraUnitMorphDefs[unitID] ~= nil) then
-	-- nothing here for now
-	--end
-	
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message
 		PWUnit = PWUnits[unitID]
 		PWUnit.currentDef = udDst
 		local data = PWUnit.owner..","..defName..","..math.floor(px)..","..math.floor(pz)..",".."S" -- todo determine and apply smart orientation of the structure
 		Spring.SendCommands("w "..hostName.." pwmorph:"..data)
-		extraUnitMorphDefs[unitID] = nil
 		--GG.PlanetWars.units[unitID] = nil
 		--GG.PlanetWars.units[newUnit] = PWUnit
 		SendToUnsynced('PWCreate', unitTeam, newUnit)
@@ -627,7 +621,6 @@ function gadget:Initialize()
 	--// make it global for unsynced access via SYNCED
 	_G.morphUnits         = morphUnits
 	_G.morphDefs          = morphDefs
-	_G.extraUnitMorphDefs = extraUnitMorphDefs
 	--_G.morphToStart       = morphToStart
 
 	--// Register CmdIDs
@@ -748,7 +741,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 		end
 	else
 		--Spring.Echo('Morph gadget: CommandFallback specific morph')
-		morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+		morphDef = (morphDefs[unitDefID] or {})[cmdID]
 	end
 	if (not morphDef) then
 		return true
@@ -841,7 +834,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			--Spring.Echo('Morph gadget: AllowCommand morph cannot be here!')
 		elseif (cmdID > CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
 			--Spring.Echo('Morph gadget: AllowCommand specific morph')
-			morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+			morphDef = (morphDefs[unitDefID] or {})[cmdID]
 		end
 		if morphDef then
 			if (isFactory(unitDefID)) then
@@ -987,7 +980,7 @@ local function StartMorph(cmd, unitID, unitDefID, morphID)
 			CallAsTeam({['read'] = readTeam },
 				function()
 					if (unitID)and(IsUnitVisible(unitID)) then
-						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID] or SYNCED.extraUnitMorphDefs[unitID])
+						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID])
 					end
 				end
 			)
