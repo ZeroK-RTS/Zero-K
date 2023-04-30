@@ -418,6 +418,7 @@ local function InitializeBriefingWindow()
 		TakeObjectivesLists()
 		
 		briefingWindow:SetVisibility(true)
+		briefingWindow:BringToFront()
 	end
 	
 	function externalFunctions.Hide()
@@ -888,6 +889,9 @@ function widget:Update()
 	if firstUpdates then
 		if TakeMouseOffEdge() and WG.ZoomToStart then
 			WG.ZoomToStart()
+		end
+		if firstUpdates < 2 and briefingWindow then
+			briefingWindow.Show()
 		end
 		firstUpdates = firstUpdates + 1
 		if firstUpdates > 30 then
