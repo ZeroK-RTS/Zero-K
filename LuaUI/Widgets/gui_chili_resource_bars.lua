@@ -397,7 +397,7 @@ function widget:GameFrame(n)
 	"\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " ..
 	"\nTeam Metal Economy  " ..
-	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
+	"\n  Income: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
 	"\n  Base Extraction: " .. team_metalBase ..
 	"\n  Overdrive: " .. team_metalOverdrive ..
 	"\n  Reclaim : " .. team_metalReclaim ..
@@ -416,7 +416,7 @@ function widget:GameFrame(n)
 	"\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\nTeam Energy Economy" ..
-	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
+	"\n  Income: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
 	"\n  Generators: " .. team_energyGenerators ..
 	"\n  Reclaim: " .. team_energyReclaim ..
 	"\n  Overdrive: " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " metal" ..
