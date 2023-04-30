@@ -191,7 +191,7 @@ local function DoSelectionLoad()
 			CopyMoveThenUnload(heavyTrans[offset + i], light[i])
 		end
 	end
-	Spring.SetActiveCommand(-1)
+	Spring.SetActiveCommand(nil)
 end
 
 function widget:CommandNotify(cmdId)

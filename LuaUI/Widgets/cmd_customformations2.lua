@@ -812,7 +812,7 @@ local function StopCommandAndRelinquishMouse()
 		if shift then
 			endShift = true -- Reset on release of shift
 		else
-			spSetActiveCommand(0) -- Reset immediately
+			spSetActiveCommand(nil) -- Reset immediately
 		end
 	end
 end
@@ -840,7 +840,7 @@ function widget:MouseRelease(mx, my, mButton)
 		if shift then
 			endShift = true -- Reset on release of shift
 		else
-			spSetActiveCommand(0) -- Reset immediately
+			spSetActiveCommand(nil) -- Reset immediately
 		end
 	end
 	-- Are we going to use the drawn formation?
@@ -977,7 +977,7 @@ end
 
 function widget:KeyRelease(key)
 	if (key == keyShift) and endShift then
-		spSetActiveCommand(0)
+		spSetActiveCommand(nil)
 		endShift = false
 	end
 end
