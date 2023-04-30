@@ -421,6 +421,12 @@ local function InitializeBriefingWindow()
 		briefingWindow:BringToFront()
 	end
 	
+	function externalFunctions.BringToFrontFix()
+		if briefingWindow.visible then
+			briefingWindow:BringToFront()
+		end
+	end
+	
 	function externalFunctions.Hide()
 		if WG.PauseScreen_SetEnabled then
 			WG.PauseScreen_SetEnabled(true)
@@ -891,7 +897,7 @@ function widget:Update()
 			WG.ZoomToStart()
 		end
 		if firstUpdates < 2 and briefingWindow then
-			briefingWindow.Show()
+			briefingWindow.BringToFrontFix()
 		end
 		firstUpdates = firstUpdates + 1
 		if firstUpdates > 30 then
