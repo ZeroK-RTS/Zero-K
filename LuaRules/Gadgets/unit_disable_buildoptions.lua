@@ -56,21 +56,24 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	for i = 1, #buildOptions do
 		local buildeeDefID = buildOptions[i]
-		local buildeeMoveDef = UnitDefs[buildeeDefID].moveDef
-		local smClass = buildeeMoveDef.smClass
-		cmdEditArray.disabled = false
-		if not smClass then
-			-- aircraft or immobile (like nano), not handled atm. FIXME: could be handled
-		elseif smClass == smcShip then
-			if depth < buildeeMoveDef.depth then
-				cmdEditArray.disabled = true
+		local cmdIndex = spFindUnitCmdDesc(unitID, -buildeeDefID)
+		if cmdIndex then -- maybe it got removed via disabled units modoption etc
+			local buildeeMoveDef = UnitDefs[buildeeDefID].moveDef
+			local smClass = buildeeMoveDef.smClass
+			cmdEditArray.disabled = false
+			if not smClass then
+				-- aircraft or immobile (like nano), not handled atm. FIXME: could be handled
+			elseif smClass == smcShip then
+				if depth < buildeeMoveDef.depth then
+					cmdEditArray.disabled = true
+				end
+				-- FIXME: handle other reasons (steep slope? 0 speed typemap? water is acid?)
+			elseif smClass ~= smcHover then
+				if depth > buildeeMoveDef.depth then
+					cmdEditArray.disabled = true
+				end
 			end
-			-- FIXME: handle other reasons (steep slope? 0 speed typemap? water is acid?)
-		elseif smClass ~= smcHover then
-			if depth > buildeeMoveDef.depth then
-				cmdEditArray.disabled = true
-			end
+			spEditUnitCmdDesc(unitID, cmdIndex, cmdEditArray)
 		end
-		spEditUnitCmdDesc(unitID, spFindUnitCmdDesc(unitID, -buildeeDefID), cmdEditArray)
 	end
 end
