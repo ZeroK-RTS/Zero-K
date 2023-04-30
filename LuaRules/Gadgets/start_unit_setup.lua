@@ -337,7 +337,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		end
 		
 		-- CREATE UNIT
-		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
+		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, nil, nil, nil, nil, nil, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
 		
 		if not unitID then
 			return
