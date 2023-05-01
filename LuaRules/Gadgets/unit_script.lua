@@ -535,6 +535,14 @@ local function Basename(filename)
 	return filename:match("[^\\/:]*$") or filename
 end
 
+local function preprocess_math_rad(expression)
+	local number = tonumber(expression)
+	if number then
+		return tostring(math.rad(number))
+	else
+		return "math.rad(" .. expression .. ")"
+	end
+end
 
 local function LoadChunk(filename)
 	local text = VFS.LoadFile(filename, VFSMODE)
@@ -542,6 +550,11 @@ local function LoadChunk(filename)
 		Spring.Log(section, LOG.ERROR, "Failed to load: " .. filename)
 		return nil
 	end
+
+	-- pre-process constants (for example "math.rad(180)" -> "3.1415")
+	-- to avoid tons of needless global dereferences, function calls etc
+	text = text:gsub("math.rad%(([^%)]*)%)", preprocess_math_rad)
+
 	local chunk, err = loadstring(scriptHeader .. text, filename)
 	if (chunk == nil) then
 		Spring.Log(section, LOG.ERROR, "Failed to load: " .. Basename(filename) .. "  (" .. err .. ")")
