@@ -89,16 +89,16 @@ local function Walk()
 		end
 
 		Turn(shin[side],    x_axis, strideMult * math.rad(85),  speedMult*0.35)
-		Turn(ankle[side],   x_axis, strideMult * math.rad(0),   speedMult*0.25)
-		Turn(foot[side],    x_axis, strideMult * math.rad(0),   speedMult*0.25)
+		Turn(ankle[side],   x_axis, 0, speedMult*0.25)
+		Turn(foot[side],    x_axis, 0, speedMult*0.25)
 		Turn(thigh[side],   x_axis, strideMult * math.rad(-36), speedMult*0.16)
 		Turn(thigh[3-side], x_axis, strideMult * math.rad(36),  speedMult*0.16)
-		Turn(shin[3-side],  x_axis, strideMult * math.rad(0),   speedMult*0.16)
+		Turn(shin[3-side],  x_axis, 0, speedMult*0.16)
 
 		Move(hips, y_axis, 1.5, speedMult*2.0)
 		WaitForMove(hips, y_axis)
 
-		Turn(shin[side],   x_axis, strideMult * math.rad(0),   speedMult*0.26)
+		Turn(shin[side],   x_axis, 0, speedMult*0.26)
 		Turn(ankle[side],  x_axis, strideMult * math.rad(10),  speedMult*0.26)
 		Turn(foot[side],   x_axis, strideMult * math.rad(-20), speedMult*0.25)
 		Turn(foot[3-side], x_axis, strideMult * math.rad(5),   speedMult*0.15)
@@ -291,19 +291,19 @@ local function SetupReloadStance()
 end
 
 local function LeaveReloadStance()
-	Turn(arml, y_axis, math.rad(0), math.rad(45))
-	Turn(arml, x_axis, math.rad(0), math.rad(45))
-	Turn(arml, z_axis, math.rad(0), math.rad(45))
+	Turn(arml, y_axis, 0, math.rad(45))
+	Turn(arml, x_axis, 0, math.rad(45))
+	Turn(arml, z_axis, 0, math.rad(45))
 	
 	Turn(forearml, z_axis, math.rad(-90), math.rad(45))
 	
-	Turn(armr, x_axis, math.rad(0), math.rad(45))
-	Turn(armr, y_axis, math.rad(0), math.rad(45))
+	Turn(armr, x_axis, 0, math.rad(45))
+	Turn(armr, y_axis, 0, math.rad(45))
 	
-	Turn(forearmr, z_axis, math.rad(0), math.rad(45))
+	Turn(forearmr, z_axis, 0, math.rad(45))
 	
-	Turn(camera, y_axis, math.rad(0), math.rad(80))
-	Turn(camera, x_axis, math.rad(0), math.rad(80))
+	Turn(camera, y_axis, 0, math.rad(80))
+	Turn(camera, x_axis, 0, math.rad(80))
 	
 	Move(stock, y_axis, 9, 9)
 	Turn(handl, z_axis, 0, math.rad(6))
@@ -314,12 +314,12 @@ local function LeaveReloadStance()
 end
 
 local function WiggleReload()
-	Move(stock, y_axis, 9 - 10 * math.random(), 20 * math.random())
-	Turn(forearml, z_axis, math.rad(-48 + 6 * math.random()), math.rad(8))
-	Turn(forearmr, z_axis, math.rad(45 - 3 * math.random()), math.rad(8))
-	Turn(camera, y_axis, math.rad(-15 + 20 * math.random()), math.rad(30))
-	Turn(handl, z_axis, math.rad(8 - 16 * math.random()), math.rad(10))
-	Turn(handr, z_axis, math.rad(10 - 10 * math.random()), math.rad(10))
+	Move(stock, y_axis, 9 - 10 * math.random(), math.rad(20) * math.random())
+	Turn(forearml, z_axis, math.rad(-48) + math.rad(6) * math.random(), math.rad(8))
+	Turn(forearmr, z_axis, math.rad(45) - math.rad(3) * math.random(), math.rad(8))
+	Turn(camera, y_axis, math.rad(-15) + math.rad(20) * math.random(), math.rad(30))
+	Turn(handl, z_axis, math.rad(8) - math.rad(16) * math.random(), math.rad(10))
+	Turn(handr, z_axis, math.rad(10) - math.rad(10) * math.random(), math.rad(10))
 end
 
 local function ReloadPenaltyAndAnimation()

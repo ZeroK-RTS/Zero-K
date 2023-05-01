@@ -238,9 +238,9 @@ function script.AimWeapon(num, heading, pitch)
 		isLasering = true
 		if pitch > math.rad(-45) then
 			Turn(rarm, x_axis, -pitch, ARM_SPEED_PITCH)
-			Turn(rhand, x_axis, math.rad(0), ARM_SPEED_PITCH)
+			Turn(rhand, x_axis, 0, ARM_SPEED_PITCH)
 		else
-			Turn(rarm, x_axis, -math.rad(18), ARM_SPEED_PITCH)
+			Turn(rarm, x_axis, math.rad(-18), ARM_SPEED_PITCH)
 			Turn(rhand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
 		end
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
@@ -257,9 +257,9 @@ function script.AimWeapon(num, heading, pitch)
 		isDgunning = true
 		if pitch > math.rad(-45) then
 			Turn(larm, x_axis, -pitch, ARM_SPEED_PITCH)
-			Turn(lnanohand, x_axis, math.rad(0), ARM_SPEED_PITCH)
+			Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
 		else
-			Turn(larm, x_axis, -math.rad(18), ARM_SPEED_PITCH)
+			Turn(larm, x_axis, math.rad(-18), ARM_SPEED_PITCH)
 			Turn(lnanohand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
 		end
 		--Turn(larm, x_axis, math.min(math.rad(-18), -pitch), ARM_SPEED_PITCH)

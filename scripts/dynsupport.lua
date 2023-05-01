@@ -56,7 +56,7 @@ local bAiming = false
 local inBuildAnim = false
 
 local SPEEDUP_FACTOR = 1.02
-local REF_TURN_SPEED = 185  -- deg/s
+local REF_TURN_SPEED = math.rad(185)
 local walkTurnSpeed1 = 1
 local walkSleepMult = 1.0
 local walkAngleMult = 1.0
@@ -129,7 +129,7 @@ local function RestoreAfterDelay()
 			Turn(luparm, z_axis, 0, math.rad(250))
 			Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up 5
 			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
-			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
+			Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
 			Turn(lloarm, y_axis, 0, math.rad(250))
 			Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring 94
@@ -146,153 +146,153 @@ end
 
 local function Walk()
 	if (bMoving ) then
-		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
+		Turn(pelvis, x_axis, math.rad(6), math.rad(30) * animationSpeedMult) --tilt forward
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(3.335165), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(3.335165), walkTurnSpeed1)
 		end
 
 		Move(pelvis, y_axis, 0)
-		Turn(rupleg, x_axis, math.rad(5.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-26.467033)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(26.967033)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(26.967033)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-19.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(5.670330)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-26.467033)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(26.967033)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(26.967033)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-19.824176)*walkAngleMult, walkTurnSpeed1)
 		Sleep(180 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(1.681319), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(1.681319), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-5.269231)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-20.989011)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(20.945055)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(41.368132)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-5.269231)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-20.989011)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(20.945055)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(41.368132)*walkAngleMult, walkTurnSpeed1)
 		Turn(rfoot, x_axis, math.rad(-15.747253)*walkAngleMult)
 		Sleep(160 * walkSleepMult )
 	end
 	
 	if (bMoving ) then
-		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult))
+		Turn(pelvis, x_axis, 0, math.rad(30) * animationSpeedMult)
 		if not bAiming then
-			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, 0, walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-9.071429)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-12.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(12.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(43.571429)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-12.016484)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-9.071429)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-12.670330)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(12.670330)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(43.571429)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-12.016484)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-1.77), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(-1.77), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-21.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(3.560440)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-4.527473)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(52.505495)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-21.357143)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(3.560440)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-4.527473)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(52.505495)*walkAngleMult, walkTurnSpeed1)
 		Turn(rfoot, x_axis, 0)
 		Sleep(140 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(-3.15), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-35.923077)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(7.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(8.203297)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-12.571429)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(54.390110)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-35.923077)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(7.780220)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(8.203297)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-12.571429)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(54.390110)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 	
-		Turn(pelvis, x_axis, math.rad(6), math.rad(30 * animationSpeedMult)) --tilt forward
+		Turn(pelvis, x_axis, math.rad(6), math.rad(30) * animationSpeedMult) --tilt forward
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-4.21), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(-4.21), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-37.780220)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(10.137363)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(13.302198)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-16.714286)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(32.582418)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-37.780220)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(10.137363)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(13.302198)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-16.714286)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(32.582418)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 	
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-3.15), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(-3.15), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-28.758242)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(12.247253)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(19.659341)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-19.659341)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(28.758242)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-28.758242)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(12.247253)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(19.659341)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-19.659341)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(28.758242)*walkAngleMult, walkTurnSpeed1)
 		Sleep(160 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(-1.88), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(-1.88), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-22.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(34.060440)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-6.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-22.824176)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(2.824176)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(34.060440)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-6.313187)*walkAngleMult, walkTurnSpeed1)
 		Sleep(160 * walkSleepMult )
 	end
 	
 	if (bMoving ) then
-		Turn(pelvis, x_axis, math.rad(0), math.rad(30 * animationSpeedMult))
+		Turn(pelvis, x_axis, 0, math.rad(30) * animationSpeedMult)
 		if not bAiming then
-			Turn(torso, y_axis, 0, math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, 0, walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(-11.604396)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-6.725275)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(39.401099)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-13.956044)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(19.005495)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-7.615385)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(-11.604396)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-6.725275)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(39.401099)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-13.956044)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(19.005495)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-7.615385)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 	
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(1.88), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(1.88), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(1.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-24.357143)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(45.093407)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-7.703297)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(3.560440)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-4.934066)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(1.857143)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-24.357143)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(45.093407)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-7.703297)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(3.560440)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-4.934066)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(3.15), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(3.15), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(7.148352)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-28.181319)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(7.148352)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-28.181319)*walkAngleMult, walkTurnSpeed1)
 		Sleep(140 * walkSleepMult )
 	end
 	
 	if (bMoving ) then
 		if not bAiming then
-			Turn(torso, y_axis, math.rad(4.20), math.rad(walkTurnSpeed1))
+			Turn(torso, y_axis, math.rad(4.20), walkTurnSpeed1)
 		end
-		Turn(rupleg, x_axis, math.rad(8.423077)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lupleg, x_axis, math.rad(-32.060440)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lloleg, x_axis, math.rad(27.527473)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(lfoot, x_axis, math.rad(-2.857143)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rloleg, x_axis, math.rad(24.670330)*walkAngleMult, math.rad(walkTurnSpeed1))
-		Turn(rfoot, x_axis, math.rad(-26.313187)*walkAngleMult, math.rad(walkTurnSpeed1))
+		Turn(rupleg, x_axis, math.rad(8.423077)*walkAngleMult, walkTurnSpeed1)
+		Turn(lupleg, x_axis, math.rad(-32.060440)*walkAngleMult, walkTurnSpeed1)
+		Turn(lloleg, x_axis, math.rad(27.527473)*walkAngleMult, walkTurnSpeed1)
+		Turn(lfoot, x_axis, math.rad(-2.857143)*walkAngleMult, walkTurnSpeed1)
+		Turn(rloleg, x_axis, math.rad(24.670330)*walkAngleMult, walkTurnSpeed1)
+		Turn(rfoot, x_axis, math.rad(-26.313187)*walkAngleMult, walkTurnSpeed1)
 		Sleep(160 * walkSleepMult )
 	end
 end
@@ -337,7 +337,7 @@ local function MotionControl()
 			justmoved = true
 		else
 			if justmoved then
-				Turn(pelvis, x_axis, math.rad(0), math.rad(60))
+				Turn(pelvis, x_axis, 0, math.rad(60))
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
 				Turn(rloleg, x_axis, 0, math.rad(200.071429))
 				Turn(rfoot, x_axis, 0, math.rad(200.071429))
@@ -366,19 +366,19 @@ function script.Create()
 	Turn(ruparm, z_axis, 0, math.rad(250))
 	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --
 	Turn(rarm, y_axis, 0, math.rad(250))
-	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up
+	Turn(rarm, z_axis, math.rad(12), math.rad(250))	--up
 	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up
 	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up
-	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up
+	Turn(rloarm, z_axis, math.rad(47), math.rad(250)) --up
 	Turn(luparm, x_axis, math.rad(12), math.rad(250))	 --up
 	Turn(luparm, y_axis, 0, math.rad(250))
 	Turn(luparm, z_axis, 0, math.rad(250))
 	Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up
 	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up
-	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up
+	Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up
 	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up
 	Turn(lloarm, y_axis, 0, math.rad(250))
-	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring
+	Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring
 
 	Hide(flare)
 	Hide(ac1)
@@ -525,12 +525,12 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(rloleg, x_axis, math.rad(25), math.rad(250))
 		Turn(lupleg, x_axis, math.rad(7), math.rad(250))
 		Turn(lupleg, y_axis, math.rad(34), math.rad(250))
-		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))
+		Turn(lupleg, z_axis, math.rad(9), math.rad(250))
 		
 		GG.Script.InitializeDeathAnimation(unitID)
 		Sleep(200) --give time to fall
 		Turn(luparm, y_axis, math.rad(18), math.rad(350))
-		Turn(luparm, z_axis, math.rad(-(-45)), math.rad(350))
+		Turn(luparm, z_axis, math.rad(45), math.rad(350))
 		Sleep(650)
 		--EmitSfx(turret, 1026) --impact
 

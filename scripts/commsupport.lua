@@ -107,7 +107,7 @@ local function RestoreAfterDelay()
 			Turn(luparm, z_axis, 0, math.rad(250))
 			Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up 5
 			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
-			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
+			Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
 			Turn(lloarm, y_axis, 0, math.rad(250))
 			Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring 94
@@ -284,19 +284,19 @@ function script.Create()
 	Turn(ruparm, z_axis, 0, math.rad(250))
 	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --
 	Turn(rarm, y_axis, 0, math.rad(250))
-	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up
+	Turn(rarm, z_axis, math.rad(12), math.rad(250))	--up
 	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up
 	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up
-	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up
+	Turn(rloarm, z_axis, math.rad(47), math.rad(250)) --up
 	Turn(luparm, x_axis, math.rad(12), math.rad(250))	 --up
 	Turn(luparm, y_axis, 0, math.rad(250))
 	Turn(luparm, z_axis, 0, math.rad(250))
 	Turn(larm, x_axis, math.rad(-35), math.rad(250))	 --up
 	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up
-	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up
+	Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up
 	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up
 	Turn(lloarm, y_axis, 0, math.rad(250))
-	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring
+	Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring
 
 	Hide(flare)
 	Hide(ac1)
@@ -448,10 +448,10 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(rloleg, x_axis, math.rad(25), math.rad(250))
 		Turn(lupleg, x_axis, math.rad(7), math.rad(250))
 		Turn(lupleg, y_axis, math.rad(34), math.rad(250))
-		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))
+		Turn(lupleg, z_axis, math.rad(9), math.rad(250))
 		Sleep(200) --give time to fall
 		Turn(luparm, y_axis, math.rad(18), math.rad(350))
-		Turn(luparm, z_axis, math.rad(-(-45)), math.rad(350))
+		Turn(luparm, z_axis, math.rad(45), math.rad(350))
 		Sleep(650)
 		--EmitSfx(turret, 1026) --impact
 

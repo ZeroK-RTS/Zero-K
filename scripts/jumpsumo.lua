@@ -132,8 +132,8 @@ local function Walk()
 		
 		Turn(lf_foot, y_axis, math.rad(20), sp1)
 		Turn(rf_foot, y_axis, math.rad(20), sp2)
-		Turn(lb_foot, y_axis, -math.rad(20), sp2)
-		Turn(rb_foot, y_axis, -math.rad(20), sp1)
+		Turn(lb_foot, y_axis, math.rad(-20), sp2)
+		Turn(rb_foot, y_axis, math.rad(-20), sp1)
 		
 		WaitForTurn(rb_ball, y_axis)
 		Sleep(50)
@@ -189,8 +189,8 @@ local function Walk()
 		Turn(rf_foot, x_axis, sh_angle, sh_speed)
 		Turn(rb_foot, x_axis, -sh_angle+0.3, sh_speed+.7)
 		
-		Turn(lf_foot, y_axis, -math.rad(20), sp2)
-		Turn(rf_foot, y_axis, -math.rad(20), sp1)
+		Turn(lf_foot, y_axis, math.rad(-20), sp2)
+		Turn(rf_foot, y_axis, math.rad(-20), sp1)
 		Turn(lb_foot, y_axis, math.rad(20), sp1)
 		Turn(rb_foot, y_axis, math.rad(20), sp2)
 		

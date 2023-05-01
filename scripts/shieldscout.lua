@@ -52,13 +52,13 @@ local function jumpTuckInLegs(leg)
 end
 
 local function jumpUnTuckLegs(leg)
-	Turn(leg.thigh, x_axis, math.rad(0), math.rad(200))
-	Turn(leg.calf, x_axis, math.rad(0), math.rad(200))
-	Turn(leg.foot, x_axis, math.rad(0), math.rad(200))
+	Turn(leg.thigh, x_axis, 0, math.rad(200))
+	Turn(leg.calf, x_axis, 0, math.rad(200))
+	Turn(leg.foot, x_axis, 0, math.rad(200))
 end
 
 local function somersaultThread(jumpDuration)
-	Turn(pelvis, x_axis, math.rad(0))
+	Turn(pelvis, x_axis, 0)
 	Sleep(jumpDuration/4)
 
 	jumpTuckInLegs(leftLeg)
@@ -77,8 +77,8 @@ end
 
 local function jumpLegLaunch(leg)
 	Signal(SIG_WALK)
-	Turn(leg.thigh, x_axis, math.rad(0))
-	Turn(leg.calf, x_axis, math.rad(0))
+	Turn(leg.thigh, x_axis, 0)
+	Turn(leg.calf, x_axis, 0)
 	Turn(leg.foot, x_axis, math.rad(-40))
 	
 	Turn(leg.thigh, x_axis, math.rad(-30), math.rad(100))
@@ -87,7 +87,7 @@ local function jumpLegLaunch(leg)
 end
 
 local function jumpLegLand(leg)
-	Turn(leg.thigh, x_axis, math.rad(0), math.rad(100))
+	Turn(leg.thigh, x_axis, 0, math.rad(100))
 	Turn(leg.calf, x_axis, math.rad(-30), math.rad(300))
 	Turn(leg.foot, x_axis, math.rad(10), math.rad(100))
 end
@@ -96,7 +96,7 @@ function beginJump(turn,lineDist,flightDist,duration)
 	Turn(box, x_axis, math.rad(20))
 	jumpLegLaunch(leftLeg)
 	jumpLegLaunch(rightLeg)
-	Turn(box, x_axis, math.rad(0), math.rad(150))
+	Turn(box, x_axis, 0, math.rad(150))
 	
 	doingSomersault = math.random() < 0.15
 	
@@ -113,7 +113,7 @@ end
 
 function endJump()
 	Spring.UnitScript.StopSpin(pelvis, x_axis)
-	Turn(pelvis, x_axis, math.rad(0))
+	Turn(pelvis, x_axis, 0)
 	Turn(box, x_axis, math.rad(40),math.rad(400))
 	Move(pelvis, y_axis, -8, 80)
 	jumpLegLand(leftLeg)
@@ -132,9 +132,9 @@ local function Step(front, back)
 	Turn(back.calf, x_axis, math.rad(50), math.rad(420))
 	--Turn(back.foot, x_axis, math.rad(30), math.rad(420))
 	
-	--Turn(pelvis, z_axis, math.rad(-(5)), math.rad(40))
-	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
-	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	--Turn(pelvis, z_axis, math.rad(-5), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(5), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(5), math.rad(40))
 	--Move(pelvis, y_axis, 0.7, 8000)
 	
 	--WaitForTurn(front.thigh, x_axis)
@@ -385,11 +385,11 @@ end
 
 function script.FireWeapon(num)
 	Turn(pole, x_axis, math.rad(90), math.rad(40000))
-	Turn(box, x_axis, -math.rad(50), math.rad(40000))
+	Turn(box, x_axis, math.rad(-50), math.rad(40000))
 	Move(box, y_axis, 15, 300)
 	Sleep(30)
-	Turn(pole, x_axis, math.rad(0), math.rad(80))
-	Turn(box, x_axis, math.rad(0), math.rad(40))
+	Turn(pole, x_axis, 0, math.rad(80))
+	Turn(box, x_axis, 0, math.rad(40))
 	Move(box, y_axis, 0, 10)
 end
 

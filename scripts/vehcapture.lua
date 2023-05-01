@@ -128,8 +128,7 @@ local function IdleAnim()
 	Signal(SIG_IDLE)
 	SetSignalMask(SIG_IDLE)
 	while true do
-		local angle = math.random(0,360)
-		Turn(turret, y_axis, math.rad(angle), TURRET_SPEED)
+		Turn(turret, y_axis, math.random() * math.rad(360), TURRET_SPEED)
 		Sleep(4000)
 	end
 end
@@ -175,10 +174,10 @@ function script.Activate()
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn(panel_a1, z_axis, math.rad(-(30)), DEPLOY_SPEED)
-	Turn(panel_a2, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
-	Turn(panel_b1, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
-	Turn(panel_b2, z_axis, math.rad(-(30)), DEPLOY_SPEED)
+	Turn(panel_a1, z_axis, math.rad(-30), DEPLOY_SPEED)
+	Turn(panel_a2, z_axis, math.rad(30), DEPLOY_SPEED)
+	Turn(panel_b1, z_axis, math.rad(30), DEPLOY_SPEED)
+	Turn(panel_b2, z_axis, math.rad(-30), DEPLOY_SPEED)
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
@@ -190,7 +189,7 @@ end
 function script.Deactivate()
 	Signal(SIG_ACTIVATE)
 	SetSignalMask(SIG_ACTIVATE)
-	Turn(turret, y_axis, 0, math.rad(TURRET_SPEED))
+	Turn(turret, y_axis, 0, TURRET_SPEED)
 	WaitForTurn(turret, y_axis)
 	
 	Turn(panel_a1, z_axis, 0, DEPLOY_SPEED)

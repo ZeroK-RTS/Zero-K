@@ -27,55 +27,55 @@ local function Walk()
 	SetSignalMask(SIG_WALK)
 	while true do
 		--/RIGHT LEG
-		Turn(lshoulder, x_axis, math.rad(45), math.rad(22.5*RUN_SPEED_FAST))
-		Turn(llarm, x_axis, math.rad(-22.5), math.rad(22.5*RUN_SPEED_FAST))
-		Turn(rshoulder, x_axis, 0, math.rad(22.5*RUN_SPEED_FAST))
-		Turn(rlarm, x_axis, math.rad(-67.5), math.rad(22.5*RUN_SPEED_FAST))
+		Turn(lshoulder, x_axis, math.rad(45), math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(llarm, x_axis, math.rad(-22.5), math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(rshoulder, x_axis, 0, math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(rlarm, x_axis, math.rad(-67.5), math.rad(22.5)*RUN_SPEED_FAST)
 	
-		Turn(lthigh, x_axis, math.rad(16), math.rad(16*RUN_SPEED_FAST))
-		Turn(lshin, x_axis, math.rad(15), math.rad(15*RUN_SPEED_FAST))
-		Turn(lfoot, x_axis, math.rad(-26), math.rad(26*RUN_SPEED_FAST))
+		Turn(lthigh, x_axis, math.rad(16), math.rad(16)*RUN_SPEED_FAST)
+		Turn(lshin, x_axis, math.rad(15), math.rad(15)*RUN_SPEED_FAST)
+		Turn(lfoot, x_axis, math.rad(-26), math.rad(26)*RUN_SPEED_FAST)
 		
-		Turn(rthigh, x_axis, math.rad(-45), math.rad(38*RUN_SPEED_FAST))
-		Turn(rshin, x_axis, math.rad(11), math.rad(26*RUN_SPEED_FAST))
-		Turn(rfoot, x_axis, math.rad(36), math.rad(41*RUN_SPEED_FAST))
+		Turn(rthigh, x_axis, math.rad(-45), math.rad(38)*RUN_SPEED_FAST)
+		Turn(rshin, x_axis, math.rad(11), math.rad(26)*RUN_SPEED_FAST)
+		Turn(rfoot, x_axis, math.rad(36), math.rad(41)*RUN_SPEED_FAST)
 		Sleep(1000 / RUN_SPEED_FAST)
 		
 		--/FINISH CYCLE
-		Turn(lthigh, x_axis, math.rad(-7), math.rad(23*RUN_SPEED_FAST))
-		Turn(lshin, x_axis, math.rad(-13), math.rad(28*RUN_SPEED_FAST))
-		Turn(lfoot, x_axis, math.rad(-5), math.rad(21*RUN_SPEED_FAST))
+		Turn(lthigh, x_axis, math.rad(-7), math.rad(23)*RUN_SPEED_FAST)
+		Turn(lshin, x_axis, math.rad(-13), math.rad(28)*RUN_SPEED_FAST)
+		Turn(lfoot, x_axis, math.rad(-5), math.rad(21)*RUN_SPEED_FAST)
 
-		Turn(rthigh, x_axis, 0, math.rad(45*RUN_SPEED_FAST))
-		Turn(rshin, x_axis, 0, math.rad(11*RUN_SPEED_FAST))
-		Turn(rfoot, x_axis, 0, math.rad(36*RUN_SPEED_FAST))
+		Turn(rthigh, x_axis, 0, math.rad(45)*RUN_SPEED_FAST)
+		Turn(rshin, x_axis, 0, math.rad(11)*RUN_SPEED_FAST)
+		Turn(rfoot, x_axis, 0, math.rad(36)*RUN_SPEED_FAST)
 				
 		Sleep(1000 / RUN_SPEED_FAST)
 		
 		--/LEFT LEG
-		Turn(rshoulder, x_axis, math.rad(45), math.rad(22.5*RUN_SPEED_FAST))
-		Turn(rlarm, x_axis, math.rad(-22.5), math.rad(22.5*RUN_SPEED_FAST))
-		Turn(lshoulder, x_axis, 0, math.rad(22.5*RUN_SPEED_FAST))
-		Turn(llarm, x_axis, math.rad(-67.5), math.rad(22.5*RUN_SPEED_FAST))
+		Turn(rshoulder, x_axis, math.rad(45), math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(rlarm, x_axis, math.rad(-22.5), math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(lshoulder, x_axis, 0, math.rad(22.5)*RUN_SPEED_FAST)
+		Turn(llarm, x_axis, math.rad(-67.5), math.rad(22.5)*RUN_SPEED_FAST)
 		
-		Turn(lthigh, x_axis, math.rad(-45), math.rad(38*RUN_SPEED_FAST))
-		Turn(lshin, x_axis, math.rad(11), math.rad(26*RUN_SPEED_FAST))
-		Turn(lfoot, x_axis, math.rad(36), math.rad(41*RUN_SPEED_FAST))
+		Turn(lthigh, x_axis, math.rad(-45), math.rad(38)*RUN_SPEED_FAST)
+		Turn(lshin, x_axis, math.rad(11), math.rad(26)*RUN_SPEED_FAST)
+		Turn(lfoot, x_axis, math.rad(36), math.rad(41)*RUN_SPEED_FAST)
 	
-		Turn(rthigh, x_axis, math.rad(16), math.rad(16*RUN_SPEED_FAST))
-		Turn(rshin, x_axis, math.rad(15), math.rad(15*RUN_SPEED_FAST))
-		Turn(rfoot, x_axis, math.rad(-26), math.rad(26*RUN_SPEED_FAST))
+		Turn(rthigh, x_axis, math.rad(16), math.rad(16)*RUN_SPEED_FAST)
+		Turn(rshin, x_axis, math.rad(15), math.rad(15)*RUN_SPEED_FAST)
+		Turn(rfoot, x_axis, math.rad(-26), math.rad(26)*RUN_SPEED_FAST)
 		
 		Sleep(1000 / RUN_SPEED_FAST)
 		
 		--/FINISH CYCLE
-		Turn(lthigh, x_axis, 0, math.rad(45*RUN_SPEED_FAST))
-		Turn(lshin, x_axis, 0, math.rad(11*RUN_SPEED_FAST))
-		Turn(lfoot, x_axis, 0, math.rad(36*RUN_SPEED_FAST))
+		Turn(lthigh, x_axis, 0, math.rad(45)*RUN_SPEED_FAST)
+		Turn(lshin, x_axis, 0, math.rad(11)*RUN_SPEED_FAST)
+		Turn(lfoot, x_axis, 0, math.rad(36)*RUN_SPEED_FAST)
 	
-		Turn(rthigh, x_axis, math.rad(-7), math.rad(23*RUN_SPEED_FAST))
-		Turn(rshin, x_axis, math.rad(-13), math.rad(28*RUN_SPEED_FAST))
-		Turn(rfoot, x_axis, math.rad(-5), math.rad(21*RUN_SPEED_FAST))
+		Turn(rthigh, x_axis, math.rad(-7), math.rad(23)*RUN_SPEED_FAST)
+		Turn(rshin, x_axis, math.rad(-13), math.rad(28)*RUN_SPEED_FAST)
+		Turn(rfoot, x_axis, math.rad(-5), math.rad(21)*RUN_SPEED_FAST)
 		
 		Sleep(1000 / RUN_SPEED_FAST)
 	end
@@ -178,14 +178,14 @@ function beginJump()
 end
 
 function halfJump()
-	--Turn(torso, x_axis, math.rad(0), math.rad(80))
+	--Turn(torso, x_axis, 0, math.rad(80))
 	Move(base, y_axis, 0, 18)
 	
-	Turn(lshin, x_axis, math.rad(0), math.rad(200))
-	Turn(lfoot, x_axis, math.rad(0), math.rad(80))
+	Turn(lshin, x_axis, 0, math.rad(200))
+	Turn(lfoot, x_axis, 0, math.rad(80))
 	
-	Turn(rshin, x_axis, math.rad(0), math.rad(200))
-	Turn(rfoot, x_axis, math.rad(0), math.rad(80))
+	Turn(rshin, x_axis, 0, math.rad(200))
+	Turn(rfoot, x_axis, 0, math.rad(80))
 end
 
 function script.Killed(recentDamage, maxHealth)

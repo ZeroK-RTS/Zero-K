@@ -64,16 +64,16 @@ local armGunIsR = false
 local missilegun = 1
 local PACE = 1.15
 
-local LEG_FRONT_ANGLES    = { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-35), shin=math.rad(5), foot=0, toef=0, toeb=math.rad(25) }
 local LEG_FRONT_SPEEDS    = { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-6), shin=math.rad(6), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-6), shin=math.rad(6), foot=0, toef=0, toeb=0 }
 local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BACK_ANGLES     = { thigh=math.rad(25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
+local LEG_BACK_ANGLES     = { thigh=math.rad(25), shin=math.rad(5), foot=0, toef=math.rad(-25), toeb=0 }
 local LEG_BACK_SPEEDS     = { thigh=math.rad(72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BENT_ANGLES     = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-30), shin=math.rad(95), foot=0, toef=0, toeb=0 }
 local LEG_BENT_SPEEDS     = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)

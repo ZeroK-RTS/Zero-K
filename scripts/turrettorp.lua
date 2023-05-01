@@ -20,12 +20,12 @@ local SIG_AIM = 2
 
 local function Bob(rot)
 	while true do
-		Turn(base, x_axis, math.rad(rot + math.random(-5,5)), math.rad(math.random(1,2)))
-		Turn(base, z_axis, math.rad(math.random(-5,5)), math.rad(math.random(1,2)))
+		Turn(base, x_axis, rot + math.rad(10)*math.random() - math.rad(5), math.rad(1) + math.rad(1)*math.random())
+		Turn(base, z_axis, math.rad(10)*math.random() - math.rad(5), math.rad(1) + math.rad(1)*math.random())
 		Move(base, y_axis, 48 + math.rad(math.random(0,2)), math.rad(math.random(1,2)))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(rot + math.random(-5,5)), math.rad(math.random(1,2)))
-		Turn(base, z_axis, math.rad(math.random(-5,5)), math.rad(math.random(1,2)))
+		Turn(base, x_axis, rot + math.rad(10)*math.random() - math.rad(5), math.rad(1) + math.rad(1)*math.random())
+		Turn(base, z_axis, math.rad(10)*math.random() - math.rad(5), math.rad(1) + math.rad(1)*math.random())
 		Move(base, y_axis, 48 + math.rad(math.random(-2,0)), math.rad(math.random(1,2)))
 		Sleep(1000)
 	end
@@ -42,12 +42,12 @@ function script.Create()
 		StartThread(Bob, 0)
 	else
 		waterFire = true
-		StartThread(Bob, 180)
+		StartThread(Bob, math.rad(180))
 		Turn(base, x_axis, math.rad(180))
 		Move(base, y_axis, 48)
 		Turn(arm1, x_axis, math.rad(180))
 		Turn(arm2, x_axis, math.rad(180))
-		--Turn(turret, x_axis, math.rad(0))
+		--Turn(turret, x_axis, 0)
 	end
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
@@ -56,7 +56,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	if waterFire then
-		Turn(turret, y_axis, -heading + math.pi, math.rad(120))
+		Turn(turret, y_axis, math.pi - heading, math.rad(120))
 	else
 		Turn(turret, y_axis, heading, math.rad(120))
 	end

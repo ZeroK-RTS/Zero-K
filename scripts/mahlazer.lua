@@ -222,17 +222,17 @@ function Dock()
 		Sleep(100)
 		
 		for i = 1, 4 do
-			Turn(DocksClockwise[i]	   ,z_axis,math.rad(0),1)
-			Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1)
+			Turn(DocksClockwise[i]	   ,z_axis,0,1)
+			Turn(DocksCounterClockwise[i],z_axis,0,1)
 			
-			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2)
-			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad(0),2)
+			Turn(ActuatorBaseClockwise[i],z_axis,0,2)
+			Turn(ActuatorBaseCCW[i]	  ,z_axis,0,2)
 			
-			Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5)
-			Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5)
+			Turn(ActuatorMidCW [i],z_axis,0,1.5)
+			Turn(ActuatorMidCCW[i],z_axis,0,1.5)
 			
-			Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2)
-			Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2)
+			Turn(ActuatorTipCW [i],z_axis,0,2.2)
+			Turn(ActuatorTipCCW[i],z_axis,0,2.2)
 		end
 	end
 end

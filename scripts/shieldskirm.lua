@@ -53,7 +53,7 @@ local function HalfWalk(p_thigh, p_leg, p_foot, p_toe, pf_toe, pb_toe, s_thigh, 
 	Turn(p_foot, x_axis, math.rad(-40), math.rad(35) * speedMod)
 	Turn(pf_toe, x_axis, math.rad(-40), math.rad(180) * speedMod)
 	Turn(pb_toe, x_axis, math.rad(-50), math.rad(180) * speedMod)
-	Turn(p_toe, z_axis, math.rad(-(20)), math.rad(140) * speedMod)
+	Turn(p_toe, z_axis, math.rad(-20), math.rad(140) * speedMod)
 	--left forward
 	Turn(s_thigh, x_axis, math.rad(-80), math.rad(115) * speedMod)
 	Turn(s_leg, x_axis, math.rad(120), math.rad(130) * speedMod)
@@ -74,7 +74,7 @@ local function HalfWalk(p_thigh, p_leg, p_foot, p_toe, pf_toe, pb_toe, s_thigh, 
 	Sleep(500 / speedMod)
 	
 	--part two
-	Turn(head, z_axis, math.rad(-(-3)), math.rad(3))
+	Turn(head, z_axis, math.rad(3), math.rad(3))
 	Turn(head, x_axis, math.rad(-7), math.rad(5))
 	--right back to front
 	Turn(p_thigh, x_axis, math.rad(35), math.rad(15) * speedMod)
@@ -82,9 +82,9 @@ local function HalfWalk(p_thigh, p_leg, p_foot, p_toe, pf_toe, pb_toe, s_thigh, 
 	Turn(p_foot, x_axis, math.rad(-10), math.rad(30) * speedMod)
 	Turn(pf_toe, x_axis, math.rad(40), math.rad(180) * speedMod)
 	Turn(pb_toe, x_axis, math.rad(-30), math.rad(180) * speedMod)
-	Turn(p_toe, z_axis, math.rad(-(25)), math.rad(140) * speedMod)
+	Turn(p_toe, z_axis, math.rad(-25), math.rad(140) * speedMod)
 	--left front to back
-	Turn(s_thigh, x_axis, math.rad(0), math.rad(80) * speedMod)
+	Turn(s_thigh, x_axis, 0, math.rad(80) * speedMod)
 	Turn(s_leg, x_axis, math.rad(70), math.rad(100) * speedMod)
 	Turn(s_foot, x_axis, math.rad(-15), math.rad(5) * speedMod)
 	
@@ -115,19 +115,19 @@ local function stopWalk()
 	Turn(r_thigh, x_axis, math.rad(18), math.rad(200))
 	Turn(r_leg, x_axis, math.rad(30), math.rad(200))
 	Turn(r_foot, x_axis, math.rad(-18), math.rad(200))
-	Turn(r_toe, z_axis, math.rad(-(0)), math.rad(200))
+	Turn(r_toe, z_axis, 0, math.rad(200))
 	Turn(rf_toe, x_axis, 0, math.rad(200))
 	Turn(rb_toe, x_axis, 0, math.rad(200))
 	
 	Turn(l_thigh, x_axis, math.rad(18), math.rad(200))
 	Turn(l_leg, x_axis, math.rad(30), math.rad(200))
 	Turn(l_foot, x_axis, math.rad(-18), math.rad(200))
-	Turn(l_toe, z_axis, math.rad(-(0)), math.rad(200))
+	Turn(l_toe, z_axis, 0, math.rad(200))
 	Turn(lf_toe, x_axis, 0, math.rad(200))
 	Turn(lb_toe, x_axis, 0, math.rad(200))
 	
 	Move(base, y_axis, 6, 16)
-	Turn(head, z_axis, math.rad(-(0)), math.rad(200))
+	Turn(head, z_axis, 0, math.rad(200))
 	Turn(head, x_axis, 0, math.rad(200))
 
 end
@@ -151,7 +151,7 @@ end
 
 local function RestoreAfterDelayLeft()
 	Sleep(RESTORE_DELAY_TUBE)
-	Turn(l_tube, x_axis, math.rad(0), math.rad(45))
+	Turn(l_tube, x_axis, 0, math.rad(45))
 	Move(l_missile, z_axis, 0)
 	Move(l_missile, y_axis, .4)
 	Move(l_missile, x_axis, 6)
@@ -160,7 +160,7 @@ local function RestoreAfterDelayLeft()
 	Move(l_door, z_axis, 0.5, 1)
 	Move(l_doorslid, z_axis, -1, 1)
 	WaitForMove(l_doorslid, z_axis)
-	Turn(l_door, z_axis, math.rad(-(-100)), math.rad(90))
+	Turn(l_door, z_axis, math.rad(100), math.rad(90))
 	WaitForTurn(l_door, z_axis)
 	Spin(l_missile, z_axis, math.rad(90))
 	Move(l_missile, y_axis, 0, .4)
@@ -169,12 +169,12 @@ local function RestoreAfterDelayLeft()
 	Spin(l_missile, z_axis, 0)
 	Move(l_door, z_axis, 0, 1)
 	Move(l_doorslid, z_axis, 0, 1)
-	Turn(l_door, z_axis, math.rad(-(0)), math.rad(90))
+	Turn(l_door, z_axis, 0, math.rad(90))
 end
 
 local function RestoreAfterDelayRight()
 	Sleep(RESTORE_DELAY_TUBE)
-	Turn(r_tube, x_axis, math.rad(0), math.rad(45))
+	Turn(r_tube, x_axis, 0, math.rad(45))
 	Move(r_missile, z_axis,5* 0)
 	Move(r_missile, y_axis, .4)
 	Move(r_missile, x_axis, -6)
@@ -183,7 +183,7 @@ local function RestoreAfterDelayRight()
 	Move(r_door, z_axis, 0.5, 1)
 	Move(r_doorslid, z_axis, -1, 1)
 	WaitForMove(r_doorslid, z_axis)
-	Turn(r_door, z_axis, math.rad(-(100)), math.rad(90))
+	Turn(r_door, z_axis, math.rad(-100), math.rad(90))
 	WaitForTurn(r_door, z_axis)
 	Spin(r_missile, z_axis, math.rad(-90))
 	Move(r_missile, y_axis, 0, .4)
@@ -192,7 +192,7 @@ local function RestoreAfterDelayRight()
 	Spin(r_missile, z_axis, 0)
 	Move(r_door, z_axis, 0, 1)
 	Move(r_doorslid, z_axis, 0, 1)
-	Turn(r_door, z_axis, math.rad(-(0)), math.rad(90))
+	Turn(r_door, z_axis, 0, math.rad(90))
 end
 
 
@@ -201,9 +201,9 @@ local function RestoreAfterDelayHead()
 	SetSignalMask(SIG_RESTORE)
 	
 	Sleep(RESTORE_DELAY_HEAD)
-	Turn(head, y_axis, math.rad(0), math.rad(90))
-	Turn(r_tube, x_axis, math.rad(0), math.rad(45))
-	Turn(l_tube, x_axis, math.rad(0), math.rad(45))
+	Turn(head, y_axis, 0, math.rad(90))
+	Turn(r_tube, x_axis, 0, math.rad(45))
+	Turn(l_tube, x_axis, 0, math.rad(45))
 end
 
 function script.AimWeapon(num, heading, pitch)

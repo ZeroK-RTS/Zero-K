@@ -187,8 +187,8 @@ function script.AimWeapon(num, heading, pitch)
 		GG.Script_OffsetAimAndColVol(unitID, false, 15)
 		
 		--Opening animation
-		Turn(lidLeft, y_axis, math.rad(0), unpackSpeed);
-		Turn(lidRight, y_axis, math.rad(0), unpackSpeed);
+		Turn(lidLeft, y_axis, 0, unpackSpeed);
+		Turn(lidRight, y_axis, 0, unpackSpeed);
 		WaitForTurn(lidLeft, y_axis);
 		
 		Turn(wheel, x_axis, math.rad(-15), unpackSpeed)

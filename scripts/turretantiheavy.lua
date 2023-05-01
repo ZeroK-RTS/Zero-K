@@ -84,8 +84,8 @@ local function Close()
 	end
 	
 	
-	Turn(door1, z_axis, math.rad(-(90)), math.rad(80))
-	Turn(door2, z_axis, math.rad(-(-90)), math.rad(80))
+	Turn(door1, z_axis, math.rad(-90), math.rad(80))
+	Turn(door2, z_axis, math.rad(90), math.rad(80))
 	WaitForTurn(door1, z_axis)
 	WaitForTurn(door2, z_axis)
 	
