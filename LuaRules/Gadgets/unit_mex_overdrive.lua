@@ -1914,3 +1914,50 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 -------------------------------------------------------------------------------------
+-- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, attachedPylons = {[1] = size, [2] =  unitID, ...}}
+local function GetGridmates(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam (unitID)
+	local gridId = pylon[allyTeamID][unitID].gridID
+	local gridMates = {}
+	local numGridMates = 1
+	local unitPylonData = pylon[allyTeamID][unitID]
+	local attachedPylons = unitPylonData.attachedPylons
+	if attachedPylons and attachedPylons[1] < 2 then  -- If this pylon isn't actually in a grid due to having no connections
+		return {{
+					pylonId = unitID,
+					x = unitPylonData.x,
+					z = unitPylonData.z
+				}}
+	end
+	for pylonId, pylonData in pairs(pylon[allyTeamID]) do
+		if pylonData.gridID == gridId then
+			gridMates[numGridMates] = {
+				pylonId = pylonId,
+				x = pylonData.x,
+				z = pylonData.z
+			}
+			numGridMates = numGridMates + 1
+		end
+	end
+	return gridMates
+end
+
+function GG.GetClosestPylonInGrid(pylonId, x, z)
+	local gridMates = GetGridmates(pylonId)
+	local minEffectiveDist = 9999999
+	local bestPylon = -1
+	local bestPylonRange = -1
+	for _, gridPylonData in ipairs(gridMates) do
+		local gPylonId = gridPylonData.pylonId
+		local defId = spGetUnitDefID(gPylonId)
+		local range = pylonDefs[defId].range
+		local gx, _, gz = spGetUnitPosition(gPylonId)
+		local effectiveDist = sqrt((gx - x) * (gx - x) + (gz - z) * (gz - z)) - range
+		if minEffectiveDist > effectiveDist then
+			minEffectiveDist = effectiveDist
+			bestPylon = gPylonId
+			bestPylonRange = range
+		end
+	end
+	return bestPylon, bestPylonRange
+end
