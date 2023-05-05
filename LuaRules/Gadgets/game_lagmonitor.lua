@@ -45,7 +45,7 @@ local spSetPlayerRulesParam   = Spring.SetPlayerRulesParam
 local spGiveOrderToUnitArray  = Spring.GiveOrderToUnitArray
 local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
-local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor ~= "off" and not Spring.Utilities.Gametype.isNoHumanConflict())
+local useAfkDetection = (Spring.GetModOptions().enablelagmonitor == "on") or (Spring.GetModOptions().enablelagmonitor ~= "off" and not Spring.Utilities.Gametype.isCoop())
 
 include("LuaRules/Configs/constants.lua")
 

@@ -624,7 +624,7 @@ local function ReportPlayer(subject)
 	     but let it hang around in case we discover cases where it doesn't ]]
 	local utils = Spring.Utilities
 	local gametype = utils.Gametype
-	if gametype.isCompStomp() then
+	if gametype.isCoop() then
 		local humans = #(Spring.GetTeamList(0) or {})
 		extraText = extraText .. humans .. " vs " .. (gametype.isChickens() and "Chickens" or "Bots")
 	elseif gametype.isTeamFFA() then
