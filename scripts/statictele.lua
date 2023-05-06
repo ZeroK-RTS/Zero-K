@@ -12,17 +12,21 @@ local teleRadius = 400
 local teleMaxTries = 30
 
 local spTestMoveOrder = Spring.TestMoveOrder
+local spGetGroundHeight = Spring.GetGroundHeight
+local spSetHeightMapFunc = Spring.SetHeightMapFunc
+local spSetHeightMap = Spring.SetHeightMap
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	script.Activate()
 end
 
-function script.Activate ()
+function script.Activate()
 	Spin(gen1, y_axis, 1, 0.01)
 	Spin(gen2, y_axis, -1, 0.01)
 end
 
-function script.Deactivate ()
+function script.Deactivate()
 	StopSpin(gen1, y_axis, 0.1)
 	StopSpin(gen2, y_axis, 0.1)
 end
@@ -113,7 +117,9 @@ local function TeleportUnit(uID, tx, tz, radius)
 	local size = UnitDefs[udid].xsize
 	local _, _, _, ax, ay, az = Spring.GetUnitPosition(uID, true)
 	Spring.SpawnCEG("teleport_out", ax, ay, az, 0, 0, 0, size)
-	Spring.SetUnitPosition(uID, dx, dz)
+	
+	GG.MoveGeneralUnit(uID, dx, false, dz)
+	
 	_, _, _, ax, ay, az = Spring.GetUnitPosition(uID, true)
 	Spring.SpawnCEG("teleport_in", dx, ay, dz, 0, 0, 0, size)
 	
@@ -122,13 +128,52 @@ local function TeleportUnit(uID, tx, tz, radius)
 	oldBlocking[uID] = nil
 end
 
+local function GetMedianEdgeHeight(ox, oz, radius, samples)
+	local heights = {}
+	local sampleToRad = 2 * math.pi / samples
+	for i = 1, samples do
+		local x = math.cos(i*sampleToRad)*radius
+		local z = math.sin(i*sampleToRad)*radius
+		heights[#heights + 1] = spGetGroundHeight(x + ox, z + oz)
+	end
+	table.sort(heights)
+	return heights[math.ceil(#heights / 2)]
+end
+
+local function SwapTerrain(ox, oz, tx, tz, radius)
+	local rightBound = math.ceil(radius/8)*8
+	local botBound = math.ceil(radius/8)*8
+	local radSq = radius*radius
+	
+	local oEdgeHeight = GetMedianEdgeHeight(ox, oz, radius - 8, 72)
+	local tEdgeHeight = GetMedianEdgeHeight(tx, tz, radius - 8, 72)
+	
+	spSetHeightMapFunc(function ()
+		for x = math.floor(-radius/8)*8, rightBound, 8 do
+			for z = math.floor(-radius/8)*8, botBound, 8 do
+				if x*x + z*z <= radSq then
+					local oHeight = spGetGroundHeight(x + ox, z + oz)
+					local tHeight = spGetGroundHeight(x + tx, z + tz)
+					spSetHeightMap(x + ox, z + oz, tHeight + oEdgeHeight - tEdgeHeight)
+					spSetHeightMap(x + tx, z + tz, oHeight + tEdgeHeight - oEdgeHeight)
+				end
+			end
+		end
+	end)
+	Spring.ForceTesselationUpdate(true, true)
+end
+
 local function DoTeleport(tx, tz)
 	local ux, _, uz = Spring.GetUnitPosition(unitID)
+	ux, uz = math.floor((ux + 4)/8)*8, math.floor((uz + 4)/8)*8
+	tx, tz = math.floor((tx + 4)/8)*8, math.floor((tz + 4)/8)*8
 	
 	local unitsNearTarget = Spring.GetUnitsInCylinder(tx, tz, teleRadius)
 	local unitsNearMe = Spring.GetUnitsInCylinder(ux, uz, teleRadius)
 	unitsNearTarget = FilterOutUnitAndUnblock(unitsNearTarget, unitID)
 	unitsNearMe = FilterOutUnitAndUnblock(unitsNearMe, unitID)
+	
+	SwapTerrain(ux, uz, tx, tz, teleRadius)
 	
 	for i = 1, #unitsNearMe do
 		TeleportUnit(unitsNearMe[i], tx, tz, teleRadius)

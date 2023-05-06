@@ -1,3 +1,4 @@
+
 local moveType = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -9,8 +10,9 @@ for i = 1, #UnitDefs do
 		end
 	elseif not ud.isImmobile then
 		moveType[i] = 2 -- ground/sea
+	else
+		moveType[i] = false -- For structures or any other invalid movetype
 	end
-	moveType[i] = false -- For structures or any other invalid movetype
 end
 
 function Spring.Utilities.getMovetype(ud)

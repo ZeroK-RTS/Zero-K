@@ -446,6 +446,7 @@ function gadget:GameFrame(n)
 	
 	if BAR_COMPAT and USE_FORCE_UPDATE then
 		Spring.ForceTesselationUpdate(true, true)
+		--Spring.Echo("ForceTesselationUpdate", math.random())
 	else
 		toSet = Spring.GetConfigInt("GroundDetail", 90) -- Default in epic menu
 		Spring.SendCommands{"GroundDetail " .. (toSet + 1)}

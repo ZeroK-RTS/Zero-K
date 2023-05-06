@@ -171,6 +171,10 @@ local function removeUnit(unitID, unitDefID, unitTeam)
 	pylonByID[unitID] = nil
 end
 
+function widget:UnitStructureMoved(unitID, unitDefID, newX, newZ)
+	Spring.MarkerAddPoint(newX, 0, newZ, "UnitStructureMoved")
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	addUnit(unitID, unitDefID, unitTeam)
 end
@@ -309,7 +313,7 @@ local function HighlightPlacement(unitDefID)
 	if coords then
 		local radius = pylonDefs[unitDefID]
 		if (radius ~= 0) then
-			local x, _, z = spPos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
+			local x, _, z = spPos2BuildPos(unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
 			glColor(placementColor)
 			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end
