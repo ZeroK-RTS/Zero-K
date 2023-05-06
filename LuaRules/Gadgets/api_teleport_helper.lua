@@ -74,9 +74,23 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 
 local function UnitStructureMoved(_, unitID, unitDefID, tx, tz)
-	if Script.LuaUI['UnitStructureMoved'] then
-		Spring.Echo("bla", unitID, unitDefID, tx, tz)
-		Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+	if not Script.LuaUI['UnitStructureMoved'] then
+		return
+	end
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local spec, specFullView = Spring.GetSpectatingState()
+	local isAllyUnit = Spring.AreTeamsAllied(Spring.GetUnitTeam(unitID), Spring.GetMyTeamID())
+	
+	if spec then
+		if not specFullView and not isAllyUnit and (Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1) then
+			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+		end
+	else
+		if isAllyUnit then
+			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+		elseif Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+		end
 	end
 end
 

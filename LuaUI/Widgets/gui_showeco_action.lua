@@ -172,8 +172,11 @@ local function removeUnit(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-	Spring.Echo("sssssssssssssss", unitID, unitDefID, newX, newZ)
-	Spring.MarkerAddPoint(newX, 0, newZ, "UnitStructureMoved")
+	if pylonByID[unitID] then
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		removeUnit(unitID, unitDefID, unitTeam)
+		addUnit(unitID, unitDefID, unitTeam)
+	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)

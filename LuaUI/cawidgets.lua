@@ -2515,7 +2515,6 @@ function widgetHandler:GameID(gameID)
 end
 
 function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-	Spring.Echo("aaaaa", unitID, unitDefID, newX, newZ)
 	for _, w in r_ipairs(self.UnitStructureMovedList) do
 		w:UnitStructureMoved(unitID, unitDefID, newX, newZ)
 	end

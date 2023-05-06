@@ -202,7 +202,7 @@ local function FireTeleporter()
 end
 
 function script.QueryWeapon(num)
-	return base
+	return gen1
 end
 
 function script.AimWeapon(num, heading, pitch)
