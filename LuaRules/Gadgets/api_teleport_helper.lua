@@ -73,8 +73,9 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function UnitStructureMoved(unitID, unitDefID, tx, tz)
+local function UnitStructureMoved(_, unitID, unitDefID, tx, tz)
 	if Script.LuaUI['UnitStructureMoved'] then
+		Spring.Echo("bla", unitID, unitDefID, tx, tz)
 		Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
 	end
 end
@@ -82,7 +83,6 @@ end
 function gadget:Initialize()
 	gadgetHandler:AddSyncAction("UnitStructureMoved", UnitStructureMoved)
 end
-
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
