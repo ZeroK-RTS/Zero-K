@@ -236,7 +236,7 @@ options = {
 	nukeWarningOpacity = {
 		name = "Nuclear launch warning opacity",
 		type = "number",
-		value = 60,
+		value = 100,
 		min = 1, max = 100, step = 1,
 		advanced = true,
 		OnChange = UpdateFlashStateDefs
