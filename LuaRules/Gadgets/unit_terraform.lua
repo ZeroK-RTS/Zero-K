@@ -220,9 +220,6 @@ end
 
 local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because only the 4th parameter changes
 
-local workaround_recursion_in_cmd_fallback = {}
-local workaround_recursion_in_cmd_fallback_needed = false
-
 local wantForceCompleteFrameZero = false
 local freeTerraform = false
 local debugMode = false
@@ -3211,20 +3208,7 @@ function gadget:GameFrame(n)
 	if n == 0 and wantForceCompleteFrameZero then
 		DoTerraformUpdate(n, true)
 	end
-	
-	if workaround_recursion_in_cmd_fallback_needed then
-		for unitID, terraID in pairs(workaround_recursion_in_cmd_fallback) do
-			REPAIR_ORDER_PARAMS[4] = terraID
-			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
-		end
-		workaround_recursion_in_cmd_fallback = {}
-		workaround_recursion_in_cmd_fallback_needed = false
-	end
-	
-	--if n % 300 == 0 then
-	--    GG.Terraform_RaiseWater(-20)
-	--end
-	
+
 	if n >= nextUpdateCheck then
 		updatePeriod = math.max(MIN_UPDATE_PERIOD, min(MAX_UPDATE_PERIOD, terraformOperations/60))
 		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
@@ -3359,17 +3343,13 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			end
 		end
 	end
-	
+
 	if closestID then
-		--[[ Recursion not allowed.
-			REPAIR_ORDER_PARAMS[4] = closestID
-			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
-		]]
-		workaround_recursion_in_cmd_fallback[unitID] = closestID
-		workaround_recursion_in_cmd_fallback_needed = true
+		REPAIR_ORDER_PARAMS[4] = closestID
+		spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
 		return true, false
 	end
-	
+
 	fallbackCommands[teamID][cmdParams[4]] = nil
 	return false
 end
