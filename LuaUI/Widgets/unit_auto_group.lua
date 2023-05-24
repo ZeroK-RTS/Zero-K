@@ -18,7 +18,7 @@ local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
-local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic' }
+local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic', 'missileslow' }
 
 local groupableBuildings = {}
 for _, v in ipairs( groupableBuildingTypes ) do
