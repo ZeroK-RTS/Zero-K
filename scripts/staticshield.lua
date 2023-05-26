@@ -2,6 +2,7 @@
 include "constants.lua"
 
 local ALLY_ACCESS = {allied = true}
+local spGetUnitShieldState = Spring.GetUnitShieldState
 
 --pieces
 local base = piece "base"
@@ -39,7 +40,7 @@ local k_speed = 10
 
 local function hover()
 	while(true) do
-		Spin(glow, y_axis, 1)
+		Spin(glow, y_axis, select(2,spGetUnitShieldState(unitID,1))/3600)
 		Move(glow, y_axis, math.random(1,5), 2)
 		WaitForMove(glow, y_axis)
 		Sleep (200)
