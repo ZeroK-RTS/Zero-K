@@ -45,7 +45,19 @@ local function hover()
 	end
 end
 
-local function initialize()
+local function unfoldPetals(rotSpeed)
+	-- FIXME: rotations don't stack sensibly, needs the solar cardinal rotation hax
+	Turn(lf_leaf, x_axis, math.rad( 40), rotSpeed)
+	Turn(lf_leaf, z_axis, math.rad(-40), rotSpeed)
+	Turn(rf_leaf, x_axis, math.rad( 40), rotSpeed)
+	Turn(rf_leaf, z_axis, math.rad( 40), rotSpeed)
+	Turn(lb_leaf, x_axis, math.rad(-40), rotSpeed)
+	Turn(lb_leaf, z_axis, math.rad(-40), rotSpeed)
+	Turn(rb_leaf, x_axis, math.rad(-40), rotSpeed)
+	Turn(rb_leaf, z_axis, math.rad( 40), rotSpeed)
+end
+
+local function initialize(isMorphed)
 	local spGetUnitHealth = Spring.GetUnitHealth
 	local sel = select
 	while sel(5, spGetUnitHealth(unitID)) < 1 do
@@ -53,17 +65,10 @@ local function initialize()
 	end
 
 	Move(glow, y_axis, 10, 4)
-	Sleep(500)
-
-	-- FIXME: rotations don't stack sensibly, needs the solar cardinal rotation hax
-	Turn(lf_leaf, x_axis, math.rad( 40), math.rad(15))
-	Turn(lf_leaf, z_axis, math.rad(-40), math.rad(15))
-	Turn(rf_leaf, x_axis, math.rad( 40), math.rad(15))
-	Turn(rf_leaf, z_axis, math.rad( 40), math.rad(15))
-	Turn(lb_leaf, x_axis, math.rad(-40), math.rad(15))
-	Turn(lb_leaf, z_axis, math.rad(-40), math.rad(15))
-	Turn(rb_leaf, x_axis, math.rad(-40), math.rad(15))
-	Turn(rb_leaf, z_axis, math.rad( 40), math.rad(15))
+	if not isMorphed then
+		Sleep(500)
+		unfoldPetals(math.rad(15))
+	end
 
 	WaitForMove(glow, y_axis)
 	WaitForTurn(lf_leaf, x_axis)
@@ -74,18 +79,24 @@ function script.Create()
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)	-- don't lose jitter effect with on/off button
 
 	-- FIXME: these should be reflected in the model (building ghost mismatch)
-	Move(base, y_axis, -8)
-	Turn(lf_knee, x_axis, math.rad(-45))
-	Turn(lf_knee, z_axis, math.rad( 45))
-	Turn(lb_knee, x_axis, math.rad( 45))
-	Turn(lb_knee, z_axis, math.rad( 45))
-	Turn(rf_knee, x_axis, math.rad(-45))
-	Turn(rf_knee, z_axis, math.rad(-45))
-	Turn(rb_knee, x_axis, math.rad( 45))
-	Turn(rb_knee, z_axis, math.rad(-45))
+	local isMorphed = Spring.GetGameRulesParam("morphUnitCreating") == 1
+	local rotSpeed = isMorphed and math.rad(10) or nil -- needs 'or nil' because Turn doesn't accept 'false'
+	Move(base, y_axis, -8, isMorphed and 2 or nil)
+	Turn(lf_knee, x_axis, math.rad(-45), rotSpeed)
+	Turn(lf_knee, z_axis, math.rad( 45), rotSpeed)
+	Turn(lb_knee, x_axis, math.rad( 45), rotSpeed)
+	Turn(lb_knee, z_axis, math.rad( 45), rotSpeed)
+	Turn(rf_knee, x_axis, math.rad(-45), rotSpeed)
+	Turn(rf_knee, z_axis, math.rad(-45), rotSpeed)
+	Turn(rb_knee, x_axis, math.rad( 45), rotSpeed)
+	Turn(rb_knee, z_axis, math.rad(-45), rotSpeed)
+
+	if isMorphed then
+		unfoldPetals(nil)
+	end
 
 	StartThread(GG.Script.SmokeUnit, unitID, {glow})
-	StartThread(initialize)
+	StartThread(initialize, isMorphed)
 end
 
 function script.Activate()
