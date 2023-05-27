@@ -10,12 +10,6 @@ local l_fan = piece "l_fan"
 local r_wing = piece "r_wing"
 local r_fan = piece "r_fan"
 
-local side = 1
-local forward = 3
-local up = 2
-
-local RIGHT_ANGLE = math.rad(90)
-
 local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
@@ -32,23 +26,19 @@ local function Burrow()
 		x,y,z = Spring.GetUnitPosition(unitID)
 		height = Spring.GetGroundHeight(x,z)
 	end
-	
-	--Spring.UnitScript.SetUnitValue(firestate, 0)
-	Turn(base, side, -RIGHT_ANGLE, 5)
-	Turn(l_wing, side, RIGHT_ANGLE, 5)
-	Turn(r_wing, side, RIGHT_ANGLE, 5)
-	Move(base, up, 8, 8)
-	--Move(base, forward, -4, 5)
+
+	Turn(base, x_axis, math.rad(-90), 5)
+	Turn(l_wing, x_axis, math.rad(90), 5)
+	Turn(r_wing, x_axis, math.rad(90), 5)
+	Move(base, y_axis, 8, 8)
 end
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
-	--Spring.UnitScript.SetUnitValue(firestate, 2)
-	Turn(base, side, 0, 5)
-	Turn(l_wing, side,0, 5)
-	Turn(r_wing, side, 0, 5)
-	Move(base, up, 0, 10)
-	--Move(base, forward, 0, 5)
+	Turn(base, x_axis, 0, 5)
+	Turn(l_wing, x_axis, 0, 5)
+	Turn(r_wing, x_axis, 0, 5)
+	Move(base, y_axis, 0, 10)
 end
 
 function Detonate() -- Giving an order causes recursion.
