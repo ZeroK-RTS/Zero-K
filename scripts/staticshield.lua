@@ -38,8 +38,10 @@ local k_angle = math.rad(45)
 local k_speed = 10
 
 local function hover()
-	while(true) do
-		Spin(glow, y_axis, 1)
+	local spGetUnitShieldState = Spring.GetUnitShieldState
+	while true do
+		local shieldEnabled, shieldHealth = spGetUnitShieldState(unitID)
+		Spin(glow, y_axis, shieldEnabled and (shieldHealth / 3000) or 0)
 		Move(glow, y_axis, math.random(1,5), 2)
 		WaitForMove(glow, y_axis)
 		Sleep (200)
