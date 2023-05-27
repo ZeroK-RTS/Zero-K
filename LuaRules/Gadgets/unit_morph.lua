@@ -377,18 +377,18 @@ local function FinishMorph(unitID, morphData)
 		if zsize/4 ~= math.floor(zsize/4) then
 			z = z+8
 		end
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
 		end
 		Spring.SetUnitPosition(newUnit, x, y, z)
 	else
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
