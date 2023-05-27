@@ -555,6 +555,9 @@ local function LoadChunk(filename)
 	-- to avoid tons of needless global dereferences, function calls etc
 	text = text:gsub("math%.pi", math.pi)
 	text = text:gsub("math%.tau", math.tau)
+	text = text:gsub("([xyz])_axis", { x = 1, y = 2, z = 3 })
+	text = text:gsub("SFX%.([_%u]+)", SFX)
+	text = text:gsub("COB%.([_%u]+)", COB)
 	text = text:gsub("math%.rad%(([^%)]*)%)", preprocess_math_rad)
 
 	local chunk, err = loadstring(scriptHeader .. text, filename)
