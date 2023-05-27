@@ -60,7 +60,7 @@ local function TiltBody()
 
 				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*GG.Script.headingToRad
 
-				local diffHeading = (velHeading - curHeading + math.pi)%GG.Script.tau - math.pi -- keep in range [-math.pi,math.pi)
+				local diffHeading = (velHeading - curHeading + math.pi) % math.tau - math.pi -- keep in range [-math.pi,math.pi)
 
 				local newHeading
 

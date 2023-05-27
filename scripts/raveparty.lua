@@ -141,12 +141,12 @@ function script.AimWeapon(num, heading, pitch)
 	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
 	local headDiff = heading - curHead
 	if math.abs(headDiff) > math.pi then
-		headDiff = headDiff - math.abs(headDiff)/headDiff*2*math.pi
+		headDiff = headDiff - math.abs(headDiff) / headDiff * math.tau
 	end
 	--Spring.Echo(headDiff*180/math.pi)
 
 	if math.abs(headDiff) > hpi then
-		heading = (heading+math.pi)%GG.Script.tau
+		heading = (heading + math.pi) % math.tau
 		pitch = -pitch+math.pi
 	end
 	local spindlePitch = -pitch + (num - 1)* math.pi/3
@@ -155,7 +155,7 @@ function script.AimWeapon(num, heading, pitch)
 	WaitForTurn(turret, y_axis)
 	
 	local currentSpindle = select(1, Spring.UnitScript.GetPieceRotation(spindle))
-	local diff = math.abs(((currentSpindle - spindlePitch - math.pi)%GG.Script.tau) - math.pi)
+	local diff = math.abs(((currentSpindle - spindlePitch - math.pi) % math.tau) - math.pi)
 	if diff < math.pi/3 then
 		gunNum = num
 	end

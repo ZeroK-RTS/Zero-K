@@ -6,8 +6,6 @@ local gen2 = piece "gen2"
 
 local smokePiece = {gen1}
 
-local tau = 2*math.pi
-
 local teleRadius = 400
 local teleMaxTries = 30
 
@@ -65,7 +63,7 @@ end
 
 local function RandomPointInCircle(cx, cz, radius)
 	local r = radius*math.sqrt(math.random())
-	local angle = math.random()*tau
+	local angle = math.random() * math.tau
 	local rx, rz = cx + r*math.cos(angle), cz + r*math.sin(angle)
 	return rx, rz
 end

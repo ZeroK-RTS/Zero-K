@@ -122,6 +122,10 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 	end
 end
 
+if not math.tau then -- 104-1421 AFAICT
+	math.tau = 2 * math.pi
+end
+
 if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
 	--[[ This is just here so gadget code can avoid
 	     a nil check. The workaround was to apply

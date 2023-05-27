@@ -345,7 +345,7 @@ function Spring.UnitScript.WaitForMove(piece, axis)
 end
 
 -- overwrites engine's WaitForTurn
-local tau = 2 * math.pi
+local tau = math.tau
 function Spring.UnitScript.WaitForTurn(piece, axis)
 	local activeUnit = GetActiveUnit()
 	local speed = activeUnit.pieceRotSpeeds[piece][axis]

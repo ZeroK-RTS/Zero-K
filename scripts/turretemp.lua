@@ -26,8 +26,8 @@ local readyToFire = false
 local RESTORE_DELAY = 3000
 local position = 0
 
-local tauOn12 = GG.Script.tau/12
-local tauOn6 = GG.Script.tau/6
+local tauOn12 = math.tau/12
+local tauOn6 = math.tau/6
 
 -- Signal definitions
 local SIG_RESTORE = 1

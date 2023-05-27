@@ -65,8 +65,8 @@ function script.AimWeapon(num, heading, pitch)
 	--local _, curHeading = Spring.GetUnitPieceDirection(unitID, turret)
 	--local curPitch = Spring.GetUnitPieceDirection(unitID, launcher1)
 	--
-	--local diffHeading = math.pi - math.abs((curHeading - heading)%GG.Script.tau - math.pi)
-	--local diffPitch = math.pi - math.abs((curPitch + pitch)%GG.Script.tau - math.pi)
+	--local diffHeading = math.pi - math.abs((curHeading - heading) % math.tau - math.pi)
+	--local diffPitch = math.pi - math.abs((curPitch + pitch) % math.tau - math.pi)
 	--
 	--local sleepTime = (diffHeading/math.rad(200))*1000 - 300
 	--Spring.Echo(sleepTime)
