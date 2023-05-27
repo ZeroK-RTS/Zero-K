@@ -553,9 +553,9 @@ local function LoadChunk(filename)
 
 	-- pre-process constants (for example "math.rad(180)" -> "3.1415")
 	-- to avoid tons of needless global dereferences, function calls etc
-	text = text:gsub("math.pi", math.pi)
-	text = text:gsub("math.tau", math.tau)
-	text = text:gsub("math.rad%(([^%)]*)%)", preprocess_math_rad)
+	text = text:gsub("math%.pi", math.pi)
+	text = text:gsub("math%.tau", math.tau)
+	text = text:gsub("math%.rad%(([^%)]*)%)", preprocess_math_rad)
 
 	local chunk, err = loadstring(scriptHeader .. text, filename)
 	if (chunk == nil) then
