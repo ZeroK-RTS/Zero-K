@@ -14,6 +14,73 @@ local function GetPloomPos(pos)
 end
 
 local cegs = {
+  ["fireball_animated"] = {
+    flame = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+          properties = {
+              airdrag            = 1,
+              colormap           = [[1 0.78 0.2 0.45   1.0 0.6 0.2 0.5  0.8 0.5 0.2 0.44   0.22 0.13 0.1 0.33   0.023 0.022 0.022 0.125   0 0 0 0.01]],
+              directional        = false,
+              emitrot            = 0,
+              emitrotspread      = 40,
+              --emitvector         = [[0.3, 0.7, 0.3]],
+              gravity            = [[0, 0.3 r0.15, 0]],
+              numparticles       = 1,
+              particlelife       = 36,
+              particlelifespread = 9,
+              particlesize       = [[18.4 d1]],
+              particlesizespread = 18.8,
+              particlespeed      = 150,
+              particlespeedspread = 0.6,
+              rotParams          = [[-24 r48, -60 r120, -180 r360]],
+              animParams         = [[10,10,30]],
+              pos                = [[0 0 0]],
+              size               = 40,
+              sizegrowth         = [[4 r1.9]],
+              sizemod            = 0.94,
+              texture            = [[smoke2]],
+              drawOrder          = 1,
+              castShadow         = true,
+          },
+    },
+  },
+
+  ["fireball_animated_small"] = {
+    flame = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+          properties = {
+              airdrag            = 0.97,
+              colormap           = [[1 0.78 0.2 0.9   1.0 0.6 0.2 1  0.8 0.5 0.2 0.88   0.22 0.13 0.1 0.66   0.023 0.022 0.022 0.25   0 0 0 0.01]],
+              directional        = false,
+              emitrot            = 70,
+              emitrotspread      = 40,
+              emitvector         = [[0.3, 0.7, 0.3]],
+              gravity            = [[0, 0.06 r0.05, 0]],
+              numparticles       = 1,
+              particlelife       = 24,
+              particlelifespread = 9,
+              particlesize       = 18.4,
+              particlesizespread = 18.8,
+              particlespeed      = 0.3,
+              particlespeedspread = 0.6,
+              rotParams          = [[-24 r48, -60 r120, -180 r360]],
+              animParams         = [[10,10,30]],
+              pos                = [[0 0 0]],
+              sizegrowth         = [[1.7 r1.9]],
+              sizemod            = 0.93,
+              texture            = [[smoke2]],
+              drawOrder          = 1,
+              castShadow         = true,
+          },
+    },
+  },
+
   ["napalm_phoenix"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -35,7 +102,7 @@ local cegs = {
       underwater         = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:NAPALMFIREBALL_75]],
+        explosiongenerator = [[custom:fireball_animated]],
         pos                = [[-20 r40, 30, -20 r40]],
       },
     },
