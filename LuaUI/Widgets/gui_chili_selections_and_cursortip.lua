@@ -694,11 +694,13 @@ local function GetUnitRegenString(unitID, ud)
 end
 
 local function GetUnitShieldRegenString(unitID, ud)
-	if ud.customParams.shield_recharge_delay or true then
-		local shieldRegen = spGetUnitRulesParam(unitID, "shieldRegenTimer")
-		if shieldRegen and shieldRegen > 0 then
-			return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
-		end
+	if spGetUnitRulesParam(unitID, "att_shieldDisabled") == 1 then
+		return ""
+	end
+	
+	local shieldRegen = spGetUnitRulesParam(unitID, "shieldRegenTimer")
+	if shieldRegen and shieldRegen > 0 then
+		return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
 	end
 	
 	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))

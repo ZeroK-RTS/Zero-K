@@ -178,7 +178,9 @@ local function CheckWaterBlockCloak(unitID, pos)
 		if not waterUnitCloakBlocked[unitID] then
 			PokeDecloakUnit(unitID)
 			spSetUnitRulesParam(unitID, "cannotcloak", 1, alliedTrueTable)
+			spSetUnitRulesParam(unitID, "shield_disabled", 1, alliedTrueTable)
 			waterUnitCloakBlocked[unitID] = true
+			GG.UpdateUnitAttributes(unitID)
 		end
 		return true
 	end
@@ -212,11 +214,15 @@ function gadget:GameFrame(n)
 				if pos < 0 then
 					if (not CheckWaterBlockCloak(unitID, pos)) and waterUnitCloakBlocked[unitID] then
 						spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
+						spSetUnitRulesParam(unitID, "shield_disabled", 0, alliedTrueTable)
+						GG.UpdateUnitAttributes(unitID)
 						waterUnitCloakBlocked[unitID] = false
 					end
 				else
 					if waterUnitCloakBlocked[unitID] then
 						spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
+						spSetUnitRulesParam(unitID, "shield_disabled", 0, alliedTrueTable)
+						GG.UpdateUnitAttributes(unitID)
 						waterUnitCloakBlocked[unitID] = false
 					end
 				end
