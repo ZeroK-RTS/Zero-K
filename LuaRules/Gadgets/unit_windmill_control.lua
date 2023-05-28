@@ -166,6 +166,19 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function GetWindMin(groundHeight)
+	return math.max(0, math.min(MIN_BOUND, (groundHeight - GG.WindGroundMin)*energyPropPerAlt))
+end
+
+local function UpdateWindTooltip(unitID, ud, windData)
+	spSetUnitRulesParam(unitID, "minWind", windMin + windRange*windData.myMin, inlosTrueTable)
+	spSetUnitTooltip(
+		unitID, --Spring.GetUnitTooltip(unitID)..
+		ud.humanName .. " - " .. ud.tooltip ..
+		" (E " .. round(windMin+windRange*windData.myMin,1) .. "-" .. round(windMax,1) .. ")"
+	)
+end
+
 local function SetupUnit(unitID)
 	if not windMin then
 		gadget:Initialize()
@@ -192,19 +205,12 @@ local function SetupUnit(unitID)
 	
 	spSetUnitRulesParam(unitID, "isWind", 1, inlosTrueTable)
 	
-	local unitDef = UnitDefs[unitDefID]
+	local ud = UnitDefs[unitDefID]
 	local windData = {
-		myMin = math.max(0, math.min(MIN_BOUND, (y - GG.WindGroundMin)*energyPropPerAlt)),
+		myMin = GetWindMin(y),
 		teamID = Spring.GetUnitTeam(unitID),
 	}
-	
-	spSetUnitRulesParam(unitID,"minWind", windMin + windRange*windData.myMin, inlosTrueTable)
-	spSetUnitTooltip(
-		unitID, --Spring.GetUnitTooltip(unitID)..
-		unitDef.humanName .. " - " .. unitDef.tooltip ..
-		" (E " .. round(windMin+windRange*windData.myMin,1) .. "-" .. round(windMax,1) .. ")"
-	)
-	
+	UpdateWindTooltip(unitID, ud, windData)
 	IterableMap.Add(windmills, unitID, windData)
 	
 	return true, windMin+windRange*windData.myMin, windRange*(1-windData.myMin)
@@ -260,6 +266,29 @@ function gadget:Initialize()
 	gadgetHandler:AddChatAction("windanim", ToggleWindAnimation, "Toggles windmill animations.")
 	
 	UpdateWindStrengthAndDir()
+end
+
+function GG.MoveWindmill(unitID, unitDefID)
+	if not windDefs[unitDefID] and IterableMap.Get(windmills, unitID) then
+		return
+	end
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if not env then
+		return
+	end
+	local x, y, z = spGetUnitPosition(unitID)
+	local myHeight = Spring.GetGroundHeight(x, z)
+	
+	if Spring.GetUnitRulesParam(unitID, "isWind") == 1 then
+		local windData = IterableMap.Get(windmills, unitID)
+		windData.myMin = GetWindMin(myHeight)
+		local ud = UnitDefs[unitDefID]
+		UpdateWindTooltip(unitID, ud, windData)
+		Spring.UnitScript.CallAsUnit(unitID, env.SetWindParams, windData.myMin, windRange*(1 - windData.myMin))
+	else
+		local tidalEnabled = (myHeight <= TIDAL_HEIGHT)
+		Spring.UnitScript.CallAsUnit(unitID, env.SetTidalEnabled, tidalEnabled)
+	end
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)

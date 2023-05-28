@@ -43,6 +43,7 @@ function GG.MoveStructure(unitID, tx, tz)
 	if GG.TerraformFunctions then
 		GG.TerraformFunctions.StructureMoveAftermath(unitID, unitDefID)
 	end
+	GG.MoveWindmill(unitID, unitDefID)
 	
 	SendToUnsynced("UnitStructureMoved", unitID, unitDefID, tx, tz)
 end
@@ -81,16 +82,12 @@ local function UnitStructureMoved(_, unitID, unitDefID, tx, tz)
 	local spec, specFullView = Spring.GetSpectatingState()
 	local isAllyUnit = Spring.AreTeamsAllied(Spring.GetUnitTeam(unitID), Spring.GetMyTeamID())
 	
-	if spec then
-		if not specFullView and not isAllyUnit and (Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1) then
-			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
-		end
-	else
-		if isAllyUnit then
-			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
-		elseif Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
-			Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
-		end
+	if spec and specFullView then
+		Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+	elseif isAllyUnit then
+		Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
+	elseif Spring.GetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
+		Script.LuaUI.UnitStructureMoved(unitID, unitDefID, tx, tz)
 	end
 end
 

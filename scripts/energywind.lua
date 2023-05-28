@@ -13,12 +13,14 @@ local BUILD_PERIOD = 500
 local turnSpeed = math.rad(20)
 local waterFanSpin = math.rad(30)
 
+local SIG_ANIM = 1
 local isWind, baseWind, rangeWind
 
 local rand = math.random
 local function BobTidal()
+	SetSignalMask(SIG_ANIM)
 	-- Body movement models being somewhat free-floating upon the waves
-	local bodySpinSpeed	= 0
+	local bodySpinSpeed = 0
 	while true do
 		bodySpinSpeed = 0.99*bodySpinSpeed + (rand() - 0.5) * 0.016
 		Spin(cradle, y_axis, bodySpinSpeed)
@@ -74,6 +76,22 @@ function InitializeWind()
 		Move(fan, z_axis, 9)
 		Move(fan, y_axis, -5)
 	end
+end
+
+function SetTidalEnabled(enabled)
+	Signal(SIG_ANIM)
+	if enabled then
+		StartThread(BobTidal)
+	else
+		StopSpin(fan, z_axis)
+		StopSpin(cradle, y_axis)
+	end
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", (enabled and 1) or 0)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+function SetWindParams(newMin, newRange)
+	baseWind, rangeWind = newMin, newRange
 end
 
 function script.Create()
