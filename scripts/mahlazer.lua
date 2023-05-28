@@ -448,7 +448,7 @@ function script.AimWeapon(num, heading, pitch)
 		
 		wantedDirection = currentHeading - heading + math.pi
 		
-		pitchFudge = (math.pi/2 + pitch)*0.998 - math.pi/2
+		pitchFudge = (math.pi/2 + pitch)*0.999 - math.pi/2
 		
 		local speedMult = (GG.att_ReloadChange[unitID] or 1)
 		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2, PITCH_AIM_RATE*speedMult)
