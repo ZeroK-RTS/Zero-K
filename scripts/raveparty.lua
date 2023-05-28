@@ -165,7 +165,9 @@ function script.AimWeapon(num, heading, pitch)
 		heading = (heading + math.pi) % math.tau
 		pitch = -pitch+math.pi
 	end
-	if math.abs(headDiff) > 0.01 and math.abs(headDiff) < 3.131 then
+
+	-- note, DRP can actually fire backwards
+	if math.abs(headDiff) > 0.01 and math.abs(headDiff) < math.pi - 0.01 then
 		UpdateSpin(false, true)
 		isAiming = true
 	end

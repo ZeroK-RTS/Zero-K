@@ -448,6 +448,8 @@ function script.AimWeapon(num, heading, pitch)
 		
 		wantedDirection = currentHeading - heading + math.pi
 		
+		-- Starlight misses Gnat at max range if the fudge
+		-- factor is either 0.998 or 1.0, unsure why.
 		pitchFudge = (math.pi/2 + pitch)*0.999 - math.pi/2
 		
 		local speedMult = (GG.att_ReloadChange[unitID] or 1)
