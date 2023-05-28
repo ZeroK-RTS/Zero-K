@@ -315,9 +315,7 @@ end
 
 function script.Create()
 	spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
-	if Spring.GetGameRulesParam("loadPurge") ~= 1 then
-		Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
-	end
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
