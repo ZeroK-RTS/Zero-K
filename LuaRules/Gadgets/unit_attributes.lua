@@ -516,12 +516,17 @@ function UpdateUnitAttributes(unitID, frame)
 		setNewState = true
 	end
 	
-	if shieldWeaponDef[unitDefID] and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and shieldDisabled ~= unitShieldDisabled[unitID] then
+	if shieldWeaponDef[unitDefID] and shieldDisabled ~= unitShieldDisabled[unitID] then
 		spSetUnitRulesParam(unitID, "att_shieldDisabled", shieldDisabled and 1 or 0)
 		if shieldDisabled then
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
-		else
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+			Spring.SetUnitShieldState(unitID, -1, 0)
+		end
+		if spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 then
+			if shieldDisabled then
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
+			else
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+			end
 		end
 		changedAtt = true
 	end
