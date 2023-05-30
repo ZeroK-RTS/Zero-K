@@ -239,9 +239,9 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(restoreDelay)
-	--Turn(Base,x_axis, math.rad(0),1) --default tilt
+	--Turn(Base,x_axis, 0, 1) --default tilt
 	--WaitForTurn (Base, x_axis)
-	--Turn(Base,z_axis, math.rad(0),1) --default tilt
+	--Turn(Base,z_axis, 0, 1) --default tilt
 	--WaitForTurn (Base, z_axis)
 	--Signal(tiltSignal)
 end

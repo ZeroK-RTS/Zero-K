@@ -86,6 +86,8 @@ local callInLists = {
 	"GameID",
 	"TeamDied",
 
+	"GamePaused",
+
 	"PlayerAdded",
 	"PlayerChanged",
 	"PlayerRemoved",
@@ -222,10 +224,6 @@ local callInLists = {
 	"MapDrawCmd",
 	"GameSetup",
 	"DefaultCommand",
-
-	-- Save/Load
-	"Save",
-	"Load",
 
 	-- FIXME: NOT IN BASE
 	"UnitCommand",
@@ -964,6 +962,13 @@ end
 function gadgetHandler:GameStart()
   for _,g in r_ipairs(self.GameStartList) do
     g:GameStart()
+  end
+  return
+end
+
+function gadgetHandler:GamePaused(playerID, paused)
+  for _,g in r_ipairs(self.GamePausedList) do
+    g:GamePaused(playerID, paused)
   end
   return
 end
@@ -2045,24 +2050,6 @@ function gadgetHandler:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
   end
   return
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function gadgetHandler:Save(zip)
-  for _,g in r_ipairs(self.SaveList) do
-    g:Save(zip)
-  end
-  return
-end
-
-
-function gadgetHandler:Load(zip)
-  for _,g in r_ipairs(self.LoadList) do
-    g:Load(zip)
-  end
-  return
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

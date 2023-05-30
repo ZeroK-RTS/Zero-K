@@ -50,12 +50,12 @@ end
 function closeDoors()
 	Signal(SIG_CLOSEDOORS)
 	SetSignalMask(SIG_CLOSEDOORS)
-	Turn(lUpperCl1,z_axis, math.rad(0),4)
-	Turn(rUpperCl1,z_axis, math.rad(0),4)
+	Turn(lUpperCl1,z_axis, 0, 4)
+	Turn(rUpperCl1,z_axis, 0, 4)
 	Sleep(100)
 
-	Turn(lUpperCl2,z_axis, math.rad(0),4)
-	Turn(rUpperCl2,z_axis, math.rad(0),4)
+	Turn(lUpperCl2,z_axis, 0, 4)
+	Turn(rUpperCl2,z_axis, 0, 4)
 
 	WaitForTurn(lUpperCl1, z_axis)
 	WaitForTurn(rUpperCl1, z_axis)

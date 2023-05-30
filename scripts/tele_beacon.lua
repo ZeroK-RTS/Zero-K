@@ -9,9 +9,9 @@ local SIG_CEG_EFFECTS = 1
 local smokePiece = {sphere}
 
 local spinmodes = {
-	[1] = {holder = 30, sphere = 25},
-	[2] = {holder = 50, sphere = 45},
-	[3] = {holder = 100, sphere = 130},
+	[1] = {holder = math.rad(30), sphere = 25},
+	[2] = {holder = math.rad(50), sphere = 45},
+	[3] = {holder = math.rad(100), sphere = 130},
 }
 
 local holderDirection = plusOrMinusOne()
@@ -30,11 +30,14 @@ function activity_mode(n)
 		if n == 3 then
 			soundIndex = 9
 		end
-		
-		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection))
-		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
-		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
-		Spin(sphere, z_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
+
+		local spinData = spinmodes[n]
+		local spinSphere = spinData.sphere
+		local rand = math.random
+		Spin(holder, y_axis, spinData.holder*holderDirection)
+		Spin(sphere, x_axis, spinSphere*(1 + rand())*plusOrMinusOne())
+		Spin(sphere, y_axis, spinSphere*(1 + rand())*plusOrMinusOne())
+		Spin(sphere, z_axis, spinSphere*(1 + rand())*plusOrMinusOne())
 		mode = n
 	end
 end

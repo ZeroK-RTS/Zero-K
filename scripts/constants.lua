@@ -20,7 +20,6 @@ GG.Script.CRASHING = 97
 --SFXTYPE_REVERSEWAKE2 = 5
 
 -- Maths
-GG.Script.tau = math.pi*2
 
 GG.Script.toDegrees = 180/math.pi
 GG.Script.frameToMs = 1000/30
@@ -119,8 +118,8 @@ function GG.Script.NonBlockingWaitTurn(piece, axis, angle, leeway)
 	local rot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
 	leeway = leeway or 0.1
 	
-	angle = (angle - rot)%GG.Script.tau
-	if angle > leeway and angle < GG.Script.tau - leeway then
+	angle = (angle - rot) % math.tau
+	if angle > leeway and angle < math.tau - leeway then
 		WaitForTurn(piece, axis)
 	end
 end

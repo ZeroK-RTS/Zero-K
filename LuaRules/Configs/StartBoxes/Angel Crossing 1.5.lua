@@ -437,7 +437,7 @@ do
 		boxes2 = {[1] = box_2_main, [2] = box_2_sea1, [3] = box_2_sea2, [4] = box_2_center}
 		start1 = CombineTables(box_1_mainstarts, box_1_middlestarts, box_1_seastarts)
 		start2 = CombineTables(box_2_mainstarts, box_2_centerstarts, box_2_seastarts)
-	elseif Spring.Utilities.Gametype.is1v1 then
+	elseif Spring.Utilities.Gametype.is1v1() then
 		if math.random(1, 4) <= 2 then -- start on corner
 			boxes1 = {[1] = box_1_main}
 			boxes2 = {[1] = box_2_main}

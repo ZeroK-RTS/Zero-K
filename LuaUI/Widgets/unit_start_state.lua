@@ -1218,9 +1218,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return
 	end
-	-- don't apply some states to save/loaded unit
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
-	
+
 	local myTeam, amLeader = AmITeamLeader(unitTeam)
 	if not amLeader then
 		if myTeam or spectatingState then
@@ -1228,15 +1226,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		return
 	end
-	
-	if oldID then
-		return
-	end
 
 	local ud = UnitDefs[unitDefID]
 	local orderArray = {}
 	if ud.customParams.commtype or ud.customParams.level then
-		local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
+		local morphed = Spring.GetGameRulesParam("morphUnitCreating") == 1
 		if morphed then
 			-- Gadget and Spring unit states are applied in unit_morph gadget. Widget unit
 			-- states are handled by their widget.
@@ -1487,12 +1481,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
-		return
-	end
-	
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
-	if oldID then
+	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
 		return
 	end
 

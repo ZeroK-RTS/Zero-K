@@ -13,7 +13,7 @@ local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 local PACE = 2
 
-local THIGH_FRONT_ANGLE = -math.rad(50)
+local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -63,7 +63,7 @@ local function Walk()
 		Turn(lfoot, x_axis, math.rad(50), math.rad(140)*PACE)
 		Turn(rthigh, x_axis, math.rad(40), math.rad(140)*PACE)
 		Turn(rshin, x_axis, math.rad(-40), math.rad(140)*PACE)
-		Turn(rfoot, x_axis, math.rad(0), math.rad(140)*PACE)
+		Turn(rfoot, x_axis, 0, math.rad(140)*PACE)
 		Move(torso, y_axis, 0, 12*PACE)
 		WaitForMove(torso, y_axis)
 		Sleep(0)
@@ -90,7 +90,7 @@ local function Walk()
 		Turn(lthigh, x_axis, math.rad(40), math.rad(140)*PACE)
 --		Turn(lknee, x_axis, math.rad(-35), math.rad(135))
 		Turn(lshin, x_axis, math.rad(-40), math.rad(140)*PACE)
-		Turn(lfoot, x_axis, math.rad(0), math.rad(140)*PACE)
+		Turn(lfoot, x_axis, 0, math.rad(140)*PACE)
 		Move(torso, y_axis, 0, 12*PACE)
 		WaitForMove(torso, y_axis)
 		Sleep(0)

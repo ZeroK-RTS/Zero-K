@@ -126,17 +126,6 @@ local checkFrame = {}
 -------------------------------------------------------------------------------------
 -- Most script interaction
 
-local function callScript(unitID, funcName, args)
-	local func = Spring.UnitScript.GetScriptEnv(unitID)
-	if func then
-		func = func[funcName]
-		if func then
-			return Spring.UnitScript.CallAsUnit(unitID,func, args)
-		end
-	end
-	return false
-end
-
 local function changeSpeed(tid, bid, speed)
 	Spring.UnitScript.CallAsUnit(tid, Spring.UnitScript.GetScriptEnv(tid).activity_mode, speed)
 	if bid then
@@ -385,9 +374,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		or not beacon[beaconID]
 		or not Spring.AreTeamsAllied(teamID, Spring.GetUnitTeam(beaconID))
 		then
-			-- don't remove command if we're in game load
-			-- at this point the commands have been loaded but beacon table hasn't been regenerated
-			return true, Spring.GetGameRulesParam("loadPurge") == 1
+			return true, true
 		end
 
 		if not (beaconWaiter[unitID] and beaconWaiter[unitID].beaconID == beaconID) then
@@ -508,13 +495,7 @@ function gadget:GameFrame(f)
 							tele[tid].teleportiee = nil
 							Spring.SetUnitRulesParam(tid, "teleportiee", -1)
 							
-							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
-								Spring.SetUnitPosition(teleportiee, dx, dz)
-								Spring.MoveCtrl.Enable(teleportiee)
-								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
-								Spring.MoveCtrl.Disable(teleportiee)
-							end
-							
+							GG.MoveMobileUnit(teleportiee, dx, dy, dz)
 							-- actual pos might not match nominal destination due to floating amphs
 							local ax, ay, az = Spring.GetUnitPosition(teleportiee)
 							Spring.SpawnCEG("teleport_in", ax, ay, az, 0, 0, 0, size)

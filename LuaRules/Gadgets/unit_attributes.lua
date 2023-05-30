@@ -364,10 +364,12 @@ local currentAcc = {}
 
 local unitSlowed = {}
 local unitAbilityDisabled = {}
+local unitShieldDisabled = {}
 
 local function removeUnit(unitID)
 	unitSlowed[unitID] = nil
 	unitAbilityDisabled[unitID] = nil
+	unitShieldDisabled[unitID] = nil
 	unitReloadPaused[unitID] = nil
 	
 	currentEcon[unitID] = nil
@@ -425,7 +427,8 @@ function UpdateUnitAttributes(unitID, frame)
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
 	-- Disable
-	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
+	local shieldDisabled = (spGetUnitRulesParam(unitID, "shield_disabled") == 1)
+	local fullDisable    = (spGetUnitRulesParam(unitID, "fulldisable") == 1)
 	
 	local weaponMods = false
 	if GG.att_genericUsed and GG.att_moveMult[unitID] then
@@ -504,20 +507,28 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	local forcedOff = spGetUnitRulesParam(unitID, "forcedOff")
 	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or completeDisable == 1 or crashing == 1)
-	local setNewState
+	shieldDisabled = (shieldDisabled or abilityDisabled)
 	
+	local setNewState
 	if abilityDisabled ~= unitAbilityDisabled[unitID] then
 		spSetUnitRulesParam(unitID, "att_abilityDisabled", abilityDisabled and 1 or 0)
 		unitAbilityDisabled[unitID] = abilityDisabled
 		setNewState = true
 	end
 	
-	if shieldWeaponDef[unitDefID] and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and setNewState then
-		if abilityDisabled then
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
-		else
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+	if shieldWeaponDef[unitDefID] and shieldDisabled ~= unitShieldDisabled[unitID] then
+		spSetUnitRulesParam(unitID, "att_shieldDisabled", shieldDisabled and 1 or 0)
+		if shieldDisabled then
+			Spring.SetUnitShieldState(unitID, -1, 0)
 		end
+		if spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 then
+			if shieldDisabled then
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
+			else
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+			end
+		end
+		changedAtt = true
 	end
 	
 	local radarOverride = spGetUnitRulesParam(unitID, "radarRangeOverride")
@@ -576,12 +587,5 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false
 	else
 		return true
-	end
-end
-
--- All information required for load is stored in unitRulesParams.
-function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		UpdateUnitAttributes(unitID)
 	end
 end

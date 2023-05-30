@@ -61,19 +61,19 @@ local SIG_Walk = 2
 local PACE = 0.8
 
 -- four leg positions - front to straight, then to back, then to bent (then front again)
-local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(15) }
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad(50), foot=0, toef=0, toeb=math.rad(15) }
 local LEG_FRONT_SPEEDS    = { thigh=math.rad(60)*PACE, knee=math.rad(60)*PACE, shin=math.rad(110)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
-local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-10), knee=math.rad(-20), shin=math.rad(30), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-10), knee=math.rad(-20), shin=math.rad(30), foot=0, toef=0, toeb=0 }
 local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(60)*PACE, knee=math.rad(30)*PACE, shin=math.rad(40)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(30)*PACE }
 
-local LEG_BACK_ANGLES     = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=math.rad(0), toef=math.rad(-20), toeb=math.rad(-10) }
+local LEG_BACK_ANGLES     = { thigh=math.rad(10), knee=math.rad(-5), shin=math.rad(15), foot=0, toef=math.rad(-20), toeb=math.rad(-10) }
 local LEG_BACK_SPEEDS     = { thigh=math.rad(30)*PACE, knee=math.rad(60)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(40)*PACE, toeb=math.rad(60)*PACE }
 
-local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad(20), shin=math.rad(-20), foot=0, toef=0, toeb=0 }
 local LEG_BENT_SPEEDS     = { thigh=math.rad(60)*PACE, knee=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=math.rad(0), toef=math.rad(8), toeb=math.rad(0) }
+local LEG_STEP_ANGLES     = { thigh=math.rad(-9), knee=math.rad(30), shin=math.rad(-22), foot=0, toef=math.rad(8), toeb=0 }
 local LEG_STEP_SPEEDS     = { thigh=math.rad(15)*PACE, knee=math.rad(50)*PACE, shin=math.rad(36.6)*PACE, foot=math.rad(50)*PACE, toef=math.rad(13.3)*PACE, toeb=math.rad(50)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)

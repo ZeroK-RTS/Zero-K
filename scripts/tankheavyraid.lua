@@ -25,8 +25,8 @@ local SIG_AIM1 = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
-local TURRET_TURN_SPEED = 500
-local GUN_TURN_SPEED = 150
+local TURRET_TURN_SPEED = math.rad(500)
+local GUN_TURN_SPEED = math.rad(150)
 
 local WHEEL_TURN_SPEED1 = 480
 local WHEEL_TURN_SPEED1_ACCELERATION = 75
@@ -40,8 +40,8 @@ local function RestoreAfterDelay()
 	
 	Sleep(RESTORE_DELAY)
 	
-	Turn(turret, y_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
-	Turn(sleeve, x_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
+	Turn(turret, y_axis, 0, TURRET_TURN_SPEED/2)
+	Turn(sleeve, x_axis, 0, TURRET_TURN_SPEED/2)
 end
 
 
@@ -147,8 +147,8 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM1)
 	SetSignalMask(SIG_AIM1)
 	
-	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
-	Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+	Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+	Turn(sleeve, x_axis, -pitch, GUN_TURN_SPEED)
 	
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
@@ -170,8 +170,8 @@ function script.AimWeapon(num, heading, pitch)
 		-- EmitSfx works if the turret takes no time to turn and there is no waitForTurn
 		return true
 	else
-		Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
-		Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+		Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+		Turn(sleeve, x_axis, -pitch, GUN_TURN_SPEED)
 		StartThread(RestoreAfterDelay)
 		return false
 	end

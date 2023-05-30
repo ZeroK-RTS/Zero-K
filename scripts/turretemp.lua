@@ -26,8 +26,8 @@ local readyToFire = false
 local RESTORE_DELAY = 3000
 local position = 0
 
-local tauOn12 = GG.Script.tau/12
-local tauOn6 = GG.Script.tau/6
+local tauOn12 = math.tau/12
+local tauOn6 = math.tau/6
 
 -- Signal definitions
 local SIG_RESTORE = 1
@@ -44,10 +44,10 @@ local function popUp()
 	Signal(SIG_CLOSE)
 	SetSignalMask(SIG_OPEN)
 	
-	Turn(door1, z_axis, math.rad(0), math.rad(210))
-	Turn(door2, z_axis, math.rad(0), math.rad(210))
-	Turn(door3, z_axis, math.rad(0), math.rad(210))
-	Turn(door4, z_axis, math.rad(0), math.rad(210))
+	Turn(door1, z_axis, 0, math.rad(210))
+	Turn(door2, z_axis, 0, math.rad(210))
+	Turn(door3, z_axis, 0, math.rad(210))
+	Turn(door4, z_axis, 0, math.rad(210))
 	Turn(door5, x_axis, 0, math.rad(210))
 	Turn(door6, x_axis, 0, math.rad(210))
 	

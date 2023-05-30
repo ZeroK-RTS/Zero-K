@@ -160,7 +160,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
-	
+
+	-- Some units can be deeper than usual via waterline.
+	-- Poke above the surface instead of their "base" level
+	-- since it blocks lots of weaponry
+	if baseY < 0 and ud.floatOnWater then
+		baseY = 0
+	end
+
 	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)
 	local aimAbove = (midY - baseY) + aim[2] - mid[2]
 	

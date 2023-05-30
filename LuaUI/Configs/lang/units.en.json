@@ -107,7 +107,7 @@
 	"tankheavyassault" : {
 		"name" : "Cyclops",
 		"description" : "Very Heavy Tank Buster",
-		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty disruptor cannon designed to smash lesser tanks and other heavies alike into oblivion, slowing any survivors down to prevent them from escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
+		"helptext" : "The Cyclops is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks and other heavies alike into oblivion, its disruptor sidearm slowing any survivors down to prevent them from escaping its grasp. However, it turns like a tub of water, its short range makes it easy prey for advanced skirmishers or air attacks, and its slow rate of fire makes it vulnerable to massed raider attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications."
 	},
 	"damagesink" : {
 		"name" : "Damage Sink thing",
@@ -147,7 +147,7 @@
 	"factoryveh" : {
 		"name" : "Rover Assembly",
 		"description" : "Produces Light Wheeled Vehicles",
-		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Slasher"
+		"helptext" : "A traditional favourite, the Rover Assembly is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Ripper, Fencer"
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
@@ -1004,6 +1004,11 @@
 		"description" : "Seismic Missile",
 		"helptext" : "The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units."
 	},
+	"missileslow" : {
+		"name" : "Zeno",
+		"description" : "Slow Homing Missile - High single-target slow damage with lingering damage over time",
+		"helptext" : "The Zeno slows down a single target and leaves a slowing area behind it. It has far more range than other combat missiles and homes onto its target."
+	},
 	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Cloaked Infiltration Strider",
@@ -1202,7 +1207,7 @@
 	"gunshipheavytrans" : {
 		"name" : "Hercules",
 		"description" : "Armed Heavy Air Transport",
-		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships (except Reef and Shogun). Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs."
+		"helptext" : "The Hercules can haul any non-flying mobile unit in the game, including ships. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot landing zones."
 	},
 	"planescout" : {
 		"name" : "Owl",

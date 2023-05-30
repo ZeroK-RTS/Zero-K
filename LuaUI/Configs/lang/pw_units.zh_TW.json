@@ -10,18 +10,18 @@
 		"helptext" : "生產用於攻擊敵方星球的太空轟炸機。在行星入侵期間，生產一般轟炸機。"
 	},
 	"pw_dropfac" : {
-		"name" : "船艦工廠",
-		"description" : "生產船艦",
+		"name" : "運輸船工廠",
+		"description" : "生產運輸船",
 		"helptext" : "為入侵敵方星球所生產的太空船艦。在行星入侵期間，生產一般運輸船。"
 	},
 	"pw_estorage" : {
-		"name" : "能量儲存",
-		"description" : "儲存能量",
+		"name" : "電力倉庫",
+		"description" : "儲存電源",
 		"helptext" : "一個大電容器。"
 	},
 	"pw_estorage2" : {
-		"name" : "雙重能量儲存",
-		"description" : "儲存能量",
+		"name" : "雙重電源儲存",
+		"description" : "儲存電源",
 		"helptext" : "一個大雙重電容器。"
 	},
 	"pw_garrison" : {
@@ -31,7 +31,7 @@
 	},
 	"pw_gaspowerstation" : {
 		"name" : "燃氣發電站",
-		"description" : "生產能量",
+		"description" : "生產電源",
 		"helptext" : "一個燃氣發電機。"
 	},
 	"pw_grid" : {
@@ -66,33 +66,33 @@
 	},
 	"pw_mine" : {
 		"name" : "電力產生器",
-		"description" : "生產 50 能量／轉",
+		"description" : "生產 50 電源／回合",
 		"helptext" : "一個小型高效的發電機。"
 	},
 	"pw_mine2" : {
 		"name" : "軌道太陽能陣列",
-		"description" : "生產 100 能量／轉",
-		"helptext" : "一個大型且輸出功率更高發電機。"
+		"description" : "生產 100 電源／回合",
+		"helptext" : "一個大型且輸出功率更高的發電機。"
 	},
 	"pw_mine3" : {
 		"name" : "星球地熱電站",
-		"description" : "生產 250 能量／轉",
+		"description" : "生產 250 電源／回合",
 		"helptext" : "這個巨大綜合體直接從星球的地函汲取能量。如果被摧毀，它將在核爆炸中升空。"
 	},
 	"pw_mstorage2" : {
-		"name" : "金屬儲存",
+		"name" : "金屬倉庫",
 		"description" : "儲存金屬",
 		"helptext" : "儲存大量金屬用於星球。"
 	},
 	"pw_warpgate" : {
 		"name" : "傳送門",
-		"description" : "生產傳送核心",
+		"description" : "生產傳送器核心",
 		"helptext" : "這個設施生產令人垂涎的傳送核心，可以在眨眼間將飛船送至銀河系。"
 	},
 	"pw_warpjammer" : {
-		"name" : "傳送干擾機",
+		"name" : "傳送干擾器",
 		"description" : "防止傳送攻擊",
-		"helptext" : "傳送干擾機透過立場來保護所在區域防止配備傳送核心的船艦入侵。"
+		"helptext" : "傳送干擾機透過力場來保護所在區域防止配備傳送核心的船艦入侵。"
 	},
 	"pw_wormhole" : {
 		"name" : "蟲洞產生器",

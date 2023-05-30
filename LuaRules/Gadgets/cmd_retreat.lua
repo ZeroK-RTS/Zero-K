@@ -18,8 +18,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local SAVE_FILE = "Gadgets/cmd_retreat.lua"
-
 local Tooltips = {
 	'Orders: Never retreat.',
 	'Orders: Retreat at less than 30% health (right-click to cancel).',
@@ -102,24 +100,9 @@ for unitDefID, unitDef in pairs(UnitDefs) do
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- allow gadget:Save (unsynced) to reach them
-local function UpdateSaveReferences()
-	_G.interruptedRetreaters = interruptedRetreaters
-	_G.wantRetreat = wantRetreat
-	_G.isRetreating = isRetreating
-	_G.retreaterTagsMove = retreaterTagsMove
-	_G.retreaterTagsWait = retreaterTagsWait
-	_G.retreaterHasRearm = retreaterHasRearm
-	_G.retreatState = retreatState
-	_G.retreatables = retreatables
-	_G.isPlane = isPlane
-	_G.havens = havens
-end
-UpdateSaveReferences()
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+_G.retreaterTagsMove = retreaterTagsMove
+_G.retreaterTagsWait = retreaterTagsWait
+
 ----------------------------
 ----- Haven Handling
 ----------------------------
@@ -570,39 +553,6 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Retreat", SAVE_FILE)
-	if not loadData then
-		return
-	end
-	
-	-- regenerate havens
-	for teamID, havenList in pairs(loadData.havens) do
-		-- havenList = {count = x, data = {}}
-		for havenNum, havenData in ipairs(havenList.data) do
-			AddHaven(teamID, havenData.x, havenData.z)
-		end
-		SendToUnsynced("HavenUpdate", teamID)
-	end
-	
-	isRetreating = GG.SaveLoad.GetNewUnitIDKeys(loadData.isRetreating or {})
-	interruptedRetreaters = GG.SaveLoad.GetNewUnitIDKeys(loadData.interruptedRetreaters or {})
-	
-	-- reissue retreat commands
-	for unitID,_ in pairs(retreatables) do
-		if isRetreating[unitID] and not interruptedRetreaters[unitID] then
-			isRetreating[unitID] = nil	-- clear retreating state so gadget can re-order it to retreat
-			PeriodicUnitCheck(unitID)
-		end
-	end
-	
-	UpdateSaveReferences()
-end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 else  -- UNSYNCED
@@ -679,31 +629,5 @@ function gadget:Shutdown()
 	
 	GG.Retreat = nil
 end
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local name = "Retreat"
-	-- basically everything here is regenerated either on unit recreation or when retreat check is done
-	local data = {
-		interruptedRetreaters = Spring.Utilities.MakeRealTable(SYNCED.interruptedRetreaters, name),
-		--wantRetreat = Spring.Utilities.MakeRealTable(SYNCED.wantRetreat, name)
-		isRetreating = Spring.Utilities.MakeRealTable(SYNCED.isRetreating, name),
-		--retreaterTagsMove = Spring.Utilities.MakeRealTable(SYNCED.retreaterTagsMove, name)
-		--retreaterTagsWait = Spring.Utilities.MakeRealTable(SYNCED.retreaterTagsWait, name)
-		--retreaterHasRearm = Spring.Utilities.MakeRealTable(SYNCED.retreaterHasRearm, name)
-		--retreatState = Spring.Utilities.MakeRealTable(SYNCED.retreatState, name)
-		--retreatables = Spring.Utilities.MakeRealTable(SYNCED.retreatables, name)
-		--isPlane = Spring.Utilities.MakeRealTable(SYNCED.isPlane, name)
-		havens = Spring.Utilities.MakeRealTable(SYNCED.havens, name)
-	}
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, data)
-end
-
--------------------------------------------------------------------------------------
 
 end

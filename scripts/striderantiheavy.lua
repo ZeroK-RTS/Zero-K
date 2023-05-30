@@ -34,7 +34,7 @@ local firepoints = {[0] = nanospray, [1] = laserblade}
 --------------------------------------------------------------------------------
 local PACE = 3.2
 
-local THIGH_FRONT_ANGLE = -math.rad(50)
+local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -43,14 +43,14 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(10)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = -math.rad(40)
+local ARM_FRONT_ANGLE = math.rad(-40)
 local ARM_FRONT_SPEED = math.rad(40) * PACE
 local ARM_BACK_ANGLE = math.rad(30)
 local ARM_BACK_SPEED = math.rad(40) * PACE
 
-local FOREARM_FRONT_ANGLE = -math.rad(90)
+local FOREARM_FRONT_ANGLE = math.rad(-90)
 local FOREARM_FRONT_SPEED = math.rad(20) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(70)
+local FOREARM_BACK_ANGLE = math.rad(-70)
 local FOREARM_BACK_SPEED = math.rad(20) * PACE
 
 local TORSO_ANGLE_MOTION = math.rad(20)
@@ -86,7 +86,7 @@ function beginJump()
 	Turn(rloarm, x_axis, math.rad(-90), math.rad(200))
 	Turn(lthigh, x_axis, math.rad(-30), math.rad(200))
 	Turn(lleg, x_axis, math.rad(110), math.rad(200))
-	Turn(rthigh, z_axis, math.rad(-(-20)), math.rad(200))
+	Turn(rthigh, z_axis, math.rad(20), math.rad(200))
 	Turn(rthigh, x_axis, math.rad(-80), math.rad(200))
 	Turn(rleg, x_axis, math.rad(-10), math.rad(200))
 end
@@ -99,7 +99,7 @@ function EndJump()
 	Turn(rloarm, x_axis, 0, math.rad(400))
 	Turn(lthigh, x_axis, 0, math.rad(400))
 	Turn(rthigh, x_axis, 0, math.rad(400))
-	Turn(rthigh, z_axis, math.rad(-(0)), math.rad(400))
+	Turn(rthigh, z_axis, 0, math.rad(400))
 	Turn(rleg, x_axis, 0, math.rad(400))
 	Turn(lleg, x_axis, 0, math.rad(400))
 	Turn(ground, x_axis, 0, math.rad(4000))

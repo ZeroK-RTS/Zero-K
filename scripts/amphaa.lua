@@ -54,13 +54,14 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	while true do
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(0,2)), math.rad(math.random()))
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(-2,0)), math.rad(math.random()))
+
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(-2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
 	end
 end
@@ -109,29 +110,24 @@ local function riseFloat_thread()
 
 	while true do
 
-		Turn(lthigh,x_axis, math.rad(30+15), math.rad(75))
-		Turn(rthigh,x_axis, math.rad(30-15), math.rad(75))
-
-
+		Turn(lthigh,x_axis, math.rad(45), math.rad(75))
+		Turn(rthigh,x_axis, math.rad(15), math.rad(75))
 		Sleep(200)
 
-		Turn(lcalf,x_axis, math.rad(-55-20), math.rad(100))
-		Turn(lfoot,x_axis, math.rad(80+20), math.rad(100))
-		Turn(rcalf,x_axis, math.rad(-55+20), math.rad(100))
-		Turn(rfoot,x_axis, math.rad(80-20), math.rad(100))
-
+		Turn(lcalf,x_axis, math.rad(-75), math.rad(100))
+		Turn(lfoot,x_axis, math.rad(100), math.rad(100))
+		Turn(rcalf,x_axis, math.rad(-35), math.rad(100))
+		Turn(rfoot,x_axis, math.rad(60),  math.rad(100))
 		Sleep(200)
 
-		Turn(lthigh,x_axis, math.rad(30-15), math.rad(75))
-		Turn(rthigh,x_axis, math.rad(30+15), math.rad(75))
-
+		Turn(lthigh,x_axis, math.rad(15), math.rad(75))
+		Turn(rthigh,x_axis, math.rad(45), math.rad(75))
 		Sleep(200)
 
-		Turn(lcalf,x_axis, math.rad(-55+20), math.rad(100))
-		Turn(lfoot,x_axis, math.rad(80-20), math.rad(100))
-		Turn(rcalf,x_axis, math.rad(-55-20), math.rad(100))
-		Turn(rfoot,x_axis, math.rad(80+20), math.rad(100))
-
+		Turn(lcalf,x_axis, math.rad(-35), math.rad(100))
+		Turn(lfoot,x_axis, math.rad(60),  math.rad(100))
+		Turn(rcalf,x_axis, math.rad(-75), math.rad(100))
+		Turn(rfoot,x_axis, math.rad(100), math.rad(100))
 		Sleep(200)
 	end
 end
@@ -145,36 +141,31 @@ local function staticFloat_thread()
 	Signal(SIG_FLOAT)
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
-	Turn(lcalf,x_axis, math.rad(-55-20), math.rad(50))
-	Turn(lfoot,x_axis, math.rad(80+20), math.rad(50))
-	Turn(rcalf,x_axis, math.rad(-55+20), math.rad(50))
-	Turn(rfoot,x_axis, math.rad(80-20), math.rad(50))
+	Turn(lcalf,x_axis, math.rad(-75), math.rad(50))
+	Turn(lfoot,x_axis, math.rad(100), math.rad(50))
+	Turn(rcalf,x_axis, math.rad(-35), math.rad(50))
+	Turn(rfoot,x_axis, math.rad(60),  math.rad(50))
 
 	while true do
 
-		Turn(lthigh,x_axis, math.rad(30+15), math.rad(37.5))
-		Turn(rthigh,x_axis, math.rad(30-15), math.rad(37.5))
-
-
+		Turn(lthigh,x_axis, math.rad(45), math.rad(37.5))
+		Turn(rthigh,x_axis, math.rad(15), math.rad(37.5))
 		Sleep(400)
 
-		Turn(lcalf,x_axis, math.rad(-55-20), math.rad(50))
-		Turn(lfoot,x_axis, math.rad(80+20), math.rad(50))
-		Turn(rcalf,x_axis, math.rad(-55+20), math.rad(50))
-		Turn(rfoot,x_axis, math.rad(80-20), math.rad(50))
-
+		Turn(lcalf,x_axis, math.rad(-75), math.rad(50))
+		Turn(lfoot,x_axis, math.rad(100), math.rad(50))
+		Turn(rcalf,x_axis, math.rad(-35), math.rad(50))
+		Turn(rfoot,x_axis, math.rad(60),  math.rad(50))
 		Sleep(400)
 
-		Turn(lthigh,x_axis, math.rad(30-15), math.rad(37.5))
-		Turn(rthigh,x_axis, math.rad(30+15), math.rad(37.5))
-
+		Turn(lthigh,x_axis, math.rad(15), math.rad(37.5))
+		Turn(rthigh,x_axis, math.rad(45), math.rad(37.5))
 		Sleep(400)
 
-		Turn(lcalf,x_axis, math.rad(-55+20), math.rad(50))
-		Turn(lfoot,x_axis, math.rad(80-20), math.rad(50))
-		Turn(rcalf,x_axis, math.rad(-55-20), math.rad(50))
-		Turn(rfoot,x_axis, math.rad(80+20), math.rad(50))
-
+		Turn(lcalf,x_axis, math.rad(-35), math.rad(50))
+		Turn(lfoot,x_axis, math.rad(60),  math.rad(50))
+		Turn(rcalf,x_axis, math.rad(-75), math.rad(50))
+		Turn(rfoot,x_axis, math.rad(100), math.rad(50))
 		Sleep(400)
 	end
 end
@@ -198,15 +189,14 @@ local function sinkFloat_thread()
 	Turn(pelvis, z_axis, 0, math.rad(20)*PACE)
 	Move(pelvis, y_axis, 0, 12*PACE)
 
-	Turn(base, x_axis,0, math.rad(math.random(1,2)))
-	Turn(base, z_axis, 0, math.rad(math.random(1,2)))
-	Move(base, y_axis, 0, math.rad(math.random(1,2)))
+	Turn(base, x_axis, 0, math.random()*math.rad(1) + math.rad(1))
+	Turn(base, z_axis, 0, math.random()*math.rad(1) + math.rad(1))
+	Move(base, y_axis, 0, math.random()*math.rad(1) + math.rad(1))
 
-	while true do --FIXME: not stopped when sinking ends!
+	while true do -- stopped via signal
 		EmitSfx(vent, 1026)
 		Sleep(66)
 	end
-
 end
 
 local function dustBottom()

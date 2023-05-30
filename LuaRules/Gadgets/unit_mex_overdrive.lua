@@ -1819,6 +1819,38 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function MoveOrTransferSetup(unitID, unitDefID)
+	if (mexDefs[unitDefID] and mexByID[unitID]) then
+		RemoveMex(unitID)
+	end
+
+	if pylonDefs[unitDefID] then
+		RemovePylon(unitID)
+	end
+
+	if paybackDefs[unitDefID] and enableEnergyPayback then
+		RemoveEnergyToPayback(unitID, unitDefID)
+	end
+end
+
+local function MoveOrTransferAftermath(unitID, unitDefID)
+	if (mexDefs[unitDefID]) then
+		local inc = spGetUnitRulesParam(unitID, "mexIncome")
+		AddMex(unitID, false, inc)
+	end
+
+	if pylonDefs[unitDefID] then
+		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
+		--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
+	end
+end
+
+GG.Overdrive_MoveOrTransferSetup = MoveOrTransferSetup
+GG.Overdrive_MoveOrTransferAftermath = MoveOrTransferAftermath
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
@@ -1855,15 +1887,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID, false)
 
 	if (newAllyTeam ~= oldAllyTeam) then
-		if (mexDefs[unitDefID]) then
-			local inc = spGetUnitRulesParam(unitID, "mexIncome")
-			AddMex(unitID, false, inc)
-		end
-
-		if pylonDefs[unitDefID] then
-			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
-			--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
-		end
+		MoveOrTransferAftermath(unitID, unitDefID)
 	end
 
 	if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
@@ -1876,17 +1900,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID, false)
 
 	if (newAllyTeam ~= oldAllyTeam) then
-		if (mexDefs[unitDefID] and mexByID[unitID]) then
-			RemoveMex(unitID)
-		end
-
-		if pylonDefs[unitDefID] then
-			RemovePylon(unitID)
-		end
-
-		if paybackDefs[unitDefID] and enableEnergyPayback then
-			RemoveEnergyToPayback(unitID, unitDefID)
-		end
+		MoveOrTransferSetup(unitID, unitDefID)
 	end
 
 	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
@@ -1913,4 +1927,5 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 end
 
+-------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

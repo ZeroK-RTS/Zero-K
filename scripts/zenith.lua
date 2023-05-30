@@ -20,10 +20,12 @@ local SPREAD_PER_DIST = 0.03
 -- 6 minutes to reach capacity.
 local SPAWN_PERIOD = 1200 -- in milliseconds
 local METEOR_CAPACITY = 300
-
 local fireRange = WeaponDefNames["zenith_meteor"].range
 
 local smokePiece = {base}
+
+local SIG_SPAWN = 1
+local lastSpawnProjectileTime = Spring.GetGameFrame()
 
 local Vector = Spring.Utilities.Vector
 local projectiles = {}
@@ -193,6 +195,7 @@ end
 
 local function SpawnProjectileThread()
 	GG.zenith_spawnBlocked = GG.zenith_spawnBlocked or {}
+	SetSignalMask(SIG_SPAWN)
 
 	while true do
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
@@ -205,9 +208,11 @@ local function SpawnProjectileThread()
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
 		while IsDisabled() do
+			lastSpawnProjectileTime = Spring.GetGameFrame()
 			UpdateEnabled(false)
 			Sleep(100)
 		end
+		lastSpawnProjectileTime = Spring.GetGameFrame()
 		local reloadMult = (stunned_or_inbuild and 0) or (spGetUnitRulesParam(unitID, "lowpower") == 1 and 0) or (GG.att_ReloadChange[unitID] or 1)
 
 		EmitSfx(flare, 2049)
@@ -310,9 +315,7 @@ end
 
 function script.Create()
 	spSetUnitRulesParam(unitID, "meteorSpawnBlocked", 0)
-	if Spring.GetGameRulesParam("loadPurge") ~= 1 then
-		Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
-	end
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", 0, INLOS_ACCESS)
 	spSetUnitRulesParam(unitID, "meteorsControlledMax", METEOR_CAPACITY, INLOS_ACCESS)
 	local x, _, z = Spring.GetUnitPosition(unitID)
 	ux, uy, uz = x, Spring.GetGroundHeight(x, z), z
@@ -330,6 +333,11 @@ function script.Create()
 end
 
 function script.QueryWeapon(num)
+	if lastSpawnProjectileTime < Spring.GetGameFrame() - 300 then
+		lastSpawnProjectileTime = Spring.GetGameFrame()
+		Signal(SIG_SPAWN)
+		StartThread(SpawnProjectileThread)
+	end
 	return firept
 end
 

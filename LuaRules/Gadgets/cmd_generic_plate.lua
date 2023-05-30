@@ -22,7 +22,6 @@ if gadgetHandler:IsSyncedCode() then
 
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitIsDead       = Spring.GetUnitIsDead
-local spGetUnitDefID        = Spring.GetUnitDefID
 
 local plateParent = {}
 local canBuildPlateCache = {}

@@ -26,7 +26,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local SAVE_FILE = "Gadgets/unit_morph.lua"
 local emptyTable = {} -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -130,7 +129,6 @@ local PRIVATE = {private = true}
 --------------------------------------------------------------------------------
 
 local morphDefs	= {} --// make it global in Initialize()
-local extraUnitMorphDefs = {} -- stores mainly planetwars morphs
 local hostName = nil -- planetwars hostname
 local PWUnits = {} -- planetwars units
 local morphUnits = {} --// make it global in Initialize(); needs save/load
@@ -379,18 +377,18 @@ local function FinishMorph(unitID, morphData)
 		if zsize/4 ~= math.floor(zsize/4) then
 			z = z+8
 		end
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
 		end
 		Spring.SetUnitPosition(newUnit, x, y, z)
 	else
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
@@ -399,17 +397,12 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
-	--if (extraUnitMorphDefs[unitID] ~= nil) then
-	-- nothing here for now
-	--end
-	
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message
 		PWUnit = PWUnits[unitID]
 		PWUnit.currentDef = udDst
 		local data = PWUnit.owner..","..defName..","..math.floor(px)..","..math.floor(pz)..",".."S" -- todo determine and apply smart orientation of the structure
 		Spring.SendCommands("w "..hostName.." pwmorph:"..data)
-		extraUnitMorphDefs[unitID] = nil
 		--GG.PlanetWars.units[unitID] = nil
 		--GG.PlanetWars.units[newUnit] = PWUnit
 		SendToUnsynced('PWCreate', unitTeam, newUnit)
@@ -628,7 +621,6 @@ function gadget:Initialize()
 	--// make it global for unsynced access via SYNCED
 	_G.morphUnits         = morphUnits
 	_G.morphDefs          = morphDefs
-	_G.extraUnitMorphDefs = extraUnitMorphDefs
 	--_G.morphToStart       = morphToStart
 
 	--// Register CmdIDs
@@ -749,7 +741,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 		end
 	else
 		--Spring.Echo('Morph gadget: CommandFallback specific morph')
-		morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+		morphDef = (morphDefs[unitDefID] or {})[cmdID]
 	end
 	if (not morphDef) then
 		return true
@@ -842,7 +834,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			--Spring.Echo('Morph gadget: AllowCommand morph cannot be here!')
 		elseif (cmdID > CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
 			--Spring.Echo('Morph gadget: AllowCommand specific morph')
-			morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+			morphDef = (morphDefs[unitDefID] or {})[cmdID]
 		end
 		if morphDef then
 			if (isFactory(unitDefID)) then
@@ -877,43 +869,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false --// command was not used
 	end
 	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
-end
-
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	--[[
-	morphUnits[unitID] = {
-		def = morphDef,
-		progress = 0.0,
-		increment = morphDef.increment,
-		morphID = morphID,
-		teamID = teamID,
-		combatMorph = morphDef.combatMorph,
-		morphRate = 0.0,
-	}
-	]]
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Morph", SAVE_FILE) or emptyTable
-	for oldID, entry in pairs(loadData.morph or emptyTable) do
-		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		if newID then
-			morphUnits[newID] = entry
-			
-			local morphDef = entry.def
-			if morphDef.cmd then
-				local cmdDescID = Spring.FindUnitCmdDesc(newID, morphDef.cmd)
-				if (cmdDescID) then
-					Spring.EditUnitCmdDesc(newID, cmdDescID, {id = morphDef.stopCmd, name = RedStr .. "Stop"})
-				end
-			elseif morphDef.stopCmd == CMD_UPGRADE_STOP then
-				Spring.InsertUnitCmdDesc(newID, stopUpgradeCmdDesc)
-			end
-		end
-	end
 end
 
 --------------------------------------------------------------------------------
@@ -1025,7 +980,7 @@ local function StartMorph(cmd, unitID, unitDefID, morphID)
 			CallAsTeam({['read'] = readTeam },
 				function()
 					if (unitID)and(IsUnitVisible(unitID)) then
-						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID] or SYNCED.extraUnitMorphDefs[unitID])
+						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID])
 					end
 				end
 			)
@@ -1255,19 +1210,6 @@ end
 
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
-end
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local morph = Spring.Utilities.MakeRealTable(SYNCED.morphUnits, "Morph")
-	--local morphToStart = Spring.Utilities.MakeRealTable(SYNCED.morphToStart, "Morph (to start)")
-	local save = {morph = morph}	-- {morph = morph, morphToStart = morphToStart}
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, save)
 end
 
 --------------------------------------------------------------------------------

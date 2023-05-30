@@ -1,18 +1,18 @@
 local teamCount
-local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isCompStomp, isFFA, isTeamFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false, false, false
+local is1v1, isTeams, isBigTeams, isSmallTeams, isChickens, isCoop, isFFA, isTeamFFA, isSandbox, isPlanetWars = false, false, false, false, false, false, false, false, false, false
 do
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID(), false))
 	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
-	local entirelyHumanAllyTeams = {}
+	local allyTeamsWithHumans = {}
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
-		local allyteamEntirelyHuman = true
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
 			local isTeamValid = true
+			local humanExists = false
 			for j = 1, #teamList do
-				if select (4, Spring.GetTeamInfo(teamList[j], false)) then
-					allyteamEntirelyHuman = false
+				if not select (4, Spring.GetTeamInfo(teamList[j], false)) then
+					humanExists = true
 				end
 				local luaAI = Spring.GetTeamLuaAI(teamList[j])
 				if luaAI and luaAI:find("Chicken") then
@@ -23,8 +23,8 @@ do
 			if isTeamValid then
 				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
 			end
-			if allyteamEntirelyHuman then
-				entirelyHumanAllyTeams[#entirelyHumanAllyTeams+1] = allyTeamList[i]
+			if humanExists then
+				allyTeamsWithHumans[#allyTeamsWithHumans + 1] = allyTeamList[i]
 			end
 		end
 	end
@@ -57,9 +57,8 @@ do
 		end
 	end
 
-	if #entirelyHumanAllyTeams == 1 then
-		isCompStomp = true
-		isCoop = (#Spring.GetTeamList(entirelyHumanAllyTeams[1]) > 1)
+	if #allyTeamsWithHumans == 1 then
+		isCoop = true
 	end
 
 	if Spring.GetModOptions().planet then
@@ -78,7 +77,6 @@ Spring.Utilities.Gametype = {
 	isSmallTeams = function () return isSmallTeams end,
 	isChickens   = function () return isChickens   end,
 	isCoop       = function () return isCoop       end,
-	isCompStomp  = function () return isCompStomp  end,
 	isTeamFFA    = function () return isTeamFFA    end,
 	isFFA        = function () return isFFA        end,
 	isSandbox    = function () return isSandbox    end,

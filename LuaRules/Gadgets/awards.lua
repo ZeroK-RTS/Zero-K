@@ -94,6 +94,7 @@ local staticO_small = {
 	seismic = 1,
 	tacnuke = 1,
 	empmissile = 1,
+	missileslow = 1,
 	napalmmissile = 1,
 	wolverine_mine = 1,
 }

@@ -32,16 +32,16 @@ local gun = {
 }
 
 local function restoreWings()
-	Turn(mhull, y_axis, math.rad(0),math.rad(15))
-	Turn(lhull, y_axis, math.rad(0),math.rad(15))
-	Turn(rhull, y_axis, math.rad(0),math.rad(15))
+	Turn(mhull, y_axis, 0, math.rad(15))
+	Turn(lhull, y_axis, 0, math.rad(15))
+	Turn(rhull, y_axis, 0, math.rad(15))
 
-	Turn(mhull, x_axis, math.rad(0),math.rad(12))
-	Turn(lhull, x_axis, math.rad(0),math.rad(12))
-	Turn(rhull, x_axis, math.rad(0),math.rad(12))
+	Turn(mhull, x_axis, 0, math.rad(12))
+	Turn(lhull, x_axis, 0, math.rad(12))
+	Turn(rhull, x_axis, 0, math.rad(12))
 
-	Turn(middle, x_axis, math.rad(0), math.rad(30))
-	Turn(middle, y_axis, math.rad(0), math.rad(30))
+	Turn(middle, x_axis, 0, math.rad(30))
+	Turn(middle, y_axis, 0, math.rad(30))
 end
 
 local function TiltBody()
@@ -60,46 +60,46 @@ local function TiltBody()
 
 				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*GG.Script.headingToRad
 
-				local diffHeading = (velHeading - curHeading + math.pi)%GG.Script.tau - math.pi -- keep in range [-math.pi,math.pi)
+				local diffHeading = (velHeading - curHeading + math.pi) % math.tau - math.pi -- keep in range [-math.pi,math.pi)
 
 				local newHeading
 
 				if diffHeading < -math.pi/3 then
-					Turn(lhull, x_axis, math.rad(speed*0.8),math.rad(24))
-					Turn(rhull, y_axis, -math.rad(speed),math.rad(30))
-					Turn(mhull, y_axis, math.rad(speed),math.rad(30))
+					Turn(lhull, x_axis, speed*math.rad(0.8),math.rad(24))
+					Turn(rhull, y_axis, speed*math.rad(-1),math.rad(30))
+					Turn(mhull, y_axis, speed*math.rad(1),math.rad(30))
 					newHeading = velHeading + 2*math.pi/3
 
-					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, -math.rad(2*speed*root3on2), math.rad(30*root3on2))
+					Turn(middle, x_axis, speed*math.rad(-2)*0.5,      math.rad(30)*0.5)
+					Turn(middle, y_axis, speed*math.rad(-2)*root3on2, math.rad(30)*root3on2)
 
-					Turn(lhull, y_axis, math.rad(0),math.rad(30))
-					Turn(mhull, x_axis, math.rad(0),math.rad(24))
-					Turn(rhull, x_axis, math.rad(0),math.rad(24))
+					Turn(lhull, y_axis, 0, math.rad(30))
+					Turn(mhull, x_axis, 0, math.rad(24))
+					Turn(rhull, x_axis, 0, math.rad(24))
 				elseif diffHeading < math.pi/3 then
-					Turn(mhull, x_axis, math.rad(speed*0.8),math.rad(24))
-					Turn(lhull, y_axis, -math.rad(speed),math.rad(30))
-					Turn(rhull, y_axis, math.rad(speed),math.rad(30))
+					Turn(mhull, x_axis, speed*math.rad(0.8),math.rad(24))
+					Turn(lhull, y_axis, speed*math.rad(-1),math.rad(30))
+					Turn(rhull, y_axis, speed*math.rad(1),math.rad(30))
 					newHeading = velHeading
 
-					Turn(middle, x_axis, math.rad(2*speed), math.rad(30))
-					Turn(middle, y_axis, math.rad(0), math.rad(30))
+					Turn(middle, x_axis, math.rad(2)*speed, math.rad(30))
+					Turn(middle, y_axis, 0, math.rad(30))
 
-					Turn(mhull, y_axis, math.rad(0),math.rad(30))
-					Turn(lhull, x_axis, math.rad(0),math.rad(24))
-					Turn(rhull, x_axis, math.rad(0),math.rad(24))
+					Turn(mhull, y_axis, 0, math.rad(30))
+					Turn(lhull, x_axis, 0, math.rad(24))
+					Turn(rhull, x_axis, 0, math.rad(24))
 				else
-					Turn(rhull, x_axis, math.rad(speed*0.8),math.rad(24))
-					Turn(mhull, y_axis, -math.rad(speed),math.rad(30))
-					Turn(lhull, y_axis, math.rad(speed),math.rad(30))
+					Turn(rhull, x_axis, speed*math.rad(0.8),math.rad(24))
+					Turn(mhull, y_axis, speed*math.rad(-1),math.rad(30))
+					Turn(lhull, y_axis, speed*math.rad(1),math.rad(30))
 					newHeading = velHeading - 2*math.pi/3
 
-					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, math.rad(2*speed*root3on2), math.rad(30*root3on2))
+					Turn(middle, x_axis, speed*math.rad(-2)*0.5, math.rad(30)*0.5)
+					Turn(middle, y_axis, speed*math.rad(2)*root3on2, math.rad(30)*root3on2)
 
-					Turn(rhull, y_axis, math.rad(0),math.rad(30))
-					Turn(mhull, x_axis, math.rad(0),math.rad(24))
-					Turn(lhull, x_axis, math.rad(0),math.rad(24))
+					Turn(rhull, y_axis, 0, math.rad(30))
+					Turn(mhull, x_axis, 0, math.rad(24))
+					Turn(lhull, x_axis, 0, math.rad(24))
 				end
 
 				Turn(base, z_axis, newHeading, math.rad(100))

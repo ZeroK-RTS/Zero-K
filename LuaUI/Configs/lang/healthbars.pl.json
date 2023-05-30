@@ -11,6 +11,8 @@
 	"water_tank" : "cysterna",
 	"teleport" : "teleport",
 	"ability" : "umiejętność",
+	"heat" : "przegrzanie",
+	"speed" : "prędkość",
 	"reload" : "przeładowanie",
 	"slow" : "spowolnienie",
 	"goo" : "rozmnażanie",

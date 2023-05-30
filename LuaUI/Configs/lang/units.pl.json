@@ -76,8 +76,13 @@
 	},
 	"hoverraid" : {
 		"name" : "Dagger",
-		"description" : "Lekki poduszkowiec",
+		"description" : "Lekki poduszkowiec (zwalcza podwodne)",
 		"helptext" : "Dagger to lekki poduszkowiec. Nadaje się do zwiadu, jako że jest szybki i tani; może też niszczyć odsłonięte cele. Jego lekkie działko Gaussa może atakować również cele podwodne."
+	},
+	"hoverheavyraid" : {
+		"name" : "Bolas",
+		"description" : "Poduszkowiec spowalniacz",
+		"helptext" : "Bolas to średni poduszkowiec bojowy z promieniem spowalniającym. Chociaż zadaje niemałe obrażenia, jeszcze lepiej pracuje w parach z jednostkami takimi jak Mace czy Scalpel, które dobrze wykorzystają spowolnienie wrogów."
 	},
 	"chicken_digger" : {
 		"name" : "Digger",
@@ -96,13 +101,13 @@
 	},
 	"turrettorp" : {
 		"name" : "Urchin",
-		"description" : "Wyrzutnia torped",
+		"description" : "Wyrzutnia torped (zwalcza podwodne)",
 		"helptext" : "Wyrzutnia torped to podstawowa wieżyczka do obrony na morzu - atakuje cele pod wodą, na powierzchni i poduszkowce."
 	},
 	"tankheavyassault" : {
 		"name" : "Cyclops",
 		"description" : "Ciężki niszczyciel czołgów",
-		"helptext" : "Cyclops to najcięższy czołg. Jego działo zadaje ciężkie obrażenia, a jednostki, które zdołają przeżyć pierwszy pocisk zostają spowolnione. Dodatkowo działo jest w stanie stopniowo burzyć terraformowane ściany. Choć Cyclops ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
+		"helptext" : "Cyclops to najcięższy czołg. Jego działo zadaje ciężkie obrażenia, a jednostki, które zdołają przeżyć pierwszy pocisk są zatrzymywane przez jego promień spowalniający. Dodatkowo działo jest w stanie stopniowo burzyć terraformowane ściany. Choć Cyclops ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
 	},
 	"damagesink" : {
 		"name" : "Pochłaniacz obrażeń",
@@ -146,8 +151,8 @@
 	},
 	"turretgauss" : {
 		"name" : "Gauss",
-		"description" : "Działo Gaussa, +10 HP/s gdy nie strzela",
-		"helptext" : "Wytrzymała wiezyczka uzbrojona w działo Gaussa, która może atakować także cele podwodne. Gdy jest zamknięta, otrzymuje tylko ćwierć obrażeń i regeneruje 20 punktów wytrzymałości na sekundę."
+		"description" : "Działo Gaussa, regeneracja gdy nie strzela (zwalcza podwodne)",
+		"helptext" : "Wytrzymała wiezyczka uzbrojona w działo Gaussa, która może atakować także cele podwodne. Gdy jest zamknięta, otrzymuje trzykrotnie mniej obrażeń i regeneruje się."
 	},
 	"nebula" : {
 		"name" : "Nebula",
@@ -181,13 +186,13 @@
 	},
 	"mahlazer" : {
 		"name" : "Starlight",
-		"description" : "Laser orbitalny",
+		"description" : "Laser orbitalny - wymaga sieci energetycznej 600E",
 		"helptext" : "W czasie pokoju narzędzie do przerabiania terenu pod terraforming. W czasie wojny narzędzie do przerabiania wrogich robotów w złom."
 	},
 	"spidercrabe" : {
 		"name" : "Crab",
 		"description" : "Ciężki opancerzony pająk bojowy",
-		"helptext" : "Ciężkie pociski Craba niszczą grupy lekkich jednostek i mają zasięg większy niż lekkie wieżyczki. Gdy nie porusza się, Crab zwija się w kulkę i otrzymuje tylko 1/4 obrażeń."
+		"helptext" : "Ciężkie pociski Craba niszczą grupy lekkich jednostek i mają zasięg większy niż lekkie wieżyczki. Gdy nie porusza się, Crab zwija się w kulkę i otrzymuje tylko 1/3 obrażeń. Jego główną wadą jest niska mobilność."
 	},
 	"subscout" : {
 		"name" : "Lancelet",
@@ -257,7 +262,7 @@
 	"hoverassault" : {
 		"name" : "Halberd",
 		"description" : "Poduszkowiec szturmowy",
-		"helptext" : "Halberd przechodzi w tryb opancerzony, gdy nie strzela, co zmniejsza przyjmowane obrażenia 4-krotnie. Jego powolne działko energetyczne nie sprawdza się przeciwko szybkim jednostkom."
+		"helptext" : "Halberd przechodzi w tryb opancerzony, gdy nie strzela, co zmniejsza przyjmowane obrażenia 3-krotnie. Jego powolne działko energetyczne nie sprawdza się przeciwko szybkim jednostkom."
 	},
 	"shieldcon" : {
 		"name" : "Convict",
@@ -266,7 +271,7 @@
 	},
 	"energysingu" : {
 		"name" : "Reaktor grawitacyjny",
-		"description" : "Duża elektrownia NIEBEZPIECZNE",
+		"description" : "Duża elektrownia - NIEBEZPIECZNE",
 		"helptext" : "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
 	},
 	"bomberdisarm" : {
@@ -296,7 +301,7 @@
 	},
 	"energyheavygeo" : {
 		"name" : "Ulepszona Geotermia",
-		"description" : "Duża elektrownia NIEBEZPIECZNE",
+		"description" : "Duża elektrownia - NIEBEZPIECZNE",
 		"helptext" : "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."
 	},
 	"staticcon" : {
@@ -317,11 +322,11 @@
 	"energypylon" : {
 		"name" : "Pylon",
 		"description" : "Węzeł energetyczny",
-		"helptext" : "Węzeł energetyczny pozwala rozszerzyć siatkę energetyczną, by pomóc dostarczyć energię z generatorów do kopalni lub wieżyczek. Pamiętaj, że na małe dystanse bardziej opłaca się użyć rzędu lekkich elektrowni (tj. paneli słonecznych lub turbin)."
+		"helptext" : "Węzeł energetyczny pozwala rozszerzyć siatkę energetyczną, by pomóc dostarczyć energię z generatorów do kopalni lub wieżyczek. Pamiętaj, że na małe dystanse bardziej opłaca się użyć rzędu lekkich elektrowni, tj. paneli słonecznych lub turbin."
 	},
 	"bomberprec" : {
 		"name" : "Raven",
-		"description" : "Bombowiec precyzyjny",
+		"description" : "Bombowiec precyzyjny (i zwalcza podwodne)",
 		"helptext" : "Raven to bombowiec precyzyjny. Świetnie nadaje się do bombardowania ważnych celów, ale przenosi na pokładzie tylko jedną bombę i musi skorzystać z lądowiska, by można było go ponownie użyć."
 	},
 	"chicken_shield" : {
@@ -367,7 +372,7 @@
 	"energysolar" : {
 		"name" : "Panel słoneczny",
 		"description" : "Mała elektrownia",
-		"helptext" : "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
+		"helptext" : "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń trzykrotnie."
 	},
 	"gunshipheavyskirm" : {
 		"name" : "Nimbus",
@@ -378,6 +383,61 @@
 		"name" : "Fabryka tarczowników",
 		"description" : "Buduje harde boty",
 		"helptext" : "Boty tu produkowane z reguły wyposażone są w tarcze, co daje im wysoką wytrzymałość. Łączenie tarcz powoduje, że dobrze działają w grupach. Dobra fabryka dla nowicjuszy."
+	},
+	"platecloak" : {
+		"name" : "Warsztat cichociemnych",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plateshield" : {
+		"name" : "Warsztat tarczowników",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"platespider" : {
+		"name" : "Warsztat pająków",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"platejump" : {
+		"name" : "Warsztat skoczków",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plateveh" : {
+		"name" : "Warsztat pojazdów",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"platetank" : {
+		"name" : "Warsztat czołgów",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"platehover" : {
+		"name" : "Warsztat poduszkowców",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plateamph" : {
+		"name" : "Warsztat amfibii",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plateship" : {
+		"name" : "Warsztat okrętów",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plateplane" : {
+		"name" : "Warsztat samolotów",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
+	},
+	"plategunship" : {
+		"name" : "Warsztat statków powietrznych",
+		"description" : "Dodatkowa kolejka budowy",
+		"helptext" : "Warsztaty stawia się obok fabryk i są dobrym sposobem na zwiększenie mocy i uzyskanie równoległych kolejek budowy, tańszym nawet niż wieżyczki budownicze Caretaker, choć mniej elastycznym. Warsztat przestaje działać, gdy nie ma w pobliżu fabryki."
 	},
 	"chickena" : {
 		"name" : "Cockatrice",
@@ -456,7 +516,7 @@
 	},
 	"striderantiheavy" : {
 		"name" : "Ultimatum",
-		"description" : "Niewidzialny bot na ciężkie jednostki",
+		"description" : "Niewidzialny mech, zwalcza ciężkie jednostki (strzela pod wodą)",
 		"helptext" : "Ultimatum posiada dezintegrator, który jest w stanie zniszczyć nawet ciężkie jednostki jednym strzałem. Niewidzialność pozwala mu podejść pod wrogie mechy i szybko się ich pozbyć; lekkie jednostki bardzo skutecznie mu w tym przeszkadzają."
 	},
 	"staticmex" : {
@@ -496,7 +556,7 @@
 	},
 	"hoverdepthcharge" : {
 		"name" : "Claymore",
-		"description" : "Poduszkowiec przeciwpodwodny",
+		"description" : "Poduszkowiec wsparcia (zwalcza podwodne)",
 		"helptext" : "Claymore zrzuca do wody ładunki głębinowe o wysokim obszarze rażenia. W razie potrzeby można je zrzucić na lądzie ręcznie."
 	},
 	"gunshipkrow" : {
@@ -531,7 +591,7 @@
 	},
 	"factoryship" : {
 		"name" : "Stocznia",
-		"description" : "Buduje statki",
+		"description" : "Buduje okręty",
 		"helptext" : "Stocznia buduje statki i łodzie podwodne. Pozostałe jednostki wodne, tj. poduszkowce i amfibie, mają osobne fabryki."
 	},
 	"vehassault" : {
@@ -541,7 +601,7 @@
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
-		"description" : "Destruktywny projektor tęczy",
+		"description" : "Destruktywny projektor tęczy - wymaga sieci energetycznej 400E",
 		"helptext" : "Disco Rave Party wystrzeliwuje kolorowe kulki, z których każda zawiera inną niespodziankę. Świetna zabawa dla całej rodziny!"
 	},
 	"turretlaser" : {
@@ -596,7 +656,7 @@
 	},
 	"striderdetriment" : {
 		"name" : "Detriment",
-		"description" : "Najcięższy mech szturmowy",
+		"description" : "Najcięższy mech szturmowy (strzela pod wodą)",
 		"helptext" : "Detriment to najcięższy mech na polu bitwy. Posiada lasery przeciwlotnicze i rakiety dalekiego zasięgu, ale jego siła pochodzi z niesamowitego pancerza i potężnych dział, które szybko likwidują wrogie jednostki. Mimo swojej ogromnej mocy, Detriment nie powinien pracować bez odpowiedniego wsparcia ze strony lzejszych jednostek."
 	},
 	"energygeo" : {
@@ -666,7 +726,7 @@
 	},
 	"staticheavyarty" : {
 		"name" : "Big Bertha",
-		"description" : "Działo strategiczne - wymaga sieci energetycznej 50 E",
+		"description" : "Działo strategiczne - wymaga sieci energetycznej 50E",
 		"helptext" : "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
 	},
 	"cloaksnipe" : {
@@ -712,7 +772,7 @@
 	"cloakriot" : {
 		"name" : "Reaver",
 		"description" : "Bot wsparcia",
-		"helptext" : "Reaver ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Reaver samoczynnie naprawia się."
+		"helptext" : "Reaver ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości, więc mimo siły nie jest to bot szturmowy. Po wyjściu z walki Reaver samoczynnie naprawia się."
 	},
 	"chickenspire" : {
 		"name" : "Szpila kurczaków",
@@ -722,7 +782,7 @@
 	"turretemp" : {
 		"name" : "Faraday",
 		"description" : "Wieżyczka paralizacyjna",
-		"helptext" : "Faraday to wieżyczka uzbrojona w mocne działko EMP. Doskonale współpracuje z innymi wieżyczkami, lecz sama jest bezużyteczna. Kiedy nie atakuje, otrzymuje tylko ćwierć obrażeń."
+		"helptext" : "Faraday to wieżyczka uzbrojona w mocne działko paraliżujące. Doskonale współpracuje z innymi wieżyczkami, lecz sama jest bezużyteczna. Kiedy nie atakuje, otrzymuje 3 razy mniej obrażeń."
 	},
 	"factoryspider" : {
 		"name" : "Fabryka pająków",
@@ -766,7 +826,7 @@
 	},
 	"zenith" : {
 		"name" : "Zenith",
-		"description" : "Kontroler meteorytów",
+		"description" : "Kontroler meteorytów - wymaga sieci energetycznej 400E",
 		"helptext" : "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 300). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
 	},
 	"vehaa" : {
@@ -801,12 +861,12 @@
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",
-		"description" : "Buduje mechy - wymaga sieci energetycznej 50 E",
+		"description" : "Buduje mechy - wymaga sieci energetycznej 50E",
 		"helptext" : "Centrum konstrukcyjne mechów powołuje do życia ogromne roboty, ostateczną pięść pancerną natarcia powodującą zniszczenie i przerażenie w szeregach przeciwnika. W przeciwieństwie do zwykłej fabryki, centrum konstrukcyjne wymagane jest jedynie do zainicjowania budowy jednostki."
 	},
 	"amphcon" : {
 		"name" : "Conch",
-		"description" : "Amfibijny bot konstruktor",
+		"description" : "Amfibijny bot konstruktor, zwiększa pancerz w bezruchu",
 		"helptext" : "Conch to wytrzymały konstruktor, który swoje obowiązki wykonuje zarówno na lądzie, jak i pod wodą."
 	},
 	"spiderriot" : {
@@ -821,8 +881,8 @@
 	},
 	"turretantiheavy" : {
 		"name" : "Lucifer",
-		"description" : "Akcelerator tachionów - wymaga sieci energetycznej 50 E",
-		"helptext" : "Lucifer posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia czterokrotnie."
+		"description" : "Akcelerator tachionów - wymaga sieci energetycznej 50E",
+		"helptext" : "Lucifer posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia trzykrotnie."
 	},
 	"jumparty" : {
 		"name" : "Firewalker",
@@ -866,17 +926,17 @@
 	},
 	"shipscout" : {
 		"name" : "Cutter",
-		"description" : "Łódka patrolowa - rozbraja",
+		"description" : "Łódka zwiadowcza (rozbraja)",
 		"helptext" : "Tania i szybka, łódka patrolowa dobrze nadaje się do najazdów na odkryte tereny wroga i wypatrywania celów dla większych statków. Nie ma siły ognia ani wytrzymałości do poważnej walki."
 	},
 	"shiptorpraider" : {
 		"name" : "Hunter",
-		"description" : "Lekka łódź torpedowa",
+		"description" : "Lekka łódź torpedowa (zwalcza podwodne)",
 		"helptext" : "Hunter to lekka łódź z torpedami przeznaczona do najazdów i niszczenia łodzi podwodnych. W dużej ilości nieźle się też sprawdza przeciwko bardzo ciężkim okrętom."
 	},
 	"shipskirm" : {
 		"name" : "Mistral",
-		"description" : "Łódź rakietowa - harcownik",
+		"description" : "Okręt harcownik",
 		"helptext" : "Mistral wystrzeliwuje salwy rakiet średniego zasięgu, dobre do ostrzeliwania celów zarówno morskich, jak i nabrzeżnych. Jest bardzo lekko pancerzony, więc powinien wystrzegać się szybkich jednostek, które mogą go łatwo dosięgnąć, oraz łodzi podwodnych."
 	},
 	"subraider" : {
@@ -891,12 +951,12 @@
 	},
 	"shipriot" : {
 		"name" : "Corsair",
-		"description" : "Korweta (lekka / wsparcia)",
+		"description" : "Lekka korweta wsparcia",
 		"helptext" : "Corsair to korweta z dwoma shotgunami, którymi ciężko kara wszystko, co się zbliży. Jest jednak bezbronna wobec jednostek podwodnych i ma niski zasięg."
 	},
 	"shipassault" : {
 		"name" : "Siren",
-		"description" : "Niszczyciel (wsparcie / szturmowy)",
+		"description" : "Niszczyciel szturmowy/wsparcia (zwalcza podwodne)",
 		"helptext" : "Niszczyciel Siren to statek ogólnego przeznaczenia, który łączy silne obszarowe działko soniczne (zdolne razić cele zarówno pod wodą, jak i nad nią), rakiety kinetyczne średniego zasięgu (świetne na budynki) oraz dobry pancerz."
 	},
 	"shiparty" : {
@@ -921,8 +981,8 @@
 	},
 	"turretheavy" : {
 		"name" : "Desolator",
-		"description" : "Forteca średniego zasięgu (działo wymaga sieci energetycznej 50 E)",
-		"helptext" : "Desolator to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny.  Jest w stanie schować działo, by zmniejszyć otrzymywane obrażenia czterokrotnie."
+		"description" : "Forteca średniego zasięgu - wymaga sieci energetycznej 50E",
+		"helptext" : "Desolator to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny. Jest w stanie schować uzbrojenie, by zmniejszyć otrzymywane obrażenia 3-krotnie."
 	},
 	"turretimpulse" : {
 		"name" : "Newton",
@@ -944,6 +1004,11 @@
 		"description" : "Rakieta sejsmiczna",
 		"helptext" : "Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, lecz wyrównuje trafiony teren."
 	},
+	"missileslow" : {
+		"name" : "Zenon",
+		"description" : "Rakieta spowalniająca",
+		"helptext" : "Jednorazowa rakieta spowalniająca dalekiego zasięgu. Nie zadaje obrażeń, lecz silnie spowalnia pojedynczy cel i pozostawia obszarowe pole spowalniające."
+	},
 	"striderscorpion" : {
 		"name" : "Scorpion",
 		"description" : "Ciężki niewidzialny pająk-mech",
@@ -962,7 +1027,7 @@
 	"striderbantha" : {
 		"name" : "Paladin",
 		"description" : "Mech bojowy",
-		"helptext" : "Paladin to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
+		"helptext" : "Paladin to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek."
 	},
 	"shipcarrier" : {
 		"name" : "Reef",
@@ -992,7 +1057,7 @@
 	"turretaalaser" : {
 		"name" : "Razor",
 		"description" : "Laser przeciwlotniczy",
-		"helptext" : "Razor to wytrzymała wieżyczka przeciwlotnicza. Wysoka wyrzymałość i 4-krotne zmniejszenie obrażeń, gdy nie atakuje powodują, że ciężko jest się go pozbyć."
+		"helptext" : "Razor to wytrzymała wieżyczka przeciwlotnicza. Wysoka wyrzymałość i 3-krotne zmniejszenie obrażeń, gdy nie atakuje powodują, że ciężko jest się go pozbyć."
 	},
 	"hovercon" : {
 		"name" : "Quill",
@@ -1016,8 +1081,8 @@
 	},
 	"amphimpulse" : {
 		"name" : "Archer",
-		"description" : "Lekki amfibijny bot wsparcia",
-		"helptext" : "Archer używa strumienia wody do walki. Archer jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni wody."
+		"description" : "Lekki amfibijny bot wsparcia (zwalcza podwodne)",
+		"helptext" : "Archer używa strumienia wody do walki. Nie może strzelać spod wody, ale jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni."
 	},
 	"fakeunit" : {
 		"name" : "Sygnał-ściema",
@@ -1042,12 +1107,12 @@
 	"tankraid" : {
 		"name" : "Kodachi",
 		"description" : "Lekki czołg",
-		"helptext" : "Kodachi to lekki czołg z bombami zapalającymi, które dobrze spisują się przeciwko budynkom. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
+		"helptext" : "Kodachi to lekki czołg z bombami zapalającymi, które na chwilę podpalają ziemię. Nadaje sie do zwiadu oraz asekuracji cięższych jednostek. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
 	},
 	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Niewidzialny bot konstruktor",
-		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem radaru krótkiego zasięgu. Może też włączyć pole niewidzialności, co jednak w przeciwieństwie do wcześniej wymienionych umiejętności wymaga energii do działania."
+		"helptext" : "Conjurer to niewidzialny konstruktor z zakłócaczem radaru krótkiego zasięgu. Może też włączyć pole maskujące kosztem energii i prędkości ruchu."
 	},
 	"turretsunlance" : {
 		"name" : "Sunlance",
@@ -1061,18 +1126,18 @@
 	},
 	"amphriot" : {
 		"name" : "Scallop",
-		"description" : "Amfibijny bot wsparcia (przeciwpodwodny)",
-		"helptext" : "Amfibia uzbrojona w ładunki głębinowe do użytku przeciw celom podwodnym i shotgun do niszczenia celów na lądzie."
+		"description" : "Amfibijny bot wsparcia (strzela pod wodą)",
+		"helptext" : "Wszechstronna amfibia uzbrojona w torpedy do użytku pod wodą i shotgun do niszczenia celów na lądzie."
 	},
 	"planecon" : {
 		"name" : "Crane",
-		"description" : "Statek powietrzny konstruktor",
+		"description" : "Samolot konstruktor",
 		"helptext" : "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
 	},
 	"gunshipraid" : {
 		"name" : "Locust",
 		"description" : "Lekki statek powietrzny",
-		"helptext" : "Locust ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Locust jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
+		"helptext" : "Locust to lekki statek powietrzny o bardzo dużej prędkości i dość dobrych obrażeniach, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Locusta jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
 	},
 	"shieldraid" : {
 		"name" : "Bandit",
@@ -1081,7 +1146,7 @@
 	},
 	"amphraid" : {
 		"name" : "Duck",
-		"description" : "Lekki bot amfibijny",
+		"description" : "Lekki bot amfibijny (strzela pod wodą, zwalcza podwodne)",
 		"helptext" : "Duck to lekki bot amfibijny ze specjalnymi rakietami krótkiego zasięgu, które może odpalić także w wodzie. Jest szybki i tani, lecz delikatny."
 	},
 	"planefighter" : {
@@ -1142,7 +1207,7 @@
 	"gunshipheavytrans" : {
 		"name" : "Hercules",
 		"description" : "Uzbrojony transportowy statek powietrzny",
-		"helptext" : "Hercules jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
+		"helptext" : "Hercules jest w stanie przenosić każdą jednostkę naziemną oraz okręty. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
 	},
 	"planescout" : {
 		"name" : "Owl",
@@ -1158,6 +1223,11 @@
 		"name" : "Buoy",
 		"description" : "Ciężki amfibijny bot harcownik",
 		"helptext" : "Buoy nie może strzelać pod wodą, ale radzi sobie z tym poprzez wypływanie na powierzchnię. Wtedy może atakować przy użyciu działka o dobrym zasięgu, zadając dodatkowo obrażenia spowalniające. Będąc na powierzchni nie może się poruszać."
+	},
+	"amphsupport" : {
+		"name" : "Bulkhead",
+		"description" : "Rozstawiany bot amfibijny (musi stać w miejscu, by strzelać)",
+		"helptext" : "Bulkhead to ciężkie amfibijne działo plazmowe. Chociaż ma imponującą wytrzymałość i zasięg, to nie jest w stanie strzelać w ruchu. W wodzie może wypływać na powierzchnię, by strzelać."
 	},
 	"dynknight1" : {
 		"name" : "Dowódca",

@@ -215,7 +215,7 @@ local function IsEnabled(unitID)
 	if stunned_or_inbuild then
 		return false
 	end
-	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_shieldDisabled") ~= 1)
 	return att_enabled
 end
 

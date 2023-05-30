@@ -39,6 +39,9 @@ local form = 12 --text format depends on screen size
 local xstart,ystart = 0
 local cmd,xend,yend,x,y,b1,b2
 local inMinimap = false --mouse cursor in minimap
+
+local LIVE_RECLAIM_EFFICIENCY = Game.reclaimUnitEfficiency
+
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
@@ -166,7 +169,7 @@ function widget:DrawScreen()
 				color = "\255\220\10\10"
 			end
 			gl.PushMatrix()
-				gl.Text(color .. "    M:" .. metal*0.5, x, y, form) -- multiply metal by unit reclaim mult in gamerules
+				gl.Text(color .. "    M:" .. math.floor((metal or 0)*LIVE_RECLAIM_EFFICIENCY), x, y, form) -- multiply metal by unit reclaim mult in gamerules
 			gl.PopMatrix()
 		end
 	end

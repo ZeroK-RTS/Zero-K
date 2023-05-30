@@ -1,10 +1,10 @@
 {
 	"morph_complete" : "变形完成: %{old} -> %{new}",
 	"nuclear_launch_detected" : "警告：核攻击即将到达！",
-	"geospot" : "地热通风口\n能在这里放个地热发电机吗？",
+	"geospot" : "地热通风口\n这里能放地热发电机",
 	"build_eta" : "预计到达时间",
 	"lvl" : "lvl",
-	"builds_at" : "%{desc}, 建造速度在 %{bp}M/秒",
+	"builds_at" : "%{desc}, 以 %{bp}M/秒速度构建",
 	"disabled_no_grid" : "禁用-无网格",
 	"grid" : "网格",
 	"wind_range" : "风向范围",

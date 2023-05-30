@@ -13,12 +13,14 @@ local BUILD_PERIOD = 500
 local turnSpeed = math.rad(20)
 local waterFanSpin = math.rad(30)
 
+local SIG_ANIM = 1
 local isWind, baseWind, rangeWind
 
 local rand = math.random
 local function BobTidal()
+	SetSignalMask(SIG_ANIM)
 	-- Body movement models being somewhat free-floating upon the waves
-	local bodySpinSpeed	= 0
+	local bodySpinSpeed = 0
 	while true do
 		bodySpinSpeed = 0.99*bodySpinSpeed + (rand() - 0.5) * 0.016
 		Spin(cradle, y_axis, bodySpinSpeed)
@@ -76,9 +78,25 @@ function InitializeWind()
 	end
 end
 
+function SetTidalEnabled(enabled)
+	Signal(SIG_ANIM)
+	if enabled then
+		StartThread(BobTidal)
+	else
+		StopSpin(fan, z_axis)
+		StopSpin(cradle, y_axis)
+	end
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", (enabled and 1) or 0)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+function SetWindParams(newMin, newRange)
+	baseWind, rangeWind = newMin, newRange
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	baseDirection = math.random() * GG.Script.tau
+	baseDirection = math.random() * math.tau
 	Turn(base, y_axis, baseDirection)
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
 	InitializeWind()
@@ -88,7 +106,7 @@ local function CreateTidalWreck()
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local heading = Spring.GetUnitHeading(unitID)
 	local team = Spring.GetUnitTeam(unitID)
-	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/GG.Script.tau, team)
+	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/math.tau, team)
 	Spring.SetFeatureResurrect(featureID, "energywind")
 end
 
