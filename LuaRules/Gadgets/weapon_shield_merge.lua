@@ -340,6 +340,12 @@ local function RegenerateData()
 	end
 end
 
+function gadget:Load()
+	if MERGE_ENABLED then
+		RegenerateData()
+	end
+end
+
 function gadget:Initialize()
 	GG.DrainShieldAndCheckProjectilePenetrate = DrainShieldAndCheckProjectilePenetrate
 	

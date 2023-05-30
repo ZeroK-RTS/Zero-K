@@ -265,9 +265,6 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	
 	if playerID then
 		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
-		if country == '??' then -- no '??.png' for windows filename reasons
-			country = 'wut'
-		end
 		customKeys = customKeys or {}
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)

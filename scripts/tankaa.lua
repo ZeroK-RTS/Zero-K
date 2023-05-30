@@ -120,7 +120,8 @@ local explodables = {a1, a2, neck, turret, barrels[1], barrels[2]}
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = severity > 0.5
-	local explodeFX = SFX.FALL + (brutal and (SFX.SMOKE + SFX.FIRE) or 0)
+	local sfx = SFX
+	local explodeFX = sfx.FALL + (brutal and (sfx.SMOKE + sfx.FIRE) or 0)
 	local rand = math.random
 
 	for i = 1, #explodables do
@@ -130,7 +131,7 @@ function script.Killed (recentDamage, maxHealth)
 	end
 
 	if brutal then
-		Explode(base, SFX.SHATTER)
+		Explode(base, sfx.SHATTER)
 		return 2
 	else
 		return 1

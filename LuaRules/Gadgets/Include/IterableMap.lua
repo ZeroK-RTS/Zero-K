@@ -140,7 +140,6 @@ end
 -- As above, but applies to every (mod)th element with an offset
 function IterableMap.ApplyFraction(self, mod, offset, funcToApply, ...)
 	local i = 1 + (offset or 0)
-	offset = offset % mod
 	while i <= self.indexMax do
 		local key = self.keyByIndex[i]
 		if funcToApply(key, self.dataByKey[key], i, ...) then

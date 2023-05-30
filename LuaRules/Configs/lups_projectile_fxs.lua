@@ -1,3 +1,5 @@
+local MergeTable = Spring.Utilities.MergeTable
+
 local fx = {
     flame_heat = {
       class        = 'JitterParticles2',

@@ -165,7 +165,8 @@ end
 local function DeathAnim()
 	dead = true
 	--Turn(ground, z_axis, math.random(math.rad(-15), math.rad(15)), math.rad(1))
-	--Turn(ground, x_axis, math.rad(-10), math.rad(10) * (0.3 + math.random() * 0.7))
+	local speed = math.rad(math.random(3, 10)/10)
+	--Turn(ground, x_axis, math.rad(-10), speed)
 	EmitSfx(turret2, 1024)
 	
 	GG.Script.InitializeDeathAnimation(unitID)

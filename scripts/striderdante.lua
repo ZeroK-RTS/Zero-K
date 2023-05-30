@@ -142,18 +142,18 @@ local function RestoreAfterDelay()
 				
 				Turn(ruparm, x_axis, 0, math.rad(250))
 				Turn(ruparm, y_axis, 0, math.rad(250))
-				Turn(ruparm, z_axis, 0, math.rad(250))
+				Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250))
 				Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
 				Turn(rarm, y_axis, 0, math.rad(250))
-				Turn(rarm, z_axis, 0, math.rad(250))	--up -12
+				Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
 				Turn(flagellum, x_axis, 0, math.rad(90))
 			
 				Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
 				Turn(luparm, y_axis, 0, math.rad(250))
-				Turn(luparm, z_axis, 0, math.rad(250))
+				Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))
 				Turn(larm, x_axis, 0, math.rad(250))	 --up 5
 				Turn(larm, y_axis, 0, math.rad(250))	 --up -3
-				Turn(larm, z_axis, 0, math.rad(250))	 --up 22
+				Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
 				RestorePose()
 			end
 			StartThread(IdleAnim)
@@ -177,7 +177,7 @@ local tempSpeed = 40
 local walkAngle = {
 	{ -- Moving forwards
 		{
-			hip = {0, math.rad(20) * PACE},
+			hip = {math.rad(0), math.rad(20) * PACE},
 			leg = {math.rad(-20), math.rad(40) * PACE},
 			foot = {math.rad(15), math.rad(54) * PACE},
 			toeFront = {math.rad(22), math.rad(45) * PACE},
@@ -186,7 +186,7 @@ local walkAngle = {
 		},
 		{
 			hip = {math.rad(-35), math.rad(35) * PACE},
-			leg = {0, math.rad(20) * PACE},
+			leg = {math.rad(0), math.rad(20) * PACE},
 			foot = {math.rad(-5), math.rad(20) * PACE},
 			toeFront = {math.rad(22), 0},
 			toeRear = {math.rad(-6), 10},
@@ -462,10 +462,10 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(luparm, y_axis, math.rad(54), math.rad(50))
 		Turn(rupleg, x_axis, math.rad(-27), math.rad(50))
 		Turn(rupleg, y_axis, math.rad(-42), math.rad(50))
-		Turn(rupleg, z_axis, math.rad(5), math.rad(50))
+		Turn(rupleg, z_axis, math.rad(-(-5)), math.rad(50))
 		Turn(rleg, x_axis, math.rad(13), math.rad(50))
 		Turn(rleg, y_axis, math.rad(-36), math.rad(50))
-		Turn(rleg, z_axis, math.rad(-24), math.rad(50))
+		Turn(rleg, z_axis, math.rad(-(24)), math.rad(50))
 		Turn(lupleg, y_axis, math.rad(18), math.rad(50))
 		Turn(lleg, x_axis, math.rad(20), math.rad(50))
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))

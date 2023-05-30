@@ -94,10 +94,6 @@ function widget:AddConsoleMessage(msg)
 	if not (msg and msg.msgtype == "player_to_allies" and msg.playername ~= myPlayerName) then
 		return
 	end
-	local comselect = "I choose:"
-	if Spring.IsReplay() and msg and msg.argument:sub(1, #comselect) == comselect then
-		return
-	end
 	Spring.SendLuaMenuMsg("textToSpeechSay_" .. (msg.playername or "unknown") .. " " .. (msg.argument or ""))
 end
 

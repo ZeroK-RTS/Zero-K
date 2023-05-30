@@ -62,8 +62,8 @@ local smokePiece = {rotating_bas, mc_rocket_ho}
 
 local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
-local TURN_SPEED = math.rad(145)
-local GEAR_SPEED = TURN_SPEED * 5
+local TURN_SPEED = 145
+local TILT_SPEED = 200
 local RELOAD_SPEED = 20
 local MOV_DEL = 50
 
@@ -94,7 +94,7 @@ local function IdleAnim()
 	while true do
 		EmitSfx(zelena, 1025)
 		
-		local heading = math.random() * math.rad(180) - math.rad(90)
+		local heading = math.rad(math.random(-90, 90))
 		if(lastHeading > heading) then
 			rotateWise = 1
 		else
@@ -106,12 +106,12 @@ local function IdleAnim()
 			StartThread(DoAmmoRotate)
 		end
 		
-		Spin(gear, y_axis, GEAR_SPEED * rotateWise)
-		Spin(gear001, y_axis, GEAR_SPEED * rotateWise)
-		Spin(gear002, y_axis, GEAR_SPEED * rotateWise)
+		Spin(gear, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
+		Spin(gear001, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
+		Spin(gear002, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
 	
 		Turn(rotating_bas, y_axis, heading, math.rad(60))
-		Turn(mc_rocket_ho, x_axis, math.rad(-25)*math.random(), math.rad(60))
+		Turn(mc_rocket_ho, x_axis, math.rad(math.random(-25, 0)), math.rad(60))
 		
 		WaitForTurn(rotating_bas, y_axis)
 		EmitSfx(modra, 1026)
@@ -359,13 +359,13 @@ function script.AimWeapon(num, heading, pitch)
 		end
 	end
 	
-	Turn(rotating_bas, y_axis, heading, TURN_SPEED)
+	Turn(rotating_bas, y_axis, heading, math.rad(TURN_SPEED))
 	
-	Spin(gear, y_axis, GEAR_SPEED * rotateWise)
-	Spin(gear001, y_axis, GEAR_SPEED * rotateWise)
-	Spin(gear002, y_axis, GEAR_SPEED * rotateWise)
+	Spin(gear, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
+	Spin(gear001, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
+	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
 	
-	Turn(mc_rocket_ho, x_axis, -pitch, math.rad(200))
+	Turn(mc_rocket_ho, x_axis, -pitch, math.rad(TILT_SPEED))
 	WaitForTurn(rotating_bas, y_axis)
 	WaitForTurn(mc_rocket_ho, x_axis)
 	

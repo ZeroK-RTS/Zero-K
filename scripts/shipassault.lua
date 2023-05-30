@@ -46,7 +46,7 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	for i = 1, #missiles do
-		Turn(missiles[i], x_axis, math.rad(-90))
+		Turn(missiles[i], x_axis, -math.rad(90))
 	end
 	
 	Move(flare1, z_axis, -8)

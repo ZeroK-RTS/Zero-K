@@ -44,7 +44,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(12)
-local legBackwardTheta = math.rad(-25)
+local legBackwardTheta = -math.rad(25)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 

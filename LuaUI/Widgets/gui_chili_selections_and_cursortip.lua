@@ -46,8 +46,14 @@ local cyan = '\255\1\255\255'
 local white = '\255\255\255\255'
 local yellow = '\255\255\255\1'
 
-local selectionTooltip
-local singleSelectionTooltip
+local selectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" ..
+	green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
+	green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
+	green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
+	green .. WG.Translate("interface", "space_click_show_stats")
+
+local singleSelectionTooltip = "\n" .. green .. WG.Translate("interface", "lmb") .. ": " .. "Center view" .. "\n" .. green .. WG.Translate("interface", "space_click_show_stats")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -694,13 +700,11 @@ local function GetUnitRegenString(unitID, ud)
 end
 
 local function GetUnitShieldRegenString(unitID, ud)
-	if spGetUnitRulesParam(unitID, "att_shieldDisabled") == 1 then
-		return ""
-	end
-	
-	local shieldRegen = spGetUnitRulesParam(unitID, "shieldRegenTimer")
-	if shieldRegen and shieldRegen > 0 then
-		return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
+	if ud.customParams.shield_recharge_delay or true then
+		local shieldRegen = spGetUnitRulesParam(unitID, "shieldRegenTimer")
+		if shieldRegen and shieldRegen > 0 then
+			return "  (" .. math.ceil(shieldRegen / 30) .. "s)"
+		end
 	end
 	
 	local mult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1 * (1 - (spGetUnitRulesParam(unitID, "shieldChargeDisabled") or 0))
@@ -1443,16 +1447,6 @@ local function GetUnitGroupIconButton(parentControl)
 		UpdateUnitInfo()
 	end
 	
-	function externalStuff.LanguageChange()
-		if not unitDefID then
-			return
-		end
-
-		local ud = UnitDefs[unitDefID]
-		unitImage.tooltip = GetUnitSelectionTooltip(ud, unitDefID, unitID)
-		unitImage:Invalidate()
-	end
-
 	return externalStuff
 end
 
@@ -1788,13 +1782,7 @@ local function GetMultiUnitInfoPanel(parentControl)
 		iconSize = newIconSize
 		Resize(holder)
 	end
-
-	function externalFunctions.LanguageChange()
-		for i = 1, #displayButtons do
-			displayButtons[i].LanguageChange()
-		end
-	end
-
+	
 	return externalFunctions
 end
 
@@ -2184,32 +2172,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		prevVisible = visible
 		prevMorphTime, prevMorphCost, prevMousePlace = morphTime, morphCost, ((mousePlaceX and true) or false)
 	end
-
-	function externalFunctions.LanguageChange()
-		if prevUnitDefID then
-			local ud = UnitDefs[prevUnitDefID]
-			unitDesc:SetText(GetDescription(ud, prevUnitID))
-			unitDesc:Invalidate()
-
-			local unitName = GetHumanName(ud, prevUnitID)
-			unitNameUpdate(true, unitName, GetUnitIcon(prevUnitDefID))
-
-			if not isTooltipVersion then
-				unitImage.tooltip = GetSingleUnitSelectionTooltip(ud, prevUnitDefID)
-				unitImage:Invalidate()
-			elseif prevUnitID then
-				local teamID = Spring.GetUnitTeam(prevUnitID)
-				local playerName = teamID and GetPlayerCaption(teamID)
-				if playerName then
-					playerNameLabel:SetCaption(playerName)
-				end
-			end
-		end
-		if isTooltipVersion then
-			spaceClickLabel:SetCaption(green .. WG.Translate("interface", "space_click_show_stats"))
-		end
-	end
-
+	
 	function externalFunctions.SetVisible(newVisible)
 		leftPanel:SetVisibility(newVisible)
 		rightPanel:SetVisibility(newVisible)
@@ -2256,10 +2219,6 @@ local function GetTooltipWindow()
 	
 	local externalFunctions = {}
 	
-	function externalFunctions.LanguageChange()
-		unitDisplay.LanguageChange()
-	end
-
 	function externalFunctions.SetVisible(newVisible)
 		window:SetVisibility(newVisible)
 	end
@@ -2552,11 +2511,6 @@ local function GetSelectionWindow()
 	
 	local externalFunctions = {}
 	
-	function externalFunctions.LanguageChange()
-		singleUnitDisplay.LanguageChange()
-		multiUnitDisplay.LanguageChange()
-	end
-
 	function externalFunctions.ShowSingleUnit(unitID)
 		singleUnitID, singleUnitDefID = unitID, spGetUnitDefID(unitID)
 		singleUnitDisplay.SetDisplay(unitID, spGetUnitDefID(unitID))
@@ -2714,30 +2668,6 @@ function widget:Initialize()
 	selectionWindow = GetSelectionWindow()
 	tooltipWindow = (WG.Modding_TooltipOverride and WG.Modding_TooltipOverride()) or GetTooltipWindow()
 	InitializeWindParameters()
-
-	local function LanguageUpdate()
-		singleSelectionTooltip = "\n" ..
-			green .. WG.Translate("interface", "lmb") .. ": " .. "Center view" .. "\n" ..
-			green .. WG.Translate("interface", "space_click_show_stats")
-		selectionTooltip = "\n" ..
-			green .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" ..
-			green .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" ..
-			green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" ..
-			green .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" ..
-			green .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to") .. "\n" ..
-			green .. WG.Translate("interface", "space_click_show_stats")
-
-		unitSelectionTooltipCache = {}
-		unitSingleSelectionTooltipCache = {}
-
-		if tooltipWindow.LanguageChange then
-			tooltipWindow.LanguageChange()
-		end
-		selectionWindow.LanguageChange()
-	end
-
-	LanguageUpdate()
-	WG.InitializeTranslation(LanguageUpdate, "gui_chili_selections_and_cursortip.lua")
 end
 
 function widget:UnitDestroyed(unitID)
@@ -2747,7 +2677,6 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:Shutdown()
-	WG.ShutdownTranslation("gui_chili_selections_and_cursortip.lua")
 	Spring.SendCommands({"tooltip 1"})
 	Spring.SetDrawSelectionInfo(true)
 	Spring.SetDrawSelectionInfo(true)

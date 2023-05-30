@@ -53,7 +53,7 @@ if height and baseHeight then
 end
 ]]--
 
-local THIGH_FRONT_ANGLE = math.rad(-50)
+local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -62,19 +62,19 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(10)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = math.rad(-20)
+local ARM_FRONT_ANGLE = -math.rad(20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
-local FOREARM_FRONT_ANGLE = math.rad(-40)
+local FOREARM_FRONT_ANGLE = -math.rad(40)
 local FOREARM_FRONT_SPEED = math.rad(45) * PACE
 local FOREARM_BACK_ANGLE = math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(45) * PACE
 --[[
-local FOREARM_FRONT_ANGLE = math.rad(-15)
+local FOREARM_FRONT_ANGLE = -math.rad(15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = math.rad(-10)
+local FOREARM_BACK_ANGLE = -math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(40) * PACE
 ]]--
 

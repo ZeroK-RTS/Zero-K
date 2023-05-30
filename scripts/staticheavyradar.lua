@@ -43,13 +43,13 @@ local function Deactivate()
 		Spring.UnitScript.StopSpin(dish, y_axis, math.rad(10))
 		Spring.UnitScript.StopSpin(spinner, y_axis, math.rad(10))
 	else
-		Spin(dish, y_axis, 0, math.rad(20))
-		Turn(ant, z_axis, 0, math.rad(60))
-		Turn(arm, z_axis, 0, math.rad(40))
+		Spin(dish, y_axis, math.rad(0), math.rad(20))
+		Turn(ant, z_axis, math.rad(0), math.rad(60))
+		Turn(arm, z_axis, math.rad(0), math.rad(40))
 		WaitForTurn(ant, z_axis)
 		Move(dish, y_axis, 0, 7)
 		WaitForMove(dish, y_axis)
-		Spin(spinner, y_axis, 0, math.rad(3))
+		Spin(spinner, y_axis, math.rad(0), math.rad(3))
 	end
 end
 

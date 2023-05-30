@@ -111,19 +111,19 @@ local function RestoreAfterDelay()
 			Turn(ruparm, z_axis, 0, math.rad(250))
 			Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
 			Turn(rarm, y_axis, 0, math.rad(250))
-			Turn(rarm, z_axis, math.rad(12), math.rad(250))	--up -12
+			Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
 			Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
 			Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
-			Turn(rloarm, z_axis, math.rad(47), math.rad(250)) --up -47
+			Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
 			Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
 			Turn(luparm, y_axis, 0, math.rad(250))
 			Turn(luparm, z_axis, 0, math.rad(250))
 			Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
 			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
-			Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up 22
+			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
 			Turn(lloarm, y_axis, 0, math.rad(250))
-			Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring 94
+			Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 			-- done at ease
 			Sleep(100)
 		end
@@ -153,7 +153,7 @@ local function Walk()
 	Turn(rupleg, x_axis, math.rad(-5.269231) * sizeSpeedMult)
 	Turn(lupleg, x_axis, math.rad(-20.989011) * sizeSpeedMult)
 	Turn(lloleg, x_axis, math.rad(20.945055) * sizeSpeedMult)
-	Turn(rloleg, x_axis, math.rad(41.368132) * sizeSpeedMult)
+	Turn(rloleg, x_axis, math.rad(41.368132 * sizeSpeedMult))
 	Turn(rfoot, x_axis, math.rad(-15.747253) * sizeSpeedMult)
 	Sleep(70/sizeSpeedMult)
 	
@@ -341,19 +341,19 @@ function script.Create()
 	Turn(ruparm, z_axis, 0, math.rad(250))
 	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
 	Turn(rarm, y_axis, 0, math.rad(250))
-	Turn(rarm, z_axis, math.rad(12), math.rad(250))	--up -12
+	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
 	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
 	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
-	Turn(rloarm, z_axis, math.rad(47), math.rad(250)) --up -47
+	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
 	Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
 	Turn(luparm, y_axis, 0, math.rad(250))
 	Turn(luparm, z_axis, 0, math.rad(250))
 	Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
 	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
-	Turn(larm, z_axis, math.rad(-22), math.rad(250))	 --up 22
+	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
 	Turn(lloarm, y_axis, 0, math.rad(250))
-	Turn(lloarm, z_axis, math.rad(-94), math.rad(250)) --upspring 94
+	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 
 	Hide(flare)
 	Hide(jx1)
@@ -390,18 +390,18 @@ local function AimRifle(heading, pitch, isDgun)
 	--rarm
 	Turn(ruparm, x_axis, math.rad(-83), math.rad(250))
 	Turn(ruparm, y_axis, math.rad(30), math.rad(250))
-	Turn(ruparm, z_axis, math.rad(-10), math.rad(250))
+	Turn(ruparm, z_axis, math.rad(-(10)), math.rad(250))
 	
 	Turn(rarm, x_axis, math.rad(41), math.rad(250))
 	Turn(rarm, y_axis, math.rad(19), math.rad(250))
-	Turn(rarm, z_axis, math.rad(3), math.rad(250))
+	Turn(rarm, z_axis, math.rad(-(-3)), math.rad(250))
 	
 	Turn(rloarm, x_axis, math.rad(18), math.rad(250))
 	Turn(rloarm, y_axis, math.rad(19), math.rad(250))
-	Turn(rloarm, z_axis, math.rad(-14), math.rad(250))
+	Turn(rloarm, z_axis, math.rad(-(14)), math.rad(250))
 	
-	Turn(gun, x_axis, math.rad(15), math.rad(250))
-	Turn(gun, y_axis, math.rad(-15), math.rad(250))
+	Turn(gun, x_axis, math.rad(15.0), math.rad(250))
+	Turn(gun, y_axis, math.rad(-15.0), math.rad(250))
 	Turn(gun, z_axis, math.rad(31), math.rad(250))
 	--larm
 	Turn(luparm, x_axis, math.rad(-80), math.rad(250))
@@ -410,7 +410,7 @@ local function AimRifle(heading, pitch, isDgun)
 	
 	Turn(larm, x_axis, math.rad(5), math.rad(250))
 	Turn(larm, y_axis, math.rad(-77), math.rad(250))
-	Turn(larm, z_axis, math.rad(26), math.rad(250))
+	Turn(larm, z_axis, math.rad(-(-26)), math.rad(250))
 	
 	Turn(lloarm, x_axis, math.rad(65), math.rad(250))
 	Turn(lloarm, y_axis, math.rad(-37), math.rad(250))
@@ -530,7 +530,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(turret, y_axis, 0, math.rad(90))
 		Turn(rloleg, x_axis, math.rad(9), math.rad(250))
 		Turn(rloleg, y_axis, math.rad(-73), math.rad(250))
-		Turn(rloleg, z_axis, math.rad(-3), math.rad(250))
+		Turn(rloleg, z_axis, math.rad(-(3)), math.rad(250))
 		Turn(lupleg, x_axis, math.rad(7), math.rad(250))
 		Turn(lloleg, y_axis, math.rad(21), math.rad(250))
 		Turn(lfoot, x_axis, math.rad(24), math.rad(250))
@@ -541,7 +541,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(ruparm, y_axis, math.rad(32), math.rad(350)) --was -32
 		Turn(luparm, x_axis, math.rad(-50), math.rad(350))
 		Turn(luparm, y_axis, math.rad(47), math.rad(350))
-		Turn(luparm, z_axis, math.rad(-50), math.rad(350))
+		Turn(luparm, z_axis, math.rad(-(50)), math.rad(350))
 		Sleep(600)
 		EmitSfx(turret, 1027) --impact
 		--StartThread(burn)

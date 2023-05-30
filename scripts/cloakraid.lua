@@ -64,7 +64,7 @@ function script.Create()
 	Turn(lshoulder, x_axis, math.rad(-10))
 	Turn(lforearm, x_axis, math.rad(-30))
 	Turn(lforearm, z_axis, math.rad(-12))
-	Turn(rshoulder, x_axis, 0)
+	Turn(rshoulder, x_axis, math.rad(0))
 	Turn(rforearm, x_axis, math.rad(-15))
 end
 
@@ -96,13 +96,13 @@ local function Walk()
 			Turn(head, y_axis, 0, 2.0)
 			Turn(lshoulder, x_axis, math.rad(-15)-math.rad(45)*sway, truespeed*0.5)
 			Turn(lforearm, x_axis, math.rad(-45)+math.rad(45)*sway, truespeed*0.5)
-			Turn(rshoulder, x_axis, math.rad(45)*sway, truespeed*0.5)
+			Turn(rshoulder, x_axis, math.rad(0)+math.rad(45)*sway, truespeed*0.5)
 			Turn(rforearm, x_axis, math.rad(-80)-math.rad(40)*sway, truespeed*0.5)
 		end
 
 		Turn(thigh[side], x_axis, math.rad(-85), truespeed*1)
 		Turn(shin[side], x_axis, math.rad(75), truespeed*1)
-		Turn(foot[side], x_axis, 0, truespeed*0.33)
+		Turn(foot[side], x_axis, math.rad(0), truespeed*0.33)
 
 		Turn(thigh[3-side], x_axis, math.rad(68), truespeed*1)
 		Turn(shin[3-side], x_axis, math.rad(12), truespeed*1)
@@ -164,7 +164,7 @@ local function StopWalk()
 		Turn(lforearm, x_axis, math.rad(-12), runspeed*0.3)
 	end
 
-	Turn(rshoulder, x_axis, 0, runspeed*0.3)
+	Turn(rshoulder, x_axis, math.rad(0), runspeed*0.3)
 	Turn(rforearm, x_axis, math.rad(-15), runspeed*0.3)
 
 	for i = 1, 2 do
@@ -172,8 +172,8 @@ local function StopWalk()
 		Turn(shin[i], x_axis, 0, 5)
 		Turn(foot[i], x_axis, 0, 5)
 
-		Turn(thigh[i], y_axis, math.rad(12) - i*math.rad(8), runspeed*0.1)
-		Turn(thigh[i], z_axis, math.rad(4)*i - math.rad(6), runspeed*0.1)
+		Turn(thigh[i], y_axis, math.rad(12 - i*8), runspeed*0.1)
+		Turn(thigh[i], z_axis, math.rad(4*i - 6), runspeed*0.1)
 	end
 
 	StartThread(Idle)
@@ -195,7 +195,7 @@ local function RestoreAfterDelay()
 	Turn(lshoulder, x_axis, math.rad(-45), 5)
 	Turn(lshoulder, z_axis, 0, 3)
 	Turn(lforearm, z_axis, math.rad(-12), 5)
-	Turn(rshoulder, x_axis, 0, runspeed*0.3)
+	Turn(rshoulder, x_axis, math.rad(0), runspeed*0.3)
 	Turn(rforearm, x_axis, math.rad(-15), runspeed*0.3)
 	Spin(magazine, y_axis, 0)
 
@@ -221,7 +221,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(lforearm, z_axis, 0, 6)
 	Turn(lforearm, x_axis, 0, 6)
 	Turn(lshoulder, x_axis, -pitch - math.rad(80), 12)
-	Turn(rshoulder, x_axis, 0, math.rad(90))
+	Turn(rshoulder, x_axis, math.rad(0), math.rad(90))
 	Turn(rforearm, x_axis, math.rad(-45), math.rad(90))
 
 	WaitForTurn(chest, y_axis)

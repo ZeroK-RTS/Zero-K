@@ -68,6 +68,7 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons
 local useUiKeys = false
+local lastSaveGameFrame, totalSaveGameFrame
 
 --file_return = nil
 
@@ -714,14 +715,12 @@ local function MakeFlags()
 		local langData = languages[i]
 		flagChildren[#flagChildren + 1] = Image:New{
 			file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. langData.flag ..'.png',
-			lang = langData.lang,
-			OnClick = {SetLang }
 		}
 		flagChildren[#flagChildren + 1] = Button:New{
 			caption = langData.name,
 			objectOverrideFont = WG.GetFont(),
 			name = 'countryButton' .. langData.lang;
-			width = '100%',
+			width = '50%',
 			lang = langData.lang,
 			OnClick = {SetLang }
 		}
@@ -3292,8 +3291,15 @@ function widget:GameFrame(n)
 			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/30))
 			widgetHandler:RemoveWidgetCallIn("GameFrame", self)
 		end
-		if n%30 == 0 then
-			lbl_gtime:SetCaption(GetTimeString(n/30))
+		if not lastSaveGameFrame then
+			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+		end
+		if not totalSaveGameFrame then
+			totalSaveGameFrame = Spring.GetGameRulesParam("totalSaveGameFrame") or 0
+		end
+		
+		if (n + totalSaveGameFrame)%30 == 0 then
+			lbl_gtime:SetCaption(GetTimeString((n + totalSaveGameFrame)/30))
 		end
 	end
 end

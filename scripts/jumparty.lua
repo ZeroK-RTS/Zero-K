@@ -42,7 +42,7 @@ local SIG_MOVE = 16
 
 local RESTORE_DELAY = 6000
 
-local WALK_RATE = math.rad(38)
+local WALK_RATE = 38
 
 --------------------------------------------------------------------------------
 -- variables
@@ -58,82 +58,82 @@ local function Walk()
 	SetSignalMask(SIG_MOVE)
 	while true do
 		local pace = WALK_RATE*(Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-
-		Turn(rupleg, y_axis, 0, pace)
-		Turn(lupleg, y_axis, 0, pace)
-
-		Turn(rupleg, z_axis, 0, pace)
-		Turn(lupleg, z_axis, 0, pace)
-		Turn(lfoot, z_axis, 0, pace)
-		Turn(rfoot, z_axis, 0, pace)
-
-		Turn(rupleg, x_axis, math.rad(-70), pace*4) --Forward
-		Turn(rloleg, x_axis, math.rad(70), pace*9)
-		Turn(rfoot, x_axis, 0, pace*4)
-
-		Turn(rftoe, x_axis, 0, pace*6)
-		Turn(rrtoe, x_axis, 0, pace*6)
-
-		Turn(lupleg, x_axis, math.rad(10), pace*4) --Back
-		Turn(lloleg, x_axis, 0, pace*2)
-		Turn(lfoot, x_axis, math.rad(-10), pace*2)
-
-		Turn(lftoe, x_axis, math.rad(-20), pace*6)
-
-		Turn(torso, z_axis, math.rad(-5), pace*0.4)
-		Turn(torso, x_axis, math.rad(3), pace)
-
+		
+		Turn(rupleg 	, y_axis, 0, math.rad(pace))
+		Turn(lupleg 	, y_axis, 0, math.rad(pace))
+		
+		Turn(rupleg 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(lupleg 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(lfoot 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(rfoot 	, z_axis, math.rad(-(0)), math.rad(pace))
+	
+		Turn(rupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Forward
+		Turn(rloleg, x_axis, math.rad(70.000000), math.rad(pace*9))
+		Turn(rfoot, x_axis, 0, math.rad(pace*4))
+		
+		Turn(rftoe, x_axis, 0, math.rad(pace*6))
+		Turn(rrtoe, x_axis, 0, math.rad(pace*6))
+		
+		Turn(lupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Back
+		Turn(lloleg, x_axis, 0, math.rad(pace*2))
+		Turn(lfoot, x_axis, math.rad(-10.000000), math.rad(pace*2))
+		
+		Turn(lftoe, x_axis, math.rad(-20), math.rad(pace*6))
+		
+		Turn(torso, z_axis, math.rad(-(5)), math.rad(pace*0.4))
+		Turn(torso, x_axis, math.rad(3), math.rad(pace*1))
+	
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
-
-		Turn(rupleg, x_axis, math.rad(10), pace*4) --Mid
-		Turn(rloleg, x_axis, math.rad(20), pace*5)
-		Turn(rfoot, x_axis, math.rad(10), pace)
-
-		Turn(lupleg, x_axis, math.rad(-70), pace*4) --Up
-		Turn(lloleg, x_axis, math.rad(-20), pace*2)
-		Turn(lfoot, x_axis, math.rad(40), pace*4)
-
-		Turn(lftoe, x_axis, math.rad(30), pace*3)
-		Turn(lrtoe, x_axis, math.rad(-30), pace*3)
-
-		Turn(torso, x_axis, math.rad(-3), pace)
-
+			
+		Turn(rupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Mid
+		Turn(rloleg, x_axis, math.rad(20.000000), math.rad(pace*5))
+		Turn(rfoot, x_axis, math.rad(10.000000), math.rad(pace*1))
+		
+		Turn(lupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Up
+		Turn(lloleg, x_axis, math.rad(-20.000000), math.rad(pace*2))
+		Turn(lfoot, x_axis, math.rad(40.000000), math.rad(pace*4))
+		
+		Turn(lftoe, x_axis, math.rad(30), math.rad(pace*3))
+		Turn(lrtoe, x_axis, math.rad(-30), math.rad(pace*3))
+		
+		Turn(torso, x_axis, math.rad(-3), math.rad(pace*1))
+		
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
-
-		Turn(rupleg, x_axis, math.rad(10), pace*4) --Back
-		Turn(rloleg, x_axis, 0, pace*2)
-		Turn(rfoot, x_axis, math.rad(-10), pace*2)
-
-		Turn(rftoe, x_axis, math.rad(-20), pace*6)
-
-		Turn(lupleg, x_axis, math.rad(-70), pace*4) --Forward
-		Turn(lloleg, x_axis, math.rad(70), pace*9)
-		Turn(lfoot, x_axis, 0, pace*4)
-
-		Turn(lftoe, x_axis, 0, pace*6)
-		Turn(lrtoe, x_axis, 0, pace*6)
-
-		Turn(torso, z_axis, math.rad(5), pace*0.4)
-		Turn(torso, x_axis, math.rad(3), pace)
-
+		
+		Turn(rupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Back
+		Turn(rloleg, x_axis, 0, math.rad(pace*2))
+		Turn(rfoot, x_axis, math.rad(-10.000000), math.rad(pace*2))
+		
+		Turn(rftoe, x_axis, math.rad(-20), math.rad(pace*6))
+		
+		Turn(lupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Forward
+		Turn(lloleg, x_axis, math.rad(70.000000), math.rad(pace*9))
+		Turn(lfoot, x_axis, 0, math.rad(pace*4))
+		
+		Turn(lftoe, x_axis, 0, math.rad(pace*6))
+		Turn(lrtoe, x_axis, 0, math.rad(pace*6))
+		
+		Turn(torso, z_axis, math.rad(-(-5)), math.rad(pace*0.4))
+		Turn(torso, x_axis, math.rad(3), math.rad(pace*1))
+		
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
-
-		Turn(rupleg, x_axis, math.rad(-70), pace*4) --Up
-		Turn(rloleg, x_axis, math.rad(-20), pace*2)
-		Turn(rfoot, x_axis, math.rad(40), pace*4)
-
-		Turn(rftoe, x_axis, math.rad(30), pace*3)
-		Turn(rrtoe, x_axis, math.rad(-30), pace*3)
-
-		Turn(lupleg, x_axis, math.rad(10), pace*4) --Mid
-		Turn(lloleg, x_axis, math.rad(20), pace*5)
-		Turn(lfoot, x_axis, math.rad(10), pace)
-
-		Turn(torso, x_axis, math.rad(-3), pace)
-
+		
+		Turn(rupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Up
+		Turn(rloleg, x_axis, math.rad(-20.000000), math.rad(pace*2))
+		Turn(rfoot, x_axis, math.rad(40.000000), math.rad(pace*4))
+		
+		Turn(rftoe, x_axis, math.rad(30), math.rad(pace*3))
+		Turn(rrtoe, x_axis, math.rad(-30), math.rad(pace*3))
+		
+		Turn(lupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Mid
+		Turn(lloleg, x_axis, math.rad(20.000000), math.rad(pace*5))
+		Turn(lfoot, x_axis, math.rad(10.000000), math.rad(pace*1))
+		
+		Turn(torso, x_axis, math.rad(-3), math.rad(pace*1))
+		
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
 	end
@@ -147,8 +147,8 @@ local function Stop()
 	Turn(lloleg, x_axis, 0, math.rad(100))
 	Turn(rloleg, x_axis, 0, math.rad(100))
 	if not bAiming then
-		Turn(torso, z_axis, 0, math.rad(100))
-		Turn(torso, x_axis, 0, math.rad(20))
+		Turn(torso, z_axis, math.rad(-(0.000000)), math.rad(100))
+		Turn(torso, x_axis, 0, math.rad(20.000000))
 	end
 	Turn(rftoe, x_axis, 0, math.rad(100))
 	Turn(rrtoe, x_axis, 0, math.rad(100))
@@ -159,17 +159,17 @@ local function Stop()
 	WaitForTurn(torso, x_axis)
 	if not bAiming then
 	
-		Turn(torso, x_axis, math.rad(10), math.rad(48))
+		Turn(torso, x_axis, math.rad(10.000000), math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
 	if not bAiming then
 	
-		Turn(torso, x_axis, math.rad(-3), math.rad(48))
+		Turn(torso, x_axis, math.rad(-3.000000), math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
 	if not bAiming then
 	
-		Turn(torso, x_axis, 0, math.rad(48))
+		Turn(torso, x_axis, 0, math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
 	Sleep(20)

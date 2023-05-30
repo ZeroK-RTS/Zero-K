@@ -46,7 +46,7 @@ local SIG_FLOAT = 8
 local SIG_BOB = 16
 
 local GUN_DEPLOY_DIST = 6
-local AIM_SPEED = math.rad(180)
+local AIM_SPEED = 180
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -65,15 +65,14 @@ local PACE = 1.75
 local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
-	local rand = math.random
 	while true do
-		Turn(base, x_axis, math.rad(6)*rand() - math.rad(3), math.rad(1) + rand()*math.rad(1))
-		Turn(base, z_axis, math.rad(6)*rand() - math.rad(3), math.rad(1) + rand()*math.rad(1))
-		Move(base, y_axis, math.rad(6)*rand(), math.rad(2) + rand()*math.rad(4))
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(6)*rand() - math.rad(3), math.rad(1) + rand()*math.rad(1))
-		Turn(base, z_axis, math.rad(6)*rand() - math.rad(3), math.rad(1) + rand()*math.rad(1))
-		Move(base, y_axis, math.rad(-6)*rand(), math.rad(2) + rand()*math.rad(4))
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)))
 		Sleep(2000)
 	end
 end
@@ -100,36 +99,31 @@ local function FloatThread(sign)
 	SetSignalMask(SIG_FLOAT)
 	local speed = 0.7
 	local cycle = 0
-
-	local sgn9 = sign * math.rad(9)
-	Turn(rthigh, x_axis, math.rad(-100) + sgn9, math.rad( 80)*speed)
-	Turn(rcalf, x_axis,  math.rad(115)  + sgn9, math.rad(100)*speed)
-	Turn(rfoot, x_axis,  math.rad(-10)  + sgn9, math.rad(100)*speed)
-	Turn(lthigh, x_axis, math.rad(-100) + sgn9, math.rad( 80)*speed)
-	Turn(lcalf, x_axis,  math.rad(115)  + sgn9, math.rad(100)*speed)
-	Turn(lfoot, x_axis,  math.rad(-10)  + sgn9, math.rad(100)*speed)
-	Turn(cthigh, x_axis, math.rad(-90)  - sgn9, math.rad( 80)*speed)
-	Turn(ccalf, x_axis,  math.rad(-70)  - sgn9, math.rad(100)*speed)
-	Turn(cfoot, x_axis,  math.rad(10)   + sgn9, math.rad(100)*speed)
+	
+	Turn(rthigh, x_axis, math.rad(-100 + 9*sign), math.rad(80)*speed)
+	Turn(rcalf, x_axis,  math.rad(115  + 9*sign), math.rad(100)*speed)
+	Turn(rfoot, x_axis,  math.rad(-10  + 9*sign), math.rad(100)*speed)
+	Turn(lthigh, x_axis, math.rad(-100 + 9*sign), math.rad(80)*speed)
+	Turn(lcalf, x_axis,  math.rad(115  + 9*sign), math.rad(100)*speed)
+	Turn(lfoot, x_axis,  math.rad(-10  + 9*sign), math.rad(100)*speed)
+	Turn(cthigh, x_axis, math.rad(-90  - 9*sign), math.rad(80)*speed)
+	Turn(ccalf, x_axis,  math.rad(-70  - 9*sign), math.rad(100)*speed)
+	Turn(cfoot, x_axis,  math.rad(10   + 9*sign), math.rad(100)*speed)
 	Sleep(150)
-
+	
 	while true do
-		local c0 = ((cycle + 0)%3 - 1) * math.rad(9)
-		local c1 = ((cycle + 1)%3 - 1) * math.rad(9)
-		local c2 = ((cycle + 2)%3 - 1) * math.rad(9)
-
-		Turn(rthigh, x_axis, math.rad(-100) + c0, math.rad( 80)*speed)
-		Turn(rcalf, x_axis,  math.rad( 115) + c0, math.rad(100)*speed)
-		Turn(rfoot, x_axis,  math.rad(-10 ) + c0, math.rad(100)*speed)
-
-		Turn(lthigh, x_axis, math.rad(-100) + c1, math.rad( 80)*speed)
-		Turn(lcalf, x_axis,  math.rad( 115) + c1, math.rad(100)*speed)
-		Turn(lfoot, x_axis,  math.rad(-10 ) + c1, math.rad(100)*speed)
-
-		Turn(cthigh, x_axis, math.rad(-90 ) - c2, math.rad( 80)*speed)
-		Turn(ccalf, x_axis,  math.rad(-70 ) - c2, math.rad(100)*speed)
-		Turn(cfoot, x_axis,  math.rad(  10) + c2, math.rad(100)*speed)
-
+		Turn(rthigh, x_axis, math.rad(-100 + ((cycle + 0)%3 - 1)*9), math.rad(80)*speed)
+		Turn(rcalf, x_axis,  math.rad(115  + ((cycle + 0)%3 - 1)*9), math.rad(100)*speed)
+		Turn(rfoot, x_axis,  math.rad(-10  + ((cycle + 0)%3 - 1)*9), math.rad(100)*speed)
+		
+		Turn(lthigh, x_axis, math.rad(-100 + ((cycle + 1)%3 - 1)*9), math.rad(80)*speed)
+		Turn(lcalf, x_axis,  math.rad(115  + ((cycle + 1)%3 - 1)*9), math.rad(100)*speed)
+		Turn(lfoot, x_axis,  math.rad(-10  + ((cycle + 1)%3 - 1)*9), math.rad(100)*speed)
+		
+		Turn(cthigh, x_axis, math.rad(-90  - ((cycle + 2)%3 - 1)*9), math.rad(80)*speed)
+		Turn(ccalf, x_axis,  math.rad(-70  - ((cycle + 2)%3 - 1)*9), math.rad(100)*speed)
+		Turn(cfoot, x_axis,  math.rad(10   + ((cycle + 2)%3 - 1)*9), math.rad(100)*speed)
+	
 		Sleep(900)
 		speed = 0.1
 		cycle = (cycle + 1)%3
@@ -285,7 +279,7 @@ local function AnimateDeployment(distance, speed, wait)
 	if wait then
 		Sleep(300)
 		Turn(cthigh, x_axis, math.rad(-118)*distance, math.rad(30)*speed)
-		Turn(ccalf, x_axis, 0, math.rad(55)*speed)
+		Turn(ccalf, x_axis, math.rad(0)*distance, math.rad(55)*speed)
 		Turn(cfoot, x_axis, math.rad(-25)*distance, math.rad(70)*speed)
 	
 		WaitForTurn(lcalf, x_axis)
@@ -306,7 +300,7 @@ local function AnimateDeployment(distance, speed, wait)
 	
 	if not wait then
 		Turn(cthigh, x_axis, math.rad(-118)*distance, math.rad(80)*speed)
-		Turn(ccalf, x_axis, 0, math.rad(80)*speed)
+		Turn(ccalf, x_axis, math.rad(0)*distance, math.rad(80)*speed)
 		Turn(cfoot, x_axis, math.rad(-25)*distance, math.rad(50)*speed)
 	end
 	
@@ -333,9 +327,9 @@ local function SetDeploy(wantDeploy)
 		SetSpeedMult(0.25)
 	else
 		deployed = false
-		Turn(head, y_axis, 0, AIM_SPEED)
-		Turn(laxel, x_axis, math.rad(-10), AIM_SPEED*1.5)
-		Turn(raxel, x_axis, math.rad(-10), AIM_SPEED*1.5)
+		Turn(head, y_axis, 0, math.rad(AIM_SPEED))
+		Turn(laxel, x_axis, math.rad(-10), math.rad(AIM_SPEED*1.5))
+		Turn(raxel, x_axis, math.rad(-10), math.rad(AIM_SPEED*1.5))
 		--WaitForTurn(head, y_axis)
 		--WaitForTurn(head, laxel)
 
@@ -442,10 +436,10 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(2750)
-	Turn(head, y_axis, 0, AIM_SPEED*0.25)
+	Turn(head, y_axis, 0, math.rad(AIM_SPEED*0.25))
 	WaitForTurn(head, y_axis)
-	Turn(laxel, x_axis, math.rad(-10), AIM_SPEED*0.37)
-	Turn(raxel, x_axis, math.rad(-10), AIM_SPEED*0.37)
+	Turn(laxel, x_axis, math.rad(-10), math.rad(AIM_SPEED*0.37))
+	Turn(raxel, x_axis, math.rad(-10), math.rad(AIM_SPEED*0.37))
 end
 
 function script.QueryWeapon(num)
@@ -468,9 +462,9 @@ function script.AimWeapon(num, heading, pitch)
 		if moving or not deployed then
 			return false
 		else
-			Turn(head, y_axis, heading, AIM_SPEED) -- left-right
-			Turn(laxel, x_axis, -pitch, AIM_SPEED*1.5) --up-down
-			Turn(raxel, x_axis, -pitch, AIM_SPEED*1.5) --up-down
+			Turn(head, y_axis, heading, math.rad(AIM_SPEED)) -- left-right
+			Turn(laxel, x_axis, -pitch, math.rad(AIM_SPEED*1.5)) --up-down
+			Turn(raxel, x_axis, -pitch, math.rad(AIM_SPEED*1.5)) --up-down
 			WaitForTurn(head, y_axis)
 			WaitForTurn(laxel, x_axis)
 			StartThread(RestoreAfterDelay)

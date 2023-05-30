@@ -63,6 +63,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 	local msgTable = Spring.Utilities.ExplodeString( '|', msg )
 	local command = msgTable[1]
 	
+	local bounty_prefix = "$bounty"
+	
 	if command == '$bounty' then
 		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID, false)
 		if spec then

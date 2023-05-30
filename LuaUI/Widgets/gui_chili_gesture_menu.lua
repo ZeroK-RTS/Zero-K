@@ -554,7 +554,7 @@ function widget:MouseRelease(x,y,button)
 
 		local activeCmdIndex, activeid = Spring.GetActiveCommand()
 		if (activeid ~= nil and activeid < 0) then  -- we already had unit selected and menu wasnt visible - cancel previous unit selection
-			Spring.SetActiveCommand(nil)
+			Spring.SetActiveCommand(0)
 		else
 			local inMinimap = Spring.IsAboveMiniMap(x, y)
 			local pos

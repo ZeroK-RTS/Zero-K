@@ -95,6 +95,17 @@ GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
 
 loaded = true
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- For gadget:Save
+local function UpdateSaveReferences()
+	_G.missionGalaxySaveTable = {
+		unitLineage        = unitLineage,
+		initialUnitData    = initialUnitData,
+		bonusObjectiveList = bonusObjectiveList,
+	}
+end
+UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1460,6 +1471,9 @@ end
 
 
 function gadget:GamePreload()
+	if Spring.GetGameRulesParam("loadedGame") then
+		return
+	end
 	DoInitialTerraform()
 	if SPAWN_GAME_PRELOAD then
 		DoInitialUnitPlacement()
@@ -1473,9 +1487,14 @@ function gadget:GameFrame(n)
 		InitializeMidgameUnits(n)
 		firstGameFrame = false
 		if not SPAWN_GAME_PRELOAD then
-			DoInitialUnitPlacement()
+			if not Spring.GetGameRulesParam("loadedGame") then
+				DoInitialUnitPlacement()
+			end
 		end
 		DoStructureLevelGround()
+		if Spring.GetGameRulesParam("loadedGame") then
+			DoInitialTerraform(true)
+		end
 	end
 	
 	if midgamePlacement[n] then
@@ -1512,9 +1531,94 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Load
+
+function gadget:Load(zip)
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Galaxy Campaign Battle Handler", SAVE_FILE) or {}
+	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+
+	if not loadData.unitLineage
+	or not loadData.bonusObjectiveList
+	or not loadData.initialUnitData
+	then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission load file corrupted")
+		return
+	end
+	
+	loaded = true
+
+	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
+	unitLineage = {}
+	for oldUnitID, teamID in pairs(loadData.unitLineage) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		if unitID then
+			unitLineage[unitID] = teamID
+			SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
+		end
+	end
+	
+	for i = 1, #loadData.bonusObjectiveList do
+		bonusObjectiveList[i] = loadData.bonusObjectiveList[i]
+		local oldUnits = loadData.bonusObjectiveList[i].units
+		if oldUnits then
+			bonusObjectiveList[i].units = {}
+			for oldUnitID, allyTeamID in pairs(oldUnits) do
+				local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+				if unitID then
+					bonusObjectiveList[i].units[unitID] = allyTeamID
+				end
+			end
+		end
+	end
+	
+	-- Clear the commanders out of victoryAtLocation
+	victoryAtLocation = {}
+	initialUnitData = {}
+	
+	-- Put the units back in the objectives
+	for oldUnitID, data in pairs(loadData.initialUnitData) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		if unitID then
+			SetupInitialUnitParameters(unitID, data)
+		end
+	end
+	
+	-- restore victoryAtLocation units
+	-- needed for any units that weren't created at start; e.g. Dantes on planet 21 (Vis Ragstrom)
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local finished = select(5, Spring.GetUnitHealth(unitID)) == 1
+		if finished and not victoryAtLocation[unitID] then
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local unitTeam = Spring.GetUnitTeam(unitID)
+			gadget:UnitFinished(unitID, unitDefID, unitTeam)
+		end
+	end
+	
+	UpdateSaveReferences()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local MakeRealTable = Spring.Utilities.MakeRealTable
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
+		return
+	end
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.missionGalaxySaveTable, "Campaign"))
+end
 
 local function MissionGameOver(cmd, missionWon)
 	if (Script.LuaUI('MissionGameOver')) then

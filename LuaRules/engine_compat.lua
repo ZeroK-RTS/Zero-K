@@ -1,6 +1,5 @@
 local RET_FALSE = function() return false end
 local RET_NONE  = function() end
-local RET_TABLE = function() return {} end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
      though this can only happen for random people's forks since regular BAR & Spring build
@@ -75,8 +74,8 @@ if Script.IsEngineMinVersion(104, 0, 536) then
 		if not playerID then
 			return
 		end
-		local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12 = origGetPlayerInfo(playerID)
-		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r10, r12
+		local r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11 = origGetPlayerInfo(playerID)
+		return r1, r2, r3, r4, r5, r6, r7, r8, r9, r11, r10
 	end
 end
 
@@ -120,10 +119,6 @@ if Script.IsEngineMinVersion(104, 0, 1166) then
 		local r1, r2, r3, r4, r5, r6, r7, r8 = origGetTeamInfo(p1, p2)
 		return r1, r2, r3, r4, r5, r6, r8, r7
 	end
-end
-
-if not math.tau then -- 104-1421 AFAICT
-	math.tau = 2 * math.pi
 end
 
 if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
@@ -195,37 +190,6 @@ if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
-
-if not Spring.GetFeaturesInScreenRectangle and not Script.GetSynced() then -- BAR 105-1649
-	Spring.GetFeaturesInScreenRectangle = RET_TABLE
-end
-
-if Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1706) then
-	local inTransfer = false
-	local originalTransferUnit = Spring.TransferUnit
-	Spring.TransferUnit = function(unitID, teamID, captured)
-		if inTransfer then
-			return
-		end
-		inTransfer = true
-		originalTransferUnit(unitID, teamID, captured)
-		inTransfer = false
-	end
-end
-
-if not Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1719) then
-	local originalSetActiveCommand = Spring.SetActiveCommand
-	Spring.SetActiveCommand = function(...)
-		if not select(1, ...) then
-			return originalSetActiveCommand(-1)
-		else
-			return originalSetActiveCommand(...)
-		end
-	end
-end
-
-Game.footprintScale  = Game.footprintScale  or  2 -- BAR 105-1725
-Game.buildSquareSize = Game.buildSquareSize or 16 -- BAR 105-1725
 
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
 	local spSetGameRulesParam = Spring.SetGameRulesParam

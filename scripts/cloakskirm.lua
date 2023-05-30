@@ -54,8 +54,8 @@ local function Walk()
 		local truespeed = runspeed * speedmod
 
 		Turn (shin[side], x_axis, math.rad(85), truespeed*0.28)
-		Turn (heel[side], x_axis, 0, truespeed*0.25)
-		Turn (foot[side], x_axis, 0, truespeed*0.25)
+		Turn (heel[side], x_axis, math.rad(0), truespeed*0.25)
+		Turn (foot[side], x_axis, math.rad(0), truespeed*0.25)
 		Turn (thigh[side], x_axis, math.rad(-36), truespeed*0.16)
 		Turn (thigh[3-side], x_axis, math.rad(36), truespeed*0.16)
 
@@ -87,8 +87,8 @@ local function StopWalk()
 		Turn (heel[i], x_axis, 0, runspeed*0.2)
 		Turn (foot[i], x_axis, 0, runspeed*0.2)
 
-		Turn (thigh[i], y_axis, math.rad(60) - i*math.rad(40), runspeed*0.1)
-		Turn (thigh[i], z_axis, math.rad(6)*i - math.rad(9), runspeed*0.1)
+		Turn (thigh[i], y_axis, math.rad(60 - i*40), runspeed*0.1)
+		Turn (thigh[i], z_axis, math.rad(6*i - 9), runspeed*0.1)
 	end
 end
 

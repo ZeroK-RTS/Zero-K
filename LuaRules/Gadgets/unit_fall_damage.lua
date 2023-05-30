@@ -60,7 +60,7 @@ for unitDefID=1,#UnitDefs do
 	end
 end
 
-local wantedWeaponList = {-2, -3}
+local wantedWeaponList = {-1, -2, -3}
 
 local collisionDamageMult = {}
 local fallDamageImmunityWeaponID = {}
@@ -313,7 +313,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		damageTotal = damageTotal*(collisionDamageMult[unitID] or 1)
 		return damageTotal
 	end
-
+	
+	if weaponDefID == -1 then
+		return 20
+	end
+	
 	return damage
 end
 

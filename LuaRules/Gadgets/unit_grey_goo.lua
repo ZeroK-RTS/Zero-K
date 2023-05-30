@@ -54,7 +54,7 @@ local CMD_GUARD      = CMD.GUARD
 local DEFAULT_GOO = 1
 local CMD_STOP = CMD.STOP
 
-local CMD_GOO_GATHER = Spring.Utilities.CMD.GOO_GATHER
+include("LuaRules/Configs/customcmds.h.lua")
 
 local gooGatherBehaviour = {
 	id      = CMD_GOO_GATHER,

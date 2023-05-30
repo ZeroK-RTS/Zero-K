@@ -69,7 +69,19 @@ else
   local particleCnt  = 1
   local particleList = {}
 
+  local lastShoot = {}
+
   function FlameShot(_,unitID, unitDefID, weapon)
+	-- why is this even needed? we limited frequency of fire FX back in synced
+	--[[
+    local n = Spring.GetGameFrame()
+	lastShoot[unitID] = lastShoot[unitID] or {}
+    if ((lastShoot[unitID][weapon] or 0) > (n-MIN_EFFECT_INTERVAL) ) then
+      return
+    end
+    lastShoot[unitID][weapon] = n
+	]]--
+
     local posx,posy,posz, dirx,diry,dirz = Spring.GetUnitWeaponVectors(unitID,weapon)
     local wd  = WeaponDefs[UnitDefs[unitDefID].weapons[weapon].weaponDef]
     local weaponRange = wd.range*wd.duration*15

@@ -508,9 +508,9 @@ local function DisposePlayer(playerID) -- clean up this player. Called 1 frame a
 		local i = 0
 		for key, data in pairs(invites[playerID]) do -- kill off invites.
 			i = i + 1
-			spSetPlayerRulesParam(playerID, "commshare_invite_" .. i .. "_id", nil)
-			spSetPlayerRulesParam(playerID, "commshare_invite_" .. i .. "_timeleft", nil)
-			spSetPlayerRulesParam(playerID, "commshare_invitecount", nil)
+			spSetPlayerRulesParam(player, "commshare_invite_" .. i .. "_id", nil)
+			spSetPlayerRulesParam(player, "commshare_invite_" .. i .. "_timeleft", nil)
+			spSetPlayerRulesParam(player, "commshare_invitecount", nil)
 		end
 		invites[playerID] = nil
 	end

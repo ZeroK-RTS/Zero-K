@@ -832,7 +832,7 @@ function widget:MouseRelease(x, y, button)
 		return false
 	end
 	if button ~= 1 then
-		Spring.SetActiveCommand(nil)
+		Spring.SetActiveCommand(-1)
 		return false
 	end
 	local mx, my = spGetMouseState()
@@ -841,7 +841,7 @@ function widget:MouseRelease(x, y, button)
 		local _, retain = PlaceSingleMex(coords[1], coords[3])
 		placedMexSinceShiftPressed = true
 		if not retain then
-			Spring.SetActiveCommand(nil)
+			Spring.SetActiveCommand(-1)
 		end
 	end
 	return true
@@ -1053,7 +1053,7 @@ function widget:KeyRelease(key, modifier, isRepeat)
 		placedMexSinceShiftPressed = false
 		local _, cmdID = Spring.GetActiveCommand()
 		if cmdID == -mexDefID then
-			Spring.SetActiveCommand(nil)
+			Spring.SetActiveCommand(-1)
 		end
 	end
 end

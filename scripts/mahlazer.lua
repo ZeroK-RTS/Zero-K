@@ -222,17 +222,17 @@ function Dock()
 		Sleep(100)
 		
 		for i = 1, 4 do
-			Turn(DocksClockwise[i]	   ,z_axis,0,1)
-			Turn(DocksCounterClockwise[i],z_axis,0,1)
+			Turn(DocksClockwise[i]	   ,z_axis,math.rad(0),1)
+			Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1)
 			
-			Turn(ActuatorBaseClockwise[i],z_axis,0,2)
-			Turn(ActuatorBaseCCW[i]	  ,z_axis,0,2)
+			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2)
+			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad(0),2)
 			
-			Turn(ActuatorMidCW [i],z_axis,0,1.5)
-			Turn(ActuatorMidCCW[i],z_axis,0,1.5)
+			Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5)
+			Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5)
 			
-			Turn(ActuatorTipCW [i],z_axis,0,2.2)
-			Turn(ActuatorTipCCW[i],z_axis,0,2.2)
+			Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2)
+			Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2)
 		end
 	end
 end
@@ -448,9 +448,7 @@ function script.AimWeapon(num, heading, pitch)
 		
 		wantedDirection = currentHeading - heading + math.pi
 		
-		-- Starlight misses Gnat at max range if the fudge
-		-- factor is either 0.998 or 1.0, unsure why.
-		pitchFudge = (math.pi/2 + pitch)*0.999 - math.pi/2
+		pitchFudge = (math.pi/2 + pitch)*0.998 - math.pi/2
 		
 		local speedMult = (GG.att_ReloadChange[unitID] or 1)
 		CallSatelliteScript('mahlazer_AimAt', pitchFudge + math.pi/2, PITCH_AIM_RATE*speedMult)

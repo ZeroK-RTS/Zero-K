@@ -22,7 +22,7 @@ local AUTOSAVE_DIR = SAVE_DIR .. "/auto"
 local MAX_SAVES = 99999
 
 local LOAD_GAME_STRING = "loadFilename "
-local SAVE_TYPE = "save "
+local SAVE_TYPE = (Spring.Utilities.IsCurrentVersionNewerThan(104, 1322) and "save ") or "luasave "
 -- https://springrts.com/mantis/view.php?id=6219
 -- https://springrts.com/mantis/view.php?id=6222
 
@@ -223,9 +223,9 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.gameVersion = Game.gameVersion
 			saveData.engineVersion = Spring.Utilities.GetEngineVersion()
 			saveData.map = Game.mapName
-			saveData.gameID = Game.gameID
+			saveData.gameID = (Spring.GetGameRulesParam("save_gameID") or Game.gameID)
 			saveData.gameframe = Spring.GetGameFrame()
-			saveData.totalGameframe = Spring.GetGameFrame()
+			saveData.totalGameframe = Spring.GetGameFrame() + (Spring.GetGameRulesParam("totalSaveGameFrame") or 0)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 			table.save(saveData, path)
 			

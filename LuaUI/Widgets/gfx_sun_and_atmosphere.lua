@@ -159,7 +159,7 @@ local function SaveSettings()
 		fog         = fogSettingsChanged       and GetOptionsTable(fogPath),
 		water       = waterSettingsChanged     and GetOptionsTable(waterpath),
 	}
-	if OVERRIDE_CONFIG and OVERRIDE_CONFIG.forceIsland ~= nil then
+	if OVERRIDE_CONFIG.forceIsland ~= nil then
 		writeTable.forceIsland = OVERRIDE_CONFIG.forceIsland
 	end
 	

@@ -17,7 +17,7 @@ local SIG_Aim = 1
 
 function script.Create()
 	for i=1,#blades do
-		Turn(blades[i], y_axis, math.rad(60)*(i-1))
+		Turn(blades[i], y_axis, math.rad((i-1)*60))
 	end
 	Spin(fan, y_axis, rotorSpeed, rotorAccel)
 end

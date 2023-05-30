@@ -98,6 +98,7 @@ end
 local function LoadLavaConf()
 	local gameConfig = VFS.FileExists(GAMESIDE_LAVACONF) and VFS.Include(GAMESIDE_LAVACONF) or false
 	local mapConfig = VFS.FileExists(MAPSIDE_LAVACONF) and VFS.Include(MAPSIDE_LAVACONF) or false
+	Spring.Echo("GAMESIDE_LAVACONF", GAMESIDE_LAVACONF)
 	return ProcessLavalConf(gameConfig or mapConfig)
 end
 

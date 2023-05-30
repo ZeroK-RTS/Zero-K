@@ -64,8 +64,8 @@ end
 local function Dock()
 	SetSignalMask(SIG_DOCK)
 	for i=1,4 do
-		Turn(InnerLimbs[i],y_axis,0,1)
-		Turn(OuterLimbs[i],y_axis,0,1)
+		Turn(InnerLimbs[i],y_axis,math.rad(0),1)
+		Turn(OuterLimbs[i],y_axis,math.rad(0),1)
 	end
 end
 

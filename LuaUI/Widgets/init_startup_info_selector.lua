@@ -493,10 +493,15 @@ end
 local timer = 0
 local startPosTimer = 0
 function widget:Update(dt)
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
 	if timer then
 		timer = timer + dt
 		if timer >= 0.01 then
-			if wantClose then
+			if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
 				Close(true, wantClose)
 			end
 			timer = false

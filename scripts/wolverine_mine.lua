@@ -84,9 +84,9 @@ function script.Create()
 	for i = 1, #petals do
 		Move (petals[i][1], y_axis, 100)
 		Turn (petals[i][1], y_axis, i * 2 * math.pi / #petals)
-		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49) * UNFURL_SPEED)
-		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14) * UNFURL_SPEED)
-		Turn (petals[i][4], x_axis, math.rad(-30), math.rad(21) * UNFURL_SPEED)
+		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49 * UNFURL_SPEED))
+		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14 * UNFURL_SPEED))
+		Turn (petals[i][4], x_axis, math.rad(-30), math.rad(21 * UNFURL_SPEED))
 	end
 
 	for i = 1, #stalk do

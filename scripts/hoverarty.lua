@@ -27,10 +27,10 @@ local firing = false
 
 local function Tilt()
 	while true do
-		local angle1 = math.random()*math.rad(3) - math.rad(1.5)
-		local angle2 = math.random()*math.rad(3) - math.rad(1.5)
-		Turn(base, x_axis, angle1, math.rad(1))
-		Turn(base, z_axis, angle2, math.rad(1))
+		local angle1 = math.random(-15, 15)
+		local angle2 = math.random(-15, 15)
+		Turn(base, x_axis, math.rad(angle1*0.1), math.rad(1))
+		Turn(base, z_axis, math.rad(angle2*0.1), math.rad(1))
 		WaitForTurn(base, x_axis)
 		WaitForTurn(base, z_axis)
 	end

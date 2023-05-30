@@ -54,6 +54,19 @@ function GG.Terrain_Texture_changeBlockList(blockX, blockZ, blockTex)
 	SendToUnsynced("changeBlockList")
 end
 
+function gadget:Load(zip)
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+
+	local loadData = GG.SaveLoad.ReadFile(zip, "Terrain Texture", SAVE_FILE) or {}
+	if loadData and #loadData > 0 then
+		GG.Terrain_Texture_changeBlockList(loadData1[1], loadData1[2], loadData1[3])
+	end
+	SendToUnsynced("UpdateAll")
+end
+
 function gadget:Shutdown()
 	if Spring.IsCheatingEnabled() then
 		SendToUnsynced("Shutdown")
@@ -108,22 +121,24 @@ local syncedHeights = {} -- list of synced heightmap point values
 
 local UMHU_updatequeue = {} -- send update data from gadget:UnsyncedHeightMapUpdate() to gadget:DrawWorld()
 
-local function ChangeTextureBlock(bx, bz, myTex)
+local function ChangeTextureBlock(x, z, myTex)
 	-- Ensure they snap to grid
-	bx = math.floor(bx/8)*8
-	bz = math.floor(bz/8)*8
+	x = math.floor(x/8)*8
+	z = math.floor(z/8)*8
 	
-	-- UHM chunk location of bx,bz
-	local cx = floor(bx/UHM_WIDTH)
-	local cz = floor(bz/UHM_HEIGHT)
-	-- Drawing square location of bx,bz
-	local sx = floor(bx/SQUARE_SIZE)
-	local sz = floor(bz/SQUARE_SIZE)
+	-- UHM chunk location of x,z
+	local cx = floor(x/UHM_WIDTH)
+	local cz = floor(z/UHM_HEIGHT)
+	-- Drawing square location of x,z
+	local sx = floor(x/SQUARE_SIZE)
+	local sz = floor(z/SQUARE_SIZE)
 
 	-- Ensure the existence of this UHM chunk
 	if not (chunkMap[cx] and chunkMap[cx][cz]) then
 		chunkMap[cx] = chunkMap[cx] or {}
 		chunkMap[cx][cz] = {
+			squareMap = {},
+			squareList = {count = 0, data = {}},
 			blockMap = {},
 			blockList = {count = 0, data = {}},
 		}
@@ -134,17 +149,17 @@ local function ChangeTextureBlock(bx, bz, myTex)
 	-- Update Block map and list
 	local blockMap = chunk.blockMap
 	local blockList = chunk.blockList
-	if blockMap[bx] and blockMap[bx][bz] then
+	if blockMap[x] and blockMap[x][z] then
 		-- There is already a pending change for this block
-		local otherIndex = blockMap[bx][bz]
+		local otherIndex = blockMap[x][z]
 		local otherTex = blockList.data[otherIndex].tex
-		if blockStateMap[bx] and blockStateMap[bx][bz] == myTex then
+		if blockStateMap[x] and blockStateMap[x][z] == myTex then
 			-- Remove pending change
 			local endX = blockList.data[blockList.count].x
 			local endZ = blockList.data[blockList.count].z
 			blockList.data[otherIndex] = blockList.data[blockList.count]
 			blockMap[endX][endZ] = otherIndex
-			blockMap[bx][bz] = nil
+			blockMap[x][z] = nil
 			blockList.data[blockList.count] = nil
 			blockList.count = blockList.count - 1
 		elseif myTex ~= otherTex then
@@ -152,19 +167,30 @@ local function ChangeTextureBlock(bx, bz, myTex)
 			blockList.data[otherIndex].tex = myTex
 		end
 		return -- Always return, square is sure to be already marked.
-	elseif not (blockStateMap[bx] and blockStateMap[bx][bz]) and myTex == 0 then
+	elseif not (blockStateMap[x] and blockStateMap[x][z]) and myTex == 0 then
 		-- adding no new texture to unchanged block
 		return
-	elseif blockStateMap[bx] and blockStateMap[bx][bz] == myTex then
+	elseif blockStateMap[x] and blockStateMap[x][z] == myTex then
 		-- Nothing to do if there is no change to the seen map`
 		-- and if there is no pending change to this block.
 		return
 	else
 		-- Add a new pending change.
 		blockList.count = blockList.count + 1
-		blockList.data[blockList.count] = {x = bx, z = bz, tex = myTex}
-		blockMap[bx] = blockMap[bx] or {}
-		blockMap[bx][bz] = blockList.count
+		blockList.data[blockList.count] = {x = x, z = z, tex = myTex}
+		blockMap[x] = blockMap[x] or {}
+		blockMap[x][z] = blockList.count
+	end
+	
+	-- Mark the square as changed.
+	local squareMap = chunk.squareMap
+	local squareList = chunk.squareList
+	
+	if not (squareMap[sx] and squareMap[sx][sz]) then
+		squareMap[sx] = squareMap[sx] or {}
+		squareMap[sx][sz] = true
+		squareList.count = squareList.count + 1
+		squareList.data[squareList.count] = {x = sx, z = sz}
 	end
 end
 
@@ -207,7 +233,7 @@ function gadget:DrawGenesis()
 		for cx = cx1, cx2 do
 			if chunkMap[cx] and chunkMap[cx][cz] and not (chunkUpdateMap[cx] and chunkUpdateMap[cx][cz]) then --only process chunk that has been added by ChangeTextureBlock()
 				chunkUpdateMap[cx] = chunkUpdateMap[cx] or {}
-				chunkUpdateMap[cx][cz] = true
+                chunkUpdateMap[cx][cz] = true
 				chunkUpdateList.count = chunkUpdateList.count + 1
 				chunkUpdateList.data[chunkUpdateList.count] = {x = cx, z = cz}
 				--Spring.MarkerAddPoint(x,0,z,"point triggered")
@@ -378,14 +404,18 @@ function gadget:DrawGenesis()
 		local chunkUpdate = chunkUpdateList.data[c]
 		local chunk = chunkMap[chunkUpdate.x][chunkUpdate.z]
 
-		local sx = floor(chunkUpdate.x * UHM_WIDTH/SQUARE_SIZE)
-		local sz = floor(chunkUpdate.z * UHM_HEIGHT/SQUARE_SIZE)
-		if (mapTex[sx] and mapTex[sx][sz]) and not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
-			gl.GenerateMipmap(mapTex[sx][sz].cur)
-			spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
-			--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
-			updatedSquareMap[sx] = updatedSquareMap[sx] or {}
-			updatedSquareMap[sx][sz] = true
+		local squareList = chunk.squareList
+		for i = 1, squareList.count do
+			local square = squareList.data[i]
+			local sx = square.x
+			local sz = square.z
+			if mapTex[sx][sz] and not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
+				gl.GenerateMipmap(mapTex[sx][sz].cur)
+				spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
+				--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
+				updatedSquareMap[sx] = updatedSquareMap[sx] or {}
+				updatedSquareMap[sx][sz] = true
+			end
 		end
 		
 		-- Wipe updated chunks
@@ -446,7 +476,6 @@ function gadget:GameFrame(n)
 	
 	if BAR_COMPAT and USE_FORCE_UPDATE then
 		Spring.ForceTesselationUpdate(true, true)
-		--Spring.Echo("ForceTesselationUpdate", math.random())
 	else
 		toSet = Spring.GetConfigInt("GroundDetail", 90) -- Default in epic menu
 		Spring.SendCommands{"GroundDetail " .. (toSet + 1)}
@@ -457,6 +486,41 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Gadget Interface
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local blockX = {}
+	local blockZ = {}
+	local blockTex = {}
+	-- Save the current texture
+	for x, rest in pairs(blockStateMap) do
+		for z, tex in pairs(rest) do
+			blockX[#blockX + 1] = x
+			blockZ[#blockZ + 1] = z
+			blockTex[#blockTex + 1] = tex
+		end
+	end
+	
+	-- Save the pending changes
+	for _, chunkCols in pairs(chunkMap) do
+		for _, chunk in pairs(chunkCols) do
+			local chunkBlocks = chunk.blockList
+			for i = 1, chunkBlocks.count do
+				local b = chunkBlocks.data[i]
+				blockX[#blockX + 1] = b.x
+				blockZ[#blockZ + 1] = b.z
+				blockTex[#blockTex + 1] = b.tex
+			end
+		end
+	end
+	
+	local saveData = {blockX, blockZ, blockTex}
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(blockList, "Terrain Texture"))
+end
 
 local function Shutdown()
 	-- Iterating over a map here but it's so rare that I don't care!

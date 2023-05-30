@@ -238,9 +238,6 @@ local flexCallIns = {
 	'Save',
 	'Load',
 	'GameID',
-
-	-- From gadgets
-	"UnitStructureMoved",
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -2514,11 +2511,6 @@ function widgetHandler:GameID(gameID)
 	end
 end
 
-function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-	for _, w in r_ipairs(self.UnitStructureMovedList) do
-		w:UnitStructureMoved(unitID, unitDefID, newX, newZ)
-	end
-end
 
 -- local helper (not a real call-in)
 local oldSelection = {}

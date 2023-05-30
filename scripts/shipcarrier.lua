@@ -148,7 +148,7 @@ local function closeBay(piece)
 			SetSignalMask("bay"..piece)
 			Sleep(1000);
 			Move(bay.slider,x_axis,0,3);
-			Turn(bay.hatch, z_axis, 0, math.rad(40))
+			Turn(bay.hatch, z_axis, math.rad(0),math.rad(40));
 		end
 	end
 end

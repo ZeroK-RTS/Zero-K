@@ -661,3 +661,20 @@ end
 function GG.SetJumpReloadMod(unitID, value)
 	jumpReloadMod[unitID] = value
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitRulesParam(unitID, "is_jumping") == 1 then
+			local goalX = Spring.GetUnitRulesParam(unitID, "jump_goal_x")
+			local goalZ = Spring.GetUnitRulesParam(unitID, "jump_goal_z")
+			if goalX and goalZ then
+				local goal = {goalX, 0, goalZ}
+				Jump(unitID, goal, goal, true)
+			end
+		end
+	end
+end

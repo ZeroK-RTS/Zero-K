@@ -47,7 +47,7 @@ local legRaiseAngle = math.rad(20)
 local legLowerSpeed = math.rad(50)*PACE
 
 local legForwardSpeed = math.rad(40)*PACE
-local legForwardAngle = math.rad(-20)
+local legForwardAngle = -math.rad(20)
 local legBackwardSpeed = math.rad(35)*PACE
 local legBackwardAngle = math.rad(45)
 local legBackwardAngleMinor = math.rad(10)
@@ -329,7 +329,7 @@ function script.AimWeapon(num, heading, pitch)
 	elseif num == 2 then
 		Signal(SIG_AIM2)
 		SetSignalMask(SIG_AIM2)
-		Turn(rocket, y_axis, heading, math.rad(190))
+		Turn(rocket, y_axis, math.rad(heading), math.rad(190))
 		Turn(rocket, x_axis, 0, math.rad(150))
 		WaitForTurn(rocket, y_axis)
 		WaitForTurn(rocket, x_axis)

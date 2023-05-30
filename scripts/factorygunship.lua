@@ -53,7 +53,9 @@ local explodables = smokePieces -- these are all empty pieces to generate smoke 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
-	local effect = SFX.FALL + (brutal and (SFX.SMOKE + SFX.FIRE) or 0)
+	local sfx = SFX
+
+	local effect = sfx.FALL + (brutal and (sfx.SMOKE + sfx.FIRE) or 0)
 	for i = 1, #explodables do
 		if math.random() < severity then
 			Explode (explodables[i], effect)
@@ -63,7 +65,7 @@ function script.Killed (recentDamage, maxHealth)
 	if not brutal then
 		return 1
 	else
-		Explode (base, SFX.SHATTER)
+		Explode (base, sfx.SHATTER)
 		return 2
 	end
 end

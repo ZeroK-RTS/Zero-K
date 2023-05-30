@@ -16,7 +16,7 @@ local smokePiece = {body}
 --------------------------------------------------------------------------------------
 local PACE = 2
 
-local THIGH_FRONT_ANGLE = math.rad(-50)
+local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE

@@ -314,3 +314,48 @@ function widget:Initialize()
 		widget:UnitCreated(id, spGetUnitDefID(id),team)
 	end
 end
+
+-----------------------
+-- save/load
+function widget:Load(zip)
+	if not WG.SaveLoad then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+
+	local loadData = WG.SaveLoad.ReadFile(zip, "Cloaker Guard", SAVE_FILE)
+	if not loadData then
+		return
+	end
+
+	-- load cloakers
+	for oldID, data in pairs(loadData.cloakers or {}) do
+		local newID = WG.SaveLoad.GetNewUnitID(oldID)
+		if newID then
+			data.id = newID
+			data.cloakiees = WG.SaveLoad.GetNewUnitIDValues(data.cloakiees)
+			cloakers[newID] = data
+		end
+	end
+	-- load followers
+	for oldID, data in pairs(loadData.follower or {}) do
+		local newID = WG.SaveLoad.GetNewUnitID(oldID)
+		if newID then
+			data.id = newID
+			data.fol = WG.SaveLoad.GetNewUnitID(data.fol)
+			if data.fol then
+				follower[newID] = data
+			end
+		end
+	end
+end
+
+function widget:Save(zip)
+	if not WG.SaveLoad then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+
+	local data = {cloakers = cloakers, follower = follower}
+	WG.SaveLoad.WriteSaveData(zip, SAVE_FILE, data)
+end

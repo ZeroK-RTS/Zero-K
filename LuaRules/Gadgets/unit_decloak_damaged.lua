@@ -178,9 +178,7 @@ local function CheckWaterBlockCloak(unitID, pos)
 		if not waterUnitCloakBlocked[unitID] then
 			PokeDecloakUnit(unitID)
 			spSetUnitRulesParam(unitID, "cannotcloak", 1, alliedTrueTable)
-			spSetUnitRulesParam(unitID, "shield_disabled", 1, alliedTrueTable)
 			waterUnitCloakBlocked[unitID] = true
-			GG.UpdateUnitAttributes(unitID)
 		end
 		return true
 	end
@@ -214,15 +212,11 @@ function gadget:GameFrame(n)
 				if pos < 0 then
 					if (not CheckWaterBlockCloak(unitID, pos)) and waterUnitCloakBlocked[unitID] then
 						spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
-						spSetUnitRulesParam(unitID, "shield_disabled", 0, alliedTrueTable)
-						GG.UpdateUnitAttributes(unitID)
 						waterUnitCloakBlocked[unitID] = false
 					end
 				else
 					if waterUnitCloakBlocked[unitID] then
 						spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
-						spSetUnitRulesParam(unitID, "shield_disabled", 0, alliedTrueTable)
-						GG.UpdateUnitAttributes(unitID)
 						waterUnitCloakBlocked[unitID] = false
 					end
 				end
@@ -370,3 +364,25 @@ function gadget:Initialize()
 		end
 	end
 end
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+	  -- restore cloak for dyncomms during a loaded savegame
+	  -- the CMD_CLOAK cmd desc ID was already removed during the UnitCreated() call, so we can't use the detection method used there
+	  -- instead we do this
+		if GG.Upgrades_UnitCanCloak(unitID) then
+			Spring.InsertUnitCmdDesc(unitID, unitWantCloakCommandDesc)
+			local wantedState = spGetUnitRulesParam(unitID, "wantcloak")
+			spSetUnitRulesParam(unitID, "wantcloak", 0, alliedTrueTable)
+			SetWantedCloaked(unitID, wantedState)
+			-- unit_commander_upgrade runs after us and decloaks us while setting our decloak radius,
+			-- so reset at earliest opportunity
+			if wantedState == 1 then
+				recloakUnit[unitID] = 0
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

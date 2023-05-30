@@ -58,6 +58,10 @@ if gadgetHandler:IsSyncedCode() then
 				local weaponDefID = UnitDefs[unitDefID].weapons[beamEmitterWeaponNum].weaponDef
 				wd = WeaponDefs[weaponDefID]
 				if wd then
+					local dmgMod = 1
+					if wd.type ~= "LightningCannon" then
+						dmgMod = 1 / (wd.beamtime * GAMESPEED)
+					end
 					beamDamDefs[unitDefID][beamEmitterWeaponNum] = wd.damages[SHIELDARMORID]
 					if beamDamDefs[unitDefID][beamEmitterWeaponNum] <= 0.1 then --some stupidity here: llt has 0.0001 dmg in wd.damages[SHIELDARMORID]
 						beamDamDefs[unitDefID][beamEmitterWeaponNum] = wd.damages[SHIELDARMORIDALT]
@@ -70,6 +74,8 @@ if gadgetHandler:IsSyncedCode() then
 		end
 
 		if damage and damage ~= -1 then
+			--Spring.Utilities.TableEcho(wd.damages)
+			--Spring.Echo("dmg=", dmg, dmg * dmgMod)
 			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
 			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
 			SendToUnsynced("AddShieldHitDataHandler", gameFrame, shieldCarrierUnitID, damage, dx, dy, dz)

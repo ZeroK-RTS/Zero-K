@@ -11,7 +11,7 @@ local smokePiece = {body}
 --------------------------------------------------------------------------------------
 local PACE = 2
 
-local THIGH_FRONT_ANGLE = math.rad(-50)
+local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -40,14 +40,13 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	while true do
-		Turn(base, x_axis, math.rad(6)*math.random() - math.rad(3), math.rad(1) + math.random()*math.rad(1))
-		Turn(base, z_axis, math.rad(6)*math.random() - math.rad(3), math.rad(1) + math.random()*math.rad(1))
-		Move(base, y_axis, math.rad(6)*math.random(), math.rad(2) + math.random()*math.rad(4))
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)))
 		Sleep(2000)
-
-		Turn(base, x_axis, math.rad(6)*math.random() - math.rad(3), math.rad(1) + math.random()*math.rad(1))
-		Turn(base, z_axis, math.rad(6)*math.random() - math.rad(3), math.rad(1) + math.random()*math.rad(1))
-		Move(base, y_axis, math.rad(-6)*math.random(), math.rad(2) + math.random()*math.rad(4))
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)))
 		Sleep(2000)
 	end
 end

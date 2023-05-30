@@ -99,16 +99,16 @@ local function Walk()
 
 		Turn(thigh[side], x_axis, math.rad(-50), truespeed*math.rad(150))
 		Turn(shin[side], x_axis, math.rad(75), truespeed*math.rad(240))
-		Turn(foot[side], x_axis, 0, truespeed*math.rad(50))
+		Turn(foot[side], x_axis, math.rad(0), truespeed*math.rad(50))
 
 		Turn(thigh[3-side], x_axis, math.rad(50), truespeed*math.rad(150))
-		Turn(shin[3-side], x_axis, 0, truespeed*math.rad(240))
+		Turn(shin[3-side], x_axis, math.rad(0), truespeed*math.rad(240))
 		Turn(foot[3-side], x_axis, math.rad(20), truespeed*math.rad(50))
 
 		Move(hips, y_axis, 0, truespeed*6)
 		WaitForMove(hips, y_axis)
 
-		Turn(shin[side], x_axis, 0, truespeed*math.rad(60))
+		Turn(shin[side], x_axis, math.rad(0), truespeed*math.rad(60))
 		Turn(foot[side], x_axis, math.rad(-20), truespeed*math.rad(50))
 		Move(hips, y_axis, -0.5, truespeed*3)
 		WaitForMove(hips, y_axis)

@@ -35,6 +35,8 @@ local CAMPAIGN_SPAWN_DEBUG = (Spring.GetModOptions().campaign_spawn_debug == "1"
 local gaiateam = Spring.GetGaiaTeamID()
 local allyTeamAFKers = {}
 
+local SAVE_FILE = "Gadgets/start_unit_setup.lua"
+
 local fixedStartPos = (modOptions.fixedstartpos == "1")
 
 local modStartMetal = START_METAL
@@ -142,6 +144,17 @@ GG.waitingForComm = waitingForComm
 -- overlaps with the rulesparam
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
+
+-- allow gadget:Save (unsynced) to reach them
+local function UpdateSaveReferences()
+	_G.waitingForComm = waitingForComm
+	_G.scheduledSpawn = scheduledSpawn
+	_G.playerSides = playerSides
+	_G.teamSides = teamSides
+	_G.commSpawnedTeam = commSpawnedTeam
+	_G.commSpawnedPlayer = commSpawnedPlayer
+end
+UpdateSaveReferences()
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -337,7 +350,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		end
 		
 		-- CREATE UNIT
-		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, nil, nil, nil, nil, nil, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
+		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
 		
 		if not unitID then
 			return
@@ -520,6 +533,9 @@ local function SpawnAllyTeamExtraCommanders(allyTeamID, wanted)
 end
 
 function gadget:GameStart()
+	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
+		return
+	end
 	gamestart = true
 	
 	-- check starting/innate resource modoptions
@@ -705,6 +721,25 @@ function gadget:Shutdown()
 	--Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
+function gadget:Load(zip)
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
+		return
+	end
+	loadGame = true
+	local data = GG.SaveLoad.ReadFile(zip, "Start Unit Setup", SAVE_FILE) or {}
+
+	-- load data wholesale
+	waitingForComm = data.waitingForComm or {}
+	scheduledSpawn = data.scheduledSpawn or {}
+	playerSides = data.playerSides or {}
+	teamSides = data.teamSides or {}
+	commSpawnedPlayer = data.commSpawnedPlayer or {}
+	commSpawnedTeam = data.commSpawnedTeam or {}
+	
+	UpdateSaveReferences()
+end
+
 --------------------------------------------------------------------
 -- unsynced code
 --------------------------------------------------------------------
@@ -724,6 +759,27 @@ function CommSelection(_,playerID, startUnit)
 			Script.LuaUI.CommSelection(playerID, startUnit) --send to widgets as event
 		end
 	end
+end
+
+local MakeRealTable = Spring.Utilities.MakeRealTable
+
+function gadget:Save(zip)
+	if VFS.FileExists("mission.lua") then -- nothing to do
+		return
+	end
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
+		return
+	end
+	local toSave = {
+		waitingForComm = MakeRealTable(SYNCED.waitingForComm, "Start setup (waitingForComm)"),
+		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn, "Start setup (scheduledSpawn)"),
+		playerSides = MakeRealTable(SYNCED.playerSides, "Start setup (playerSides)"),
+		teamSides = MakeRealTable(SYNCED.teamSides, "Start setup (teamSides)"),
+		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer, "Start setup (commSpawnedPlayer)"),
+		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam, "Start setup (commSpawnedTeam)"),
+	}
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end
 
 end

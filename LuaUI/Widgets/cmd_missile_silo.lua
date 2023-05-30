@@ -51,7 +51,8 @@ local function GetMissiles(siloID, justOne)
 	for i=1,#units do
 		local unitID = units[i]
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-		if Spring.GetUnitRulesParam(unitID, "missile_parentSilo") == siloID then
+		if Spring.GetUnitRulesParam(unitID, "missile_parentSilo") == siloID
+			and Spring.GetUnitRulesParam(unitID, "do_not_save") ~= 1 then	-- not already launched
 			if justOne and buildProgress == 1 then
 				local spawnedFrame = Spring.GetUnitRulesParam(unitID, "missile_spawnedFrame") or 999998
 				if spawnedFrame < oldestFrame then

@@ -93,7 +93,7 @@ function script.AimWeapon(id, heading, pitch)
 	end
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn (turret, y_axis, heading, math.rad(300) * slowMult)
+	Turn (turret, y_axis, heading, math.rad(300 * slowMult))
 	WaitForTurn (turret, y_axis)
 
 	StartThread (RestoreAfterDelay)

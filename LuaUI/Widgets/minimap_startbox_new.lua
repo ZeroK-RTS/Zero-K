@@ -289,6 +289,13 @@ function widget:Initialize()
 	boxMinimapList = gl.CreateList(drawBoxesMinimap)
 end
 
+function widget:Update()
+	if Spring.GetGameRulesParam("totalSaveGameFrame") then
+		Spring.SendCommands("forcestart")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 function widget:Shutdown()
 	gl.DeleteList(xformList)
 	gl.DeleteList(coneList)

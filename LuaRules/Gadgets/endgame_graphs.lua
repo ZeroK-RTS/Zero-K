@@ -18,6 +18,7 @@ end
 local unitCategoryDefs = VFS.Include("LuaRules/Configs/unit_category.lua")
 
 local teamList = Spring.GetTeamList()
+local gaiaTeamID = Spring.GetGaiaTeamID()
 local allyTeamByTeam
 
 local spAreTeamsAllied = Spring.AreTeamsAllied

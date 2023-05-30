@@ -42,6 +42,15 @@ local path = aStar.GetPath(startID, goalID)
 ---------------------------------------------------------------------
 ---------------------------------------------------------------------
 
+local function GetSetCount(set)
+  local count = 0
+  for _ in pairs(set) do
+    count = count + 1
+  end
+  return count
+end
+
+
 local function ReconstructPath(parents, node)
   local path = {}
   repeat

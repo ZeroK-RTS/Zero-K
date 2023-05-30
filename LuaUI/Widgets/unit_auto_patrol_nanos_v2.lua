@@ -535,7 +535,8 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -571,6 +572,7 @@ end
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if debug and
 			unitTeam == spGetMyTeamID() and
+			not spGetGameRulesParam("loadPurge") and
 			IsImmobileBuilder(UnitDefs[unitDefID]) then
 		Log("UnitCommand ", unitID, ": ", cmdID, " (", cmdParams[1], ", ",
 				cmdParams[2], ", ", cmdParams[3], ", ", cmdParams[4],
@@ -580,7 +582,8 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	if not enableIdleNanos
 			or cmdOptions.internal
 			or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -611,7 +614,8 @@ end
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 
@@ -626,7 +630,8 @@ end
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if not enableIdleNanos or stoppedUnit[unitID]
 			or unitTeam ~= spGetMyTeamID()
-			or not IsImmobileBuilder(UnitDefs[unitDefID]) then
+			or not IsImmobileBuilder(UnitDefs[unitDefID])
+			or spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 

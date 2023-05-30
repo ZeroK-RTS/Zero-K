@@ -21,11 +21,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local CMD_ONOFF = CMD.ONOFF
+include("LuaRules/Configs/customcmds.h.lua")
 
-local customCMD = Spring.Utilities.CMD
-local CMD_WANT_ONOFF = customCMD.WANT_ONOFF
-local CMD_PUSH_PULL  = customCMD.PUSH_PULL
+local CMD_ONOFF = CMD.ONOFF
 
 local wantOnOffCmdDesc = {
 	id      = CMD_WANT_ONOFF,

@@ -389,6 +389,7 @@ local function CauseVictory(victoryAllyTeamID)
 		Spring.Echo("CauseVictory", victoryAllyTeamID)
 	end
 	local allylist = spGetAllyTeamList()
+	local count = 0
 	for _, allyTeamID in pairs(allylist) do
 		if allyTeamID ~= victoryAllyTeamID and allyTeamID ~= gaiaAllyTeamID then
 			DestroyAlliance(allyTeamID)
@@ -701,6 +702,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if spGetGameRulesParam("loadPurge") == 1 then
+		return
+	end
+	
 	if (teamID ~= gaiaTeamID)
 	  and(not doesNotCountList[unitDefID])
 	  and finishedUnits[unitID]

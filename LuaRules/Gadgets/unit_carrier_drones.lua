@@ -875,3 +875,21 @@ function gadget:Shutdown()
 		Spring.DestroyUnit(unitID, true)
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+local function LoadDrone(unitID, parentID)
+	Spring.DestroyUnit(unitID, false, true)
+end
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local parentID = Spring.GetUnitRulesParam(unitID, "parent_unit_id")
+		if parentID then
+			LoadDrone(unitID, parentID)
+		end
+	end
+end
+

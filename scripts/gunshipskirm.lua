@@ -21,8 +21,8 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	Turn(lWing,z_axis, 0, 1)
-	Turn(rWing,z_axis, 0, 1)
+	Turn(lWing,z_axis, math.rad(0),1)
+	Turn(rWing,z_axis, math.rad(0),1)
 end
 
 function script.QueryWeapon(num)

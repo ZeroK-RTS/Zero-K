@@ -44,7 +44,7 @@ local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
-local THIGH_FRONT_ANGLE = math.rad(-60)
+local THIGH_FRONT_ANGLE = -math.rad(60)
 local THIGH_FRONT_SPEED = math.rad(40) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(40) * PACE
@@ -53,15 +53,15 @@ local SHIN_FRONT_SPEED = math.rad(60) * PACE
 local SHIN_BACK_ANGLE = math.rad(15)
 local SHIN_BACK_SPEED = math.rad(60) * PACE
 
-local ARM_FRONT_ANGLE = math.rad(-15)
+local ARM_FRONT_ANGLE = -math.rad(15)
 local ARM_FRONT_SPEED = math.rad(14.5) * PACE
 local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(14.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
 --[[
-local FOREARM_FRONT_ANGLE = math.rad(-15)
+local FOREARM_FRONT_ANGLE = -math.rad(15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = math.rad(-10)
+local FOREARM_BACK_ANGLE = -math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(40) * PACE
 ]]--
 
@@ -194,9 +194,9 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
-		Turn(rarm, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(rarm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(rhand, x_axis, 0, ARM_SPEED_PITCH)
+		Turn(rhand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreLaser)
@@ -208,9 +208,9 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_DGUN)
 		SetSignalMask(SIG_DGUN)
 		isDgunning = true
-		Turn(larm, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(larm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
+		Turn(lnanohand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreDGun)

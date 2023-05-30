@@ -83,7 +83,7 @@ local function Stopping()
 	
 	Move(base, y_axis, 0, 200)
 	Move(base, z_axis, 0, 200)
-	Turn(base, z_axis, 0, math.rad(200))
+	Turn(base, z_axis, math.rad(-(0)), math.rad(200))
 end
 
 function script.StartMoving()

@@ -220,6 +220,9 @@ end
 
 local REPAIR_ORDER_PARAMS = {0, CMD_REPAIR, CMD_OPT_RIGHT, 0} -- static because only the 4th parameter changes
 
+local workaround_recursion_in_cmd_fallback = {}
+local workaround_recursion_in_cmd_fallback_needed = false
+
 local wantForceCompleteFrameZero = false
 local freeTerraform = false
 local debugMode = false
@@ -3208,7 +3211,20 @@ function gadget:GameFrame(n)
 	if n == 0 and wantForceCompleteFrameZero then
 		DoTerraformUpdate(n, true)
 	end
-
+	
+	if workaround_recursion_in_cmd_fallback_needed then
+		for unitID, terraID in pairs(workaround_recursion_in_cmd_fallback) do
+			REPAIR_ORDER_PARAMS[4] = terraID
+			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		end
+		workaround_recursion_in_cmd_fallback = {}
+		workaround_recursion_in_cmd_fallback_needed = false
+	end
+	
+	--if n % 300 == 0 then
+	--    GG.Terraform_RaiseWater(-20)
+	--end
+	
 	if n >= nextUpdateCheck then
 		updatePeriod = math.max(MIN_UPDATE_PERIOD, min(MAX_UPDATE_PERIOD, terraformOperations/60))
 		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
@@ -3343,13 +3359,17 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			end
 		end
 	end
-
+	
 	if closestID then
-		REPAIR_ORDER_PARAMS[4] = closestID
-		spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		--[[ Recursion not allowed.
+			REPAIR_ORDER_PARAMS[4] = closestID
+			spGiveOrderToUnit(unitID, CMD_INSERT, REPAIR_ORDER_PARAMS, CMD_OPT_ALT)
+		]]
+		workaround_recursion_in_cmd_fallback[unitID] = closestID
+		workaround_recursion_in_cmd_fallback_needed = true
 		return true, false
 	end
-
+	
 	fallbackCommands[teamID][cmdParams[4]] = nil
 	return false
 end
@@ -3472,6 +3492,7 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 end
 
 function gadget:Explosion(weaponID, x, y, z, owner)
+	
 	if SeismicWeapon[weaponID] then
 		local height = spGetGroundHeight(x,z)
 		
@@ -3536,10 +3557,7 @@ end
 -- Death Explosion Terraform
 --------------------------------------------------------------------------------
 
-local function DeregisterStructure(unitID)
-	if not structure[unitID] then
-		return
-	end
+local function deregisterStructure(unitID)
 	if structure[unitID].checkAtDeath then
 		for i = 1, terraformOrders do
 			if (structure[unitID].minx < terraformOrder[i].border.right and
@@ -3572,7 +3590,7 @@ local function DeregisterStructure(unitID)
 						
 						if recalc then
 							updateTerraformEdgePoints(oid)
-							EchoDebug(id, "DeregisterStructure update cost")
+							EchoDebug(id, "deregisterStructure update cost")
 							updateTerraformCost(oid)
 						end
 					end
@@ -3603,109 +3621,8 @@ local function DeregisterStructure(unitID)
 	end
 	structureCount = structureCount - 1
 	structure[unitID] = nil
+	
 end
-
-local function RegisterStructure(unitID, ud)
-	local ux, uy, uz = spGetUnitPosition(unitID)
-	ux = floor((ux+4)/8)*8
-	uz = floor((uz+4)/8)*8
-	local face = spGetUnitBuildFacing(unitID)
-	local xsize = ud.xsize*4
-	local ysize = (ud.zsize or ud.ysize)*4
-	
-	structureCount = structureCount + 1
-	
-	if ((face == 0) or(face == 2)) then
-		structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-		minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
-	else
-		structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
-		minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
-	end
-	
-	if structure[unitID].minx == 0 then
-		structure[unitID].minx = -8
-	end
-	if structure[unitID].minz == 0 then
-		structure[unitID].minz = -8
-	end
-	if structure[unitID].maxx == mapWidth then
-		structure[unitID].maxx = mapWidth + 8
-	end
-	if structure[unitID].maxz == mapHeight then
-		structure[unitID].maxz = mapHeight + 8
-	end
-	
-	for i = structure[unitID].minx, structure[unitID].maxx, 8 do
-		structure[unitID].area[i] = {}
-		for j = structure[unitID].minz, structure[unitID].maxz, 8 do
-			structure[unitID].area[i][j] = true
-			AddStructure(unitID, i, j)
-		end
-	end
-	
-	structureTable[structureCount] = unitID
-	
-	-- slow update for terrain checking
-	if not structureCheckFrame[currentCheckFrame] then
-		structureCheckFrame[currentCheckFrame] = {count = 0, unit = {}}
-	end
-	structureCheckFrame[currentCheckFrame].count = structureCheckFrame[currentCheckFrame].count + 1
-	structureCheckFrame[currentCheckFrame].unit[structureCheckFrame[currentCheckFrame].count] = unitID
-	structure[unitID].frame = currentCheckFrame
-	structure[unitID].frameIndex = structureCheckFrame[currentCheckFrame].count
-	
-	currentCheckFrame = currentCheckFrame + 1
-	if currentCheckFrame > structureCheckLoopFrames then
-		currentCheckFrame = 0
-	end
-	
-	-- check if the building is on terraform
-	for i = 1, terraformOrders do
-		
-		if (structure[unitID].minx < terraformOrder[i].border.right and
-			structure[unitID].maxx > terraformOrder[i].border.left and
-			structure[unitID].minz < terraformOrder[i].border.bottom and
-			structure[unitID].maxz> terraformOrder[i].border.top) then
-			
-			for j = 1, terraformOrder[i].indexes  do
-				local oid = terraformUnitTable[terraformOrder[i].index[j]]
-
-				if (structure[unitID].minx < terraformUnit[oid].border.right and
-					structure[unitID].maxx > terraformUnit[oid].border.left and
-					structure[unitID].minz < terraformUnit[oid].border.bottom and
-					structure[unitID].maxz > terraformUnit[oid].border.top) then
-					
-					structure[unitID].checkAtDeath = true
-					
-					local recalc = false
-					local area = terraformUnit[oid].area
-					for k = 1, terraformUnit[oid].points do
-						local point = terraformUnit[oid].point[k]
-						local x, z = point.x, point.z
-						if structure[unitID].area[x] and structure[unitID].area[x][z] then
-							terraformUnit[oid].point[k].diffHeight = 0.0001
-							terraformUnit[oid].point[k].structure = true
-							if area[x] and area[x][z] then
-								area[x][z] = nil
-							end
-							recalc = true
-						end
-					end
-					
-					if recalc then
-						EchoDebug(id, "UnitCreated update cost")
-						updateTerraformCost(oid)
-						updateTerraformEdgePoints(oid)
-					end
-				end
-			end
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	local config = terraformOnUnitDestroyed[unitDefID]
@@ -3795,9 +3712,13 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 
 	if structure[unitID] then
-		DeregisterStructure(unitID)
+		deregisterStructure(unitID)
 	end
+	
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if spGetUnitIsDead(unitID) then
@@ -3823,7 +3744,102 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	-- add structure to structure table
 	if ud.isImmobile and not ud.customParams.mobilebuilding then
-		RegisterStructure(unitID, ud)
+		local ux, uy, uz = spGetUnitPosition(unitID)
+		ux = floor((ux+4)/8)*8
+		uz = floor((uz+4)/8)*8
+		local face = spGetUnitBuildFacing(unitID)
+		local xsize = ud.xsize*4
+		local ysize = (ud.zsize or ud.ysize)*4
+		
+		structureCount = structureCount + 1
+		
+		if ((face == 0) or(face == 2)) then
+			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
+			minx = ux-xsize, minz = uz-ysize, maxx = ux+xsize, maxz = uz+ysize, area = {}, index = structureCount}
+		else
+			structure[unitID] = { x = ux, z = uz , h = spGetGroundHeight(ux, uz), def = ud,
+			minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
+		end
+		
+		if structure[unitID].minx == 0 then
+			structure[unitID].minx = -8
+		end
+		if structure[unitID].minz == 0 then
+			structure[unitID].minz = -8
+		end
+		if structure[unitID].maxx == mapWidth then
+			structure[unitID].maxx = mapWidth + 8
+		end
+		if structure[unitID].maxz == mapHeight then
+			structure[unitID].maxz = mapHeight + 8
+		end
+		
+		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
+			structure[unitID].area[i] = {}
+			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
+				structure[unitID].area[i][j] = true
+				AddStructure(unitID, i, j)
+			end
+		end
+		
+		structureTable[structureCount] = unitID
+		
+		-- slow update for terrain checking
+		if not structureCheckFrame[currentCheckFrame] then
+			structureCheckFrame[currentCheckFrame] = {count = 0, unit = {}}
+		end
+		structureCheckFrame[currentCheckFrame].count = structureCheckFrame[currentCheckFrame].count + 1
+		structureCheckFrame[currentCheckFrame].unit[structureCheckFrame[currentCheckFrame].count] = unitID
+		structure[unitID].frame = currentCheckFrame
+		structure[unitID].frameIndex = structureCheckFrame[currentCheckFrame].count
+		
+		currentCheckFrame = currentCheckFrame + 1
+		if currentCheckFrame > structureCheckLoopFrames then
+			currentCheckFrame = 0
+		end
+		
+		-- check if the building is on terraform
+		for i = 1, terraformOrders do
+			
+			if (structure[unitID].minx < terraformOrder[i].border.right and
+				structure[unitID].maxx > terraformOrder[i].border.left and
+				structure[unitID].minz < terraformOrder[i].border.bottom and
+				structure[unitID].maxz> terraformOrder[i].border.top) then
+				
+				for j = 1, terraformOrder[i].indexes  do
+					local oid = terraformUnitTable[terraformOrder[i].index[j]]
+
+					if (structure[unitID].minx < terraformUnit[oid].border.right and
+						structure[unitID].maxx > terraformUnit[oid].border.left and
+						structure[unitID].minz < terraformUnit[oid].border.bottom and
+						structure[unitID].maxz > terraformUnit[oid].border.top) then
+						
+						structure[unitID].checkAtDeath = true
+						
+						local recalc = false
+						local area = terraformUnit[oid].area
+						for k = 1, terraformUnit[oid].points do
+							local point = terraformUnit[oid].point[k]
+							local x, z = point.x, point.z
+							if structure[unitID].area[x] and structure[unitID].area[x][z] then
+								terraformUnit[oid].point[k].diffHeight = 0.0001
+								terraformUnit[oid].point[k].structure = true
+								if area[x] and area[x][z] then
+									area[x][z] = nil
+								end
+								recalc = true
+							end
+						end
+						
+						if recalc then
+							EchoDebug(id, "UnitCreated update cost")
+							updateTerraformCost(oid)
+							updateTerraformEdgePoints(oid)
+						end
+					end
+				end
+			end
+		end
 	end
 end
 --------------------------------------------------------------------------------
@@ -3851,7 +3867,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Gadget API
+-- Initialise, check modoptions and register command
 
 local TerraformFunctions = {}
 
@@ -3892,24 +3908,6 @@ function TerraformFunctions.SetFreeTerraform(newFreeTerraform)
 	freeTerraform = newFreeTerraform
 end
 
-function TerraformFunctions.StructureMoveSetup(unitID, unitDefID)
-	if structure[unitID] then
-		DeregisterStructure(unitID)
-	end
-end
-
-function TerraformFunctions.StructureMoveAftermath(unitID, unitDefID)
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	ud = UnitDefs[unitDefID]
-	if ud.isImmobile and not ud.customParams.mobilebuilding then
-		RegisterStructure(unitID, ud)
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Initialise, check modoptions and register command
-
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
@@ -3941,6 +3939,18 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitDefID(unitID) == terraunitDefID then
+			spDestroyUnit(unitID)
+		end
 	end
 end
 

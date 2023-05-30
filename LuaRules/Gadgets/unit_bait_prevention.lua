@@ -36,7 +36,7 @@ local baitPreventionDefaults, targetBaitLevelDefs, targetBaitLevelArmorDefs, tar
 
 local unitBaitLevel = {}
 
-local CMD_PREVENT_BAIT = Spring.Utilities.CMD.PREVENT_BAIT
+include("LuaRules/Configs/customcmds.h.lua")
 
 local preventChaffShootingCmdDesc = {
 	id      = CMD_PREVENT_BAIT,

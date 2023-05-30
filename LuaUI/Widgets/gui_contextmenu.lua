@@ -1352,13 +1352,15 @@ local function GetMoveType(ud)
 	end
 
 	local md = ud.moveDef
-	if md.isSubmarine then
-		return "Submarine"
-	end
-
 	local smClass = Game.speedModClasses
+
 	if md.smClass == smClass.Ship then
-		return "Ship"
+		-- caveman style workaround for the lack of `md.subMarine`
+		if ud.name == "subraider" or ud.name == "subtacmissile" or ud.name == "subscout" then
+			return "Submarine"
+		else
+			return "Ship"
+		end
 	end
 
 	local slope = slopeDegrees(md.maxSlope)

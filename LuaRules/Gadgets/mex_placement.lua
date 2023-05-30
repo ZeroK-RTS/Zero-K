@@ -98,6 +98,8 @@ end
 -- Command Handling
 --------------------------------------------------------------------------------
 
+local sameOrder = {}
+
 function gadget:AllowCommand_GetWantedCommand()
 	return {[-mexDefID] = true, [CMD.INSERT] = true}
 end

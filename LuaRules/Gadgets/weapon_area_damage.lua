@@ -12,6 +12,12 @@ function gadget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local SAVE_FILE = "Gadgets/weapon_area_damage.lua"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 -- SYNCED
@@ -189,4 +195,34 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:Load(zip)
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local savedGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	local loadData = GG.SaveLoad.ReadFile(zip, "Weapon area damage", SAVE_FILE) or {}
+	explosionList = loadData
+	for i=1,#explosionList do
+		local explo = explosionList[i]
+		explo.owner = GG.SaveLoad.GetNewUnitID(explo.ownerID)
+		explo.expiry = explo.expiry - savedGameFrame
+	end
+	
+	_G.explosionList = explosionList
+	explosionCount = #explosionList
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- unsynced
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.explosionList, "Weapon area damage"))
+end
+--------------------------------------------------------------------------------
+end
+--------------------------------------------------------------------------------

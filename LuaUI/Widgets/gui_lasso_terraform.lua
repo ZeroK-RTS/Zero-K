@@ -407,7 +407,7 @@ local function completelyStopCommand()
 	volumeSelection = 0
 	
 	currentlyActiveCommand = false
-	spSetActiveCommand(nil)
+	spSetActiveCommand(-1)
 	originalCommandGiven = false
 	drawingLasso = false
 	drawingRectangle = false
@@ -480,7 +480,7 @@ local function SendCommand()
 		if s then
 			originalCommandGiven = true
 		else
-			spSetActiveCommand(nil)
+			spSetActiveCommand(-1)
 			originalCommandGiven = false
 		end
 	else
@@ -511,7 +511,7 @@ local function SendCommand()
 		if s then
 			originalCommandGiven = true
 		else
-			spSetActiveCommand(nil)
+			spSetActiveCommand(-1)
 			originalCommandGiven = false
 		end
 	end
@@ -1178,7 +1178,7 @@ function widget:MousePress(mx, my, button)
 				end
 			end
 		else
-			spSetActiveCommand(nil)
+			spSetActiveCommand(-1)
 			originalCommandGiven = false
 			return true
 		end
@@ -1619,7 +1619,7 @@ function widget:MouseRelease(mx, my, button)
 	elseif drawingRectangle then
 	
 		if button == 1 then
-			--spSetActiveCommand(nil)
+			--spSetActiveCommand(-1)
 			
 			if (not presetTerraHeight) and (terraform_type == 1 or terraform_type == 2) then
 				setHeight = true
@@ -1850,7 +1850,7 @@ function widget:MouseRelease(mx, my, button)
 		if button == 1 then
 			mouseX = mx
 			mouseY = my
-			--spSetActiveCommand(nil)
+			--spSetActiveCommand(-1)
 			drawingRamp = 2
 			return true
 		elseif button == 4 or button == 5 then

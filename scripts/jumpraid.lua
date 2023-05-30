@@ -187,7 +187,7 @@ local function walk()
 	while true do
 	
 		Move(base, y_axis, 1.5, LINEAR_SPEED)
-		Turn(low_head, z_axis, math.rad(7), ANGULAR_SPEED/4)
+		Turn(low_head, z_axis, math.rad(-(-7)), ANGULAR_SPEED/4)
 		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
 		Turn(l_leg, x_axis, math.rad(-35), ANGULAR_SPEED*1.4)
@@ -220,7 +220,7 @@ local function walk()
 		Move(l_shin, y_axis, .5, LINEAR_SPEED*2)
 	
 		Move(base, y_axis, 1.5, LINEAR_SPEED)
-		Turn(low_head, z_axis, math.rad(-7), ANGULAR_SPEED/4)
+		Turn(low_head, z_axis, math.rad(-(7)), ANGULAR_SPEED/4)
 		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
 		Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED*1.4)
@@ -266,7 +266,7 @@ function script.StopMoving()
 	
 	Move(base, y_axis, 0, LINEAR_SPEED)
 	if not firing then
-		Turn(low_head, z_axis, 0, ANGULAR_SPEED)
+		Turn(low_head, z_axis, math.rad(-(0)), ANGULAR_SPEED)
 		Turn(low_head, x_axis, 0, ANGULAR_SPEED)
 	end
 	

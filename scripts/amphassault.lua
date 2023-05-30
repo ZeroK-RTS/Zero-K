@@ -26,8 +26,8 @@ local function Bob()
 	Turn(rbleg, x_axis, math.rad(-20),math.rad(60))
 	Turn(rbfoot, x_axis, math.rad(20),math.rad(60))
 	
-	Move(rfleg, y_axis, 0, 1)
-	Move(rbleg, y_axis, 0, 1)
+	Move(rfleg, y_axis, 0,1)
+	Move(rbleg, y_axis, 0,1)
 	
 	Turn(lfleg, x_axis, math.rad(20),math.rad(60))
 	Turn(lffoot, x_axis, math.rad(-20),math.rad(60))
@@ -35,18 +35,34 @@ local function Bob()
 	Turn(lbleg, x_axis, math.rad(-20),math.rad(60))
 	Turn(lbfoot, x_axis, math.rad(20),math.rad(60))
 	
-	Move(lfleg, y_axis, 0, 1)
-	Move(lbleg, y_axis, 0, 1)
+	Move(lfleg, y_axis, 0,1)
+	Move(lbleg, y_axis, 0,1)
 	
 	while true do
-		Turn(base, x_axis, math.rad(2)*math.random() - math.rad(1), math.random()*math.rad(1))
-		Turn(base, z_axis, math.rad(2)*math.random() - math.rad(1), math.random()*math.rad(1))
-		Move(base, y_axis, math.rad(3)*math.random(), math.rad(1) + math.random()*math.rad(1))
+		
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)))
 		Sleep(2000)
-
-		Turn(base, x_axis, math.rad(2)*math.random() - math.rad(1), math.random()*math.rad(1))
-		Turn(base, z_axis, math.rad(2)*math.random() - math.rad(1), math.random()*math.rad(1))
-		Move(base, y_axis, math.rad(-3)*math.random(), math.rad(1) + math.random()*math.rad(1))
+		
+		--[[ Doesn't workm don't know why.
+		Turn(rfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn(rbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn(lfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn(lbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		--]]
+		
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)))
+		
 		Sleep(2000)
 	end
 end
@@ -54,20 +70,20 @@ end
 local function SinkBubbles()
 	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	
-	Turn(rfleg, x_axis, 0, math.rad(20))
-	Turn(rffoot, x_axis, 0, math.rad(20))
+	Turn(rfleg, x_axis, math.rad(0),math.rad(20))
+	Turn(rffoot, x_axis, math.rad(0),math.rad(20))
 	
-	Turn(rbleg, x_axis, 0, math.rad(20))
-	Turn(rbfoot, x_axis, 0, math.rad(20))
+	Turn(rbleg, x_axis, math.rad(0),math.rad(20))
+	Turn(rbfoot, x_axis, math.rad(0),math.rad(20))
 	
 	Move(rfleg, y_axis, 0,1)
 	Move(rbleg, y_axis, 0,1)
 	
-	Turn(lfleg, x_axis, 0, math.rad(20))
-	Turn(lffoot, x_axis, 0, math.rad(20))
+	Turn(lfleg, x_axis, math.rad(0),math.rad(20))
+	Turn(lffoot, x_axis, math.rad(0),math.rad(20))
 	
-	Turn(lbleg, x_axis, 0, math.rad(20))
-	Turn(lbfoot, x_axis, 0, math.rad(20))
+	Turn(lbleg, x_axis, math.rad(0),math.rad(20))
+	Turn(lbfoot, x_axis, math.rad(0),math.rad(20))
 	
 	Move(lfleg, y_axis, 0,1)
 	Move(lbleg, y_axis, 0,1)
@@ -167,8 +183,8 @@ local function Walk()
 		Turn(lfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
 		Turn(lffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
 		
-		Turn(lbleg, x_axis, 0, math.rad(45)*speedmult)
-		Turn(lbfoot, x_axis, 0, math.rad(46)*speedmult)
+		Turn(lbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
 
 		Move(lfleg, y_axis, 1,4.4*speedmult)
 		Move(lbleg, y_axis, 1,2*speedmult)
@@ -184,8 +200,8 @@ local function Walk()
 		Move(rbleg, y_axis, 2,2.8*speedmult)
 		
 		-- left
-		Turn(lfleg, x_axis, 0, math.rad(40)*speedmult)
-		Turn(lffoot, x_axis, 0, math.rad(80)*speedmult)
+		Turn(lfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn(lffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
 		
 		Move(lfleg, y_axis, 0,2*speedmult)
 		Move(lbleg, y_axis, 0,2*speedmult)
@@ -197,8 +213,8 @@ local function Walk()
 		Turn(rfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
 		Turn(rffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
 		
-		Turn(rbleg, x_axis, 0, math.rad(45)*speedmult)
-		Turn(rbfoot, x_axis, 0, math.rad(46)*speedmult)
+		Turn(rbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
 		
 		Move(rfleg, y_axis, 1,4.4*speedmult)
 		Move(rbleg, y_axis, 1,2*speedmult)
@@ -218,8 +234,8 @@ local function Walk()
 		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn(rfleg, x_axis, 0, math.rad(40)*speedmult)
-		Turn(rffoot, x_axis, 0, math.rad(80)*speedmult)
+		Turn(rfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn(rffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
 		
 		Move(rfleg, y_axis, 0,2)
 		Move(rbleg, y_axis, 0,2)
@@ -240,20 +256,20 @@ local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Turn(rfleg, x_axis, 0, math.rad(60))
-	Turn(rffoot, x_axis, 0, math.rad(60))
+	Turn(rfleg, x_axis, math.rad(0),math.rad(60))
+	Turn(rffoot, x_axis, math.rad(0),math.rad(60))
 	
-	Turn(rbleg, x_axis, 0, math.rad(60))
-	Turn(rbfoot, x_axis, 0, math.rad(60))
+	Turn(rbleg, x_axis, math.rad(0),math.rad(60))
+	Turn(rbfoot, x_axis, math.rad(0),math.rad(60))
 	
 	Move(rfleg, y_axis, 0,1)
 	Move(rbleg, y_axis, 0,1)
 	
-	Turn(lfleg, x_axis, 0, math.rad(60))
-	Turn(lffoot, x_axis, 0, math.rad(60))
+	Turn(lfleg, x_axis, math.rad(0),math.rad(60))
+	Turn(lffoot, x_axis, math.rad(0),math.rad(60))
 	
-	Turn(lbleg, x_axis, 0, math.rad(60))
-	Turn(lbfoot, x_axis, 0, math.rad(60))
+	Turn(lbleg, x_axis, math.rad(0),math.rad(60))
+	Turn(lbfoot, x_axis, math.rad(0),math.rad(60))
 	
 	Move(lfleg, y_axis, 0,1)
 	Move(lbleg, y_axis, 0,1)
@@ -270,11 +286,11 @@ end
 
 function script.Create()
 	
-	Turn(rfleg, x_axis, 0)
-	Turn(rffoot, x_axis, 0)
+	Turn(rfleg, x_axis, math.rad(0))
+	Turn(rffoot, x_axis, math.rad(0))
 	
-	Turn(rbleg, x_axis, 0)
-	Turn(rbfoot, x_axis, 0)
+	Turn(rbleg, x_axis, math.rad(0))
+	Turn(rbfoot, x_axis, math.rad(0))
 	StartThread(GG.Script.SmokeUnit, unitID, {turret})
 end
 

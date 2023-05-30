@@ -34,32 +34,22 @@ local flashTime = 0
 
 local FLASH_PERIOD = 0.4
 
-local flashStateDefs
-
-local UpdateFont
-
-local function UpdateFlashStateDefs()
-	local opacity = options and options.nukeWarningOpacity and (options.nukeWarningOpacity.value / 100.0) or 0.6
-
-	flashStateDefs = {
-		{
-			color = {1,0.2,0,opacity},
-			outlinecolor = {0.3,0.1,0,opacity},
-		},
-		{
-			color = {0.9,0.6,0.1,opacity},
-			outlinecolor = {0.25,0.15,0,opacity},
-		}
-	}
-
-	if currentlyShown then UpdateFont(flashState) end
-end
+local flashStateDefs = {
+	{
+		color = {1,0.2,0,1},
+		outlinecolor = {0.3,0.1,0,1},
+	},
+	{
+		color = {0.9,0.6,0.1,1},
+		outlinecolor = {0.25,0.15,0,1},
+	},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Update Text
 
-function UpdateFont(state)
+local function UpdateFont(state)
 	local c = flashStateDefs[state].color
 	local o = flashStateDefs[state].outlinecolor
 	mainWindow.label.font:SetColor(c[1],c[2],c[3], c[4])
@@ -76,15 +66,10 @@ end
 local function CreateWindow()
 	local data = {}
 	
-	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	local screenWidth = Spring.GetViewGeometry()
 	local screenHorizCentre = screenWidth / 2
+	local windowWidth = 500
 	local resourcePanelHeight = 100
-
-	local isHuge = options and options.nukeWarningIsHuge and options.nukeWarningIsHuge.value
-
-	local windowWidth = isHuge and (screenWidth - 10) or 500
-	local windowHeight = isHuge and (screenHeight - 2*resourcePanelHeight) or 50
-	local fontSize = isHuge and 200 or 32
 
 	data.window = Chili.Window:New{
 		parent = screen0,
@@ -95,7 +80,7 @@ local function CreateWindow()
 		x = screenHorizCentre - windowWidth/2,
 		y = resourcePanelHeight,
 		clientWidth  = windowWidth,
-		clientHeight = windowHeight,
+		clientHeight = 50,
 		dockable = false,
 		draggable = false,
 		resizable = false,
@@ -115,7 +100,7 @@ local function CreateWindow()
 		align  = "center",
 		autosize = false,
 		font   = {
-			size = fontSize,
+			size = 32,
 			outline = true,
 			outlineWidth = 6,
 			outlineWeight = 6,
@@ -176,7 +161,6 @@ function widget:Initialize()
 		return
 	end
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
-	UpdateFlashStateDefs()
 end
 
 function widget:Update(dt)
@@ -210,35 +194,3 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-options_path = "Settings/Accessibility"
-options_order = { "mainlabel", "nukeWarningIsHuge", "nukeWarningOpacity" }
-
-options = {
-	mainlabel = {name='Nuclear launch warning', type='label'},
-	nukeWarningIsHuge = {
-		name = "Full-screen nuclear launch warning",
-		type = "bool",
-		value = false,
-		noHotkey = true,
-		OnChange = function (self)
-			if mainWindow and mainWindow.window then
-				mainWindow.window:Dispose()
-				mainWindow = nil
-				currentlyShown = false
-			end
-
-			if wantedShown then
-				ShowWindow()
-			end
-		end
-	},
-	nukeWarningOpacity = {
-		name = "Nuclear launch warning opacity",
-		type = "number",
-		value = 100,
-		min = 1, max = 100, step = 1,
-		advanced = true,
-		OnChange = UpdateFlashStateDefs
-	},
-}

@@ -196,7 +196,7 @@ local function MouseRelease(x, y)
 	end
 	
 	if (not shift) or clickRight then
-		Spring.SetActiveCommand(nil)
+		Spring.SetActiveCommand(-1)
 	end
 	
 	GiveNotifyingOrder(clickCommandID, {clickTargetID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))

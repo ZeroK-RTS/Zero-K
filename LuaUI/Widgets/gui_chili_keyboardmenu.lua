@@ -1236,7 +1236,7 @@ end
 function widget:MousePress(x,y,button)
 	if build_mode and button == 3 then
 		UpdateButtons()
-		Spring.SetActiveCommand(nil)
+		Spring.SetActiveCommand(0)
 		BuildMode(false)
 		return true
 	end

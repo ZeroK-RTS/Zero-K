@@ -754,3 +754,15 @@ function gadget:Initialize()
 	end
 	
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		if Spring.GetUnitRulesParam(unitID, "comm_level") then
+			ApplyModuleEffectsFromUnitRulesParams(unitID)
+		end
+	end
+end

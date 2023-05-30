@@ -45,7 +45,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
-local legBackwardTheta = math.rad(-45)
+local legBackwardTheta = -math.rad(45)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
@@ -96,7 +96,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(450))
-	Turn(barrel, x_axis, math.max(-pitch - math.rad(15), math.rad(-90)), math.rad(180))
+	Turn(barrel, x_axis, math.max(-pitch - math.rad(15), -math.rad(90)), math.rad(180))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel, x_axis)
 	StartThread(RestoreAfterDelay)

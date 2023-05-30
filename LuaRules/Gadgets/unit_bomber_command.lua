@@ -47,12 +47,7 @@ local CMD_OPT_ALT      = CMD.OPT_ALT
 local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
 local CMD_OPT_SHIFT    = CMD.OPT_SHIFT
 
-local customCMD = Spring.Utilities.CMD
-local CMD_REARM       = customCMD.REARM
-local CMD_FIND_PAD    = customCMD.FIND_PAD
-local CMD_RAW_MOVE    = customCMD.RAW_MOVE
-local CMD_RAW_BUILD   = customCMD.RAW_BUILD
-local CMD_EXCLUDE_PAD = customCMD.EXCLUDE_PAD
+include "LuaRules/Configs/customcmds.h.lua"
 
 local airpadDefs = VFS.Include("LuaRules/Configs/airpad_defs.lua", nil, VFS.GAME)
 

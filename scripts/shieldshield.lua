@@ -52,7 +52,6 @@ local k_speed = 2
 local walk = 2
 local aim = 4
 local SIG_Flutter = 1
-local SIG_FLOAT = 8
 
 local function Walk()
 	Signal(walk)
@@ -145,63 +144,6 @@ local function Flutter()
 	end
 end
 
-local function dustBottom()
-	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID, base)
-	Spring.SpawnCEG("uw_amphlift", x1, y1, z1, 0, 0, 0, 0)
-end
-
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
--- Swim gadget callins
-
-local function riseFloat_thread()
-	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT + walk)
-
-	Turn(lf_ball, y_axis, 0, 0.8)
-	Turn(lb_ball, y_axis, 0, 0.8)
-	Turn(rf_ball, y_axis, 0, 0.8)
-	Turn(rb_ball, y_axis, 0, 0.8)
-	
-	Turn(lf_knee, x_axis, 0, 0.8)
-	Turn(lb_knee, x_axis, 0, 0.8)
-	Turn(rf_knee, z_axis, 0, 0.8)
-	Turn(rb_knee, z_axis, 0, 0.8)
-
-	Sleep(400)
-
-	while true do
-		Turn(lf_knee, x_axis, math.random()*2 - 1, 0.16)
-		Turn(lb_knee, x_axis, math.random()*2 - 1, 0.16)
-		Turn(rf_knee, z_axis, math.random()*2 - 1, 0.16)
-		Turn(rb_knee, z_axis, math.random()*2 - 1, 0.16)
-		
-		Turn(lf_ball, y_axis,  math.random() - 0.5, 0.2)
-		Turn(lb_ball, y_axis,  math.random() - 0.5, 0.2)
-		Turn(rf_ball, y_axis,  math.random() - 0.5, 0.2)
-		Turn(rb_ball, y_axis,  math.random() - 0.5, 0.2)
-		Sleep(500)
-	end
-end
-
-function Float_startFromFloor()
-	dustBottom()
-	Signal(walk)
-	StartThread(riseFloat_thread)
-end
-
-function Float_stopOnFloor()
-	dustBottom()
-	Signal(SIG_FLOAT)
-end
-
-function unit_teleported(position)
-	return GG.Floating_UnitTeleported(unitID, position)
-end
-
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
-
 function script.Create()
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)	-- don't lose jitter effect with on/off button
 	Turn(lf_leaf, x_axis, l_angle, 1)
@@ -270,7 +212,6 @@ local function Stopping()
 	Turn(lb_knee, z_axis, 0, 1)
 	Turn(rb_knee, x_axis, 0, 1)
 	Turn(rb_knee, z_axis, 0, 1)
-	GG.Floating_StopMoving(unitID)
 end
 
 function script.StartMoving()

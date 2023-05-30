@@ -103,6 +103,7 @@ local unitsOnFire = {}
 local inWater = {}
 local inGameFrame = false
 
+_G.unitsOnFire = unitsOnFire
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function CheckImmersion(unitID)
@@ -229,4 +230,43 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:Load(zip)
+	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Units on Fire", SAVE_FILE) or {}
+	local currGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+	unitsOnFire = {}
+	for oldID, entry in pairs(loadData) do
+		local newID = GG.SaveLoad.GetNewUnitID(oldID)
+		entry.endFrame = entry.endFrame - currGameFrame
+		entry.attackerID = GG.SaveLoad.GetNewUnitID(entry.attackerID)
+		unitsOnFire[newID] = entry
+		SetUnitRulesParam(newID, "on_fire", 1, LOS_ACCESS)
+		GG.UpdateUnitAttributes(newID)
+	end
+	_G.unitsOnFire = unitsOnFire
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
+		return
+	end
+	
+	local onFire = Spring.Utilities.MakeRealTable(SYNCED.unitsOnFire, "Units on Fire")
+	--local inWater = {}	-- regenerate on init
+	
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, onFire)
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 end
