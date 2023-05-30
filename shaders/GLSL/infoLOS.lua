@@ -5,19 +5,21 @@ return {
 	definitions = {
 		Spring.GetConfigInt("HighResInfoTexture") and "#define HIGH_QUALITY" or "",
 	},
-	vertex = [[#version 130
-		varying vec2 texCoord;
-		void main() {
-			texCoord = gl_MultiTexCoord0.st;
-			gl_Position = vec4(gl_Vertex.xyz, 1.0);
-		}
+	vertex = [[
+	#version 130
+	varying vec2 texCoord;
+	void main() {
+		texCoord = gl_MultiTexCoord0.st;
+		gl_Position = vec4(gl_Vertex.xyz, 1.0);
+	}
 	]],
-	fragment = [[#version 130
-
+	fragment = [[
+	#version 130
 	#ifdef HIGH_QUALITY
 		#extension GL_ARB_texture_query_lod : enable
+		#extension GL_EXT_gpu_shader4_1 : enable
 	#endif
-	
+
 	uniform float time;
 	uniform vec4 alwaysColor;
 	uniform vec4 losColor;
@@ -28,14 +30,26 @@ return {
 	uniform sampler2D tex1;  // r = Air LOS
 	uniform sampler2D tex2;  // r = Radar coverage, g = Jammer coverage
 	varying vec2 texCoord;
-	
-	#if defined(HIGH_QUALITY) && (GL_ARB_texture_query_lod == 1)
-		//! source: http://www.ozone3d.net/blogs/lab/20110427/glsl-random-generator/
-		float rand(const in vec2 n) {
-			return fract(sin(dot(n, vec2(12.9898, 78.233))) * 43758.5453);
+
+	#ifdef HIGH_QUALITY
+		#if GL_ARB_texture_query_lod == 1
+			#define GET_TEXLOD(tex, p) (int(textureQueryLOD(tex, p).x))
+		#elif GL_EXT_gpu_shader4_1 == 1
+			#define GET_TEXLOD(tex, p) (int(textureQueryLod(tex, p).x))
+		#else
+			#define GET_TEXLOD(tex, p) (0)
+		#endif
+
+		#define HASHSCALE1 443.8975
+		float rand(vec2 p) {
+			vec3 p3  = fract(vec3(p.xyx) * HASHSCALE1);
+			p3 += dot(p3, p3.yzx + 19.19);
+			return fract((p3.x + p3.y) * p3.z);
 		}
+
+		//! source: http://www.iquilezles.org/www/articles/texture/texture.htm
 		vec4 getTexel(in sampler2D tex, in vec2 p) {
-			int lod = int(textureQueryLOD(tex, p).x);
+			int lod = GET_TEXLOD(tex, p);
 			vec2 texSize = vec2(textureSize(tex, lod));
 			vec2 off = vec2(time);
 			vec4 c = vec4(0.0);
@@ -49,7 +63,7 @@ return {
 	#else
 		#define getTexel texture2D
 	#endif
-	
+
 	void main() {
 		float los = getTexel(tex0, texCoord).r;
 		float airLos = getTexel(tex1, texCoord).r;
@@ -57,7 +71,7 @@ return {
 		float losMix = los*0.9 + airLos*0.1;
 		float radar = radarJammer.r;
 		float jammer = radarJammer.g;
-	
+
 		// The radarColor2 fringing occurs as an edge case when it has color channels at 1.0
 		// The fract() returns 0.0 for that infill while maintaining the edge falloff
 		// Our goal is as follows:
@@ -66,8 +80,8 @@ return {
 		//   - Ensure radarColor2 infill is ONLY visible in the absence of LOS
 		//   - Do not draw radarColor2 infill for color channels set to 1.0
 		//   - Ensure jamColor is ALWAYS visible, especially as it almost always is LOS
-	
-		gl_FragColor.rgb = losColor.rgb * losMix;
+
+		gl_FragColor.rgb =  losColor.rgb * losMix;
 		gl_FragColor.rgb += jamColor.rgb * jammer;
 		gl_FragColor.rgb += fract(radarColor2.rgb) * step(1.0, radar) * (1.0 - los);  // Radar infill
 		gl_FragColor.rgb += radarColor2.rgb * fract(step(0.8, radar) * radar);  // Radar inner edge/fringing
