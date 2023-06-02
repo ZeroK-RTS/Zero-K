@@ -345,7 +345,6 @@ end
 local BP2RES = 0
 local BP2RES_FACTORY = 0
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
---local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
 	local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
 
@@ -378,15 +377,6 @@ for name, ud in pairs (UnitDefs) do
 			ud.terraformspeed = bp * BP2TERRASPEED
 		end
 	end
-
-	--setting standard seismicSignature
-	--[[
-	if ud.floater or ud.canhover or ud.canfly then
-		if not ud.seismicsignature then ud.seismicsignature = 0 end
-	else
-		if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
-	end
-	]]--
 
 	--setting levelGround
 	--[[
@@ -1002,5 +992,15 @@ if (modOptions and tobool(modOptions.reveal_superweapons)) then
 		if ud.customparams.superweapon then
 			ud.customparams.reveal_at_build = 0.05
 		end
+	end
+end
+
+-- Units with nonzero signatures produce seismic pings even though we
+-- have no seismic detection, which is fairly pointless. Modders might
+-- want to set them explicitly anyway, because the defaults are "realism"
+-- oriented and therefore suck (for example hovercraft don't produce pings).
+for name, ud in pairs(UnitDefs) do
+	if not ud.seismicsignature then
+		ud.seismicsignature = 0
 	end
 end
