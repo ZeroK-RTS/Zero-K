@@ -140,13 +140,14 @@ local modrules  = {
   },
   
   system = {
+    allowTake = false,
+    enableSmoothMesh = false,
+    LuaAllocLimit = 2560,
     pathFinderSystem = 0, --(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
     pathFinderUpdateRate = 0.0000001,
     pathFinderRawDistMult = 100000,
     pfForceSingleThreaded = forceSingleThreaded,
     pfForceUpdateSingleThreaded = forceSingleThreaded,
-    allowTake = false,
-    enableSmoothMesh = false,
   },
 }
 --------------------------------------------------------------------------------
