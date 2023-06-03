@@ -6,6 +6,7 @@ local ALLY_ACCESS = {allied = true}
 
 --pieces
 local base = piece "base"
+local altar = piece "altar"
 local glow = piece "glow"
 
 local lf_leaf = piece "lf_leaf"
