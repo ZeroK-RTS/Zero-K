@@ -25,8 +25,6 @@ local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local sputGetUnitCost        = Spring.Utilities.GetUnitCost
 
 local gh = gadgetHandler
-local ghRemoveCallIn = gh.RemoveCallIn
-local ghUpdateCallIn = gh.UpdateCallIn
 
 local CMD_SELFD = CMD.SELFD
 
@@ -49,8 +47,6 @@ function gadget:Initialize()
 		local teamID = teamList[i]
 		deathTeams[teamID] = false
 	end
-
-	ghRemoveCallIn(gh, 'GameFrame')
 end
 
 function gadget:AllowCommand_GetWantedCommand()
@@ -62,10 +58,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if not needsCheck then
-		needsCheck = true
-		ghUpdateCallIn(gh, 'GameFrame')
-	end
+	needsCheck = true
 	deathTeams[unitTeam] = true
 	return true
 end
@@ -131,6 +124,9 @@ local function CheckDeathTeam(teamID)
 end
 
 function gadget:GameFrame(n)
+	if not needsCheck then
+		return
+	end
 	for i = 1, teamCount do
 		local teamID = teamList[i]
 		if deathTeams[teamID] then
@@ -138,7 +134,4 @@ function gadget:GameFrame(n)
 			deathTeams[teamID] = false
 		end
 	end
-
-	needsCheck = false
-	ghRemoveCallIn(gh, 'GameFrame')
 end

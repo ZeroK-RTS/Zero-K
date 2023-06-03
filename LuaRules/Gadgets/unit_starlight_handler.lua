@@ -48,18 +48,18 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if alreadyAdded then
 		return
 	end
-
-	gadgetHandler:UpdateCallIn("GameFrame")
 	alreadyAdded = true
 end
 
 function gadget:GameFrame(f)
+	if not alreadyAdded then
+		return
+	end
 	for satID, team in pairs(transfers) do
 		spTransferUnit(satID, team, false)
 		transfers[satID] = nil
 	end
 	alreadyAdded = false
-	gadgetHandler:RemoveCallIn("GameFrame")
 end
 
 --------------------------------------------------------------------------------
@@ -114,10 +114,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 function gadget:Initialize()
-	if not alreadyAdded then
-		gadgetHandler:RemoveCallIn("GameFrame")
-	end
-	
 	GG.Starlight_DamageFrame = {}
 	
 	for weaponDefID, _ in pairs(starlightWeapons) do
