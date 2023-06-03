@@ -295,7 +295,7 @@ local function WakeUp(thread, ...)
 	if (not good) then
 		Spring.Log(section, LOG.ERROR, err)
 		Spring.Echo("Error in WakeUp (co_resume failure)", thread.unitID)
-		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].humanName)
+		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name .. " script error")
 		RunOnError(thread)
 	end
 end
