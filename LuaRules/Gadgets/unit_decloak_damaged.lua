@@ -282,6 +282,7 @@ end
 
 function gadget:AllowUnitDecloak(unitID, objectID, weaponID)
 	recloakFrame[unitID] = currentFrame + GetActionDecloakTime(unitID)
+	return true
 end
 
 --------------------------------------------------------------------------------
