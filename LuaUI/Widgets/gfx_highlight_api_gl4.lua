@@ -158,6 +158,11 @@ local function HighlightUnitGL4(objectID, objecttype, r, g, b, alpha, edgealpha,
 	-- note that widgets are responsible for stopping the drawing of every unit that they submit!
 	uniqueID = uniqueID + 1
 	local staticmodel = (objecttype == "unitDefID" or objecttype == "featureDefID") and 1 or 0
+	if objecttype == "unitDefID" and not Spring.ValidUnitID(objectID) then
+		return false
+	elseif objecttype == "featureDefID" and not Spring.ValidFeatureID(objectID) then
+		return false
+	end
 	-- Spring.Echo("HighlightUnitGL4", objecttype, objectID, staticmodel,"to uniqueID", uniqueID, r, g, b, alpha, edgealpha, edgeexponent, animamount, px, py, pz, rotationY, highlight)
 	local elementID = pushElementInstance(highlightUnitVBOTable, {
 			px or 0, py or 0, pz or 0, rotationY or 0,
