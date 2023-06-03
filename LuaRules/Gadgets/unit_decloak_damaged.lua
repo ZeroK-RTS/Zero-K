@@ -264,7 +264,7 @@ function gadget:AllowUnitCloak(unitID, enemyID)
 		return false
 	end
 	
-	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1) and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) == 0)
+	local areaCloaked = (Spring.GetUnitRulesParam(unitID, "areacloaked") == 1)
 	if areaCloaked then
 		return GG.AreaCloakFinishedCharging(unitID)
 	else -- Not area cloaked
