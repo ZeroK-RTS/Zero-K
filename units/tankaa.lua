@@ -82,7 +82,7 @@ return { tankaa = {
       cylinderTargeting       = 1,
 
       customParams              = {
-        reaim_time = 4, -- COB
+        reaim_time = 1, -- looks silly when rotating otherwise (high turret and body turn rates)
         isaa = [[1]],
         light_radius = 0,
       },
