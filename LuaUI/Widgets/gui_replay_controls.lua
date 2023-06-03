@@ -451,6 +451,9 @@ function skipPreGameChatter ()
 	Spring.Echo("Skipping pregame chatter")
 	if (demoStarted) then
 		Spring.SendCommands("skip 1")
+	else
+		Spring.SendCommands("forcestart")
+		Spring.SendCommands("skip 0")
 	end
 	skipped = true
 	-- window:RemoveChild(button_skipPreGame)
