@@ -101,7 +101,6 @@ local function UpdateSpin(gainSpin, loseSpin)
 		if timeDiff > maxStoreFrames then
 			timeDiff = defaultTimeFrames
 		end
-		local _, _, z = Spring.GetUnitPosition(unitID)
 		spinMult = spinMult + spinMult * maxLoseSpinStoreTotal * timeDiff / maxStoreFrames
 		if spinMult < 0 then
 			spinMult = 0
