@@ -1006,7 +1006,7 @@
 	},
 	"missileslow" : {
 		"name" : "Zenon",
-		"description" : "Rakieta spowalniająca",
+		"description" : "Rakieta spowalniająca - mocno spowalnia jedną jednostkę i zostawia spowolnienie obszarowe",
 		"helptext" : "Jednorazowa rakieta spowalniająca dalekiego zasięgu. Nie zadaje obrażeń, lecz silnie spowalnia pojedynczy cel i pozostawia obszarowe pole spowalniające."
 	},
 	"striderscorpion" : {
