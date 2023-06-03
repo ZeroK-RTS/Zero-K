@@ -288,13 +288,14 @@ local function WakeUp(thread, ...)
 	thread.container = nil
 	local co = thread.thread
 	if debugMode and not co then
-		Spring.Echo("Error in WakeUp", thread.unitID)
+		Spring.Echo("Error in WakeUp (nil coroutine)", thread.unitID)
 		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name)
 	end
 	local good, err = co_resume(co, ...)
 	if (not good) then
 		Spring.Log(section, LOG.ERROR, err)
-		Spring.Log(section, LOG.ERROR, debug.traceback(co))
+		Spring.Echo("Error in WakeUp (co_resume failure)", thread.unitID)
+		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].humanName)
 		RunOnError(thread)
 	end
 end
