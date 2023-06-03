@@ -211,6 +211,37 @@ local section = 'unit_script.lua'
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function CheckForDesiredThread()
+	if Spring.GetGameFrame() < 330*30 then
+		return
+	end
+	for unitID, data in pairs(units) do
+		if Spring.GetUnitDefID(unitID) == UnitDefNames["amphsupport"].id then
+			for thread, threadData in pairs(data.threads) do
+				if threadData.signal_mask == 128 then
+					--Spring.Utilities.UnitEcho(unitID, 'f')
+				end
+			end
+		end
+	end
+	for frame, zzz in pairs(sleepers) do
+		for i = 1, #zzz do
+			local threadData = zzz[i]
+			local unitID = threadData.unitID
+			if Spring.GetUnitDefID(unitID) == UnitDefNames["amphsupport"].id then
+				if threadData.signal_mask == 128 then
+					--Spring.Utilities.UnitEcho(unitID, 'f')
+					--Spring.Echo("frame", frame, "curFrame", Spring.GetGameFrame())
+				end
+			end
+		end
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 -- Helper for Destroy and Signal.
 -- NOTE:
 --   Must not change the relative order of all other elements!
@@ -914,6 +945,7 @@ function gadget:GameFrame()
 			PopActiveUnitID()
 		end
 	end
+	--CheckForDesiredThread()
 end
 
 --------------------------------------------------------------------------------
