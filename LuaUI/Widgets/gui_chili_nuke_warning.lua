@@ -77,12 +77,11 @@ local function CreateWindow()
 	local data = {}
 	
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
-	local screenHorizCentre = screenWidth / 2
 	local resourcePanelHeight = 100
 
 	local isHuge = options and options.nukeWarningIsHuge and options.nukeWarningIsHuge.value
 
-	local windowWidth = isHuge and (screenWidth - 10) or 500
+	local windowWidth = screenWidth - 10
 	local windowHeight = isHuge and (screenHeight - 2*resourcePanelHeight) or 50
 	local fontSize = isHuge and 200 or 32
 
@@ -92,7 +91,7 @@ local function CreateWindow()
 		color = {0, 0, 0, 0},
 		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
-		x = screenHorizCentre - windowWidth/2,
+		x = 5,
 		y = resourcePanelHeight,
 		clientWidth  = windowWidth,
 		clientHeight = windowHeight,
