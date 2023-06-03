@@ -971,7 +971,7 @@ local function CheckNeedsRecalculating()
 	return false
 end
 
-local firstUpdate = true
+local firstFewUpdates = 2
 local cumDt = 0
 local camDir
 local debounceCamUpdate
@@ -981,12 +981,18 @@ function widget:Update(dt)
 	widget:Initialize()
 	cumDt = cumDt + dt
 	
-	if firstUpdate then
+	if firstFewUpdates then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 			Initialize()
 			CheckAllTerrainChanges()
 		end
-		firstUpdate = false
+		firstFewUpdates = firstFewUpdates - 1
+		if firstFewUpdates <= 0 then
+			firstFewUpdates = false
+		end
+		if wantDrawListUpdate then
+			updateMexDrawList()
+		end
 	end
 
 	if CheckNeedsRecalculating() then
@@ -1201,7 +1207,11 @@ function updateMexDrawList()
 	if minimapDrawList then
 		gl.DeleteList(minimapDrawList)
 	end
+	if incomeLabelList then
+		gl.DeleteList(incomeLabelList)
+	end
 
+	incomeLabelList = glCreateList(DrawIncomeLabels)
 	circleOnlyMexDrawList = glCreateList(calcMainMexDrawList)
 	minimapDrawList = glCreateList(calcMinimapMexDrawList)
 	if not circleOnlyMexDrawList then
