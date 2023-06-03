@@ -27,6 +27,7 @@ return { striderfunnelweb = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    modelradius    = [[50]],
     priority_misc  = 1, -- Medium
     shield_emit_height = 45,
     unarmed       = true,
