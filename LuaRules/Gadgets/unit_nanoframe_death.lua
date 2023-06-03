@@ -73,7 +73,7 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 
 				local currentMetal = progress * FeatureDefs[wreck].metal
 				if Spring.SetFeatureResources then -- 103.0 non-dev version compat
-					Spring.SetFeatureResources(featureID, currentMetal, 0, currentMetal, progress)
+					Spring.SetFeatureResources(featureID, currentMetal, 0, nil, progress)
 				else
 					spSetFeatureReclaim(featureID, progress)
 				end
