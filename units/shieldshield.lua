@@ -19,6 +19,9 @@ return { shieldshield = {
     aimposoffset   = [[0 5 0]],
     floattoggle        = [[2]],
 
+    morphto = [[staticshield]],
+    morphtime = 30,
+
     outline_x = 80,
     outline_y = 80,
     outline_yoff = 12.5,
