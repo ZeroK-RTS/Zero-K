@@ -215,7 +215,12 @@ options_path = "Settings/Accessibility"
 options_order = { "mainlabel", "nukeWarningIsHuge", "nukeWarningOpacity" }
 
 options = {
-	mainlabel = {name='Nuclear launch warning', type='label'},
+	mainlabel = {
+		name='Nuclear launch warning',
+		type='label',
+		simpleMode = true,
+		everyMode = true,
+	},
 	nukeWarningIsHuge = {
 		name = "Full-screen nuclear launch warning",
 		type = "bool",
@@ -231,7 +236,9 @@ options = {
 			if wantedShown then
 				ShowWindow()
 			end
-		end
+		end,
+		simpleMode = true,
+		everyMode = true,
 	},
 	nukeWarningOpacity = {
 		name = "Nuclear launch warning opacity",
@@ -239,6 +246,8 @@ options = {
 		value = 100,
 		min = 1, max = 100, step = 1,
 		advanced = true,
-		OnChange = UpdateFlashStateDefs
+		OnChange = UpdateFlashStateDefs,
+		simpleMode = true,
+		everyMode = true,
 	},
 }
