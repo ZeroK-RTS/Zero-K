@@ -124,11 +124,16 @@ end
 
 Spring.Utilities.MakeRealTable = MakeRealTable
 
-local function TableEcho(data, name, indent, tableChecked)
+local function TableEcho(data, name, depthLimit, indent, tableChecked)
 	name = name or "TableEcho"
+	depthLimit = depthLimit or 20
 	indent = indent or ""
 	if (not tableChecked) and type(data) ~= "table" then
 		Spring.Echo(indent .. name, data)
+		return
+	end
+	if depthLimit and depthLimit <= 0 then
+		Spring.Echo(indent .. name, "Table at depth limit")
 		return
 	end
 	Spring.Echo(indent .. name .. " = {")
@@ -137,7 +142,7 @@ local function TableEcho(data, name, indent, tableChecked)
 		local name = tostring(nameRaw)
 		local ty = type(v)
 		if ty == "table" then
-			TableEcho(v, name, newIndent, true)
+			TableEcho(v, name, depthLimit and (depthLimit - 1), newIndent, true)
 		elseif ty == "boolean" then
 			Spring.Echo(newIndent .. name .. " = " .. (v and "true" or "false"))
 		elseif ty == "string" or ty == "number" then
