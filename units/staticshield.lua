@@ -12,9 +12,6 @@ return { staticshield = {
   buildPic                      = [[staticshield.png]],
   canMove                       = true, -- for queuing orders during morph to mobile
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[30 39 30]],
-  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
   explodeAs                     = [[BIG_UNITEX]],
   floater                       = true,
@@ -36,6 +33,7 @@ return { staticshield = {
   yardMap                       = [[oooo]],
 
   customParams        = {
+    aimposoffset   = [[0 5 0]],
     removewait     = 1,
 
     morphto = [[shieldshield]],

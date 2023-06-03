@@ -11,19 +11,13 @@ return { shieldshield = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[34 39 29]],
-  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    modelradius    = [[17]],
-    
-    morphto = [[staticshield]],
-    morphtime = 30,
-    
     priority_misc = 1, -- Medium
     unarmed       = true,
+    aimposoffset   = [[0 5 0]],
+    floattoggle        = [[2]],
 
     outline_x = 80,
     outline_y = 80,
@@ -43,7 +37,6 @@ return { shieldshield = {
   moveState              = 0,
   objectName             = [[m-8.s3o]],
   onoffable              = true,
-  pushResistant          = 0,
   script                 = [[shieldshield.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 300,

@@ -5,6 +5,7 @@ local ALLY_ACCESS = {allied = true}
 
 --pieces
 local base = piece "base"
+local altar = piece "altar"
 local glow = piece "glow"
 
 local lf_leaf = piece "lf_leaf"
@@ -36,10 +37,10 @@ local function hover()
 	while true do
 		local shieldEnabled, shieldHealth = spGetUnitShieldState(unitID)
 		Spin(glow, y_axis, shieldEnabled and (shieldHealth / 3000) or 0)
-		Move(glow, y_axis, math.random(11,15), 2)
+		Move(glow, y_axis, math.random()*4 + 8, 1.8)
 		WaitForMove(glow, y_axis)
 		Sleep (200)
-		Move(glow, y_axis, math.random(4,9), 2)
+		Move(glow, y_axis, math.random()*4 + 3, 1.8)
 		WaitForMove(glow, y_axis)
 		Sleep (200)
 	end
@@ -81,7 +82,7 @@ function script.Create()
 	-- FIXME: these should be reflected in the model (building ghost mismatch)
 	local isMorphed = Spring.GetGameRulesParam("morphUnitCreating") == 1
 	local rotSpeed = isMorphed and math.rad(10) or nil -- needs 'or nil' because Turn doesn't accept 'false'
-	Move(base, y_axis, -8, isMorphed and 2 or nil)
+	Move(altar, y_axis, -7, isMorphed and 2 or nil)
 	Turn(lf_knee, x_axis, math.rad(-45), rotSpeed)
 	Turn(lf_knee, z_axis, math.rad( 45), rotSpeed)
 	Turn(lb_knee, x_axis, math.rad( 45), rotSpeed)
@@ -110,7 +111,7 @@ function script.Deactivate()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, SFX.EXPLODE)
+	Explode(altar, SFX.EXPLODE)
 	
 	Explode(lf_leaf, SFX.EXPLODE)
 	Explode(rf_leaf, SFX.EXPLODE)
