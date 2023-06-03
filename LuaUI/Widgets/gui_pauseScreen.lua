@@ -312,7 +312,7 @@ function drawPause(paused, now)
 	glPushMatrix()
 	
 	if ( diffPauseTime <= slideTime ) then
-		local group1XOffset = 0
+		local group1XOffset
 		--we are sliding
 		if ( paused ) then
 			--sliding in

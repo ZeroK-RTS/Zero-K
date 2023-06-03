@@ -23,9 +23,6 @@ end
 local DEFAULT_RADIUS = 35
 local DEFAULT_OFFSET = 35
 
-DEFAULT_RADIUS = 35
-DEFAULT_OFFSET = 35
-
 local buggeroffDefs = {}
 for unitDefID, ud in pairs(UnitDefs) do
 	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then

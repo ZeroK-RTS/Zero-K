@@ -248,15 +248,15 @@ function widget:IsAbove(x, y)
 end
 
 function widget:GetTooltip(x, y)
-	if hideTooltips then return end
-	local text = ""
-	if ( readyNukeCount > 0 ) then
-		text = "Left-Click: Select next nuke\nDouble-Click: Aim next nuke"
-	else
-		text = "Loading Nuke: " .. string.format("%.2f", highProgress * 100) .. "%"
+	if hideTooltips then
+		return
 	end
-	
-	return text
+
+	if readyNukeCount > 0 then
+		return "Left-Click: Select next nuke\nDouble-Click: Aim next nuke"
+	else
+		return string.format("Loading Nuke: %.2f%%", highProgress * 100)
+	end
 end
 
 

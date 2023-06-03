@@ -319,7 +319,7 @@ local function DrawSearchlights()
 		  local ecc
 		  local heading
 		  local baseX, baseZ
-		  local leadDist_to_height_ratio = 1
+		  local leadDist_to_height_ratio
 		  local isAboveNominalHeight = false
 		  
 		  if unitDef.isImmobile then
