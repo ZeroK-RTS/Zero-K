@@ -66,7 +66,7 @@ local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
 local maxGainStoreTotal = 0.045
-local maxLoseSpinStoreTotal = -0.12
+local maxLoseSpinStoreTotal = -0.15
 local maxStoreFrames = 150
 local defaultTimeFrames = 30
 local lastGainStoreTime = 0
@@ -101,7 +101,8 @@ local function UpdateSpin(gainSpin, loseSpin)
 		if timeDiff > maxStoreFrames then
 			timeDiff = defaultTimeFrames
 		end
-		spinMult = spinMult + math.sqrt(spinMult) * maxLoseSpinStoreTotal * timeDiff / maxStoreFrames
+		local _, _, z = Spring.GetUnitPosition(unitID)
+		spinMult = spinMult + spinMult * maxLoseSpinStoreTotal * timeDiff / maxStoreFrames
 		if spinMult < 0 then
 			spinMult = 0
 		end
