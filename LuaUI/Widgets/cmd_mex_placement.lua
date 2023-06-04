@@ -993,6 +993,7 @@ function widget:Update(dt)
 		if wantDrawListUpdate then
 			updateMexDrawList()
 		end
+		debounceCamUpdate = 0.1
 	end
 
 	if CheckNeedsRecalculating() then
@@ -1207,11 +1208,6 @@ function updateMexDrawList()
 	if minimapDrawList then
 		gl.DeleteList(minimapDrawList)
 	end
-	if incomeLabelList then
-		gl.DeleteList(incomeLabelList)
-	end
-
-	incomeLabelList = glCreateList(DrawIncomeLabels)
 	circleOnlyMexDrawList = glCreateList(calcMainMexDrawList)
 	minimapDrawList = glCreateList(calcMinimapMexDrawList)
 	if not circleOnlyMexDrawList then
