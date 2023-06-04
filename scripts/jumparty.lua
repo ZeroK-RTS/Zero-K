@@ -6,6 +6,7 @@ include "constants.lua"
 local base = piece 'base'
 local pelvis = piece 'pelvis'
 local torso = piece 'torso'
+local aim = piece 'aim'
 local rgun = piece 'rgun'
 local lgun = piece 'lgun'
 local rbarrel = piece 'rbarrel'
@@ -49,6 +50,7 @@ local WALK_RATE = math.rad(38)
 --------------------------------------------------------------------------------
 local bAiming = false
 local gun_1 = 0
+local isBursting = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -227,17 +229,13 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(lflap2, x_axis, 0, math.rad(168)*aimMult)
 	Turn(lflap3, y_axis, 0, math.rad(168)*aimMult)
 	Turn(lflap4, y_axis, 0, math.rad(168)*aimMult)
-	Turn(rgun, x_axis, - pitch + 0.15, math.rad(168)*aimMult)
-	Turn(lgun, x_axis, - pitch + 0.15, math.rad(168)*aimMult)
+	Turn(rgun, x_axis, - pitch + 0.05, math.rad(168)*aimMult)
+	Turn(lgun, x_axis, - pitch + 0.05, math.rad(168)*aimMult)
 	Turn(torso, y_axis, heading, math.rad(65)*aimMult)
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(lgun, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
-end
-
-function script.AimFromWeapon(num)
-	return torso
 end
 
 
@@ -254,8 +252,56 @@ function script.Shot(num)
 	gun_1 = 1 - gun_1
 end
 
+local function GetWeaponTargetPos(num, targetID)
+	if targetID then
+		local _,_,_, _,_,_, tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
+			function () return Spring.GetUnitPosition(targetID, true, true) end)
+		return tx, ty, tz
+	end
+	local _, _, pos = Spring.GetUnitWeaponTarget(unitID, 1)
+	if pos and type(pos) == "table" then
+		return pos[1], pos[2], pos[3]
+	end
+	return false
+end
+
+local function IsGunFree(num, gunNum, tx, ty, tz)
+	local gx, gy, gz = Spring.GetUnitPiecePosDir(unitID, flares[gunNum])
+	if not gz then
+		return false
+	end
+	--Spring.MarkerAddPoint(tx, ty, tz, "t")
+	--Spring.MarkerAddPoint(gx, gy, gz, "g")
+	return Spring.GetUnitWeaponHaveFreeLineOfFire(unitID, num, gx, gy, gz, tx, ty, tz)
+end
+
+local function ShouldBlockShot(num, targetID)
+	local tx, ty, tz = GetWeaponTargetPos(num, targetID)
+	if not tz then
+		return false
+	end
+	return not (IsGunFree(num, 0, tx, ty, tz) and IsGunFree(num, 1, tx, ty, tz))
+end
+
+function script.BlockShot(num, targetID)
+	local shouldBlock = ShouldBlockShot(num, targetID)
+	isBursting = not shouldBlock
+	return shouldBlock
+end
+
+function script.EndBurst()
+	isBursting = false
+end
+
 function script.QueryWeapon(num)
-	return flares[gun_1]
+	if isBursting and false then
+		return flares[gun_1]
+	end
+	return aim
+end
+
+function script.AimFromWeapon(num)
+	return aim
 end
 
 function script.Killed(recentDamage, maxHealth)
