@@ -58,6 +58,9 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 
+-- So units can detect when they are being or have just been teleported.
+GG.teleport_lastUnitFrame = {}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- SYNCED
@@ -507,6 +510,11 @@ function gadget:GameFrame(f)
 							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, 0, 0)
 							Spring.GiveOrderToUnit(teleportiee, CMD.WAIT, 0, 0)
 							Spring.GiveOrderToUnit(teleportiee, CMD.REMOVE, cmdTag, 0)
+							
+							local cmdID = Spring.GetUnitCurrentCommand(teleportiee)
+							if not cmdID then
+								GG.Floating_StopMoving(teleportiee)
+							end
 						end
 					end
 					

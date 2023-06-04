@@ -78,6 +78,23 @@ local buildTestUnitDefID = UnitDefNames["turretriot"].id --we use Stardust to ch
 GG.floatUnit = {}
 
 --------------------------------------------------------------------------------
+-- Utilities
+
+local function HasMovementCommand(unitID)
+	local cmdID = Spring.GetUnitCurrentCommand(unitID)
+	if not (cmdID and sinkCommand[cmdID]) then
+		return false
+	end
+	if cmdID == CMD_WAIT_AT_BEACON then
+		if (GG.teleport_lastUnitFrame[unitID] or 0) + 10 > Spring.GetGameFrame() then
+			return false
+		end
+	end
+	return true
+end
+
+
+--------------------------------------------------------------------------------
 -- Communication to script
 
 local function callScript(unitID, funcName, args)
@@ -89,7 +106,7 @@ end
 --------------------------------------------------------------------------------
 -- Float Table Manipulation
 
-local function addFloat(unitID, unitDefID, isFlying,transportCall)
+local function addFloat(unitID, unitDefID, isFlying, transportCall)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitPosition(unitID)
@@ -160,7 +177,7 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	end
 end
 
-function gadget:UnitUnloaded(unitID, unitDefID, unitTeam,transportID, transportTeam)
+local function CheckAddFlyingFloat(unitID, unitDefID)
 	if floatDefs[unitDefID] and not float[unitID] then
 		local px,py,pz = Spring.GetUnitPosition(unitID)
 		if py > Spring.GetGroundHeight(px,pz) + 20 then
@@ -169,17 +186,21 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam,transportID, transportT
 	end
 end
 
+function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	CheckAddFlyingFloat(unitID, unitDefID)
+end
+
 --------------------------------------------------------------------------------
 -- Script calls
 
 GG.Floating_StopMoving = GG.Floating_StopMoving or function() end --empty function. Defined in gadget:Initialize()
 GG.Floating_AimWeapon = GG.Floating_AimWeapon or function() end
 GG.Floating_UnitTeleported = GG.Floating_UnitTeleported or function() end
+GG.Floating_CheckAddFlyingFloat = GG.Floating_CheckAddFlyingFloat or function() end
 
 local function checkAlwaysFloat(unitID)
 	if not select(1, Spring.GetUnitIsStunned(unitID)) then
-		local cmdID = Spring.GetUnitCurrentCommand(unitID)
-		local moving = cmdID and sinkCommand[cmdID]
+		local moving = HasMovementCommand(unitID)
 		if not moving then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local px,py,pz = Spring.GetUnitPosition(unitID)
@@ -263,13 +284,11 @@ function gadget:GameFrame(f)
 			-- Check if the unit should sink
 			if checkOrder then
 				if data.transportCall > 0 then
-					local cmdID = Spring.GetUnitCurrentCommand(unitID)
-					local moving = cmdID and sinkCommand[cmdID]
+					local moving = HasMovementCommand(unitID)
 					setSurfaceState(unitID, data.unitDefID, not moving)
 					data.transportCall = data.transportCall - 1
 				elseif floatState[unitID] == FLOAT_ALWAYS then
-					local cmdID = Spring.GetUnitCurrentCommand(unitID)
-					local moving = cmdID and sinkCommand[cmdID]
+					local moving = HasMovementCommand(unitID)
 					setSurfaceState(unitID, data.unitDefID, not moving)
 				elseif floatState[unitID] == FLOAT_ATTACK then
 					local cmdID, cmdOpts = Spring.GetUnitCurrentCommand(unitID)
@@ -471,7 +490,7 @@ function gadget:Initialize()
 	end
 	
 	GG.Floating_StopMoving = function(unitID) --real function. Note: we do this in gadget:Initialize() so that only gadget that actually run will initialize GG. with a correct function
-		if floatState[unitID] == FLOAT_ALWAYS  then
+		if floatState[unitID] == FLOAT_ALWAYS then
 			checkAlwaysFloat(unitID)
 		end
 	end
@@ -543,4 +562,6 @@ function gadget:Initialize()
 			floatDisableFrame[unitID] = Spring.GetGameFrame() + frames
 		end
 	end
+	
+	GG.Floating_CheckAddFlyingFloat = CheckAddFlyingFloat
 end

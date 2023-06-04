@@ -212,6 +212,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 				
 				local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
 				if flyTime then
+					local nearDefID = Spring.GetUnitDefID(nearID)
 					flyTime = flyTime + 15 -- Sideways time.
 					
 					SetUnitDrag(nearID, 0)
@@ -219,6 +220,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 					Spring.SetUnitLeaveTracks(nearID, false)
 					IterableMap.Add(physicsRestore, nearID,
 						{
+							unitDefID = nearDefID,
 							odx = odx,
 							ty = ty,
 							odz = odz,
@@ -228,7 +230,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 							collisionResistence = -5*flyTime/MIN_FLY_TIME,
 						}
 					)
-					SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID), flyTime)
+					SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
 					GG.Floating_InterruptFloat(nearID, 60)
 				end
 			end
@@ -382,6 +384,7 @@ local function ReinstatePhysics(unitID, data)
 			Spring.SetUnitLeaveTracks(unitID, true)
 			SetUnitDrag(unitID, 1)
 			data.drag = nil
+			GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
 		end
 	end
 	

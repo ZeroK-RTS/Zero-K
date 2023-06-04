@@ -41,6 +41,7 @@ local function AddSphericalLOSCheck(unitID, unitDefID)
 		--Spring.Utilities.UnitEcho(unitID, "added")
 		units.data[units.count] = {
 			unitID = unitID,
+			unitDefID = unitDefID,
 			los = ud.losRadius,
 			airLos = ud.airLosRadius,
 			removeAfter = frame + 40,
@@ -95,6 +96,7 @@ function gadget:GameFrame(f)
 			local unitID = data.unitID
 			local valid, flying = CheckUnit(unitID, data.los, data.airLos)
 			if valid and (flying or f < data.removeAfter) then
+				GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
 				--if flying then
 				--	Spring.Utilities.UnitEcho(unitID, "F")
 				--else

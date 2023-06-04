@@ -9,9 +9,9 @@ local SIG_CEG_EFFECTS = 1
 local smokePiece = {sphere}
 
 local spinmodes = {
-	[1] = {holder = math.rad(30), sphere = 25},
-	[2] = {holder = math.rad(50), sphere = 45},
-	[3] = {holder = math.rad(100), sphere = 130},
+	[1] = {holder = math.rad(30), sphere = math.rad(25)},
+	[2] = {holder = math.rad(50), sphere = math.rad(45)},
+	[3] = {holder = math.rad(100), sphere = math.rad(130)},
 }
 
 local holderDirection = plusOrMinusOne()
@@ -54,6 +54,7 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 		if teleportieeValid then
 			Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 			GG.PokeDecloakUnit(teleportiee)
+			GG.teleport_lastUnitFrame[teleportiee] = Spring.GetGameFrame()
 		end
 		if teleporterValid then
 			GG.PokeDecloakUnit(teleporter)
