@@ -1,6 +1,8 @@
-local RET_FALSE = function() return false end
-local RET_NONE  = function() end
-local RET_TABLE = function() return {} end
+local RET_FALSE  = function() return false end
+local RET_NONE   = function() end
+local RET_TABLE  = function() return {} end
+local RET_ZERO   = function() return 0 end
+local RET_STRING = function() return "" end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
      though this can only happen for random people's forks since regular BAR & Spring build
@@ -126,6 +128,30 @@ if not math.tau then -- 104-1421 AFAICT
 	math.tau = 2 * math.pi
 end
 
+if not Spring.SetUnitBuildParams and Script.GetSynced() then -- BAR 105-552
+	Spring.SetUnitBuildParams = RET_NONE
+end
+if not Spring.GetUnitBuildParams then -- BAR 105-552
+	Spring.GetUnitBuildParams = RET_ZERO
+end
+
+if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
+	Spring.GetUnitsInScreenRectangle = RET_TABLE
+end
+
+if not Spring.SetUnitNoEngineDraw then -- BAR 105-653
+	Spring.SetUnitNoEngineDraw    = RET_NONE
+	Spring.SetFeatureNoEngineDraw = RET_NONE
+end
+if not Spring.GetUnitNoEngineDraw and not Script.GetSynced() then -- BAR 105-653
+	Spring.GetUnitNoEngineDraw    = RET_FALSE
+	Spring.GetFeatureNoEngineDraw = RET_FALSE
+end
+
+if not Spring.GetUnitInBuildStance then -- BAR 105-665
+	Spring.GetUnitInBuildStance = RET_FALSE
+end
+
 if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-710
 	--[[ This is just here so gadget code can avoid
 	     a nil check. The workaround was to apply
@@ -136,12 +162,42 @@ if not Spring.ForceTesselationUpdate and not Script.GetSynced() then -- BAR 105-
 	Spring.ForceTesselationUpdate = RET_FALSE
 end
 
+if not Spring.SetWindowGeometry then -- BAR 105-733
+	Spring.SetWindowGeometry = RET_NONE
+end
+
+if not Spring.UnitIconGetDraw and not Script.GetSynced() then -- BAR 105-800
+	Spring.UnitIconGetDraw = RET_FALSE
+end
+if not Spring.UnitIconSetDraw then -- BAR 105-800
+	Spring.UnitIconSetDraw = RET_NONE
+end
+
+if not Spring.GetTimerMicros and not Script.GetSynced() then -- BAR 105-916
+	Spring.GetTimerMicros = RET_ZERO
+end
+
+if not Spring.LevelOriginalHeightMap and Script.GetSynced() then -- BAR 105-946
+	-- NB: no Get here
+	Spring.LevelOriginalHeightMap   = RET_NONE
+	Spring.AdjustOriginalHeightMap  = RET_NONE
+	Spring.RevertOriginalHeightMap  = RET_NONE
+	Spring.AddOriginalHeightMap     = RET_ZERO
+	Spring.SetOriginalHeightMap     = RET_ZERO
+	Spring.SetOriginalHeightMapFunc = RET_ZERO
+end
+
 if not Spring.AddUnitExperience and Script.GetSynced() then -- BAR 105-961
 	local spGetUnitExperience = Spring.GetUnitExperience
 	local spSetUnitExperience = Spring.SetUnitExperience
 	Spring.AddUnitExperience = function (unitID, deltaXP)
 		spSetUnitExperience(unitID, spGetUnitExperience(unitID) + deltaXP)
 	end
+end
+
+if not Spring.SetBoxSelectionByEngine and not Script.GetSynced() then -- BAR 105-980
+	Spring.SetBoxSelectionByEngine = RET_NONE
+	Spring.GetBoxSelectionByEngine = RET_FALSE
 end
 
 if not Spring.SetFactoryBuggerOff and Script.GetSynced() then -- BAR 105-1029
@@ -158,6 +214,22 @@ if not Spring.GetFactoryBuggerOff then -- BAR 105-1029
 	end
 end
 
+if not Spring.GetSyncedGCInfo and not Script.GetSynced() then -- BAR 105-1131
+	Spring.GetSyncedGCInfo = RET_ZERO
+end
+
+if not Spring.GetKeyFromScanSymbol and not Script.GetSynced() then -- BAR 105-1169
+	Spring.GetKeyFromScanSymbol = RET_STRING
+end
+
+if not Spring.GetSelectionBox and not Script.GetSynced() then -- BAR 105-1193
+	Spring.GetSelectionBox = RET_NONE
+end
+
+if not Spring.GetPressedScans and not Script.GetSynced() then -- BAR 105-1199
+	Spring.GetPressedScans = RET_TABLE
+end
+
 if not Spring.GetCameraRotation and not Script.GetSynced() then -- BAR 105-1242
 	local spGetCameraDirection = Spring.GetCameraDirection
 	local acos = math.acos
@@ -171,9 +243,7 @@ if not Spring.GetCameraRotation and not Script.GetSynced() then -- BAR 105-1242
 end
 
 if not Spring.GetMiniMapRotation and not Script.GetSynced() then -- BAR 105-1242
-	Spring.GetMiniMapRotation = function()
-		return 0
-	end
+	Spring.GetMiniMapRotation = RET_ZERO
 end
 
 if not Spring.LoadModelTextures and not Script.GetSynced() then -- BAR 105-1244
@@ -195,6 +265,29 @@ if not Spring.GiveOrderArrayToUnit then -- BAR 105-1492
 end
 
 Game.metalMapSquareSize = Game.metalMapSquareSize or 16 -- BAR 105-1505
+
+if not Spring.SetUnitHeadingAndUpDir and Script.GetSynced() then -- BAR 105-1611
+	Spring.SetUnitHeadingAndUpDir    = RET_NONE
+	Spring.SetFeatureHeadingAndUpDir = RET_NONE
+end
+
+if not Script.GetSynced() and not Script.IsEngineMinVersion(105, 0, 1621) then
+	local originalGetSelectedUnitsSorted = Spring.GetSelectedUnitsSorted
+	Spring.GetSelectedUnitsSorted = function()
+		local units = originalGetSelectedUnitsSorted()
+		local n = units.n
+		units.n = nil
+		return units, n
+	end
+
+	local originalGetSelectedUnitsCounts = Spring.GetSelectedUnitsCounts
+	Spring.GetSelectedUnitsCounts = function()
+		local units = originalGetSelectedUnitsCounts()
+		local n = units.n
+		units.n = nil
+		return units, n
+	end
+end
 
 if not Spring.GetFeaturesInScreenRectangle and not Script.GetSynced() then -- BAR 105-1649
 	Spring.GetFeaturesInScreenRectangle = RET_TABLE
