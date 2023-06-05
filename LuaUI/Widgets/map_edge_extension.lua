@@ -365,7 +365,6 @@ local function DrawOMap(useMirrorShader)
 end
 
 local function Initialize()
-	
 	if not drawingEnabled then
 		return
 	end
@@ -424,7 +423,12 @@ function widget:Initialize()
 	Initialize()
 end
 
+local firstUpdate = true
 function widget:Update()
+	if firstUpdate then
+		firstUpdate = false
+		return
+	end
 	Initialize()
 end
 

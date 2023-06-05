@@ -357,7 +357,12 @@ function widget:Initialize()
 	Initialize()
 end
 
+local firstUpdate = true
 function widget:Update()
+	if firstUpdate then
+		firstUpdate = false
+		return
+	end
 	Initialize()
 end
 
