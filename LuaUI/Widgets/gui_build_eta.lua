@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "trepan (modified by jK) (stall ETA fixed by Google Frog)",
 		date      = "Feb, 2008",
 		license   = "GNU GPL, v2 or later",
-		layer     = -1,
+		layer     = -9,
 		enabled   = true,
 	}
 end

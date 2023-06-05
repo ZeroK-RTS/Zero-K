@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author    = "Beherith",
 		date      = "2022.03.05",
 		license   = "Lua: GNU GPL, v2 or later, GLSL code: (c) Beherith, mysterme@gmail.com ",
-		layer     = -50,
+		layer     = -5,
 		enabled   = true
 	}
 end
