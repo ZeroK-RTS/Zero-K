@@ -200,7 +200,7 @@ options = {
 	cas_height_scale = {
 		name = 'Zoom sharpening range',
 		type = 'number',
-		value = 0.65,
+		value = 0.1,
 		min = 0,
 		max = 1,
 		tooltipFunction = function(self)
@@ -216,9 +216,9 @@ options = {
 	cas_height_scale_start = {
 		name = 'Zoom start',
 		type = 'number',
-		value = 300, 
+		value = 800, 
 		min = 0,
-		max = 8000,
+		max = 4000,
 		tooltipFunction = function(self)
 			return "Current: " .. self.value .. "\nMinimum camera height for zoom scaling."
 		end,
@@ -232,9 +232,9 @@ options = {
 	cas_height_scale_end = {
 		name = 'Zoom end',
 		type = 'number',
-		value = 4000, 
+		value = 6000, 
 		min = 0,
-		max = 8000,
+		max = 16000,
 		tooltipFunction = function(self)
 			return "Current: " .. self.value .. "\nMaximum camera height for zoom scaling."
 		end,
