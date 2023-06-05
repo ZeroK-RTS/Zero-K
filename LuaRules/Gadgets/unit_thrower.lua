@@ -362,6 +362,9 @@ function gadget:Initialize()
 end
 
 local function UpdateTrajectory(unitID, data)
+	if not Spring.ValidUnitID(unitID) then
+		return true
+	end
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then

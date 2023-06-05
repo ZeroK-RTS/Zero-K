@@ -178,9 +178,9 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 end
 
 local function CheckAddFlyingFloat(unitID, unitDefID)
-	if floatDefs[unitDefID] and not float[unitID] then
-		local px,py,pz = Spring.GetUnitPosition(unitID)
-		if py > Spring.GetGroundHeight(px,pz) + 20 then
+	if unitID and unitDefID and floatDefs[unitDefID] and (not float[unitID]) and Spring.ValidUnitID(unitID) then
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		if pz and py > Spring.GetGroundHeight(px, pz) + 20 then
 			addFloat(unitID, unitDefID, true)
 		end
 	end
