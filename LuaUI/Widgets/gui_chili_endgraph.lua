@@ -29,6 +29,7 @@ local buttongroups = {
 		{"metalProduced"   , "Metal Produced", "Cumulative total of metal produced."},
 		{"metalUsed"       , "Metal Used", "Cumulative total of metal used."},
 		{"metal_income"    , "Metal Income", "Total metal income."},
+		{"metal_base_mex"  , "Base Extraction", "Cumulative total of non-overdrive metal produced by extractors."},
 		{"metal_overdrive" , "Metal Overdrive", "Cumulative total of metal produced by overdrive."},
 		{"metal_reclaim"   , "Metal Reclaimed", "Cumulative total of metal reclaimed. Includes wreckage, unit reclaim and construction cancellation."},
 		{"metal_excess"    , "Metal Excess", "Cumulative total of metal lost to excess."},
@@ -53,6 +54,7 @@ local buttongroups = {
 local rulesParamStats = {
 	metal_excess = true,
 	metal_overdrive = true,
+	metal_base_mex = true,
 	metal_reclaim = true,
 	unit_value = true,
 	unit_value_army = true,

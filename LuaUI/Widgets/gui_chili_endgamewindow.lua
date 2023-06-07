@@ -644,7 +644,7 @@ function widget:Update(dt)
 		return
 	end
 	local screenWidth, screenHeight = Spring.GetViewGeometry()
-	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.2,screenWidth*0.6,screenHeight*0.6)
+	window_endgame:SetPos(screenWidth*0.2,screenHeight*0.19,screenWidth*0.6,screenHeight*0.62)
 	statsPanel:SetPosRelative(10, 50, -(10+10), -(50+10))
 	statsSubPanel.graphButtons[1].OnClick[1](statsSubPanel.graphButtons[1])
 	awardButton:Show()
