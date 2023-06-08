@@ -28,6 +28,9 @@ return { factorycloak = {
   canMove                       = true,
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
+  selectionVolumeOffsets        = [[0 0 10]],
+  selectionVolumeScales         = [[104 50 136]],
+  selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

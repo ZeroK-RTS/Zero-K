@@ -11,6 +11,9 @@ return { tankheavyassault = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[64 64 64]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
