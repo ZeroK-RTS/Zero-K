@@ -15,7 +15,7 @@ return { vehsupport = {
   collisionVolumeScales  = [[26 30 36]],
   collisionVolumeType    = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

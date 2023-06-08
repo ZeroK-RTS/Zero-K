@@ -18,7 +18,7 @@ return { striderscorpion = {
   collisionVolumeScales         = [[60 20 80]],
   collisionVolumeType           = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[85 85 85]],
+  selectionVolumeScales  = [[128 128 128]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

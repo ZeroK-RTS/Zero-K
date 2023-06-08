@@ -14,7 +14,7 @@ return { cloakriot = {
   collisionVolumeScales  = [[26 36 26]],
   collisionVolumeType    = [[cylY]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

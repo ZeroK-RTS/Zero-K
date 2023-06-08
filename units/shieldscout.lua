@@ -14,7 +14,7 @@ return { shieldscout = {
   collisionVolumeScales  = [[34 45 27]],
   collisionVolumeType    = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[34 45 34]],
+  selectionVolumeScales  = [[51 68 51]],
   selectionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 

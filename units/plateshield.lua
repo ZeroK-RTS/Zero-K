@@ -44,7 +44,6 @@ return { plateshield = {
     solid_factory      = [[3]],
     default_spacing    = 4,
     unstick_help       = 1,
-    selectionscalemult = 1,
     cus_noflashlight   = 1,
     child_of_factory   = [[factoryshield]],
     buggeroff_offset   = 40,

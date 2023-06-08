@@ -772,11 +772,7 @@ for name, ud in pairs(UnitDefs) do
 	
 	if ud.collisionvolumescales or ud.selectionvolumescales then
 		-- Do not override default colvol because it is hard to measure.
-		
-		if ud.selectionvolumescales then
-			local dim = GetDimensions(ud.selectionvolumescales)
-			ud.selectionvolumescales  = math.ceil(dim[1]*scale) .. " " .. math.ceil(dim[2]*scale) .. " " .. math.ceil(dim[3]*scale)
-		else
+		if not ud.selectionvolumescales then
 			local size = math.max(ud.footprintx or 0, ud.footprintz or 0)*15
 			if size > 0 then
 				local dimensions, largest = GetDimensions(ud.collisionvolumescales)

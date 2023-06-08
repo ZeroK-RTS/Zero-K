@@ -12,7 +12,7 @@ return { vehriot = {
   canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

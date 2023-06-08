@@ -17,7 +17,7 @@ return { jumpcon = {
   canPatrol           = true,
   category            = [[LAND UNARMED]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[32 32 32]],
+  selectionVolumeScales  = [[48 48 48]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

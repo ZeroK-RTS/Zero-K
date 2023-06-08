@@ -15,7 +15,7 @@ return { vehcapture = {
   collisionVolumeScales  = [[26 26 50]],
   collisionVolumeType    = [[cylZ]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[40 40 50]],
+  selectionVolumeScales  = [[60 60 75]],
   selectionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 

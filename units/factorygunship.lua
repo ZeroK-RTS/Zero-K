@@ -43,7 +43,6 @@ return { factorygunship = {
     sortName = [[3]],
     modelradius    = [[43]],
     default_spacing = 8,
-    selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[plategunship]],

@@ -15,7 +15,7 @@ return { vehscout = {
   collisionVolumeScales  = [[14 14 40]],
   collisionVolumeType    = [[cylZ]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[25 25 30]],
+  selectionVolumeScales  = [[38 38 45]],
   selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 

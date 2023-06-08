@@ -12,7 +12,7 @@ return { jumparty = {
   canPatrol              = true,
   category               = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[55 55 55]],
+  selectionVolumeScales  = [[83 83 83]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

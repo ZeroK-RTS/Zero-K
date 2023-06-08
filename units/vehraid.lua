@@ -15,7 +15,7 @@ return { vehraid = {
   collisionVolumeScales  = [[26 26 36]],
   collisionVolumeType    = [[cylZ]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[28 28 34]],
+  selectionVolumeScales  = [[42 42 51]],
   selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 

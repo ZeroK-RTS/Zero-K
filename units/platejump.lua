@@ -45,7 +45,6 @@ return { platejump = {
     solid_factory      = [[3]],
     default_spacing    = 4,
     unstick_help       = 1,
-    selectionscalemult = 1,
     child_of_factory   = [[factoryjump]],
     buggeroff_offset   = 45,
 

@@ -43,7 +43,6 @@ return { plategunship = {
     sortName           = [[3]],
     modelradius        = [[43]],
     default_spacing    = 4,
-    selectionscalemult = 1,
     child_of_factory   = [[factorygunship]],
     buggeroff_offset   = 0,
 

@@ -13,7 +13,7 @@ return { shieldriot = {
   category               = [[LAND]],
   corpse                 = [[DEAD]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {

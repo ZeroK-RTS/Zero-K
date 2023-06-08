@@ -16,7 +16,7 @@ return { hoveraa = {
   collisionVolumeScales  = [[40 40 40]],
   collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

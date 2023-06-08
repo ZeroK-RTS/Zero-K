@@ -24,7 +24,6 @@ return { staticantinuke = {
     removestop     = 1,
     nuke_coverage  = 2500,
     modelradius      = [[50]],
-    selectionscalemult = 1,
 
     outline_x = 185,
     outline_y = 185,

@@ -11,7 +11,7 @@ return { terraunit = {
   collisionVolumeScales  = [[32 32 32]],
   collisionVolumeType    = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[32 16 32]],
+  selectionVolumeScales  = [[44 22 44]],
   selectionVolumeType    = [[box]],
 
   customParams           = {

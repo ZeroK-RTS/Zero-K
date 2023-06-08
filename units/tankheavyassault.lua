@@ -12,7 +12,7 @@ return { tankheavyassault = {
   canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[64 64 64]],
+  selectionVolumeScales  = [[96 96 96]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

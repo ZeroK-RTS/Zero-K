@@ -39,7 +39,6 @@ return { plateship = {
     modelradius            = [[50]],
     solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
     default_spacing        = 4,
-    selectionscalemult     = 1,
     cus_noflashlight       = 1,
     child_of_factory       = [[factoryship]],
     buggeroff_offset       = 0,

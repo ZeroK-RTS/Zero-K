@@ -42,7 +42,6 @@ return { platetank = {
     midposoffset       = [[0 0 -35]],
     modelradius        = [[50]],
     unstick_help       = 1,
-    selectionscalemult = 1,
     child_of_factory   = [[factorytank]],
     buggeroff_offset   = 45,
 

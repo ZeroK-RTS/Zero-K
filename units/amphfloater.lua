@@ -12,7 +12,7 @@ return { amphfloater = {
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

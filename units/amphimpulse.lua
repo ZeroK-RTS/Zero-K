@@ -12,7 +12,7 @@ return { amphimpulse = {
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

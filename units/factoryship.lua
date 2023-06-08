@@ -40,7 +40,6 @@ return { factoryship = {
     modelradius    = [[100]],
     solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
     default_spacing = 8,
-    selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
     cus_noflashlight = 1,

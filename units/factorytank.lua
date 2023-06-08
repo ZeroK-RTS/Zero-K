@@ -43,7 +43,6 @@ return { factorytank = {
     midposoffset   = [[0 15 -10]],
     modelradius    = [[100]],
     unstick_help   = 1,
-    selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
     parent_of_plate   = [[platetank]],

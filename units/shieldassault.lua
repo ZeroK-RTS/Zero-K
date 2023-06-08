@@ -12,7 +12,7 @@ return { shieldassault = {
   canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

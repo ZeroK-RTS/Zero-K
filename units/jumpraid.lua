@@ -12,7 +12,7 @@ return { jumpraid = {
   canPatrol             = true,
   category              = [[LAND FIREPROOF TOOFAST]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 

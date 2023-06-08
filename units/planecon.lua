@@ -8,7 +8,7 @@ return { planecon = {
   buildCostMetal      = 200,
   buildDistance       = 160,
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   builder             = true,
 

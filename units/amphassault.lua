@@ -15,7 +15,7 @@ return { amphassault = {
   --collisionVolumeScales = [[70 70 70]],
   --collisionVolumeType   = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[70 70 70]],
+  selectionVolumeScales  = [[105 105 105]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

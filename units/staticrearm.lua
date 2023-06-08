@@ -30,7 +30,6 @@ return { staticrearm = {
     nobuildpower   = 1,
     notreallyafactory = 1,
     selection_rank  = [[1]],
-    selectionscalemult = 1,
     ispad         = 1,
 
     outline_x = 250,

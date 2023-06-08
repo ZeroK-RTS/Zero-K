@@ -14,7 +14,7 @@ return { cloakassault = {
   collisionVolumeScales  = [[35 50 35]],
   collisionVolumeType    = [[cylY]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 

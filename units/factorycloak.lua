@@ -41,7 +41,6 @@ return { factorycloak = {
     solid_factory       = [[7]],
     unstick_help        = [[1]],
     unstick_help_buffer = 0.3,
-    selectionscalemult  = 1,
     factorytab          = 1,
     shared_energy_gen   = 1,
     parent_of_plate     = [[platecloak]],

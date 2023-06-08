@@ -29,7 +29,7 @@ return { factoryshield = {
   canPatrol                     = true,
   category                      = [[SINK UNARMED]],
   selectionVolumeOffsets        = [[0 0 14]],
-  selectionVolumeScales         = [[80 50 80]],
+  selectionVolumeScales         = [[108 68 108]],
   selectionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 

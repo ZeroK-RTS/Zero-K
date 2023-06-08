@@ -17,7 +17,7 @@ return { shieldcon = {
   canPatrol           = true,
   category            = [[LAND UNARMED]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

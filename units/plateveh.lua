@@ -43,7 +43,6 @@ return { plateveh = {
     midposoffset       = [[0 0 -26]],
     modelradius        = [[50]],
     unstick_help       = 1,
-    selectionscalemult = 1,
     child_of_factory   = [[factoryveh]],
 
     outline_x = 165,

@@ -17,7 +17,7 @@ return { jumpskirm = {
 --  collisionVolumeScales         = [[30 30 20]],
 --  collisionVolumeType           = [[box]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

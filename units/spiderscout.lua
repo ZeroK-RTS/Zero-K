@@ -15,7 +15,7 @@ return { spiderscout = {
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeScales  = [[42 42 42]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 

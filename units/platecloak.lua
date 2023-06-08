@@ -44,7 +44,6 @@ return { platecloak = {
     modelradius        = [[50]],
     solid_factory      = [[3]],
     unstick_help       = [[1]],
-    selectionscalemult = 1,
     child_of_factory   = [[factorycloak]],
 
     outline_x = 165,
