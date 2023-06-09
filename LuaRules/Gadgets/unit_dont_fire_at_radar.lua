@@ -61,6 +61,7 @@ local canHandleUnit = {} -- unitIDs that CAN be handled
 local units = {}
 
 local wantGoodTarget = {}
+local isImmobileCache = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -74,11 +75,15 @@ local function canShootAtUnit(targetID, allyTeam)
 	if raw % 2 == 1 then -- in LoS
 		return true
 	end
-	if floor(raw / 4) % 4 == 3 then -- typed
+	if raw >= 6 then -- at least either INRADAR + PREVLOS or CONTRADAR
 		local unitDefID = spGetUnitDefID(targetID)
-		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isImmobile then
-			return true
+		if not unitDefID then
+			return false
 		end
+		if not isImmobileCache[unitDefID] then
+			isImmobileCache[unitDefID] = (UnitDefs[unitDefID] and UnitDefs[unitDefID].isImmobile) and 1 or 0
+		end
+		return (isImmobileCache[unitDefID] == 1)
 	end
 	return false
 end
