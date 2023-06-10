@@ -320,14 +320,14 @@ end
 Game.footprintScale  = Game.footprintScale  or  2 -- BAR 105-1725
 Game.buildSquareSize = Game.buildSquareSize or 16 -- BAR 105-1725
 
-if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- future
+if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- BAR 105-1803
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
 		return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
 	end
 end
 
-if not Spring.GetPlayerRulesParam then -- future
+if not Spring.GetPlayerRulesParam then -- BAR 105-1803
 	local spGetGameRulesParam = Spring.GetGameRulesParam
 	Spring.GetPlayerRulesParam = function (playerID, key)
 		return spGetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
