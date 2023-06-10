@@ -24,8 +24,6 @@ local spGetUnitSelfDTime     = Spring.GetUnitSelfDTime
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local sputGetUnitCost        = Spring.Utilities.GetUnitCost
 
-local gh = gadgetHandler
-
 local CMD_SELFD = CMD.SELFD
 
 local teamList = Spring.GetTeamList()
@@ -111,9 +109,9 @@ local function CheckDeathTeam(teamID)
 	     the self-D command but not resign (forcing veterans to
 	     learn the new methods, which would ultimately allow us to
 	     remove the block as well). ]]
-	ghRemoveCallIn(gh, 'AllowCommand')
+	gadgetHandler.RemoveCallIn(gadgetHandler, 'AllowCommand')
 	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, 0, 0)
-	ghUpdateCallIn(gh, 'AllowCommand')
+	gadgetHandler.UpdateCallIn(gadgetHandler, 'AllowCommand')
 	if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
 		local _, leader = Spring.GetTeamInfo(teamID)
 		local playerName = (leader and Spring.GetPlayerInfo(leader)) or "Unknown"
