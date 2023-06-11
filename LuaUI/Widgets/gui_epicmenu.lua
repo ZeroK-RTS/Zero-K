@@ -2040,13 +2040,13 @@ MakeSubWindow = function(path, pause, labelScroll)
 		bottom = B_HEIGHT + 5;
 		
 		caption = 'Simple Settings',
+		tooltip = 'Untick to expand the number of graphics and interface options.',
 		checked = settings.simpleSettingsMode,
 		OnChange = {function(self)
 			settings.simpleSettingsMode = not settings.simpleSettingsMode
 			RemakeEpicMenu()
 		end },
 		objectOverrideFont = WG.GetSpecialFont(13, "epic_sub_fg", {color = color.sub_fg}),
-		tooltip   = 'For experienced users only.',
 	}
 	
 	window_children[#window_children+1] = buttonBar

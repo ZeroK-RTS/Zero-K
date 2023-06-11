@@ -455,6 +455,7 @@ local pathMisc = 'Settings/Misc'
 	AddOption(pathMisc,
 	{
 		name = 'Show Advanced Settings',
+		desc = 'Show developer tools and settings that should essentially never be disabled, except for testing.',
 		type = 'bool',
 		value = false,
 		OnChange = function (self)

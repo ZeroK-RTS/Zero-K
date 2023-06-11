@@ -84,15 +84,22 @@ options_order = {
 options = {
 	label_selection_rank = {
 		type = 'text',
-		name = 'Selection Filtering Rank',
-		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
+		name = 'Selection Rank Filtering',
+		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
+ - Normal selection only selects the boxed units with the highest rank.
+ - Shift ignores rank.
+ - Combat units default to rank 3.
+ - Constructors default to rank 2.
+ - Structures default to rank 1.
+ - Rank 0 intended for manual use to make a unit hard to accidentally select.
+ - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
 	},
 	useSelectionFilteringOption = {
 		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Filter constructors out of mixed constructor/combat unit selection.",
+		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
 		end
