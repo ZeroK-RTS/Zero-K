@@ -320,6 +320,53 @@ end
 Game.footprintScale  = Game.footprintScale  or  2 -- BAR 105-1725
 Game.buildSquareSize = Game.buildSquareSize or 16 -- BAR 105-1725
 
+if not Script.IsEngineMinVersion(105, 0, 1776) then
+	local originalSetSunDirection = Spring.SetSunDirection
+	Spring.SetSunDirection = function (x, y, z, a)
+		local n = math.diag(x, y, z)
+		return originalSetSunDirection(x / n, y / n, z / n, a)
+	end
+end
+
+if not Spring.SetUnitSeismicSignature and Script.GetSynced() then -- BAR 105-1777
+	Spring.SetUnitSeismicSignature = RET_NONE
+end
+if not Spring.GetUnitSeismicSignature then -- BAR 105-1777
+	Spring.GetUnitSeismicSignature = RET_ZERO
+end
+
+if not Spring.SelectUnit and not Script.GetSynced() then -- BAR 105-1790
+	local spSelectUnitArray = Spring.SelectUnitArray
+	Spring.SelectUnit = function (unitID, append)
+		return spSelectUnitArray({unitID}, append)
+	end
+
+	local spGetSelectedUnits = Spring.GetSelectedUnits
+	Spring.DeselectUnit = function (unitID)
+		local selected = spGetSelectedUnits()
+		for i = 1, #selected do
+			if selected[i] == unitID then
+				selected[i] = selected[#selected]
+				selected[#selected] = nil
+				spSelectUnitArray(selected)
+				return
+			end
+		end
+	end
+end
+
+if not Spring.GetUnitWorkerTask then -- BAR 105-1793
+	local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
+	Spring.GetUnitWorkerTask = function(unitID)
+		local cmdID, _, _, targetID = spGetUnitCurrentCommand(unitID)
+		return cmdID, targetID
+	end
+end
+
+if not Spring.SetUnitShieldRechargeDelay and Script.GetSynced() then -- BAR 105-1799
+	Spring.SetUnitShieldRechargeDelay = RET_NONE
+end
+
 if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- BAR 105-1803
 	local spSetGameRulesParam = Spring.SetGameRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
