@@ -71,6 +71,7 @@ end
 options_path = 'Settings/Interface/Selection'
 local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
+	'label_selection_rank',
 	'useSelectionFilteringOption',
 	'selectionFilteringOnlyAltOption',
 	'ctrlFlattenRankOption',
@@ -81,8 +82,13 @@ options_order = {
 }
 
 options = {
+	label_selection_rank = {
+		type = 'text',
+		name = 'Selection Filtering Rank',
+		value = 'Update modified custom grid hotkeys by clicking the button above. Reselecting any selected units may also be required. Note that "Apply Changes" can be bound to a key for convinence.',
+	},
 	useSelectionFilteringOption = {
-		name = "Use selection filtering",
+		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
 		noHotkey = true,

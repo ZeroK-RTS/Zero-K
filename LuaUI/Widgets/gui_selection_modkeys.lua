@@ -34,14 +34,31 @@ local CLICK_LEEWAY = 2
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Selection'
-options_order = {'enable',}
+options_order = {'enable', 'leeway_time', 'leeway_distance'}
 options = {
+	leeway_time = {
+		name = "Selection leeway time (seconds)",
+		desc = "If the mouse is clicked and released within the leeway time, and moves less than the leeway distance, then the unit clicked on will be selected.",
+		type = 'number',
+		value = 0.15,
+		min = 0, max = 1, step = 0.01,
+		noHotkey = true
+	},
+	leeway_distance = {
+		name = "Selection leeway distance (pixels)",
+		desc = "If the mouse is clicked and released within the leeway time, and moves less than the leeway distance, then the unit clicked on will be selected.",
+		type = 'number',
+		value = 150,
+		min = 0, max = 1000, step = 1,
+		noHotkey = true
+	},
 	enable = {
 		name = "New left click selection modifiers",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Implements new modifiers for left clicking on units.",
+		desc = "Implements new modifiers for left clicking on units. There is essentially no reason to disable this.",
+		advanced = true,
 	},
 }
 
@@ -183,6 +200,35 @@ local function MousePress(x, y)
 	prevClick = spGetTimer()
 end
 
+local function DoMouseClickOnClickUnit()
+	if clickUnitID then
+		local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), clickUnitID, true)
+		if newSel then
+			spSelectUnitArray(newSel)
+		end
+	end
+	Reset()
+end
+
+local function ShouldSelectClickUnit(x, y)
+	if (clickX and clickY and clickUnitID) then
+		targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
+		if targetID == clickUnitID then
+			return true, targetID
+		end
+		--Spring.Echo("Time", spDiffTimers(spGetTimer(), prevClick))
+		--Spring.Echo("Distance", math.abs(clickX - x), math.abs(clickY - y))
+		if options.leeway_time.value > 0 and options.leeway_distance.value > 0 and
+				spDiffTimers(spGetTimer(), prevClick) < options.leeway_time.value then
+			if math.abs(clickX - x) < options.leeway_distance.value and math.abs(clickY - y) < options.leeway_distance.value then
+				return true, targetID
+			end
+		end
+		return false, targetID
+	end
+	return false
+end
+
 local function MouseRelease(x, y)
 	if not options.enable.value then
 		return
@@ -195,17 +241,10 @@ local function MouseRelease(x, y)
 		return
 	end
 	
-	local targetID
-	if (clickX and clickY and clickUnitID) then
-		targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
-		if targetID == clickUnitID then
-			local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, true)
-			if newSel then
-				spSelectUnitArray(newSel)
-			end
-			Reset()
-			return
-		end
+	local shouldSelect, targetID = ShouldSelectClickUnit(x, y)
+	if shouldSelect then
+		DoMouseClickOnClickUnit()
+		return
 	end
 	
 	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
@@ -233,16 +272,18 @@ end
 
 function WG.SelectionModkeys_GetUnitReleaseWouldClick()
 	if not options.enable.value then
-		return
+		return false
 	end
-	if not (clickX and clickY and clickUnitID) then
-		return
-	end
-	local targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
-	if targetID == clickUnitID then
+	local x, y = Spring.GetMouseState()
+	local shouldSelect, targetID = ShouldSelectClickUnit(x, y)
+	if shouldSelect then
 		return clickUnitID
 	end
-	return false
+	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
+		return false
+	end
+	targetID = targetID or WG.PreSelection_GetUnitUnderCursor(true, true)
+	return targetID
 end
 
 --------------------------------------------------------------------------------
@@ -253,14 +294,10 @@ function widget:SelectionChanged(selectedUnits)
 		return
 	end
 	local x, y = Spring.GetMouseState()
-	local targetID
-	if (clickX and clickY and clickUnitID) then
-		targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
-		if targetID == clickUnitID then
-			local newSel = HandleUnitSelection(Spring.GetSelectedUnits(), targetID, true)
-			Reset()
-			return newSel
-		end
+	local shouldSelect, targetID = ShouldSelectClickUnit(x, y)
+	if shouldSelect then
+		DoMouseClickOnClickUnit()
+		return
 	end
 	
 	if not (clickX and clickY and clickUnitID) or (math.abs(clickX - x) > CLICK_LEEWAY) or (math.abs(clickY - y) > CLICK_LEEWAY) then
