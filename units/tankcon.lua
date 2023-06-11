@@ -32,7 +32,6 @@ return { tankcon = {
     outline_yoff = 12.5,
   },
 
-  energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,

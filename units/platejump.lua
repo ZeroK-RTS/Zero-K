@@ -53,7 +53,6 @@ return { platejump = {
     outline_yoff = 27.5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[FAC_PLATEEX]],
   footprintX                    = 5,
   footprintZ                    = 7,

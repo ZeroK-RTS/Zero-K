@@ -27,7 +27,6 @@ return { vehcon = {
     cus_noflashlight = 1,
   },
 
-  energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,

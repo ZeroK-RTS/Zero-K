@@ -33,7 +33,6 @@ return { shipcon = {
     outline_yoff = 16,
   },
 
-  energyUse              = 0,
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
   footprintX             = 3,

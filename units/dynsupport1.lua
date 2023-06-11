@@ -44,7 +44,6 @@ return { dynsupport1 = {
   },
 
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,

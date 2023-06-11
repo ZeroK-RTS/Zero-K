@@ -28,7 +28,6 @@ return { zenith = {
     pylonrange     = 150,
   },
   
-  energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
   fireState                     = 0,
   footprintX                    = 8,

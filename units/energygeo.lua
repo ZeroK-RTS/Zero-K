@@ -35,7 +35,6 @@ return { energygeo = {
   },
 
   energyMake                    = 25,
-  energyUse                     = 0,
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 5,
   footprintZ                    = 5,

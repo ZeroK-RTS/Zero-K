@@ -54,7 +54,6 @@ return { factorytank = {
     outline_yoff = 5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 8,
   footprintZ                    = 8,

@@ -56,7 +56,6 @@ return { factoryplane = {
     outline_yoff = 5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 8,

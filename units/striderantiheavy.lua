@@ -26,7 +26,6 @@ return { striderantiheavy = {
     stats_show_death_explosion = 1,
   },
 
-  energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 2,
   footprintZ             = 2,

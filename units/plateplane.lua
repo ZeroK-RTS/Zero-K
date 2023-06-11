@@ -50,7 +50,6 @@ return { plateplane = {
     outline_yoff = 27.5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[FAC_PLATEEX]],
   fireState                     = 0,
   footprintX                    = 6,

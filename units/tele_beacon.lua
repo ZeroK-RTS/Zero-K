@@ -11,7 +11,6 @@ return { tele_beacon = {
       dontcount = [[1]],
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[TINY_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,

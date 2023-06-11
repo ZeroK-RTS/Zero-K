@@ -33,7 +33,6 @@ return { energysingu = {
   },
 
   energyMake                    = 225,
-  energyUse                     = 0,
   explodeAs                     = [[SINGULARITY]],
   footprintX                    = 7,
   footprintZ                    = 7,

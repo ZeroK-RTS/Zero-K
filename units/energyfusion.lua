@@ -21,7 +21,6 @@ return { energyfusion = {
   },
 
   energyMake                    = 35,
-  energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 5,
   footprintZ                    = 4,

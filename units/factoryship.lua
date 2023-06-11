@@ -54,7 +54,6 @@ return { factoryship = {
     outline_yoff = 25,
   },
 
-  energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 8,
   footprintZ             = 12,

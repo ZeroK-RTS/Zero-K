@@ -40,7 +40,6 @@ return { planecon = {
     outline_yoff = 7.5,
   },
 
-  energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,

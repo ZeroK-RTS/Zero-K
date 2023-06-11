@@ -8,7 +8,6 @@ return { rocksink = {
   buildingGroundDecalType = [[zenith_aoplane.dds]],
   buildPic                = [[zenith.png]],
   category                = [[SINK GUNSHIP]],
-  energyUse               = 0,
   footprintX              = 2,
   footprintZ              = 2,
   iconType                = [[mahlazer]],

@@ -41,7 +41,6 @@ return { energywind = {
                                             the icon on the UI to check OD payback ETA) since it
                                             approximately averages the income of a wind with some
                                             penalty for unreliability. ]]
-  energyUse                     = 0,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,

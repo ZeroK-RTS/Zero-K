@@ -42,7 +42,6 @@ return { gunshipcon = {
     outline_yoff = 25,
   },
 
-  energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,

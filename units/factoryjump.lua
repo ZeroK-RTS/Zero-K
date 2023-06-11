@@ -56,7 +56,6 @@ return { factoryjump = {
     outline_yoff = 5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
   footprintZ                    = 7,

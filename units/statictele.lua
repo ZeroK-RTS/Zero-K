@@ -23,7 +23,6 @@ return { statictele = {
     priority_misc  = 1, -- Medium
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[GRAV_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 8,

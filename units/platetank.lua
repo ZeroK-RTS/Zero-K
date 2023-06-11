@@ -50,7 +50,6 @@ return { platetank = {
     outline_yoff = 27.5,
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[FAC_PLATEEX]],
   footprintX                    = 6,
   footprintZ                    = 8,

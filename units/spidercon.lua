@@ -27,7 +27,6 @@ return { spidercon = {
     selection_scale = 1.2,
   },
 
-  energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,

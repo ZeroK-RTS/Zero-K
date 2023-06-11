@@ -9,7 +9,6 @@ return { empiricaldpsersmall = {
   collisionVolumeOffsets  = [[0 -4 0]],
   collisionVolumeScales   = [[2 2 2]],
   collisionVolumeType     = [[ellipsoid]],
-  energyUse               = 0,
   footprintX              = 2,
   footprintZ              = 2,
   iconType                = [[mahlazer]],

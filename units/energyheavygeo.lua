@@ -22,7 +22,6 @@ return { energyheavygeo = {
   },
 
   energyMake                    = 100,
-  energyUse                     = 0,
   explodeAs                     = [[NUCLEAR_MISSILE]],
   footprintX                    = 5,
   footprintZ                    = 5,

@@ -65,7 +65,6 @@ return { athena = {
     outline_yoff = 12,
   },
 
-  energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,

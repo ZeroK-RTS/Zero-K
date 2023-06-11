@@ -28,7 +28,6 @@ return { hovercon = {
     turnatfullspeed_hover = [[1]],
   },
 
-  energyUse           = 0,
   explodeAs           = [[BIG_UNITEX]],
   floater             = true,
   footprintX          = 2,

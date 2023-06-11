@@ -27,7 +27,6 @@ return { staticmissilesilo = {
     missile_silo_capacity = 4,
     stats_show_death_explosion = 1,
   },
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 6,

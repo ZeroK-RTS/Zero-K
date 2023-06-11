@@ -32,7 +32,6 @@ return { staticmex = {
     outline_sea_yoff = -70,
   },
 
-  energyUse              = 0,
   explodeAs              = [[SMALL_BUILDINGEX]],
   floater                = true,
   footprintX             = 3,

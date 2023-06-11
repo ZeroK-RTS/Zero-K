@@ -16,7 +16,6 @@ return { pw_hq_attacker = {
     planetwars_structure = [[1]],
   },
 
-  energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 8,
