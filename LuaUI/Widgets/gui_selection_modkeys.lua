@@ -21,6 +21,7 @@ local spGetTimer        = Spring.GetTimer
 local spGetUnitTeam     = Spring.GetUnitTeam
 
 local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
+--MouseDragSelectionThreshold
 toleranceTime = toleranceTime + 0.03 -- fudge for Update
 
 local LEFT_CLICK = 1
@@ -225,6 +226,23 @@ local function MouseRelease(x, y)
 		spSelectUnitArray(newSel)
 	end
 	Reset()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function WG.SelectionModkeys_GetUnitReleaseWouldClick()
+	if not options.enable.value then
+		return
+	end
+	if not (clickX and clickY and clickUnitID) then
+		return
+	end
+	local targetID = WG.PreSelection_GetUnitUnderCursor(true, true)
+	if targetID == clickUnitID then
+		return clickUnitID
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------

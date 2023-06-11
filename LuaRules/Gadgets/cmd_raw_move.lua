@@ -130,7 +130,20 @@ end
 --local oldSetMoveGoal = Spring.SetUnitMoveGoal
 --function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
 --	oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
---	Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
+--	--if unitID == 3744 then
+--		Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
+--		Spring.Echo("SetGoal", unitID, x, y, z, radius, speed, raw)
+--	--end
+--end
+--
+--local oldClearUnitGoal = Spring.ClearUnitGoal
+--function Spring.ClearUnitGoal(unitID)
+--	if Spring.GetGameFrame() < 550*30 or unitID ~= 3744 then
+--		oldClearUnitGoal(unitID)
+--	end
+--	--if unitID == 3744 then
+--		Spring.Echo("ClearGoal", unitID)
+--	--end
 --end
 
 ----------------------------------------------------------------------------------------------
