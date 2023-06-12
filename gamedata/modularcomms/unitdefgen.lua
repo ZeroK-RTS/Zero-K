@@ -237,10 +237,10 @@ local function ProcessComm(name, config)
 		-- set costs
 		config.cost = config.cost or 0
 		-- a bit less of a hack
-		local commDefsCost = math.max(commDefs[name].buildcostmetal or 0, commDefs[name].buildcostenergy or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
-		commDefs[name].buildcostmetal = commDefsCost + config.cost
-		commDefs[name].buildcostenergy = commDefsCost + config.cost
-		commDefs[name].buildtime = commDefsCost + config.cost
+		local commDefsCost = math.max(commDefs[name].metalcost or 0, commDefs[name].energycost or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
+		commDefs[name].metalcost  = commDefsCost + config.cost
+		commDefs[name].energycost = commDefsCost + config.cost
+		commDefs[name].buildtime  = commDefsCost + config.cost
 		cp.cost = config.cost
 		
 		if config.power then
@@ -385,8 +385,8 @@ for name, data in pairs(commDefs) do
 			mult = 0.2
 		end
 		array.description = typeName .. " - " .. data.name
-		array.metal = data.buildcostmetal * mult
-		array.reclaimtime = data.buildcostmetal * mult
+		array.metal = data.metalcost * mult
+		array.reclaimtime = data.metalcost * mult
 		array.damage = data.maxdamage
 		array.customparams = {}
 		array.customparams.unit = data.unitname

@@ -5,7 +5,6 @@ return { amphcon = {
   acceleration        = 1.2,
   activateWhenBuilt   = true,
   brakeRate           = 1.5,
-  buildCostMetal      = 150,
   buildDistance       = 128,
   builder             = true,
 
@@ -35,6 +34,7 @@ return { amphcon = {
   maxDamage           = 850,
   maxSlope            = 36,
   maxVelocity         = 1.8,
+  metalCost           = 150,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],
   selfDestructAs      = [[BIG_UNITEX]],

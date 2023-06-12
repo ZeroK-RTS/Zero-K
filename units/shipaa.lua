@@ -6,10 +6,7 @@ return { shipaa = {
   acceleration           = 0.3,
   activateWhenBuilt   = true,
   brakeRate              = 1.0,
-
-  buildCostMetal         = 400,
   builder                = false,
-
   buildPic               = [[shipaa.png]],
   canGuard               = true,
   canMove                = true,
@@ -38,6 +35,7 @@ return { shipaa = {
   losEmitHeight          = 40,
   maxDamage              = 1900,
   maxVelocity            = 2.84,
+  metalCost              = 400,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
   moveState              = 0,

@@ -5,7 +5,6 @@ return { hovercon = {
   acceleration        = 0.4,
   activateWhenBuilt   = true,
   brakeRate           = 18.0,
-  buildCostMetal      = 125,
   buildDistance       = 170,
   builder             = true,
 
@@ -36,6 +35,7 @@ return { hovercon = {
   maxDamage           = 960,
   maxSlope            = 36,
   maxVelocity         = 2.9,
+  metalCost           = 125,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[corch.s3o]],

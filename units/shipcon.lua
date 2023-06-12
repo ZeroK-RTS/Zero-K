@@ -5,7 +5,6 @@ return { shipcon = {
   acceleration           = 0.307,
   activateWhenBuilt      = true,
   brakeRate              = 0.732,
-  buildCostMetal         = 200,
   buildDistance          = 330,
   builder                = true,
 
@@ -40,6 +39,7 @@ return { shipcon = {
   iconType               = [[builder]],
   maxDamage              = 1400,
   maxVelocity            = 2.5,
+  metalCost              = 200,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,

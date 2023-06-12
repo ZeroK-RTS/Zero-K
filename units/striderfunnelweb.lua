@@ -5,7 +5,6 @@ return { striderfunnelweb = {
   acceleration           = 0.166,
   activateWhenBuilt      = true,
   brakeRate              = 0.825,
-  buildCostMetal         = 4000,
   buildPic               = [[striderfunnelweb.png]],
   builder                = true,
   
@@ -48,6 +47,7 @@ return { striderfunnelweb = {
   maxSlope               = 36,
   maxVelocity            = 1.3666,
   maxWaterDepth          = 22,
+  metalCost              = 4000,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],

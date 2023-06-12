@@ -6,7 +6,6 @@ return { dynstrike1 = {
   activateWhenBuilt      = true,
   autoheal               = 5,
   brakeRate              = 2.25,
-  buildCostMetal         = 1200,
   buildDistance          = 144,
   builder                = true,
 
@@ -56,6 +55,7 @@ return { dynstrike1 = {
   maxSlope               = 36,
   maxVelocity            = 1.45,
   maxWaterDepth          = 5000,
+  metalCost              = 1200,
   metalStorage           = 500,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
