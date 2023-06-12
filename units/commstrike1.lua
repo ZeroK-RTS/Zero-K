@@ -6,7 +6,6 @@ return { commstrike1 = {
   activateWhenBuilt      = true,
   autoheal               = 5,
   brakeRate              = 2.25,
-  buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
 
@@ -47,6 +46,7 @@ return { commstrike1 = {
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
+  metalCost              = 1200,
   metalStorage           = 500,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

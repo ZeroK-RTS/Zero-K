@@ -5,7 +5,6 @@ return { gunshipcon = {
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
-  buildCostMetal      = 300,
   buildDistance       = 180,
   builder             = true,
 
@@ -50,6 +49,7 @@ return { gunshipcon = {
   iconType            = [[builderair]],
   maxDamage           = 1500,
   maxVelocity         = 2.4,
+  metalCost           = 300,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[bumblebee.dae]],

@@ -151,8 +151,8 @@ local statOverrides = {
 	cloakcostmoving = 10,
 	onoffable       = true, -- For jammer and cloaker toggling
 	canmanualfire   = true, -- For manualfire weapons.
-	buildcostmetal  = commanderCost,
-	buildcostenergy = commanderCost,
+	metalcost       = commanderCost,
+	energycost      = commanderCost,
 	buildtime       = commanderCost,
 	power           = 1200,
 }

@@ -6,7 +6,6 @@ return { dynsupport1 = {
   activateWhenBuilt   = true,
   autoheal            = 5,
   brakeRate           = 2.7,
-  buildCostMetal      = 1200,
   buildDistance       = 232,
   builder             = true,
 
@@ -54,6 +53,7 @@ return { dynsupport1 = {
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalStorage        = 500,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

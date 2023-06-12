@@ -5,8 +5,6 @@ return { chickenbroodqueen = {
   acceleration        = 0.6,
   autoHeal            = 10,
   brakeRate           = 1.23,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
   buildDistance       = 240,
   builder             = true,
 
@@ -34,7 +32,6 @@ return { chickenbroodqueen = {
   },
 
   buildPic            = [[chickenbroodqueen.png]],
-  buildTime           = 1000,
   CanBeAssisted       = 0,
   canGuard            = true,
   canMove             = true,
@@ -59,6 +56,9 @@ return { chickenbroodqueen = {
   maxSlope            = 72,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
+  metalCost           = 0,
+  energyCost          = 0,
+  buildTime           = 1000,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

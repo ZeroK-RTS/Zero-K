@@ -3,7 +3,6 @@ return { staticrearm = {
   name                = [[Airpad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
   activateWhenBuilt   = true,
-  buildCostMetal      = 350,
   buildDistance       = 6,
   builder             = true, --[[ This makes the airpad a factory from the engine's technical PoV.
                                    The purpose is to let airpads have a rally queue that units leaving
@@ -44,6 +43,7 @@ return { staticrearm = {
   maxDamage           = 1860,
   maxSlope            = 18,
   maxVelocity         = 0,
+  metalCost           = 350,
   objectName          = [[staticrearm.dae]],
   script              = [[staticrearm.lua]],
   selfDestructAs      = [[LARGE_BUILDINGEX]],

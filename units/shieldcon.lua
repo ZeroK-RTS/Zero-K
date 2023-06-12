@@ -5,7 +5,6 @@ return { shieldcon = {
   acceleration        = 1.5,
   activateWhenBuilt   = true,
   brakeRate           = 1.8,
-  buildCostMetal      = 120,
   buildDistance       = 128,
   builder             = true,
 
@@ -34,6 +33,7 @@ return { shieldcon = {
   maxSlope            = 36,
   maxVelocity         = 2.05,
   maxWaterDepth       = 22,
+  metalCost           = 120,
   movementClass       = [[KBOT2]],
   objectName          = [[conbot.s3o]],
   onoffable           = false,

@@ -6,7 +6,6 @@ return { corcom1 = {
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 2.25,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -47,6 +46,7 @@ return { corcom1 = {
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
+  metalCost           = 1200,
   metalMake           = 4,
   metalStorage        = 500,
   movementClass       = [[AKBOT2]],

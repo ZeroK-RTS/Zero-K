@@ -4,7 +4,6 @@ return { vehcon = {
   description            = [[Construction Rover]],
   acceleration           = 0.4,
   brakeRate              = 18.0,
-  buildCostMetal         = 120,
   buildDistance          = 180,
   builder                = true,
 
@@ -36,6 +35,7 @@ return { vehcon = {
   maxSlope               = 18,
   maxVelocity            = 2.3,
   maxWaterDepth          = 22,
+  metalCost              = 120,
   movementClass          = [[TANK2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

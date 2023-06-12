@@ -132,6 +132,26 @@ VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
 local Utilities = VFS.Include('gamedata/utilities.lua')
 
+-- Handle obsolete keys in mods gracefully while they migrate
+for name, ud in pairs(UnitDefs) do
+	if ud.metaluse then
+		Spring.Echo("ERROR: " .. name .. ".metalUse set, should be metalUpkeep instead!")
+		ud.metalupkeep = ud.metalupkeep or ud.metaluse
+	end
+	if ud.energyuse then
+		Spring.Echo("ERROR: " .. name .. ".energyuse set, should be energyUpkeep instead!")
+		ud.energyupkeep = ud.energyupkeep or ud.energyuse
+	end
+	if ud.buildcostmetal then
+		Spring.Echo("ERROR: " .. name .. ".buildCostMetal set, should be metalCost instead!")
+		ud.metalcost = ud.metalcost or ud.buildcostmetal
+	end
+	if ud.buildcostenergy then
+		Spring.Echo("ERROR: " .. name .. ".buildCostEnergy set, should be energyCost instead!")
+		ud.energycost = ud.energycost or ud.buildcostenergy
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -346,11 +366,11 @@ local BP2RES = 0
 local BP2RES_FACTORY = 0
 local BP2TERRASPEED = 1000 --used to be 60 in most of the cases
 for name, ud in pairs (UnitDefs) do
-	local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
+	local cost = math.max (ud.energycost or 0, ud.metalcost or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
 
 	--setting uniform buildTime, M/E cost
-	if not ud.buildcostenergy then ud.buildcostenergy = cost end
-	if not ud.buildcostmetal then ud.buildcostmetal = cost end
+	if not ud.energycost then ud.energycost = cost end
+	if not ud.metalcost then ud.metalcost = cost end
 	if not ud.buildtime then ud.buildtime = cost end
 
 	--setting uniform M/E storage
@@ -390,14 +410,14 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Lua implementation of energyUse
+-- Lua implementation of energyUpkeep
 --
 
 for name, ud in pairs(UnitDefs) do
-	local energyUse = tonumber(ud.energyuse or 0)
-	if energyUse and (energyUse > 0) then
-		ud.customparams.upkeep_energy = energyUse
-		ud.energyuse = 0
+	local energyUpkeep = tonumber(ud.energyupkeep or 0)
+	if energyUpkeep and (energyUpkeep > 0) then
+		ud.customparams.upkeep_energy = energyUpkeep
+		ud.energyupkeep = 0
 	end
 end
 
@@ -666,7 +686,7 @@ end
 --
 
 --for name, ud in pairs(UnitDefs) do
---	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
+--	if ud.metalcost ~= ud.energycost or ud.buildtime ~= ud.energycost then
 --		Spring.Echo("Inconsistent Cost for " .. ud.name)
 --	end
 --end
@@ -859,8 +879,8 @@ end
 
 --[[for name, ud in pairs(UnitDefs) do
 	if (ud.unitname:sub(1,7) == "chicken") then
-		ud.buildcostmetal = ud.buildtime
-		ud.buildcostenergy = ud.buildtime
+		ud.metalcost = ud.buildtime
+		ud.energycost = ud.buildtime
 	end
 end]]
 
@@ -946,7 +966,7 @@ end
 if Utilities.IsCurrentVersionNewerThan(104, 600) then
 	for name, ud in pairs (UnitDefs) do
 		ud.transportmass = nil
-		local buildCost = ud.buildcostmetal and tonumber(ud.buildcostmetal)
+		local buildCost = ud.metalcost and tonumber(ud.metalcost)
 		if buildCost then
 			if buildCost > TRANSPORT_MEDIUM_COST_MAX then
 				ud.customparams.requireheavytrans = 1
@@ -998,5 +1018,14 @@ end
 for name, ud in pairs(UnitDefs) do
 	if not ud.seismicsignature then
 		ud.seismicsignature = 0
+	end
+end
+
+if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
+	for name, ud in pairs(UnitDefs) do
+		ud.metaluse  = ud.metalupkeep
+		ud.energyuse = ud.energyupkeep
+		ud.buildcostmetal  = ud.metalcost
+		ud.buildcostenergy = ud.energycost
 	end
 end

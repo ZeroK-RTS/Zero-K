@@ -5,7 +5,6 @@ return { spidercon = {
   acceleration           = 0.6,
   activateWhenBuilt      = true,
   brakeRate              = 3.6,
-  buildCostMetal         = 170,
   buildDistance          = 220,
   builder                = true,
 
@@ -36,6 +35,7 @@ return { spidercon = {
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
+  metalCost              = 170,
   movementClass          = [[TKBOT2]],
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,

@@ -5,7 +5,6 @@ return { cloakcon = {
   acceleration           = 1.5,
   activateWhenBuilt      = true,
   brakeRate              = 9.0,
-  buildCostMetal         = 120,
   buildDistance          = 128,
   builder                = true,
 
@@ -51,6 +50,7 @@ return { cloakcon = {
   maxSlope               = 36,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
+  metalCost              = 120,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],

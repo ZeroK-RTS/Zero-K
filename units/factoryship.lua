@@ -2,7 +2,6 @@ return { factoryship = {
   unitname               = [[factoryship]],
   name                   = [[Shipyard]],
   description            = [[Produces Naval Units]],
-  buildCostMetal         = Shared.FACTORY_COST,
   buildDistance          = Shared.FACTORY_PLATE_RANGE,
   builder                = true,
 
@@ -61,6 +60,7 @@ return { factoryship = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
+  metalCost              = Shared.FACTORY_COST,
   minWaterDepth          = 15,
   moveState              = 1,
   objectName             = [[seafac.s3o]],

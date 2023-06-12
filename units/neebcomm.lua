@@ -4,7 +4,6 @@ return { neebcomm = {
   description         = [[Ugly Turkey]],
   acceleration        = 0.6,
   brakeRate           = 1.23,
-  buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
 
@@ -35,6 +34,7 @@ return { neebcomm = {
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 22,
+  metalCost           = 1200,
   metalMake           = 2,
   metalStorage        = 500,
   movementClass       = [[AKBOT3]],

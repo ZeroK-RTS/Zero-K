@@ -4,7 +4,6 @@ return { jumpcon = {
   description         = [[Jumpjet Constructor]],
   acceleration        = 0.78,
   brakeRate           = 4.68,
-  buildCostMetal      = 140,
   buildDistance       = 128,
   builder             = true,
 
@@ -38,6 +37,7 @@ return { jumpcon = {
   maxSlope            = 36,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
+  metalCost           = 140,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

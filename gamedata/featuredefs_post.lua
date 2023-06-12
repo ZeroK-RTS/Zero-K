@@ -146,10 +146,10 @@ local function ProcessUnitDef(udName, ud)
       FeatureDefs[fullName] = fd
 
       if fd.featuredead then -- it's a DEAD feature
-        if not fd.metal then fd.metal = ud.buildcostmetal * DEAD_MULT end
+        if not fd.metal then fd.metal = ud.metalcost * DEAD_MULT end
         if not fd.description then fd.description = "Wreckage - "..ud.name end
       else --it's a HEAP feature
-        if not fd.metal then fd.metal = ud.buildcostmetal * HEAP_MULT end
+        if not fd.metal then fd.metal = ud.metalcost * HEAP_MULT end
         if not fd.description then fd.description = "Debris - "..ud.name end
       end
       
@@ -187,7 +187,7 @@ local function ProcessUnitDef(udName, ud)
         fd.resurrectable = 1
       end
       ud.corpse = fullName
-	  --if fd.metal ~= ud.buildcostmetal*0.4 or fd.damage ~= ud.maxdamage then
+	  --if fd.metal ~= ud.metalcost*0.4 or fd.damage ~= ud.maxdamage then
 	  --  Spring.Echo(ud.name)
 	  --end
     end

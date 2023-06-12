@@ -6,7 +6,6 @@ return { athena = {
   airStrafe           = 0,
   autoHeal            = 20,
   brakeRate           = 0.08,
-  buildCostMetal      = 600,
   buildDistance       = 180,
   builder             = true,
 
@@ -75,6 +74,7 @@ return { athena = {
   maxDamage           = 750,
   maxSlope            = 36,
   maxVelocity         = 7,
+  metalCost           = 600,
   minCloakDistance    = 125,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
