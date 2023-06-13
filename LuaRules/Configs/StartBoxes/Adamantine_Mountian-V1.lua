@@ -1,8 +1,8 @@
 return {
 	[0] = {
-		startpoints = {
 		nameLong = "North-West",
 		nameShort = "NW",
+		startpoints = {
 			{799,512},
 		},
 		boxes = {

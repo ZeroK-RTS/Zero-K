@@ -22,12 +22,17 @@ end
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
 
-local allyTargetUnits = {
-	[UnitDefNames["jumpsumo"].id] = true,
-	[UnitDefNames["turretimpulse"].id] = true,
-	[UnitDefNames["jumpblackhole"].id] = true,
-	[UnitDefNames["amphlaunch"].id] = true,
-}
+local tobool = Spring.Utilities.tobool
+
+local allyTargetUnits = {}
+
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+
+	if tobool(ud.customParams.can_target_allies) then
+		allyTargetUnits[unitDefID] = true
+	end
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

@@ -4,8 +4,6 @@ include "constants.lua"
 local base, fan, barrel, flare, thrust1, thrust2 = piece('base', 'fan', 'barrel', 'flare', 'thrust1', 'thrust2')
 local blades = {piece('b1', 'b2', 'b3', 'b4', 'b5', 'b6')}
 
-local smokePiece = {base}
-
 --constants
 local rotorSpeed = math.rad(1080)
 local rotorAccel = math.rad(240)
@@ -19,7 +17,7 @@ local SIG_Aim = 1
 
 function script.Create()
 	for i=1,#blades do
-		Turn(blades[i], y_axis, math.rad((i-1)*60))
+		Turn(blades[i], y_axis, math.rad(60)*(i-1))
 	end
 	Spin(fan, y_axis, rotorSpeed, rotorAccel)
 end

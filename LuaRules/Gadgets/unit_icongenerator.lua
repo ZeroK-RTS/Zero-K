@@ -78,8 +78,8 @@ if (gadgetHandler:IsSyncedCode()) then
 			curTeam = cunit.team;
 
 			Spring.SetUnitNeutral(uid,true);
-			Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},0);
-			Spring.GiveOrderToUnit(uid,CMD.STOP,{},0);
+			Spring.GiveOrderToUnit(uid, CMD.FIRE_STATE, 0, 0)
+			Spring.GiveOrderToUnit(uid, CMD.STOP, 0, 0)
 
 			local env = Spring.UnitScript.GetScriptEnv(uid)
 			if env then lus = true end
@@ -957,6 +957,7 @@ end
       --end;
 
       gl.SaveImage(0,0,iconX,iconY, outfile,{alpha=true});
+      Spring.Echo("saved to", outfile)
     end);
 
     if (not result and not cfg.empty) then

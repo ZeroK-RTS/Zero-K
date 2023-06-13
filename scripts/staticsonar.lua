@@ -33,7 +33,7 @@ local function Bobbing ()
 	local dir = 1
 	while true do
 		Move (base, y_axis, 1.5*dir, 0.6)
-		Turn (base, x_axis, math.rad(5*dir), math.rad(2))
+		Turn (base, x_axis, math.rad(5)*dir, math.rad(2))
 		WaitForTurn (base, x_axis)
 		Sleep (800)
 		dir = -dir

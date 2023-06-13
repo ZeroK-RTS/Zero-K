@@ -22,8 +22,6 @@ local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spGetTeamInfo		= Spring.GetTeamInfo
 local spGetTeamList		= Spring.GetTeamList
 local spAreTeamsAllied	= Spring.AreTeamsAllied
-local spGetAllUnits     = Spring.GetAllUnits
-local spGetUnitDefID    = Spring.GetUnitDefID
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -33,10 +31,6 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitPosition		= Spring.GetUnitPosition
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetTeamUnitCount	= Spring.GetTeamUnitCount
-local spInsertUnitCmdDesc	= Spring.InsertUnitCmdDesc
 local spGetAllyTeamList		= Spring.GetAllyTeamList
 local spSetTeamRulesParam	= Spring.SetTeamRulesParam
 local spSetGameRulesParam	= Spring.SetGameRulesParam
@@ -228,12 +222,6 @@ function gadget:GameFrame(f)
 	if (f%32) < 0.1 then
 		checkVotes()
 		checkOffers()
-		--local teamList = spGetTeamList()
-		--for _,teamID in ipairs(teamList) do
-			--if spGetTeamUnitCount(teamID) == 0 then
-				--gadget:TeamDied(teamID)
-			--end
-		--end
 	end
 end
 

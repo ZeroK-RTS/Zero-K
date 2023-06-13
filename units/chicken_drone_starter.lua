@@ -1,3 +1,7 @@
+--[[ NB: this is a legacy def without any purpose in ZK itself,
+     but is kept for compatibility because some mods (specifically
+     Zero Wars, possibly others) have already started using it ]]
+
 return { chicken_drone_starter = {
   unitname            = [[chicken_drone_starter]],
   name                = [[Drone]],
@@ -35,7 +39,6 @@ return { chicken_drone_starter = {
   maxWaterDepth       = 5000,
   metalMake           = 0,
   metalStorage        = 50,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -60,7 +63,7 @@ return { chicken_drone_starter = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 10,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

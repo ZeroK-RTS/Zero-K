@@ -1,5 +1,6 @@
-if not Script.GetSynced() then
-	return
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return false
 end
 
 function gadget:GetInfo()
@@ -20,7 +21,6 @@ local spDestroyUnit           = Spring.DestroyUnit
 local spGetGameFrame          = Spring.GetGameFrame
 local spGetProjectileDefID    = Spring.GetProjectileDefID
 local spGetProjectileTeamID   = Spring.GetProjectileTeamID
-local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetUnitShieldState    = Spring.GetUnitShieldState
 local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 local spSetFeatureDirection   = Spring.SetFeatureDirection
@@ -34,7 +34,6 @@ local GAME_SPEED = Game.gameSpeed
 local TAU = 2 * math.pi
 local PRIVATE = { private = true }
 local CMD_WAIT = CMD.WAIT
-local EMPTY_TABLE = {}
 
 local noCreate = false
 
@@ -100,8 +99,8 @@ local function SpawnUnit(spawnData)
 		end
 
 		-- force a slowupdate to make the unit act immediately
-		spGiveOrderToUnit(unitID, CMD_WAIT, EMPTY_TABLE, 0)
-		spGiveOrderToUnit(unitID, CMD_WAIT, EMPTY_TABLE, 0)
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, 0)
+		spGiveOrderToUnit(unitID, CMD_WAIT, 0, 0)
 	end
 end
 

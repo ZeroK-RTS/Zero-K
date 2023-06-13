@@ -8,6 +8,7 @@ for id, ud in pairs (UnitDefs) do
 			speed = tonumber(cp.jump_speed),
 			reload = tonumber(cp.jump_reload),
 			delay = tonumber(cp.jump_delay),
+			delayTurnScale = tonumber(cp.jump_delay_turn_scale),
 			height = tonumber(cp.jump_height),
 			
 			noJumpHandling =  (tonumber(cp.no_jump_handling) == 1),

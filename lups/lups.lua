@@ -708,6 +708,7 @@ local function GetUnitIsActive(unitID)
 	activeUnitCheckTime[unitID] = thisGameFrame + ACTIVE_CHECK_PERIOD
 	activeUnit[unitID] = (spGetUnitIsActive(unitID) or spGetUnitRulesParam(unitID, "unitActiveOverride") == 1)
 		and	(spGetUnitRulesParam(unitID, "disarmed") ~= 1)
+		and	(spGetUnitRulesParam(unitID, "att_shieldDisabled") ~= 1)
 		and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
 		and not spGetUnitIsStunned(unitID)
 	

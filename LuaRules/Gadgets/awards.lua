@@ -12,8 +12,6 @@ end
 
 include("LuaRules/Configs/constants.lua")
 
-local spGetAllyTeamList = Spring.GetAllyTeamList
-local spIsGameOver      = Spring.IsGameOver
 local spGetTeamInfo     = Spring.GetTeamInfo
 local gaiaTeamID        = Spring.GetGaiaTeamID()
 
@@ -29,8 +27,6 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local spAreTeamsAllied      = Spring.AreTeamsAllied
-local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetTeamStatsHistory = Spring.GetTeamStatsHistory
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitTeam         = Spring.GetUnitTeam
@@ -71,7 +67,7 @@ local awardAbsolutes = {
 	head        = 3,
 	dragon      = 3,
 	sweeper     = 20,
-	heart       = 1*10^9, --we should not exceed 2*10^9 because math.floor-ing the value will return integer -2147483648. Reference: https://code.google.com/p/zero-k/source/detail?r=9681
+	heart       = 1*10^9, -- avoid higher values, math.floor starts returning INT_MIN at some point
 	vet         = 3,
 }
 
@@ -98,6 +94,7 @@ local staticO_small = {
 	seismic = 1,
 	tacnuke = 1,
 	empmissile = 1,
+	missileslow = 1,
 	napalmmissile = 1,
 	wolverine_mine = 1,
 }
@@ -110,39 +107,21 @@ local staticO_big = {
 	raveparty = 1,
 }
 
+--[[ Note that units need to still be alive by the time
+     damage is dealt. This means that the death explosion
+     has to have an instant shockwave or the unit has to
+     be hidden (as happens with Limpet and Puppy). ]]
 local kamikaze = {
 	shieldbomb=1,
 	jumpbomb=1,
 	gunshipbomb=1,
 	jumpscout=1,
+	amphbomb=1,
+	subscout=1,
+	chicken_dodo=1,
 }
 
 local flamerWeaponDefs = {}
-
--------------------
--- Resource tracking
-
-
-local allyTeamInfo = {}
---local resourceInfo = {count = 0, data = {}}
-
-do
-	local allyTeamList = Spring.GetAllyTeamList()
-	for i=1,#allyTeamList do
-		local allyTeamID = allyTeamList[i]
-		allyTeamInfo[allyTeamID] = {
-			team = {},
-			teams = 0,
-		}
-
-		local teamList = Spring.GetTeamList(allyTeamID)
-		for j=1,#teamList do
-			local teamID = teamList[j]
-			allyTeamInfo[allyTeamID].teams = allyTeamInfo[allyTeamID].teams + 1
-			allyTeamInfo[allyTeamID].team[allyTeamInfo[allyTeamID].teams] = teamID
-		end
-	end
-end
 
 ------------------------------------------------
 -- functions
@@ -216,96 +195,6 @@ local function CopyTable(original) -- Warning: circular table references lead to
 	return copy
 end
 
-local function UpdateResourceStats(t)
-
-	resourceInfo.count = resourceInfo.count + 1
-	resourceInfo.data[resourceInfo.count] = {allyRes = {}, teamRes = {}, t = t}
-
-	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
-		local teams = allyTeamData.teams
-		local team = allyTeamData.team
-
-		local allyOverdriveResources = GG.Overdrive_allyTeamResources[allyTeamID] or {}
-
-		resourceInfo.data[resourceInfo.count].allyRes[allyTeamID] = {
-			metal_income_total = 0,
-			metal_income_base = allyOverdriveResources.baseMetal or 0,
-			metal_income_overdrive = allyOverdriveResources.overdriveMetal or 0,
-			metal_income_other = 0,
-
-			metal_spend_total = 0,
-			metal_spend_construction = 0,
-			metal_spend_waste = 0,
-
-			metal_storage_current = 0,
-			metal_storage_free = 0,
-
-			energy_income_total = allyOverdriveResources.baseEnergy or 0,
-
-			energy_spend_total = 0,
-			energy_spend_overdrive = allyOverdriveResources.overdriveEnergy or 0,
-			energy_spend_construction = 0,
-			energy_spend_other = 0,
-			energy_spend_waste = allyOverdriveResources.wasteEnergy or 0,
-
-			energy_storage_current = 0,
-		}
-
-		local aRes = resourceInfo.data[resourceInfo.count].allyRes[allyTeamID]
-
-		for i = 1, teams do
-			local teamID = team[i]
-			local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teamID, "metal")
-			aRes.metal_spend_construction = aRes.metal_spend_construction + mExpe
-			aRes.metal_income_total = aRes.metal_income_total + mInco
-			aRes.metal_spend_total = aRes.metal_spend_total + mExpe
-			aRes.metal_storage_free = aRes.metal_storage_free + mStor - mCurr
-			aRes.metal_storage_current = aRes.metal_storage_current + mCurr
-
-			local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teamID, "energy")
-			aRes.energy_spend_total = aRes.energy_spend_total + eExpe
-			aRes.energy_storage_current = aRes.energy_storage_current + eCurr
-
-			local teamOverdriveResources = GG.Overdrive_teamResources[teamID] or {}
-
-			resourceInfo.data[resourceInfo.count].teamRes[teamID] = {
-				metal_income_total = mInco + mReci,
-				metal_income_base = teamOverdriveResources.baseMetal or 0,
-				metal_income_overdrive = teamOverdriveResources.overdriveMetal or 0,
-				metal_income_other = 0,
-
-				metal_spend_total = mExpe + mSent,
-				metal_spend_construction = mExpe,
-
-				metal_share_net = mReci - mSent,
-
-				metal_storage_current = mCurr,
-
-				energy_income_total = eInco,
-
-				energy_spend_total = eExpe,
-				energy_spend_construction = mExpe,
-				energy_spend_other = 0,
-
-				energy_share_net = teamOverdriveResources.overdriveEnergyChange or 0,
-
-				energy_storage_current = eCurr,
-			}
-
-			local tRes = resourceInfo.data[resourceInfo.count].teamRes[teamID]
-
-			tRes.metal_income_other = tRes.metal_income_total - tRes.metal_income_base - tRes.metal_income_overdrive - mReci
-			tRes.energy_spend_other = tRes.energy_spend_total - tRes.energy_spend_construction + math.min(0, tRes.energy_share_net)
-		end
-
-		aRes.metal_income_other = aRes.metal_income_total - aRes.metal_income_base - aRes.metal_income_overdrive
-		aRes.metal_spend_waste = math.min(aRes.metal_storage_free - aRes.metal_income_total - aRes.metal_spend_total,0)
-
-		aRes.energy_spend_construction = aRes.metal_spend_construction
-		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)
-	end
-end
-
 local function AddAwardPoints( awardType, teamID, amount )
 	if (teamID and (teamID ~= gaiaTeamID)) then
 		awardData[awardType][teamID] = awardData[awardType][teamID] + (amount or 0)
@@ -358,6 +247,8 @@ local function ProcessAwardData()
 					message = 'Stunned value: ' .. maxValWrite
 				elseif awardType == 'slow' then
 					message = 'Slowed value: ' .. maxValWrite
+				elseif awardType == 'disarm' then
+					message = 'Disarmed value: ' .. maxValWrite
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
@@ -400,8 +291,6 @@ function gadget:Initialize()
 	GG.Awards = GG.Awards or {}
 	GG.Awards.AddAwardPoints = AddAwardPoints
 	
-	--_G.resourceInfo = resourceInfo
-
 	local tempTeamList = Spring.GetTeamList()
 	for i=1, #tempTeamList do
 		local team = tempTeamList[i]
@@ -421,18 +310,22 @@ function gadget:Initialize()
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-
 	end
 
-	local boatFacs = {'factoryship', 'striderhub'}
-	for _, boatFac in pairs(boatFacs) do
-		local udBoatFac = UnitDefNames[boatFac]
-		if udBoatFac then
-			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
-					boats[boatDefID] = true
-				end
-			end
+	local shipSMClass = Game.speedModClasses.Ship
+	for i = 1, #UnitDefs do
+		local ud = UnitDefs[i]
+
+		--[[ NB: ships that extend legs and walk onto land, like
+		     the SupCom Cybran Siren or RA3 Soviet Stingray, are
+		     technically hovercraft in Spring so would need some
+		     extra handling AFAIK. No such ship in vanilla ZK. ]]
+		if (ud.moveDef.smClass == shipSMClass) then
+			boats[i] = true
+		end
+
+		if ud.customParams.dynamic_comm then
+			comms[i] = true
 		end
 	end
 
@@ -442,12 +335,6 @@ function gadget:Initialize()
 			flamerWeaponDefs[i] = true
 		end
 	end
-
-	for i=1,#UnitDefs do
-		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
-	end
- end
-
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -526,6 +413,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
 		damage = damage + hp
+	end
+	if damage < 0 then
+		-- can happen with the EMP component of mixed weapons, when last-hitting
+		return
 	end
 	AddAwardPoints( 'ouch', unitTeam, damage )
 
@@ -616,8 +507,6 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spSendCommands  = Spring.SendCommands
-
 local teamNames     = {}
 local awardList
 
@@ -644,86 +533,11 @@ function gadget:Initialize()
 	end
 end
 
-local function SendEconomyDataToWidget()
-
-	if (Script.LuaUI('WriteResourceStatsToFile')) then
-		Spring.Echo("Awards: Writing resource data to widget")
-		local resourceInfo = SYNCED.resourceInfo
-		local count = resourceInfo.count
-		local data = resourceInfo.data
-		local reallyBigString = ""
-
-		for i = 1, count do
-			if data[i] then
-				local toSend = data[i].t .. " "
-				for allyTeamID, allyData in spairs(data[i].allyRes) do
-					toSend = toSend .. " " .. allyTeamID .. " " ..
-					allyData.metal_income_total .. " " ..
-					allyData.metal_income_base .. " " ..
-					allyData.metal_income_overdrive .. " " ..
-					allyData.metal_income_other .. " " ..
-
-					allyData.metal_spend_total .. " " ..
-					allyData.metal_spend_construction .. " " ..
-					allyData.metal_spend_waste .. " " ..
-
-					allyData.metal_storage_current .. " " ..
-					allyData.metal_storage_free .. " " ..
-
-					allyData.energy_income_total .. " " ..
-
-					allyData.energy_spend_total .. " " ..
-					allyData.energy_spend_overdrive .. " " ..
-					allyData.energy_spend_construction .. " " ..
-					allyData.energy_spend_other .. " " ..
-					allyData.energy_spend_waste .. " " ..
-
-					allyData.energy_storage_current
-				end
-				--Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
-				reallyBigString = reallyBigString .. toSend .. "\n"
-
-				toSend = data[i].t .. " "
-
-				for teamID, teamData in spairs(data[i].teamRes) do
-					toSend = toSend .. " " .. teamID .. " " ..
-					teamData.metal_income_total .. " " ..
-					teamData.metal_income_base .. " " ..
-					teamData.metal_income_overdrive .. " " ..
-					teamData.metal_income_other .. " " ..
-
-					teamData.metal_spend_total .. " " ..
-					teamData.metal_spend_construction .. " " ..
-
-					teamData.metal_share_net .. " " ..
-
-					teamData.metal_storage_current .. " " ..
-
-					teamData.energy_income_total .. " " ..
-
-					teamData.energy_spend_total .. " " ..
-					teamData.energy_spend_construction .. " " ..
-					teamData.energy_spend_other .. " " ..
-
-					teamData.energy_share_net .. " " ..
-
-					teamData.energy_storage_current
-				end
-
-				reallyBigString = reallyBigString .. toSend .. "\n"
-			end
-		end
-
-		Script.LuaUI.WriteResourceStatsToFile(reallyBigString, teamNames)
-	end
-
-end
-
 -- function to convert SYNCED table to regular table. assumes no self referential loops
 local function ConvertToRegularTable(stable)
 	local ret = {}
 	local stableLocal = stable
-	for k,v in spairs(stableLocal) do
+	for k,v in pairs(stableLocal) do
 		if type(v) == 'table' then
 			v = ConvertToRegularTable(v)
 		end

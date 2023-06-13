@@ -68,11 +68,6 @@ function widget:Initialize()
 end
 
 function widget:Update(dt)
-	if Spring.GetGameRulesParam("totalSaveGameFrame") then
-		widgetHandler:RemoveWidget(self)
-		return
-	end
-
 	elapsedSecond = elapsedSecond + dt
 	if elapsedSecond>=0.1 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
 		for i=1, #playerInfo do

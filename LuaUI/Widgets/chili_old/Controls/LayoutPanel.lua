@@ -822,12 +822,10 @@ function LayoutPanel:MultiRectSelect(item1,item2,append)
 
   local cell1,cell2 = cells[item1],cells[item2]
 
-  local convexHull = {
-    math.min(cell1[1],cell2[1]),
-    math.min(cell1[2],cell2[2]),
-  }
-  convexHull[3] = math.max(cell1[1]+cell1[3],cell2[1]+cell2[3]) - convexHull[1]
-  convexHull[4] = math.max(cell1[2]+cell1[4],cell2[2]+cell2[4]) - convexHull[2]
+  local hullX = math.min(cell1[1], cell2[1])
+  local hullY = math.min(cell1[2], cell2[2])
+  local hullW = math.max(cell1[1] + cell1[3], cell2[1] + cell2[3]) - hullX
+  local hullH = math.max(cell1[2] + cell1[4], cell2[2] + cell2[4]) - hullY
 
   local newSelected = self.selectedItems
   if (not append) then
@@ -837,7 +835,7 @@ function LayoutPanel:MultiRectSelect(item1,item2,append)
   for i=1,#cells do
     local cell  = cells[i]
     local cellbox = ExpandRect(cell,itemPadding)
-    if (AreRectsOverlapping(convexHull,cellbox)) then
+    if (AreRectsOverlapping(hullX, hullY, hullW, hullH, cellbox[1], cellbox[2], cellbox[3], cellbox[4])) then
       newSelected[i] = true
     end
   end

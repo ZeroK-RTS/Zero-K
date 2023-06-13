@@ -28,7 +28,7 @@ local function WalkThread ()
 	SetSignalMask (SIG_MOVE)
 	while true do
 
-		local slow_mult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+		local slow_mult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 		local anim_speed = math.rad(150) * slow_mult
 
 		Turn (Left_Back_Leg, y_axis, pi6, anim_speed)
@@ -92,9 +92,6 @@ function endJump ()
 	Turn (Left_Front_Leg, y_axis, 0, pi3)
 	Turn (Right_Front_Leg, y_axis, 0, pi3)
 end
-
-function preJump () end
-function jumping() end
 
 function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)

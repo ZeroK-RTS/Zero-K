@@ -40,13 +40,8 @@ local turretData = {
 	}
 }
 
-local gun_1, gun_2
-
 -- Signal definitions
-local SIG_AIM = 2
-local SIG_AIM_2 = 4
 local SIG_MOVE = 8
-local SIG_RESTORE = 16
 
 local RESTORE_DELAY = 3000
 

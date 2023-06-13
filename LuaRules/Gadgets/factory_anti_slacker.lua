@@ -28,6 +28,11 @@ local noEject = {
 	[UnitDefNames["factoryship"].id] = true,
 	[UnitDefNames["factoryplane"].id] = true,
 	[UnitDefNames["factorygunship"].id] = true,
+	[UnitDefNames["plateship"].id] = true,
+	[UnitDefNames["plateplane"].id] = true,
+	[UnitDefNames["plategunship"].id] = true,
+	[UnitDefNames["pw_dropfac"].id] = true,
+	[UnitDefNames["pw_bomberfac"].id] = true,
 }
 local ghostFrames = 30	--how long the unit will be ethereal
 

@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -54,7 +52,7 @@ if height and baseHeight then
 end
 ]]--
 
-local THIGH_FRONT_ANGLE = -math.rad(50)
+local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -63,15 +61,15 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(10)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = -math.rad(20)
+local ARM_FRONT_ANGLE = math.rad(-20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
 --[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
+local FOREARM_FRONT_ANGLE = math.rad(-15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
+local FOREARM_BACK_ANGLE = math.rad(-10)
 local FOREARM_BACK_SPEED = math.rad(40) * PACE
 ]]--
 
@@ -97,7 +95,6 @@ for index, weapon in pairs(wepTable) do
 		starBLaunchers[index] = true
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -242,14 +239,6 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
-function script.Activate()
-	--spSetUnitShieldState(unitID, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, false)
-end
-
 function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1024)
@@ -279,11 +268,6 @@ function script.StartBuilding(heading, pitch)
 	end
 	restoreHeading, restorePitch = heading, pitch
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
-	return nanospray
 end
 
 function script.Killed(recentDamage, maxHealth)

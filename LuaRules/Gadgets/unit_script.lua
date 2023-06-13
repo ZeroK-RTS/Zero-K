@@ -211,6 +211,37 @@ local section = 'unit_script.lua'
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function CheckForDesiredThread()
+	if Spring.GetGameFrame() < 330*30 then
+		return
+	end
+	for unitID, data in pairs(units) do
+		if Spring.GetUnitDefID(unitID) == UnitDefNames["amphsupport"].id then
+			for thread, threadData in pairs(data.threads) do
+				if threadData.signal_mask == 128 then
+					--Spring.Utilities.UnitEcho(unitID, 'f')
+				end
+			end
+		end
+	end
+	for frame, zzz in pairs(sleepers) do
+		for i = 1, #zzz do
+			local threadData = zzz[i]
+			local unitID = threadData.unitID
+			if Spring.GetUnitDefID(unitID) == UnitDefNames["amphsupport"].id then
+				if threadData.signal_mask == 128 then
+					--Spring.Utilities.UnitEcho(unitID, 'f')
+					--Spring.Echo("frame", frame, "curFrame", Spring.GetGameFrame())
+				end
+			end
+		end
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 -- Helper for Destroy and Signal.
 -- NOTE:
 --   Must not change the relative order of all other elements!
@@ -257,13 +288,14 @@ local function WakeUp(thread, ...)
 	thread.container = nil
 	local co = thread.thread
 	if debugMode and not co then
-		Spring.Echo("Error in WakeUp", thread.unitID)
+		Spring.Echo("Error in WakeUp (nil coroutine)", thread.unitID)
 		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name)
 	end
 	local good, err = co_resume(co, ...)
 	if (not good) then
 		Spring.Log(section, LOG.ERROR, err)
-		Spring.Log(section, LOG.ERROR, debug.traceback(co))
+		Spring.Echo("Error in WakeUp (co_resume failure)", thread.unitID)
+		Spring.Utilities.UnitEcho(thread.unitID, UnitDefs[Spring.GetUnitDefID(thread.unitID)].name .. " script error")
 		RunOnError(thread)
 	end
 end
@@ -345,7 +377,7 @@ function Spring.UnitScript.WaitForMove(piece, axis)
 end
 
 -- overwrites engine's WaitForTurn
-local tau = 2 * math.pi
+local tau = math.tau
 function Spring.UnitScript.WaitForTurn(piece, axis)
 	local activeUnit = GetActiveUnit()
 	local speed = activeUnit.pieceRotSpeeds[piece][axis]
@@ -535,6 +567,14 @@ local function Basename(filename)
 	return filename:match("[^\\/:]*$") or filename
 end
 
+local function preprocess_math_rad(expression)
+	local number = tonumber(expression)
+	if number then
+		return tostring(math.rad(number))
+	else
+		return "math.rad(" .. expression .. ")"
+	end
+end
 
 local function LoadChunk(filename)
 	local text = VFS.LoadFile(filename, VFSMODE)
@@ -542,6 +582,16 @@ local function LoadChunk(filename)
 		Spring.Log(section, LOG.ERROR, "Failed to load: " .. filename)
 		return nil
 	end
+
+	-- pre-process constants (for example "math.rad(180)" -> "3.1415")
+	-- to avoid tons of needless global dereferences, function calls etc
+	text = text:gsub("math%.pi", math.pi)
+	text = text:gsub("math%.tau", math.tau)
+	text = text:gsub("([xyz])_axis", { x = 1, y = 2, z = 3 })
+	text = text:gsub("SFX%.([_%u]+)", SFX)
+	text = text:gsub("COB%.([_%u]+)", COB)
+	text = text:gsub("math%.rad%(([^%)]*)%)", preprocess_math_rad)
+
 	local chunk, err = loadstring(scriptHeader .. text, filename)
 	if (chunk == nil) then
 		Spring.Log(section, LOG.ERROR, "Failed to load: " .. Basename(filename) .. "  (" .. err .. ")")
@@ -896,6 +946,7 @@ function gadget:GameFrame()
 			PopActiveUnitID()
 		end
 	end
+	--CheckForDesiredThread()
 end
 
 --------------------------------------------------------------------------------

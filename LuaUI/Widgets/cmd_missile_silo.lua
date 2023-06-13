@@ -30,13 +30,15 @@ local selectMissilesCmdDesc = {
 }
 
 local SEARCH_RANGE = 48
---local FIRE_INTERVAL = 90	-- gameframes
+--local FIRE_INTERVAL = 90 -- gameframes
 local UPDATE_INTERVAL = 10
 local EMPTY_TABLE = {}
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local CMD_OPT_CTRL = CMD.OPT_CTRL
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local silos = {}	-- [unitID] = frames before next shot allowed
+local silos = {} -- [unitID] = frames before next shot allowed
 
 local function GetMissiles(siloID, justOne)
 	local missiles = {}
@@ -49,8 +51,7 @@ local function GetMissiles(siloID, justOne)
 	for i=1,#units do
 		local unitID = units[i]
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-		if Spring.GetUnitRulesParam(unitID, "missile_parentSilo") == siloID
-			and Spring.GetUnitRulesParam(unitID, "do_not_save") ~= 1 then	-- not already launched
+		if Spring.GetUnitRulesParam(unitID, "missile_parentSilo") == siloID then
 			if justOne and buildProgress == 1 then
 				local spawnedFrame = Spring.GetUnitRulesParam(unitID, "missile_spawnedFrame") or 999998
 				if spawnedFrame < oldestFrame then
@@ -72,19 +73,19 @@ end
 
 local orderParamsTable = {1, 2, 3}
 local function RemoveAttackCommandIfFirst(unitID)
-	local rpt = Spring.Utilities.GetUnitRepeat(unitID)
 	
-	local cmdID, _, cmdTag, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(unitID)
+	local cmdID, cmdOpt, cmdTag, cmdX, cmdY, cmdZ = Spring.GetUnitCurrentCommand(unitID)
 	if cmdID ~= CMD.ATTACK then
 		return
 	end
-	
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmdTag}, 0)
+	
+	local rpt = Spring.Utilities.IsBitSet(cmdOpt, CMD_OPT_CTRL) --Spring.Utilities.GetUnitRepeat(unitID)
 	if rpt then
 		orderParamsTable[1] = cmdX
 		orderParamsTable[2] = cmdY
 		orderParamsTable[3] = cmdZ
-		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, orderParamsTable, CMD.OPT_SHIFT)
+		Spring.GiveOrderToUnit(unitID, CMD.ATTACK, orderParamsTable, CMD_OPT_SHIFT + CMD_OPT_CTRL)
 	end
 end
 
@@ -128,7 +129,7 @@ end
 --------------------------------------------------------------------------------
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if silos[factID] then
-		RemoveAttackCommandIfFirst(factID)	-- missile launched fresh from silo
+		RemoveAttackCommandIfFirst(factID) -- missile launched fresh from silo
 	end
 end
 

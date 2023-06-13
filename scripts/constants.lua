@@ -20,7 +20,6 @@ GG.Script.CRASHING = 97
 --SFXTYPE_REVERSEWAKE2 = 5
 
 -- Maths
-GG.Script.tau = math.pi*2
 
 GG.Script.toDegrees = 180/math.pi
 GG.Script.frameToMs = 1000/30
@@ -107,7 +106,7 @@ function GG.Script.onWater(unitID)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local x,_,z = spGetUnitPosition(unitID)
 	if x then
-		h = spGetGroundHeight(x,z)
+		local h = spGetGroundHeight(x,z)
 		if h and h < 0 then
 			return true
 		end
@@ -119,10 +118,30 @@ function GG.Script.NonBlockingWaitTurn(piece, axis, angle, leeway)
 	local rot = select(axis, Spring.UnitScript.GetPieceRotation(piece))
 	leeway = leeway or 0.1
 	
-	angle = (angle - rot)%GG.Script.tau
-	if angle > leeway and angle < GG.Script.tau - leeway then
+	angle = (angle - rot) % math.tau
+	if angle > leeway and angle < math.tau - leeway then
 		WaitForTurn(piece, axis)
 	end
+end
+
+function GG.Script.OverkillPreventionCheck(unitID, targetID, damage, range, fullTime, hitTimeMod, useTargetSpeed, minRange, fastMult, radarMult, staticOnly)
+	-- damage: Damage that the projectile deals, or a bit lower to deal with things like repair and wobbles.
+	-- range: 2D weapon range.
+	-- fullTime: Time (in frames) from shot to damage for a target at max range.
+	-- hitTimeMod: Constant fudge factor for overestimating/underestimating impact times. Positive hitTimeMod is the normal use, and makes OKP less strict.
+	-- useTargetSpeed: Add the potential effect of target speed to hitTimeMod
+	-- minRange: Minimum range that a target is at for expected hit time calculations. Use for indirect fire.
+	-- fastMult, radarMult, staticOnly: Paramters for the gadget.
+	if Spring.ValidUnitID(targetID) then
+		local distMult = math.max(minRange or 0, Spring.GetUnitSeparation(unitID, targetID) or 0)/range
+		if useTargetSpeed then
+			local _, _, _, speed = Spring.GetUnitVelocity(targetID)
+			hitTimeMod = hitTimeMod + speed/range
+		end
+		local timeout = math.floor(fullTime*math.max(0, distMult - hitTimeMod))
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
+	end
+	return false
 end
 
 function GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, KillFunc, delayTime)
@@ -166,4 +185,27 @@ end
 function GG.Script.InitializeDeathAnimation(unitID)
 	local paralyzeDamage = select(3, Spring.GetUnitHealth(unitID))
 	Spring.SetUnitRulesParam(unitID, "real_para", paralyzeDamage or 0)
+end
+
+-- engine forcefully closes the yard on EMP
+-- without any event to catch and prevent it
+function GG.Script.UnstickFactory(unitID)
+	while true do
+		SetUnitValue(COB.YARD_OPEN, 1)
+		--SetUnitValue(COB.BUGGER_OFF, 1)
+		Sleep(1000 + math.random()*1000)
+	end
+end
+
+function GG.Script.GetSpeedParams(unitID, animFrames)
+	local attMod = (GG.att_MoveChange[unitID] or 1)
+	if attMod <= 0 then
+		return 0, 300
+	end
+	local sleepFrames = math.floor(animFrames / attMod + 0.5)
+	if sleepFrames < 1 then
+		sleepFrames = 1
+	end
+	local speedMod = 1 / sleepFrames
+	return speedMod, 33*sleepFrames
 end

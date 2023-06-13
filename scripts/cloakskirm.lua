@@ -27,7 +27,8 @@ local runspeed = 25 * (UnitDefs[unitDefID].speed / 69)
 local aimBlocked = false
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function SetSelfSpeedMod(speedmod)
@@ -53,8 +54,8 @@ local function Walk()
 		local truespeed = runspeed * speedmod
 
 		Turn (shin[side], x_axis, math.rad(85), truespeed*0.28)
-		Turn (heel[side], x_axis, math.rad(0), truespeed*0.25)
-		Turn (foot[side], x_axis, math.rad(0), truespeed*0.25)
+		Turn (heel[side], x_axis, 0, truespeed*0.25)
+		Turn (foot[side], x_axis, 0, truespeed*0.25)
 		Turn (thigh[side], x_axis, math.rad(-36), truespeed*0.16)
 		Turn (thigh[3-side], x_axis, math.rad(36), truespeed*0.16)
 
@@ -86,8 +87,8 @@ local function StopWalk()
 		Turn (heel[i], x_axis, 0, runspeed*0.2)
 		Turn (foot[i], x_axis, 0, runspeed*0.2)
 
-		Turn (thigh[i], y_axis, math.rad(60 - i*40), runspeed*0.1)
-		Turn (thigh[i], z_axis, math.rad(6*i - 9), runspeed*0.1)
+		Turn (thigh[i], y_axis, math.rad(60) - i*math.rad(40), runspeed*0.1)
+		Turn (thigh[i], z_axis, math.rad(6)*i - math.rad(9), runspeed*0.1)
 	end
 end
 
@@ -121,19 +122,22 @@ local function ReloadPenaltyAndAnimation()
 	Turn (turner, y_axis, 0, math.rad(200))
 
 	Sleep(2300) -- 3.5 second reload so no point checking earlier.
+	local checkRate = 400
 	while true do
 		local state = Spring.GetUnitWeaponState(unitID, 1, "reloadState")
 		local gameFrame = Spring.GetGameFrame()
-		if state - 32 < gameFrame then
+		if state - 40 < gameFrame then
+			checkRate = 100
+		end
+		if state - 10 < gameFrame then
 			aimBlocked = false
-
-			Sleep(500)
+			Sleep(250)
 			Turn (gun, x_axis, 0, math.rad(100))
 			SetSelfSpeedMod(1)
 			RestoreAfterDelay()
 			return
 		end
-		Sleep(340)
+		Sleep(checkRate)
 	end
 end
 
@@ -159,8 +163,8 @@ function script.AimWeapon(num, heading, pitch)
 
 	Turn (hips, x_axis, 0)
 	Turn (chest, x_axis, 0)
-	Turn (gun, x_axis, -pitch, math.rad(100))
-	Turn (turner, y_axis, heading + math.rad(5), math.rad(200))
+	Turn (gun, x_axis, -pitch, math.rad(130))
+	Turn (turner, y_axis, heading + math.rad(5), math.rad(220))
 
 	WaitForTurn (turner, y_axis)
 	WaitForTurn (gun, x_axis)

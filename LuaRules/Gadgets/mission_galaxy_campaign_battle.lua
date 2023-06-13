@@ -95,17 +95,6 @@ GG.terraformRequiresUnlock = true
 GG.terraformUnlocked = {}
 
 loaded = true
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- For gadget:Save
-local function UpdateSaveReferences()
-	_G.missionGalaxySaveTable = {
-		unitLineage        = unitLineage,
-		initialUnitData    = initialUnitData,
-		bonusObjectiveList = bonusObjectiveList,
-	}
-end
-UpdateSaveReferences()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -192,6 +181,11 @@ local function GetExtraStartUnits(teamID, customKeys)
 	end
 	initialUnitDataTable[teamID] = startUnits
 	return startUnits
+end
+
+local function SetGameRulesParamHax(key, value)
+	--Spring.SetGameRulesParam(key, value)
+	Spring.SetTeamRulesParam(0, key, value, publicTrueTable)
 end
 
 --------------------------------------------------------------------------------
@@ -281,7 +275,7 @@ local function VictoryAtLocationUpdate()
 			if DoVictoryAtLocationCheck(unitID, data[i]) then
 				if data[i].objectiveID then
 					local objParameter = "objectiveSuccess_" .. data[i].objectiveID
-					Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
+					SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0))
 				end
 				GG.CauseVictory(data[i].allyTeamID)
 				return
@@ -322,7 +316,7 @@ end
 
 local function CompleteBonusObjective(bonusObjectiveID, success)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
-	Spring.SetGameRulesParam("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
+	SetGameRulesParamHax("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
 	
 	objectiveData.success = success
 	objectiveData.terminated = true
@@ -1093,6 +1087,14 @@ local function SetTeamUnlocks(teamID, customKeys)
 			unlockCount = unlockCount + 1
 			Spring.SetTeamRulesParam(teamID, "unlockedUnit" .. unlockCount, ud.name, alliedTrueTable)
 			unlockedUnits[ud.id] = true
+			if ud.customParams.parent_of_plate then
+				local pud = UnitDefNames[ud.customParams.parent_of_plate]
+				if pud and not unlockedUnits[pud.id] then
+					unlockCount = unlockCount + 1
+					Spring.SetTeamRulesParam(teamID, "unlockedUnit" .. unlockCount, pud.name, alliedTrueTable)
+					unlockedUnits[pud.id] = true
+				end
+			end
 		end
 	end
 	Spring.SetTeamRulesParam(teamID, "unlockedUnitCount", unlockCount, alliedTrueTable)
@@ -1151,7 +1153,7 @@ local function InitializeUnlocks()
 	if doNotDisableAnyUnits then
 		GG.terraformRequiresUnlock = false
 	else
-		Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+		SetGameRulesParamHax("terraformRequiresUnlock", 1)
 	end
 	
 	local teamList = Spring.GetTeamList()
@@ -1308,20 +1310,24 @@ local function DoInitialTerraform(noBuildings)
 				{x = pos[1], z = pos[4] - 8},
 				{x = pos[1], z = pos[2]},
 			}
-			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformArea(terraform.terraformType, points, 5, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 2 then
 			-- Line
 			local points = {
 				{x = pos[1], z = pos[2]},
 				{x = pos[3], z = pos[4]},
 			}
-			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction)
+			GG.Terraform.TerraformWall(terraform.terraformType, points, 2, terraform.height or 0, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[2], i, terraform.needConstruction, terraform.enableDecay)
 		elseif terraform.terraformShape == 3 then
 			-- Ramp
-			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID, terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction)
+			GG.Terraform.TerraformRamp(pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], terraform.width, nil, nil, terraform.teamID or gaiaTeamID,
+				terraform.volumeSelection or 0, true, pos[1], pos[3], i, terraform.needConstruction, terraform.enableDecay)
 		end
 	end
-	GG.Terraform.ForceTerraformCompletion(true)
+	local fixSaves = Spring.GetModOptions().init_terra_save_fix
+	GG.Terraform.ForceTerraformCompletion(true, fixSaves == 1 or fixSaves == "1")
 end
 
 --------------------------------------------------------------------------------
@@ -1346,18 +1352,6 @@ end
 
 function GalaxyCampaignHandler.GetDefeatConfig(allyTeamID)
 	return defeatConditionConfig[allyTeamID]
-end
-
-function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
-	local customKeys = select(7, Spring.GetTeamInfo(teamID, true))
-	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
-	if retinueData then
-		local range = 70 + #retinueData*20
-		for i = 1, #retinueData do
-			local unitData = retinueData[i]
-			PlaceRetinueUnit(unitData.retinueID, range, unitData.unitDefName, x, z, facing, teamID, unitData.experience)
-		end
-	end
 end
 
 function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
@@ -1397,10 +1391,10 @@ local function MissionGameOver(missionWon)
 	gameIsOver = true
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
-	Spring.SetGameRulesParam("MissionGameOver", (missionWon and 1) or 0)
+	SetGameRulesParamHax("MissionGameOver", (missionWon and 1) or 0)
 	local frame = Spring.GetGameFrame()
 	Spring.Echo("set MissionGameOver_frames", frame)
-	Spring.SetGameRulesParam("MissionGameOver_frames", frame)
+	SetGameRulesParamHax("MissionGameOver_frames", frame)
 end
 
 --------------------------------------------------------------------------------
@@ -1466,9 +1460,6 @@ end
 
 
 function gadget:GamePreload()
-	if Spring.GetGameRulesParam("loadedGame") then
-		return
-	end
 	DoInitialTerraform()
 	if SPAWN_GAME_PRELOAD then
 		DoInitialUnitPlacement()
@@ -1482,14 +1473,9 @@ function gadget:GameFrame(n)
 		InitializeMidgameUnits(n)
 		firstGameFrame = false
 		if not SPAWN_GAME_PRELOAD then
-			if not Spring.GetGameRulesParam("loadedGame") then
-				DoInitialUnitPlacement()
-			end
+			DoInitialUnitPlacement()
 		end
 		DoStructureLevelGround()
-		if Spring.GetGameRulesParam("loadedGame") then
-			DoInitialTerraform(true)
-		end
 	end
 	
 	if midgamePlacement[n] then
@@ -1508,7 +1494,7 @@ function gadget:GameFrame(n)
 					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
 					if defeatConfig.timeLossObjectiveID then
 						local objParameter = "objectiveSuccess_" .. defeatConfig.timeLossObjectiveID
-						Spring.SetGameRulesParam(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
+						SetGameRulesParamHax(objParameter, (Spring.GetGameRulesParam(objParameter) or 0) + ((allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1))
 					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
@@ -1526,94 +1512,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Load
-
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
-		return
-	end
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Galaxy Campaign Battle Handler", SAVE_FILE) or {}
-	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
-
-	if not loadData.unitLineage
-	or not loadData.bonusObjectiveList
-	or not loadData.initialUnitData
-	then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission load file corrupted")
-		return
-	end
-	
-	loaded = true
-
-	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
-	unitLineage = {}
-	for oldUnitID, teamID in pairs(loadData.unitLineage) do
-		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		if unitID then
-			unitLineage[unitID] = teamID
-			SetBuildOptions(unitID, unitDefID, Spring.GetUnitTeam(unitID))
-		end
-	end
-	
-	for i = 1, #loadData.bonusObjectiveList do
-		bonusObjectiveList[i] = loadData.bonusObjectiveList[i]
-		local oldUnits = loadData.bonusObjectiveList[i].units
-		if oldUnits then
-			bonusObjectiveList[i].units = {}
-			for oldUnitID, allyTeamID in pairs(oldUnits) do
-				local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-				if unitID then
-					bonusObjectiveList[i].units[unitID] = allyTeamID
-				end
-			end
-		end
-	end
-	
-	-- Clear the commanders out of victoryAtLocation
-	victoryAtLocation = {}
-	initialUnitData = {}
-	
-	-- Put the units back in the objectives
-	for oldUnitID, data in pairs(loadData.initialUnitData) do
-		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		if unitID then
-			SetupInitialUnitParameters(unitID, data)
-		end
-	end
-	
-	-- restore victoryAtLocation units
-	-- needed for any units that weren't created at start; e.g. Dantes on planet 21 (Vis Ragstrom)
-	local units = Spring.GetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		local finished = select(5, Spring.GetUnitHealth(unitID)) == 1
-		if finished and not victoryAtLocation[unitID] then
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local unitTeam = Spring.GetUnitTeam(unitID)
-			gadget:UnitFinished(unitID, unitDefID, unitTeam)
-		end
-	end
-	
-	UpdateSaveReferences()
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local MakeRealTable = Spring.Utilities.MakeRealTable
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
-		return
-	end
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.missionGalaxySaveTable, "Campaign"))
-end
 
 local function MissionGameOver(cmd, missionWon)
 	if (Script.LuaUI('MissionGameOver')) then

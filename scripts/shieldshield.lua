@@ -6,6 +6,7 @@ local ALLY_ACCESS = {allied = true}
 
 --pieces
 local base = piece "base"
+local altar = piece "altar"
 local glow = piece "glow"
 
 local lf_leaf = piece "lf_leaf"
@@ -52,6 +53,7 @@ local k_speed = 2
 local walk = 2
 local aim = 4
 local SIG_Flutter = 1
+local SIG_FLOAT = 8
 
 local function Walk()
 	Signal(walk)
@@ -144,6 +146,78 @@ local function Flutter()
 	end
 end
 
+local function dustBottom()
+	local x1,y1,z1 = Spring.GetUnitPiecePosDir(unitID, base)
+	Spring.SpawnCEG("uw_amphlift", x1, y1, z1, 0, 0, 0, 0)
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim gadget callins
+
+local function riseFloat_thread()
+	Signal(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + walk)
+
+	Turn(lf_ball, y_axis, 0, 0.8)
+	Turn(lb_ball, y_axis, 0, 0.8)
+	Turn(rf_ball, y_axis, 0, 0.8)
+	Turn(rb_ball, y_axis, 0, 0.8)
+	
+	Turn(lf_ball, x_axis, 0.8,  3.8)
+	Turn(lb_ball, x_axis, -0.8, 3.8)
+	Turn(rf_ball, x_axis, 0.8,  3.8)
+	Turn(rb_ball, x_axis, -0.8, 3.8)
+	
+	Turn(rf_knee, x_axis, -0.2, 2.8)
+	Turn(rb_knee, x_axis, 0.2,  2.8)
+	
+	Turn(lf_knee, x_axis, 0, 0.8)
+	Turn(lb_knee, x_axis, 0, 0.8)
+	Turn(rf_knee, z_axis, 0, 0.8)
+	Turn(rb_knee, z_axis, 0, 0.8)
+
+	Sleep(400)
+
+	while true do
+		Turn(lf_knee, x_axis, math.random()*2 - 1, 0.18)
+		Turn(lb_knee, x_axis, math.random()*2 - 1, 0.18)
+		Turn(rf_knee, z_axis, math.random()*2 - 1, 0.18)
+		Turn(rb_knee, z_axis, math.random()*2 - 1, 0.18)
+		
+		Turn(lf_ball, y_axis,  math.random() - 0.5, 0.23)
+		Turn(lb_ball, y_axis,  math.random() - 0.5, 0.23)
+		Turn(rf_ball, y_axis,  math.random() - 0.5, 0.23)
+		Turn(rb_ball, y_axis,  math.random() - 0.5, 0.23)
+		Sleep(466)
+	end
+end
+
+function Float_startFromFloor()
+	dustBottom()
+	Signal(walk)
+	StartThread(riseFloat_thread)
+end
+
+function Float_stopOnFloor()
+	dustBottom()
+	Signal(SIG_FLOAT)
+	Turn(lf_ball, x_axis, 0, 4.8)
+	Turn(lb_ball, x_axis, 0, 4.8)
+	Turn(rf_ball, x_axis, 0, 4.8)
+	Turn(rb_ball, x_axis, 0, 4.8)
+	
+	Turn(rf_knee, x_axis, 0, 3.8)
+	Turn(rb_knee, x_axis, 0, 3.8)
+end
+
+function unit_teleported(position)
+	return GG.Floating_UnitTeleported(unitID, position)
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
 function script.Create()
 	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)	-- don't lose jitter effect with on/off button
 	Turn(lf_leaf, x_axis, l_angle, 1)
@@ -212,6 +286,7 @@ local function Stopping()
 	Turn(lb_knee, z_axis, 0, 1)
 	Turn(rb_knee, x_axis, 0, 1)
 	Turn(rb_knee, z_axis, 0, 1)
+	GG.Floating_StopMoving(unitID)
 end
 
 function script.StartMoving()
@@ -225,7 +300,7 @@ function script.StopMoving()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, SFX.EXPLODE)
+	Explode(altar, SFX.EXPLODE)
 	
 	Explode(lf_leaf, SFX.EXPLODE)
 	Explode(rf_leaf, SFX.EXPLODE)

@@ -39,7 +39,6 @@ local evacuateCmdDesc = {
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local spSetHeightMap    = Spring.SetHeightMap
-local spAreTeamsAllied  = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
@@ -486,12 +485,12 @@ local function SpawnStructure(info, teamID, boxData)
 		end
 	end
 	
-	if (unitDef.oddX) then
+	if oddX then
 		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
-	if (unitDef.oddZ) then
+	if oddZ then
 		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
@@ -567,12 +566,12 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 		end
 	end
 	
-	if (unitDef.oddX) then
+	if oddX then
 		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
-	if (unitDef.oddZ) then
+	if oddZ then
 		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION

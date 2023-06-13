@@ -1,6 +1,6 @@
 return { chickenflyerqueen = {
   unitname            = [[chickenflyerqueen]],
-  name                = [[Chicken Flyer Queen]],
+  name                = [[Chicken Queen]],
   description         = [[Clucking Hell!]],
   acceleration        = 1.2,
   activateWhenBuilt   = true,
@@ -23,6 +23,10 @@ return { chickenflyerqueen = {
 
   customParams        = {
     statsname = "chickenlandqueen",
+
+    outline_x = 400,
+    outline_y = 400,
+    outline_yoff = 90,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -31,8 +35,8 @@ return { chickenflyerqueen = {
   footprintZ          = 8,
   hoverattack         = true,
   iconType            = [[chickenq]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
+  idleAutoHeal        = 20,
+  idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxDamage           = 150000,
@@ -213,7 +217,6 @@ return { chickenflyerqueen = {
       damage                  = {
         default = 1500,
         planes  = 1500,
-        subs    = 30,
       },
 
       explosionGenerator      = [[custom:large_green_goo]],
@@ -255,7 +258,6 @@ return { chickenflyerqueen = {
       damage                  = {
         default = 75,
         planes  = [[150]],
-        subs    = 7.5,
       },
 
       dance                   = 60,

@@ -2,23 +2,20 @@ include "constants.lua"
 
 local base = piece 'base'
 local turret = piece 'turret'
-local hull = piece 'hull'
 local wake1 = piece 'wake1'
 local wake2 = piece 'wake2'
 local missile = piece 'missile'
 local firepoint = piece 'firepoint'
 local doorl = piece 'doorl'
 local doorr = piece 'doorr'
+-- unused piece: hull
 
 local smokePiece = {base}
 
 -- Signal definitions
 local SIG_MOVE = 1
 
-local gun_1 = 0
-
 function script.Create()
-	restore_delay = 3000
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn(turret, x_axis, math.rad(-90), math.rad(10000))
 	Turn(doorl, z_axis, math.rad(-100), math.rad(240))

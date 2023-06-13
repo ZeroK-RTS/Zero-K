@@ -3,11 +3,7 @@ local lWing = piece 'lWing'
 local rWing = piece 'rWing'
 local gun1 = piece 'gun1'
 local gun2 = piece 'gun2'
-local muzz1 = piece 'muzzle1'
-local muzz2 = piece 'muzzle2'
-
-local thrust1 = piece 'thrust1'
-local thrust2 = piece 'thrust2'
+-- unused pieces: muzzle[12], thrust[12]
 
 local smokePiece = {base}
 
@@ -25,8 +21,8 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	Turn(lWing,z_axis, math.rad(0),1)
-	Turn(rWing,z_axis, math.rad(0),1)
+	Turn(lWing,z_axis, 0, 1)
+	Turn(rWing,z_axis, 0, 1)
 end
 
 function script.QueryWeapon(num)
@@ -46,7 +42,7 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 200.1, 35)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 190.1, 25)
 end
 
 function script.EndBurst(num)

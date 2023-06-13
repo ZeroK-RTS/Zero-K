@@ -13,9 +13,8 @@ local smokePiece = {basebottom, basemid, basetop}
 -- Local Constants
 
 local BASETOP_TURN_SPEED = math.rad(200)
-local BASEMID_TURN_SPEED = math.rad(230)
 local HOUSING_TURN_SPEED = math.rad(200)
-local SPINDLE_TURN_SPEED = math.rad(120 / 0.8)
+local SPINDLE_TURN_SPEED = math.rad(120) / 0.8
 
 local firing = false
 local index = 2
@@ -47,7 +46,7 @@ function script.Create()
 	local midpos = {midTable.midx, midTable.midy,      midTable.midz}
 	local aimpos = {midTable.midx, midTable.midy + 15, midTable.midz}
 
-	GG.SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, midpos, aimpos, midTable.midy + 15, midTable.midy + 60, 15, 48)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 end
@@ -93,9 +92,9 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn(basetop, y_axis, heading, BASETOP_TURN_SPEED*slowMult)
+	Turn(basetop, z_axis, heading, BASETOP_TURN_SPEED*slowMult)
 	Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED*slowMult)
-	WaitForTurn(basetop, y_axis)
+	WaitForTurn(basetop, z_axis)
 	WaitForTurn(housing, x_axis)
 	StartThread (RestoreAfterDelay)
 	return true

@@ -1,8 +1,8 @@
 -- $Id: init_start_point_remover.lua 3171 2008-11-06 09:06:29Z det $
 function widget:GetInfo()
   return {
-    name      = "Start Point Remover & Comm Selector",
-    desc      = "Deletes your start point once the game begins & select commander",
+    name      = "Select Com at start",
+    desc      = "Selects the commander at the beginning of the game.",
     author    = "TheFatController and jK",
     date      = "Jul 11, 2007",
     license   = "GNU GPL, v2 or later",

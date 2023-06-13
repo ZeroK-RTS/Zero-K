@@ -28,6 +28,8 @@ return { cremcom1 = {
     statsname = [[dynknight1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     --lups_unit_fxs = { "commandShieldBlue" },
     commtype = [[6]],
@@ -35,13 +37,10 @@ return { cremcom1 = {
 
   energyMake             = 6,
   energyStorage          = 500,
-  energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDINGEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[commander1]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight       = 40,
   maxDamage              = 2500,
@@ -50,7 +49,6 @@ return { cremcom1 = {
   maxWaterDepth          = 5000,
   metalMake              = 4,
   metalStorage           = 500,
-  minCloakDistance       = 75,
   modelCenterOffset      = [[0 1 0]],
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -76,7 +74,7 @@ return { cremcom1 = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  turnRate               = 1148,
+  turnRate               = 1377,
   upright                = true,
   workerTime             = 10,
 
@@ -114,7 +112,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
@@ -156,7 +153,6 @@ return { cremcom1 = {
 
       damage                  = {
         default = 16.5,
-        subs    = 8.25,
       },
 
       duration                = 0.1,

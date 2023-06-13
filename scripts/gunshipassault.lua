@@ -14,7 +14,6 @@ local smokePiece = {base}
 include "constants.lua"
 
 local gun_1 = false
-local firestate = Spring.GetUnitStates(unitID).firestate
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local function TiltWings()
@@ -25,7 +24,7 @@ local function TiltWings()
 		else
 			local vx,_,vz = spGetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
-			Turn(wings, x_axis, math.rad(speed*3), math.rad(45))
+			Turn(wings, x_axis, math.rad(3)*speed, math.rad(45))
 			Sleep(250)
 		end
 	end

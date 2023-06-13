@@ -22,6 +22,9 @@ return { chicken_roc = {
   cruiseAlt           = 150,
 
   customParams        = {
+    outline_x = 180,
+    outline_y = 180,
+    outline_yoff = 17.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -30,8 +33,8 @@ return { chicken_roc = {
   footprintZ          = 2,
   hoverattack         = true,
   iconType            = [[heavygunship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
+  idleAutoHeal        = 20,
+  idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
   maxDamage           = 2500,
@@ -142,7 +145,6 @@ return { chicken_roc = {
       damage                  = {
         default = 80,
         planes  = 80,
-        subs    = 8,
       },
 
       dance                   = 60,

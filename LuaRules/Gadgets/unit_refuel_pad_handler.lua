@@ -57,11 +57,14 @@ local min = math.min
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local mobilePadDefs = {
-	[UnitDefNames["shipcarrier"].id] = true,
-}
+local mobilePadDefs = {}
 
-local DEFAULT_REAMMO_TIME = 5
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.ispad and (not ud.isImmobile) then
+		mobilePadDefs[unitDefID] = true
+	end
+end
+
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
@@ -90,8 +93,8 @@ for i = 1, #UnitDefs do
 		turnRadius[i] = 20
 		rotateUnit[i] = false
 	end
-	if ud.customParams.requireammo then
-		reammoFrames[i] = (tonumber(ud.customParams.reammoseconds) or DEFAULT_REAMMO_TIME)*30
+	if ud.customParams.reammoseconds then
+		reammoFrames[i] = tonumber(ud.customParams.reammoseconds)*30
 		reammoDrain[i] = (tonumber(ud.customParams.reammodrain) or DEFAULT_REAMMO_DRAIN)/30
 	end
 	
@@ -225,26 +228,24 @@ local function SitOnPad(unitID)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
-			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)*GG.REPAIR_RESOURCE_MULT
+			updateCost = ((reammoProgress and (reammoDrain[unitDefID] or 0)) or repairFrameDrain)
 			if updateCost ~= oldUpdateCost or oldBuildRate ~= buildRate then
 				oldBuildRate = buildRate
 				oldUpdateCost = updateCost
 				if updateCost > 0 then
-					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, not GG.REPAIR_COSTS_METAL, miscPriorityKey)
+					GG.StartMiscPriorityResourcing(landData.padID, buildRate*updateCost*30, true, miscPriorityKey)
 				else
 					GG.StopMiscPriorityResourcing(landData.padID, miscPriorityKey)
 				end
 			end
 			
 			if (updateCost > 0) then
-				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, not GG.REPAIR_COSTS_METAL)
-				resTable.e = updateCost*updateRate
-				if GG.REPAIR_COSTS_METAL then
-					resTable.m = resTable.e
-				end
+				updateRate = GG.GetMiscPrioritySpendScale(landData.padID, padTeamID, true)
 			else
 				updateRate = 1
 			end
+			updateRate = updateRate*buildRate
+			resTable.e = updateCost*updateRate
 			
 			if reammoProgress then
 				if (updateRate > 0) and ((updateCost == 0) or spUseUnitResource(landData.padID, resTable)) then

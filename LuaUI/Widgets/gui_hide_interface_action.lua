@@ -40,6 +40,8 @@ local cursorNames = {
 	'cursornumber',
 	'cursortime',
 	'cursorunload',
+	'cursormex',
+	'cursorterramex',
 	'cursorLevel',
 	'cursorRaise',
 	'cursorRamp',

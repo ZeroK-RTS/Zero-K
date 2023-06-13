@@ -52,13 +52,14 @@ local function ParseTypes(types, def)
 end
 
 
-local function MakeKeySetString(key, mods)
+local function MakeKeySetString(key, mods, getSymbol)
+	getSymbol = getSymbol or Spring.GetKeySymbol
 	local keyset = ""
 	if (mods.alt)   then keyset = keyset .. "A+" end
 	if (mods.ctrl)  then keyset = keyset .. "C+" end
 	if (mods.meta)  then keyset = keyset .. "M+" end
 	if (mods.shift) then keyset = keyset .. "S+" end
-	local userSym, defSym = Spring.GetKeySymbol(key)
+	local _, defSym = getSymbol(key)
 	return (keyset .. defSym)
 end
 
@@ -129,7 +130,7 @@ local function TryAction(actionMap, cmd, optLine, optWords, isRepeat, release)
 	if not callInfoList then
 		return false
 	end
-	for i,callInfo in ipairs(callInfoList) do
+	for i, callInfo in ipairs(callInfoList) do
 		--local addon = callInfo[1]
 		local func   = callInfo[2]
 		local data   = callInfo[3]
@@ -211,26 +212,38 @@ end
 --
 
 
-local function KeyAction(press, key, mods, isRepeat, _)
-	assert(_ == nil, "actionHandler:Foobar() is deprecated, use actionHandler.Foobar()!")
-
-	local keyset = MakeKeySetString(key, mods)
-	local defBinds = Spring.GetKeyBindings(keyset)
-	if (defBinds) then
-		local actionSet
-		if (press) then
-			actionSet = isRepeat and keyRepeatActions or keyPressActions
+local function KeyAction(press, key, mods, isRepeat, scanCode, actions)
+	if not Spring.GetScanSymbol then
+		assert(scanCode == nil, "actionHandler:Foobar() is deprecated, use actionHandler.Foobar()!")
+	end
+	if not actions then -- engine does not send actions (older version)
+		local keyset = MakeKeySetString(key, mods, Spring.GetKeySymbol)
+		if Spring.GetScanSymbol then
+			local scanset = MakeKeySetString(scanCode, mods, Spring.GetScanSymbol)
+			actions = Spring.GetKeyBindings(keyset, scanset)
 		else
-			actionSet = keyReleaseActions
-		end
-		for b,bAction in ipairs(defBinds) do
-			local bCmd, bOpts = next(bAction, nil)
-			local words = MakeWords(bOpts)
-			if (TryAction(actionSet, bCmd, bOpts, words, isRepeat, not press)) then
-				return true
-			end
+			actions = Spring.GetKeyBindings(keyset)
 		end
 	end
+
+	if not (actions and next(actions)) then
+		return false
+	end
+
+	local actionSet
+	if (press) then
+		actionSet = isRepeat and keyRepeatActions or keyPressActions
+	else
+		actionSet = keyReleaseActions
+	end
+	for b, bAction in ipairs(actions) do
+		local bCmd, bOpts = next(bAction, nil)
+		local words = MakeWords(bOpts)
+		if (TryAction(actionSet, bCmd, bOpts, words, isRepeat, not press)) then
+			return true
+		end
+	end
+
 	return false
 end
 
@@ -245,7 +258,7 @@ local function TextAction(line, _)
 	end
 	-- remove the command from the words list and the raw line
 	table.remove(words, 1)
-	local _,_,line = line:find("[^%s]+[%s]+(.*)")
+	local _, _, line = line:find("[^%s]+[%s]+(.*)")
 	if not line then
 		line = ""  -- no args
 	end

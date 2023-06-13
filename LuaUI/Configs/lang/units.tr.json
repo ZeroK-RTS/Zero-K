@@ -41,7 +41,7 @@
     },
     "energyfusion": {
         "name": "Füzyon Reaktörü",
-        "description": "Orta Enerji Santrali(+35)",
+        "description": "Orta Enerji Santrali",
         "helptext": "Füzyon reaktörleri makul bir fiyata iyi miktarda sabit enerji çıkışı sağlar. Onlar çekici hedefler ve çok iyi zırhlı değiller, bu yüzden iyi korunmalarını sağla. Öldürüldüğünde, füzyon reaktörleri yakındaki birimlere ağır hasar verir."
     },
     "chickenlandqueen": {
@@ -146,7 +146,7 @@
     },
     "turretgauss": {
         "name": "Gaus",
-        "description": "Gaus Tareti, kapalıyken 20 can/s yeniler",
+        "description": "Gaus Tareti, kapalıyken 10 can/s yeniler",
         "helptext": "Gaus, orta menzilli bir gaus topuyla birlikte kompakt ve esnek bir tarettir. Patlatıldığında, gelen hasarın dörtte birini ve ayrıca az miktarda sağlık rejenerasyonunu alır. Aynı zamanda sualtı hedeflerine de saldırabilir."
     },
     "nebula": {
@@ -187,7 +187,7 @@
     "spidercrabe": {
         "name": "Yengeç",
         "description": "Ağır İsyan / Çatışma Böceği - Sabitken Zırhlı Forma Geçer",
-        "helptext": "Yengeç'in büyük topları, büyük miktarda ucuz ünite kümesini yok eder ve aynı zamanda temel savunmaları yenebilir. Yürümeyi bıraktığında, yengeç üçte bir gelen hasarı azaltarak zırhlı formda kıvrılıyor. Yengeç in temel zayıflığı, hız eksikliğidir."
+        "helptext": "Yengeç'in büyük topları, büyük miktarda ucuz ünite kümesini yok eder ve aynı zamanda temel savunmaları yenebilir. Yürümeyi bıraktığında, yengeç dörtte bir gelen hasarı azaltarak zırhlı formda kıvrılıyor. Yengeç in temel zayıflığı, hız eksikliğidir."
     },
     "subscout": {
         "name": "Mızrak",
@@ -266,7 +266,7 @@
     },
     "energysingu": {
         "name": "Boyutsal Reaktör",
-        "description": "Büyük Güç Santrali (+225) - TEHLİKELİ",
+        "description": "Büyük Güç Santrali TEHLİKELİ",
         "helptext": "Boyutsal Reaktör, kontrollü bir kara delik kullanarak, kulağa geldiği kadar güvenli olan büyük miktarda enerji üretir. Reaktör tahrip edildiğinde, kara delik şiddetli bir şekilde çarparak birimleri içeri sürükler. Bunun inşa edildiği kıtanın tamamı güvenli olmayan zemin olarak değerlendirilmelidir."
     },
     "bomberdisarm": {
@@ -296,7 +296,7 @@
     },
     "energyheavygeo": {
         "name": "Gelişmiş Jeotermal",
-        "description": "Büyük Güç Santrali (+100) - TEHLİKELİ",
+        "description": "Büyük Güç Santrali TEHLİKELİ",
         "helptext": "Gelişmiş Jeotermal Santrali büyük miktarda enerji üretir. Bununla birlikte, onu yok etmek yıkıcı bir patlamaya neden olacağı için korunmayı gerektirir."
     },
     "staticcon": {
@@ -366,7 +366,7 @@
     },
     "energysolar": {
         "name": "Solar Santral",
-        "description": "Küçük Santral (+2)",
+        "description": "Küçük Santral",
         "helptext": "Güneş Santralleri enerji yapılarının maliyet açısından en az verimli olduğu, ancak aynı zamanda en güvenilir ve sağlam. Saldırıya uğradığında, santraller 8 saniye boyunca zırhlı bir şekilde kıvrılır ve bu da gelen hasarı çeyreğe kadar azaltır ve akıncılara karşı mükemmel koruma sağlar."
     },
     "gunshipheavyskirm": {
@@ -601,7 +601,7 @@
     },
     "energygeo": {
         "name": "Jeotermal Jeneratör",
-        "description": "Orta Santral (+25)",
+        "description": "Orta Santral",
         "helptext": "Jeotermal santralleri yalnızca haritada bulunan jeojik alanlar üzerine kurulabilen yüksek verimli enerji kaynaklarıdır. Yok edildiklerinde şiddetli bir şekilde patlarlar, bu nedenle doğrudan bitişik herhangi bir şey koymaktan kaçının."
     },
     "jumpcon": {
@@ -666,7 +666,7 @@
     },
     "staticheavyarty": {
         "name": "Büyük Bertha",
-        "description": "Stratejik Plazma Topu",
+        "description": "Stratejik Plazma Topu - 50 enerjilik alana bağlanarak çalışır",
         "helptext": "Bertha, harita boyunca yüksek enerjili plazmidleri ateşleyen devasa bir top. Uygun şekilde kullanıldığında, düşman operasyonlarını üssünüzün güvenliğinden etkili bir şekilde bastırabilir. Bununla birlikte, yalnızca sizin için savaşlar kazanmasını beklemeyin."
     },
     "cloaksnipe": {
@@ -811,7 +811,7 @@
     },
     "striderhub": {
         "name": "Strider Merkezi",
-        "description": "Striderlar Üretir",
+        "description": "Striderlar Üretir - 50 enerjilik alana bağlanarak çalışır",
         "helptext": "Strider Merkezi, savaş alanında huşu ve korku uyandıran \"koskocaman makina\" olan striders'ı dağıtır. Normal bir fabrikadan farklı olarak, merkez projeyi bitirmek için değil, sadece bir projeyi başlatmak için gereklidir."
     },
     "amphcon": {
@@ -1012,7 +1012,7 @@
     "tankheavyraid": {
         "name": "Baskıncı",
         "description": "Şimşek Taarruz/Akıncı Tank",
-        "helptext": "Baskıncı  yüksek teknolojili bir akıncı silahı olan yıldırım silahı, çoğunlukla felç edici hasarı verir. Bu şekilde, Baskıncı taretleri devre dışı bırakabilir, savunma hattını kullanarak vals yapabilir ve rakibin üssünün ekonomik kalbi seviyesini yükseltebilir. Öldürüldüğünde, çevredeki akıncıları sersemletebilecek bir EMD patlaması meydana getiriyor."
+        "helptext": "Baskıncı  yüksek teknolojili bir akıncı silahı olan yıldırım silahı, çoğunlukla felç edici hasarı verir. Bu şekilde, Baskıncı taretleri devre dışı bırakabilir, savunma hattını kullanarak vals yapabilir ve rakibin üssünün ekonomik kalbi seviyesini yükseltebilir."
     },
     "staticheavyradar": {
         "name": "Gelişmiş Radar",

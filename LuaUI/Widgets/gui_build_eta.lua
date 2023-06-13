@@ -5,14 +5,13 @@ function widget:GetInfo()
 		author    = "trepan (modified by jK) (stall ETA fixed by Google Frog)",
 		date      = "Feb, 2008",
 		license   = "GNU GPL, v2 or later",
-		layer     = -1,
+		layer     = -9,
 		enabled   = true,
 	}
 end
 
 local gl     = gl
 local Spring = Spring
-local table  = table
 
 local stockpilerDefNames = {
 	"staticnuke",
@@ -315,6 +314,12 @@ function widget:Update()
 	end
 end
 
+function widget:PlayerChanged(playerID)
+	if playerID == Spring.GetMyPlayerID() and not previousFullview then
+		InitializeUnits()
+	end
+end
+
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsUnitIcon = Spring.IsUnitIcon
 local function DrawEtaText(unitID, timeLeft,yoffset, negative)
@@ -355,7 +360,7 @@ function widget:DrawWorld()
 
 	for unitID, bi in pairs(stockpileEtaTable) do
 		local stocked, wanted = Spring.GetUnitStockpile(unitID)
-		if (stocked < wanted) then
+		if wanted > 0 then
 			DrawEtaText(unitID, bi.timeLeft, bi.yoffset, false)
 		end
 	end

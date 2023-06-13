@@ -18,8 +18,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 70,
-		subs    = 3,
+		default = 64.0001,
 	},
 
 	explosionGenerator      = [[custom:flash1red]],

@@ -344,7 +344,7 @@ function DrawButton(obj)
   gl.Texture(0,false)
 
   if (obj.caption) and not obj.noFont then
-    obj.font:Print(obj.caption, x + w*0.5, y + math.floor(h*0.5 - obj.font.size*0.35), "center", "linecenter")
+    obj.font:Print(obj.caption, x + w*obj.alignPadding + (obj.captionHorAlign or 0), y + math.floor(h*0.5 - obj.font.size*0.35), obj.align, "linecenter")
   end
 end
 
@@ -393,15 +393,19 @@ function DrawEditBox(obj)
 	local displayHint = false
 	
 	if text == "" and not obj.state.focused then
-		text = obj.hint
-		displayHint = true
-		font = obj.hintFont
+		if obj.noHint then
+			text = false
+		else
+			text = obj.hint
+			displayHint = true
+			font = obj.hintFont
+		end
 	end
 	
 	if (text) then
-        if obj.passwordInput and not displayHint then
-            text = string.rep("*", #text)
-        end
+		if obj.passwordInput and not displayHint then
+			text = string.rep("*", #text)
+		end
 
 		if (obj.offset > obj.cursor) and not obj.multiline then
 			obj.offset = obj.cursor
@@ -496,18 +500,18 @@ function DrawEditBox(obj)
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
 			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
 		end
-        if obj.selStart and obj.state.focused then
+		if obj.selStart and obj.state.focused then
 			local cc = obj.selectionColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4])
 
 			local top, bottom = obj.selStartPhysicalY, obj.selEndPhysicalY
 			local left, right = obj.selStartPhysical,  obj.selEndPhysical
 			if obj.multiline and top > bottom then
-                top, bottom = bottom, top
+				top, bottom = bottom, top
 				left, right = right, left
-            elseif top == bottom and left > right then
-                left, right = right, left
-            end
+			elseif top == bottom and left > right then
+				left, right = right, left
+			end
 
 			local y = clientY
 			local height = clientHeight
@@ -542,9 +546,9 @@ function DrawEditBox(obj)
 				end
 				gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, clientX - 1, clientY + bottomLine.y, rightX, bottomLine.lh)
 			end
-        end
+		end
 	end
-	
+
 	gl.Translate(-obj.x, -obj.y, 0) -- Remove with new chili, does translates for us.
 end
 
@@ -790,7 +794,7 @@ function DrawCheckbox(obj)
 
   gl.Color(1,1,1,1)
   if (obj.caption) and not obj.noFont then
-    obj.font:Print(obj.caption, obj.x + tx, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
+    obj.font:Print(obj.caption, obj.x + tx + obj.textoffset, obj.y + ty  - obj.font.size*0.35, nil, "linecenter")
   end
 end
 

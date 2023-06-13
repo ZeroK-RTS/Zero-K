@@ -46,6 +46,7 @@ for i = 1, #WeaponDefs do
 end
 
 local beamWeaponDef = {}
+local errorSent = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -213,10 +214,6 @@ end
 --------------------------------------------------------------------------------
 -- Hit and update handling
 
-local beamMultiHitException = {
-	[UnitDefNames["amphassault"].id] = true,
-	[UnitDefNames["striderdetriment"].id] = true,
-}
 local penetrationPower = {}
 
 function gadget:GameFrame(n)
@@ -249,6 +246,14 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 	if PARTIAL_PENETRATE and penetrationPower[proID] then
 		damage = penetrationPower[proID]
 		penetrationPower[proID] = nil
+	end
+	if not damage then
+		if not errorSent then
+			Spring.Echo("LUA_ERRRUN", "Missing shield damage for projectile.", proID, Spring.GetProjectileDefID(proID))
+			Spring.Utilities.UnitEcho(unitID, "Error")
+			errorSent = true
+		end
+		return true -- No idea why this would happen, but it has.
 	end
 	
 	if charge and damage < charge then
@@ -323,7 +328,6 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	end
 
 	local damage = shieldDamages[weaponDefID]
-	
 	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, defaultShielDamages[weaponDefID], hackyProID or proID)
 	return projectilePasses
 end
@@ -333,12 +337,6 @@ local function RegenerateData()
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
-	end
-end
-
-function gadget:Load()
-	if MERGE_ENABLED then
-		RegenerateData()
 	end
 end
 

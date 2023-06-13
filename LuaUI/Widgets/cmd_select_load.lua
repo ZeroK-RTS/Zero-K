@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Transport Load Double Tap",
-    desc      = "Matches selected tranaports and units when load is double pressed.",
+    desc      = "Matches selected transports and units when load is double pressed.",
     author    = "GoogleFrog",
     date      = "8 May 2015",
     license   = "GNU GPL, v2 or later",
@@ -191,7 +191,7 @@ local function DoSelectionLoad()
 			CopyMoveThenUnload(heavyTrans[offset + i], light[i])
 		end
 	end
-	Spring.SetActiveCommand(-1)
+	Spring.SetActiveCommand(nil)
 end
 
 function widget:CommandNotify(cmdId)

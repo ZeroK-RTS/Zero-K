@@ -22,14 +22,11 @@ return { spideranarchid = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[spiderriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 72,
   maxVelocity            = 1.6,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[spideranarchid.s3o]],
@@ -51,7 +48,7 @@ return { spideranarchid = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1600,
+  turnRate               = 1920,
 
   weapons                       = {
 
@@ -76,7 +73,6 @@ return { spideranarchid = {
 
       damage                  = {
         default = 5,
-        subs    = 0.25,
       },
 
       explosionGenerator      = [[custom:FLASH1blue]],

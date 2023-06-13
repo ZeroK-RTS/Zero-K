@@ -76,7 +76,6 @@ local SIG_CLOSEDOORS = 2
 local SIG_AIM = 4
 local SIG_AIM2 = 8
 local SIG_AIM3 = 16
-local SIG_RESTORE = 32
 local SIG_TOL = 64
 
 local doorSpeed = 3
@@ -162,33 +161,33 @@ function closeDoors()
 	Signal(SIG_CLOSEDOORS)
 	SetSignalMask(SIG_CLOSEDOORS)
 
-	Turn(LUpperClaw1,z_axis, math.rad(0),doorSpeed)
-	Turn(RUpperClaw1,z_axis, math.rad(0),doorSpeed)
-	Turn(LMidClaw1,z_axis, math.rad(0),doorSpeed)
-	Turn(RMidClaw1,z_axis, math.rad(0),doorSpeed)
-	Turn(LLowClaw1,z_axis, math.rad(0),doorSpeed)
-	Turn(RLowClaw1,z_axis, math.rad(0),doorSpeed)
+	Turn(LUpperClaw1,z_axis, 0, doorSpeed)
+	Turn(RUpperClaw1,z_axis, 0, doorSpeed)
+	Turn(LMidClaw1,z_axis, 0, doorSpeed)
+	Turn(RMidClaw1,z_axis, 0, doorSpeed)
+	Turn(LLowClaw1,z_axis, 0, doorSpeed)
+	Turn(RLowClaw1,z_axis, 0, doorSpeed)
 	Sleep(200)
-	Turn(LUpperClaw2,z_axis, math.rad(0),doorSpeed)
-	Turn(RUpperClaw2,z_axis, math.rad(0),doorSpeed)
-	Turn(LMidClaw2,z_axis, math.rad(0),doorSpeed)
-	Turn(RMidClaw2,z_axis, math.rad(0),doorSpeed)
-	Turn(LLowClaw2,z_axis, math.rad(0),doorSpeed)
-	Turn(RLowClaw2,z_axis, math.rad(0),doorSpeed)
+	Turn(LUpperClaw2,z_axis, 0, doorSpeed)
+	Turn(RUpperClaw2,z_axis, 0, doorSpeed)
+	Turn(LMidClaw2,z_axis, 0, doorSpeed)
+	Turn(RMidClaw2,z_axis, 0, doorSpeed)
+	Turn(LLowClaw2,z_axis, 0, doorSpeed)
+	Turn(RLowClaw2,z_axis, 0, doorSpeed)
 	Sleep(200)
-	Turn(LUpperClaw3,z_axis, math.rad(0),doorSpeed)
-	Turn(RUpperClaw3,z_axis, math.rad(0),doorSpeed)
-	Turn(LMidClaw3,z_axis, math.rad(0),doorSpeed)
-	Turn(RMidClaw3,z_axis, math.rad(0),doorSpeed)
-	Turn(LLowClaw3,z_axis, math.rad(0),doorSpeed)
-	Turn(RLowClaw3,z_axis, math.rad(0),doorSpeed)
+	Turn(LUpperClaw3,z_axis, 0, doorSpeed)
+	Turn(RUpperClaw3,z_axis, 0, doorSpeed)
+	Turn(LMidClaw3,z_axis, 0, doorSpeed)
+	Turn(RMidClaw3,z_axis, 0, doorSpeed)
+	Turn(LLowClaw3,z_axis, 0, doorSpeed)
+	Turn(RLowClaw3,z_axis, 0, doorSpeed)
 	Sleep(200)
-	Turn(LUpperClaw4,z_axis, math.rad(0),doorSpeed)
-	Turn(RUpperClaw4,z_axis, math.rad(0),doorSpeed)
-	Turn(LMidClaw4,z_axis, math.rad(0),doorSpeed)
-	Turn(RMidClaw4,z_axis, math.rad(0),doorSpeed)
-	Turn(LLowClaw4,z_axis, math.rad(0),doorSpeed)
-	Turn(RLowClaw4,z_axis, math.rad(0),doorSpeed)
+	Turn(LUpperClaw4,z_axis, 0, doorSpeed)
+	Turn(RUpperClaw4,z_axis, 0, doorSpeed)
+	Turn(LMidClaw4,z_axis, 0, doorSpeed)
+	Turn(RMidClaw4,z_axis, 0, doorSpeed)
+	Turn(LLowClaw4,z_axis, 0, doorSpeed)
+	Turn(RLowClaw4,z_axis, 0, doorSpeed)
 	Sleep(200)
 	doorOpen = false
 	--[[
@@ -258,6 +257,10 @@ function ForceDropUnit()
 	end
 	unitLoaded = nil
 	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
+end
+
+function OnStartingCrash()
+	ForceDropUnit()
 end
 
 --fetch unit id of passenger (from the load command)
@@ -391,7 +394,7 @@ function script.BeginTransport(passengerID)
 	end
 	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
-	if not GG.TransportAllowed(passengerID) then
+	if not GG.TransportAllowed(unitID, passengerID) then
 		Sleep(10)
 		unitLoaded = passengerID
 		ForceDropUnit()

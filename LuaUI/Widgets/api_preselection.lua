@@ -104,11 +104,11 @@ WG.PreSelection_GetUnitUnderCursor = function (onlySelectable, ignoreSelectionBo
 	end
 end
 
-WG.PreSelection_IsSelectionBoxActive = function ()
+WG.PreSelection_IsSelectionBoxActive = function (thresholdMatters)
 	local x, y, lmb = spGetMouseState()
 	local _, here = SafeTraceScreenRay(x, y, true, thruMinimap)
 
-	if lmb and not cannotSelect and holdingForSelection and not (here[1] == start[1] and here[2] == start[2] and here[3] == start[3]) then
+	if lmb and not cannotSelect and holdingForSelection and ((not thresholdMatters) or not (here[1] == start[1] and here[2] == start[2] and here[3] == start[3])) then
 		return true
 	end
 	return false
@@ -124,6 +124,7 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 
 		if thruMinimap then
 			local posX, posY, sizeX, sizeY = Spring.GetMiniMapGeometry()
+			local alwaysSelectedID = WG.SelectionModkeys_GetUnitReleaseWouldClick and WG.SelectionModkeys_GetUnitReleaseWouldClick()
 			x = math_max(x, posX)
 			x = math_min(x, posX+sizeX)
 			y = math_max(y, posY)
@@ -135,13 +136,28 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 			local top = math_max(start[3], here[3])
 			local units = Spring.GetUnitsInRectangle(left, bottom, right, top)
 			if spec and fullselect then
+				if alwaysSelectedID then
+					local found = false
+					for i = 1, #units do
+						if units[i] == alwaysSelectedID then
+							found = true
+							break
+						end
+					end
+					if not found then
+						units[#units + 1] = alwaysSelectedID
+					end
+				end
 				return (WG.SelectionRank_GetFilteredSelection and WG.SelectionRank_GetFilteredSelection(units)) or units --nil if empty
 			else
 				local myUnits = {}
+				if alwaysSelectedID then
+					myUnits[#myUnits + 1] = alwaysSelectedID
+				end
 				local teamID = 0
 				for i = 1, #units do
 					teamID = Spring.GetUnitTeam(units[i])
-					if teamID == myTeamID and not Spring.GetUnitNoSelect(units[i]) then
+					if teamID == myTeamID and (units[i] ~= alwaysSelectedID) and not Spring.GetUnitNoSelect(units[i]) then
 						myUnits[#myUnits+1] = units[i]
 					end
 				end
@@ -154,6 +170,10 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 		else
 			local allBoxedUnits = {}
 			local units = {}
+			local alwaysSelectedID = WG.SelectionModkeys_GetUnitReleaseWouldClick and WG.SelectionModkeys_GetUnitReleaseWouldClick()
+			if alwaysSelectedID then
+				allBoxedUnits[#allBoxedUnits + 1] = alwaysSelectedID
+			end
 
 			if spec and fullselect then
 				units = Spring.GetAllUnits()
@@ -165,8 +185,9 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 				local uvx, uvy, uvz = Spring.GetUnitViewPosition(units[i], true)
 				local ux, uy, uz = spWorldToScreenCoords(uvx, uvy, uvz)
 				local hereMouseX, hereMouseY = x, y
-				if ux and not Spring.GetUnitNoSelect(units[i]) then
-					if ux >= math_min(screenStartX, hereMouseX) and ux < math_max(screenStartX, hereMouseX) and uy >= math_min(screenStartY, hereMouseY) and uy < math_max(screenStartY, hereMouseY) then
+				if ux and (units[i] ~= alwaysSelectedID) and not Spring.GetUnitNoSelect(units[i]) then
+					if ux >= math_min(screenStartX, hereMouseX) and ux < math_max(screenStartX, hereMouseX) and
+							uy >= math_min(screenStartY, hereMouseY) and uy < math_max(screenStartY, hereMouseY) then
 						allBoxedUnits[#allBoxedUnits+1] = units[i]
 					end
 				end
@@ -192,6 +213,9 @@ WG.PreSelection_IsUnitInSelectionBox = function (unitID)
 				boxedUnitIDs[boxedUnits[i]] = true
 			end
 		end
+	end
+	if WG.SelectionModkeys_GetUnitReleaseWouldClick and (unitID == WG.SelectionModkeys_GetUnitReleaseWouldClick()) then
+		return true
 	end
 	return boxedUnitIDs[unitID] or false
 end

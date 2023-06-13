@@ -247,10 +247,6 @@ local icontypes = {
     bitmap='icons/vehiclelrarty.dds',
     size=2.2,
   },
-  vehicleaa = {
-    bitmap='icons/vehicleaa.dds',
-    size=1.8,
-  },
 
   --walkers
   walkerjammer = {
@@ -316,6 +312,10 @@ local icontypes = {
   amphskirm = {
     bitmap='icons/amphskirm.png',
     size=1.8,
+  },
+  amphsupport = {
+    bitmap='icons/amphsupport.png',
+    size=1.9,
   },
   amphassault = {
     bitmap='icons/amphassault.png',
@@ -627,11 +627,11 @@ local icontypes = {
   },
   t3builder = {
     bitmap='icons/t3builder.dds',
-    size=2,
+    size=1.8,
   },
   staticbuilder = {
     bitmap='icons/staticbuilder.dds',
-    size=1,
+    size=1.5,
   },
   t3hub = {
     bitmap='icons/t3hub.dds',
@@ -729,7 +729,7 @@ local icontypes = {
   },
   advradar = {
     bitmap='icons/radar.dds',
-    size=2.8,
+    size=2.5,
   },
    sonar = {
     bitmap='icons/sonar.dds',
@@ -915,17 +915,6 @@ local icontypes = {
     bitmap='icons/airbomb.dds',
 	distance=0.5,
     size=1.6,
-  },
-
-  --spec ops
-  t3builder = {
-    bitmap='icons/t3builder.dds',
-    size=1.8,
-  },
-  --nanos
-  staticbuilder = {
-    bitmap='icons/staticbuilder.dds',
-    size=1.5,
   },
 
   --ship icons
@@ -1175,6 +1164,63 @@ local icontypes = {
   fachover = {
     bitmap='icons/fachover.dds',
     size=2.6,
+    radiusadjust=0,
+  },
+
+  --plates
+  padair = {
+    bitmap='icons/padair.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padamph = {
+    bitmap='icons/padamph.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padbot = {
+    bitmap='icons/padbot.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padgunship = {
+    bitmap='icons/padgunship.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padhover = {
+    bitmap='icons/padhover.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padjumpjet = {
+    bitmap='icons/padjumpjet.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padship = {
+    bitmap='icons/padship.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padspider = {
+    bitmap='icons/padspider.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padtank = {
+    bitmap='icons/padtank.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padveh = {
+    bitmap='icons/padveh.png',
+    size=2.15,
+    radiusadjust=0,
+  },
+  padwalker = {
+    bitmap='icons/padwalker.png',
+    size=2.15,
     radiusadjust=0,
   },
 

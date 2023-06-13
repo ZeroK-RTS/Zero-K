@@ -46,8 +46,9 @@ local damageDefs = {}
 
 for udid, ud in pairs(UnitDefs) do
 	local burstDef
-	for i = 1, #ud.weapons do
-		local weapon = ud.weapons[i]
+	local weapons = ud.weapons
+	for i = 1, #weapons do
+		local weapon = weapons[i]
 		burstDef = burstDef or processWeapon(WeaponDefs[weapon.weaponDef], weapon.onlyTargets)
 		if burstDef then
 			break

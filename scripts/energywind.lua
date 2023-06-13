@@ -11,21 +11,29 @@ local UPDATE_PERIOD = 1000
 local BUILD_PERIOD = 500
 
 local turnSpeed = math.rad(20)
+local waterFanSpin = math.rad(30)
 
+local SIG_ANIM = 1
 local isWind, baseWind, rangeWind
 
+local rand = math.random
 local function BobTidal()
-	baseDirection = baseDirection + math.random(0,math.rad(2))
+	SetSignalMask(SIG_ANIM)
+	-- Body movement models being somewhat free-floating upon the waves
+	local bodySpinSpeed = 0
 	while true do
-		Turn(cradle, y_axis, baseDirection, math.rad(1))
-		
-		Move(cradle, x_axis, math.random(-2,2), 0.2)
-		Move(cradle, y_axis, math.random(-0.5,0.5) - 51, 0.05)
-		Move(cradle, z_axis, math.random(-2,2), 0.2)
+		bodySpinSpeed = 0.99*bodySpinSpeed + (rand() - 0.5) * 0.016
+		Spin(cradle, y_axis, bodySpinSpeed)
+		Spin(fan, z_axis, waterFanSpin + bodySpinSpeed)
+
+		Move(cradle, x_axis, rand(-2,2), 0.3)
+		Move(cradle, y_axis, rand(-2,2) * 0.5 - 51, 0.2)
+		Move(cradle, z_axis, rand(-2,2), 0.3)
 		Sleep(1000)
-		
+
 		if GG.Wind_SpinDisabled then
 			StopSpin(fan, z_axis)
+			StopSpin(cradle, y_axis)
 			return
 		end
 	end
@@ -42,12 +50,12 @@ function SpinWind()
 			if GG.WindStrength and ((oldWindStrength ~= GG.WindStrength) or (oldWindHeading ~= GG.WindHeading)) then
 				oldWindStrength, oldWindHeading = GG.WindStrength, GG.WindHeading
 				local st = baseWind + (GG.WindStrength or 0)*rangeWind
-				Spin(fan, z_axis, -st*(0.94 + 0.08*math.random()))
+				Spin(fan, z_axis, -st*(0.94 + 0.08*rand()))
 				Turn(cradle, y_axis, GG.WindHeading - baseDirection + math.pi, turnSpeed)
 			end
-			Sleep(UPDATE_PERIOD + 200*math.random())
+			Sleep(UPDATE_PERIOD + 200*rand())
 		end
-		
+
 		if GG.Wind_SpinDisabled then
 			StopSpin(fan, z_axis)
 			return
@@ -64,26 +72,31 @@ function InitializeWind()
 		Hide(base)
 		Hide(flaot)
 		Move(cradle, y_axis, -51)
-		Turn(fan, x_axis, math.rad(90))
+		Turn(fan, x_axis, hpi)
 		Move(fan, z_axis, 9)
 		Move(fan, y_axis, -5)
-		--[[ diagonal down, needs teamcolour
-		Move(cradle, y_axis, -41)
-		Move(cradle, z_axis, -10)
-		Turn(cradle, z_axis, math.pi)
-		Turn(cradle, x_axis, math.rad(-15))
-		Turn(fan, x_axis, math.rad(50))
-		Move(fan, x_axis, 0)
-		Move(fan, z_axis, 14)
-		Move(fan, y_axis, 18)
-		--]]
-		Spin(fan, z_axis, math.rad(30))
 	end
+end
+
+function SetTidalEnabled(enabled)
+	Signal(SIG_ANIM)
+	if enabled then
+		StartThread(BobTidal)
+	else
+		StopSpin(fan, z_axis)
+		StopSpin(cradle, y_axis)
+	end
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", (enabled and 1) or 0)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+function SetWindParams(newMin, newRange)
+	baseWind, rangeWind = newMin, newRange
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	baseDirection = math.random(0,GG.Script.tau)
+	baseDirection = math.random() * math.tau
 	Turn(base, y_axis, baseDirection)
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
 	InitializeWind()
@@ -93,7 +106,7 @@ local function CreateTidalWreck()
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local heading = Spring.GetUnitHeading(unitID)
 	local team = Spring.GetUnitTeam(unitID)
-	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/GG.Script.tau, team)
+	local featureID = Spring.CreateFeature("energywind_deadwater", x, y, z, heading + baseDirection*65536/math.tau, team)
 	Spring.SetFeatureResurrect(featureID, "energywind")
 end
 

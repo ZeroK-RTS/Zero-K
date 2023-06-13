@@ -11,9 +11,9 @@ return {
 		["groundDiffuseColor"]= {0.45714286, 0.42380953, 0.37142858, 1},
 		["groundAmbientColor"]= {0.48095238, 0.48571429, 0.5, 1},
 		["unitAmbientColor"]= {0.85238093, 0.9285714, 0.8142857, 1},
-		["groundSpecularColor"]= {0.07619048, 0.06666667, 0.05238095, 1},
-		["specularExponent"]= 0.75,
 		["unitDiffuseColor"]= {0.40952381, 0.37142858, 0.35714287, 1},
-		["unitSpecularColor"]= {0.54761904, 0.53809524, 0.54285717, 1},
+		["groundSpecularColor"]= {0.07, 0.06, 0.05714286, 1},
+		["specularExponent"]= 32,
+		["unitSpecularColor"]= {0.33809525, 0.32857144, 0.41904762, 1},
 	},
 }

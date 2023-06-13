@@ -47,7 +47,7 @@ function script.Create()
 	Turn(boom, x_axis, math.rad(60))
 	Turn(boom, y_axis, math.pi)
 	Move(boom, y_axis, 12)
-	Turn(neck, x_axis, -math.rad(120))
+	Turn(neck, x_axis, math.rad(-120))
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(HoveringAnimations)
 	Spring.SetUnitNanoPieces(unitID, {beam})
@@ -73,11 +73,6 @@ end
 
 function script.setSFXoccupy(num)
 	curTerrainType = num
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),beam)
-	return beam
 end
 
 function script.Killed(recentDamage, maxHealth)

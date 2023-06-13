@@ -1,4 +1,5 @@
 include "constants.lua"
+include "pieceControl.lua"
 
 -- these are satellite pieces
 local LimbA1 = piece('LimbA1')
@@ -63,8 +64,8 @@ end
 local function Dock()
 	SetSignalMask(SIG_DOCK)
 	for i=1,4 do
-		Turn(InnerLimbs[i],y_axis,math.rad(0),1)
-		Turn(OuterLimbs[i],y_axis,math.rad(0),1)
+		Turn(InnerLimbs[i],y_axis,0,1)
+		Turn(OuterLimbs[i],y_axis,0,1)
 	end
 end
 
@@ -118,7 +119,7 @@ function mahlazer_Hide()
 end
 
 function mahlazer_Show()
-	for i=1,4 do
+	for i = 1, 4 do
 		Show(InnerLimbs[i])
 		Show(OuterLimbs[i])
 	end
@@ -137,9 +138,14 @@ function mahlazer_DisengageTheLaserBeam()
 	on = false
 end
 
-function mahlazer_AimAt(pitch)
-	Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
-	Turn(Satellite, x_axis, pitch/2, math.rad(0.6))
+function mahlazer_StopAim()
+	GG.PieceControl.StopTurn(SatelliteMuzzle, x_axis)
+	GG.PieceControl.StopTurn(Satellite, x_axis)
+end
+
+function mahlazer_AimAt(pitch, speed)
+	Turn(SatelliteMuzzle, x_axis, pitch, speed)
+	Turn(Satellite, x_axis, pitch/2, speed*0.5)
 end
 
 function mahlazer_Undock()

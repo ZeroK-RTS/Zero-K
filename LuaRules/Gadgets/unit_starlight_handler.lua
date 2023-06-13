@@ -48,18 +48,18 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if alreadyAdded then
 		return
 	end
-
-	gadgetHandler:UpdateCallIn("GameFrame")
 	alreadyAdded = true
 end
 
 function gadget:GameFrame(f)
+	if not alreadyAdded then
+		return
+	end
 	for satID, team in pairs(transfers) do
 		spTransferUnit(satID, team, false)
 		transfers[satID] = nil
 	end
 	alreadyAdded = false
-	gadgetHandler:RemoveCallIn("GameFrame")
 end
 
 --------------------------------------------------------------------------------
@@ -82,6 +82,28 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Stop command aim interrupt
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD.STOP] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return {[starlightDefID] = true}
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if unitDefID == starlightDefID and cmdID == CMD.STOP then
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		if env.StopAim then
+			Spring.UnitScript.CallAsUnit(unitID, env.StopAim)
+		end
+	end
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Initialization
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
@@ -92,16 +114,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 function gadget:Initialize()
-	if not alreadyAdded then
-		gadgetHandler:RemoveCallIn("GameFrame")
-	end
-	
-	--for _, unitID in pairs(Spring.GetAllUnits()) do
-	--	gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
-	--end
-	
 	GG.Starlight_DamageFrame = {}
-	local ud = UnitDefs[starlightDefID]
 	
 	for weaponDefID, _ in pairs(starlightWeapons) do
 		Script.SetWatchExplosion(weaponDefID, true)

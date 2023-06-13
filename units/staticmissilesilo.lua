@@ -14,6 +14,7 @@ return { staticmissilesilo = {
     [[seismic]],
     [[empmissile]],
     [[napalmmissile]],
+    [[missileslow]],
   },
 
   buildPic                      = [[staticmissilesilo.png]],
@@ -22,23 +23,18 @@ return { staticmissilesilo = {
   canPatrol                     = false,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
-
-  customParams                  = {
-    nongroundfac = [[1]],
+  customparams = {
+    missile_silo_capacity = 4,
+    stats_show_death_explosion = 1,
   },
-
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 6,
   footprintZ                    = 6,
   iconType                      = [[cruisemissile]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
   script                        = [[staticmissilesilo.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],

@@ -16,7 +16,7 @@
 function widget:GetInfo()
   return {
     name      = "LupsStats",
-    desc      = "",
+    desc      = "Shows some LUPS stats",
     author    = "jK",
     date      = "Dec, 2007",
     license   = "GNU GPL, v2 or later",

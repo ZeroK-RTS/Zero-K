@@ -28,7 +28,11 @@ local BUTTON_SIZE = 25
 local BONUS_TOGGLE_IMAGE = 'LuaUI/images/plus_green.png'
 local BRIEFING_IMAGE = LUAUI_DIRNAME .. "images/advplayerslist/random.png"
 
+local spGetDescription = Spring.Utilities.GetDescription
+local spGetHumanName = Spring.Utilities.GetHumanName
+local spGetModKeyState = Spring.GetModKeyState
 local spGetMouseState = Spring.GetMouseState
+local spGetUnitDefID = Spring.GetUnitDefID
 
 local max, min = math.max, math.min
 
@@ -134,7 +138,7 @@ local function TakeMouseOffEdge()
 		return
 	end
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local changed = false
 	
 	if mx < SCREEN_EDGE then
@@ -186,12 +190,33 @@ local function InitializeNewtonFirezones()
 	end
 end
 
+local function GetUnitDefFromIconFilename(filename)
+-- 	Spring.Echo('Searching for unit in filename: ' .. filename)
+	local name = string.match(filename, "unitpics/(%w+).png")
+	if name then
+-- 		Spring.Echo('Found unitname: ' .. name)
+		local udef = UnitDefNames[name]
+		if udef then
+			return udef
+		end
+	end
+	return
+end
+
+local function GetUnitTooltip(udef)
+	return spGetHumanName(udef) .. " - " .. spGetDescription(udef) .. "\n\255\1\255\1" .. WG.Translate("interface", "space_click_show_stats")
+end
+
+local function GetGameRulesHax(key)
+	--return Spring.GetGameRulesParam(key)
+	return Spring.GetTeamRulesParam(0, key)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Briefing Window
 
 local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
-	
 	local offset = 0
 	
 	local holder = Chili.Control:New{
@@ -209,7 +234,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 		if imageFile then
 			textPos = imageSize + 10
 			
-			Chili.Image:New{
+			local image = Chili.Image:New{
 				x = 4,
 				y = offset,
 				width = imageSize,
@@ -218,6 +243,21 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 				file = imageFile,
 				parent = holder
 			}
+			local udef = GetUnitDefFromIconFilename(imageFile)
+			if udef then
+				image.tooltip = GetUnitTooltip(udef)
+				image.OnClick = {
+						function(_, _, _, button)
+							local _, _, meta, _ = spGetModKeyState()
+							if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+								local x, y = spGetMouseState()
+								WG.MakeStatsWindow(udef, x, y)
+								return true
+							end
+							return false
+						end
+				}
+			end
 		end
 		
 		local label = Chili.TextBox:New{
@@ -239,6 +279,7 @@ local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
 		
 		offset = offset + offsetSize + paragraphSpacing
 		holder:SetPos(nil, nil, nil, offset - paragraphSpacing/2)
+		return offset - paragraphSpacing/2
 	end
 	
 	return externalFunctions
@@ -253,10 +294,11 @@ local function InitializeBriefingWindow()
 	
 	local SCROLL_POS = 70
 	local SCROLL_HEIGHT = 170
+	local DEFAULT_SCROLL_SIZE = 320
 	
 	local externalFunctions = {}
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	local briefingWindow = Chili.Window:New{
 		classname = "main_window",
@@ -317,14 +359,18 @@ local function InitializeBriefingWindow()
 		parent = briefingWindow,
 	}
 	local planetTextHandler = GetNewTextHandler(textScroll, 22, 64)
-	planetTextHandler.AddEntry(textOverride or planetInformation.description)
+	local textSize = planetTextHandler.AddEntry(textOverride or planetInformation.description)
 	
 	if planetInformation.tips then
 		local tips = tipsOverride or planetInformation.tips
 		for i = 1, #tips do
-			planetTextHandler.AddEntry(tips[i].text, tips[i].image)
+			textSize = planetTextHandler.AddEntry(tips[i].text, tips[i].image)
 		end
 	end
+	
+	local totalSize = math.min(math.floor(screenHeight*0.90), (BRIEF_HEIGHT + math.max(0, textSize - DEFAULT_SCROLL_SIZE)))
+	local finalPosition = math.max(50, math.floor((screenHeight - totalSize)/2.5))
+	briefingWindow:SetPos(nil, finalPosition, nil, totalSize)
 	
 	Chili.Button:New{
 		x = "38%",
@@ -358,9 +404,13 @@ local function InitializeBriefingWindow()
 		if not withoutPause then
 			if gameNotStarted then
 				wantPause = true
+				wantUnpause = true
 			else
 				local paused = select(3, Spring.GetGameSpeed())
-				if not paused then
+				if paused then
+					wantUnpause = false
+				else
+					wantUnpause = true
 					Spring.SendCommands("pause")
 				end
 			end
@@ -368,16 +418,25 @@ local function InitializeBriefingWindow()
 		TakeObjectivesLists()
 		
 		briefingWindow:SetVisibility(true)
+		briefingWindow:BringToFront()
+	end
+	
+	function externalFunctions.BringToFrontFix()
+		if briefingWindow.visible then
+			briefingWindow:BringToFront()
+		end
 	end
 	
 	function externalFunctions.Hide()
 		if WG.PauseScreen_SetEnabled then
 			WG.PauseScreen_SetEnabled(true)
 		end
-		wantPause = false
-		local paused = select(3, Spring.GetGameSpeed())
-		if paused then
-			Spring.SendCommands("pause")
+		if wantUnpause then
+			wantPause = false
+			local paused = select(3, Spring.GetGameSpeed())
+			if paused then
+				Spring.SendCommands("pause")
+			end
 		end
 		briefingWindow:SetVisibility(false)
 	end
@@ -437,6 +496,21 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 			file = OBJECTIVE_ICON,
 			parent = holderControl,
 		}
+		local udef = GetUnitDefFromIconFilename(OBJECTIVE_ICON)
+		if udef then
+			image.tooltip = GetUnitTooltip(udef)
+			image.OnClick = {
+					function(_, _, _, button)
+						local _, _, meta, _ = spGetModKeyState()
+						if meta and (button == 1) and WG.MakeStatsWindow then  -- Space+Click - show unit stats
+							local x, y = spGetMouseState()
+							WG.MakeStatsWindow(udef, x, y)
+							return true
+						end
+						return false
+					end
+			}
+		end
 		objectives[i] = {
 			offset = offset,
 			label = label,
@@ -459,7 +533,7 @@ local function GetObjectivesBlock(holderWindow, position, items, gameRulesParam,
 		if objectives[index].terminated then
 			return
 		end
-		local newSuccess = Spring.GetGameRulesParam(gameRulesParam .. index)
+		local newSuccess = GetGameRulesHax(gameRulesParam .. index)
 		if not newSuccess then
 			return
 		end
@@ -679,7 +753,7 @@ end
 -- Victory/Defeat
 
 local function GetTimeString()
-	local frames = Spring.GetGameRulesParam("MissionGameOver_frames") or select(1, Spring.GetGameFrame()) or 0
+	local frames = GetGameRulesHax("MissionGameOver_frames") or select(1, Spring.GetGameFrame()) or 0
 	return frames
 end
 
@@ -821,6 +895,9 @@ function widget:Update()
 	if firstUpdates then
 		if TakeMouseOffEdge() and WG.ZoomToStart then
 			WG.ZoomToStart()
+		end
+		if firstUpdates < 2 and briefingWindow then
+			briefingWindow.BringToFrontFix()
 		end
 		firstUpdates = firstUpdates + 1
 		if firstUpdates > 30 then
@@ -972,7 +1049,7 @@ function widget:Initialize()
 	myFont = glLoadFont(fontPath, fontSizeHeadline, nil, nil) -- FIXME: nils for #2564
 	UpdateWindowCoords()
 	
-	local initMissionGameOver = Spring.GetGameRulesParam("MissionGameOver")
+	local initMissionGameOver = GetGameRulesHax("MissionGameOver")
 	if initMissionGameOver then
 		MissionGameOver(initMissionGameOver == 1)
 	end

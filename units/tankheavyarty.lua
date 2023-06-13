@@ -2,8 +2,8 @@ return { tankheavyarty = {
   unitname               = [[tankheavyarty]],
   name                   = [[Tremor]],
   description            = [[Heavy Saturation Artillery Tank]],
-  acceleration           = 0.3,
-  brakeRate              = 1.24,
+  acceleration           = 0.36,
+  brakeRate              = 1.488,
   buildCostMetal         = 1600,
   builder                = false,
   buildPic               = [[tankheavyarty.png]],
@@ -17,9 +17,11 @@ return { tankheavyarty = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     modelradius       = [[17]],
     cus_noflashlight  = 1,
     selection_scale   = 0.92,
+    unstick_leeway    = 60, -- Don't lose move orders if stuck while packing.
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -27,19 +29,17 @@ return { tankheavyarty = {
   footprintZ             = 4,
   highTrajectory         = 1,
   iconType               = [[tanklrarty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 2045,
   maxSlope               = 18,
-  maxVelocity            = 1.35,
+  maxVelocity            = 1.25,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TANK4]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName             = [[cortrem.s3o]],
+  script                 = [[tankheavyarty.lua]],
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {
@@ -56,7 +56,7 @@ return { tankheavyarty = {
   trackType              = [[StdTank]],
   trackWidth             = 38,
   turninplace            = 0,
-  turnRate               = 312,
+  turnRate               = 500,
   workerTime             = 0,
 
   weapons                = {
@@ -64,8 +64,6 @@ return { tankheavyarty = {
     {
       def                = [[PLASMA]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      mainDir            = [[0 0 1]],
-      maxAngleDif        = 270,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -99,7 +97,6 @@ return { tankheavyarty = {
       damage                  = {
         default = 145,
         planes  = 145,
-        subs    = 7,
       },
       
       edgeEffectiveness       = 0.5,
@@ -109,7 +106,7 @@ return { tankheavyarty = {
       interceptedByShieldType = 1,
       myGravity               = 0.1,
       noSelfDamage            = false,
-      range                   = 1220,
+      range                   = 1160,
       reloadtime              = 0.333,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/tremor_fire]],

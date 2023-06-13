@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		date = "30 May 2011",
 		license = "GNU GPL, v2 or later",
 		layer = 0,
-		enabled = true
+		enabled = false
 	}
 end
 
@@ -38,8 +38,6 @@ local unitBomberDiveState = {
 --------------------------------------------------------------------------------
 
 local CMD_ATTACK = CMD.ATTACK
-
-local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
@@ -282,8 +280,13 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 						bombers[proOwnerID].underShield = gameFrame + 45
 						if targetID then
 							local height = GetWantedBomberHeight(targetID, proOwnerID, bombers[proOwnerID].config, true)
-							local distance = GetCollisionDistance(proOwnerID, targetID)
-							temporaryDive(proOwnerID, 45, height, distance, targetID)
+							--[[ Distance to target is nil to dive as soon as possible,
+							     as suggested by the comments inside `temporaryDive`.
+							     Without it, the first dive attempt can be ignored for
+							     being too far away and yet the second one will be too
+							     close already (because the fake weapon shoots comparatively
+							     rarely for how fast bombers are). ]]
+							temporaryDive(proOwnerID, 45, height, nil, targetID)
 						else
 							temporaryDive(proOwnerID, 45, 40)
 						end

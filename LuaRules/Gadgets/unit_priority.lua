@@ -27,7 +27,7 @@ function gadget:GetInfo()
 		-- Must be before mex_overdrive
 		layer     = -5,
 		enabled   = true
-	}
+  }
 end
 
 --------------------------------------------------------------------------------
@@ -49,22 +49,22 @@ local DefaultState = 1
 
 local CommandOrder = 123456
 local CommandDesc = {
-	id          = CMD_PRIORITY,
-	type        = CMDTYPE.ICON_MODE,
-	name        = 'Construction Priority',
-	action      = 'priority',
-	tooltip 	= 'Construction Priority' .. TooltipsA[DefaultState + 1],
-	params      = {DefaultState, 'Low','Normal','High'}
+	id      = CMD_PRIORITY,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Construction Priority',
+	action  = 'priority',
+	tooltip = 'Construction Priority' .. TooltipsA[DefaultState + 1],
+	params  = {DefaultState, 'Low','Normal','High'}
 }
 
 local MiscCommandOrder = 123457
 local MiscCommandDesc = {
-	id          = CMD_MISC_PRIORITY,
-	type        = CMDTYPE.ICON_MODE,
-	name        = 'Morph&Stock Priority',
-	action      = 'miscpriority',
-	tooltip     = 'Morph&Stock Priority' .. TooltipsA[DefaultState + 1],
-	params      = {DefaultState, 'Low','Normal','High'}
+	id      = CMD_MISC_PRIORITY,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Morph&Stock Priority',
+	action  = 'miscpriority',
+	tooltip = 'Morph&Stock Priority' .. TooltipsA[DefaultState + 1],
+	params  = {DefaultState, 'Low','Normal','High'}
 }
 
 local StateCount = #CommandDesc.params-1
@@ -80,9 +80,9 @@ local TeamEnergyReserved = {} -- ditto for energy
 local effectiveTeamMetalReserved = {} -- Takes max storage into account
 local effectiveTeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
-local UnitOnlyEnergy = {} -- Whether a unit is only using energy for engine-default behaviour
-local buildSpeedMod = {}
+local UnitOnlyEnergy = {} -- UnitOnlyEnergy[unitID] = true if the unit does not try to drain metal
 
+local checkOnlyEnergy = false -- becomes true onces every second to check for repairers
 
 -- Derandomization of resource allocation. Remembers the portion of resources allocated to the unit and gives access
 -- when they have a full chunk.
@@ -100,21 +100,28 @@ local priorityTypes = {
 
 local ALLY_ACCESS = {allied = true}
 
-
 local debugTeam = false
 local debugOnUnits = false
 local debugBuildUnit
-
-GG.REPAIR_COSTS_METAL = false -- Configurable
-GG.REPAIR_RESOURCE_MULT = 1
-local REPAIR_METAL_COST_FACTOR = Game.repairEnergyCostFactor
 
 --------------------------------------------------------------------------------
 --  COMMON
 --------------------------------------------------------------------------------
 
-local function isFactory(UnitDefID)
-  return UnitDefs[UnitDefID].isFactory or false
+local isFactoryUnitDef = {}
+local havePriorityUnitDef = {}
+local buildSpeedUnitDef = {}
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.isFactory and not ud.customParams.notreallyafactory then
+		isFactoryUnitDef[unitDefID] = true
+	end
+	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then
+		havePriorityUnitDef[unitDefID] = true
+	end
+	if ud.buildSpeed ~= 0 then
+		buildSpeedUnitDef[unitDefID] = ud.buildSpeed
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -132,16 +139,11 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
-local spUseUnitResource   = Spring.UseUnitResource
-
-local GetUnitCost = Spring.Utilities.GetUnitCost
 
 local alliedTable = {allied = true}
-local resourceTable = {e = 0, m = 0}
 
 local function SetMetalReserved(teamID, value)
 	TeamMetalReserved[teamID] = value or 0
@@ -202,17 +204,18 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID,
                                 cmdID, cmdParams, cmdOptions)
-  if (cmdID ~= CMD_PRIORITY) then
-    return false  -- command was not used
-  end
-  PriorityCommand(unitID, cmdParams, cmdOptions)
-  return true, true  -- command was used, remove it
+	if (cmdID ~= CMD_PRIORITY) then
+		return false  -- command was not used
+	end
+	PriorityCommand(unitID, cmdParams, cmdOptions)
+	return true, true  -- command was used, remove it
 end
 
 -- Misc Priority tasks can get their reduced build rate directly.
 -- The external gadget is then trusted to obey the proportion which
 -- they are allocated.
 local function GetMiscPrioritySpendScale(unitID, teamID, onlyEnergy)
+
 	if (teamMiscPriorityUnits[teamID] == nil) then
 		teamMiscPriorityUnits[teamID] = {}
 	end
@@ -297,7 +300,6 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if debugBuildUnit and debugBuildUnit[unitID] then
 		Spring.Echo("AUBS", builderID, teamID, unitID, unitDefID, step, Spring.GetUnitHealth(unitID))
 	end
-	
 	if (step <= 0) then
 		--// Reclaiming and null buildpower (waited cons) aren't prioritized
 		return true
@@ -309,23 +311,21 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	end
 	
 	local scale
-	buildSpeedMod[builderID] = GG.unitRepairRate[unitID]
-	if GG.unitRepairRate[unitID] then
-		buildSpeedMod[builderID] = buildSpeedMod[builderID]*GG.REPAIR_RESOURCE_MULT
+	if UnitOnlyEnergy[builderID] then
+		scale = TeamScaleEnergy[teamID]
+	else
+		scale = TeamScale[teamID]
 	end
 	
-	if GG.REPAIR_COSTS_METAL then
-		scale = TeamScale[teamID]
-	else
-		if GG.unitRepairRate[unitID] then
-			UnitOnlyEnergy[builderID] = true
-			scale = TeamScaleEnergy[teamID]
-		else
+	if checkOnlyEnergy then
+		local _,_,inBuild = spGetUnitIsStunned(unitID)
+		if inBuild then
 			UnitOnlyEnergy[builderID] = false
-			scale = TeamScale[teamID]
+		else
+			UnitOnlyEnergy[builderID] = GG.unitRepairRate[unitID] or 1
 		end
 	end
-
+	
 	local priorityLevel
 	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then
 		priorityLevel = 1
@@ -341,27 +341,17 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then
 			UnitConPortion[builderID] = conAmount - 1
-			if not (priorityLevel == 3 or CheckReserveResourceUse(teamID)) then
-				return false
-			end
+			return priorityLevel == 3 or CheckReserveResourceUse(teamID, UnitOnlyEnergy[builderID])
 		else
 			UnitConPortion[builderID] = conAmount
 			return false
 		end
 	end
-	
-	-- Add metal cost to repairing
-	if GG.REPAIR_COSTS_METAL and GG.unitRepairRate[unitID] then
-		resourceTable.m = step*GetUnitCost(unitID, unitDefID)*REPAIR_METAL_COST_FACTOR
-		if not spUseUnitResource(builderID, resourceTable) then
-			return false
-		end
-	end
-	
 	return true
 end
 
 function gadget:GameFrame(n)
+
 	if n % TEAM_SLOWUPDATE_RATE == 1 then
 		local prioUnits, miscPrioUnits
 		
@@ -395,25 +385,25 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if UnitOnlyEnergy[unitID] then
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
-						energySpending[pri] = energySpending[pri] + buildSpeed*(buildSpeedMod[unitID] or 1)
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
+						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
 						if scaleEnergy and scaleEnergy[pri] then
-							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
+							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
 							
 							if debugMode and debugOnUnits then
 								Spring.Utilities.UnitEcho(unitID, "Energy Priority: " ..  pri ..
 									", BP: " .. buildSpeed ..
-									", Pull: " .. buildSpeed*(buildSpeedMod[unitID] or 1)*scaleEnergy[pri]
+									", Pull: " .. buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
 								)
 							end
 						end
 					else
-						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
-						spending[pri] = spending[pri] + buildSpeed*(buildSpeedMod[unitID] or 1)
+						local buildSpeed = GG.att_out_buildSpeed[unitID] or buildSpeedUnitDef[unitDefID] or 0
+						spending[pri] = spending[pri] + buildSpeed
 						
 						if debugMode and debugOnUnits then
 							Spring.Utilities.UnitEcho(unitID, "Priority: " .. pri ..
-								", BP: " ..  buildSpeed*(buildSpeedMod[unitID] or 1)
+								", BP: " .. buildSpeed
 							)
 						end
 					end
@@ -530,7 +520,6 @@ function gadget:GameFrame(n)
 					local mRatio = max(0,nextMetalLevel)/metalDrain
 					local eRatio = max(0,nextEnergyLevel)/energyDrain
 				
-					local spare
 					if mRatio < eRatio then
 						-- mRatio is lower so we are stalling metal harder.
 						-- Set construction scale limited by metal.
@@ -605,6 +594,12 @@ function gadget:GameFrame(n)
 		
 		teamMiscPriorityUnits = {} --reset priority list
 		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
+		
+		checkOnlyEnergy = false
+	end
+	
+	if n % TEAM_SLOWUPDATE_RATE == 0 then
+		checkOnlyEnergy = true
 	end
 end
 
@@ -615,7 +610,6 @@ end
 function AddMiscPriorityUnit(unitID) --remotely add a priority command.
 	if not UnitMiscPriority[unitID] then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
 		spInsertUnitCmdDesc(unitID, MiscCommandOrder, MiscCommandDesc)
 		SetPriorityState(unitID, DefaultState, CMD_MISC_PRIORITY)
 	end
@@ -649,7 +643,6 @@ function RemoveMiscPriorityUnit(unitID) --remotely remove a forced priority comm
 			MiscUnitOnlyEnergy[unitID] = nil
 		end
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_MISC_PRIORITY)
 		if (cmdDescID) then
 			spRemoveUnitCmdDesc(unitID, cmdDescID)
@@ -753,24 +746,28 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
-function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID)
-	local prio  = DefaultState
-	if (builderID ~= nil)  then
-		local unitDefID = spGetUnitDefID(builderID)
-		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then
-			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
-			LastUnitFromFactory[builderID] = UnitID
+function gadget:UnitCreated(unitID, unitDefID, TeamID, builderID)
+	if not havePriorityUnitDef[unitDefID] then
+		local _,_,inBuild = spGetUnitIsStunned(unitID)
+		if not inBuild then
+			return -- Do not add priority to completed units
 		end
 	end
-	UnitPriority[UnitID] =  prio
+	local prio  = DefaultState
+	if (builderID ~= nil)  then
+		local builderDefID = spGetUnitDefID(builderID)
+		if (builderDefID ~= nil and isFactoryUnitDef[builderDefID]) then
+			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
+			LastUnitFromFactory[builderID] = unitID
+		end
+	end
+	UnitPriority[unitID] =  prio
 	CommandDesc.params[1] = prio
-	spInsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
+	spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
-	
-	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then
+	if havePriorityUnitDef[unitDefID] then
 		SetPriorityState(unitID, DefaultState, CMD_PRIORITY)
 	else  -- not a builder priority makes no sense now
 		UnitPriority[unitID] = nil
@@ -779,7 +776,6 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 			spRemoveUnitCmdDesc(unitID, cmdDescID)
 		end
 	end
-
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)

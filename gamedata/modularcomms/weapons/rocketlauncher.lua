@@ -1,7 +1,7 @@
 local name = "commweapon_rocketlauncher"
 local weaponDef = {
 	name                    = [[Rocket Launcher]],
-	areaOfEffect            = 96,
+	areaOfEffect            = 90,
 	cegTag                  = [[rocket_trail_bar_flameboosted]],
 	craterBoost             = 0,
 	craterMult              = 0,
@@ -19,7 +19,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 360,
-		subs    = 18,
 	},
 
 	fireStarter             = 180,
@@ -41,7 +40,7 @@ local weaponDef = {
 	turret                  = true,
 	weaponAcceleration      = 100,
 	weaponType              = [[MissileLauncher]],
-	weaponVelocity          = 250,
+	weaponVelocity          = 235,
 }
 
 return name, weaponDef

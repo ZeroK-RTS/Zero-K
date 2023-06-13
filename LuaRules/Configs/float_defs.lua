@@ -45,10 +45,9 @@ local floatDefs = {
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
-
 	[UnitDefNames["amphimpulse"].id] = {
 		initialRiseSpeed = 5,
-		riseAccel = 0.15,
+		riseAccel = 0.20,
 		riseUpDrag = 0.99,
 		riseDownDrag = 0.7,
 		sinkAccel = -0.12,
@@ -64,7 +63,6 @@ local floatDefs = {
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
-	
 	[UnitDefNames["amphriot"].id] = {
 		initialRiseSpeed = 3,
 		riseAccel = 0.13,
@@ -84,6 +82,43 @@ local floatDefs = {
 		surfaceWaitPos = -30,
 		surfaceMinWait = 80,
 		surfaceMaxWait = 120,
+	},
+	[UnitDefNames["amphsupport"].id] = {
+		initialRiseSpeed = 2.2,
+		riseAccel = 0.1,
+		riseUpDrag = 0.92,
+		riseDownDrag = 0.9,
+		sinkAccel = -0.12,
+		sinkUpDrag = 0.9,
+		sinkDownDrag = 0.85,
+		airAccel = -0.1, -- aka gravity, only effective out of water
+		airDrag = 0.99,
+		waterHitDrag = 0.3,
+		floatPoint = -22,
+		surfaceDampen = 10,
+		depthRequirement = -20,
+		stopSpeedLeeway = 0.05,
+		stopPositionLeeway = 0.1,
+		surfaceWaitPos = -30,
+		surfaceMinWait = 80,
+		surfaceMaxWait = 120,
+	},
+	[UnitDefNames["shieldshield"].id] = {
+		initialRiseSpeed = 3,
+		riseAccel = 0.14,
+		riseUpDrag = 0.9,
+		riseDownDrag = 0.7,
+		sinkAccel = -0.13,
+		sinkUpDrag = 0.92,
+		sinkDownDrag = 0.9,
+		airAccel = -0.1,
+		airDrag = 0.995,
+		waterHitDrag = 0.52,
+		floatPoint = -15,
+		surfaceDampen = 10,
+		depthRequirement = -35,
+		stopSpeedLeeway = 0.05,
+		stopPositionLeeway = 0.1,
 	},
 	-- This unit expels water with an air tank to float. It results in high rise
 	-- acceleration with low drag. To sink the tank must be filled with water

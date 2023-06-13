@@ -74,17 +74,6 @@ local controllers = {}
 local reloading = {}
 
 --------------------------------------------------------------------------------
--- For gadget:Save
---------------------------------------------------------------------------------
-local function UpdateSaveReferences()
-	_G.unitDamage    = unitDamage
-	_G.capturedUnits = capturedUnits
-	_G.controllers   = controllers
-	_G.reloading     = reloading
-end
-UpdateSaveReferences()
-
---------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utilities
 
@@ -560,79 +549,12 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Capture failed to access save/load API")
-		return
-	end
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Capture", SAVE_FILE) or {}
-
-	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
-	
-	-- Reset data (something may have triggered during unit creation).
-	damageByID = {data = {}, count = 0}
-	unitDamage = {}
-	capturedUnits = {}
-	controllers = {}
-	reloading = {}
-	
-	-- Load the data
-	for oldUnitID, data in pairs(loadData.unitDamage or {}) do
-		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		if unitID then
-			damageByID.count = damageByID.count + 1
-			damageByID.data[damageByID.count] = unitID
-			unitDamage[unitID] = data
-			unitDamage[unitID].index = damageByID.count
-		end
-	end
-	
-	for oldUnitID, data in pairs(loadData.capturedUnits or {}) do
-		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		if unitID then
-			capturedUnits[unitID] = data
-			capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
-		end
-	end
-	
-	for oldUnitID, data in pairs(loadData.controllers or {}) do
-		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-		if unitID then
-			controllers[unitID] = {
-				postCaptureReload = data.postCaptureReload,
-				units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
-				unitByID = {
-					count = data.unitByID.count,
-					data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
-				},
-				killSubordinates = data.killSubordinates,
-			}
-			
-			KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
-		end
-	end
-	
-	for frame, data in pairs(loadData.reloading or {}) do
-		local newFrame = frame - loadGameFrame
-		if newFrame >= 0 then
-			reloading[newFrame] = {
-				count = data.count,
-				data = GG.SaveLoad.GetNewUnitIDValues(data.data)
-			}
-		end
-	end
-	
-	UpdateSaveReferences()
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
@@ -700,14 +622,13 @@ local function DrawWire(units, spec)
 			local los1 = spGetUnitLosState(controller, myTeam, false)
 			local los2 = spGetUnitLosState(controliee, myTeam, false)
 			if teamID and (spec or (los1 and los1.los) or (los2 and los2.los)) then
-				-- (spIsUnitInView(controliee) or spIsUnitInView(controller)) -- Doesn't quite work because capture line may be long.
 				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
 				
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controller, true)
+				local _,_,_,xxx,yyy,zzz = spGetUnitPosition(controller, true)
 				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz, 50)
 				point[1] = {xxx, yyy, zzz}
 				point[2] = {topX, topY, topZ}
-				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controliee, true)
+				_,_,_,xxx,yyy,zzz = spGetUnitPosition(controliee, true)
 				topX, topY, topZ = GetUnitTop(controliee, xxx, yyy, zzz)
 				point[3] = {topX,topY,topZ}
 				point[4] = {xxx,yyy,zzz}
@@ -739,7 +660,7 @@ end
 
 local lastFrame = 0
 function gadget:DrawWorld()
-	if Spring.GetGameFrame() ~= lastFrame then
+	if spGetGameFrame() ~= lastFrame then
 		UpdateList()
 	end
 	
@@ -775,32 +696,4 @@ function gadget:UnitDestroyed (unitID)
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Save/Load
-
-function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		gadget:UnitGiven(unitID)
-	end
-end
-
-local MakeRealTable = Spring.Utilities.MakeRealTable
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Capture failed to access save/load API")
-		return
-	end
-	local toSave = {
-		unitDamage = MakeRealTable(SYNCED.unitDamage, "Capture unit damage"),
-		capturedUnits = MakeRealTable(SYNCED.capturedUnits, "Capture captured units"),
-		controllers = MakeRealTable(SYNCED.controllers, "Capture controllers"),
-		reloading = MakeRealTable(SYNCED.reloading, "Capture reloads"),
-	}
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 end

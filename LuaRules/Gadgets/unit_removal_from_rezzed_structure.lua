@@ -12,24 +12,23 @@ function gadget:GetInfo()
         "by moving them aside",
         author    = "Alcur",
         date      = "21.10.2017",
-        license   = "GNU GPL, v2 or later", -- is that the correct license?
-        layer     = 0, -- what should the layer be?
+        license   = "GNU GPL, v2 or later",
+        layer     = 0,
         enabled   = true,
     }
 end
 
 
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 local spGetUnitRadius = Spring.GetUnitRadius
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spEcho = Spring.Echo
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetGroundNormal = Spring.GetGroundNormal
 local spSetUnitPosition = Spring.SetUnitPosition
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitHeight = Spring.GetUnitHeight
 local gameSquareSize = Game.squareSize
 
@@ -52,6 +51,12 @@ local function Debug(message)
     spEcho(gadgetName .. ": " .. message)
 end
 
+-- other traits not cached and read from UnitDefs directly on purpose, see below
+local pushesWhenRezzed = {}
+for unitDefID, unitDef in pairs(UnitDefs) do
+	pushesWhenRezzed[unitDefID] = unitDef.isImmobile
+end
+
 local function IsGroundSlopeTraversable(unitDef, x, z)
     local _, _, _, slope = spGetGroundNormal(x, z)
     local traversable = unitDef.moveDef.maxSlope >= slope
@@ -65,7 +70,7 @@ local function CanUnitSwim(unitDef)
 end
 
 local function IsUnitShip(unitDef)
-    return unitDef.moveDef.type == "ship"
+    return unitDef.moveDef.smClass == Game.speedModClasses.Ship
 end
 
 
@@ -220,78 +225,76 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
-    local uDef = UnitDefs[unitDefID]
-    if builderID then
-        if Spring.GetUnitCurrentCommand(builderID) == CMD_RESURRECT and uDef.isImmobile and
-        uDef.name ~= "terraunit" then
-            local ux1, uy1, uz1 = spGetUnitPosition(unitID)
-            --local dimensions = spGetUnitDefDimensions(unitDefID)
-            --Debug("Created unit height = " .. dimensions.height)
-            --Debug("Created unit radius = " .. dimensions.radius)
-            --Debug("Created unit xsize = " .. uDef.xsize)
-            --Debug("Created unit zsize = " .. uDef.zsize)
-            local footprintXElmos = uDef.xsize * gameSquareSize
-            local footprintZElmos = uDef.zsize * gameSquareSize
-            --local createdUnitGroundY = spGetGroundHeight(ux1, uz1)
+	if not pushesWhenRezzed[unitDefID]
+	or not builderID
+	or spGetUnitCurrentCommand(builderID) ~= CMD_RESURRECT then
+		return
+	end
 
+	--[[ Indexing UnitDefs looks bad, but reaching here will already be
+	     very rare and the gadget is very comprehensive in checking the
+	     conditions, so a ton of different fields are used: likely it's
+	     not too efficient to cache them all. ]]
+	local uDef = UnitDefs[unitDefID]
 
-            local createdUnitMinX =  ux1 - footprintXElmos / 2
-            local createdUnitMinZ =  uz1 - footprintZElmos / 2
-            local createdUnitMaxX =  ux1 + footprintXElmos / 2
-            local createdUnitMaxZ =  uz1 + footprintZElmos / 2
+	local ux1, uy1, uz1 = spGetUnitPosition(unitID)
+	--Debug("Created unit xsize = " .. uDef.xsize)
+	--Debug("Created unit zsize = " .. uDef.zsize)
+	local footprintXElmos = uDef.xsize * gameSquareSize
+	local footprintZElmos = uDef.zsize * gameSquareSize
+	--local createdUnitGroundY = spGetGroundHeight(ux1, uz1)
 
-            --Debug("createdUnitMinX = " .. createdUnitMinX .. ", createdUnitMaxX = " .. createdUnitMaxX)
-            --Debug("createdUnitMinZ = " .. createdUnitMinZ .. ", createdUnitMaxZ = " .. createdUnitMaxZ)
+	local createdUnitMinX = ux1 - footprintXElmos / 2
+	local createdUnitMinZ = uz1 - footprintZElmos / 2
+	local createdUnitMaxX = ux1 + footprintXElmos / 2
+	local createdUnitMaxZ = uz1 + footprintZElmos / 2
+	--Debug("createdUnitMinX = " .. createdUnitMinX .. ", createdUnitMaxX = " .. createdUnitMaxX)
+	--Debug("createdUnitMinZ = " .. createdUnitMinZ .. ", createdUnitMaxZ = " .. createdUnitMaxZ)
 
-            local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance,
-                createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance,
-                createdUnitMaxZ + extraGatherDistance)
+	local units = spGetUnitsInRectangle(createdUnitMinX - extraGatherDistance,
+		createdUnitMinZ - extraGatherDistance, createdUnitMaxX + extraGatherDistance,
+		createdUnitMaxZ + extraGatherDistance)
 
+	--Debug("Y of the created unit: " .. uy1)
+	--Debug("Ground Y of the created unit: " .. createdUnitGroundY)
+	for i = 1, #units do
+		local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
+			createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
+		if units[i] ~= unitID and shouldUnitBeMoved then
 
-            --Debug("Y of the created unit: " .. uy1)
-            --Debug("Ground Y of the created unit: " .. createdUnitGroundY)
-            for i = 1, #units do
-                local shouldUnitBeMoved, requiredGap = ShouldUnitBeMoved(units[i], createdUnitMinX,
-                    createdUnitMinZ, createdUnitMaxX, createdUnitMaxZ)
-                if units[i] ~= unitID and shouldUnitBeMoved then
+			local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
 
-                    local rectUX, rectUY, rectUZ = spGetUnitPosition(units[i])
+			local xDiff1 = rectUX - (createdUnitMinX - requiredGap)
+			local xDiff2 = rectUX - (createdUnitMaxX + requiredGap)
+			local zDiff1 = rectUZ - (createdUnitMinZ - requiredGap)
+			local zDiff2 = rectUZ - (createdUnitMaxZ + requiredGap)
 
-                    local xDiff1 = rectUX - (createdUnitMinX - requiredGap)
-                    local xDiff2 = rectUX - (createdUnitMaxX + requiredGap)
-                    local zDiff1 = rectUZ - (createdUnitMinZ - requiredGap)
-                    local zDiff2 = rectUZ - (createdUnitMaxZ + requiredGap)
-                    
-                    
+			local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
+				{isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
 
-                    local diffs = {{isX = true, value = xDiff1}, {isX = true, value = xDiff2},
-                        {isX = false, value = zDiff1}, {isX = false, value = zDiff2}}
+			local comp = function(elem1, elem2)
+				return Abs(elem1.value) < Abs(elem2.value)
+			end
 
-                    local comp = function(elem1, elem2)
-                        return Abs(elem1.value) < Abs(elem2.value)
-                    end
+			SortTable(diffs, comp)
 
-                    SortTable(diffs, comp)
+			local diffsCopy = {}
+			for j = 1, #diffs do
+				diffsCopy[j] = {}
+				diffsCopy[j].isX = diffs[j].isX
+				diffsCopy[j].value = diffs[j].value
+			end
 
-                    local diffsCopy = {}
-                    for j = 1, #diffs do
-                        diffsCopy[j] = {}
-                        diffsCopy[j].isX = diffs[j].isX
-                        diffsCopy[j].value = diffs[j].value
-                    end
-
-                    local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
-                    local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
-                    if targetX then
-                        spSetUnitPosition(units[i], targetX, targetZ)
-                        -- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
-                    --else
-                        --Debug("Failed to find an accessible spot")
-                    end
-                end
-            end
-        end
-    end
+			local rectUDef = UnitDefs[spGetUnitDefID(units[i])]
+			local targetX, targetZ = FindAccessibleSpot(diffsCopy, rectUDef, rectUX, rectUZ)
+			if targetX then
+			spSetUnitPosition(units[i], targetX, targetZ)
+				-- Spring.MarkerAddPoint(targetX, 0, targetZ, "target")
+			--else
+				--Debug("Failed to find an accessible spot")
+			end
+		end
+	end
 end
 
 -- The below code is for testing. It creates an athena and a cloakassault if they don't exist.

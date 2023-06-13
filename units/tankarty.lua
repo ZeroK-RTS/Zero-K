@@ -2,8 +2,8 @@ return { tankarty = {
   unitname            = [[tankarty]],
   name                = [[Emissary]],
   description         = [[General-Purpose Artillery]],
-  acceleration        = 0.141,
-  brakeRate           = 1.36,
+  acceleration        = 0.17,
+  brakeRate           = 1.632,
   buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[tankarty.png]],
@@ -12,25 +12,24 @@ return { tankarty = {
   canPatrol           = true,
   category            = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
+    unstick_leeway    = 30, -- Don't lose move orders if stuck while packing.
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[tankarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 840,
   maxSlope            = 18,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[TANK3]],
   moveState           = 0,
   noAutoFire          = false,
@@ -46,7 +45,7 @@ return { tankarty = {
   trackType           = [[StdTank]],
   trackWidth          = 34,
   turninplace         = 0,
-  turnRate            = 400,
+  turnRate            = 640,
   workerTime          = 0,
 
   weapons             = {
@@ -75,14 +74,12 @@ return { tankarty = {
       customParams            = {
         burst = Shared.BURST_RELIABLE,
 
-        reaim_time = 8, -- COB
         light_color = [[1.4 0.8 0.3]],
       },
 
       damage                  = {
         default = 600.5,
         planes  = 600.5,
-        subs    = 35,
       },
 
       edgeEffectiveness       = 0.5,
@@ -90,7 +87,7 @@ return { tankarty = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity               = 0.095,
+      myGravity               = 0.090,
       noSelfDamage            = true,
       range                   = 1120,
       reloadtime              = 7,
@@ -98,7 +95,7 @@ return { tankarty = {
       soundStart              = [[weapon/cannon/pillager_fire]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 315,
+      weaponVelocity          = 320,
     },
 
   },

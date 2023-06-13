@@ -21,6 +21,7 @@ return { gunshipassault = {
   cruiseAlt           = 135,
 
   customParams        = {
+    bait_level_default = 1,
     airstrafecontrol = [[1]],
     modelradius    = [[10]],
   },
@@ -33,7 +34,6 @@ return { gunshipassault = {
   iconType            = [[heavygunshipassault]],
   maxDamage           = 3600,
   maxVelocity         = 4.5,
-  minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[Black_Dawn.s3o]],
@@ -81,7 +81,6 @@ return { gunshipassault = {
 
       damage                  = {
         default = 220.5,
-        subs    = 11,
       },
 
       dance                   = 30,
@@ -92,7 +91,7 @@ return { gunshipassault = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[hobbes.s3o]],
+      model                   = [[hobbes_nohax.s3o]],
       noSelfDamage            = true,
       range                   = 270,
       reloadtime              = 9,

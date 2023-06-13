@@ -16,6 +16,7 @@ Button = Control:Inherit{
 
 	align = "center",
 	valign = "center",
+	alignPadding = 0.5,
 	noFont = false,
 }
 

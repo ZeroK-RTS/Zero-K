@@ -3,11 +3,12 @@ include 'constants.lua'
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
-local anteny = piece 'anteny'
+
+-- unused pieces: anteny, ozdoba
+
 local cervena = piece 'cervena'
 local modra = piece 'modra'
 local zelena = piece 'zelena'
-local ozdoba = piece 'ozdoba'
 local spodni_zebra = piece 'spodni_zebra'
 local vrchni_zebra = piece 'vrchni_zebra'
 local trubky = piece 'trubky'
@@ -59,8 +60,10 @@ local flare2 = piece 'flare_l'
 --------------------------------------------------------------------------------
 local smokePiece = {rotating_bas, mc_rocket_ho}
 
-local TURN_SPEED = 145
-local TILT_SPEED = 200
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
+local TURN_SPEED = math.rad(145)
+local GEAR_SPEED = TURN_SPEED * 5
 local RELOAD_SPEED = 20
 local MOV_DEL = 50
 
@@ -91,7 +94,7 @@ local function IdleAnim()
 	while true do
 		EmitSfx(zelena, 1025)
 		
-		heading = math.rad(math.random(-90, 90))
+		local heading = math.random() * math.rad(180) - math.rad(90)
 		if(lastHeading > heading) then
 			rotateWise = 1
 		else
@@ -103,12 +106,12 @@ local function IdleAnim()
 			StartThread(DoAmmoRotate)
 		end
 		
-		Spin(gear, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
-		Spin(gear001, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
-		Spin(gear002, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
+		Spin(gear, y_axis, GEAR_SPEED * rotateWise)
+		Spin(gear001, y_axis, GEAR_SPEED * rotateWise)
+		Spin(gear002, y_axis, GEAR_SPEED * rotateWise)
 	
 		Turn(rotating_bas, y_axis, heading, math.rad(60))
-		Turn(mc_rocket_ho, x_axis, math.rad(math.random(-25, 0)), math.rad(60))
+		Turn(mc_rocket_ho, x_axis, math.rad(-25)*math.random(), math.rad(60))
 		
 		WaitForTurn(rotating_bas, y_axis)
 		EmitSfx(modra, 1026)
@@ -356,13 +359,13 @@ function script.AimWeapon(num, heading, pitch)
 		end
 	end
 	
-	Turn(rotating_bas, y_axis, heading, math.rad(TURN_SPEED))
+	Turn(rotating_bas, y_axis, heading, TURN_SPEED)
 	
-	Spin(gear, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
-	Spin(gear001, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
-	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
+	Spin(gear, y_axis, GEAR_SPEED * rotateWise)
+	Spin(gear001, y_axis, GEAR_SPEED * rotateWise)
+	Spin(gear002, y_axis, GEAR_SPEED * rotateWise)
 	
-	Turn(mc_rocket_ho, x_axis, -pitch, math.rad(TILT_SPEED))
+	Turn(mc_rocket_ho, x_axis, -pitch, math.rad(200))
 	WaitForTurn(rotating_bas, y_axis)
 	WaitForTurn(mc_rocket_ho, x_axis)
 	
@@ -379,10 +382,8 @@ function script.Shot(num)
 end
 
 function Bum()
-	temp = flare
-	flare = flare2
-	flare2 = temp
-	
+	flare, flare2 = flare2, flare
+
 	if(gun) then
 		Hide(raketa026)
 				
@@ -408,11 +409,7 @@ function script.AimFromWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1800
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 1800, 70, 0.1, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

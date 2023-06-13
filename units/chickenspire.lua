@@ -2,9 +2,7 @@ return { chickenspire = {
   unitname                      = [[chickenspire]],
   name                          = [[Chicken Spire]],
   description                   = [[Static Artillery]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
   builder                       = false,
@@ -20,6 +18,9 @@ return { chickenspire = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
+    outline_x = 155,
+    outline_y = 200,
+    outline_yoff = 75,
   },
 
   energyMake                    = 0,
@@ -29,8 +30,8 @@ return { chickenspire = {
   footprintZ                    = 4,
   highTrajectory                = 1,
   iconType                      = [[staticarty]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
+  idleAutoHeal                  = 20,
+  idleTime                      = 300,
   levelGround                   = false,
   maxDamage                     = 1500,
   maxSlope                      = 36,
@@ -56,7 +57,6 @@ return { chickenspire = {
   },
   sightDistance                 = 512,
   sonarDistance                 = 512,
-  turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooooooooooooooo]],

@@ -16,10 +16,12 @@ local spGetMyTeamID        	= Spring.GetMyTeamID
 local spGetSpectatingState 	= Spring.GetSpectatingState
 local spGetUnitLosState    	= Spring.GetUnitLosState
 
-local scriptUnitDestroyed		= Script.LuaUI.UnitDestroyed
-local scriptUnitDestroyedByTeam	= Script.LuaUI.UnitDestroyedByTeam
+--[[ NB: these are C proxies, not the actual Lua functions currently linked LuaUI-side,
+     so it is safe to cache them here even if the underlying func changes afterwards ]]
+local scriptUnitDestroyed       = Script.LuaUI.UnitDestroyed
+local scriptUnitDestroyedByTeam = Script.LuaUI.UnitDestroyedByTeam
 
-function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
 	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
 	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
@@ -27,14 +29,14 @@ function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDe
 	-- we need to check if any widget uses the callin, otherwise it is not bound and will produce error spam
 	if Script.LuaUI('UnitDestroyedByTeam') then
 		if spec then
-			scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)
+			scriptUnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamID)
 			if not specFullView and not isAllyUnit and (spGetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1) then
 				scriptUnitDestroyed (unitID, unitDefID, unitTeam)
 			end
 		else
 			local attackerInLos = attUnitID and (spGetUnitLosState(attUnitID, myAllyTeamID, true) % 2 == 1)
 			if isAllyUnit then
-				scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+				scriptUnitDestroyedByTeam(unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
 			elseif spGetUnitLosState(unitID, myAllyTeamID, true) % 2 == 1 then
 					scriptUnitDestroyed (unitID, unitDefID, unitTeam)
 					scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
@@ -42,7 +44,7 @@ function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDe
 		end
 	else
 		if not isAllyUnit and (not (spec and specFullView) and (spGetUnitLosState(unitID, spGetMyAllyTeamID(), true) % 2 == 1)) then
-			scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+			scriptUnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 end

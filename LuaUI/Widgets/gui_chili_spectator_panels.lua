@@ -406,7 +406,7 @@ local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, stora
 	
 	-- local newFontSize = math.round(GetFontMult(income)*options.resourceMainFontSize.value)
 	-- panel.label_income.font.size = newFontSize
-	panel.label_income.font.size =math.round(GetFontMult(income)*options.resourceMainFontSize.value)
+	panel.label_income.font.size = math.floor(GetFontMult(income)*options.resourceMainFontSize.value)
 	panel.label_income:Invalidate()
 	panel.label_income:SetCaption(Format(income, ""))
 	
@@ -603,7 +603,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		width  = incomeWidth,
 		height = incomeHeight,
 		caption = "0.0",
-		valign = "center",
+		valign = "linecenter",
 		align  = "center",
 		autosize = false,
 		font   = {
@@ -622,7 +622,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		width  = textWidth,
 		height = textHeight,
 		caption = "OD: 0",
-		valign = "center",
+		valign = "linecenter",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.resourceFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -635,7 +635,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		width  = textWidth,
 		height = textHeight,
 		caption = "Re: 0",
-		valign = "center",
+		valign = "linecenter",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.resourceFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -698,7 +698,7 @@ local function AddEconomyWindows()
 	else
 		Spring.SendCommands("resbar 0")
 		
-		local screenWidth,screenHeight = Spring.GetWindowGeometry()
+		local screenWidth,screenHeight = Spring.GetViewGeometry()
 		local screenHorizCentre = screenWidth / 2
 		local spacing = 360
 		local econWidth = 480
@@ -726,7 +726,7 @@ end
 local function CreatePlayerWindow()
 	local data = {}
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local screenHorizCentre = screenWidth / 2
 	local playerWindowWidth = 500
 
@@ -784,7 +784,7 @@ local function CreatePlayerWindow()
 		right  = 0,
 		bottom = texBottom,
 		caption = GetTimeString(),
-		valign = "center",
+		valign = "linecenter",
 		align  = "center",
 		autosize = false,
 		font   = {
@@ -803,7 +803,7 @@ local function CreatePlayerWindow()
 		right  = nameInner,
 		bottom = texBottom,
 		caption = allyTeamData[1].name,
-		valign = "center",
+		valign = "linecenter",
 		align  = "left",
 		autosize = false,
 		font   = {
@@ -822,7 +822,7 @@ local function CreatePlayerWindow()
 		right  = nameOuter,
 		bottom = texBottom,
 		caption = allyTeamData[2].name,
-		valign = "center",
+		valign = "linecenter",
 		align  = "right",
 		autosize = false,
 		font   = {
@@ -841,7 +841,7 @@ local function CreatePlayerWindow()
 		right  = winsInner,
 		bottom = texBottom,
 		caption = allyTeamData[1].winString,
-		valign = "center",
+		valign = "linecenter",
 		align  = "left",
 		autosize = false,
 		font   = {
@@ -860,7 +860,7 @@ local function CreatePlayerWindow()
 		right  = winsOuter,
 		bottom = texBottom,
 		caption = allyTeamData[2].winString,
-		valign = "center",
+		valign = "linecenter",
 		align  = "right",
 		autosize = false,
 		font   = {

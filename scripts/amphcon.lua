@@ -3,7 +3,8 @@
 include "constants.lua"
 include 'reliableStartMoving.lua'
 
-local base, pelvis, torso = piece('base', 'pelvis', 'torso')
+-- unused piece: base
+local pelvis, torso = piece('pelvis', 'torso')
 local rleg, rfoot, lleg, lfoot = piece('rleg', 'rfoot', 'lleg', 'lfoot')
 local rdoor, rnozzle, rnano, ldoor, lnozzle, lnano = piece('rdoor', 'rnozzle', 'rnano', 'ldoor', 'lnozzle', 'lnano')
 
@@ -27,8 +28,8 @@ local SIG_RESTORE = 8
 
 local moving = false
 local building = false
+local movingData = {}
 
-local nanoNum = 0
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local function Walk()
@@ -99,12 +100,14 @@ local function UnCurl()
 end
 
 function script.StartMoving()
+	movingData.moving = true
 	StartThread(Walk)
 	moving = true
 	StartThread(UnCurl)
 end
 
 function script.StopMoving()
+	movingData.moving = false
 	StartThread(Stopping)
 	moving = false
 	StartThread(Curl)
@@ -113,7 +116,7 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	StartThread(Curl)
 end
 
@@ -153,13 +156,6 @@ function script.StartBuilding(heading, pitch)
 	Turn(lnozzle, x_axis, - pitch, math.rad(180))
 	Turn(rnozzle, x_axis, - pitch, math.rad(180))
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	nanoNum = 1 - nanoNum
-	local nano = nanoPieces[nanoNum]
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nano)
-	return nano
 end
 
 function script.Killed(recentDamage, maxHealth)

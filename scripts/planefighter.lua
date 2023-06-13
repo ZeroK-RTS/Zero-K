@@ -6,16 +6,22 @@ local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing,
 
 local smokePiece = {base, rwing, lwing}
 
+local IN_LOS = {inlos = true}
+
 --variables
 local shotCycle = 0
 local flare = {
 	[0] = flare1,
 	[1] = flare2,
 }
+local isMoving = false
 
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
-local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
+local SPEEDUP_RELOAD_PER_FRAME = 1 / tonumber(UnitDef.customParams.specialreloadtime)
+local MOVE_THRESHOLD = 8
+
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 ----------------------------------------------------------
 
@@ -36,7 +42,9 @@ end
 ----------------------------------------------------------
 
 function SprintThread()
-	for i=1, SPEEDUP_DURATION do
+	GG.PokeDecloakUnit(unitID, unitDefID)
+	local _,_,_, sx, sy, sz = Spring.GetUnitPosition(unitID, true)
+	for i = 1, SPEEDUP_DURATION do
 		EmitSfx(ljet, 1027)
 		EmitSfx(rjet, 1027)
 		Sleep(33)
@@ -50,6 +58,29 @@ function SprintThread()
 	
 	Turn(rwing, y_axis, 0, math.rad(100))
 	Turn(lwing, y_axis, 0, math.rad(100))
+	
+	-- Refund reload time if the unit didn't move.
+	local _,_,_, ex, ey, ez = Spring.GetUnitPosition(unitID, true)
+	if math.abs(ex - sx) < MOVE_THRESHOLD and math.abs(ey - sy) < MOVE_THRESHOLD and math.abs(ez - sz) < MOVE_THRESHOLD then
+		Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", 0, IN_LOS)
+		return
+	end
+	
+	local reloadRemaining = 1 -- Synced to specialReloadRemaining because nothing else changes it.
+	while reloadRemaining > 0 do
+		Sleep(33)
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		if not stunnedOrInbuild then
+			local reloadSpeedMult = (GG.att_ReloadChange[unitID] or 1)
+			if reloadSpeedMult > 0 then
+				reloadRemaining = reloadRemaining - SPEEDUP_RELOAD_PER_FRAME*reloadSpeedMult
+				if reloadRemaining < 0 then
+					reloadRemaining = 0
+				end
+				Spring.SetUnitRulesParam(unitID, "specialReloadRemaining", reloadRemaining, IN_LOS)
+			end
+		end
+	end
 end
 
 function Sprint()
@@ -90,10 +121,12 @@ function script.Create()
 end
 
 function script.StartMoving()
+	isMoving = true
 	activate()
 end
 
 function script.StopMoving()
+	isMoving = false
 	deactivate()
 end
 
@@ -110,7 +143,11 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return not (GetUnitValue(COB.CRASHING) == 1)
+	if not (GetUnitValue(COB.CRASHING) == 1) and isMoving then
+		x,y,z = Spring.GetUnitVelocity(unitID)
+		return (x ~=0 or z ~= 0)
+	end
+	return false
 end
 
 function script.FireWeapon(num)
@@ -129,7 +166,7 @@ function script.BlockShot(num, targetID)
 		return true
 	end
 	if num == 2 then
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 133, 35)
+		return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 530, 38, 0.1, false, 100)
 	end
 	return false
 end

@@ -15,6 +15,8 @@ local allied_teams
 
 local is_RoI = (Spring.GetModOptions().overdrivesharingscheme ~= "0")
 
+local MAX_NAME_LENGTH = 100
+
 local window, fake_window
 local name_labels = {}
 local roi_labels = {}
@@ -37,8 +39,16 @@ function widget:Initialize()
 	end
 
 	if spectating then
-		allied_teams = Spring.GetTeamList ()
+		allied_teams = Spring.GetTeamList()
 		allied_teams[#allied_teams] = nil -- Gaia
+		local allyTeamIDs = {}
+		for i = 1, #allied_teams do
+			allyTeamIDs[allied_teams[i]] = select(6, Spring.GetTeamInfo(allied_teams[i]))
+		end
+		local function SortFunc(a, b)
+			return allyTeamIDs[a] < allyTeamIDs[b]
+		end
+		table.sort(allied_teams, SortFunc)
 	else
 		allied_teams = Spring.GetTeamList (Spring.GetMyAllyTeamID())
 		for i = 1, #allied_teams do -- put self first on the list
@@ -73,15 +83,13 @@ function widget:Update(s)
 		for i = 1, #allied_teams do
 			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue") or 0))
 			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue") or 0))
-			base_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalBase") or 0))
-			od_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalOverdrive") or 0))
+			base_income_labels[i]:SetCaption (string.format("+%.1f m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalBase") or 0))
+			od_income_labels[i]:SetCaption (string.format("+%.1f m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalOverdrive") or 0))
 		end
 	end
 end
 
 function CreateWindow()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-
 	fake_window = Chili.Window:New {
 		color = {1,1,1,0.7},
 		parent = Chili.Screen0,
@@ -99,7 +107,7 @@ function CreateWindow()
 		resizable = true,
 		tweakDraggable = true,
 		tweakResizable = true,
-        minimizable = false,
+		minimizable = false,
 		parentWidgetName = widget:GetInfo().name, -- docking
 	}
 
@@ -107,11 +115,11 @@ function CreateWindow()
 		parent = fake_window,
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},
-		height = 220,
 		x = 0,
 		y = 20,
-		width = 350,
-		padding = {0, 0, 0, 0},
+		right = 0,
+		bottom = 0,
+		padding = {5, 2, 2, 2},
 		scrollbarSize = 10,
 		scrollPosY    = 0,
 		verticalScrollbar   = true,
@@ -121,11 +129,11 @@ function CreateWindow()
 	}
 
 	title_caption = Chili.Label:New {
-		x = 5,
-		y = 5,
+		x = 10,
+		y = 8,
 		width = 10,
 		parent = window,
-		caption = "Player     Due:  OD       Base     Income:  OD      Base",
+		caption = "Player           Due: OD       Base     Income: OD     Base",
 		fontsize = 13,
 		textColor = {1,1,1,1},
 	}
@@ -134,7 +142,7 @@ function CreateWindow()
 	for i = 1, #allied_teams do
 		local tID = allied_teams[i]
 		local r, g, b = Spring.GetTeamColor(tID)
-		local name = Spring.GetPlayerInfo (select (2, Spring.GetTeamInfo(tID, false)), false)
+		local name = Spring.GetPlayerInfo (select (2, Spring.GetTeamInfo(tID, false)), false) or "Unknown"
 		name_labels[i] = Chili.Label:New{
 			x = 5,
 			y = 16*i - 10,
@@ -144,8 +152,10 @@ function CreateWindow()
 			fontsize = 13,
 			textColor = {r, g, b, 1},
 		}
+		name_labels[i].caption = Spring.Utilities.TruncateStringIfRequiredAndDotDot(name, name_labels[i].font, MAX_NAME_LENGTH) or name
+		
 		roi_labels[i] = Chili.Label:New{
-			x = 100,
+			x = 112,
 			y = 16*i - 10,
 			width = 50,
 			parent = window,
@@ -163,7 +173,7 @@ function CreateWindow()
 			textColor = {0.65, 0.65, 0.65, 1},
 		}
 		od_income_labels[i] = Chili.Label:New{
-			x = 250,
+			x = 225,
 			y = 16*i - 10,
 			width = 50,
 			parent = window,

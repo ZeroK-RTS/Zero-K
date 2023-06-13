@@ -2,7 +2,6 @@ local raider = {
 	"cloakraid",
 	"cloakheavyraid",
 	"shieldraid",
-	"armflash",
 	"vehscout",
 	"vehraid",
 	"amphraid",
@@ -11,7 +10,6 @@ local raider = {
 	"tankheavyraid",
 	"tankraid",
 	
-	"armsh",
 	"hoverraid",
 	"hoverheavyraid",
 	
@@ -28,17 +26,14 @@ local assault = {
 	"spiderassault",
 	"jumpassault",
 	--"jumpsumo",
-	"armbull",
 	"tankassault",
 	"tankheavyassault",
 	"amphassault",
 	
-	"armanac",
 	"hoverassault",
 	
 	--"striderbantha",
 	--"striderdetriment",
-	--"corkrog",
 	
 	--"chickena",
 	--"chickenc",
@@ -48,15 +43,11 @@ local assault = {
 local skirm = {
 	"cloakskirm",
 	"shieldskirm",
-	"armjanus",
-	"armstump",
 	"amphfloater",
 	
 	"spiderskirm",
 	"cloaksnipe",
-	"cormort",
 	"jumpskirm",
-	"cormortgold",
 	"hoverarty",
 	
 	"hoverskirm",
@@ -74,18 +65,17 @@ local jumper = { -- uses jump for offense. IE do not put commander or AA here.
 local riot = {
 	"cloakriot",
 	"shieldriot",
+	"shieldfelon",
 	"vehriot",
 	"spiderriot",
 	"amphimpulse",
 	"amphriot",
 	
 	"spideremp",
-	"tawf003",
 	"tankriot",
-
+	"hoverdepthcharge",
 	"hoverriot",
 	
-	"armraz",
 	"striderdante",
 	
 	"chickenwurm",
@@ -93,20 +83,17 @@ local riot = {
 
 local arty = {
 	"cloakarty",
-	"punisher",
 	"jumparty",
-	"tawf013",
+	"shieldarty",
 	"veharty",
+	"amphsupport",
 	
 	"vehheavyarty",
 	--"hoverarty",
 	"tankarty",
 	"tankheavyarty",
 	
-	"armshock",
 	"striderarty",
-	
-	"hoverartillery",
 	
 	"chickenr",
 	"chickenblobber",
@@ -121,15 +108,17 @@ local prioritySos = {
 	"energyfusion",
 	"energysingu",
 	"factoryshield",
-    "factorycloak",
-    "factoryveh",
-    "factoryplane",
-    "factorygunship",
-    "factoryhover",
-    "factoryspider",
-    "factoryjump",
-    "factorytank",
-    "factoryship",
+	"factorycloak",
+	"factoryamph",
+	"factoryveh",
+	"factoryplane",
+	"factorygunship",
+	"factoryhover",
+	"factoryspider",
+	"factoryjump",
+	"factorytank",
+	"factoryship",
+	"striderhub",
 	"dyntrainer_recon_base",
 	"dyntrainer_support_base",
 	"dyntrainer_assault_base",

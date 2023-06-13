@@ -83,6 +83,12 @@ CallInsList = {
 	"DrawScreenPost",
 	"DrawScreen",
 	"DrawInMiniMap",
+	'DrawOpaqueUnitsLua',
+	'DrawOpaqueFeaturesLua',
+	'DrawAlphaUnitsLua',
+	'DrawAlphaFeaturesLua',
+	'DrawShadowUnitsLua',
+	'DrawShadowFeaturesLua',
 
 	"Explosion",
 	"ShockFront",
@@ -108,7 +114,7 @@ CallInsList = {
 	"DownloadFinished",
 	"DownloadFailed",
 	"DownloadProgress",
-	
+
 	"Save",
 	"Load",
 }
@@ -117,7 +123,7 @@ CallInsList = {
 -- make the map
 CallInsMap = {}
 for _, callin in ipairs(CallInsList) do
-  CallInsMap[callin] = true
+	CallInsMap[callin] = true
 end
 
 

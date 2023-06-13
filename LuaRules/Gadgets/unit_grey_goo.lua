@@ -54,7 +54,7 @@ local CMD_GUARD      = CMD.GUARD
 local DEFAULT_GOO = 1
 local CMD_STOP = CMD.STOP
 
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_GOO_GATHER = Spring.Utilities.CMD.GOO_GATHER
 
 local gooGatherBehaviour = {
 	id      = CMD_GOO_GATHER,
@@ -273,9 +273,9 @@ function gadget:GameFrame(f)
 						firestate, movestate = spGetUnitStates(unitIndex[i], false)
 					end
 					
-					spGiveOrderToUnit(newId, CMD_FIRE_STATE, {firestate}, 0)
-					spGiveOrderToUnit(newId, CMD_MOVE_STATE, {movestate}, 0)
-					spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
+					spGiveOrderToUnit(newId, CMD_FIRE_STATE, firestate   , 0)
+					spGiveOrderToUnit(newId, CMD_MOVE_STATE, movestate   , 0)
+					spGiveOrderToUnit(newId, CMD_GUARD     , unitIndex[i], 0)
 
 					spSpawnCEG(CEG_SPAWN,
 						x, y, z,

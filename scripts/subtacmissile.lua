@@ -55,7 +55,14 @@ end
 function script.FireWeapon()
 	respawning_rocket = true
 	Signal (SIG_AIM)
+end
 
+function script.EndBurst()
+	--[[ NB: hiding the missile is done here rather than in FireWeapon
+	     partially because a modded unit can have a longer burst, but
+	     mostly because FireWeapon applies before the projectile is
+	     actually spawned so the Turn would ruin the spawnpoint, up to
+	     clipping it into other units or seaside cliffs. ]]
 	Hide (missile)
 	Turn (missile, x_axis, 0)
 
@@ -66,26 +73,6 @@ function script.FireWeapon()
 
 	respawning_rocket = false
 	Show(missile)
-end
-
-local submerged = true
-local subArmorClass = Game.armorTypes.subs
-local elseArmorClass = Game.armorTypes["else"]
-
-function script.setSFXoccupy(num)
-	if (num == 4) or (num == 0)
-		then submerged = false
-		else submerged = true
-	end
-end
-
-function script.HitByWeapon (x, z, weaponDefID, damage)
-	if weaponDefID < 0 then return damage end
-	if not submerged then
-		local damageTable = WeaponDefs[weaponDefID].damages
-		return damage * (damageTable[elseArmorClass] / damageTable[subArmorClass])
-	end
-	return damage
 end
 
 function script.Killed(recentDamage, maxHealth)

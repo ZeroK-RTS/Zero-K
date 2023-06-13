@@ -160,14 +160,8 @@ function jumping(jumpPercent)
 	end
 end
 
-function preJump(turn,distance)
-end
-
 function beginJump()
 	StartThread(BeginJumpThread)
-end
-
-function halfJump()
 end
 
 function endJump()
@@ -193,7 +187,7 @@ local function walk()
 	while true do
 	
 		Move(base, y_axis, 1.5, LINEAR_SPEED)
-		Turn(low_head, z_axis, math.rad(-(-7)), ANGULAR_SPEED/4)
+		Turn(low_head, z_axis, math.rad(7), ANGULAR_SPEED/4)
 		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
 		Turn(l_leg, x_axis, math.rad(-35), ANGULAR_SPEED*1.4)
@@ -226,7 +220,7 @@ local function walk()
 		Move(l_shin, y_axis, .5, LINEAR_SPEED*2)
 	
 		Move(base, y_axis, 1.5, LINEAR_SPEED)
-		Turn(low_head, z_axis, math.rad(-(7)), ANGULAR_SPEED/4)
+		Turn(low_head, z_axis, math.rad(-7), ANGULAR_SPEED/4)
 		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
 		Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED*1.4)
@@ -272,7 +266,7 @@ function script.StopMoving()
 	
 	Move(base, y_axis, 0, LINEAR_SPEED)
 	if not firing then
-		Turn(low_head, z_axis, math.rad(-(0)), ANGULAR_SPEED)
+		Turn(low_head, z_axis, 0, ANGULAR_SPEED)
 		Turn(low_head, x_axis, 0, ANGULAR_SPEED)
 	end
 	
@@ -292,6 +286,7 @@ function script.StopMoving()
 end
 
 function script.Create()
+	Move(up_head, y_axis, -0.5) -- no mouth breathing
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	
@@ -324,7 +319,7 @@ local function RestoreAfterDelay()
 	Sleep(2500)
 	Turn(low_head, y_axis, 0, math.rad(200))
 	Turn(low_head, x_axis, 0, math.rad(45))
-	Move(up_head, y_axis, 0, LINEAR_SPEED/3)
+	Move(up_head, y_axis, -0.5, LINEAR_SPEED/3)
 	firing = false
 end
 
@@ -334,9 +329,13 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	firing = true
 	--turn head, open mouth/limbs
-	Turn(low_head, y_axis, heading, math.rad(650)) -- left-right
-	Turn(low_head, x_axis, -pitch, math.rad(200)) --up-down
-	Move(up_head, y_axis, 1, LINEAR_SPEED/2)
+	Turn(low_head, y_axis, heading, math.rad(650))
+	Turn(low_head, x_axis, -pitch, math.rad(200))
+
+	-- NB: lower_head (ie. jaw) shouldn't move because
+	-- it is actually the parent piece for the upper head
+	Move(up_head, y_axis, 3, LINEAR_SPEED*2)
+
 	WaitForTurn(low_head, y_axis)
 	WaitForTurn(low_head, x_axis)
 	StartThread(RestoreAfterDelay)

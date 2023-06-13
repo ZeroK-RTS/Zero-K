@@ -18,8 +18,8 @@ return { cloakjammer = {
 
     area_cloak = 1,
     area_cloak_upkeep = 15,
-    area_cloak_radius = 440,
-    area_cloak_decloak_distance = 75,
+    area_cloak_radius = 360,
+    area_cloak_recloak_rate = 800,
     
     priority_misc = 1,
     cus_noflashlight = 1,
@@ -30,8 +30,6 @@ return { cloakjammer = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[kbotjammer]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 36,
@@ -42,7 +40,7 @@ return { cloakjammer = {
   onoffable              = true,
   pushResistant          = 0,
   script                 = [[cloakjammer.lua]],
-  radarDistanceJam       = 440,
+  radarDistanceJam       = 360,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 400,
   trackOffset            = 0,
@@ -50,7 +48,7 @@ return { cloakjammer = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2100,
+  turnRate               = 2520,
 
   featureDefs            = {
 

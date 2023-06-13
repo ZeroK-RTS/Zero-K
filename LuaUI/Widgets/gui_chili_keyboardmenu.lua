@@ -23,9 +23,14 @@ local echo = Spring.Echo
 
 -- config
 include("keysym.lua")
-local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
-	
+local factory_commands,econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
+local _, _, overrides = include("Configs/integral_menu_config.lua", nil, VFS.RAW_FIRST)
+
+-- "marking menu" is not the best name, but it's also used by
+-- other similar widgets and also people may have already
+-- overridden it locally, so don't rename it
 local build_menu_use = include("Configs/marking_menu_menus.lua")
+
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local initialBuilder = 'armcom1'
@@ -153,6 +158,7 @@ options = {
 			{key='qwerty', name='QWERTY', },
 			{key='qwertz', name='QWERTZ', },
 			{key='azerty', name='AZERTY', },
+			{key='dvorak', name='Dvorak', },
 			
 		},
 	},
@@ -778,6 +784,10 @@ SetupKeybuttons = function()
 		keyRows = options.sevenperrow.value
 			and	{ 'AZERTYU', 'QSDFGHJ', 'WXCVBN,' }
 			or 	{ 'AZERTY', 'QSDFGH', 'WXCVBN' }
+	elseif options.layout.value == 'dvorak' then
+		keyRows = options.sevenperrow.value
+			and	{ '\',.PYFG', 'AOEUIDH', ';QJKXBM' }
+			or 	{ '\',.PYF', 'AOEUID', ';QJKXB' }
 	else
 		keyRows = options.sevenperrow.value
 			and	{ 'QWERTYU', 'ASDFGHJ', 'ZXCVBNM' }
@@ -1226,7 +1236,7 @@ end
 function widget:MousePress(x,y,button)
 	if build_mode and button == 3 then
 		UpdateButtons()
-		Spring.SetActiveCommand(0)
+		Spring.SetActiveCommand(nil)
 		BuildMode(false)
 		return true
 	end

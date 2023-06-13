@@ -132,26 +132,31 @@ function widget:Shutdown()
    --glDeleteList(circlePolys)
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 -- Retrieving radius:
 local function GetUnitDefRealRadius(udid)
 	local radius = realRadii[udid]
-	if (radius) then return radius end
+	if (radius) then
+		return radius
+	end
 	local ud = UnitDefs[udid]
-	if (ud == nil) then return nil end
+	if (ud == nil) then
+		return nil
+	end
 	--local dims = spGetUnitDefDimensions(udid)
 	--if (dims == nil) then return nil end
 	--local scale = ud.hitSphereScale -- missing in 0.76b1+
 	--scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
 	--radius = dims.radius / scale
 	realRadii[udid] = circleSize*(ud.xsize^2 + ud.zsize^2)^0.5
+	if ud.customParams and ud.customParams.selection_scale then
+		local factor = (tonumber(ud.customParams.selection_scale) or 1)
+		realRadii[udid] = realRadii[udid] * factor
+	end
 	return realRadii[udid]
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

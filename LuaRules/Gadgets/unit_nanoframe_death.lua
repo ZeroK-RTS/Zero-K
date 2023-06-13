@@ -1,6 +1,3 @@
--- $Id: unit_terraform.lua 3299 2008-11-25 07:25:57Z google frog $
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function gadget:GetInfo()
 	return {
@@ -25,23 +22,13 @@ end
 --------------------------------------------------------------------------------
 
 -- Speedups
-
-local spSetUnitHealth = Spring.SetUnitHealth
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitPosition	= Spring.GetUnitPosition
 local spGetUnitBuildFacing	= Spring.GetUnitBuildFacing
-local spCreateUnit = Spring.CreateUnit
-local spDestroyUnit = Spring.DestroyUnit
-local spGetUnitSelfDTime = Spring.GetUnitSelfDTime
-
-
-local spSetFeatureResurrect = Spring.SetFeatureResurrect
 local spSetFeatureHealth = Spring.SetFeatureHealth
 local spSetFeatureReclaim = Spring.SetFeatureReclaim
 local spGetGroundHeight = Spring.GetGroundHeight
 local spCreateFeature = Spring.CreateFeature
-
-local spValidUnitID = Spring.ValidUnitID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -86,9 +73,9 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 
 				local currentMetal = progress * FeatureDefs[wreck].metal
 				if Spring.SetFeatureResources then -- 103.0 non-dev version compat
-					Spring.SetFeatureResources(featureID, currentMetal, 0, currentMetal, progress)
+					Spring.SetFeatureResources(featureID, currentMetal, 0, nil, progress)
 				else
-					Spring.SetFeatureReclaim(featureID, progress)
+					spSetFeatureReclaim(featureID, progress)
 				end
 
 				spSetFeatureHealth(featureID, progress * FeatureDefs[wreck].maxHealth)
@@ -113,9 +100,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	local ud = UnitDefs[unitDefID]
 	local face = (spGetUnitBuildFacing(unitID) or 1)
-	local noWreck = Spring.GetUnitRulesParam(unitID, "noWreck") == 1	-- set by api_saveload to clear stuff from factories
 	
-	if (progress > 0.8 and not noWreck) then
+	if progress > 0.8 then
 		local explodeAs = ud.deathExplosion
 		if explodeAs then
 			local wd = WeaponDefNames[explodeAs]
@@ -130,7 +116,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 	
-	if (progress > 0.05 and not noWreck) then
+	if progress > 0.05 then
 		ScrapUnit(unitID, unitDefID, unitTeam, progress, face)
 	end
 	

@@ -7,7 +7,7 @@ return { gunshipkrow = {
   airStrafe              = 0,
   bankingAllowed         = false,
   brakeRate              = 0.04,
-  buildCostMetal         = 4500,
+  buildCostMetal         = 4200,
   builder                = false,
   buildPic               = [[gunshipkrow.png]],
   canFly                 = true,
@@ -25,6 +25,7 @@ return { gunshipkrow = {
 
   customParams           = {
     modelradius    = [[10]],
+    fire_towards_range_buffer = 95,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -33,12 +34,9 @@ return { gunshipkrow = {
   footprintZ             = 5,
   hoverAttack            = true,
   iconType               = [[supergunship]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maneuverleashlength    = [[500]],
   maxDamage              = 16000,
   maxVelocity            = 3.3,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[krow.s3o]],
@@ -48,7 +46,7 @@ return { gunshipkrow = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:BEAMWEAPON_MUZZLE_BIG_RED]],
       [[custom:DOT_Pillager_Explo]],
     },
 
@@ -62,8 +60,8 @@ return { gunshipkrow = {
 
     {
       def                = [[KROWLASER]],
-      mainDir            = [[0.38 0.1 0.2]],
-      maxAngleDif        = 180,
+      mainDir            = [[0.4 0.1 0.2]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -71,8 +69,8 @@ return { gunshipkrow = {
 
     {
       def                = [[KROWLASER]],
-      mainDir            = [[-0.38 0.1 0.2]],
-      maxAngleDif        = 180,
+      mainDir            = [[-0.4 0.1 0.2]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -85,8 +83,8 @@ return { gunshipkrow = {
     
     {
       def                = [[KROWLASER]],
-      mainDir            = [[0 0.1 -0.38]],
-      maxAngleDif        = 180,
+      mainDir            = [[0 0.1 -0.4]],
+      maxAngleDif        = 200,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -112,8 +110,7 @@ return { gunshipkrow = {
       },
 
       damage                  = {
-        default = 37.8,
-        subs    = 1.8,
+        default = 45,
       },
 
       duration                = 0.02,
@@ -123,7 +120,7 @@ return { gunshipkrow = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      range                   = 450,
+      range                   = 395,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -134,7 +131,7 @@ return { gunshipkrow = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2300,
+      weaponVelocity          = 2370,
     },
 
     CLUSTERBOMB = {
@@ -150,7 +147,6 @@ return { gunshipkrow = {
       damage                  = {
         default = 250,
         planes  = 250,
-        subs    = 12.5,
       },
       
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
@@ -166,7 +162,7 @@ return { gunshipkrow = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/cannon/mini_cannon]],
       soundStartVolume        = 2,
-      sprayangle              = 14400,
+      sprayangle              = 13500,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,

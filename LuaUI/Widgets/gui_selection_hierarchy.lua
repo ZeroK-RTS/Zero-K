@@ -70,14 +70,36 @@ end
 
 options_path = 'Settings/Interface/Selection'
 local retreatPath = 'Settings/Interface/Retreat Zones'
-options_order = { 'useSelectionFilteringOption', 'selectionFilteringOnlyAltOption', 'ctrlFlattenRankOption', 'doubleClickFlattenRankOption', 'retreatOverrideOption', 'retreatingRankOption', 'retreatDeselects' }
+options_order = {
+	'label_selection_rank',
+	'useSelectionFilteringOption',
+	'selectionFilteringOnlyAltOption',
+	'ctrlFlattenRankOption',
+	'doubleClickFlattenRankOption',
+	'retreatOverrideOption',
+	'retreatingRankOption',
+	'retreatDeselects'
+}
+
 options = {
+	label_selection_rank = {
+		type = 'text',
+		name = 'Selection Rank Filtering',
+		value = [[Units have a toggleable selection rank on the right side of their command card (the circle with numbers 0-3).
+ - Normal selection only selects the boxed units with the highest rank.
+ - Shift ignores rank.
+ - Combat units default to rank 3.
+ - Constructors default to rank 2.
+ - Structures default to rank 1.
+ - Rank 0 intended for manual use to make a unit hard to accidentally select.
+ - Default rank can be edited in 'Settings/Unit Behaviour/Default States'.]],
+	},
 	useSelectionFilteringOption = {
-		name = "Use selection filtering",
+		name = "Enable selection filtering",
 		type = "bool",
 		value = true,
 		noHotkey = true,
-		desc = "Filter constructors out of mixed constructor/combat unit selection.",
+		desc = "Enables selection rank, which filters constructors from combat units by default.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
 		end
@@ -264,6 +286,11 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		if retreatOverride and unitID and (Spring.GetUnitRulesParam(unitID, "retreat") == 1) and (rank > retreatingRank) then
 			rank = retreatingRank
 		end
+
+		if WG.GlobalBuildCommand and WG.GlobalBuildCommand.IsSelectionOverrideSet and WG.GlobalBuildCommand.IsControllingUnit(unitID) and (rank > WG.GlobalBuildCommand.SelectionOverrideRank) then
+			rank = WG.GlobalBuildCommand.SelectionOverrideRank
+		end
+
 		if rank then
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
@@ -374,6 +401,9 @@ function widget:CommandNotify(id, params, options)
 	local selectedUnits = Spring.GetSelectedUnits()
 	for i = 1, #selectedUnits do
 		selectionRank[selectedUnits[i]] = newRank
+	end
+	if WG.noises and selectedUnits[1] then
+		WG.noises.PlayResponse(selectedUnits[1], CMD_SELECTION_RANK)
 	end
 	return true
 end

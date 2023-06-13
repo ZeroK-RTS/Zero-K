@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Resource Bars Classic",
-    desc      = "",
+    desc      = "Classic CA style resource bars",
     author    = "jK",
     date      = "2010",
     license   = "GNU GPL, v2 or later",
@@ -397,7 +397,7 @@ function widget:GameFrame(n)
 	"\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " ..
 	"\nTeam Metal Economy  " ..
-	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
+	"\n  Income: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
 	"\n  Base Extraction: " .. team_metalBase ..
 	"\n  Overdrive: " .. team_metalOverdrive ..
 	"\n  Reclaim : " .. team_metalReclaim ..
@@ -416,7 +416,7 @@ function widget:GameFrame(n)
 	"\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " ..
 	"\nTeam Energy Economy" ..
-	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
+	"\n  Income: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
 	"\n  Generators: " .. team_energyGenerators ..
 	"\n  Reclaim: " .. team_energyReclaim ..
 	"\n  Overdrive: " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " metal" ..
@@ -547,7 +547,7 @@ function CreateWindow()
 	end
 	
 	-- Set the size for the default settings.
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local width = 430
 	local x = math.min(screenWidth/2 - width/2, screenWidth - 400 - width)
 	

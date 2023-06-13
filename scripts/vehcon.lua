@@ -16,7 +16,6 @@ local smokePiece = {body, turret}
 
 local wheels = {fwheel, rwheel1, rwheel2, rwheel3, rwheel4, lwheel1, lwheel2, lwheel3, lwheel4}
 
-local SIG_MOVE = 1
 local SIG_BUILD = 2
 
 local WHEEL_TURN_SPEED = math.rad(480)
@@ -121,18 +120,12 @@ function script.StartBuilding(heading, pitch)
 	end
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), firepoint)
-	return firepoint
-end
-
 local explodables = {nano, rear, cradle, panel_t, panel_b, panel_l, panel_r, turret, fwheel, rwheel1}
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
-	local sfx = SFX
 
-	local effect = sfx.FALL + (brutal and (sfx.SMOKE + sfx.FIRE) or 0)
+	local effect = SFX.FALL + (brutal and (SFX.SMOKE + SFX.FIRE) or 0)
 	for i = 1, #explodables do
 		if math.random() < severity then
 			Explode (explodables[i], effect)
@@ -142,7 +135,7 @@ function script.Killed (recentDamage, maxHealth)
 	if not brutal then
 		return 1
 	else
-		Explode (base, sfx.SHATTER)
+		Explode (base, SFX.SHATTER)
 		return 2
 	end
 end

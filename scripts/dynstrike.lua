@@ -307,7 +307,7 @@ local walkAngle = {
 			leg = {math.rad(80), math.rad(100) * PACE},
 			foot = {math.rad(15), math.rad(150) * PACE},
 			arm = {math.rad(5), math.rad(20) * PACE},
-			hand = {math.rad(0), math.rad(20) * PACE},
+			hand = {0, math.rad(20) * PACE},
 		},
 		{
 			hip = {math.rad(-32), math.rad(30) * PACE},
@@ -341,7 +341,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()) * 0.96
+		local speedMult = math.max(0.05, (GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()) * 0.96
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]

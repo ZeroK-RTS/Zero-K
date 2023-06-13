@@ -15,33 +15,10 @@ end
 include("keysym.lua")
 local _, ToKeysyms = include("Configs/integral_menu_special_keys.lua")
 
----- CHANGELOG -----
--- versus666,		v3.03	(17dec2011)	: 	Back to alt BACKQUOTE to remove selected units from group
---											to please licho, changed help accordingly.
--- versus666,		v3.02	(16dec2011)	: 	Fixed for 84, removed unused features, now alt backspace to remove
---											selected units from group, changed help accordingly.
--- versus666,		v3.01	(07jan2011)	: 	Added check to comply with F5.
--- wagonrepairer	v3.00	(07dec2010)	:	'Chilified' autogroup.
--- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
--- versus666, 		v2.24	(27oct2010)	:	Added switch to auto add units when built from factories.
---											Add group label numbers to units in group.
---											Sped up some routines & cleaned code.
---		?,			v2,23				:	Unknown.
--- very_bad_solider,v2.22				:	Ignores buildings and factories.
---											Does not react when META (+ALT) is pressed.
--- CarRepairer,		v2.00				:	Autogroups key is alt instead of alt+ctrl.
---											Added commands: help, loadgroups, cleargroups, verboseMode, addall.
--- Licho,			v1.0				:	Creation.
-
---REMINDER :
--- none
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
-local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic' }
+local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic', 'missileslow' }
 
 local groupableBuildings = {}
 for _, v in ipairs( groupableBuildingTypes ) do
@@ -248,37 +225,26 @@ function widget:DrawWorld()
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeam and unitID ~= nil) then
-		if (createdFrame[unitID] == GetGameFrame()) then
-			local gr = unit2group[unitDefID]
-				--printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
-			if gr ~= nil then
-				SetUnitGroup(unitID, gr)
-			end
-		else
-			finiGroup[unitID] = 1
+	if unitTeam ~= myTeam then
+		return
+	end
+
+	if createdFrame[unitID] == GetGameFrame() -- probably to handle /give
+	or options.immediate.value
+	or groupableBuildings[unitDefID] then
+		local gr = unit2group[unitDefID]
+		if gr then
+			SetUnitGroup(unitID, gr)
 		end
+	else
+		IterableMap.Add(screwyWaypointUnits, unitID, {})
+		finiGroup[unitID] = true
 	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if (unitTeam == myTeam) then
 		createdFrame[unitID] = GetGameFrame()
-	end
-end
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeam) then
-		if options.immediate.value or groupableBuildings[unitDefID] then
-			createdFrame[unitID] = GetGameFrame()
-			local gr = unit2group[unitDefID]
-			if gr ~= nil then
-				SetUnitGroup(unitID, gr)
-			end
-			--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
-		else
-			IterableMap.Add(screwyWaypointUnits, unitID, {})
-		end
 	end
 end
 
@@ -333,7 +299,7 @@ function DoAutogroupAction(gr)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if ( modifier.alt and not modifier.meta ) then
+	if (modifier.alt and not modifier.meta ) then
 		local gr = groupNumber[key]
 		if (key == removeAutogroupKey) then gr = -1 end
 		if (gr ~= nil) then
@@ -344,7 +310,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			local exec = false --set to true when there is at least one unit to process
 			for _, unitID in ipairs(GetSelectedUnits()) do
 				local udid = GetUnitDefID(unitID)
-				if ( not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
+				if (not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
 					selUnitDefIDs[udid] = true
 					unit2group[udid] = gr
 					--local x, y, z = Spring.GetUnitPosition(unitID)

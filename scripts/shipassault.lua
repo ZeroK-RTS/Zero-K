@@ -46,7 +46,7 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	for i = 1, #missiles do
-		Turn(missiles[i], x_axis, -math.rad(90))
+		Turn(missiles[i], x_axis, math.rad(-90))
 	end
 	
 	Move(flare1, z_axis, -8)
@@ -99,6 +99,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 local function Recoil(piece)
+	Sleep(33)
 	Move(piece, z_axis, -8)
 	Sleep(400)
 	Move(piece, z_axis, 0, 6)
@@ -107,7 +108,9 @@ end
 
 function script.Shot(num)
 	if num == 1 then
-		--EmitSfx(gunPieces[gun_1].flare, 1024)
+		Move(gunPieces[gun_1].flare, z_axis, 5)
+		EmitSfx(gunPieces[gun_1].flare, 1024)
+		Move(gunPieces[gun_1].flare, z_axis, 0)
 		StartThread(Recoil, gunPieces[gun_1].barrel)
 	elseif num == 2 then
 		missileNum = missileNum + 1

@@ -66,6 +66,13 @@ function Spring.Utilities.MergeWithDefault(default, override)
 	return new
 end
 
+function Spring.Utilities.PermuteList(list)
+	for i = #list, 2, -1 do
+		local j = math.random(i)
+		list[i], list[j] = list[j], list[i]
+	end
+end
+
 function Spring.Utilities.TableToString(data, key)
 	 local dataType = type(data)
 	-- Check the type
@@ -105,7 +112,7 @@ local function MakeRealTable(proxy, debugTag)
 	end
 	local proxyLocal = proxy
 	local ret = {}
-	for i,v in spairs(proxyLocal) do
+	for i,v in pairs(proxyLocal) do
 		if type(v) == "table" then
 			ret[i] = MakeRealTable(v)
 		else
@@ -117,11 +124,16 @@ end
 
 Spring.Utilities.MakeRealTable = MakeRealTable
 
-local function TableEcho(data, name, indent, tableChecked)
+local function TableEcho(data, name, depthLimit, indent, tableChecked)
 	name = name or "TableEcho"
+	depthLimit = depthLimit or 20
 	indent = indent or ""
 	if (not tableChecked) and type(data) ~= "table" then
 		Spring.Echo(indent .. name, data)
+		return
+	end
+	if depthLimit and depthLimit <= 0 then
+		Spring.Echo(indent .. name, "Table at depth limit")
 		return
 	end
 	Spring.Echo(indent .. name .. " = {")
@@ -130,7 +142,7 @@ local function TableEcho(data, name, indent, tableChecked)
 		local name = tostring(nameRaw)
 		local ty = type(v)
 		if ty == "table" then
-			TableEcho(v, name, newIndent, true)
+			TableEcho(v, name, depthLimit and (depthLimit - 1), newIndent, true)
 		elseif ty == "boolean" then
 			Spring.Echo(newIndent .. name .. " = " .. (v and "true" or "false"))
 		elseif ty == "string" or ty == "number" then

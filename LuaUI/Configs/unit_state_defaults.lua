@@ -29,6 +29,17 @@ local factoryDefs = { -- Standard factories
 	[UnitDefNames["factoryplane"].id] = 0,
 	[UnitDefNames["factorygunship"].id] = 0,
 	[UnitDefNames["factoryship"].id] = 0,
+	[UnitDefNames["platecloak"].id] = 0,
+	[UnitDefNames["plateshield"].id] = 0,
+	[UnitDefNames["platespider"].id] = 0,
+	[UnitDefNames["platejump"].id] = 0,
+	[UnitDefNames["plateveh"].id] = 0,
+	[UnitDefNames["platehover"].id] = 0,
+	[UnitDefNames["plateamph"].id] = 0,
+	[UnitDefNames["platetank"].id] = 0,
+	[UnitDefNames["plateplane"].id] = 0,
+	[UnitDefNames["plategunship"].id] = 0,
+	[UnitDefNames["plateship"].id] = 0,
 }
 
 return alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs

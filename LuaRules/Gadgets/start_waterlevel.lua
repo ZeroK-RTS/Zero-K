@@ -38,7 +38,6 @@ function gadget:Initialize() -- GamePreload causes issues with widgets.
 		waterlevel = heights [math.ceil (heightsCount * FLOODED_AREA)] - FLOOD_OFFSET
 	end
 
-	Spring.SetGameRulesParam("waterlevel", waterlevel)
 	if waterlevel ~= 0 then
 		GG.Terraform_RaiseWater(waterlevel)
 	end

@@ -18,18 +18,16 @@ return { hoverskirm2 = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[hoverskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.5,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],
@@ -48,7 +46,7 @@ return { hoverskirm2 = {
 
   sightDistance       = 450,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 800,
 
   weapons             = {
 
@@ -75,7 +73,6 @@ return { hoverskirm2 = {
 
       damage                  = {
         default = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:flash1red]],

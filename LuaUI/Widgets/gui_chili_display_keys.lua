@@ -59,8 +59,6 @@ local highlightColor = {1,0.7, 0, 1}
 local function InitializeDisplayLabelControl(name)
 	local data = {}
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-
 	local window = Chili.Window:New{
 		parent = screen0,
 		dockable = true,

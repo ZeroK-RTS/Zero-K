@@ -8,7 +8,9 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
-if (not gadgetHandler:IsSyncedCode()) then return end
+if (not gadgetHandler:IsSyncedCode()) then 
+	return 
+end
 
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spKillTeam = Spring.KillTeam
@@ -51,28 +53,45 @@ function gadget:GotChatMsg (msg, senderID)
 	if Spring.GetGameFrame() <= 0 then
 		return
 	end
-	if (string.find(msg, "resignteam") == 1) then
+	if string.find(msg, "resignteam") ~= 1 then
+		return
+	end
 
-		local allowed = false
-		if (senderID == 255) then -- Springie
+	local allowed = false
+	if (senderID == 255) then -- Springie
+		allowed = true
+	else
+		local playerkeys = select (10, spGetPlayerInfo(senderID))
+		if playerkeys and (playerkeys.admin == "1" or playerkeys.room_boss == "1") then
 			allowed = true
-		else
-			local playerkeys = select (10, spGetPlayerInfo(senderID))
-			if (playerkeys and playerkeys.admin and (playerkeys.admin == "1")) then
-				allowed = true
-			end
 		end
-		if not allowed then return end
+	end
+	if not allowed then
+		return
+	end
 
-		local target = string.sub(msg, 12)
-		local people = spGetPlayerList()
-		for i = 1, #people do
-			local personID = people[i]
-			local nick, _, _, teamID = spGetPlayerInfo(personID, false)
-			if (target == nick) then
-				ResignTeam (teamID)
+	local target = string.sub(msg, 12)
+	local players = spGetPlayerList()
+	for i = 1, #players do
+		local playerID = players[i]
+		local nick, _, isSpectator, teamID = spGetPlayerInfo(playerID, false)
+		if target == nick then
+			if isSpectator then
 				return
 			end
+
+			local commshareID = Spring.GetPlayerRulesParam(playerID, "commshare_orig_teamid")
+			if commshareID or #Spring.GetPlayerList(teamID) > 1 then
+				teamID = GG.UnmergePlayerFromCommshare(playerID)
+			end
+
+			if #Spring.GetPlayerList(teamID) > 1 then
+				Spring.Echo("Force-resign: comshare unmerge failed, other players still on team", nick, "playerID", playerID, "teamID", teamID)
+				return
+			end
+
+			ResignTeam(teamID)
+			return
 		end
 	end
 end

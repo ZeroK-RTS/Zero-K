@@ -28,19 +28,18 @@ return { benzcom1 = {
     statsname = [[dynassault1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[5]],
   },
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 2250,
@@ -49,7 +48,6 @@ return { benzcom1 = {
   maxWaterDepth       = 5000,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName          = [[benzcom1.s3o]],
@@ -75,7 +73,7 @@ return { benzcom1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1148,
+  turnRate            = 1377,
   upright             = true,
   workerTime          = 10,
 
@@ -110,7 +108,6 @@ return { benzcom1 = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       edgeEffectiveness       = 0.99,
@@ -147,7 +144,6 @@ return { benzcom1 = {
       damage                  = {
         default = 360,
         planes  = 360,
-        subs    = 18,
       },
       
       explosionGenerator      = [[custom:INGEBORG]],

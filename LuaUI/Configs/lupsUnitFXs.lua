@@ -60,23 +60,6 @@ effectUnitDefs = {
 		--{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
 		{class='GroundFlash', options=groundFlashOrange},
 	},
-	corfus = {
-		{class='StaticParticles', options=corfusNova},
-		{class='StaticParticles', options=corfusNova2},
-		{class='StaticParticles', options=corfusNova3},
-		{class='StaticParticles', options=corfusNova4},
-
-		{class='Bursts', options=corfusBursts},
-		{class='ShieldJitter', options={delay=0,life=math.huge, pos={0,40.5,0.0}, size=10, precision=22, repeatEffect=true}},
-	},
-	aafus = {
-		{class='SimpleParticles2', options=MergeTable({piece="rod2", delay=30, lifeSpread=math.random()*20},sparks)},
-		{class='SimpleParticles2', options=MergeTable({piece="rod4", delay=60, lifeSpread=math.random()*20},sparks)},
-		{class='SimpleParticles2', options=MergeTable({piece="rod5", delay=90, lifeSpread=math.random()*20},sparks)},
-		{class='SimpleParticles2', options=MergeTable({piece="rod7", delay=120, lifeSpread=math.random()*20},sparks)},
-
-		{class='Sound', options={repeatEffect=true, file="Sparks", blockfor=4.8*30, length=5.1*30}},
-	},
 
 	--// SHIELDS //---------------------------
 	-- Don't raise strength of ShieldJitter recklessly, it can really distort things (including unit icons) under it!
@@ -113,9 +96,6 @@ effectUnitDefs = {
 	},
 
 	--// ENERGY STORAGE //--------------------
-	corestor = {
-		{class='GroundFlash', options=groundFlashCorestor},
-	},
 	energypylon = {
 		{class='GroundFlash', options=groundFlashenergypylon},
 	},
@@ -132,11 +112,6 @@ effectUnitDefs = {
 		{class='OverdriveParticles', options=staticmexGlow},
 	},
 	
-	--// PYLONS // ----------------------------------
-	mexpylon = {
-		{class='GroundFlash', options=groundFlashCorestor},
-	},
-
 	--// OTHER
 	roost = {
 		{class='SimpleParticles', options=roostDirt},
@@ -152,11 +127,6 @@ effectUnitDefs = {
 	staticheavyradar = {
 		{class='StaticParticles', options=MergeTable(blinkyLightWhite,{piece="point"})},
 		--{class='StaticParticles', options=MergeTable(blinkyLightBlue,{piece="point", delay=15})},
-	},
-	corarad = {
-		{class='StaticParticles', options=radarBlink},
-		{class='StaticParticles', options=MergeTable(radarBlink,{pos={-1.6,25,0.0},delay=15})},
-		{class='StaticParticles', options=MergeTable(radarBlink,{pos={0,21,-1.0},delay=30})},
 	},
 	staticradar = {
 		{class='StaticParticles', options=MergeTable(radarBlink,{piece="head"})},
@@ -225,21 +195,11 @@ effectUnitDefs = {
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true, noIconDraw = true}},
 	 },
-	armhawk2 = {
-		{class='AirJet', options={color={0.2,0.2,1.0}, width=2.8, length=25, piece="enginel", onActive=true, noIconDraw = true}},
-		{class='AirJet', options={color={0.2,0.2,1.0}, width=2.8, length=25, piece="enginer", onActive=true, noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=12, piece="wingtip1", noIconDraw = true}},
-		{class='Ribbon', options={width=1, size=12, piece="wingtip2", noIconDraw = true}},
-	},
 	gunshipheavyskirm = {
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="lfjet", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=5, length=15, piece="rfjet", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=2.5, length=10, piece="lrjet", onActive=true, noIconDraw = true}},
 		{class='AirJet', options={color={0.0,0.5,1.0}, width=2.5, length=10, piece="rrjet", onActive=true, noIconDraw = true}},
-	},
-	armawac = {
-		{class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="rjet", noIconDraw = true}},
-		{class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="ljet", noIconDraw = true}},
 	},
 	bomberdisarm = {
 		{class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet1", onActive=true, noIconDraw = true}},

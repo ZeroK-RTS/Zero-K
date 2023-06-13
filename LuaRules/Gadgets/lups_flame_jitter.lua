@@ -69,19 +69,7 @@ else
   local particleCnt  = 1
   local particleList = {}
 
-  local lastShoot = {}
-
   function FlameShot(_,unitID, unitDefID, weapon)
-	-- why is this even needed? we limited frequency of fire FX back in synced
-	--[[
-    local n = Spring.GetGameFrame()
-	lastShoot[unitID] = lastShoot[unitID] or {}
-    if ((lastShoot[unitID][weapon] or 0) > (n-MIN_EFFECT_INTERVAL) ) then
-      return
-    end
-    lastShoot[unitID][weapon] = n
-	]]--
-
     local posx,posy,posz, dirx,diry,dirz = Spring.GetUnitWeaponVectors(unitID,weapon)
     local wd  = WeaponDefs[UnitDefs[unitDefID].weapons[weapon].weaponDef]
     local weaponRange = wd.range*wd.duration*15
@@ -89,8 +77,6 @@ else
     local speedx,speedy,speedz = Spring.GetUnitVelocity(unitID)
     local partpos = "x*delay,y*delay,z*delay|x="..speedx..",y="..speedy..",z="..speedz
 
-	local altFlameTexture = wd.customParams.altflametex	-- FIXME: more elegant solution when this is actually implemented (as in, one that doesn't rely on different unitdef)
-	
     particleList[particleCnt] = {
       class        = 'JitterParticles2',
       colormap     = { {1,1,1,1},{1,1,1,1} },
@@ -153,7 +139,7 @@ else
       sizeExp      = 0.7,
 
       --texture     = "bitmaps/smoke/smoke06.tga",
-      texture     = altFlameTexture and "bitmaps/GPL/flame_alt.png" or "bitmaps/GPL/flame.png",
+      texture     = "bitmaps/GPL/flame.png",
     }
     particleCnt = particleCnt + 1
 

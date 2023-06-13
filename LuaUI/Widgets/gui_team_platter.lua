@@ -31,7 +31,6 @@ local widgetName = widget:GetInfo().name
 
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
-local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
 --------------------------------------------------------------------------------
@@ -96,14 +95,23 @@ local teamColors = {}
 --------------------------------------------------------------------------------
 
 local function SetupCommandColors(state)
-  local alpha = state and 1 or 0
-  local f = io.open('cmdcolors.tmp', 'w+')
-  if (f) then
-    f:write('unitBox  0 1 0 ' .. alpha)
-    f:close()
-    spSendCommands({'cmdcolors cmdcolors.tmp'})
-  end
-  os.remove('cmdcolors.tmp')
+	if state then
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 1) - 1
+		if WG.widgets_handling_selection > 0 then
+			return
+		end
+	else
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 0) + 1
+	end
+
+	local alpha = state and 1 or 0
+	local f = io.open('cmdcolors.tmp', 'w+')
+	if (f) then
+		f:write('unitBox  0 1 0 ' .. alpha)
+		f:close()
+		spSendCommands({'cmdcolors cmdcolors.tmp'})
+	end
+	os.remove('cmdcolors.tmp')
 end
 
 --------------------------------------------------------------------------------
@@ -215,22 +223,30 @@ end
 
 
 local function GetUnitDefRealRadius(udid)
-  local radius = realRadii[udid]
-  if (radius) then
-    return radius
-  end
+	local radius = realRadii[udid]
+	if (radius) then
+		return radius
+	end
 
-  local ud = UnitDefs[udid]
-  if (ud == nil) then return nil end
+	local ud = UnitDefs[udid]
+	if (ud == nil) then
+		return nil
+	end
 
-  local dims = spGetUnitDefDimensions(udid)
-  if (dims == nil) then return nil end
+	local dims = spGetUnitDefDimensions(udid)
+	if (dims == nil) then
+		return nil
+	end
 
-  local scale = ud.hitSphereScale -- missing in 0.76b1+
-  scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
-  radius = dims.radius / scale
-  realRadii[udid] = radius
-  return radius
+	local scale = ud.hitSphereScale -- missing in 0.76b1+
+	scale = ((scale == nil) or (scale == 0.0)) and 1.0 or scale
+	radius = dims.radius / scale
+	realRadii[udid] = radius
+	if ud.customParams and ud.customParams.selection_scale then
+		local factor = (tonumber(ud.customParams.selection_scale) or 1)
+		realRadii[udid] = realRadii[udid] * factor
+	end
+	return radius
 end
 
 

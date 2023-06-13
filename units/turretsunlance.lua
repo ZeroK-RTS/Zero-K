@@ -28,7 +28,6 @@ return { turretsunlance = {
   levelGround                   = false,
   maxDamage                     = 5600,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[heavyturret.s3o]],

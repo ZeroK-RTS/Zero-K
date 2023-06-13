@@ -25,11 +25,8 @@ return { assaultcruiser = {
   footprintX             = 5,
   footprintZ             = 5,
   iconType               = [[vanquisher]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 9600,
   maxVelocity            = 2.7,
-  minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT5]],
   noAutoFire             = false,
@@ -123,7 +120,6 @@ return { assaultcruiser = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
@@ -160,7 +156,6 @@ return { assaultcruiser = {
       damage                  = {
         default = 200,
         planes  = 200,
-        subs    = 10,
       },
 
       explosionGenerator      = [[custom:gauss_hit_m]],
@@ -198,7 +193,6 @@ return { assaultcruiser = {
 
       damage                  = {
         default = 160,
-        subs    = 160,
       },
 
       edgeEffectiveness       = 0.5,

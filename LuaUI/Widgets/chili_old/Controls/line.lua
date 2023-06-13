@@ -6,6 +6,7 @@ Line = Control:Inherit{
   defaultWidth  = 100,
   defaultHeight = 1,
   style = "horizontal",
+  noFont = true,
 }
 
 local this = Line

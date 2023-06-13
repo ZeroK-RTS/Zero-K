@@ -33,7 +33,8 @@ local runspeed = 1.37 * (UnitDefs[unitDefID].speed / 57)
 --------------------------------------------------------------------------------
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function IsBuilding()
@@ -98,16 +99,16 @@ local function Walk()
 
 		Turn(thigh[side], x_axis, math.rad(-50), truespeed*math.rad(150))
 		Turn(shin[side], x_axis, math.rad(75), truespeed*math.rad(240))
-		Turn(foot[side], x_axis, math.rad(0), truespeed*math.rad(50))
+		Turn(foot[side], x_axis, 0, truespeed*math.rad(50))
 
 		Turn(thigh[3-side], x_axis, math.rad(50), truespeed*math.rad(150))
-		Turn(shin[3-side], x_axis, math.rad(0), truespeed*math.rad(240))
+		Turn(shin[3-side], x_axis, 0, truespeed*math.rad(240))
 		Turn(foot[3-side], x_axis, math.rad(20), truespeed*math.rad(50))
 
 		Move(hips, y_axis, 0, truespeed*6)
 		WaitForMove(hips, y_axis)
 
-		Turn(shin[side], x_axis, math.rad(0), truespeed*math.rad(60))
+		Turn(shin[side], x_axis, 0, truespeed*math.rad(60))
 		Turn(foot[side], x_axis, math.rad(-20), truespeed*math.rad(50))
 		Move(hips, y_axis, -0.5, truespeed*3)
 		WaitForMove(hips, y_axis)
@@ -183,11 +184,6 @@ function script.StopBuilding()
 	Turn(claw2, x_axis, 0, math.rad(100))
 
 	StartThread(Idle)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), claw1)
-	return claw1
 end
 
 function script.Create()

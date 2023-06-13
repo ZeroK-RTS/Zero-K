@@ -1,5 +1,5 @@
 {
-	"shield" : "shield",
+	"shield_bar" : "shield",
 	"health_bar" : "health",
 	"building" : "building",
 	"morph" : "morph",
@@ -11,6 +11,8 @@
 	"water_tank" : "water tank",
 	"teleport" : "teleport",
 	"ability" : "ability",
+	"heat" : "heat",
+	"speed" : "speed",
 	"reload" : "reload",
 	"slow" : "slow",
 	"goo" : "goo",

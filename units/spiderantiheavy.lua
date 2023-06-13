@@ -11,14 +11,15 @@ return { spiderantiheavy = {
   canMove               = true,
   canPatrol             = true,
   category              = [[LAND]],
-  cloakCost             = 4,
-  cloakCostMoving       = 12,
+  cloakCost              = 5,
+  cloakCostMoving        = 15,
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[30 30 30]],
+  selectionVolumeScales  = [[45 45 45]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
+    bait_level_default = 2,
     dontfireatradarcommand = '1',
     cus_noflashlight = 1,
   },
@@ -28,8 +29,6 @@ return { spiderantiheavy = {
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[spiderspecialscout]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
   leaveTracks           = true,
   initCloaked           = true,
   maxDamage             = 270,
@@ -37,7 +36,7 @@ return { spiderantiheavy = {
   maxVelocity           = 2.55,
   maxWaterDepth         = 22,
   minCloakDistance      = 60,
-  movementClass         = [[TKBOT3]],
+  movementClass         = [[TKBOT2]],
   moveState             = 0,
   noChaseCategory       = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName            = [[infiltrator.s3o]],
@@ -49,7 +48,7 @@ return { spiderantiheavy = {
   trackStretch          = 1,
   trackType             = [[ChickenTrackPointyShort]],
   trackWidth            = 45,
-  turnRate              = 1800,
+  turnRate              = 2160,
 
   weapons               = {
 

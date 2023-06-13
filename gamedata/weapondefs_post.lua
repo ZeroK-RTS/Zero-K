@@ -12,6 +12,18 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.FileExists = VFS.FileExists or function() return false end	-- unitdef exporter compatibility
+
+--[[ This lets mutators add a bit of weapondefs_post processing without
+     losing access to future gameside updates to weapondefs_post. ]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/weapondefs_mod.lua'
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS.GAME) then
+	VFS.Include(MODSIDE_POSTS_FILEPATH, nil, VFS.GAME)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 Spring.Echo("Loading WeaponDefs_posts")
 
 --------------------------------------------------------------------------------
@@ -49,6 +61,10 @@ local function ProcessUnitDef(udName, ud)
       local fullName = udName .. '_' .. wdName
       WeaponDefs[fullName] = wd
       wd.filename = ud.filename
+      local wdcp = wd.customparams
+      if wdcp and wdcp.reammoseconds then
+        wdcp.reammoseconds = ud.customparams.reammoseconds
+      end
     end
   end
 
@@ -219,12 +235,26 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Set myGravity for Cannons because maps cannot be trusted. Standard is 120,
+-- Set myGravity for ballistic weapons because maps cannot be trusted. Standard is 120,
 -- gravity of 150 can cause high things (such as HLT) to be unhittable.
 
- for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.weapontype == "Cannon" and not weaponDef.mygravity then
-		weaponDef.mygravity = 2/15 -- 120/(GAME_SPEED^2)
+Game = Game or {}	-- unitdef exporter compatibility
+Game.gameSpeed = Game.gameSpeed or 30
+
+local defaultMyGravity = 120 / (Game.gameSpeed^2)
+
+for _, weaponDef in pairs(WeaponDefs) do
+
+	--[[ There are other weapons that follow gravity,
+	     for example expired missiles and torpedoes
+	     who fall out of water, but these disobey the
+	     tag and always use map gravity anyway ]]
+	local supportsMyGravity =
+		(weaponDef.weapontype == "Cannon") or
+		(weaponDef.weapontype == "AircraftBomb")
+
+	if supportsMyGravity and (not weaponDef.mygravity) then -- setting myGravity = 0.0 will use map gravity anyway
+		weaponDef.mygravity = defaultMyGravity
 	end
 end
 --------------------------------------------------------------------------------
@@ -365,20 +395,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Remove submarine damage modifier
--- TODO: also remove from defs
-
-for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.damage then
-		if weaponDef.damage.subs and weaponDef.damage.default then
-			weaponDef.damage.subs = weaponDef.damage.default
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
 -- Fix the canAttack tag
 --
 
@@ -409,6 +425,31 @@ do
 	for name, ud in pairs(UnitDefs) do
 		if not ud.canattack then
 			ud.canattack = CanAttack(ud)
+		end
+	end
+end
+
+
+--[[ Optimisation: if there are no firebases, we can set
+     that flag to collide. For most weapons, normally it
+     is the only thing they ghost through, and enabling
+     collisions with everything enables them to take the
+     fast collision code path that skips ghosting checks.
+
+     The version check is because the fast path used to
+     be broken and instead ghosted through everything. ]]
+if Script and Script.IsEngineMinVersion(105, 0, 1578) then
+	local anyFirePlatformExists = false
+	for name, ud in pairs(UnitDefs) do
+		if ud.isfireplatform then
+			anyFirePlatformExists = true
+			break
+		end
+	end
+
+	if not anyFirePlatformExists then
+		for name, weaponDef in pairs(WeaponDefs) do
+			weaponDef.collidefirebase = true
 		end
 	end
 end

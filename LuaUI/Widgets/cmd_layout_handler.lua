@@ -20,6 +20,7 @@ local emptyTable = {}
 --------------------------------------------------------------------------------
 -- Add commands to epic menu
 
+local spSendCommands = Spring.SendCommands
 local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local function CapCase(str)
@@ -45,12 +46,29 @@ local function AddHotkeyOptions()
 		
 		local cmdnamel = cmdname:lower()
 		local cmdname_disp = cmdData.name or CapCase(cmdname)
-		options[cmdname_disp] = {
-			name = cmdname_disp,
-			type = 'button',
-			action = cmdnamel,
-			path = 'Hotkeys/Commands',
-		}
+		local path = 'Hotkeys/Commands' .. ((number == 2 and "/State") or (number == 3 and "/Instant") or "/Targeted")
+		if cmdData.setValue and cmdData.cmdID then
+			options[cmdname_disp] = {
+				name = cmdname_disp,
+				type = 'button',
+				OnChange = function (self)
+					if WG.SetStateToggle then
+						WG.SetStateToggle(cmdData.cmdID, cmdData.setValue)
+						if WG.noises then
+							WG.noises.PlayResponse(false, cmdData.cmdID)
+						end
+					end
+				end,
+				path = path
+			}
+		else
+			options[cmdname_disp] = {
+				name = cmdname_disp,
+				type = 'button',
+				action = cmdnamel,
+				path = path
+			}
+		end
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdname_disp
 			--options[cmdnamel].isUnitStateCommand = true
@@ -63,26 +81,26 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Hotkeys/Commands',}
-	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Hotkeys/Commands',}
-	options.lblstate	= { type='label', name='State Commands', path = 'Hotkeys/Commands',}
+	--options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Hotkeys/Commands',}
+	--options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Hotkeys/Commands',}
+	--options.lblstate	= { type='label', name='State Commands', path = 'Hotkeys/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)
 	table.sort(options_order_tmp_cmd_instant)
 	table.sort(options_order_tmp_states)
 
-	options_order[#options_order+1] = 'lblcmd'
+	--options_order[#options_order+1] = 'lblcmd'
 	for i=1, #options_order_tmp_cmd do
 		options_order[#options_order+1] = options_order_tmp_cmd[i]
 	end
 	
-	options_order[#options_order+1] = 'lblcmdinstant'
+	--options_order[#options_order+1] = 'lblcmdinstant'
 	for i=1, #options_order_tmp_cmd_instant do
 		options_order[#options_order+1] = options_order_tmp_cmd_instant[i]
 	end
 	
-	options_order[#options_order+1] = 'lblstate'
+	--options_order[#options_order+1] = 'lblstate'
 	for i=1, #options_order_tmp_states do
 		options_order[#options_order+1] = options_order_tmp_states[i]
 	end

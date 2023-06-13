@@ -28,6 +28,8 @@ return { commsupport1 = {
     statsname = [[dynsupport1]],
     soundok = [[heavy_bot_move]],
     soundselect = [[bot_select]],
+    soundok_vol = [[0.58]],
+    soundselect_vol = [[0.5]],
     soundbuild = [[builder_start]],
     commtype = [[4]],
     aimposoffset   = [[0 15 0]],
@@ -35,13 +37,10 @@ return { commsupport1 = {
 
   energyMake          = 6,
   energyStorage       = 500,
-  energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[commander1]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
   maxDamage           = 2000,
@@ -50,7 +49,6 @@ return { commsupport1 = {
   maxWaterDepth       = 5000,
   metalMake           = 4,
   metalStorage        = 500,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commsupport.s3o]],
@@ -75,7 +73,7 @@ return { commsupport1 = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  turnRate            = 1350,
+  turnRate            = 1620,
   upright             = true,
   workerTime          = 12,
 
@@ -151,7 +149,6 @@ return { commsupport1 = {
       damage                  = {
         default = 140,
         planes  = 140,
-        subs    = 8,
       },
       
       customParams = {

@@ -27,10 +27,10 @@ function script.Activate()
 end
 
 function script.StopMoving()
-	Spin(rffan, y_axis, math.rad(0), math.rad(100))
-	Spin(lffan, y_axis, math.rad(0), math.rad(100))
-	Spin(rrfan, y_axis, math.rad(0), math.rad(100))
-	Spin(lrfan, y_axis, math.rad(0), math.rad(100))
+	Spin(rffan, y_axis, 0, math.rad(100))
+	Spin(lffan, y_axis, 0, math.rad(100))
+	Spin(rrfan, y_axis, 0, math.rad(100))
+	Spin(lrfan, y_axis, 0, math.rad(100))
 end
 
 local function TiltBody()

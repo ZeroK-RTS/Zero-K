@@ -24,17 +24,23 @@ end
 -- Config
 --------------------------------------------------------------------------------
 
-local nukeDefs = {
-	[UnitDefNames["staticnuke"].id] = true,
-}
+local nukeDefs = {}
+local interceptorRanges = {}
 
-local interceptorRanges = {
-	[UnitDefNames["staticantinuke"].id] = 2500^2,
-	--[UnitDefNames["reef"].id] = 1200^2,
-}
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.customParams.is_nuke then
+		nukeDefs[unitDefID] = true
+	end
+
+	if ud.customParams.nuke_coverage then
+		interceptorRanges[unitDefID] = (ud.customParams.nuke_coverage)^2
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local GetNukeIntercepted = VFS.Include("LuaRules/Gadgets/Include/GetNukeIntercepted.lua")
 
 function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD.ATTACK] = true, [CMD.INSERT] = true}
@@ -73,10 +79,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return true
 end
 
-local function InCircle(x,y,radiusSq)
-	return x*x + y*y <= radiusSq
-end
-
 function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)
 	
 	local unitDefID = Spring.GetUnitDefID(interceptorUnitID)
@@ -98,59 +100,7 @@ function gadget:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponN
 	local px, _, pz = Spring.GetProjectilePosition(targetProjectileID)
 	local tx, tz = targetData[1], targetData[3]
 	
-	-- Translate projectile position to the origin.
-	ux, uz, tx, tz, px, pz = ux - px, uz - pz, tx - px, tz - pz, 0, 0
-	
-	-- Get direction from projectile to target
-	local tDir
-	if tx == 0 then
-		if tz == 0 then
-			return InCircle(ux, uy, radiusSq)
-		elseif tz > 0 then
-			tDir = math.pi/4
-		else
-			tDir = math.pi*3/4
-		end
-	elseif tx > 0 then
-		tDir = math.atan(tz/tx)
-	else
-		tDir = math.atan(tz/tx) + math.pi
-	end
-	
-	-- Rotate space such that direction from projectile to target is 0
-	-- The nuke projectile will travel along the positive x-axis
-	local cosDir = math.cos(-tDir)
-	local sinDir = math.sin(-tDir)
-	ux, uz = ux*cosDir - uz*sinDir, uz*cosDir + ux*sinDir
-	tx, tz = tx*cosDir - tz*sinDir, tz*cosDir + tx*sinDir
-	
-	-- Find intersection of antinuke range with x-axis
-	-- Quadratic formula, a = 1
-	local b = -2*ux
-	local c = ux^2 + uz^2 - radiusSq
-	local determinate = b^2 - 4*c
-	if determinate < 0 then
-		-- No real solutions so the circle does not intersect x-axis.
-		-- This means that antinuke projectile does not cross intercept
-		-- range.
-		return false
-	end
-	
-	determinate = math.sqrt(determinate)
-	local leftInt = (-b - determinate)/2
-	local rightInt = (-b + determinate)/2
-	
-	--Spring.Echo(tDir*180/math.pi)
-	--Spring.Echo("Unit X: " .. ux .. ", Unit Z: " .. uz)
-	--Spring.Echo("Tar X: " .. tx .. ", Tar Z: " .. tz)
-	--Spring.Echo("Left: " .. leftInt .. ", Right: " .. rightInt)
-	
-	-- IF the nuke does not fall short of coverage AND
-	-- the projectile is still within coverage
-	if leftInt < tx and rightInt > 0 then
-		return true
-	end
-	return false
+	return GetNukeIntercepted(ux, uz, px, pz, tx, tz, radiusSq)
 end
 
 function gadget:Initialize()

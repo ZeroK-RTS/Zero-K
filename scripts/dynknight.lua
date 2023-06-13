@@ -56,7 +56,7 @@ if height and baseHeight then
 end
 ]]--
 
-local THIGH_FRONT_ANGLE = -math.rad(50)
+local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -65,19 +65,19 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(10)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = -math.rad(20)
+local ARM_FRONT_ANGLE = math.rad(-20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
-local FOREARM_FRONT_ANGLE = -math.rad(40)
+local FOREARM_FRONT_ANGLE = math.rad(-40)
 local FOREARM_FRONT_SPEED = math.rad(45) * PACE
 local FOREARM_BACK_ANGLE = math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(45) * PACE
 --[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
+local FOREARM_FRONT_ANGLE = math.rad(-15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
+local FOREARM_BACK_ANGLE = math.rad(-10)
 local FOREARM_BACK_SPEED = math.rad(40) * PACE
 ]]--
 
@@ -102,7 +102,6 @@ end
 --------------------------------------------------------------------------------
 local armsFree = true
 local restoreHeading = 0
-local gun_num = 0
 
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
@@ -114,7 +113,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
 
@@ -125,7 +123,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedMult = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*dyncomm.GetPace()
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
 		
 		--left leg up, right leg back
 		Turn(thighL, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
@@ -201,9 +199,6 @@ function jumping()
 	for i=1,4 do
 		EmitSfx(jets[i], 1028)
 	end
-end
-
-function halfJump()
 end
 
 function endJump()
@@ -313,11 +308,6 @@ function script.StartBuilding(heading, pitch)
 	restoreHeading = heading
 	Turn(torso, y_axis, heading, ARM_SPEED_PITCH)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),snout)
-	return snout
 end
 
 function script.Killed(recentDamage, maxHealth)

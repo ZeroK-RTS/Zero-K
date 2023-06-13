@@ -19,11 +19,6 @@ local turnAmount = math.rad(10)
 local turnSpeed = turnAmount*2000/(2*pause)
 
 -- variables
-local walking = false
-local forward = 8
-local backward = 5
-local up = 8
-
 local waveWeaponDef = WeaponDefNames["amphbomb_amphbomb_death"]
 local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
 
@@ -124,6 +119,8 @@ local function Killed(recentDamage, maxHealth)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	-- keep the unit technically alive (but hidden) for some time so that the death
+	-- blast can tell who its owner is (so that it can do no damage to allies)
 	return GG.Script.DelayTrueDeath(unitID, unitDefID, recentDamage, maxHealth, Killed, WAVE_TIMEOUT)
 end
 

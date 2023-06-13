@@ -18,10 +18,10 @@ end
 
 local echo = Spring.Echo
 
-local spGetUnitDefID 	= Spring.GetUnitDefID
-local spIsUnitInView 	= Spring.IsUnitInView
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spIsUnitInView        = Spring.IsUnitInView
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetGameFrame 	= Spring.GetGameFrame
+local spGetGameFrame        = Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -77,7 +77,7 @@ local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconoffset = 22
+local iconoffset = 26
 
 
 local iconUnitTexture = {}
@@ -265,15 +265,15 @@ local function DrawUnitFunc(xshift, yshift)
 end
 
 local function DrawWorldFunc()
-	if Spring.IsGUIHidden() then return end
+	if Spring.IsGUIHidden() then
+		return
+	end
 	
 	if (next(unitHeights) == nil) then
 		return -- avoid unnecessary GL calls
 	end
 	
-	
 	local gameFrame = spGetGameFrame()
-	
 	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
@@ -281,38 +281,31 @@ local function DrawWorldFunc()
 	glAlphaTest(GL_GREATER, 0.001)
 	
 	--for texture, units in pairs(textureUnitsXshift) do
-	
-	
 	for texture, curTextureData in pairs(textureData) do
 		for iconName, units in pairs(curTextureData) do
-		
-		
-		glTexture(texture)
-		for unitID,xshift in pairs(units) do
-			local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
-			if textureColor then
-				gl.Color( textureColor )
-			elseif pulseIcons[iconName] then
-				gl.Color( 1,1,1,iconFade )
-			end
-			
-			local unitInView = spIsUnitInView(unitID)
-			if unitInView and xshift and unitHeights and unitHeights[unitID] then
-				if forRadarIcons then
-					DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
-				else
-					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
+			glTexture(texture)
+			for unitID,xshift in pairs(units) do
+				local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
+				if textureColor then
+					gl.Color( textureColor )
+				elseif pulseIcons[iconName] then
+					gl.Color( 1,1,1,iconFade )
+				end
+				
+				local unitInView = spIsUnitInView(unitID)
+				if unitInView and xshift and unitHeights and unitHeights[unitID] then
+					if forRadarIcons then
+						DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
+					else
+						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
+					end
+				end
+				
+				if textureColor or pulseIcons[iconName] then
+					gl.Color(1,1,1,1)
 				end
 			end
-			
-			if textureColor or pulseIcons[iconName] then
-				gl.Color(1,1,1,1)
-			end
 		end
-		
-	end
-	
-	--new
 	end
 	
 	glTexture(false)

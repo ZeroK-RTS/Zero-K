@@ -16,13 +16,7 @@ local wingRightRear = piece('wingRightRear');
 local wingTopFront = piece('wingTopFront');
 local wingTopRear = piece('wingTopRear');
 
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitHeading = Spring.GetUnitHeading
-local spGetUnitVelocity = Spring.GetUnitVelocity
-
 local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
-
-local bombs = 1
 
 include "bombers.lua"
 include "constants.lua"
@@ -63,8 +57,6 @@ function script.FireWeapon(num)
 	Reload()
 	end
 end
-
-local predictMult = 3
 
 function script.BlockShot(num, targetID)
 	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))

@@ -46,7 +46,8 @@ local runspeed = 0.56 * (UnitDefs[unitDefID].speed / 87)
 --------------------------------------------------------------------------------
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead -> infinite loop)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function Idle()
@@ -104,10 +105,10 @@ local function Walk()
 
 		Turn(thigh[side], x_axis, math.rad(-50), truespeed*math.rad(450))
 		Turn(shin[side], x_axis, math.rad(65), truespeed*math.rad(640))
-		Turn(foot[side], x_axis, math.rad(0), truespeed*math.rad(30))
+		Turn(foot[side], x_axis, 0, truespeed*math.rad(30))
 
 		Turn(thigh[3-side], x_axis, math.rad(50), truespeed*math.rad(450))
-		Turn(shin[3-side], x_axis, math.rad(0), truespeed*math.rad(800))
+		Turn(shin[3-side], x_axis, 0, truespeed*math.rad(800))
 
 		Move(hips, y_axis, 0.5, truespeed*18)
 		WaitForMove(hips, y_axis)

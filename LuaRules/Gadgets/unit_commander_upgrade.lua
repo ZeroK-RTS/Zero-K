@@ -42,25 +42,16 @@ local commanderCloakShieldDef = {
 	delay = 30,
 	energy = 15,
 	minrad = 64,
-	maxrad = 350,
+	maxrad = 320, -- Update a number in dynamic_comm_defs
+	recloakRate = 800, -- Update a number in dynamic_comm_defs
 	
 	growRate = 512,
 	shrinkRate = 2048,
 	selfCloak = true,
-	decloakDistance = 75,
 	isTransport = false,
-	
-	radiusException = {}
 }
 
 local COMMANDER_JAMMING_COST = 1.5
-
-for _, eud in pairs (UnitDefs) do
-	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
-		commanderCloakShieldDef.radiusException[eud.id] = true
-	end
-end
-
 local commAreaShield = WeaponDefNames["shieldshield_cor_shield_small"]
 
 local commAreaShieldDefID = {
@@ -77,6 +68,7 @@ local moduleSlotTypeMap = {
 	module = "module",
 	basic_weapon = "module",
 	adv_weapon = "module",
+	dual_basic_weapon = "module",
 }
 
 local function SetUnitRulesModule(unitID, counts, moduleDefID)
@@ -93,7 +85,6 @@ end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
 	if (not weapon2) and weapon1 then
-		local unitDefID = Spring.GetUnitDefID(unitID)
 		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
 		if wd and wd.customParams and wd.customParams.manualfire then
@@ -122,9 +113,16 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 	
 	-- Update ApplyModuleEffectsFromUnitRulesParams if any non-unitRulesParams changes are made.
-	if data.speedMod then
-		local speedMult = (data.speedMod + ud.speed)/ud.speed
+	if data.speedMultPost or data.speedMod then
+		local speedMult = (data.speedMultPost or 1)*((data.speedMod or 0) + ud.speed)/ud.speed
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", speedMult, INLOS)
+	end
+	
+	if data.jumpReloadMod then
+		Spring.SetUnitRulesParam(unitID, "upgradesJumpReloadMod", data.jumpReloadMod, INLOS)
+		if GG.SetJumpReloadMod then
+			GG.SetJumpReloadMod(unitID, data.jumpReloadMod)
+		end
 	end
 	
 	if data.radarRange then
@@ -154,6 +152,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak", 1, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_upkeep", data.cloakFieldUpkeep, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_area_recloak_rate", data.cloakFieldRecloakRate, INLOS)
 	end
 	
 	local buildPowerMult = ((data.bonusBuildPower or 0) + ud.buildSpeed)/ud.buildSpeed
@@ -381,11 +380,13 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, targetLevel)
+	local chassisName = commProfileInfo.chassis
+	local chassisModuleDefs = moduleDefNames[chassisName] or {}
 	for i = 0, targetLevel do
 		local levelModules = commProfileInfo.modules[i]
 		if levelModules then
 			for j = 1, #levelModules do
-				local moduleID = moduleDefNames[levelModules[j]]
+				local moduleID = chassisModuleDefs[levelModules[j]]
 				if moduleID and moduleDefs[moduleID] then
 					moduleList[#moduleList + 1] = moduleID
 					moduleCost = moduleCost + moduleDefs[moduleID].cost
@@ -437,7 +438,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
-	local moduleList = {moduleDefNames.econ, moduleDefNames.module_radarnet}
+	local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
+	local moduleList = {chassisModuleDefs.econ, chassisModuleDefs.module_radarnet}
 	local moduleCost = 0
 	for i = 1, #moduleList do
 		moduleCost = moduleCost + moduleDefs[moduleList[i]].cost
@@ -446,8 +448,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	if commProfileInfo.decorations then
 		for i = 1, #commProfileInfo.decorations do
 			local decName = commProfileInfo.decorations[i]
-			if moduleDefNames[decName] then
-				moduleList[#moduleList + 1] = moduleDefNames[decName]
+			if chassisModuleDefs[decName] then
+				moduleList[#moduleList + 1] = chassisModuleDefs[decName]
 			end
 		end
 	end
@@ -501,14 +503,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if profileID then
 		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
+		local chassisModuleDefs = moduleDefNames[commProfileInfo.chassis] or {}
 		
 		-- Add decorations
 		local moduleList = {}
 		if commProfileInfo.decorations then
 			for i = 1, #commProfileInfo.decorations do
 				local decName = commProfileInfo.decorations[i]
-				if moduleDefNames[decName] then
-					moduleList[#moduleList + 1] = moduleDefNames[decName]
+				if chassisModuleDefs[decName] then
+					moduleList[#moduleList + 1] = chassisModuleDefs[decName]
 				end
 			end
 		end
@@ -750,16 +753,4 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Save/Load
-
-function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		if Spring.GetUnitRulesParam(unitID, "comm_level") then
-			ApplyModuleEffectsFromUnitRulesParams(unitID)
-		end
-	end
 end

@@ -35,9 +35,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Automatically generated local definitions
 
 local CMD_GUARD            = CMD.GUARD
-local spGetMyTeamID        = Spring.GetMyTeamID
 local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
-local spGetUnitGroup       = Spring.GetUnitGroup
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetUnitRadius      = Spring.GetUnitRadius
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
@@ -49,21 +47,26 @@ VFS.Include("LuaRules/Utilities/ClampPosition.lua")
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 
-local factoryDefs = {
-	[UnitDefNames["factorycloak"].id] = 0,
-	[UnitDefNames["factoryshield"].id] = 0,
-	[UnitDefNames["factoryspider"].id] = 0,
-	[UnitDefNames["factoryjump"].id] = 0,
-	[UnitDefNames["factoryveh"].id] = 0,
-	[UnitDefNames["factoryhover"].id] = 0,
-	[UnitDefNames["factoryamph"].id] = 0,
-	[UnitDefNames["factorytank"].id] = 0,
-	[UnitDefNames["factoryplane"].id] = 0,
-	[UnitDefNames["factorygunship"].id] = 0,
-	[UnitDefNames["factoryship"].id] = 0,
-}
+local factoryDefs = {}
+
+for unitDefID, ud in pairs(UnitDefs) do
+	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local buildOptions = ud.buildOptions
+
+		for i = 1, #buildOptions do
+			local boDefID = buildOptions[i]
+			local bod = UnitDefs[boDefID]
+
+			if (bod and bod.isBuilder and bod.canAssist) then
+				factoryDefs[unitDefID] = true  -- only factories that can build builders are included
+				break
+			end
+		end
+	end
+end
 
 local factories = {}
+local deferCheckUnits = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -96,7 +99,7 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
   
 	-- the unit will move itself if it can fly
 	if ud.canFly then
-		spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, 0)
+		spGiveOrderToUnit(unitID, CMD_GUARD, factID, 0)
 		return
 	end
 
@@ -149,11 +152,11 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		rx, rz =  0,  dist
 	end
 	
-	GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, 0)
-	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, CMD.OPT_SHIFT, true) then
-		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, CMD.OPT_SHIFT)
+	--GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, 0)
+	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, 0, true) then
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, 0)
 	end
-	spGiveOrderToUnit(unitID, CMD_GUARD, { factID }, CMD.OPT_SHIFT)
+	spGiveOrderToUnit(unitID, CMD_GUARD, factID, CMD.OPT_SHIFT)
 end
 
 --------------------
@@ -179,8 +182,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,
-                             cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_FACTORY_GUARD and factoryDefs[unitDefID] then
 		SetAssistState(unitID, cmdParams[1])
 		return false  -- command was used
@@ -199,14 +201,23 @@ function gadget:UnitCreated(unitID, unitDefID,  unitTeam)
 	end
 end
 
-function gadget:UnitFromFactory(unitID, unitDefID, unitTeam,
-                                factID, factDefID, userOrders)
-
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if (userOrders) then
 		return -- already has user assigned orders
 	end
 	if factories[factID] and factories[factID].assist then
 		GuardFactory(unitID, unitDefID, factID, factDefID)
+		deferCheckUnits = deferCheckUnits or {}
+		deferCheckUnits[unitID] = {unitDefID, factID, factDefID}
+	end
+end
+
+function gadget:GameFrame(n)
+	if deferCheckUnits then
+		for unitID, data in pairs(deferCheckUnits) do
+			GuardFactory(unitID, data[1], data[2], data[3])
+		end
+		deferCheckUnits = false
 	end
 end
 

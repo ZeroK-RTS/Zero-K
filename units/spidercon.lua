@@ -27,19 +27,15 @@ return { spidercon = {
     selection_scale = 1.2,
   },
 
-  energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[builder]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 980,
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[TKBOT2]],
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,
@@ -53,7 +49,7 @@ return { spidercon = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
-  turnRate               = 1400,
+  turnRate               = 1680,
   workerTime             = 7.5,
 
   featureDefs            = {

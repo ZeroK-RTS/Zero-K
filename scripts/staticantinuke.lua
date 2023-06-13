@@ -5,8 +5,6 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 local base, door1, door2, brace, missile, aimpoint = piece('base', 'door1', 'door2', 'brace', 'missile', 'aimpoint')
 
-local smokePiece = {base}
-
 --------------------------------------------------------------------------------
 -- signals
 --------------------------------------------------------------------------------
@@ -43,7 +41,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(GG.Script.SmokeUnit, unitID, {piece('smoke1', 'smoke2', 'smoke3', 'smoke4', 'smoke5', 'smoke6', 'smoke7')}, 4)
 end
 
 local function RestoreAfterDelay()
@@ -64,6 +62,7 @@ function script.AimWeapon(weaponNum, heading, pitch)
 end
 
 function script.FireWeapon(weaponNum)
+	Spring.AddUnitExperience(unitID, 1) -- nuke missiles aren't worth exactly 1 anti, but for simplicity
 	Hide(missile)
 	Sleep(500)
 	if open then Close() end

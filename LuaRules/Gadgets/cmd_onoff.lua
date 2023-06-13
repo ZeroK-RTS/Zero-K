@@ -21,9 +21,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
-
 local CMD_ONOFF = CMD.ONOFF
+
+local customCMD = Spring.Utilities.CMD
+local CMD_WANT_ONOFF = customCMD.WANT_ONOFF
+local CMD_PUSH_PULL  = customCMD.PUSH_PULL
 
 local wantOnOffCmdDesc = {
 	id      = CMD_WANT_ONOFF,
@@ -122,10 +124,13 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return onOffUnits
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if not onOffUnits[unitDefID] then
+		return false
+	end
 	if (cmdID == CMD_ONOFF) then
 		return (cmdParams[2] == CMD_WANT_ONOFF) -- we block any on/off that we didn't call ourselves
 	end

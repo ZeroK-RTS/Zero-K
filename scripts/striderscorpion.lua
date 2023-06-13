@@ -17,8 +17,7 @@ local armr1 = piece 'armr1'
 local arml1 = piece 'arml1'
 local gunr = piece 'gunr'
 local gunl = piece 'gunl'
-local barrel1r, barrel2r, barrel3r = piece('barrel1r', 'barrel2r', 'barrel3r')
-local barrel1l, barrel2l, barrel3l = piece('barrel1l', 'barrel2l', 'barrel3l')
+-- unused pieces: barrel[123][rl]
 local flare1r, flare2r, flare3r = piece('flare1r', 'flare2r', 'flare3r')
 local flare1l, flare2l, flare3l = piece('flare1l', 'flare2l', 'flare3l')
 
@@ -54,6 +53,7 @@ local SIG_RESTORE = 2
 local PERIOD = 0.22
 
 local sleepTime = PERIOD*1000
+local resetRestore = false
 
 local legRaiseAngle = math.rad(30)
 local legRaiseSpeed = legRaiseAngle/PERIOD
@@ -61,7 +61,7 @@ local legLowerSpeed = legRaiseAngle/PERIOD
 
 local legForwardAngle = math.rad(20)
 local legForwardTheta = math.rad(25)
-local legForwardOffset = -math.rad(20)
+local legForwardOffset = math.rad(-20)
 local legForwardSpeed = legForwardAngle/PERIOD
 
 local legMiddleAngle = math.rad(20)
@@ -70,11 +70,9 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
-local legBackwardTheta = -math.rad(25)
+local legBackwardTheta = math.rad(-25)
 local legBackwardOffset = math.rad(20)
 local legBackwardSpeed = legBackwardAngle/PERIOD
-
-local restore_delay = 5000
 
 local tailTurnSpeed = math.rad(20)
 local tailPitchSpeed = math.rad(10)
@@ -101,9 +99,36 @@ local function RestoreLegs()
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)
 end
 
+local function RestoreAfterDelay()
+	local counter = 5
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 5
+		end
+		if counter == 0 then
+			local turnSpeed = tailTurnSpeed/2
+			local pitchSpeed = tailPitchSpeed/2
+			for i=1, #tailPieces do
+				Turn(tailPieces[i], x_axis, 0, pitchSpeed)
+				Turn(tailPieces[i], y_axis, 0, turnSpeed)
+			end
+			
+			for i=4,5 do
+				Turn(weaponPieces[i].pivot, y_axis, 0, math.rad(60))
+				Turn(weaponPieces[i].pitch, x_axis, 0, math.rad(45))
+			end
+		end
+		Sleep(1000)
+	end
+end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 	Move(flare1, z_axis, 7)
 --	Turn(armr1, z_axis, math.rad(30), 100)
 --	Turn(arml1, z_axis, math.rad(-30), 100)
@@ -115,23 +140,6 @@ end
 
 function script.StopMoving()
 	StartThread(RestoreLegs)
-end
-
-local function RestoreAfterDelay()
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
-	Sleep(restore_delay)
-	local turnSpeed = tailTurnSpeed/2
-	local pitchSpeed = tailPitchSpeed/2
-	for i=1, #tailPieces do
-		Turn(tailPieces[i], x_axis, 0, pitchSpeed)
-		Turn(tailPieces[i], y_axis, 0, turnSpeed)
-	end
-	
-	for i=4,5 do
-		Turn(weaponPieces[i].pivot, y_axis, 0, math.rad(60))
-		Turn(weaponPieces[i].pitch, x_axis, 0, math.rad(45))
-	end
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -146,13 +154,13 @@ function script.AimWeapon(num, heading, pitch)
 		end
 		WaitForTurn(tailgun, y_axis)
 		WaitForTurn(tailgun, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 	elseif num ~= 1 then
 		Turn(weaponPieces[num].pivot, y_axis, heading, math.rad(120))
 		Turn(weaponPieces[num].pitch, x_axis, -pitch, math.rad(90))
 		WaitForTurn(weaponPieces[num].pivot, y_axis)
 		WaitForTurn(weaponPieces[num].pitch, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 	end
 	return true
 end

@@ -15,25 +15,22 @@ return { striderdante = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    aim_lookahead = 200,
+    decloak_footprint     = 5,
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[t3riot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 50,
   maxDamage           = 11000,
   maxSlope            = 36,
   maxVelocity         = 1.75,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT4]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM SATELLITE SUB DRONE]],
   objectName          = [[dante.s3o]],
   script              = [[striderdante.lua]],
   selfDestructAs      = [[CRAWL_BLASTSML]],
@@ -52,7 +49,7 @@ return { striderdante = {
   trackStretch        = 0.6,
   trackType           = [[ComTrack]],
   trackWidth          = 38,
-  turnRate            = 597,
+  turnRate            = 720,
   upright             = true,
   workerTime          = 0,
 
@@ -119,7 +116,6 @@ return { striderdante = {
       
       damage                  = {
         default = 15,
-        subs    = 0.15,
       },
 
       duration                  = 0.01,
@@ -133,7 +129,7 @@ return { striderdante = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 340,
+      range                   = 320,
       reloadtime              = 0.133,
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],
@@ -169,12 +165,12 @@ return { striderdante = {
       damage                  = {
         default = 49,
         planes  = 49,
-        subs    = 2.45,
       },
 
       duration                = 0.3,
       dynDamageExp            = 1,
       dynDamageInverted       = false,
+      dynDamageRange          = 430,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 1,
       fireStarter             = 90,
@@ -186,7 +182,7 @@ return { striderdante = {
       lodDistance             = 10000,
       projectiles             = 2,
       proximityPriority       = 4,
-      range                   = 430,
+      range                   = 417,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.1 0]],
       rgbColor2               = [[1 1 0.25]],
@@ -210,12 +206,13 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 1125, -- 37.5s
         reaim_time = 1,
+        force_ignore_ground = [[1]],
       },
       
       damage                  = {
         default = 120.8,
-        subs    = 6,
       },
 
       edgeEffectiveness       = 0.75,
@@ -261,6 +258,7 @@ return { striderdante = {
       customParams              = {
         setunitsonfire = "1",
         burnchance = "1",
+        burntime = 1125, -- 37.5s
         
         light_color = [[0.8 0.4 0.1]],
         light_radius = 320,
@@ -269,7 +267,6 @@ return { striderdante = {
       
       damage                  = {
         default = 120.8,
-        subs    = 6,
       },
 
       dance                   = 15,

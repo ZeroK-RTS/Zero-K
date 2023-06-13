@@ -1,5 +1,5 @@
 {
-	"shield" : "tarcza",
+	"shield_bar" : "tarcza",
 	"health_bar" : "życie",
 	"building" : "budowa",
 	"morph" : "ulepszenie",
@@ -11,6 +11,8 @@
 	"water_tank" : "cysterna",
 	"teleport" : "teleport",
 	"ability" : "umiejętność",
+	"heat" : "przegrzanie",
+	"speed" : "prędkość",
 	"reload" : "przeładowanie",
 	"slow" : "spowolnienie",
 	"goo" : "rozmnażanie",

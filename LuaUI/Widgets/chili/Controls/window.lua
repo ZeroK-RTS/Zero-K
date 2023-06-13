@@ -9,6 +9,7 @@ Window = Control:Inherit{
 	resizable = true,
 	draggable = true,
 	bringToFrontOnClick = true,
+	noFont = true,
 
 	minWidth  = 50,
 	minHeight = 50,

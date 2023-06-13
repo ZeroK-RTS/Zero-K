@@ -14,7 +14,7 @@ local smokePiece = {base, turret}
 
 include "constants.lua"
 
-local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -84,8 +84,8 @@ local function Close()
 	end
 	
 	
-	Turn(door1, z_axis, math.rad(-(90)), math.rad(80))
-	Turn(door2, z_axis, math.rad(-(-90)), math.rad(80))
+	Turn(door1, z_axis, math.rad(-90), math.rad(80))
+	Turn(door2, z_axis, math.rad(90), math.rad(80))
 	WaitForTurn(door1, z_axis)
 	WaitForTurn(door2, z_axis)
 	
@@ -121,7 +121,7 @@ function script.AimWeapon(weaponNum, heading, pitch)
 	Turn(gun, x_axis, 0 - pitch, math.rad(40))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
-	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0) --checks for sufficient energy in grid
 end
 
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
@@ -132,7 +132,9 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
+	-- partial OKP damage because long beam means the unit can dodge and just get grazed
+	-- Underestimate beam time so that fully-hit targets always have more pending damage in reality than in theory.
+	return targetID and (GG.DontFireRadar_CheckBlock(unitID, targetID) or GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000, 20))
 end
 
 --[[

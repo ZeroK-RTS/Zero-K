@@ -1,8 +1,7 @@
-local versionNumber = "v0.92 "
 function widget:GetInfo()
   return {
     name     = "Resurrect Congregate",
-    desc     = versionNumber .. "Automatically send resurrected unit to nearby blob of allied units. (1 Blob = 5 ground units within 300 elmo radius, Congregating range: 3000 elmo)",
+    desc     = "Resurrected units automatically move towards a nearby unit group",
     author   = "msafwan",
     date     = "3 November 2013",
     license  = "GNU GPL, v2 or later",

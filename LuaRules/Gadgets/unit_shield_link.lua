@@ -28,7 +28,6 @@ local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetTeamInfo         = Spring.GetTeamInfo
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
-local spGetUnitIsActive     = Spring.GetUnitIsActive
 local spGetUnitShieldState  = Spring.GetUnitShieldState
 local spSetUnitShieldState  = Spring.SetUnitShieldState
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
@@ -216,7 +215,7 @@ local function IsEnabled(unitID)
 	if stunned_or_inbuild then
 		return false
 	end
-	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_shieldDisabled") ~= 1)
 	return att_enabled
 end
 

@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name = "Misc default command replacements",
+	desc = "Implements some right-click behaviour options",
 	license = "Public Domain",
 	layer = 0,
 	enabled = Script.IsEngineMinVersion(104, 0, 53), -- 53 on maintenance branch, 211 on develob
@@ -21,6 +22,13 @@ options = {
 		type = "bool",
 		value = true,
 		desc = "If enabled, rightclicking a constructor will always Guard it.\nIf disabled, the command can be Repair.",
+		noHotkey = true,
+	},
+	set_target_instead_of_attack = {
+		name = "Right click sets target instead of attacking",
+		type = "bool",
+		value = false,
+		desc = "If enabled, rightclicking an enemy will give the Set Target command.\nIf disabled, the command is Attack.",
 		noHotkey = true,
 	},
 }
@@ -54,6 +62,12 @@ local handlers = {
 		or facs[unitDefID] and options.guard_facs.value
 		then
 			return CMD.GUARD
+		end
+	end,
+
+	[CMD.ATTACK] = function (unitID)
+		if options.set_target_instead_of_attack.value then
+			return CMD_UNIT_SET_TARGET
 		end
 	end,
 }

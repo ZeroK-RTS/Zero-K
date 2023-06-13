@@ -48,13 +48,10 @@ local spValidUnitID			= Spring.ValidUnitID
 local spGetUnitTeam			= Spring.GetUnitTeam
 --local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
 local spIsPosInRadar		= Spring.IsPosInRadar
-local spGetTeamUnits		= Spring.GetTeamUnits
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 local jumpDefs = VFS.Include"LuaRules/Configs/jump_defs.lua"
-
-local SAVE_FILE = "Gadgets/ai_cai.lua"
 
 --------------------------------------------------------------------------------
 -- commands
@@ -601,7 +598,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 	for tid,data in pairs(turretByID) do
 		local tx,_,tz = spGetUnitPosition(tid)
 		if (not data.finished) and disSQ(ux,uz,tx,tz) < aidSearchRange^2 and not data.air then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {tid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, tid, 0)
 			conByID[unitID].makingDefence = true
 			return
 		end
@@ -710,7 +707,7 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityD
 	for tid,data in pairs(turretByID) do
 		local tx,_,tz = spGetUnitPosition(tid)
 		if (not data.finished) and disSQ(x,z,tx,tz) < searchRange^2 and not data.air then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {tid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, tid, 0)
 			return true
 		end
 	end
@@ -769,7 +766,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 	for tid,data in pairs(turretByID) do
 		local tx,_,tz = spGetUnitPosition(tid)
 		if (not data.finished) and disSQ(x,z,tx,tz) < searchRange^2 and data.air then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {tid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, tid, 0)
 			return true
 		end
 	end
@@ -872,7 +869,7 @@ local function makeMiscBuilding(team, unitID, defId, searchRange, maxRange)
 		if data.ud.id == defId and (not data.finished) then
 			local x,_,z = spGetUnitPosition(id)
 			if disSQ(ux,uz,x,z) < maxRange^2 then
-				spGiveOrderToUnit(unitID, CMD_REPAIR, {id}, 0)
+				spGiveOrderToUnit(unitID, CMD_REPAIR, id, 0)
 				return true
 			end
 		end
@@ -910,7 +907,7 @@ local function makeRadar(team, unitID, searchRange, minDistance)
 	for rid,_ in pairs(at.units.radarByID) do
 		local x,_,z = spGetUnitPosition(rid)
 		if disSQ(ux,uz,x,z) < minDistance^2 then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {rid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, rid, 0)
 			return true
 		end
 	end
@@ -954,7 +951,7 @@ local function makeMex(team, unitID)
 		local ux = mexByID[mid].x
 		local uz = mexByID[mid].z
 		if (not mexByID[mid].finished) and disSQ(x,z,ux,uz) < 1000^2 then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {mid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, mid, 0)
 			return
 		end
 	end
@@ -999,7 +996,7 @@ local function makeNano(team,unitID)
 		local nid = nano[i]
 		local data = a.controlledUnit.nanoByID[nid]
 		if (not a.controlledUnit.nanoByID[nid].finished) and disSQ(data.x,data.z,ux,uz) < 1000^2 then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {nid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, nid, 0)
 			return
 		end
 	end
@@ -1071,7 +1068,7 @@ local function makeEnergy(team,unitID)
 		local x = econByID[eid].x
 		local z = econByID[eid].z
 		if (not econByID[eid].finished) and disSQ(x,z,ux,uz) < 1000^2 then
-			spGiveOrderToUnit(unitID, CMD_REPAIR, {eid}, 0)
+			spGiveOrderToUnit(unitID, CMD_REPAIR, eid, 0)
 			return
 		end
 	end
@@ -1083,7 +1080,7 @@ local function makeEnergy(team,unitID)
 		if cQueue and #cQueue > 0 and disSQ(cx,cz,ux,uz) < 800^2 then
 			for i = 1, buildDefs.energyIds.count do
 				if cQueue[1].id == buildDefs.energyIds[i].ID then
-					spGiveOrderToUnit(unitID, CMD_GUARD, {cid}, 0)
+					spGiveOrderToUnit(unitID, CMD_GUARD, cid, 0)
 					conByID[unitID].idle = true
 					return
 				end
@@ -1186,7 +1183,7 @@ local function assignFactory(team,unitID,cQueue)
 			end
 			
 			
-			spGiveOrderToUnit(unitID, CMD_GUARD, {facID},CMD_OPT_SHIFT)
+			spGiveOrderToUnit(unitID, CMD_GUARD, facID, CMD_OPT_SHIFT)
 		else
 			
 			local buildableFactoryCount = 0
@@ -1430,7 +1427,7 @@ local function setRetreatState(unitID, unitDefID, unitTeam, num)
 			return
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD_RETREAT, {num}, 0)
+	spGiveOrderToUnit(unitID, CMD_RETREAT, num, 0)
 end
 
 local function getPositionTowardsMiddle(unitID, range, inc, count)
@@ -1520,7 +1517,7 @@ local function factoryJobHandler(team)
 			local bud = chooseUnitDefIDWithDebug(defData[choice], unitID, data.ud, choice)
 			data.producingScout = scouting
 			data.producingRaider = raiding
-			spGiveOrderToUnit(unitID, -bud , {}, 0)
+			spGiveOrderToUnit(unitID, -bud, 0, 0)
 		end
 	end
 
@@ -1903,7 +1900,7 @@ local function raiderJobHandler(team)
 		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
-				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, 0)
+				spGiveOrderToUnit(unitID, CMD_ATTACK, eID, 0)
 			elseif tX and not unitInBattleGroupByID[unitID] then
 				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, 0)
 				for i = 1, battleGroup.count do
@@ -2063,7 +2060,7 @@ local function gunshipJobHandler(team)
 		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
-				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, 0)
+				spGiveOrderToUnit(unitID, CMD_ATTACK, eID, 0)
 			elseif tX and not unitInBattleGroupByID[unitID] then
 				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, 0)
 				for i = 1, battleGroup.count do
@@ -2096,7 +2093,7 @@ local function fighterJobHandler(team)
 		for unitID,data in pairs(fighterByID) do
 			local cQueue = spGetCommandQueue(unitID, 1)
 			if cQueue and #cQueue == 0 then
-				spGiveOrderToUnit(unitID, CMD_ATTACK , { at.fighterTarget}, 0)
+				spGiveOrderToUnit(unitID, CMD_ATTACK, at.fighterTarget, 0)
 			end
 		end
 	else
@@ -2227,7 +2224,7 @@ local function combatJobHandler(team)
 		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
-				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, 0)
+				spGiveOrderToUnit(unitID, CMD_ATTACK, eID, 0)
 			elseif tX and not unitInBattleGroupByID[unitID] then
 				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-300,300),tY,tZ + math.random(-300,300),}, 0)
 				for i = 1, battleGroup.count do
@@ -3419,7 +3416,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					setRetreatState(unitID, unitDefID, unitTeam, 2)
 				else -- nano turret
 					local x,y,z = spGetUnitPosition(unitID)
-					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, 0)
+					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 2, 0)
 					GiveClampedOrderToUnit(unitID, CMD_PATROL, { x + 25, y, z - 25 }, 0)
 					controlledUnit.nanoByID[unitID].finished = true
 				end
@@ -3431,8 +3428,8 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				setRetreatState(unitID, unitDefID, unitTeam, 1)
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
-					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, 0)
-					spGiveOrderToUnit(unitID, CMD_FIRE_STATE, { 2 }, 0)
+					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 1, 0)
+					spGiveOrderToUnit(unitID, CMD_FIRE_STATE, 2, 0)
 					if ud.isFighter then -- fighter
 						controlledUnit.fighterByID[unitID].finished = true
 						setRetreatState(unitID, unitDefID, unitTeam, 2)
@@ -3446,8 +3443,8 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					controlledUnit.scoutByID[unitID].finished = true
 				end
 			elseif ud.maxWeaponRange > 0 and not ud.isImmobile then -- land combat unit
-				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, 0)
-				spGiveOrderToUnit(unitID, CMD_FIRE_STATE, { 2 }, 0)
+				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, 1, 0)
+				spGiveOrderToUnit(unitID, CMD_FIRE_STATE, 2, 0)
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
 					if ud.speed >= 3*30 then -- raider
 						controlledUnit.raiderByID[unitID].finished = true
@@ -4110,109 +4107,6 @@ function gadget:Shutdown()
 	GG.CAI = nil
 end
 
-local function ReloadUnitIDs()
-	local GetNewKeys = GG.SaveLoad.GetNewUnitIDKeys
-
-	for teamID, teamData in pairs(aiTeamData) do
-		teamData.unitInBattleGroupByID = GetNewKeys(teamData.unitInBattleGroupByID)
-		for battleGroupID, battleGroupData in pairs(teamData.battleGroup) do
-			if type(battleGroupData) == "table" then
-				battleGroupData.unit = GetNewKeys(battleGroupData.unit)
-				battleGroupData.aa = GetNewKeys(battleGroupData.aa)
-			end
-		end
-		for job, jobData in pairs(teamData.conJob) do
-			jobData.con = GetNewKeys(jobData.con)
-		end
-		for jobIndex, jobData in pairs(teamData.conJobByIndex) do
-			jobData.con = GetNewKeys(jobData.con)
-		end
-		teamData.sosTimeout = GetNewKeys(teamData.sosTimeout)
-		
-		for controlledUnitCategory, controlledUnitData in pairs(teamData.controlledUnit) do
-			local isID = string.sub(controlledUnitCategory, -4) == "ByID"
-			Spring.Echo("category", controlledUnitCategory)
-			if isID then
-				teamData.controlledUnit[controlledUnitCategory] = GetNewKeys(controlledUnitData)
-			else
-				local new = {cost = controlledUnitData.cost, count = controlledUnitData.count}
-				for index, oldID in ipairs(controlledUnitData) do
-					new[index] = GG.SaveLoad.GetNewUnitID(oldID)
-				end
-				teamData.controlledUnit[controlledUnitCategory] = new
-			end
-		end
-	end
-	
-	for teamID, teamData in pairs(allyTeamData) do
-		for unitCategory, unitData in pairs(teamData.units) do
-			if type(unitData) == "table" then
-				local isID = string.sub(unitCategory, -4) == "ByID"
-				if isID then
-					teamData.units[unitCategory] = GetNewKeys(unitData)
-				else
-					local new = {cost = unitData.cost, count = unitData.count}
-					for index, oldID in ipairs(unitData) do
-						new[index] = GG.SaveLoad.GetNewUnitID(oldID)
-					end
-					teamData.units[unitCategory] = new
-				end
-			end
-		end
-	end
-end
-
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
-		return
-	end
-	local data = GG.SaveLoad.ReadFile(zip, "CAI", SAVE_FILE) or {}
-	aiTeamData = data.aiTeamData
-	allyTeamData = data.allyTeamData
-
-	local toResetUnitDefs = {
-		"anyByID",
-		"combatByID",
-		"conByID",
-		"econByID",
-		"mexByID",
-		"factoryByID",
-		"nanoByID",
-		"radarByID",
-		"airpadByID",
-		"scoutByID",
-		"raiderByID",
-		"artyByID",
-		"aaByID",
-		"turretByID",
-		"fighterByID",
-		"bomberByID",
-		"gunshipByID",
-	}
-	
-	ReloadUnitIDs()
-	
-	-- reassign function variables and unitDef information
-	for teamID,teamData in pairs(aiTeamData) do
-		local aiConfig = aiConfigByName[spGetTeamLuaAI(teamID)]
-		teamData.controlFunction = aiConfig.controlFunction
-		--teamData.buildConfig = aiConfig.buildConfig
-		teamData.buildConfig = CopyTable(aiConfig.buildConfig)
-		teamData.raiderBattlegroupCondition = aiConfig.raiderBattlegroupCondition
-		teamData.combatBattlegroupCondition = aiConfig.combatBattlegroupCondition
-		teamData.gunshipBattlegroupCondition = aiConfig.gunshipBattlegroupCondition
-		for i=1,#toResetUnitDefs do
-			local key = toResetUnitDefs[i]
-			local units = teamData.controlledUnit[key]
-			for unitID,unitData in pairs(units) do
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				unitData.ud = UnitDefs[unitDefID]
-			end
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
@@ -4234,10 +4128,10 @@ function gadget:DrawWorldPreUnit()
 	if Spring.IsCheatingEnabled() then
 		if SYNCED and SYNCED.debugData and SYNCED.debugData.drawScoutmap then
 			local scoutmaps = SYNCED.debugData.drawScoutmap
-			for allyTeam in spairs(scoutmaps) do
+			for allyTeam in pairs(scoutmaps) do
 				local scoutmap = SYNCED.allyTeamData[allyTeam].scoutingHeatmap
-				for x,xdata in spairs(scoutmap) do
-					for z,zdata in spairs(xdata) do
+				for x,xdata in pairs(scoutmap) do
+					for z,zdata in pairs(xdata) do
 						local px, pz = heatmapPosition[x][z].x, heatmapPosition[x][z].z
 						if not zdata.scouted then
 							gl.Color(0,0,0,0.5)
@@ -4274,17 +4168,6 @@ function gadget:Initialize()
 		return
 	end
 	--heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
-end
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
-		return
-	end
-	local allyTeamData = MakeRealTable(SYNCED.allyTeamData, "CAI ally team data")
-	local aiTeamData = MakeRealTable(SYNCED.aiTeamData, "CAI AI team data")
-	local toSave = {allyTeamData = allyTeamData, aiTeamData = aiTeamData}
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end
 
 end

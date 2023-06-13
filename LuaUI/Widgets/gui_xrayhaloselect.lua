@@ -8,7 +8,6 @@ function widget:GetInfo()
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
-    experimental = true,
     layer     = 0,
     enabled   = false,
   }
@@ -16,7 +15,6 @@ end
 
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
 local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
-local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
 --------------------------------------------------------------------------------
@@ -197,14 +195,23 @@ local function GetVisibleUnits()
 end
 
 local function SetupCommandColors(state)
-  local alpha = state and 1 or 0
-  local f = io.open('cmdcolors.tmp', 'w+')
-  if (f) then
-    f:write('unitBox  0 1 0 ' .. alpha)
-    f:close()
-    Spring.SendCommands({'cmdcolors cmdcolors.tmp'})
-  end
-  os.remove('cmdcolors.tmp')
+	if state then
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 1) - 1
+		if WG.widgets_handling_selection > 0 then
+			return
+		end
+	else
+		WG.widgets_handling_selection = (WG.widgets_handling_selection or 0) + 1
+	end
+
+	local alpha = state and 1 or 0
+	local f = io.open('cmdcolors.tmp', 'w+')
+	if (f) then
+		f:write('unitBox  0 1 0 ' .. alpha)
+		f:close()
+		Spring.SendCommands({'cmdcolors cmdcolors.tmp'})
+	end
+	os.remove('cmdcolors.tmp')
 end
 
 --

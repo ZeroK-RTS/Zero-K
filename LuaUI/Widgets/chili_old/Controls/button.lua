@@ -6,6 +6,10 @@ Button = Control:Inherit{
   defaultWidth  = 70,
   defaultHeight = 20,
   noFont = false,
+
+  align = "center",
+  valign = "center",
+  alignPadding = 0.5,
 }
 
 local this = Button

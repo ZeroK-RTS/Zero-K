@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name      = "Defense Range Zero-K",
-		desc      = "[v6.2.6] Displays range of defenses (enemy and ally)",
+		desc      = "Displays range of defenses (enemy and ally)",
 		author    = "very_bad_soldier / versus666",
 		date      = "October 21, 2007 / September 08, 2010",
 		license   = "GNU GPL v2",
@@ -33,6 +33,7 @@ for unitName, conf in pairs({
 		class = ANTI,
 		color = { 1, 1, 1 },
 		colorInBuild = { 0, 0.6, 0.8 },
+		lineWidth = 2,
 	},
 	turretemp = {
 		color = {1, 0.56, 0},
@@ -167,7 +168,7 @@ local unitDefIDRemap = {
 }
 
 -- speedups
-
+local gl = gl
 local GL_LINE_STRIP         = GL.LINE_STRIP
 local glBeginEnd            = gl.BeginEnd
 local glCallList            = gl.CallList
@@ -192,7 +193,7 @@ local myPlayerID = Spring.GetLocalPlayerID()
 
 local defences = {}
 local needRedraw = false
-local defenseRangeDrawList = false
+local defenseRangeDrawList
 
 -- Chili buttonry
 
@@ -202,8 +203,7 @@ local global_command_button
 
 -- EPIC options
 
-local Chili
-options_path = 'Settings/Interface/Defense and Cloak Ranges'
+options_path = 'Settings/Interface/Defence and Cloak Ranges'
 
 local function OnOptChange(self)
 	local cb = checkboxes[self.key]
@@ -216,7 +216,7 @@ local function OnOptChange(self)
 end
 
 options = {
-	label = { type = 'label', name = 'Defense Ranges' },
+	label = { type = 'label', name = 'Defence Ranges' },
 	allyground = {
 		name = 'Show Ally Ground Defence',
 		type = 'bool',
@@ -304,7 +304,7 @@ local function BuildVertexList(verts)
 	glVertex(verts[1])
 end
 
-local function CreateDrawList(isAlly, configData, inBuild, x, y, z)
+local function CreateDrawList(configData, inBuild, x, y, z)
 	local color = inBuild and configData.colorInBuild or configData.color
 
 	glLineWidth(configData.lineWidth)
@@ -320,7 +320,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function UnitDetected(unitID, unitDefID, isAlly)
+local defNeedingLosChecks = {}
+local defNeedingBuildingChecks = {}
+
+local function RemoveUnit(unitID)
+	defNeedingLosChecks[unitID] = nil
+	defNeedingBuildingChecks[unitID] = nil
+	local def = defences[unitID]
+	if not def then return end
+	glDeleteList(def.drawList)
+	defences[unitID] = nil
+end
+
+local function UnitDetected(unitID, unitDefID, isAlly, alwaysUpdate)
 	if not unitDefID then
 		return
 	end
@@ -337,29 +349,32 @@ local function UnitDetected(unitID, unitDefID, isAlly)
 		return
 	end
 
-	local inBuild = select(3, Spring.GetUnitIsStunned(unitID))
+	local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
 
 	local defenceData = defences[unitID]
 	if defenceData then
-		if not configData.colorInBuild or inBuild == defenceData.isBuild then
+		if not alwaysUpdate and not configData.colorInBuild or inBuild == defenceData.isBuild then
 			return
 		end
+		RemoveUnit(unitID)
 	end
 
 	local x, y, z = spGetUnitPosition(unitID)
 	defences[unitID] = {
-		drawList = glCreateList(CreateDrawList, isAlly, configData, inBuild, x, y, z),
+		drawList = glCreateList(CreateDrawList, configData, inBuild, x, y, z),
 		x = x, y = y, z = z,
 		inBuild = inBuild,
 		isAlly = isAlly,
-		checkCompleteness = (not isAlly) and inBuild and configData.colorInBuild and true,
 		unitDefID = unitDefID,
 	}
+	if (not isAlly) and inBuild and configData.colorInBuild then
+		defNeedingBuildingChecks[unitID] = true
+	end
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
 RedoUnitList = function()
-
+	local options = options
 	for _, def in pairs(unitConfig) do
 		if def.class == GROUND then
 			def.wantedAlly = options.allyground.value
@@ -415,13 +430,27 @@ function widget:UnitDestroyed(unitID)
 		return
 	end
 
-	glDeleteList(def.drawList)
-	defences[unitID] = nil
+	RemoveUnit(unitID)
 	needRedraw = needRedraw or REDRAW_TIME
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- if this is defence we knew about, we don't need to poll the position for los anymore
+		defNeedingLosChecks[unitID] = nil
+	end
 	UnitDetected(unitID, Spring.GetUnitDefID(unitID), false)
+end
+
+function widget:UnitLeftLos(unitID, unitTeam)
+	local def = defences[unitID]
+	if def then
+		-- slow poll this defence's position to see if the position entered los, but the unit didn't, meaning it was destroyed out of los
+		defNeedingLosChecks[unitID] = true
+		-- we invoke UnitDetected on UnitEnteredLos anyway, and if it is still incomplete then, it'll be re-added to defNeedingBuildingChecks
+		defNeedingBuildingChecks[unitID] = nil
+	end
 end
 
 local function RedrawDrawRanges()
@@ -439,12 +468,23 @@ function widget:Update(dt)
 	if needRedraw then
 		needRedraw = needRedraw - dt
 		if needRedraw < 0 then
-			if defenseRangeDrawList then
-				gl.DeleteList(defenseRangeDrawList)
-			end
+			glDeleteList(defenseRangeDrawList)
 			defenseRangeDrawList = glCreateList(RedrawDrawRanges)
 			needRedraw = false
 		end
+	end
+end
+
+local function DoFullUnitReload()
+	for unitID,def in pairs(defences) do
+		RemoveUnit(unitID)
+	end
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam, true)
 	end
 end
 
@@ -453,28 +493,50 @@ function widget:GameFrame(n)
 		return
 	end
 
-	for unitID, def in pairs(defences) do
+	for unitID in pairs(defNeedingBuildingChecks) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if unitDefID then
-			if defences[unitID].checkCompleteness then
-				-- Not allied because this check is only required for enemies.
-				-- Allied units are detected in UnitFinished.
-				UnitDetected(unitID, unitDefID, false)
+			UnitDetected(unitID, unitDefID, false)
+		end
+	end
+
+	for unitID in pairs(defNeedingLosChecks) do -- TODO: rarely updated but constantly iterated, consider IndexableArray
+		if not spGetUnitDefID(unitID) then
+			local def = defences[unitID]
+			local _, inLos = spGetPositionLosState(def.x, def.y, def.z)
+			if inLos then
+				RemoveUnit(unitID)
+				needRedraw = needRedraw or REDRAW_TIME
 			end
-		elseif select(2, spGetPositionLosState(def.x, def.y, def.z)) then
-			glDeleteList(def.drawList)
-			defences[unitID] = nil
-			needRedraw = needRedraw or REDRAW_TIME
 		end
 	end
 end
 
+local myTeam = Spring.GetMyTeamID()
+local fullView = false
 function widget:PlayerChanged(playerID)
 	if myPlayerID ~= playerID then
 		return
 	end
 
-	local newSpectating = Spring.GetSpectatingState()
+	local newMyTeam = Spring.GetMyTeamID()
+	local newSpectating, newFullView = Spring.GetSpectatingState()
+	-- we can avoid a lot of expensive recalulation if we're only moving from spectating one team under fullview to another
+	if fullView ~= newFullView or (not fullView and myTeam ~= newMyTeam) then
+		if fullView then
+			widgetHandler:RemoveCallIn('GameFrame')
+			-- we now know everything, but callins for entering radar/los won't trigger in this transition.
+		else
+			widgetHandler:UpdateCallIn('GameFrame')
+			-- we don't know everything anymore, and callins for leaving radar/los won't trigger in this transition.
+		end
+		-- callins for units entering radar/los won't trigger during team/spectator change
+		-- so we could miss incomplete or completed units suddenly appearing in los,
+		-- or fail to mark units suddenly leaving los/radar for loschecks.
+		DoFullUnitReload()
+		fullView = newFullView
+	end
+	myTeam = newMyTeam
 	if spectating ~= newSpectating then
 		spectating = newSpectating
 		needRedraw = needRedraw or REDRAW_TIME
@@ -497,13 +559,14 @@ local function SetupChiliStuff()
 	local Chili = WG.Chili
 	local Window = Chili.Window
 	local Image = Chili.Image
+	local Checkbox = Chili.Checkbox
 
-	local mainWindow = WG.Chili.Window:New{
+	local mainWindow = Window:New{
 		classname = "main_window_small_tall",
 		name      = 'DefenseRangesWindow',
 		x         =  50,
 		y         = 150,
-		width     = 120,
+		width     = 130,
 		height    = 168,
 		padding = {12, 12, 12, 12},
 		dockable  = true,
@@ -514,15 +577,15 @@ local function SetupChiliStuff()
 		parent = WG.Chili.Screen0,
 	}
 
-	pics.ground = WG.Chili.Image:New { x = 0, y = 24*1, file = 'LuaUI/Images/defense_ranges/ground.png' }
-	pics.air    = WG.Chili.Image:New { x = 0, y = 24*2, file = 'LuaUI/Images/defense_ranges/air.png'    }
-	pics.nuke   = WG.Chili.Image:New { x = 0, y = 24*3, file = 'LuaUI/Images/defense_ranges/nuke.png'   }
-	pics.shield = WG.Chili.Image:New { x = 0, y = 24*4, file = 'LuaUI/Images/defense_ranges/shield.png' }
-	pics.radar  = WG.Chili.Image:New { x = 0, y = 24*5, file = 'LuaUI/Images/defense_ranges/radar.png'  }
+	pics.ground = Image:New { x = 0, y = 24*1, file = 'LuaUI/Images/defense_ranges/ground.png' }
+	pics.air    = Image:New { x = 0, y = 24*2, file = 'LuaUI/Images/defense_ranges/air.png'    }
+	pics.nuke   = Image:New { x = 0, y = 24*3, file = 'LuaUI/Images/defense_ranges/nuke.png'   }
+	pics.shield = Image:New { x = 0, y = 24*4, file = 'LuaUI/Images/defense_ranges/shield.png' }
+	pics.radar  = Image:New { x = 0, y = 24*5, file = 'LuaUI/Images/defense_ranges/radar.png'  }
 
-	pics.ally  = WG.Chili.Image:New { x = 24*1, y = 0, file = 'LuaUI/Images/defense_ranges/defense_ally.png'  }
-	pics.enemy = WG.Chili.Image:New { x = 24*2, y = 0, file = 'LuaUI/Images/defense_ranges/defense_enemy.png' }
-	pics.spec  = WG.Chili.Image:New { x = 24*3, y = 0, file = 'LuaUI/Images/dynamic_comm_menu/eye.png'        }
+	pics.ally  = Image:New { x = 24*1, y = 0, file = 'LuaUI/Images/defense_ranges/defense_ally.png'  }
+	pics.enemy = Image:New { x = 24*2, y = 0, file = 'LuaUI/Images/defense_ranges/defense_enemy.png' }
+	pics.spec  = Image:New { x = 24*3, y = 0, file = 'LuaUI/Images/dynamic_comm_menu/eye.png'        }
 
 	for key, pic in pairs(pics) do
 		pic.width = 24
@@ -530,20 +593,20 @@ local function SetupChiliStuff()
 		mainWindow:AddChild(pic)
 	end
 
-	checkboxes.allyground  = WG.Chili.Checkbox:New { x = 26, y = 28, }
-	checkboxes.enemyground = WG.Chili.Checkbox:New { x = 50, y = 28, }
-	checkboxes.specground  = WG.Chili.Checkbox:New { x = 74, y = 28, }
-	checkboxes.allyair     = WG.Chili.Checkbox:New { x = 26, y = 52, }
-	checkboxes.enemyair    = WG.Chili.Checkbox:New { x = 50, y = 52, }
-	checkboxes.specair     = WG.Chili.Checkbox:New { x = 74, y = 52, }
-	checkboxes.allynuke    = WG.Chili.Checkbox:New { x = 26, y = 76, }
-	checkboxes.enemynuke   = WG.Chili.Checkbox:New { x = 50, y = 76, }
-	checkboxes.specnuke    = WG.Chili.Checkbox:New { x = 74, y = 76, }
+	checkboxes.allyground  = Checkbox:New { x = 26, y = 28, noFont = true}
+	checkboxes.enemyground = Checkbox:New { x = 50, y = 28, noFont = true}
+	checkboxes.specground  = Checkbox:New { x = 74, y = 28, noFont = true}
+	checkboxes.allyair     = Checkbox:New { x = 26, y = 52, noFont = true}
+	checkboxes.enemyair    = Checkbox:New { x = 50, y = 52, noFont = true}
+	checkboxes.specair     = Checkbox:New { x = 74, y = 52, noFont = true}
+	checkboxes.allynuke    = Checkbox:New { x = 26, y = 76, noFont = true}
+	checkboxes.enemynuke   = Checkbox:New { x = 50, y = 76, noFont = true}
+	checkboxes.specnuke    = Checkbox:New { x = 74, y = 76, noFont = true}
 	-- no allyshield
-	checkboxes.enemyshield = WG.Chili.Checkbox:New { x = 50, y = 100, }
+	checkboxes.enemyshield = Checkbox:New { x = 50, y = 100, noFont = true}
 	-- no specshield
 	-- no allyradar
-	checkboxes.enemyradar  = WG.Chili.Checkbox:New { x = 50, y = 124, }
+	checkboxes.enemyradar  = Checkbox:New { x = 50, y = 124, noFont = true}
 	-- no specradar
 
 	local function OnCheckboxChangeFunc(self)
@@ -574,26 +637,30 @@ local function SetupChiliStuff()
 	end
 
 	mainWindow:SetVisibility(false)
-	if WG.GlobalCommandBar then
+
+	local GCB = WG.GlobalCommandBar
+	if GCB then
 		local function ToggleWindow()
 			if mainWindow then
 				mainWindow:SetVisibility(not mainWindow.visible)
 			end
 		end
-		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/defense_ranges/defense_colors.png", "Defense Ranges", ToggleWindow)
+		global_command_button = GCB.AddCommand("LuaUI/Images/defense_ranges/defense_colors.png", "Defence Ranges", ToggleWindow)
 	end
 end
 
 function widget:Initialize()
+	widget:PlayerChanged(Spring.GetMyPlayerID())
 	SetupChiliStuff()
 
 	RedoUnitList()
 
-	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
-		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
-		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam)
+	DoFullUnitReload()
+end
+
+function widget:Shutdown()
+	for unitID,def in pairs(defences) do
+		glDeleteList(def.drawList)
 	end
+	glDeleteList(defenseRangeDrawList)
 end

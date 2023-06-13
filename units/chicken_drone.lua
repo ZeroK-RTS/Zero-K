@@ -16,6 +16,13 @@ return { chicken_drone = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+	morphto_1 = "chickend",
+	morphtime_1 = 20,
+	morphcost_1 = 15,
+
+	morphto_2 = "chickenspire",
+	morphtime_2 = 90,
+	morphcost_2 = 600,
   },
 
   energyMake          = 0,
@@ -34,7 +41,6 @@ return { chicken_drone = {
   maxWaterDepth       = 5000,
   metalMake           = 0,
   metalStorage        = 50,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -60,7 +66,7 @@ return { chicken_drone = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 10,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "BlobShadow",
-    desc      = "shows blob shadows",
+    desc      = "Simplifies unit shadows to circular blobs (for performance and glance value)",
     author    = "jK",
     date      = "2007,2009",
     license   = "GNU GPL, v2 or later",

@@ -15,7 +15,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 1500,
-		subs    = 75,
 	},
 
 	explosionGenerator      = [[custom:spectre_hit]],

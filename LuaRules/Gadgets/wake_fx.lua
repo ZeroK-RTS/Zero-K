@@ -9,12 +9,12 @@ end
 function gadget:GetInfo()
 	return {
 		name      = "Wade Effects",
-		desc      = "Spawn wakes when non-ship ground units move while partially, but not completely submerged",
-		author    = "Anarchid",
+		desc      = "Spawn wakes when wading; splash when yitten into the sea",
+		author    = "Anarchid, Sprung",
 		date      = "March 2016",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true  --  loaded by default?
+		enabled   = true
 	}
 end
 
@@ -26,63 +26,68 @@ local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
 local current_fold = 1
 
-local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
-local spGetUnitPosition  = Spring.GetUnitPosition
-local spGetUnitVelocity  = Spring.GetUnitVelocity
+local spGetGroundHeight      = Spring.GetGroundHeight
+local spGetUnitIsCloaked     = Spring.GetUnitIsCloaked
+local spGetUnitPosition      = Spring.GetUnitPosition
+local spGetUnitVelocity      = Spring.GetUnitVelocity
+local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
+local spSpawnCEG             = Spring.SpawnCEG
 
 local spusCallAsUnit = Spring.UnitScript.CallAsUnit
 local spusEmitSfx    = Spring.UnitScript.EmitSfx
 
 local wadeDepth = {}
 local wadeSfxID = {}
-do
-	local smc = Game.speedModClasses
-	local wadingSMC = {
-		[smc.Tank] = true,
-		[smc.KBot] = true,
-	}
-	local SFXTYPE_WAKE1 = 2
-	local SFXTYPE_WAKE2 = 3
 
-	local UD = UnitDefs
-	local function checkCanWade(unitDef)
-		local moveDef = unitDef.moveDef
-		if not moveDef then
-			return false
-		end
+local smc = Game.speedModClasses
+local wadingSMC = {
+	[smc.Tank] = true,
+	[smc.KBot] = true,
+}
+local SFXTYPE_WAKE1 = 2
+local SFXTYPE_WAKE2 = 3
 
-		local smClass = moveDef.smClass
-		if not smClass or not wadingSMC[smClass] then
-			return false
-		end
-
-		return true
+local function checkCanWade(unitDef)
+	local moveDef = unitDef.moveDef
+	if not moveDef then
+		return false
 	end
-
-	local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
-	for unitDefID = 1, #UD do
-		local unitDef = UD[unitDefID]
-		if checkCanWade(unitDef) then
-			wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
-
-			local cpR = unitDef.customParams.modelradius
-			local r = cpR and tonumber(cpR) or unitDef.radius
-			wadeSfxID[unitDefID] = (((r > 50) or unitDef.customParams.floattoggle) and SFXTYPE_WAKE2) or SFXTYPE_WAKE1
-		else
-			-- there are ~400 wadables but the highest one's ID is >512, so we also assign `false`
-			-- instead of keeping them `nil` to keep the internal representation an array (faster)
-			wadeDepth[unitDefID] = false
-			wadeSfxID[unitDefID] = false
-		end
+	local smClass = moveDef.smClass
+	if not smClass or not wadingSMC[smClass] then
+		return false
 	end
+	return true
+end
+
+local function GetUnitWakeParams(unitDefID)
+	if wadeDepth[unitDefID] ~= nil then
+		return wadeDepth[unitDefID], wadeSfxID[unitDefID]
+	end
+	
+	local unitDef = UnitDefs[unitDefID]
+	if checkCanWade(unitDef) then
+		-- note, the code below loads unit model if it's not yet loaded,
+		-- so avoid trying to precache it (increases load times a lot)
+
+		wadeDepth[unitDefID] = -spGetUnitDefDimensions(unitDefID).height
+
+		local cpR = unitDef.customParams.modelradius
+		local r = cpR and tonumber(cpR) or unitDef.radius
+		wadeSfxID[unitDefID] = (((r > 50) or unitDef.customParams.floattoggle) and SFXTYPE_WAKE2) or SFXTYPE_WAKE1
+	else
+		wadeDepth[unitDefID] = false
+		wadeSfxID[unitDefID] = false
+	end
+	
+	return wadeDepth[unitDefID], wadeSfxID[unitDefID]
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	local maxDepth = wadeDepth[unitDefID]
+	local maxDepth, fxID = GetUnitWakeParams(unitDefID)
 	if maxDepth then
 		unitsCount = unitsCount + 1
 		unitsData[unitsCount] = unitID
-		unit[unitID] = {id = unitsCount, h = maxDepth, fx = wadeSfxID[unitDefID]}
+		unit[unitID] = {id = unitsCount, h = maxDepth, fx = fxID}
 	end
 end
 
@@ -108,16 +113,65 @@ function gadget:GameFrame(n)
 			local x,y,z = spGetUnitPosition(unitID)
 			local h = data.h
 
-			local _, _, _, speed = spGetUnitVelocity(unitID)
-			if speed and y > h and y <= 0 and speed > 0 and not spGetUnitIsCloaked(unitID) then
-				-- 1 is the pieceID, most likely it's usually the base piece
-				-- but even if it isn't, it doesn't really matter
-				spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
+			if y and h and y > h and y <= 0  and not spGetUnitIsCloaked(unitID) then
+				local _, _, _, speed = spGetUnitVelocity(unitID)
+				if speed and speed > 0 then
+					--[[ 1 is the pieceID, most likely it's usually the base piece
+					     but even if it isn't, it doesn't really matter (the effect
+					     doesn't have to be accurately in the middle).
+					     Also note that Spring.SpawnCEG cannot spawn wakes,
+					     which is why we're using unit script callouts. ]]
+					spusCallAsUnit(unitID, spusEmitSfx, 1, data.fx)
+				end
 			end
 		end
 		current_fold = (current_fold % n_folds) + 1
 	end
 end
+
+function gadget:UnitEnteredWater(unitID, unitDefID)
+	if not unit[unitID] then
+		--[[ Maybe hovers and ships should be eligible for splashes too,
+		     like when skipping stones? If making the check more lenient,
+		     remember not to include air units (they can land on surface
+		     of the sea and do so at fairly high speeds). ]]
+		return
+	end
+
+	local x, y, z = spGetUnitPosition(unitID)
+	local h = spGetGroundHeight(x, z)
+	if h + 1 > y then
+		--[[ The unit is already on the seafloor, so either:
+
+		 * the unit did not enter water through the surface,
+		   for example it was just rezzed/built/djinn'd/puppywarped,
+		   or maybe it was the seafloor itself that got terraformed.
+
+		 * the unit is entering the water normally,
+		   walking along the floor all along. This could
+		   make a reduced splash but this is what wakes
+		   already achieve so let's not overcomplicate.
+
+		 * water is just extremely shallow here, not deep
+		   enough to produce a proper splash. ]]
+		return
+	end
+
+	--[[ Placeholder black holes can in theory make a unit
+	     oscillate back and forth on the sea surface. This
+	     could be detected here to prevent splash spammaeg,
+	     but I have been unable to reproduce it on purpose
+	     and it should be extremely rare in practice. ]]
+
+	--[[ Align to water surface (y = 0).
+	     Note that spusEmitSfx cannot spawn arbitrary CEGs. ]]
+	spSpawnCEG("watersplash_bar_large", x, 0, z)
+end
+
+--[[ Leaving the water forcefully is fairly rare. The three
+     most common cases would be Recon Comm jumping out, Lobster
+     hurling stuff, and the more buoyant amphs floating up. ]]
+gadget.UnitLeftWater = gadget.UnitEnteredWater
 
 function gadget:Initialize()
 	local spGetUnitDefID = Spring.GetUnitDefID

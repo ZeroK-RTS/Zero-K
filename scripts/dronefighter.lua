@@ -4,8 +4,6 @@ include "constants.lua"
 local rocketR, rocketL = piece("RocketR", "RocketL");
 local droneMain = piece("DroneMain");
 
-local smokePiece = {rocketR, rocketL,droneMain};
-
 --variables
 local shotCycle = 0
 local flare = {

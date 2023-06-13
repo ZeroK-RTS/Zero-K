@@ -230,7 +230,7 @@ options = {
 		end
 	},
 	monitoridlecomms = {
-		name = 'Track idle comms',
+		name = 'Track idle commanders',
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -717,7 +717,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		y = "5%",
 		right = "5%",
 		bottom = "5%",
-		caption = '',
+		noFont = true,
 		padding = {1,1,1,1},
 		backgroundColor = backgroundColor,
 		OnClick = {
@@ -844,7 +844,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				align = "left",
 				valign = "top",
 				caption = '\255\0\255\0' .. hotkeyText,
-				fontSize = 11,
+				objectOverrideFont = WG.GetFont(12),
 				fontShadow = true,
 				parent = button
 			}
@@ -858,12 +858,12 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			bottomLabel = Label:New {
 				x = 0,
 				y = 0,
-				right = 0,
-				bottom = 0,
+				right = 5,
+				bottom = 5,
 				align = "right",
 				valign = "bottom",
 				caption = caption,
-				fontSize = 16,
+				objectOverrideFont = WG.GetFont(14),
 				autosize = false,
 				fontShadow = true,
 				parent = image,
@@ -1560,7 +1560,7 @@ end
 
 local function InitializeControls()
 	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local BUTTON_HEIGHT = 55*options.buttonSizeLong.value/60
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
@@ -1584,6 +1584,7 @@ local function InitializeControls()
 		tweakResizable = true,
 		minWidth = 32,
 		minHeight = 32,
+		noFont = true,
 		color = {0,0,0,0},
 		OnClick = {
 			function(self)

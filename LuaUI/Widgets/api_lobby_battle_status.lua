@@ -3,14 +3,15 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Lobby Battle Status",
-		desc      = "Communicates with the lobby about the status of the battle.",
-		author    = "GoogleFrog",
-		date      = "16 May 2019",
-		license   = "GPL-v2",
-		layer     = 0,
-		enabled   = true,
-		api	      = true,
+		name        = "Lobby Battle Status",
+		desc        = "Communicates with the lobby about the status of the battle.",
+		author      = "GoogleFrog",
+		date        = "16 May 2019",
+		license     = "GPL-v2",
+		layer       = 0,
+		alwaysStart = true,
+		enabled     = true,
+		api         = true,
 	}
 end
 
@@ -23,7 +24,8 @@ local DELIM = "_"
 local GAME_INIT = "ingameInfoInit" .. DELIM
 local GAME_START = "ingameInfoStart" .. DELIM
 
-local RELOAD_MODE = false
+local gameString
+local sentPreGame = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -42,7 +44,7 @@ end
 local function DataTableToString(dataTable)
 	local retString = ""
 	for name, value in pairs(dataTable) do
-		retString = retString .. name .. DELIM .. value .. DELIM
+		retString = retString .. name .. DELIM .. tostring(value) .. DELIM
 	end
 	return retString
 end
@@ -96,17 +98,17 @@ local function GetGameTypeCoded()
 	local playerList = Spring.GetPlayerList()
 	
 	local dataTable = {
-		isPlayer = (((not Spring.GetSpectatingState()) and "1") or "0"),
+		isPlayer = (not Spring.GetSpectatingState()),
 		playerCount = ((playerList and #playerList) or 1),
 		teamOnePlayers = (playersFirstTeam or 0),
 		teamTwoPlayers = (playerSecondTeam or 0),
 		teamPlayers = (teamPlayerCount or 0),
-		isFFA = ((playerTeamCount > 2 and "1") or "0"),
-		isAI = ((aiTeamCount > 0 and "1") or "0"),
-		isReplay = ((Spring.IsReplay() and "1") or "0"),
-		isChicken = ((chickenTeamID and "1") or "0"),
-		isCampaign = ((Spring.GetModOptions().singleplayercampaignbattleid and "1") or "0"),
-		planetName = ((WG.campaign_planetInformation and WG.campaign_planetInformation.name) or ""),
+		isFFA = (playerTeamCount > 2),
+		isAI = (aiTeamCount > 0),
+		isReplay = Spring.IsReplay(),
+		isChicken = (chickenTeamID and true) or false,
+		isCampaign = (Spring.GetModOptions().singleplayercampaignbattleid and true) or false,
+		planetName = (WG.campaign_planetInformation and WG.campaign_planetInformation.name) or "",
 	}
 	
 	return DataTableToString(dataTable)
@@ -128,22 +130,16 @@ end
 --------------------------------------------------------------------------------
 -- Widget Interface
 
-local gameString
-function widget:GameFrame(n)
-	if n == 1 or RELOAD_MODE then
+function widget:Update(dt)
+	if Spring.GetGameFrame() > 1 then
 		gameString = gameString or GetGameTypeCoded()
 		SendGameStart(gameString)
-	end
-	widgetHandler:RemoveWidget()
-end
-
-function widget:Update(dt)
-	if (not RELOAD_MODE) and Spring.GetGameFrame() > 0 then
 		widgetHandler:RemoveWidget()
+	elseif not sentPreGame then
+		gameString = gameString or GetGameTypeCoded()
+		SendPreGame(gameString)
+		sentPreGame = true
 	end
-	gameString = gameString or GetGameTypeCoded()
-	SendPreGame(gameString)
-	widgetHandler:RemoveCallIn("Update")
 end
 
 function widget:Initialize()

@@ -16,9 +16,12 @@ return { turretaalaser = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    bait_level_target  = 2,
+    bait_level_target_armor = 1,
+    bait_level_default = 0,
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.333,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
@@ -27,7 +30,6 @@ return { turretaalaser = {
   levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[aapopup.s3o]],
@@ -81,7 +83,6 @@ return { turretaalaser = {
       damage                  = {
         default = 1.49,
         planes  = 14.9,
-        subs    = 0.8,
       },
 
       duration                = 0.02,
@@ -93,7 +94,7 @@ return { turretaalaser = {
       interceptedByShieldType = 1,
       lodDistance             = 10000,
       proximityPriority       = 4,
-      range                   = 1040,
+      range                   = 1000,
       reloadtime              = 0.1,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],

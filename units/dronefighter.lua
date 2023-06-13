@@ -11,7 +11,7 @@ return { dronefighter = {
   canMove                = true,
   canPatrol              = true,
   canSubmerge            = false,
-  category               = [[FIXEDWING]],
+  category               = [[FIXEDWING DRONE]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[25 8 40]],
@@ -21,6 +21,7 @@ return { dronefighter = {
   canLand                = false,
 
   customParams           = {
+    bait_level_target      = 1,
     modelradius    = [[5]],
     refuelturnradius = [[80]],
     is_drone = 1,
@@ -42,11 +43,12 @@ return { dronefighter = {
   maxElevator            = 0.02,
   maxRudder              = 0.006,
   --maxPitch               = 0.1,
-  minCloakDistance       = 75,
   mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[fighterdrone.dae]],
+  reclaimable            = false,
+  repairable             = false, -- mostly not to waste constructor attention on area-repair; has regen anyway
   script                 = [[dronefighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -89,7 +91,6 @@ return { dronefighter = {
 
       damage                  = {
         default = 33,
-        subs    = 2.2,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],

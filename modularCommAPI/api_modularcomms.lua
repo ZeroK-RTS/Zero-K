@@ -28,7 +28,6 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 local predefinedDynamicComms = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua", nil, VFSMODE)
 local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTranslate.lua", nil, VFSMODE)
-local success, err
 
 local legacyToDyncommChassisMap = legacyTranslators.legacyToDyncommChassisMap
 
@@ -50,7 +49,8 @@ local function LoadCommData()
 	local newCommProfilesByProfileID = {}
 	local newCommProfileIDsByPlayerID = {}
 	local newProfileIDByBaseDefID = {}
-	
+	local success, err
+
 	if not (commDataRaw and type(commDataRaw) == 'string') then
 		err = "Comm data entry in modoption is empty or in invalid format"
 		newCommData = {}
@@ -92,7 +92,8 @@ local function LoadCommData()
 			else
 				playerCommProfileIDsRaw = string.gsub(playerCommProfileIDsRaw, '_', '=')
 				playerCommProfileIDsRaw = Spring.Utilities.Base64Decode(playerCommProfileIDsRaw)
-				local playerCommProfileIDsFunc, err = loadstring("return "..playerCommProfileIDsRaw)
+				local playerCommProfileIDsFunc
+				playerCommProfileIDsFunc, err = loadstring("return "..playerCommProfileIDsRaw)
 				if playerCommProfileIDsFunc then
 					success, playerCommProfileIDs = pcall(playerCommProfileIDsFunc)
 					if not success then

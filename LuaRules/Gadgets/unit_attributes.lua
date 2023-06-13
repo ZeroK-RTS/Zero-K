@@ -35,7 +35,6 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spSetUnitBuildSpeed   = Spring.SetUnitBuildSpeed
 local spSetUnitWeaponState  = Spring.SetUnitWeaponState
 local spGetUnitWeaponState  = Spring.GetUnitWeaponState
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local spGetUnitMoveTypeData    = Spring.GetUnitMoveTypeData
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
@@ -46,12 +45,14 @@ local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
 local ALLY_ACCESS = {allied = true}
 local INLOS_ACCESS = {inlos = true}
 
+local tobool      = Spring.Utilities.tobool
 local getMovetype = Spring.Utilities.getMovetype
 
 local spSetUnitCOBValue = Spring.SetUnitCOBValue
-local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 local CMD_WAIT = CMD.WAIT
+
+local HALF_FRAME = 1/60
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
@@ -64,12 +65,16 @@ GG.att_econMult   = GG.att_econMult   or {}
 GG.att_buildMult  = GG.att_buildMult  or {}
 GG.att_weaponMods = GG.att_weaponMods or {}
 
+-- To tell other gadgets things without creating RulesParams
+GG.att_out_buildSpeed = {}
+
+local allowUnitCoast = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- UnitDefs caching
 
 local shieldWeaponDef = {}
-local isFirePlatform = {}
 local buildSpeedDef = {}
 
 for i = 1, #UnitDefs do
@@ -77,40 +82,27 @@ for i = 1, #UnitDefs do
 	if ud.shieldWeaponDef then
 		shieldWeaponDef[i] = true
 	end
-	if ud.isFirePlatform then
-		isFirePlatform[i] = true
-	end
 	if (ud.buildSpeed or 0) ~= 0 then
 		buildSpeedDef[i] = ud.buildSpeed
 	end
 end
 
-local hasSensorOrJamm = {
-	[ UnitDefNames['staticheavyradar'].id ] = true,
-	[ UnitDefNames['cloakjammer'].id ] = true,
-	[ UnitDefNames['staticjammer'].id ] = true,
-	[ UnitDefNames['staticsonar'].id ] = true,
-	[ UnitDefNames['staticradar'].id ] = true,
-	[ UnitDefNames['planescout'].id ] = true,
-	[ UnitDefNames['shipcarrier'].id ] = true,
-}
-
 local radarUnitDef = {}
 local sonarUnitDef = {}
 local jammerUnitDef = {}
 
-for unitDefID,_ in pairs(hasSensorOrJamm) do
-	local ud = UnitDefs[unitDefID]
+for unitDefID, ud in pairs(UnitDefs) do
 	if ud.radarRadius > 0 then
 		radarUnitDef[unitDefID] = ud.radarRadius
 	end
-	if ud.sonarRadius > 0 then
+	if ud.sonarRadius > 0 and tobool(ud.customParams.sonar_can_be_disabled) then
 		sonarUnitDef[unitDefID] = ud.sonarRadius
 	end
 	if ud.jammerRadius > 0 then
 		jammerUnitDef[unitDefID] = ud.jammerRadius
 	end
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
@@ -138,14 +130,13 @@ end
 
 local REPAIR_ENERGY_COST_FACTOR = Game.repairEnergyCostFactor
 
-
 local function UpdateBuildSpeed(unitID, unitDefID, speedFactor)
 	local buildSpeed = (buildSpeedDef[unitDefID] or 0)
 	if buildSpeed == 0 then
 		return
 	end
 
-	spSetUnitRulesParam(unitID, "buildSpeed", buildSpeed*speedFactor, INLOS_ACCESS)
+	GG.att_out_buildSpeed[unitID] = buildSpeed*speedFactor
 
 	spSetUnitBuildSpeed(unitID,
 		buildSpeed*speedFactor, -- build
@@ -240,10 +231,11 @@ local function UpdateReloadSpeed(unitID, unitDefID, weaponMods, speedFactor, gam
 			local moddedSpeed = ((weaponMods and weaponMods[i] and weaponMods[i].reloadMult) or 1)*speedFactor
 			local newReload = w.reload/moddedSpeed
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+			-- Add HALF_FRAME to round reloadTime to the closest multiple of 1/30, since the the engine rounds down to a multiple of 1/30.
 			if w.burstRate then
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload, burstRate = w.burstRate/moddedSpeed + HALF_FRAME})
 			else
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload + HALF_FRAME, reloadState = nextReload})
 			end
 		end
 	end
@@ -259,7 +251,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	if not origUnitSpeed[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		local moveData = spGetUnitMoveTypeData(unitID)
-    
+
 		origUnitSpeed[unitDefID] = {
 			origSpeed = ud.speed,
 			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
@@ -275,7 +267,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	
 	local state = origUnitSpeed[unitDefID]
 	local decFactor = maxAccelerationFactor
-	local isSlowed = speedFactor < 1
+	local isSlowed = (speedFactor < 1) and not allowUnitCoast[unitID]
 	if isSlowed then
 		-- increase brake rate to cause units to slow down to their new max speed correctly.
 		decFactor = 1000
@@ -347,8 +339,8 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 				GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
-				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
-				spSetUnitCOBValue(unitID, COB_MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
+				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB.MAX_SPEED))
+				spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 			end
 		end
 	end
@@ -359,6 +351,10 @@ end
 --------------------------------------------------------------------------------
 -- UnitRulesParam Handling
 
+GG.att_EconomyChange = {}
+GG.att_ReloadChange = {}
+GG.att_MoveChange = {}
+
 local currentEcon = {}
 local currentBuildpower = {}
 local currentReload = {}
@@ -368,10 +364,12 @@ local currentAcc = {}
 
 local unitSlowed = {}
 local unitAbilityDisabled = {}
+local unitShieldDisabled = {}
 
 local function removeUnit(unitID)
 	unitSlowed[unitID] = nil
 	unitAbilityDisabled[unitID] = nil
+	unitShieldDisabled[unitID] = nil
 	unitReloadPaused[unitID] = nil
 	
 	currentEcon[unitID] = nil
@@ -380,6 +378,13 @@ local function removeUnit(unitID)
 	currentMovement[unitID] = nil
 	currentTurn[unitID] = nil
 	currentAcc[unitID] = nil
+	allowUnitCoast[unitID] = nil
+	
+	GG.att_EconomyChange[unitID] = nil
+	GG.att_ReloadChange[unitID] = nil
+	GG.att_MoveChange[unitID] = nil
+	
+	GG.att_out_buildSpeed[unitID] = nil
 end
 
 function UpdateUnitAttributes(unitID, frame)
@@ -410,7 +415,7 @@ function UpdateUnitAttributes(unitID, frame)
 	local upgradesSpeedMult   = spGetUnitRulesParam(unitID, "upgradesSpeedMult")
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
-	local selfIncomeChange = spGetUnitRulesParam(unitID, "selfIncomeChange")
+	local selfIncomeChange = (spGetUnitRulesParam(unitID, "selfIncomeChange") or 1) * (GG.unit_handicap[unitID] or 1)
 	local selfMaxAccelerationChange = spGetUnitRulesParam(unitID, "selfMaxAccelerationChange") --only exist in airplane??
 	
 	-- SLOW --
@@ -422,7 +427,8 @@ function UpdateUnitAttributes(unitID, frame)
 	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
 	-- Disable
-	local fullDisable = spGetUnitRulesParam(unitID, "fulldisable") == 1
+	local shieldDisabled = (spGetUnitRulesParam(unitID, "shield_disabled") == 1)
+	local fullDisable    = (spGetUnitRulesParam(unitID, "fulldisable") == 1)
 	
 	local weaponMods = false
 	if GG.att_genericUsed and GG.att_moveMult[unitID] then
@@ -465,6 +471,11 @@ function UpdateUnitAttributes(unitID, frame)
 		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 		
+		-- GG is faster (but gadget-only). The totals are for gadgets, so should be migrated to GG eventually.
+		GG.att_EconomyChange[unitID] = econMult
+		GG.att_ReloadChange[unitID] = reloadMult
+		GG.att_MoveChange[unitID] = moveMult
+		
 		unitSlowed[unitID] = moveMult < 1
 		if weaponMods or reloadMult ~= currentReload[unitID] then
 			UpdateReloadSpeed(unitID, unitDefID, weaponMods, reloadMult, frame)
@@ -496,20 +507,28 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	local forcedOff = spGetUnitRulesParam(unitID, "forcedOff")
 	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or completeDisable == 1 or crashing == 1)
-	local setNewState
+	shieldDisabled = (shieldDisabled or abilityDisabled)
 	
+	local setNewState
 	if abilityDisabled ~= unitAbilityDisabled[unitID] then
 		spSetUnitRulesParam(unitID, "att_abilityDisabled", abilityDisabled and 1 or 0)
 		unitAbilityDisabled[unitID] = abilityDisabled
 		setNewState = true
 	end
 	
-	if shieldWeaponDef[unitDefID] and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and setNewState then
-		if abilityDisabled then
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
-		else
-			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+	if shieldWeaponDef[unitDefID] and shieldDisabled ~= unitShieldDisabled[unitID] then
+		spSetUnitRulesParam(unitID, "att_shieldDisabled", shieldDisabled and 1 or 0)
+		if shieldDisabled then
+			Spring.SetUnitShieldState(unitID, -1, 0)
 		end
+		if spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 then
+			if shieldDisabled then
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
+			else
+				Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
+			end
+		end
+		changedAtt = true
 	end
 	
 	local radarOverride = spGetUnitRulesParam(unitID, "radarRangeOverride")
@@ -519,7 +538,6 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	if setNewState or radarOverride or sonarOverride or jammerOverride or sightOverride then
 		changedAtt = true
-		abilityDisabled = abilityDisabled and not isFirePlatform[unitDefID] -- Can't have surfboard losing sensors
 		UpdateSensorAndJamm(unitID, unitDefID, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 
@@ -534,8 +552,14 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 end
 
+-- Whatever sets this should call UpdateUnitAttributes frames afterwards too
+local function SetAllowUnitCoast(unitID, allowed)
+	allowUnitCoast[unitID] = allowed
+end
+
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
+	GG.SetAllowUnitCoast = SetAllowUnitCoast
 end
 
 function gadget:GameFrame(f)
@@ -563,12 +587,5 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false
 	else
 		return true
-	end
-end
-
--- All information required for load is stored in unitRulesParams.
-function gadget:Load(zip)
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		UpdateUnitAttributes(unitID)
 	end
 end

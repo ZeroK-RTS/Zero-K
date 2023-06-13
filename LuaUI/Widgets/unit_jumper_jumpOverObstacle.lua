@@ -1,8 +1,7 @@
-local version = "v0.507"
 function widget:GetInfo()
   return {
     name      = "Auto Jump Over Terrain",
-    desc      = version .. " Jumper automatically jump over terrain or buildings if it shorten walk time.",
+    desc      = "Jumpers automatically jump over terrain or buildings if it shortens walk time.",
 	author    = "Msafwan",
     date      = "4 February 2014",
     license   = "GNU GPL, v2 or later",

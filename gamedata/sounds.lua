@@ -29,6 +29,13 @@ local Sounds = {
 			MapEntryValExtract(items, "rolloff", rolloff);
 		},
 		--]]
+		PulseLaser = {
+			file = "sounds/weapon/laser/pulse_laser_start.wav",
+			pitchmod = 0.15,
+			gainmod = 0.1,
+			pitch = 1,
+			gain = 1.5,
+		},
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
 			pitchmod = 0.1,
@@ -60,6 +67,11 @@ local Sounds = {
 			maxconcurrent = 4, --- some reasonable limits
 			maxdist = nil, --- no cutoff at all (engine defaults to FLT_MAX)
 		},
+		DetrimentJump = {
+			file = "sounds/detriment_jump.wav",
+			pitchmod = 0.1,
+			gainmod = 0.05,
+		},
 		Sparks = {
 			file = "sounds/sparks.wav",
 			priority = -10,
@@ -89,6 +101,14 @@ local Sounds = {
 			file = "sounds/jump_land.wav",
 			pitchmod = 0.1,
 			gainmod = 0.05,
+		},
+		SiloLaunch = {
+			file = "sounds/weapon/missile/tacnuke_launch.wav",
+			gain = 1.0,
+			pitch = 1.0,
+			priority = 1,
+			maxconcurrent = 30,
+			maxdist = nil,
 		},
 	},
 }
@@ -125,25 +145,15 @@ local ignoredExtensions = {
 
 local function AutoAdd(subDir, generalOpts)
 	generalOpts = generalOpts or {}
-	local opts
+
 	local dirList = RecursiveFileSearch("sounds/" .. subDir)
-	--local dirList = RecursiveFileSearch("sounds/")
-	--Spring.Echo("Adding sounds for " .. subDir)
-	for _, fullPath in ipairs(dirList) do
-		local path, key, ext = fullPath:match("sounds/(.*/(.*)%.(.*))")
-		local pathPart = fullPath:match("(.*)[.]")
-		pathPart = pathPart:sub(8, -1)	-- truncates extension fullstop and "sounds/" part of path
-		--Spring.Echo(pathPart)
-		if path ~= nil and (not ignoredExtensions[ext]) then
-			if optionOverrides[pathPart] then
-				opts = optionOverrides[pathPart]
-				--Spring.Echo("optionOverrides for " .. pathPart)
-			else
-				opts = generalOpts
-			end
-			--Spring.Echo(path,key,ext, pathPart)
+	for i = 1, #dirList do
+		local fullPath = dirList[i]
+		local pathPart, ext = fullPath:match("sounds/(.*)%.(.*)")
+		if not ignoredExtensions[ext] then
+			local opts = optionOverrides[pathPart] or generalOpts
 			Sounds.SoundItems[pathPart] = {
-				file = tostring('sounds/'..path),
+				file = fullPath,
 				rolloff = opts.rollOff,
 				dopplerscale = opts.dopplerscale,
 				maxdist = opts.maxdist,
@@ -155,7 +165,6 @@ local function AutoAdd(subDir, generalOpts)
 				pitch = opts.pitch,
 				pitchmod = opts.pitchmod
 			}
-			--Spring.Echo(Sounds.SoundItems[key].file)
 		end
 	end
 end

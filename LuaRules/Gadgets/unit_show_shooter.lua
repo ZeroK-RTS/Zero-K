@@ -32,9 +32,10 @@ local MOBILE_SHOW_TIME = 4.5 -- 2.5 seconds
 local fakeWeapons = {} -- WeaponDefs which are for hax.
 local fakeWeaponByNum = {}
 local immobileUnits = {} -- Units which are static
-local noDecloakUnits = {
-	[UnitDefNames["cloaksnipe"].id] = true,
-}
+local noDecloakUnits = {}
+local buildRevealUnitDef = {}
+local pendingBuildRevealUnits = false
+local r = {}
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -45,15 +46,23 @@ end
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.weapons then
+	local weapons = ud.weapons
+	if weapons then
 		immobileUnits[i] = true
-		for j = 1, #ud.weapons do
-			local weaponDefID = ud.weapons[j].weaponDef
+		for j = 1, #weapons do
+			local weaponDefID = weapons[j].weaponDef
 			if fakeWeapons[weaponDefID] then
 				fakeWeaponByNum[i] = fakeWeaponByNum[i] or {}
 				fakeWeaponByNum[i][j] = true
 			end
 		end
+
+		if Spring.Utilities.tobool(ud.customParams.no_decloak_on_weapon_fire) then
+			noDecloakUnits[i] = true
+		end
+	end
+	if ud.customParams.reveal_at_build then
+		buildRevealUnitDef[i] = tonumber(ud.customParams.reveal_at_build)
 	end
 end
 
@@ -79,7 +88,7 @@ local function CheckUnitRevealAllyTeam(unitID, unitDefID, x, z, allyTeamID)
 	
 	-- Don't reveal units which are already in LOS. Waste of time to do so.
 	if aLos and not los then
-		if noDecloakUnits[unitDefID] and Spring.GetUnitIsCloaked(unitID) then
+		if buildRevealUnitDef[unitDefID] or (noDecloakUnits[unitDefID] and Spring.GetUnitIsCloaked(unitID)) then
 			return
 		end
 		revealedUnits[allyTeamID][unitID] = immobileUnits[unitDefID] and STATIC_SHOW_TIME or MOBILE_SHOW_TIME
@@ -124,6 +133,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Build Reveal
+
+local function CheckBuildRevealUnit(index)
+	local unitID = pendingBuildRevealUnits[index]
+	if Spring.ValidUnitID(unitID) then
+		local _, _, _, _, buildProgress = Spring.GetUnitHealth(unitID)
+		if buildProgress >= buildRevealUnitDef[Spring.GetUnitDefID(unitID)] then
+			Spring.SetUnitAlwaysVisible(unitID, true)
+		else
+			return false
+		end
+	end
+	pendingBuildRevealUnits[index] = pendingBuildRevealUnits[#pendingBuildRevealUnits]
+	pendingBuildRevealUnits[#pendingBuildRevealUnits] = nil
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Updates
 
 local function RevealedUnitTimeout(n)
@@ -150,6 +178,23 @@ end
 function gadget:GameFrame(n)
 	ClearFiredUnits(n)
 	RevealedUnitTimeout(n)
+	if pendingBuildRevealUnits and n%84 == 0 then
+		local i = 1
+		while i <= #pendingBuildRevealUnits do
+			if not CheckBuildRevealUnit(i) then
+				i = i + 1
+			end
+		end
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	if not buildRevealUnitDef[unitDefID] then
+		return
+	end
+	pendingBuildRevealUnits = pendingBuildRevealUnits or {}
+	pendingBuildRevealUnits[#pendingBuildRevealUnits + 1] = unitID
+	CheckBuildRevealUnit(#pendingBuildRevealUnits)
 end
 
 -- TODO Replace SetWatchProjectile with a notifier in LUS.Shot or LUS.BlockShot. Perhaps this could be added to unit_script.lua.
@@ -162,6 +207,13 @@ function gadget:Initialize()
 				Script.SetWatchWeapon(weaponID, true)
 			end
 		end
+	end
+	
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
 	end
 end
 

@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -41,7 +39,7 @@ local BASE_VELOCITY = UnitDefNames.corcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
-local THIGH_FRONT_ANGLE = -math.rad(40)
+local THIGH_FRONT_ANGLE = math.rad(-40)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
 local THIGH_BACK_ANGLE = math.rad(20)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
@@ -50,15 +48,15 @@ local SHIN_FRONT_SPEED = math.rad(90) * PACE
 local SHIN_BACK_ANGLE = math.rad(5)
 local SHIN_BACK_SPEED = math.rad(90) * PACE
 
-local ARM_FRONT_ANGLE = -math.rad(15)
+local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
 --[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
+local FOREARM_FRONT_ANGLE = math.rad(-15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
+local FOREARM_BACK_ANGLE = math.rad(-10)
 local FOREARM_BACK_SPEED = math.rad(40) * PACE
 ]]--
 
@@ -84,7 +82,6 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -219,8 +216,8 @@ function script.AimWeapon(num, heading, pitch)
 		if not isDgunning then
 			Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
 		end
-		Turn(luparm, x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH)
-		Turn(nanolathe, x_axis, math.rad(0), ARM_SPEED_PITCH)
+		Turn(luparm, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(nanolathe, x_axis, 0, ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
 		StartThread(RestoreLaser)
@@ -233,8 +230,8 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_DGUN)
 		isDgunning = true
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(ruparm, x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH)
-		Turn(biggun, x_axis, math.rad(0), ARM_SPEED_PITCH)
+		Turn(ruparm, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(biggun, x_axis, 0, ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
@@ -257,19 +254,6 @@ function script.StartBuilding(heading, pitch)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	restoreHeading, restorePitch = heading, pitch
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),rbigflash)
-	return rbigflash
-end
-
-function script.Activate()
-	--spSetUnitShieldState(unitID, 2, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, 2, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

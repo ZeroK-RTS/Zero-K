@@ -12,17 +12,18 @@ return { empmissile = {
 
   customParams           = {
     mobilebuilding = [[1]],
+
+    outline_x = 55,
+    outline_y = 80,
+    outline_yoff = 55,
   },
 
   explodeAs              = [[EMP_WEAPON]],
   footprintX             = 1,
   footprintZ             = 1,
   iconType               = [[cruisemissilesmall]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 1000,
   maxSlope               = 18,
-  minCloakDistance       = 150,
   objectName             = [[wep_empmissile.s3o]],
   script                 = [[cruisemissile.lua]],
   selfDestructAs         = [[EMP_WEAPON]],
@@ -63,8 +64,6 @@ return { empmissile = {
       customparams = {
         burst = Shared.BURST_RELIABLE,
 
-        restrict_in_widgets = 1,
-
         stats_hide_dps = 1, -- one use
         stats_hide_reload = 1,
         
@@ -90,7 +89,7 @@ return { empmissile = {
       reloadtime              = 3,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/emp_missile_hit]],
-      soundStart              = [[weapon/missile/tacnuke_launch]],
+      soundStart              = [[SiloLaunch]],
       tolerance               = 4000,
       tracks                  = false,
       turnrate                = 12000,

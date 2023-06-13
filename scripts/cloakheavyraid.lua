@@ -49,16 +49,17 @@ local SIG_Walk = 1
 local SIG_Aim = 2
 
 local function GetSpeedMod()
-	return (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Turn(lshoulder, z_axis, math.rad(0))
-	Turn(lshoulder, x_axis, -math.rad(10))
-	Turn(lforearm, x_axis, -math.rad(80))
-	Turn(lforearm, y_axis, -math.rad(30))
-	Turn(halberd, z_axis, math.rad(0))
+	Turn(lshoulder, z_axis, 0)
+	Turn(lshoulder, x_axis, math.rad(-10))
+	Turn(lforearm, x_axis, math.rad(-80))
+	Turn(lforearm, y_axis, math.rad(-30))
+	Turn(halberd, z_axis, 0)
 	Turn(rthigh, y_axis, math.rad(-10))
 	Turn(lthigh, y_axis, math.rad(10))
 	Turn(rthigh, z_axis, math.rad(-3))
@@ -94,20 +95,20 @@ local function Walk()
 		if not aiming then
 			Turn(head, y_axis, math.rad(6)*sway, truespeed*math.rad(8))
 			Turn(chest, y_axis, math.rad(-6)*sway, truespeed*math.rad(8))
-			Turn(rshoulder, x_axis, math.rad(0)-math.rad(35)*sway, truespeed*0.35)
+			Turn(rshoulder, x_axis, math.rad(-35)*sway, truespeed*0.35)
 			Turn(rforearm, x_axis, math.rad(-80)+math.rad(20)*sway, truespeed*0.2)
 
-			Turn(lshoulder, x_axis, -math.rad(10)+math.rad(10)*sway, truespeed*0.2)
-			Turn(lforearm, x_axis, -math.rad(80)-math.rad(10)*sway, truespeed*0.2)
-			Turn(lforearm, y_axis, -math.rad(30)-math.rad(6)*sway, truespeed*0.05)
+			Turn(lshoulder, x_axis, math.rad(-10)+math.rad(10)*sway, truespeed*0.2)
+			Turn(lforearm, x_axis, math.rad(-80)-math.rad(10)*sway, truespeed*0.2)
+			Turn(lforearm, y_axis, math.rad(-30)-math.rad(6)*sway, truespeed*0.05)
 		end
 
 		Turn(thigh[side], x_axis, math.rad(-64), truespeed*0.75)
 		Turn(shin[side], x_axis, math.rad(75), truespeed*1)
-		Turn(foot[side], x_axis, math.rad(0), truespeed*0.33)
+		Turn(foot[side], x_axis, 0, truespeed*0.33)
 
 		Turn(thigh[3-side], x_axis, math.rad(50), truespeed*0.75)
-		Turn(shin[3-side], x_axis, math.rad(0), truespeed*1.25)
+		Turn(shin[3-side], x_axis, 0, truespeed*1.25)
 		Turn(foot[3-side], x_axis, math.rad(-20), truespeed*0.33)
 
 		Turn(hips, z_axis, math.rad(-6)*sway, truespeed*0.05)
@@ -139,11 +140,11 @@ local function StopWalk()
 	if not aiming then
 		Turn(chest, y_axis, 0, math.rad(64))
 
-		Turn(lshoulder, z_axis, math.rad(0), math.rad(180))
-		Turn(lshoulder, x_axis, -math.rad(10), math.rad(180))
-		Turn(lforearm, x_axis, -math.rad(80), math.rad(180))
-		Turn(lforearm, y_axis, -math.rad(30), math.rad(180))
-		Turn(halberd, z_axis, math.rad(0), math.rad(120))
+		Turn(lshoulder, z_axis, 0, math.rad(180))
+		Turn(lshoulder, x_axis, math.rad(-10), math.rad(180))
+		Turn(lforearm, x_axis, math.rad(-80), math.rad(180))
+		Turn(lforearm, y_axis, math.rad(-30), math.rad(180))
+		Turn(halberd, z_axis, 0, math.rad(120))
 	end
 
 	Move(hips, y_axis, 0, 3.0)
@@ -180,11 +181,11 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(2000)
-	Turn(lshoulder, z_axis, math.rad(0), math.rad(180))
-	Turn(lshoulder, x_axis, -math.rad(10), math.rad(180))
-	Turn(lforearm, x_axis, -math.rad(80), math.rad(180))
-	Turn(lforearm, y_axis, -math.rad(30), math.rad(180))
-	Turn(halberd, z_axis, math.rad(0), math.rad(120))
+	Turn(lshoulder, z_axis, 0, math.rad(180))
+	Turn(lshoulder, x_axis, math.rad(-10), math.rad(180))
+	Turn(lforearm, x_axis, math.rad(-80), math.rad(180))
+	Turn(lforearm, y_axis, math.rad(-30), math.rad(180))
+	Turn(halberd, z_axis, 0, math.rad(120))
 	Move(halberd, z_axis, 0, 40)
 
 	if not moving then
@@ -197,18 +198,22 @@ local function RestoreAfterDelay()
 	aiming = false
 end
 
-function script.QueryWeapon1() return head end
+function script.QueryWeapon()
+	return head
+end
 
-function script.AimFromWeapon1() return head end
+function script.AimFromWeapon()
+	return head
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	aiming = true
 
 	Turn(chest, y_axis, heading, 12)
 	Turn(head, y_axis, 0, math.rad(64))
-	Turn(rshoulder, x_axis, math.rad(0), runspeed*0.35)
+	Turn(rshoulder, x_axis, 0, runspeed*0.35)
 	Turn(rforearm, x_axis, math.rad(-80), runspeed*0.2)
 
 	WaitForTurn(chest, y_axis)
@@ -216,7 +221,7 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	Turn(lforearm, x_axis, 0.4, 5)
 	Turn(lshoulder, z_axis, - 0, 12)
 	Turn(lshoulder, x_axis, - 0.7, 12)

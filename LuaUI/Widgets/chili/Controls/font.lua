@@ -26,6 +26,8 @@ Font = Object:Inherit{
 	color         = {1, 1, 1, 1},
 	outlineColor  = {0, 0, 0, 1},
 	autoOutlineColor = true,
+
+	uiScale = 1
 }
 
 local this = Font
@@ -35,6 +37,7 @@ local inherited = this.inherited
 
 function Font:New(obj)
 	obj = inherited.New(self, obj)
+	obj.uiScale = (WG and WG.uiScale or 1)
 
 	--// Load the font
 	obj:_LoadFont()
@@ -54,7 +57,8 @@ end
 
 function Font:_LoadFont()
 	local oldfont = self._font
-	self._font = FontHandler.LoadFont(self.font, self.size, self.outlineWidth, self.outlineWeight)
+	self._font = FontHandler.LoadFont(self.font, math.floor(self.size*self.uiScale), math.floor(self.outlineWidth*self.uiScale), self.outlineWeight)
+	--self._font = FontHandler.LoadFont(self.font, self.size, self.outlineWidth, self.outlineWeight)
 	--// do this after LoadFont because it can happen that LoadFont returns the same font again
 	--// but if we Unload our old one before, the gc could collect it before, so the engine would have to reload it again
 	FontHandler.UnloadFont(oldfont)
@@ -249,8 +253,15 @@ local function _GetExtra(align, valign)
 end
 
 --// =============================================================================
+function Font:CheckUiScaleChange()
+	if (WG and WG.uiScale or 1) ~= self.uiScale then
+		self.uiScale = (WG and WG.uiScale or 1)
+		self:_LoadFont()
+	end
+end
 
 function Font:_DrawText(text, x, y, extra)
+	self:CheckUiScaleChange()
 	local font = self._font
 
 	gl.PushAttrib(GL.COLOR_BUFFER_BIT)
@@ -263,7 +274,7 @@ function Font:_DrawText(text, x, y, extra)
 		font:SetTextColor(self.color)
 		font:SetOutlineColor(self.outlineColor)
 		font:SetAutoOutlineColor(self.autoOutlineColor)
-			font:Print(text, x, -y, self.size, extra)
+		font:Print(text, x, -y, self.size, extra)
 		font:End()
 	gl.PopMatrix()
 	gl.PopAttrib()
@@ -274,12 +285,13 @@ function Font:Draw(text, x, y, align, valign)
 	if (not text) then
 		return
 	end
+	self:CheckUiScaleChange()
 
 	local extra = _GetExtra(align, valign)
 	if self.outline then
-	extra = extra .. 'o'
+		extra = extra .. 'o'
 	elseif self.shadow then
-	extra = extra .. 's'
+		extra = extra .. 's'
 	end
 
 	self:_DrawText(text, x, y, extra)
@@ -290,6 +302,7 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
 	if (not text) then
 		return
 	end
+	self:CheckUiScaleChange()
 
 	local x, y, extra = self:AdjustPosToAlignment(x, y, w, h, align, valign)
 

@@ -38,9 +38,9 @@ local steptime = 10
 local stride_top = -0.5
 local stride_bottom = -2.75
 
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local function GetSpeedMod()
-	return (spGetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)
+	-- disallow zero (instant turn instead)
+	return math.max(0.05, GG.att_MoveChange[unitID] or 1)
 end
 
 local function walk()

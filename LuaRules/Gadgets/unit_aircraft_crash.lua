@@ -54,6 +54,16 @@ function gadget:GameFrame(n)
 	end
 end
 
+local function CallAsUnitIfExists(unitID, funcName)
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if not env then
+		return
+	end
+	if env and env[funcName] then
+		Spring.UnitScript.CallAsUnit(unitID, env[funcName])
+	end
+end
+
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if not aircraftDefIDs[unitDefID] then
 		return
@@ -73,6 +83,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local maxHealth = aircraftDefIDs[unitDefID]
 		local severity = rDam/maxHealth
 		if severity < 0.5 then
+			CallAsUnitIfExists(unitID, "OnStartingCrash") -- tell the LUS that we're crashing (mostly for transports)
 			Spring.SetUnitCrashing(unitID, true)
 			Spring.SetUnitNoSelect(unitID, true)
 			Spring.SetUnitSensorRadius(unitID, "los", 0)

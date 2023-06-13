@@ -26,10 +26,10 @@ local resources = {
 		},
 
 		scars = {
-			'unknown/scars/scar1.png',
-			'unknown/scars/scar2.png',
-			'unknown/scars/scar3.png',
-			'unknown/scars/scar4.png',
+			'unknown/enlarge/scar1.png',
+			'unknown/enlarge/scar2.png',
+			'unknown/enlarge/scar3.png',
+			'unknown/enlarge/scar4.png',
 		},
 
 		trees = {
@@ -69,7 +69,15 @@ local resources = {
 			explofade='explofade.tga',
 			heatcloud='GPL/explo.png',
 			explo='GPL/fire.png',
+
+			bar_dirt       = 'CC/bar_icexuick/dirt.png',
+			bar_explowater = 'CC/bar_icexuick/explowater.tga',
+			bar_gunshotxl  = 'CC/bar_icexuick/gunshotxl.tga',
+			bar_waterrush  = 'CC/bar_icexuick/waterrush.tga',
+			bar_wave       = 'CC/bar_icexuick/wave.tga',
+
 	  -- MANUAL
+	  flarescale01='flarescale01.tga',
 
       ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",
@@ -88,6 +96,7 @@ local resources = {
       corelaser= "gpl/corelaser.png",
       darksmoketrail= "darksmoketrail.tga",
       debris2= "other/debris2.tga",
+      debris= "other/debris2.tga",
       diamondstar= "other/diamondstar.tga",
       dirt= "cc/dirt.png",
       dirtplosion2= "pd/dirtplosion2.tga",

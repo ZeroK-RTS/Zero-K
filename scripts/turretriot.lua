@@ -9,7 +9,54 @@ local smokePiece = { base, turret }
 local stuns = {false, false, false}
 local disarmed = false
 
+local LOS_ACCESS = {inlos = true}
 local SigAim = 1
+
+local function SetupHeat()
+	local ud = UnitDefs[unitDefID]
+	local cp = ud.customParams
+	return tonumber(cp.heat_per_shot), (tonumber(cp.heat_decay) or 0)/30, tonumber(cp.heat_max_slow), tonumber(cp.heat_initial) or 0
+end
+local heatPerShot, heatDecay, heatMaxSlow, currentHeat = SetupHeat()
+
+local function UpdateReloadTime()
+	local reloadMult = 1 - currentHeat * heatMaxSlow
+	Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", reloadMult, LOS_ACCESS)
+	Spring.SetUnitRulesParam(unitID, "heat_bar", currentHeat, LOS_ACCESS)
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function HeatUpdateThread()
+	while currentHeat > 0 do
+		UpdateReloadTime()
+		Sleep(33)
+		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
+		if not stunned_or_inbuild then
+			local decayMult = (GG.att_EconomyChange[unitID] or 1)
+			if decayMult > 0 then
+				currentHeat = currentHeat - heatDecay*decayMult
+				if currentHeat <= 0 then
+					currentHeat = 0
+					UpdateReloadTime()
+					return
+				end
+			end
+		end
+	end
+end
+
+local function AddHeat(newHeat)
+	local newThread = (currentHeat == 0)
+
+	currentHeat = currentHeat + newHeat
+	if currentHeat > 1 then
+		currentHeat = 1
+	end
+
+	if newThread then
+		StartThread(HeatUpdateThread)
+	end
+end
 
 local function RestoreAfterDelay()
 	Sleep (5000)
@@ -47,6 +94,9 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Turn (ejector, y_axis, math.rad(-90))
+	if currentHeat > 0 then
+		StartThread(HeatUpdateThread)
+	end
 end
 
 function script.QueryWeapon()
@@ -76,11 +126,16 @@ function script.AimWeapon (num, heading, pitch)
 	return true
 end
 
+--local lastFrameFired = Spring.GetGameFrame()
 function script.FireWeapon ()
+	--Spring.Echo("fire", Spring.GetGameFrame() - lastFrameFired, Spring.GetGameFrame())
+	--lastFrameFired = Spring.GetGameFrame()
+
 	EmitSfx (muzzle, 1024)
 	EmitSfx (ejector, 1025)
 	Spin (barrel, z_axis, math.rad(720))
 	StopSpin (barrel, z_axis, math.rad(18))
+	AddHeat(heatPerShot)
 end
 
 function script.Killed (recentDamage, maxHealth)

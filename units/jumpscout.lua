@@ -11,15 +11,17 @@ return { jumpscout = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND TOOFAST]],
+  category               = [[LAND SMALL TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeType    = [[ellipsoid]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[28 28 28]],
+  selectionVolumeScales  = [[42 42 42]],
   selectionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     modelradius    = [[10]],
     
     grey_goo = 1,
@@ -27,21 +29,21 @@ return { jumpscout = {
     grey_goo_drain = 5,
     grey_goo_cost = 45,
     grey_goo_range = 120,
+    jump_using_weapon = 1, -- Value is weapon number
+    jump_self_damage = 15,
     selection_scale = 1, -- Maybe change later
+    select_show_eco = 1,
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[kbotbomb]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 80,
   maxSlope               = 36,
   maxVelocity            = 3.5,
   maxWaterDepth          = 15,
-  minCloakDistance       = 75,
   movementClass          = [[SKBOT2]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING]],
@@ -65,7 +67,7 @@ return { jumpscout = {
   trackStretch           = 0.6,
   trackType              = [[ComTrack]],
   trackWidth             = 12,
-  turnRate               = 1800,
+  turnRate               = 2160,
   workerTime             = 0,
 
   weapons                = {
@@ -95,7 +97,6 @@ return { jumpscout = {
       damage                  = {
         default = 410.1,
         planes  = 410.1,
-        subs    = 20.5,
       },
 
       fireStarter             = 70,

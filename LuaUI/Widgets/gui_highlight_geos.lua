@@ -12,6 +12,8 @@ function widget:GetInfo()
 	}
 end
 
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
+
 ----------------------------------------------------------------
 -- Globals
 ----------------------------------------------------------------
@@ -26,7 +28,10 @@ local glCallList = gl.CallList
 local spGetMapDrawMode = Spring.GetMapDrawMode
 local spGetActiveCommand = Spring.GetActiveCommand
 local spGetGameFrame        = Spring.GetGameFrame
+local spGetMouseState = Spring.GetMouseState
+local spTraceScreenRay = Spring.TraceScreenRay
 
+local abs = math.abs
 
 local geoDefID = UnitDefNames["energygeo"].id
 
@@ -34,6 +39,7 @@ local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
 local mapXinv = 1/mapX
 local mapZinv = 1/mapZ
+local lastX, lastY, lastGeo
 
 local size = math.max(mapX,mapZ) * 60/4096
 
@@ -87,8 +93,7 @@ end
 function widget:DrawWorld()
 	
 	local _, cmdID = spGetActiveCommand()
-	local showecoMode = WG.showeco
-	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1
+	drawGeos = -geoDefID == cmdID or WG.showeco or spGetMapDrawMode() == 'metal' or spGetGameFrame() < 1
 	
 	if drawGeos then
 		glLineWidth(20)
@@ -99,16 +104,22 @@ function widget:DrawWorld()
 end
 
 function widget:Update()
-	local mx, my = Spring.GetMouseState()
-	local pos = select(2, Spring.TraceScreenRay(mx, my, true))
-	if pos then
-		for i = 1, #geos do
-			if (math.abs(pos[1] - geos[i].x) < 24 and math.abs(pos[3] - geos[i].z) < 24) then
-				WG.mouseAboveGeo = {geos[i].x, geos[i].z}
-				return
+	local mx, my = spGetMouseState()
+	if mx ~= lastX and my ~= lastY then
+		pos = select(2, spTraceScreenRay(mx, my, true)) 
+		if pos then
+			for i = 1, #geos do
+				if (abs(pos[1] - geos[i].x) < 24 and abs(pos[3] - geos[i].z) < 24) then
+					WG.mouseAboveGeo = {geos[i].x, geos[i].z}
+					lastGeo = WG.mouseAboveGeo
+					return
+				end
 			end
 		end
+	else
+		WG.mouseAboveGeo = lastGeo
 	end
+	lastX, lastY = mx, my
 	WG.mouseAboveGeo = nil
 end
 
@@ -127,13 +138,16 @@ function widget:DefaultCommand(type, id)
 end
 
 function widget:DrawInMiniMap()
-
 	if drawGeos then
-	
 		gl.PushMatrix()
 		gl.LoadIdentity()
-		gl.Translate(0,1,0)
-		gl.Scale(mapXinv , -mapZinv, 1)
+		if GetMiniMapFlipped() then
+			gl.Translate(1, 0, 0)
+			gl.Scale(-mapXinv , mapZinv, 1)
+		else
+			gl.Translate(0, 1, 0)
+			gl.Scale(mapXinv , -mapZinv, 1)
+		end
 		gl.LineWidth(2)
 		gl.Lighting(false)
 		gl.Color(1,1,0,0.7)

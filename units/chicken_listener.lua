@@ -16,6 +16,9 @@ return { chicken_listener = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
+    outline_x = 85,
+    outline_y = 85,
+    outline_yoff = 9,
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -30,7 +33,6 @@ return { chicken_listener = {
   maxSlope            = 36,
   maxVelocity         = 0.6,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[KBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -56,7 +58,7 @@ return { chicken_listener = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 50,
-  turnRate            = 632,
+  turnRate            = 758,
   upright             = false,
   waterline           = 8,
   workerTime          = 0,

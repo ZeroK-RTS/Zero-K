@@ -10,8 +10,9 @@ for i = 1, #UnitDefs do
 		end
 	elseif not ud.isImmobile then
 		moveType[i] = 2 -- ground/sea
+	else
+		moveType[i] = false -- For structures or any other invalid movetype
 	end
-	moveType[i] = false -- For structures or any other invalid movetype
 end
 
 function Spring.Utilities.getMovetype(ud)
@@ -36,5 +37,21 @@ function Spring.Utilities.getMovetypeByID(unitDefID)
 	if ud then
 		return Spring.Utilities.getMovetype(ud)
 	end
+	return false
+end
+
+function Spring.Utilities.isGroundFactory(ud)
+	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local buildOptions = ud.buildOptions
+
+		for i = 1, #buildOptions do
+			local boDefID = buildOptions[i]
+
+			if (Spring.Utilities.getMovetypeByID(boDefID) == 2) then
+				return true
+			end
+		end
+	end
+
 	return false
 end

@@ -12,9 +12,6 @@ end
 
 include "constants.lua"
 
-local SIG_MOVE = 1
-local SIG_AIM = 2
-
 local function WobbleUnit()
 	local wobble = true
 	while true do

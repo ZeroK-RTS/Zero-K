@@ -14,7 +14,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local SIZE_FACTOR = ((select(1, Spring.GetWindowGeometry()) > 3000) and 2) or 1
+local SIZE_FACTOR = ((select(1, Spring.GetViewGeometry()) > 3000) and 2) or 1
 
 local function SetCircleDragThreshold(value)
 	value = value*SIZE_FACTOR
@@ -22,7 +22,7 @@ local function SetCircleDragThreshold(value)
 	WG.CircleDragThreshold = value
 end
 
-options_path = 'Settings/Interface/Area Commands'
+options_path = 'Settings/Interface/Commands'
 options_order = { 'circleDragThreshold', 'unitTargetHelper' }
 options = {
 	circleDragThreshold = {
@@ -37,8 +37,8 @@ options = {
 		end
 	},
 	unitTargetHelper = {
-		name = "Use unit target helper",
-		desc = "When enabled, targets the unit under mouse press if nothing is under the mouse on release.",
+		name = "Speedy unit click helper",
+		desc = "When enabled, clicking on a unit will target it even if it is no longer under the mouse when the click is released.",
 		type = "bool",
 		value = true,
 		noHotkey = true,
@@ -86,7 +86,6 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local clickTargetID = false
 local clickCommandID = false
-local clickActiveCmdID = false
 local clickRight = false
 local totalDist = 0
 
@@ -96,20 +95,20 @@ local totalDist = 0
 local function Reset()
 	clickTargetID = false
 	clickCommandID = false
-	clickActiveCmdID = false
 	clickRight = false
 	totalDist = 0
 end
 
 local function GetActionCommand(right)
 	local _, activeCmdID = Spring.GetActiveCommand()
-	if activeCmdID and not right then
+	if activeCmdID and (not right) then
+		-- Left click means the active command should be issued.
 		return activeCmdID
-	else
-		if right then
-			local _, defaultCmdID = Spring.GetDefaultCommand()
-			return defaultCmdID
-		end
+	elseif (not activeCmdID) and right then
+		-- Right click means the default command should be issued, unless
+		-- there is an active command, in which case it is cancelled.
+		local _, defaultCmdID = Spring.GetDefaultCommand()
+		return defaultCmdID
 	end
 	return false
 end
@@ -182,7 +181,6 @@ local function MousePress(x, y, right)
 	
 	clickTargetID = targetID
 	clickCommandID = cmdID
-	clickActiveCmdID = select(2, Spring.GetActiveCommand())
 	clickRight = right
 end
 
@@ -198,7 +196,7 @@ local function MouseRelease(x, y)
 	end
 	
 	if (not shift) or clickRight then
-		Spring.SetActiveCommand(-1)
+		Spring.SetActiveCommand(nil)
 	end
 	
 	GiveNotifyingOrder(clickCommandID, {clickTargetID}, GetCmdOpts(alt, ctrl, meta, shift, clickRight))
@@ -257,10 +255,6 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	if not Spring.Utilities.IsCurrentVersionNewerThan(104, 1000) then
-		widgetHandler:RemoveWidget(widget)
-		return
-	end
 	screen0 = WG.Chili and WG.Chili.Screen0
 	SetCircleDragThreshold(options.circleDragThreshold.value)
 end

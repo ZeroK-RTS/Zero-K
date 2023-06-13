@@ -15,7 +15,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 360,
-		subs    = 18,
 	},
 
 	explosionGenerator      = [[custom:INGEBORG]],

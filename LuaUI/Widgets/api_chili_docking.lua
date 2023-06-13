@@ -8,7 +8,6 @@ function widget:GetInfo()
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    experimental = false,
     handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
     enabled   = true,  --  loaded by default?
     alwaysStart = true,
@@ -459,7 +458,12 @@ function widget:ViewResize(vsx, vsy)
 end
 
 function widget:SetConfigData(data)
+	local minimap
+
 	local vsx, vsy = gl.GetViewSizes()
+	if WG.uiScale and WG.uiScale > 0 then
+		vsx, vsy = vsx/WG.uiScale, vsy/WG.uiScale
+	end
 	for k, v in pairs (data) do
 		if v[5] then
 			v[1] = v[1] + vsx
@@ -471,13 +475,46 @@ function widget:SetConfigData(data)
 			v[4] = v[4] + vsy
 			v[6] = nil
 		end
+		
+		if v[1] < 0 then
+			v[3] = v[3] - v[1]
+			v[1] = 0
+		end
+		if v[2] < 0 then
+			v[4] = v[4] - v[2]
+			v[2] = 0
+		end
+		if v[3] > vsx then
+			v[1] = v[1] - v[3] + vsx
+			v[3] = vsx
+		end
+		if v[4] > vsy then
+			v[2] = v[2] - v[4] + vsy
+			v[4] = vsy
+		end
+		
+		if k == "Minimap Window" then
+			minimap = Spring.Utilities.CopyTable(v, true)
+		end
 	end
+	
+	if minimap then
+		for k, v in pairs (data) do
+			if k ~= "Minimap Window" and v[1] >= minimap[1] and v[2] >= minimap[2] and v[3] <= minimap[3] and v[4] <= minimap[4] then
+				data[k] = nil -- Delete window settings saved underneath the minimap.
+			end
+		end
+	end
+	
 	settings = data
 end
 
 function widget:GetConfigData()
 	local data = Spring.Utilities.CopyTable(settings, true)
 	local vsx, vsy = gl.GetViewSizes()
+	if WG.uiScale and WG.uiScale > 0 then
+		vsx, vsy = vsx/WG.uiScale, vsy/WG.uiScale
+	end
 	for k, v in pairs (data) do
 		-- if closer to the edge opposite 0, save relative to it (to keep stuff at edge if someone migrates to a larger screen)
 		if vsx - v[3] < v[1] then

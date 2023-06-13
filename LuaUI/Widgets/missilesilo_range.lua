@@ -33,7 +33,7 @@ local drawRadius = {}
 drawRadius[1] = {
 	range = 3500,
 	color = {1,0.2,0.2,1},
-	text = "Tacnuke and EMP",
+	text = "Tacnuke, EMP and Inferno",
 	width = 1,
 	miniWidth = 1,
 	textSize = 180,
@@ -42,7 +42,7 @@ drawRadius[1] = {
 drawRadius[2] = {
 	range = 6000,
 	color = {0.4,1,0.2,1},
-	text = "Seismic",
+	text = "Seismic and Slow",
 	width = 1,
 	miniWidth = 1,
 	textSize = 260,
@@ -84,6 +84,7 @@ local circleDivs = 64
 -- Speedup
 
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay
@@ -187,8 +188,13 @@ local function DrawActiveCommandRangesMinimap(minimapX, minimapY)
 	
 	local height = spGetGroundHeight(mouseX,mouseZ)
 	
-	glTranslate(0,minimapY,0)
-	glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	if GetMiniMapFlipped() then
+		glTranslate(minimapY, 0, 0)
+		glScale(-minimapX/mapX, minimapY/mapZ, 1)
+	else
+		glTranslate(0, minimapY, 0)
+		glScale(minimapX/mapX, -minimapY/mapZ, 1)
+	end
 	
 	for i = 1, (options.missile_silo_advanced.value and 5 or 2) do
 		local radius = drawRadius[i]

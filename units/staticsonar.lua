@@ -17,11 +17,8 @@ return { staticsonar = {
   footprintX        = 2,
   footprintZ        = 2,
   iconType          = [[sonar]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
   maxDamage         = 750,
   maxSlope          = 18,
-  minCloakDistance  = 150,
   minWaterDepth     = 10,
   objectName        = [[novasonar.s3o]],
   onoffable         = true,
@@ -35,7 +32,9 @@ return { staticsonar = {
   customParams                  = {
     modelradius    = [[16]],
     removewait     = 1,
+    removestop     = 1,
     priority_misc  = 2, -- High
+    sonar_can_be_disabled = 1,
   },
 
   featureDefs       = {

@@ -2,8 +2,6 @@ return { turretaaflak = {
   unitname                      = [[turretaaflak]],
   name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -19,6 +17,7 @@ return { turretaaflak = {
 
   customParams                  = {
     aimposoffset   = [[0 16 0]],
+    bait_level_default = 0,
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -26,14 +25,11 @@ return { turretaaflak = {
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[staticaa]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 5000,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[corflak.s3o]],
@@ -48,7 +44,6 @@ return { turretaaflak = {
 
   },
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],
@@ -85,7 +80,6 @@ return { turretaaflak = {
       damage                  = {
         default = 13.2,
         planes  = 132,
-        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

@@ -1,5 +1,6 @@
-if not Script.GetSynced() then
-	return
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return false
 end
 
 function gadget:GetInfo()
@@ -18,8 +19,6 @@ local commands = {} -- [1] = {unitID = id or array, cmdID = bla, params = bla, .
 local commandCount = 0
 
 local gh = gadgetHandler
-local ghRemoveCallIn = gh.RemoveCallIn
-local ghUpdateCallIn = gh.UpdateCallIn
 
 local function ExecuteCommand(cmd)
 	if type(cmd.unitID) == "table" then
@@ -30,6 +29,9 @@ local function ExecuteCommand(cmd)
 end
 
 function gadget:GameFrame(n)
+	if commandCount == 0 then
+		return
+	end
 	for i = 1, commandCount do
 		local cmd = commands[i]
 		local success, err = pcall(ExecuteCommand, cmd)
@@ -38,16 +40,10 @@ function gadget:GameFrame(n)
 		end
 		commands[i] = nil
 	end
-
 	commandCount = 0
-	ghRemoveCallIn(gh, 'GameFrame')
 end
 
 local function DelegateOrder(unitID, cmdID, cmdParams, cmdOptions)
-	if commandCount == 0 then
-		ghUpdateCallIn(gh, 'GameFrame')
-	end
-
 	commandCount = commandCount + 1
 	commands[commandCount] = {unitID = unitID, cmdID = cmdID, params = cmdParams, options = cmdOptions}
 end

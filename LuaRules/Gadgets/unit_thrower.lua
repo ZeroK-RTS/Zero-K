@@ -33,6 +33,7 @@ for i = 1, #WeaponDefs do
 	end
 end
 
+local spGetUnitPosition = Spring.GetUnitPosition
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 
@@ -123,7 +124,7 @@ local unitBlockAttackCmd = {
 -------------------------------------------------------------------------------------
 
 local function SetUnitDrag(unitID, drag)
-	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+	local ux, uy, uz = spGetUnitPosition(unitID)
 	local rx, ry, rz = Spring.GetUnitRotation(unitID)
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	Spring.SetUnitPhysics(unitID, ux, uy, uz, vx, vy, vz, rx, ry, rz, drag, drag, drag)
@@ -141,7 +142,7 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 	if Spring.GetUnitTransporter(unitID) then
 		return false
 	end
-	local _,_,_, _, ny, _ = Spring.GetUnitPosition(unitID, true)
+	local _,_,_, _, ny = spGetUnitPosition(unitID, true)
 	if not ny then
 		return false
 	end
@@ -171,14 +172,14 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if targetType == GROUND then
 		tx, ty, tz = targetPos[1], targetPos[2], targetPos[3]
 	else
-		_, _, _, tx, ty, tz = Spring.GetUnitPosition(targetPos, true)
+		_, _, _, tx, ty, tz = spGetUnitPosition(targetPos, true)
 		local groundHeight = math.max(Spring.Utilities.GetGroundHeightMinusOffmap(tx, tz) or 0, 0)
 		ty = math.min(ty, groundHeight - MAX_ALTITUDE_AIM)
 	end
 	ty = math.max(ty, 0)
 	
 	-- Calculate horizontal aiming parameters based on projectile owner position.
-	local _,_,_, ox, oy, oz = Spring.GetUnitPosition(proOwnerID, true)
+	local _,_,_, ox, oy, oz = spGetUnitPosition(proOwnerID, true)
 	local odx, ody, odz = tx - ox, ty - oy, tz - oz
 	local fireDistance = math.sqrt(odx^2 + odz^2)
 	
@@ -211,6 +212,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 				
 				local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
 				if flyTime then
+					local nearDefID = Spring.GetUnitDefID(nearID)
 					flyTime = flyTime + 15 -- Sideways time.
 					
 					SetUnitDrag(nearID, 0)
@@ -218,6 +220,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 					Spring.SetUnitLeaveTracks(nearID, false)
 					IterableMap.Add(physicsRestore, nearID,
 						{
+							unitDefID = nearDefID,
 							odx = odx,
 							ty = ty,
 							odz = odz,
@@ -227,7 +230,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 							collisionResistence = -5*flyTime/MIN_FLY_TIME,
 						}
 					)
-					SendToUnsynced("addFlying", nearID, Spring.GetUnitDefID(nearID), flyTime)
+					SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
 					GG.Floating_InterruptFloat(nearID, 60)
 				end
 			end
@@ -359,6 +362,9 @@ function gadget:Initialize()
 end
 
 local function UpdateTrajectory(unitID, data)
+	if not Spring.ValidUnitID(unitID) then
+		return true
+	end
 	if data.sidewaysCounter then
 		data.sidewaysCounter = data.sidewaysCounter - 1
 		if data.sidewaysCounter < 10 then
@@ -373,6 +379,7 @@ local function UpdateTrajectory(unitID, data)
 end
 
 local function ReinstatePhysics(unitID, data)
+	GG.PokeDecloakUnit(unitID, data.unitDefID)
 	if data.drag then
 		SetUnitDrag(unitID, math.max(0, math.min(1, data.drag)))
 		data.drag = data.drag + 0.05
@@ -380,6 +387,7 @@ local function ReinstatePhysics(unitID, data)
 			Spring.SetUnitLeaveTracks(unitID, true)
 			SetUnitDrag(unitID, 1)
 			data.drag = nil
+			GG.Floating_CheckAddFlyingFloat(unitID, data.unitDefID)
 		end
 	end
 	
@@ -420,12 +428,10 @@ else -- UNSYNCED
 
 local glVertex            = gl.Vertex
 local spIsUnitInView      = Spring.IsUnitInView
-local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetUnitLosState   = Spring.GetUnitLosState
 local spValidUnitID       = Spring.ValidUnitID
 local spGetMyAllyTeamID   = Spring.GetMyAllyTeamID
 local spGetUnitVectors    = Spring.GetUnitVectors
-local spGetLocalTeamID    = Spring.GetLocalTeamID
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
@@ -471,13 +477,13 @@ local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
 			point[2] = {topX, topY, topZ}
-			local _,_,_, rX, rY, rZ = Spring.GetUnitPosition(recUnitID, true)
+			local _,_,_, rX, rY, rZ = spGetUnitPosition(recUnitID, true)
 			topX, topY, topZ = GetUnitTop(recUnitID, rX, rY, rZ)
 			point[3] = {topX,topY,topZ}
 			point[4] = {rX, rY, rZ}
 			gl.PushAttrib(GL.LINE_BITS)
 			gl.DepthTest(true)
-			gl.Color (0, 1, 0.5, math.random()*0.05 + 0.15)
+			gl.Color (0, 1, 0.5, math.random()*0.1 + 0.18)
 			gl.LineWidth(3)
 			gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 			gl.DepthTest(false)
@@ -493,7 +499,7 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	end
 	local los = spGetUnitLosState(unitID, myAllyTeam, false)
 	if spec or (los and los.los) then
-		local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+		local _,_,_, x, y, z = spGetUnitPosition(unitID, true)
 		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 		if nearUnits then
 			for i = 1, #nearUnits do

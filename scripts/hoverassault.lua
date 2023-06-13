@@ -46,7 +46,6 @@ local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
 
 local RESTORE_DELAY = 1100
-local ROCK_DAMGE_MULT = 0.003
 local ROCK_FIRE_FORCE = 0.03
 
 local ROCK_SPEED = 12		--Number of half-cycles per second around x-axis.
@@ -109,6 +108,7 @@ local function WobbleUnit()
 end
 
 --[[
+local ROCK_DAMGE_MULT = 0.003
 function script.HitByWeapon(x, z, weaponID, damage)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], false, x*ROCK_DAMGE_MULT*damage)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], false, -z*ROCK_DAMGE_MULT*damage)
@@ -156,14 +156,14 @@ local function Close()
 	closed = true
 
 	Move(turretbase, y_axis, 0, 20)
-	Turn(turretbase, x_axis, 0, math.rad(150.000000))
-	Turn(turret, x_axis, 0, math.rad(150.000000))
-	Turn(door1, z_axis, math.rad(-(0)), math.rad(150.000000))
-	Turn(door2, z_axis, math.rad(-(0)), math.rad(150.000000))
-	Turn(rim1, z_axis, math.rad(-(0)), math.rad(150.000000))
-	Turn(rim2, z_axis, math.rad(-(0)), math.rad(150.000000))
-	Turn(gun, y_axis, 0, math.rad(300.000000))
-	Turn(gun, x_axis, 0, math.rad(60.000000))
+	Turn(turretbase, x_axis, 0, math.rad(150))
+	Turn(turret, x_axis, 0, math.rad(150))
+	Turn(door1, z_axis, 0, math.rad(150))
+	Turn(door2, z_axis, 0, math.rad(150))
+	Turn(rim1, z_axis, 0, math.rad(150))
+	Turn(rim2, z_axis, 0, math.rad(150))
+	Turn(gun, y_axis, 0, math.rad(300))
+	Turn(gun, x_axis, 0, math.rad(60))
 
 	WaitForMove(turretbase, y_axis)
 	WaitForTurn(turretbase, x_axis)
@@ -185,12 +185,12 @@ local function Open()
 	Spring.SetUnitArmored(unitID, false)
 
 	Move(turretbase, y_axis, 3, 30)
-	Turn(turretbase, x_axis, math.rad(30), math.rad(150.000000))
-	Turn(turret, x_axis, math.rad(-30), math.rad(150.000000))
-	Turn(door1, z_axis, math.rad(80), math.rad(150.000000))
-	Turn(door2, z_axis, math.rad(-80), math.rad(150.000000))
-	Turn(rim1, z_axis, math.rad(-30), math.rad(150.000000))
-	Turn(rim2, z_axis, math.rad(30), math.rad(150.000000))
+	Turn(turretbase, x_axis, math.rad(30), math.rad(150))
+	Turn(turret, x_axis, math.rad(-30), math.rad(150))
+	Turn(door1, z_axis, math.rad(80), math.rad(150))
+	Turn(door2, z_axis, math.rad(-80), math.rad(150))
+	Turn(rim1, z_axis, math.rad(-30), math.rad(150))
+	Turn(rim2, z_axis, math.rad(30), math.rad(150))
 
 	WaitForMove(turretbase, y_axis)
 	WaitForTurn(turretbase, x_axis)
@@ -247,8 +247,8 @@ function script.AimWeapon(num, heading, pitch)
 
 	-- start aiming gun even if Open animation hasn't completed
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
-	Turn(gun, y_axis, heading, math.rad(300.000000)*slowMult)
-	Turn(gun, x_axis, -pitch, math.rad(60.000000)*slowMult)
+	Turn(gun, y_axis, heading, math.rad(300)*slowMult)
+	Turn(gun, x_axis, -pitch, math.rad(60)*slowMult)
 
 	while closed do
 		Sleep(34)
@@ -269,8 +269,8 @@ end
 function script.FireWeapon(num)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[z_axis], gunHeading, ROCK_FIRE_FORCE)
 	StartThread(GG.ScriptRock.Rock, dynamicRockData[x_axis], gunHeading - hpi, ROCK_FIRE_FORCE)
-	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
+	EmitSfx(flareMap[shootCycle], 1025)
 end
 
 function script.Killed(recentDamage, maxHealth)

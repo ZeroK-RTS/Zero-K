@@ -34,7 +34,12 @@ local function CreateTreeDef(i)
   }
 end
 
-for i=0,20 do
+--[[ In theory it's possible to have treetype16 or higher.
+     However in practice Spring struggles to render trees
+     higher than 15, for which reason map compilers don't
+     allow trees higher than that, in turn making it hard
+     to find a map with those. ]]
+for i=0,15 do
   CreateTreeDef(i)
 end
 

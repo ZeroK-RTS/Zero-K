@@ -22,7 +22,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
-local spRequestPath = Spring.RequestPath
 
 local leaperDefID = UnitDefNames.chicken_leaper.id
 local gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
@@ -79,7 +78,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			leapersCommand = leapersCommand or {}
 			leapersCommand[unitID] = {}
 			if not cmdOptions.shift then
-				leapersCommand[unitID][1] = {CMD.STOP, {}, 0}
+				leapersCommand[unitID][1] = {CMD.STOP, 0, 0}
 			end
 			local d = 0
 			local way1,way2,way3 = startX,startY,startZ
@@ -102,7 +101,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			leapersCommand[unitID][idx] = {CMD_JUMP, {cmdParams[1], cmdParams[2], cmdParams[3]}, CMD.OPT_SHIFT}
 		else -- if the computed path shows "no path found" (false), abort
 			leapersCommand = leapersCommand or {}
-			leapersCommand[unitID] = {[1]={CMD.STOP, {}, cmdOptions.shift and CMD.OPT_SHIFT or 0}}
+			leapersCommand[unitID] = {[1]={CMD.STOP, 0, cmdOptions.shift and CMD.OPT_SHIFT or 0}}
 			return false;
 		end
 		return false -- reject original command, we're handling it

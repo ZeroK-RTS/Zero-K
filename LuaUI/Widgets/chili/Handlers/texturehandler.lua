@@ -139,6 +139,7 @@ function TextureHandler.Update()
 				local texture = {}
 				texture.dl = gl.CreateList(gl.Texture, filename)
 				loaded[filename] = texture
+				--Spring.Echo("loaded texture", filename)
 
 				for obj in pairs(objs) do
 					obj:Invalidate()

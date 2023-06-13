@@ -251,7 +251,7 @@ local function CreateTeleportWindow()
 		teleportProgress:SetCaption(percent .. "%")
 		
 		if numChargesNew ~= numCharges then
-			local text = ""
+			local text
 			if (numChargesNew > 0) then
 				text = "\255\0\255\32 " .. strings.evac_ready .. "\008"
 				teleportImage.color = {1,1,1,1}

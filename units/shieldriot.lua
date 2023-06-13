@@ -13,24 +13,26 @@ return { shieldriot = {
   category               = [[LAND]],
   corpse                 = [[DEAD]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[45 45 45]],
+  selectionVolumeScales  = [[68 68 68]],
   selectionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    selection_scale   = 0.85,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 15.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[walkerriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 1050,
+  maxDamage              = 1100,
   maxSlope               = 36,
-  maxVelocity            = 1.9,
+  maxVelocity            = 2,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
@@ -56,7 +58,7 @@ return { shieldriot = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 22,
-  turnRate               = 2000,
+  turnRate               = 2400,
   upright                = true,
 
   weapons                = {
@@ -90,9 +92,8 @@ return { shieldriot = {
       craterMult              = 0,
 
       damage                  = {
-        default = 25,
-        planes  = 25,
-        subs    = 0.1,
+        default = 30,
+        planes  = 30,
       },
 
       customParams           = {
@@ -100,10 +101,10 @@ return { shieldriot = {
         lups_explodespeed = 1,
         lups_explodelife = 0.6,
         nofriendlyfire = 1,
-        timeslow_damagefactor = 3,
+        timeslow_damagefactor = 2.5,
       },
 
-      edgeeffectiveness       = 1,
+      edgeeffectiveness       = 0.6,
       explosionGenerator      = [[custom:NONE]],
       explosionSpeed          = 12,
       impulseBoost            = 0,
@@ -129,7 +130,6 @@ return { shieldriot = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -167,7 +167,6 @@ return { shieldriot = {
       damage                  = {
         default = 1E-06,
         planes  = 1E-06,
-        subs    = 5E-08,
       },
 
       explosionGenerator      = [[custom:NONE]],

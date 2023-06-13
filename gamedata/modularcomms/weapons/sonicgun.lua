@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 175,
-		subs    = 175,
 	},
 
 	cegTag			= [[sonictrail]],
@@ -31,7 +30,7 @@ local weaponDef = {
 	impulseFactor           = 0.5,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 320,
+	range                   = 303,
 	reloadtime              = 1.1,
 	soundStart              = [[weapon/sonicgun]],
 	soundHit                = [[weapon/unfa_blast_2]],

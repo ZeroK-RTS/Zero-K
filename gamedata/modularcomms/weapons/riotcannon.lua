@@ -20,7 +20,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 220.2,
-		subs    = 12,
 	},
 
 	edgeEffectiveness       = 0.75,
@@ -30,8 +29,8 @@ local weaponDef = {
 	impulseFactor           = 0.5,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 300,
-	reloadtime              = 49/30,
+	range                   = 285,
+	reloadtime              = 54/30,
 	soundHit                = [[weapon/cannon/generic_cannon]],
 	soundStart              = [[weapon/cannon/outlaw_gun]],
 	soundStartVolume        = 3,

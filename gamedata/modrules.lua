@@ -8,6 +8,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local forceSingleThreaded = false
+local modoptions = Spring.GetModOptions()
+if (modoptions and (modoptions.mtpath == 0 or modoptions.mtpath == "0")) then
+	forceSingleThreaded = true
+end
+Spring.Echo("forceSingleThreaded", forceSingleThreaded)
+
 local modrules  = {
   
   movement = {
@@ -15,9 +22,13 @@ local modrules  = {
     allowPushingEnemyUnits   = true; -- defaults to false
     allowCrushingAlliedUnits = false; -- defaults to false
     allowUnitCollisionDamage = true; -- defaults to false
-    allowUnitCollisionOverlap = false,	-- defaults to true	-- this lets units clump close together when moving, after which they are pushed apart
+    allowUnitCollisionOverlap = false, -- defaults to true -- this lets units clump close together when moving, after which they are pushed apart
     allowGroundUnitGravity = false,
-	allowDirectionalPathing = true,
+    allowDirectionalPathing = true,
+    maxCollisionPushMultiplier = 0.8,
+    
+    forceCollisionsSingleThreaded  = forceSingleThreaded,
+    forceCollisionAvoidanceSingleThreaded  = forceSingleThreaded,
   },
   
   construction = {
@@ -26,14 +37,18 @@ local modrules  = {
     constructionDecaySpeed = 0.03;  -- defaults to 0.03
   },
 
+  damage = {
+    debris = 20,
+  },
 
   reclaim = {
     multiReclaim  = 1;    -- defaults to 0
     reclaimMethod = 0;    -- defaults to 1
     unitMethod    = 0;    -- defaults to 1
+    unitDrainHealth = false,
 
     unitEnergyCostFactor    = 0;  -- defaults to 0
-    unitEfficiency          = 0.5;  -- defaults to 1
+    unitEfficiency          = 0.8;  -- defaults to 1
     featureEnergyCostFactor = 0;  -- defaults to 0
 
     allowEnemies  = false;  -- defaults to true
@@ -58,7 +73,7 @@ local modrules  = {
   
   paralyze = {
     paralyzeOnMaxHealth = true, -- defaults to true
-	unitParalysisDeclineScale = 40, -- Time in seconds to go from 100% to 0% emp
+    unitParalysisDeclineScale = 40, -- Time in seconds to go from 100% to 0% emp
   },
 
   sensors = {
@@ -67,8 +82,8 @@ local modrules  = {
     decloakRequiresLineOfSight = true, -- default false
     
     los = {
-	  -- Don't bother changing these values.
-	  -- In a test, both mip levels from 2 -> 4 changed the usage from around 1% to 0.6%.
+      -- Don't bother changing these values.
+      -- In a test, both mip levels from 2 -> 4 changed the usage from around 1% to 0.6%.
       losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
       airMipLevel = 2,  -- defaults to 2
@@ -81,7 +96,7 @@ local modrules  = {
     transportHover  = 1;   -- defaults to 0
     transportShip   = 1;  -- defaults to 0
     transportAir    = 0;  -- defaults to 0
-	targetableTransportedUnits = true;
+    targetableTransportedUnits = true;
   },
 
 
@@ -125,10 +140,14 @@ local modrules  = {
   },
   
   system = {
+    allowTake = false,
+    enableSmoothMesh = false,
+    LuaAllocLimit = 2560,
     pathFinderSystem = 0, --(Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0, -- QTPFS causes desync https://springrts.com/mantis/view.php?id=5936
-	pathFinderUpdateRate = 0.0000001,
-	pathFinderRawDistMult = 1.25,
-	allowTake = false,
+    pathFinderUpdateRate = 0.0000001,
+    pathFinderRawDistMult = 100000,
+    pfForceSingleThreaded = forceSingleThreaded,
+    pfForceUpdateSingleThreaded = forceSingleThreaded,
   },
 }
 --------------------------------------------------------------------------------

@@ -22,13 +22,6 @@ function script.StopBuilding()
 	Move (nano, z_axis, 0, 12)
 end
 
-local current_nano = 1
-function script.QueryNanoPiece()
-	current_nano = 3 - current_nano
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), nanos[current_nano])
-	return nanos[current_nano]
-end
-
 -- Weaponry
 
 local flares = { piece 'flare1', piece 'flare2' }

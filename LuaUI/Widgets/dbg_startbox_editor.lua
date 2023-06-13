@@ -1,6 +1,6 @@
 function widget:GetInfo() return {
 	name    = "Startbox Editor",
-	desc    = "cruder than yo momma",
+	desc    = "Map development tool for drawing startboxes. Consult the ZK mediawiki at Startbox_API for usage and tips",
 	author  = "git blame",
 	date    = "git log",
 	license = "PD",
@@ -19,17 +19,47 @@ copy it from infolog to the config
 dont forget to change TEAM to an actual number
 ]]
 
+local MAP_WIDTH, MAP_HEIGHT = Game.mapSizeX, Game.mapSizeZ
+local LEEWAY = 20
+
 local polygon = { }
 local final_polygons = { }
 
 function widget:MousePress(mx, my, button)
+	if (button ~= 1 and button ~= 3) then
+		return
+	end
 	widgetHandler:UpdateCallIn("MapDrawCmd")
-
+	
 	local pos = select(2, Spring.TraceScreenRay(mx, my, true, true))
 	if not pos then
 		return true
 	end
-
+	
+	if pos[1] < LEEWAY then
+		pos[1] = 0
+	end
+	if pos[3] < LEEWAY then
+		pos[3] = 0
+	end
+	if pos[1] > MAP_WIDTH - LEEWAY then
+		pos[1] = MAP_WIDTH
+	end
+	if pos[3] > MAP_HEIGHT - LEEWAY then
+		pos[3] = MAP_HEIGHT
+	end
+	
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	if ctrl and #polygon > 0 then
+		eastWest = math.abs(polygon[#polygon][1] - pos[1])
+		northSouth = math.abs(polygon[#polygon][3] - pos[3])
+		if eastWest > northSouth then
+			pos[3] = polygon[#polygon][3]
+		else
+			pos[1] = polygon[#polygon][1]
+		end
+	end
+	
 	if (#polygon == 0) then
 		polygon[#polygon+1] = pos
 	else
@@ -74,22 +104,32 @@ include("keysym.lua")
 
 function widget:KeyPress(key)
 	if (key == KEYSYMS.S) then
-		local str = "\n\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
+		local str = "\t\n\t\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
 		for j = 1, #final_polygons do
-			str = str .. "\t\t{\n"
+			str = str .. "\t\t\t{\n"
 			local polygon = final_polygons[j]
 			for i = 1, #polygon do
 				local pos = polygon[i]
-				str = str .. "\t\t\t{" .. math.floor(pos[1]) .. ", " .. math.floor(pos[3]) .. "},\n"
+				str = str .. "\t\t\t\t{" .. math.floor(pos[1]) .. ", " .. math.floor(pos[3]) .. "},\n"
 			end
-			str = str .. "\t\t},\n"
+			str = str .. "\t\t\t},\n"
 		end
-		str = str .. "\t},\n"
+		str = str .. "\t\t},\n"
 		Spring.Echo(str)
-		final_polygons = {}
+		return true
 	end
 	if (key == KEYSYMS.D) and (#final_polygons > 0) then
 		final_polygons[#final_polygons] = nil
+		return true
+	end
+	if (key == KEYSYMS.N) and polygon and #polygon >= 3 then
+		final_polygons[#final_polygons+1] = polygon
+		polygon = {}
+		return true
+	end
+	if (key == KEYSYMS.U) and polygon and #polygon > 0 then
+		polygon[#polygon] = nil
+		return true
 	end
 end
 

@@ -32,8 +32,8 @@ local unitFloatIdleBehaviour = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Float State',
 	action  = 'floatstate',
-	tooltip	= 'Float / Sink', --colorful tooltip is written in integral_menu_commands.lua
-	params 	= {DEFAULT_FLOAT, 'Sink','Attack','Float'}
+	tooltip = 'Float / Sink', --colorful tooltip is written in integral_menu_commands.lua
+	params  = {DEFAULT_FLOAT, 'Sink','Attack','Float'}
 }
 
 local FLOAT_NEVER = 0
@@ -62,7 +62,6 @@ local floatByID = {data = {}, count = 0}
 
 local floatState = {}
 local aimWeapon = {}
-local GRAVITY = Game.gravity/30/30
 local RAD_PER_ROT = (math.pi/(2^15))
 local buildTestUnitDefID = UnitDefNames["turretriot"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
 --------------------------------------------------------------------------------
@@ -145,8 +144,8 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	if float[unitID] then
 		Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
 		Spring.MoveCtrl.Disable(unitID)
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
 		callScript(unitID, "script.StopMoving")
 		removeFloat(unitID)
 	end
@@ -218,8 +217,8 @@ function gadget:GameFrame(f)
 				if cmdID then
 					if (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE) and cmdOpts == CMD.OPT_RIGHT then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
 						Spring.GiveOrderArrayToUnitArray({unitID},{
-							{CMD.REMOVE, {cmdTag}, 0},--clear Spring's command that desire unit to return to old position
-							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, CMD.OPT_ALT},
+							{CMD.REMOVE, cmdTag, 0},--clear Spring's command that desire unit to return to old position
+							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT}, CMD.OPT_ALT},
 						})
 					end
 				end
@@ -362,8 +361,8 @@ function gadget:GameFrame(f)
 					Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
 					Spring.SetUnitPosition(unitID, data.x, height, data.z)
 					Spring.MoveCtrl.Disable(unitID)
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
-					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, 0)
+					Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
+					Spring.GiveOrderToUnit(unitID,CMD.WAIT, 0, 0)
 					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					
@@ -393,7 +392,8 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 			state = (state + 1)%3
 		end
 		if (cmdDescID) then
-			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = {state, 'Sink','Attack','Float'}})
+			unitFloatIdleBehaviour.params[1] = state
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitFloatIdleBehaviour.params})
 		end
 		floatState[unitID] = state
 		if state == FLOAT_ALWAYS then
@@ -426,6 +426,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if floatDefs[unitDefID] then
 		floatState[unitID] = DEFAULT_FLOAT
+		unitFloatIdleBehaviour.params[1] = DEFAULT_FLOAT
 		Spring.InsertUnitCmdDesc(unitID, unitFloatIdleBehaviour)
 	end
 end

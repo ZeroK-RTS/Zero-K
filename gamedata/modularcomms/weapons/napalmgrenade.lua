@@ -29,7 +29,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 200,
-		subs    = 10,
 	},
 
 	explosionGenerator      = [[custom:napalm_hellfire]],

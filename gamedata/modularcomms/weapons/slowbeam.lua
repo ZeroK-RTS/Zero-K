@@ -12,8 +12,6 @@ local weaponDef = {
 	customParams            = {
 		is_unit_weapon = 1,
 		slot = [[5]],
-		--timeslow_preset = [[commrecon_slowbeam]],
-		timeslow_damagefactor = [[2]],
 		timeslow_onlyslow = [[1]],
 		timeslow_smartretarget = [[0.5]],
 
@@ -24,7 +22,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 225,
+		default = 450,
 	},
 
 	explosionGenerator      = [[custom:flashslow]],

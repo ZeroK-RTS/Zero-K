@@ -19,14 +19,20 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
 local spectatingState = select(1, Spring.GetSpectatingState())
 
-local unitsToFactory = {}	-- [unitDefName] = factoryDefName
+local unitsToFactory = {} -- [unitDefName] = factoryDefName
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local preventBaitTip = "\nAvoidance is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands."
+local badTargetDescStr = "\n\nAvoid Bad Targets prevents auto-aim at low value targets. It is disabled for units with Force Fire (only for the target), Attack Move or Patrol commands. The lowest level avoids armoured targets (excluding Crab) while levels Light to Heavy ignore unidentified radar dots."
+
 
 local tooltipFunc = {}
 local tooltips = {
@@ -82,6 +88,27 @@ local tooltips = {
 		[2] = "2",
 		[3] = "3",
 	},
+	formationrank = {
+		[0] = "0",
+		[1] = "1",
+		[2] = "2",
+		[3] = "3",
+	},
+	prevent_bait = {
+		[0] = "Disable target avoidance.",
+		[1] = "Avoid shooting at light drones, Wind, Solar, Claw, Dirtbag, low value nanoframes and armoured targets (excluding Crab)." .. preventBaitTip,
+		[2] = "Avoid shooting at units costing less than 90, Razor, Sparrow, unknown radar dots, low value nanoframes and armoured targets (except Crab)." .. preventBaitTip,
+		[3] = "Avoid shooting at units costing less than 240 (excluding Stardust) as well as, Raptor, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
+		[4] = "Avoid shooting at  units costing less than 420, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
+	},
+	fire_at_shield = {
+		[0] = "Disabled.",
+		[1] = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+	},
+	fire_towards_enemy = {
+		[0] = "Disabled.",
+		[1] = "Shoot towards the closest enemy when nothing else is in range.",
+	},
 }
 
 for name, values in pairs(tooltips) do
@@ -94,7 +121,11 @@ end
 --------------------------------------------------------------------------------
 
 local function IsGround(ud)
-    return not ud.canFly and not ud.isFactory
+	return not ud.canFly
+end
+
+local function IsFactory(ud)
+	return ud.customParams.factorytab or ud.customParams.child_of_factory
 end
 
 local impulseUnitDefID = {}
@@ -115,9 +146,11 @@ options_order = {
 	'resetMoveStates', 'holdPosition',
 	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition',
 	'enableTacticalAI', 'disableTacticalAI',
+	'preventBaitOff', 'preventBaitDefault', 'preventBaitMinOne', 'preventBaitPlusOne',
 	'enableAutoAssist', 'disableAutoAssist',
 	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'setRanksToDefault', 'setRanksToThree',
+	'setFactoryRanksToThree', 'setFactoryRanksToTwo',
 	'categorieslabel',
 	'commander_label',
 	'commander_firestate0',
@@ -127,6 +160,7 @@ options_order = {
 	'commander_retreat',
 	'commander_auto_call_transport_2',
 	'commander_selection_rank',
+	'commander_formation_rank',
 }
 
 options = {
@@ -266,6 +300,74 @@ options = {
 			end
 		end,
 	},
+	preventBaitOff = {
+		type = 'button',
+		name = "Disable Avoid Bad Targets",
+		desc = "Disable low value target avoidance for all units." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = 0
+				end
+			end
+		end,
+	},
+	preventBaitDefault = {
+		type = 'button',
+		name = "Default Avoid Bad Targets",
+		desc = "Set low value target avoidance back to the default. This causes some units with costly or high reload shots to ignore targets at the 40 or 100 threshold." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = baitPreventionDefault[ud.id]
+				end
+			end
+		end,
+	},
+	preventBaitMinOne = {
+		type = 'button',
+		name = "Set min Avoid Bad Targets",
+		desc = "Set low value target avoidance to a cost threshold of 40 if the default is not higher." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = math.max(1, baitPreventionDefault[ud.id])
+				end
+			end
+		end,
+	},
+	preventBaitPlusOne = {
+		type = 'button',
+		name = "Set high Avoid Bad Targets",
+		desc = "Set low value target avoidance to one higher than the default for all units." .. badTargetDescStr,
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_prevent_bait")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = baitPreventionDefault[ud.id] + 1
+				end
+			end
+		end,
+	},
 	
 	enableAutoAssist = {
 		type = 'button',
@@ -346,7 +448,7 @@ options = {
 	},
 	setRanksToDefault = {
 		type = 'button',
-		name = "Set Selection Ranks to Default",
+		name = "Set Select Rank to Default",
 		desc = "Resets selection ranks to default, 1 for structures, 2 for constructors and 3 for combat units (including commander).",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -364,7 +466,7 @@ options = {
 	},
 	setRanksToThree = {
 		type = 'button',
-		name = "Set Selection Ranks to Three",
+		name = "Set All Select Rank to 3",
 		desc = "Effectively disables selection ranking while retaining the ability to manually set ranks.",
 		path = "Settings/Unit Behaviour/Default States/Presets",
 		OnChange = function ()
@@ -374,6 +476,42 @@ options = {
 				local find = string.find(opt, "_selection_rank")
 				if find then
 					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToThree = {
+		type = 'button',
+		name = "Factory Select Rank to 3",
+		desc = "Sets Factories and Plates to have selection rank 3.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 3
+				end
+			end
+		end,
+	},
+	setFactoryRanksToTwo = {
+		type = 'button',
+		name = "Factory Select Rank to 2",
+		desc = "Sets Factories and Plates to have selection rank 2.",
+		path = "Settings/Unit Behaviour/Default States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud and IsFactory(ud) then
+					options[opt].value = 2
 				end
 			end
 		end,
@@ -457,7 +595,7 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.auto_call_transport,
 	},
-	
+
 	commander_selection_rank = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
@@ -469,14 +607,38 @@ options = {
 		path = "Settings/Unit Behaviour/Default States/Misc",
 		tooltipFunction = tooltipFunc.selectionrank,
 	},
+
+	commander_formation_rank = {
+		name = "  Formation Rank",
+		desc = "Formation Rank: units of lower rank line up in front of units of higher rank when given line movement orders.",
+		type = 'number',
+		value = 2,
+		min = 0,
+		max = 3,
+		step = 1,
+		path = "Settings/Unit Behaviour/Default States/Misc",
+		tooltipFunction = tooltipFunc.formationrank,
+	},
 }
 
-local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
-
 local tacticalAIUnits = {}
-
-for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-	tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+local wardFireUnits = {}
+local wardFireCmdID = {}
+do
+	local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
+	for unitDefID, behaviourData in pairs(tacticalAIDefs) do
+		if not behaviourData.onlyIdleHandling then
+			local unitDefName = unitDefID and UnitDefs[unitDefID]
+			unitDefName = unitDefName and unitDefName.name
+			if unitDefName then
+				tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+			end
+			if behaviourData.hasWardFire then
+				wardFireUnits[unitDefName] = (behaviourData.wardFireDefault and 1) or 0
+				wardFireCmdID[unitDefName] = behaviourData.wardFireCmdID
+			end
+		end
+	end
 end
 
 local unitAlreadyAdded = {}
@@ -506,6 +668,7 @@ local function addUnit(defName, path)
 		Spring.Echo("Initial States invalid unit " .. defName)
 		return
 	end
+	local unitDefID = ud.id
 
 	options[defName .. "_label"] = {
 		name = "label",
@@ -584,7 +747,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_repeat"
 	end
 	
-	if factoryDefs[ud.id] then
+	if factoryDefs[unitDefID] then
 		options[defName .. "_auto_assist"] = {
 			name = "  Auto Assist",
 			desc = "Newly built constructors assist the factory",
@@ -696,7 +859,7 @@ local function addUnit(defName, path)
 			tooltipFunction = tooltipFunc.auto_call_transport,
 		}
 		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
-	elseif ud.isFactory and not ud.customParams.nongroundfac then
+	elseif Spring.Utilities.isGroundFactory(ud) then
 		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Disabled, Enabled",
@@ -725,12 +888,12 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
-	
+
 	options[defName .. "_selection_rank"] = {
 		name = "  Selection Rank",
 		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
 		type = 'number',
-		value = defaultSelectionRank[ud.id] or 3,
+		value = defaultSelectionRank[unitDefID] or 3,
 		min = 0,
 		max = 3,
 		step = 1,
@@ -738,6 +901,21 @@ local function addUnit(defName, path)
 		tooltipFunction = tooltipFunc.selectionrank,
 	}
 	options_order[#options_order+1] = defName .. "_selection_rank"
+	
+	if ud.canMove and not ud.isFactory and not (ud.springCategories.fixedwing) then
+		options[defName .. "_formation_rank"] = {
+			name = "  Formation Rank",
+			desc = "Formation Rank: set rank in formation",
+			type = 'number',
+			value = 2,
+			min = 0,
+			max = 3,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.formationrank,
+		}
+		options_order[#options_order+1] = defName .. "_formation_rank"
+	end
 	
 	if tacticalAIUnits[defName] then
 		options[defName .. "_tactical_ai_2"] = {
@@ -761,15 +939,68 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
 	end
 
-	if dontFireAtRadarUnits[ud.id] ~= nil then
+	if dontFireAtRadarUnits[unitDefID] ~= nil then
 		options[defName .. "_fire_at_radar"] = {
 			name = "  Fire at radar",
 			desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
 			type = 'bool',
-			value = dontFireAtRadarUnits[ud.id],
+			value = dontFireAtRadarUnits[unitDefID],
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_fire_at_radar"
+	end
+
+	if overkillPrevention[unitDefID] or overkillPreventionBlackHole[unitDefID] then
+		options[defName .. "_overkill_prevention"] = {
+			name = "  Overkill Prevention",
+			desc = "Check box to make these units avoid firing at targets that are already likely to die due to incoming fire.",
+			type = 'bool',
+			value = true,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_overkill_prevention"
+	end
+
+	if wardFireUnits[defName] then
+		local def = wardFireUnits[defName]
+		local wardCmd = wardFireCmdID[defName]
+		
+		if wardCmd == CMD_FIRE_AT_SHIELD then
+			options[defName .. "_fire_at_shield"] = {
+				name = "  Fire at Shields",
+				desc = "Shoot at the shields of Thugs, Felons and Convicts when nothing else is in range.",
+				type = 'bool',
+				value = (wardFireUnits[defName] == 1),
+				path = path,
+				tooltipFunction = tooltipFunc.prevent_bait,
+			}
+			options_order[#options_order+1] = defName .. "_fire_at_shield"
+		elseif wardCmd == CMD_FIRE_TOWARDS_ENEMY then
+			options[defName .. "_fire_towards_enemy"] = {
+				name = "  Fire Towards Enemies",
+				desc = "Shoot towards the closest enemy when nothing else is in range.",
+				type = 'bool',
+				value = (wardFireUnits[defName] == 1),
+				path = path,
+				tooltipFunction = tooltipFunc.prevent_bait,
+			}
+			options_order[#options_order+1] = defName .. "_fire_towards_enemy"
+		end
+	end
+
+	if baitPreventionDefault[unitDefID] then
+		options[defName .. "_prevent_bait"] = {
+			name = "  Avoid bad targets",
+			desc = "Avoid shooting at low value targets, set by a threshold.",
+			type = 'number',
+			value = baitPreventionDefault[unitDefID],
+			min = 0,
+			max = 4,
+			step = 1,
+			path = path,
+			tooltipFunction = tooltipFunc.prevent_bait,
+		}
+		options_order[#options_order+1] = defName .. "_prevent_bait"
 	end
 
 	if ud.canCloak then
@@ -784,7 +1015,7 @@ local function addUnit(defName, path)
 	end
 
 	if ud.onOffable then
-		if impulseUnitDefID[ud.id] then
+		if impulseUnitDefID[unitDefID] then
 			options[defName .. "_impulseMode"] = {
 				name = "  Gravity Gun Push/Pull",
 				desc = "Check box to default to Push.",
@@ -831,35 +1062,38 @@ local function addUnit(defName, path)
 	end
 end
 
-local function AddFactoryOfUnits(defName)
+local function AddFactoryOfUnits(defName, plateDefName)
 	if unitAlreadyAdded[defName] then
 		return
 	end
 	local ud = UnitDefNames[defName]
 	local name = string.gsub(ud.humanName, "/", "-")
 	addUnit(defName, name)
+	if plateDefName then
+		addUnit(plateDefName, name)
+	end
 	for i = 1, #ud.buildOptions do
 		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
 		unitsToFactory[UnitDefs[ud.buildOptions[i]].name] = defName
 	end
 end
 
-AddFactoryOfUnits("factoryshield")
-AddFactoryOfUnits("factorycloak")
-AddFactoryOfUnits("factoryveh")
-AddFactoryOfUnits("factoryplane")
-AddFactoryOfUnits("factorygunship")
-AddFactoryOfUnits("factoryhover")
-AddFactoryOfUnits("factoryamph")
-AddFactoryOfUnits("factoryspider")
-AddFactoryOfUnits("factoryjump")
-AddFactoryOfUnits("factorytank")
-AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("factoryshield",  "plateshield")
+AddFactoryOfUnits("factorycloak",   "platecloak")
+AddFactoryOfUnits("factoryveh",     "plateveh")
+AddFactoryOfUnits("factoryplane",   "plateplane")
+AddFactoryOfUnits("factorygunship", "plategunship")
+AddFactoryOfUnits("factoryhover",   "platehover")
+AddFactoryOfUnits("factoryamph",    "plateamph")
+AddFactoryOfUnits("factoryspider",  "platespider")
+AddFactoryOfUnits("factoryjump",    "platejump")
+AddFactoryOfUnits("factorytank",    "platetank")
+AddFactoryOfUnits("factoryship",    "plateship")
 AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua", nil, VFS.RAW_FIRST)
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands_processed.lua", nil, VFS.RAW_FIRST)
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
@@ -902,13 +1136,22 @@ end
 local function ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	local name = ud.name
+	
 	if options[name .. "_selection_rank"] and WG.SetSelectionRank then
 		WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
 	end
-	
 	if ud.customParams.commtype or ud.customParams.level then
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+	end
+	
+	if options[name .. "_formation_rank"] and WG.SetFormationRank then
+		WG.SetFormationRank(unitID, options[name .. "_formation_rank"].value)
+	end
+	if ud.customParams.commtype or ud.customParams.level then
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 end
@@ -975,9 +1218,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return
 	end
-	-- don't apply some states to save/loaded unit
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
-	
+
 	local myTeam, amLeader = AmITeamLeader(unitTeam)
 	if not amLeader then
 		if myTeam or spectatingState then
@@ -985,15 +1226,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		return
 	end
-	
-	if oldID then
-		return
-	end
 
 	local ud = UnitDefs[unitDefID]
 	local orderArray = {}
 	if ud.customParams.commtype or ud.customParams.level then
-		local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
+		local morphed = Spring.GetGameRulesParam("morphUnitCreating") == 1
 		if morphed then
 			-- Gadget and Spring unit states are applied in unit_morph gadget. Widget unit
 			-- states are handled by their widget.
@@ -1009,6 +1246,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		if options.commander_selection_rank and WG.SetSelectionRank then
 			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+		if options.commander_formation_rank and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, options.commander_formation_rank.value)
 		end
 	end
 
@@ -1089,6 +1329,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		QueueState(name, "auto_assist", CMD_FACTORY_GUARD, orderArray)
 		QueueState(name, "airstrafe1", CMD_AIR_STRAFE, orderArray)
 		QueueState(name, "floattoggle", CMD_UNIT_FLOAT_STATE, orderArray)
+		QueueState(name, "goostate", CMD_GOO_GATHER, orderArray)
 		
 		local retreat = GetStateValue(name, "retreatpercent")
 		if retreat == -1 then --if inherit
@@ -1154,11 +1395,31 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			WG.SetSelectionRank(unitID, value)
 		end
 		
+		value = GetStateValue(name, "prevent_bait")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_PREVENT_BAIT, {value}, CMD.OPT_SHIFT}
+		end
+		
+		value = GetStateValue(name, "fire_at_shield")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_FIRE_AT_SHIELD, {(value and 1) or 0}, CMD.OPT_SHIFT}
+		end
+		
+		value = GetStateValue(name, "fire_towards_enemy")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
+		end
+		
 		value = GetStateValue(name, "disableattack")
 		if value then -- false is the default
 			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
 		end
-		
+
+		value = GetStateValue(name, "formation_rank")
+		if value and WG.SetFormationRank then
+			WG.SetFormationRank(unitID, value)
+		end
+	
 		QueueState(name, "tactical_ai_2", CMD_UNIT_AI, orderArray)
 		
 		value = GetStateValue(name, "tactical_ai_transport")
@@ -1172,6 +1433,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		QueueState(name, "fire_at_radar", CMD_DONT_FIRE_AT_RADAR, orderArray, true)
+		QueueState(name, "overkill_prevention", CMD_PREVENT_OVERKILL, orderArray)
 		QueueState(name, "personal_cloak_0", CMD_WANT_CLOAK, orderArray)
 		QueueState(name, "impulseMode", CMD_PUSH_PULL, orderArray)
 		QueueState(name, "activateWhenBuilt", CMD_WANT_ONOFF, orderArray)
@@ -1219,12 +1481,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
-		return
-	end
-	
-	local oldID = Spring.GetUnitRulesParam(unitID, "saveload_oldID")
-	if oldID then
+	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetGameRulesParam("morphUnitCreating") == 1) then
 		return
 	end
 

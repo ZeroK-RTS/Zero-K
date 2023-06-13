@@ -18,6 +18,10 @@ return { chicken_shield = {
   customParams        = {
     shield_emit_height = 26,
     shield_emit_offset = 0,
+
+    outline_x = 145,
+    outline_y = 145,
+    outline_yoff = 27.5,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -31,8 +35,7 @@ return { chicken_shield = {
   maxSlope            = 37,
   maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
-  minCloakDistance    = 75,
-  movementClass       = [[AKBOT6]],
+  movementClass       = [[AKBOT4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[chicken_shield.s3o]],
@@ -56,7 +59,7 @@ return { chicken_shield = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 
@@ -101,7 +104,6 @@ return { chicken_shield = {
       damage                  = {
         default = 60,
         planes  = 60,
-        subs    = 6,
       },
 
       dance                   = 60,
@@ -146,7 +148,6 @@ return { chicken_shield = {
       damage                  = {
         default = 0.01,
         planes  = 0.01,
-        subs    = 0.01,
       },
 
       explosionGenerator      = [[custom:NONE]],

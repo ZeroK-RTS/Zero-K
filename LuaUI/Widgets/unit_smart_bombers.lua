@@ -7,7 +7,7 @@
 function widget:GetInfo()
   return {
     name      = "Smart Bombers",
-    desc      = "Automatically sets bombers to fire at will when following fight or patrol orders, and hold fire otherwise.",
+    desc      = "Automatically sets bombers to fire at will when following fight or patrol orders, and hold fire otherwise. Bomber Fog Chase replaces this behaviour.",
     author    = "aeonios",
     date      = "Nov, 2016",
     license   = "GNU GPL, v2 or later",

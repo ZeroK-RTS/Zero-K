@@ -16,7 +16,7 @@ VFS.Include("LuaRules/Configs/constants.lua")
 
 local GetLeftRightAllyTeamIDs = VFS.Include("LuaUI/Headers/allyteam_selection_utilities.lua")
 
-options_path = 'Settings/HUD Panels/Attrition Counter'
+options_path = 'Settings/HUD Panels/Extras/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
 	updateFrequency = { -- fixme: this setting should die and the counters should update if and only if needed
@@ -467,7 +467,6 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function CreateWindow()
-	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local countsOffset = 43;
 	
 	--// WINDOW

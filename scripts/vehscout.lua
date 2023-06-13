@@ -3,7 +3,7 @@ include "constants.lua"
 local base, body, turret, gun, barrel, bwheel, fwheel, firepoint = piece('base', 'body', 'turret', 'gun', 'barrel', 'bwheel', 'fwheel', 'firepoint')
 
 -- tweakables
-local AIM_SPEED = math.rad(200)
+local AIM_SPEED = math.rad(320)
 
 local LEAN_SPEED = math.rad(100)
 local LEAN_MAX = math.rad(50)
@@ -76,7 +76,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal (SIG_AIM)
 	SetSignalMask (SIG_AIM)
 	Turn (turret, y_axis, heading, AIM_SPEED)
-	Turn (gun,    x_axis,  -pitch, AIM_SPEED)
+	Turn (gun,    x_axis,  -pitch, AIM_SPEED * 0.4)
 	WaitForTurn (turret, y_axis)
 	WaitForTurn (gun,    x_axis)
 	StartThread (RestoreAfterDelay)

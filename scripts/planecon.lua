@@ -5,17 +5,13 @@ local base = piece 'base'
 local body = piece 'body'
 local engine1 = piece 'engine1'
 local engine2 = piece 'engine2'
-local nozzle = piece 'nozzle'
 local nano = piece 'nano'
 
 --New bits
 local centreClaw 		= piece 'CentreClaw'
 local centreClawBit 	= piece 'CentreClawBit'
-local CentreNano		= piece 'CentreNano'
 local leftClaw 			= piece 'LeftClaw'
 local leftClawBit 		= piece 'LeftClawBit'
-local leftNano 			= piece 'LeftNano'
-local rightNano 		= piece 'RightNano'
 local rightClaw 		= piece 'RightClaw'
 local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
@@ -23,8 +19,9 @@ local engShield2 		= piece 'EngShield2'
 
 local smokePiece = {base, engine1, engine2}
 
--- intentionally not {CentreNano, leftNano, rightNano}
--- 3 beams look too powerful for a low 4 BP constructor
+-- unused pieces: nozzle, CentreNano, LeftNano, RightNano
+-- the latter 3 intentionally not used as nano beam pieces
+-- 3 beams look too powerful for a low BP constructor
 local nanoPieces = {nano}
 
 local SIG_TILT = 1
@@ -44,7 +41,7 @@ local function TiltBody()
 			Move(engShield2, y_axis, -0.25*speed, 2)
 			Sleep(100)
 		else
-			Turn(base, x_axis, math.rad(0), math.rad(45))
+			Turn(base, x_axis, 0, math.rad(45))
 			Move(engShield1, y_axis, 0, 2)
 			Move(engShield2, y_axis, 0, 2)
 			Sleep(100)
@@ -118,13 +115,13 @@ function script.StopBuilding()
 	StartThread(TiltBody)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	
-	Turn(base,x_axis, math.rad(0),0.5)
-	Turn(centreClaw,x_axis, math.rad(0),0.5)
-	Turn(centreClawBit,x_axis, math.rad(0),2)
-	Turn(leftClaw,y_axis, math.rad(0),0.5)
-	Turn(leftClawBit,y_axis, math.rad(0),2)
-	Turn(rightClaw,y_axis, math.rad(0),0.5)
-	Turn(rightClawBit,y_axis, math.rad(0),2)
+	Turn(base,x_axis, 0,0.5)
+	Turn(centreClaw,x_axis, 0,0.5)
+	Turn(centreClawBit,x_axis, 0,2)
+	Turn(leftClaw,y_axis, 0,0.5)
+	Turn(leftClawBit,y_axis, 0,2)
+	Turn(rightClaw,y_axis, 0,0.5)
+	Turn(rightClawBit,y_axis, 0,2)
 	
 	--[[
 	WaitForTurn(centreClaw, x_axis)
@@ -134,11 +131,6 @@ function script.StopBuilding()
 	WaitForTurn(rightClaw, y_axis)
 	WaitForTurn(rightClawBit, y_axis)
 	]]
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), nano)
-	return nano
 end
 
 function script.Killed(recentDamage, maxHealth)

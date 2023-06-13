@@ -1,11 +1,8 @@
 return { turrettorp = {
   unitname          = [[turrettorp]],
   name              = [[Urchin]],
-  description       = [[Torpedo Launcher]],
-  acceleration      = 0,
+  description       = [[Torpedo Launcher (Anti-Sub)]],
   activateWhenBuilt = true,
-  brakeRate         = 0,
-
   buildCostMetal    = 120,
   builder           = false,
   buildPic          = [[turrettorp.png]],
@@ -24,13 +21,9 @@ return { turrettorp = {
   footprintX        = 3,
   footprintZ        = 3,
   iconType          = [[defensetorp]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-
   maxDamage         = 1020,
   maxSlope          = 18,
   maxVelocity       = 0,
-  minCloakDistance  = 150,
   noAutoFire        = false,
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName        = [[torpedo launcher.s3o]],
@@ -39,7 +32,6 @@ return { turrettorp = {
 
   sightDistance     = 653, -- Range*1.1 + 48 for radar overshoot
   sonarDistance     = 653,
-  turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
   yardMap           = [[wwwwwwwww]],
@@ -64,10 +56,15 @@ return { turrettorp = {
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
       burnblow                = true,
+      canAttackGround         = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
       cegTag                  = [[torpedo_trail]],
+
+      customparams = {
+        stays_underwater = 1,
+      },
 
       damage                  = {
         default = 190,

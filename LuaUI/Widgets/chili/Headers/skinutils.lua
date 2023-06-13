@@ -565,7 +565,7 @@ function DrawButton(obj)
 
 	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
-		font:Print(obj.caption, w*0.5 + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), "center", "linecenter")
+		font:Print(obj.caption, w*obj.alignPadding + (obj.captionHorAlign or 0), math.floor(h*0.5 - font.size*0.35) + (obj.captionAlign or 0), obj.align, "linecenter")
 	end
 end
 
@@ -607,16 +607,20 @@ function DrawEditBox(obj)
 	gl.Texture(0, false)
 
 	local text = obj.text and tostring(obj.text)
-		if text and obj.textEditing then
-				text = text .. obj.textEditing
-		end
+	if text and obj.textEditing then
+		text = text .. obj.textEditing
+	end
 	local font = _GetControlFont(obj)
 	local displayHint = false
 
-	if text == "" and not obj.state.focused then
-		text = obj.hint
-		displayHint = true
-		font = obj.hintFont
+	if text == "" then
+		if obj.noHint then
+			text = false
+		else
+			text = obj.hint
+			displayHint = true
+			font = obj.hintFont
+		end
 	end
 
 	if (text) then
@@ -1038,7 +1042,7 @@ function DrawCheckbox(obj)
 	gl.Color(1, 1, 1, 1)
 	if (obj.caption) and not obj.noFont then
 		local font = _GetControlFont(obj)
-		font:Print(obj.caption, tx, ty - font.size*0.35, nil, obj.valign)
+		font:Print(obj.caption, tx + obj.textoffset, ty - font.size*0.35, nil, obj.valign)
 	end
 end
 
@@ -1340,7 +1344,7 @@ function DrawTabBarItem(obj)
 
 	if (obj.caption) and not obj.noFont then
 		local cx, cy, cw, ch = unpack4(obj.clientArea)
-		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "center")
+		_GetControlFont(obj):DrawInBox(obj.caption, cx, cy, cw, ch, "center", "linecenter")
 	end
 end
 

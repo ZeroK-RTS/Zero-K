@@ -26,9 +26,8 @@ end
 local xtiltv, ztiltv = 0, 0
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local function Suspension()
-	local xtilt, xtilta = 0, 0
-	local ztilt, ztilta = 0, 0
-	local ya, yv, yp = 0, 0, 0
+	local xtilt, ztilt = 0, 0
+	local yv, yp = 0, 0
 
 	while true do
 		local s1r = GetWheelHeight(gs1r)
@@ -38,15 +37,15 @@ local function Suspension()
 		local s2l = GetWheelHeight(gs2l)
 		local s3l = GetWheelHeight(gs3l)
 
-		xtilta = (s3r + s3l - s1l - s1r)/6000
+		local xtilta = (s3r + s3l - s1l - s1r)/6000
 		xtiltv = xtiltv*0.99 + xtilta
 		xtilt = xtilt*0.98 + xtiltv
 
-		ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
+		local ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/15000
 		ztiltv = ztiltv*0.99 + ztilta
 		ztilt = ztilt*0.99 + ztiltv
 
-		ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
+		local ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1500
 		yv = yv*0.99 + ya
 		if yv < -0.1 then
 			yv = -0.1

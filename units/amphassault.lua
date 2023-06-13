@@ -14,9 +14,13 @@ return { amphassault = {
   collisionVolumeOffsets  = [[0 0 0]],
   --collisionVolumeScales = [[70 70 70]],
   --collisionVolumeType   = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[105 105 105]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
+    bait_level_default = 1,
     amph_regen = 40,
     amph_submerged_at = 40,
     sink_on_emp    = 0,
@@ -30,14 +34,11 @@ return { amphassault = {
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[amphassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 8400,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxReverseVelocity  = 0,
-  minCloakDistance    = 75,
   movementClass       = [[AKBOT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[amphassault.s3o]],
@@ -48,6 +49,7 @@ return { amphassault = {
 
     explosiongenerators = {
       [[custom:watercannon_muzzle]],
+      [[custom:bubbles_small]],
     },
 
   },
@@ -59,7 +61,7 @@ return { amphassault = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 66,
-  turnRate            = 500,
+  turnRate            = 600,
   upright             = false,
 
   weapons                       = {
@@ -97,7 +99,6 @@ return { amphassault = {
       damage                  = {
         default = 750.1,
         planes  = 750.1,
-        subs    = 45.1,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],
@@ -147,7 +148,6 @@ return { amphassault = {
 
       damage                  = {
         default = 300,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:flash1bluedark]],
@@ -160,7 +160,7 @@ return { amphassault = {
       laserFlareSize          = 10.4,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 550,
+      range                   = 600,
       reloadtime              = 6,
       rgbColor                = [[0 0 1]],
       scrollSpeed             = 5,

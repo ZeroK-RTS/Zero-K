@@ -25,7 +25,6 @@ local feet = true
 
 --signals
 local SIG_Aim = 1
-local SIG_Aim2 = 2
 local SIG_Fly = 16
 
 --cob values

@@ -13,28 +13,18 @@ function gadget:GetInfo()
    }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local SAVE_FILE = "Gadgets/unit_timeslow.lua"
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 --SYNCED
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitCOBValue     = Spring.GetUnitCOBValue
-local spAreTeamsAllied      = Spring.AreTeamsAllied
 local spValidUnitID         = Spring.ValidUnitID
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spGetUnitHealth       = Spring.GetUnitHealth
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
-local spGetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy
+local GetUnitCost           = Spring.Utilities.GetUnitCost
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
@@ -52,8 +42,6 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDATE_PERIOD = include("LuaRules/Configs/timeslow_defs.lua")
 local slowedUnits = {}
-
-_G.slowedUnits = slowedUnits
 
 Spring.SetGameRulesParam("slowState",1)
 
@@ -115,8 +103,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 
 	if GG.Awards and GG.Awards.AddAwardPoints then
-		local ud = UnitDefs[unitDefID]
-		local cost_slowdown = (slowdown / ud.health) * ud.metalCost
+		local _, maxHp = spGetUnitHealth(unitID)
+		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID)
 		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
 	end
 
@@ -136,10 +124,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 					if cID_2 == CMD_SET_WANTED_MAX_SPEED then
 						spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1, cTag_2}, 0)
 					else
-						spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1},0)
+						spGiveOrderToUnit(attackerID,CMD_REMOVE,cTag_1,0)
 					end
 					if re then
-						spGiveOrderToUnit(attackerID,CMD_ATTACK, {cp_1},CMD.OPT_SHIFT)
+						spGiveOrderToUnit(attackerID,CMD_ATTACK, cp_1,CMD.OPT_SHIFT)
 					end
 				end
 			end
@@ -151,18 +139,18 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 					
 					local team = spGetUnitTeam(newTargetID)
 					if (not team) or team ~= gaiaTeamID then
-						spSetUnitTarget(attackerID,newTargetID)
+						spSetUnitTarget(attackerID, newTargetID)
 						if cID_1 and cID_1 == CMD_ATTACK then
 							local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
 							if cID_2 and cID_2 == CMD_SET_WANTED_MAX_SPEED then
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1,cTag_2}, 0)
 							else
-								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_1},0)
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,cTag_1,0)
 							end
 						elseif cID_2 and (cID_1 == CMD_MOVE or cID_1 == CMD_RAW_MOVE or cID_1 == CMD_RAW_BUILD) then
 							local cID_2, cOpt_2, cTag_2, cps_1, cps_2 = Spring.GetUnitCurrentCommand(attackerID, 2)
 							if cID_2 == CMD_FIGHT and Spring.Utilities.CheckBit(gadget:GetInfo().name, cOpt_2, CMD.OPT_INTERNAL) and (not cps_2) and cps_1 == unitID then
-								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cTag_2},0)
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,cTag_2,0)
 							end
 						end
 					end
@@ -182,21 +170,24 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 
-local function addSlowDamage(unitID, damage)
-
+local function addSlowDamage(unitID, damage, overslow)
 	-- add stats that the unit requires for this gadget
-	if not slowedUnits[unitID] then
-		slowedUnits[unitID] = {
+	local su = slowedUnits[unitID]
+	if not su then
+		su = {
 			slowDamage = 0,
-			degradeTimer = DEGRADE_TIMER,
 		}
+		slowedUnits[unitID] = su
 	end
 
 	-- add slow damage
-	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + damage
-	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
-	
-	updateSlow( unitID, slowedUnits[unitID]) -- without this unit does not fire slower, only moves slower
+	su.slowDamage = su.slowDamage + damage
+	su.degradeTimer = DEGRADE_TIMER
+	if overslow then
+		su.extraSlowBound = math.max(overslow * DEGRADE_FACTOR, su.extraSlowBound or 0)
+	end
+
+	updateSlow(unitID, su) -- without this unit does not fire slower, only moves slower
 end
 
 local function getSlowDamage(unitID)
@@ -246,39 +237,4 @@ function gadget:UnitDestroyed(unitID)
    removeUnit(unitID)
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Time Slow", SAVE_FILE) or {}
-	slowedUnits = {}
-	for oldID, entry in pairs(loadData) do
-		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		if newID then
-			slowedUnits[newID] = entry
-			GG.UpdateUnitAttributes(newID)
-		end
-	end
-	_G.slowedUnits = slowedUnits
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-else
--- UNSYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, Spring.Utilities.MakeRealTable(SYNCED.slowedUnits, "Time Slow"))
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 end

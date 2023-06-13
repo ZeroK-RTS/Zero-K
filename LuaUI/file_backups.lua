@@ -6,7 +6,7 @@
 
 local function CheckLUAFileAndBackup(filePath)
 	Spring.Log("CheckLUAFileAndBackup", LOG.INFO, "Creating backup for file", filePath)
-
+	
 	local backupPath = filePath .. ".bak"
 	local chunk, err = loadfile(filePath)
 	if chunk then
@@ -18,7 +18,7 @@ local function CheckLUAFileAndBackup(filePath)
 		end
 	end
 	Spring.Log("CheckLUAFileAndBackup", LOG.WARNING, tostring(err), "Trying to load backup instead", backupPath)
-
+	
 	local backupChunk, backupErr = loadfile(backupPath)
 	if backupChunk then
 		setfenv(backupChunk, {})
@@ -29,7 +29,7 @@ local function CheckLUAFileAndBackup(filePath)
 		end
 	end
 	Spring.Log("CheckLUAFileAndBackup", LOG.ERROR, tostring(backupErr), "Backup also failed, removing both")
-
+	
 	os.remove (filePath)
 	os.remove (backupPath)
 end

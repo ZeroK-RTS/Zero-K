@@ -29,7 +29,7 @@ local spGetUnitHealth = Spring.GetUnitHealth
 ------------------------
 --  CONFIG
 ------------------------
-options_path = 'Settings/Nag/Clippy Comments'
+options_path = 'Settings/Tips/Clippy Comments'
 options = {
 	rankLimit = {
 		name = "Rank Limit",

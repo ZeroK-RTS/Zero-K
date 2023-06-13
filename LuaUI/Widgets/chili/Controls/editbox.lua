@@ -11,7 +11,7 @@
 -- @string[opt = "left"] align alignment
 -- @string[opt = "linecenter"] valign vertical alignment
 -- @string[opt = ""] text text contained in the editbox
--- @string[opt = ""] hint hint to be displayed when there is no text and the control isn't focused
+-- @string[opt = ""] hint hint to be displayed when there is no text
 -- @int[opt = 1] cursor cursor position
 -- @bool passwordInput specifies whether the text should be treated as a password
 EditBox = Control:Inherit{
@@ -28,7 +28,7 @@ EditBox = Control:Inherit{
 	align    = "left",
 	valign   = "linecenter",
 
-	hintFont = table.merge({ color = {1, 1, 1, 0.7} }, Control.font),
+	hintFont = table.merge({ color = {1, 1, 1, 0.48} }, Control.font),
 
 	text   = "", -- Do NOT use directly.
 	hint   = "",
@@ -83,8 +83,14 @@ function EditBox:New(obj)
 	obj = inherited.New(self, obj)
 	obj._interactedTime = Spring.GetTimer()
 		--// create font
-	obj.hintFont = Font:New(obj.hintFont)
-	obj.hintFont:SetParent(obj)
+	if not obj.noHint then
+		if obj.objectOverrideHintFont then
+			obj.hintFont = obj.objectOverrideHintFont
+		else
+			obj.hintFont = Font:New(obj.hintFont)
+			obj.hintFont:SetParent(obj)
+		end
+	end
 	local text = obj.text
 	obj.text = nil
 	obj:SetText(text)
@@ -95,7 +101,9 @@ end
 
 function EditBox:Dispose(...)
 	Control.Dispose(self)
-	self.hintFont:SetParent()
+	if not (self.noHint or self.objectOverrideHintFont) then
+		self.hintFont:SetParent()
+	end
 end
 
 function EditBox:HitTest(x, y)
@@ -149,6 +157,11 @@ function EditBox:SetText(newtext)
 	end
 	self:UpdateLayout()
 	self:Invalidate()
+end
+
+function EditBox:Clear()
+	self:SetText("")
+	inherited.TextModified(self)
 end
 
 function EditBox:_LineLog2Phys(logicalLine, pos)
@@ -744,6 +757,7 @@ function EditBox:ClearSelected()
 	self.selEnd = nil
 	self.selEndY = nil
 	self:Invalidate()
+	inherited.TextModified(self)
 end
 
 -- TODO only works/tested for not multiline things, joy ^_^
@@ -820,6 +834,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 			else
 				self.text, self.cursor = Utf8BackspaceAt(self.text, self.cursor)
 			end
+			inherited.TextModified(self)
 		else
 			self:ClearSelected()
 		end
@@ -834,6 +849,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 				self.text = Utf8DeleteAt(txt, cp)
 				self:UpdateLine(1, self.text)
 			end
+			inherited.TextModified(self)
 		else
 			self:ClearSelected()
 		end
@@ -930,6 +946,7 @@ function EditBox:TextInput(utf8char, ...)
 
 	self._interactedTime = Spring.GetTimer()
 	inherited.TextInput(self, utf8char, ...)
+	inherited.TextModified(self, utf8char, ...)
 	self:UpdateLayout()
 	self:Invalidate()
 	return self

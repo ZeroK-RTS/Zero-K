@@ -3,8 +3,6 @@ include "constants.lua"
 --pieces
 local base, flare = piece('base', 'flare')
 
-local smokePiece = {base}
-
 ----------------------------------------------------------
 
 function script.Create()

@@ -136,11 +136,15 @@ local function RestoreAfterDelay()
 	Turn(rshoulder, z_axis, 0, 3)
 end
 
-function script.QueryWeapon1() return flare end
+function script.QueryWeapon()
+	return flare
+end
 
-function script.AimFromWeapon1() return chest end
+function script.AimFromWeapon()
+	return chest
+end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
@@ -166,15 +170,12 @@ function script.AimWeapon1(heading, pitch)
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	EmitSfx(flare, 1025)
 end
 
 function script.BlockShot(num, targetID)
 	return GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, Spring.GetUnitAllyTeam(unitID))
-end
-
-function preJump(turn, distance)
 end
 
 function beginJump()
@@ -188,9 +189,6 @@ function jumping()
 	EmitSfx(rfoot, GG.Script.UNIT_SFX2)
 	EmitSfx(lshoulder, GG.Script.UNIT_SFX3)
 	EmitSfx(rshoulder, GG.Script.UNIT_SFX3)
-end
-
-function halfJump()
 end
 
 function endJump()

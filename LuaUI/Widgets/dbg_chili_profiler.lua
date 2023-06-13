@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "ChiliProfiler",
-    desc      = "",
+    desc      = "Profiles the Chili API",
     author    = "",
     date      = "2013",
     license   = "GPLv2",

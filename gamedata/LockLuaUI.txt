@@ -1,3 +1,5 @@
-You can override CA's widget handler by creating camain.lua in your LuaUI
-directory and changing "cawidgets.lua" to "widgets.lua", or by copying your
-widget handler to cawidgets.lua.
+Obosolete for modern engines (since 104-813).
+
+Left here for compatibility with 104-287, which was the Steam release version,
+for easy comparison - without this, the engine supplied widgets.lua is used,
+which does not like our modern widget handler.

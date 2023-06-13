@@ -1,7 +1,8 @@
 include "constants.lua"
 include "pieceControl.lua"
 
-local base, body, aim = piece('base', 'body', 'aim')
+-- unused piece: 'base'
+local body, aim = piece('body', 'aim')
 local door1, door2, hinge1, hinge2 = piece('door1', 'door2', 'hinge1', 'hinge2')
 local turret, launcher, firep1, firep2 = piece('turret', 'launcher', 'firep1', 'firep2')
 
@@ -27,8 +28,8 @@ local function Close ()
 	WaitForMove (turret, y_axis)
 	if disarmed then return	end
 
-	Turn (door1, z_axis, math.rad(150),math.rad(125))
-	Turn (door2, z_axis, -math.rad(150),math.rad(125))
+	Turn (door1, z_axis, math.rad( 150), math.rad(125))
+	Turn (door2, z_axis, math.rad(-150), math.rad(125))
 	WaitForTurn (door1, z_axis)
 	if disarmed then return	end
 

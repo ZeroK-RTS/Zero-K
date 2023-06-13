@@ -2,7 +2,7 @@ local base = piece 'base'
 local tube = piece 'tube'
 local tower = piece 'tower'
 local nuke = piece 'nuke'
-local hoses = piece 'hoses'
+-- unused piece: hoses
 local doorl = piece 'doorl'
 local doorr = piece 'doorr'
 local point = piece 'point'
@@ -96,7 +96,7 @@ function StockpileChanged(newStock)
 end
 
 function script.Create()
-	StartThread(GG.Script.SmokeUnit, unitID, {base})
+	StartThread(GG.Script.SmokeUnit, unitID, {piece("smoke1", "smoke2", "smoke3")})
 	Hide(tube)
 	Hide(tower)
 	Hide(nuke)

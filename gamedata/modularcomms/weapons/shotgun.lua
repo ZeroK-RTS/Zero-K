@@ -28,7 +28,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 32,
-		subs    = 1.6,
 	},
 
 	duration                = 0.02,
@@ -39,8 +38,8 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
 	projectiles             = 4,
-	range                   = 290,
-	reloadtime              = 2,
+	range                   = 285,
+	reloadtime              = 54/30,
 	rgbColor                = [[1 1 0]],
 	soundHit                = [[impacts/shotgun_impactv5]],
 	soundStart              = [[weapon/shotgun_firev4]],
@@ -51,7 +50,7 @@ local weaponDef = {
 	tolerance               = 10000,
 	turret                  = true,
 	weaponType              = [[LaserCannon]],
-	weaponVelocity          = 880,
+	weaponVelocity          = 950,
 }
 
 return name, weaponDef

@@ -93,7 +93,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-	local aiOnTeam = {}
 	usingAI = false
 
 	--// Mex spot detection
@@ -119,7 +118,6 @@ function gadget:Initialize()
 				end
 				
 				aiTeam[team] = AiTeamHandler.CreateAiTeam(allyteamID, team, allyTeamInfo[allyTeam])
-				aiOnTeam[allyTeam] = true
 				usingAI = true
 			end
 		end

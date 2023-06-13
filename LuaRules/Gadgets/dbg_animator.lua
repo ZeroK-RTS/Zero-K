@@ -28,10 +28,6 @@ local function tobool(val)
   return false
 end
 
-local devMode = tobool(Spring.GetModOptions().devmode)
---if not devMode then return end
-
-
 local echo = Spring.Echo
 
 if (gadgetHandler:IsSyncedCode()) then

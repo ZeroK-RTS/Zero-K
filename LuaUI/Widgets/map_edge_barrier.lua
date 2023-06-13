@@ -77,11 +77,18 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local offset = (Spring.GetGameRulesParam("waterlevel") or 0)
 local function GetGroundHeight(x, z)
-	return spGetGroundHeight(x,z)
+	return spGetGroundHeight(x,z) - offset
 end
 
 local function IsIsland()
+	if WG.GetIslandOverride then
+		local override, value = WG.GetIslandOverride()
+		if override then
+			return value
+		end
+	end
 	local sampleDist = 512
 	for i=1,Game.mapSizeX,sampleDist do
 		-- top edge
@@ -210,7 +217,12 @@ function widget:Initialize()
 	Initialize()
 end
 
+local firstUpdate = true
 function widget:Update()
+	if firstUpdate then
+		firstUpdate = false
+		return
+	end
 	Initialize()
 end
 

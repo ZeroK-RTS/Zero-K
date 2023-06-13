@@ -2,7 +2,9 @@ if GG.StartStopMovingControl then
 	return
 end
 
-function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving)
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
+
+function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, fallingCountsAsMoving, externalDataAccess, fallTimeLeeway, pileHaxUponHax)
 	local spGetGroundHeight = Spring.GetGroundHeight
 	local spGetUnitVelocity = Spring.GetUnitVelocity
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -19,19 +21,38 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 		if not x then
 			return
 		end
+		if externalDataAccess then
+			moving = externalDataAccess.moving
+		end
 		height = spGetGroundHeight(x,z)
-		if y - height < 1 then
-			speed = select(4, spGetUnitVelocity(unitID))
-			--Spring.Echo("speed", speed, "moving", moving, "Spring.GetUnitTravel", Spring.GetUnitTravel(unitID))
-			if moving then
-				if speed <= thresholdSpeed then
-					moving = false
-					stopFunc()
+		--Spring.Echo("y - height", y - height)
+		if y - height < 0.01 then
+			if externalDataAccess and externalDataAccess.fallTime then
+				externalDataAccess.fallTime = externalDataAccess.fallTime - 1
+				if externalDataAccess.fallTime <= 0 then
+					externalDataAccess.fallTime = false
 				end
-			else
-				if speed > thresholdSpeed then
-					moving = true
-					startFunc()
+			end
+			
+			if not (externalDataAccess and externalDataAccess.fallTime) then
+				speed = select(4, spGetUnitVelocity(unitID))
+				--Spring.Echo("speed", speed, "moving", moving, "Spring.GetUnitTravel", Spring.GetUnitTravel(unitID))
+				if moving then
+					if speed <= ((externalDataAccess and externalDataAccess.thresholdSpeed) or thresholdSpeed) then
+						moving = false
+						stopFunc()
+					end
+				else
+					if speed > ((externalDataAccess and externalDataAccess.thresholdSpeed) or thresholdSpeed) then
+						moving = true
+						startFunc()
+					elseif pileHaxUponHax then
+						local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = Spring.GetUnitCurrentCommand(unitID)
+						if cmdID == CMD_RAW_MOVE then
+							moving = true
+							startFunc()
+						end
+					end
 				end
 			end
 		elseif fallingCountsAsMoving then
@@ -39,6 +60,9 @@ function GG.StartStopMovingControl(unitID, startFunc, stopFunc, thresholdSpeed, 
 				moving = true
 				startFunc()
 			end
+		elseif fallTimeLeeway then
+			-- Falling does not count as moving and we have some time to not start moving after hitting the ground
+			externalDataAccess.fallTime = fallTimeLeeway
 		end
 		Sleep(350)
 	end

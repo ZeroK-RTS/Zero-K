@@ -80,6 +80,14 @@ confdata.eopt = {}
 local function nullFunc()
 end
 
+local function SetWidgetEnableState(widget, state)
+	if state then
+		spSendCommands{"luaui enablewidget " .. widget}
+	else
+		spSendCommands{"luaui disablewidget " .. widget}
+	end
+end
+
 local function AddOption(path, option)
 	option.path = path or "Settings/Broken Paths"
 	if not option.key then
@@ -148,8 +156,15 @@ confdata.subMenuIcons = {
 	['Hotkeys/Camera']              = imgPath..'epicmenu/video_camera.png',
 	['Hotkeys/Construction']        = imgPath..'factory.png',
 	['Hotkeys/Selection']           = imgPath..'epicmenu/selection.png',
-	['Hotkeys/Commands']            = imgPath..'epicmenu/fingertap.png',
-	['Hotkeys/Command Panel']       = imgPath..'epicmenu/control_panel.png',
+	['Hotkeys/Commands']            = imgPath..'commands/Bold/move.png',
+	['Hotkeys/Grid Hotkeys']       = imgPath..'epicmenu/grid.png',
+	
+	['Hotkeys/Commands/Targeted']   = imgPath..'commands/Bold/attack.png',
+	['Hotkeys/Commands/Instant']    = imgPath..'commands/Bold/action.png',
+	['Hotkeys/Commands/State']      = imgPath..'commands/states/move_engage.png',
+	
+	['Hotkeys/Camera/Camera Position Hotkeys']     = imgPath..'epicmenu/marker.png',
+	['Hotkeys/Camera/Camera Mode Hotkeys']         = imgPath..'epicmenu/move.png',
 	
 	['Settings/Reset Settings']     = imgPath..'epicmenu/undo.png',
 	['Settings/Audio']              = imgPath..'epicmenu/vol.png',
@@ -160,25 +175,28 @@ confdata.subMenuIcons = {
 	['Settings/HUD Presets']        = imgPath..'epicmenu/speed-test-icon.png',
 	['Settings/Interface']          = imgPath..'epicmenu/robotarm.png',
 	['Settings/Misc']               = imgPath..'epicmenu/misc.png',
+	['Settings/Tips']    = imgPath..'epicmenu/questionmark.png',
 	
 	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Reclaim Highlight']        = imgPath..'epicmenu/reclaimfield.png',
 	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
 	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Common Team Colors']       = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Build ETA']                = imgPath..'epicmenu/stop_watch_icon.png',
-	['Settings/Interface/Defense and Cloak Ranges'] = imgPath..'epicmenu/target.png',
+	['Settings/Interface/Defence and Cloak Ranges'] = imgPath..'epicmenu/target.png',
 	['Settings/Interface/Command Visibility']       = imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Line Formations']          = imgPath..'commands/bold/move.png',
 	['Settings/Interface/Hovering Icons']           = imgPath..'epicmenu/halo.png',
 	['Settings/Interface/Selection']                = imgPath..'epicmenu/selection.png',
 	['Settings/Interface/Control Groups']           = imgPath..'epicmenu/addusergroup.png',
 	['Settings/Interface/Gesture Menu']             = imgPath..'epicmenu/stock_brightness.png',
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
-	['Settings/Interface/Area Commands']            = imgPath..'commands/bold/areaattack.png',
+	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -192,11 +210,19 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Player List']             = imgPath..'epicmenu/people.png',
 	['Settings/HUD Panels/Extras/Docking']          = imgPath..'epicmenu/anchor.png',
 	['Settings/HUD Panels/Selected Units Panel']    = imgPath..'epicmenu/grid.png',
+	['Settings/HUD Panels/Command Panel']           = imgPath..'epicmenu/control_panel.png',
+	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
+	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
+	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
+	['Settings/HUD Panels/Spectator Panels']        = imgPath..'advplayerlist/spec.png',
+	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 }
 
 confdata.simpleModeDirectory = {
 	['Reset Settings'] = true,
 	['Interface'] = true,
+	['Commands'] = true,
+	['Presets'] = true,
 	['Audio'] = true,
 	['Graphics'] = true,
 	['Camera'] = true,
@@ -291,11 +317,11 @@ local cameraPath = 'Settings/Camera'
 	ShRadio( cameraPath,
 		'Camera Type', {
 			{name = 'Default camera', key='Default', desc='Default camera', hotkey=nil},
-			{name = 'FPS',key='FPS', hotkey=nil},
-			{name = 'Free',key='Free', hotkey=nil},
 			{name = 'Rotatable Overhead',key='Rotatable Overhead', hotkey=nil},
-			{name = 'Total War',key='Total War',  hotkey=nil},
-			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'COFC (highly configurable)',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+			{name = 'FPS (experimental)',key='FPS', hotkey=nil},
+			{name = 'Free (experimental)',key='Free', hotkey=nil},
+			{name = 'Spring (experimental)',key='Spring',  hotkey=nil},
 		},'Default',
 		function(self)
 			local key = self.value
@@ -307,8 +333,8 @@ local cameraPath = 'Settings/Camera'
 				spSendCommands{cofcDisable ,"viewfree"}
 			elseif key == 'Rotatable Overhead' then
 				spSendCommands{cofcDisable ,"viewrot"}
-			elseif key == 'Total War' then
-				spSendCommands{cofcDisable ,"viewtw"}
+			elseif key == 'Spring' then
+				spSendCommands{cofcDisable ,"viewspring"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
 			else
@@ -323,24 +349,43 @@ local camerHotkeys = 'Hotkeys/Camera'
 	ShButton(camerHotkeys, 'Move Left', 'moveleft')
 	ShButton(camerHotkeys, 'Move Right', 'moveright')
 	ShLabel(camerHotkeys, '')
-	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
-	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	ShButton(camerHotkeys, 'Overview Mode', 'toggleoverview')
 	ShButton(camerHotkeys, 'Track unit', 'track')
 	ShButton(camerHotkeys, 'Flip the Camera', 'viewtaflip')
-
-	ShLabel(camerHotkeys, '')
 	ShButton(camerHotkeys, 'Panning mode','mousestate', 'Note: must be bound to a key for use', true)
-	ShButton(camerHotkeys, 'Switch Default', 'viewta', nil, true)
-	ShButton(camerHotkeys, 'Switch FPS', 'viewfps', nil, true)
-	ShButton(camerHotkeys, 'Switch Free', 'viewfree', nil, true)
-	ShButton(camerHotkeys, 'Switch Rotatable', 'viewrot', nil, true)
-	ShButton(camerHotkeys, 'Switch Total War', 'viewtw', nil, true)
+	ShButton(camerHotkeys, 'Tilt Camera', 'movetilt', "Tilt the camera with mouse wheel while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Overview Zoom', 'movereset', "Mousewheel down with this key held to zoom all the way out. Mousewheel up to return to previous zoom level.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Fast Camera Movement', 'movefast', "Increased camera speed while this key is held.", nil, nil, nil, true)
+	ShButton(camerHotkeys, 'Slow Camera Movement', 'moveslow', "Decreased camera speed while this key is held.", nil, nil, nil, true)
+	-- Requires Spring Camera to be default.
+	--ShButton(camerHotkeys, 'Rotate Camera', 'moverotate', "Decreased camera speed while this key is held.", nil, nil, nil, true)
 	
+	ShLabel(camerHotkeys, 'Saving Position and Switching Camera')
+
+local camerTypeZoom = 'Hotkeys/Camera/Camera Position Hotkeys'
+	ShButton(camerTypeZoom, 'Cycle through alerts', 'lastmsgpos') -- Does not allow camtime override
 	
+local camerTypeHotkeys = 'Hotkeys/Camera/Camera Mode Hotkeys'
+	AddOption(camerTypeHotkeys,
+	{
+		type='text',
+		name='Camera Modes',
+		value = [[For more camera configuration navigate to Settings/Camera and untick 'Simple Settings'.]]
+	})
+	ShButton(camerTypeHotkeys, 'Switch to Default', 'viewta')
+	--ShButton(camerTypeHotkeys, 'Switch FPS', 'viewfps', nil, true)
+	--ShButton(camerTypeHotkeys, 'Switch Free', 'viewfree', nil, true)
+	ShButton(camerTypeHotkeys, 'Switch to Rotatable', 'viewrot')
+	--ShButton(camerTypeHotkeys, 'Switch Total War', 'viewtw', nil, true)
+
+-- Control menu order
+ShLabel('Hotkeys/Commands', 'Command Categories')
+
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
+	ShButton(HUDPath, 'Toggle Attrition Counter', function() spSendCommands{"luaui togglewidget Attrition Counter"} end, "Tracks killed and lost units (only in line of sight while playing)")
+	ShButton(HUDPath, 'Toggle RoI Tracker', function() spSendCommands{"luaui togglewidget RoI Tracker"} end, "Tracks ")
 
 local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	AddOption(HUDSkinPath,
@@ -373,8 +418,9 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 	{
 		name = 'Hardware Cursor',
 		type = 'bool',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		--advanced = true, -- The temp toggle is somewhat useful.
 		springsetting = 'HardwareCursor',
-		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end,
 	})
 	
@@ -387,15 +433,29 @@ local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selecti
 	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
+local pathReclaimHighlight = "Settings/Interface/Reclaim Highlight"
+	ShButton(pathReclaimHighlight, 'Toggle Field Summary', function() spSendCommands{"luaui togglewidget Reclaim Field Highlight"} end, "Draws shapes around fields of reclaim, and shows their equivalent metal value")
+
 local pathGesture = 'Settings/Interface/Gesture Menu'
 	ShButton(pathGesture, 'Toggle gesture menu', function() spSendCommands{"luaui togglewidget Chili Gesture Menu"} end, "Enable/disable gesture build menu.")
-  
+
+local pathToolbox = 'Settings/Toolbox'
+	ShButton(pathToolbox, 'Toggle Start Zone Editor', function() spSendCommands{"luaui togglewidget Startbox Editor"} end, [[Map creation gui for drawing polygons and writing their coordinates to infolog.txt.
+  - Left click to place a vertex.
+  - Right click to place a vertex then finish the polygon (start zones can have multiple polygons).
+  - Press N finish the current polygon.
+  - Press U to undo the last placed vertex
+  - Press S to print the current boxes to infolog.txt.
+  - Press D to delete the most recently placed box.
+  - Hold Ctrl to snap to cardinal directions.]])
+
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
 	AddOption(pathMisc,
 	{
 		name = 'Show Advanced Settings',
+		desc = 'Show developer tools and settings that should essentially never be disabled, except for testing.',
 		type = 'bool',
 		value = false,
 		OnChange = function (self)
@@ -451,7 +511,7 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"water " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 
@@ -464,13 +524,14 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 		function(self)
 			spSendCommands{"Shadows " .. self.value}
 		end,
-		false,
+		true,
 		true
 	)
 	AddOption(pathGraphicsMap,
 	{
 		name = 'Shadow detail level',
-		desc = 'How detailed shadows are.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096, 8192, 16384},
 		springsetting = 'ShadowMapSize',
@@ -522,7 +583,8 @@ local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	AddOption(pathGraphicsExtras,
 	{
 		name = 'Particle density',
-		desc = 'How many visual effects can exist at the same time.',
+		desc = 'Temporary toggle. For a permanent toggle change go to Settings in the non-game main menu.',
+		advanced = true,
 		type = 'number',
 		min = 250,
 		max = 20000,
@@ -545,7 +607,8 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		min = 1,
 		max = 10000,
 		springsetting = 'UnitLodDist',
-		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end
+		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end,
+		advanced = true,
 	} )
 	AddOption(pathUnitVisiblity,
 	{
@@ -556,17 +619,58 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		springsetting = 'UnitIconDist',
 		OnChange = function(self)
 			spSendCommands{"disticon " .. self.value}
+			WG.resetIconDist = self.value
 		end
 	} )
 	AddOption(pathUnitVisiblity,
 	{
 		name = 'Shiny Units',
 		type = 'bool',
+		advanced = true,
 		springsetting = 'AdvUnitShading',
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
-	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
-	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+	ShLabel(pathUnitVisiblity, 'Unit Highlight Options')
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Halos',
+		desc = "Shows a thin halo of team colour around units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Halo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Teamcolour Baseplatter',
+		desc = "Highlight the base of units with a disk of their team colour.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Fancy Teamplatter", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Halo',
+		desc = "Add a large halo around selected and hovered units.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			SetWidgetEnableState("Selection BlurryHalo", self.value)
+		end,
+	} )
+	AddOption(pathUnitVisiblity,
+	{
+		name = 'Selection Shapes (default)',
+		desc = "Show appropriate shapes around the base of selected and hovered units. This is the default option.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			SetWidgetEnableState("UnitShapes", self.value)
+		end,
+	} )
 	
 	--local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
 	--	ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
@@ -574,10 +678,12 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	--	ShButton(pathPlatter, 'Toggle Unit Platter', function() spSendCommands{"luaui togglewidget Fancy Teamplatter"} end, "Puts a team-coloured platter-halo below units.")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	local pathIconZoomTransition = 'Settings/Graphics/Unit Visibility/Icon Zoom Transition'
+		ShButton(pathIconZoomTransition, 'Toggle Smooth Icon Zoom', function() spSendCommands{"luaui togglewidget Icon Zoom Transition"} end, "Draw both icons and models at medium zoom distance.")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function()
 				spSendCommands{"luaui disablewidget Outline No Shader"}
-				spSendCommands{"luaui togglewidget Outline Shader"}
+				spSendCommands{"luaui togglewidget Outline Shader GL4"}
 			end, "Highlights edges of units")
 
 
@@ -589,7 +695,11 @@ local pathAudio = 'Settings/Audio'
 		min = 0,
 		max = 100,
 		springsetting = 'snd_volmaster',
-		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end,
+		OnChange = function(self)
+			if WG.crude and WG.crude.SetMasterVolume then
+				WG.crude.SetMasterVolume(self.value)
+			end
+		end,
 		simpleMode = true,
 		everyMode = true,
 	})
@@ -606,7 +716,7 @@ local pathAudio = 'Settings/Audio'
 	})
 	AddOption(pathAudio,{
 		name = 'UI Volume',
-		desc = 'Interface notifications such as chat.',
+		desc = 'Interface notifications such as chat. Also applies to unit replies.',
 		type = 'number',
 		min = 0,
 		max = 100,
@@ -619,10 +729,11 @@ local pathAudio = 'Settings/Audio'
 		name = 'Unit Reply Volume',
 		desc = 'Noises that units make when being selected or given orders.',
 		type = 'number',
+		key = "unit_reply_volume",
+		value = 50,
 		min = 0,
 		max = 100,
-		springsetting = 'snd_volunitreply',
-		OnChange = function(self) spSendCommands{"set snd_volunitreply " .. self.value} end,
+		OnChange = function(self) WG.unitReplyVolumeMult =  self.value / 50 end, -- pay attention, the scaled value is 0-2!
 		simpleMode = true,
 		everyMode = true,
 	})
@@ -646,16 +757,9 @@ local pathAudio = 'Settings/Audio'
 		-- springsetting = 'snd_volmusic', -- TODO: we should probably switch from WG to this at some point
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)
-			if (WG.music_start_volume or 0 > 0) then
-				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume)
-			else
-				Spring.SetSoundStreamVolume(self.value)
+			if WG.crude and WG.crude.SetMusicVolume then
+				WG.crude.SetMusicVolume(self.value)
 			end
-			local prevValue = WG.music_volume
-			--settings.music_volume = self.value
-			WG.music_volume = self.value
-			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end
-			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end
 		end,
 		simpleMode = true,
 		everyMode = true,
@@ -681,17 +785,32 @@ AddOption("Settings/HUD Panels/Pause Screen",
 	})
 
 --- HELP ---
-local pathHelp = 'Settings/Nag'
+local pathHelp = 'Help'
 	AddOption(pathHelp,
 	{
 		type='text',
-		name='Tips',
-		value = [[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options.
-		          You can also space-click on menu elements to see context settings. ]]
+		name='Space + Click Tips',
+		value = [[Hold Space and click on a unit or wreck to display detailed information.
+        You can also space-click on commands and other interface elements to open their hotkey settings. ]]
 	})
-	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	AddOption(pathHelp,
+	{
+		type='text',
+		name='Ingame Tutorial',
+		value = [[The button below guides you through the whys and hows of setting up a base and advancing with an army. It can be disabled at any time.
+        This tutorial is not availible in the campaign or when spectating.]]
+	})
+	ShButton(pathHelp,'Toggle Ingame Tutorial', function() spSendCommands{"luaui togglewidget Nubtron 2.0"} end )
+	AddOption(pathHelp,
+	{
+		type='label',
+		name='Unit Lists and Concepts',
+	})
+	
+--- TIPS ---
+local pathTips = 'Settings/Tips'
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-local pathClippy = 'Settings/Nag/Clippy Comments'
+local pathClippy = 'Settings/Tips/Clippy Comments'
 	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC

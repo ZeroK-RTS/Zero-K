@@ -3,8 +3,13 @@ local VFS_Include = VFS.Include
 local VFS_GAME = VFS.GAME
 local VFS_MAP = VFS.MAP
 
-local system = VFS_Include('gamedata/system.lua')
-local lowerKeys = system.lowerkeys
+--[[ unitdefs_post is massively simplified by being able to assume
+     that all def keys are lowercase. However, being able to use
+     uppercase in the defs is also good for readability (also we
+     have to support modders with lax standards anyway). This is
+     why lowerkeys are applied to all defs; this has nothing to do
+     with the engine (all cases are accepted by Spring). ]]
+local lowerKeys = VFS_Include('gamedata/system.lua').lowerkeys
 
 VFS_Include("LuaRules/Utilities/tablefunctions.lua")
 local suCopyTable = Spring.Utilities.CopyTable
@@ -47,10 +52,18 @@ end
 
      2) VFS.Include is broken in the same way on old engines (specifically
         on 104-287 which we want to keep supporting for the time being).
-	 This means that the gameside posts would instead be included twice. ]]
+     This means that the gameside posts would instead be included twice. ]]
+
 local MAPSIDE_POSTS_FILEPATH = 'gamedata/unitdefs_map.lua'
 if VFS.FileExists(MAPSIDE_POSTS_FILEPATH, VFS_MAP) then
 	VFS_Include(MAPSIDE_POSTS_FILEPATH, nil, VFS_MAP)
+end
+
+--[[ This lets mutators add a bit of unitdefs_posts processing without
+     losing access to future gameside updates to unitdefs_posts.]]
+local MODSIDE_POSTS_FILEPATH = 'gamedata/unitdefs_mod.lua'
+if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS_GAME) then
+	VFS_Include(MODSIDE_POSTS_FILEPATH, nil, VFS_GAME)
 end
 
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)

@@ -26,7 +26,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local SAVE_FILE = "Gadgets/unit_morph.lua"
 local emptyTable = {} -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -50,9 +49,9 @@ local emptyTable = {} -- for speedups
 --
 -- Thus other gadgets can know which morphing commands are available
 -- Then they can simply issue:
---	Spring.GiveOrderToUnit(u,genericMorphCmdID,{}, 0)
--- or Spring.GiveOrderToUnit(u,genericMorphCmdID,{targetUnitDefId}, 0)
--- or Spring.GiveOrderToUnit(u,specificMorphCmdID,{}, 0)
+--	Spring.GiveOrderToUnit(u, genericMorphCmdID, 0, 0)
+-- or Spring.GiveOrderToUnit(u, genericMorphCmdID, targetUnitDefId, 0)
+-- or Spring.GiveOrderToUnit(u, specificMorphCmdID, 0, 0)
 --
 -- where:
 -- genericMorphCmdID is the same unique value, no matter what is the source unit or target unit
@@ -62,11 +61,11 @@ local emptyTable = {} -- for speedups
 --[[ Sample codes that could be used in other gadgets:
 
 	-- Morph unit u
-	Spring.GiveOrderToUnit(u,31210,{}, 0)
+	Spring.GiveOrderToUnit(u, 31210, 0, 0)
 
 	-- Morph unit u into a supertank:
 	local otherDefId=UnitDefNames["supertank"].id
-	Spring.GiveOrderToUnit(u,31210,{otherDefId}, 0)
+	Spring.GiveOrderToUnit(u, 31210, otherDefId, 0)
 
 	-- In place of writing 31210 you could use a morphCmdID that you'd read with:
 	local morphCmdID=(GG.MorphInfo or {})["CMD_MORPH_BASE_ID"]
@@ -130,7 +129,6 @@ local PRIVATE = {private = true}
 --------------------------------------------------------------------------------
 
 local morphDefs	= {} --// make it global in Initialize()
-local extraUnitMorphDefs = {} -- stores mainly planetwars morphs
 local hostName = nil -- planetwars hostname
 local PWUnits = {} -- planetwars units
 local morphUnits = {} --// make it global in Initialize(); needs save/load
@@ -220,7 +218,7 @@ local function ReAssignAssists(newUnit,oldUnit)
 				params[1] = newUnit
 				local opts = (cmd.options.meta and CMD.OPT_META or 0) + (cmd.options.ctrl and CMD.OPT_CTRL or 0) + (cmd.options.alt and CMD.OPT_ALT or 0)
 				Spring.GiveOrderToUnit(unitID, CMD.INSERT, {cmd.tag, cmd.id, opts, params[1], params[2], params[3]}, 0)
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmd.tag, 0)
 			end
 		end
 	end
@@ -230,7 +228,9 @@ end
 --------------------------------------------------------------------------------
 
 local function GetMorphRate(unitID)
-	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
+	-- Do not read full attributes-derived BP multiplier here because morph
+	-- disables units, causing BP mult to be zero.
+	return (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1) * (GG.unit_handicap and GG.unit_handicap[unitID] or 1)
 end
 
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
@@ -377,18 +377,18 @@ local function FinishMorph(unitID, morphData)
 		if zsize/4 ~= math.floor(zsize/4) then
 			z = z+8
 		end
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
 		end
 		Spring.SetUnitPosition(newUnit, x, y, z)
 	else
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 1)
 		newUnit = CreateMorphedToUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt, morphData.def.upgradeDef)
-		Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
+		Spring.SetGameRulesParam("morphUnitCreating", 0)
 		if not newUnit then
 			StopMorph(unitID, morphData)
 			return
@@ -397,17 +397,12 @@ local function FinishMorph(unitID, morphData)
 		Spring.SetUnitPosition(newUnit, px, py, pz)
 	end
 
-	--if (extraUnitMorphDefs[unitID] ~= nil) then
-	-- nothing here for now
-	--end
-	
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message
 		PWUnit = PWUnits[unitID]
 		PWUnit.currentDef = udDst
 		local data = PWUnit.owner..","..defName..","..math.floor(px)..","..math.floor(pz)..",".."S" -- todo determine and apply smart orientation of the structure
 		Spring.SendCommands("w "..hostName.." pwmorph:"..data)
-		extraUnitMorphDefs[unitID] = nil
 		--GG.PlanetWars.units[unitID] = nil
 		--GG.PlanetWars.units[newUnit] = PWUnit
 		SendToUnsynced('PWCreate', unitTeam, newUnit)
@@ -505,7 +500,7 @@ local function FinishMorph(unitID, morphData)
 	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara, capture = captureProgress })
 	
 	--//transfer experience
-	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(unitID, morphData.def.into))
+	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(newUnit, morphData.def.into))
 	Spring.SetUnitExperience(newUnit, newXp)
 	--// transfer shield power
 	if oldShieldState then
@@ -514,15 +509,15 @@ local function FinishMorph(unitID, morphData)
 	
 	--//transfer some state
 	Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-		{CMD.FIRE_STATE,    { states.firestate             }, 0 },
-		{CMD.MOVE_STATE,    { states.movestate             }, 0 },
-		{CMD.REPEAT,        { states["repeat"] and 1 or 0  }, 0 },
-		{CMD_WANT_CLOAK,    { wantCloakState or 0          }, 0 },
-		{CMD.ONOFF,         { 1                            }, 0 },
-		{CMD.TRAJECTORY,    { states.trajectory and 1 or 0 }, 0 },
-		{CMD_PRIORITY,      { states.buildPrio             }, 0 },
-		{CMD_RETREAT,       { states.retreat               }, states.retreat == 0 and CMD.OPT_RIGHT or 0 },
-		{CMD_MISC_PRIORITY, { states.miscPrio              }, 0 },
+		{CMD.FIRE_STATE,    states.firestate            , 0 },
+		{CMD.MOVE_STATE,    states.movestate            , 0 },
+		{CMD.REPEAT,        states["repeat"] and 1 or 0 , 0 },
+		{CMD_WANT_CLOAK,    wantCloakState or 0         , 0 },
+		{CMD.ONOFF,         1                           , 0 },
+		{CMD.TRAJECTORY,    states.trajectory and 1 or 0, 0 },
+		{CMD_PRIORITY,      states.buildPrio            , 0 },
+		{CMD_RETREAT,       states.retreat              , states.retreat == 0 and CMD.OPT_RIGHT or 0 },
+		{CMD_MISC_PRIORITY, states.miscPrio             , 0 },
 	})
 	
 	--//reassign assist commands to new unit
@@ -539,7 +534,7 @@ local function FinishMorph(unitID, morphData)
 			for j = 1, #units do
 				local areaUnitID = units[j]
 				if allyTeam == Spring.GetUnitAllyTeam(areaUnitID) and Spring.GetUnitDefID(areaUnitID) == -cmd.id then
-					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, coded)
+					Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, areaUnitID, coded)
 					notFound = false
 					break
 				end
@@ -598,6 +593,10 @@ local function UpdateMorph(unitID, morphData)
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
 	end
+	if not morphData.combatMorph then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		GG.PokeDecloakUnit(unitID, unitDefID)
+	end
 	return true
 end
 
@@ -622,7 +621,6 @@ function gadget:Initialize()
 	--// make it global for unsynced access via SYNCED
 	_G.morphUnits         = morphUnits
 	_G.morphDefs          = morphDefs
-	_G.extraUnitMorphDefs = extraUnitMorphDefs
 	--_G.morphToStart       = morphToStart
 
 	--// Register CmdIDs
@@ -743,7 +741,7 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 		end
 	else
 		--Spring.Echo('Morph gadget: CommandFallback specific morph')
-		morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+		morphDef = (morphDefs[unitDefID] or {})[cmdID]
 	end
 	if (not morphDef) then
 		return true
@@ -836,7 +834,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			--Spring.Echo('Morph gadget: AllowCommand morph cannot be here!')
 		elseif (cmdID > CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
 			--Spring.Echo('Morph gadget: AllowCommand specific morph')
-			morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+			morphDef = (morphDefs[unitDefID] or {})[cmdID]
 		end
 		if morphDef then
 			if (isFactory(unitDefID)) then
@@ -873,43 +871,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	--[[
-	morphUnits[unitID] = {
-		def = morphDef,
-		progress = 0.0,
-		increment = morphDef.increment,
-		morphID = morphID,
-		teamID = teamID,
-		combatMorph = morphDef.combatMorph,
-		morphRate = 0.0,
-	}
-	]]
-	
-	local loadData = GG.SaveLoad.ReadFile(zip, "Morph", SAVE_FILE) or emptyTable
-	for oldID, entry in pairs(loadData.morph or emptyTable) do
-		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		if newID then
-			morphUnits[newID] = entry
-			
-			local morphDef = entry.def
-			if morphDef.cmd then
-				local cmdDescID = Spring.FindUnitCmdDesc(newID, morphDef.cmd)
-				if (cmdDescID) then
-					Spring.EditUnitCmdDesc(newID, cmdDescID, {id = morphDef.stopCmd, name = RedStr .. "Stop"})
-				end
-			elseif morphDef.stopCmd == CMD_UPGRADE_STOP then
-				Spring.InsertUnitCmdDesc(newID, stopUpgradeCmdDesc)
-			end
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 --	END SYNCED
 --------------------------------------------------------------------------------
@@ -924,8 +885,6 @@ else
 local gameFrame
 local SYNCED = SYNCED
 local CallAsTeam = CallAsTeam
-local spairs = spairs
-local snext = snext
 
 local spGetUnitPosition = Spring.GetUnitPosition
 
@@ -969,6 +928,7 @@ local headingToDegree = (360 / 65535)
 local useLuaUI = false
 local oldFrame = 0		--//used to save bandwidth between unsynced->LuaUI
 local drawProgress = true --//a widget can do this job too (see healthbars)
+local morphUnitsSynced = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -988,7 +948,8 @@ local function SelectSwap(cmd, oldID, newID)
 
 	if (Script.LuaUI('MorphFinished')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil,GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1009,7 +970,8 @@ end
 local function StartMorph(cmd, unitID, unitDefID, morphID)
 	if (Script.LuaUI('MorphStart')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1018,7 +980,7 @@ local function StartMorph(cmd, unitID, unitDefID, morphID)
 			CallAsTeam({['read'] = readTeam },
 				function()
 					if (unitID)and(IsUnitVisible(unitID)) then
-						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID] or SYNCED.extraUnitMorphDefs[unitID])
+						Script.LuaUI.MorphStart(unitID, (SYNCED.morphDefs[unitDefID] or {})[morphID])
 					end
 				end
 			)
@@ -1030,7 +992,8 @@ end
 local function StopMorph(cmd, unitID)
 	if (Script.LuaUI('MorphStop')) then
 		if useLuaUI then
-			local readTeam, spec, specFullView = nil, GetSpectatingState()
+			local readTeam
+			local spec, specFullView = GetSpectatingState()
 			if specFullView then
 				readTeam = Script.ALL_ACCESS_TEAM
 			else
@@ -1067,8 +1030,8 @@ function gadget:Update()
 	local frame = GetGameFrame()
 	if frame > oldFrame then
 		oldFrame = frame
-		local morphUnitsSynced = SYNCED.morphUnits
-		if snext(morphUnitsSynced) then
+		morphUnitsSynced = SYNCED.morphUnits
+		if next(morphUnitsSynced) then
 			local useLuaUI_ = Script.LuaUI('MorphUpdate')
 			if useLuaUI_ ~= useLuaUI then --//Update Callins on change
 				drawProgress = not Script.LuaUI('MorphDrawProgress')
@@ -1077,7 +1040,8 @@ function gadget:Update()
 
 			if useLuaUI then
 				local morphTable = {}
-				local readTeam, spec, specFullView = nil,GetSpectatingState()
+				local readTeam
+				local spec, specFullView = GetSpectatingState()
 				if specFullView then
 					readTeam = Script.ALL_ACCESS_TEAM
 				else
@@ -1085,7 +1049,7 @@ function gadget:Update()
 				end
 				CallAsTeam({ ['read'] = readTeam },
 					function()
-						for unitID, morphData in spairs(morphUnitsSynced) do
+						for unitID, morphData in pairs(morphUnitsSynced) do
 							if (unitID and morphData)and(IsUnitVisible(unitID)) then
 								morphTable[unitID] = {progress = morphData.progress, into = morphData.def.into, combatMorph = morphData.combatMorph}
 							end
@@ -1204,9 +1168,7 @@ end
 
 local function DrawWorldFunc()
 
-	local morphUnits = SYNCED.morphUnits
-
-	if (not snext(morphUnits)) then
+	if (not next(morphUnitsSynced)) then
 		return --//no morphs to draw
 	end
 
@@ -1225,7 +1187,7 @@ local function DrawWorldFunc()
 
 	CallAsTeam({['read'] = readTeam},
 		function()
-			for unitID, morphData in spairs(morphUnits) do
+			for unitID, morphData in pairs(morphUnitsSynced) do
 				if (unitID and morphData)and(IsUnitVisible(unitID)) then
 					if morphData.combatMorph then
 						DrawCombatMorphUnit(unitID, morphData,readTeam)
@@ -1238,6 +1200,7 @@ local function DrawWorldFunc()
 	)
 	glDepthTest(false)
 	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	glCulling(false)
 	phase = phase + .06
 end
 
@@ -1247,64 +1210,6 @@ end
 
 function gadget:DrawWorldRefraction()
 	DrawWorldFunc()
-end
-
-local function split(msg,sep)
-	local s=sep or '|'
-	local t={}
-	for e in string.gmatch(msg..s,'([^%'..s..']+)%'..s) do
-		t[#t+1] = e
-	end
-	return t
-end
-
--- Exemple of AI messages:
--- "aiShortName|morph|762" -- morph the unit of unitId 762
--- "aiShortName|morph|861|12" -- morph the unit of unitId 861 into an unit of unitDefId 12
---
--- Does not work because apparently Spring.GiveOrderToUnit from unsynced gadgets are ignored.
---
-function gadget:AICallIn(data)
-	if type(data) == "string" then
-		local message = split(data)
-		if message[1] == "Shard" or true then-- Because other AI shall be allowed to send such morph command without having to pretend to be Shard
-			if message[2] == "morph" and message[3] then
-				local unitID = tonumber(message[3])
-				if unitID and Spring.ValidUnitID(unitID) then
-					if message[4] then
-						local destDefId=tonumber(message[4])
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] into "..UnitDefs[destDefId].name)
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{destDefId}, 0)
-					else
-						--Spring.Echo("Morph AICallIn: Morphing Unit["..unitID.."] to auto")
-						Spring.GiveOrderToUnit(unitID,CMD_MORPH,{}, 0)
-					end
-				else
-					Spring.Echo("Not a valid unitID in AICallIn morph request: \""..data.."\"")
-				end
-			end
-		end
-	end
-end
-
--- Just something to test the above AICallIn
---function gadget:KeyPress(key)
---	if key == 32 then--space key
---	gadget:AICallIn("asn|morph|762")
---	end
---end
-
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	
-	local morph = Spring.Utilities.MakeRealTable(SYNCED.morphUnits, "Morph")
-	--local morphToStart = Spring.Utilities.MakeRealTable(SYNCED.morphToStart, "Morph (to start)")
-	local save = {morph = morph}	-- {morph = morph, morphToStart = morphToStart}
-	
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, save)
 end
 
 --------------------------------------------------------------------------------

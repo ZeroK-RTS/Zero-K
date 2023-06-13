@@ -24,6 +24,8 @@ local smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local PERIOD = 0.17
 
 local sleepTime = PERIOD*1000
@@ -43,7 +45,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
-local legBackwardTheta = -math.rad(45)
+local legBackwardTheta = math.rad(-45)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
@@ -94,7 +96,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(450))
-	Turn(barrel, x_axis, math.max(-pitch - math.rad(15), -math.rad(90)), math.rad(180))
+	Turn(barrel, x_axis, math.max(-pitch - math.rad(15), math.rad(-90)), math.rad(180))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel, x_axis)
 	StartThread(RestoreAfterDelay)
@@ -106,11 +108,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if Spring.ValidUnitID(targetID) then
-		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1000
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 260.1, 75 * distMult)
-	end
-	return false
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 1000, 38, 0.05, true)
 end
 
 function script.QueryWeapon(num)

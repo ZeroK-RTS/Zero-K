@@ -19,17 +19,12 @@ return {
 end
 
 local spGetTeamUnits         = Spring.GetTeamUnits
-local spGetUnitAllyTeam      = Spring.GetUnitAllyTeam
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetUnitSelfDTime     = Spring.GetUnitSelfDTime
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-
-local gh = gadgetHandler
-local ghRemoveCallIn = gh.RemoveCallIn
-local ghUpdateCallIn = gh.UpdateCallIn
+local sputGetUnitCost        = Spring.Utilities.GetUnitCost
 
 local CMD_SELFD = CMD.SELFD
-local EMPTY_TABLE = {}
 
 local teamList = Spring.GetTeamList()
 local teamCount = #teamList
@@ -50,8 +45,6 @@ function gadget:Initialize()
 		local teamID = teamList[i]
 		deathTeams[teamID] = false
 	end
-
-	ghRemoveCallIn(gh, 'GameFrame')
 end
 
 function gadget:AllowCommand_GetWantedCommand()
@@ -63,10 +56,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if not needsCheck then
-		needsCheck = true
-		ghUpdateCallIn(gh, 'GameFrame')
-	end
+	needsCheck = true
 	deathTeams[unitTeam] = true
 	return true
 end
@@ -90,15 +80,51 @@ local function CheckDeathTeam(teamID)
 		end
 	end
 
-	if selfDUnitCount > 0.8 * realUnitCount then
-		ghRemoveCallIn(gh, 'AllowCommand')
-		spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, EMPTY_TABLE, 0)
-		ghUpdateCallIn(gh, 'AllowCommand')
-		GG.ResignTeam(teamID)
+	--[[ The threshold is not 100% because between hitting Ctrl+A
+	     and the self-D order reaching the server some more units
+	     could have been created (keypress delay, network lag). ]]
+	if selfDUnitCount < 0.85 * realUnitCount then
+		return
+	end
+
+	--[[ Don't apply when self-destructing singular units, up
+	     to 4k cost. The intent is to allow self-ding things
+	     like your fac in a high density teamgame (apparently
+	     a common case) and this value is supposed to let such
+	     units through, while still not being enough to let a
+	     commander self-d. ]]
+	if selfDUnitCount < 10 then
+		local value = 0
+		for i = 1, selfDUnitCount do
+			value = value + sputGetUnitCost(selfDUnitIDs[i])
+		end
+		if value < 4000 then
+			return
+		end
+	end
+
+	--[[ Resign the team because using Ctrl+AD to quit is a habit
+	     that people have already developed (originating all the
+	     way back in OTA). Perhaps it would be good to just block
+	     the self-D command but not resign (forcing veterans to
+	     learn the new methods, which would ultimately allow us to
+	     remove the block as well). ]]
+	gadgetHandler.RemoveCallIn(gadgetHandler, 'AllowCommand')
+	spGiveOrderToUnitArray(selfDUnitIDs, CMD_SELFD, 0, 0)
+	gadgetHandler.UpdateCallIn(gadgetHandler, 'AllowCommand')
+	if #Spring.GetPlayerList(teamID) < 2 then -- do not kill commshare teams!
+		local _, leader = Spring.GetTeamInfo(teamID)
+		local playerName = (leader and Spring.GetPlayerInfo(leader)) or "Unknown"
+		Spring.Echo("Someone attempted to self-destruct most of their stuff!")
+		Spring.Echo("TeamID: ", teamID, "Player: ", playerName)
+		--GG.ResignTeam(teamID)
 	end
 end
 
 function gadget:GameFrame(n)
+	if not needsCheck then
+		return
+	end
 	for i = 1, teamCount do
 		local teamID = teamList[i]
 		if deathTeams[teamID] then
@@ -106,7 +132,4 @@ function gadget:GameFrame(n)
 			deathTeams[teamID] = false
 		end
 	end
-
-	needsCheck = false
-	ghRemoveCallIn(gh, 'GameFrame')
 end

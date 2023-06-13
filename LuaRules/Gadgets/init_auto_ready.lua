@@ -123,10 +123,6 @@ function gadget:GameSetup(label, ready, playerStates)
 end
 
 local function GetStartText()
-	if Spring.GetGameRulesParam("totalSaveGameFrame") then
-		return "Loading game..."
-	end
-	
 	local text = lastLabel
 	if text == nil then
 		text = "Waiting for people "

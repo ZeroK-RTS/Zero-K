@@ -2,8 +2,6 @@ return { staticnuke = {
   unitname                      = [[staticnuke]],
   name                          = [[Trinity]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostMetal                = 8000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -21,25 +19,26 @@ return { staticnuke = {
     stockpiletime  = [[180]],
     stockpilecost  = [[3240]],
     priority_misc  = 1, -- Medium
+    is_nuke = true,
+
+    outline_x = 195,
+    outline_y = 195,
+    outline_yoff = 15,
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 6,
   footprintZ                    = 8,
   iconType                      = [[nuke]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   maxDamage                     = 5000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  minCloakDistance              = 150,
   noAutoFire                    = false,
-  objectName                    = [[Silencer.s3o]],
+  objectName                    = [[staticnuke.s3o]],
   script                        = [[staticnuke.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 660,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardmap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooo]],
@@ -68,8 +67,6 @@ return { staticnuke = {
       craterMult              = 6,
 
       customParams              = {
-        restrict_in_widgets = 1,
-
         light_color = [[2.92 2.64 1.76]],
         light_radius = 3000,
       },
@@ -85,7 +82,7 @@ return { staticnuke = {
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 65,
-      model                   = [[crblmsslr.s3o]],
+      model                   = [[staticnuke_projectile.s3o]],
       noSelfDamage            = false,
       range                   = 72000,
       reloadtime              = 10,
@@ -113,7 +110,7 @@ return { staticnuke = {
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 8,
-      object           = [[silencer_dead.s3o]],
+      object           = [[staticnuke_dead.s3o]],
     },
 
     HEAP  = {

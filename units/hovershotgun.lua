@@ -16,18 +16,16 @@ return { hovershotgun = {
 
   customParams        = {
     modelradius    = [[25]],
+    turnatfullspeed_hover = [[1]],
  },
 
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[hoverassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,
-  minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -44,7 +42,7 @@ return { hovershotgun = {
   },
   sightDistance       = 385,
   turninplace         = 0,
-  turnRate            = 616,
+  turnRate            = 985,
   workerTime          = 0,
 
   weapons             = {
@@ -76,7 +74,6 @@ return { hovershotgun = {
     damage                  = {
         default = 32,
         planes  = 32,
-        subs    = 1.6,
     },
     
     duration                = 0.02,
@@ -88,7 +85,7 @@ return { hovershotgun = {
     interceptedByShieldType = 1,
     noSelfDamage            = true,
     projectiles             = 4,
-    range                   = 250,
+    range                   = 235,
     reloadtime              = 3,
     rgbColor                = [[1 1 0]],
     soundHit                = [[weapon/laser/lasercannon_hit]],

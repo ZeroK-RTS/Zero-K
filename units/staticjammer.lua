@@ -11,7 +11,9 @@ return { staticjammer = {
   buildingGroundDecalType       = [[staticjammer_aoplane.dds]],
   buildPic                      = [[staticjammer.png]],
   category                      = [[SINK UNARMED]],
-  canMove                       = true,
+  canAttack                     = false,
+  canManualFire                 = true,
+  canMove                       = true, -- for queuing orders during morph to mobile
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
@@ -19,19 +21,24 @@ return { staticjammer = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    removewait     = 1,
 
     morphto = [[cloakjammer]],
     morphtime = 30,
 
     area_cloak = 1,
     area_cloak_upkeep = 12,
-    area_cloak_radius = 550,
-    area_cloak_decloak_distance = 75,
+    area_cloak_radius = 400,
+    area_cloak_shift_range = 200,
+    area_cloak_recloak_rate = 1200,
+    removeattack = 1,
 
     priority_misc  = 1,
     addfight       = 1,
     addpatrol      = 1,
+
+    outline_x = 90,
+    outline_y = 130,
+    outline_yoff = 20,
   },
 
   energyUse                     = 1.5,
@@ -40,8 +47,6 @@ return { staticjammer = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[staticjammer]],
-  idleAutoHeal                  = 5,
-  idleTime                      = 1800,
   initCloaked                   = true,
   levelGround                   = false,
   maxDamage                     = 700,
@@ -50,12 +55,52 @@ return { staticjammer = {
   noAutoFire                    = false,
   objectName                    = [[radarjammer.dae]],
   onoffable                     = true,
-  radarDistanceJam              = 550,
+  radarDistanceJam              = 600,
   script                        = [[staticjammer.lua]],
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 250,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oo oo]],
+
+  weapons                = {
+
+    {
+      def                = [[BOGUS_CLOAK_TARGET]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+    },
+    
+  },
+
+  weaponDefs             = {
+
+    BOGUS_CLOAK_TARGET        = {
+      name                    = [[Bogus Cloak Target]],
+      areaOfEffect            = 800,
+      collideFriendly         = false,
+      commandfire             = true,
+
+      customParams        = {
+        gui_draw_range  = 200,
+        gui_draw_leashed_to_range  = 1,
+        attack_aoe_circle_mode = "cloaker"
+      },
+      
+      damage                  = {
+        default = 0,
+      },
+
+      edgeEffectiveness       = 1,
+      range                   = 72000,
+      reloadtime              = 4/30,
+      turnrate                = 1000000000,
+      turret                  = true,
+      weaponAcceleration      = 20000,
+      weaponTimer             = 0.5,
+      weaponType              = [[StarburstLauncher]],
+      weaponVelocity          = 20000,
+    },
+
+  },
 
   featureDefs                   = {
 

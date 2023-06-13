@@ -17,6 +17,7 @@ end
 -- Widget option functions
 
 local CHAT_PADDING = 100
+local DEFAULT_RESOURCE_BAR_HEIGHT = 116
 local USE_SIZE_FACTOR = false
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
@@ -196,7 +197,7 @@ end
 ----------------------------------------------------
 
 local function SetupMissionGUI(preset)
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	-- mission objectives
 	local objOnLeft = (preset == "new") or (preset == "newMinimapLeft") or (preset == "newMinimapRight") or (preset == "westwood") or (preset == "crafty") or (preset == "ensemble")
 	local objX = objOnLeft and 0 or screenWidth - 64
@@ -289,7 +290,7 @@ local function SetupDefaultPreset()
 	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	-- Minimap
 	local minimapWidth = math.ceil(screenWidth*2/11)
@@ -374,7 +375,7 @@ local function SetupDefaultPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
 	local resourceBarRight = resourceBarWidth + resourceBarX
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
@@ -427,7 +428,7 @@ local function SetupNewPreset()
 	SetNewOptions()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
@@ -554,7 +555,7 @@ local function SetupNewPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -722,7 +723,7 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 end
 
 local function SetupNewUITop()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.floor(screenHeight)
 	local SIZE_FACTOR = 1
 	if screenWidth > 3000 and USE_SIZE_FACTOR then
@@ -734,7 +735,7 @@ local function SetupNewUITop()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.max(580 * SIZE_FACTOR, math.min(screenWidth - 700, 660 * SIZE_FACTOR))
-	local resourceBarHeight = 110 * SIZE_FACTOR
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT * SIZE_FACTOR
 	
 	-- Chicken
 	local chickenWidth = 189 * SIZE_FACTOR
@@ -820,7 +821,7 @@ local function SetupMinimapLeftPreset()
 	SetupNewWidgets()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
@@ -926,7 +927,7 @@ local function SetupMinimapRightPreset()
 	SetupNewWidgets()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	screenHeight = math.ceil(screenHeight)
 	
 	if screenWidth <= 1650 then
@@ -1051,7 +1052,7 @@ local function SetupCraftyPreset()
 	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	-- Minimap
 	local minimapWidth = screenWidth*9/44 + 20
@@ -1129,7 +1130,7 @@ local function SetupCraftyPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth + 4)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -1179,7 +1180,7 @@ local function SetupEnsemblePreset()
 	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
@@ -1257,7 +1258,7 @@ local function SetupEnsemblePreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -1306,11 +1307,11 @@ local function SetupWestwoodPreset()
 	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	
 	-- Resource Bar
 	local resourceBarWidth = screenWidth*5/22 + 20
-	local resourceBarHeight = 65
+	local resourceBarHeight = DEFAULT_RESOURCE_BAR_HEIGHT
 	local resourceBarX = screenWidth - resourceBarWidth
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
@@ -1483,7 +1484,8 @@ options = {
 			--{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
 			--{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
 			--{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
-			{key = 'default', name = 'None', desc = "No preset. Select this if you want to modify your UI and have the changes rememberd on subsequent launches.",},
+			{key = 'default', name = 'None', desc = [[This allows you to modify your UI with Alt+F11 and have the changes remembered on subsequent launches.
+You must untick 'Stay up to date' above to select this option.]],},
 		},
 		noHotkey = true,
 		OnChange = UpdateInterfacePreset
@@ -1548,7 +1550,7 @@ function widget:Update(dt)
 	if firstUpdate then
 		firstUpdate = false
 		
-		local screenWidth, screenHeight = Spring.GetWindowGeometry()
+		local screenWidth, screenHeight = Spring.GetViewGeometry()
 		oldWidth = screenWidth
 		oldHeight = screenHeight
 		UpdateInterfacePreset(options.interfacePreset)
@@ -1557,7 +1559,7 @@ function widget:Update(dt)
 	if options.maintainDefaultUI.value  then
 		timeSinceUpdate = timeSinceUpdate + dt
 		if timeSinceUpdate > UPDATE_FREQUENCY then
-			local screenWidth, screenHeight = Spring.GetWindowGeometry()
+			local screenWidth, screenHeight = Spring.GetViewGeometry()
 			if oldWidth ~= screenWidth or oldHeight ~= screenHeight then
 				oldWidth = screenWidth
 				oldHeight = screenHeight
@@ -1577,7 +1579,7 @@ function widget:ViewResize(screenWidth, screenHeight)
 end
 
 function widget:GetConfigData()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	return {oldScreenWidth = screenWidth, oldScreenHeight = screenHeight}
 end
 

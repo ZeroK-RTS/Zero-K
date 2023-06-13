@@ -10,13 +10,13 @@ local pad = piece 'pad'
 local pontoon = piece 'pontoon'
 
 local emitPieces = {piece('emit04', 'emit08', 'emit012')}
-local nanoNum = 1
 
 local smokePiece = {base}
 
 -- Signal definitions
 local SIG_BUILD = 2
 
+--[[
 local function PadAdjust()
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
@@ -33,6 +33,13 @@ local function PadAdjust()
 		Sleep(500)
 	end
 end
+]]
+
+local function Unstick()
+	Signal(SIG_BUILD)
+	SetSignalMask(SIG_BUILD)
+	GG.Script.UnstickFactory(unitID)
+end
 
 function script.Activate()
 	--StartThread(PadAdjust)
@@ -44,7 +51,8 @@ function script.Activate()
 	end
 	]]--
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
+	StartThread(Unstick)
 end
 
 function script.Deactivate()
@@ -57,7 +65,7 @@ function script.Deactivate()
 	]]--
 	Signal(SIG_BUILD)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	SetUnitValue(COB.BUGGER_OFF, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
 	Move(pad, z_axis, 0)
 end
 
@@ -65,15 +73,6 @@ end
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, emitPieces)
-end
-
-function script.QueryNanoPiece()
-	nanoNum = nanoNum + 1
-	if nanoNum > 3 then nanoNum = 1 end
-
-	local piece = emitPieces[nanoNum]
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,spGetUnitTeam(unitID),piece)
-	return piece
 end
 
 function script.QueryBuildInfo()

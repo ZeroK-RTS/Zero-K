@@ -4,14 +4,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
--- Automatically generated local definitions
-
-local spCallCOBScript        = Spring.CallCOBScript
-local spGetLocalTeamID       = Spring.GetLocalTeamID
-local spGetTeamList          = Spring.GetTeamList
 local spGetTeamUnits         = Spring.GetTeamUnits
-local spSetUnitCOBValue      = Spring.SetUnitCOBValue
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetUnitTeam		     = Spring.GetUnitTeam
 --------------------------------------------------------------------------------

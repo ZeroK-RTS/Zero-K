@@ -28,7 +28,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 1512,
-		subs    = 75.6,
 	},
 
 	edgeEffectiveness       = 1,
@@ -39,8 +38,8 @@ local weaponDef = {
 	impulseFactor           = 0.2,
 	interceptedByShieldType = 2,
 	leadLimit               = 0.0,
-	model                   = [[wep_m_phoenix.s3o]],
-    noSelfDamage            = false,
+	model                   = [[wep_m_phoenix_nonhax.s3o]],
+	noSelfDamage            = false,
 	range                   = 700,
 	reloadtime              = 30,
 	smokeTrail              = false,

@@ -174,13 +174,13 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 
       -- if the computed path shows "no path found" (false), abort
       if Spring.GetUnitIsDead(unitID) and not path then
-        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, cmdOptions.shift and CMD.OPT_SHIFT or 0)
+        Spring.GiveOrderToUnit(unitID, CMD.STOP, 0, cmdOptions.shift and CMD.OPT_SHIFT or 0)
         return
       end
 
       -- give the orders
       if Spring.GetUnitIsDead(unitID) and not cmdOptions.shift then
-        Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+        Spring.GiveOrderToUnit(unitID, CMD.STOP, 0, 0)
       end
       for nodeIndex=2, #path do -- skip first node
         local node = path[nodeIndex]

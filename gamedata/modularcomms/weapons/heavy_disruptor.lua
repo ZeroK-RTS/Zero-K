@@ -10,7 +10,6 @@ local weaponDef = {
 
 	customParams            = {
 		is_unit_weapon = 1,
-		--timeslow_preset       = [[module_disruptorbeam]],
 		timeslow_damagefactor = [[2]],
 
 		light_color = [[1.88 0.63 2.5]],
@@ -20,7 +19,6 @@ local weaponDef = {
 
 	damage                  = {
 		default = 600,
-		subs    = 40,
 	},
 
 	explosionGenerator      = [[custom:flash2purple_large]],

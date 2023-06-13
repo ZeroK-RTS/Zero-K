@@ -7,6 +7,27 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetGroundHeight = Spring.GetGroundHeight
 local CMD_INSERT = CMD.INSERT
 
+local oddX = {}
+local oddZ = {}
+
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	oddX[i] = (ud.xsize % 4)*4
+	oddZ[i] = (ud.zsize % 4)*4
+end
+
+function Spring.Utilities.SnapToBuildGrid(unitDefID, facing, mx, mz)
+	local offFacing = (facing == 1 or facing == 3)
+	if offFacing then
+		mx = math.floor((mx + 8 - oddZ[unitDefID])/16)*16 + oddZ[unitDefID]
+		mz = math.floor((mz + 8 - oddX[unitDefID])/16)*16 + oddX[unitDefID]
+	else
+		mx = math.floor((mx + 8 - oddX[unitDefID])/16)*16 + oddX[unitDefID]
+		mz = math.floor((mz + 8 - oddZ[unitDefID])/16)*16 + oddZ[unitDefID]
+	end
+	return mx, mz
+end
+
 function Spring.Utilities.IsValidPosition(x, z)
 	return x and z and x >= 1 and z >= 1 and x <= mapWidth-1 and z <= mapHeight-1
 end
@@ -79,4 +100,3 @@ function Spring.Utilities.GetGroundHeightMinusOffmap(x, z)
 	end
 	return Spring.GetGroundHeight(x, z) - maxOff
 end
-

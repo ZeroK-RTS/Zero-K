@@ -108,7 +108,8 @@ local SOUND_DIRNAME_SHORT = 'reply/'
 local LUAUI_DIRNAME = 'LuaUI/'
 local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
-local myTeamID
+local myPlayerID = Spring.GetMyPlayerID()
+local myTeamID = Spring.GetMyTeamID()
 local cooldown = {}
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
@@ -137,7 +138,7 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	cooldownTime = cooldownTime or 0
 	local t = osClock()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
-		playSound(category, volume or 1, 'userinterface') -- not using 'unitreply' because only 1 can play at a time, the next cutting off the first
+		playSound(category, (volume or 1) * (WG.unitReplyVolumeMult or 1), 'userinterface') -- not using 'unitreply' because only 1 can play at a time, the next cutting off the first
 		cooldown[category] = t
 	end
 end
@@ -181,14 +182,18 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 
 	if not isBuild then
 		if sounds.ok then
-			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, sounds.ok.volume)
+			CoolNoisePlay(sounds.ok[1], options.commandSoundCooldown.value, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
 	elseif sounds.build then
-		CoolNoisePlay(sounds.build[1], options.commandSoundCooldown.value)
+		CoolNoisePlay(sounds.build[1], options.commandSoundCooldown.value, options.ordernoisevolume.value)
 	end
 end
 
-local function PlayResponse(unitID, cmdID, cooldown)
+local function PlayResponse(unitID, cmdID)
+	unitID = unitID or GetSelectedUnits()[1]
+	if not unitID then
+		return false
+	end
 	local unitDefID = GetUnitDefID(unitID)
 	if not unitDefID then
 		return false
@@ -257,9 +262,14 @@ function externalFunctions.PlayResponse(unitID, cmdID)
 	PlayResponse(unitID, cmdID)
 end
 
+function widget:PlayerChanged(playerID)
+	if playerID ~= myPlayerID then
+		return
+	end
+	myTeamID = Spring.GetMyTeamID()
+end
+
 function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
-	myTeamID = team
 	WG.noises = externalFunctions
 end
 

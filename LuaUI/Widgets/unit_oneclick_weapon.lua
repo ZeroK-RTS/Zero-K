@@ -1,5 +1,6 @@
 function widget:GetInfo() return {
 	name = "One click weapon handler",
+	desc = "Prevents abilities (Krow, Swift, etc.) from cancelling the entire order queue without SHIFT",
 	layer = -1337, -- before cmd_commandinsert
 	enabled = true,
 } end

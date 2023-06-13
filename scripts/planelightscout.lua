@@ -4,8 +4,8 @@ include "fixedwingTakeOff.lua"
 --------------------------------------------------------------------
 -- constants/vars
 --------------------------------------------------------------------
-local fuselage, KRisaravinglunatic, canardl, canardr, wingl, wingtipl, wingr, wingtipr, enginel, exhaustl, enginer, exhaustr = piece(
-	"fuselage", "KRisaravinglunatic", "canardl", "canardr", "wingl", "wingtipl", "wingr", "wingtipr", "enginel", "exhaustl", "enginer", "exhaustr")
+local fuselage, KRisaravinglunatic, wingl, wingr = piece("fuselage", "KRisaravinglunatic", "wingl", "wingr")
+-- unused pieces: canardl, canardr, wingtipl, wingtipr, enginer, enginel, exhaustl, exhaustr
 local smokePiece = {KRisaravinglunatic}
 
 local SIG_TAKEOFF = 2

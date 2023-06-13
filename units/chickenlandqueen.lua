@@ -23,19 +23,24 @@ return { chickenlandqueen = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
+    selection_scale       = 2,
+
+    outline_x = 400,
+    outline_y = 400,
+    outline_yoff = 90,
   },
 
   explodeAs              = [[SMALL_UNITEX]],
-  footprintX             = 8,
-  footprintZ             = 8,
+  footprintX             = 4,
+  footprintZ             = 4,
   iconType               = [[chickenq]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
+  idleAutoHeal           = 20,
+  idleTime               = 300,
   leaveTracks            = true,
   maxDamage              = 200000,
   maxVelocity            = 2.5,
   minCloakDistance       = 250,
-  movementClass          = [[AKBOT6]],
+  movementClass          = [[AKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP STUPIDTARGET MINE]],
   objectName             = [[chickenflyerqueen.s3o]],
@@ -60,7 +65,7 @@ return { chickenlandqueen = {
   trackStretch           = 1,
   trackType              = [[ChickenTrack]],
   trackWidth             = 100,
-  turnRate               = 399,
+  turnRate               = 480,
   upright                = true,
   workerTime             = 0,
 
@@ -269,7 +274,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 400,
         planes  = 400,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -304,7 +308,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 1000,
         planes  = 1000,
-        subs    = 1000,
       },
 
       explosionGenerator      = [[custom:NONE]],
@@ -341,7 +344,6 @@ return { chickenlandqueen = {
         default    = 10,
         chicken    = 0.001,
         planes     = 10,
-        subs       = 5,
       },
 
       edgeEffectiveness       = 1,
@@ -379,7 +381,6 @@ return { chickenlandqueen = {
       damage                  = {
         default = 75,
         planes  = [[150]],
-        subs    = 7.5,
       },
 
       dance                   = 60,

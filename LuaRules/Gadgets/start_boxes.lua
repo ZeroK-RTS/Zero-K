@@ -31,7 +31,7 @@ local function GetAverageStartpoint(boxID)
 	return x, z
 end
 
-local function RegtangularizeTrapezoid(edgeA, edgeB)
+local function RectangularizeTrapezoid(edgeA, edgeB)
 	local vector = Spring.Utilities.Vector
 	local origin = edgeA[1]
 	local unit = vector.Unit(vector.Subtract(edgeA[2], edgeA[1]))
@@ -148,7 +148,7 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 		local edgesA = GetEdgePoints(pointA)
 		local edgesB = GetEdgePoints(pointB)
 		
-		return RegtangularizeTrapezoid(edgesA, edgesB)
+		return RectangularizeTrapezoid(edgesA, edgesB)
 	end
 
 	return {
@@ -264,7 +264,10 @@ local function GetTeamNames (allyTeamID)
 	end
 
 	if humans == 0 then
-		return "AI", "AI"
+		--[[ AI is treated like a clan, so it generally takes
+		     priority unless there are multiple AI allyteams ]]
+		clanShortName = "AI"
+		clanLongName = "AI"
 	end
 
 	local boxCount = 0
@@ -283,6 +286,11 @@ local function GetTeamNames (allyTeamID)
 				return box.nameLong, box.nameShort, clanLongName, clanShortName
 			end
 		end
+	end
+
+	if humans == 0 then
+		local aiStr = "AI " .. allyTeamID
+		return aiStr, aiStr, clanLongName, clanShortName
 	end
 
 	return ("Team " .. leaderName), leaderName, clanLongName, clanShortName
@@ -413,6 +421,21 @@ function gadget:Initialize()
 		if (clan[1] == 1) and (clanName ~= "") then
 			Spring.SetGameRulesParam("allyteam_short_name_" .. clan[3], clan[2])
 			Spring.SetGameRulesParam("allyteam_long_name_"  .. clan[3], clanName)
+		end
+	end
+	
+	-- AllyTeam 'origin'
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local boxID = GetBoxID(allyTeamID)
+		if boxID then
+			local boxX, boxZ = GetAverageStartpoint(boxID)
+			if boxX and boxZ then
+				local teamID = Spring.GetTeamList(allyTeamID)[1]
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_x", boxX)
+				Spring.SetTeamRulesParam(teamID, "allyteam_origin_z", boxZ)
+				--Spring.MarkerAddPoint(boxX, 0, boxZ, "ally origin " .. allyTeamID)
+			end
 		end
 	end
 end

@@ -10,8 +10,10 @@ function widget:GetInfo() return {
 
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
+local flipped
 
 local GetRawBoxes, GetParsedBoxes = VFS.Include("LuaUI/Headers/startbox_utilities.lua")
+local GetMiniMapFlipped = Spring.Utilities.IsMinimapFlipped
 local startboxConfig = GetParsedBoxes()
 
 local rawBoxes = GetRawBoxes()
@@ -184,6 +186,7 @@ local function drawBoxesMinimap()
 		gl.Color (allyStartBoxColor)
 		for i = 1, #allyStartBox do
 			local x1, z1, x2, z2, x3, z3 = unpack(allyStartBox[i])
+
 			gl.Shape (GL.TRIANGLES, {
 				{ v = {x1, z1, 0} },
 				{ v = {x2, z2, 0} },
@@ -206,6 +209,17 @@ local function drawBoxesMinimap()
 	end
 end
 
+local function xForm()
+		gl.LoadIdentity()
+		if flipped then
+			gl.Translate(1, 0, 0)
+			gl.Scale(-1 / Game.mapSizeX, 1 / Game.mapSizeZ, 1)
+		else
+			gl.Translate(0, 1, 0)
+			gl.Scale(1 / Game.mapSizeX, -1 / Game.mapSizeZ, 1)
+		end
+end
+
 function widget:Initialize()
 	-- only show at the beginning
 	if (Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2) or (Spring.GetModOptions().fixedstartpos == "1") then
@@ -213,12 +227,10 @@ function widget:Initialize()
 		return
 	end
 
+	flipped = GetMiniMapFlipped()
+
 	-- flip and scale (using x & y for gl.Rect())
-	xformList = gl.CreateList(function()
-		gl.LoadIdentity()
-		gl.Translate(0, 1, 0)
-		gl.Scale(1 / Game.mapSizeX, -1 / Game.mapSizeZ, 1)
-	end)
+	xformList = gl.CreateList(xForm)
 
 	-- cone list for world start positions
 	coneList = gl.CreateList(function()
@@ -277,13 +289,6 @@ function widget:Initialize()
 	boxMinimapList = gl.CreateList(drawBoxesMinimap)
 end
 
-function widget:Update()
-	if Spring.GetGameRulesParam("totalSaveGameFrame") then
-		Spring.SendCommands("forcestart")
-		widgetHandler:RemoveWidget()
-	end
-end
-
 function widget:Shutdown()
 	gl.DeleteList(xformList)
 	gl.DeleteList(coneList)
@@ -302,7 +307,6 @@ local function ValidStartpos (x, y, z)
 end
 
 function widget:DrawWorld()
-
 	gl.Fog(false)
 
 	gl.CallList(boxList)
@@ -310,7 +314,7 @@ function widget:DrawWorld()
 	if (allyStartBox and recommendedStartpoints) then
 		gl.Color (allyStartBoxColor)
 		gl.LineWidth(3)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINES)
+		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
 		for i = 1, #recommendedStartpoints do
 			local x = recommendedStartpoints[i][1]
 			local z = recommendedStartpoints[i][2]
@@ -325,7 +329,7 @@ function widget:DrawWorld()
 		end
 		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	end
-	
+
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if ValidStartpos(x,y,z) then
@@ -391,10 +395,18 @@ function widget:DrawScreenEffects()
 	gl.Fog(true)
 end
 
-local boxes_loaded_minimap = false
 function widget:DrawInMiniMap(minimapX, minimapY)
+	local newFlipped = GetMiniMapFlipped()
 
 	gl.PushMatrix()
+
+	if flipped ~= newFlipped then
+		flipped = newFlipped
+
+		gl.DeleteList(xformList)
+		xformList = gl.CreateList(xForm)
+	end
+
 	gl.CallList(xformList)
 	gl.LineWidth(1.49)
 	gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
@@ -408,9 +420,9 @@ function widget:DrawInMiniMap(minimapX, minimapY)
 	local dotSize = math.max(minimapX, minimapY) * 0.3
 	gl.PushMatrix()
 	gl.LineWidth(3)
-	gl.Translate(0, minimapY, 0)
-	gl.Scale(minimapX/mapX, -minimapY/mapZ, 1)
-	
+
+	gl.CallList(xformList)
+
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if ValidStartpos(x, y, z) then

@@ -25,7 +25,7 @@ function script.Create()
 	end
 	
 	for i = 1, 3 do
-		local rot = math.rad(120*i - 120)
+		local rot = math.rad(120)*(i - 1)
 		Turn(wheels[i], y_axis, rot)
 		Spin(wheels[i], x_axis, spin)
 	end

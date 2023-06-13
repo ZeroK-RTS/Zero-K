@@ -20,7 +20,7 @@ upgrades = {
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
-		description = "Basic self-defense weapon",
+		description = "Basic self-defence weapon",
 	},
 
 	commweapon_assaultcannon = {
@@ -82,6 +82,10 @@ upgrades = {
 	commweapon_shotgun = {
 		name = "Shotgun",
 		description = "Can hammer a single large target or shred many small ones",
+	},
+	commweapon_shotcannon = {
+		name = "12 gauge shotgun",
+		description = "Shotgun but shoots GLOWING HOT BALLS OF STEEL instead of nerd-ass lasers",
 	},
 	commweapon_slowbeam = {
 		name = "Slowing Beam",
@@ -335,7 +339,7 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if v.customparams.idstring == "commweapon_lightninggun" then
-						v.customparams.extra_damage_mult = v.customparams.extra_damage_mult * 1.25
+						v.customparams.extra_damage = v.customparams.extra_damage * 1.25
 						v.paralyzetime = v.paralyzetime + 2
 					end
 				end
@@ -676,7 +680,7 @@ upgrades = {
 	},
 	-- modules that use a weapon slot
 	module_guardian_armor = {
-		name = "Guardian Defense System",
+		name = "Guardian Defence System",
 		description = "Adds 100% HP (including other modules); self-repairs 20 HP/s",
 		func = function(unitDef, attributeMods)
 				attributeMods.health = attributeMods.health + 1

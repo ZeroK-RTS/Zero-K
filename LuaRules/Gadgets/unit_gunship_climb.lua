@@ -28,7 +28,6 @@ local UPDATE_PERIOD = 2
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Shared functions
-local spGetUnitDefID = Spring.GetUnitDefID
 local getMovetype = Spring.Utilities.getMovetype
 
 local gunshipDef = {}

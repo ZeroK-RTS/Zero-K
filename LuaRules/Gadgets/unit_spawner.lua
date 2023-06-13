@@ -15,11 +15,6 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-local SAVE_FILE = "Gadgets/unit_spawner.lua"
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 -- BEGIN SYNCED
 
@@ -61,8 +56,7 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local emptyTable	= {}
-local roamParam		= {2}
+local CMD_MOVESTATE_ROAM = CMD.MOVESTATE_ROAM
 local maxTries		= 500
 local maxTriesSmall	= 100
 local lava = (Game.waterDamage > 0)
@@ -334,18 +328,28 @@ end
 
 local function KillAllComputerUnits()
 	data.victory = true
+
+	local ggDestroyAlliance = GG.DestroyAlliance
+	if not ggDestroyAlliance then
+		return
+	end
+
+	
+	local allyteamsToKill = {}
+	local count = 0
+	local spGetTeamInfo = Spring.GetTeamInfo
 	for teamID in pairs(computerTeams) do
-		--local teamUnits = spGetTeamUnits(teamID)
-		--for i=1,#teamUnits do
-		--	Spring.DestroyUnit(teamUnits[i])
-		--end
-		local allyTeam = select(6, Spring.GetTeamInfo(teamID, false))
-		if GG.DestroyAlliance then
-			GG.DestroyAlliance(allyTeam)
-		end
+		local _, _, _, _, _, allyTeam = spGetTeamInfo(teamID, false)
+		count = count + 1
+		allyteamsToKill[count] = allyTeam
+	end
+
+	for i = 1, count do
+		-- not destroyed directly in the previous loop
+		-- because removal breaks the pairs iterator
+		ggDestroyAlliance(allyteamsToKill[i])
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -428,11 +432,11 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 	local validUnitID = spValidUnitID(data.targetID) --in case multiple UnitDestroyed() is called at same frame and burrow happen to choose a target before all Destroyed unit is registered.
 	if validUnitID and targetData.targetID ~= oldTarget then
 		targetData.targetTeam = spGetUnitTeam(data.targets[data.targetID])
-		--spGiveOrderToUnit(burrowID, CMD_ATTACK, {data.targetID}, 0)
+		--spGiveOrderToUnit(burrowID, CMD_ATTACK, data.targetID, 0)
 		--echo("Target for burrow ID ".. burrowID .." updated to target ID " .. data.targetID)
 	elseif not validUnitID then
 		targetData.targetID = nil
-		--spGiveOrderToUnit(burrowID, CMD_STOP, {}, 0)
+		--spGiveOrderToUnit(burrowID, CMD_STOP, 0, 0)
 		--echo("Target for burrow ID ".. burrowID .." lost, waiting")
 	end
 end
@@ -550,7 +554,7 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
 		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
 		local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, CMD_MOVESTATE_ROAM, 0)
 			if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, 0) end
 			data.chickenBirths[unitID] = now
 		end
@@ -758,7 +762,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 	for i=1, (number or 1) do
 		local unitID = spCreateUnit(unitName, x + random(-spawnSquare, spawnSquare), y, z + random(-spawnSquare, spawnSquare), "n", chickenTeamID)
 		if unitID then
-			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, 0) --// set moveState to roam
+			spGiveOrderToUnit(unitID, CMD.MOVE_STATE, CMD_MOVESTATE_ROAM, 0)
 		end
 	end
 end
@@ -849,11 +853,15 @@ local function ProcessSpecialPowers()
 	
 	if selection.tieToBurrow then
 		local burrowsOrdered = {}
+		local burrowsOrderedCount = 0
 		for id in pairs(data.burrows) do
-			burrowsOrdered[#burrowsOrdered + 1] = id
+			burrowsOrderedCount = burrowsOrderedCount + 1
+			burrowsOrdered[burrowsOrderedCount] = id
 		end
-		local burrowID = burrowsOrdered[math.random(#burrowsOrdered)]
-		SpawnTurret(burrowID, selection.unit, count, true)
+		if burrowsOrderedCount > 0 then
+			local burrowID = burrowsOrdered[math.random(burrowsOrderedCount)]
+			SpawnTurret(burrowID, selection.unit, count, true)
+		end
 	else
 		local target = selection.targetHuman and ChooseTarget()
 		SpawnUnit(selection.unit, count, selection.minDist, selection.maxDist, target)
@@ -1321,51 +1329,6 @@ function gadget:GameOver()
 	Spring.SendCommands("wbynum 255 SPRINGIE:score,ID: "..Spring.Utilities.Base64Encode(tostring(spGetGameFrame() + gameFrameOffset).."/"..tostring(math.floor(score))))
 end
 
-function gadget:Load(zip)
-	if not (GG.SaveLoad and GG.SaveLoad.ReadFile) then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
-		return
-	end
-	
-	gameFrameOffset = GG.SaveLoad.GetSavedGameFrame()
-	
-	local saveData = GG.SaveLoad.ReadFile(zip, "Chicken", SAVE_FILE) or {}
-	data.queenID = GG.SaveLoad.GetNewUnitID(saveData.queenID)
-	data.queenTime = (saveData.queenTime or baseQueenTime) - gameFrameOffset/30
-	data.miniQueenNum = saveData.miniQueenNum
-	--data.targetCache = saveData.targetCache	-- not needed
-	data.burrows = GG.SaveLoad.GetNewUnitIDKeys(saveData.burrows)
-	for burrowID, targetData in pairs(data.burrows) do
-		targetData.targetID = GG.SaveLoad.GetNewUnitID(targetData.targetID)
-	end
-	data.chickenBirths = GG.SaveLoad.GetNewUnitIDKeys(saveData.chickenBirths)
-	data.timeOfLastSpawn = saveData.timeOfLastSpawn - math.floor(gameFrameOffset/30)
-	data.waveSchedule = saveData.waveSchedule - gameFrameOffset
-	data.waveNumber = saveData.waveNumber
-	data.eggDecay = GG.SaveLoad.GetNewFeatureIDKeys(saveData.eggDecay)
-	data.targets = GG.SaveLoad.GetNewUnitIDKeys(saveData.targets)
-	data.totalTechAccel = saveData.totalTechAccel
-	data.defensePool = saveData.defensePool
-	data.defenseQuota = saveData.defenseQuota
-	
-	data.humanAggro = saveData.humanAggro
-	data.humanAggroDelta = saveData.humanAggroDelta
-	data.humanAggroPerWave = saveData.humanAggroPerWave
-	
-	data.endgame = saveData.endgame
-	data.victory = saveData.victory
-	data.endMiniQueenNum = saveData.endMiniQueenNum
-	
-	data.morphFrame = saveData.morphFrame - gameFrameOffset
-	data.morphed = saveData.morphed
-	data.specialPowerCooldown = saveData.specialPowerCooldown
-	
-	Spring.SetGameRulesParam("queenTime", data.queenTime)
-	_G.chickenEventArgs = {type="refresh"}
-	SendToUnsynced("ChickenEvent")
-	_G.chickenEventArgs = nil
-end
-
 function gadget:Initialize()
 	Spring.SetGameRulesParam("malus", malus)
 	Spring.SetGameRulesParam("lagging", 0)
@@ -1401,7 +1364,7 @@ else
 function WrapToLuaUI()
 	if (Script.LuaUI('ChickenEvent')) then
 		local chickenEventArgs = {}
-		for k, v in spairs(SYNCED.chickenEventArgs) do
+		for k, v in pairs(SYNCED.chickenEventArgs) do
 			chickenEventArgs[k] = v
 		end
 		Script.LuaUI.ChickenEvent(chickenEventArgs)
@@ -1413,18 +1376,6 @@ function gadget:Initialize()
 	gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
 end
 
-function gadget:Save(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
-		return
-	end
-	
-	local chickenTable = SYNCED.data
-	chickenTable = Spring.Utilities.MakeRealTable(chickenTable, "Chicken")
-	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, chickenTable)
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 end
 -- END UNSYNCED
 --------------------------------------------------------------------------------

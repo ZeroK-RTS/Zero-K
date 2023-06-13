@@ -29,14 +29,6 @@ function script.StopBuilding()
 	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0);
 end
 
-
-function script.QueryNanoPiece()
-	--// send to LUPS
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),emitnano)
-
-	return emitnano
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 

@@ -10,6 +10,8 @@ local tex
 local cameraUniform,lightUniform
 local isS3oUniform, lifeUniform
 
+local USE_SPECULAR = Spring.Utilities.IsCurrentVersionNewerThan(105, 1000)
+
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +73,9 @@ function UnitCloaker:BeginDraw()
 	--gl.Texture(1,'bitmaps/clouddetail.bmp')
 	--gl.Texture(1,'bitmaps/GPL/Lups/perlin_noise.jpg')
 	gl.Texture(2,'bitmaps/GPL/Lups/mynoise2.png')
-	gl.Texture(3,'$specular')
+	if USE_SPECULAR then
+		gl.Texture(3,'$specular')
+	end
 	gl.Texture(4,'$reflection')
 
 	gl.MatrixMode(GL.PROJECTION)

@@ -29,7 +29,6 @@ local WHEEL_SPIN_DECEL_L = math.rad(15)
 
 local DEPLOY_SPEED = math.rad(90)
 local TURRET_SPEED = math.rad(60)
-local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
 local PIVOT_MOD = 1.6 --appox. equal to MAX_PIVOT / turnrate
@@ -40,6 +39,7 @@ local MIN_DIFF = math.rad(0.01)
 
 local smokePiece = {base, turret}
 
+--[[
 local function ImpactTilt(x,z)
 	Turn(base, z_axis, math.rad(-z), math.rad(105))
 	Turn(base, x_axis, math.rad(x), math.rad(105))
@@ -49,7 +49,6 @@ local function ImpactTilt(x,z)
 	Turn(base, x_axis, 0, math.rad(300))
 end
 
---[[
 function script.HitByWeapon(x, z)
 	StartThread(ImpactTilt, x, z)
 end
@@ -129,8 +128,7 @@ local function IdleAnim()
 	Signal(SIG_IDLE)
 	SetSignalMask(SIG_IDLE)
 	while true do
-		local angle = math.random(0,360)
-		Turn(turret, y_axis, math.rad(angle), TURRET_SPEED)
+		Turn(turret, y_axis, math.random() * math.rad(360), TURRET_SPEED)
 		Sleep(4000)
 	end
 end
@@ -176,10 +174,10 @@ function script.Activate()
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn(panel_a1, z_axis, math.rad(-(30)), DEPLOY_SPEED)
-	Turn(panel_a2, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
-	Turn(panel_b1, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
-	Turn(panel_b2, z_axis, math.rad(-(30)), DEPLOY_SPEED)
+	Turn(panel_a1, z_axis, math.rad(-30), DEPLOY_SPEED)
+	Turn(panel_a2, z_axis, math.rad(30), DEPLOY_SPEED)
+	Turn(panel_b1, z_axis, math.rad(30), DEPLOY_SPEED)
+	Turn(panel_b2, z_axis, math.rad(-30), DEPLOY_SPEED)
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
@@ -191,7 +189,7 @@ end
 function script.Deactivate()
 	Signal(SIG_ACTIVATE)
 	SetSignalMask(SIG_ACTIVATE)
-	Turn(turret, y_axis, 0, math.rad(TURRET_SPEED))
+	Turn(turret, y_axis, 0, TURRET_SPEED)
 	WaitForTurn(turret, y_axis)
 	
 	Turn(panel_a1, z_axis, 0, DEPLOY_SPEED)

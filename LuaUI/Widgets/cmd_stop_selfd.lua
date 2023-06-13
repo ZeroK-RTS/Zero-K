@@ -3,8 +3,8 @@ function widget:GetInfo()
     name      = "Stop Self-D",
     desc      = "Stop orders cancel self destruct commands",
     author    = "Bluestone",
-    date      = "GPL v3 or later",
-    license   = "Feb 2015",
+    license   = "GPL v2 or later",
+    date      = "Feb 2015",
     layer     = 0,
     enabled   = true
   }

@@ -5,6 +5,7 @@ local defaults = {
 	grow_rate = 512,
 	shrink_rate = 2048,
 	decloak_distance = 300,
+	recloak_rate = 1000,
 
 	init = 1,
 	draw = 1,

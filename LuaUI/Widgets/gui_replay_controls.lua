@@ -118,7 +118,7 @@ end
 
 function CreateTheUI()
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local windowY = math.floor(screenWidth*2/11 + 32)
 	
@@ -451,6 +451,9 @@ function skipPreGameChatter ()
 	Spring.Echo("Skipping pregame chatter")
 	if (demoStarted) then
 		Spring.SendCommands("skip 1")
+	else
+		Spring.SendCommands("forcestart")
+		Spring.SendCommands("skip 0")
 	end
 	skipped = true
 	-- window:RemoveChild(button_skipPreGame)

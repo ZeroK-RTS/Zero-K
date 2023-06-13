@@ -20,18 +20,19 @@ local function Open ()
 	Turn (nanobase, x_axis, math.rad(10), math.rad(10))
 	WaitForTurn (centre, x_axis)
 
-	SetUnitValue (COB.YARD_OPEN, 1)
-	SetUnitValue (COB.INBUILDSTANCE, 1)
-	SetUnitValue (COB.BUGGER_OFF, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
 	Signal (1)
 	SetSignalMask (1)
 
-	SetUnitValue (COB.YARD_OPEN, 0)
-	SetUnitValue (COB.BUGGER_OFF, 0)
-	SetUnitValue (COB.INBUILDSTANCE, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
+	SetUnitValue(COB.INBUILDSTANCE, 0)
 
 	Turn (leftpiece,  z_axis, 0, math.rad(36))
 	Turn (rightpiece, z_axis, 0, math.rad(36))
@@ -47,11 +48,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
-end
-
-function script.QueryNanoPiece ()
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanoemit)
-	return nanoemit
 end
 
 function script.Activate ()

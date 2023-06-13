@@ -54,9 +54,6 @@ local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, _, moduleDefNames 
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
--- This command is entirely internal. Does not hit gadget land.
-local CMD_UPGRADE_UNIT = 11432
-
 -- Configurable things, possible to add to Epic Menu later.
 local BUTTON_SIZE = 55
 local ROW_COUNT = 6
@@ -184,7 +181,7 @@ local function CreateModuleSelectionWindow()
 		children = {selectionButtonPanel}
 	}
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth,screenHeight = Spring.GetViewGeometry()
 	local minimapHeight = screenWidth/6 + 45
 	
 	local selectionWindowMain = Window:New{
@@ -600,7 +597,7 @@ local function HideMainWindow()
 end
 
 local function CreateMainWindow()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	local minimapHeight = screenWidth/6 + 45
 	
 	local mainHeight = math.min(420, math.max(325, screenHeight - 450))
@@ -785,7 +782,7 @@ local function CreateMainWindow()
 	}
 end
 
-local function ShowModuleListWindow(slotDefaults, level, chassis, alreadyOwnedModules)
+local function ShowModuleListWindow(unitID, slotDefaults, level, chassis, alreadyOwnedModules)
 	if not currentModuleList then
 		CreateMainWindow()
 	end
@@ -799,6 +796,9 @@ local function ShowModuleListWindow(slotDefaults, level, chassis, alreadyOwnedMo
 		morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
 	end
 	
+	if Spring.ValidUnitID(unitID) then
+		morphBuildPower = morphBuildPower * (Spring.GetGameRulesParam("econ_mult_" .. (Spring.GetUnitAllyTeam(unitID) or "")) or 1)
+	end
 	local slots = chassisDefs[chassis].levelDefs[level].upgradeSlots
 
 	if not mainWindowShown then
@@ -951,18 +951,19 @@ local function CreateModuleListWindowFromUnit(unitID)
 		if savedSlotLoadout[profileID] and savedSlotLoadout[profileID][level] then
 			slotDefaults = savedSlotLoadout[profileID][level]
 		else
+			local chassisModuleDefs = moduleDefNames[(chassisDefs[chassis] or {}).name] or {}
 			local commProfileInfo = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 			if commProfileInfo and commProfileInfo.modules and commProfileInfo.modules[level + 1] then
 				local defData = commProfileInfo.modules[level + 1]
 				for i = 1, #defData do
-					slotDefaults[i] = moduleDefNames[defData[i]]
+					slotDefaults[i] = chassisModuleDefs[defData[i]]
 				end
 			end
 		end
 	end
 	
 	-- Create the window
-	ShowModuleListWindow(slotDefaults, level + 1, chassis, alreadyOwned)
+	ShowModuleListWindow(unitID, slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
 local function GetCommanderUpgradeAttributes(unitID, cullMorphing)

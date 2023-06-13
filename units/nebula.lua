@@ -7,7 +7,7 @@ return { nebula = {
   airStrafe              = 0,
   bankingAllowed         = false,
   brakeRate              = 0.48,
-  buildCostMetal         = 6000,
+  buildCostMetal         = 8000,
   builder                = false,
   buildPic               = [[nebula.png]],
   canFly                 = true,
@@ -28,6 +28,10 @@ return { nebula = {
     cantuseairpads = 1,
     modelradius    = [[40]],
     shield_emit_height = 20,
+
+    outline_x = 420,
+    outline_y = 420,
+    outline_yoff = 40,
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -36,11 +40,8 @@ return { nebula = {
   footprintZ             = 5,
   hoverAttack            = true,
   iconType               = [[nebula]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 11000,
   maxVelocity            = 3.3,
-  minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[nebula.s3o]],
@@ -110,7 +111,6 @@ return { nebula = {
 
       damage                  = {
         default = 40,
-        subs    = 2,
       },
 
       explosionGenerator      = [[custom:plasma_hit_32]],

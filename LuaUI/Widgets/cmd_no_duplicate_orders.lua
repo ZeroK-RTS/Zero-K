@@ -33,6 +33,8 @@ local GetUnitPosition  = Spring.GetUnitPosition
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitHealth    = Spring.GetUnitHealth
 
+local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local buildList = {}
@@ -133,8 +135,9 @@ function widget:CommandNotify(id, params, options)
 		local blockUnits = {}
 		for i = 1, #selUnits do
 			local unitID = selUnits[i]
-			local cmdID, _, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
-			if cmdID and (params[1] == cmdParam) then
+			local cmdID, cmdOpts, _, cmdParam = Spring.GetUnitCurrentCommand(unitID)
+			-- Override internal commands to override idle behaviour.
+			if cmdID and (params[1] == cmdParam) and (cmdOpts ~= CMD_OPT_INTERNAL) then
 				blockUnits[unitID] = true
 			end
 		end -- for

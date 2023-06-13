@@ -30,23 +30,51 @@ local dontCheckFeatures = {}
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
 
+local function HaveFullview()
+	local spec, fullview = Spring.GetSpectatingState()
+	return spec and fullview
+end
+
+local function CheckSpecState()
+	if HaveFullview() then
+		Spring.Echo("<Ghost Site> Spectator mode. Widget removed.")
+		widgetHandler:RemoveWidget()
+		return false
+	end
+	return true
+end
+
 local shaderObj
 function InitShader()
 	local shaderTemplate = include("Widgets/Shaders/default_tint.lua")
 
-    local shader = gl.CreateShader(shaderTemplate)
-    if not shader then
-        Spring.Echo("Ghost Site shader compilation failed: " .. gl.GetShaderLog())
-        return
-    end
-    shaderObj = {
-        shader = shader,
-        teamColorID = gl.GetUniformLocation(shader, "teamColor"),
-        tint = gl.GetUniformLocation(shader, "tint")
-    }
+	local shader = gl.CreateShader(shaderTemplate)
+	if not shader then
+		Spring.Echo("Ghost Site shader compilation failed: " .. gl.GetShaderLog())
+		return
+	end
+	shaderObj = {
+		shader = shader,
+		teamColorID = gl.GetUniformLocation(shader, "teamColor"),
+		tint = gl.GetUniformLocation(shader, "tint")
+	}
 end
 
 local function DrawGhostFeatures()
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	if cameraHeight < 1 then
+		cameraHeight = 1
+	end
+	if cameraHeight > Spring.GetConfigInt("FeatureDrawDistance") then
+		return
+	end
 	gl.Color(1.0, 1.0, 1.0, 0.35)
   
 	--gl.Texture(0,"$units1") --.3do texture atlas for .3do model
@@ -187,20 +215,6 @@ local function ResetGl()
 	gl.Color(1.0, 1.0, 1.0, 1.0)
 	gl.Texture(false)
 end
-
-local function CheckSpecState()
-	local playerID = Spring.GetMyPlayerID()
-	local _, _, spec = Spring.GetPlayerInfo(playerID, false)
-
-	if spec then
-		Spring.Echo("<Ghost Site> Spectator mode. Widget removed.")
-		widgetHandler:RemoveWidget()
-		return false
-	end
-
-	return true
-end
-
 
 function widget:Update(dt)
 	updateTimer = updateTimer + dt

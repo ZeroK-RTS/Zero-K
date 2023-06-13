@@ -52,7 +52,7 @@ local embarkCmdDesc = {
   name    = 'Embark',
   cursor  = 'Attack',
   action  = 'embark',
-  tooltip = 'Transport to location, or queue Embark point (SHIFT)',
+  tooltip = 'Call transports to take selected units to the end of their Move order queues, or queue and Embark point (SHIFT).',
   params  = {"alt"}
 }
 
@@ -76,10 +76,15 @@ local transportToCmdDesc = {
   tooltip = 'Transport To location.',
 }
 
-local transDefs = {
-  [ UnitDefNames['gunshiptrans'].id ] = true,
-  [ UnitDefNames['gunshipheavytrans'].id ] = true,
-}
+local transDefs = {}
+
+for unitDefID = 1, #UnitDefs do
+  local ud = UnitDefs[unitDefID]
+
+  if (ud.isTransport) then
+    transDefs[unitDefID] = true
+  end
+end
 
 local hasTransports = {}
 
@@ -157,16 +162,6 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	gadget:UnitDestroyed(unitID, unitDefID, oldTeamID) --remove embark/disembark command
 end
 
-
-
-function gadget:UnitGiven(unitID) -- minor hack unrelated to transport ai - enable captured unit
-    GiveOrderToUnit(unitID, CMD_ONOFF, { 1 }, 0)
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 function gadget:Initialize()
   gadgetHandler:RegisterCMDID(CMD_EMBARK);
   gadgetHandler:RegisterCMDID(CMD_DISEMBARK);
@@ -209,7 +204,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		GiveOrderToUnit(unitID, CMD_RAW_MOVE, {cmdParams[1],cmdParams[2],cmdParams[3]}, opt) -- This move command determine transport_AI destination.
 	end
 	if not embark then
-		GiveOrderToUnit(unitID, CMD_WAIT, {}, opt) --Note: transport AI use CMD_WAIT to identify transport unit. "Ctrl" will flag enter/exit transport point.
+		GiveOrderToUnit(unitID, CMD_WAIT, 0, opt) --Note: transport AI use CMD_WAIT to identify transport unit. "Ctrl" will flag enter/exit transport point.
 	end
 	SendToUnsynced("taiEmbark", unitID, teamID, embark, cmdOptions.shift, cmdOptions.alt) --this will put unit into transport_AI's priority (see: unit_transport_ai.lua)
     return false

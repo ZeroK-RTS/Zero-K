@@ -4,7 +4,7 @@ function widget:GetInfo()
 		desc      = "Draws a decal on each metal spot",
 		author    = "Bluestone (based on the Lua Metal Spots widget by Cheesecan)",
 		date      = "April 2014",
-		license   = "GPL v3 or later",
+		license   = "GPL v2 or later",
 		layer     = 5,
 		enabled   = true  --  loaded by default?
 	}
@@ -62,6 +62,7 @@ end
 function widget:GameFrame(n)
 	if n%15 == 0 then
 		-- Update display to take terraform into account
+		gl.DeleteList(displayList)
 		displayList = gl.CreateList(drawPatches)
 	end
 end

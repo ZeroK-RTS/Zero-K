@@ -16,6 +16,9 @@ return { chickenc = {
   category            = [[LAND SINK]],
 
   customParams        = {
+    outline_x = 130,
+    outline_y = 130,
+    outline_yoff = 30,
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -29,7 +32,6 @@ return { chickenc = {
   maxSlope            = 72,
   maxVelocity         = 2.2,
   maxWaterDepth       = 22,
-  minCloakDistance    = 75,
   movementClass       = [[ATKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
@@ -55,7 +57,7 @@ return { chickenc = {
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 70,
   turninplace         = 0,
-  turnRate            = 806,
+  turnRate            = 967,
   upright             = false,
   workerTime          = 0,
 

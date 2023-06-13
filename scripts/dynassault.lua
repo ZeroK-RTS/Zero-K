@@ -3,8 +3,6 @@ include "constants.lua"
 local dyncomm = include('dynamicCommander.lua')
 _G.dyncomm = dyncomm
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -45,41 +43,14 @@ local SIG_RESTORE_TORSO = 32
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local PACE = 1.8
-local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
-local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-PACE = PACE * VELOCITY/BASE_VELOCITY
-
-local THIGH_FRONT_ANGLE = -math.rad(45)
-local THIGH_FRONT_SPEED = math.rad(42) * PACE
-local THIGH_BACK_ANGLE = math.rad(30)
-local THIGH_BACK_SPEED = math.rad(40) * PACE
-local SHIN_FRONT_ANGLE = math.rad(40)
-local SHIN_FRONT_SPEED = math.rad(60) * PACE
-local SHIN_BACK_ANGLE = math.rad(15)
-local SHIN_BACK_SPEED = math.rad(60) * PACE
-
-local ARM_FRONT_ANGLE = -math.rad(15)
-local ARM_FRONT_SPEED = math.rad(14.5) * PACE
-local ARM_BACK_ANGLE = math.rad(5)
-local ARM_BACK_SPEED = math.rad(14.5) * PACE
 local ARM_PERPENDICULAR = math.rad(90)
---[[
-local FOREARM_FRONT_ANGLE = -math.rad(15)
-local FOREARM_FRONT_SPEED = math.rad(40) * PACE
-local FOREARM_BACK_ANGLE = -math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(40) * PACE
-]]--
-
-local TORSO_ANGLE_MOTION = math.rad(8)
-local TORSO_SPEED_MOTION = math.rad(7)*PACE
 
 local RESTORE_DELAY = 2500
 
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isLasering, isDgunning, gunLockOut = false, false, false
+local isLasering, isDgunning = false, false
 local restoreHeading, restorePitch = 0, 0
 
 local starBLaunchers = {}
@@ -92,16 +63,14 @@ for index, weapon in pairs(wepTable) do
 		--Spring.Echo("sbl found")
 	end
 end
-wepTable = nil
 
 --------------------------------------------------------------------------------
 -- Walking
 --------------------------------------------------------------------------------
 local PACE_MULT = 0.7
-local PACE = 2*PACE_MULT
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
-local PACE = PACE * VELOCITY/BASE_VELOCITY
+local PACE = 2*PACE_MULT * VELOCITY/BASE_VELOCITY
 
 local SLEEP_TIME = 360/PACE_MULT
 
@@ -143,7 +112,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)*dyncomm.GetPace()
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
@@ -267,9 +236,14 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
-		Turn(rarm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
+		if pitch > math.rad(-45) then
+			Turn(rarm, x_axis, -pitch, ARM_SPEED_PITCH)
+			Turn(rhand, x_axis, 0, ARM_SPEED_PITCH)
+		else
+			Turn(rarm, x_axis, math.rad(-18), ARM_SPEED_PITCH)
+			Turn(rhand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
+		end
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(rhand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreLaser)
@@ -281,11 +255,18 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_DGUN)
 		SetSignalMask(SIG_DGUN)
 		isDgunning = true
-		Turn(larm, x_axis, math.rad(0) -pitch, ARM_SPEED_PITCH)
+		if pitch > math.rad(-45) then
+			Turn(larm, x_axis, -pitch, ARM_SPEED_PITCH)
+			Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
+		else
+			Turn(larm, x_axis, math.rad(-18), ARM_SPEED_PITCH)
+			Turn(lnanohand, x_axis, math.rad(18) -pitch, ARM_SPEED_PITCH)
+		end
+		--Turn(larm, x_axis, math.min(math.rad(-18), -pitch), ARM_SPEED_PITCH)
+		--Turn(lnanohand, x_axis, math.max(0, math.rad(18) -pitch), ARM_SPEED_PITCH)
 		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
-		Turn(lnanohand, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(rarm, x_axis)
+		WaitForTurn(lnanohand, x_axis)
 		StartThread(RestoreDGun)
 		return true
 	elseif weaponNum == 3 then
@@ -344,11 +325,6 @@ function script.StartBuilding(heading, pitch)
 	Turn(larm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
-	return lnanoflare
 end
 
 function script.Killed(recentDamage, maxHealth)

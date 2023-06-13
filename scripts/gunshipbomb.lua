@@ -10,12 +10,6 @@ local l_fan = piece "l_fan"
 local r_wing = piece "r_wing"
 local r_fan = piece "r_fan"
 
-local side = 1
-local forward = 3
-local up = 2
-
-local RIGHT_ANGLE = math.rad(90)
-
 local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
@@ -32,49 +26,57 @@ local function Burrow()
 		x,y,z = Spring.GetUnitPosition(unitID)
 		height = Spring.GetGroundHeight(x,z)
 	end
-	
-	--Spring.UnitScript.SetUnitValue(firestate, 0)
-	Turn(base, side, -RIGHT_ANGLE, 5)
-	Turn(l_wing, side, RIGHT_ANGLE, 5)
-	Turn(r_wing, side, RIGHT_ANGLE, 5)
-	Move(base, up, 8, 8)
-	--Move(base, forward, -4, 5)
+
+	Turn(base, x_axis, math.rad(-90), 5)
+	Turn(l_wing, x_axis, math.rad(90), 5)
+	Turn(r_wing, x_axis, math.rad(90), 5)
+	Move(base, y_axis, 8, 8)
 end
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
-	Spring.SetUnitCloak(unitID, 0)
-	Spring.SetUnitStealth(unitID, false)
-	--Spring.UnitScript.SetUnitValue(firestate, 2)
-	Turn(base, side, 0, 5)
-	Turn(l_wing, side,0, 5)
-	Turn(r_wing, side, 0, 5)
-	Move(base, up, 0, 10)
-	--Move(base, forward, 0, 5)
+	Turn(base, x_axis, 0, 5)
+	Turn(l_wing, x_axis, 0, 5)
+	Turn(r_wing, x_axis, 0, 5)
+	Move(base, y_axis, 0, 10)
 end
 
 function Detonate() -- Giving an order causes recursion.
 	GG.QueueUnitDescruction(unitID)
 end
 
+local function BurrowThread()
+	--[[ Ideally this would use events instead of polling,
+	     but gunships don't receive Skidding events so hurling
+	     it via gravguns would let it keep cloaked.
+
+	     Note that the animation is still tied to events because
+	     they produce better looks (transitions happen in flight). ]]
+	while true do
+		local _, _, _, v = Spring.GetUnitVelocity(unitID)
+		if v < 0.02 then
+			Spring.SetUnitCloak(unitID, 2)
+			Spring.SetUnitStealth(unitID, true)
+		else
+			Spring.SetUnitCloak(unitID, 0)
+			Spring.SetUnitStealth(unitID, false)
+		end
+
+		Sleep(200)
+	end
+end
+
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(BurrowThread)
 	if not Spring.GetUnitIsStunned(unitID) then
-		Spring.SetUnitCloak(unitID, 2)
-		Spring.SetUnitStealth(unitID, true)
 		Burrow()
 	end
 end
 
-function script.Activate()
+function script.StartMoving()
 	StartThread(UnBurrow)
 end
-
-function script.Deactivate()
-	Spring.SetUnitCloak(unitID, 2)
-	Spring.SetUnitStealth(unitID, true)
-end
-
 function script.StopMoving()
 	StartThread(Burrow)
 end

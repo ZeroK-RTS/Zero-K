@@ -18,6 +18,7 @@ local p3 = piece 'p3'
 local p4 = piece 'p4'
 
 include "constants.lua"
+include "aimPosTerraform.lua"
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
@@ -25,8 +26,8 @@ local readyToFire = false
 local RESTORE_DELAY = 3000
 local position = 0
 
-local tauOn12 = GG.Script.tau/12
-local tauOn6 = GG.Script.tau/6
+local tauOn12 = math.tau/12
+local tauOn6 = math.tau/6
 
 -- Signal definitions
 local SIG_RESTORE = 1
@@ -37,15 +38,16 @@ local SIG_CLOSE = 8
 local smokePiece = { base, aim}
 
 local function popUp()
+	GG.Script_OffsetAimAndColVol(unitID, false, 0)
 	Spring.SetUnitArmored(unitID,false)
 	
 	Signal(SIG_CLOSE)
 	SetSignalMask(SIG_OPEN)
 	
-	Turn(door1, z_axis, math.rad(0), math.rad(210))
-	Turn(door2, z_axis, math.rad(0), math.rad(210))
-	Turn(door3, z_axis, math.rad(0), math.rad(210))
-	Turn(door4, z_axis, math.rad(0), math.rad(210))
+	Turn(door1, z_axis, 0, math.rad(210))
+	Turn(door2, z_axis, 0, math.rad(210))
+	Turn(door3, z_axis, 0, math.rad(210))
+	Turn(door4, z_axis, 0, math.rad(210))
 	Turn(door5, x_axis, 0, math.rad(210))
 	Turn(door6, x_axis, 0, math.rad(210))
 	
@@ -59,7 +61,6 @@ local function popUp()
 end
 
 local function popDown()
-	
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_CLOSE)
 	
@@ -83,11 +84,11 @@ local function popDown()
 	Turn(door6, x_axis, math.rad(-120), math.rad(110))
 	
 	Spring.SetUnitArmored(unitID,true)
+	GG.Script_OffsetAimAndColVol(unitID, 26, -30)
 end
 
 
 local function RestoreAfterDelay()
-
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 
@@ -100,8 +101,14 @@ local function RestoreAfterDelay()
 end
 
 function script.Create()
-
 	Hide(flare)
+	
+	local ud = UnitDefs[unitDefID]
+	local midTable = ud.model
+	
+	local mid = {midTable.midx, midTable.midy, midTable.midz}
+	local aim = {midTable.midx, midTable.midy + 10, midTable.midz}
+	GG.Script_SetupAimPosTerraform(unitID, ud.floatOnWater, mid, aim, midTable.midy + 12, midTable.midy + 30, 15, 28)
 	
 	position = 0
 	

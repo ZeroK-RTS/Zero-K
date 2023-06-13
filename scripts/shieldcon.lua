@@ -71,7 +71,7 @@ local function Stopping()
 	SetSignalMask(SIG_MOVE)
 
 	Move(pelvis, y_axis, 0, 12)
-	Turn(pelvis, z_axis, math.rad(0), math.rad(15) * PACE)
+	Turn(pelvis, z_axis, 0, math.rad(15) * PACE)
 	
 	Turn(rightLeg.thigh, x_axis, 0, math.rad(60) * PACE)
 	Turn(leftLeg.thigh, x_axis, 0, math.rad(60) * PACE)
@@ -134,11 +134,6 @@ function script.StopBuilding()
 	Turn(rightLeg.uppercalf, x_axis, 0, math.rad(40) * PACE)
 	Turn(rightLeg.foot, x_axis, 0, math.rad(40) * PACE)
 	Move(pelvis, y_axis, 0, 6 * PACE)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),emit)
-	return emit
 end
 
 function script.Killed(recentDamage, maxHealth)

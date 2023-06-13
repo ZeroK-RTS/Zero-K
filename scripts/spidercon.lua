@@ -22,8 +22,7 @@ local nanoPiece = flare
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM = 2
-local SIG_BUILD = 3
+local SIG_BUILD = 2
 local SIG_STOPBUILD = 4
 
 local PERIOD = 0.22
@@ -45,14 +44,9 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
-local legBackwardTheta = -math.rad(45)
+local legBackwardTheta = math.rad(-45)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
-
---------------------------------------------------------------------------------
--- variables
---------------------------------------------------------------------------------
-local gun_1 = 1
 
 -- four-stroke hexapedal walkscript
 local function Walk()
@@ -98,10 +92,10 @@ function script.StartBuilding(heading, pitch)
 		Move(elevator,y_axis, 4.5, 15)
 		Move(elevator2,y_axis, 4.5, 15)
 		Move(gun,y_axis, 4.5, 15)
-		Turn(cover_r,z_axis,-math.rad(120), math.rad(250))
+		Turn(cover_r,z_axis,math.rad(-120), math.rad(250))
 		Turn(cover_l,z_axis,math.rad(120), math.rad(250))
 		Turn(panel_r,y_axis,math.rad(80), math.rad(250))
-		Turn(panel_l,y_axis,-math.rad(80), math.rad(250))
+		Turn(panel_l,y_axis,math.rad(-80), math.rad(250))
 		WaitForMove(gun, y_axis)
 		Turn(platform,y_axis,heading,math.rad(140))
 	end
@@ -124,11 +118,6 @@ function script.StopBuilding()
 		Turn(cover_r,z_axis,0, math.rad(250))
 		Turn(cover_l,z_axis,0, math.rad(250))
 	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),flare)
-	return flare
 end
 
 function script.Killed(recentDamage, maxHealth)

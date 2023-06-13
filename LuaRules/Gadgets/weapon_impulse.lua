@@ -30,15 +30,9 @@ local UNSTICK_CONSTANT = 4
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetCommandQueue = Spring.GetCommandQueue
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local getMovetype = Spring.Utilities.getMovetype
 local abs = math.abs
@@ -133,9 +127,11 @@ local function DetatchFromGround(unitID, threshold, height, doImpulse)
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, doImpulse, 0)
 		end
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
-		Spring.MoveCtrl.Disable(unitID)
+		if not Spring.MoveCtrl.IsEnabled(unitID) then
+			Spring.MoveCtrl.Enable(unitID)
+			Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
+			Spring.MoveCtrl.Disable(unitID)
+		end
 		if doImpulse then
 			spAddUnitImpulse(unitID, 0, -doImpulse, 0)
 		end
@@ -324,35 +320,9 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:Load(zip)
-	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to access save/load API")
-		return
-	end
-	local units = GG.SaveLoad.GetSavedUnitsCopy()
-	for oldID, data in pairs(units) do
-		local newID = GG.SaveLoad.GetNewUnitID(oldID)
-		if newID and data.states.custom then
-			local state = data.states.custom[CMD_PUSH_PULL]
-			if state then
-				local unitDefID = Spring.GetUnitDefID(newID)
-				PushPullToggleCommand(newID, unitDefID, tonumber(state))
-			end
-		end
-	end
-	if collectgarbage then
-		units = nil
-		collectgarbage("collect")
-	end
-end
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Main Impulse Handling
-
-local function distance(x1,y1,z1,x2,y2,z2)
-	return math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2)
-end
 
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
@@ -411,11 +381,11 @@ local function AddImpulses()
 
 					--if data.allied then
 						if Spring.GetUnitCurrentCommand(unitID) == CMD_GUARD then
-							spGiveOrderToUnit(unitID, CMD_STOP, {0}, 0)
+							spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 						end
 
 						if Spring.Utilities.GetUnitRepeat(unitID) then
-							spGiveOrderToUnit(unitID, CMD_REPEAT, {0}, 0)
+							spGiveOrderToUnit(unitID, CMD_REPEAT, 0, 0)
 						end
 					--end
 					--[[

@@ -1,11 +1,7 @@
-local version = "v1.121"
-
 function widget:GetInfo()
   return {
     name      = "Area Attack Tweak",
-    desc      = version .. " Tweak to area attack command:"..
-				"\n• automatically filter out ground target for AA units."..
-				"\n• CTRL+Attack split targets among units.",
+    desc      = "CTRL+Attack splits targets. AA automatically drops ground targets.",
     author    = "msafwan",
     date      = "May 22, 2012",
     license   = "GNU GPL, v2 or later",
@@ -18,6 +14,11 @@ end
 --------------------------------------------------------------------------------
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local SPLIT_ATTACK_SINGLE = false
+local MAX_TOTAL_QUEUE = 2000
+local MAX_ENGINE_HANDLE = 10
+local MIN_QUEUE = 8
 
 local defaultCommands = {
 	[CMD.ATTACK] = true,
@@ -37,6 +38,8 @@ local defaultCommands = {
 	-- [CMD.INSERT] = true,
 }
 
+local spGetUnitPosition = Spring.GetUnitPosition
+
 local unitsSplitAttackQueue = {nil} --just in case user press SHIFT after doing split attack, we need to remove these queue
 local handledCount = 0
 
@@ -48,13 +51,13 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 		return false
 	end
 	local units
-	if handledCount > 0 then
+	if SPLIT_ATTACK_SINGLE and handledCount > 0 then
 		 --This remove all but 1st attack order from CTRL+Area_attack if user choose to append new order to unit (eg: SHIFT+move),
 		 --this is to be consistent with bomber_command (rearm-able bombers), which only shoot 1st target and move on to next order.
 		 
 		 --Known limitation: not able to remove order if user queued faster than network delay (it need to see unit's current command queue)
 		units = Spring.GetSelectedUnits()
-		local unitID,attackList
+		local unitID, attackList
 		for i=1,#units do
 			unitID = units[i]
 			attackList = GetAndRemoveHandledHistory(unitID)
@@ -91,22 +94,24 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 	return false
 end
 
-function widget:UnitGiven(unitID)
-	GetAndRemoveHandledHistory(unitID)
-end
-
-function widget:UnitDestroyed(unitID)
-	GetAndRemoveHandledHistory(unitID)
-end
---------------------------------------------------------------------------------
-function GetAndRemoveHandledHistory(unitID)
-	if unitsSplitAttackQueue[unitID] then
-		local attackList = unitsSplitAttackQueue[unitID]
-		unitsSplitAttackQueue[unitID] = nil
-		handledCount = handledCount - 1
-		return attackList
+if SPLIT_ATTACK_SINGLE then
+	function widget:UnitGiven(unitID)
+		GetAndRemoveHandledHistory(unitID)
 	end
-	return nil
+
+	function widget:UnitDestroyed(unitID)
+		GetAndRemoveHandledHistory(unitID)
+	end
+	--------------------------------------------------------------------------------
+	function GetAndRemoveHandledHistory(unitID)
+		if unitsSplitAttackQueue[unitID] then
+			local attackList = unitsSplitAttackQueue[unitID]
+			unitsSplitAttackQueue[unitID] = nil
+			handledCount = handledCount - 1
+			return attackList
+		end
+		return nil
+	end
 end
 
 function RevertAllButOneAttackQueue(unitID,attackList)
@@ -193,7 +198,7 @@ function ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,c
 		IssueSplitedCommand(normalUnits,allTargets,cmdID,options)
 		isHandled = true
 	else -- normal queue
-		if #antiAirUnits>1 then
+		if #antiAirUnits > 1 or #normalUnits > MAX_ENGINE_HANDLE then
 			--split between AA and ground,
 			IssueCommand(antiAirUnits,airTargets,cmdID,options)
 			IssueCommand(normalUnits,allTargets,cmdID,options)
@@ -204,36 +209,55 @@ function ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,c
 	end
 	return isHandled
 end
+
 --------------------------------------------------------------------------------
-function IssueCommand(selectedUnits,allTargets,cmdID,options)
-	if #allTargets>=1 then
-		local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,1) -- prepare a normal queue (like regular SHIFT)
-		Spring.GiveOrderArrayToUnitArray (selectedUnits, attackCommandListAll)
+function IssueCommand(selectedUnits, allTargets, cmdID, options)
+	if #allTargets >= 1 and #selectedUnits >= 1 then
+		local toQueue = math.max(MIN_QUEUE, math.ceil(MAX_TOTAL_QUEUE / #selectedUnits))
+		local aveX, aveZ, count, ux, uz = 0, 0, 0, 0, 0
+		for i = 1, #selectedUnits do
+			ux, _, uz = spGetUnitPosition(selectedUnits[i])
+			if ux then
+				aveX = aveX + ux
+				aveZ = aveZ + uz
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			aveX = aveX/count
+			aveZ = aveZ/count
+		end
+		
+		local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options, 1, false, toQueue, aveX, aveZ) -- prepare a normal queue (like regular SHIFT)
+		Spring.GiveOrderArrayToUnitArray(selectedUnits, attackCommandListAll)
 	end
 end
 
 function IssueSplitedCommand(selectedUnits,allTargets,cmdID,options)
-	if #allTargets>=1 then
-		local targetsUnordered = {}
-		if cmdID==CMD.ATTACK then --and not CMD_UNIT_SET_TARGET. Note: only CMD.ATTACK support split attack queue, and in such case we also need to remember the queue so we can revert later if user decided to do SHIFT+Move
-			for i=1,#allTargets do
-				targetsUnordered[allTargets[i] ] = true
-			end
-			for i=1, #selectedUnits do
-				unitsSplitAttackQueue[selectedUnits[i] ] = targetsUnordered --note: all units in this loop was refer to same table to avoid duplication
-				handledCount = handledCount + 1
+	if #allTargets >= 1 then
+		if SPLIT_ATTACK_SINGLE then
+			local targetsUnordered = {}
+			if cmdID == CMD.ATTACK then --and not CMD_UNIT_SET_TARGET. Note: only CMD.ATTACK support split attack queue, and in such case we also need to remember the queue so we can revert later if user decided to do SHIFT+Move
+				for i = 1,#allTargets do
+					targetsUnordered[allTargets[i] ] = true
+				end
+				for i = 1, #selectedUnits do
+					unitsSplitAttackQueue[selectedUnits[i] ] = targetsUnordered --note: all units in this loop was refer to same table to avoid duplication
+					handledCount = handledCount + 1
+				end
 			end
 		end
-		for i=1, #selectedUnits do
-			-- local noAttackQueue = queueException[Spring.GetUnitDefID(selectedUnits[i])]
-			local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,i,true,noAttackQueue) --prepare a shuffled queue for target splitting
+		local toQueue = math.max(MIN_QUEUE, math.ceil(MAX_TOTAL_QUEUE / #selectedUnits))
+		for i = 1, #selectedUnits do
+			local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options, i, true, toQueue) --prepare a shuffled queue for target splitting
 			Spring.GiveOrderArrayToUnitArray ({selectedUnits[i]}, attackCommandListAll)
 		end
 	end
 end
+
 --------------------------------------------------------------------------------
 function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
-	local x, y, z = Spring.GetUnitPosition(unitID)
+	local x, y, z = spGetUnitPosition(unitID)
 	if x == nil then
 		return false
 	end
@@ -246,7 +270,22 @@ function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
 	return isFloating
 end
 
-function PrepareCommandArray (targetUnits, cmdID, options,indx,shuffle)
+function PrepareCommandArray(targetUnits, cmdID, options, indx, shuffle, toQueue, nearX, nearZ)
+	if nearX then
+		local dist = {}
+		local ux, uz = 0, 0
+		for i = 1, #targetUnits do
+			ux, _, uz = spGetUnitPosition(targetUnits[i])
+			ux = (ux or 0) - nearX
+			uz = (uz or 0) - nearZ
+			dist[targetUnits[i]] = ux*ux + uz*uz
+		end
+		
+		local function SortFunc(a, b)
+			return dist[a] < dist[b]
+		end
+		table.sort(targetUnits, SortFunc)
+	end
 	indx = LoopAroundIndex(indx, #targetUnits)
 	local stepSkip = 1
 	if shuffle then
@@ -256,17 +295,19 @@ function PrepareCommandArray (targetUnits, cmdID, options,indx,shuffle)
 	end
 	local attackCommandList = {}
 	local j = 1
-	attackCommandList[j] = {cmdID,{targetUnits[indx],},{((options.shift and "shift") or nil),}}
+	attackCommandList[j] = {cmdID, {targetUnits[indx]}, {((options.shift and "shift") or nil)}}
 	if cmdID == CMD.ATTACK then
-		for i=1, #targetUnits-1, 1 do
+		toQueue = (toQueue and math.min(toQueue, #targetUnits - 1)) or (#targetUnits - 1)
+		for i = 1, toQueue do
 			j= j + 1
 			indx = indx + stepSkip --stepSkip>1 will shuffle the queue
 			indx = LoopAroundIndex(indx, #targetUnits)
-			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift",}} --every unit get to attack every target
+			attackCommandList[j] = {cmdID, {targetUnits[indx]}, {"shift"}} --every unit get to attack every target
 		end
 	end
 	return attackCommandList
 end
+
 --------------------------------------------------------------------------------
 function LoopAroundIndex(indx, maxIndex)
 	----

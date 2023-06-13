@@ -36,6 +36,7 @@ local pause = 300
 local dirtfling = 1024+2
 
 local smokePiece = {body}
+local movingData = {}
 
 --variables
 local burrowed = false
@@ -46,10 +47,6 @@ local up = 8
 --signals
 local aim = 1
 
---cob values
-local cloaked = COB.CLOAKED
-local stealth = COB.STEALTH
-
 --signals
 local SIG_BURROW = 1
 local SIG_Walk = 2
@@ -58,9 +55,9 @@ local function Burrow()
 	Signal(SIG_BURROW)
 	SetSignalMask(SIG_BURROW)
 	Sleep(400)
+	burrowed = true
 	
 	Signal(SIG_Walk)
-	burrowed = true
 	EmitSfx(digger, dirtfling)
 	
 	--burrow
@@ -87,7 +84,6 @@ local function Burrow()
 	--]]
 	if(burrowed == true) then
 		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue(stealth, 1)
 		--Spring.UnitScript.SetUnitValue() MAX_SPEED to maxSpeed/4
 		--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 2
 	end
@@ -149,7 +145,6 @@ local function UnBurrow()
 	Signal(SIG_BURROW)
 	burrowed = false
 	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue(stealth, 0)
 	Move(body, 2, 0, 3)
 	Turn(body, 1, 0, 3)
 
@@ -172,6 +167,8 @@ local function Talk()
 end
 
 function script.StartMoving()
+	--Spring.Utilities.UnitEcho(unitID, "a")
+	movingData.moving = true
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -182,6 +179,8 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	--Spring.Utilities.UnitEcho(unitID, "p")
+	movingData.moving = false
 	StartThread(Burrow)
 end
 
@@ -191,7 +190,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true)
+	StartThread(GG.StartStopMovingControl, unitID, script.StartMoving, script.StopMoving, nil, true, movingData)
 	if not Spring.GetUnitIsStunned(unitID) then
 		Burrow()
 	end

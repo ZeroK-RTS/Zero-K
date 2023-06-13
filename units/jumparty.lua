@@ -12,26 +12,28 @@ return { jumparty = {
   canPatrol              = true,
   category               = [[LAND]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[55 55 55]],
+  selectionVolumeScales  = [[83 83 83]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 1,
     selection_scale   = 0.92,
+
+    outline_x = 125,
+    outline_y = 125,
+    outline_yoff = 21,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[fatbotarty]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
   maxVelocity            = 1.4,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
@@ -54,7 +56,7 @@ return { jumparty = {
   trackStretch           = 0.6,
   trackType              = [[ComTrack]],
   trackWidth             = 33,
-  turnRate               = 600,
+  turnRate               = 720,
   upright                = true,
   workerTime             = 0,
 
@@ -81,22 +83,21 @@ return { jumparty = {
       customParams              = {
         setunitsonfire = "1",
         burntime = 60,
+        force_ignore_ground = [[1]],
 
         area_damage = 1,
         area_damage_radius = 64,
-        area_damage_dps = 20,
+        area_damage_dps = 19,
         area_damage_duration = 16,
 
         --lups_heat_fx = [[firewalker]],
         light_camera_height = 2500,
         light_color = [[0.25 0.13 0.05]],
-        light_radios = 460,
+        light_radius = 460,
       },
       
       damage                  = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
+        default = 68,
       },
 
       explosionGenerator      = [[custom:napalm_firewalker_small]],

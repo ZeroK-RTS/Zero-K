@@ -21,7 +21,6 @@ local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].wea
 local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
 
 --signals
-local SIG_Aim = 1
 local SIG_Move = 16
 
 --cob values

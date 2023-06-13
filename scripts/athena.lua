@@ -83,11 +83,6 @@ function script.StopBuilding()
 	Turn(jaw2, x_axis, 0, math.rad(100))
 end
 
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanopoint)
-	return nanopoint
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then

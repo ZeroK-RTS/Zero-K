@@ -76,8 +76,8 @@ if (vsx < 1024 or vsy < 768) then
 end
 
 local commTips = {
-	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA slow tanky chassis with a wide range of weapons and inbuilt battle drones. Can dual wield.",
-	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Otherwise has poor survivability and lower build power.",
+	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA slow tanky chassis with a wide range of weapons and inbuilt battle drones. Can dual wield and gains 25% extra health from armour modules.",
+	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Gains bonus speed and jump cooldown from speed modules. Otherwise has poor survivability and lower build power.",
 	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with good speed and health. Can dual wield and gains extra health regeneration with levels.",
 	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to increase production. It has relatively poor speed and health.",
 	["LuaUI/Images/startup_info_selector/chassis_cremcom.png"] = "Select Campaign Chassis\nCan mount any module.",
@@ -89,7 +89,7 @@ local commTips = {
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
 local function ToggleTrainerButtons(bool)
 	for i=1,#buttonData do
-		if buttonData[i].trainer then
+		if buttonData[i].trainer and (#buttonData > 4) then
 			if bool then
 				grid:AddChild(buttonData[i].control)
 			else
@@ -110,7 +110,7 @@ options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
 		name = 'Hide default commanders',
-		desc = 'You can customize your commanders on the Zero-K site: https://zero-k.info',
+		desc = 'You can customise your commanders for use in multiplayer on the Zero-K site: https://zero-k.info',
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
@@ -296,7 +296,7 @@ local function CreateWindow()
 	local i = 0
 	for index, option in ipairs(optionData) do
 		i = i + 1
-		local hideButton = options.hideTrainers.value and option.trainer
+		local hideButton = options.hideTrainers.value and option.trainer and (#optionData > 4)
 		
 		local tooltip = ((options.showModules.value and (option.tooltip .. "\n\n\n")) or "") .. (commTips[option.image] or "")
 		
@@ -363,28 +363,30 @@ local function CreateWindow()
 		bottom = 5,
 		OnClick = {function() Close(false, false) end}
 	}
-	trainerCheckbox = Chili.Checkbox:New{
-		parent = mainWindow,
-		x = 6,
-		bottom = 5,
-		width = 180,
-		caption = options.hideTrainers.name,
-		tooltip = options.hideTrainers.desc,
-		checked = options.hideTrainers.value,
-		OnChange = { function(self)
-			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
-			if options.hideTrainers.epic_reference then
-				options.hideTrainers.epic_reference.checked = not self.checked
-				options.hideTrainers.epic_reference.state.checked = not self.checked
-				options.hideTrainers.epic_reference:Invalidate()
-			end
-			options.hideTrainers.value = not self.checked
-			ToggleTrainerButtons(self.checked)
-		end },
-	}
+	if #optionData > 4 then
+		trainerCheckbox = Chili.Checkbox:New{
+			parent = mainWindow,
+			x = 160,
+			bottom = 5,
+			width = 180,
+			caption = options.hideTrainers.name,
+			tooltip = options.hideTrainers.desc,
+			checked = options.hideTrainers.value,
+			OnChange = { function(self)
+				-- this is called *before* the 'checked' value is swapped, hence negation everywhere
+				if options.hideTrainers.epic_reference then
+					options.hideTrainers.epic_reference.checked = not self.checked
+					options.hideTrainers.epic_reference.state.checked = not self.checked
+					options.hideTrainers.epic_reference:Invalidate()
+				end
+				options.hideTrainers.value = not self.checked
+				ToggleTrainerButtons(self.checked)
+			end },
+		}
+	end
 	showModulesCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
-		x = 220,
+		x = 16,
 		bottom = 5,
 		width = 115,
 		caption = options.showModules.name,
@@ -491,15 +493,10 @@ end
 local timer = 0
 local startPosTimer = 0
 function widget:Update(dt)
-	if Spring.GetGameRulesParam("totalSaveGameFrame") then
-		widgetHandler:RemoveWidget()
-		return
-	end
-	
 	if timer then
 		timer = timer + dt
 		if timer >= 0.01 then
-			if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
+			if wantClose then
 				Close(true, wantClose)
 			end
 			timer = false

@@ -22,7 +22,7 @@ local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGetUnitHeight = Spring.GetUnitHeight
 local spGetFeatureHeight = Spring.GetFeatureHeight
 
-local image = "LuaUI/Images/arrowhead.png"
+--local image = "LuaUI/Images/arrowhead.png"
 local diamondDList
 
 local INIT_Y_OFFSET = 24

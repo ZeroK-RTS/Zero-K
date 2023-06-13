@@ -80,7 +80,7 @@ function widget:CommandNotify(id, params, options)
 	end
 end
 
-function CheckBuilding(ux,uz,ud)
+local function CheckBuilding(ux,uz,ud)
 	for index, i in pairs(buildings) do
 		if (i.x) then
 			if (abs(i.x - ux) < 16) and (abs(i.z - uz) < 16) then

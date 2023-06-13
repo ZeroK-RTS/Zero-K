@@ -14,6 +14,8 @@ local SIG_Idle = 1
 local SIG_Aim = 2
 local lastHeading = 0
 
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
+
 local function IdleAnim()
 	Signal(SIG_Idle)
 	SetSignalMask(SIG_Idle)
@@ -58,7 +60,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1600.1, 50)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 2400, 55, -0.05, true, 100)
 end
 
 function script.Killed(recentDamage, maxHealth)

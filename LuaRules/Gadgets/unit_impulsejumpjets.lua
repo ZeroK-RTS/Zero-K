@@ -52,32 +52,23 @@ local spGetUnitPosition  = Spring.GetUnitPosition
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
-local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
 local spGetUnitIsStunned   = Spring.GetUnitIsStunned
 local spGetCommandQueue    = Spring.GetCommandQueue
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
 local spSetUnitVelocity    = Spring.SetUnitVelocity
-local spSetUnitNoSelect    = Spring.SetUnitNoSelect
-local spSetUnitBlocking    = Spring.SetUnitBlocking
 local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
-local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
 local spGetUnitHeading     = Spring.GetUnitHeading
-local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitTeam        = Spring.GetUnitTeam
-local spDestroyUnit        = Spring.DestroyUnit
-local spCreateUnit         = Spring.CreateUnit
 
 local spAddUnitImpulse      = Spring.AddUnitImpulse
 local spSetUnitRotation  	= Spring.SetUnitRotation
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 
 local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
-
-local emptyTable = {}
 
 local coroutines = {}
 local lastJump = {}
@@ -143,7 +134,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 		end
 	end
 
-	spGiveOrderToUnit(unitID, CMD_STOP, emptyTable, 0)
+	spGiveOrderToUnit(unitID, CMD_STOP, 0, 0)
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
@@ -415,8 +406,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		SetLeaveTracks(unitID, true)
 		
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
+			spGiveOrderToUnit(unitID,CMD_WAIT, 0, 0)
 		end
 
 		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)

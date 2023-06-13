@@ -15,6 +15,7 @@ Image = Button:Inherit{
   flip2 = true;
 
   keepAspect = true;
+  noFont = true,
 
   OnClick  = {},
 }

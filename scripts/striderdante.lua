@@ -73,6 +73,8 @@ local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].wea
 local dead = false
 local armsFree = true
 local dgunning = false
+local resetRestore = false
+local rightArmPitch = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -94,6 +96,7 @@ local function RestorePose()
 	Turn(pelvis, z_axis, 0, math.rad(100))
 
 	Move(pelvis, y_axis, 0, 25)
+	rightArmPitch = 0
 end
 
 local function IdleAnim()
@@ -123,31 +126,41 @@ local function IdleAnim()
 end
 
 local function RestoreAfterDelay()
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
-	Sleep(8000)
-	--torso
-	if not dead then
-		Turn(torso, y_axis, 0, math.rad(100))
-		
-		Turn(ruparm, x_axis, 0, math.rad(250))
-		Turn(ruparm, y_axis, 0, math.rad(250))
-		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250))
-		Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
-		Turn(rarm, y_axis, 0, math.rad(250))
-		Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
-		Turn(flagellum, x_axis, 0, math.rad(90))
-	
-		Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
-		Turn(luparm, y_axis, 0, math.rad(250))
-		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))
-		Turn(larm, x_axis, 0, math.rad(250))	 --up 5
-		Turn(larm, y_axis, 0, math.rad(250))	 --up -3
-		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
-		RestorePose()
+	local counter = 8
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 8
+		end
+		if counter == 0 then
+			--torso
+			if not dead then
+				Turn(torso, y_axis, 0, math.rad(100))
+				
+				Turn(ruparm, x_axis, 0, math.rad(250))
+				Turn(ruparm, y_axis, 0, math.rad(250))
+				Turn(ruparm, z_axis, 0, math.rad(250))
+				Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
+				Turn(rarm, y_axis, 0, math.rad(250))
+				Turn(rarm, z_axis, 0, math.rad(250))	--up -12
+				Turn(flagellum, x_axis, 0, math.rad(90))
+			
+				Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
+				Turn(luparm, y_axis, 0, math.rad(250))
+				Turn(luparm, z_axis, 0, math.rad(250))
+				Turn(larm, x_axis, 0, math.rad(250))	 --up 5
+				Turn(larm, y_axis, 0, math.rad(250))	 --up -3
+				Turn(larm, z_axis, 0, math.rad(250))	 --up 22
+				RestorePose()
+			end
+			StartThread(IdleAnim)
+			armsFree = true
+		end
+		Sleep(1000)
 	end
-	StartThread(IdleAnim)
-	armsFree = true
 end
 
 --------------------------------------------------------------------------------
@@ -164,7 +177,7 @@ local tempSpeed = 40
 local walkAngle = {
 	{ -- Moving forwards
 		{
-			hip = {math.rad(0), math.rad(20) * PACE},
+			hip = {0, math.rad(20) * PACE},
 			leg = {math.rad(-20), math.rad(40) * PACE},
 			foot = {math.rad(15), math.rad(54) * PACE},
 			toeFront = {math.rad(22), math.rad(45) * PACE},
@@ -173,7 +186,7 @@ local walkAngle = {
 		},
 		{
 			hip = {math.rad(-35), math.rad(35) * PACE},
-			leg = {math.rad(0), math.rad(20) * PACE},
+			leg = {0, math.rad(20) * PACE},
 			foot = {math.rad(-5), math.rad(20) * PACE},
 			toeFront = {math.rad(22), 0},
 			toeRear = {math.rad(-6), 10},
@@ -236,11 +249,12 @@ local function Walk()
 		Turn(rarm, y_axis, 0, math.rad(120))
 		Turn(luparm, x_axis, 0, math.rad(240))
 		Turn(ruparm, x_axis, 0, math.rad(240))
+		rightArmPitch = 0
 	end
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
+		local speedMult = math.max(0.05, GG.att_MoveChange[unitID] or 1)
 		
 		local left = walkAngle[walkCycle]
 		local right = walkAngle[3 - walkCycle]
@@ -286,6 +300,7 @@ function script.Create()
 	Hide(jet2)
 	
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 end
 
 local function Stopping()
@@ -310,16 +325,21 @@ end
 -- Weaponry
 
 function script.AimFromWeapon(num)
+	if num > 4 then
+		return torso
+	end
 	return weaponPieces[num].aimFrom
 end
 
 function script.QueryWeapon(num)
+	if num > 4 then
+		return torso
+	end
 	local pieces = weaponPieces[num].query
 	return pieces[weaponPieces[num].index]
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal(SIG_IDLE)
 	if num == 1 then
 		if dgunning then return false end
 		Signal(SIG_AIM)
@@ -332,6 +352,8 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis) --need to make surenot
+		
+		rightArmPitch = -pitch
 		return true
 	elseif num == 2 then
 		if dgunning then return false end
@@ -339,10 +361,11 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask(SIG_AIM_2)
 		Turn(torso, y_axis, heading, math.rad(200))
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	elseif num == 3 then
 		dgunning = true
+		resetRestore = true
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		Signal(SIG_AIM_3)
@@ -358,26 +381,29 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
 		dgunning = false
+		
+		rightArmPitch = -pitch
 		return true
 	elseif num == 4 then
 		if dgunning then return false end
 		Signal(SIG_AIM_4)
 		SetSignalMask(SIG_AIM_4)
 	
-		Turn(flagellum, x_axis, -pitch, math.rad(90))
+		Turn(flagellum, x_axis, -pitch - rightArmPitch + 0.45, math.rad(90))
 		Turn(torso, y_axis, heading, math.rad(250))
 		WaitForTurn(ruparm, x_axis)
 		WaitForTurn(flagellum, x_axis)
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	end
+	return true
 end
 
 function script.Shot(num)
@@ -436,10 +462,10 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(luparm, y_axis, math.rad(54), math.rad(50))
 		Turn(rupleg, x_axis, math.rad(-27), math.rad(50))
 		Turn(rupleg, y_axis, math.rad(-42), math.rad(50))
-		Turn(rupleg, z_axis, math.rad(-(-5)), math.rad(50))
+		Turn(rupleg, z_axis, math.rad(5), math.rad(50))
 		Turn(rleg, x_axis, math.rad(13), math.rad(50))
 		Turn(rleg, y_axis, math.rad(-36), math.rad(50))
-		Turn(rleg, z_axis, math.rad(-(24)), math.rad(50))
+		Turn(rleg, z_axis, math.rad(-24), math.rad(50))
 		Turn(lupleg, y_axis, math.rad(18), math.rad(50))
 		Turn(lleg, x_axis, math.rad(20), math.rad(50))
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))

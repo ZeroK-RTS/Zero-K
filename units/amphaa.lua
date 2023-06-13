@@ -12,29 +12,32 @@ return { amphaa = {
   canPatrol              = true,
   category               = [[LAND SINK]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[42 42 42]],
+  selectionVolumeScales  = [[63 63 63]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    bait_level_default = 0,
     amph_regen        = 20,
     amph_submerged_at = 40,
     sink_on_emp       = 1,
     floattoggle       = [[1]],
     selection_scale   = 0.85,
+    okp_damage = 140.1,
+
+    outline_x = 80,
+    outline_y = 80,
+    outline_yoff = 12.5,
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[amphaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -46,6 +49,7 @@ return { amphaa = {
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
       [[custom:STORMBACK]],
+      [[custom:bubbles_small]],
     },
   },
 
@@ -56,7 +60,7 @@ return { amphaa = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 30,
-  turnRate               = 1000,
+  turnRate               = 1200,
   upright                = true,
 
   weapons                = {
@@ -71,6 +75,55 @@ return { amphaa = {
 
   weaponDefs             = {
 
+    ALPHABET_MISSILE = {
+      name                    = [[https://github.com/beyond-all-reason/spring/issues/509]],
+      areaOfEffect            = 48,
+      canAttackGround         = false,
+      cegTag                  = [[missiletrailblue]],
+      craterBoost             = 1,
+      craterMult              = 2,
+      cylinderTargeting       = 1,
+
+      customParams            = {
+        burst = Shared.BURST_RELIABLE,
+
+        isaa = [[1]],
+        script_reload = [[12]],
+        script_burst = [[4]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
+      },
+
+      damage                  = {
+        default = 15.01,
+        planes  = 150.1,
+      },
+
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+      flightTime              = 3,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
+      noSelfDamage            = true,
+      range                   = 820,
+      reloadtime              = 0.3,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startVelocity           = 650,
+      texture1                = [[flarescale01]],
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 9000,
+      tracks                  = true,
+      turnRate                = 63000,
+      turret                  = true,
+      weaponAcceleration      = 141,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 850,
+    },
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
@@ -93,7 +146,6 @@ return { amphaa = {
       damage                  = {
         default = 15.01,
         planes  = 150.1,
-        subs    = 8,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -103,7 +155,7 @@ return { amphaa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_phoenix.s3o]],
+      model                   = [[wep_m_phoenix.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 820,
       reloadtime              = 0.3,
@@ -111,6 +163,7 @@ return { amphaa = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 650,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,

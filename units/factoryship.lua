@@ -2,9 +2,8 @@ return { factoryship = {
   unitname               = [[factoryship]],
   name                   = [[Shipyard]],
   description            = [[Produces Naval Units]],
-  acceleration           = 0,
-  brakeRate              = 0,
   buildCostMetal         = Shared.FACTORY_COST,
+  buildDistance          = Shared.FACTORY_PLATE_RANGE,
   builder                = true,
 
   buildoptions           = {
@@ -32,6 +31,7 @@ return { factoryship = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    ploppable = 1,
     sortName       = [[7]],
     unstick_help   = 1,
     aimposoffset   = [[60 0 -15]],
@@ -40,23 +40,27 @@ return { factoryship = {
     modelradius    = [[100]],
     solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
     default_spacing = 8,
-    selectionscalemult = 1,
     factorytab       = 1,
     shared_energy_gen = 1,
     cus_noflashlight = 1,
+    parent_of_plate   = [[plateship]],
+    buggeroff_offset    = 0,
+    buggeroff_radius    = 42,
+
+    stats_show_death_explosion = 1,
+
+    outline_x = 340,
+    outline_y = 340,
+    outline_yoff = 25,
   },
 
-  energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 8,
   footprintZ             = 12,
   iconType               = [[facship]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  minCloakDistance       = 150,
   minWaterDepth          = 15,
   moveState              = 1,
   objectName             = [[seafac.s3o]],
@@ -64,7 +68,6 @@ return { factoryship = {
   selfDestructAs         = [[LARGE_BUILDINGEX]],
   showNanoSpray          = false,
   sightDistance          = 273,
-  turnRate               = 0,
   waterline              = 0,
   workerTime             = Shared.FACTORY_BUILDPOWER,
   yardMap                = [[oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc oocccccc]],

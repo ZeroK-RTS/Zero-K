@@ -16,10 +16,6 @@ local smokePiece = {pelvis, torso}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-
-local restore_delay = 3000
-local base_speed = 100
-
 local SIG_WALK = 1
 local SIG_AIM1 = 2
 local SIG_AIM2 = 4
@@ -43,7 +39,7 @@ local function Walk()
 		
 		-- extend left
 		Turn(lfleg, x_axis, math.rad(-50), math.rad(25)*speedmult)
-		Turn(lffoot, x_axis, math.rad(0), math.rad(150)*speedmult)
+		Turn(lffoot, x_axis, 0, math.rad(150)*speedmult)
 		
 		Turn(rfleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
 		Turn(rffoot, x_axis, math.rad(60), math.rad(120)*speedmult)
@@ -71,7 +67,7 @@ local function Walk()
 		Turn(lffoot, x_axis, math.rad(60), math.rad(120)*speedmult)
 		
 		Turn(rfleg, x_axis, math.rad(-50), math.rad(25)*speedmult)
-		Turn(rffoot, x_axis, math.rad(0), math.rad(150)*speedmult)
+		Turn(rffoot, x_axis, 0, math.rad(150)*speedmult)
 		
 		Turn(rbleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
 		Turn(rbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)
@@ -111,6 +107,7 @@ local longRange = false
 local torpRange = WeaponDefNames["amphriot_torpedo"].range
 local shotRange = WeaponDefNames["amphriot_flechette"].range
 
+--[[
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
@@ -128,7 +125,7 @@ local function WeaponRangeUpdate()
 		Sleep(200)
 	end
 end
-
+]]
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim functions
@@ -140,13 +137,14 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	while true do
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(0,2)), math.rad(math.random()))
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Turn(base, z_axis, math.rad(math.random(-2,2)), math.rad(math.random()))
-		Move(base, y_axis, math.rad(math.random(-2,0)), math.rad(math.random()))
+
+		Turn(base, x_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Turn(base, z_axis, math.rad(4)*math.random() - math.rad(2), math.random()*math.rad(1))
+		Move(base, y_axis, math.rad(-2)*math.random(), math.random()*math.rad(1))
 		Sleep(2000)
 	end
 end
@@ -158,44 +156,41 @@ local function riseFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 
 	Turn(lfleg, x_axis, 0, math.rad(800))
 	Turn(lffoot, x_axis, 0, math.rad(800))
 	Turn(rfleg, x_axis, 0, math.rad(800))
 	Turn(rffoot, x_axis, 0, math.rad(800))
-	
+
 	Turn(lbleg, x_axis, 0, math.rad(800))
 	Turn(lbfoot, x_axis, 0, math.rad(800))
 	Turn(rbleg, x_axis, 0, math.rad(800))
 	Turn(rbfoot, x_axis, 0, math.rad(800))
-	
 	Sleep(100)
-	
+
 	Turn(lfleg,x_axis, math.rad(100), math.rad(320))
 	Turn(rfleg,x_axis, math.rad(100), math.rad(320))
 	Turn(lbleg,x_axis, math.rad(-100), math.rad(320))
 	Turn(rbleg,x_axis, math.rad(-100), math.rad(320))
-	
+
 	Turn(lffoot,x_axis, math.rad(-90), math.rad(300))
 	Turn(rffoot,x_axis, math.rad(-90), math.rad(300))
 	Turn(lbfoot,x_axis, math.rad(90), math.rad(300))
 	Turn(rbfoot,x_axis, math.rad(90), math.rad(300))
-	
 	Sleep(200)
-	
+
 	while true do
-		Turn(lffoot,x_axis, math.rad(-90+10), math.rad(50))
-		Turn(rffoot,x_axis, math.rad(-90-10), math.rad(50))
-		Turn(lbfoot,x_axis, math.rad(90-10), math.rad(50))
-		Turn(rbfoot,x_axis, math.rad(90+10), math.rad(50))
-	
+		Turn(lffoot,x_axis, math.rad(-80),  math.rad(50))
+		Turn(rffoot,x_axis, math.rad(-100), math.rad(50))
+		Turn(lbfoot,x_axis, math.rad(80),   math.rad(50))
+		Turn(rbfoot,x_axis, math.rad(100),  math.rad(50))
 		Sleep(300)
-		Turn(lffoot,x_axis, math.rad(-90-10), math.rad(50))
-		Turn(rffoot,x_axis, math.rad(-90+10), math.rad(50))
-		Turn(lbfoot,x_axis, math.rad(90+10), math.rad(50))
-		Turn(rbfoot,x_axis, math.rad(90-10), math.rad(50))
-	
+
+		Turn(lffoot,x_axis, math.rad(-100), math.rad(50))
+		Turn(rffoot,x_axis, math.rad(-80),  math.rad(50))
+		Turn(lbfoot,x_axis, math.rad(100),  math.rad(50))
+		Turn(rbfoot,x_axis, math.rad(80),   math.rad(50))
 		Sleep(300)
 	end
 end
@@ -207,47 +202,42 @@ local function staticFloat_thread()
 		return
 	end
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
-	
-	Turn(lfleg,x_axis, math.rad(55-15), math.rad(60))
-	Turn(rfleg,x_axis, math.rad(55+15), math.rad(60))
-	Turn(lbleg,x_axis, math.rad(-55+15), math.rad(60))
-	Turn(rbleg,x_axis, math.rad(-55-15), math.rad(60))
-	
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
+
+	Turn(lfleg,x_axis, math.rad(40), math.rad(60))
+	Turn(rfleg,x_axis, math.rad(70), math.rad(60))
+	Turn(lbleg,x_axis, math.rad(-40), math.rad(60))
+	Turn(rbleg,x_axis, math.rad(-70), math.rad(60))
 	Sleep(400)
-	
-	Turn(lffoot,x_axis, math.rad(-60-20), math.rad(60))
-	Turn(rffoot,x_axis, math.rad(-60+20), math.rad(60))
-	Turn(lbfoot,x_axis, math.rad(60-20), math.rad(60))
-	Turn(rbfoot,x_axis, math.rad(60-20), math.rad(60))
-	
+
+	Turn(lffoot,x_axis, math.rad(-80), math.rad(60))
+	Turn(rffoot,x_axis, math.rad(-40), math.rad(60))
+	Turn(lbfoot,x_axis, math.rad(80),  math.rad(60))
+	Turn(rbfoot,x_axis, math.rad(40),  math.rad(60))
+
 	while true do
-		Turn(lfleg,x_axis, math.rad(55+15), math.rad(37.5))
-		Turn(rfleg,x_axis, math.rad(55-15), math.rad(37.5))
-		Turn(lbleg,x_axis, math.rad(-55-15), math.rad(37.5))
-		Turn(rbleg,x_axis, math.rad(-55+15), math.rad(37.5))
-	
+		Turn(lfleg,x_axis, math.rad(70),  math.rad(37.5))
+		Turn(rfleg,x_axis, math.rad(40),  math.rad(37.5))
+		Turn(lbleg,x_axis, math.rad(-70), math.rad(37.5))
+		Turn(rbleg,x_axis, math.rad(-40), math.rad(37.5))
 		Sleep(400)
-	
-		Turn(lffoot,x_axis, math.rad(-60+20), math.rad(40))
-		Turn(rffoot,x_axis, math.rad(-60-20), math.rad(25))
-		Turn(lbfoot,x_axis, math.rad(60-20), math.rad(40))
-		Turn(rbfoot,x_axis, math.rad(60+20), math.rad(25))
-	
+
+		Turn(lffoot,x_axis, math.rad(-40), math.rad(40))
+		Turn(rffoot,x_axis, math.rad(-80), math.rad(25))
+		Turn(lbfoot,x_axis, math.rad(40),  math.rad(40))
+		Turn(rbfoot,x_axis, math.rad(80),  math.rad(25))
 		Sleep(400)
-	
-		Turn(lfleg,x_axis, math.rad(55-15), math.rad(37.5))
-		Turn(rfleg,x_axis, math.rad(55+15), math.rad(37.5))
-		Turn(lbleg,x_axis, math.rad(-55+15), math.rad(37.5))
-		Turn(rbleg,x_axis, math.rad(-55-15), math.rad(37.5))
-	
+
+		Turn(lfleg,x_axis, math.rad(40),  math.rad(37.5))
+		Turn(rfleg,x_axis, math.rad(70),  math.rad(37.5))
+		Turn(lbleg,x_axis, math.rad(-40), math.rad(37.5))
+		Turn(rbleg,x_axis, math.rad(-70), math.rad(37.5))
 		Sleep(400)
-	
-		Turn(lffoot,x_axis, math.rad(-60-20), math.rad(25))
-		Turn(rffoot,x_axis, math.rad(-60+20), math.rad(40))
-		Turn(lbfoot,x_axis, math.rad(60+20), math.rad(25))
-		Turn(rbfoot,x_axis, math.rad(60-20), math.rad(40))
-	
+
+		Turn(lffoot,x_axis, math.rad(-80), math.rad(25))
+		Turn(rffoot,x_axis, math.rad(-40), math.rad(40))
+		Turn(lbfoot,x_axis, math.rad(80),  math.rad(25))
+		Turn(rbfoot,x_axis, math.rad(40),  math.rad(40))
 		Sleep(400)
 	end
 end
@@ -260,7 +250,7 @@ local function sinkFloat_thread()
 	end
 
 	Signal(SIG_FLOAT)
-	SetSignalMask(SIG_FLOAT)
+	SetSignalMask(SIG_FLOAT + SIG_WALK)
 	Signal(SIG_BOB)
 
 	Turn(lfleg, x_axis, 0, math.rad(80))
@@ -271,19 +261,19 @@ local function sinkFloat_thread()
 	Turn(lbfoot, x_axis, 0, math.rad(80))
 	Turn(rbleg, x_axis, 0, math.rad(80))
 	Turn(rbfoot, x_axis, 0, math.rad(80))
-	
-	Turn(base, x_axis, 0, math.rad(math.random()))
-	Turn(base, z_axis, 0, math.rad(math.random()))
-	Move(base, y_axis, 0, math.rad(math.random()))
 
-	while true do
-		EmitSfx(lfleg, SFX.BUBBLE)
+	Turn(base, x_axis, 0, math.rad(1)*math.random())
+	Turn(base, z_axis, 0, math.rad(1)*math.random())
+	Move(base, y_axis, 0, math.rad(1)*math.random())
+
+	while true do -- not infinite, stopped via signal
+		EmitSfx(lfleg, 1026)
 		Sleep(66)
-		EmitSfx(rfleg, SFX.BUBBLE)
+		EmitSfx(rfleg, 1026)
 		Sleep(66)
-		EmitSfx(lbleg, SFX.BUBBLE)
+		EmitSfx(lbleg, 1026)
 		Sleep(66)
-		EmitSfx(rbleg, SFX.BUBBLE)
+		EmitSfx(rbleg, 1026)
 		Sleep(66)
 	end
 
@@ -340,16 +330,16 @@ function script.Create()
 	--StartThread(Walk)
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	--StartThread(WeaponRangeUpdate) -- Equal range so not required
-	local height = select(2, Spring.GetUnitPosition(unitID))
-	if height < -20 then
-		if not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
-			longRange = true
-		end
-	elseif longRange then
-		Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
-		longRange = false
-	end
+	--local height = select(2, Spring.GetUnitPosition(unitID))
+	--if height < -20 then
+	--	if not longRange then
+	--		Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+	--		longRange = true
+	--	end
+	--elseif longRange then
+	--	Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+	--	longRange = false
+	--end
 end
 
 function script.StartMoving()
@@ -389,8 +379,8 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM2)
 		SetSignalMask(SIG_AIM2)
 		
-		if pitch < -math.rad(10) then
-			pitch = -math.rad(10)
+		if pitch < math.rad(-10) then
+			pitch = math.rad(-10)
 		elseif pitch > math.rad(10) then
 			pitch = math.rad(10)
 		end
@@ -433,10 +423,9 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 2 then -- torpedoes
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		-- Lower than real damage (180) to help against Duck regen case.
-		return y < -22 or GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
+	if num == 2 and targetID then -- torpedoes
+		-- Lower than real damage (104) to help against Duck regen case.
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 92, 40)
 	end
 	return false
 end

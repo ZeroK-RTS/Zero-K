@@ -1,0 +1,5 @@
+hotspot topleft
+frame  anims/cursorterramex_0.png  0.2
+frame  anims/cursorterramex_1.png  0.2
+frame  anims/cursorterramex_0.png  0.2
+frame  anims/cursorterramex_2.png  0.2

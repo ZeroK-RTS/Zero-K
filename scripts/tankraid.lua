@@ -35,8 +35,8 @@ local function RestoreAfterDelay()
 	
 	Sleep(RESTORE_DELAY)
 	
-	Turn(turret, y_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
-	Turn(sleeve, x_axis, math.rad(0), math.rad(GUN_TURN_SPEED/2))
+	Turn(turret, y_axis, 0, TURRET_TURN_SPEED/2)
+	Turn(sleeve, x_axis, 0, GUN_TURN_SPEED/2)
 end
 
 ----------------------------------------------------------
@@ -48,8 +48,8 @@ function FlameTrailThread()
 	Signal(SIG_Restore)
 	Signal(SIG_AIM1)
 	
-	Turn(turret, y_axis, math.pi, math.rad(TURRET_TURN_SPEED))
-	Turn(sleeve, x_axis, 0.6, math.rad(GUN_TURN_SPEED))
+	Turn(turret, y_axis, math.pi, TURRET_TURN_SPEED)
+	Turn(sleeve, x_axis, 0.6, GUN_TURN_SPEED)
 	
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, x_axis)
@@ -193,8 +193,8 @@ function script.AimWeapon(num, heading, pitch)
 		-- EmitSfx works if the turret takes no time to turn and there is no waitForTurn
 		return true
 	else
-		Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
-		Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+		Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+		Turn(sleeve, x_axis, -pitch, GUN_TURN_SPEED)
 		StartThread(RestoreAfterDelay)
 		return false
 	end
@@ -225,7 +225,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local hitTime = (Spring.GetUnitSeparation(unitID, targetID) or 0)*0.1
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 58, hitTime)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 35, hitTime) -- Often grazes with AoE
 	end
 	return false
 end

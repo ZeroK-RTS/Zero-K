@@ -1,9 +1,7 @@
 local base = piece 'base'
 local cap = piece 'cap'
 local boosters = piece 'boosters'
-local rjet = piece 'rjet'
-local jets = piece 'jets'
-local ljet = piece 'ljet'
+-- unused pieces: [lr]jet, jets
 local firepoint = piece 'firepoint'
 local weapon = piece 'weapon'
 local housing = piece 'housing'

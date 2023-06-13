@@ -5,9 +5,9 @@ local ALLY_ACCESS = {allied = true}
 
 local notum = piece 'notum'
 local gaster = piece 'gaster'
-local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
-local shieldArm, shield, eye, eyeflare = piece('shield_arm', 'shield', 'eye', 'eyeflare')
-local emitl, emitr = piece('emitl', 'emitr')
+local gunL, gunR, aimpoint = piece('gunl', 'gunr', 'aimpoint')
+local shieldArm, shield, eye = piece('shield_arm', 'shield', 'eye')
+-- unused pieces: emit[lr], flare[LR], eyeflare
 
 -- note reversed sides from piece names!
 local br = piece 'thigh_bacl'	-- back right
@@ -44,7 +44,7 @@ local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(12)
-local legBackwardTheta = -math.rad(25)
+local legBackwardTheta = math.rad(-25)
 local legBackwardOffset = 0
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
@@ -106,11 +106,6 @@ end
 
 function script.StopMoving ()
 	StartThread (RestoreLegs)
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gaster)
-	return gaster
 end
 
 function script.QueryWeapon(num)

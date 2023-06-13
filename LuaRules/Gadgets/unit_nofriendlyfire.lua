@@ -57,8 +57,6 @@ end
 
 local spAreTeamsAllied      = Spring.AreTeamsAllied
 local spGetProjectileTeamID = Spring.GetProjectileTeamID
-local spGetUnitHealth       = Spring.GetUnitHealth
-local spSetUnitHealth       = Spring.SetUnitHealth
 
 local DefensiveManeuverDefs = {
 	[UnitDefNames["energysolar"].id] = true
@@ -111,7 +109,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		-- note: haxProjectiles may still be nil legitimately. For example you can
 		-- reclaim an Outlaw fast enough for it to be gone before the wave hits,
 		-- or modders can fail to set "needs hax" on their weapons
-		attackerTeam = attackerTeam or haxProjectiles[projectileID] or unitTeam
+		attackerTeam = attackerTeam or haxProjectiles[projectileID] or Spring.GetProjectileTeamID(projectileID) or unitTeam
 		if attackerID ~= unitID and spAreTeamsAllied(unitTeam, attackerTeam) then
 			return 0, 0
 		elseif unitDefID and DefensiveManeuverDefs[unitDefID] then

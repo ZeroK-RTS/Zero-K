@@ -4,7 +4,8 @@ include "constants.lua"
 include "utility.lua"
 include 'letsNotFailAtTrig.lua'
 
-local base, pelvis, body = piece('base', 'pelvis', 'body')
+-- unused piece: base
+local pelvis, body = piece('pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
 local holder, sphere = piece('holder', 'sphere')
 
@@ -27,7 +28,7 @@ local beaconCreateX, beaconCreateZ
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local BEACON_SPAWN_SPEED = 9 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
+local BEACON_SPAWN_SPEED = 8 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
 
 
 local function Create_Beacon_Thread(x,z)
@@ -47,11 +48,11 @@ local function Create_Beacon_Thread(x,z)
 	GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
 		local speedMult = (spGetUnitRulesParam(unitID,"baseSpeedMult") or 1) * BEACON_SPAWN_SPEED
-		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
+		
+		Turn(body, y_axis, math.rad(4)*i, math.rad(50)*speedMult)
 		Sleep(100/speedMult)
 		if i == 1 then
-			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
-			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+			GG.WaitWaitMoveUnit(unitID)
 		end
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
@@ -66,7 +67,7 @@ local function Create_Beacon_Thread(x,z)
 		end
 	end
 
-	GG.tele_createBeacon(unitID,x,z)
+	GG.tele_createBeacon(unitID,unitDefID,x,z)
 	
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
 	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)
@@ -99,38 +100,36 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Deploy into static mode animation and delay
-local DEPLOY_SPEED = 0.3
+local DEPLOY_SPEED = 0.9
 
 local function DeployTeleport_Thread()
-	
 	Signal(SIG_DEPLOY)
 	StopCreateBeacon()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_DEPLOY)
 	
-	Turn(rthigh, x_axis, 0, math.rad(1000))
-	Turn(rshin, x_axis, 0, math.rad(1000))
-	Turn(rfoot, x_axis, 0, math.rad(1000))
-	Turn(lthigh, x_axis, 0, math.rad(1000))
-	Turn(lshin, x_axis, 0, math.rad(1000))
-	Turn(lfoot, x_axis, 0, math.rad(1000))
-	Turn(pelvis, z_axis, 0, math.rad(1000))
+	Turn(rthigh, x_axis, 0, math.rad(300))
+	Turn(rshin, x_axis, 0, math.rad(300))
+	Turn(rfoot, x_axis, 0, math.rad(300))
+	Turn(lthigh, x_axis, 0, math.rad(300))
+	Turn(lshin, x_axis, 0, math.rad(300))
+	Turn(lfoot, x_axis, 0, math.rad(300))
+	Turn(pelvis, z_axis, 0, math.rad(300))
 	Move(pelvis, y_axis, 0, 10)
 	
-	Sleep(33)
+	Sleep(100)
 	
-	Sleep(33)
-	Turn(body, x_axis, math.rad(90), math.rad(90*DEPLOY_SPEED))
-	Move(pelvis, y_axis, 11, 11*DEPLOY_SPEED)
-	Move(pelvis, z_axis, -6, 6*DEPLOY_SPEED)
+	Turn(body, x_axis, math.rad(90), math.rad(90)*DEPLOY_SPEED)
+	Move(pelvis, y_axis, 10, 10*DEPLOY_SPEED)
+	Move(pelvis, z_axis, -5, 5*DEPLOY_SPEED)
 	
-	Turn(rthigh, x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED))
-	Turn(rshin, x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED))
-	Turn(rfoot, x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED))
+	Turn(rthigh, x_axis, math.rad(-36), math.rad(36)*DEPLOY_SPEED)
+	Turn(rshin, x_axis, math.rad(64), math.rad(64)*DEPLOY_SPEED)
+	Turn(rfoot, x_axis, math.rad(-28), math.rad(28)*DEPLOY_SPEED)
 	
-	Turn(lthigh, x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED))
-	Turn(lshin, x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED))
-	Turn(lfoot, x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED))
+	Turn(lthigh, x_axis, math.rad(-36), math.rad(36)*DEPLOY_SPEED)
+	Turn(lshin, x_axis, math.rad(64), math.rad(64)*DEPLOY_SPEED)
+	Turn(lfoot, x_axis, math.rad(-28), math.rad(28)*DEPLOY_SPEED)
 
 	Sleep(1000/DEPLOY_SPEED)
 
@@ -178,16 +177,16 @@ end
 
 function UndeployTeleport()
 	deployed = false
-	Turn(body, x_axis, math.rad(0), math.rad(90))
-	Move(body, z_axis, 0, 5)
+	Turn(body, x_axis, 0, math.rad(90))
+	Move(body, z_axis, 0, 10)
 	Turn(rthigh, x_axis, 0, math.rad(80))
 	Turn(rshin, x_axis, 0, math.rad(120))
 	Turn(rfoot, x_axis, 0, math.rad(80))
 	Turn(lthigh, x_axis, 0, math.rad(80))
-	Turn(lshin, x_axis, 0, math.rad(80))
+	Turn(lshin, x_axis, 0, math.rad(120))
 	Turn(lfoot, x_axis, 0, math.rad(80))
 	Turn(pelvis, z_axis, 0, math.rad(20))
-	Move(pelvis, y_axis, 0, 12)
+	Move(pelvis, y_axis, 0, 20)
 end
 
 
@@ -195,9 +194,9 @@ end
 --------------------------------------------------------------------------------------
 -- Ball animation
 local spinmodes = {
-	[1] = {holder = 30, sphere = 25},
-	[2] = {holder = 50, sphere = 45},
-	[3] = {holder = 100, sphere = 130},
+	[1] = {holder = math.rad(30), sphere = math.rad(25)},
+	[2] = {holder = math.rad(50), sphere = math.rad(45)},
+	[3] = {holder = math.rad(100), sphere = math.rad(130)},
 }
 
 local holderDirection = plusOrMinusOne()
@@ -211,10 +210,13 @@ function activity_mode(n)
 			Spring.SetUnitRulesParam(unitID, "teleActive", 1, INLOS)
 		end
 
-		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection))
-		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
-		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
-		Spin(sphere, z_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
+		local spinData = spinmodes[n]
+		local spinSphere = spinData.sphere
+		local rand = math.random
+		Spin(holder, z_axis, spinData.holder*holderDirection)
+		Spin(sphere, x_axis, spinSphere*(1 + rand())*plusOrMinusOne())
+		Spin(sphere, y_axis, spinSphere*(1 + rand())*plusOrMinusOne())
+		Spin(sphere, z_axis, spinSphere*(1 + rand())*plusOrMinusOne())
 		mode = n
 	end
 end
@@ -225,9 +227,9 @@ end
 
 local function Walk()
 	
-	Turn(body, x_axis, math.rad(0), math.rad(90))
+	Turn(body, x_axis, 0, math.rad(90))
 	Move(body, z_axis, 0, 5)
-	Turn(body, y_axis, math.rad(0), math.rad(80))
+	Turn(body, y_axis, 0, math.rad(80))
 	
 	Signal(SIG_DEPLOY)
 	StopCreateBeacon()
@@ -236,12 +238,12 @@ local function Walk()
 	while true do
 		local speedmult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)*SPEED
 		
-		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
+		Turn(pelvis, z_axis, 0, math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)
 		
 		-- Right leg mid
 		Turn(rthigh, x_axis, math.rad(-15), math.rad(35)*speedmult)
-		Turn(rshin, x_axis, math.rad(0), math.rad(15)*speedmult)
+		Turn(rshin, x_axis, 0, math.rad(15)*speedmult)
 		Turn(rfoot, x_axis, math.rad(15), math.rad(20)*speedmult)
 		
 		-- Left leg raise
@@ -266,7 +268,7 @@ local function Walk()
 		
 		Sleep(1000/speedmult)
 		
-		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
+		Turn(pelvis, z_axis, 0, math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)
 		
 		-- Right leg raise
@@ -276,7 +278,7 @@ local function Walk()
 		
 		-- Left leg mid
 		Turn(lthigh, x_axis, math.rad(-15), math.rad(35)*speedmult)
-		Turn(lshin, x_axis, math.rad(0), math.rad(15)*speedmult)
+		Turn(lshin, x_axis, 0, math.rad(15)*speedmult)
 		Turn(lfoot, x_axis, math.rad(15), math.rad(20)*speedmult)
 		
 		Sleep(1000/speedmult)

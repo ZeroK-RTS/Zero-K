@@ -23,9 +23,11 @@ return { gunshipaa = {
   cruiseAlt              = 110,
 
   customParams           = {
+    bait_level_default = 0,
     modelradius    = [[18]],
     midposoffset   = [[0 15 0]],
     selection_velocity_heading = 1,
+    okp_damage = 190.1,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -34,11 +36,8 @@ return { gunshipaa = {
   footprintZ             = 3,
   hoverAttack            = true,
   iconType               = [[gunshipaa]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
   maxDamage              = 900,
   maxVelocity            = 3.8,
-  minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[trifighter.s3o]],
@@ -94,7 +93,6 @@ return { gunshipaa = {
       damage                  = {
         default = 20.01,
         planes  = 200.1,
-        subs    = 3.5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -104,7 +102,7 @@ return { gunshipaa = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_fury.s3o]],
+      model                   = [[wep_m_fury_cent.s3o]], -- Model radius 150 for QuadField fix.
       noSelfDamage            = true,
       range                   = 750,
       reloadtime              = 1.2,
@@ -112,6 +110,7 @@ return { gunshipaa = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 650,
+      texture1                = [[flarescale01]],
       texture2                = [[AAsmoketrail]],
       texture3                = [[null]],
       tolerance               = 32767,

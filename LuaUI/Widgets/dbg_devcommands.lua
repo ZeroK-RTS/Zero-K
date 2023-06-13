@@ -79,18 +79,19 @@ local function GetCommandString(index, command)
 end
 
 local function ProcessUnitCommands(inTabs, commands, unitID, mobileUnit)
-	if mobileUnit and ((commands[1] and commands[1].id == CMD.PATROL) or (commands[2] and commands[2].id == CMD.PATROL)) then
-		
-		local fullCommandString
-		for i = 1, #commands do
-			local command = commands[i]
-			if command.id == CMD.PATROL and command.params[1] and command.params[3] then
-				fullCommandString = (fullCommandString or "") .. inTabs .. "\t" .. [[{]] .. math.floor(command.params[1]) .. ", " .. math.floor(command.params[3]) .. [[},]] .. "\n"
+	if mobileUnit and commands[1] then
+		if (commands[1].id == CMD.PATROL) or (commands[2] and commands[2].id == CMD.PATROL) then
+			local fullCommandString
+			for i = 1, #commands do
+				local command = commands[i]
+				if command.id == CMD.PATROL and command.params[1] and command.params[3] then
+					fullCommandString = (fullCommandString or "") .. inTabs .. "\t" .. [[{]] .. math.floor(command.params[1]) .. ", " .. math.floor(command.params[3]) .. [[},]] .. "\n"
+				end
 			end
-		end
-		
-		if fullCommandString then
-			return inTabs  .. [[patrolRoute = {]] .. "\n" .. fullCommandString .. inTabs .. "},\n"
+			
+			if fullCommandString then
+				return inTabs  .. [[patrolRoute = {]] .. "\n" .. fullCommandString .. inTabs .. "},\n"
+			end
 		end
 	end
 
@@ -170,7 +171,7 @@ local function GetFeatureString(fID)
 	return unitString .. tabs.. "},"
 end
 
-local function ExportTeamUnitsForMission(teamID, sendCommands)
+local function ExportTeamUnitsForMission(teamID, sendCommands, selectedOnly)
 	local units = Spring.GetTeamUnits(teamID)
 	if not (units and #units > 0) then
 		return
@@ -182,26 +183,32 @@ local function ExportTeamUnitsForMission(teamID, sendCommands)
 	end
 	local unitsString = tabs .. "startUnits = {\n"
 	for i = 1, #units do
-		Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
+		if (not selectedOnly) or Spring.IsUnitSelected(units[i]) then
+			Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
+		end
 	end
 	--unitsString = unitsString .. tabs .. "}"
 	--Spring.Echo(unitsString)
 end
 
-local function ExportUnitsForMission(sendCommands)
+local function ExportUnitsForMission(sendCommands, selectedOnly)
 	if recentlyExported then
 		return
 	end
 	local teamList = Spring.GetTeamList()
 	Spring.Echo("================== ExportUnitsForMission ==================")
 	for i = 1, #teamList do
-		ExportTeamUnitsForMission(teamList[i], sendCommands)
+		ExportTeamUnitsForMission(teamList[i], sendCommands, selectedOnly)
 	end
 	recentlyExported = 1
 end
 
 local function ExportUnitsAndCommandsForMission()
 	ExportUnitsForMission(true)
+end
+
+local function ExportSelectedUnitsAndCommandsForMission()
+	ExportUnitsForMission(true, true)
 end
 
 local function ExportFeaturesForMission()
@@ -434,6 +441,12 @@ options = {
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportUnitsAndCommandsForMission,
+	},
+	missionexportselectedcommands = {
+		name = "Mission Unit Export (Selected and Commands)",
+		type = 'button',
+		action = 'mission_unit_commands_export',
+		OnChange = ExportSelectedUnitsAndCommandsForMission,
 	},
 	missionexportfeatures = {
 		name = "Mission Feature Export",

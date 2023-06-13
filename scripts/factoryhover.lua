@@ -21,18 +21,19 @@ local function Open ()
 	Move (nano, y_axis, 7.625, 17.5)
 	WaitForMove (nano, y_axis)
 
-	SetUnitValue (COB.YARD_OPEN, 1)
-	SetUnitValue (COB.INBUILDSTANCE, 1)
-	SetUnitValue (COB.BUGGER_OFF, 1)
+	SetUnitValue(COB.YARD_OPEN, 1)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+	--SetUnitValue(COB.BUGGER_OFF, 1)
+	GG.Script.UnstickFactory(unitID)
 end
 
 local function Close()
 	Signal (1)
 	SetSignalMask (1)
 
-	SetUnitValue (COB.YARD_OPEN, 0)
-	SetUnitValue (COB.BUGGER_OFF, 0)
-	SetUnitValue (COB.INBUILDSTANCE, 0)
+	SetUnitValue(COB.YARD_OPEN, 0)
+	--SetUnitValue(COB.BUGGER_OFF, 0)
+	SetUnitValue(COB.INBUILDSTANCE, 0)
 
 	Move (nano, y_axis, 0, 17.5)
 	WaitForMove (nano, y_axis)
@@ -45,17 +46,6 @@ end
 function script.Create()
 	StartThread (GG.Script.SmokeUnit, unitID, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
-end
-
--- doesn't actually get called as far as I can tell
--- but other cons have this so maybe there's some legacy use (icongenerator or whatever)
--- consider finding out and cleaning up across all con scripts at some point
-local lastNanopiece = 1
-function script.QueryNanoPiece ()
-	lastNanopiece = (lastNanopiece + 1) % 6
-	local nanoemit = nanoPieces[lastNanopiece + 1]
-	GG.LUPS.QueryNanoPiece (unitID, unitDefID, Spring.GetUnitTeam(unitID), nanoemit)
-	return nanoemit
 end
 
 function script.Activate ()
@@ -74,9 +64,7 @@ local explodables = beams
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	local brutal = (severity > 0.5)
-	local sfx = SFX
-
-	local effect = sfx.FALL + (brutal and (sfx.SMOKE + sfx.FIRE) or 0)
+	local effect = SFX.FALL + (brutal and (SFX.SMOKE + SFX.FIRE) or 0)
 	for i = 1, #explodables do
 		if math.random() < severity then
 			Explode (explodables[i], effect)
@@ -86,8 +74,8 @@ function script.Killed (recentDamage, maxHealth)
 	if not brutal then
 		return 1
 	else
-		Explode (nano, sfx.SHATTER)
-		Explode (base, sfx.SHATTER)
+		Explode (nano, SFX.SHATTER)
+		Explode (base, SFX.SHATTER)
 		return 2
 	end
 end

@@ -14,7 +14,7 @@ return { cloakheavyraid = {
   collisionVolumeScales  = [[28 36 28]],
   collisionVolumeType    = [[cylY]],
   selectionVolumeOffsets = [[0 0 0]],
-  selectionVolumeScales  = [[32 32 32]],
+  selectionVolumeScales  = [[48 48 48]],
   selectionVolumeType    = [[ellipsoid]],
   cloakCost              = 0.2,
   cloakCostMoving        = 1,
@@ -60,7 +60,7 @@ return { cloakheavyraid = {
   trackStretch           = 0.9,
   trackType              = [[ComTrack]],
   trackWidth             = 18,
-  turnRate               = 2200,
+  turnRate               = 2640,
   upright                = true,
 
   weapons                = {
@@ -96,7 +96,6 @@ return { cloakheavyraid = {
       damage                  = {
         default = 200.1,
         planes  = 200,
-        subs    = 15,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],

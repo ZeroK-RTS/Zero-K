@@ -2,14 +2,36 @@ include "constants.lua"
 
 local base = piece 'base'
 local launched = false
+local unitDefName = UnitDefs[unitDefID].name
 
-function script.AimWeapon1(heading, pitch) return true end
+function script.AimWeapon(heading, pitch)
+	return true
+end
 
 local function RemoveMissile()
 	GG.MissileSilo.DestroyMissile(unitID, unitDefID)
-	Spring.SetUnitRulesParam(unitID, "do_not_save", 1)
+	Spring.SetUnitRulesParam(unitID, "missile_parentSilo", nil)
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	if unitDefName == "missileslow" then
+		Move(base, x_axis, -3)
+		Move(base, z_axis, -5)
+	elseif unitDefName == "napalmmissile" then
+		Move(base, x_axis, 6)
+		Move(base, z_axis, -3)
+		Move(base, y_axis, 36)
+	elseif unitDefName == "empmissile" then
+		Move(base, x_axis, 0.1)
+		Move(base, z_axis, -2)
+		Move(base, y_axis, 27)
+	elseif unitDefName == "tacnuke" then
+		Move(base, x_axis, -0.5)
+		Move(base, z_axis, 2)
+		Move(base, y_axis, 8)
+	elseif unitDefName == "seismic" then
+		Move(base, x_axis, 3.5)
+		Move(base, y_axis, 27)
+	end
 	
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
@@ -18,6 +40,7 @@ local function RemoveMissile()
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)
 	Spring.SetUnitBlocking(unitID,false,false,false)
+	Spring.SetUnitGroup(unitID, -1)
 	launched = true
 	Sleep(2000)
 
@@ -46,7 +69,11 @@ end
 
 function script.Create()
 	Turn(base, x_axis, math.rad(-90))
-	Move(base, y_axis, 40)
+	if unitDefName == "missileslow" then
+		Move(base, z_axis, 40)
+	else
+		Move(base, y_axis, 40)
+	end
 end
 
 function script.HitByWeapon(x, z, weaponDefID, damage)

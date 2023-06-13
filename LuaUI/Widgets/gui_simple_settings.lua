@@ -36,8 +36,8 @@ local optionGenerationTable = {
 		optionWidget = "Selection Hierarchy",
 		optionPath = "Settings/Interface/Selection",
 		optionName = "useSelectionFilteringOption",
-		name  = "Use selection filtering",
-		desc = "Filter constructors out of mixed constructor/combat unit selection.",
+		name  = "Enable selection filtering",
+		desc = "Filter constructors out of mixed unit selections.",
 		type = "bool",
 		default = true,
 		path = "Settings/Interface",
@@ -113,7 +113,7 @@ local optionGenerationTable = {
 		optionName = "unitOutline",
 		optionFunction = function(self)
 			Spring.SendCommands{"luaui disablewidget Outline No Shader"}
-			Spring.SendCommands{"luaui togglewidget Outline Shader"}
+			Spring.SendCommands{"luaui togglewidget Outline Shader GL4"}
 		end,
 		name = "Toggle Unit Outline",
 		desc = "Draws a black outline around units.",

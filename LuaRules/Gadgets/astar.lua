@@ -207,8 +207,7 @@ function aStar.GetDistanceEstimate(a, b) -- heuristic estimate of distance to go
 end
 
 function aStar.GetPathsThreaded(startID, goalID, cyclesBeforeYield)
-  cyclesBeforeYield = cyclesBeforeYield or 1000
-  return coroutine.create(aStar.GetPath)
+  return coroutine.create(aStar.GetPath, startID, goalID, cyclesBeforeYield or 1000)
 end
 
 function aStar.GetPath(startID, goalID, cyclesBeforeYield)

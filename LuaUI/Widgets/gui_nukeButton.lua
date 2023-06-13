@@ -52,19 +52,18 @@ local readyNukeCount = 0
 local highProgress = -1
 local lastTime
 local nukeList = {}
-local curUnitList
+local curUnitList = {}
+
+for unitDefName, ud in pairs(UnitDefNames) do
+	if ud.customParams.is_nuke then
+		curUnitList[unitDefName] = true
+	end
+end
 
 
 local config = {}
 config["buttonXPer"] = 0.935
 config["buttonYPer"] = 0.765
-
-
---Game Config ------------------------------------
-local unitList = {}
-unitList["ZK"] = {} --initialize table
-unitList["ZK"]["staticnuke"] = {}
---End
 
 local upper                 = string.upper
 local floor                 = math.floor
@@ -137,15 +136,6 @@ function widget:Initialize()
 	ResizeButtonsToScreen()
 
 	myPlayerID = spGetMyPlayerID() --spGetLocalTeamID()
-	curModID = upper(Game.modShortName or "")
-	
-	if ( unitList[curModID] == nil ) then
-		spEcho("<Nuke Icon>: Unsupported Game, shutting down...")
-		widgetHandler:RemoveWidget()
-		return
-	end
-	
-	curUnitList = unitList[curModID]
 	
 	--add all already existing nukes
 	searchAndAddNukes()
@@ -258,15 +248,15 @@ function widget:IsAbove(x, y)
 end
 
 function widget:GetTooltip(x, y)
-	if hideTooltips then return end
-	local text = ""
-	if ( readyNukeCount > 0 ) then
-		text = "Left-Click: Select next nuke\nDouble-Click: Aim next nuke"
-	else
-		text = "Loading Nuke: " .. string.format("%.2f", highProgress * 100) .. "%"
+	if hideTooltips then
+		return
 	end
-	
-	return text
+
+	if readyNukeCount > 0 then
+		return "Left-Click: Select next nuke\nDouble-Click: Aim next nuke"
+	else
+		return string.format("Loading Nuke: %.2f%%", highProgress * 100)
+	end
 end
 
 
