@@ -496,6 +496,14 @@ local options = {
     type    = "string",
     def     = "",
   },
+  {
+    key     = "option_notes",
+    name    = "Notes",
+    desc    = "A message that is displayed at the start of the game.",
+    section = 'experimental',
+    type    = "string",
+    def     = "",
+  },
 --[[
   {
     key    = 'damagemult',
