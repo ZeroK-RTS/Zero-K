@@ -47,14 +47,14 @@ local trackedMissiles = {
 	},
 }
 
-local slamDefaults = {
-	color = redDefault,
-	humanName = "Tactical Nuke (Commander S.L.A.M Rocket)",
-	fadeIn = lowAltFadeIn
-}
-for i=0,8 do
-  -- S.L.A.M variants
-  trackedMissiles[WeaponDefNames[i .. '_commweapon_slamrocket'].id] = slamDefaults
-end
+--local slamDefaults = {
+--	color = redDefault,
+--	humanName = "Tactical Nuke (Commander S.L.A.M Rocket)",
+--	fadeIn = lowAltFadeIn
+--}
+--for i = 0, 8 do
+--	-- S.L.A.M variants
+--	trackedMissiles[WeaponDefNames[i .. '_commweapon_slamrocket'].id] = slamDefaults
+--end
 
 return trackedMissiles

@@ -241,6 +241,8 @@ local flexCallIns = {
 
 	-- From gadgets
 	"UnitStructureMoved",
+	'MissileFired',
+	'MissileDestroyed',
 }
 local flexCallInMap = {}
 for _, ci in ipairs(flexCallIns) do
@@ -2518,6 +2520,26 @@ function widgetHandler:UnitStructureMoved(unitID, unitDefID, newX, newZ)
 	for _, w in r_ipairs(self.UnitStructureMovedList) do
 		w:UnitStructureMoved(unitID, unitDefID, newX, newZ)
 	end
+end
+
+--------------------------------------------------------------------------------
+--
+-- Projectile call-ins
+--
+
+function widgetHandler:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
+	for _,w in r_ipairs(self.MissileFiredList) do
+		w:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
+	end
+	return
+end
+
+
+function widgetHandler:MissileDestroyed(proID, proOwnerID, weaponDefID)
+	for _,w in r_ipairs(self.MissileDestroyedList) do
+		w:MissileDestroyed(proID, proOwnerID, weaponDefID)
+	end
+	return
 end
 
 -- local helper (not a real call-in)

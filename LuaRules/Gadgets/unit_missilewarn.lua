@@ -31,12 +31,12 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:ProjectileCreated(...)
-	SendToUnsynced(MAGIC_FIRED, ...)
+function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
+	SendToUnsynced(MAGIC_FIRED, proID, proOwnerID, weaponID)
 end
 
-function gadget:ProjectileDestroyed(...)
-	SendToUnsynced(MAGIC_DESTROYED, ...)
+function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)
+	SendToUnsynced(MAGIC_DESTROYED, proID, proOwnerID, weaponID)
 end
 
 else
@@ -61,12 +61,14 @@ local projectilesTracked = {}
 
 local deferredProjectiles = {}
 -- ProjectileCreated is too early in a projectile's lifetime to reliably read parameters from
-local function ProjectileCreated(...)
-	deferredProjectiles[#deferredProjectiles+1] = {...}
+local function ProjectileCreated(proID, proOwnerID, weaponID)
+	deferredProjectiles[#deferredProjectiles + 1] = {proID, proOwnerID, weaponID}
 end
 
 local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
-	if not trackedMissiles[weaponDefID] then return end
+	if not trackedMissiles[weaponDefID] then
+		return
+	end
 	local teamID = spGetUnitTeam(proOwnerID)
 	local spec, specFullView = spGetSpectatingState()
 	local isAlly = spAreTeamsAllied(teamID, spGetMyTeamID())
@@ -85,22 +87,25 @@ local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
 
 	local rx,ry,rz,rt = StarburstPredict(proID, weaponDefID, curFrame)
 	scriptMissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
-
 end
 
-local function ProjectileDestroyed(proID)
-	if not projectilesTracked[proID] then return end
-	if not Script.LuaUI('MissileDestroyed') then return end
-	scriptMissileDestroyed(proID)
+local function ProjectileDestroyed(proID, proOwnerID, weaponID)
+	if not projectilesTracked[proID] then
+		return
+	end
+	if not Script.LuaUI('MissileDestroyed') then
+		return
+	end
+	scriptMissileDestroyed(proID, proOwnerID, weaponID)
 	projectilesTracked[proID] = nil
 end
 
 
-function gadget:RecvFromSynced(magic, ...)
+function gadget:RecvFromSynced(magic, proID, proOwnerID, weaponID)
 	if magic == MAGIC_FIRED then
-		ProjectileCreated(...)
+		ProjectileCreated(proID, proOwnerID, weaponID)
 	elseif magic == MAGIC_DESTROYED then
-		ProjectileDestroyed(...)
+		ProjectileDestroyed(proID, proOwnerID, weaponID)
 	else
 		return false
 	end
@@ -109,9 +114,12 @@ end
 
 function gadget:GameFrame(n)
 	curFrame = n
-	if #deferredProjectiles == 0 then return end
-	for _,deferredArgs in ipairs(deferredProjectiles) do
-		ProjectileCreatedDeferred(unpack(deferredArgs))
+	if #deferredProjectiles == 0 then
+		return
+	end
+	for i = 1, #deferredProjectiles do
+		local proData = deferredProjectiles[i]
+		ProjectileCreatedDeferred(proData[1], proData[2], proData[3])
 	end
 	deferredProjectiles = {}
 end
