@@ -10,22 +10,43 @@ function widget:GetInfo()
 	}
 end
 
-options = {}
+local END_FADE_TIME = 10
+local START_FADE_TIME = 5
+
+options_order = {"alpha", "thickness"}
+options = {
+	alpha = {
+		name = "Line opacity",
+		type = "number",
+		value = 0.6,
+		min = 0,
+		max = 1,
+		step = 0.01,
+	},
+	thickness = {
+		name = "Line thickness",
+		type = "number",
+		value = 3,
+		min = 1,
+		max = 10,
+		step = 0.1,
+	},
+}
 local trackedMissiles = include("LuaRules/Configs/tracked_missiles.lua")
-for id,data in pairs(trackedMissiles) do
-	data.radius = WeaponDefs[id].damageAreaOfEffect
+for id, data in pairs(trackedMissiles) do
+	data.radius = math.floor(WeaponDefs[id].damageAreaOfEffect * (data.radiusMult or 1))
 	local name = data.humanName
 	local key = name .. " Color"
-	local function OnChange()
-		trackedMissiles.color = options[key].color
+	local function OnChange(self)
+		data.color = self.value
 	end
+	options_order[#options_order + 1] = key
 	options[key] = {
 		name = "Color for " .. name .. " impact points",
 		type = "colors",
 		value = data.color,
 		OnChange = OnChange
 	}
-	OnChange()
 end
 
 options_path = 'Settings/Interface/Missile Impact Warnings'
@@ -44,14 +65,16 @@ local max = math.max
 local min = math.min
 
 -- id -> {x,y,z,impactFrame,weaponDefID}
-local points = {}
+local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
+local points = IterableMap.New()
 
 function widget:MissileFired(proID, proOwnerID, weaponDefID, impactX, impactY, impactZ, impactFrame)
-	points[proID] = {impactX,impactY,impactZ,impactFrame,weaponDefID}
+	local currentFrame = Spring.GetGameFrame()
+	IterableMap.Add(points, proID, {impactX, impactY, impactZ, math.max(currentFrame + 5, impactFrame), currentFrame, weaponDefID})
 end
 
 function widget:MissileDestroyed(proID)
-	points[proID] = nil
+	IterableMap.Remove(points, proID)
 end
 
 local function GetCameraHeight()
@@ -64,46 +87,49 @@ local function GetCameraHeight()
 	return testHeight
 end
 
-local curFrame = -1
+local function GetThicknessFactor()
+	local height = GetCameraHeight()
+	if height < 1000 then
+		return 1
+	end
+	return 1000 / (1000 + height) + 0.5
+end
+
+local function DrawPoint(proID, data, index, curFrame)
+	local x, y, z, impactFrame, fireFrame, weaponDefID = unpack(data)
+	if curFrame >= impactFrame then
+		return true
+	end
+	local weaponDefConfig = trackedMissiles[weaponDefID]
+	local r,g,b = unpack(weaponDefConfig.color)
+	local radius = weaponDefConfig.radius
+	local fadeIn = weaponDefConfig.fadeIn
+	local impactProportion = (curFrame - impactFrame) / (fireFrame - impactFrame)
+	
+	local innerAlpha = max(0.1, min(1, (fadeIn - impactProportion)/fadeIn)) * options.alpha.value
+	local outerAlpha = options.alpha.value
+	if curFrame + END_FADE_TIME > impactFrame then
+		outerAlpha = outerAlpha * math.sqrt((impactFrame - curFrame) / END_FADE_TIME)
+	end
+	if curFrame < fireFrame + START_FADE_TIME then
+		local prop = math.sqrt((curFrame - fireFrame) / START_FADE_TIME)
+		innerAlpha = innerAlpha * prop
+		outerAlpha = outerAlpha * prop
+	end
+	
+	glLineWidth(options.thickness.value * GetThicknessFactor())
+	
+	glColor(r, g, b, innerAlpha)
+	glDrawGroundCircle(x, y, z, math.max(2, radius * impactProportion), 8 + radius * impactProportion)
+	
+	glColor(r, g, b, outerAlpha)
+	glDrawGroundCircle(x, y, z, radius, math.ceil(8 + radius * 0.4))
+end
 
 function widget:DrawWorldPreUnit()
-	-- Red shrinking circles for impact points
-	for i,data in pairs(points) do
-		local x,y,z,impactFrame,weaponDefID = unpack(data)
-		local weaponDefConfig = trackedMissiles[weaponDefID]
-		local r,g,b = unpack(weaponDefConfig.color)
-		local radius = weaponDefConfig.radius
-		local fadeIn = weaponDefConfig.fadeIn
-		local extra_radius = (impactFrame - curFrame) * (radius+3700) / 5000
-		if extra_radius >= 0 then
-			glLineWidth(max(1.0,38/(4+GetCameraHeight()/800)))
-			-- faded features first
-			glPushMatrix()
-			glTranslate(x, y, z)
-			local fadeAlpha = max(0.1,min(1,(fadeIn-extra_radius)/fadeIn))
-			glColor(r,g,b,fadeAlpha)
-			-- a ground circle, fading in closer to impact time, that approaches the fixed circle as impact time approaches
-			glDrawGroundCircle(0, 0, 0, radius+extra_radius, radius+extra_radius)
-			glColor(r,g,b,1)
-			-- a ground circle, fixed in visibility, that shows the area of effect
-			glDrawGroundCircle(0, 0, 0, radius, radius)
-			glPopMatrix()
-		end
+	if IterableMap.IsEmpty(points) then
+		return
 	end
-end
-
-function widget:GameFrame(n)
-	curFrame = n
-	for i,v in ipairs(points) do
-		if v[4] < n then
-			points[i] = points[#points]
-			points[#points] = nil
-		end
-	end
-end
-
-function widget:Initialize()
-	for k,v in pairs(options) do
-		v.OnChange()
-	end
+	local curFrame = Spring.GetGameFrame()
+	IterableMap.Apply(points, DrawPoint, curFrame)
 end

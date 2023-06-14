@@ -9,16 +9,17 @@ local highAltFadeIn = 10*UPDATES_PER_SECOND
 local lowAltFadeIn = 5*UPDATES_PER_SECOND
 
 local trackedMissiles = {
-  -- Trinity/Nuke
+	-- Trinity/Nuke
 	[WeaponDefNames.staticnuke_crblmssl.id] = {
 		color = redDefault,
 		humanName = "Nuclear Missile",
-		fadeIn = 30*UPDATES_PER_SECOND
+		fadeIn = 30*UPDATES_PER_SECOND,
+		radiusMult = 0.985,
 	},
 	-- EOS/Tacnuke
 	[WeaponDefNames.tacnuke_weapon.id] = {
 		color = redDefault,
-		humanName = "Tactical Nuke (Missile Silo)",
+		humanName = "Tactical Nuke (Silo)",
 		fadeIn = lowAltFadeIn
 	},
 	-- Shockley
@@ -42,7 +43,7 @@ local trackedMissiles = {
 	-- Scylla
 	[WeaponDefNames.subtacmissile_tacnuke.id] = {
 		color = redDefault,
-		humanName = "Tactical Nuke (Nuclear Submarine)",
+		humanName = "Tactical Nuke (Submarine)",
 		fadeIn = lowAltFadeIn
 	},
 }
