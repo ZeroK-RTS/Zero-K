@@ -13,40 +13,70 @@ local arm3 = piece "arm3"
 
 local smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
 
-local function StartAnim()
-	Show(energyball)
+local ballSize = 0
+local is_stunned = true
 
-	Spin(toroid, y_axis, 1)
-	Spin(arm1, y_axis, -2)
-	Spin(arm2, y_axis, -2)
-	Spin(arm3, y_axis, -2)
-	Spin(nexus, y_axis, -2)
-	
-	Spin(energyball, x_axis, 1)
-	Spin(energyball, y_axis, -0.7)
+local function SizeControl()
+	local mag = math.random() + 1
+	local period = math.random()*20 + 15
+	local t = 0
+
+	local sin = math.sin
+	local spSetUnitPieceMatrix = Spring.SetUnitPieceMatrix
+	local pieceTable = {Spring.GetUnitPieceMatrix(unitID, energyball)}
+
+	while true do
+		if is_stunned then
+			if ballSize > 3 then
+				ballSize = ballSize - 3
+			else
+				ballSize = 1
+				Hide(energyball)
+			end
+		else
+			if ballSize == 1 then
+				Show(energyball)
+			end
+			if ballSize < 100 then
+				ballSize = ballSize + 1
+			end
+		end
+
+		local ballSwellFactor = 1.13^(sin(t/period)*mag) * (ballSize^2 / 11000)
+		pieceTable[ 1] = ballSwellFactor
+		pieceTable[ 6] = ballSwellFactor
+		pieceTable[11] = ballSwellFactor
+		spSetUnitPieceMatrix(unitID, energyball, pieceTable)
+
+		t = t + 1
+		Sleep(33)
+	end
+end
+
+local function StartAnim()
+	Spin(toroid, y_axis, 1, 0.25 / Game.gameSpeed)
+	Spin(arm1, y_axis, -2, 0.5 / Game.gameSpeed)
+	Spin(arm2, y_axis, -2, 0.5 / Game.gameSpeed)
+	Spin(arm3, y_axis, -2, 0.5 / Game.gameSpeed)
+	Spin(nexus, y_axis, -2, 0.5 / Game.gameSpeed)
 end
 
 local function StopAnim()
-	Hide(energyball)
-
-	StopSpin(toroid, y_axis)
-	StopSpin(arm1, y_axis)
-	StopSpin(arm2, y_axis)
-	StopSpin(arm3, y_axis)
-	StopSpin(nexus, y_axis)
-	
-	StopSpin(energyball, x_axis)
-	StopSpin(energyball, y_axis)
+	StopSpin(toroid, y_axis, 1 / Game.gameSpeed)
+	StopSpin(arm1, y_axis, 2 / Game.gameSpeed)
+	StopSpin(arm2, y_axis, 2 / Game.gameSpeed)
+	StopSpin(arm3, y_axis, 2 / Game.gameSpeed)
+	StopSpin(nexus, y_axis, 2 / Game.gameSpeed)
 end
 
-
 local function Anim()
-	local last_inbuilt = true
-	while (true) do
-		local inbuilt = select(5,Spring.GetUnitHealth(unitID)) < 1
-		if (inbuilt ~= last_inbuilt) then
-			last_inbuilt = inbuilt
-			if (inbuilt) then
+	local spGetUnitIsStunned = Spring.GetUnitIsStunned
+	local was_stunned = true
+	while true do
+		is_stunned = spGetUnitIsStunned(unitID)
+		if is_stunned ~= was_stunned then
+			was_stunned = is_stunned
+			if is_stunned then
 				StopAnim()
 			else
 				StartAnim()
@@ -62,6 +92,7 @@ function script.Create()
 
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(Anim)
+	StartThread(SizeControl)
 end
 
 function script.Killed(recentDamage, maxHealth)
