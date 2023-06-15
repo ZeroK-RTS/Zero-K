@@ -17,6 +17,7 @@ end
 -- Protocol numbers and which missiles to handle are used in both synced and unsynced
 local MAGIC_FIRED     = 'missile_fired'
 local MAGIC_DESTROYED = 'missile_destroyed'
+local u_CHAR = string.byte('u')
 
 local trackedMissiles = include("LuaRules/Configs/tracked_missiles.lua")
 
@@ -84,9 +85,27 @@ local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
 	if not Script.LuaUI('MissileFired') then
 		return
 	end
-
-	local rx,ry,rz,rt = StarburstPredict(proID, weaponDefID, curFrame)
-	scriptMissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
+	
+	local rx, ry, rz, rt = StarburstPredict(proID, weaponDefID, curFrame)
+	local targetID = false
+	local weaponDefConfig = trackedMissiles[weaponDefID]
+	if weaponDefConfig.homing then
+		local t, tpos = Spring.GetProjectileTarget(proID)
+		if t == u_CHAR then
+			targetID = tpos
+		end
+	end
+	if weaponDefConfig.distanceFudge then
+		local px, py, pz = Spring.GetProjectilePosition(proID)
+		if pz then
+			local dist = math.sqrt((rx - px)^2 + (ry - py)^2 + (rz - pz)^2)
+			local frame = Spring.GetGameFrame()
+			local mult = weaponDefConfig.distanceFudge(dist)
+			rt = frame + (rt - frame) * mult
+		end
+	end
+	
+	scriptMissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt, targetID)
 end
 
 local function ProjectileDestroyed(proID, proOwnerID, weaponID)

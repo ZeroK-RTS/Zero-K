@@ -10,8 +10,8 @@ function widget:GetInfo()
 	}
 end
 
-local END_FADE_TIME = 10
-local START_FADE_TIME = 5
+local END_FADE_TIME = 12
+local START_FADE_TIME = 8
 
 options_order = {"alpha", "thickness"}
 options = {
@@ -34,7 +34,7 @@ options = {
 }
 local trackedMissiles = include("LuaRules/Configs/tracked_missiles.lua")
 for id, data in pairs(trackedMissiles) do
-	data.radius = math.floor(WeaponDefs[id].damageAreaOfEffect * (data.radiusMult or 1))
+	data.radius = data.radiusOverride or math.floor(WeaponDefs[id].damageAreaOfEffect * (data.radiusMult or 1))
 	local name = data.humanName
 	local key = name .. " Color"
 	local function OnChange(self)
@@ -68,13 +68,27 @@ local min = math.min
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local points = IterableMap.New()
 
-function widget:MissileFired(proID, proOwnerID, weaponDefID, impactX, impactY, impactZ, impactFrame)
+function widget:MissileFired(proID, proOwnerID, weaponDefID, impactX, impactY, impactZ, impactFrame, targetID)
 	local currentFrame = Spring.GetGameFrame()
-	IterableMap.Add(points, proID, {impactX, impactY, impactZ, math.max(currentFrame + 5, impactFrame), currentFrame, weaponDefID})
+	impactFrame = math.max(currentFrame + 5, impactFrame)
+	IterableMap.Add(points, proID, {
+		ix = impactX,
+		iy = impactY,
+		iz = impactZ,
+		impactFrame = impactFrame,
+		fireFrame = currentFrame,
+		dieFrame = impactFrame + END_FADE_TIME,
+		weaponDefID = weaponDefID,
+		targetID = targetID,
+	})
 end
 
 function widget:MissileDestroyed(proID)
-	IterableMap.Remove(points, proID)
+	local proData = IterableMap.Get(points, proID)
+	if proData then
+		proData.dieFrame = math.min(Spring.GetGameFrame() + END_FADE_TIME, proData.dieFrame)
+		proData.isDead = true
+	end
 end
 
 local function GetCameraHeight()
@@ -96,34 +110,42 @@ local function GetThicknessFactor()
 end
 
 local function DrawPoint(proID, data, index, curFrame)
-	local x, y, z, impactFrame, fireFrame, weaponDefID = unpack(data)
-	if curFrame >= impactFrame then
+	if curFrame >= data.dieFrame then
 		return true
 	end
-	local weaponDefConfig = trackedMissiles[weaponDefID]
+	local weaponDefConfig = trackedMissiles[data.weaponDefID]
 	local r,g,b = unpack(weaponDefConfig.color)
 	local radius = weaponDefConfig.radius
 	local fadeIn = weaponDefConfig.fadeIn
-	local impactProportion = (curFrame - impactFrame) / (fireFrame - impactFrame)
+	local impactProportion = (curFrame - data.impactFrame) / (data.fireFrame - data.impactFrame)
+	
+	if data.targetID and not data.isDead then
+		local x, y, z = Spring.GetUnitPosition(data.targetID)
+		if x and y and z then
+			data.ix, data.iy, data.iz = x, y, z
+		end
+	end
 	
 	local innerAlpha = max(0.1, min(1, (fadeIn - impactProportion)/fadeIn)) * options.alpha.value
 	local outerAlpha = options.alpha.value
-	if curFrame + END_FADE_TIME > impactFrame then
-		outerAlpha = outerAlpha * math.sqrt((impactFrame - curFrame) / END_FADE_TIME)
+	if curFrame + END_FADE_TIME > data.dieFrame then
+		outerAlpha = outerAlpha * math.sqrt((data.dieFrame - curFrame) / END_FADE_TIME)
 	end
-	if curFrame < fireFrame + START_FADE_TIME then
-		local prop = math.sqrt((curFrame - fireFrame) / START_FADE_TIME)
+	
+	if curFrame < data.fireFrame + START_FADE_TIME then
+		local prop = math.sqrt((curFrame - data.fireFrame) / START_FADE_TIME)
 		innerAlpha = innerAlpha * prop
 		outerAlpha = outerAlpha * prop
 	end
 	
 	glLineWidth(options.thickness.value * GetThicknessFactor())
-	
-	glColor(r, g, b, innerAlpha)
-	glDrawGroundCircle(x, y, z, math.max(2, radius * impactProportion), 8 + radius * impactProportion)
+	if curFrame < data.impactFrame then
+		glColor(r, g, b, innerAlpha)
+		glDrawGroundCircle(data.ix, data.iy, data.iz, math.max(2, radius * impactProportion), 8 + radius * impactProportion)
+	end
 	
 	glColor(r, g, b, outerAlpha)
-	glDrawGroundCircle(x, y, z, radius, math.ceil(8 + radius * 0.4))
+	glDrawGroundCircle(data.ix, data.iy, data.iz, radius, (data.targetID and radius) or math.ceil(8 + radius * 0.4))
 end
 
 function widget:DrawWorldPreUnit()

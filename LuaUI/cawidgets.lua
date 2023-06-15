@@ -2527,9 +2527,9 @@ end
 -- Projectile call-ins
 --
 
-function widgetHandler:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
+function widgetHandler:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt, targetID)
 	for _,w in r_ipairs(self.MissileFiredList) do
-		w:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt)
+		w:MissileFired(proID, proOwnerID, weaponDefID, rx, ry, rz, rt, targetID)
 	end
 	return
 end
