@@ -239,9 +239,6 @@ end
 
 local offset = (Spring.GetGameRulesParam("waterlevel") or 0)
 local function GetGroundHeight(x, z)
-	if math.random() < 0.1 then
-		Spring.MarkerAddPoint(x, 200, z, spGetGroundHeight(x,z))
-	end
 	return spGetGroundHeight(x,z) - offset
 end
 
@@ -426,7 +423,7 @@ function widget:Initialize()
 	Initialize()
 end
 
-local firstUpdate = false
+local firstUpdate = true
 function widget:Update()
 	if firstUpdate then
 		firstUpdate = false
