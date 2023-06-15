@@ -74,7 +74,7 @@ groundFlashenergypylon = {
 
 energysinguBursts = {
 	life       = math.huge,
-	pos        = {0,58,-5},
+	pos        = {0,65,0},
 	rotSpeed   = 0.5,
 	rotSpread  = 1,
 	arc        = 90,
