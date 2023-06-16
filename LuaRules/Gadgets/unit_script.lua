@@ -510,13 +510,14 @@ function Spring.UnitScript.Show(piece)
 end
 
 -- may be useful to other gadgets
-function Spring.UnitScript.GetScriptEnv(unitID)
+local function GetScriptEnv(unitID)
 	local unit = units[unitID]
 	if unit then
 		return unit.env
 	end
 	return nil
 end
+Spring.UnitScript.GetScriptEnv = GetScriptEnv
 
 function Spring.UnitScript.GetLongestReloadTime(unitID)
 	local longest = 0
@@ -785,6 +786,44 @@ local function MemoizedInclude(filename, env)
 end
 
 --------------------------------------------------------------------------------
+
+function gadget:UnitFinished(unitID)
+	local env = GetScriptEnv(unitID)
+	if not env then
+		return
+	end
+
+	local script = env.script
+	if not script then
+		return
+	end
+
+	local func = script.Finish
+	if not func then
+		return
+	end
+
+	CallAsUnitNoReturn(unitID, func)
+end
+
+function gadget:UnitReverseBuilt(unitID)
+	local env = GetScriptEnv(unitID)
+	if not env then
+		return
+	end
+
+	local script = env.script
+	if not script then
+		return
+	end
+
+	local func = script.ReverseBuild
+	if not func then
+		return
+	end
+
+	CallAsUnitNoReturn(unitID, func)
+end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
