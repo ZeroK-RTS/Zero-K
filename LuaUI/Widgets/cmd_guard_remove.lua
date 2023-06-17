@@ -12,7 +12,6 @@ function widget:GetInfo()
 end
 
 include("keysym.lua")
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 -- Epic Menu Options
@@ -41,11 +40,12 @@ options = {
 
 local doCommandRemove = false
 
+local SUC = Spring.Utilities.CMD
 local removableCommand = {
 	[CMD.GUARD] = true,
 	[CMD.PATROL] = true,
-	[CMD_ORBIT] = true,
-	[CMD_AREA_GUARD] = true,
+	[SUC.ORBIT] = true,
+	[SUC.AREA_GUARD] = true,
 }
 
 local CMD_REPAIR = CMD.REPAIR

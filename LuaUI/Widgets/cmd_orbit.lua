@@ -23,7 +23,10 @@ local spTraceScreenRay = Spring.TraceScreenRay
 
 local FACING_SIZE = math.pi*2/7 -- size of the directional facing
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local customCmds = Spring.Utilities.CMD
+local CMD_ORBIT      = customCmds.ORBIT
+local CMD_ORBIT_DRAW = customCmds.CMD_ORBIT_DRAW
+local CMD_AREA_GUARD = customCmds.CMD_AREA_GUARD
 
 local function GiveFacingOrder(targetID, cx, cz, radius, options)
 	local mx, my = Spring.GetMouseState()

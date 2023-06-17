@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
 
 function widget:CommandNotify(id, params, options)
 	if id == CMD_RAW_MOVE and options.ctrl then

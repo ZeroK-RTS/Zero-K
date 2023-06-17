@@ -34,8 +34,7 @@ local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitHealth    = Spring.GetUnitHealth
 
 local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
-
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_RAW_BUILD = Spring.Utilities.CMD.RAW_BUILD
 
 local buildList = {}
 

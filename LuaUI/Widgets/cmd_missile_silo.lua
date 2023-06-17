@@ -15,7 +15,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_SELECT_MISSILES = Spring.Utilities.CMD.SELECT_MISSILES
 
 local siloDefID = UnitDefNames.staticmissilesilo.id
 

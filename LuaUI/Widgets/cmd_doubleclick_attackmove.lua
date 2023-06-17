@@ -28,12 +28,11 @@ options = {
 	},
 }
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
-
 local spDiffTimers = Spring.DiffTimers
 local spGetTimer = Spring.GetTimer
 local spGiveOrder = Spring.GiveOrder
 local CMD_FIGHT = CMD.FIGHT
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
 
 local toleranceTime = Spring.GetConfigInt('DoubleClickTime', 300) * 0.001 -- no event to notify us if this changes but not really a big deal
 local toleranceDistSq = 50 -- no engine config here at all

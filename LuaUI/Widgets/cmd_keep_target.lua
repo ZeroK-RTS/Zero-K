@@ -17,8 +17,6 @@ function widget:GetInfo()
   }
 end
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
-
 --------------------------------------------------------------------------------
 -- Epic Menu Options
 --------------------------------------------------------------------------------
@@ -78,16 +76,17 @@ local TargetIssuingCommand = {
 	[CMD.ATTACK] = true,
 }
 
+local SUC = Spring.Utilities.CMD
 local TargetKeepingCommand = {
 	[CMD.MOVE] = true,
-	[CMD_RAW_MOVE] = true,
-	[CMD_RAW_BUILD] = true,
-	[CMD_JUMP] = true,
+	[SUC.RAW_MOVE] = true,
+	[SUC.RAW_BUILD] = true,
+	[SUC.JUMP] = true,
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
-	[CMD_AREA_MEX] = true,
-	[CMD_AREA_TERRA_MEX] = true,
+	[SUC.AREA_MEX] = true,
+	[SUC.AREA_TERRA_MEX] = true,
 	[CMD.LOAD_UNITS] = true,
 	[CMD.UNLOAD_UNITS] = true,
 	[CMD.LOAD_ONTO] = true,
@@ -105,6 +104,8 @@ local TargetCancelingCommand = {
 
 local orderParamTable = {0}
 local CMD_OPT_INTERNAL = CMD.OPT_INTERNAL
+local CMD_UNIT_SET_TARGET    = SUC.UNIT_SET_TARGET
+local CMD_UNIT_CANCEL_TARGET = SUC.UNIT_CANCEL_TARGET
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if TargetKeepingCommand[cmdID] and options.keepTarget.value then
 		local units = Spring.GetSelectedUnits()

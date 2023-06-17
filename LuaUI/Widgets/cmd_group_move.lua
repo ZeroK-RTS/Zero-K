@@ -13,7 +13,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitPosition  = Spring.GetUnitPosition
