@@ -207,7 +207,7 @@ options_order = {
 	--'pointButtonOpacity',
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'sound_for_lobby', 'color_highlight', 'color_from_lobby',
+	'highlight_surround', 'highlight_sound', 'send_lobby_updates', 'sound_for_lobby', 'color_highlight', 'color_from_lobby',
 	
 	--'highlighted_text_height',
 	
@@ -434,13 +434,20 @@ options = {
 		advanced = true,
 		path = hilite_path,
 	},
-	sound_for_lobby = {
-		name = "Sound lobby updates",
+	send_lobby_updates = {
+		name = "Display lobby chat and updates",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
 		OnChange = onOptionsChanged,
-		advanced = true,
+		path = hilite_path,
+	},
+	sound_for_lobby = {
+		name = "Play sound for lobby updates",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = onOptionsChanged,
 		path = hilite_path,
 	},
 	hideSpec = {
@@ -1761,12 +1768,14 @@ function widget:RecvLuaMsg(msg, playerID)
 	if msg:sub(1,16) == 'LobbyChatUpdate_' then -- FIXME: why does an in-world object care about the overlay?
 		local message = msg:sub(17, msg:len())
 		if message then
-			local toAdd = {
-				formatted = "[" .. incolor_fromlobby .. "Lobby" .. "\255\255\255\255] " .. message,
-				dup = 0,
-			}
-			AddMessage(toAdd, 'chat')
-			AddMessage(toAdd, 'backchat')
+			if options.send_lobby_updates.value then
+				local toAdd = {
+					formatted = "[" .. incolor_fromlobby .. "Lobby Message" .. "\255\255\255\255] " .. message,
+					dup = 0,
+				}
+				AddMessage(toAdd, 'chat')
+				AddMessage(toAdd, 'backchat')
+			end
 			if options.sound_for_lobby.value then
 				PlaySound('lobby')
 			end
