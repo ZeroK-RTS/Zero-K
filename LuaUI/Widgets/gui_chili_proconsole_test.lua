@@ -108,6 +108,7 @@ local MESSAGE_RULES = {
 local SOUNDS = {
 	ally = "sounds/talk.wav",
 	label = "sounds/talk.wav",
+	lobby = "sounds/beep4_decrackled.wav",
 	highlight = "LuaUI/Sounds/communism/cash-register-01.wav" -- TODO find a better sound :)
 }
 
@@ -206,7 +207,7 @@ options_order = {
 	--'pointButtonOpacity',
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight', 'color_from_lobby',
+	'highlight_surround', 'highlight_sound', 'sound_for_lobby', 'color_highlight', 'color_from_lobby',
 	
 	--'highlighted_text_height',
 	
@@ -433,6 +434,15 @@ options = {
 		advanced = true,
 		path = hilite_path,
 	},
+	sound_for_lobby = {
+		name = "Sound lobby updates",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
+		path = hilite_path,
+	},
 	hideSpec = {
 		name = "Hide Spectator Chat",
 		type = 'bool',
@@ -524,7 +534,7 @@ options = {
 		path = hilite_path,
 	},
 	color_from_lobby = {
-		name = 'From lobby',
+		name = 'Lobby notification color',
 		type = 'colors',
 		value = { 1, 0.2, 1, 1 },
 		OnChange = onOptionsChanged,
@@ -1113,7 +1123,6 @@ local function AddMessage(msg, target, remake)
 	end
 
 	stack:UpdateClientArea()
-		
 end
 
 
@@ -1758,6 +1767,9 @@ function widget:RecvLuaMsg(msg, playerID)
 			}
 			AddMessage(toAdd, 'chat')
 			AddMessage(toAdd, 'backchat')
+			if options.sound_for_lobby.value then
+				PlaySound('lobby')
+			end
 		end
 	end
 end
