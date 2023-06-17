@@ -770,6 +770,38 @@ local options = {
 		max     = 10000000,
 		step    = 1,
 	},
+	{
+		key     = "allyteam_long_name_1",
+		name    = "Team 1 Name Override",
+		desc    = "Overrides the name of team 1 in the player list.",
+		section = 'mapsettings',
+		type    = "string",
+		def     = "",
+	},
+	{
+		key     = "allyteam_short_name_1",
+		name    = "Team 1 Short Name Override",
+		desc    = "Overrides the short name of team 1 on the spectator panels.",
+		section = 'mapsettings',
+		type    = "string",
+		def     = "",
+	},
+	{
+		key     = "allyteam_long_name_2",
+		name    = "Team 2 Name Override",
+		desc    = "Overrides the name of team 2 in the player list.",
+		section = 'mapsettings',
+		type    = "string",
+		def     = "",
+	},
+	{
+		key     = "allyteam_short_name_2",
+		name    = "Team 2 Short Name Override",
+		desc    = "Overrides the short name of team 2 on the spectator panels.",
+		section = 'mapsettings',
+		type    = "string",
+		def     = "",
+	},
 	--[[ Engine option, would need proper UI before enabling
 	{
 		key     = 'fixedallies',

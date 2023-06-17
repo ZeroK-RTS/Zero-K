@@ -11,12 +11,20 @@ end
 local PUBLIC_VISIBLE = {public = true}
 
 function gadget:Initialize()
+	local modOptions = Spring.GetModOptions()
 	local allyTeamList = Spring.GetAllyTeamList()
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
+		Spring.Echo("allyTeamIDallyTeamID", allyTeamID)
 		if not Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) then
 			Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, "Team " .. allyTeamID)
 			Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, "Team " .. allyTeamID)
+		end
+		if string.len(modOptions["allyteam_short_name_" .. (allyTeamID + 1)] or "") > 0 then
+			Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, modOptions["allyteam_short_name_" .. (allyTeamID + 1)])
+		end
+		if string.len(modOptions["allyteam_long_name_" .. (allyTeamID + 1)] or "") > 0 then
+			Spring.SetGameRulesParam("allyteam_long_name_" .. allyTeamID, modOptions["allyteam_long_name_" .. (allyTeamID + 1)])
 		end
 	end
 	
