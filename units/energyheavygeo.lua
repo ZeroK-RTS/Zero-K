@@ -17,7 +17,7 @@ return { energyheavygeo = {
     pylonrange     = 150,
     removewait     = 1,
     removestop     = 1,
-	aimposoffset = [[0 30 0]],
+    aimposoffset = [[0 30 0]],
 
     stats_show_death_explosion = 1,
   },
