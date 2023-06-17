@@ -599,7 +599,7 @@ local icontypes = {
   },
   shipbuilder = {
     bitmap='icons/shipbuilder.png',
-    size=1.8,
+    size=3,
   },
   shipbuilder_alt = {
     bitmap='icons/shipbuilder_alt.png',
