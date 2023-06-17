@@ -206,7 +206,7 @@ options_order = {
 	--'pointButtonOpacity',
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight',
+	'highlight_surround', 'highlight_sound', 'color_highlight', 'color_from_lobby',
 	
 	--'highlighted_text_height',
 	
@@ -520,6 +520,13 @@ options = {
 		name = 'Highlight mark',
 		type = 'colors',
 		value = { 1, 1, 0.2, 1 },
+		OnChange = onOptionsChanged,
+		path = hilite_path,
+	},
+	color_from_lobby = {
+		name = 'From lobby',
+		type = 'colors',
+		value = { 1, 0.2, 1, 1 },
 		OnChange = onOptionsChanged,
 		path = hilite_path,
 	},
@@ -1113,6 +1120,7 @@ end
 local function setupColors()
 	incolor_dup			= color2incolor(options.color_dup.value)
 	incolor_highlight	= color2incolor(options.color_highlight.value)
+	incolor_fromlobby	= color2incolor(options.color_from_lobby.value)
 	incolors['#h']		= incolor_highlight
 	incolors['#a'] 		= color2incolor(options.color_ally.value)
 	incolors['#e'] 		= color2incolor(options.color_chat.value)
@@ -1738,6 +1746,20 @@ end
 
 function widget:GameStart()
 	setupPlayers() --re-check teamColor at gameStart for Singleplayer (special case. widget Initialized before player join).
+end
+
+function widget:RecvLuaMsg(msg, playerID)
+	if msg:sub(1,16) == 'LobbyChatUpdate_' then -- FIXME: why does an in-world object care about the overlay?
+		local message = msg:sub(17, msg:len())
+		if message then
+			local toAdd = {
+				formatted = "[" .. incolor_fromlobby .. "Lobby" .. "\255\255\255\255] " .. message,
+				dup = 0,
+			}
+			AddMessage(toAdd, 'chat')
+			AddMessage(toAdd, 'backchat')
+		end
+	end
 end
 
 -----------------------------------------------------------------------
