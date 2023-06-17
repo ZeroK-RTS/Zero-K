@@ -14,8 +14,10 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
 
-local spGetScriptEnv = Spring.UnitScript.GetScriptEnv
-local spCallAsUnit   = Spring.UnitScript.CallAsUnit
+-- Not localized at the top like usual, because these
+-- get overwritten by the LUS gadget. Gotta wait until Initialize
+local spGetScriptEnv
+local spCallAsUnit
 
 local function callScript(unitID, funcName, args)
 	local func = spGetScriptEnv(unitID)
@@ -61,6 +63,10 @@ function gadget:UnitFinished(unitID)
 end
 
 function gadget:Initialize()
+	local spUS = Spring.UnitScript
+	spGetScriptEnv = spUS.GetScriptEnv
+	spCallAsUnit   = spUS.CallAsUnit
+
 	GG.ScriptNotifyDisarmed = ScriptNotifyDisarmed
 	GG.ScriptNotifyUnpowered = ScriptNotifyUnpowered
 end
