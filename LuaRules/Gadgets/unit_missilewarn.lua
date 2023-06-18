@@ -87,6 +87,9 @@ local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
 	end
 	
 	local rx, ry, rz, rt = StarburstPredict(proID, weaponDefID, curFrame)
+	if not rx then
+		return
+	end
 	local targetID = false
 	local weaponDefConfig = trackedMissiles[weaponDefID]
 	if weaponDefConfig.homing then

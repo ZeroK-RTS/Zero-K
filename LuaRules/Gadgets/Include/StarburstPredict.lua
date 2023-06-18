@@ -64,6 +64,9 @@ end
 
 local function GetProjectileParameters(projectileID, weaponDefID,curFrame)
 	local x,y,z = GetProjectilePosition(projectileID)
+	if not x then
+		return -- Projectile has died.
+	end
 	local dx,dy,dz = GetProjectileVelocity(projectileID)
 	local ttl = GetProjectileTimeToLive(projectileID)
 	local ift = initialFlightTime[weaponDefID]
@@ -90,6 +93,9 @@ end
 function StarburstPredict(projectileID, weaponDefID, curFrame, targetPosition)
 	-- Initial projectile values
 	local ix,iy,iz,idx,idy,idz,age = GetProjectileParameters(projectileID, weaponDefID, curFrame)
+	if not ix then
+		return false -- Projectile has died.
+	end
 	local x,y,z,dx,dy,dz = ix,iy,iz,idx,idy,idz
 	-- Target location
 	local tx,ty,tz

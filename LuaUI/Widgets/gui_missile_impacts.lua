@@ -42,14 +42,14 @@ for id, data in pairs(trackedMissiles) do
 	end
 	options_order[#options_order + 1] = key
 	options[key] = {
-		name = "Color for " .. name .. " impact points",
+		name = "Allied " .. name .. " target color",
 		type = "colors",
 		value = data.color,
 		OnChange = OnChange
 	}
 end
 
-options_path = 'Settings/Interface/Missile Impact Warnings'
+options_path = 'Settings/Interface/Missile Warnings'
 
 local spGetCameraState     = Spring.GetCameraState
 local spGetGroundHeight    = Spring.GetGroundHeight

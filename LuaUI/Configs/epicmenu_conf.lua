@@ -197,6 +197,8 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Economy Overlay']          = imgPath..'energy.png',
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
+	['Settings/Interface/Missile Warnings']         = imgPath..'nuke_button_48.png',
+	
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
