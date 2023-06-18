@@ -25,8 +25,8 @@ local FACING_SIZE = math.pi*2/7 -- size of the directional facing
 
 local customCmds = Spring.Utilities.CMD
 local CMD_ORBIT      = customCmds.ORBIT
-local CMD_ORBIT_DRAW = customCmds.CMD_ORBIT_DRAW
-local CMD_AREA_GUARD = customCmds.CMD_AREA_GUARD
+local CMD_ORBIT_DRAW = customCmds.ORBIT_DRAW
+local CMD_AREA_GUARD = customCmds.AREA_GUARD
 
 local function GiveFacingOrder(targetID, cx, cz, radius, options)
 	local mx, my = Spring.GetMouseState()
