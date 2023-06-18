@@ -72,7 +72,7 @@ return { hoverarty = {
 
     ATA = {
       name                    = [[Tachyon Accelerator]],
-      areaOfEffect            = 23,
+      areaOfEffect            = 20,
       beamTime                = 1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -101,7 +101,7 @@ return { hoverarty = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 980,
-      reloadtime              = 20,
+      reloadtime              = 23,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
       soundStartVolume        = 15,
