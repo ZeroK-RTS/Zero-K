@@ -119,6 +119,11 @@ local Sounds = {
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
 local optionOverrides = {
+	["weapon/missile/missile_launch_short"] = {
+		pitchmod = 0,
+		gainmod = 0,
+		maxconcurrent = 5,
+	}
 }
 
 local defaultOpts = {
