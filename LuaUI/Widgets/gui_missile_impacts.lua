@@ -149,7 +149,7 @@ local function DrawPoint(proID, data, index, curFrame)
 end
 
 function widget:DrawWorldPreUnit()
-	if IterableMap.IsEmpty(points) then
+	if IterableMap.IsEmpty(points) or Spring.IsGUIHidden() then
 		return
 	end
 	local curFrame = Spring.GetGameFrame()

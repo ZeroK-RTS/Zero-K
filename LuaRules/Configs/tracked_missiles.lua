@@ -40,7 +40,8 @@ local trackedMissiles = {
 	[WeaponDefNames.seismic_seismic_weapon.id] = {
 		color = greenDefault,
 		humanName = "Seismic Missile",
-		fadeIn = lowAltFadeIn
+		fadeIn = lowAltFadeIn,
+		radiusMult = 0.9,
 	},
 	-- Zeno
 	[WeaponDefNames.missileslow_weapon.id] = {
