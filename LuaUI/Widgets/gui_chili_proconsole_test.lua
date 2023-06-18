@@ -1776,7 +1776,7 @@ function widget:RecvLuaMsg(msg, playerID)
 				AddMessage(toAdd, 'chat')
 				AddMessage(toAdd, 'backchat')
 			end
-			if options.sound_for_lobby.value then
+			if options.sound_for_lobby.value and not Spring.IsGameOver() then
 				PlaySound('lobby')
 			end
 		end
