@@ -1,11 +1,11 @@
 local UPDATES_PER_SECOND = 30
 
-local redDefault = {1.0,0.1,0.1,0.9}
+local redDefault = {1.0,0.15,0.15,0.9}
 local orangeDefault = {0.9,0.5,0.1,0.8}
 local greenDefault = {0.1,0.9,0.2,0.8}
-local blueDefault = {0.12,0.33,0.95,0.9}
-local purpleDefault = {0.9,0.1,0.9,0.9}
-local whiteDefault = {0.9,0.9,0.9,0.9}
+local blueDefault = {0.15,0.35,1.0,0.9}
+local purpleDefault = {0.9,0.1,0.9,0.8}
+local whiteDefault = {0.9,0.9,0.9,0.8}
 
 local highAltFadeIn = 10*UPDATES_PER_SECOND
 local lowAltFadeIn = 5*UPDATES_PER_SECOND
