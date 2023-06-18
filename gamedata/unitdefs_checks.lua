@@ -69,8 +69,12 @@ local function processWeapons(unitDefName, unitDef)
 
 	for weaponDefName, weaponDef in pairs (weaponDefs) do
 		local fullWeaponName = unitDefName .. "." .. weaponDefName
-		round_to_frames(fullWeaponName, weaponDef, "reloadtime")
-		round_to_frames(fullWeaponName, weaponDef, "burstrate")
+		if Game.gameSpeed == 30 then
+			round_to_frames(fullWeaponName, weaponDef, "reloadtime")
+			round_to_frames(fullWeaponName, weaponDef, "burstrate")
+		else
+			-- Godspeed, you crazy motherfucker!
+		end
 		print_bounce_warning(fullWeaponName, weaponDef)
 		check_lasercannon_range(fullWeaponName, weaponDef)
 	end
