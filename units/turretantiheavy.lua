@@ -48,7 +48,7 @@ return { turretantiheavy = {
   onoffable                     = true,
   script                        = [[turretantiheavy.lua]],
   selfdestructas                = [[ESTOR_BUILDING]],
-  sightDistance                 = 1260,
+  sightDistance                 = 1280,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooo oooo oooo oooo]],
 
