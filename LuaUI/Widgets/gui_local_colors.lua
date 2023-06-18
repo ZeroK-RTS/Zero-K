@@ -168,6 +168,10 @@ local function SetNewTeamColors()
 	
 	local enemyColorMap = colorEnemiesByAllyTeam and {}
 	
+	WG.LocalColor.allyColor  = allyColors[1]
+	WG.LocalColor.enemyColor = enemyColors[1]
+	WG.LocalColor.myColor    = myColor
+	
 	local a, e = 0, 0
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID, false)
@@ -274,7 +278,7 @@ local friendlyColors
 
 local function LoadFriendlyColors()
 	friendlyColors = {myColor}
-	for i=1,#allyColors do
+	for i = 1,#allyColors do
 		friendlyColors[#friendlyColors + 1] = allyColors[i]
 	end
 end
