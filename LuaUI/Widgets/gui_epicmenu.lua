@@ -32,6 +32,7 @@ local spGetConfigInt            = Spring.GetConfigInt
 local spSendCommands            = Spring.SendCommands
 local min = math.min
 local max = math.max
+local gameSpeed = Game.gameSpeed
 
 local echo = Spring.Echo
 
@@ -3289,11 +3290,11 @@ function widget:GameFrame(n)
 	if lbl_gtime then
 		local gameOverFrame = Spring.GetGameRulesParam("MissionGameOver_frames")
 		if gameOverFrame then
-			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/30))
+			lbl_gtime:SetCaption(GetTimeString((gameOverFrame)/gameSpeed))
 			widgetHandler:RemoveWidgetCallIn("GameFrame", self)
 		end
-		if n%30 == 0 then
-			lbl_gtime:SetCaption(GetTimeString(n/30))
+		if n%gameSpeed == 0 then
+			lbl_gtime:SetCaption(GetTimeString(n/gameSpeed))
 		end
 	end
 end
