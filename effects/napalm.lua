@@ -339,7 +339,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 120,
+      flashsize          = 135,
       ttl                = 480,
       color = {
         [1]  = 0.7,
@@ -590,7 +590,7 @@ local altforms = {
     modifications = {
       rocks = {
 		colormap   = [[0 0 0 0.002   .5 .5 .5 0.08     .5 .5 .5 0.06    .4 .4 .4 0.05   0 0 0 0.003]],
-	    properties = {particlelife = 90, particlelifespread = 40, particlesize = 100, particlesizespread = 25,},
+	    properties = {particlelife = 90, particlelifespread = 40, particlesize = 120, particlesizespread = 30,},
       },
     },
   },
@@ -599,7 +599,7 @@ local altforms = {
     modifications = {
       rocks = {
 		colormap   = [[0 0 0 0.002   .5 .5 .5 0.08     .5 .5 .5 0.06    .4 .4 .4 0.05   0 0 0 0.003]],
-	    properties = {particlelife = 380, particlelifespread = 50, particlesize = 80, particlesizespread = 25,
+	    properties = {particlelife = 340, particlelifespread = 50, particlesize = 96, particlesizespread = 30,
         numparticles       = 1,},
       },
     },
@@ -609,7 +609,7 @@ local altforms = {
     modifications = {
       rocks = {
 		colormap   = [[0 0 0 0.001   .3 .3 .3 0.01     .3 .3 .3 0.025    .2 .2 .2 0.018   0 0 0 0.001]],
-	    properties = {particlelife = 700, particlelifespread = 200, particlesize = 70, particlesizespread = 30},
+	    properties = {particlelife = 585, particlelifespread = 165, particlesize = 92, particlesizespread = 30},
       },
     },
   },

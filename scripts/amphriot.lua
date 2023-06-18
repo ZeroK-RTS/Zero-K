@@ -22,7 +22,7 @@ local SIG_AIM2 = 4
 local SIG_BOB = 8
 local SIG_FLOAT = 16
 
-local SPEED = 2
+local SPEED = 2.06
 
 --------------------------------------------------------------------------------
 -- vars

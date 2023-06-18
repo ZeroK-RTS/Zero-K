@@ -72,7 +72,7 @@ return { hoverarty = {
 
     ATA = {
       name                    = [[Tachyon Accelerator]],
-      areaOfEffect            = 20,
+      areaOfEffect            = 23,
       beamTime                = 1,
       coreThickness           = 0.5,
       craterBoost             = 0,

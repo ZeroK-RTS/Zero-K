@@ -75,7 +75,7 @@ return { gunshipbomb = {
   weaponDefs = {
     gunshipbomb_EXPLOSION = {
       name               = "Blastwing Explosion",
-      areaOfEffect       = 256,
+      areaOfEffect       = 288,
       craterBoost        = 1,
       craterMult         = 3.5,
 
@@ -84,9 +84,9 @@ return { gunshipbomb = {
         burntime = 30,
 
         area_damage = 1,
-        area_damage_radius = 128,
-        area_damage_dps = 25,
-        area_damage_duration = 25,
+        area_damage_radius = 144,
+        area_damage_dps = 32,
+        area_damage_duration = 20,
 
         --lups_heat_fx = [[firewalker]],
       },
