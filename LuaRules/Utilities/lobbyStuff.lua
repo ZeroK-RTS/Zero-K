@@ -18,3 +18,16 @@ function Spring.Utilities.TranslateLobbyRank(elo, xp)
 	end
 	return elo, retXP
 end
+
+function Spring.Utilities.GetCountryFlagPath(country)
+	if not country or country == '' or country == '??' then
+		country = 'XX'
+	end
+
+	local filename = "LuaUI/Images/flags/" .. country .. ".png"
+	if VFS.FileExists(filename, VFS.GAME) then
+		return filename
+	else
+		return "LuaUI/Images/flags/XX.png"
+	end
+end

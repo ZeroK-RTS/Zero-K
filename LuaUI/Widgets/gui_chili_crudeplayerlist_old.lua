@@ -507,7 +507,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 	end
 	local icon = nil
 	local icRank = nil
-	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
+	local icCountry = Spring.Utilities.GetCountryFlagPath(country)
 	
 	-- clan/faction emblems, level, country
 	if (not entity.isAI and customKeys ~= nil) then

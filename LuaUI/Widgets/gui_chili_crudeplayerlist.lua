@@ -265,14 +265,11 @@ local function GetEntryData(playerID, teamID, allyTeamID, isAiTeam, isDead)
 	
 	if playerID then
 		local playerName, active, spectator, teamID, allyTeamID, pingTime, cpuUsage, country, rank, customKeys = Spring.GetPlayerInfo(playerID, true)
-		if country == '??' then -- no '??.png' for windows filename reasons
-			country = 'wut'
-		end
 		customKeys = customKeys or {}
 		
 		entryData.isMe = (entryData.playerID == myPlayerID)
 		entryData.name = playerName
-		entryData.country = (country and country ~= '' and ("LuaUI/Images/flags/" .. country ..".png"))
+		entryData.country = Spring.Utilities.GetCountryFlagPath(country)
 		entryData.rank = ("LuaUI/Images/LobbyRanks/" .. (customKeys.icon or "0_0") .. ".png")
 		
 		if customKeys.clan and customKeys.clan ~= "" then
