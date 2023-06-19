@@ -11,9 +11,12 @@ return { energypylon = {
   buildingGroundDecalType       = [[energypylon_aoplane.dds]],
   buildPic                      = [[energypylon.png]],
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[48 48 48]],
-  collisionVolumeType           = [[ellipsoid]],
+  collisionVolumeOffsets        = [[0 1 0]],
+  collisionVolumeScales         = [[46 40 46]],
+  collisionVolumeType           = [[cylY]],
+  selectionVolumeOffsets        = [[0 0 0]],
+  selectionVolumeScales         = [[46 38 46]],
+  selectionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
