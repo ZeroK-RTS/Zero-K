@@ -26,7 +26,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-local defaultValue = 1
+local defaultValue = 0.8
 local isDisabled = (defaultValue ~= 0)
 
 -----------------------------------------------------------------
@@ -36,7 +36,7 @@ local isDisabled = (defaultValue ~= 0)
 local oldZoomScale = false
 
 local function GetZoomScale()
-	if options.cas_height_scale.value == 1 then
+	if options.cas_height_scale2.value == 1 then
 		return 1
 	end
 	local cs = Spring.GetCameraState()
@@ -49,18 +49,18 @@ local function GetZoomScale()
 	end
 	cameraHeight = math.max(1.0, cameraHeight)
 
-	local zoomMin = options.cas_height_scale_start.value
-	local zoomMax = options.cas_height_scale_end.value
+	local zoomMin = options.cas_height_scale2_start.value
+	local zoomMax = options.cas_height_scale2_end.value
 	if cameraHeight < zoomMin then
 		return 1
 	end
 	if cameraHeight > zoomMax then
-		return options.cas_height_scale.value
+		return options.cas_height_scale2.value
 	end
 	
 	local zoomScale = (math.cos(math.pi*((cameraHeight - zoomMin)/(zoomMax - zoomMin))^0.75) + 1)/2
 	--Spring.Echo("zoomScale", zoomScale)
-	return zoomScale*(1 - options.cas_height_scale.value) + options.cas_height_scale.value
+	return zoomScale*(1 - options.cas_height_scale2.value) + options.cas_height_scale2.value
 end
 
 local function GetCurrentZoomScale()
@@ -74,7 +74,7 @@ local function GetChangedZoomScale()
 		return false 
 	end
 	oldZoomScale = newZoomScale
-	return 
+	return oldZoomScale
 end
 
 -----------------------------------------------------------------
@@ -82,7 +82,7 @@ end
 -----------------------------------------------------------------
 
 local function MakeShader()
-	local sharpness = options.cas_sharpness5.value
+	local sharpness = options.cas_sharpness6.value
 	if sharpness == 0 then
 		-- lazy initialisation; zero is the default so this avoids creating those objects to lay unused
 		widgetHandler:RemoveCallIn("DrawScreenEffects")
@@ -156,7 +156,7 @@ end
 -----------------------------------------------------------------
 
 local function UpdateShader()
-	if options.cas_sharpness5.value > 0 then
+	if options.cas_sharpness6.value > 0 then
 		if isDisabled then
 			isDisabled = false
 			widgetHandler:UpdateCallIn("DrawScreenEffects")
@@ -166,7 +166,7 @@ local function UpdateShader()
 			MakeShader()
 		end
 		casShader:ActivateWith(function()
-			casShader:SetUniform("sharpness", options.cas_sharpness5.value * GetCurrentZoomScale())
+			casShader:SetUniform("sharpness", options.cas_sharpness6.value * GetCurrentZoomScale())
 			casShader:SetUniform("viewPosX", vpx)
 			casShader:SetUniform("viewPosY", vpy)
 		end)
@@ -179,9 +179,9 @@ local function UpdateShader()
 end
 
 options_path = 'Settings/Graphics/Effects/CAS'
-options_order = {'cas_sharpness5', 'cas_height_scale', 'cas_height_scale_start', 'cas_height_scale_end'}
+options_order = {'cas_sharpness6', 'cas_height_scale2', 'cas_height_scale2_start', 'cas_height_scale2_end'}
 options = {
-	cas_sharpness5 = {
+	cas_sharpness6 = {
 		name = 'Sharpening',
 		type = 'number',
 		value = defaultValue, -- note `isDisabled` above, change to false if not leaving at 0. The value does not seem to be in any specific unit.
@@ -197,10 +197,10 @@ options = {
 		noHotkey = true,
 		update_on_the_fly = true,
 	},
-	cas_height_scale = {
+	cas_height_scale2 = {
 		name = 'Zoom sharpening range',
 		type = 'number',
-		value = 0.1,
+		value = 0.2,
 		min = 0,
 		max = 1,
 		tooltipFunction = function(self)
@@ -213,7 +213,7 @@ options = {
 		noHotkey = true,
 		update_on_the_fly = true,
 	},
-	cas_height_scale_start = {
+	cas_height_scale2_start = {
 		name = 'Zoom start',
 		type = 'number',
 		value = 800, 
@@ -229,7 +229,7 @@ options = {
 		noHotkey = true,
 		update_on_the_fly = true,
 	},
-	cas_height_scale_end = {
+	cas_height_scale2_end = {
 		name = 'Zoom end',
 		type = 'number',
 		value = 6000, 
@@ -270,10 +270,10 @@ function widget:DrawScreenEffects()
 	glTexture(0, screenCopyTex)
 	glBlending(false)
 	casShader:Activate()
-	if options.cas_height_scale.value ~= 1 then
+	if options.cas_height_scale2.value ~= 1 then
 		local zoomScale = GetChangedZoomScale()
 		if zoomScale then
-			casShader:SetUniform("sharpness", options.cas_sharpness5.value * zoomScale)
+			casShader:SetUniform("sharpness", options.cas_sharpness6.value * zoomScale)
 		end
 	end
 	fullTexQuad:DrawArrays(GL_TRIANGLES, 3)
