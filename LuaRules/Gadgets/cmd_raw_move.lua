@@ -40,6 +40,10 @@ local MAX_UNITS = Game.maxUnits
 
 local rawBuildUpdateIgnore = include("LuaRules/Configs/state_commands.lua")
 
+local debugEnabled = false
+local debugUnitRestriction = false
+local debugMoveGoalOverridden = false
+
 local stopCommand = {
 	[CMD.GUARD] = true,
 	[CMD.REPAIR] = true,
@@ -125,26 +129,6 @@ for i = 1, #UnitDefs do
 		stoppingRadiusIncrease[i] = ud.xsize*260*(1 + math.max(0, (ud.xsize - 4)*0.15))
 	end
 end
-
--- Debug
---local oldSetMoveGoal = Spring.SetUnitMoveGoal
---function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
---	oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
---	--if unitID == 3744 then
---		Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
---		Spring.Echo("SetGoal", unitID, x, y, z, radius, speed, raw)
---	--end
---end
---
---local oldClearUnitGoal = Spring.ClearUnitGoal
---function Spring.ClearUnitGoal(unitID)
---	if Spring.GetGameFrame() < 550*30 or unitID ~= 3744 then
---		oldClearUnitGoal(unitID)
---	end
---	--if unitID == 3744 then
---		Spring.Echo("ClearGoal", unitID)
---	--end
---end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
@@ -761,6 +745,48 @@ end
 
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
+-- Debug
+
+local function ToggleDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	local unitID = tonumber(words[1])
+	if unitID then
+		Spring.Echo("Debug raw move for " .. unitID)
+		debugEnabled = true
+		debugUnitRestriction = debugUnitRestriction or {}
+		debugUnitRestriction[unitID] = true
+	elseif debugEnabled then
+		debugEnabled = false
+		Spring.Echo("Debug raw move disabled")
+	else
+		Spring.Echo("Debug raw move enabled")
+		debugEnabled = true
+		debugUnitRestriction = false
+	end
+	
+	if debugEnabled and not debugMoveGoalOverridden then
+		local oldSetMoveGoal = Spring.SetUnitMoveGoal
+		function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
+			oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
+			if (not debugUnitRestriction) or debugUnitRestriction[unitID] then
+				Spring.MarkerAddPoint(x, y, z, ((raw and "r") or "") .. (radius or 0))
+				Spring.Echo("SetGoal", unitID, x, y, z, radius, speed, raw)
+			end
+		end
+		local oldClearUnitGoal = Spring.ClearUnitGoal
+		function Spring.ClearUnitGoal(unitID)
+			oldClearUnitGoal(unitID)
+			if (not debugUnitRestriction) or debugUnitRestriction[unitID] then
+				Spring.Echo("ClearGoal", unitID)
+			end
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------
 -- Gadget Interface
 
 local function WaitWaitMoveUnit(unitID)
@@ -799,6 +825,7 @@ function gadget:Initialize()
 	GG.StopRawMoveUnit = StopRawMoveUnit
 	GG.RawMove_IsPathFree = RawMove_IsPathFree
 	GG.WaitWaitMoveUnit = WaitWaitMoveUnit
+	gadgetHandler:AddChatAction("debugmove", ToggleDebug, "Debugs raw move.")
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
