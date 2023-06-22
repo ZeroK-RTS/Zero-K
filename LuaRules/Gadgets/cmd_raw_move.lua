@@ -102,9 +102,11 @@ for i = 1, #UnitDefs do
 		if (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
 			-- Slow spiders need a lot of leeway when climing cliffs.
 			stuckTravelOverride[i] = 5
-			startMovingTime[i] = 12 -- May take longer to start moving
+			startMovingTime[i] = 18 -- May take longer to start moving
 			-- Lower stopping distance for more precise placement on terrain
 			loneStopDist = 4
+		elseif ud.speed < 60 then
+			stuckTravelOverride[i] = 12
 		end
 		if ud.customParams.unstick_leeway then
 			startMovingTime[i] = tonumber(ud.customParams.unstick_leeway)
@@ -147,6 +149,8 @@ local TEST_MOVE_SPACING = 16
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
+local STUCK_START_MOVE_TIMER = 12
+local STUCK_TIMER_BASE = 8
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
@@ -275,7 +279,7 @@ local function StopRawMoveUnit(unitID, stopNonRaw)
 	--Spring.Echo("StopRawMoveUnit", math.random())
 end
 
-local function HandleRawMove(unitID, unitDefID, cmdParams)
+local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	if spMoveCtrlGetTag(unitID) then
 		--Spring.Echo("ret 10")
 		return true, false
@@ -358,7 +362,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or 8)
+		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or STUCK_START_MOVE_TIMER)
 		if distSq > GIVE_UP_STUCK_DIST_SQ then
 			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8)
 		end
@@ -370,9 +374,9 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
-			unitData.stuckCheckTimer = math.floor(math.random()*6) + 5
+			unitData.stuckCheckTimer = math.floor(math.random()*6) + STUCK_TIMER_BASE
 			if not GG.floatUnit[unitID] then
-				if distSq < GIVE_UP_STUCK_DIST_SQ then
+				if canGiveUp and distSq < GIVE_UP_STUCK_DIST_SQ then
 					StopRawMoveUnit(unitID, true)
 					--Spring.Echo("ret 4")
 					return true, true
@@ -390,7 +394,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 				end
 			end
 		else
-			unitData.stuckCheckTimer = 4 + math.min(6, math.floor(distSq/500))
+			unitData.stuckCheckTimer = STUCK_TIMER_BASE + math.min(6, math.floor(distSq/500))
 			if distSq > GIVE_UP_STUCK_DIST_SQ then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10)
 			end
@@ -416,8 +420,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 		else
 			local distance = math.sqrt(distSq)
 			local rx, rz
-			freePath, rx, rz = IsPathFree(unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE, goalDistOverride and (goalDistOverride - 20), BLOCK_RELAX_DISTANCE)
-			if rx then
+			freePath, rx, rz = IsPathFree(
+				unitDefID, x, z, mx, mz, distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE,
+				goalDistOverride and (goalDistOverride - 20), canGiveUp and BLOCK_RELAX_DISTANCE
+			)
+			if rx and freePath then
 				mx, my, mz = rx, Spring.GetGroundHeight(rx, rz), rz
 			end
 			if (not freePath) then
@@ -425,7 +432,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams)
 			end
 		end
 		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
-			Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDist[unitDefID] or 16, nil, freePath)
+			Spring.SetUnitMoveGoal(unitID, mx, my, mz, goalDistOverride or goalDist[unitDefID] or 16, nil, freePath)
 			unitData.mx, unitData.mz = mx, mz
 			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
 			unitData.possiblyTurning = true
@@ -455,7 +462,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) then
 		return false
 	end
-	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams)
+	local canGiveUp = not (cmdID == CMD_RAW_BUILD) -- Build orders are never removed, so raw build should not be either.
+	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	return cmdUsed, cmdRemove
 end
 
@@ -573,7 +581,7 @@ local function CheckConstructorBuild(unitID)
 		local buildDistSq = (buildDist + 30)^2
 		local distSq = (cx - x)^2 + (cz - z)^2
 		if distSq > buildDistSq then
-			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist, CONSTRUCTOR_TIMEOUT_RATE}, CMD_OPT_ALT)
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_BUILD, 0, cx, cy, cz, buildDist - 2, CONSTRUCTOR_TIMEOUT_RATE}, CMD_OPT_ALT)
 		end
 	end
 end
