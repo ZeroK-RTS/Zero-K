@@ -47,6 +47,7 @@ local defaultRank, morphRankTransfer = VFS.Include(LUAUI_DIRNAME .. "Configs/sel
 -- Epic Menu Options
 
 local ctrlFlattenRank = 1
+local altFilterHighRank = 2
 local doubleClickFlattenRank = 1
 local retreatOverride = true
 local retreatingRank = 0
@@ -73,8 +74,8 @@ local retreatPath = 'Settings/Interface/Retreat Zones'
 options_order = {
 	'label_selection_rank',
 	'useSelectionFilteringOption',
-	'selectionFilteringOnlyAltOption',
 	'ctrlFlattenRankOption',
+	'selectionFilteringOnlyAltOption',
 	'doubleClickFlattenRankOption',
 	'retreatOverrideOption',
 	'retreatingRankOption',
@@ -104,16 +105,6 @@ options = {
 			useSelectionFiltering = self.value
 		end
 	},
-	selectionFilteringOnlyAltOption = {
-		name = "Only filter when Alt is held",
-		type = "bool",
-		value = false,
-		noHotkey = true,
-		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
-		OnChange = function (self)
-			selectionFilteringOnlyAlt = self.value
-		end
-	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',
 		desc = "Useful so that global selection hotkeys (such as Ctrl+Z) can expand upon a mixed selection.",
@@ -124,6 +115,28 @@ options = {
 		tooltip_format = "%.0f",
 		OnChange = function (self)
 			ctrlFlattenRank = self.value
+		end
+	},
+	selectionFilteringOnlyAltOption = {
+		name = "Only filter when Alt is held",
+		type = "bool",
+		value = false,
+		noHotkey = true,
+		desc = "Enable selection filtering when Alt is held. Requires the main selection filtering option to be enabled.",
+		OnChange = function (self)
+			selectionFilteringOnlyAlt = self.value
+		end
+	},
+	altBlocksHighRankSelection = {
+		name = 'Hold Alt to filter out ranks above:',
+		desc = "Useful for selecting low-rank units, such as constructors as they default to rank 2.",
+		type = 'number',
+		value = 2,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		tooltip_format = "%.0f",
+		OnChange = function (self)
+			altFilterHighRank = self.value
 		end
 	},
 	doubleClickFlattenRankOption = {
@@ -256,12 +269,12 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		return -- Don't filter when the change is just that something was deselected
 	end
 	
-	if #units <= 1 then
+	if #units <= 1 and not alt then
 		return
 	end
 	
 	if CheckControlGroupHotkeys() then
-		return	-- assume the user is selecting a control group
+		return -- assume the user is selecting a control group
 	end
 	
 	if doubleClickUnitDefID then
@@ -292,6 +305,9 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		end
 
 		if rank then
+			if (alt and rank > altFilterHighRank) then
+				rank = -1
+			end
 			if ctrl and rank > ctrlFlattenRank then
 				rank = ctrlFlattenRank
 			end
@@ -310,6 +326,10 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 				needsChanging = true
 			end
 		end
+	end
+	
+	if bestRank == -1 then
+		return {}
 	end
 	
 	if needsChanging then
