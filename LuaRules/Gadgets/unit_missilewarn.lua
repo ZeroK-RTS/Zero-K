@@ -33,6 +33,9 @@ function gadget:Initialize()
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
+	if not proOwnerID or proOwnerID == -1 then
+		return -- tacnuke nanoframe death is technically launching an ownerless, TTL=0 missile
+	end
 	SendToUnsynced(MAGIC_FIRED, proID, proOwnerID, weaponID)
 end
 
