@@ -11,7 +11,7 @@ return { spiderriot = {
   canPatrol              = true,
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 5 0]],
-  collisionVolumeScales  = [[36 36 36]],
+  collisionVolumeScales  = [[45 36 45]],
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -40,7 +40,7 @@ return { spiderriot = {
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
-  turnRate               = 2040,
+  turnRate               = 1938,
 
   weapons                = {
 
