@@ -26,7 +26,7 @@ local glBlending = gl.Blending
 local glCopyToTexture = gl.CopyToTexture
 local GL_TRIANGLES = GL.TRIANGLES
 
-local defaultValue = 0.8
+local defaultValue = 0.6
 local isDisabled = (defaultValue ~= 0)
 
 -----------------------------------------------------------------
@@ -217,7 +217,7 @@ options = {
 		name = 'Zoom start',
 		type = 'number',
 		value = 800, 
-		min = 0,
+		min = 0.05,
 		max = 4000,
 		tooltipFunction = function(self)
 			return "Current: " .. self.value .. "\nMinimum camera height for zoom scaling."
