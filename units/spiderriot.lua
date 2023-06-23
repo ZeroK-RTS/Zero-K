@@ -13,6 +13,9 @@ return { spiderriot = {
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[45 36 45]],
   collisionVolumeType    = [[ellipsoid]],
+  selectionVolumeOffsets = [[0 0 4]],
+  selectionVolumeScales  = [[68 45 76]],
+  selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
