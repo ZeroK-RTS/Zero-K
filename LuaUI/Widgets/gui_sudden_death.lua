@@ -113,7 +113,8 @@ function widget:DrawWorldPreUnit()
 		return
 	end
 	
-	local midRadius = 120 * (1 - (Spring.GetGameRulesParam("suddenDeathProgress") or 0))
+	local shrinkProgress = (Spring.GetGameRulesParam("suddenDeathProgress") or 0)
+	local midRadius = 120 * (1 - shrinkProgress)
 	if midRadius < 0 then
 		return
 	end
@@ -133,7 +134,12 @@ function widget:DrawWorldPreUnit()
 	end
 	
 	glLineWidth(thickness * 0.6)
-	glColor(options.mid_color.value[1], options.mid_color.value[2], options.mid_color.value[3], options.mid_color.value[4] * alpha)
+	glColor(
+		shrinkProgress * options.color.value[1] + (1 - shrinkProgress) * options.mid_color.value[1],
+		shrinkProgress * options.color.value[2] + (1 - shrinkProgress) * options.mid_color.value[2],
+		shrinkProgress * options.color.value[3] + (1 - shrinkProgress) * options.mid_color.value[3],
+		shrinkProgress * options.color.value[4] + (1 - shrinkProgress) * options.mid_color.value[4] * alpha)
+	
 	glDrawGroundCircle(ox, 0, oz, midRadius, math.max(12, midRadius))
 	if preProgress < 0.97 then
 		glDrawGroundCircle(ox, 0, oz, midRadius * preProgress, math.max(12, midRadius))
