@@ -146,16 +146,18 @@ function widget:DrawWorldPreUnit()
 	elseif preProgress < 1 then
 		local prop = (preProgress - 0.97) / 0.03
 		prop = (prop < 0.5 and prop*prop*2) or (1 - (-2 * prop + 2) * (-2 * prop + 2) / 2)
+		local colorProp = math.sqrt((prop > 0 and prop) or 0)
+		
 		local radiusOne = Spring.GetGameRulesParam("suddenDeathStartDistance")
 		local radiusTwo = midRadius * preProgress
 		local radiusAverage = prop * radiusOne + (1 - prop) * radiusTwo
 		
 		glLineWidth(thickness * (0.4*prop + 0.6))
 		glColor(
-			prop * options.color.value[1] + (1 - prop) * options.mid_color.value[1],
-			prop * options.color.value[2] + (1 - prop) * options.mid_color.value[2],
-			prop * options.color.value[3] + (1 - prop) * options.mid_color.value[3],
-			prop * options.color.value[4] + (1 - prop) * options.mid_color.value[4] * alpha)
+			colorProp * options.color.value[1] + (1 - colorProp) * options.mid_color.value[1],
+			colorProp * options.color.value[2] + (1 - colorProp) * options.mid_color.value[2],
+			colorProp * options.color.value[3] + (1 - colorProp) * options.mid_color.value[3],
+			colorProp * options.color.value[4] + (1 - colorProp) * options.mid_color.value[4] * alpha)
 		
 		glDrawGroundCircle(ox, 0, oz, radiusAverage, math.max(12, radiusAverage))
 	end
