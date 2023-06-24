@@ -55,6 +55,7 @@ MessageProcessor.MESSAGE_DEFINITIONS = {
 	{ msgtype = 'userinfo', pattern = '^> SPRINGIE:User (.+)', noplayername = true },
 	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
 	{ msgtype = 'game_message', pattern = '^game_message:(.)(.*)', isgamemessage = true },
+	{ msgtype = 'game_priority_message', pattern = '^game_priority_message:(.)(.*)', isgamemessage = true },
 	{ msgtype = 'other' } -- no pattern... will match anything else
 }
 

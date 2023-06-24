@@ -1504,7 +1504,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 		local newMsg = { text = msg, priority = priority }
 		MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
-		if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'userinfo' and newMsg.msgtype ~= 'game_message' then
+		if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'userinfo' and newMsg.msgtype ~= 'game_message' and newMsg.msgtype ~= 'game_priority_message' then
 			if MUTE_SPECTATORS and newMsg.msgtype == 'spec_to_everyone' then
 				local spectating = select(1, Spring.GetSpectatingState())
 				if not spectating then

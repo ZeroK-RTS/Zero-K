@@ -99,7 +99,8 @@ local MESSAGE_RULES = {
 	point = { format = '#p$playername#e added point.' },
 	autohost = { format = '#o> $argument', noplayername = true },
 	other = { format = '#o$text' }, -- no pattern... will match anything else
-	game_message = { format = '#o$text' } -- no pattern...
+	game_message = { format = '#o$text' }, -- no pattern...
+	game_priority_message = { format = '#e$text' }, -- no pattern...
 }
 
 --------------------------------------------------------------------------------
@@ -878,7 +879,11 @@ end
 
 local function detectHighlight(msg)
 	-- must handle case where we are spec and message comes from player
-
+	
+	if msg.msgtype == 'game_priority_message' then
+		msg.highlight = true
+		return
+	end
 	if msg.msgtype == 'player_to_player_received' and options.highlight_all_private.value then
 		msg.highlight = true
 		return
@@ -1502,7 +1507,7 @@ function widget:AddConsoleMessage(msg)
 	
 	if msg.highlight and options.highlight_sound.value then
 		PlaySound("highlight")
-	elseif (msg.msgtype == "player_to_allies") then -- FIXME not for sent messages
+	elseif (msg.msgtype == "player_to_allies") or (msg.msgtype == "game_priority_message") then -- FIXME not for sent messages
 		PlaySound("ally")
 	elseif msg.msgtype == "label" then
 		PlaySound("label")

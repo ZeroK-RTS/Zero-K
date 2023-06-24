@@ -16,6 +16,7 @@ return { terraunit = {
 
   customParams           = {
     dontcount      = [[1]],
+    dontkill       = [[1]],
     mobilebuilding = [[1]],
     cannotcloak    = [[1]],
     instantselfd   = [[1]],

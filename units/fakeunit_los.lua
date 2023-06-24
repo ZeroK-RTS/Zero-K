@@ -19,8 +19,9 @@ return { fakeunit_los = {
   cruiseAlt             = 300,
   
   customParams          = {
-      dontcount = [[1]],
-      completely_hidden = 1, -- for widget-senpai not to notice me
+    dontcount         = [[1]],
+    dontkill          = [[1]],
+    completely_hidden = 1, -- for widget-senpai not to notice me
   },
   
   floater               = true,
