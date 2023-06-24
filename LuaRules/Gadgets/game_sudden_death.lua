@@ -47,6 +47,7 @@ local elgibleDefIdCache = {}
 local suddenDeathRadius = false
 local suddenDeathRadiusSq = false
 local nextAnnounceSecond = 60
+local stopSuddenDeath = false
 
 local function IsEligible(unitDefID)
 	if not elgibleDefIdCache[unitDefID] then
@@ -66,10 +67,12 @@ local startDistanceSq = originX*originX + originZ*originZ
 local startDistance = math.sqrt(startDistanceSq)
 local suddenDeathFrame = 60*30*30
 local suddenSweepFrames = 60*30
+local damageReferenceDistance = 400
 
-local baseDamage        = 60 * UPDATE_FREQ_DAMAGE / 30
-local baseDamagePerElmo = 0.1 * UPDATE_FREQ_DAMAGE / 30
-local propDamagePerElmo = 0.00015 * UPDATE_FREQ_DAMAGE / 30
+local baseDamage          = 50 * UPDATE_FREQ_DAMAGE / 30
+local propDamage          = 0.04 * UPDATE_FREQ_DAMAGE / 30
+local baseDamageAtRefDist = 40 * UPDATE_FREQ_DAMAGE / 30
+local propDamageAtRefDist = 0.05 * UPDATE_FREQ_DAMAGE / 30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -78,7 +81,6 @@ local propDamagePerElmo = 0.00015 * UPDATE_FREQ_DAMAGE / 30
 local function GetDefaultConfig()
 	local suddenDeathMinutes = tonumber((Spring.GetModOptions() or {}).sudden_death_minutes) or false
 	local suddenDeathSweepSeconds = tonumber((Spring.GetModOptions() or {}).sudden_death_sweep_seconds) or false
-	Spring.Echo("suddenDeathMinutessuddenDeathMinutes", suddenDeathMinutes)
 	if not suddenDeathMinutes then
 		return false
 	end
@@ -96,18 +98,19 @@ local function SetupSuddenDeath()
 		return false
 	end
 	
-	originX           = config.originX or originX
-	originZ           = config.originZ or originZ
-	suddenDeathFrame  = (config.suddenDeathStartSeconds and config.suddenDeathStartSeconds*30) or suddenDeathFrame
-	suddenSweepFrames = (config.suddenDeathSweepSeconds and config.suddenDeathSweepSeconds*30) or suddenSweepFrames
-	startDistance     = config.startDistance or startDistance
-	damageMult        = config.damageMult or false
+	originX                 = config.originX or originX
+	originZ                 = config.originZ or originZ
+	suddenDeathFrame        = (config.suddenDeathStartSeconds and config.suddenDeathStartSeconds*30) or suddenDeathFrame
+	suddenSweepFrames       = (config.suddenDeathSweepSeconds and config.suddenDeathSweepSeconds*30) or suddenSweepFrames
+	startDistance           = config.startDistance or startDistance
+	damageMult              = config.damageMult or false
 	
 	startDistanceSq   = startDistance*startDistance
 	if damageMult then
-		baseDamage        = baseDamage * damageMult
-		baseDamagePerElmo = baseDamagePerElmo * damageMult
-		propDamagePerElmo = propDamagePerElmo * damageMult
+		baseDamage = baseDamage * damageMult
+		propDamage = propDamage * damageMult
+		baseDamageAtRefDist = baseDamageAtRefDist * damageMult
+		propDamageatRefDist = propDamageatRefDist * damageMult
 	end
 	
 	if suddenSweepFrames < 1 then
@@ -127,6 +130,9 @@ end
 -- Sudden Death Handling
 
 local function CheckOutOfBounds(unitID)
+	if stopSuddenDeath then
+		return true
+	end
 	local x, _, z = spGetUnitPosition(unitID)
 	if not x then
 		return true
@@ -143,6 +149,9 @@ local function CheckOutOfBounds(unitID)
 end
 
 local function CheckDamage(unitID)
+	if stopSuddenDeath then
+		return true
+	end
 	local x, _, z = spGetUnitPosition(unitID)
 	if not x then
 		return true
@@ -155,13 +164,20 @@ local function CheckDamage(unitID)
 	end
 	
 	local inDist = math.sqrt(distSq) - suddenDeathRadius
+	inDist = (inDist / damageReferenceDistance)
+	
 	local _, maxHealth = spGetUnitHealth(unitID)
 	local armored, armorMult = spGetUnitArmored(unitID)
-	local damagePerElmo = baseDamagePerElmo + propDamagePerElmo * maxHealth / (armorMult or 1)
-	Spring.AddUnitDamage(unitID, baseDamage + inDist * damagePerElmo)
+	maxHealth = maxHealth / (armorMult or 1)
+	local damagePerElmo = baseDamageAtRefDist + propDamageAtRefDist * maxHealth
+	
+	Spring.AddUnitDamage(unitID, baseDamage + propDamage * maxHealth + inDist * inDist * damagePerElmo)
 end
 
 local function UpdateSuddenDeathRing(n)
+	if stopSuddenDeath then
+		return
+	end
 	local progress = (n - suddenDeathFrame) / suddenSweepFrames
 	if progress < 1 then
 		suddenDeathRadius = (1 - progress)*(1 - progress)*(1 - progress*(1 - progress)) * startDistance
@@ -239,12 +255,16 @@ end
 
 function gadget:Initialize()
 	Spring.Echo("InitializeInitializeInitialize")
-	if not SetupSuddenDeath() then
+	if (not SetupSuddenDeath()) or Spring.IsGameOver() then
 		gadgetHandler:RemoveGadget()
 		return
 	end
 	gadgetHandler:RemoveCallIn("UnitCreated")
 	gadgetHandler:RemoveCallIn("UnitDestroyed")
+end
+
+function gadget:GameOver()
+	stopSuddenDeath = true
 end
 
 -------------------------------------------------------------------------------------
