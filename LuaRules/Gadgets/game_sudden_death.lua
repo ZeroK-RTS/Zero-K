@@ -46,7 +46,7 @@ local beingDamagedUnits = false
 local elgibleDefIdCache = {}
 local suddenDeathRadius = false
 local suddenDeathRadiusSq = false
-local nextAnnounceSecond = 10
+local nextAnnounceSecond = 60
 
 local function IsEligible(unitDefID)
 	if not elgibleDefIdCache[unitDefID] then
@@ -186,7 +186,7 @@ local function SuddenDeathActivate()
 end
 
 local function CheckSuddenDeathAnnouncement(n)
-	if not (nextAnnounceSecond and n + nextAnnounceSecond*30 > suddenDeathFrame) then
+	if not (nextAnnounceSecond and n + nextAnnounceSecond*30 == suddenDeathFrame) then
 		return
 	end
 	if nextAnnounceSecond == 0 then
@@ -195,7 +195,9 @@ local function CheckSuddenDeathAnnouncement(n)
 		return
 	end
 	Spring.Echo("game_priority_message: Sudden death starting in " .. nextAnnounceSecond .. "s")
-	if nextAnnounceSecond > 4 then
+	if nextAnnounceSecond > 10 then
+		nextAnnounceSecond = nextAnnounceSecond - 50
+	elseif nextAnnounceSecond > 4 then
 		nextAnnounceSecond = nextAnnounceSecond - 7
 	else
 		nextAnnounceSecond = nextAnnounceSecond - 1
