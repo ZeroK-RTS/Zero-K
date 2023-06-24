@@ -328,10 +328,6 @@ local function RawGetFilteredSelection(units, subselection, subselectionCheckDon
 		end
 	end
 	
-	if bestRank == -1 then
-		return {}
-	end
-	
 	if needsChanging then
 		return bestUnits
 	end
