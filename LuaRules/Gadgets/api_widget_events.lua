@@ -10,11 +10,11 @@ function gadget:GetInfo() return {
 	enabled   = true,
 } end
 
-local spAreTeamsAllied     	= Spring.AreTeamsAllied
-local spGetMyAllyTeamID    	= Spring.GetMyAllyTeamID
-local spGetMyTeamID        	= Spring.GetMyTeamID
-local spGetSpectatingState 	= Spring.GetSpectatingState
-local spGetUnitLosState    	= Spring.GetUnitLosState
+local spAreTeamsAllied     = Spring.AreTeamsAllied
+local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
+local spGetMyTeamID        = Spring.GetMyTeamID
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetUnitLosState    = Spring.GetUnitLosState
 
 --[[ NB: these are C proxies, not the actual Lua functions currently linked LuaUI-side,
      so it is safe to cache them here even if the underlying func changes afterwards ]]

@@ -82,6 +82,7 @@ return { empmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_empmissile.s3o]],
       paralyzer               = true,
       paralyzeTime            = 45,

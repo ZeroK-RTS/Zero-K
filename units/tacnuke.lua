@@ -87,6 +87,7 @@ return { tacnuke = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_tacnuke.s3o]],
       range                   = 3500,
       reloadtime              = 10,

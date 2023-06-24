@@ -89,6 +89,7 @@ return { seismic = {
       fireStarter             = 0,
       flightTime              = 100,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_seismic.s3o]],
       noSelfDamage            = true,
       range                   = 6000,

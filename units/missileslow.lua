@@ -84,6 +84,8 @@ return { missileslow = {
 
         gui_aoe = 320,
         gui_ee = 0.1,
+
+        radar_homing_distance = 400,
       },
 
       damage                  = {
@@ -97,7 +99,7 @@ return { missileslow = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       model                   = [[slowmissile.dae]],
-	  myGravity               = 0.1,
+      myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 6000,
       reloadtime              = 10,

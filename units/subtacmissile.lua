@@ -84,6 +84,7 @@ return { subtacmissile = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      leadLimit               = 0,
       model                   = [[wep_tacnuke.s3o]],
       noSelfDamage            = true,
       range                   = 3000,
