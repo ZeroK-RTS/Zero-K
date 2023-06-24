@@ -140,7 +140,7 @@ function widget:DrawWorldPreUnit()
 		shrinkProgress * options.color.value[3] + (1 - shrinkProgress) * options.mid_color.value[3],
 		shrinkProgress * options.color.value[4] + (1 - shrinkProgress) * options.mid_color.value[4] * alpha)
 	
-	glDrawGroundCircle(ox, 0, oz, midRadius, math.max(12, midRadius))
+	glDrawGroundCircle(ox, 0, oz, midRadius, math.max(24, midRadius))
 	if preProgress < 0.97 then
 		glDrawGroundCircle(ox, 0, oz, midRadius * preProgress, math.max(12, midRadius))
 	elseif preProgress < 1 then
@@ -159,7 +159,7 @@ function widget:DrawWorldPreUnit()
 			colorProp * options.color.value[3] + (1 - colorProp) * options.mid_color.value[3],
 			colorProp * options.color.value[4] + (1 - colorProp) * options.mid_color.value[4] * alpha)
 		
-		glDrawGroundCircle(ox, 0, oz, radiusAverage, math.max(12, radiusAverage))
+		glDrawGroundCircle(ox, 0, oz, radiusAverage, math.max(24, radiusAverage))
 	end
 	
 	if preProgress < 1 then
@@ -173,7 +173,7 @@ function widget:DrawWorldPreUnit()
 	glLineWidth(thickness)
 	glColor(options.color.value[1], options.color.value[2], options.color.value[3], options.color.value[4] * alpha)
 	
-	glDrawGroundCircle(ox, 0, oz, radius, math.max(12, radius))
+	glDrawGroundCircle(ox, 0, oz, radius, math.max(24, radius))
 	
 	glLineWidth(1)
 	glColor(1, 1, 1, 1)
