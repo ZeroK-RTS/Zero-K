@@ -22,7 +22,7 @@
 	"amphlaunch" : {
 		"name" : "Lobster",
 		"description" : "Amphibious Launcher Bot",
-		"helptext" : "Lacking armaments of its own, the Lobsters response to threats is to throw other units at the problem. Though originally intended for rapid coastline deployement, the Lobster has a variety of uses and can even offensively throw enemies units."
+		"helptext" : "Lacking armaments of its own, the Lobsters response to threats is to throw other units at the problem. Though originally intended for rapid coastline deployment, the Lobster has a variety of uses and can even offensively throw enemies units."
 	},
 	"tankarty" : {
 		"name" : "Emissary",
