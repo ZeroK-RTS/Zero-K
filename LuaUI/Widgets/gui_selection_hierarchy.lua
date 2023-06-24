@@ -76,6 +76,7 @@ options_order = {
 	'useSelectionFilteringOption',
 	'ctrlFlattenRankOption',
 	'selectionFilteringOnlyAltOption',
+	'altBlocksHighRankSelection',
 	'doubleClickFlattenRankOption',
 	'retreatOverrideOption',
 	'retreatingRankOption',
