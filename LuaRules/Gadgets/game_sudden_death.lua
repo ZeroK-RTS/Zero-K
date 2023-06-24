@@ -69,10 +69,10 @@ local suddenDeathFrame = 60*30*30
 local suddenSweepFrames = 60*30
 local damageReferenceDistance = 400
 
-local baseDamage          = 45 * UPDATE_FREQ_DAMAGE / 30
-local propDamage          = 0.045 * UPDATE_FREQ_DAMAGE / 30
-local baseDamageAtRefDist = 45 * UPDATE_FREQ_DAMAGE / 30
-local propDamageAtRefDist = 0.045 * UPDATE_FREQ_DAMAGE / 30
+local baseDamage          = 30 * UPDATE_FREQ_DAMAGE / 30
+local propDamage          = 0.05 * UPDATE_FREQ_DAMAGE / 30
+local baseDamageAtRefDist = 30 * UPDATE_FREQ_DAMAGE / 30
+local propDamageAtRefDist = 0.05 * UPDATE_FREQ_DAMAGE / 30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
