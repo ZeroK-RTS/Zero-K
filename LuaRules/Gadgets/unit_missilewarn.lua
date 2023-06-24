@@ -74,8 +74,12 @@ local function ProjectileCreatedDeferred(proID, proOwnerID, weaponDefID)
 		return
 	end
 	local teamID = spGetUnitTeam(proOwnerID)
+	local myTeamID = spGetMyTeamID()
+	if not (teamID and myTeamID) then
+		return
+	end
 	local spec, specFullView = spGetSpectatingState()
-	local isAlly = spAreTeamsAllied(teamID, spGetMyTeamID())
+	local isAlly = spAreTeamsAllied(teamID, myTeamID)
 
 	if not (isAlly or (spec and specFullView)) then
 		return
