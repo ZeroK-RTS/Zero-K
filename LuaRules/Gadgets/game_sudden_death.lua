@@ -210,7 +210,7 @@ local function CheckSuddenDeathAnnouncement(n)
 		nextAnnounceSecond = false
 		return
 	end
-	Spring.Echo("game_priority_message: Sudden death starting in " .. nextAnnounceSecond .. "s")
+	Spring.Echo("game_priority_message: Sudden death in " .. nextAnnounceSecond .. "s")
 	if nextAnnounceSecond > 10 then
 		nextAnnounceSecond = nextAnnounceSecond - 50
 	elseif nextAnnounceSecond > 4 then
