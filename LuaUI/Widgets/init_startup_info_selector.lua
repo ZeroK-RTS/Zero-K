@@ -53,6 +53,9 @@ local scroll
 local grid
 local trainerCheckbox
 local showModulesCheckbox
+local sideOpenButton
+local closeButton
+local showModulesCheckbox
 local buttonData = {}
 local buttonLabels = {}
 local trainerLabels = {}
@@ -75,13 +78,15 @@ if (vsx < 1024 or vsy < 768) then
 	BUTTON_HEIGHT = vsy*(BUTTON_HEIGHT/768)
 end
 
-local commTips = {
-	["LuaUI/Images/startup_info_selector/chassis_benzcom.png"] = "Select Guardian Chassis\nA slow tanky chassis with a wide range of weapons and inbuilt battle drones. Can dual wield and gains 25% extra health from armour modules.",
-	["LuaUI/Images/startup_info_selector/chassis_commrecon.png"] = "Select Recon Chassis\nA nimble chassis that uses speed and jumpjets to explore the map and avoid opposition. Gains bonus speed and jump cooldown from speed modules. Otherwise has poor survivability and lower build power.",
-	["LuaUI/Images/startup_info_selector/chassis_commstrike.png"] = "Select Strike Chassis\nAn all-round chassis with good speed and health. Can dual wield and gains extra health regeneration with levels.",
-	["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = "Select Engineer Chassis\nA chassis focused on economy that uses its high build range and base build power to increase production. It has relatively poor speed and health.",
-	["LuaUI/Images/startup_info_selector/chassis_cremcom.png"] = "Select Campaign Chassis\nCan mount any module.",
-}
+local commTips = {}
+local function regenerateCommTips()
+	commTips["LuaUI/Images/startup_info_selector/chassis_benzcom.png"]     = WG.Translate("interface", "startup_commenu_guardian_name") .. "\n" .. WG.Translate("interface", "startup_commenu_guardian_desc")
+	commTips["LuaUI/Images/startup_info_selector/chassis_commrecon.png"]   = WG.Translate("interface", "startup_commenu_recon_name")    .. "\n" .. WG.Translate("interface", "startup_commenu_recon_desc")
+	commTips["LuaUI/Images/startup_info_selector/chassis_commstrike.png"]  = WG.Translate("interface", "startup_commenu_strike_name")   .. "\n" .. WG.Translate("interface", "startup_commenu_strike_desc")
+	commTips["LuaUI/Images/startup_info_selector/chassis_commsupport.png"] = WG.Translate("interface", "startup_commenu_engineer_name") .. "\n" .. WG.Translate("interface", "startup_commenu_engineer_desc")
+	commTips["LuaUI/Images/startup_info_selector/chassis_cremcom.png"]     = WG.Translate("interface", "startup_commenu_campaign_name") .. "\n" .. WG.Translate("interface", "startup_commenu_campaign_desc")
+end
+regenerateCommTips()
 
 --local wantLabelUpdate = false
 --------------------------------------------------------------------------------
@@ -109,8 +114,8 @@ end
 options_path = 'Settings/HUD Panels/Commander Selector'
 options = {
 	hideTrainers = {
-		name = 'Hide default commanders',
-		desc = 'You can customise your commanders for use in multiplayer on the Zero-K site: https://zero-k.info',
+		name = WG.Translate("interface", "startup_commenu_hide_default_commanders"),
+		desc = WG.Translate("interface", "startup_commenu_sitelink"),
 		-- use the below after Chobby replaces site for customisation
 		-- desc = 'You can customize your commanders before the game, in the main menu.',
 		type = 'bool',
@@ -126,7 +131,7 @@ options = {
 		end
 	},
 	showModules = {
-		name = 'Module tooltips',
+		name = WG.Translate("interface", "startup_commenu_module_tooltips"),
 		type = 'bool',
 		value = false,
 		noHotkey = true,
@@ -274,7 +279,7 @@ local function CreateWindow()
 		y = math.floor((vsy - WINDOW_HEIGHT)/2),
 		classname = "main_window",
 		parent = screen0,
-		caption = "COMMANDER SELECTOR",
+		caption = WG.Translate("interface", "startup_commenu_title"),
 		}
 	--scroll = ScrollPanel:New{
 	--	parent = mainWindow,
@@ -354,9 +359,9 @@ local function CreateWindow()
 		--end
 	end
 	local cbWidth = WINDOW_WIDTH*0.4
-	local closeButton = Button:New{
+	closeButton = Button:New{
 		parent = mainWindow,
-		caption = "CLOSE",
+		caption = WG.Translate("interface", "startup_commenu_close"),
 		width = cbWidth,
 		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
@@ -407,6 +412,41 @@ local function CreateWindow()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function languageChanged ()
+	regenerateCommTips()
+
+	local optShowModules = options.showModules
+	optShowModules.name = WG.Translate("interface", "startup_commenu_module_tooltips")
+	if showModulesCheckbox then
+		showModulesCheckbox.caption = optShowModules.name
+		showModulesCheckbox:Invalidate()
+	end
+	ToggleModuleTooltip(optShowModules.value)
+
+	local optHideTrainers = options.hideTrainers
+	optHideTrainers.name = WG.Translate("interface", "startup_commenu_hide_default_commanders")
+	optHideTrainers.desc = WG.Translate("interface", "startup_commenu_sitelink")
+	if trainerCheckbox then
+			trainerCheckbox.caption = optHideTrainers.name
+			trainerCheckbox.tooltip = optHideTrainers.desc
+			trainerCheckbox:Invalidate()
+	end
+
+	if sideOpenButton then
+		sideOpenButton.tooltip = WG.Translate("interface", "startup_commenu_open")
+	end
+
+	if closeButton then
+		closeButton.caption = WG.Translate("interface", "startup_commenu_close")
+		closeButton:Invalidate()
+	end
+
+	if mainWindow then
+		mainWindow.caption = WG.Translate("interface", "startup_commenu_title")
+		mainWindow:Invalidate()
+	end
+end
+
 function widget:Initialize()
 	optionData = include("Configs/startup_info_selector.lua")
 
@@ -464,10 +504,10 @@ function widget:Initialize()
 			screen0:AddChild(buttonWindow)
 		end
 		
-		button = Button:New{
+		sideOpenButton = Button:New{
 			parent = buttonWindow,
 			caption = '',
-			tooltip = "Open comm selection screen",
+			tooltip = WG.Translate("interface", "startup_commenu_open"),
 			width = "100%",
 			height = "100%",
 			x = 0,
@@ -487,6 +527,8 @@ function widget:Initialize()
 		}
 		CreateWindow()
 	end
+
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 -- hide window if game was loaded

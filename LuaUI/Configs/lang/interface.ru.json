@@ -103,6 +103,11 @@
 	"cheatsheet_cat_wacky" : "Забавные",
 	"cheatsheet_cat_planetwars" : "Планетарные войны",
 	"cheatsheet_cat_rejects" : "Технический мусор",
+	"startup_commenu_sitelink" : "Персонализация командира доступна на сайте Zero-K: https://zero-k.info",
+	"startup_commenu_module_tooltips" : "          Модули",
+	"startup_commenu_open" : "Открыть окно выбора командира",
+	"startup_commenu_close" : "ЗАКРЫТЬ",
+	"startup_commenu_title" : "ВЫБОР КОМАНДИРА",
 	"x_units_in_queue" : {
 		"one" : "%{count} юнит в очереди.",
 		"few" : "%{count} юнита в очереди.",
