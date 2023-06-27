@@ -53,6 +53,115 @@ local function GetAdvShadingActive()
 	return advUnitShading and advMapShading
 end
 
+local function GetEngineUniformBufferDefs()
+    local eubs = [[
+layout(std140, binding = 0) uniform UniformMatrixBuffer {
+	mat4 screenView;
+	mat4 screenProj;
+	mat4 screenViewProj;
+
+	mat4 cameraView;
+	mat4 cameraProj;
+	mat4 cameraViewProj;
+	mat4 cameraBillboardView;
+
+	mat4 cameraViewInv;
+	mat4 cameraProjInv;
+	mat4 cameraViewProjInv;
+
+	mat4 shadowView;
+	mat4 shadowProj;
+	mat4 shadowViewProj;
+
+	mat4 orthoProj01;
+
+	// transforms for [0] := Draw, [1] := DrawInMiniMap, [2] := Lua DrawInMiniMap
+	mat4 mmDrawView; //world to MM
+	mat4 mmDrawProj; //world to MM
+	mat4 mmDrawViewProj; //world to MM
+
+	mat4 mmDrawIMMView; //heightmap to MM
+	mat4 mmDrawIMMProj; //heightmap to MM
+	mat4 mmDrawIMMViewProj; //heightmap to MM
+
+	mat4 mmDrawDimView; //mm dims
+	mat4 mmDrawDimProj; //mm dims
+	mat4 mmDrawDimViewProj; //mm dims
+};
+
+layout(std140, binding = 1) uniform UniformParamsBuffer {
+	vec3 rndVec3; //new every draw frame.
+	uint renderCaps; //various render booleans
+
+	vec4 timeInfo; //gameFrame, gameSeconds, drawFrame, frameTimeOffset
+	vec4 viewGeometry; //vsx, vsy, vpx, vpy
+	vec4 mapSize; //xz, xzPO2
+	vec4 mapHeight; //height minCur, maxCur, minInit, maxInit
+
+	vec4 fogColor; //fog color
+	vec4 fogParams; //fog {start, end, 0.0, scale}
+
+	vec4 sunDir;
+
+	vec4 sunAmbientModel;
+	vec4 sunAmbientMap;
+	vec4 sunDiffuseModel;
+	vec4 sunDiffuseMap;
+	vec4 sunSpecularModel;
+	vec4 sunSpecularMap;
+
+	vec4 shadowDensity;
+
+	vec4 windInfo; // windx, windy, windz, windStrength
+	vec2 mouseScreenPos; //x, y. Screen space.
+	uint mouseStatus; // bits 0th to 32th: LMB, MMB, RMB, offscreen, mmbScroll, locked
+	uint mouseUnused;
+	vec4 mouseWorldPos; //x,y,z; w=0 -- offmap. Ignores water, doesn't ignore units/features under the mouse cursor
+
+	vec4 teamColor[255]; //all team colors
+};
+
+// glsl rotate convencience funcs: https://github.com/dmnsgn/glsl-rotate
+
+mat3 rotation3dY(float a) {
+	float s = sin(a);
+	float c = cos(a);
+
+  return mat3(
+    c, 0.0, -s,
+    0.0, 1.0, 0.0,
+    s, 0.0, c);
+}
+
+mat4 scaleMat(vec3 s) {
+	return mat4(
+		s.x, 0.0, 0.0, 0.0,
+		0.0, s.y, 0.0, 0.0,
+		0.0, 0.0, s.z, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	);
+}
+
+mat4 translationMat(vec3 t) {
+	return mat4(
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		t.x, t.y, t.z, 1.0
+	);
+}
+    ]]
+
+    return eubs
+end
+
+local function CreateShaderDefinesString(args) -- Args is a table of stuff that are the shader parameters
+  local defines = {}
+  for k, v in pairs (args) do
+      defines[#defines + 1] = string.format("#define %s %s\n", tostring(k), tostring(v))
+  end
+  return table.concat(defines)
+end
 
 local LuaShader = setmetatable({}, {
 	__call = function(self, ...) return new(self, ...) end,
@@ -62,6 +171,9 @@ LuaShader.isGeometryShaderSupported = IsGeometryShaderSupported()
 LuaShader.isTesselationShaderSupported = IsTesselationShaderSupported()
 LuaShader.isDeferredShadingEnabled = IsDeferredShadingEnabled()
 LuaShader.GetAdvShadingActive = GetAdvShadingActive
+LuaShader.GetEngineUniformBufferDefs = GetEngineUniformBufferDefs
+LuaShader.CreateShaderDefinesString = CreateShaderDefinesString
+
 
 -----------------============ Warnings & Error Gandling ============-----------------
 function LuaShader:OutputLogEntry(text, isError)

@@ -96,6 +96,8 @@ function ShieldSphereColorHQParticle:EndDraw()
 	gl.UseShader(0)
 
 	gl.Texture(0, false)
+	gl.Texture(1, false)
+	gl.Texture(2, false)
 	lastTexture = ""
 
 	gl.Culling(false)
@@ -132,6 +134,8 @@ function ShieldSphereColorHQParticle:Draw()
 			gl.UniformInt(methodUniform, 1)
 			if (lastTexture ~= self.texture) then
 				gl.Texture(0, self.texture)
+				gl.Texture(1, "$map_gbuffer_zvaltex")
+				gl.Texture(2, "$model_gbuffer_zvaltex")
 				lastTexture = self.texture
 			end
 		end
@@ -245,8 +249,8 @@ ____VS_CODE_DEFS_____
 
 local fsCode = [[
 ____FS_CODE_DEFS_____
-	varying float opac;
-	varying vec3 normal;
+	in float opac;
+	in vec3 normal;
 
 	uniform float timer;
 
@@ -270,6 +274,8 @@ ____FS_CODE_DEFS_____
 	uniform float hitPoints[5 * MAX_POINTS];
 
 	uniform sampler2D tex0;
+	uniform sampler2D mapDepthTex;
+	uniform sampler2D modelsDepthTex;
 
 	uniform int method;
 
@@ -278,7 +284,7 @@ ____FS_CODE_DEFS_____
 	#define SZDRIFTTOUV 7.0
 	#define nsin(x) (0.5 * sin(x) + 0.5)
 	#define HASHSCALE1 443.8975
-	
+
 	float hex(vec2 p, float width, float coreSize)
 	{
 		p.x *= 0.57735 * 2.0;
@@ -491,7 +497,15 @@ ____FS_CODE_DEFS_____
 		else
 			texel = vec4(0.0);
 		
+		float minDepth = 1.0;
+		// terrain outline mapDepthTex
+		// units outline modelDepthTex
+		
+		vec4 worldpos = viewMatrixI * vec4(vec3(gl_TexCoord[0].st,
+		texture2D( mapDepthTex, gl_TexCoord[0].st ).x) * 2.0 - 1.0, 1.0);
+		
 		vec4 colorMultAdj = colorMult * (1.0 + length(offset2) * 50.0) * noiseMult;
+		colorMultAdj.a = worldpos.w * colorMultAdj.a;
 		//float colorMultAdj = colorMult;
 		//vec4 color1M = color1 * colorMultAdj;
 		vec4 color2M = color2 * colorMultAdj;
@@ -533,6 +547,8 @@ function ShieldSphereColorHQParticle:Initialize()
 		fragment = fsCodeEff,
 		uniformInt = {
 			tex0 = 0,
+			mapDepthTex = 1,
+			modelsDepthTex = 2,
 		},
 	})
 
