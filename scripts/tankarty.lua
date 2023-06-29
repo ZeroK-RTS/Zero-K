@@ -27,7 +27,7 @@ local SIG_TILT = 4
 local SIG_PUSH = 16
 local SIG_STOW = 32
 
-local TURRET_SPEED = math.rad(40)
+local TURRET_SPEED = math.rad(80)
 local TURRET_SPEED_2 = math.rad(80)
 
 local BARREL_DISTANCE = -4
