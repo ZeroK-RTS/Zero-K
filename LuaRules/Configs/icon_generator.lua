@@ -69,10 +69,6 @@ local function GreaterZero(a)   return a>0;   end
 local function GreaterEqZero(a) return a>=0;  end
 local function GreaterFour(a)   return a>4;   end
 local function LessEqZero(a)    return a<=0;  end
-local function IsCoreOrChicken(a)
-	if a then return a.chicken
-	else return false end
-end
 local function IsHover(a)
 	return a and a.name and string.find(a.name, "hover") ~= nil
 end
@@ -96,7 +92,6 @@ backgrounds = {
 --//air
   {check={canFly=true},                                      texture="LuaRules/Images/IconGenBkgs/bg_air.png"},
 --//hovers
-  {check={factions=IsCoreOrChicken,moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
   {check={moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
 --//subs
   {check={waterline=GreaterEq15,minWaterDepth=GreaterZero},  texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
@@ -104,10 +99,8 @@ backgrounds = {
 --//sea
   {check={floatOnWater=true,minWaterDepth=GreaterZero},           texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
 --//amphibous
-  {check={factions=IsCoreOrChicken,maxWaterDepth=Greater30,minWaterDepth=LessEqZero}, texture="LuaRules/Images/IconGenBkgs/bg_amphibous_rock.png"},
   {check={maxWaterDepth=Greater30,minWaterDepth=LessEqZero}, texture="LuaRules/Images/IconGenBkgs/bg_amphibous.png"},
 --//ground
-  {check={factions=IsCoreOrChicken},                         texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
   {check={},                                                 texture="LuaRules/Images/IconGenBkgs/bg_ground.png"},
 }
 
