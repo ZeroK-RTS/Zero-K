@@ -45,7 +45,7 @@ return { tankarty = {
   trackType           = [[StdTank]],
   trackWidth          = 34,
   turninplace         = 0,
-  turnRate            = 640,
+  turnRate            = 512,
   workerTime          = 0,
 
   weapons             = {

@@ -16,6 +16,7 @@ local smoke = piece 'smoke'
 
 local gunHeading = 0
 local moving = false
+local aimBlocked = false
 local hpi = math.pi*0.5
 
 local RESTORE_DELAY = 3000
@@ -27,8 +28,11 @@ local SIG_TILT = 4
 local SIG_PUSH = 16
 local SIG_STOW = 32
 
-local TURRET_SPEED = math.rad(80)
-local TURRET_SPEED_2 = math.rad(80)
+local TURRET_SPEED = math.rad(70)
+local TURRET_SPEED_2 = math.rad(40)
+
+-- Gun might need to turn 240 degrees to hit target if the target passes over its rear
+local AIM_BLOCK_TIME = 1000 * (WeaponDefs[UnitDefs[unitDefID].weapons[1].weaponDef].reload - math.rad(250) / TURRET_SPEED)
 
 local BARREL_DISTANCE = -4
 local BREECH_DISTANCE = -2
@@ -115,7 +119,7 @@ local function StowGun()
 	SetSignalMask(SIG_STOW)
 	
 	Turn(turret, y_axis, 0, TURRET_SPEED)
-	Turn(outer, x_axis, 0, TURRET_SPEED)
+	Turn(outer, x_axis, 0, TURRET_SPEED_2)
 	Turn(inner, x_axis, 0, TURRET_SPEED_2)
 	Turn(sleeve, x_axis, 0, TURRET_SPEED_2)
 	WaitForTurn(turret, y_axis)
@@ -154,22 +158,37 @@ end
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	Turn(turret, y_axis, 0, TURRET_SPEED)
-	Turn(outer, x_axis, 0, TURRET_SPEED)
+	Turn(outer, x_axis, 0, TURRET_SPEED_2)
 	Turn(inner, x_axis, 0, TURRET_SPEED_2)
 	Turn(sleeve, x_axis, 0, TURRET_SPEED_2)
+end
+
+local function FireStow()
+	-- Stow after every shot for improved responsiveness.
+	aimBlocked = true
+	Sleep(200) -- Sleep a bit for impact and because units don't have perfect reaction times.
+	Turn(turret, y_axis, 0, TURRET_SPEED)
+	
+	Sleep(500) 
+	Turn(outer, x_axis, 0, TURRET_SPEED_2)
+	Turn(inner, x_axis, 0, TURRET_SPEED_2)
+	Turn(sleeve, x_axis, 0, TURRET_SPEED_2)
+	
+	Sleep(AIM_BLOCK_TIME)
+	aimBlocked = false
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	
-	if moving then
+	if moving or aimBlocked then
 		return false
 	end
 	SetAbleToMove(false)
 	
 	Turn(turret, y_axis, heading, TURRET_SPEED)
-	Turn(outer, x_axis, -pitch, TURRET_SPEED)
+	Turn(outer, x_axis, -pitch, TURRET_SPEED_2)
 	Turn(inner, x_axis, 2 * pitch, TURRET_SPEED_2)
 	Turn(sleeve, x_axis, -2 * pitch, TURRET_SPEED_2)
 	WaitForTurn(turret, y_axis)
@@ -186,6 +205,9 @@ function script.FireWeapon()
 	Move(breech, z_axis, BREECH_DISTANCE)
 	Move(barrel, z_axis, 0, BARREL_SPEED)
 	Move(breech, z_axis, 0, BREECH_SPEED)
+	if AIM_BLOCK_TIME > 1000 then
+		StartThread(FireStow)
+	end
 	--Spring.Echo("Fire", Spring.GetGameFrame())
 end
 
