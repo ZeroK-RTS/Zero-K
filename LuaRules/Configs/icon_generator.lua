@@ -93,6 +93,7 @@ backgrounds = {
   {check={canFly=true},                                      texture="LuaRules/Images/IconGenBkgs/bg_air.png"},
 --//hovers
   {check={moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
+  {check={floatOnWater=true,maxWaterDepth=GreaterZero, minWaterDepth=LessEqZero},           texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
 --//subs
   {check={waterline=GreaterEq15,minWaterDepth=GreaterZero},  texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
   {check={floatOnWater=false,minWaterDepth=GreaterFour},          texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
