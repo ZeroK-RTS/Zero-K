@@ -1086,6 +1086,20 @@ local schemes,resolutions,ratios = {},{},{}
     --// get all known configurations
     schemes,resolutions,ratios = include("LuaRules/Configs/","icon_generator.lua",{info=true})
 
+	if false then -- debug only
+		LoadScheme()
+		local strings = {}
+		for i = 1, #UnitDefs do
+			local ud = UnitDefs[i]
+			if not ud.customParams.dynamic_comm and not ud.customParams.commtype then
+				strings[#strings+1] = ud.name
+				strings[#strings+1] = Background(i)
+			end
+		end
+		Spring.Echo("UNIT ICON BACKGROUNDS")
+		Spring.Echo(table.concat(strings, "\n"))
+	end
+
     gadgetHandler:AddChatAction("buildicon", BuildIcon," : auto generates creates buildicons");
     gadgetHandler:AddChatAction("buildicons", BuildIcon," : auto generates creates buildicons");
     gadgetHandler:AddSyncAction("buildicon_unitcreated", UnitCreated);
