@@ -753,8 +753,7 @@ end
         end
 
         if (fulfill) then
-          DrawBackground(bg.texture)
-          break
+          return bg.texture
         end
       end
     end
@@ -926,7 +925,12 @@ end
 
       gl.Clear(GL.COLOR_BUFFER_BIT, 0,0,0,0);
       gl.Color(1,1,1,1);
-      if (background) then Background(udid); end;
+      if background then
+        local bg_texture = Background(udid)
+        if bg_texture then
+          DrawBackground(bg_texture)
+        end
+      end
 
       if (halo) then
         gl.UseShader(halo_shader);
