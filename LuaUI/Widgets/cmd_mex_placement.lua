@@ -901,7 +901,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	end
 end
 
-local function Initialize()
+local function Initialize(allUnits)
 	if WG.metalSpots then
 		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
 		for i = 1, #WG.metalSpots do
@@ -911,8 +911,7 @@ local function Initialize()
 		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
 
-	local units = spGetAllUnits()
-	for i, unitID in ipairs(units) do
+	for i, unitID in ipairs(allUnits) do
 		local unitDefID = spGetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, teamID)
@@ -942,9 +941,9 @@ function widget:PlayerChanged(playerID)
 	UpdateOctant()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if metalSpotsNil and WG.metalSpots ~= nil then
-		Initialize()
+		Initialize(allUnits or spGetAllUnits())
 		UpdateOctant()
 		metalSpotsNil = false
 	end
@@ -978,12 +977,12 @@ local debounceCamUpdate
 local incomeLabelList
 local DrawIncomeLabels
 function widget:Update(dt)
-	widget:Initialize()
+	widget:Initialize(nil)
 	cumDt = cumDt + dt
 	
 	if firstFewUpdates then
 		if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
-			Initialize()
+			Initialize(spGetAllUnits())
 			CheckAllTerrainChanges()
 		end
 		firstFewUpdates = firstFewUpdates - 1
