@@ -1031,7 +1031,7 @@ function widgetHandler:InsertWidget(widget)
 	self:UpdateCallIns()
 
 	if (widget.Initialize) then
-		widget:Initialize()
+		widget:Initialize(Spring.GetAllUnits())
 	end
 end
 

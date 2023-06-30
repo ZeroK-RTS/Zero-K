@@ -626,7 +626,7 @@ function gadgetHandler:InsertGadget(gadget)
 
   self:UpdateCallIns()
   if (gadget.Initialize) then
-    gadget:Initialize()
+    gadget:Initialize(Spring.GetAllUnits())
   end
   self:UpdateCallIns()
 end
