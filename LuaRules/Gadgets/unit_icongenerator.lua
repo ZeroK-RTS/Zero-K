@@ -736,28 +736,36 @@ end
     end
   end
 
+	local function Background(unitDefID)
+		local ud = UnitDefs[unitDefID]
 
-  local function Background(unitdefid)
-    local udef = UnitDefs[unitdefid];
-    for j=1,#backgrounds do
-      local bg = backgrounds[j]
-      if (type(bg.check) == "table") then
-        local fulfill = true
-        for key,value in pairs(bg.check) do
-          if (type(value)=="function") then
-            fulfill = value(udef[key])
-          else
-            fulfill = (udef[key] == value)
-          end
-          if (not fulfill) then break end
-        end
+		if ud.isStrafingAirUnit or ud.isHoveringAirUnit then
+			return "bg_air.png"
+		end
 
-        if (fulfill) then
-          return bg.texture
-        end
-      end
-    end
-  end
+		if ud.isImmobile then
+			if ud.maxWaterDepth <= 0 then
+				return "bg_ground.png"
+			elseif ud.minWaterDepth > 0 then
+				return ud.floatOnWater and "bg_water.png" or "bg_underwater.png"
+			else
+				return ud.floatOnWater and "bg_hover.png" or "bg_amphibous.png"
+			end
+		end
+
+		local md = ud.moveDef
+		if md.isSubmarine then
+			return "bg_underwater.png"
+		elseif md.smClass == Game.speedModClasses.Ship then
+			return "bg_water.png"
+		elseif md.smClass == Game.speedModClasses.Hover then
+			return "bg_hover.png"
+		elseif md.depth > 1337 then
+			return "bg_amphibous.png"
+		else
+			return "bg_ground.png"
+		end
+	end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -925,11 +933,9 @@ end
 
       gl.Clear(GL.COLOR_BUFFER_BIT, 0,0,0,0);
       gl.Color(1,1,1,1);
-      if background then
-        local bg_texture = Background(udid)
-        if bg_texture then
-          DrawBackground(bg_texture)
-        end
+      local bg_texture = Background(udid)
+      if bg_texture then
+        DrawBackground("LuaRules/Images/IconGenBkgs/" .. bg_texture)
       end
 
       if (halo) then
