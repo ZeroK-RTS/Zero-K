@@ -1,3 +1,5 @@
+-- SEE: GFX_OUTLINE_SHADER_GL3.LUA for an overview of this special consideration!!
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -57,7 +59,7 @@ options = {
 		OnChange = function(self)
 			if dListWall then
 				gl.DeleteList(dListWall)
-				widget:Initialize()
+				widget:Initialize(/* Spring.GetAllUnits */)
 			end
 		end
 	},
@@ -69,7 +71,7 @@ options = {
 		OnChange = function(self)
 			if dListWall then
 				gl.DeleteList(dListWall)
-				widget:Initialize()
+				widget:Initialize(/* Spring.GetAllUnits */)
 			end
 		end,
 	},
@@ -210,7 +212,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize()
+function widget:Initialize(/* allUnits */)
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end

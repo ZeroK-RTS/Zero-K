@@ -1,3 +1,5 @@
+-- SEE: GFX_OUTLINE_SHADER_GL3.LUA for an overview of this special consideration!!
+
 local wiName = "Outline Shader Old"
 function widget:GetInfo()
 	return {
@@ -296,10 +298,10 @@ end
 
 function widget:ViewResize()
 	widget:Shutdown()
-	widget:Initialize()
+	widget:Initialize(/* Spring.GetAllUnits() */)
 end
 
-function widget:Initialize()
+function widget:Initialize(/* allUnits */)
 	if not shadersEnabled then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))
 		WG.HudEnableWidget("Outline No Shader")

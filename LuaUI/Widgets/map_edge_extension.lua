@@ -1,3 +1,5 @@
+-- SEE: GFX_OUTLINE_SHADER_GL3.LUA for an overview of this special consideration!!
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -62,7 +64,7 @@ local function ResetWidget()
 		gl.DeleteShader(mirrorShader)
 		mirrorShader = nil
 	end
-	widget:Initialize()
+	widget:Initialize(/* Spring.GetAllUnits() */)
 end
 
 options_path = 'Settings/Graphics/Map Exterior'
@@ -416,7 +418,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize()
+function widget:Initialize(/* allUnits */)
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end

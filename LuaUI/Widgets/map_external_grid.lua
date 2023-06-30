@@ -1,3 +1,6 @@
+-- SEE: GFX_OUTLINE_SHADER_GL3.LUA for an overview of this special consideration!!
+-- OR SEE THE TOP ONCHANGE FUNCTION
+
 --related thread: http://springrts.com/phpbb/viewtopic.php?f=13&t=26732&start=22
 function widget:GetInfo()
   return {
@@ -57,7 +60,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize()
+				widget:Initialize(allUnits)
 			end
 		end,
 	},
@@ -73,7 +76,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize()
+				widget:Initialize(/* Spring.GetAllUnits is really not worth it here when we don't even use it in Initialize, maybe if we move the initialization logic that this calls to a separate function to allow widget:initialize to still take in allUnits? */)
 			end
 		end,
 	},
@@ -89,7 +92,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize()
+				widget:Initialize(/* Spring.GetAllUnits() - See above */)
 			end
 		end,
 	},
@@ -101,7 +104,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize()
+				widget:Initialize(/* see above */)
 			end
 		end,
 	},
@@ -350,7 +353,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize()
+function widget:Initialize(/* allUnits */)
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
