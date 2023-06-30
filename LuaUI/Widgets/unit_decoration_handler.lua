@@ -172,8 +172,7 @@ function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
 	RemovePossibleCommander(unitID,  unitDefID)
 end
 
-function widget:Initialize()
-	local allUnits = spGetAllUnits()
+function widget:Initialize(allUnits)
 	for i = 1, #allUnits do
 		local unitID = allUnits[i]
 		local unitDefID = spGetUnitDefID(unitID)

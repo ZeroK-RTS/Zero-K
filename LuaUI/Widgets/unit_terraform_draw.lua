@@ -64,8 +64,8 @@ local function UpdateTeamColors()
 	end
 end
 
-function widget:Initialize()
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
+function widget:Initialize(allUnits)
+	for _, unitID in ipairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, teamID)

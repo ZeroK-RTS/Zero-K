@@ -153,8 +153,7 @@ end
 -- callins
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
-  local allUnits = GetAllUnits()
+function widget:Initialize(allUnits)
   for _, unitID in pairs(allUnits) do
     local unitDefID = GetUnitDefID(unitID)
     if (unitDefID and UnitDefs[unitDefID].customParams.level) then

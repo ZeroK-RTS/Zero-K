@@ -364,14 +364,13 @@ end
 -- Event Call-ins
 --
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	waiting_on_double = false
 	target_mode = nil
 	kp_timer = nil
 	current_mode = "Dynamic"
 	UpdateDynamic()
 
-	local allUnits = spGetAllUnits()
 	for _,unitID in pairs (allUnits) do
 		local unitDefID = spGetUnitDefID(unitID)
 		addUnitIcon(unitID, unitDefID)

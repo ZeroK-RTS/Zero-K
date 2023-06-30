@@ -384,12 +384,11 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	IterableMap.Clear(factories)
 	
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
 		widget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
 end
@@ -402,7 +401,7 @@ function widget:PlayerChanged(playerID)
 		return
 	end
 	myAllyTeamID = Spring.GetMyAllyTeamID()
-	widget:Initialize()
+	widget:Initialize(Spring.GetAllUnits())
 end
 
 --------------------------------------------------------------------------------

@@ -208,8 +208,8 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:Initialize()
-	for i,unitID in ipairs(Spring.GetAllUnits()) do
+function widget:Initialize(allUnits)
+	for i,unitID in ipairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local unitTeam = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, unitTeam)

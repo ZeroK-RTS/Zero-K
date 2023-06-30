@@ -74,7 +74,7 @@ local myTeamID
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	myTeamID = GetMyTeamID()
 	
 	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
@@ -82,7 +82,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 	end
 	
-	for _,unitID in ipairs(GetAllUnits()) do
+	for _,unitID in ipairs(allUnits) do
 		local unitTeam = GetUnitTeam(unitID)
 		if (unitTeam == myTeamID) or AreTeamsAllied(unitTeam, myTeamID) then
 			local unitDefID = GetUnitDefID(unitID)

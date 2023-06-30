@@ -691,7 +691,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -783,7 +783,6 @@ function widget:Initialize()
 	myTeamID = Spring.GetLocalTeamID()
 	_, _, _, _, myFaction = Spring.GetTeamInfo(myTeamID, false)
 
-	local allUnits = GetAllUnits()
 	for _, unitID in pairs(allUnits) do
 		local unitDefID = GetUnitDefID(unitID)
 		local unitTeam = GetUnitTeam(unitID)

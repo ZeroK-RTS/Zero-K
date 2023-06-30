@@ -63,7 +63,7 @@ local waitForNetworkDelay = {}
 local issuedOrderTo = {}
 --end network lag stuff
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 		if spec then
 		widgetHandler:RemoveWidget()
@@ -71,9 +71,8 @@ function widget:Initialize()
 	end
 	myTeamID = teamID
 
-	local units = Spring.GetAllUnits()
-	for i=1,#units do  -- init existing transports
-		local unitID = units[i]
+	for i=1,#allUnits do  -- init existing transports
+		local unitID = allUnits[i]
 		if Spring.IsUnitAllied(unitID) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			if isBeaconDef[unitDefID] then

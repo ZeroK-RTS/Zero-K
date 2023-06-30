@@ -198,7 +198,7 @@ if TESTMODE then
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not Platform.glHaveGL4 then
 		Spring.Echo("highlightUnitShader no GL4 support")
 		widgetHandler:RemoveWidget()
@@ -225,7 +225,7 @@ function widget:Initialize()
 	highlightUnitVBOTable.indexVBO = indxVBO
 	highlightUnitVBOTable.vertexVBO = vertVBO
 
-	local unitIDs = Spring.GetAllUnits()
+	local unitIDs = allUnits
 	local featuresIDs = Spring.GetAllFeatures()
 
 	local engineUniformBufferDefs = LuaShader.GetEngineUniformBufferDefs()

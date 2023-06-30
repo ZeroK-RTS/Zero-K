@@ -84,7 +84,7 @@ end
 
 ---------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (gl.CreateShader == nil) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "removing widget, no shader support")
 		widgetHandler:RemoveWidget()

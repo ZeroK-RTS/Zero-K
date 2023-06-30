@@ -476,11 +476,11 @@ local function InitializeParticleLists()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	shaders = CreateShader()
 	InitializeParticleLists()
 	
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
+	for _, unitID in ipairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		widget:UnitCreated(unitID, unitDefID, myTeamID)
 	end

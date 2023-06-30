@@ -323,13 +323,13 @@ function widget:GameFrame(f)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.icons.SetOrder('lowpower', 2)
 	WG.icons.SetOrder('retreat', 5)
 	WG.icons.SetDisplay('retreat', true)
 	WG.icons.SetPulse('retreat', true)
 	
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
+	for _, unitID in ipairs(allUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		widget:UnitCreated(unitID, unitDefID, myTeamID)
 	end

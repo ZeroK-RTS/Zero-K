@@ -33,10 +33,9 @@ local rankTextures = {
 	[10] = rankTexBase .. 'goldeverything.png',
 }
 
-function widget:Initialize ()
+function widget:Initialize(allUnits)
 	WG.icons.SetOrder ('rank', 1)
 
-	local allUnits = Spring.GetAllUnits()
 	for _,unitID in pairs (allUnits) do
 		UpdateUnitRank (unitID)
 	end
