@@ -196,10 +196,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function InitializeUnits()
+local function InitializeUnits(maybeAllUnits)
 	pylons = {count = 0, data = {}}
 	pylonByID = {}
-	local allUnits = Spring.GetAllUnits()
+	local allUnits = maybeAllUnits or Spring.GetAllUnits() -- This is option 1
 	for i=1, #allUnits do
 		local unitID = allUnits[i]
 		local unitDefID = spGetUnitDefID(unitID)
@@ -215,7 +215,7 @@ function widget:Update(dt)
 	local teamID = Spring.GetMyTeamID()
 	local _, fullView = Spring.GetSpectatingState()
 	if (fullView ~= prevFullView) or (teamID ~= prevTeamID) then
-		InitializeUnits()
+		InitializeUnits(Spring.GetAllUnits()) -- See other files for more info here, this is option 2
 	end
 	prevFullView = fullView
 	prevTeamID = teamID
@@ -225,8 +225,8 @@ end
 -------------------------------------------------------------------------------------
 -- Drawing
 
-function widget:Initialize()
-	InitializeUnits()
+function widget:Initialize(allUnits)
+	InitializeUnits(allUnits)
 end
 
 function widget:Shutdown()

@@ -475,14 +475,13 @@ function widget:Update(dt)
 	end
 end
 
-local function DoFullUnitReload()
+local function DoFullUnitReload(allUnits)
 	for unitID,def in pairs(defences) do
 		RemoveUnit(unitID)
 	end
 	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
 		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
 		UnitDetected(unitID, Spring.GetUnitDefID(unitID), unitAllyTeam == myAllyTeam, true)
 	end
@@ -533,7 +532,7 @@ function widget:PlayerChanged(playerID)
 		-- callins for units entering radar/los won't trigger during team/spectator change
 		-- so we could miss incomplete or completed units suddenly appearing in los,
 		-- or fail to mark units suddenly leaving los/radar for loschecks.
-		DoFullUnitReload()
+		DoFullUnitReload(Spring.GetAllUnits()) -- See the other files for more info on this
 		fullView = newFullView
 	end
 	myTeam = newMyTeam
@@ -649,13 +648,13 @@ local function SetupChiliStuff()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widget:PlayerChanged(Spring.GetMyPlayerID())
 	SetupChiliStuff()
 
 	RedoUnitList()
 
-	DoFullUnitReload()
+	DoFullUnitReload(allUnits)
 end
 
 function widget:Shutdown()

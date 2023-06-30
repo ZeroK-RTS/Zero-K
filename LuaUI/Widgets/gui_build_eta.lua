@@ -106,12 +106,12 @@ function widget:Shutdown()
 	WG.ShutdownTranslation(GetInfo().name)
 end
 
-local function InitializeUnits()
+local function InitializeUnits(maybeAllUnits)
 	etaTable = {}
 	stockpileEtaTable = {}
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local allUnits = Spring.GetAllUnits()
+	local allUnits = maybeAllUnits or Spring.GetAllUnits() -- Again, a different option if we dont want to pass through Spring.GetAllUnits() every time, as I have below
 	for i = 1, #allUnits do
 		local unitID = allUnits[i]
 		if (Spring.GetUnitAllyTeam(unitID) == myAllyTeam) or (spect and spectFull) then
@@ -134,9 +134,9 @@ local function InitializeUnits()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
-	InitializeUnits()
+	InitializeUnits(allUnits)
 	previousFullview = select(2, Spring.GetSpectatingState())
 	WG.etaTable = etaTable
 end
@@ -309,14 +309,14 @@ function widget:Update()
 	end
 	local newFullview = select(2, Spring.GetSpectatingState())
 	if newFullview ~= previousFullview then
-		InitializeUnits()
+		InitializeUnits(Spring.GetAllUnits()) -- InitUnits would have called Spring.GetAllUnits anyway so doing so here is no impact
 		previousFullview = newFullview
 	end
 end
 
 function widget:PlayerChanged(playerID)
 	if playerID == Spring.GetMyPlayerID() and not previousFullview then
-		InitializeUnits()
+		InitializeUnits(Spring.GetAllUnits()) -- InitUnits would have called Spring.GetAllUnits anyway so doing so here is no impact
 	end
 end
 

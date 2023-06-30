@@ -110,13 +110,13 @@ local function RemoveUnit(unitID)
 	specUnit[unitID] = nil
 end
 
-local function ReaddUnits()
+local function ReaddUnits(allUnits)
 	enemyInt = {}
 	enemyNuke = {}
 	allyInt = {}
 	allyNuke = {}
 	specUnit = {}
-	local units = Spring.GetAllUnits()
+	local units = allUnits or Spring.GetAllUnits() -- Not necessary here but shown as one solution (#1)
 	for i=1,#units do
 		local unitID = units[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -214,7 +214,7 @@ function widget:GameFrame(n)
 	local newSpec = Spring.GetSpectatingState()
 	if newSpec ~= spectating then
 		spectating = newSpec
-		ReaddUnits()
+		ReaddUnits(Spring.GetAllUnits()) -- This is one option (#2) which is fine here since this function would have called it anyway
 	end
 end
 
@@ -239,8 +239,8 @@ local function SortUnitsIntoAllyEnemy(teamID, matchAllyTeam)
 end
 
 -- Add All Units
-function widget:Initialize()
-	ReaddUnits()
+function widget:Initialize(allUnits)
+	ReaddUnits(allUnits)
 end
 
 --------------------------------------------------------------------------------

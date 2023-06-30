@@ -216,12 +216,12 @@ function SetUnitStateIcons(unitID)
 	end
 end
 
-local function UpdateAllUnits()
+local function UpdateAllUnits(allUnits)
 	if hide and not ((options.showpriority.value == "always") or (options.showarmorstate.value == "always")) then
 		return
 	end
 	local unitID
-	local units = spGetAllUnits()
+	local units = allUnits or spGetAllUnits() -- See the other files first but this is one option
 	for i = 1, #units do
 		unitID = units[i]
 		SetUnitStateIcons(unitID)
@@ -267,7 +267,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			WG.icons.SetDisplay('miscpriority', true)
 		end
 		
-		UpdateAllUnits()
+		UpdateAllUnits(Spring.GetAllUnits()) -- this is ok (?) to do since this would be run anyway when this was called
 	end
 end
 function widget:KeyRelease(key, modifier )
@@ -293,7 +293,7 @@ end
 function widget:GameFrame(f)
 
 	if f%(30) == 0 then --1 second
-		UpdateAllUnits()
+		UpdateAllUnits(Spring.GetAllUnits())  -- this is ok (?) to do since this would be run anyway when this was called
 	end
 end
 
@@ -304,14 +304,14 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOp
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	
 	WG.icons.SetOrder( 'firestate', 5 )
 	WG.icons.SetOrder( 'movestate', 6 )
 	WG.icons.SetDisplay('firestate', false)
 	WG.icons.SetDisplay('movestate', false)
 	
-	UpdateAllUnits()
+	UpdateAllUnits(allUnits)
 end
 
 --------------------------------------------------------------------------------
