@@ -121,6 +121,7 @@ local HIGHLIGHT_SURROUND_SEQUENCE_2 = ' <<<'
 local DEDUPE_SUFFIX = 'x '
 
 local MIN_HEIGHT = 50
+local MAX_HEIGHT = 2160
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
 
@@ -201,6 +202,7 @@ options_order = {
 	
 	'color_chat_background','color_console_background',
 	'color_chat', 'color_ally', 'color_other', 'color_spec',
+	'color_usernames',
 	
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',
@@ -525,6 +527,14 @@ options = {
 		type = 'colors',
 		value = { 0.8, 0.8, 0.8, 1 },
 		OnChange = onOptionsChanged,
+		path = color_path,
+	},
+	color_usernames = {
+		name = "Color usernames in messages",
+		type = 'bool',
+		value = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
 		path = color_path,
 	},
 	color_dup = {
@@ -905,7 +915,29 @@ end
 
 local function formatMessage(msg)
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
-	
+
+	-- Find and colour any usernames in the message body
+	if options.color_usernames.value then
+		-- This could be slightly faster by caching the value for each format rule,
+		-- but that's more effort elsewhere, risks cache bugs,
+		-- this operation is much faster than the N regex replacements,
+		-- and this code path isn't that hot to begin with (not many chat messages per second)
+		local last_colour_code = format:match('.*(#%w)') or '#o'
+		local message_colour = incolors[last_colour_code]
+
+		-- Lua lacks \b, so we match with spaces instead and strip the added ones afterwards
+		local formatted_arg = ' '..msg.argument..' '
+		-- incolors contains the control codes #[aehos] and also each player's username
+		-- we get all the usernames by iterating it and just ignoring the #[aehos] control codes
+		for name, colour in pairs(incolors) do
+			if name:sub(1,1) ~= '#' then
+				local pattern = '[^%w]' .. name .. '[^%w]'
+				formatted_arg, _ = formatted_arg:gsub(pattern, function(parameter) return parameter:sub(1,1) .. colour .. parameter:sub(2,-1) .. message_colour end)
+			end
+		end
+		msg.argument = formatted_arg:sub(2, -2)  -- strip added spaces
+	end
+
 	-- insert/sandwich colour string into text
 	local formatted, _ = format:gsub('([#%$]%w+)', function(parameter) -- FIXME pattern too broad for 1-char color specifiers
 			if parameter:sub(1,1) == '$' then
@@ -1326,7 +1358,7 @@ local function MakeMessageWindow(name, enabled, ParentFunc)
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
-		maxHeight = 500,
+		maxHeight = MAX_HEIGHT,
 		color = { 0, 0, 0, 0 },
 		OnMouseDown = {
 			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
