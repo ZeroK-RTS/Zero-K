@@ -743,7 +743,7 @@ local function toggleOption()
 	init()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	--// catch f9
 	Spring.SendCommands({"showhealthbars 0"})
 	Spring.SendCommands({"showrezbars 0"})

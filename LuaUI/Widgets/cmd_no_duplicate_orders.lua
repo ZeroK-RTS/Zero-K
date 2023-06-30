@@ -38,7 +38,7 @@ local CMD_RAW_BUILD = Spring.Utilities.CMD.RAW_BUILD
 
 local buildList = {}
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		widgetHandler:RemoveWidget()
 	end

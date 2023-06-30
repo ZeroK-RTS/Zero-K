@@ -203,7 +203,7 @@ function widget:Update()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not WG.HighlightUnitGL4 then
 		widgetHandler:RemoveWidget()
 		return

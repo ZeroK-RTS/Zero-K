@@ -18,7 +18,7 @@ local unitCount = 1 -- counter just in case there would be more than one unit sp
 
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (CheckForSpec()) then
 		return false
 	end

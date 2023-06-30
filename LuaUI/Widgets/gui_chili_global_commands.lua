@@ -535,7 +535,7 @@ function GlobalCommandBar.AddCommand(imageFile, tooltip, onClick)
 	return AddCommand(imageFile, tooltip, onClick)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label

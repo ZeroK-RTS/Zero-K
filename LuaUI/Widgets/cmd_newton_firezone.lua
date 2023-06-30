@@ -843,7 +843,7 @@ function EstimateCrashLocation(victimID, transportID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	--IsSpectatorAndExit()
 	
 	local circleVertex = function()

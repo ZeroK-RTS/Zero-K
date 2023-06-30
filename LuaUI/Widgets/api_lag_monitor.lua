@@ -152,7 +152,7 @@ function widget:PlayerChanged()
 	personallySucceptible = UpdateLagmonitorSucceptibility()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	personallySucceptible = UpdateLagmonitorSucceptibility()
 end
 

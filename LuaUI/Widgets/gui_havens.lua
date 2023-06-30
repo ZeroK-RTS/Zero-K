@@ -122,7 +122,7 @@ function widget:PlayerChanged(playerID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	RADIUS = Spring.GetGameRulesParam('retreatZoneRadius') or 5
 	widgetHandler:RegisterGlobal(widget, "HavenUpdate", HavenUpdate)
 	GetHavens()

@@ -76,7 +76,7 @@ local distAdj  = 100
 --------------------------------------------------------------------------------
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   -- required for ShockFront() call-ins
   -- (threshold uses the 1/d^2 power)
   spSetShockFrontFactors(minArea, minPower, distAdj)

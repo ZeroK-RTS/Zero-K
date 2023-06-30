@@ -205,7 +205,7 @@ function widget:Update(dt)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	
 	WG.ChiliRedraw = {

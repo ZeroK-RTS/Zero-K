@@ -767,7 +767,7 @@ end
 --callins
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	for unitDefID = 1, #UnitDefs do
 		local unitDef = UnitDefs[unitDefID]
 		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)

@@ -251,7 +251,7 @@ options = {
 -- API
 -----------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	UpdateShader()
 end
 

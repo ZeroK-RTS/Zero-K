@@ -261,7 +261,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if gl.CreateShader then
 		InitShader()
 	end

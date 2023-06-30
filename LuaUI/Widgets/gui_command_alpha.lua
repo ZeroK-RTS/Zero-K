@@ -19,7 +19,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local cmdAlpha = (tonumber(Spring.GetConfigString("CmdAlpha") or "0.7") or 0.7)
 local terraformColor = {0.7, 0.75, 0, cmdAlpha}
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Spring.SetCustomCommandDrawData(CMD_ORBIT_DRAW, "Guard", {0.3, 0.3, 1.0, cmdAlpha})
 	Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, cmdAlpha}) -- "" mean there's no MOVE cursor if the command is drawn.
 	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, cmdAlpha})

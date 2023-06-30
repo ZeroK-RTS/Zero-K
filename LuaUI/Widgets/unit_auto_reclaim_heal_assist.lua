@@ -121,7 +121,7 @@ local function DisableForCommshare() -- this breaks commshare very badly by not 
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	DisableForSpec()
 	DisableForCommshare()
 	local units = Spring.GetTeamUnits(Spring.GetMyTeamID())

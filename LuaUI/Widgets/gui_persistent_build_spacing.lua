@@ -598,7 +598,7 @@ function widget:SetConfigData(data)
 	end
 end
 -- Init
-function widget:Initialize()-- fixing the missing hotkey recognition in pre-game
+function widget:Initialize(allUnits)-- fixing the missing hotkey recognition in pre-game
 	preGame = Spring.GetGameFrame()<1
 	UpdateKeys()
 	if not wheelSpacing then -- now MouseWheel callin is updated/removed when option change

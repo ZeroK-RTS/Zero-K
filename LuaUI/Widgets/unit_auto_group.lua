@@ -192,7 +192,7 @@ function widget:PlayerChanged(playerID)
 	-- but the player is transferred before his units so reassignation happens in UnitGiven
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then
 		widgetHandler:RemoveWidget()

@@ -208,7 +208,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.Analytics = Analytics
 	Analytics.SendOnetimeEvent("begin_load")
 end

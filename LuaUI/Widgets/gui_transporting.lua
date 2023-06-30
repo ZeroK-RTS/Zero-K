@@ -30,7 +30,7 @@ end
 --  Disabled for Spring versions older then 0.74b3 (no GetUnitDefDimensions())
 --
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   if ((Spring.GetUnitDefDimensions == nil) or
       (Spring.GetUnitIsTransporting == nil)) then
     Spring.SendCommands({"echo Transporting widget has been disabled"})

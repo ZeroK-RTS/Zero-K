@@ -38,7 +38,7 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if spGetSpectatingState() then
 		widgetHandler:RemoveWidget()
 	end

@@ -26,6 +26,6 @@ options = {
 	},
 }
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	ToggleTeamhighlight (options.enable_th)
 end

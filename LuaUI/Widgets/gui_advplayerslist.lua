@@ -212,7 +212,7 @@ local m_cpuping
 local m_diplo
 local m_spec
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Init()
 end
 

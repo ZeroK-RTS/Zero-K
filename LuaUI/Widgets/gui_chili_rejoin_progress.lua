@@ -128,7 +128,7 @@ function widget:Update (dt)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	local screenWidth = Spring.GetViewGeometry()
 	local y = screenWidth*2/11 + 32

@@ -297,7 +297,7 @@ function widget:Update(dt)
 	DoDelayedUpdate(mouseData, dt)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
 

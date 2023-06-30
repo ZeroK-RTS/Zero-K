@@ -168,7 +168,7 @@ local function SpawnDisabled()
 	return (not setSpawns) or (setSpawns == 0) or (setSpawns == "0")
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if SpawnDisabled() or (Spring.GetGameFrame() > 0) then
 		widgetHandler:RemoveWidget(widget)
 		return

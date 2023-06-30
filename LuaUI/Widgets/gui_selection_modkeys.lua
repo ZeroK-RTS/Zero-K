@@ -330,7 +330,7 @@ function widget:Update()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	screen0 = WG.Chili and WG.Chili.Screen0
 	widget:PlayerChanged()
 end

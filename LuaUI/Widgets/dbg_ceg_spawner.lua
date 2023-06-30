@@ -122,6 +122,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	cy = vsy * 0.5
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   SetupOptions()
 end

@@ -11,7 +11,7 @@ function widget:GetInfo()
 	}
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Spring.SetConfigInt("MiniMapCanFlip", 1)
 	Spring.SetConfigInt("RotateLogFiles", 1)
 	Spring.SendCommands("maxviewrange 100000")

@@ -132,7 +132,7 @@ local glRect				= gl.Rect
 local IsGuiHidden		=	Spring.IsGUIHidden
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	ResizeButtonsToScreen()
 
 	myPlayerID = spGetMyPlayerID() --spGetLocalTeamID()

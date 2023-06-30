@@ -89,7 +89,7 @@ end
 --------------------------------------------------------------------------------
 -- Widget interface
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	UpdatePlayerState()
 
 	for _, unitID in pairs(Spring.GetTeamUnits(myTeamID)) do

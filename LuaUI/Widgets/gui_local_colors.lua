@@ -243,7 +243,7 @@ function UpdateColor(doNotNotify)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	UpdateSimpleEnemyColor(options.simpleEnemyAllyTeam)
 	UpdateColorConfig(options.colorSetting)
 end

@@ -305,7 +305,7 @@ end
 --callins
 ----------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	timeNow = nil
 	timePart = nil
 	

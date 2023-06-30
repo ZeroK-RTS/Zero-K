@@ -52,7 +52,7 @@ local function GetMexSpotsFromGameRules()
 	WG.metalSpotsByPos = metalSpotsByPos
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Spring.Echo("Mexspot Fetcher fetching")
 	GetMexSpotsFromGameRules()
 end

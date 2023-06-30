@@ -359,7 +359,7 @@ function widget:GameFrame()
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
     
 end
 

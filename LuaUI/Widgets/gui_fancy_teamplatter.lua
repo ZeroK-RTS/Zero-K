@@ -76,7 +76,7 @@ local circlePolys             = {}
 
 
 -- Creating polygons:
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
    local teamList = spGetTeamList()
    local numberOfTeams = #teamList

@@ -177,7 +177,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button

@@ -445,7 +445,7 @@ function widget:SelectionChanged(newSelection)
 	currentBuilder = nil
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if VFS.FileExists("mission.lua") then
 		widgetHandler:RemoveWidget()	-- no need for tips in mission
 	end

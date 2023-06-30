@@ -54,7 +54,7 @@ end
 local vsx, vsy
 local screencopy
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	vsx, vsy = widgetHandler:GetViewSizes()
 	widget:ViewResize(vsx, vsy)
 end

@@ -205,7 +205,7 @@ local function CheckHardware()
   return true
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   if (not CheckHardware()) then return false end
 
   -- create shaders code

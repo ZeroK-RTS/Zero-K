@@ -357,7 +357,7 @@ function widget:Shutdown()
 	widgetHandler:RemoveAction("filterfulltransports")
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widgetHandler:AddAction("selectemptytransports", SelectEmptyTransports, nil, 'tp')
 	widgetHandler:AddAction("selectfulltransports", SelectFullTransports, nil, 'tp')
 	widgetHandler:AddAction("filteremptytransports", FilterEmptyTransports, nil, 'tp')

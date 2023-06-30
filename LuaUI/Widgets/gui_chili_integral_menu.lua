@@ -2564,7 +2564,7 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")
 	initialized = true

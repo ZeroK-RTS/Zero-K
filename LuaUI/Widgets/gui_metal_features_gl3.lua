@@ -140,7 +140,7 @@ function widget:Update()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Spring.SendCommands("luarules metal_highlight 0")
 end
 

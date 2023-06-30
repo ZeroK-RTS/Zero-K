@@ -521,6 +521,6 @@ function widget:SetConfigData(data)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	HotkeyChangeNotification()
 end

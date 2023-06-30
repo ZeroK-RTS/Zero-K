@@ -119,7 +119,7 @@ end
 --callins
 ----------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	timeNow = false
 	timePart = false
 	myPlayerID = Spring.GetMyPlayerID()

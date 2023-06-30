@@ -95,7 +95,7 @@ function widget:PlayerChanged()
 	CheckEnable()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	myTeam = Spring.GetMyTeamID()
 	CheckEnable()
 end

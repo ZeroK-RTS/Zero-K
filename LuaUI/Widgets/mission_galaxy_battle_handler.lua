@@ -1031,7 +1031,7 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	objectivesWindow = InitializeObjectivesWindow()
 	if objectivesWindow then

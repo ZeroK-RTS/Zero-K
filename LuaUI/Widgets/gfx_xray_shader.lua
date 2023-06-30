@@ -120,7 +120,7 @@ function widget:Shutdown()
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
   shader = glCreateShader({
 

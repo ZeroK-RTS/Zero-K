@@ -409,7 +409,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if VFS.FileExists("mission.lua") then
 		widgetHandler:RemoveWidget()	-- no need for tips in mission
 	end

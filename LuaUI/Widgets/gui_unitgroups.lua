@@ -127,7 +127,7 @@ function widget:SetConfigData(data)
 	slideOffset.bottom = data.slideOffsetBottom or -1
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID(), false)
 	if spec then
 		widgetHandler:RemoveWidget()

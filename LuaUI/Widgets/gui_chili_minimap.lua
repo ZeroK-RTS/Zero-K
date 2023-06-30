@@ -993,7 +993,7 @@ local function CleanUpFBO()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (Spring.GetMiniMapDualScreen()) then
 		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
 		-- we still depend on the minimap widget to provide fog of war / radar and config, so we can't outright disable it.

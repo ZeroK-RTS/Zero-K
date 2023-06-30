@@ -79,7 +79,7 @@ function widget:Shutdown()
 	end
 end
 
-function widget:Initialize() -- for cases when there's no GamePreload (eg `/luaui reload`)
+function widget:Initialize(allUnits) -- for cases when there's no GamePreload (eg `/luaui reload`)
 	geoDisplayList = gl.CreateList(HighlightGeos)
 end
 

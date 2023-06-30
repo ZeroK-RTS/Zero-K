@@ -381,7 +381,7 @@ function widget:GameOver()
 	widgetHandler:RemoveCallIn('Update') -- stop music player on game over.
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.Music = WG.Music or {}
 	WG.Music.StartTrack = StartTrack
 	WG.Music.StartLoopingTrack = StartLoopingTrack

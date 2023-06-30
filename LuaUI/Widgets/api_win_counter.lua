@@ -143,7 +143,7 @@ local function Reset()
 	WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.WinCounter_Set = Set
 	WG.WinCounter_Reset = Reset
 	WG.WinCounter_Increment = IncrementAllyTeamWins

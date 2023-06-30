@@ -192,7 +192,7 @@ function widget:SelectionChanged(selection, subselection)
 	overriddenStateExpiry = {}
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.GetOverriddenState = GetOverriddenState
 	WG.SetStateToggle = SetStateToggle
 end

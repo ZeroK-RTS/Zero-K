@@ -511,7 +511,7 @@ function widget:DrawScreen()
 	api.DrawElement("default", 3)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if HARD_DISABLE then
 		widgetHandler:RemoveWidget()
 		return

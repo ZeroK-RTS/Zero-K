@@ -67,7 +67,7 @@ local function GetThicknessFactor()
 	return 200 / (200 + height) + 0.5
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not Spring.GetGameRulesParam("suddenDeathFrames") then
 		widgetHandler:RemoveWidget()
 	end

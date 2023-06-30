@@ -721,7 +721,7 @@ local function GetUnlockedBuildOptions(fullOptions)
 	return newOptions
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.InitialQueueHandleCommand = InitialQueueHandleCommand
 	WG.InitialQueueGetTail = InitialQueueGetTail
 

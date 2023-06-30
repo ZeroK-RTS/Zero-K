@@ -537,7 +537,7 @@ function widget:UnitTaken(unitID)
 	widget:UnitDestroyed(unitID)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
 		widgetHandler:RemoveWidget(widget)
 	end

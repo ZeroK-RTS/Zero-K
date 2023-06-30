@@ -83,7 +83,7 @@ CHILI_DIRNAME = DIR .. "chili/"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = VFS.Include(CHILI_DIRNAME .. "core.lua", nil, VFS.ZIP)
 
 	screen0 = Chili.Screen:New{}
@@ -260,7 +260,7 @@ CHILI_DIRNAME = DIR .. "chili_old/"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = VFS.Include(CHILI_DIRNAME .. "core.lua", nil, VFS.ZIP)
 
 	screen0 = Chili.Screen:New{}

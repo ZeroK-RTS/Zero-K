@@ -11,7 +11,7 @@ function widget:GetInfo()
 	}
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local x, y, z = 0.01, 1, 0.01 -- 0/1/0 breaks shadows.
 	local dist = math.sqrt(x*x + y*y + z*z)
 	x, y, z = x/dist, y/dist, z/dist

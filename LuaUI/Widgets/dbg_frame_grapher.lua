@@ -18,7 +18,7 @@ local timerold = 0
 local viewSizeX, viewSizeY = 0,0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	startframe = Spring.GetGameFrame()
 	oldframe = startframe
 	viewSizeX, viewSizeY = gl.GetViewSizes()

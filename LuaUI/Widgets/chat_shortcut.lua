@@ -47,7 +47,7 @@ local drawText = {false, "", {0,0,0}}
 --------------------------------------------------------------------------------
 -- Methods:
 -- Processes:
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local gameID_to_playerName = gameID_to_playerName_gbl
 	----
 	local teamList = Spring.GetTeamList() --//check teamIDlist for AI, retrieve all names

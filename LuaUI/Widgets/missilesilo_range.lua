@@ -232,7 +232,7 @@ local function languageChanged ()
 	drawRadius[5].text = WG.Translate("interface", "tacnuke_vertical")
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 

@@ -235,7 +235,7 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1, 1)
 end
   
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	diamondDList = gl.CreateList(gl.BeginEnd, GL.POLYGON, Diamond)
 end
 

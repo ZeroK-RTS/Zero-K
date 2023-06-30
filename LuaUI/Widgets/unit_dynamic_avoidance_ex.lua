@@ -229,7 +229,7 @@ options = {
 	},
 }
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	skippingTimerG.echoTimestamp = spGetGameSeconds()
 	myPlayerID=Spring.GetMyPlayerID()
 	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)

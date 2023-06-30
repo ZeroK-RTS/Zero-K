@@ -166,7 +166,7 @@ end
 
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
   circleLines = glCreateList(function()
     glBeginEnd(GL_LINE_LOOP, function()

@@ -372,7 +372,7 @@ local commandType = {
 --------------------------------------------------------------------------------
 -- Top -------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- add all existing workers to GBC.
 	local units = spGetTeamUnits(myTeamID)
 		for _, uid in ipairs(units) do

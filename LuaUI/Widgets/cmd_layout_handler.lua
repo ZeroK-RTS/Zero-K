@@ -195,7 +195,7 @@ end
 --end
 -- Then find repalce '[f=0000678] action, ' with '"] = true,\n\t["'
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 end

@@ -505,7 +505,7 @@ function Mode(_,_,words)
 	widget:UpdateCallIns()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (canShader) then
 		stereoShader = gl.CreateShader({
 			fragment = [[

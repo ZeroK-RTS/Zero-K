@@ -30,7 +30,7 @@ function widget:DrawScreen()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.DrawAfterChili = DrawAfterChili
 end
 

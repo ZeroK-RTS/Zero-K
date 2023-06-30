@@ -286,7 +286,7 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local myPlayerID=Spring.GetMyPlayerID()
 	local _, _, spec = Spring.GetPlayerInfo(myPlayerID, false)
 	if spec or Spring.GetModOptions().campaign_disable_share_marker then

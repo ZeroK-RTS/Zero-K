@@ -31,7 +31,7 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.allySelUnits = {}
 end
 

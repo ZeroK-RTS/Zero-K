@@ -419,7 +419,7 @@ function InitialiseShaders()
 	widget:ViewResize()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (glCreateShader == nil) then
 		Spring.Echo('Deferred Rendering requires shader support!')
 		widgetHandler:RemoveWidget()

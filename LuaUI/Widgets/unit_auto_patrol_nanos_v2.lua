@@ -524,7 +524,7 @@ options = {
 --------------------------------------------------------------------------------
 -- Callins
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("uapn2 disabled for spectators")
 		widgetHandler:RemoveWidget()

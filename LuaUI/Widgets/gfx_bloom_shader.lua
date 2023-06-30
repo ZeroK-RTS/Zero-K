@@ -233,7 +233,7 @@ end
 --------------------------------------------------------------------------------
 
 local initialized = false
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
   SetIllumThreshold()
 

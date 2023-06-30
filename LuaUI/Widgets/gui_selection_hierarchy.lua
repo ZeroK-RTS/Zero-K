@@ -374,7 +374,7 @@ local function SetSelectionRank(unitID, newRank)
 	selectionRank[unitID] = newRank
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	options.retreatDeselects.OnChange(options.retreatDeselects)
 
 	WG.SetSelectionRank = SetSelectionRank

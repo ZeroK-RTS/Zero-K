@@ -62,7 +62,7 @@ function widget:PlayerChanged()
 	myTeamID = Spring.GetMyTeamID()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widget:PlayerChanged()
 	options.enable_automorph:OnChange()
 end

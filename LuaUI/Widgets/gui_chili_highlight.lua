@@ -203,7 +203,7 @@ function widget:Update(dt)
 	alpha = 0.75 + 0.25*math.sin(timer)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	
 	WG.ChiliHighlight = {

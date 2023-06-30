@@ -145,7 +145,7 @@ local function playSound(filename, ...)
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	myFont = glLoadFont( fontPath, fontSizeHeadline, nil, nil ) -- FIXME: nils are for #2564, remove later
 	updateWindowCoords()
 end

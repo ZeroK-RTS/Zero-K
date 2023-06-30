@@ -167,7 +167,7 @@ function widget:Shutdown()
 	WG.ShutdownTranslation(GetInfo().name)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
 	if (not Chili) then

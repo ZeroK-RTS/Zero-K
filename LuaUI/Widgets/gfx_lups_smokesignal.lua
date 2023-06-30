@@ -70,7 +70,7 @@ local AddParticles
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	if not WG.Lups then
 		widgetHandler:RemoveCallIn("MapDrawCmd")

@@ -631,7 +631,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()

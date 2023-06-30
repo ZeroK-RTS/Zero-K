@@ -858,7 +858,7 @@ function widget:CommandsChanged()
 	table.insert(customCommands, setAiPosCommand)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
 	--[[ Don't display the controls (esp. the top bar button) before

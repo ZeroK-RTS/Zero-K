@@ -181,7 +181,7 @@ function widget:GameFrame(n)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if enabled then
 		widgetHandler:UpdateCallIn("GameFrame")
 	else

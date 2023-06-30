@@ -2704,7 +2704,7 @@ function widget:ViewResize(vsx, vsy)
 	screenHeight = vsy/(WG.uiScale or 1)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
 	

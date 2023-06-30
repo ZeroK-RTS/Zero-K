@@ -478,7 +478,7 @@ end
 --callins
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   currDayTime = options.time.value or startDayTime
   UpdateColors()
   vsx, vsy = widgetHandler:GetViewSizes()

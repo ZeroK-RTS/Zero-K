@@ -108,7 +108,7 @@ function widget:GameFrame(gf)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not WG.HighlightUnitGL4 then
 		Spring.Echo("WG.HighlightUnitGL4 not found, removing highlight selected units.")
 		widgetHandler:RemoveWidget()

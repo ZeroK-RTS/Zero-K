@@ -54,7 +54,7 @@ options={
 		end,
 	},
 }
-function widget:Initialize()
+function widget:Initialize(allUnits)
   specOld = spec
   spec = Spring.GetSpectatingState()
   if spec == false then

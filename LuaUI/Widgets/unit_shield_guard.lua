@@ -297,7 +297,7 @@ end
 -----------------------
 --Add shield names to array
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local units = spGetTeamUnits(team)
 	for i, id in ipairs(units) do
 		widget:UnitCreated(id, spGetUnitDefID(id),team)

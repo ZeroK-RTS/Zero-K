@@ -176,7 +176,7 @@ local unbuiltUnits = {}
 --------------------------------------------------------------------------------
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	vsx, vsy = widgetHandler:GetViewSizes()
 
 	self:ViewResize(widgetHandler:GetViewSizes())

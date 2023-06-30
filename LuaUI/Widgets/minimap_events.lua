@@ -209,7 +209,7 @@ local function CreateLists()
   --end)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
   gameSecs = GetGameSecs()
   gamestart = gameSecs > 0

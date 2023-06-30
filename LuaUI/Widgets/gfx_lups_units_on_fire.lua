@@ -111,7 +111,7 @@ function widget:GameFrame(n)
 	IterableMap.Apply(trackedUnits, UpdateBurningUnit, flameFX, n, math.max(0, math.min(1, 1 - (count - 400)/400)))
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not WG.Lups then
 		widgetHandler:RemoveCallIn("GameFrame")
 		return

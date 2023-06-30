@@ -2804,7 +2804,7 @@ function widget:DrawScreen()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5

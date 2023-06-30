@@ -4,7 +4,7 @@
 Example:
 local tr
 local hellWorld
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	tr=WG.initializeTranslation(GetInfo().name,langCallback)
 	hellWorld=tr("helloworld")
 end

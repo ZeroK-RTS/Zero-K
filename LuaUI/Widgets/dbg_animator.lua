@@ -358,7 +358,7 @@ function widget:SelectionChanged(selectedUnits)
 	UpdateAnimWindow(selectedUnit)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local devMode = Spring.GetGameRulesParam('devmode') == 1
 	if not WG.Chili or not devMode then
 		widgetHandler:RemoveWidget(widget)

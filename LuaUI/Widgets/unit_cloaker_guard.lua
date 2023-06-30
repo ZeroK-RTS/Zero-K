@@ -304,7 +304,7 @@ end
 -----------------------
 --Add cloaker names to array
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<Cloaker Guard>: disabled for spectators")
 		widgetHandler:RemoveWidget()

@@ -447,7 +447,7 @@ local function languageChanged ()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	optionData = include("Configs/startup_info_selector.lua")
 
 	if not (WG.Chili) then

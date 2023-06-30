@@ -28,7 +28,7 @@ local EMPTY_TABLE = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<Stockpiler>: disabled for spectators")
 		widgetHandler:RemoveWidget()

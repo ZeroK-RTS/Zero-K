@@ -46,7 +46,7 @@ local function checkSpec()
   end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
  myID = Spring.GetMyPlayerID()
  checkSpec()
 end

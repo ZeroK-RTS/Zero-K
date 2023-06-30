@@ -52,7 +52,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeamID, builderID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() return false end --remove widget when spectating
 	myTeamID_gbl = Spring.GetMyTeamID()
 end

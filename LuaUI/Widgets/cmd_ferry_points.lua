@@ -481,7 +481,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	addUnit(unitID, unitDefID, newTeam)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local myUnits = Spring.GetTeamUnits(myTeam)
 	
 	for i = 1, #myUnits do

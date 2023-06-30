@@ -554,7 +554,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 Spring.Echo("Initialize")
 	UpdateTeamAndAllyTeamID()
 	screenx, screeny = widgetHandler:GetViewSizes()

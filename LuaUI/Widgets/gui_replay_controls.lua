@@ -96,7 +96,7 @@ options = {
 ---------------------------------
 ---------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (not Spring.IsReplay()) then
 		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
 		widgetHandler:RemoveWidget(self)

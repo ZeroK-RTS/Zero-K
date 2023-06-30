@@ -1825,7 +1825,7 @@ function widget:Shutdown()
 	WG.CoreSelector = nil
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
 		return

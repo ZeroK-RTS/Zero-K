@@ -194,7 +194,7 @@ function widget:Update()
 
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	waiting_on_double = false
 	target_mode = nil
 	kp_timer = nil

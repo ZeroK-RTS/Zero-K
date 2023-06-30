@@ -18,7 +18,7 @@ local x --intentionally Nil
 local z=0
 local n=0
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if Spring.GetSpectatingState() then
 		Spring.Echo("Spectator mode detected. Removed: Auto First Build Facing") --added this message because widget removed message might not appear (make debugging harder)
 		widgetHandler:RemoveWidget(self)

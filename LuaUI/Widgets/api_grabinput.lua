@@ -81,7 +81,7 @@ options = {
 --------------------------------------------------------------------------------
 -- Widget Interface
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not lobbyOverlayActive then
 		Spring.SendCommands("grabinput")
 		Spring.SendCommands("grabinput " .. ((options.grabinput.value and "1") or "0"))

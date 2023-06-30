@@ -112,7 +112,7 @@ local function distSqr(x1,y1,z1, x2, y2, z2)
 	return (x2-x1)*(x2-x1) + (z2-z1)*(z2-z1)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		widgetHandler:RemoveWidget()
 		return true

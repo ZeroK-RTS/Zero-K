@@ -1120,7 +1120,7 @@ end --//end do
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
 	--// catch f9

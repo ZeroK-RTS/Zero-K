@@ -243,7 +243,7 @@ function widget:Shutdown()
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
     showAlly = options.showally.value
     shader = glCreateShader({

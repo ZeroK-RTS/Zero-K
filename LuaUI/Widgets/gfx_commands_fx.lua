@@ -297,7 +297,7 @@ end
 
 local circleDrawList
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVerticies, 18)
 end
 

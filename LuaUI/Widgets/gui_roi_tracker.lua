@@ -24,7 +24,7 @@ local base_labels = {}
 local base_income_labels = {}
 local od_income_labels = {}
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not is_RoI then
 		Spring.Echo ("RoI Counter: No need to track capital under Communism, comrade!")
 		widgetHandler:RemoveWidget()

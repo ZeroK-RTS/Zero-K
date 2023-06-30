@@ -1622,7 +1622,7 @@ function widget:RecvLuaMsg(msg)
 	HandleKickMessage(msg)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local spectating = Spring.GetSpectatingState()
 	
 	for _, playerID in ipairs(Spring.GetPlayerList()) do

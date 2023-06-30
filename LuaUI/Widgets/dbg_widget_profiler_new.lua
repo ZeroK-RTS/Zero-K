@@ -78,7 +78,7 @@ end
 
 -- make a table of the names of user widgets
 local userWidgets = {}
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	for name,wData in pairs(widgetHandler.knownWidgets) do
 		userWidgets[name] = (not wData.fromZip)
 	end

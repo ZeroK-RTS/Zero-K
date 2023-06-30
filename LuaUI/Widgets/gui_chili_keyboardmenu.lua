@@ -1086,7 +1086,7 @@ end
 ------------------------------------------------
 --callins
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widget:SelectionChanged(Spring.GetSelectedUnits())
 
 	-- setup Chili

@@ -1213,7 +1213,7 @@ local function SetFormationRank(unitID, newRank)
 	formationRank[unitID] = newRank
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- filledCircle = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, 8)
 	InitFilledCircle(CMD_MOVE)
 	InitFilledCircle(CMD_RAW_MOVE)

@@ -610,7 +610,7 @@ local function languageChanged ()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (not DEBUG_MODE) and (not Spring.GetModOptions().planet) then
 		widgetHandler:RemoveWidget()
 		return

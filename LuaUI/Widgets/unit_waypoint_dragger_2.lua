@@ -87,7 +87,7 @@ function widget:GetInfo()
 	}
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 end
 
 function widget:Shutdown()

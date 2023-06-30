@@ -106,7 +106,7 @@ local glPopMatrix     = gl.PopMatrix
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   if (not gl.CreateShader)or(not gl.CreateFBO) then
     Spring.Echo("Halo widget: your card is unsupported!")
     widgetHandler:RemoveWidget()

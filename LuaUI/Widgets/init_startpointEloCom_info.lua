@@ -35,7 +35,7 @@ function widget:GameStart()
 	widgetHandler:RemoveWidget()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	if Spring.GetGameFrame()>0 then
 		widgetHandler:RemoveWidget()

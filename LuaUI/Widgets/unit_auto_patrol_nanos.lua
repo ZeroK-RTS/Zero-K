@@ -132,7 +132,7 @@ options = {
 --------------------------------------------------------------------------------
 -- Callins
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	SetupAll()
 end
 

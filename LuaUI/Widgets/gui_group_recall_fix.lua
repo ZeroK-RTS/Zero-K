@@ -184,6 +184,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	HotkeyChangeNotification()
 end

@@ -682,7 +682,7 @@ function widget:RecvLuaMsg(msg, playerID)
 	
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	myPlayerID = GetMyPlayerID()
 	timeSinceBroadcast = 0
 	totalTime = 0

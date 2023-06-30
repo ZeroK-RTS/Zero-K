@@ -67,7 +67,7 @@ local function ttsNotify()
 	SetupTTS(options.tts_vol.value)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	luaMenuActive = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	SetupTTS(options.tts_vol.value)
 	WG.TextToSpeech = TextToSpeech

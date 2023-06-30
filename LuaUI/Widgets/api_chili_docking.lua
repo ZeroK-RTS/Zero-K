@@ -100,7 +100,7 @@ function WG.SetWindowPosAndSize(window,x,y,w,h)
 	settings[window] = {x,y,x+w,y+h}
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget) --"widget" as extra argument because "handler=true"
 		return

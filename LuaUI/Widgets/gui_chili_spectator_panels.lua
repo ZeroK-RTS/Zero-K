@@ -1044,7 +1044,7 @@ function widget:PlayerChanged(pID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
 	

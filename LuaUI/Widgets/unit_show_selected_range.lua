@@ -121,7 +121,7 @@ function widget:DrawWorldPreUnit()
 	glLineWidth(1.0)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widgetHandler:RemoveCallIn("DrawWorldPreUnit")
 	widgetHandler:RemoveCallIn("SelectionChanged")
 end

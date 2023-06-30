@@ -1397,7 +1397,7 @@ function widget:Update(dt)
 	UpdateReserveSentTimer(dt)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 
 	if (not Chili) then

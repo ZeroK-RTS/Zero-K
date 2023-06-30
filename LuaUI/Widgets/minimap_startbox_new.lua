@@ -220,7 +220,7 @@ local function xForm()
 		end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- only show at the beginning
 	if (Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2) or (Spring.GetModOptions().fixedstartpos == "1") then
 		widgetHandler:RemoveWidget(self)

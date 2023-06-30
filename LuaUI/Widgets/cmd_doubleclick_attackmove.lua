@@ -65,6 +65,6 @@ function widget:CommandNotify(id, params, opts)
 	return true
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	ToggleCallins(options.enabled)
 end

@@ -553,7 +553,7 @@ end
 -- callins
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	Control = Chili.Control
 	Window = Chili.Window

@@ -354,7 +354,7 @@ function widget:KeyPress(k, modifier)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 	Button = Chili.Button
 	Window = Chili.Window

@@ -186,7 +186,7 @@ function widget:GameFrame(gf)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	widget:ViewResize()
 	Init()
 end

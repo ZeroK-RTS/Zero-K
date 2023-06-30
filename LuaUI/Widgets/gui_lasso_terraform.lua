@@ -2015,7 +2015,7 @@ function WG.Terraform_GetIsPlacingStructure()
 	return (placingRectangle or buildToGive) and true
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	--set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
 	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle
 	WG.Terraform_SetPlacingRectangleCheck = Terraform_SetPlacingRectangleCheck

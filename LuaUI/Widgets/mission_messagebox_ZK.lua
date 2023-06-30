@@ -600,7 +600,7 @@ function widget:DrawScreen()
   end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   Chili = WG.Chili
 
   -- hook widgetHandler to allow us to override the DrawScreen callin

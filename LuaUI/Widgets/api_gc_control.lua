@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- See:
 	-- https://springrts.com/mantis/view.php?id=5951
 	-- https://github.com/spring/spring/commit/a8b5ffc86351680c6e0e8d7e8db161e63dbb912e

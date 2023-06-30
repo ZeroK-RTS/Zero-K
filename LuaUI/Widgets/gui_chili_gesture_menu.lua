@@ -731,7 +731,7 @@ function widget:DrawScreen()
 	glColor(1,1,1,1)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	OptionsChanged()
 

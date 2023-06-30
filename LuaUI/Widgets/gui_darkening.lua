@@ -74,7 +74,7 @@ function fileexists( file )
     end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   if VFS.FileExists(LUA_BRIGHT_MAP_FILE, VFS.MAP) then
     darkeningMap = include(LUA_BRIGHT_MAP_FILE, nil, VFS.MAP)
   end

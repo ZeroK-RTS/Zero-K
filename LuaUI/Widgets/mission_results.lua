@@ -46,7 +46,7 @@ function widget:GameOver(winners)
 	varsWritten = true
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.missionVars = missionVars
 end
 

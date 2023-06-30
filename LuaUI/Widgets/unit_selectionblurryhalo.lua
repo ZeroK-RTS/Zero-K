@@ -322,7 +322,7 @@ end
 --------------------------------------------------------------------------------
 -- initializers
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not gl.CreateShader or not gl.CreateFBO then
 		Spring.Echo("Blurry Halo Selections: your card does not support shaders!")
 		widgetHandler:RemoveWidget()

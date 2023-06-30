@@ -385,7 +385,7 @@ function widget:MouseRelease(mx, my, button)
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	myAllyID = spGetLocalAllyTeamID()
 	myTeamID = spGetLocalTeamID()
 		

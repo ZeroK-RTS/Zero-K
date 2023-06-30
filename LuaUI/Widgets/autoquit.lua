@@ -32,7 +32,7 @@ function widget:GetInfo()
   }
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
   endTime = false
 end
 

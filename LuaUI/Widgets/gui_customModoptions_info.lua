@@ -31,7 +31,7 @@ local forceHideModoptions = {
 -- gui elements
 local window2, window3
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	-- ZK Mission Editor mission
 	if VFS.FileExists("mission.lua") then
 		widgetHandler:RemoveWidget()

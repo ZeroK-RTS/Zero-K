@@ -48,7 +48,7 @@ local badwidgets = {
 }
 
 -- callins --
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	for i=1, #badwidgets do
 		local widget = badwidgets[i]
 		if widgetHandler:IsWidgetKnown(widget.name) then -- If this widget is loaded, unload it and echo a reason.

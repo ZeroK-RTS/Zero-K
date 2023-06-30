@@ -269,7 +269,7 @@ function widget:PlayerChanged(playerID)
 	myTeamID = Spring.GetMyTeamID()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	WG.noises = externalFunctions
 end
 

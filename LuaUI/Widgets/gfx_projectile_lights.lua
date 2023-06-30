@@ -528,7 +528,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if WG.DeferredLighting_RegisterFunction then
 		WG.DeferredLighting_RegisterFunction(GetProjectileLights)
 		projectileLightTypes = GetLightsFromUnitDefs()

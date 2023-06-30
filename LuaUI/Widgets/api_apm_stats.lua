@@ -112,7 +112,7 @@ local function ProcessPlayerStats(msg, playerID)
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local _, _, isSpec, teamID = spGetPlayerInfo(myPlayerID, false)
 	--This will also get called if coming back into game as a spectator -- in that case we don't want to start logging stats again
 	--so wantStats will be false

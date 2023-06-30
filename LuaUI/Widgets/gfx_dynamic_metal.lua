@@ -51,7 +51,7 @@ function widget:DrawWorldPreUnit()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not (WG.metalSpots and Spring.GetGameRulesParam("mex_need_drawing")) then
 		widgetHandler:RemoveWidget(self)
 		return

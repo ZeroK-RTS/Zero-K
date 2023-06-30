@@ -273,7 +273,7 @@ WG.SavePythonOrJSONDict = SavePythonOrJSONDict
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:Initialize()
+function widget:Initialize(allUnits)
   WG.GetBuildIconFrame = GetBuildIconFrame
 end
 

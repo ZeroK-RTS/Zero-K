@@ -641,7 +641,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID(), false)
 	 if spec then
 		widgetHandler:RemoveWidget(widget)

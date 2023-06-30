@@ -797,7 +797,7 @@ function widget:DrawWorld()
 	end
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not (LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive() and BAR_COMPAT and Platform.glHaveGL4) then
 		goodbye("Adv shading not enabled")
 		return

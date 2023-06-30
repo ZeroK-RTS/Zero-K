@@ -532,7 +532,7 @@ local function DestroyShape(shape)
 	gl.DeleteList(shape.shape)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not WG.allySelUnits then
 		WG.allySelUnits = {}
 	end

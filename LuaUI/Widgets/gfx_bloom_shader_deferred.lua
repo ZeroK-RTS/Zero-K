@@ -329,7 +329,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	MakeBloomShaders()
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 
 	if glCreateShader == nil then
 		RemoveMe("[BloomShader::Initialize] removing widget, no shader support")

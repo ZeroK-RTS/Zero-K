@@ -12,7 +12,7 @@ function widget:GetInfo()
 end
 
 if Spring.GetModOptions().singleplayercampaignbattleid then
-	function widget:Initialize()
+	function widget:Initialize(allUnits)
 		Spring.SendCommands("info 0")
 	end
 
@@ -721,7 +721,7 @@ function widget:TeamChanged(teamID)
 	UpdateTeam(teamID)
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	Chili = WG.Chili
 
 	if (not Chili) then

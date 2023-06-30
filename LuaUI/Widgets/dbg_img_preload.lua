@@ -38,7 +38,7 @@ local function AddDir(path)
 	end]]--
 end
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if Spring.GetGameFrame() > 0 then
 	      Spring.Log(widget:GetInfo().name, LOG.INFO, "Game has started. Widget removed.")
 	      widgetHandler:RemoveWidget()
