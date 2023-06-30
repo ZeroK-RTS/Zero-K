@@ -64,7 +64,7 @@ local function ResetWidget()
 		gl.DeleteShader(mirrorShader)
 		mirrorShader = nil
 	end
-	widget:Initialize(/* Spring.GetAllUnits() */)
+	widget:Initialize(--[[ Spring.GetAllUnits() --]])
 end
 
 options_path = 'Settings/Graphics/Map Exterior'
@@ -418,7 +418,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize(/* allUnits */)
+function widget:Initialize(allUnits)
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end

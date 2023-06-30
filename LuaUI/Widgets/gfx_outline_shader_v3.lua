@@ -177,10 +177,10 @@ end
 
 function widget:ViewResize()
 	widget:Shutdown()
-	widget:Initialize(/* Spring.GetAllUnits() */)
+	widget:Initialize(--[[ Spring.GetAllUnits() ]])
 end
 
-function widget:Initialize(/* allUnits */)
+function widget:Initialize(--[[ allUnits ]])
 	local canContinue = LuaShader.isDeferredShadingEnabled and LuaShader.GetAdvShadingActive()
 	if not canContinue then
 		Spring.Echo(string.format("Error in [%s] widget: %s", wiName, "Deferred shading is not enabled or advanced shading is not active"))

@@ -60,7 +60,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize(allUnits)
+				widget:Initialize(--[[allUnits--]])
 			end
 		end,
 	},
@@ -76,7 +76,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize(/* Spring.GetAllUnits is really not worth it here when we don't even use it in Initialize, maybe if we move the initialization logic that this calls to a separate function to allow widget:initialize to still take in allUnits? */)
+				widget:Initialize(--[[ Spring.GetAllUnits is really not worth it here when we don't even use it in Initialize, maybe if we move the initialization logic that this calls to a separate function to allow widget:initialize to still take in allUnits? --]])
 			end
 		end,
 	},
@@ -92,7 +92,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize(/* Spring.GetAllUnits() - See above */)
+				widget:Initialize(--[[ Spring.GetAllUnits() - See above --]])
 			end
 		end,
 	},
@@ -104,7 +104,7 @@ options = {
 		OnChange = function(self)
 			if DspLst then
 				gl.DeleteList(DspLst)
-				widget:Initialize(/* see above */)
+				widget:Initialize(--[[ see above --]])
 			end
 		end,
 	},
@@ -353,7 +353,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize(/* allUnits */)
+function widget:Initialize(--[[ allUnits --]])
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end

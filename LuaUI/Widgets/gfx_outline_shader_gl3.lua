@@ -296,7 +296,7 @@ function widget:ViewResize()
 		return
 	end
 	widget:Shutdown()
-	widget:Initialize(/* is Spring.GetAllUnits() worth it when Initialize doesnt even use it? Maybe split init into a separate func for this to call that doesnt take allUnits so Initialize can take allUnits and the api stays the same? */)
+	widget:Initialize(--[[ is Spring.GetAllUnits() worth it when Initialize doesnt even use it? Maybe split init into a separate func for this to call that doesnt take allUnits so Initialize can take allUnits and the api stays the same? ]])
 end
 
 local firstUpdate = true
@@ -312,7 +312,7 @@ function widget:Update(dt)
 	end
 end
 
-function widget:Initialize(/* allUnits, except this init code is called from ViewResize and that doesnt pass through allUnits */)
+function widget:Initialize(--[[ allUnits, except this init code is called from ViewResize and that doesnt pass through allUnits ]])
 	if BAR_COMPAT then
 		return
 	end

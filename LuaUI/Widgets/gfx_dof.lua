@@ -93,7 +93,7 @@ options = {
 
 local function onChangeFunc()
 	if options.useDoF.value then
-		widget:Initialize(/* We are called again up here, is it worth passing through Spring.GetAllUnits when widget:Initialize doesn't even take it simply to maintain the same api? */)
+		widget:Initialize(--[[ We are called again up here, is it worth passing through Spring.GetAllUnits when widget:Initialize doesn't even take it simply to maintain the same api? ]])
 	else
 		if glDeleteTexture then
 			CleanupTextures()
@@ -328,7 +328,7 @@ function widget:ViewResize(x, y)
 	InitTextures()
 end
 
-function widget:Initialize(/*allUnits??*/)
+function widget:Initialize(--[[allUnits??]])
 	if (glCreateShader == nil) then
 		Spring.Echo("[Depth of Field::Initialize] removing widget, no shader support")
 		widgetHandler:RemoveWidget()

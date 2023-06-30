@@ -59,7 +59,7 @@ options = {
 		OnChange = function(self)
 			if dListWall then
 				gl.DeleteList(dListWall)
-				widget:Initialize(/* Spring.GetAllUnits */)
+				widget:Initialize(--[[ Spring.GetAllUnits ]])
 			end
 		end
 	},
@@ -71,7 +71,7 @@ options = {
 		OnChange = function(self)
 			if dListWall then
 				gl.DeleteList(dListWall)
-				widget:Initialize(/* Spring.GetAllUnits */)
+				widget:Initialize(--[[ Spring.GetAllUnits ]])
 			end
 		end,
 	},
@@ -212,7 +212,7 @@ local function Initialize()
 	widgetHandler:RemoveCallIn("Update")
 end
 
-function widget:Initialize(/* allUnits */)
+function widget:Initialize(--[[ allUnits --]])
 	if Spring.GetGameRulesParam("waterLevelModifier") or Spring.GetGameRulesParam("mapgen_enabled") then
 		return
 	end
