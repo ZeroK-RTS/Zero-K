@@ -86,6 +86,7 @@ local IMAGE = {
 	TIME = 'LuaUI/images/clock.png',
 	METAL = 'LuaUI/images/metalplus.png',
 	ENERGY = 'LuaUI/images/energyplus.png',
+	WIND_SPEED = 'LuaUI/images/windspeed.png',
 	METAL_RECLAIM = 'LuaUI/images/ibeamReclaim.png',
 	ENERGY_RECLAIM = 'LuaUI/images/energyReclaim.png',
 }
@@ -820,6 +821,7 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	local cost = econDef.cost
 	local extraText = ""
 	local healthOverride = false
+	local minWind = 0
 	if econDef.isWind then
 		if mousePlaceX and mousePlaceY then
 			local _, pos = spTraceScreenRay(mousePlaceX, mousePlaceY, true)
@@ -831,10 +833,12 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 					if y <= tidalHeight then
 						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +" .. math.round(income, 1)
 						healthOverride = TIDAL_HEALTH
+						minWind = income
 					else
 						local minWindIncome = (windMin + (windMax - windMin)*math.max(0, math.min(windMinBound, windGroundSlope*(y - windGroundMin))))
 						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. math.round(minWindIncome * mult, 1) .. " - " .. math.round(windMax * mult, 1)
 						income = mult * (minWindIncome + windMax)/2
+						minWind = minWindIncome
 					end
 				end
 			end
@@ -890,9 +894,9 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 		--.. "\n extraMetal: " .. extraMetalza
 		--.. "\n unitformCasePayback: " .. unitformCasePayback
 		--.. "\n worstCasePayback: " .. worstCasePayback
-		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride
+		return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback), healthOverride, minWind
 	end
-	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "unknown"), healthOverride
+	return extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "unknown"), healthOverride, minWind
 end
 
 local function GetPlayerCaption(teamID)
@@ -1873,6 +1877,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
 	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
+	local minWindLabel = GetImageWithText(leftPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)	
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
@@ -1930,6 +1935,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			metalInfoUpdate(true, FormatPlusMinus(mm - mu), IMAGE.METAL, PIC_HEIGHT + LEFT_SPACE + 4)
 			energyInfoUpdate(true, FormatPlusMinus(em - eu), IMAGE.ENERGY, PIC_HEIGHT + 2*LEFT_SPACE + 4)
 			showMetalInfo = true
+			minWindLabel(false)
 		else
 			metalInfoUpdate(false)
 			energyInfoUpdate(false)
@@ -1990,7 +1996,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local ud = UnitDefs[unitDefID]
 		local extraTooltip, healthOverride
 		if not (unitID or featureID) then
-			extraTooltip, healthOverride = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+			extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 		end
 		if extraTooltip then
 			unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
@@ -2001,6 +2007,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if econStructureDefs[unitDefID].isWind then
 			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
+			if mousePlaceX then
+				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
+			end
 		end
 	end
 	
@@ -2091,9 +2100,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			end
 			costInfoUpdate(true, cyan .. smallCostDisplay, IMAGE.COST, PIC_HEIGHT + 4)
 			
-			local extraTooltip, healthOverride
+			local extraTooltip, healthOverride, minWind
 			if not (unitID or featureID) then
-				extraTooltip, healthOverride = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
+				extraTooltip, healthOverride, minWind = GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mousePlaceY)
 			end
 			if extraTooltip then
 				unitDesc:SetText(GetDescription(ud, unitID) .. extraTooltip)
@@ -2155,6 +2164,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if not metalInfoShown then
 			metalInfoUpdate(false)
 			energyInfoUpdate(false)
+			minWindLabel(false)
 		end
 		
 		if playerNameLabel then
