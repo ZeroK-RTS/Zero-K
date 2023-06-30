@@ -439,7 +439,7 @@ function widget:DrawWorldPreUnit()
 	end
 end
 
-local function initializeAllUnits()
+local function initializeAllUnits(maybeAllUnits)
 	alliedUnits = {}
 	numAlliedUnits = 0
 	visibleUnits = {}
@@ -458,7 +458,7 @@ local function initializeAllUnits()
 		clearInstanceTable(unitTrackerVBO)
 	end
 	
-	local allunits = Spring.GetAllUnits()
+	local allunits = maybeAllUnits or Spring.GetAllUnits()
 	for i, unitID in pairs (allunits) do 
 		widget:UnitCreated(unitID, spGetUnitDefID(unitID), spGetUnitTeam(unitID), nil, "initializeAllUnits", true) -- silent is true
 	end
@@ -534,7 +534,7 @@ function widget:PlayerChanged(playerID)
 end
 
 
-function widget:Initialize()
+function widget:Initialize(allUnits)
 	if not gl.GetVBO then
 		Spring.Echo("api_unit_tracker_gl4.lua: no VBO support, exiting")
 		widgetHandler:RemoveWidget(widget)
@@ -563,7 +563,7 @@ function widget:Initialize()
 	WG['unittrackerapi'].visibleUnits = visibleUnits
 	WG['unittrackerapi'].alliedUnits = alliedUnits
 	WG['unittrackerapi'].initializeAllUnits = initializeAllUnits
-	initializeAllUnits()
+	initializeAllUnits(allUnits)
 end
 
 function widget:Shutdown()
