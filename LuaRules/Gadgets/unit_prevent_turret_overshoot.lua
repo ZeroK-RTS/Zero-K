@@ -46,9 +46,10 @@ end
 
 include "LuaRules/Configs/customcmds.h.lua"
 
+local CMD_INSERT = CMD.INSERT
 local blockedCmds = {
 	[CMD.ATTACK] = true,
-	[CMD.INSERT] = true,
+	[CMD_INSERT] = true,
 	[CMD_UNIT_SET_TARGET] = true,
 }
 
