@@ -1935,11 +1935,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			metalInfoUpdate(true, FormatPlusMinus(mm - mu), IMAGE.METAL, PIC_HEIGHT + LEFT_SPACE + 4)
 			energyInfoUpdate(true, FormatPlusMinus(em - eu), IMAGE.ENERGY, PIC_HEIGHT + 2*LEFT_SPACE + 4)
 			showMetalInfo = true
-			minWindLabel(false)
 		else
 			metalInfoUpdate(false)
 			energyInfoUpdate(false)
 		end
+		minWindLabel(false)
 		
 		local healthPos
 		if shieldBarUpdate then
@@ -2009,7 +2009,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			maxHealthLabel(true, healthOverride or ud.health, IMAGE.HEALTH)
 			if mousePlaceX then
 				minWindLabel(true, FormatPlusMinus(minWind), IMAGE.WIND_SPEED)
+			else
+				minWindLabel(false)
 			end
+		else
+			minWindLabel(false)
 		end
 	end
 	
@@ -2053,6 +2057,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					end
 					if econStructureDefs[unitDefID] then
 						UpdateDynamicEconInfo(unitDefID, mousePlaceX, mousePlaceY)
+					else
+						minWindLabel(false)
 					end
 				end
 			end
@@ -2063,6 +2069,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			teamID = Spring.GetFeatureTeam(featureID)
 			local featureTooltip, featureUnitDefID = GetFeatureDisplayAttributes(featureDefID)
 			healthBarUpdate(false)
+			minWindLabel(false)
 			if featureUnitDefID then
 				unitDefID = featureUnitDefID
 				if playerNameLabel then
@@ -2164,7 +2171,6 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		if not metalInfoShown then
 			metalInfoUpdate(false)
 			energyInfoUpdate(false)
-			minWindLabel(false)
 		end
 		
 		if playerNameLabel then
