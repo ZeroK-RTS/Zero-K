@@ -23,20 +23,7 @@ imageExt = ".png"
 --// render into a fbo in 4x size
 renderScale = 4
 
---// faction colors (check (and needs) LuaRules/factions.lua)
-factionTeams = {
-  arm     = 0,   --// arm
-  core    = 1,   --// core
-  chicken = 2,   --// chicken
-  unknown = 2,   --// unknown
-}
-factionColors = {
-  arm     = {0.05, 0.96, 0.95},   --// arm
-  core    = {0.05, 0.96, 0.95},   --// core
-  chicken = {1.0,0.8,0.2},   --// chicken
-  unknown = {0.05, 0.96, 0.95},   --// unknown
-}
-
+teamColor = {0.05, 0.96, 0.95}
 
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
@@ -86,6 +73,9 @@ defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=f
 --// per unitdef settings
 unitConfigs = {
   
+  [UnitDefNames.comm_campaign_isonade.id] = {
+    teamColor = { 1, 0.75, 0 },
+  },
   [UnitDefNames.staticradar.id] = {
     scale = 3,
     rot   = 200,
