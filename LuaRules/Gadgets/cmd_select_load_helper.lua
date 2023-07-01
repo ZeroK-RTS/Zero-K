@@ -18,15 +18,9 @@ function gadget:GetInfo()
   }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
-include "LuaRules/Configs/customcmds.h.lua"
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Global Variables
-
+local CMD_LOADUNITS_SELECTED = Spring.Utilities.CMD.LOADUNITS_SELECTED
 local loadSelectedCmd = {
     id      = CMD_LOADUNITS_SELECTED,
     name    = "Load Selected",

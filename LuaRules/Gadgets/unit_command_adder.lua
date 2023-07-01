@@ -22,8 +22,6 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 ---------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
-
 local fightCmdDesc = {
 	id        = CMD.FIGHT,
 	type      = CMDTYPE.ICON_FRONT,

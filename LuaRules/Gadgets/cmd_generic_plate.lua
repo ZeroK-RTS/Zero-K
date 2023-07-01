@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Speedup
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_BUILD_PLATE = Spring.Utilities.CMD.BUILD_PLATE
 
 if gadgetHandler:IsSyncedCode() then
 

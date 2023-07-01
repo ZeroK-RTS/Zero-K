@@ -9,7 +9,6 @@ function gadget:GetInfo()
 		enabled = true,
 	}
 end
-include("LuaRules/Configs/customcmds.h.lua")
 
 if gadgetHandler:IsSyncedCode() then
 
@@ -17,6 +16,7 @@ if gadgetHandler:IsSyncedCode() then
 ----------------------------------------------------------------------------------------------
 -- Speedups
 
+local CMD_TRANSFER_UNIT = Spring.Utilities.CMD.TRANSFER_UNIT
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 
 ----------------------------------------------------------------------------------------------

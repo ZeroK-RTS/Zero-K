@@ -12,7 +12,7 @@
 -- end
 
 --Note: Widget became less relevant for Spring 95+ because unit will always go out from factory in Spring 95+.
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_JUMP = Spring.Utilities.CMD.JUMP
 
 local excludedFactory = {
 	[UnitDefNames["factorygunship"].id] = true,

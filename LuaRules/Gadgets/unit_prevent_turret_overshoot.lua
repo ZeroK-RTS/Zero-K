@@ -44,13 +44,11 @@ for unitDefID = 1, #UnitDefs do
     end
 end
 
-include "LuaRules/Configs/customcmds.h.lua"
-
 local CMD_INSERT = CMD.INSERT
 local blockedCmds = {
 	[CMD.ATTACK] = true,
 	[CMD_INSERT] = true,
-	[CMD_UNIT_SET_TARGET] = true,
+	[Spring.Utilities.CMD.UNIT_SET_TARGET] = true,
 }
 
 

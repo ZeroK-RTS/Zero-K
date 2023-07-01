@@ -11,7 +11,6 @@ function gadget:GetInfo()
 	}
 end
 
-include("LuaRules/Configs/customcmds.h.lua")
 local allyTeamByTeam = {}
 local teamList = Spring.GetTeamList()
 for i = 1, #teamList do
@@ -79,6 +78,7 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local CMD_RAW_MOVE = Spring.Utilities.CMD.RAW_MOVE
 function gadget:DefaultCommand(targetType, targetID)
 	if (targetType == 'unit') and targetID and Spring.GetUnitNeutral(targetID) then
 		if (Spring.GetUnitRulesParam(targetID, "avoidAttackingNeutral") == 1) or (Spring.GetUnitRulesParam(targetID, "avoidRightClickAttack") == 1) then
