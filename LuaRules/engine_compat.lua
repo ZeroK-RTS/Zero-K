@@ -380,3 +380,13 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1803
 		return spGetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
 	end
 end
+
+if not Spring.GetUnitIsBeingBuilt then -- BAR 105-1806
+	local spGetUnitHealth = Spring.GetUnitHealth
+	local spGetUnitIsStunned = Spring.GetUnitIsStunned
+	Spring.GetUnitIsBeingBuilt = function(unitID)
+		local _, _, inBuild = spGetUnitIsStunned(unitID)
+		local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
+		return inBuild, buildProgress
+	end
+end
