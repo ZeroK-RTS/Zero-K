@@ -20,8 +20,8 @@ local highlightUnitVBOTable
 local uniqueID = 0
 
 local highlightunitShaderConfig = {
-	ANIMSPEED = 0.066,
-	ANIMFREQUENCY = 0.033,
+	ANIMSPEED = 2 / Game.gameSpeed,
+	ANIMFREQUENCY = 1 / Game.gameSpeed,
 	SKINSUPPORT = Spring.Utilities.IsCurrentVersionNewerThan(105, 1653) and 1 or 0,
 }
 
