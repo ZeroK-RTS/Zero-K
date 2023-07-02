@@ -24,7 +24,7 @@ local smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
-local PERIOD = 0.17
+local PERIOD = 0.185
 
 local sleepTime = PERIOD*1000
 

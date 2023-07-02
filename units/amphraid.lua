@@ -86,7 +86,7 @@ return { amphraid = {
       },
 
       explosionGenerator      = [[custom:INGEBORG]],
-      flightTime              = 2,
+      flightTime              = 1.5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
