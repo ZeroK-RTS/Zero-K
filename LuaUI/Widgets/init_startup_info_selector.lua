@@ -516,8 +516,8 @@ function widget:Initialize()
 			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}
 		}
 		
-		buttonImage = Image:New{
-			parent = button,
+		Image:New{
+			parent = sideOpenButton,
 			width="100%";
 			height="100%";
 			x=0;
