@@ -1,5 +1,4 @@
 return { energyfusion = {
-  unitname                      = [[energyfusion]],
   name                          = [[Fusion Reactor]],
   description                   = [[Medium Powerplant (+35)]],
   activateWhenBuilt             = true,

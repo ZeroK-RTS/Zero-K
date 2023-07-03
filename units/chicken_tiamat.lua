@@ -1,5 +1,4 @@
 return { chicken_tiamat = {
-  unitname            = [[chicken_tiamat]],
   name                = [[Tiamat]],
   description         = [[Heavy Assault/Riot]],
   acceleration        = 1.08,

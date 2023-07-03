@@ -1,5 +1,4 @@
 return { amphlaunch = {
-  unitname               = [[amphlaunch]],
   name                   = [[Lobster]],
   description            = [[Amphibious Launcher Bot]],
   acceleration           = 0.6,

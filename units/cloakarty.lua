@@ -1,5 +1,4 @@
 return { cloakarty = {
-  unitname               = [[cloakarty]],
   name                   = [[Sling]],
   description            = [[Light Artillery Bot]],
   acceleration           = 0.75,

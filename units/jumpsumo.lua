@@ -1,5 +1,4 @@
 return { jumpsumo = {
-  unitname            = [[jumpsumo]],
   name                = [[Jugglenaut]],
   description         = [[Heavy Riot Jumper]],
   acceleration        = 0.3,

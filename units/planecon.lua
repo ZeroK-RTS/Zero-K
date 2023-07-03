@@ -1,5 +1,4 @@
 return { planecon = {
-  unitname            = [[planecon]],
   name                = [[Crane]],
   description         = [[Construction Aircraft]],
   acceleration        = 0.1,

@@ -1,5 +1,4 @@
 return { gunshipemp = {
-  unitname            = [[gunshipemp]],
   name                = [[Gnat]],
   description         = [[Anti-Heavy EMP Drone]],
   acceleration        = 0.264,

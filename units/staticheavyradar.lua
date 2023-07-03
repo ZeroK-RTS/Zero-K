@@ -1,5 +1,4 @@
 return { staticheavyradar = {
-  unitname                      = [[staticheavyradar]],
   name                          = [[Advanced Radar]],
   description                   = [[Long-Range Radar]],
   activateWhenBuilt             = true,

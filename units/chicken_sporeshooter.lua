@@ -1,5 +1,4 @@
 return { chicken_sporeshooter = {
-  unitname            = [[chicken_sporeshooter]],
   name                = [[Sporeshooter]],
   description         = [[All-Terrain Spores (Anti-Air/Skirm)]],
   acceleration        = 1.08,

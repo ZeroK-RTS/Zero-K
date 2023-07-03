@@ -1,5 +1,4 @@
 return { factoryplane = {
-  unitname                      = [[factoryplane]],
   name                          = [[Airplane Plant]],
   description                   = [[Produces Airplanes]],
   activateWhenBuilt             = false,

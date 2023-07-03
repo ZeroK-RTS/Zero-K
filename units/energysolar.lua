@@ -1,5 +1,4 @@
 return { energysolar = {
-  unitname                      = [[energysolar]],
   name                          = [[Solar Collector]],
   description                   = [[Small Powerplant (+2)]],
   activateWhenBuilt             = true,

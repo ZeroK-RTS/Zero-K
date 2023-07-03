@@ -1,5 +1,4 @@
 return { bomberstrike = {
-  unitname            = [[bomberstrike]],
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
   brakerate           = 0.4,

@@ -1,5 +1,4 @@
 return { turretaalaser = {
-  unitname                      = [[turretaalaser]],
   name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
   builder                       = false,

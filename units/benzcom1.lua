@@ -1,5 +1,4 @@
 return { benzcom1 = {
-  unitname            = [[benzcom1]],
   name                = [[Siege Commander]],
   description         = [[Standoff Combat Commander]],
   acceleration        = 0.54,

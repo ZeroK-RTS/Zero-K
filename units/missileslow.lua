@@ -1,5 +1,4 @@
 return { missileslow = {
-  unitname                      = [[missileslow]],
   name                          = [[Zeno]],
   description                   = [[Slow Homing Missile - High single-target slow damage with lingering damage over time]],
   builder                       = false,

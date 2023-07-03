@@ -1,5 +1,4 @@
 return { shieldriot = {
-  unitname               = [[shieldriot]],
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
   acceleration           = 0.75,

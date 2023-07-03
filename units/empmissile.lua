@@ -1,5 +1,4 @@
 return { empmissile = {
-  unitname               = [[empmissile]],
   name                   = [[Shockley]],
   description            = [[EMP missile]],
   builder                = false,

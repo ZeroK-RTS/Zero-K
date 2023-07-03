@@ -1,5 +1,4 @@
 return { shiptorpraider = {
-  unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
   description         = [[Torpedo Raider Ship (Anti-Sub)]],
   acceleration        = 0.288,

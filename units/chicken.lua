@@ -1,5 +1,4 @@
 return { chicken = {
-  unitname            = [[chicken]],
   name                = [[Chicken]],
   description         = [[Swarmer]],
   acceleration        = 1.08,

@@ -1,5 +1,4 @@
 return { shieldaa = {
-  unitname               = [[shieldaa]],
   name                   = [[Vandal]],
   description            = [[Anti-Air Bot]],
   acceleration           = 1.35,

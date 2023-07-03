@@ -1,5 +1,4 @@
 return { turretheavylaser = {
-  unitname                      = [[turretheavylaser]],
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
   builder                       = false,

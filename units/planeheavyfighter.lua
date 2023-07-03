@@ -1,5 +1,4 @@
 return { planeheavyfighter = {
-  unitname               = [[planeheavyfighter]],
   name                   = [[Raptor]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,

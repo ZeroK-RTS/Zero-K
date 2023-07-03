@@ -1,5 +1,4 @@
 return { cloakriot = {
-  unitname               = [[cloakriot]],
   name                   = [[Reaver]],
   description            = [[Riot Bot]],
   acceleration           = 0.75,

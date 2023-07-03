@@ -1,5 +1,4 @@
 return { vehassault = {
-  unitname               = [[vehassault]],
   name                   = [[Ravager]],
   description            = [[Assault Rover]],
   acceleration           = 0.162,

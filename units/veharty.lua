@@ -1,5 +1,4 @@
 return { veharty = {
-  unitname            = [[veharty]],
   name                = [[Badger]],
   description         = [[Artillery Minelayer Rover]],
   acceleration        = 0.168,

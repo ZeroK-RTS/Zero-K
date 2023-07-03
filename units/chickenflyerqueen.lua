@@ -1,5 +1,4 @@
 return { chickenflyerqueen = {
-  unitname            = [[chickenflyerqueen]],
   name                = [[Chicken Queen]],
   description         = [[Clucking Hell!]],
   acceleration        = 1.2,

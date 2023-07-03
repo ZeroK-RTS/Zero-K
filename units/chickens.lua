@@ -1,5 +1,4 @@
 return { chickens = {
-  unitname            = [[chickens]],
   name                = [[Spiker]],
   description         = [[Skirmisher]],
   acceleration        = 1.3,

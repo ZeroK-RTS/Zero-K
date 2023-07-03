@@ -1,5 +1,4 @@
 return { energywind = {
-  unitname                      = [[energywind]],
   name                          = [[Wind/Tidal Generator]],
   description                   = [[Small Powerplant]],
   activateWhenBuilt             = true,

@@ -1,5 +1,4 @@
 return { shipheavyarty = {
-  unitname               = [[shipheavyarty]],
   name                   = [[Shogun]],
   description            = [[Battleship (Heavy Artillery)]],
   acceleration           = 0.234,

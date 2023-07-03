@@ -1,5 +1,4 @@
 return { cloaksnipe = {
-  unitname               = [[cloaksnipe]],
   name                   = [[Phantom]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.9,

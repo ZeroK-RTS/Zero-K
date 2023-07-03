@@ -1,5 +1,4 @@
 return { factoryjump = {
-  unitname                      = [[factoryjump]],
   name                          = [[Jumpbot Factory]],
   description                   = [[Produces Jumpjet Equipped Robots]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

@@ -1,5 +1,4 @@
 return { plateamph = {
-  unitname                      = [[plateamph]],
   name                          = [[Amphbot Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

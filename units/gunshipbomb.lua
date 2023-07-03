@@ -1,5 +1,4 @@
 return { gunshipbomb = {
-  unitname               = [[gunshipbomb]],
   name                   = [[Blastwing]],
   description            = [[Flying Bomb/Scout (Burrows)]],
   acceleration           = 0.25,

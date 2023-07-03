@@ -1,5 +1,4 @@
 return { platejump = {
-  unitname                      = [[platejump]],
   name                          = [[Jumpbot Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

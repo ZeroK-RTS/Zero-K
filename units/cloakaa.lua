@@ -1,5 +1,4 @@
 return { cloakaa = {
-  unitname               = [[cloakaa]],
   name                   = [[Gremlin]],
   description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 1.5,

@@ -1,5 +1,4 @@
 return { subscout = {
-  unitname              = [[subscout]],
   name                  = [[Lancelet]],
   description           = [[Scout/Suicide Minisub]],
   acceleration          = 0.192,

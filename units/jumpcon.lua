@@ -1,5 +1,4 @@
 return { jumpcon = {
-  unitname            = [[jumpcon]],
   name                = [[Constable]],
   description         = [[Jumpjet Constructor]],
   acceleration        = 0.78,

@@ -1,5 +1,4 @@
 return { spiderassault = {
-  unitname               = [[spiderassault]],
   name                   = [[Hermit]],
   description            = [[All Terrain Assault Bot]],
   acceleration           = 0.54,

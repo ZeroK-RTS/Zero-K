@@ -1,5 +1,4 @@
 return { spidercon = {
-  unitname               = [[spidercon]],
   name                   = [[Weaver]],
   description            = [[Construction Spider]],
   acceleration           = 0.6,

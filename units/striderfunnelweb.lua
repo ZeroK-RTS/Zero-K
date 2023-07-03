@@ -1,5 +1,4 @@
 return { striderfunnelweb = {
-  unitname               = [[striderfunnelweb]],
   name                   = [[Funnelweb]],
   description            = [[Shield Support Strider]],
   acceleration           = 0.166,

@@ -1,5 +1,4 @@
 return { turretheavy = {
-  unitname                      = [[turretheavy]],
   name                          = [[Desolator]],
   description                   = [[Medium Range Defence Fortress - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,

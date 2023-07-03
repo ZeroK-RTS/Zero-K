@@ -1,5 +1,4 @@
 return { jumpbomb = {
-  unitname               = [[jumpbomb]],
   name                   = [[Skuttle]],
   description            = [[Cloaked Jumping Anti-Heavy Bomb]],
   acceleration           = 0.54,

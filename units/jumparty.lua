@@ -1,5 +1,4 @@
 return { jumparty = {
-  unitname               = [[jumparty]],
   name                   = [[Firewalker]],
   description            = [[Saturation Artillery Walker]],
   acceleration           = 0.36,

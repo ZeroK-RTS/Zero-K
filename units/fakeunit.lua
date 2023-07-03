@@ -1,5 +1,4 @@
 return { fakeunit = {
-  unitname                      = [[fakeunit]],
   name                          = [[Fake radar signal]],
   description                   = [[Created by scrambling devices.]],
   activateWhenBuilt             = false,

@@ -1,5 +1,4 @@
 return { empiricaldpser = {
-  unitname                = [[empiricaldpser]],
   name                    = [[Empirical DPS thing]],
   description             = [[Shoot at it for science.]],
   builder                 = false,

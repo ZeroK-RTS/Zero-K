@@ -1,5 +1,4 @@
 return { chickenf = {
-  unitname            = [[chickenf]],
   name                = [[Talon]],
   description         = [[Flying Spike Spitter]],
   acceleration        = 0.8,

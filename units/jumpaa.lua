@@ -1,5 +1,4 @@
 return { jumpaa = {
-  unitname            = [[jumpaa]],
   name                = [[Toad]],
   description         = [[Heavy Anti-Air Jumper]],
   acceleration        = 0.54,

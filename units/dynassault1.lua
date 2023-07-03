@@ -1,5 +1,4 @@
 return { dynassault1 = {
-  unitname            = [[dynassault1]],
   name                = [[Guardian Commander]],
   description         = [[Heavy Combat Commander]],
   acceleration        = 0.54,

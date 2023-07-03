@@ -1,5 +1,4 @@
 return { roost = {
-  unitname          = [[roost]],
   name              = [[Roost]],
   description       = [[Spawns Chicken]],
   activateWhenBuilt = true,

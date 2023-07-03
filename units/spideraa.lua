@@ -1,5 +1,4 @@
 return { spideraa = {
-  unitname               = [[spideraa]],
   name                   = [[Tarantula]],
   description            = [[Anti-Air Spider]],
   acceleration           = 0.66,

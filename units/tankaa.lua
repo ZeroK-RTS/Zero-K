@@ -1,5 +1,4 @@
 return { tankaa = {
-  unitname               = [[tankaa]],
   name                   = [[Ettin]],
   description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.36,

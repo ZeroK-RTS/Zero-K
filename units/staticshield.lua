@@ -1,5 +1,4 @@
 return { staticshield = {
-  unitname                      = [[staticshield]],
   name                          = [[Aegis]],
   description                   = [[Area Shield]],
   activateWhenBuilt             = true,

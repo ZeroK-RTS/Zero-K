@@ -1,5 +1,4 @@
 return { tankcon = {
-  unitname               = [[tankcon]],
   name                   = [[Welder]],
   description            = [[Armed Construction Tank]],
   acceleration           = 0.4,

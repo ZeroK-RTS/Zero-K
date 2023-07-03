@@ -1,5 +1,4 @@
 return { factoryshield = {
-  unitname                      = [[factoryshield]],
   name                          = [[Shieldbot Factory]],
   description                   = [[Produces Tough, Shielded Robots]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

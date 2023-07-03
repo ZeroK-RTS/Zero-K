@@ -1,5 +1,4 @@
 return { gunshipheavyskirm = {
-  unitname            = [[gunshipheavyskirm]],
   name                = [[Nimbus]],
   description         = [[Fire Support Gunship]],
   acceleration        = 0.2,

@@ -1,5 +1,4 @@
 return { chickenc = {
-  unitname            = [[chickenc]],
   name                = [[Basilisk]],
   description         = [[All-Terrain Riot]],
   acceleration        = 1.08,

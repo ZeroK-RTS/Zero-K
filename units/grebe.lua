@@ -1,5 +1,4 @@
 return { grebe = {
-  unitname               = [[grebe]],
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
   acceleration           = 0.6,

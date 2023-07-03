@@ -1,5 +1,4 @@
 return { spiderriot = {
-  unitname               = [[spiderriot]],
   name                   = [[Redback]],
   description            = [[Riot Spider]],
   acceleration           = 0.66,

@@ -1,5 +1,4 @@
 return { cloakassault = {
-  unitname               = [[cloakassault]],
   name                   = [[Knight]],
   description            = [[Lightning Assault Bot]],
   acceleration           = 0.6,

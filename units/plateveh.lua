@@ -1,5 +1,4 @@
 return { plateveh = {
-  unitname                      = [[plateveh]],
   name                          = [[Rover Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

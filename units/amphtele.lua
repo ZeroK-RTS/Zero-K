@@ -1,5 +1,4 @@
 return { amphtele = {
-  unitname               = [[amphtele]],
   name                   = [[Djinn]],
   description            = [[Amphibious Teleport Bridge]],
   acceleration           = 0.75,

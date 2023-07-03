@@ -1,5 +1,4 @@
 return { shieldshield = {
-  unitname               = [[shieldshield]],
   name                   = [[Aspis]],
   description            = [[Area Shield Walker]],
   acceleration           = 0.75,

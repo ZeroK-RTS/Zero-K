@@ -1,5 +1,4 @@
 return { tankheavyraid = {
-  unitname               = [[tankheavyraid]],
   name                   = [[Blitz]],
   description            = [[Lightning Assault/Raider Tank]],
   acceleration           = 0.75,

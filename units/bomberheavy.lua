@@ -1,5 +1,4 @@
 return { bomberheavy = {
-  unitname            = [[bomberheavy]],
   name                = [[Likho]],
   description         = [[Singularity Bomber]],
   --autoheal          = 25,

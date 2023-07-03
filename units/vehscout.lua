@@ -1,5 +1,4 @@
 return { vehscout = {
-  unitname               = [[vehscout]],
   name                   = [[Dart]],
   description            = [[Disruptor Raider/Scout Rover]],
   acceleration           = 0.84,

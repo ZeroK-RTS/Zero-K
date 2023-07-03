@@ -1,5 +1,4 @@
 return { striderbantha = {
-  unitname               = [[striderbantha]],
   name                   = [[Paladin]],
   description            = [[Ranged Support Strider]],
   acceleration           = 0.314,

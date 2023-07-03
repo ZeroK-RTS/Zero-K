@@ -1,5 +1,4 @@
 return { chicken_digger = {
-  unitname            = [[chicken_digger]],
   name                = [[Digger]],
   description         = [[Burrowing Scout/Raider]],
   acceleration        = 1.08,

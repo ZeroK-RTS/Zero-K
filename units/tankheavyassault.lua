@@ -1,5 +1,4 @@
 return { tankheavyassault = {
-  unitname            = [[tankheavyassault]],
   name                = [[Cyclops]],
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.17,

@@ -1,5 +1,4 @@
 return { striderscorpion = {
-  unitname               = [[striderscorpion]],
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
   acceleration           = 0.78,

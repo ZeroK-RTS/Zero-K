@@ -1,5 +1,4 @@
 return { asteroid = {
-  unitname                      = [[asteroid]],
   name                          = [[Asteroid]],
   description                   = [[Space Rock]],
   builder                       = false,

@@ -1,5 +1,4 @@
 return { rocksink = {
-  unitname                = [[rocksink]],
   name                    = [[Rocking Damage Sink thing]],
   description             = [[Rocks when you shoot at it.]],
   autoHeal                = 500000,

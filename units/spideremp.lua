@@ -1,5 +1,4 @@
 return { spideremp = {
-  unitname               = [[spideremp]],
   name                   = [[Venom]],
   description            = [[Lightning Riot Spider]],
   acceleration           = 0.78,

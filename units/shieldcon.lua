@@ -1,5 +1,4 @@
 return { shieldcon = {
-  unitname            = [[shieldcon]],
   name                = [[Convict]],
   description         = [[Shielded Construction Bot]],
   acceleration        = 1.5,

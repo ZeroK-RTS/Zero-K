@@ -1,5 +1,4 @@
 return { jumpraid = {
-  unitname              = [[jumpraid]],
   name                  = [[Pyro]],
   description           = [[Raider/Riot Jumper]],
   acceleration          = 1.2,

@@ -1,5 +1,4 @@
 return { dronecarry = {
-  unitname            = [[dronecarry]],
   name                = [[Gull]],
   description         = [[Carrier Drone]],
   acceleration        = 0.3,

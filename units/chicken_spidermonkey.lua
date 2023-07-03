@@ -1,5 +1,4 @@
 return { chicken_spidermonkey = {
-  unitname            = [[chicken_spidermonkey]],
   name                = [[Spidermonkey]],
   description         = [[All-Terrain Support]],
   acceleration        = 1.08,

@@ -1,5 +1,4 @@
 return { shieldarty = {
-  unitname               = [[shieldarty]],
   name                   = [[Racketeer]],
   description            = [[Disarming Artillery]],
   acceleration           = 0.75,

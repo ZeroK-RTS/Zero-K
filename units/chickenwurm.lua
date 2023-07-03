@@ -1,5 +1,4 @@
 return { chickenwurm = {
-  unitname            = [[chickenwurm]],
   name                = [[Wurm]],
   description         = [[Burrowing Flamer (Assault/Riot)]],
   acceleration        = 1.08,

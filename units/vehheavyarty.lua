@@ -1,5 +1,4 @@
 return { vehheavyarty = {
-  unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Rover]],
   acceleration        = 0.252,

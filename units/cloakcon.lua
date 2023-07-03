@@ -1,5 +1,4 @@
 return { cloakcon = {
-  unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
   description            = [[Cloaked Construction Bot]],
   acceleration           = 1.5,

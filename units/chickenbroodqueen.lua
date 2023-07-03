@@ -1,5 +1,4 @@
 return { chickenbroodqueen = {
-  unitname            = [[chickenbroodqueen]],
   name                = [[Chicken Brood Queen]],
   description         = [[Tends the Nest]],
   acceleration        = 0.6,

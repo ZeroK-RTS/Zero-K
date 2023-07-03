@@ -1,5 +1,4 @@
 return { tankassault = {
-  unitname            = [[tankassault]],
   name                = [[Minotaur]],
   description         = [[Assault Tank]],
   acceleration        = 0.144,

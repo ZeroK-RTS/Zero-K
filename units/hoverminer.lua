@@ -1,5 +1,4 @@
 return { hoverminer = {
-  unitname            = [[hoverminer]],
   name                = [[Dampener]],
   description         = [[Minelaying Hover]],
   acceleration        = 0.2175,

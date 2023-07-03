@@ -1,5 +1,4 @@
 return { nebula = {
-  unitname               = [[nebula]],
   name                   = [[Nebula]],
   description            = [[Atmospheric Mothership]],
   acceleration           = 0.04,

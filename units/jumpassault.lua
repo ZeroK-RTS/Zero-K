@@ -1,5 +1,4 @@
 return { jumpassault = {
-  unitname            = [[jumpassault]],
   name                = [[Jack]],
   description         = [[Melee Assault Jumper]],
   acceleration        = 0.48,

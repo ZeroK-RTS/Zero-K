@@ -1,5 +1,4 @@
 return { factorytank = {
-  unitname                      = [[factorytank]],
   name                          = [[Tank Foundry]],
   description                   = [[Produces Heavy Tracked Vehicles]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

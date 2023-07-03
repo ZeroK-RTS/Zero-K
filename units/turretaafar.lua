@@ -1,5 +1,4 @@
 return { turretaafar = {
-  unitname                      = [[turretaafar]],
   name                          = [[Chainsaw]],
   description                   = [[Long-Range Anti-Air Missile Battery]],
   builder                       = false,

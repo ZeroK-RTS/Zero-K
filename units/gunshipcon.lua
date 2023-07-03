@@ -1,5 +1,4 @@
 return { gunshipcon = {
-  unitname            = [[gunshipcon]],
   name                = [[Wasp]],
   description         = [[Heavy Gunship Constructor]],
   acceleration        = 0.1,

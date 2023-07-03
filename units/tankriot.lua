@@ -1,5 +1,4 @@
 return { tankriot = {
-  unitname            = [[tankriot]],
   name                = [[Ogre]],
   description         = [[Heavy Riot Support Tank]],
   acceleration        = 0.132,

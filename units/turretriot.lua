@@ -1,5 +1,4 @@
 return { turretriot = {
-  unitname                      = [[turretriot]],
   name                          = [[Stardust]],
   description                   = [[Anti-Swarm Turret]],
   activateWhenBuilt             = true,

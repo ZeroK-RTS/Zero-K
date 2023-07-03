@@ -1,5 +1,4 @@
 return { dronelight = {
-  unitname            = [[dronelight]],
   name                = [[Firefly]],
   description         = [[Attack Drone]],
   acceleration        = 0.3,

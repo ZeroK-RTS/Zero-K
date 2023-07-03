@@ -1,5 +1,4 @@
 return { tankarty = {
-  unitname            = [[tankarty]],
   name                = [[Emissary]],
   description         = [[General-Purpose Artillery]],
   acceleration        = 0.17,

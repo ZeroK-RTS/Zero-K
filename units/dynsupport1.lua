@@ -1,5 +1,4 @@
 return { dynsupport1 = {
-  unitname            = [[dynsupport1]],
   name                = [[Engineer Commander]],
   description         = [[Econ/Support Commander]],
   acceleration        = 0.75,

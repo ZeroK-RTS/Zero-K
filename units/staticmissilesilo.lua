@@ -1,5 +1,4 @@
 return { staticmissilesilo = {
-  unitname                      = [[staticmissilesilo]],
   name                          = [[Missile Silo]],
   description                   = [[Produces Tactical Missiles]],
   builder                       = true,

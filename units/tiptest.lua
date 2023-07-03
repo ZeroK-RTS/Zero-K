@@ -1,7 +1,6 @@
 local included = VFS.Include("units/vehassault.lua")
 local unitDef = included.vehassault
 
-unitDef.unitname = "tiptest"
 unitDef.name = "Turn In Place test"
 unitDef.description = "Tests turn in place"
 

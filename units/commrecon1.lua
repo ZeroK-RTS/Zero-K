@@ -1,5 +1,4 @@
 return { commrecon1 = {
-  unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander]],
   acceleration        = 0.75,

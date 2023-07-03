@@ -1,5 +1,4 @@
 return { shieldskirm = {
-  unitname               = [[shieldskirm]],
   name                   = [[Rogue]],
   description            = [[Skirmisher Bot (Indirect Fire)]],
   acceleration           = 0.75,

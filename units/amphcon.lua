@@ -1,5 +1,4 @@
 return { amphcon = {
-  unitname            = [[amphcon]],
   name                = [[Conch]],
   description         = [[Amphibious Construction Bot, Armored When Idle]],
   acceleration        = 1.2,

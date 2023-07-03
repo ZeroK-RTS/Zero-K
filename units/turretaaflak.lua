@@ -1,5 +1,4 @@
 return { turretaaflak = {
-  unitname                      = [[turretaaflak]],
   name                          = [[Thresher]],
   description                   = [[Anti-Air Flak Gun]],
   builder                       = false,

@@ -1,5 +1,4 @@
 return { staticantinuke = {
-  unitname                      = [[staticantinuke]],
   name                          = [[Antinuke]],
   description                   = [[Strategic Nuke Interception System]],
   activateWhenBuilt             = true,

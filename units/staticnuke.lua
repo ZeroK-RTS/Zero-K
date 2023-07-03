@@ -1,5 +1,4 @@
 return { staticnuke = {
-  unitname                      = [[staticnuke]],
   name                          = [[Trinity]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   builder                       = false,

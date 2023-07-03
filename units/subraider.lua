@@ -1,5 +1,4 @@
 return { subraider = {
-  unitname               = [[subraider]],
   name                   = [[Seawolf]],
   description            = [[Raider Submarine (Anti-Sub, Undersea Fire)]],
   acceleration           = 0.36,

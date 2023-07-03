@@ -1,5 +1,4 @@
 return { napalmmissile = {
-  unitname                      = [[napalmmissile]],
   name                          = [[Inferno]],
   description                   = [[Napalm Missile]],
   builder                       = false,

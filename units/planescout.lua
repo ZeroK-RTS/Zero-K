@@ -1,5 +1,4 @@
 return { planescout = {
-  unitname            = [[planescout]],
   name                = [[Owl]],
   description         = [[Area Jammer, Radar/Sonar Plane]],
   brakerate           = 0.4,

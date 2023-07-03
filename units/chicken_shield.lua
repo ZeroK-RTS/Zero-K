@@ -1,5 +1,4 @@
 return { chicken_shield = {
-  unitname            = [[chicken_shield]],
   name                = [[Blooper]],
   description         = [[Shield/Anti-Air]],
   acceleration        = 1.08,

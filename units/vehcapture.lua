@@ -1,5 +1,4 @@
 return { vehcapture = {
-  unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
   description         = [[Capture Rover]],
   acceleration        = 0.266,

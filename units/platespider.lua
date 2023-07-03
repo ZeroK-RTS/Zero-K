@@ -1,5 +1,4 @@
 return { platespider = {
-  unitname                      = [[platespider]],
   name                          = [[Spider Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

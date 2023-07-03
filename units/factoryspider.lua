@@ -1,5 +1,4 @@
 return { factoryspider = {
-  unitname                      = [[factoryspider]],
   name                          = [[Spider Factory]],
   description                   = [[Produces Spiders]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

@@ -1,5 +1,4 @@
 return { assaultcruiser = {
-  unitname               = [[assaultcruiser]],
   name                   = [[Vanquisher]],
   description            = [[Heavy Cruiser (Assault)]],
   acceleration           = 0.384,

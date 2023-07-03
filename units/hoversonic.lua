@@ -1,5 +1,4 @@
 return { hoversonic = {
-  unitname            = [[hoversonic]],
   name                = [[Morningstar]],
   description         = [[Antisub Hovercraft]],
   acceleration        = 0.24,

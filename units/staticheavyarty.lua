@@ -1,5 +1,4 @@
 return { staticheavyarty = {
-  unitname                      = [[staticheavyarty]],
   name                          = [[Big Bertha]],
   description                   = [[Strategic Plasma Cannon]],
   builder                       = false,

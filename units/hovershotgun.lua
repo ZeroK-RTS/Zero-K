@@ -1,5 +1,4 @@
 return { hovershotgun = {
-  unitname            = [[hovershotgun]],
   name                = [[Punisher]],
   description         = [[Shotgun Hover]],
   acceleration        = 0.24,

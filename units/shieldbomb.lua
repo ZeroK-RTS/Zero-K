@@ -1,5 +1,4 @@
 return { shieldbomb = {
-  unitname               = [[shieldbomb]],
   name                   = [[Snitch]],
   description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.75,

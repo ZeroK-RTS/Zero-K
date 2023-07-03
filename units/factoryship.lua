@@ -1,5 +1,4 @@
 return { factoryship = {
-  unitname               = [[factoryship]],
   name                   = [[Shipyard]],
   description            = [[Produces Naval Units]],
   buildDistance          = Shared.FACTORY_PLATE_RANGE,

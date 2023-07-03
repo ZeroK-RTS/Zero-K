@@ -1,5 +1,4 @@
 return { amphbomb = {
-  unitname               = [[amphbomb]],
   name                   = [[Limpet]],
   description            = [[Amphibious Slow Bomb]],
   acceleration           = 0.45,

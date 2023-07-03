@@ -1,5 +1,4 @@
 return { jumpblackhole = {
-  unitname              = [[jumpblackhole]],
   name                  = [[Placeholder]],
   description           = [[Black Hole Launcher]],
   acceleration          = 1.2,

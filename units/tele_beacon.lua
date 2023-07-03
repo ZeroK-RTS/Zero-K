@@ -1,5 +1,4 @@
 return { tele_beacon = {
-  unitname                      = [[tele_beacon]],
   name                          = [[Lamp]],
   description                   = [[Teleport Bridge Entry Beacon, right click to teleport.]],
   builder                       = false,

@@ -1,5 +1,4 @@
 return { chicken_pigeon = {
-  unitname            = [[chicken_pigeon]],
   name                = [[Pigeon]],
   description         = [[Flying Spore Scout]],
   activateWhenBuilt   = true,

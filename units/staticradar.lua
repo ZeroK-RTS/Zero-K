@@ -1,5 +1,4 @@
 return { staticradar = {
-  unitname                      = [[staticradar]],
   name                          = [[Radar Tower]],
   description                   = [[Early Warning System]],
   activateWhenBuilt             = true,

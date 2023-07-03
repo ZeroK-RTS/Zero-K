@@ -1,5 +1,4 @@
 return { bomberdisarm = {
-  unitname            = [[bomberdisarm]],
   name                = [[Thunderbird]],
   description         = [[Disarming Lightning Bomber]],
   brakerate           = 0.4,

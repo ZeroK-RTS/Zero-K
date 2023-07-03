@@ -1,5 +1,4 @@
 return { shipcon = {
-  unitname               = [[shipcon]],
   name                   = [[Mariner]],
   description            = [[Construction Ship]],
   acceleration           = 0.307,

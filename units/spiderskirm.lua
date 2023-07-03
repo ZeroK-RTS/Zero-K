@@ -1,5 +1,4 @@
 return { spiderskirm = {
-  unitname               = [[spiderskirm]],
   name                   = [[Recluse]],
   description            = [[Skirmisher Spider (Indirect Fire)]],
   acceleration           = 0.78,

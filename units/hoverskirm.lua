@@ -1,5 +1,4 @@
 return { hoverskirm = {
-  unitname            = [[hoverskirm]],
   name                = [[Scalpel]],
   description         = [[Skirmisher/Anti-Heavy Hovercraft]],
   acceleration        = 0.24,

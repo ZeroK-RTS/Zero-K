@@ -1,5 +1,4 @@
 return { tankheavyarty = {
-  unitname               = [[tankheavyarty]],
   name                   = [[Tremor]],
   description            = [[Heavy Saturation Artillery Tank]],
   acceleration           = 0.36,

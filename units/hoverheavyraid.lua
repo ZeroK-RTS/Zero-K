@@ -1,5 +1,4 @@
 return { hoverheavyraid = {
-  unitname            = [[hoverheavyraid]],
   name                = [[Bolas]],
   description         = [[Disruptor Hovercraft]],
   acceleration        = 0.18,

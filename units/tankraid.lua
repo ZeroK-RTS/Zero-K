@@ -1,5 +1,4 @@
 return { tankraid = {
-  unitname            = [[tankraid]],
   name                = [[Kodachi]],
   description         = [[Raider Tank]],
   acceleration        = 0.75,

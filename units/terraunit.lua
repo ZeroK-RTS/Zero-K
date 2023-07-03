@@ -1,5 +1,4 @@
 return { terraunit = {
-  unitname               = [[terraunit]],
   name                   = [[Terraform]],
   description            = [[Spent: 0]],
   builder                = false,

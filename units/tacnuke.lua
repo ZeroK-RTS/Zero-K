@@ -1,5 +1,4 @@
 return { tacnuke = {
-  unitname                      = [[tacnuke]],
   name                          = [[Eos]],
   description                   = [[Tactical Nuke]],
   builder                       = false,

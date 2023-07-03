@@ -1,5 +1,4 @@
 return { chicken_rafflesia = {
-  unitname                      = [[chicken_rafflesia]],
   name                          = [[Rafflesia]],
   description                   = [[Chicken Shield (Static)]],
   activateWhenBuilt             = true,

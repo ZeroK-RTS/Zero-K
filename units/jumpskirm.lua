@@ -1,5 +1,4 @@
 return { jumpskirm = {
-  unitname            = [[jumpskirm]],
   name                = [[Moderator]],
   description         = [[Disruptor Skirmisher Walker]],
   acceleration        = 0.6,

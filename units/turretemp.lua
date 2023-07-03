@@ -1,5 +1,4 @@
 return { turretemp = {
-  unitname                      = [[turretemp]],
   name                          = [[Faraday]],
   description                   = [[EMP Turret]],
   builder                       = false,

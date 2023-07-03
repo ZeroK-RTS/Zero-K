@@ -1,5 +1,4 @@
 return { turretaaclose = {
-  unitname                      = [[turretaaclose]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
   builder                       = false,

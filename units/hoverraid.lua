@@ -1,5 +1,4 @@
 return { hoverraid = {
-  unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft (Anti-Sub)]],
   acceleration        = 0.384,

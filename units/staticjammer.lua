@@ -1,5 +1,4 @@
 return { staticjammer = {
-  unitname                      = [[staticjammer]],
   name                          = [[Cornea]],
   description                   = [[Area Cloaker/Jammer]],
   activateWhenBuilt             = true,

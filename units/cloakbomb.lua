@@ -1,5 +1,4 @@
 return { cloakbomb = {
-  unitname               = [[cloakbomb]],
   name                   = [[Imp]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.75,

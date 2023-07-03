@@ -1,5 +1,4 @@
 return { vehcon = {
-  unitname               = [[vehcon]],
   name                   = [[Mason]],
   description            = [[Construction Rover]],
   acceleration           = 0.4,

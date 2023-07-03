@@ -1,5 +1,4 @@
 return { vehaa = {
-  unitname               = [[vehaa]],
   name                   = [[Crasher]],
   description            = [[Fast Anti-Air Rover]],
   acceleration           = 0.36,

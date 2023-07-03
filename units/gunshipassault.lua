@@ -1,5 +1,4 @@
 return { gunshipassault = {
-  unitname            = [[gunshipassault]],
   name                = [[Revenant]],
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.15,

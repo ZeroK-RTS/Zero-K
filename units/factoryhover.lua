@@ -1,5 +1,4 @@
 return { factoryhover = {
-  unitname                      = [[factoryhover]],
   name                          = [[Hovercraft Platform]],
   description                   = [[Produces Hovercraft]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

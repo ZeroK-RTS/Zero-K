@@ -1,5 +1,4 @@
 return { shiparty = {
-  unitname               = [[shiparty]],
   name                   = [[Envoy]],
   description            = [[Artillery Cruiser]],
   acceleration           = 0.25,

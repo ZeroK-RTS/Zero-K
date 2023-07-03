@@ -1,5 +1,4 @@
 return { raveparty = {
-  unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
   builder                       = false,

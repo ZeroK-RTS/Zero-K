@@ -1,5 +1,4 @@
 return { factoryveh = {
-  unitname                      = [[factoryveh]],
   name                          = [[Rover Assembly]],
   description                   = [[Produces Rovers]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

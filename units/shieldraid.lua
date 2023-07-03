@@ -1,5 +1,4 @@
 return { shieldraid = {
-  unitname               = [[shieldraid]],
   name                   = [[Bandit]],
   description            = [[Medium-Light Raider Bot]],
   acceleration           = 1.5,

@@ -1,5 +1,4 @@
 return { factorycloak = {
-  unitname                      = [[factorycloak]],
   name                          = [[Cloakbot Factory]],
   description                   = [[Produces Cloaked, Mobile Robots]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

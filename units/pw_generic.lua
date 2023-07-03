@@ -1,5 +1,4 @@
 return { pw_generic = {
-  unitname                      = [[pw_generic]],
   name                          = [[Generic Neutral Structure]],
   description                   = [[Blank]],
   activateWhenBuilt             = true,

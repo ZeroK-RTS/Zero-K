@@ -1,5 +1,4 @@
 return { striderhub = {
-  unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
   description                   = [[Constructs Striders]],
   buildDistance                 = 300,

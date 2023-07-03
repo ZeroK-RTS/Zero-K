@@ -1,5 +1,4 @@
 return { plateplane = {
-  unitname                      = [[plateplane]],
   name                          = [[Airplane Plate]],
   description                   = [[Parallel Unit Production]],
   activateWhenBuilt             = false,

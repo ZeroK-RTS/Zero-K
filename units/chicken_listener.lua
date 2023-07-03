@@ -1,5 +1,4 @@
 return { chicken_listener = {
-  unitname            = [[chicken_listener]],
   name                = [[Listener]],
   description         = [[Burrowing Mobile Seismic Detector]],
   acceleration        = 0.48,

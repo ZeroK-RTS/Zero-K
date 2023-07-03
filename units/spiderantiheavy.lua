@@ -1,5 +1,4 @@
 return { spiderantiheavy = {
-  unitname              = [[spiderantiheavy]],
   name                  = [[Widow]],
   description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.9,

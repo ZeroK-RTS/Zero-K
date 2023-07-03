@@ -1,5 +1,4 @@
 return { striderdetriment = {
-  unitname               = [[striderdetriment]],
   name                   = [[Detriment]],
   description            = [[Ultimate Assault Strider (Undersea Fire)]],
   acceleration           = 0.328,

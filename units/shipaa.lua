@@ -1,5 +1,4 @@
 return { shipaa = {
-  unitname               = [[shipaa]],
 
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],

@@ -1,5 +1,4 @@
 return { seismic = {
-  unitname                      = [[seismic]],
   name                          = [[Quake]],
   description                   = [[Seismic Missile]],
   builder                       = false,

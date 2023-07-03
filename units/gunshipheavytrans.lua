@@ -1,5 +1,4 @@
 return { gunshipheavytrans = {
-  unitname               = [[gunshipheavytrans]],
   name                   = [[Hercules]],
   description            = [[Armed Heavy Air Transport]],
   acceleration           = 0.2,

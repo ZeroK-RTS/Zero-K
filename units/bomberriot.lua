@@ -1,5 +1,4 @@
 return { bomberriot = {
-  unitname            = [[bomberriot]],
   name                = [[Phoenix]],
   description         = [[Saturation Napalm Bomber]],
   brakerate           = 0.4,

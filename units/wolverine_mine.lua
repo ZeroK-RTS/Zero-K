@@ -1,5 +1,4 @@
 return { wolverine_mine = {
-  unitname               = [[wolverine_mine]],
   name                   = [[Claw]],
   description            = [[Badger Mine]],
   activateWhenBuilt      = false,

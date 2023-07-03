@@ -1,5 +1,4 @@
 return { chicken_dragon = {
-  unitname               = [[chicken_dragon]],
   name                   = [[White Dragon]],
   description            = [[Prime Assault Chicken]],
   acceleration           = 6.0,

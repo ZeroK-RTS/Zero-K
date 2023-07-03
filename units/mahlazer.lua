@@ -1,5 +1,4 @@
 return { mahlazer = {
-  unitname                      = [[mahlazer]],
   name                          = [[Starlight]],
   description                   = [[Planetary Energy Chisel]],
   activateWhenBuilt             = true,

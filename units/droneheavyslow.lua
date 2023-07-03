@@ -1,5 +1,4 @@
 return { droneheavyslow = {
-  unitname            = [[droneheavyslow]],
   name                = [[Viper]],
   description         = [[Advanced Battle Drone]],
   acceleration        = 0.3,

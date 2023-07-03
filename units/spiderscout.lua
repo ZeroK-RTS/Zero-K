@@ -1,5 +1,4 @@
 return { spiderscout = {
-  unitname            = [[spiderscout]],
   name                = [[Flea]],
   description         = [[Ultralight Scout Spider (Burrows)]],
   acceleration        = 2.1,

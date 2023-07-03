@@ -3,7 +3,6 @@
      Zero Wars, possibly others) have already started using it ]]
 
 return { chicken_drone_starter = {
-  unitname            = [[chicken_drone_starter]],
   name                = [[Drone]],
   description         = [[Morphs Into Chicken Structures]],
   acceleration        = 1.08,

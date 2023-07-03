@@ -1,5 +1,4 @@
 return { hoverarty = {
-  unitname            = [[hoverarty]],
   name                = [[Lance]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.096,

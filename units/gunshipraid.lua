@@ -1,5 +1,4 @@
 return { gunshipraid = {
-  unitname               = [[gunshipraid]],
   name                   = [[Locust]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,

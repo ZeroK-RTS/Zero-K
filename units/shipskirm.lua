@@ -1,5 +1,4 @@
 return { shipskirm = {
-  unitname               = [[shipskirm]],
   name                   = [[Mistral]],
   description            = [[Skirmisher Ship]],
   acceleration           = 0.234,

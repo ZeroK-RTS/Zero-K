@@ -1,5 +1,4 @@
 return { staticstorage = {
-  unitname                      = [[staticstorage]],
   name                          = [[Storage]],
   description                   = [[Stores Metal and Energy (500)]],
   activateWhenBuilt             = true,

@@ -1,5 +1,4 @@
 return { chicken_drone = {
-  unitname            = [[chicken_drone]],
   name                = [[Drone]],
   description         = [[Morphs Into Chicken Structures]],
   acceleration        = 1.08,

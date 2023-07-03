@@ -1,5 +1,4 @@
 return { energypylon = {
-  unitname                      = [[energypylon]],
   name                          = [[Energy Pylon]],
   description                   = [[Extends overdrive grid]],
   activateWhenBuilt             = true,

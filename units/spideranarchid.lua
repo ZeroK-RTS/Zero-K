@@ -1,5 +1,4 @@
 return { spideranarchid = {
-  unitname               = [[spideranarchid]],
   name                   = [[Anarchid]],
   description            = [[Riot EMP Spider]],
   acceleration           = 0.78,

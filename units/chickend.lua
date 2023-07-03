@@ -1,5 +1,4 @@
 return { chickend = {
-  unitname                      = [[chickend]],
   name                          = [[Chicken Tube]],
   description                   = [[Defence and energy source]],
   activateWhenBuilt             = true,

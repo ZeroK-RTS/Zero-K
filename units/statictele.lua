@@ -1,5 +1,4 @@
 return { statictele = {
-  unitname                      = [[statictele]],
   name                          = [[Teleporter]],
   description                   = [[Blank]],
   activateWhenBuilt             = true,

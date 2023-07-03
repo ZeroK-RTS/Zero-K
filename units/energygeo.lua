@@ -1,5 +1,4 @@
 return { energygeo = {
-  unitname                      = [[energygeo]],
   name                          = [[Geothermal Generator]],
   description                   = [[Medium Powerplant (+25)]],
   activateWhenBuilt             = true,

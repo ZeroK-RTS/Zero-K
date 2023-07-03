@@ -1,5 +1,4 @@
 return { turretlaser = {
-  unitname                      = [[turretlaser]],
   name                          = [[Lotus]],
   description                   = [[Light Laser Tower]],
   builder                       = false,

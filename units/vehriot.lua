@@ -1,5 +1,4 @@
 return { vehriot = {
-  unitname            = [[vehriot]],
   name                = [[Ripper]],
   description         = [[Riot Rover]],
   acceleration        = 0.191,

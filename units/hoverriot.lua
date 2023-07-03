@@ -1,5 +1,4 @@
 return { hoverriot = {
-  unitname            = [[hoverriot]],
   name                = [[Mace]],
   description         = [[Riot Hover]],
   acceleration        = 0.168,

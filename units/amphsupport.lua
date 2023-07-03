@@ -1,5 +1,4 @@
 return { amphsupport = {
-  unitname               = [[amphsupport]],
   name                   = [[Bulkhead]],
   description            = [[Deployable Amphibious Fire Support (must stop to fire)]],
   acceleration           = 0.4,

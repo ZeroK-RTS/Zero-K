@@ -1,5 +1,4 @@
 return { turretmissile = {
-  unitname                      = [[turretmissile]],
   name                          = [[Picket]],
   description                   = [[Light Missile Tower]],
   builder                       = false,

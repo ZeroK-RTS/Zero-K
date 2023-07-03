@@ -1,5 +1,4 @@
 return { chickenblobber = {
-  unitname            = [[chickenblobber]],
   name                = [[Blobber]],
   description         = [[Heavy Artillery]],
   acceleration        = 1.3,

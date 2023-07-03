@@ -1,5 +1,4 @@
 return { damagesink = {
-  unitname                = [[damagesink]],
   name                    = [[Damage Sink thing]],
   description             = [[Does not care if you shoot at it.]],
   autoHeal                = 500000,

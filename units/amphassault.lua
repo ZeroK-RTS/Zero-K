@@ -1,5 +1,4 @@
 return { amphassault = {
-  unitname            = [[amphassault]],
   name                = [[Grizzly]],
   description         = [[Heavy Amphibious Assault Walker]],
   acceleration        = 0.3,

@@ -1,5 +1,4 @@
 return { striderarty = {
-  unitname               = [[striderarty]],
   name                   = [[Merlin]],
   description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.328,

@@ -1,5 +1,4 @@
 return { chickena = {
-  unitname            = [[chickena]],
   name                = [[Cockatrice]],
   description         = [[Assault/Anti-Armor]],
   acceleration        = 1.08,

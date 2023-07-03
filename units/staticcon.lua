@@ -1,5 +1,4 @@
 return { staticcon = {
-  unitname                      = [[staticcon]],
   name                          = [[Caretaker]],
   description                   = [[Construction Assistant]],
   buildDistance                 = 500,

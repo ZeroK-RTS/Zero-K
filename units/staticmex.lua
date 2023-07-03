@@ -1,5 +1,4 @@
 return { staticmex = {
-  unitname               = [[staticmex]],
   name                   = [[Metal Extractor]],
   description            = [[Produces Metal]],
   activateWhenBuilt      = true,

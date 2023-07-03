@@ -1,5 +1,4 @@
 return { hovercon = {
-  unitname            = [[hovercon]],
   name                = [[Quill]],
   description         = [[Construction Hovercraft]],
   acceleration        = 0.4,

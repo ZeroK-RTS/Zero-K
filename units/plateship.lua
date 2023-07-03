@@ -1,5 +1,4 @@
 return { plateship = {
-  unitname                      = [[plateship]],
   name                          = [[Ship Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

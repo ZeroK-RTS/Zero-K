@@ -1,5 +1,4 @@
 return { corcom1 = {
-  unitname            = [[corcom1]],
   name                = [[Battle Commander]],
   description         = [[Heavy Combat Commander]],
   acceleration        = 0.54,

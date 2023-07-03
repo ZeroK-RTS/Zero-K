@@ -1,5 +1,4 @@
 return { cremcom1 = {
-  unitname               = [[cremcom1]],
   name                   = [[Commander]],
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,

@@ -1,5 +1,4 @@
 return { turretantiheavy = {
-  unitname                      = [[turretantiheavy]],
   name                          = [[Lucifer]],
   description                   = [[Tachyon Projector - Power by connecting to a 50 energy grid]],
   activateWhenBuilt             = true,

@@ -1,5 +1,4 @@
 return { shieldassault = {
-  unitname            = [[shieldassault]],
   name                = [[Thug]],
   description         = [[Shielded Assault Bot]],
   acceleration        = 0.75,

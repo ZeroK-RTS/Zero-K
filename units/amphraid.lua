@@ -1,5 +1,4 @@
 return { amphraid = {
-  unitname               = [[amphraid]],
   name                   = [[Duck]],
   description            = [[Amphibious Raider (Anti-Sub, Undersea Fire)]],
   acceleration           = 0.54,

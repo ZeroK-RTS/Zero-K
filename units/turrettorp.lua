@@ -1,5 +1,4 @@
 return { turrettorp = {
-  unitname          = [[turrettorp]],
   name              = [[Urchin]],
   description       = [[Torpedo Launcher (Anti-Sub)]],
   activateWhenBuilt = true,

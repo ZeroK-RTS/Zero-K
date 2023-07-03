@@ -1,5 +1,4 @@
 return { cloakskirm = {
-  unitname               = [[cloakskirm]],
   name                   = [[Ronin]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
   acceleration           = 0.9,

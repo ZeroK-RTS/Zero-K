@@ -1,5 +1,4 @@
 return { shipriot = {
-  unitname               = [[shipriot]],
   name                   = [[Corsair]],
   description            = [[Raider/Riot Corvette]],
   acceleration           = 0.25,

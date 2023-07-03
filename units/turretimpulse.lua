@@ -1,5 +1,4 @@
 return { turretimpulse = {
-  unitname                      = [[turretimpulse]],
   name                          = [[Newton]],
   description                   = [[Gravity Turret]],
   activateWhenBuilt             = true,

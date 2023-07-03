@@ -1,5 +1,4 @@
 return { vehraid = {
-  unitname               = [[vehraid]],
   name                   = [[Scorcher]],
   description            = [[Raider Rover]],
   acceleration           = 0.342,

@@ -1,5 +1,4 @@
 return { shieldfelon = {
-  unitname            = [[shieldfelon]],
   name                = [[Felon]],
   description         = [[Shielded Riot/Skirmisher Bot]],
   acceleration        = 0.75,

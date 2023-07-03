@@ -1,5 +1,4 @@
 return { dronefighter = {
-  unitname               = [[dronefighter]],
   name                   = [[Spicula]],
   description            = [[Fighter Drone]],
   brakerate              = 0.4,

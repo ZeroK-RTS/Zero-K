@@ -1,5 +1,4 @@
 return { gunshipaa = {
-  unitname               = [[gunshipaa]],
   name                   = [[Trident]],
   description            = [[Anti-Air Gunship]],
   acceleration           = 0.18,

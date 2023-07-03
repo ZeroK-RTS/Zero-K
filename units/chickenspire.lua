@@ -1,5 +1,4 @@
 return { chickenspire = {
-  unitname                      = [[chickenspire]],
   name                          = [[Chicken Spire]],
   description                   = [[Static Artillery]],
   activateWhenBuilt             = true,

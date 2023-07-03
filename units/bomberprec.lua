@@ -1,5 +1,4 @@
 return { bomberprec = {
-  unitname            = [[bomberprec]],
   name                = [[Raven]],
   description         = [[Precision Bomber (Anti-Sub)]],
   brakerate           = 0.4,

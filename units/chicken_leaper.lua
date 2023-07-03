@@ -1,5 +1,4 @@
 return { chicken_leaper = {
-  unitname            = [[chicken_leaper]],
   name                = [[Leaper]],
   description         = [[Hopping Raider]],
   acceleration        = 1.5,

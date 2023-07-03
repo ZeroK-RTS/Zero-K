@@ -1,6 +1,5 @@
 local included = VFS.Include("units/dynstrike1.lua")
 local unitDef = included.dynstrike1
-unitDef.unitname = "dynknight1"
 unitDef.buildPic = [[cremcom.png]]
 unitDef.objectName = [[cremcom.s3o]]
 unitDef.script  = [[dynknight.lua]]

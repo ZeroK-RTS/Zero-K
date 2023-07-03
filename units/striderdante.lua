@@ -1,5 +1,4 @@
 return { striderdante = {
-  unitname            = [[striderdante]],
   name                = [[Dante]],
   description         = [[Assault/Riot Strider]],
   acceleration        = 0.295,

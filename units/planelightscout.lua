@@ -1,5 +1,4 @@
 return { planelightscout = {
-  unitname            = [[planelightscout]],
   name                = [[Sparrow]],
   description         = [[Light Scout Plane]],
   brakerate           = 0.4,

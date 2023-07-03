@@ -1,5 +1,4 @@
 return { factoryamph = {
-  unitname                      = [[factoryamph]],
   name                          = [[Amphbot Factory]],
   description                   = [[Produces Amphibious Bots]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

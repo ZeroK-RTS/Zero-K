@@ -1,5 +1,4 @@
 return { platehover = {
-  unitname                      = [[platehover]],
   name                          = [[Hovercraft Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

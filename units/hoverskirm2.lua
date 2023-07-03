@@ -1,5 +1,4 @@
 return { hoverskirm2 = {
-  unitname            = [[hoverskirm2]],
   name                = [[Trisula]],
   description         = [[Light Assault/Battle Hovercraft]],
   acceleration        = 0.15,

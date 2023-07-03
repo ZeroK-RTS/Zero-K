@@ -1,5 +1,4 @@
 return { commstrike1 = {
-  unitname               = [[commstrike1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,

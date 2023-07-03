@@ -1,5 +1,4 @@
 return { staticsonar = {
-  unitname          = [[staticsonar]],
   name              = [[Sonar Station]],
   description       = [[Locates Water Units]],
   activateWhenBuilt = true,

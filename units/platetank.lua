@@ -1,5 +1,4 @@
 return { platetank = {
-  unitname                      = [[platetank]],
   name                          = [[Tank Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

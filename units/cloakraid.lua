@@ -1,5 +1,4 @@
 return { cloakraid = {
-  unitname               = [[cloakraid]],
   name                   = [[Glaive]],
   description            = [[Light Raider Bot]],
   acceleration           = 1.5,

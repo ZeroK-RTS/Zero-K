@@ -1,5 +1,4 @@
 return { neebcomm = {
-  unitname            = [[neebcomm]],
   name                = [[Neeb Comm]],
   description         = [[Ugly Turkey]],
   acceleration        = 0.6,

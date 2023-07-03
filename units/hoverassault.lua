@@ -1,5 +1,4 @@
 return { hoverassault = {
-  unitname            = [[hoverassault]],
   name                = [[Halberd]],
   description         = [[Blockade Runner Hover]],
   acceleration        = 0.288,

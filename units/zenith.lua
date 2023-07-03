@@ -1,5 +1,4 @@
 return { zenith = {
-  unitname                      = [[zenith]],
   name                          = [[Zenith]],
   description                   = [[Meteor Controller]],
   activateWhenBuilt             = true,

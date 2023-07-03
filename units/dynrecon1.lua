@@ -1,5 +1,4 @@
 return { dynrecon1 = {
-  unitname            = [[dynrecon1]],
   name                = [[Recon Commander]],
   description         = [[High Mobility Commander]],
   acceleration        = 0.75,

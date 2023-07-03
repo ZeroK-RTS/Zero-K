@@ -853,8 +853,8 @@ end
 
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
 	local hpMulti = modOptions.hpmult
-	for unitDefID, unitDef in pairs(UnitDefs) do
-		if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
+	for name, unitDef in pairs(UnitDefs) do
+		if unitDef.maxdamage and name ~= "terraunit" then
 			unitDef.maxdamage = math.max(unitDef.maxdamage * hpMulti, 1)
 		end
 	end
@@ -878,7 +878,7 @@ end
 --
 
 --[[for name, ud in pairs(UnitDefs) do
-	if (ud.unitname:sub(1,7) == "chicken") then
+	if (name:sub(1,7) == "chicken") then
 		ud.metalcost = ud.buildtime
 		ud.energycost = ud.buildtime
 	end

@@ -1,5 +1,4 @@
 return { amphfloater = {
-  unitname               = [[amphfloater]],
   name                   = [[Buoy]],
   description            = [[Heavy Amphibious Skirmisher Bot]],
   acceleration           = 0.6,

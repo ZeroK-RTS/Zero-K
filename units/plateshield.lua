@@ -1,5 +1,4 @@
 return { plateshield = {
-  unitname                      = [[plateshield]],
   name                          = [[Shieldbot Plate]],
   description                   = [[Parallel Unit Production]],
   buildDistance                 = Shared.FACTORY_PLATE_RANGE,

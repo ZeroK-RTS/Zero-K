@@ -1,5 +1,4 @@
 return { athena = {
-  unitname            = [[athena]],
   name                = [[Athena]],
   description         = [[Airborne SpecOps Engineer]],
   acceleration        = 0.1,

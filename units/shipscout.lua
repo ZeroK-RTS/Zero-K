@@ -1,5 +1,4 @@
 return { shipscout = {
-  unitname               = [[shipscout]],
   name                   = [[Cutter]],
   description            = [[Scout Ship (Disarming)]],
   acceleration           = 0.6,

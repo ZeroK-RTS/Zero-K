@@ -1,5 +1,4 @@
 return { fakeunit_los = {
-  unitname              = [[fakeunit_los]],
   name                  = [[LOS Provider]],
   description           = [[Knows all and sees all]],
   acceleration          = 1,

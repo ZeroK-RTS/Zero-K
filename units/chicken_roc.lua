@@ -1,5 +1,4 @@
 return { chicken_roc = {
-  unitname            = [[chicken_roc]],
   name                = [[Roc]],
   description         = [[Heavy Attack Flyer]],
   acceleration        = 1.2,

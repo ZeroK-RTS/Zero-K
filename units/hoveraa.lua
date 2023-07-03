@@ -1,5 +1,4 @@
 return { hoveraa = {
-  unitname            = [[hoveraa]],
   name                = [[Flail]],
   description         = [[Anti-Air Hovercraft]],
   acceleration        = 0.288,

@@ -1,5 +1,4 @@
 return { gunshipskirm = {
-  unitname               = [[gunshipskirm]],
   name                   = [[Harpy]],
   description            = [[Multi-Role Support Gunship]],
   acceleration           = 0.152,

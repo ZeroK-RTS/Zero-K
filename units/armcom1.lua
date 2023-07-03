@@ -1,5 +1,4 @@
 return { armcom1 = {
-  unitname               = [[armcom1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.54,

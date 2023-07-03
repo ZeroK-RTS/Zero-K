@@ -1,5 +1,4 @@
 return { turretgauss = {
-  unitname                      = [[turretgauss]],
   name                          = [[Gauss]],
   description                   = [[Popup gauss turret, regenerates when closed (Anti-Sub)]],
   builder                       = false,

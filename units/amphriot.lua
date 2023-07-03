@@ -1,5 +1,4 @@
 return { amphriot = {
-  unitname               = [[amphriot]],
   name                   = [[Scallop]],
   description            = [[Amphibious Riot Bot (Undersea Fire)]],
   acceleration           = 0.54,

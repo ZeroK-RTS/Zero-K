@@ -1,5 +1,4 @@
 return { gunshipkrow = {
-  unitname               = [[gunshipkrow]],
   name                   = [[Krow]],
   description            = [[Flying Fortress]],
   acceleration           = 0.09,

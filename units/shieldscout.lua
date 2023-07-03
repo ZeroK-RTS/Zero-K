@@ -1,5 +1,4 @@
 return { shieldscout = {
-  unitname               = [[shieldscout]],
   name                   = [[Dirtbag]],
   description            = [[Box of Dirt]],
   acceleration           = 0.6,

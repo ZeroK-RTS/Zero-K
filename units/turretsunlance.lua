@@ -1,5 +1,4 @@
 return { turretsunlance = {
-  unitname                      = [[turretsunlance]],
   name                          = [[Sunlance]],
   description                   = [[Anti-Tank Turret - Requires 25 Power]],
   activateWhenBuilt             = true,

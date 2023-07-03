@@ -1,5 +1,4 @@
 return { cloakjammer = {
-  unitname               = [[cloakjammer]],
   name                   = [[Iris]],
   description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.75,
