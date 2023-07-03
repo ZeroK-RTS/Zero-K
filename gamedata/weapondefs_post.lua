@@ -453,3 +453,14 @@ if Script and Script.IsEngineMinVersion(105, 0, 1578) then
 		end
 	end
 end
+
+--[[ Burst-rate limits the actual fire-rate even if burst=1,
+     and the engine defaults it to 0.1, so modders who set
+     reload time to 0.066 or 0.033 would not see any effect
+     unless they also knew about burstRate (or if the weapon
+     happened to be a beamlaser, who worked correctly). ]]
+for name, weaponDef in pairs(WeaponDefs) do
+	if not weaponDef.burstrate then
+		weaponDef.burstrate = 0
+	end
+end
