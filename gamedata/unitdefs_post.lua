@@ -1029,3 +1029,14 @@ if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 		ud.buildcostenergy = ud.energycost
 	end
 end
+
+if Game.gameSpeed ~= 30 then
+	local FPS_SCALE = 30 / Game.gameSpeed
+	for name, ud in pairs(UnitDefs) do
+		if ud.maxvelocity        then ud.maxvelocity        = ud.maxvelocity        * FPS_SCALE end
+		if ud.maxreversevelocity then ud.maxreversevelocity = ud.maxreversevelocity * FPS_SCALE end
+		if ud.acceleration       then ud.acceleration       = ud.acceleration       * FPS_SCALE end
+		if ud.brakerate          then ud.brakerate          = ud.brakerate          * FPS_SCALE end
+		if ud.turnrate           then ud.turnrate           = ud.turnrate           * FPS_SCALE end
+	end
+end
