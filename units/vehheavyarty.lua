@@ -14,6 +14,9 @@ return { vehheavyarty = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    chase_everything = 1, -- don't ignore solars. Doesn't chase mobiles anyway
+    target_stupid_targets = 1, -- ditto, don't deprioritize solars (mobile stupid targets already deprioritized)
+
     bait_level_default = 2,
     dontfireatradarcommand = '0',
   },
@@ -28,7 +31,7 @@ return { vehheavyarty = {
   maxVelocity         = 2.0,
   metalCost           = 700,
   movementClass       = [[TANK3]],
-  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP MOBILE]],
   objectName          = [[core_diplomat.s3o]],
   script              = [[vehheavyarty.lua]],
   selfDestructAs      = [[BIG_UNITEX_MERL]],
@@ -54,7 +57,7 @@ return { vehheavyarty = {
 
     {
       def                = [[CORTRUCK_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 

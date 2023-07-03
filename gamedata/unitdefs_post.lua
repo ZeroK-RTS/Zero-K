@@ -611,7 +611,7 @@ end
 -- Avoid firing at unarmed
 --
 for name, ud in pairs(UnitDefs) do
-	if (ud.weapons and not ud.canfly) then
+	if ud.weapons and not ud.canfly and not ud.target_stupid_targets then
 		for wName, wDef in pairs(ud.weapons) do
 			if wDef.badtargetcategory then
 				wDef.badtargetcategory = wDef.badtargetcategory .. " STUPIDTARGET"
