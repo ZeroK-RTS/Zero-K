@@ -2,28 +2,14 @@
 {
   name=NuclearMissile;
   areaofeffect=1280;
-  collidefriendly=0;
-  commandfire=1;
   craterboost=6;
   cratermult=6;
   edgeeffectiveness=0.3;
-  energypershot=125000;
   explosiongenerator=custom:NUKE_600;
   firestarter=0;
   impulseboost=0.5;
   impulsefactor=0.2;
-  interceptedbyshieldtype=2;
-  metalpershot=1000;
-  range=72000;
-  reloadtime=120;
-  smoketrail=1;
   soundhit=explosion/ex_ultra1;
-  stockpile=1;
-  targetable=1;
-  tolerance=4000;
-  weaponacceleration=95;
-  weapontimer=9;
-  weaponvelocity=1600;
   [DAMAGE]
   {
     default=9500;

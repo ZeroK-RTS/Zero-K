@@ -7,12 +7,7 @@
   explosiongenerator=custom:FLASH2;
   impulseboost=0;
   impulsefactor=0.4;
-  interceptedbyshieldtype=1;
-  range=96;
-  reloadtime=3.6;
   soundhit=explosion/ex_small1;
-  turret=1;
-  weaponvelocity=70;
   [DAMAGE]
   {
     default=5;

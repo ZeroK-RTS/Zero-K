@@ -7,12 +7,7 @@
   explosiongenerator=custom:FLASHSMALLUNITEX;
   impulseboost=0;
   impulsefactor=0.4;
-  interceptedbyshieldtype=1;
-  range=480;
-  reloadtime=3.6;
   soundhit=explosion/ex_med11;
-  turret=1;
-  weaponvelocity=250;
   [DAMAGE]
   {
     default=10;

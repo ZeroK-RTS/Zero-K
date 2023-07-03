@@ -5,8 +5,6 @@
   explosiongenerator=custom:none;
   impactOnly=1;
   impulsefactor=0;
-  interceptedbyshieldtype=0;
-  range=0;
   [DAMAGE]
   {
     default=0;

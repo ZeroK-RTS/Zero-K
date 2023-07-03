@@ -8,12 +8,7 @@
   explosiongenerator=custom:FLASHNUKE280;
   impulseboost=0;
   impulsefactor=0.4;
-  interceptedbyshieldtype=1;
-  range=400;
-  reloadtime=3.6;
   soundhit=explosion/mini_nuke;
-  turret=1;
-  weaponvelocity=250;
   [DAMAGE]
   {
     default=1000;
