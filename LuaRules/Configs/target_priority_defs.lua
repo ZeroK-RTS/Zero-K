@@ -9,6 +9,7 @@ local DISARM_ADD = 0.2
 local DISARM_ADD_TIME = 10*30 -- frames
 
 local weaponBadCats_fixedwing = {}
+local weaponBadCats_mobile = {}
 local weaponBadCats_gunship = {}
 local weaponBadCats_ground = {}
 local weaponBadCats_heavy = {}
@@ -52,9 +53,11 @@ end
 local unitIsGunship = {}
 local unitIsFixedwing = {}
 local unitIsGround = {}
+local unitIsMobile = {}
 local getMovetype = Spring.Utilities.getMovetype
 for i = 1, udCount do
 	local ud = UnitDefs[i]
+	unitIsMobile[i] = not ud.isImmobile
 	local unitType = getMovetype(ud) --1 gunship, 0 fixedplane, 2 ground/sea, false everything-else
 	if unitType == 1 then
 		unitIsGunship[i] = true
@@ -115,6 +118,15 @@ local unitIsHeavyHitter = {
 	[UnitDefNames["hoverskirm"].id] = true,
 	[UnitDefNames["striderbantha"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
+}
+
+-- Hardcore things that are bad vs mobiles
+local unitIsBadVsMobiles = {
+	[UnitDefNames["vehheavyarty"].id] = true,
+	[UnitDefNames["tacnuke"].id] = true,
+	[UnitDefNames["empmissile"].id] = true,
+	[UnitDefNames["napalmmissile"].id] = true,
+	-- Sling (cloakarty)? Is okay vs mobiles but should probably still prefer buildings
 }
 
 local unitIsCheap = {
@@ -274,6 +286,13 @@ for i = 1, udCount do
 			local realWD = wd.weaponDef
 			weaponBadCats_heavy[realWD] = true
 		end
+	elseif unitIsBadVsMobiles[i] then
+		local weapons = weaponsCache[i]
+		for j = 1, #weapons do
+			local wd = weapons[j]
+			local realWD = wd.weaponDef
+			weaponBadCats_mobile[realWD] = true
+		end
 	end
 end
 
@@ -340,6 +359,8 @@ local function GetPriority(uid, wid)
 			targetTable[uid][wid] = priority + 10
 		elseif (unitIsBomber[uid] and weaponIsAA[wid]) or (weaponBadCats_heavy[wid] and unitIsHeavy[uid]) then
 			targetTable[uid][wid] = priority*0.3
+		elseif weaponBadCats_mobile[wid] and unitIsMobile[uid] then
+			targetTable[uid][wid] = priority + 100
 		else
 			targetTable[uid][wid] = priority
 		end

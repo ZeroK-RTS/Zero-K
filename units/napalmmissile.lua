@@ -48,7 +48,7 @@ return { napalmmissile = {
 
     {
       def                = [[WEAPON]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[MOBILE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
