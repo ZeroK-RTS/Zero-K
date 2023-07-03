@@ -382,7 +382,7 @@ end
 
 --Time("Modify the velocity penalty")
 
-local reloadTimeAlpha = 1.8 --seconds, matches Ripper's reload time
+local reloadTimeAlpha = 1.76 -- seconds, matches Ripper's reload time
 local highAlphaWeaponDamages = {}
 for wid = 1, wdCount do
 	local wd = WeaponDefs[wid]
