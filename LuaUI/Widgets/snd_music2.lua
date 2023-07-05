@@ -110,6 +110,7 @@ local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 local defeat = false
 
 local spToggleSoundStreamPaused = Spring.PauseSoundStream
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -331,6 +332,9 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitExceptions[unitDefID] then
+		return
+	end
+	if spGetUnitRulesParam(unitID, "wasMorphedTo") then
 		return
 	end
 	local unitWorth = 50
