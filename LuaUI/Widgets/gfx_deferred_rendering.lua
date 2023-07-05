@@ -455,6 +455,9 @@ end
 local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam = 1
 	--Spring.Echo('Camera FOV = ', Spring.GetCameraFOV()) -- default TA cam fov = 45
 	--set uniforms:
+
+	glBlending(GL.DST_COLOR, GL.ONE)
+
 	local cpx, cpy, cpz = spGetCameraPosition()
 	if lighttype == 0 then --point
 		glUseShader(depthPointShader)
@@ -542,6 +545,7 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 		end
 	end
 	glUseShader(0)
+	glBlending(false)
 end
 
 local function renderToTextureFunc(tex, s, t)
