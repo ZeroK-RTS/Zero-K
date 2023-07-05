@@ -644,9 +644,9 @@ function widget:DrawScreenEffects()
 		end
 	end
 
-	glBlending(false)
-
 	if options.enableHDR.value then
 		Bloom()
 	end
+
+	glBlending(false)
 end
