@@ -53,6 +53,9 @@ return { energysingu = {
 
     DEAD = {
       blocking         = true,
+      collisionVolumeScales  = [[100 36 100]],
+      collisionVolumeOffsets = [[0 -33 0]],
+      collisionVolumeType    = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,

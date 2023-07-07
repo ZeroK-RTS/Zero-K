@@ -353,7 +353,7 @@ return { zenith = {
       footprintX       = 8,
       footprintZ       = 8,
       object           = [[zenith_dead.s3o]],
-      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeOffsets = [[10 0 0]],
       collisionVolumeScales  = [[90 194 90]],
       collisionVolumeType    = [[cylY]],
     },

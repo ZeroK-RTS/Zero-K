@@ -121,6 +121,8 @@ return { tankheavyarty = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales  = [[34 34 50]],
+      collisionVolumeType    = [[cylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

@@ -105,6 +105,8 @@ return { staticjammer = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[32 70 32]],
+      collisionVolumeType   = [[CylY]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

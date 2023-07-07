@@ -56,6 +56,9 @@ return { vehcon = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 5 0]],
+      collisionVolumeScales  = [[28 28 40]],
+      collisionVolumeType    = [[cylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

@@ -113,6 +113,8 @@ return { staticantinuke = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[70 55 110]],
+      collisionVolumeType   = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 8,

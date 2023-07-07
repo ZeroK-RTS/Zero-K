@@ -348,6 +348,8 @@ return { raveparty = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[70 194 70]],
+      collisionVolumeType   = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

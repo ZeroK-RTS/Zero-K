@@ -138,6 +138,8 @@ return { tankraid = {
 
     DEAD = {
       blocking         = true,
+      collisionVolumeScales = [[34 26 34]],
+	  collisionVolumeType   = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

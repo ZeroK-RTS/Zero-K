@@ -119,6 +119,9 @@ return { vehscout = {
 
     DEAD  = {
       blocking         = false,
+      collisionVolumeOffsets = [[0 0 2]],
+      collisionVolumeScales  = [[14 14 40]],
+      collisionVolumeType    = [[cylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

@@ -49,6 +49,9 @@ return { staticheavyradar = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 -8 0]],
+      collisionVolumeScales  = [[32 83 32]],
+      collisionVolumeType    = [[CylY]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

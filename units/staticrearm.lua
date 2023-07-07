@@ -57,6 +57,8 @@ return { staticrearm = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[130 40 130]],
+      collisionVolumeType   = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 9,
       footprintZ       = 9,

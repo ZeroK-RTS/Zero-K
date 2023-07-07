@@ -219,6 +219,8 @@ return { mahlazer = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[150 200 150]],
+      collisionVolumeType   = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 10,
       footprintZ       = 10,

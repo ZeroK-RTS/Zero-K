@@ -119,6 +119,8 @@ return { tankheavyraid = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[28 12 28]],
+      collisionVolumeType   = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

@@ -49,6 +49,8 @@ return { energypylon = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[42 42 42]],
+      collisionVolumeType   = [[cylY]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

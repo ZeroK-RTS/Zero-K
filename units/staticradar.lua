@@ -67,6 +67,9 @@ return { staticradar = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 -32 0]],
+      collisionVolumeScales  = [[32 90 32]],
+      collisionVolumeType    = [[CylY]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,

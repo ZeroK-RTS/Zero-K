@@ -124,6 +124,9 @@ return { vehsupport = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeOffsets = [[0 5 0]],
+      collisionVolumeScales  = [[26 30 36]],
+      collisionVolumeType    = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,

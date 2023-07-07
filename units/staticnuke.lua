@@ -106,6 +106,8 @@ return { staticnuke = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[90 55 115]],
+      collisionVolumeType   = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 8,

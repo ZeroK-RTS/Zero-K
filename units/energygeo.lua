@@ -54,6 +54,8 @@ return { energygeo = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales = [[84 84 84]],
+      collisionVolumeType   = [[ellipsoid]],
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,

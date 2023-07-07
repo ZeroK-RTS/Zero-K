@@ -119,6 +119,8 @@ return { vehheavyarty = {
 
     DEAD  = {
       blocking         = true,
+      collisionVolumeScales  = [[40 20 40]],
+      collisionVolumeType    = [[box]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
