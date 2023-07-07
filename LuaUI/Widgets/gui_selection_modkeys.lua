@@ -241,6 +241,13 @@ local function MouseRelease(x, y)
 		return
 	end
 	
+	-- The player has clicked on some other chili UI element
+	local activeControl = WG.Chili and WG.Chili.Screen0.activeControl
+	if activeControl then
+		Reset()
+		return
+	end
+	
 	local shouldSelect, targetID = ShouldSelectClickUnit(x, y)
 	if shouldSelect then
 		DoMouseClickOnClickUnit()

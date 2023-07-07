@@ -269,7 +269,7 @@ options_order = {
 	'showDrawTools', 'tooltip_opacity',
 	
 	--selected units
-	'selection_opacity', 'allowclickthrough', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
+	'selection_opacity', 'allowclickthrough', 'tooltipThroughPanels', 'groupbehaviour', 'showgroupinfo', 'ctrlFilter',
 	'uniticon_size', 'manualWeaponReloadBar', 'jumpReloadBar',
 	'fancySkinning', 'leftPadding',
 }
@@ -335,6 +335,10 @@ options = {
 		noHotkey = true,
 		desc = 'Show pencil or eraser when drawing or erasing.'
 	},
+	tooltipThroughPanels = {
+		name='Allow hovering through', type='bool', value=false,
+		desc = 'Show tooltips for units behind empty interface panels.',
+	},
 	tooltip_opacity = {
 		name = "Opacity",
 		type = "number",
@@ -361,7 +365,8 @@ options = {
 		path = selPath,
 	},
 	allowclickthrough = {
-		name='Allow clicking through', type='bool', value=true,
+		name = 'Allow clicking through', type='bool', value=false,
+		desc = 'Mouse clicks through empty parts of the panel act on whatever is underneath.',
 		path = selPath,
 		OnChange = function(self)
 			if selectionWindow then
@@ -2445,6 +2450,10 @@ local function UpdateTooltipContent(mx, my, dt, requiredOnly)
 		return true
 	end
 	
+	if (not options.tooltipThroughPanels.value) and screen0.hoveredControl then
+		return false
+	end
+	
 	-- Unit or feature tooltip
 	local thingType, thingID = spTraceScreenRay(mx,my)
 	local thingIsUnit = (thingType == "unit")
@@ -2555,7 +2564,7 @@ local function GetSelectionWindow()
 				return true --skip button function, else clicking on build pic will also select the unit.
 			end
 		},
-		noClickThrough = false,
+		noClickThrough = not options.allowclickthrough.value,
 		parent = holderWindow
 	}
 	mainPanel.padding[1] = mainPanel.padding[1] + options.leftPadding.value

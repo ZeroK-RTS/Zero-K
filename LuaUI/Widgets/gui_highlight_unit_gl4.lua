@@ -173,6 +173,20 @@ function widget:ViewResize()
 	vsx, vsy = Spring.GetViewGeometry()
 end
 
+local function ShouldHighlight()
+	if Spring.IsGUIHidden() then
+		return false
+	end
+	local screen0 = WG.Chili and WG.Chili.Screen0
+	if screen0 and screen0.activeControl then
+		return false
+	end
+	if screen0 and screen0.hoveredControl then
+		return false
+	end
+	return true
+end
+
 function widget:Update()
 	if hidden and Spring.GetGameFrame() > hideBelowGameframe then
 		hidden = false
@@ -185,7 +199,7 @@ function widget:Update()
 			local targetType, data = spTraceScreenRay(mx, my)
 			local unitID
 			local addedUnitID
-			if targetType == 'unit' and not Spring.IsGUIHidden() then
+			if targetType == 'unit' and ShouldHighlight() then
 				unitID = data
 				if not unitshapes[unitID] then
 					AddUnitShape(unitID)

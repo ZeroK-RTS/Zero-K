@@ -87,6 +87,10 @@ WG.PreSelection_GetUnitUnderCursor = function (onlySelectable, ignoreSelectionBo
 	if outsideSpring then
 		return
 	end
+	local hoveredControl = WG.Chili and WG.Chili.Screen0.hoveredControl
+	if hoveredControl then
+		return
+	end
 
 	local aboveMiniMap = spIsAboveMiniMap(x, y)
 	local onAndUsingMinimap = (not WG.MinimapDraggingCamera and aboveMiniMap) or not aboveMiniMap
@@ -107,6 +111,10 @@ end
 WG.PreSelection_IsSelectionBoxActive = function (thresholdMatters)
 	local x, y, lmb = spGetMouseState()
 	local _, here = SafeTraceScreenRay(x, y, true, thruMinimap)
+	local activeControl = WG.Chili and WG.Chili.Screen0.activeControl
+	if activeControl then
+		return
+	end
 
 	if lmb and not cannotSelect and holdingForSelection and ((not thresholdMatters) or not (here[1] == start[1] and here[2] == start[2] and here[3] == start[3])) then
 		return true
@@ -115,6 +123,10 @@ WG.PreSelection_IsSelectionBoxActive = function (thresholdMatters)
 end
 
 WG.PreSelection_GetUnitsInSelectionBox = function ()
+	local activeControl = WG.Chili and WG.Chili.Screen0.activeControl
+	if activeControl then
+		return
+	end
 
 	local x, y, lmb = spGetMouseState()
 
@@ -205,6 +217,10 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 end
 
 WG.PreSelection_IsUnitInSelectionBox = function (unitID)
+	local activeControl = WG.Chili and WG.Chili.Screen0.activeControl
+	if activeControl then
+		return
+	end
 	if not boxedUnitIDs then
 		boxedUnitIDs = {}
 		local boxedUnits = WG.PreSelection_GetUnitsInSelectionBox()
