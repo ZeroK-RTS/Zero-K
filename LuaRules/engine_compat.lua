@@ -367,9 +367,13 @@ if not Spring.SetUnitShieldRechargeDelay and Script.GetSynced() then -- BAR 105-
 	Spring.SetUnitShieldRechargeDelay = RET_NONE
 end
 
-if not Spring.SetPlayerRulesParam and Script.GetSynced() then -- BAR 105-1803
+if true or ((not Spring.SetPlayerRulesParam) and Script.GetSynced()) then -- BAR 105-1803
 	local spSetGameRulesParam = Spring.SetGameRulesParam
+	local oldPlayerRulesParam = Script.GetSynced() and Spring.SetPlayerRulesParam
 	Spring.SetPlayerRulesParam = function (playerID, key, value)
+		if oldPlayerRulesParam then
+			oldPlayerRulesParam(playerID, key, value)
+		end
 		return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
 	end
 end

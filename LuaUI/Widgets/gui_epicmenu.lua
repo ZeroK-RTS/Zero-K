@@ -635,18 +635,6 @@ local function AllowPauseOnMenuChange(pause)
 end
 WG.crude.AllowPauseOnMenuChange = AllowPauseOnMenuChange
 
-local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
-	if Spring.GetSpectatingState() then
-		return false
-	end
-	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
-	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	if #teams == 1 then -- if I'm alone and playing (no ally)
-		return true
-	end
-	return false
-end
-
 local function CanSaveGame()
 	if Spring.IsCheatingEnabled() then
 		return true
@@ -2707,6 +2695,22 @@ local function MakeSaveLoadButtons()
 	})
 end
 
+local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
+	if Spring.GetSpectatingState() then
+		return false
+	end
+	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
+	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
+	if #teams == 1 then -- if I'm alone and playing (no ally)
+		return true
+	end
+	return false
+end
+
+local function CanVoteResign()
+	return not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
+end
+
 local function MakeQuitButtons()
 	--AddOption('', {
 	--	type = 'label',
@@ -2723,15 +2727,13 @@ local function MakeQuitButtons()
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
-				if not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission) then
+				if not CanVoteResign() then
 					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
 		key = 'Vote Resign',
-		DisableFunc = function()
-			return (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
-		end, --function that trigger grey colour on buttons (not actually disable their functions)
+		DisableFunc = CanVoteResign, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('', {
 		type = 'button',
