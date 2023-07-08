@@ -22,13 +22,16 @@ end
 
 local DEFAULT_RADIUS = 35
 local DEFAULT_OFFSET = 35
+local DEFAULT_ANGLE  = 0
 
 local buggeroffDefs = {}
 for unitDefID, ud in pairs(UnitDefs) do
 	if ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
+		local angle = tonumber(ud.customParams.buggeroff_angle or DEFAULT_ANGLE)
 		buggeroffDefs[unitDefID] = {
 			radius = tonumber(ud.customParams.buggeroff_radius or DEFAULT_RADIUS) or DEFAULT_RADIUS,
 			offset = tonumber(ud.customParams.buggeroff_offset or DEFAULT_OFFSET) or DEFAULT_OFFSET,
+			heading = Spring.GetHeadingFromVector(math.sin(angle), math.cos(angle)),
 		}
 	end
 end
@@ -39,7 +42,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if buggeroffDefs[unitDefID] then
 		local def = buggeroffDefs[unitDefID]
-		Spring.SetFactoryBuggerOff(unitID, true, def.offset, def.radius)
+		Spring.SetFactoryBuggerOff(unitID, true, def.offset, def.radius, def.heading)
 	end
 end
 
