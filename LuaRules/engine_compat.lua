@@ -367,24 +367,6 @@ if not Spring.SetUnitShieldRechargeDelay and Script.GetSynced() then -- BAR 105-
 	Spring.SetUnitShieldRechargeDelay = RET_NONE
 end
 
-if true or ((not Spring.SetPlayerRulesParam) and Script.GetSynced()) then -- BAR 105-1803
-	local spSetGameRulesParam = Spring.SetGameRulesParam
-	local oldPlayerRulesParam = Script.GetSynced() and Spring.SetPlayerRulesParam
-	Spring.SetPlayerRulesParam = function (playerID, key, value)
-		if oldPlayerRulesParam then
-			oldPlayerRulesParam(playerID, key, value)
-		end
-		return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
-	end
-end
-
-if not Spring.GetPlayerRulesParam then -- BAR 105-1803
-	local spGetGameRulesParam = Spring.GetGameRulesParam
-	Spring.GetPlayerRulesParam = function (playerID, key)
-		return spGetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
-	end
-end
-
 if not Spring.GetUnitIsBeingBuilt then -- BAR 105-1806
 	local spGetUnitHealth = Spring.GetUnitHealth
 	local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -392,5 +374,22 @@ if not Spring.GetUnitIsBeingBuilt then -- BAR 105-1806
 		local _, _, inBuild = spGetUnitIsStunned(unitID)
 		local _, _, _, _, buildProgress = spGetUnitHealth(unitID)
 		return inBuild, buildProgress
+	end
+end
+
+if not Spring.GetPlayerRulesParam then -- BAR 105-1823
+	local spGetGameRulesParam = Spring.GetGameRulesParam
+	Spring.GetPlayerRulesParam = function (playerID, key)
+		return spGetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
+	end
+
+	Spring.GetPlayerRulesParams = RET_TABLE
+
+	-- Set technically added in BAR 105-1803, but useless without the matching Get
+	if Script.GetSynced() then
+		local spSetGameRulesParam = Spring.SetGameRulesParam
+		Spring.SetPlayerRulesParam = function (playerID, key, value)
+			return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
+		end
 	end
 end
