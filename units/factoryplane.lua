@@ -45,7 +45,8 @@ return { factoryplane = {
     ispad         = 1,
     parent_of_plate   = [[plateplane]],
     buggeroff_radius    = 40,
-    buggeroff_offset    = 15,
+    buggeroff_offset    = 45,
+    buggeroff_angle     = math.rad(-65),
 
     stats_show_death_explosion = 1,
 
