@@ -2707,8 +2707,8 @@ local function PlayingButNoTeammate() --I am playing and playing alone with no t
 	return false
 end
 
-local function CanVoteResign()
-	return not (Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission)
+local function DisableVoteResign()
+	return Spring.GetPlayerRulesParam(Spring.GetLocalPlayerID(), "initiallyPlayingPlayer") ~= 1 or PlayingButNoTeammate() or isMission
 end
 
 local function MakeQuitButtons()
@@ -2727,13 +2727,13 @@ local function MakeQuitButtons()
 		desc = "Ask teammates to resign",
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
-				if not CanVoteResign() then
+				if not DisableVoteResign() then
 					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
 		key = 'Vote Resign',
-		DisableFunc = CanVoteResign, --function that trigger grey colour on buttons (not actually disable their functions)
+		DisableFunc = DisableVoteResign, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('', {
 		type = 'button',
