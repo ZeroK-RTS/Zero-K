@@ -54,13 +54,13 @@ return { shipaa = {
   weapons                = {
 
     [1] = {
-      def                = [[AALASER]],
+      def                = [[EMG]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
 
     [2] = {
-      def                = [[AALASER]],
+      def                = [[EMG]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
