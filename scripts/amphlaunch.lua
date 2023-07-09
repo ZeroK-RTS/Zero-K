@@ -97,7 +97,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turretheading, y_axis, heading, 24)
+	Turn(turretheading, y_axis, heading, 18)
 	--Move(turretheading, y_axis, 1.5*math.abs(pitch), 3.5)
 	--Turn(turretpitch, x_axis, -pitch, 1.9)
 	--WaitForTurn(turretheading, y_axis)
@@ -135,7 +135,7 @@ function script.BlockShot(num, targetID)
 			return true
 		end
 	end
-	if not GG.Thrower.GetAffectedUnits(unitID, true) then
+	if GG.Thrower.CheckOverlobPrevention(unitID) then
 		nextFireBlockCheckFrame = gameFrame + 3
 		return true
 	end

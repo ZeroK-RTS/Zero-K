@@ -67,6 +67,7 @@ local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
 local ATTACK_BLOCK_DEFAULT = 1
+local OVERKILL_PREVENT_DEFAULT = 1
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -111,6 +112,7 @@ local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
+local spGetUnitLosState     = Spring.GetUnitLosState
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_INSERT = CMD.INSERT
@@ -122,6 +124,15 @@ local unitBlockAttackCmd = {
 	action  = 'disableattack',
 	tooltip = 'Allow attack commands',
 	params  = {0, 'Allowed','Blocked'}
+}
+
+local preventOverkillCmdDesc = {
+	id      = CMD_PREVENT_OVERKILL,
+	type    = CMDTYPE.ICON_MODE,
+	name    = "Prevent Overkill.",
+	action  = 'preventoverkill',
+	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
+	params 	= {0, "Prevent Overkill", "Fire at anything"}
 }
 
 -------------------------------------------------------------------------------------
@@ -160,8 +171,8 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 	return flyTime
 end
 
-local function GetAffectedUnits(unitID, onlyCheckExistence, unitX, unitZ)
-	-- Use onlyCheckExistence to check if any targets exist. It was
+local function GetAffectedUnits(unitID, checkOverlobAllyTeam, unitX, unitZ)
+	-- Use checkOverlobAllyTeam to check if any targets exist in LOS. It was
 	-- shoehorned in as keeping validity in one place seems best.
 	local data = IterableMap.Get(throwUnits, unitID)
 	if not data then
@@ -180,15 +191,18 @@ local function GetAffectedUnits(unitID, onlyCheckExistence, unitX, unitZ)
 			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
 			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
 			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(unitID, nearID, speed) then
-				if onlyCheckExistence then
-					return true
+				if checkOverlobAllyTeam then
+					local inLos = spGetUnitLosState(nearID, checkOverlobAllyTeam, true)
+					if inLos and inLos%2 == 1 then
+						return true
+					end
 				end
 				affectedUnits = affectedUnits or {}
 				affectedUnits[#affectedUnits + 1] = nearUnits[i]
 			end
 		end
 	end
-	if onlyCheckExistence then
+	if checkOverlobAllyTeam then
 		return false
 	end
 	return affectedUnits
@@ -336,6 +350,22 @@ local function BlockAttackToggle(unitID, cmdParams)
 	end
 end
 
+local function PreventOverkillToggleCommand(unitID, cmdParams)
+	local data = IterableMap.Get(throwUnits, unitID)
+	if not data then
+		return true
+	end
+	local state = cmdParams[1]
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
+	
+	if (cmdDescID) then
+		preventOverkillCmdDesc.params[1] = state
+		spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
+	end
+	data.preventOverlob = (state == 1)
+	return false
+end
+
 function gadget:AllowCommand_GetWantedCommand()
 	return {
 		[CMD_DISABLE_ATTACK] = true,
@@ -343,6 +373,7 @@ function gadget:AllowCommand_GetWantedCommand()
 		[CMD_INSERT] = true,
 		[CMD_UNIT_SET_TARGET] = true,
 		[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+		[CMD_PREVENT_OVERKILL] = true,
 	}
 end
 
@@ -367,6 +398,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true  -- command was not used
 	end
 	
+	if (cmdID == CMD_PREVENT_OVERKILL) then
+		return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
+	end
 	if (cmdID ~= CMD_DISABLE_ATTACK) then
 		return true  -- command was not used
 	end
@@ -389,7 +423,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		)
 		
 		spInsertUnitCmdDesc(unitID, unitBlockAttackCmd)
+		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		BlockAttackToggle(unitID, {ATTACK_BLOCK_DEFAULT})
+		PreventOverkillToggleCommand(unitID, {OVERKILL_PREVENT_DEFAULT})
 	end
 end
 
@@ -408,7 +444,16 @@ function externalFunc.BlockAttack(unitID)
 	return unitData and unitData.blockAttack
 end
 
-externalFunc.GetAffectedUnits = GetAffectedUnits
+function externalFunc.CheckOverlobPrevention(unitID)
+	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
+	if not unitData then
+		return false
+	end
+	if not unitData.preventOverlob then
+		return false
+	end
+	return not GetAffectedUnits(unitID, Spring.GetUnitAllyTeam(unitID))
+end
 
 function gadget:Initialize()
 	-- register command
@@ -536,8 +581,8 @@ end
 local function DrawWire(emitUnitID, recUnitID, spec, myAllyTeam, x, y, z)
 	local point = {}
 	if spValidUnitID(recUnitID) then
-		local los = spGetUnitLosState(recUnitID, myAllyTeam, false)
-		if (spec or (los and los.los)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
+		local los = spGetUnitLosState(recUnitID, myAllyTeam, true)
+		if (spec or (los and los%2 == 1)) and (spIsUnitInView(emitUnitID) or spIsUnitInView(recUnitID)) then
 			local topX, topY, topZ = GetUnitTop(emitUnitID, x, y, z)
 			point[1] = {x, y, z}
 			point[2] = {topX, topY, topZ}
@@ -561,8 +606,8 @@ local function DrawThrowerWires(unitID, data, index, spec, myAllyTeam)
 	if not UnitIsActive(unitID) then
 		return
 	end
-	local los = spGetUnitLosState(unitID, myAllyTeam, false)
-	if spec or (los and los.los) then
+	local los = spGetUnitLosState(unitID, myAllyTeam, true)
+	if spec or (los and (los and los%2 == 1)) then
 		local _,_,_, x, y, z = spGetUnitPosition(unitID, true)
 		local nearUnits = Spring.GetUnitsInCylinder(x, z, data.def.radius)
 		if nearUnits then
