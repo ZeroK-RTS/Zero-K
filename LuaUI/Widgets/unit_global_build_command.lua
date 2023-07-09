@@ -394,7 +394,7 @@ function widget:Initialize()
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
 					end
-					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+					UpdateOneWorkerPathing(uid) -- then precalculate pathing info
 				end
 			end
 			
