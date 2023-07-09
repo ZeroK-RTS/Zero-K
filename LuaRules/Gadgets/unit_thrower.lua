@@ -40,6 +40,8 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local applyBlockingFrame = {}
 local unitIsNotBlocking = {}
 
+local cachedAttackCommandDesc = false
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Constants
@@ -64,6 +66,7 @@ local RECENT_INT_WIDTH = 1
 local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
+local ATTACK_BLOCK_DEFAULT = 1
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -294,6 +297,16 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 
+local function CacheAttackCommandDesc(unitID)
+	local cmdTable = Spring.GetUnitCmdDescs(unitID)
+	for i = 1, #cmdTable do
+		if cmdTable[i].id == CMD.ATTACK then
+			cachedAttackCommandDesc = cmdTable[i]
+			return
+		end
+	end
+end
+
 local function BlockAttackToggle(unitID, cmdParams)
 	local data = IterableMap.Get(throwUnits, unitID)
 	if data then
@@ -307,7 +320,16 @@ local function BlockAttackToggle(unitID, cmdParams)
 		if state == 1 then
 			local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
 			if cmdDesc then
+				if not cachedAttackCommandDesc then
+					CacheAttackCommandDesc(unitID)
+					Spring.Utilities.TableEcho(cachedAttackCommandDesc, "cmdDesc")
+				end
 				spRemoveUnitCmdDesc(unitID, cmdDesc)
+			end
+		elseif cachedAttackCommandDesc then
+			local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
+			if not cmdDesc then
+				spInsertUnitCmdDesc(unitID, cachedAttackCommandDesc)
 			end
 		end
 		data.blockAttack = (state == 1)
@@ -367,7 +389,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		)
 		
 		spInsertUnitCmdDesc(unitID, unitBlockAttackCmd)
-		BlockAttackToggle(unitID, {0})
+		BlockAttackToggle(unitID, {ATTACK_BLOCK_DEFAULT})
 	end
 end
 

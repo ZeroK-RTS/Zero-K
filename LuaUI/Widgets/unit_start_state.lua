@@ -1037,7 +1037,7 @@ local function addUnit(defName, path)
 	end
 	
 	if ud.customParams.attack_toggle then
-		options[defName .. "_disableattack"] = {
+		options[defName .. "_disableattack_0"] = {
 			name = "  Disable Attack Commands",
 			desc = "Check the box to make the unit not respond to attack commands.",
 			type = 'bool',
