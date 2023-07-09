@@ -79,7 +79,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "Prevent Overkill with Fire At Will", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
@@ -304,9 +304,18 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	return false
 end
 
+local function HasOverkillPrevention(unitID, targetID)
+	if not (unitID and targetID and units[unitID]) then
+		return false
+	end
+	if units[unitID] == 1 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
+		return false
+	end
+	return true
+end
 
 function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult, staticOnly)
-	if not (unitID and targetID and units[unitID]) then
+	if not HasOverkillPrevention(unitID, targetID) then
 		return false
 	end
 
@@ -318,7 +327,7 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 end
 
 function GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
-	if not (unitID and targetID and units[unitID]) then
+	if not HasOverkillPrevention(unitID, targetID) then
 		return false
 	end
 
@@ -331,7 +340,7 @@ function GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, damage, timeou
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
-	if not (unitID and targetID and units[unitID]) then
+	if not HasOverkillPrevention(unitID, targetID) then
 		return false
 	end
 
@@ -348,16 +357,17 @@ end
 local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
+		if cmdOptions and cmdOptions.right then
+			state = (state - 2)%3
+		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 
 		if (cmdDescID) then
 			preventOverkillCmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
 		end
-		if state == 1 then
-			if not units[unitID] then
-				units[unitID] = true
-			end
+		if state >= 1 then
+			units[unitID] = state
 		else
 			if units[unitID] then
 				units[unitID] = nil

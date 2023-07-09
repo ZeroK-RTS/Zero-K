@@ -19,7 +19,7 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local overkillPrevention, overkillPreventionBlackHole = include("LuaRules/Configs/overkill_prevention_defs.lua")
+local overkillPrevention, overkillPreventionBlackHole, _, overkillPreventionLobster = include("LuaRules/Configs/overkill_prevention_defs.lua")
 local baitPreventionDefault = include("LuaRules/Configs/bait_prevention_defs.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 local defaultSelectionRank = VFS.Include(LUAUI_DIRNAME .. "Configs/selection_rank.lua")
@@ -100,6 +100,11 @@ local tooltips = {
 		[2] = "Avoid shooting at units costing less than 90, Razor, Sparrow, unknown radar dots, low value nanoframes and armoured targets (except Crab)." .. preventBaitTip,
 		[3] = "Avoid shooting at units costing less than 240 (excluding Stardust) as well as, Raptor, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
 		[4] = "Avoid shooting at  units costing less than 420, unknown radar dots, low value nanoframes and armoured targets (excluding Crab). Disables Ward Fire." .. preventBaitTip,
+	},
+	overkill_prevention = {
+		[0] = "Disabled.",
+		[1] = "Active when the unit is set to Fire At Will.",
+		[2] = "Always active.",
 	},
 	fire_at_shield = {
 		[0] = "Disabled.",
@@ -950,15 +955,20 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_fire_at_radar"
 	end
 
-	if overkillPrevention[unitDefID] or overkillPreventionBlackHole[unitDefID] then
-		options[defName .. "_overkill_prevention"] = {
+	local overkillPrevention = overkillPrevention[unitDefID] or overkillPreventionBlackHole[unitDefID] or overkillPreventionLobster[unitDefID]
+	if overkillPrevention then
+		options[defName .. "_overkill_prevention0"] = {
 			name = "  Overkill Prevention",
-			desc = "Check box to make these units avoid firing at targets that are already likely to die due to incoming fire.",
-			type = 'bool',
-			value = true,
+			desc = "Control when the unit tries to prevent overkill. This is done by not shooting at units that are already likely to die due to incoming fire.",
+			type = 'number',
+			value = overkillPrevention,
+			min = 0,
+			max = 2,
+			step = 1,
 			path = path,
+			tooltipFunction = tooltipFunc.overkill_prevention,
 		}
-		options_order[#options_order+1] = defName .. "_overkill_prevention"
+		options_order[#options_order+1] = defName .. "_overkill_prevention0"
 	end
 
 	if wardFireUnits[defName] then

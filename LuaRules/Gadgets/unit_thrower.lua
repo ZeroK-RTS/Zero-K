@@ -42,6 +42,8 @@ local unitIsNotBlocking = {}
 
 local cachedAttackCommandDesc = false
 
+local _, _, _, overkillPreventionDefault = include("LuaRules/Configs/overkill_prevention_defs.lua")
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Constants
@@ -67,7 +69,6 @@ local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
 local ATTACK_BLOCK_DEFAULT = 1
-local OVERKILL_PREVENT_DEFAULT = 1
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Prevent Overkill", "Fire at anything"}
+	params 	= {0, "Fire at anything", "Prevent Overkill with Fire At Will", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
@@ -350,19 +351,22 @@ local function BlockAttackToggle(unitID, cmdParams)
 	end
 end
 
-local function PreventOverkillToggleCommand(unitID, cmdParams)
+local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	local data = IterableMap.Get(throwUnits, unitID)
 	if not data then
 		return true
 	end
 	local state = cmdParams[1]
+	if cmdOptions and cmdOptions.right then
+		state = (state - 2)%3
+	end
 	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 	
 	if (cmdDescID) then
 		preventOverkillCmdDesc.params[1] = state
 		spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
 	end
-	data.preventOverlob = (state == 1)
+	data.preventOverlob = ((state >= 1) and state)
 	return false
 end
 
@@ -425,7 +429,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spInsertUnitCmdDesc(unitID, unitBlockAttackCmd)
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		BlockAttackToggle(unitID, {ATTACK_BLOCK_DEFAULT})
-		PreventOverkillToggleCommand(unitID, {OVERKILL_PREVENT_DEFAULT})
+		PreventOverkillToggleCommand(unitID, {overkillPreventionDefault[unitDefID]})
 	end
 end
 
@@ -450,6 +454,9 @@ function externalFunc.CheckOverlobPrevention(unitID)
 		return false
 	end
 	if not unitData.preventOverlob then
+		return false
+	end
+	if unitData.preventOverlob == 1 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
 		return false
 	end
 	return not GetAffectedUnits(unitID, Spring.GetUnitAllyTeam(unitID))
