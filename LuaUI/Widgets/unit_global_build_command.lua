@@ -309,7 +309,13 @@ local myTeamID = spGetMyTeamID()
 local statusColor = {1.0, 1.0, 1.0, 0.85}
 local queueColor = {1.0, 1.0, 1.0, 0.9}
 local textSize = 12.0
+
 local terraunitDefID = UnitDefNames.terraunit.id
+local     solarDefID = UnitDefNames.energysolar.id
+local      windDefID = UnitDefNames.energywind.id
+local      nanoDefID = UnitDefNames.staticcon.id
+local      clawDefID = UnitDefNames.wolverine_mine.id
+local       mexDefID = UnitDefNames.staticmex.id
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
 local rec_icon = "LuaUI/Images/commands/Bold/reclaim.png"
@@ -388,11 +394,11 @@ function widget:Initialize()
 					else -- otherwise we mark it as idle
 						includedBuilders[uid] = {cmdtype=commandType.idle, unreachable={}}
 					end
-					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+					UpdateOneWorkerPathing(uid) -- then precalculate pathing info
 				end
 			end
 			
-			if ud.name == 'staticmex' then
+			if unitDefID == mexDefID then
 				local x, _, z = spGetUnitPosition(uid)
 				territoryPos.x = territoryPos.x + x
 				territoryPos.z = territoryPos.z + z
@@ -416,7 +422,7 @@ function widget:Initialize()
 	widget:PlayerChanged()
 	--[[if spGetSpectatingState() then
 		Echo( "<Global Build Command>: Spectator mode. Widget removed." )
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget)
 		return
 	end--]]
 end
@@ -826,16 +832,17 @@ function widget:PlayerChanged(playerID)
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	myTeamID = spGetMyTeamID()
 end
 
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if not unitTeam == spGetMyTeamID() then
+	if not unitTeam == myTeamID then
 		return -- if it's not our unit then ignore it!
 	end
 	
 	-- update territory info when new mexes are created.
-	if UnitDefs[unitDefID].name == 'staticmex' then
+	if unitDefID == mexDefID then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x + x
 		territoryPos.z = territoryPos.z + z
@@ -942,7 +949,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		allBuilders[unitID] = nil
 	end
 	
-	if UnitDefs[unitDefID].name == 'staticmex' then
+	if unitDefID == mexDefID then
 		local x, _, z = spGetUnitPosition(unitID)
 		territoryPos.x = territoryPos.x - x
 		territoryPos.z = territoryPos.z - z
@@ -1010,7 +1017,7 @@ end
 
 -- This function implements auto-repair
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
-	if spIsUnitAllied(unitID) and options.autoRepair.value and UnitDefs[unitDefID].name ~= 'wolverine_mine' then
+	if spIsUnitAllied(unitID) and options.autoRepair.value and unitDefID ~= clawDefID then
 		local myCmd = {id=CMD_REPAIR, target=unitID, assignedUnits={}}
 		local hash = BuildHash(myCmd)
 		if not buildQueue[hash] then
@@ -1091,7 +1098,7 @@ function widget:CommandsChanged()
 	end
 end
 
---	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which
+--	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific)
 function CommandNotifyPreQue(unitID)
 	if includedBuilders[unitID] then
 		includedBuilders[unitID].cmdtype = commandType.drec
@@ -1565,11 +1572,11 @@ function FindCheapestJob(unitID)
 		local buildDist = UnitDefs[unitDefID].buildDistance
 		local moveID = UnitDefs[unitDefID].moveDef.id
 		
-		if moveID then -- for ground units, just cache the cost
+		if moveID then -- for ground units, cache the cost, and only very slightly reduce the cost of the current job to avoid eg. repeat turning around for builders with a low turn rate
 			if options.intelliCost.value then
-				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz)
+				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz) - 30
 			else
-				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz)
+				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz) - 30
 			end
 		else -- for air units, reduce the cost of their current job since they tend to wander around while building
 			if options.intelliCost.value then
@@ -1670,9 +1677,10 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
+	local unitDefID = abs(job.id)
 	local unitDef = nil
 	if job.id < 0 then
-		unitDef = UnitDefs[abs(job.id)]
+		unitDef = UnitDefs[unitDefID]
 	end
 	local metalCost = false
 	
@@ -1698,7 +1706,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 			end
 		elseif (unitDef and unitDef.reloadTime > 0) or job.id == CMD_RESURRECT then -- for small defenses and resurrect
 			cost = distance - 150
-		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind")) then -- for small energy
+		elseif unitDef and (unitDefID == solarDefID or unitDefID == windDefID) then -- for small energy
 			cost = distance + 100
 		else -- for resurrect and all other small build jobs
 			cost = distance
@@ -1706,7 +1714,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == CMD_RESURRECT then -- for expensive buildings and resurrect
 			cost = (distance/2) + (200 * (costMod - 2))
-		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'staticcon') then -- for small defenses and caretakers, allow up to two workers before increasing cost
+		elseif unitDef and (unitDef.reloadTime > 0 or unitDefID == nanoDefID) then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == CMD_REPAIR then -- for repair
 			if job.target then
@@ -2011,7 +2019,7 @@ function CaptureTF()
 		unitID = teamUnits[i]
 		unitDID = spGetUnitDefID(unitID)
 		unitDef = UnitDefs[unitDID]
-		if string.match(unitDef.humanName, "erraform") then -- identify 'terraunits'
+		if unitDID == terraunitDefID then
 			local myCmd = {id=CMD_REPAIR, target=unitID, assignedUnits={}}
 			local hash = BuildHash(myCmd)
 			if not buildQueue[hash] then -- add repair jobs for them if they're not already on the queue
@@ -2219,8 +2227,6 @@ end
 -- Helper Functions ------------------------------------------------------------
 --[[
 HOW THIS WORKS:
-	UpdateOneGroupsDetails()
-		Adds and removes units from includedBuilders as they enter or leave the exclusion group, or when the exclusion group number changes.
 	CanBuildThis()
 		Determines whether a given worker can perform a given job or not.
 	IsTargetReachable()
@@ -2384,9 +2390,9 @@ function RemoveJobs(x, z, r)
 				zSize = UnitDefs[cmdID].xsize*4
 			end
 			 -- get the distances to the four corner vertices of the building footprint
-			local dist1 = Distance(x, z, cx, cz)
-			local dist2 = Distance(x, z, cx+xSize, cz)
-			local dist3 = Distance(x, z, cx, cz+zSize)
+			local dist1 = Distance(x, z, cx-xSize, cz-zSize)
+			local dist2 = Distance(x, z, cx+xSize, cz-zSize)
+			local dist3 = Distance(x, z, cx-xSize, cz+zSize)
 			local dist4 = Distance(x, z, cx+xSize, cz+zSize)
 			
 			if dist1 < r or dist2 < r or dist3 < r or dist4 < r then -- if any of the corners falls within the radius, then mark the job for removal
@@ -2414,8 +2420,8 @@ function RemoveJobs(x, z, r)
 					inRadius = true
 					local udid = spGetUnitDefID(target)
 					local unitDef = UnitDefs[udid]
-					if string.match(unitDef.humanName, "erraform") ~= nil then -- if the target was a 'terraunit', self-destruct it
-						spGiveOrderToUnit(target, 65, EMPTY_TABLE, 0)
+					if unitDID == terraunitDefID then
+						spGiveOrderToUnit(target, CMD.SELFD, EMPTY_TABLE, 0)
 					end
 				end
 			end
