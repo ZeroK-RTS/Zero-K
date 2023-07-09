@@ -133,7 +133,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "Prevent Overkill with Fire At Will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
 }
 
 -------------------------------------------------------------------------------------
@@ -358,7 +358,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 	local state = cmdParams[1]
 	if cmdOptions and cmdOptions.right then
-		state = (state - 2)%3
+		state = (state - 2)%4
 	end
 	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 	
@@ -456,9 +456,10 @@ function externalFunc.CheckOverlobPrevention(unitID)
 	if not unitData.preventOverlob then
 		return false
 	end
-	if unitData.preventOverlob == 1 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
+	if unitData.preventOverlob == 2 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
 		return false
 	end
+	-- Don't handle unitData.preventOverlob as Lobster is rarely fired at units and all ground commands are manual
 	return not GetAffectedUnits(unitID, Spring.GetUnitAllyTeam(unitID))
 end
 

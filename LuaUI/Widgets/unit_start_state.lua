@@ -103,8 +103,9 @@ local tooltips = {
 	},
 	overkill_prevention = {
 		[0] = "Disabled.",
-		[1] = "Active when the unit is set to Fire At Will.",
-		[2] = "Always active.",
+		[1] = "Enabled only for automatically aquired targets when set to Fire At Will.",
+		[2] = "Enabled when the unit is set to Fire At Will.",
+		[3] = "Always enabled.",
 	},
 	fire_at_shield = {
 		[0] = "Disabled.",
@@ -963,7 +964,7 @@ local function addUnit(defName, path)
 			type = 'number',
 			value = overkillPrevention,
 			min = 0,
-			max = 2,
+			max = 3,
 			step = 1,
 			path = path,
 			tooltipFunction = tooltipFunc.overkill_prevention,

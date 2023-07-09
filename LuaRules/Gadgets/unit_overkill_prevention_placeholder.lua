@@ -22,13 +22,13 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spValidUnitID         = Spring.ValidUnitID
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spSetUnitTarget       = Spring.SetUnitTarget
-local spGetCommandQueue     = Spring.GetCommandQueue
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spValidUnitID           = Spring.ValidUnitID
+local spFindUnitCmdDesc       = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc       = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc     = Spring.InsertUnitCmdDesc
+local spSetUnitTarget         = Spring.SetUnitTarget
+local spGetCommandQueue       = Spring.GetCommandQueue
+local spGiveOrderToUnit       = Spring.GiveOrderToUnit
 
 local FEATURE = 102
 local UNIT = 117
@@ -44,7 +44,7 @@ local preventOverkillCmdDesc = {
 	name    = "Prevent Overkill.",
 	action  = 'preventoverkill',
 	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
-	params 	= {0, "Fire at anything", "Prevent Overkill with Fire At Will", "Prevent Overkill"}
+	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
 }
 
 local shotRequirement = {}
@@ -117,7 +117,7 @@ function GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, allyTeamI
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
-	if units[unitID] == 1 and Spring.Utilities.GetUnitFireState(unitID) ~= 2 then
+	if not GG.OverkillPrevention_IsWanted(unitID, targetID, units) then
 		return false
 	end
 	
@@ -260,7 +260,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		if cmdOptions and cmdOptions.right then
-			state = (state - 2)%3
+			state = (state - 2)%4
 		end
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
 		
@@ -303,7 +303,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if handledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
-		PreventOverkillToggleCommand(unitID, {1})
+		PreventOverkillToggleCommand(unitID, {handledUnitDefIDs[unitDefID]})
 	end
 end
 

@@ -1,63 +1,63 @@
 
 -- Value is the default state of the command
 local handledUnitDefIDs = {
-	[UnitDefNames["turretmissile"].id] = 1,
-	[UnitDefNames["turretaafar"].id] = 1,
-	[UnitDefNames["hoverskirm"].id] = 1,
-	[UnitDefNames["hoverdepthcharge"].id] = 1,
-	[UnitDefNames["turretaaclose"].id] = 1,
-	[UnitDefNames["turretaaheavy"].id] = 1,
-	[UnitDefNames["amphaa"].id] = 1,
-	[UnitDefNames["jumpscout"].id] = 1,
-	[UnitDefNames["planefighter"].id] = 1,
-	[UnitDefNames["hoveraa"].id] = 1,
-	[UnitDefNames["tankraid"].id] = 1,
-	[UnitDefNames["spideraa"].id] = 1,
-	[UnitDefNames["vehaa"].id] = 1,
-	[UnitDefNames["gunshipaa"].id] = 1,
-	[UnitDefNames["gunshipskirm"].id] = 1,
-	[UnitDefNames["gunshipassault"].id] = 1,
-	[UnitDefNames["cloaksnipe"].id] = 1,
-	[UnitDefNames["amphraid"].id] = 1,
-	[UnitDefNames["amphimpulse"].id] = 1,
-	[UnitDefNames["amphriot"].id] = 1,
-	[UnitDefNames["shieldaa"].id] = 1,
-	[UnitDefNames["vehsupport"].id] = 1,
-	[UnitDefNames["tankriot"].id] = 1, --HT's banisher
-	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
-	[UnitDefNames["bomberprec"].id] = 2,
-	[UnitDefNames["bomberstrike"].id] = 2,
-	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
-	[UnitDefNames["shiptorpraider"].id] = 1,
-	[UnitDefNames["shipskirm"].id] = 1,
-	[UnitDefNames["subraider"].id] = 1,
-	[UnitDefNames["turretheavylaser"].id] = 1,
-	[UnitDefNames["amphassault"].id] = 1,
-	[UnitDefNames["hoverarty"].id] = 1,
-	[UnitDefNames["turretantiheavy"].id] = 1,
+	[UnitDefNames["turretmissile"].id]    = 2,
+	[UnitDefNames["turretaafar"].id]      = 2,
+	[UnitDefNames["hoverskirm"].id]       = 2,
+	[UnitDefNames["hoverdepthcharge"].id] = 2,
+	[UnitDefNames["turretaaclose"].id]    = 2,
+	[UnitDefNames["turretaaheavy"].id]    = 2,
+	[UnitDefNames["amphaa"].id]           = 2,
+	[UnitDefNames["jumpscout"].id]        = 2,
+	[UnitDefNames["planefighter"].id]     = 2,
+	[UnitDefNames["hoveraa"].id]          = 2,
+	[UnitDefNames["tankraid"].id]         = 2,
+	[UnitDefNames["spideraa"].id]         = 2,
+	[UnitDefNames["vehaa"].id]            = 2,
+	[UnitDefNames["gunshipaa"].id]        = 2,
+	[UnitDefNames["gunshipskirm"].id]     = 2,
+	[UnitDefNames["gunshipassault"].id]   = 2,
+	[UnitDefNames["cloaksnipe"].id]       = 2,
+	[UnitDefNames["amphraid"].id]         = 2,
+	[UnitDefNames["amphimpulse"].id]      = 2,
+	[UnitDefNames["amphriot"].id]         = 2,
+	[UnitDefNames["shieldaa"].id]         = 2,
+	[UnitDefNames["vehsupport"].id]       = 2,
+	[UnitDefNames["tankriot"].id]         = 2, --HT's banisher
+	[UnitDefNames["shieldarty"].id]       = 2, --Shields's racketeer
+	[UnitDefNames["bomberprec"].id]       = 3,
+	[UnitDefNames["bomberstrike"].id]     = 3,
+	[UnitDefNames["shipscout"].id]        = 0, --Defaults to off because of strange disarm + normal damage behaviour.
+	[UnitDefNames["shiptorpraider"].id]   = 2,
+	[UnitDefNames["shipskirm"].id]        = 2,
+	[UnitDefNames["subraider"].id]        = 2,
+	[UnitDefNames["turretheavylaser"].id] = 2,
+	[UnitDefNames["amphassault"].id]      = 2,
+	[UnitDefNames["hoverarty"].id]        = 2,
+	[UnitDefNames["turretantiheavy"].id]  = 2,
 
 	-- Static only OKP below
-	[UnitDefNames["amphfloater"].id] = 1,
-	[UnitDefNames["amphsupport"].id] = 1,
-	[UnitDefNames["vehheavyarty"].id] = 1,
-	[UnitDefNames["shieldskirm"].id] = 1,
-	[UnitDefNames["shieldassault"].id] = 1,
-	[UnitDefNames["spiderassault"].id] = 1,
-	[UnitDefNames["cloakskirm"].id] = 1,
-	[UnitDefNames["cloakarty"].id] = 1,
-	[UnitDefNames["tankarty"].id] = 1,
-	[UnitDefNames["striderdetriment"].id] = 1,
-	[UnitDefNames["shipassault"].id] = 1,
-	[UnitDefNames["shiparty"].id] = 1,
-	[UnitDefNames["spiderskirm"].id] = 1,
-	[UnitDefNames["tankassault"].id] = 1,
-	[UnitDefNames["vehassault"].id] = 1,
-	[UnitDefNames["tankheavyassault"].id] = 1,
-	[UnitDefNames["spidercrabe"].id] = 1,
+	[UnitDefNames["amphfloater"].id]      = 2,
+	[UnitDefNames["amphsupport"].id]      = 2,
+	[UnitDefNames["vehheavyarty"].id]     = 2,
+	[UnitDefNames["shieldskirm"].id]      = 2,
+	[UnitDefNames["shieldassault"].id]    = 2,
+	[UnitDefNames["spiderassault"].id]    = 2,
+	[UnitDefNames["cloakskirm"].id]       = 2,
+	[UnitDefNames["cloakarty"].id]        = 2,
+	[UnitDefNames["tankarty"].id]         = 2,
+	[UnitDefNames["striderdetriment"].id] = 2,
+	[UnitDefNames["shipassault"].id]      = 2,
+	[UnitDefNames["shiparty"].id]         = 2,
+	[UnitDefNames["spiderskirm"].id]      = 2,
+	[UnitDefNames["tankassault"].id]      = 2,
+	[UnitDefNames["vehassault"].id]       = 2,
+	[UnitDefNames["tankheavyassault"].id] = 2,
+	[UnitDefNames["spidercrabe"].id]      = 2,
 }
 
 local blackHoleUnitDefs = {
-	[UnitDefNames["jumpblackhole"].id] = true,
+	[UnitDefNames["jumpblackhole"].id] = 2,
 }
 
 local blackHoleWeaponDefs = {
@@ -65,7 +65,7 @@ local blackHoleWeaponDefs = {
 }
 
 local lobsterUnitDefs = {
-	[UnitDefNames["amphlaunch"].id] = 2,
+	[UnitDefNames["amphlaunch"].id] = 3,
 }
 
 
