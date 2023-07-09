@@ -22,6 +22,8 @@ local LEG_Z_SPEED = 1100 * 8/PERIOD
 local LEG_RAISE_DISPLACEMENT = 2
 local LEG_Y_SPEED = 1100 * LEG_RAISE_DISPLACEMENT/PERIOD * 2
 
+local nextFireBlockCheckFrame = 0
+
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitPosition = Spring.GetUnitPosition
 
@@ -112,6 +114,10 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
+	local gameFrame = Spring.GetGameFrame()
+	if nextFireBlockCheckFrame > gameFrame then
+		return true
+	end
 	if num == 1 and GG.Thrower and GG.Thrower.BlockAttack(unitID) then
 		return true
 	end
@@ -129,6 +135,11 @@ function script.BlockShot(num, targetID)
 			return true
 		end
 	end
+	if not GG.Thrower.GetAffectedUnits(unitID, true) then
+		nextFireBlockCheckFrame = gameFrame + 3
+		return true
+	end
+	
 	local reloadTime = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")*30 -- Takes slow into account
 	local otherNum = 3 - num
 	local gameFrame = Spring.GetGameFrame()

@@ -105,6 +105,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
 include("LuaRules/Configs/customcmds.h.lua")
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spRemoveUnitCmdDesc   = Spring.RemoveUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 
@@ -156,6 +157,40 @@ local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, o
 	return flyTime
 end
 
+local function GetAffectedUnits(unitID, onlyCheckExistence, unitX, unitZ)
+	-- Use onlyCheckExistence to check if any targets exist. It was
+	-- shoehorned in as keeping validity in one place seems best.
+	local data = IterableMap.Get(throwUnits, unitID)
+	if not data then
+		return
+	end
+	if not unitX then
+		local _,_,_, ox, oy, oz = spGetUnitPosition(unitID, true)
+		unitX, unitZ = ox, oz
+	end
+	
+	local nearUnits = Spring.GetUnitsInCylinder(unitX, unitZ, data.def.radius)
+	local affectedUnits = false
+	if nearUnits then
+		for i = 1, #nearUnits do
+			local nearID = nearUnits[i]
+			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
+			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(unitID, nearID, speed) then
+				if onlyCheckExistence then
+					return true
+				end
+				affectedUnits = affectedUnits or {}
+				affectedUnits[#affectedUnits + 1] = nearUnits[i]
+			end
+		end
+	end
+	if onlyCheckExistence then
+		return false
+	end
+	return affectedUnits
+end
+
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if not weaponDefID and throwWeaponDef[weaponDefID] then
 		return
@@ -198,42 +233,41 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	unitIsNotBlocking[proOwnerID] = frame
 	
 	-- Apply impulse
-	local nearUnits = Spring.GetUnitsInCylinder(ox, oz, data.def.radius)
-	if nearUnits then
-		for i = 1, #nearUnits do
-			local nearID = nearUnits[i]
-			local physicsData = physicsRestore and IterableMap.Get(physicsRestore, nearID)
-			local _, _, _, speed = Spring.GetUnitVelocity(nearID)
-			if ((not physicsData) or (not physicsData.drag) or physicsData.drag > RECENT_MAX) and ValidThrowTarget(proOwnerID, nearID, speed) then
-				
-				local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
-				local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
-				local launchMult = speedMult
-				
-				local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
-				if flyTime then
-					local nearDefID = Spring.GetUnitDefID(nearID)
-					flyTime = flyTime + 15 -- Sideways time.
-					
-					SetUnitDrag(nearID, 0)
-					GG.SetCollisionDamageMult(nearID, 0)
-					Spring.SetUnitLeaveTracks(nearID, false)
-					IterableMap.Add(physicsRestore, nearID,
-						{
-							unitDefID = nearDefID,
-							odx = odx,
-							ty = ty,
-							odz = odz,
-							sidewaysCounter = 15,
-							launchMult = launchMult,
-							drag = -1.5,
-							collisionResistence = -5*flyTime/MIN_FLY_TIME,
-						}
-					)
-					SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
-					GG.Floating_InterruptFloat(nearID, 60)
-				end
-			end
+	local affectedUnits = GetAffectedUnits(proOwnerID, false, ox, oz)
+	if not affectedUnits then
+		Spring.DeleteProjectile(proID)
+		return
+	end
+	
+	for i = 1, #affectedUnits do
+		local nearID = affectedUnits[i]
+		local _, _, _, speed = Spring.GetUnitVelocity(nearID)
+		local recentMult = max(0, min(1, (((physicsData and physicsData.drag) or 0) - RECENT_MAX)/RECENT_INT_WIDTH))
+		local speedMult  = max(0, min(1, (SPEED_MAX - speed)/SPEED_INT_WIDTH))
+		local launchMult = speedMult
+		
+		local flyTime = SendUnitToTarget(nearID, launchMult, 0, 1, odx, ty, odz)
+		if flyTime then
+			local nearDefID = Spring.GetUnitDefID(nearID)
+			flyTime = flyTime + 15 -- Sideways time.
+			
+			SetUnitDrag(nearID, 0)
+			GG.SetCollisionDamageMult(nearID, 0)
+			Spring.SetUnitLeaveTracks(nearID, false)
+			IterableMap.Add(physicsRestore, nearID,
+				{
+					unitDefID = nearDefID,
+					odx = odx,
+					ty = ty,
+					odz = odz,
+					sidewaysCounter = 15,
+					launchMult = launchMult,
+					drag = -1.5,
+					collisionResistence = -5*flyTime/MIN_FLY_TIME,
+				}
+			)
+			SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
+			GG.Floating_InterruptFloat(nearID, 60)
 		end
 	end
 	
@@ -269,6 +303,12 @@ local function BlockAttackToggle(unitID, cmdParams)
 		if (cmdDescID) then
 			unitBlockAttackCmd.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitBlockAttackCmd.params})
+		end
+		if state == 1 then
+			local cmdDesc = spFindUnitCmdDesc(unitID, CMD.ATTACK)
+			if cmdDesc then
+				spRemoveUnitCmdDesc(unitID, cmdDesc)
+			end
 		end
 		data.blockAttack = (state == 1)
 	end
@@ -345,6 +385,8 @@ function externalFunc.BlockAttack(unitID)
 	local unitData = unitID and IterableMap.Get(throwUnits, unitID)
 	return unitData and unitData.blockAttack
 end
+
+externalFunc.GetAffectedUnits = GetAffectedUnits
 
 function gadget:Initialize()
 	-- register command
