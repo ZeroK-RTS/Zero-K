@@ -1044,7 +1044,7 @@ local function addUnit(defName, path)
 			value = false,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_disableattack"
+		options_order[#options_order+1] = defName .. "_disableattack_0"
 	end
 	
 	if ud.canStockpile then
