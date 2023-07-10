@@ -34,7 +34,7 @@ function WG.GetFont(size)
 			outlineWeight = 3,
 			color         = {1, 1, 1, 1},
 			outlineColor  = {0, 0, 0, 1},
-			autoOutlineColor = true,
+			autoOutlineColor = false,
 		}
 	end
 	return font[size]
@@ -46,7 +46,7 @@ function WG.GetSpecialFont(size, name, data)
 		specialFont[size] = {}
 	end
 	if (not specialFont[size][name]) or DISABLE then
-		local shadows, outline, autoOutlineColor = true, false, true
+		local shadows, outline, autoOutlineColor = true, false, false
 		if data.shadows ~= nil then
 			shadows = data.shadows
 		end
