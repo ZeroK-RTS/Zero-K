@@ -161,7 +161,7 @@ local function ValidPosition(unitDefID, x, z, sX, sZ, minHeight, maxHeight, dire
 	return true
 end
 
-local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible)
+local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible, allowFailure)
 	if not noGoZones then
 		InitialiseNoGoZones()
 	end
@@ -203,6 +203,9 @@ local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible)
 		iteration = iteration + 1
 		if iteration > 300 then
 			x, z = position[1], position[2]
+			if allowFailure then
+				return false
+			end
 			break
 		end
 	end

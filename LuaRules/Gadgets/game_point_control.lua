@@ -60,8 +60,11 @@ local function RectangleAllyTeamSpawn(rect, count, allyTeamID)
 			pos = vector.Mult(-1, pos)
 			pos = vector.Add(rect[1], vector.Add(rect[2], vector.Add(rect[3], pos)))
 		end
-		local unitID, spawnPos = GG.SpawnPregameStructure(objUnitDefID, teamID, pos, true)
-		teamSpawnedPos[allyTeamID][i] = spawnPos
+		local unitID, spawnPos = GG.SpawnPregameStructure(objUnitDefID, teamID, pos, true, true)
+		if unitID then
+			Spring.SetUnitNeutral(unitID, true)
+			teamSpawnedPos[allyTeamID][i] = spawnPos
+		end
 	end
 end
 
@@ -119,7 +122,10 @@ local function PlaceArtefactsFromConfig(config)
 		local allyTeamID = (vector.DistSq(allyOneX, allyOneZ, data.pos[1], data.pos[2]) < vector.DistSq(allyTwoX, allyTwoZ, data.pos[1], data.pos[2])) and 0 or 1
 		local teams = Spring.GetTeamList(allyTeamID)
 		local teamID = teams[1]
-		GG.SpawnPregameStructure(objUnitDefID, teamID, data.pos, true)
+		local unitID = GG.SpawnPregameStructure(objUnitDefID, teamID, data.pos, true, true)
+		if unitID then
+			Spring.SetUnitNeutral(unitID, true)
+		end
 	end
 end
 
