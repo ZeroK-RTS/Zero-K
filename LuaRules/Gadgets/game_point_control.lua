@@ -119,12 +119,17 @@ local function DoLossCheck(allyTeamID)
 	return true
 end
 
+local function UpdateSpinSpeeds()
+	-- TODO
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitDefID == objUnitDefID then
 		IterableMap.Add(objectives, unitID)
+		UpdateSpinSpeeds()
 	end
 end
 
@@ -134,6 +139,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		IterableMap.Remove(objectives, unitID)
 		checkLoss = true
 	end
+end
+
+function gadget:UnitGiven(unitID, unitDefID, oldTeamID, teamID)
+	UpdateSpinSpeeds()
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)

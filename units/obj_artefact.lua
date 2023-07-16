@@ -6,14 +6,15 @@ return { obj_artefact = {
   builder                       = false,
   canSelfDestruct               = false,
   category                      = [[SINK UNARMED STUPIDTARGET]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[80 120 80]],
+  collisionVolumeOffsets        = [[0 -15 0]],
+  collisionVolumeScales         = [[80 110 80]],
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     removewait = 1,
     removestop = 1,
+    midposoffset   = [[0 25 0]],
     soundselect = "cloaker_select",
     rescale_factor = 1.4
   },
