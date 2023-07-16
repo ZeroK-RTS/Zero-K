@@ -201,6 +201,12 @@ local function GetPlanetwarsBoxes(teamDistance, teamWidth, neutralWidth, edgeDis
 	}
 end
 
+local function GetAllyAverageStartpoint(allyTeamID)
+	local allyBoxID = GetBoxID(allyTeamID)
+	local boxX, boxZ = GetAverageStartpoint(allyBoxID)
+	return boxX, boxZ
+end
+
 local function CheckStartbox (boxID, x, z)
 	if not boxID then
 		return true
@@ -357,6 +363,7 @@ function gadget:Initialize()
 	GG.startBoxConfig = startboxConfig
 	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
 	GG.CheckStartbox = CheckStartbox
+	GG.GetAllyAverageStartpoint = GetAllyAverageStartpoint
 
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)

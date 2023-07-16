@@ -1,6 +1,6 @@
 return { obj_artefact = {
   name                          = [[Ancient Artefact]],
-  description                   = [[Control all of artefacts to win. Take control by destroying enemy artefacts.]],
+  description                   = [[Capture artefacts by destroying them. Control all artefacts to win.]],
   activateWhenBuilt             = true,
   autoHeal                      = 200,
   builder                       = false,

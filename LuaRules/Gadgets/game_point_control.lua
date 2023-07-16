@@ -28,7 +28,7 @@ local vector = Spring.Utilities.Vector
 local objUnitDefID = UnitDefNames["obj_artefact"].id
 
 local EDGE_SIDE_PAD = 0.1
-local EDGE_PAD = 0.15
+local EDGE_PAD = 0.05
 local MID_PAD = 0
 
 local toCreate = false
@@ -65,10 +65,6 @@ local function RectangleAllyTeamSpawn(rect, count, allyTeamID)
 	end
 end
 
-local function ConfigAllyTeamSpawn(config, allyTeamID)
-
-end
-
 local function PlaceArtefactsRandomly()
 	local minEdgeProp = math.min(
 		(Spring.GetGameRulesParam("mex_min_x_prop") or 0),
@@ -78,6 +74,9 @@ local function PlaceArtefactsRandomly()
 	
 	local edgePadding = math.min(math.min(Game.mapSizeX, Game.mapSizeZ))*math.max(minEdgeProp - 0.04, 0.03)
 	local boxes = GG.GetPlanetwarsBoxes(0.1, 0.1, 0.34, edgePadding)
+	if not boxes then
+		return false
+	end
 	--Spring.Utilities.TableEcho(boxes, "boxes")
 	
 	local rect = boxes.neutral
@@ -89,7 +88,7 @@ local function PlaceArtefactsRandomly()
 	local teamSide, edgeSide = rect[2], rect[3]
 	local teamFacingLength = vector.AbsVal(teamSide)
 	local spawnsPerTeam = 2
-	if teamFacingLength > 3700 then
+	if teamFacingLength > 4500 then
 		spawnsPerTeam = 3
 	end
 	if teamFacingLength > 9000 then
@@ -105,10 +104,23 @@ local function PlaceArtefactsRandomly()
 	
 	RectangleAllyTeamSpawn(rect, spawnsPerTeam, 0)
 	RectangleAllyTeamSpawn(rect, spawnsPerTeam, 1)
+	return true
 end
 
-local function PlaceArtefactsFromConfig()
-
+local function PlaceArtefactsFromConfig(config)
+	if not GG.GetAllyAverageStartpoint then
+		return false
+	end
+	local allyOneX, allyOneZ = GG.GetAllyAverageStartpoint(0)
+	local allyTwoX, allyTwoZ = GG.GetAllyAverageStartpoint(1)
+	
+	for i = 1, #config.artefacts do
+		local data = config.artefacts[i]
+		local allyTeamID = (vector.DistSq(allyOneX, allyOneZ, data.pos[1], data.pos[2]) < vector.DistSq(allyTwoX, allyTwoZ, data.pos[1], data.pos[2])) and 0 or 1
+		local teams = Spring.GetTeamList(allyTeamID)
+		local teamID = teams[1]
+		GG.SpawnPregameStructure(objUnitDefID, teamID, data.pos, true)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -206,8 +218,13 @@ function gadget:Initialize()
 	local mapConfig  = VFS.FileExists(MAPSIDE_CONFIG_FILE) and VFS.Include(MAPSIDE_CONFIG_FILE) or false
 	local config     = gameConfig or mapConfig
 	if config then
-		PlaceArtefactsFromConfig(config)
+		if not PlaceArtefactsFromConfig(config) then
+			gadgetHandler:RemoveGadget()
+		end
 		return
 	end
-	PlaceArtefactsRandomly()
+	
+	if not PlaceArtefactsRandomly() then
+		gadgetHandler:RemoveGadget()
+	end
 end
