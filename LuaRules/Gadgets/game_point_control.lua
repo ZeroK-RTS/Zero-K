@@ -30,6 +30,7 @@ local objUnitDefID = UnitDefNames["obj_artefact"].id
 local EDGE_SIDE_PAD = 0.1
 local EDGE_PAD = 0.05
 local MID_PAD = 0
+local SET_NEUTRAL = false
 
 local toCreate = false
 local checkLoss = false
@@ -62,7 +63,9 @@ local function RectangleAllyTeamSpawn(rect, count, allyTeamID)
 		end
 		local unitID, spawnPos = GG.SpawnPregameStructure(objUnitDefID, teamID, pos, true, true)
 		if unitID then
-			Spring.SetUnitNeutral(unitID, true)
+			if SET_NEUTRAL then
+				Spring.SetUnitNeutral(unitID, true)
+			end
 			teamSpawnedPos[allyTeamID][i] = spawnPos
 		end
 	end
@@ -123,7 +126,7 @@ local function PlaceArtefactsFromConfig(config)
 		local teams = Spring.GetTeamList(allyTeamID)
 		local teamID = teams[1]
 		local unitID = GG.SpawnPregameStructure(objUnitDefID, teamID, data.pos, true, true)
-		if unitID then
+		if unitID and SET_NEUTRAL then
 			Spring.SetUnitNeutral(unitID, true)
 		end
 	end

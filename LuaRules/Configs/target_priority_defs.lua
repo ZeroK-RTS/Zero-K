@@ -72,10 +72,14 @@ end
 
 -- Find the things which are unarmed
 local unitIsUnarmed = {}
+local unitIsLowPriority = {}
 for i = 1, udCount do
 	local weapons = weaponsCache[i]
 	if (not weapons or #weapons == 0) and not UnitDefs[i].canKamikaze then
 		unitIsUnarmed[i] = true
+	end
+	if UnitDefs[i].customParams.very_low_priority_target then
+		unitIsLowPriority[i] = true
 	end
 end
 
@@ -88,11 +92,6 @@ local unitIsFighterOrDrone = {
 	[UnitDefNames["dronelight"].id] = true,
 	[UnitDefNames["droneheavyslow"].id] = true,
 	[UnitDefNames["dronecarry"].id] = true,
-}
-
---Badger mines are stupid targets.
-local unitIsClaw = {
-	[UnitDefNames["wolverine_mine"].id] = true,
 }
 
 -- swifts should prefer to target air over ground
@@ -348,7 +347,7 @@ local function GetPriority(uid, wid)
 		priority = priority + (unitPriorityModifier[uid] or 0)
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = priority + 35
-		elseif unitIsClaw[uid] then
+		elseif unitIsLowPriority[uid] then
 			targetTable[uid][wid] = priority + 1000
 		elseif (
 				weaponBadCats_fixedwing[wid] and unitIsFixedwing[uid]) or 

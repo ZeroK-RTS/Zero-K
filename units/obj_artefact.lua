@@ -17,10 +17,12 @@ return { obj_artefact = {
     midposoffset   = [[0 25 0]],
     soundselect = "cloaker_select",
     rescale_factor = 1.4,
-    no_xp = 1
+    no_xp = 1,
+    bait_level_target = 1,
+    very_low_priority_target = 1,
   },
 
-  explodeAs                     = [[ATOMIC_BLAST]],
+  explodeAs                     = [[MEDIUM_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 7,
   footprintZ                    = 7,
@@ -34,7 +36,7 @@ return { obj_artefact = {
   objectName                    = [[pw_artefact.dae]],
   reclaimable                   = false,
   script                        = [[obj_artefact.lua]],
-  selfDestructAs                = [[ATOMIC_BLAST]],
+  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   selfDestructCountdown         = 9001,
   sightDistance                 = 273,
   useBuildingGroundDecal        = false,
