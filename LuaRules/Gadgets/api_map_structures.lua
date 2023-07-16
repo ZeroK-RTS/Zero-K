@@ -223,6 +223,9 @@ local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible)
 		flattenAreas = flattenAreas or {}
 		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
 	end
+	if y < 0 and unitDef.floatOnWater then
+		y = 0
+	end
 	
 	local unitID = Spring.CreateUnit(unitDefID, x, y, z, direction, teamID, false, alwaysVisible)
 	if alwaysVisible then
