@@ -1066,6 +1066,10 @@ local icontypes = {
     bitmap='icons/mahlazer.dds',
     size=3.0,
   },
+  mahlazer_special = {
+    bitmap='icons/mahlazer_special.dds',
+    size=2.8,
+  },
   -- Starlight satellite
   satellite = {
     bitmap = 'icons/satellite.png',

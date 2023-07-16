@@ -218,6 +218,14 @@ local options = {
     def         = false,
   },
   {
+    key         = "artefact_control",
+    name        = "Artefact Control",
+    desc        = "Win the game by taking control of all the artefacts on the map.",
+    type        = "bool",
+    section     = "experimental",
+    def         = false,
+  },
+  {
     key         = "disableresurrect",
     name        = "Disable resurrect",
     desc        = "Removes resurrect abilities from the game",

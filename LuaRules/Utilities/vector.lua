@@ -23,16 +23,20 @@ local function Subtract(v1, v2)
 	return {v1[1] - v2[1], v1[2] - v2[2]}
 end
 
-local function AbsVal(x, y, z)
+local function AbsValSq(x, y, z)
 	if z then
-		return sqrt(x*x + y*y + z*z)
+		return x*x + y*y + z*z
 	elseif y then
-		return sqrt(x*x + y*y)
+		return x*x + y*y
 	elseif x[3] then
-		return sqrt(x[1]*x[1] + x[2]*x[2] + x[3]*x[3])
+		return x[1]*x[1] + x[2]*x[2] + x[3]*x[3]
 	else
-		return sqrt(x[1]*x[1] + x[2]*x[2])
+		return x[1]*x[1] + x[2]*x[2]
 	end
+end
+
+local function AbsVal(x, y, z)
+	return sqrt(AbsValSq(x, y, z))
 end
 
 local function Unit(v)
@@ -195,11 +199,29 @@ local function AngleAverageShortest(angleA, angleB)
 	return angleA - diff/2
 end
 
+local function RandomPointInCircle(radius, startAngle, endAngle)
+	startAngle = startAngle or 0
+	endAngle = endAngle or 2*pi
+	
+	local r = math.random()
+	local angle = startAngle + math.random()*(endAngle - startAngle)
+	return PolarToCart(radius*math.sqrt(r), angle)
+end
+
+local function DrawLine(p1, p2)
+	Spring.MarkerAddLine(p1[1], 0, p1[2], p2[1], 0, p2[2])
+end
+
+local function DrawPoint(p1, message)
+	Spring.MarkerAddPoint(p1[1], 0, p1[2], message or "")
+end
+
 Spring.Utilities.Vector = {
 	DistSq = DistSq,
 	Dist3D = Dist3D,
 	Mult = Mult,
 	AbsVal = AbsVal,
+	AbsValSq = AbsValSq,
 	Unit = Unit,
 	Dot = Dot,
 	Cross = Cross,
@@ -220,4 +242,7 @@ Spring.Utilities.Vector = {
 	DistanceToLineSq = DistanceToLineSq,
 	AngleSubtractShortest = AngleSubtractShortest,
 	AngleAverageShortest = AngleAverageShortest,
+	RandomPointInCircle = RandomPointInCircle,
+	DrawLine = DrawLine,
+	DrawPoint = DrawPoint,
 }
