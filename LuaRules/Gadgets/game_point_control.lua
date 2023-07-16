@@ -20,6 +20,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local MAPSIDE_CONFIG_FILE = "mapconfig/control_points.lua"
+local GAMESIDE_CONFIG_FILE = "LuaRules/Configs/ControlPoints/" .. (Game.mapName or "") .. ".lua"
+
 local vector = Spring.Utilities.Vector
 
 local objUnitDefID = UnitDefNames["obj_artefact"].id
@@ -37,9 +40,11 @@ local objectives = IterableMap.New()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function SpawnStructuresForAllyTeam(rect, count, allyTeamID)
+local teamSpawnedPos = {}
+local function RectangleAllyTeamSpawn(rect, count, allyTeamID)
 	local teams = Spring.GetTeamList(allyTeamID)
 	local teamID = teams[1]
+	teamSpawnedPos[allyTeamID] = {}
 	
 	for i = 0, count - 1 do
 		local sidePad = EDGE_SIDE_PAD + (1 - 2*EDGE_SIDE_PAD) * i / (count - 1)
@@ -49,11 +54,22 @@ local function SpawnStructuresForAllyTeam(rect, count, allyTeamID)
 			towardsPad = 1 - towardsPad
 		end
 		local pos = vector.Add(rect[1], vector.Add(vector.Mult(sidePad, rect[2]), vector.Mult(towardsPad, rect[3])))
-		local unitID = GG.SpawnPregameStructure(objUnitDefID, teamID, pos, true)
+		if teamSpawnedPos[1 - allyTeamID] and i == (count - 1)/2 then
+			-- Fairness for mirrored positions
+			pos = vector.Subtract(teamSpawnedPos[1 - allyTeamID][i], rect[1])
+			pos = vector.Mult(-1, pos)
+			pos = vector.Add(rect[1], vector.Add(rect[2], vector.Add(rect[3], pos)))
+		end
+		local unitID, spawnPos = GG.SpawnPregameStructure(objUnitDefID, teamID, pos, true)
+		teamSpawnedPos[allyTeamID][i] = spawnPos
 	end
 end
 
-local function PlaceArtefacts()
+local function ConfigAllyTeamSpawn(config, allyTeamID)
+
+end
+
+local function PlaceArtefactsRandomly()
 	local minEdgeProp = math.min(
 		(Spring.GetGameRulesParam("mex_min_x_prop") or 0),
 		1 - (Spring.GetGameRulesParam("mex_max_x_prop") or 1),
@@ -61,7 +77,7 @@ local function PlaceArtefacts()
 		1 - (Spring.GetGameRulesParam("mex_max_z_prop") or 1))
 	
 	local edgePadding = math.min(math.min(Game.mapSizeX, Game.mapSizeZ))*math.max(minEdgeProp - 0.04, 0.03)
-	local boxes = GG.GetPlanetwarsBoxes(0.1, 0.1, 0.38, edgePadding)
+	local boxes = GG.GetPlanetwarsBoxes(0.1, 0.1, 0.34, edgePadding)
 	--Spring.Utilities.TableEcho(boxes, "boxes")
 	
 	local rect = boxes.neutral
@@ -87,8 +103,12 @@ local function PlaceArtefacts()
 	--vector.DrawPoint(vector.Add(rect[1], vector.Mult(0.1, rect[2])), "VEC 2")
 	--vector.DrawPoint(vector.Add(rect[1], vector.Mult(0.1, rect[3])), "VEC 3")
 	
-	SpawnStructuresForAllyTeam(rect, spawnsPerTeam, 0)
-	SpawnStructuresForAllyTeam(rect, spawnsPerTeam, 1)
+	RectangleAllyTeamSpawn(rect, spawnsPerTeam, 0)
+	RectangleAllyTeamSpawn(rect, spawnsPerTeam, 1)
+end
+
+local function PlaceArtefactsFromConfig()
+
 end
 
 --------------------------------------------------------------------------------
@@ -178,7 +198,16 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
-	if Spring.GetGameFrame() <= 0 then
-		PlaceArtefacts()
+	if Spring.GetGameFrame() > 0 then
+		return
 	end
+	
+	local gameConfig = VFS.FileExists(GAMESIDE_CONFIG_FILE) and VFS.Include(GAMESIDE_CONFIG_FILE) or false
+	local mapConfig  = VFS.FileExists(MAPSIDE_CONFIG_FILE) and VFS.Include(MAPSIDE_CONFIG_FILE) or false
+	local config     = gameConfig or mapConfig
+	if config then
+		PlaceArtefactsFromConfig(config)
+		return
+	end
+	PlaceArtefactsRandomly()
 end

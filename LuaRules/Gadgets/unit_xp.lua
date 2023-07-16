@@ -21,6 +21,15 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitLosState = Spring.GetUnitLosState
 local allyTeamByTeam = {}
 
+local noXpCache = {}
+local function NoXpFromUnit(unitDefID)
+	if not noXpCache[unitDefID] then
+		local ud = UnitDefs[unitDefID]
+		noXpCache[unitDefID] = (ud.customParams.no_xp and 1) or 0
+	end
+	return (noXpCache[unitDefID] == 1)
+end
+
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 
 	if not attackerID or not spValidUnitID(attackerID)
@@ -35,7 +44,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		return
 	end
 
-	no_xp
+	if NoXpFromUnit(unitDefID) then
+		return
+	end
 
 	local parentID = spGetUnitRulesParam(attackerID, "parent_unit_id")
 	if parentID then

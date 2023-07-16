@@ -196,6 +196,7 @@ local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible)
 	end
 	
 	local iteration = 0
+	--Spring.MarkerAddPoint(x, 0, z, "START")
 	while not ValidPosition(unitDefID, x, z, sX, sZ, minHeight, maxHeight, direction) do
 		x, z = GetRandomPosition(position, iteration)
 		--Spring.MarkerAddPoint(x, 0, z, "")
@@ -233,7 +234,7 @@ local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible)
 		end
 	end
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
-	return unitID
+	return unitID, {x, z}
 end
 
 --------------------------------------------------------------------------------
