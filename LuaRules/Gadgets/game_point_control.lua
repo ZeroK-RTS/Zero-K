@@ -28,8 +28,8 @@ local vector = Spring.Utilities.Vector
 local objUnitDefID = UnitDefNames["obj_artefact"].id
 
 local EDGE_SIDE_PAD = 0.1
-local EDGE_PAD = 0.1
-local MID_PAD = -0.1
+local EDGE_PAD = 0.15
+local MID_PAD = 0
 
 local toCreate = false
 local checkLoss = false
