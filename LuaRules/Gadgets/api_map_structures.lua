@@ -231,6 +231,9 @@ local function SpawnPregameStructure(unitDefID, teamID, position, alwaysVisible,
 	end
 	
 	local unitID = Spring.CreateUnit(unitDefID, x, y, z, direction, teamID, false, alwaysVisible)
+	if not unitID then
+		return false
+	end
 	if alwaysVisible then
 		Spring.SetUnitAlwaysVisible(unitID, true)
 		local allyTeamList = Spring.GetAllyTeamList()

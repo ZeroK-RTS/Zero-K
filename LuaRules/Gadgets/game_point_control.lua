@@ -196,7 +196,10 @@ function gadget:GameFrame(n)
 			local data = toCreate[i]
 			local teams = Spring.GetTeamList(data.allyTeamID)
 			local teamID = teams[1]
-			Spring.CreateUnit(objUnitDefID, data.x, Spring.GetGroundHeight(data.x, data.z), data.z, data.direction, teamID, false, true)
+			local unitID = Spring.CreateUnit(objUnitDefID, data.x, Spring.GetGroundHeight(data.x, data.z), data.z, data.direction, teamID, false, true)
+			if unitID then
+				Spring.SetUnitAlwaysVisible(unitID, true)
+			end
 		end
 		toCreate = false
 	end
