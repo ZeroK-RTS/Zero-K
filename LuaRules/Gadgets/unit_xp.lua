@@ -24,9 +24,9 @@ local allyTeamByTeam = {}
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 
 	if not attackerID or not spValidUnitID(attackerID)
-	or spAreTeamsAllied(unitTeam, attackerTeam)
-	or paralyzer -- requires a sensible formula
-	then
+			or spAreTeamsAllied(unitTeam, attackerTeam)
+			or paralyzer -- requires a sensible formula
+			then
 		return
 	end
 
@@ -34,6 +34,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if canAttackerSeeTarget % 2 == 0 then
 		return
 	end
+
+	no_xp
 
 	local parentID = spGetUnitRulesParam(attackerID, "parent_unit_id")
 	if parentID then
