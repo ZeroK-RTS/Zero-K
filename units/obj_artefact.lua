@@ -9,6 +9,9 @@ return { obj_artefact = {
   collisionVolumeOffsets        = [[0 -15 0]],
   collisionVolumeScales         = [[80 110 80]],
   collisionVolumeType           = [[CylY]],
+  selectionVolumeOffsets        = [[0 -15 0]],
+  selectionVolumeScales         = [[100 110 100]],
+  selectionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -22,7 +25,7 @@ return { obj_artefact = {
     very_low_priority_target = 1,
   },
 
-  explodeAs                     = [[MEDIUM_BUILDINGEX]],
+  explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 7,
   footprintZ                    = 7,
@@ -36,7 +39,7 @@ return { obj_artefact = {
   objectName                    = [[pw_artefact.dae]],
   reclaimable                   = false,
   script                        = [[obj_artefact.lua]],
-  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
+  selfDestructAs                = [[ESTOR_BUILDINGEX]],
   selfDestructCountdown         = 9001,
   sightDistance                 = 273,
   useBuildingGroundDecal        = false,
