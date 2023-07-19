@@ -52,7 +52,6 @@ return { planefighter = {
   maxAcc                 = 0.5,
   maxDamage              = 300,
   maxRudder              = 0.007,
-  maxVelocity            = 13,
   metalCost              = 150,
   mygravity              = 1,
   noAutoFire             = false,
@@ -72,6 +71,7 @@ return { planefighter = {
 
   },
   sightDistance          = 520,
+  speed                  = 390,
   speedToFront           = 0,
   turnRadius             = 150,
   turnRate               = 839,

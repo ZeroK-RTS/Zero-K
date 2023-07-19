@@ -35,7 +35,6 @@ return { staticantinuke = {
   levelGround                   = false,
   maxDamage                     = 3300,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 3000,
   objectName                    = [[staticantinuke.s3o]],

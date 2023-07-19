@@ -33,7 +33,6 @@ return { obj_artefact = {
   iconType                      = [[mahlazer_special]],
   maxDamage                     = 12000,
   maxSlope                      = 24,
-  maxVelocity                   = 0,
   metalCost                     = 1000,
   noAutoFire                    = false,
   objectName                    = [[pw_artefact.dae]],

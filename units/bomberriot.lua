@@ -37,7 +37,6 @@ return { bomberriot = {
   maxElevator         = 0.02,
   maxRudder           = 0.009,
   maxFuel             = 1000000,
-  maxVelocity         = 8.1,
   metalCost           = 360,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
@@ -55,6 +54,7 @@ return { bomberriot = {
 
   },
   sightDistance       = 780,
+  speed               = 243,
   turnRadius          = 160,
   workerTime          = 0,
 

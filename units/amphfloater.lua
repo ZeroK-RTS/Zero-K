@@ -35,7 +35,6 @@ return { amphfloater = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
-  maxVelocity            = 1.7,
   metalCost              = 280,
   movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -52,6 +51,7 @@ return { amphfloater = {
 
   sightDistance          = 500,
   sonarDistance          = 500,
+  speed                  = 51,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

@@ -23,7 +23,6 @@ return { spideranarchid = {
   leaveTracks            = true,
   maxDamage              = 600,
   maxSlope               = 72,
-  maxVelocity            = 1.6,
   maxWaterDepth          = 22,
   metalCost              = 250,
   movementClass          = [[TKBOT3]],
@@ -42,6 +41,7 @@ return { spideranarchid = {
   },
 
   sightDistance          = 440,
+  speed                  = 48,
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,

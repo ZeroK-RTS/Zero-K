@@ -27,7 +27,6 @@ return { staticarty = {
   iconType                      = [[staticarty]],
   maxDamage                     = 3750,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 2500,
   noAutoFire                    = false,

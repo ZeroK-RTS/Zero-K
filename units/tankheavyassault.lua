@@ -30,7 +30,6 @@ return { tankheavyassault = {
   leaveTracks         = true,
   maxDamage           = 12000,
   maxSlope            = 18,
-  maxVelocity         = 1.9,
   maxWaterDepth       = 22,
   metalCost           = 2200,
   movementClass       = [[TANK4]],
@@ -48,6 +47,7 @@ return { tankheavyassault = {
 
   },
   sightDistance       = 540,
+  speed               = 57,
   trackOffset         = 8,
   trackStrength       = 10,
   trackStretch        = 1,

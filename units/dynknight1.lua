@@ -3,7 +3,7 @@ local unitDef = included.dynstrike1
 unitDef.buildPic = [[cremcom.png]]
 unitDef.objectName = [[cremcom.s3o]]
 unitDef.script  = [[dynknight.lua]]
-unitDef.maxVelocity = 1.35
+unitDef.speed       = 40.5
 unitDef.radarDistanceJam = 0 -- needless complexity
 
 unitDef.customParams.commtype = "6"

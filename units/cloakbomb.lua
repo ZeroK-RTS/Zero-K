@@ -31,7 +31,6 @@ return { cloakbomb = {
   leaveTracks            = true,
   maxDamage              = 50,
   maxSlope               = 72,
-  maxVelocity            = 4.2,
   metalCost              = 125,
   movementClass          = [[TKBOT2]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
@@ -50,6 +49,7 @@ return { cloakbomb = {
   },
 
   sightDistance          = 240,
+  speed                  = 126,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

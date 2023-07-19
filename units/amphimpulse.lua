@@ -36,7 +36,6 @@ return { amphimpulse = {
   leaveTracks            = true,
   maxDamage              = 760,
   maxSlope               = 36,
-  maxVelocity            = 2.35,
   metalCost              = 200,
   movementClass          = [[AKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -53,6 +52,7 @@ return { amphimpulse = {
 
   sightDistance          = 500,
   sonarDistance          = 500,
+  speed                  = 70.5,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

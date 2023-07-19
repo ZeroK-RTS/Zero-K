@@ -27,7 +27,6 @@ return { shieldraid = {
   leaveTracks            = true,
   maxDamage              = 340,
   maxSlope               = 36,
-  maxVelocity            = 3,
   maxWaterDepth          = 22,
   metalCost              = 75,
   movementClass          = [[KBOT2]],
@@ -45,6 +44,7 @@ return { shieldraid = {
   },
 
   sightDistance          = 560,
+  speed                  = 90,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

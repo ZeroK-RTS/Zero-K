@@ -35,7 +35,6 @@ return { shieldbomb = {
   leaveTracks            = true,
   maxDamage              = 60,
   maxSlope               = 36,
-  maxVelocity            = 3.6,
   maxWaterDepth          = 15,
   metalCost              = 170,
   movementClass          = [[SKBOT2]],
@@ -57,6 +56,7 @@ return { shieldbomb = {
   },
 
   sightDistance          = 240,
+  speed                  = 108,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

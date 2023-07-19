@@ -35,7 +35,6 @@ return { bomberassault = {
   maxElevator         = 0.01,
   maxRudder           = 0.003,
   maxFuel             = 1000000,
-  maxVelocity         = 6,
   metalCost           = 1000,
   mygravity           = 1,
   noAutoFire          = false,
@@ -45,6 +44,7 @@ return { bomberassault = {
   script              = [[bomberassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
+  speed               = 180,
   turnRadius          = 90,
   workerTime          = 0,
 

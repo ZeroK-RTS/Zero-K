@@ -38,7 +38,6 @@ return { striderscorpion = {
   leaveTracks            = true,
   maxDamage              = 12000,
   maxSlope               = 72,
-  maxVelocity            = 1.3,
   maxWaterDepth          = 22,
   metalCost              = 3000,
   minCloakDistance       = 150,
@@ -60,6 +59,7 @@ return { striderscorpion = {
 
   },
   sightDistance          = 517,
+  speed                  = 39,
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,

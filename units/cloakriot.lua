@@ -37,7 +37,6 @@ return { cloakriot = {
   leaveTracks            = true,
   maxDamage              = 820,
   maxSlope               = 36,
-  maxVelocity            = 1.75,
   maxWaterDepth          = 22,
   metalCost              = 210,
   movementClass          = [[KBOT3]],
@@ -56,6 +55,7 @@ return { cloakriot = {
   },
 
   sightDistance          = 350,
+  speed                  = 52.5,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,

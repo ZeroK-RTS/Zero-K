@@ -52,7 +52,6 @@ return { plateship = {
   iconType                      = [[padship]],
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH * 3 / 2,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = Shared.FACTORY_PLATE_COST,
   minWaterDepth                 = 15,
   moveState                     = 1,

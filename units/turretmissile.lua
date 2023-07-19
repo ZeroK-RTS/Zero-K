@@ -32,7 +32,6 @@ return { turretmissile = {
   losEmitHeight                 = 40,
   maxDamage                     = 340,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 100,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],

@@ -31,7 +31,6 @@ return { hoverarty = {
   losEmitHeight       = 40,
   maxDamage           = 1000,
   maxSlope            = 18,
-  maxVelocity         = 1.65,
   maxWaterDepth       = 22,
   metalCost           = 1100,
   movementClass       = [[HOVER4]],
@@ -52,6 +51,7 @@ return { hoverarty = {
   
   sightDistance       = 660,
   sonarDistance       = 660,
+  speed               = 49.5,
   turninplace         = 0,
   turnRate            = 420,
   workerTime          = 0,

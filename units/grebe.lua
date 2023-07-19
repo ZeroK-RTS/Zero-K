@@ -21,7 +21,6 @@ return { grebe = {
   leaveTracks            = true,
   maxDamage              = 900,
   maxSlope               = 36,
-  maxVelocity            = 2.4,
   maxWaterDepth          = 5000,
   metalCost              = 300,
   movementClass          = [[AKBOT2]],
@@ -37,6 +36,7 @@ return { grebe = {
 
   sightDistance          = 500,
   sonarDistance          = 300,
+  speed                  = 72,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

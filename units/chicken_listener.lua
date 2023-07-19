@@ -27,7 +27,6 @@ return { chicken_listener = {
   leaveTracks         = true,
   maxDamage           = 700,
   maxSlope            = 36,
-  maxVelocity         = 0.6,
   maxWaterDepth       = 22,
   metalCost           = 0,
   energyCost          = 0,
@@ -52,6 +51,7 @@ return { chicken_listener = {
 
   },
   sightDistance       = 700,
+  speed               = 18,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

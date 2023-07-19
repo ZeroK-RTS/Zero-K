@@ -30,7 +30,6 @@ return { chicken_blimpy = {
   maneuverleashlength = [[64000]],
   maxDamage           = 1850,
   maxSlope            = 18,
-  maxVelocity         = 5,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 750,
@@ -53,6 +52,7 @@ return { chicken_blimpy = {
   },
   sightDistance       = 512,
   sonarDistance       = 512,
+  speed               = 150,
   turnRate            = 6000,
   workerTime          = 0,
 

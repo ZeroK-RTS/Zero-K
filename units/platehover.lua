@@ -55,7 +55,6 @@ return { platehover = {
   levelGround      = false,
   maxDamage        = Shared.FACTORY_PLATE_HEALTH,
   maxSlope         = 15,
-  maxVelocity      = 0,
   metalCost                     = Shared.FACTORY_PLATE_COST,
   moveState        = 1,
   noAutoFire       = false,

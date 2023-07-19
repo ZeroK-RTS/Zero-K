@@ -58,7 +58,6 @@ return { striderhub = {
   maneuverleashlength           = [[380]],
   maxDamage                     = 2000,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = Shared.FACTORY_COST,
   movementClass                 = [[KBOT4]],
   noAutoFire                    = false,

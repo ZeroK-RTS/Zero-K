@@ -34,7 +34,6 @@ return { jumpraid = {
   leaveTracks           = true,
   maxDamage             = 690,
   maxSlope              = 36,
-  maxVelocity           = 3,
   maxWaterDepth         = 22,
   metalCost             = 220,
   movementClass         = [[KBOT2]],
@@ -57,6 +56,7 @@ return { jumpraid = {
   },
 
   sightDistance         = 560,
+  speed                 = 90,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,

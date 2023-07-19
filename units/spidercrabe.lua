@@ -33,7 +33,6 @@ return { spidercrabe = {
   leaveTracks            = true,
   maxDamage              = 4200,
   maxSlope               = 36,
-  maxVelocity            = 1.35,
   maxWaterDepth          = 22,
   metalCost              = 1600,
   movementClass          = [[TKBOT4]],
@@ -56,6 +55,7 @@ return { spidercrabe = {
   },
 
   sightDistance          = 660,
+  speed                  = 40.5,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

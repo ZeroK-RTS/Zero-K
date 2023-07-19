@@ -32,7 +32,6 @@ return { gunshipraid = {
   idleAutoHeal           = 6,
   idleTime               = 150,
   maxDamage              = 800,
-  maxVelocity            = 6.9,
   metalCost              = 220,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
@@ -48,6 +47,7 @@ return { gunshipraid = {
   },
 
   sightDistance          = 500,
+  speed                  = 207,
   turnRate               = 693,
 
   weapons                = {

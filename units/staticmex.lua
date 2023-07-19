@@ -38,7 +38,6 @@ return { staticmex = {
   levelGround            = false,
   maxDamage              = 600,
   maxSlope               = 28,
-  maxVelocity            = 0,
   maxWaterDepth          = 5000,
   metalCost              = 85,
   noAutoFire             = false,

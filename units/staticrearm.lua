@@ -41,7 +41,6 @@ return { staticrearm = {
   iconType            = [[building]],
   maxDamage           = 1860,
   maxSlope            = 18,
-  maxVelocity         = 0,
   metalCost           = 350,
   objectName          = [[staticrearm.dae]],
   script              = [[staticrearm.lua]],

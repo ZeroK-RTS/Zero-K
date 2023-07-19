@@ -22,7 +22,6 @@ return { fakeunit_aatarget = {
   kamikazeDistance      = 64,
   levelGround           = false,
   maxDamage             = 900000,
-  maxVelocity           = 0,
   maxWaterDepth         = 0,
   metalCost             = 0.45,
   noAutoFire            = false,

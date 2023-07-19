@@ -19,7 +19,6 @@ return { roost = {
   levelGround       = false,
   maxDamage         = 1800,
   maxSlope          = 36,
-  maxVelocity       = 0,
   metalCost         = 340,
   metalMake         = 2.5,
   noAutoFire        = false,

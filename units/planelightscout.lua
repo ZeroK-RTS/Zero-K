@@ -38,7 +38,6 @@ return { planelightscout = {
   maxAileron          = 0.016,
   maxElevator         = 0.022,
   maxRudder           = 0.012,
-  maxVelocity         = 7,
   metalCost           = 235,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -46,6 +45,7 @@ return { planelightscout = {
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 950,
+  speed               = 210,
   turnRadius          = 50,
   workerTime          = 0,
 

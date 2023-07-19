@@ -32,7 +32,6 @@ return { tankheavyraid = {
   leaveTracks            = true,
   maxDamage              = 1300,
   maxSlope               = 18,
-  maxVelocity            = 3.25,
   maxWaterDepth          = 22,
   metalCost              = 300,
   movementClass          = [[TANK3]],
@@ -50,6 +49,7 @@ return { tankheavyraid = {
 
   },
   sightDistance          = 560,
+  speed                  = 97.5,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,

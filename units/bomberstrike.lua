@@ -35,7 +35,6 @@ return { bomberstrike = {
   maxElevator         = 0.01,
   maxRudder           = 0.007,
   maxFuel             = 1000000,
-  maxVelocity         = 8.4,
   metalCost           = 240,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
@@ -45,6 +44,7 @@ return { bomberstrike = {
 
   sfxtypes            = {},
   sightDistance       = 780,
+  speed               = 252,
   turnRadius          = 500,
   workerTime          = 0,
 

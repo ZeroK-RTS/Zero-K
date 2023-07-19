@@ -21,7 +21,6 @@ return { shieldarty = {
   leaveTracks            = true,
   maxDamage              = 780,
   maxSlope               = 36,
-  maxVelocity            = 1.75,
   maxWaterDepth          = 22,
   metalCost              = 340,
   movementClass          = [[KBOT2]],
@@ -40,6 +39,7 @@ return { shieldarty = {
   },
 
   sightDistance          = 325,
+  speed                  = 52.5,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

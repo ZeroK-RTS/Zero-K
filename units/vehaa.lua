@@ -32,7 +32,6 @@ return { vehaa = {
   maneuverleashlength    = [[30]],
   maxDamage              = 900,
   maxSlope               = 18,
-  maxVelocity            = 3.7,
   maxWaterDepth          = 22,
   metalCost              = 220,
   movementClass          = [[TANK3]],
@@ -52,6 +51,7 @@ return { vehaa = {
 
   },
   sightDistance          = 660,
+  speed                  = 111,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,

@@ -29,7 +29,6 @@ return { shieldriot = {
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
-  maxVelocity            = 2,
   maxWaterDepth          = 22,
   metalCost              = 250,
   movementClass          = [[KBOT3]],
@@ -52,6 +51,7 @@ return { shieldriot = {
   },
 
   sightDistance          = 347,
+  speed                  = 60,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

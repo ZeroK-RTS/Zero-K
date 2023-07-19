@@ -25,7 +25,6 @@ return { hoverskirm2 = {
   iconType            = [[hoverskirm]],
   maxDamage           = 1300,
   maxSlope            = 36,
-  maxVelocity         = 2.5,
   metalCost           = 180,
   movementClass       = [[HOVER2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
@@ -44,6 +43,7 @@ return { hoverskirm2 = {
   },
 
   sightDistance       = 450,
+  speed               = 75,
   turninplace         = 0,
   turnRate            = 800,
 

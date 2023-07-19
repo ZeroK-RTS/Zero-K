@@ -33,7 +33,6 @@ return { chicken_drone = {
   leaveTracks         = true,
   maxDamage           = 170,
   maxSlope            = 36,
-  maxVelocity         = 1.8,
   maxWaterDepth       = 5000,
   metalCost           = 0,
   energyCost          = 0,
@@ -60,6 +59,7 @@ return { chicken_drone = {
 
   },
   sightDistance       = 256,
+  speed               = 54,
   trackOffset         = 1,
   trackStrength       = 6,
   trackStretch        = 1,

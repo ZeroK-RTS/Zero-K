@@ -30,7 +30,6 @@ return { hoverskirm = {
   leaveTracks         = true,
   maxDamage           = 660,
   maxSlope            = 18,
-  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   metalCost           = 220,
   movementClass       = [[HOVER3]],
@@ -52,6 +51,7 @@ return { hoverskirm = {
 
   sightDistance       = 484,
   sonarDistance       = 484,
+  speed               = 63,
   turninplace         = 0,
   turnRate            = 563,
   workerTime          = 0,

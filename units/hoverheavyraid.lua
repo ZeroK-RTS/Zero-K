@@ -27,7 +27,6 @@ return { hoverheavyraid = {
   iconType            = [[hoverraider]],
   maxDamage           = 700,
   maxSlope            = 36,
-  maxVelocity         = 3.2,
   metalCost           = 180,
   movementClass       = [[HOVER3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
@@ -47,6 +46,7 @@ return { hoverheavyraid = {
 
   sightDistance       = 560,
   sonarDistance       = 560,
+  speed               = 96,
   turninplace         = 0,
   turnRate            = 848,
 

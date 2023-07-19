@@ -32,7 +32,6 @@ return { jumpblackhole = {
   losEmitHeight         = 40,
   maxDamage             = 900,
   maxSlope              = 36,
-  maxVelocity           = 2,
   maxWaterDepth         = 22,
   metalCost             = 250,
   movementClass         = [[KBOT2]],
@@ -54,6 +53,7 @@ return { jumpblackhole = {
 
   },
   sightDistance         = 605,
+  speed                 = 60,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,

@@ -34,7 +34,6 @@ return { amphsupport = {
   leaveTracks            = true,
   maxDamage              = 1540,
   maxSlope               = 36,
-  maxVelocity            = 1.6,
   metalCost              = 230,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
@@ -58,6 +57,7 @@ return { amphsupport = {
 
   sightDistance          = 660,
   sonarDistance          = 660,
+  speed                  = 48,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

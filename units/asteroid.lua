@@ -11,7 +11,6 @@ return { asteroid = {
   levelGround                   = false,
   maxDamage                     = 500,
   maxSlope                      = 255,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 50,
   objectName                    = [[asteroid.s3o]],

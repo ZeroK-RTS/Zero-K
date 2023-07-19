@@ -40,7 +40,6 @@ return { planescout = {
   maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.008,
-  maxVelocity         = 12,
   metalCost           = 340,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -51,6 +50,7 @@ return { planescout = {
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,
   sonarDistance       = 700,
+  speed               = 360,
   turnRadius          = 60,
   workerTime          = 0,
 

@@ -28,7 +28,6 @@ return { hoverraid = {
   iconType            = [[hoverscout]],
   maxDamage           = 300,
   maxSlope            = 36,
-  maxVelocity         = 4.8,
   metalCost           = 80,
   movementClass       = [[HOVER2]],
   noAutoFire          = false,
@@ -48,6 +47,7 @@ return { hoverraid = {
 
   sightDistance       = 640,
   sonarDistance       = 640,
+  speed               = 144,
   turninplace         = 0,
   turnRate            = 864,
   workerTime          = 0,

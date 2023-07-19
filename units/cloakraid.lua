@@ -30,7 +30,6 @@ return { cloakraid = {
   leaveTracks            = true,
   maxDamage              = 230,
   maxSlope               = 36,
-  maxVelocity            = 3.85,
   maxWaterDepth          = 22,
   metalCost              = 65,
   movementClass          = [[KBOT2]],
@@ -50,6 +49,7 @@ return { cloakraid = {
   },
 
   sightDistance          = 560,
+  speed                  = 115.5,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.9,

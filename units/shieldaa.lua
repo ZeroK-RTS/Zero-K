@@ -29,7 +29,6 @@ return { shieldaa = {
   leaveTracks            = true,
   maxDamage              = 650,
   maxSlope               = 36,
-  maxVelocity            = 2.7,
   maxWaterDepth          = 22,
   metalCost              = 90,
   movementClass          = [[KBOT2]],
@@ -48,6 +47,7 @@ return { shieldaa = {
   },
 
   sightDistance          = 660,
+  speed                  = 81,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

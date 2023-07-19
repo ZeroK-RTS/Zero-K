@@ -150,6 +150,14 @@ for name, ud in pairs(UnitDefs) do
 		Spring.Echo("ERROR: " .. name .. ".buildCostEnergy set, should be energyCost instead!")
 		ud.energycost = ud.energycost or ud.buildcostenergy
 	end
+	if ud.maxvelocity then
+		Spring.Echo("ERROR: " .. name .. ".maxVelocity set, should be speed instead!")
+		ud.speed = ud.speed or (ud.maxvelocity * Game.gameSpeed)
+	end
+	if ud.maxreversevelocity then
+		Spring.Echo("ERROR: " .. name .. ".maxReverseVelocity set, should be rSpeed instead!")
+		ud.rspeed = ud.rspeed or (ud.maxreversevelocity * Game.gameSpeed)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -215,7 +223,7 @@ end
 -- see http://springrts.com/phpbb/viewtopic.php?f=13&t=27550
 
 for name, ud in pairs(UnitDefs) do
-	if (ud.maxvelocity and ud.maxvelocity > 0) or ud.customparams.mobilebuilding then
+	if (ud.speed and ud.speed > 0) or ud.customparams.mobilebuilding then
 		ud.customparams.ignoreplacementrestriction = "true"
 	end
 end
@@ -348,7 +356,7 @@ for name, ud in pairs(UnitDefs) do
 				end
 			end
 		end
-		if (hasShield or (((not ud.maxvelocity) or ud.maxvelocity == 0) and not ud.cloakcost)) then
+		if (hasShield or (((not ud.speed) or ud.speed == 0) and not ud.cloakcost)) then
 			ud.customparams.cannotcloak = 1
 			ud.mincloakdistance = 0
 			ud.cloakcost = nil
@@ -505,8 +513,8 @@ end
 if (modOptions and modOptions.unitspeedmult and modOptions.unitspeedmult ~= 1) then
 	local unitspeedmult = modOptions.unitspeedmult
 	for unitDefID, unitDef in pairs(UnitDefs) do
-		if (unitDef.maxvelocity) then
-			unitDef.maxvelocity = unitDef.maxvelocity * unitspeedmult
+		if (unitDef.speed) then
+			unitDef.speed = unitDef.speed * unitspeedmult
 		end
 		if (unitDef.acceleration) then
 			unitDef.acceleration = unitDef.acceleration * unitspeedmult
@@ -552,22 +560,22 @@ for name, ud in pairs(UnitDefs) do
 	if ud.turnrate then
 		if ud.customparams.turnatfullspeed_hover then
 			ud.turninplace = false
-			ud.turninplacespeedlimit = (ud.maxvelocity or 0)*(ud.customparams.boost_speed_mult or 0.8)
+			ud.turninplacespeedlimit = (ud.speed or 0)*(ud.customparams.boost_speed_mult or 0.8) / Game.gameSpeed
 			ud.turninplaceanglelimit = 90
 		elseif (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
 			ud.turninplace = false
-			ud.turninplacespeedlimit = (ud.maxvelocity or 0)
+			ud.turninplacespeedlimit = (ud.speed or 0) / Game.gameSpeed
 		elseif ud.turninplace ~= true then
 			ud.turninplace = false -- true
-			ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+			ud.turninplacespeedlimit = ud.turninplacespeedlimit or ((ud.speed and ud.speed*0.6 or 0) / Game.gameSpeed)
 			--ud.turninplaceanglelimit = 180
 		end
 	end
 
 	if ud.category and not (ud.category:find("SHIP", 1, true) or ud.category:find("SUB", 1, true)) then
-		if (ud.maxvelocity) and not ud.maxreversevelocity then
+		if (ud.speed) and not ud.rspeed then
 			if not name:find("chicken", 1, true) then
-				ud.maxreversevelocity = ud.maxvelocity * 0.33
+				ud.rspeed = ud.speed * 0.33
 			end
 		end
 	end
@@ -889,7 +897,7 @@ end]]
 -- Category changes
 --
 for name, ud in pairs(UnitDefs) do
-	if ((ud.maxvelocity or 0) > 0) then
+	if ((ud.speed or 0) > 0) then
 		ud.category = ud.category .. " MOBILE"
 	end
 end
@@ -1024,8 +1032,6 @@ end
 if Game.gameSpeed ~= 30 then
 	local FPS_SCALE = 30 / Game.gameSpeed
 	for name, ud in pairs(UnitDefs) do
-		if ud.maxvelocity        then ud.maxvelocity        = ud.maxvelocity        * FPS_SCALE end
-		if ud.maxreversevelocity then ud.maxreversevelocity = ud.maxreversevelocity * FPS_SCALE end
 		if ud.acceleration       then ud.acceleration       = ud.acceleration       * FPS_SCALE end
 		if ud.brakerate          then ud.brakerate          = ud.brakerate          * FPS_SCALE end
 		if ud.turnrate           then ud.turnrate           = ud.turnrate           * FPS_SCALE end
@@ -1038,5 +1044,7 @@ if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 		ud.energyuse = ud.energyupkeep
 		ud.buildcostmetal  = ud.metalcost
 		ud.buildcostenergy = ud.energycost
+		ud.maxreversevelocity = ud.rspeed / Game.gameSpeed
+		ud.maxvelocity        = ud.speed  / Game.gameSpeed
 	end
 end

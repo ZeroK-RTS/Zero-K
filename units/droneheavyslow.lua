@@ -24,7 +24,6 @@ return { droneheavyslow = {
   idleAutoHeal        = 10,
   idleTime            = 300,
   maxDamage           = 430,
-  maxVelocity         = 5,
   metalCost           = 35,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -47,6 +46,7 @@ return { droneheavyslow = {
 
   },
   sightDistance       = 500,
+  speed               = 150,
   turnRate            = 792,
   upright             = true,
 

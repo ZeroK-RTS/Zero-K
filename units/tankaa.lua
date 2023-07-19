@@ -27,7 +27,6 @@ return { tankaa = {
   maneuverleashlength    = [[30]],
   maxDamage              = 1400,
   maxSlope               = 18,
-  maxVelocity            = 3.2,
   maxWaterDepth          = 22,
   metalCost              = 500,
   movementClass          = [[TANK3]],
@@ -46,6 +45,7 @@ return { tankaa = {
 
   },
   sightDistance          = 660,
+  speed                  = 96,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,

@@ -49,7 +49,6 @@ return { planeheavyfighter = {
   maxDamage              = 1100,
   maxElevator            = 0.015,
   maxRudder              = 0.008,
-  maxVelocity            = 7.6,
   metalCost              = 300,
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -57,6 +56,7 @@ return { planeheavyfighter = {
   script                 = [[planeheavyfighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
+  speed                  = 228,
   speedToFront           = 0.5,
   turnRadius             = 160,
 

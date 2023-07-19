@@ -19,7 +19,6 @@ return { starlight_satellite = {
   hoverAttack            = true,
   iconType               = [[satellite]],
   maxDamage              = 1500,
-  maxVelocity            = 0.001,
   metalCost              = 300,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -46,6 +45,7 @@ return { starlight_satellite = {
   },
 
   sightDistance          = 0,
+  speed                  = 0.03,
   turnRate               = 1,
 
   weapons                       = {

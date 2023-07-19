@@ -36,7 +36,6 @@ return { jumpskirm = {
   leaveTracks         = true,
   maxDamage           = 480,
   maxSlope            = 36,
-  maxVelocity         = 1.9,
   maxWaterDepth       = 22,
   metalCost           = 240,
   movementClass       = [[KBOT3]],
@@ -55,6 +54,7 @@ return { jumpskirm = {
   },
 
   sightDistance       = 473,
+  speed               = 57,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 0.8,

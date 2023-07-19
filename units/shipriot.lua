@@ -26,7 +26,6 @@ return { shipriot = {
   footprintZ             = 4,
   iconType               = [[shipriot]],
   maxDamage              = 1350,
-  maxVelocity            = 2.7,
   metalCost              = 240,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
@@ -47,6 +46,7 @@ return { shipriot = {
   },
   
   sonarDistance          = 500,
+  speed                  = 81,
   turninplace            = 0,
   turnRate               = 800,
   waterline              = 0,

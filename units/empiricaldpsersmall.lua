@@ -13,7 +13,6 @@ return { empiricaldpsersmall = {
   idleAutoHeal            = 0,
   maxDamage               = 16000,
   maxSlope                = 18,
-  maxVelocity             = 0,
   maxWaterDepth           = 0,
   metalCost               = 10000,
   objectName              = [[claw.s3o]],

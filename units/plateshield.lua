@@ -57,7 +57,6 @@ return { plateshield = {
   iconType                      = [[padwalker]],
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = Shared.FACTORY_PLATE_COST,
   moveState                     = 1,

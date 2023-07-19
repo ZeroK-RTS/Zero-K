@@ -43,7 +43,6 @@ return { jumpsumo = {
   losEmitHeight       = 60,
   maxDamage           = 13500,
   maxSlope            = 36,
-  maxVelocity         = 1.15,
   maxWaterDepth       = 22,
   metalCost           = 1700,
   movementClass       = [[KBOT4]],
@@ -63,6 +62,7 @@ return { jumpsumo = {
 
   },
   sightDistance       = 480,
+  speed               = 34.5,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

@@ -44,7 +44,6 @@ return { bomberprec = {
   maxRudder           = 0.013,
   maxFuel             = 1000000,
   maxPitch            = 0.4,
-  maxVelocity         = 7.8,
   metalCost           = 300,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP TOOFAST]],
@@ -61,6 +60,7 @@ return { bomberprec = {
 
   },
   sightDistance       = 780,
+  speed               = 234,
   turnRadius          = 300,
   workerTime          = 0,
 

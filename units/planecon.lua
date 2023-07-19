@@ -45,7 +45,6 @@ return { planecon = {
   hoverAttack         = true,
   iconType            = [[builderair]],
   maxDamage           = 260,
-  maxVelocity         = 6,
   metalCost           = 200,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -54,6 +53,7 @@ return { planecon = {
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 375,
+  speed               = 180,
   turnRate            = 500,
   workerTime          = 5,
 

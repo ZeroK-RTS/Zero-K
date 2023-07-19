@@ -30,7 +30,6 @@ return { jumpassault = {
   leaveTracks         = true,
   maxDamage           = 6000,
   maxSlope            = 36,
-  maxVelocity         = 1.81,
   maxWaterDepth       = 22,
   metalCost           = 600,
   movementClass       = [[KBOT2]],
@@ -49,6 +48,7 @@ return { jumpassault = {
 
   },
   sightDistance       = 350,
+  speed               = 54.3,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

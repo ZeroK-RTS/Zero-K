@@ -32,7 +32,6 @@ return { veharty = {
   maneuverleashlength = [[650]],
   maxDamage           = 450,
   maxSlope            = 18,
-  maxVelocity         = 1.85,
   maxWaterDepth       = 22,
   metalCost           = 270,
   movementClass       = [[TANK3]],
@@ -52,6 +51,7 @@ return { veharty = {
 
   },
   sightDistance       = 660,
+  speed               = 55.5,
   trackOffset         = 6,
   trackStrength       = 5,
   trackStretch        = 1,

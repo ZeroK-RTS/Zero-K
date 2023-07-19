@@ -39,7 +39,6 @@ return { staticcon = {
   levelGround                   = false,
   maxDamage                     = 500,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = 180,
   movementClass                 = [[KBOT2]],
   objectName                    = [[armsenan.s3o]],

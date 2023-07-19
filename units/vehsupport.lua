@@ -35,7 +35,6 @@ return { vehsupport = {
   leaveTracks            = true,
   maxDamage              = 530,
   maxSlope               = 18,
-  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
   metalCost              = 145,
   movementClass          = [[TANK3]],
@@ -56,6 +55,7 @@ return { vehsupport = {
 
   },
   sightDistance          = 660,
+  speed                  = 84,
   trackOffset            = -6,
   trackStrength          = 5,
   trackStretch           = 1,

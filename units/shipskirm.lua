@@ -29,7 +29,6 @@ return { shipskirm = {
   iconType               = [[shipskirm]],
   losEmitHeight          = 30,
   maxDamage              = 650,
-  maxVelocity            = 2.1,
   metalCost              = 220,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
@@ -49,6 +48,7 @@ return { shipskirm = {
 
   sightDistance          = 720,
   sonarDistance          = 720,
+  speed                  = 63,
   turninplace            = 0,
   turnRate               = 736,
   waterline              = 4,

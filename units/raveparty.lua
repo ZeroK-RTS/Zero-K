@@ -35,7 +35,6 @@ return { raveparty = {
   losEmitHeight                 = 100,
   maxDamage                     = 8000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 42000,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

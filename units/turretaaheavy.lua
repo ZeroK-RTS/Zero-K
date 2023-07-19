@@ -29,7 +29,6 @@ return { turretaaheavy = {
   iconType                      = [[heavysam]],
   maxDamage                     = 3200,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 2400,
   noAutoFire                    = false,

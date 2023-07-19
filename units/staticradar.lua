@@ -41,7 +41,6 @@ return { staticradar = {
   levelGround                   = false,
   maxDamage                     = 80,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 55,
   noAutoFire                    = false,
   objectName                    = [[ARADARLVL1.s3o]],

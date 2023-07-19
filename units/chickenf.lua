@@ -33,7 +33,6 @@ return { chickenf = {
   leaveTracks         = true,
   maxDamage           = 1200,
   maxSlope            = 18,
-  maxVelocity         = 10,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 450,
@@ -55,6 +54,7 @@ return { chickenf = {
   },
   sightDistance       = 512,
   sonarDistance       = 512,
+  speed               = 300,
   turnRate            = 6000,
   workerTime          = 0,
 

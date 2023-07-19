@@ -33,7 +33,6 @@ return { shipassault = {
   iconType               = [[shipassault]],
   losEmitHeight          = 25,
   maxDamage              = 5200,
-  maxVelocity            = 2.0,
   metalCost              = 600,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
@@ -54,6 +53,7 @@ return { shipassault = {
 
   sightDistance          = 440,
   sonarDistance          = 440,
+  speed                  = 60,
   turninplace            = 0,
   turnRate               = 384,
   workerTime             = 0,

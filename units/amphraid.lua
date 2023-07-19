@@ -28,7 +28,6 @@ return { amphraid = {
   leaveTracks            = true,
   maxDamage              = 360,
   maxSlope               = 36,
-  maxVelocity            = 3,
   metalCost              = 80,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -43,6 +42,7 @@ return { amphraid = {
 
   sightDistance          = 560,
   sonarDistance          = 560,
+  speed                  = 90,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

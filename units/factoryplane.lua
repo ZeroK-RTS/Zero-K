@@ -62,7 +62,6 @@ return { factoryplane = {
   iconType                      = [[facair]],
   maxDamage                     = 4000,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = Shared.FACTORY_COST,
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],

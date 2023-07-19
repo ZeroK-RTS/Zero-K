@@ -35,7 +35,6 @@ return { chicken_roc = {
   maneuverleashlength = [[64000]],
   maxDamage           = 2500,
   maxSlope            = 36,
-  maxVelocity         = 3,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 1250,
@@ -59,6 +58,7 @@ return { chicken_roc = {
   },
   sightDistance       = 750,
   sonarDistance       = 750,
+  speed               = 90,
   turnRate            = 1350,
   workerTime          = 0,
 

@@ -30,7 +30,6 @@ return { jumparty = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxSlope               = 36,
-  maxVelocity            = 1.4,
   maxWaterDepth          = 22,
   metalCost              = 900,
   movementClass          = [[KBOT4]],
@@ -50,6 +49,7 @@ return { jumparty = {
 
   },
   sightDistance          = 660,
+  speed                  = 42,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,

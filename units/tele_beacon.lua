@@ -16,7 +16,6 @@ return { tele_beacon = {
   iconType                      = [[statictransport]],
   maxDamage                     = 1500,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   metalCost                     = 100,
   noAutoFire                    = false,
   objectName                    = [[amphteleportbeacon.s3o]],

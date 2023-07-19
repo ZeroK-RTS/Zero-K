@@ -31,7 +31,6 @@ return { gunshipassault = {
   hoverAttack         = true,
   iconType            = [[heavygunshipassault]],
   maxDamage           = 4200,
-  maxVelocity         = 4.5,
   metalCost           = 850,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
@@ -39,6 +38,7 @@ return { gunshipassault = {
   script              = [[gunshipassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 585,
+  speed               = 135,
   turnRate            = 1000,
 
   weapons             = {

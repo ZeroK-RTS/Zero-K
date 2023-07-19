@@ -34,7 +34,6 @@ return { gunshipkrow = {
   iconType               = [[supergunship]],
   maneuverleashlength    = [[500]],
   maxDamage              = 16000,
-  maxVelocity            = 3.3,
   metalCost              = 4200,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -51,6 +50,7 @@ return { gunshipkrow = {
 
   },
   sightDistance          = 633,
+  speed                  = 99,
   turnRate               = 250,
   upright                = true,
   workerTime             = 0,

@@ -31,7 +31,6 @@ return { vehriot = {
   leaveTracks         = true,
   maxDamage           = 1020,
   maxSlope            = 18,
-  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   metalCost           = 240,
   movementClass       = [[TANK3]],
@@ -51,6 +50,7 @@ return { vehriot = {
 
   },
   sightDistance       = 350,
+  speed               = 63,
   trackOffset         = 7,
   trackStrength       = 6,
   trackStretch        = 1,

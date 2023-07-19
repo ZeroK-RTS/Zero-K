@@ -11,7 +11,6 @@ return { empiricaldpser = {
   idleAutoHeal            = 0,
   maxDamage               = 30000,
   maxSlope                = 18,
-  maxVelocity             = 0,
   maxWaterDepth           = 0,
   metalCost               = 30000000,
   objectName              = [[zenith.s3o]],

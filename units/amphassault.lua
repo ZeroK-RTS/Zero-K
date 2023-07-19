@@ -35,8 +35,6 @@ return { amphassault = {
   leaveTracks         = true,
   maxDamage           = 8400,
   maxSlope            = 36,
-  maxVelocity         = 1.5,
-  maxReverseVelocity  = 0,
   metalCost           = 2000,
   movementClass       = [[AKBOT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
@@ -55,6 +53,8 @@ return { amphassault = {
 
   sightDistance       = 660,
   sonarDistance       = 660,
+  speed               = 45,
+  rSpeed              = 0,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
