@@ -40,7 +40,7 @@
 --    ud = udo
 --  end
 --  if ReplaceUDefsByLua then
---    ud["maxVelocity"] = ud.projectilespeed
+--    ud["speed"] = ud.projectilespeed
 --    ud.projectilespeed = nil
 --    ud["areaOfEffect"] = ud["damageAreaOfEffect"]
 --    ud["damageAreaOfEffect"] = nil

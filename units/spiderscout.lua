@@ -31,7 +31,6 @@ return { spiderscout = {
   leaveTracks         = true,
   maxDamage           = 40,
   maxSlope            = 72,
-  maxVelocity         = 4.8,
   maxWaterDepth       = 15,
   metalCost           = 25,
   minCloakDistance    = 130,
@@ -52,6 +51,7 @@ return { spiderscout = {
   },
 
   sightDistance       = 620,
+  speed               = 144,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

@@ -29,7 +29,6 @@ return { hoverassault = {
   iconType            = [[hoverassault]],
   maxDamage           = 1450,
   maxSlope            = 36,
-  maxVelocity         = 3.2,
   metalCost           = 210,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
@@ -49,6 +48,7 @@ return { hoverassault = {
 
   sightDistance       = 385,
   sonarDistance       = 385,
+  speed               = 96,
   turninplace         = 0,
   turnRate            = 985,
   workerTime          = 0,

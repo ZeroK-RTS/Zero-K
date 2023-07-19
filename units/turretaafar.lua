@@ -28,7 +28,6 @@ return { turretaafar = {
   losEmitHeight                 = 40,
   maxDamage                     = 2500,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 5000,
   metalCost                     = 900,
   noAutoFire                    = false,

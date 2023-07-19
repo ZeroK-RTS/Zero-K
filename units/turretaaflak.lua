@@ -26,7 +26,6 @@ return { turretaaflak = {
   levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 5000,
   metalCost                     = 450,
   noAutoFire                    = false,

@@ -47,7 +47,6 @@ return { gunshipcon = {
   hoverAttack         = true,
   iconType            = [[builderair]],
   maxDamage           = 1500,
-  maxVelocity         = 2.4,
   metalCost           = 300,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -56,6 +55,7 @@ return { gunshipcon = {
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 375,
+  speed               = 72,
   turnRate            = 500,
   workerTime          = 10,
 

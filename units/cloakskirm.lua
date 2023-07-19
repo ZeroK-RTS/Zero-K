@@ -29,7 +29,6 @@ return { cloakskirm = {
   leaveTracks            = true,
   maxDamage              = 380,
   maxSlope               = 36,
-  maxVelocity            = 2.3,
   maxWaterDepth          = 20,
   metalCost              = 90,
   movementClass          = [[KBOT2]],
@@ -47,6 +46,7 @@ return { cloakskirm = {
   },
 
   sightDistance          = 523,
+  speed                  = 69,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,

@@ -21,7 +21,6 @@ return { pw_hq_attacker = {
   iconType                      = [[pw_assault]],
   maxDamage                     = 10000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   metalCost                     = 1000,
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],

@@ -34,7 +34,6 @@ return { jumpcon = {
   leaveTracks         = true,
   maxDamage           = 550,
   maxSlope            = 36,
-  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   metalCost           = 140,
   movementClass       = [[KBOT2]],
@@ -55,6 +54,7 @@ return { jumpcon = {
 
   showNanoSpray       = false,
   sightDistance       = 375,
+  speed               = 63,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

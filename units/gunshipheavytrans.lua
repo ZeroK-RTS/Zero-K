@@ -44,7 +44,6 @@ return { gunshipheavytrans = {
   iconType               = [[heavygunshiptransport]],
   maneuverleashlength    = [[1280]],
   maxDamage              = 1800,
-  maxVelocity            = 9,
   metalCost              = 750,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
@@ -62,6 +61,7 @@ return { gunshipheavytrans = {
 
   },
   sightDistance          = 660,
+  speed                  = 270,
   transportCapacity      = 1,
   transportSize          = 25,
   turninplace            = 0,

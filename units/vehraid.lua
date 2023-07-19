@@ -31,7 +31,6 @@ return { vehraid = {
   leaveTracks            = true,
   maxDamage              = 480,
   maxSlope               = 18,
-  maxVelocity            = 3.7,
   maxWaterDepth          = 22,
   metalCost              = 130,
   movementClass          = [[TANK2]],
@@ -49,6 +48,7 @@ return { vehraid = {
 
   },
   sightDistance          = 560,
+  speed                  = 111,
   trackOffset            = 5,
   trackStrength          = 5,
   trackStretch           = 1,

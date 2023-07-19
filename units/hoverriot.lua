@@ -37,7 +37,6 @@ return { hoverriot = {
   iconType            = [[hoverriot]],
   maxDamage           = 1400,
   maxSlope            = 36,
-  maxVelocity         = 2.05,
   metalCost           = 400,
   movementClass       = [[HOVER4]],
   noAutoFire          = false,
@@ -58,6 +57,7 @@ return { hoverriot = {
 
   sightDistance       = 431,
   sonarDistance       = 431,
+  speed               = 61.5,
   turninplace         = 0,
   turnRate            = 600,
   workerTime          = 0,

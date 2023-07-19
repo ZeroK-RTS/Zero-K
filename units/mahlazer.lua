@@ -39,7 +39,6 @@ return { mahlazer = {
   iconType                      = [[mahlazer]],
   maxDamage                     = 12000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 60000,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

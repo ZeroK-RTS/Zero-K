@@ -35,7 +35,6 @@ return { gunshipaa = {
   hoverAttack            = true,
   iconType               = [[gunshipaa]],
   maxDamage              = 900,
-  maxVelocity            = 3.8,
   metalCost              = 270,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -51,6 +50,7 @@ return { gunshipaa = {
 
   },
   sightDistance          = 660,
+  speed                  = 114,
   turnRate               = 0,
   workerTime             = 0,
 

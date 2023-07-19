@@ -37,7 +37,6 @@ return { dronefighter = {
   maneuverleashlength    = [[400]],
   maxAcc                 = 0.7,
   maxDamage              = 360,
-  maxVelocity            = 8,
   maxElevator            = 0.02,
   maxRudder              = 0.006,
   --maxPitch               = 0.1,
@@ -62,6 +61,7 @@ return { dronefighter = {
 
   },
   sightDistance          = 520,
+  speed                  = 240,
   speedToFront           = 0,
   turnRate               = 9001,
   turnRadius             = 90,

@@ -37,7 +37,6 @@ return { energysingu = {
   iconType                      = [[energysingu]],
   maxDamage                     = 4000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 4000,
   noAutoFire                    = false,

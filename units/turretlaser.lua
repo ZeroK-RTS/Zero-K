@@ -30,7 +30,6 @@ return { turretlaser = {
   losEmitHeight                 = 60,
   maxDamage                     = 785,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 90,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

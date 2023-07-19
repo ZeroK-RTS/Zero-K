@@ -47,7 +47,6 @@ return { striderdetriment = {
   losEmitHeight          = 100,
   maxDamage              = 86000,
   maxSlope               = 37,
-  maxVelocity            = 1.2,
   maxWaterDepth          = 5000,
   metalCost              = 24000,
   movementClass          = [[AKBOT4]],
@@ -72,6 +71,7 @@ return { striderdetriment = {
   
   sightDistance          = 900,
   sonarDistance          = 900,
+  speed                  = 36,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.7,

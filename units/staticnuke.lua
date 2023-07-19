@@ -30,7 +30,6 @@ return { staticnuke = {
   iconType                      = [[nuke]],
   maxDamage                     = 5000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 8000,
   noAutoFire                    = false,

@@ -20,7 +20,6 @@ return { fakeunit = {
   levelGround                   = false,
   maxDamage                     = 100000,
   maxSlope                      = 255,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 0.45,
   noAutoFire                    = false,

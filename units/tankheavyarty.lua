@@ -30,7 +30,6 @@ return { tankheavyarty = {
   leaveTracks            = true,
   maxDamage              = 2045,
   maxSlope               = 18,
-  maxVelocity            = 1.25,
   maxWaterDepth          = 22,
   metalCost              = 1600,
   movementClass          = [[TANK4]],
@@ -49,6 +48,7 @@ return { tankheavyarty = {
 
   },
   sightDistance          = 660,
+  speed                  = 37.5,
   trackOffset            = 20,
   trackStrength          = 8,
   trackStretch           = 1,

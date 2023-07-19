@@ -37,7 +37,6 @@ return { gunshipheavyskirm = {
   iconType            = [[heavygunshipskirm]],
   maneuverleashlength = [[1280]],
   maxDamage           = 2800,
-  maxVelocity         = 3.3,
   metalCost           = 760,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -54,6 +53,7 @@ return { gunshipheavyskirm = {
 
   },
   sightDistance       = 600,
+  speed               = 99,
   turnRate            = 600,
   workerTime          = 0,
 

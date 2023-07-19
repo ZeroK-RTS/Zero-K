@@ -23,7 +23,6 @@ return { hoversonic = {
   iconType            = [[hoverassault]],
   maxDamage           = 900,
   maxSlope            = 36,
-  maxVelocity         = 3,
   metalCost           = 300,
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
@@ -41,6 +40,7 @@ return { hoversonic = {
 
   },
   sightDistance       = 385,
+  speed               = 90,
   turninplace         = 0,
   turnRate            = 985,
   workerTime          = 0,

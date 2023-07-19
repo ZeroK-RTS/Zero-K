@@ -31,7 +31,6 @@ return { hoveraa = {
   iconType            = [[hoveraa]],
   maxDamage           = 950,
   maxSlope            = 36,
-  maxVelocity         = 3.5,
   metalCost           = 300,
   movementClass       = [[HOVER3]],
   moveState           = 0,
@@ -52,6 +51,7 @@ return { hoveraa = {
 
   sightDistance       = 660,
   sonarDistance       = 660,
+  speed               = 105,
   turninplace         = 0,
   turnRate            = 985,
   workerTime          = 0,

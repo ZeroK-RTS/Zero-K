@@ -30,7 +30,6 @@ return { cloakassault = {
   losEmitHeight          = 35,
   maxDamage              = 2400,
   maxSlope               = 36,
-  maxVelocity            = 1.7,
   maxWaterDepth          = 22,
   metalCost              = 350,
   movementClass          = [[KBOT3]],
@@ -49,6 +48,7 @@ return { cloakassault = {
   },
 
   sightDistance          = 385,
+  speed                  = 51,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.8,

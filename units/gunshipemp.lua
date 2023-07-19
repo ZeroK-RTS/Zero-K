@@ -33,7 +33,6 @@ return { gunshipemp = {
   hoverAttack         = true,
   iconType            = [[gunshipscout]],
   maxDamage           = 440,
-  maxVelocity         = 7.5,
   metalCost           = 85,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
   objectName          = [[marshmellow.s3o]],
@@ -49,6 +48,7 @@ return { gunshipemp = {
   },
 
   sightDistance       = 380,
+  speed               = 225,
   turnRate            = 1144,
   upright             = true,
 

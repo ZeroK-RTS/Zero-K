@@ -24,7 +24,6 @@ return { chicken_digger = {
   leaveTracks         = true,
   maxDamage           = 180,
   maxSlope            = 36,
-  maxVelocity         = 3,
   maxWaterDepth       = 22,
   metalCost           = 0,
   energyCost          = 0,
@@ -48,6 +47,7 @@ return { chicken_digger = {
 
   },
   sightDistance       = 256,
+  speed               = 90,
   trackOffset         = 1,
   trackStrength       = 6,
   trackStretch        = 1,

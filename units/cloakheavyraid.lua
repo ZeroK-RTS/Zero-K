@@ -33,7 +33,6 @@ return { cloakheavyraid = {
   leaveTracks            = true,
   maxDamage              = 820,
   maxSlope               = 36,
-  maxVelocity            = 3,
   maxWaterDepth          = 22,
   metalCost              = 250,
   minCloakDistance       = 75,
@@ -54,6 +53,7 @@ return { cloakheavyraid = {
   },
 
   sightDistance          = 425,
+  speed                  = 90,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.9,

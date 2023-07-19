@@ -25,7 +25,6 @@ return { shipscout = {
   footprintZ             = 3,
   iconType               = [[shipscout]],
   maxDamage              = 260,
-  maxVelocity            = 5.2,
   metalCost              = 65,
   movementClass          = [[BOAT3]],
   noChaseCategory        = [[TERRAFORM SUB]],
@@ -43,6 +42,7 @@ return { shipscout = {
   
   sightDistance          = 800,
   sonarDistance          = 800,
+  speed                  = 156,
   turninplace            = 0,
   turnRate               = 1184,
   waterline              = 2,

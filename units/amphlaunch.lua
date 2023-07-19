@@ -32,7 +32,6 @@ return { amphlaunch = {
   leaveTracks            = true,
   maxDamage              = 960,
   maxSlope               = 36,
-  maxVelocity            = 1.8,
   maxWaterDepth          = 5000,
   metalCost              = 340,
   movementClass          = [[AKBOT2]],
@@ -49,6 +48,7 @@ return { amphlaunch = {
 
   sightDistance          = 500,
   sonarDistance          = 500,
+  speed                  = 54,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

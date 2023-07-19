@@ -33,7 +33,6 @@ return { zenith = {
   iconType                      = [[mahlazer]],
   maxDamage                     = 9000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 38000,
   noChaseCategory               = [[FIXEDWING GUNSHIP SUB STUPIDTARGET]],

@@ -19,7 +19,6 @@ return { staticshield = {
   levelGround                   = false,
   maxDamage                     = 900,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 525,
   noAutoFire                    = false,
   objectName                    = [[m-8.s3o]],

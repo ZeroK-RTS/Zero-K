@@ -41,7 +41,6 @@ return { turretheavy = {
   losEmitHeight                 = 70,
   maxDamage                     = 10000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 1600,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

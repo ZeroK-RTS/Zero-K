@@ -27,7 +27,6 @@ return { vehheavyarty = {
   leaveTracks         = true,
   maxDamage           = 1100,
   maxSlope            = 18,
-  maxVelocity         = 2.0,
   metalCost           = 700,
   movementClass       = [[TANK3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP MOBILE]],
@@ -44,6 +43,7 @@ return { vehheavyarty = {
   },
 
   sightDistance       = 660,
+  speed               = 60,
   trackOffset         = 15,
   trackStrength       = 8,
   trackStretch        = 1,

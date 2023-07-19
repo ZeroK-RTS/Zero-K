@@ -19,7 +19,6 @@ return { chicken_rafflesia = {
   levelGround                   = false,
   maxDamage                     = 500,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 20,
   metalCost                     = 0,
   energyCost                    = 0,

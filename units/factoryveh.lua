@@ -61,7 +61,6 @@ return { factoryveh = {
   levelGround                   = false,
   maxDamage                     = 4000,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = Shared.FACTORY_COST,
   moveState                     = 1,

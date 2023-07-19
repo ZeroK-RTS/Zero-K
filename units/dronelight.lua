@@ -24,7 +24,6 @@ return { dronelight = {
   idleAutoHeal        = 10,
   idleTime            = 300,
   maxDamage           = 180,
-  maxVelocity         = 7,
   metalCost           = 20,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -48,6 +47,7 @@ return { dronelight = {
 
   },
   sightDistance       = 500,
+  speed               = 210,
   turnRate            = 792,
   upright             = true,
 

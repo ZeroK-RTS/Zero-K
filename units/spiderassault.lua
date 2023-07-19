@@ -26,7 +26,6 @@ return { spiderassault = {
   leaveTracks            = true,
   maxDamage              = 1500,
   maxSlope               = 36,
-  maxVelocity            = 1.7,
   maxWaterDepth          = 22,
   metalCost              = 150,
   movementClass          = [[TKBOT3]],
@@ -46,6 +45,7 @@ return { spiderassault = {
   },
 
   sightDistance          = 420,
+  speed                  = 51,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

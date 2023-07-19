@@ -21,7 +21,6 @@ return { turrettorp = {
   iconType          = [[defensetorp]],
   maxDamage         = 1020,
   maxSlope          = 18,
-  maxVelocity       = 0,
   metalCost         = 120,
   noAutoFire        = false,
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

@@ -28,7 +28,6 @@ return { chicken_pigeon = {
   idleTime            = 300,
   maxDamage           = 150,
   maxSlope            = 18,
-  maxVelocity         = 10,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 50,
@@ -51,6 +50,7 @@ return { chicken_pigeon = {
   },
   sightDistance       = 512,
   sonarDistance       = 512,
+  speed               = 300,
   turnRate            = 6000,
   workerTime          = 0,
 

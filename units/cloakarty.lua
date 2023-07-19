@@ -30,7 +30,6 @@ return { cloakarty = {
   leaveTracks            = true,
   maxDamage              = 350,
   maxSlope               = 36,
-  maxVelocity            = 1.5,
   maxWaterDepth          = 22,
   metalCost              = 100,
   movementClass          = [[KBOT3]],
@@ -50,6 +49,7 @@ return { cloakarty = {
   },
 
   sightDistance          = 660,
+  speed                  = 45,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.9,

@@ -40,7 +40,6 @@ return { jumpscout = {
   leaveTracks            = true,
   maxDamage              = 80,
   maxSlope               = 36,
-  maxVelocity            = 3.5,
   maxWaterDepth          = 15,
   metalCost              = 45,
   movementClass          = [[SKBOT2]],
@@ -61,6 +60,7 @@ return { jumpscout = {
 
   },
   sightDistance          = 640,
+  speed                  = 105,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,

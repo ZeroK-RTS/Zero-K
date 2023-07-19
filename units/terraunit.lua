@@ -28,7 +28,6 @@ return { terraunit = {
   levelGround            = false,
   maxDamage              = 100000,
   maxSlope               = 255,
-  maxVelocity            = 0,
   metalCost              = 100000,
   minCloakDistance       = 0,
   objectName             = [[sphere.s3o]],

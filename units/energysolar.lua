@@ -34,7 +34,6 @@ return { energysolar = {
   iconType                      = [[energy_med]],
   maxDamage                     = 600,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   metalCost                     = 70,
   noAutoFire                    = false,

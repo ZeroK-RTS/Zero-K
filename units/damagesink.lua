@@ -11,7 +11,6 @@ return { damagesink = {
   iconType                = [[mahlazer]],
   maxDamage               = 500000,
   maxSlope                = 18,
-  maxVelocity             = 0,
   maxWaterDepth           = 0,
   metalCost               = 10,
   objectName              = [[zenith.s3o]],

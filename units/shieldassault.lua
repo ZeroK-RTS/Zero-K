@@ -32,7 +32,6 @@ return { shieldassault = {
   leaveTracks         = true,
   maxDamage           = 960,
   maxSlope            = 36,
-  maxVelocity         = 1.9,
   maxWaterDepth       = 22,
   metalCost           = 175,
   movementClass       = [[KBOT3]],
@@ -53,6 +52,7 @@ return { shieldassault = {
   },
 
   sightDistance       = 420,
+  speed               = 57,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

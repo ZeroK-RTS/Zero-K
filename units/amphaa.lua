@@ -35,7 +35,6 @@ return { amphaa = {
   leaveTracks            = true,
   maxDamage              = 1100,
   maxSlope               = 36,
-  maxVelocity            = 1.6,
   metalCost              = 180,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
@@ -54,6 +53,7 @@ return { amphaa = {
 
   sightDistance          = 660,
   sonarDistance          = 660,
+  speed                  = 48,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

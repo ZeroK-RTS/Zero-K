@@ -30,7 +30,6 @@ return { spideremp = {
   leaveTracks            = true,
   maxDamage              = 740,
   maxSlope               = 72,
-  maxVelocity            = 2.8,
   maxWaterDepth          = 22,
   metalCost              = 190,
   movementClass          = [[TKBOT3]],
@@ -49,6 +48,7 @@ return { spideremp = {
   },
 
   sightDistance          = 440,
+  speed                  = 84,
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,

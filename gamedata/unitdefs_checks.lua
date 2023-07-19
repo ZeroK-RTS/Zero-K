@@ -81,7 +81,7 @@ local function processWeapons(unitDefName, unitDef)
 end
 
 local function checkBuildingness(name, ud)
-	if not ud.maxvelocity or ud.maxvelocity == 0 then
+	if not ud.speed or ud.speed == 0 then
 		if ud.brakerate     then Spring.Echo(name .. " is a building but has the `brakeRate` field set!") end
 		if ud.acceleration  then Spring.Echo(name .. " is a building but has the `acceleration` field set!") end
 		if ud.turnrate      then Spring.Echo(name .. " is a building but has the `turnRate` field set!") end
@@ -91,6 +91,9 @@ local function checkBuildingness(name, ud)
 end
 
 for unitDefName, unitDef in pairs (UnitDefs) do
-	checkBuildingness(unitDefName, unitDef)
+	-- One of the relevant unit def keys changed,
+	-- temporarily disabled while mods migrate.
+	-- checkBuildingness(unitDefName, unitDef)
+
 	processWeapons(unitDefName, unitDef)
 end

@@ -28,7 +28,6 @@ return { dronecarry = {
   idleAutoHeal        = 10,
   idleTime            = 300,
   maxDamage           = 180,
-  maxVelocity         = 8.56,
   metalCost           = 15,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -54,6 +53,7 @@ return { dronecarry = {
 
   },
   sightDistance       = 500,
+  speed               = 256.8,
   turnRate            = 792,
   upright             = true,
 

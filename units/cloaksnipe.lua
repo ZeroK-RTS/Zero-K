@@ -40,7 +40,6 @@ return { cloaksnipe = {
   initCloaked            = true,
   maxDamage              = 560,
   maxSlope               = 36,
-  maxVelocity            = 1.4,
   maxWaterDepth          = 22,
   metalCost              = 750,
   minCloakDistance       = 155,
@@ -60,6 +59,7 @@ return { cloaksnipe = {
   },
 
   sightDistance          = 400,
+  speed                  = 42,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

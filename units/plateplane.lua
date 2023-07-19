@@ -55,7 +55,6 @@ return { plateplane = {
   iconType                      = [[padair]],
   maxDamage                     = Shared.FACTORY_PLATE_HEALTH,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = Shared.FACTORY_PLATE_COST,
   noAutoFire                    = false,
   objectName                    = [[plate_plane.s3o]],

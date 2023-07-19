@@ -31,7 +31,6 @@ return { turretheavylaser = {
   losEmitHeight                 = 80,
   maxDamage                     = 2250,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 450,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],

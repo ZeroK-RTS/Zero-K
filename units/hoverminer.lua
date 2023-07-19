@@ -23,7 +23,6 @@ return { hoverminer = {
   leaveTracks         = true,
   maxDamage           = 400,
   maxSlope            = 18,
-  maxVelocity         = 2.1,
   maxWaterDepth       = 22,
   metalCost           = 200,
   movementClass       = [[HOVER3]],
@@ -41,6 +40,7 @@ return { hoverminer = {
 
   },
   sightDistance       = 484,
+  speed               = 63,
   turninplace         = 0,
   turnRate            = 800,
   workerTime          = 0,

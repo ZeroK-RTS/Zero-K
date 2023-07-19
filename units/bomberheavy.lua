@@ -40,7 +40,6 @@ return { bomberheavy = {
   maxDamage           = 2360,
   maxFuel             = 1000000,
   maxRudder           = 0.0045,
-  maxVelocity         = 9,
   metalCost           = 2000,
   mygravity           = 1,
   noAutoFire          = false,
@@ -50,6 +49,7 @@ return { bomberheavy = {
   script              = [[bomberheavy.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 780,
+  speed               = 270,
   turnRadius          = 20,
   workerTime          = 0,
 

@@ -29,7 +29,6 @@ return { gunshipskirm = {
   hoverAttack            = true,
   iconType               = [[gunshipskirm]],
   maxDamage              = 1200,
-  maxVelocity            = 3.8,
   metalCost              = 300,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
@@ -45,6 +44,7 @@ return { gunshipskirm = {
   },
 
   sightDistance          = 550,
+  speed                  = 114,
   turnRate               = 594,
 
   weapons                = {

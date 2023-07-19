@@ -59,7 +59,6 @@ return { factorygunship = {
   iconType                      = [[facgunship]],
   maxDamage                     = 4000,
   maxSlope                      = 15,
-  maxVelocity                   = 0,
   metalCost                     = Shared.FACTORY_COST,
   moveState                     = 1,
   noAutoFire                    = false,

@@ -33,7 +33,6 @@ return { wolverine_mine = {
   initCloaked            = true,
   maxDamage              = 40,
   maxSlope               = 255,
-  maxVelocity            = 0,
   metalCost              = 5,
   minCloakDistance       = 80,
   noAutoFire             = false,

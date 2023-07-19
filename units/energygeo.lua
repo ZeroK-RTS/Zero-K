@@ -39,7 +39,6 @@ return { energygeo = {
   iconType                      = [[energygeo]],
   maxDamage                     = 1750,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   metalCost                     = 500,
   noAutoFire                    = false,
   objectName                    = [[geo.dae]],

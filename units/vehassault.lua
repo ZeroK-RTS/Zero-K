@@ -32,7 +32,6 @@ return { vehassault = {
   leaveTracks            = true,
   maxDamage              = 2000,
   maxSlope               = 18,
-  maxVelocity            = 2.95,
   maxWaterDepth          = 22,
   metalCost              = 250,
   movementClass          = [[TANK3]],
@@ -51,6 +50,7 @@ return { vehassault = {
 
   },
   sightDistance          = 385,
+  speed                  = 88.5,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,

@@ -58,7 +58,6 @@ return { factoryship = {
   iconType               = [[facship]],
   maxDamage              = 6000,
   maxSlope               = 15,
-  maxVelocity            = 0,
   metalCost              = Shared.FACTORY_COST,
   minWaterDepth          = 15,
   moveState              = 1,

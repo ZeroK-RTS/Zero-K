@@ -39,7 +39,6 @@ return { nebula = {
   hoverAttack            = true,
   iconType               = [[nebula]],
   maxDamage              = 11000,
-  maxVelocity            = 3.3,
   metalCost              = 8000,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -57,6 +56,7 @@ return { nebula = {
 
   },
   sightDistance          = 633,
+  speed                  = 99,
   turnRate               = 100,
   upright                = true,
   workerTime             = 0,

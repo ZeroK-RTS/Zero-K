@@ -26,7 +26,6 @@ return { chicken_leaper = {
   leaveTracks         = false,
   maxDamage           = 720,
   maxSlope            = 36,
-  maxVelocity         = 4,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 100,
@@ -48,6 +47,7 @@ return { chicken_leaper = {
 
   },
   sightDistance       = 256,
+  speed               = 120,
   turnRate            = 1920,
   upright             = true,
   workerTime          = 0,

@@ -28,7 +28,6 @@ return { statictele = {
   iconType                      = [[mahlazer]],
   maxDamage                     = 5000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   metalCost                     = 1000,
   noAutoFire                    = false,
   objectName                    = [[pw_warpgate.dae]],

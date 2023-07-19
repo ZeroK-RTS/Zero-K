@@ -28,7 +28,6 @@ return { shieldskirm = {
   leaveTracks            = true,
   maxDamage              = 520,
   maxSlope               = 36,
-  maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   metalCost              = 130,
   movementClass          = [[KBOT2]],
@@ -47,6 +46,7 @@ return { shieldskirm = {
   },
 
   sightDistance          = 583,
+  speed                  = 54,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
