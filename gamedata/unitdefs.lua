@@ -2,6 +2,7 @@ local VFS = VFS
 local VFS_Include = VFS.Include
 local VFS_GAME = VFS.GAME
 local VFS_MAP = VFS.MAP
+local VFS_DirList = VFS_Include('gamedata/recursive_dir_list.lua', nil, VFS_GAME)
 
 --[[ unitdefs_post is massively simplified by being able to assume
      that all def keys are lowercase. However, being able to use
@@ -20,7 +21,7 @@ UnitDefs = unitDefs
 local shared = VFS_Include('gamedata/unitdefs_pre.lua', nil, VFS_GAME)
 Shared = shared
 
-local zkUnits = VFS.DirList('units', '*.lua', VFS_GAME)
+local zkUnits = VFS_DirList('units', '*.lua', VFS_GAME, true)
 for i = 1, #zkUnits do
 	suCopyTable(lowerKeys(VFS_Include(zkUnits[i], nil, VFS_GAME)), false, unitDefs)
 end
@@ -33,7 +34,7 @@ Game = Game or { gameSpeed = 30 } -- compat for 287, would ideally be in defs.lu
 VFS_Include('gamedata/unitdefs_checks.lua', nil, VFS_GAME)
 
 lowerkeys = lowerKeys -- legacy mapside defs might want it
-local mapUnits = VFS.DirList('units', '*.lua', VFS_MAP)
+local mapUnits = VFS_DirList('units', '*.lua', VFS_MAP, true)
 for i = 1, #mapUnits do
 	suCopyTable(lowerKeys(VFS_Include(mapUnits[i], nil, VFS_MAP)), false, unitDefs)
 end
