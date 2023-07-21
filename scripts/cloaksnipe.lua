@@ -59,8 +59,8 @@ local GUN_READY_SPEED = math.rad(45)
 local VERT_AIM_SPEED = math.rad(210)
 local AIM_SPEED = math.rad(480) -- noscope
 
-local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty)
-local RELOAD_PENALTY_HALF = 0.5 + 0.5 * tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty)
+local RELOAD_PENALTY = tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty or 1)
+local RELOAD_PENALTY_HALF = 0.5 + 0.5 * tonumber(UnitDefs[unitDefID].customParams.reload_move_penalty or 1)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
