@@ -150,6 +150,10 @@ for name, ud in pairs(UnitDefs) do
 		Spring.Echo("ERROR: " .. name .. ".buildCostEnergy set, should be energyCost instead!")
 		ud.energycost = ud.energycost or ud.buildcostenergy
 	end
+	if ud.maxdamage then
+		Spring.Echo("ERROR: " .. name .. ".maxDamage set, should be health instead!")
+		ud.health = ud.health or ud.maxdamage
+	end
 	if ud.maxvelocity then
 		Spring.Echo("ERROR: " .. name .. ".maxVelocity set, should be speed instead!")
 		ud.speed = ud.speed or (ud.maxvelocity * Game.gameSpeed)
@@ -664,7 +668,7 @@ end
 -- Set mass
 --
 for name, ud in pairs(UnitDefs) do
-	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
+	ud.mass = (((ud.buildtime/2) + (ud.health/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
 	end
@@ -862,8 +866,8 @@ end
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
 	local hpMulti = modOptions.hpmult
 	for name, unitDef in pairs(UnitDefs) do
-		if unitDef.maxdamage and name ~= "terraunit" then
-			unitDef.maxdamage = math.max(unitDef.maxdamage * hpMulti, 1)
+		if unitDef.health and name ~= "terraunit" then
+			unitDef.health = math.max(unitDef.health * hpMulti, 1)
 		end
 	end
 end
@@ -1044,6 +1048,7 @@ if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 		ud.energyuse = ud.energyupkeep
 		ud.buildcostmetal  = ud.metalcost
 		ud.buildcostenergy = ud.energycost
+		ud.maxdamage = ud.health
 		ud.maxreversevelocity = ud.rspeed / Game.gameSpeed
 		ud.maxvelocity        = ud.speed  / Game.gameSpeed
 	end

@@ -168,7 +168,7 @@ local function ProcessComm(name, config)
 		
 		-- store base values
 		cp.basespeed = tostring(commDefs[name].speed)
-		cp.basehp = tostring(commDefs[name].maxdamage)
+		cp.basehp = tostring(commDefs[name].health)
 		for i,v in pairs(commDefs[name].weapondefs or {}) do
 			v.customparams = v.customparams or {}
 			v.customparams.rangemod = 0
@@ -232,7 +232,7 @@ local function ProcessComm(name, config)
 			commDefs[name].speed = commDefs[name].speed*(1+attributeMods.speed)
 			--commDefs[name].speed = commDefs[name].speed/(1-attributeMods.speed)
 		end
-		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
+		commDefs[name].health = commDefs[name].health*(1+attributeMods.health)
 		
 		-- set costs
 		config.cost = config.cost or 0
@@ -387,7 +387,7 @@ for name, data in pairs(commDefs) do
 		array.description = typeName .. " - " .. data.name
 		array.metal = data.metalcost * mult
 		array.reclaimtime = data.metalcost * mult
-		array.damage = data.maxdamage
+		array.damage = data.health
 		array.customparams = {}
 		array.customparams.unit = data.unitname
 	end

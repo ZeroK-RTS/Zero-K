@@ -427,7 +427,7 @@ upgrades = {
 		name = "Ablative Armor Plates",
 		description = "Adds 600 HP",
 		func = function(unitDef)
-				unitDef.maxdamage = unitDef.maxdamage + 600
+				unitDef.health = unitDef.health + 600
 			end,
 	},
 	module_adv_targeting = {
@@ -542,7 +542,7 @@ upgrades = {
 		name = "High Density Plating",
 		description = "Adds 1600 HP, slows comm by +10%",
 		func = function(unitDef, attributeMods)
-				unitDef.maxdamage = unitDef.maxdamage + 1600
+				unitDef.health = unitDef.health + 1600
 				attributeMods.speed = attributeMods.speed - 0.1
 			end,
 	},
@@ -663,7 +663,7 @@ upgrades = {
 		name = "Ultralight Hull",
 		description = "-1200 HP, +25% speed",
 		func = function(unitDef, attributeMods)
-				unitDef.maxdamage = unitDef.maxdamage - 1200
+				unitDef.health = unitDef.health - 1200
 				attributeMods.speed = attributeMods.speed + 0.25
 			end,
 	},
@@ -671,7 +671,7 @@ upgrades = {
 		name = "Weapon Hi-Charger",
 		description = "-1000 HP, +40% damage",
 		func = function(unitDef, attributeMods)
-				unitDef.maxdamage = unitDef.maxdamage - 1000
+				unitDef.health = unitDef.health - 1000
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					v.customparams.damagemod = v.customparams.damagemod + 0.4

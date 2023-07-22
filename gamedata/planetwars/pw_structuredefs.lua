@@ -32,7 +32,7 @@ local fakeWeapons = {
 
 local structureConfig = {
 	generic_tech = function(unitDef)
-		unitDef.maxdamage = 10000
+		unitDef.health = 10000
 		unitDef.objectname = "pw_techlab.dae"
 		unitDef.script = "pw_techlab.lua"
 		unitDef.footprintx = 8
@@ -45,7 +45,7 @@ local structureConfig = {
 	end,
 
 	pw_artefact = function(unitDef)
-		unitDef.maxdamage = 20000
+		unitDef.health = 20000
 		unitDef.name = "Ancient Artefact"
 		unitDef.description = "Mysterious Relic"
 		unitDef.objectname = "pw_artefact.dae"
@@ -65,7 +65,7 @@ local structureConfig = {
 	end,
 
 	pw_dropfac = function(unitDef)
-		unitDef.maxdamage = 16000
+		unitDef.health = 16000
 		unitDef.name = "Dropship Factory"
 		unitDef.description = "Produces dropships"
 		unitDef.objectname = "pw_dropfac.dae"
@@ -97,7 +97,7 @@ local structureConfig = {
 	end,
 
 	pw_bomberfac = function(unitDef)
-		unitDef.maxdamage = 16000
+		unitDef.health = 16000
 		unitDef.name = "Bomber Factory"
 		unitDef.description = "Produces bombers"
 		unitDef.objectname = "pw_dropdepot.dae"
@@ -132,7 +132,7 @@ local structureConfig = {
 	end,
 
 	pw_mine = function(unitDef)
-		unitDef.maxdamage = 10000
+		unitDef.health = 10000
 		unitDef.name = "Power Generator Unit"
 		unitDef.description = "Produces 50 energy/turn"
 		unitDef.objectname = "pw_mine2.dae"
@@ -156,7 +156,7 @@ local structureConfig = {
 	end,
 
 	pw_mine2 = function(unitDef)
-		unitDef.maxdamage = 16000
+		unitDef.health = 16000
 		unitDef.name = "Orbital Solar Array"
 		unitDef.description = "Produces 100 energy/turn"
 		unitDef.objectname = "pw_mine.dae"
@@ -186,7 +186,7 @@ local structureConfig = {
 	end,
 
 	pw_mine3 = function(unitDef)
-		unitDef.maxdamage = 24000
+		unitDef.health = 24000
 		unitDef.name = "Planetary Geothermal Tap"
 		unitDef.description = "Produces 250 energy/turn"
 		unitDef.objectname = "pw_mine3.dae"
@@ -213,7 +213,7 @@ local structureConfig = {
 	end,
 
 	pw_garrison = function(unitDef)
-		unitDef.maxdamage = 16000
+		unitDef.health = 16000
 		unitDef.name = "Field Garrison"
 		unitDef.description = "Reduces Influence gain"
 		unitDef.objectname = "pw_wormhole.dae"
@@ -238,7 +238,7 @@ local structureConfig = {
 	end,
 
 	pw_interception = function(unitDef)
-		unitDef.maxdamage = 16000
+		unitDef.health = 16000
 		unitDef.name = "Interception Network"
 		unitDef.description = "Intercepts planetary bombers"
 		unitDef.objectname = "pw_warpjammer.s3o"
@@ -268,7 +268,7 @@ local structureConfig = {
 	end,
 
 	pw_grid = function(unitDef)
-		unitDef.maxdamage = 20000
+		unitDef.health = 20000
 		unitDef.name = "Planetary Defence Grid"
 		unitDef.description = "Defends against everything"
 		unitDef.objectname = "pw_wormhole2.dae"
@@ -295,7 +295,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole = function(unitDef)
-		unitDef.maxdamage = 12000
+		unitDef.health = 12000
 		unitDef.name = "Wormhole Generator"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_estorage.dae"
@@ -316,7 +316,7 @@ local structureConfig = {
 	end,
 
 	pw_wormhole2 = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Improved Wormhole"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_gaspowerstation.dae"
@@ -338,7 +338,7 @@ local structureConfig = {
 	end,
 
 	pw_warpgate = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
 		unitDef.objectname = "pw_techlab.dae"
@@ -355,7 +355,7 @@ local structureConfig = {
 	end,
 
 	pw_warpjammer = function(unitDef)
-		unitDef.maxdamage = 12000
+		unitDef.health = 12000
 		unitDef.name = "Warp Jammer"
 		unitDef.description = "Prevents warp attacks"
 		unitDef.objectname = "pw_warpgate.dae"
@@ -387,7 +387,7 @@ local structureConfig = {
 	end,
 
 	pw_inhibitor = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Wormhole Inhibitor"
 		unitDef.description = "Blocks Influence Spread"
 		unitDef.objectname = "pw_mstorage2.dae"
@@ -406,7 +406,7 @@ local structureConfig = {
 	end,
 
 	pw_guerilla = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Guerilla Jumpgate"
 		unitDef.description = "Spreads Influence remotely"
 		unitDef.objectname = "pw_gaspowerstation.dae"
@@ -429,7 +429,7 @@ local structureConfig = {
 	------------------------------------------------------------------------
 
 	pw_metal = function(unitDef)
-		unitDef.maxdamage = 10000
+		unitDef.health = 10000
 		unitDef.name = "Ancient Fabricator"
 		unitDef.description = "Produces Metal out of thin air (+10)"
 		unitDef.objectname = "pw_mine3.dae"
@@ -455,7 +455,7 @@ local structureConfig = {
 	end,
 
 	pw_techlab = function(unitDef)
-		unitDef.maxdamage = 2500
+		unitDef.health = 2500
 		unitDef.metalcost = 1000
 		unitDef.name = "Tech Lab"
 		unitDef.description = "Contains powerful ancient technology"
@@ -476,7 +476,7 @@ local structureConfig = {
 	-- the following are presently just for missions
 	------------------------------------------------------------------------
 	pw_gaspowerstation = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Gas Power Station"
 		unitDef.description = "Produces Energy"
 		unitDef.objectname = "pw_gaspowerstation.dae"
@@ -494,7 +494,7 @@ local structureConfig = {
 	end,
 
 	pw_mstorage2 = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Metal Storage"
 		unitDef.description = "Stores metal"
 		unitDef.objectname = "pw_mstorage2.dae"
@@ -511,7 +511,7 @@ local structureConfig = {
 	end,
 
 	pw_estorage = function(unitDef)
-		unitDef.maxdamage = 10000
+		unitDef.health = 10000
 		unitDef.name = "Energy Storage"
 		unitDef.description = "Stores energy"
 		unitDef.objectname = "pw_estorage.dae"
@@ -528,7 +528,7 @@ local structureConfig = {
 	end,
 
 	pw_estorage2 = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Double Energy Storage"
 		unitDef.description = "Stores energy"
 		unitDef.objectname = "pw_estorage2.dae"
@@ -545,7 +545,7 @@ local structureConfig = {
 	end,
 
 	pw_warpgatealt = function(unitDef)
-		unitDef.maxdamage = 15000
+		unitDef.health = 15000
 		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
 		unitDef.objectname = "pw_warpgate.dae"
@@ -567,7 +567,7 @@ local structureConfig = {
 	end,
 
 	pw_relay = function(unitDef)
-		unitDef.maxdamage = 6000
+		unitDef.health = 6000
 		unitDef.name = "Communication Relay"
 		unitDef.description = "Sends messages across the void"
 		unitDef.objectname = "pw_warpgate_alt.dae"
