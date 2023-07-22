@@ -2,7 +2,7 @@ return { obj_artefact = {
   name                          = [[Ancient Artefact]],
   description                   = [[Capture artefacts by destroying them. Control all artefacts to win.]],
   activateWhenBuilt             = true,
-  autoHeal                      = 200,
+  autoHeal                      = 100,
   builder                       = false,
   canSelfDestruct               = false,
   category                      = [[SINK UNARMED STUPIDTARGET]],
@@ -12,7 +12,6 @@ return { obj_artefact = {
   selectionVolumeOffsets        = [[0 -15 0]],
   selectionVolumeScales         = [[100 110 100]],
   selectionVolumeType           = [[CylY]],
-  corpse                        = [[DEAD]],
 
   customParams                  = {
     removewait = 1,
