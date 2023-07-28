@@ -18,7 +18,7 @@ return { bomberriot = {
   selectionVolumeScales  = [[108 27 108]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 160,
+  cruiseAltitude      = 160,
 
   customParams        = {
     modelradius    = [[10]],

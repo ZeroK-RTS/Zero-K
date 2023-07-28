@@ -33,7 +33,6 @@ return { striderbantha = {
   health                 = 32000,
   iconType               = [[t3generic]],
   leaveTracks            = true,
-  losEmitHeight          = 60,
   maxSlope               = 36,
   maxWaterDepth          = 22,
   metalCost              = 10000,
@@ -53,6 +52,7 @@ return { striderbantha = {
     },
 
   },
+  sightEmitHeight        = 60,
   sightDistance          = 720,
   speed                  = 43.5,
   trackOffset            = 0,

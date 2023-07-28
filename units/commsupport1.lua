@@ -41,7 +41,6 @@ return { commsupport1 = {
   health              = 2000,
   iconType            = [[commander1]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
   metalCost           = 1200,
@@ -64,6 +63,7 @@ return { commsupport1 = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
+  sightEmitHeight     = 40,
   sightDistance       = 500,
   sonarDistance       = 300,
   speed               = 36,

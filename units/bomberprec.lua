@@ -18,7 +18,7 @@ return { bomberprec = {
   selectionVolumeScales  = [[129 34 81]],
   selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 180,
+  cruiseAltitude      = 180,
 
   customParams        = {
     modelradius      = [[15]],

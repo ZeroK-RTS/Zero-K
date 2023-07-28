@@ -239,8 +239,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 				local speed = ud.speed/30
 				cloakers[unitID] = {
 					id = unitID, ux = ux, uy = uy, uz = uz,
-					range = ud.jammerRadius-cloakRangeSafety,
-					reactiveRange = ud.jammerRadius-cloakReactivateRange,
+					range = ud.radarDistanceJam - cloakRangeSafety,
+					reactiveRange = ud.radarDistanceJam - cloakReactivateRange,
 					cloakiees = {},
 					folCount = 0,
 					selfVel = speed,

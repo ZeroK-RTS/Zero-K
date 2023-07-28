@@ -41,7 +41,6 @@ return { cremcom1 = {
   health                 = 2500,
   iconType               = [[commander1]],
   leaveTracks            = true,
-  losEmitHeight       = 40,
   maxSlope               = 36,
   maxWaterDepth          = 5000,
   metalCost              = 1200,
@@ -65,6 +64,7 @@ return { cremcom1 = {
 
   showNanoSpray          = false,
   showPlayerName         = true,
+  sightEmitHeight        = 40,
   sightDistance          = 500,
   sonarDistance          = 300,
   speed                  = 40.5,

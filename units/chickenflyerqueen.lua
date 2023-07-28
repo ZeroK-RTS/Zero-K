@@ -15,7 +15,7 @@ return { chickenflyerqueen = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  cruiseAlt           = 150,
+  cruiseAltitude      = 150,
 
   customParams        = {
     statsname = "chickenlandqueen",

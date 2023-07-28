@@ -15,7 +15,7 @@ return { planelightscout = {
   collisionVolumeScales  = [[14 14 45]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 220,
+  cruiseAltitude      = 220,
 
   customParams        = {
     bait_level_target      = 2,

@@ -15,7 +15,7 @@ return { chickenf = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 150,
+  cruiseAltitude      = 150,
 
   customParams        = {
     outline_x = 180,

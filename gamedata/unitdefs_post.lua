@@ -609,12 +609,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Set higher default losEmitHeight. Engine default is 20.
+-- Set higher default sightEmitHeight. Engine default is 20.
 --
 
 for name, unitDef in pairs(UnitDefs) do
-	if not unitDef.losEmitHeight then
-		unitDef.losEmitHeight = 30
+	if not unitDef.sightemitheight then
+		unitDef.sightemitheight = 30
 	end
 end
 

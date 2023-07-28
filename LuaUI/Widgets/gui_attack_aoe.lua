@@ -236,7 +236,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 			retData = {type = "direct", scatter = scatter, range = weaponDef.range}
 		end
 	elseif (weaponType == "AircraftBomb") then
-		retData = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.wantedHeight, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
+		retData = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.cruiseAltitude, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
 	elseif (weaponType == "StarburstLauncher") then
 		if (weaponDef.tracks) then
 			retData = {type = "tracking", range = weaponDef.range}

@@ -25,7 +25,6 @@ return { shieldfelon = {
   health              = 1600,
   iconType            = [[walkersupport]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 22,
   metalCost           = 620,
@@ -44,6 +43,7 @@ return { shieldfelon = {
 
   },
 
+  sightEmitHeight     = 40,
   sightDistance       = 520,
   speed               = 45,
   trackOffset         = 0,

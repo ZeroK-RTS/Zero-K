@@ -20,7 +20,7 @@ return { bomberheavy = {
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
-  cruiseAlt           = 250,
+  cruiseAltitude      = 250,
 
   customParams        = {
     modelradius      = [[10]],

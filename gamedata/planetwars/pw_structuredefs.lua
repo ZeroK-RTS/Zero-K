@@ -258,7 +258,7 @@ local structureConfig = {
 		unitDef.sightdistance = 800
 		unitDef.radardistance = 2100
 		unitDef.radaremitheight = 150
-		unitDef.losemitheight = 150
+		unitDef.sightemitheight = 150
 		unitDef.onoffable = false
 
 		unitDef.collisionvolumescales = [[100 80 100]]

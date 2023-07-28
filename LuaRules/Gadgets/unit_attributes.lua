@@ -92,14 +92,14 @@ local sonarUnitDef = {}
 local jammerUnitDef = {}
 
 for unitDefID, ud in pairs(UnitDefs) do
-	if ud.radarRadius > 0 then
-		radarUnitDef[unitDefID] = ud.radarRadius
+	if ud.radarDistance > 0 then
+		radarUnitDef[unitDefID] = ud.radarDistance
 	end
-	if ud.sonarRadius > 0 and tobool(ud.customParams.sonar_can_be_disabled) then
-		sonarUnitDef[unitDefID] = ud.sonarRadius
+	if ud.sonarDistance > 0 and tobool(ud.customParams.sonar_can_be_disabled) then
+		sonarUnitDef[unitDefID] = ud.sonarDistance
 	end
-	if ud.jammerRadius > 0 then
-		jammerUnitDef[unitDefID] = ud.jammerRadius
+	if ud.radarDistanceJam > 0 then
+		jammerUnitDef[unitDefID] = ud.radarDistanceJam
 	end
 end
 

@@ -14,7 +14,7 @@ return { chicken_pigeon = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 200,
+  cruiseAltitude      = 200,
 
   customParams        = {
   },

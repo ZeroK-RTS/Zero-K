@@ -37,7 +37,6 @@ return { cloaksnipe = {
   health                 = 560,
   iconType               = [[sniper]],
   leaveTracks            = true,
-  losEmitHeight          = 40,
   initCloaked            = true,
   maxSlope               = 36,
   maxWaterDepth          = 22,
@@ -58,6 +57,7 @@ return { cloaksnipe = {
 
   },
 
+  sightEmitHeight        = 40,
   sightDistance          = 400,
   speed                  = 42,
   trackOffset            = 0,

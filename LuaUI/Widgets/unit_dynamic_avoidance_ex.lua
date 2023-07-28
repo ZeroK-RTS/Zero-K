@@ -870,7 +870,7 @@ function GetUnitLOSRadius(case,unitInMotionSingleUnit)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
-		losRadius= unitDef.losRadius --in normal case use real LOS
+		losRadius= unitDef.sightDistance --in normal case use real LOS
 		losRadius= losRadius + extraLOSRadiusCONSTANT --add extra detection range for beyond LOS (radar)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			
@@ -969,7 +969,7 @@ function CatalogueMovingObject(surroundingUnits, unitID,losRadius)
 					local enemyDefID = spGetUnitDefID(unitRectangleID)
 					local unitDefsSonarContent = 9999 --//set to very large so that any un-identified contact is assumed as having sonar (as threat).
 					if UnitDefs[enemyDefID]~=nil then
-						unitDefsSonarContent = UnitDefs[enemyDefID].sonarRadius
+						unitDefsSonarContent = UnitDefs[enemyDefID].sonarDistance
 					end
 					local enemySonarRadius = (unitDefsSonarContent or 0)
 					if enemySonarRadius > halfLosRadius then --//check enemy for sonar

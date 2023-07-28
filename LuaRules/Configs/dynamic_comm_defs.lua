@@ -1865,7 +1865,7 @@ end
 if UnitDefNames then
 	for i = 1, #chassisDefs do
 		local data = chassisDefs[i]
-		local wreckData = FeatureDefNames[UnitDefs[data.baseUnitDef].wreckName]
+		local wreckData = FeatureDefNames[UnitDefs[data.baseUnitDef].corpse]
 
 		data.baseWreckID = wreckData.id
 		data.baseHeapID = wreckData.deathFeatureID

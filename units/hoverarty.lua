@@ -29,7 +29,6 @@ return { hoverarty = {
   health              = 1000,
   iconType            = [[mobiletachyon]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 18,
   maxWaterDepth       = 22,
   metalCost           = 1100,
@@ -49,6 +48,7 @@ return { hoverarty = {
 
   },
   
+  sightEmitHeight     = 40,
   sightDistance       = 660,
   sonarDistance       = 660,
   speed               = 49.5,

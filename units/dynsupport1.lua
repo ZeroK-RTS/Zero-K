@@ -48,7 +48,6 @@ return { dynsupport1 = {
   health              = 3800,
   iconType            = [[commander1]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
   metalCost           = 1200,
@@ -73,6 +72,7 @@ return { dynsupport1 = {
   },
 
   showNanoSpray       = false,
+  sightEmitHeight     = 40,
   sightDistance       = 500,
   sonarDistance       = 500,
   speed               = 36,

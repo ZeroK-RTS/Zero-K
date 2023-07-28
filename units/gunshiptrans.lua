@@ -20,7 +20,7 @@ return { gunshiptrans = {
   selectionVolumeScales  = [[68 24 68]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 140,
+  cruiseAltitude      = 140,
 
   customParams        = {
     airstrafecontrol  = [[1]],

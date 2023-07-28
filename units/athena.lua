@@ -48,7 +48,7 @@ return { athena = {
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 20 60]],
   collisionVolumeType    = [[ellipsoid]],
-  cruiseAlt           = 80,
+  cruiseAltitude      = 80,
 
   customParams        = {
     airstrafecontrol = [[1]],

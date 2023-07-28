@@ -46,7 +46,6 @@ return { commrecon1 = {
   health              = 1650,
   iconType            = [[commander1]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
   metalCost           = 1200,
@@ -73,6 +72,7 @@ return { commrecon1 = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
+  sightEmitHeight     = 40,
   sightDistance       = 500,
   sonarDistance       = 300,
   speed               = 43.5,

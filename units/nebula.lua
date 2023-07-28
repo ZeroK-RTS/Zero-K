@@ -20,7 +20,7 @@ return { nebula = {
   collisionVolumeType    = [[box]],
 
   corpse                 = [[DEAD]],
-  cruiseAlt              = 300,
+  cruiseAltitude         = 300,
 
   customParams           = {
     cantuseairpads = 1,

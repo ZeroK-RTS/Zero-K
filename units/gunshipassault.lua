@@ -16,7 +16,7 @@ return { gunshipassault = {
   collisionVolumeScales  = [[50 15 50]],
   collisionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 135,
+  cruiseAltitude      = 135,
 
   customParams        = {
     bait_level_default = 1,

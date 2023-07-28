@@ -16,7 +16,7 @@ return { gunshipheavyskirm = {
   collisionVolumeScales  = [[40 20 60]],
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 240,
+  cruiseAltitude      = 240,
 
   customParams        = {
     bait_level_default = 0,

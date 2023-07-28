@@ -15,7 +15,7 @@ return { bomberdisarm = {
   selectionVolumeScales  = [[95 34 95]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 180,
+  cruiseAltitude      = 180,
 
   customParams        = {
     modelradius    = [[10]],

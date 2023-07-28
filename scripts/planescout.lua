@@ -12,7 +12,7 @@ local SIG_CLOAK = 1
 local CLOAK_TIME = 5000
 
 local SIG_TAKEOFF = 2
-local takeoffHeight = UnitDefNames["planescout"].wantedHeight
+local takeoffHeight = UnitDefNames["planescout"].cruiseAltitude
 --------------------------------------------------------------------
 -- functions
 --------------------------------------------------------------------

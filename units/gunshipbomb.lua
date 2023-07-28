@@ -19,7 +19,7 @@ return { gunshipbomb = {
   selectionVolumeScales  = [[48 48 48]],
   selectionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
-  cruiseAlt              = 30,
+  cruiseAltitude         = 30,
 
   customParams           = {
     landflystate   = [[1]],

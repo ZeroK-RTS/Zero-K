@@ -21,7 +21,7 @@ return { gunshipheavytrans = {
   selectionVolumeScales  = [[83 38 135]],
   selectionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
-  cruiseAlt              = 250,
+  cruiseAltitude         = 250,
 
   customParams           = {
     midposoffset   = [[0 0 0]],

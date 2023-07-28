@@ -30,7 +30,6 @@ return { turretmissile = {
   health                        = 340,
   iconType                      = [[defenseskirm]],
   levelGround                   = false,
-  losEmitHeight                 = 40,
   maxSlope                      = 36,
   metalCost                     = 100,
   noAutoFire                    = false,
@@ -47,6 +46,7 @@ return { turretmissile = {
     },
 
   },
+  sightEmitHeight               = 40,
   sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

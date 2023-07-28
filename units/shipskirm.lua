@@ -28,7 +28,6 @@ return { shipskirm = {
   footprintZ             = 3,
   health                 = 650,
   iconType               = [[shipskirm]],
-  losEmitHeight          = 30,
   metalCost              = 220,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],

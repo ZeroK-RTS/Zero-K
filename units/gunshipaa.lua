@@ -18,7 +18,7 @@ return { gunshipaa = {
   collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 110,
+  cruiseAltitude         = 110,
 
   customParams           = {
     bait_level_default = 0,

@@ -18,7 +18,7 @@ return { planeheavyfighter = {
   selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.01,
-  cruiseAlt              = 220,
+  cruiseAltitude         = 220,
 
   customParams           = {
     bait_level_default = 0,

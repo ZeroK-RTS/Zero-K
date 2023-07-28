@@ -28,7 +28,6 @@ return { turretlaser = {
   health                        = 785,
   iconType                      = [[defenseraider]],
   levelGround                   = false,
-  losEmitHeight                 = 60,
   maxSlope                      = 36,
   metalCost                     = 90,
   noAutoFire                    = false,
@@ -44,6 +43,7 @@ return { turretlaser = {
     },
 
   },
+  sightEmitHeight               = 60,
   sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   waterline                     = 5,

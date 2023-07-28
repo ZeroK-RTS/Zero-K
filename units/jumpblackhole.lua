@@ -30,7 +30,6 @@ return { jumpblackhole = {
   health                = 900,
   iconType              = [[kbotwideriot]],
   leaveTracks           = true,
-  losEmitHeight         = 40,
   maxSlope              = 36,
   maxWaterDepth         = 22,
   metalCost             = 250,
@@ -52,6 +51,7 @@ return { jumpblackhole = {
     },
 
   },
+  sightEmitHeight       = 40,
   sightDistance         = 605,
   speed                 = 60,
   trackOffset           = 0,

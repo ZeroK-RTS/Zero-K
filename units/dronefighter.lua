@@ -15,7 +15,7 @@ return { dronefighter = {
   collisionVolumeScales  = [[25 8 40]],
   collisionVolumeType    = [[box]],
   crashDrag              = 0.02,
-  cruiseAlt              = 250,
+  cruiseAltitude         = 250,
   canLand                = false,
 
   customParams           = {

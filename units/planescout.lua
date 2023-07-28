@@ -15,7 +15,7 @@ return { planescout = {
   collisionVolumeScales  = [[40 15 75]],
   collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 250,
+  cruiseAltitude      = 250,
 
   customParams        = {
     modelradius       = [[20]],

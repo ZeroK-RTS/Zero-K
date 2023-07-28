@@ -343,15 +343,15 @@ local function DrawSearchlights()
 			end
 			heading = math.atan2(vz, vx)
 			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
-			relativeHeight = relativeHeight+unitDef.wantedHeight--nominal search light height is unit height + flying height distance
+			relativeHeight = relativeHeight + unitDef.cruiseAltitude --nominal search light height is unit height + flying height distance
 			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius * 2
 		  elseif (unitDef.canFly) then
 			cache[defID]= cache[defID] or {}
 			if not cache[defID].leadDist then
 				local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
-				leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight,0)) * 0.8
-				relativeHeight = relativeHeight+unitDef.wantedHeight
+				leadDistance = math.sqrt(math.max(range * range - unitDef.cruiseAltitude * unitDef.cruiseAltitude,0)) * 0.8
+				relativeHeight = relativeHeight + unitDef.cruiseAltitude
 				leadDist_to_height_ratio = leadDistance/relativeHeight
 				--cache
 				cache[defID].leadDist = leadDistance

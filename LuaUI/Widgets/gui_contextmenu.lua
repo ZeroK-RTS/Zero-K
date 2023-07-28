@@ -992,10 +992,10 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarRadius
-	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.jammerRadius
+	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarDistance
+	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.radarDistanceJam
 	
-	if (radarRadius > 0) or (jammerRadius > 0) or ud.targfac then
+	if (radarRadius > 0) or (jammerRadius > 0) or ud.isTargetingUpgrade then
 		cells[#cells+1] = 'Provides intel'
 		cells[#cells+1] = ''
 		if (radarRadius > 0) then
@@ -1006,7 +1006,7 @@ local function printAbilities(ud, unitID)
 			cells[#cells+1] = ' - Radar jamming:'
 			cells[#cells+1] = numformat(jammerRadius) .. " elmo"
 		end
-		if ud.targfac then
+		if ud.isTargetingUpgrade then
 			cells[#cells+1] = ' - Improves radar accuracy'
 			cells[#cells+1] = ''
 		end
@@ -1220,7 +1220,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if ud.selfDCountdown <= 1 then
+	if ud.selfDestructCountdown <= 1 then
 		cells[#cells+1] = 'Instant self-destruction'
 		cells[#cells+1] = ''
 	end
@@ -1548,19 +1548,19 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy) .. " E/s", textColor = color.stats_fg, }
 	end
 	
-	if ud.losRadius > 0 then
+	if ud.sightDistance > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sightDistance) .. " elmo", textColor = color.stats_fg, }
 	end
 
-	if (ud.sonarRadius > 0) then
+	if (ud.sonarDistance > 0) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sonar: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarRadius) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarDistance) .. " elmo", textColor = color.stats_fg, }
 	end
 
-	if ud.wantedHeight > 0 then
+	if ud.cruiseAltitude > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight*1.5) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.cruiseAltitude * 1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then

@@ -32,7 +32,6 @@ return { shipassault = {
   footprintZ             = 4,
   health                 = 5200,
   iconType               = [[shipassault]],
-  losEmitHeight          = 25,
   metalCost              = 600,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
@@ -51,6 +50,7 @@ return { shipassault = {
 
   },
 
+  sightEmitHeight        = 25,
   sightDistance          = 440,
   sonarDistance          = 440,
   speed                  = 60,

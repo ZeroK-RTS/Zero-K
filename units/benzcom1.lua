@@ -40,7 +40,6 @@ return { benzcom1 = {
   health              = 2250,
   iconType            = [[commander1]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
   metalCost           = 1200,
@@ -64,6 +63,7 @@ return { benzcom1 = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
+  sightEmitHeight     = 40,
   sightDistance       = 500,
   sonarDistance       = 300,
   speed               = 37.5,

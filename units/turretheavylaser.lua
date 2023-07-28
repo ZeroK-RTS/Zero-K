@@ -29,7 +29,6 @@ return { turretheavylaser = {
   health                        = 2250,
   iconType                      = [[defenseheavy]],
   levelGround                   = false,
-  losEmitHeight                 = 80,
   maxSlope                      = 36,
   metalCost                     = 450,
   noAutoFire                    = false,
@@ -46,6 +45,7 @@ return { turretheavylaser = {
     },
 
   },
+  sightEmitHeight               = 80,
   sightDistance                 = 730, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

@@ -41,7 +41,6 @@ return { jumpsumo = {
   health              = 13500,
   iconType            = [[t3jumpjetriot]],
   leaveTracks         = true,
-  losEmitHeight       = 60,
   maxSlope            = 36,
   maxWaterDepth       = 22,
   metalCost           = 1700,
@@ -61,6 +60,7 @@ return { jumpsumo = {
     },
 
   },
+  sightEmitHeight     = 60,
   sightDistance       = 480,
   speed               = 34.5,
   trackOffset         = 0,

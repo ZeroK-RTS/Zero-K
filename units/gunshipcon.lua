@@ -26,7 +26,7 @@ return { gunshipcon = {
   selectionVolumeType    = [[ellipsoid]],
   collide             = true,
   corpse              = [[DEAD]],
-  cruiseAlt           = 80,
+  cruiseAltitude      = 80,
 
   customParams        = {
     airstrafecontrol = [[0]],

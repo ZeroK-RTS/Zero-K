@@ -12,7 +12,7 @@ return { fakeunit_los = {
   canSubmerge           = false,
   canSelfDestruct       = false,
   category              = [[FAKEUNIT]],
-  cruiseAlt             = 300,
+  cruiseAltitude        = 300,
   
   customParams          = {
     dontcount         = [[1]],

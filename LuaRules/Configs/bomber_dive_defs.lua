@@ -17,7 +17,7 @@ local units = {
 		diveDistanceMult = 1.7,
 		altPerFlightFrame = 6.15,
 		sizeSafetyFactor = 0.75,
-		orgHeight = UnitDefNames["bomberprec"].wantedHeight*FUDGE_FACTOR,
+		orgHeight = UnitDefNames["bomberprec"].cruiseAltitude * FUDGE_FACTOR,
 	},
 }
 

@@ -46,7 +46,6 @@ return { energywind = {
   health                        = 150, -- as wind; see customparams for tidal
   iconType                      = [[energywind]],
   levelGround                   = false,
-  losEmitHeight                 = 30,
   maxSlope                      = 75,
   metalCost                     = 35,
   objectName                    = [[arm_wind_generator.s3o]],

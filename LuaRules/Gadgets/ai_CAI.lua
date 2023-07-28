@@ -3343,7 +3343,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.econ[controlledUnit.econ.count] = unitID
 					controlledUnit.econByID[unitID] = {index = controlledUnit.econ.count,finished = false,
 						ud = ud,x = x, y = y, z = z, nearbyTurrets = 0, cost = ud.metalCost, onDefenceHeatmap = not built}
-				elseif ud.radarRadius > 0 then -- radar
+				elseif ud.radarDistance > 0 then -- radar
 					controlledUnit.radar.cost = controlledUnit.econ.cost + ud.metalCost
 					controlledUnit.radar.count = controlledUnit.econ.count + 1
 					controlledUnit.radarByID[unitID] = {finished = false, ud = ud,x = x, y = y, z = z, cost = ud.metalCost}
@@ -3375,7 +3375,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				units.turretByID[unitID] = true
 			elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) then
 				units.econByID[unitID] = true
-			elseif ud.radarRadius > 0 then -- radar
+			elseif ud.radarDistance > 0 then -- radar
 				units.radarByID[unitID] = true
 			end
 		end
@@ -3466,7 +3466,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					controlledUnit.turretByID[unitID].finished = true
 				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econByID[unitID].finished = true
-				elseif ud.radarRadius > 0 then -- radar
+				elseif ud.radarDistance > 0 then -- radar
 					controlledUnit.radarByID[unitID].finished = true
 				end
 			end

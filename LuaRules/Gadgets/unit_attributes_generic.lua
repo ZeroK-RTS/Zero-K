@@ -64,11 +64,11 @@ local function UpdateSensorAndJamm(unitID, unitDefID, multiplier)
 	if not origUnitSight[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		origUnitSight[unitDefID] = {
-			radar = (ud.radarRadius > 0) and ud.radarRadius,
-			sonar = (ud.sonarRadius > 0) and ud.sonarRadius ,
-			jammer = (ud.jammerRadius > 0) and ud.jammerRadius ,
-			los = (ud.losRadius > 0) and ud.losRadius,
-			airLos = (ud.airLosRadius > 0) and ud.airLosRadius,
+			radar = (ud.radarDistance > 0) and ud.radarDistance,
+			sonar = (ud.sonarDistance > 0) and ud.sonarDistance,
+			jammer = (ud.radarDistanceJam > 0) and ud.radarDistanceJam,
+			los = (ud.sightDistance > 0) and ud.sightDistance,
+			airLos = (ud.airSightDistance > 0) and ud.airSightDistance,
 		}
 	end
 	local orig = origUnitSight[unitDefID]

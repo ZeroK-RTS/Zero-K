@@ -14,7 +14,7 @@ return { chicken_blimpy = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 250,
+  cruiseAltitude      = 250,
 
   customParams        = {
   },

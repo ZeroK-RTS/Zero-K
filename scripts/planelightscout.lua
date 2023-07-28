@@ -9,7 +9,7 @@ local fuselage, KRisaravinglunatic, wingl, wingr = piece("fuselage", "KRisaravin
 local smokePiece = {KRisaravinglunatic}
 
 local SIG_TAKEOFF = 2
-local takeoffHeight = UnitDefNames["planelightscout"].wantedHeight
+local takeoffHeight = UnitDefNames["planelightscout"].cruiseAltitude
 --------------------------------------------------------------------
 -- functions
 --------------------------------------------------------------------

@@ -226,7 +226,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and (string.match(ud.tooltip, 'Skirm') or string.match(ud.tooltip, 'Capture') or string.match(ud.tooltip, 'Black Hole')) and IsGround(ud) then
+				if ud and (string.match(ud.description, 'Skirm') or string.match(ud.description, 'Capture') or string.match(ud.description, 'Black Hole')) and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -244,7 +244,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Arti') and IsGround(ud) then
+				if ud and string.match(ud.description, 'Arti') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -262,7 +262,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air') and IsGround(ud) then
+				if ud and string.match(ud.description, 'Anti') and string.match(ud.description, 'Air') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end

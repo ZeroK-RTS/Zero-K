@@ -33,7 +33,6 @@ return { raveparty = {
   highTrajectory                = 2,
   iconType                      = [[mahlazer]],
   levelGround                   = false,
-  losEmitHeight                 = 100,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
   metalCost                     = 42000,
@@ -52,6 +51,7 @@ return { raveparty = {
     },
 
   },
+  sightEmitHeight               = 100,
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

@@ -19,7 +19,7 @@ return { gunshipkrow = {
   collisionVolumeScales  = [[86 22 86]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
-  cruiseAlt              = 120,
+  cruiseAltitude         = 120,
 
   customParams           = {
     modelradius    = [[10]],

@@ -16,7 +16,7 @@ return { gunshipraid = {
   selectionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 100,
+  cruiseAltitude         = 100,
 
   customParams           = {
     airstrafecontrol = [[1]],

@@ -39,7 +39,6 @@ return { turretheavy = {
   health                        = 10000,
   iconType                      = [[staticassaultriot]],
   levelGround                   = false,
-  losEmitHeight                 = 70,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
   metalCost                     = 1600,
@@ -56,6 +55,7 @@ return { turretheavy = {
     },
 
   },
+  sightEmitHeight               = 70,
   sightDistance                 = 763, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

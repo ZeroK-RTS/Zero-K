@@ -15,7 +15,7 @@ return { chicken_roc = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  cruiseAlt           = 150,
+  cruiseAltitude      = 150,
 
   customParams        = {
     outline_x = 180,

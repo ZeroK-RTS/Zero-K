@@ -49,7 +49,6 @@ return { dynrecon1 = {
   health              = 3250,
   iconType            = [[commander1]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
   maxSlope            = 36,
   maxWaterDepth       = 5000,
   metalCost           = 1200,
@@ -74,6 +73,7 @@ return { dynrecon1 = {
   },
 
   showNanoSpray       = false,
+  sightEmitHeight     = 40,
   sightDistance       = 500,
   sonarDistance       = 500,
   speed               = 43.5,

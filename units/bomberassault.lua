@@ -17,7 +17,7 @@ return { bomberassault = {
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
-  cruiseAlt           = 250,
+  cruiseAltitude      = 250,
 
   customParams        = {
     reammoseconds    = 20,

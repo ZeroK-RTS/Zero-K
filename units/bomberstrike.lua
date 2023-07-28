@@ -15,7 +15,7 @@ return { bomberstrike = {
   collisionVolumeScales  = [[50 18 80]],
   collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 160,
+  cruiseAltitude      = 160,
 
   customParams        = {
     reallyabomber    = [[1]],

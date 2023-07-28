@@ -28,7 +28,6 @@ return { cloakassault = {
   health                 = 2400,
   iconType               = [[kbotassault]],
   leaveTracks            = true,
-  losEmitHeight          = 35,
   maxSlope               = 36,
   maxWaterDepth          = 22,
   metalCost              = 350,
@@ -47,6 +46,7 @@ return { cloakassault = {
 
   },
 
+  sightEmitHeight        = 35,
   sightDistance          = 385,
   speed                  = 51,
   trackOffset            = 0,

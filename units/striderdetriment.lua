@@ -45,7 +45,6 @@ return { striderdetriment = {
   health                 = 86000,
   iconType               = [[krogoth]],
   leaveTracks            = true,
-  losEmitHeight          = 100,
   maxSlope               = 37,
   maxWaterDepth          = 5000,
   metalCost              = 24000,
@@ -69,6 +68,7 @@ return { striderdetriment = {
     },
   },
   
+  sightEmitHeight        = 100,
   sightDistance          = 900,
   sonarDistance          = 900,
   speed                  = 36,
