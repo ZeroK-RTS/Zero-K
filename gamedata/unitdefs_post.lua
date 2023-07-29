@@ -1049,7 +1049,11 @@ if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 		ud.buildcostmetal  = ud.metalcost
 		ud.buildcostenergy = ud.energycost
 		ud.maxdamage = ud.health
-		ud.maxreversevelocity = ud.rspeed / Game.gameSpeed
-		ud.maxvelocity        = ud.speed  / Game.gameSpeed
+		if ud.speed then
+			ud.maxvelocity = ud.speed / Game.gameSpeed
+		end
+		if ud.rspeed then
+			ud.maxreversevelocity = ud.rspeed / Game.gameSpeed
+		end
 	end
 end

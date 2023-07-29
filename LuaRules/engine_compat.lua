@@ -367,6 +367,42 @@ if not Spring.SetUnitShieldRechargeDelay and Script.GetSynced() then -- BAR 105-
 	Spring.SetUnitShieldRechargeDelay = RET_NONE
 end
 
+if UnitDefs then -- BAR 105-1801
+
+	local keys = { -- old, new
+		"tooltip"       , "description",
+		"wreckName"     , "corpse",
+		"buildpicname"  , "buildPic",
+		"canSelfD"      , "canSelfDestruct",
+		"selfDCountdown", "selfDestructCountdown",
+		"losRadius"     , "sightDistance",
+		"losHeight"     , "sightEmitHeight",
+		"airLosRadius"  , "airSightDistance",
+		"radarRadius"   , "radarDistance",
+		"jammerRadius"  , "radarDistanceJam",
+		"sonarRadius"   , "sonarDistance",
+		"sonarJamRadius", "sonarDistanceJam",
+		"seismicRadius" , "seismicDistance",
+		"kamikazeDist"  , "kamikazeDistance",
+		"targfac"       , "isTargetingUpgrade",
+		"wantedHeight"  , "cruiseAltitude",
+	}
+
+	for _, unitDef in pairs (UnitDefs) do
+		for i = 1, #keys, 2 do
+			local oldKey = keys[i]
+			local newKey = keys[i+1]
+
+			-- Spring recoils in horror if you try to assign existing
+			-- keys, so it MUST be done under a nil check (also remember
+			-- that some are bools so it can't be just "if not x")
+			if unitDef[newKey] == nil then
+				unitDef[newKey] = unitDef[oldKey]
+			end
+		end
+	end
+end
+
 if not Spring.GetUnitIsBeingBuilt then -- BAR 105-1806
 	local spGetUnitHealth = Spring.GetUnitHealth
 	local spGetUnitIsStunned = Spring.GetUnitIsStunned
