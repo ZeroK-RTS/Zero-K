@@ -442,7 +442,13 @@ local function RemovePylonsFromGridQueue(unitID)
 	end
 end
 
-local function AddPylon(unitID, unitDefID, range)
+local function MaybeAddPylon(unitID, unitDefID)
+	local pylonDef = pylonDefs[unitDefID]
+	if not pylonDef then
+		return
+	end
+	local range = pylonDef.range
+
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
@@ -450,6 +456,7 @@ local function AddPylon(unitID, unitDefID, range)
 	if pylon[allyTeamID][unitID] then
 		return
 	end
+
 	quadFields[allyTeamID]:Insert(unitID, pX, pZ, range)
 	local intersections = quadFields[allyTeamID]:GetIntersections(unitID)
 	local neededLink = pylonDefs[unitDefID].neededLink
@@ -560,7 +567,11 @@ local function DeactivatePylon(unitID)
 	pylon[allyTeamID][unitID].active = false
 end
 
-local function RemovePylon(unitID)
+local function RemovePylon(unitID, unitDefID)
+	if not pylonDefs[unitDefID] then
+		return
+	end
+
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 
 	if debugGridMode then
@@ -693,6 +704,10 @@ local function GetUnitTeamBuildProp(unitID, teamID)
 end
 
 local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
+	if not paybackDefs[unitDefID] or not enableEnergyPayback then
+		return
+	end
+
 	if unitPaybackTeamIDs[unitID] then
 		-- Only add units to payback once.
 		return
@@ -713,6 +728,10 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 end
 
 local function RemoveEnergyToPayback(unitID, unitDefID)
+	if not paybackDefs[unitDefID] or not enableEnergyPayback then
+		return
+	end
+
 	local paybackTeams = unitPaybackTeamIDs[unitID]
 	if paybackTeams then -- many energy pieces will not have a payback when destroyed
 		for teamID, prop in pairs(paybackTeams) do
@@ -741,10 +760,16 @@ local function UpdateAndGetCurrentMexRefundShare(unitID, baseMetal)
 	return refund
 end
 
-local function AddMexPayback(unitID, unitDefID, refundTeams, metalMake)
-	if (metalMake or 0) <= 0 then
+local function AddMexPayback(unitID, unitDefID, refundTeams)
+	if not mexDefs[unitDefID] or not enableMexPayback then
 		return
 	end
+
+	local metalMake = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	if metalMake <= 0 then
+		return
+	end
+
 	if (not mexByID[unitID]) then
 		return
 	end
@@ -1539,10 +1564,17 @@ end
 -------------------------------------------------------------------------------------
 -- MEXES
 
-local function AddMex(unitID, metalMake)
-	if (metalMake or 0) <= 0 then
+local function MaybeAddMex(unitID, unitDefID)
+	local mexDef = mexDefs[unitDefID]
+	if not mexDef then
 		return
 	end
+
+	local metalMake = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	if metalMake <= 0 then
+		return
+	end
+
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
@@ -1559,11 +1591,13 @@ local function AddMex(unitID, metalMake)
 	end
 end
 
-local function RemoveMex(unitID)
-	local gridID = 0
+local function RemoveMex(unitID, unitDefID)
 	local mex = mexByID[unitID]
+	if not mex then
+		return
+	end
 
-	if mex and mexes[mex.allyTeamID][mex.gridID][unitID] then
+	if mexes[mex.allyTeamID][mex.gridID][unitID] then
 
 		local orgMetal = mexes[mex.allyTeamID][mex.gridID][unitID]
 		local ai = allyTeamInfo[mex.allyTeamID]
@@ -1602,8 +1636,6 @@ end
 -- RESOURCE GENERATORS
 
 local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
-	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
-	teamID = teamID or spGetUnitTeam(unitID)
 
 	--if generator[allyTeamID][teamID][unitID] then
 		--return
@@ -1639,9 +1671,18 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	resourceGeneratingUnit[unitID] = true
 end
 
+local function MaybeAddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
+	if generatorDefs[unitDefID] or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
+		AddResourceGenerator(unitID, unitDefID, teamID or spGetUnitTeam(unitID), allyTeamID or spGetUnitAllyTeam(unitID))
+	end
+end
+
 local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
+	if not generatorDefs[unitDefID] and not resourceGeneratingUnit[unitID] then
+		return
+	end
+
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
-	teamID = teamID or spGetUnitTeam(unitID)
 
 	resourceGeneratingUnit[unitID] = false
 
@@ -1790,16 +1831,9 @@ function gadget:Initialize()
 	_G.pylon = pylon
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
-		if (mexDefs[unitDefID]) then
-			local inc = spGetUnitRulesParam(unitID, "mexIncome")
-			AddMex(unitID, inc)
-		end
-		if (pylonDefs[unitDefID]) then
-			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
-		end
-		if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
-			AddResourceGenerator(unitID, unitDefID)
-		end
+		MaybeAddMex(unitID, unitDefID)
+		MaybeAddPylon(unitID, unitDefID)
+		MaybeAddResourceGenerator(unitID, unitDefID)
 	end
 
 	local teamList = Spring.GetTeamList()
@@ -1821,29 +1855,14 @@ end
 -------------------------------------------------------------------------------------
 
 local function MoveOrTransferSetup(unitID, unitDefID)
-	if (mexDefs[unitDefID] and mexByID[unitID]) then
-		RemoveMex(unitID)
-	end
-
-	if pylonDefs[unitDefID] then
-		RemovePylon(unitID)
-	end
-
-	if paybackDefs[unitDefID] and enableEnergyPayback then
-		RemoveEnergyToPayback(unitID, unitDefID)
-	end
+	RemoveMex(unitID, unitDefID)
+	RemovePylon(unitID, unitDefID)
+	RemoveEnergyToPayback(unitID, unitDefID)
 end
 
 local function MoveOrTransferAftermath(unitID, unitDefID)
-	if (mexDefs[unitDefID]) then
-		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMex(unitID, inc)
-	end
-
-	if pylonDefs[unitDefID] then
-		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
-		--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
-	end
+	MaybeAddMex(unitID, unitDefID)
+	MaybeAddPylon(unitID, unitDefID)
 end
 
 GG.Overdrive_MoveOrTransferSetup = MoveOrTransferSetup
@@ -1853,34 +1872,20 @@ GG.Overdrive_MoveOrTransferAftermath = MoveOrTransferAftermath
 -------------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if (mexDefs[unitDefID]) then
-		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMex(unitID, inc)
-	end
-	if pylonDefs[unitDefID] then
-		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
-	end
-	if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
-		AddResourceGenerator(unitID, unitDefID, unitTeam)
-	end
+	MaybeAddMex(unitID, unitDefID)
+	MaybeAddPylon(unitID, unitDefID)
+	MaybeAddResourceGenerator(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if paybackDefs[unitDefID] and enableEnergyPayback then
-		if unitAlreadyFinished[unitID] then
-			return
-		end
-		unitAlreadyFinished[unitID] = true
-		AddEnergyToPayback(unitID, unitDefID, GetUnitTeamBuildProp(unitID, unitTeam))
+	if unitAlreadyFinished[unitID] then
+		return
 	end
-	if mexDefs[unitDefID] and enableMexPayback then
-		if unitAlreadyFinished[unitID] then
-			return
-		end
-		unitAlreadyFinished[unitID] = true
-		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMexPayback(unitID, unitDefID, GetUnitTeamBuildProp(unitID, unitTeam), inc)
-	end
+	unitAlreadyFinished[unitID] = true
+
+	local paybackTeams = GetUnitTeamBuildProp(unitID, unitTeam)
+	AddEnergyToPayback(unitID, unitDefID, paybackTeams)
+	AddMexPayback(unitID, unitDefID, paybackTeams)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
@@ -1891,9 +1896,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		MoveOrTransferAftermath(unitID, unitDefID)
 	end
 
-	if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
-		AddResourceGenerator(unitID, unitDefID, teamID, newAllyTeamID)
-	end
+	MaybeAddResourceGenerator(unitID, unitDefID, teamID, newAllyTeamID)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
@@ -1904,28 +1907,17 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		MoveOrTransferSetup(unitID, unitDefID)
 	end
 
-	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
-		RemoveResourceGenerator(unitID, unitDefID, oldTeamID, oldAllyTeamID)
-	end
+	RemoveResourceGenerator(unitID, unitDefID, oldTeamID, oldAllyTeamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (mexDefs[unitDefID] and mexByID[unitID]) then
-		unitAlreadyFinished[unitID] = nil
-		buildPropTracker[unitID] = nil
-		RemoveMex(unitID)
-	end
-	if (pylonDefs[unitDefID]) then
-		RemovePylon(unitID)
-	end
-	if paybackDefs[unitDefID] and enableEnergyPayback then
-		unitAlreadyFinished[unitID] = nil
-		buildPropTracker[unitID] = nil
-		RemoveEnergyToPayback(unitID, unitDefID)
-	end
-	if generatorDefs[unitDefID] or resourceGeneratingUnit[unitID] then
-		RemoveResourceGenerator(unitID, unitDefID, unitTeam)
-	end
+	RemoveMex(unitID, unitDefID)
+	RemovePylon(unitID, unitDefID)
+	RemoveEnergyToPayback(unitID, unitDefID)
+	RemoveResourceGenerator(unitID, unitDefID, unitTeam)
+
+	unitAlreadyFinished[unitID] = nil
+	buildPropTracker[unitID] = nil
 end
 
 -------------------------------------------------------------------------------------
