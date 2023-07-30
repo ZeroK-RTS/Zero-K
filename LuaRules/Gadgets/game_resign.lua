@@ -87,7 +87,6 @@ function gadget:GotChatMsg (msg, senderID)
 
 			if #Spring.GetPlayerList(teamID) > 1 then
 				Spring.Echo("Force-resign: comshare unmerge failed, other players still on team", nick, "playerID", playerID, "teamID", teamID)
-				return
 			end
 
 			ResignTeam(teamID)
