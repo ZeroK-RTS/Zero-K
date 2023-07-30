@@ -86,29 +86,30 @@ local QUADFIELD_SQUARE_SIZE = 300
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
-	if (udef.customParams.ismex) then
+	local cp = udef.customParams
+	if cp.ismex then
 		mexDefs[i] = true
 		allowBuildStepDef[i] = true
 	end
-	local pylonRange = tonumber(udef.customParams.pylonrange) or 0
+	local pylonRange = tonumber(cp.pylonrange) or 0
 	if pylonRange > 0 then
 		pylonDefs[i] = {
 			range = pylonRange,
-			neededLink = tonumber(udef.customParams.neededlink) or false,
-			keeptooltip = udef.customParams.keeptooltip or false,
+			neededLink = tonumber(cp.neededlink) or false,
+			keeptooltip = cp.keeptooltip or false,
 		}
 	end
-	local metalIncome = tonumber(udef.customParams.income_metal) or 0
-	local energyIncome = tonumber(udef.customParams.income_energy) or 0
-	local isWind = (udef.customParams.windgen and true) or false
+	local metalIncome = tonumber(cp.income_metal) or 0
+	local energyIncome = tonumber(cp.income_energy) or 0
+	local isWind = (cp.windgen and true) or false
 	if metalIncome > 0 or energyIncome > 0 or isWind then
 		generatorDefs[i] = {
 			metalIncome = metalIncome,
 			energyIncome = energyIncome,
-			sharedEnergyGenerator = udef.customParams.shared_energy_gen and true
+			sharedEnergyGenerator = cp.shared_energy_gen and true
 		}
 		if energyIncome > 0 or isWind then
-			paybackDefs[i] = (udef.customParams.overdrive_payback and tonumber(udef.customParams.overdrive_payback)) or (udef.metalCost * PAYBACK_FACTOR)
+			paybackDefs[i] = (cp.overdrive_payback and tonumber(cp.overdrive_payback)) or (udef.metalCost * PAYBACK_FACTOR)
 			allowBuildStepDef[i] = true
 		end
 	end
