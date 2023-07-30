@@ -1539,7 +1539,7 @@ end
 -------------------------------------------------------------------------------------
 -- MEXES
 
-local function AddMex(unitID, teamID, metalMake)
+local function AddMex(unitID, metalMake)
 	if (metalMake or 0) <= 0 then
 		return
 	end
@@ -1792,7 +1792,7 @@ function gadget:Initialize()
 		local unitDefID = spGetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
 			local inc = spGetUnitRulesParam(unitID, "mexIncome")
-			AddMex(unitID, false, inc)
+			AddMex(unitID, inc)
 		end
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
@@ -1837,7 +1837,7 @@ end
 local function MoveOrTransferAftermath(unitID, unitDefID)
 	if (mexDefs[unitDefID]) then
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMex(unitID, false, inc)
+		AddMex(unitID, inc)
 	end
 
 	if pylonDefs[unitDefID] then
@@ -1855,7 +1855,7 @@ GG.Overdrive_MoveOrTransferAftermath = MoveOrTransferAftermath
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		AddMex(unitID, unitTeam, inc)
+		AddMex(unitID, inc)
 	end
 	if pylonDefs[unitDefID] then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
