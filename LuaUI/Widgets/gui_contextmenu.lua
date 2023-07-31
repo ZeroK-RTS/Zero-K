@@ -309,7 +309,20 @@ for i = 1, #players do
 	end
 end
 
+
+--[[ Mods can add "tier 2", "moho" etc mexes that gather a different
+     amount of metal per spot. In those cases, display the multiplier
+     for all mexes. Avoid it for vanilla tho because it's implying. ]]
+local differentMexTypeExists = false
+
 for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	local cp = ud.customParams
+	local mexMult = tonumber(cp.metal_extractor_mult)
+	if mexMult and mexMult ~= 1 and mexMult > 0 then
+		differentMexTypeExists = true
+	end
+
 	if not alreadyAdded[i] then
 		local ud = UnitDefs[i]
 		if ud.name:lower():find('pw_') and (Spring.GetGameRulesParam("planetwars_structures") == 1) then
@@ -1230,9 +1243,14 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if cp.ismex then
+	local mexMult = tonumber(cp.metal_extractor_mult)
+	if mexMult then
 		cells[#cells+1] = 'Extracts metal'
-		cells[#cells+1] = ''
+		if differentMexTypeExists and mexMult > 0 then
+			cells[#cells+1] = numformat(100*mexMult) .. "% extraction"
+		else
+			cells[#cells+1] = ''
+		end
 	end
 
 	if cp.fireproof then

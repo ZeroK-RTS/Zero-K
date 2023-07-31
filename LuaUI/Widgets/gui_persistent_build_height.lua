@@ -114,7 +114,12 @@ options = {
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local mexDefID = UnitDefNames["staticmex"].id
+local mexDefIDs = {}
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.metal_extractor_mult then
+		mexDefIDs[i] = true
+	end
+end
 
 local INCREMENT_SIZE = 20
 
@@ -178,7 +183,7 @@ local function SendCommand()
 	end
 	
 	-- Snap mex to metal spots
-	if buildingPlacementID == mexDefID and WG.GetClosestMetalSpot then
+	if mexDefIDs[buildingPlacementID] and WG.GetClosestMetalSpot then
 		local pos = WG.GetClosestMetalSpot(pointX, pointZ)
 		if pos then
 			pointX, pointZ = pos.x, pos.z

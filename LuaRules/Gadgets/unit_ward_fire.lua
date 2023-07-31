@@ -43,7 +43,12 @@ local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local unitAIBehaviour = include("LuaRules/Configs/tactical_ai_defs.lua")
 local mexShootBehaviour = include("LuaRules/Configs/mex_shoot_defs.lua")
 
-local MEX_DEF_ID = UnitDefNames["staticmex"].id
+local MEX_DEF_IDs = {}
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.metal_extractor_mult then
+		MEX_DEF_IDs[i] = true
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -248,14 +253,14 @@ local function DoMexShootUnitUpdate(unitID, unitData)
 		Spring.Echo("act", unitData.active, "fire", Spring.Utilities.GetUnitFireState(unitID), "hasTarget", GG.GetUnitHasSetTarget(unitID), "bait", GG.baitPrevention_GetLevel(unitID))
 	end
 	local busy, busyUnitID = IsTooBusyToFire(unitID, unitData)
-	if busy and not (busyUnitID and spGetUnitDefID(busyUnitID) == MEX_DEF_ID) then
+	if busy and not (busyUnitID and MEX_DEF_IDs[spGetUnitDefID(busyUnitID)]) then
 		return
 	end
 	local behaviour = unitData.def
 	
 	local enemyID = busyUnitID or spGetUnitNearestEnemy(unitID, behaviour.searchRange, true)
 	local enemyUnitDefID = enemyID and spGetUnitDefID(enemyID)
-	if enemyID and enemyUnitDefID ~= MEX_DEF_ID then
+	if enemyID and not MEX_DEF_IDs[enemyUnitDefID] then
 		return
 	end
 	

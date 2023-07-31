@@ -87,8 +87,9 @@ local QUADFIELD_SQUARE_SIZE = 300
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
 	local cp = udef.customParams
-	if cp.ismex then
-		mexDefs[i] = true
+	local mexMult = cp.metal_extractor_mult
+	if mexMult then
+		mexDefs[i] = tonumber(mexMult)
 		allowBuildStepDef[i] = true
 	end
 	local pylonRange = tonumber(cp.pylonrange) or 0
@@ -761,11 +762,16 @@ local function UpdateAndGetCurrentMexRefundShare(unitID, baseMetal)
 end
 
 local function AddMexPayback(unitID, unitDefID, refundTeams)
-	if not mexDefs[unitDefID] or not enableMexPayback then
+	if not enableMexPayback then
 		return
 	end
 
-	local metalMake = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	local mexDef = mexDefs[unitDefID]
+	if not mexDef then
+		return
+	end
+
+	local metalMake = (spGetUnitRulesParam(unitID, "mexIncome") or 0) * mexDef
 	if metalMake <= 0 then
 		return
 	end
@@ -1570,7 +1576,7 @@ local function MaybeAddMex(unitID, unitDefID)
 		return
 	end
 
-	local metalMake = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	local metalMake = (spGetUnitRulesParam(unitID, "mexIncome") or 0) * mexDef
 	if metalMake <= 0 then
 		return
 	end

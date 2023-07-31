@@ -85,10 +85,6 @@ local REZ_SOUND = "sounds/misc/resurrect.wav"
 
 local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
 
-local MexDefs = {
-	[UnitDefNames["staticmex"].id] = true,
-}
-
 local NonZombies = {
 	["asteroid"] = true,
 }

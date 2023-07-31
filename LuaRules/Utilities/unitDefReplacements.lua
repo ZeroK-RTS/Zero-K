@@ -143,12 +143,12 @@ local function GetGridTooltip(unitID)
 	return WG.Translate("interface", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
 end
 
-local function GetMexTooltip(unitID)
+local function GetMexTooltip(unitID, ud)
 	local metalMult = Spring.GetUnitRulesParam(unitID, "overdrive_proportion")
 	if not metalMult then return end
 
 	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
-	local mexIncome = Spring.GetUnitRulesParam(unitID, "mexIncome") or 0
+	local mexIncome = (Spring.GetUnitRulesParam(unitID, "mexIncome") or 0) * (ud.customParams.metal_extractor_mult or 0)
 	local baseFactor = Spring.GetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
 
 	if currentIncome == 0 then
@@ -214,7 +214,7 @@ end
 
 local function GetCustomTooltip (unitID, ud)
 	return GetGridTooltip(unitID)
-	or GetMexTooltip(unitID)
+	or GetMexTooltip(unitID, ud)
 	or GetTerraformTooltip(unitID)
 	or GetZenithTooltip(unitID)
 	or GetAvatarTooltip(unitID)

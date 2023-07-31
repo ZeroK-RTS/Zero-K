@@ -53,6 +53,16 @@ local spValidUnitID			= Spring.ValidUnitID
 
 local echo = Spring.Echo
 
+local mexesUnitDefID = {}
+local mexes = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.metal_extractor_mult then
+		mexesUnitDefID[-i] = true
+		mexes[ud.name] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

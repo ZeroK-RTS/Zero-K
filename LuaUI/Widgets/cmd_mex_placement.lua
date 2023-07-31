@@ -240,12 +240,20 @@ local extraction = 0
 -------------------------------------------------------------------------------------
 -- Mexes and builders
 
-local mexDefID = UnitDefNames["staticmex"].id
+local mexDefIDs = {}
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.metal_extractor_mult then
+		mexDefIDs[i] = true
+	end
+end
+
+local primaryMexDefID = UnitDefNames["staticmex"].id -- FIXME: let mods specify a different one?
+
 local lltDefID = UnitDefNames["turretlaser"].id
 local solarDefID = UnitDefNames["energysolar"].id
 local windDefID = UnitDefNames["energywind"].id
 
-local mexUnitDef = UnitDefNames["staticmex"]
+local mexUnitDef = UnitDefs[primaryMexDefID]
 local mexDefInfo = {
 	extraction = 0.001,
 	oddX = mexUnitDef.xsize % 4 == 2,
@@ -257,8 +265,8 @@ local mexBuilder = {}
 local mexBuilderDefs = {}
 for udid, ud in ipairs(UnitDefs) do
 	for i, option in ipairs(ud.buildOptions) do
-		if mexDefID == option then
-			mexBuilderDefs[udid] = true
+		if mexDefIDs[option] then
+			mexBuilderDefs[udid] = option -- FIXME: modded builders can build many mexes, make this a set?
 		end
 	end
 end
@@ -433,8 +441,8 @@ local function MakeOptions()
 end
 
 local function PlaceSingleMex(bx, bz, facing, options)
-	facing = facing or Spring.GetBuildFacing() or 0
-	options = options or MakeOptions()
+	local facing = Spring.GetBuildFacing() or 0
+	local options = MakeOptions()
 
 	local closestSpot = GetClosestMetalSpot(bx, bz)
 	if closestSpot then
@@ -444,7 +452,7 @@ local function PlaceSingleMex(bx, bz, facing, options)
 		for i = 1, #units do
 			local unitID = units[i]
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			if unitDefID and mexDefID == unitDefID then
+			if mexDefIDs[unitDefID] then
 				if spGetUnitAllyTeam(unitID) == spGetMyAllyTeamID() then
 					foundUnit = unitID
 				else
@@ -469,6 +477,12 @@ local function PlaceSingleMex(bx, bz, facing, options)
 			end
 			return true, true
 		else
+			local mexDefID = primaryMexDefID
+			local _, cmdID = spGetActiveCommand()
+			if cmdID and mexDefIDs[-cmdID] then
+				mexDefID = -cmdID
+			end
+
 			-- check if some other widget wants to handle the command before sending it to units.
 			local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
 			if Spring.TestBuildOrder(mexDefID, closestSpot.x, commandHeight, closestSpot.z, facing) == 0 then
@@ -561,10 +575,13 @@ local function HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	local aveX = 0
 	local aveZ = 0
 
+	local mexDefID = primaryMexDefID
 	local units = spGetSelectedUnits()
 	for i = 1, #units do
 		local unitID = units[i]
-		if mexBuilder[unitID] then
+		local buildableMexDefID = mexBuilder[unitID]
+		if buildableMexDefID then
+			mexDefID = buildableMexDefID
 			local x,_,z = spGetUnitPosition(unitID)
 			ux = ux+x
 			uz = uz+z
@@ -711,7 +728,7 @@ function widget:CommandNotify(cmdID, params, cmdOpts)
 		return HandleAreaMex(cmdID, cx, cy, cz, cr, cmdOpts)
 	end
 
-	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX or cmdID == -mexDefID) and params[3] then
+	if (cmdID == CMD_AREA_MEX or cmdID == CMD_AREA_TERRA_MEX or mexDefIDs[-cmdID]) and params[3] then
 		-- Just area mex on the closest spot. Reuses all the code for key modifiers.
 		local bx, bz = params[1], params[3]
 		local closestSpot = GetClosestMetalSpot(bx, bz)
@@ -731,7 +748,7 @@ function widget:UnitEnteredLos(unitID, teamID)
 	end
 
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID ~= mexDefID or not WG.metalSpots then
+	if not mexDefIDs[unitDefID] or not WG.metalSpots then
 		return
 	end
 
@@ -748,7 +765,7 @@ end
 
 local function DidMexDie(unitID, expectedSpotID) --> dead, idReusedForAnotherMex
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID ~= mexDefID then -- not just a nil check, the unitID could have gotten recycled for another unit
+	if not mexDefIDs[unitDefID] then -- not just a nil check, the unitID could have gotten recycled for another unit
 		return true, false
 	end
 
@@ -820,7 +837,7 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	local _, cmdID = spGetActiveCommand()
-	if (-mexDefID == cmdID and WG.metalSpots) then
+	if (cmdID and mexDefIDs[-cmdID] and WG.metalSpots) then
 		return true
 	end
 	return false
@@ -861,12 +878,13 @@ function widget:GameFrame(n)
 end
 
 function widget:UnitCreated(unitID, unitDefID, teamID)
-	if mexBuilderDefs[unitDefID] then
-		mexBuilder[unitID] = true
+	local mexDefID = mexBuilderDefs[unitDefID]
+	if mexDefID then
+		mexBuilder[unitID] = mexDefID
 		return
 	end
 
-	if unitDefID ~= mexDefID or not WG.metalSpots then
+	if not mexDefIDs[unitDefID] or not WG.metalSpots then
 		return
 	end
 
@@ -885,7 +903,7 @@ function widget:UnitDestroyed(unitID, unitDefID)
 	if mexBuilder[unitID] then
 		mexBuilder[unitID] = nil
 	end
-	if unitDefID == mexDefID and spotByID[unitID] then
+	if mexDefIDs[unitDefID] and spotByID[unitID] then
 		spotData[spotByID[unitID]] = nil
 		spotByID[unitID] = nil
 		updateMexDrawList()
@@ -893,10 +911,11 @@ function widget:UnitDestroyed(unitID, unitDefID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	if mexBuilderDefs[unitDefID] then
-		mexBuilder[unitID] = true
+	local mexDefID = mexBuilderDefs[unitDefID]
+	if mexDefID then
+		mexBuilder[unitID] = mexDefID
 	end
-	if unitDefID == mexDefID then
+	if mexDefIDs[unitDefID] then
 		widget:UnitCreated(unitID, unitDefID, newTeamID)
 	end
 end
@@ -1003,7 +1022,7 @@ function widget:Update(dt)
 		for i, unitID in ipairs(units) do
 			local unitDefID = spGetUnitDefID(unitID)
 			local teamID = Spring.GetUnitTeam(unitID)
-			if unitDefID == mexDefID then
+			if mexDefIDs[unitDefID] then
 				widget:UnitCreated(unitID, unitDefID, teamID)
 			end
 		end
@@ -1037,16 +1056,22 @@ function widget:Update(dt)
 		WG.mouseoverMex = mexSpotToDraw
 	else
 		local _, cmd_id = spGetActiveCommand()
-		if -mexDefID ~= cmd_id then
+		if not cmd_id then
 			return
 		end
+
+		local mexMult = mexDefIDs[cmd_id]
+		if not mexMult then
+			return
+		end
+
 		local mx, my = spGetMouseState()
 		local _, coords = spTraceScreenRay(mx, my, true, true)
 		if (not coords) then
 			return
 		end
 		IntegrateMetal(coords[1], coords[3])
-		WG.mouseoverMexIncome = extraction
+		WG.mouseoverMexIncome = extraction * mexMult
 	end
 end
 
@@ -1059,7 +1084,7 @@ function widget:KeyRelease(key, modifier, isRepeat)
 	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and placedMexSinceShiftPressed then
 		placedMexSinceShiftPressed = false
 		local _, cmdID = Spring.GetActiveCommand()
-		if cmdID == -mexDefID then
+		if cmdID and mexDefIDs[-cmdID] then
 			Spring.SetActiveCommand(nil)
 		end
 	end
@@ -1245,7 +1270,7 @@ function widget:DrawWorldPreUnit()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
 
-	drawMexSpots = (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID or peruse)
+	drawMexSpots = ((cmdID and mexDefIDs[-cmdID]) or CMD_AREA_MEX == cmdID or CMD_AREA_TERRA_MEX == cmdID or peruse)
 
 	if WG.metalSpots and (drawMexSpots or WG.showeco_always_mexes) then
 		gl.DepthTest(true)
@@ -1268,8 +1293,8 @@ function widget:DrawWorld()
 
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local isMexCmd = (-mexDefID == cmdID)
-
+	local isMexCmd = cmdID and mexDefIDs[-cmdID]
+	local mexDefID = isMexCmd and -cmdID or primaryMexDefID
 
 	mexSpotToDraw = false
 	local pregame = (spGetGameFrame() < 1)
@@ -1340,8 +1365,8 @@ function widget:DrawWorld()
 end
 
 function widget:DefaultCommand(cmdType, id)
-	if mexSpotToDraw and not cmdType and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
-		return -mexDefID
+	if mexSpotToDraw and not cmdType and (Spring.TestBuildOrder(primaryMexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
+		return -primaryMexDefID -- FIXME: if modded mexes exist then get selected units and pick an appropriate modded mex
 	end
 end
 

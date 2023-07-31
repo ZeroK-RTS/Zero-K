@@ -37,9 +37,14 @@ local positionCommand = {
 	[CMD_LEVEL] = true,
 }
 
-local doNotHandleRaw = {
-	[-UnitDefNames["staticmex"].id] = true,
-}
+local doNotHandleRaw = {}
+
+-- "build mex" commands are handled by the mex placer widget
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.metal_extractor_mult then
+		doNotHandleRaw[-i] = true
+	end
+end
 
 local EMPTY_TABLE = {}
 --[[
