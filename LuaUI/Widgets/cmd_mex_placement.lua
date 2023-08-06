@@ -903,8 +903,16 @@ function widget:UnitDestroyed(unitID, unitDefID)
 	if mexBuilder[unitID] then
 		mexBuilder[unitID] = nil
 	end
-	if mexDefIDs[unitDefID] and spotByID[unitID] then
-		spotData[spotByID[unitID]] = nil
+
+	local spotID = spotByID[unitID]
+	if mexDefIDs[unitDefID] and spotID then
+		local morpheeID = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+		if morpheeID then
+			spotData[spotID].unitID = morpheeID
+			spotByID[morpheeID] = spotID
+		else
+			spotData[spotID] = nil
+		end
 		spotByID[unitID] = nil
 		updateMexDrawList()
 	end

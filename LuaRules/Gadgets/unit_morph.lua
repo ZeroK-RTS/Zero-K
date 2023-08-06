@@ -523,6 +523,11 @@ local function FinishMorph(unitID, morphData)
 	--//reassign assist commands to new unit
 	ReAssignAssists(newUnit,unitID)
 
+	-- pretend we moved so that OD-senpai can notice a mex spot is now free
+	local newDefID = UnitDefNames[defName].id
+	GG.Overdrive_MoveOrTransferSetup(newUnit, newDefID)
+	GG.Overdrive_MoveOrTransferAftermath(newUnit, newDefID)
+
 	--//transfer command queue
 	for i = 1, #cmds do
 		local cmd = cmds[i]

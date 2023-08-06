@@ -219,10 +219,20 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if mexDefIDs[unitDefID] and spotByID[unitID] then
-		spotData[spotByID[unitID]] = nil
-		spotByID[unitID] = nil
+	local spotID = spotByID[unitID]
+	if not mexDefIDs[unitDefID] or not spotID then
+		return
 	end
+
+	local morpheeID = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morpheeID then
+		spotData[spotID].unitID = morpheeID
+		spotByID[morpheeID] = spotID
+		Spring.SetUnitRulesParam(morpheeID, "mexIncome", metalSpots[spotID].metal, inlosTrueTable)
+	else
+		spotData[spotID] = nil
+	end
+	spotByID[unitID] = nil
 end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
