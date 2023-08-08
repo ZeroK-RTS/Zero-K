@@ -166,7 +166,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[r14.1421 y10 -1 x10x10 y10 200 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        pos                = [[r14.1421 p2 y0 -1 x0 200 y0 r6.283 -3.1415 y1 a1 1.57 s1 x0, 30, a1 s1 x0]],
         -- circle
 		-- RADIUS y10 = 200 + -1 * rand(200^(1/2))^2
       },
@@ -180,7 +180,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = [[r3.7606 y10 -1 x10x10x10x10 y10 200 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        pos                = [[r3.7606 p4 y0 -1 x0 200 y0 r6.2831 -3.1415 y1 r1 y2 -1 x2 1 p0.5 y3 4 x2 p0.5 x3 y3 a1 1.57 s1 x0 x3, 2 x2 -1 x0, a1 s1 x0 x3]],
         -- RADIUS y10 = 200 + -1 * rand(200^(1/4))^4
         -- ANGLE  y11 = rand(2 pi) - pi
         -- A = rand(1)
@@ -228,7 +228,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[r17.3205 y10 -1 x10x10 y10 300 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        pos                = [[r17.3205 p2 y0 -1 x0 300 y0 r6.283 -3.1415 y1 a1 1.57 s1 x0, 30, a1 s1 x0]],
       },
     },
     redploom_long = {
@@ -240,7 +240,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_450]],
-        pos                = [[r4.1617 y10 -1 x10x10x10x10 y10 300 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        pos                = [[r4.1617 p4 y0 -1 x0 300 y0 r6.2831 -3.1415 y1 r1 y2 -1 x2 1 p0.5 y3 4 x2 p0.5 x3 y3 a1 1.57 s1 x0 x3, 2 x2 -1 x0, a1 s1 x0 x3]],
       },
     },
   },
@@ -266,7 +266,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[r10 y10 -1 x10x10 y10 100 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        pos                = [[r10 p2 y0 -1 x0 100 y0 r6.283 -3.1415 y1 a1 1.57 s1 x0, 30, a1 s1 x0]],
       },
     },
     redploom_long = {
@@ -278,7 +278,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[r4.64159 y10 -1 x10x10x10 y10 100 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        pos                = [[r4.64159 p3 y0 -1 x0 100 y0 r6.2831 -3.1415 y1 r1 y2 -1 x2 1 p0.5 y3 4 x2 p0.5 x3 y3 a1 1.57 s1 x0 x3, 2 x2 -1 x0, a1 s1 x0 x3]],
       },
     },
   },
@@ -406,7 +406,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[r10 y10 -1 x10x10 y10 100 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        pos                = [[r10 p2 y0 -1 x0 100 y0 r6.283 -3.1415 y1 a1 1.57 s1 x0, 30, a1 s1 x0]],
       },
     },
     redploom_long = {
@@ -418,7 +418,7 @@ local cegs = {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = [[r4.64159 y10 -1 x10x10x10 y10 100 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        pos                = [[r4.64159 p3 y0 -1 x0 100 y0 r6.2831 -3.1415 y1 r1 y2 -1 x2 1 p0.5 y3 4 x2 p0.5 x3 y3 a1 1.57 s1 x0 x3, 2 x2 -1 x0, a1 s1 x0 x3]],
       },
     },
   },
@@ -437,7 +437,7 @@ local cegs = {
         directional        = false,
         emitrot            = 60,
         emitrotspread      = 30,
-        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
+        emitvector         = [[r6.2831 -3.1415 y0 r1 y1 -1 x1 1 p0.5 y2 4 x1 p0.5 x2 y2 a0 1.57 s1 x2, 2 x1 -1, a0 s1 x2]],
         gravity            = [[0.001 r-0.002, 0.001 r0.002, 0.001 r-0.002]],
         numparticles       = 2,
         particlelife       = 60,
