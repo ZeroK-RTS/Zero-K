@@ -1,8 +1,19 @@
 local VFS = VFS
-local VFS_Include = VFS.Include
+local orig_VFS_Include = VFS.Include
 local VFS_GAME = VFS.GAME
 local VFS_MAP = VFS.MAP
-local VFS_DirList = VFS_Include('gamedata/recursive_dir_list.lua', nil, VFS_GAME)
+local VFS_DirList = orig_VFS_Include('gamedata/recursive_dir_list.lua', nil, VFS_GAME)
+
+local errors_during_loading = {}
+local function VFS_Include(filename, env, mode, recursive)
+	local ok, result = pcall(orig_VFS_Include, filename, env, mode, recursive)
+	if ok then
+		return result
+	else
+		errors_during_loading[#errors_during_loading + 1] = result
+		return {}
+	end
+end
 
 --[[ unitdefs_post is massively simplified by being able to assume
      that all def keys are lowercase. However, being able to use
@@ -68,5 +79,20 @@ if VFS.FileExists(MODSIDE_POSTS_FILEPATH, VFS_GAME) then
 end
 
 VFS_Include('gamedata/unitdefs_post.lua', nil, VFS_GAME)
+
+local errors = #errors_during_loading
+if errors > 0 then
+	for i = 1, errors do
+		Spring.Log("UNIT DEFS LOADING ERROR", LOG.ERROR, errors_during_loading[i])
+	end
+
+	--[[ Modders often run the game via Chobby. In that case, if parsing
+	     ends with an error, whole Spring crashes and they waste a lot of
+	     time setting up a room again. The solution is to continue the
+	     loading, but leave a "message" that something happened. Pick any
+	     unit that happened to load, since nothing is 100% to exist now. ]]
+	local _, validUnit = next(unitDefs)
+	unitDefs["unitdefs_failed_to_load"] = validUnit
+end
 
 return unitDefs

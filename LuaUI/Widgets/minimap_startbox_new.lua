@@ -222,7 +222,7 @@ end
 
 function widget:Initialize()
 	-- only show at the beginning
-	if (Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2) or (Spring.GetModOptions().fixedstartpos == "1") then
+	if (Spring.GetGameFrame() > 1) or (Game.startPosType ~= 2) or (Spring.GetModOptions().fixedstartpos == "1") or UnitDefNames.unitdefs_failed_to_load then
 		widgetHandler:RemoveWidget(self)
 		return
 	end

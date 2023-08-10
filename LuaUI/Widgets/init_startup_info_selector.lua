@@ -450,8 +450,9 @@ end
 function widget:Initialize()
 	optionData = include("Configs/startup_info_selector.lua")
 
-	if not (WG.Chili) then
+	if not (WG.Chili) or UnitDefNames.unitdefs_failed_to_load then
 		widgetHandler:RemoveWidget()
+		return
 	end
 	CheckForSpec()
 
