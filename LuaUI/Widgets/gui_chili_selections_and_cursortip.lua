@@ -173,15 +173,16 @@ local econStructureDefs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local cp = ud.customParams
+
+	local energyIncome = tonumber(cp.income_energy) or 0
+	if energyIncome > 0 then
+		econStructureDefs[i] = {cost = ud.metalCost, income = energyIncome}
+	end
+
 	local mexMult = tonumber(cp.metal_extractor_mult) or 0
 	if mexMult > 0 then
 		econStructureDefs[i] = {cost = ud.metalCost, mex = mexMult}
 	end
-end
-
-for _, defName in pairs({"energywind", "energysolar", "energygeo", "energyheavygeo", "energyfusion", "energysingu"}) do
-	local def = UnitDefNames[defName]
-	econStructureDefs[def.id] = { cost = def.metalCost, income = def.customParams.income_energy }
 end
 
 econStructureDefs[UnitDefNames.energywind.id].isWind = true
