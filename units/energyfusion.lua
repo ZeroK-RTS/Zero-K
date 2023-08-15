@@ -1,6 +1,6 @@
 return { energyfusion = {
   name                          = [[Fusion Reactor]],
-  description                   = [[Medium Powerplant (+35)]],
+  description                   = [[Medium Powerplant]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,

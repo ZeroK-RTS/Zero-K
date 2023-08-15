@@ -1,6 +1,6 @@
 return { energyheavygeo = {
   name                          = [[Advanced Geothermal]],
-  description                   = [[Large Powerplant (+100) - HAZARDOUS]],
+  description                   = [[Large Powerplant - HAZARDOUS]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,

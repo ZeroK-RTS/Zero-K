@@ -1,6 +1,6 @@
 return { energysolar = {
   name                          = [[Solar Collector]],
-  description                   = [[Small Powerplant (+2)]],
+  description                   = [[Small Powerplant]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,

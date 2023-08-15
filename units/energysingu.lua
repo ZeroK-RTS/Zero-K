@@ -1,6 +1,6 @@
 return { energysingu = {
   name                          = [[Singularity Reactor]],
-  description                   = [[Large Powerplant (+225) - HAZARDOUS]],
+  description                   = [[Large Powerplant - HAZARDOUS]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,

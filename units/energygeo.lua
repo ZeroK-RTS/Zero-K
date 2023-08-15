@@ -1,6 +1,6 @@
 return { energygeo = {
   name                          = [[Geothermal Generator]],
-  description                   = [[Medium Powerplant (+25)]],
+  description                   = [[Medium Powerplant]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
