@@ -96,7 +96,12 @@ local ipairs = ipairs
 -- read local widgets config
 local localWidgetsFirst = false
 local localWidgets = false
-local disableLocalWidgets = (Spring.GetModOptions().disable_local_widgets and Spring.GetModOptions().disable_local_widgets ~= "0" and Spring.GetModOptions().disable_local_widgets ~= 0)
+local disableLocalWidgets = (
+	Spring.GetModOptions().disable_local_widgets and
+	Spring.GetModOptions().disable_local_widgets ~= "0" and
+	Spring.GetModOptions().disable_local_widgets ~= 0 and
+	not (Spring.GetSpectatingState() or Spring.IsReplay())
+)
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
 	if not disableLocalWidgets then
