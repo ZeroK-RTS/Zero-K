@@ -14,6 +14,7 @@ return { staticmex = {
   customParams           = {
     occupationStrength = 1,
     pylonrange         = 50,
+    ismex              = 1,
     metal_extractor_mult = 1,
     aimposoffset       = [[0 11 0]],
     midposoffset       = [[0 0 0]],
