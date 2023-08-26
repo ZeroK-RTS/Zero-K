@@ -172,18 +172,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Make Terraunit not decloak enemies
---
-
-if Utilities.IsCurrentVersionNewerThan(104, 1400) and not Utilities.IsCurrentVersionNewerThan(104, 1470) then
-	UnitDefs.terraunit.collisionvolumeoffsets = [[0 -550 0]]
-	UnitDefs.terraunit.selectionvolumeoffsets = [[0 550 0]]
-	UnitDefs.terraunit.customparams.midposoffset = [[0 -550 0]]
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
 -- Convert all CustomParams to strings
 --
 
