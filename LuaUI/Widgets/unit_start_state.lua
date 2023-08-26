@@ -1048,14 +1048,14 @@ local function addUnit(defName, path)
 	end
 	
 	if ud.customParams.attack_toggle then
-		options[defName .. "_disableattack_1"] = {
-			name = "  Disable Attack Commands",
-			desc = "Check the box to make the unit not respond to attack commands.",
+		options[defName .. "_enableattack_1"] = {
+			name = "  Enable Force Fire Command",
+			desc = "Make the unit respond to Force Fire commands as well as Fire Special Weapon.",
 			type = 'bool',
-			value = true,
+			value = false,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_disableattack_1"
+		options_order[#options_order+1] = defName .. "_enableattack_1"
 	end
 	
 	if ud.canStockpile then
@@ -1420,14 +1420,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if value then
 			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
-
-		-- BREAKS FACTORY QUEUE
-		-- The order somehow lingers and the fac now thinks the player overrode the rally with custom orders.
-		-- value = GetStateValue(name, "disableattack_1")
-		-- if not value then
-		-- 	orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {0}, CMD.OPT_SHIFT}
-		-- end
-
+		
+		value = GetStateValue(name, "enableattack_1")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {0}, CMD.OPT_SHIFT}
+		end
+		
 		value = GetStateValue(name, "formation_rank")
 		if value and WG.SetFormationRank then
 			WG.SetFormationRank(unitID, value)
