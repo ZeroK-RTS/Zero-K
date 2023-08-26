@@ -338,28 +338,6 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
 local creationUnitList, creationIndex
 
-local BUILD_RESOLUTION =  16
-local function SanitizeBuildPositon(x, z, ud, facing)
-	local oddX = (ud.xsize % 4 == 2)
-	local oddZ = (ud.zsize % 4 == 2)
-	
-	if facing % 2 == 1 then
-		oddX, oddZ = oddZ, oddX
-	end
-	
-	if oddX then
-		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-	else
-		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
-	end
-	if oddZ then
-		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-	else
-		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
-	end
-	return x, z
-end
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -454,7 +432,7 @@ local function RotateUnit(cmd, line, words, player)
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local ud = unitDefID and UnitDefs[unitDefID]
 	if ud.isImmobile then
-		x, z = SanitizeBuildPositon(x, z, ud, facing)
+		x, y, z = Spring.Pos2BuildPos(unitDefID, x, y, z, facing)
 	end
 	
 	Spring.DestroyUnit(unitID, false, true)
