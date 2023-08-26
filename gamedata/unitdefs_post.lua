@@ -163,8 +163,9 @@ for name, ud in pairs(UnitDefs) do
 		ud.rspeed = ud.rspeed or (ud.maxreversevelocity * Game.gameSpeed)
 	end
 	if ud.customparams.ismex then
-		Spring.Echo("ERROR: " .. name .. ".customParams.ismex set, should be metal_extractor_mult (= 1) instead!")
-		ud.customparams.metal_extractor_mult = 1
+		-- temporarily don't complain about `ismex` because CircuitAI needs it
+		-- Spring.Echo("ERROR: " .. name .. ".customParams.ismex set, should be metal_extractor_mult (= 1) instead!")
+		ud.customparams.metal_extractor_mult = ud.customparams.metal_extractor_mult or 1
 	end
 end
 
