@@ -1420,11 +1420,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if value then
 			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
-		
-		value = GetStateValue(name, "disableattack_1")
-		if not value then
-			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {0}, CMD.OPT_SHIFT}
-		end
+
+		-- BREAKS FACTORY QUEUE
+		-- The order somehow lingers and the fac now thinks the player overrode the rally with custom orders.
+		-- value = GetStateValue(name, "disableattack_1")
+		-- if not value then
+		-- 	orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {0}, CMD.OPT_SHIFT}
+		-- end
 
 		value = GetStateValue(name, "formation_rank")
 		if value and WG.SetFormationRank then
