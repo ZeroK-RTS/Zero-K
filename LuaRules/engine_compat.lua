@@ -2,6 +2,7 @@ local RET_FALSE  = function() return false end
 local RET_NONE   = function() end
 local RET_TABLE  = function() return {} end
 local RET_ZERO   = function() return 0 end
+local RET_ONE    = function() return 1 end
 local RET_STRING = function() return "" end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
@@ -428,4 +429,10 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 			return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
 		end
 	end
+end
+
+if not Spring.GetModelRootPiece then -- BAR 105-1924
+	Spring.GetModelRootPiece   = RET_ONE
+	Spring.GetUnitRootPiece    = RET_ONE
+	Spring.GetFeatureRootPiece = RET_ONE
 end

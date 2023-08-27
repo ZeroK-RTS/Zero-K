@@ -21,7 +21,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local NULL_PIECE = "[null]"
 local origPieceTable = {}
 
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
@@ -56,20 +55,11 @@ local function SetScale(unitID, base, scale)
 	Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
 end
 
-local function FindBase(unitID)
-	local pieces = Spring.GetUnitPieceList(unitID)
-	for pieceNum = 1, #pieces do
-		if Spring.GetUnitPieceInfo(unitID, pieceNum).parent == NULL_PIECE then
-			return pieceNum
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function UnitModelRescale(unitID, scale)
-	local base = FindBase(unitID)
+	local base = Spring.GetUnitRootPiece(unitID)
 	if base then
 		if not origPieceTable[unitID] then
 			origPieceTable[unitID] = {Spring.GetUnitPieceMatrix(unitID, base)}
