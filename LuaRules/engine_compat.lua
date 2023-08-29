@@ -431,6 +431,18 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 	end
 end
 
+if not Spring.GetFacingFromHeading then -- BAR 105-1921
+	Spring.GetFacingFromHeading = function (heading)
+		return math.floor((heading / 16384 + 0.5) % 4)
+	end
+	Spring.GetHeadingFromFacing = function (facing)
+		return facing == 1 and  16384
+		    or facing == 2 and  32767
+		    or facing == 3 and -16384
+		    or                      0
+	end
+end
+
 if not Spring.GetModelRootPiece then -- BAR 105-1924
 	Spring.GetModelRootPiece   = RET_ONE
 	Spring.GetUnitRootPiece    = RET_ONE
