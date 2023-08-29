@@ -1035,6 +1035,18 @@ if Game.gameSpeed ~= 30 then
 	end
 end
 
+-- Engine rejects an explicit buildtime of 0, though costs are fine.
+-- Modders often set cost to 0 for fake units, which then gets
+-- propagated to buildtime via posts, which would then necessitate
+-- setting non-zero buildtime explicitly. Avoid this by making free
+-- units have some token buildtime.
+for name, ud in pairs(UnitDefs) do
+	if (ud.metalcost or 0) == 0 and (ud.energycost or 0) == 0
+	and ud.buildtime and ud.buildtime <= 0 then
+		ud.buildtime = 1
+	end
+end
+
 if not Script or not Script.IsEngineMinVersion(105, 0, 1801) then
 	for name, ud in pairs(UnitDefs) do
 		ud.metaluse  = ud.metalupkeep
