@@ -37,6 +37,9 @@ local glUnit = gl.Unit
 local GL_DST_COLOR = GL.DST_COLOR
 local GL_ZERO = GL.ZERO
 local GL_FUNC_ADD = GL.FUNC_ADD
+local scALL_ACCESS_TEAM = Script.ALL_ACCESS_TEAM
+local spGetLocalTeamID = Spring.GetLocalTeamID
+local CallAsTeam = CallAsTeam
 
 local shader
 local tintedUnits = {}
@@ -112,8 +115,10 @@ local function DrawWorldFunc()
 	glPolygonOffset(-2, -2)
 
 	for unitID, colour in pairs(tintedUnits) do
-		glColor(colour[1], colour[2], colour[3])
-		glUnit(unitID, true)
+		if Spring.IsUnitVisible(unitID) then
+			glColor(colour[1], colour[2], colour[3])
+			glUnit(unitID, true, -1)
+		end
 	end
 
 	glPolygonOffset(false)
@@ -122,9 +127,18 @@ local function DrawWorldFunc()
 	glColor(1, 1, 1, 1)
 end
 
+local function DrawWorldFuncTeamWrapper()
+	local isSpec, specFullView = Spring.GetSpectatingState
+	if isSpec and specFullView then
+		CallAsTeam(scALL_ACCESS_TEAM, DrawWorldFunc)
+	else
+		CallAsTeam(spGetLocalTeamID(), DrawWorldFunc)
+	end
+end
+
 -- FIXME: optimize to only run if something is actually tinted!
-gadget.DrawWorld           = DrawWorldFunc
-gadget.DrawWorldRefraction = DrawWorldFunc
+gadget.DrawWorld           = DrawWorldFuncTeamWrapper
+gadget.DrawWorldRefraction = DrawWorldFuncTeamWrapper
 
 function gadget:Shutdown()
 	if shader then

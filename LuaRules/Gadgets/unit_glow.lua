@@ -32,6 +32,9 @@ local glUseShader = gl.UseShader
 local glDepthTest = gl.DepthTest
 local glPolygonOffset = gl.PolygonOffset
 local glUnit = gl.Unit
+local scALL_ACCESS_TEAM = Script.ALL_ACCESS_TEAM
+local spGetLocalTeamID = Spring.GetLocalTeamID
+local CallAsTeam = CallAsTeam
 
 local shader
 local glowingUnits = {}
@@ -118,8 +121,10 @@ local function DrawWorldFunc()
 	glPolygonOffset(-2, -2)
 
 	for unitID, colour in pairs(glowingUnits) do
-		glColor(colour[1], colour[2], colour[3], colour[4] or 1)
-		glUnit(unitID, true)
+		if Spring.IsUnitVisible(unitID) then
+			glColor(colour[1], colour[2], colour[3], colour[4] or 1)
+			glUnit(unitID, true, -1)
+		end
 	end
 
 	glPolygonOffset(false)
@@ -128,9 +133,18 @@ local function DrawWorldFunc()
 	glColor(1, 1, 1, 1)
 end
 
+local function DrawWorldFuncTeamWrapper()
+	local isSpec, specFullView = Spring.GetSpectatingState
+	if isSpec and specFullView then
+		CallAsTeam(scALL_ACCESS_TEAM, DrawWorldFunc)
+	else
+		CallAsTeam(spGetLocalTeamID(), DrawWorldFunc)
+	end
+end
+
 -- FIXME: optimize to only run if something is actually glowing!
-gadget.DrawWorld           = DrawWorldFunc
-gadget.DrawWorldRefraction = DrawWorldFunc
+gadget.DrawWorld           = DrawWorldFuncTeamWrapper
+gadget.DrawWorldRefraction = DrawWorldFuncTeamWrapper
 
 function gadget:Shutdown()
 	if shader then
