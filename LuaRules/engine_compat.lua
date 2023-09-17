@@ -448,3 +448,17 @@ if not Spring.GetModelRootPiece then -- BAR 105-1924
 	Spring.GetUnitRootPiece    = RET_ONE
 	Spring.GetFeatureRootPiece = RET_ONE
 end
+
+Game.textColorCodes = Game.textColorCodes or -- BAR 105-1983
+	{ Color           = '\255'
+	, ColorAndOutline = '\254'
+	, Reset           = '\008'
+}
+
+if GL then -- BAR 105-1988
+	GL.FUNC_ADD              = GL.FUNC_ADD              or 32774
+	GL.FUNC_SUBTRACT         = GL.FUNC_SUBTRACT         or 32778
+	GL.FUNC_REVERSE_SUBTRACT = GL.FUNC_REVERSE_SUBTRACT or 32779
+	GL.MIN                   = GL.MIN                   or 32775
+	GL.MAX                   = GL.MAX                   or 32776
+end

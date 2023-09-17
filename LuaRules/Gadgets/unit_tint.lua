@@ -36,6 +36,7 @@ local glBlending = gl.Blending
 local glUnit = gl.Unit
 local GL_DST_COLOR = GL.DST_COLOR
 local GL_ZERO = GL.ZERO
+local GL_FUNC_ADD = GL.FUNC_ADD
 
 local shader
 local tintedUnits = {}
@@ -105,7 +106,7 @@ end
 
 local function DrawWorldFunc()
 	glUseShader(shader)
-	glBlendEquation(32774) -- GL.FUNC_ADD
+	glBlendEquation(GL_FUNC_ADD)
 	glBlending(GL_DST_COLOR, GL_ZERO)
 	glDepthTest(true)
 	glPolygonOffset(-2, -2)
