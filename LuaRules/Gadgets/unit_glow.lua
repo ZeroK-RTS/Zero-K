@@ -31,6 +31,7 @@ local glColor = gl.Color
 local glUseShader = gl.UseShader
 local glDepthTest = gl.DepthTest
 local glPolygonOffset = gl.PolygonOffset
+local glUnit = gl.Unit
 
 local shader
 local glowingUnits = {}
@@ -62,15 +63,15 @@ function gadget:RecvFromSynced(magic, unitID, r, g, b, a)
 end
 
 function gadget:Initialize()
-
-	if not gl.CreateShader then
+	local glCreateShader = gl.CreateShader
+	if not glCreateShader then
 		Spring.Log("Glow API (unit_glow.lua)", LOG.ERROR, "Potato with no shaders, exiting")
 		GG.GlowUnit = function() end
 		gadgetHandler:RemoveGadget()
 		return
 	end
 
-	shader = gl.CreateShader({
+	shader = glCreateShader({
 		vertex = [[
 			varying vec3 normal;
 			varying vec3 eyeVec;
@@ -112,29 +113,30 @@ function gadget:Initialize()
 end
 
 local function DrawWorldFunc()
-	gl.Color(1, 1, 1, 1)
-	gl.UseShader(shader)
-	gl.DepthTest(true)
-	gl.PolygonOffset(-2, -2)
+	glUseShader(shader)
+	glDepthTest(true)
+	glPolygonOffset(-2, -2)
 
 	for unitID, colour in pairs(glowingUnits) do
-		gl.Color(colour[1], colour[2], colour[3], colour[4] or 1)
-		gl.Unit(unitID, true)
+		glColor(colour[1], colour[2], colour[3], colour[4] or 1)
+		glUnit(unitID, true)
 	end
 
-	gl.PolygonOffset(false)
-	gl.DepthTest(false)
-	gl.UseShader(0)
-	gl.Color(1, 1, 1, 1)
+	glPolygonOffset(false)
+	glDepthTest(false)
+	glUseShader(0)
+	glColor(1, 1, 1, 1)
 end
 
 -- FIXME: optimize to only run if something is actually glowing!
-function gadget:DrawWorld()
-	DrawWorldFunc()
-end
+gadget.DrawWorld           = DrawWorldFunc
+gadget.DrawWorldRefraction = DrawWorldFunc
 
-function gadget:DrawWorldRefraction()
-	DrawWorldFunc()
+function gadget:Shutdown()
+	if shader then
+		gl.DeleteShader(shader)
+		shader = nil
+	end
 end
 
 local glowUnitDefIDs = {}

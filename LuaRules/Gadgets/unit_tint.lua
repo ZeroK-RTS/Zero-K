@@ -18,7 +18,7 @@ if gadgetHandler:IsSyncedCode() then
 		elseif type(r_or_table) == 'table' then
 			SendToUnsynced(TINT_MAGIC, unitID, r_or_table[1], r_or_table[2], r_or_table[3])
 		else
-			SendToUnsynced(TINT_MAGIC, unitID, r_or_table, g, b, a)
+			SendToUnsynced(TINT_MAGIC, unitID, r_or_table, g, b)
 		end
 	end
 
@@ -31,6 +31,11 @@ local glColor = gl.Color
 local glUseShader = gl.UseShader
 local glDepthTest = gl.DepthTest
 local glPolygonOffset = gl.PolygonOffset
+local glBlendEquation = gl.BlendEquation
+local glBlending = gl.Blending
+local glUnit = gl.Unit
+local GL_DST_COLOR = GL.DST_COLOR
+local GL_ZERO = GL.ZERO
 
 local shader
 local tintedUnits = {}
@@ -63,14 +68,15 @@ end
 
 function gadget:Initialize()
 
-	if not gl.CreateShader then
+	local glCreateShader = gl.CreateShader
+	if not glCreateShader then
 		Spring.Log("Tint API (unit_tint.lua)", LOG.ERROR, "Potato with no shaders, exiting")
 		GG.TintUnit = function() end
 		gadgetHandler:RemoveGadget()
 		return
 	end
 
-	shader = gl.CreateShader({
+	shader = glCreateShader({
 		vertex = [[
 			varying vec3 color;
 			void main() {
@@ -98,30 +104,32 @@ function gadget:Initialize()
 end
 
 local function DrawWorldFunc()
-	gl.UseShader(shader)
-	gl.BlendEquation(32774) -- GL.FUNC_ADD
-	gl.Blending(GL.DST_COLOR, GL.ZERO)
-	gl.DepthTest(true)
-	gl.PolygonOffset(-2, -2)
+	glUseShader(shader)
+	glBlendEquation(32774) -- GL.FUNC_ADD
+	glBlending(GL_DST_COLOR, GL_ZERO)
+	glDepthTest(true)
+	glPolygonOffset(-2, -2)
 
 	for unitID, colour in pairs(tintedUnits) do
-		gl.Color(colour[1], colour[2], colour[3])
-		gl.Unit(unitID, true)
+		glColor(colour[1], colour[2], colour[3])
+		glUnit(unitID, true)
 	end
 
-	gl.PolygonOffset(false)
-	gl.DepthTest(false)
-	gl.UseShader(0)
-	gl.Color(1, 1, 1, 1)
+	glPolygonOffset(false)
+	glDepthTest(false)
+	glUseShader(0)
+	glColor(1, 1, 1, 1)
 end
 
 -- FIXME: optimize to only run if something is actually tinted!
-function gadget:DrawWorld()
-	DrawWorldFunc()
-end
+gadget.DrawWorld           = DrawWorldFunc
+gadget.DrawWorldRefraction = DrawWorldFunc
 
-function gadget:DrawWorldRefraction()
-	DrawWorldFunc()
+function gadget:Shutdown()
+	if shader then
+		gl.DeleteShader(shader)
+		shader = nil
+	end
 end
 
 local tintUnitDefIDs = {}
