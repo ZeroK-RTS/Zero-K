@@ -12,11 +12,11 @@ end
 
 local TINT_MAGIC = 'unit_tint'
 if gadgetHandler:IsSyncedCode() then
-	function GG.TintUnit(unitID, r_or_table, g, b, a)
+	function GG.TintUnit(unitID, r_or_table, g, b)
 		if not r_or_table then
 			SendToUnsynced(TINT_MAGIC, unitID)
 		elseif type(r_or_table) == 'table' then
-			SendToUnsynced(TINT_MAGIC, unitID, r_or_table[1], r_or_table[2], r_or_table[3], r_or_table[4])
+			SendToUnsynced(TINT_MAGIC, unitID, r_or_table[1], r_or_table[2], r_or_table[3])
 		else
 			SendToUnsynced(TINT_MAGIC, unitID, r_or_table, g, b, a)
 		end
@@ -35,13 +35,13 @@ local glPolygonOffset = gl.PolygonOffset
 local shader
 local tintedUnits = {}
 
-function TintUnit(unitID, r_or_table, g, b, a)
+function TintUnit(unitID, r_or_table, g, b)
 	if not r_or_table then
 		tintedUnits[unitID] = nil
 	elseif type(r_or_table) == 'table' then
 		tintedUnits[unitID] = r_or_table
 	else
-		tintedUnits[unitID] = {r_or_table, g, b, a}
+		tintedUnits[unitID] = {r_or_table, g, b}
 	end
 end
 
@@ -49,13 +49,13 @@ function gadget:UnitDestroyed(unitID)
 	tintedUnits[unitID] = nil
 end
 
-function gadget:RecvFromSynced(magic, unitID, r, g, b, a)
+function gadget:RecvFromSynced(magic, unitID, r, g, b)
 	if magic ~= TINT_MAGIC then
 		return
 	end
 
 	if r then
-		tintedUnits[unitID] = {r, g, b, a}
+		tintedUnits[unitID] = {r, g, b}
 	else
 		tintedUnits[unitID] = nil
 	end
@@ -72,31 +72,17 @@ function gadget:Initialize()
 
 	shader = gl.CreateShader({
 		vertex = [[
-			varying vec3 normal;
-			varying vec3 eyeVec;
-			varying vec4 color;
-			uniform mat4 camera;
-			uniform mat4 caminv;
-
+			varying vec3 color;
 			void main() {
-				vec4 P = gl_ModelViewMatrix * gl_Vertex;
-				eyeVec = P.xyz;
-				normal  = gl_NormalMatrix * gl_Normal;
-				color = gl_Color.rgba;
-				gl_Position = gl_ProjectionMatrix * P;
+				color = gl_Color.rgb;
+				gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
 			}
 		]],
 
 		fragment = [[
-			varying vec3 normal;
-			varying vec3 eyeVec;
-			varying vec4 color;
-
+			varying vec3 color;
 			void main() {
-				float opac = dot(normalize(normal), normalize(eyeVec));
-				opac = 1.0 - abs(opac);
-				gl_FragColor.rgba = color;
-				gl_FragColor.a = gl_FragColor.a * opac;
+				gl_FragColor.rgb = color; // using `gl_Color.rgb` directly doesn't seem to work
 			}
 		]],
 	})
@@ -112,13 +98,14 @@ function gadget:Initialize()
 end
 
 local function DrawWorldFunc()
-	gl.Color(1, 1, 1, 1)
 	gl.UseShader(shader)
+	gl.BlendEquation(32774) -- GL.FUNC_ADD
+	gl.Blending(GL.DST_COLOR, GL.ZERO)
 	gl.DepthTest(true)
 	gl.PolygonOffset(-2, -2)
 
 	for unitID, colour in pairs(tintedUnits) do
-		gl.Color(colour[1], colour[2], colour[3], colour[4] or 1)
+		gl.Color(colour[1], colour[2], colour[3])
 		gl.Unit(unitID, true)
 	end
 
@@ -141,10 +128,10 @@ local tintUnitDefIDs = {}
 for i = 1, #UnitDefs do
 	local tint = UnitDefs[i].customParams.model_tint
 	if tint then
-		local rs, gs, bs, as = tint:match("(%S+)%s*(%S+)%s*(%S+)%s*(%S*)")
-		local r, g, b, a = tonumber(rs), tonumber(gs), tonumber(bs), tonumber(as)
+		local rs, gs, bs = tint:match("(%S+)%s*(%S+)%s*(%S+)")
+		local r, g, b = tonumber(rs), tonumber(gs), tonumber(bs)
 		if r and g and b then
-			tintUnitDefIDs[i] = {r, g, b, a}
+			tintUnitDefIDs[i] = {r, g, b}
 		end
 	end
 end
