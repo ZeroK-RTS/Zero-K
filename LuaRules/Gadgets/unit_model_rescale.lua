@@ -75,5 +75,21 @@ end
 
 GG.UnitModelRescale = UnitModelRescale
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+local rescaleUnitDefIDs = {}
+for i = 1, #UnitDefs do
+	local scale = tonumber(UnitDefs[i].customParams.model_rescale)
+	if scale and scale ~= 1 and scale > 0 then
+		rescaleUnitDefIDs[i] = scale
+	end
+end
+
+if next(rescaleUnitDefIDs) then
+	function gadget:UnitCreated(unitID, unitDefID)
+		local scale = rescaleUnitDefIDs[unitDefID]
+		if not scale then
+			return
+		end
+
+		UnitModelRescale(unitID, scale)
+	end
+end
