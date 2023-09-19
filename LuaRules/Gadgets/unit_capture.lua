@@ -298,7 +298,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		if controllers[attackerID].postCaptureReload then
 			local gameFrame = spGetGameFrame()
 			local captureReloadMult = (((not build) or build == 1) and 1) or (build*0.5)
-			local frame = gameFrame + math.floor(controllers[attackerID].postCaptureReload*captureReloadMult)
+			local nominalReloadFrames = controllers[attackerID].postCaptureReload*captureReloadMult
+			local realReloadFrames = math.max(math.floor(nominalReloadFrames), 1) -- frames are discrete; can't be zero because that frame already passed!
+			local frame = gameFrame + realReloadFrames
 			spSetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, LOS_ACCESS)
 			spSetUnitRulesParam(attackerID, "captureRechargeFrame", frame, LOS_ACCESS)
 			GG.UpdateUnitAttributes(attackerID, gameFrame)
