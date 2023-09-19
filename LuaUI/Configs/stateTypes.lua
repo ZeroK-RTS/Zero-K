@@ -1,40 +1,41 @@
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local CMD = CMD
+local SUC = Spring.Utilities.CMD
 
 local stateData = {
-	[CMD_WANT_ONOFF] = 2,
+	[SUC.WANT_ONOFF] = 2,
 	[CMD.IDLEMODE] = 2,
-	[CMD_AP_FLY_STATE] = 2,
-	[CMD_CLOAK_SHIELD] = 2,
-	[CMD_DONT_FIRE_AT_RADAR] = 2,
-	[CMD_FACTORY_GUARD] = 2,
-	[CMD_WANT_CLOAK] = 2,
-	[CMD_PRIORITY] = 3,
-	[CMD_TOGGLE_DRONES] = 2,
-	[CMD_UNIT_FLOAT_STATE] = 3,
-	[CMD_AIR_STRAFE] = 2,
+	[SUC.AP_FLY_STATE] = 2,
+	[SUC.CLOAK_SHIELD] = 2,
+	[SUC.DONT_FIRE_AT_RADAR] = 2,
+	[SUC.FACTORY_GUARD] = 2,
+	[SUC.WANT_CLOAK] = 2,
+	[SUC.PRIORITY] = 3,
+	[SUC.TOGGLE_DRONES] = 2,
+	[SUC.UNIT_FLOAT_STATE] = 3,
+	[SUC.AIR_STRAFE] = 2,
 	[CMD.FIRE_STATE] = 3,
 	[CMD.MOVE_STATE] = 3,
-	[CMD_PUSH_PULL] = 2,
-	[CMD_MISC_PRIORITY] = 3,
-	[CMD_GOO_GATHER] = 3,
+	[SUC.PUSH_PULL] = 2,
+	[SUC.MISC_PRIORITY] = 3,
+	[SUC.GOO_GATHER] = 3,
 	[CMD.REPEAT] = 2,
-	[CMD_RETREAT] = 4,
+	[SUC.RETREAT] = 4,
 	[CMD.TRAJECTORY] = 2,
-	[CMD_DISABLE_ATTACK] = 2,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = 4,
-	--[CMD_AUTO_CALL_TRANSPORT] = 2, -- Handled entirely in luaUI so not included here.
-	--[CMD_GLOBAL_BUILD] = 2, -- Handled entirely in luaUI so not included here.
-	[CMD_UNIT_KILL_SUBORDINATES] = 2,
-	[CMD_PREVENT_OVERKILL] = 4,
-	[CMD_PREVENT_BAIT] = 5,
-	[CMD_FIRE_AT_SHIELD] = 2,
-	[CMD_FIRE_TOWARDS_ENEMY] = 2,
-	--[CMD_SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
-	[CMD_UNIT_AI] = 2,
+	[SUC.DISABLE_ATTACK] = 2,
+	[SUC.UNIT_BOMBER_DIVE_STATE] = 4,
+	--[SUC.AUTO_CALL_TRANSPORT] = 2, -- Handled entirely in luaUI so not included here.
+	--[SUC.GLOBAL_BUILD] = 2, -- Handled entirely in luaUI so not included here.
+	[SUC.UNIT_KILL_SUBORDINATES] = 2,
+	[SUC.PREVENT_OVERKILL] = 4,
+	[SUC.PREVENT_BAIT] = 5,
+	[SUC.FIRE_AT_SHIELD] = 2,
+	[SUC.FIRE_TOWARDS_ENEMY] = 2,
+	--[SUC.SELECTION_RANK] = 2, -- Handled entirely in luaUI so not included here.
+	[SUC.UNIT_AI] = 2,
 }
 
 local specialHandling = {
-	[CMD_RETREAT] = function (state, options)
+	[SUC.RETREAT] = function (state, options)
 		if options.right then
 			state = 0
 		elseif state == 0 then --note: this means that to set "Retreat Off" (state = 0) you need to use the "right" modifier, whether the command is given by the player using an ui button or by Lua
@@ -45,13 +46,13 @@ local specialHandling = {
 }
 
 local gadgetReverse = {
-	[CMD_PRIORITY] = true,
-	[CMD_UNIT_FLOAT_STATE] = true,
-	[CMD_MISC_PRIORITY] = true,
-	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
-	[CMD_PREVENT_BAIT] = true,
-	[CMD_PREVENT_OVERKILL] = true,
-	[CMD_GOO_GATHER] = true,
+	[SUC.PRIORITY] = true,
+	[SUC.UNIT_FLOAT_STATE] = true,
+	[SUC.MISC_PRIORITY] = true,
+	[SUC.UNIT_BOMBER_DIVE_STATE] = true,
+	[SUC.PREVENT_BAIT] = true,
+	[SUC.PREVENT_OVERKILL] = true,
+	[SUC.GOO_GATHER] = true,
 }
 
 return stateData, gadgetReverse, specialHandling

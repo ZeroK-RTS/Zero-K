@@ -16,8 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
-
+local CMD_WANT_CLOAK = Spring.Utilities.CMD.WANT_CLOAK
 local CMD_CLOAK = CMD.CLOAK
 
 local unitWantCloakCommandDesc = {

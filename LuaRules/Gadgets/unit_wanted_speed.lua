@@ -21,7 +21,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_WANTED_SPEED = Spring.Utilities.CMD.WANTED_SPEED
 
 local wantedCommand = {
 	[CMD_WANTED_SPEED] = true,

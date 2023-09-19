@@ -38,11 +38,10 @@ local CMD_OPT_INTERNAL  = CMD.OPT_INTERNAL
 local CMD_FIRE_STATE    = CMD.FIRE_STATE
 local CMD_INSERT        = CMD.INSERT
 local CMD_REMOVE        = CMD.REMOVE
+local CMD_DONT_FIRE_AT_RADAR = Spring.Utilities.CMD.DONT_FIRE_AT_RADAR
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-include("LuaRules/Configs/customcmds.h.lua")
 
 local dontFireAtRadarCmdDesc = {
 	id      = CMD_DONT_FIRE_AT_RADAR,

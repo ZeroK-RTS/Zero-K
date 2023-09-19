@@ -15,7 +15,9 @@ end
 -- Command Definition
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_AREA_MEX = SUC.AREA_MEX
+local CMD_AREA_TERRA_MEX = SUC.AREA_TERRA_MEX
 
 local cmdMex = {
 	id      = CMD_AREA_MEX,

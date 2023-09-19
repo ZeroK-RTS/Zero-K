@@ -9,7 +9,9 @@ function gadget:GetInfo()
 		enabled = true,
 	}
 end
-include("LuaRules/Configs/customcmds.h.lua")
+
+local SUC = Spring.Utilities.CMD
+local CMD_RAW_MOVE = SUC.RAW_MOVE
 
 if gadgetHandler:IsSyncedCode() then
 
@@ -33,6 +35,7 @@ local CMD_REMOVE  = CMD.REMOVE
 local CMD_REPAIR  = CMD.REPAIR
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_MOVE    = CMD.MOVE
+local CMD_RAW_BUILD = SUC.RAW_BUILD
 
 local CMD_OPT_ALT = CMD.OPT_ALT
 
@@ -49,7 +52,7 @@ local stopCommand = {
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
-	[CMD_JUMP] = true,
+	[SUC.JUMP] = true,
 	[CMD.PATROL] = true,
 	[CMD.FIGHT] = true,
 	[CMD.MOVE] = true,

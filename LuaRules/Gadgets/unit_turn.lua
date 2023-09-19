@@ -10,10 +10,10 @@ function gadget:GetInfo()
 	}
 end
 
-include("LuaRules/Configs/customcmds.h.lua")
-
 if (gadgetHandler:IsSyncedCode()) then
 -- SYNCED
+
+local CMD_TURN = Spring.Utilities.CMD.TURN
 
 -- SyncedCtrl
 local SetUnitCOBValue = Spring.SetUnitCOBValue

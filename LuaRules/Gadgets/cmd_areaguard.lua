@@ -21,10 +21,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include "LuaRules/Configs/customcmds.h.lua"
+local spUtilities = Spring.Utilities
+local SUC = spUtilities.CMD
+local CMD_AREA_GUARD = SUC.AREA_GUARD
+local CMD_ORBIT = SUC.ORBIT
+local CMD_ORBIT_DRAW = SUC.ORBIT_DRAW
 
-local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
-local Angle = Spring.Utilities.Vector.Angle
+local GiveClampedMoveGoalToUnit = spUtilities.GiveClampedMoveGoalToUnit
+local Angle = spUtilities.Vector.Angle
 
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity

@@ -22,7 +22,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 ---------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_AIR_STRAFE = Spring.Utilities.CMD.AIR_STRAFE
 
 local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 

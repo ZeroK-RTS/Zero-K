@@ -25,7 +25,9 @@ end
 local DEFAULT_FLOAT = 1
 local CMD_STOP = CMD.STOP
 
-include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_UNIT_FLOAT_STATE = SUC.UNIT_FLOAT_STATE
+local CMD_RAW_MOVE = SUC.RAW_MOVE
 
 local unitFloatIdleBehaviour = {
 	id      = CMD_UNIT_FLOAT_STATE,
@@ -49,7 +51,7 @@ local sinkCommand = {
 	[CMD.GUARD] = true,
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
-	[CMD_WAIT_AT_BEACON] = true,
+	[SUC.WAIT_AT_BEACON] = true,
 }
 
 local floatDefs = include("LuaRules/Configs/float_defs.lua")

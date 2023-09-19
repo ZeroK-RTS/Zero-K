@@ -30,7 +30,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_FACTORY_GUARD = SUC.FACTORY_GUARD
+local CMD_RAW_MOVE = SUC.RAW_MOVE
 
 -- Automatically generated local definitions
 

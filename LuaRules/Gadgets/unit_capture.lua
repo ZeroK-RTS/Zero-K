@@ -24,7 +24,7 @@ local FIREWALL_HEALTH        = 1000
 
 local SAVE_FILE = "Gadgets/unit_capture.lua"
 
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_KILL_SUBORDINATES = Spring.Utilities.CMD.UNIT_KILL_SUBORDINATES
 local CMD_STOP = CMD.STOP
 local CMD_SELFD = CMD.SELFD
 
