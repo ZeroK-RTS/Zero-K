@@ -34,6 +34,7 @@ local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitExperience   = Spring.GetUnitExperience
 local spGetTeamResources    = Spring.GetTeamResources
 local GetUnitCost           = Spring.Utilities.GetUnitCost
+local GetUnitValue          = Spring.Utilities.GetUnitValue
 
 local floor = math.floor
 
@@ -345,7 +346,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	if not spAreTeamsAllied(oldTeam,newTeam) then
 		if awardData['cap'][newTeam] then --if team exist, then:
 			local ud = UnitDefs[unitDefID]
-			local mCost = GetUnitCost(unitID, unitDefID)
+			local mCost = GetUnitValue(unitID, unitDefID)
 			AddAwardPoints( 'cap', newTeam, mCost )
 			if (ud.customParams.dynamic_comm) then
 				if (not cappedComs[unitID]) then
@@ -357,7 +358,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		end
 	else -- teams are allied
 		if (unitDefID ~= terraunitDefID) then
-			local mCost = GetUnitCost(unitID, unitDefID)
+			local mCost = GetUnitValue(unitID, unitDefID)
 			AddAwardPoints('share', oldTeam,  mCost)
 			AddAwardPoints('share', newTeam, -mCost)
 		end

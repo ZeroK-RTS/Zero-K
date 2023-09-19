@@ -53,7 +53,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function Spring.Utilities.GetUnitCost(unitID, unitDefID)
+local function GetUnitCost(unitID, unitDefID)
 	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if unitID and variableCostUnit[unitDefID] then
 		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
@@ -65,6 +65,13 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		return buildTimes[unitDefID]
 	end
 	return 50
+end
+Spring.Utilities.GetUnitCost = GetUnitCost
+
+function Spring.Utilities.GetUnitValue(unitID, unitDefID)
+	local cost = GetUnitCost(unitID, unitDefID)
+	local _, buildProgress = Spring.GetUnitIsBeingBuilt(unitID)
+	return cost * buildProgress
 end
 
 function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
