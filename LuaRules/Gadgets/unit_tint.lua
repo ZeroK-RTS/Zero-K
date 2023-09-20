@@ -37,6 +37,8 @@ local glUnit = gl.Unit
 local GL_DST_COLOR = GL.DST_COLOR
 local GL_ZERO = GL.ZERO
 local GL_FUNC_ADD = GL.FUNC_ADD
+local GL_SRC_ALPHA = GL.SRC_ALPHA
+local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
 local scALL_ACCESS_TEAM = Script.ALL_ACCESS_TEAM
 local spGetLocalTeamID = Spring.GetLocalTeamID
 local CallAsTeam = CallAsTeam
@@ -123,6 +125,7 @@ local function DrawWorldFunc()
 
 	glPolygonOffset(false)
 	glDepthTest(false)
+	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	glUseShader(0)
 	glColor(1, 1, 1, 1)
 end

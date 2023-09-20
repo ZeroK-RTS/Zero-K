@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author  = "trepan (xray shader), Sprung (api)",
 		license = "GNU GPL, v2 or later (xray), Public Domain (api)",
 		date    = "2023-09-17",
-		layer   = 0,
+		layer   = 1, -- after tint (so it doesn't get tinted itself)
 		enabled = true,
 	}
 end
