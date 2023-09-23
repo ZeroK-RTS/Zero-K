@@ -133,7 +133,14 @@ if not Spring.SetUnitBuildParams and Script.GetSynced() then -- BAR 105-552
 	Spring.SetUnitBuildParams = RET_NONE
 end
 if not Spring.GetUnitBuildParams then -- BAR 105-552
-	Spring.GetUnitBuildParams = RET_ZERO
+	Spring.GetUnitBuildParams = function(unitID, param)
+		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if param == "buildRange3D" then
+			return unitDef.buildRange3D
+		else
+			return unitDef.buildDistance
+		end
+	end
 end
 
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
@@ -427,6 +434,26 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 		local spSetGameRulesParam = Spring.SetGameRulesParam
 		Spring.SetPlayerRulesParam = function (playerID, key, value)
 			return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
+		end
+	end
+end
+
+if not Spring.GetUnitEffectiveBuildRange then -- BAR 105-1882
+	local spGetUnitBuildParams = Spring.GetUnitBuildParams
+	Spring.GetUnitEffectiveBuildRange = function(unitID, unitDefID)
+		-- don't add the unitDefID radius, that's how it worked back then
+		return spGetUnitBuildParams(unitID, "buildRange")
+	end
+end
+
+if not Script.IsEngineMinVersion(105, 0, 1900) then
+	local originalGetUnitEffectiveBuildRange = Spring.GetUnitEffectiveBuildRange
+	local spGetUnitBuildParams = Spring.GetUnitBuildParams
+	Spring.GetUnitEffectiveBuildRange = function(unitID, unitDefID)
+		if not unitDefID then
+			return spGetUnitBuildParams(unitID, "buildRange")
+		else
+			return originalGetUnitEffectiveBuildRange(unitID, unitDefID)
 		end
 	end
 end
