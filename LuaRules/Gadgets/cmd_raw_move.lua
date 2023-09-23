@@ -529,11 +529,11 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID, 2)
 	end
 	if not cmdID then
-		return false
+		return
 	end
 
 	if cmdID < 0 then
-		return cp_1, cp_2, cp_3
+		return -cmdID, cp_1, cp_2, cp_3
 	end
 
 	if cmdID == CMD_REPAIR then
@@ -545,7 +545,7 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 				-- Don't try to chase moving units with raw move.
 				local x, y, z = Spring.GetUnitPosition(targetUnitID)
 				if x then
-					return x, y, z
+					return unitDefID, x, y, z
 				end
 			end
 		end
@@ -556,20 +556,21 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 		if (cp_1 and not cp_2) or (cp_5 and not cp_6) then
 			local x, y, z = Spring.GetFeaturePosition(cp_1 - MAX_UNITS)
 			if x then
-				return x, y, z
+				return nil, x, y, z
 			end
 		end
 	end
 end
 
 local function CheckConstructorBuild(unitID)
-	local buildDist = constructorBuildDist[unitID]
-	if not buildDist then
+	-- FIXME: `constructorBuildDist` contains buildrange -> redundant
+	local isBuilder = constructorBuildDist[unitID]
+	if not isBuilder then
 		return
 	end
 	
 	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID)
-	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
+	local unitDefID, cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
 		if (not cx) or math.abs(cx - cp_1) > 3 or math.abs(cz - cp_3) > 3 then
@@ -581,6 +582,7 @@ local function CheckConstructorBuild(unitID)
 
 	if cx then
 		local x,_,z = Spring.GetUnitPosition(unitID)
+		local buildDist = Spring.GetUnitEffectiveBuildRange(unitID, unitDefID)
 		local buildDistSq = (buildDist + 30)^2
 		local distSq = (cx - x)^2 + (cz - z)^2
 		if distSq > buildDistSq then
