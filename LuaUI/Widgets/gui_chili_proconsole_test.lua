@@ -1180,6 +1180,7 @@ local function setupColors()
 	incolors['#e'] 		= color2incolor(options.color_chat.value)
 	incolors['#o'] 		= color2incolor(options.color_other.value)
 	incolors['#s'] 		= color2incolor(options.color_spec.value)
+	incolors['#p'] 		= '' -- gets replaced with a player-specific color later; here just not to crash
 end
 
 local function setupPlayers(playerID)
