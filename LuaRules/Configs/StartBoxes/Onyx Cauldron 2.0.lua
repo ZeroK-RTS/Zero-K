@@ -1106,7 +1106,7 @@ if gametype.isFFA() then
 		{boxes = {SE_box}, startpoints = {SE_start}, nameLong = "South-East", nameShort = "SE" },
 		{boxes = {NE_box}, startpoints = {NE_start}, nameLong = "North-East", nameShort = "NE" },
 	}
-elseif gametype.isChickens() or (gametype.isCoop() and gametype.isTeams()) then
+elseif gametype.isChickens() then
 	return {
 		{boxes = {SW_box                }, startpoints = {SW_start                    }, nameLong = "Porculon" , nameShort = "Porculon"  },
 		{boxes = {NE_box, SE_box, NW_box}, startpoints = {NE_start, SE_start, NW_start}, nameLong = "Attackers", nameShort = "Attackers" },
