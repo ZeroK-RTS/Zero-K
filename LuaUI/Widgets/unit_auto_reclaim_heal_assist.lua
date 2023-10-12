@@ -43,7 +43,7 @@ local ConController = {
 	handle=function(self)
 		local cmdQueue = Spring.GetUnitCommands(self.unitID, 3);
 		if (#cmdQueue == 0) then
-			if (not Spring.IsUnitSelected(self.unitID)) then              --if unit is not selected
+			if ((not Spring.IsUnitSelected(self.unitID) and (not Spring.GetUnitStates(self.unitID)["cloak"]))) then  --if unit is not selected and not cloaked
 				self.cmdPos = {GetUnitPosition(self.unitID)}
 				Spring.GiveOrderToUnit(self.unitID, CMD.FIGHT, self.cmdPos, {})   --command unit to reclaim
 				-- printThing("order", Spring.GetUnitCommands(self.unitID, 2), "")
