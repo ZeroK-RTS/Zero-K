@@ -152,6 +152,7 @@ local TEST_MOVE_SPACING = 16
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
+local STUCK_COUNTER_TRAVEL_THRESHOLD = 180
 local STUCK_START_MOVE_TIMER = 12
 local STUCK_TIMER_BASE = 8
 local STUCK_MOVE_RANGE = 140
@@ -260,6 +261,7 @@ local function ResetUnitData(unitData)
 	unitData.nextRawCheckDistSq = nil
 	unitData.doingRawMove = nil
 	unitData.possiblyTurning = nil
+	unitData.stuckCheckCount = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -280,6 +282,15 @@ local function StopRawMoveUnit(unitID, stopNonRaw)
 	end
 	rawMoveUnit[unitID] = nil
 	--Spring.Echo("StopRawMoveUnit", math.random())
+end
+
+local function StuckUnitCloseEnough(unitData, distSq)
+	if unitData.stuckCheckCount then
+		distSq = (math.sqrt(distSq) - 200 * math.pow(unitData.stuckCheckCount, 1.2))
+		distSq = distSq*distSq
+	end
+	--Spring.Echo(math.sqrt(distSq), math.sqrt(GIVE_UP_STUCK_DIST_SQ), unitData.stuckCheckCount)
+	return distSq <= GIVE_UP_STUCK_DIST_SQ
 end
 
 local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
@@ -366,20 +377,21 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
 		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or STUCK_START_MOVE_TIMER)
-		if distSq > GIVE_UP_STUCK_DIST_SQ then
+		if not StuckUnitCloseEnough(unitData, distSq) then
 			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8)
 		end
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - timerIncrement
-
+	
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*6) + STUCK_TIMER_BASE
+			unitData.stuckCheckCount = (unitData.stuckCheckCount or 0) + 1
 			if not GG.floatUnit[unitID] then
-				if canGiveUp and distSq < GIVE_UP_STUCK_DIST_SQ then
+				if canGiveUp and StuckUnitCloseEnough(unitData, distSq) then
 					StopRawMoveUnit(unitID, true)
 					--Spring.Echo("ret 4")
 					return true, true
@@ -398,7 +410,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 			end
 		else
 			unitData.stuckCheckTimer = STUCK_TIMER_BASE + math.min(6, math.floor(distSq/500))
-			if distSq > GIVE_UP_STUCK_DIST_SQ then
+			if travelled > STUCK_COUNTER_TRAVEL_THRESHOLD then
+				unitData.stuckCheckCount = nil
+			end
+			if not StuckUnitCloseEnough(unitData, distSq) then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10)
 			end
 		end
