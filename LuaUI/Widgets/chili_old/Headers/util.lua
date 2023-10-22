@@ -14,6 +14,14 @@ function unpack4(t)
   end
 end
 
+function unpack2(t)
+  if t then
+    return t[1], t[2]
+  else
+    return false, false
+  end
+end
+
 function clamp(min,max,num)
   if (num<min) then
     return min

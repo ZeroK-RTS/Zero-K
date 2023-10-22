@@ -661,6 +661,7 @@ skin.main_window_tall = {
 skin.main_window = {
   TileImage = ":c:tech_mainwindow.png",
   tiles = {176, 64, 176, 64}, --// tile widths: left,top,right,bottom
+  tileScale = {1.5, 1.5}, -- Commander selector window
   padding = {10, 6, 10, 6},
   hitpadding = {4, 4, 4, 4},
 

@@ -26,13 +26,18 @@ end
 local _DrawTextureAspect = _DrawTextureAspect
 
 
-function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex)
-    texIndex = texIndex or 0
+function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, texIndex, skHorScale, skVertScale)
+    texIndex = texIndex or 0 -- skHorScale, skVertScale should really be between skBottom and texw
 
     local txLeft   = skLeft/texw
     local txTop    = skTop/texh
     local txRight  = skRight/texw
     local txBottom = skBottom/texh
+
+    skLeft = skLeft * (skHorScale or 1)
+    skRight = skRight * (skHorScale or 1)
+    skTop = skTop * (skVertScale or 1)
+    skBottom = skBottom * (skVertScale or 1)
 
     --//scale down the texture if we don't have enough space
     local scaleY = h/(skTop+skBottom)
@@ -278,6 +283,7 @@ function DrawWindow(obj)
   local h = obj.height
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
+  local skHorScale, skVertScale = unpack2(obj.tileScale)
 
   local c = obj.color
   if (c) then
@@ -289,7 +295,7 @@ function DrawWindow(obj)
     local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, false, skHorScale, skVertScale)
   gl.Texture(0,false)
 
   if (obj.caption) and not obj.noFont then
