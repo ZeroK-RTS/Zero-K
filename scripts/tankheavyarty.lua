@@ -23,10 +23,11 @@ local SIG_OPEN = 4
 
 local RESTORE_DELAY = 1000
 
+-- wheel celeration is relatively instant because so is track animation
 local WHEEL_SPIN_SPEED_L = math.rad(360)
-local WHEEL_SPIN_DECEL_L = math.rad(30)
+local WHEEL_SPIN_DECEL_L = math.rad(360)
 local WHEEL_SPIN_SPEED_S = math.rad(900)
-local WHEEL_SPIN_DECEL_S = math.rad(75)
+local WHEEL_SPIN_DECEL_S = math.rad(900)
 
 local BAY_SPEED = 20
 local BAY2_DIST = 17
@@ -65,12 +66,13 @@ local function SetAbleToMove(newMove)
 	end
 end
 
+local firstMove
 local function TrackControl()
 	SetSignalMask(SIG_MOVE)
 	firstMove = false
 	while isMoving do
 		if ableToMove then
-			if firstMove then
+			if not firstMove then
 				firstMove = true
 				Spin(wheels1, x_axis, WHEEL_SPIN_SPEED_L)
 				Spin(wheels2, x_axis, WHEEL_SPIN_SPEED_L)
