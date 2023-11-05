@@ -4,7 +4,7 @@ function widget:GetInfo()
 		desc = "Mark missile impact areas and ETAs from allies.",
 		author = "esainane",
 		date = "2020-07",
-		license = "GPL v3.0+",
+		license = "GPL v2.0+",
 		layer = 0,
 		enabled = true
 	}

@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		desc = "Provide missile impact points and ETAs for allies.",
 		author = "esainane",
 		date = "2020-07",
-		license = "GPL v3.0+",
+		license = "GPL v2.0+",
 		layer = 0,
 		enabled = true
 	}
