@@ -77,7 +77,7 @@ local function Angle(x, z)
 	return 0
 end
 
-function Dot(v1, v2)
+local function Dot(v1, v2)
 	if v1[3] then
 		return v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3]
 	else
@@ -85,7 +85,7 @@ function Dot(v1, v2)
 	end
 end
 
-function Cross(v1, v2)
+local function Cross(v1, v2)
 	return {v1[2]*v2[3] - v1[3]*v2[2], v1[3]*v2[1] - v1[1]*v2[3], v1[1]*v2[2] - v1[2]*v2[1]}
 end
 
