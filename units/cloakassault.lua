@@ -82,7 +82,7 @@ return { cloakassault = {
         extra_damage = 60,
         
         light_camera_height = 1600,
-        light_color = [[0.2 0.6 1.2]],
+        light_color = [[0.8 0.8 1.2]],
         light_radius = 200,
       },
 
@@ -102,10 +102,10 @@ return { cloakassault = {
       paralyzeTime            = 1,
       range                   = 340,
       reloadtime              = 2.2,
-      rgbColor                = [[0 0.25 1]],
+      rgbColor                = [[0.65 0.7 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
-      thickness               = 3.5,
+      thickness               = 1,
       turret                  = true,
       waterweapon             = false,
       weaponType              = [[LightningCannon]],
