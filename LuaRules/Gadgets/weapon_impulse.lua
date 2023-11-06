@@ -411,6 +411,11 @@ local function AddImpulses()
 				end
 				if data.useDummy then
 					local dir = math.random()*2*math.pi
+
+					-- Numbers determined empirically. Larger units need more impulse,
+					-- the square is to reduce the chance of unsticking the biggest ones.
+					-- This is to make unsticking more reliable, otherwise the units
+					-- can't move on their own but aren't actually pushed/pulled.
 					local mag = math.pow(4*math.random(), 2)*2
 					local upMag = math.random()*GROUND_PUSH_CONSTANT*0.5
 					local dummyX, dummyZ = mag*math.cos(dir), mag*math.sin(dir)
