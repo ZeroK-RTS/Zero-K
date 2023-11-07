@@ -256,6 +256,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			origSpeed = ud.speed,
 			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
 			origTurnRate = ud.turnRate,
+			origMaxRudder = moveData.maxRudder,
 			origMaxAcc = ud.maxAcc,
 			origMaxDec = ud.maxDec,
 			movetype = -1,
@@ -303,9 +304,17 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 	
 	if spMoveCtrlGetTag(unitID) == nil then
 		if state.movetype == 0 then
+			if speedFactor > 0 then
+				-- Only modify turning that goes beyond the turn factor that units get alongside
+				-- speed factor. This makes sense as planes turn via speed already.
+				turnFactor = turnFactor / speedFactor
+			else
+				turnFactor = 1
+			end
 			local attribute = {
 				maxSpeed        = state.origSpeed       *speedFactor,
 				maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
+				maxRudder       = state.origMaxRudder   *turnFactor,
 			}
 			spSetAirMoveTypeData (unitID, attribute)
 			spSetAirMoveTypeData (unitID, attribute)

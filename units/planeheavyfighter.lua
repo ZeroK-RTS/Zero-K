@@ -58,7 +58,7 @@ return { planeheavyfighter = {
   sightDistance          = 750,
   speed                  = 228,
   speedToFront           = 0.5,
-  turnRadius             = 160,
+  turnRadius             = 10,
 
   weapons                = {
 
@@ -66,7 +66,7 @@ return { planeheavyfighter = {
       def                = [[LASER]],
       badTargetCategory  = [[GUNSHIP]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 100,
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
@@ -95,8 +95,8 @@ return { planeheavyfighter = {
       },
 
       damage                  = {
-        default = 0.96,
-        planes  = 9.6,
+        default = 1.0,
+        planes  = 10,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
