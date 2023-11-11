@@ -155,15 +155,12 @@ return { striderscorpion = {
     
     LIGHTNING = {
       name                    = [[Lightning Gun]],
-      accuracy                = 700,
-      beamTTL                 = 1,
-      burst                   = 10,
-      burstrate               = 0.033,
+      areaOfEffect            = 8,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = 108,
+        extra_damage = 1080,
         
         light_camera_height = 1600,
         light_color = [[0.85 0.85 1.2]],
@@ -175,25 +172,29 @@ return { striderscorpion = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 36,
+        default        = 360,
       },
 
-      explosionGenerator      = [[custom:lightningplosion_continuous]],
+      duration                = 10,
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      intensity               = 27,
+      intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 3,
       range                   = 490,
       reloadtime              = 2,
-      rgbColor                = [[0 0.25 1]],
+      rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
-      thickness               = 5,
+      sprayAngle              = 700,
+      texture1                = [[lightning]],
+      thickness               = 10,
       turret                  = true,
       weaponType              = [[LightningCannon]],
+      weaponVelocity          = 400,
     },
     
     MULTILIGHTNING = {

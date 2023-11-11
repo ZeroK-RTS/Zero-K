@@ -295,7 +295,7 @@ local function armrecoil()
 		Turn(rarm_lgunclaw, y_axis, 0, 0.5)
 		Turn(rarm_rgunclaw, y_axis, 0, 0.5)
 	end
-	Sleep(900)
+	Sleep(33)
 	armGunIsR = not armGunIsR
 end
 
@@ -326,9 +326,6 @@ end
 
 local beam_duration = WeaponDefs[UnitDef.weapons[1].weaponDef].beamtime * 1000
 function script.FireWeapon(num)
-    if num == 2 then
-		StartThread(armrecoil)
-	end
 	if num ~= 1 then
 		return
 	end
@@ -372,7 +369,9 @@ end
 
 
 function script.Shot(num)
-	if num == 3 then
+	if num == 2 then
+		StartThread(armrecoil)
+	elseif num == 3 then
 		missilegun = (missilegun % 2) + 1
 		StartThread(missilelaunch)
 	end

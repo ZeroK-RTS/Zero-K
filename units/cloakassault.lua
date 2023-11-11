@@ -71,41 +71,41 @@ return { cloakassault = {
 
     LIGHTNING = {
       name                    = [[Lightning Gun]],
-      accuracy                = 900,
-      beamTTL                 = 1,
-      burst                   = 10,
-      burstrate               = 0.033,
+      areaOfEffect            = 8,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = 60,
+        extra_damage = 600,
         
         light_camera_height = 1600,
-        light_color = [[0.8 0.8 1.2]],
+        light_color = [[0.85 0.85 1.2]],
         light_radius = 200,
       },
 
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 23,
+        default        = 230,
       },
 
-      explosionGenerator      = [[custom:lightningplosion_continuous]],
+      duration                = 10,
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
-      intensity               = 24,
+      intensity               = 12,
       interceptedByShieldType = 1,
       paralyzeTime            = 1,
       range                   = 340,
       reloadtime              = 2.2,
-      rgbColor                = [[0.65 0.7 1]],
+      rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
-      thickness               = 1,
+      sprayAngle              = 900,
+      texture1                = [[lightning]],
+      thickness               = 10,
       turret                  = true,
       waterweapon             = false,
       weaponType              = [[LightningCannon]],

@@ -134,7 +134,6 @@ local resources = {
       largelaser= "gpl/largelaserfalloff.png",
 	  largelaser_long= "gpl/largelaserfalloff_long.png",
       lightb= "pd/lightningball.tga",
-      lightb2= "pd/lightningball2.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",
       lightb_purple= "pd/lightningball_purple.png",
