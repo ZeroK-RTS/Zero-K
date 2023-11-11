@@ -189,6 +189,17 @@ function gadget:Initialize()
 	end
 end
 
+local function CallScript(unitID, funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)
+	if func then
+		func = func[funcName]
+		if func then
+			return Spring.UnitScript.CallAsUnit(unitID, func, args)
+		end
+	end
+	return false
+end
+
 local function MakeOptsWithShift(opts)
 	return opts.coded + (opts.shift and 0 or CMD_OPT_SHIFT)
 end
@@ -661,6 +672,7 @@ end
 
 function GG.RefuelComplete(bomberID)
 	spSetUnitRulesParam(bomberID, "noammo", 3) -- mark bomber as repairing/ not refueling anymore
+	CallScript(bomberID, "ReammoComplete")
 end
 
 function GG.LandComplete(bomberID)

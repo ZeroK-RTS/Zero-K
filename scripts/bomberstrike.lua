@@ -31,6 +31,11 @@ local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function ReammoComplete()
+	Show(missiler)
+	Show(missilel)
+end
+
 function script.Create()
 	SetInitialBomberSettings()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)

@@ -21,6 +21,10 @@ local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
 include "bombers.lua"
 include "constants.lua"
 
+function ReammoComplete()
+	Show(bomb)
+end
+
 function script.Deactivate()
 	StopSpin(turbineTop, y_axis, 0.5);
 	StopSpin(turbineLeft, y_axis, 0.5);
