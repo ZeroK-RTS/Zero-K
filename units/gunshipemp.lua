@@ -19,7 +19,7 @@ return { gunshipemp = {
   selectionVolumeType    = [[ellipsoid]],
   collide             = true,
   corpse              = [[DEAD]],
-  cruiseAlt           = 78,
+  cruiseAltitude      = 78,
 
   customParams        = {
     airstrafecontrol = [[1]],
@@ -30,10 +30,9 @@ return { gunshipemp = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
+  health              = 440,
   hoverAttack         = true,
   iconType            = [[gunshipscout]],
-  maxDamage           = 440,
-  maxVelocity         = 7.5,
   metalCost           = 85,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
   objectName          = [[marshmellow.s3o]],
@@ -49,6 +48,7 @@ return { gunshipemp = {
   },
 
   sightDistance       = 380,
+  speed               = 225,
   turnRate            = 1144,
   upright             = true,
 

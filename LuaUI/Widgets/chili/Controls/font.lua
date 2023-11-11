@@ -25,7 +25,7 @@ Font = Object:Inherit{
 	outline       = false,
 	color         = {1, 1, 1, 1},
 	outlineColor  = {0, 0, 0, 1},
-	autoOutlineColor = true,
+	autoOutlineColor = false,
 
 	uiScale = 1
 }

@@ -343,7 +343,7 @@ function gadget:GameFrame(f)
     end
     
     for i = 1, #features do
-        if FeatureDefs[spGetFeatureDefID(features[i])].name == UnitDefNames[resUnit.name].wreckName then
+        if FeatureDefs[spGetFeatureDefID(features[i])].name == UnitDefNames[resUnit.name].corpse then
             resUnit.wreckFound = true
         end
     end

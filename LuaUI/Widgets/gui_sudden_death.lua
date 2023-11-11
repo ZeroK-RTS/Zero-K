@@ -3,8 +3,8 @@ function widget:GetInfo()
 		name = "Sudden Death",
 		desc = "Draws sudden death circle.",
 		author = "GoogleFrog",
-		date = "24 Hune 2023",
-		license = "GPL v3.0+",
+		date = "24 June 2023",
+		license = "GPL v2.0+",
 		layer = 0,
 		enabled = true
 	}

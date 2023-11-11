@@ -15,7 +15,9 @@ end
 -- Command Definition
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_AREA_MEX = SUC.AREA_MEX
+local CMD_AREA_TERRA_MEX = SUC.AREA_TERRA_MEX
 
 local cmdMex = {
 	id      = CMD_AREA_MEX,
@@ -45,12 +47,17 @@ if gadgetHandler:IsSyncedCode() then
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 
-local mexDefID = UnitDefNames["staticmex"].id
+local mexDefIDs = {}
+for udid, ud in ipairs(UnitDefs) do
+	if ud.customParams.metal_extractor_mult then
+		mexDefIDs[udid] = true
+	end
+end
 
 local canMex = {}
 for udid, ud in ipairs(UnitDefs) do
 	for i, option in ipairs(ud.buildOptions) do
-		if mexDefID == option then
+		if mexDefIDs[option] then
 			canMex[udid] = true
 			--Spring.Echo(ud.name)
 		end
@@ -99,7 +106,11 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowCommand_GetWantedCommand()
-	return {[-mexDefID] = true, [CMD.INSERT] = true}
+	local wantedCmds = {[CMD.INSERT] = true}
+	for unitDefID in pairs(mexDefIDs) do
+		wantedCmds[-unitDefID] = true
+	end
+	return wantedCmds
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
@@ -107,7 +118,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
+	if (mexDefIDs[-cmdID] or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] and mexDefIDs[-cmdParams[2]])) and metalSpots then
 		local x, z
 		if cmdID == CMD.INSERT then
 			x = cmdParams[4] and math.ceil(cmdParams[4])
@@ -178,7 +189,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		Spring.InsertUnitCmdDesc(unitID, cmdTerraMex)
 	end
 	
-	if unitDefID == mexDefID then
+	if mexDefIDs[unitDefID] then
 		local x,_,z = Spring.GetUnitPosition(unitID)
 		if metalSpots then
 			local spotID = metalSpotsByPos[x] and metalSpotsByPos[x][z]
@@ -210,10 +221,20 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if unitDefID == mexDefID and spotByID[unitID] then
-		spotData[spotByID[unitID]] = nil
-		spotByID[unitID] = nil
+	local spotID = spotByID[unitID]
+	if not mexDefIDs[unitDefID] or not spotID then
+		return
 	end
+
+	local morpheeID = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morpheeID then
+		spotData[spotID].unitID = morpheeID
+		spotByID[morpheeID] = spotID
+		Spring.SetUnitRulesParam(morpheeID, "mexIncome", metalSpots[spotID].metal, inlosTrueTable)
+	else
+		spotData[spotID] = nil
+	end
+	spotByID[unitID] = nil
 end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------

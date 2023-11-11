@@ -1,6 +1,6 @@
 return { energyheavygeo = {
   name                          = [[Advanced Geothermal]],
-  description                   = [[Large Powerplant (+100) - HAZARDOUS]],
+  description                   = [[Large Powerplant - HAZARDOUS]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -24,8 +24,8 @@ return { energyheavygeo = {
   explodeAs                     = [[NUCLEAR_MISSILE]],
   footprintX                    = 5,
   footprintZ                    = 5,
+  health                        = 3250,
   iconType                      = [[energyheavygeo]],
-  maxDamage                     = 3250,
   maxSlope                      = 255,
   metalCost                     = 1500,
   objectName                    = [[energyheavygeo.s3o]],

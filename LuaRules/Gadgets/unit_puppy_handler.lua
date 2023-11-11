@@ -80,7 +80,7 @@ for unitDefID = 1, #UnitDefs do
 		puppyDefs[unitDefID] = {
 			weaponDefID = weaponDefID,
 			selfDamage = tonumber(ud.customParams.jump_self_damage),
-			losRadius = ud.losRadius,
+			losRadius = ud.sightDistance,
 		}
 
 		wantedWeaponsSet[weaponDefID] = true

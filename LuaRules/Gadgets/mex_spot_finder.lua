@@ -126,16 +126,40 @@ local function SetMexHelperAttributes(metalSpots, needMexDrawing)
 	end
 	local mexCount = #metalSpots
 	
-	local minHeight
+	local minHeight, maxHeight, minX, maxX, minZ, maxZ
 	for i = 1, mexCount do
 		local mex = metalSpots[i]
 		if (not minHeight) or (mex.y < minHeight) then
 			minHeight = mex.y
 		end
+		if (not maxHeight) or (mex.y > maxHeight) then
+			maxHeight = mex.y
+		end
+		if (not minX) or (mex.x < minX) then
+			minX = mex.x
+		end
+		if (not maxX) or (mex.x > maxX) then
+			maxX = mex.x
+		end
+		if (not minZ) or (mex.z < minZ) then
+			minZ = mex.z
+		end
+		if (not maxZ) or (mex.z > maxZ) then
+			maxZ = mex.z
+		end
 	end
 	
 	if minHeight then
 		spSetGameRulesParam("mex_min_height", minHeight)
+		spSetGameRulesParam("mex_max_height", maxHeight)
+		spSetGameRulesParam("mex_min_x", minX)
+		spSetGameRulesParam("mex_max_x", maxX)
+		spSetGameRulesParam("mex_min_z", minZ)
+		spSetGameRulesParam("mex_max_z", maxZ)
+		spSetGameRulesParam("mex_min_x_prop", minX / Game.mapSizeX)
+		spSetGameRulesParam("mex_max_x_prop", maxX / Game.mapSizeX)
+		spSetGameRulesParam("mex_min_z_prop", minZ / Game.mapSizeZ)
+		spSetGameRulesParam("mex_max_z_prop", maxZ / Game.mapSizeZ)
 	end
 end
 

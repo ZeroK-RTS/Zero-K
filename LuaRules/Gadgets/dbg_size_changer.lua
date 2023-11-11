@@ -18,14 +18,6 @@ function gadget:GetInfo()
 	}
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local NULL_PIECE = "[null]"
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local function SetScale(unitID, base, scale)
 	local p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16 = Spring.GetUnitPieceMatrix(unitID, base)
 	local pieceTable = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16}
@@ -54,20 +46,11 @@ local function SetScale(unitID, base, scale)
 	Spring.SetUnitPieceMatrix(unitID, base, pieceTable)
 end
 
-local function FindBase(unitID)
-	local pieces = Spring.GetUnitPieceList(unitID)
-	for pieceNum = 1, #pieces do
-		if Spring.GetUnitPieceInfo(unitID, pieceNum).parent == NULL_PIECE then
-			return pieceNum
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	local base = FindBase(unitID)
+	local base = Spring.GetUnitRootPiece(unitID)
 	if base then
 		SetScale(unitID, base, 2)
 	end

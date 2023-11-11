@@ -18,7 +18,7 @@ return { planefighter = {
   selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.02,
-  cruiseAlt              = 200,
+  cruiseAltitude         = 200,
 
   customParams           = {
     bait_level_default = 0,
@@ -47,12 +47,11 @@ return { planefighter = {
   footprintX             = 2,
   footprintZ             = 2,
   frontToSpeed           = 0,
+  health                 = 300,
   iconType               = [[fighter]],
   maneuverleashlength    = [[1280]],
   maxAcc                 = 0.5,
-  maxDamage              = 300,
   maxRudder              = 0.007,
-  maxVelocity            = 13,
   metalCost              = 150,
   mygravity              = 1,
   noAutoFire             = false,
@@ -72,6 +71,7 @@ return { planefighter = {
 
   },
   sightDistance          = 520,
+  speed                  = 390,
   speedToFront           = 0,
   turnRadius             = 150,
   turnRate               = 839,

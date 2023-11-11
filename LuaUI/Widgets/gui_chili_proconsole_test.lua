@@ -931,8 +931,9 @@ local function formatMessage(msg)
 		-- we get all the usernames by iterating it and just ignoring the #[aehos] control codes
 		for name, colour in pairs(incolors) do
 			if name:sub(1,1) ~= '#' then
-				local pattern = '[^%w]' .. name .. '[^%w]'
-				formatted_arg, _ = formatted_arg:gsub(pattern, function(parameter) return parameter:sub(1,1) .. colour .. parameter:sub(2,-1) .. message_colour end)
+				local pattern = '([^%w_])(' .. name .. ')([^%w_])'
+				local sub = '%1'..colour..'%2'..message_colour..'%3'
+				formatted_arg, _ = formatted_arg:gsub(pattern, sub)
 			end
 		end
 		msg.argument = formatted_arg:sub(2, -2)  -- strip added spaces
@@ -1179,6 +1180,7 @@ local function setupColors()
 	incolors['#e'] 		= color2incolor(options.color_chat.value)
 	incolors['#o'] 		= color2incolor(options.color_other.value)
 	incolors['#s'] 		= color2incolor(options.color_spec.value)
+	incolors['#p'] 		= '' -- gets replaced with a player-specific color later; here just not to crash
 end
 
 local function setupPlayers(playerID)

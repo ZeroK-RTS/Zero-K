@@ -18,7 +18,7 @@ return { planeheavyfighter = {
   selectionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.01,
-  cruiseAlt              = 220,
+  cruiseAltitude         = 220,
 
   customParams           = {
     bait_level_default = 0,
@@ -43,13 +43,12 @@ return { planeheavyfighter = {
   footprintX             = 2,
   footprintZ             = 2,
   frontToSpeed           = 0.1,
+  health                 = 1100,
   iconType               = [[stealthfighter]],
   maxAcc                 = 0.605,
   maxAileron             = 0.02,
-  maxDamage              = 1100,
   maxElevator            = 0.015,
   maxRudder              = 0.008,
-  maxVelocity            = 7.6,
   metalCost              = 300,
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -57,8 +56,9 @@ return { planeheavyfighter = {
   script                 = [[planeheavyfighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
+  speed                  = 228,
   speedToFront           = 0.5,
-  turnRadius             = 160,
+  turnRadius             = 10,
 
   weapons                = {
 
@@ -66,7 +66,7 @@ return { planeheavyfighter = {
       def                = [[LASER]],
       badTargetCategory  = [[GUNSHIP]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 100,
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
@@ -95,8 +95,8 @@ return { planeheavyfighter = {
       },
 
       damage                  = {
-        default = 0.96,
-        planes  = 9.6,
+        default = 1.0,
+        planes  = 10,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

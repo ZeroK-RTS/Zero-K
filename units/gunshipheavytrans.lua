@@ -21,7 +21,7 @@ return { gunshipheavytrans = {
   selectionVolumeScales  = [[83 38 135]],
   selectionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
-  cruiseAlt              = 250,
+  cruiseAltitude         = 250,
 
   customParams           = {
     midposoffset   = [[0 0 0]],
@@ -40,11 +40,10 @@ return { gunshipheavytrans = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
+  health                 = 1800,
   hoverAttack            = true,
   iconType               = [[heavygunshiptransport]],
   maneuverleashlength    = [[1280]],
-  maxDamage              = 1800,
-  maxVelocity            = 9,
   metalCost              = 750,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
@@ -62,6 +61,7 @@ return { gunshipheavytrans = {
 
   },
   sightDistance          = 660,
+  speed                  = 270,
   transportCapacity      = 1,
   transportSize          = 25,
   turninplace            = 0,

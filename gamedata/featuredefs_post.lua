@@ -158,7 +158,7 @@ local function ProcessUnitDef(udName, ud)
 
       fd.customparams = fd.customparams or {}
       fd.customparams.fromunit = "1"
-      fd.damage = fd.customparams.health_override or ud.maxdamage
+      fd.damage = fd.customparams.health_override or ud.health
       fd.energy = 0
       fd.reclaimable = true
       fd.reclaimtime = fd.metal
@@ -187,7 +187,7 @@ local function ProcessUnitDef(udName, ud)
         fd.resurrectable = 1
       end
       ud.corpse = fullName
-	  --if fd.metal ~= ud.metalcost*0.4 or fd.damage ~= ud.maxdamage then
+	  --if fd.metal ~= ud.metalcost*0.4 or fd.damage ~= ud.health then
 	  --  Spring.Echo(ud.name)
 	  --end
     end

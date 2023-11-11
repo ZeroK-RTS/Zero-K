@@ -2,6 +2,15 @@ local sqrt = math.sqrt
 local pi = math.pi
 local cos = math.cos
 local sin = math.sin
+local atan2 = math.atan2
+
+local function New3(x,y,z)
+	return {x, z}, y
+end
+
+local function Clone(v)
+	return {v[1], v[2]}
+end
 
 local function DistSq(x1,z1,x2,z2)
 	return (x1 - x2)*(x1 - x2) + (z1 - z2)*(z1 - z2)
@@ -23,16 +32,25 @@ local function Subtract(v1, v2)
 	return {v1[1] - v2[1], v1[2] - v2[2]}
 end
 
-local function AbsVal(x, y, z)
+local function Distance(v1, v2)
+	local dir = {v1[1] - v2[1], v1[2] - v2[2]}
+	return sqrt(dir[1]*dir[1] + dir[2]*dir[2])
+end
+
+local function AbsValSq(x, y, z)
 	if z then
-		return sqrt(x*x + y*y + z*z)
+		return x*x + y*y + z*z
 	elseif y then
-		return sqrt(x*x + y*y)
+		return x*x + y*y
 	elseif x[3] then
-		return sqrt(x[1]*x[1] + x[2]*x[2] + x[3]*x[3])
+		return x[1]*x[1] + x[2]*x[2] + x[3]*x[3]
 	else
-		return sqrt(x[1]*x[1] + x[2]*x[2])
+		return x[1]*x[1] + x[2]*x[2]
 	end
+end
+
+local function AbsVal(x, y, z)
+	return sqrt(AbsValSq(x, y, z))
 end
 
 local function Unit(v)
@@ -73,7 +91,11 @@ local function Angle(x, z)
 	return 0
 end
 
-function Dot(v1, v2)
+local function AngleTo(v1, v2)
+	return atan2(v1[1]*v2[2] - v1[2]*v2[1], v1[1]*v2[1] + v1[2]*v2[2]);
+end
+
+local function Dot(v1, v2)
 	if v1[3] then
 		return v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3]
 	else
@@ -81,7 +103,7 @@ function Dot(v1, v2)
 	end
 end
 
-function Cross(v1, v2)
+local function Cross(v1, v2)
 	return {v1[2]*v2[3] - v1[3]*v2[2], v1[3]*v2[1] - v1[1]*v2[3], v1[1]*v2[2] - v1[2]*v2[1]}
 end
 
@@ -95,6 +117,23 @@ end
 local function Normal(v1, v2)
 	local projection = Project(v1, v2)
 	return Subtract(v1, projection), projection
+end
+
+local function SlopeIntercept(v1, v2)
+	local a = v2[2] - v1[2]
+	local b = v1[1] - v2[1]
+	local c = (a * v1[1]) + (b * v1[2])
+	return a, b, c
+end
+
+local function Intersection(v1, d1, v2, d2)
+	local a1, b1, c1 = SlopeIntercept(v1, Add(v1, d1))
+	local a2, b2, c2 = SlopeIntercept(v2, Add(v2, d2))
+	local delta = a1 * b2 - b1 * a2
+	if delta == 0 then
+	  return nil
+	end
+	return {((b2 * c1) - (b1 * c2)) / delta, ((a1 * c2) - (a2 * c1)) / delta}
 end
 
 -- Spring.GetHeadingFromVector is actually broken at angles close to pi/4 and reflections
@@ -195,21 +234,45 @@ local function AngleAverageShortest(angleA, angleB)
 	return angleA - diff/2
 end
 
+local function RandomPointInCircle(radius, startAngle, endAngle)
+	startAngle = startAngle or 0
+	endAngle = endAngle or 2*pi
+	
+	local r = math.random()
+	local angle = startAngle + math.random()*(endAngle - startAngle)
+	return PolarToCart(radius*math.sqrt(r), angle)
+end
+
+local function DrawLine(p1, p2)
+	Spring.MarkerAddLine(p1[1], 0, p1[2], p2[1], 0, p2[2])
+end
+
+local function DrawPoint(p1, message)
+	Spring.MarkerAddPoint(p1[1], 0, p1[2], message or "")
+end
+
 Spring.Utilities.Vector = {
+	New3 = New3,
+	Clone = Clone,
 	DistSq = DistSq,
 	Dist3D = Dist3D,
 	Mult = Mult,
 	AbsVal = AbsVal,
+	AbsValSq = AbsValSq,
 	Unit = Unit,
 	Dot = Dot,
 	Cross = Cross,
 	Norm = Norm,
 	Angle = Angle,
+	AngleTo = AngleTo,
 	Project = Project,
 	Normal = Normal,
+	SlopeIntercept = SlopeIntercept,
+	Intersection = Intersection,
 	PolarToCart = PolarToCart,
 	Add = Add,
 	Subtract = Subtract,
+	Distance = Distance,
 	GetAngleBetweenUnitVectors = GetAngleBetweenUnitVectors,
 	InverseBasis = InverseBasis,
 	ChangeBasis = ChangeBasis,
@@ -220,4 +283,7 @@ Spring.Utilities.Vector = {
 	DistanceToLineSq = DistanceToLineSq,
 	AngleSubtractShortest = AngleSubtractShortest,
 	AngleAverageShortest = AngleAverageShortest,
+	RandomPointInCircle = RandomPointInCircle,
+	DrawLine = DrawLine,
+	DrawPoint = DrawPoint,
 }

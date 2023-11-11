@@ -19,7 +19,7 @@ return { gunshipkrow = {
   collisionVolumeScales  = [[86 22 86]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
-  cruiseAlt              = 120,
+  cruiseAltitude         = 120,
 
   customParams           = {
     modelradius    = [[10]],
@@ -30,11 +30,10 @@ return { gunshipkrow = {
   floater                = true,
   footprintX             = 5,
   footprintZ             = 5,
+  health                 = 16000,
   hoverAttack            = true,
   iconType               = [[supergunship]],
   maneuverleashlength    = [[500]],
-  maxDamage              = 16000,
-  maxVelocity            = 3.3,
   metalCost              = 4200,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -50,6 +49,7 @@ return { gunshipkrow = {
 
   },
   sightDistance          = 633,
+  speed                  = 99,
   turnRate               = 250,
   upright                = true,
   workerTime             = 0,

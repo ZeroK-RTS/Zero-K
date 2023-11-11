@@ -226,7 +226,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and (string.match(ud.tooltip, 'Skirm') or string.match(ud.tooltip, 'Capture') or string.match(ud.tooltip, 'Black Hole')) and IsGround(ud) then
+				if ud and (string.match(ud.description, 'Skirm') or string.match(ud.description, 'Capture') or string.match(ud.description, 'Black Hole')) and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -244,7 +244,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Arti') and IsGround(ud) then
+				if ud and string.match(ud.description, 'Arti') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -262,7 +262,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air') and IsGround(ud) then
+				if ud and string.match(ud.description, 'Anti') and string.match(ud.description, 'Air') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -1048,14 +1048,14 @@ local function addUnit(defName, path)
 	end
 	
 	if ud.customParams.attack_toggle then
-		options[defName .. "_disableattack_0"] = {
-			name = "  Disable Attack Commands",
-			desc = "Check the box to make the unit not respond to attack commands.",
+		options[defName .. "_enableattack_1"] = {
+			name = "  Enable Force Fire Command",
+			desc = "Make the unit respond to Force Fire commands as well as Fire Special Weapon.",
 			type = 'bool',
 			value = false,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_disableattack_0"
+		options_order[#options_order+1] = defName .. "_enableattack_1"
 	end
 	
 	if ud.canStockpile then
@@ -1421,11 +1421,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			orderArray[#orderArray + 1] = {CMD_FIRE_TOWARDS_ENEMY, {(value and 1) or 0}, CMD.OPT_SHIFT}
 		end
 		
-		value = GetStateValue(name, "disableattack")
-		if value then -- false is the default
-			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {1}, CMD.OPT_SHIFT}
+		value = GetStateValue(name, "enableattack_1")
+		if value then
+			orderArray[#orderArray + 1] = {CMD_DISABLE_ATTACK, {0}, CMD.OPT_SHIFT}
 		end
-
+		
 		value = GetStateValue(name, "formation_rank")
 		if value and WG.SetFormationRank then
 			WG.SetFormationRank(unitID, value)

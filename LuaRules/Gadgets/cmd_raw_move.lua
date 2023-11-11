@@ -9,7 +9,9 @@ function gadget:GetInfo()
 		enabled = true,
 	}
 end
-include("LuaRules/Configs/customcmds.h.lua")
+
+local SUC = Spring.Utilities.CMD
+local CMD_RAW_MOVE = SUC.RAW_MOVE
 
 if gadgetHandler:IsSyncedCode() then
 
@@ -33,6 +35,7 @@ local CMD_REMOVE  = CMD.REMOVE
 local CMD_REPAIR  = CMD.REPAIR
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_MOVE    = CMD.MOVE
+local CMD_RAW_BUILD = SUC.RAW_BUILD
 
 local CMD_OPT_ALT = CMD.OPT_ALT
 
@@ -49,7 +52,7 @@ local stopCommand = {
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
-	[CMD_JUMP] = true,
+	[SUC.JUMP] = true,
 	[CMD.PATROL] = true,
 	[CMD.FIGHT] = true,
 	[CMD.MOVE] = true,
@@ -149,6 +152,7 @@ local TEST_MOVE_SPACING = 16
 local LAZY_SEARCH_DISTANCE = 450
 local BLOCK_RELAX_DISTANCE = 250
 local STUCK_TRAVEL = 25
+local STUCK_COUNTER_TRAVEL_THRESHOLD = 180
 local STUCK_START_MOVE_TIMER = 12
 local STUCK_TIMER_BASE = 8
 local STUCK_MOVE_RANGE = 140
@@ -257,6 +261,7 @@ local function ResetUnitData(unitData)
 	unitData.nextRawCheckDistSq = nil
 	unitData.doingRawMove = nil
 	unitData.possiblyTurning = nil
+	unitData.stuckCheckCount = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -277,6 +282,15 @@ local function StopRawMoveUnit(unitID, stopNonRaw)
 	end
 	rawMoveUnit[unitID] = nil
 	--Spring.Echo("StopRawMoveUnit", math.random())
+end
+
+local function StuckUnitCloseEnough(unitData, distSq)
+	if unitData.stuckCheckCount then
+		distSq = (math.sqrt(distSq) - 200 * math.pow(unitData.stuckCheckCount, 1.2))
+		distSq = distSq*distSq
+	end
+	--Spring.Echo(math.sqrt(distSq), math.sqrt(GIVE_UP_STUCK_DIST_SQ), unitData.stuckCheckCount)
+	return distSq <= GIVE_UP_STUCK_DIST_SQ
 end
 
 local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
@@ -363,20 +377,21 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
 		unitData.stuckCheckTimer = (startMovingTime[unitDefID] or STUCK_START_MOVE_TIMER)
-		if distSq > GIVE_UP_STUCK_DIST_SQ then
+		if not StuckUnitCloseEnough(unitData, distSq) then
 			unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*8)
 		end
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - timerIncrement
-
+	
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
 		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*6) + STUCK_TIMER_BASE
+			unitData.stuckCheckCount = (unitData.stuckCheckCount or 0) + 1
 			if not GG.floatUnit[unitID] then
-				if canGiveUp and distSq < GIVE_UP_STUCK_DIST_SQ then
+				if canGiveUp and StuckUnitCloseEnough(unitData, distSq) then
 					StopRawMoveUnit(unitID, true)
 					--Spring.Echo("ret 4")
 					return true, true
@@ -395,7 +410,10 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 			end
 		else
 			unitData.stuckCheckTimer = STUCK_TIMER_BASE + math.min(6, math.floor(distSq/500))
-			if distSq > GIVE_UP_STUCK_DIST_SQ then
+			if travelled > STUCK_COUNTER_TRAVEL_THRESHOLD then
+				unitData.stuckCheckCount = nil
+			end
+			if not StuckUnitCloseEnough(unitData, distSq) then
 				unitData.stuckCheckTimer = unitData.stuckCheckTimer + math.floor(math.random()*10)
 			end
 		end
@@ -526,11 +544,11 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 		cmdID, _, _, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID, 2)
 	end
 	if not cmdID then
-		return false
+		return
 	end
 
 	if cmdID < 0 then
-		return cp_1, cp_2, cp_3
+		return -cmdID, cp_1, cp_2, cp_3
 	end
 
 	if cmdID == CMD_REPAIR then
@@ -542,7 +560,7 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 				-- Don't try to chase moving units with raw move.
 				local x, y, z = Spring.GetUnitPosition(targetUnitID)
 				if x then
-					return x, y, z
+					return unitDefID, x, y, z
 				end
 			end
 		end
@@ -553,20 +571,21 @@ local function GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_
 		if (cp_1 and not cp_2) or (cp_5 and not cp_6) then
 			local x, y, z = Spring.GetFeaturePosition(cp_1 - MAX_UNITS)
 			if x then
-				return x, y, z
+				return nil, x, y, z
 			end
 		end
 	end
 end
 
 local function CheckConstructorBuild(unitID)
-	local buildDist = constructorBuildDist[unitID]
-	if not buildDist then
+	-- FIXME: `constructorBuildDist` contains buildrange -> redundant
+	local isBuilder = constructorBuildDist[unitID]
+	if not isBuilder then
 		return
 	end
 	
 	local cmdID, _, cmdTag, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6 = spGetUnitCurrentCommand(unitID)
-	local cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
+	local unitDefID, cx, cy, cz = GetConstructorCommandPos(cmdID, cp_1, cp_2, cp_3, cp_4, cp_5, cp_6, unitID)
 
 	if cmdID == CMD_RAW_BUILD and cp_3 then
 		if (not cx) or math.abs(cx - cp_1) > 3 or math.abs(cz - cp_3) > 3 then
@@ -578,6 +597,7 @@ local function CheckConstructorBuild(unitID)
 
 	if cx then
 		local x,_,z = Spring.GetUnitPosition(unitID)
+		local buildDist = Spring.GetUnitEffectiveBuildRange(unitID, unitDefID)
 		local buildDistSq = (buildDist + 30)^2
 		local distSq = (cx - x)^2 + (cz - z)^2
 		if distSq > buildDistSq then

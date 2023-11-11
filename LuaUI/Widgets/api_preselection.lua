@@ -195,12 +195,14 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 
 			for i=1, #units do
 				local uvx, uvy, uvz = Spring.GetUnitViewPosition(units[i], true)
-				local ux, uy, uz = spWorldToScreenCoords(uvx, uvy, uvz)
-				local hereMouseX, hereMouseY = x, y
-				if ux and (units[i] ~= alwaysSelectedID) and not Spring.GetUnitNoSelect(units[i]) then
-					if ux >= math_min(screenStartX, hereMouseX) and ux < math_max(screenStartX, hereMouseX) and
-							uy >= math_min(screenStartY, hereMouseY) and uy < math_max(screenStartY, hereMouseY) then
-						allBoxedUnits[#allBoxedUnits+1] = units[i]
+				if uvz then
+					local ux, uy, uz = spWorldToScreenCoords(uvx, uvy, uvz)
+					local hereMouseX, hereMouseY = x, y
+					if ux and (units[i] ~= alwaysSelectedID) and not Spring.GetUnitNoSelect(units[i]) then
+						if ux >= math_min(screenStartX, hereMouseX) and ux < math_max(screenStartX, hereMouseX) and
+								uy >= math_min(screenStartY, hereMouseY) and uy < math_max(screenStartY, hereMouseY) then
+							allBoxedUnits[#allBoxedUnits+1] = units[i]
+						end
 					end
 				end
 			end

@@ -38,7 +38,7 @@ local function GetBuildIconFrame(udef)
 	elseif (udef.weapons[1] and udef.isBuilding) then
 		return unitTex
 
-	elseif (cp.income_energy or cp.ismex or cp.windgen) then
+	elseif (cp.income_energy or cp.metal_extractor_mult or cp.windgen) then
 		return ecoTex
 
 	elseif ((udef.weapons[1] or udef.canKamikaze) and not cp.unarmed) then

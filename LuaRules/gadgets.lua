@@ -1135,12 +1135,12 @@ end
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID,
                                          builderTeam, x, y, z, facing)
   for _,g in r_ipairs(self.AllowUnitCreationList) do
-    if (not g:AllowUnitCreation(unitDefID, builderID,
-                                builderTeam, x, y, z, facing)) then
-      return false
+    local allow, drop = g:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing)
+    if not allow then
+      return false, drop
     end
   end
-  return true
+  return true, true
 end
 
 

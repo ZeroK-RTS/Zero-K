@@ -22,12 +22,10 @@ return { shieldfelon = {
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
+  health              = 1600,
   iconType            = [[walkersupport]],
   leaveTracks         = true,
-  losEmitHeight       = 40,
-  maxDamage           = 1600,
   maxSlope            = 36,
-  maxVelocity         = 1.5,
   maxWaterDepth       = 22,
   metalCost           = 620,
   movementClass       = [[KBOT3]],
@@ -45,7 +43,9 @@ return { shieldfelon = {
 
   },
 
+  sightEmitHeight     = 40,
   sightDistance       = 520,
+  speed               = 45,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

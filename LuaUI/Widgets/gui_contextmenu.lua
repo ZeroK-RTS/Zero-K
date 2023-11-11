@@ -309,7 +309,20 @@ for i = 1, #players do
 	end
 end
 
+
+--[[ Mods can add "tier 2", "moho" etc mexes that gather a different
+     amount of metal per spot. In those cases, display the multiplier
+     for all mexes. Avoid it for vanilla tho because it's implying. ]]
+local differentMexTypeExists = false
+
 for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	local cp = ud.customParams
+	local mexMult = tonumber(cp.metal_extractor_mult)
+	if mexMult and mexMult ~= 1 and mexMult > 0 then
+		differentMexTypeExists = true
+	end
+
 	if not alreadyAdded[i] then
 		local ud = UnitDefs[i]
 		if ud.name:lower():find('pw_') and (Spring.GetGameRulesParam("planetwars_structures") == 1) then
@@ -854,7 +867,7 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ''
 		end
 
-		if wd.noExplode then
+		if wd.noExplode or cp.pretend_no_explode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
 			if not (cp.single_hit or cp.single_hit_multi) then
@@ -992,10 +1005,10 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarRadius
-	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.jammerRadius
+	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarDistance
+	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.radarDistanceJam
 	
-	if (radarRadius > 0) or (jammerRadius > 0) or ud.targfac then
+	if (radarRadius > 0) or (jammerRadius > 0) or ud.isTargetingUpgrade then
 		cells[#cells+1] = 'Provides intel'
 		cells[#cells+1] = ''
 		if (radarRadius > 0) then
@@ -1006,7 +1019,7 @@ local function printAbilities(ud, unitID)
 			cells[#cells+1] = ' - Radar jamming:'
 			cells[#cells+1] = numformat(jammerRadius) .. " elmo"
 		end
-		if ud.targfac then
+		if ud.isTargetingUpgrade then
 			cells[#cells+1] = ' - Improves radar accuracy'
 			cells[#cells+1] = ''
 		end
@@ -1129,8 +1142,10 @@ local function printAbilities(ud, unitID)
 		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30) .. 's'
-		cells[#cells+1] = ' - Reload: '
-		cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30) .. 's'
+		if cp.specialreloadtime then
+			cells[#cells+1] = ' - Reload: '
+			cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30) .. 's'
+		end
 		if cp.boost_distance then
 			cells[#cells+1] = ' - Distance: '
 			cells[#cells+1] = numformat(tonumber(cp.boost_distance)) .. ' elmos (approx.)'
@@ -1220,7 +1235,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if ud.selfDCountdown <= 1 then
+	if ud.selfDestructCountdown <= 1 then
 		cells[#cells+1] = 'Instant self-destruction'
 		cells[#cells+1] = ''
 	end
@@ -1230,9 +1245,14 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	if cp.ismex then
+	local mexMult = tonumber(cp.metal_extractor_mult)
+	if mexMult then
 		cells[#cells+1] = 'Extracts metal'
-		cells[#cells+1] = ''
+		if differentMexTypeExists and mexMult > 0 then
+			cells[#cells+1] = numformat(100*mexMult) .. "% extraction"
+		else
+			cells[#cells+1] = ''
+		end
 	end
 
 	if cp.fireproof then
@@ -1548,19 +1568,19 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy) .. " E/s", textColor = color.stats_fg, }
 	end
 	
-	if ud.losRadius > 0 then
+	if ud.sightDistance > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sightDistance) .. " elmo", textColor = color.stats_fg, }
 	end
 
-	if (ud.sonarRadius > 0) then
+	if (ud.sonarDistance > 0) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sonar: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarRadius) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarDistance) .. " elmo", textColor = color.stats_fg, }
 	end
 
-	if ud.wantedHeight > 0 then
+	if ud.cruiseAltitude > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight*1.5) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.cruiseAltitude * 1.5) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then

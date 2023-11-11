@@ -20,36 +20,6 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Mission Creation
 
 local recentlyExported = false
-local BUILD_RESOLUTION = 16
-
-local function SanitizeBuildPositon(x, z, ud, facing)
-	local oddX = (ud.xsize % 4 == 2)
-	local oddZ = (ud.zsize % 4 == 2)
-	
-	if facing % 2 == 1 then
-		oddX, oddZ = oddZ, oddX
-	end
-	
-	if oddX then
-		x = math.floor((x + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-	else
-		x = math.floor(x/BUILD_RESOLUTION)*BUILD_RESOLUTION
-	end
-	if oddZ then
-		z = math.floor((z + 8)/BUILD_RESOLUTION)*BUILD_RESOLUTION - 8
-	else
-		z = math.floor(z/BUILD_RESOLUTION)*BUILD_RESOLUTION
-	end
-	return x, z
-end
-
-local function GetUnitFacing(unitID)
-	return math.floor(((Spring.GetUnitHeading(unitID) or 0)/16384 + 0.5)%4)
-end
-
-local function GetFeatureFacing(unitID)
-	return math.floor(((Spring.GetFeatureHeading(unitID) or 0)/16384 + 0.5)%4)
-end
 
 local commandNameMap = {
 	[CMD.PATROL] = "PATROL",
@@ -108,16 +78,16 @@ local function ProcessUnitCommands(inTabs, commands, unitID, mobileUnit)
 end
 
 local function GetUnitString(unitID, tabs, sendCommands)
-	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local ud = UnitDefs[unitDefID]
 	local x, y, z = Spring.GetUnitPosition(unitID)
 	
-	local facing = 0
-	
+	local facing
 	if ud.isImmobile then
 		facing = Spring.GetUnitBuildFacing(unitID)
-		x, z = SanitizeBuildPositon(x, z, ud, facing)
+		x, y, z = Spring.Pos2BuildPos(unitDefID, x, y, z, facing)
 	else
-		facing = GetUnitFacing(unitID)
+		facing = Spring.GetFacingfromHeading(Spring.GetUnitHeading(unitID))
 	end
 	
 	local build = select(5, Spring.GetUnitHealth(unitID))
@@ -166,7 +136,7 @@ local function GetFeatureString(fID)
 	unitString = unitString .. inTabs .. [[name = "]] .. fd.name .. [[",]] .. "\n"
 	unitString = unitString .. inTabs .. [[x = ]] .. math.floor(fx) .. [[,]] .. "\n"
 	unitString = unitString .. inTabs .. [[z = ]] .. math.floor(fz) .. [[,]] .. "\n"
-	unitString = unitString .. inTabs .. [[facing = ]] .. GetFeatureFacing(fID) .. [[,]] .. "\n"
+	unitString = unitString .. inTabs .. [[facing = ]] .. Spring.GetFacingFromHeading(Spring.GetFeatureHeading(fID)) .. [[,]] .. "\n"
 	
 	return unitString .. tabs.. "},"
 end
@@ -248,10 +218,10 @@ local function MoveUnitRaw(snap)
 		return
 	end
 	
-	local x, z = math.floor(pos[1]), math.floor(pos[3])
+	local x, y, z = math.floor(pos[1]), pos[2], math.floor(pos[3])
 	if snap or ud.isImmobile then
 		local facing = Spring.GetUnitBuildFacing(unitID)
-		x, z = SanitizeBuildPositon(x, z, ud, facing)
+		x, y, z = Spring.Pos2BuildPos(unitDefID, x, y, z, facing)
 	end
 	
 	Spring.SendCommands("luarules moveunit " .. unitID .. " " .. x .. " " .. z)
@@ -290,7 +260,7 @@ local function RotateUnit(add)
 			if ud.isImmobile then
 				facing = Spring.GetUnitBuildFacing(units[i])
 			else
-				facing = GetUnitFacing(units[i])
+				facing = Spring.GetFacingFromHeading(Spring.GetUnitHeading(units[i]))
 			end
 			facing = (facing + add)%4
 			Spring.SendCommands("luarules rotateunit " .. units[i] .. " " .. facing)

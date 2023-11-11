@@ -14,7 +14,7 @@ return { chicken_pigeon = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 200,
+  cruiseAltitude      = 200,
 
   customParams        = {
   },
@@ -23,12 +23,11 @@ return { chicken_pigeon = {
   floater             = true,
   footprintX          = 1,
   footprintZ          = 1,
+  health              = 150,
   iconType            = [[scoutplane]],
   idleAutoHeal        = 20,
   idleTime            = 300,
-  maxDamage           = 150,
   maxSlope            = 18,
-  maxVelocity         = 10,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 50,
@@ -51,6 +50,7 @@ return { chicken_pigeon = {
   },
   sightDistance       = 512,
   sonarDistance       = 512,
+  speed               = 300,
   turnRate            = 6000,
   workerTime          = 0,
 

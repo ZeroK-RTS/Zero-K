@@ -284,8 +284,7 @@ local function AddNoGoZone(x, z, size)
 	noGoZones.data[noGoZones.count] = {zl = z - size, zu = z + size, xl = x - size, xu = x + size}
 end
 
-local function initialiseNoGoZones()
-
+local function InitialiseNoGoZones()
 	do
 		local geoUnitDef = UnitDefNames["energygeo"]
 		local features = Spring.GetAllFeatures()
@@ -310,7 +309,7 @@ local function initialiseNoGoZones()
 				end
 				
 				noGoZones.count = noGoZones.count + 1
-				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x-sZ}
+				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x+sX}
 			end
 		end
 	end
@@ -346,7 +345,7 @@ local function initialiseNoGoZones()
 	--]]
 end
 
-local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does not include boundry points
+local function CheckOverlapWithNoGoZone(xl, zl, xu, zu) -- intersection check does not include boundry points
 	for i = 1, noGoZones.count do
 		local d = noGoZones.data[i]
 		if xl < d.xu and xu > d.xl and zl < d.zu and zu > d.zl then
@@ -476,7 +475,7 @@ local function SpawnStructure(info, teamID, boxData)
 	local giveUp = 0
 	while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
 		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
-		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
@@ -557,7 +556,7 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	local giveUp = 0
 	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
 		  (lava and Spring.GetGroundHeight(x,z) <= 0) or
-		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  CheckOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
 		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
@@ -798,7 +797,7 @@ function gadget:Initialize()
 		return
 	end
 	
-	initialiseNoGoZones()
+	InitialiseNoGoZones()
 	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()
 	
 	if spawningAnything then

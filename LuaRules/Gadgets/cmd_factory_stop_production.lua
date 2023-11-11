@@ -30,8 +30,7 @@ local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local CMD_OPT_CTRL = CMD.OPT_CTRL
 local CMD_REMOVE = CMD.REMOVE
 local CMD_WAIT = CMD.WAIT
-
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_STOP_PRODUCTION = Spring.Utilities.CMD.STOP_PRODUCTION
 
 local isFactory = {}
 for udid = 1, #UnitDefs do

@@ -15,7 +15,7 @@ return { chickenf = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 150,
+  cruiseAltitude      = 150,
 
   customParams        = {
     outline_x = 180,
@@ -27,13 +27,12 @@ return { chickenf = {
   floater             = true,
   footprintX          = 1,
   footprintZ          = 1,
+  health              = 1200,
   iconType            = [[chickenf]],
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  maxDamage           = 1200,
   maxSlope            = 18,
-  maxVelocity         = 10,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 450,
@@ -55,6 +54,7 @@ return { chickenf = {
   },
   sightDistance       = 512,
   sonarDistance       = 512,
+  speed               = 300,
   turnRate            = 6000,
   workerTime          = 0,
 

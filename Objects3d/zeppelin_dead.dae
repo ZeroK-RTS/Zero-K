@@ -104,7 +104,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="hull" name="hull" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 5.755582 0 0 0 1</matrix>
+        <matrix sid="transform">1.4 0 0 0 0 1.4 0 0 0 0 1.4 5.755582 0 0 0 1.4</matrix>
         <instance_geometry url="#Icosphere_006-mesh">
           <bind_material>
             <technique_common>

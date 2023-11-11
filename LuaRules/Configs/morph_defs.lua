@@ -2,7 +2,9 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_MORPH = SUC.MORPH
+local CMD_MORPH_STOP = SUC.MORPH_STOP
 
 local morphDefs = {}
 

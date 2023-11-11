@@ -31,7 +31,11 @@ Changelog:
 local DEFAULT_FLOAT = 1
 local CMD_STOP = CMD.STOP
 
-include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_UNIT_FLOAT_STATE = SUC.UNIT_FLOAT_STATE
+local CMD_RAW_MOVE = SUC.RAW_MOVE
+local CMD_RAW_BUILD = SUC.RAW_BUILD
+local CMD_WAIT_AT_BEACON = SUC.WAIT_AT_BEACON
 
 local unitFloatIdleBehaviour = {
 	id      = CMD_UNIT_FLOAT_STATE,

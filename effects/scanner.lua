@@ -1,4 +1,67 @@
 return {
+  ["scan_star"] = {
+    contract = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      unit               = true,
+      underwater         = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 0.065,
+        maxheat            = 30,
+        pos                = [[0,4,0]],
+        size               = 30,
+        sizegrowth         = -0.05,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+  },
+  ["scan_explode"] = {
+    contract = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      unit               = true,
+      underwater         = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 1.1,
+        maxheat            = 30,
+        pos                = [[0,4,0]],
+        size               = 64,
+        sizegrowth         = 12,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+  },
+  ["scan_trail"] = {
+    contract = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      unit               = true,
+      underwater         = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 0.9,
+        maxheat            = 30,
+        pos                = [[0,4,0]],
+        size               = 60,
+        sizegrowth         = -0.8,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+  },
   ["scanner_ping"] = {
     usedefaultexplosions = false,
     groundflash = {

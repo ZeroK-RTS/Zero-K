@@ -62,7 +62,8 @@ local GetVisibleUnits     = Spring.GetVisibleUnits
 local GetUnitDefID        = Spring.GetUnitDefID
 local GetAllUnits         = Spring.GetAllUnits
 local GetUnitHeading      = Spring.GetUnitHeading
-local IsUnitIcon 		  = Spring.IsUnitIcon
+local IsUnitIcon          = Spring.IsUnitIcon
+local spGetUnitPieceMap   = Spring.GetUnitPieceMap
 
 local iconsize   = 10
 local iconhsize  = iconsize * 0.5
@@ -161,15 +162,6 @@ function widget:Initialize()
       comms[unitID] = GetCommAttributes(unitID, unitDefID)
     end
   end
-end
-
-
-function spGetUnitPieceMap(unitID)
-  local pieceMap = {}
-  for piecenum,piecename in pairs(Spring.GetUnitPieceList(unitID)) do
-    pieceMap[piecename] = piecenum
-  end
-  return pieceMap
 end
 
 local function DrawWorldFunc()

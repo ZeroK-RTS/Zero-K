@@ -20,7 +20,7 @@ return { nebula = {
   collisionVolumeType    = [[box]],
 
   corpse                 = [[DEAD]],
-  cruiseAlt              = 300,
+  cruiseAltitude         = 300,
 
   customParams           = {
     cantuseairpads = 1,
@@ -36,10 +36,9 @@ return { nebula = {
   floater                = true,
   footprintX             = 5,
   footprintZ             = 5,
+  health                 = 11000,
   hoverAttack            = true,
   iconType               = [[nebula]],
-  maxDamage              = 11000,
-  maxVelocity            = 3.3,
   metalCost              = 8000,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
@@ -57,6 +56,7 @@ return { nebula = {
 
   },
   sightDistance          = 633,
+  speed                  = 99,
   turnRate               = 100,
   upright                = true,
   workerTime             = 0,

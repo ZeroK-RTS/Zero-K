@@ -803,6 +803,10 @@ local icontypes = {
     bitmap='icons/bombernuke.dds',
     size=2.5,
   },
+  bomberassaultarty = {
+    bitmap='icons/bomberassaultarty.png',
+    size=2.5,
+  },
   bomberriot = {
     bitmap='icons/bomberriot.dds',
     size=2.1,
@@ -1065,6 +1069,10 @@ local icontypes = {
   mahlazer = {
     bitmap='icons/mahlazer.dds',
     size=3.0,
+  },
+  mahlazer_special = {
+    bitmap='icons/mahlazer_special.dds',
+    size=2.8,
   },
   -- Starlight satellite
   satellite = {

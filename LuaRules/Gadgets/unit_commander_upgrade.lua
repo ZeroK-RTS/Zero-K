@@ -28,8 +28,6 @@ local internalCreationModuleEffectData
 local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedJammingRange, unitCreatedCloakShield, unitCreatedWeaponNums
 
 local moduleDefs, chassisDefs, upgradeUtilities, LEVEL_BOUND, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
-	
-include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -694,7 +692,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		time = morphTime,
 		into = targetUnitDefID,
 		increment = increment,
-		stopCmd = CMD_UPGRADE_STOP,
+		stopCmd = Spring.Utilities.CMD.UPGRADE_STOP,
 		resTable = {
 			m = (increment * cost),
 			e = (increment * cost)

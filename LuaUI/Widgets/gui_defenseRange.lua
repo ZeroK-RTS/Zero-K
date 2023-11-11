@@ -138,7 +138,7 @@ for unitName, conf in pairs({
 		conf.radius = weaponDef.customParams.nuke_coverage
 	elseif conf.class == RADAR then
 		conf.weaponDef = CYLINDER_HEIGHTMOD
-		conf.radius = unitDef.radarRadius
+		conf.radius = unitDef.radarDistance
 	elseif conf.class == SHIELD then
 		conf.weaponDef = SPHERE_HEIGHTMOD
 		conf.radius = weaponDef.shieldRadius

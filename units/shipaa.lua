@@ -30,6 +30,7 @@ return { shipaa = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
+  health                 = 1900,
   iconType               = [[shipaa]],
   losEmitHeight          = 40,
   maxDamage              = 2400,
@@ -55,6 +56,7 @@ return { shipaa = {
 
   sightDistance          = 660,
   sonarDistance          = 660,
+  speed                  = 85.2,
   turninplace            = 0,
   turnRate               = 777,
   waterline              = 4,

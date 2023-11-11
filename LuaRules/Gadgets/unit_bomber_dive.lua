@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-include("LuaRules/Configs/customcmds.h.lua")
+local CMD_UNIT_BOMBER_DIVE_STATE = Spring.Utilities.CMD.UNIT_BOMBER_DIVE_STATE
 
 local DEFAULT_COMMAND_STATE = 1
 

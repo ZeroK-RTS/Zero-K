@@ -1,6 +1,6 @@
 return { energyfusion = {
   name                          = [[Fusion Reactor]],
-  description                   = [[Medium Powerplant (+35)]],
+  description                   = [[Medium Powerplant]],
   activateWhenBuilt             = true,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -22,8 +22,8 @@ return { energyfusion = {
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 5,
   footprintZ                    = 4,
+  health                        = 2200,
   iconType                      = [[energyfusion]],
-  maxDamage                     = 2200,
   maxSlope                      = 18,
   metalCost                     = 1000,
   objectName                    = [[energyfusion.s3o]],

@@ -29,7 +29,7 @@ local function GetUnitCategory(unitDefID)
 		return "other"
 	end
 
-	if cp.ismex or cp.income_energy or (cp.pylonrange and ((tonumber(cp.pylonrange) or 0) > 400)) or ud.energyStorage > 0 or ud.isBuilder then
+	if cp.metal_extractor_mult or cp.income_energy or (cp.pylonrange and ((tonumber(cp.pylonrange) or 0) > 400)) or ud.energyStorage > 0 or ud.isBuilder then
 		return "econ"
 	end
 	

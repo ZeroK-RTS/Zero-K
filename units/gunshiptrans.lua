@@ -20,7 +20,7 @@ return { gunshiptrans = {
   selectionVolumeScales  = [[68 24 68]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 140,
+  cruiseAltitude      = 140,
 
   customParams        = {
     airstrafecontrol  = [[1]],
@@ -35,10 +35,9 @@ return { gunshiptrans = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
+  health              = 300,
   hoverAttack         = true,
   iconType            = [[gunshiptransport]],
-  maxDamage           = 300,
-  maxVelocity         = 11.5,
   metalCost           = 100,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
@@ -55,6 +54,7 @@ return { gunshiptrans = {
 
   },
   sightDistance       = 300,
+  speed               = 345,
   transportCapacity   = 1,
   transportMass       = 330,
   transportSize       = 4,

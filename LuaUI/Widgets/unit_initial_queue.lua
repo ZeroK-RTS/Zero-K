@@ -735,7 +735,7 @@ function widget:Initialize()
 		return
 	end
 	for uDefID, uDef in pairs(UnitDefs) do
-		if uDef.customParams.ismex then
+		if uDef.customParams.metal_extractor_mult then
 			isMex[uDefID] = true
 		end
 

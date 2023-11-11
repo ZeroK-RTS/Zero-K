@@ -19,7 +19,7 @@ local function processWeapon(weaponDef, targetCats)
 	local projectiles = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or weaponDef.salvoSize) * weaponDef.projectiles)
 	local rawDamage = cp.stats_damage * projectiles
 	local burstDef = {
-		damage = math.floor(rawDamage + 0.5), -- units often do extra .1 damage which would result in ugliness for 10+ units
+		damage = tonumber(cp.stats_burst_damage) or math.floor(rawDamage + 0.5), -- units often do extra .1 damage which would result in ugliness for 10+ units
 		unreliable = (cp.burst == burstDefs.BURST_UNRELIABLE),
 		class = (weaponDef.paralyzer or cp.disarmdamagemult) and EMP_OR_DISARM or NORMAL,
 	}

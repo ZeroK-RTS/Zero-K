@@ -18,7 +18,7 @@ return { gunshipaa = {
   collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 110,
+  cruiseAltitude         = 110,
 
   customParams           = {
     bait_level_default = 0,
@@ -32,10 +32,9 @@ return { gunshipaa = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
+  health                 = 900,
   hoverAttack            = true,
   iconType               = [[gunshipaa]],
-  maxDamage              = 900,
-  maxVelocity            = 3.8,
   metalCost              = 270,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -51,6 +50,7 @@ return { gunshipaa = {
 
   },
   sightDistance          = 660,
+  speed                  = 114,
   turnRate               = 0,
   workerTime             = 0,
 

@@ -16,7 +16,7 @@ return { gunshipraid = {
   selectionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 100,
+  cruiseAltitude         = 100,
 
   customParams           = {
     airstrafecontrol = [[1]],
@@ -27,12 +27,11 @@ return { gunshipraid = {
   floater                = true,
   footprintX             = 2,
   footprintZ             = 2,
+  health                 = 800,
   hoverAttack            = true,
   iconType               = [[gunshipraider]],
   idleAutoHeal           = 6,
   idleTime               = 150,
-  maxDamage              = 800,
-  maxVelocity            = 6.9,
   metalCost              = 220,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
@@ -48,6 +47,7 @@ return { gunshipraid = {
   },
 
   sightDistance          = 500,
+  speed                  = 207,
   turnRate               = 693,
 
   weapons                = {

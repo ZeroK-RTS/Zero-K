@@ -61,7 +61,48 @@ local function GetBoxID(allyTeamID)
 	return boxID
 end
 
-local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
+local function OrientRectangleToPoint(rect, point)
+	-- Return three vectors.
+	-- rect[1] is a point on the edge closest to startPos.
+	-- rect[2] is such that rect[1]+rect[2] defines the other point on the edge closest to startPos.
+	-- rect[3] is such that rect[1]+rect[3] and rect[1]+rect[2]+rect[3] are the other two points of the rectangle.
+	
+	local v = Spring.Utilities.Vector
+	local shortIndex = 1
+	local shortDistSq = v.AbsValSq(v.Subtract(point, v.Add(rect[1], v.Mult(0.5, rect[2]))))
+	
+	local challengeDistSq = v.AbsValSq(v.Subtract(point, v.Add(rect[1], v.Mult(0.5, rect[3]))))
+	if challengeDistSq < shortDistSq then
+		shortIndex = 2
+		shortDistSq = challengeDistSq
+	end
+	challengeDistSq = v.AbsValSq(v.Subtract(point, v.Add(rect[1], v.Add(rect[3], v.Mult(0.5, rect[2])))))
+	if challengeDistSq < shortDistSq then
+		shortIndex = 3
+		shortDistSq = challengeDistSq
+	end
+	challengeDistSq = v.AbsValSq(v.Subtract(point, v.Add(rect[1], v.Add(rect[2], v.Mult(0.5, rect[3])))))
+	if challengeDistSq < shortDistSq then
+		shortIndex = 4
+		shortDistSq = challengeDistSq
+	end
+	
+	if shortIndex == 2 then
+		rect[2], rect[3] = rect[3], rect[2]
+	end
+	if shortIndex == 3 or  shortIndex == 4 then
+		rect[1] = v.Add(rect[1], v.Add(rect[2], rect[3]))
+		rect[2] = v.Mult(-1, rect[2])
+		rect[3] = v.Mult(-1, rect[3])
+		if shortIndex == 4 then
+			rect[2], rect[3] = rect[3], rect[2]
+		end
+	end
+	
+	return rect
+end
+
+local function GetPlanetwarsBoxes(teamDistance, teamWidth, neutralWidth, edgeDist)
 	local attackerBoxID = GetBoxID(0)
 	local defenderBoxID = GetBoxID(1)
 	if not attackerBoxID or not defenderBoxID then
@@ -86,28 +127,30 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	local attackerBoxEnd = GetPointOnLine(1 - (teamDistance + teamWidth))
 	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
 
-	local function GetBasicRectangle(pointA, pointB, isX)
+	local function GetBasicRectangle(pointA, pointB, isX, startPos)
+		local box
 		if isX then
-			return {
+			box = {
 				{edgeDist, pointA[2]},
 				{0, pointB[2] - pointA[2]},
 				{Game.mapSizeX - 2*edgeDist, 0},
 			}
 		else
-			return {
+			box = {
 				{pointA[1], edgeDist},
 				{0, Game.mapSizeZ - 2*edgeDist},
 				{pointB[1] - pointA[1], 0},
 			}
 		end
+		return OrientRectangleToPoint(box, startPos)
 	end
 	
 	if math.abs(defenderX - attackerX) < 10 or math.abs(defenderZ - attackerZ) < 10 then
 		local isX = math.abs(defenderX - attackerX) < 10
 		return {
-			attacker = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
-			defender = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
-			neutral = GetBasicRectangle(middleBoxStart, middleBoxEnd, isX),
+			attacker = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX, {attackerX, attackerZ}),
+			defender = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX, {defenderX, defenderZ}),
+			neutral = GetBasicRectangle(middleBoxStart, middleBoxEnd, isX, {attackerX, attackerZ}),
 		}
 	end
 	
@@ -144,18 +187,24 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 		return {left, right}
 	end
 
-	local function GetRectangle(pointA, pointB)
+	local function GetRectangle(pointA, pointB, startPos)
 		local edgesA = GetEdgePoints(pointA)
 		local edgesB = GetEdgePoints(pointB)
-		
-		return RectangularizeTrapezoid(edgesA, edgesB)
+		local box = RectangularizeTrapezoid(edgesA, edgesB)
+		return OrientRectangleToPoint(box, startPos)
 	end
 
 	return {
-		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
-		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
-		neutral = GetRectangle(middleBoxStart, middleBoxEnd),
+		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd, {attackerX, attackerZ}),
+		defender = GetRectangle(defenderBoxStart, defenderBoxEnd, {defenderX, defenderZ}),
+		neutral = GetRectangle(middleBoxStart, middleBoxEnd, {attackerX, attackerZ}),
 	}
+end
+
+local function GetAllyAverageStartpoint(allyTeamID)
+	local allyBoxID = GetBoxID(allyTeamID)
+	local boxX, boxZ = GetAverageStartpoint(allyBoxID)
+	return boxX, boxZ
 end
 
 local function CheckStartbox (boxID, x, z)
@@ -314,6 +363,7 @@ function gadget:Initialize()
 	GG.startBoxConfig = startboxConfig
 	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
 	GG.CheckStartbox = CheckStartbox
+	GG.GetAllyAverageStartpoint = GetAllyAverageStartpoint
 
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)

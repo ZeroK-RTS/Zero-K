@@ -21,8 +21,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local SUC = Spring.Utilities.CMD
+local CMD_AP_FLY_STATE = SUC.AP_FLY_STATE
+local CMD_AP_AUTOREPAIRLEVEL = SUC.AP_AUTOREPAIRLEVEL
 
 local EditUnitCmdDesc = Spring.EditUnitCmdDesc
 local FindUnitCmdDesc = Spring.FindUnitCmdDesc

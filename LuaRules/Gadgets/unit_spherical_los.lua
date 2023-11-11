@@ -42,8 +42,8 @@ local function AddSphericalLOSCheck(unitID, unitDefID)
 		units.data[units.count] = {
 			unitID = unitID,
 			unitDefID = unitDefID,
-			los = ud.losRadius,
-			airLos = ud.airLosRadius,
+			los = ud.sightDistance,
+			airLos = ud.airSightDistance,
 			removeAfter = frame + 40,
 		}
 		unitsByID[unitID] = units.count

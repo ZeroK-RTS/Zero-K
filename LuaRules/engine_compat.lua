@@ -2,6 +2,7 @@ local RET_FALSE  = function() return false end
 local RET_NONE   = function() end
 local RET_TABLE  = function() return {} end
 local RET_ZERO   = function() return 0 end
+local RET_ONE    = function() return 1 end
 local RET_STRING = function() return "" end
 
 --[[ For some reason IsEngineMinVersion breaks on tags where the minor is not 0 (X.1.Y-...),
@@ -132,7 +133,14 @@ if not Spring.SetUnitBuildParams and Script.GetSynced() then -- BAR 105-552
 	Spring.SetUnitBuildParams = RET_NONE
 end
 if not Spring.GetUnitBuildParams then -- BAR 105-552
-	Spring.GetUnitBuildParams = RET_ZERO
+	Spring.GetUnitBuildParams = function(unitID, param)
+		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if param == "buildRange3D" then
+			return unitDef.buildRange3D
+		else
+			return unitDef.buildDistance
+		end
+	end
 end
 
 if not Spring.GetUnitsInScreenRectangle and not Script.GetSynced() then -- BAR 105-637
@@ -367,6 +375,42 @@ if not Spring.SetUnitShieldRechargeDelay and Script.GetSynced() then -- BAR 105-
 	Spring.SetUnitShieldRechargeDelay = RET_NONE
 end
 
+if UnitDefs then -- BAR 105-1801
+
+	local keys = { -- old, new
+		"tooltip"       , "description",
+		"wreckName"     , "corpse",
+		"buildpicname"  , "buildPic",
+		"canSelfD"      , "canSelfDestruct",
+		"selfDCountdown", "selfDestructCountdown",
+		"losRadius"     , "sightDistance",
+		"losHeight"     , "sightEmitHeight",
+		"airLosRadius"  , "airSightDistance",
+		"radarRadius"   , "radarDistance",
+		"jammerRadius"  , "radarDistanceJam",
+		"sonarRadius"   , "sonarDistance",
+		"sonarJamRadius", "sonarDistanceJam",
+		"seismicRadius" , "seismicDistance",
+		"kamikazeDist"  , "kamikazeDistance",
+		"targfac"       , "isTargetingUpgrade",
+		"wantedHeight"  , "cruiseAltitude",
+	}
+
+	for _, unitDef in pairs (UnitDefs) do
+		for i = 1, #keys, 2 do
+			local oldKey = keys[i]
+			local newKey = keys[i+1]
+
+			-- Spring recoils in horror if you try to assign existing
+			-- keys, so it MUST be done under a nil check (also remember
+			-- that some are bools so it can't be just "if not x")
+			if unitDef[newKey] == nil then
+				unitDef[newKey] = unitDef[oldKey]
+			end
+		end
+	end
+end
+
 if not Spring.GetUnitIsBeingBuilt then -- BAR 105-1806
 	local spGetUnitHealth = Spring.GetUnitHealth
 	local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -392,4 +436,56 @@ if not Spring.GetPlayerRulesParam then -- BAR 105-1823
 			return spSetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
 		end
 	end
+end
+
+if not Spring.GetUnitEffectiveBuildRange then -- BAR 105-1882
+	local spGetUnitBuildParams = Spring.GetUnitBuildParams
+	Spring.GetUnitEffectiveBuildRange = function(unitID, unitDefID)
+		-- don't add the unitDefID radius, that's how it worked back then
+		return spGetUnitBuildParams(unitID, "buildRange")
+	end
+end
+
+if not Script.IsEngineMinVersion(105, 0, 1900) then
+	local originalGetUnitEffectiveBuildRange = Spring.GetUnitEffectiveBuildRange
+	local spGetUnitBuildParams = Spring.GetUnitBuildParams
+	Spring.GetUnitEffectiveBuildRange = function(unitID, unitDefID)
+		if not unitDefID then
+			return spGetUnitBuildParams(unitID, "buildRange")
+		else
+			return originalGetUnitEffectiveBuildRange(unitID, unitDefID)
+		end
+	end
+end
+
+if not Spring.GetFacingFromHeading then -- BAR 105-1921
+	Spring.GetFacingFromHeading = function (heading)
+		return math.floor((heading / 16384 + 0.5) % 4)
+	end
+	Spring.GetHeadingFromFacing = function (facing)
+		return facing == 1 and  16384
+		    or facing == 2 and  32767
+		    or facing == 3 and -16384
+		    or                      0
+	end
+end
+
+if not Spring.GetModelRootPiece then -- BAR 105-1924
+	Spring.GetModelRootPiece   = RET_ONE
+	Spring.GetUnitRootPiece    = RET_ONE
+	Spring.GetFeatureRootPiece = RET_ONE
+end
+
+Game.textColorCodes = Game.textColorCodes or -- BAR 105-1983
+	{ Color           = '\255'
+	, ColorAndOutline = '\254'
+	, Reset           = '\008'
+}
+
+if GL then -- BAR 105-1988
+	GL.FUNC_ADD              = GL.FUNC_ADD              or 32774
+	GL.FUNC_SUBTRACT         = GL.FUNC_SUBTRACT         or 32778
+	GL.FUNC_REVERSE_SUBTRACT = GL.FUNC_REVERSE_SUBTRACT or 32779
+	GL.MIN                   = GL.MIN                   or 32775
+	GL.MAX                   = GL.MAX                   or 32776
 end

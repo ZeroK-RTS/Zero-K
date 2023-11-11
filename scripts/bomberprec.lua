@@ -34,7 +34,7 @@ local SIG_TAKEOFF = 1
 local SIG_NOT_BLOCKED = 2
 local predictMult = 3
 
-local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
+local takeoffHeight = UnitDefNames["bomberprec"].cruiseAltitude
 local takeoffHeightInElmos = takeoffHeight*1.5
 local smokePiece = {fuselage, thrustr, thrustl}
 

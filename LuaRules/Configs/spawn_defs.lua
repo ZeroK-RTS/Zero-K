@@ -24,12 +24,6 @@ endlessMode				= false
 
 tooltipMessage			= "Kill chickens and collect their eggs to get metal."
 
-mexesUnitDefID = {
-	[-UnitDefNames.staticmex.id] = true,
-}
-mexes = {
-	"staticmex",
-}
 noTarget = {
 	terraunit=true,
 	wolverine_mine=true,

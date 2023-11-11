@@ -32,10 +32,9 @@ return { staticheavyarty = {
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 4,
   footprintZ                    = 4,
+  health                        = 4800,
   iconType                      = [[lrpc]],
   levelGround                   = false,
-  losEmitHeight                 = 90,
-  maxDamage                     = 4800,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,
   metalCost                     = 6000,
@@ -54,6 +53,7 @@ return { staticheavyarty = {
 
   },
 
+  sightEmitHeight               = 90,
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooo oooo oooo oooo]],

@@ -25,12 +25,10 @@ return { turretlaser = {
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
+  health                        = 785,
   iconType                      = [[defenseraider]],
   levelGround                   = false,
-  losEmitHeight                 = 60,
-  maxDamage                     = 785,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 90,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
@@ -45,6 +43,7 @@ return { turretlaser = {
     },
 
   },
+  sightEmitHeight               = 60,
   sightDistance                 = 554,  -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   waterline                     = 5,

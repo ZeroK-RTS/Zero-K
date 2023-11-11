@@ -2602,7 +2602,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					addValueToHeatmapInArea(enemyDefence,enemyDefenceHeatmap, ud.metalCost, x, z)
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.metal_extractor_mult then -- econ
 			addValueToHeatmap(enemyEconomy, enemyEconomyHeatmap, ud.metalCost, aX, aZ)
 		end
 		
@@ -2946,7 +2946,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost - ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count - 1
 				controlledUnit.airpadByID[unitID] = nil
-			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
+			elseif ud.customParams.metal_extractor_mult and buildDefs.econByDefId[unitDefID] then
 				if controlledUnit.mexByID[unitID].onDefenceHeatmap then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
 				end
@@ -3086,7 +3086,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 		units.cost = units.cost - ud.metalCost
 		units.cost = units.cost + ud.metalCost
 		
-		if ud.customParams.ismex then
+		if ud.customParams.metal_extractor_mult then
 			units.mex.count = units.mex.count - 1
 		end
 		units.factoryByID[unitID] = nil
@@ -3171,7 +3171,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					end
 				end
 				
-				-- if ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
+				-- if ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.metal_extractor_mult then -- econ
 					-- at.enemyForceComposition.unit.econ = at.enemyForceComposition.unit.econ - ud.metalCost
 				-- end --handled by "at.enemyEconomy.totalCost"
 				
@@ -3206,7 +3206,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost + ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count + 1
 				controlledUnit.airpadByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
-			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
+			elseif ud.customParams.metal_extractor_mult and buildDefs.econByDefId[unitDefID] then
 				local x,y,z = spGetUnitPosition(unitID)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
@@ -3343,7 +3343,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.econ[controlledUnit.econ.count] = unitID
 					controlledUnit.econByID[unitID] = {index = controlledUnit.econ.count,finished = false,
 						ud = ud,x = x, y = y, z = z, nearbyTurrets = 0, cost = ud.metalCost, onDefenceHeatmap = not built}
-				elseif ud.radarRadius > 0 then -- radar
+				elseif ud.radarDistance > 0 then -- radar
 					controlledUnit.radar.cost = controlledUnit.econ.cost + ud.metalCost
 					controlledUnit.radar.count = controlledUnit.econ.count + 1
 					controlledUnit.radarByID[unitID] = {finished = false, ud = ud,x = x, y = y, z = z, cost = ud.metalCost}
@@ -3357,7 +3357,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 	
 		units.cost = units.cost + ud.metalCost
 		
-		if ud.customParams.ismex then
+		if ud.customParams.metal_extractor_mult then
 			units.mex.count = units.mex.count + 1
 			units.mexByID[unitID] = true
 		elseif ud.isFactory then -- factory
@@ -3375,7 +3375,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				units.turretByID[unitID] = true
 			elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) then
 				units.econByID[unitID] = true
-			elseif ud.radarRadius > 0 then -- radar
+			elseif ud.radarDistance > 0 then -- radar
 				units.radarByID[unitID] = true
 			end
 		end
@@ -3400,7 +3400,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			controlledUnit.anyByID[unitID].finished = true
 			if unitDefID == buildDefs.airpadDefID then
 				controlledUnit.airpadByID[unitID].finished = true
-			elseif ud.customParams.ismex and buildDefs.econByDefId[unitDefID] then
+			elseif ud.customParams.metal_extractor_mult and buildDefs.econByDefId[unitDefID] then
 				controlledUnit.mexByID[unitID].finished = true
 			elseif ud.isFactory and buildDefs.factoryByDefId[unitDefID] then -- factory
 				a.conJob.factory.assignedBP = a.conJob.factory.assignedBP + ud.buildSpeed
@@ -3466,7 +3466,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					controlledUnit.turretByID[unitID].finished = true
 				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econByID[unitID].finished = true
-				elseif ud.radarRadius > 0 then -- radar
+				elseif ud.radarDistance > 0 then -- radar
 					controlledUnit.radarByID[unitID].finished = true
 				end
 			end

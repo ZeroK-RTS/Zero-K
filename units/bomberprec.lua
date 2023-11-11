@@ -18,7 +18,7 @@ return { bomberprec = {
   selectionVolumeScales  = [[129 34 81]],
   selectionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 180,
+  cruiseAltitude      = 180,
 
   customParams        = {
     modelradius      = [[15]],
@@ -35,16 +35,15 @@ return { bomberprec = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
+  health              = 1000,
   iconType            = [[bomberassault]],
   maneuverleashlength = [[1380]],
   maxAcc              = 0.5,
   maxBank             = 0.6,
-  maxDamage           = 1000,
   maxElevator         = 0.02,
   maxRudder           = 0.013,
   maxFuel             = 1000000,
   maxPitch            = 0.4,
-  maxVelocity         = 7.8,
   metalCost           = 300,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP TOOFAST]],
@@ -61,6 +60,7 @@ return { bomberprec = {
 
   },
   sightDistance       = 780,
+  speed               = 234,
   turnRadius          = 300,
   workerTime          = 0,
 

@@ -13,8 +13,9 @@ local smokePiece = {base, engineL, engineR}
 --variables
 local gun = false
 
-local RESTORE_DELAY = 150
+local RESTORE_FRAMES = 6
 local FIRE_SLOWDOWN = tonumber(UnitDef.customParams.combat_slowdown)
+local FIRE_TURN_INC = 3
 
 --signals
 local SIG_RESTORE = 2
@@ -83,14 +84,19 @@ local function RestoreAfterDelay()
 		Turn(engineR, x_axis, 0.6, 1)
 	end
 	
-	Sleep(RESTORE_DELAY)
+	for i = 1, RESTORE_FRAMES do
+		local prop = 1 - i / RESTORE_FRAMES
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN * prop + prop)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", FIRE_TURN_INC * prop + prop)
+		GG.UpdateUnitAttributes(unitID)
+		Sleep(33)
+	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 
 	-- Don't ask me why this must be called twice for planes, Spring is crazy
 	GG.UpdateUnitAttributes(unitID)
 	GG.UpdateUnitAttributes(unitID)
-	
 	
 	if getState() then
 		script.StartMoving()
@@ -105,7 +111,7 @@ function script.BlockShot(num)
 	else
 		if Spring.GetUnitRulesParam(unitID, "selfMoveSpeedChange") ~= FIRE_SLOWDOWN then
 			Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN)
-			Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/FIRE_SLOWDOWN)
+			Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", FIRE_TURN_INC)
 			GG.UpdateUnitAttributes(unitID)
 		end
 		StartThread(RestoreAfterDelay)

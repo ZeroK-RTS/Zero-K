@@ -16,7 +16,7 @@ return { gunshipheavyskirm = {
   collisionVolumeScales  = [[40 20 60]],
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 240,
+  cruiseAltitude      = 240,
 
   customParams        = {
     bait_level_default = 0,
@@ -33,11 +33,10 @@ return { gunshipheavyskirm = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
+  health              = 2800,
   hoverAttack         = true,
   iconType            = [[heavygunshipskirm]],
   maneuverleashlength = [[1280]],
-  maxDamage           = 2800,
-  maxVelocity         = 3.3,
   metalCost           = 760,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -54,6 +53,7 @@ return { gunshipheavyskirm = {
 
   },
   sightDistance       = 600,
+  speed               = 99,
   turnRate            = 600,
   workerTime          = 0,
 

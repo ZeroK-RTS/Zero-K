@@ -24,8 +24,6 @@ end
 --around 1/1/2017: added hold fire functionality, recall drones button, circular drone leash, drones pay attention to set target
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-include("LuaRules/Configs/customcmds.h.lua")
-
 local AddUnitDamage       = Spring.AddUnitDamage
 local CreateUnit          = Spring.CreateUnit
 local GetCommandQueue     = Spring.GetCommandQueue
@@ -46,7 +44,14 @@ local spGetGameFrame      = Spring.GetGameFrame
 local spGetUnitVelocity   = Spring.GetUnitVelocity
 local spGetUnitSeparation = Spring.GetUnitSeparation
 local random              = math.random
+
 local CMD_ATTACK          = CMD.ATTACK
+
+local SUC = Spring.Utilities.CMD
+local CMD_UNIT_SET_TARGET        = SUC.UNIT_SET_TARGET
+local CMD_UNIT_SET_TARGET_CIRCLE = SUC.UNIT_SET_TARGET_CIRCLE
+local CMD_RECALL_DRONES          = SUC.RECALL_DRONES
+local CMD_TOGGLE_DRONES          = SUC.TOGGLE_DRONES
 
 local INLOS_ACCESS = {inlos = true}
 

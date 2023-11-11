@@ -360,9 +360,9 @@
 		"helptext" : "Lo Spicula è un drone da battaglia veloce e multiruolo. Il suo cannone a raggi di particelle è efficace contro bersagli di superficie e di aria."
 	},
 	"bomberassault" : {
-		"name" : "Eclipse",
+		"name" : "Ragnarok",
 		"description" : "Bombardiere d'assalto (Anti-strutture)",
-		"helptext" : "Le bombe dell'Eclipse può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Eclipse, a causa delle grandi dimensioni, sono un bersaglio facile!"
+		"helptext" : "Le bombe dell'Ragnarok può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Ragnarok, a causa delle grandi dimensioni, sono un bersaglio facile!"
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -1170,9 +1170,9 @@
 		"helptext" : "E' il Chicken d'assalto definitivo. E' una mostruosità sputafuoco, dalla mascella di ferro e che vomita spore. Non conosce né paura né pietà. Ha uno scudo mucoso per proteggere se stesso e i chicken circostanti."
 	},
 	"bomberstrike" : {
-		"name" : "Kestrel",
+		"name" : "Penguin",
 		"description" : "Bombardiere d'attacco tattico",
-		"helptext" : "Il Kestrel lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
+		"helptext" : "Il Penguin lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",

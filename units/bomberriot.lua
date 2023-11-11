@@ -18,7 +18,7 @@ return { bomberriot = {
   selectionVolumeScales  = [[108 27 108]],
   selectionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
-  cruiseAlt           = 160,
+  cruiseAltitude      = 160,
 
   customParams        = {
     modelradius    = [[10]],
@@ -30,14 +30,13 @@ return { bomberriot = {
   floater             = true,
   footprintX          = 4,
   footprintZ          = 4,
+  health              = 1060,
   iconType            = [[bomberraider]],
   maxAcc              = 0.5,
-  maxDamage           = 1060,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.009,
   maxFuel             = 1000000,
-  maxVelocity         = 8.1,
   metalCost           = 360,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
@@ -55,6 +54,7 @@ return { bomberriot = {
 
   },
   sightDistance       = 780,
+  speed               = 243,
   turnRadius          = 160,
   workerTime          = 0,
 

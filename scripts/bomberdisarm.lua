@@ -11,7 +11,7 @@ local preDropMoved = false
 local sound_index = 0
 
 local SIG_TAKEOFF = 1
-local takeoffHeight = UnitDefNames["bomberdisarm"].wantedHeight
+local takeoffHeight = UnitDefNames["bomberdisarm"].cruiseAltitude
 
 function script.Create()
 	SetInitialBomberSettings()

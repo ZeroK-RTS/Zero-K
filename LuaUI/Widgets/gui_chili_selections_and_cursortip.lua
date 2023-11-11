@@ -169,13 +169,22 @@ local JUMP_RELOAD_PARAM = "jumpReload"
 local reloadBarColor = {013, 245, 243, 1}
 local fullHealthBarColor = {0, 255, 0, 1}
 
-local econStructureDefs = {
-	[UnitDefNames.staticmex.id] = {cost = UnitDefNames.staticmex.metalCost, mex = true},
-}
-for _, defName in pairs({"energywind", "energysolar", "energygeo", "energyheavygeo", "energyfusion", "energysingu"}) do
-	local def = UnitDefNames[defName]
-	econStructureDefs[def.id] = { cost = def.metalCost, income = def.customParams.income_energy }
+local econStructureDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	local cp = ud.customParams
+
+	local energyIncome = tonumber(cp.income_energy) or 0
+	if energyIncome > 0 then
+		econStructureDefs[i] = {cost = ud.metalCost, income = energyIncome}
+	end
+
+	local mexMult = tonumber(cp.metal_extractor_mult) or 0
+	if mexMult > 0 then
+		econStructureDefs[i] = {cost = ud.metalCost, mex = mexMult}
+	end
 end
+
 econStructureDefs[UnitDefNames.energywind.id].isWind = true
 
 local TIDAL_HEALTH = UnitDefNames.energywind.customParams.tidal_health
@@ -812,9 +821,10 @@ local function GetExtraBuildTooltipAndHealthOverride(unitDefID, mousePlaceX, mou
 	
 	if econDef.mex then
 		if mousePlaceX and WG.mouseoverMexIncome then
-			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(WG.mouseoverMexIncome * mult, 2)
+			local finalBaseIncome = WG.mouseoverMexIncome * mult * econDef.mex
+			local extraText = ", ".. WG.Translate("interface", "income") .. " +" .. math.round(finalBaseIncome, 2)
 			if WG.mouseoverMexIncome > 0 then
-				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost / (WG.mouseoverMexIncome * mult))
+				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(econDef.cost / finalBaseIncome)
 			else
 				return extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
 			end

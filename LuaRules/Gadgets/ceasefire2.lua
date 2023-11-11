@@ -36,12 +36,11 @@ local spSetTeamRulesParam	= Spring.SetTeamRulesParam
 local spSetGameRulesParam	= Spring.SetGameRulesParam
 
 local CMD_ATTACK            = CMD.ATTACK
+local CMD_ANTINUKEZONE      = Spring.Utilities.CMD.ANTINUKEZONE
 
 local cfData = {}
 local cloakedUnits = {}
 local gaiaAlliance, gaiaTeam
-
-include("LuaRules/Configs/customcmds.h.lua")
 
 local nukeDefs = {}
 local nukeNames = { 'staticnuke', }

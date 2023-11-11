@@ -167,8 +167,8 @@ local function ProcessComm(name, config)
 		end
 		
 		-- store base values
-		cp.basespeed = tostring(commDefs[name].maxvelocity)
-		cp.basehp = tostring(commDefs[name].maxdamage)
+		cp.basespeed = tostring(commDefs[name].speed)
+		cp.basehp = tostring(commDefs[name].health)
 		for i,v in pairs(commDefs[name].weapondefs or {}) do
 			v.customparams = v.customparams or {}
 			v.customparams.rangemod = 0
@@ -227,12 +227,12 @@ local function ProcessComm(name, config)
 		
 		-- apply attributemods
 		if attributeMods.speed > 0 then
-			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
+			commDefs[name].speed = commDefs[name].speed*(1+attributeMods.speed)
 		else
-			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
-			--commDefs[name].maxvelocity = commDefs[name].maxvelocity/(1-attributeMods.speed)
+			commDefs[name].speed = commDefs[name].speed*(1+attributeMods.speed)
+			--commDefs[name].speed = commDefs[name].speed/(1-attributeMods.speed)
 		end
-		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
+		commDefs[name].health = commDefs[name].health*(1+attributeMods.health)
 		
 		-- set costs
 		config.cost = config.cost or 0
@@ -339,8 +339,8 @@ for name, data in pairs(commDefs) do
 	ModifyWeaponRange(data, rangeBonus, true)
 
 	if data.customparams.speedbonus then
-		commDefs[name].customparams.basespeed = commDefs[name].customparams.basespeed or commDefs[name].maxvelocity
-		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
+		commDefs[name].customparams.basespeed = commDefs[name].customparams.basespeed or commDefs[name].speed
+		commDefs[name].speed = commDefs[name].speed + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
 	end
 	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
@@ -387,7 +387,7 @@ for name, data in pairs(commDefs) do
 		array.description = typeName .. " - " .. data.name
 		array.metal = data.metalcost * mult
 		array.reclaimtime = data.metalcost * mult
-		array.damage = data.maxdamage
+		array.damage = data.health
 		array.customparams = {}
 		array.customparams.unit = data.unitname
 	end

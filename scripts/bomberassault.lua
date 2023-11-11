@@ -21,6 +21,10 @@ local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
 include "bombers.lua"
 include "constants.lua"
 
+function ReammoComplete()
+	Show(bomb)
+end
+
 function script.Deactivate()
 	StopSpin(turbineTop, y_axis, 0.5);
 	StopSpin(turbineLeft, y_axis, 0.5);
@@ -37,6 +41,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	Move(bomb, y_axis, -10)
 end
 
 function script.QueryWeapon(num)
@@ -48,17 +53,23 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if num == 3 then
+		return false
+	end
 	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
 function script.FireWeapon(num)
-	if num == 1 then
+	Hide(bomb)
+	Move(bomb, y_axis, -14)
 	Sleep(66)
 	Reload()
-	end
 end
 
 function script.BlockShot(num, targetID)
+	if num == 1 or num == 3 then
+		return true
+	end
 	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 end
 

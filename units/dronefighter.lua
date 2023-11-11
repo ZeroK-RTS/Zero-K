@@ -15,7 +15,7 @@ return { dronefighter = {
   collisionVolumeScales  = [[25 8 40]],
   collisionVolumeType    = [[box]],
   crashDrag              = 0.02,
-  cruiseAlt              = 250,
+  cruiseAltitude         = 250,
   canLand                = false,
 
   customParams           = {
@@ -31,13 +31,12 @@ return { dronefighter = {
   footprintX             = 2,
   footprintZ             = 2,
   frontToSpeed           = 0,
+  health                 = 360,
   iconType               = [[fighter]],
   idleAutoHeal           = 10,
   idleTime               = 300,
   maneuverleashlength    = [[400]],
   maxAcc                 = 0.7,
-  maxDamage              = 360,
-  maxVelocity            = 8,
   maxElevator            = 0.02,
   maxRudder              = 0.006,
   --maxPitch               = 0.1,
@@ -62,6 +61,7 @@ return { dronefighter = {
 
   },
   sightDistance          = 520,
+  speed                  = 240,
   speedToFront           = 0,
   turnRate               = 9001,
   turnRadius             = 90,

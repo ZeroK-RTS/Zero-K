@@ -15,7 +15,7 @@ return { chickenflyerqueen = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  cruiseAlt           = 150,
+  cruiseAltitude      = 150,
 
   customParams        = {
     statsname = "chickenlandqueen",
@@ -29,15 +29,14 @@ return { chickenflyerqueen = {
   floater             = true,
   footprintX          = 8,
   footprintZ          = 8,
+  health              = 150000,
   hoverattack         = true,
   iconType            = [[chickenq]],
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
-  maxDamage           = 150000,
   maxSlope            = 36,
-  maxVelocity         = 3,
   metalCost           = 0,
   energyCost          = 0,
   buildTime           = 40000,
@@ -61,6 +60,7 @@ return { chickenflyerqueen = {
   },
   sightDistance       = 4096,
   sonarDistance       = 4096,
+  speed               = 90,
   turnRate            = 900,
   workerTime          = 0,
 

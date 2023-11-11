@@ -27,12 +27,10 @@ return { turretmissile = {
   floater                       = true,
   footprintX                    = 2,
   footprintZ                    = 2,
+  health                        = 340,
   iconType                      = [[defenseskirm]],
   levelGround                   = false,
-  losEmitHeight                 = 40,
-  maxDamage                     = 340,
   maxSlope                      = 36,
-  maxVelocity                   = 0,
   metalCost                     = 100,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
@@ -48,6 +46,7 @@ return { turretmissile = {
     },
 
   },
+  sightEmitHeight               = 40,
   sightDistance                 = 719, -- Range*1.1 + 48 for radar overshoot
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
