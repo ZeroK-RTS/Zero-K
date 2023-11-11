@@ -20,6 +20,9 @@ return { planelightscout = {
   customParams        = {
     bait_level_target      = 2,
 
+    boost_speed_mult = 3,
+    boost_duration = 90,
+
     modelradius    = [[8]],
     refuelturnradius = [[130]],
 
@@ -28,22 +31,29 @@ return { planelightscout = {
     outline_yoff = 10,
   },
 
-  explodeAs           = [[GUNSHIPEX]],
+  explodeAs           = [[PLANELIGHTSCOUT_DEATH]],
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
   health              = 350,
   iconType            = [[scoutplane]],
-  maxAcc              = 0.5,
+  maxAcc              = 0.6,
   maxAileron          = 0.016,
   maxElevator         = 0.022,
   maxRudder           = 0.012,
-  metalCost           = 235,
+  metalCost           = 230,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[planelightscout.s3o]],
   script              = [[planelightscout.lua]],
-  selfDestructAs      = [[GUNSHIPEX]],
+  selfDestructAs      = [[PLANELIGHTSCOUT_DEATH]],
+  sfxtypes               = {
+
+    explosiongenerators = {
+      [[custom:scan_trail]],
+    },
+
+  },
   sightDistance       = 950,
   speed               = 210,
   turnRadius          = 50,
@@ -69,4 +79,20 @@ return { planelightscout = {
 
   },
 
+  weaponDefs = {
+    PLANELIGHTSCOUT_DEATH = {
+      name               = "Scanner Payload",
+      areaOfEffect       = 16,
+      craterBoost        = 1,
+      craterMult         = 3,
+      damage = {
+        default          = 150.1,
+      },
+     
+      edgeEffectiveness  = 0.4,
+      explosionGenerator = "custom:scan_explode",
+      soundHit           = [[explosion/scan_explode]],
+      soundHitVolume     = 4,
+    },
+  }
 } }

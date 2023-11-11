@@ -905,6 +905,14 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
+	bomberassault = {
+		ok = {
+			[1] = "heavy_gunship_move",
+		},
+		select = {
+			[1] = "bomber_select",
+		},
+	},
 	bomberheavy = {
 		ok = {
 			[1] = "bomber_move",

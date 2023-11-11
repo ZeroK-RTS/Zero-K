@@ -16,18 +16,17 @@ local sleevel = piece 'sleevel'
 local sleever = piece 'sleever'
 local barrell = piece 'barrell'
 local barrelr = piece 'barrelr'
-local flarel = piece 'flarel'
-local flarer = piece 'flarer'
-local bombl = piece 'bombl'
-local bombr = piece 'bombr'
+local flaremissilel = piece 'flaremissilel'
+local flaremissiler = piece 'flaremissiler'
+local missiler = piece 'missiler'
+local missilel = piece 'missilel'
 
-local bFirepoint1 = false
-local bFirepoint2 = false
+local firstFirepoint = false
 
 local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["bomberstrike"].cruiseAltitude
 
-local DAMAGE = 540
+local OKP_DAMAGE = tonumber(UnitDefs[unitDefID].customParams.okp_damage)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -58,111 +57,78 @@ function script.StopMoving()
 	StartThread(GG.TakeOffFuncs.TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
-local function RestoreAfterDelay()
-	Sleep(Static_Var_1)
-	Turn(turret, y_axis, math.rad(180), math.rad(90))
-	Turn(sleevel, x_axis, 0, math.rad(50))
-	Turn(sleever, x_axis, 0, math.rad(50))
-end
-
 function script.AimWeapon(num, heading, pitch)
 	return true
 end
 
 function script.QueryWeapon(num)
-	if num == 1 then
-	return bFirepoint1 and bombl or bombr
-	elseif num == 2 then
-	return bFirepoint2 and flarel or flarer
-	end
+	return firstFirepoint and flaremissilel or flaremissiler
 end
 
 function script.AimFromWeapon(num)
-	if num == 1 then
-	return bFirepoint1 and bombl or bombr
-	elseif num == 2 then
-	return bFirepoint2 and flarel or flarer
-	end
+	return firstFirepoint and flaremissilel or flaremissiler
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then
-		return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
-	elseif num == 2 then
-		Signal(SIG_AIM_2)
-		SetSignalMask(SIG_AIM_2)
-		Turn(turret, y_axis, heading, math.rad(390))
-		Turn(sleevel, x_axis, 0, math.rad(350))
-		Turn(sleever, x_axis, 0, math.rad(350))
-		WaitForTurn(turret, y_axis)
-		WaitForTurn(sleevel, x_axis)
-		WaitForTurn(sleever, x_axis)
-		StartThread(RestoreAfterDelay)
-		return true
-	end
+	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
-
 function script.Shot(num)
-	if num == 1 then
-	bFirepoint1 = not bFirepoint1
-	elseif num == 2 then
 	EmitSfx(turret, 1025)
-	if bFirepoint2 then
-		EmitSfx(flarel, 1024)
+	if firstFirepoint then
+		EmitSfx(flaremissilel, 1024)
 	else
-		EmitSfx(flarer, 1024)
+		EmitSfx(flaremissiler, 1024)
 	end
-	bFirepoint2 = not bFirepoint2
-	end
+	firstFirepoint = not firstFirepoint
 end
 
 function script.FireWeapon(num)
-	if num == 1 then
-		Sleep(66)
-		Reload()
-	end
+	Hide(missiler)
+	Hide(missilel)
+	Sleep(66)
+	Reload()
 end
 
 function script.AimFromWeapon(num)
-	return bFirepoint2 and flarel or flarer
+	return firstFirepoint and flaremissilel or flaremissiler
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, DAMAGE, 140, 0.7, false, false) then
-                -- Remove attack command on blocked target, it's already dead so move on.
-                local cQueue = Spring.GetCommandQueue(unitID, 1)
-                if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-                        Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
-                end
-                return true
-        end
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, DAMAGE, 140, 0.7, false, false)
+	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, OKP_DAMAGE, 140, 0.7, false, false) then
+		-- Remove attack command on blocked target, it's already dead so move on.
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
+		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
+		end
+		return true
+	end
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, OKP_DAMAGE, 140, 0.7, false, false)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .5 then
-	Explode(fuselage, SFX.NONE)
-	Explode(head, SFX.NONE)
-	Explode(wingl, SFX.NONE)
-	Explode(wingr, SFX.NONE)
-	Explode(enginel, SFX.NONE)
-	Explode(enginer, SFX.NONE)
-	Explode(turret, SFX.NONE)
-	Explode(sleevel, SFX.NONE)
-	Explode(sleever, SFX.NONE)
-	return 1
+		Explode(fuselage, SFX.NONE)
+		Explode(head, SFX.NONE)
+		Explode(wingl, SFX.NONE)
+		Explode(wingr, SFX.NONE)
+		Explode(enginel, SFX.NONE)
+		Explode(enginer, SFX.NONE)
+		Explode(turret, SFX.NONE)
+		Explode(sleevel, SFX.NONE)
+		Explode(sleever, SFX.NONE)
+		return 1
 	else
-	Explode(fuselage, SFX.FALL + SFX.SMOKE)
-	Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE)
-	Explode(wingl, SFX.FALL + SFX.SMOKE)
-	Explode(wingr, SFX.FALL + SFX.SMOKE)
-	Explode(enginel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-	Explode(enginer, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
-	Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
-	Explode(sleevel, SFX.FALL + SFX.SMOKE)
-	Explode(sleever, SFX.FALL + SFX.SMOKE)
-	return 2
+		Explode(fuselage, SFX.FALL + SFX.SMOKE)
+		Explode(head, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(wingl, SFX.FALL + SFX.SMOKE)
+		Explode(wingr, SFX.FALL + SFX.SMOKE)
+		Explode(enginel, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(enginer, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE)
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(sleevel, SFX.FALL + SFX.SMOKE)
+		Explode(sleever, SFX.FALL + SFX.SMOKE)
+		return 2
 	end
 end

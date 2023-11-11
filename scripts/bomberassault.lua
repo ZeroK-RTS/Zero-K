@@ -48,17 +48,21 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if num == 3 then
+		return false
+	end
 	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
 function script.FireWeapon(num)
-	if num == 1 then
 	Sleep(66)
 	Reload()
-	end
 end
 
 function script.BlockShot(num, targetID)
+	if num == 1 or num == 3 then
+		return true
+	end
 	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 end
 

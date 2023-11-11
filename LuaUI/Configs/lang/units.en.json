@@ -360,9 +360,9 @@
 		"helptext" : "The Spicula is a fast multirole fighter drone whose particle beam is effective against both land and air targets."
 	},
 	"bomberassault" : {
-		"name" : "Eclipse",
+		"name" : "Ragnarok",
 		"description" : "Assault Bomber (Anti-Static)",
-		"helptext" : "The Eclipse's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
+		"helptext" : "The Ragnarok's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -1175,9 +1175,9 @@
 		"helptext" : "The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage."
 	},
 	"bomberstrike" : {
-		"name" : "Kestrel",
+		"name" : "Penguin",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
+		"helptext" : "The Penguin launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",

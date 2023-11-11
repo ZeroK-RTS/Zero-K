@@ -1,7 +1,7 @@
 return {
-      radius = 40.0,
-      height = 40.0,
+      radius = 35.0,
+      height = 35.0,
 	  tex1 = "wreck.dds",
 	  tex2 = "wreck2.dds",
-      midpos = {0,0,0},
+      midpos = {0,15,0},
 }

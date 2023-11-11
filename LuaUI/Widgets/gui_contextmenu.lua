@@ -867,7 +867,7 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ''
 		end
 
-		if wd.noExplode then
+		if wd.noExplode or cp.pretend_no_explode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
 			if not (cp.single_hit or cp.single_hit_multi) then
@@ -1142,8 +1142,10 @@ local function printAbilities(ud, unitID)
 		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.boost_duration)/30) .. 's'
-		cells[#cells+1] = ' - Reload: '
-		cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30) .. 's'
+		if cp.specialreloadtime then
+			cells[#cells+1] = ' - Reload: '
+			cells[#cells+1] = numformat(tonumber(cp.specialreloadtime)/30) .. 's'
+		end
 		if cp.boost_distance then
 			cells[#cells+1] = ' - Distance: '
 			cells[#cells+1] = numformat(tonumber(cp.boost_distance)) .. ' elmos (approx.)'

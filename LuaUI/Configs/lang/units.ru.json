@@ -362,7 +362,7 @@
 	"bomberassault" : {
 		"name" : "Затмение",
 		"description" : "Штурмовой бомбардировщик (против неподвижных целей)",
-		"helptext" : "Внушительный корпус Затмения (Eclipse) способен выдержать серьёзный обстрел и обеспечить доставку смертельного груза до цели, но использование бомб без систем наведения создаёт проблемы при атаке подвижных целей, а большой размер делает его легкой целью."
+		"helptext" : "Внушительный корпус Затмения (Ragnarok) способен выдержать серьёзный обстрел и обеспечить доставку смертельного груза до цели, но использование бомб без систем наведения создаёт проблемы при атаке подвижных целей, а большой размер делает его легкой целью."
 	},
 	"cloakassault" : {
 		"name" : "Рыцарь",
@@ -1172,7 +1172,7 @@
 	"bomberstrike" : {
 		"name" : "Пустельга",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
+		"helptext" : "The Penguin launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"staticrearm" : {
 		"name" : "ВВП",

@@ -360,9 +360,9 @@
 		"helptext" : "Spicula to dron-myśliwiec, który skutecznie atakuje cele naziemne i latające."
 	},
 	"bomberassault" : {
-		"name" : "Eclipse",
+		"name" : "Ragnarok",
 		"description" : "Bombowiec szturmowy (na budynki)",
-		"helptext" : "Mimo że przez swój rozmiar łatwo go trafić, Eclipse jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
+		"helptext" : "Mimo że przez swój rozmiar łatwo go trafić, Ragnarok jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -1175,9 +1175,9 @@
 		"helptext" : "Tiamat to wytrzymałe, ziejące ogniem i wypuszczające zarodniki monstrum z mocnymi szczękami i śluzową tarcza, ktora chroni okoliczne kurczaki."
 	},
 	"bomberstrike" : {
-		"name" : "Kestrel",
+		"name" : "Penguin",
 		"description" : "Bombowiec taktyczny",
-		"helptext" : "Kestrel wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
+		"helptext" : "Penguin wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
 	},
 	"staticrearm" : {
 		"name" : "Lądowisko",
