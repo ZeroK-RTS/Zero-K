@@ -47,6 +47,8 @@ return { planelightscout = {
   objectName          = [[planelightscout.s3o]],
   script              = [[planelightscout.lua]],
   selfDestructAs      = [[PLANELIGHTSCOUT_DEATH]],
+  selfDestructCountdown  = 0,
+  
   sfxtypes               = {
 
     explosiongenerators = {

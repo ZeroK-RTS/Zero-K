@@ -18,6 +18,7 @@ for i = 1,#WeaponDefs do
 	if wcp and wcp.child_chain_projectile then
 		chainDefs[i] = {
 			childDefID = WeaponDefNames[wcp.child_chain_projectile].id,
+			setSpeed = tonumber(wcp.child_chain_speed) or false,
 		}
 	end
 end
@@ -38,13 +39,22 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 	projectileParams.pos = {x, y, z}
 	
 	local vx, vy, vz = Spring.GetProjectileVelocity(proID)
+	local proSpeed = math.sqrt(vx*vx + vy*vy + vz*vz)
+	if chainDef.setSpeed then
+		local factor = chainDef.setSpeed/proSpeed
+		vx, vy, vz = vx * factor, vy * factor, vz * factor
+		proSpeed = chainDef.setSpeed
+	end
 	projectileParams["end"] = {x + vx, y + vy, z + vz}
-	projectileParams.speed = math.sqrt(vx*vx + vy*vy + vz*vz)
+	projectileParams.speed = proSpeed
 	
 	projectileParams.spread = {0, 0, 0}
 	projectileParams.error = projectileParams.spread
 	
-	projectileParams.owner = Spring.GetProjectileOwnerID(proID)
+	local ownerID = Spring.GetProjectileOwnerID(proID)
+	if Spring.ValidUnitID(ownerID) then
+		projectileParams.owner = ownerID
+	end
 	projectileParams.team = Spring.GetProjectileTeamID(proID)
 	
 	local newProID = Spring.SpawnProjectile(chainDef.childDefID, projectileParams)
