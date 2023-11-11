@@ -3,8 +3,11 @@ include "pieceControl.lua"
 
 local base, wakel, waker, hull, radar = piece ('base', 'wakel', 'waker', 'hull', 'radar')
 local turret = {piece('fturret'), piece('bturret')}
-local barrels = {piece('fbarrels'), piece('bbarrels')}
-local flare = {piece('fflare'), piece('bflare')}
+local barrels = {{piece('lmissile'), piece('rmissile')}, {piece('bbarrels')}}
+local flare = {{piece('flflare'), piece('frflare')}, {piece('blflare'), piece('brflare')}}
+local gunNum = {1, 1}
+
+local exhaust = {{piece('lexhaust'), piece('rexhaust')}}
 
 local SIG_Aim = {2, 4}
 
@@ -21,8 +24,10 @@ local function RestoreAfterDelay()
 	SetSignalMask(SIG_Aim[1] + SIG_Aim[2])
 	Sleep (5000)
 	for i = 1, 2 do
-		Turn (turret[i], y_axis, 0, math.rad(30))
-		Turn (barrels[i], x_axis, 0, math.rad(30))
+		Turn(turret[i], y_axis, 0, math.rad(30))
+		for j = 1, #barrels[i] do
+			Turn(barrels[i][j], x_axis, 0, math.rad(30))
+		end
 	end
 end
 
@@ -50,7 +55,9 @@ local function StunThread ()
 	for i = 1, 2 do
 		Signal (SIG_Aim[i])
 		GG.PieceControl.StopTurn (turret[i], y_axis)
-		GG.PieceControl.StopTurn (barrels[i], x_axis)
+		for j = 1, #barrels[i] do
+			GG.PieceControl.StopTurn (barrels[i][j], x_axis)
+		end
 	end
 end
 
@@ -75,6 +82,8 @@ end
 function script.Create()
 	StartThread(MoveScript)
 	StartThread(GG.Script.SmokeUnit, unitID, {hull, turret[1], turret[2]})
+	Turn(exhaust[1][1], y_axis, math.pi)
+	Turn(exhaust[1][2], y_axis, math.pi)
 end
 
 function script.AimFromWeapon(id)
@@ -82,7 +91,7 @@ function script.AimFromWeapon(id)
 end
 
 function script.QueryWeapon(id)
-	return flare[id]
+	return flare[id][gunNum[id]]
 end
 
 function script.AimWeapon(id, heading, pitch)
@@ -95,17 +104,28 @@ function script.AimWeapon(id, heading, pitch)
 
 	local slowMult = (Spring.GetUnitRulesParam(unitID,"baseSpeedMult") or 1)
 	Turn (turret[id], y_axis, heading, math.rad(360) * slowMult)
-	Turn (barrels[id], x_axis, -pitch, math.rad(360) * slowMult)
-
+	for i = 1, #barrels[id] do
+		Turn (barrels[id][i], x_axis, -pitch, math.rad(360) * slowMult)
+	end
+	
 	WaitForTurn (turret[id], y_axis)
-	WaitForTurn (barrels[id], x_axis)
+	WaitForTurn (barrels[id][1], x_axis)
 
 	StartThread (RestoreAfterDelay)
 
 	return true
 end
 
-local explodables = {turret[1], turret[2], barrels[1], barrels[2], radar}
+function script.Shot(id)
+	gunNum[id] = 3 - gunNum[id]
+	if id == 1 then
+		EmitSfx(exhaust[id][gunNum[id]], 1024)
+	end
+end
+
+
+
+local explodables = {turret[1], turret[2], barrels[1][1], barrels[1][2], barrels[2][1], radar}
 function script.Killed(severity, health)
 	severity = severity / health
 

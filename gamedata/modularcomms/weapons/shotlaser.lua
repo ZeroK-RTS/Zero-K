@@ -1,11 +1,9 @@
-local name = "commweapon_shotcannon"
+local name = "commweapon_shotlaser"
 local weaponDef = {
-	name                    = [[12 gauge]],
-	alphaDecay              = 0.3,
+	name                    = [[Shotgun]],
 	areaOfEffect            = 32,
 	burst                   = 3,
 	burstRate               = 0.033,
-	burnblow                = true,
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
@@ -17,14 +15,14 @@ local weaponDef = {
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
 		altforms = {
 			green = {
-				-- explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
+				explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
 				rgbColor = [[0 1 0]],
 			},
 		},
 
 		light_camera_height = 2000,
 		light_color = [[0.3 0.3 0.05]],
-		light_radius = 50,
+		light_radius = 120,
 		reaim_time = 1,
 	},
 
@@ -33,7 +31,7 @@ local weaponDef = {
 	},
 
 	duration                = 0.02,
-	explosionGenerator      = [[custom:ARCHPLOSION]],
+	explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
 	fireStarter             = 50,
 	heightMod               = 1,
 	impulseBoost            = 0,
@@ -43,18 +41,15 @@ local weaponDef = {
 	range                   = 285,
 	reloadtime              = 54/30,
 	rgbColor                = [[1 1 0]],
-	separation              = 1.2,
-	size                    = 2,
-	sizeDecay               = 0,
 	soundHit                = [[impacts/shotgun_impactv5]],
 	soundStart              = [[weapon/shotgun_firev4]],
 	soundStartVolume        = 0.6,
 	soundTrigger            = true,
 	sprayangle              = 1600,
-	stages                  = 20,
+	thickness               = 2,
 	tolerance               = 10000,
 	turret                  = true,
-	weaponType              = [[Cannon]],
+	weaponType              = [[LaserCannon]],
 	weaponVelocity          = 950,
 }
 

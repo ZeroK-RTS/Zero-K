@@ -32,6 +32,9 @@ return { shipaa = {
   footprintZ             = 4,
   health                 = 1900,
   iconType               = [[shipaa]],
+  losEmitHeight          = 40,
+  maxDamage              = 2400,
+  maxVelocity            = 2.84,
   metalCost              = 400,
   minWaterDepth          = 5,
   movementClass          = [[BOAT4]],
@@ -42,7 +45,15 @@ return { shipaa = {
   radarDistance          = 1000,
   script                 = [[shipaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
-  sightEmitHeight        = 40,
+
+  sfxtypes               = {
+
+    explosiongenerators = {
+      [[custom:CRASHMUZZLE]],
+    },
+
+  },
+
   sightDistance          = 660,
   sonarDistance          = 660,
   speed                  = 85.2,
@@ -54,7 +65,7 @@ return { shipaa = {
   weapons                = {
 
     [1] = {
-      def                = [[AALASER]],
+      def                = [[AA_MISSILE]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
@@ -115,48 +126,56 @@ return { shipaa = {
       weaponVelocity          = 1500,
     },
 
-    EMG           = {
-      name                    = [[Anti-Air Autocannon]],
-      alphaDecay              = 0.7,
-      burst                   = 11,
-      burstRate               = 0.033,
-      burnBlow                = false,
+    AA_MISSILE = {
+      name                    = [[Homing Missiles]],
+      areaOfEffect            = 48,
+      burst                   = 2,
+      burstRate               = 0.2,
       canattackground         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
+      cegTag                  = [[missiletrailblue]],
+      craterBoost             = 1,
+      craterMult              = 2,
       cylinderTargeting       = 1,
 
       customParams              = {
-        isaa = [[1]],
+        burst = Shared.BURST_RELIABLE,
 
-        light_camera_height = 1600,
-        light_color = [[0.9 0.86 0.45]],
-        light_radius = 140,
+        isaa = [[1]],
+        light_color = [[0.5 0.6 0.6]],
+        light_radius = 380,
       },
 
       damage                  = {
-        default = 1,
-        planes  = 25,
+        default = 7.2,
+        planes  = 72,
       },
 
-      explosionGenerator      = [[custom:ARCHPLOSION]],
-      impactOnly              = true,
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+      flightTime              = 3,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      intensity               = 0.8,
-      interceptedByShieldType = 1,
-      proximityPriority       = 4,
-      range                   = 1040,
-      reloadtime              = 2.2,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      sprayangle              = 512,
-      soundStart              = [[weapon/emg]],
-      stages                  = 10,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_fury.s3o]], -- Model radius 150 for QuadField fix.
+      noSelfDamage            = true,
+      range                   = 1000,
+      reloadtime              = 1.6,
+      trajectoryHeight        = 0.3,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startVelocity           = 650,
+      texture1                = [[flarescale01]],
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 9000,
+      tracks                  = true,
+      turnRate                = 63000,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 1750,
+      weaponAcceleration      = 141,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 850,
     },
+
   },
 
 
