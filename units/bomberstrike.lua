@@ -23,6 +23,7 @@ return { bomberstrike = {
     refuelturnradius = [[150]],
     modelradius      = [[10]],
     okp_damage       = 250, -- Not perfectly reliable
+    can_set_target   = [[1]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -55,7 +56,7 @@ return { bomberstrike = {
       def                = [[MISSILE]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 110,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SINK SUB]],
     },
   },

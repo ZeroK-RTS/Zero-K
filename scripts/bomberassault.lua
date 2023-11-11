@@ -61,6 +61,7 @@ end
 
 function script.FireWeapon(num)
 	Hide(bomb)
+	Move(bomb, y_axis, -14)
 	Sleep(66)
 	Reload()
 end

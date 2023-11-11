@@ -12,8 +12,8 @@ return { bomberassault = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  collisionVolumeOffsets = [[0 0 -5]],
-  collisionVolumeScales  = [[60 55 120]],
+  collisionVolumeOffsets = [[0 2 -5]],
+  collisionVolumeScales  = [[60 52 120]],
   collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
   crashDrag           = 0.02,
@@ -23,6 +23,7 @@ return { bomberassault = {
     refuelturnradius = [[350]],
     reammoseconds    = 30,
     modelradius      = [[10]],
+    can_set_target   = [[1]],
   },
 
   selfDestructAs         = [[ESTOR_BUILDING]],
