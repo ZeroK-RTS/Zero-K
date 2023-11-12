@@ -22,7 +22,7 @@ return { bomberstrike = {
     reammoseconds    = [[20]],
     refuelturnradius = [[150]],
     modelradius      = [[10]],
-    okp_damage       = 250, -- Not perfectly reliable
+    okp_damage       = 340, -- Not perfectly reliable
     can_set_target   = [[1]],
   },
 

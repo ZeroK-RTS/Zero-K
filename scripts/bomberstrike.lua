@@ -100,15 +100,20 @@ function script.AimFromWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, OKP_DAMAGE, 140, 0.7, false, false) then
-		-- Remove attack command on blocked target, it's already dead so move on.
-		local cQueue = Spring.GetCommandQueue(unitID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
-				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cQueue[1].tag, 0)
+	if GG.OverkillPrevention_CheckBlockNoFire(unitID, targetID, OKP_DAMAGE, 40, false, false, false) then
+		-- Remove attack command on blocked target, if it is followed by another attack command. This is commands queued in an area.
+		local cmdID, _, cmdTag, cp_1, cp_2 = Spring.GetUnitCurrentCommand(unitID)
+		if cmdID == CMD.ATTACK and (not cp_2) and cp_1 == targetID then
+			local cmdID_2, _, _, cp_1_2, cp_2_2 = Spring.GetUnitCurrentCommand(unitID, 2)
+			if cmdID_2 == CMD.ATTACK and (not cp_2_2) then
+				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+			end
 		end
 		return true
 	end
-	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 550, 40, 0.2, true, false, 0.8, 0.3, false)
+	Spring.Echo(unitID, targetID, OKP_DAMAGE)
+	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 550, 40, 0, true, false, 0.8)
 end
 
 function script.Killed(recentDamage, maxHealth)
