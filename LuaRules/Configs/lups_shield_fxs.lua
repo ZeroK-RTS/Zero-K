@@ -23,7 +23,7 @@ local SEARCH_SMALL = {
 local shieldStyles = {
 	noisy = {
 		shieldSize = "medium",
-		sizeDrift = 0.01,
+		sizeDrift = 0.012,
 		marginHQ = 2.8,
 		uvMul = 1.0,
 		hitResposeMult = 0.6,
@@ -31,7 +31,7 @@ local shieldStyles = {
 		drawBackCol = 0.9,
 		drawBackMargin = 1.8,
 		margin = 1.8,
-		shieldNoise = 4.2,
+		shieldNoise = 3.8,
 	},
 }
 
