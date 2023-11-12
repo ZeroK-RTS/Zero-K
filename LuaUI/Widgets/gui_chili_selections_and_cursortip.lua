@@ -89,6 +89,7 @@ local IMAGE = {
 	WIND_SPEED = 'LuaUI/images/windspeed.png',
 	METAL_RECLAIM = 'LuaUI/images/ibeamReclaim.png',
 	ENERGY_RECLAIM = 'LuaUI/images/energyReclaim.png',
+	NO_AMMO =  'LuaUI/images/noammo.png',
 }
 
 local CURSOR_ERASE = 'eraser'
@@ -230,6 +231,7 @@ end
 local manualFireTimeDefs = {}
 local specialReloadDefs = {}
 local jumpReloadDefs = {}
+local ammoRequiringDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	local unitWeapon = (ud and ud.weapons)
@@ -243,6 +245,9 @@ for unitDefID = 1, #UnitDefs do
 	end
 	if ud.customParams.canjump then
 		jumpReloadDefs[unitDefID] = -1 --Signifies that reload time is not stored
+	end
+	if ud.customParams.reammoseconds then
+		ammoRequiringDefs[unitDefID] = true
 	end
 end
 
@@ -725,11 +730,15 @@ local function GetUnitShieldRegenString(unitID, ud)
 
 	-- FIXME: take energy stall into account
 	local wd = WeaponDefs[ud.shieldWeaponDef]
-	local regen = mult * (wd.customParams.shield_rate or wd.shieldPowerRegen)
-	if math.abs(math.ceil(regen) - regen) < 0.05 then
-		return " (+" .. math.ceil(regen - 0.2) .. ")"
+	local regen = tonumber(wd.customParams.shield_rate or wd.shieldPowerRegen)
+	if not wd.customParams.slow_immune then
+		regen = mult * regen
 	end
-	return " (+" .. strFormat("%+.1f", regen) .. ")"
+	local sign = (regen > 0) and "+" or ""
+	if math.abs(math.ceil(regen) - regen) < 0.05 then
+		return " (" .. sign .. math.ceil(regen - 0.2) .. ")"
+	end
+	return " (" .. sign .. strFormat("%+.1f", regen) .. ")"
 end
 
 local function IsUnitInLos(unitID)
@@ -742,6 +751,13 @@ local function IsUnitInLos(unitID)
 	end
 	local state = Spring.GetUnitLosState(unitID)
 	return state and state.los
+end
+
+local function GetUnitNeedRearm(unitID, unitDefID)
+	if not ammoRequiringDefs[unitDefID] then
+		return false
+	end
+	return spGetUnitRulesParam(unitID, "noammo") == 1
 end
 
 local function GetManualFireReload(unitID, unitDefID)
@@ -1126,6 +1142,40 @@ local function GetBarWithImage(parentControl, name, initY, imageFile, color, col
 	return UpdateBar
 end
 
+local function GetImage(parentControl, name, initY, imageFile, iconSize, xOffset)
+	iconSize = iconSize or ICON_SIZE
+	xOffset = xOffset or 0
+	
+	local image = Chili.Image:New{
+		name = name .. "_image",
+		x = xOffset,
+		y = initY,
+		width = iconSize,
+		height = iconSize,
+		file = imageFile,
+		parent = parentControl,
+	}
+	image:SetVisibility(false)
+	
+	local function Update(visible, newImage, yPos)
+		image:SetVisibility(visible)
+		if not visible then
+			return
+		end
+		if yPos then
+			image:SetPos(nil, yPos, nil, nil, nil, true)
+			label:SetPos(nil, yPos + textOffset, nil, nil, nil, true)
+		end
+		if newImage ~= imageFile then
+			imageFile = newImage
+			image.file = imageFile
+			image:Invalidate()
+		end
+	end
+	
+	return Update
+end
+
 local function GetImageWithText(parentControl, name, initY, imageFile, caption, fontSize, iconSize, textOffset, xOffset)
 	fontSize = fontSize or IMAGE_FONT
 	iconSize = iconSize or ICON_SIZE
@@ -1308,6 +1358,7 @@ local function GetUnitGroupIconButton(parentControl)
 	local unitID
 	local unitList
 	local unitCount
+	local unitpicBadgeUpdate
 	
 	local size = options.uniticon_size.value
 	
@@ -1377,6 +1428,13 @@ local function GetUnitGroupIconButton(parentControl)
 				jumpBar = UpdateManualFireReload(jumpBar, unitImage, unitID, false, JUMP_RELOAD_PARAM, jumpReloadTime, true)
 			elseif jumpBar then
 				jumpBar:SetVisibility(false)
+			end
+			local needRearm = GetUnitNeedRearm(unitID, unitDefID)
+			if needRearm and (not unitpicBadgeUpdate) then
+				unitpicBadgeUpdate = GetImage(unitImage, "costInfoUpdate", 4, IMAGE.NO_AMMO, ICON_SIZE, 4)
+			end
+			if unitpicBadgeUpdate then
+				unitpicBadgeUpdate(needRearm, IMAGE.NO_AMMO)
 			end
 			return
 		end
@@ -1892,8 +1950,9 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	local energyInfoUpdate = GetImageWithText(leftPanel, "energyInfoUpdate", PIC_HEIGHT + 2*LEFT_SPACE + 4, IMAGE.ENERGY, nil, nil, ICON_SIZE, 4)
 	local maxHealthLabel = GetImageWithText(rightPanel, "maxHealthLabel", PIC_HEIGHT + 4, IMAGE.HEALTH, nil, NAME_FONT, ICON_SIZE, 2, 2)
 	
-	local minWindLabel = GetImageWithText(leftPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)	
+	local minWindLabel = GetImageWithText(leftPanel, "minWindLabel", PIC_HEIGHT + LEFT_SPACE + 4, IMAGE.WIND_SPEED, nil, nil, ICON_SIZE, 4)
 	local healthBarUpdate = GetBarWithImage(rightPanel, "healthBarUpdate", PIC_HEIGHT + 4, IMAGE.HEALTH, {0, 1, 0, 1}, GetHealthColor)
+	local unitpicBadgeUpdate = GetImage(unitImage, "costInfoUpdate", 4, IMAGE.NO_AMMO, ICON_SIZE, 4)
 	
 	local metalInfo
 	local energyInfo
@@ -1992,6 +2051,7 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			unitDesc:SetText(GetDescription(ud, unitID))
 		end
 		
+		unitpicBadgeUpdate(GetUnitNeedRearm(unitID, unitDefID), IMAGE.NO_AMMO)
 		UpdateReloadTime(unitID, unitDefID)
 		
 		return showMetalInfo
