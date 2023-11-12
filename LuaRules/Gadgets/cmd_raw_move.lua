@@ -308,7 +308,7 @@ local function StuckUnitCloseEnough(unitData, distSq)
 	return distSq <= GIVE_UP_STUCK_DIST_SQ
 end
 
-local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
+local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp, canFinish)
 	if spMoveCtrlGetTag(unitID) then
 		--Spring.Echo("ret 10")
 		return true, false
@@ -316,7 +316,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 
 	if #cmdParams < 3 then
 		--Spring.Echo("ret 9")
-		return true, true
+		return true, canFinish
 	end
 
 	local mx, my, mz = cmdParams[1], cmdParams[2], cmdParams[3]
@@ -374,7 +374,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 		end
 		StopRawMoveUnit(unitID, true)
 		--Spring.Echo("ret 7")
-		return true, true
+		return true, canFinish
 	end
 
 	if canFlyDefs[unitDefID] then
@@ -409,7 +409,7 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
 				if canGiveUp and StuckUnitCloseEnough(unitData, distSq) then
 					StopRawMoveUnit(unitID, true)
 					--Spring.Echo("ret 4")
-					return true, true
+					return true, canFinish
 				else
 					local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 					local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
@@ -495,8 +495,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD_AIR_MANUALFIRE) then
 		return false
 	end
-	local canGiveUp = not (cmdID == CMD_RAW_BUILD) -- Build orders are never removed, so raw build should not be either.
-	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp)
+	local canGiveUp = not (cmdID == CMD_RAW_BUILD or cmdID == CMD_AIR_MANUALFIRE)
+	local canFinish = not (cmdID == CMD_AIR_MANUALFIRE)
+	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp, canFinish)
 	return cmdUsed, cmdRemove
 end
 
