@@ -734,7 +734,7 @@ local function GetUnitShieldRegenString(unitID, ud)
 	if not wd.customParams.slow_immune then
 		regen = mult * regen
 	end
-	local sign = (regen > 0) and "+" or ""
+	local sign = (regen >= 0) and "+" or ""
 	if math.abs(math.ceil(regen) - regen) < 0.05 then
 		return " (" .. sign .. math.ceil(regen - 0.2) .. ")"
 	end
