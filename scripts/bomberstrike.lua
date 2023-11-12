@@ -49,6 +49,11 @@ function script.Create()
 	Hide(barrell)
 	Hide(sleever)
 	Hide(barrelr)
+	
+	Move(flaremissilel, y_axis, 18)
+	Move(flaremissiler, y_axis, 18)
+	Move(flaremissilel, z_axis, 1)
+	Move(flaremissiler, z_axis, 1)
 end
 
 function script.StartMoving()
@@ -112,7 +117,6 @@ function script.BlockShot(num, targetID)
 		end
 		return true
 	end
-	Spring.Echo(unitID, targetID, OKP_DAMAGE)
 	return GG.Script.OverkillPreventionCheck(unitID, targetID, OKP_DAMAGE, 550, 40, 0, true, false, 0.8)
 end
 

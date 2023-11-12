@@ -68,6 +68,7 @@ return { bomberstrike = {
       name                    = [[Heavy Missiles]],
       areaOfEffect            = 48,
       cegTag                  = [[missiletrailyellow]],
+      collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
