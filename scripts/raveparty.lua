@@ -16,7 +16,7 @@ end
 
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(2.5)
+local headingSpeed = math.rad(3)
 local pitchSpeed = math.rad(61) -- Float maths makes this exactly one revolution every 6 seconds.
 
 guns[5].y = 11
@@ -65,7 +65,7 @@ local minSpinMult = 0.2
 local spinScriptAccel = 0.05
 local maxSpin = math.pi/3
 
-local maxGainStoreTotal = 0.045
+local maxGainStoreTotal = 0.062
 local maxLoseSpinStoreTotal = -0.15
 local maxStoreFrames = 150
 local defaultTimeFrames = 30
