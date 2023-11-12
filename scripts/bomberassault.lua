@@ -1,4 +1,5 @@
 local bomb = piece('bomb');
+local bombEmit = piece('bombEmit');
 local exhaustLeft = piece('exhaustLeft');
 local exhaustRight = piece('exhaustRight');
 local exhaustTop = piece('exhaustTop');
@@ -41,15 +42,16 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Move(bomb, y_axis, -14)
+	Move(bomb, y_axis, -8)
+	Move(bombEmit, y_axis, -8)
 end
 
 function script.QueryWeapon(num)
-	return bomb
+	return bombEmit
 end
 
 function script.AimFromWeapon(num)
-	return bomb
+	return bombEmit
 end
 
 function script.AimWeapon(num, heading, pitch)
