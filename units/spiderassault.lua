@@ -22,7 +22,7 @@ return { spiderassault = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  health                 = 1500,
+  health                 = 1550,
   iconType               = [[spiderassault]],
   leaveTracks            = true,
   maxSlope               = 36,
@@ -45,7 +45,7 @@ return { spiderassault = {
   },
 
   sightDistance          = 420,
-  speed                  = 51,
+  speed                  = 54,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

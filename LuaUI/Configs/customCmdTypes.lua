@@ -27,7 +27,7 @@ local custom_cmd_actions = {
 	reclaim = {cmdType = 1, name = "Reclaim"},
 	resurrect = {cmdType = 1, name = "Resurrect"},
 	manualfire = {cmdType = 1, name = "Fire Special Weapon"},
-	airmanualfire = {cmdType = 1, name = "Fire Special Weapon"},
+	airmanualfire = {cmdType = 1, name = "Fire Special Weapon (Aircraft)"},
 	loadunits = {cmdType = 1, name = "Load Units"},
 	unloadunits = {cmdType = 1, name = "Unload Units"},
 	areaattack = {cmdType = 1, name = "Area Attack"},

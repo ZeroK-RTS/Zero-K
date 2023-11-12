@@ -28,11 +28,11 @@ local SIG_Aim = 2
 --constants
 local sa = math.rad(-10)
 local ma = math.rad(40)
-local pause = 440
+local pause = 330
 
-local forward = 2.2
-local backward = 2
-local up = 1
+local forward = 2.2*1.35
+local backward = 2*1.35
+local up = 1*1.35
 
 local gun = false
 
