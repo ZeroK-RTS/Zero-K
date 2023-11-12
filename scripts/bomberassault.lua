@@ -41,7 +41,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
-	Move(bomb, y_axis, -10)
+	Move(bomb, y_axis, -14)
 end
 
 function script.QueryWeapon(num)
@@ -61,7 +61,6 @@ end
 
 function script.FireWeapon(num)
 	Hide(bomb)
-	Move(bomb, y_axis, -14)
 	Sleep(66)
 	Reload()
 end
