@@ -379,8 +379,11 @@ local function HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp, canFinish)
 
 	if canFlyDefs[unitDefID] then
 		if unitData.commandHandled then
-			--Spring.Echo("ret 6")
-			return true, false
+			local moveData = Spring.GetUnitMoveTypeData(unitID)
+			if moveData and (math.abs(mx - (moveData.goalx or 0)) < 0.1 and math.abs(mz - (moveData.goalz or 0)) < 0.1) then
+				--Spring.Echo("ret 6")
+				return true, false
+			end
 		end
 		unitData.switchedFromRaw = true
 		unitData.commandHandled = true
