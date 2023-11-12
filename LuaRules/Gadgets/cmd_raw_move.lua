@@ -156,7 +156,7 @@ local moveRawCmdDesc = {
 
 local airManualFireCmdDesc = {
 	id      = CMD_AIR_MANUALFIRE,
-	type    = CMDTYPE.ICON_MAP,
+	type    = CMDTYPE.ICON_UNIT_OR_MAP,
 	name    = 'Air Manual Fire',
 	cursor  = 'ManualFire', -- add with LuaUI?
 	action  = 'airmanualfire',
@@ -497,6 +497,21 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	local canGiveUp = not (cmdID == CMD_RAW_BUILD or cmdID == CMD_AIR_MANUALFIRE)
 	local canFinish = not (cmdID == CMD_AIR_MANUALFIRE)
+	if (cmdID == CMD_AIR_MANUALFIRE) and not cmdParams[3] and Spring.ValidUnitID(cmdParams[1]) then
+		local tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
+			function ()
+				local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(cmdParams[1], true, true)
+				ty = math.max(0, Spring.GetGroundHeight(tx, tz))
+				return tx, ty, tz
+			end)
+		if tz then
+			cmdParams[1] = tx
+			cmdParams[2] = ty
+			cmdParams[3] = tz
+		else
+			return true, false
+		end
+	end
 	local cmdUsed, cmdRemove = HandleRawMove(unitID, unitDefID, cmdParams, canGiveUp, canFinish)
 	return cmdUsed, cmdRemove
 end

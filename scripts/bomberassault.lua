@@ -34,18 +34,31 @@ function ReammoComplete()
 end
 
 local function AirManualFireThread()
+	local unitFollow = 0
 	while true do
-		local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
-		--if cmdID == CMD_AIR_MANUALFIRE then
-		--	if not cp_3 then
-		--	
-		--	end
-		--	local canShoot = Spring.GetUnitWeaponTestTarget ( number unitID, number weaponNum, number targetID | number posX, number posY, number posZ ) 
+		local cmdID, cmdOpts, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
 		if cmdID == CMD_AIR_MANUALFIRE then
-			Spring.SetUnitTarget(unitID, cp_1, cp_2, cp_3, false, false, 4)
-			manualTarget_p1 = cp_1
-			manualTarget_p2 = cp_2
-			manualTarget_p3 = cp_3
+			if cp_3 then
+				Spring.SetUnitTarget(unitID, cp_1, cp_2, cp_3, false, false, 4)
+				manualTarget_p1 = cp_1
+				manualTarget_p2 = cp_2
+				manualTarget_p3 = cp_3
+			elseif unitFollow then
+				if cp_1 and Spring.ValidUnitID(cp_1) then
+					local tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
+						function ()
+							local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(cp_1, true, true)
+							ty = math.max(0, Spring.GetGroundHeight(tx, tz))
+							return tx, ty, tz
+						end)
+					if tx then
+						Spring.SetUnitTarget(unitID, tx, ty, tz, false, false, 4)
+						manualTarget_p1 = tx
+						manualTarget_p2 = ty
+						manualTarget_p3 = tz
+					end
+				end
+			end
 		else
 			manualTarget_p1 = false
 			manualTarget_p2 = false
@@ -54,6 +67,7 @@ local function AirManualFireThread()
 		--else
 		--	
 		--end
+		unitFollow = (unitFollow + 1)%3
 		Sleep(33)
 	end
 end

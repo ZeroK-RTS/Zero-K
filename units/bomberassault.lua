@@ -232,7 +232,7 @@ return { bomberassault = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       model                   = [[m-8_projectile.s3o]],
-      myGravity               = 0.4,
+      myGravity               = 0.25,
       noSelfDamage            = true,
       range                   = 550,
       reloadtime              = 5.6,
@@ -243,7 +243,7 @@ return { bomberassault = {
       soundStartVolume        = 16,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 340,
+      weaponVelocity          = 300,
     },
 
   },
