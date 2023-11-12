@@ -1446,6 +1446,9 @@ local function GetUnitGroupIconButton(parentControl)
 		if jumpBar then
 			jumpBar:SetVisibility(false)
 		end
+		if unitpicBadgeUpdate then
+			unitpicBadgeUpdate(false)
+		end
 		
 		local totalHealth, totalMax = 0, 0
 		for i = 1, #unitList do
