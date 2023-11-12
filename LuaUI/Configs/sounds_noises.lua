@@ -1373,6 +1373,14 @@ local sounds = {
 			[1] = "shield_select",
 		},
 	},
+	statictempshield = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "shield_select",
+		},
+	},
 	staticjammer = {
 		ok = {
 			[1] = "turret_move",

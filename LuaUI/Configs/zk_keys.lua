@@ -94,6 +94,7 @@ return {
 		{	"selfd",	"C+d",},
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
+		{	"airmanualfire",	"d",},
 		{	"oneclickwep",	"d",},
 		{	"placebeacon",	"d",},
 		{	"selectmissiles",	"Any+d"},

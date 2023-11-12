@@ -117,6 +117,15 @@ staticshieldBall = {
 	noIconDraw = true,
 	quality = 3, -- High
 }
+staticshieldBallSmall = {
+	piece = "glow",
+	life = math.huge,
+	size = 6.5,
+	colormap1 = {{0.95, 0.1, 0.95, 0.9}},
+	repeatEffect = true,
+	noIconDraw = true,
+	quality = 3, -- High
+}
 
 staticshieldBurstsBig = {
 	layer      = -35,
@@ -135,6 +144,25 @@ staticshieldBurstsBig = {
 	repeatEffect = true,
 	noIconDraw = true,
 	count      = 8,
+	quality = 3, -- High
+}
+staticshieldBurstsSmall = {
+	layer      = -35,
+	life       = math.huge,
+	piece      = "glow",
+	rotSpeed   = 0.7,
+	rotSpread  = 0,
+	arc        = 50,
+	arcSpread  = 0,
+	size       = 11,
+	sizeSpread = 5,
+	texture    = "bitmaps/GPL/Lups/shieldbursts5.png",
+	--colormap   = { {1, 0.6, 1, 0.8} },
+	colormap   = { {1, 0.3, 1, 0.8} },
+	directional= true,
+	repeatEffect = true,
+	noIconDraw = true,
+	count      = 4,
 	quality = 3, -- High
 }
 ----------------------------------------------------------------------------

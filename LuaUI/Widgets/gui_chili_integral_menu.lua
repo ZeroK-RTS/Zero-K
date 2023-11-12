@@ -79,6 +79,7 @@ local DRAW_NAME_COMMANDS = {
 local DYNAMIC_COMMANDS = {
 	[CMD_ONECLICK_WEAPON] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD_AIR_MANUALFIRE] = true,
 }
 
 local REMOVE_TAG_FRAMES = 180 -- Game frames between reseting the tag removal table.

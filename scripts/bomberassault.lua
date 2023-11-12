@@ -19,11 +19,54 @@ local wingTopRear = piece('wingTopRear');
 
 local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
 
+local CMD_AIR_MANUALFIRE = Spring.Utilities.CMD.AIR_MANUALFIRE
+local manualfireWeapon = tonumber(UnitDefs[unitDefID].customParams.air_manual_fire_weapon)
+
 include "bombers.lua"
 include "constants.lua"
 
+local manualTarget_p1 = false
+local manualTarget_p2 = false
+local manualTarget_p3 = false
+
 function ReammoComplete()
 	Show(bomb)
+end
+
+local function AirManualFireThread()
+	while true do
+		local cmdID, _, cmdTag, cp_1, cp_2, cp_3 = Spring.GetUnitCurrentCommand(unitID)
+		--if cmdID == CMD_AIR_MANUALFIRE then
+		--	if not cp_3 then
+		--	
+		--	end
+		--	local canShoot = Spring.GetUnitWeaponTestTarget ( number unitID, number weaponNum, number targetID | number posX, number posY, number posZ ) 
+		if cmdID == CMD_AIR_MANUALFIRE then
+			Spring.SetUnitTarget(unitID, cp_1, cp_2, cp_3, false, false, 4)
+			manualTarget_p1 = cp_1
+			manualTarget_p2 = cp_2
+			manualTarget_p3 = cp_3
+		else
+			manualTarget_p1 = false
+			manualTarget_p2 = false
+			manualTarget_p3 = false
+		end
+		--else
+		--	
+		--end
+		Sleep(33)
+	end
+end
+
+local function IsManualFireTargetValid()
+	local targetType, isUser, targetParams = Spring.GetUnitWeaponTarget(unitID, 4)
+	if targetType == 2 then
+		if targetParams and targetParams[1] == manualTarget_p1 and
+				targetParams[2] == manualTarget_p2 and targetParams[3] == manualTarget_p3 then
+			return true
+		end
+	end
+	return false
 end
 
 function script.Deactivate()
@@ -42,6 +85,7 @@ end
 
 function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(AirManualFireThread)
 	Move(bomb, y_axis, -8)
 	Move(bombEmit, y_axis, -8)
 end
@@ -55,10 +99,13 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 3 then
+	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return false
 	end
-	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	if num == manualfireWeapon then
+		return IsManualFireTargetValid()
+	end
+	return true
 end
 
 function script.FireWeapon(num)
@@ -68,7 +115,7 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 1 or num == 3 then
+	if num == 1 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
 		return true
 	end
 	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))

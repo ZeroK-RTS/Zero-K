@@ -146,6 +146,7 @@ local formationCmds = {
 	[CMD.FIGHT] = true,
 	[CMD.ATTACK] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD_AIR_MANUALFIRE] = true,
 	[CMD.PATROL] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_JUMP] = true, -- jump
@@ -169,6 +170,7 @@ local movementCmds = {
 local requiresAlt = {
 	[CMD.ATTACK] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD_AIR_MANUALFIRE] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
@@ -184,9 +186,9 @@ local overrideCmds = {
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
 local positionCmds  =  {
-	[CMD.MOVE] = true,        [CMD_RAW_MOVE] = true,    [CMD_RAW_BUILD] = true,  [CMD.ATTACK] = true,     [CMD.RECLAIM] = true,      [CMD.RESTORE] = true,
-	[CMD.PATROL] = true,      [CMD.CAPTURE] = true,     [CMD.FIGHT] = true,      [CMD.MANUALFIRE] = true, [CMD_JUMP] = true,         [CMD.RESURRECT] = true,
-	[CMD.UNLOAD_UNIT] = true, [CMD.UNLOAD_UNITS] = true,[CMD.LOAD_UNITS] = true, [CMD.GUARD] = true,      [CMD.AREA_ATTACK]  =  true,
+	[CMD.MOVE] = true,        [CMD_RAW_MOVE] = true,    [CMD_RAW_BUILD] = true,    [CMD.ATTACK] = true,     [CMD.RECLAIM] = true,        [CMD.RESTORE] = true,
+	[CMD.PATROL] = true,      [CMD.CAPTURE] = true,     [CMD.FIGHT] = true,        [CMD.MANUALFIRE] = true, [CMD_AIR_MANUALFIRE] = true, [CMD_JUMP] = true,
+	[CMD.RESURRECT] = true,   [CMD.UNLOAD_UNIT] = true, [CMD.UNLOAD_UNITS] = true, [CMD.LOAD_UNITS] = true, [CMD.GUARD] = true,          [CMD.AREA_ATTACK]  =  true,
 }
 
 --------------------------------------------------------------------------------
@@ -349,14 +351,14 @@ local function GetUnitFinalPosition(uID)
 end
 
 local function SetColor(cmdID, alpha)
-	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE then glColor(0.5, 1.0, 0.5, alpha) -- Green
-	elseif cmdID == CMD_ATTACK                 then glColor(1.0, 0.2, 0.2, alpha) -- Red
-	elseif cmdID == CMD.MANUALFIRE             then glColor(1.0, 1.0, 1.0, alpha) -- White
-	elseif cmdID == CMD_UNLOADUNIT             then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
-	elseif cmdID == CMD_UNIT_SET_TARGET        then glColor(1.0, 0.75, 0.0, alpha) -- Orange
-	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE then glColor(1.0, 0.75, 0.0, alpha) -- Orange
-	elseif cmdID == CMD_JUMP                   then glColor(0.2, 1.0, 0.2, alpha) -- Deeper Green
-	else                                            glColor(0.5, 0.5, 1.0, alpha) -- Blue
+	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE             then glColor(0.5, 1.0, 0.5, alpha) -- Green
+	elseif cmdID == CMD_ATTACK                                    then glColor(1.0, 0.2, 0.2, alpha) -- Red
+	elseif cmdID == CMD.MANUALFIRE or cmdID == CMD_AIR_MANUALFIRE then glColor(1.0, 1.0, 1.0, alpha) -- White
+	elseif cmdID == CMD_UNLOADUNIT                                then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
+	elseif cmdID == CMD_UNIT_SET_TARGET                           then glColor(1.0, 0.75, 0.0, alpha) -- Orange
+	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE                    then glColor(1.0, 0.75, 0.0, alpha) -- Orange
+	elseif cmdID == CMD_JUMP                                      then glColor(0.2, 1.0, 0.2, alpha) -- Deeper Green
+	else                                                               glColor(0.5, 0.5, 1.0, alpha) -- Blue
 	end
 end
 

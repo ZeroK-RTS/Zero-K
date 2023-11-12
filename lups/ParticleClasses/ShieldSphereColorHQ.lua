@@ -106,12 +106,12 @@ function ShieldSphereColorHQParticle:Draw()
 	gl.Culling(GL.FRONT)
 	-- Noise should only vary from 0.0 to 1.0
 	local noiseLevel = 0
-	if self.rechargeDelay > 0 then
+	if self.rechargeDelay > 0 or self.shieldNoise then
 		gl.UniformInt(methodUniform, 2)
 		local hitTime = Spring.GetUnitRulesParam(self.unit, "shieldHitFrame") or -999999
 		local currTime = Spring.GetGameFrame()
-		local cooldown = hitTime + self.rechargeDelay * 30 - currTime
-		if cooldown > 0 then
+		local cooldown = hitTime + (self.rechargeDelay or 0) * 30 - currTime
+		if cooldown > 0 and self.rechargeSpinupTime then
 			local rampDown = 1.0
 			if cooldown < self.rechargeSpinupTime then
 				rampDown = cooldown / self.rechargeSpinupTime
@@ -136,7 +136,7 @@ function ShieldSphereColorHQParticle:Draw()
 			end
 		end
 	end
-	gl.Uniform(shieldRechargingNoiseUniform, noiseLevel)
+	gl.Uniform(shieldRechargingNoiseUniform, noiseLevel + (self.shieldNoise or 0))
 
 	local col1, col2 = GetShieldColor(self.unit, self)
 

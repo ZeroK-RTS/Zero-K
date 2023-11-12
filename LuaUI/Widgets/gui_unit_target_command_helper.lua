@@ -64,6 +64,7 @@ local handledCommand = {
 	[CMD.UNLOAD_UNITS] = true,
 	[CMD.CAPTURE] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD_AIR_MANUALFIRE] = true,
 
 	[CMD_UNIT_SET_TARGET] = true,
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true,

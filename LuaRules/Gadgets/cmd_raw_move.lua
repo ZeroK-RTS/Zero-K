@@ -12,6 +12,7 @@ end
 
 local SUC = Spring.Utilities.CMD
 local CMD_RAW_MOVE = SUC.RAW_MOVE
+local CMD_AIR_MANUALFIRE = SUC.AIR_MANUALFIRE
 
 if gadgetHandler:IsSyncedCode() then
 
@@ -68,6 +69,8 @@ local queueFrontCommand = {
 
 local canMoveDefs = {}
 local canFlyDefs = {}
+local hasAirManualFire = {}
+
 local goalDist = {}
 local turnDiameterSq = {}
 local turnPeriods = {}
@@ -123,6 +126,9 @@ for i = 1, #UnitDefs do
 				loneStopDist = math.min(loneStopDist, 80)
 			end
 			goalDist[i] = 8
+			if ud.customParams.air_manual_fire_weapon then
+				hasAirManualFire[i] = true
+			end
 		end
 		if stopDist then
 			stopDistSq[i] = stopDist*stopDist
@@ -146,6 +152,15 @@ local moveRawCmdDesc = {
 	cursor  = 'Move', -- add with LuaUI?
 	action  = 'rawmove',
 	tooltip = 'Move: Move to a position. Click and drag to line move.',
+}
+
+local airManualFireCmdDesc = {
+	id      = CMD_AIR_MANUALFIRE,
+	type    = CMDTYPE.ICON_MAP,
+	name    = 'Air Manual Fire',
+	cursor  = 'ManualFire', -- add with LuaUI?
+	action  = 'airmanualfire',
+	tooltip = 'Manual fire for aircraft.',
 }
 
 local TEST_MOVE_SPACING = 16
@@ -477,7 +492,7 @@ end
 -- Command Handling
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
-	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD) then
+	if not (cmdID == CMD_RAW_MOVE or cmdID == CMD_RAW_BUILD or cmdID == CMD_AIR_MANUALFIRE) then
 		return false
 	end
 	local canGiveUp = not (cmdID == CMD_RAW_BUILD) -- Build orders are never removed, so raw build should not be either.
@@ -487,7 +502,8 @@ end
 
 local function CheckUnitQueues()
 	for unitID,_ in pairs(unitQueuesToCheck) do
-		if spGetUnitCurrentCommand(unitID) ~= CMD_RAW_MOVE then
+		local currentCommand = spGetUnitCurrentCommand(unitID)
+		if currentCommand ~= CMD_RAW_MOVE and currentCommand ~= CMD_AIR_MANUALFIRE then
 			StopRawMoveUnit(unitID)
 		end
 		unitQueuesToCheck[unitID] = nil
@@ -511,11 +527,12 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if constructorBuildDistDefs[unitDefID] and not rawBuildUpdateIgnore[cmdID] then
 		fastConstructorUpdate = fastConstructorUpdate or {}
 		fastConstructorUpdate[#fastConstructorUpdate + 1] = unitID
-		--Spring.Utilities.UnitEcho(unitID, cmdID)
 	end
 
 	if canMoveDefs[unitDefID] then
-		if cmdID == CMD_STOP or ((not cmdOptions.shift) and (cmdID < 0 or stopCommand[cmdID])) then
+		if cmdID == CMD_AIR_MANUALFIRE then
+			return hasAirManualFire[unitDefID]
+		elseif cmdID == CMD_STOP or ((not cmdOptions.shift) and (cmdID < 0 or stopCommand[cmdID])) then
 			StopRawMoveUnit(unitID)
 		elseif cmdID == CMD_INSERT and (cmdParams[1] == 0 or not cmdOptions.alt) then
 			StopRawMoveUnit(unitID)
@@ -527,10 +544,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if cmdID == CMD_INSERT then
 			cmdID = cmdParams[2]
 		end
-		if cmdID == CMD_RAW_MOVE then
+		if cmdID == CMD_RAW_MOVE or cmdID == CMD_AIR_MANUALFIRE then
 			return false
 		end
 	end
+	
 	return true
 end
 
@@ -845,6 +863,7 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
+	gadgetHandler:RegisterCMDID(CMD_AIR_MANUALFIRE)
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
@@ -860,6 +879,10 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if (canMoveDefs[unitDefID]) then
 		spInsertUnitCmdDesc(unitID, moveRawCmdDesc)
 	end
+	if (hasAirManualFire[unitDefID]) then
+		spInsertUnitCmdDesc(unitID, airManualFireCmdDesc)
+	end
+	
 	if constructorBuildDistDefs[unitDefID] and not constructorByID[unitID] then
 		AddConstructor(unitID, constructorBuildDistDefs[unitDefID])
 	end
@@ -921,6 +944,10 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 	Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "RawMove", {0.5, 1.0, 0.5, 0.7}) -- "" mean there's no MOVE cursor if the command is drawn.
 	Spring.AssignMouseCursor("RawMove", "cursormove", true, true)
+	
+	gadgetHandler:RegisterCMDID(CMD_AIR_MANUALFIRE)
+	Spring.SetCustomCommandDrawData(CMD_AIR_MANUALFIRE, "AirManualFire", {1.0, 0.2, 0.2, 0.4})
+	Spring.AssignMouseCursor("AirManualFire", "cursordgun", true)
 end
 
 end

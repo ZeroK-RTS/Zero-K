@@ -68,12 +68,16 @@ end
 local DEFAULT_REAMMO_DRAIN = 10
 local DEFAULT_REPAIR_BP = 2.5
 
+local LAND_SPEED_MULT = 0.82 -- Tweaked for visuals.
+
 local REPAIR_COST_FACTOR = Game.repairEnergyCostFactor
 
 local padSnapRangeSqr = 80^2
 local resTable = {e = 0, m = 0}
 
 local turnRadius = {}
+local maxBank = {}
+local lowerExponent = {}
 local reammoFrames = {}
 local reammoDrain = {}
 local padRepairBp = {}
@@ -88,6 +92,8 @@ for i = 1, #UnitDefs do
 		else
 			turnRadius[i] = ud.turnRadius
 		end
+		maxBank[i] = tonumber(ud.customParams.refuelmaxbank) or 0.8
+		lowerExponent[i] = tonumber(ud.customParams.refueldiveexponent) or 2.5
 		rotateUnit[i] = true
 	elseif movetype == 1 then -- gunship
 		turnRadius[i] = 20
@@ -320,7 +326,7 @@ local function CircleToLand(unitID, goal)
 	local vx,vy,vz = spGetUnitVelocity(unitID)
 	local maxSpeed = sqrt(vx*vx + vy*vy + vz*vz)
 	
-	local targetSpeed = ud.speed/30
+	local targetSpeed = ud.speed/30 * LAND_SPEED_MULT
 	
 	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
 	
@@ -446,8 +452,8 @@ local function CircleToLand(unitID, goal)
 	-- end
 	
 	-- Straight line Version
-	local function TimeToVerticalPositon(t)
-		return start[2] + (goal[2] - start[2])*t/estimatedTime
+	local function TimeToVerticalPositon(t, exponent)
+		return start[2] + (goal[2] - start[2])*math.pow(t/estimatedTime, exponent)
 	end
 	
 	--[[
@@ -467,7 +473,8 @@ local function CircleToLand(unitID, goal)
 	
 	local rollStopFudgeDistance = maxSpeed*25
 	local rollSpeed = 0.03
-	local maxRoll = 0.8
+	local maxRoll = maxBank[unitDefID]
+	local exponent = lowerExponent[unitDefID]
 	
 	-- Move control stuff
 	if not unitMovectrled[unitID] then
@@ -495,9 +502,13 @@ local function CircleToLand(unitID, goal)
 				return
 			end
 			
-			local px, pz = DistanceToPosition(currentDistance)
-			local py = TimeToVerticalPositon(currentTime)
-			local direction = DistanceToDirection(currentDistance)
+			local smoothedTravel = currentDistance / totalDist
+			smoothedTravel = math.pow(math.max(0, smoothedTravel - 0.1), 2)*(1 - smoothedTravel) + smoothedTravel
+			smoothedTravel = smoothedTravel * totalDist
+			
+			local px, pz = DistanceToPosition(smoothedTravel)
+			local py = TimeToVerticalPositon(currentTime, exponent)
+			local direction = DistanceToDirection(smoothedTravel)
 			
 			if rotateUnit[unitDefID] then
 				mcSetRotation(unitID,0,-direction,-roll)

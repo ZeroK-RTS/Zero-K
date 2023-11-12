@@ -82,6 +82,10 @@ effectUnitDefs = {
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=355, strength = .001, precision=50, repeatEffect=true, quality = 1, onActive = true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
 	},
+	statictempshield = {
+		{class='Bursts', options=staticshieldBurstsSmall},
+		{class='ShieldSphere', options= staticshieldBallSmall},
+	},
 	shieldfelon = {
 	--{class='Bursts', options=MergeTable({piece="lpilot"},staticshieldBursts)},
 	--{class='Bursts', options=MergeTable({piece="rpilot"},staticshieldBursts)},

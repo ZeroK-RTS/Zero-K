@@ -32,6 +32,7 @@ local cmdPosDef = {
 	[CMD_NEWTON_FIREZONE]      = {pos = 7, priority = -3},
 	
 	[CMD.MANUALFIRE]      = {pos = 7, priority = 0.1},
+	[CMD_AIR_MANUALFIRE]  = {pos = 7, priority = 0.12},
 	[CMD_PLACE_BEACON]    = {pos = 7, priority = 0.2},
 	[CMD_ONECLICK_WEAPON] = {pos = 7, priority = 0.24},
 	[CMD.STOCKPILE]       = {pos = 7, priority = 0.25},

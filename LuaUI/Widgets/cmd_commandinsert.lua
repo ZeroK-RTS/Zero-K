@@ -30,6 +30,7 @@ local positionCommand = {
 	[CMD.RECLAIM] = true,
 	[CMD.RESURRECT] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD_AIR_MANUALFIRE] = true,
 	[CMD.GUARD] = true,
 	[CMD.FIGHT] = true,
 	[CMD.ATTACK] = true,

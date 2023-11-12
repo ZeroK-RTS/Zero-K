@@ -84,6 +84,7 @@ return { amphlaunch = {
       craterMult              = 0,
 
       customParams            = {
+        ui_manual_fire = 1,
         lups_noshockwave = [[1]],
         thower_weapon    = 1,
       },

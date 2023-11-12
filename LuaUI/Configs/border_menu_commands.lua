@@ -205,6 +205,7 @@ local overrides = {
 	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {caption = '\255\0\255\0B', texture = imageDir .. 'Bold/build.png'},
 	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png'},
+	[CMD_AIR_MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png'},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
@@ -293,6 +294,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	reclaim=1,
 	resurrect=1,
 	manualfire=1,
+	airmanualfire=1,
 	loadunits=1,
 	unloadunits=1,
 	areaattack=1,

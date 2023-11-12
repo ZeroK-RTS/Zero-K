@@ -463,7 +463,7 @@ local function weapons2Table(cells, ws, unitID)
 		name = name .. " (water only)"
 	end
 
-	if wd.manualFire then
+	if wd.manualFire or cp.ui_manual_fire then
 		name = name .. " (manual fire)"
 	end
 	
@@ -857,7 +857,7 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ''
 		end
 
-		if not wd.avoidFriendly and not wd.noFriendlyCollide then
+		if not wd.avoidFriendly and not wd.noFriendlyCollide and not cp.ui_no_friendly_fire then
 			cells[#cells+1] = ' - Potential friendly fire'
 			cells[#cells+1] = ''
 		end

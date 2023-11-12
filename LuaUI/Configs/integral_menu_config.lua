@@ -60,6 +60,7 @@ local commandDisplayConfig = {
 	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png', tooltip = "Resurrect: Spend energy to turn a wreck into a unit."},
 	[CMD_BUILD] = {texture = imageDir .. 'Bold/build.png'},
 	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the unit's special weapon."},
+	[CMD_AIR_MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', tooltip = "Fire Special Weapon: Fire the unit's special weapon."},
 	[CMD.STOCKPILE] = {tooltip = "Stockpile: Queue missile production. Right click to reduce the queue."},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', tooltip = "Load: Pick up a unit. Click and drag to load unit in an area."},

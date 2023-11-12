@@ -3,6 +3,8 @@
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 
+local CMD_AIR_MANUALFIRE = Spring.Utilities.CMD.AIR_MANUALFIRE
+
 -- old crappy way
 --[[
 local function ReloadQueue(queue, cmdTag)
@@ -72,7 +74,7 @@ function Reload()
 		if cmdID == CMD.AREA_ATTACK then
 			areaAttack = cmd.params
 		end
-		if cmdID == CMD.AREA_ATTACK or cmdID == CMD.ATTACK then
+		if cmdID == CMD.AREA_ATTACK or cmdID == CMD.ATTACK or cmdID == CMD_AIR_MANUALFIRE then
 			re = ReloadQueue(queue, cmd)
 		end
 	end

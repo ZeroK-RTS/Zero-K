@@ -7,6 +7,7 @@ local configList = {
 	{cmdID = CMD_BUILD_PLATE           , default = true, name = "Build Plate"},
 	{cmdID = CMD_EMBARK                , default = true, name = "Embark"},
 	{cmdID = CMD.MANUALFIRE            , default = true, name = "Fire Special Weapon"},
+	{cmdID = CMD_AIR_MANUALFIRE        , default = true, name = "Fire Special Weapon (Aircraft)"},
 	{cmdID = CMD.ATTACK                , default = true, name = "Force Fire"},
 	{cmdID = CMD_JUMP                  , default = true, name = "Jump"},
 	{cmdID = CMD.LOAD_UNITS            , default = true, name = "Load"},

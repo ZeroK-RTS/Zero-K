@@ -1104,9 +1104,14 @@ local icontypes = {
   --landmines
   mine = {
     bitmap='icons/mine.dds',
-	distance=0.75,
-    size=1.4,
+    distance=0.75,
+    size=1.2,
   },
+  tempshield = {
+    bitmap='icons/tempshield.dds',
+    size=1.2,
+  },
+  
 
   --facs
   factory = {

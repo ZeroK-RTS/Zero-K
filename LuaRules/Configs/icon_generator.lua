@@ -131,6 +131,9 @@ unitConfigs = {
   [UnitDefNames.staticshield.id] = {
     unfold = true,
   },
+  [UnitDefNames.statictempshield.id] = {
+    unfold = true,
+  },
   	
   [UnitDefNames.tankarty.id] = {
     unfold = true,

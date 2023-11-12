@@ -360,9 +360,9 @@
 		"helptext" : "Lo Spicula è un drone da battaglia veloce e multiruolo. Il suo cannone a raggi di particelle è efficace contro bersagli di superficie e di aria."
 	},
 	"bomberassault" : {
-		"name" : "Ragnarok",
+		"name" : "Odin",
 		"description" : "Bombardiere d'assalto (Anti-strutture)",
-		"helptext" : "Le bombe dell'Ragnarok può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Ragnarok, a causa delle grandi dimensioni, sono un bersaglio facile!"
+		"helptext" : "Le bombe dell'Odin può provocare danni significativi mentre è costantemente in fiamme, ma. non essendo guidata, ha problemi nel colpire bersagli mobili. Le unità Odin, a causa delle grandi dimensioni, sono un bersaglio facile!"
 	},
 	"cloakassault" : {
 		"name" : "Knight",

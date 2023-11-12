@@ -757,7 +757,8 @@ local function GetUnitNeedRearm(unitID, unitDefID)
 	if not ammoRequiringDefs[unitDefID] then
 		return false
 	end
-	return spGetUnitRulesParam(unitID, "noammo") == 1
+	local reammoState = (spGetUnitRulesParam(unitID, "noammo") or 0)
+	return reammoState == 1 or reammoState == 2
 end
 
 local function GetManualFireReload(unitID, unitDefID)

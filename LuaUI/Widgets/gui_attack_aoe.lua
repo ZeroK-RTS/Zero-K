@@ -71,6 +71,7 @@ local spGetUnitDefID         = Spring.GetUnitDefID
 
 local CMD_ATTACK             = CMD.ATTACK
 local CMD_MANUALFIRE         = CMD.MANUALFIRE
+local CMD_AIR_MANUALFIRE     = Spring.Utilities.CMD.AIR_MANUALFIRE
 local g                      = Game.gravity
 local GAME_SPEED             = 30
 local g_f                    = g / GAME_SPEED / GAME_SPEED
@@ -273,7 +274,8 @@ local function SetupUnit(unitDef, unitID)
 		return
 	end
 
-	local weapon1, weapon2, manualfireWeapon, rangeMult
+	local weapon1, weapon2, rangeMult
+	local manualfireWeapon = unitDef.customParams.air_manual_fire_weapon and tonumber(unitDef.customParams.air_manual_fire_weapon)
 	if unitID then
 		weapon1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
 		weapon2 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
@@ -802,7 +804,7 @@ function widget:DrawWorld()
 	if (cmd == CMD_ATTACK and aoeUnitInfo) then
 		info = aoeUnitInfo
 		unitID = aoeUnitID
-	elseif (cmd == CMD_MANUALFIRE and dgunUnitInfo) then
+	elseif ((cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) and dgunUnitInfo) then
 		info = dgunUnitInfo
 		local extraDrawParam = Spring.GetUnitRulesParam(dgunUnitID, "secondary_range")
 		if extraDrawParam then
@@ -870,7 +872,7 @@ function widget:DrawWorld()
 		DrawAoE(tx, ty, tz, info.aoe, info.ee, false, false, info.circleMode)
 	end
 
-	if (cmd == CMD_MANUALFIRE) and info.range then
+	if ((cmd == CMD_MANUALFIRE) or (cmd == CMD_AIR_MANUALFIRE)) and info.range then
 		glColor(1, 0, 0, 0.75)
 		glLineWidth(1)
 		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)

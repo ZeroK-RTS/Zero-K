@@ -20,6 +20,21 @@ local SEARCH_SMALL = {
 	{0, -1},
 }
 
+local shieldStyles = {
+	noisy = {
+		shieldSize = "medium",
+		sizeDrift = 0.01,
+		marginHQ = 2.8,
+		uvMul = 1.0,
+		hitResposeMult = 0.6,
+		drawBack = 0.75,
+		drawBackCol = 0.9,
+		drawBackMargin = 1.8,
+		margin = 1.8,
+		shieldNoise = 4.2,
+	},
+}
+
 local SEARCH_MULT = 1
 local SEARCH_BASE = 16
 local DIAG = 1/math.sqrt(2)
@@ -40,9 +55,10 @@ local searchSizes = {}
 local shieldUnitDefs = {}
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
+	local cp = ud.customParams
 
-	if ud.customParams.shield_radius then
-		local radius = tonumber(ud.customParams.shield_radius)
+	if cp.shield_radius then
+		local radius = tonumber(cp.shield_radius)
 		if not searchSizes[radius] then
 			local searchType = (radius > 250 and SEARCH_LARGE) or SEARCH_SMALL
 			local search = {}
@@ -55,11 +71,23 @@ for unitDefID = 1, #UnitDefs do
 		----==== myShield ====----
 
 		local myShield = Spring.Utilities.CopyTable(ShieldSphereBase, true)
-		if radius > 250 then
+		if cp.shield_draw_style and shieldStyles[cp.shield_draw_style] then
+			local style = shieldStyles[cp.shield_draw_style]
+			myShield.shieldSize     = style.shieldSize     or myShield.shieldSize
+			myShield.sizeDrift      = style.sizeDrift      or myShield.sizeDrift
+			myShield.marginHQ       = style.marginHQ       or myShield.marginHQ
+			myShield.uvMul          = style.uvMul          or myShield.uvMul
+			myShield.hitResposeMult = style.hitResposeMult or myShield.hitResposeMult
+			myShield.drawBack       = style.drawBack       or myShield.drawBack
+			myShield.drawBackCol    = style.drawBackCol    or myShield.drawBackCol
+			myShield.drawBackMargin = style.drawBackMargin or myShield.drawBackMargin
+			myShield.margin         = style.margin         or myShield.margin
+			myShield.shieldNoise    = style.shieldNoise    or myShield.shieldNoise
+		elseif radius > 250 then
 			if radius > 400 then
 				myShield.shieldSize = "huge"
 				--==  HQ  ==--
-				myShield.sizeDrift = 0.0;
+				myShield.sizeDrift = 0.001;
 				myShield.marginHQ = 2.8
 				myShield.uvMul = 1.0
 				--== /HQ  ==--
@@ -100,20 +128,20 @@ for unitDefID = 1, #UnitDefs do
 			myShield.margin = 1.8
 			myShield.hitResposeMult = 1
 		end
-		myShield.rechargeDelay = tonumber(ud.customParams.shield_recharge_delay) or 0
+		myShield.rechargeDelay = tonumber(cp.shield_recharge_delay) or 0
 
 		myShield.size = radius
 		myShield.radius = radius
-		myShield.pos = {0, tonumber(ud.customParams.shield_emit_height) or 0, tonumber(ud.customParams.shield_emit_offset) or 0}
+		myShield.pos = {0, tonumber(cp.shield_emit_height) or 0, tonumber(cp.shield_emit_offset) or 0}
 
-		local strengthMult = tonumber(ud.customParams.shield_color_mult)
+		local strengthMult = tonumber(cp.shield_color_mult)
 		if strengthMult then
 			myShield.colormap1[1][4] = strengthMult*myShield.colormap1[1][4]
 			myShield.colormap1[2][4] = strengthMult*myShield.colormap1[2][4]
 		end
 		
 		-- Very powerful non-chicken shields get a different look
-		local shieldPower = tonumber(ud.customParams.shield_power)
+		local shieldPower = tonumber(cp.shield_power)
 		local decayFactor = 0.1
 		if shieldPower > 10000 then
 			myShield.texture = "bitmaps/PD/shieldblank.png"
@@ -162,8 +190,8 @@ for unitDefID = 1, #UnitDefs do
 		shieldUnitDefs[unitDefID] = {
 			fx = fxTable,
 			search = searchSizes[radius],
-			shieldCapacity = tonumber(ud.customParams.shield_power),
-			damageMultShieldCapacity = tonumber(ud.customParams.shield_power_gfx_override or ud.customParams.shield_power),
+			shieldCapacity = tonumber(cp.shield_power),
+			damageMultShieldCapacity = tonumber(cp.shield_power_gfx_override or cp.shield_power),
 			decayFactor = decayFactor,
 			shieldPos = myShield.pos,
 			shieldRadius = radius,

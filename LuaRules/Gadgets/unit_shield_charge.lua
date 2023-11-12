@@ -47,15 +47,18 @@ for unitDefID = 1, #UnitDefs do
 	if ud.shieldWeaponDef and not ud.customParams.dynamic_comm then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		if shieldWep.customParams then
+			local wcp = shieldWep.customParams
 			local def = {
 				maxCharge = shieldWep.shieldPower,
-				chargePerUpdate = PERIOD*tonumber(shieldWep.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
-				startPower = shieldWep.customParams.shieldstartingpower and tonumber(shieldWep.customParams.shieldstartingpower),
+				chargePerUpdate = PERIOD*tonumber(wcp.shield_rate)/TEAM_SLOWUPDATE_RATE,
+				startPower = wcp.shieldstartingpower and tonumber(wcp.shieldstartingpower),
+				slowImmune = wcp.slow_immune and true or false,
+				dieOnEmpty = wcp.die_on_empty and true or false,
 			}
-			if shieldWep.customParams.shield_drain and tonumber(shieldWep.customParams.shield_drain) > 0 then
-				def.perUpdateCost = PERIOD*tonumber(shieldWep.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE
-				def.perSecondCost = tonumber(shieldWep.customParams.shield_drain)
-				def.rechargeDelay = shieldWep.customParams.shield_recharge_delay and tonumber(shieldWep.customParams.shield_recharge_delay)
+			if wcp.shield_drain and tonumber(wcp.shield_drain) > 0 then
+				def.perUpdateCost = PERIOD*tonumber(wcp.shield_drain)/TEAM_SLOWUPDATE_RATE
+				def.perSecondCost = tonumber(wcp.shield_drain)
+				def.rechargeDelay = wcp.shield_recharge_delay and tonumber(wcp.shield_recharge_delay)
 			end
 			shieldUnitDefID[unitDefID] = def
 		end
@@ -90,6 +93,7 @@ function gadget:GameFrame(n)
 
 	local updatePriority = (n % TEAM_SLOWUPDATE_RATE == 0)
 	local setParam = ((n % 30) == 8)
+	local toDestroy = false
 	
 	for i = 1, unitCount do
 		local data = unitList[i]
@@ -108,9 +112,9 @@ function gadget:GameFrame(n)
 			end
 		end
 		
-		if enabled and charge < def.maxCharge and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
+		if enabled and (charge < def.maxCharge or def.chargePerUpdate < 0) and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			-- Get changed charge rate based on slow
-			local newChargeRate = GetChargeRate(unitID)
+			local newChargeRate = (def.slowImmune and 1) or GetChargeRate(unitID)
 			
 			if data.resTable then
 				if data.oldChargeRate ~= newChargeRate then
@@ -131,6 +135,14 @@ function gadget:GameFrame(n)
 				chargeAdd = chargeAdd*overProportion
 			end
 
+			if charge + chargeAdd <= 0 then
+				chargeAdd = -charge
+				if def.dieOnEmpty then
+					toDestroy = toDestroy or {}
+					toDestroy[#toDestroy + 1] = unitID
+				end
+			end
+			
 			-- Check if the change can be carried out
 			if (not data.resTable) or ((GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable))) then
 				spSetUnitShieldState(unitID, data.shieldNum, charge + chargeAdd)
@@ -139,10 +151,21 @@ function gadget:GameFrame(n)
 		
 		-- Drain shields on paralysis etc..
 		if enabled ~= data.enabled then
+			if def.dieOnEmpty and (not enabled) then
+				toDestroy = toDestroy or {}
+				toDestroy[#toDestroy + 1] = unitID
+			end
 			if not enabled then
 				spSetUnitShieldState(unitID, -1, 0)
 			end
 			data.enabled = enabled
+		end
+	end
+	
+	if toDestroy then
+		for i = 1, #toDestroy do
+			local unitID = toDestroy[i]
+			Spring.DestroyUnit(unitID, true)
 		end
 	end
 end
