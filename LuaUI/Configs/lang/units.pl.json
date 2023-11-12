@@ -967,7 +967,7 @@
 	"shipaa" : {
 		"name" : "Zephyr",
 		"description" : "Fregata przeciwlotnicza",
-		"helptext" : "Zapewnia flocie ochronę przed wrogim lotnictwem przy użyciu podwójych działek laserowych."
+		"helptext" : "Zapewnia flocie ochronę przed wrogim lotnictwem przy użyciu działka laserowego i rakiet."
 	},
 	"shipheavyarty" : {
 		"name" : "Shogun",

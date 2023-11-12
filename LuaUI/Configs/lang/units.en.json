@@ -967,7 +967,7 @@
 	"shipaa" : {
 		"name" : "Zephyr",
 		"description" : "Anti-Air Frigate",
-		"helptext" : "With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
+		"helptext" : "With its missiles and a laser battery, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
 	},
 	"shipheavyarty" : {
 		"name" : "Shogun",
