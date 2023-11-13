@@ -77,6 +77,7 @@ local resTable = {e = 0, m = 0}
 
 local turnRadius = {}
 local maxBank = {}
+local maxLanderTurnRadius = {}
 local lowerExponent = {}
 local reammoFrames = {}
 local reammoDrain = {}
@@ -102,6 +103,9 @@ for i = 1, #UnitDefs do
 	if ud.customParams.reammoseconds then
 		reammoFrames[i] = tonumber(ud.customParams.reammoseconds)*30
 		reammoDrain[i] = (tonumber(ud.customParams.reammodrain) or DEFAULT_REAMMO_DRAIN)/30
+	end
+	if ud.customParams.max_lander_refuelturnradius then
+		maxLanderTurnRadius[i] = tonumber(ud.customParams.max_lander_refuelturnradius)
 	end
 	
 	if ud.customParams.ispad then
@@ -231,6 +235,10 @@ local function SitOnPad(unitID)
 				end
 				mcSetPosition(unitID, px, py, pz)
 				mcSetRotation(unitID,0,-(headingDiff+newPadHeading),0)
+				
+				local vx,vy,vz = spGetUnitVelocity(landData.padID)
+				mcSetVelocity(unitID, vx, vy, vz)
+				spSetUnitVelocity(unitID, vx, vy, vz)
 			end
 			
 			buildRate = GetBuildRate(landData.padID)
@@ -303,7 +311,7 @@ local function SitOnPad(unitID)
 	StartScript(SitLoop)
 end
 
-local function CircleToLand(unitID, goal)
+local function CircleToLand(unitID, padDefID, goal)
 	unitNewScript[unitID] = true
 	
 	local start = {spGetUnitBasePosition(unitID)}
@@ -315,7 +323,11 @@ local function CircleToLand(unitID, goal)
 		return
 	end
 	
+	local mobilePad = padDefID and mobilePadDefs[padDefID]
 	local turnCircleRadius = turnRadius[unitDefID]
+	if padDefID and maxLanderTurnRadius[padDefID] then
+		turnCircleRadius = math.min(turnCircleRadius, maxLanderTurnRadius[padDefID])
+	end
 	local turnCircleRadiusSq = turnCircleRadius^2
 	
 	local disSq = (goal[1] - start[1])^2 + (goal[2] - start[2])^2 + (goal[3] - start[3])^2
@@ -510,6 +522,12 @@ local function CircleToLand(unitID, goal)
 			local py = TimeToVerticalPositon(currentTime, exponent)
 			local direction = DistanceToDirection(smoothedTravel)
 			
+			if mobilePad and landingUnit[unitID] and landingUnit[unitID].padID and Spring.ValidUnitID(landingUnit[unitID].padID) then
+				local nx, ny, nz = Spring.GetUnitPiecePosDir(landingUnit[unitID].padID, landingUnit[unitID].padPieceID)
+				local f = math.max(0, math.min(1, smoothedTravel / totalDist))
+				px, py, pz = px*(1 - f) + nx*f, py*(1 - f) + ny*f, pz*(1 - f) + nz*f
+			end
+			
 			if rotateUnit[unitDefID] then
 				mcSetRotation(unitID,0,-direction,-roll)
 			end
@@ -559,12 +577,13 @@ function GG.SendBomberToPad(unitID, padID, padPieceID)
 	landingUnit[unitID] = {
 		mobilePad = padDefID and mobilePadDefs[padDefID],
 		padID = padID,
+		padDefID = padDefID,
 		padPieceID = padPieceID,
 		repairBp = padRepairBp[padDefID],
 	}
 	
 	local px, py, pz = Spring.GetUnitPiecePosDir(padID, padPieceID)
-	CircleToLand(unitID, {px,py,pz})
+	CircleToLand(unitID, padDefID, {px,py,pz})
 end
 
 function GG.LandAborted(unitID)
@@ -587,18 +606,6 @@ local function UpdateCoroutines()
 	end
 end
 
-local function UpdatePadLocations(f)
-	for unitID, data in pairs(landingUnit) do
-		if data.mobilePad and not data.landed then
-			local px, py, pz = Spring.GetUnitPiecePosDir(data.padID, data.padPieceID)
-			CircleToLand(unitID, {px,py,pz})
-		end
-	end
-end
-
 function gadget:GameFrame(f)
 	UpdateCoroutines()
-	if f%3 == 1 then
-		UpdatePadLocations()
-	end
 end
