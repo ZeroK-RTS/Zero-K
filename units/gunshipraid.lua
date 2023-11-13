@@ -47,7 +47,7 @@ return { gunshipraid = {
   },
 
   sightDistance          = 500,
-  speed                  = 207,
+  speed                  = 212,
   turnRate               = 693,
 
   weapons                = {
@@ -86,7 +86,7 @@ return { gunshipraid = {
       },
 
       damage                  = {
-        default = 7.9,
+        default = 8.1,
       },
 
       explosionGenerator      = [[custom:flash1red]],
