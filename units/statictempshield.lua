@@ -1,5 +1,5 @@
 return { statictempshield = {
-  name                   = [[Rond]],
+  name                   = [[Pavise]],
   description            = [[Temporary Shield]],
   activateWhenBuilt      = true,
   builder                = false,

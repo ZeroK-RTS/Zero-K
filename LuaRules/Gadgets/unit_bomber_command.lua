@@ -81,7 +81,7 @@ end
 local bomberDefs = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	bomberDefs[i] = (ud.isBomber or ud.customParams.reallyabomber)
+	bomberDefs[i] = (ud.isBomber or ud.isBomberAirUnit or ud.customParams.reallyabomber)
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -89,14 +89,15 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- SYNCED
 --------------------------------------------------------------------------------
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spGetUnitsInBox	= Spring.GetUnitsInBox
-local spGetUnitPieceMap = Spring.GetUnitPieceMap
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitPiecePosition = Spring.GetUnitPiecePosition
-local spGetUnitVectors = Spring.GetUnitVectors
-local spGetUnitIsStunned = Spring.GetUnitIsStunned
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGiveOrderToUnit       = Spring.GiveOrderToUnit
+local spGetUnitsInBox         = Spring.GetUnitsInBox
+local spGetUnitPieceMap       = Spring.GetUnitPieceMap
+local spGetUnitPosition       = Spring.GetUnitPosition
+local spGetUnitPiecePosition  = Spring.GetUnitPiecePosition
+local spGetUnitVectors        = Spring.GetUnitVectors
+local spGetUnitIsStunned      = Spring.GetUnitIsStunned
+local spGetCommandQueue       = Spring.GetCommandQueue
+local spGetUnitCurrentCommand = Spring.GetUnitCurrentCommand
 
 --------------------------------------------------------------------------------
 -- config
@@ -397,9 +398,13 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting, followMove)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if unitDefID and bomberDefs[unitDefID] then
 		-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
-		local queueLength = spGetCommandQueue(unitID, 0)
-		if queueLength <= 2 and (not Spring.Utilities.GetUnitRepeat(unitID)) then
-			spGiveOrderToUnit(unitID, CMD_REMOVE, CMD_FIGHT, CMD_OPT_ALT)
+		local cmdID, _, cmdTag = spGetUnitCurrentCommand(unitID)
+		if cmdID == CMD_FIGHT and (not Spring.Utilities.GetUnitRepeat(unitID)) then
+			spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
+			cmdID, _, cmdTag = spGetUnitCurrentCommand(unitID)
+			if cmdID == CMD_FIGHT then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, cmdTag, 0)
+			end
 		end
 	end
 	
