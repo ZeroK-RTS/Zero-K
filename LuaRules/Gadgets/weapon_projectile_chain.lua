@@ -35,7 +35,6 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 	local projectileParams = {}
 	
 	local x, y, z = Spring.GetProjectilePosition(proID)
-	x = x
 	projectileParams.pos = {x, y, z}
 	
 	local vx, vy, vz = Spring.GetProjectileVelocity(proID)

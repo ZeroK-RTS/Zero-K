@@ -22,7 +22,7 @@ return { bomberassault = {
   customParams        = {
     refuelturnradius       = [[300]],
     refuelmaxbank          = 0.015,
-    reammoseconds          = 30,
+    reammoseconds          = 35,
     modelradius            = [[10]],
     can_set_target         = [[1]],
     air_manual_fire_weapon = 4,
@@ -123,14 +123,14 @@ return { bomberassault = {
 
       customparams            = {
         child_chain_projectile = "bomberassault_disintegrator_real",
-        child_chain_speed = 7,
+        child_chain_speed = 10,
       },
 
       damage                  = {
         default = 2000,
       },
 
-      explosionGenerator      = [[custom:DGUNTRACE]],
+      explosionGenerator      = [[custom:none]],
       heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -182,7 +182,7 @@ return { bomberassault = {
       myGravity               = 0.08,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 60,
+      range                   = 90,
       reloadtime              = 2,
       size                    = 6,
       soundHit                = [[explosion/ex_med6]],
@@ -192,7 +192,7 @@ return { bomberassault = {
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 90,
+      weaponVelocity          = 300,
     },
 
     DEPLOY_SHIELD = {
