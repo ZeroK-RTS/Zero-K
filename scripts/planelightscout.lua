@@ -32,6 +32,8 @@ function SprintThread()
 		denonateCharge = (denonateCharge or 0) + 1
 		Sleep(33)
 	end
+	
+	-- Don't read cp.boost_detonate, because then we'd have to write a dead code path for post-boost
 	Spring.DestroyUnit(unitID, true)
 end
 
@@ -58,7 +60,15 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local ux, _, uz = Spring.GetUnitPosition(unitID)
-	GG.ScanSweep.AddArea("scoutPlane", Spring.GetUnitTeam(unitID), ux, uz, 400 + 200 * (denonateCharge or 0) / SPEEDUP_DURATION)
+	local ud = UnitDefs[unitDefID]
+	
+	local scanFrames = ud.customParams.scan_frames and tonumber(ud.customParams.scan_frames) or 360
+	local scanRadius = ud.customParams.scan_radius_base and tonumber(ud.customParams.scan_radius_base) or 400
+	if ud.customParams.scan_radius_max then
+		scanRadius = scanRadius + ((tonumber(ud.customParams.scan_radius_max) or 640) - scanRadius) * (denonateCharge or 0) / SPEEDUP_DURATION
+	end
+	
+	GG.ScanSweep.AddArea("scoutPlane", Spring.GetUnitTeam(unitID), ux, uz, scanRadius, scanFrames)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
 		Explode(wingr, SFX.EXPLODE)

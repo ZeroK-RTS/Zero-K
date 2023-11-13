@@ -1150,6 +1150,25 @@ local function printAbilities(ud, unitID)
 			cells[#cells+1] = ' - Distance: '
 			cells[#cells+1] = numformat(tonumber(cp.boost_distance)) .. ' elmos (approx.)'
 		end
+		if cp.boost_detonate then
+			cells[#cells+1] = ' - Self detonates upon completion'
+			cells[#cells+1] = ''
+		end
+		cells[#cells+1] = ''
+		cells[#cells+1] = ''
+	end
+
+	if cp.scan_radius_base then
+		cells[#cells+1] = 'Reveals area on death'
+		cells[#cells+1] = ''
+		cells[#cells+1] = ' - Radius: '
+		cells[#cells+1] = math.floor(tonumber(cp.scan_radius_base or "1")) .. ' elmos'
+		if cp.scan_radius_max then
+			cells[#cells+1] = ' - After full boost: '
+			cells[#cells+1] = math.floor(tonumber(cp.scan_radius_max or "1")) .. ' elmos'
+		end
+		cells[#cells+1] = ' - Duration: '
+		cells[#cells+1] = numformat(tonumber(cp.scan_frames)/30) .. 's'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

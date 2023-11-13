@@ -21,9 +21,14 @@ return { planelightscout = {
     bait_level_target      = 2,
 
     boost_speed_mult = 3,
-    boost_duration = 90,
+    boost_duration   = 90,
+    boost_detonate   = 1,
 
-    modelradius    = [[8]],
+    scan_radius_base = 400,
+    scan_radius_max  = 640,
+    scan_frames      = 12 * 30,
+
+    modelradius      = [[8]],
     refuelturnradius = [[130]],
 
     outline_x = 75,

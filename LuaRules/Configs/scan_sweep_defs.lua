@@ -1,9 +1,7 @@
 return {
 	scoutPlane = {
-		radius = 200,
-		duration = 300,
 		ceg = "scan_star",
-		cegDensity = 0.00025, -- Per square elmo
+		cegDensity = 0.0002, -- Per square elmo
 		cegHeightVariance = 80,
 		cegHeight = 220,
 	},
