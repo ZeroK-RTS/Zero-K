@@ -25,13 +25,13 @@ local shieldStyles = {
 		shieldSize = "medium",
 		sizeDrift = 0.012,
 		marginHQ = 2.8,
-		uvMul = 1.0,
+		uvMul = 0.1,
 		hitResposeMult = 0.6,
 		drawBack = 0.75,
 		drawBackCol = 0.9,
 		drawBackMargin = 1.8,
-		margin = 1.8,
-		shieldNoise = 3.8,
+		margin = 1,
+		shieldNoise = 1.7,
 	},
 }
 

@@ -101,7 +101,7 @@ function script.Create()
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
 	StartThread(AirManualFireThread)
 	Move(bomb, y_axis, -8)
-	Move(bombEmit, y_axis, -8)
+	Move(bombEmit, y_axis, -6)
 end
 
 function script.QueryWeapon(num)
