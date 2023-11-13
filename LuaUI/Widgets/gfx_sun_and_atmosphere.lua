@@ -31,6 +31,7 @@ if not OVERRIDE_CONFIG then
 end
 
 local sunSettingsList = {}
+local waterSettingsList = {}
 local sunSettingsGetSunMap = {}
 
 local defaultFog = {
@@ -113,6 +114,16 @@ local function UpdateFogValue(name, value)
 	fogSettingsChanged = true
 end
 
+local function FullWaterUpdate()
+	local waterData = {}
+	for i = 1, #waterSettingsList do
+		local name = waterSettingsList[i]
+		waterData[name] = options[name].value
+	end
+	Spring.SetWaterParams(waterData)
+	ResetWater()
+end
+
 local function UpdateWaterValue(name, value)
 	Spring.SetWaterParams({[name] = value})
 	ResetWater()
@@ -154,10 +165,11 @@ end
 
 local function SaveSettings()
 	local writeTable = {
-		sun         = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
-		direction   = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
-		fog         = fogSettingsChanged       and GetOptionsTable(fogPath),
-		water       = waterSettingsChanged     and GetOptionsTable(waterpath),
+		fixDefaultWater = options.override_water_with_default.value or nil,
+		sun             = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
+		direction       = directionSettingsChanged and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, true),
+		fog             = fogSettingsChanged       and GetOptionsTable(fogPath),
+		water           = waterSettingsChanged     and GetOptionsTable(waterpath),
 	}
 	if OVERRIDE_CONFIG and OVERRIDE_CONFIG.forceIsland ~= nil then
 		writeTable.forceIsland = OVERRIDE_CONFIG.forceIsland
@@ -166,12 +178,11 @@ local function SaveSettings()
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
 
-local function ApplyDefaultWaterFix()
-	Spring.SetWaterParams(defaultWaterFixParams)
-	ResetWater()
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function SaveDefaultWaterFix()
+	options.override_water_with_default.value = true
 	local writeTable = {
 		fixDefaultWater = true,
 		sun       = sunSettingsChanged       and GetOptionsTable(sunPath, {sunDir = true, sunPitch = true}, false),
@@ -181,6 +192,31 @@ local function SaveDefaultWaterFix()
 	
 	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
+
+local function ResetWaterDefault()
+	if options.override_water_with_default.value then
+		FullWaterUpdate()
+	end
+	options.override_water_with_default.value = false
+end
+
+local function ApplyDefaultWaterFix()
+	options.override_water_with_default.value = true
+	Spring.SetWaterParams(defaultWaterFixParams)
+	ResetWater()
+end
+
+local function ToggleDefaultWater(self)
+	if self.value then
+		ApplyDefaultWaterFix()
+	else
+		FullWaterUpdate()
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function ReadSunFromMap(sunConf, dirConf)
 	for i = 1, #sunSettingsList do
@@ -242,6 +278,7 @@ local function LoadSunAndFogSettings()
 	end
 	
 	if override.fixDefaultWater then
+		fixDefaultWater = true
 		ApplyDefaultWaterFix()
 	end
 end
@@ -301,7 +338,7 @@ local function GetOptions()
 		options_order[#options_order + 1] = name
 	end
 	
-	local function AddColorOption(name, humanName, path, ApplyFunc, defaultVal)
+	local function AddColorOption(name, humanName, path, ApplyFunc, defaultVal, extraFunc)
 		options[name] = {
 			name = humanName,
 			type = 'colors',
@@ -310,16 +347,18 @@ local function GetOptions()
 				if initialized then
 					Spring.Utilities.TableEcho(self.value, name)
 					ApplyFunc(name, self.value)
+					if extraFunc then
+						extraFunc()
+					end
 				end
 			end,
-			advanced = true,
 			developmentOnly = true,
 			path = path
 		}
 		options_order[#options_order + 1] = name
 	end
 	
-	local function AddNumberOption(name, humanName, path, ApplyFunc, defaultVal, minVal, maxVal)
+	local function AddNumberOption(name, humanName, path, ApplyFunc, defaultVal, minVal, maxVal, extraFunc)
 		options[name] = {
 			name = humanName,
 			type = 'number',
@@ -328,9 +367,11 @@ local function GetOptions()
 			OnChange = function (self)
 				if initialized then
 					ApplyFunc(name, self.value)
+					if extraFunc then
+						extraFunc()
+					end
 				end
 			end,
-			advanced = true,
 			developmentOnly = true,
 			path = path
 		}
@@ -374,7 +415,6 @@ local function GetOptions()
 				FullSunUpdate()
 			end
 		end,
-		advanced = true,
 		developmentOnly = true,
 		path = sunPath
 	}
@@ -391,7 +431,6 @@ local function GetOptions()
 				FullSunUpdate()
 			end
 		end,
-		advanced = true,
 		developmentOnly = true,
 		path = sunPath
 	}
@@ -415,43 +454,38 @@ local function GetOptions()
 ---------------------------------------
 	for i = 1, #waterNumberDefaults do
 		local data = waterNumberDefaults[i]
-		AddNumberOption(data.name, data.name, waterpath, UpdateWaterValue, data.val, data.minVal, data.maxVal)
+		waterSettingsList[#waterSettingsList + 1] = data.name
+		AddNumberOption(data.name, data.name, waterpath, UpdateWaterValue, data.val, data.minVal, data.maxVal, ResetWaterDefault)
 	end
 	for i = 1, #waterColorDefaults do
 		local data = waterColorDefaults[i]
-		AddColorOption(data.name, data.name, waterpath, UpdateWaterValue, data.val)
+		waterSettingsList[#waterSettingsList + 1] = data.name
+		AddColorOption(data.name, data.name, waterpath, UpdateWaterValue, data.val, ResetWaterDefault)
 	end
 
 ---------------------------------------
 -- Save/Load
 ---------------------------------------
+	AddOption("override_water_with_default", {
+		name = 'Default Water Fix',
+		type = 'bool',
+		desc = "Overrides all the water settings with a decent default.",
+		developmentOnly = true,
+		OnChange = ToggleDefaultWater,
+	})
 	AddOption("save_map_settings", {
 		name = 'Save Settings',
 		type = 'button',
 		desc = "Save settings to infolog.",
+		developmentOnly = true,
 		OnChange = SaveSettings,
-		advanced = true
 	})
 	AddOption("load_map_settings", {
 		name = 'Load Settings',
 		type = 'button',
 		desc = "Load the settings, if the map has a config.",
+		developmentOnly = true,
 		OnChange = LoadSunAndFogSettings,
-		advanced = true
-	})
-	AddOption("save_water_fix", {
-		name = 'Save Water Fix',
-		type = 'button',
-		desc = "Save settings to infolog, overriding water with a minimal fix for default water.",
-		OnChange = SaveDefaultWaterFix,
-		advanced = true
-	})
-	AddOption("apply_water_fix", {
-		name = 'Apply Water Fix',
-		type = 'button',
-		desc = "Test the minimal fix for default water.",
-		OnChange = ApplyDefaultWaterFix,
-		advanced = true
 	})
 	return options, options_order
 end
