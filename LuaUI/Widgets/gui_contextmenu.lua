@@ -1169,6 +1169,8 @@ local function printAbilities(ud, unitID)
 		end
 		cells[#cells+1] = ' - Duration: '
 		cells[#cells+1] = numformat(tonumber(cp.scan_frames)/30) .. 's'
+		cells[#cells+1] = ' - Reveals cloaked and underwater units'
+		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

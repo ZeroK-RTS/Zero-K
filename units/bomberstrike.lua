@@ -103,7 +103,6 @@ return { bomberstrike = {
       trajectoryHeight        = 0,
       turnRate                = 13000,
       turret                  = true,
-      waterweapon             = true,
       weaponAcceleration      = 80,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,

@@ -20,7 +20,7 @@ return { planelightscout = {
   customParams        = {
     bait_level_target      = 2,
 
-    boost_speed_mult = 3,
+    boost_speed_mult = 4,
     boost_duration   = 90,
     boost_detonate   = 1,
 

@@ -362,7 +362,12 @@
 	"bomberassault" : {
 		"name" : "Odin",
 		"description" : "Heavy Assault/Utility Bomber (Anti-Static)",
-		"helptext" : "The Odin's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
+		"helptext" : "The Odin's imposing hull can weather significant punishment as it reaches its target, where it delivers either devastating damage or much-needed respite. Its main weapon - the disintegrator bomb - vaporises almost anything it touches, which is harder than it sounds, as mobile units have plenty of time to dodge the slow moving projectile. When no sufficiently stationary and valuable targets present themself, Odin can support ground forces by deploying a cluster of tempoary shields with its special weapon."
+	},
+	"statictempshield" : {
+		"name" : "Pavise",
+		"description" : "Temporary Shield",
+		"helptext" : "Clusters of Pavise can be deployed by Odin to support ground forces. These temporary shields lose charge over time and self-destruct when their charge hits zero."
 	},
 	"cloakassault" : {
 		"name" : "Knight",
@@ -1177,7 +1182,7 @@
 	"bomberstrike" : {
 		"name" : "Penguin",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Penguin launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
+		"helptext" : "The Penguin launches short-range homing missiles at ground and air targets. It makes up for its low damage and long rearm time by boasting the range and manoeuvrability to hit dangerous targets and make it back to base."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",
@@ -1217,7 +1222,7 @@
 	"planelightscout" : {
 		"name" : "Sparrow",
 		"description" : "Light Scout Plane",
-		"helptext" : "The Sparrow is a light scout that can be built from a Radar Tower, making it the only plane that is availible without a Plane Factory. Such an accessible scouting option is invaluable to those without access to planes, but is generally outclassed by the faster Swift and larger Owl."
+		"helptext" : "The Sparrow is a light scout plane that detonates to reveal an 12 seconds. It can be morphed from a Radar Tower, making it accessible without an Airplane Plant, but is generally outclassed by the faster Swift and larger Owl."
 	},
 	"amphfloater" : {
 		"name" : "Buoy",
