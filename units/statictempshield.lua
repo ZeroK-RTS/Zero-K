@@ -22,6 +22,7 @@ return { statictempshield = {
     very_low_priority_target = 1,
 
     shield_draw_style = [[noisy]],
+    shield_color_mult = 0.6,
   },
 
   explodeAs              = [[NOWEAPON]],

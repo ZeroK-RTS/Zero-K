@@ -204,6 +204,7 @@ return { bomberassault = {
       avoidNeutral            = false,
       burst                   = 7,
       burstRate               = 0.0666,
+      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 

@@ -29,9 +29,10 @@ local shieldStyles = {
 		hitResposeMult = 0.6,
 		drawBack = 0.75,
 		drawBackCol = 0.9,
-		drawBackMargin = 1.8,
+		drawBackMargin = 1.2,
 		margin = 1,
-		shieldNoise = 1.7,
+		shieldNoise = 1.1,
+		faintShield = true,
 	},
 }
 
@@ -150,8 +151,6 @@ for unitDefID = 1, #UnitDefs do
 			myShield.hitResposeMult = 0.15
 			myShield.faintShield = true
 			decayFactor = 0.1
-		else
-			myShield.faintShield = false
 		end
 
 		local isChicken = false
