@@ -11,8 +11,9 @@ local smokePiece = {KRisaravinglunatic}
 local SIG_TAKEOFF = 2
 local takeoffHeight = UnitDefNames["planelightscout"].cruiseAltitude
 
-local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
-local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
+local SPEEDUP_FACTOR = tonumber(UnitDef.customParams.boost_speed_mult)
+local ACCEL_FACTOR = tonumber(UnitDef.customParams.boost_accel_mult) or SPEEDUP_FACTOR
+local SPEEDUP_DURATION = tonumber(UnitDef.customParams.boost_duration)
 
 local denonateCharge = false
 
@@ -46,6 +47,7 @@ function SprintDetonate()
 
 	StartThread(SprintThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", ACCEL_FACTOR / SPEEDUP_FACTOR)
 	GG.UpdateUnitAttributes(unitID)
 end
 

@@ -1136,6 +1136,8 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Boost speed: '
 		cells[#cells+1] = math.floor((tonumber(cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
+		cells[#cells+1] = ' - Boost accel: '
+		cells[#cells+1] = math.floor((tonumber(cp.boost_accel_mult or cp.boost_speed_mult or "1")*100) + 0.5) .. "%"
 		if cp.boost_reload_speed_mult then
 			cells[#cells+1] = ' - Recharge speed: '
 			cells[#cells+1] = math.floor((tonumber(cp.boost_reload_speed_mult or "1")*100) + 0.5) .. "%"

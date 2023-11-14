@@ -66,6 +66,11 @@ local function SetScannedArea(scanType, teamID, ax, az, radius, duration)
 	
 	local frame = spGetGameFrame()
 	local scanID = spCreateUnit("fakeunit_los", ax, 10000, az, 0, teamID)
+	if not scanID then
+		-- Unit might not exist due to unit limit.
+		-- This mainly happens if the team dies.
+		return
+	end
 	local scanTime = frame + duration
 
 	-- change LoS to the wanted value and make the unit not interact with the environment

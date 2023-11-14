@@ -26,7 +26,6 @@ return { planefighter = {
     specialreloadtime = [[850]],
     specialreload_userate = [[1]],
     boost_speed_mult = 5,
-    boost_accel_mult = 6,
     boost_duration = 30, -- frames
 
     fighter_pullup_dist = 400,
