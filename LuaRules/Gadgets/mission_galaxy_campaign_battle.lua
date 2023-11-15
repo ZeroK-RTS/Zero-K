@@ -1392,9 +1392,14 @@ local function MissionGameOver(missionWon)
 	SetWinBeforeBonusObjective(missionWon)
 	SendToUnsynced("MissionGameOver", missionWon)
 	SetGameRulesParamHax("MissionGameOver", (missionWon and 1) or 0)
+	
 	local frame = Spring.GetGameFrame()
 	Spring.Echo("set MissionGameOver_frames", frame)
 	SetGameRulesParamHax("MissionGameOver_frames", frame)
+	
+	local losses = Spring.GetTeamRulesParam(PLAYER_TEAM_ID, "stats_history_unit_lost_tally_current")
+	Spring.Echo("set MissionGameOver_losses", losses)
+	SetGameRulesParamHax("MissionGameOver_losses", losses)
 end
 
 --------------------------------------------------------------------------------

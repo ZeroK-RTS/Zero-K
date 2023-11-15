@@ -10,6 +10,7 @@ return { empmissile = {
 
   customParams           = {
     mobilebuilding = [[1]],
+    ignore_for_loss_stats = [[1]],
 
     outline_x = 55,
     outline_y = 80,

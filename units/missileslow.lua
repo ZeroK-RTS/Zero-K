@@ -14,6 +14,7 @@ return { missileslow = {
 
   customParams                  = {
     mobilebuilding = [[1]],
+    ignore_for_loss_stats = [[1]],
     midposoffset   = [[0 72 0]],
 
     outline_x = 55,

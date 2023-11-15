@@ -757,11 +757,16 @@ local function GetTimeString()
 	return frames
 end
 
+local function GetLossesString()
+	local losses = GetGameRulesHax("MissionGameOver_losses") or 10000000
+	return losses
+end
+
 local function SendVictoryToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
 		local bonusObjectiveString = bonusObjectiveBlock and bonusObjectiveBlock.MakeObjectivesString()
-		Spring.SendLuaMenuMsg(WIN_MESSAGE .. " " .. planetID .. " " .. GetTimeString() .. " " .. (bonusObjectiveString or "") .. " " .. (missionDifficulty or "0"))
+		Spring.SendLuaMenuMsg(WIN_MESSAGE .. " " .. planetID .. " " .. GetTimeString() .. " " .. (bonusObjectiveString or "") .. " " .. (missionDifficulty or "0") .. " " .. GetLossesString())
 	end
 end
 
