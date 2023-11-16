@@ -39,13 +39,13 @@ local function GetWinChanceThresholdMod(first, second)
 		return 1, 0
 	elseif lowerElo < 2000 then
 		local prog = (lowerElo - 1500) / 500
-		return 0.66 + 0.34 * (1 - prog), 0
+		return 0.63 + 0.37 * (1 - prog), -0.005 * prog
 	end
 	if lowerElo < 2500 then
 		local prog = (lowerElo - 2000) / 500
-		return 0.66, -0.03 * prog
+		return 0.5 * prog + 0.63 * (1 - prog), -0.005 - 0.035 * prog
 	end
-	return 0.66, -0.03
+	return 0.5, -0.04
 end
 
 local function GetAutoHandicapValue(firstAllyTeamMean, secondAllyTeamMean)
