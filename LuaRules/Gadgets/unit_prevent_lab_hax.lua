@@ -40,12 +40,6 @@ local min = math.min
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
-local FEATURE_ONLY = {
-	factorygunship = true,
-	staticmissilesilo = true,
-	staticrearm = true,
-}
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -225,7 +219,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 		
 		local solidFactoryLimit = ud.customParams.solid_factory and tonumber(ud.customParams.solid_factory)
 		local unitExpulsionParameters
-		if not FEATURE_ONLY[ud.name] then
+		if not ud.customParams.solid_factory.lab_hax_feature_only then
 			unitExpulsionParameters = {
 				minx - 0.1,
 				minz - 0.1,
@@ -291,7 +285,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 
 		--Spring.Echo(xsize)
 		--Spring.Echo(zsize)
-		
+		--
 		--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[3],0,unitExpulsionParameters[2])
 		--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[1],0,unitExpulsionParameters[4])
 		--Spring.MarkerAddLine(unitExpulsionParameters[3],0,unitExpulsionParameters[4],unitExpulsionParameters[3],0,unitExpulsionParameters[2])

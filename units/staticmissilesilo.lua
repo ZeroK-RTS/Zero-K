@@ -22,6 +22,7 @@ return { staticmissilesilo = {
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
   customparams = {
+    solid_factory = [[6]],
     missile_silo_capacity = 4,
     stats_show_death_explosion = 1,
   },

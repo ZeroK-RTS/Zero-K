@@ -29,6 +29,7 @@ return { staticrearm = {
     notreallyafactory = 1,
     selection_rank  = [[1]],
     ispad         = 1,
+    lab_hax_feature_only = 1,
 
     outline_x = 250,
     outline_y = 250,

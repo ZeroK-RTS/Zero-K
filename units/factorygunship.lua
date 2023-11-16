@@ -36,6 +36,7 @@ return { factorygunship = {
 
   customParams                  = {
     ploppable = 1,
+    lab_hax_feature_only = 1,
     landflystate   = [[0]],
     factory_land_state = 0,
     sortName = [[3]],
