@@ -70,6 +70,7 @@ local queueFrontCommand = {
 local canMoveDefs = {}
 local canFlyDefs = {}
 local hasAirManualFire = {}
+local airManualFireDesc = {}
 
 local goalDist = {}
 local turnDiameterSq = {}
@@ -127,6 +128,7 @@ for i = 1, #UnitDefs do
 			end
 			goalDist[i] = 8
 			if ud.customParams.air_manual_fire_weapon then
+				airManualFireDesc[i] = ud.customParams.manualfire_desc
 				hasAirManualFire[i] = true
 			end
 		end
@@ -899,7 +901,14 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spInsertUnitCmdDesc(unitID, moveRawCmdDesc)
 	end
 	if (hasAirManualFire[unitDefID]) then
-		spInsertUnitCmdDesc(unitID, airManualFireCmdDesc)
+		if airManualFireDesc[unitDefID] then
+			airManualFireCmdDesc.tooltip = airManualFireDesc[unitDefID]
+		else
+			airManualFireCmdDesc.tooltip = GG.DEFAULT_MANUALFIRE_DESC
+		end
+		if airManualFireCmdDesc.tooltip then
+			spInsertUnitCmdDesc(unitID, airManualFireCmdDesc)
+		end
 	end
 	
 	if constructorBuildDistDefs[unitDefID] and not constructorByID[unitID] then

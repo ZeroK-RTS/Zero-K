@@ -26,6 +26,7 @@ return { bomberassault = {
     modelradius            = [[10]],
     can_set_target         = [[1]],
     air_manual_fire_weapon = 4,
+	manualfire_desc        = [[Fire Special Weapon: Fire a cluster of temporary shield generators.]],
   },
 
   selfDestructAs         = [[ESTOR_BUILDING]],

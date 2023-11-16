@@ -14,6 +14,7 @@ return { striderdante = {
 
   customParams        = {
     decloak_footprint     = 5,
+    manualfire_desc = [[Fire Special Weapon: Fire a napalm rocket salvo.]]
   },
 
   explodeAs           = [[CRAWL_BLASTSML]],
