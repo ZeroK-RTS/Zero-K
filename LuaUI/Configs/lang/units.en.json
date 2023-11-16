@@ -1180,9 +1180,9 @@
 		"helptext" : "The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage."
 	},
 	"bomberstrike" : {
-		"name" : "Penguin",
+		"name" : "Magpie",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Penguin launches short-range homing missiles at ground and air targets. It makes up for its low damage and long rearm time by boasting the range and manoeuvrability to hit dangerous targets and make it back to base."
+		"helptext" : "The Magpie launches short-range homing missiles at ground and air targets. It makes up for its low damage and long rearm time by boasting the range and manoeuvrability to hit dangerous targets and make it back to base."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",

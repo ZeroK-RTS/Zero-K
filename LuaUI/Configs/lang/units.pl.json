@@ -1175,9 +1175,9 @@
 		"helptext" : "Tiamat to wytrzymałe, ziejące ogniem i wypuszczające zarodniki monstrum z mocnymi szczękami i śluzową tarcza, ktora chroni okoliczne kurczaki."
 	},
 	"bomberstrike" : {
-		"name" : "Penguin",
+		"name" : "Magpie",
 		"description" : "Bombowiec taktyczny",
-		"helptext" : "Penguin wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
+		"helptext" : "Magpie wystrzeliwuje rakiety krótkiego zasięgu, które mogą trafić cele w powietrzu, na powierzchni lub pod wodą. Spośród bombowców najlepiej nadaje się do niszczenia pojedynczych jednostek."
 	},
 	"staticrearm" : {
 		"name" : "Lądowisko",

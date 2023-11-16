@@ -1172,7 +1172,7 @@
 	"bomberstrike" : {
 		"name" : "Пустельга",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Penguin launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
+		"helptext" : "The Magpie launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"staticrearm" : {
 		"name" : "ВВП",

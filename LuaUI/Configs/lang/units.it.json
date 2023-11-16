@@ -1170,9 +1170,9 @@
 		"helptext" : "E' il Chicken d'assalto definitivo. E' una mostruosità sputafuoco, dalla mascella di ferro e che vomita spore. Non conosce né paura né pietà. Ha uno scudo mucoso per proteggere se stesso e i chicken circostanti."
 	},
 	"bomberstrike" : {
-		"name" : "Penguin",
+		"name" : "Magpie",
 		"description" : "Bombardiere d'attacco tattico",
-		"helptext" : "Il Penguin lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
+		"helptext" : "Il Magpie lancia missili d'attacco di superficie a corto raggio che possono colpire anche i sottomarini. È il miglior bombardiere per abbattere bersagli singoli."
 	},
 	"staticrearm" : {
 		"name" : "Airpad",

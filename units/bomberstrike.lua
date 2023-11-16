@@ -1,5 +1,5 @@
 return { bomberstrike = {
-  name                = [[Penguin]],
+  name                = [[Magpie]],
   description         = [[Tactical Strike Bomber]],
   brakerate           = 0.4,
   builder             = false,

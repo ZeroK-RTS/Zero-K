@@ -81,7 +81,7 @@ return { hoverheavyraid = {
       },
       
       damage                  = {
-        default = 34,
+        default = 42,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
@@ -95,7 +95,7 @@ return { hoverheavyraid = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 225,
-      reloadtime              = 0.3 + 2/30,
+      reloadtime              = 0.4 + 1/30,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],
       soundStartVolume        = 3,

@@ -1100,9 +1100,9 @@
 		"helptext" : "Der Nimbus ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Nimbus besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier."
 	},
 	"bomberstrike" : {
-		"name" : "Penguin",
+		"name" : "Magpie",
 		"description" : "Tactical Strike Bomber",
-		"helptext" : "The Penguin launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
+		"helptext" : "The Magpie launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets."
 	},
 	"cloaksnipe" : {
 		"name" : "Phantom",
