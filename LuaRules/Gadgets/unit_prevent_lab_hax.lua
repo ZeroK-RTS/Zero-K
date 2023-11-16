@@ -219,7 +219,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 		
 		local solidFactoryLimit = ud.customParams.solid_factory and tonumber(ud.customParams.solid_factory)
 		local unitExpulsionParameters
-		if not ud.customParams.solid_factory.lab_hax_feature_only then
+		if not ud.customParams.lab_hax_feature_only then
 			unitExpulsionParameters = {
 				minx - 0.1,
 				minz - 0.1,
