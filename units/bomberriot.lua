@@ -33,9 +33,9 @@ return { bomberriot = {
   health              = 1400,
   iconType            = [[bomberraider]],
   maxAcc              = 0.5,
-  maxAileron          = 0.018,
+  maxAileron          = 0.016,
   maxElevator         = 0.02,
-  maxRudder           = 0.009,
+  maxRudder           = 0.0075,
   maxFuel             = 1000000,
   metalCost           = 460,
   noAutoFire          = false,
@@ -76,8 +76,8 @@ return { bomberriot = {
       areaOfEffect            = 320,
       avoidFeature            = false,
       avoidFriendly           = false,
-      burst                   = 15,
-      burstrate               = 0.133,
+      burst                   = 18,
+      burstrate               = 0.1,
       collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 0,
@@ -92,7 +92,7 @@ return { bomberriot = {
       },
       
       damage                  = {
-        default = 50,
+        default = 40,
       },
 
       edgeEffectiveness       = 0.7,

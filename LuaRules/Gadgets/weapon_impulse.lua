@@ -419,9 +419,9 @@ local function AddImpulses()
 					local mag = math.pow(4*math.random(), 2)*2
 					local upMag = math.random()*GROUND_PUSH_CONSTANT*0.5
 					local dummyX, dummyZ = mag*math.cos(dir), mag*math.sin(dir)
-					spAddUnitImpulse(unitID, dummyX, -upMag, dummyZ) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
+					spAddUnitImpulse(unitID, dummyX, 0, dummyZ) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
 					spAddUnitImpulse(unitID, data.x, data.y, data.z)
-					spAddUnitImpulse(unitID, -dummyX, upMag, -dummyZ) --remove dummy impulse
+					spAddUnitImpulse(unitID, -dummyX, 0, -dummyZ) --remove dummy impulse
 				else
 					spAddUnitImpulse(unitID, data.x, data.y, data.z)
 				end
