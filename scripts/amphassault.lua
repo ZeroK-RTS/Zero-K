@@ -6,6 +6,9 @@ local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot = piece('rfleg'
 
 local vents = {rffoot, lffoot, rbfoot, lbfoot, piece('ventf1', 'ventf2', 'ventr1', 'ventr2', 'ventr3')}
 
+local canAim = true
+local turretAimHeading = 0
+
 local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_RESTORE = 4
@@ -308,10 +311,11 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then
+	if num == 1 and canAim then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(180))
+		turretAimHeading = heading
 		Turn(lbarrel1, x_axis, -pitch, math.rad(90))
 		Turn(rbarrel1, x_axis, -pitch, math.rad(90))
 		WaitForTurn(turret, y_axis)
@@ -337,6 +341,17 @@ function script.BlockShot(num, targetID)
 	return block
 end
 
+local function HoldGunSteady()
+	canAim = false
+	local heading = Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
+	for i = 1, 24 do
+		Sleep(33)
+		local newHeading = Spring.GetUnitHeading(unitID)*GG.Script.headingToRad
+		Turn(turret, y_axis, turretAimHeading + heading - newHeading)
+	end
+	canAim = true
+end
+
 function script.Shot(num)
 	if num == 1 then
 		beamCount = beamCount + 1
@@ -354,6 +369,12 @@ function script.Shot(num)
 		else
 			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
 		end
+	end
+end
+
+function script.FireWeapon(num)
+	if num == 1 then
+		StartThread(HoldGunSteady)
 	end
 end
 

@@ -93,6 +93,7 @@ return { amphassault = {
 
         light_color = [[0.5 0.5 1.5]],
         light_radius = 180,
+        reaim_time = 1,
       },
 
       damage                  = {
