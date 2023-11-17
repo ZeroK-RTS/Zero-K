@@ -2348,7 +2348,9 @@ end
 
 function widgetHandler:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
 	for _, w in r_ipairs(self.UnitDamagedList) do
-		w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+		-- The engine only provides attacker information when visible. However weapon information is always passed - arguably
+		-- the weapon is always visible - but we don't want widgets to be able to infer the attacker when it is not visible.
+		w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, nil, nil, attackerID, attackerDefID, attackerTeam)
 	end
 end
 
