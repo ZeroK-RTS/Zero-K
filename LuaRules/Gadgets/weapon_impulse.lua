@@ -25,6 +25,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua", nil, VFS.GAME)
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
 local GROUND_PUSH_CONSTANT = 1.12*GRAVITY/30/30
+local UNSTICK_CONSTANT = 4.5
 
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
@@ -411,13 +412,7 @@ local function AddImpulses()
 				end
 				if data.useDummy then
 					local dir = math.random()*2*math.pi
-
-					-- Numbers determined empirically. Larger units need more impulse,
-					-- the square is to reduce the chance of unsticking the biggest ones.
-					-- This is to make unsticking more reliable, otherwise the units
-					-- can't move on their own but aren't actually pushed/pulled.
-					local mag = math.pow(4*math.random(), 2)*2
-					local upMag = math.random()*GROUND_PUSH_CONSTANT*0.5
+					local mag = UNSTICK_CONSTANT
 					local dummyX, dummyZ = mag*math.cos(dir), mag*math.sin(dir)
 					spAddUnitImpulse(unitID, dummyX, 0, dummyZ) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
 					spAddUnitImpulse(unitID, data.x, data.y, data.z)

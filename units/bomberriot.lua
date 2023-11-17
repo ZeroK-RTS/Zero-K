@@ -23,7 +23,7 @@ return { bomberriot = {
   customParams        = {
     modelradius    = [[10]],
     refuelturnradius = [[120]],
-    reammoseconds = 5,
+    reammoseconds = 8,
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -34,6 +34,7 @@ return { bomberriot = {
   iconType            = [[bomberraider]],
   maxAcc              = 0.5,
   maxAileron          = 0.016,
+  maxBank             = 0.72,
   maxElevator         = 0.02,
   maxRudder           = 0.0075,
   maxFuel             = 1000000,
