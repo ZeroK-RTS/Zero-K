@@ -337,7 +337,7 @@ local function BlockAttackToggle(unitID, cmdParams)
 			if cmdDesc then
 				if not cachedAttackCommandDesc then
 					CacheAttackCommandDesc(unitID)
-					Spring.Utilities.TableEcho(cachedAttackCommandDesc, "cmdDesc")
+					--Spring.Utilities.TableEcho(cachedAttackCommandDesc, "cmdDesc")
 				end
 				spRemoveUnitCmdDesc(unitID, cmdDesc)
 			end

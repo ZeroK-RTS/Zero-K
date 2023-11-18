@@ -33,7 +33,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		return
 	end
 	cmdDesc.tooltip = manualFireDesc[unitDefID] or GG.DEFAULT_MANUALFIRE_DESC
-	Spring.Utilities.UnitEcho(unitID, "EditUnitCmdDesc")
-	Spring.Utilities.TableEcho(cmdDesc)
+	--Spring.Utilities.UnitEcho(unitID, "EditUnitCmdDesc")
+	--Spring.Utilities.TableEcho(cmdDesc)
 	Spring.EditUnitCmdDesc(unitID,  CMD.MANUALFIRE, cmdDesc)
 end
