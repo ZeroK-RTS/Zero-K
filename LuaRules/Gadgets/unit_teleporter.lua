@@ -21,12 +21,19 @@ local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
 local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 
+local SPEED_MULTIPLIER = 0.05
+local MAX_MOVE_SPEED = 2
+
 -- Used in synced and unsynced
 local canTeleport = {}
+local slowToTeleport = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if not (ud.isImmobile or ud.isStrafingAirUnit) then
+	if not (ud.isImmobile) then
 		canTeleport[i] = true
+		if ud.isStrafingAirUnit then
+			slowToTeleport[i] = true
+		end
 	elseif ud.isFactory and (not ud.customParams.notreallyafactory) and ud.buildOptions then
 		local buildOptions = ud.buildOptions
 
@@ -34,7 +41,7 @@ for i = 1, #UnitDefs do
 			local boDefID = buildOptions[j]
 			local bod = UnitDefs[boDefID]
 
-			if bod and not (bod.isImmobile or bod.isStrafingAirUnit) then
+			if bod and not (bod.isImmobile) then
 				canTeleport[i] = true  -- only factories that can build teleportable units are included
 				break
 			end
@@ -141,8 +148,13 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 		return
 	end
 	if tele[unitID].teleportiee then
+		if slowToTeleport[tele[unitID].teleportieeDefID] then
+			Spring.SetUnitRulesParam(tele[unitID].teleportiee, "teleportSpeedMult", nil)
+			GG.UpdateUnitAttributes(tele[unitID].teleportiee)
+		end
 		teleportingUnit[tele[unitID].teleportiee] = nil
 		tele[unitID].teleportiee = false
+		tele[unitID].teleportieeDefID = false
 		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
 	end
 	tele[unitID].teleFrame = false
@@ -494,8 +506,14 @@ function gadget:GameFrame(f)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
 							
+							if slowToTeleport[tele[tid].teleportieeDefID] then
+								Spring.SetUnitRulesParam(teleportiee, "teleportSpeedMult", nil)
+								GG.UpdateUnitAttributes(teleportiee)
+							end
+							
 							teleportingUnit[teleportiee] = nil
 							tele[tid].teleportiee = nil
+							tele[tid].teleportieeDefID = nil
 							Spring.SetUnitRulesParam(tid, "teleportiee", -1)
 							
 							GG.MoveMobileUnit(teleportiee, dx, dy, dz)
@@ -555,8 +573,8 @@ function gadget:GameFrame(f)
 					end
 					
 					if teleportiee then
-						local ud = Spring.GetUnitDefID(teleportiee)
-						ud = ud and UnitDefs[ud]
+						local unitDefID = Spring.GetUnitDefID(teleportiee)
+						local ud = unitDefID and UnitDefs[unitDefID]
 						local flying = isUnitFlying(tid)
 						if ud and not flying then
 
@@ -565,11 +583,22 @@ function gadget:GameFrame(f)
 							local cost = math.floor(mass/tele[tid].throughput)
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
+							tele[tid].teleportieeDefID = unitDefID
 							Spring.SetUnitRulesParam(tid, "teleportiee", teleportiee)
 							tele[tid].teleFrame = f + cost
 							tele[tid].teleTargetX = teleTargetX
 							tele[tid].teleTargetZ = teleTargetZ
 							tele[tid].cost = cost
+							
+							if slowToTeleport[unitDefID] then
+								Spring.SetUnitRulesParam(teleportiee, "teleportSpeedMult", SPEED_MULTIPLIER)
+								local vx, vy, vz, speed = Spring.GetUnitVelocity(teleportiee)
+								if speed > MAX_MOVE_SPEED then
+									vx, vy, vz = vx*MAX_MOVE_SPEED/speed, vy*MAX_MOVE_SPEED/speed, vz*MAX_MOVE_SPEED/speed
+									Spring.SetUnitVelocity(teleportiee, vx, vy, vz)
+								end
+								GG.UpdateUnitAttributes(teleportiee)
+							end
 							
 							Spring.SetUnitRulesParam(tid,"teleportcost",tele[tid].cost)
 							Spring.SetUnitRulesParam(bid,"teleportcost",tele[tid].cost)
@@ -649,6 +678,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			orphanedBeacons[#orphanedBeacons + 1] = beaconID
 			beacon[beaconID] = nil
 		end
+		interruptTeleport(unitID, true)
 		tele[teleID.data[teleID.count]].index = tele[unitID].index
 		teleID.data[tele[unitID].index] = teleID.data[teleID.count]
 		teleID.data[teleID.count] = nil
