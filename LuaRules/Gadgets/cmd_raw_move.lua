@@ -506,8 +506,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		local tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
 			function ()
 				local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(cmdParams[1], true, true)
-				ty = math.max(0, Spring.GetGroundHeight(tx, tz))
-				return tx, ty, tz
+				if tx then
+					ty = math.max(0, Spring.GetGroundHeight(tx, tz))
+					return tx, ty, tz
+				end
 			end)
 		if tz then
 			cmdParams[1] = tx

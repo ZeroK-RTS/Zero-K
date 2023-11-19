@@ -87,18 +87,17 @@ local rotateUnit = {}
 for i = 1, #UnitDefs do
 	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
 	local ud = UnitDefs[i]
-	if movetype == 0 then -- fixedwing
+	if movetype == 0 or movetype == 1 then
 		if ud.customParams and ud.customParams.refuelturnradius then
 			turnRadius[i] = tonumber(ud.customParams.refuelturnradius)
+		elseif movetype == 1 then -- Gunship
+			turnRadius[i] = 20
 		else
 			turnRadius[i] = ud.turnRadius
 		end
-		maxBank[i] = tonumber(ud.customParams.refuelmaxbank) or 0.8
+		maxBank[i] = tonumber(ud.customParams.refuelmaxbank) or ((movetype == 1) and 0) or 0.8
 		lowerExponent[i] = tonumber(ud.customParams.refueldiveexponent) or 2.5
-		rotateUnit[i] = true
-	elseif movetype == 1 then -- gunship
-		turnRadius[i] = 20
-		rotateUnit[i] = false
+		rotateUnit[i] = (movetype == 0) -- Fixedwing
 	end
 	if ud.customParams.reammoseconds then
 		reammoFrames[i] = tonumber(ud.customParams.reammoseconds)*30

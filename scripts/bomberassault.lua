@@ -48,8 +48,10 @@ local function AirManualFireThread()
 					local tx, ty, tz = CallAsTeam(Spring.GetUnitTeam(unitID),
 						function ()
 							local _,_,_, _,_,_, tx, ty, tz = Spring.GetUnitPosition(cp_1, true, true)
-							ty = math.max(0, Spring.GetGroundHeight(tx, tz))
-							return tx, ty, tz
+							if tx then
+								ty = math.max(0, Spring.GetGroundHeight(tx, tz))
+								return tx, ty, tz
+							end
 						end)
 					if tx then
 						Spring.SetUnitTarget(unitID, tx, ty, tz, false, false, 4)

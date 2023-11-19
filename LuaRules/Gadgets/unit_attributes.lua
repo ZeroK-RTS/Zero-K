@@ -248,6 +248,10 @@ end
 local origUnitSpeed = {}
 
 local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFactor, maxAccelerationFactor)
+	if spMoveCtrlGetTag(unitID) ~= nil then
+		return
+	end
+	
 	if not origUnitSpeed[unitDefID] then
 		local ud = UnitDefs[unitDefID]
 		local moveData = spGetUnitMoveTypeData(unitID)
@@ -256,7 +260,7 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 			origSpeed = ud.speed,
 			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
 			origTurnRate = ud.turnRate,
-			origMaxRudder = moveData.maxRudder,
+			origMaxRudder = ud.maxRudder,
 			origMaxAcc = ud.maxAcc,
 			origMaxDec = ud.maxDec,
 			movetype = -1,
@@ -302,58 +306,55 @@ local function UpdateMovementSpeed(unitID, unitDefID, speedFactor, turnAccelFact
 		maxAccelerationFactor = 0.001
 	end
 	
-	if spMoveCtrlGetTag(unitID) == nil then
-		if state.movetype == 0 then
-			if speedFactor > 0 then
-				-- Only modify turning that goes beyond the turn factor that units get alongside
-				-- speed factor. This makes sense as planes turn via speed already.
-				turnFactor = turnFactor / speedFactor
-			else
-				turnFactor = 1
+	if state.movetype == 0 then
+		if speedFactor > 0 then
+			-- Only modify turning that goes beyond the turn factor that units get alongside
+			-- speed factor. This makes sense as planes turn via speed already.
+			turnFactor = turnFactor / speedFactor
+		else
+			turnFactor = 1
+		end
+		local attribute = {
+			maxSpeed        = state.origSpeed       *speedFactor,
+			maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
+			maxRudder       = state.origMaxRudder   *turnFactor,
+		}
+		spSetAirMoveTypeData (unitID, attribute)
+		spSetAirMoveTypeData (unitID, attribute)
+	elseif state.movetype == 1 then
+		local attribute =  {
+			maxSpeed        = state.origSpeed       *speedFactor,
+			--maxReverseSpeed = state.origReverseSpeed*speedFactor,
+			turnRate        = state.origTurnRate    *turnFactor,
+			accRate         = state.origMaxAcc      *maxAccelerationFactor,
+			decRate         = state.origMaxDec      *maxAccelerationFactor
+		}
+		spSetGunshipMoveTypeData (unitID, attribute)
+		GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
+	elseif state.movetype == 2 then
+		if workingGroundMoveType then
+			local accRate = state.origMaxAcc*maxAccelerationFactor
+			if isSlowed and accRate > speedFactor then
+				-- Clamp acceleration to mitigate prevent brief speedup when executing new order
+				-- 1 is here as an arbitary factor, there is no nice conversion which means that 1 is a good value.
+				accRate = speedFactor
 			end
-			local attribute = {
-				maxSpeed        = state.origSpeed       *speedFactor,
-				maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
-				maxRudder       = state.origMaxRudder   *turnFactor,
-			}
-			spSetAirMoveTypeData (unitID, attribute)
-			spSetAirMoveTypeData (unitID, attribute)
-		elseif state.movetype == 1 then
 			local attribute =  {
 				maxSpeed        = state.origSpeed       *speedFactor,
-				--maxReverseSpeed = state.origReverseSpeed*speedFactor,
+				maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
 				turnRate        = state.origTurnRate    *turnFactor,
-				accRate         = state.origMaxAcc      *maxAccelerationFactor,
-				decRate         = state.origMaxDec      *maxAccelerationFactor
+				accRate         = accRate,
+				decRate         = state.origMaxDec      *decFactor,
+				turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
 			}
-			spSetGunshipMoveTypeData (unitID, attribute)
+			spSetGroundMoveTypeData (unitID, attribute)
 			GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
-		elseif state.movetype == 2 then
-			if workingGroundMoveType then
-				local accRate = state.origMaxAcc*maxAccelerationFactor
-				if isSlowed and accRate > speedFactor then
-					-- Clamp acceleration to mitigate prevent brief speedup when executing new order
-					-- 1 is here as an arbitary factor, there is no nice conversion which means that 1 is a good value.
-					accRate = speedFactor
-				end
-				local attribute =  {
-					maxSpeed        = state.origSpeed       *speedFactor,
-					maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
-					turnRate        = state.origTurnRate    *turnFactor,
-					accRate         = accRate,
-					decRate         = state.origMaxDec      *decFactor,
-					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
-				}
-				spSetGroundMoveTypeData (unitID, attribute)
-				GG.ForceUpdateWantedMaxSpeed(unitID, unitDefID)
-			else
-				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
-				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB.MAX_SPEED))
-				spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
-			end
+		else
+			--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
+			--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB.MAX_SPEED))
+			spSetUnitCOBValue(unitID, COB.MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 		end
 	end
-	
 end
 
 --------------------------------------------------------------------------------

@@ -53,6 +53,9 @@ local unitState = {}
 -- Command Handling
 local function ToggleCommand(unitID, cmdParams, unitDefID)
 	if unitState[unitID] and strafeUnitDefs[unitDefID] then
+		if spMoveCtrlGetTag(unitID) ~= nil then
+			return
+		end
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_AIR_STRAFE)
 		
@@ -61,7 +64,7 @@ local function ToggleCommand(unitID, cmdParams, unitDefID)
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = airStrafeCmdDesc.params})
 		end
 		unitState[unitID].active = (state == 1)
-        Spring.MoveCtrl.SetGunshipMoveTypeData(unitID, {airStrafe = unitState[unitID].active})
+		Spring.MoveCtrl.SetGunshipMoveTypeData(unitID, {airStrafe = unitState[unitID].active})
 	end
 	
 end
@@ -75,13 +78,10 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if (cmdID ~= CMD_AIR_STRAFE) then
 		return true  -- command was not used
 	end
-	if spMoveCtrlGetTag(unitID) == nil then
-		ToggleCommand(unitID, cmdParams, unitDefID)
-	end
+	ToggleCommand(unitID, cmdParams, unitDefID)
 	return false  -- command was used
 end
 
@@ -101,14 +101,14 @@ function gadget:Initialize()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-    local ud = UnitDefs[unitDefID]
-    if ud and strafeUnitDefs[unitDefID] then
-        unitState[unitID] = {active = ud.airStrafe}
-        spInsertUnitCmdDesc(unitID, airStrafeCmdDesc)
-        if unitState[unitID].active then
-            ToggleCommand(unitID, {1}, unitDefID)
-        end
-    end
+	local ud = UnitDefs[unitDefID]
+	if ud and strafeUnitDefs[unitDefID] then
+		unitState[unitID] = {active = ud.airStrafe}
+		spInsertUnitCmdDesc(unitID, airStrafeCmdDesc)
+		if unitState[unitID].active then
+			ToggleCommand(unitID, {1}, unitDefID)
+		end
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
