@@ -85,6 +85,10 @@ return { striderantiheavy = {
       craterBoost             = 1,
       craterMult              = 6,
 
+      customparams            = {
+        noexplode_speed_damage = 1,
+      },
+
       damage                  = {
         default = 2000,
       },

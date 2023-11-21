@@ -16,6 +16,7 @@ local weaponDef = {
 		slot = [[3]],
 		manualfire = 1,
 		reaim_time = 1,
+		noexplode_speed_damage = 1,
 	},
 
 	damage                  = {

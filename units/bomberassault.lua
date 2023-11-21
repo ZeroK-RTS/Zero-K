@@ -124,7 +124,7 @@ return { bomberassault = {
 
       customparams            = {
         child_chain_projectile = "bomberassault_disintegrator_real",
-        child_chain_speed = 10,
+        child_chain_speed = 28,
       },
 
       damage                  = {
@@ -168,6 +168,7 @@ return { bomberassault = {
         truerange     = 200,
         burst = Shared.BURST_UNRELIABLE,
         stats_burst_damage  = 18000,
+        noexplode_speed_damage = 1,
       },
 
       damage                  = {
@@ -183,7 +184,7 @@ return { bomberassault = {
       myGravity               = 0.08,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 90,
+      range                   = 120,
       reloadtime              = 2,
       size                    = 6,
       soundHit                = [[explosion/ex_med6]],
@@ -193,7 +194,7 @@ return { bomberassault = {
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 840,
     },
 
     DEPLOY_SHIELD = {
