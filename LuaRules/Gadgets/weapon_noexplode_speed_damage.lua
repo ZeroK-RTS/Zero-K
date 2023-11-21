@@ -13,6 +13,7 @@ function gadget:GetInfo()
 end
 
 local dgunDefs = {}
+local removeDamageDefs = {}
 local alreadyTakenDamage = false -- Noexplode weapons can deal damage twice in one frame
 local IterableMap = VFS.Include("LuaRules/Gadgets/Include/IterableMap.lua")
 local activeProjectiles = IterableMap.New()
@@ -23,6 +24,9 @@ for i = 1,#WeaponDefs do
 		dgunDefs[i] = {
 			maxSpeed = WeaponDefs[i].projectilespeed,
 		}
+	end
+	if wcp and wcp.remove_damage then
+		removeDamageDefs[i] = true
 	end
 end
 
@@ -52,7 +56,10 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam, projectileID)
-	if (not projectileID) or (not dgunDefs[weaponDefID]) then
+	if (weaponDefID and removeDamageDefs[weaponDefID]) then
+		return 0
+	end
+	if (not projectileID) or not (weaponDefID and dgunDefs[weaponDefID]) then
 		return damage
 	end
 	local proData = IterableMap.Get(activeProjectiles, projectileID)
@@ -66,7 +73,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	alreadyTakenDamage[unitID][projectileID] = true
 	totalDamage = totalDamage + damage * proData.damageMod
-	Spring.Echo(totalDamage, damage, proData.damageMod, Spring.GetGameFrame())
 	return damage * proData.damageMod
 end
 

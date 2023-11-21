@@ -131,7 +131,7 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if num == 1 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
+	if num == 1 or  num == 3 or (num == manualfireWeapon and not IsManualFireTargetValid()) then
 		return true
 	end
 	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
