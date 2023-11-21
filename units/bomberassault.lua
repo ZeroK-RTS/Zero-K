@@ -125,6 +125,7 @@ return { bomberassault = {
       customparams            = {
         child_chain_projectile = "bomberassault_disintegrator_real",
         child_chain_speed      = 28,
+        child_max_vertical     = 2.5,
         remove_damage          = 1
       },
 

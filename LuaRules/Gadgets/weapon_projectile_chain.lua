@@ -19,6 +19,7 @@ for i = 1,#WeaponDefs do
 		chainDefs[i] = {
 			childDefID = WeaponDefNames[wcp.child_chain_projectile].id,
 			setSpeed = tonumber(wcp.child_chain_speed) or false,
+			maxVerticalFactor = tonumber(wcp.child_max_vertical) or false,
 		}
 	end
 end
@@ -42,6 +43,20 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 	if chainDef.setSpeed then
 		local factor = chainDef.setSpeed/proSpeed
 		vx, vy, vz = vx * factor, vy * factor, vz * factor
+		
+		if vx == 0 and vz == 0 then
+			vx = 0.0000001 + (math.floor(math.random()*2)*2 - 1) * math.random()*0.0000001
+			vz = 0.0000001 + (math.floor(math.random()*2)*2 - 1) * math.random()*0.0000001
+		end
+		if chainDef.maxVerticalFactor then
+			local vertfactor = math.abs(vy) / (chainDef.maxVerticalFactor * math.sqrt(vx*vx + vz*vz))
+			if vertfactor > 1 then
+				vx, vz = vx * vertfactor, vz * vertfactor
+				proSpeed = math.sqrt(vx*vx + vy*vy + vz*vz)
+				factor = chainDef.setSpeed/proSpeed
+				vx, vy, vz = vx * factor, vy * factor, vz * factor
+			end
+		end
 		proSpeed = chainDef.setSpeed
 	end
 	projectileParams["end"] = {x + vx, y + vy, z + vz}
