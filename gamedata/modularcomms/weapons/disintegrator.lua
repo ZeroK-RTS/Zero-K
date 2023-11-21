@@ -17,6 +17,8 @@ local weaponDef = {
 		manualfire = 1,
 		reaim_time = 1,
 		noexplode_speed_damage = 1,
+		stats_burst_damage  = 18000,
+		stats_typical_damage  = 18000,
 	},
 
 	damage                  = {

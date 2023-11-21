@@ -87,6 +87,9 @@ return { striderantiheavy = {
 
       customparams            = {
         noexplode_speed_damage = 1,
+        burst = Shared.BURST_UNRELIABLE,
+        stats_burst_damage  = 18000,
+        stats_typical_damage  = 18000,
       },
 
       damage                  = {

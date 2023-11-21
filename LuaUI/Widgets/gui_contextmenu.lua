@@ -550,7 +550,11 @@ local function weapons2Table(cells, ws, unitID)
 		local dpss = math.floor(dams/reloadtime + 0.5)
 		local dpsd = math.floor(damd/reloadtime + 0.5)
 		local dpsc = math.floor(damc/reloadtime + 0.5)
-
+		Spring.Echo("comm_mult", comm_mult)
+		if cp.stats_typical_damage then
+			dps  = math.floor(tonumber(cp.stats_typical_damage) * comm_mult /reloadtime + 0.5)
+		end
+		
 		local mult = tonumber(cp.statsprojectiles) or ((tonumber(cp.script_burst) or wd.salvoSize) * wd.projectiles)
 
 		local dps_str, dam_str, shield_dam_str = '', '', ''
@@ -642,6 +646,16 @@ local function weapons2Table(cells, ws, unitID)
 			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
 		end
 
+		if cp.stats_typical_damage then
+			cells[#cells+1] = ' - Typical Damage:'
+			cells[#cells+1] = numformat(math.floor(tonumber(cp.stats_typical_damage) * comm_mult))
+			cells[#cells+1] = ' - Continual damage while piercing'
+			cells[#cells+1] = ''
+		end
+
+		if cp.noexplode_speed_damage then
+			dam_str = dam_str .. " per touch"
+		end
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
@@ -870,10 +884,6 @@ local function weapons2Table(cells, ws, unitID)
 		if wd.noExplode or cp.pretend_no_explode then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
-			if not (cp.single_hit or cp.single_hit_multi) then
-				cells[#cells+1] = ' - Damage increase vs large units'
-				cells[#cells+1] = ''
-			end
 		end
 
 		if cp.dyndamageexp then
