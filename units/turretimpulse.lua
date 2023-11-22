@@ -85,6 +85,7 @@ return { turretimpulse = {
 
       duration                = 0.0333,
       explosionGenerator      = [[custom:NONE]],
+      heightMod               = 0.4,
       impactOnly              = true,
       intensity               = 0.7,
       interceptedByShieldType = 0,
@@ -129,6 +130,7 @@ return { turretimpulse = {
 
       duration                = 0.0333,
       explosionGenerator      = [[custom:NONE]],
+      heightMod               = 0.4,
       impactOnly              = true,
       intensity               = 0.7,
       interceptedByShieldType = 0,

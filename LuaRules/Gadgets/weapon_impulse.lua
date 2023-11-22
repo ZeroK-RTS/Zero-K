@@ -57,6 +57,7 @@ local CMD_ONOFF = CMD.ONOFF
 --local spAreTeamsAllied = Spring.AreTeamsAllied
 
 local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
+local FIXEDWING_VERTICAL_MULT = 0.5 -- prevents rediculus gunship climb
 
 local impulseMult = {
 	[0] = 0.022, -- fixedwing
@@ -208,9 +209,9 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
 
 	if moveTypeByID[unitDefID] == 0 then
-		x,y,z = x*mag, y*mag, z*mag
-	elseif moveTypeByID[unitDefID] == 1 then
 		x,y,z = x*mag, y*mag * GUNSHIP_VERTICAL_MULT, z*mag
+	elseif moveTypeByID[unitDefID] == 1 then
+		x,y,z = x*mag, y*mag * FIXEDWING_VERTICAL_MULT, z*mag
 	elseif moveTypeByID[unitDefID] == 2 then
 		x,y,z = x*mag, y*mag, z*mag
 		y = y + abs(magnitude)/(20*myMass)
@@ -377,6 +378,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
+local function ForceAircraftToFly(unitID)
+	if not Spring.GetUnitIsActive(unitID) then
+		local ux, uy, uz = Spring.GetUnitPosition(unitID)
+		Spring.SetUnitMoveGoal(unitID, ux, uy, uz)
+		Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+		Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, 0)
+	end
+end
+
 local function AddImpulses()
 	if thereIsStuffToDo then
 		for i = 1, unitByID.count do
@@ -385,6 +395,7 @@ local function AddImpulses()
 			if data.moveType == 1 then
 				local vx, vy, vz = spGetUnitVelocity(unitID)
 				if vx then
+					ForceAircraftToFly(unitID)
 					spSetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 
 					--if data.allied then
@@ -405,6 +416,7 @@ local function AddImpulses()
 					--]]
 				end
 			elseif data.moveType == 0 then
+				ForceAircraftToFly(unitID)
 				spAddUnitImpulse(unitID, data.x, data.y, data.z)
 			else
 				if data.pushOffGround then
