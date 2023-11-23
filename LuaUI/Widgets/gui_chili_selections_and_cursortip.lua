@@ -730,7 +730,10 @@ local function GetUnitShieldRegenString(unitID, ud)
 
 	-- FIXME: take energy stall into account
 	local wd = WeaponDefs[ud.shieldWeaponDef]
-	local regen = tonumber(wd.customParams.shield_rate or wd.shieldPowerRegen)
+	local wdc = wd.customParams
+	local regen = (wdc.shield_rate_charge and Spring.GetUnitRulesParam(unitID, "shield_rate_override") and
+			math.floor(Spring.GetUnitRulesParam(unitID, "shield_rate_override")*15 + 0.5)) or
+			tonumber(wdc.shield_rate or wd.shieldPowerRegen)
 	if not wd.customParams.slow_immune then
 		regen = mult * regen
 	end

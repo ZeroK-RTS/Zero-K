@@ -55,6 +55,9 @@ for unitDefID = 1, #UnitDefs do
 				slowImmune = wcp.slow_immune and true or false,
 				dieOnEmpty = wcp.die_on_empty and true or false,
 			}
+			if wcp.shield_rate_charge then
+				def.chargeRateChange = PERIOD*PERIOD*tonumber(wcp.shield_rate_charge)/(TEAM_SLOWUPDATE_RATE * TEAM_SLOWUPDATE_RATE)
+			end
 			if wcp.shield_drain and tonumber(wcp.shield_drain) > 0 then
 				def.perUpdateCost = PERIOD*tonumber(wcp.shield_drain)/TEAM_SLOWUPDATE_RATE
 				def.perSecondCost = tonumber(wcp.shield_drain)
@@ -112,7 +115,13 @@ function gadget:GameFrame(n)
 			end
 		end
 		
-		if enabled and (charge < def.maxCharge or def.chargePerUpdate < 0) and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
+		local chargeRate = def.chargePerUpdate
+		if def.chargeRateChange then
+			chargeRate = (Spring.GetUnitRulesParam(unitID, "shield_rate_override") or def.chargePerUpdate) + def.chargeRateChange
+			Spring.SetUnitRulesParam(unitID, "shield_rate_override", chargeRate, losTable)
+		end
+		
+		if enabled and (charge < def.maxCharge or chargeRate < 0) and not inCooldown and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			-- Get changed charge rate based on slow
 			local newChargeRate = (def.slowImmune and 1) or GetChargeRate(unitID)
 			
@@ -126,7 +135,7 @@ function gadget:GameFrame(n)
 			end
 			
 			-- Deal with overflow
-			local chargeAdd = newChargeRate*def.chargePerUpdate
+			local chargeAdd = newChargeRate*chargeRate
 			if charge + chargeAdd > def.maxCharge then
 				local overProportion = 1 - (charge + chargeAdd - def.maxCharge)/chargeAdd
 				if data.resTable then

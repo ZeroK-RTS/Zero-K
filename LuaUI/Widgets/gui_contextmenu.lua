@@ -480,6 +480,10 @@ local function weapons2Table(cells, ws, unitID)
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
 		cells[#cells+1] = regen .. " HP/s"
+		if wd.customParams.shield_rate_charge then
+			cells[#cells+1] = ' - Regen change:'
+			cells[#cells+1] = tonumber(wd.customParams.shield_rate_charge) .. " HP/s²"
+		end
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = drain .. " E/s"
 		local rechargeDelay = tonumber(wd.shieldrechargedelay or wd.customParams.shield_recharge_delay)

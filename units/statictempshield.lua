@@ -69,6 +69,7 @@ return { statictempshield = {
         shield_die_on_zero_charge = 1,
         slow_immune               = 1,
         die_on_empty              = 1,
+        shield_rate_charge        = -20,
       },
 
       damage                  = {
@@ -81,7 +82,7 @@ return { statictempshield = {
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3400,
-      shieldPowerRegen        = -40,
+      shieldPowerRegen        = 100,
       shieldPowerRegenEnergy  = 0,
       shieldRadius            = 200,
       shieldRepulser          = false,
