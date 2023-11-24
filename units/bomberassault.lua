@@ -240,7 +240,7 @@ return { bomberassault = {
       model                   = [[m-8_projectile.s3o]],
       myGravity               = 0.25,
       noSelfDamage            = true,
-      range                   = 550,
+      range                   = 500,
       reloadtime              = 5.6,
       sprayangle              = 7500,
       soundHit                = [[weapon/cannon/badger_hit]],
@@ -249,7 +249,7 @@ return { bomberassault = {
       soundStartVolume        = 16,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 250,
     },
 
   },
