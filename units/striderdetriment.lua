@@ -93,7 +93,8 @@ return { striderdetriment = {
     },
     {
       def                = [[OBLITERATION_BLASTER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[FIXEDWING, GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
     {
       def                = [[AALASER]],
@@ -281,10 +282,11 @@ return { striderdetriment = {
       avoidNeutral            = false,
       burst                   = 10,
       burstRate               = 0.1 + 1/30,
-      coreThickness           = 1.5,
+      coreThickness           = 2.5,
       craterBoost             = 6,
       craterMult              = 14,
       commandFire             = true,
+
       customparams = {
         light_radius = 380,
         light_color = [[0.5 0.95 0]],
@@ -300,7 +302,7 @@ return { striderdetriment = {
         default = 1200.1,
       },
 
-      duration                = 0.06,
+      duration                = 0.05,
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:slam]],
       fallOffRate             = 0.1,
@@ -319,7 +321,9 @@ return { striderdetriment = {
       sweepfire               = false,
       texture1                = [[largelaser_long]],
       texture2                = [[flare]],
-      thickness               = 14,
+      texture3                = [[largelaser_long]],
+      texture4                = [[largelaser_long]],
+      thickness               = 9,
       tolerance               = 2000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
