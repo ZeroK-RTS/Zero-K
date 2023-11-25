@@ -379,7 +379,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 local function ForceAircraftToFly(unitID)
-	if unitID and not Spring.GetUnitIsActive(unitID) then
+	if unitID and Spring.ValidUnitID(unitID) and not Spring.GetUnitIsActive(unitID) then
 		local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		if ux then
 			Spring.SetUnitMoveGoal(unitID, ux, uy, uz)
