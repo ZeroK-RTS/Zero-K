@@ -93,7 +93,7 @@ return { striderantiheavy = {
       },
 
       damage                  = {
-        default = 2000,
+        default = 2000.1,
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
