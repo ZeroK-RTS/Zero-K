@@ -68,6 +68,7 @@ local RECENT_INT_WIDTH = 1
 local MAX_ALTITUDE_AIM = 60
 
 local NO_BLOCK_TIME = 5
+local REMOVE_COMMAND_FRAME = 2
 local ATTACK_BLOCK_DEFAULT = 1
 
 -------------------------------------------------------------------------------------
@@ -136,6 +137,8 @@ local preventOverkillCmdDesc = {
 	params 	= {0, "Fire at anything", "On automatic commands", "On fire at will", "Prevent Overkill"}
 }
 
+local recentlyLobbedLobsters = {}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -152,7 +155,6 @@ local min = math.min
 local throwUnits = IterableMap.New()
 local physicsRestore = IterableMap.New()
 local UPDATE_PERIOD = 6
-
 
 local function SendUnitToTarget(unitID, launchMult, sideMult, upMult, odx, ty, odz)
 	if Spring.GetUnitTransporter(unitID) then
@@ -209,6 +211,23 @@ local function GetAffectedUnits(unitID, checkOverlobAllyTeam, unitX, unitZ)
 	return affectedUnits
 end
 
+local function CheckRedundantCommandRemoval(unitID)
+	if (not Spring.ValidUnitID(unitID)) or Spring.Utilities.GetUnitRepeat(unitID) then
+		return
+	end
+	local beingLobbedTo = IterableMap.Get(physicsRestore, unitID)
+	if not beingLobbedTo then
+		return
+	end
+	local cmdID, _, cmdTag, cp_1, cp_2, cp_3  = Spring.GetUnitCurrentCommand(unitID)
+	if not (cp_3 and (cmdID == CMD_ATTACK or cmdID == CMD.MANUALFIRE)) then
+		return
+	end
+	if math.abs(cp_1 - beingLobbedTo.tx) < 1 and math.abs(cp_3 - beingLobbedTo.tz) < 1 then
+		Spring.GiveOrderToUnit(unitID, CMD.REMOVE, cmdTag, 0)
+	end
+end
+
 function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	if not weaponDefID and throwWeaponDef[weaponDefID] then
 		return
@@ -245,10 +264,11 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 	
 	-- Blocking
 	Spring.SetUnitBlocking(proOwnerID, true, false)
-	local frame = Spring.GetGameFrame() + NO_BLOCK_TIME
-	applyBlockingFrame[frame] = applyBlockingFrame[frame] or {}
-	applyBlockingFrame[frame][proOwnerID] = true
-	unitIsNotBlocking[proOwnerID] = frame
+	local frame = Spring.GetGameFrame() 
+	local noBlockFrame = frame + NO_BLOCK_TIME
+	applyBlockingFrame[noBlockFrame] = applyBlockingFrame[noBlockFrame] or {}
+	applyBlockingFrame[noBlockFrame][proOwnerID] = true
+	unitIsNotBlocking[proOwnerID] = noBlockFrame
 	
 	-- Apply impulse
 	local affectedUnits = GetAffectedUnits(proOwnerID, false, ox, oz)
@@ -257,6 +277,7 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 		return
 	end
 	
+	local lobbedLobbers = {}
 	for i = 1, #affectedUnits do
 		local nearID = affectedUnits[i]
 		local _, _, _, speed = Spring.GetUnitVelocity(nearID)
@@ -275,8 +296,10 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			IterableMap.Add(physicsRestore, nearID,
 				{
 					unitDefID = nearDefID,
-					odx = odx,
+					tx = tx,
 					ty = ty,
+					tz = tz,
+					odx = odx,
 					odz = odz,
 					sidewaysCounter = 15,
 					launchMult = launchMult,
@@ -286,6 +309,12 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponDefID)
 			)
 			SendToUnsynced("addFlying", nearID, nearDefID, flyTime)
 			GG.Floating_InterruptFloat(nearID, 60)
+			
+			if IterableMap.Get(throwUnits, nearID) then
+				local removeFrame = frame + REMOVE_COMMAND_FRAME
+				recentlyLobbedLobsters[removeFrame] = recentlyLobbedLobsters[removeFrame] or {}
+				recentlyLobbedLobsters[removeFrame][#recentlyLobbedLobsters[removeFrame] + 1] = nearID
+			end
 		end
 	end
 	
@@ -533,6 +562,17 @@ function gadget:GameFrame(n)
 			end
 		end
 		applyBlockingFrame[n] = nil
+	end
+	
+	if recentlyLobbedLobsters[n] then
+		local handled = {}
+		for i = 1, #recentlyLobbedLobsters[n] do
+			local unitID = recentlyLobbedLobsters[n][i]
+			if not handled[unitID] then
+				CheckRedundantCommandRemoval(unitID)
+			end
+		end
+		recentlyLobbedLobsters[n] = nil
 	end
 end
 
