@@ -67,9 +67,8 @@ return { statictempshield = {
       customParams            = {
         unlinked                  = true,
         shield_die_on_zero_charge = 1,
-        slow_immune               = 1,
         die_on_empty              = 1,
-        shield_rate_charge        = -25,
+        shield_rate_charge        = -30,
       },
 
       damage                  = {
@@ -82,7 +81,7 @@ return { statictempshield = {
       shieldGoodColor         = [[0.1 0.1 1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 3400,
-      shieldPowerRegen        = 150,
+      shieldPowerRegen        = 200,
       shieldPowerRegenEnergy  = 0,
       shieldRadius            = 200,
       shieldRepulser          = false,
