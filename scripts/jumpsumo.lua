@@ -339,6 +339,7 @@ function endJump()
 	--Move(b_dome, z_axis, 12)
 	
 	EmitSfx(emit, crater)
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	--Move(b_dome, x_axis, 0)
 	--Move(b_dome, y_axis, 0)
 	--Move(b_dome, z_axis, 0)

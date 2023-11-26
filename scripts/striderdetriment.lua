@@ -299,6 +299,7 @@ local function PreJumpThread(turn, lineDist, flightDist, duration)
 end
 
 local function EndJumpThread()
+	GG.PokeDecloakUnit(unitID, unitDefID)
 	EmitSfx(lfoot, landing_explosion)
 	EmitSfx(lfoot, dirtfling)
 	Turn(torso, x_axis, math.rad(45))
