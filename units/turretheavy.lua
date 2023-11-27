@@ -179,6 +179,9 @@ return { turretheavy = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[ddm_dead.s3o]],
+      collisionVolumeOffsets        = [[0 -5 10]],
+      collisionVolumeScales         = [[100 80 55]],
+      collisionVolumeType           = [[ellipsoid]],
     },
 
 
