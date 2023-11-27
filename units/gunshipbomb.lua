@@ -24,9 +24,10 @@ return { gunshipbomb = {
   customParams           = {
     landflystate   = [[1]],
     idle_cloak = 1,
+    stats_detonate_weapon = [[gunshipbomb_gunshipbomb_bomb]],
   },
 
-  explodeAs              = [[gunshipbomb_EXPLOSION]],
+  explodeAs              = [[TINY_BUILDINGEX]],
   --fireState              = 0,
   floater                = true,
   footprintX             = 2,
@@ -44,7 +45,7 @@ return { gunshipbomb = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
   script                 = [[gunshipbomb.lua]],
-  selfDestructAs         = [[gunshipbomb_EXPLOSION]],
+  selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 0,
   sightDistance          = 500,
   speed                  = 246,
@@ -72,36 +73,45 @@ return { gunshipbomb = {
   },
 
   weaponDefs = {
-    gunshipbomb_EXPLOSION = {
-      name               = "Blastwing Explosion",
-      areaOfEffect       = 288,
+    gunshipbomb_bomb = {
+      name                    = [[Blastwing Bomb]],
+      areaOfEffect       = 256,
       craterBoost        = 1,
       craterMult         = 3.5,
 
       customParams          = {
         setunitsonfire = "1",
-        burntime = 30,
+        burnchance     = "1",
+        burntime = 660,
 
         area_damage = 1,
-        area_damage_radius = 144,
-        area_damage_dps = 32,
-        area_damage_duration = 20,
+        area_damage_radius = 128,
+        area_damage_dps = 25,
+        area_damage_duration = 2,
 
         --lups_heat_fx = [[firewalker]],
       },
 
-      damage = {
-        default = 40,
-        planes  = 40,
+      damage                  = {
+        default = 300,
       },
 
-      edgeeffectiveness  = 0.7,
-      explosionGenerator = [[custom:napalm_gunshipbomb]],
-      explosionSpeed     = 10000,
-      firestarter        = 180,
-      impulseBoost       = 0,
-      impulseFactor      = 0.4,
-      soundHit           = "explosion/ex_med17",
+      explosionGenerator      = [[custom:blastwing]],
+      edgeeffectiveness       = 0.9,
+      explosionSpeed          = 10000,
+      firestarter             = 180,
+      impulseBoost            = 0.1,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      model                   = [[f-1_bomb.s3o]],
+      myGravity               = 0.34,
+      noSelfDamage            = true,
+      range                   = 750,
+      reloadtime              = 5.6,
+      soundHit                = [[explosion/burn_explode]],
+      turret                  = false,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 500,
     },
   }
 } }

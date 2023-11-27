@@ -1724,7 +1724,8 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Death Explosion', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 
-		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
+		local weaponName = ud.customParams.stats_detonate_weapon or ud.deathExplosion:lower()
+		local weaponStats = GetWeapon( weaponName )
 		local wepCp = weaponStats.customParams
 		local damageValue = tonumber(weaponStats.customParams.stats_damage)
 

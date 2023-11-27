@@ -331,7 +331,7 @@ local function GetPriority(uid, wid)
 	
 	local ud = UnitDefs[uid]
 	local unitHealth = ud.health
-	local inverseUnitCost = 1 / ud.buildTime
+	local inverseUnitCost = 1 / ((ud.customParams.target_priority_cost and tonumber(ud.customParams.target_priority_cost)) or ud.buildTime)
 	local armorType = ud.armorType
 	targetTable[uid] = {}
 	for wid = 1, wdCount do

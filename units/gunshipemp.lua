@@ -23,7 +23,8 @@ return { gunshipemp = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    modelradius    = [[9]],
+    modelradius      = [[9]],
+    target_priority_cost = 140,
   },
 
   explodeAs           = [[TINY_BUILDINGEX]],

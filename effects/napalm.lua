@@ -570,11 +570,11 @@ local cegs = {
 }
 
 local altforms = {
-   napalmfireball_150 = {
+   napalmfireball_60 = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {particlelife = 50, particlelifespread = 100},
+	properties = {particlelife = 50, particlelifespread = 20},
       },
     },
   },

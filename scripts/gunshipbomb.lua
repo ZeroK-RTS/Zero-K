@@ -14,6 +14,8 @@ local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
 
+local bombDefID = WeaponDefNames["gunshipbomb_gunshipbomb_bomb"].id
+
 local function Burrow()
 	Signal(SIG_BURROW)
 	SetSignalMask(SIG_BURROW)
@@ -39,6 +41,22 @@ local function UnBurrow()
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
 	Move(base, y_axis, 0, 10)
+end
+
+local function ThrowBomb()
+	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	if not vz then
+		return
+	end
+	local px, py, pz = Spring.GetUnitPosition(unitID)
+	local params = {
+		pos = {px, py, pz},
+		speed = {vx, vy + 0.3, vz},
+		team = Spring.GetUnitTeam(unitID),
+		owner = unitID,
+		gravity = -0.12,
+	}
+	Spring.SpawnProjectile(bombDefID, params)
 end
 
 function Detonate() -- Giving an order causes recursion.
@@ -77,16 +95,16 @@ end
 function script.StartMoving()
 	StartThread(UnBurrow)
 end
+
 function script.StopMoving()
 	StartThread(Burrow)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, SFX.EXPLODE + SFX.FIRE + SFX.SMOKE)
-	Explode(l_wing, SFX.EXPLODE)
-	Explode(r_wing, SFX.EXPLODE)
-	
-	Explode(missile, SFX.SHATTER)
+	ThrowBomb()
+	Explode(base, SFX.FALL + SFX.EXPLODE + SFX.FIRE + SFX.SMOKE)
+	Explode(l_wing, SFX.FALL + SFX.EXPLODE)
+	Explode(r_wing, SFX.FALL + SFX.EXPLODE)
 	
 	--Explode(l_fan, SFX.EXPLODE)
 	--Explode(r_fan, SFX.EXPLODE)
