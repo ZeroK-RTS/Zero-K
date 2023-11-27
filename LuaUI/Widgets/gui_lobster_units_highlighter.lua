@@ -20,7 +20,7 @@ end
 -- TODO: Make this configurable
 local unitJumpStatusLineWidth = 4
 -- TODO: Make colors configurable
-local RED = {1, 0.35, 0.35, 0.75}
+local LIGHTRED = {1, 0.35, 0.35, 0.75}
 local ORANGE = {0.9, 0.7, 0.35, 0.75}
 local GREEN = {0.35, 1, 0.35, 0.75}
 local YELLOW = {1, 1, 0.35, 0.75}
@@ -157,26 +157,20 @@ function drawLobsterLobProperties()
 		glLineWidth(1)
 		glDrawGroundCircle(fx, fy, fz, lobsterGatherRange, 50)
 		glColor(1,1,1,1)
-		
-		-- Draw the lobster attack circle because the inbuilt one is buggy and only draws one if you have multiple lobs selected
-		glColor(RED)
-		glLineWidth(1)
-		glDrawGroundCircle(x, y, z, lobsterFireRange, 50)
-		glColor(1,1,1,1)
 	end
 	-- Highlight lobsters that will NOT be thrown
 	for i = 1, #lobstersSelected do
 		local unitID = lobstersSelected[i]
 		if unitsAffected[unitID] == nil then
 			local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
-			DrawStatusCircle(RED, fx, fy, fz)
+			DrawStatusCircle(LIGHTRED, fx, fy, fz)
 		end
 	end
 	-- Highlight units that are just out of range
 	for unitID, _ in pairs(unitsJustOutOfRange) do
 		if unitsAffected[unitID] == nil then
 			local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
-			DrawStatusCircle(RED, fx, fy, fz)
+			DrawStatusCircle(LIGHTRED, fx, fy, fz)
 		end
 	end
 	-- Highlight units that will be thrown

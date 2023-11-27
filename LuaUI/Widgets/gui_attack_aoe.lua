@@ -29,8 +29,6 @@ local depthLineWidth       = 1
 local circleDivs           = 64
 local minSpread            = 8 --weapons with this spread or less are ignored
 local numAoECircles        = 9
-local pointSizeMult        = 2048
-
 --------------------------------------------------------------------------------
 --vars
 --------------------------------------------------------------------------------
@@ -42,11 +40,11 @@ local unitAoeDefs = {}
 local unitDgunDefs = {}
 local unitHasBeenSetup = {}
 
-local aoeUnitInfo
-local dgunUnitInfo
-local aoeUnitID
-local dgunUnitID
+local aoeUnitInfos = {}
+local dgunUnitInfos = {}
+
 local selUnitID
+
 local circleList
 local secondPart = 0
 local mouseDistance = 1000
@@ -363,10 +361,8 @@ end
 
 local function UpdateSelection(sel)
 	local maxCost = 0
-	dgunUnitInfo = nil
-	aoeUnitInfo = nil
-	dgunUnitID = nil
-	aoeUnitID = nil
+	dgunUnitInfos = {}
+	aoeUnitInfos = {}
 	sumoSelected = false
 	detrimentSelected = false
 	detrimentUnitID = nil
@@ -395,16 +391,14 @@ local function UpdateSelection(sel)
 			end
 			
 			if (dgunInfo[unitDefID]) then
-				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
-				dgunUnitID = unitID
+				dgunUnitInfos[unitID] = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
 			end
 
 			if (aoeDefInfo[unitDefID]) then
 				local currCost = Spring.Utilities.GetUnitCost(unitID, unitDefID) * seenCount[unitDefID]
 				if (currCost > maxCost) then
 					maxCost = currCost
-					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
-					aoeUnitID = unitID
+					aoeUnitInfos[unitID] = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
 				end
 			end
 
@@ -766,62 +760,10 @@ local function LeashDrawRange(unitID, range, tx, ty, tz)
 end
 
 --------------------------------------------------------------------------------
---callins
+--Main draw
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
-	for unitDefID = 1, #UnitDefs do
-		local unitDef = UnitDefs[unitDefID]
-		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
-	end
-	SetupDisplayLists()
-end
-
-function widget:Shutdown()
-	DeleteDisplayLists()
-end
-
-function widget:DrawWorld()
-	mouseDistance = GetMouseDistance() or 1000
-
-	local tx, ty, tz, targetIsGround = GetMouseTargetPosition()
-	if (not tx) then
-		return
-	end
-	local _, cmd, _ = GetActiveCommand()
-	local info, unitID
-
-	if extraDrawRange and selUnitID and cmd == CMD_ATTACK then
-		local _,_,_,fx, fy, fz = GetUnitPosition(selUnitID, true)
-		if fx then
-			glColor(1, 0.35, 0.35, 0.75)
-			glLineWidth(1)
-			glDrawGroundCircle(fx, fy, fz, extraDrawRange, 50)
-			glColor(1,1,1,1)
-		end
-	end
-
-	if (cmd == CMD_ATTACK and aoeUnitInfo) then
-		info = aoeUnitInfo
-		unitID = aoeUnitID
-	elseif ((cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) and dgunUnitInfo) then
-		info = dgunUnitInfo
-		local extraDrawParam = Spring.GetUnitRulesParam(dgunUnitID, "secondary_range")
-		if extraDrawParam then
-			info.range = extraDrawParam
-		end
-		unitID = dgunUnitID
-	elseif (cmd == CMD_JUMP and sumoSelected) then
-		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
-		return
-	elseif (cmd == CMD_JUMP and detrimentSelected) then
-		local _,_,_,fx, fy, fz = GetUnitPosition(detrimentUnitID, true)
-		DrawAoE(tx, ty, tz, detrimentLandingAoE, detrimentLandingEE)
-		return
-	else
-		return
-	end
-	
+local function drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
 	if info.drawLeashedToRange then
 		tx, ty, tz = LeashDrawRange(unitID, info.range, tx, ty, tz)
 	end
@@ -877,6 +819,61 @@ function widget:DrawWorld()
 		glLineWidth(1)
 		glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
 		glColor(1,1,1,1)
+	end
+end
+
+--------------------------------------------------------------------------------
+--callins
+--------------------------------------------------------------------------------
+
+function widget:Initialize()
+	for unitDefID = 1, #UnitDefs do
+		local unitDef = UnitDefs[unitDefID]
+		aoeDefInfo[unitDefID], dgunInfo[unitDefID], extraDrawRangeDefInfo[unitDefID] = SetupUnit(unitDef)
+	end
+	SetupDisplayLists()
+end
+
+function widget:Shutdown()
+	DeleteDisplayLists()
+end
+
+function widget:DrawWorld()
+	mouseDistance = GetMouseDistance() or 1000
+
+	local tx, ty, tz, targetIsGround = GetMouseTargetPosition()
+	if (not tx) then
+		return
+	end
+	local _, cmd, _ = GetActiveCommand()
+
+	if extraDrawRange and selUnitID and cmd == CMD_ATTACK then
+		local _,_,_,fx, fy, fz = GetUnitPosition(selUnitID, true)
+		if fx then
+			glColor(1, 0.35, 0.35, 0.75)
+			glLineWidth(1)
+			glDrawGroundCircle(fx, fy, fz, extraDrawRange, 50)
+			glColor(1,1,1,1)
+		end
+	end
+	if (cmd == CMD_JUMP and sumoSelected) then
+		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
+		return
+	elseif (cmd == CMD_JUMP and detrimentSelected) then
+		local _,_,_,fx, fy, fz = GetUnitPosition(detrimentUnitID, true)
+		DrawAoE(tx, ty, tz, detrimentLandingAoE, detrimentLandingEE)
+		return
+	end
+
+	if cmd == CMD_ATTACK then
+		for unitID, info in pairs(aoeUnitInfos) do
+			drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
+		end
+	end
+	if (cmd == CMD_MANUALFIRE or cmd == CMD_AIR_MANUALFIRE) then
+		for unitID, info in pairs(dgunUnitInfos) do
+			drawForUnit(unitID, tx, ty, tz, targetIsGround, cmd, info)
+		end
 	end
 
 end
