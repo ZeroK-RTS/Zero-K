@@ -16,31 +16,37 @@ local SIG_BURROW = 1
 
 local bombDefID = WeaponDefNames["gunshipbomb_gunshipbomb_bomb"].id
 
-local function Burrow()
-	Signal(SIG_BURROW)
-	SetSignalMask(SIG_BURROW)
-	
-	local x,y,z = Spring.GetUnitPosition(unitID)
-	local height = Spring.GetGroundHeight(x,z)
-	
-	while height + 35 < y do
-		Sleep(500)
-		x,y,z = Spring.GetUnitPosition(unitID)
-		height = Spring.GetGroundHeight(x,z)
-	end
-
-	Turn(base, x_axis, math.rad(-90), 5)
-	Turn(l_wing, x_axis, math.rad(90), 5)
-	Turn(r_wing, x_axis, math.rad(90), 5)
-	Move(base, y_axis, 8, 8)
-end
-
 local function UnBurrow()
 	Signal(SIG_BURROW)
 	Turn(base, x_axis, 0, 5)
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
 	Move(base, y_axis, 0, 10)
+end
+
+local function Burrow()
+	Signal(SIG_BURROW)
+	SetSignalMask(SIG_BURROW)
+	
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
+	
+	while height + 35 < y do
+		Sleep(500)
+		x,y,z = Spring.GetUnitPosition(unitID)
+		height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
+	end
+
+	Turn(base, x_axis, math.rad(-90), 5)
+	Turn(l_wing, x_axis, math.rad(90), 5)
+	Turn(r_wing, x_axis, math.rad(90), 5)
+	Move(base, y_axis, 8, 16)
+	Sleep(600)
+	
+	local x,y,z, speed = Spring.GetUnitVelocity(unitID)
+	if speed > 0.01 then
+		UnBurrow()
+	end
 end
 
 local function ThrowBomb()
@@ -94,6 +100,10 @@ end
 
 function script.StartMoving()
 	StartThread(UnBurrow)
+end
+
+function script.Deactivate()
+	StartThread(Burrow)
 end
 
 function script.StopMoving()
