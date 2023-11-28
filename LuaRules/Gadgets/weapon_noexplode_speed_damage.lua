@@ -131,8 +131,12 @@ local function UpdateProjectile(proID, proData, index, frame)
 			proData.damageMod = proData.damageMod + def.damageModPerFrame
 		end
 		if def.ceg then
-			Spring.Echo("proData.damageMod", proData.damageMod)
 			Spring.SpawnCEG(def.ceg, px + 3*vx, py + 3*vy, pz + 3*vz, vx, vy, vz, 10, proData.damageMod) 
+		end
+		if def.sound then
+			if math.random() < 0.02 then
+				Spring.PlaySoundFile(def.sound, math.random(20,40)/100, px, py, pz, 'sfx')
+			end
 		end
 	end
 	if proData.killFrame and frame >= proData.killFrame then
