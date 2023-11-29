@@ -31,6 +31,17 @@ if gadgetHandler:IsSyncedCode() then
 	function gadget:GameFrame(n)
 		gameFrame = n
 	end
+	
+	local function DoShieldDamage(shieldCarrierUnitID, damage, hitX, hitY, hitZ)
+		if damage and damage ~= -1 then
+			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
+			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
+			SendToUnsynced("AddShieldHitDataHandler", gameFrame, shieldCarrierUnitID, damage, dx, dy, dz)
+		end
+
+		spSetUnitRulesParam(shieldCarrierUnitID, "shieldHitFrame", gameFrame, INLOS_ACCESS)
+	end
+	GG.Lups_DoShieldDamage = DoShieldDamage
 
 	function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 		
@@ -69,13 +80,7 @@ if gadgetHandler:IsSyncedCode() then
 			damage = beamDamDefs[unitDefID][beamEmitterWeaponNum]
 		end
 
-		if damage and damage ~= -1 then
-			local x, y, z = Spring.GetUnitPosition(shieldCarrierUnitID)
-			local dx, dy, dz = hitX - x, hitY - y, hitZ - z
-			SendToUnsynced("AddShieldHitDataHandler", gameFrame, shieldCarrierUnitID, damage, dx, dy, dz)
-		end
-
-		spSetUnitRulesParam(shieldCarrierUnitID, "shieldHitFrame", gameFrame, INLOS_ACCESS)
+		DoShieldDamage(shieldCarrierUnitID, damage, hitX, hitY, hitZ)
 		return false
 	end
 

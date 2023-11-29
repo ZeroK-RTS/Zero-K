@@ -113,7 +113,7 @@ return { bomberassault = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator but also fake and bogus]],
-      areaOfEffect            = 48,
+      areaOfEffect            = 40,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidGround             = false,
@@ -126,12 +126,11 @@ return { bomberassault = {
       customparams            = {
         --child_chain_projectile = "bomberassault_disintegrator_real",
         --remove_damage          = 1
-        thermite_frames       = 1050,
+        thermite_frames       = 900,
         thermite_dps_start    = 0,
-        thermite_dps_end      = 700,
+        thermite_dps_end      = 1000,
         thermite_ceg          = [[beamerray_angry_thermite]],
-        thermite_sound        = [[weapon/burning]],
-        thermite_sound_frames = 25,
+        thermite_sound        = [[weapon/burning_fixed]],
       },
 
       damage                  = {
@@ -149,7 +148,7 @@ return { bomberassault = {
       noSelfDamage            = true,
       range                   = 3000,
       reloadtime              = 2,
-      size                    = 6,
+      size                    = 0.01,
       soundStart              = [[weapon/cannon/cannon_fire8_deep]],
       soundStartVolume        = 80,
       soundTrigger            = true,

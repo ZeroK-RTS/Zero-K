@@ -27,7 +27,6 @@ for i = 1,#WeaponDefs do
 			thermiteFrames = wcp.thermite_frames,
 			ceg = wcp.thermite_ceg,
 			sound = wcp.thermite_sound,
-			soundFrames = wcp.thermite_sound_frames,
 		}
 		if wcp.thermite_dps_start and wcp.thermite_dps_end then
 			local damage = WeaponDefs[i].damages[0]
@@ -65,7 +64,7 @@ function gadget:ProjectileDestroyed(proID, proOwnerID)
 	IterableMap.Remove(activeProjectiles, proID)
 end
 
-function gadget:ShieldPreDamaged(projectileID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitter, beamCarrierID)
+function gadget:ShieldPreDamaged(projectileID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile, beamEmitterWeaponNum, beamEmitterUnitID, startX, startY, startZ, hitX, hitY, hitZ)
 	if (not projectileID) then
 		return false
 	end
@@ -78,8 +77,11 @@ function gadget:ShieldPreDamaged(projectileID, proOwnerID, shieldEmitterWeaponNu
 	if fullDamage > charge then
 		return true -- Passes shield
 	end
-	Spring.SetUnitShieldState(shieldCarrierUnitID, -1, true, charge - (fullDamage - proData.def.baseDamage))
+	Spring.SetUnitShieldState(shieldCarrierUnitID, -1, true, charge - fullDamage)
 	proData.resetNextFrame = true
+	if GG.Lups_DoShieldDamage then
+		GG.Lups_DoShieldDamage(shieldCarrierUnitID, fullDamage, hitX, hitY, hitZ)
+	end
 	return true -- Passes shield anyway
 end
 
@@ -126,17 +128,18 @@ local function UpdateProjectile(proID, proData, index, frame)
 			px, py, pz = proData.px, proData.py, proData.pz
 			Spring.SetProjectilePosition(proID, px, py, pz)
 			proData.resetNextFrame = false
+			if def.sound then
+				if (not proData.nextSoundFrame) or proData.nextSoundFrame < frame then
+					Spring.PlaySoundFile(def.sound, 4*(math.random()*0.5 + 0.5), px, py, pz, 'sfx')
+					proData.nextSoundFrame = frame + 28 + math.random()*10 - 0.3*proData.damageMod
+				end
+			end
 		end
 		if def.damageModPerFrame then
 			proData.damageMod = proData.damageMod + def.damageModPerFrame
 		end
 		if def.ceg then
-			Spring.SpawnCEG(def.ceg, px + 3*vx, py + 3*vy, pz + 3*vz, vx, vy, vz, 10, proData.damageMod) 
-		end
-		if def.sound then
-			if math.random() < 0.02 then
-				Spring.PlaySoundFile(def.sound, math.random(20,40)/100, px, py, pz, 'sfx')
-			end
+			Spring.SpawnCEG(def.ceg, px, py + 0.02, pz, vx, vy, vz, 10, proData.damageMod) 
 		end
 	end
 	if proData.killFrame and frame >= proData.killFrame then

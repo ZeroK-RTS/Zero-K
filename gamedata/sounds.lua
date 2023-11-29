@@ -123,6 +123,12 @@ local optionOverrides = {
 		pitchmod = 0,
 		gainmod = 0,
 		maxconcurrent = 5,
+	},
+	["weapon/burning_fixed"] = {
+		pitchmod = 0.03,
+		gainmod = 0.1,
+		maxconcurrent = 10,
+		rolloff = 2,
 	}
 }
 
@@ -138,8 +144,8 @@ local replyOpts = {
 local noVariation = {
 	dopplerscale = 0,
 	in3d = false,
-	pitchmod = 0,
 	gainmod = 0,
+	pitchmod = 0,
 	pitch = 1,
 	gain = 1,
 }
