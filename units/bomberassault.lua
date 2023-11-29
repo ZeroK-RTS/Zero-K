@@ -120,8 +120,8 @@ return { bomberassault = {
       avoidNeutral            = false,
       collideFeature          = false,
       cegTag                  = [[custom:none]],
-      craterBoost             = 1,
-      craterMult              = 6,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       customparams            = {
         --child_chain_projectile = "bomberassault_disintegrator_real",

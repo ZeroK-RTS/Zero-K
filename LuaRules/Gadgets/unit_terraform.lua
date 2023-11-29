@@ -3471,64 +3471,68 @@ local function DoSmoothDirectly(x, z, sx, sz, smoothradius, origHeight, groundHe
 	end
 end
 
+local function DoSmooth(def, x, y, z)
+	local height = spGetGroundHeight(x,z)
+	
+	local smoothradius = def.smoothradius
+	local gatherradius = def.gatherradius
+	local detachmentradius = def.detachmentradius
+	local maxSmooth = def.smooth
+	local smoothheightoffset = def.smoothheightoffset
+	
+	if y > height + HEIGHT_FUDGE_FACTOR then
+		local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
+		if factor > 0 then
+			smoothradius = smoothradius*factor
+			gatherradius = gatherradius*factor
+			maxSmooth = maxSmooth*factor
+		else
+			return
+		end
+	end
+	
+	local smoothradiusSQ = smoothradius^2
+	local gatherradiusSQ = gatherradius^2
+	
+	smoothradius = smoothradius + (8 - smoothradius%8)
+	gatherradius = gatherradius + (8 - gatherradius%8)
+	
+	local sx = floor((x+4)/8)*8
+	local sz = floor((z+4)/8)*8
+	
+	local groundPoints = 0
+	local groundHeight = 0
+	
+	local increment = (def.quickgather and 16) or 8
+	for i = sx - gatherradius, sx + gatherradius, increment do
+		for j = sz - gatherradius, sz + gatherradius, increment do
+			local disSQ = (i - x)^2 + (j - z)^2
+			if disSQ <= gatherradiusSQ then
+				groundPoints = groundPoints + 1
+				groundHeight = groundHeight + spGetGroundHeight(i,j)
+			end
+		end
+	end
+	
+	if groundPoints > 0 then
+		groundHeight = groundHeight/groundPoints - (smoothheightoffset or 0)
+		spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, def.smoothexponent, def.movestructures)
+	end
+	
+	if detachmentradius then
+		local GRAVITY = Game.gravity
+		local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
+		for i = 1, #units do
+			local hitUnitID = units[i]
+			GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
+		end
+	end
+end
+
 function gadget:Explosion(weaponID, x, y, z, owner)
 	if SeismicWeapon[weaponID] then
-		local height = spGetGroundHeight(x,z)
-		
 		local def = SeismicWeapon[weaponID]
-		local smoothradius = def.smoothradius
-		local gatherradius = def.gatherradius
-		local detachmentradius = def.detachmentradius
-		local maxSmooth = def.smooth
-		local smoothheightoffset = def.smoothheightoffset
-		
-		if y > height + HEIGHT_FUDGE_FACTOR then
-			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
-			if factor > 0 then
-				smoothradius = smoothradius*factor
-				gatherradius = gatherradius*factor
-				maxSmooth = maxSmooth*factor
-			else
-				return
-			end
-		end
-		
-		local smoothradiusSQ = smoothradius^2
-		local gatherradiusSQ = gatherradius^2
-		
-		smoothradius = smoothradius + (8 - smoothradius%8)
-		gatherradius = gatherradius + (8 - gatherradius%8)
-		
-		local sx = floor((x+4)/8)*8
-		local sz = floor((z+4)/8)*8
-		
-		local groundPoints = 0
-		local groundHeight = 0
-		
-		local increment = (def.quickgather and 16) or 8
-		for i = sx - gatherradius, sx + gatherradius, increment do
-			for j = sz - gatherradius, sz + gatherradius, increment do
-				local disSQ = (i - x)^2 + (j - z)^2
-				if disSQ <= gatherradiusSQ then
-					groundPoints = groundPoints + 1
-					groundHeight = groundHeight + spGetGroundHeight(i,j)
-				end
-			end
-		end
-		
-		if groundPoints > 0 then
-			groundHeight = groundHeight/groundPoints - (smoothheightoffset or 0)
-			spSetHeightMapFunc(DoSmoothDirectly, x, z, sx, sz, smoothradius, origHeight, groundHeight, maxSmooth, smoothradiusSQ, def.smoothexponent, def.movestructures)
-		end
-		
-		if detachmentradius then
-			local GRAVITY = Game.gravity
-			local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
-			for i = 1, #units do
-				local hitUnitID = units[i]
-				GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
-			end
-		end
+		DoSmooth(def, x, y, z)
 	end
 end
 
@@ -3854,6 +3858,7 @@ end
 -- Gadget API
 
 local TerraformFunctions = {}
+TerraformFunctions.DoSmooth = DoSmooth
 
 function TerraformFunctions.ForceTerraformCompletion(pregame, needSaveHax)
 	if pregame and needSaveHax then

@@ -120,7 +120,7 @@ local function UpdateProjectile(proID, proData, index, frame)
 		local vx, vy, vz = Spring.GetProjectileVelocity(proID)
 		if proData.resetNextFrame then
 			if py < height + 4 then
-				Spring.SetProjectileVelocity(proID, 0, 2, 0)
+				Spring.SetProjectileVelocity(proID, 0, 0, 0)
 			else
 				-- Counteract gravity
 				Spring.SetProjectileVelocity(proID, vx, vy + 0.08, vz)
@@ -131,7 +131,7 @@ local function UpdateProjectile(proID, proData, index, frame)
 			if def.sound then
 				if (not proData.nextSoundFrame) or proData.nextSoundFrame < frame then
 					Spring.PlaySoundFile(def.sound, 4*(math.random()*0.5 + 0.5), px, py, pz, 'sfx')
-					proData.nextSoundFrame = frame + 28 + math.random()*10 - 0.3*proData.damageMod
+					proData.nextSoundFrame = frame + 28 + math.random()*5 - 0.2*proData.damageMod
 				end
 			end
 		end
