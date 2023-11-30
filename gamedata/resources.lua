@@ -118,6 +118,7 @@ local resources = {
       exp02_2= "gpl/explosion3/exp02_2.png",
       exp02_3= "gpl/explosion3/exp02_3.png",
       fireball= "pd/fireball.tga",
+      FireBall02_8x8 = "cc/FireBall02_8x8.tga",
       fireyexplo= "cc/fireyexplo.tga",
 	  flareprojectiletexture= "pd/fireball.tga",
       flashside1= "cc/flashside1.tga",
