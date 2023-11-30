@@ -26,9 +26,11 @@ local min                 = math.min
 local sqrt                = math.sqrt
 
 local Echo                = Spring.Echo
+local GetAIInfo           = Spring.GetAIInfo
 local GetAllUnits         = Spring.GetAllUnits
 local GetAllyTeamList     = Spring.GetAllyTeamList
 local GetCameraPosition   = Spring.GetCameraPosition
+local GetGaiaTeamID       = Spring.GetGaiaTeamID
 local GetMoveType         = Spring.Utilities.getMovetype
 local GetPlayerInfo       = Spring.GetPlayerInfo
 local GetScreenGeometry   = Spring.GetScreenGeometry
@@ -58,13 +60,20 @@ local teamAvatars         = {}
 local teamCheckDelays     = {}
 
 function initTeams()
+    local gaiaTeamID = GetGaiaTeamID()
     for _, allyTeam in pairs(GetAllyTeamList()) do
         for _, teamID in pairs(GetTeamList(allyTeam)) do
-            local teamLeader = nil
-            _, teamLeader = GetTeamInfo(teamID)
-            local teamName = "unknown"
-            if teamLeader then
+            local teamName
+            if teamID == gaiaTeamID then
+                teamName = "Gaia"
+            else
+                local _, teamLeader, _, isAI = GetTeamInfo(teamID)
+                if isAI then
+                    local _, name = GetAIInfo(teamID)
+                    teamName = name
+                else
                 teamName = GetPlayerInfo(teamLeader)
+                end
             end
             local r, g, b = GetTeamColor(teamID)
 
