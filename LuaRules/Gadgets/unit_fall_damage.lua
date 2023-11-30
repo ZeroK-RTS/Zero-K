@@ -201,7 +201,7 @@ local function DoCollisionDamage(unitID, unitDefID, otherID)
 			end
 		end
 		if not colliderImmune then
-			spAddUnitDamage(unitID, damageToDeal*(collisionDamageMult[unitID] or 1), 0, nil, -7)
+			spAddUnitDamage(unitID, damageToDeal*(collisionDamageMult[unitID] or 1), 0, otherID, -7)
 		end
 		local collideeImmune = false
 		if unitImmune[otherID] then
@@ -219,7 +219,7 @@ local function DoCollisionDamage(unitID, unitDefID, otherID)
 			end
 		end
 		if not collideeImmune then
-			spAddUnitDamage(otherID, damageToDeal*(collisionDamageMult[otherID] or 1), 0, nil, -7)
+			spAddUnitDamage(otherID, damageToDeal*(collisionDamageMult[otherID] or 1), 0, unitID, -7)
 		end
 	end
 end
