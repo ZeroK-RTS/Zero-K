@@ -131,6 +131,7 @@ return { bomberassault = {
         thermite_dps_end      = 1000,
         thermite_ceg          = [[beamerray_angry_thermite]],
         thermite_sound        = [[weapon/burning_fixed]],
+        thermite_sound_hit    = [[explosion/ex_med6]],
       },
 
       damage                  = {
@@ -149,8 +150,8 @@ return { bomberassault = {
       range                   = 3000,
       reloadtime              = 2,
       size                    = 0.01,
-      soundStart              = [[weapon/cannon/cannon_fire8_deep]],
-      soundStartVolume        = 80,
+      soundStart              = [[weapon/cannon/plasma_fire_extra]],
+      soundStartVolume        = 200,
       soundTrigger            = true,
       tolerance               = 10000,
       turret                  = true,

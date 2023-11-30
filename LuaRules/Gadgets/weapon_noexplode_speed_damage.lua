@@ -27,6 +27,7 @@ for i = 1,#WeaponDefs do
 			thermiteFrames = wcp.thermite_frames,
 			ceg = wcp.thermite_ceg,
 			sound = wcp.thermite_sound,
+			hitSound = wcp.thermite_sound_hit,
 		}
 		if wcp.thermite_dps_start and wcp.thermite_dps_end then
 			local damage = WeaponDefs[i].damages[0]
@@ -116,9 +117,13 @@ local function UpdateProjectile(proID, proData, index, frame)
 		proData.damageMod = math.min(1, travelled / def.maxSpeed)
 	end
 	if def.thermiteFrames then
-		local height = Spring.GetGroundHeight(px, pz)
+		local height = Spring.GetGroundHeight(px, pz) or py
 		local vx, vy, vz = Spring.GetProjectileVelocity(proID)
 		if proData.resetNextFrame then
+			if def.hitSound and not proData.playedHitAlready then
+				Spring.PlaySoundFile(def.hitSound, 12, px, py, pz, 'sfx')
+				proData.playedHitAlready = true
+			end
 			if py < height + 4 then
 				Spring.SetProjectileVelocity(proID, 0, 0, 0)
 			else
@@ -130,7 +135,7 @@ local function UpdateProjectile(proID, proData, index, frame)
 			proData.resetNextFrame = false
 			if def.sound then
 				if (not proData.nextSoundFrame) or proData.nextSoundFrame < frame then
-					Spring.PlaySoundFile(def.sound, 4*(math.random()*0.5 + 0.5), px, py, pz, 'sfx')
+					Spring.PlaySoundFile(def.sound, 4.5*(math.random()*0.5 + 0.5) + 0.3*proData.damageMod, px, py, pz, 'sfx')
 					proData.nextSoundFrame = frame + 28 + math.random()*5 - 0.2*proData.damageMod
 				end
 			end
@@ -139,7 +144,8 @@ local function UpdateProjectile(proID, proData, index, frame)
 			proData.damageMod = proData.damageMod + def.damageModPerFrame
 		end
 		if def.ceg then
-			Spring.SpawnCEG(def.ceg, px, py + 0.02, pz, vx, vy, vz, 10, proData.damageMod) 
+			local height = Spring.GetGroundHeight(px, pz) or py
+			Spring.SpawnCEG(def.ceg, px, math.max(height, py), pz, vx, vy, vz, 10, proData.damageMod) 
 		end
 	end
 	if proData.killFrame and frame >= proData.killFrame then

@@ -128,7 +128,10 @@ local optionOverrides = {
 		pitchmod = 0.03,
 		gainmod = 0.1,
 		maxconcurrent = 10,
-		rolloff = 2,
+		rolloff = 0.8,
+	},
+	["weapon/cannon/plasma_fire_extra"] = {
+		gain = 10,
 	}
 }
 

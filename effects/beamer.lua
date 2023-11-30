@@ -188,7 +188,7 @@ return {
         dir                = [[-2 r4,-2 r4,-2 r4]],
         length             = [[1.02 d1 6.4]],
         width              = [[1 d1 3.4]],
-        pos                = [[0, 7, 0]],
+        pos                = [[0, 5, 0]],
       },
     },
     sparks_white = {
