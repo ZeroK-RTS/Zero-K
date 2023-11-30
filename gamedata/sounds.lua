@@ -130,8 +130,8 @@ local optionOverrides = {
 		maxconcurrent = 10,
 		rolloff = 0.8,
 	},
-	["weapon/cannon/plasma_fire_extra"] = {
-		gain = 10,
+	["weapon/cannon/plasma_fire_extra2"] = {
+		gain = 20,
 	}
 }
 

@@ -121,7 +121,7 @@ local function UpdateProjectile(proID, proData, index, frame)
 		local vx, vy, vz = Spring.GetProjectileVelocity(proID)
 		if proData.resetNextFrame then
 			if def.hitSound and not proData.playedHitAlready then
-				Spring.PlaySoundFile(def.hitSound, 12, px, py, pz, 'sfx')
+				Spring.PlaySoundFile(def.hitSound, 14, px, py, pz, 'sfx')
 				proData.playedHitAlready = true
 			end
 			if py < height + 4 then
