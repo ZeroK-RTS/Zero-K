@@ -48,7 +48,7 @@ return { cloakaa = {
 
   },
 
-  sightDistance          = 660,
+  sightDistance          = 760, -- over the usual 660 limit on purpose. Matches Toad bonus to let lasers hit at max range, and makes for a better spotter.
   speed                  = 87,
   trackOffset            = 0,
   trackStrength          = 8,
