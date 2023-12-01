@@ -59,7 +59,7 @@ local unitsByTeam         = {}
 local teamAvatars         = {}
 local teamCheckDelays     = {}
 
-function initTeams()
+local function _initTeams()
     local gaiaTeamID = GetGaiaTeamID()
     for _, allyTeam in pairs(GetAllyTeamList()) do
         for _, teamID in pairs(GetTeamList(allyTeam)) do
@@ -87,11 +87,11 @@ function initTeams()
     end
 end
 
-local function length(x, y, z)
+local function _length(x, y, z)
     return sqrt(x * x + y * y + (z and z * z or 0))
 end
 
-function _addUnit(unitTeam, unitID, unitDefID)
+local function _addUnit(unitTeam, unitID, unitDefID)
     unitDefID = unitDefID or GetUnitDefID(unitID)
     local unitDef = UnitDefs[unitDefID]
     if not unitDef then
@@ -103,6 +103,14 @@ function _addUnit(unitTeam, unitID, unitDefID)
     unitsByTeam[unitTeam][unitID] = { isStatic, height }
 end
 
+local function _removeUnit(unitTeam, unitID)
+    unitsByTeam[unitTeam][unitID] = nil
+    if teamAvatars[unitTeam] and teamAvatars[unitTeam][1] == unitID then
+        teamAvatars[unitTeam] = nil
+        teamCheckDelays[unitTeam] = 0
+    end
+end
+
 local scx, scy, sDistanceMax
 
 function widget:Initialize()
@@ -112,7 +120,7 @@ function widget:Initialize()
     local sDistanceFraction = 0.85
     sDistanceMax = min(scx * sDistanceFraction, scy * sDistanceFraction)
 
-    initTeams()
+    _initTeams()
 
     for _, unitID in pairs(GetAllUnits()) do
         _addUnit(GetUnitTeam(unitID), unitID, GetUnitDefID(unitID))
@@ -148,7 +156,7 @@ local function _DrawTeamNames()
         -- Periodically check if avatar is near center of screen
         if teamAvatar and teamCheckDelays[teamID] <= 0 then
             local usx, usy = _GetScreenCoords(teamAvatar[1])
-            if not usx or not usy or length(scx - usx, scy - usy) > sDistanceMax then
+            if not usx or not usy or _length(scx - usx, scy - usy) > sDistanceMax then
                 teamAvatar = nil
                 teamAvatars[teamID] = nil
             end
@@ -164,7 +172,7 @@ local function _DrawTeamNames()
                 if IsUnitInView(unitID) then
                     local isStatic = unitInfo[1]
                     local usx, usy = _GetScreenCoords(unitID)
-                    local distance = length(scx - usx, scy - usy)
+                    local distance = _length(scx - usx, scy - usy)
                     if (bestIsStatic and not isStatic) or ((bestIsStatic or not isStatic) and bestDistance > distance) then
                         bestDistance = distance
                         bestUnitID = unitID
@@ -183,7 +191,7 @@ local function _DrawTeamNames()
     for _, attributes in pairs(teamAvatars) do
         -- Log scale the text so that it's readable over a wider range whilst still being world rendered
         local ux, uy, uz = GetUnitPosition(attributes[1])
-        local cDistance = length(cx - ux, cy - uy, cz - uz)
+        local cDistance = _length(cx - ux, cy - uy, cz - uz)
         local fontSize = 5 * log(cDistance / 32, 2)
         attributes[4] = fontSize
         glDrawFuncAtUnit(attributes[1], false, _DrawTeamName, attributes[1], attributes)
@@ -201,16 +209,16 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-    unitsByTeam[unitTeam][unitID] = nil
+    _removeUnit(unitTeam, unitID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
-    unitsByTeam[oldTeam][unitID] = nil
+    _removeUnit(oldTeam, unitID)
     _addUnit(unitTeam, unitID, unitDefID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-    unitsByTeam[unitTeam][unitID] = nil
+    _removeUnit(unitTeam, unitID)
     _addUnit(newTeam, unitID, unitDefID)
 end
 
@@ -220,5 +228,5 @@ end
 
 -- This seems to be called more frequently than UnitEnteredLos, at least during spec, so don't use it
 -- function widget:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
---     unitsByTeam[unitTeam][unitID] = nil
+--    _removeUnit(unitTeam, unitID)
 -- end
