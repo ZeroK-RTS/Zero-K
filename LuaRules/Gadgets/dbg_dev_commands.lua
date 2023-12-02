@@ -841,10 +841,14 @@ local function PlaceBattle(cmd, line, words, player)
 	gadgetHandler:GotChatMsg("disablegadget " .. "Galaxy Campaign Battle Handler", 0)
 	gadgetHandler:GotChatMsg("enablegadget " .. "Galaxy Campaign Battle Handler", 0)
 	
-	-- Load config on command, since its a massive table.
-	local unitList, featureList = VFS.Include("LuaRules/Configs/battle_config.lua")
-	GG.mission_PlaceFeatures(featureList, 0)
-	GG.mission_PlaceUnits(unitList, 0)
+	local battleName = words[1] or "cc"
+	local unitList, featureList = VFS.Include("LuaRules/Configs/battles/" .. battleName .. ".lua")
+	if featureList then
+		GG.mission_PlaceFeatures(featureList, 0)
+	end
+	if unitList then
+		GG.mission_PlaceTeamUnits(unitList)
+	end
 end
 
 function gadget:GameFrame(n)

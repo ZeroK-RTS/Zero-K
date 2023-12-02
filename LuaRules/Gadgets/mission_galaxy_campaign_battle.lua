@@ -1426,6 +1426,22 @@ function GG.mission_PlaceUnits(unitList, teamID)
 	end
 end
 
+function GG.mission_PlaceTeamUnits(unitTeamList)
+	commandsToGive = nil
+	for teamID, unitList in pairs(unitTeamList) do
+		for i = 1, #unitList do
+			PlaceUnit(unitList[i], teamID, false, false)
+		end
+	end
+	if commandsToGive then
+		for i = 1, #commandsToGive do
+			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
+		end
+		commandsToGive = nil
+	end
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- (Most) callins
