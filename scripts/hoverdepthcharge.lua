@@ -112,6 +112,7 @@ function script.Create()
 	Turn(rim1, y_axis, math.rad(-35))
 	Turn(rim2, y_axis, math.rad(35))
 	
+	Spring.SetUnitMaxRange(unitID, 280)
 	StartThread(GG.Script.SmokeUnit, unitID, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
