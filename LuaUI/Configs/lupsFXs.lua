@@ -91,6 +91,7 @@ energysinguBursts = {
 
 staticshieldBursts = {
 	layer      = -35,
+	onActive    = true,
 	life       = math.huge,
 	piece      = "glow",
 	rotSpeed   = 0.7,
@@ -110,6 +111,7 @@ staticshieldBursts = {
 }
 staticshieldBall = {
 	piece = "glow",
+	onActive    = true,
 	life = math.huge,
 	size = 11,
 	colormap1 = {{0.95, 0.1, 0.95, 0.9}},
@@ -119,6 +121,7 @@ staticshieldBall = {
 }
 staticshieldBallSmall = {
 	piece = "glow",
+	onActive    = true,
 	life = math.huge,
 	size = 6.5,
 	colormap1 = {{0.95, 0.1, 0.95, 0.9}},
@@ -129,6 +132,7 @@ staticshieldBallSmall = {
 
 staticshieldBurstsBig = {
 	layer      = -35,
+	onActive    = true,
 	life       = math.huge,
 	piece      = "glow",
 	rotSpeed   = 0.7,
@@ -148,6 +152,7 @@ staticshieldBurstsBig = {
 }
 staticshieldBurstsSmall = {
 	layer      = -35,
+	onActive    = true,
 	life       = math.huge,
 	piece      = "glow",
 	rotSpeed   = 0.7,
