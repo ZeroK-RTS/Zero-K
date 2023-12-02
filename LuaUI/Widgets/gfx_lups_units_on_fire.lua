@@ -74,9 +74,9 @@ local function UpdateFlameFxToDuration(unitID, flameFX, frame)
 	
 	flameFX.life = remaining * 0.05 + 25
 	flameFX.lifeSpread = flameFX.life * 0.2 + 5
-	flameFX.speed = math.min(0.65, 0.9 * math.pow(0.99, remaining))
-	flameFX.force[2] = 1.5 + 1.5 * math.pow(0.999, remaining)
-	flameFX.emitRotSpread = math.max(25, 70 - remaining * 0.01)
+	flameFX.speed = math.min(0.65, 0.8 * math.pow(0.99, remaining))
+	flameFX.force[2] = 1.5 + math.min(1.5, 1.8 * math.pow(0.999, remaining))
+	flameFX.emitRotSpread = math.max(25, 70 - remaining * 0.006)
 	
 	flameFX.colormap[3][1] = math.max(0.15, 0.35 - remaining * 0.001)
 end
