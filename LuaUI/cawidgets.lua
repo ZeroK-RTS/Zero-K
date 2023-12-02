@@ -17,6 +17,7 @@
 local ignorelist = {count = 0, ignorees = {} } -- Ignore workaround for WG table.
 local playerstate = {} -- for PlayerChangedTeam, PlayerResigned
 local resetWidgetDetailLevel = false -- has widget detail level changed
+local myPlayerID = Spring.GetLocalPlayerID()
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
 local DATA_VERSION = 9 -- change this to reset widget settings
@@ -2347,13 +2348,17 @@ end
 
 
 function widgetHandler:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+	local spectating = playerstate[myPlayerID].spectator
 	for _, w in r_ipairs(self.UnitDamagedList) do
 		-- The engine only provides attackerID etc if the attacker is visible.
 		-- OTOH weaponDefID and projectileID are always provided - elide projectileID so that widgets can't aquire projectile vector and locate the attacker.
-		w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, nil, attackerID, attackerDefID, attackerTeam)
+		if spectating then
+			w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+		else
+			w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, attackerID and weaponDefID, nil, attackerID, attackerDefID, attackerTeam)
+		end
 	end
 end
-
 function widgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
 	for _, w in r_ipairs(self.UnitStunnedList) do
 		w:UnitStunned(unitID, unitDefID, unitTeam, stunned)
