@@ -87,7 +87,7 @@ local function GetUnitString(unitID, tabs, sendCommands)
 		facing = Spring.GetUnitBuildFacing(unitID)
 		x, y, z = Spring.Pos2BuildPos(unitDefID, x, y, z, facing)
 	else
-		facing = Spring.GetFacingfromHeading(Spring.GetUnitHeading(unitID))
+		facing = Spring.GetFacingFromHeading(Spring.GetUnitHeading(unitID))
 	end
 	
 	local build = select(5, Spring.GetUnitHealth(unitID))
