@@ -141,6 +141,24 @@ local function GetFeatureString(fID)
 	return unitString .. tabs.. "},"
 end
 
+local function ExportAllyTeamUnits(allyTeamID, sendCommands, selectedOnly)
+	local units = Spring.GetAllUnits(teamID)
+	if not (units and #units > 0) then
+		return
+	end
+	local tabs = (teamID == 0 and "\t\t\t\t") or "\t\t\t\t\t"
+	Spring.Echo("====== Unit export allyTeam " .. (allyTeamID or "??") .. " ======")
+	for i = 1, 20 do
+		Spring.Echo("= - = - = - = - = - = - = - = - = - = - = - = - = - = - = - = - =")
+	end
+	local unitsString = tabs .. "startUnits = {\n"
+	for i = 1, #units do
+		if Spring.GetUnitAllyTeam(units[i]) == allyTeamID then
+			Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
+		end
+	end
+end
+
 local function ExportTeamUnitsForMission(teamID, sendCommands, selectedOnly)
 	local units = Spring.GetTeamUnits(teamID)
 	if not (units and #units > 0) then
@@ -157,8 +175,18 @@ local function ExportTeamUnitsForMission(teamID, sendCommands, selectedOnly)
 			Spring.Echo(GetUnitString(units[i], tabs, sendCommands))
 		end
 	end
-	--unitsString = unitsString .. tabs .. "}"
-	--Spring.Echo(unitsString)
+end
+
+local function ExportUnitsForMission(sendCommands, selectedOnly)
+	if recentlyExported then
+		return
+	end
+	local teamList = Spring.GetTeamList()
+	Spring.Echo("================== ExportUnitsForMission ==================")
+	for i = 1, #teamList do
+		ExportTeamUnitsForMission(teamList[i], sendCommands, selectedOnly)
+	end
+	recentlyExported = 1
 end
 
 local function ExportUnitsForMission(sendCommands, selectedOnly)
@@ -180,6 +208,17 @@ end
 local function ExportSelectedUnitsAndCommandsForMission()
 	ExportUnitsForMission(true, true)
 end
+
+local function ExportAllyTeamUnitsAndCommands()
+	if recentlyExported then
+		return
+	end
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		ExportAllyTeamUnits(allyTeamList[i], true)
+	end
+end
+
 
 local function ExportFeaturesForMission()
 	Spring.Echo("================== ExportFeaturesForMission ==================")
@@ -417,6 +456,12 @@ options = {
 		type = 'button',
 		action = 'mission_unit_commands_export',
 		OnChange = ExportSelectedUnitsAndCommandsForMission,
+	},
+	exportallyteamcommands = {
+		name = "AllyTeam Unit Export (Selected and Commands)",
+		type = 'button',
+		action = 'allyteam_unit_commands_export',
+		OnChange = ExportAllyTeamUnitsAndCommands,
 	},
 	missionexportfeatures = {
 		name = "Mission Feature Export",
