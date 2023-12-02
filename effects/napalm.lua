@@ -158,9 +158,9 @@ local cegs = {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i40]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[-35 r70, 30, -35 r70]],
+        delay              = [[0 i30]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_PYRO]],
+        pos                = [[-25 r50, 10 r25, -25 r50]],
       },
     },
   },
@@ -445,7 +445,7 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 10,
+      count              = 8,
       ground             = true,
       water              = true,
       properties = {
@@ -457,7 +457,7 @@ local cegs = {
     redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 45,
+      count              = 30,
       ground             = true,
       water              = true,
       properties = {
@@ -577,6 +577,20 @@ local altforms = {
     modifications = {
       rocks = {
 	properties = {particlelife = 50, particlelifespread = 20},
+      },
+    },
+  },
+  NAPALMFIREBALL_PYRO = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		properties = {particlelife = 150, particlelifespread = 80,
+	       particlesize       = 50,
+        particlesizespread = 20,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.7,
+        colormap           = [[0 0 0 0     0.4 0.4 0.4 0.1    0.6 0.6 0.6 0.1    0.5 0.5 0.5 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+		},
       },
     },
   },
