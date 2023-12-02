@@ -14,7 +14,7 @@ end
 
 local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 local missionDifficulty = tonumber(Spring.GetModOptions().planetmissiondifficulty) or 2
-if not campaignBattleID then
+if not campaignBattleID and not GG.load_galaxy_mission_handler then
 	return
 end
 
@@ -1400,6 +1400,30 @@ local function MissionGameOver(missionWon)
 	local losses = Spring.GetTeamRulesParam(PLAYER_TEAM_ID, "stats_history_unit_lost_tally_current")
 	Spring.Echo("set MissionGameOver_losses", losses)
 	SetGameRulesParamHax("MissionGameOver_losses", losses)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Gadget helpers, for profiler but maybe other things
+
+function GG.mission_PlaceFeatures(featureList, teamID)
+	for i = 1, #featureList do
+		PlaceFeature(featureList[i], teamID)
+	end
+end
+
+function GG.mission_PlaceUnits(unitList, teamID)
+	commandsToGive = nil
+	for i = 1, #unitList do
+		PlaceUnit(unitList[i], teamID, false, false)
+	end
+	
+	if commandsToGive then
+		for i = 1, #commandsToGive do
+			GiveCommandsToUnit(commandsToGive[i].unitID, commandsToGive[i].commands)
+		end
+		commandsToGive = nil
+	end
 end
 
 --------------------------------------------------------------------------------

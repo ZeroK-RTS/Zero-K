@@ -216,7 +216,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Quick Selection Bar']     = imgPath..'idlecon.png',
 	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
 	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
-	['Settings/HUD Panels/Spectator Panels']        = imgPath..'advplayerlist/spec.png',
+	['Settings/HUD Panels/Spectator Panels']        = imgPath..'advplayerslist/spec.png',
 	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
 }
 

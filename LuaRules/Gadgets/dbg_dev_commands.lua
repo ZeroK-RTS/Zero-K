@@ -833,6 +833,20 @@ local function PrintUnits(cmd, line, words, player)
 	end
 end
 
+local function PlaceBattle(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then
+		return
+	end
+	GG.load_galaxy_mission_handler = true
+	gadgetHandler:GotChatMsg("disablegadget " .. "Galaxy Campaign Battle Handler", 0)
+	gadgetHandler:GotChatMsg("enablegadget " .. "Galaxy Campaign Battle Handler", 0)
+	
+	-- Load config on command, since its a massive table.
+	local unitList, featureList = VFS.Include("LuaRules/Configs/battle_config.lua")
+	GG.mission_PlaceFeatures(featureList, 0)
+	GG.mission_PlaceUnits(unitList, 0)
+end
+
 function gadget:GameFrame(n)
 	if not spIsCheatingEnabled() then
 		return
@@ -886,6 +900,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self, "nocost", nocost, "Makes everything gadget-implemented free.")
 	gadgetHandler.actionHandler.AddChatAction(self, "power", power, "Remove grid power limit.")
 	gadgetHandler.actionHandler.AddChatAction(self, "printunits",  PrintUnits, "")
+	gadgetHandler.actionHandler.AddChatAction(self, "battle",  PlaceBattle, "")
 
 	gadgetHandler:RemoveGadgetCallIn('GameFrame', gadget)
 end
