@@ -91,7 +91,7 @@ return {
 		{	"debugcolvol",	"Ctrl+Alt+b",},
 		{	"repeat",	"ctrl+r"},
 		{	"priority", "ctrl+q"},
-		{	"selfd",	"C+d",},
+		{	"selfd",	"C+k",},
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
 		{	"airmanualfire",	"d",},
