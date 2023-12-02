@@ -178,6 +178,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		weaponID    = weaponID,
 	}
 	SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
+	SetUnitRulesParam(unitID, "on_fire_max_frame", Spring.GetGameFrame() + fwd.burnTime*(fwd.burnTimeRand + fwd.burnTimeBase), LOS_ACCESS)
 	GG.UpdateUnitAttributes(unitID)
 end
 

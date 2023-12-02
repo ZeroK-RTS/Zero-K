@@ -30,7 +30,7 @@ local UNIT_TIMEOUT = 140
 local flameFX = {
 	layer        = 0,
 	speed        = 0.65,
-	life         = 90,
+	life         = 25,
 	lifeSpread   = 10,
 	delaySpread  = 20,
 	colormap     = {
@@ -43,7 +43,7 @@ local flameFX = {
 	rotSpeedSpread = -2,
 	rotSpread    = 360,
 	sizeSpread   = 1,
-	sizeGrowth   = 0.9,
+	sizeGrowth   = 0.8,
 	emitVector   = {0, 1, 0},
 	emitRotSpread = 60,
 	texture      = 'bitmaps/GPL/flame.png',
@@ -53,7 +53,7 @@ local flameFX = {
 	force = {0, 1, 0},
 	pos = {0, 0, 0},
 	partpos = "",
-	size = 1,
+	size = 2,
 }
 
 --------------------------------------------------------------------------------
@@ -68,6 +68,19 @@ local spGetUnitRadius   = Spring.GetUnitRadius
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function UpdateFlameFxToDuration(unitID, flameFX, frame)
+	local endFrame = spGetUnitRulesParam(unitID, "on_fire_max_frame") or frame
+	local remaining = math.max(0, endFrame - frame)
+	
+	flameFX.life = remaining * 0.05 + 25
+	flameFX.lifeSpread = flameFX.life * 0.2 + 5
+	flameFX.speed = math.min(0.65, 0.9 * math.pow(0.99, remaining))
+	flameFX.force[2] = 1.5 + 1.5 * math.pow(0.999, remaining)
+	flameFX.emitRotSpread = math.max(25, 70 - remaining * 0.01)
+	
+	flameFX.colormap[3][1] = math.max(0.15, 0.35 - remaining * 0.001)
+end
+
 local function UpdateBurningUnit(unitID, timeoutFrame, index, flameFX, gameFrame, passsChance)
 	if not spGetUnitHealth(unitID) then
 		--  Dead or outside LOS, just wait until update time to remove
@@ -80,6 +93,7 @@ local function UpdateBurningUnit(unitID, timeoutFrame, index, flameFX, gameFrame
 	local x, y, z = spGetUnitPosition(unitID)
 	local r = spGetUnitRadius(unitID)
 	if (r and x) and math.random() < passsChance then
+		local intensity = UpdateFlameFxToDuration(unitID, flameFX, gameFrame)
 		flameFX.pos[1] = x
 		flameFX.pos[2] = y
 		flameFX.pos[3] = z
@@ -104,9 +118,8 @@ function widget:GameFrame(n)
 	end
 
 	local wx, wy, wz = GetWind()
-	flameFX.force[1] = wx * 0.09
-	flameFX.force[2] = wy * 0.09 + 3
-	flameFX.force[3] = wz * 0.09
+	flameFX.force[1] = wx * 0.04
+	flameFX.force[3] = wz * 0.04
 	local count = IterableMap.GetIndexMax(trackedUnits)
 	IterableMap.Apply(trackedUnits, UpdateBurningUnit, flameFX, n, math.max(0, math.min(1, 1 - (count - 400)/400)))
 end
