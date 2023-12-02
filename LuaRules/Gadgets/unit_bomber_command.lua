@@ -112,24 +112,6 @@ local combatCommands = { -- commands that require ammo to execute
 	[CMD.MANUALFIRE] = true,
 }
 
-local defaultCommands = { -- commands that is processed by gadget
-	[CMD.ATTACK] = true,
-	[CMD_AIR_MANUALFIRE] = true,
-	[CMD.AREA_ATTACK] = true,
-	[CMD_FIGHT] = true,
-	[CMD.PATROL] = true,
-	[CMD.GUARD] = true,
-	[CMD.MANUALFIRE] = true,
-	[CMD_REARM] = true,
-	[CMD_FIND_PAD] = true,
-	[CMD.MOVE] = true,
-	[CMD_RAW_MOVE] = true,
-	[CMD_RAW_BUILD] = true,
-	[CMD_REMOVE] = true,
-	[CMD_INSERT] = true,
-	[CMD_EXCLUDE_PAD] = true,
-}
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -759,7 +741,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 end
 
 function gadget:AllowCommand_GetWantedCommand()
-	return defaultCommands --command which is expected by gadget, other command is unhandled cases
+	return true
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
