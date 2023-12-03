@@ -391,6 +391,7 @@ end
 getEngineArrays = function(statistic, labelCaption)
 	local teamScores = {}
 	local teams = Spring.GetTeamList()
+	local spectating, specFullView = Spring.GetSpectatingState()
 	local graphLength = Spring.GetGameRulesParam("gameover_historyframe") or (Spring.GetTeamStatsHistory(Spring.GetMyTeamID()) - 1)
 	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
 	local totalTime = Spring.GetGameRulesParam("gameover_second")
@@ -441,7 +442,7 @@ getEngineArrays = function(statistic, labelCaption)
 				stats = {}
 				for i = 0, graphLength do
 					stats[i] = {}
-					if hiddenStats[statistic] and gameOver then
+					if hiddenStats[statistic] and (gameOver or (spectating and specFullView)) then
 						stats[i][statistic] = GetHiddenTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
 					else
 						stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
