@@ -333,7 +333,7 @@ local cegs = {
     groundflash = {
       flashalpha         = 1,
       flashsize          = 64,
-      ttl                = 480,
+      ttl                = 520,
       color = {
         [1]  = 0.7,
         [2]  = 0.3,
@@ -348,7 +348,7 @@ local cegs = {
       water              = true,
       properties = {
         delay              = [[0 i10]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_450]],
+        explosiongenerator = [[custom:napalmfireball_firewalker_small]],
         pos                = [[-20 r40, 10 r10, -20 r40]],
       },
     },
@@ -614,6 +614,20 @@ local altforms = {
         particlespeed      = 0.4,
         particlespeedspread = 0.7,
         colormap           = [[0.2 0.2 0.2 0.1   0.4 0.4 0.4 0.1  0.35 0.35 0.2 0.12    0.3 0.3 0.3 0.15    0.3 0.3 0.3 0.15    0.2 0.2 0.2 0.15    0.2 0.2 0.2 0.15    0.1 0.1 0.1 0.18    0 0 0 0]],
+		},
+      },
+    },
+  },
+  napalmfireball_firewalker_small = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+        properties = {
+		particlelife = 250, 
+		particlelifespread = 450,
+        particlespeed      = 0.4,
+        particlespeedspread = 0.7,
+        colormap           = [[0.2 0.2 0.2 0.1   0.4 0.4 0.4 0.1  0.38 0.38 0.38 0.11    0.35 0.35 0.35 0.12    0.32 0.32 0.32 0.13    0.3 0.3 0.3 0.14   0.12 0.12 0.12 0.18    0 0 0 0]],
 		},
       },
     },
