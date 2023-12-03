@@ -63,7 +63,6 @@ local random = math.random
 local Spring = Spring
 local gadget = gadget
 local AreTeamsAllied    = Spring.AreTeamsAllied
-local AddUnitDamage     = Spring.AddUnitDamage
 local SetUnitRulesParam = Spring.SetUnitRulesParam
 local SetUnitCloak      = Spring.SetUnitCloak
 
@@ -142,7 +141,7 @@ function gadget:UnitLeftWater(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
-                            attackerID, attackerDefID, attackerTeam)
+                            attackerID, attackerDefID, attackerTeam, projectileID)
 	if inGameFrame then
 		-- ignore own AddUnitDamage calls
 		-- FIXME: just toggle the callin in GameFrame
@@ -166,16 +165,19 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	if unitsOnFire[unitID] and unitsOnFire[unitID].damageLeft > (burnLength*fwd.burnDamage) then
 		return
 	end
-
+	if not attackerTeam and projectileID then
+		attackerTeam = Spring.GetProjectileTeamID(projectileID)
+	end
 	SetFireGameRulesParamQueue(unitID)
 
 	unitsOnFire[unitID] = {
-		endFrame    = gameFrame + burnLength,
-		damageLeft  = burnLength*fwd.burnDamage,
-		fireDmg     = fwd.burnDamage,
-		attackerID  = attackerID,
+		endFrame     = gameFrame + burnLength,
+		damageLeft   = burnLength*fwd.burnDamage,
+		fireDmg      = fwd.burnDamage,
+		attackerID   = attackerID,
+		attackerTeam = attackerTeam,
 		--attackerDefID = attackerDefID,
-		weaponID    = weaponID,
+		weaponID     = weaponID,
 	}
 	SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
 	SetUnitRulesParam(unitID, "on_fire_max_frame", Spring.GetGameFrame() + fwd.burnTime*(fwd.burnTimeRand + fwd.burnTimeBase), LOS_ACCESS)
@@ -200,8 +202,9 @@ function gadget:GameFrame(n)
 				GG.UpdateUnitAttributes(unitID)
 				unitsOnFire[unitID] = nil
 			else
+				local damage = t.fireDmg*CHECK_INTERVAL
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
-				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponID )
+				Spring.AddUnitDamageByTeam(unitID, damage, 0, t.attackerID, t.weaponID, t.attackerTeam)
 				cnt=cnt+1
 			end
 		end

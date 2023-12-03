@@ -1445,7 +1445,12 @@ end
 
 function gadgetHandler:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                                      attackerID, attackerDefID, attackerTeam, pre)
-  if pre == false then return end
+  if pre == false then
+    return
+  end
+  if gadgetHandler.GG._AddUnitDamage_teamID then
+    attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
+  end
   for _,g in r_ipairs(self.UnitDestroyedList) do
     g:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                     attackerID, attackerDefID, attackerTeam)
@@ -1523,6 +1528,9 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 
 	local gadgets = UnitPreDamaged_GadgetMap[weaponDefID]
 	if gadgets then
+		if gadgetHandler.GG._AddUnitDamage_teamID then
+			attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
+		end
 		local data = gadgets.data
 		local g
 		for i = 1, gadgets.count do
@@ -1560,12 +1568,16 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 		UnitDamaged_first = false
 	end
 
+	if gadgetHandler.GG._AddUnitDamage_teamID then
+		attackerTeam = gadgetHandler.GG._AddUnitDamage_teamID
+	end
+
 	local g
 	for i = 1, UnitDamaged_count do
 		g = UnitDamaged_gadgets[i]
 		g:UnitDamaged(unitID, unitDefID, unitTeam,
 				damage, paralyzer, weaponID,
-				attackerID, attackerDefID, attackerTeam)
+				attackerID, attackerDefID, attackerTeam, projectileID)
 	end
 	return
 end

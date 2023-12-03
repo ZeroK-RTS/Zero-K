@@ -75,6 +75,7 @@ local function RegisterLuaDamageArea(weaponID, px, py, pz, ownerID, teamID)
 		radius = weaponInfo[weaponID].radius,
 		plateauRadius = weaponInfo[weaponID].plateauRadius,
 		damage = weaponDamage,
+		teamID = teamID,
 		impulse = weaponInfo[weaponID].impulse,
 		expiry = frameNum + weaponInfo[weaponID].duration,
 		rangeFall = weaponInfo[weaponID].rangeFall,
@@ -138,9 +139,9 @@ local function HandleDamageArea(data, f)
 						GG.SetUnitFallDamageImmunity(u, f + 10)
 						GG.DoAirDrag(u, damage)
 					elseif data.slow then
-						GG.addSlowDamage(u, damage)
+						GG.addSlowDamage(u, damage, false, data.teamID)
 					else
-						Spring.AddUnitDamage(u, damage, 0, data.owner, data.id, 0, 0, 0)
+						Spring.AddUnitDamageByTeam(u, damage, 0, data.owner, data.id, data.teamID)
 					end
 				end
 			end

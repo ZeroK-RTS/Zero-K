@@ -489,3 +489,12 @@ if GL then -- BAR 105-1988
 	GL.MIN                   = GL.MIN                   or 32775
 	GL.MAX                   = GL.MAX                   or 32776
 end
+
+if true then -- No engine has this yet
+	local origAddUnitDamage = Spring.AddUnitDamage
+	function Spring.AddUnitDamageByTeam(unitID, damage, paralyze, attackerID, weaponID, teamID)
+		gadgetHandler.GG._AddUnitDamage_teamID = teamID
+		origAddUnitDamage(unitID, damage, paralyze, attackerID, weaponID)
+		gadgetHandler.GG._AddUnitDamage_teamID = nil
+	end
+end

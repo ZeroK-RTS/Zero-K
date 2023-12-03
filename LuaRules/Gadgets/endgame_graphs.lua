@@ -84,18 +84,17 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	return true
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if damage <= 0 or paralyzer then
-		return
-	end
-
+local function DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	local hp, maxHP = spGetUnitHealth(unitID)
 	if (hp < 0) then
 		damage = damage + hp
 	end
-
 	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
+	return costdamage
+end
 
+local function AddTeamDamageDealt(unitID, unitTeam, attackerTeam, costdamage)
 	if attackerTeam and not spAreTeamsAllied(attackerTeam, unitTeam) then
 		damageDealtByTeamHax[attackerTeam] = damageDealtByTeamHax[attackerTeam] + costdamage
 
@@ -103,6 +102,19 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			damageDealtByTeamNonhax[attackerTeam] = damageDealtByTeamNonhax[attackerTeam] + costdamage
 		end
 	end
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam, projectileID)
+	if damage <= 0 or paralyzer then
+		return
+	end
+
+	if not attackerTeam and projectileID then
+		attackerTeam = Spring.GetProjectileTeamID(projectileID)
+	end
+
+	local costdamage = DamageToCostDamage(unitID, damage, unitDefID, unitTeam)
+	AddTeamDamageDealt(unitID, unitTeam, attackerTeam, costdamage)
 	damageReceivedByTeam[unitTeam] = damageReceivedByTeam[unitTeam] + costdamage
 end
 

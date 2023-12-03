@@ -45,8 +45,15 @@ local slowedUnits = {}
 
 Spring.SetGameRulesParam("slowState",1)
 
-local function updateSlow(unitID, state)
+local function AddAwardSlow(unitID, attackerTeam, slowdown)
+	if GG.Awards and GG.Awards.AddAwardPoints then
+		local _, maxHp = spGetUnitHealth(unitID)
+		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID)
+		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
+	end
+end
 
+local function updateSlow(unitID, state)
 	local health = spGetUnitHealth(unitID)
 
 	if health then
@@ -101,12 +108,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if slowDef.overslow then
 		slowedUnits[unitID].extraSlowBound = math.max(slowedUnits[unitID].extraSlowBound or 0, slowDef.overslow)
 	end
-
-	if GG.Awards and GG.Awards.AddAwardPoints then
-		local _, maxHp = spGetUnitHealth(unitID)
-		local cost_slowdown = (slowdown / maxHp) * GetUnitCost(unitID)
-		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
-	end
+	AddAwardSlow(unitID, attackerTeam, slowdown)
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
@@ -170,7 +172,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 
-local function addSlowDamage(unitID, damage, overslow)
+local function addSlowDamage(unitID, damage, overslow, attackerTeam)
 	-- add stats that the unit requires for this gadget
 	local su = slowedUnits[unitID]
 	if not su then
@@ -179,7 +181,8 @@ local function addSlowDamage(unitID, damage, overslow)
 		}
 		slowedUnits[unitID] = su
 	end
-
+	AddAwardSlow(unitID, attackerTeam, damage)
+	
 	-- add slow damage
 	su.slowDamage = su.slowDamage + damage
 	su.degradeTimer = DEGRADE_TIMER

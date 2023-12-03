@@ -24,7 +24,6 @@ end
 --around 1/1/2017: added hold fire functionality, recall drones button, circular drone leash, drones pay attention to set target
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local AddUnitDamage       = Spring.AddUnitDamage
 local CreateUnit          = Spring.CreateUnit
 local GetCommandQueue     = Spring.GetCommandQueue
 local spGetUnitDirection  = Spring.GetUnitDirection
