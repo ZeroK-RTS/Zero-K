@@ -9,6 +9,9 @@ local effects = {
   ["none"] = {
   },
 
+  ["custom:none"] = {
+  },
+
 }
 
 return effects
