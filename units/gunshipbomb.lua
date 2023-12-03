@@ -52,7 +52,7 @@ return { gunshipbomb = {
   turnRate               = 1144,
   upright                = false,
   workerTime             = 0,
-  
+
   featureDefs            = {
 
     DEAD      = {
@@ -99,7 +99,7 @@ return { gunshipbomb = {
       impulseBoost            = 0.1,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[f-1_bomb.s3o]],
+      model                   = [[f-1_bomb.dae]],
       myGravity               = 0.34,
       noSelfDamage            = true,
       range                   = 750,
