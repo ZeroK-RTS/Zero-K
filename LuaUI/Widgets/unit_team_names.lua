@@ -16,6 +16,8 @@ end
 
 local heightOffset        = 32
 local teamCheckDelay      = 0.2
+-- labels are sticky unless units stray into screen borders defined by this fraction
+local borderFraction = 0.15
 
 --------------------------------------------------------------------------------
 -- speed-ups
@@ -33,7 +35,6 @@ local GetCameraPosition   = Spring.GetCameraPosition
 local GetGaiaTeamID       = Spring.GetGaiaTeamID
 local GetMoveType         = Spring.Utilities.getMovetype
 local GetPlayerInfo       = Spring.GetPlayerInfo
-local GetScreenGeometry   = Spring.GetScreenGeometry
 local GetTeamColor        = Spring.GetTeamColor
 local GetTeamInfo         = Spring.GetTeamInfo
 local GetTeamList         = Spring.GetTeamList
@@ -41,6 +42,7 @@ local GetUnitDefID        = Spring.GetUnitDefID
 local GetUnitHeight       = Spring.Utilities.GetUnitHeight
 local GetUnitPosition     = Spring.GetUnitPosition
 local GetUnitTeam         = Spring.GetUnitTeam
+local GetViewSizes        = Spring.GetViewSizes
 local IsUnitInView        = Spring.IsUnitInView
 local WorldToScreenCoords = Spring.WorldToScreenCoords
 
@@ -72,7 +74,7 @@ local function _initTeams()
                     local _, name = GetAIInfo(teamID)
                     teamName = name
                 else
-                teamName = GetPlayerInfo(teamLeader)
+                    teamName = GetPlayerInfo(teamLeader)
                 end
             end
             local r, g, b = GetTeamColor(teamID)
@@ -111,15 +113,7 @@ local function _removeUnit(unitTeam, unitID)
     end
 end
 
-local scx, scy, sDistanceMax
-
 function widget:Initialize()
-    scx, scy = GetScreenGeometry()
-    scx, scy = scx / 2, scy / 2
-    -- i.e. the radius of a circle that fills most of the smallest dimension
-    local sDistanceFraction = 0.85
-    sDistanceMax = min(scx * sDistanceFraction, scy * sDistanceFraction)
-
     _initTeams()
 
     for _, unitID in pairs(GetAllUnits()) do
@@ -150,13 +144,19 @@ local function _DrawTeamName(unitID, attributes)
 end
 
 local function _DrawTeamNames()
+    local sx, sy = GetViewSizes()
+    local scale = WG.uiScale or 1
+    sx, sy = sx * scale, sy * scale
+    local scx, scy = sx / 2, sy / 2
+    local sxmin, sxmax, symin, symax = sx * borderFraction, sx * (1 - borderFraction), sy * borderFraction, sy * (1 - borderFraction)
+
     for teamID, _ in pairs(teamInfos) do
         local teamAvatar = teamAvatars[teamID]
 
         -- Periodically check if avatar is near center of screen
         if teamAvatar and teamCheckDelays[teamID] <= 0 then
             local usx, usy = _GetScreenCoords(teamAvatar[1])
-            if not usx or not usy or _length(scx - usx, scy - usy) > sDistanceMax then
+            if not usx or not usy or usx < sxmin or usx > sxmax or usy < symin or usy > symax then
                 teamAvatar = nil
                 teamAvatars[teamID] = nil
             end
@@ -201,6 +201,8 @@ local function _DrawTeamNames()
 end
 
 function widget:DrawWorld()
+    if Spring.IsGUIHidden() then return end
+
     _DrawTeamNames()
 end
 
