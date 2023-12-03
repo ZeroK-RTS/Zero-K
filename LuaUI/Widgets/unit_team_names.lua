@@ -11,15 +11,6 @@ function widget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
--- config
---------------------------------------------------------------------------------
-
-local heightOffset        = 32
-local teamCheckDelay      = 0.2
--- labels are sticky unless units stray into screen borders defined by this fraction
-local borderFraction = 0.15
-
---------------------------------------------------------------------------------
 -- speed-ups
 --------------------------------------------------------------------------------
 
@@ -53,13 +44,40 @@ local glText              = gl.Text
 local glTranslate         = gl.Translate
 
 --------------------------------------------------------------------------------
--- callins
+-- config
 --------------------------------------------------------------------------------
 
+local heightOffset        = 32
+local teamCheckDelay      = 0.2
+-- labels are sticky unless units stray into screen borders defined by this fraction
+local borderFraction = 0.15
+
 local teamInfos           = {}
+-- table: teamID -> table: unitID -> { isStatic, isComm, height }
 local unitsByTeam         = {}
 local teamAvatars         = {}
 local teamCheckDelays     = {}
+
+options_path = "Settings/Interface/Unit Team Names"
+options_order = {"onlyComms"}
+options = {
+	onlyComms = {
+		name = "Only tag Commanders",
+		type = "bool",
+		value = false,
+		desc = "Name tags will only be shown on Commanders",
+		OnChange = function(self)
+			onlyComms = self.value
+            teamAvatars = {}
+		end,
+	},
+}
+
+onlyComms = options.onlyComms.value
+
+local function _length(x, y, z)
+    return sqrt(x * x + y * y + (z and z * z or 0))
+end
 
 local function _initTeams()
     local gaiaTeamID = GetGaiaTeamID()
@@ -89,10 +107,6 @@ local function _initTeams()
     end
 end
 
-local function _length(x, y, z)
-    return sqrt(x * x + y * y + (z and z * z or 0))
-end
-
 local function _addUnit(unitTeam, unitID, unitDefID)
     unitDefID = unitDefID or GetUnitDefID(unitID)
     local unitDef = UnitDefs[unitDefID]
@@ -101,8 +115,9 @@ local function _addUnit(unitTeam, unitID, unitDefID)
         return
     end
     local isStatic = not GetMoveType(unitDef)
+    local isComm = unitDef.customParams.level
     local height = GetUnitHeight(unitDef) + heightOffset
-    unitsByTeam[unitTeam][unitID] = { isStatic, height }
+    unitsByTeam[unitTeam][unitID] = { isStatic, isComm, height }
 end
 
 local function _removeUnit(unitTeam, unitID)
@@ -112,6 +127,10 @@ local function _removeUnit(unitTeam, unitID)
         teamCheckDelays[unitTeam] = 0
     end
 end
+
+--------------------------------------------------------------------------------
+-- callins
+--------------------------------------------------------------------------------
 
 function widget:Initialize()
     _initTeams()
@@ -169,7 +188,7 @@ local function _DrawTeamNames()
 
             local bestUnitID, bestUnitInfo, bestDistance, bestIsStatic = nil, nil, 999999999, true
             for unitID, unitInfo in pairs(unitsByTeam[teamID]) do
-                if IsUnitInView(unitID) then
+                if IsUnitInView(unitID) and (not onlyComms or unitInfo[2]) then
                     local isStatic = unitInfo[1]
                     local usx, usy = _GetScreenCoords(unitID)
                     local distance = _length(scx - usx, scy - usy)
@@ -182,7 +201,7 @@ local function _DrawTeamNames()
                 end
             end
             if bestUnitID ~= nil and bestUnitInfo ~= nil then
-                teamAvatars[teamID] = { bestUnitID, teamInfos[teamID], bestUnitInfo[2] }
+                teamAvatars[teamID] = { bestUnitID, teamInfos[teamID], bestUnitInfo[3] }
             end
         end
     end
