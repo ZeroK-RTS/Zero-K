@@ -13,11 +13,13 @@ local r_fan = piece "r_fan"
 local smokePiece = { base, l_wing, r_wing }
 
 local SIG_BURROW = 1
+local burrowed = false
 
 local bombDefID = WeaponDefNames["gunshipbomb_gunshipbomb_bomb"].id
 
 local function UnBurrow()
 	Signal(SIG_BURROW)
+	burrowed = false
 	Turn(base, x_axis, 0, 5)
 	Turn(l_wing, x_axis, 0, 5)
 	Turn(r_wing, x_axis, 0, 5)
@@ -36,6 +38,7 @@ local function Burrow()
 		x,y,z = Spring.GetUnitPosition(unitID)
 		height = math.max(Spring.GetGroundHeight(x,z) or 0, 0)
 	end
+	burrowed = true
 
 	Turn(base, x_axis, math.rad(-90), 5)
 	Turn(l_wing, x_axis, math.rad(90), 5)
@@ -77,13 +80,10 @@ local function BurrowThread()
 	     Note that the animation is still tied to events because
 	     they produce better looks (transitions happen in flight). ]]
 	while true do
-		local _, _, _, v = Spring.GetUnitVelocity(unitID)
-		if v < 0.02 then
-			Spring.SetUnitCloak(unitID, 2)
-			Spring.SetUnitStealth(unitID, true)
+		if burrowed and (select(4, Spring.GetUnitVelocity(unitID)) or 0.02) < 0.02 then
+			GG.SetWantedCloaked(unitID, 1)
 		else
-			Spring.SetUnitCloak(unitID, 0)
-			Spring.SetUnitStealth(unitID, false)
+			GG.SetWantedCloaked(unitID, 0)
 		end
 
 		Sleep(200)
