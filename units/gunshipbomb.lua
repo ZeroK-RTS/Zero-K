@@ -60,7 +60,7 @@ return { gunshipbomb = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[wreck2x2b.s3o]],
+      object           = [[debris2x2a.s3o]],
     },
 
     HEAP      = {
@@ -76,18 +76,14 @@ return { gunshipbomb = {
     gunshipbomb_bomb = {
       name                    = [[Blastwing Bomb]],
       areaOfEffect       = 256,
+      cegTag             = [[blastwingtrail]],
       craterBoost        = 1,
       craterMult         = 3.5,
 
       customParams          = {
         setunitsonfire = "1",
         burnchance     = "1",
-        burntime = 660,
-
-        area_damage = 1,
-        area_damage_radius = 128,
-        area_damage_dps = 25,
-        area_damage_duration = 2,
+        burntime = 720,
 
         --lups_heat_fx = [[firewalker]],
       },

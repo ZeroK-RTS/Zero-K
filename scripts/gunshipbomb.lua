@@ -63,6 +63,7 @@ local function ThrowBomb()
 		speed = {vx, vy + 0.3, vz},
 		team = Spring.GetUnitTeam(unitID),
 		owner = unitID,
+		ttl = 300,
 		gravity = -0.12,
 	}
 	Spring.SpawnProjectile(bombDefID, params)
