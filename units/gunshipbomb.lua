@@ -52,7 +52,7 @@ return { gunshipbomb = {
   turnRate               = 1144,
   upright                = false,
   workerTime             = 0,
-
+  
   featureDefs            = {
 
     DEAD      = {
@@ -86,6 +86,8 @@ return { gunshipbomb = {
         burntime = 720,
 
         --lups_heat_fx = [[firewalker]],
+        light_color = [[1.6 0.8 0.32]],
+        light_radius = 500,
       },
 
       damage                  = {
@@ -99,7 +101,7 @@ return { gunshipbomb = {
       impulseBoost            = 0.1,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[f-1_bomb.dae]],
+      model                   = [[f-1_bomb.s3o]],
       myGravity               = 0.34,
       noSelfDamage            = true,
       range                   = 750,
