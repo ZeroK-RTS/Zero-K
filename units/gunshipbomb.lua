@@ -95,7 +95,7 @@ return { gunshipbomb = {
       },
 
       explosionGenerator      = [[custom:blastwing]],
-      edgeeffectiveness       = 0.9,
+      edgeeffectiveness       = 0.7,
       explosionSpeed          = 10000,
       firestarter             = 180,
       impulseBoost            = 0.1,
