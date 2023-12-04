@@ -74,7 +74,7 @@ return { gunshipbomb = {
 
   weaponDefs = {
     gunshipbomb_bomb = {
-      name                    = [[Blastwing Bomb]],
+      name               = [[Blastwing Bomb]],
       areaOfEffect       = 256,
       cegTag             = [[blastwingtrail]],
       craterBoost        = 1,
