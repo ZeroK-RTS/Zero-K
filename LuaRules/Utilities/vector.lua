@@ -53,7 +53,11 @@ local function AbsVal(x, y, z)
 	return sqrt(AbsValSq(x, y, z))
 end
 
-local function Unit(v)
+local function Unit(v, v2, v3)
+	if v3 then
+		local dist = Dist3D(v, v2, v3,0,0,0)
+		return v/dist, v2/dist, v3/dist
+	end
 	local mag = AbsVal(v)
 	if mag > 0 then
 		return {v[1]/mag, v[2]/mag}
@@ -103,7 +107,10 @@ local function Dot(v1, v2)
 	end
 end
 
-local function Cross(v1, v2)
+local function Cross(v1, v2, v3, e1, e2, e3)
+	if e3 then
+		return v2*e3 - v3*e2, v3*e1 - v1*e3, v1*e2 - v2*e1
+	end
 	return {v1[2]*v2[3] - v1[3]*v2[2], v1[3]*v2[1] - v1[1]*v2[3], v1[1]*v2[2] - v1[2]*v2[1]}
 end
 
