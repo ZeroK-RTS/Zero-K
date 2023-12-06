@@ -26,6 +26,10 @@ return { staticantinuke = {
     outline_x = 185,
     outline_y = 185,
     outline_yoff = 25,
+
+    construction_rebate = 0.5,
+    construction_rebate_decrement = 0.1,
+    construction_rebate_seconds = 200,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

@@ -405,6 +405,27 @@ local structureConfig = {
 		unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
 	end,
 
+	pw_storage = function(unitDef)
+		unitDef.health = 15000
+		unitDef.name = "Mega Storage"
+		unitDef.description = "Stores 100,000 metal"
+		unitDef.objectname = "pw_mstorage2.dae"
+		unitDef.icontype = [[pw_riot]]
+
+		unitDef.footprintx = 7
+		unitDef.footprintz = 5
+		unitDef.metalcost = 350*STRUCTURE_COST_MULT
+		unitDef.metalstorage = 100000
+		unitDef.energystorage = 0
+
+		unitDef.customparams.soundselect = "shield_select"
+
+		unitDef.collisionvolumescales = [[80 25 60]]
+		unitDef.collisionvolumetype	= [[Box]]
+
+		unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
+	end,
+
 	pw_guerilla = function(unitDef)
 		unitDef.health = 15000
 		unitDef.name = "Guerilla Jumpgate"

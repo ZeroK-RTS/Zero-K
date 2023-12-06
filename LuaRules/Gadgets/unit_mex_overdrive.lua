@@ -52,6 +52,7 @@ local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.6
 local MEX_REFUND_SHARE = 0.8 -- refund starts at 80% of base income and linearly goes to 20% as full payback approaches
 local MEX_REFUND_MIN = 0.2
+local MISC_PAYBACK_OD_PROP = 0.1 -- Maximum proportion of overdrive metal that can go towards misc payback
 
 --[[ Uses the regular 50% payback. This is because at 100% people would leave
      empty nanoframes for their allies to finish (actual experience from past).
@@ -69,6 +70,8 @@ local mexDefs = {}
 local pylonDefs = {}
 local generatorDefs = {}
 local paybackDefs = {} -- how much to pay back
+local paybackMiscTimeDefs = {} -- the payback rate for non-mexes and non-energy
+local paybackDefDecrement = {} -- how much payback reduces as duplicates are created
 local allowBuildStepDef = {} -- cache basically?
 
 local isReturnOfInvestment = (Spring.GetModOptions().overdrivesharingscheme ~= "0")
@@ -83,6 +86,21 @@ include("LuaRules/Configs/constants.lua")
      A potential optimisation here would be to measure if limiting this value to Solar radius would help even further
      since Solar/Wind/Mex make up the majority of linkables. ]]
 local QUADFIELD_SQUARE_SIZE = 300
+
+local function paybackFactorFunction(repayRatio)
+	-- Must map [0,1) to (0,1]
+	-- Must not have any sequences on the domain that converge to 0 in the codomain.
+	-- Assumed to be maximum at 0
+	local repay =  0.35 - repayRatio*0.25
+	if repay > 0.35 then
+		return 0.35
+	else
+		return repay
+	end
+end
+
+local AVERAGE_PAYBACK_RATE = 0.95 * (paybackFactorFunction(0) + paybackFactorFunction(1)) / 2
+
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -114,6 +132,16 @@ for i = 1, #UnitDefs do
 			allowBuildStepDef[i] = true
 		end
 	end
+	if cp.construction_rebate then
+		paybackDefs[i] = (udef.metalCost * tonumber(cp.construction_rebate))
+		allowBuildStepDef[i] = true
+	end
+	if cp.construction_rebate_seconds then
+		paybackMiscTimeDefs[i] = tonumber(cp.construction_rebate_seconds) * AVERAGE_PAYBACK_RATE
+	end
+	if cp.construction_rebate_decrement then
+		paybackDefDecrement[i] = (udef.metalCost * tonumber(cp.construction_rebate_decrement))
+	end
 end
 
 local alliedTrueTable = {allied = true}
@@ -123,18 +151,6 @@ local sentErrorWarning = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-
-local function paybackFactorFunction(repayRatio)
-	-- Must map [0,1) to (0,1]
-	-- Must not have any sequences on the domain that converge to 0 in the codomain.
-	local repay =  0.35 - repayRatio*0.25
-	if repay > 0.35 then
-		return 0.35
-	else
-		return repay
-	end
-end
 
 local spammedError = false
 local debugGridMode = false
@@ -160,6 +176,8 @@ local pylonGridQueue = false -- pylonGridQueue[unitID] = true
 
 local unitPaybackTeamIDs = {} -- indexed by unitID, tells unit which teams gets it's payback.
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
+local allyTeamMiscPaybackRateSum = {} -- teamPayback[allyTeamID] = total non-energy or mex payback expected.
+local paybackReduction = {} --paybackReduction[allyTeamID] = {[unitDefID] = reduced payback, ...}
 
 local allyTeamInfo = {}
 
@@ -704,7 +722,7 @@ local function GetUnitTeamBuildProp(unitID, teamID)
 	return prop
 end
 
-local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
+local function AddEnergyToPayback(unitID, unitDefID, unitTeam, paybackTeams)
 	if not paybackDefs[unitDefID] or not enableEnergyPayback then
 		return
 	end
@@ -714,6 +732,18 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 		return
 	end
 	local paybackCost = paybackDefs[unitDefID]
+	if paybackDefDecrement[unitDefID] then
+		local _, _, _, _, _, allyTeamID = Spring.GetTeamInfo(unitTeam)
+		paybackReduction[allyTeamID] = (paybackReduction[allyTeamID] or {})
+		paybackReduction[allyTeamID][unitDefID] = (paybackReduction[allyTeamID][unitDefID] or 0)
+		paybackCost = paybackCost - paybackReduction[allyTeamID][unitDefID]
+		if paybackCost <= 0 then
+			return
+		end
+		paybackReduction[allyTeamID][unitDefID] = paybackReduction[allyTeamID][unitDefID] + paybackDefDecrement[unitDefID]
+	end
+	
+	local paybackMiscRate = paybackMiscTimeDefs[unitDefID] and (paybackCost / paybackMiscTimeDefs[unitDefID])
 	unitPaybackTeamIDs[unitID] = paybackTeams
 	
 	for teamID, prop in pairs(paybackTeams) do
@@ -724,6 +754,11 @@ local function AddEnergyToPayback(unitID, unitDefID, paybackTeams)
 			cost = paybackCost * prop,
 			repaid = 0,
 		}
+		if paybackMiscRate then
+			local _, _, _, _, _, allyTeamID = Spring.GetTeamInfo(teamID)
+			teamData.data[teamData.count].miscRepayRate = paybackMiscRate * prop
+			allyTeamMiscPaybackRateSum[allyTeamID] = (allyTeamMiscPaybackRateSum[allyTeamID] or 0) + teamData.data[teamData.count].miscRepayRate
+		end
 		teamData.metalDueOD = teamData.metalDueOD + paybackCost * prop
 	end
 end
@@ -1382,7 +1417,16 @@ function gadget:GameFrame(n)
 			-- Payback from energy production
 			local summedOverdriveMetalAfterPayback = summedOverdrive
 			local teamPaybackOD = {}
-			if enableEnergyPayback then
+			if enableEnergyPayback and summedOverdrive > 0 then
+				local totalMiscPaybackRate = (allyTeamMiscPaybackRateSum[allyTeamID] or 0)
+				local newMiscPaybackRate = 0
+				local poolForEnergyPayback = summedOverdrive
+				local miscPaybackFactor = 1
+				if totalMiscPaybackRate > 0 then
+					miscPaybackFactor = math.min(1, (summedOverdrive * MISC_PAYBACK_OD_PROP) / (totalMiscPaybackRate * paybackFactorFunction(0)))
+					poolForEnergyPayback = summedOverdrive - totalMiscPaybackRate * miscPaybackFactor
+				end
+				
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					if teamResourceShare[teamID] then -- Isn't this always 1 or 0?
@@ -1401,19 +1445,26 @@ function gadget:GameFrame(n)
 
 								if not removeNow then
 									if spValidUnitID(unitID) then
-										local inc = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
-										if inc > 0 then
-											local repayRatio = data[j].repaid/data[j].cost
-											if repayRatio < 1 then
-												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
+										local repayRatio = data[j].repaid/data[j].cost
+										if repayRatio < 1 then
+											local inc = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
+											local repayMetal = 0
+											if inc > 0 then
+												repayMetal = inc/allyTeamEnergyIncome * poolForEnergyPayback * paybackFactorFunction(repayRatio)
+											elseif data[j].miscRepayRate then
+												newMiscPaybackRate = newMiscPaybackRate + data[j].miscRepayRate
+												repayMetal = data[j].miscRepayRate * math.min(miscPaybackFactor, paybackFactorFunction(repayRatio))
+											end
+											
+											if repayMetal > 0 then
 												data[j].repaid = data[j].repaid + repayMetal
 												summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
 												teamPaybackOD[teamID] = teamPaybackOD[teamID] + repayMetal
 												paybackInfo.metalDueOD = paybackInfo.metalDueOD - repayMetal
 												--Spring.Echo("Repaid " .. data[j].repaid)
-											else
-												removeNow = true
 											end
+										else
+											removeNow = true
 										end
 									else
 										-- This should never happen in theory
@@ -1423,6 +1474,9 @@ function gadget:GameFrame(n)
 
 								if removeNow then
 									paybackInfo.metalDueOD = paybackInfo.metalDueOD + data[j].repaid - data[j].cost
+									if data[j].miscRepayRate then
+										allyTeamMiscPaybackRateSum[allyTeamID] = (allyTeamMiscPaybackRateSum[allyTeamID] or 0) - data[j].miscRepayRate
+									end
 									data[j] = data[paybackInfo.count]
 									if toRemove[unitID] then
 										toRemove[unitID] = nil
@@ -1436,6 +1490,9 @@ function gadget:GameFrame(n)
 						end
 					end
 				end
+				
+				-- Just for safety
+				allyTeamMiscPaybackRateSum[allyTeamID] = newMiscPaybackRate
 			end
 			
 			--// Share Overdrive Metal and Energy
@@ -1890,7 +1947,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	unitAlreadyFinished[unitID] = true
 
 	local paybackTeams = GetUnitTeamBuildProp(unitID, unitTeam)
-	AddEnergyToPayback(unitID, unitDefID, paybackTeams)
+	AddEnergyToPayback(unitID, unitDefID, unitTeam, paybackTeams)
 	AddMexPayback(unitID, unitDefID, paybackTeams)
 end
 
