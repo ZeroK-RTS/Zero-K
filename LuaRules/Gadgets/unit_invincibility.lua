@@ -18,7 +18,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local noDamageWeaponDefID = WeaponDefNames["noweapon"].id
 local invincibleUnits = {}
 local LOS_ACCESS = {inlos = true}
 
@@ -28,7 +27,7 @@ local function SetUnitInvincible(unitID, newInvincible)
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if invincibleUnits[unitID] or weaponID == noDamageWeaponDefID then
+	if invincibleUnits[unitID] then
 		return 0
 	end
 	return damage
