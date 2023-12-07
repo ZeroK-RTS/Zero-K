@@ -346,7 +346,7 @@
 	},
 	"tacnuke" : {
 		"name" : "Eos",
-		"description" : "Tactical Nuke",
+		"description" : "Tactical Nuke - High damage in a small area. Blocked by fully charged area shields.",
 		"helptext" : "A long-range precision strike weapon. The Eos' blast radius is small, but lethal."
 	},
 	"chickenwurm" : {
@@ -586,7 +586,7 @@
 	},
 	"napalmmissile" : {
 		"name" : "Inferno",
-		"description" : "Napalm Missile",
+		"description" : "Napalm Missile - Sets an area on fire for 45s. Low direct damage, blocked by area shield.",
 		"helptext" : "The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time."
 	},
 	"factoryamph" : {
@@ -861,7 +861,7 @@
 	},
 	"empmissile" : {
 		"name" : "Shockley",
-		"description" : "EMP missile",
+		"description" : "EMP missile - Stuns almost everything for 45s. Pieces shields except charged Funnelweb.",
 		"helptext" : "The Shockley disables units in a small area for up to 45 seconds."
 	},
 	"striderhub" : {
@@ -1006,7 +1006,7 @@
 	},
 	"seismic" : {
 		"name" : "Quake",
-		"description" : "Seismic Missile",
+		"description" : "Seismic Missile - Destroys terrain but deals no damage. Blocked by high hits on area shields.",
 		"helptext" : "The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units."
 	},
 	"missileslow" : {
