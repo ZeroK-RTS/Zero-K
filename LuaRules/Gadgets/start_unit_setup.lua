@@ -303,7 +303,7 @@ local function CanUnitDropHere(unitDefID, x, y, z, facing, checkFeature)
 end
 
 local function GetAdjustedDropPosition(unitDefID, facing, x, z)
-	local radius = 16
+	local radius = 16 -- FIXME: take the actual unit footprint size, perhaps also facing for nota style comms
 	local y = Spring.GetGroundHeight(x, z)
 	local canDropHere = CanUnitDropHere(unitDefID, x, y, z, facing, false)
 	if canDropHere then return x, y, z end
