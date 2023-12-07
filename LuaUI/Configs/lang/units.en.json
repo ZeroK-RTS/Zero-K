@@ -861,7 +861,7 @@
 	},
 	"empmissile" : {
 		"name" : "Shockley",
-		"description" : "EMP missile - Stuns almost everything for 45s. Pieces shields except charged Funnelweb.",
+		"description" : "EMP missile - Stuns almost everything for 45s. Pierces shields except charged Funnelweb.",
 		"helptext" : "The Shockley disables units in a small area for up to 45 seconds."
 	},
 	"striderhub" : {
