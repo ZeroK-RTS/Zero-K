@@ -535,7 +535,7 @@ local function ToggleExclusion(padID, teamID)
 		return
 	end
 
- --Check if the unit is an airpad and if it already exists
+	--Check if the unit is an airpad and if it already exists
 	if airpadDefs[spGetUnitDefID(padID)] then
 		if not excludedPads[teamID][padID] then
 			excludedPads[teamID][padID] = true
