@@ -41,31 +41,46 @@ local unitList = {}
 local unitCount = 0
 
 local shieldUnitDefID = {}
+local shieldCommWeaponDefID = {}
+
+local function LoadShieldWeaponDef(shieldWep)
+	local wcp = shieldWep.customParams
+	local def = {
+		maxCharge = shieldWep.shieldPower,
+		chargePerUpdate = PERIOD*tonumber(wcp.shield_rate)/TEAM_SLOWUPDATE_RATE,
+		startPower = wcp.shieldstartingpower and tonumber(wcp.shieldstartingpower),
+		slowImmune = wcp.slow_immune and true or false,
+		dieOnEmpty = wcp.die_on_empty and true or false,
+	}
+	if wcp.shield_rate_charge then
+		def.chargeRateChange = PERIOD*PERIOD*tonumber(wcp.shield_rate_charge)/(TEAM_SLOWUPDATE_RATE * TEAM_SLOWUPDATE_RATE)
+	end
+	if wcp.shield_drain and tonumber(wcp.shield_drain) > 0 then
+		def.perUpdateCost = PERIOD*tonumber(wcp.shield_drain)/TEAM_SLOWUPDATE_RATE
+		def.perSecondCost = tonumber(wcp.shield_drain)
+		def.rechargeDelay = wcp.shield_recharge_delay and tonumber(wcp.shield_recharge_delay)
+	end
+	return def
+end
 
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	if ud.shieldWeaponDef and not ud.customParams.dynamic_comm then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		if shieldWep.customParams then
-			local wcp = shieldWep.customParams
-			local def = {
-				maxCharge = shieldWep.shieldPower,
-				chargePerUpdate = PERIOD*tonumber(wcp.shield_rate)/TEAM_SLOWUPDATE_RATE,
-				startPower = wcp.shieldstartingpower and tonumber(wcp.shieldstartingpower),
-				slowImmune = wcp.slow_immune and true or false,
-				dieOnEmpty = wcp.die_on_empty and true or false,
-			}
-			if wcp.shield_rate_charge then
-				def.chargeRateChange = PERIOD*PERIOD*tonumber(wcp.shield_rate_charge)/(TEAM_SLOWUPDATE_RATE * TEAM_SLOWUPDATE_RATE)
-			end
-			if wcp.shield_drain and tonumber(wcp.shield_drain) > 0 then
-				def.perUpdateCost = PERIOD*tonumber(wcp.shield_drain)/TEAM_SLOWUPDATE_RATE
-				def.perSecondCost = tonumber(wcp.shield_drain)
-				def.rechargeDelay = wcp.shield_recharge_delay and tonumber(wcp.shield_recharge_delay)
-			end
-			shieldUnitDefID[unitDefID] = def
+			shieldUnitDefID[unitDefID] = LoadShieldWeaponDef(shieldWep)
 		end
 	end
+end
+
+local commShieldDefs = {
+	WeaponDefNames["commweapon_areashield"],
+	WeaponDefNames["commweapon_personal_shield"],
+}
+
+for i = 1, #commShieldDefs do
+	local wd = commShieldDefs[i]
+	shieldCommWeaponDefID[wd.id] = LoadShieldWeaponDef(wd)
 end
 
 --------------------------------------------------------------------------------
@@ -184,17 +199,24 @@ end
 -- Unit Tracking
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if ((shieldUnitDefID[unitDefID] and shieldUnitDefID[unitDefID].chargePerUpdate) or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
+	if unitMap[unitID] then
+		return
+	end
+	if shieldUnitDefID[unitDefID] and shieldUnitDefID[unitDefID].perUpdateCost then
+		GG.AddMiscPriorityUnit(unitID)
+	end
+	local commShieldDefID = GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID)
+	if commShieldDefID and shieldCommWeaponDefID[commShieldDefID] and shieldCommWeaponDefID[commShieldDefID].perUpdateCost then
 		GG.AddMiscPriorityUnit(unitID)
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	local commShieldID = GG.Upgrades_UnitShieldDef and select(1, GG.Upgrades_UnitShieldDef(unitID))
-	if ((shieldUnitDefID[unitDefID] and not UnitDefs[unitDefID].customParams.dynamic_comm) or commShieldID) and not unitMap[unitID] then
+	local commShieldDefID = GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID)
+	if ((shieldUnitDefID[unitDefID] and not UnitDefs[unitDefID].customParams.dynamic_comm) or commShieldDefID) and not unitMap[unitID] then
 		local def = shieldUnitDefID[unitDefID]
-		if commShieldID then
-			def = select(3, GG.Upgrades_UnitShieldDef(unitID))
+		if commShieldDefID then
+			def = shieldCommWeaponDefID[commShieldDefID]
 			if not def then
 				return
 			end
@@ -203,7 +225,6 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		if def.startPower then
 			spSetUnitShieldState(unitID, shieldNum, def.startPower)
 		end
-		
 		unitCount = unitCount + 1
 		local data = {
 			unitID = unitID,

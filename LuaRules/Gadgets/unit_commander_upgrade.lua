@@ -50,14 +50,6 @@ local commanderCloakShieldDef = {
 }
 
 local COMMANDER_JAMMING_COST = 1.5
-local commAreaShield = WeaponDefNames["shieldshield_cor_shield_small"]
-
-local commAreaShieldDefID = {
-	maxCharge = commAreaShield.shieldPower,
-	perUpdateCost = 2*tonumber(commAreaShield.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
-	chargePerUpdate = 2*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
-	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
-}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -710,12 +702,7 @@ end
 function GG.Upgrades_UnitShieldDef(unitID)
 	local shieldDefID = (unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) or false
 	local shieldNum = (unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num")) or false
-	local shieldDef = false
-	if shieldDefID and WeaponDefs[shieldDefID].shieldRadius > 200 then
-		shieldDef = commAreaShieldDefID
-	end
-
-	return shieldDefID, shieldNum, shieldDef
+	return shieldDefID, shieldNum
 end
 
 function GG.Upgrades_UnitCanCloak(unitID)
