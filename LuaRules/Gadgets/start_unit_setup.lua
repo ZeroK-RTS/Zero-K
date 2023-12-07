@@ -311,35 +311,32 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 		nz = z + offsetZ
 		ny = Spring.GetGroundHeight(nx, nz)
 		canDropHere = CanUnitDropHere(startBoxID, unitDefID, nx, ny, nz, facing, false, true)
-		if not canDropHere then 
-			if movesLeft == 0 and not (mag == 8 and movesLeft == 0 and dir == 4) then 
-				spiralChangeNumber = spiralChangeNumber + 1
-				if spiralChangeNumber%3 == 0 then 
-					mag = mag + 1
-				end
-				movesLeft = mag
-				dir = dir%4 + 1
-			elseif mag == 8 and movesLeft == 0 and dir == 4 then -- abort
-				aborted = true 
-			else -- move to the next offset
-				if dir == 1 then
-					offsetX = offsetX + radius
-				elseif dir == 2 then
-					offsetZ = offsetZ + radius
-				elseif dir == 3 then
-					offsetX = offsetX - radius
-				elseif dir == 4 then
-					offsetZ = offsetZ - radius
-				end
-				movesLeft = movesLeft - 1
+		if canDropHere then
+			return nx, ny, nz
+		end
+		if movesLeft == 0 and not (mag == 8 and movesLeft == 0 and dir == 4) then 
+			spiralChangeNumber = spiralChangeNumber + 1
+			if spiralChangeNumber%3 == 0 then 
+				mag = mag + 1
 			end
+			movesLeft = mag
+			dir = dir%4 + 1
+		elseif mag == 8 and movesLeft == 0 and dir == 4 then -- abort
+			aborted = true 
+		else -- move to the next offset
+			if dir == 1 then
+				offsetX = offsetX + radius
+			elseif dir == 2 then
+				offsetZ = offsetZ + radius
+			elseif dir == 3 then
+				offsetX = offsetX - radius
+			elseif dir == 4 then
+				offsetZ = offsetZ - radius
+			end
+			movesLeft = movesLeft - 1
 		end
 	until canDropHere or aborted
-	if canDropHere then
-		return nx, ny, nz
-	else -- aborted: give original position back.
-		return x, Spring.GetGroundHeight(x, z), z
-	end
+	return x, Spring.GetGroundHeight(x, z), z -- aborted, return original position.
 end
 	
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
