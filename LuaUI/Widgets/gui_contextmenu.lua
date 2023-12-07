@@ -653,8 +653,23 @@ local function weapons2Table(cells, ws, unitID)
 		if cp.stats_typical_damage then
 			cells[#cells+1] = ' - Typical Damage:'
 			cells[#cells+1] = numformat(math.floor(tonumber(cp.stats_typical_damage) * comm_mult))
-			cells[#cells+1] = ' - Continual damage while piercing'
-			cells[#cells+1] = ''
+			if cp.thermite_frames then
+				cells[#cells+1] = ' - Projectile lingers on target'
+				cells[#cells+1] = ''
+				cells[#cells+1] = ' - Projectile life:'
+				cells[#cells+1] = numformat(tonumber(cp.thermite_frames)/30) .. "s"
+				if cp.thermite_dps_end then
+					cells[#cells+1] = ' - Damage increases over time'
+					cells[#cells+1] = ''
+					cells[#cells+1] = ' - Initial damage:'
+					cells[#cells+1] = numformat(tonumber(cp.thermite_dps_start)) .. " HP/s"
+					cells[#cells+1] = ' - Final damage:'
+					cells[#cells+1] = numformat(tonumber(cp.thermite_dps_end)) .. " HP/s"
+				end
+			elseif wd.noExplode or cp.pretend_no_explode then
+				cells[#cells+1] = ' - Continual damage while piercing'
+				cells[#cells+1] = ''
+			end
 		end
 
 		if cp.noexplode_speed_damage then
@@ -885,7 +900,7 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ''
 		end
 
-		if wd.noExplode or cp.pretend_no_explode then
+		if (wd.noExplode or cp.pretend_no_explode) and not cp.thermite_frames then
 			cells[#cells+1] = ' - Piercing '
 			cells[#cells+1] = ''
 		end
