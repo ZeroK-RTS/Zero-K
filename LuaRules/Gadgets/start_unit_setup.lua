@@ -302,7 +302,7 @@ local function CanUnitDropHere(unitDefID, x, y, z, facing, checkFeature)
 	end
 end
 
-local function GetAdjustedDropPosition(unitDefID, facing, x, z)
+local function GetClosestValidSpawnSpot(unitDefID, facing, x, z)
 	local radius = 16 -- FIXME: take the actual unit footprint size, perhaps also facing for nota style comms
 	local y = Spring.GetGroundHeight(x, z)
 	local canDropHere = CanUnitDropHere(unitDefID, x, y, z, facing, false)
@@ -367,7 +367,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
-		x, y, z = GetAdjustedDropPosition(startUnit, facing, x, z) -- adjust for new location.
+		x, y, z = GetClosestValidSpawnSpot(startUnit, facing, x, z) -- adjust for new location.
 
 		if CAMPAIGN_SPAWN_DEBUG then
 			local _, aiName = Spring.GetAIInfo(teamID)
