@@ -282,6 +282,50 @@ local function GetStartPos(teamID, teamInfo, isAI)
 	return x, y, z
 end
 
+local offsetGrid = {
+	[1] = {-1, 0},
+	[2] = {-1, -1},
+	[3] = {0, -1},
+	[4] = {1, -1},
+	[5] = {1, 0},
+	[6] = {1, 1},
+	[7] = {0, 1},
+	[8] = {-1, 1},
+}
+
+local function CanUnitDropHere(unitDefID, x, y, z, facing, checkFeature)
+	local blocking, feature = Spring.TestBuildOrder(unitDefID, x, y, z, facing)
+	if checkFeature then
+		return blocking == 3 -- Recoil engine now has 3 for "free", 2 for "blocked by feature"
+	else
+		return blocking > 1
+	end
+end
+
+local function GetAdjustedDropPosition(unitDefID, facing, x, z)
+	local radius = 16
+	local y = Spring.GetGroundHeight(x, z)
+	local canDropHere = CanUnitDropHere(unitDefID, x, y, z, facing, false)
+	if canDropHere then return x, y, z end
+	local mag = 1
+	local index = 1
+	local nx, ny, nz
+	repeat
+		nx = x + (offsetGrid[index][1] * radius * mag)
+		nz = z + (offsetGrid[index][2] * radius * mag)
+		ny = Spring.GetGroundHeight(nx, nz)
+		canDropHere = CanUnitDropHere(unitDefID, nx, ny, nz, facing, false)
+		if not canDropHere then 
+			index = index + 1
+			if index == 9 then
+				index = 1
+				mag = mag + 1
+			end
+		end
+	until canDropHere
+	return nx, ny, nz
+end
+	
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
 	if not teamID then
 		return
@@ -323,6 +367,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
+		x, y, z = GetAdjustedDropPosition(startUnit, facing, x, z) -- adjust for new location.
 
 		if CAMPAIGN_SPAWN_DEBUG then
 			local _, aiName = Spring.GetAIInfo(teamID)
