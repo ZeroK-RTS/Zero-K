@@ -305,6 +305,7 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 	local dir = 1 -- 1: right, 2: up, 3: left, 4 down
 	local nx, ny, nz
 	local offsetX, offsetZ = 0, 0
+	local aborted = false
 	repeat -- 1 right, 1 up, 2 left, 2 down, 3 right, 3 up
 		nx = x + offsetX
 		nz = z + offsetZ
@@ -319,7 +320,7 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 				movesLeft = mag
 				dir = dir%4 + 1
 			elseif mag == 8 and movesLeft == 0 and dir == 4 then -- abort
-				canDropHere = true 
+				aborted = true 
 			else -- move to the next offset
 				if dir == 1 then
 					offsetX = offsetX + radius
@@ -333,8 +334,12 @@ local function GetClosestValidSpawnSpot(teamID, unitDefID, facing, x, z)
 				movesLeft = movesLeft - 1
 			end
 		end
-	until canDropHere
-	return nx, ny, nz
+	until canDropHere or aborted
+	if canDropHere then
+		return nx, ny, nz
+	else -- aborted: give original position back.
+		return x, Spring.GetGroundHeight(x, z), z
+	end
 end
 	
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
