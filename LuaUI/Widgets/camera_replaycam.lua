@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
-		name    = "ReplayCam",
-		desc    = "Pan to and comment on interesting events",
+		name    = "Action Tracking Camera",
+		desc    = "Automated camera for spectator mode",
 		author  = "fiendicus_prime",
 		date    = "2023-11-24",
 		license = "GNU GPL v2",
@@ -10,6 +10,7 @@ function widget:GetInfo()
 	}
 end
 
+local abs = math.abs
 local atan2 = math.atan2
 local cos = math.cos
 local deg = math.deg
@@ -88,18 +89,14 @@ options = {
 		desc = 'Draw a reticle around the units being tracked',
 		type = 'bool',
 		value = false,
-	},
-	disable_tracking = {
-		name = 'Disable tracking',
-		desc = 'Disable camera tracking',
-		type = 'bool',
-		value = false,
+		noHotkey = true,
 	},
 	user_interrupts_tracking = {
 		name = 'Pause tracking on user input',
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	}
 }
 
@@ -1628,7 +1625,7 @@ local function updateCamera(dt, userCameraOverride)
 	local showReticle = display.camType == camTypeTracking
 	camera = { x = cx, y = cy, z = cz, xv = cxv, yv = cyv, zv = czv, rx = crx, rxv = crxv, ry = cry, ryv = cryv, fov = cfov, deferRotationRenderFrames = deferRotationRenderFrames, reticle = showReticle and { xMin, zMin, xMax, zMax } }
 
-	if options.disable_tracking.value or userCameraOverride then
+	if userCameraOverride then
 		return
 	end
 
