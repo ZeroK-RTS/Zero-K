@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name    = "ReplayCam",
 		desc    = "Pan to and comment on interesting events",
-		author  = "moreginger",
+		author  = "fiendicus_prime",
 		date    = "2023-11-24",
 		license = "GNU GPL v2",
 		layer   = 0,
@@ -39,7 +39,6 @@ local spGetCameraState = Spring.GetCameraState
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetHumanName = Spring.Utilities.GetHumanName
-local spGetMapDrawMode = Spring.GetMapDrawMode
 local spGetMouseState = Spring.GetMouseState
 local spGetMovetype = Spring.Utilities.getMovetype
 local spGetPlayerInfo = Spring.GetPlayerInfo
@@ -57,7 +56,6 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetViewGeometry = Spring.GetViewGeometry
 local spIsReplay = Spring.IsReplay
-local spSendCommands = Spring.SendCommands
 local spSetCameraState = Spring.SetCameraState
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
@@ -66,15 +64,13 @@ local Window
 local ScrollPanel
 local screen0
 
-local customCmds                = VFS.Include("LuaRules/Configs/customcmds.lua")
 local CMD_ATTACK = CMD.ATTACK
 local CMD_ATTACK_MOVE = CMD.FIGHT
 local CMD_MOVE = CMD.MOVE
-local CMD_RAW_MOVE = customCmds.RAW_MOVE
+local CMD_RAW_MOVE = VFS.Include("LuaRules/Configs/customcmds.lua").RAW_MOVE
 
 local framesPerSecond = 30
 local gameFrame = 0
-local doToggleLos = true
 
 -- CONFIGURATION
 
@@ -1197,11 +1193,6 @@ function widget:Initialize()
 end
 
 function widget:GameFrame(frame)
-	if doToggleLos and spGetMapDrawMode() == "los" then
-		spSendCommands("togglelos")
-		doToggleLos = false
-	end
-
 	gameFrame = frame
 	unitInfo:update(frame)
 
@@ -1315,7 +1306,11 @@ local moveCommands = {
 	[CMD_RAW_MOVE] = true,
 }
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, _, _)
+    if not unitID or not unitDefID or not unitTeam or not cmdID or not cmdParams then
+		return
+	end
+
 	if not moveCommands[cmdID] and cmdID ~= CMD_ATTACK then
 		return
 	end
@@ -1391,14 +1386,23 @@ local function _updateBuildingEvent(event)
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+function widget:UnitCreated(unitID, unitDefID, unitTeam, _)
+	if not unitID or not unitDefID or not unitTeam then
+		return
+	end
+	
 	local allyTeam = teamInfo[unitTeam].allyTeam
 	local sbjLocation, _, importance, sbjName = unitInfo:watch(unitID, allyTeam, unitDefID)
 	local meta = { sbjUnitID = unitID }
 	addEvent(unitTeam, importance, sbjLocation, meta, sbjName, buildingEventType, unitID, _updateBuildingEvent)
 end
 
-function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+function widget:UnitDamaged(unitID, unitDefID, _, damage, paralyzer, _, _, attackerID, _, attackerTeam)
+	-- attackerID and attackerTeam may be nil and are tolerated
+	if not unitID or not unitDefID or not damage then
+		return
+	end
+
 	if paralyzer then
 		-- Paralyzer weapons deal very high "damage", but it's not as important as real damage
 		damage = damage / 2
@@ -1419,18 +1423,18 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, _, attackerTeam)
+	-- First do some cleanup, if we can
+	if not unitID then
+		return
+	end
+
 	local destroyedLocation, _, importance, destroyedName = unitInfo:get(unitID)
 	unitInfo:forget(unitID)
 	purgeEvents(__purgeSubject, { unitID = unitID })
 
-	if not destroyedLocation or not importance or not destroyedName then
-		-- Might happen if an uncached unit is destroyed and fails to retrieve current location
-		return
-	end
-
-	if not attackerTeam then
-		-- Attempt to ignore cancelled builds and other similar things like comm upgrade
+	if not unitDefID or not unitTeam or not attackerID or not attackerTeam or not destroyedLocation or not importance or not destroyedName then
+		-- Ignore cancelled builds and other similar things like comm upgrade and other calls we don't understand
 		return
 	end
 
@@ -1451,12 +1455,20 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	if not unitID or not unitDefID or not unitTeam then
+		return
+	end
+
 	local allyTeam = teamInfo[unitTeam].allyTeam
 	local sbjLocation, _, importance, sbjName = unitInfo:watch(unitID, allyTeam, unitDefID)
 	addEvent(unitTeam, importance, sbjLocation, nil, sbjName, unitBuiltEventType, unitID)
 end
 
-function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+function widget:UnitTaken(unitID, _, _, newTeam)
+	if not unitID or not newTeam then
+		return
+	end
+
 	-- Note that UnitTaken (and UnitGiven) are both called for both capture and release.
 	local captureController = spGetUnitRulesParam(unitID, "capture_controller");
 	if not captureController or captureController == -1 then
