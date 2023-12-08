@@ -225,7 +225,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
-      underwater         = true,
+      underwater         = false,
       properties = {
         airdrag            = 0.97,
         colormap           = [[0.8 0.6 0 0.01   1 0.7 0.1 0.01   0 0 0 0.01]],
@@ -252,7 +252,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
-      water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         colormap           = [[1.0 0.2 0.2 0.01   0.8 0.1 0.1 0.01   0 0 0 0.01]],
@@ -274,6 +274,38 @@ return {
         texture            = [[plasma]],
       },
     },
+	bubbles_rising = {
+		class              = [[CSimpleParticleSystem]],
+		count              = 1,
+		air                = false,
+		ground             = false,
+		underwater         = true,
+		properties = {
+			airdrag            = [[0.98]],
+			--alwaysvisible      = true,
+			colormap           = [[0.9 0.9 0.9 0.9
+						   0.8 0.8 0.8 0.2
+						   0.8 0.8 0.8 0.1
+						   0 0 0 0]],
+			directional        = true,
+			emitrot            = 45,
+			emitrotspread      = 10,
+			emitvector         = [[0, 1, 0]],
+			gravity            = [[0, 0 d0.1 x0.1, 0]],
+			numparticles       = [[r4]],
+			particlelife       = [[20 d0.5]],
+			particlelifespread = 20,
+			particlesize       = 1,
+			particlesizespread = 3,
+			particlespeed      = 0.3,
+			particlespeedspread = 1,
+			pos                = [[-5 r10, -5 r10, -5 r10]],
+			sizegrowth         = [[0.3 r0.2]],
+			sizemod            = [[0.98 r0.01]],
+			texture            = [[randdots]],
+			useairlos          = false,
+		},
+	},
   },
 }
 
