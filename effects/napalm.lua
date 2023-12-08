@@ -369,11 +369,11 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 1,
+      count              = 3,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i10]],
+        delay              = [[0 i2]],
         explosiongenerator = [[custom:NAPALMFIREBALL_45]],
         pos                = [[-10 r10, 25, -10 r10]],
       },
@@ -637,14 +637,17 @@ local altforms = {
     modifications = {
       rocks = {
       properties = {
-        particlelife = 35,
+        emitrot            = 90,
+        emitrotspread      = 90,
+        particlelife       = 35,
         particlelifespread = 12,
-        particlesize       = 50,
+        particlesize       = 35,
         particlesizespread = 16,
-        particlespeed      = 0.2,
+        particlespeed      = 0.4,
         particlespeedspread = 0.2,
-        colormap           = [[0.2 0.2 0.2 0.15   0.4 0.4 0.4 0.1    0.6 0.6 0.6 0.1    0.5 0.5 0.5 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
-		},
+        sizegrowth         = 0.45,
+        colormap           = [[0.2 0.2 0.2 0.15   0.3 0.3 0.3 0.1    0.4 0.4 0.4 0.1    0.45 0.45 0.45 0.1    0.35 0.35 0.2 0.12     0.2 0.2 0.2 0.15    0 0 0 0]],
+        },
       },
     },
   },
