@@ -654,7 +654,7 @@ local function weapons2Table(cells, ws, unitID)
 			cells[#cells+1] = ' - Typical Damage:'
 			cells[#cells+1] = numformat(math.floor(tonumber(cp.stats_typical_damage) * comm_mult))
 			if cp.thermite_frames then
-				cells[#cells+1] = ' - Lingers when interrupted by obstacles'
+				cells[#cells+1] = ' - Lingers when blocked by obstacles'
 				cells[#cells+1] = ''
 				cells[#cells+1] = ' - Projectile life:'
 				cells[#cells+1] = numformat(tonumber(cp.thermite_frames)/30) .. "s"
