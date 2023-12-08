@@ -367,7 +367,7 @@ for i=1,#UnitDefs do
 		local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 		if unitDef.customParams.commtype == "1" then
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={pos={0.3*s,1.1*s,-6 - 3*s}, emitVector={-1,0,-0.08}, width=3.6*s, height=6.2*s, ballSize=0.9*s, piece="Head"}},
+				{class='SantaHat', options={pos={0.3*s,1.1*s,-3.5 - 3*s}, emitVector={-1,0,-0.08}, width=3.6*s, height=6.2*s, ballSize=0.7*s, piece="Head"}},
 			}
 		elseif unitDef.customParams.commtype == "2" then
 			effectUnitDefsXmas[unitDef.name] = {
@@ -375,7 +375,7 @@ for i=1,#UnitDefs do
 			}
 		elseif unitDef.customParams.commtype == "3" then
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.5*s, height=6*s, ballSize=0.7*s, piece="head"}},
+				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.3*s}, emitVector={0.7,1.6,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "4" then
 			effectUnitDefsXmas[unitDef.name] = {

@@ -47,7 +47,7 @@ function SantaHat:BeginDraw()
 	gl.DepthMask(true)
 	gl.Lighting(true)
 	gl.Light(0, true )
-	gl.Light(0, GL.POSITION, gl.GetSun() )
+	--gl.Light(0, GL.POSITION, gl.GetSun() )
 	gl.Light(0, GL.AMBIENT, gl.GetSun("ambient","unit") )
 	gl.Light(0, GL.DIFFUSE, gl.GetSun("diffuse","unit") )
 	gl.Light(0, GL.SPECULAR, gl.GetSun("specular") )
@@ -65,7 +65,7 @@ function SantaHat:Draw()
 	--gl.Color(self.color)
 	local color = self.color
 	gl.Material({
-		ambient   = {color[1]*0.5,color[2]*0.5,color[3]*0.5,color[4]},
+		ambient   = {color[1]*0.68,color[2]*0.68,color[3]*0.68,color[4]},
 		diffuse   = color,
 		specular  = {1,1,1,1},
 		shininess = 65,
