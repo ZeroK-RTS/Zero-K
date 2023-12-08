@@ -93,6 +93,7 @@ local ARM_SIDE_ANGLE = math.rad(5)
 
 local isFiring = false
 local isFiringBeam = false
+local resetRestore = false
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
@@ -103,12 +104,38 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function DoRestore()
+	Turn(head, y_axis, 0, 3)
+	Turn(torso, y_axis, 0, 3)
+	Turn(larm, x_axis, 0, 3)
+	Turn(rarm, x_axis, 0, 3)
+	isFiring = false
+end
+
+local function RestoreAfterDelay()
+	local counter = 6
+	while true do
+		if counter > 0 then
+			counter = counter - 1
+		end
+		if resetRestore then
+			resetRestore = false
+			counter = 6
+		end
+		if counter == 0 then
+			DoRestore()
+		end
+		Sleep(1000)
+	end
+end
+
 function script.Create()
 	Turn(larm, z_axis, -0.1)
 	Turn(rarm, z_axis, 0.1)
 	Turn(lmissileflare, z_axis, math.rad(-90))
 	Turn(rmissileflare, z_axis, math.rad(-90))
 	StartThread(GG.Script.SmokeUnit, unitID, smokePiece)
+	StartThread(RestoreAfterDelay)
 end
 
 local function IdleAnim()
@@ -250,19 +277,6 @@ function script.StopMoving()
 end
 
 
-local function RestoreAfterDelay()
-	Signal(SIG_Restore)
-	SetSignalMask(SIG_Restore)
-	Sleep(6000)
-	Turn(head, y_axis, 0, 3)
-	Turn(torso, y_axis, 0, 3)
-	Turn(larm, x_axis, 0, 3)
-	Turn(rarm, x_axis, 0, 3)
-	isFiring = false
-	StartThread(IdleAnim)
-end
-
-
 local function missilelaunch()
 	Hide (lmissiles)
 	Hide (rmissiles)
@@ -347,7 +361,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(headflare, x_axis, -pitch, HEAD_AIM_SPEED)
 		WaitForTurn(head, y_axis)
 		WaitForTurn(headflare, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	elseif num == 2 then
 		Signal(SIG_Aim2)
@@ -359,7 +373,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rarm, x_axis, -pitch, ARM_AIM_SPEED)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
-		StartThread(RestoreAfterDelay)
+		resetRestore = true
 		return true
 	elseif num == 3 then
 		return true
