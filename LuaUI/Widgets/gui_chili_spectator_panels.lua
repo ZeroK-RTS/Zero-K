@@ -127,7 +127,7 @@ ShowOptions = {ShowOptions}
 --------------------------------------------------------------------------------
 -- Options
 
-options_path = 'Settings/Interface/Spectating/Economy Panels'
+options_path = 'Settings/Spectating/Team Information Panels'
 
 options_order = {
 	'enableSpectator',

@@ -27,7 +27,7 @@ local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
 local selName, selPath = "Chili Selections & CursorTip v2", "Settings/HUD Panels/Selected Units Panel"
 local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
-local specName, specPath = "Chili Spectator Panels", "Settings/Interface/Spectating/Economy Panels"
+local specName, specPath = "Chili Spectator Panels", "Settings/Spectating/Economy Panels"
 local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Extras/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)

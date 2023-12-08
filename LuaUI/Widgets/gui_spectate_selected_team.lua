@@ -21,7 +21,7 @@ local team
 
 local SelectNextPlayer = function() end
 
-options_path = 'Settings/Interface/Spectating'
+options_path = 'Settings/Spectating/Player View'
 options_order = {'followNextPlayer','specviewselection',}
 options={
 	followNextPlayer = {
@@ -32,11 +32,11 @@ options={
 	},
 	specviewselection = {
 		type='radioButton',
-		name='Spectator View Type',
+		name='View and Selection Restriction',
 		items = {
 			{name = 'Chosen player only',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
 			{name = 'Full vision',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},
-			{name = 'Full selection, current vision',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
+			{name = 'Player vision with full selection',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
 			{name = 'Full vision and selection',key='viewallselectany', desc="Unlimited line of sight, and you can select any unit.", hotkey=nil},
 		},
 		value = 'viewallselectany',

@@ -5,7 +5,7 @@ function widget:GetInfo()
 		author  = "moreginger",
 		date    = "2023-11-24",
 		license = "GNU GPL v2",
-		--layer        = 0,
+		layer   = 0,
 		enabled = false
 	}
 end
@@ -83,14 +83,13 @@ local logging = LOG_ERROR
 local updateIntervalFrames = framesPerSecond
 local defaultFov, defaultRx, defaultRy = 45, -1.0, pi
 
-options_path = 'Settings/Camera/ReplayCam'
+options_path = 'Settings/Spectating/Action Tracking Camera'
 options = {
 	tracking_reticle = {
 		name = 'Show tracking reticle',
 		desc = 'Draw a reticle around the units being tracked',
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	},
 	disable_tracking = {
 		name = 'Disable tracking',
@@ -103,7 +102,6 @@ options = {
 		desc = 'Pause camera tracking when the user moves the mouse etc',
 		type = 'bool',
 		value = true,
-		noHotkey = true,
 	}
 }
 

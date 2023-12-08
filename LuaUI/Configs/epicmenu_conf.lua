@@ -175,14 +175,15 @@ confdata.subMenuIcons = {
 	['Settings/HUD Presets']        = imgPath..'epicmenu/speed-test-icon.png',
 	['Settings/Interface']          = imgPath..'epicmenu/robotarm.png',
 	['Settings/Misc']               = imgPath..'epicmenu/misc.png',
-	['Settings/Tips']    = imgPath..'epicmenu/questionmark.png',
+	['Settings/Tips']               = imgPath..'epicmenu/questionmark.png',
+	['Settings/Spectating']         = imgPath..'epicmenu/popcorn.png',
+	['Settings/Toolbox']            = imgPath..'commands/states/autoassist_on.png',
 	
 	['Settings/Interface/Mouse Cursor']             = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map']                      = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars']               = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones']            = imgPath..'commands/Bold/retreat.png',
 	['Settings/Interface/Reclaim Highlight']        = imgPath..'epicmenu/reclaimfield.png',
-	['Settings/Interface/Spectating']               = imgPath..'epicmenu/popcorn.png',
 	['Settings/Interface/Building Placement']       = imgPath..'factory.png',
 	['Settings/Interface/Team Colors']              = imgPath..'map/minimap_colors_simple.png',
 	['Settings/Interface/Common Team Colors']       = imgPath..'map/minimap_colors_simple.png',
@@ -198,7 +199,6 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Falling Units']            = imgPath..'advplayerslist/point2.png',
 	['Settings/Interface/Commands']                 = imgPath..'commands/bold/attack.png',
 	['Settings/Interface/Missile Warnings']         = imgPath..'nuke_button_48.png',
-	
 	
 	['Settings/HUD Panels/Minimap']                 = imgPath..'epicmenu/map.png',
 	['Settings/HUD Panels/Economy Panel']           = imgPath..'ibeam.png',
@@ -217,6 +217,10 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Stats Graph']             = imgPath..'graphs_icon.png',
 	['Settings/HUD Panels/Global Commands']         = imgPath..'planetQuestion.png',
 	['Settings/HUD Panels/Extras']                  = imgPath..'plus_green.png',
+	
+	['Settings/Spectating/Action Tracking Camera']  = imgPath..'epicmenu/video_camera.png',
+	['Settings/Spectating/Team Information Panels'] = imgPath..'epicmenu/corcommander.png',
+	['Settings/Spectating/Player View']             = imgPath..'advplayerslist/spec.png',
 }
 
 confdata.simpleModeDirectory = {
@@ -411,9 +415,15 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	})
 	ShButton(HUDSkinPath, 'Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.', true)
 
+--- Spectating --- anything that's an interface but not a HUD Panel
+local pathSpectating = 'Settings/Spectating'
+	ShButton(pathSpectating .. "/Action Tracking Camera", 'Toggle Action Camera', function() spSendCommands{"luaui togglewidget ReplayCam"} end, "Toggles an automatic action tracking camera. Only activates for non-players.")
 
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
+
+
+
 local pathMouse = 'Settings/Interface/Mouse Cursor'
 	AddOption(pathMouse,
 	{
@@ -449,6 +459,9 @@ local pathToolbox = 'Settings/Toolbox'
   - Press S to print the current boxes to infolog.txt.
   - Press D to delete the most recently placed box.
   - Hold Ctrl to snap to cardinal directions.]])
+
+	
+	ShButton(pathToolbox, 'Toggle Economy Announcer', function() spSendCommands{"luaui togglewidget Economic Victory Announcer v2"} end, "Toggles a widget that tracks team economies and announces 'victory' in chat, for certain manually run tournament games.")
 
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 local pathMisc = 'Settings/Misc'
@@ -813,6 +826,7 @@ local pathTips = 'Settings/Tips'
 	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
 local pathClippy = 'Settings/Tips/Clippy Comments'
 	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
+
 
 --- MISC
 --

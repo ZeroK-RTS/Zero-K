@@ -1,12 +1,12 @@
 function widget:GetInfo()
 	return {
-		name      = "Economic Victory Announcer",
+		name      = "Economic Victory Announcer v2",
 		desc      = "Announces when a team has won a victory simply by owning more stuff.",
 		author    = "GoogleFrog",
 		date      = "25 May, 2016",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true --  loaded by default?
+		enabled   = false --  loaded by default?
 	}
 end
 
@@ -29,7 +29,7 @@ end
 
 local enabled = false
 
-options_path = 'Settings/Interface/Spectating/Econ. Announcer'
+options_path = 'Settings/Toolbox/Economy Announcer'
 
 options_order = {
 	'enable',
