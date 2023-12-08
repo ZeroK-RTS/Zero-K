@@ -33,9 +33,11 @@ local glPolygonMode = gl.PolygonMode
 local glRect = gl.Rect
 
 local spEcho = Spring.Echo
+local spGetAIInfo = Spring.GetAIInfo
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spGetCameraPosition = Spring.GetCameraPosition
 local spGetCameraState = Spring.GetCameraState
+local spGetGaiaTeamID = Spring.GetGaiaTeamID
 local spGetGameRulesParam = Spring.GetGameRulesParam
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetHumanName = Spring.Utilities.GetHumanName
@@ -1140,6 +1142,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 
 	-- Init teams.
+    local gaiaTeamID = spGetGaiaTeamID()
 	teamInfo = {}
 	local teamCount = 0
 	local allyTeams = spGetAllyTeamList()
@@ -1152,11 +1155,17 @@ function widget:Initialize()
 		end
 
 		for _, teamID in pairs(teamList) do
-			local teamLeader = nil
-			_, teamLeader = spGetTeamInfo(teamID)
-			local teamName = "unknown"
-			if teamLeader then
+			local teamName
+            if teamID == gaiaTeamID then
+                teamName = "Gaia"
+            else
+                local _, teamLeader, _, isAI = spGetTeamInfo(teamID)
+                if isAI then
+                    local _, name = spGetAIInfo(teamID)
+                    teamName = name
+                else
 				teamName = spGetPlayerInfo(teamLeader)
+                end
 			end
 			teamInfo[teamID] = {
 				allyTeam = allyTeam,
@@ -1455,7 +1464,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, _, attack
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if not unitID or not unitDefID or not unitTeam then
+if not unitID or not unitDefID or not unitTeam then
 		return
 	end
 
@@ -1465,7 +1474,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitTaken(unitID, _, _, newTeam)
-	if not unitID or not newTeam then
+if not unitID or not newTeam then
 		return
 	end
 
@@ -1638,7 +1647,7 @@ end
 function widget:Update(dt)
 	local mx, my = spGetMouseState()
 	local newMouseLocation = { mx, 0, my }
-  if distance(newMouseLocation, lastMouseLocation) ~= 0 then
+    if distance(newMouseLocation, lastMouseLocation) ~= 0 then
 		lastMouseLocation = newMouseLocation
 		userAction()
 	end
