@@ -127,7 +127,7 @@ ShowOptions = {ShowOptions}
 --------------------------------------------------------------------------------
 -- Options
 
-options_path = 'Settings/HUD Panels/Spectator Panels'
+options_path = 'Settings/Interface/Spectating/Economy Panels'
 
 options_order = {
 	'enableSpectator',
@@ -159,7 +159,7 @@ options = {
 			local enabled = option_CheckEnable(self)
 			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", enabled)
 		end,
-		desc = "Enables the spectator resource bars when spectating a game with two teams."
+		desc = "Automatically enables the spectator panels and disables the player resource bar when spectating."
 	},
 	clanNameLengthCutoff = {
 		name  = "Max Clan Name Length",

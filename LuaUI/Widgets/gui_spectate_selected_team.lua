@@ -26,18 +26,18 @@ options_order = {'followNextPlayer','specviewselection',}
 options={
 	followNextPlayer = {
 		name = "Select Next Player",
-		desc = "Quickly select next player. Is useful when spectating using COFC's Follow Player Cursor mode & when this button is hotkeyed.",
+		desc = "Quickly select next player. Hotkey this button.",
 		type = 'button',
 		OnChange = function(self) SelectNextPlayer() end,
 	},
 	specviewselection = {
 		type='radioButton',
-		name='Spectator View Selection',
+		name='Spectator View Type',
 		items = {
-			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
-			{name = 'View All',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},
-			{name = 'Select Any Unit',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
-			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line of sight, and you can select any unit.", hotkey=nil},
+			{name = 'Chosen player only',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
+			{name = 'Full vision',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},
+			{name = 'Full selection, current vision',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
+			{name = 'Full vision and selection',key='viewallselectany', desc="Unlimited line of sight, and you can select any unit.", hotkey=nil},
 		},
 		value = 'viewallselectany',
 		OnChange = function(self)
