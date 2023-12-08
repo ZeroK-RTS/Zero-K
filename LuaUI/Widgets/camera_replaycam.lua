@@ -60,6 +60,7 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetViewGeometry = Spring.GetViewGeometry
 local spIsReplay = Spring.IsReplay
 local spSetCameraState = Spring.SetCameraState
+local spSetMouseCursor = Spring.SetMouseCursor
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 
 local Chili
@@ -81,6 +82,8 @@ local LOG_ERROR, LOG_DEBUG = 1, 2
 local logging = LOG_ERROR
 local updateIntervalFrames = framesPerSecond
 local defaultFov, defaultRx, defaultRy = 45, -1.0, pi
+-- Time until we think the user is watching, not playing
+local userInactiveSecondsThreshold = 2
 
 options_path = 'Settings/Spectating/Action Tracking Camera'
 options = {
@@ -979,7 +982,7 @@ local mapEdgeBorder = worldGridSize * 0.5
 local keepTrackingRange = worldGridSize * 2
 
 local display, initialCameraState, camera
-local userCameraOverrideFrame, lastMouseLocation = -1000, { -1, 0, -1 }
+local userInactiveSeconds, lastMouseLocation = 0, { -1, 0, -1 }
 
 local function initCamera(cx, cy, cz, rx, ry, type)
 	return { x = cx, y = cy, z = cz, xv = 0, yv = 0, zv = 0, rx = rx, rxv = 0, ry = ry, ryv = 0, fov = defaultFov, type = type }
@@ -1255,8 +1258,7 @@ end
 
 local function userAction()
 	if options.user_interrupts_tracking.value then
-		-- Override camera movements for a short time.
-		userCameraOverrideFrame = gameFrame + framesPerSecond
+		userInactiveSeconds = 0
 	end
 end
 
@@ -1648,7 +1650,11 @@ function widget:Update(dt)
 		lastMouseLocation = newMouseLocation
 		userAction()
 	end
-	updateCamera(dt, userCameraOverrideFrame >= gameFrame)
+	userInactiveSeconds = userInactiveSeconds + dt
+	if userInactiveSeconds > userInactiveSecondsThreshold then
+		spSetMouseCursor('none')
+	end
+	updateCamera(dt, userInactiveSeconds < userInactiveSecondsThreshold)
 end
 
 function widget:DrawScreen()
