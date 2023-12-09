@@ -10,7 +10,7 @@ function widget:GetInfo()
 		date      = "25 November 2023",
 		license   = "PD",
 		layer     = 1,
-		enabled   = true  --  loaded by default?
+		enabled   = false  --  loaded by default?
 	}
 end
 
