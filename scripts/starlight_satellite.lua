@@ -77,6 +77,7 @@ local function Undock()
 	end
 end
 
+local cutterCycle = 1
 local function EmitShot()
 	if not parentUnitID then
 		return
@@ -94,7 +95,12 @@ local function EmitShot()
 		EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W1)
 		shooting = shooting - 1
 	else
-		EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
+		if cutterCycle == 0 then
+			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W2)
+		else
+			EmitSfx(SatelliteMuzzle, GG.Script.FIRE_W3)
+		end
+		cutterCycle = (cutterCycle + 1)%5
 	end
 end
 

@@ -57,6 +57,10 @@ return { starlight_satellite = {
       def                = [[CUTTER]],
       onlyTargetCategory = [[NONE]],
     },
+    {
+      def                = [[NON_CUTTER]],
+      onlyTargetCategory = [[NONE]],
+    },
   },
 
 
@@ -124,8 +128,54 @@ return { starlight_satellite = {
       avoidGround             = false,
       beamTime                = 1/30,
       coreThickness           = 0.5,
-      craterBoost             = 4,
-      craterMult              = 8,
+      craterBoost             = 30,
+      craterMult              = 30,
+
+      customParams              = {
+        light_color = [[3 0.2 4]],
+        light_radius = 1200,
+        light_beam_start = 0.8,
+      },
+      
+      damage                  = {
+        default = 150,
+      },
+
+      explosionGenerator      = [[custom:FLASHLAZER]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 12,
+      minIntensity            = 1,
+      range                   = 10500,
+      reloadtime              = 20,
+      rgbColor                = [[0.25 0 1]],
+      scrollSpeed             = 8,
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 50,
+      tolerance               = 65536,
+      tileLength              = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+    },
+    NON_CUTTER    = {
+      name                    = [[Groovecutter]],
+      alwaysVisible           = 0,
+      areaOfEffect            = 140,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      avoidGround             = false,
+      beamTime                = 1/30,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       customParams              = {
         light_color = [[3 0.2 4]],
